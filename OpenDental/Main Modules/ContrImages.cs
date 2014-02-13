@@ -736,6 +736,12 @@ namespace OpenDental {
 		///<summary></summary>
 		public void ModuleUnselected() {
 			FamCur=null;
+			foreach(Control c in this.Controls) {
+				if(c.GetType()==typeof(AxAcroPDFLib.AxAcroPDF)) {
+					Controls.Remove(c);
+					c.Dispose();
+				}
+			}
 			//Cancel current image capture.
 			xRayImageController.KillXRayThread();
 			Plugins.HookAddCode(this,"ContrImages.ModuleUnselected_end");
