@@ -2,26 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data;
 using System.IO;
-using System.Globalization;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
-using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDentBusiness{
 	///<summary>An email message is always attached to a patient.</summary>
 	public class EmailMessages{
-
 		///<summary>Used to cache DirectAgent objects, because creating a new DirectAgent object takes up to 10 seconds. If we did not cache, then inbox load would be slow and so would Direct message sending.</summary>
 		private static Hashtable HashDirectAgents=new Hashtable();
 		private static object _lockEmailReceive=new object();
@@ -43,11 +37,8 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets all inbox email messages where EmailMessage.RecipientAddress==emailAddressInbox OR EmailMessage.ProvNumWebMail==provNum.</summary>
 		public static List<EmailMessage> GetInboxForAddress(string emailAddressInbox,long provNum) {
-			if(emailAddressInbox==null) {
-				emailAddressInbox="";//no email address configured
-			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List <EmailMessage>>(MethodBase.GetCurrentMethod(),emailAddressInbox);
+				return Meth.GetObject<List<EmailMessage>>(MethodBase.GetCurrentMethod(),emailAddressInbox,provNum);
 			}
 			string command="SELECT * FROM emailmessage "
 				+"WHERE SentOrReceived IN ("
