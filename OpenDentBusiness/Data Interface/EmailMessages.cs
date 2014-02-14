@@ -43,6 +43,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets all inbox email messages where EmailMessage.RecipientAddress==emailAddressInbox OR EmailMessage.ProvNumWebMail==provNum.</summary>
 		public static List<EmailMessage> GetInboxForAddress(string emailAddressInbox,long provNum) {
+			if(emailAddressInbox==null) {
+				emailAddressInbox="";//no email address configured
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List <EmailMessage>>(MethodBase.GetCurrentMethod(),emailAddressInbox);
 			}
