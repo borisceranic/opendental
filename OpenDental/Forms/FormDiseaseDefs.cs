@@ -251,7 +251,7 @@ namespace OpenDental{
 				for(int i=0;i<DiseaseDefs.ListLong.Length;i++) {
 					row=new ODGridRow();
 					row.Cells.Add(DiseaseDefs.ListLong[i].ICD9Code);
-					row.Cells.Add(DiseaseDefs.List[i].Icd10Code);
+					row.Cells.Add(DiseaseDefs.ListLong[i].Icd10Code);
 					row.Cells.Add(DiseaseDefs.ListLong[i].SnomedCode);
 					row.Cells.Add(DiseaseDefs.ListLong[i].DiseaseName);
 					row.Cells.Add(DiseaseDefs.ListLong[i].IsHidden?"X":"");
