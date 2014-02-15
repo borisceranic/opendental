@@ -68,6 +68,7 @@ namespace OpenDentBusiness.Crud{
 				hL7Def.ShowDemographics     = (HL7ShowDemographics)PIn.Int(table.Rows[i]["ShowDemographics"].ToString());
 				hL7Def.ShowAppts            = PIn.Bool  (table.Rows[i]["ShowAppts"].ToString());
 				hL7Def.ShowAccount          = PIn.Bool  (table.Rows[i]["ShowAccount"].ToString());
+				hL7Def.IsQuadAsToothNum     = PIn.Bool  (table.Rows[i]["IsQuadAsToothNum"].ToString());
 				retVal.Add(hL7Def);
 			}
 			return retVal;
@@ -108,7 +109,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="HL7DefNum,";
 			}
-			command+="Description,ModeTx,IncomingFolder,OutgoingFolder,IncomingPort,OutgoingIpPort,FieldSeparator,ComponentSeparator,SubcomponentSeparator,RepetitionSeparator,EscapeCharacter,IsInternal,InternalType,InternalTypeVersion,IsEnabled,Note,HL7Server,HL7ServiceName,ShowDemographics,ShowAppts,ShowAccount) VALUES(";
+			command+="Description,ModeTx,IncomingFolder,OutgoingFolder,IncomingPort,OutgoingIpPort,FieldSeparator,ComponentSeparator,SubcomponentSeparator,RepetitionSeparator,EscapeCharacter,IsInternal,InternalType,InternalTypeVersion,IsEnabled,Note,HL7Server,HL7ServiceName,ShowDemographics,ShowAppts,ShowAccount,IsQuadAsToothNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(hL7Def.HL7DefNum)+",";
 			}
@@ -133,7 +134,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7Def.HL7ServiceName)+"',"
 				+    POut.Int   ((int)hL7Def.ShowDemographics)+","
 				+    POut.Bool  (hL7Def.ShowAppts)+","
-				+    POut.Bool  (hL7Def.ShowAccount)+")";
+				+    POut.Bool  (hL7Def.ShowAccount)+","
+				+    POut.Bool  (hL7Def.IsQuadAsToothNum)+")";
 			if(hL7Def.Note==null) {
 				hL7Def.Note="";
 			}
@@ -170,7 +172,8 @@ namespace OpenDentBusiness.Crud{
 				+"HL7ServiceName       = '"+POut.String(hL7Def.HL7ServiceName)+"', "
 				+"ShowDemographics     =  "+POut.Int   ((int)hL7Def.ShowDemographics)+", "
 				+"ShowAppts            =  "+POut.Bool  (hL7Def.ShowAppts)+", "
-				+"ShowAccount          =  "+POut.Bool  (hL7Def.ShowAccount)+" "
+				+"ShowAccount          =  "+POut.Bool  (hL7Def.ShowAccount)+", "
+				+"IsQuadAsToothNum     =  "+POut.Bool  (hL7Def.IsQuadAsToothNum)+" "
 				+"WHERE HL7DefNum = "+POut.Long(hL7Def.HL7DefNum);
 			if(hL7Def.Note==null) {
 				hL7Def.Note="";
@@ -265,6 +268,10 @@ namespace OpenDentBusiness.Crud{
 			if(hL7Def.ShowAccount != oldHL7Def.ShowAccount) {
 				if(command!=""){ command+=",";}
 				command+="ShowAccount = "+POut.Bool(hL7Def.ShowAccount)+"";
+			}
+			if(hL7Def.IsQuadAsToothNum != oldHL7Def.IsQuadAsToothNum) {
+				if(command!=""){ command+=",";}
+				command+="IsQuadAsToothNum = "+POut.Bool(hL7Def.IsQuadAsToothNum)+"";
 			}
 			if(command==""){
 				return;

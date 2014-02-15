@@ -57,6 +57,7 @@ namespace OpenDental{
 		private Label label10;
 		private TextBox textMedPanelURL;
 		private Label label11;
+		private CheckBox checkQuadAsToothNum;
 		private Label labelHL7FolderIn;
 
 		///<summary></summary>
@@ -129,6 +130,7 @@ namespace OpenDental{
 			this.label10 = new System.Windows.Forms.Label();
 			this.textMedPanelURL = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
+			this.checkQuadAsToothNum = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -141,7 +143,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(563, 506);
+			this.butCancel.Location = new System.Drawing.Point(563, 527);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -156,7 +158,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(482, 506);
+			this.butOK.Location = new System.Drawing.Point(482, 527);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -359,7 +361,7 @@ namespace OpenDental{
 			this.butDiagnostic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDiagnostic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDiagnostic.CornerRadius = 4F;
-			this.butDiagnostic.Location = new System.Drawing.Point(299, 506);
+			this.butDiagnostic.Location = new System.Drawing.Point(299, 527);
 			this.butDiagnostic.Name = "butDiagnostic";
 			this.butDiagnostic.Size = new System.Drawing.Size(90, 24);
 			this.butDiagnostic.TabIndex = 61;
@@ -462,9 +464,7 @@ namespace OpenDental{
 			this.labelDefEnabledWarning.Name = "labelDefEnabledWarning";
 			this.labelDefEnabledWarning.Size = new System.Drawing.Size(569, 32);
 			this.labelDefEnabledWarning.TabIndex = 72;
-			this.labelDefEnabledWarning.Text = "An HL7Def is enabled.  The HL7 Server, HL7 Service Name, and HL7 Synch Folders ar" +
-    "e set in that definition.  Message processing is also handled using the specific" +
-    "ations in that definition.";
+			this.labelDefEnabledWarning.Text = resources.GetString("labelDefEnabledWarning.Text");
 			this.labelDefEnabledWarning.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.labelDefEnabledWarning.Visible = false;
 			// 
@@ -493,11 +493,23 @@ namespace OpenDental{
 			this.label11.Text = "Medical Panel URL";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// checkQuadAsToothNum
+			// 
+			this.checkQuadAsToothNum.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkQuadAsToothNum.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkQuadAsToothNum.Location = new System.Drawing.Point(23, 497);
+			this.checkQuadAsToothNum.Name = "checkQuadAsToothNum";
+			this.checkQuadAsToothNum.Size = new System.Drawing.Size(199, 18);
+			this.checkQuadAsToothNum.TabIndex = 76;
+			this.checkQuadAsToothNum.Text = "Send Quadrant as Tooth Number";
+			this.checkQuadAsToothNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormEClinicalWorks
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(650, 542);
+			this.ClientSize = new System.Drawing.Size(650, 563);
+			this.Controls.Add(this.checkQuadAsToothNum);
 			this.Controls.Add(this.textMedPanelURL);
 			this.Controls.Add(this.label11);
 			this.Controls.Add(this.label8);
@@ -556,6 +568,7 @@ namespace OpenDental{
 				textHL7FolderIn.ReadOnly=true;
 				textHL7FolderOut.ReadOnly=true;
 				labelDefEnabledWarning.Visible=true;
+				checkQuadAsToothNum.Enabled=false;
 			}
 		}
 
@@ -574,12 +587,14 @@ namespace OpenDental{
 				textHL7ServiceName.Text=def.HL7ServiceName;
 				textHL7FolderIn.Text=def.OutgoingFolder;//because these are the opposite of the way they are in the HL7Def
 				textHL7FolderOut.Text=def.IncomingFolder;
+				checkQuadAsToothNum.Checked=def.IsQuadAsToothNum;
 			}
 			else {
 				textHL7Server.Text=GetProp("HL7Server");
 				textHL7ServiceName.Text=GetProp("HL7ServiceName");
 				textHL7FolderIn.Text=PrefC.GetString(PrefName.HL7FolderIn);
 				textHL7FolderOut.Text=PrefC.GetString(PrefName.HL7FolderOut);
+				checkQuadAsToothNum.Checked=GetProp("IsQuadAsToothNum")=="1";//if a def is enabled, the value associated with the def will override this setting
 			}
 			textODServer.Text=MiscData.GetODServer();
 			comboDefaultUserGroup.Items.Clear();
@@ -618,6 +633,7 @@ namespace OpenDental{
 				textHL7FolderIn.ReadOnly=true;
 				textHL7FolderOut.ReadOnly=true;
 				labelDefEnabledWarning.Visible=true;
+				checkQuadAsToothNum.Enabled=false;
 			}
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning!  Read the manual carefully before turning this bridge on or off.  Make sure you understand the difference between the bridging modes and how it will affect patient accounts.  Continue anyway?")) {
 				checkEnabled.Checked=!checkEnabled.Checked;
@@ -735,6 +751,12 @@ namespace OpenDental{
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7Server",textHL7Server.Text);
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7ServiceName",textHL7ServiceName.Text);
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"MedicalPanelUrl",textMedPanelURL.Text);
+			if(checkQuadAsToothNum.Checked) {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","1");
+			}
+			else {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","0");
+			}
 			if(radioModeTight.Checked || radioModeFull.Checked) {
 				if(radioModeTight.Checked) {
 					ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eClinicalWorksMode","0");//Tight

@@ -54,6 +54,9 @@ namespace OpenDentBusiness{
 		public bool ShowAppts;
 		///<summary>Show Account module</summary>
 		public bool ShowAccount;
+		///<summary>Send the quadrant in the tooth number component instead of the surface component of the FT1.26 field of the outgoing DFT messages.  Only for eCW.</summary>
+		public bool IsQuadAsToothNum;
+
 
 		///<Summary>List of messages associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>
 		[CrudColumn(IsNotDbColumn=true)]

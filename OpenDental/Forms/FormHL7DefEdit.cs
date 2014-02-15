@@ -51,6 +51,7 @@ namespace OpenDental {
 			SetShowRadioButtons();
 			checkShowAccount.Checked=HL7DefCur.ShowAccount;
 			checkShowAppts.Checked=HL7DefCur.ShowAppts;
+			checkQuadAsToothNum.Checked=HL7DefCur.IsQuadAsToothNum;
 			if(HL7DefCur.IsInternal) {
 				if(!HL7DefCur.IsEnabled) {
 					textDescription.ReadOnly=true;
@@ -70,6 +71,7 @@ namespace OpenDental {
 					groupShowDemographics.Enabled=false;
 					checkShowAppts.Enabled=false;
 					checkShowAccount.Enabled=false;
+					checkQuadAsToothNum.Enabled=false;
 				}
 				butAdd.Enabled=false;
 				butDelete.Enabled=false;
@@ -187,6 +189,7 @@ namespace OpenDental {
 				groupShowDemographics.Enabled=true;
 				checkShowAppts.Enabled=true;
 				checkShowAccount.Enabled=true;
+				checkQuadAsToothNum.Enabled=true;
 			}
 			else {
 				butBrowseIn.Enabled=false;
@@ -206,6 +209,7 @@ namespace OpenDental {
 				groupShowDemographics.Enabled=false;
 				checkShowAppts.Enabled=false;
 				checkShowAccount.Enabled=false;
+				checkQuadAsToothNum.Enabled=false;
 			}
 		}
 
@@ -403,6 +407,7 @@ namespace OpenDental {
 			}
 			HL7DefCur.ShowAccount=checkShowAccount.Checked;
 			HL7DefCur.ShowAppts=checkShowAppts.Checked;
+			HL7DefCur.IsQuadAsToothNum=checkQuadAsToothNum.Checked;
 			if(comboModeTx.SelectedIndex==(int)ModeTxHL7.File) {
 				HL7DefCur.IncomingFolder=textInPath.Text;
 				HL7DefCur.OutgoingFolder=textOutPath.Text;
