@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.1.1.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.1.3.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -3858,6 +3858,42 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '14.1.1.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_1_3();
+		}
+
+		private static void To14_1_3() {
+			if(FromVersion<new Version("14.1.3.0")) {
+				string command;
+				//add programproperty to eClinicalWorks program link for changing the FT1 segments of the DFT messages
+				//to place quadrants in the ToothNum component instead of the surface component
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
+					int programNum=PIn.Int(Db.GetScalar(command));
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+							+") VALUES("
+							+"'"+POut.Long(programNum)+"', "
+							+"'IsQuadAsToothNum', "
+							+"'0')";//set to 0 (false) by default so behavior of existing customers will not change
+					Db.NonQ(command);
+				}
+				else {//oracle
+					//eCW will never use Oracle.
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD IsQuadAsToothNum tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD IsQuadAsToothNum number(3)";
+					Db.NonQ(command);
+					command="UPDATE hl7def SET IsQuadAsToothNum = 0 WHERE IsQuadAsToothNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE hl7def MODIFY IsQuadAsToothNum NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.1.3.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_1_X();

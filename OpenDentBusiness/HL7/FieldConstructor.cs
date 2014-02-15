@@ -154,7 +154,7 @@ namespace OpenDentBusiness.HL7 {
 						return "";
 					}
 					else {
-						return gTreatArea(def.ComponentSeparator,proc);
+						return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
 					}
 				case "proccode.ProcCode":
 					if(proc==null) {
@@ -297,14 +297,18 @@ namespace OpenDentBusiness.HL7 {
 			}
 		}
 
-		private static string gTreatArea(string componentSep,Procedure proc) {
+		private static string gTreatArea(string componentSep,Procedure proc,bool isQuadAsToothNum) {
 			string retVal="";
 			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
 			if(procCode.TreatArea==TreatmentArea.ToothRange) {
-				retVal=proc.ToothRange;
+				retVal=gConcat(componentSep,proc.ToothRange,"");
 			}
 			else if(procCode.TreatArea==TreatmentArea.Surf) {//probably not necessary
 				retVal=gConcat(componentSep,Tooth.ToInternat(proc.ToothNum),Tooth.SurfTidyForClaims(proc.Surf,proc.ToothNum));
+			}
+			//requested change to have the UL, UR, LL, LR appear in the tooth number component of this field instead of the surface component
+			else if(procCode.TreatArea==TreatmentArea.Quad && isQuadAsToothNum) {
+				retVal=gConcat(componentSep,proc.Surf,"");
 			}
 			else {
 				retVal=gConcat(componentSep,Tooth.ToInternat(proc.ToothNum),proc.Surf);

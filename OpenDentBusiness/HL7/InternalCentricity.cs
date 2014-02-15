@@ -31,6 +31,7 @@ namespace OpenDentBusiness.HL7 {
 				def.ShowDemographics=HL7ShowDemographics.ChangeAndAdd;
 				def.ShowAccount=true;
 				def.ShowAppts=true;
+				def.IsQuadAsToothNum=false;
 			}
 			def.hl7DefMessages=new List<HL7DefMessage>();
 			HL7DefMessage msg=new HL7DefMessage();

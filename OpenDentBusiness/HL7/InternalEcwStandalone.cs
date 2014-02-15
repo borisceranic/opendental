@@ -32,6 +32,7 @@ namespace OpenDentBusiness.HL7 {
 				def.ShowDemographics=HL7ShowDemographics.ChangeAndAdd;
 				def.ShowAccount=true;
 				def.ShowAppts=true;
+				def.IsQuadAsToothNum=false;
 			}
 			def.hl7DefMessages=new List<HL7DefMessage>();//so that if this is called repeatedly, it won't pile on duplicate messages.
 			//in either case, now get all child objects, which can't be in the database.
