@@ -162,6 +162,12 @@ namespace OpenDentBusiness{
 			}
 			int index = Array.IndexOf(labelsUniversal, tooth_id);
 			if(index==-1){
+				if(nomenclature == ToothNumberingNomenclature.FDI
+					&& CultureInfo.CurrentCulture.Name.EndsWith("CA")
+					&& tooth_id=="51")
+				{
+					return "99";//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
+				}
 				return "-";
 			}
 			if(nomenclature == ToothNumberingNomenclature.FDI) {
@@ -216,7 +222,10 @@ namespace OpenDentBusiness{
 				return tooth_label;
 			}
 			int index = 0;
-			if(nomenclature == ToothNumberingNomenclature.FDI) { 
+			if(nomenclature == ToothNumberingNomenclature.FDI) {
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && tooth_label=="99") {
+					return "51";//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
+				}
 				index = Array.IndexOf(labelsFDI, tooth_label);
 			}
 			else if(nomenclature == ToothNumberingNomenclature.Haderup) { 
@@ -375,6 +384,9 @@ namespace OpenDentBusiness{
 					return true;
 				}
 				if(Regex.IsMatch(toothNum,"^[5-8][1-5]$")){//pri teeth: matches firt digit 5-8 and second digit 1-5
+					return true;
+				}
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && toothNum=="99") {//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
 					return true;
 				}
 				return false;

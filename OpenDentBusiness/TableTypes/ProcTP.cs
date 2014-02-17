@@ -19,7 +19,7 @@ namespace OpenDentBusiness{
 		public int ItemOrder;
 		///<summary>FK to definition.DefNum which contains the text of the priority.</summary>
 		public long Priority;
-		///<summary>A simple string displaying the tooth number.  If international tooth numbers are used, then this will be in international format already.</summary>
+		///<summary>A simple string displaying the tooth number.  If international tooth numbers are used, then this will be in international format already.  For Canadian users, using FDI nomenclature, we use 51 as a placeholder for supernumerary teeth, which is tooth number 99 according to CDHA standards (2/17/2014).  Logic for this is handled in the tooth logic class.</summary>
 		public string ToothNumTP;
 		///<summary>Tooth surfaces or area.  This is already converted for international use.  If arch or quad, then it will have U,LR, etc.</summary>
 		public string Surf;

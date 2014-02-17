@@ -23,7 +23,7 @@ namespace OpenDentBusiness {
 		public double ProcFee;
 		///<summary>Surfaces, or use "UL" etc for quadrant, "2" etc for sextant, "U","L" for arches.</summary>
 		public string Surf;
-		///<summary>May be blank, otherwise 1-32, 51-82, A-T, or AS-TS, 1 or 2 char.</summary>
+		///<summary>May be blank, otherwise 1-32, 51-82, A-T, or AS-TS, 1 or 2 char.  For Canadian users, using FDI nomenclature, we use 51 as a placeholder for supernumerary teeth, which is tooth number 99 according to CDHA standards (2/17/2014).  Logic for this is handled in the tooth logic class.</summary>
 		public string ToothNum;
 		///<summary>May be blank, otherwise is series of toothnumbers separated by commas.</summary>
 		public string ToothRange;
