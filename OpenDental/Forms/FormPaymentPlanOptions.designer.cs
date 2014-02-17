@@ -32,6 +32,7 @@ namespace OpenDental{
 			this.radioEveryOtherWeek = new System.Windows.Forms.RadioButton();
 			this.radioOrdinalWeekday = new System.Windows.Forms.RadioButton();
 			this.label1 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -42,7 +43,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(365, 274);
+			this.butClose.Location = new System.Drawing.Point(400, 274);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -55,7 +56,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.label8.Location = new System.Drawing.Point(39, 10);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(391, 62);
+			this.label8.Size = new System.Drawing.Size(426, 62);
 			this.label8.TabIndex = 20;
 			this.label8.Text = resources.GetString("label8.Text");
 			// 
@@ -116,14 +117,27 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.label1.Location = new System.Drawing.Point(39, 192);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(391, 66);
+			this.label1.Size = new System.Drawing.Size(426, 66);
 			this.label1.TabIndex = 26;
 			this.label1.Text = resources.GetString("label1.Text");
+			// 
+			// label2
+			// 
+			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.label2.ForeColor = System.Drawing.Color.Red;
+			this.label2.Location = new System.Drawing.Point(12, 274);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(382, 24);
+			this.label2.TabIndex = 27;
+			this.label2.Text = "Only monthly payment plans work with CC Recurring Charges.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormPaymentPlanOptions
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(455, 312);
+			this.ClientSize = new System.Drawing.Size(490, 312);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.radioOrdinalWeekday);
 			this.Controls.Add(this.radioEveryOtherWeek);
@@ -132,6 +146,7 @@ namespace OpenDental{
 			this.Controls.Add(this.radioMonthly);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPaymentPlanOptions";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment Plan Options";
@@ -149,5 +164,6 @@ namespace OpenDental{
 		public System.Windows.Forms.RadioButton radioEveryOtherWeek;
 		public System.Windows.Forms.RadioButton radioOrdinalWeekday;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label label2;
 	}
 }
