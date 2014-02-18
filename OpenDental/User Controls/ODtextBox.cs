@@ -11,10 +11,9 @@ using OpenDental.UI;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace OpenDental
-{
+namespace OpenDental {
 	/// <summary>This is used instead of a regular textbox when quickpaste functionality is needed.</summary>
-	public class ODtextBox : RichTextBox{//System.ComponentModel.Component
+	public class ODtextBox:RichTextBox {//System.ComponentModel.Component
 		private System.Windows.Forms.ContextMenu contextMenu;
 		private IContainer components;// Required designer variable.
 		private static Hunspell HunspellGlobal;//We create this object one time for every instance of this textbox control within the entire program.
@@ -57,19 +56,20 @@ namespace OpenDental
 		}*/
 
 		///<summary></summary>
-		public ODtextBox(){
+		public ODtextBox() {
 			InitializeComponent();// Required for Windows.Forms Class Composition Designer support
 			spellCheckIsEnabled=true;
 			this.AcceptsTab=true;//Causes CR to not also trigger OK button on a form when that button is set as AcceptButton on the form.
 			this.DetectUrls=false;
 			if(System.ComponentModel.LicenseManager.UsageMode!=System.ComponentModel.LicenseUsageMode.Designtime
-				&& HunspellGlobal==null)
+				&& HunspellGlobal==null) 
 			{
 				HunspellGlobal=new Hunspell(Properties.Resources.en_US_aff,Properties.Resources.en_US_dic);
 			}
 			ListCorrect=new List<string>();
+			ListCorrect.Add("\r");//to allow newline characters to not be counted as incorrect.
+			ListCorrect.Add("\r\n");//to allow 
 			ListCorrect.Add("\n");
-			//ListCorrect.Add("\r\n");
 			ListCorrect.Add("\t");
 			ListIncorrect=new List<string>();
 			EventHandler onClick=new EventHandler(menuItem_Click);
@@ -97,12 +97,9 @@ namespace OpenDental
 		}
 
 		///<summary>Clean up any resources being used.</summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if(components != null)
-				{
+		protected override void Dispose(bool disposing) {
+			if(disposing) {
+				if(components != null) {
 					components.Dispose();
 				}
 				if(BufferGraphics!=null) {//Dispose before bitmap.
@@ -111,17 +108,33 @@ namespace OpenDental
 				}
 				//We do not dispose the hunspell object because it will be automatially disposed of when the program closes.
 			}
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
+		///<summary>Newline characters are handled differently with rich text boxes.  They were forcefully changing '\r\n' with '\n'.  This was causing issues.
+		///E.g. Sometimes a pop up would display, the user would click OK and it would ask the users if they wanted to save the changes when they didn't change anything.</summary>
+		public override string Text {
+			//Slower option
+			//get {
+			//	return base.Text.Replace("\r\n","\n").Replace("\n","\r\n");
+			//}
+			//set {
+			//	base.Text=value.Replace("\r\n","\n").Replace("\n","\r\n");
+			//}
+			get {
+				return Regex.Replace(base.Text,"(?<!\r)\n","\r\n");//replace '\n' with "\r\n"
+			}
+			set {
+				base.Text=Regex.Replace(value,"(?<!\r)\n","\r\n");
+			}
+		}
 
 		#region Component Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.contextMenu = new System.Windows.Forms.ContextMenu();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -149,16 +162,16 @@ namespace OpenDental
 
 		///<summary></summary>
 		[Category("Behavior"),Description("This will determine which category of Quick Paste notes opens first.")]
-		public QuickPasteType QuickPasteType{
-			get{
+		public QuickPasteType QuickPasteType {
+			get {
 				return quickPasteType;
 			}
-			set{
+			set {
 				quickPasteType=value;
 			}
 		}
 
-		private void contextMenu_Popup(object sender, System.EventArgs e) {
+		private void contextMenu_Popup(object sender,System.EventArgs e) {
 			if(SelectionLength==0) {
 				contextMenu.MenuItems[12].Enabled=false;//cut
 				contextMenu.MenuItems[13].Enabled=false;//copy
@@ -216,11 +229,11 @@ namespace OpenDental
 			int charIndex=this.GetCharIndexFromPosition(PositionOfClick);
 			Point charLocation=this.GetPositionFromCharIndex(charIndex);
 			if(PositionOfClick.Y<charLocation.Y-2 || PositionOfClick.Y>charLocation.Y+this.FontHeight+2) {//this is the closest char but they were not very close when they right clicked
-			  return false;
+				return false;
 			}
 			char c=this.GetCharFromPosition(PositionOfClick);
 			if(c=='\n') {//if closest char is a new line char, then assume not on a misspelled word
-			  return false;
+				return false;
 			}
 			List<MatchOD> words=GetWords();
 			if(words.Count==0) {
@@ -289,7 +302,7 @@ namespace OpenDental
 				MsgBox.Show(this,"This feature is currently disabled due to this text box being read only.");
 				return;
 			}
-			switch(contextMenu.MenuItems.IndexOf((MenuItem)sender)){
+			switch(contextMenu.MenuItems.IndexOf((MenuItem)sender)) {
 				case 0:
 				case 1:
 				case 2:
@@ -352,8 +365,8 @@ namespace OpenDental
 					break;
 				case 14://paste
 					if(!Clipboard.ContainsText()) {
-					  MsgBox.Show(this,"There is no text on the clipboard.");
-					  break;
+						MsgBox.Show(this,"There is no text on the clipboard.");
+						break;
 					}
 					int caret=SelectionStart;
 					IDataObject iData=Clipboard.GetDataObject();
@@ -361,7 +374,7 @@ namespace OpenDental
 						Text=Text.Remove(SelectionStart,SelectionLength);
 						SelectionLength=0;
 					}
-					string strPaste=(string)iData.GetData(DataFormats.Text); 
+					string strPaste=(string)iData.GetData(DataFormats.Text);
 					Text=Text.Insert(caret,strPaste);
 					//MaxLength is not enforced by the RichTextBox.  It allows us to set the Text value to a longer length, so we have to handle it manually.
 					if(Text.Length>MaxLength) {
@@ -414,18 +427,19 @@ namespace OpenDental
 			}
 			textEndPoint=textEndPointCur;
 		}
-		
+
 		///<summary></summary>
 		protected override void OnKeyUp(KeyEventArgs e) {
 			base.OnKeyUp(e);
 			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
 				timer1.Stop();
 			}
-			int originalLength=base.Text.Length;
+			//int originalLength=base.Text.Length;
+			int originalLength=Text.Length;
 			int originalCaret=base.SelectionStart;
 			string newText=QuickPasteNotes.Substitute(Text,quickPasteType);
-			if(base.Text!=newText) {
-				base.Text=newText;
+			if(Text!=newText) {
+				Text=newText;
 				SelectionStart=originalCaret+Text.Length-originalLength;
 			}
 			//then CtrlQ
@@ -443,7 +457,7 @@ namespace OpenDental
 			BufferGraphics.Clear(Color.Transparent);//We don't want to overwrite the text in the rich text box.
 			Graphics graphicsTextBox=Graphics.FromHwnd(this.Handle);
 			//split by spaces
-			MatchCollection mc=Regex.Matches(Text,@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
+			MatchCollection mc=Regex.Matches(Text.Replace("\r\n","\n"),@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
 			if(mc.Count==0) {//all text was deleted, clear the entire text box
 				Rectangle wavyLineArea=new Rectangle(1,1,this.Width,this.Height);
 				BufferGraphics.FillRectangle(Brushes.White,wavyLineArea);
@@ -629,13 +643,15 @@ namespace OpenDental
 		///<summary></summary>
 		private List<MatchOD> GetWords() {
 			List<MatchOD> wordList=new List<MatchOD>();
-			MatchCollection mc=Regex.Matches(Text,@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
+			//Replace "\r\n" with " \n" so that the regex measures the start indexes correctly.
+			MatchCollection mc=Regex.Matches(Text.Replace("\r\n","\n"),@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
 			foreach(Match m in mc) {
 				Group g=m.Groups[0];//Group 0 is the entire match
 				if(g.Value.Length<2) {//only allow 'words' that are at least two chars long, 1 char 'words' are assumed spelled correctly
 					continue;
 				}
 				MatchOD word=new MatchOD();
+				//The index below is incrementally off by one for each preceding line return.
 				word.StartIndex=g.Index;//this index is the index within Text of the first char of this word (match)
 				word.Value=g.Value;
 				//loop through starting at the beginning of word looking for first letter or digit
@@ -709,14 +725,14 @@ namespace OpenDental
 			}
 		}
 
-		private void ShowFullDialog(){
+		private void ShowFullDialog() {
 			FormQuickPaste FormQ=new FormQuickPaste();
 			FormQ.TextToFill=this;
 			FormQ.QuickType=quickPasteType;
 			FormQ.ShowDialog();
 		}
 
-		private void InsertDate(){
+		private void InsertDate() {
 			int caret=SelectionStart;
 			string strPaste=DateTime.Today.ToShortDateString();
 			Text=Text.Insert(caret,strPaste);
