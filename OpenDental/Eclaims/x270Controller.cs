@@ -95,6 +95,9 @@ namespace OpenDental.Eclaims {
 					else if(X277.Is277(Xobj)) {
 						etrans271.Etype=EtransType.StatusNotify_277;
 					}
+					else if(X835.Is835(Xobj)) {
+						etrans271.Etype=EtransType.ERA_835;
+					}
 				}
 				else{
 					etrans271.Etype=EtransType.BenefitResponse271;
@@ -135,7 +138,18 @@ namespace OpenDental.Eclaims {
 				MessageBox.Show(etrans.Note);
 				//CodeBase.MsgBoxCopyPaste msgbox=new CodeBase.MsgBoxCopyPaste(etrans.Note);
 				//msgbox.ShowDialog();
-				//don't show the 270 interface.
+				//don't show the 277 interface.
+				return;
+			}
+			else if(etrans271.Etype==EtransType.ERA_835) {
+				X835 x835=new X835(x12response);
+				string error835=x835.GetHumanReadable();
+				etrans.Note="Error: "+error835;//"Malformed document sent.  835 error returned.";
+				Etranss.Update(etrans);
+				MessageBox.Show(etrans.Note);
+				//CodeBase.MsgBoxCopyPaste msgbox=new CodeBase.MsgBoxCopyPaste(etrans.Note);
+				//msgbox.ShowDialog();
+				//don't show the 835 interface.
 				return;
 			}
 			else { //271

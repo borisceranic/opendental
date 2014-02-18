@@ -66,8 +66,8 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans270Edit_Shown(object sender,EventArgs e) {
-			//The 997, 999, or 277 would only exist for a failure.  A success would be a 271.
-			if(EtransAck271!=null && (EtransAck271.Etype==EtransType.Acknowledge_997 || EtransAck271.Etype==EtransType.Acknowledge_999 || EtransAck271.Etype==EtransType.StatusNotify_277)) {
+			//The 997, 999, 277, or 835 would only exist for a failure.  A success would be a 271.
+			if(EtransAck271!=null && (EtransAck271.Etype==EtransType.Acknowledge_997 || EtransAck271.Etype==EtransType.Acknowledge_999 || EtransAck271.Etype==EtransType.StatusNotify_277 || EtransAck271.Etype==EtransType.ERA_835)) {
 				if(IsInitialResponse) {
 					MessageBox.Show(EtransCur.Note);
 				}

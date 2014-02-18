@@ -110,7 +110,7 @@ namespace OpenDentBusiness{
 		BenefitResponse271,
 		///<summary>26 When a Canadian message is sent, and an error comes back instead of a message.  This stores information about the error.  The etrans with this type is attached it to the original etrans as an ack.</summary>
 		AckError,
-		///<summary>27 X12-835. Not used yet.</summary>
+		///<summary>27 X12-835. Electronic Remittance Advice (ERA).  Also known an an electronic EOB.</summary>
 		ERA_835,
 		///<summary>28 Ack from clearinghouse. X12-999.</summary>
 		Acknowledge_999,

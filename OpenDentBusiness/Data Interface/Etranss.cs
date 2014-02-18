@@ -587,7 +587,28 @@ namespace OpenDentBusiness{
 							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
 						Db.NonQ(command);
 					}
-					////none of the other fields make sense, because this ack could refer to many claims.
+					//none of the other fields make sense, because this ack could refer to many claims.
+				}
+				else if(X835.Is835(Xobj)) {
+					X835 x835=new X835(messageText);
+					etrans.Etype=EtransType.ERA_835;
+					Etranss.Insert(etrans);
+					List<string> claimTrackingNumbers=x835.GetClaimTrackingNumbers();
+					for(int i=0;i<claimTrackingNumbers.Count;i++) {
+						string ack=x835.GetClaimInfo(claimTrackingNumbers[i])[3];
+						long claimNum=Claims.GetClaimNumForIdentifier(claimTrackingNumbers[i]);
+						//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
+						//We overwrite existing acks from 997s, 999s, and 277s.
+						command="UPDATE etrans SET AckCode='"+ack+"', "
+							+"AckEtransNum="+POut.Long(etrans.EtransNum)
+							+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
+							+" AND ClaimNum="+POut.Long(claimNum)
+							+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+							+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
+							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
+						Db.NonQ(command);
+					}
+					//none of the other fields make sense, because this ack could refer to many claims.
 				}
 				else {//unknown type of X12 report.
 					etrans.Etype=EtransType.TextReport;

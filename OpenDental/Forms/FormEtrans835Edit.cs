@@ -76,13 +76,17 @@ namespace OpenDental {
 			textPayerContactInfo.Text=x835.GetPayerContactInfo();
 			//Payee information
 			textPayeeName.Text=x835.GetPayeeName();
-			textPayeeIdType.Text=x835.GetPayeeIdType();
+			labelPayeeIdType.Text=Lan.g(this,"Payee")+" "+x835.GetPayeeIdType();
 			textPayeeID.Text=x835.GetPayeeId();
 			//Payment information
 			textTransHandlingDesc.Text=x835.GetTransactionHandlingCodeDescription();
 			textPaymentMethod.Text=x835.GetPaymentMethodDescription();
-			textPaymentAmount.Text=x835.GetPaymentAmount();
-			textCreditOrDebit.Text=x835.GetCreditDebit();
+			if(x835.IsCredit()) {
+				textPaymentAmount.Text=x835.GetPaymentAmount();
+			}
+			else {
+				textPaymentAmount.Text="("+x835.GetPaymentAmount()+")";
+			}
 			textAcctNumEndingIn.Text=x835.GetAccountNumReceivingShort();
 			DateTime dateEffective=x835.GetDateEffective();
 			if(dateEffective.Year>1880) {
