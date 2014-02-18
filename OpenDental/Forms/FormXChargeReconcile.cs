@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.IO;
 
 namespace OpenDental {
 	public partial class FormXChargeReconcile:Form {
+
 		public FormXChargeReconcile() {
 			InitializeComponent();
 			Lan.F(this);
@@ -41,7 +37,7 @@ namespace OpenDental {
 				string line=sr.ReadLine();
 				while(line!=null) {
 					fields=line.Split(new string[1] { "," },StringSplitOptions.None);
-					if(fields.Length<16){
+					if(fields.Length<16) {
 						continue;
 					}
 					trans.TransType=fields[0];
@@ -64,12 +60,13 @@ namespace OpenDental {
 					trans.ItemNum=fields[12];
 					trans.ApprCode=fields[13];
 					trans.TransactionDateTime=PIn.Date(fields[14]).AddHours(PIn.Double(fields[15].Substring(0,2))).AddMinutes(PIn.Double(fields[15].Substring(3,2)));
-					if(trans.BatchNum=="" || trans.ItemNum=="") {
-						line=sr.ReadLine();
-						continue;
-					}
-					transCheck=XChargeTransactions.CheckByBatchItem(trans.BatchNum,trans.ItemNum);
-					if(transCheck==trans) {
+					//Code removed in 14.2 so all transactions are allowed historically.
+					//if(trans.BatchNum=="" || trans.ItemNum=="") {
+					//	line=sr.ReadLine();
+					//	continue;
+					//}
+					transCheck=XChargeTransactions.GetOneByBatchItem(trans.BatchNum,trans.ItemNum);
+					if(transCheck!=null && trans.TransType!="CCVoid") {
 						XChargeTransactions.Delete(transCheck.XChargeTransactionNum);
 						XChargeTransactions.Insert(trans);
 					}
@@ -86,7 +83,8 @@ namespace OpenDental {
 		private void butViewImported_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query="SELECT TransactionDateTime,ClerkID,BatchNum,ItemNum,PatNum,CCType,CreditCardNum,Expiration,Result,Amount FROM xchargetransaction "
+			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,CASE WHEN ResultCode=0 THEN Amount ELSE Amount=0 END AS Amount "
+				+"FROM xchargetransaction "
 				+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart);
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
@@ -94,28 +92,27 @@ namespace OpenDental {
 			report.Title="XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString();
 			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
 			report.SetColumn(this,0,"Transaction Date/Time",170);
-			report.SetColumn(this,1,"Clerk ID",80);
-			report.SetColumn(this,2,"Batch#",50);
+			report.SetColumn(this,1,"Transaction Type",120);
+			report.SetColumn(this,2,"Clerk ID",80);
 			report.SetColumn(this,3,"Item#",50);
 			report.SetColumn(this,4,"PatNum",50);
-			report.SetColumn(this,5,"CC Type",55);
-			report.SetColumn(this,6,"Credit Card Num",140);
-			report.SetColumn(this,7,"Exp",50);
-			report.SetColumn(this,8,"Result",50);
-			report.SetColumn(this,9,"Amount",60,HorizontalAlignment.Right);
+			report.SetColumn(this,5,"Credit Card Num",140);
+			report.SetColumn(this,6,"Exp",50);
+			report.SetColumn(this,7,"Result",50);
+			report.SetColumn(this,8,"Amount",60,HorizontalAlignment.Right);
 			Cursor=Cursors.Default;
 			FormQuery2.ShowDialog();
 		}
 
 		private void butPayments_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
+			string paymentType=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query="SET @pos=0; "
-				+"SELECT @pos:=@pos+1 as 'Count', patient.PatNum, LName, FName, DateEntry,PayDate, PayNote,PayAmt "
+				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt,PayType "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
-				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)
-				+"ORDER BY PayDate ASC, patient.LName";
+				+"WHERE PayType="+paymentType+" AND (DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
+				+"ORDER BY Count ASC";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();
@@ -137,29 +134,29 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query="SELECT TransactionDateTime,ClerkID,BatchNum,ItemNum,xchargetransaction.PatNum,CCType,CreditCardNum,Expiration,Result,Amount "
+			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,xchargetransaction.PatNum,CreditCardNum,Expiration,Result,Amount "
 				+" FROM xchargetransaction LEFT JOIN ("
 					+" SELECT patient.PatNum,LName,FName,DateEntry,PayDate,PayAmt,PayNote"
 					+" FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum"
 					+" WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)
 				+" ) AS P ON xchargetransaction.PatNum=P.PatNum AND DATE(xchargetransaction.TransactionDateTime)=P.DateEntry AND xchargetransaction.Amount=P.PayAmt "
 				+" WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)
-				+" AND P.PatNum IS NULL;";
+				+" AND P.PatNum IS NULL"
+				+" AND xchargetransaction.ResultCode=0;";//Valid entries to count have result code 0
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();
 			report.Title="XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString();
 			report.SubTitle.Add("No Matching Transaction Found in Open Dental");
 			report.SetColumn(this,0,"Transaction Date/Time",170);
-			report.SetColumn(this,1,"Clerk ID",80);
-			report.SetColumn(this,2,"Batch#",50);
+			report.SetColumn(this,1,"Transaction Type",120);
+			report.SetColumn(this,2,"Clerk ID",80);
 			report.SetColumn(this,3,"Item#",50);
 			report.SetColumn(this,4,"PatNum",50);
-			report.SetColumn(this,5,"CC Type",55);
-			report.SetColumn(this,6,"Credit Card Num",140);
-			report.SetColumn(this,7,"Exp",50);
-			report.SetColumn(this,8,"Result",50);
-			report.SetColumn(this,9,"Amount",60,HorizontalAlignment.Right);
+			report.SetColumn(this,5,"Credit Card Num",140);
+			report.SetColumn(this,6,"Exp",50);
+			report.SetColumn(this,7,"Result",50);
+			report.SetColumn(this,8,"Amount",60,HorizontalAlignment.Right);
 			Cursor=Cursors.Default;
 			FormQuery2.ShowDialog();
 		}
@@ -171,7 +168,8 @@ namespace OpenDental {
 			report.Query="SELECT payment.PatNum, LName, FName, payment.DateEntry,payment.PayDate, payment.PayNote,payment.PayAmt "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
 				+"LEFT JOIN (SELECT TransactionDateTime,ClerkID,BatchNum,ItemNum,PatNum,CCType,CreditCardNum,Expiration,Result,Amount FROM xchargetransaction "
-					+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+@") AS X "
+					+"WHERE (DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
+						+"AND ResultCode=0 "+@") AS X "
 				+"ON X.PatNum=payment.PatNum AND DATE(X.TransactionDateTime)=payment.DateEntry AND X.Amount=payment.PayAmt "
 				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"AND X.TransactionDateTime IS NULL "
