@@ -1860,6 +1860,7 @@ namespace OpenDental{
 			Bridges.ICat.StartFileWatcher();
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				menuItemResellers.Visible=true;
+				menuItemXChargeReconcile.Visible=false;
 				#if !DEBUG
 					if(Process.GetProcessesByName("WebCamOD").Length==0) {
 						try {

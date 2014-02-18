@@ -18,7 +18,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets one XChargeTransaction from the db by batchNum and itemNum. For example: ("1515","0001").</summary>
-		public static XChargeTransaction CheckByBatchItem(string batchNum,string itemNum){
+		public static XChargeTransaction GetOneByBatchItem(string batchNum,string itemNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				return Meth.GetObject<XChargeTransaction>(MethodBase.GetCurrentMethod(),batchNum,itemNum);
 			}
