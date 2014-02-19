@@ -225,10 +225,10 @@ namespace OpenDentBusiness{
 		public static DataTable GetPtDataTable(bool limit,string lname,string fname,string phone,
 			string address,bool hideInactive,string city,string state,string ssn,string patnum,string chartnumber,
 			long billingtype,bool guarOnly,bool showArchived,long clinicNum,DateTime birthdate,
-			long siteNum,string subscriberId,string email)
+			long siteNum,string subscriberId,string email,string country)
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,clinicNum,birthdate,siteNum,subscriberId,email);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,clinicNum,birthdate,siteNum,subscriberId,email,country);
 			}
 			string billingsnippet=" ";
 			if(billingtype!=0){
@@ -260,7 +260,7 @@ namespace OpenDentBusiness{
 				regexp+=phonedigits[i];
 			}
 			string command="SELECT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
-				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email ";
+				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email,Country ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+=",GROUP_CONCAT(DISTINCT phonenumber.PhoneNumberVal) AS OtherPhone ";//this customer might have multiple extra phone numbers that match the param.
 			}
@@ -345,7 +345,8 @@ namespace OpenDentBusiness{
 					+(ssn.Length>0?"AND SSN LIKE '"+POut.String(ssn)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(chartnumber.Length>0?"AND ChartNumber LIKE '"+POut.String(chartnumber)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(email.Length>0?"AND Email LIKE '%"+POut.String(email)+"%' ":"");//LIKE is case insensitive in mysql.
+					+(email.Length>0?"AND Email LIKE '%"+POut.String(email)+"%' ":"")//LIKE is case insensitive in mysql.
+				+(country.Length>0?"AND Country LIKE '%"+POut.String(country)+"%' ":"");//LIKE is case insensitive in mysql.
 			}
 			else {//oracle
 				command+=
@@ -355,7 +356,8 @@ namespace OpenDentBusiness{
 					+(ssn.Length>0?"AND LOWER(SSN) LIKE '"+POut.String(ssn).ToLower()+"%' ":"")//In case an office uses this field for something else.
 					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//case matters in a like statement in oracle.
 					+(chartnumber.Length>0?"AND LOWER(ChartNumber) LIKE '"+POut.String(chartnumber).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(email.Length>0?"AND LOWER(Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"");//LIKE is case insensitive in mysql.
+					+(email.Length>0?"AND LOWER(Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//LIKE is case insensitive in mysql.
+				+(country.Length>0?"AND LOWER(Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"");//LIKE is case insensitive in mysql.
 			}
 			if(birthdate.Year>1880 && birthdate.Year<2100){
 				command+="AND Birthdate ="+POut.Date(birthdate)+" ";
@@ -436,6 +438,7 @@ namespace OpenDentBusiness{
 				r["PriProv"]=Providers.GetAbbr(PIn.Long(table.Rows[i]["PriProv"].ToString()));
 				r["site"]=Sites.GetDescription(PIn.Long(table.Rows[i]["SiteNum"].ToString()));
 				r["Email"]=table.Rows[i]["Email"].ToString();
+				r["Country"]=table.Rows[i]["Country"].ToString();
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
 					r["OtherPhone"]=table.Rows[i]["OtherPhone"].ToString();
 				}
