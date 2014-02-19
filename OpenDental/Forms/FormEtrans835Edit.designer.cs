@@ -54,10 +54,20 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.labelPayeeIdType = new System.Windows.Forms.Label();
 			this.textPayeeID = new System.Windows.Forms.TextBox();
+			this.textClaimPaymentTotal = new System.Windows.Forms.TextBox();
+			this.label17 = new System.Windows.Forms.Label();
+			this.textProvAdjustmentTotal = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label16 = new System.Windows.Forms.Label();
+			this.label18 = new System.Windows.Forms.Label();
+			this.label19 = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
+			this.textPaymentAmountCalc = new System.Windows.Forms.TextBox();
+			this.label21 = new System.Windows.Forms.Label();
 			this.gridProviderAdjustments = new OpenDental.UI.ODGrid();
 			this.gridClaimDetails = new OpenDental.UI.ODGrid();
 			this.butRawMessage = new OpenDental.UI.Button();
-			this.butOK = new OpenDental.UI.Button();
+			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label5
@@ -304,7 +314,7 @@ namespace OpenDental{
 			this.labelPayeeIdType.Name = "labelPayeeIdType";
 			this.labelPayeeIdType.Size = new System.Drawing.Size(159, 20);
 			this.labelPayeeIdType.TabIndex = 166;
-			this.labelPayeeIdType.Text = "Payee Medicaid ID/NPI";
+			this.labelPayeeIdType.Text = "Payee Medicaid ID/NPI/TIN";
 			this.labelPayeeIdType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textPayeeID
@@ -315,16 +325,103 @@ namespace OpenDental{
 			this.textPayeeID.Size = new System.Drawing.Size(90, 20);
 			this.textPayeeID.TabIndex = 169;
 			// 
+			// textClaimPaymentTotal
+			// 
+			this.textClaimPaymentTotal.Location = new System.Drawing.Point(30, 667);
+			this.textClaimPaymentTotal.Name = "textClaimPaymentTotal";
+			this.textClaimPaymentTotal.ReadOnly = true;
+			this.textClaimPaymentTotal.Size = new System.Drawing.Size(110, 20);
+			this.textClaimPaymentTotal.TabIndex = 176;
+			this.textClaimPaymentTotal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label17
+			// 
+			this.label17.Location = new System.Drawing.Point(3, 646);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(140, 20);
+			this.label17.TabIndex = 175;
+			this.label17.Text = "InsPaid Total";
+			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textProvAdjustmentTotal
+			// 
+			this.textProvAdjustmentTotal.Location = new System.Drawing.Point(163, 667);
+			this.textProvAdjustmentTotal.Name = "textProvAdjustmentTotal";
+			this.textProvAdjustmentTotal.ReadOnly = true;
+			this.textProvAdjustmentTotal.Size = new System.Drawing.Size(110, 20);
+			this.textProvAdjustmentTotal.TabIndex = 178;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(161, 646);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(140, 20);
+			this.label3.TabIndex = 177;
+			this.label3.Text = "Prov AdjAmt Total";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label16
+			// 
+			this.label16.Location = new System.Drawing.Point(146, 646);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(12, 20);
+			this.label16.TabIndex = 179;
+			this.label16.Text = "-";
+			this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label18
+			// 
+			this.label18.Location = new System.Drawing.Point(146, 667);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(12, 20);
+			this.label18.TabIndex = 180;
+			this.label18.Text = "-";
+			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label19
+			// 
+			this.label19.Location = new System.Drawing.Point(304, 646);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(12, 20);
+			this.label19.TabIndex = 181;
+			this.label19.Text = "=";
+			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label20
+			// 
+			this.label20.Location = new System.Drawing.Point(304, 667);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(12, 20);
+			this.label20.TabIndex = 182;
+			this.label20.Text = "=";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPaymentAmountCalc
+			// 
+			this.textPaymentAmountCalc.Location = new System.Drawing.Point(330, 667);
+			this.textPaymentAmountCalc.Name = "textPaymentAmountCalc";
+			this.textPaymentAmountCalc.ReadOnly = true;
+			this.textPaymentAmountCalc.Size = new System.Drawing.Size(110, 20);
+			this.textPaymentAmountCalc.TabIndex = 184;
+			// 
+			// label21
+			// 
+			this.label21.Location = new System.Drawing.Point(328, 646);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(140, 20);
+			this.label21.TabIndex = 183;
+			this.label21.Text = "Payment Amount";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// gridProviderAdjustments
 			// 
-			this.gridProviderAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridProviderAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridProviderAdjustments.HScrollVisible = false;
 			this.gridProviderAdjustments.Location = new System.Drawing.Point(9, 195);
 			this.gridProviderAdjustments.Name = "gridProviderAdjustments";
 			this.gridProviderAdjustments.ScrollValue = 0;
-			this.gridProviderAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.None;
+			this.gridProviderAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
 			this.gridProviderAdjustments.Size = new System.Drawing.Size(956, 81);
 			this.gridProviderAdjustments.TabIndex = 170;
 			this.gridProviderAdjustments.TabStop = false;
@@ -340,11 +437,13 @@ namespace OpenDental{
 			this.gridClaimDetails.Location = new System.Drawing.Point(9, 282);
 			this.gridClaimDetails.Name = "gridClaimDetails";
 			this.gridClaimDetails.ScrollValue = 0;
-			this.gridClaimDetails.Size = new System.Drawing.Size(956, 376);
+			this.gridClaimDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridClaimDetails.Size = new System.Drawing.Size(956, 361);
 			this.gridClaimDetails.TabIndex = 0;
 			this.gridClaimDetails.TabStop = false;
 			this.gridClaimDetails.Title = "Claim Details";
 			this.gridClaimDetails.TranslationName = "FormEtrans835Edit";
+			this.gridClaimDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClaimDetails_CellDoubleClick);
 			// 
 			// butRawMessage
 			// 
@@ -361,25 +460,35 @@ namespace OpenDental{
 			this.butRawMessage.Text = "Raw Message";
 			this.butRawMessage.Click += new System.EventHandler(this.butRawMessage_Click);
 			// 
-			// butOK
+			// butClose
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Autosize = true;
-			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(890, 664);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
-			this.butOK.Text = "&OK";
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butClose.Autosize = true;
+			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClose.CornerRadius = 4F;
+			this.butClose.Location = new System.Drawing.Point(890, 664);
+			this.butClose.Name = "butClose";
+			this.butClose.Size = new System.Drawing.Size(75, 24);
+			this.butClose.TabIndex = 3;
+			this.butClose.Text = "&Close";
+			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// FormEtrans835Edit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.textPaymentAmountCalc);
+			this.Controls.Add(this.label21);
+			this.Controls.Add(this.label20);
+			this.Controls.Add(this.label19);
+			this.Controls.Add(this.label18);
+			this.Controls.Add(this.label16);
+			this.Controls.Add(this.textProvAdjustmentTotal);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.textClaimPaymentTotal);
+			this.Controls.Add(this.label17);
 			this.Controls.Add(this.gridProviderAdjustments);
 			this.Controls.Add(this.textPayeeID);
 			this.Controls.Add(this.labelPayeeIdType);
@@ -413,12 +522,12 @@ namespace OpenDental{
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.butRawMessage);
 			this.Controls.Add(this.gridClaimDetails);
-			this.Controls.Add(this.butOK);
+			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835Edit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Electronic EOB";
+			this.Text = "Electronic Remittance Advice (ERA) - Format X12 835";
 			this.Load += new System.EventHandler(this.FormEtrans835Edit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835Edit_Resize);
 			this.ResumeLayout(false);
@@ -428,7 +537,7 @@ namespace OpenDental{
 
 		#endregion
 
-		private OpenDental.UI.Button butOK;
+		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.ODGrid gridClaimDetails;
 		private UI.Button butRawMessage;
 		private System.Windows.Forms.Label label5;
@@ -462,5 +571,15 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelPayeeIdType;
 		private System.Windows.Forms.TextBox textPayeeID;
 		private UI.ODGrid gridProviderAdjustments;
+		private System.Windows.Forms.TextBox textClaimPaymentTotal;
+		private System.Windows.Forms.Label label17;
+		private System.Windows.Forms.TextBox textProvAdjustmentTotal;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.Label label18;
+		private System.Windows.Forms.Label label19;
+		private System.Windows.Forms.Label label20;
+		private System.Windows.Forms.TextBox textPaymentAmountCalc;
+		private System.Windows.Forms.Label label21;
 	}
 }

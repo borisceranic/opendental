@@ -166,7 +166,7 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the payment credit or debit amount in Table 1 (Header) BPR02. Required.</summary>
 		public string GetPaymentAmount() {
-			return segBPR.Get(2);
+			return PIn.Decimal(segBPR.Get(2)).ToString("f2");
 		}
 
 		///<summary>Gets the payment credit or debit flag in Table 1 (Header) BPR03. Returns true if "Credit" or false if "Debit". Required.</summary>
@@ -318,12 +318,12 @@ namespace OpenDentBusiness
 		}
 
 		///<summary>Result will contain strings in the following order:
-		///0) Claim Status Code Description (CLP02)
-		///1) Total Claim Charge Amount (CLP03)
-		///2) Claim Payment Amount (CLP04)
-		///3) Patient Responsibility Amount (CLP05)
-		///4) Payer Claim Control Number (CLP07).</summary>
-    public string[] GetClaimInfo(string trackingNumber) {
+		///00 Claim Status Code Description (CLP02)
+		///01 Total Claim Charge Amount (CLP03)
+		///02 Claim Payment Amount (CLP04)
+		///03 Patient Responsibility Amount (CLP05)
+		///04 Payer Claim Control Number (CLP07).</summary>
+    public string[] GetClaimInfo(string claimTrackingNumber) {
       string[] result=new string[5];
       for(int i=0;i<result.Length;i++) {
         result[i]="";
@@ -331,18 +331,146 @@ namespace OpenDentBusiness
       for(int i=0;i<segNumsCLP.Count;i++) {
         int segNum=segNumsCLP[i];
 				X12Segment segCLP=segments[segNum];
-				if(segCLP.Get(1)!=trackingNumber) {//CLP01 Patient Control Number
+				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
 					continue;
 				}
 				result[0]=GetClaimStatusDescriptionForCode(segCLP.Get(2));//CLP02 Claim Status Code Description
-				result[1]=segCLP.Get(3);//CLP03 Total Claim Charge Amount
-				result[2]=segCLP.Get(4);//CLP04 Claim Payment Amount
-				result[3]=segCLP.Get(5);//CLP05 Patient Responsibility Amount
+				result[1]=PIn.Decimal(segCLP.Get(3)).ToString("f2");//CLP03 Total Claim Charge Amount
+				result[2]=PIn.Decimal(segCLP.Get(4)).ToString("f2");//CLP04 Claim Payment Amount
+				result[3]=PIn.Decimal(segCLP.Get(5)).ToString("f2");//CLP05 Patient Responsibility Amount
 				result[4]=segCLP.Get(7);//CLP07 Payer Claim Control Number
 				break;
       }
       return result;
     }
+
+		///<summary>This function gets extra notes regarding the adjuducation of the claim if present.
+		///The data comes from two different segments, MIA (Inpatient Adjudication Information) and MOA (Outpatient Adjudication Information).
+		///Both segments MIA and MOA are situational, and if present, there will only be one or the other.
+		///The values returned are in pairs, such that the first item in each pair is a field name and the second item in the pair is the field value.</summary>
+		public List<string> GetClaimAdjudicationInfo(string claimTrackingNumber) {
+			List<string> listAdjudicationInfo=new List<string>();
+			for(int i=0;i<segNumsCLP.Count;i++) {
+				int segNum=segNumsCLP[i];
+				X12Segment segCLP=segments[segNum];
+				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
+					continue;
+				}
+				int startSegNum=segNum+1;
+				int endSegNum=segments.Count;
+				if(i<segNumsCLP.Count-1) {
+					endSegNum=segNumsCLP[i+1];
+				}
+				for(int j=startSegNum;j<endSegNum;j++) {
+					X12Segment seg=segments[j];
+					if(seg.SegmentID=="MIA") {
+						if(seg.Get(1)!="") {
+							listAdjudicationInfo.Add("Covered Days or Visits Count");		listAdjudicationInfo.Add(seg.Get(1));
+						}
+						if(seg.Get(2)!="") {
+							listAdjudicationInfo.Add("PPS Operating Outlier Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(2)).ToString("f2"));
+						}
+						if(seg.Get(3)!="") {
+							listAdjudicationInfo.Add("Lifetime Psychiatric Days Count"); listAdjudicationInfo.Add(seg.Get(3));
+						}
+						if(seg.Get(4)!="") {
+							listAdjudicationInfo.Add("Claim Diagnosis Related Group Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(4)).ToString("f2"));
+						}
+						if(seg.Get(5)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(6)!="") {
+							listAdjudicationInfo.Add("Disproportionate Share Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(6)).ToString("f2"));
+						}
+						if(seg.Get(7)!="") {
+							listAdjudicationInfo.Add("Medicare Secondary Payer (MSP) Pass-Through Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(7)).ToString("f2"));
+						}
+						if(seg.Get(8)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(8)).ToString("f2"));
+						}
+						if(seg.Get(9)!="") {
+							listAdjudicationInfo.Add("Prospectice Payment System (PPS) Capital, Federal Specific Portion, Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(9)).ToString("f2"));
+						}
+						if(seg.Get(10)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital, Hospital Specific Portion, Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(10)).ToString("f2"));
+						}
+						if(seg.Get(11)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital, Disproportionate Share, Hospital Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(11)).ToString("f2"));
+						}
+						if(seg.Get(12)!="") {
+							listAdjudicationInfo.Add("Old Capital Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(12)).ToString("f2"));
+						}
+						if(seg.Get(13)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Indirect Medical Education Claim Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(13)).ToString("f2"));
+						}
+						if(seg.Get(14)!="") {
+							listAdjudicationInfo.Add("Hospital Specific Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(14)).ToString("f2"));
+						}
+						if(seg.Get(15)!="") {
+							listAdjudicationInfo.Add("Cost Report Day Count"); listAdjudicationInfo.Add(seg.Get(15));
+						}
+						if(seg.Get(16)!="") {
+							listAdjudicationInfo.Add("Federal Specific Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(16)).ToString("f2"));
+						}
+						if(seg.Get(17)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Outlier Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(17)).ToString("f2"));
+						}
+						if(seg.Get(18)!="") {
+							listAdjudicationInfo.Add("Indirect Teaching Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(18)).ToString("f2"));
+						}
+						if(seg.Get(19)!="") {
+							listAdjudicationInfo.Add("Professional Component Amount Billed But Not Payable"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(19)).ToString("f2"));
+						}
+						if(seg.Get(20)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(20)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(21)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(21)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(22)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(22)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(23)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(23)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(24)!="") {
+							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Exception Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(24)).ToString("f2"));
+						}
+					}
+					else if(seg.SegmentID=="MOA") {
+						if(seg.Get(1)!="") {
+							listAdjudicationInfo.Add("Reimbursement Rate"); listAdjudicationInfo.Add((PIn.Decimal(seg.Get(1))*100).ToString()+"%");
+						}
+						if(seg.Get(2)!="") {
+							listAdjudicationInfo.Add("Claim Health Care Financing Administration Common Procedural Coding System (HCPCS) Payable Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(2)).ToString("f2"));
+						}
+						if(seg.Get(3)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(3)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(4)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(4)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(5)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(6)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(6)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(7)!="") {
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(7)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+						}
+						if(seg.Get(8)!="") {
+							listAdjudicationInfo.Add("End Stage Renal Disease (ESRD) Payment Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(8)).ToString("f2"));
+						}
+						if(seg.Get(9)!="") {
+							listAdjudicationInfo.Add("Professional Component Amount Billed But Not Payable"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(9)).ToString("f2"));
+						}
+					}
+				}
+				break;
+			}
+			return listAdjudicationInfo;
+		}
 
 		private string GetClaimStatusDescriptionForCode(string claimStatusCode) {
 			string claimStatusCodeDescript="";
@@ -392,29 +520,33 @@ namespace OpenDentBusiness
 				X12Segment segPLB=segments[segNumsPLB[i]];
 				string provNPI=segPLB.Get(1);//PLB01 is required.
 				string dateFiscalPeriodStr=segPLB.Get(2);//PLB02 is required.
-				DateTime dateFiscalPeriod=DateTime.MinValue;
+				string dateFiscalPeriod="";
 				try {
 					int dateEffectiveYear=int.Parse(dateFiscalPeriodStr.Substring(0,4));
 					int dateEffectiveMonth=int.Parse(dateFiscalPeriodStr.Substring(4,2));
 					int dateEffectiveDay=int.Parse(dateFiscalPeriodStr.Substring(6,2));
-					dateFiscalPeriod=new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay);
+					dateFiscalPeriod=(new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay)).ToShortDateString();
 				}
 				catch {
 					//Oh well, not very important infomration anyway.
 				}
-				//TODO: This code creates an infinate loop. Fix it.
-				//int segNumAdjCode=3;//PLB03 is required.
-				//while(segNumAdjCode<segPLB.Elements.Length) {
-				//	string reasonCode=segPLB.Get(segNumAdjCode,1);
-				//	//For each adjustment reason code, the reference identification is optional.
-				//	string referenceIdentification="";
-				//	if(segPLB.Get(3).Length>reasonCode.Length) {
-				//		referenceIdentification=segPLB.Get(3,2);
-				//	}
-				//	//For each adjustment reason code, an amount is required.
-				//	string amount=segPLB.Get(segNumAdjCode+1);
-				//	result.Add(new string[] { provNPI,dateFiscalPeriod.ToShortDateString(),GetDescriptForProvAdjCode(reasonCode),reasonCode,referenceIdentification,amount });
-				//}
+				//After PLB02, the segments are in pairs, with a minimum of one pair, and a maximum of six pairs.  Starting with PLB03 and PLB04 (both are required), the remaining pairs are optional.
+				//Each pair represents a single provider adjustment and reason for adjustment.  The provider is identified in PLB01 by NPI.
+				//There can be more than one PLB segment, therefore it is possible to create more than six adjustments for a single provider by creating more than one PLB segment.
+				//The loop below is intended to capture all adjustments within the current PLB segment.
+				int segNumAdjCode=3;//PLB03 and PLB04 are required.  We start at segment 3 and increment by 2 with each iteration of the loop.
+				while(segNumAdjCode<segPLB.Elements.Length) {
+					string reasonCode=segPLB.Get(segNumAdjCode,1);
+					//For each adjustment reason code, the reference identification is situational.
+					string referenceIdentification="";
+					if(segPLB.Get(3).Length>reasonCode.Length) {
+						referenceIdentification=segPLB.Get(3,2);
+					}
+					//For each adjustment reason code, an amount is required.
+					string amount=PIn.Decimal(segPLB.Get(segNumAdjCode+1)).ToString("f2");
+					result.Add(new string[] { provNPI,dateFiscalPeriod,GetDescriptForProvAdjCode(reasonCode),reasonCode,referenceIdentification,amount });
+					segNumAdjCode+=2;
+				}
 			}
 			return result;
 		}
@@ -1277,7 +1409,7 @@ namespace OpenDentBusiness
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*1234~
-//BPR*C*150000*C*ACH*CTX*01*999999992*DA*123456*1512345678*01*999988880*DA*98765*20020913~
+//BPR*C*150000*C*ACH*CTX*01*999999992*DA*123456*1512345678**01*999988880*DA*98765*20020913~
 //TRN*1*12345*1512345678~
 //DTM*405*20020916~
 //N1*PR*INSURANCE COMPANY OF TIMBUCKTU~
@@ -1298,7 +1430,7 @@ namespace OpenDentBusiness
 //LX*130212~
 //TS3*6543210909*13*19961231*1*15000****11980.33**3019.67~
 //CLP*777777*1*150000*11980.33**MB*1999999444445*13*1~
-//CAS*CO*35*3019.67~
+//CAS*CO*45*3019.67~
 //NM1*QC*1*BORDER*LIZ*E***HN*996669999B~
 //MOA***MA02~
 //DTM*232*20020512~
@@ -1311,7 +1443,7 @@ namespace OpenDentBusiness
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*12233~
-//BPR*I*945*C*ACH*CCP*01*888999777*DA*24681012*1935665544*01*111333555*DA*144444*20020316~
+//BPR*I*945*C*ACH*CCP*01*888999777*DA*24681012*1935665544**01*111333555*DA*144444*20020316~
 //TRN*1*71700666555*1935665544~
 //DTM*405*20020314~
 //N1*PR*RUSHMORE LIFE~
