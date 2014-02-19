@@ -686,7 +686,7 @@ namespace OpenDental {
 					textBMIPercentileCode.Text="LOINC 59576-9";//Body mass index (BMI) [Percentile] Per age and gender, only code we will allow for percentile
 				}
 			}
-			if(bmiPercentile==-1 || ageBeforeJanFirst>=17 || ageBeforeJanFirst<3) {
+			if(bmiPercentile==-1) {
 				labelBMIPercentile.Visible=false;
 				textBMIPercentile.Visible=false;
 				labelBMIPercentileCode.Visible=false;
@@ -1334,12 +1334,12 @@ Do you want to remove the pregnancy diagnosis?"))
 			VitalsignCur.Weight=weight;
 			VitalsignCur.BpDiastolic=BPdia;
 			VitalsignCur.BpSystolic=BPsys;
+			//textBMIPercentile will be the calculated percentile or -1 if not in age range or there is an error calculating the percentile.
+			//In this case the text box will be not visible, but the text will be set to -1 and we will store it that way to indicate no valid BMIPercentile
+			VitalsignCur.BMIPercentile=PIn.Int(textBMIPercentile.Text);//could be -1 if not in age range or error calculating percentile
 			VitalsignCur.BMIExamCode="";
 			if(textBMIPercentileCode.Visible && textBMIPercentileCode.Text!="") {
 				VitalsignCur.BMIExamCode="59576-9";//Body mass index (BMI) [Percentile] Per age and gender, only code used for percentile, only visible if under 17 at time of exam
-			}
-			if(textBMIExamCode.Visible) {
-				VitalsignCur.BMIPercentile=PIn.Int(textBMIPercentile.Text);//could be -1 if not in age range or error calculating percentile
 			}
 			if(comboHeightExamCode.SelectedIndex>0) {
 				VitalsignCur.HeightExamCode=listHeightCodes[comboHeightExamCode.SelectedIndex-1].LoincCode;
