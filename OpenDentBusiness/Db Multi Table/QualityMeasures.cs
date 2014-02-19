@@ -5741,7 +5741,7 @@ BMI 18.5-25.";
 			_listExtraPopIndxs=new List<int>();
 			_listExtraPopIndxs.Add((int)QualityType2014.CariesPrevent_1);
 			_listExtraPopIndxs.Add((int)QualityType2014.CariesPrevent_2);
-			_listExtraPopIndxs.Add((int)QualityType2014.CariesPrevent_2);
+			_listExtraPopIndxs.Add((int)QualityType2014.CariesPrevent_3);
 			_listExtraPopIndxs.Add((int)QualityType2014.WeightAdult);
 			_listExtraPopIndxs.Add((int)QualityType2014.WeightChild_1_2);
 			_listExtraPopIndxs.Add((int)QualityType2014.WeightChild_1_3);
@@ -5944,12 +5944,13 @@ BMI 18.5-25.";
 				int s2numer1Indx=(int)QualityType2014.WeightChild_3_1;
 				int s2numer2Indx=(int)QualityType2014.WeightChild_3_2;
 				int s2numer3Indx=(int)QualityType2014.WeightChild_3_3;
-				int numPops=1;//if set to two or three, this will generate additional sets of population data (measure 69 has two populations, measure 155 has 3 numerators)
+				int numPops;//if set to two or three, this will generate additional sets of population data (measure 69 has two populations, measure 155 has 3 numerators)
 				for(int i=0;i<listQMs.Count;i++) {
 					//_listExtraPopIndxs will contain all of the Type2014 enum types that are stratifications or extra populations of other measures, so skip them here
 					if(_listExtraPopIndxs.Contains(i)) {
 						continue;
 					}
+					numPops=1;
 					switch(i) {
 						case (int)QualityType2014.WeightOver65:
 							//this wil create 2 populations, one for weight ages 18-64 and one for weight 65+
@@ -6427,6 +6428,7 @@ BMI 18.5-25.";
 					if(_listExtraPopIndxs.Contains(i)) {
 						continue;
 					}
+					numPops=1;
 					switch(i) {
 						case (int)QualityType2014.WeightOver65:
 							//this wil create 2 populations, one for weight ages 18-64 and one for weight 65+
@@ -7000,16 +7002,24 @@ BMI 18.5-25.";
 					Start("recordTarget");
 					#region patientRole
 					Start("patientRole");
+					//According to the QDM-Based QRDA template, the patientRole SHALL contain exactly 1 id such that it SHOULD contain zero or one Medicare HIC number
+					//No other id's are allowed, so if they do not have the Medicaid ID field in the patient info window filled in, the id will have nullFlavor=NI (No Information)
+					//see section 5.2 in the QRDA category I implementation guide, release 2
+					//located here: \\SERVERFILES\storage\EHR\Quality Measures\QRDA\CDAR2_QRDA_DSTUR2_2012JUL\CDAR2_QRDA_DSTUR2_2012JUL.docx
+					//if(patCur.SSN.Trim().Length==9) {
+					//	_w.WriteComment("This is the patient's SSN using the HL7 SSN OID");
+					//	StartAndEnd("id","root","2.16.840.1.113883.4.1","extension",patCur.SSN.Trim());//HL7 SSN OID root with patient's SSN if they have a valid one
+					//}
+					//_w.WriteComment("The extension is the patient's Open Dental number, the root is the assigning authority");
+					//StartAndEnd("id","root",_strOIDInternalPatRoot,"extension",patNumCur.ToString());
 					string strHICNum=ValidateMedicaidID(patCur.MedicaidID);
 					if(strHICNum!="") {
 						_w.WriteComment("This is the patient's Medicare HIC (Health Insurance Claim) number");
 						StartAndEnd("id","root","2.16.840.1.113883.4.572","extension",strHICNum);
 					}
-					//_w.WriteComment("The extension is the patient's Open Dental number, the root is the assigning authority");
-					//StartAndEnd("id","root",_strOIDInternalPatRoot,"extension",patNumCur.ToString());
-					if(patCur.SSN.Trim().Length==9) {
-						_w.WriteComment("This is the patient's SSN using the HL7 SSN OID");
-						StartAndEnd("id","root","2.16.840.1.113883.4.1","extension",patCur.SSN.Trim());//HL7 SSN OID root with patient's SSN if they have a valid one
+					else {
+						_w.WriteComment("The patient does not have a Medicare HIC (Health Insurance Claim) number assigned, use nullFlavor NI = No Information");
+						StartAndEnd("id","nullFlavor","NI");
 					}
 					AddressUnitedStates(patCur.Address,patCur.Address2,patCur.City,patCur.State,patCur.Zip,"HP");//Validated
 					if(patCur.WirelessPhone.Trim()!="") {//There is at least one phone, due to validation.
@@ -7308,12 +7318,29 @@ BMI 18.5-25.";
 					End("tr");
 					End("thead");
 					Start("tbody");
+					bool isInMeas155=false;
 					for(int j=0;j<listQMs.Count;j++) {
 						//_listExtraPopIndxs will contain all of the Type2014 enum types that are stratifications or extra populations of other measures, so skip them here
-						if(_listExtraPopIndxs.Contains(i)) {
+						if(_listExtraPopIndxs.Contains(j)
+							&& j!=(int)QualityType2014.WeightAdult //patient will be in either WeightAdult or WeightOver65 or neither, if in either group add measure
+							&& j!=(int)QualityType2014.WeightChild_1_2
+							&& j!=(int)QualityType2014.WeightChild_1_3)//if in any numerator for measure 155, Height and Weight, counseling for nutrition, or counseling for physical activity, add the measure
+						{
 							continue;
 						}
-						MeasureTextTableRow(listQMs[j].eMeasureTitle,listQMs[j].eMeasureNum,listQMs[j].eMeasureVNeutralId,listQMs[j].eMeasureVersion,listQMs[j].eMeasureVSpecificId);
+						for(int k=0;k<dictPatNumListQMs[patNumCur].Count;k++) {
+							if((int)dictPatNumListQMs[patNumCur][k].Type2014!=j) {
+								continue;
+							}
+							if(j==(int)QualityType2014.WeightChild_1_1 || j==(int)QualityType2014.WeightChild_1_2 || j==(int)QualityType2014.WeightChild_1_3) {
+								if(isInMeas155) {
+									break;
+								}
+								isInMeas155=true;
+							}
+							MeasureTextTableRow(listQMs[j].eMeasureTitle,listQMs[j].eMeasureNum,listQMs[j].eMeasureVNeutralId,listQMs[j].eMeasureVersion,listQMs[j].eMeasureVSpecificId);
+							break;
+						}
 					}
 					End("tbody");
 					End("table");
@@ -7321,12 +7348,29 @@ BMI 18.5-25.";
 					#endregion text version of eMeasures as table
 					#region eMeasure entries
 					_w.WriteComment("1..* Organizers, each containing a reference to an eMeasure");
+					isInMeas155=false;
 					for(int j=0;j<listQMs.Count;j++) {
 						//_listExtraPopIndxs will contain all of the Type2014 enum types that are stratifications or extra populations of other measures, so skip them here
-						if(_listExtraPopIndxs.Contains(i)) {
+						if(_listExtraPopIndxs.Contains(j)
+							&& j!=(int)QualityType2014.WeightAdult //patient will be in either WeightAdult or WeightOver65 or neither, if in either group add measure
+							&& j!=(int)QualityType2014.WeightChild_1_2
+							&& j!=(int)QualityType2014.WeightChild_1_3)//if in any numerator for measure 155, Height and Weight, counseling for nutrition, or counseling for physical activity, add the measure
+						{
 							continue;
 						}
-						MeasureEntry(listQMs[j].eMeasureVSpecificId,listQMs[j].eMeasureTitle,listQMs[j].eMeasureVNeutralId,listQMs[j].eMeasureVersion);
+						for(int k=0;k<dictPatNumListQMs[patNumCur].Count;k++) {
+							if((int)dictPatNumListQMs[patNumCur][k].Type2014!=j) {
+								continue;
+							}
+							if(j==(int)QualityType2014.WeightChild_1_1 || j==(int)QualityType2014.WeightChild_1_2 || j==(int)QualityType2014.WeightChild_1_3) {
+								if(isInMeas155) {
+									break;
+								}
+								isInMeas155=true;
+							}
+							MeasureEntry(listQMs[j].eMeasureVSpecificId,listQMs[j].eMeasureTitle,listQMs[j].eMeasureVNeutralId,listQMs[j].eMeasureVersion);
+							break;
+						}
 					}
 					#endregion eMeasure entries
 					End("section");
@@ -7688,9 +7732,13 @@ BMI 18.5-25.";
 										GenerateVitalsignEntry(vCur,"BMI");
 									}
 								}
-								//if(vCur.BMIPercentile>-1) {
-								//	GenerateVitalsignEntry(vCur,"BMIp");
-								//}
+								if(vCur.BMIPercentile>-1) {
+									extensCur=CqmItemAbbreviation.Vital.ToString()+"2.16.840.1.113883.3.464.1003.121.12.1012"+"Num"+vCur.EhrCqmVitalsignNum.ToString();
+									if(!listUniqueItemExtensionsWithValueSetOIDs.Contains(extensCur)) {
+										listUniqueItemExtensionsWithValueSetOIDs.Add(extensCur);
+										GenerateVitalsignEntry(vCur,"BMIp");
+									}
+								}
 								extensCur=CqmItemAbbreviation.Vital.ToString()+vCur.EhrCqmVitalsignNum.ToString();
 								if(listUniqueItemExtensions.Contains(extensCur)) {
 									continue;
@@ -7714,10 +7762,10 @@ BMI 18.5-25.";
 									descript="Physical Exam, Finding: BMI LOINC Value";
 									PatientDataTextTableRow(descript,"2.16.840.1.113883.3.600.1.681","LOINC","39156-5",vCur.DateTaken,vCur.DateTaken,vCur.BMI.ToString("0.00")+" kg/m2");
 								}
-								//if(vCur.BMIPercentile>-1) {
-								//	descript="Physical Exam, Finding: BMI Percentile";
-								//	PatientDataTextTableRow(descript,"2.16.840.1.113883.3.464.1003.121.12.1012","LOINC",vCur.BMIExamCode,vCur.DateTaken,vCur.DateTaken,vCur.BMIPercentile.ToString());
-								//}
+								if(vCur.BMIPercentile>-1) {
+									descript="Physical Exam, Finding: BMI Percentile";
+									PatientDataTextTableRow(descript,"2.16.840.1.113883.3.464.1003.121.12.1012","LOINC",vCur.BMIExamCode,vCur.DateTaken,vCur.DateTaken,vCur.BMIPercentile.ToString());
+								}
 								#endregion BuildPlainTextVersion
 							}
 						}
