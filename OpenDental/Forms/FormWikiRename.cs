@@ -40,6 +40,10 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return false;
 			}
+			if(textPageTitle.Text.Contains("#")) {
+				MsgBox.Show(this,"Page title cannot contain the pound character.");
+				return false;
+			}
 			if(textPageTitle.Text.StartsWith("_")) {
 				MsgBox.Show(this,"Page title cannot start with the underscore character.");
 				return false;
