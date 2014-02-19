@@ -599,6 +599,9 @@ namespace OpenDental{
 		}
 
 		private void RunDaily(){
+			if(Plugins.HookMethod(this,"FormRpProdInc.RunDaily_Start",PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text))) {
+				return;
+			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
 			//Date
@@ -1071,6 +1074,9 @@ namespace OpenDental{
 		}
 
 		private void RunMonthly(){
+			if(Plugins.HookMethod(this,"FormRpProdInc.RunMonthly_Start",PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text))) {
+				return;
+			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
 /*  There are 8 temp tables  
@@ -1648,6 +1654,9 @@ ORDER BY adjdate DESC
 		}
 
 		private void RunAnnual(){
+			if(Plugins.HookMethod(this,"FormRpProdInc.RunAnnual_Start",PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text))) {
+				return;
+			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
 			/*  There are 4 temp tables  
