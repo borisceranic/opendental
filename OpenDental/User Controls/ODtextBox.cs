@@ -122,10 +122,15 @@ namespace OpenDental {
 			//	base.Text=value.Replace("\r\n","\n").Replace("\n","\r\n");
 			//}
 			get {
+				if(base.Text==null) {
+					return "";
+				}
 				return Regex.Replace(base.Text,"(?<!\r)\n","\r\n");//replace '\n' with "\r\n"
 			}
 			set {
-				base.Text=Regex.Replace(value,"(?<!\r)\n","\r\n");
+				if(value!=null) {
+					base.Text=Regex.Replace(value,"(?<!\r)\n","\r\n");
+				}
 			}
 		}
 
