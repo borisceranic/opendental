@@ -280,7 +280,7 @@ namespace WebForms {
 			else if(!String.IsNullOrEmpty(RadioButtonValue)) {// cases like gender, position etc that have no value for RadioButtonGroup but have RadioButtonValue
 				ChkBoxGroupName=FieldName;
 			}
-			return ChkBoxGroupName;
+			return GetValidCheckBoxName(ChkBoxGroupName);
 		}
 
 		/// <summary>
@@ -347,9 +347,10 @@ namespace WebForms {
 				HiddenField hfAllGroupsList= new HiddenField();
 				hfAllGroupsList.ID="hfAllGroupsList";
 				foreach(string strkey in hiddenChkBoxGroupHashTable.Keys) {
+					string hiddenFieldId=GetValidCheckBoxName(strkey);
 					HiddenField hf= new HiddenField();
-					hf.ID=strkey;
-					hf.Value=(string)hiddenChkBoxGroupHashTable[strkey];
+					hf.ID=hiddenFieldId;
+					hf.Value=(string)hiddenChkBoxGroupHashTable[hiddenFieldId];
 					Panel1.Controls.Add(hf);
 					hfAllGroupsList.Value+=" "+hf.ID;
 				}
@@ -358,6 +359,25 @@ namespace WebForms {
 			}catch(Exception ex) {
 				Logger.LogError("IpAddress="+HttpContext.Current.Request.UserHostAddress+" DentalOfficeID="+DentalOfficeID+" WebSheetDefID="+WebSheetDefID,ex);
 			}
+		}
+
+		///<summary>Check box group and field names cannot have certain characters in their names.  These names are only used to help the javascript keep track of groups of check boxes and for checking if the check box has been flagged as required.  The following characters are replaced with a safe text version: /"'’`:\[]&- #</summary>
+		private string GetValidCheckBoxName(string name) {
+			string retVal=name;
+			retVal=retVal.Replace("/","fwdslash");
+			retVal=retVal.Replace("\"","dblqte");
+			retVal=retVal.Replace("'","sngqte");
+			retVal=retVal.Replace("’","curlysngqte");
+			retVal=retVal.Replace("`","tick");
+			retVal=retVal.Replace(":","colon");
+			retVal=retVal.Replace("\\","bckslash");
+			retVal=retVal.Replace("[","lftbrcket");
+			retVal=retVal.Replace("]","rgtbrcket");
+			retVal=retVal.Replace("&","amp");
+			retVal=retVal.Replace("-","dash");
+			retVal=retVal.Replace(" ","space");
+			retVal=retVal.Replace("#","pound");
+			return retVal;
 		}
 
 		/// <summary>
