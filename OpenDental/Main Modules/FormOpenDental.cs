@@ -516,11 +516,11 @@ namespace OpenDental{
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();
 			this.labelMsg = new System.Windows.Forms.Label();
-			this.labelWaitTime = new System.Windows.Forms.Label();
-			this.labelTriage = new System.Windows.Forms.Label();
 			this.butMapPhones = new OpenDental.UI.Button();
 			this.butTriage = new OpenDental.UI.Button();
 			this.butBigPhones = new OpenDental.UI.Button();
+			this.labelWaitTime = new System.Windows.Forms.Label();
+			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -1170,6 +1170,7 @@ namespace OpenDental{
 			// 
 			this.menuItemXChargeReconcile.Index = 8;
 			this.menuItemXChargeReconcile.Text = "X-Charge Reconcile";
+			this.menuItemXChargeReconcile.Visible = false;
 			this.menuItemXChargeReconcile.Click += new System.EventHandler(this.menuItemXChargeReconcile_Click);
 			// 
 			// menuItem9
@@ -1481,28 +1482,6 @@ namespace OpenDental{
 			this.labelMsg.Text = "V:00";
 			this.labelMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// labelWaitTime
-			// 
-			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
-			this.labelWaitTime.Location = new System.Drawing.Point(67, 2);
-			this.labelWaitTime.Name = "labelWaitTime";
-			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
-			this.labelWaitTime.TabIndex = 53;
-			this.labelWaitTime.Text = "00m";
-			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelTriage
-			// 
-			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTriage.ForeColor = System.Drawing.Color.Black;
-			this.labelTriage.Location = new System.Drawing.Point(30, 2);
-			this.labelTriage.Name = "labelTriage";
-			this.labelTriage.Size = new System.Drawing.Size(41, 20);
-			this.labelTriage.TabIndex = 53;
-			this.labelTriage.Text = "T:000";
-			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// butMapPhones
 			// 
 			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1544,6 +1523,28 @@ namespace OpenDental{
 			this.butBigPhones.TabIndex = 52;
 			this.butBigPhones.Text = "B";
 			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
+			// 
+			// labelWaitTime
+			// 
+			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
+			this.labelWaitTime.Location = new System.Drawing.Point(67, 2);
+			this.labelWaitTime.Name = "labelWaitTime";
+			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
+			this.labelWaitTime.TabIndex = 53;
+			this.labelWaitTime.Text = "00m";
+			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelTriage
+			// 
+			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTriage.ForeColor = System.Drawing.Color.Black;
+			this.labelTriage.Location = new System.Drawing.Point(30, 2);
+			this.labelTriage.Name = "labelTriage";
+			this.labelTriage.Size = new System.Drawing.Size(41, 20);
+			this.labelTriage.TabIndex = 53;
+			this.labelTriage.Text = "T:000";
+			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// lightSignalGrid1
 			// 
@@ -1860,7 +1861,7 @@ namespace OpenDental{
 			Bridges.ICat.StartFileWatcher();
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				menuItemResellers.Visible=true;
-				menuItemXChargeReconcile.Visible=false;
+				menuItemXChargeReconcile.Visible=true;
 				#if !DEBUG
 					if(Process.GetProcessesByName("WebCamOD").Length==0) {
 						try {
