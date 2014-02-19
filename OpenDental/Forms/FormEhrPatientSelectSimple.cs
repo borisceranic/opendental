@@ -29,7 +29,7 @@ namespace OpenDental {
 				"",false,"","",
 				"","","",0,
 				false,false,
-				Security.CurUser.ClinicNum,DateTime.MinValue,0,"","");
+				Security.CurUser.ClinicNum,DateTime.MinValue,0,"","","");
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
