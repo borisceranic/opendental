@@ -68,7 +68,7 @@ namespace OpenDental {
 		private void gridMain_CellLeave(object sender,ODGridClickEventArgs e) {
 			//Save data from grid into table. No call to DB, so this should be safe.
 			for(int i=0;i<gridMain.Rows.Count;i++) {
-				TableItem.Rows[0][i+1]=gridMain.Rows[i].Cells[1].Text;//Column 0 of TableItems.Rows[0] is in the title bar, so it is off from the grid by 1.
+				TableItem.Rows[0][i+1]=gridMain.Rows[i].Cells[1].Text.Replace("\r\n","\n").Replace("\n","\r\n");//Column 0 of TableItems.Rows[0] is in the title bar, so it is off from the grid by 1.
 			}
 			//FillGrid();//Causes errors with tabbing between cells. We put the PK in the title bar to fix this (now it doesn't need to be refreshed).
 		}
