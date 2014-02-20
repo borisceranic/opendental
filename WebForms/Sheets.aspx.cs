@@ -280,7 +280,10 @@ namespace WebForms {
 			else if(!String.IsNullOrEmpty(RadioButtonValue)) {// cases like gender, position etc that have no value for RadioButtonGroup but have RadioButtonValue
 				ChkBoxGroupName=FieldName;
 			}
-			return GetValidCheckBoxName(ChkBoxGroupName);
+			if(!String.IsNullOrEmpty(ChkBoxGroupName)) {
+				ChkBoxGroupName=GetValidCheckBoxName(ChkBoxGroupName);
+			}
+			return ChkBoxGroupName;
 		}
 
 		/// <summary>
