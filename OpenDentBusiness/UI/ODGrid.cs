@@ -976,8 +976,14 @@ namespace OpenDental.UI {
 		#endregion BeginEndUpdate
 
 		#region Printing
+
 		///<summary>If there are more pages to print, it returns -1.  If this is the last page, it returns the yPos of where the printing stopped.  Graphics will be paper, pageNumber resets some class level variables at page 0, bounds are used to contain the grid drawing, and marginTopFirstPage leaves room so as to not overwrite the title and subtitle.</summary>
 		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage) {
+			return PrintPage(g,pageNumber,bounds,marginTopFirstPage,false);
+		}
+
+		///<summary>Same as PrintPage, but added bool to signature for HasHeaderEveryPage. </summary>
+		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage,bool HasHeaderSpaceOnEveryPage) {
 			//Printers ignore TextRenderingHint.AntiAlias.  
 			//And they ignore SmoothingMode.HighQuality.
 			//They seem to do font themselves instead of letting us have control.
@@ -1006,6 +1012,9 @@ namespace OpenDental.UI {
 			gridPen=new Pen(this.cGridLine);
 			lowerPen=new Pen(this.cGridLine);
 			int yPos=bounds.Top;
+			if(HasHeaderSpaceOnEveryPage) {
+				yPos=marginTopFirstPage;//Margin is lower because title and subtitle are printed externally.
+			}
 			if(pageNumber==0) {
 				yPos=marginTopFirstPage;//Margin is lower because title and subtitle are printed externally.
 				RowsPrinted=0;

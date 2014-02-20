@@ -9527,7 +9527,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void pd2_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
+		private void pd2_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Rectangle bounds=new Rectangle(50,40,800,1000);//1035);//Some printers can handle up to 1042
 			Graphics g=e.Graphics;
 			string text;
@@ -9535,26 +9535,29 @@ namespace OpenDental{
 			Font subHeadingFont=new Font("Arial",10,FontStyle.Bold);
 			int yPos=bounds.Top;
 			#region printHeading
-			if(!headingPrinted){
-				text="Chart Progress Notes";
-				g.DrawString(text,headingFont,Brushes.Black,400-g.MeasureString(text,headingFont).Width/2,yPos);
-				yPos+=(int)g.MeasureString(text,headingFont).Height;
-				text=PatCur.GetNameFL();
-				g.DrawString(text,subHeadingFont,Brushes.Black,400-g.MeasureString(text,subHeadingFont).Width/2,yPos);
-				yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
-				text=DateTime.Today.ToShortDateString();
-				g.DrawString(text,subHeadingFont,Brushes.Black,400-g.MeasureString(text,subHeadingFont).Width/2,yPos);
-				yPos+=30;
-				headingPrinted=true;
-				headingPrintH=yPos;
+			text="Chart Progress Notes";//heading
+			g.DrawString(text,headingFont,Brushes.Black,400-g.MeasureString(text,headingFont).Width/2,yPos);
+			text=DateTime.Today.ToShortDateString();//date
+			g.DrawString(text,subHeadingFont,Brushes.Black,800-g.MeasureString(text,subHeadingFont).Width,yPos);
+			yPos+=(int)g.MeasureString(text,headingFont).Height;
+			text=PatCur.GetNameFL();//name
+			if(g.MeasureString(text,subHeadingFont).Width>700) {
+				//extremely long name
+				text=PatCur.GetNameFirst()[0]+". "+PatCur.LName;//example: J. Sparks
 			}
+			g.DrawString(text,subHeadingFont,Brushes.Black,400-g.MeasureString(text,subHeadingFont).Width/2,yPos);
+			text="Page "+(pagesPrinted+1);
+			g.DrawString(text,subHeadingFont,Brushes.Black,800-g.MeasureString(text,subHeadingFont).Width,yPos);
+			yPos+=30;
+			headingPrinted=true;
+			headingPrintH=yPos;
 			#endregion
-			yPos=gridProg.PrintPage(g,pagesPrinted,bounds,headingPrintH);
+			yPos=gridProg.PrintPage(g,pagesPrinted,bounds,headingPrintH,true);
 			pagesPrinted++;
 			if(yPos==-1) {
 				e.HasMorePages=true;
 			}
-			else{
+			else {
 				e.HasMorePages=false;
 			}
 			g.Dispose();
