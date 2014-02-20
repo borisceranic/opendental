@@ -27,12 +27,6 @@ namespace OpenDental {
 		private bool spellCheckIsEnabled;//set to true in constructor
 		private Point textEndPoint;
 
-		//public override string TextRN {
-		//	get {
-		//		return base.Text.Replace("\n","\r\n");
-		//	}
-		//}
-
 		///<summary>Set true to enable spell checking in this control.</summary>
 		[Category("Behavior"),Description("Set true to enable spell checking.")]
 		[DefaultValue(true)]
@@ -62,13 +56,10 @@ namespace OpenDental {
 			this.AcceptsTab=true;//Causes CR to not also trigger OK button on a form when that button is set as AcceptButton on the form.
 			this.DetectUrls=false;
 			if(System.ComponentModel.LicenseManager.UsageMode!=System.ComponentModel.LicenseUsageMode.Designtime
-				&& HunspellGlobal==null) 
-			{
+				&& HunspellGlobal==null) {
 				HunspellGlobal=new Hunspell(Properties.Resources.en_US_aff,Properties.Resources.en_US_dic);
 			}
 			ListCorrect=new List<string>();
-			ListCorrect.Add("\r");//to allow newline characters to not be counted as incorrect.
-			ListCorrect.Add("\r\n");//to allow 
 			ListCorrect.Add("\n");
 			ListCorrect.Add("\t");
 			ListIncorrect=new List<string>();
@@ -111,28 +102,6 @@ namespace OpenDental {
 			base.Dispose(disposing);
 		}
 
-		///<summary>Newline characters are handled differently with rich text boxes.  They were forcefully changing '\r\n' with '\n'.  This was causing issues.
-		///E.g. Sometimes a pop up would display, the user would click OK and it would ask the users if they wanted to save the changes when they didn't change anything.</summary>
-		public override string Text {
-			//Slower option
-			//get {
-			//	return base.Text.Replace("\r\n","\n").Replace("\n","\r\n");
-			//}
-			//set {
-			//	base.Text=value.Replace("\r\n","\n").Replace("\n","\r\n");
-			//}
-			get {
-				if(base.Text==null) {
-					return "";
-				}
-				return Regex.Replace(base.Text,"(?<!\r)\n","\r\n");//replace '\n' with "\r\n"
-			}
-			set {
-				if(value!=null) {
-					base.Text=Regex.Replace(value,"(?<!\r)\n","\r\n");
-				}
-			}
-		}
 
 		#region Component Designer generated code
 		/// <summary>
@@ -439,12 +408,11 @@ namespace OpenDental {
 			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
 				timer1.Stop();
 			}
-			//int originalLength=base.Text.Length;
-			int originalLength=Text.Length;
+			int originalLength=base.Text.Length;
 			int originalCaret=base.SelectionStart;
 			string newText=QuickPasteNotes.Substitute(Text,quickPasteType);
-			if(Text!=newText) {
-				Text=newText;
+			if(base.Text!=newText) {
+				base.Text=newText;
 				SelectionStart=originalCaret+Text.Length-originalLength;
 			}
 			//then CtrlQ
@@ -462,7 +430,7 @@ namespace OpenDental {
 			BufferGraphics.Clear(Color.Transparent);//We don't want to overwrite the text in the rich text box.
 			Graphics graphicsTextBox=Graphics.FromHwnd(this.Handle);
 			//split by spaces
-			MatchCollection mc=Regex.Matches(Text.Replace("\r\n","\n"),@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
+			MatchCollection mc=Regex.Matches(Text,@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
 			if(mc.Count==0) {//all text was deleted, clear the entire text box
 				Rectangle wavyLineArea=new Rectangle(1,1,this.Width,this.Height);
 				BufferGraphics.FillRectangle(Brushes.White,wavyLineArea);
@@ -648,15 +616,13 @@ namespace OpenDental {
 		///<summary></summary>
 		private List<MatchOD> GetWords() {
 			List<MatchOD> wordList=new List<MatchOD>();
-			//Replace "\r\n" with " \n" so that the regex measures the start indexes correctly.
-			MatchCollection mc=Regex.Matches(Text.Replace("\r\n","\n"),@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
+			MatchCollection mc=Regex.Matches(Text,@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
 			foreach(Match m in mc) {
 				Group g=m.Groups[0];//Group 0 is the entire match
 				if(g.Value.Length<2) {//only allow 'words' that are at least two chars long, 1 char 'words' are assumed spelled correctly
 					continue;
 				}
 				MatchOD word=new MatchOD();
-				//The index below is incrementally off by one for each preceding line return.
 				word.StartIndex=g.Index;//this index is the index within Text of the first char of this word (match)
 				word.Value=g.Value;
 				//loop through starting at the beginning of word looking for first letter or digit
@@ -743,7 +709,6 @@ namespace OpenDental {
 			Text=Text.Insert(caret,strPaste);
 			SelectionStart=caret+strPaste.Length;
 		}
-
 
 		///<summary>Analogous to a Match.  We use it to keep track of words that we find and their location within the larger string.</summary>
 		private class MatchOD {
