@@ -978,6 +978,11 @@ namespace OpenDental.UI {
 		#region Printing
 		///<summary>If there are more pages to print, it returns -1.  If this is the last page, it returns the yPos of where the printing stopped.  Graphics will be paper, pageNumber resets some class level variables at page 0, bounds are used to contain the grid drawing, and marginTopFirstPage leaves room so as to not overwrite the title and subtitle.</summary>
 		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage) {
+			return PrintPage(g,pageNumber,bounds,marginTopFirstPage,false);
+		}
+
+		///<summary>Same as PrintPage, but added bool to signature for HasHeaderEveryPage. </summary>
+		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage,bool HasHeaderSpaceOnEveryPage) {
 			//Printers ignore TextRenderingHint.AntiAlias.  
 			//And they ignore SmoothingMode.HighQuality.
 			//They seem to do font themselves instead of letting us have control.
@@ -1006,6 +1011,9 @@ namespace OpenDental.UI {
 			gridPen=new Pen(this.cGridLine);
 			lowerPen=new Pen(this.cGridLine);
 			int yPos=bounds.Top;
+			if(HasHeaderSpaceOnEveryPage) {
+				yPos=marginTopFirstPage;//Margin is lower because title and subtitle are printed externally.
+			}
 			if(pageNumber==0) {
 				yPos=marginTopFirstPage;//Margin is lower because title and subtitle are printed externally.
 				RowsPrinted=0;
@@ -1150,7 +1158,7 @@ namespace OpenDental.UI {
 					if(rows[RowsPrinted].Note=="") {
 						RowsPrinted++;//There is no note. Go to next row.
 						isFirstRowOnPage=false;
-						continue; 
+						continue;
 					}
 					//Figure out how much vertical distance the rest of the note will take up.
 					int noteHeight;
@@ -1228,7 +1236,7 @@ namespace OpenDental.UI {
 						noteHeight=bounds.Bottom-yPos;//This is the amount of space remaining.
 						if(noteHeight<15) {
 							return -1; //If noteHeight is less than this we will get a negative value for the rectangle of space remaining because we subtract 15 from this for the rectangle size when using measureString. This is because one line takes 15, and if there is 1 pixel of height available, measureString will fill it with text, which will then get partly cut off. So when we use measureString we will subtract 15 from the noteHeight.
-						}							
+						}
 						SizeF sizeF;
 						int charactersFitted;
 						int linesFilled;
@@ -1300,10 +1308,9 @@ namespace OpenDental.UI {
 					ComputeRows(gfx);
 				}
 				return yPos;
-				
+
 			}
-			else{//more pages to print
-				
+			else {//more pages to print
 				return -1;
 			}
 		}
