@@ -322,8 +322,8 @@ namespace OpenDental{
 			MinutesDisabled=0;
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			if(PopupCur.Description!=textDescription.Text) {//if user changed the note
+		private void butOK_Click(object sender,System.EventArgs e) {
+			if(PopupCur.Description.Replace("\r","")!=textDescription.Text.Replace("\r","")) {//if user changed the note
 				if(MsgBox.Show(this,true,"Save changes to note?")) {
 					Popup popupArchive=PopupCur.Copy();
 					popupArchive.IsArchived=true;
