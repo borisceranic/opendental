@@ -247,7 +247,7 @@ namespace OpenDental.Eclaims {
 					}
 				}
 				if(formId=="05") { //Manual claim form
-					Canadian.ShowManualClaimForm(claim);
+					Canadian.ShowCdaClaimForm(claim);
 					Close();
 				}
 				else {
@@ -258,18 +258,54 @@ namespace OpenDental.Eclaims {
 			}
 			else {
 				pd=CreatePrintDocument();
-				if(formId=="05") { //Manual claim form
+				if(formId=="05") { //Manual claim form (CDA claim form)
 #if DEBUG
-					Canadian.ShowManualClaimForm(claim);
+					Canadian.ShowCdaClaimForm(claim);//In debug mode, show the form on screen to save paper. Do not print to printer.
 #else
-					Canadian.PrintManualClaimForm(claim);//Send the print job to the physical printer.
+					Canadian.PrintCdaClaimForm(claim);//Send the print job to the physical printer.
 #endif
 				}
-				else {
+				else { //All other Canadian forms
 #if DEBUG
-					new FormCCDPrint(etrans.Copy(),MessageText,0,false,patientCopy);//Show the form on the screen.
+					new FormCCDPrint(etrans.Copy(),MessageText,0,false,patientCopy);//In debug mode, show the form on screen to save paper. Do not print to printer.
 #else
-					pd.Print();//Send the print job to the physical printer.
+					//Print to the printer in Release mode.
+					string strAuditDesc="";
+					switch(formId) {
+						default:
+							strAuditDesc="Default form printed";
+							break;
+						case "01"://CDA EOB Form
+							strAuditDesc="EOB form printed";
+							break;
+						case "02"://Dentaide Form
+							strAuditDesc="Dentaide form printed";
+							break;
+						case "03"://Claim Acknowledgement Form
+							strAuditDesc="Claim acknowledgement form printed";
+							break;
+						case "04"://Employer Certified Form
+							strAuditDesc="Employer certified form printed";
+							break;
+						case "05"://Plan Paper Claim Form (CDA form)
+							//Printed in an earlier step. This line should never be hit.
+							strAuditDesc="CDA claim form printed";
+							break;
+						case "06"://Predetermination Acknowledgement Form
+							strAuditDesc="Predetermination acknowledgement form printed";
+							break;
+						case "07"://Predetermination EOB Form
+							strAuditDesc="Predetermination EOB form printed";
+							break;
+						case "08"://Eligibility Form
+							strAuditDesc="Eligibility form printed";
+							break;
+					}
+					//Tries to print to the printer chosen by the user in File | Printers | Claim.
+					if(PrinterL.SetPrinter(pd,PrintSituation.Claim,etrans.PatNum,strAuditDesc)) {
+						pd.PrinterSettings.Copies=1;//Should always be 1, and we set it here just in case.  We also think that removing this line might cause an issue, but we can't remember what it is.
+						pd.Print();//Send the print job to the physical printer.
+					}
 #endif
 				}
 				//Print the remaining copies recursively.

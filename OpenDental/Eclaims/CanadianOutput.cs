@@ -715,7 +715,7 @@ namespace OpenDental.Eclaims {
 								claim.ClaimStatus="S";
 							}
 							else if(etransAck.AckCode=="M") {
-								Canadian.PrintManualClaimForm(claim);
+								Canadian.PrintCdaClaimForm(claim);
 							}
 							Claims.Update(claim);
 						}						
