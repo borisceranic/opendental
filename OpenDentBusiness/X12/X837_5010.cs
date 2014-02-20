@@ -229,7 +229,7 @@ namespace OpenDentBusiness
 				if(claim.ProvBill==claim.ProvTreat) {
 					usePrvBilling=true;
 				}
-				if(IsWashingtonMedicaid(clearhouse,carrier)) {
+				if(IsPassportHealthMedicaid(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
 					usePrvBilling=true;
 				}
 				if(usePrvBilling) {
@@ -1938,6 +1938,11 @@ namespace OpenDentBusiness
 
 		private static bool IsOfficeAlly(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="330897513");
+		}
+
+		///<summary>Contact information for this carrier is: (800)578-0775, P.O. BOX 7114 London Kentucky 40742-7114.</summary>
+		private static bool IsPassportHealthMedicaid(Clearinghouse clearinghouse) {
+			return (clearinghouse.ISA08=="61129");
 		}
 
 		private static bool IsTesia(Clearinghouse clearinghouse) {
