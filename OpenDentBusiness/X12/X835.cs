@@ -344,6 +344,75 @@ namespace OpenDentBusiness
       return result;
     }
 
+		///<summary>Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		public List<string> GetClaimAdjustmentInfo(string claimTrackingNumber) {
+			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
+			for(int i=0;i<segNumsCLP.Count;i++) {
+				int segNum=segNumsCLP[i];
+				X12Segment segCLP=segments[segNum];
+				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
+					continue;
+				}
+				int startSegNum=segNum+1;
+				int endSegNum=segments.Count;//this variable tracks where the segments end for claim i.
+				if(i<segNumsCLP.Count-1) {
+					endSegNum=segNumsCLP[i+1];
+				}
+				for(int j=startSegNum;j<endSegNum;j++) {
+					X12Segment seg=segments[j];
+					if(seg.SegmentID=="SVC") {
+						//If a procedure segment is encountered, then we have finished processing all of the claim-level adjustments.  Discontinue processing.
+						break;
+					}
+					if(seg.SegmentID!="CAS") {
+						continue;//Not an adjustment segment.
+					}
+					listClaimCasSegments.Add(seg);					
+				}
+			}
+			return ConvertCasAdjustmentsToHumanReadable(listClaimCasSegments);
+		}
+
+		///<summary>Converts a list of CAS segments into human readable data.
+		///Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		private List<string> ConvertCasAdjustmentsToHumanReadable(List<X12Segment> listCasSegments) {
+			List<string> listAdjustments=new List<string>();
+			for(int i=0;i<listCasSegments.Count;i++) {
+				X12Segment seg=listCasSegments[i];
+				string adjDescript="";
+				if(seg.Get(1)=="CO") {
+					adjDescript="Contractual Obligations (CO)";
+				}
+				else if(seg.Get(1)=="PI") {
+					adjDescript="Payor Initiated Reductions (PI)";
+				}
+				else if(seg.Get(1)=="PR") {
+					adjDescript="Patient Responsibility (PR)";
+				}
+				else { //seg.Get(1)=="OA"
+					adjDescript="Other Adjustments (OA)";
+				}
+				//Each CAS segment can contain up to 6 adjustments of the same type.
+				for(int k=2;k<=17;k+=3) {
+					string strAdjReasonCode=seg.Get(k);
+					string strAmt=seg.Get(k+1);
+					if(strAdjReasonCode=="" && strAmt=="") {
+						continue;
+					}
+					decimal amt=PIn.Decimal(strAmt);
+					if(amt==0) {
+						continue;
+					}
+					string strAdjReasonDescript="";
+					if(strAdjReasonCode!="") {
+						strAdjReasonDescript=GetDescriptForReasonCode(strAdjReasonCode);
+					}
+					listAdjustments.Add(adjDescript); listAdjustments.Add(strAdjReasonDescript); listAdjustments.Add(amt.ToString("f2"));
+				}
+			}
+			return listAdjustments;
+		}
+
 		///<summary>This function gets extra notes regarding the adjuducation of the claim if present.
 		///The data comes from two different segments, MIA (Inpatient Adjudication Information) and MOA (Outpatient Adjudication Information).
 		///Both segments MIA and MOA are situational, and if present, there will only be one or the other.
@@ -357,7 +426,7 @@ namespace OpenDentBusiness
 					continue;
 				}
 				int startSegNum=segNum+1;
-				int endSegNum=segments.Count;
+				int endSegNum=segments.Count;//this variable tracks where the segments end for claim i.
 				if(i<segNumsCLP.Count-1) {
 					endSegNum=segNumsCLP[i+1];
 				}
@@ -377,7 +446,7 @@ namespace OpenDentBusiness
 							listAdjudicationInfo.Add("Claim Diagnosis Related Group Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(4)).ToString("f2"));
 						}
 						if(seg.Get(5)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(6)!="") {
 							listAdjudicationInfo.Add("Disproportionate Share Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(6)).ToString("f2"));
@@ -422,16 +491,16 @@ namespace OpenDentBusiness
 							listAdjudicationInfo.Add("Professional Component Amount Billed But Not Payable"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(19)).ToString("f2"));
 						}
 						if(seg.Get(20)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(20)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(20)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(21)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(21)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(21)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(22)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(22)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(22)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(23)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(23)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(23)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(24)!="") {
 							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Exception Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(24)).ToString("f2"));
@@ -445,19 +514,19 @@ namespace OpenDentBusiness
 							listAdjudicationInfo.Add("Claim Health Care Financing Administration Common Procedural Coding System (HCPCS) Payable Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(2)).ToString("f2"));
 						}
 						if(seg.Get(3)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(3)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(3)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(4)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(4)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(4)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(5)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(5)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(6)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(6)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(6)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(7)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(7)+" See code source 411 at https://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
+							listAdjudicationInfo.Add("Claim Payment Remark Code"); listAdjudicationInfo.Add("Code: "+seg.Get(7)+"\r\nSee code source 411 at\r\nhttps://www.wpc-edi.com/reference/codelists/healthcare/remittance-advice-remark-codes/");
 						}
 						if(seg.Get(8)!="") {
 							listAdjudicationInfo.Add("End Stage Renal Disease (ESRD) Payment Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(8)).ToString("f2"));

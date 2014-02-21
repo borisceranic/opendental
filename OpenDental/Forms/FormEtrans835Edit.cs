@@ -35,7 +35,10 @@ namespace OpenDental {
 			if(_x835==null) {
 				return;
 			}
+			gridProviderAdjustments.Width=butClose.Right-gridProviderAdjustments.Left;
 			FillProviderAdjustmentDetails();//Because the grid columns change size depending on the form size.
+			gridClaimDetails.Width=gridProviderAdjustments.Width;
+			gridClaimDetails.Height=labelInsPaidTotal.Top-5-gridClaimDetails.Top;
 			FillClaimDetails();//Because the grid columns change size depending on the form size.
 		}
 
@@ -110,7 +113,7 @@ namespace OpenDental {
 			const int colWidthClaimAmt=80;
 			const int colWidthPaidAmt=80;
 			const int colWidthPatAmt=80;
-			int colWidthVariable=this.Width-2*gridClaimDetails.Left-36-colWidthLname-colWidthFname-colWidthDateService-colWidthClaimId-colWidthPayorControlNum-colWidthClaimAmt-colWidthPaidAmt-colWidthPatAmt;
+			int colWidthVariable=gridClaimDetails.Width-colWidthLname-colWidthFname-colWidthDateService-colWidthClaimId-colWidthPayorControlNum-colWidthClaimAmt-colWidthPaidAmt-colWidthPatAmt;
 			gridClaimDetails.BeginUpdate();
 			gridClaimDetails.Columns.Clear();
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"LName"),colWidthLname,HorizontalAlignment.Left));
@@ -161,7 +164,7 @@ namespace OpenDental {
 			const int colWidthReasonCode=90;
 			const int colWidthRefIdent=80;
 			const int colWidthAmount=80;
-			int colWidthVariable=this.Width-gridProviderAdjustments.Left-36-colWidthNPI-colWidthFiscalPeriod-colWidthReasonCode-colWidthRefIdent-colWidthAmount;
+			int colWidthVariable=gridProviderAdjustments.Width-colWidthNPI-colWidthFiscalPeriod-colWidthReasonCode-colWidthRefIdent-colWidthAmount;
 			gridProviderAdjustments.BeginUpdate();
 			gridProviderAdjustments.Columns.Clear();
 			gridProviderAdjustments.Columns.Add(new ODGridColumn("NPI",colWidthNPI,HorizontalAlignment.Center));
@@ -203,11 +206,12 @@ namespace OpenDental {
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			string claimTrackingNumber=(string)gridClaimDetails.Rows[e.Row].Tag;
 			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(_x835,claimTrackingNumber);
-			form.ShowDialog();
+			form.Show(this);
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.OK;
+			Close();
 		}
 		
 	}

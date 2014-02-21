@@ -1137,7 +1137,7 @@ namespace OpenDental{
 			if(et.Etype==EtransType.ERA_835) {
 				FormEtrans835Edit Form835=new FormEtrans835Edit();
 				Form835.EtransCur=et;
-				Form835.ShowDialog();
+				Form835.Show();
 				return;//No refresh needed because 835s are not editable, they are read only.
 			}
 			FormEtransEdit FormE=new FormEtransEdit();

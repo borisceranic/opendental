@@ -28,7 +28,6 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.textDateService = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
-			this.butClose = new OpenDental.UI.Button();
 			this.textClaimIdentifier = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textPayorControlNum = new System.Windows.Forms.TextBox();
@@ -43,6 +42,8 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.gridAdjudicationDetails = new OpenDental.UI.ODGrid();
 			this.gridProcedureDetails = new OpenDental.UI.ODGrid();
+			this.butClose = new OpenDental.UI.Button();
+			this.gridAdjustmentDetails = new OpenDental.UI.ODGrid();
 			this.SuspendLayout();
 			// 
 			// textPatientName
@@ -78,21 +79,6 @@ namespace OpenDental{
 			this.label9.TabIndex = 152;
 			this.label9.Text = "Date Service";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// butClose
-			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butClose.Autosize = true;
-			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(890, 664);
-			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75, 24);
-			this.butClose.TabIndex = 3;
-			this.butClose.Text = "&Close";
-			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// textClaimIdentifier
 			// 
@@ -201,15 +187,16 @@ namespace OpenDental{
 			this.gridAdjudicationDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridAdjudicationDetails.HScrollVisible = false;
-			this.gridAdjudicationDetails.Location = new System.Drawing.Point(9, 101);
+			this.gridAdjudicationDetails.Location = new System.Drawing.Point(9, 551);
 			this.gridAdjudicationDetails.Name = "gridAdjudicationDetails";
 			this.gridAdjudicationDetails.ScrollValue = 0;
 			this.gridAdjudicationDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridAdjudicationDetails.Size = new System.Drawing.Size(956, 84);
+			this.gridAdjudicationDetails.Size = new System.Drawing.Size(956, 107);
 			this.gridAdjudicationDetails.TabIndex = 197;
 			this.gridAdjudicationDetails.TabStop = false;
 			this.gridAdjudicationDetails.Title = "Adjudication Details";
 			this.gridAdjudicationDetails.TranslationName = "FormEtrans835Edit";
+			this.gridAdjudicationDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAdjudicationDetails_CellDoubleClick);
 			// 
 			// gridProcedureDetails
 			// 
@@ -217,20 +204,51 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridProcedureDetails.HScrollVisible = false;
-			this.gridProcedureDetails.Location = new System.Drawing.Point(9, 191);
+			this.gridProcedureDetails.Location = new System.Drawing.Point(9, 267);
 			this.gridProcedureDetails.Name = "gridProcedureDetails";
 			this.gridProcedureDetails.ScrollValue = 0;
 			this.gridProcedureDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 467);
+			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 278);
 			this.gridProcedureDetails.TabIndex = 0;
 			this.gridProcedureDetails.TabStop = false;
 			this.gridProcedureDetails.Title = "Procedure Details";
 			this.gridProcedureDetails.TranslationName = "FormEtrans835Edit";
 			// 
+			// butClose
+			// 
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butClose.Autosize = true;
+			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClose.CornerRadius = 4F;
+			this.butClose.Location = new System.Drawing.Point(890, 664);
+			this.butClose.Name = "butClose";
+			this.butClose.Size = new System.Drawing.Size(75, 24);
+			this.butClose.TabIndex = 3;
+			this.butClose.Text = "&Close";
+			this.butClose.Click += new System.EventHandler(this.butClose_Click);
+			// 
+			// gridAdjustmentDetails
+			// 
+			this.gridAdjustmentDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAdjustmentDetails.HScrollVisible = false;
+			this.gridAdjustmentDetails.Location = new System.Drawing.Point(9, 97);
+			this.gridAdjustmentDetails.Name = "gridAdjustmentDetails";
+			this.gridAdjustmentDetails.ScrollValue = 0;
+			this.gridAdjustmentDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridAdjustmentDetails.Size = new System.Drawing.Size(956, 107);
+			this.gridAdjustmentDetails.TabIndex = 198;
+			this.gridAdjustmentDetails.TabStop = false;
+			this.gridAdjustmentDetails.Title = "Adjustment Details";
+			this.gridAdjustmentDetails.TranslationName = "FormEtrans835Edit";
+			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.gridAdjustmentDetails);
 			this.Controls.Add(this.gridAdjudicationDetails);
 			this.Controls.Add(this.textPatientPortion);
 			this.Controls.Add(this.label7);
@@ -283,5 +301,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPatientPortion;
 		private System.Windows.Forms.Label label7;
 		private UI.ODGrid gridAdjudicationDetails;
+		private UI.ODGrid gridAdjustmentDetails;
 	}
 }

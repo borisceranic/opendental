@@ -18,6 +18,8 @@ namespace OpenDental {
 		private string[] _claimInfo;
 		private Claim _claim;
 		private Patient _pat;
+		private List<string> _listAdjustmentDetails;
+		private List<string> _listAdjudicationDetails;
 
 		public FormEtrans835ClaimEdit(X835 x835,string claimTrackingNumber) {
 			InitializeComponent();
@@ -39,11 +41,15 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835ClaimEdit_Resize(object sender,EventArgs e) {
+			FillAdjustmentDetail();//Because the grid columns change size depending on the form size.
+			FillProcedureDetails();//Because the grid columns change size depending on the form size.
 			FillAdjudicationDetails();//Because the grid columns change size depending on the form size.
 		}
 
 		private void FillAll() {
 			FillHeader();
+			FillAdjustmentDetail();
+			FillProcedureDetails();
 			FillAdjudicationDetails();
 		}
 
@@ -68,24 +74,74 @@ namespace OpenDental {
 			textPatientPortion.Text=_claimInfo[3];
 		}
 
+		private void FillAdjustmentDetail() {
+			_listAdjustmentDetails=_x835.GetClaimAdjustmentInfo(_claimTrackingNumber);
+			if(_listAdjustmentDetails.Count==0) {
+				gridAdjustmentDetails.Title="Adjustment Details (None Reported)";
+			}
+			else {
+				gridAdjustmentDetails.Title="Adjustment Details";
+			}
+			gridAdjustmentDetails.BeginUpdate();
+			gridAdjustmentDetails.Columns.Clear();
+			const int colWidthDescription=200;
+			const int colWidthAmount=80;
+			int colWidthVariable=gridAdjustmentDetails.Width-10-colWidthDescription-colWidthAmount;
+			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Description",colWidthDescription,HorizontalAlignment.Left));
+			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
+			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Amount",colWidthAmount,HorizontalAlignment.Right));
+			gridAdjustmentDetails.Rows.Clear();
+			for(int i=0;i<_listAdjustmentDetails.Count;i+=3) {
+				ODGridRow row=new ODGridRow();
+				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i]));//Description
+				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+1]));//Reason
+				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+2]));//Amount
+				gridAdjustmentDetails.Rows.Add(row);
+			}
+			gridAdjustmentDetails.EndUpdate();
+		}
+
+		private void FillProcedureDetails() {
+			List<string> listProcedureDetails=new List<string>();//TODO: Get data from x835.
+			if(listProcedureDetails.Count==0) {
+				gridProcedureDetails.Title="Procedure Details (None Reported)";
+			}
+			else {
+				gridProcedureDetails.Title="Procedure Details";
+			}
+			//TODO:
+		}
+
 		private void FillAdjudicationDetails() {
+			_listAdjudicationDetails=_x835.GetClaimAdjudicationInfo(_claimTrackingNumber);
+			if(_listAdjudicationDetails.Count==0) {
+				gridAdjudicationDetails.Title="Adjudication Details (None Reported)";
+			}
+			else {
+				gridAdjudicationDetails.Title="Adjudication Details";
+			}
 			gridAdjudicationDetails.BeginUpdate();
 			gridAdjudicationDetails.Columns.Clear();
 			gridAdjudicationDetails.Columns.Add(new UI.ODGridColumn("Description",gridAdjudicationDetails.Width/2,HorizontalAlignment.Left));
 			gridAdjudicationDetails.Columns.Add(new UI.ODGridColumn("Value",gridAdjudicationDetails.Width/2,HorizontalAlignment.Left));
 			gridAdjudicationDetails.Rows.Clear();
-			List<string> listAdjudicationDetails=_x835.GetClaimAdjudicationInfo(_claimTrackingNumber);
-			for(int i=0;i<listAdjudicationDetails.Count;i+=2) {
+			for(int i=0;i<_listAdjudicationDetails.Count;i+=2) {
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new UI.ODGridCell(listAdjudicationDetails[i]));
-				row.Cells.Add(new UI.ODGridCell(listAdjudicationDetails[i+1]));
+				row.Cells.Add(new UI.ODGridCell(_listAdjudicationDetails[i]));
+				row.Cells.Add(new UI.ODGridCell(_listAdjudicationDetails[i+1]));
 				gridAdjudicationDetails.Rows.Add(row);
 			}
 			gridAdjudicationDetails.EndUpdate();
 		}
 
+		private void gridAdjudicationDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_listAdjudicationDetails[e.Row*2+1]);
+			msgbox.Show(this);
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.OK;
+			Close();
 		}
 		
 	}
