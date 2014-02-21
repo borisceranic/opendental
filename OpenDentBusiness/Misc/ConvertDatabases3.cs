@@ -3902,7 +3902,15 @@ namespace OpenDentBusiness {
 		private static void To14_2_0() {
 			if(FromVersion<new Version("14.2.0.0")) {
 				string command;
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('CustListenerPort','25255')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'CustListenerPort','25255')";
+					Db.NonQ(command);
+				}
+				
 
 
 

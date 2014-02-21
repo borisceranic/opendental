@@ -135,6 +135,12 @@ namespace OpenDentBusiness {
 		CQMDefaultEncounterCodeValue,
 		CQMDefaultEncounterCodeSystem,
 		CropDelta,
+		///<summary>Used by OpenDentalCustListener.  String specifies which port the OpenDentalWebService should look for on the customer's server in order to create a socket connection.  Will typically be converted to an int but we will store it as a string just in case.</summary>
+		CustListenerPort,
+		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalCustListener when service initialized.  Specifies the read/write socket timeout.  Will typically be converted to an int but we will store it as a string just in case.</summary>
+		CustListenerSocketTimeoutMS,
+		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalCustListener when service initialized.  Specifies the time (in minutes) between each time that the listener service will upload it's current heartbeat to HQ.  Stored as int.</summary>
+		CustListenerHeartbeatFrequencyMinutes,
 		CustomizedForPracticeWeb,
 		DatabaseConvertedForMySql41,
 		DataBaseVersion,
