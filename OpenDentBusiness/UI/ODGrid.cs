@@ -1740,6 +1740,16 @@ namespace OpenDental.UI {
 
 		///<summary>When selection mode is OneCell, and user clicks in a column that isEditable, then this edit box will appear.  Pass in the location from the click event so that we can determine where to place the text cursor in the box.</summary>
 		private void CreateEditBox() {
+			if(-vScroll.Value+1+titleHeight+headerHeight+RowLocs[selectedCell.Y]+RowHeights[selectedCell.Y]>this.DisplayRectangle.Bottom) {//If new edit box location is below the display screen
+				int onScreenPixels=vScroll.Value+DisplayRectangle.Height-titleHeight-headerHeight-(RowLocs[selectedCell.Y]);
+				int offScreenPixels=RowHeights[selectedCell.Y]-onScreenPixels;
+				if(offScreenPixels>0) {
+					ScrollValue+=offScreenPixels;//Scrolling down
+				}
+			}
+			else if(-vScroll.Value+1+titleHeight+headerHeight+RowLocs[selectedCell.Y]<this.DisplayRectangle.Top+titleHeight+headerHeight) {//If new edit box location is above the display screen
+				ScrollToIndex(selectedCell.Y);//Scrolling up
+			}
 			editBox=new TextBox();
 			//The problem is that it ignores the height.
 			editBox.Multiline=true;
