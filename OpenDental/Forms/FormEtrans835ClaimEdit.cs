@@ -70,8 +70,11 @@ namespace OpenDental {
 			textPayorControlNum.Text=_claimInfo[4];
 			textStatus.Text=_claimInfo[0];
 			textClaimFee.Text=_claimInfo[1];
+			textClaimFee2.Text=_claimInfo[1];
 			textInsPaid.Text=_claimInfo[2];
+			textInsPaid2.Text=_claimInfo[2];
 			textPatientPortion.Text=_claimInfo[3];
+			textPatientPortion2.Text=_claimInfo[3];
 		}
 
 		private void FillAdjustmentDetail() {
@@ -91,14 +94,18 @@ namespace OpenDental {
 			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
 			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Amount",colWidthAmount,HorizontalAlignment.Right));
 			gridAdjustmentDetails.Rows.Clear();
+			decimal totalAdjustments=0;
 			for(int i=0;i<_listAdjustmentDetails.Count;i+=3) {
 				ODGridRow row=new ODGridRow();
 				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i]));//Description
 				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+1]));//Reason
 				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+2]));//Amount
+				decimal adjAmount=PIn.Decimal(_listAdjustmentDetails[i+2]);
+				totalAdjustments+=adjAmount;
 				gridAdjustmentDetails.Rows.Add(row);
 			}
 			gridAdjustmentDetails.EndUpdate();
+			textTotalAdjustments.Text=totalAdjustments.ToString("f2");
 		}
 
 		private void FillProcedureDetails() {

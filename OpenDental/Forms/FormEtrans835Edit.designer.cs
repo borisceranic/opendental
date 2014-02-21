@@ -55,18 +55,14 @@ namespace OpenDental{
 			this.labelPayeeIdType = new System.Windows.Forms.Label();
 			this.textPayeeID = new System.Windows.Forms.TextBox();
 			this.textClaimPaymentTotal = new System.Windows.Forms.TextBox();
-			this.labelInsPaidTotal = new System.Windows.Forms.Label();
+			this.labelEquation = new System.Windows.Forms.Label();
 			this.textProvAdjustmentTotal = new System.Windows.Forms.TextBox();
-			this.label3 = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
-			this.label19 = new System.Windows.Forms.Label();
 			this.label20 = new System.Windows.Forms.Label();
 			this.textPaymentAmountCalc = new System.Windows.Forms.TextBox();
-			this.label21 = new System.Windows.Forms.Label();
 			this.gridProviderAdjustments = new OpenDental.UI.ODGrid();
-			this.butRawMessage = new OpenDental.UI.Button();
 			this.gridClaimDetails = new OpenDental.UI.ODGrid();
+			this.butRawMessage = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
@@ -333,71 +329,41 @@ namespace OpenDental{
 			this.textClaimPaymentTotal.ReadOnly = true;
 			this.textClaimPaymentTotal.Size = new System.Drawing.Size(110, 20);
 			this.textClaimPaymentTotal.TabIndex = 176;
-			this.textClaimPaymentTotal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
-			// labelInsPaidTotal
+			// labelEquation
 			// 
-			this.labelInsPaidTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInsPaidTotal.Location = new System.Drawing.Point(3, 646);
-			this.labelInsPaidTotal.Name = "labelInsPaidTotal";
-			this.labelInsPaidTotal.Size = new System.Drawing.Size(140, 20);
-			this.labelInsPaidTotal.TabIndex = 175;
-			this.labelInsPaidTotal.Text = "InsPaid Total";
-			this.labelInsPaidTotal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelEquation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelEquation.Location = new System.Drawing.Point(3, 646);
+			this.labelEquation.Name = "labelEquation";
+			this.labelEquation.Size = new System.Drawing.Size(494, 20);
+			this.labelEquation.TabIndex = 175;
+			this.labelEquation.Text = "         InsPaid Total                  -    Prov AdjAmtTotal          =    Payme" +
+    "nt Amount";
+			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textProvAdjustmentTotal
 			// 
 			this.textProvAdjustmentTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textProvAdjustmentTotal.Location = new System.Drawing.Point(163, 667);
+			this.textProvAdjustmentTotal.Location = new System.Drawing.Point(161, 667);
 			this.textProvAdjustmentTotal.Name = "textProvAdjustmentTotal";
 			this.textProvAdjustmentTotal.ReadOnly = true;
 			this.textProvAdjustmentTotal.Size = new System.Drawing.Size(110, 20);
 			this.textProvAdjustmentTotal.TabIndex = 178;
 			// 
-			// label3
-			// 
-			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label3.Location = new System.Drawing.Point(161, 646);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(140, 20);
-			this.label3.TabIndex = 177;
-			this.label3.Text = "Prov AdjAmt Total";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// label16
-			// 
-			this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label16.Location = new System.Drawing.Point(146, 646);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(12, 20);
-			this.label16.TabIndex = 179;
-			this.label16.Text = "-";
-			this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// label18
 			// 
 			this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label18.Location = new System.Drawing.Point(146, 667);
+			this.label18.Location = new System.Drawing.Point(144, 667);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(12, 20);
 			this.label18.TabIndex = 180;
 			this.label18.Text = "-";
 			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label19
-			// 
-			this.label19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label19.Location = new System.Drawing.Point(304, 646);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(12, 20);
-			this.label19.TabIndex = 181;
-			this.label19.Text = "=";
-			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// label20
 			// 
 			this.label20.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label20.Location = new System.Drawing.Point(304, 667);
+			this.label20.Location = new System.Drawing.Point(274, 667);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(12, 20);
 			this.label20.TabIndex = 182;
@@ -407,21 +373,11 @@ namespace OpenDental{
 			// textPaymentAmountCalc
 			// 
 			this.textPaymentAmountCalc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textPaymentAmountCalc.Location = new System.Drawing.Point(330, 667);
+			this.textPaymentAmountCalc.Location = new System.Drawing.Point(289, 667);
 			this.textPaymentAmountCalc.Name = "textPaymentAmountCalc";
 			this.textPaymentAmountCalc.ReadOnly = true;
 			this.textPaymentAmountCalc.Size = new System.Drawing.Size(110, 20);
 			this.textPaymentAmountCalc.TabIndex = 184;
-			// 
-			// label21
-			// 
-			this.label21.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label21.Location = new System.Drawing.Point(328, 646);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(140, 20);
-			this.label21.TabIndex = 183;
-			this.label21.Text = "Payment Amount";
-			this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// gridProviderAdjustments
 			// 
@@ -435,6 +391,20 @@ namespace OpenDental{
 			this.gridProviderAdjustments.TabStop = false;
 			this.gridProviderAdjustments.Title = "Provider Adjustments";
 			this.gridProviderAdjustments.TranslationName = "FormEtrans835Edit";
+			// 
+			// gridClaimDetails
+			// 
+			this.gridClaimDetails.HScrollVisible = false;
+			this.gridClaimDetails.Location = new System.Drawing.Point(9, 296);
+			this.gridClaimDetails.Name = "gridClaimDetails";
+			this.gridClaimDetails.ScrollValue = 0;
+			this.gridClaimDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridClaimDetails.Size = new System.Drawing.Size(956, 347);
+			this.gridClaimDetails.TabIndex = 0;
+			this.gridClaimDetails.TabStop = false;
+			this.gridClaimDetails.Title = "Claim EOBs";
+			this.gridClaimDetails.TranslationName = "FormEtrans835Edit";
+			this.gridClaimDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClaimDetails_CellDoubleClick);
 			// 
 			// butRawMessage
 			// 
@@ -450,20 +420,6 @@ namespace OpenDental{
 			this.butRawMessage.TabIndex = 116;
 			this.butRawMessage.Text = "Raw Message";
 			this.butRawMessage.Click += new System.EventHandler(this.butRawMessage_Click);
-			// 
-			// gridClaimDetails
-			// 
-			this.gridClaimDetails.HScrollVisible = false;
-			this.gridClaimDetails.Location = new System.Drawing.Point(9, 296);
-			this.gridClaimDetails.Name = "gridClaimDetails";
-			this.gridClaimDetails.ScrollValue = 0;
-			this.gridClaimDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridClaimDetails.Size = new System.Drawing.Size(956, 347);
-			this.gridClaimDetails.TabIndex = 0;
-			this.gridClaimDetails.TabStop = false;
-			this.gridClaimDetails.Title = "Claim EOBs";
-			this.gridClaimDetails.TranslationName = "FormEtrans835Edit";
-			this.gridClaimDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClaimDetails_CellDoubleClick);
 			// 
 			// butClose
 			// 
@@ -485,15 +441,11 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textPaymentAmountCalc);
-			this.Controls.Add(this.label21);
 			this.Controls.Add(this.label20);
-			this.Controls.Add(this.label19);
 			this.Controls.Add(this.label18);
-			this.Controls.Add(this.label16);
 			this.Controls.Add(this.textProvAdjustmentTotal);
-			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textClaimPaymentTotal);
-			this.Controls.Add(this.labelInsPaidTotal);
+			this.Controls.Add(this.labelEquation);
 			this.Controls.Add(this.gridProviderAdjustments);
 			this.Controls.Add(this.textPayeeID);
 			this.Controls.Add(this.labelPayeeIdType);
@@ -577,14 +529,10 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPayeeID;
 		private UI.ODGrid gridProviderAdjustments;
 		private System.Windows.Forms.TextBox textClaimPaymentTotal;
-		private System.Windows.Forms.Label labelInsPaidTotal;
+		private System.Windows.Forms.Label labelEquation;
 		private System.Windows.Forms.TextBox textProvAdjustmentTotal;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label16;
 		private System.Windows.Forms.Label label18;
-		private System.Windows.Forms.Label label19;
 		private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.TextBox textPaymentAmountCalc;
-		private System.Windows.Forms.Label label21;
 	}
 }

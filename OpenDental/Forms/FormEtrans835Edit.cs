@@ -38,7 +38,7 @@ namespace OpenDental {
 			gridProviderAdjustments.Width=butClose.Right-gridProviderAdjustments.Left;
 			FillProviderAdjustmentDetails();//Because the grid columns change size depending on the form size.
 			gridClaimDetails.Width=gridProviderAdjustments.Width;
-			gridClaimDetails.Height=labelInsPaidTotal.Top-5-gridClaimDetails.Top;
+			gridClaimDetails.Height=labelEquation.Top-5-gridClaimDetails.Top;
 			FillClaimDetails();//Because the grid columns change size depending on the form size.
 		}
 

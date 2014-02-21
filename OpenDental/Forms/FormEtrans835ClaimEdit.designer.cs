@@ -44,6 +44,16 @@ namespace OpenDental{
 			this.gridProcedureDetails = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
 			this.gridAdjustmentDetails = new OpenDental.UI.ODGrid();
+			this.label18 = new System.Windows.Forms.Label();
+			this.textTotalAdjustments = new System.Windows.Forms.TextBox();
+			this.textClaimFee2 = new System.Windows.Forms.TextBox();
+			this.labelEquation = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
+			this.textPatientPortion2 = new System.Windows.Forms.TextBox();
+			this.label10 = new System.Windows.Forms.Label();
+			this.textInsPaid2 = new System.Windows.Forms.TextBox();
+			this.textProcAdjustments = new System.Windows.Forms.TextBox();
+			this.label11 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// textPatientName
@@ -204,11 +214,11 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridProcedureDetails.HScrollVisible = false;
-			this.gridProcedureDetails.Location = new System.Drawing.Point(9, 267);
+			this.gridProcedureDetails.Location = new System.Drawing.Point(9, 254);
 			this.gridProcedureDetails.Name = "gridProcedureDetails";
 			this.gridProcedureDetails.ScrollValue = 0;
 			this.gridProcedureDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 278);
+			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 291);
 			this.gridProcedureDetails.TabIndex = 0;
 			this.gridProcedureDetails.TabStop = false;
 			this.gridProcedureDetails.Title = "Procedure Details";
@@ -244,10 +254,116 @@ namespace OpenDental{
 			this.gridAdjustmentDetails.Title = "Adjustment Details";
 			this.gridAdjustmentDetails.TranslationName = "FormEtrans835Edit";
 			// 
+			// label18
+			// 
+			this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label18.Location = new System.Drawing.Point(287, 228);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(12, 20);
+			this.label18.TabIndex = 204;
+			this.label18.Text = "-";
+			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textTotalAdjustments
+			// 
+			this.textTotalAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textTotalAdjustments.Location = new System.Drawing.Point(304, 228);
+			this.textTotalAdjustments.Name = "textTotalAdjustments";
+			this.textTotalAdjustments.ReadOnly = true;
+			this.textTotalAdjustments.Size = new System.Drawing.Size(110, 20);
+			this.textTotalAdjustments.TabIndex = 202;
+			// 
+			// textClaimFee2
+			// 
+			this.textClaimFee2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textClaimFee2.Location = new System.Drawing.Point(173, 228);
+			this.textClaimFee2.Name = "textClaimFee2";
+			this.textClaimFee2.ReadOnly = true;
+			this.textClaimFee2.Size = new System.Drawing.Size(110, 20);
+			this.textClaimFee2.TabIndex = 200;
+			// 
+			// labelEquation
+			// 
+			this.labelEquation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelEquation.Location = new System.Drawing.Point(174, 207);
+			this.labelEquation.Name = "labelEquation";
+			this.labelEquation.Size = new System.Drawing.Size(700, 20);
+			this.labelEquation.TabIndex = 199;
+			this.labelEquation.Text = "Claim Fee                       -    Claim Adjustments          -    Proc Adjustm" +
+    "ents           -    Patient Portion               =    Ins Paid";
+			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label3
+			// 
+			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label3.Location = new System.Drawing.Point(417, 228);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(12, 20);
+			this.label3.TabIndex = 206;
+			this.label3.Text = "-";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPatientPortion2
+			// 
+			this.textPatientPortion2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textPatientPortion2.Location = new System.Drawing.Point(566, 228);
+			this.textPatientPortion2.Name = "textPatientPortion2";
+			this.textPatientPortion2.ReadOnly = true;
+			this.textPatientPortion2.Size = new System.Drawing.Size(110, 20);
+			this.textPatientPortion2.TabIndex = 205;
+			// 
+			// label10
+			// 
+			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label10.Location = new System.Drawing.Point(679, 228);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(12, 20);
+			this.label10.TabIndex = 207;
+			this.label10.Text = "=";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textInsPaid2
+			// 
+			this.textInsPaid2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textInsPaid2.Location = new System.Drawing.Point(697, 228);
+			this.textInsPaid2.Name = "textInsPaid2";
+			this.textInsPaid2.ReadOnly = true;
+			this.textInsPaid2.Size = new System.Drawing.Size(110, 20);
+			this.textInsPaid2.TabIndex = 208;
+			// 
+			// textProcAdjustments
+			// 
+			this.textProcAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textProcAdjustments.Location = new System.Drawing.Point(433, 228);
+			this.textProcAdjustments.Name = "textProcAdjustments";
+			this.textProcAdjustments.ReadOnly = true;
+			this.textProcAdjustments.Size = new System.Drawing.Size(110, 20);
+			this.textProcAdjustments.TabIndex = 209;
+			// 
+			// label11
+			// 
+			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label11.Location = new System.Drawing.Point(547, 227);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(12, 20);
+			this.label11.TabIndex = 210;
+			this.label11.Text = "-";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.label11);
+			this.Controls.Add(this.textProcAdjustments);
+			this.Controls.Add(this.textInsPaid2);
+			this.Controls.Add(this.label10);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.textPatientPortion2);
+			this.Controls.Add(this.label18);
+			this.Controls.Add(this.textTotalAdjustments);
+			this.Controls.Add(this.textClaimFee2);
+			this.Controls.Add(this.labelEquation);
 			this.Controls.Add(this.gridAdjustmentDetails);
 			this.Controls.Add(this.gridAdjudicationDetails);
 			this.Controls.Add(this.textPatientPortion);
@@ -302,5 +418,15 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label7;
 		private UI.ODGrid gridAdjudicationDetails;
 		private UI.ODGrid gridAdjustmentDetails;
+		private System.Windows.Forms.Label label18;
+		private System.Windows.Forms.TextBox textTotalAdjustments;
+		private System.Windows.Forms.TextBox textClaimFee2;
+		private System.Windows.Forms.Label labelEquation;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.TextBox textPatientPortion2;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.TextBox textInsPaid2;
+		private System.Windows.Forms.TextBox textProcAdjustments;
+		private System.Windows.Forms.Label label11;
 	}
 }
