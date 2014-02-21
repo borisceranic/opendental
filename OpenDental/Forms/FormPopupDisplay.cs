@@ -295,6 +295,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPopupDisplay_Load(object sender,EventArgs e) {
+			//This homogenizes the display because sometimes popups are stored with "\n" and sometimes they are saved with "\r\n"
 			textDescription.Text=PopupCur.Description.Replace("\r\n","\n").Replace("\n","\r\n");
 			if(PopupCur.UserNum!=0) {
 				textUser.Text=Userods.GetUser(PopupCur.UserNum).UserName;
@@ -323,7 +324,7 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			if(PopupCur.Description.Replace("\r","")!=textDescription.Text.Replace("\r","")) {//if user changed the note
+			if(PopupCur.Description.Replace("\r","")!=textDescription.Text.Replace("\r","")) {//if user changed the note. remove "\r" to homogenize line returns because "\r\n" is the same as "\n"
 				if(MsgBox.Show(this,true,"Save changes to note?")) {
 					Popup popupArchive=PopupCur.Copy();
 					popupArchive.IsArchived=true;
