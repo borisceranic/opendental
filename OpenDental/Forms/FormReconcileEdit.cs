@@ -1,17 +1,11 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using System.Text.RegularExpressions;
 using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Shapes;
-using MigraDoc.DocumentObjectModel.Tables;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
+using System.Drawing.Printing;
 
 namespace OpenDental{
 	/// <summary>
@@ -42,7 +36,6 @@ namespace OpenDental{
 		private TextBox textFindAmount;
 		private Label label6;
 		private OpenDental.UI.Button butPrint;
-		private System.Drawing.Printing.PrintDocument pd2;
 		///<summary></summary>
 		public bool IsNew;
 
@@ -90,7 +83,6 @@ namespace OpenDental{
 			this.checkLocked = new System.Windows.Forms.CheckBox();
 			this.textFindAmount = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.pd2 = new System.Drawing.Printing.PrintDocument();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -521,31 +513,38 @@ namespace OpenDental{
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			MigraDoc.DocumentObjectModel.Document doc=CreatePrintDocument();
+			PrintDocument pd=new PrintDocument();
+			if(!PrinterL.SetPrinter(pd,PrintSituation.Default,0,"Reconcile list printed")) {
+				return;//User cancelled.
+			}
+			pd.DefaultPageSettings.Margins=new Margins(25,25,40,40);
+			if(pd.DefaultPageSettings.PrintableArea.Height==0) {
+				pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
+			}
+			MigraDoc.DocumentObjectModel.Document doc=CreatePrintDocument(pd);
 			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
 			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
 			renderer.PrepareDocument();
+			printdoc.PrinterSettings=pd.PrinterSettings;
 			printdoc.Renderer=renderer;
 #if DEBUG
 			FormRpPrintPreview pView=new FormRpPrintPreview();
 			pView.printPreviewControl2.Document=printdoc;
 			pView.ShowDialog();
 #else
-			//Always prints to the Windows default printer.
-			if(PrinterL.SetPrinter(pd2,PrintSituation.Default,0,"Reconcile list printed")){
-				printdoc.Print();
-			}
+			printdoc.Print();
 #endif
 		}
 
-		private MigraDoc.DocumentObjectModel.Document CreatePrintDocument() {
+		private MigraDoc.DocumentObjectModel.Document CreatePrintDocument(PrintDocument pd) {
 			string text;
 			MigraDoc.DocumentObjectModel.Document doc=new MigraDoc.DocumentObjectModel.Document();
-			doc.DefaultPageSetup.PageWidth=Unit.FromInch(8.5);
-			doc.DefaultPageSetup.PageHeight=Unit.FromInch(11);
-			doc.DefaultPageSetup.TopMargin=Unit.FromInch(.5);
-			doc.DefaultPageSetup.LeftMargin=Unit.FromInch(.5);
-			doc.DefaultPageSetup.RightMargin=Unit.FromInch(.5);
+			doc.DefaultPageSetup.PageWidth=Unit.FromInch((double)pd.DefaultPageSettings.PaperSize.Width/100);
+			doc.DefaultPageSetup.PageHeight=Unit.FromInch((double)pd.DefaultPageSettings.PaperSize.Height/100);
+			doc.DefaultPageSetup.TopMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Top/100);
+			doc.DefaultPageSetup.LeftMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Left/100);
+			doc.DefaultPageSetup.RightMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Right/100);
+			doc.DefaultPageSetup.BottomMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Bottom/100);
 			MigraDoc.DocumentObjectModel.Section section=doc.AddSection();
 			MigraDoc.DocumentObjectModel.Font headingFont=MigraDocHelper.CreateFont(13,true);
 			MigraDoc.DocumentObjectModel.Font bodyFontx=MigraDocHelper.CreateFont(9,false);
