@@ -1,23 +1,17 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using System.Text.RegularExpressions;
 using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Shapes;
-using MigraDoc.DocumentObjectModel.Tables;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
+using System.Drawing.Printing;
 
-namespace OpenDental{
+namespace OpenDental {
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormReconcileEdit : System.Windows.Forms.Form{
+	public class FormReconcileEdit:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		/// <summary>
@@ -37,18 +31,16 @@ namespace OpenDental{
 		private TextBox textSum;
 		private CheckBox checkLocked;
 		private Reconcile ReconcileCur;
-		private List <JournalEntry> JournalList;
+		private List<JournalEntry> JournalList;
 		private OpenDental.UI.Button butDelete;
 		private TextBox textFindAmount;
 		private Label label6;
 		private OpenDental.UI.Button butPrint;
-		private System.Drawing.Printing.PrintDocument pd2;
 		///<summary></summary>
 		public bool IsNew;
 
 		///<summary></summary>
-		public FormReconcileEdit(Reconcile reconcileCur)
-		{
+		public FormReconcileEdit(Reconcile reconcileCur) {
 			//
 			// Required for Windows Form Designer support
 			//
@@ -60,16 +52,13 @@ namespace OpenDental{
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if(components != null)
-				{
+		protected override void Dispose(bool disposing) {
+			if(disposing) {
+				if(components != null) {
 					components.Dispose();
 				}
 			}
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
 		#region Windows Form Designer generated code
@@ -77,8 +66,7 @@ namespace OpenDental{
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReconcileEdit));
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
@@ -90,7 +78,6 @@ namespace OpenDental{
 			this.checkLocked = new System.Windows.Forms.CheckBox();
 			this.textFindAmount = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.pd2 = new System.Drawing.Printing.PrintDocument();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -371,7 +358,7 @@ namespace OpenDental{
 				}
 				else {
 					row.Cells.Add(JournalList[i].DebitAmt.ToString("n"));
-					if(JournalList[i].ReconcileNum!=0){
+					if(JournalList[i].ReconcileNum!=0) {
 						sum+=(decimal)JournalList[i].DebitAmt;
 					}
 				}
@@ -380,24 +367,25 @@ namespace OpenDental{
 				}
 				else {
 					row.Cells.Add(JournalList[i].CreditAmt.ToString("n"));
-					if(JournalList[i].ReconcileNum!=0){
+					if(JournalList[i].ReconcileNum!=0) {
 						sum-=(decimal)JournalList[i].CreditAmt;
 					}
 				}
-				if(JournalList[i].ReconcileNum==0){
+				if(JournalList[i].ReconcileNum==0) {
 					row.Cells.Add("");
 				}
-				else{
+				else {
 					row.Cells.Add("X");
 				}
-				if(this.textFindAmount.Text.Length>0){
-					try{
+				if(this.textFindAmount.Text.Length>0) {
+					try {
 						double famt=Convert.ToDouble(textFindAmount.Text);
-						if(famt==JournalList[i].CreditAmt || famt==JournalList[i].DebitAmt){
+						if(famt==JournalList[i].CreditAmt || famt==JournalList[i].DebitAmt) {
 							//row.ColorText=System.Drawing.Color.DarkRed;
 							row.ColorBackG=System.Drawing.Color.Yellow;
 						}
-					}catch{
+					}
+					catch {
 						//Just a format error in the amount probably, who cares.
 					}
 				}
@@ -408,16 +396,16 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
-			if(e.Col != 4){
+			if(e.Col != 4) {
 				return;
 			}
-			if(checkLocked.Checked){
+			if(checkLocked.Checked) {
 				return;
 			}
-			if(JournalList[e.Row].ReconcileNum==0){
+			if(JournalList[e.Row].ReconcileNum==0) {
 				JournalList[e.Row].ReconcileNum=ReconcileCur.ReconcileNum;
 			}
-			else{
+			else {
 				JournalList[e.Row].ReconcileNum=0;
 			}
 			int rowClicked=e.Row;
@@ -444,14 +432,14 @@ namespace OpenDental{
 		}
 
 		private void checkLocked_Click(object sender,EventArgs e) {
-			if(checkLocked.Checked){
-				if(textTarget.Text != textSum.Text){
+			if(checkLocked.Checked) {
+				if(textTarget.Text != textSum.Text) {
 					MsgBox.Show(this,"Target change must match sum of transactions.");
 					checkLocked.Checked=false;
 					return;
 				}
 			}
-			else{//unchecking
+			else {//unchecking
 				//need to check permissions here.
 			}
 			SaveList();
@@ -461,21 +449,21 @@ namespace OpenDental{
 		}
 
 		///<summary>Saves all changes to JournalList to database.  Can only be called once when closing form.</summary>
-		private void SaveList(){
+		private void SaveList() {
 			JournalEntries.SaveList(JournalList,ReconcileCur.ReconcileNum);
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			try{
+			try {
 				Reconciles.Delete(ReconcileCur);
 				DialogResult=DialogResult.OK;
 			}
-			catch(ApplicationException ex){
+			catch(ApplicationException ex) {
 				MessageBox.Show(ex.Message);
 			}
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
+		private void butOK_Click(object sender,System.EventArgs e) {
 			if(textDate.errorProvider1.GetError(textDate)!=""
 				|| textStart.errorProvider1.GetError(textStart)!=""
 				|| textEnd.errorProvider1.GetError(textEnd)!=""
@@ -492,16 +480,16 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
+		private void butCancel_Click(object sender,System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
 
 		private void FormReconcileEdit_FormClosing(object sender,FormClosingEventArgs e) {
-			if(DialogResult==DialogResult.OK){
+			if(DialogResult==DialogResult.OK) {
 				return;
 			}
-			if(IsNew){
-				for(int i=0;i<JournalList.Count;i++){
+			if(IsNew) {
+				for(int i=0;i<JournalList.Count;i++) {
 					JournalList[i].ReconcileNum=0;
 				}
 				SaveList();//detaches all journal entries.
@@ -515,37 +503,44 @@ namespace OpenDental{
 
 		private void textFindAmount_Leave(object sender,EventArgs e) {
 			if(this.textFindAmount.Text!="" && 
-				!Regex.IsMatch(this.textFindAmount.Text,"[0-9]+(\\.[0-9]+)?")){
+				!Regex.IsMatch(this.textFindAmount.Text,"[0-9]+(\\.[0-9]+)?")) {
 				MessageBox.Show("Invalid amount format in text search amount field.");
 			}
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			MigraDoc.DocumentObjectModel.Document doc=CreatePrintDocument();
+			PrintDocument pd=new PrintDocument();
+			if(!PrinterL.SetPrinter(pd,PrintSituation.Default,0,"Reconcile list printed")) {
+				return;//User cancelled.
+			}
+			pd.DefaultPageSettings.Margins=new Margins(25,25,40,40);
+			if(pd.DefaultPageSettings.PrintableArea.Height==0) {
+				pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
+			}
+			MigraDoc.DocumentObjectModel.Document doc=CreatePrintDocument(pd);
 			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
 			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
 			renderer.PrepareDocument();
+			printdoc.PrinterSettings=pd.PrinterSettings;
 			printdoc.Renderer=renderer;
 #if DEBUG
 			FormRpPrintPreview pView=new FormRpPrintPreview();
 			pView.printPreviewControl2.Document=printdoc;
 			pView.ShowDialog();
 #else
-			//Always prints to the Windows default printer.
-			if(PrinterL.SetPrinter(pd2,PrintSituation.Default,0,"Reconcile list printed")){
-				printdoc.Print();
-			}
+			printdoc.Print();
 #endif
 		}
 
-		private MigraDoc.DocumentObjectModel.Document CreatePrintDocument() {
+		private MigraDoc.DocumentObjectModel.Document CreatePrintDocument(PrintDocument pd) {
 			string text;
 			MigraDoc.DocumentObjectModel.Document doc=new MigraDoc.DocumentObjectModel.Document();
-			doc.DefaultPageSetup.PageWidth=Unit.FromInch(8.5);
-			doc.DefaultPageSetup.PageHeight=Unit.FromInch(11);
-			doc.DefaultPageSetup.TopMargin=Unit.FromInch(.5);
-			doc.DefaultPageSetup.LeftMargin=Unit.FromInch(.5);
-			doc.DefaultPageSetup.RightMargin=Unit.FromInch(.5);
+			doc.DefaultPageSetup.PageWidth=Unit.FromInch((double)pd.DefaultPageSettings.PaperSize.Width/100);
+			doc.DefaultPageSetup.PageHeight=Unit.FromInch((double)pd.DefaultPageSettings.PaperSize.Height/100);
+			doc.DefaultPageSetup.TopMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Top/100);
+			doc.DefaultPageSetup.LeftMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Left/100);
+			doc.DefaultPageSetup.RightMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Right/100);
+			doc.DefaultPageSetup.BottomMargin=Unit.FromInch((double)pd.DefaultPageSettings.Margins.Bottom/100);
 			MigraDoc.DocumentObjectModel.Section section=doc.AddSection();
 			MigraDoc.DocumentObjectModel.Font headingFont=MigraDocHelper.CreateFont(13,true);
 			MigraDoc.DocumentObjectModel.Font bodyFontx=MigraDocHelper.CreateFont(9,false);
@@ -577,7 +572,7 @@ namespace OpenDental{
 			return doc;
 		}
 
-		
+
 
 	}
 }
