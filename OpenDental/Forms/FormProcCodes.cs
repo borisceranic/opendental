@@ -7,17 +7,15 @@ using System.Data;
 using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Serialization;
 using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcCodes : System.Windows.Forms.Form{
+	public class FormProcCodes:System.Windows.Forms.Form {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
@@ -59,24 +57,24 @@ namespace OpenDental{
 		private Def[] CatList;
 
 		///<summary></summary>
-		public FormProcCodes(){
+		public FormProcCodes() {
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
 		}
 
 		///<summary></summary>
-		protected override void Dispose( bool disposing ){
-			if( disposing ){
-				if(components != null){
+		protected override void Dispose(bool disposing) {
+			if(disposing) {
+				if(components != null) {
 					components.Dispose();
 				}
 			}
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
 		#region Windows Form Designer generated code
 
-		private void InitializeComponent(){
+		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProcCodes));
 			this.listFeeSched = new System.Windows.Forms.ListBox();
 			this.labelFeeSched = new System.Windows.Forms.Label();
@@ -120,6 +118,7 @@ namespace OpenDental{
 			this.listFeeSched.Name = "listFeeSched";
 			this.listFeeSched.Size = new System.Drawing.Size(200,511);
 			this.listFeeSched.TabIndex = 6;
+			this.listFeeSched.KeyUp += new System.Windows.Forms.KeyEventHandler(this.listFeeSched_KeyUp);
 			this.listFeeSched.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listFeeSched_MouseDown);
 			// 
 			// labelFeeSched
@@ -511,7 +510,7 @@ namespace OpenDental{
 		#endregion
 
 
-		private void FormProcCodes_Load(object sender, System.EventArgs e){
+		private void FormProcCodes_Load(object sender,System.EventArgs e) {
 			checkShowHidden.Checked=PrefC.GetBool(PrefName.ProcCodeListShowHidden);
 			if(!Security.IsAuthorized(Permissions.Setup,DateTime.MinValue,true)) {
 				groupFeeScheds.Visible=false;
@@ -521,7 +520,7 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.SecurityAdmin,DateTime.MinValue,true)) {
 				butProcTools.Visible=false;
 			}
-			if(!IsSelectionMode){
+			if(!IsSelectionMode) {
 				butOK.Visible=false;
 				butCancel.Text=Lan.g(this,"Close");
 			}
@@ -534,12 +533,12 @@ namespace OpenDental{
 			//this.textDescription.Focus();
 		}
 
-		private void FillFeeSchedules(){
+		private void FillFeeSchedules() {
 			listFeeSched.Items.Clear();
 			string str;
 			for(int i=0;i<FeeSchedC.ListShort.Count;i++) {
 				str=FeeSchedC.ListShort[i].Description;
-				if(FeeSchedC.ListShort[i].FeeSchedType!=FeeScheduleType.Normal){
+				if(FeeSchedC.ListShort[i].FeeSchedType!=FeeScheduleType.Normal) {
 					str+=" ("+FeeSchedC.ListShort[i].FeeSchedType.ToString()+")";
 				}
 				listFeeSched.Items.Add(str);
@@ -555,7 +554,7 @@ namespace OpenDental{
 			comboCompare2.SelectedIndex=0;
 			for(int i=0;i<FeeSchedC.ListShort.Count;i++) {
 				str=FeeSchedC.ListShort[i].Description;
-				if(FeeSchedC.ListShort[i].FeeSchedType!=FeeScheduleType.Normal){
+				if(FeeSchedC.ListShort[i].FeeSchedType!=FeeScheduleType.Normal) {
 					str+=" ("+FeeSchedC.ListShort[i].FeeSchedType.ToString()+")";
 				}
 				comboCompare1.Items.Add(str);
@@ -563,28 +562,28 @@ namespace OpenDental{
 			}
 		}
 
-		private void FillCats(){
+		private void FillCats() {
 			ArrayList selected=new ArrayList();
-			for(int i=0;i<listCategories.SelectedIndices.Count;i++){
+			for(int i=0;i<listCategories.SelectedIndices.Count;i++) {
 				selected.Add(CatList[listCategories.SelectedIndices[i]].DefNum);
 			}
-			if(checkShowHidden.Checked){
+			if(checkShowHidden.Checked) {
 				CatList=DefC.Long[(int)DefCat.ProcCodeCats];
 			}
-			else{
+			else {
 				CatList=DefC.Short[(int)DefCat.ProcCodeCats];
 			}
 			listCategories.Items.Clear();
 			for(int i=0;i<CatList.Length;i++) {
 				listCategories.Items.Add(CatList[i].ItemName);
-				if(selected.Contains(CatList[i].DefNum)){
+				if(selected.Contains(CatList[i].DefNum)) {
 					listCategories.SetSelected(i,true);
 				}
 			}
 		}
 
-		private void FillGrid(){
-			if(listFeeSched.Items.Count==0){
+		private void FillGrid() {
+			if(listFeeSched.Items.Count==0) {
 				gridMain.BeginUpdate();
 				gridMain.Rows.Clear();
 				gridMain.EndUpdate();
@@ -592,7 +591,7 @@ namespace OpenDental{
 				return;
 			}
 			string selected="";
-			if(gridMain.GetSelectedIndex() !=-1){
+			if(gridMain.GetSelectedIndex() !=-1) {
 				selected=ProcTable.Rows[gridMain.GetSelectedIndex()][3].ToString();
 			}
 			int scroll=gridMain.ScrollValue;
@@ -622,13 +621,13 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g("TableProcedures","Code"),50);
 			gridMain.Columns.Add(col);
 			string heading=FeeSchedC.ListShort[listFeeSched.SelectedIndex].Description;
-			if(heading.Length>8){
+			if(heading.Length>8) {
 				heading=heading.Substring(0,8);
 			}
 			col=new ODGridColumn(heading,50,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
 			heading="";
-			if(comboCompare1.SelectedIndex!=0){
+			if(comboCompare1.SelectedIndex!=0) {
 				heading=FeeSchedC.ListShort[comboCompare1.SelectedIndex-1].Description;
 			}
 			if(heading.Length>8) {
@@ -644,15 +643,15 @@ namespace OpenDental{
 				heading=heading.Substring(0,8);
 			}
 			col=new ODGridColumn(heading,50,HorizontalAlignment.Right);
-			gridMain.Columns.Add(col);	
+			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ProcTable.Rows.Count;i++){
+			for(int i=0;i<ProcTable.Rows.Count;i++) {
 				row=new ODGridRow();
-				if(i==0 || ProcTable.Rows[i-1]["ProcCat"].ToString() != ProcTable.Rows[i]["ProcCat"].ToString()){
+				if(i==0 || ProcTable.Rows[i-1]["ProcCat"].ToString() != ProcTable.Rows[i]["ProcCat"].ToString()) {
 					row.Cells.Add(DefC.GetName(DefCat.ProcCodeCats,PIn.Long(ProcTable.Rows[i]["ProcCat"].ToString())));
 				}
-				else{
+				else {
 					row.Cells.Add("");
 				}
 				row.Cells.Add(ProcTable.Rows[i]["Descript"].ToString());
@@ -661,7 +660,7 @@ namespace OpenDental{
 				if(ProcTable.Rows[i]["FeeAmt1"].ToString()=="-1") {
 					row.Cells.Add("");
 				}
-				else{
+				else {
 					row.Cells.Add(PIn.Double(ProcTable.Rows[i]["FeeAmt1"].ToString()).ToString("n"));
 				}
 				if(ProcTable.Rows[i]["FeeAmt2"].ToString()=="-1") {
@@ -680,9 +679,9 @@ namespace OpenDental{
 			}
 			gridMain.EndUpdate();
 			gridMain.ScrollValue=scroll;
-			if(selected!=""){//if a row was previously selected
-				for(int i=0;i<ProcTable.Rows.Count;i++){
-					if(ProcTable.Rows[i][3].ToString()==selected){
+			if(selected!="") {//if a row was previously selected
+				for(int i=0;i<ProcTable.Rows.Count;i++) {
+					if(ProcTable.Rows[i][3].ToString()==selected) {
 						gridMain.SetSelected(i,true);
 						break;
 					}
@@ -691,7 +690,7 @@ namespace OpenDental{
 		}
 
 		private void butAll_Click(object sender,EventArgs e) {
-			for(int i=0;i<listCategories.Items.Count;i++){
+			for(int i=0;i<listCategories.Items.Count;i++) {
 				listCategories.SetSelected(i,true);
 			}
 			FillGrid();
@@ -751,8 +750,17 @@ namespace OpenDental{
 			MessageBox.Show(Lan.g(this,"Show Hidden will default to ")+hiddenStatus);
 		}
 
-		private void listFeeSched_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
+		private void listFeeSched_MouseDown(object sender,System.Windows.Forms.MouseEventArgs e) {
 			FillGrid();
+		}
+
+		private void listFeeSched_KeyUp(object sender,KeyEventArgs e) {
+			if(e.KeyData==Keys.Up 
+				|| e.KeyData==Keys.Down
+				|| e.KeyData==Keys.Left
+				|| e.KeyData==Keys.Right) {
+				FillGrid();
+			}
 		}
 
 		private void comboCompare1_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -763,21 +771,21 @@ namespace OpenDental{
 			FillGrid();
 		}
 
-		private void butEditFeeSched_Click(object sender, System.EventArgs e) {
+		private void butEditFeeSched_Click(object sender,System.EventArgs e) {
 			//won't even be visible if no permission
 			long selectedSched=0;
-			if(listFeeSched.SelectedIndex !=-1){
+			if(listFeeSched.SelectedIndex !=-1) {
 				selectedSched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
 			}
 			FormFeeScheds FormF=new FormFeeScheds();
 			FormF.ShowDialog();
-			DataValid.SetInvalid(InvalidType.FeeScheds, InvalidType.Fees,InvalidType.ProcCodes);
+			DataValid.SetInvalid(InvalidType.FeeScheds,InvalidType.Fees,InvalidType.ProcCodes);
 			//Fees.Refresh();
 			//ProcedureCodes.RefreshCache();
 			changed=true;
 			FillFeeSchedules();
-			for(int i=0;i<FeeSchedC.ListShort.Count;i++){
-				if(FeeSchedC.ListShort[i].FeeSchedNum==selectedSched){
+			for(int i=0;i<FeeSchedC.ListShort.Count;i++) {
+				if(FeeSchedC.ListShort[i].FeeSchedNum==selectedSched) {
 					listFeeSched.SelectedIndex=i;
 				}
 			}
@@ -786,10 +794,10 @@ namespace OpenDental{
 			//FillGrid();//will be done automatically because of lines above			
 		}
 
-		private void butTools_Click(object sender, System.EventArgs e) {
+		private void butTools_Click(object sender,System.EventArgs e) {
 			FormFeeSchedTools FormF=new FormFeeSchedTools(FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum);
 			FormF.ShowDialog();
-			if(FormF.DialogResult==DialogResult.Cancel){
+			if(FormF.DialogResult==DialogResult.Cancel) {
 				return;
 			}
 			Fees.RefreshCache();
@@ -800,19 +808,19 @@ namespace OpenDental{
 			}
 			FillGrid();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Fee Schedule Tools");
-		}		
+		}
 
 		private void butExport_Click(object sender,EventArgs e) {
-			if(ProcTable.Rows.Count==0){
+			if(ProcTable.Rows.Count==0) {
 				MsgBox.Show(this,"No procedurecodes are displayed for export.");
 				return;
 			}
-			if(!MsgBox.Show(this,true,"Only the codes showing in this list will be exported.  Continue?")){
+			if(!MsgBox.Show(this,true,"Only the codes showing in this list will be exported.  Continue?")) {
 				return;
 			}
 			List<ProcedureCode> listCodes=new List<ProcedureCode>();
-			for(int i=0;i<ProcTable.Rows.Count;i++){
-				if(ProcTable.Rows[i]["ProcCode"].ToString()==""){
+			for(int i=0;i<ProcTable.Rows.Count;i++) {
+				if(ProcTable.Rows[i]["ProcCode"].ToString()=="") {
 					continue;
 				}
 				listCodes.Add(ProcedureCodes.GetProcCode(ProcTable.Rows[i]["ProcCode"].ToString()));
@@ -858,7 +866,7 @@ namespace OpenDental{
 
 		///<summary>Can be called externally.  Surround with try catch.  Returns number of codes inserted.  Supply path to file to import or a list of procedure codes, or an xml string.  Make sure to set the other two values blank or null.</summary>
 		public static int ImportProcCodes(string path,List<ProcedureCode> listCodes,string xmlData) {
-			if(listCodes==null){
+			if(listCodes==null) {
 				listCodes=new List<ProcedureCode>();
 			}
 			//xmlData should already be tested ahead of time to make sure it's not blank.
@@ -918,11 +926,11 @@ namespace OpenDental{
 			}
 		}
 
-		private void butNew_Click(object sender, System.EventArgs e) {
+		private void butNew_Click(object sender,System.EventArgs e) {
 			//won't be visible if no permission
 			FormProcCodeNew FormPCN=new FormProcCodeNew();
 			FormPCN.ShowDialog();
-			if(FormPCN.Changed){
+			if(FormPCN.Changed) {
 				changed=true;
 				ProcedureCodes.RefreshCache();
 				FillGrid();
@@ -930,31 +938,31 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(IsSelectionMode){
+			if(IsSelectionMode) {
 				SelectedCodeNum=PIn.Long(ProcTable.Rows[e.Row]["CodeNum"].ToString());
 				DialogResult=DialogResult.OK;
 				return;
 			}
 			//else not selecting a code
-			if(!Security.IsAuthorized(Permissions.Setup,DateTime.MinValue,true)){
+			if(!Security.IsAuthorized(Permissions.Setup,DateTime.MinValue,true)) {
 				return;
 			}
 			long codeNum=PIn.Long(ProcTable.Rows[e.Row]["CodeNum"].ToString());
 			//string =ProcTable.Rows[e.Row]["ProcCode"].ToString();
-			if(e.Col>3){//if double clicked on a fee
+			if(e.Col>3) {//if double clicked on a fee
 				Fee FeeCur=null;
 				long feesched=0;
-				if(e.Col==4){
+				if(e.Col==4) {
 					feesched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
 					FeeCur=Fees.GetFee(codeNum,feesched);
 				}
 				if(e.Col==5) {
-					if(comboCompare1.SelectedIndex==0){
+					if(comboCompare1.SelectedIndex==0) {
 						return;
 					}
 					feesched=FeeSchedC.ListShort[comboCompare1.SelectedIndex-1].FeeSchedNum;
 					FeeCur=Fees.GetFee(codeNum,feesched);
-					
+
 				}
 				if(e.Col==6) {
 					if(comboCompare2.SelectedIndex==0) {
@@ -999,24 +1007,24 @@ namespace OpenDental{
 			long feesched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
 			Fee fee=Fees.GetFee(codeNum,feesched);
 			string strOld="";
-			if(fee!=null){
+			if(fee!=null) {
 				strOld=fee.Amount.ToString("n");
 			}
 			string strNew=gridMain.Rows[e.Row].Cells[e.Col].Text;
-			if(strOld==strNew){
+			if(strOld==strNew) {
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.Setup)){//includes dialog
+			if(!Security.IsAuthorized(Permissions.Setup)) {//includes dialog
 				gridMain.Rows[e.Row].Cells[e.Col].Text=strOld;
 				gridMain.Invalidate();
 				return;
 			}
 			double dNew=-1;
-			if(strNew!=""){
-				try{
+			if(strNew!="") {
+				try {
 					dNew=PIn.Double(strNew);
 				}
-				catch{
+				catch {
 					gridMain.SetSelected(new Point(e.Col,e.Row));
 					MessageBox.Show(Lan.g(this,"Please fix data entry error first."));
 					return;
@@ -1024,11 +1032,11 @@ namespace OpenDental{
 				gridMain.Rows[e.Row].Cells[e.Col].Text=dNew.ToString("n");//to standardize formatting.  They probably didn't type .00
 				//invalidate doesn't seem to be necessary here
 			}
-			if(strOld==""){//if no fee was originally entered and since it's no longer empty, then we need to insert a fee.
+			if(strOld=="") {//if no fee was originally entered and since it's no longer empty, then we need to insert a fee.
 				//Somehow duplicate fees were being inserted so double check that this fee does not already exist.
 				Fee tmpFee=Fees.GetFee(codeNum,feesched);//Looks in cache.
 				if(tmpFee!=null) {
-				  return;//Fee exists. Must be unknown bug.
+					return;//Fee exists. Must be unknown bug.
 				}
 				fee=new Fee();
 				fee.FeeSched=feesched;
@@ -1037,12 +1045,12 @@ namespace OpenDental{
 				Fees.Insert(fee);
 				Fees.Listt.Add(fee);
 			}
-			else{//if fee existed
-				if(strNew==""){//delete old fee
+			else {//if fee existed
+				if(strNew=="") {//delete old fee
 					Fees.Delete(fee);
 					Fees.Listt.Remove(fee);
 				}
-				else{//change fee
+				else {//change fee
 					fee.Amount=dNew;
 					Fees.Update(fee);
 					Fees.Listt[Fees.Listt.IndexOf(fee)].Amount=dNew;
@@ -1053,8 +1061,8 @@ namespace OpenDental{
 				+". "+Lan.g(this,"Manual edit in grid from Procedure Codes list."),fee.CodeNum);
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e){
-			if(gridMain.SelectedCell.Y==-1){
+		private void butOK_Click(object sender,System.EventArgs e) {
+			if(gridMain.SelectedCell.Y==-1) {
 				MsgBox.Show(this,"Please select a procedure code first.");
 				return;
 			}
@@ -1062,19 +1070,21 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butCancel_Click(object sender, System.EventArgs e){		
+		private void butCancel_Click(object sender,System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
 
-		private void FormProcedures_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(changed){
-				DataValid.SetInvalid(InvalidType.ProcCodes, InvalidType.Fees);
+		private void FormProcedures_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
+			if(changed) {
+				DataValid.SetInvalid(InvalidType.ProcCodes,InvalidType.Fees);
 			}
 		}
 
-		
 
-		
+
+
+
+
 
 
 
