@@ -320,7 +320,7 @@ namespace OpenDental{
 			this.textEmailSubject.AcceptsReturn = true;
 			this.textEmailSubject.AcceptsTab = true;
 			this.textEmailSubject.Location = new System.Drawing.Point(6, 87);
-			this.textEmailSubject.MaxLength = 255;
+			this.textEmailSubject.MaxLength = 200;
 			this.textEmailSubject.Multiline = true;
 			this.textEmailSubject.Name = "textEmailSubject";
 			this.textEmailSubject.Size = new System.Drawing.Size(412, 22);

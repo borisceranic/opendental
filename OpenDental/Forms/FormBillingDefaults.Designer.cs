@@ -265,6 +265,7 @@ namespace OpenDental{
 			// textBillingEmailSubject
 			// 
 			this.textBillingEmailSubject.Location = new System.Drawing.Point(12, 70);
+			this.textBillingEmailSubject.MaxLength = 200;
 			this.textBillingEmailSubject.Name = "textBillingEmailSubject";
 			this.textBillingEmailSubject.Size = new System.Drawing.Size(616, 20);
 			this.textBillingEmailSubject.TabIndex = 0;

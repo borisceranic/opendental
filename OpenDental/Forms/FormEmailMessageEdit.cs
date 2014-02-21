@@ -141,6 +141,7 @@ namespace OpenDental{
 			// textSubject
 			// 
 			this.textSubject.Location = new System.Drawing.Point(278, 83);
+			this.textSubject.MaxLength = 200;
 			this.textSubject.Name = "textSubject";
 			this.textSubject.Size = new System.Drawing.Size(328, 20);
 			this.textSubject.TabIndex = 2;

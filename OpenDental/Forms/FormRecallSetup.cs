@@ -828,7 +828,7 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PrefName prefName=(PrefName)Enum.Parse(typeof(PrefName),gridMain.Rows[e.Row].Tag.ToString());
-			FormRecallMessageEdit FormR=new FormRecallMessageEdit();
+			FormRecallMessageEdit FormR=new FormRecallMessageEdit(prefName);
 			FormR.MessageVal=PrefC.GetString(prefName);
 			FormR.ShowDialog();
 			if(FormR.DialogResult!=DialogResult.OK) {
