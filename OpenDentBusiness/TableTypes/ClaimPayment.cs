@@ -29,6 +29,8 @@ namespace OpenDentBusiness{
 		public DateTime DateIssued;
 		///<summary>.</summary>
 		public bool IsPartial;
+		///<summary>FK to definition.DefinitionNum.  0 if not attached to any definitions</summary>
+		public long PayType;
 
 		///<summary>Returns a copy of this ClaimPayment.</summary>
 		public ClaimPayment Copy(){

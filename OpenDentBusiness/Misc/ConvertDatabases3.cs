@@ -3910,6 +3910,22 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'CustListenerPort','25255')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimpayment ADD PayType bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD INDEX (PayType)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimpayment ADD PayType number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimpayment SET PayType = 0 WHERE PayType IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment MODIFY PayType NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimpayment_PayType ON claimpayment (PayType)";
+					Db.NonQ(command);
+				}
 				
 
 
@@ -3929,7 +3945,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
 
 
 

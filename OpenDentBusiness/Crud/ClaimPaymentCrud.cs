@@ -57,6 +57,7 @@ namespace OpenDentBusiness.Crud{
 				claimPayment.CarrierName    = PIn.String(table.Rows[i]["CarrierName"].ToString());
 				claimPayment.DateIssued     = PIn.Date  (table.Rows[i]["DateIssued"].ToString());
 				claimPayment.IsPartial      = PIn.Bool  (table.Rows[i]["IsPartial"].ToString());
+				claimPayment.PayType        = PIn.Long  (table.Rows[i]["PayType"].ToString());
 				retVal.Add(claimPayment);
 			}
 			return retVal;
@@ -97,7 +98,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimPaymentNum,";
 			}
-			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial) VALUES(";
+			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claimPayment.ClaimPaymentNum)+",";
 			}
@@ -111,7 +112,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (claimPayment.DepositNum)+","
 				+"'"+POut.String(claimPayment.CarrierName)+"',"
 				+    POut.Date  (claimPayment.DateIssued)+","
-				+    POut.Bool  (claimPayment.IsPartial)+")";
+				+    POut.Bool  (claimPayment.IsPartial)+","
+				+    POut.Long  (claimPayment.PayType)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -133,7 +135,8 @@ namespace OpenDentBusiness.Crud{
 				+"DepositNum     =  "+POut.Long  (claimPayment.DepositNum)+", "
 				+"CarrierName    = '"+POut.String(claimPayment.CarrierName)+"', "
 				+"DateIssued     =  "+POut.Date  (claimPayment.DateIssued)+", "
-				+"IsPartial      =  "+POut.Bool  (claimPayment.IsPartial)+" "
+				+"IsPartial      =  "+POut.Bool  (claimPayment.IsPartial)+", "
+				+"PayType        =  "+POut.Long  (claimPayment.PayType)+" "
 				+"WHERE ClaimPaymentNum = "+POut.Long(claimPayment.ClaimPaymentNum);
 			Db.NonQ(command);
 		}
@@ -180,6 +183,10 @@ namespace OpenDentBusiness.Crud{
 			if(claimPayment.IsPartial != oldClaimPayment.IsPartial) {
 				if(command!=""){ command+=",";}
 				command+="IsPartial = "+POut.Bool(claimPayment.IsPartial)+"";
+			}
+			if(claimPayment.PayType != oldClaimPayment.PayType) {
+				if(command!=""){ command+=",";}
+				command+="PayType = "+POut.Long(claimPayment.PayType)+"";
 			}
 			if(command==""){
 				return;
