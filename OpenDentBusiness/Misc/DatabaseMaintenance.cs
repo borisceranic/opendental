@@ -88,6 +88,7 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>Always safe to backport changes to this function to the current stable version. As per conversation between OD engineers. 2/24/2014</summary>
 		public static string DatesNoZeros(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -97,7 +98,7 @@ namespace OpenDentBusiness {
 				return "";//This check is not valid for Oracle, because each of the following fields are defined as non-null,
 				//and 0000-00-00 is not a valid Oracle date.
 			}
-			if(isCheck){
+			if(isCheck) {
 				string[] commands=new string[]
 				{
 				  "SELECT COUNT(*) FROM adjustment WHERE AdjDate='0000-00-00'"
@@ -126,6 +127,7 @@ namespace OpenDentBusiness {
 				  ,"SELECT COUNT(*) FROM procedurelog WHERE DateOriginalProsth='0000-00-00'"
 				  ,"SELECT COUNT(*) FROM procedurelog WHERE DateEntryC='0000-00-00'"
 				  ,"SELECT COUNT(*) FROM procedurelog WHERE DateTP='0000-00-00'"
+				  ,"SELECT COUNT(*) FROM procedurelog WHERE DateTStamp='0000-00-00 00:00:00'"//Timestamp invalid 
 				  ,"SELECT COUNT(*) FROM recall WHERE DateDueCalc='0000-00-00'"
 				  ,"SELECT COUNT(*) FROM recall WHERE DateDue='0000-00-00'"
 				  ,"SELECT COUNT(*) FROM recall WHERE DatePrevious='0000-00-00'"
@@ -144,7 +146,7 @@ namespace OpenDentBusiness {
 					log+=Lans.g("FormDatabaseMaintenance","Dates invalid:")+" "+numInvalidDates+"\r\n";
 				}
 			}
-			else{
+			else {
 				string[] commands=new string[]
 				{
 				  "UPDATE adjustment SET AdjDate='0001-01-01' WHERE AdjDate='0000-00-00'"
@@ -155,7 +157,7 @@ namespace OpenDentBusiness {
 					,"UPDATE appointment SET DateTimeAskedToArrive='0001-01-01 00:00:00' WHERE DateTimeAskedToArrive LIKE '0000-00-00%'"
 				  ,"UPDATE appointment SET DateTimeSeated='0001-01-01 00:00:00' WHERE DateTimeSeated LIKE '0000-00-00%'"
 				  ,"UPDATE appointment SET DateTimeDismissed='0001-01-01 00:00:00' WHERE DateTimeDismissed LIKE '0000-00-00%'"
-				  ,"UPDATE appointment SET DateTStamp='2009-08-24 00:00:00' WHERE DateTStamp='0000-00-00 00:00:00'"
+				  ,"UPDATE appointment SET DateTStamp='1970-01-01 00:00:01' WHERE DateTStamp='0000-00-00 00:00:00'"//Was set to 2009-08-24, this was also the date this line of code was added.
 				  ,"UPDATE claim SET DateService='0001-01-01' WHERE DateService='0000-00-00'"
 				  ,"UPDATE claim SET DateSent='0001-01-01' WHERE DateSent='0000-00-00'"
 				  ,"UPDATE claim SET DateReceived='0001-01-01' WHERE DateReceived='0000-00-00'"
@@ -173,6 +175,7 @@ namespace OpenDentBusiness {
 				  ,"UPDATE procedurelog SET DateOriginalProsth='0001-01-01' WHERE DateOriginalProsth='0000-00-00'"
 				  ,"UPDATE procedurelog SET DateEntryC='0001-01-01' WHERE DateEntryC='0000-00-00'"
 				  ,"UPDATE procedurelog SET DateTP='0001-01-01' WHERE DateTP='0000-00-00'"
+				  ,"UPDATE procedurelog SET DateTStamp='1970-01-01 00:00:01' WHERE DateTStamp='0000-00-00 00:00:00'"//Timestamp invalid, set to minimum valid date '1970-01-01 00:00:01'
 				  ,"UPDATE recall SET DateDueCalc='0001-01-01' WHERE DateDueCalc='0000-00-00'"
 				  ,"UPDATE recall SET DateDue='0001-01-01' WHERE DateDue='0000-00-00'"
 				  ,"UPDATE recall SET DatePrevious='0001-01-01' WHERE DatePrevious='0000-00-00'"
