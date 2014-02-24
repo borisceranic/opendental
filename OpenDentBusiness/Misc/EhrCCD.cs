@@ -606,13 +606,7 @@ Allergies
 				//Or the ValueSet 2.16.840.1.113883.3.88.12.80.17 Medication Clinical Drug (code system: RxNorm 2.16.840.1.113883.6.88). Example: 313850	RxNorm	Amoxicillin 40 MG/ML Oral Suspensionv 
 				//In an allergy to a class of medications the code SHALL be selected from the ValueSet 2.16.840.1.113883.3.88.12.80.18 Medication Drug Class (code system: NDF-RT 2.16.840.1.113883.3.26.1.5). Example: 2-Propanol
 				//In an allergy to a food or other substance the code SHALL be selected from the ValueSet 2.16.840.1.113883.3.88.12.80.20 Ingredient Name (code system: Unique Ingredient Identifier (UNII) 2.16.840.1.113883.4.9). Example: Peanut.
-				//if(allergyDef.SnomedAllergyTo!="") {//Is Snomed allergy.
-				//	Snomed snomedAllergyTo=Snomeds.GetByCode(allergyDef.SnomedAllergyTo);
-				//	StartAndEnd("code","code",snomedAllergyTo.SnomedCode,"displayName",snomedAllergyTo.Description,"codeSystem",strCodeSystemSnomed,"codeSystemName",strCodeSystemNameSnomed);
-				//}
-				//else {//Medication allergy
-				//TODO: We must handle allergies to classes of medications as well as food/substance allergies in the near future.
-				if(allergyDef.MedicationNum==0) {
+				if(allergyDef.MedicationNum==0) {//Unique Ingredient Identifier (UNII codes)
 					if(allergyDef.UniiCode=="") {
 						StartAndEnd("code","nullFlavor","UNK");
 					}
@@ -620,11 +614,19 @@ Allergies
 						StartAndEnd("code","code",allergyDef.UniiCode,"displayName",allergyDef.Description,"codeSystem",strCodeSystemUnii,"codeSystemName",strCodeSystemNameUnii);
 					}
 				}
-				else {
+				//else if() {//Medication Drug Class (NDF-RT codes) //TODO: We need a UI box for this in allergy def.
+					//Current work around is (per js on 10/02/2013):
+					//If using eRx, search for a class such as NSAID.
+					//If that's not an option, pick a common medication in that class such as Ibuprofen, and the eRx will automatically list cross-sensitivity and allergy warnings for any other related medication.
+					//The allergy alerts built into OD do not have that rich database available.
+					//If you are not using paper Rx from within OD, then you could enter the allergy however it makes sense, either NSAID or Ibuprofen.
+					//If you are using paper Rx and you are trying to generate allergy warnings, then you also enter any specific medications that you might prescribe.
+					//For example, you might enter an allergy for Vicoprofen.
+				//}
+				else {//Medication Brand Name or Medication Clinical Drug (RxNorm codes)
 					Medication med=Medications.GetMedication(allergyDef.MedicationNum);
 					StartAndEnd("code","code",med.RxCui.ToString(),"displayName",med.MedName,"codeSystem",strCodeSystemRxNorm,"codeSystemName",strCodeSystemNameRxNorm);
 				}
-				//}
 				End("playingEntity");
 				End("participantRole");
 				End("participant");
