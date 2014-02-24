@@ -88,7 +88,10 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Always safe to backport changes to this function to the current stable version. As per conversation between OD engineers. 2/24/2014</summary>
+		///<summary>This method updates many invalid date columns to '0001-01-01' and a few invalid DateTStamp columns to '1970-01-01 00:00:01'.
+		///DateTStamp columns are TIMESTAMP data type.  The TIMESTAMP data type has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
+		///https://dev.mysql.com/doc/refman/5.0/en/datetime.html
+		///Always safe to backport changes to this function to the current stable version. As per conversation between OD engineers. 2/24/2014</summary>
 		public static string DatesNoZeros(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
