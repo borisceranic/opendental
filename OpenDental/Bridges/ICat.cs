@@ -174,6 +174,10 @@ namespace OpenDental.Bridges{
 
 		///<summary></summary>
 		public static void StartFileWatcher() {
+			Program prog = Programs.GetCur(ProgramName.iCat);
+			if(!prog.Enabled) {
+				return;
+			}
 			ArrayList ForProgram=ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.iCat));
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Return folder path");
 			string returnFolder=PPCur.PropertyValue;
