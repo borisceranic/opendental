@@ -1221,10 +1221,12 @@ namespace OpenDentBusiness
 					//2400 REF: (medical) A variety of medical REFs not supported.
 					//2400 REF: Pretermination ID. Not used.
 					//2400 REF: Referral #. Not used.
-					//2400 REF: Line item control number(Proc Num)
+					//2400 REF: Line Item Control Number (ProcNum).  Used in 835s (electronic EOBs) to match payment to the claimproc.
+					//Prefixed with "p" to convey that the Line Item Control Number on the 835 is a ProcNum.
+					//In older versions of OD, we did not send the REF*6R segment, and for these claims, the Line Item Control Number that will show on the 835 is the Line Counter from LX01 above.
 					seg++;
 					sw.WriteLine("REF*6R*"//REF01: 6R=Procedure control number
-						+proc.ProcNum.ToString()+"~");
+						+"p"+proc.ProcNum.ToString()+"~");
 					//2400 AMT(x4): (medical) Various amounts. Not supported
 					//2400 K3: (medical) Not supported.
 					//2400 NTE: Line note

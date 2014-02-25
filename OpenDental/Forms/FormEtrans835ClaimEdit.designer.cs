@@ -49,11 +49,9 @@ namespace OpenDental{
 			this.textClaimFee2 = new System.Windows.Forms.TextBox();
 			this.labelEquation = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.textPatientPortion2 = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.textInsPaid2 = new System.Windows.Forms.TextBox();
 			this.textProcAdjustments = new System.Windows.Forms.TextBox();
-			this.label11 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// textPatientName
@@ -75,7 +73,7 @@ namespace OpenDental{
 			// 
 			// textDateService
 			// 
-			this.textDateService.Location = new System.Drawing.Point(140, 31);
+			this.textDateService.Location = new System.Drawing.Point(626, 11);
 			this.textDateService.Name = "textDateService";
 			this.textDateService.ReadOnly = true;
 			this.textDateService.Size = new System.Drawing.Size(90, 20);
@@ -83,7 +81,7 @@ namespace OpenDental{
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(2, 31);
+			this.label9.Location = new System.Drawing.Point(488, 11);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(138, 20);
 			this.label9.TabIndex = 152;
@@ -92,15 +90,15 @@ namespace OpenDental{
 			// 
 			// textClaimIdentifier
 			// 
-			this.textClaimIdentifier.Location = new System.Drawing.Point(140, 51);
+			this.textClaimIdentifier.Location = new System.Drawing.Point(140, 31);
 			this.textClaimIdentifier.Name = "textClaimIdentifier";
 			this.textClaimIdentifier.ReadOnly = true;
-			this.textClaimIdentifier.Size = new System.Drawing.Size(90, 20);
+			this.textClaimIdentifier.Size = new System.Drawing.Size(325, 20);
 			this.textClaimIdentifier.TabIndex = 186;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(2, 51);
+			this.label1.Location = new System.Drawing.Point(2, 31);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(138, 20);
 			this.label1.TabIndex = 185;
@@ -109,15 +107,15 @@ namespace OpenDental{
 			// 
 			// textPayorControlNum
 			// 
-			this.textPayorControlNum.Location = new System.Drawing.Point(140, 71);
+			this.textPayorControlNum.Location = new System.Drawing.Point(140, 51);
 			this.textPayorControlNum.Name = "textPayorControlNum";
 			this.textPayorControlNum.ReadOnly = true;
-			this.textPayorControlNum.Size = new System.Drawing.Size(90, 20);
+			this.textPayorControlNum.Size = new System.Drawing.Size(325, 20);
 			this.textPayorControlNum.TabIndex = 188;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(2, 71);
+			this.label2.Location = new System.Drawing.Point(2, 51);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(138, 20);
 			this.label2.TabIndex = 187;
@@ -126,7 +124,7 @@ namespace OpenDental{
 			// 
 			// textStatus
 			// 
-			this.textStatus.Location = new System.Drawing.Point(626, 11);
+			this.textStatus.Location = new System.Drawing.Point(140, 71);
 			this.textStatus.Name = "textStatus";
 			this.textStatus.ReadOnly = true;
 			this.textStatus.Size = new System.Drawing.Size(325, 20);
@@ -134,7 +132,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(488, 11);
+			this.label4.Location = new System.Drawing.Point(2, 71);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(138, 20);
 			this.label4.TabIndex = 189;
@@ -194,7 +192,7 @@ namespace OpenDental{
 			// 
 			// gridAdjudicationDetails
 			// 
-			this.gridAdjudicationDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridAdjudicationDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridAdjudicationDetails.HScrollVisible = false;
 			this.gridAdjudicationDetails.Location = new System.Drawing.Point(9, 551);
@@ -204,7 +202,7 @@ namespace OpenDental{
 			this.gridAdjudicationDetails.Size = new System.Drawing.Size(956, 107);
 			this.gridAdjudicationDetails.TabIndex = 197;
 			this.gridAdjudicationDetails.TabStop = false;
-			this.gridAdjudicationDetails.Title = "Adjudication Details";
+			this.gridAdjudicationDetails.Title = "Claim Adjudication Info";
 			this.gridAdjudicationDetails.TranslationName = "FormEtrans835Edit";
 			this.gridAdjudicationDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAdjudicationDetails_CellDoubleClick);
 			// 
@@ -221,7 +219,7 @@ namespace OpenDental{
 			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 291);
 			this.gridProcedureDetails.TabIndex = 0;
 			this.gridProcedureDetails.TabStop = false;
-			this.gridProcedureDetails.Title = "Procedure Details";
+			this.gridProcedureDetails.Title = "Procedure Breakdown";
 			this.gridProcedureDetails.TranslationName = "FormEtrans835Edit";
 			// 
 			// butClose
@@ -251,13 +249,12 @@ namespace OpenDental{
 			this.gridAdjustmentDetails.Size = new System.Drawing.Size(956, 107);
 			this.gridAdjustmentDetails.TabIndex = 198;
 			this.gridAdjustmentDetails.TabStop = false;
-			this.gridAdjustmentDetails.Title = "Adjustment Details";
+			this.gridAdjustmentDetails.Title = "Claim Adjustments";
 			this.gridAdjustmentDetails.TranslationName = "FormEtrans835Edit";
 			// 
 			// label18
 			// 
-			this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label18.Location = new System.Drawing.Point(287, 228);
+			this.label18.Location = new System.Drawing.Point(353, 228);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(12, 20);
 			this.label18.TabIndex = 204;
@@ -266,8 +263,7 @@ namespace OpenDental{
 			// 
 			// textTotalAdjustments
 			// 
-			this.textTotalAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textTotalAdjustments.Location = new System.Drawing.Point(304, 228);
+			this.textTotalAdjustments.Location = new System.Drawing.Point(370, 228);
 			this.textTotalAdjustments.Name = "textTotalAdjustments";
 			this.textTotalAdjustments.ReadOnly = true;
 			this.textTotalAdjustments.Size = new System.Drawing.Size(110, 20);
@@ -275,8 +271,7 @@ namespace OpenDental{
 			// 
 			// textClaimFee2
 			// 
-			this.textClaimFee2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textClaimFee2.Location = new System.Drawing.Point(173, 228);
+			this.textClaimFee2.Location = new System.Drawing.Point(239, 228);
 			this.textClaimFee2.Name = "textClaimFee2";
 			this.textClaimFee2.ReadOnly = true;
 			this.textClaimFee2.Size = new System.Drawing.Size(110, 20);
@@ -284,38 +279,26 @@ namespace OpenDental{
 			// 
 			// labelEquation
 			// 
-			this.labelEquation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelEquation.Location = new System.Drawing.Point(174, 207);
+			this.labelEquation.Location = new System.Drawing.Point(240, 207);
 			this.labelEquation.Name = "labelEquation";
-			this.labelEquation.Size = new System.Drawing.Size(700, 20);
+			this.labelEquation.Size = new System.Drawing.Size(581, 20);
 			this.labelEquation.TabIndex = 199;
 			this.labelEquation.Text = "Claim Fee                       -    Claim Adjustments          -    Proc Adjustm" +
-    "ents           -    Patient Portion               =    Ins Paid";
+    "ents          =    Ins Paid";
 			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label3
 			// 
-			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label3.Location = new System.Drawing.Point(417, 228);
+			this.label3.Location = new System.Drawing.Point(483, 228);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(12, 20);
 			this.label3.TabIndex = 206;
 			this.label3.Text = "-";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textPatientPortion2
-			// 
-			this.textPatientPortion2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textPatientPortion2.Location = new System.Drawing.Point(566, 228);
-			this.textPatientPortion2.Name = "textPatientPortion2";
-			this.textPatientPortion2.ReadOnly = true;
-			this.textPatientPortion2.Size = new System.Drawing.Size(110, 20);
-			this.textPatientPortion2.TabIndex = 205;
-			// 
 			// label10
 			// 
-			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label10.Location = new System.Drawing.Point(679, 228);
+			this.label10.Location = new System.Drawing.Point(613, 228);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(12, 20);
 			this.label10.TabIndex = 207;
@@ -324,8 +307,7 @@ namespace OpenDental{
 			// 
 			// textInsPaid2
 			// 
-			this.textInsPaid2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textInsPaid2.Location = new System.Drawing.Point(697, 228);
+			this.textInsPaid2.Location = new System.Drawing.Point(631, 228);
 			this.textInsPaid2.Name = "textInsPaid2";
 			this.textInsPaid2.ReadOnly = true;
 			this.textInsPaid2.Size = new System.Drawing.Size(110, 20);
@@ -333,33 +315,20 @@ namespace OpenDental{
 			// 
 			// textProcAdjustments
 			// 
-			this.textProcAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textProcAdjustments.Location = new System.Drawing.Point(433, 228);
+			this.textProcAdjustments.Location = new System.Drawing.Point(499, 228);
 			this.textProcAdjustments.Name = "textProcAdjustments";
 			this.textProcAdjustments.ReadOnly = true;
 			this.textProcAdjustments.Size = new System.Drawing.Size(110, 20);
 			this.textProcAdjustments.TabIndex = 209;
 			// 
-			// label11
-			// 
-			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label11.Location = new System.Drawing.Point(547, 227);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(12, 20);
-			this.label11.TabIndex = 210;
-			this.label11.Text = "-";
-			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
-			this.Controls.Add(this.label11);
 			this.Controls.Add(this.textProcAdjustments);
 			this.Controls.Add(this.textInsPaid2);
 			this.Controls.Add(this.label10);
 			this.Controls.Add(this.label3);
-			this.Controls.Add(this.textPatientPortion2);
 			this.Controls.Add(this.label18);
 			this.Controls.Add(this.textTotalAdjustments);
 			this.Controls.Add(this.textClaimFee2);
@@ -388,7 +357,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835ClaimEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Electronic Claim Explanation of Benefits (EOB)";
+			this.Text = "Claim Explanation of Benefits (EOB)";
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimEdit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835ClaimEdit_Resize);
 			this.ResumeLayout(false);
@@ -423,10 +392,8 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textClaimFee2;
 		private System.Windows.Forms.Label labelEquation;
 		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.TextBox textPatientPortion2;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.TextBox textInsPaid2;
 		private System.Windows.Forms.TextBox textProcAdjustments;
-		private System.Windows.Forms.Label label11;
 	}
 }

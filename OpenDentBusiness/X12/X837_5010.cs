@@ -1685,10 +1685,12 @@ namespace OpenDentBusiness
 					//2400 REF: 9B (medical,institutional) Repriced Line Item Reference Number. Situational. We do not use.
 					//2400 REF: 9C (dental) Adjusted Repriced claim Number. Situational. We do not use.
 					//2400 REF: 9D (medical,instituitonal) Adjusted Repriced Line Item Reference Number. Situational. We do not use.
-					//2400 REF: 6R (medical,institutional,dental) Line Item Control Number. ProcNum. Will later be used for ERAs.
+					//2400 REF: 6R (medical,institutional,dental) Line Item Control Number (ProcNum). Used in 835s (electronic EOBs) to match payment to the claimproc.
+					//Prefixed with "p" to convey that the Line Item Control Number on the 835 is a ProcNum.
+					//In older versions of OD, we did not send the REF*6R segment, and for these claims, the Line Item Control Number that will show on the 835 is the Service Line Number from LX01 above.
 					sw.Write("REF"+s
 						+"6R"+s//REF01 2/3 Reference Identification Qualifier: 6R=Procedure Control Number.
-						+proc.ProcNum.ToString());//REF02 1/50 Reference Identification: 
+						+"p"+proc.ProcNum.ToString());//REF02 1/50 Reference Identification: 
 					EndSegment(sw);//REF03 and REF04 are not used.
 					//2400 REF: EW (medical) Mammography Certification Number. Situational. We do not use.
 					//2400 REF: X4 (medical) Clinical Laboratory Improvement Amendment (CLIA) Number. Situational. We do not use.

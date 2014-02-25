@@ -74,7 +74,6 @@ namespace OpenDental {
 			textInsPaid.Text=_claimInfo[2];
 			textInsPaid2.Text=_claimInfo[2];
 			textPatientPortion.Text=_claimInfo[3];
-			textPatientPortion2.Text=_claimInfo[3];
 		}
 
 		private void FillAdjustmentDetail() {
@@ -109,14 +108,55 @@ namespace OpenDental {
 		}
 
 		private void FillProcedureDetails() {
-			List<string> listProcedureDetails=new List<string>();//TODO: Get data from x835.
-			if(listProcedureDetails.Count==0) {
+			List<string> listProcInfo=_x835.GetProcInfo(_claimTrackingNumber);
+			if(listProcInfo.Count==0) {
 				gridProcedureDetails.Title="Procedure Details (None Reported)";
 			}
 			else {
 				gridProcedureDetails.Title="Procedure Details";
 			}
-			//TODO:
+			gridProcedureDetails.BeginUpdate();
+			const int colWidthProcNum=80;
+			const int colWidthProcCode=80;
+			const int colWidthProcFee=80;
+			const int colWidthAdjAmt=80;
+			const int colWidthInsPaid=80;
+			int colWidthVariable=gridProcedureDetails.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-colWidthAdjAmt-colWidthInsPaid;
+			gridProcedureDetails.Columns.Clear();
+			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
+			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
+			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
+			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
+			gridProcedureDetails.Columns.Add(new ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureDetails.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
+			gridProcedureDetails.Rows.Clear();
+			decimal totalProcAdjustments=0;
+			for(int i=0;i<listProcInfo.Count;i+=5) {
+				ODGridRow row=new ODGridRow();
+				row.Cells.Add(new ODGridCell(listProcInfo[i+4]));//ProcNum
+				string strProcCode=listProcInfo[i+1];
+				row.Cells.Add(new ODGridCell(strProcCode));//ProcCode
+				string procDescript="";
+				if(ProcedureCodes.IsValidCode(strProcCode)) {
+					ProcedureCode procCode=ProcedureCodes.GetProcCode(strProcCode);
+					procDescript=procCode.AbbrDesc;
+				}
+				row.Cells.Add(new ODGridCell(procDescript));//ProcDescript
+				row.Cells.Add(new ODGridCell(listProcInfo[i+2]));//ProcFee
+				int segSvcIndex=PIn.Int(listProcInfo[i]);
+				List<string> listProcAdjustments=_x835.GetProcAdjustmentInfo(segSvcIndex);
+				decimal adjAmtForProc=0;
+				for(int j=0;j<listProcAdjustments.Count;j+=3) {
+					decimal adjAmt=PIn.Decimal(listProcAdjustments[j+2]);
+					adjAmtForProc+=adjAmt;
+					totalProcAdjustments+=adjAmt;
+				}
+				row.Cells.Add(new ODGridCell(adjAmtForProc.ToString("f2")));//AdjAmt
+				row.Cells.Add(new ODGridCell(listProcInfo[i+3]));//InsPaid
+				gridProcedureDetails.Rows.Add(row);
+			}
+			gridProcedureDetails.EndUpdate();
+			textProcAdjustments.Text=totalProcAdjustments.ToString("f2");
 		}
 
 		private void FillAdjudicationDetails() {

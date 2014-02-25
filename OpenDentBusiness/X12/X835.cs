@@ -7,29 +7,29 @@ namespace OpenDentBusiness
 {
 	///<summary>X12 835 Health Care Claim Payment/Advice. This transaction type is a response to an 837 claim submission. The 835 will always come after a 277 is received and a 277 will always come after a 999. Neither the 277 nor the 999 are required, so it is possible that an 835 will be received directly after the 837. The 835 is not required either, so it is possible that none of the 997, 999, 277 or 835 reports will be returned from the carrier.</summary>
 	public class X835:X12object {
-
+		
 		///<summary>All segments within the transaction.</summary>
-    private List<X12Segment> segments;
+    private List<X12Segment> _listSegments;
 		///<summary>BPR segment (pg. 69). Financial Information segment. Required.</summary>
-		private X12Segment segBPR;
+		private X12Segment _segBPR;
 		///<summary>TRN segment (pg. 77). Reassociation Trace Number segment. Required.</summary>
-		private X12Segment segTRN;
+		private X12Segment _segTRN;
 		///<summary>N1*PR segment of loop 1000A (pg. 87). Payer Identification segment. Required.</summary>
-		private X12Segment segN1_PR;
+		private X12Segment _segN1_PR;
 		///<summary>N3 segment of loop 1000A (pg. 89). Payer Address. Required.</summary>
-		private X12Segment segN3_PR;
+		private X12Segment _segN3_PR;
 		///<summary>N4 segment of loop 1000A (pg. 90). Payer City, Sate, Zip code. Required.</summary>
-		private X12Segment segN4_PR;
+		private X12Segment _segN4_PR;
 		///<summary>PER*BL segment of loop 1000A (pg. 97). Payer technical contact information. Required (but is not included in any of the examples, so we assume situational). Can repeat more than once, but we only are about the first occurrence.</summary>
-		private X12Segment segPER_BL;
+		private X12Segment _segPER_BL;
 		///<summary>N1*PE segment of loop 1000B (pg. 102). Payee identification. Required. We include this information because it could be helpful for those customers who are using clinics.</summary>
-		private X12Segment segN1_PE;
+		private X12Segment _segN1_PE;
 		///<summary>CLP of loop 2100 (pg. 123). Claim payment information.</summary>
-		private List<int> segNumsCLP;
+		private List<int> _listSegNumsCLP;
 		///<summary>SVC of loop 2110 (pg. 186). Service (procedure) payment information.</summary>
-		private List<int> segNumsSVC;
+		private List<int> _listSegNumsSVC;
 		///<summary>PLB segments (pg.217). Provider Adjustment. Situational. This is the footer and table 3 if pesent.</summary>
-		private List<int> segNumsPLB;
+		private List<int> _listSegNumsPLB;
 
     public static bool Is835(X12object xobj) {
       if(xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
@@ -45,34 +45,34 @@ namespace OpenDentBusiness
     public X835(string messageText):base(messageText) {
 			//Table 1 - Header
 			//ST: Transaction Set Header.  Required.  Repeat 1.  Guide page 68.  The GS segment contains exactly one ST segment below it.
-      segments=FunctGroups[0].Transactions[0].Segments;
+      _listSegments=FunctGroups[0].Transactions[0].Segments;
 			//BPR: Financial Information.  Required.  Repeat 1.  Guide page 69.
-			segBPR=segments[0];
+			_segBPR=_listSegments[0];
 			//TRN: Reassociation Trace Number.  Required.  Repeat 1.  Guide page 77.
-			segTRN=segments[1];
+			_segTRN=_listSegments[1];
 			//CUR: Foreign Currency Information.  Situational.  Repeat 1.  Guide page 79.  We do not use.
 			//REF: Receiver Identification.  Situational.  Repeat 1.  Guide page 82.  We do not use.
 			//REF: Version Identification.  Situational.  Repeat 1.  Guide page 84.  We do not use.
 			//DTM: Production Date.  Situational.  Repeat 1.  Guide page 85.  We do not use.
-			segNumsCLP=new List<int>();
-			segNumsSVC=new List<int>();
-			segNumsPLB=new List<int>();
-			for(int i=0;i<segments.Count;i++) {
-				X12Segment seg=segments[i];
+			_listSegNumsCLP=new List<int>();
+			_listSegNumsSVC=new List<int>();
+			_listSegNumsPLB=new List<int>();
+			for(int i=0;i<_listSegments.Count;i++) {
+				X12Segment seg=_listSegments[i];
 				//Loop 1000A Payer Identification. Repeat 1.
 				if(seg.SegmentID=="N1" && seg.Get(1)=="PR") {//Locates the first segment in loop 1000A.
 					//1000A N1: Payer Identification. Required.  Repeat 1. Guide page 87.
-					segN1_PR=seg;
+					_segN1_PR=seg;
 					//1000A N3: Payer Address.  Required.  Repeat 1.  Guide page 89.
-					segN3_PR=segments[i+1];
+					_segN3_PR=_listSegments[i+1];
 					//1000A N4: Payer City, State, ZIP Code.  Required.  Repeat 1.  Guide page 90.
-					segN4_PR=segments[i+2];
+					_segN4_PR=_listSegments[i+2];
 					//1000A REF: Additional Payer Identification.  Situational.  Repeat 4.  Guide page 92.  We do not use.
 					//1000A PER: Payer Business Contact Information.  Situational.  Repeat 1.  Guide page 94.  We do not use.
 					//1000A PER: Payer Technical Contact Information.  Required (but is not included in any of the examples, so we assume situational).  Repeat >1.  Guide page 97.  We only care about the first occurrence.
 					for(int j=i+3;j<i+6;j++) {//Since the previous 2 segments are situational, we must skip them if they exist.
-						if(segments[j].SegmentID=="PER" && segments[j].Get(1)=="BL") {
-							segPER_BL=segments[j];
+						if(_listSegments[j].SegmentID=="PER" && _listSegments[j].Get(1)=="BL") {
+							_segPER_BL=_listSegments[j];
 							break;
 						}
 					}
@@ -81,7 +81,7 @@ namespace OpenDentBusiness
 				//Loop 1000B Payee Identification.  Repeat 1.
 				if(seg.SegmentID=="N1" && seg.Get(1)=="PE") {//Locates the first segment in loop 1000B.
 					//1000B N1: Payee Identification.  Required.  Repeat 1.  Guide page 102.
-					segN1_PE=seg;
+					_segN1_PE=seg;
 					//1000B N3: Payee Address.  Situational.  Repeat 1.  Guide page 104.  We do not use because the payee already knows their own address, and because it is not required.
 					//1000B N4: Payee City, State, ZIP Code.  Situational.  Repeat 1.  Guide page 105.  We do not use because the payee already knows their own address, and because it is not required.
 					//1000B REF: Payee Additional Identification.  Situational.  Repeat >1.  Guide page 107.  We do not use.
@@ -95,7 +95,7 @@ namespace OpenDentBusiness
 				//Loop 2100 Claim Payment Information.  Repeat >1.
 				if(seg.SegmentID=="CLP") {//The CLP segment only exists one time within the 2100 loop.
 					//2100 CLP: Claim Payment Information.  Required.  Repeat 1.  Guide page 123.
-					segNumsCLP.Add(i);
+					_listSegNumsCLP.Add(i);
 					//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.  We do not use.
 					//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.  We do not use.
 					//2100 NM1: Insured Name.  Situational.  Repeat 1.  Guide page 140.  We do not use.
@@ -118,7 +118,7 @@ namespace OpenDentBusiness
 				//Loop 2110 Service Payment Information.  Repeat 999.
 				if(seg.SegmentID=="SVC") {//The SVC segment only exists one time within the 2110 loop.
 					//2110 SVC: Service Payment Information.  Situational.  Repeat 1.  Guide page 186.
-					segNumsSVC.Add(i);
+					_listSegNumsSVC.Add(i);
 					//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
 					//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.  We do not use.
 					//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
@@ -132,14 +132,14 @@ namespace OpenDentBusiness
 				//Table 3 - Summary
 				if(seg.SegmentID=="PLB") {
 					//PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.
-					segNumsPLB.Add(i);
+					_listSegNumsPLB.Add(i);
 				}
 			}
     }
 
 		///<summary>Gets the description for the transaction handling code in Table 1 (Header) BPR01. Required.</summary>
 		public string GetTransactionHandlingCodeDescription() {
-			string transactionHandlingCode=segBPR.Get(1);
+			string transactionHandlingCode=_segBPR.Get(1);
 			if(transactionHandlingCode=="C") {
 				return "Payment Accompanies Remittance Advice";
 			}
@@ -166,12 +166,12 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the payment credit or debit amount in Table 1 (Header) BPR02. Required.</summary>
 		public string GetPaymentAmount() {
-			return PIn.Decimal(segBPR.Get(2)).ToString("f2");
+			return PIn.Decimal(_segBPR.Get(2)).ToString("f2");
 		}
 
 		///<summary>Gets the payment credit or debit flag in Table 1 (Header) BPR03. Returns true if "Credit" or false if "Debit". Required.</summary>
 		public bool IsCredit() {
-			string creditDebitFlag=segBPR.Get(3);
+			string creditDebitFlag=_segBPR.Get(3);
 			if(creditDebitFlag=="C") {
 				return true;
 			}
@@ -180,7 +180,7 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the description for the payment method in Table 1 (Header) BPR04. Required.</summary>
 		public string GetPaymentMethodDescription() {
-			string paymentMethodCode=segBPR.Get(4);
+			string paymentMethodCode=_segBPR.Get(4);
 			if(paymentMethodCode=="ACH") {
 				return "Automated Clearing House (ACH)";
 			}
@@ -201,7 +201,7 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the last 4 digits of the account number for the receiving company (the provider office) in Table 1 (Header) BPR15. Situational. If not present, then returns empty string.</summary>
 		public string GetAccountNumReceivingShort() {
-			string accountNumber=segBPR.Get(15);
+			string accountNumber=_segBPR.Get(15);
 			if(accountNumber.Length<=4) {
 				return accountNumber;
 			}
@@ -210,7 +210,7 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the effective payment date in Table 1 (Header) BPR16. Required.</summary>
 		public DateTime GetDateEffective() {
-			string dateEffectiveStr=segBPR.Get(16);//BPR16 will be blank if the payment is a check.
+			string dateEffectiveStr=_segBPR.Get(16);//BPR16 will be blank if the payment is a check.
 			if(dateEffectiveStr.Length<8) {
 				return DateTime.MinValue;
 			}
@@ -222,74 +222,74 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the check number or transaction reference number in Table 1 (Header) TRN02. Required.</summary>
 		public string GetTransactionReferenceNumber() {
-			return segTRN.Get(2);
+			return _segTRN.Get(2);
 		}
 
 		///<summary>Gets the payer name in Table 1 (Header) N102. Required.</summary>
 		public string GetPayerName() {
-			return segN1_PR.Get(2);
+			return _segN1_PR.Get(2);
 		}
 
 		///<summary>Gets the payer electronic ID in Table 1 (Header) N104 of segment N1*PR. Situational. If not present, then returns empty string.</summary>
 		public string GetPayerID() {
-			if(segN1_PR.Elements.Length>=4) {
-				return segN1_PR.Get(4);
+			if(_segN1_PR.Elements.Length>=4) {
+				return _segN1_PR.Get(4);
 			}
 			return "";
 		}
 
 		///<summary>Gets the payer address line 1 in Table 1 (Header) N301 of segment N1*PR. Required.</summary>
 		public string GetPayerAddress1() {
-			return segN3_PR.Get(1);
+			return _segN3_PR.Get(1);
 		}
 
 		///<summary>Gets the payer city name in Table 1 (Header) N401 of segment N1*PR. Required.</summary>
 		public string GetPayerCityName() {
-			return segN4_PR.Get(1);
+			return _segN4_PR.Get(1);
 		}
 
 		///<summary>Gets the payer state in Table 1 (Header) N402 of segment N1*PR. Required when in USA or Canada.</summary>
 		public string GetPayerState() {
-			return segN4_PR.Get(2);
+			return _segN4_PR.Get(2);
 		}
 
 		///<summary>Gets the payer zip code in Table 1 (Header) N403 of segment N1*PR. Required when in USA or Canada.</summary>
 		public string GetPayerZip() {
-			return segN4_PR.Get(3);
+			return _segN4_PR.Get(3);
 		}
 
 		///<summary>Gets the contact information from segment PER*BL. Phone/email in PER04 or the contact phone/email in PER06 or both. If neither PER04 nor PER06 are present, then returns empty string.</summary>
 		public string GetPayerContactInfo() {
-			if(segPER_BL==null) {
+			if(_segPER_BL==null) {
 				return "";
 			}
 			string contact_info="";
-			if(segPER_BL.Elements.Length>=4 && segPER_BL.Get(4)!="") {//Contact number 1.
-				contact_info=segPER_BL.Get(4);
+			if(_segPER_BL.Elements.Length>=4 && _segPER_BL.Get(4)!="") {//Contact number 1.
+				contact_info=_segPER_BL.Get(4);
 			}
-			if(segPER_BL.Elements.Length>=6 && segPER_BL.Get(6)!="") {//Contact number 2.
+			if(_segPER_BL.Elements.Length>=6 && _segPER_BL.Get(6)!="") {//Contact number 2.
 				if(contact_info!="") {
 					contact_info+=" or ";
 				}
-				contact_info+=segPER_BL.Get(6);
+				contact_info+=_segPER_BL.Get(6);
 			}
-			if(segPER_BL.Elements.Length>=8 && segPER_BL.Get(8)!="") {//Telephone extension for contact number 2.
+			if(_segPER_BL.Elements.Length>=8 && _segPER_BL.Get(8)!="") {//Telephone extension for contact number 2.
 				if(contact_info!="") {
 					contact_info+=" x";
 				}
-				contact_info+=segPER_BL.Get(8);
+				contact_info+=_segPER_BL.Get(8);
 			}
 			return contact_info;
 		}
 
 		///<summary>Gets the payee name in Table 1 (Header) N102 of segment N1*PE. Required.</summary>
 		public string GetPayeeName() {
-			return segN1_PE.Get(2);
+			return _segN1_PE.Get(2);
 		}
 
 		///<summary>Gets a human readable description for the identifiation code qualifier found in N103 of segment N1*PE. Required.</summary>
 		public string GetPayeeIdType() {
-			string qualifier=segN1_PE.Get(3);
+			string qualifier=_segN1_PE.Get(3);
 			if(qualifier=="FI") {
 				return "TIN";
 			}
@@ -304,14 +304,14 @@ namespace OpenDentBusiness
 
 		///<summary>Gets the payee identification number found in N104 of segment N1*PE. Required. Usually the NPI number.</summary>
 		public string GetPayeeId() {
-			return segN1_PE.Get(4);
+			return _segN1_PE.Get(4);
 		}
 
 		///<summary>CLP01 in loop 2100. Referred to in this format as a Patient Control Number. Do this first to get a list of all claim tracking numbers that are contained within this 835.  Then, for each claim tracking number, we can later retrieve specific information for that single claim. The claim tracking numbers correspond to CLM01 exactly as submitted in the 837. We refer to CLM01 as the claim identifier on our end. We allow more than just digits in our claim identifiers, so we must return a list of strings.</summary>
 		public List<string> GetClaimTrackingNumbers() {
 			List<string> retVal=new List<string>();
-			for(int i=0;i<segNumsCLP.Count;i++) {
-				X12Segment seg=segments[segNumsCLP[i]];//CLP segment.
+			for(int i=0;i<_listSegNumsCLP.Count;i++) {
+				X12Segment seg=_listSegments[_listSegNumsCLP[i]];//CLP segment.
 				retVal.Add(seg.Get(1));//CLP01
 			}
 			return retVal;
@@ -328,9 +328,9 @@ namespace OpenDentBusiness
       for(int i=0;i<result.Length;i++) {
         result[i]="";
       }
-      for(int i=0;i<segNumsCLP.Count;i++) {
-        int segNum=segNumsCLP[i];
-				X12Segment segCLP=segments[segNum];
+      for(int i=0;i<_listSegNumsCLP.Count;i++) {
+        int segNum=_listSegNumsCLP[i];
+				X12Segment segCLP=_listSegments[segNum];
 				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
 					continue;
 				}
@@ -347,19 +347,19 @@ namespace OpenDentBusiness
 		///<summary>Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
 		public List<string> GetClaimAdjustmentInfo(string claimTrackingNumber) {
 			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
-			for(int i=0;i<segNumsCLP.Count;i++) {
-				int segNum=segNumsCLP[i];
-				X12Segment segCLP=segments[segNum];
+			for(int i=0;i<_listSegNumsCLP.Count;i++) {
+				int segNum=_listSegNumsCLP[i];
+				X12Segment segCLP=_listSegments[segNum];
 				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
 					continue;
 				}
 				int startSegNum=segNum+1;
-				int endSegNum=segments.Count;//this variable tracks where the segments end for claim i.
-				if(i<segNumsCLP.Count-1) {
-					endSegNum=segNumsCLP[i+1];
+				int endSegNum=_listSegments.Count;//this variable tracks where the segments end for claim i.
+				if(i<_listSegNumsCLP.Count-1) {
+					endSegNum=_listSegNumsCLP[i+1];
 				}
 				for(int j=startSegNum;j<endSegNum;j++) {
-					X12Segment seg=segments[j];
+					X12Segment seg=_listSegments[j];
 					if(seg.SegmentID=="SVC") {
 						//If a procedure segment is encountered, then we have finished processing all of the claim-level adjustments.  Discontinue processing.
 						break;
@@ -419,19 +419,19 @@ namespace OpenDentBusiness
 		///The values returned are in pairs, such that the first item in each pair is a field name and the second item in the pair is the field value.</summary>
 		public List<string> GetClaimAdjudicationInfo(string claimTrackingNumber) {
 			List<string> listAdjudicationInfo=new List<string>();
-			for(int i=0;i<segNumsCLP.Count;i++) {
-				int segNum=segNumsCLP[i];
-				X12Segment segCLP=segments[segNum];
+			for(int i=0;i<_listSegNumsCLP.Count;i++) {
+				int segNum=_listSegNumsCLP[i];
+				X12Segment segCLP=_listSegments[segNum];
 				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
 					continue;
 				}
 				int startSegNum=segNum+1;
-				int endSegNum=segments.Count;//this variable tracks where the segments end for claim i.
-				if(i<segNumsCLP.Count-1) {
-					endSegNum=segNumsCLP[i+1];
+				int endSegNum=_listSegments.Count;//this variable tracks where the segments end for claim i.
+				if(i<_listSegNumsCLP.Count-1) {
+					endSegNum=_listSegNumsCLP[i+1];
 				}
 				for(int j=startSegNum;j<endSegNum;j++) {
-					X12Segment seg=segments[j];
+					X12Segment seg=_listSegments[j];
 					if(seg.SegmentID=="MIA") {
 						if(seg.Get(1)!="") {
 							listAdjudicationInfo.Add("Covered Days or Visits Count");		listAdjudicationInfo.Add(seg.Get(1));
@@ -541,6 +541,92 @@ namespace OpenDentBusiness
 			return listAdjudicationInfo;
 		}
 
+		///<summary>Procedure level information is not required, but is useful if present.
+		///The returned list of strings will include 5 values for each procedure found.  Fields will be in the following order:
+		///00 SVC Segment Index within _listSegNumsSVC. More convenient than the line item number, beacuse it is always available and easier to use in later steps.
+		///01 Procedure Code.
+		///02 Procedure Fee.
+		///03 Ins Paid Amount.
+		///04 ProcNum (REF*6R from the 837), or blank for older claims.</summary>
+		public List<string> GetProcInfo(string claimTrackingNumber) {
+			List<string> listProcInfo=new List<string>();
+			for(int i=0;i<_listSegNumsCLP.Count;i++) {
+				int segNum=_listSegNumsCLP[i];
+				X12Segment segCLP=_listSegments[segNum];
+				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
+					continue;
+				}
+				int startSegNumCLP=segNum+1;
+				int endSegNumCLP=_listSegments.Count;//this variable tracks where the segments end for claim i.
+				if(i<_listSegNumsCLP.Count-1) {
+					endSegNumCLP=_listSegNumsCLP[i+1];
+				}
+				for(int j=0;j<_listSegNumsSVC.Count;j++) {
+					int segSvcIndex=_listSegNumsSVC[j];
+					if(segSvcIndex>=startSegNumCLP && segSvcIndex<endSegNumCLP) {
+						listProcInfo.Add(j.ToString());//00 SVC Segment Index.
+						X12Segment segSVC=_listSegments[segSvcIndex];
+						listProcInfo.Add(segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1]);//01 SVC1-2: Procedure code.
+						listProcInfo.Add(PIn.Decimal(segSVC.Get(2)).ToString("f2"));//02 SVC2: Procedure Fee.
+						listProcInfo.Add(PIn.Decimal(segSVC.Get(3)).ToString("f2"));//03 SVC3: Ins Paid Amount.
+						int segRefIndex=-1;
+						for(int k=segSvcIndex+1;k<_listSegments.Count;k++) {//Find the first REF*6R segment.
+							if(_listSegments[k].SegmentID=="REF" && _listSegments[k].Get(1)=="6R") {
+								segRefIndex=k;
+								break;
+							}
+						}
+						//Back track to see if the located REF*6R segment belongs to the current procedure (because the REF*6F segments are optional and could be on some procedures but not others).
+						bool isRefMatch=false;
+						if(segRefIndex!=-1) {
+							for(int k=segRefIndex;k>=segSvcIndex;k--) {
+								if(_listSegments[k].SegmentID!="SVC") {
+									continue;
+								}
+								if(k==segSvcIndex) {
+									isRefMatch=true;
+								}
+								break;
+							}
+						}
+						string procNum="";
+						if(isRefMatch) {
+							string strRef02=_listSegments[segRefIndex].Get(2);
+							if(strRef02.StartsWith("p")) {
+								//If the control number is prefixed with a "p", then it is a ProcNum.
+								//Otherwise, for older versions, it will be the Line Counter from LX01 in the 837, which is basically an index.  We will ignore these older index based values.
+								procNum=strRef02.Substring(1);//Remove the leading "p".
+							}							
+						}
+						listProcInfo.Add(procNum);//04 REF02: Line Item Control Number.  This is the REF*6R from the 837.
+					}
+				}
+			}
+			return listProcInfo;
+		}
+
+		///<summary>Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		public List<string> GetProcAdjustmentInfo(int segSvcIndex) {
+			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
+			int startSegNum=_listSegNumsSVC[segSvcIndex];
+			int endSegNum=_listSegments.Count;
+			if(segSvcIndex<_listSegNumsSVC.Count-1) {
+				endSegNum=_listSegNumsSVC[segSvcIndex+1];
+			}
+			for(int j=startSegNum;j<endSegNum;j++) {
+				X12Segment seg=_listSegments[j];
+				if(seg.SegmentID=="CLP") {
+					//If another claim segment is encountered, then we have finished processing all of the procedure-level adjustments.  Discontinue processing.
+					break;
+				}
+				if(seg.SegmentID!="CAS") {
+					continue;//Not an adjustment segment.
+				}
+				listClaimCasSegments.Add(seg);
+			}
+			return ConvertCasAdjustmentsToHumanReadable(listClaimCasSegments);
+		}
+
 		private string GetClaimStatusDescriptionForCode(string claimStatusCode) {
 			string claimStatusCodeDescript="";
 			if(claimStatusCode=="1") {
@@ -585,8 +671,8 @@ namespace OpenDentBusiness
 		///05 Amount (PLB04 1/18).</summary>
 		public List<string[]> GetProviderLevelAdjustments() {
 			List<string[]> result=new List<string[]>();
-			for(int i=0;i<segNumsPLB.Count;i++) {
-				X12Segment segPLB=segments[segNumsPLB[i]];
+			for(int i=0;i<_listSegNumsPLB.Count;i++) {
+				X12Segment segPLB=_listSegments[_listSegNumsPLB[i]];
 				string provNPI=segPLB.Get(1);//PLB01 is required.
 				string dateFiscalPeriodStr=segPLB.Get(2);//PLB02 is required.
 				string dateFiscalPeriod="";
@@ -1508,7 +1594,7 @@ namespace OpenDentBusiness
 //GE*1*1~
 //IEA*1*000000001~
 
-//Example 2 From 835 Specification:
+//Example 2 From 835 Specification (modified to include a procedure line item control number in REF*6R):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*12233~
@@ -1536,11 +1622,12 @@ namespace OpenDentBusiness
 //DTM*151*20020312~
 //CAS*PR*1*600~
 //CAS*CO*45*50~
+//REF*6R*p1000~
 //SE*25*112233~
 //GE*1*1~
 //IEA*1*000000001~
 
-//Example 3 From 835 Specification:
+//Example 3 From 835 Specification (modified to include a procedure line item control number in REF*6R):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
@@ -1572,12 +1659,14 @@ namespace OpenDentBusiness
 //SVC*HC>12345>26*166.5*30**1~
 //DTM*472*20050106~
 //CAS*OA*23*136.50~
+//REF*6R*p1001~
 //REF*1B*43285~
 //AMT*AU*150~
 //SVC*HC>66543>26*585*280*220*1~
 //DTM*472*20050106~
 //CAS*PR*1*150**2*70~
 //CAS*CO*42*85~
+//REF*6R*123456~
 //REF*1B*43285~
 //AMT*AU*500~
 //SE*38*0001~
