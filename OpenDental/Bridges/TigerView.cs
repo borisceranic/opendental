@@ -37,11 +37,11 @@ namespace OpenDental.Bridges {
 				for(int i=2;i<2000;i++) {
 					string numString=String.Format("{0:0000}",i);     //0001, 0002 ect
 					backupFileName=filePath+".bak"+numString;
-					if(!System.IO.File.Exists(backupFileName)){
+					if(!System.IO.File.Exists(backupFileName)) {
 						break;
 					}
 				}
-			try{
+			try {
 				//Create the backup file
 				System.IO.File.Copy(filePath,backupFileName);
 				sr=new StreamReader(filePath);
@@ -52,23 +52,23 @@ namespace OpenDental.Bridges {
 				while((line1=sr.ReadLine())!=null) {
 					// Locate Section
 					System.Text.RegularExpressions.Match m1=regSection.Match(line1);
-					if(m1.Success){
+					if(m1.Success) {
 						SectionFound=true;
 						BeforeSection=false;
 					}
-					if(SectionFound&&!AfterSection){
-						if(Section_Collection.Count!=0&&r.Match(line1).Success){
+					if(SectionFound&&!AfterSection) {
+						if(Section_Collection.Count!=0&&r.Match(line1).Success) {
 							AfterSection=true;
 						}
 					}
 					//Record line in collections
-					if(BeforeSection){
+					if(BeforeSection) {
 						Before_Section_Collection.Add(line1);
 					}
-					if(SectionFound&&!AfterSection){
+					if(SectionFound&&!AfterSection) {
 						Section_Collection.Add(line1);
 					}
-					if(AfterSection){
+					if(AfterSection) {
 						After_Section_Collection.Add(line1);
 					}
 				}
@@ -87,32 +87,33 @@ namespace OpenDental.Bridges {
 				}
 				//-- rewrite files
 				sw=new StreamWriter(filePath);
-				for(int i=0;i<Before_Section_Collection.Count;i++){
+				for(int i=0;i<Before_Section_Collection.Count;i++) {
 					sw.WriteLine(Before_Section_Collection[i]);
 				}
-				for(int i=0;i<Section_Collection.Count;i++){
+				for(int i=0;i<Section_Collection.Count;i++) {
 					sw.WriteLine(Section_Collection[i]);
 				}
-				for(int i=0;i<After_Section_Collection.Count;i++){
+				for(int i=0;i<After_Section_Collection.Count;i++) {
 					sw.WriteLine(After_Section_Collection[i]);
 				}
 				sw.Close();
 				//All is good remove the backup file
-				if(System.IO.File.Exists(backupFileName)){
+				if(System.IO.File.Exists(backupFileName)) {
 					System.IO.File.Delete(backupFileName);
 				}
 			}
-			catch{
-				if(System.IO.File.Exists(backupFileName)){
+			catch {
+				if(System.IO.File.Exists(backupFileName)) {
 					System.IO.File.Copy(backupFileName,filePath); // restore backup
 				}
 				MessageBox.Show("There was an error writing to file: "+filePath+"\nThe operation you have just tried to do will likely fail");
 				rVal=false;
-			}finally{
-				if(sr!=null){
+			}
+			finally {
+				if(sr!=null) {
 					sr.Close();
 				}
-				if(sw!=null){
+				if(sw!=null) {
 					sw.Close();
 				}
 			}
@@ -129,7 +130,7 @@ namespace OpenDental.Bridges {
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Tiger1.ini path");
 			iniFile=PPCur.PropertyValue;
 			System.Collections.Hashtable htKeyVals=new Hashtable();
-			if(pat!=null){
+			if(pat!=null) {
 				if(!File.Exists(iniFile)) {
 					MessageBox.Show("Could not find "+iniFile);
 					return;
@@ -138,16 +139,18 @@ namespace OpenDental.Bridges {
 				htKeyVals["FirstName"]=pat.FName;
 				//Patient Id can be any string format.
 				PPCur=ProgramProperties.GetCur(ForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
-				if(PPCur.PropertyValue=="0"){
+				if(PPCur.PropertyValue=="0") {
 					htKeyVals["PatientID"]=pat.PatNum.ToString();
-				}else{
+				}
+				else {
 					htKeyVals["PatientID"]=pat.ChartNumber;
 				}
 				htKeyVals["PatientSSN"]=pat.SSN;
 				//WriteValue("SubscriberSSN",pat);
-				if(pat.Gender==PatientGender.Female){
+				if(pat.Gender==PatientGender.Female) {
 					htKeyVals["Gender"]="Female";
-				}else{
+				}
+				else {
 					htKeyVals["Gender"]="Male";
 				}
 				htKeyVals["DOB"]=pat.Birthdate.ToString("MM/dd/yy");
@@ -160,20 +163,23 @@ namespace OpenDental.Bridges {
 				htKeyVals["AddrZip"]=pat.Zip;
 				htKeyVals["PhHome"]=LimitLength(pat.HmPhone,13);
 				htKeyVals["PhWork"]=LimitLength(pat.WkPhone,13);
-				if(!WritePrivatePofileString2("Slave",htKeyVals,iniFile)){
+				if(!WritePrivatePofileString2("Slave",htKeyVals,iniFile)) {
 					MessageBox.Show(Lan.g(null,"Unable to start external program: ")+path);
-				}else{
-					try{
+				}
+				else {
+					try {
 						Process.Start(path,ProgramCur.CommandLine);
-					}catch{
+					}
+					catch {
 						MessageBox.Show(path+" is not available.");
 					}
 				}
 			}//if patient is loaded
-			else{
-				try{
+			else {
+				try {
 					Process.Start(path);//should start TigerView without bringing up a pt.
-				}catch{
+				}
+				catch {
 					MessageBox.Show(path+" is not available.");
 				}
 			}
@@ -184,6 +190,95 @@ namespace OpenDental.Bridges {
 				return str;
 			}
 			return str.Substring(0,length);
+		}
+
+		///<summary></summary>
+		public static void StartFileWatcher() {
+			Program prog = Programs.GetCur(ProgramName.TigerView);
+			if(!prog.Enabled) {
+				return;
+			}
+			ArrayList propertiesForProgram=ProgramProperties.GetForProgram(prog.ProgramNum);
+			ProgramProperty programProperty=ProgramProperties.GetCur(propertiesForProgram,"TigerView EMR folder path");
+			string returnFolder=programProperty.PropertyValue;
+			if(!Directory.Exists(returnFolder)) {
+				//Do not show a message that the directory was not found because not every workstation in the office will be running this service.
+				return;
+			}
+			FileSystemWatcher watcher=new FileSystemWatcher(returnFolder,"*.tig");
+			watcher.Created+=new FileSystemEventHandler(OnCreated);
+			watcher.EnableRaisingEvents=true;
+			string[] arrayUnprocessedFiles=Directory.GetFiles(returnFolder,"*.tig");
+			for(int i=0;i<arrayUnprocessedFiles.Length;i++) {
+				try {
+					ProcessFile(arrayUnprocessedFiles[i]);
+				}
+				catch { }
+			}
+		}
+
+		private static void OnCreated(object source,FileSystemEventArgs e) {
+			try {
+				ProcessFile(e.FullPath);
+			}
+			catch { }
+		}
+
+		private static void ProcessFile(string fullPath) {
+			string filename=Path.GetFileName(fullPath);
+			//Get the patNum/chartNum from filename.  Example: tmb123.20091119.XXXXXX.tig where X is identifier
+			string[] splitFileName=filename.Split(new char[] { '.' });
+			if(splitFileName.Length!=4) { //Not correct format
+				return;
+			}
+			string identifier=splitFileName[2]; //Third quadrant
+			bool useChartNum=false;
+			for(int i=0;i<identifier.Length;i++) { //Check to see if the identifer has anything but numbers, if so it has to be a chartnum or invalid
+				if(!Char.IsNumber(identifier,i)) {
+					useChartNum=true;
+					break;
+				}
+			}
+			if(!useChartNum) { //If it could be a valid patnum, check program pref
+				ArrayList propertiesForProgram=ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.TigerView));
+				ProgramProperty programProperty=ProgramProperties.GetCur(propertiesForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
+				if(programProperty.PropertyValue=="1") {//ChartNum
+					useChartNum=true;
+				}
+			}
+			Patient patCur;
+			if(!useChartNum) {//Use PatNum
+				patCur=Patients.GetPat(PIn.Long(identifier));
+			}
+			else {//Use ChartNum
+				patCur=Patients.GetPatByChartNumber(identifier);
+			}
+			if(patCur==null) { //Could not find a patient with given PatNum/ChartNum
+				return;
+			}
+			long imageCatDefNum=0;
+			for(int j=0;j<DefC.Long[(int)DefCat.ImageCats].Length;j++) { //Look for an image category with the name "Xray"
+				if(DefC.Long[(int)DefCat.ImageCats][j].ItemName.ToLower()=="xray") {
+					imageCatDefNum=DefC.Long[(int)DefCat.ImageCats][j].DefNum;
+				}
+			}
+			if(imageCatDefNum==0) { //If no "Xray" category exists, insert new category with the name "Xray"
+				Def def = new Def();
+				def.ItemName="Xray";
+				def.Category=DefCat.ImageCats;
+				imageCatDefNum=Defs.Insert(def);
+			}
+			string newFileName="TV_"+filename.Substring(0,filename.IndexOf('.')+1)+CodeBase.MiscUtils.CreateRandomAlphaNumericString(4)+".tig";
+			string newpath=CodeBase.ODFileUtils.CombinePaths(ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath()),newFileName);
+			Document docCur = new Document();
+			docCur.DocCategory=imageCatDefNum;
+			docCur.FileName=newFileName;
+			docCur.PatNum=patCur.PatNum;
+			docCur.ImgType=ImageType.Photo;
+			docCur.DateCreated=DateTime.Now;
+			docCur.Description=newFileName;
+			System.IO.File.Move(fullPath,newpath);
+			Documents.Insert(docCur,patCur);
 		}
 
 	}

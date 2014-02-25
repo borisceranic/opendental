@@ -1859,6 +1859,7 @@ namespace OpenDental{
 			Bridges.Trojan.StartupCheck();
 			FormUAppoint.StartThreadIfEnabled();
 			Bridges.ICat.StartFileWatcher();
+			Bridges.TigerView.StartFileWatcher();
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				menuItemResellers.Visible=true;
 				menuItemXChargeReconcile.Visible=true;

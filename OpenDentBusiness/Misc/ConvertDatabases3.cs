@@ -3926,7 +3926,13 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX claimpayment_PayType ON claimpayment (PayType)";
 					Db.NonQ(command);
 				}
-				
+				//Add program property for Tigerview enchancement
+				command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(Programs.GetProgramNum(ProgramName.TigerView))+"', "
+				    +"'TigerView EMR folder path', "
+				    +"'')";
+				Db.NonQ(command);
 
 
 

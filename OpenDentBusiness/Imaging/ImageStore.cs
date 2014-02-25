@@ -843,8 +843,9 @@ namespace OpenDentBusiness {
 		public static bool HasImageExtension(string fileName) {
 			string ext = Path.GetExtension(fileName).ToLower();
 			//The following supported bitmap types were found on a microsoft msdn page:
+			//==02/25/2014 - Added .tig as an accepted image extention for tigerview enhancement.
 			return (ext == ".jpg" || ext == ".jpeg" || ext == ".tga" || ext == ".bmp" || ext == ".tif" ||
-				ext == ".tiff" || ext == ".gif" || ext == ".emf" || ext == ".exif" || ext == ".ico" || ext == ".png" || ext == ".wmf");
+				ext == ".tiff" || ext == ".gif" || ext == ".emf" || ext == ".exif" || ext == ".ico" || ext == ".png" || ext == ".wmf" || ext == ".tig");
 		}
 	}
 }
