@@ -1489,8 +1489,11 @@ namespace UnitTests {
 			//Validate
 			string retVal="";
 			//Check
-			
-			TimeAdjust result = TimeAdjusts.Refresh(emp.EmployeeNum,startDate,startDate.AddDays(28))[0];
+			List<TimeAdjust> resultList=TimeAdjusts.Refresh(emp.EmployeeNum,startDate,startDate.AddDays(28));
+			if(resultList.Count < 1) {
+				throw new Exception("No time adjustments were found.  Should never happen.\r\n");
+			}
+			TimeAdjust result=resultList[0];
 			if(result.RegHours!=TimeSpan.FromHours(-4)) {
 				throw new Exception("Time adjustment to regular hours should be -4 hours, instead it is " + result.RegHours.TotalHours + " hours.\r\n");
 			}

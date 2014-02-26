@@ -294,12 +294,32 @@ namespace OpenDentBusiness{
 			if(date.DayOfWeek==(DayOfWeek)PrefC.GetInt(PrefName.TimeCardOvertimeFirstDayOfWeek)) {
 				return retVal;
 			}
-			List<ClockEvent> events=Refresh(empNum,date.AddDays(-6),date.AddDays(-1),false);
-			//eg, if this is Thursday, then we are getting last Friday through this Wed.
-			for(int i=0;i<events.Count;i++){
-				if(events[i].TimeDisplayed1.DayOfWeek > date.DayOfWeek){//eg, Friday > Thursday, so ignore
-					continue;
+			//We only want to go back to the most recent "FirstDayOfWeek" week day.
+			//The old code would simply go back in time 6 days which would cause problems.
+			//The main problem was that hours from previous weeks were being counted towards other pay periods (sometimes).
+			//E.g. pay period A = 01/28/2014 - 02/10/2014  pay period B = 02/11/2014 - 02/24/2014
+			//The preference TimeCardOvertimeFirstDayOfWeek is set to Tuesday.
+			//Employee worked 8 hours on Monday 02/10/2014 (falls within pay period A)
+			//The first weekly total in pay period B will include hours worked from Monday 02/10/2014 (pay period A) because Tuesday > Monday (old logic).
+			//However, the weekly total should NOT include Monday 02/10/2014 in pay period B's first weekly total because it is in not part of the current "week" based on TimeCardOvertimeFirstDayOfWeek. 
+			//Therefore, we need to find out the date of the most recent TimeCardOvertimeFirstDayOfWeek.
+			DateTime mostRecentFirstDayOfWeekDate=date;//Start with the current date.
+			//Loop backwards through the week days until the TimeCardOvertimeFirstDayOfWeek is hit.
+			for(int i=1;i<7;i++) {//1 based because we already know that TimeCardOvertimeFirstDayOfWeek is not set to today so no need to check it.
+				if(mostRecentFirstDayOfWeekDate.AddDays(-i).DayOfWeek==(DayOfWeek)PrefC.GetInt(PrefName.TimeCardOvertimeFirstDayOfWeek)) {
+					mostRecentFirstDayOfWeekDate=mostRecentFirstDayOfWeekDate.AddDays(-i);
+					break;
 				}
+			}
+			//mostRecentFirstDayOfWeekDate=date.AddDays(-6);
+			List<ClockEvent> events=Refresh(empNum,mostRecentFirstDayOfWeekDate,date.AddDays(-1),false);
+			//eg, if this is Thursday, then we are getting last Friday through this Wed.
+			for(int i=0;i<events.Count;i++) {
+				//This is the old logic of trying to figure out if "events" fall within the most recent week.
+				//The new way is correctly getting only the "events" for the most recent week which negates the need for any filtering.
+				//if(events[i].TimeDisplayed1.DayOfWeek > date.DayOfWeek){//eg, Friday > Thursday, so ignore
+				//	continue;
+				//}
 				retVal+=events[i].TimeDisplayed2-events[i].TimeDisplayed1;
 				if(events[i].AdjustIsOverridden) {
 					retVal+=events[i].Adjust;
@@ -316,11 +336,13 @@ namespace OpenDentBusiness{
 				}
 			}
 			//now, adjustments
-			List<TimeAdjust> TimeAdjustList=TimeAdjusts.Refresh(empNum,date.AddDays(-6),date.AddDays(-1));
+			List<TimeAdjust> TimeAdjustList=TimeAdjusts.Refresh(empNum,mostRecentFirstDayOfWeekDate,date.AddDays(-1));
 			for(int i=0;i<TimeAdjustList.Count;i++) {
-				if(TimeAdjustList[i].TimeEntry.DayOfWeek > date.DayOfWeek) {//eg, Friday > Thursday, so ignore
-					continue;
-				}
+				//This is the old logic of trying to figure out if adjustments fall within the most recent week.  
+				//The new way is correctly getting only the "TimeAdjustList" for the most recent week which negates the need for any filtering.
+				//if(TimeAdjustList[i].TimeEntry.DayOfWeek > date.DayOfWeek) {//eg, Friday > Thursday, so ignore
+				//	continue;
+				//}
 				retVal+=TimeAdjustList[i].RegHours;
 			}
 			return retVal;
