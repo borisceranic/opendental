@@ -4458,7 +4458,14 @@ namespace OpenDental{
 			String postdata="RxInput=base64:"+xmlBase64;
 			byte[] PostDataBytes=System.Text.Encoding.UTF8.GetBytes(postdata);
 			string additionalHeaders="Content-Type: application/x-www-form-urlencoded\r\n";
-			InternetExplorer IEControl=new InternetExplorer();
+			InternetExplorer IEControl;
+			try {
+				IEControl=new InternetExplorer();
+			}
+			catch {
+				MsgBox.Show(this,"Internet Explorer not installed.");
+				return;
+			}
 			IWebBrowserApp IE=(IWebBrowserApp)IEControl;
 			IE.Visible=true;
 #if DEBUG
