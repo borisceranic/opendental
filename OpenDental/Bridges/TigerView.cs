@@ -266,9 +266,14 @@ namespace OpenDental.Bridges {
 				Def def = new Def();
 				def.ItemName="Xray";
 				def.Category=DefCat.ImageCats;
+				def.ItemValue="X"; //Will make this category show in the chart module
+				def.ItemOrder=DefC.Long[(int)DefCat.ImageCats].Length;
 				imageCatDefNum=Defs.Insert(def);
+				Cache.Refresh(InvalidType.Defs);
 			}
-			string newFileName="TV_"+filename.Substring(0,filename.IndexOf('.')+1)+CodeBase.MiscUtils.CreateRandomAlphaNumericString(4)+".tig";
+			string newFileName="TV_"+filename.Substring(0,filename.IndexOf('.')+1)+CodeBase.MiscUtils.CreateRandomAlphaNumericString(4);
+			newFileName=newFileName.Replace('.','_'); //Get rid of any periods in the file name.
+			newFileName+=".tig"; //Add extention on to file name after other '.' were replaced.
 			string newpath=CodeBase.ODFileUtils.CombinePaths(ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath()),newFileName);
 			Document docCur = new Document();
 			docCur.DocCategory=imageCatDefNum;
