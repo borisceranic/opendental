@@ -17,6 +17,7 @@ namespace OpenDentBusiness{
 			DataTable table=new DataTable();
 			DataRow row;
 			table.Columns.Add("amount");
+			table.Columns.Add("payType");
 			table.Columns.Add("BankBranch");
 			table.Columns.Add("ClaimPaymentNum");
 			table.Columns.Add("checkDate");
@@ -24,16 +25,17 @@ namespace OpenDentBusiness{
 			table.Columns.Add("Note");
 			List<DataRow> rows=new List<DataRow>();
 			string command="SELECT BankBranch,claimpayment.ClaimPaymentNum,CheckNum,CheckDate,"
-				+"SUM(claimproc.InsPayAmt) amount,Note "
+				+"SUM(claimproc.InsPayAmt) amount,Note,PayType "
 				+"FROM claimpayment,claimproc "
 				+"WHERE claimpayment.ClaimPaymentNum = claimproc.ClaimPaymentNum "
 				+"AND claimproc.ClaimNum = '"+POut.Long(claimNum)+"' "
-				+"GROUP BY claimpayment.ClaimPaymentNum, BankBranch, CheckDate, CheckNum, Note";
+				+"GROUP BY claimpayment.ClaimPaymentNum, BankBranch, CheckDate, CheckNum, Note, PayType";
 			DataTable rawT=Db.GetTable(command);
 			DateTime date;
 			for(int i=0;i<rawT.Rows.Count;i++) {
 				row=table.NewRow();
 				row["amount"]=PIn.Double(rawT.Rows[i]["amount"].ToString()).ToString("F");
+				row["payType"]=DefC.GetName(DefCat.InsurancePaymentType,PIn.Long(rawT.Rows[i]["PayType"].ToString()));
 				row["BankBranch"]=rawT.Rows[i]["BankBranch"].ToString();
 				row["ClaimPaymentNum"]=rawT.Rows[i]["ClaimPaymentNum"].ToString();
 				date=PIn.Date(rawT.Rows[i]["CheckDate"].ToString());
@@ -68,16 +70,29 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all unattached claimpayments for display in a new deposit.  Excludes payments before dateStart and partials.</summary>
-		public static ClaimPayment[] GetForDeposit(DateTime dateStart,long clinicNum) {
+		public static ClaimPayment[] GetForDeposit(DateTime dateStart,long clinicNum,List<long> insPayTypes) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<ClaimPayment[]>(MethodBase.GetCurrentMethod(),dateStart,clinicNum);
+				return Meth.GetObject<ClaimPayment[]>(MethodBase.GetCurrentMethod(),dateStart,clinicNum,insPayTypes);
 			}
 			string command=
 				"SELECT * FROM claimpayment "
+				+"INNER JOIN definition ON claimpayment.PayType=definition.DefNum "
 				+"WHERE DepositNum = 0 "
+				+"AND definition.ItemValue='' "//Check if payment type should show in the deposit slip.  'N'=not show, empty string means should show.
 				+"AND CheckDate >= "+POut.Date(dateStart);
 			if(clinicNum!=0){
 				command+=" AND ClinicNum="+POut.Long(clinicNum);
+			}
+			for(int i=0;i<insPayTypes.Count;i++) {
+				if(i==0) {
+					command+=" AND PayType IN ("+insPayTypes[0];
+				}
+				else {
+					command+=","+insPayTypes[i];
+				}
+				if(i==insPayTypes.Count-1) {
+					command+=")";
+				}
 			}
 			command+=" AND IsPartial=0"//Don't let users attach partial insurance payments to deposits.
 				+" ORDER BY CheckDate";
@@ -91,7 +106,9 @@ namespace OpenDentBusiness{
 			}
 			string command=
 				"SELECT * FROM claimpayment "
+				+"INNER JOIN definition ON claimpayment.PayType=definition.DefNum "
 				+"WHERE DepositNum = "+POut.Long(depositNum)
+				+" AND definition.ItemValue=''"//Check if payment type should show in the deposit slip.  'N'=not show, empty string means should show.
 				+" ORDER BY CheckDate";
 			return Crud.ClaimPaymentCrud.SelectMany(command).ToArray();
 		}

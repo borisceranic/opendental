@@ -3933,6 +3933,27 @@ namespace OpenDentBusiness {
 				    +"'TigerView EMR folder path', "
 				    +"'')";
 				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) "
+									+"VALUES (32"+",'"+POut.String("Check")+"','0','')";
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+									+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),32,'"+POut.String("Check")+"','0','')";
+				}
+				long defNum=Db.NonQ(command,true);
+				//At this point in time, all claimpayments in the database are assumed to be of pay type "Check".
+				command="UPDATE claimpayment SET PayType = "+POut.Long(defNum)+ " WHERE PayType = 0";
+				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) "
+									+"VALUES (32"+",'"+POut.String("EFT")+"','0','N')";
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+									+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),32,'"+POut.String("EFT")+"','0','N')";
+				}
+				Db.NonQ(command,true);
 
 
 

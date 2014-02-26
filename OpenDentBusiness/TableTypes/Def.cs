@@ -125,8 +125,8 @@ namespace OpenDentBusiness {
 		Prognosis,
 		///<summary>31- Custom Tracking, statuses such as 'review', 'hold', 'riskmanage', etc.</summary>
 		ClaimCustomTracking,
-		///<summary>32- PayType for Claims such as 'check', 'cc', etc.</summary>
-		ClaimPaymentType
+		///<summary>32- PayType for claims such as 'Check', 'EFT', etc.</summary>
+		InsurancePaymentType
 	}
 
 	

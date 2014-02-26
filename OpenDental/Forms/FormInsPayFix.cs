@@ -29,6 +29,7 @@ namespace OpenDental {
 				cp.CheckAmt=splits[i].InsPayAmt;
 				cp.ClinicNum=claim.ClinicNum;
 				cp.CarrierName=splits[i].Carrier;
+				cp.PayType=DefC.GetList(DefCat.InsurancePaymentType)[0].DefNum;
 				ClaimPayments.Insert(cp);
 				List<ClaimProc> claimP=ClaimProcs.RefreshForClaim(splits[i].ClaimNum);
 				for(int j=0;j<claimP.Count;j++) {

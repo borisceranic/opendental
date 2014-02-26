@@ -77,13 +77,16 @@ namespace OpenDentBusiness {
 			return Crud.DefCrud.Insert(def);
 		}
 
-		///<summary>CAUTION.  This does not perform all validations.  It only properly validates for two def types right now.</summary>
+		///<summary>CAUTION.  This does not perform all validations.  It only properly validates for three def types right now; SupplyCats, ClaimCustomTracking, and InsurancePaymentType.</summary>
 		public static void Delete(Def def) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),def);
 				return;
 			}
-			if(def.Category!=DefCat.SupplyCats && def.Category!=DefCat.ClaimCustomTracking) {
+			if(def.Category!=DefCat.SupplyCats 
+				&& def.Category!=DefCat.ClaimCustomTracking
+				&& def.Category!=DefCat.InsurancePaymentType) 
+			{
 				throw new ApplicationException("NOT Allowed to delete this type of def.");
 			}
 			string command="";
@@ -92,6 +95,9 @@ namespace OpenDentBusiness {
 			}
 			else if(def.Category==DefCat.ClaimCustomTracking){
 				command="SELECT COUNT(*) FROM claim WHERE CustomTracking="+POut.Long(def.DefNum);
+			}
+			else if(def.Category==DefCat.InsurancePaymentType) {
+				command="SELECT COUNT(*) FROM claimpayment WHERE PayType="+POut.Long(def.DefNum);
 			}
 			if(Db.GetCount(command)!="0"){
 				throw new ApplicationException(Lans.g("Defs","Def is in use.  Not allowed to delete."));

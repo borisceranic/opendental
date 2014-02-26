@@ -264,9 +264,13 @@ namespace OpenDental{
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			//This is VERY new.  Only allowed and visible for two categories so far: supply cats and claim custom tracking.
+			//This is VERY new.  Only allowed and visible for three categories so far: supply cats, claim payment types, and claim custom tracking.
 			if(IsNew){
 				DialogResult=DialogResult.Cancel;
+				return;
+			}
+			if(DefCur.Category==DefCat.InsurancePaymentType && DefC.GetList(DefCat.InsurancePaymentType).Length==1) {
+				MsgBox.Show(this,"Cannot delete the last def from this category.");
 				return;
 			}
 			try{
@@ -310,6 +314,12 @@ namespace OpenDental{
 						if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: Billing type is currently in use by patients.")) {
 							return;
 						}
+					}
+					break;
+				case DefCat.InsurancePaymentType:
+					if(textValue.Text!="" && textValue.Text!="N") {
+						MsgBox.Show(this,"Valid values are blank or N.");
+						return;
 					}
 					break;
 				case DefCat.CommLogTypes:

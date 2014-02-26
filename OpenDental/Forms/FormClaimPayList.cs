@@ -52,11 +52,13 @@ namespace OpenDental {
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Date"),70);
 			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Type"),70);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Amount"),75,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Partial"),40,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Carrier"),250);
+			col=new ODGridColumn(Lan.g(this,"Carrier"),200);
 			gridMain.Columns.Add(col);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				col=new ODGridColumn(Lan.g(this,"Clinic"),100);
@@ -74,6 +76,7 @@ namespace OpenDental {
 				else{
 					row.Cells.Add(ListClaimPay[i].CheckDate.ToShortDateString());
 				}
+				row.Cells.Add(DefC.GetName(DefCat.InsurancePaymentType,ListClaimPay[i].PayType));
 				row.Cells.Add(ListClaimPay[i].CheckAmt.ToString("c"));
 				row.Cells.Add(ListClaimPay[i].IsPartial?"X":"");
 				row.Cells.Add(ListClaimPay[i].CarrierName);

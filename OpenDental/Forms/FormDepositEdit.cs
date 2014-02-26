@@ -58,8 +58,12 @@ namespace OpenDental{
 		private Label labelMemo;
 		///<summary>Only used if linking to QB account.</summary>
 		private List<string> IncomeAccountsQB;
+		private ListBox listInsPayType;
+		private Label label6;
 		///<summary>True if the accounting software pref is set to QuickBooks.</summary>
 		private bool IsQuickBooks;
+		///<summary>Used to store DefNums in a 1:1 ratio for listInsPayType</summary>
+		private List<long> _insPayDefNums;
 
 		///<summary></summary>
 		public FormDepositEdit(Deposit depositCur)
@@ -96,6 +100,8 @@ namespace OpenDental{
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormDepositEdit));
 			this.groupSelect = new System.Windows.Forms.GroupBox();
+			this.butRefresh = new OpenDental.UI.Button();
+			this.textDateStart = new OpenDental.ValidDate();
 			this.label5 = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
@@ -119,15 +125,17 @@ namespace OpenDental{
 			this.textDate = new OpenDental.ValidDate();
 			this.butDelete = new OpenDental.UI.Button();
 			this.gridPat = new OpenDental.UI.ODGrid();
-			this.butRefresh = new OpenDental.UI.Button();
-			this.textDateStart = new OpenDental.ValidDate();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.listInsPayType = new System.Windows.Forms.ListBox();
+			this.label6 = new System.Windows.Forms.Label();
 			this.groupSelect.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupSelect
 			// 
+			this.groupSelect.Controls.Add(this.listInsPayType);
+			this.groupSelect.Controls.Add(this.label6);
 			this.groupSelect.Controls.Add(this.butRefresh);
 			this.groupSelect.Controls.Add(this.textDateStart);
 			this.groupSelect.Controls.Add(this.label5);
@@ -138,10 +146,31 @@ namespace OpenDental{
 			this.groupSelect.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupSelect.Location = new System.Drawing.Point(602, 296);
 			this.groupSelect.Name = "groupSelect";
-			this.groupSelect.Size = new System.Drawing.Size(204, 324);
+			this.groupSelect.Size = new System.Drawing.Size(355, 324);
 			this.groupSelect.TabIndex = 99;
 			this.groupSelect.TabStop = false;
 			this.groupSelect.Text = "Show";
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(144, 294);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 24);
+			this.butRefresh.TabIndex = 106;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
+			// textDateStart
+			// 
+			this.textDateStart.Location = new System.Drawing.Point(14, 31);
+			this.textDateStart.Name = "textDateStart";
+			this.textDateStart.Size = new System.Drawing.Size(94, 20);
+			this.textDateStart.TabIndex = 105;
 			// 
 			// label5
 			// 
@@ -175,7 +204,7 @@ namespace OpenDental{
 			this.listPayType.Location = new System.Drawing.Point(14, 111);
 			this.listPayType.Name = "listPayType";
 			this.listPayType.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listPayType.Size = new System.Drawing.Size(134, 173);
+			this.listPayType.Size = new System.Drawing.Size(165, 173);
 			this.listPayType.TabIndex = 96;
 			// 
 			// label2
@@ -301,7 +330,7 @@ namespace OpenDental{
 			this.butSendQB.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSendQB.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSendQB.CornerRadius = 4F;
-			this.butSendQB.Location = new System.Drawing.Point(816, 301);
+			this.butSendQB.Location = new System.Drawing.Point(897, 268);
 			this.butSendQB.Name = "butSendQB";
 			this.butSendQB.Size = new System.Drawing.Size(75, 24);
 			this.butSendQB.TabIndex = 115;
@@ -332,7 +361,7 @@ namespace OpenDental{
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(511, 631);
+			this.butPrint.Location = new System.Drawing.Point(588, 631);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(81, 24);
 			this.butPrint.TabIndex = 108;
@@ -377,27 +406,6 @@ namespace OpenDental{
 			this.gridPat.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPat_CellClick);
 			this.gridPat.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridPat_MouseUp);
 			// 
-			// butRefresh
-			// 
-			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Autosize = true;
-			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(13, 291);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(75, 24);
-			this.butRefresh.TabIndex = 106;
-			this.butRefresh.Text = "Refresh";
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
-			// 
-			// textDateStart
-			// 
-			this.textDateStart.Location = new System.Drawing.Point(14, 31);
-			this.textDateStart.Name = "textDateStart";
-			this.textDateStart.Size = new System.Drawing.Size(94, 20);
-			this.textDateStart.TabIndex = 105;
-			// 
 			// butOK
 			// 
 			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -406,7 +414,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(712, 631);
+			this.butOK.Location = new System.Drawing.Point(789, 631);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -421,17 +429,34 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(805, 631);
+			this.butCancel.Location = new System.Drawing.Point(882, 631);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// listInsPayType
+			// 
+			this.listInsPayType.Location = new System.Drawing.Point(184, 111);
+			this.listInsPayType.Name = "listInsPayType";
+			this.listInsPayType.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listInsPayType.Size = new System.Drawing.Size(165, 173);
+			this.listInsPayType.TabIndex = 107;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(181, 90);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(162, 18);
+			this.label6.TabIndex = 108;
+			this.label6.Text = "Insurance Payment Types";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormDepositEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(897, 667);
+			this.ClientSize = new System.Drawing.Size(974, 667);
 			this.Controls.Add(this.textMemo);
 			this.Controls.Add(this.labelMemo);
 			this.Controls.Add(this.butSendQB);
@@ -503,6 +528,15 @@ namespace OpenDental{
 				for(int i=0;i<DefC.Short[(int)DefCat.PaymentTypes].Length;i++) {
 					listPayType.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
 					listPayType.SetSelected(i,true);
+				}
+				_insPayDefNums=new List<long>();
+				for(int i=0;i<DefC.Short[(int)DefCat.InsurancePaymentType].Length;i++) {
+					if(DefC.Short[(int)DefCat.InsurancePaymentType][i].ItemValue!="") {
+						continue;//skip defs not selected for deposit slip
+					}
+					listInsPayType.Items.Add(DefC.Short[(int)DefCat.InsurancePaymentType][i].ItemName);
+					_insPayDefNums.Add(DefC.Short[(int)DefCat.InsurancePaymentType][i].DefNum);
+					listInsPayType.SetSelected(listInsPayType.Items.Count-1,true);
 				}
 				textDepositAccount.Visible=false;//this is never visible for new. It's a description if already attached.
 				if(Accounts.DepositsLinked() && !IsQuickBooks) {
@@ -595,8 +629,12 @@ namespace OpenDental{
 				for(int i=0;i<listPayType.SelectedIndices.Count;i++) {
 					payTypes.Add(DefC.Short[(int)DefCat.PaymentTypes][listPayType.SelectedIndices[i]].DefNum);
 				}
+				List<long> insPayTypes=new List<long>();
+				for(int i=0;i<listInsPayType.SelectedIndices.Count;i++) {
+					insPayTypes.Add(_insPayDefNums[listInsPayType.SelectedIndices[i]]);
+				}
 				PatPayList=Payments.GetForDeposit(dateStart,clinicNum,payTypes);
-				ClaimPayList=ClaimPayments.GetForDeposit(dateStart,clinicNum);
+				ClaimPayList=ClaimPayments.GetForDeposit(dateStart,clinicNum,insPayTypes);
 			}
 			else{
 				PatPayList=Payments.GetForDeposit(DepositCur.DepositNum);
@@ -612,9 +650,9 @@ namespace OpenDental{
 			gridPat.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableDepositSlipPat","Date"),80);
 			gridPat.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableDepositSlipPat","Patient"),130);
+			col=new ODGridColumn(Lan.g("TableDepositSlipPat","Patient"),150);
 			gridPat.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableDepositSlipPat","Type"),90);
+			col=new ODGridColumn(Lan.g("TableDepositSlipPat","Type"),70);
 			gridPat.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableDepositSlipPat","Check Number"),95);
 			gridPat.Columns.Add(col);
@@ -640,7 +678,9 @@ namespace OpenDental{
 			gridIns.Columns.Clear();
 			col=new ODGridColumn(Lan.g("TableDepositSlipIns","Date"),80);
 			gridIns.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableDepositSlipIns","Carrier"),220);
+			col=new ODGridColumn(Lan.g("TableDepositSlipIns","Carrier"),150);
+			gridIns.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableDepositSlipIns","Type"),70);
 			gridIns.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableDepositSlipIns","Check Number"),95);
 			gridIns.Columns.Add(col);
@@ -653,6 +693,7 @@ namespace OpenDental{
 				row=new OpenDental.UI.ODGridRow();
 				row.Cells.Add(ClaimPayList[i].CheckDate.ToShortDateString());
 				row.Cells.Add(ClaimPayList[i].CarrierName);
+				row.Cells.Add(DefC.GetName(DefCat.InsurancePaymentType,ClaimPayList[i].PayType));
 				row.Cells.Add(ClaimPayList[i].CheckNum);
 				row.Cells.Add(ClaimPayList[i].BankBranch);
 				row.Cells.Add(ClaimPayList[i].CheckAmt.ToString("F"));
