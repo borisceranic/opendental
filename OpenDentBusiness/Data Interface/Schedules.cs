@@ -230,20 +230,8 @@ namespace OpenDentBusiness{
 					}
 				}
 				if(sched.ScheduleNum!=ListForType[i].ScheduleNum
-					&& sched.StartTime >= ListForType[i].StartTime
-					&& sched.StartTime < ListForType[i].StopTime)
-				{
-					return true;
-				}
-				if(sched.ScheduleNum!=ListForType[i].ScheduleNum
-					&& sched.StopTime > ListForType[i].StartTime
-					&& sched.StopTime <= ListForType[i].StopTime)
-				{
-					return true;
-				}
-				if(sched.ScheduleNum!=ListForType[i].ScheduleNum
-					&& sched.StartTime <= ListForType[i].StartTime
-					&& sched.StopTime >= ListForType[i].StopTime)
+					&& sched.StopTime  > ListForType[i].StartTime //stop time after another schedule has started
+					&& sched.StartTime < ListForType[i].StopTime) //start time before the other schedule has ended.
 				{
 					return true;
 				}
