@@ -3805,6 +3805,28 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		public static string SchedulesBlockoutStopBeforeStart(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM schedule WHERE StopTime<StartTime";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Schedules and blockouts having stop time before start time: ")+numFound+"\r\n";
+				}
+			}
+			else {//Fix
+				command="DELETE FROM schedule WHERE StopTime<StartTime";
+				long numFixed=Db.NonQ(command);
+				if(numFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Schedules and blockouts having stop time before start time fixed: ")+numFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
 		public static string SchedulesDeleteHiddenProviders(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
