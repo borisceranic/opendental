@@ -54,16 +54,18 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.labelPayeeIdType = new System.Windows.Forms.Label();
 			this.textPayeeID = new System.Windows.Forms.TextBox();
-			this.textClaimPaymentTotal = new System.Windows.Forms.TextBox();
+			this.textClaimInsPaidSum = new System.Windows.Forms.TextBox();
 			this.labelEquation = new System.Windows.Forms.Label();
-			this.textProvAdjustmentTotal = new System.Windows.Forms.TextBox();
+			this.textProjAdjAmtSum = new System.Windows.Forms.TextBox();
 			this.label18 = new System.Windows.Forms.Label();
 			this.label20 = new System.Windows.Forms.Label();
-			this.textPaymentAmountCalc = new System.Windows.Forms.TextBox();
+			this.textPayAmountCalc = new System.Windows.Forms.TextBox();
 			this.gridProviderAdjustments = new OpenDental.UI.ODGrid();
 			this.gridClaimDetails = new OpenDental.UI.ODGrid();
 			this.butRawMessage = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.groupBalancing = new System.Windows.Forms.GroupBox();
+			this.groupBalancing.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label5
@@ -323,37 +325,36 @@ namespace OpenDental{
 			// 
 			// textClaimPaymentTotal
 			// 
-			this.textClaimPaymentTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textClaimPaymentTotal.Location = new System.Drawing.Point(30, 667);
-			this.textClaimPaymentTotal.Name = "textClaimPaymentTotal";
-			this.textClaimPaymentTotal.ReadOnly = true;
-			this.textClaimPaymentTotal.Size = new System.Drawing.Size(110, 20);
-			this.textClaimPaymentTotal.TabIndex = 176;
+			this.textClaimInsPaidSum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textClaimInsPaidSum.Location = new System.Drawing.Point(6, 37);
+			this.textClaimInsPaidSum.Name = "textClaimPaymentTotal";
+			this.textClaimInsPaidSum.ReadOnly = true;
+			this.textClaimInsPaidSum.Size = new System.Drawing.Size(110, 20);
+			this.textClaimInsPaidSum.TabIndex = 176;
 			// 
 			// labelEquation
 			// 
 			this.labelEquation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelEquation.Location = new System.Drawing.Point(3, 646);
+			this.labelEquation.Location = new System.Drawing.Point(6, 16);
 			this.labelEquation.Name = "labelEquation";
-			this.labelEquation.Size = new System.Drawing.Size(494, 20);
+			this.labelEquation.Size = new System.Drawing.Size(369, 20);
 			this.labelEquation.TabIndex = 175;
-			this.labelEquation.Text = "         InsPaid Total                  -    Prov AdjAmtTotal          =    Payme" +
-    "nt Amount";
+			this.labelEquation.Text = "Claim InsPaid Sum         -    Prov AdjAmt Sum           =    Pay Amount Calc";
 			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textProvAdjustmentTotal
 			// 
-			this.textProvAdjustmentTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textProvAdjustmentTotal.Location = new System.Drawing.Point(161, 667);
-			this.textProvAdjustmentTotal.Name = "textProvAdjustmentTotal";
-			this.textProvAdjustmentTotal.ReadOnly = true;
-			this.textProvAdjustmentTotal.Size = new System.Drawing.Size(110, 20);
-			this.textProvAdjustmentTotal.TabIndex = 178;
+			this.textProjAdjAmtSum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textProjAdjAmtSum.Location = new System.Drawing.Point(137, 37);
+			this.textProjAdjAmtSum.Name = "textProvAdjustmentTotal";
+			this.textProjAdjAmtSum.ReadOnly = true;
+			this.textProjAdjAmtSum.Size = new System.Drawing.Size(110, 20);
+			this.textProjAdjAmtSum.TabIndex = 178;
 			// 
 			// label18
 			// 
 			this.label18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label18.Location = new System.Drawing.Point(144, 667);
+			this.label18.Location = new System.Drawing.Point(118, 37);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(12, 20);
 			this.label18.TabIndex = 180;
@@ -363,7 +364,7 @@ namespace OpenDental{
 			// label20
 			// 
 			this.label20.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label20.Location = new System.Drawing.Point(274, 667);
+			this.label20.Location = new System.Drawing.Point(251, 37);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(12, 20);
 			this.label20.TabIndex = 182;
@@ -372,17 +373,17 @@ namespace OpenDental{
 			// 
 			// textPaymentAmountCalc
 			// 
-			this.textPaymentAmountCalc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textPaymentAmountCalc.Location = new System.Drawing.Point(289, 667);
-			this.textPaymentAmountCalc.Name = "textPaymentAmountCalc";
-			this.textPaymentAmountCalc.ReadOnly = true;
-			this.textPaymentAmountCalc.Size = new System.Drawing.Size(110, 20);
-			this.textPaymentAmountCalc.TabIndex = 184;
+			this.textPayAmountCalc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textPayAmountCalc.Location = new System.Drawing.Point(265, 37);
+			this.textPayAmountCalc.Name = "textPaymentAmountCalc";
+			this.textPayAmountCalc.ReadOnly = true;
+			this.textPayAmountCalc.Size = new System.Drawing.Size(110, 20);
+			this.textPayAmountCalc.TabIndex = 184;
 			// 
 			// gridProviderAdjustments
 			// 
 			this.gridProviderAdjustments.HScrollVisible = false;
-			this.gridProviderAdjustments.Location = new System.Drawing.Point(9, 195);
+			this.gridProviderAdjustments.Location = new System.Drawing.Point(9, 247);
 			this.gridProviderAdjustments.Name = "gridProviderAdjustments";
 			this.gridProviderAdjustments.ScrollValue = 0;
 			this.gridProviderAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
@@ -395,11 +396,11 @@ namespace OpenDental{
 			// gridClaimDetails
 			// 
 			this.gridClaimDetails.HScrollVisible = false;
-			this.gridClaimDetails.Location = new System.Drawing.Point(9, 296);
+			this.gridClaimDetails.Location = new System.Drawing.Point(9, 348);
 			this.gridClaimDetails.Name = "gridClaimDetails";
 			this.gridClaimDetails.ScrollValue = 0;
 			this.gridClaimDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridClaimDetails.Size = new System.Drawing.Size(956, 347);
+			this.gridClaimDetails.Size = new System.Drawing.Size(956, 295);
 			this.gridClaimDetails.TabIndex = 0;
 			this.gridClaimDetails.TabStop = false;
 			this.gridClaimDetails.Title = "Claim EOBs";
@@ -414,7 +415,7 @@ namespace OpenDental{
 			this.butRawMessage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRawMessage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRawMessage.CornerRadius = 4F;
-			this.butRawMessage.Location = new System.Drawing.Point(883, 169);
+			this.butRawMessage.Location = new System.Drawing.Point(883, 150);
 			this.butRawMessage.Name = "butRawMessage";
 			this.butRawMessage.Size = new System.Drawing.Size(82, 24);
 			this.butRawMessage.TabIndex = 116;
@@ -436,16 +437,26 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// groupBalancing
+			// 
+			this.groupBalancing.Controls.Add(this.labelEquation);
+			this.groupBalancing.Controls.Add(this.textPayAmountCalc);
+			this.groupBalancing.Controls.Add(this.textClaimInsPaidSum);
+			this.groupBalancing.Controls.Add(this.label20);
+			this.groupBalancing.Controls.Add(this.textProjAdjAmtSum);
+			this.groupBalancing.Controls.Add(this.label18);
+			this.groupBalancing.Location = new System.Drawing.Point(9, 176);
+			this.groupBalancing.Name = "groupBalancing";
+			this.groupBalancing.Size = new System.Drawing.Size(956, 65);
+			this.groupBalancing.TabIndex = 211;
+			this.groupBalancing.TabStop = false;
+			this.groupBalancing.Text = "Balancing - Pay Amount Calc should exactly match Payment Amount";
+			// 
 			// FormEtrans835Edit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
-			this.Controls.Add(this.textPaymentAmountCalc);
-			this.Controls.Add(this.label20);
-			this.Controls.Add(this.label18);
-			this.Controls.Add(this.textProvAdjustmentTotal);
-			this.Controls.Add(this.textClaimPaymentTotal);
-			this.Controls.Add(this.labelEquation);
+			this.Controls.Add(this.groupBalancing);
 			this.Controls.Add(this.gridProviderAdjustments);
 			this.Controls.Add(this.textPayeeID);
 			this.Controls.Add(this.labelPayeeIdType);
@@ -487,6 +498,8 @@ namespace OpenDental{
 			this.Text = "Electronic Remittance Advice (ERA) - Format X12 835";
 			this.Load += new System.EventHandler(this.FormEtrans835Edit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835Edit_Resize);
+			this.groupBalancing.ResumeLayout(false);
+			this.groupBalancing.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -528,11 +541,12 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelPayeeIdType;
 		private System.Windows.Forms.TextBox textPayeeID;
 		private UI.ODGrid gridProviderAdjustments;
-		private System.Windows.Forms.TextBox textClaimPaymentTotal;
+		private System.Windows.Forms.TextBox textClaimInsPaidSum;
 		private System.Windows.Forms.Label labelEquation;
-		private System.Windows.Forms.TextBox textProvAdjustmentTotal;
+		private System.Windows.Forms.TextBox textProjAdjAmtSum;
 		private System.Windows.Forms.Label label18;
 		private System.Windows.Forms.Label label20;
-		private System.Windows.Forms.TextBox textPaymentAmountCalc;
+		private System.Windows.Forms.TextBox textPayAmountCalc;
+		private System.Windows.Forms.GroupBox groupBalancing;
 	}
 }

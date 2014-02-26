@@ -18,8 +18,11 @@ namespace OpenDental {
 		private string[] _claimInfo;
 		private Claim _claim;
 		private Patient _pat;
-		private List<string> _listAdjustmentDetails;
-		private List<string> _listAdjudicationDetails;
+		private List<string> _listClaimAdjustments;
+		private List<string> _listProcInfo;
+		private List<string> _listAdjudicationInfo;
+		private decimal _claimAdjAmtSum;
+		private decimal _procAdjAmtSum;
 
 		public FormEtrans835ClaimEdit(X835 x835,string claimTrackingNumber) {
 			InitializeComponent();
@@ -41,16 +44,16 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835ClaimEdit_Resize(object sender,EventArgs e) {
-			FillAdjustmentDetail();//Because the grid columns change size depending on the form size.
-			FillProcedureDetails();//Because the grid columns change size depending on the form size.
-			FillAdjudicationDetails();//Because the grid columns change size depending on the form size.
+			FillClaimAdjustments();//Because the grid columns change size depending on the form size.
+			FillProcedureBreakdown();//Because the grid columns change size depending on the form size.
+			FillAdjudicationInfo();//Because the grid columns change size depending on the form size.
 		}
 
 		private void FillAll() {
+			FillClaimAdjustments();
+			FillProcedureBreakdown();
+			FillAdjudicationInfo();
 			FillHeader();
-			FillAdjustmentDetail();
-			FillProcedureDetails();
-			FillAdjudicationDetails();
 		}
 
 		private void FillHeader() {
@@ -72,69 +75,69 @@ namespace OpenDental {
 			textClaimFee.Text=_claimInfo[1];
 			textClaimFee2.Text=_claimInfo[1];
 			textInsPaid.Text=_claimInfo[2];
-			textInsPaid2.Text=_claimInfo[2];
+			textInsPaidCalc.Text=(PIn.Decimal(_claimInfo[1])-_claimAdjAmtSum-_procAdjAmtSum).ToString("f2");
 			textPatientPortion.Text=_claimInfo[3];
 		}
 
-		private void FillAdjustmentDetail() {
-			_listAdjustmentDetails=_x835.GetClaimAdjustmentInfo(_claimTrackingNumber);
-			if(_listAdjustmentDetails.Count==0) {
-				gridAdjustmentDetails.Title="Adjustment Details (None Reported)";
+		private void FillClaimAdjustments() {
+			_listClaimAdjustments=_x835.GetClaimAdjustmentInfo(_claimTrackingNumber);
+			if(_listClaimAdjustments.Count==0) {
+				gridClaimAdjustments.Title="Claim Adjustments (None Reported)";
 			}
 			else {
-				gridAdjustmentDetails.Title="Adjustment Details";
+				gridClaimAdjustments.Title="Claim Adjustments";
 			}
-			gridAdjustmentDetails.BeginUpdate();
-			gridAdjustmentDetails.Columns.Clear();
+			gridClaimAdjustments.BeginUpdate();
+			gridClaimAdjustments.Columns.Clear();
 			const int colWidthDescription=200;
-			const int colWidthAmount=80;
-			int colWidthVariable=gridAdjustmentDetails.Width-10-colWidthDescription-colWidthAmount;
-			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Description",colWidthDescription,HorizontalAlignment.Left));
-			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
-			gridAdjustmentDetails.Columns.Add(new UI.ODGridColumn("Amount",colWidthAmount,HorizontalAlignment.Right));
-			gridAdjustmentDetails.Rows.Clear();
-			decimal totalAdjustments=0;
-			for(int i=0;i<_listAdjustmentDetails.Count;i+=3) {
+			const int colWidthAdjAmt=80;
+			int colWidthVariable=gridClaimAdjustments.Width-10-colWidthDescription-colWidthAdjAmt;
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Description",colWidthDescription,HorizontalAlignment.Left));
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridClaimAdjustments.Rows.Clear();
+			_claimAdjAmtSum=0;
+			for(int i=0;i<_listClaimAdjustments.Count;i+=3) {
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i]));//Description
-				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+1]));//Reason
-				row.Cells.Add(new ODGridCell(_listAdjustmentDetails[i+2]));//Amount
-				decimal adjAmount=PIn.Decimal(_listAdjustmentDetails[i+2]);
-				totalAdjustments+=adjAmount;
-				gridAdjustmentDetails.Rows.Add(row);
+				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i]));//Description
+				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i+1]));//Reason
+				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i+2]));//AdjAmt
+				decimal adjAmt=PIn.Decimal(_listClaimAdjustments[i+2]);
+				_claimAdjAmtSum+=adjAmt;
+				gridClaimAdjustments.Rows.Add(row);
 			}
-			gridAdjustmentDetails.EndUpdate();
-			textTotalAdjustments.Text=totalAdjustments.ToString("f2");
+			gridClaimAdjustments.EndUpdate();
+			textClaimAdjAmtSum.Text=_claimAdjAmtSum.ToString("f2");
 		}
 
-		private void FillProcedureDetails() {
-			List<string> listProcInfo=_x835.GetProcInfo(_claimTrackingNumber);
-			if(listProcInfo.Count==0) {
-				gridProcedureDetails.Title="Procedure Details (None Reported)";
+		private void FillProcedureBreakdown() {
+			_listProcInfo=_x835.GetProcInfo(_claimTrackingNumber);
+			if(_listProcInfo.Count==0) {
+				gridProcedureBreakdown.Title="Procedure Breakdown (None Reported)";
 			}
 			else {
-				gridProcedureDetails.Title="Procedure Details";
+				gridProcedureBreakdown.Title="Procedure Breakdown";
 			}
-			gridProcedureDetails.BeginUpdate();
+			gridProcedureBreakdown.BeginUpdate();
 			const int colWidthProcNum=80;
 			const int colWidthProcCode=80;
 			const int colWidthProcFee=80;
 			const int colWidthAdjAmt=80;
 			const int colWidthInsPaid=80;
-			int colWidthVariable=gridProcedureDetails.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-colWidthAdjAmt-colWidthInsPaid;
-			gridProcedureDetails.Columns.Clear();
-			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
-			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
-			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
-			gridProcedureDetails.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
-			gridProcedureDetails.Columns.Add(new ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
-			gridProcedureDetails.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
-			gridProcedureDetails.Rows.Clear();
-			decimal totalProcAdjustments=0;
-			for(int i=0;i<listProcInfo.Count;i+=5) {
+			int colWidthVariable=gridProcedureBreakdown.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-colWidthAdjAmt-colWidthInsPaid;
+			gridProcedureBreakdown.Columns.Clear();
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Rows.Clear();
+			_procAdjAmtSum=0;
+			for(int i=0;i<_listProcInfo.Count;i+=5) {
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new ODGridCell(listProcInfo[i+4]));//ProcNum
-				string strProcCode=listProcInfo[i+1];
+				row.Cells.Add(new ODGridCell(_listProcInfo[i+4]));//ProcNum
+				string strProcCode=_listProcInfo[i+1];
 				row.Cells.Add(new ODGridCell(strProcCode));//ProcCode
 				string procDescript="";
 				if(ProcedureCodes.IsValidCode(strProcCode)) {
@@ -142,47 +145,59 @@ namespace OpenDental {
 					procDescript=procCode.AbbrDesc;
 				}
 				row.Cells.Add(new ODGridCell(procDescript));//ProcDescript
-				row.Cells.Add(new ODGridCell(listProcInfo[i+2]));//ProcFee
-				int segSvcIndex=PIn.Int(listProcInfo[i]);
+				row.Cells.Add(new ODGridCell(_listProcInfo[i+2]));//ProcFee
+				int segSvcIndex=PIn.Int(_listProcInfo[i]);
 				List<string> listProcAdjustments=_x835.GetProcAdjustmentInfo(segSvcIndex);
 				decimal adjAmtForProc=0;
 				for(int j=0;j<listProcAdjustments.Count;j+=3) {
 					decimal adjAmt=PIn.Decimal(listProcAdjustments[j+2]);
 					adjAmtForProc+=adjAmt;
-					totalProcAdjustments+=adjAmt;
+					_procAdjAmtSum+=adjAmt;
 				}
 				row.Cells.Add(new ODGridCell(adjAmtForProc.ToString("f2")));//AdjAmt
-				row.Cells.Add(new ODGridCell(listProcInfo[i+3]));//InsPaid
-				gridProcedureDetails.Rows.Add(row);
+				row.Cells.Add(new ODGridCell(_listProcInfo[i+3]));//InsPaid
+				row.Tag=i;
+				gridProcedureBreakdown.Rows.Add(row);
 			}
-			gridProcedureDetails.EndUpdate();
-			textProcAdjustments.Text=totalProcAdjustments.ToString("f2");
+			gridProcedureBreakdown.EndUpdate();
+			textProcAdjAmtSum.Text=_procAdjAmtSum.ToString("f2");
 		}
 
-		private void FillAdjudicationDetails() {
-			_listAdjudicationDetails=_x835.GetClaimAdjudicationInfo(_claimTrackingNumber);
-			if(_listAdjudicationDetails.Count==0) {
-				gridAdjudicationDetails.Title="Adjudication Details (None Reported)";
+		private void FillAdjudicationInfo() {
+			_listAdjudicationInfo=_x835.GetClaimAdjudicationInfo(_claimTrackingNumber);
+			if(_listAdjudicationInfo.Count==0) {
+				gridAdjudicationInfo.Title="Claim Adjudication Info (None Reported)";
 			}
 			else {
-				gridAdjudicationDetails.Title="Adjudication Details";
+				gridAdjudicationInfo.Title="Claim Adjudication Info";
 			}
-			gridAdjudicationDetails.BeginUpdate();
-			gridAdjudicationDetails.Columns.Clear();
-			gridAdjudicationDetails.Columns.Add(new UI.ODGridColumn("Description",gridAdjudicationDetails.Width/2,HorizontalAlignment.Left));
-			gridAdjudicationDetails.Columns.Add(new UI.ODGridColumn("Value",gridAdjudicationDetails.Width/2,HorizontalAlignment.Left));
-			gridAdjudicationDetails.Rows.Clear();
-			for(int i=0;i<_listAdjudicationDetails.Count;i+=2) {
+			gridAdjudicationInfo.BeginUpdate();
+			gridAdjudicationInfo.Columns.Clear();
+			gridAdjudicationInfo.Columns.Add(new UI.ODGridColumn("Description",gridAdjudicationInfo.Width/2,HorizontalAlignment.Left));
+			gridAdjudicationInfo.Columns.Add(new UI.ODGridColumn("Value",gridAdjudicationInfo.Width/2,HorizontalAlignment.Left));
+			gridAdjudicationInfo.Rows.Clear();
+			for(int i=0;i<_listAdjudicationInfo.Count;i+=2) {
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new UI.ODGridCell(_listAdjudicationDetails[i]));
-				row.Cells.Add(new UI.ODGridCell(_listAdjudicationDetails[i+1]));
-				gridAdjudicationDetails.Rows.Add(row);
+				row.Cells.Add(new UI.ODGridCell(_listAdjudicationInfo[i]));
+				row.Cells.Add(new UI.ODGridCell(_listAdjudicationInfo[i+1]));
+				gridAdjudicationInfo.Rows.Add(row);
 			}
-			gridAdjudicationDetails.EndUpdate();
+			gridAdjudicationInfo.EndUpdate();
 		}
 
-		private void gridAdjudicationDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_listAdjudicationDetails[e.Row*2+1]);
+		private void gridProcedureBreakdown_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			int procInfoIndex=(int)gridProcedureBreakdown.Rows[e.Row].Tag;
+			int strSegSvcIndex=PIn.Int(_listProcInfo[procInfoIndex]);
+			string strProcNum=_listProcInfo[procInfoIndex+4];
+			string strProcCode=_listProcInfo[procInfoIndex+1];
+			string strProcFee=_listProcInfo[procInfoIndex+2];
+			string strInsPaid=_listProcInfo[procInfoIndex+3];
+			FormEtrans835ProcEdit form=new FormEtrans835ProcEdit(_x835,strSegSvcIndex,strProcNum,strProcCode,strProcFee,strInsPaid);
+			form.Show();
+		}
+
+		private void gridAdjudicationInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_listAdjudicationInfo[e.Row*2+1]);
 			msgbox.Show(this);
 		}
 

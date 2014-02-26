@@ -16,8 +16,8 @@ namespace OpenDental {
 		public Etrans EtransCur;
 		private string _messageText;
 		private X835 _x835;
-		private decimal _claimPaymentTotal;
-		private decimal _provAdjustmentTotal;
+		private decimal _claimInsPaidSum;
+		private decimal _provAdjAmtSum;
 
 		public FormEtrans835Edit() {
 			InitializeComponent();
@@ -126,7 +126,7 @@ namespace OpenDental {
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"InsPaid"),colWidthPaidAmt,HorizontalAlignment.Right));//Claim Payment Amount (CLP04)
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"PatPortion"),colWidthPatAmt,HorizontalAlignment.Right));//Patient Responsibility Amount (CLP05)
 			gridClaimDetails.Rows.Clear();
-			_claimPaymentTotal=0;
+			_claimInsPaidSum=0;
 			for(int i=0;i<claimTrackingNumbers.Count;i++) {
 				ODGridRow row=new ODGridRow();
 				string[] claimInfo=_x835.GetClaimInfo(claimTrackingNumbers[i]);
@@ -149,7 +149,7 @@ namespace OpenDental {
 				row.Cells.Add(new UI.ODGridCell(claimInfo[0]));//Status
 				row.Cells.Add(new UI.ODGridCell(claimInfo[1]));//ClaimFee
 				row.Cells.Add(new UI.ODGridCell(claimInfo[2]));//InsPaid
-				_claimPaymentTotal+=PIn.Decimal(claimInfo[2]);
+				_claimInsPaidSum+=PIn.Decimal(claimInfo[2]);
 				row.Cells.Add(new UI.ODGridCell(claimInfo[3]));//PatPortion
 				row.Tag=claimTrackingNumbers[i];
 				gridClaimDetails.Rows.Add(row);
@@ -177,7 +177,7 @@ namespace OpenDental {
 			gridProviderAdjustments.BeginUpdate();
 			gridProviderAdjustments.Rows.Clear();
 			List<string[]> providerAdjustments=_x835.GetProviderLevelAdjustments();
-			_provAdjustmentTotal=0;
+			_provAdjAmtSum=0;
 			for(int i=0;i<providerAdjustments.Count;i++) {
 				ODGridRow row=new ODGridRow();
 				row.Cells.Add(new ODGridCell(providerAdjustments[i][0]));//NPI
@@ -186,16 +186,16 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell(providerAdjustments[i][3]));//ReasonCode
 				row.Cells.Add(new ODGridCell(providerAdjustments[i][4]));//RefIdent
 				row.Cells.Add(new ODGridCell(providerAdjustments[i][5]));//AdjAmt
-				_provAdjustmentTotal+=PIn.Decimal(providerAdjustments[i][5]);
+				_provAdjAmtSum+=PIn.Decimal(providerAdjustments[i][5]);
 				gridProviderAdjustments.Rows.Add(row);
 			}
 			gridProviderAdjustments.EndUpdate();
 		}
 
 		private void FillFooter() {
-			textClaimPaymentTotal.Text=_claimPaymentTotal.ToString("f2");
-			textProvAdjustmentTotal.Text=_provAdjustmentTotal.ToString("f2");
-			textPaymentAmountCalc.Text=(_claimPaymentTotal-_provAdjustmentTotal).ToString("f2");
+			textClaimInsPaidSum.Text=_claimInsPaidSum.ToString("f2");
+			textProjAdjAmtSum.Text=_provAdjAmtSum.ToString("f2");
+			textPayAmountCalc.Text=(_claimInsPaidSum-_provAdjAmtSum).ToString("f2");
 		}
 
 		private void butRawMessage_Click(object sender,EventArgs e) {

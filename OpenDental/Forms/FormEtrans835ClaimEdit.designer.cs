@@ -40,18 +40,20 @@ namespace OpenDental{
 			this.label6 = new System.Windows.Forms.Label();
 			this.textPatientPortion = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
-			this.gridAdjudicationDetails = new OpenDental.UI.ODGrid();
-			this.gridProcedureDetails = new OpenDental.UI.ODGrid();
-			this.butClose = new OpenDental.UI.Button();
-			this.gridAdjustmentDetails = new OpenDental.UI.ODGrid();
 			this.label18 = new System.Windows.Forms.Label();
-			this.textTotalAdjustments = new System.Windows.Forms.TextBox();
+			this.textClaimAdjAmtSum = new System.Windows.Forms.TextBox();
 			this.textClaimFee2 = new System.Windows.Forms.TextBox();
 			this.labelEquation = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
-			this.textInsPaid2 = new System.Windows.Forms.TextBox();
-			this.textProcAdjustments = new System.Windows.Forms.TextBox();
+			this.textInsPaidCalc = new System.Windows.Forms.TextBox();
+			this.textProcAdjAmtSum = new System.Windows.Forms.TextBox();
+			this.groupBalancing = new System.Windows.Forms.GroupBox();
+			this.gridClaimAdjustments = new OpenDental.UI.ODGrid();
+			this.gridAdjudicationInfo = new OpenDental.UI.ODGrid();
+			this.gridProcedureBreakdown = new OpenDental.UI.ODGrid();
+			this.butClose = new OpenDental.UI.Button();
+			this.groupBalancing.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textPatientName
@@ -190,37 +192,139 @@ namespace OpenDental{
 			this.label7.Text = "Patient Portion";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// gridAdjudicationDetails
+			// label18
 			// 
-			this.gridAdjudicationDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+			this.label18.Location = new System.Drawing.Point(119, 37);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(12, 20);
+			this.label18.TabIndex = 204;
+			this.label18.Text = "-";
+			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textClaimAdjustmentTotal
+			// 
+			this.textClaimAdjAmtSum.Location = new System.Drawing.Point(136, 37);
+			this.textClaimAdjAmtSum.Name = "textClaimAdjustmentTotal";
+			this.textClaimAdjAmtSum.ReadOnly = true;
+			this.textClaimAdjAmtSum.Size = new System.Drawing.Size(110, 20);
+			this.textClaimAdjAmtSum.TabIndex = 202;
+			// 
+			// textClaimFee2
+			// 
+			this.textClaimFee2.Location = new System.Drawing.Point(5, 37);
+			this.textClaimFee2.Name = "textClaimFee2";
+			this.textClaimFee2.ReadOnly = true;
+			this.textClaimFee2.Size = new System.Drawing.Size(110, 20);
+			this.textClaimFee2.TabIndex = 200;
+			// 
+			// labelEquation
+			// 
+			this.labelEquation.Location = new System.Drawing.Point(6, 16);
+			this.labelEquation.Name = "labelEquation";
+			this.labelEquation.Size = new System.Drawing.Size(501, 20);
+			this.labelEquation.TabIndex = 199;
+			this.labelEquation.Text = "Claim Fee                       -    Claim AdjAmt Sum          -    Proc AdjAmt S" +
+    "um          =    Ins Paid Calc";
+			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(249, 37);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(12, 20);
+			this.label3.TabIndex = 206;
+			this.label3.Text = "-";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(379, 37);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(12, 20);
+			this.label10.TabIndex = 207;
+			this.label10.Text = "=";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textInsPaidCalc
+			// 
+			this.textInsPaidCalc.Location = new System.Drawing.Point(397, 37);
+			this.textInsPaidCalc.Name = "textInsPaidCalc";
+			this.textInsPaidCalc.ReadOnly = true;
+			this.textInsPaidCalc.Size = new System.Drawing.Size(110, 20);
+			this.textInsPaidCalc.TabIndex = 208;
+			// 
+			// textProcAdjustmentTotal
+			// 
+			this.textProcAdjAmtSum.Location = new System.Drawing.Point(265, 37);
+			this.textProcAdjAmtSum.Name = "textProcAdjustmentTotal";
+			this.textProcAdjAmtSum.ReadOnly = true;
+			this.textProcAdjAmtSum.Size = new System.Drawing.Size(110, 20);
+			this.textProcAdjAmtSum.TabIndex = 209;
+			// 
+			// groupBalancing
+			// 
+			this.groupBalancing.Controls.Add(this.labelEquation);
+			this.groupBalancing.Controls.Add(this.textProcAdjAmtSum);
+			this.groupBalancing.Controls.Add(this.textClaimFee2);
+			this.groupBalancing.Controls.Add(this.textInsPaidCalc);
+			this.groupBalancing.Controls.Add(this.textClaimAdjAmtSum);
+			this.groupBalancing.Controls.Add(this.label10);
+			this.groupBalancing.Controls.Add(this.label18);
+			this.groupBalancing.Controls.Add(this.label3);
+			this.groupBalancing.Location = new System.Drawing.Point(9, 101);
+			this.groupBalancing.Name = "groupBalancing";
+			this.groupBalancing.Size = new System.Drawing.Size(956, 65);
+			this.groupBalancing.TabIndex = 210;
+			this.groupBalancing.TabStop = false;
+			this.groupBalancing.Text = "Balancing - Ins Paid Calc should exactly match Ins Paid";
+			// 
+			// gridClaimAdjustments
+			// 
+			this.gridClaimAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridAdjudicationDetails.HScrollVisible = false;
-			this.gridAdjudicationDetails.Location = new System.Drawing.Point(9, 551);
-			this.gridAdjudicationDetails.Name = "gridAdjudicationDetails";
-			this.gridAdjudicationDetails.ScrollValue = 0;
-			this.gridAdjudicationDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridAdjudicationDetails.Size = new System.Drawing.Size(956, 107);
-			this.gridAdjudicationDetails.TabIndex = 197;
-			this.gridAdjudicationDetails.TabStop = false;
-			this.gridAdjudicationDetails.Title = "Claim Adjudication Info";
-			this.gridAdjudicationDetails.TranslationName = "FormEtrans835Edit";
-			this.gridAdjudicationDetails.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAdjudicationDetails_CellDoubleClick);
+			this.gridClaimAdjustments.HScrollVisible = false;
+			this.gridClaimAdjustments.Location = new System.Drawing.Point(9, 172);
+			this.gridClaimAdjustments.Name = "gridClaimAdjustments";
+			this.gridClaimAdjustments.ScrollValue = 0;
+			this.gridClaimAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridClaimAdjustments.Size = new System.Drawing.Size(956, 107);
+			this.gridClaimAdjustments.TabIndex = 198;
+			this.gridClaimAdjustments.TabStop = false;
+			this.gridClaimAdjustments.Title = "Claim Adjustments";
+			this.gridClaimAdjustments.TranslationName = "FormEtrans835Edit";
 			// 
-			// gridProcedureDetails
+			// gridAdjudicationInfo
 			// 
-			this.gridProcedureDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.gridAdjudicationInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAdjudicationInfo.HScrollVisible = false;
+			this.gridAdjudicationInfo.Location = new System.Drawing.Point(9, 551);
+			this.gridAdjudicationInfo.Name = "gridAdjudicationInfo";
+			this.gridAdjudicationInfo.ScrollValue = 0;
+			this.gridAdjudicationInfo.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridAdjudicationInfo.Size = new System.Drawing.Size(956, 107);
+			this.gridAdjudicationInfo.TabIndex = 197;
+			this.gridAdjudicationInfo.TabStop = false;
+			this.gridAdjudicationInfo.Title = "Claim Adjudication Info";
+			this.gridAdjudicationInfo.TranslationName = "FormEtrans835Edit";
+			this.gridAdjudicationInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAdjudicationInfo_CellDoubleClick);
+			// 
+			// gridProcedureBreakdown
+			// 
+			this.gridProcedureBreakdown.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridProcedureDetails.HScrollVisible = false;
-			this.gridProcedureDetails.Location = new System.Drawing.Point(9, 254);
-			this.gridProcedureDetails.Name = "gridProcedureDetails";
-			this.gridProcedureDetails.ScrollValue = 0;
-			this.gridProcedureDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridProcedureDetails.Size = new System.Drawing.Size(956, 291);
-			this.gridProcedureDetails.TabIndex = 0;
-			this.gridProcedureDetails.TabStop = false;
-			this.gridProcedureDetails.Title = "Procedure Breakdown";
-			this.gridProcedureDetails.TranslationName = "FormEtrans835Edit";
+			this.gridProcedureBreakdown.HScrollVisible = false;
+			this.gridProcedureBreakdown.Location = new System.Drawing.Point(9, 285);
+			this.gridProcedureBreakdown.Name = "gridProcedureBreakdown";
+			this.gridProcedureBreakdown.ScrollValue = 0;
+			this.gridProcedureBreakdown.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridProcedureBreakdown.Size = new System.Drawing.Size(956, 260);
+			this.gridProcedureBreakdown.TabIndex = 0;
+			this.gridProcedureBreakdown.TabStop = false;
+			this.gridProcedureBreakdown.Title = "Procedure Breakdown";
+			this.gridProcedureBreakdown.TranslationName = "FormEtrans835Edit";
+			this.gridProcedureBreakdown.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridProcedureBreakdown_CellDoubleClick);
 			// 
 			// butClose
 			// 
@@ -237,104 +341,13 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// gridAdjustmentDetails
-			// 
-			this.gridAdjustmentDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridAdjustmentDetails.HScrollVisible = false;
-			this.gridAdjustmentDetails.Location = new System.Drawing.Point(9, 97);
-			this.gridAdjustmentDetails.Name = "gridAdjustmentDetails";
-			this.gridAdjustmentDetails.ScrollValue = 0;
-			this.gridAdjustmentDetails.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridAdjustmentDetails.Size = new System.Drawing.Size(956, 107);
-			this.gridAdjustmentDetails.TabIndex = 198;
-			this.gridAdjustmentDetails.TabStop = false;
-			this.gridAdjustmentDetails.Title = "Claim Adjustments";
-			this.gridAdjustmentDetails.TranslationName = "FormEtrans835Edit";
-			// 
-			// label18
-			// 
-			this.label18.Location = new System.Drawing.Point(353, 228);
-			this.label18.Name = "label18";
-			this.label18.Size = new System.Drawing.Size(12, 20);
-			this.label18.TabIndex = 204;
-			this.label18.Text = "-";
-			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textTotalAdjustments
-			// 
-			this.textTotalAdjustments.Location = new System.Drawing.Point(370, 228);
-			this.textTotalAdjustments.Name = "textTotalAdjustments";
-			this.textTotalAdjustments.ReadOnly = true;
-			this.textTotalAdjustments.Size = new System.Drawing.Size(110, 20);
-			this.textTotalAdjustments.TabIndex = 202;
-			// 
-			// textClaimFee2
-			// 
-			this.textClaimFee2.Location = new System.Drawing.Point(239, 228);
-			this.textClaimFee2.Name = "textClaimFee2";
-			this.textClaimFee2.ReadOnly = true;
-			this.textClaimFee2.Size = new System.Drawing.Size(110, 20);
-			this.textClaimFee2.TabIndex = 200;
-			// 
-			// labelEquation
-			// 
-			this.labelEquation.Location = new System.Drawing.Point(240, 207);
-			this.labelEquation.Name = "labelEquation";
-			this.labelEquation.Size = new System.Drawing.Size(581, 20);
-			this.labelEquation.TabIndex = 199;
-			this.labelEquation.Text = "Claim Fee                       -    Claim Adjustments          -    Proc Adjustm" +
-    "ents          =    Ins Paid";
-			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// label3
-			// 
-			this.label3.Location = new System.Drawing.Point(483, 228);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(12, 20);
-			this.label3.TabIndex = 206;
-			this.label3.Text = "-";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// label10
-			// 
-			this.label10.Location = new System.Drawing.Point(613, 228);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(12, 20);
-			this.label10.TabIndex = 207;
-			this.label10.Text = "=";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textInsPaid2
-			// 
-			this.textInsPaid2.Location = new System.Drawing.Point(631, 228);
-			this.textInsPaid2.Name = "textInsPaid2";
-			this.textInsPaid2.ReadOnly = true;
-			this.textInsPaid2.Size = new System.Drawing.Size(110, 20);
-			this.textInsPaid2.TabIndex = 208;
-			// 
-			// textProcAdjustments
-			// 
-			this.textProcAdjustments.Location = new System.Drawing.Point(499, 228);
-			this.textProcAdjustments.Name = "textProcAdjustments";
-			this.textProcAdjustments.ReadOnly = true;
-			this.textProcAdjustments.Size = new System.Drawing.Size(110, 20);
-			this.textProcAdjustments.TabIndex = 209;
-			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
-			this.Controls.Add(this.textProcAdjustments);
-			this.Controls.Add(this.textInsPaid2);
-			this.Controls.Add(this.label10);
-			this.Controls.Add(this.label3);
-			this.Controls.Add(this.label18);
-			this.Controls.Add(this.textTotalAdjustments);
-			this.Controls.Add(this.textClaimFee2);
-			this.Controls.Add(this.labelEquation);
-			this.Controls.Add(this.gridAdjustmentDetails);
-			this.Controls.Add(this.gridAdjudicationDetails);
+			this.Controls.Add(this.groupBalancing);
+			this.Controls.Add(this.gridClaimAdjustments);
+			this.Controls.Add(this.gridAdjudicationInfo);
 			this.Controls.Add(this.textPatientPortion);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.textInsPaid);
@@ -351,15 +364,17 @@ namespace OpenDental{
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.textPatientName);
 			this.Controls.Add(this.label8);
-			this.Controls.Add(this.gridProcedureDetails);
+			this.Controls.Add(this.gridProcedureBreakdown);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835ClaimEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Claim Explanation of Benefits (EOB)";
+			this.Text = "Explanation of Benefits (EOB) for Claim";
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimEdit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835ClaimEdit_Resize);
+			this.groupBalancing.ResumeLayout(false);
+			this.groupBalancing.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -368,7 +383,7 @@ namespace OpenDental{
 		#endregion
 
 		private OpenDental.UI.Button butClose;
-		private OpenDental.UI.ODGrid gridProcedureDetails;
+		private OpenDental.UI.ODGrid gridProcedureBreakdown;
 		private System.Windows.Forms.TextBox textPatientName;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.TextBox textDateService;
@@ -385,15 +400,16 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textPatientPortion;
 		private System.Windows.Forms.Label label7;
-		private UI.ODGrid gridAdjudicationDetails;
-		private UI.ODGrid gridAdjustmentDetails;
+		private UI.ODGrid gridAdjudicationInfo;
+		private UI.ODGrid gridClaimAdjustments;
 		private System.Windows.Forms.Label label18;
-		private System.Windows.Forms.TextBox textTotalAdjustments;
+		private System.Windows.Forms.TextBox textClaimAdjAmtSum;
 		private System.Windows.Forms.TextBox textClaimFee2;
 		private System.Windows.Forms.Label labelEquation;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.TextBox textInsPaid2;
-		private System.Windows.Forms.TextBox textProcAdjustments;
+		private System.Windows.Forms.TextBox textInsPaidCalc;
+		private System.Windows.Forms.TextBox textProcAdjAmtSum;
+		private System.Windows.Forms.GroupBox groupBalancing;
 	}
 }

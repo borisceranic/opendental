@@ -377,6 +377,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEtrans835ProcEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEtrans835ProcEdit.designer.cs">
+      <DependentUpon>FormEtrans835ProcEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEtrans835ClaimEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3375,6 +3381,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans835ProcEdit.resx">
+      <DependentUpon>FormEtrans835ProcEdit.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835ClaimEdit.resx">
       <DependentUpon>FormEtrans835ClaimEdit.cs</DependentUpon>
