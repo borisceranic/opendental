@@ -91,6 +91,7 @@ namespace OpenDentBusiness{
 		Tscan,
 		UAppoint,
 		Vipersoft,
+		VistaDent,
 		VixWin,
 		VixWinBase41,
 		VixWinOld,
