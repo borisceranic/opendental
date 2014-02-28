@@ -38,6 +38,8 @@ namespace OpenDentHL7 {
 		///<summary></summary>
 		private HL7Def HL7DefEnabled;
 		private static bool IsSendTCPConnected;
+		private static bool _ecwFileModeIsSending;
+		private static DateTime _ecwDateTimeOldMsgsDeleted;
 
 		public ServiceHL7() {
 			InitializeComponent();
@@ -152,6 +154,8 @@ namespace OpenDentHL7 {
 					EventLog.WriteEntry("OpenDentHL7","The incoming HL7 folder does not exist.  Path is set to: "+hl7FolderIn,EventLogEntryType.Error);
 					throw new ApplicationException("The incoming HL7 folder does not exist.  Path is set to: "+hl7FolderIn);
 				}
+				_ecwDateTimeOldMsgsDeleted=DateTime.MinValue;
+				_ecwFileModeIsSending=false;
 				//start polling the folder for waiting messages to import.  Every 5 seconds.
 				TimerCallback timercallbackReceive=new TimerCallback(TimerCallbackReceiveFiles);
 				timerReceiveFiles=new System.Threading.Timer(timercallbackReceive,null,5000,5000);
@@ -225,14 +229,41 @@ namespace OpenDentHL7 {
 		}
 
 		private void TimerCallbackSendFiles(Object stateInfo) {
-			List<HL7Msg> list=HL7Msgs.GetOnePending();
-			string filename;
-			for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
-				filename=ODFileUtils.CreateRandomFile(hl7FolderOut,".txt");
-				File.WriteAllText(filename,list[i].MsgText);
-				list[i].HL7Status=HL7MessageStatus.OutSent;
-				HL7Msgs.Update(list[i]);//set the status to sent.
-				HL7Msgs.DeleteOldMsgText();//This is inside the loop so that it happens less frequently.  To clean up incoming messages, we may move this someday.
+			if(_ecwFileModeIsSending) {//if there is a thread that is still sending, return
+				return;
+			}
+			try {
+				_ecwFileModeIsSending=true;
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("GetOnePending Start");
+				}
+				List<HL7Msg> list=HL7Msgs.GetOnePending();
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("GetOnePending Finished");
+				}
+				string filename;
+				for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
+					filename=ODFileUtils.CreateRandomFile(hl7FolderOut,".txt");
+					File.WriteAllText(filename,list[i].MsgText);
+					list[i].HL7Status=HL7MessageStatus.OutSent;
+					HL7Msgs.Update(list[i]);//set the status to sent.
+				}
+				if(_ecwDateTimeOldMsgsDeleted.Date<DateTime.Now.Date) {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Starting");
+					}
+					_ecwDateTimeOldMsgsDeleted=DateTime.Now;
+					HL7Msgs.DeleteOldMsgText();//this function deletes if DateTStamp is less than CURDATE-INTERVAL 4 MONTH.  That means it will delete message text only once a day, not time based.
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Finished");
+					}
+				}
+			}
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentHL7 error when sending HL7 message: "+ex.Message,EventLogEntryType.Warning);//Warning because the service will spawn a new thread in 1.8 seconds
+			}
+			finally {
+				_ecwFileModeIsSending=false;
 			}
 		}
 
@@ -496,10 +527,18 @@ namespace OpenDentHL7 {
 				}
 				list[i].HL7Status=HL7MessageStatus.OutSent;
 				HL7Msgs.Update(list[i]);//set the status to sent and save ack message in Note field.
-				HL7Msgs.DeleteOldMsgText();//This is inside the loop so that it happens less frequently.  To clean up incoming messages, we may move this someday.
+				if(_ecwDateTimeOldMsgsDeleted.Date<DateTime.Now.Date) {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Starting");
+					}
+					_ecwDateTimeOldMsgsDeleted=DateTime.Now;
+					HL7Msgs.DeleteOldMsgText();//this function deletes if DateTStamp is less than CURDATE-INTERVAL 4 MONTH.  That means it will delete message text only once a day, not time based.
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Finished");
+					}
+				}
 			}
-		}
-		
+		}	
 		
 	}
 }
