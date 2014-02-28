@@ -66,7 +66,7 @@ namespace OpenDental {
 					//	continue;
 					//}
 					transCheck=XChargeTransactions.GetOneByBatchItem(trans.BatchNum,trans.ItemNum);
-					if(transCheck!=null && trans.TransType!="CCVoid") {
+					if(transCheck!=null && trans.Result!="AP DUPE" && trans.TransType!="CCVoid") {
 						XChargeTransactions.Delete(transCheck.XChargeTransactionNum);
 						XChargeTransactions.Insert(trans);
 					}
@@ -95,7 +95,7 @@ namespace OpenDental {
 			report.SetColumn(this,1,"Transaction Type",120);
 			report.SetColumn(this,2,"Clerk ID",80);
 			report.SetColumn(this,3,"Item#",50);
-			report.SetColumn(this,4,"PatNum",50);
+			report.SetColumn(this,4,"PatNums",50);
 			report.SetColumn(this,5,"Credit Card Num",140);
 			report.SetColumn(this,6,"Exp",50);
 			report.SetColumn(this,7,"Result",50);
@@ -119,7 +119,7 @@ namespace OpenDental {
 			report.Title="Payments From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString();
 			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
 			report.SetColumn(this,0,"Count",50);
-			report.SetColumn(this,1,"PatNum",50);
+			report.SetColumn(this,1,"PatNums",50);
 			report.SetColumn(this,2,"LName",100);
 			report.SetColumn(this,3,"FName",100);
 			report.SetColumn(this,4,"DateEntry",100);
@@ -152,7 +152,7 @@ namespace OpenDental {
 			report.SetColumn(this,1,"Transaction Type",120);
 			report.SetColumn(this,2,"Clerk ID",80);
 			report.SetColumn(this,3,"Item#",50);
-			report.SetColumn(this,4,"PatNum",50);
+			report.SetColumn(this,4,"PatNums",50);
 			report.SetColumn(this,5,"Credit Card Num",140);
 			report.SetColumn(this,6,"Exp",50);
 			report.SetColumn(this,7,"Result",50);
@@ -179,7 +179,7 @@ namespace OpenDental {
 			FormQuery2.SubmitReportQuery();
 			report.Title="Payments From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString();
 			report.SubTitle.Add("No Matching X-Charge Transactions for these Payments");
-			report.SetColumn(this,0,"PatNum",50);
+			report.SetColumn(this,0,"PatNums",50);
 			report.SetColumn(this,1,"LName",100);
 			report.SetColumn(this,2,"FName",100);
 			report.SetColumn(this,3,"DateEntry",100);
