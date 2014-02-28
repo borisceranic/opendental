@@ -40,6 +40,7 @@ namespace OpenDentBusiness {
 		///<summary>Instantiated each time GenerateQrda_xml() is called. Used to generate unique "id" element "root" attribute identifiers. The Ids in this list are random GUIDs which are 36 characters in length.  They are used to uniquely identify the QRDA documents.</summary>
 		private static HashSet<string> _hashQrdaGuids;
 		private static List<int> _listExtraPopIndxs;
+		private static long _provNumLegal;
 
 		///<summary>Generates a list of all the quality measures for 2011.  Performs all calculations and manipulations.  Returns list for viewing/output.</summary>
 		public static List<QualityMeasure> GetAll(DateTime dateStart,DateTime dateEnd,long provNum) {
@@ -5709,11 +5710,12 @@ BMI 18.5-25.";
 		///and qualifies the patient for inclusion in multiple measures.
 		///The Category I files will be zipped per measure, so a patient's file be in the zip for every measure to which they belong.
 		///The Category III document contains the aggregate information for each of the selected measures.</summary>
-		public static void GenerateQRDA(List<QualityMeasure> listQMs,long provNum,DateTime dateStart,DateTime dateEnd,string folderRoot) {
+		public static void GenerateQRDA(List<QualityMeasure> listQMs,long provNum,DateTime dateStart,DateTime dateEnd,string folderRoot,long provNumLegal) {
 			//Set global variables for use by the GenerateCatOne and GenerateCatThree functions
 			if(listQMs==null || listQMs.Count==0) {//this should never happen
 				throw new ApplicationException("No measures to report on.");
 			}
+			_provNumLegal=provNumLegal;
 			string strErrors=ValidateSettings();
 			if(strErrors!="") {
 				throw new ApplicationException(strErrors);
@@ -5835,7 +5837,7 @@ BMI 18.5-25.";
 				TimeElement("time",DateTime.Now);
 				StartAndEnd("signatureCode","code","S");
 				Start("assignedEntity");
-				Provider provLegal=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+				Provider provLegal=Providers.GetProv(_provNumLegal);
 				StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provLegal.NationalProvID,"assigningAuthorityName","NPI");//Validated NPI
 				Start("representedOrganization");
 				StartAndEnd("id","root",_strOIDInternalRoot);//This is the root assigned to the practice, based on the OD root 2.16.840.1.113883.3.4337
@@ -6938,7 +6940,14 @@ BMI 18.5-25.";
 			List<EhrCqmPatient> listAllEhrPats=new List<EhrCqmPatient>();
 			//create a dictionary linking a patient to the measures to which they belong
 			Dictionary<long,List<QualityMeasure>> dictPatNumListQMs=new Dictionary<long,List<QualityMeasure>>();
+			//list of all 9 unique emeasure numbers, used to generate the zip files
+			List<string> listAllEMeasureNums=new List<string>();
+			//dictionary links a patient to any of the 9 emeasure nums they are in the initial patient population for, used to generate the zip files
+			Dictionary<long,List<string>> dictPatNumListEMeasureNums=new Dictionary<long,List<string>>();
 			for(int i=0;i<listQMs.Count;i++) {
+				if(!listAllEMeasureNums.Contains(listQMs[i].eMeasureNum)) {
+					listAllEMeasureNums.Add(listQMs[i].eMeasureNum);
+				}
 				for(int j=0;j<listQMs[i].ListEhrPats.Count;j++) {
 					if(!dictPatNumListQMs.ContainsKey(listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum)) {
 						dictPatNumListQMs.Add(listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum,new List<QualityMeasure>() { listQMs[i] });
@@ -6946,6 +6955,12 @@ BMI 18.5-25.";
 					}
 					else {
 						dictPatNumListQMs[listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum].Add(listQMs[i]);
+					}
+					if(!dictPatNumListEMeasureNums.ContainsKey(listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum)) {
+						dictPatNumListEMeasureNums.Add(listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum,new List<string>() { listQMs[i].eMeasureNum });
+					}
+					else {
+						dictPatNumListEMeasureNums[listQMs[i].ListEhrPats[j].EhrCqmPat.PatNum].Add(listQMs[i].eMeasureNum);
 					}
 				}
 			}
@@ -6955,6 +6970,11 @@ BMI 18.5-25.";
 			StringBuilder strBuilderPatDataEntries=new StringBuilder();
 			//this dictionary links a PatNum key to the patient's Cat I xml dictionary value
 			Dictionary<long,string> dictPatNumXml=new Dictionary<long,string>();
+#if DEBUG
+			System.Diagnostics.Stopwatch swGenerateXMLs=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch swCreateZipFiles=new System.Diagnostics.Stopwatch();
+			swGenerateXMLs.Restart();
+#endif
 			#region Cateogry I QRDA Documents
 			for(int i=0;i<listAllEhrPats.Count;i++) {
 				strBuilder=new StringBuilder();
@@ -7207,7 +7227,7 @@ BMI 18.5-25.";
 					TimeElement("time",DateTime.Now);
 					StartAndEnd("signatureCode","code","S");
 					Start("assignedEntity");
-					Provider provLegal=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+					Provider provLegal=Providers.GetProv(_provNumLegal);
 					StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provLegal.NationalProvID,"assigningAuthorityName","NPI");//Validated NPI
 					AddressUnitedStates(PrefC.GetString(PrefName.PracticeAddress),PrefC.GetString(PrefName.PracticeAddress2),PrefC.GetString(PrefName.PracticeCity),PrefC.GetString(PrefName.PracticeST),PrefC.GetString(PrefName.PracticeZip),"WP");//Validated
 					StartAndEnd("telecom","use","WP","value","tel:"+strPracticePhone);//Validated
@@ -7807,32 +7827,33 @@ BMI 18.5-25.";
 				dictPatNumXml.Add(patNumCur,xmlResult);
 				SecurityLogs.MakeLogEntry(Permissions.Copy,patNumCur,"QRDA Category I generated");//Create audit log entry.
 			}
-			for(int i=0;i<listAllEhrPats.Count;i++) {
-				Patient patCur=listAllEhrPats[i].EhrCqmPat;
-				if(!dictPatNumXml.ContainsKey(patCur.PatNum)) {//every patient will be in the dictionary, this is just in case
-					continue;
-				}
-				List<QualityMeasure> listPatQMs=dictPatNumListQMs[patCur.PatNum];
-				for(int j=0;j<listPatQMs.Count;j++) {
-					System.IO.File.WriteAllText(folderRoot+"\\Measure_"+listPatQMs[j].eMeasureNum+"\\"+patCur.PatNum+"_"+patCur.LName+"_"+patCur.FName+".xml",dictPatNumXml[patCur.PatNum]);
-				}
-			}
-			try {
-				string[] allMeasDirs=System.IO.Directory.GetDirectories(folderRoot);
-				for(int i=0;i<allMeasDirs.Length;i++) {
-					using(ZipFile zipCur=new ZipFile()) {
-						string[] allPatFiles=System.IO.Directory.GetFiles(allMeasDirs[i]);
-						zipCur.AddFiles(allPatFiles,"");
-						zipCur.Save(allMeasDirs[i]+".zip");
-						System.IO.Directory.Delete(allMeasDirs[i],true);
-					}
-				}
-			}
-			catch(Exception ex){
-				throw new ApplicationException("Zipfile creation error: "+ex.Message);
-			}
 			_w.Flush();
 			_w.Close();
+#if DEBUG
+			swGenerateXMLs.Stop();
+			swCreateZipFiles.Restart();
+#endif
+			for(int i=0;i<listAllEMeasureNums.Count;i++) {//make a file for each of our 9 eMeasures
+				using(ZipFile zipCur=new ZipFile()) {
+					for(int j=0;j<listAllEhrPats.Count;j++) {//go through list of all unique patients that are in any of the IPPs
+						Patient patCur=listAllEhrPats[j].EhrCqmPat;
+						if(!dictPatNumXml.ContainsKey(patCur.PatNum)) {//just in case, every patient will be in the dictionary.  Dictionary links a PatNum key to the cat I QRDA xml string value
+							continue;
+						}
+						if(!dictPatNumListEMeasureNums.ContainsKey(patCur.PatNum)) {//just in case, every patient in listAllEhrPats will be in the dictionary linked to their eMeasureNums
+							continue;
+						}
+						if(dictPatNumListEMeasureNums[patCur.PatNum].Contains(listAllEMeasureNums[i])) {
+							zipCur.AddEntry(patCur.PatNum.ToString()+"_"+patCur.LName+"_"+patCur.FName+".xml",dictPatNumXml[patCur.PatNum]);
+						}
+					}
+					zipCur.Save(folderRoot+"\\Measure_"+listAllEMeasureNums[i]+".zip");
+				}
+			}
+#if DEBUG
+			swCreateZipFiles.Stop();
+			System.Windows.Forms.MessageBox.Show("Generating XMLs: "+swGenerateXMLs.Elapsed.ToString()+"\r\n"+"Creating zip files: "+swCreateZipFiles.Elapsed.ToString());
+#endif
 			#endregion Cateogry I QRDA Documents
 		}
 
@@ -8911,38 +8932,34 @@ BMI 18.5-25.";
 				}
 				strErrors+="Invalid practice zip.  Must be at least 5 digits long.";
 			}
-			Provider provDefault=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			if(provDefault.FName.Trim()=="") {
+			//The Legal Authenticator must have a valid first name, last name, and NPI number and is the "single person legally responsible for the document" and "must be a person".
+			//Guaranteed to be a provider that is not marked 'Not a Person' when we get here.
+			Provider provLegal=Providers.GetProv(_provNumLegal);
+			if(provLegal.FName.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing provider "+provDefault.Abbr+" first name.";
+				strErrors+="Missing Legal Authenticator "+provLegal.Abbr+" first name.";
 			}
-			if(provDefault.LName.Trim()=="") {
+			if(provLegal.LName.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing provider "+provDefault.Abbr+" last name.";
+				strErrors+="Missing Legal Authenticator "+provLegal.Abbr+" last name.";
 			}
-			if(provDefault.NationalProvID.Trim()=="") {
+			if(provLegal.NationalProvID.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing provider "+provDefault.Abbr+" NPI.";
+				strErrors+="Missing Legal Authenticator "+provLegal.Abbr+" NPI.";
 			}
 			if(Snomeds.GetCodeCount()==0) {
-				//TODO: We need to replace this check with a more extensive check which validates the SNOMED codes that will actually go out on the CCD to ensure they are in our database.
-				//One way a SNOMED code could get into the patinet record without being in the snomed table, would be via an imported CCD. We might get around this issue by simply
-				//exporting the code without the description, because the descriptions are usually optional.
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
 				strErrors+="Missing SNOMED codes.  Go to Setup | EHR | Code System Importer to download.";
 			}
 			if(Cvxs.GetCodeCount()==0) {
-				//TODO: We need to replace this check with a more extensive check which validates the CVX codes that will actually go out on the CCD to ensure they are in our database.
-				//One way a CVX code could get into the patinet record without being in the snomed table, would be via an imported CCD. We might get around this issue by simply
-				//exporting the code without the description, because the descriptions are usually optional.
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}

@@ -138,6 +138,23 @@ namespace OpenDental {
 				MsgBox.Show(this,"The values in the grid do not apply to the provider selected.  Click Refresh first.");
 				return;
 			}
+			Provider provDefault=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+			long provNumLegal=provDefault.ProvNum;
+			//The practice default provider may be set to a non-person, like Apple Tree Dental, in which case there is no first name allowed and an NPI number does not make sense.
+			//Prompt user to select the provider to set as the legal authenticator for the QRDA documents.
+			//The Legal Authenticator must have a valid first name, last name, and NPI number and is the "single person legally responsible for the document" and "must be a person".
+			if(provDefault.IsNotPerson) {
+				MsgBox.Show(this,"The practice default provider is marked 'Not a Person'.  Please select the provider legally responsible for the documents.  The provider must have a first name, last name, and NPI number.");
+				FormProviderPick FormPP=new FormProviderPick();
+				if(FormPP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				if(Providers.GetProv(FormPP.SelectedProvNum).IsNotPerson) {
+					MsgBox.Show(this,"The selected provider was marked 'Not a person'.");
+					return;
+				}
+				provNumLegal=FormPP.SelectedProvNum;
+			}
 			FolderBrowserDialog fbd = new FolderBrowserDialog();
 			if(fbd.ShowDialog()!=DialogResult.OK) {
 				return;
@@ -155,12 +172,6 @@ namespace OpenDental {
 			}
 			try {
 				System.IO.Directory.CreateDirectory(folderPath);
-				for(int i=0;i<listQ.Count;i++) {
-					if(System.IO.Directory.Exists(folderPath+"\\Measure_"+listQ[i].eMeasureNum)) {
-						continue;
-					}
-					System.IO.Directory.CreateDirectory(folderPath+"\\Measure_"+listQ[i].eMeasureNum);
-				}
 			}
 			catch(Exception ex) {
 				MessageBox.Show("Folder was not created: "+ex.Message);
@@ -168,7 +179,7 @@ namespace OpenDental {
 			}
 			Cursor=Cursors.WaitCursor;
 			try {
-				QualityMeasures.GenerateQRDA(listQ,_provNum,_dateStart,_dateEnd,folderPath);//folderPath is a new directory created within the chosen directory
+				QualityMeasures.GenerateQRDA(listQ,_provNum,_dateStart,_dateEnd,folderPath,provNumLegal);//folderPath is a new directory created within the chosen directory
 			}
 			catch(Exception ex) {
 				Cursor=Cursors.Default;

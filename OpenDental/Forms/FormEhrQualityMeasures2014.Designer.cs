@@ -39,7 +39,7 @@
 			// butClose
 			// 
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butClose.Location = new System.Drawing.Point(658, 408);
+			this.butClose.Location = new System.Drawing.Point(707, 408);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 23);
 			this.butClose.TabIndex = 1;
@@ -49,7 +49,7 @@
 			// 
 			// butRefresh
 			// 
-			this.butRefresh.Location = new System.Drawing.Point(633, 8);
+			this.butRefresh.Location = new System.Drawing.Point(666, 8);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 23);
 			this.butRefresh.TabIndex = 21;
@@ -93,14 +93,14 @@
 			// 
 			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProv.FormattingEnabled = true;
-			this.comboProv.Location = new System.Drawing.Point(395, 8);
+			this.comboProv.Location = new System.Drawing.Point(428, 8);
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(215, 21);
 			this.comboProv.TabIndex = 24;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(273, 12);
+			this.label2.Location = new System.Drawing.Point(306, 12);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(118, 13);
 			this.label2.TabIndex = 23;
@@ -127,7 +127,7 @@
 			this.gridMain.Location = new System.Drawing.Point(12, 36);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(721, 366);
+			this.gridMain.Size = new System.Drawing.Size(770, 366);
 			this.gridMain.TabIndex = 0;
 			this.gridMain.Title = "Clinical Quality Measures 2014";
 			this.gridMain.TranslationName = null;
@@ -137,7 +137,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(745, 438);
+			this.ClientSize = new System.Drawing.Size(794, 438);
 			this.Controls.Add(this.butCreateQRDAs);
 			this.Controls.Add(this.textDateEnd);
 			this.Controls.Add(this.comboProv);
