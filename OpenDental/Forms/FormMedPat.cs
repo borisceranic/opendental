@@ -575,6 +575,7 @@ namespace OpenDental{
 			else {
 				SecurityLogs.MakeLogEntry(Permissions.PatMedicationListEdit,MedicationPatCur.PatNum,Medications.GetMedication(MedicationPatCur.MedicationNum).MedName+" deleted");
 			}
+			MedicationPatCur=null;//This prevents other windows trying to use the medication pat after this window has closed.
 			DialogResult=DialogResult.OK;
 		}
 

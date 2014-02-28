@@ -641,12 +641,22 @@ namespace OpenDental{
 			FormMP.MedicationPatCur=medList[e.Row];
 			FormMP.ShowDialog();
 			if(FormMP.DialogResult==DialogResult.OK 
+				&& FormMP.MedicationPatCur!=null //Can get be null if the user removed the medication from the patient.
 				&& CDSPermissions.GetForUser(Security.CurUser.UserNum).ShowCDS 
 				&& CDSPermissions.GetForUser(Security.CurUser.UserNum).MedicationCDS) 
 			{
-				FormCDSIntervention FormCDSI=new FormCDSIntervention();
-				FormCDSI.ListCDSI=EhrTriggers.TriggerMatch(Medications.GetMedication(FormMP.MedicationPatCur.MedicationNum),PatCur);
-				FormCDSI.ShowIfRequired(false);
+				object triggerObject=null;
+				if(FormMP.MedicationPatCur.MedicationNum > 0) {//0 indicats the med is from NewCrop.
+					triggerObject=Medications.GetMedication(FormMP.MedicationPatCur.MedicationNum);
+				}
+				else if(FormMP.MedicationPatCur.RxCui > 0) {//Meds from NewCrop might have a valid RxNorm.
+					triggerObject=RxNorms.GetByRxCUI(FormMP.MedicationPatCur.RxCui.ToString());
+				}
+				if(triggerObject!=null) {
+					FormCDSIntervention FormCDSI=new FormCDSIntervention();
+					FormCDSI.ListCDSI=EhrTriggers.TriggerMatch(triggerObject,PatCur);
+					FormCDSI.ShowIfRequired(false);
+				}
 			}
 			FillMeds();
 		}
