@@ -108,9 +108,11 @@ namespace OpenDental {
 				//LaunchOrdersWindow();
 				OnShowLaunchOrders=false;
 			}
-			if(ProvPat.EhrKey=="") {
-				MessageBox.Show("No ehr provider key entered for this patient's primary provider.");
-			}
+			//We already indicate that the patient's provider does not have an ehr key entered in labelProvPat.  No need for a popup.
+			//This is so that non-ehr providers can still use many of our ehr features.  E.g. vital signs.
+			//if(ProvPat.EhrKey=="") {
+			//	MessageBox.Show("No ehr provider key entered for this patient's primary provider.");
+			//}
 		}
 
 		private void FillGridMu() {
@@ -126,19 +128,21 @@ namespace OpenDental {
 			gridMu.Columns.Add(col);
 			col=new ODGridColumn("Related Actions",142);
 			gridMu.Columns.Add(col);
-			if(ProvPat.EhrKey=="") {
-				listMu=new List<EhrMu>();
+			//Always fill the grid regardless if the patient's provider has a valid ehr key.
+			//This is so that non-ehr providers can still use many of our ehr features.  E.g. vital signs.
+			//if(ProvPat.EhrKey=="") {
+			//	listMu=new List<EhrMu>();
+			//}
+			//else {
+			if(PrefC.GetBool(PrefName.MeaningfulUseTwo)) {
+				gridMu.Title="Stage 2 Meaningful Use for this patient";
+				listMu=EhrMeasures.GetMu2(PatCur);
 			}
 			else {
-				if(PrefC.GetBool(PrefName.MeaningfulUseTwo)) {
-					gridMu.Title="Stage 2 Meaningful Use for this patient";
-					listMu=EhrMeasures.GetMu2(PatCur);
-				}
-				else {
-					gridMu.Title="Stage 1 Meaningful Use for this patient";
-					listMu=EhrMeasures.GetMu(PatCur);
-				}
+				gridMu.Title="Stage 1 Meaningful Use for this patient";
+				listMu=EhrMeasures.GetMu(PatCur);
 			}
+			//}
 			gridMu.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<listMu.Count;i++) {
