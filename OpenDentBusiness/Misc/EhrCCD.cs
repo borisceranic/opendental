@@ -52,7 +52,7 @@ namespace OpenDentBusiness {
 		private const string strCodeSystemUnii="2.16.840.1.113883.4.9";
 		///<summary>UNII</summary>
 		private const string strCodeSystemNameUnii="UNII";
-		
+
 		///<summary>Set each time GenerateCCD() is called. Used by helper functions to avoid sending the patient as a parameter to each helper function.</summary>
 		private Patient _patOutCcd=null;
 		///<summary>Set each time ValidateAll and ValidateAllergy is called.</summary>
@@ -84,8 +84,8 @@ namespace OpenDentBusiness {
 		///<summary>Instantiated each time GenerateCCD() is called. Used to generate unique "id" element "root" attribute identifiers. The Ids in this list are random GUIDs which are 36 characters in length.</summary>
 		private HashSet<string> _hashCcdGuids;
 
-		#region Private Constructor		
-		
+		#region Private Constructor
+
 		///<summary>Constructor is private to limit instantiation to internal use only. All access to this class is static, however, there are private member variables which are used by each instance for ease of access.</summary>
 		private EhrCCD() { }
 
@@ -120,7 +120,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Throws an exception if validation fails.</summary>
 		private static string GenerateCCD(Patient pat,string referralReason) {
-			EhrCCD ccd=new EhrCCD();			
+			EhrCCD ccd=new EhrCCD();
 			return ccd.GenerateCCD(pat,referralReason,true,true,true,true,true,true,true,true,true,true,true,true,null);
 		}
 
@@ -162,7 +162,7 @@ namespace OpenDentBusiness {
 				StartAndEnd("confidentialityCode","code","N","codeSystem","2.16.840.1.113883.5.25");//Fixed value.  Confidentiality Code System.  Codes: N=(Normal), R=(Restricted),V=(Very Restricted)
 				StartAndEnd("languageCode","code","en-US");
 				Start("recordTarget");
-				Start("patientRole");				
+				Start("patientRole");
 				//TODO: We might need to assign a global GUID for each office so that the patient can be uniquely identified anywhere in the world.
 				StartAndEnd("id","extension",pat.PatNum.ToString(),"root",OIDInternals.GetForType(IdentifierType.Patient).IDRoot);
 				if(pat.SSN.Length==9) {
@@ -180,11 +180,11 @@ namespace OpenDentBusiness {
 				}
 				Start("patient");
 				Start("name","use","L");
-				_w.WriteElementString("given",pat.FName);//Validated
+				_w.WriteElementString("given",pat.FName.Trim());//Validated
 				if(pat.MiddleI!="") {
-					_w.WriteElementString("given",pat.MiddleI);
+					_w.WriteElementString("given",pat.MiddleI.Trim());
 				}
-				_w.WriteElementString("family",pat.LName);//Validated
+				_w.WriteElementString("family",pat.LName.Trim());//Validated
 				if(pat.Title!="") {
 					Start("suffix","qualifier","TITLE");
 					_w.WriteString(pat.Title);
@@ -269,7 +269,8 @@ namespace OpenDentBusiness {
 				End("recordTarget");
 				//author--------------------------------------------------------------------------------------------------
 				//The author element represents the creator of the clinical document.  The author may be a device, or a person.  Section 2.1.2, page 65
-				Provider provAuthor=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+				//pat.PrivProv cannot be zero, because of validation below.
+				Provider provAuthor=Providers.GetProv(pat.PriProv);//Uses primary provider, the primary provider cannot have the IsNotPerson set to true so they must have a first name.
 				Start("author");
 				TimeElement("time",DateTime.Now);
 				Start("assignedAuthor");
@@ -281,8 +282,8 @@ namespace OpenDentBusiness {
 				StartAndEnd("telecom","use","WP","value","tel:"+strPracticePhone);//Validated
 				Start("assignedPerson");
 				Start("name");
-				_w.WriteElementString("given",provAuthor.FName);//Validated
-				_w.WriteElementString("family",provAuthor.LName);//Validated
+				_w.WriteElementString("given",provAuthor.FName.Trim());//Validated
+				_w.WriteElementString("family",provAuthor.LName.Trim());//Validated
 				End("name");
 				End("assignedPerson");
 				End("assignedAuthor");
@@ -318,61 +319,65 @@ namespace OpenDentBusiness {
 				End("custodian");
 				//legalAuthenticator--------------------------------------------------------------------------------------
 				//This element identifies the single person legally responsible for the document and must be present if the document has been legally authenticated.
-				Start("legalAuthenticator");
-				TimeElement("time",DateTime.Now);
-				StartAndEnd("signatureCode","code","S");
-				Start("assignedEntity");
 				Provider provLegal=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-				if(pat.PriProv>0) {
-					provLegal=Providers.GetProv(pat.PriProv);
+				if(!provLegal.IsNotPerson) {
+					Start("legalAuthenticator");
+					TimeElement("time",DateTime.Now);
+					StartAndEnd("signatureCode","code","S");
+					Start("assignedEntity");
+					if(pat.PriProv>0) {
+						provLegal=Providers.GetProv(pat.PriProv);
+					}
+					StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provLegal.NationalProvID);//Validated NPI. We might need to assign a global GUID for each office so that the provider can be uniquely identified anywhere in the world.
+					string legalAuthAddress=PrefC.GetString(PrefName.PracticeAddress);//Validated
+					string legalAuthAddress2=PrefC.GetString(PrefName.PracticeAddress2);//Validated
+					string legalAuthCity=PrefC.GetString(PrefName.PracticeCity);//Validated
+					string legalAuthState=PrefC.GetString(PrefName.PracticeST);//Validated
+					string legalAuthPhone=strPracticePhone;
+					if(!PrefC.GetBool(PrefName.EasyNoClinics) && _patOutCcd.ClinicNum!=0) {
+						Clinic clinicAuth=Clinics.GetClinic(_patOutCcd.ClinicNum);
+						legalAuthAddress=clinicAuth.Address;//Validated
+						legalAuthAddress2=clinicAuth.Address2;//Validated
+						legalAuthCity=clinicAuth.City;//Validated
+						legalAuthState=clinicAuth.State;//Validated
+						legalAuthPhone=clinicAuth.Phone;//Validated
+					}
+					AddressUnitedStates(legalAuthAddress,legalAuthAddress2,legalAuthCity,legalAuthState);//Validated
+					StartAndEnd("telecom","use","WP","value","tel:"+legalAuthPhone);//Validated
+					Start("assignedPerson");
+					Start("name");
+					_w.WriteElementString("given",provLegal.FName.Trim());//Validated
+					_w.WriteElementString("family",provLegal.LName.Trim());//Validated
+					End("name");
+					End("assignedPerson");
+					End("assignedEntity");
+					End("legalAuthenticator");
 				}
-				StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provLegal.NationalProvID);//Validated NPI. We might need to assign a global GUID for each office so that the provider can be uniquely identified anywhere in the world.
-				string legalAuthAddress=PrefC.GetString(PrefName.PracticeAddress);//Validated
-				string legalAuthAddress2=PrefC.GetString(PrefName.PracticeAddress2);//Validated
-				string legalAuthCity=PrefC.GetString(PrefName.PracticeCity);//Validated
-				string legalAuthState=PrefC.GetString(PrefName.PracticeST);//Validated
-				string legalAuthPhone=strPracticePhone;
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && _patOutCcd.ClinicNum!=0) {
-					Clinic clinicAuth=Clinics.GetClinic(_patOutCcd.ClinicNum);
-					legalAuthAddress=clinicAuth.Address;//Validated
-					legalAuthAddress2=clinicAuth.Address2;//Validated
-					legalAuthCity=clinicAuth.City;//Validated
-					legalAuthState=clinicAuth.State;//Validated
-					legalAuthPhone=clinicAuth.Phone;//Validated
-				}
-				AddressUnitedStates(legalAuthAddress,legalAuthAddress2,legalAuthCity,legalAuthState);//Validated
-				StartAndEnd("telecom","use","WP","value","tel:"+legalAuthPhone);//Validated
-				Start("assignedPerson");
-				Start("name");
-				_w.WriteElementString("given",provLegal.FName);//Validated
-				_w.WriteElementString("family",provLegal.LName);//Validated
-				End("name");
-				End("assignedPerson");
-				End("assignedEntity");
-				End("legalAuthenticator");
 				Start("documentationOf","typeCode","DOC");
 				Start("serviceEvent","classCode","PCPR");
 				Start("effectiveTime");
 				TimeElement("low",DateTime.Now);
 				TimeElement("high",DateTime.Now);
 				End("effectiveTime");
-				Start("performer","typeCode","PRF");
-				Start("assignedEntity");
-				Provider provPri=Providers.GetProv(_patOutCcd.PriProv);//Could be 0.
-				if(provPri==null) {
-					provPri=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+				Provider provPri=Providers.GetProv(_patOutCcd.PriProv);//Cannot be zero, because of validation below.
+				if(!provPri.IsNotPerson) {
+					Start("performer","typeCode","PRF");
+					Start("assignedEntity");
+					if(provPri==null) {
+						provPri=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+					}
+					StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provPri.NationalProvID);//Validated NPI. We might need to assign a global GUID for each office so that the provider can be uniquely identified anywhere in the world.
+					AddressUnitedStates(PrefC.GetString(PrefName.PracticeAddress),PrefC.GetString(PrefName.PracticeAddress2),PrefC.GetString(PrefName.PracticeCity),PrefC.GetString(PrefName.PracticeST));//Validated
+					StartAndEnd("telecom","use","WP","value","tel:"+strPracticePhone);//Validated
+					Start("assignedPerson");
+					Start("name");
+					_w.WriteElementString("given",provPri.FName.Trim());//Validated
+					_w.WriteElementString("family",provPri.LName.Trim());//Validated
+					End("name");
+					End("assignedPerson");
+					End("assignedEntity");
+					End("performer");
 				}
-				StartAndEnd("id","root","2.16.840.1.113883.4.6","extension",provPri.NationalProvID);//Validated NPI. We might need to assign a global GUID for each office so that the provider can be uniquely identified anywhere in the world.
-				AddressUnitedStates(PrefC.GetString(PrefName.PracticeAddress),PrefC.GetString(PrefName.PracticeAddress2),PrefC.GetString(PrefName.PracticeCity),PrefC.GetString(PrefName.PracticeST));//Validated
-				StartAndEnd("telecom","use","WP","value","tel:"+strPracticePhone);//Validated
-				Start("assignedPerson");
-				Start("name");
-				_w.WriteElementString("given",provPri.FName);//Validated
-				_w.WriteElementString("family",provPri.LName);//Validated
-				End("name");
-				End("assignedPerson");
-				End("assignedEntity");
-				End("performer");
 				End("serviceEvent");
 				End("documentationOf");
 				_w.WriteComment(@"
@@ -473,19 +478,19 @@ Allergies
 					//	_w.WriteElementString("td",snomedAllergyTo.SnomedCode+" - "+snomedAllergyTo.Description);
 					//}
 					//else {//Medication allergy
-						Medication med;
-						if(allergyDef.MedicationNum==0) {
-							if(allergyDef.UniiCode=="") {
-								_w.WriteElementString("td","");
-							}
-							else {
-								_w.WriteElementString("td",allergyDef.UniiCode+" - "+allergyDef.Description);
-							}
+					Medication med;
+					if(allergyDef.MedicationNum==0) {
+						if(allergyDef.UniiCode=="") {
+							_w.WriteElementString("td","");
 						}
 						else {
-							med=Medications.GetMedication(allergyDef.MedicationNum);
-							_w.WriteElementString("td",med.RxCui.ToString()+" - "+med.MedName);
+							_w.WriteElementString("td",allergyDef.UniiCode+" - "+allergyDef.Description);
 						}
+					}
+					else {
+						med=Medications.GetMedication(allergyDef.MedicationNum);
+						_w.WriteElementString("td",med.RxCui.ToString()+" - "+med.MedName);
+					}
 					//}
 					_w.WriteElementString("td",allergy.Reaction);
 					_w.WriteElementString("td",AllergyDefs.GetSnomedAllergyDesc(allergyDef.SnomedType));
@@ -615,13 +620,13 @@ Allergies
 					}
 				}
 				//else if() {//Medication Drug Class (NDF-RT codes) //TODO: We need a UI box for this in allergy def.
-					//Current work around is (per js on 10/02/2013):
-					//If using eRx, search for a class such as NSAID.
-					//If that's not an option, pick a common medication in that class such as Ibuprofen, and the eRx will automatically list cross-sensitivity and allergy warnings for any other related medication.
-					//The allergy alerts built into OD do not have that rich database available.
-					//If you are not using paper Rx from within OD, then you could enter the allergy however it makes sense, either NSAID or Ibuprofen.
-					//If you are using paper Rx and you are trying to generate allergy warnings, then you also enter any specific medications that you might prescribe.
-					//For example, you might enter an allergy for Vicoprofen.
+				//Current work around is (per js on 10/02/2013):
+				//If using eRx, search for a class such as NSAID.
+				//If that's not an option, pick a common medication in that class such as Ibuprofen, and the eRx will automatically list cross-sensitivity and allergy warnings for any other related medication.
+				//The allergy alerts built into OD do not have that rich database available.
+				//If you are not using paper Rx from within OD, then you could enter the allergy however it makes sense, either NSAID or Ibuprofen.
+				//If you are using paper Rx and you are trying to generate allergy warnings, then you also enter any specific medications that you might prescribe.
+				//For example, you might enter an allergy for Vicoprofen.
 				//}
 				else {//Medication Brand Name or Medication Clinical Drug (RxNorm codes)
 					Medication med=Medications.GetMedication(allergyDef.MedicationNum);
@@ -777,32 +782,39 @@ Encounters
 				else {
 					StartAndEnd("effectiveTime","value",listEncountersFiltered[i].DateEncounter.ToString("yyyyMMdd"));
 				}
-				Start("performer");
-				Start("assignedEntity");
-				Guid();
-				_w.WriteComment("Performer Information");
-				Provider prov=null;
-				if(listEncountersFiltered[i].ProvNum==0) {
-					StartAndEnd("code","nullFlavor","UNK");
+				Provider prov=Providers.GetProv(listEncountersFiltered[i].ProvNum);
+				if(prov!=null && !prov.IsNotPerson) {
+					Start("performer");
+					Start("assignedEntity");
+					Guid();
+					_w.WriteComment("Performer Information");
+					if(listEncountersFiltered[i].ProvNum==0) {
+						StartAndEnd("code","nullFlavor","UNK");
+					}
+					else {
+						prov=Providers.GetProv(listEncountersFiltered[i].ProvNum);
+						StartAndEnd("code","code",GetTaxonomy(prov),"codeSystem",strCodeSystemNucc,"codeSystemName",strCodeSystemNameNucc);
+					}
+					//The assignedPerson element might not be allowed here. If that is the case, then performer is useless, because it would only contain the specialty code. Our HTML output shows the prov name.
+					Start("assignedPerson");
+					if(listEncountersFiltered[i].ProvNum==0) {
+						StartAndEnd("name","nullFlavor","UNK");
+					}
+					else {
+						Start("name");
+						if(prov.IsNotPerson) {
+							_w.WriteElementString("given","");//Not needed for CCD
+						}
+						else {
+							_w.WriteElementString("given",prov.FName.Trim());
+						}
+						_w.WriteElementString("family",prov.LName.Trim());
+						End("name");
+					}
+					End("assignedPerson");
+					End("assignedEntity");
+					End("performer");
 				}
-				else {
-					prov=Providers.GetProv(listEncountersFiltered[i].ProvNum);
-					StartAndEnd("code","code",GetTaxonomy(prov),"codeSystem",strCodeSystemNucc,"codeSystemName",strCodeSystemNameNucc);
-				}
-				//The assignedPerson element might not be allowed here. If that is the case, then performer is useless, because it would only contain the specialty code. Our HTML output shows the prov name.
-				Start("assignedPerson");
-				if(listEncountersFiltered[i].ProvNum==0) {
-					StartAndEnd("name","nullFlavor","UNK");
-				}
-				else {
-					Start("name");
-					_w.WriteElementString("given",prov.FName);
-					_w.WriteElementString("family",prov.LName);
-					End("name");
-				}
-				End("assignedPerson");
-				End("assignedEntity");
-				End("performer");
 				//Possibly add an Instructions Template
 				bool isInversion=false;//Specifies that the problem was or was not observed. All problems are "observed" for now.
 				Start("entryRelationship","typeCode","SUBJ","inversionInd",isInversion?"true":"false");
@@ -942,7 +954,7 @@ Functional and Cognitive Status
 			for(int i=0;i<listProblemsFiltered.Count;i++) {
 				DiseaseDef diseaseDef=null;
 				Snomed snomedProblem=null;
-				if(listProblemsFiltered[i].PatNum!=0) {					
+				if(listProblemsFiltered[i].PatNum!=0) {
 					diseaseDef=DiseaseDefs.GetItem(listProblemsFiltered[i].DiseaseDefNum);
 					snomedProblem=Snomeds.GetByCode(diseaseDef.SnomedCode);
 				}
@@ -1307,7 +1319,7 @@ Medications
 					strMedName=listMedPatsFiltered[i].MedDescript;//This might be blank, for example not from NewCrop.
 				}
 				if(listMedPatsFiltered[i].MedicationNum!=0) {//If NewCrop, this will be 0.  Also might be zero in the future when we start allowing freeform medications.
-					strMedName=Medications.GetNameOnly(listMedPatsFiltered[i].MedicationNum);					
+					strMedName=Medications.GetNameOnly(listMedPatsFiltered[i].MedicationNum);
 				}
 				Start("entry","typeCode","DRIV");
 				Start("substanceAdministration","classCode","SBADM","moodCode","EVN");
@@ -1335,7 +1347,7 @@ Medications
 				else {
 					DateElement("high",listMedPatsFiltered[i].DateStop);//Only one of these dates can be null, because of our filter above.
 				}
-				End("effectiveTime");		
+				End("effectiveTime");
 				Start("consumable");
 				Start("manufacturedProduct","classCode","MANU");
 				TemplateId("2.16.840.1.113883.10.20.22.4.23");//Medication Information template.
@@ -1991,7 +2003,7 @@ Laboratory Test Results
 =====================================================================================================
 Social History
 =====================================================================================================");
-			List <EhrMeasureEvent> listEhrMeasureEventsFiltered;
+			List<EhrMeasureEvent> listEhrMeasureEventsFiltered;
 			if(!hasSocialHistory) {
 				listEhrMeasureEventsFiltered=new List<EhrMeasureEvent>();
 			}
@@ -2274,7 +2286,7 @@ Vital Signs
 			End("observation");
 			End("component");
 		}
-		
+
 		///<summary>Helper for GenerateCCD(). Builds an "id" element and writes a random 32 character alpha-numeric string into the "root" attribute.</summary>
 		private void Id() {
 			string id=MiscUtils.CreateRandomAlphaNumericString(32);
@@ -2441,7 +2453,7 @@ Vital Signs
 				strErrors+="Invalid practice state.  Must be two letters.";
 			}
 			Provider provDefault=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			if(provDefault.FName.Trim()=="") {
+			if(provDefault.FName.Trim()=="" && !provDefault.IsNotPerson) {//Have a first name and is a person.
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
@@ -2484,6 +2496,12 @@ Vital Signs
 		///Returns empty string if no errors, otherwise returns a string containing error messages.</summary>
 		public static string ValidatePatient(Patient pat) {
 			string strErrors="";
+			if(pat.PriProv==0) {//this should never happen
+				if(strErrors!="") {
+					strErrors+="\r\n";
+				}
+				strErrors+="Primary provider must be set.";
+			}
 			if(pat.FName.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
@@ -2560,7 +2578,7 @@ Vital Signs
 				}
 			}
 			Provider provPractice=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			if(provPractice.FName.Trim()=="") {
+			if(provPractice.FName.Trim()=="" && !provPractice.IsNotPerson) {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
@@ -2580,7 +2598,7 @@ Vital Signs
 			}
 			if(pat.PriProv>0 && pat.PriProv!=PrefC.GetLong(PrefName.PracticeDefaultProv)) {
 				Provider provPri=Providers.GetProv(pat.PriProv);
-				if(provPri.FName.Trim()=="") {
+				if(provPri.FName.Trim()=="" && !provPri.IsNotPerson) {
 					if(strErrors!="") {
 						strErrors+="\r\n";
 					}
@@ -2950,7 +2968,7 @@ Vital Signs
 		}
 
 		///<summary>Calls GetNodesByTagNameAndAttributes() for each item in listXmlNode.</summary>
-		private static List<XmlNode> GetNodesByTagNameAndAttributesFromList(List <XmlNode> listXmlNode,string strTagName,params string[] arrayAttributes) {
+		private static List<XmlNode> GetNodesByTagNameAndAttributesFromList(List<XmlNode> listXmlNode,string strTagName,params string[] arrayAttributes) {
 			List<XmlNode> retVal=new List<XmlNode>();
 			for(int i=0;i<listXmlNode.Count;i++) {
 				retVal.AddRange(GetNodesByTagNameAndAttributes(listXmlNode[i],strTagName,arrayAttributes));
