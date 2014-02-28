@@ -2726,6 +2726,14 @@ namespace OpenDental{
 			else {
 				butSearch.Visible=false;
 			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				radioS1.Text="03";//Sextant 1 in the United States is sextant 03 in Canada.
+				radioS2.Text="04";//Sextant 2 in the United States is sextant 04 in Canada.
+				radioS3.Text="05";//Sextant 3 in the United States is sextant 05 in Canada.
+				radioS4.Text="06";//Sextant 4 in the United States is sextant 06 in Canada.
+				radioS5.Text="07";//Sextant 5 in the United States is sextant 07 in Canada.
+				radioS6.Text="08";//Sextant 6 in the United States is sextant 08 in Canada.
+			}
 			IsStartingUp=true;
 			FillControlsOnStartup();
 			SetControlsUpperLeft();

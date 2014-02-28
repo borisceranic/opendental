@@ -21,7 +21,7 @@ namespace OpenDentBusiness {
 		public DateTime ProcDate;
 		///<summary>Procedure fee.</summary>
 		public double ProcFee;
-		///<summary>Surfaces, or use "UL" etc for quadrant, "2" etc for sextant, "U","L" for arches.</summary>
+		///<summary>Surfaces, or use "UL" etc for quadrant, "2" etc for sextant, "U","L" for arches.  Sextants in the United States are: 1 (Upper Right), 2 (Upper Anterior), 3 (Upper Left), 4 (Lower Left), 5 (Lower Anterior), 6 (Lower Right).  In Canada, Sextants are 03 through 08 (add 2 to the US sextant and prepend a zero).</summary>
 		public string Surf;
 		///<summary>May be blank, otherwise 1-32, 51-82, A-T, or AS-TS, 1 or 2 char.  For Canadian users, using FDI nomenclature, we use 51 as a placeholder for supernumerary teeth, which is tooth number 99 according to CDHA standards (2/17/2014).  Logic for this is handled in the tooth logic class.</summary>
 		public string ToothNum;

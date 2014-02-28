@@ -3534,10 +3534,22 @@ namespace OpenDental{
 					//surf blank
 					break;
 				case TreatmentArea.Sextant:
-					area="";//leave it blank.  Never used anyway.
-					//area="S"+ProcCur.Surf;//area
-					//num blank
-					//surf blank
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						//United States Sextant 1 is Canadian sextant 03.
+						//United States Sextant 2 is Canadian sextant 04.
+						//United States Sextant 3 is Canadian sextant 05.
+						//United States Sextant 4 is Canadian sextant 06.
+						//United States Sextant 5 is Canadian sextant 07.
+						//United States Sextant 6 is Canadian sextant 08.
+						//The sextant goes into the "International Tooth Code" column on the claim form, according to the Nova Scotia NIHB fee guide page VII.
+						toothNum=(PIn.Int(ProcCur.Surf)+2).ToString().PadLeft(2,'0');//Add 2 to US sextant, then prepend a '0'.
+					}
+					else {//United States
+						area="";//leave it blank.  Never used anyway.
+						//area="S"+ProcCur.Surf;//area
+						//num blank
+						//surf blank
+					}
 					break;
 				case TreatmentArea.Arch:
 					area=AreaToCode(ProcCur.Surf);//area "U", etc
