@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrAmendmentEdit));
 			this.label5 = new System.Windows.Forms.Label();
 			this.textDescription = new System.Windows.Forms.TextBox();
 			this.labelScan = new System.Windows.Forms.Label();
@@ -309,6 +310,7 @@
 			this.Controls.Add(this.labelScan);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.label5);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrAmendmentEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Amendment";
