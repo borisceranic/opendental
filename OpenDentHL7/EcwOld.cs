@@ -24,6 +24,8 @@ namespace OpenDentHL7 {
 		private static string ecwOldHl7FolderOut;
 		///<summary>Indicates the standalone mode for eCW, or the use of Mountainside.  In both cases, chartNumber will be used instead of PatNum.</summary>
 		private static bool ecwOldIsStandalone;
+		private static bool _ecwOldIsSending;
+		private static DateTime _ecwOldDateTimeOldMsgsDeleted;
 
 		private void EcwOldSendAndReceive(){
 			ecwOldIsStandalone=true;//and for Mountainside
@@ -48,6 +50,8 @@ namespace OpenDentHL7 {
 			if(!Directory.Exists(ecwOldHl7FolderIn)) {
 				throw new ApplicationException(ecwOldHl7FolderIn+" does not exist.");
 			}
+			_ecwOldDateTimeOldMsgsDeleted=DateTime.MinValue;
+			_ecwOldIsSending=false;
 			TimerCallback timercallbackSend=new TimerCallback(EcwOldTimerCallbackSendFunction);
 			ecwOldTimerSend=new System.Threading.Timer(timercallbackSend,null,1800,1800);
 		}
@@ -115,20 +119,47 @@ namespace OpenDentHL7 {
 
 		private void EcwOldTimerCallbackSendFunction(Object stateInfo) {
 			//does not happen for standalone
-			List<HL7Msg> list=HL7Msgs.GetOnePending();
-			string filename;
-			for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
-				if(list[i].AptNum==0){
-					filename=ODFileUtils.CreateRandomFile(ecwOldHl7FolderIn,".txt");
+			if(_ecwOldIsSending) {//if there is a thread that is still sending, return
+				return;
+			}
+			try {
+				_ecwOldIsSending=true;
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("GetOnePending Start");
 				}
-				else{
-					filename=Path.Combine(ecwOldHl7FolderIn,list[i].AptNum.ToString()+".txt");
+				List<HL7Msg> list=HL7Msgs.GetOnePending();
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("GetOnePending Finished");
 				}
-				//EventLog.WriteEntry("Attempting to create file: "+filename);
-				File.WriteAllText(filename,list[i].MsgText);
-				list[i].HL7Status=HL7MessageStatus.OutSent;
-				HL7Msgs.Update(list[i]);//set the status to sent.
-				HL7Msgs.DeleteOldMsgText();//This is inside the loop so that it happens less frequently.  To clean up incoming messages, we may move this someday.
+				string filename;
+				for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
+					if(list[i].AptNum==0) {
+						filename=ODFileUtils.CreateRandomFile(ecwOldHl7FolderIn,".txt");
+					}
+					else {
+						filename=Path.Combine(ecwOldHl7FolderIn,list[i].AptNum.ToString()+".txt");
+					}
+					//EventLog.WriteEntry("Attempting to create file: "+filename);
+					File.WriteAllText(filename,list[i].MsgText);
+					list[i].HL7Status=HL7MessageStatus.OutSent;
+					HL7Msgs.Update(list[i]);//set the status to sent.
+				}
+				if(_ecwOldDateTimeOldMsgsDeleted.Date<DateTime.Now.Date) {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Starting");
+					}
+					_ecwOldDateTimeOldMsgsDeleted=DateTime.Now;
+					HL7Msgs.DeleteOldMsgText();//this function deletes if DateTStamp is less than CURDATE-INTERVAL 4 MONTH.  That means it will delete message text only once a day, not time based.
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("DeleteOldMsgText Finished");
+					}
+				}
+			}
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentHL7 error when sending HL7 message: "+ex.Message,EventLogEntryType.Warning);//Warning because the service will spawn a new thread in 1.8 seconds
+			}
+			finally {
+				_ecwOldIsSending=false;
 			}
 		}
 
