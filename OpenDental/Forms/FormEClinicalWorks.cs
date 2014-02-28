@@ -58,6 +58,8 @@ namespace OpenDental{
 		private TextBox textMedPanelURL;
 		private Label label11;
 		private CheckBox checkQuadAsToothNum;
+		private CheckBox checkLBSessionId;
+		private Label label12;
 		private Label labelHL7FolderIn;
 
 		///<summary></summary>
@@ -131,6 +133,8 @@ namespace OpenDental{
 			this.textMedPanelURL = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.checkQuadAsToothNum = new System.Windows.Forms.CheckBox();
+			this.checkLBSessionId = new System.Windows.Forms.CheckBox();
+			this.label12 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -143,7 +147,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(563, 527);
+			this.butCancel.Location = new System.Drawing.Point(563, 551);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -158,7 +162,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(482, 527);
+			this.butOK.Location = new System.Drawing.Point(482, 551);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -249,7 +253,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.textHL7FolderIn);
 			this.groupBox1.Controls.Add(this.labelHL7FolderOut);
 			this.groupBox1.Controls.Add(this.labelHL7FolderIn);
-			this.groupBox1.Location = new System.Drawing.Point(12, 312);
+			this.groupBox1.Location = new System.Drawing.Point(12, 336);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(538, 101);
 			this.groupBox1.TabIndex = 52;
@@ -266,7 +270,7 @@ namespace OpenDental{
 			// 
 			// labelDefaultUserGroup
 			// 
-			this.labelDefaultUserGroup.Location = new System.Drawing.Point(21, 428);
+			this.labelDefaultUserGroup.Location = new System.Drawing.Point(21, 452);
 			this.labelDefaultUserGroup.Name = "labelDefaultUserGroup";
 			this.labelDefaultUserGroup.Size = new System.Drawing.Size(186, 18);
 			this.labelDefaultUserGroup.TabIndex = 53;
@@ -277,7 +281,7 @@ namespace OpenDental{
 			// 
 			this.comboDefaultUserGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboDefaultUserGroup.FormattingEnabled = true;
-			this.comboDefaultUserGroup.Location = new System.Drawing.Point(209, 428);
+			this.comboDefaultUserGroup.Location = new System.Drawing.Point(209, 452);
 			this.comboDefaultUserGroup.Name = "comboDefaultUserGroup";
 			this.comboDefaultUserGroup.Size = new System.Drawing.Size(215, 21);
 			this.comboDefaultUserGroup.TabIndex = 54;
@@ -286,7 +290,7 @@ namespace OpenDental{
 			// 
 			this.checkShowImages.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkShowImages.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowImages.Location = new System.Drawing.Point(23, 455);
+			this.checkShowImages.Location = new System.Drawing.Point(23, 479);
 			this.checkShowImages.Name = "checkShowImages";
 			this.checkShowImages.Size = new System.Drawing.Size(199, 18);
 			this.checkShowImages.TabIndex = 55;
@@ -324,7 +328,7 @@ namespace OpenDental{
 			// 
 			this.checkFeeSchedules.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkFeeSchedules.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkFeeSchedules.Location = new System.Drawing.Point(23, 476);
+			this.checkFeeSchedules.Location = new System.Drawing.Point(23, 500);
 			this.checkFeeSchedules.Name = "checkFeeSchedules";
 			this.checkFeeSchedules.Size = new System.Drawing.Size(199, 18);
 			this.checkFeeSchedules.TabIndex = 58;
@@ -333,7 +337,7 @@ namespace OpenDental{
 			// 
 			// labelHL7Warning
 			// 
-			this.labelHL7Warning.Location = new System.Drawing.Point(227, 475);
+			this.labelHL7Warning.Location = new System.Drawing.Point(227, 499);
 			this.labelHL7Warning.Name = "labelHL7Warning";
 			this.labelHL7Warning.Size = new System.Drawing.Size(170, 18);
 			this.labelHL7Warning.TabIndex = 59;
@@ -361,7 +365,7 @@ namespace OpenDental{
 			this.butDiagnostic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDiagnostic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDiagnostic.CornerRadius = 4F;
-			this.butDiagnostic.Location = new System.Drawing.Point(299, 527);
+			this.butDiagnostic.Location = new System.Drawing.Point(299, 551);
 			this.butDiagnostic.Name = "butDiagnostic";
 			this.butDiagnostic.Size = new System.Drawing.Size(90, 24);
 			this.butDiagnostic.TabIndex = 61;
@@ -460,7 +464,7 @@ namespace OpenDental{
 			// labelDefEnabledWarning
 			// 
 			this.labelDefEnabledWarning.ForeColor = System.Drawing.Color.Red;
-			this.labelDefEnabledWarning.Location = new System.Drawing.Point(40, 277);
+			this.labelDefEnabledWarning.Location = new System.Drawing.Point(40, 301);
 			this.labelDefEnabledWarning.Name = "labelDefEnabledWarning";
 			this.labelDefEnabledWarning.Size = new System.Drawing.Size(569, 32);
 			this.labelDefEnabledWarning.TabIndex = 72;
@@ -497,18 +501,41 @@ namespace OpenDental{
 			// 
 			this.checkQuadAsToothNum.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkQuadAsToothNum.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkQuadAsToothNum.Location = new System.Drawing.Point(23, 497);
+			this.checkQuadAsToothNum.Location = new System.Drawing.Point(23, 521);
 			this.checkQuadAsToothNum.Name = "checkQuadAsToothNum";
 			this.checkQuadAsToothNum.Size = new System.Drawing.Size(199, 18);
 			this.checkQuadAsToothNum.TabIndex = 77;
 			this.checkQuadAsToothNum.Text = "Send Quadrant as Tooth Number";
 			this.checkQuadAsToothNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// checkLBSessionId
+			// 
+			this.checkLBSessionId.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkLBSessionId.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkLBSessionId.Location = new System.Drawing.Point(23, 278);
+			this.checkLBSessionId.Name = "checkLBSessionId";
+			this.checkLBSessionId.Size = new System.Drawing.Size(199, 18);
+			this.checkLBSessionId.TabIndex = 79;
+			this.checkLBSessionId.Text = "Using eCW Version 10";
+			this.checkLBSessionId.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(228, 274);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(256, 27);
+			this.label12.TabIndex = 80;
+			this.label12.Text = "Check this box if using eCW version 10 or greater and the medical panel is not wo" +
+    "rking.";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEClinicalWorks
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(650, 563);
+			this.ClientSize = new System.Drawing.Size(650, 587);
+			this.Controls.Add(this.label12);
+			this.Controls.Add(this.checkLBSessionId);
 			this.Controls.Add(this.checkQuadAsToothNum);
 			this.Controls.Add(this.textMedPanelURL);
 			this.Controls.Add(this.label11);
@@ -607,6 +634,7 @@ namespace OpenDental{
 			checkShowImages.Checked=GetProp("ShowImagesModule")=="1";
 			checkFeeSchedules.Checked=GetProp("FeeSchedulesSetManually")=="1";
 			textMedPanelURL.Text=GetProp("MedicalPanelUrl");
+			checkLBSessionId.Checked=GetProp("IsLBSessionIdExcluded")=="1";
 		}
 
 		private string GetProp(string desc){
@@ -751,6 +779,12 @@ namespace OpenDental{
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7Server",textHL7Server.Text);
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7ServiceName",textHL7ServiceName.Text);
 			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"MedicalPanelUrl",textMedPanelURL.Text);
+			if(checkLBSessionId.Checked) {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsLBSessionIdExcluded","1");
+			}
+			else {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsLBSessionIdExcluded","0");
+			}
 			if(checkQuadAsToothNum.Checked) {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","1");
 			}

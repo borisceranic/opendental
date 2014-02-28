@@ -3706,7 +3706,12 @@ namespace OpenDental{
 									InternetSetCookie("http://"+strAppServer,null,"JSESSIONIDSSO = "+Bridges.ECW.JSessionIdSSO);
 								}
 								if(!String.IsNullOrEmpty(Bridges.ECW.LBSessionId)) {
-									InternetSetCookie("http://"+strAppServer,null,"LBSESSIONID = "+Bridges.ECW.LBSessionId);
+									if(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsLBSessionIdExcluded")=="0") {
+										InternetSetCookie("http://"+strAppServer,null,"LBSESSIONID = "+Bridges.ECW.LBSessionId);
+									}
+									else {
+										InternetSetCookie("http://"+strAppServer,null,Bridges.ECW.LBSessionId);
+									}
 								}
 							}
 							else {
@@ -3727,7 +3732,12 @@ namespace OpenDental{
 									InternetSetCookie(cookieUrl,null,"JSESSIONIDSSO = "+Bridges.ECW.JSessionIdSSO);
 								}
 								if(!String.IsNullOrEmpty(Bridges.ECW.LBSessionId)) {
-									InternetSetCookie(cookieUrl,null,"LBSESSIONID = "+Bridges.ECW.LBSessionId);
+									if(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsLBSessionIdExcluded")=="0") {
+										InternetSetCookie(cookieUrl,null,"LBSESSIONID = "+Bridges.ECW.LBSessionId);
+									}
+									else {
+										InternetSetCookie(cookieUrl,null,Bridges.ECW.LBSessionId);
+									}
 								}
 							}
 							//navigate
