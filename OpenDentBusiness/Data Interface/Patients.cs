@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -521,7 +519,7 @@ namespace OpenDentBusiness{
 		///<summary>Gets the patient and provider balances for all patients in the family.  Used from the payment window to help visualize and automate the family splits. groupByProv means group by provider only not provider/clinic.</summary>
 		public static DataTable GetPaymentStartingBalances(long guarNum,long excludePayNum,bool groupByProv) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),guarNum,excludePayNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),guarNum,excludePayNum,groupByProv);
 			}
 			/*command=@"SELECT (SELECT EstBalance FROM patient WHERE PatNum="+POut.PInt(patNum)+" GROUP BY PatNum) EstBalance, "
 				+"IFNULL((SELECT SUM(ProcFee) FROM procedurelog WHERE PatNum="+POut.PInt(patNum)+" AND ProcStatus=2 GROUP BY PatNum),0)"//complete
@@ -1422,7 +1420,7 @@ namespace OpenDentBusiness{
 			ArrayList billingFilter,string code1,string code2) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),noIns);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),noIns,patsWithAppts,monthStart,dateSince,aboveAmount,providerFilter,billingFilter,code1,code2);
 			}
 			DataTable table=new DataTable();
 			DataRow row;
@@ -1672,8 +1670,7 @@ FROM insplan";
 		///<summary>To prevent orphaned patients, if patFrom is a guarantor then all family members of patFrom are moved into the family patTo belongs to, and then the merge of the two specified accounts is performed.  Returns false if the merge was canceled by the user.</summary>
 		public static bool MergeTwoPatients(long patTo,long patFrom,string atoZpath){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patTo,patFrom);
-				return true;
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patTo,patFrom,atoZpath);
 			}
 			if(patTo==patFrom) {
 				//Do not merge the same patient onto itself.
@@ -2025,6 +2022,7 @@ FROM insplan";
 		public static void ChangeProviders(long provNumFrom,long provNumTo) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),provNumFrom,provNumTo);
+				return;
 			}
 			string command= 
 				"UPDATE patient " 
@@ -2036,7 +2034,7 @@ FROM insplan";
 		/// <summary>Gets all patients whose primary provider PriProv is in the list provNums.</summary>
 		public static DataTable GetPatsByPriProvs(List<long> provNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),provNums);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),provNums);
 			}
 			if(provNums.Count==0) {
 				return null;
@@ -2087,6 +2085,7 @@ FROM insplan";
 		public static void ReassignProv(long patNum,long provNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,provNum);
+				return;
 			}
 			string command= 
 				"UPDATE patient " 
@@ -2190,6 +2189,7 @@ FROM insplan";
 		public static void AssignToSuperfamily(long guarantor,long superFamilyNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),guarantor,superFamilyNum);
+				return;
 			}
 			string command="UPDATE patient SET SuperFamily="+POut.Long(superFamilyNum)+" WHERE Guarantor="+POut.Long(guarantor);
 			Db.NonQ(command);
@@ -2198,6 +2198,7 @@ FROM insplan";
 		public static void MoveSuperFamily(long oldSuperFamilyNum,long newSuperFamilyNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),oldSuperFamilyNum,newSuperFamilyNum);
+				return;
 			}
 			if(oldSuperFamilyNum==0) {
 				return;
@@ -2231,7 +2232,7 @@ FROM insplan";
 		///<summary>Get a list of patients for FormEhrPatientExport. If provNum, clinicNum, or siteNum are =0 get all.</summary>
 		public static DataTable GetExportList(long patNum, string firstName,string lastName,long provNum,long clinicNum,long siteNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),firstName,lastName,provNum,clinicNum,siteNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum,firstName,lastName,provNum,clinicNum,siteNum);
 			}
 			string command = "SELECT patient.PatNum, patient.FName, patient.LName, provider.Abbr AS Provider, clinic.Description AS Clinic, site.Description AS Site "
 				+"FROM patient "
