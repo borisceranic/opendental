@@ -3896,6 +3896,30 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.1.3.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_1_8();
+		}
+
+		private static void To14_1_8() {
+			if(FromVersion<new Version("14.1.8.0")) {
+				string command;
+				//add programproperty to eClinicalWorks program link for changing the cookie creation for the LBSESSIONID
+				//This is a fix for their version 10 so that the medical panel will work correctly
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
+					int programNum=PIn.Int(Db.GetScalar(command));
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+							+") VALUES("
+							+"'"+POut.Long(programNum)+"', "
+							+"'IsLBSessionIdExcluded', "
+							+"'0')";//set to 0 (false) by default so behavior of existing customers will not change
+					Db.NonQ(command);
+				}
+				else {//oracle
+					//eCW will never use Oracle.
+				}
+				command="UPDATE preference SET ValueString = '14.1.8.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_2_0();
 		}
 
