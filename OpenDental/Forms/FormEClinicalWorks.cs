@@ -516,17 +516,16 @@ namespace OpenDental{
 			this.checkLBSessionId.Name = "checkLBSessionId";
 			this.checkLBSessionId.Size = new System.Drawing.Size(199, 18);
 			this.checkLBSessionId.TabIndex = 77;
-			this.checkLBSessionId.Text = "Using eCW Version 10";
+			this.checkLBSessionId.Text = "Exclude LBSESSIONID";
 			this.checkLBSessionId.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label12
 			// 
-			this.label12.Location = new System.Drawing.Point(228, 274);
+			this.label12.Location = new System.Drawing.Point(227, 278);
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(256, 27);
+			this.label12.Size = new System.Drawing.Size(256, 17);
 			this.label12.TabIndex = 78;
-			this.label12.Text = "Check this box if using eCW version 10 or greater and the medical panel is not wo" +
-    "rking.";
+			this.label12.Text = "Check this box if the medical panel is not working.";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// FormEClinicalWorks
