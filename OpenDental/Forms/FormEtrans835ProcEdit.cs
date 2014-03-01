@@ -21,7 +21,10 @@ namespace OpenDental {
 		private string _strInsPaid;
 		private List<string> _listProcedureAdjustments;
 		private List<string> _listRemarks;
-		private decimal _procAdjAmtSum;
+		private decimal _patientPortionSum;
+		private decimal _contractualObligationSum;
+		private decimal _payorInitiatedReductionSum;
+		private decimal _otherAdjustmentSum;
 
 		public FormEtrans835ProcEdit(X835 x835,int segSvcIndex,string strProcNum,string strProcCode,string strProcFee,string strInsPaid) {
 			InitializeComponent();
@@ -58,7 +61,7 @@ namespace OpenDental {
 			textProcCode.Text=_strProcCode;
 			textProcFee.Text=_strProcFee;
 			textInsPaid.Text=_strInsPaid;
-			textInsPaidCalc.Text=(PIn.Decimal(_strProcFee)-_procAdjAmtSum).ToString("f2");
+			textInsPaidCalc.Text=(PIn.Decimal(_strProcFee)-_patientPortionSum-_contractualObligationSum-_payorInitiatedReductionSum-_otherAdjustmentSum).ToString("f2");
 		}
 
 		private void FillProcedureAdjustments() {
@@ -78,18 +81,35 @@ namespace OpenDental {
 			gridProcedureAdjustments.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
 			gridProcedureAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureAdjustments.Rows.Clear();
-			_procAdjAmtSum=0;
-			for(int i=0;i<_listProcedureAdjustments.Count;i+=3) {
+			_patientPortionSum=0;
+			_contractualObligationSum=0;
+			_payorInitiatedReductionSum=0;
+			_otherAdjustmentSum=0;
+			for(int i=0;i<_listProcedureAdjustments.Count;i+=4) {
 				ODGridRow row=new ODGridRow();
 				row.Cells.Add(new ODGridCell(_listProcedureAdjustments[i]));//Description
 				row.Cells.Add(new ODGridCell(_listProcedureAdjustments[i+1]));//Reason
 				row.Cells.Add(new ODGridCell(_listProcedureAdjustments[i+2]));//AdjAmt
 				decimal adjAmount=PIn.Decimal(_listProcedureAdjustments[i+2]);
-				_procAdjAmtSum+=adjAmount;
+				if(_listProcedureAdjustments[i+3]=="PR") {//Patient Responsibility
+					_patientPortionSum+=adjAmount;
+				}
+				else if(_listProcedureAdjustments[i+3]=="CO") {//Contractual Obligations
+					_contractualObligationSum+=adjAmount;
+				}
+				else if(_listProcedureAdjustments[i+3]=="PI") {//Payor Initiated Reductions
+					_payorInitiatedReductionSum+=adjAmount;
+				}
+				else {//Other Adjustments
+					_otherAdjustmentSum+=adjAmount;
+				}
 				gridProcedureAdjustments.Rows.Add(row);
 			}
 			gridProcedureAdjustments.EndUpdate();
-			textProcAdjAmtSum.Text=_procAdjAmtSum.ToString("f2");
+			textPatientPortionSum.Text=_patientPortionSum.ToString("f2");
+			textContractualObligSum.Text=_contractualObligationSum.ToString("f2");
+			textPayorReductionSum.Text=_payorInitiatedReductionSum.ToString("f2");
+			textOtherAdjustmentSum.Text=_otherAdjustmentSum.ToString("f2");
 		}
 
 		private void FillRemarks() {

@@ -201,10 +201,10 @@ namespace OpenDental{
 			this.label18.Text = "-";
 			this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textClaimAdjustmentTotal
+			// textClaimAdjAmtSum
 			// 
 			this.textClaimAdjAmtSum.Location = new System.Drawing.Point(136, 37);
-			this.textClaimAdjAmtSum.Name = "textClaimAdjustmentTotal";
+			this.textClaimAdjAmtSum.Name = "textClaimAdjAmtSum";
 			this.textClaimAdjAmtSum.ReadOnly = true;
 			this.textClaimAdjAmtSum.Size = new System.Drawing.Size(110, 20);
 			this.textClaimAdjAmtSum.TabIndex = 202;
@@ -253,10 +253,10 @@ namespace OpenDental{
 			this.textInsPaidCalc.Size = new System.Drawing.Size(110, 20);
 			this.textInsPaidCalc.TabIndex = 208;
 			// 
-			// textProcAdjustmentTotal
+			// textProcAdjAmtSum
 			// 
 			this.textProcAdjAmtSum.Location = new System.Drawing.Point(265, 37);
-			this.textProcAdjAmtSum.Name = "textProcAdjustmentTotal";
+			this.textProcAdjAmtSum.Name = "textProcAdjAmtSum";
 			this.textProcAdjAmtSum.ReadOnly = true;
 			this.textProcAdjAmtSum.Size = new System.Drawing.Size(110, 20);
 			this.textProcAdjAmtSum.TabIndex = 209;
@@ -370,7 +370,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835ClaimEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Explanation of Benefits (EOB) for Claim";
+			this.Text = "Claim Explanation of Benefits (EOB)";
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimEdit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835ClaimEdit_Resize);
 			this.groupBalancing.ResumeLayout(false);

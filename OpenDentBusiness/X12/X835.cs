@@ -370,7 +370,7 @@ namespace OpenDentBusiness
 		///00 Claim Status Code Description (CLP02)
 		///01 Total Claim Charge Amount (CLP03)
 		///02 Claim Payment Amount (CLP04)
-		///03 Patient Responsibility Amount (CLP05)
+		///03 Patient Portion Amount (CLP05)
 		///04 Payer Claim Control Number (CLP07).</summary>
     public string[] GetClaimInfo(string claimTrackingNumber) {
       string[] result=new string[5];
@@ -386,14 +386,14 @@ namespace OpenDentBusiness
 				result[0]=GetClaimStatusDescriptionForCode(segCLP.Get(2));//CLP02 Claim Status Code Description
 				result[1]=PIn.Decimal(segCLP.Get(3)).ToString("f2");//CLP03 Total Claim Charge Amount
 				result[2]=PIn.Decimal(segCLP.Get(4)).ToString("f2");//CLP04 Claim Payment Amount
-				result[3]=PIn.Decimal(segCLP.Get(5)).ToString("f2");//CLP05 Patient Responsibility Amount
+				result[3]=PIn.Decimal(segCLP.Get(5)).ToString("f2");//CLP05 Patient Portion Amount
 				result[4]=segCLP.Get(7);//CLP07 Payer Claim Control Number
 				break;
       }
       return result;
     }
 
-		///<summary>Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		///<summary>Returns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
 		public List<string> GetClaimAdjustmentInfo(string claimTrackingNumber) {
 			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
 			for(int i=0;i<_listSegNumsCLP.Count;i++) {
@@ -617,7 +617,7 @@ namespace OpenDentBusiness
 			return listProcInfo;
 		}
 
-		///<summary>Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		///<summaryReturns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
 		public List<string> GetProcAdjustmentInfo(int segSvcIndex) {
 			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
 			int startSegNum=_listSegNumsSVC[segSvcIndex];
@@ -673,22 +673,23 @@ namespace OpenDentBusiness
 		#endregion Procedure Level
 		#region Helpers
 		///<summary>Converts a list of CAS segments into human readable data.  Helper function for both claim level and procedure level.
-		///Returns a list of strings with values in triplets, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount.</summary>
+		///Returns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
 		private List<string> ConvertCasAdjustmentsToHumanReadable(List<X12Segment> listCasSegments) {
 			List<string> listAdjustments=new List<string>();
 			for(int i=0;i<listCasSegments.Count;i++) {
 				X12Segment seg=listCasSegments[i];
+				string adjCode=seg.Get(1);
 				string adjDescript="";
-				if(seg.Get(1)=="CO") {
+				if(adjCode=="CO") {
 					adjDescript="Contractual Obligations";
 				}
-				else if(seg.Get(1)=="PI") {
+				else if(adjCode=="PI") {
 					adjDescript="Payor Initiated Reductions";
 				}
-				else if(seg.Get(1)=="PR") {
-					adjDescript="Patient Responsibility";
+				else if(adjCode=="PR") {//Patient Responsibility
+					adjDescript="Patient Portion";
 				}
-				else { //seg.Get(1)=="OA"
+				else { //adjCode=="OA"
 					adjDescript="Other Adjustments";
 				}
 				//Each CAS segment can contain up to 6 adjustments of the same type.
@@ -706,7 +707,7 @@ namespace OpenDentBusiness
 					if(strAdjReasonCode!="") {
 						strAdjReasonDescript=GetDescriptFrom139(strAdjReasonCode);
 					}
-					listAdjustments.Add(adjDescript); listAdjustments.Add(strAdjReasonDescript); listAdjustments.Add(amt.ToString("f2"));
+					listAdjustments.Add(adjDescript); listAdjustments.Add(strAdjReasonDescript); listAdjustments.Add(amt.ToString("f2")); listAdjustments.Add(adjCode);
 				}
 			}
 			return listAdjustments;
@@ -1759,7 +1760,7 @@ namespace OpenDentBusiness
 			else if(code=="MA10") { return "Alert: The patient's payment was in excess of the amount owed. You must refund the overpayment to the patient."; }
 			else if(code=="MA11") { return "Payment is being issued on a conditional basis. If no-fault insurance, liability insurance, Workers' Compensation, Department of Veterans Affairs, or a group health plan for employees and dependents also covers this claim, a refund may be due us. Please contact us if the patient is covered by any of these sources."; }
 			else if(code=="MA12") { return "You have not established that you have the right under the law to bill for services furnished by the person(s) that furnished this (these) service(s)."; }
-			else if(code=="MA13") { return "Alert: You may be subject to penalties if you bill the patient for amounts not reported with the PR (patient responsibility) group code."; }
+			else if(code=="MA13") { return "Alert: You may be subject to penalties if you bill the patient for amounts not reported with the PR (patient portion) group code."; }
 			else if(code=="MA14") { return "Alert: The patient is a member of an employer-sponsored prepaid health plan. Services from outside that health plan are not covered. However, as you were not previously notified of this, we are paying this time. In the future, we will not pay you for non-plan services."; }
 			else if(code=="MA15") { return "Alert: Your claim has been separated to expedite handling. You will receive a separate notice for the other services reported."; }
 			else if(code=="MA16") { return "The patient is covered by the Black Lung Program. Send this claim to the Department of Labor, Federal Black Lung Program, P.O. Box 828, Lanham-Seabrook MD 20703."; }
@@ -1805,7 +1806,7 @@ namespace OpenDentBusiness
 			else if(code=="MA56") { return "Our records show you have opted out of Medicare, agreeing with the patient not to bill Medicare for services/tests/supplies furnished. As result, we cannot pay this claim. The patient is responsible for payment, but under Federal law, you cannot charge the patient more than the limiting charge amount."; }
 			else if(code=="MA57") { return "Patient submitted written request to revoke his/her election for religious non-medical health care services."; }
 			else if(code=="MA58") { return "Missing/incomplete/invalid release of information indicator."; }
-			else if(code=="MA59") { return "Alert: The patient overpaid you for these services. You must issue the patient a refund within 30 days for the difference between his/her payment and the total amount shown as patient responsibility on this notice."; }
+			else if(code=="MA59") { return "Alert: The patient overpaid you for these services. You must issue the patient a refund within 30 days for the difference between his/her payment and the total amount shown as patient portion on this notice."; }
 			else if(code=="MA60") { return "Missing/incomplete/invalid patient relationship to insured."; }
 			else if(code=="MA61") { return "Missing/incomplete/invalid social security number or health insurance claim number."; }
 			else if(code=="MA62") { return "Alert: This is a telephone review decision."; }
@@ -1818,12 +1819,12 @@ namespace OpenDentBusiness
 			else if(code=="MA69") { return "Missing/incomplete/invalid remarks."; }
 			else if(code=="MA70") { return "Missing/incomplete/invalid provider representative signature."; }
 			else if(code=="MA71") { return "Missing/incomplete/invalid provider representative signature date."; }
-			else if(code=="MA72") { return "Alert: The patient overpaid you for these assigned services. You must issue the patient a refund within 30 days for the difference between his/her payment to you and the total of the amount shown as patient responsibility and as paid to the patient on this notice."; }
+			else if(code=="MA72") { return "Alert: The patient overpaid you for these assigned services. You must issue the patient a refund within 30 days for the difference between his/her payment to you and the total of the amount shown as patient portion and as paid to the patient on this notice."; }
 			else if(code=="MA73") { return "Informational remittance associated with a Medicare demonstration. No payment issued under fee-for-service Medicare as patient has elected managed care."; }
 			else if(code=="MA74") { return "This payment replaces an earlier payment for this claim that was either lost, damaged or returned."; }
 			else if(code=="MA75") { return "Missing/incomplete/invalid patient or authorized representative signature."; }
 			else if(code=="MA76") { return "Missing/incomplete/invalid provider identifier for home health agency or hospice when physician is performing care plan oversight services."; }
-			else if(code=="MA77") { return "Alert: The patient overpaid you. You must issue the patient a refund within 30 days for the difference between the patient’s payment less the total of our and other payer payments and the amount shown as patient responsibility on this notice."; }
+			else if(code=="MA77") { return "Alert: The patient overpaid you. You must issue the patient a refund within 30 days for the difference between the patient’s payment less the total of our and other payer payments and the amount shown as patient portion on this notice."; }
 			else if(code=="MA78") { return "The patient overpaid you. You must issue the patient a refund within 30 days for the difference between our allowed amount total and the amount paid by the patient."; }
 			else if(code=="MA79") { return "Billed in excess of interim rate."; }
 			else if(code=="MA80") { return "Informational notice. No payment issued for this claim with this notice. Payment issued to the hospital by its intermediary for all services for this encounter under a demonstration project."; }
@@ -2015,7 +2016,7 @@ namespace OpenDentBusiness
 			else if(code=="N132") { return "Alert: Payments will cease for services rendered by this US Government debarred or excluded provider after the 30 day grace period as previously notified."; }
 			else if(code=="N133") { return "Alert: Services for predetermination and services requesting payment are being processed separately."; }
 			else if(code=="N134") { return "Alert: This represents your scheduled payment for this service. If treatment has been discontinued, please contact Customer Service."; }
-			else if(code=="N135") { return "Record fees are the patient's responsibility and limited to the specified co-payment."; }
+			else if(code=="N135") { return "Record fees are the patient's portion and limited to the specified co-payment."; }
 			else if(code=="N136") { return "Alert: To obtain information on the process to file an appeal in Arizona, call the Department's Consumer Assistance Office at (602) 912-8444 or (800) 325-2548."; }
 			else if(code=="N137") { return "Alert: The provider acting on the Member's behalf, may file an appeal with the Payer. The provider, acting on the Member's behalf, may file a complaint with the State Insurance Regulatory Authority without first filing an appeal, if the coverage decision involves an urgent condition for which care has not been rendered. The address may be obtained from the State Insurance Regulatory Authority."; }
 			else if(code=="N138") { return "Alert: In the event you disagree with the Dental Advisor's opinion and have additional information relative to the case, you may submit radiographs to the Dental Advisor Unit at the subscriber's dental insurance carrier for a second Independent Dental Advisor Review."; }
@@ -2416,7 +2417,7 @@ namespace OpenDentBusiness
 			else if(code=="N533") { return "Services performed in an Indian Health Services facility under a self-insured tribal Group Health Plan."; }
 			else if(code=="N534") { return "This is an individual policy, the employer does not participate in plan sponsorship."; }
 			else if(code=="N535") { return "Payment is adjusted when procedure is performed in this place of service based on the submitted procedure code and place of service."; }
-			else if(code=="N536") { return "We are not changing the prior payer's determination of patient responsibility, which you may collect, as this service is not covered by us."; }
+			else if(code=="N536") { return "We are not changing the prior payer's determination of patient portion, which you may collect, as this service is not covered by us."; }
 			else if(code=="N537") { return "We have examined claims history and no records of the services have been found."; }
 			else if(code=="N538") { return "A facility is responsible for payment to outside providers who furnish these services/supplies/drugs to its patients/residents."; }
 			else if(code=="N539") { return "Alert: We processed appeals/waiver requests on your behalf and that request has been denied."; }
@@ -2575,7 +2576,7 @@ namespace OpenDentBusiness
 			else if(code=="N692") { return "Alert: This reversal is due to an incorrect rate on the initial adjudication. (Note: To be used with claim/service reversal)"; }
 			else if(code=="N693") { return "Alert: This reversal is due to a cancelation of the claim by the provider."; }
 			else if(code=="N694") { return "Alert: This reversal is due to a resubmission/change to the claim by the provider."; }
-			else if(code=="N695") { return "Alert: This reversal is due to incorrect patient financial responsibility information on the initial adjudication."; }
+			else if(code=="N695") { return "Alert: This reversal is due to incorrect patient financial portion information on the initial adjudication."; }
 			else if(code=="N696") { return "Alert: This reversal is due to a Coordination of Benefits or Third Party Liability Recovery retroactive adjustment. (Note: To be used with claim/service reversal)"; }
 			else if(code=="N697") { return "Alert: This reversal is due to a payer's retroactive contract incentive program adjustment. (Note: To be used with claim/service reversal)"; }
 			else if(code=="N698") { return "Alert: This reversal is due to non-payment of the Health Insurance Exchange premiums by the end of the premium payment grace period, resulting in loss of coverage. (Note: To be used with claim/service reversal)"; }

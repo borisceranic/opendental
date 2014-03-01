@@ -97,7 +97,7 @@ namespace OpenDental {
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridClaimAdjustments.Rows.Clear();
 			_claimAdjAmtSum=0;
-			for(int i=0;i<_listClaimAdjustments.Count;i+=3) {
+			for(int i=0;i<_listClaimAdjustments.Count;i+=4) {
 				ODGridRow row=new ODGridRow();
 				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i]));//Description
 				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i+1]));//Reason
@@ -124,13 +124,16 @@ namespace OpenDental {
 			const int colWidthProcFee=80;
 			const int colWidthAdjAmt=80;
 			const int colWidthInsPaid=80;
-			int colWidthVariable=gridProcedureBreakdown.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-colWidthAdjAmt-colWidthInsPaid;
+			int colWidthVariable=gridProcedureBreakdown.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-4*colWidthAdjAmt-colWidthInsPaid;
 			gridProcedureBreakdown.Columns.Clear();
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
-			gridProcedureBreakdown.Columns.Add(new ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PatPortion",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ContractOblig",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PayorReduct",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("OtherAdjust",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Rows.Clear();
 			_procAdjAmtSum=0;
@@ -149,12 +152,31 @@ namespace OpenDental {
 				int segSvcIndex=PIn.Int(_listProcInfo[i]);
 				List<string> listProcAdjustments=_x835.GetProcAdjustmentInfo(segSvcIndex);
 				decimal adjAmtForProc=0;
-				for(int j=0;j<listProcAdjustments.Count;j+=3) {
+				decimal patPortionForProc=0;
+				decimal contractObligForProc=0;
+				decimal payorInitReductForProc=0;
+				decimal otherAdjustForProc=0;
+				for(int j=0;j<listProcAdjustments.Count;j+=4) {
 					decimal adjAmt=PIn.Decimal(listProcAdjustments[j+2]);
+					if(listProcAdjustments[j+3]=="PR") {//Patient Responsibility
+						patPortionForProc+=adjAmt;
+					}
+					else if(listProcAdjustments[j+3]=="CO") {//Contractual Obligations
+						contractObligForProc+=adjAmt;
+					}
+					else if(listProcAdjustments[j+3]=="PI") {//Payor Initiated Reductions
+						payorInitReductForProc+=adjAmt;
+					}
+					else {//Other Adjustments
+						otherAdjustForProc+=adjAmt;
+					}
 					adjAmtForProc+=adjAmt;
 					_procAdjAmtSum+=adjAmt;
 				}
-				row.Cells.Add(new ODGridCell(adjAmtForProc.ToString("f2")));//AdjAmt
+				row.Cells.Add(new ODGridCell(patPortionForProc.ToString("f2")));//PatPortion
+				row.Cells.Add(new ODGridCell(contractObligForProc.ToString("f2")));//ContractOblig
+				row.Cells.Add(new ODGridCell(payorInitReductForProc.ToString("f2")));//PayorReduct
+				row.Cells.Add(new ODGridCell(otherAdjustForProc.ToString("f2")));//OtherAdjust
 				row.Cells.Add(new ODGridCell(_listProcInfo[i+3]));//InsPaid
 				row.Tag=i;
 				gridProcedureBreakdown.Rows.Add(row);
