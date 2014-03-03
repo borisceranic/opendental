@@ -48,6 +48,9 @@ namespace OpenDental {
 				for(int j=0;j<medicationPats.Count;j++) {
 					bool isMedInteraction=false;
 					Medication medForAlert=Medications.GetMedication(alertList[i].MedicationNum);
+					if(medForAlert==null) {
+						continue;//MedicationNum will be 0 for all other alerts that are not medication alerts.
+					}
 					if(medicationPats[j].MedicationNum!=0 && alertList[i].MedicationNum==medicationPats[j].MedicationNum) {//Medication from medication list.
 						isMedInteraction=true;
 					}
