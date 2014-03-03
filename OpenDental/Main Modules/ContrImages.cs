@@ -1874,6 +1874,7 @@ namespace OpenDental {
 				}
 			}
 			OpenFileDialog openFileDialog=new OpenFileDialog();
+			openFileDialog.Multiselect=true;
 			if(EhrAmendmentCur!=null) {
 				openFileDialog.Multiselect=false;//this image module control is reused in formEHR for amendments. If so, EhrAmendmentCur!=null and we should only allow single select.
 			}
