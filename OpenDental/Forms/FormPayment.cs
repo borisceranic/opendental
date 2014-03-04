@@ -1912,23 +1912,25 @@ namespace OpenDental {
 					SplitList.Add(split);
 				}
 			}
-			else if(SplitList.Count==1//if one split
-				&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
-			{
-				SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match
-			}
-			else if(SplitList.Count==1//if one split
-				&& PaymentCur.PayDate != SplitList[0].ProcDate
-				&& SplitList[0].ProcNum==0)//not attached to procedure
-			{
-				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
-					SplitList[0].ProcDate=PaymentCur.PayDate;
+			else {
+				if(SplitList.Count==1//if one split
+					&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
+				{
+					SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match
 				}
-			}
-			else if(PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
-				MsgBox.Show(this,"Split totals must equal payment amount.");
-				//work on reallocation schemes here later
-				return;
+				if(SplitList.Count==1//if one split
+					&& PaymentCur.PayDate != SplitList[0].ProcDate
+					&& SplitList[0].ProcNum==0)//not attached to procedure
+				{
+					if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
+						SplitList[0].ProcDate=PaymentCur.PayDate;
+					}
+				}
+				if(SplitList.Count!=1 && PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
+					MsgBox.Show(this,"Split totals must equal payment amount.");
+					//work on reallocation schemes here later
+					return;
+				}
 			}
 			if(SplitList.Count>1) {
 				PaymentCur.IsSplit=true;
