@@ -137,5 +137,31 @@ namespace OpenDentBusiness
 			}
 		}
 
+		///<summary>Returns a non-empty string if there would be a display issue due to invalid settings.
+		///Use the result to block the display from the user when needed.</summary>
+		public static string ValidateSettings() {
+			string validationErrors="";
+			Array arrayEbenetitCats=Enum.GetValues(typeof(EbenefitCategory));
+			for(int i=0;i<arrayEbenetitCats.Length;i++) {
+				EbenefitCategory ebenCat=(EbenefitCategory)arrayEbenetitCats.GetValue(i);
+				if(ebenCat==EbenefitCategory.None) {
+					continue;
+				}
+				CovCat covCat=CovCats.GetForEbenCat(ebenCat);
+				if(covCat==null) {
+					if(validationErrors!="") {
+						validationErrors+=", ";
+					}
+					validationErrors+=ebenCat.ToString();
+				}
+			}
+			if(validationErrors!="") {
+				validationErrors="Missing or hidden insurance category for each of the following E-benefits:"+"\r\n"
+					+validationErrors+"\r\n"
+					+"Go to Setup then Insurance Categories to add or edit.";
+			}
+			return validationErrors;
+		}
+
 	}
 }
