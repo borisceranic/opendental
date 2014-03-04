@@ -57,6 +57,11 @@ namespace OpenDental {
 				formETE.ShowDialog();
 			}
 			else {
+				string settingErrors271=X271.ValidateSettings();
+				if(settingErrors271!="") {
+					MessageBox.Show(settingErrors271);
+					return;
+				}
 				FormEtrans270Edit formE=new FormEtrans270Edit(PatPlanNum,PlanNum,SubNum);
 				formE.EtransCur=etrans;
 				formE.benList=BenList;

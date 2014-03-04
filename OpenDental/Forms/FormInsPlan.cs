@@ -3460,6 +3460,13 @@ namespace OpenDental{
 				EligibilityCheckCanada();
 				return;
 			}
+			//Validate the 271 settings before sending the request, otherwise the request might take 10-20 seconds to run, then the user might be blocked after waiting.
+			//It is nicer to the user to not make them wait when they can fix the settings beforehand.
+			string settingErrors271=X271.ValidateSettings();
+			if(settingErrors271!="") {
+				MessageBox.Show(settingErrors271);
+				return;
+			}
 			if(!FillPlanCurFromForm()) {
 				return;
 			}

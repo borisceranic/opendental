@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEtrans270Edit));
 			this.labelNote = new System.Windows.Forms.Label();
 			this.textNote = new System.Windows.Forms.TextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -50,81 +51,81 @@ namespace OpenDental{
 			// 
 			// labelNote
 			// 
-			this.labelNote.Location = new System.Drawing.Point(6,576);
+			this.labelNote.Location = new System.Drawing.Point(6, 576);
 			this.labelNote.Name = "labelNote";
-			this.labelNote.Size = new System.Drawing.Size(100,17);
+			this.labelNote.Size = new System.Drawing.Size(100, 17);
 			this.labelNote.TabIndex = 15;
 			this.labelNote.Text = "Note";
 			this.labelNote.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textNote
 			// 
-			this.textNote.Location = new System.Drawing.Point(9,596);
+			this.textNote.Location = new System.Drawing.Point(9, 596);
 			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
-			this.textNote.Size = new System.Drawing.Size(355,40);
+			this.textNote.Size = new System.Drawing.Size(355, 40);
 			this.textNote.TabIndex = 14;
 			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.butShowResponse);
 			this.groupBox2.Controls.Add(this.butShowRequest);
-			this.groupBox2.Location = new System.Drawing.Point(705,12);
+			this.groupBox2.Location = new System.Drawing.Point(705, 12);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(168,49);
+			this.groupBox2.Size = new System.Drawing.Size(168, 49);
 			this.groupBox2.TabIndex = 116;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Show Raw Message of...";
 			// 
 			// butShowResponse
 			// 
-			this.butShowResponse.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butShowResponse.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butShowResponse.Autosize = true;
 			this.butShowResponse.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butShowResponse.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butShowResponse.CornerRadius = 4F;
-			this.butShowResponse.Location = new System.Drawing.Point(87,19);
+			this.butShowResponse.Location = new System.Drawing.Point(87, 19);
 			this.butShowResponse.Name = "butShowResponse";
-			this.butShowResponse.Size = new System.Drawing.Size(75,24);
+			this.butShowResponse.Size = new System.Drawing.Size(75, 24);
 			this.butShowResponse.TabIndex = 116;
 			this.butShowResponse.Text = "Response";
 			this.butShowResponse.Click += new System.EventHandler(this.butShowResponse_Click);
 			// 
 			// butShowRequest
 			// 
-			this.butShowRequest.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butShowRequest.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butShowRequest.Autosize = true;
 			this.butShowRequest.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butShowRequest.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butShowRequest.CornerRadius = 4F;
-			this.butShowRequest.Location = new System.Drawing.Point(6,19);
+			this.butShowRequest.Location = new System.Drawing.Point(6, 19);
 			this.butShowRequest.Name = "butShowRequest";
-			this.butShowRequest.Size = new System.Drawing.Size(75,24);
+			this.butShowRequest.Size = new System.Drawing.Size(75, 24);
 			this.butShowRequest.TabIndex = 115;
 			this.butShowRequest.Text = "Request";
 			this.butShowRequest.Click += new System.EventHandler(this.butShowRequest_Click);
 			// 
 			// labelImport
 			// 
-			this.labelImport.Location = new System.Drawing.Point(295,421);
+			this.labelImport.Location = new System.Drawing.Point(295, 421);
 			this.labelImport.Name = "labelImport";
-			this.labelImport.Size = new System.Drawing.Size(133,17);
+			this.labelImport.Size = new System.Drawing.Size(133, 17);
 			this.labelImport.TabIndex = 120;
 			this.labelImport.Text = "Selected Benefits";
 			this.labelImport.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// butImport
 			// 
-			this.butImport.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butImport.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butImport.Autosize = true;
 			this.butImport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butImport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butImport.CornerRadius = 4F;
 			this.butImport.Image = global::OpenDental.Properties.Resources.down;
 			this.butImport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butImport.Location = new System.Drawing.Point(347,394);
+			this.butImport.Location = new System.Drawing.Point(347, 394);
 			this.butImport.Name = "butImport";
-			this.butImport.Size = new System.Drawing.Size(81,24);
+			this.butImport.Size = new System.Drawing.Size(81, 24);
 			this.butImport.TabIndex = 119;
 			this.butImport.Text = "Import";
 			this.butImport.Click += new System.EventHandler(this.butImport_Click);
@@ -132,10 +133,10 @@ namespace OpenDental{
 			// gridBen
 			// 
 			this.gridBen.HScrollVisible = false;
-			this.gridBen.Location = new System.Drawing.Point(432,394);
+			this.gridBen.Location = new System.Drawing.Point(432, 394);
 			this.gridBen.Name = "gridBen";
 			this.gridBen.ScrollValue = 0;
-			this.gridBen.Size = new System.Drawing.Size(441,242);
+			this.gridBen.Size = new System.Drawing.Size(441, 242);
 			this.gridBen.TabIndex = 118;
 			this.gridBen.Title = "Current Benefits";
 			this.gridBen.TranslationName = "FormEtrans270Edit";
@@ -144,10 +145,10 @@ namespace OpenDental{
 			// gridDates
 			// 
 			this.gridDates.HScrollVisible = false;
-			this.gridDates.Location = new System.Drawing.Point(9,12);
+			this.gridDates.Location = new System.Drawing.Point(9, 12);
 			this.gridDates.Name = "gridDates";
 			this.gridDates.ScrollValue = 0;
-			this.gridDates.Size = new System.Drawing.Size(407,119);
+			this.gridDates.Size = new System.Drawing.Size(407, 119);
 			this.gridDates.TabIndex = 117;
 			this.gridDates.Title = "Dates";
 			this.gridDates.TranslationName = "FormEtrans270Edit";
@@ -155,11 +156,11 @@ namespace OpenDental{
 			// gridMain
 			// 
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(9,137);
+			this.gridMain.Location = new System.Drawing.Point(9, 137);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(864,254);
+			this.gridMain.Size = new System.Drawing.Size(864, 254);
 			this.gridMain.TabIndex = 114;
 			this.gridMain.Title = "Response Benefit Information";
 			this.gridMain.TranslationName = "FormEtrans270Edit";
@@ -167,7 +168,7 @@ namespace OpenDental{
 			// 
 			// butDelete
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -175,39 +176,39 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(9,641);
+			this.butDelete.Location = new System.Drawing.Point(9, 641);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(81,24);
+			this.butDelete.Size = new System.Drawing.Size(81, 24);
 			this.butDelete.TabIndex = 113;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(717,641);
+			this.butOK.Location = new System.Drawing.Point(717, 641);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(798,641);
+			this.butCancel.Location = new System.Drawing.Point(798, 641);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
@@ -216,9 +217,9 @@ namespace OpenDental{
 			// 
 			this.groupImport.Controls.Add(this.radioInNetwork);
 			this.groupImport.Controls.Add(this.radioOutNetwork);
-			this.groupImport.Location = new System.Drawing.Point(470,73);
+			this.groupImport.Location = new System.Drawing.Point(470, 73);
 			this.groupImport.Name = "groupImport";
-			this.groupImport.Size = new System.Drawing.Size(167,58);
+			this.groupImport.Size = new System.Drawing.Size(167, 58);
 			this.groupImport.TabIndex = 124;
 			this.groupImport.TabStop = false;
 			this.groupImport.Text = "Mark for import if";
@@ -226,9 +227,9 @@ namespace OpenDental{
 			// radioInNetwork
 			// 
 			this.radioInNetwork.Checked = true;
-			this.radioInNetwork.Location = new System.Drawing.Point(12,16);
+			this.radioInNetwork.Location = new System.Drawing.Point(12, 16);
 			this.radioInNetwork.Name = "radioInNetwork";
-			this.radioInNetwork.Size = new System.Drawing.Size(121,18);
+			this.radioInNetwork.Size = new System.Drawing.Size(121, 18);
 			this.radioInNetwork.TabIndex = 121;
 			this.radioInNetwork.TabStop = true;
 			this.radioInNetwork.Text = "In network";
@@ -237,9 +238,9 @@ namespace OpenDental{
 			// 
 			// radioOutNetwork
 			// 
-			this.radioOutNetwork.Location = new System.Drawing.Point(12,35);
+			this.radioOutNetwork.Location = new System.Drawing.Point(12, 35);
 			this.radioOutNetwork.Name = "radioOutNetwork";
-			this.radioOutNetwork.Size = new System.Drawing.Size(121,18);
+			this.radioOutNetwork.Size = new System.Drawing.Size(121, 18);
 			this.radioOutNetwork.TabIndex = 122;
 			this.radioOutNetwork.Text = "Out of network";
 			this.radioOutNetwork.UseVisualStyleBackColor = true;
@@ -249,9 +250,9 @@ namespace OpenDental{
 			// 
 			this.groupBox3.Controls.Add(this.radioModeElect);
 			this.groupBox3.Controls.Add(this.radioModeMessage);
-			this.groupBox3.Location = new System.Drawing.Point(470,12);
+			this.groupBox3.Location = new System.Drawing.Point(470, 12);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(167,58);
+			this.groupBox3.Size = new System.Drawing.Size(167, 58);
 			this.groupBox3.TabIndex = 126;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Viewing Mode";
@@ -259,9 +260,9 @@ namespace OpenDental{
 			// radioModeElect
 			// 
 			this.radioModeElect.Checked = true;
-			this.radioModeElect.Location = new System.Drawing.Point(12,16);
+			this.radioModeElect.Location = new System.Drawing.Point(12, 16);
 			this.radioModeElect.Name = "radioModeElect";
-			this.radioModeElect.Size = new System.Drawing.Size(121,18);
+			this.radioModeElect.Size = new System.Drawing.Size(121, 18);
 			this.radioModeElect.TabIndex = 121;
 			this.radioModeElect.TabStop = true;
 			this.radioModeElect.Text = "Electronic Import";
@@ -270,9 +271,9 @@ namespace OpenDental{
 			// 
 			// radioModeMessage
 			// 
-			this.radioModeMessage.Location = new System.Drawing.Point(12,35);
+			this.radioModeMessage.Location = new System.Drawing.Point(12, 35);
 			this.radioModeMessage.Name = "radioModeMessage";
-			this.radioModeMessage.Size = new System.Drawing.Size(121,18);
+			this.radioModeMessage.Size = new System.Drawing.Size(121, 18);
 			this.radioModeMessage.TabIndex = 122;
 			this.radioModeMessage.Text = "Message Text";
 			this.radioModeMessage.UseVisualStyleBackColor = true;
@@ -280,14 +281,14 @@ namespace OpenDental{
 			// 
 			// butPrint
 			// 
-			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butPrint.Autosize = true;
 			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPrint.CornerRadius = 4F;
-			this.butPrint.Location = new System.Drawing.Point(644,106);
+			this.butPrint.Location = new System.Drawing.Point(644, 106);
 			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(75,24);
+			this.butPrint.Size = new System.Drawing.Size(75, 24);
 			this.butPrint.TabIndex = 127;
 			this.butPrint.Text = "Print";
 			this.butPrint.Visible = false;
@@ -296,7 +297,7 @@ namespace OpenDental{
 			// FormEtrans270Edit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(882,674);
+			this.ClientSize = new System.Drawing.Size(882, 674);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupImport);
@@ -311,6 +312,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEtrans270Edit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Electronic Benefit Request";
