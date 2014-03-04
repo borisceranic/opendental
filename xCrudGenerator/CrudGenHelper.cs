@@ -138,6 +138,18 @@ namespace xCrudGenerator {
 			return retVal;
 		}
 
+		///<summary>For Mobile, this only excludes PK2; result includes PK1, the CustomerNum.  Includes IsNotDbColumn.</summary>
+		public static List<FieldInfo> GetAllFieldsExceptPriKey(FieldInfo[] fields,FieldInfo priKey) {
+			List<FieldInfo> retVal=new List<FieldInfo>();
+			for(int i=0;i<fields.Length;i++) {
+				if(fields[i].Name==priKey.Name) {
+					continue;
+				}
+				retVal.Add(fields[i]);
+			}
+			return retVal;
+		}
+
 		///<summary>This only excludes fields that are not in the database, like patient.Age.</summary>
 		public static List<FieldInfo> GetFieldsExceptNotDb(FieldInfo[] fields) {
 			List<FieldInfo> retVal=new List<FieldInfo>();

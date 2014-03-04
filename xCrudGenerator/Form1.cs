@@ -807,6 +807,156 @@ using System.Drawing;"+rn);
 				}
 			}
 			#endregion ConvertToM
+			//IsEqual is currently unfinished, but is here so that we can enhance it to truly compare two objects. 
+			//This will check all DB columns and all Non-DB columns for equality and return a boolean. 
+			//The problem with implementing this at this time (3/4/2014) is that lists are created with a name that does not conform to the rest of our naming of variables in the CRUD.
+			#region IsEqual
+			//IsEqual-------------------------------------------------------------------------------
+			//if(!isMobile) {
+			//	if(typeClass.Name=="RxPat" || typeClass.Name=="Appointment" || typeClass.Name=="Claim" || typeClass.Name=="LetterMerge") {
+			//		List<FieldInfo> allFields=CrudGenHelper.GetAllFieldsExceptPriKey(fields,priKey);
+			//		strb.Append(rn+rn+t2+"///<summary>Checks two "+typeClass.Name+" objects for equality. Return true if equal and false if any variables are different. This includes special columns not included in the DB.</summary>");
+			//		strb.Append(rn+t2+"public static bool IsEqual("+typeClass.Name+" "+obj+","+typeClass.Name+" "+oldObj+"){");
+			//		for(int f=0;f<allFields.Count;f++) {
+			//			if(CrudGenHelper.IsNotDbColumn(allFields[f])) {
+			//				switch(allFields[f].FieldType.Name) {
+			//					case "int":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "List<int>":
+			//						strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//						strb.Append(rn+t4+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t5+"return false;");
+			//						strb.Append(rn+t4+"}");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "string":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "List<string>":
+			//						strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//						strb.Append(rn+t4+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t5+"return false;");
+			//						strb.Append(rn+t4+"}");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "long":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "List<long>":
+			//						strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//						strb.Append(rn+t4+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t5+"return false;");
+			//						strb.Append(rn+t4+"}");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "Color":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+".ToArgb() != "+oldObj+"."+allFields[f].Name+".ToArgb()) {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "DateTime"://This is only for date, not dateT.
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "double":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "List<double>":
+			//						strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//						strb.Append(rn+t4+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t5+"return false;");
+			//						strb.Append(rn+t4+"}");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "Interval":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "bool":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					case "TimeSpan":
+			//						strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+".Ticks != "+oldObj+"."+allFields[f].Name+".Ticks) {");
+			//						strb.Append(rn+t4+"return false;");
+			//						strb.Append(rn+t3+"}");
+			//						break;
+			//					default:
+			//						//TODO: Add a sub-section for s-classes ending in H to have an ES added to them
+			//						if(allFields[f].FieldType.Name.StartsWith("List<")) {
+			//							strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//							string objName=allFields[f].FieldType.Name.Substring(5);
+			//							objName=objName.Remove(objName.Length-1);
+			//							string obj2=objName.Substring(0,1).ToLower()+objName.Substring(1);//lowercase initial letter.  Example feeSched
+			//							string oldObj2="old"+objName;//Example oldFeeSched
+			//							if(allFields[f].FieldType.Name.EndsWith("y")) {
+			//								strb.Append(rn+t4+"if(!"+objName.Remove(objName.Length-1)+"ies.IsEqual("+objName+" "+obj2+","+objName+" "+oldObj2+") {");
+			//								strb.Append(rn+t5+"return false;");
+			//								strb.Append(rn+t4+"}");
+			//							}
+			//							else {
+			//								strb.Append(rn+t4+"if(!"+objName+"s.IsEqual("+objName+" "+obj2+","+objName+" "+oldObj2+") {");
+			//								strb.Append(rn+t5+"return false;");
+			//								strb.Append(rn+t4+"}");
+			//							}
+			//							strb.Append(rn+t3+"}");
+			//						}
+			//						else if(allFields[f].FieldType.Name.EndsWith("[]")) {
+			//							strb.Append(rn+t3+"for(int i=0;i<"+obj+"."+allFields[f].Name+".Count;i++) {");
+			//							string objName=allFields[f].FieldType.Name.Remove(allFields[f].FieldType.Name.Length-2);
+			//							string obj2=objName.Substring(0,1).ToLower()+objName.Substring(1);//lowercase initial letter.  Example feeSched
+			//							string oldObj2="old"+objName;//Example oldFeeSched
+			//							if(allFields[f].FieldType.Name.EndsWith("y")) {
+			//								strb.Append(rn+t4+"if(!"+objName.Remove(objName.Length-1)+"ies.IsEqual("+objName+" "+obj2+","+objName+" "+oldObj2+") {");
+			//								strb.Append(rn+t5+"return false;");
+			//								strb.Append(rn+t4+"}");
+			//							}
+			//							else {
+			//								strb.Append(rn+t4+"if(!"+objName+"s.IsEqual("+objName+" "+obj2+","+objName+" "+oldObj2+") {");
+			//								strb.Append(rn+t5+"return false;");
+			//								strb.Append(rn+t4+"}");
+			//							}
+			//							strb.Append(rn+t3+"}");
+			//						}
+			//						else {
+			//							string obj2=allFields[f].FieldType.Name.Substring(0,1).ToLower()+typeClass.Name.Substring(1);//lowercase initial letter.  Example feeSched
+			//							string oldObj2="old"+allFields[f].FieldType.Name;//Example oldFeeSched
+			//							if(allFields[f].FieldType.Name.EndsWith("y")) {
+			//								strb.Append(rn+t3+"if(!"+allFields[f].FieldType.Name.Remove(allFields[f].FieldType.Name.Length-1)+"ies.IsEqual("+allFields[f].FieldType.Name+" "+obj2+","+allFields[f].FieldType.Name+oldObj2+") {");
+			//								strb.Append(rn+t4+"return false;");
+			//								strb.Append(rn+t3+"}");
+			//							}
+			//							else {
+			//								strb.Append(rn+t3+"if(!"+allFields[f].FieldType.Name+"s.IsEqual("+allFields[f].FieldType.Name+" "+obj2+","+allFields[f].FieldType.Name+oldObj2+") {");
+			//								strb.Append(rn+t4+"return false;");
+			//								strb.Append(rn+t3+"}");
+			//							}
+			//						}
+			//						break;
+			//				}
+			//			}
+			//			//TODO: Check all special crud column types and hanlde their equals in their own way
+			//			strb.Append(rn+t3+"if("+obj+"."+allFields[f].Name+" != "+oldObj+"."+allFields[f].Name+") {");
+			//			strb.Append(rn+t4+"return false;");
+			//			strb.Append(rn+t3+"}");
+			//		}
+			//		strb.Append(rn+t3+"return true;");
+			//		strb.Append(rn+t2+"}");
+			//	}
+			//}
+			#endregion IsEqual
 			//Footer
 			strb.Append(rn);
 			strb.Append(@"
