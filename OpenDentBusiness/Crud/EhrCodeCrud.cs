@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrCode ehrCode,EhrCode oldEhrCode){
+		///<summary>Updates one EhrCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrCode ehrCode,EhrCode oldEhrCode){
 			string command="";
 			if(ehrCode.MeasureIds != oldEhrCode.MeasureIds) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsInDb = "+POut.Bool(ehrCode.IsInDb)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrcode SET "+command
 				+" WHERE EhrCodeNum = "+POut.Long(ehrCode.EhrCodeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrCode from the database.</summary>

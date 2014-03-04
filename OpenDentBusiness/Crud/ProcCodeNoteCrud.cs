@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ProcCodeNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProcCodeNote procCodeNote,ProcCodeNote oldProcCodeNote){
+		///<summary>Updates one ProcCodeNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProcCodeNote procCodeNote,ProcCodeNote oldProcCodeNote){
 			string command="";
 			if(procCodeNote.CodeNum != oldProcCodeNote.CodeNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ProcTime = '"+POut.String(procCodeNote.ProcTime)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE proccodenote SET "+command
 				+" WHERE ProcCodeNoteNum = "+POut.Long(procCodeNote.ProcCodeNoteNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ProcCodeNote from the database.</summary>

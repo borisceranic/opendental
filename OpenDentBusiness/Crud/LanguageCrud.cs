@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Language in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Language language,Language oldLanguage){
+		///<summary>Updates one Language in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Language language,Language oldLanguage){
 			string command="";
 			if(language.EnglishComments != oldLanguage.EnglishComments) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsObsolete = "+POut.Bool(language.IsObsolete)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE language SET "+command
 				+" WHERE LanguageNum = "+POut.Long(language.LanguageNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Language from the database.</summary>

@@ -165,8 +165,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Phone in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Phone phone,Phone oldPhone){
+		///<summary>Updates one Phone in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Phone phone,Phone oldPhone){
 			string command="";
 			if(phone.Extension != oldPhone.Extension) {
 				if(command!=""){ command+=",";}
@@ -233,11 +233,12 @@ namespace OpenDentBusiness.Crud{
 				command+="LastCallTimeStart = "+POut.DateT(phone.LastCallTimeStart)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE phone SET "+command
 				+" WHERE PhoneNum = "+POut.Long(phone.PhoneNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Phone from the database.</summary>

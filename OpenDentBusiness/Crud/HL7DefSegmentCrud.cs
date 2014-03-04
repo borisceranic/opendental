@@ -143,8 +143,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramNote);
 		}
 
-		///<summary>Updates one HL7DefSegment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(HL7DefSegment hL7DefSegment,HL7DefSegment oldHL7DefSegment){
+		///<summary>Updates one HL7DefSegment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(HL7DefSegment hL7DefSegment,HL7DefSegment oldHL7DefSegment){
 			string command="";
 			if(hL7DefSegment.HL7DefMessageNum != oldHL7DefSegment.HL7DefMessageNum) {
 				if(command!=""){ command+=",";}
@@ -171,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 				command+="Note = "+DbHelper.ParamChar+"paramNote";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(hL7DefSegment.Note==null) {
 				hL7DefSegment.Note="";
@@ -180,6 +180,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE hl7defsegment SET "+command
 				+" WHERE HL7DefSegmentNum = "+POut.Long(hL7DefSegment.HL7DefSegmentNum);
 			Db.NonQ(command,paramNote);
+			return true;
 		}
 
 		///<summary>Deletes one HL7DefSegment from the database.</summary>

@@ -128,8 +128,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramContentSummary);
 		}
 
-		///<summary>Updates one EhrSummaryCcd in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrSummaryCcd ehrSummaryCcd,EhrSummaryCcd oldEhrSummaryCcd){
+		///<summary>Updates one EhrSummaryCcd in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrSummaryCcd ehrSummaryCcd,EhrSummaryCcd oldEhrSummaryCcd){
 			string command="";
 			if(ehrSummaryCcd.PatNum != oldEhrSummaryCcd.PatNum) {
 				if(command!=""){ command+=",";}
@@ -148,7 +148,7 @@ namespace OpenDentBusiness.Crud{
 				command+="EmailAttachNum = "+POut.Long(ehrSummaryCcd.EmailAttachNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(ehrSummaryCcd.ContentSummary==null) {
 				ehrSummaryCcd.ContentSummary="";
@@ -157,6 +157,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE ehrsummaryccd SET "+command
 				+" WHERE EhrSummaryCcdNum = "+POut.Long(ehrSummaryCcd.EhrSummaryCcdNum);
 			Db.NonQ(command,paramContentSummary);
+			return true;
 		}
 
 		///<summary>Deletes one EhrSummaryCcd from the database.</summary>

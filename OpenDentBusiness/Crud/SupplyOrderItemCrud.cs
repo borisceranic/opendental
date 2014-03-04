@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SupplyOrderItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SupplyOrderItem supplyOrderItem,SupplyOrderItem oldSupplyOrderItem){
+		///<summary>Updates one SupplyOrderItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SupplyOrderItem supplyOrderItem,SupplyOrderItem oldSupplyOrderItem){
 			string command="";
 			if(supplyOrderItem.SupplyOrderNum != oldSupplyOrderItem.SupplyOrderNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Price = '"+POut.Double(supplyOrderItem.Price)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE supplyorderitem SET "+command
 				+" WHERE SupplyOrderItemNum = "+POut.Long(supplyOrderItem.SupplyOrderItemNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SupplyOrderItem from the database.</summary>

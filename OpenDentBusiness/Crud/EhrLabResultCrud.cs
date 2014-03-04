@@ -361,8 +361,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrLabResult in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrLabResult ehrLabResult,EhrLabResult oldEhrLabResult){
+		///<summary>Updates one EhrLabResult in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrLabResult ehrLabResult,EhrLabResult oldEhrLabResult){
 			string command="";
 			if(ehrLabResult.EhrLabNum != oldEhrLabResult.EhrLabNum) {
 				if(command!=""){ command+=",";}
@@ -617,11 +617,12 @@ namespace OpenDentBusiness.Crud{
 				command+="MedicalDirectorIdentifierTypeCode = '"+POut.String(ehrLabResult.MedicalDirectorIdentifierTypeCode.ToString())+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrlabresult SET "+command
 				+" WHERE EhrLabResultNum = "+POut.Long(ehrLabResult.EhrLabResultNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrLabResult from the database.</summary>

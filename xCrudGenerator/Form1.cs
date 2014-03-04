@@ -639,8 +639,8 @@ using System.Drawing;"+rn);
 			#region Update 2nd override
 			//Update, 2nd override-------------------------------------------------------------------------------
 			if(!isMobile) {
-				strb.Append(rn+rn+t2+"///<summary>Updates one "+typeClass.Name+" in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>");
-				strb.Append(rn+t2+"public static void Update("+typeClass.Name+" "+obj+","+typeClass.Name+" "+oldObj+"){");
+				strb.Append(rn+rn+t2+"///<summary>Updates one "+typeClass.Name+" in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>");
+				strb.Append(rn+t2+"public static bool Update("+typeClass.Name+" "+obj+","+typeClass.Name+" "+oldObj+"){");
 				strb.Append(rn+t3+"string command=\"\";");
 				for(int f=0;f<fieldsExceptPri.Count;f++) {
 					//if(isMobile && fieldsExceptPri[f]==priKey1) {//2 already skipped
@@ -732,7 +732,7 @@ using System.Drawing;"+rn);
 					strb.Append(rn+t3+"}");
 				}
 				strb.Append(rn+t3+"if(command==\"\"){");
-				strb.Append(rn+t4+"return;");
+				strb.Append(rn+t4+"return false;");
 				strb.Append(rn+t3+"}");
 				for(int i=0;i<paramList.Count;i++) {
 					strb.Append(rn+t3+"if("+obj+"."+paramList[i].ParameterName+"==null) {");
@@ -744,6 +744,7 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t3+"command=\"UPDATE "+tablename+" SET \"+command");
 				strb.Append(rn+t4+"+\" WHERE "+priKey.Name+" = \"+POut.Long("+obj+"."+priKey.Name+");");
 				strb.Append(rn+t3+"Db.NonQ(command"+paramsString+");");
+				strb.Append(rn+t3+"return true;");
 				strb.Append(rn+t2+"}");
 			}
 			#endregion Update 2nd override
@@ -807,9 +808,9 @@ using System.Drawing;"+rn);
 				}
 			}
 			#endregion ConvertToM
-			//IsEqual is currently unfinished, but is here so that we can enhance it to truly compare two objects. 
+			//IsEqual is currently unfinished, but is here so that we can enhance it later to truly compare two objects. 
 			//This will check all DB columns and all Non-DB columns for equality and return a boolean. 
-			//The problem with implementing this at this time (3/4/2014) is that lists are created with a name that does not conform to the rest of our naming of variables in the CRUD.
+			//The problem with implementing this at this time (3/4/2014) is that we don't have time to implement validating lists of objects.
 			#region IsEqual
 			//IsEqual-------------------------------------------------------------------------------
 			//if(!isMobile) {

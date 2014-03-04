@@ -128,8 +128,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramRawBase64);
 		}
 
-		///<summary>Updates one DocumentMisc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DocumentMisc documentMisc,DocumentMisc oldDocumentMisc){
+		///<summary>Updates one DocumentMisc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DocumentMisc documentMisc,DocumentMisc oldDocumentMisc){
 			string command="";
 			if(documentMisc.DateCreated != oldDocumentMisc.DateCreated) {
 				if(command!=""){ command+=",";}
@@ -148,7 +148,7 @@ namespace OpenDentBusiness.Crud{
 				command+="RawBase64 = "+DbHelper.ParamChar+"paramRawBase64";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(documentMisc.RawBase64==null) {
 				documentMisc.RawBase64="";
@@ -157,6 +157,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE documentmisc SET "+command
 				+" WHERE DocMiscNum = "+POut.Long(documentMisc.DocMiscNum);
 			Db.NonQ(command,paramRawBase64);
+			return true;
 		}
 
 		///<summary>Deletes one DocumentMisc from the database.</summary>

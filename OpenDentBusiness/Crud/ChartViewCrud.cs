@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ChartView in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ChartView chartView,ChartView oldChartView){
+		///<summary>Updates one ChartView in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ChartView chartView,ChartView oldChartView){
 			string command="";
 			if(chartView.Description != oldChartView.Description) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DatesShowing = "+POut.Int   ((int)chartView.DatesShowing)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE chartview SET "+command
 				+" WHERE ChartViewNum = "+POut.Long(chartView.ChartViewNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ChartView from the database.</summary>

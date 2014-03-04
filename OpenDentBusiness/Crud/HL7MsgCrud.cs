@@ -134,8 +134,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramMsgText);
 		}
 
-		///<summary>Updates one HL7Msg in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(HL7Msg hL7Msg,HL7Msg oldHL7Msg){
+		///<summary>Updates one HL7Msg in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(HL7Msg hL7Msg,HL7Msg oldHL7Msg){
 			string command="";
 			if(hL7Msg.HL7Status != oldHL7Msg.HL7Status) {
 				if(command!=""){ command+=",";}
@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				command+="Note = '"+POut.String(hL7Msg.Note)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(hL7Msg.MsgText==null) {
 				hL7Msg.MsgText="";
@@ -168,6 +168,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE hl7msg SET "+command
 				+" WHERE HL7MsgNum = "+POut.Long(hL7Msg.HL7MsgNum);
 			Db.NonQ(command,paramMsgText);
+			return true;
 		}
 
 		///<summary>Deletes one HL7Msg from the database.</summary>

@@ -149,8 +149,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramBodyText);
 		}
 
-		///<summary>Updates one EmailMessage in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EmailMessage emailMessage,EmailMessage oldEmailMessage){
+		///<summary>Updates one EmailMessage in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EmailMessage emailMessage,EmailMessage oldEmailMessage){
 			string command="";
 			if(emailMessage.PatNum != oldEmailMessage.PatNum) {
 				if(command!=""){ command+=",";}
@@ -197,7 +197,7 @@ namespace OpenDentBusiness.Crud{
 				command+="PatNumSubj = "+POut.Long(emailMessage.PatNumSubj)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(emailMessage.BodyText==null) {
 				emailMessage.BodyText="";
@@ -206,6 +206,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE emailmessage SET "+command
 				+" WHERE EmailMessageNum = "+POut.Long(emailMessage.EmailMessageNum);
 			Db.NonQ(command,paramBodyText);
+			return true;
 		}
 
 		///<summary>Deletes one EmailMessage from the database.</summary>

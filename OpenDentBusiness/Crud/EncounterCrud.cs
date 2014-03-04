@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Encounter in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Encounter encounter,Encounter oldEncounter){
+		///<summary>Updates one Encounter in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Encounter encounter,Encounter oldEncounter){
 			string command="";
 			if(encounter.PatNum != oldEncounter.PatNum) {
 				if(command!=""){ command+=",";}
@@ -154,11 +154,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateEncounter = "+POut.Date(encounter.DateEncounter)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE encounter SET "+command
 				+" WHERE EncounterNum = "+POut.Long(encounter.EncounterNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Encounter from the database.</summary>

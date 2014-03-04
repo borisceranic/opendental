@@ -162,8 +162,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Loinc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Loinc loinc,Loinc oldLoinc){
+		///<summary>Updates one Loinc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Loinc loinc,Loinc oldLoinc){
 			string command="";
 			if(loinc.LoincCode != oldLoinc.LoincCode) {
 				if(command!=""){ command+=",";}
@@ -238,11 +238,12 @@ namespace OpenDentBusiness.Crud{
 				command+="RankCommonOrders = "+POut.Int(loinc.RankCommonOrders)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE loinc SET "+command
 				+" WHERE LoincNum = "+POut.Long(loinc.LoincNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Loinc from the database.</summary>

@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ScreenPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ScreenPat screenPat,ScreenPat oldScreenPat){
+		///<summary>Updates one ScreenPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ScreenPat screenPat,ScreenPat oldScreenPat){
 			string command="";
 			if(screenPat.PatNum != oldScreenPat.PatNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SheetNum = "+POut.Long(screenPat.SheetNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE screenpat SET "+command
 				+" WHERE ScreenPatNum = "+POut.Long(screenPat.ScreenPatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ScreenPat from the database.</summary>

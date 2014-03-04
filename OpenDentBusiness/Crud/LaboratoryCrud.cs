@@ -138,8 +138,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Laboratory in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Laboratory laboratory,Laboratory oldLaboratory){
+		///<summary>Updates one Laboratory in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Laboratory laboratory,Laboratory oldLaboratory){
 			string command="";
 			if(laboratory.Description != oldLaboratory.Description) {
 				if(command!=""){ command+=",";}
@@ -182,11 +182,12 @@ namespace OpenDentBusiness.Crud{
 				command+="WirelessPhone = '"+POut.String(laboratory.WirelessPhone)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE laboratory SET "+command
 				+" WHERE LaboratoryNum = "+POut.Long(laboratory.LaboratoryNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Laboratory from the database.</summary>

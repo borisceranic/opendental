@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one MapArea in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(MapArea mapArea,MapArea oldMapArea){
+		///<summary>Updates one MapArea in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(MapArea mapArea,MapArea oldMapArea){
 			string command="";
 			if(mapArea.Extension != oldMapArea.Extension) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ItemType = "+POut.Int   ((int)mapArea.ItemType)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE maparea SET "+command
 				+" WHERE MapAreaNum = "+POut.Long(mapArea.MapAreaNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one MapArea from the database.</summary>

@@ -142,8 +142,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrLabSpecimen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrLabSpecimen ehrLabSpecimen,EhrLabSpecimen oldEhrLabSpecimen){
+		///<summary>Updates one EhrLabSpecimen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrLabSpecimen ehrLabSpecimen,EhrLabSpecimen oldEhrLabSpecimen){
 			string command="";
 			if(ehrLabSpecimen.EhrLabNum != oldEhrLabSpecimen.EhrLabNum) {
 				if(command!=""){ command+=",";}
@@ -190,11 +190,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CollectionDateTimeEnd = '"+POut.String(ehrLabSpecimen.CollectionDateTimeEnd)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrlabspecimen SET "+command
 				+" WHERE EhrLabSpecimenNum = "+POut.Long(ehrLabSpecimen.EhrLabSpecimenNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrLabSpecimen from the database.</summary>

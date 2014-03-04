@@ -186,8 +186,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Appointment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Appointment appointment,Appointment oldAppointment){
+		///<summary>Updates one Appointment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Appointment appointment,Appointment oldAppointment){
 			string command="";
 			if(appointment.PatNum != oldAppointment.PatNum) {
 				if(command!=""){ command+=",";}
@@ -291,11 +291,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ColorOverride = "+POut.Int(appointment.ColorOverride.ToArgb())+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE appointment SET "+command
 				+" WHERE AptNum = "+POut.Long(appointment.AptNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Appointment from the database.</summary>

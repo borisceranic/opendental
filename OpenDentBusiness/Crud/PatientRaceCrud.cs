@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PatientRace in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PatientRace patientRace,PatientRace oldPatientRace){
+		///<summary>Updates one PatientRace in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PatientRace patientRace,PatientRace oldPatientRace){
 			string command="";
 			if(patientRace.PatNum != oldPatientRace.PatNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CdcrecCode = '"+POut.String(patientRace.CdcrecCode)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE patientrace SET "+command
 				+" WHERE PatientRaceNum = "+POut.Long(patientRace.PatientRaceNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PatientRace from the database.</summary>

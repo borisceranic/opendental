@@ -261,8 +261,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Procedure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Procedure procedure,Procedure oldProcedure){
+		///<summary>Updates one Procedure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Procedure procedure,Procedure oldProcedure){
 			string command="";
 			if(procedure.PatNum != oldProcedure.PatNum) {
 				if(command!=""){ command+=",";}
@@ -466,11 +466,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SnomedBodySite = '"+POut.String(procedure.SnomedBodySite)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE procedurelog SET "+command
 				+" WHERE ProcNum = "+POut.Long(procedure.ProcNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		//Delete not allowed for this table

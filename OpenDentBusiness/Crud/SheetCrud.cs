@@ -144,8 +144,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Sheet in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Sheet sheet,Sheet oldSheet){
+		///<summary>Updates one Sheet in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Sheet sheet,Sheet oldSheet){
 			string command="";
 			if(sheet.SheetType != oldSheet.SheetType) {
 				if(command!=""){ command+=",";}
@@ -196,11 +196,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsWebForm = "+POut.Bool(sheet.IsWebForm)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE sheet SET "+command
 				+" WHERE SheetNum = "+POut.Long(sheet.SheetNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Sheet from the database.</summary>

@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimValCodeLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimValCodeLog claimValCodeLog,ClaimValCodeLog oldClaimValCodeLog){
+		///<summary>Updates one ClaimValCodeLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimValCodeLog claimValCodeLog,ClaimValCodeLog oldClaimValCodeLog){
 			string command="";
 			if(claimValCodeLog.ClaimNum != oldClaimValCodeLog.ClaimNum) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Ordinal = "+POut.Int(claimValCodeLog.Ordinal)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimvalcodelog SET "+command
 				+" WHERE ClaimValCodeLogNum = "+POut.Long(claimValCodeLog.ClaimValCodeLogNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimValCodeLog from the database.</summary>

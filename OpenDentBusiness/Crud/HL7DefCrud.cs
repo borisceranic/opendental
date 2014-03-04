@@ -182,8 +182,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramNote);
 		}
 
-		///<summary>Updates one HL7Def in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(HL7Def hL7Def,HL7Def oldHL7Def){
+		///<summary>Updates one HL7Def in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(HL7Def hL7Def,HL7Def oldHL7Def){
 			string command="";
 			if(hL7Def.Description != oldHL7Def.Description) {
 				if(command!=""){ command+=",";}
@@ -274,7 +274,7 @@ namespace OpenDentBusiness.Crud{
 				command+="IsQuadAsToothNum = "+POut.Bool(hL7Def.IsQuadAsToothNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(hL7Def.Note==null) {
 				hL7Def.Note="";
@@ -283,6 +283,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE hl7def SET "+command
 				+" WHERE HL7DefNum = "+POut.Long(hL7Def.HL7DefNum);
 			Db.NonQ(command,paramNote);
+			return true;
 		}
 
 		///<summary>Deletes one HL7Def from the database.</summary>

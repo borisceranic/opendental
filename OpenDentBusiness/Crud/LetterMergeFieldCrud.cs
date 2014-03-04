@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one LetterMergeField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(LetterMergeField letterMergeField,LetterMergeField oldLetterMergeField){
+		///<summary>Updates one LetterMergeField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(LetterMergeField letterMergeField,LetterMergeField oldLetterMergeField){
 			string command="";
 			if(letterMergeField.LetterMergeNum != oldLetterMergeField.LetterMergeNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FieldName = '"+POut.String(letterMergeField.FieldName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE lettermergefield SET "+command
 				+" WHERE FieldNum = "+POut.Long(letterMergeField.FieldNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one LetterMergeField from the database.</summary>

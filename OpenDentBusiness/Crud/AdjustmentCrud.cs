@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Adjustment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Adjustment adjustment,Adjustment oldAdjustment){
+		///<summary>Updates one Adjustment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Adjustment adjustment,Adjustment oldAdjustment){
 			string command="";
 			if(adjustment.AdjDate != oldAdjustment.AdjDate) {
 				if(command!=""){ command+=",";}
@@ -186,11 +186,12 @@ namespace OpenDentBusiness.Crud{
 				command+="StatementNum = "+POut.Long(adjustment.StatementNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE adjustment SET "+command
 				+" WHERE AdjNum = "+POut.Long(adjustment.AdjNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Adjustment from the database.</summary>

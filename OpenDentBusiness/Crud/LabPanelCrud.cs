@@ -143,8 +143,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramRawMessage);
 		}
 
-		///<summary>Updates one LabPanel in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(LabPanel labPanel,LabPanel oldLabPanel){
+		///<summary>Updates one LabPanel in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(LabPanel labPanel,LabPanel oldLabPanel){
 			string command="";
 			if(labPanel.PatNum != oldLabPanel.PatNum) {
 				if(command!=""){ command+=",";}
@@ -180,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 				command+="MedicalOrderNum = "+POut.Long(labPanel.MedicalOrderNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(labPanel.RawMessage==null) {
 				labPanel.RawMessage="";
@@ -189,6 +189,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE labpanel SET "+command
 				+" WHERE LabPanelNum = "+POut.Long(labPanel.LabPanelNum);
 			Db.NonQ(command,paramRawMessage);
+			return true;
 		}
 
 		///<summary>Deletes one LabPanel from the database.</summary>

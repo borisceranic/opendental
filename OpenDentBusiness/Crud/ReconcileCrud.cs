@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Reconcile in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Reconcile reconcile,Reconcile oldReconcile){
+		///<summary>Updates one Reconcile in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Reconcile reconcile,Reconcile oldReconcile){
 			string command="";
 			if(reconcile.AccountNum != oldReconcile.AccountNum) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsLocked = "+POut.Bool(reconcile.IsLocked)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE reconcile SET "+command
 				+" WHERE ReconcileNum = "+POut.Long(reconcile.ReconcileNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Reconcile from the database.</summary>

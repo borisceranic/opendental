@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one WikiPage in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(WikiPage wikiPage,WikiPage oldWikiPage){
+		///<summary>Updates one WikiPage in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(WikiPage wikiPage,WikiPage oldWikiPage){
 			string command="";
 			if(wikiPage.UserNum != oldWikiPage.UserNum) {
 				if(command!=""){ command+=",";}
@@ -144,11 +144,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//DateTimeSaved not allowed to change
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE wikipage SET "+command
 				+" WHERE WikiPageNum = "+POut.Long(wikiPage.WikiPageNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one WikiPage from the database.</summary>

@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one OrthoChart in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(OrthoChart orthoChart,OrthoChart oldOrthoChart){
+		///<summary>Updates one OrthoChart in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(OrthoChart orthoChart,OrthoChart oldOrthoChart){
 			string command="";
 			if(orthoChart.PatNum != oldOrthoChart.PatNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FieldValue = '"+POut.String(orthoChart.FieldValue)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE orthochart SET "+command
 				+" WHERE OrthoChartNum = "+POut.Long(orthoChart.OrthoChartNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one OrthoChart from the database.</summary>

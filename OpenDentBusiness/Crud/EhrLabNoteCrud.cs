@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramComments);
 		}
 
-		///<summary>Updates one EhrLabNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrLabNote ehrLabNote,EhrLabNote oldEhrLabNote){
+		///<summary>Updates one EhrLabNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrLabNote ehrLabNote,EhrLabNote oldEhrLabNote){
 			string command="";
 			if(ehrLabNote.EhrLabNum != oldEhrLabNote.EhrLabNum) {
 				if(command!=""){ command+=",";}
@@ -142,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 				command+="Comments = "+DbHelper.ParamChar+"paramComments";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(ehrLabNote.Comments==null) {
 				ehrLabNote.Comments="";
@@ -151,6 +151,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE ehrlabnote SET "+command
 				+" WHERE EhrLabNoteNum = "+POut.Long(ehrLabNote.EhrLabNoteNum);
 			Db.NonQ(command,paramComments);
+			return true;
 		}
 
 		///<summary>Deletes one EhrLabNote from the database.</summary>

@@ -147,8 +147,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PaySplit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PaySplit paySplit,PaySplit oldPaySplit){
+		///<summary>Updates one PaySplit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PaySplit paySplit,PaySplit oldPaySplit){
 			string command="";
 			if(paySplit.SplitAmt != oldPaySplit.SplitAmt) {
 				if(command!=""){ command+=",";}
@@ -200,11 +200,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ClinicNum = "+POut.Long(paySplit.ClinicNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE paysplit SET "+command
 				+" WHERE SplitNum = "+POut.Long(paySplit.SplitNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PaySplit from the database.</summary>

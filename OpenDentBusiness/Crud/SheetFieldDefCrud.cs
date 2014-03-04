@@ -167,8 +167,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramFieldValue);
 		}
 
-		///<summary>Updates one SheetFieldDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SheetFieldDef sheetFieldDef,SheetFieldDef oldSheetFieldDef){
+		///<summary>Updates one SheetFieldDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SheetFieldDef sheetFieldDef,SheetFieldDef oldSheetFieldDef){
 			string command="";
 			if(sheetFieldDef.SheetDefNum != oldSheetFieldDef.SheetDefNum) {
 				if(command!=""){ command+=",";}
@@ -239,7 +239,7 @@ namespace OpenDentBusiness.Crud{
 				command+="ReportableName = '"+POut.String(sheetFieldDef.ReportableName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(sheetFieldDef.FieldValue==null) {
 				sheetFieldDef.FieldValue="";
@@ -248,6 +248,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE sheetfielddef SET "+command
 				+" WHERE SheetFieldDefNum = "+POut.Long(sheetFieldDef.SheetFieldDefNum);
 			Db.NonQ(command,paramFieldValue);
+			return true;
 		}
 
 		///<summary>Deletes one SheetFieldDef from the database.</summary>

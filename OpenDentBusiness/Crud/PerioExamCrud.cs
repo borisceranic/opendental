@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PerioExam in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PerioExam perioExam,PerioExam oldPerioExam){
+		///<summary>Updates one PerioExam in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PerioExam perioExam,PerioExam oldPerioExam){
 			string command="";
 			if(perioExam.PatNum != oldPerioExam.PatNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ProvNum = "+POut.Long(perioExam.ProvNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE perioexam SET "+command
 				+" WHERE PerioExamNum = "+POut.Long(perioExam.PerioExamNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PerioExam from the database.</summary>

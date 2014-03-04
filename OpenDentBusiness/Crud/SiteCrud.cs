@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Site in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Site site,Site oldSite){
+		///<summary>Updates one Site in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Site site,Site oldSite){
 			string command="";
 			if(site.Description != oldSite.Description) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Note = '"+POut.String(site.Note)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE site SET "+command
 				+" WHERE SiteNum = "+POut.Long(site.SiteNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Site from the database.</summary>

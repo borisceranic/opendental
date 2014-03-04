@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CovCat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CovCat covCat,CovCat oldCovCat){
+		///<summary>Updates one CovCat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CovCat covCat,CovCat oldCovCat){
 			string command="";
 			if(covCat.Description != oldCovCat.Description) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="EbenefitCat = "+POut.Int   ((int)covCat.EbenefitCat)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE covcat SET "+command
 				+" WHERE CovCatNum = "+POut.Long(covCat.CovCatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CovCat from the database.</summary>

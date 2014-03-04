@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrMeasure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrMeasure ehrMeasure,EhrMeasure oldEhrMeasure){
+		///<summary>Updates one EhrMeasure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrMeasure ehrMeasure,EhrMeasure oldEhrMeasure){
 			string command="";
 			if(ehrMeasure.MeasureType != oldEhrMeasure.MeasureType) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Denominator = "+POut.Int(ehrMeasure.Denominator)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrmeasure SET "+command
 				+" WHERE EhrMeasureNum = "+POut.Long(ehrMeasure.EhrMeasureNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrMeasure from the database.</summary>

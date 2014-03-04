@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ZipCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ZipCode zipCode,ZipCode oldZipCode){
+		///<summary>Updates one ZipCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ZipCode zipCode,ZipCode oldZipCode){
 			string command="";
 			if(zipCode.ZipCodeDigits != oldZipCode.ZipCodeDigits) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsFrequent = "+POut.Bool(zipCode.IsFrequent)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE zipcode SET "+command
 				+" WHERE ZipCodeNum = "+POut.Long(zipCode.ZipCodeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ZipCode from the database.</summary>

@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EmailMessageUid in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EmailMessageUid emailMessageUid,EmailMessageUid oldEmailMessageUid){
+		///<summary>Updates one EmailMessageUid in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EmailMessageUid emailMessageUid,EmailMessageUid oldEmailMessageUid){
 			string command="";
 			if(emailMessageUid.MsgId != oldEmailMessageUid.MsgId) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="RecipientAddress = '"+POut.String(emailMessageUid.RecipientAddress)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE emailmessageuid SET "+command
 				+" WHERE EmailMessageUidNum = "+POut.Long(emailMessageUid.EmailMessageUidNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EmailMessageUid from the database.</summary>

@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CDSPermission in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CDSPermission cDSPermission,CDSPermission oldCDSPermission){
+		///<summary>Updates one CDSPermission in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CDSPermission cDSPermission,CDSPermission oldCDSPermission){
 			string command="";
 			if(cDSPermission.UserNum != oldCDSPermission.UserNum) {
 				if(command!=""){ command+=",";}
@@ -189,11 +189,12 @@ namespace OpenDentBusiness.Crud{
 				command+="VitalCDS = "+POut.Bool(cDSPermission.VitalCDS)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE cdspermission SET "+command
 				+" WHERE CDSPermissionNum = "+POut.Long(cDSPermission.CDSPermissionNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CDSPermission from the database.</summary>

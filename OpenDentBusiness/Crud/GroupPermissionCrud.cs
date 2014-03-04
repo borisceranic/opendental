@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one GroupPermission in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(GroupPermission groupPermission,GroupPermission oldGroupPermission){
+		///<summary>Updates one GroupPermission in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(GroupPermission groupPermission,GroupPermission oldGroupPermission){
 			string command="";
 			if(groupPermission.NewerDate != oldGroupPermission.NewerDate) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PermType = "+POut.Int   ((int)groupPermission.PermType)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE grouppermission SET "+command
 				+" WHERE GroupPermNum = "+POut.Long(groupPermission.GroupPermNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one GroupPermission from the database.</summary>

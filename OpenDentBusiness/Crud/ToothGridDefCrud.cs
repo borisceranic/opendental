@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ToothGridDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ToothGridDef toothGridDef,ToothGridDef oldToothGridDef){
+		///<summary>Updates one ToothGridDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ToothGridDef toothGridDef,ToothGridDef oldToothGridDef){
 			string command="";
 			if(toothGridDef.SheetFieldDefNum != oldToothGridDef.SheetFieldDefNum) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ProcStatus = "+POut.Int   ((int)toothGridDef.ProcStatus)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE toothgriddef SET "+command
 				+" WHERE ToothGridDefNum = "+POut.Long(toothGridDef.ToothGridDefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ToothGridDef from the database.</summary>

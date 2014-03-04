@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RepeatCharge in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RepeatCharge repeatCharge,RepeatCharge oldRepeatCharge){
+		///<summary>Updates one RepeatCharge in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RepeatCharge repeatCharge,RepeatCharge oldRepeatCharge){
 			string command="";
 			if(repeatCharge.PatNum != oldRepeatCharge.PatNum) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsEnabled = "+POut.Bool(repeatCharge.IsEnabled)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE repeatcharge SET "+command
 				+" WHERE RepeatChargeNum = "+POut.Long(repeatCharge.RepeatChargeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RepeatCharge from the database.</summary>

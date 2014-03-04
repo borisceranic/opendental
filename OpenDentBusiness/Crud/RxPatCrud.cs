@@ -153,8 +153,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RxPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RxPat rxPat,RxPat oldRxPat){
+		///<summary>Updates one RxPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RxPat rxPat,RxPat oldRxPat){
 			string command="";
 			if(rxPat.PatNum != oldRxPat.PatNum) {
 				if(command!=""){ command+=",";}
@@ -214,11 +214,12 @@ namespace OpenDentBusiness.Crud{
 				command+="NewCropGuid = '"+POut.String(rxPat.NewCropGuid)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE rxpat SET "+command
 				+" WHERE RxNum = "+POut.Long(rxPat.RxNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RxPat from the database.</summary>

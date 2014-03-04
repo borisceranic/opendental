@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ToothGridCell in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ToothGridCell toothGridCell,ToothGridCell oldToothGridCell){
+		///<summary>Updates one ToothGridCell in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ToothGridCell toothGridCell,ToothGridCell oldToothGridCell){
 			string command="";
 			if(toothGridCell.SheetFieldNum != oldToothGridCell.SheetFieldNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ToothNum = '"+POut.String(toothGridCell.ToothNum)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE toothgridcell SET "+command
 				+" WHERE ToothGridCellNum = "+POut.Long(toothGridCell.ToothGridCellNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ToothGridCell from the database.</summary>

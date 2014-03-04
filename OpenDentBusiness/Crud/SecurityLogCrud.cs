@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SecurityLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SecurityLog securityLog,SecurityLog oldSecurityLog){
+		///<summary>Updates one SecurityLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SecurityLog securityLog,SecurityLog oldSecurityLog){
 			string command="";
 			if(securityLog.PermType != oldSecurityLog.PermType) {
 				if(command!=""){ command+=",";}
@@ -158,11 +158,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FKey = "+POut.Long(securityLog.FKey)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE securitylog SET "+command
 				+" WHERE SecurityLogNum = "+POut.Long(securityLog.SecurityLogNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SecurityLog from the database.</summary>

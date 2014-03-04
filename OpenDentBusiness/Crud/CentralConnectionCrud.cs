@@ -138,8 +138,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CentralConnection in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CentralConnection centralConnection,CentralConnection oldCentralConnection){
+		///<summary>Updates one CentralConnection in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CentralConnection centralConnection,CentralConnection oldCentralConnection){
 			string command="";
 			if(centralConnection.ServerName != oldCentralConnection.ServerName) {
 				if(command!=""){ command+=",";}
@@ -182,11 +182,12 @@ namespace OpenDentBusiness.Crud{
 				command+="WebServiceIsEcw = "+POut.Bool(centralConnection.WebServiceIsEcw)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE centralconnection SET "+command
 				+" WHERE CentralConnectionNum = "+POut.Long(centralConnection.CentralConnectionNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CentralConnection from the database.</summary>

@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Cvx in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Cvx cvx,Cvx oldCvx){
+		///<summary>Updates one Cvx in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Cvx cvx,Cvx oldCvx){
 			string command="";
 			if(cvx.CvxCode != oldCvx.CvxCode) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsActive = '"+POut.String(cvx.IsActive)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE cvx SET "+command
 				+" WHERE CvxNum = "+POut.Long(cvx.CvxNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Cvx from the database.</summary>

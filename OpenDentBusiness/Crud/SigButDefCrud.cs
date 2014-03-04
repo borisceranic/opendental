@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SigButDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SigButDef sigButDef,SigButDef oldSigButDef){
+		///<summary>Updates one SigButDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SigButDef sigButDef,SigButDef oldSigButDef){
 			string command="";
 			if(sigButDef.ButtonText != oldSigButDef.ButtonText) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ComputerName = '"+POut.String(sigButDef.ComputerName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE sigbutdef SET "+command
 				+" WHERE SigButDefNum = "+POut.Long(sigButDef.SigButDefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SigButDef from the database.</summary>

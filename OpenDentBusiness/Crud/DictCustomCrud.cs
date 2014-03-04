@@ -111,19 +111,20 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one DictCustom in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DictCustom dictCustom,DictCustom oldDictCustom){
+		///<summary>Updates one DictCustom in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DictCustom dictCustom,DictCustom oldDictCustom){
 			string command="";
 			if(dictCustom.WordText != oldDictCustom.WordText) {
 				if(command!=""){ command+=",";}
 				command+="WordText = '"+POut.String(dictCustom.WordText)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE dictcustom SET "+command
 				+" WHERE DictCustomNum = "+POut.Long(dictCustom.DictCustomNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one DictCustom from the database.</summary>

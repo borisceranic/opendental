@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SchoolClass in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SchoolClass schoolClass,SchoolClass oldSchoolClass){
+		///<summary>Updates one SchoolClass in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SchoolClass schoolClass,SchoolClass oldSchoolClass){
 			string command="";
 			if(schoolClass.GradYear != oldSchoolClass.GradYear) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Descript = '"+POut.String(schoolClass.Descript)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE schoolclass SET "+command
 				+" WHERE SchoolClassNum = "+POut.Long(schoolClass.SchoolClassNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SchoolClass from the database.</summary>

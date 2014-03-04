@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EmailTemplate in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EmailTemplate emailTemplate,EmailTemplate oldEmailTemplate){
+		///<summary>Updates one EmailTemplate in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EmailTemplate emailTemplate,EmailTemplate oldEmailTemplate){
 			string command="";
 			if(emailTemplate.Subject != oldEmailTemplate.Subject) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="BodyText = '"+POut.String(emailTemplate.BodyText)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE emailtemplate SET "+command
 				+" WHERE EmailTemplateNum = "+POut.Long(emailTemplate.EmailTemplateNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EmailTemplate from the database.</summary>

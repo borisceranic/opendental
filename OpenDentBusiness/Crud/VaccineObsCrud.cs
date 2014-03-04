@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one VaccineObs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(VaccineObs vaccineObs,VaccineObs oldVaccineObs){
+		///<summary>Updates one VaccineObs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(VaccineObs vaccineObs,VaccineObs oldVaccineObs){
 			string command="";
 			if(vaccineObs.VaccinePatNum != oldVaccineObs.VaccinePatNum) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="MethodCode = '"+POut.String(vaccineObs.MethodCode)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE vaccineobs SET "+command
 				+" WHERE VaccineObsNum = "+POut.Long(vaccineObs.VaccineObsNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one VaccineObs from the database.</summary>

@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TaskAncestor in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TaskAncestor taskAncestor,TaskAncestor oldTaskAncestor){
+		///<summary>Updates one TaskAncestor in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TaskAncestor taskAncestor,TaskAncestor oldTaskAncestor){
 			string command="";
 			if(taskAncestor.TaskNum != oldTaskAncestor.TaskNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="TaskListNum = "+POut.Long(taskAncestor.TaskListNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE taskancestor SET "+command
 				+" WHERE TaskAncestorNum = "+POut.Long(taskAncestor.TaskAncestorNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TaskAncestor from the database.</summary>

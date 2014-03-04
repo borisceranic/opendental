@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TerminalActive in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TerminalActive terminalActive,TerminalActive oldTerminalActive){
+		///<summary>Updates one TerminalActive in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TerminalActive terminalActive,TerminalActive oldTerminalActive){
 			string command="";
 			if(terminalActive.ComputerName != oldTerminalActive.ComputerName) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PatNum = "+POut.Long(terminalActive.PatNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE terminalactive SET "+command
 				+" WHERE TerminalActiveNum = "+POut.Long(terminalActive.TerminalActiveNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TerminalActive from the database.</summary>

@@ -134,8 +134,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramSound);
 		}
 
-		///<summary>Updates one SigElementDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SigElementDef sigElementDef,SigElementDef oldSigElementDef){
+		///<summary>Updates one SigElementDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SigElementDef sigElementDef,SigElementDef oldSigElementDef){
 			string command="";
 			if(sigElementDef.LightRow != oldSigElementDef.LightRow) {
 				if(command!=""){ command+=",";}
@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				command+="ItemOrder = "+POut.Int(sigElementDef.ItemOrder)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(sigElementDef.Sound==null) {
 				sigElementDef.Sound="";
@@ -171,6 +171,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE sigelementdef SET "+command
 				+" WHERE SigElementDefNum = "+POut.Long(sigElementDef.SigElementDefNum);
 			Db.NonQ(command,paramSound);
+			return true;
 		}
 
 		///<summary>Deletes one SigElementDef from the database.</summary>

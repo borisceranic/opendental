@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Pref in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Pref pref,Pref oldPref){
+		///<summary>Updates one Pref in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Pref pref,Pref oldPref){
 			string command="";
 			if(pref.PrefName != oldPref.PrefName) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Comments = '"+POut.String(pref.Comments)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE preference SET "+command
 				+" WHERE PrefNum = "+POut.Long(pref.PrefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Pref from the database.</summary>

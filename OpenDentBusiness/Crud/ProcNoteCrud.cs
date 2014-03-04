@@ -137,8 +137,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramNote);
 		}
 
-		///<summary>Updates one ProcNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProcNote procNote,ProcNote oldProcNote){
+		///<summary>Updates one ProcNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProcNote procNote,ProcNote oldProcNote){
 			string command="";
 			if(procNote.PatNum != oldProcNote.PatNum) {
 				if(command!=""){ command+=",";}
@@ -166,7 +166,7 @@ namespace OpenDentBusiness.Crud{
 				command+="Signature = '"+POut.String(procNote.Signature)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(procNote.Note==null) {
 				procNote.Note="";
@@ -175,6 +175,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE procnote SET "+command
 				+" WHERE ProcNoteNum = "+POut.Long(procNote.ProcNoteNum);
 			Db.NonQ(command,paramNote);
+			return true;
 		}
 
 		///<summary>Deletes one ProcNote from the database.</summary>

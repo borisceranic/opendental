@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Printer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Printer printer,Printer oldPrinter){
+		///<summary>Updates one Printer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Printer printer,Printer oldPrinter){
 			string command="";
 			if(printer.ComputerNum != oldPrinter.ComputerNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DisplayPrompt = "+POut.Bool(printer.DisplayPrompt)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE printer SET "+command
 				+" WHERE PrinterNum = "+POut.Long(printer.PrinterNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Printer from the database.</summary>

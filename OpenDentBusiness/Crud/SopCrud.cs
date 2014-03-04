@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Sop in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Sop sop,Sop oldSop){
+		///<summary>Updates one Sop in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Sop sop,Sop oldSop){
 			string command="";
 			if(sop.SopCode != oldSop.SopCode) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Description = '"+POut.String(sop.Description)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE sop SET "+command
 				+" WHERE SopNum = "+POut.Long(sop.SopNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Sop from the database.</summary>

@@ -128,8 +128,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramButtonImage);
 		}
 
-		///<summary>Updates one ProcButton in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProcButton procButton,ProcButton oldProcButton){
+		///<summary>Updates one ProcButton in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProcButton procButton,ProcButton oldProcButton){
 			string command="";
 			if(procButton.Description != oldProcButton.Description) {
 				if(command!=""){ command+=",";}
@@ -148,7 +148,7 @@ namespace OpenDentBusiness.Crud{
 				command+="ButtonImage = "+DbHelper.ParamChar+"paramButtonImage";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(procButton.ButtonImage==null) {
 				procButton.ButtonImage="";
@@ -157,6 +157,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE procbutton SET "+command
 				+" WHERE ProcButtonNum = "+POut.Long(procButton.ProcButtonNum);
 			Db.NonQ(command,paramButtonImage);
+			return true;
 		}
 
 		///<summary>Deletes one ProcButton from the database.</summary>

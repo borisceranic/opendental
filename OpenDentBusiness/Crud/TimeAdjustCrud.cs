@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TimeAdjust in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TimeAdjust timeAdjust,TimeAdjust oldTimeAdjust){
+		///<summary>Updates one TimeAdjust in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TimeAdjust timeAdjust,TimeAdjust oldTimeAdjust){
 			string command="";
 			if(timeAdjust.EmployeeNum != oldTimeAdjust.EmployeeNum) {
 				if(command!=""){ command+=",";}
@@ -154,11 +154,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsAuto = "+POut.Bool(timeAdjust.IsAuto)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE timeadjust SET "+command
 				+" WHERE TimeAdjustNum = "+POut.Long(timeAdjust.TimeAdjustNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TimeAdjust from the database.</summary>

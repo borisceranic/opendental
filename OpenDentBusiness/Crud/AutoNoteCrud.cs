@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one AutoNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(AutoNote autoNote,AutoNote oldAutoNote){
+		///<summary>Updates one AutoNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(AutoNote autoNote,AutoNote oldAutoNote){
 			string command="";
 			if(autoNote.AutoNoteName != oldAutoNote.AutoNoteName) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="MainText = '"+POut.String(autoNote.MainText)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE autonote SET "+command
 				+" WHERE AutoNoteNum = "+POut.Long(autoNote.AutoNoteNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one AutoNote from the database.</summary>

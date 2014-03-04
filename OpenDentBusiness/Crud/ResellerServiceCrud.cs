@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ResellerService in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ResellerService resellerService,ResellerService oldResellerService){
+		///<summary>Updates one ResellerService in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ResellerService resellerService,ResellerService oldResellerService){
 			string command="";
 			if(resellerService.ResellerNum != oldResellerService.ResellerNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Fee = '"+POut.Double(resellerService.Fee)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE resellerservice SET "+command
 				+" WHERE ResellerServiceNum = "+POut.Long(resellerService.ResellerServiceNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ResellerService from the database.</summary>

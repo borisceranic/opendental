@@ -137,8 +137,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramEmailBody);
 		}
 
-		///<summary>Updates one Dunning in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Dunning dunning,Dunning oldDunning){
+		///<summary>Updates one Dunning in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Dunning dunning,Dunning oldDunning){
 			string command="";
 			if(dunning.DunMessage != oldDunning.DunMessage) {
 				if(command!=""){ command+=",";}
@@ -169,7 +169,7 @@ namespace OpenDentBusiness.Crud{
 				command+="EmailBody = "+DbHelper.ParamChar+"paramEmailBody";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(dunning.EmailBody==null) {
 				dunning.EmailBody="";
@@ -178,6 +178,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE dunning SET "+command
 				+" WHERE DunningNum = "+POut.Long(dunning.DunningNum);
 			Db.NonQ(command,paramEmailBody);
+			return true;
 		}
 
 		///<summary>Deletes one Dunning from the database.</summary>

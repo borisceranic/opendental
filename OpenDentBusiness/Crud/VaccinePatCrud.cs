@@ -168,8 +168,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one VaccinePat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(VaccinePat vaccinePat,VaccinePat oldVaccinePat){
+		///<summary>Updates one VaccinePat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(VaccinePat vaccinePat,VaccinePat oldVaccinePat){
 			string command="";
 			if(vaccinePat.VaccineDefNum != oldVaccinePat.VaccineDefNum) {
 				if(command!=""){ command+=",";}
@@ -252,11 +252,12 @@ namespace OpenDentBusiness.Crud{
 				command+="AdministrationSite = "+POut.Int   ((int)vaccinePat.AdministrationSite)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE vaccinepat SET "+command
 				+" WHERE VaccinePatNum = "+POut.Long(vaccinePat.VaccinePatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one VaccinePat from the database.</summary>

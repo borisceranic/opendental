@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Account in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Account account,Account oldAccount){
+		///<summary>Updates one Account in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Account account,Account oldAccount){
 			string command="";
 			if(account.Description != oldAccount.Description) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="AccountColor = "+POut.Int(account.AccountColor.ToArgb())+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE account SET "+command
 				+" WHERE AccountNum = "+POut.Long(account.AccountNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Account from the database.</summary>

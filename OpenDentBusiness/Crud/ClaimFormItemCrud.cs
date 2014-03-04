@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimFormItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimFormItem claimFormItem,ClaimFormItem oldClaimFormItem){
+		///<summary>Updates one ClaimFormItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimFormItem claimFormItem,ClaimFormItem oldClaimFormItem){
 			string command="";
 			if(claimFormItem.ClaimFormNum != oldClaimFormItem.ClaimFormNum) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Height = "+POut.Float(claimFormItem.Height)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimformitem SET "+command
 				+" WHERE ClaimFormItemNum = "+POut.Long(claimFormItem.ClaimFormItemNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimFormItem from the database.</summary>

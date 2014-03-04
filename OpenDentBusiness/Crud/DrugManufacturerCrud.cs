@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one DrugManufacturer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DrugManufacturer drugManufacturer,DrugManufacturer oldDrugManufacturer){
+		///<summary>Updates one DrugManufacturer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DrugManufacturer drugManufacturer,DrugManufacturer oldDrugManufacturer){
 			string command="";
 			if(drugManufacturer.ManufacturerName != oldDrugManufacturer.ManufacturerName) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ManufacturerCode = '"+POut.String(drugManufacturer.ManufacturerCode)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE drugmanufacturer SET "+command
 				+" WHERE DrugManufacturerNum = "+POut.Long(drugManufacturer.DrugManufacturerNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one DrugManufacturer from the database.</summary>

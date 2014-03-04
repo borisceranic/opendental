@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Hcpcs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Hcpcs hcpcs,Hcpcs oldHcpcs){
+		///<summary>Updates one Hcpcs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Hcpcs hcpcs,Hcpcs oldHcpcs){
 			string command="";
 			if(hcpcs.HcpcsCode != oldHcpcs.HcpcsCode) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DescriptionShort = '"+POut.String(hcpcs.DescriptionShort)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE hcpcs SET "+command
 				+" WHERE HcpcsNum = "+POut.Long(hcpcs.HcpcsNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Hcpcs from the database.</summary>

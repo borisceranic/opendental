@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrAptObs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrAptObs ehrAptObs,EhrAptObs oldEhrAptObs){
+		///<summary>Updates one EhrAptObs in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrAptObs ehrAptObs,EhrAptObs oldEhrAptObs){
 			string command="";
 			if(ehrAptObs.AptNum != oldEhrAptObs.AptNum) {
 				if(command!=""){ command+=",";}
@@ -154,11 +154,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ValCodeSystem = '"+POut.String(ehrAptObs.ValCodeSystem)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehraptobs SET "+command
 				+" WHERE EhrAptObsNum = "+POut.Long(ehrAptObs.EhrAptObsNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrAptObs from the database.</summary>

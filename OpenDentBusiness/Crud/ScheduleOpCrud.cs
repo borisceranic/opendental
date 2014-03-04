@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ScheduleOp in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ScheduleOp scheduleOp,ScheduleOp oldScheduleOp){
+		///<summary>Updates one ScheduleOp in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ScheduleOp scheduleOp,ScheduleOp oldScheduleOp){
 			string command="";
 			if(scheduleOp.ScheduleNum != oldScheduleOp.ScheduleNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="OperatoryNum = "+POut.Long(scheduleOp.OperatoryNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE scheduleop SET "+command
 				+" WHERE ScheduleOpNum = "+POut.Long(scheduleOp.ScheduleOpNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ScheduleOp from the database.</summary>

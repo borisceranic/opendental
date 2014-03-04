@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one QuickPasteCat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(QuickPasteCat quickPasteCat,QuickPasteCat oldQuickPasteCat){
+		///<summary>Updates one QuickPasteCat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(QuickPasteCat quickPasteCat,QuickPasteCat oldQuickPasteCat){
 			string command="";
 			if(quickPasteCat.Description != oldQuickPasteCat.Description) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DefaultForTypes = '"+POut.String(quickPasteCat.DefaultForTypes)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE quickpastecat SET "+command
 				+" WHERE QuickPasteCatNum = "+POut.Long(quickPasteCat.QuickPasteCatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one QuickPasteCat from the database.</summary>

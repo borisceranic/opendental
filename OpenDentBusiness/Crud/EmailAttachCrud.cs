@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EmailAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EmailAttach emailAttach,EmailAttach oldEmailAttach){
+		///<summary>Updates one EmailAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EmailAttach emailAttach,EmailAttach oldEmailAttach){
 			string command="";
 			if(emailAttach.EmailMessageNum != oldEmailAttach.EmailMessageNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ActualFileName = '"+POut.String(emailAttach.ActualFileName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE emailattach SET "+command
 				+" WHERE EmailAttachNum = "+POut.Long(emailAttach.EmailAttachNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EmailAttach from the database.</summary>

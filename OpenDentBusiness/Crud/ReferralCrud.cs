@@ -174,8 +174,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Referral in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Referral referral,Referral oldReferral){
+		///<summary>Updates one Referral in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Referral referral,Referral oldReferral){
 			string command="";
 			if(referral.LName != oldReferral.LName) {
 				if(command!=""){ command+=",";}
@@ -266,11 +266,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsDoctor = "+POut.Bool(referral.IsDoctor)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE referral SET "+command
 				+" WHERE ReferralNum = "+POut.Long(referral.ReferralNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Referral from the database.</summary>

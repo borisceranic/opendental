@@ -119,15 +119,15 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramMessageText);
 		}
 
-		///<summary>Updates one EtransMessageText in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EtransMessageText etransMessageText,EtransMessageText oldEtransMessageText){
+		///<summary>Updates one EtransMessageText in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EtransMessageText etransMessageText,EtransMessageText oldEtransMessageText){
 			string command="";
 			if(etransMessageText.MessageText != oldEtransMessageText.MessageText) {
 				if(command!=""){ command+=",";}
 				command+="MessageText = "+DbHelper.ParamChar+"paramMessageText";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(etransMessageText.MessageText==null) {
 				etransMessageText.MessageText="";
@@ -136,6 +136,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE etransmessagetext SET "+command
 				+" WHERE EtransMessageTextNum = "+POut.Long(etransMessageText.EtransMessageTextNum);
 			Db.NonQ(command,paramMessageText);
+			return true;
 		}
 
 		///<summary>Deletes one EtransMessageText from the database.</summary>

@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CanadianNetwork in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CanadianNetwork canadianNetwork,CanadianNetwork oldCanadianNetwork){
+		///<summary>Updates one CanadianNetwork in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CanadianNetwork canadianNetwork,CanadianNetwork oldCanadianNetwork){
 			string command="";
 			if(canadianNetwork.Abbrev != oldCanadianNetwork.Abbrev) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CanadianIsRprHandler = "+POut.Bool(canadianNetwork.CanadianIsRprHandler)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE canadiannetwork SET "+command
 				+" WHERE CanadianNetworkNum = "+POut.Long(canadianNetwork.CanadianNetworkNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CanadianNetwork from the database.</summary>

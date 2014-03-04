@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PhoneGraph in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PhoneGraph phoneGraph,PhoneGraph oldPhoneGraph){
+		///<summary>Updates one PhoneGraph in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PhoneGraph phoneGraph,PhoneGraph oldPhoneGraph){
 			string command="";
 			if(phoneGraph.EmployeeNum != oldPhoneGraph.EmployeeNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateEntry = "+POut.Date(phoneGraph.DateEntry)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE phonegraph SET "+command
 				+" WHERE PhoneGraphNum = "+POut.Long(phoneGraph.PhoneGraphNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PhoneGraph from the database.</summary>

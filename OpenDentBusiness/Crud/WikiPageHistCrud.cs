@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one WikiPageHist in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(WikiPageHist wikiPageHist,WikiPageHist oldWikiPageHist){
+		///<summary>Updates one WikiPageHist in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(WikiPageHist wikiPageHist,WikiPageHist oldWikiPageHist){
 			string command="";
 			if(wikiPageHist.UserNum != oldWikiPageHist.UserNum) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsDeleted = "+POut.Bool(wikiPageHist.IsDeleted)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE wikipagehist SET "+command
 				+" WHERE WikiPageNum = "+POut.Long(wikiPageHist.WikiPageNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one WikiPageHist from the database.</summary>

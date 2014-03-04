@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TaskSubscription in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TaskSubscription taskSubscription,TaskSubscription oldTaskSubscription){
+		///<summary>Updates one TaskSubscription in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TaskSubscription taskSubscription,TaskSubscription oldTaskSubscription){
 			string command="";
 			if(taskSubscription.UserNum != oldTaskSubscription.UserNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="TaskListNum = "+POut.Long(taskSubscription.TaskListNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE tasksubscription SET "+command
 				+" WHERE TaskSubscriptionNum = "+POut.Long(taskSubscription.TaskSubscriptionNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TaskSubscription from the database.</summary>

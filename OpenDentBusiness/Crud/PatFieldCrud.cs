@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PatField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PatField patField,PatField oldPatField){
+		///<summary>Updates one PatField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PatField patField,PatField oldPatField){
 			string command="";
 			if(patField.PatNum != oldPatField.PatNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FieldValue = '"+POut.String(patField.FieldValue)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE patfield SET "+command
 				+" WHERE PatFieldNum = "+POut.Long(patField.PatFieldNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PatField from the database.</summary>

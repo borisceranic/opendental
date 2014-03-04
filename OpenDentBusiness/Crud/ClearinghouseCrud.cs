@@ -180,8 +180,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Clearinghouse in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Clearinghouse clearinghouse,Clearinghouse oldClearinghouse){
+		///<summary>Updates one Clearinghouse in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Clearinghouse clearinghouse,Clearinghouse oldClearinghouse){
 			string command="";
 			if(clearinghouse.Description != oldClearinghouse.Description) {
 				if(command!=""){ command+=",";}
@@ -277,11 +277,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SeparatorSegment = '"+POut.String(clearinghouse.SeparatorSegment)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE clearinghouse SET "+command
 				+" WHERE ClearinghouseNum = "+POut.Long(clearinghouse.ClearinghouseNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Clearinghouse from the database.</summary>

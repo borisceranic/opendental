@@ -122,8 +122,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramBodyText);
 		}
 
-		///<summary>Updates one Letter in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Letter letter,Letter oldLetter){
+		///<summary>Updates one Letter in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Letter letter,Letter oldLetter){
 			string command="";
 			if(letter.Description != oldLetter.Description) {
 				if(command!=""){ command+=",";}
@@ -134,7 +134,7 @@ namespace OpenDentBusiness.Crud{
 				command+="BodyText = "+DbHelper.ParamChar+"paramBodyText";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(letter.BodyText==null) {
 				letter.BodyText="";
@@ -143,6 +143,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE letter SET "+command
 				+" WHERE LetterNum = "+POut.Long(letter.LetterNum);
 			Db.NonQ(command,paramBodyText);
+			return true;
 		}
 
 		///<summary>Deletes one Letter from the database.</summary>

@@ -336,8 +336,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Patient in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Patient patient,Patient oldPatient){
+		///<summary>Updates one Patient in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Patient patient,Patient oldPatient){
 			string command="";
 			if(patient.LName != oldPatient.LName) {
 				if(command!=""){ command+=",";}
@@ -641,11 +641,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateTimeDeceased = "+POut.DateT(patient.DateTimeDeceased)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE patient SET "+command
 				+" WHERE PatNum = "+POut.Long(patient.PatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Patient from the database.</summary>

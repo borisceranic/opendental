@@ -128,8 +128,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramRawBase64);
 		}
 
-		///<summary>Updates one EobAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EobAttach eobAttach,EobAttach oldEobAttach){
+		///<summary>Updates one EobAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EobAttach eobAttach,EobAttach oldEobAttach){
 			string command="";
 			if(eobAttach.ClaimPaymentNum != oldEobAttach.ClaimPaymentNum) {
 				if(command!=""){ command+=",";}
@@ -148,7 +148,7 @@ namespace OpenDentBusiness.Crud{
 				command+="RawBase64 = "+DbHelper.ParamChar+"paramRawBase64";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(eobAttach.RawBase64==null) {
 				eobAttach.RawBase64="";
@@ -157,6 +157,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE eobattach SET "+command
 				+" WHERE EobAttachNum = "+POut.Long(eobAttach.EobAttachNum);
 			Db.NonQ(command,paramRawBase64);
+			return true;
 		}
 
 		///<summary>Deletes one EobAttach from the database.</summary>

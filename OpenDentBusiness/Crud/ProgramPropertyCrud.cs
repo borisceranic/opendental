@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ProgramProperty in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProgramProperty programProperty,ProgramProperty oldProgramProperty){
+		///<summary>Updates one ProgramProperty in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProgramProperty programProperty,ProgramProperty oldProgramProperty){
 			string command="";
 			if(programProperty.ProgramNum != oldProgramProperty.ProgramNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ComputerName = '"+POut.String(programProperty.ComputerName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE programproperty SET "+command
 				+" WHERE ProgramPropertyNum = "+POut.Long(programProperty.ProgramPropertyNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ProgramProperty from the database.</summary>

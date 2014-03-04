@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ProviderIdent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProviderIdent providerIdent,ProviderIdent oldProviderIdent){
+		///<summary>Updates one ProviderIdent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProviderIdent providerIdent,ProviderIdent oldProviderIdent){
 			string command="";
 			if(providerIdent.ProvNum != oldProviderIdent.ProvNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IDNumber = '"+POut.String(providerIdent.IDNumber)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE providerident SET "+command
 				+" WHERE ProviderIdentNum = "+POut.Long(providerIdent.ProviderIdentNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ProviderIdent from the database.</summary>

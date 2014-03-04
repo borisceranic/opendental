@@ -125,8 +125,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramQueryText);
 		}
 
-		///<summary>Updates one UserQuery in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(UserQuery userQuery,UserQuery oldUserQuery){
+		///<summary>Updates one UserQuery in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(UserQuery userQuery,UserQuery oldUserQuery){
 			string command="";
 			if(userQuery.Description != oldUserQuery.Description) {
 				if(command!=""){ command+=",";}
@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				command+="QueryText = "+DbHelper.ParamChar+"paramQueryText";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(userQuery.QueryText==null) {
 				userQuery.QueryText="";
@@ -150,6 +150,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE userquery SET "+command
 				+" WHERE QueryNum = "+POut.Long(userQuery.QueryNum);
 			Db.NonQ(command,paramQueryText);
+			return true;
 		}
 
 		///<summary>Deletes one UserQuery from the database.</summary>

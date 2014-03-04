@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ReqNeeded in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ReqNeeded reqNeeded,ReqNeeded oldReqNeeded){
+		///<summary>Updates one ReqNeeded in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ReqNeeded reqNeeded,ReqNeeded oldReqNeeded){
 			string command="";
 			if(reqNeeded.Descript != oldReqNeeded.Descript) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SchoolClassNum = "+POut.Long(reqNeeded.SchoolClassNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE reqneeded SET "+command
 				+" WHERE ReqNeededNum = "+POut.Long(reqNeeded.ReqNeededNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ReqNeeded from the database.</summary>

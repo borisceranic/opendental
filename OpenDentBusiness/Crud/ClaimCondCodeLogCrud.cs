@@ -144,8 +144,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimCondCodeLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimCondCodeLog claimCondCodeLog,ClaimCondCodeLog oldClaimCondCodeLog){
+		///<summary>Updates one ClaimCondCodeLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimCondCodeLog claimCondCodeLog,ClaimCondCodeLog oldClaimCondCodeLog){
 			string command="";
 			if(claimCondCodeLog.ClaimNum != oldClaimCondCodeLog.ClaimNum) {
 				if(command!=""){ command+=",";}
@@ -196,11 +196,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Code10 = '"+POut.String(claimCondCodeLog.Code10)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimcondcodelog SET "+command
 				+" WHERE ClaimCondCodeLogNum = "+POut.Long(claimCondCodeLog.ClaimCondCodeLogNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimCondCodeLog from the database.</summary>

@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PayPlan in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PayPlan payPlan,PayPlan oldPayPlan){
+		///<summary>Updates one PayPlan in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PayPlan payPlan,PayPlan oldPayPlan){
 			string command="";
 			if(payPlan.PatNum != oldPayPlan.PatNum) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="InsSubNum = "+POut.Long(payPlan.InsSubNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE payplan SET "+command
 				+" WHERE PayPlanNum = "+POut.Long(payPlan.PayPlanNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PayPlan from the database.</summary>

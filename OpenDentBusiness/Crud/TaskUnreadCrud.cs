@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TaskUnread in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TaskUnread taskUnread,TaskUnread oldTaskUnread){
+		///<summary>Updates one TaskUnread in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TaskUnread taskUnread,TaskUnread oldTaskUnread){
 			string command="";
 			if(taskUnread.TaskNum != oldTaskUnread.TaskNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="UserNum = "+POut.Long(taskUnread.UserNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE taskunread SET "+command
 				+" WHERE TaskUnreadNum = "+POut.Long(taskUnread.TaskUnreadNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TaskUnread from the database.</summary>

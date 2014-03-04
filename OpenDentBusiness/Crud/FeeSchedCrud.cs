@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one FeeSched in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(FeeSched feeSched,FeeSched oldFeeSched){
+		///<summary>Updates one FeeSched in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(FeeSched feeSched,FeeSched oldFeeSched){
 			string command="";
 			if(feeSched.Description != oldFeeSched.Description) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsHidden = "+POut.Bool(feeSched.IsHidden)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE feesched SET "+command
 				+" WHERE FeeSchedNum = "+POut.Long(feeSched.FeeSchedNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one FeeSched from the database.</summary>

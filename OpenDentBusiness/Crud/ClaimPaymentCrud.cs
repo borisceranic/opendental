@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimPayment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimPayment claimPayment,ClaimPayment oldClaimPayment){
+		///<summary>Updates one ClaimPayment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimPayment claimPayment,ClaimPayment oldClaimPayment){
 			string command="";
 			if(claimPayment.CheckDate != oldClaimPayment.CheckDate) {
 				if(command!=""){ command+=",";}
@@ -189,11 +189,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PayType = "+POut.Long(claimPayment.PayType)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimpayment SET "+command
 				+" WHERE ClaimPaymentNum = "+POut.Long(claimPayment.ClaimPaymentNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimPayment from the database.</summary>

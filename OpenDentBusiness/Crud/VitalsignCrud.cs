@@ -162,8 +162,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Vitalsign in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Vitalsign vitalsign,Vitalsign oldVitalsign){
+		///<summary>Updates one Vitalsign in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Vitalsign vitalsign,Vitalsign oldVitalsign){
 			string command="";
 			if(vitalsign.PatNum != oldVitalsign.PatNum) {
 				if(command!=""){ command+=",";}
@@ -238,11 +238,12 @@ namespace OpenDentBusiness.Crud{
 				command+="BMIPercentile = "+POut.Int(vitalsign.BMIPercentile)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE vitalsign SET "+command
 				+" WHERE VitalsignNum = "+POut.Long(vitalsign.VitalsignNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Vitalsign from the database.</summary>

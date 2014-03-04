@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ApptField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ApptField apptField,ApptField oldApptField){
+		///<summary>Updates one ApptField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ApptField apptField,ApptField oldApptField){
 			string command="";
 			if(apptField.AptNum != oldApptField.AptNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FieldValue = '"+POut.String(apptField.FieldValue)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE apptfield SET "+command
 				+" WHERE ApptFieldNum = "+POut.Long(apptField.ApptFieldNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ApptField from the database.</summary>

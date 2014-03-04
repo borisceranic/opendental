@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one DrugUnit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DrugUnit drugUnit,DrugUnit oldDrugUnit){
+		///<summary>Updates one DrugUnit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DrugUnit drugUnit,DrugUnit oldDrugUnit){
 			string command="";
 			if(drugUnit.UnitIdentifier != oldDrugUnit.UnitIdentifier) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="UnitText = '"+POut.String(drugUnit.UnitText)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE drugunit SET "+command
 				+" WHERE DrugUnitNum = "+POut.Long(drugUnit.DrugUnitNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one DrugUnit from the database.</summary>

@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Equipment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Equipment equipment,Equipment oldEquipment){
+		///<summary>Updates one Equipment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Equipment equipment,Equipment oldEquipment){
 			string command="";
 			if(equipment.Description != oldEquipment.Description) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateEntry = "+POut.Date(equipment.DateEntry)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE equipment SET "+command
 				+" WHERE EquipmentNum = "+POut.Long(equipment.EquipmentNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Equipment from the database.</summary>

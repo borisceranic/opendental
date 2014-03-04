@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one FormPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(FormPat formPat,FormPat oldFormPat){
+		///<summary>Updates one FormPat in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(FormPat formPat,FormPat oldFormPat){
 			string command="";
 			if(formPat.PatNum != oldFormPat.PatNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FormDateTime = "+POut.DateT(formPat.FormDateTime)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE formpat SET "+command
 				+" WHERE FormPatNum = "+POut.Long(formPat.FormPatNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one FormPat from the database.</summary>

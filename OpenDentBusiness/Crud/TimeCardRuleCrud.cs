@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TimeCardRule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TimeCardRule timeCardRule,TimeCardRule oldTimeCardRule){
+		///<summary>Updates one TimeCardRule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TimeCardRule timeCardRule,TimeCardRule oldTimeCardRule){
 			string command="";
 			if(timeCardRule.EmployeeNum != oldTimeCardRule.EmployeeNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="BeforeTimeOfDay = "+POut.Time  (timeCardRule.BeforeTimeOfDay)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE timecardrule SET "+command
 				+" WHERE TimeCardRuleNum = "+POut.Long(timeCardRule.TimeCardRuleNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TimeCardRule from the database.</summary>

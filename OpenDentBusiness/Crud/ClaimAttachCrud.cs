@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimAttach claimAttach,ClaimAttach oldClaimAttach){
+		///<summary>Updates one ClaimAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimAttach claimAttach,ClaimAttach oldClaimAttach){
 			string command="";
 			if(claimAttach.ClaimNum != oldClaimAttach.ClaimNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ActualFileName = '"+POut.String(claimAttach.ActualFileName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimattach SET "+command
 				+" WHERE ClaimAttachNum = "+POut.Long(claimAttach.ClaimAttachNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimAttach from the database.</summary>

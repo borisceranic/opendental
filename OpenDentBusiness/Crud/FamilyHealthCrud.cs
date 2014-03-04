@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one FamilyHealth in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(FamilyHealth familyHealth,FamilyHealth oldFamilyHealth){
+		///<summary>Updates one FamilyHealth in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(FamilyHealth familyHealth,FamilyHealth oldFamilyHealth){
 			string command="";
 			if(familyHealth.PatNum != oldFamilyHealth.PatNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PersonName = '"+POut.String(familyHealth.PersonName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE familyhealth SET "+command
 				+" WHERE FamilyHealthNum = "+POut.Long(familyHealth.FamilyHealthNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one FamilyHealth from the database.</summary>

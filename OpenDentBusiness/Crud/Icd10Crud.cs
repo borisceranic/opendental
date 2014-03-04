@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Icd10 in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Icd10 icd10,Icd10 oldIcd10){
+		///<summary>Updates one Icd10 in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Icd10 icd10,Icd10 oldIcd10){
 			string command="";
 			if(icd10.Icd10Code != oldIcd10.Icd10Code) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsCode = '"+POut.String(icd10.IsCode)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE icd10 SET "+command
 				+" WHERE Icd10Num = "+POut.Long(icd10.Icd10Num);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Icd10 from the database.</summary>

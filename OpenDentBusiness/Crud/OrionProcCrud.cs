@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one OrionProc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(OrionProc orionProc,OrionProc oldOrionProc){
+		///<summary>Updates one OrionProc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(OrionProc orionProc,OrionProc oldOrionProc){
 			string command="";
 			if(orionProc.ProcNum != oldOrionProc.ProcNum) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsRepair = "+POut.Bool(orionProc.IsRepair)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE orionproc SET "+command
 				+" WHERE OrionProcNum = "+POut.Long(orionProc.OrionProcNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one OrionProc from the database.</summary>

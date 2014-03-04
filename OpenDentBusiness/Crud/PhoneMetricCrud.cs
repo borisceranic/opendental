@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PhoneMetric in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PhoneMetric phoneMetric,PhoneMetric oldPhoneMetric){
+		///<summary>Updates one PhoneMetric in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PhoneMetric phoneMetric,PhoneMetric oldPhoneMetric){
 			string command="";
 			if(phoneMetric.DateTimeEntry != oldPhoneMetric.DateTimeEntry) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="MinutesBehind = "+POut.Int(phoneMetric.MinutesBehind)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE phonemetric SET "+command
 				+" WHERE PhoneMetricNum = "+POut.Long(phoneMetric.PhoneMetricNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PhoneMetric from the database.</summary>

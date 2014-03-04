@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Pharmacy in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Pharmacy pharmacy,Pharmacy oldPharmacy){
+		///<summary>Updates one Pharmacy in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Pharmacy pharmacy,Pharmacy oldPharmacy){
 			string command="";
 			if(pharmacy.PharmID != oldPharmacy.PharmID) {
 				if(command!=""){ command+=",";}
@@ -186,11 +186,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//DateTStamp can only be set by MySQL
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE pharmacy SET "+command
 				+" WHERE PharmacyNum = "+POut.Long(pharmacy.PharmacyNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Pharmacy from the database.</summary>

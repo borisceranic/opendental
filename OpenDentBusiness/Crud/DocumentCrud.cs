@@ -190,8 +190,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramRawBase64,paramThumbnail);
 		}
 
-		///<summary>Updates one Document in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Document document,Document oldDocument){
+		///<summary>Updates one Document in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Document document,Document oldDocument){
 			string command="";
 			if(document.Description != oldDocument.Description) {
 				if(command!=""){ command+=",";}
@@ -279,7 +279,7 @@ namespace OpenDentBusiness.Crud{
 				command+="Thumbnail = "+DbHelper.ParamChar+"paramThumbnail";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(document.RawBase64==null) {
 				document.RawBase64="";
@@ -292,6 +292,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE document SET "+command
 				+" WHERE DocNum = "+POut.Long(document.DocNum);
 			Db.NonQ(command,paramRawBase64,paramThumbnail);
+			return true;
 		}
 
 		///<summary>Deletes one Document from the database.</summary>

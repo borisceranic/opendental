@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ScreenGroup in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ScreenGroup screenGroup,ScreenGroup oldScreenGroup){
+		///<summary>Updates one ScreenGroup in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ScreenGroup screenGroup,ScreenGroup oldScreenGroup){
 			string command="";
 			if(screenGroup.Description != oldScreenGroup.Description) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SGDate = "+POut.Date(screenGroup.SGDate)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE screengroup SET "+command
 				+" WHERE ScreenGroupNum = "+POut.Long(screenGroup.ScreenGroupNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ScreenGroup from the database.</summary>

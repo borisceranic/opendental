@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Employer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Employer employer,Employer oldEmployer){
+		///<summary>Updates one Employer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Employer employer,Employer oldEmployer){
 			string command="";
 			if(employer.EmpName != oldEmployer.EmpName) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Phone = '"+POut.String(employer.Phone)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE employer SET "+command
 				+" WHERE EmployerNum = "+POut.Long(employer.EmployerNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Employer from the database.</summary>

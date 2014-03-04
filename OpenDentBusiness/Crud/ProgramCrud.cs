@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Program in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Program program,Program oldProgram){
+		///<summary>Updates one Program in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Program program,Program oldProgram){
 			string command="";
 			if(program.ProgName != oldProgram.ProgName) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PluginDllName = '"+POut.String(program.PluginDllName)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE program SET "+command
 				+" WHERE ProgramNum = "+POut.Long(program.ProgramNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Program from the database.</summary>

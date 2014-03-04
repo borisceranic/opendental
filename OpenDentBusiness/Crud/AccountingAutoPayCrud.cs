@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one AccountingAutoPay in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(AccountingAutoPay accountingAutoPay,AccountingAutoPay oldAccountingAutoPay){
+		///<summary>Updates one AccountingAutoPay in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(AccountingAutoPay accountingAutoPay,AccountingAutoPay oldAccountingAutoPay){
 			string command="";
 			if(accountingAutoPay.PayType != oldAccountingAutoPay.PayType) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PickList = '"+POut.String(accountingAutoPay.PickList)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE accountingautopay SET "+command
 				+" WHERE AccountingAutoPayNum = "+POut.Long(accountingAutoPay.AccountingAutoPayNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one AccountingAutoPay from the database.</summary>

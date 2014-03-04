@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one OIDExternal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(OIDExternal oIDExternal,OIDExternal oldOIDExternal){
+		///<summary>Updates one OIDExternal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(OIDExternal oIDExternal,OIDExternal oldOIDExternal){
 			string command="";
 			if(oIDExternal.IDType != oldOIDExternal.IDType) {
 				if(command!=""){ command+=",";}
@@ -149,11 +149,12 @@ namespace OpenDentBusiness.Crud{
 				command+="rootExternal = '"+POut.String(oIDExternal.rootExternal)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE oidexternal SET "+command
 				+" WHERE OIDExternalNum = "+POut.Long(oIDExternal.OIDExternalNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one OIDExternal from the database.</summary>

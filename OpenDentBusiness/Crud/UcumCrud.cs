@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Ucum in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Ucum ucum,Ucum oldUcum){
+		///<summary>Updates one Ucum in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Ucum ucum,Ucum oldUcum){
 			string command="";
 			if(ucum.UcumCode != oldUcum.UcumCode) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsInUse = "+POut.Bool(ucum.IsInUse)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ucum SET "+command
 				+" WHERE UcumNum = "+POut.Long(ucum.UcumNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Ucum from the database.</summary>

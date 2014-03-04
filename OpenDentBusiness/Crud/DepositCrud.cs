@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Deposit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Deposit deposit,Deposit oldDeposit){
+		///<summary>Updates one Deposit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Deposit deposit,Deposit oldDeposit){
 			string command="";
 			if(deposit.DateDeposit != oldDeposit.DateDeposit) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Memo = '"+POut.String(deposit.Memo)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE deposit SET "+command
 				+" WHERE DepositNum = "+POut.Long(deposit.DepositNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Deposit from the database.</summary>

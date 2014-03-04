@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CodeSystem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CodeSystem codeSystem,CodeSystem oldCodeSystem){
+		///<summary>Updates one CodeSystem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CodeSystem codeSystem,CodeSystem oldCodeSystem){
 			string command="";
 			if(codeSystem.CodeSystemName != oldCodeSystem.CodeSystemName) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Note = '"+POut.String(codeSystem.Note)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE codesystem SET "+command
 				+" WHERE CodeSystemNum = "+POut.Long(codeSystem.CodeSystemNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CodeSystem from the database.</summary>

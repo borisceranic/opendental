@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one InsFilingCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(InsFilingCode insFilingCode,InsFilingCode oldInsFilingCode){
+		///<summary>Updates one InsFilingCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(InsFilingCode insFilingCode,InsFilingCode oldInsFilingCode){
 			string command="";
 			if(insFilingCode.Descript != oldInsFilingCode.Descript) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ItemOrder = "+POut.Int(insFilingCode.ItemOrder)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE insfilingcode SET "+command
 				+" WHERE InsFilingCodeNum = "+POut.Long(insFilingCode.InsFilingCodeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one InsFilingCode from the database.</summary>

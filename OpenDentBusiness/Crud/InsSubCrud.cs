@@ -143,8 +143,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramBenefitNotes);
 		}
 
-		///<summary>Updates one InsSub in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(InsSub insSub,InsSub oldInsSub){
+		///<summary>Updates one InsSub in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(InsSub insSub,InsSub oldInsSub){
 			string command="";
 			if(insSub.PlanNum != oldInsSub.PlanNum) {
 				if(command!=""){ command+=",";}
@@ -183,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 				command+="SubscNote = '"+POut.String(insSub.SubscNote)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(insSub.BenefitNotes==null) {
 				insSub.BenefitNotes="";
@@ -192,6 +192,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE inssub SET "+command
 				+" WHERE InsSubNum = "+POut.Long(insSub.InsSubNum);
 			Db.NonQ(command,paramBenefitNotes);
+			return true;
 		}
 
 		///<summary>Deletes one InsSub from the database.</summary>

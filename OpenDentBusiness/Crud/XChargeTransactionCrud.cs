@@ -150,8 +150,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one XChargeTransaction in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(XChargeTransaction xChargeTransaction,XChargeTransaction oldXChargeTransaction){
+		///<summary>Updates one XChargeTransaction in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(XChargeTransaction xChargeTransaction,XChargeTransaction oldXChargeTransaction){
 			string command="";
 			if(xChargeTransaction.TransType != oldXChargeTransaction.TransType) {
 				if(command!=""){ command+=",";}
@@ -210,11 +210,12 @@ namespace OpenDentBusiness.Crud{
 				command+="TransactionDateTime = "+POut.DateT(xChargeTransaction.TransactionDateTime)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE xchargetransaction SET "+command
 				+" WHERE XChargeTransactionNum = "+POut.Long(xChargeTransaction.XChargeTransactionNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one XChargeTransaction from the database.</summary>

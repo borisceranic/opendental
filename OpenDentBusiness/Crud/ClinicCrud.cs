@@ -144,8 +144,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Clinic in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Clinic clinic,Clinic oldClinic){
+		///<summary>Updates one Clinic in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Clinic clinic,Clinic oldClinic){
 			string command="";
 			if(clinic.Description != oldClinic.Description) {
 				if(command!=""){ command+=",";}
@@ -196,11 +196,12 @@ namespace OpenDentBusiness.Crud{
 				command+="EmailAddressNum = "+POut.Long(clinic.EmailAddressNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE clinic SET "+command
 				+" WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Clinic from the database.</summary>

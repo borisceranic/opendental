@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Commlog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Commlog commlog,Commlog oldCommlog){
+		///<summary>Updates one Commlog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Commlog commlog,Commlog oldCommlog){
 			string command="";
 			if(commlog.PatNum != oldCommlog.PatNum) {
 				if(command!=""){ command+=",";}
@@ -186,11 +186,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateTimeEnd = "+POut.DateT(commlog.DateTimeEnd)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE commlog SET "+command
 				+" WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Commlog from the database.</summary>

@@ -133,8 +133,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrLabSpecimenRejectReason in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason,EhrLabSpecimenRejectReason oldEhrLabSpecimenRejectReason){
+		///<summary>Updates one EhrLabSpecimenRejectReason in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason,EhrLabSpecimenRejectReason oldEhrLabSpecimenRejectReason){
 			string command="";
 			if(ehrLabSpecimenRejectReason.EhrLabSpecimenNum != oldEhrLabSpecimenRejectReason.EhrLabSpecimenNum) {
 				if(command!=""){ command+=",";}
@@ -169,11 +169,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SpecimenRejectReasonTextOriginal = '"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrlabspecimenrejectreason SET "+command
 				+" WHERE EhrLabSpecimenRejectReasonNum = "+POut.Long(ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrLabSpecimenRejectReason from the database.</summary>

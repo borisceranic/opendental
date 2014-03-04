@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Signalod in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Signalod signalod,Signalod oldSignalod){
+		///<summary>Updates one Signalod in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Signalod signalod,Signalod oldSignalod){
 			string command="";
 			if(signalod.FromUser != oldSignalod.FromUser) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="TaskNum = "+POut.Long(signalod.TaskNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE signalod SET "+command
 				+" WHERE SignalNum = "+POut.Long(signalod.SignalNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Signalod from the database.</summary>

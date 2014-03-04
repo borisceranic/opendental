@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Operatory in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Operatory operatory,Operatory oldOperatory){
+		///<summary>Updates one Operatory in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Operatory operatory,Operatory oldOperatory){
 			string command="";
 			if(operatory.OpName != oldOperatory.OpName) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SetProspective = "+POut.Bool(operatory.SetProspective)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE operatory SET "+command
 				+" WHERE OperatoryNum = "+POut.Long(operatory.OperatoryNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Operatory from the database.</summary>

@@ -153,8 +153,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Carrier in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Carrier carrier,Carrier oldCarrier){
+		///<summary>Updates one Carrier in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Carrier carrier,Carrier oldCarrier){
 			string command="";
 			if(carrier.CarrierName != oldCarrier.CarrierName) {
 				if(command!=""){ command+=",";}
@@ -217,11 +217,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CanadianSupportedTypes = "+POut.Int   ((int)carrier.CanadianSupportedTypes)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE carrier SET "+command
 				+" WHERE CarrierNum = "+POut.Long(carrier.CarrierNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Carrier from the database.</summary>

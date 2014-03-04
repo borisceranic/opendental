@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Snomed in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Snomed snomed,Snomed oldSnomed){
+		///<summary>Updates one Snomed in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Snomed snomed,Snomed oldSnomed){
 			string command="";
 			if(snomed.SnomedCode != oldSnomed.SnomedCode) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Description = '"+POut.String(snomed.Description)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE snomed SET "+command
 				+" WHERE SnomedNum = "+POut.Long(snomed.SnomedNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Snomed from the database.</summary>

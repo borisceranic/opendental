@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Mount in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Mount mount,Mount oldMount){
+		///<summary>Updates one Mount in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Mount mount,Mount oldMount){
 			string command="";
 			if(mount.PatNum != oldMount.PatNum) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Height = "+POut.Int(mount.Height)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE mount SET "+command
 				+" WHERE MountNum = "+POut.Long(mount.MountNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Mount from the database.</summary>

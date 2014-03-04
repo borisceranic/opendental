@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SigElement in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SigElement sigElement,SigElement oldSigElement){
+		///<summary>Updates one SigElement in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SigElement sigElement,SigElement oldSigElement){
 			string command="";
 			if(sigElement.SigElementDefNum != oldSigElement.SigElementDefNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SignalNum = "+POut.Long(sigElement.SignalNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE sigelement SET "+command
 				+" WHERE SigElementNum = "+POut.Long(sigElement.SigElementNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SigElement from the database.</summary>

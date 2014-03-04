@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Popup in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Popup popup,Popup oldPopup){
+		///<summary>Updates one Popup in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Popup popup,Popup oldPopup){
 			string command="";
 			if(popup.PatNum != oldPopup.PatNum) {
 				if(command!=""){ command+=",";}
@@ -165,11 +165,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PopupNumArchive = "+POut.Long(popup.PopupNumArchive)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE popup SET "+command
 				+" WHERE PopupNum = "+POut.Long(popup.PopupNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Popup from the database.</summary>

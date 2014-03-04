@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Guardian in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Guardian guardian,Guardian oldGuardian){
+		///<summary>Updates one Guardian in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Guardian guardian,Guardian oldGuardian){
 			string command="";
 			if(guardian.PatNumChild != oldGuardian.PatNumChild) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsGuardian = "+POut.Bool(guardian.IsGuardian)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE guardian SET "+command
 				+" WHERE GuardianNum = "+POut.Long(guardian.GuardianNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Guardian from the database.</summary>

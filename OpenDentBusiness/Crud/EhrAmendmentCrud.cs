@@ -146,8 +146,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramRawBase64);
 		}
 
-		///<summary>Updates one EhrAmendment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrAmendment ehrAmendment,EhrAmendment oldEhrAmendment){
+		///<summary>Updates one EhrAmendment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrAmendment ehrAmendment,EhrAmendment oldEhrAmendment){
 			string command="";
 			if(ehrAmendment.PatNum != oldEhrAmendment.PatNum) {
 				if(command!=""){ command+=",";}
@@ -190,7 +190,7 @@ namespace OpenDentBusiness.Crud{
 				command+="DateTAppend = "+POut.DateT(ehrAmendment.DateTAppend)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(ehrAmendment.RawBase64==null) {
 				ehrAmendment.RawBase64="";
@@ -199,6 +199,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE ehramendment SET "+command
 				+" WHERE EhrAmendmentNum = "+POut.Long(ehrAmendment.EhrAmendmentNum);
 			Db.NonQ(command,paramRawBase64);
+			return true;
 		}
 
 		///<summary>Deletes one EhrAmendment from the database.</summary>

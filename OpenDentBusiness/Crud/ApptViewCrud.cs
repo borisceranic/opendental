@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ApptView in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ApptView apptView,ApptView oldApptView){
+		///<summary>Updates one ApptView in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ApptView apptView,ApptView oldApptView){
 			string command="";
 			if(apptView.Description != oldApptView.Description) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ClinicNum = "+POut.Long(apptView.ClinicNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE apptview SET "+command
 				+" WHERE ApptViewNum = "+POut.Long(apptView.ApptViewNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ApptView from the database.</summary>

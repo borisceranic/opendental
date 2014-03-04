@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ICD9 in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ICD9 iCD9,ICD9 oldICD9){
+		///<summary>Updates one ICD9 in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ICD9 iCD9,ICD9 oldICD9){
 			string command="";
 			if(iCD9.ICD9Code != oldICD9.ICD9Code) {
 				if(command!=""){ command+=",";}
@@ -130,11 +130,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//DateTStamp can only be set by MySQL
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE icd9 SET "+command
 				+" WHERE ICD9Num = "+POut.Long(iCD9.ICD9Num);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ICD9 from the database.</summary>

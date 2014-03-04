@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ProcGroupItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProcGroupItem procGroupItem,ProcGroupItem oldProcGroupItem){
+		///<summary>Updates one ProcGroupItem in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProcGroupItem procGroupItem,ProcGroupItem oldProcGroupItem){
 			string command="";
 			if(procGroupItem.ProcNum != oldProcGroupItem.ProcNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="GroupNum = "+POut.Long(procGroupItem.GroupNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE procgroupitem SET "+command
 				+" WHERE ProcGroupItemNum = "+POut.Long(procGroupItem.ProcGroupItemNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ProcGroupItem from the database.</summary>

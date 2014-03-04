@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrNotPerformed in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrNotPerformed ehrNotPerformed,EhrNotPerformed oldEhrNotPerformed){
+		///<summary>Updates one EhrNotPerformed in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrNotPerformed ehrNotPerformed,EhrNotPerformed oldEhrNotPerformed){
 			string command="";
 			if(ehrNotPerformed.PatNum != oldEhrNotPerformed.PatNum) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateEntry = "+POut.Date(ehrNotPerformed.DateEntry)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrnotperformed SET "+command
 				+" WHERE EhrNotPerformedNum = "+POut.Long(ehrNotPerformed.EhrNotPerformedNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrNotPerformed from the database.</summary>

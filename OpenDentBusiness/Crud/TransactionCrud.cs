@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Transaction in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Transaction transaction,Transaction oldTransaction){
+		///<summary>Updates one Transaction in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Transaction transaction,Transaction oldTransaction){
 			string command="";
 			//DateTimeEntry not allowed to change
 			if(transaction.UserNum != oldTransaction.UserNum) {
@@ -137,11 +137,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PayNum = "+POut.Long(transaction.PayNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE transaction SET "+command
 				+" WHERE TransactionNum = "+POut.Long(transaction.TransactionNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Transaction from the database.</summary>

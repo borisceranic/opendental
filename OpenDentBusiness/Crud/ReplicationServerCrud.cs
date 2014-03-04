@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ReplicationServer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ReplicationServer replicationServer,ReplicationServer oldReplicationServer){
+		///<summary>Updates one ReplicationServer in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ReplicationServer replicationServer,ReplicationServer oldReplicationServer){
 			string command="";
 			if(replicationServer.Descript != oldReplicationServer.Descript) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="SlaveMonitor = '"+POut.String(replicationServer.SlaveMonitor)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE replicationserver SET "+command
 				+" WHERE ReplicationServerNum = "+POut.Long(replicationServer.ReplicationServerNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ReplicationServer from the database.</summary>

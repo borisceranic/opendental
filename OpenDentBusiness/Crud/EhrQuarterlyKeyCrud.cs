@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrQuarterlyKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrQuarterlyKey ehrQuarterlyKey,EhrQuarterlyKey oldEhrQuarterlyKey){
+		///<summary>Updates one EhrQuarterlyKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrQuarterlyKey ehrQuarterlyKey,EhrQuarterlyKey oldEhrQuarterlyKey){
 			string command="";
 			if(ehrQuarterlyKey.YearValue != oldEhrQuarterlyKey.YearValue) {
 				if(command!=""){ command+=",";}
@@ -154,11 +154,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Notes = '"+POut.String(ehrQuarterlyKey.Notes)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrquarterlykey SET "+command
 				+" WHERE EhrQuarterlyKeyNum = "+POut.Long(ehrQuarterlyKey.EhrQuarterlyKeyNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrQuarterlyKey from the database.</summary>

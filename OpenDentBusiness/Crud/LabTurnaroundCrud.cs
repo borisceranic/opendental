@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one LabTurnaround in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(LabTurnaround labTurnaround,LabTurnaround oldLabTurnaround){
+		///<summary>Updates one LabTurnaround in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(LabTurnaround labTurnaround,LabTurnaround oldLabTurnaround){
 			string command="";
 			if(labTurnaround.LaboratoryNum != oldLabTurnaround.LaboratoryNum) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DaysActual = "+POut.Int(labTurnaround.DaysActual)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE labturnaround SET "+command
 				+" WHERE LabTurnaroundNum = "+POut.Long(labTurnaround.LabTurnaroundNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one LabTurnaround from the database.</summary>

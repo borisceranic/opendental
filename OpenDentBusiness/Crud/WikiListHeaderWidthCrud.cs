@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one WikiListHeaderWidth in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(WikiListHeaderWidth wikiListHeaderWidth,WikiListHeaderWidth oldWikiListHeaderWidth){
+		///<summary>Updates one WikiListHeaderWidth in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(WikiListHeaderWidth wikiListHeaderWidth,WikiListHeaderWidth oldWikiListHeaderWidth){
 			string command="";
 			if(wikiListHeaderWidth.ListName != oldWikiListHeaderWidth.ListName) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ColWidth = "+POut.Int(wikiListHeaderWidth.ColWidth)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE wikilistheaderwidth SET "+command
 				+" WHERE WikiListHeaderWidthNum = "+POut.Long(wikiListHeaderWidth.WikiListHeaderWidthNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one WikiListHeaderWidth from the database.</summary>

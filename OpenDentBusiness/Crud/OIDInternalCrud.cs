@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one OIDInternal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(OIDInternal oIDInternal,OIDInternal oldOIDInternal){
+		///<summary>Updates one OIDInternal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(OIDInternal oIDInternal,OIDInternal oldOIDInternal){
 			string command="";
 			if(oIDInternal.IDType != oldOIDInternal.IDType) {
 				if(command!=""){ command+=",";}
@@ -135,11 +135,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IDRoot = '"+POut.String(oIDInternal.IDRoot)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE oidinternal SET "+command
 				+" WHERE OIDInternalNum = "+POut.Long(oIDInternal.OIDInternalNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one OIDInternal from the database.</summary>

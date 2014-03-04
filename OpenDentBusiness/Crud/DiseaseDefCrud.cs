@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one DiseaseDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DiseaseDef diseaseDef,DiseaseDef oldDiseaseDef){
+		///<summary>Updates one DiseaseDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DiseaseDef diseaseDef,DiseaseDef oldDiseaseDef){
 			string command="";
 			if(diseaseDef.DiseaseName != oldDiseaseDef.DiseaseName) {
 				if(command!=""){ command+=",";}
@@ -158,11 +158,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Icd10Code = '"+POut.String(diseaseDef.Icd10Code)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE diseasedef SET "+command
 				+" WHERE DiseaseDefNum = "+POut.Long(diseaseDef.DiseaseDefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one DiseaseDef from the database.</summary>

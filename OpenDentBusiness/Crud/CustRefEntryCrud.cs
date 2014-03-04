@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CustRefEntry in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CustRefEntry custRefEntry,CustRefEntry oldCustRefEntry){
+		///<summary>Updates one CustRefEntry in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CustRefEntry custRefEntry,CustRefEntry oldCustRefEntry){
 			string command="";
 			if(custRefEntry.PatNumCust != oldCustRefEntry.PatNumCust) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Note = '"+POut.String(custRefEntry.Note)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE custrefentry SET "+command
 				+" WHERE CustRefEntryNum = "+POut.Long(custRefEntry.CustRefEntryNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CustRefEntry from the database.</summary>

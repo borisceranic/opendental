@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Def in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Def def,Def oldDef){
+		///<summary>Updates one Def in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Def def,Def oldDef){
 			string command="";
 			if(def.Category != oldDef.Category) {
 				if(command!=""){ command+=",";}
@@ -154,11 +154,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsHidden = "+POut.Bool(def.IsHidden)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE definition SET "+command
 				+" WHERE DefNum = "+POut.Long(def.DefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Def from the database.</summary>

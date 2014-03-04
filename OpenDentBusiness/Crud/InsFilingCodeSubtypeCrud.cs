@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one InsFilingCodeSubtype in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(InsFilingCodeSubtype insFilingCodeSubtype,InsFilingCodeSubtype oldInsFilingCodeSubtype){
+		///<summary>Updates one InsFilingCodeSubtype in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(InsFilingCodeSubtype insFilingCodeSubtype,InsFilingCodeSubtype oldInsFilingCodeSubtype){
 			string command="";
 			if(insFilingCodeSubtype.InsFilingCodeNum != oldInsFilingCodeSubtype.InsFilingCodeNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Descript = '"+POut.String(insFilingCodeSubtype.Descript)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE insfilingcodesubtype SET "+command
 				+" WHERE InsFilingCodeSubtypeNum = "+POut.Long(insFilingCodeSubtype.InsFilingCodeSubtypeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one InsFilingCodeSubtype from the database.</summary>

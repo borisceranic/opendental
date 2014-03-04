@@ -207,8 +207,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Provider in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Provider provider,Provider oldProvider){
+		///<summary>Updates one Provider in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Provider provider,Provider oldProvider){
 			string command="";
 			if(provider.Abbr != oldProvider.Abbr) {
 				if(command!=""){ command+=",";}
@@ -340,11 +340,12 @@ namespace OpenDentBusiness.Crud{
 				command+="EmailAddressNum = "+POut.Long(provider.EmailAddressNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE provider SET "+command
 				+" WHERE ProvNum = "+POut.Long(provider.ProvNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Provider from the database.</summary>

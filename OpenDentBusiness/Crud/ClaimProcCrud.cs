@@ -219,8 +219,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClaimProc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClaimProc claimProc,ClaimProc oldClaimProc){
+		///<summary>Updates one ClaimProc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClaimProc claimProc,ClaimProc oldClaimProc){
 			string command="";
 			if(claimProc.ProcNum != oldClaimProc.ProcNum) {
 				if(command!=""){ command+=",";}
@@ -371,11 +371,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PaymentRow = "+POut.Int(claimProc.PaymentRow)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE claimproc SET "+command
 				+" WHERE ClaimProcNum = "+POut.Long(claimProc.ClaimProcNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClaimProc from the database.</summary>

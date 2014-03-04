@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one JournalEntry in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(JournalEntry journalEntry,JournalEntry oldJournalEntry){
+		///<summary>Updates one JournalEntry in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(JournalEntry journalEntry,JournalEntry oldJournalEntry){
 			string command="";
 			if(journalEntry.TransactionNum != oldJournalEntry.TransactionNum) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ReconcileNum = "+POut.Long(journalEntry.ReconcileNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE journalentry SET "+command
 				+" WHERE JournalEntryNum = "+POut.Long(journalEntry.JournalEntryNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one JournalEntry from the database.</summary>

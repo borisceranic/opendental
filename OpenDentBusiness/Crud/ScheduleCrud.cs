@@ -138,8 +138,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Schedule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Schedule schedule,Schedule oldSchedule){
+		///<summary>Updates one Schedule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Schedule schedule,Schedule oldSchedule){
 			string command="";
 			if(schedule.SchedDate != oldSchedule.SchedDate) {
 				if(command!=""){ command+=",";}
@@ -179,11 +179,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//DateTStamp can only be set by MySQL
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE schedule SET "+command
 				+" WHERE ScheduleNum = "+POut.Long(schedule.ScheduleNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Schedule from the database.</summary>

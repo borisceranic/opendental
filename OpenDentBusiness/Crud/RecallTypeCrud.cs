@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RecallType in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RecallType recallType,RecallType oldRecallType){
+		///<summary>Updates one RecallType in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RecallType recallType,RecallType oldRecallType){
 			string command="";
 			if(recallType.Description != oldRecallType.Description) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Procedures = '"+POut.String(recallType.Procedures)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE recalltype SET "+command
 				+" WHERE RecallTypeNum = "+POut.Long(recallType.RecallTypeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RecallType from the database.</summary>

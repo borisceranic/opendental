@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one AutoCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(AutoCode autoCode,AutoCode oldAutoCode){
+		///<summary>Updates one AutoCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(AutoCode autoCode,AutoCode oldAutoCode){
 			string command="";
 			if(autoCode.Description != oldAutoCode.Description) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="LessIntrusive = "+POut.Bool(autoCode.LessIntrusive)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE autocode SET "+command
 				+" WHERE AutoCodeNum = "+POut.Long(autoCode.AutoCodeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one AutoCode from the database.</summary>

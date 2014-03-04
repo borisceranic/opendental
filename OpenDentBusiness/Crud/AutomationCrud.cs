@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Automation in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Automation automation,Automation oldAutomation){
+		///<summary>Updates one Automation in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Automation automation,Automation oldAutomation){
 			string command="";
 			if(automation.Description != oldAutomation.Description) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="MessageContent = '"+POut.String(automation.MessageContent)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE automation SET "+command
 				+" WHERE AutomationNum = "+POut.Long(automation.AutomationNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Automation from the database.</summary>

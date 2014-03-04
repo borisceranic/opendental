@@ -150,8 +150,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ClockEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ClockEvent clockEvent,ClockEvent oldClockEvent){
+		///<summary>Updates one ClockEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ClockEvent clockEvent,ClockEvent oldClockEvent){
 			string command="";
 			if(clockEvent.EmployeeNum != oldClockEvent.EmployeeNum) {
 				if(command!=""){ command+=",";}
@@ -207,11 +207,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Rate2Auto = '"+POut.TSpan (clockEvent.Rate2Auto)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE clockevent SET "+command
 				+" WHERE ClockEventNum = "+POut.Long(clockEvent.ClockEventNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ClockEvent from the database.</summary>

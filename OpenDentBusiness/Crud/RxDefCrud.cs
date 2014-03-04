@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RxDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RxDef rxDef,RxDef oldRxDef){
+		///<summary>Updates one RxDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RxDef rxDef,RxDef oldRxDef){
 			string command="";
 			if(rxDef.Drug != oldRxDef.Drug) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="RxCui = "+POut.Long(rxDef.RxCui)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE rxdef SET "+command
 				+" WHERE RxDefNum = "+POut.Long(rxDef.RxDefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RxDef from the database.</summary>

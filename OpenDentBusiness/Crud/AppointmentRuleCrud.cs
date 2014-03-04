@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one AppointmentRule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(AppointmentRule appointmentRule,AppointmentRule oldAppointmentRule){
+		///<summary>Updates one AppointmentRule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(AppointmentRule appointmentRule,AppointmentRule oldAppointmentRule){
 			string command="";
 			if(appointmentRule.RuleDesc != oldAppointmentRule.RuleDesc) {
 				if(command!=""){ command+=",";}
@@ -140,11 +140,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsEnabled = "+POut.Bool(appointmentRule.IsEnabled)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE appointmentrule SET "+command
 				+" WHERE AppointmentRuleNum = "+POut.Long(appointmentRule.AppointmentRuleNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one AppointmentRule from the database.</summary>

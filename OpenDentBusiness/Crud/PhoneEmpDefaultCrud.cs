@@ -138,8 +138,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PhoneEmpDefault in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PhoneEmpDefault phoneEmpDefault,PhoneEmpDefault oldPhoneEmpDefault){
+		///<summary>Updates one PhoneEmpDefault in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PhoneEmpDefault phoneEmpDefault,PhoneEmpDefault oldPhoneEmpDefault){
 			string command="";
 			if(phoneEmpDefault.IsGraphed != oldPhoneEmpDefault.IsGraphed) {
 				if(command!=""){ command+=",";}
@@ -182,11 +182,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsTriageOperator = "+POut.Bool(phoneEmpDefault.IsTriageOperator)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE phoneempdefault SET "+command
 				+" WHERE EmployeeNum = "+POut.Long(phoneEmpDefault.EmployeeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PhoneEmpDefault from the database.</summary>

@@ -132,8 +132,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one TaskList in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(TaskList taskList,TaskList oldTaskList){
+		///<summary>Updates one TaskList in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(TaskList taskList,TaskList oldTaskList){
 			string command="";
 			if(taskList.Descript != oldTaskList.Descript) {
 				if(command!=""){ command+=",";}
@@ -168,11 +168,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DateTimeEntry = "+POut.DateT(taskList.DateTimeEntry)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE tasklist SET "+command
 				+" WHERE TaskListNum = "+POut.Long(taskList.TaskListNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one TaskList from the database.</summary>

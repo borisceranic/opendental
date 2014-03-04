@@ -171,8 +171,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one Screen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Screen screen,Screen oldScreen){
+		///<summary>Updates one Screen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Screen screen,Screen oldScreen){
 			string command="";
 			if(screen.ScreenDate != oldScreen.ScreenDate) {
 				if(command!=""){ command+=",";}
@@ -259,11 +259,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Comments = '"+POut.String(screen.Comments)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE screen SET "+command
 				+" WHERE ScreenNum = "+POut.Long(screen.ScreenNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one Screen from the database.</summary>

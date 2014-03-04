@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one DeletedObject in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(DeletedObject deletedObject,DeletedObject oldDeletedObject){
+		///<summary>Updates one DeletedObject in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(DeletedObject deletedObject,DeletedObject oldDeletedObject){
 			string command="";
 			if(deletedObject.ObjectNum != oldDeletedObject.ObjectNum) {
 				if(command!=""){ command+=",";}
@@ -130,11 +130,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//DateTStamp can only be set by MySQL
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE deletedobject SET "+command
 				+" WHERE DeletedObjectNum = "+POut.Long(deletedObject.DeletedObjectNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one DeletedObject from the database.</summary>

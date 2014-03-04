@@ -123,8 +123,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ElectID in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ElectID electID,ElectID oldElectID){
+		///<summary>Updates one ElectID in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ElectID electID,ElectID oldElectID){
 			string command="";
 			if(electID.PayorID != oldElectID.PayorID) {
 				if(command!=""){ command+=",";}
@@ -147,11 +147,12 @@ namespace OpenDentBusiness.Crud{
 				command+="Comments = '"+POut.String(electID.Comments)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE electid SET "+command
 				+" WHERE ElectIDNum = "+POut.Long(electID.ElectIDNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ElectID from the database.</summary>

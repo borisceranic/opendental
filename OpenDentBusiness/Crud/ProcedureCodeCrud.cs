@@ -189,8 +189,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ProcedureCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ProcedureCode procedureCode,ProcedureCode oldProcedureCode){
+		///<summary>Updates one ProcedureCode in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ProcedureCode procedureCode,ProcedureCode oldProcedureCode){
 			string command="";
 			//ProcCode excluded from update
 			if(procedureCode.Descript != oldProcedureCode.Descript) {
@@ -295,11 +295,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ProvNumDefault = "+POut.Long(procedureCode.ProvNumDefault)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE procedurecode SET "+command
 				+" WHERE CodeNum = "+POut.Long(procedureCode.CodeNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ProcedureCode from the database.</summary>

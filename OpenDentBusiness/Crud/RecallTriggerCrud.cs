@@ -114,8 +114,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RecallTrigger in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RecallTrigger recallTrigger,RecallTrigger oldRecallTrigger){
+		///<summary>Updates one RecallTrigger in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RecallTrigger recallTrigger,RecallTrigger oldRecallTrigger){
 			string command="";
 			if(recallTrigger.RecallTypeNum != oldRecallTrigger.RecallTypeNum) {
 				if(command!=""){ command+=",";}
@@ -126,11 +126,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CodeNum = "+POut.Long(recallTrigger.CodeNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE recalltrigger SET "+command
 				+" WHERE RecallTriggerNum = "+POut.Long(recallTrigger.RecallTriggerNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RecallTrigger from the database.</summary>

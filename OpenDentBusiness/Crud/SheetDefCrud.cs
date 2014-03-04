@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one SheetDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(SheetDef sheetDef,SheetDef oldSheetDef){
+		///<summary>Updates one SheetDef in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(SheetDef sheetDef,SheetDef oldSheetDef){
 			string command="";
 			if(sheetDef.Description != oldSheetDef.Description) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsLandscape = "+POut.Bool(sheetDef.IsLandscape)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE sheetdef SET "+command
 				+" WHERE SheetDefNum = "+POut.Long(sheetDef.SheetDefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one SheetDef from the database.</summary>

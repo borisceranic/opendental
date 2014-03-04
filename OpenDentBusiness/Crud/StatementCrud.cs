@@ -170,8 +170,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramEmailBody);
 		}
 
-		///<summary>Updates one Statement in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Statement statement,Statement oldStatement){
+		///<summary>Updates one Statement in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Statement statement,Statement oldStatement){
 			string command="";
 			if(statement.PatNum != oldStatement.PatNum) {
 				if(command!=""){ command+=",";}
@@ -243,7 +243,7 @@ namespace OpenDentBusiness.Crud{
 				command+="EmailBody = "+DbHelper.ParamChar+"paramEmailBody";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
@@ -252,6 +252,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE statement SET "+command
 				+" WHERE StatementNum = "+POut.Long(statement.StatementNum);
 			Db.NonQ(command,paramEmailBody);
+			return true;
 		}
 
 		///<summary>Deletes one Statement from the database.</summary>

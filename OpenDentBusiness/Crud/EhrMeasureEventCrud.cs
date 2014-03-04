@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrMeasureEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrMeasureEvent ehrMeasureEvent,EhrMeasureEvent oldEhrMeasureEvent){
+		///<summary>Updates one EhrMeasureEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrMeasureEvent ehrMeasureEvent,EhrMeasureEvent oldEhrMeasureEvent){
 			string command="";
 			if(ehrMeasureEvent.DateTEvent != oldEhrMeasureEvent.DateTEvent) {
 				if(command!=""){ command+=",";}
@@ -175,11 +175,12 @@ namespace OpenDentBusiness.Crud{
 				command+="FKey = "+POut.Long(ehrMeasureEvent.FKey)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrmeasureevent SET "+command
 				+" WHERE EhrMeasureEventNum = "+POut.Long(ehrMeasureEvent.EhrMeasureEventNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrMeasureEvent from the database.</summary>

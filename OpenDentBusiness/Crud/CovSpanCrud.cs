@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CovSpan in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CovSpan covSpan,CovSpan oldCovSpan){
+		///<summary>Updates one CovSpan in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CovSpan covSpan,CovSpan oldCovSpan){
 			string command="";
 			if(covSpan.CovCatNum != oldCovSpan.CovCatNum) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ToCode = '"+POut.String(covSpan.ToCode)+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE covspan SET "+command
 				+" WHERE CovSpanNum = "+POut.Long(covSpan.CovSpanNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CovSpan from the database.</summary>

@@ -152,8 +152,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramDescript);
 		}
 
-		///<summary>Updates one Task in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Task task,Task oldTask){
+		///<summary>Updates one Task in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Task task,Task oldTask){
 			string command="";
 			if(task.TaskListNum != oldTask.TaskListNum) {
 				if(command!=""){ command+=",";}
@@ -204,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 				command+="DateTimeFinished = "+POut.DateT(task.DateTimeFinished)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(task.Descript==null) {
 				task.Descript="";
@@ -213,6 +213,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE task SET "+command
 				+" WHERE TaskNum = "+POut.Long(task.TaskNum);
 			Db.NonQ(command,paramDescript);
+			return true;
 		}
 
 		///<summary>Deletes one Task from the database.</summary>

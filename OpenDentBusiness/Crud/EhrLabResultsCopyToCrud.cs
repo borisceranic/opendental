@@ -163,8 +163,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrLabResultsCopyTo in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrLabResultsCopyTo ehrLabResultsCopyTo,EhrLabResultsCopyTo oldEhrLabResultsCopyTo){
+		///<summary>Updates one EhrLabResultsCopyTo in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrLabResultsCopyTo ehrLabResultsCopyTo,EhrLabResultsCopyTo oldEhrLabResultsCopyTo){
 			string command="";
 			if(ehrLabResultsCopyTo.EhrLabNum != oldEhrLabResultsCopyTo.EhrLabNum) {
 				if(command!=""){ command+=",";}
@@ -215,11 +215,12 @@ namespace OpenDentBusiness.Crud{
 				command+="CopyToIdentifierTypeCode = '"+POut.String(ehrLabResultsCopyTo.CopyToIdentifierTypeCode.ToString())+"'";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrlabresultscopyto SET "+command
 				+" WHERE EhrLabResultsCopyToNum = "+POut.Long(ehrLabResultsCopyTo.EhrLabResultsCopyToNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrLabResultsCopyTo from the database.</summary>

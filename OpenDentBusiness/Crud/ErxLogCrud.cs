@@ -128,8 +128,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramMsgText);
 		}
 
-		///<summary>Updates one ErxLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ErxLog erxLog,ErxLog oldErxLog){
+		///<summary>Updates one ErxLog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ErxLog erxLog,ErxLog oldErxLog){
 			string command="";
 			if(erxLog.PatNum != oldErxLog.PatNum) {
 				if(command!=""){ command+=",";}
@@ -145,7 +145,7 @@ namespace OpenDentBusiness.Crud{
 				command+="ProvNum = "+POut.Long(erxLog.ProvNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(erxLog.MsgText==null) {
 				erxLog.MsgText="";
@@ -154,6 +154,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE erxlog SET "+command
 				+" WHERE ErxLogNum = "+POut.Long(erxLog.ErxLogNum);
 			Db.NonQ(command,paramMsgText);
+			return true;
 		}
 
 		///<summary>Deletes one ErxLog from the database.</summary>

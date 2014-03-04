@@ -144,8 +144,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RegistrationKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RegistrationKey registrationKey,RegistrationKey oldRegistrationKey){
+		///<summary>Updates one RegistrationKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RegistrationKey registrationKey,RegistrationKey oldRegistrationKey){
 			string command="";
 			if(registrationKey.PatNum != oldRegistrationKey.PatNum) {
 				if(command!=""){ command+=",";}
@@ -196,11 +196,12 @@ namespace OpenDentBusiness.Crud{
 				command+="IsResellerCustomer = "+POut.Bool(registrationKey.IsResellerCustomer)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE registrationkey SET "+command
 				+" WHERE RegistrationKeyNum = "+POut.Long(registrationKey.RegistrationKeyNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RegistrationKey from the database.</summary>

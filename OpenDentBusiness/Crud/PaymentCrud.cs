@@ -155,8 +155,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command,paramReceipt);
 		}
 
-		///<summary>Updates one Payment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(Payment payment,Payment oldPayment){
+		///<summary>Updates one Payment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(Payment payment,Payment oldPayment){
 			string command="";
 			if(payment.PayType != oldPayment.PayType) {
 				if(command!=""){ command+=",";}
@@ -205,7 +205,7 @@ namespace OpenDentBusiness.Crud{
 				command+="IsRecurringCC = "+POut.Bool(payment.IsRecurringCC)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			if(payment.Receipt==null) {
 				payment.Receipt="";
@@ -214,6 +214,7 @@ namespace OpenDentBusiness.Crud{
 			command="UPDATE payment SET "+command
 				+" WHERE PayNum = "+POut.Long(payment.PayNum);
 			Db.NonQ(command,paramReceipt);
+			return true;
 		}
 
 		///<summary>Deletes one Payment from the database.</summary>

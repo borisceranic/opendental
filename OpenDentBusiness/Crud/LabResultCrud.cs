@@ -135,8 +135,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one LabResult in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(LabResult labResult,LabResult oldLabResult){
+		///<summary>Updates one LabResult in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(LabResult labResult,LabResult oldLabResult){
 			string command="";
 			if(labResult.LabPanelNum != oldLabResult.LabPanelNum) {
 				if(command!=""){ command+=",";}
@@ -172,11 +172,12 @@ namespace OpenDentBusiness.Crud{
 				command+="AbnormalFlag = "+POut.Int   ((int)labResult.AbnormalFlag)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE labresult SET "+command
 				+" WHERE LabResultNum = "+POut.Long(labResult.LabResultNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one LabResult from the database.</summary>

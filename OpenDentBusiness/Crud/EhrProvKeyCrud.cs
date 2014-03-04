@@ -129,8 +129,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one EhrProvKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(EhrProvKey ehrProvKey,EhrProvKey oldEhrProvKey){
+		///<summary>Updates one EhrProvKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(EhrProvKey ehrProvKey,EhrProvKey oldEhrProvKey){
 			string command="";
 			if(ehrProvKey.PatNum != oldEhrProvKey.PatNum) {
 				if(command!=""){ command+=",";}
@@ -161,11 +161,12 @@ namespace OpenDentBusiness.Crud{
 				command+="HasReportAccess = "+POut.Bool(ehrProvKey.HasReportAccess)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE ehrprovkey SET "+command
 				+" WHERE EhrProvKeyNum = "+POut.Long(ehrProvKey.EhrProvKeyNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one EhrProvKey from the database.</summary>

@@ -174,8 +174,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one ComputerPref in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(ComputerPref computerPref,ComputerPref oldComputerPref){
+		///<summary>Updates one ComputerPref in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(ComputerPref computerPref,ComputerPref oldComputerPref){
 			string command="";
 			if(computerPref.ComputerName != oldComputerPref.ComputerName) {
 				if(command!=""){ command+=",";}
@@ -266,11 +266,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ScanDocQuality = "+POut.Byte(computerPref.ScanDocQuality)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE computerpref SET "+command
 				+" WHERE ComputerPrefNum = "+POut.Long(computerPref.ComputerPrefNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one ComputerPref from the database.</summary>

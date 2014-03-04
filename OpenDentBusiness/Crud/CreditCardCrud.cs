@@ -144,8 +144,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one CreditCard in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(CreditCard creditCard,CreditCard oldCreditCard){
+		///<summary>Updates one CreditCard in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(CreditCard creditCard,CreditCard oldCreditCard){
 			string command="";
 			if(creditCard.PatNum != oldCreditCard.PatNum) {
 				if(command!=""){ command+=",";}
@@ -196,11 +196,12 @@ namespace OpenDentBusiness.Crud{
 				command+="PayPlanNum = "+POut.Long(creditCard.PayPlanNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE creditcard SET "+command
 				+" WHERE CreditCardNum = "+POut.Long(creditCard.CreditCardNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one CreditCard from the database.</summary>

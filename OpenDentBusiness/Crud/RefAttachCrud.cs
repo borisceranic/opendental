@@ -141,8 +141,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one RefAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(RefAttach refAttach,RefAttach oldRefAttach){
+		///<summary>Updates one RefAttach in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(RefAttach refAttach,RefAttach oldRefAttach){
 			string command="";
 			if(refAttach.ReferralNum != oldRefAttach.ReferralNum) {
 				if(command!=""){ command+=",";}
@@ -189,11 +189,12 @@ namespace OpenDentBusiness.Crud{
 				command+="ProvNum = "+POut.Long(refAttach.ProvNum)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE refattach SET "+command
 				+" WHERE RefAttachNum = "+POut.Long(refAttach.RefAttachNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one RefAttach from the database.</summary>

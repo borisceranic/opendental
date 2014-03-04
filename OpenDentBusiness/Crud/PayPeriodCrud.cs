@@ -117,8 +117,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PayPeriod in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PayPeriod payPeriod,PayPeriod oldPayPeriod){
+		///<summary>Updates one PayPeriod in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PayPeriod payPeriod,PayPeriod oldPayPeriod){
 			string command="";
 			if(payPeriod.DateStart != oldPayPeriod.DateStart) {
 				if(command!=""){ command+=",";}
@@ -133,11 +133,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DatePaycheck = "+POut.Date(payPeriod.DatePaycheck)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE payperiod SET "+command
 				+" WHERE PayPeriodNum = "+POut.Long(payPeriod.PayPeriodNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PayPeriod from the database.</summary>

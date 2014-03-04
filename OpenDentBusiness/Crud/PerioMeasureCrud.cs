@@ -138,8 +138,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Updates one PerioMeasure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.</summary>
-		public static void Update(PerioMeasure perioMeasure,PerioMeasure oldPerioMeasure){
+		///<summary>Updates one PerioMeasure in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+		public static bool Update(PerioMeasure perioMeasure,PerioMeasure oldPerioMeasure){
 			string command="";
 			if(perioMeasure.PerioExamNum != oldPerioMeasure.PerioExamNum) {
 				if(command!=""){ command+=",";}
@@ -182,11 +182,12 @@ namespace OpenDentBusiness.Crud{
 				command+="DLvalue = "+POut.Int(perioMeasure.DLvalue)+"";
 			}
 			if(command==""){
-				return;
+				return false;
 			}
 			command="UPDATE periomeasure SET "+command
 				+" WHERE PerioMeasureNum = "+POut.Long(perioMeasure.PerioMeasureNum);
 			Db.NonQ(command);
+			return true;
 		}
 
 		///<summary>Deletes one PerioMeasure from the database.</summary>
