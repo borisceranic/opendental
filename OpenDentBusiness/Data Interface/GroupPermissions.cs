@@ -207,6 +207,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Referral Add");
 				case Permissions.RxCreate:
 					return Lans.g("enumPermissions","Rx Create");
+				case Permissions.RxEdit:
+					return Lans.g("enumPermissions","Rx Edit");
 				case Permissions.Schedules:
 					return Lans.g("enumPermissions","Schedules - Practice and Provider");
 				case Permissions.SecurityAdmin:
