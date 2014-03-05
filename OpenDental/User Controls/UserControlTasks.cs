@@ -978,9 +978,21 @@ namespace OpenDental {
 				MsgBox.Show(this,"You do not have an inbox.");
 				return;
 			}
-			Task oldTask=TasksList[clickedI-TaskListsList.Count];
-			Task task=oldTask.Copy();
-			task.TaskListNum=Security.CurUser.TaskListInBox;
+			Task oldTask;
+			Task task;
+			try {
+				//If a user right clicks on a task and then the task list is updated soon after, it is possible that clickedI-TaskListsList.Count will be an index out bounds.
+				//This try catch simply solves the one scenario where the user right clicked on the last task in the list, the list auto-refreshed and the task was moved, then send to me was clicked.
+				//This fix does not fix the root of the problem because a user could right click on a task in the middle of the list which will cause a different task right to be sent.
+				//Because this is such a rare bug and no customers are complaining about it (yet), Jordan has decided to only fix the potential UE because the correct fix is very time consuming.
+				oldTask=TasksList[clickedI-TaskListsList.Count];
+				task=oldTask.Copy();
+				task.TaskListNum=Security.CurUser.TaskListInBox;
+			}
+			catch {
+				MsgBox.Show(this,"Not allowed to save changes because the task has been altered by someone else.");
+				return;
+			}
 			try {
 				Tasks.Update(task,oldTask);
 				DataValid.SetInvalidTask(task.TaskNum,true);
@@ -1263,7 +1275,6 @@ namespace OpenDental {
 				else {
 					menuItemGoto.Enabled=true;
 				}
-				menuItemSendToMe.Enabled=true;
 			}
 			else {
 				menuItemGoto.Enabled=false;//not a task
