@@ -978,9 +978,17 @@ namespace OpenDental {
 				MsgBox.Show(this,"You do not have an inbox.");
 				return;
 			}
-			Task oldTask=TasksList[clickedI-TaskListsList.Count];
-			Task task=oldTask.Copy();
-			task.TaskListNum=Security.CurUser.TaskListInBox;
+			Task oldTask;
+			Task task;
+			try {
+				oldTask=TasksList[clickedI-TaskListsList.Count];
+				task=oldTask.Copy();
+				task.TaskListNum=Security.CurUser.TaskListInBox;
+			}
+			catch {
+				MsgBox.Show(this,"Not allowed to save changes because the task has been altered by someone else.");
+				return;
+			}
 			try {
 				Tasks.Update(task,oldTask);
 				DataValid.SetInvalidTask(task.TaskNum,true);
