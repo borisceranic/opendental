@@ -90,6 +90,7 @@ namespace OpenDental{
 			this.Controls.Add(this.labelStatus);
 			this.Controls.Add(this.ToolBarMain);
 			this.Controls.Add(this.webBrowserWiki);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWiki";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Wiki";

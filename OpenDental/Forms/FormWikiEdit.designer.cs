@@ -71,38 +71,38 @@ namespace OpenDental{
             this.toolStripMenuItem2,
             this.menuItemUndo});
 			this.contextMenuMain.Name = "contextMenuMain";
-			this.contextMenuMain.Size = new System.Drawing.Size(102, 98);
+			this.contextMenuMain.Size = new System.Drawing.Size(104, 98);
 			// 
 			// menuItemCut
 			// 
 			this.menuItemCut.Name = "menuItemCut";
-			this.menuItemCut.Size = new System.Drawing.Size(101, 22);
+			this.menuItemCut.Size = new System.Drawing.Size(103, 22);
 			this.menuItemCut.Text = "Cut";
 			this.menuItemCut.Click += new System.EventHandler(this.menuItemCut_Click);
 			// 
 			// menuItemCopy
 			// 
 			this.menuItemCopy.Name = "menuItemCopy";
-			this.menuItemCopy.Size = new System.Drawing.Size(101, 22);
+			this.menuItemCopy.Size = new System.Drawing.Size(103, 22);
 			this.menuItemCopy.Text = "Copy";
 			this.menuItemCopy.Click += new System.EventHandler(this.menuItemCopy_Click);
 			// 
 			// menuItemPaste
 			// 
 			this.menuItemPaste.Name = "menuItemPaste";
-			this.menuItemPaste.Size = new System.Drawing.Size(101, 22);
+			this.menuItemPaste.Size = new System.Drawing.Size(103, 22);
 			this.menuItemPaste.Text = "Paste";
 			this.menuItemPaste.Click += new System.EventHandler(this.menuItemPaste_Click);
 			// 
 			// toolStripMenuItem2
 			// 
 			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-			this.toolStripMenuItem2.Size = new System.Drawing.Size(98, 6);
+			this.toolStripMenuItem2.Size = new System.Drawing.Size(100, 6);
 			// 
 			// menuItemUndo
 			// 
 			this.menuItemUndo.Name = "menuItemUndo";
-			this.menuItemUndo.Size = new System.Drawing.Size(101, 22);
+			this.menuItemUndo.Size = new System.Drawing.Size(103, 22);
 			this.menuItemUndo.Text = "Undo";
 			this.menuItemUndo.Click += new System.EventHandler(this.menuItemUndo_Click);
 			// 
@@ -176,6 +176,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textNumbers);
 			this.Controls.Add(this.webBrowserWiki);
 			this.Controls.Add(this.ToolBarMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWikiEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Wiki Edit";

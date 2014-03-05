@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWikiHistory));
 			this.textNumbers = new System.Windows.Forms.TextBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butRevert = new OpenDental.UI.Button();
@@ -129,6 +130,7 @@ namespace OpenDental{
 			this.Controls.Add(this.webBrowserWiki);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWikiHistory";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Wiki History";
