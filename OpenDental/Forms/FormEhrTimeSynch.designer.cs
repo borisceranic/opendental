@@ -233,6 +233,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textNistUrl);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.label5);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrTimeSynch";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Time Synchronization";

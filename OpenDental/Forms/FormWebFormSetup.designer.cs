@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWebFormSetup));
 			this.textboxWebHostAddress = new System.Windows.Forms.TextBox();
 			this.labelWebhostURL = new System.Windows.Forms.Label();
 			this.labelBorderColor = new System.Windows.Forms.Label();
@@ -41,26 +42,26 @@ namespace OpenDental{
 			// 
 			// textboxWebHostAddress
 			// 
-			this.textboxWebHostAddress.Location = new System.Drawing.Point(171,12);
+			this.textboxWebHostAddress.Location = new System.Drawing.Point(171, 12);
 			this.textboxWebHostAddress.Name = "textboxWebHostAddress";
-			this.textboxWebHostAddress.Size = new System.Drawing.Size(445,20);
+			this.textboxWebHostAddress.Size = new System.Drawing.Size(445, 20);
 			this.textboxWebHostAddress.TabIndex = 45;
 			this.textboxWebHostAddress.TextChanged += new System.EventHandler(this.textboxWebHostAddress_TextChanged);
 			// 
 			// labelWebhostURL
 			// 
-			this.labelWebhostURL.Location = new System.Drawing.Point(0,13);
+			this.labelWebhostURL.Location = new System.Drawing.Point(0, 13);
 			this.labelWebhostURL.Name = "labelWebhostURL";
-			this.labelWebhostURL.Size = new System.Drawing.Size(169,19);
+			this.labelWebhostURL.Size = new System.Drawing.Size(169, 19);
 			this.labelWebhostURL.TabIndex = 46;
 			this.labelWebhostURL.Text = "Host Server Address";
 			this.labelWebhostURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelBorderColor
 			// 
-			this.labelBorderColor.Location = new System.Drawing.Point(53,37);
+			this.labelBorderColor.Location = new System.Drawing.Point(53, 37);
 			this.labelBorderColor.Name = "labelBorderColor";
-			this.labelBorderColor.Size = new System.Drawing.Size(111,19);
+			this.labelBorderColor.Size = new System.Drawing.Size(111, 19);
 			this.labelBorderColor.TabIndex = 48;
 			this.labelBorderColor.Text = "Border Color";
 			this.labelBorderColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -69,30 +70,30 @@ namespace OpenDental{
 			// 
 			this.butWebformBorderColor.BackColor = System.Drawing.Color.RoyalBlue;
 			this.butWebformBorderColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butWebformBorderColor.Location = new System.Drawing.Point(172,37);
+			this.butWebformBorderColor.Location = new System.Drawing.Point(172, 37);
 			this.butWebformBorderColor.Name = "butWebformBorderColor";
-			this.butWebformBorderColor.Size = new System.Drawing.Size(24,24);
+			this.butWebformBorderColor.Size = new System.Drawing.Size(24, 24);
 			this.butWebformBorderColor.TabIndex = 71;
 			this.butWebformBorderColor.UseVisualStyleBackColor = false;
 			this.butWebformBorderColor.Click += new System.EventHandler(this.butWebformBorderColor_Click);
 			// 
 			// butChange
 			// 
-			this.butChange.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butChange.Autosize = true;
 			this.butChange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butChange.CornerRadius = 4F;
-			this.butChange.Location = new System.Drawing.Point(202,37);
+			this.butChange.Location = new System.Drawing.Point(202, 37);
 			this.butChange.Name = "butChange";
-			this.butChange.Size = new System.Drawing.Size(68,24);
+			this.butChange.Size = new System.Drawing.Size(68, 24);
 			this.butChange.TabIndex = 72;
 			this.butChange.Text = "Change";
 			this.butChange.Click += new System.EventHandler(this.butChange_Click);
 			// 
 			// butDelete
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -100,16 +101,16 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(223,446);
+			this.butDelete.Location = new System.Drawing.Point(223, 446);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(75,24);
+			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 58;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -117,9 +118,9 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(121,446);
+			this.butAdd.Location = new System.Drawing.Point(121, 446);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75,24);
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 57;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
@@ -130,10 +131,10 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12,67);
+			this.gridMain.Location = new System.Drawing.Point(12, 67);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(860,363);
+			this.gridMain.Size = new System.Drawing.Size(860, 363);
 			this.gridMain.TabIndex = 56;
 			this.gridMain.Title = "Sheet Defs";
 			this.gridMain.TranslationName = "TableSheetDefs";
@@ -142,29 +143,29 @@ namespace OpenDental{
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(795,446);
+			this.butCancel.Location = new System.Drawing.Point(795, 446);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butSave
 			// 
-			this.butSave.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butSave.Autosize = true;
 			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSave.CornerRadius = 4F;
-			this.butSave.Location = new System.Drawing.Point(622,10);
+			this.butSave.Location = new System.Drawing.Point(622, 10);
 			this.butSave.Name = "butSave";
-			this.butSave.Size = new System.Drawing.Size(64,24);
+			this.butSave.Size = new System.Drawing.Size(64, 24);
 			this.butSave.TabIndex = 74;
 			this.butSave.Text = "Save";
 			this.butSave.Click += new System.EventHandler(this.butSave_Click);
@@ -190,7 +191,7 @@ namespace OpenDental{
 			// FormWebFormSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(884,486);
+			this.ClientSize = new System.Drawing.Size(884, 486);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.butChange);
 			this.Controls.Add(this.butDelete);
@@ -201,6 +202,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textboxWebHostAddress);
 			this.Controls.Add(this.labelWebhostURL);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWebFormSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Web Form Setup";

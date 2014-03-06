@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormBillingDefaults));
 			this.checkIntermingled = new System.Windows.Forms.CheckBox();
 			this.labelStartDate = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
@@ -407,6 +408,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormBillingDefaults";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Billing Defaults";

@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSheetImportEnumPicker));
 			this.labelPrompt = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -102,6 +103,7 @@ namespace OpenDental{
 			this.Controls.Add(this.labelPrompt);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSheetImportEnumPicker";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Load += new System.EventHandler(this.FormSheetImportEnumPicker_Load);

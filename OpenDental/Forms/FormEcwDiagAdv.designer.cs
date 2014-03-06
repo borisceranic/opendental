@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEcwDiagAdv));
 			this.textQuery = new System.Windows.Forms.TextBox();
 			this.textConnString = new System.Windows.Forms.TextBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -140,6 +141,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textConnString);
 			this.Controls.Add(this.textQuery);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEcwDiagAdv";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "eClinical Works Diagnostic";

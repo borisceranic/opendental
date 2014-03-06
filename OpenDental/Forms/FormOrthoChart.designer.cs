@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOrthoChart));
 			this.gridPat = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butAdd = new OpenDental.UI.Button();
@@ -111,6 +112,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.gridPat);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormOrthoChart";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Ortho Chart";

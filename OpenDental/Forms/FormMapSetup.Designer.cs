@@ -24,6 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMapSetup));
 			this.checkShowGrid = new System.Windows.Forms.CheckBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.numFloorWidthFeet = new System.Windows.Forms.NumericUpDown();
@@ -197,19 +198,19 @@
             this.newCubicleToolStripMenuItem,
             this.newLabelToolStripMenuItem});
 			this.menu.Name = "menu";
-			this.menu.Size = new System.Drawing.Size(142, 48);
+			this.menu.Size = new System.Drawing.Size(143, 48);
 			// 
 			// newCubicleToolStripMenuItem
 			// 
 			this.newCubicleToolStripMenuItem.Name = "newCubicleToolStripMenuItem";
-			this.newCubicleToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.newCubicleToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
 			this.newCubicleToolStripMenuItem.Text = "New Cubicle";
 			this.newCubicleToolStripMenuItem.Click += new System.EventHandler(this.newCubicleToolStripMenuItem_Click);
 			// 
 			// newLabelToolStripMenuItem
 			// 
 			this.newLabelToolStripMenuItem.Name = "newLabelToolStripMenuItem";
-			this.newLabelToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.newLabelToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
 			this.newLabelToolStripMenuItem.Text = "New Label";
 			this.newLabelToolStripMenuItem.Click += new System.EventHandler(this.newLabelToolStripMenuItem_Click);
 			// 
@@ -307,6 +308,7 @@
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.mapAreaPanel);
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormMapSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Map Setup";

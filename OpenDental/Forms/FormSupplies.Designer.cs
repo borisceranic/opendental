@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSupplies));
 			this.label3 = new System.Windows.Forms.Label();
 			this.comboSupplier = new System.Windows.Forms.ComboBox();
 			this.checkShowHidden = new System.Windows.Forms.CheckBox();
@@ -209,6 +210,7 @@ namespace OpenDental{
 			this.Controls.Add(this.checkShowHidden);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSupplies";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Supplies";

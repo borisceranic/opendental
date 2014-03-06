@@ -24,6 +24,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReference));
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -450,12 +451,12 @@ namespace OpenDental{
 			this.menuRightReferences.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.goToAccountToolStripMenuItem});
 			this.menuRightReferences.Name = "menuRightReferences";
-			this.menuRightReferences.Size = new System.Drawing.Size(142, 26);
+			this.menuRightReferences.Size = new System.Drawing.Size(143, 26);
 			// 
 			// goToAccountToolStripMenuItem
 			// 
 			this.goToAccountToolStripMenuItem.Name = "goToAccountToolStripMenuItem";
-			this.goToAccountToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+			this.goToAccountToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
 			this.goToAccountToolStripMenuItem.Text = "Go to Family";
 			this.goToAccountToolStripMenuItem.Click += new System.EventHandler(this.goToFamilyToolStripMenuItem_Click);
 			// 
@@ -480,6 +481,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormReference";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = " Reference Select";

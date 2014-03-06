@@ -24,6 +24,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrTriggers));
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butAddTrigger = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -97,6 +98,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butAddTrigger);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu1;
 			this.Name = "FormEhrTriggers";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEcwDiag));
 			this.textLog = new System.Windows.Forms.TextBox();
 			this.checkShow = new System.Windows.Forms.CheckBox();
 			this.butRunCheck = new OpenDental.UI.Button();
@@ -90,6 +91,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butRunCheck);
 			this.Controls.Add(this.textLog);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEcwDiag";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "eClinical Works Diagnostic";

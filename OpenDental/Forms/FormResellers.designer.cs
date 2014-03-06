@@ -112,6 +112,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.butAdd);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormResellers";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Resellers";

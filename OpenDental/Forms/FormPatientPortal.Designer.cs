@@ -24,6 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPatientPortal));
 			this.butGiveAccess = new System.Windows.Forms.Button();
 			this.textOnlineUsername = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
@@ -194,6 +195,7 @@
 			this.Controls.Add(this.textPatientPortalURL);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label4);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu;
 			this.Name = "FormPatientPortal";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

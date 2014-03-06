@@ -154,6 +154,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butCheck);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormXchargeTokenTool";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "X-Charge Token Tool";

@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPatListResultsEHR2014));
 			this.butClose = new System.Windows.Forms.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butPrint = new System.Windows.Forms.Button();
@@ -73,6 +74,7 @@
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPatListResultsEHR2014";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Patient List Results";

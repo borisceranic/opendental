@@ -48,6 +48,7 @@ namespace OpenDental {
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEligibilityResponseDisplay));
 			this.butClose = new OpenDental.UI.Button();
 			this.LblPatientName = new System.Windows.Forms.Label();
 			this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -58,15 +59,15 @@ namespace OpenDental {
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.butClose.Location = new System.Drawing.Point(385,404);
+			this.butClose.Location = new System.Drawing.Point(385, 404);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,23);
+			this.butClose.Size = new System.Drawing.Size(75, 23);
 			this.butClose.TabIndex = 2;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
@@ -74,11 +75,11 @@ namespace OpenDental {
 			// LblPatientName
 			// 
 			this.LblPatientName.AutoSize = true;
-			this.LblPatientName.Font = new System.Drawing.Font("Microsoft Sans Serif",13F,System.Drawing.FontStyle.Regular,System.Drawing.GraphicsUnit.Point,((byte)(0)));
+			this.LblPatientName.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.LblPatientName.ForeColor = System.Drawing.Color.Blue;
-			this.LblPatientName.Location = new System.Drawing.Point(2,8);
+			this.LblPatientName.Location = new System.Drawing.Point(2, 8);
 			this.LblPatientName.Name = "LblPatientName";
-			this.LblPatientName.Size = new System.Drawing.Size(0,22);
+			this.LblPatientName.Size = new System.Drawing.Size(0, 22);
 			this.LblPatientName.TabIndex = 12;
 			// 
 			// dataGridView1
@@ -91,25 +92,25 @@ namespace OpenDental {
 			this.dataGridView1.CausesValidation = false;
 			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
 			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif",8.25F,System.Drawing.FontStyle.Regular,System.Drawing.GraphicsUnit.Point,((byte)(0)));
+			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
 			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
 			this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
 			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
 			dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-			dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif",8.25F,System.Drawing.FontStyle.Regular,System.Drawing.GraphicsUnit.Point,((byte)(0)));
+			dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
 			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
 			dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
 			this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-			this.dataGridView1.Location = new System.Drawing.Point(4,33);
+			this.dataGridView1.Location = new System.Drawing.Point(4, 33);
 			this.dataGridView1.Name = "dataGridView1";
 			dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
 			dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif",8.25F,System.Drawing.FontStyle.Regular,System.Drawing.GraphicsUnit.Point,((byte)(0)));
+			dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
 			dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 			dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -122,7 +123,7 @@ namespace OpenDental {
 			this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle4;
 			this.dataGridView1.RowTemplate.ReadOnly = true;
 			this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.dataGridView1.Size = new System.Drawing.Size(807,368);
+			this.dataGridView1.Size = new System.Drawing.Size(807, 368);
 			this.dataGridView1.TabIndex = 11;
 			// 
 			// MyPrintDocument
@@ -131,14 +132,14 @@ namespace OpenDental {
 			// 
 			// btnPrintPreview
 			// 
-			this.btnPrintPreview.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.btnPrintPreview.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.btnPrintPreview.Autosize = true;
 			this.btnPrintPreview.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.btnPrintPreview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.btnPrintPreview.CornerRadius = 4F;
-			this.btnPrintPreview.Location = new System.Drawing.Point(290,404);
+			this.btnPrintPreview.Location = new System.Drawing.Point(290, 404);
 			this.btnPrintPreview.Name = "btnPrintPreview";
-			this.btnPrintPreview.Size = new System.Drawing.Size(93,23);
+			this.btnPrintPreview.Size = new System.Drawing.Size(93, 23);
 			this.btnPrintPreview.TabIndex = 14;
 			this.btnPrintPreview.Text = "&Print Preview";
 			this.btnPrintPreview.UseVisualStyleBackColor = true;
@@ -146,13 +147,14 @@ namespace OpenDental {
 			// 
 			// FormEligibilityResponseDisplay
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
-			this.ClientSize = new System.Drawing.Size(814,462);
+			this.ClientSize = new System.Drawing.Size(814, 462);
 			this.Controls.Add(this.btnPrintPreview);
 			this.Controls.Add(this.LblPatientName);
 			this.Controls.Add(this.dataGridView1);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormEligibilityResponseDisplay";

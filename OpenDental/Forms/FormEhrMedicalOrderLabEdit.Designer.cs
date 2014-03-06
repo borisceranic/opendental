@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrMedicalOrderLabEdit));
 			this.butOK = new System.Windows.Forms.Button();
 			this.butCancel = new System.Windows.Forms.Button();
 			this.butDelete = new System.Windows.Forms.Button();
@@ -41,9 +42,9 @@
 			// butOK
 			// 
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Location = new System.Drawing.Point(322,346);
+			this.butOK.Location = new System.Drawing.Point(322, 346);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 11;
 			this.butOK.Text = "OK";
 			this.butOK.UseVisualStyleBackColor = true;
@@ -52,9 +53,9 @@
 			// butCancel
 			// 
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Location = new System.Drawing.Point(403,346);
+			this.butCancel.Location = new System.Drawing.Point(403, 346);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 10;
 			this.butCancel.Text = "Cancel";
 			this.butCancel.UseVisualStyleBackColor = true;
@@ -63,9 +64,9 @@
 			// butDelete
 			// 
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Location = new System.Drawing.Point(11,346);
+			this.butDelete.Location = new System.Drawing.Point(11, 346);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(75,24);
+			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 12;
 			this.butDelete.TabStop = false;
 			this.butDelete.Text = "Delete";
@@ -76,33 +77,33 @@
 			// 
 			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textDescription.Location = new System.Drawing.Point(12,97);
+			this.textDescription.Location = new System.Drawing.Point(12, 97);
 			this.textDescription.Multiline = true;
 			this.textDescription.Name = "textDescription";
-			this.textDescription.Size = new System.Drawing.Size(466,106);
+			this.textDescription.Size = new System.Drawing.Size(466, 106);
 			this.textDescription.TabIndex = 16;
 			// 
 			// labelDescription
 			// 
-			this.labelDescription.Location = new System.Drawing.Point(11,73);
+			this.labelDescription.Location = new System.Drawing.Point(11, 73);
 			this.labelDescription.Name = "labelDescription";
-			this.labelDescription.Size = new System.Drawing.Size(116,21);
+			this.labelDescription.Size = new System.Drawing.Size(116, 21);
 			this.labelDescription.TabIndex = 17;
 			this.labelDescription.Text = "Instructions";
 			this.labelDescription.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textDateTime
 			// 
-			this.textDateTime.Location = new System.Drawing.Point(271,8);
+			this.textDateTime.Location = new System.Drawing.Point(271, 8);
 			this.textDateTime.Name = "textDateTime";
-			this.textDateTime.Size = new System.Drawing.Size(207,20);
+			this.textDateTime.Size = new System.Drawing.Size(207, 20);
 			this.textDateTime.TabIndex = 18;
 			// 
 			// labelDateTime
 			// 
-			this.labelDateTime.Location = new System.Drawing.Point(153,10);
+			this.labelDateTime.Location = new System.Drawing.Point(153, 10);
 			this.labelDateTime.Name = "labelDateTime";
-			this.labelDateTime.Size = new System.Drawing.Size(116,17);
+			this.labelDateTime.Size = new System.Drawing.Size(116, 17);
 			this.labelDateTime.TabIndex = 19;
 			this.labelDateTime.Text = "Date Time";
 			this.labelDateTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -110,9 +111,9 @@
 			// checkIsDiscontinued
 			// 
 			this.checkIsDiscontinued.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsDiscontinued.Location = new System.Drawing.Point(159,36);
+			this.checkIsDiscontinued.Location = new System.Drawing.Point(159, 36);
 			this.checkIsDiscontinued.Name = "checkIsDiscontinued";
-			this.checkIsDiscontinued.Size = new System.Drawing.Size(126,18);
+			this.checkIsDiscontinued.Size = new System.Drawing.Size(126, 18);
 			this.checkIsDiscontinued.TabIndex = 23;
 			this.checkIsDiscontinued.Text = "Discontinued";
 			this.checkIsDiscontinued.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -124,10 +125,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12,209);
+			this.gridMain.Location = new System.Drawing.Point(12, 209);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(385,131);
+			this.gridMain.Size = new System.Drawing.Size(385, 131);
 			this.gridMain.TabIndex = 24;
 			this.gridMain.Title = "Attached Lab Panels";
 			this.gridMain.TranslationName = null;
@@ -136,9 +137,9 @@
 			// butAttach
 			// 
 			this.butAttach.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAttach.Location = new System.Drawing.Point(403,209);
+			this.butAttach.Location = new System.Drawing.Point(403, 209);
 			this.butAttach.Name = "butAttach";
-			this.butAttach.Size = new System.Drawing.Size(75,24);
+			this.butAttach.Size = new System.Drawing.Size(75, 24);
 			this.butAttach.TabIndex = 25;
 			this.butAttach.Text = "Attach";
 			this.butAttach.UseVisualStyleBackColor = true;
@@ -147,9 +148,9 @@
 			// butRemove
 			// 
 			this.butRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butRemove.Location = new System.Drawing.Point(403,238);
+			this.butRemove.Location = new System.Drawing.Point(403, 238);
 			this.butRemove.Name = "butRemove";
-			this.butRemove.Size = new System.Drawing.Size(75,24);
+			this.butRemove.Size = new System.Drawing.Size(75, 24);
 			this.butRemove.TabIndex = 26;
 			this.butRemove.Text = "Remove";
 			this.butRemove.UseVisualStyleBackColor = true;
@@ -159,25 +160,25 @@
 			// 
 			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProv.FormattingEnabled = true;
-			this.comboProv.Location = new System.Drawing.Point(271,59);
+			this.comboProv.Location = new System.Drawing.Point(271, 59);
 			this.comboProv.Name = "comboProv";
-			this.comboProv.Size = new System.Drawing.Size(207,21);
+			this.comboProv.Size = new System.Drawing.Size(207, 21);
 			this.comboProv.TabIndex = 27;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(153,62);
+			this.label1.Location = new System.Drawing.Point(153, 62);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(116,17);
+			this.label1.Size = new System.Drawing.Size(116, 17);
 			this.label1.TabIndex = 28;
 			this.label1.Text = "Provider";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// FormMedicalOrderLabEdit
+			// FormEhrMedicalOrderLabEdit
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(490,381);
+			this.ClientSize = new System.Drawing.Size(490, 381);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.butRemove);
@@ -191,7 +192,8 @@
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
-			this.Name = "FormMedicalOrderLabEdit";
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Name = "FormEhrMedicalOrderLabEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Lab Order Edit";
 			this.Load += new System.EventHandler(this.FormMedicalOrderLabEdit_Load);

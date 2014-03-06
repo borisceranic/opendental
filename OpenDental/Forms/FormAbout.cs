@@ -42,6 +42,7 @@ namespace OpenDental{
 		#region Windows Form Designer generated code
 
 		private void InitializeComponent(){
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAbout));
 			this.labelVersion = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
@@ -67,9 +68,11 @@ namespace OpenDental{
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.butClose.Location = new System.Drawing.Point(305, 404);
 			this.butClose.Name = "butClose";
+			this.butClose.Size = new System.Drawing.Size(75, 23);
 			this.butClose.TabIndex = 2;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
@@ -81,7 +84,7 @@ namespace OpenDental{
 			this.label1.Size = new System.Drawing.Size(585, 23);
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Open Dental (AKA Free Dental)  Copyright 2003, Jordan S. Sparks, D.M.D., www.open" +
-				"-dent.com  1-877-686-1248";
+    "-dent.com  1-877-686-1248";
 			// 
 			// label2
 			// 
@@ -116,7 +119,7 @@ namespace OpenDental{
 			this.label4.Size = new System.Drawing.Size(584, 20);
 			this.label4.TabIndex = 7;
 			this.label4.Text = "All parts of this program are licensed under the GPL, www.opensource.org/licenses" +
-				"/gpl-license.php";
+    "/gpl-license.php";
 			// 
 			// textBox1
 			// 
@@ -128,7 +131,7 @@ namespace OpenDental{
 			this.textBox1.Size = new System.Drawing.Size(558, 130);
 			this.textBox1.TabIndex = 8;
 			this.textBox1.Text = "David Adams\r\nDan Crawford\r\nLarry Dagley\r\nAnn Hellemans-De Hondt\r\nSamir Kothari\r\nJ" +
-				"eff Smerdon";
+    "eff Smerdon";
 			// 
 			// label5
 			// 
@@ -153,6 +156,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.labelVersion);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormAbout";
@@ -162,6 +166,7 @@ namespace OpenDental{
 			this.Text = "About Open Dental";
 			this.Load += new System.EventHandler(this.FormAbout_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 		#endregion

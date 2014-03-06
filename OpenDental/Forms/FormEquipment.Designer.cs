@@ -23,16 +23,17 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEquipment));
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butRefresh = new OpenDental.UI.Button();
+			this.textDateStart = new OpenDental.ValidDate();
+			this.textDateEnd = new OpenDental.ValidDate();
 			this.radioPurchased = new System.Windows.Forms.RadioButton();
 			this.radioSold = new System.Windows.Forms.RadioButton();
 			this.radioAll = new System.Windows.Forms.RadioButton();
 			this.textSnDesc = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
-			this.butRefresh = new OpenDental.UI.Button();
-			this.textDateStart = new OpenDental.ValidDate();
-			this.textDateEnd = new OpenDental.ValidDate();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -60,6 +61,34 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 23;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Date Range";
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(172, 12);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(78, 24);
+			this.butRefresh.TabIndex = 23;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
+			// textDateStart
+			// 
+			this.textDateStart.Location = new System.Drawing.Point(6, 16);
+			this.textDateStart.Name = "textDateStart";
+			this.textDateStart.Size = new System.Drawing.Size(77, 20);
+			this.textDateStart.TabIndex = 21;
+			// 
+			// textDateEnd
+			// 
+			this.textDateEnd.Location = new System.Drawing.Point(89, 15);
+			this.textDateEnd.Name = "textDateEnd";
+			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
+			this.textDateEnd.TabIndex = 22;
 			// 
 			// radioPurchased
 			// 
@@ -110,34 +139,6 @@ namespace OpenDental{
 			this.label7.TabIndex = 38;
 			this.label7.Text = "SN/Descipt/Loc";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// butRefresh
-			// 
-			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Autosize = true;
-			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(172, 12);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(78, 24);
-			this.butRefresh.TabIndex = 23;
-			this.butRefresh.Text = "Refresh";
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
-			// 
-			// textDateStart
-			// 
-			this.textDateStart.Location = new System.Drawing.Point(6, 16);
-			this.textDateStart.Name = "textDateStart";
-			this.textDateStart.Size = new System.Drawing.Size(77, 20);
-			this.textDateStart.TabIndex = 21;
-			// 
-			// textDateEnd
-			// 
-			this.textDateEnd.Location = new System.Drawing.Point(89, 15);
-			this.textDateEnd.Name = "textDateEnd";
-			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
-			this.textDateEnd.TabIndex = 22;
 			// 
 			// butPrint
 			// 
@@ -218,6 +219,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEquipment";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Equipment";

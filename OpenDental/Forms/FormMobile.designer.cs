@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMobile));
 			this.textMobileSyncServerURL = new System.Windows.Forms.TextBox();
 			this.labelMobileSynchURL = new System.Windows.Forms.Label();
 			this.labelMinutesBetweenSynch = new System.Windows.Forms.Label();
@@ -328,6 +329,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butFullSync);
 			this.Controls.Add(this.butSync);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormMobile";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Mobile Synch";

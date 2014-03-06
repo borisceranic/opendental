@@ -41,156 +41,156 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(-28,23);
+			this.label1.Location = new System.Drawing.Point(-28, 23);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(100,17);
+			this.label1.Size = new System.Drawing.Size(100, 17);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "From";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textFrom
 			// 
-			this.textFrom.Location = new System.Drawing.Point(78,20);
+			this.textFrom.Location = new System.Drawing.Point(78, 20);
 			this.textFrom.Name = "textFrom";
-			this.textFrom.Size = new System.Drawing.Size(100,20);
+			this.textFrom.Size = new System.Drawing.Size(100, 20);
 			this.textFrom.TabIndex = 5;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(197,23);
+			this.label2.Location = new System.Drawing.Point(197, 23);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(35,13);
+			this.label2.Size = new System.Drawing.Size(35, 13);
 			this.label2.TabIndex = 4;
 			this.label2.Text = "To";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textTo
 			// 
-			this.textTo.Location = new System.Drawing.Point(238,20);
+			this.textTo.Location = new System.Drawing.Point(238, 20);
 			this.textTo.Name = "textTo";
-			this.textTo.Size = new System.Drawing.Size(100,20);
+			this.textTo.Size = new System.Drawing.Size(100, 20);
 			this.textTo.TabIndex = 5;
 			// 
 			// but9D
 			// 
-			this.but9D.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but9D.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but9D.Autosize = true;
 			this.but9D.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but9D.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but9D.CornerRadius = 4F;
-			this.but9D.Location = new System.Drawing.Point(32,246);
+			this.but9D.Location = new System.Drawing.Point(32, 246);
 			this.but9D.Name = "but9D";
-			this.but9D.Size = new System.Drawing.Size(146,24);
+			this.but9D.Size = new System.Drawing.Size(146, 24);
 			this.but9D.TabIndex = 3;
 			this.but9D.Text = "9D";
 			// 
 			// but6A
 			// 
-			this.but6A.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but6A.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but6A.Autosize = true;
 			this.but6A.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but6A.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but6A.CornerRadius = 4F;
-			this.but6A.Location = new System.Drawing.Point(32,216);
+			this.but6A.Location = new System.Drawing.Point(32, 216);
 			this.but6A.Name = "but6A";
-			this.but6A.Size = new System.Drawing.Size(146,24);
+			this.but6A.Size = new System.Drawing.Size(146, 24);
 			this.but6A.TabIndex = 3;
 			this.but6A.Text = "6A";
 			// 
 			// but5
 			// 
-			this.but5.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but5.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but5.Autosize = true;
 			this.but5.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but5.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but5.CornerRadius = 4F;
-			this.but5.Location = new System.Drawing.Point(32,186);
+			this.but5.Location = new System.Drawing.Point(32, 186);
 			this.but5.Name = "but5";
-			this.but5.Size = new System.Drawing.Size(146,24);
+			this.but5.Size = new System.Drawing.Size(146, 24);
 			this.but5.TabIndex = 3;
 			this.but5.Text = "5 - Staffing";
 			// 
 			// but4
 			// 
-			this.but4.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but4.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but4.Autosize = true;
 			this.but4.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but4.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but4.CornerRadius = 4F;
-			this.but4.Location = new System.Drawing.Point(32,156);
+			this.but4.Location = new System.Drawing.Point(32, 156);
 			this.but4.Name = "but4";
-			this.but4.Size = new System.Drawing.Size(146,24);
+			this.but4.Size = new System.Drawing.Size(146, 24);
 			this.but4.TabIndex = 3;
 			this.but4.Text = "4 - Patient Characteristics";
 			// 
 			// but3B
 			// 
-			this.but3B.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but3B.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but3B.Autosize = true;
 			this.but3B.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but3B.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but3B.CornerRadius = 4F;
-			this.but3B.Location = new System.Drawing.Point(32,126);
+			this.but3B.Location = new System.Drawing.Point(32, 126);
 			this.but3B.Name = "but3B";
-			this.but3B.Size = new System.Drawing.Size(146,24);
+			this.but3B.Size = new System.Drawing.Size(146, 24);
 			this.but3B.TabIndex = 3;
 			this.but3B.Text = "3B - Race Ethicity";
 			// 
 			// butPatByZip
 			// 
-			this.butPatByZip.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butPatByZip.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butPatByZip.Autosize = true;
 			this.butPatByZip.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatByZip.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatByZip.CornerRadius = 4F;
-			this.butPatByZip.Location = new System.Drawing.Point(32,66);
+			this.butPatByZip.Location = new System.Drawing.Point(32, 66);
 			this.butPatByZip.Name = "butPatByZip";
-			this.butPatByZip.Size = new System.Drawing.Size(146,24);
+			this.butPatByZip.Size = new System.Drawing.Size(146, 24);
 			this.butPatByZip.TabIndex = 3;
 			this.butPatByZip.Text = "Patients by Zip Code";
 			this.butPatByZip.Click += new System.EventHandler(this.butPatByZip_Click);
 			// 
 			// but3A
 			// 
-			this.but3A.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.but3A.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.but3A.Autosize = true;
 			this.but3A.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.but3A.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.but3A.CornerRadius = 4F;
-			this.but3A.Location = new System.Drawing.Point(32,96);
+			this.but3A.Location = new System.Drawing.Point(32, 96);
 			this.but3A.Name = "but3A";
-			this.but3A.Size = new System.Drawing.Size(146,24);
+			this.but3A.Size = new System.Drawing.Size(146, 24);
 			this.but3A.TabIndex = 3;
 			this.but3A.Text = "3A - Age Gender";
 			this.but3A.Click += new System.EventHandler(this.but3A_Click);
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(783,514);
+			this.butClose.Location = new System.Drawing.Point(783, 514);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,24);
+			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(391,274);
+			this.label3.Location = new System.Drawing.Point(391, 274);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(261,128);
+			this.label3.Size = new System.Drawing.Size(261, 128);
 			this.label3.TabIndex = 6;
 			this.label3.Text = resources.GetString("label3.Text");
 			// 
 			// FormReportsUds
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(883,565);
+			this.ClientSize = new System.Drawing.Size(883, 565);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textTo);
 			this.Controls.Add(this.label2);
@@ -204,6 +204,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butPatByZip);
 			this.Controls.Add(this.but3A);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormReportsUds";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "UDS Reporting";

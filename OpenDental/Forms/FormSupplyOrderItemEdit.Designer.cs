@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSupplyOrderItemEdit));
 			this.label1 = new System.Windows.Forms.Label();
 			this.textSupplier = new System.Windows.Forms.TextBox();
 			this.textCatalogNumber = new System.Windows.Forms.TextBox();
@@ -234,6 +235,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSupplyOrderItemEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Supply Order Item";

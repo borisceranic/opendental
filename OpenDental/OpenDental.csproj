@@ -3391,6 +3391,9 @@
       <DependentUpon>FormEtrans835ClaimEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormMedicationUpdate.resx">
+      <DependentUpon>FormMedicationUpdate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormUcums.resx">
       <DependentUpon>FormUcums.cs</DependentUpon>
       <SubType>Designer</SubType>

@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSheetFieldInput));
 			this.label2 = new System.Windows.Forms.Label();
 			this.listFields = new System.Windows.Forms.ListBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -350,6 +351,7 @@ namespace OpenDental{
 			this.Controls.Add(this.listFields);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSheetFieldInput";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Input Field";

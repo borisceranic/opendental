@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrLabPanels));
 			this.butCancel = new System.Windows.Forms.Button();
 			this.butAdd = new System.Windows.Forms.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -36,9 +37,9 @@
 			// butCancel
 			// 
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Location = new System.Drawing.Point(327,293);
+			this.butCancel.Location = new System.Drawing.Point(327, 293);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 1;
 			this.butCancel.Text = "Cancel";
 			this.butCancel.UseVisualStyleBackColor = true;
@@ -46,9 +47,9 @@
 			// 
 			// butAdd
 			// 
-			this.butAdd.Location = new System.Drawing.Point(21,12);
+			this.butAdd.Location = new System.Drawing.Point(21, 12);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75,24);
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 2;
 			this.butAdd.Text = "Add Panel";
 			this.butAdd.UseVisualStyleBackColor = true;
@@ -60,11 +61,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(21,42);
+			this.gridMain.Location = new System.Drawing.Point(21, 42);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(381,228);
+			this.gridMain.Size = new System.Drawing.Size(381, 228);
 			this.gridMain.TabIndex = 0;
 			this.gridMain.Title = "Lab Panels";
 			this.gridMain.TranslationName = null;
@@ -73,9 +74,9 @@
 			// butSubmit
 			// 
 			this.butSubmit.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.butSubmit.Location = new System.Drawing.Point(9,17);
+			this.butSubmit.Location = new System.Drawing.Point(9, 17);
 			this.butSubmit.Name = "butSubmit";
-			this.butSubmit.Size = new System.Drawing.Size(66,24);
+			this.butSubmit.Size = new System.Drawing.Size(66, 24);
 			this.butSubmit.TabIndex = 3;
 			this.butSubmit.Text = "Submit";
 			this.butSubmit.UseVisualStyleBackColor = true;
@@ -84,9 +85,9 @@
 			// butOK
 			// 
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Location = new System.Drawing.Point(246,293);
+			this.butOK.Location = new System.Drawing.Point(246, 293);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 4;
 			this.butOK.Text = "OK";
 			this.butOK.UseVisualStyleBackColor = true;
@@ -95,9 +96,9 @@
 			// butShow
 			// 
 			this.butShow.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.butShow.Location = new System.Drawing.Point(81,17);
+			this.butShow.Location = new System.Drawing.Point(81, 17);
 			this.butShow.Name = "butShow";
-			this.butShow.Size = new System.Drawing.Size(66,24);
+			this.butShow.Size = new System.Drawing.Size(66, 24);
 			this.butShow.TabIndex = 5;
 			this.butShow.Text = "Show";
 			this.butShow.UseVisualStyleBackColor = true;
@@ -108,24 +109,25 @@
 			this.groupHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupHL7.Controls.Add(this.butShow);
 			this.groupHL7.Controls.Add(this.butSubmit);
-			this.groupHL7.Location = new System.Drawing.Point(21,276);
+			this.groupHL7.Location = new System.Drawing.Point(21, 276);
 			this.groupHL7.Name = "groupHL7";
-			this.groupHL7.Size = new System.Drawing.Size(156,47);
+			this.groupHL7.Size = new System.Drawing.Size(156, 47);
 			this.groupHL7.TabIndex = 6;
 			this.groupHL7.TabStop = false;
 			this.groupHL7.Text = "HL7 Msg";
 			// 
-			// FormLabPanels
+			// FormEhrLabPanels
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(418,331);
+			this.ClientSize = new System.Drawing.Size(418, 331);
 			this.Controls.Add(this.groupHL7);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.gridMain);
-			this.Name = "FormLabPanels";
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Name = "FormEhrLabPanels";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Lab Panels";
 			this.Load += new System.EventHandler(this.FormLabPanels_Load);

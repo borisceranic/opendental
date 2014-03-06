@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPatFieldCurrencyEdit));
 			this.labelName = new System.Windows.Forms.Label();
 			this.textFieldCurrency = new ODR.ValidDouble();
 			this.butOK = new OpenDental.UI.Button();
@@ -84,6 +85,7 @@ namespace OpenDental{
 			this.Controls.Add(this.labelName);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPatFieldCurrencyEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Patient Field Currency";

@@ -24,6 +24,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWebMailMessageEdit));
 			this.textTo = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textFrom = new System.Windows.Forms.TextBox();
@@ -224,6 +225,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butSend);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu1;
 			this.Name = "FormWebMailMessageEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

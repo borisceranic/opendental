@@ -279,7 +279,7 @@
 			this.checkNutrition.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.checkNutrition.UseVisualStyleBackColor = true;
 			// 
-			// FormVitalsignEdit
+			// FormEhrVitalsignEdit
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -302,7 +302,8 @@
 			this.Controls.Add(this.labelBP);
 			this.Controls.Add(this.labelBMI);
 			this.Controls.Add(this.label1);
-			this.Name = "FormVitalsignEdit";
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Name = "FormEhrVitalsignEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Vitalsign";
 			this.Load += new System.EventHandler(this.FormVitalsignEdit_Load);

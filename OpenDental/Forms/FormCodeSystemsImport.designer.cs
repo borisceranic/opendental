@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCodeSystemsImport));
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butCheckUpdates = new OpenDental.UI.Button();
 			this.butDownload = new OpenDental.UI.Button();
@@ -98,6 +99,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butDownload);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormCodeSystemsImport";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Import Code Systems";

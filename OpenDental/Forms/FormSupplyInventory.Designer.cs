@@ -23,6 +23,7 @@ namespace OpenDental {
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSupplyInventory));
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.menuItemSuppliers = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuItemCategories = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,7 +51,7 @@ namespace OpenDental {
 			// menuItemSuppliers
 			// 
 			this.menuItemSuppliers.Name = "menuItemSuppliers";
-			this.menuItemSuppliers.Size = new System.Drawing.Size(67, 20);
+			this.menuItemSuppliers.Size = new System.Drawing.Size(68, 20);
 			this.menuItemSuppliers.Text = "Suppliers";
 			this.menuItemSuppliers.Click += new System.EventHandler(this.menuItemSuppliers_Click);
 			// 
@@ -183,6 +184,7 @@ namespace OpenDental {
 			this.Controls.Add(this.butOrders);
 			this.Controls.Add(this.butSupplies);
 			this.Controls.Add(this.menuStrip1);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "FormSupplyInventory";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

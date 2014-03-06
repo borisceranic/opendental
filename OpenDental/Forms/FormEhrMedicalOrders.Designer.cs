@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrMedicalOrders));
 			this.butClose = new System.Windows.Forms.Button();
 			this.checkBoxShowDiscontinued = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -86,6 +87,7 @@
 			this.Controls.Add(this.checkBoxShowDiscontinued);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.gridMedOrders);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrMedicalOrders";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "2011 Lab and Radiology Orders";

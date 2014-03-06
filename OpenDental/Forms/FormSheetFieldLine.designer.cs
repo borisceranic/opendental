@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSheetFieldLine));
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
@@ -39,37 +40,37 @@ namespace OpenDental{
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(364,128);
+			this.butOK.Location = new System.Drawing.Point(364, 128);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(364,158);
+			this.butCancel.Location = new System.Drawing.Point(364, 158);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butDelete
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -77,9 +78,9 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(15,158);
+			this.butDelete.Location = new System.Drawing.Point(15, 158);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(77,24);
+			this.butDelete.Size = new System.Drawing.Size(77, 24);
 			this.butDelete.TabIndex = 100;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
@@ -87,85 +88,85 @@ namespace OpenDental{
 			// label1
 			// 
 			this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label1.Location = new System.Drawing.Point(163,67);
+			this.label1.Location = new System.Drawing.Point(163, 67);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(193,53);
+			this.label1.Size = new System.Drawing.Size(193, 53);
 			this.label1.TabIndex = 110;
 			this.label1.Text = "The line will extend from x,y to x+w,y+h.  So negative width and height are allow" +
     "ed.";
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(88,90);
+			this.textHeight.Location = new System.Drawing.Point(88, 90);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = -2000;
 			this.textHeight.Name = "textHeight";
-			this.textHeight.Size = new System.Drawing.Size(69,20);
+			this.textHeight.Size = new System.Drawing.Size(69, 20);
 			this.textHeight.TabIndex = 109;
 			// 
 			// label8
 			// 
 			this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label8.Location = new System.Drawing.Point(17,91);
+			this.label8.Location = new System.Drawing.Point(17, 91);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(71,16);
+			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 108;
 			this.label8.Text = "Height";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(88,64);
+			this.textWidth.Location = new System.Drawing.Point(88, 64);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = -2000;
 			this.textWidth.Name = "textWidth";
-			this.textWidth.Size = new System.Drawing.Size(69,20);
+			this.textWidth.Size = new System.Drawing.Size(69, 20);
 			this.textWidth.TabIndex = 107;
 			// 
 			// label7
 			// 
 			this.label7.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label7.Location = new System.Drawing.Point(17,65);
+			this.label7.Location = new System.Drawing.Point(17, 65);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(71,16);
+			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 106;
 			this.label7.Text = "Width";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textYPos
 			// 
-			this.textYPos.Location = new System.Drawing.Point(88,38);
+			this.textYPos.Location = new System.Drawing.Point(88, 38);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
-			this.textYPos.Size = new System.Drawing.Size(69,20);
+			this.textYPos.Size = new System.Drawing.Size(69, 20);
 			this.textYPos.TabIndex = 105;
 			// 
 			// label6
 			// 
 			this.label6.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label6.Location = new System.Drawing.Point(17,39);
+			this.label6.Location = new System.Drawing.Point(17, 39);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(71,16);
+			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 104;
 			this.label6.Text = "Y Pos";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textXPos
 			// 
-			this.textXPos.Location = new System.Drawing.Point(88,12);
+			this.textXPos.Location = new System.Drawing.Point(88, 12);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
-			this.textXPos.Size = new System.Drawing.Size(69,20);
+			this.textXPos.Size = new System.Drawing.Size(69, 20);
 			this.textXPos.TabIndex = 103;
 			// 
 			// label5
 			// 
 			this.label5.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label5.Location = new System.Drawing.Point(17,13);
+			this.label5.Location = new System.Drawing.Point(17, 13);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(71,16);
+			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 102;
 			this.label5.Text = "X Pos";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -173,7 +174,7 @@ namespace OpenDental{
 			// FormSheetFieldLine
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(451,194);
+			this.ClientSize = new System.Drawing.Size(451, 194);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textHeight);
 			this.Controls.Add(this.label8);
@@ -186,6 +187,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSheetFieldLine";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Static Text Field";

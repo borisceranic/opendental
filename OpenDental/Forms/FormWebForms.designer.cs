@@ -24,6 +24,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWebForms));
 			this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
 			this.menuItemSetup = new System.Windows.Forms.MenuItem();
 			this.groupDateRange = new System.Windows.Forms.GroupBox();
@@ -207,6 +208,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butRetrieve);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu1;
 			this.Name = "FormWebForms";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

@@ -58,38 +58,42 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent()
 		{
-			SparksToothChart.ToothChartData toothChartData1=new SparksToothChart.ToothChartData();
-			this.toothChart=new SparksToothChart.ToothChartWrapper();
+			SparksToothChart.ToothChartData toothChartData1 = new SparksToothChart.ToothChartData();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormToothChartingBig));
+			this.toothChart = new SparksToothChart.ToothChartWrapper();
 			this.SuspendLayout();
 			// 
 			// toothChart
 			// 
-			this.toothChart.AutoFinish=false;
-			this.toothChart.ColorBackground=System.Drawing.Color.Empty;
-			this.toothChart.CursorTool=SparksToothChart.CursorTool.Pointer;
-			this.toothChart.Dock=System.Windows.Forms.DockStyle.Fill;
-			this.toothChart.DrawMode=OpenDentBusiness.DrawingMode.Simple2D;
-			this.toothChart.Location=new System.Drawing.Point(0,0);
-			this.toothChart.Name="toothChart";
-			this.toothChart.PerioMode=false;
-			this.toothChart.PreferredPixelFormatNumber=0;
-			this.toothChart.Size=new System.Drawing.Size(926,858);
-			this.toothChart.TabIndex=0;
-			toothChartData1.SizeControl=new System.Drawing.Size(926,858);
-			this.toothChart.TcData=toothChartData1;
-			this.toothChart.UseHardware=false;
+			this.toothChart.AutoFinish = false;
+			this.toothChart.ColorBackground = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(145)))), ((int)(((byte)(152)))));
+			this.toothChart.Cursor = System.Windows.Forms.Cursors.Default;
+			this.toothChart.CursorTool = SparksToothChart.CursorTool.Pointer;
+			this.toothChart.DeviceFormat = null;
+			this.toothChart.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.toothChart.DrawMode = OpenDentBusiness.DrawingMode.Simple2D;
+			this.toothChart.Location = new System.Drawing.Point(0, 0);
+			this.toothChart.Name = "toothChart";
+			this.toothChart.PerioMode = false;
+			this.toothChart.PreferredPixelFormatNumber = 0;
+			this.toothChart.Size = new System.Drawing.Size(926, 858);
+			this.toothChart.TabIndex = 0;
+			toothChartData1.SizeControl = new System.Drawing.Size(926, 858);
+			this.toothChart.TcData = toothChartData1;
+			this.toothChart.UseHardware = false;
 			// 
 			// FormToothChartingBig
 			// 
-			this.AutoScaleBaseSize=new System.Drawing.Size(5,13);
-			this.ClientSize=new System.Drawing.Size(926,858);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(926, 858);
 			this.Controls.Add(this.toothChart);
-			this.Name="FormToothChartingBig";
-			this.StartPosition=System.Windows.Forms.FormStartPosition.CenterParent;
-			this.WindowState=System.Windows.Forms.FormWindowState.Maximized;
-			this.Load+=new System.EventHandler(this.FormToothChartingBig_Load);
-			this.FormClosed+=new System.Windows.Forms.FormClosedEventHandler(this.FormToothChartingBig_FormClosed);
-			this.ResizeEnd+=new System.EventHandler(this.FormToothChartingBig_ResizeEnd);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Name = "FormToothChartingBig";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormToothChartingBig_FormClosed);
+			this.Load += new System.EventHandler(this.FormToothChartingBig_Load);
+			this.ResizeEnd += new System.EventHandler(this.FormToothChartingBig_ResizeEnd);
 			this.ResumeLayout(false);
 
 		}

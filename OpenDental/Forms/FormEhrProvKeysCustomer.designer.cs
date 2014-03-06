@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrProvKeysCustomer));
 			this.label1 = new System.Windows.Forms.Label();
 			this.textCharge = new System.Windows.Forms.TextBox();
 			this.butAdd = new OpenDental.UI.Button();
@@ -174,6 +175,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrProvKeysCustomer";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Provider Keys for This Family";

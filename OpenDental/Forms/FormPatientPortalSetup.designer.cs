@@ -211,6 +211,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textPatientPortalURL);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPatientPortalSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Patient Portal Setup";

@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrLabOrderImport));
 			this.butCancel = new System.Windows.Forms.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butSave = new System.Windows.Forms.Button();
@@ -219,6 +220,7 @@
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrLabOrderImport";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Lab Orders";
