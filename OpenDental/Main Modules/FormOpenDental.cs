@@ -5155,6 +5155,12 @@ namespace OpenDental{
 					lbSessionId=args[i].Substring(12).Trim('"');
 				}
 			}
+			if(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsLBSessionIdExcluded")=="1" //if check box in Program Links is checked
+				&& lbSessionId=="" //if lbSessionId not previously set
+				&& !args[args.Length-1].StartsWith("LBSESSIONID="))//if there is an argument that is the last argument that is not called "LBSESSIONID", then use that argument, including the "name=" part
+			{
+				lbSessionId=args[args.Length-1].Trim('"');//example of this is command line includes LBSESSIONID= icookie=ECWAPP3ECFH. The space makes icookie a separate parameter. We want to set lbSessionId="icookie=ECWAPP3ECFH". We are not guaranteed that the parameter is always going to be named icookie, in fact it will be different on each load balancer depending on the setup of the LB.  Therefore, we cannot look for parameter name, but Aislinn from eCW guaranteed that it would be the last parameter every time during our (Cameron and Aislinn's) conversation on 3/5/2014.
+			}
 			//eCW bridge values-------------------------------------------------------------
 			Bridges.ECW.AptNum=PIn.Long(aptNum);
 			Bridges.ECW.EcwConfigPath=ecwConfigPath;
