@@ -1,13 +1,5 @@
 using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Design;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.Drawing.Printing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -55,6 +47,8 @@ namespace OpenDental{
 		private Sheet sheet;
 		private Label labelCPOE;
 		private long _provNumSelected;
+		private UI.Button butAudit;
+		private RxPat _rxPatOld;
 
 		///<summary></summary>
 		public FormRxEdit(Patient patCur,RxPat rxPatCur){
@@ -113,6 +107,7 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.textNotes = new OpenDental.ODtextBox();
 			this.labelCPOE = new System.Windows.Forms.Label();
+			this.butAudit = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -431,12 +426,28 @@ namespace OpenDental{
 			this.labelCPOE.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.labelCPOE.Visible = false;
 			// 
+			// butAudit
+			// 
+			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAudit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAudit.Autosize = true;
+			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAudit.CornerRadius = 4F;
+			this.butAudit.Location = new System.Drawing.Point(160, 443);
+			this.butAudit.Name = "butAudit";
+			this.butAudit.Size = new System.Drawing.Size(92, 24);
+			this.butAudit.TabIndex = 262;
+			this.butAudit.Text = "Audit Trail";
+			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
+			// 
 			// FormRxEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(635, 491);
+			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.labelCPOE);
 			this.Controls.Add(this.comboProvNum);
 			this.Controls.Add(this.butPickProv);
@@ -482,7 +493,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRxEdit_Load(object sender, System.EventArgs e) {
+			_rxPatOld=RxPatCur.Copy();
 			if(IsNew){
+				butAudit.Visible=false;
 				butView.Visible=false;
 				labelView.Visible=false;
 				sheet=null;
@@ -501,6 +514,21 @@ namespace OpenDental{
 				}
 				else{
 					butPrint.Visible=false;
+				}
+				if(!Security.IsAuthorized(Permissions.RxEdit)) {
+					textDate.Enabled=false;
+					checkControlled.Enabled=false;
+					textDrug.Enabled=false;
+					textSig.Enabled=false;
+					textDisp.Enabled=false;
+					textRefills.Enabled=false;
+					comboProvNum.Enabled=false;
+					butPickProv.Enabled=false;
+					textDosageCode.Enabled=false;
+					textNotes.Enabled=false;
+					butPick.Enabled=false;
+					comboSendStatus.Enabled=false;
+					butDelete.Enabled=false;
 				}
 			}
 			//security is handled on the Rx button click in the Chart module
@@ -569,11 +597,17 @@ namespace OpenDental{
 			textPharmacy.Text=Pharmacies.GetDescription(RxPatCur.PharmacyNum);
 		}
 
+		private void butAudit_Click(object sender,EventArgs e) {
+			List<Permissions> perms=new List<Permissions>();
+			perms.Add(Permissions.RxCreate);
+			perms.Add(Permissions.RxEdit);
+			FormAuditOneType FormA=new FormAuditOneType(RxPatCur.PatNum,perms,Lan.g(this,"Audit Trail for Rx"),RxPatCur.RxNum);
+			FormA.ShowDialog();
+		}
+
 		///<summary>Attempts to save, returning true if successful.</summary>
 		private bool SaveRx(){
-			if(  textDate.errorProvider1.GetError(textDate)!=""
-				//|| textRxNorm.errorProvider1.GetError(textRxNorm)!=""
-				){
+			if(textDate.errorProvider1.GetError(textDate)!="") {
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return false;
 			}
@@ -590,28 +624,30 @@ namespace OpenDental{
 			//pharmacy is set when using pick button.
 			if(IsNew){
 				RxPatCur.RxNum=RxPats.Insert(RxPatCur);
-				//SecurityLogs.MakeLogEntry("Prescription Create",RxPats.cmd.CommandText,user);
+				SecurityLogs.MakeLogEntry(Permissions.RxCreate,RxPatCur.PatNum,"CREATED("+RxPatCur.RxDate.ToShortDateString()+","+RxPatCur.Drug+","+RxPatCur.ProvNum+","+RxPatCur.Disp+","+RxPatCur.Refills+")",RxPatCur.RxNum);
 				if(FormProcGroup.IsOpen){
 					FormProcGroup.RxNum=RxPatCur.RxNum;
 				}
 			}
 			else{
-				RxPats.Update(RxPatCur);
-				//SecurityLogs.MakeLogEntry("Prescription Edit",RxPats.cmd.CommandText,user);
+				if(RxPats.Update(RxPatCur,_rxPatOld)) {
+					//The rx has changed, make an edit entry.
+					SecurityLogs.MakeLogEntry(Permissions.RxEdit,RxPatCur.PatNum,"FROM("+_rxPatOld.RxDate.ToShortDateString()+","+_rxPatOld.Drug+","+_rxPatOld.ProvNum+","+_rxPatOld.Disp+","+_rxPatOld.Refills+")"+"\r\nTO("+RxPatCur.RxDate.ToShortDateString()+","+RxPatCur.Drug+","+RxPatCur.ProvNum+","+RxPatCur.Disp+","+RxPatCur.Refills+")",RxPatCur.RxNum);
+				}
 			}
 			IsNew=false;//so that we can save it again after printing if needed.
 			return true;
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
-			if(IsNew){
+			if(IsNew) {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(MessageBox.Show(Lan.g(this,"Delete Prescription?"),"",MessageBoxButtons.OKCancel)
-				!=DialogResult.OK){
+			if(MessageBox.Show(Lan.g(this,"Delete Prescription?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
 				return;
 			}
+			SecurityLogs.MakeLogEntry(Permissions.RxEdit,RxPatCur.PatNum,"FROM("+_rxPatOld.RxDate.ToShortDateString()+","+_rxPatOld.Drug+","+_rxPatOld.ProvNum+","+_rxPatOld.Disp+","+_rxPatOld.Refills+")"+"\r\nTO('deleted')",RxPatCur.RxNum);
 			RxPats.Delete(RxPatCur.RxNum);
 			DialogResult=DialogResult.OK;	
 		}

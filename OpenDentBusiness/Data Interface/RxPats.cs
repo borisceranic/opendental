@@ -36,6 +36,13 @@ namespace OpenDentBusiness{
 			Crud.RxPatCrud.Update(rx);
 		}
 
+		public static bool Update(RxPat rx,RxPat oldRx) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),rx,oldRx);
+			}
+			return Crud.RxPatCrud.Update(rx,oldRx);
+		}
+
 		///<summary></summary>
 		public static long Insert(RxPat rx) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
