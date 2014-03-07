@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>This is only called from the UI.  Its purpose is to refresh the cache for one type on both the workstation and server.  DataValid.SetInvalid() should be used when local cache does not need to be refreshed but all other workstations need to refresh their cache.</summary>
+		///<summary>This is only called from the UI.  Its purpose is to refresh the cache for one type on both the workstation and server.  DataValid.SetInvalid() should be used when all other workstations in the office need to refresh their cache as well.</summary>
 		public static void Refresh(InvalidType itype) {
 			int intItype=(int)itype;
 			RefreshCache(intItype.ToString());
