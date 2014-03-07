@@ -51,7 +51,13 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			_ccd=EhrCCD.GenerateClinicalSummary(_patCur,checkAllergy.Checked,checkEncounter.Checked,checkFunctionalStatus.Checked,checkImmunization.Checked,checkMedication.Checked,checkPlanOfCare.Checked,checkProblem.Checked,checkProcedure.Checked,checkReferral.Checked,checkResult.Checked,checkSocialHistory.Checked,checkVitalSign.Checked,textInstructions.Text);
+			try {
+				_ccd=EhrCCD.GenerateClinicalSummary(_patCur,checkAllergy.Checked,checkEncounter.Checked,checkFunctionalStatus.Checked,checkImmunization.Checked,checkMedication.Checked,checkPlanOfCare.Checked,checkProblem.Checked,checkProcedure.Checked,checkReferral.Checked,checkResult.Checked,checkSocialHistory.Checked,checkVitalSign.Checked,textInstructions.Text);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g(this,ex.Message));
+				return;
+			}
 			DialogResult=DialogResult.OK;
 		}
 
