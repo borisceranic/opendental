@@ -1,8 +1,5 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -29,8 +26,8 @@ namespace OpenDental{
 		public bool Changed;
 		private CheckBox checkApptProcsQuickAdd;
 		private CheckBox checkRecallTypes;
-		///<summary>The actual list of ADA codes as published by the ADA.  Only available on our compiled releases.  There is no other way to get this info.</summary>
-		private List<ProcedureCode> codeList;
+		///<summary>The actual list of ADA codes as published by the ADA.  Only available on our compiled releases.  There is no other way to get this info.  For Canada, list will get filled on Run click by downloading code list from our website.</summary>
+		private List<ProcedureCode> _codeList;
 
 		///<summary></summary>
 		public FormProcTools()
@@ -233,21 +230,21 @@ namespace OpenDental{
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//Tcodes remain enabled
 				//Ncodes remain enabled
-				checkDcodes.Enabled=false;//todo: enable this when ready
-				checkDcodes.Text="CDA codes - Add any missing 2012 CDA codes.  This option does not work in the trial version or compiled version.";
+				checkDcodes.Text="CDA codes - Add any missing 2014 CDA codes.  This option does not work in the trial version.";
 				checkAutocodes.Enabled=false;
 				checkProcButtons.Enabled=false;
 				checkApptProcsQuickAdd.Enabled=false;
 				checkRecallTypes.Enabled=false;
 				checkRecallTypes.Text="Recall Types - Resets the recall types and triggers to default.  Replaces any T codes with CDA codes.";
-				codeList=null;//Is only filled when the code tool is run.
+				_codeList=null;//Is only filled when the code tool runs because the user might not need to download the codes.
 			}
 			else { //USA
-				codeList=CDT.Class1.GetADAcodes();
-			}
-			if(codeList==null || codeList.Count==0) {
-				checkDcodes.Checked=false;
-				checkDcodes.Enabled=false;
+				_codeList=CDT.Class1.GetADAcodes();
+				//If this is not the full USA release version, then disable the D-code import because the CDT codes will not be available.
+				if(_codeList==null || _codeList.Count==0) {
+					checkDcodes.Checked=false;
+					checkDcodes.Enabled=false;
+				}
 			}
 		}
 
@@ -261,9 +258,10 @@ namespace OpenDental{
 			checkRecallTypes.Checked=false;
 		}
 
+		///<summary>Downloads Canadian procedure codes from our website and updates _codeList accordingly.</summary>
 		private void CanadaDownloadProcedureCodes() {
 			Cursor=Cursors.WaitCursor;
-			codeList=new List<ProcedureCode>();
+			_codeList=new List<ProcedureCode>();
 			string url=@"http://www.opendental.com/feescanada/procedurecodes.txt";
 			string tempFile=Path.GetTempFileName();
 			WebClient myWebClient=new WebClient();
@@ -271,7 +269,7 @@ namespace OpenDental{
 				myWebClient.DownloadFile(url,tempFile);
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g(this,"Failed to download fee schedule file")+": "+ex.Message);
+				MessageBox.Show(Lan.g(this,"Failed to download procedure codes")+":\r\n"+ex.Message);
 				Cursor=Cursors.Default;
 				return;
 			}
@@ -294,7 +292,7 @@ namespace OpenDental{
 				procCode.ProcCatDescript=PIn.String(fields[7]);//7 ProcCatDescript
 				procCode.ProcTime=PIn.String(fields[8]);//8 ProcTime
 				procCode.AbbrDesc=PIn.String(fields[9]);//9 AbbrDesc
-				codeList.Add(procCode);
+				_codeList.Add(procCode);
 			}
 			Cursor=Cursors.Default;
 		}
@@ -308,11 +306,14 @@ namespace OpenDental{
 			}
 			Changed=true;
 			int rowsInserted=0;
+			#region T Codes
 			if(checkTcodes.Checked){
 				ProcedureCodes.TcodesClear();
 				//yes, this really does refresh before moving on.
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.ProcCodes, InvalidType.Fees);
 			}
+			#endregion
+			#region N Codes
 			if(checkNcodes.Checked) {
 				try {
 					rowsInserted+=FormProcCodes.ImportProcCodes("",null,Properties.Resources.NoFeeProcCodes);
@@ -323,14 +324,16 @@ namespace OpenDental{
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.ProcCodes, InvalidType.Fees);
 				//fees are included because they are grouped by defs.
 			}
+			#endregion
+			#region D Codes
 			if(checkDcodes.Checked) {
 				try {
 					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-						if(codeList==null) {
-							CanadaDownloadProcedureCodes();//Fill codeList with Canadian codes
+						if(_codeList==null) {
+							CanadaDownloadProcedureCodes();
 						}
 					}
-					rowsInserted+=FormProcCodes.ImportProcCodes("",codeList,"");
+					rowsInserted+=FormProcCodes.ImportProcCodes("",_codeList,"");
 					int descriptionsFixed=ProcedureCodes.ResetADAdescriptions();
 					MessageBox.Show("Procedure code descriptions updated: "+descriptionsFixed.ToString());
 				}
@@ -339,25 +342,34 @@ namespace OpenDental{
 				}
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.ProcCodes, InvalidType.Fees);
 			}
+			#endregion
 			if(checkNcodes.Checked || checkDcodes.Checked){
 				MessageBox.Show("Procedure codes inserted: "+rowsInserted);
 			}
+			#region Auto Codes
 			if(checkAutocodes.Checked) {
 				AutoCodes.SetToDefault();
 				DataValid.SetInvalid(InvalidType.AutoCodes);
 			}
+			#endregion
+			#region Proc Buttons
 			if(checkProcButtons.Checked) {
 				ProcButtons.SetToDefault();
 				DataValid.SetInvalid(InvalidType.ProcButtons, InvalidType.Defs);
 			}
+			#endregion
+			#region Appt Procs Quick Add
 			if(checkApptProcsQuickAdd.Checked) {
 				ProcedureCodes.ResetApptProcsQuickAdd();
 				DataValid.SetInvalid(InvalidType.Defs);
 			}
+			#endregion
+			#region Recall Types
 			if(checkRecallTypes.Checked) {
 				RecallTypes.SetToDefault();
 				DataValid.SetInvalid(InvalidType.RecallTypes,InvalidType.Prefs);
 			}
+			#endregion
 			MessageBox.Show(Lan.g(this,"Done."));
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"New Customer Procedure codes tool was run.");
 		}
