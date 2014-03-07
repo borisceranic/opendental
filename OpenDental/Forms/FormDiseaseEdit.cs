@@ -427,7 +427,7 @@ namespace OpenDental{
 			comboSnomedProblemType.Items.Add("Problem");//0 - Default value.  Problem (finding).  55607006
 			comboSnomedProblemType.Items.Add("Finding");//1 - Clinical finding (finding).  404684003
 			comboSnomedProblemType.Items.Add("Complaint");//2 - Complaint (finding).  409586006
-			comboSnomedProblemType.Items.Add("Dignosis");//3 - Diagnosis interpretation (observable entity).  282291009
+			comboSnomedProblemType.Items.Add("Diagnosis");//3 - Diagnosis interpretation (observable entity).  282291009
 			comboSnomedProblemType.Items.Add("Condition");//4 - Disease (disorder).  64572001
 			comboSnomedProblemType.Items.Add("FunctionalLimitation");//5 - Finding of functional performance and activity (finding).  248536006
 			comboSnomedProblemType.Items.Add("Symptom");//6 - Finding reported by subject or history provider (finding).  418799008
@@ -437,7 +437,7 @@ namespace OpenDental{
 			else if(DiseaseCur.SnomedProblemType=="409586006") {//Complaint
 				comboSnomedProblemType.SelectedIndex=2;
 			}
-			else if(DiseaseCur.SnomedProblemType=="282291009") {//Dignosis
+			else if(DiseaseCur.SnomedProblemType=="282291009") {//Diagnosis
 				comboSnomedProblemType.SelectedIndex=3;
 			}
 			else if(DiseaseCur.SnomedProblemType=="64572001") {//Condition
