@@ -105,57 +105,23 @@ namespace OpenDental{
 			#region Instantiate Strings
 			string fldval="";
 			string address="";
+			string apptModNote="";//This is the Appointment Module Note in the Appointments for window.  http://www.opendental.com/manual/apptsched.html
 			string apptsAllFuture="";
 			string birthdate="";
-			string carrierName="";
 			string carrierAddress="";
 			string carrierCityStZip="";
-			string subscriberId="";
-			string subscriberNameFL="";
-			string insAnnualMax="";
-			string insDeductible="";
-			string insDeductibleUsed="";
-			string insPending="";
-			string insPercentages="";
-			string insPlanGroupNumber="";
-			string insPlanGroupName="";
-			string insPlanNote="";
-			string insSubNote="";
-			string insRemaining="";
-			string insUsed="";
+			string carrierName="";
 			string carrier2Name="";
-			string subscriber2NameFL="";
-			string ins2AnnualMax="";
-			string ins2Deductible="";
-			string ins2DeductibleUsed="";
-			string ins2Pending="";
-			string ins2Percentages="";
-			string ins2Remaining="";
-			string ins2Used="";
 			string clinicDescription="";
 			string clinicAddress="";
 			string clinicCityStZip="";
-			string phone="";
 			string clinicPhone="";
-			string plannedAppointmentInfo="";
+			string dateTodayLong="";
 			string dateFirstVisit="";
-			string treatmentPlanProcs="";
 			string dateOfLastSavedTP="";
-			string tpResponsPartyAddress="";
-			string tpResponsPartyCityStZip="";
-			string tpResponsPartyNameFL="";
 			string dateRecallDue="";
-			string recallInterval="";
-			string nextSchedApptDateT="";
 			string dateTimeLastAppt="";
-			string nextSchedApptsFam="";
-			string serviceNote="";
-			string insFreqBW="";
-			string insFreqExams="";
-			string insFreqPanoFMX="";
-			string insType=""; //(ppo, etc)
-			string referredFrom=""; //(just one)
-			string referredTo=""; //(typically Drs. could be multiline. Include date)
+			string dateLastAppt="";
 			string dateLastBW="";
 			string dateLastExam="";
 			string dateLastPanoFMX="";
@@ -175,11 +141,62 @@ namespace OpenDental{
 			string guarantorNameL="";
 			string guarantorNamePref="";
 			string guarantorNameLF="";
+			string insAnnualMax="";
+			string insDeductible="";
+			string insDeductibleUsed="";
+			string insFeeSchedule="";
+			string insPending="";
+			string insPercentages="";
+			string insPlanGroupNumber="";
+			string insPlanGroupName="";
+			string insPlanNote="";
+			string insSubNote="";
+			string insSubBirthDate="";
+			string insRemaining="";
+			string insUsed="";
+			string insFreqBW="";
+			string insFreqExams="";
+			string insFreqPanoFMX="";
+			string insType=""; //(ppo, etc)
+			string ins2AnnualMax="";
+			string ins2Deductible="";
+			string ins2DeductibleUsed="";
+			string ins2Pending="";
+			string ins2Percentages="";
+			string ins2Remaining="";
+			string ins2Used="";
+			string medicalSummary="";
+			string nextSchedApptDateT="";
+			string nextSchedApptDate="";
+			string nextSchedApptsFam="";
+			string phone="";
+			string plannedAppointmentInfo="";
+			string premedicateYN="";
+			string recallInterval="";
+			string referredFrom=""; //(just one)
+			string referredTo=""; //(typically Drs. could be multiline. Include date)
+			string serviceNote="";
+			string subscriberId="";
+			string subscriberNameFL="";
+			string subscriber2NameFL="";
+			string tpResponsPartyAddress="";
+			string tpResponsPartyCityStZip="";
+			string tpResponsPartyNameFL="";
+			string treatmentPlanProcs="";
+			string treatmentPlanProcsPriority="";
 			#endregion
 			Family fam=null;
 			Provider priProv=null;
 			#region Patient Fields
 			if(pat!=null) {
+				premedicateYN="No";
+				if(pat.Premed) {
+					premedicateYN="Yes";
+				}
+				PatientNote patNote=PatientNotes.Refresh(pat.PatNum,pat.Guarantor);
+				medicalSummary=patNote.Medical;
+				apptModNote=pat.ApptModNote;
+				dateTodayLong=DateTime.Today.ToLongDateString();
 				#region Gender
 				switch(pat.Gender) {
 					case PatientGender.Male:
@@ -252,9 +269,12 @@ namespace OpenDental{
 				#region Treatment Plan Procs
 				//todo some day: move this section down to TP section
 				List<Procedure> procsList=null;//there is another variable that does the same thing. Carefully combine them.
-				if(Sheets.ContainsStaticField(sheet,"treatmentPlanProcs") || Sheets.ContainsStaticField(sheet,"plannedAppointmentInfo")) {
+				if(Sheets.ContainsStaticField(sheet,"treatmentPlanProcs") 
+					|| Sheets.ContainsStaticField(sheet,"plannedAppointmentInfo") 
+					|| Sheets.ContainsStaticField(sheet,"treatmentPlanProcsPriority")) 
+				{
 					procsList=Procedures.Refresh(pat.PatNum);
-					if(Sheets.ContainsStaticField(sheet,"treatmentPlanProcs")) {
+					if(Sheets.ContainsStaticField(sheet,"treatmentPlanProcs") || Sheets.ContainsStaticField(sheet,"treatmentPlanProcsPriority")) {
 						Procedure[] procListTP=Procedures.GetListTP(procsList);//sorted by priority, then toothnum
 						for(int i=0;i<procListTP.Length;i++) {
 							if(procListTP[i].ProcStatus!=ProcStat.TP) {
@@ -262,10 +282,20 @@ namespace OpenDental{
 							}
 							if(treatmentPlanProcs!="") {
 								treatmentPlanProcs+="\r\n";
+								treatmentPlanProcsPriority+="\r\n";
 							}
-							treatmentPlanProcs+=ProcedureCodes.GetStringProcCode(procListTP[i].CodeNum)+", "
-							+Procedures.GetDescription(procListTP[i])+", "
-							+procListTP[i].ProcFee.ToString("c");
+							//Figure out what the procedure description will be like.
+							string procDescript=ProcedureCodes.GetStringProcCode(procListTP[i].CodeNum)+", "
+								+Procedures.GetDescription(procListTP[i])+", "
+								+procListTP[i].ProcFee.ToString("c");
+							//Get the procedure's priority.
+							string priority=DefC.GetName(DefCat.TxPriorities,procListTP[i].Priority);
+							if(priority=="") {
+								priority="No priority";
+							}
+							//Set the corresponding static field text.
+							treatmentPlanProcsPriority+=priority+", "+procDescript;
+							treatmentPlanProcs+=procDescript;
 						}
 					}
 				}
@@ -303,6 +333,10 @@ namespace OpenDental{
 				long subNum=PatPlans.GetInsSubNum(patPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,patPlanList,planList,subList));
 				long patPlanNum=PatPlans.GetPatPlanNum(subNum,patPlanList);
 				InsSub sub=InsSubs.GetSub(subNum,subList);
+				Patient subscriber=Patients.GetPat(sub.Subscriber);
+				if(subscriber!=null) {
+					insSubBirthDate=subscriber.Birthdate.ToShortDateString();
+				}
 				InsPlan plan=null;
 				if(sub!=null) {
 					plan=InsPlans.GetPlan(sub.PlanNum,planList);
@@ -318,6 +352,7 @@ namespace OpenDental{
 				double doubRemain;
 				double doubUsed;
 				if(plan!=null) {
+					insFeeSchedule=FeeScheds.GetDescription(plan.FeeSched);
 					insPlanGroupName=plan.GroupName;
 					insPlanGroupNumber=plan.GroupNum;
 					insPlanNote=plan.PlanNote;
@@ -329,7 +364,9 @@ namespace OpenDental{
 					}
 					carrierCityStZip=carrier.City+", "+carrier.State+"  "+carrier.Zip;
 					subscriberId=sub.SubscriberID;
-					subscriberNameFL=Patients.GetLim(sub.Subscriber).GetNameFL();
+					if(subscriber!=null) {
+						subscriberNameFL=subscriber.GetNameFL();
+					}
 					doubAnnualMax=Benefits.GetAnnualMaxDisplay(benefitList,plan.PlanNum,patPlanNum,false);
 					doubRemain=-1;
 					if(doubAnnualMax!=-1) {
@@ -546,10 +583,12 @@ namespace OpenDental{
 					if(apptList[i].AptDateTime < DateTime.Now) {
 						//this will happen repeatedly up until the most recent.
 						dateTimeLastAppt=apptList[i].AptDateTime.ToShortDateString()+"  "+apptList[i].AptDateTime.ToShortTimeString();
+						dateLastAppt=apptList[i].AptDateTime.ToShortDateString();
 					}
 					else {//after now
 						if(nextSchedApptDateT=="") {//only the first one found
 							nextSchedApptDateT=apptList[i].AptDateTime.ToShortDateString()+"  "+apptList[i].AptDateTime.ToShortTimeString();
+							nextSchedApptDate=apptList[i].AptDateTime.ToShortDateString();
 							break;//we're done with the list now.
 						}
 					}
@@ -646,6 +685,7 @@ namespace OpenDental{
 				if(pat!=null) {
 					fldval=fldval.Replace("[address]",address);
 					fldval=fldval.Replace("[apptsAllFuture]",apptsAllFuture.TrimEnd());
+					fldval=fldval.Replace("[apptModNote]",apptModNote);
 					fldval=fldval.Replace("[age]",Patients.AgeToString(pat.Age));
 					fldval=fldval.Replace("[balTotal]",fam.ListPats[0].BalTotal.ToString("c"));
 					fldval=fldval.Replace("[bal_0_30]",fam.ListPats[0].Bal_0_30.ToString("c"));
@@ -667,6 +707,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[clinicCityStZip]",clinicCityStZip);
 					fldval=fldval.Replace("[clinicPhone]",clinicPhone);
 					fldval=fldval.Replace("[DateFirstVisit]",dateFirstVisit);
+					fldval=fldval.Replace("[dateLastAppt]",dateLastAppt);
 					fldval=fldval.Replace("[dateLastBW]",dateLastBW);
 					fldval=fldval.Replace("[dateLastExam]",dateLastExam);
 					fldval=fldval.Replace("[dateLastPanoFMX]",dateLastPanoFMX);
@@ -674,6 +715,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[dateOfLastSavedTP]",dateOfLastSavedTP);
 					fldval=fldval.Replace("[dateRecallDue]",dateRecallDue);
 					fldval=fldval.Replace("[dateTimeLastAppt]",dateTimeLastAppt);
+					fldval=fldval.Replace("[dateTodayLong]",dateTodayLong);
 					fldval=fldval.Replace("[Email]",pat.Email);
 					fldval=fldval.Replace("[famFinUrgNote]",fam.ListPats[0].FamFinUrgNote);
 					fldval=fldval.Replace("[guarantorNameF]",guarantorNameF);
@@ -697,6 +739,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[insAnnualMax]",insAnnualMax);
 					fldval=fldval.Replace("[insDeductible]",insDeductible);
 					fldval=fldval.Replace("[insDeductibleUsed]",insDeductibleUsed);
+					fldval=fldval.Replace("[insFeeSchedule]",insFeeSchedule);
 					fldval=fldval.Replace("[insFreqBW]",insFreqBW.TrimEnd());
 					fldval=fldval.Replace("[insFreqExams]",insFreqExams.TrimEnd());
 					fldval=fldval.Replace("[insFreqPanoFMX]",insFreqPanoFMX.TrimEnd());
@@ -706,6 +749,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[insPlanGroupName]",insPlanGroupName);
 					fldval=fldval.Replace("[insPlanNote]",insPlanNote);
 					fldval=fldval.Replace("[insType]",insType);
+					fldval=fldval.Replace("[insSubBirthDate]",insSubBirthDate);
 					fldval=fldval.Replace("[insSubNote]",insSubNote);
 					fldval=fldval.Replace("[insRemaining]",insRemaining);
 					fldval=fldval.Replace("[insUsed]",insUsed);
@@ -716,6 +760,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[ins2Percentages]",ins2Percentages);
 					fldval=fldval.Replace("[ins2Remaining]",ins2Remaining);
 					fldval=fldval.Replace("[ins2Used]",ins2Used);
+					fldval=fldval.Replace("[medicalSummary]",medicalSummary);
 					fldval=fldval.Replace("[MedUrgNote]",pat.MedUrgNote);
 					fldval=fldval.Replace("[nameF]",pat.FName);
 					fldval=fldval.Replace("[nameFL]",pat.GetNameFL());
@@ -724,10 +769,12 @@ namespace OpenDental{
 					fldval=fldval.Replace("[nameLF]",pat.GetNameLF());
 					fldval=fldval.Replace("[nameMI]",pat.MiddleI);
 					fldval=fldval.Replace("[namePref]",pat.Preferred);
+					fldval=fldval.Replace("[nextSchedApptDate]",nextSchedApptDate);
 					fldval=fldval.Replace("[nextSchedApptDateT]",nextSchedApptDateT);
 					fldval=fldval.Replace("[nextSchedApptsFam]",nextSchedApptsFam.TrimEnd());
 					fldval=fldval.Replace("[PatNum]",pat.PatNum.ToString());
 					fldval=fldval.Replace("[plannedAppointmentInfo]",plannedAppointmentInfo);
+					fldval=fldval.Replace("[premedicateYN]",premedicateYN);
 					fldval=fldval.Replace("[priProvNameFormal]",priProv.GetFormalName());
 					fldval=fldval.Replace("[recallInterval]",recallInterval);
 					fldval=fldval.Replace("[referredFrom]",referredFrom);
@@ -744,6 +791,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[tpResponsPartyCityStZip]",tpResponsPartyCityStZip);
 					fldval=fldval.Replace("[tpResponsPartyNameFL]",tpResponsPartyNameFL);
 					fldval=fldval.Replace("[treatmentPlanProcs]",treatmentPlanProcs);
+					fldval=fldval.Replace("[treatmentPlanProcsPriority]",treatmentPlanProcsPriority);
 					fldval=fldval.Replace("[WirelessPhone]",StripPhoneBeyondSpace(pat.WirelessPhone));
 					fldval=fldval.Replace("[WkPhone]",StripPhoneBeyondSpace(pat.WkPhone));
 				}

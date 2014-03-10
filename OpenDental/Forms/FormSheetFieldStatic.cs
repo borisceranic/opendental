@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
-using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -59,6 +55,7 @@ namespace OpenDental {
 				"address",
 				"age",
 				"apptsAllFuture",
+				"apptModNote",
 				"balTotal",
 				"bal_0_30",
 				"bal_31_60",
@@ -79,6 +76,7 @@ namespace OpenDental {
 				"clinicCityStZip",
 				"clinicPhone",
 				"DateFirstVisit",
+				"dateLastAppt",
 				"dateLastBW",
 				"dateLastExam",
 				"dateLastPanoFMX",
@@ -86,6 +84,7 @@ namespace OpenDental {
 				"dateOfLastSavedTP",
 				"dateRecallDue",
 				"dateTimeLastAppt",
+				"dateTodayLong",
 				"dateToday",
 				"Email",
 				"famFinUrgNote",
@@ -109,6 +108,7 @@ namespace OpenDental {
 				"insAnnualMax",
 				"insDeductible",
 				"insDeductibleUsed",
+				"insFeeSchedule",
 				"insFreqBW",
 				"insFreqExams",
 				"insFreqPanoFMX",
@@ -118,6 +118,7 @@ namespace OpenDental {
 				"insPlanNote",
 				"insPlanGroupNumber",
 				"insRemaining",
+				"insSubBirthDate",
 				"insSubNote",
 				"insType",
 				"insUsed",
@@ -128,6 +129,7 @@ namespace OpenDental {
 				"ins2Percentages",
 				"ins2Remaining",
 				"ins2Used",
+				"medicalSummary",
 				"MedUrgNote",
 				"nameF",
 				"nameFL",
@@ -136,11 +138,13 @@ namespace OpenDental {
 				"nameLF",
 				"nameMI",
 				"namePref",
+				"nextSchedApptDate",
 				"nextSchedApptDateT",
 				"nextSchedApptsFam",
 				"PatNum",
 				"plannedAppointmentInfo",
 				"practiceTitle",
+				"premedicateYN",
 				"priProvNameFormal",
 				"recallInterval",
 				"referredFrom",
@@ -157,6 +161,7 @@ namespace OpenDental {
 				"tpResponsPartyCityStZip",
 				"tpResponsPartyNameFL",
 				"treatmentPlanProcs",
+				"treatmentPlanProcsPriority",
 				"WirelessPhone",
 				"WkPhone"
 			};

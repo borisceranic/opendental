@@ -757,7 +757,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			y+=3;
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Treatment Plan",sheet.FontSize,sheet.FontName,true,x,y,500,19,GrowthBehaviorEnum.DownGlobal));
 			y+=19;
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("[treatmentPlanProcs]",sheet.FontSize,sheet.FontName,false,x,y,500,19,GrowthBehaviorEnum.DownGlobal));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("[treatmentPlanProcsPriority]",sheet.FontSize,sheet.FontName,false,x,y,500,19,GrowthBehaviorEnum.DownGlobal));
 			y+=rowH;
 			return sheet;
 		}
@@ -1464,13 +1464,13 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			//Title----------------------------------------------------------------------------------------------------------
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Exam for [nameFL]",12f,sheet.FontName,true,275,y,325,20));
 			y+=rowH;
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("sheet.DateTimeSheet",12f,sheet.FontName,false,350,y,100,20));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("sheet.DateTimeSheet",12f,sheet.FontName,false,350,y,180,20));
 			y+=rowH;
 			int x=100;
 			y+=30;
 			string[] fieldText=new string[] {"TMJ","Neck","Tongue","Palate","Floor of Mouth"};
 			for(int i=0;i<fieldText.Length;i++){
-				sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText(fieldText[i],sheet.FontSize,sheet.FontName,false,x,y,100,20));
+				sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText(fieldText[i],sheet.FontSize,sheet.FontName,false,x,y,120,20));
 				sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(x+120,y+2,15,15));
 				sheet.SheetFieldDefs.Add(SheetFieldDef.NewCheckBox("misc",x+121,y+4,13,13));
 				sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("WNL",sheet.FontSize,sheet.FontName,false,x+140,y,40,20));
