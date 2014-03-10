@@ -21,6 +21,7 @@ namespace OpenDental {
 		private string _strInsPaid;
 		private List<string> _listProcedureAdjustments;
 		private List<string> _listRemarks;
+		private List<string> _listSupplementalInfo;
 		private decimal _patientPortionSum;
 		private decimal _contractualObligationSum;
 		private decimal _payorInitiatedReductionSum;
@@ -44,12 +45,14 @@ namespace OpenDental {
 		private void FormEtrans835ClaimEdit_Resize(object sender,EventArgs e) {
 			FillProcedureAdjustments();//Because the grid columns change size depending on the form size.
 			FillRemarks();//Because the grid columns change size depending on the form size.
+			FillSupplementalInfo();//Because the grid columns change size depending on the form size.
 		}
 
 		private void FillAll() {
 			FillProcedureAdjustments();
-			FillHeader();
+			FillHeader();//Must be after FillProcedureAdjustments().
 			FillRemarks();
+			FillSupplementalInfo();
 		}
 
 		private void FillHeader() {
@@ -132,6 +135,29 @@ namespace OpenDental {
 			gridRemarks.EndUpdate();
 		}
 
+		private void FillSupplementalInfo() {
+			_listSupplementalInfo=_x835.GetProcSupplementalInfo(_segSvcIndex);
+			if(_listSupplementalInfo.Count==0) {
+				gridSupplementalInfo.Title="Supplemental Info (None Reported)";
+			}
+			else {
+				gridSupplementalInfo.Title="Supplemental Info";
+			}
+			gridSupplementalInfo.BeginUpdate();
+			gridSupplementalInfo.Columns.Clear();
+			const int colWidthAmt=80;
+			int colWidthVariable=gridSupplementalInfo.Width-10-colWidthAmt;
+			gridSupplementalInfo.Columns.Add(new ODGridColumn("Description",colWidthVariable,HorizontalAlignment.Left));
+			gridSupplementalInfo.Columns.Add(new ODGridColumn("Amt",colWidthAmt,HorizontalAlignment.Right));
+			gridSupplementalInfo.Rows.Clear();
+			for(int i=0;i<_listSupplementalInfo.Count;i+=2) {
+				ODGridRow row=new ODGridRow();
+				row.Cells.Add(_listSupplementalInfo[i]);//Description
+				row.Cells.Add(_listSupplementalInfo[i+1]);//Amount
+				gridSupplementalInfo.Rows.Add(row);
+			}
+			gridSupplementalInfo.EndUpdate();
+		}
 
 		private void gridRemarks_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_listRemarks[e.Row]);

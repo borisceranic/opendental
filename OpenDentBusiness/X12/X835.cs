@@ -383,7 +383,7 @@ namespace OpenDentBusiness
 				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
 					continue;
 				}
-				result[0]=GetClaimStatusDescriptionForCode(segCLP.Get(2));//CLP02 Claim Status Code Description
+				result[0]=GetDescriptForClaimStatusCode(segCLP.Get(2));//CLP02 Claim Status Code Description
 				result[1]=PIn.Decimal(segCLP.Get(3)).ToString("f2");//CLP03 Total Claim Charge Amount
 				result[2]=PIn.Decimal(segCLP.Get(4)).ToString("f2");//CLP04 Claim Payment Amount
 				result[3]=PIn.Decimal(segCLP.Get(5)).ToString("f2");//CLP05 Patient Portion Amount
@@ -649,7 +649,7 @@ namespace OpenDentBusiness
 			for(int j=startSegNum;j<endSegNum;j++) {
 				X12Segment seg=_listSegments[j];
 				if(seg.SegmentID=="CLP") {
-					//If another claim segment is encountered, then we have finished processing all of the procedure-level adjustments.  Discontinue processing.
+					//If another claim segment is encountered, then we have finished processing all of the procedure-level remarks.  Discontinue processing.
 					break;
 				}
 				if(seg.SegmentID!="LQ") {
@@ -668,6 +668,30 @@ namespace OpenDentBusiness
 				}
 			}
 			return listRemarks;
+		}
+
+		///<summaryReturns a list of strings with values in twos, such that the first item is the amount description, the second is the amount.</summary>
+		public List<string> GetProcSupplementalInfo(int segSvcIndex) {
+			List<string> listSupplementalInfo=new List<string>();
+			int startSegNum=_listSegNumsSVC[segSvcIndex];
+			int endSegNum=_listSegments.Count;
+			if(segSvcIndex<_listSegNumsSVC.Count-1) {
+				endSegNum=_listSegNumsSVC[segSvcIndex+1];
+			}
+			for(int j=startSegNum;j<endSegNum;j++) {
+				X12Segment seg=_listSegments[j];
+				if(seg.SegmentID=="CLP") {
+					//If another claim segment is encountered, then we have finished processing all of the procedure-level supplemental info.  Discontinue processing.
+					break;
+				}
+				if(seg.SegmentID!="AMT") {
+					continue;//Not a supplemental info segment.
+				}
+				string code=seg.Get(1);
+				decimal amount=PIn.Decimal(seg.Get(2));
+				listSupplementalInfo.Add(GetDescriptForAmountQualifierCode(code)); listSupplementalInfo.Add(amount.ToString("f2"));
+			}
+			return listSupplementalInfo;
 		}
 
 		#endregion Procedure Level
@@ -734,167 +758,198 @@ namespace OpenDentBusiness
 		#endregion Helpers
 		#region Code To Description
 
-		private string GetClaimStatusDescriptionForCode(string claimStatusCode) {
+		private string GetDescriptForClaimStatusCode(string code) {
 			string claimStatusCodeDescript="";
-			if(claimStatusCode=="1") {
+			if(code=="1") {
 				claimStatusCodeDescript="Processed as Primary";
 			}
-			else if(claimStatusCode=="2") {
+			else if(code=="2") {
 				claimStatusCodeDescript="Processed as Secondary";
 			}
-			else if(claimStatusCode=="3") {
+			else if(code=="3") {
 				claimStatusCodeDescript="Processed as Tertiary";
 			}
-			else if(claimStatusCode=="4") {
+			else if(code=="4") {
 				claimStatusCodeDescript="Denied";
 			}
-			else if(claimStatusCode=="19") {
+			else if(code=="19") {
 				claimStatusCodeDescript="Processed as Primary, Forwarded to Additional Payer(s)";
 			}
-			else if(claimStatusCode=="20") {
+			else if(code=="20") {
 				claimStatusCodeDescript="Processed as Secondary, Forwarded to Additional Payer(s)";
 			}
-			else if(claimStatusCode=="21") {
+			else if(code=="21") {
 				claimStatusCodeDescript="Processed as Tertiary, Forwarded to Additional Payer(s)";
 			}
-			else if(claimStatusCode=="22") {
+			else if(code=="22") {
 				claimStatusCodeDescript="Reversal of Previous Payment";
 			}
-			else if(claimStatusCode=="23") {
+			else if(code=="23") {
 				claimStatusCodeDescript="Not Our Claim, Forwarded to Additional Payer(s)";
 			}
-			else if(claimStatusCode=="25") {
+			else if(code=="25") {
 				claimStatusCodeDescript="Predetermination Pricing Only - No Payment";
 			}
 			return claimStatusCodeDescript;
 		}
 
 		///<summary>Used for the reason codes in the PLB segment.</summary>
-		private string GetDescriptForProvAdjCode(string reasonCode) {
-			if(reasonCode=="50") {
+		private string GetDescriptForProvAdjCode(string code) {
+			if(code=="50") {
 				return "Late Charge";
 			}
-			if(reasonCode=="51") {
+			if(code=="51") {
 				return "Interest Penalty Charge";
 			}
-			if(reasonCode=="72") {
+			if(code=="72") {
 				return "Authorized Return";
 			}
-			if(reasonCode=="90") {
+			if(code=="90") {
 				return "Early Payment Allowance";
 			}
-			if(reasonCode=="AH") {
+			if(code=="AH") {
 				return "Origination Fee";
 			}
-			if(reasonCode=="AM") {
+			if(code=="AM") {
 				return "Applied to Borrower's Account";
 			}
-			if(reasonCode=="AP") {
+			if(code=="AP") {
 				return "Acceleration of Benefits";
 			}
-			if(reasonCode=="B2") {
+			if(code=="B2") {
 				return "Rebate";
 			}
-			if(reasonCode=="B3") {
+			if(code=="B3") {
 				return "Recovery Allowance";
 			}
-			if(reasonCode=="BD") {
+			if(code=="BD") {
 				return "Bad Debt Adjustment";
 			}
-			if(reasonCode=="BN") {
+			if(code=="BN") {
 				return "Bonus";
 			}
-			if(reasonCode=="C5") {
+			if(code=="C5") {
 				return "Temporary Allowance";
 			}
-			if(reasonCode=="CR") {
+			if(code=="CR") {
 				return "Capitation Interest";
 			}
-			if(reasonCode=="CS") {
+			if(code=="CS") {
 				return "Adjustment";
 			}
-			if(reasonCode=="CT") {
+			if(code=="CT") {
 				return "Capitation Payment";
 			}
-			if(reasonCode=="CV") {
+			if(code=="CV") {
 				return "Capital Passthru";
 			}
-			if(reasonCode=="CW") {
+			if(code=="CW") {
 				return "Certified Registered Nurse Anesthetist Passthru";
 			}
-			if(reasonCode=="DM") {
+			if(code=="DM") {
 				return "Direct Medical Education Passthru";
 			}
-			if(reasonCode=="E3") {
+			if(code=="E3") {
 				return "Withholding";
 			}
-			if(reasonCode=="FB") {
+			if(code=="FB") {
 				return "Forwarding Balance";
 			}
-			if(reasonCode=="FC") {
+			if(code=="FC") {
 				return "Fund Allocation";
 			}
-			if(reasonCode=="GO") {
+			if(code=="GO") {
 				return "Graduate Medical Education Passthru";
 			}
-			if(reasonCode=="HM") {
+			if(code=="HM") {
 				return "Hemophilia Clotting Factor Supplement";
 			}
-			if(reasonCode=="IP") {
+			if(code=="IP") {
 				return "Incentive Premium Payment";
 			}
-			if(reasonCode=="IR") {
+			if(code=="IR") {
 				return "Internal Revenue Service Withholding";
 			}
-			if(reasonCode=="IS") {
+			if(code=="IS") {
 				return "Interim Settlement";
 			}
-			if(reasonCode=="J1") {
+			if(code=="J1") {
 				return "Nonreimbursable";
 			}
-			if(reasonCode=="L3") {
+			if(code=="L3") {
 				return "Penalty";
 			}
-			if(reasonCode=="L6") {
+			if(code=="L6") {
 				return "Interest Owed";
 			}
-			if(reasonCode=="LE") {
+			if(code=="LE") {
 				return "Levy";
 			}
-			if(reasonCode=="LS") {
+			if(code=="LS") {
 				return "Lump Sum";
 			}
-			if(reasonCode=="OA") {
+			if(code=="OA") {
 				return "Organ Acquisition Passthru";
 			}
-			if(reasonCode=="OB") {
+			if(code=="OB") {
 				return "Offset for Affiliated Providers";
 			}
-			if(reasonCode=="PI") {
+			if(code=="PI") {
 				return "Periodic Interim Payment";
 			}
-			if(reasonCode=="PL") {
+			if(code=="PL") {
 				return "Payment Final";
 			}
-			if(reasonCode=="RA") {
+			if(code=="RA") {
 				return "Retro-activity Adjustment";
 			}
-			if(reasonCode=="RE") {
+			if(code=="RE") {
 				return "Return on Equity";
 			}
-			if(reasonCode=="SL") {
+			if(code=="SL") {
 				return "Student Loan Repayment";
 			}
-			if(reasonCode=="TL") {
+			if(code=="TL") {
 				return "Third Party Liability";
 			}
-			if(reasonCode=="WO") {
+			if(code=="WO") {
 				return "Overpayment Recovery";
 			}
-			if(reasonCode=="WU") {
+			if(code=="WU") {
 				return "Unspecified Recovery";
 			}
-			return "Reason "+reasonCode;
+			return "Reason "+code;
+		}
+
+		private string GetDescriptForAmountQualifierCode(string code) {
+			if(code=="B6") {
+				return "Allowed - Actual";
+			}
+			else if(code=="KH") {
+				return "Late Filing Reduction";
+			}
+			else if(code=="T") {
+				return "Tax";
+			}
+			else if(code=="T2") {
+				return "Total Claim Before Taxes";
+			}
+			else if(code=="ZK") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 1";
+			}
+			else if(code=="ZL") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 2";
+			}
+			else if(code=="ZM") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 3";
+			}
+			else if(code=="ZN") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 4";
+			}
+			else if(code=="ZO") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 5";
+			}
+			return "Qualifier Code: "+code;
 		}
 
 		///<summary>Code Source 139. Claim Adjustment Reason Codes.  http://www.wpc-edi.com/reference/codelists/healthcare/claim-adjustment-reason-codes/ .
@@ -2626,7 +2681,7 @@ namespace OpenDentBusiness
 //GE*1*1~
 //IEA*1*000000001~
 
-//Example 2 From 835 Specification (modified to include a procedure line item control number in REF*6R, and procedure remarks in LQ):
+//Example 2 From 835 Specification (modified to include a procedure line item control number in REF*6R, procedure supplemental info in AMT, and procedure remarks in LQ):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*12233~
@@ -2646,6 +2701,7 @@ namespace OpenDentBusiness
 //DTM*150*20020301~
 //DTM*151*20020304~
 //CAS*PR*1*300~
+//AMT*T*10~
 //LQ*HE*M16~
 //CLP*8765432112*1*1200*495*600*12*9407779923000~
 //CAS*CO*A2*55~

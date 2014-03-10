@@ -131,7 +131,7 @@ namespace OpenDental {
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PatPortion",colWidthAdjAmt,HorizontalAlignment.Right));
-			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ContractOblig",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Contractual",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PayorReduct",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("OtherAdjust",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
@@ -153,7 +153,7 @@ namespace OpenDental {
 				List<string> listProcAdjustments=_x835.GetProcAdjustmentInfo(segSvcIndex);
 				decimal adjAmtForProc=0;
 				decimal patPortionForProc=0;
-				decimal contractObligForProc=0;
+				decimal contractualForProc=0;
 				decimal payorInitReductForProc=0;
 				decimal otherAdjustForProc=0;
 				for(int j=0;j<listProcAdjustments.Count;j+=4) {
@@ -162,7 +162,7 @@ namespace OpenDental {
 						patPortionForProc+=adjAmt;
 					}
 					else if(listProcAdjustments[j+3]=="CO") {//Contractual Obligations
-						contractObligForProc+=adjAmt;
+						contractualForProc+=adjAmt;
 					}
 					else if(listProcAdjustments[j+3]=="PI") {//Payor Initiated Reductions
 						payorInitReductForProc+=adjAmt;
@@ -174,7 +174,7 @@ namespace OpenDental {
 					_procAdjAmtSum+=adjAmt;
 				}
 				row.Cells.Add(new ODGridCell(patPortionForProc.ToString("f2")));//PatPortion
-				row.Cells.Add(new ODGridCell(contractObligForProc.ToString("f2")));//ContractOblig
+				row.Cells.Add(new ODGridCell(contractualForProc.ToString("f2")));//Contractual
 				row.Cells.Add(new ODGridCell(payorInitReductForProc.ToString("f2")));//PayorReduct
 				row.Cells.Add(new ODGridCell(otherAdjustForProc.ToString("f2")));//OtherAdjust
 				row.Cells.Add(new ODGridCell(_listProcInfo[i+3]));//InsPaid
