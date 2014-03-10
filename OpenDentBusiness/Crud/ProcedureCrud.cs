@@ -97,6 +97,9 @@ namespace OpenDentBusiness.Crud{
 				procedure.IsLocked          = PIn.Bool  (table.Rows[i]["IsLocked"].ToString());
 				procedure.BillingNote       = PIn.String(table.Rows[i]["BillingNote"].ToString());
 				procedure.RepeatChargeNum   = PIn.Long  (table.Rows[i]["RepeatChargeNum"].ToString());
+				procedure.DiagnosticCode2   = PIn.String(table.Rows[i]["DiagnosticCode2"].ToString());
+				procedure.DiagnosticCode3   = PIn.String(table.Rows[i]["DiagnosticCode3"].ToString());
+				procedure.DiagnosticCode4   = PIn.String(table.Rows[i]["DiagnosticCode4"].ToString());
 				procedure.SnomedBodySite    = PIn.String(table.Rows[i]["SnomedBodySite"].ToString());
 				retVal.Add(procedure);
 			}
@@ -138,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,SnomedBodySite) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,SnomedBodySite) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -193,6 +196,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (procedure.IsLocked)+","
 				+"'"+POut.String(procedure.BillingNote)+"',"
 				+    POut.Long  (procedure.RepeatChargeNum)+","
+				+"'"+POut.String(procedure.DiagnosticCode2)+"',"
+				+"'"+POut.String(procedure.DiagnosticCode3)+"',"
+				+"'"+POut.String(procedure.DiagnosticCode4)+"',"
 				+"'"+POut.String(procedure.SnomedBodySite)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
@@ -256,6 +262,9 @@ namespace OpenDentBusiness.Crud{
 				+"IsLocked          =  "+POut.Bool  (procedure.IsLocked)+", "
 				+"BillingNote       = '"+POut.String(procedure.BillingNote)+"', "
 				+"RepeatChargeNum   =  "+POut.Long  (procedure.RepeatChargeNum)+", "
+				+"DiagnosticCode2   = '"+POut.String(procedure.DiagnosticCode2)+"', "
+				+"DiagnosticCode3   = '"+POut.String(procedure.DiagnosticCode3)+"', "
+				+"DiagnosticCode4   = '"+POut.String(procedure.DiagnosticCode4)+"', "
 				+"SnomedBodySite    = '"+POut.String(procedure.SnomedBodySite)+"' "
 				+"WHERE ProcNum = "+POut.Long(procedure.ProcNum);
 			Db.NonQ(command);
@@ -460,6 +469,18 @@ namespace OpenDentBusiness.Crud{
 			if(procedure.RepeatChargeNum != oldProcedure.RepeatChargeNum) {
 				if(command!=""){ command+=",";}
 				command+="RepeatChargeNum = "+POut.Long(procedure.RepeatChargeNum)+"";
+			}
+			if(procedure.DiagnosticCode2 != oldProcedure.DiagnosticCode2) {
+				if(command!=""){ command+=",";}
+				command+="DiagnosticCode2 = '"+POut.String(procedure.DiagnosticCode2)+"'";
+			}
+			if(procedure.DiagnosticCode3 != oldProcedure.DiagnosticCode3) {
+				if(command!=""){ command+=",";}
+				command+="DiagnosticCode3 = '"+POut.String(procedure.DiagnosticCode3)+"'";
+			}
+			if(procedure.DiagnosticCode4 != oldProcedure.DiagnosticCode4) {
+				if(command!=""){ command+=",";}
+				command+="DiagnosticCode4 = '"+POut.String(procedure.DiagnosticCode4)+"'";
 			}
 			if(procedure.SnomedBodySite != oldProcedure.SnomedBodySite) {
 				if(command!=""){ command+=",";}

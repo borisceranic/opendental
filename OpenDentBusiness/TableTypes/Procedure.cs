@@ -116,6 +116,12 @@ namespace OpenDentBusiness {
 		///<summary>FK to repeatcharge.RepeatChargeNum.  Used in repeating charges to determine which procedures belong to each repeating charge. This column
 		///makes is possible to have two or more repeating charges for the same exact procedure code.</summary>
 		public long RepeatChargeNum;
+		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
+		public string DiagnosticCode2;
+		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
+		public string DiagnosticCode3;
+		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
+		public string DiagnosticCode4;
 
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
