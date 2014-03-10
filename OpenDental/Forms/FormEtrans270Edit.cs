@@ -133,10 +133,12 @@ namespace OpenDental {
 		private void FillGrid(){
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Response"),420);
+			ODGridColumn col=new ODGridColumn(Lan.g(this,"Response"),360);
 			gridMain.Columns.Add(col);
 			if(radioModeElect.Checked) {
-				col=new ODGridColumn(Lan.g(this,"Import As Benefit"),420);
+				col=new ODGridColumn(Lan.g(this,"Note"),212);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Import As Benefit"),360);
 				gridMain.Columns.Add(col);
 			}
 			gridMain.Rows.Clear();
@@ -145,6 +147,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(listEB[i].GetDescription(radioModeMessage.Checked));
 				if(radioModeElect.Checked) {
+					row.Cells.Add(listEB[i].Segment.Get(5));
 					if(listEB[i].Benefitt==null) {
 						row.Cells.Add("");
 					}
@@ -158,7 +161,7 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(e.Col==0) {//raw benefit
+			if(e.Col<2) {//raw benefit
 				FormEtrans270EBraw FormE=new FormEtrans270EBraw();
 				FormE.EB271val=listEB[e.Row];
 				FormE.ShowDialog();
