@@ -212,7 +212,15 @@ namespace OpenDentBusiness {
 			ncScript.Patient.PatientAddress.address2=pat.Address2;//May be blank.
 			ncScript.Patient.PatientAddress.city=pat.City;//May be blank.
 			ncScript.Patient.PatientAddress.state=pat.State;//May be blank. Validated in chart to be blank or to be a valid US state code.
-			ncScript.Patient.PatientAddress.zip=pat.Zip;//May be blank.
+			//For some reason, NewCrop will fail to load if a 9 digit zip code is sent.
+			//One customer had all 9 digit zip codes entered for their patients, so we added code here to only send the first 5 digits of the zip.
+			//Patient zip is validated in Chart to be blank, or #####, or #####-####, or #########.
+			if(pat.Zip=="") {
+				ncScript.Patient.PatientAddress.zip="";//Blank is allowed.
+			}
+			else {//5 or 9 digit zip. Formats are #####, or #####-####, or #########.
+				ncScript.Patient.PatientAddress.zip=pat.Zip.Substring(0,5);//First 5 digts only.
+			}
 			ncScript.Patient.PatientAddress.country=country;//Validated above.
 			ncScript.Patient.PatientContact=new ContactType();
 			ncScript.Patient.PatientContact.homeTelephone=pat.HmPhone;//May be blank. Does not need to be 10 digits.
