@@ -4455,6 +4455,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Patient state abbreviation invalid");
 				return;
 			}
+			if(PatCur.Zip!="" && !Regex.IsMatch(PatCur.Zip,@"^[0-9]{5}\-?([0-9]{4})?$")) {//Blank, or #####, or #####-####, or #########
+				MsgBox.Show(this,"Patient zip invalid");
+				return;
+			}
 			//FormErx formErx=new FormErx();
 			//formErx.prov=prov;
 			//formErx.emp=emp;
