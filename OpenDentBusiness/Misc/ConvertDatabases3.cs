@@ -4046,6 +4046,27 @@ namespace OpenDentBusiness {
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE formularymed'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 				}
+				//Add FieldType and PickList columns to displayfield table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE displayfield ADD FieldType tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE displayfield ADD FieldType number(3)";
+					Db.NonQ(command);
+					command="UPDATE displayfield SET FieldType = 0 WHERE FieldType IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE displayfield MODIFY FieldType NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE displayfield ADD PickList varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE displayfield ADD PickList varchar2(255)";
+					Db.NonQ(command);
+				}
 
 
 
