@@ -540,12 +540,9 @@ namespace OpenDentBusiness{
 				+"patient.Address,patient.Address2,patient.City,patient.State,patient.Zip,appointment.AptDateTime,appointment.ClinicNum "
 				+"FROM patient,appointment "
 				+"WHERE patient.PatNum=appointment.PatNum "
-				+"AND (";
+				+"AND (FALSE";//simplifies the remaining OR clauses
 			for(int i=0;i<aptNums.Count;i++){
-				if(i>0){
-					command+=" OR ";
-				}
-				command+="appointment.AptNum="+aptNums[i].ToString();
+				command+=" OR appointment.AptNum="+aptNums[i].ToString();
 			}
 			command+=") ORDER BY appointment.AptDateTime";
 			return Db.GetTable(command);
