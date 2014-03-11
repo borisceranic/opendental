@@ -89,6 +89,8 @@ namespace DocumentationBuilder {
 				|| tableName=="anesthmedsuppliers"
 				|| tableName=="anesthscore"
 				|| tableName=="anesthvsdata"
+				|| tableName=="files"
+				|| tableName=="instructor"
 				|| tableName=="reseller"
 				|| tableName=="resellerservice"
 				|| tableName=="") 
@@ -228,6 +230,7 @@ namespace DocumentationBuilder {
 				case "canadianclaim": return "CanadianClaim";
 				case "canadianextract": return "CanadianExtract";
 				case "canadiannetwork": return "CanadianNetwork";
+				case "cdspermission": return "CDSPermission";
 				case "centralconnection": return "CentralConnection";
 				case "chartview": return "ChartView";
 				case "claimattach": return "ClaimAttach";
@@ -238,6 +241,7 @@ namespace DocumentationBuilder {
 				case "claimproc": return "ClaimProc";
 				case "claimvalcodelog": return "ClaimValCodeLog";
 				case "clockevent": return "ClockEvent";
+				case "codesystem": return "CodeSystem";
 				case "computerpref": return "ComputerPref";
 				case "covcat": return "CovCat";
 				case "covspan": return "CovSpan";
@@ -255,19 +259,36 @@ namespace DocumentationBuilder {
 				case "drugmanufacturer": return "DrugManufacturer";
 				case "drugunit": return "DrugUnit";
 				case "eduresource": return "EduResource";
+				case "ehramendment": return "EhrAmendment";
+				case "ehraptobs": return "EhrAptObs";
+				case "ehrcareplan": return "EhrCarePlan";
+				case "ehrlab": return "EhrLab";
+				case "ehrlabclinicalinfo": return "EhrLabClinicalInfo";
+				case "ehrlabimage": return "EhrLabImage";
+				case "ehrlabnote": return "EhrLabNote";
+				case "ehrlabresult": return "EhrLabResult";
+				case "ehrlabresultscopyto": return "EhrLabResultsCopyTo";
+				case "ehrlabspecimen": return "EhrLabSpecimen";
+				case "ehrlabspecimencondition": return "EhrLabSpecimenCondition";
+				case "ehrlabspecimenrejectreason": return "EhrLabSpecimenRejectReason";
 				case "ehrmeasure": return "EhrMeasure";
 				case "ehrmeasureevent": return "EhrMeasureEvent";
+				case "ehrnotperformed": return "EhrNotPerformed";
+				case "ehrpatient": return "EhrPatient";
 				case "ehrprovkey": return "EhrProvKey";
 				case "ehrquarterlykey": return "EhrQuarterlyKey";
 				case "ehrsummaryccd": return "EhrSummaryCcd";
+				case "ehrtrigger": return "EhrTrigger";
 				case "electid": return "ElectID";
 				case "emailaddress": return "EmailAddress";
 				case "emailattach": return "EmailAttach";
 				case "emailmessage": return "EmailMessage";
+				case "emailmessageuid": return "EmailMessageUid";
 				case "emailtemplate": return "EmailTemplate";
 				case "eobattach": return "EobAttach";
 				case "etransmessagetext": return "EtransMessageText";
 				case "erxlog": return "ErxLog";
+				case "familyhealth": return "FamilyHealth";
 				case "feesched": return "FeeSched";
 				case "formpat": return "FormPat";
 				case "formularymed": return "FormularyMed";
@@ -296,11 +317,14 @@ namespace DocumentationBuilder {
 				case "languageforeign": return "LanguageForeign";
 				case "lettermerge": return "LetterMerge";
 				case "lettermergefield": return "LetterMergeField";
+				case "maparea": return "MapArea";
 				case "medicalorder": return "MedicalOrder";
 				case "medicationpat": return "MedicationPat";
 				case "mountdef": return "MountDef";
 				case "mountitem": return "MountItem";
 				case "mountitemdef": return "MountItemDef";
+				case "oidexternal": return "OIDExternal";
+				case "oidinternal": return "OIDInternal";
 				case "orthochart": return "OrthoChart";
 				case "orionproc": return "OrionProc";
 				case "patfield": return "PatField";
@@ -308,6 +332,7 @@ namespace DocumentationBuilder {
 				case "patientnote": return "PatientNote";
 				case "patientrace": return "PatientRace";
 				case "patplan": return "PatPlan";
+				case "payortype": return "PayorType";
 				case "payperiod": return "PayPeriod";
 				case "payplan": return "PayPlan";
 				case "payplancharge": return "PayPlanCharge";
@@ -352,6 +377,7 @@ namespace DocumentationBuilder {
 				case "screengroup": return "ScreenGroup";
 				case "screenpat": return "ScreenPat";
 				case "securitylog": return "SecurityLog";
+				case "securityloghash": return "SecurityLogHash";
 				case "sheetdef": return "SheetDef";
 				case "sheetfield": return "SheetField";
 				case "sheetfielddef": return "SheetFieldDef";
@@ -379,6 +405,7 @@ namespace DocumentationBuilder {
 				case "usergroup": return "UserGroup";
 				case "userquery": return "UserQuery";
 				case "vaccinedef": return "VaccineDef";
+				case "vaccineobs": return "VaccineObs";
 				case "vaccinepat": return "VaccinePat";
 				case "wikilistheaderwidth": return "WikiListHeaderWidth";
 				case "wikipage": return "WikiPage";
