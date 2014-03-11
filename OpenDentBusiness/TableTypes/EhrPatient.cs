@@ -11,7 +11,7 @@ namespace OpenDentBusiness {
 		public string MotherMaidenFname;
 		///<summary>Mother's maiden last name.  Exported in HL7 PID-6 for immunization messages.</summary>
 		public string MotherMaidenLname;
-		///<summary>Enum:YN. Indicates whether or not the patient wants to share their vaccination information with other EHRs.  Used in immunization export.</summary>
+		///<summary>Enum:YN  Indicates whether or not the patient wants to share their vaccination information with other EHRs.  Used in immunization export.</summary>
 		public YN VacShareOk;
 
 		///<summary></summary>
