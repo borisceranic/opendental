@@ -99,7 +99,7 @@ namespace OpenDental.Reporting.Allocators
 		bool TableExists()
 		{
 			bool rVal = false;
-			string cmd = "SHOW TABLES";
+			string cmd = "SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
 			string thistable = this.DbaseStorageTable.ToLower();
 			try
 			{

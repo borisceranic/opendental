@@ -78,7 +78,7 @@ namespace DatabaseIntegrityCheck {
 			MySqlCommand cmd=new MySqlCommand();
 			//int InsertID; 
 			cmd.Connection=con;
-			cmd.CommandText="SHOW TABLES";
+			cmd.CommandText="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
 			DataTable table=new DataTable();
 			try {
 				Cursor=Cursors.WaitCursor;

@@ -97,7 +97,7 @@ namespace OpenDentBusiness {
 			}
 			command="CREATE DATABASE "+newDb+" CHARACTER SET utf8";
 			dcon.NonQ(command);
-			command="SHOW TABLES";
+			command="SHOW TABLES";//Tables and views
 			table=dcon.GetTable(command);
 			string[] tableName=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {
@@ -106,7 +106,7 @@ namespace OpenDentBusiness {
 			//switch to using the new database
 			DataConnection newDcon=new DataConnection(newDb);
 			for(int i=0;i<tableName.Length;i++) {
-				command="SHOW CREATE TABLE "+oldDb+"."+tableName[i];
+				command="SHOW CREATE TABLE "+oldDb+"."+tableName[i];//also works with views.
 				table=newDcon.GetTable(command);
 				command=PIn.ByteArray(table.Rows[0][1]);
 				newDcon.NonQ(command);//this has to be run using connection with new database

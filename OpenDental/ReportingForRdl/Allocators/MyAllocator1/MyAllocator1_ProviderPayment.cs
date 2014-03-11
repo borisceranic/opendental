@@ -283,7 +283,7 @@ namespace OpenDental.Reporting.Allocators {
 		/// </summary>
 		private bool TableExists(string tblName) {
 			bool rvalExists = false;
-			string cmd = "SHOW TABLES LIKE '" + tblName + "'";
+			string cmd = "SHOW TABLES LIKE '" + tblName + "'";//will only conflict with views if view name exactly matches table name.
 			DataTable dt = Db.GetTableOld(cmd);
 			if(dt != null && dt.Rows.Count != 0 && dt.Columns.Count != 0) {
 				if(dt.Rows[0][0].ToString() == tblName)

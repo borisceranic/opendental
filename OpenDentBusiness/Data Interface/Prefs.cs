@@ -223,8 +223,8 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command="SHOW TABLES";
-			DataTable table=Db.GetTable(command);
+			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
+			DataTable table=Db.GetTable(command);//not MySQL 4.1 compatible. Should not be a problem if following reccomended update process.
 			string[] tableNames=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {
 				tableNames[i]=table.Rows[i][0].ToString();

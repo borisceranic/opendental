@@ -462,7 +462,7 @@ namespace OpenDental {
 		private string TestTemplate(bool verbose) {
 			StringBuilder retVal=new StringBuilder();
 			bool failed=true;
-			string command="SHOW TABLES;";
+			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE';";
 			DataTable qResult=MySql.Data.MySqlClient.MySqlHelper.ExecuteDataset(connString,command).Tables[0];
 			//or
 			MySql.Data.MySqlClient.MySqlDataReader mtDataReader;
