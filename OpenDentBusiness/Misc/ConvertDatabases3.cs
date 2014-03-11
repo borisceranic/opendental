@@ -4028,7 +4028,24 @@ namespace OpenDentBusiness {
 				    +"'VistaDent')";
 					Db.NonQ(command);
 				}//end VistaDent bridge
-
+				//Drop depricated Formulary table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS formulary";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE formulary'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+				}
+				//Drop depricated FormularyMed table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS formularymed";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE formularymed'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+				}
 
 
 
