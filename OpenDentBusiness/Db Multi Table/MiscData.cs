@@ -97,7 +97,7 @@ namespace OpenDentBusiness {
 			}
 			command="CREATE DATABASE "+newDb+" CHARACTER SET utf8";
 			dcon.NonQ(command);
-			command="SHOW TABLES";
+			command="SHOW TABLES";//Tables and views
 			table=dcon.GetTable(command);
 			string[] tableName=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {

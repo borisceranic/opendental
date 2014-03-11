@@ -31,7 +31,7 @@ namespace OpenDentBusiness {
 			}
 			command="DROP TABLE IF EXISTS `signal`";//Signal is keyword for MySQL 5.5.  Was renamed to signalod so drop if exists.
 			Db.NonQ(command);
-			command="SHOW TABLES";
+			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
 			table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
 			int lastRow;
@@ -72,7 +72,7 @@ namespace OpenDentBusiness {
 			#if !DEBUG
 			MiscData.MakeABackup();
 			#endif
-			command="SHOW TABLES";
+			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
 			table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {

@@ -357,7 +357,7 @@ namespace fyiReporting.RDL
 				{
 					OdbcConnection oc = cn as OdbcConnection;
 					if (oc != null && oc.Driver.ToLower().IndexOf("my") >= 0)	// not a good way but ...
-						return "show tables";					// mysql syntax is non-standard
+						return "SHOW FULL TABLES WHERE Table_type='BASE TABLE'";					// mysql syntax is non-standard
 				}
 				return "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES ORDER BY 2, 1";
 			}
@@ -365,7 +365,7 @@ namespace fyiReporting.RDL
 			{
 				OdbcConnection oc = cn as OdbcConnection;
 				if (oc != null && oc.Driver.ToLower().IndexOf("my") >= 0)	// not a good way but ...
-					return "show tables";					// mysql syntax is non-standard
+					return "SHOW FULL TABLES WHERE Table_type='BASE TABLE'";					// mysql syntax is non-standard
 			}
 			return sce.TableSelect;
 		}

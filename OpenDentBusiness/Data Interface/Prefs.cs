@@ -223,7 +223,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command="SHOW TABLES";
+			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
 			DataTable table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {
