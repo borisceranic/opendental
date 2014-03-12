@@ -4084,11 +4084,11 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE displayfield ADD PickList varchar(255) NOT NULL";
+					command="ALTER TABLE displayfield ADD PickList TEXT NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE displayfield ADD PickList varchar2(255)";
+					command="ALTER TABLE displayfield ADD PickList varchar2(4000)";
 					Db.NonQ(command);
 				}
 
