@@ -4028,6 +4028,30 @@ namespace OpenDentBusiness {
 				    +"'VistaDent')";
 					Db.NonQ(command);
 				}//end VistaDent bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD DiagnosticCode2 varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD DiagnosticCode2 varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD DiagnosticCode3 varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD DiagnosticCode3 varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD DiagnosticCode4 varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD DiagnosticCode4 varchar2(255)";
+					Db.NonQ(command);
+				}
 				//Drop depricated Formulary table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS formulary";
@@ -4092,29 +4116,3 @@ namespace OpenDentBusiness {
 
 
 
-
-
-
-				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE procedurelog ADD DiagnosticCode2 varchar(255) NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE procedurelog ADD DiagnosticCode2 varchar2(255)";
-					Db.NonQ(command);
-				}				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE procedurelog ADD DiagnosticCode3 varchar(255) NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE procedurelog ADD DiagnosticCode3 varchar2(255)";
-					Db.NonQ(command);
-				}				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE procedurelog ADD DiagnosticCode4 varchar(255) NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE procedurelog ADD DiagnosticCode4 varchar2(255)";
-					Db.NonQ(command);
-				}
-				*/
