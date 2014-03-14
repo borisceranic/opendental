@@ -13,27 +13,20 @@ using CodeBase;
 namespace OpenDental {
 	public partial class FormEtrans835ClaimEdit:Form {
 
-		private X835 _x835;
-		private string _claimTrackingNumber;
-		private string[] _claimInfo;
+		private Hx835_Claim _claimEob;
 		private Claim _claim;
 		private Patient _pat;
-		private List<string> _listClaimAdjustments;
-		private List<string> _listProcInfo;
-		private List<string> _listAdjudicationInfo;
 		private decimal _claimAdjAmtSum;
 		private decimal _procAdjAmtSum;
 
-		public FormEtrans835ClaimEdit(X835 x835,string claimTrackingNumber) {
+		public FormEtrans835ClaimEdit(Hx835_Claim claimEob) {
 			InitializeComponent();
 			Lan.F(this);
-			_x835=x835;
-			_claimTrackingNumber=claimTrackingNumber;
+			_claimEob=claimEob;
 		}
 
 		private void FormEtrans835ClaimEdit_Load(object sender,EventArgs e) {
-			_claimInfo=_x835.GetClaimInfo(_claimTrackingNumber);
-			long claimNum=Claims.GetClaimNumForIdentifier(_claimTrackingNumber);
+			long claimNum=Claims.GetClaimNumForIdentifier(_claimEob.ClaimTrackingNumber);
 			_claim=null;
 			_pat=null;
 			if(claimNum!=0) {
@@ -47,13 +40,15 @@ namespace OpenDental {
 			FillClaimAdjustments();//Because the grid columns change size depending on the form size.
 			FillProcedureBreakdown();//Because the grid columns change size depending on the form size.
 			FillAdjudicationInfo();//Because the grid columns change size depending on the form size.
+			FillSupplementalInfo();//Because the grid columns change size depending on the form size.
 		}
 
 		private void FillAll() {
 			FillClaimAdjustments();
 			FillProcedureBreakdown();
 			FillAdjudicationInfo();
-			FillHeader();
+			FillSupplementalInfo();
+			FillHeader();//Must be last, so internal summations are complete before filling totals in textboxes.
 		}
 
 		private void FillHeader() {
@@ -69,19 +64,18 @@ namespace OpenDental {
 			else {
 				textDateService.Text=_claim.DateService.ToShortDateString();
 			}
-			textClaimIdentifier.Text=_claimTrackingNumber;
-			textPayorControlNum.Text=_claimInfo[4];
-			textStatus.Text=_claimInfo[0];
-			textClaimFee.Text=_claimInfo[1];
-			textClaimFee2.Text=_claimInfo[1];
-			textInsPaid.Text=_claimInfo[2];
-			textInsPaidCalc.Text=(PIn.Decimal(_claimInfo[1])-_claimAdjAmtSum-_procAdjAmtSum).ToString("f2");
-			textPatientPortion.Text=_claimInfo[3];
+			textClaimIdentifier.Text=_claimEob.ClaimTrackingNumber;
+			textPayorControlNum.Text=_claimEob.PayorControlNumber;
+			textStatus.Text=_claimEob.StatusCodeDescript;
+			textClaimFee.Text=_claimEob.ClaimFee.ToString("f2");
+			textClaimFee2.Text=_claimEob.ClaimFee.ToString("f2");
+			textInsPaid.Text=_claimEob.InsPaid.ToString("f2");
+			textInsPaidCalc.Text=(_claimEob.ClaimFee-_claimAdjAmtSum-_procAdjAmtSum).ToString("f2");
+			textPatientPortion.Text=_claimEob.PatientPortion.ToString("f2");
 		}
 
 		private void FillClaimAdjustments() {
-			_listClaimAdjustments=_x835.GetClaimAdjustmentInfo(_claimTrackingNumber);
-			if(_listClaimAdjustments.Count==0) {
+			if(_claimEob.ListClaimAdjustments.Count==0) {
 				gridClaimAdjustments.Title="Claim Adjustments (None Reported)";
 			}
 			else {
@@ -97,13 +91,14 @@ namespace OpenDental {
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridClaimAdjustments.Rows.Clear();
 			_claimAdjAmtSum=0;
-			for(int i=0;i<_listClaimAdjustments.Count;i+=4) {
+			for(int i=0;i<_claimEob.ListClaimAdjustments.Count;i++) {
+				Hx835_Adj adj=_claimEob.ListClaimAdjustments[i];
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i]));//Description
-				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i+1]));//Reason
-				row.Cells.Add(new ODGridCell(_listClaimAdjustments[i+2]));//AdjAmt
-				decimal adjAmt=PIn.Decimal(_listClaimAdjustments[i+2]);
-				_claimAdjAmtSum+=adjAmt;
+				row.Tag=adj;
+				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
+				row.Cells.Add(new ODGridCell(adj.ReasonDescript));//Reason
+				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//AdjAmt
+				_claimAdjAmtSum+=_claimEob.ListClaimAdjustments[i].AdjAmt;
 				gridClaimAdjustments.Rows.Add(row);
 			}
 			gridClaimAdjustments.EndUpdate();
@@ -111,8 +106,7 @@ namespace OpenDental {
 		}
 
 		private void FillProcedureBreakdown() {
-			_listProcInfo=_x835.GetProcInfo(_claimTrackingNumber);
-			if(_listProcInfo.Count==0) {
+			if(_claimEob.ListProcs.Count==0) {
 				gridProcedureBreakdown.Title="Procedure Breakdown (None Reported)";
 			}
 			else {
@@ -137,48 +131,46 @@ namespace OpenDental {
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Rows.Clear();
 			_procAdjAmtSum=0;
-			for(int i=0;i<_listProcInfo.Count;i+=5) {
+			for(int i=0;i<_claimEob.ListProcs.Count;i++) {
+				Hx835_Proc proc=_claimEob.ListProcs[i];
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new ODGridCell(_listProcInfo[i+4]));//ProcNum
-				string strProcCode=_listProcInfo[i+1];
-				row.Cells.Add(new ODGridCell(strProcCode));//ProcCode
+				row.Tag=proc;
+				row.Cells.Add(new ODGridCell(proc.ProcNum.ToString()));//ProcNum
+				row.Cells.Add(new ODGridCell(proc.ProcCode));//ProcCode
 				string procDescript="";
-				if(ProcedureCodes.IsValidCode(strProcCode)) {
-					ProcedureCode procCode=ProcedureCodes.GetProcCode(strProcCode);
+				if(ProcedureCodes.IsValidCode(proc.ProcCode)) {
+					ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.ProcCode);
 					procDescript=procCode.AbbrDesc;
 				}
 				row.Cells.Add(new ODGridCell(procDescript));//ProcDescript
-				row.Cells.Add(new ODGridCell(_listProcInfo[i+2]));//ProcFee
-				int segSvcIndex=PIn.Int(_listProcInfo[i]);
-				List<string> listProcAdjustments=_x835.GetProcAdjustmentInfo(segSvcIndex);
+				row.Cells.Add(new ODGridCell(proc.ProcFee.ToString("f2")));//ProcFee
 				decimal adjAmtForProc=0;
 				decimal patPortionForProc=0;
 				decimal contractualForProc=0;
 				decimal payorInitReductForProc=0;
 				decimal otherAdjustForProc=0;
-				for(int j=0;j<listProcAdjustments.Count;j+=4) {
-					decimal adjAmt=PIn.Decimal(listProcAdjustments[j+2]);
-					if(listProcAdjustments[j+3]=="PR") {//Patient Responsibility
-						patPortionForProc+=adjAmt;
+				for(int j=0;j<proc.ListProcAdjustments.Count;j++) {
+					Hx835_Adj adj=proc.ListProcAdjustments[j];
+					if(adj.AdjCode=="PR") {//Patient Responsibility
+						patPortionForProc+=adj.AdjAmt;
 					}
-					else if(listProcAdjustments[j+3]=="CO") {//Contractual Obligations
-						contractualForProc+=adjAmt;
+					else if(adj.AdjCode=="CO") {//Contractual Obligations
+						contractualForProc+=adj.AdjAmt;
 					}
-					else if(listProcAdjustments[j+3]=="PI") {//Payor Initiated Reductions
-						payorInitReductForProc+=adjAmt;
+					else if(adj.AdjCode=="PI") {//Payor Initiated Reductions
+						payorInitReductForProc+=adj.AdjAmt;
 					}
 					else {//Other Adjustments
-						otherAdjustForProc+=adjAmt;
+						otherAdjustForProc+=adj.AdjAmt;
 					}
-					adjAmtForProc+=adjAmt;
-					_procAdjAmtSum+=adjAmt;
+					adjAmtForProc+=adj.AdjAmt;
+					_procAdjAmtSum+=adj.AdjAmt;
 				}
 				row.Cells.Add(new ODGridCell(patPortionForProc.ToString("f2")));//PatPortion
 				row.Cells.Add(new ODGridCell(contractualForProc.ToString("f2")));//Contractual
 				row.Cells.Add(new ODGridCell(payorInitReductForProc.ToString("f2")));//PayorReduct
 				row.Cells.Add(new ODGridCell(otherAdjustForProc.ToString("f2")));//OtherAdjust
-				row.Cells.Add(new ODGridCell(_listProcInfo[i+3]));//InsPaid
-				row.Tag=i;
+				row.Cells.Add(new ODGridCell(proc.InsPaid.ToString("f2")));//InsPaid
 				gridProcedureBreakdown.Rows.Add(row);
 			}
 			gridProcedureBreakdown.EndUpdate();
@@ -186,8 +178,7 @@ namespace OpenDental {
 		}
 
 		private void FillAdjudicationInfo() {
-			_listAdjudicationInfo=_x835.GetClaimAdjudicationInfo(_claimTrackingNumber);
-			if(_listAdjudicationInfo.Count==0) {
+			if(_claimEob.ListAdjudicationInfo.Count==0) {
 				gridAdjudicationInfo.Title="Claim Adjudication Info (None Reported)";
 			}
 			else {
@@ -198,28 +189,63 @@ namespace OpenDental {
 			gridAdjudicationInfo.Columns.Add(new UI.ODGridColumn("Description",gridAdjudicationInfo.Width/2,HorizontalAlignment.Left));
 			gridAdjudicationInfo.Columns.Add(new UI.ODGridColumn("Value",gridAdjudicationInfo.Width/2,HorizontalAlignment.Left));
 			gridAdjudicationInfo.Rows.Clear();
-			for(int i=0;i<_listAdjudicationInfo.Count;i+=2) {
+			for(int i=0;i<_claimEob.ListAdjudicationInfo.Count;i++) {
+				Hx835_Info info=_claimEob.ListAdjudicationInfo[i];
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new UI.ODGridCell(_listAdjudicationInfo[i]));
-				row.Cells.Add(new UI.ODGridCell(_listAdjudicationInfo[i+1]));
+				row.Tag=info;
+				row.Cells.Add(new UI.ODGridCell(info.FieldName));//Description
+				row.Cells.Add(new UI.ODGridCell(info.FieldValue));//Value
 				gridAdjudicationInfo.Rows.Add(row);
 			}
 			gridAdjudicationInfo.EndUpdate();
 		}
 
+		private void FillSupplementalInfo() {
+			if(_claimEob.ListSupplementalInfo.Count==0) {
+				gridSupplementalInfo.Title="Supplemental Info (None Reported)";
+			}
+			else {
+				gridSupplementalInfo.Title="Supplemental Info";
+			}
+			gridSupplementalInfo.BeginUpdate();
+			gridSupplementalInfo.Columns.Clear();
+			const int colWidthAmt=80;
+			int colWidthVariable=gridSupplementalInfo.Width-10-colWidthAmt;
+			gridSupplementalInfo.Columns.Add(new ODGridColumn("Description",colWidthVariable,HorizontalAlignment.Left));
+			gridSupplementalInfo.Columns.Add(new ODGridColumn("Amt",colWidthAmt,HorizontalAlignment.Right));
+			gridSupplementalInfo.Rows.Clear();
+			for(int i=0;i<_claimEob.ListSupplementalInfo.Count;i++) {
+				Hx835_Info info=_claimEob.ListSupplementalInfo[i];
+				ODGridRow row=new ODGridRow();
+				row.Tag=info;
+				row.Cells.Add(info.FieldName);//Description
+				row.Cells.Add(info.FieldValue);//Amount
+				gridSupplementalInfo.Rows.Add(row);
+			}
+			gridSupplementalInfo.EndUpdate();
+		}
+
+		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Hx835_Adj adj=(Hx835_Adj)gridProcedureBreakdown.Rows[e.Row].Tag;
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustDescript+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
+			msgbox.Show(this);
+		}
+
 		private void gridProcedureBreakdown_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			int procInfoIndex=(int)gridProcedureBreakdown.Rows[e.Row].Tag;
-			int strSegSvcIndex=PIn.Int(_listProcInfo[procInfoIndex]);
-			string strProcNum=_listProcInfo[procInfoIndex+4];
-			string strProcCode=_listProcInfo[procInfoIndex+1];
-			string strProcFee=_listProcInfo[procInfoIndex+2];
-			string strInsPaid=_listProcInfo[procInfoIndex+3];
-			FormEtrans835ProcEdit form=new FormEtrans835ProcEdit(_x835,strSegSvcIndex,strProcNum,strProcCode,strProcFee,strInsPaid);
+			Hx835_Proc proc=(Hx835_Proc)gridProcedureBreakdown.Rows[e.Row].Tag;
+			FormEtrans835ProcEdit form=new FormEtrans835ProcEdit(proc);
 			form.Show();
 		}
 
 		private void gridAdjudicationInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_listAdjudicationInfo[e.Row*2+1]);
+			Hx835_Info info=(Hx835_Info)gridAdjudicationInfo.Rows[e.Row].Tag;
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
+			msgbox.Show(this);
+		}
+
+		private void gridSupplementalInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Hx835_Info info=(Hx835_Info)gridSupplementalInfo.Rows[e.Row].Tag;
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
 			msgbox.Show(this);
 		}
 

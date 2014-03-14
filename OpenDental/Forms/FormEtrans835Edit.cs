@@ -74,37 +74,35 @@ namespace OpenDental {
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 1 (Header).</summary>
 		private void FillHeader() {
 			//Payer information
-			textPayerName.Text=_x835.GetPayerName();
-			textPayerID.Text=_x835.GetPayerID();
-			textPayerAddress1.Text=_x835.GetPayerAddress1();
-			textPayerCity.Text=_x835.GetPayerCityName();
-			textPayerState.Text=_x835.GetPayerState();
-			textPayerZip.Text=_x835.GetPayerZip();
-			textPayerContactInfo.Text=_x835.GetPayerContactInfo();
+			textPayerName.Text=_x835.PayerName;
+			textPayerID.Text=_x835.PayerId;
+			textPayerAddress1.Text=_x835.PayerAddress;
+			textPayerCity.Text=_x835.PayerCity;
+			textPayerState.Text=_x835.PayerState;
+			textPayerZip.Text=_x835.PayerZip;
+			textPayerContactInfo.Text=_x835.PayerContactInfo;
 			//Payee information
-			textPayeeName.Text=_x835.GetPayeeName();
-			labelPayeeIdType.Text=Lan.g(this,"Payee")+" "+_x835.GetPayeeIdType();
-			textPayeeID.Text=_x835.GetPayeeId();
+			textPayeeName.Text=_x835.PayeeName;
+			labelPayeeIdType.Text=Lan.g(this,"Payee")+" "+_x835.PayeeIdType;
+			textPayeeID.Text=_x835.PayeeId;
 			//Payment information
-			textTransHandlingDesc.Text=_x835.GetTransactionHandlingCodeDescription();
-			textPaymentMethod.Text=_x835.GetPaymentMethodDescription();
-			if(_x835.IsCredit()) {
-				textPaymentAmount.Text=_x835.GetPaymentAmount();
+			textTransHandlingDesc.Text=_x835.TransactionHandlingDescript;
+			textPaymentMethod.Text=_x835.PayMethodDescript;
+			if(_x835.IsCredit) {
+				textPaymentAmount.Text=_x835.InsPaid.ToString("f2");
 			}
 			else {
-				textPaymentAmount.Text="-"+_x835.GetPaymentAmount();
+				textPaymentAmount.Text="-"+_x835.InsPaid.ToString("f2");
 			}
-			textAcctNumEndingIn.Text=_x835.GetAccountNumReceivingShort();
-			DateTime dateEffective=_x835.GetDateEffective();
-			if(dateEffective.Year>1880) {
-				textDateEffective.Text=dateEffective.ToShortDateString();
+			textAcctNumEndingIn.Text=_x835.AccountNumReceiving;
+			if(_x835.DateEffective.Year>1880) {
+				textDateEffective.Text=_x835.DateEffective.ToShortDateString();
 			}
-			textCheckNumOrRefNum.Text=_x835.GetTransactionReferenceNumber();			
+			textCheckNumOrRefNum.Text=_x835.TransRefNum;
 		}
 
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 2 (Detail).</summary>
 		private void FillClaimDetails() {
-			List<string> claimTrackingNumbers=_x835.GetClaimTrackingNumbers();
 			const int colWidthLname=150;
 			const int colWidthFname=100;
 			const int colWidthDateService=80;
@@ -127,10 +125,12 @@ namespace OpenDental {
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"PatPortion"),colWidthPatAmt,HorizontalAlignment.Right));//Patient Responsibility Amount (CLP05)
 			gridClaimDetails.Rows.Clear();
 			_claimInsPaidSum=0;
-			for(int i=0;i<claimTrackingNumbers.Count;i++) {
+			List<Hx835_Claim> listClaimEOBs=_x835.ListClaimEOBs;
+			for(int i=0;i<listClaimEOBs.Count;i++) {
+				Hx835_Claim claimEob=listClaimEOBs[i];
 				ODGridRow row=new ODGridRow();
-				string[] claimInfo=_x835.GetClaimInfo(claimTrackingNumbers[i]);
-				long claimNum=Claims.GetClaimNumForIdentifier(claimTrackingNumbers[i]);
+				row.Tag=claimEob;
+				long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[i].ClaimTrackingNumber);
 				Claim claim=null;
 				if(claimNum!=0) {
 					claim=Claims.GetClaim(claimNum);
@@ -144,14 +144,13 @@ namespace OpenDental {
 					row.Cells.Add(new UI.ODGridCell(""));//FName
 					row.Cells.Add(new UI.ODGridCell(""));//DateService
 				}
-				row.Cells.Add(new UI.ODGridCell(claimTrackingNumbers[i]));//Claim Identfier
-				row.Cells.Add(new UI.ODGridCell(claimInfo[4]));//PayorControlNum
-				row.Cells.Add(new UI.ODGridCell(claimInfo[0]));//Status
-				row.Cells.Add(new UI.ODGridCell(claimInfo[1]));//ClaimFee
-				row.Cells.Add(new UI.ODGridCell(claimInfo[2]));//InsPaid
-				_claimInsPaidSum+=PIn.Decimal(claimInfo[2]);
-				row.Cells.Add(new UI.ODGridCell(claimInfo[3]));//PatPortion
-				row.Tag=claimTrackingNumbers[i];
+				row.Cells.Add(new UI.ODGridCell(claimEob.ClaimTrackingNumber));//Claim Identfier
+				row.Cells.Add(new UI.ODGridCell(claimEob.PayorControlNumber));//PayorControlNum
+				row.Cells.Add(new UI.ODGridCell(claimEob.StatusCodeDescript));//Status
+				row.Cells.Add(new UI.ODGridCell(claimEob.ClaimFee.ToString("f2")));//ClaimFee
+				row.Cells.Add(new UI.ODGridCell(claimEob.InsPaid.ToString("f2")));//InsPaid
+				_claimInsPaidSum+=claimEob.InsPaid;
+				row.Cells.Add(new UI.ODGridCell(claimEob.PatientPortion.ToString("f2")));//PatPortion
 				gridClaimDetails.Rows.Add(row);
 			}
 			gridClaimDetails.EndUpdate();
@@ -176,17 +175,19 @@ namespace OpenDental {
 			gridProviderAdjustments.EndUpdate();
 			gridProviderAdjustments.BeginUpdate();
 			gridProviderAdjustments.Rows.Clear();
-			List<string[]> providerAdjustments=_x835.GetProviderLevelAdjustments();
+			List<Hx835_ProvAdj> providerAdjustments=_x835.ListProvAdjustments;
 			_provAdjAmtSum=0;
 			for(int i=0;i<providerAdjustments.Count;i++) {
+				Hx835_ProvAdj provAdj=providerAdjustments[i];
 				ODGridRow row=new ODGridRow();
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][0]));//NPI
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][1]));//FiscalPeriod
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][2]));//Reason
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][3]));//ReasonCode
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][4]));//RefIdent
-				row.Cells.Add(new ODGridCell(providerAdjustments[i][5]));//AdjAmt
-				_provAdjAmtSum+=PIn.Decimal(providerAdjustments[i][5]);
+				row.Tag=provAdj;
+				row.Cells.Add(new ODGridCell(provAdj.Npi));//NPI
+				row.Cells.Add(new ODGridCell(provAdj.DateFiscalPeriod.ToShortDateString()));//FiscalPeriod
+				row.Cells.Add(new ODGridCell(provAdj.ReasonCodeDescript));//Reason
+				row.Cells.Add(new ODGridCell(provAdj.ReasonCode));//ReasonCode
+				row.Cells.Add(new ODGridCell(provAdj.RefIdentification));//RefIdent
+				row.Cells.Add(new ODGridCell(provAdj.AdjAmt.ToString("f2")));//AdjAmt
+				_provAdjAmtSum+=providerAdjustments[i].AdjAmt;
 				gridProviderAdjustments.Rows.Add(row);
 			}
 			gridProviderAdjustments.EndUpdate();
@@ -203,9 +204,20 @@ namespace OpenDental {
 			msgbox.ShowDialog();
 		}
 
+		private void gridProviderAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Hx835_ProvAdj provAdj=(Hx835_ProvAdj)gridProviderAdjustments.Rows[e.Row].Tag;
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(
+				provAdj.Npi+"\r\n"
+				+provAdj.DateFiscalPeriod.ToShortDateString()+"\r\n"
+				+provAdj.ReasonCode+" "+provAdj.ReasonCodeDescript+"\r\n"
+				+provAdj.RefIdentification+"\r\n"
+				+provAdj.AdjAmt.ToString("f2"));
+			msgbox.Show(this);
+		}
+
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			string claimTrackingNumber=(string)gridClaimDetails.Rows[e.Row].Tag;
-			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(_x835,claimTrackingNumber);
+			Hx835_Claim claimEob=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
+			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(claimEob);
 			form.Show(this);
 		}
 

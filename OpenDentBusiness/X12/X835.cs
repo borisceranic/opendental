@@ -3,33 +3,89 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace OpenDentBusiness
-{
+namespace OpenDentBusiness {
 	///<summary>X12 835 Health Care Claim Payment/Advice. This transaction type is a response to an 837 claim submission. The 835 will always come after a 277 is received and a 277 will always come after a 999. Neither the 277 nor the 999 are required, so it is possible that an 835 will be received directly after the 837. The 835 is not required either, so it is possible that none of the 997, 999, 277 or 835 reports will be returned from the carrier.</summary>
 	public class X835:X12object {
 		
-		///<summary>All segments within the transaction.</summary>
+		///<summary>All segments within the 835 report.</summary>
     private List<X12Segment> _listSegments;
-		///<summary>BPR segment (pg. 69). Financial Information segment. Required.</summary>
-		private X12Segment _segBPR;
-		///<summary>TRN segment (pg. 77). Reassociation Trace Number segment. Required.</summary>
-		private X12Segment _segTRN;
-		///<summary>N1*PR segment of loop 1000A (pg. 87). Payer Identification segment. Required.</summary>
-		private X12Segment _segN1_PR;
-		///<summary>N3 segment of loop 1000A (pg. 89). Payer Address. Required.</summary>
-		private X12Segment _segN3_PR;
-		///<summary>N4 segment of loop 1000A (pg. 90). Payer City, Sate, Zip code. Required.</summary>
-		private X12Segment _segN4_PR;
-		///<summary>PER*BL segment of loop 1000A (pg. 97). Payer technical contact information. Required (but is not included in any of the examples, so we assume situational). Can repeat more than once, but we only are about the first occurrence.</summary>
-		private X12Segment _segPER_BL;
-		///<summary>N1*PE segment of loop 1000B (pg. 102). Payee identification. Required. We include this information because it could be helpful for those customers who are using clinics.</summary>
-		private X12Segment _segN1_PE;
-		///<summary>CLP of loop 2100 (pg. 123). Claim payment information.</summary>
-		private List<int> _listSegNumsCLP;
-		///<summary>SVC of loop 2110 (pg. 186). Service (procedure) payment information.</summary>
-		private List<int> _listSegNumsSVC;
-		///<summary>PLB segments (pg.217). Provider Adjustment. Situational. This is the footer and table 3 if pesent.</summary>
-		private List<int> _listSegNumsPLB;
+		///<summary>The list of all provider level adjustments (one level above the claim level) within this 835.</summary>
+		private List<Hx835_ProvAdj> _listProvAdjustments;
+		///<summary>The list of all claim EOBs within this 835.</summary>
+		private List<Hx835_Claim> _listClaimEOBs;
+		///<summary>BPR01 converted into a human readable form.</summary>
+		private string _transactionHandlingDescript;
+		///<summary>BPR02 converted to decimal.</summary>
+		private decimal _insPaid;
+		///<summary>BPR03 converted to bool.</summary>
+		private bool _isCredit;
+		///<summary>BPR04 converted into a human readable form.</summary>
+		private string _payMethodDescript;
+		///<summary>BPR15 As many as 4 trailing digits of the account the payment was deposited into (only if payment was made electronically).  If not present, will be blank.</summary>
+		private string _accountNumReceiving;
+		///<summary>BPR16 The date of EFT of the date the check was printed.  If not present, will be set to 01/01/0001.</summary>
+		private DateTime _dateEffective;
+		///<summary>TRN02 Even through TRN02 is called the transaction reference number, it can include other characters besides digits.</summary>
+		private string _transRefNum;
+		///<summary>N1*PR N102</summary>
+		private string _payerName;
+		///<summary>N1*PR N104</summary>
+		private string _payerId;
+		///<summary>N3*PR N301</summary>
+		private string _payerAddress;
+		///<summary>N4*PR N401</summary>
+		private string _payerCity;
+		///<summary>N4*PR N402</summary>
+		private string _payerState;
+		///<summary>N4*PR N403</summary>
+		private string _payerZip;
+		///<summary>Represents all the data from the entire 1000A PER segment.</summary>
+		private string _payerContactInfo;
+		///<summary>N1*PE N102 loop 1000B.</summary>
+		private string _payeeName;
+		///<summary>N1*PE N103 loop 1000B.</summary>
+		private string _payeeIdType;
+		///<summary>N1*PE N104 loop 1000B.  Usually the NPI number.</summary>
+		private string _payeeId;
+
+		///<summary>The list of all provider level adjustments (one level above the claim level) within this 835.</summary>
+		public List<Hx835_ProvAdj> ListProvAdjustments { get { return _listProvAdjustments; } }
+		///<summary>The list of all claim EOBs within this 835.</summary>
+		public List<Hx835_Claim> ListClaimEOBs { get { return _listClaimEOBs; } }
+		///<summary>BPR01 converted into a human readable form.</summary>
+		public string TransactionHandlingDescript { get { return _transactionHandlingDescript; } }
+		///<summary>BPR02 converted to decimal.</summary>
+		public decimal InsPaid { get { return _insPaid; } }
+		///<summary>BPR03 converted to bool.</summary>
+		public bool IsCredit { get { return _isCredit; } }
+		///<summary>BPR04 converted into a human readable form.</summary>
+		public string PayMethodDescript { get { return _payMethodDescript; } }
+		///<summary>BPR15 As many as 4 trailing digits of the account the payment was deposited into (only if payment was made electronically).</summary>
+		public string AccountNumReceiving { get { return _accountNumReceiving; } }
+		///<summary>BPR16 The date of EFT of the date the check was printed.  If not present, will be set to 01/01/0001.</summary>
+		public DateTime DateEffective { get { return _dateEffective; } }
+		///<summary>TRN02 Even through TRN02 is called the transaction reference number, it can include other characters besides digits.</summary>
+		public string TransRefNum { get { return _transRefNum; } }
+		///<summary>N1*PR N104</summary>
+		public string PayerName { get { return _payerName; } }
+		///<summary>N1*PR N104</summary>
+		public string PayerId { get { return _payerId; } }
+		///<summary>N3*PR N301</summary>
+		public string PayerAddress { get { return _payerAddress; } }
+		///<summary>N4*PR N401</summary>
+		public string PayerCity { get { return _payerCity; } }
+		///<summary>N4*PR N402</summary>
+		public string PayerState;
+		///<summary>N4*PR N403</summary>
+		public string PayerZip;
+		///<summary>Represents all the data from the entire 1000A PER segment.</summary>
+		public string PayerContactInfo { get { return _payerContactInfo; } }
+		///<summary>N1*PE N102 loop 1000B.</summary>
+		public string PayeeName { get { return _payeeName; } }
+		///<summary>N1*PE N103 loop 1000B.</summary>
+		public string PayeeIdType { get { return _payeeIdType; } }
+		///<summary>N1*PE N104 loop 1000B.  Usually the NPI number.</summary>
+		public string PayeeId { get { return _payeeId; } }
 
     public static bool Is835(X12object xobj) {
       if(xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
@@ -42,61 +98,222 @@ namespace OpenDentBusiness
     }
 
 		///<summary>See guide page 62 for format outline.</summary>
-    public X835(string messageText):base(messageText) {
+    public X835(string messageText):base(messageText) {//Parsing happens in the base class.
+			ProcessMessage();
+    }
+
+		private void ProcessMessage() {
 			//Table 1 - Header
 			//ST: Transaction Set Header.  Required.  Repeat 1.  Guide page 68.  The GS segment contains exactly one ST segment below it.
-      _listSegments=FunctGroups[0].Transactions[0].Segments;
-			//BPR: Financial Information.  Required.  Repeat 1.  Guide page 69.
-			_segBPR=_listSegments[0];
-			//TRN: Reassociation Trace Number.  Required.  Repeat 1.  Guide page 77.
-			_segTRN=_listSegments[1];
+			_listSegments=FunctGroups[0].Transactions[0].Segments;
+			ProcessBPR(0);
+			ProcessTRN(1);
+			int segNum=2;
 			//CUR: Foreign Currency Information.  Situational.  Repeat 1.  Guide page 79.  We do not use.
-			//REF: Receiver Identification.  Situational.  Repeat 1.  Guide page 82.  We do not use.
-			//REF: Version Identification.  Situational.  Repeat 1.  Guide page 84.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CUR") {
+				segNum++;
+			}
+			//REF*EV: Receiver Identification.  Situational.  Repeat 1.  Guide page 82.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="EV") {
+				segNum++;
+			}
+			//REF*F2: Version Identification.  Situational.  Repeat 1.  Guide page 84.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="F2") {
+				segNum++;
+			}
 			//DTM: Production Date.  Situational.  Repeat 1.  Guide page 85.  We do not use.
-			_listSegNumsCLP=new List<int>();
-			_listSegNumsSVC=new List<int>();
-			_listSegNumsPLB=new List<int>();
-			for(int i=0;i<_listSegments.Count;i++) {
-				X12Segment seg=_listSegments[i];
-				//Loop 1000A Payer Identification. Repeat 1.
-				if(seg.SegmentID=="N1" && seg.Get(1)=="PR") {//Locates the first segment in loop 1000A.
-					//1000A N1: Payer Identification. Required.  Repeat 1. Guide page 87.
-					_segN1_PR=seg;
-					//1000A N3: Payer Address.  Required.  Repeat 1.  Guide page 89.
-					_segN3_PR=_listSegments[i+1];
-					//1000A N4: Payer City, State, ZIP Code.  Required.  Repeat 1.  Guide page 90.
-					_segN4_PR=_listSegments[i+2];
-					//1000A REF: Additional Payer Identification.  Situational.  Repeat 4.  Guide page 92.  We do not use.
-					//1000A PER: Payer Business Contact Information.  Situational.  Repeat 1.  Guide page 94.  We do not use.
-					//1000A PER: Payer Technical Contact Information.  Required (but is not included in any of the examples, so we assume situational).  Repeat >1.  Guide page 97.  We only care about the first occurrence.
-					for(int j=i+3;j<i+6;j++) {//Since the previous 2 segments are situational, we must skip them if they exist.
-						if(_listSegments[j].SegmentID=="PER" && _listSegments[j].Get(1)=="BL") {
-							_segPER_BL=_listSegments[j];
-							break;
-						}
-					}
-					//1000A PER: Payer WEB Site.  Situational.  Repeat 1.  Guide page 100.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
+				segNum++;
+			}
+			ProcessN1_PR(segNum);
+			ProcessN3_PR(segNum+1);
+			ProcessN4_PR(segNum+2);
+			//1000A REF: Additional Payer Identification.  Situational.  Repeat 4.  Guide page 92.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
+				segNum++;
+			}
+			//1000A PER*CX: Payer Business Contact Information.  Situational.  Repeat 1.  Guide page 94.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="CX") {
+				segNum++;
+			}
+			//1000A PER*BL: Payer Technical Contact Information.  Required (but is not included in any of the examples, so we assume situational).  Repeat >1.  Guide page 97.  We only care about the first non-empty occurrence.
+			_payerContactInfo="";
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="BL") {
+				if(_payerContactInfo=="") {
+					_payerContactInfo=ProcessPER_BL(segNum);
 				}
-				//Loop 1000B Payee Identification.  Repeat 1.
-				if(seg.SegmentID=="N1" && seg.Get(1)=="PE") {//Locates the first segment in loop 1000B.
-					//1000B N1: Payee Identification.  Required.  Repeat 1.  Guide page 102.
-					_segN1_PE=seg;
-					//1000B N3: Payee Address.  Situational.  Repeat 1.  Guide page 104.  We do not use because the payee already knows their own address, and because it is not required.
-					//1000B N4: Payee City, State, ZIP Code.  Situational.  Repeat 1.  Guide page 105.  We do not use because the payee already knows their own address, and because it is not required.
-					//1000B REF: Payee Additional Identification.  Situational.  Repeat >1.  Guide page 107.  We do not use.
-					//1000B RDM: Remittance Delivery Method.  Situational.  Repeat 1.  Guide page 109.  We do not use.
-				}
-				//Table 2 - Detail
-				//Loop 2000 Header Number.  Repeat >1.  We do not need the information in this loop, because claim payments include the unique claim identifiers that we need to match to the claims one-by-one.
-				//2000 LX: Header Number.  Situational.  Repeat 1.  Guide page 111.  We do not use.
-				//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.  We do not use.
-				//2000 TS2: Provider Supplemental Summary Infromation.  Guide page 117.  We do not use.
+				segNum++;
+			}
+			//1000A PER*IC: Payer WEB Site.  Situational.  Repeat 1.  Guide page 100.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="IC") {
+				segNum++;
+			}
+			//1000B N1*PE: Payee Identification.  Required.  Repeat 1.  Guide page 102.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N1" && _listSegments[segNum].Get(1)=="PE") {
+				ProcessN1_PE(segNum);
+				segNum++;
+			}
+			//1000B N3: Payee Address.  Situational.  Repeat 1.  Guide page 104.  We do not use because the payee already knows their own address, and because it is not required.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N3") {
+				segNum++;
+			}
+			//1000B N4: Payee City, State, ZIP Code.  Situational.  Repeat 1.  Guide page 105.  We do not use because the payee already knows their own address, and because it is not required.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N4") {
+				segNum++;
+			}
+			//1000B REF: Payee Additional Identification.  Situational.  Repeat >1.  Guide page 107.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
+				segNum++;
+			}
+			//1000B RDM: Remittance Delivery Method.  Situational.  Repeat 1.  Guide page 109.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="RDM") {
+				segNum++;
+			}
+			//Table 2 - Detail
+			//Loop 2000 Header Number.  Repeat >1.  We do not need the information in this loop, because claim payments include the unique claim identifiers that we need to match to the claims one-by-one.
+			//2000 LX: Header Number.  Situational.  Repeat 1.  Guide page 111.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="LX") {
+				segNum++;
+			}
+			//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS3") {
+				segNum++;
+			}
+			//2000 TS2: Provider Supplemental Summary Infromation.  Guide page 117.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS2") {
+				segNum++;
+			}
+			_listProvAdjustments=new List<Hx835_ProvAdj>();
+			_listClaimEOBs=new List<Hx835_Claim>();
+			while(segNum<_listSegments.Count) {
+				X12Segment seg=_listSegments[segNum];				
 				//Loop 2100 Claim Payment Information.  Repeat >1.
 				if(seg.SegmentID=="CLP") {//The CLP segment only exists one time within the 2100 loop.
-					//2100 CLP: Claim Payment Information.  Required.  Repeat 1.  Guide page 123.
-					_listSegNumsCLP.Add(i);
-					//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.  We do not use.
+					_listClaimEOBs.Add(ProcessCLP(segNum));
+				}
+				//Table 3 - Summary
+				if(seg.SegmentID=="PLB") {
+					//PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.
+					_listProvAdjustments.AddRange(ProcessPLB(segNum));
+				}
+				segNum++;
+			}
+		}
+
+		#region Segment Processing
+
+		///<summary>AMT segments are found both at the claim and procedure levels.</summary>
+		private Hx835_Info ProcessAMT(int segNum) {
+			X12Segment segAMT=_listSegments[segNum];
+			Hx835_Info info=new Hx835_Info();
+			info.FieldName=GetDescriptForAmountQualifierCode(segAMT.Get(1));
+			info.FieldValue=PIn.Decimal(segAMT.Get(2)).ToString("f2");
+			return info;
+		}
+
+		///<summary>BPR: Financial Information.  Required.  Repeat 1.  Guide page 69.</summary>
+		private void ProcessBPR(int segNum) {
+			X12Segment segBPR=_listSegments[segNum];
+			//BPR01 Transaction Handling Code.  Required.
+			_transactionHandlingDescript=this.GetDescriptForTransactionHandlingCode(segBPR.Get(1));
+			//BPR02 Total Actual Provider Payment Amount.  Required.
+			_insPaid=PIn.Decimal(segBPR.Get(2));
+			//BPR03 Credit/Debit Flag Code.  Required.
+			_isCredit=false;
+			if(segBPR.Get(3)=="C") {
+				_isCredit=true;
+			}
+			//BPR04 Payment Method Code.  Required.
+			_payMethodDescript=GetDescriptForPaymentMethodCode(segBPR.Get(4));
+			//BPR05 Payment Format Code.  Situational.  We do not use.
+			//BPR06 (DFI) ID Number Qualifier.  Situational.  We do not use.
+			//BPR07 (DFI) Identification Number.  Situational.  We do not use.
+			//BPR08 Account Number Qualifier.  Situational, but will always be the same value if present.  DA=Demand Deposit.  We do not use.
+			//BPR09 Sender Bank Account Number.  Situational.  We do not use.
+			//BPR10 Originating Company Identifier.  Situational.  We do not use.
+			//BPR11 Originating Company Supplemental Code.  Situational.  We do not use.
+			//BPR12 (DFI) ID Number Qualifier.  Situational.  We do not use.
+			//BPR13 (DFI) Identification Number.  Situational.  We do not use.
+			//BPR14 Account Number Qualifier.  Situational.  Only two values allowed, DA=Demand Deposit, SG=Savings.  We do not use.
+			//BPR15 Receiver or Provider Account Number.  Situational.
+			_accountNumReceiving=segBPR.Get(15);
+			if(_accountNumReceiving.Length>4) {
+				//Do not show more than 4 trailing digits for security reasons.
+				//For the examples I have seen, this account number should already be a short 4 or 5 digit version of the actual account number, so this replacement is just a safeguard.
+				_accountNumReceiving=_accountNumReceiving.Substring(_accountNumReceiving.Length-4);
+			}
+			//BPR16 Date EFT Effective or Date Check Issued.  Situational.
+			string strDateEffective=segBPR.Get(16);
+			_dateEffective=DateTime.MinValue;
+			if(strDateEffective.Length>=8) {
+				int dateEffectiveYear=int.Parse(strDateEffective.Substring(0,4));
+				int dateEffectiveMonth=int.Parse(strDateEffective.Substring(4,2));
+				int dateEffectiveDay=int.Parse(strDateEffective.Substring(6,2));
+				_dateEffective=new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay);
+			}
+			//BPR17 through BPR21 at not used in the format.
+		}
+
+		///<summary>Converts a CAS segment into a list of up to 6 adjustments.</summary>
+		private List<Hx835_Adj> ProcessCAS(int segNum) {
+			X12Segment segCAS=_listSegments[segNum];
+			List<Hx835_Adj> listAdjustments=new List<Hx835_Adj>();
+			string adjCode=segCAS.Get(1);
+			string adjDescript="";
+			if(adjCode=="CO") {
+				adjDescript="Contractual Obligations";
+			}
+			else if(adjCode=="PI") {
+				adjDescript="Payor Initiated Reductions";
+			}
+			else if(adjCode=="PR") {//Patient Responsibility
+				adjDescript="Patient Portion";
+			}
+			else { //adjCode=="OA"
+				adjDescript="Other Adjustments";
+			}
+			//Each CAS segment can contain up to 6 adjustments of the same type.
+			for(int k=2;k<=17;k+=3) {
+				Hx835_Adj adj=new Hx835_Adj();
+				adj.AdjCode=adjCode;
+				adj.AdjustDescript=adjDescript;
+				string strAdjReasonCode=segCAS.Get(k);
+				string strAmt=segCAS.Get(k+1);
+				if(strAdjReasonCode=="" && strAmt=="") {
+					continue;
+				}
+				adj.AdjAmt=PIn.Decimal(strAmt);
+				if(adj.AdjAmt==0) {
+					continue;
+				}
+				adj.ReasonDescript="";
+				if(strAdjReasonCode!="") {
+					adj.ReasonDescript=GetDescriptFrom139(strAdjReasonCode);
+				}
+				listAdjustments.Add(adj);
+			}
+			return listAdjustments;
+		}
+
+		///<summary>2100 CLP: Claim Payment Information.  Required.  Repeat 1.  Guide page 123.</summary>
+		private Hx835_Claim ProcessCLP(int segNum) {
+			Hx835_Claim retVal=new Hx835_Claim();
+			X12Segment segCLP=_listSegments[segNum];
+			retVal.ClaimTrackingNumber=segCLP.Get(1);//CLP01
+			retVal.PayorControlNumber=segCLP.Get(7);//CLP07 Payer Claim Control Number
+			retVal.StatusCodeDescript=GetDescriptForClaimStatusCode(segCLP.Get(2));//CLP02 Claim Status Code Description
+			retVal.ClaimFee=PIn.Decimal(segCLP.Get(3));//CLP03 Total Claim Charge Amount
+			retVal.InsPaid=PIn.Decimal(segCLP.Get(4));//CLP04 Claim Payment Amount
+			retVal.PatientPortion=PIn.Decimal(segCLP.Get(5));//CLP05 Patient Portion Amount
+			segNum++;
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID!="CLP") {//Continue until either the end of the file or the next claim is located.
+				retVal.ListClaimAdjustments=new List<Hx835_Adj>();
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
+					//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.
+					retVal.ListClaimAdjustments.AddRange(ProcessCAS(segNum));
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1") {
 					//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.  We do not use.
 					//2100 NM1: Insured Name.  Situational.  Repeat 1.  Guide page 140.  We do not use.
 					//2100 NM1: Corrected Patient/Insured Name.  Situational.  Repeat 1.  Guide page 143.  We do not use.
@@ -104,659 +321,493 @@ namespace OpenDentBusiness
 					//2100 NM1: Crossover Carrier Name.  Situational.  Repeat 1.  Guide page 150.  We do not use.
 					//2100 NM1: Corrected Priority Payer Name.  Situational.  Repeat 1.  Guide page 153.  We do not use.
 					//2100 NM1: Other Subscriber Name.  Situational.  Repeat 1.  Guide page 156.  We do not use.
+					segNum++;
+				}
+				retVal.ListAdjudicationInfo=new List<Hx835_Info>();
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MIA") {
 					//2100 MIA: Inpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 159. 
+					retVal.ListAdjudicationInfo.AddRange(ProcessMIA(segNum));
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MOA") {
 					//2100 MOA: Outpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 166.
+					retVal.ListAdjudicationInfo.AddRange(ProcessMOA(segNum));
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
 					//2100 REF: Other Claim Releated Identification.  Situational.  Repeat 5.  Guide page 169.  We do not use.
 					//2100 REF: Rendering Provider Identification.  Situational.  Repeat 10.  Guide page 171.  We do not use.
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
 					//2100 DTM: Statement From or To Date.  Situational.  Repeat 2.  Guide page 173.  We do not use.
 					//2100 DTM: Coverage Expiration Date.  Situational.  Repeat 1.  Guide page 175.  We do not use.
 					//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.  We do not use.
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER") {
 					//2100 PER: Claim Contact Information.  Situational.  Repeat 2.  Guide page 179.  We do not use.
-					//2100 AMT: Claim Supplemental Information.  Situational.  Repeat 13.  Guide page 182.  We do not use.
+					segNum++;
+				}
+				retVal.ListSupplementalInfo=new List<Hx835_Info>();
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="AMT") {
+					//2100 AMT: Claim Supplemental Information.  Situational.  Repeat 13.  Guide page 182.
+					retVal.ListSupplementalInfo.Add(ProcessAMT(segNum));
+					segNum++;
+				}
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="QTY") {
 					//2100 QTY: Claim Supplemental Information Quantity.  Situational.  Repeat 14.  Guide page 184.  We do not use.
+					segNum++;
 				}
-				//Loop 2110 Service Payment Information.  Repeat 999.
-				if(seg.SegmentID=="SVC") {//The SVC segment only exists one time within the 2110 loop.
-					//2110 SVC: Service Payment Information.  Situational.  Repeat 1.  Guide page 186.
-					_listSegNumsSVC.Add(i);
-					//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
-					//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.
-					//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
-					//2110 REF: Line Item Control Number.  Situational.  Repeat 1.  Guide page 206.
-					//2110 REF: Rendering Provider Information.  Situational.  Repeat 10.  Guide page 207.  We do not use.
-					//2110 REF: HealthCare Policy Identification.  Situational.  Repeat 5.  Guide page 209.  We do not use.
-					//2110 AMT: Service Supplemental Amount.  Situational.  Repeat 9.  Guide page 211.  We do not use.
-					//2110 QTY: Service Supplemental Quantity.  Situational.  Repeat 6.  Guide page 213.  We do not use.
-					//2110 LQ: Health Care Remark Codes.  Repeat 99.  Guide page 215.
+				//===============================  PROCEDURES  =============================
+				retVal.ListProcs=new List<Hx835_Proc>();
+				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="SVC") {
+					//2110 SVC Service Payment Information.  Situational.  Repeat 999.  Guide page 186.
+					retVal.ListProcs.Add(ProcessSVC(segNum));
+					segNum++;
 				}
-				//Table 3 - Summary
-				if(seg.SegmentID=="PLB") {
-					//PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.
-					_listSegNumsPLB.Add(i);
-				}
-			}
-    }
-
-		#region Header
-		///<summary>Gets the description for the transaction handling code in Table 1 (Header) BPR01. Required.</summary>
-		public string GetTransactionHandlingCodeDescription() {
-			string transactionHandlingCode=_segBPR.Get(1);
-			if(transactionHandlingCode=="C") {
-				return "Payment Accompanies Remittance Advice";
-			}
-			else if(transactionHandlingCode=="D") {
-				return "Make Payment Only";
-			}
-			else if(transactionHandlingCode=="H") {
-				return "Notification Only";
-			}
-			else if(transactionHandlingCode=="I") {
-				return "Remittance Information Only";
-			}
-			else if(transactionHandlingCode=="P") {
-				return "Prenotification of Future Transfers";
-			}
-			else if(transactionHandlingCode=="U") {
-				return "Split Payment and Remittance";
-			}
-			else if(transactionHandlingCode=="X") {
-				return "Handling Party's Option to Split Payment and Remittance";
-			}
-			return "UNKNOWN";
-		}
-
-		///<summary>Gets the payment credit or debit amount in Table 1 (Header) BPR02. Required.</summary>
-		public string GetPaymentAmount() {
-			return PIn.Decimal(_segBPR.Get(2)).ToString("f2");
-		}
-
-		///<summary>Gets the payment credit or debit flag in Table 1 (Header) BPR03. Returns true if "Credit" or false if "Debit". Required.</summary>
-		public bool IsCredit() {
-			string creditDebitFlag=_segBPR.Get(3);
-			if(creditDebitFlag=="C") {
-				return true;
-			}
-			return false;
-		}
-
-		///<summary>Gets the description for the payment method in Table 1 (Header) BPR04. Required.</summary>
-		public string GetPaymentMethodDescription() {
-			string paymentMethodCode=_segBPR.Get(4);
-			if(paymentMethodCode=="ACH") {
-				return "Automated Clearing House (ACH)";
-			}
-			else if(paymentMethodCode=="BOP") {
-				return "Financial Institution Option";
-			}
-			else if(paymentMethodCode=="CHK") {
-				return "Check";
-			}
-			else if(paymentMethodCode=="FWT") {
-				return "Federal Reserve Funds/Wire Transfer - Nonrepetitive";
-			}
-			else if(paymentMethodCode=="NON") {
-				return "Non-payment Data";
-			}
-			return "UNKNOWN";
-		}
-
-		///<summary>Gets the last 4 digits of the account number for the receiving company (the provider office) in Table 1 (Header) BPR15. Situational. If not present, then returns empty string.</summary>
-		public string GetAccountNumReceivingShort() {
-			string accountNumber=_segBPR.Get(15);
-			if(accountNumber.Length<=4) {
-				return accountNumber;
-			}
-			return accountNumber.Substring(accountNumber.Length-4);
-		}
-
-		///<summary>Gets the effective payment date in Table 1 (Header) BPR16. Required.</summary>
-		public DateTime GetDateEffective() {
-			string dateEffectiveStr=_segBPR.Get(16);//BPR16 will be blank if the payment is a check.
-			if(dateEffectiveStr.Length<8) {
-				return DateTime.MinValue;
-			}
-			int dateEffectiveYear=int.Parse(dateEffectiveStr.Substring(0,4));
-			int dateEffectiveMonth=int.Parse(dateEffectiveStr.Substring(4,2));
-			int dateEffectiveDay=int.Parse(dateEffectiveStr.Substring(6,2));
-			return new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay);
-		}
-
-		///<summary>Gets the check number or transaction reference number in Table 1 (Header) TRN02. Required.</summary>
-		public string GetTransactionReferenceNumber() {
-			return _segTRN.Get(2);
-		}
-
-		///<summary>Gets the payer name in Table 1 (Header) N102. Required.</summary>
-		public string GetPayerName() {
-			return _segN1_PR.Get(2);
-		}
-
-		///<summary>Gets the payer electronic ID in Table 1 (Header) N104 of segment N1*PR. Situational. If not present, then returns empty string.</summary>
-		public string GetPayerID() {
-			if(_segN1_PR.Elements.Length>=4) {
-				return _segN1_PR.Get(4);
-			}
-			return "";
-		}
-
-		///<summary>Gets the payer address line 1 in Table 1 (Header) N301 of segment N1*PR. Required.</summary>
-		public string GetPayerAddress1() {
-			return _segN3_PR.Get(1);
-		}
-
-		///<summary>Gets the payer city name in Table 1 (Header) N401 of segment N1*PR. Required.</summary>
-		public string GetPayerCityName() {
-			return _segN4_PR.Get(1);
-		}
-
-		///<summary>Gets the payer state in Table 1 (Header) N402 of segment N1*PR. Required when in USA or Canada.</summary>
-		public string GetPayerState() {
-			return _segN4_PR.Get(2);
-		}
-
-		///<summary>Gets the payer zip code in Table 1 (Header) N403 of segment N1*PR. Required when in USA or Canada.</summary>
-		public string GetPayerZip() {
-			return _segN4_PR.Get(3);
-		}
-
-		///<summary>Gets the contact information from segment PER*BL. Phone/email in PER04 or the contact phone/email in PER06 or both. If neither PER04 nor PER06 are present, then returns empty string.</summary>
-		public string GetPayerContactInfo() {
-			if(_segPER_BL==null) {
-				return "";
-			}
-			string contact_info="";
-			if(_segPER_BL.Elements.Length>=4 && _segPER_BL.Get(4)!="") {//Contact number 1.
-				contact_info=_segPER_BL.Get(4);
-			}
-			if(_segPER_BL.Elements.Length>=6 && _segPER_BL.Get(6)!="") {//Contact number 2.
-				if(contact_info!="") {
-					contact_info+=" or ";
-				}
-				contact_info+=_segPER_BL.Get(6);
-			}
-			if(_segPER_BL.Elements.Length>=8 && _segPER_BL.Get(8)!="") {//Telephone extension for contact number 2.
-				if(contact_info!="") {
-					contact_info+=" x";
-				}
-				contact_info+=_segPER_BL.Get(8);
-			}
-			return contact_info;
-		}
-
-		///<summary>Gets the payee name in Table 1 (Header) N102 of segment N1*PE. Required.</summary>
-		public string GetPayeeName() {
-			return _segN1_PE.Get(2);
-		}
-
-		///<summary>Gets a human readable description for the identifiation code qualifier found in N103 of segment N1*PE. Required.</summary>
-		public string GetPayeeIdType() {
-			string qualifier=_segN1_PE.Get(3);
-			if(qualifier=="FI") {
-				return "TIN";
-			}
-			else if(qualifier=="XV") {
-				return "Medicaid ID";
-			}
-			else if(qualifier=="XX") {
-				return "NPI";
-			}
-			return "";
-		}
-
-		///<summary>Gets the payee identification number found in N104 of segment N1*PE. Required. Usually the NPI number.</summary>
-		public string GetPayeeId() {
-			return _segN1_PE.Get(4);
-		}
-
-		#endregion Header
-		#region Provider Level
-		///<summary>Each item returned contains a string[] with values:
-		///00 Provider NPI (PLB01), 
-		///01 Fiscal Period Date (PLB02), 
-		///02 ReasonCodeDescription, 
-		///03 ReasonCode (PLB03-1 or PLB05-1 or PLB07-1 or PLB09-1 or PLB11-1 or PLB13-1 2/2), 
-		///04 ReferenceIdentification (PLB03-2 or PLB05-2 or PLB07-2 or PLB09-2 or PLB11-2 or PLB13-2 1/50),
-		///05 Amount (PLB04 1/18).</summary>
-		public List<string[]> GetProviderLevelAdjustments() {
-			List<string[]> result=new List<string[]>();
-			for(int i=0;i<_listSegNumsPLB.Count;i++) {
-				X12Segment segPLB=_listSegments[_listSegNumsPLB[i]];
-				string provNPI=segPLB.Get(1);//PLB01 is required.
-				string dateFiscalPeriodStr=segPLB.Get(2);//PLB02 is required.
-				string dateFiscalPeriod="";
-				try {
-					int dateEffectiveYear=int.Parse(dateFiscalPeriodStr.Substring(0,4));
-					int dateEffectiveMonth=int.Parse(dateFiscalPeriodStr.Substring(4,2));
-					int dateEffectiveDay=int.Parse(dateFiscalPeriodStr.Substring(6,2));
-					dateFiscalPeriod=(new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay)).ToShortDateString();
-				}
-				catch {
-					//Oh well, not very important infomration anyway.
-				}
-				//After PLB02, the segments are in pairs, with a minimum of one pair, and a maximum of six pairs.  Starting with PLB03 and PLB04 (both are required), the remaining pairs are optional.
-				//Each pair represents a single provider adjustment and reason for adjustment.  The provider is identified in PLB01 by NPI.
-				//There can be more than one PLB segment, therefore it is possible to create more than six adjustments for a single provider by creating more than one PLB segment.
-				//The loop below is intended to capture all adjustments within the current PLB segment.
-				int segNumAdjCode=3;//PLB03 and PLB04 are required.  We start at segment 3 and increment by 2 with each iteration of the loop.
-				while(segNumAdjCode<segPLB.Elements.Length) {
-					string reasonCode=segPLB.Get(segNumAdjCode,1);
-					//For each adjustment reason code, the reference identification is situational.
-					string referenceIdentification="";
-					if(segPLB.Get(3).Length>reasonCode.Length) {
-						referenceIdentification=segPLB.Get(3,2);
-					}
-					//For each adjustment reason code, an amount is required.
-					string amount=PIn.Decimal(segPLB.Get(segNumAdjCode+1)).ToString("f2");
-					result.Add(new string[] { provNPI,dateFiscalPeriod,GetDescriptForProvAdjCode(reasonCode),reasonCode,referenceIdentification,amount });
-					segNumAdjCode+=2;
-				}
-			}
-			return result;
-		}
-		#endregion Provider Level
-		#region Claim Level
-
-		///<summary>CLP01 in loop 2100. Referred to in this format as a Patient Control Number. Do this first to get a list of all claim tracking numbers that are contained within this 835.  Then, for each claim tracking number, we can later retrieve specific information for that single claim. The claim tracking numbers correspond to CLM01 exactly as submitted in the 837. We refer to CLM01 as the claim identifier on our end. We allow more than just digits in our claim identifiers, so we must return a list of strings.</summary>
-		public List<string> GetClaimTrackingNumbers() {
-			List<string> retVal=new List<string>();
-			for(int i=0;i<_listSegNumsCLP.Count;i++) {
-				X12Segment seg=_listSegments[_listSegNumsCLP[i]];//CLP segment.
-				retVal.Add(seg.Get(1));//CLP01
 			}
 			return retVal;
 		}
 
-		///<summary>Result will contain strings in the following order:
-		///00 Claim Status Code Description (CLP02)
-		///01 Total Claim Charge Amount (CLP03)
-		///02 Claim Payment Amount (CLP04)
-		///03 Patient Portion Amount (CLP05)
-		///04 Payer Claim Control Number (CLP07).</summary>
-    public string[] GetClaimInfo(string claimTrackingNumber) {
-      string[] result=new string[5];
-      for(int i=0;i<result.Length;i++) {
-        result[i]="";
-      }
-      for(int i=0;i<_listSegNumsCLP.Count;i++) {
-        int segNum=_listSegNumsCLP[i];
-				X12Segment segCLP=_listSegments[segNum];
-				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
-					continue;
-				}
-				result[0]=GetDescriptForClaimStatusCode(segCLP.Get(2));//CLP02 Claim Status Code Description
-				result[1]=PIn.Decimal(segCLP.Get(3)).ToString("f2");//CLP03 Total Claim Charge Amount
-				result[2]=PIn.Decimal(segCLP.Get(4)).ToString("f2");//CLP04 Claim Payment Amount
-				result[3]=PIn.Decimal(segCLP.Get(5)).ToString("f2");//CLP05 Patient Portion Amount
-				result[4]=segCLP.Get(7);//CLP07 Payer Claim Control Number
-				break;
-      }
-      return result;
-    }
-
-		///<summary>Returns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
-		public List<string> GetClaimAdjustmentInfo(string claimTrackingNumber) {
-			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
-			for(int i=0;i<_listSegNumsCLP.Count;i++) {
-				int segNum=_listSegNumsCLP[i];
-				X12Segment segCLP=_listSegments[segNum];
-				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
-					continue;
-				}
-				int startSegNum=segNum+1;
-				int endSegNum=_listSegments.Count;//this variable tracks where the segments end for claim i.
-				if(i<_listSegNumsCLP.Count-1) {
-					endSegNum=_listSegNumsCLP[i+1];
-				}
-				for(int j=startSegNum;j<endSegNum;j++) {
-					X12Segment seg=_listSegments[j];
-					if(seg.SegmentID=="SVC") {
-						//If a procedure segment is encountered, then we have finished processing all of the claim-level adjustments.  Discontinue processing.
-						break;
-					}
-					if(seg.SegmentID!="CAS") {
-						continue;//Not an adjustment segment.
-					}
-					listClaimCasSegments.Add(seg);					
-				}
+		///<summary>The LQ segment contains remark codes that must be converted into human readable text for it to be usable.</summary>
+		private string ProcessLQ(int segNum) {
+			X12Segment segLQ=_listSegments[segNum];
+			string code=segLQ.Get(2);
+			if(segLQ.Get(1)=="HE") {//Claim Payment Remark Codes
+				return GetDescriptFrom411(code);
 			}
-			return ConvertCasAdjustmentsToHumanReadable(listClaimCasSegments);
+			else if(segLQ.Get(1)=="RX") {//National Council for Prescription Drug Programs Reject/Payment Codes.
+				//We do not send prescriptions with X12, so we should never get responses with these codes.
+				return "Rx Rejection Reason Code: "+code;//just in case, output a generic message so the user can look it up.
+			}
+			else {//Should not be possible, but here for future versions of X12 just in case.
+				return "Code List Qualifier: "+segLQ.Get(1)+" Code: "+code;
+			}
 		}
 
-		///<summary>This function gets extra notes regarding the adjuducation of the claim if present.
-		///The data comes from two different segments, MIA (Inpatient Adjudication Information) and MOA (Outpatient Adjudication Information).
-		///Both segments MIA and MOA are situational, and if present, there will only be one or the other.
-		///The values returned are in pairs, such that the first item in each pair is a field name and the second item in the pair is the field value.</summary>
-		public List<string> GetClaimAdjudicationInfo(string claimTrackingNumber) {
-			List<string> listAdjudicationInfo=new List<string>();
-			for(int i=0;i<_listSegNumsCLP.Count;i++) {
-				int segNum=_listSegNumsCLP[i];
-				X12Segment segCLP=_listSegments[segNum];
-				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
+		///<summary>The MIA segment is for Medicare inpatient adjudication information.</summary>
+		private List<Hx835_Info> ProcessMIA(int segNum) {
+			X12Segment segMIA=_listSegments[segNum];
+			List<Hx835_Info> listAdjudicationInfo=new List<Hx835_Info>();
+			for(int i=1;i<=24;i++) {
+				if(segMIA.Get(i)=="") {
 					continue;
 				}
-				int startSegNum=segNum+1;
-				int endSegNum=_listSegments.Count;//this variable tracks where the segments end for claim i.
-				if(i<_listSegNumsCLP.Count-1) {
-					endSegNum=_listSegNumsCLP[i+1];
+				Hx835_Info info=new Hx835_Info();
+				if(i==1) {
+					info.FieldName="Covered Days or Visits Count";
+					info.FieldValue=segMIA.Get(1);
 				}
-				for(int j=startSegNum;j<endSegNum;j++) {
-					X12Segment seg=_listSegments[j];
-					if(seg.SegmentID=="MIA") {
-						if(seg.Get(1)!="") {
-							listAdjudicationInfo.Add("Covered Days or Visits Count");		listAdjudicationInfo.Add(seg.Get(1));
-						}
-						if(seg.Get(2)!="") {
-							listAdjudicationInfo.Add("PPS Operating Outlier Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(2)).ToString("f2"));
-						}
-						if(seg.Get(3)!="") {
-							listAdjudicationInfo.Add("Lifetime Psychiatric Days Count"); listAdjudicationInfo.Add(seg.Get(3));
-						}
-						if(seg.Get(4)!="") {
-							listAdjudicationInfo.Add("Claim Diagnosis Related Group Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(4)).ToString("f2"));
-						}
-						if(seg.Get(5)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(5)));
-						}
-						if(seg.Get(6)!="") {
-							listAdjudicationInfo.Add("Disproportionate Share Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(6)).ToString("f2"));
-						}
-						if(seg.Get(7)!="") {
-							listAdjudicationInfo.Add("Medicare Secondary Payer (MSP) Pass-Through Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(7)).ToString("f2"));
-						}
-						if(seg.Get(8)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(8)).ToString("f2"));
-						}
-						if(seg.Get(9)!="") {
-							listAdjudicationInfo.Add("Prospectice Payment System (PPS) Capital, Federal Specific Portion, Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(9)).ToString("f2"));
-						}
-						if(seg.Get(10)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital, Hospital Specific Portion, Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(10)).ToString("f2"));
-						}
-						if(seg.Get(11)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital, Disproportionate Share, Hospital Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(11)).ToString("f2"));
-						}
-						if(seg.Get(12)!="") {
-							listAdjudicationInfo.Add("Old Capital Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(12)).ToString("f2"));
-						}
-						if(seg.Get(13)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Indirect Medical Education Claim Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(13)).ToString("f2"));
-						}
-						if(seg.Get(14)!="") {
-							listAdjudicationInfo.Add("Hospital Specific Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(14)).ToString("f2"));
-						}
-						if(seg.Get(15)!="") {
-							listAdjudicationInfo.Add("Cost Report Day Count"); listAdjudicationInfo.Add(seg.Get(15));
-						}
-						if(seg.Get(16)!="") {
-							listAdjudicationInfo.Add("Federal Specific Diagnosis Related Group (DRG) Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(16)).ToString("f2"));
-						}
-						if(seg.Get(17)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Outlier Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(17)).ToString("f2"));
-						}
-						if(seg.Get(18)!="") {
-							listAdjudicationInfo.Add("Indirect Teaching Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(18)).ToString("f2"));
-						}
-						if(seg.Get(19)!="") {
-							listAdjudicationInfo.Add("Professional Component Amount Billed But Not Payable"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(19)).ToString("f2"));
-						}
-						if(seg.Get(20)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(20)));
-						}
-						if(seg.Get(21)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(21)));
-						}
-						if(seg.Get(22)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(22)));
-						}
-						if(seg.Get(23)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(23)));
-						}
-						if(seg.Get(24)!="") {
-							listAdjudicationInfo.Add("Prospective Payment System (PPS) Capital Exception Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(24)).ToString("f2"));
-						}
-					}
-					else if(seg.SegmentID=="MOA") {
-						if(seg.Get(1)!="") {
-							listAdjudicationInfo.Add("Reimbursement Rate"); listAdjudicationInfo.Add((PIn.Decimal(seg.Get(1))*100).ToString()+"%");
-						}
-						if(seg.Get(2)!="") {
-							listAdjudicationInfo.Add("Claim Health Care Financing Administration Common Procedural Coding System (HCPCS) Payable Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(2)).ToString("f2"));
-						}
-						if(seg.Get(3)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(3)));
-						}
-						if(seg.Get(4)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(4)));
-						}
-						if(seg.Get(5)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(5)));
-						}
-						if(seg.Get(6)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(6)));
-						}
-						if(seg.Get(7)!="") {
-							listAdjudicationInfo.Add("Claim Payment Remark"); listAdjudicationInfo.Add(GetDescriptFrom411(seg.Get(7)));
-						}
-						if(seg.Get(8)!="") {
-							listAdjudicationInfo.Add("End Stage Renal Disease (ESRD) Payment Amount"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(8)).ToString("f2"));
-						}
-						if(seg.Get(9)!="") {
-							listAdjudicationInfo.Add("Professional Component Amount Billed But Not Payable"); listAdjudicationInfo.Add(PIn.Decimal(seg.Get(9)).ToString("f2"));
-						}
-					}
+				else if(i==2) {
+					info.FieldName="PPS Operating Outlier Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(2)).ToString("f2");
 				}
-				break;
+				else if(i==3) {
+					info.FieldName="Lifetime Psychiatric Days Count";
+					info.FieldValue=segMIA.Get(3);
+				}
+				else if(i==4) {
+					info.FieldName="Claim Diagnosis Related Group Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(4)).ToString("f2");
+				}
+				else if(i==5) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMIA.Get(5));
+				}
+				else if(i==6) {
+					info.FieldName="Disproportionate Share Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(6)).ToString("f2");
+				}
+				else if(i==7) {
+					info.FieldName="Medicare Secondary Payer (MSP) Pass-Through Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(7)).ToString("f2");
+				}
+				else if(i==8) {
+					info.FieldName="Prospective Payment System (PPS) Capital Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(8)).ToString("f2");
+				}
+				else if(i==9) {
+					info.FieldName="Prospectice Payment System (PPS) Capital, Federal Specific Portion, Diagnosis Related Group (DRG) Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(9)).ToString("f2");
+				}
+				else if(i==10) {
+					info.FieldName="Prospective Payment System (PPS) Capital, Hospital Specific Portion, Diagnosis Related Group (DRG) Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(10)).ToString("f2");
+				}
+				else if(i==11) {
+					info.FieldName="Prospective Payment System (PPS) Capital, Disproportionate Share, Hospital Diagnosis Related Group (DRG) Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(11)).ToString("f2");
+				}
+				else if(i==12) {
+					info.FieldName="Old Capital Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(12)).ToString("f2");
+				}
+				else if(i==13) {
+					info.FieldName="Prospective Payment System (PPS) Capital Indirect Medical Education Claim Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(13)).ToString("f2");
+				}
+				else if(i==14) {
+					info.FieldName="Hospital Specific Diagnosis Related Group (DRG) Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(14)).ToString("f2");
+				}
+				else if(i==15) {
+					info.FieldName="Cost Report Day Count";
+					info.FieldValue=segMIA.Get(15);
+				}
+				else if(i==16) {
+					info.FieldName="Federal Specific Diagnosis Related Group (DRG) Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(16)).ToString("f2");
+				}
+				else if(i==17) {
+					info.FieldName="Prospective Payment System (PPS) Capital Outlier Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(17)).ToString("f2");
+				}
+				else if(i==18) {
+					info.FieldName="Indirect Teaching Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(18)).ToString("f2");
+				}
+				else if(i==19) {
+					info.FieldName="Professional Component Amount Billed But Not Payable";
+					info.FieldValue=PIn.Decimal(segMIA.Get(19)).ToString("f2");
+				}
+				else if(i==20) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMIA.Get(20));
+				}
+				else if(i==21) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMIA.Get(21));
+				}
+				else if(i==22) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMIA.Get(22));
+				}
+				else if(i==23) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMIA.Get(23));
+				}
+				else if(i==24) {
+					info.FieldName="Prospective Payment System (PPS) Capital Exception Amount";
+					info.FieldValue=PIn.Decimal(segMIA.Get(24)).ToString("f2");
+				}
+				listAdjudicationInfo.Add(info);
 			}
 			return listAdjudicationInfo;
 		}
 
-		#endregion Claim Level
-		#region Procedure Level
-
-		///<summary>Procedure level information is not required, but is useful if present.
-		///The returned list of strings will include 5 values for each procedure found.  Fields will be in the following order:
-		///00 SVC Segment Index within _listSegNumsSVC. More convenient than the line item number, beacuse it is always available and easier to use in later steps.
-		///01 Procedure Code.
-		///02 Procedure Fee.
-		///03 Ins Paid Amount.
-		///04 ProcNum (REF*6R from the 837), or blank for older claims.</summary>
-		public List<string> GetProcInfo(string claimTrackingNumber) {
-			List<string> listProcInfo=new List<string>();
-			for(int i=0;i<_listSegNumsCLP.Count;i++) {
-				int segNum=_listSegNumsCLP[i];
-				X12Segment segCLP=_listSegments[segNum];
-				if(segCLP.Get(1)!=claimTrackingNumber) {//CLP01 Patient Control Number
+		///<summary>The MOA segment is for Medicare outpatient adjudication information.</summary>
+		private List<Hx835_Info> ProcessMOA(int segNum) {
+			X12Segment segMOA=_listSegments[segNum];
+			List<Hx835_Info> listAdjudicationInfo=new List<Hx835_Info>();
+			for(int i=1;i<=9;i++) {
+				if(segMOA.Get(i)=="") {
 					continue;
 				}
-				int startSegNumCLP=segNum+1;
-				int endSegNumCLP=_listSegments.Count;//this variable tracks where the segments end for claim i.
-				if(i<_listSegNumsCLP.Count-1) {
-					endSegNumCLP=_listSegNumsCLP[i+1];
+				Hx835_Info info=new Hx835_Info();
+				if(i==1) {
+					info.FieldName="Reimbursement Rate";
+					info.FieldValue=((PIn.Decimal(segMOA.Get(1))*100).ToString()+"%");
 				}
-				for(int j=0;j<_listSegNumsSVC.Count;j++) {
-					int segSvcIndex=_listSegNumsSVC[j];
-					if(segSvcIndex>=startSegNumCLP && segSvcIndex<endSegNumCLP) {
-						listProcInfo.Add(j.ToString());//00 SVC Segment Index.
-						X12Segment segSVC=_listSegments[segSvcIndex];
-						listProcInfo.Add(segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1]);//01 SVC1-2: Procedure code.
-						listProcInfo.Add(PIn.Decimal(segSVC.Get(2)).ToString("f2"));//02 SVC2: Procedure Fee.
-						listProcInfo.Add(PIn.Decimal(segSVC.Get(3)).ToString("f2"));//03 SVC3: Ins Paid Amount.
-						int segRefIndex=-1;
-						for(int k=segSvcIndex+1;k<_listSegments.Count;k++) {//Find the first REF*6R segment.
-							if(_listSegments[k].SegmentID=="REF" && _listSegments[k].Get(1)=="6R") {
-								segRefIndex=k;
-								break;
-							}
-						}
-						//Back track to see if the located REF*6R segment belongs to the current procedure (because the REF*6F segments are optional and could be on some procedures but not others).
-						bool isRefMatch=false;
-						if(segRefIndex!=-1) {
-							for(int k=segRefIndex;k>=segSvcIndex;k--) {
-								if(_listSegments[k].SegmentID!="SVC") {
-									continue;
-								}
-								if(k==segSvcIndex) {
-									isRefMatch=true;
-								}
-								break;
-							}
-						}
-						string procNum="";
-						if(isRefMatch) {
-							string strRef02=_listSegments[segRefIndex].Get(2);
-							if(strRef02.StartsWith("p")) {
-								//If the control number is prefixed with a "p", then it is a ProcNum.
-								//Otherwise, for older versions, it will be the Line Counter from LX01 in the 837, which is basically an index.  We will ignore these older index based values.
-								procNum=strRef02.Substring(1);//Remove the leading "p".
-							}							
-						}
-						listProcInfo.Add(procNum);//04 REF02: Line Item Control Number.  This is the REF*6R from the 837.
-					}
+				else if(i==2) {
+					info.FieldName="Claim Health Care Financing Administration Common Procedural Coding System (HCPCS) Payable Amount";
+					info.FieldValue=PIn.Decimal(segMOA.Get(2)).ToString("f2");
 				}
+				else if(i==3) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMOA.Get(3));
+				}
+				else if(i==4) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMOA.Get(4));
+				}
+				else if(i==5) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMOA.Get(5));
+				}
+				else if(i==6) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMOA.Get(6));
+				}
+				else if(i==7) {
+					info.FieldName="Claim Payment Remark";
+					info.FieldValue=GetDescriptFrom411(segMOA.Get(7));
+				}
+				else if(i==8) {
+					info.FieldName="End Stage Renal Disease (ESRD) Payment Amount";
+					info.FieldValue=PIn.Decimal(segMOA.Get(8)).ToString("f2");
+				}
+				else if(i==9) {
+					info.FieldName="Professional Component Amount Billed But Not Payable";
+					info.FieldValue=PIn.Decimal(segMOA.Get(9)).ToString("f2");
+				}
+				listAdjudicationInfo.Add(info);
 			}
-			return listProcInfo;
+			return listAdjudicationInfo;
 		}
 
-		///<summaryReturns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
-		public List<string> GetProcAdjustmentInfo(int segSvcIndex) {
-			List<X12Segment> listClaimCasSegments=new List<X12Segment>();
-			int startSegNum=_listSegNumsSVC[segSvcIndex];
-			int endSegNum=_listSegments.Count;
-			if(segSvcIndex<_listSegNumsSVC.Count-1) {
-				endSegNum=_listSegNumsSVC[segSvcIndex+1];
-			}
-			for(int j=startSegNum;j<endSegNum;j++) {
-				X12Segment seg=_listSegments[j];
-				if(seg.SegmentID=="CLP") {
-					//If another claim segment is encountered, then we have finished processing all of the procedure-level adjustments.  Discontinue processing.
-					break;
-				}
-				if(seg.SegmentID!="CAS") {
-					continue;//Not an adjustment segment.
-				}
-				listClaimCasSegments.Add(seg);
-			}
-			return ConvertCasAdjustmentsToHumanReadable(listClaimCasSegments);
+		///<summary>1000A N1*PR: Payer Identification.  Required.  Repeat 1.  Guide page 87.</summary>
+		private void ProcessN1_PR(int segNum) {
+			X12Segment segN1_PR=_listSegments[segNum];
+			//N101 Entity Identifier Code.  Required.  Always PR=Payer.
+			//N102 Payer Name.  Required.
+			_payerName=segN1_PR.Get(2);
+			//N103 Identification Code Qualifier.  Situational.
+			//N104 Payer Identifier.  Situational.
+			_payerId=segN1_PR.Get(4);
+			//N105 Entity Relationship Code. Not used.
+			//N106 Entity Identifier Code.  Not used.
 		}
 
-		public List<string> GetProcRemarks(int segSvcIndex) {
-			List<string> listRemarks=new List<string>();
-			int startSegNum=_listSegNumsSVC[segSvcIndex];
-			int endSegNum=_listSegments.Count;
-			if(segSvcIndex<_listSegNumsSVC.Count-1) {
-				endSegNum=_listSegNumsSVC[segSvcIndex+1];
+		///<summary>1000B N1*PE: Payee identification.  Required.  Repeat 1.  Guide page 102.  We include this information because it could be helpful for those customers who are using clinics.</summary>
+		private void ProcessN1_PE(int segNum) {
+			X12Segment segN1_PE=_listSegments[segNum];
+			//N101 Entity Identifier Code.  Required.  Always PE.
+			//N102 Payee Name.  Required.
+			_payeeName=segN1_PE.Get(2);
+			//N103 Identification Code Qualifier.  Required.
+			_payeeIdType="";
+			string qualifier=segN1_PE.Get(3);
+			if(qualifier=="FI") {
+				_payeeIdType="TIN";
 			}
-			for(int j=startSegNum;j<endSegNum;j++) {
-				X12Segment seg=_listSegments[j];
-				if(seg.SegmentID=="CLP") {
-					//If another claim segment is encountered, then we have finished processing all of the procedure-level remarks.  Discontinue processing.
-					break;
-				}
-				if(seg.SegmentID!="LQ") {
-					continue;//Not a remark segment.
-				}
-				string code=seg.Get(2);
-				if(seg.Get(1)=="HE") {//Claim Payment Remark Codes
-					listRemarks.Add(GetDescriptFrom411(code));
-				}
-				else if(seg.Get(1)=="RX") {//National Council for Prescription Drug Programs Reject/Payment Codes.
-					//We do not send prescriptions with X12, so we should never get responses with these codes.
-					listRemarks.Add("Rx Rejection Reason Code: "+code);//just in case, output a generic message so the user can look it up.
-				}
-				else {//Should not be possible, but here for future versions of X12 just in case.
-					listRemarks.Add("Code List Qualifier: "+seg.Get(1)+" Code: "+code);
-				}
+			else if(qualifier=="XV") {
+				_payeeIdType="Medicaid ID";
 			}
-			return listRemarks;
+			else if(qualifier=="XX") {
+				_payeeIdType="NPI";
+			}
+			//N104 Payee Identification Code.  Required.
+			_payeeId=segN1_PE.Get(4);
+			//N105 Not used.
+			//N106 Not used.
 		}
 
-		///<summaryReturns a list of strings with values in twos, such that the first item is the amount description, the second is the amount.</summary>
-		public List<string> GetProcSupplementalInfo(int segSvcIndex) {
-			List<string> listSupplementalInfo=new List<string>();
-			int startSegNum=_listSegNumsSVC[segSvcIndex];
-			int endSegNum=_listSegments.Count;
-			if(segSvcIndex<_listSegNumsSVC.Count-1) {
-				endSegNum=_listSegNumsSVC[segSvcIndex+1];
+		///<summary>1000A N3: Payer Address.  Required.  Repeat 1.  Guide page 89.</summary>
+		private void ProcessN3_PR(int segNum) {
+			X12Segment segN3=_listSegments[segNum];
+			//N301 Payer Address Line 1.  Required
+			string address1=segN3.Get(1);
+			//N301 Payer Address Line 2.  Situational.
+			string address2=segN3.Get(2);
+			if(address2=="") {
+				_payerAddress=address1;
 			}
-			for(int j=startSegNum;j<endSegNum;j++) {
-				X12Segment seg=_listSegments[j];
-				if(seg.SegmentID=="CLP") {
-					//If another claim segment is encountered, then we have finished processing all of the procedure-level supplemental info.  Discontinue processing.
-					break;
-				}
-				if(seg.SegmentID!="AMT") {
-					continue;//Not a supplemental info segment.
-				}
-				string code=seg.Get(1);
-				decimal amount=PIn.Decimal(seg.Get(2));
-				listSupplementalInfo.Add(GetDescriptForAmountQualifierCode(code)); listSupplementalInfo.Add(amount.ToString("f2"));
+			else {
+				_payerAddress=address1+" "+address2;
 			}
-			return listSupplementalInfo;
 		}
 
-		#endregion Procedure Level
+		///<summary>1000A N4: Payer City, State, ZIP Code.  Required.  Repeat 1.  Guide page 90.</summary>
+		private void ProcessN4_PR(int segNum) {
+			X12Segment segN4=_listSegments[segNum];
+			//N401 City Name.  Required
+			_payerCity=segN4.Get(1);
+			//N402 State or Province Code.  Situational.  Required for United States addresses.
+			_payerState=segN4.Get(2);
+			//N403 Postal Code.  Situational.  Required for United States addresses.
+			_payerZip=segN4.Get(3);
+			//N404 County Code.  Situational.  Required for addresses outside the United States.
+			//N405 Not used.
+			//N406 Not used.
+			//N407 Country Subdivision Code.  Required when the address is not in the United States.
+		}
+
+		///<summary>Gets the contact information from segment PER*BL appended into a single string.
+		///Phone/email in PER04 or the contact phone/email in PER06 or both.
+		///If neither PER04 nor PER06 are present, then returns empty string.</summary>
+		private string ProcessPER_BL(int segNum) {
+			X12Segment segPER_BL=_listSegments[segNum];
+			string contact_info=segPER_BL.Get(4);//Contact number 1.
+			if(segPER_BL.Get(6)!="") {//Contact number 2.
+				if(contact_info!="") {
+					contact_info+=" or ";
+				}
+				contact_info+=segPER_BL.Get(6);
+			}
+			if(segPER_BL.Get(8)!="") {//Telephone extension for contact number 2.
+				if(contact_info!="") {
+					contact_info+=" x";
+				}
+				contact_info+=segPER_BL.Get(8);
+			}
+			return contact_info;
+		}
+
+		///<summary>PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.  Each PLB segment can return up to 6 adjustments.</summary>
+		private List<Hx835_ProvAdj> ProcessPLB(int segNum) {
+			List<Hx835_ProvAdj> retVal=new List<Hx835_ProvAdj>();
+			X12Segment segPLB=_listSegments[segNum];
+			string npi=segPLB.Get(1);//PLB01 is required.
+			string dateFiscalPeriodStr=segPLB.Get(2);//PLB02 is required.
+			DateTime dateFiscalPeriod=DateTime.MinValue;
+			try {
+				int dateEffectiveYear=int.Parse(dateFiscalPeriodStr.Substring(0,4));
+				int dateEffectiveMonth=int.Parse(dateFiscalPeriodStr.Substring(4,2));
+				int dateEffectiveDay=int.Parse(dateFiscalPeriodStr.Substring(6,2));
+				dateFiscalPeriod=new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay);
+			}
+			catch {
+				//Oh well, not very important infomration anyway.
+			}
+			//After PLB02, the segments are in pairs, with a minimum of one pair, and a maximum of six pairs.  Starting with PLB03 and PLB04 (both are required), the remaining pairs are optional.
+			//Each pair represents a single provider adjustment and reason for adjustment.  The provider is identified in PLB01 by NPI.
+			//There can be more than one PLB segment, therefore it is possible to create more than six adjustments for a single provider by creating more than one PLB segment.
+			//The loop below is intended to capture all adjustments within the current PLB segment.
+			int segNumAdjCode=3;//PLB03 and PLB04 are required.  We start at segment 3 and increment by 2 with each iteration of the loop.
+			while(segNumAdjCode<segPLB.Elements.Length) {
+				Hx835_ProvAdj provAdj=new Hx835_ProvAdj();
+				provAdj.Npi=npi;
+				provAdj.DateFiscalPeriod=dateFiscalPeriod;
+				provAdj.ReasonCode=segPLB.Get(segNumAdjCode,1);
+				provAdj.ReasonCodeDescript=GetDescriptForProvAdjCode(provAdj.ReasonCode);
+				//For each adjustment reason code, the reference identification is situational.
+				provAdj.RefIdentification="";
+				if(segPLB.Get(3).Length>provAdj.ReasonCode.Length) {
+					provAdj.RefIdentification=segPLB.Get(3,2);
+				}
+				//For each adjustment reason code, an amount is required.
+				provAdj.AdjAmt=PIn.Decimal(segPLB.Get(segNumAdjCode+1));
+				retVal.Add(provAdj);
+				segNumAdjCode+=2;
+			}
+			return retVal;
+		}
+
+		private Hx835_Proc ProcessSVC(int segNum) {
+			X12Segment segSVC=_listSegments[segNum];
+			Hx835_Proc proc=new Hx835_Proc();
+			proc.ProcCode=segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1];//SVC1-2
+			proc.ProcFee=PIn.Decimal(segSVC.Get(2));//SVC2
+			proc.InsPaid=PIn.Decimal(segSVC.Get(3));//SVC3
+			segNum++;
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
+				//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
+				segNum++;
+			}
+			proc.ListProcAdjustments=new List<Hx835_Adj>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
+				//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.
+				proc.ListProcAdjustments.AddRange(ProcessCAS(segNum));
+				segNum++;
+			}
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
+				//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
+				if(_listSegments[segNum].Get(1)=="6R") {
+					//2110 REF: Line Item Control Number.  Situational.  Repeat 1.  Guide page 206.
+					string strRef02=_listSegments[segNum].Get(2);
+					if(strRef02.StartsWith("p")) {
+						//If the control number is prefixed with a "p", then it is a ProcNum.
+						//Otherwise, for older versions, it will be the Line Counter from LX01 in the 837, which is basically an index.  We will ignore these older index based values.
+						proc.ProcNum=PIn.Long(strRef02.Substring(1));//The entire value excluding the leading "p".
+					}	
+				}
+				//2110 REF: Rendering Provider Information.  Situational.  Repeat 10.  Guide page 207.  We do not use.
+				//2110 REF: HealthCare Policy Identification.  Situational.  Repeat 5.  Guide page 209.  We do not use.
+				segNum++;
+			}
+			proc.ListSupplementalInfo=new List<Hx835_Info>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="AMT") {
+				//2110 AMT: Service Supplemental Amount.  Situational.  Repeat 9.  Guide page 211.
+				proc.ListSupplementalInfo.Add(ProcessAMT(segNum));
+				segNum++;
+			}
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="QTY") {
+				//2110 QTY: Service Supplemental Quantity.  Situational.  Repeat 6.  Guide page 213.  We do not use.
+				segNum++;
+			}
+			proc.ListRemarks=new List<string>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="LQ") {
+				//2110 LQ: Health Care Remark Codes.  Repeat 99.  Guide page 215.
+				proc.ListRemarks.Add(ProcessLQ(segNum));
+				segNum++;
+			}			
+			return proc;
+		}
+
+		///<summary>TRN: Reassociation Trace Number.  Required.  Repeat 1.  Guide page 77.</summary>
+		private void ProcessTRN(int segNum) {
+			X12Segment segTRN=_listSegments[segNum];
+			//TRN01 Trace Type Code.  Required.  Always set to 1.  Not useful.  We do not use.
+			//TRN02 Check or EFT Trace Number.  Required.
+			_transRefNum=segTRN.Get(2);
+			//TRN03 Payer Identifier.  Required.  Must be a 1 followed by the payer's EIN (or TIN).  We do not use.
+			//TRN04 Originating Company Supplemental Code.  Situational.  We do not use.
+		}
+
+		#endregion Segment Processing
 		#region Helpers
-		///<summary>Converts a list of CAS segments into human readable data.  Helper function for both claim level and procedure level.
-		///Returns a list of strings with values in fours, such that the first item is the adjustment description, the second is the reason description, and the third is the monetary amount, the fourth is the adjustment code (CO,PI,PR, or OA).</summary>
-		private List<string> ConvertCasAdjustmentsToHumanReadable(List<X12Segment> listCasSegments) {
-			List<string> listAdjustments=new List<string>();
-			for(int i=0;i<listCasSegments.Count;i++) {
-				X12Segment seg=listCasSegments[i];
-				string adjCode=seg.Get(1);
-				string adjDescript="";
-				if(adjCode=="CO") {
-					adjDescript="Contractual Obligations";
-				}
-				else if(adjCode=="PI") {
-					adjDescript="Payor Initiated Reductions";
-				}
-				else if(adjCode=="PR") {//Patient Responsibility
-					adjDescript="Patient Portion";
-				}
-				else { //adjCode=="OA"
-					adjDescript="Other Adjustments";
-				}
-				//Each CAS segment can contain up to 6 adjustments of the same type.
-				for(int k=2;k<=17;k+=3) {
-					string strAdjReasonCode=seg.Get(k);
-					string strAmt=seg.Get(k+1);
-					if(strAdjReasonCode=="" && strAmt=="") {
-						continue;
-					}
-					decimal amt=PIn.Decimal(strAmt);
-					if(amt==0) {
-						continue;
-					}
-					string strAdjReasonDescript="";
-					if(strAdjReasonCode!="") {
-						strAdjReasonDescript=GetDescriptFrom139(strAdjReasonCode);
-					}
-					listAdjustments.Add(adjDescript); listAdjustments.Add(strAdjReasonDescript); listAdjustments.Add(amt.ToString("f2")); listAdjustments.Add(adjCode);
-				}
-			}
-			return listAdjustments;
-		}
 
 		public string GetHumanReadable() {
-			string result=
-				"Claim Status Reponse From "+GetPayerName()+Environment.NewLine
-				+"Effective Pay Date: "+GetDateEffective().ToShortDateString()+Environment.NewLine
-				+"Amount: "+GetPaymentAmount()+Environment.NewLine
-				+"Individual Claim Status List: "+Environment.NewLine
-				+"Status	ClaimAmt	PaidAmt	PatientPortion	PayerControlNum";
-			List<string> claimTrackingNumbers=GetClaimTrackingNumbers();
-			for(int i=0;i<claimTrackingNumbers.Count;i++) {
-				string[] claimInfo=GetClaimInfo(claimTrackingNumbers[i]);
-				for(int j=0;j<claimInfo.Length;j++) {
-					result+=claimInfo[j]+"\\t";
-				}
-				result+=Environment.NewLine;
+			StringBuilder retVal=new StringBuilder();
+			retVal.AppendLine("Claim Status Reponse From "+PayerName);
+			retVal.AppendLine("Effective Pay Date: "+DateEffective.ToShortDateString());
+			retVal.AppendLine("Amount: "+InsPaid);
+			retVal.AppendLine("Individual Claim Status List: ");
+			retVal.AppendLine("Status	ClaimFee	InsPaid	PatientPortion	PayerControlNum");
+			List<Hx835_Claim> listClaimEOBs=_listClaimEOBs;
+			for(int i=0;i<listClaimEOBs.Count;i++) {
+				Hx835_Claim claimEob=listClaimEOBs[i];
+				retVal.Append(claimEob.StatusCodeDescript+"\t");
+				retVal.Append(claimEob.ClaimFee.ToString("f2")+"\t");
+				retVal.Append(claimEob.InsPaid.ToString("f2")+"\t");
+				retVal.Append(claimEob.PatientPortion.ToString("f2")+"\t");
+				retVal.AppendLine(claimEob.PayorControlNumber);
 			}
-			return result;
+			return retVal.ToString();
 		}
 
 		#endregion Helpers
 		#region Code To Description
+
+		private string GetDescriptForAmountQualifierCode(string code) {
+			if(code=="AU") {
+				return "Coverage Amount";
+			}
+			else if(code=="B6") {
+				return "Allowed - Actual";
+			}
+			else if(code=="D8") {
+				return "Discount Amount";
+			}
+			else if(code=="DY") {
+				return "Per Day Limit";
+			}
+			else if(code=="F5") {
+				return "Patient Amount Paid";
+			}
+			else if(code=="I") {
+				return "Interest";
+			}
+			else if(code=="KH") {
+				return "Late Filing Reduction";
+			}
+			else if(code=="NL") {
+				return "Negative Ledger Balance";
+			}
+			else if(code=="T") {
+				return "Tax";
+			}
+			else if(code=="T2") {
+				return "Total Claim Before Taxes";
+			}
+			else if(code=="ZK") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 1";
+			}
+			else if(code=="ZL") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 2";
+			}
+			else if(code=="ZM") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 3";
+			}
+			else if(code=="ZN") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 4";
+			}
+			else if(code=="ZO") {
+				return "Federal Medicare or Medicaid Payment Mandate - Category 5";
+			}
+			return "Qualifier Code: "+code;
+		}
 
 		private string GetDescriptForClaimStatusCode(string code) {
 			string claimStatusCodeDescript="";
@@ -791,6 +842,25 @@ namespace OpenDentBusiness
 				claimStatusCodeDescript="Predetermination Pricing Only - No Payment";
 			}
 			return claimStatusCodeDescript;
+		}
+
+		public string GetDescriptForPaymentMethodCode(string code) {
+			if(code=="ACH") {
+				return "Automated Clearing House (ACH)";
+			}
+			else if(code=="BOP") {
+				return "Financial Institution Option";
+			}
+			else if(code=="CHK") {
+				return "Check";
+			}
+			else if(code=="FWT") {
+				return "Federal Reserve Funds/Wire Transfer - Nonrepetitive";
+			}
+			else if(code=="NON") {
+				return "Non-payment Data";
+			}
+			return "Pay Method Code: "+code;
 		}
 
 		///<summary>Used for the reason codes in the PLB segment.</summary>
@@ -921,35 +991,30 @@ namespace OpenDentBusiness
 			return "Reason "+code;
 		}
 
-		private string GetDescriptForAmountQualifierCode(string code) {
-			if(code=="B6") {
-				return "Allowed - Actual";
+		///<summary>Gets the description for the transaction handling code in Table 1 (Header) BPR01. Required.</summary>
+		public string GetDescriptForTransactionHandlingCode(string code) {
+			if(code=="C") {
+				return "Payment Accompanies Remittance Advice";
 			}
-			else if(code=="KH") {
-				return "Late Filing Reduction";
+			else if(code=="D") {
+				return "Make Payment Only";
 			}
-			else if(code=="T") {
-				return "Tax";
+			else if(code=="H") {
+				return "Notification Only";
 			}
-			else if(code=="T2") {
-				return "Total Claim Before Taxes";
+			else if(code=="I") {
+				return "Remittance Information Only";
 			}
-			else if(code=="ZK") {
-				return "Federal Medicare or Medicaid Payment Mandate - Category 1";
+			else if(code=="P") {
+				return "Prenotification of Future Transfers";
 			}
-			else if(code=="ZL") {
-				return "Federal Medicare or Medicaid Payment Mandate - Category 2";
+			else if(code=="U") {
+				return "Split Payment and Remittance";
 			}
-			else if(code=="ZM") {
-				return "Federal Medicare or Medicaid Payment Mandate - Category 3";
+			else if(code=="X") {
+				return "Handling Party's Option to Split Payment and Remittance";
 			}
-			else if(code=="ZN") {
-				return "Federal Medicare or Medicaid Payment Mandate - Category 4";
-			}
-			else if(code=="ZO") {
-				return "Federal Medicare or Medicaid Payment Mandate - Category 5";
-			}
-			return "Qualifier Code: "+code;
+			return "Transaction Code: "+code;
 		}
 
 		///<summary>Code Source 139. Claim Adjustment Reason Codes.  http://www.wpc-edi.com/reference/codelists/healthcare/claim-adjustment-reason-codes/ .
@@ -2635,14 +2700,90 @@ namespace OpenDentBusiness
 			else if(code=="N696") { return "Alert: This reversal is due to a Coordination of Benefits or Third Party Liability Recovery retroactive adjustment. (Note: To be used with claim/service reversal)"; }
 			else if(code=="N697") { return "Alert: This reversal is due to a payer's retroactive contract incentive program adjustment. (Note: To be used with claim/service reversal)"; }
 			else if(code=="N698") { return "Alert: This reversal is due to non-payment of the Health Insurance Exchange premiums by the end of the premium payment grace period, resulting in loss of coverage. (Note: To be used with claim/service reversal)"; }
-
-
-			return "Remark code "+code;//catch all.  The user can look up the code manually in this case.
+			return "Remark code: "+code;//catch all.  The user can look up the code manually in this case.
 		}
 
 		#endregion Code To Description
 
 	}
+
+	#region Helper Classes
+
+	//Each class in this region is preceeded with an H to help identify the class as a helper class.
+	//Immediately following the H, all classes also include the string x835 in their name, so it is easy to identify what purpose they are helpers for.
+
+	///<summary>Provider level adjustment corresponding to a PLB segment.</summary>
+	public class Hx835_ProvAdj {
+		///<summary>PLB01</summary>
+		public string Npi;
+		///<summary>PLB02</summary>
+		public DateTime DateFiscalPeriod;
+		///<summary>Description of the ReasonCode in human readable terms</summary>
+		public string ReasonCodeDescript;
+		///<summary>PLB03-1 or PLB05-1 or PLB07-1 or PLB09-1 or PLB11-1 or PLB13-1</summary>
+		public string ReasonCode;
+		///<summary>PLB03-2 or PLB05-2 or PLB07-2 or PLB09-2 or PLB11-2 or PLB13-2</summary>
+		public string RefIdentification;
+		///<summary>PLB04</summary>
+		public decimal AdjAmt;
+	}
+
+	///<summary>Information about a single EOB.  There can be many EOBs within a single 835.</summary>
+	public class Hx835_Claim {
+		///<summary>CLP01 in loop 2100.  Referred to in this format as a Patient Control Number.
+		///The claim tracking numbers correspond to CLM01 exactly as submitted in the 837.
+		///We refer to CLM01 as the claim identifier on our end. We allow alphanumeric in our claim identifiers, so we must store as a string.</summary>
+		public string ClaimTrackingNumber;
+		///<summary>CLP07 The claim control number used to identify the claim in the insurance company's database.</summary>
+		public string PayorControlNumber;
+		///<summary>CLP02 A human readable copy of the claim status code.</summary>
+		public string StatusCodeDescript;
+		///<summary>CLP03 The total amount charged by the dentist for the claim.</summary>
+		public decimal ClaimFee;
+		///<summary>CLP04 The total amount insurance paid.</summary>
+		public decimal InsPaid;
+		///<summary>CLP05 A portion of the ChargeAmtTotal which the patient is responsible for.</summary>
+		public decimal PatientPortion;
+		///<summary>CAS Adjustments made by the insurance company at the claim level.  These adjustments help explain part of the amount difference between the claim fee and the amount paid.
+		///There are also adjustments at the procedure level and the patient portion to account for when balancing.</summary>
+		public List<Hx835_Adj> ListClaimAdjustments;
+		///<summary>MIA and MOA segments.</summary>
+		public List<Hx835_Info> ListAdjudicationInfo;
+		///<summary>AMT segments.</summary>
+		public List<Hx835_Info> ListSupplementalInfo;
+		///<summary>SVC segments.</summary>
+		public List<Hx835_Proc> ListProcs;
+	}
+
+	///<summary>Information about a single procedure on an EOB.  There can be many of these for each Hx835_Claim.</summary>
+	public class Hx835_Proc {
+		public string ProcCode;
+		public decimal ProcFee;
+		public decimal InsPaid;
+		///<summary>REF*6R from the 837, or zero for older claims.</summary>
+		public long ProcNum;
+		public List<Hx835_Adj> ListProcAdjustments;
+		public List<Hx835_Info> ListSupplementalInfo;
+		public List<string> ListRemarks;
+	}
+
+	///<summary>Corresponds to a CAS segment.  Both the claim level and procedure level include CAS segments.</summary>
+	public class Hx835_Adj {
+		public string AdjustDescript;
+		public string ReasonDescript;
+		public decimal AdjAmt;
+		///<summary>Will be one of these 4 values: CO, PI, PR, OA.</summary>
+		public string AdjCode;
+	}
+
+	///<summary>The values loaded into this class come from multiple segments, including the MIA, MOA, and AMT segments.</summary>
+	public class Hx835_Info {
+		public string FieldName;
+		public string FieldValue;
+	}
+
+	#endregion Helper CLasses
+
 }
 
 #region Examples
@@ -2681,7 +2822,7 @@ namespace OpenDentBusiness
 //GE*1*1~
 //IEA*1*000000001~
 
-//Example 2 From 835 Specification (modified to include a procedure line item control number in REF*6R, procedure supplemental info in AMT, and procedure remarks in LQ):
+//Example 2 From 835 Specification (modified to include: claim supplemental info in AMT, procedure line item control number in REF*6R, procedure supplemental info in AMT, and procedure remarks in LQ):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*12233~
@@ -2697,6 +2838,7 @@ namespace OpenDentBusiness
 //CLP*55545554444*1*800*450*300*12*94060555410000~
 //CAS*CO*A2*50~
 //NM1*QC*1*BUDD*WILLIAM****MI*33344555510~
+//AMT*D8*0.99~
 //SVC*HC:99211*800*500~
 //DTM*150*20020301~
 //DTM*151*20020304~

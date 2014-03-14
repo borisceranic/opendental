@@ -593,13 +593,12 @@ namespace OpenDentBusiness{
 					X835 x835=new X835(messageText);
 					etrans.Etype=EtransType.ERA_835;
 					Etranss.Insert(etrans);
-					List<string> claimTrackingNumbers=x835.GetClaimTrackingNumbers();
-					for(int i=0;i<claimTrackingNumbers.Count;i++) {
-						string ack=x835.GetClaimInfo(claimTrackingNumbers[i])[3];
-						long claimNum=Claims.GetClaimNumForIdentifier(claimTrackingNumbers[i]);
+					List<Hx835_Claim> listClaimEOBs=x835.ListClaimEOBs;
+					for(int i=0;i<listClaimEOBs.Count;i++) {
+						long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[i].ClaimTrackingNumber);
 						//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
 						//We overwrite existing acks from 997s, 999s, and 277s.
-						command="UPDATE etrans SET AckCode='"+ack+"', "
+						command="UPDATE etrans SET AckCode='A', "
 							+"AckEtransNum="+POut.Long(etrans.EtransNum)
 							+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
 							+" AND ClaimNum="+POut.Long(claimNum)

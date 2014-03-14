@@ -255,22 +255,23 @@ namespace OpenDental{
 			this.gridProcedureAdjustments.Name = "gridProcedureAdjustments";
 			this.gridProcedureAdjustments.ScrollValue = 0;
 			this.gridProcedureAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridProcedureAdjustments.Size = new System.Drawing.Size(956, 107);
+			this.gridProcedureAdjustments.Size = new System.Drawing.Size(956, 120);
 			this.gridProcedureAdjustments.TabIndex = 198;
 			this.gridProcedureAdjustments.TabStop = false;
 			this.gridProcedureAdjustments.Title = "Procedure Adjustments";
 			this.gridProcedureAdjustments.TranslationName = "FormEtrans835Edit";
+			this.gridProcedureAdjustments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridProcedureAdjustments_CellDoubleClick);
 			// 
 			// gridRemarks
 			// 
 			this.gridRemarks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridRemarks.HScrollVisible = false;
-			this.gridRemarks.Location = new System.Drawing.Point(9, 245);
+			this.gridRemarks.Location = new System.Drawing.Point(9, 258);
 			this.gridRemarks.Name = "gridRemarks";
 			this.gridRemarks.ScrollValue = 0;
 			this.gridRemarks.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridRemarks.Size = new System.Drawing.Size(956, 107);
+			this.gridRemarks.Size = new System.Drawing.Size(956, 100);
 			this.gridRemarks.TabIndex = 197;
 			this.gridRemarks.TabStop = false;
 			this.gridRemarks.Title = "Remarks";
@@ -297,15 +298,16 @@ namespace OpenDental{
 			this.gridSupplementalInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridSupplementalInfo.HScrollVisible = false;
-			this.gridSupplementalInfo.Location = new System.Drawing.Point(9, 358);
+			this.gridSupplementalInfo.Location = new System.Drawing.Point(9, 364);
 			this.gridSupplementalInfo.Name = "gridSupplementalInfo";
 			this.gridSupplementalInfo.ScrollValue = 0;
 			this.gridSupplementalInfo.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridSupplementalInfo.Size = new System.Drawing.Size(956, 107);
+			this.gridSupplementalInfo.Size = new System.Drawing.Size(956, 100);
 			this.gridSupplementalInfo.TabIndex = 213;
 			this.gridSupplementalInfo.TabStop = false;
 			this.gridSupplementalInfo.Title = "Supplemental Info";
 			this.gridSupplementalInfo.TranslationName = "FormEtrans835Edit";
+			this.gridSupplementalInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSupplementalInfo_CellDoubleClick);
 			// 
 			// FormEtrans835ProcEdit
 			// 

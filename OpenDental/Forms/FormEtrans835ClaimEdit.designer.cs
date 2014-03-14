@@ -53,6 +53,7 @@ namespace OpenDental{
 			this.gridAdjudicationInfo = new OpenDental.UI.ODGrid();
 			this.gridProcedureBreakdown = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
+			this.gridSupplementalInfo = new OpenDental.UI.ODGrid();
 			this.groupBalancing.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -287,22 +288,23 @@ namespace OpenDental{
 			this.gridClaimAdjustments.Name = "gridClaimAdjustments";
 			this.gridClaimAdjustments.ScrollValue = 0;
 			this.gridClaimAdjustments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridClaimAdjustments.Size = new System.Drawing.Size(956, 107);
+			this.gridClaimAdjustments.Size = new System.Drawing.Size(956, 100);
 			this.gridClaimAdjustments.TabIndex = 198;
 			this.gridClaimAdjustments.TabStop = false;
 			this.gridClaimAdjustments.Title = "Claim Adjustments";
 			this.gridClaimAdjustments.TranslationName = "FormEtrans835Edit";
+			this.gridClaimAdjustments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClaimAdjustments_CellDoubleClick);
 			// 
 			// gridAdjudicationInfo
 			// 
 			this.gridAdjudicationInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridAdjudicationInfo.HScrollVisible = false;
-			this.gridAdjudicationInfo.Location = new System.Drawing.Point(9, 551);
+			this.gridAdjudicationInfo.Location = new System.Drawing.Point(9, 452);
 			this.gridAdjudicationInfo.Name = "gridAdjudicationInfo";
 			this.gridAdjudicationInfo.ScrollValue = 0;
 			this.gridAdjudicationInfo.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridAdjudicationInfo.Size = new System.Drawing.Size(956, 107);
+			this.gridAdjudicationInfo.Size = new System.Drawing.Size(956, 100);
 			this.gridAdjudicationInfo.TabIndex = 197;
 			this.gridAdjudicationInfo.TabStop = false;
 			this.gridAdjudicationInfo.Title = "Claim Adjudication Info";
@@ -315,11 +317,11 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridProcedureBreakdown.HScrollVisible = false;
-			this.gridProcedureBreakdown.Location = new System.Drawing.Point(9, 285);
+			this.gridProcedureBreakdown.Location = new System.Drawing.Point(9, 278);
 			this.gridProcedureBreakdown.Name = "gridProcedureBreakdown";
 			this.gridProcedureBreakdown.ScrollValue = 0;
 			this.gridProcedureBreakdown.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridProcedureBreakdown.Size = new System.Drawing.Size(956, 260);
+			this.gridProcedureBreakdown.Size = new System.Drawing.Size(956, 168);
 			this.gridProcedureBreakdown.TabIndex = 0;
 			this.gridProcedureBreakdown.TabStop = false;
 			this.gridProcedureBreakdown.Title = "Procedure Breakdown";
@@ -341,10 +343,27 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// gridSupplementalInfo
+			// 
+			this.gridSupplementalInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridSupplementalInfo.HScrollVisible = false;
+			this.gridSupplementalInfo.Location = new System.Drawing.Point(9, 558);
+			this.gridSupplementalInfo.Name = "gridSupplementalInfo";
+			this.gridSupplementalInfo.ScrollValue = 0;
+			this.gridSupplementalInfo.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridSupplementalInfo.Size = new System.Drawing.Size(956, 100);
+			this.gridSupplementalInfo.TabIndex = 211;
+			this.gridSupplementalInfo.TabStop = false;
+			this.gridSupplementalInfo.Title = "Supplemental Info";
+			this.gridSupplementalInfo.TranslationName = "FormEtrans835Edit";
+			this.gridSupplementalInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSupplementalInfo_CellDoubleClick);
+			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.gridSupplementalInfo);
 			this.Controls.Add(this.groupBalancing);
 			this.Controls.Add(this.gridClaimAdjustments);
 			this.Controls.Add(this.gridAdjudicationInfo);
@@ -411,5 +430,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textInsPaidCalc;
 		private System.Windows.Forms.TextBox textProcAdjAmtSum;
 		private System.Windows.Forms.GroupBox groupBalancing;
+		private UI.ODGrid gridSupplementalInfo;
 	}
 }

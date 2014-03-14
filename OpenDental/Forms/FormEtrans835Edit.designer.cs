@@ -323,11 +323,11 @@ namespace OpenDental{
 			this.textPayeeID.Size = new System.Drawing.Size(90, 20);
 			this.textPayeeID.TabIndex = 169;
 			// 
-			// textClaimPaymentTotal
+			// textClaimInsPaidSum
 			// 
 			this.textClaimInsPaidSum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textClaimInsPaidSum.Location = new System.Drawing.Point(6, 37);
-			this.textClaimInsPaidSum.Name = "textClaimPaymentTotal";
+			this.textClaimInsPaidSum.Name = "textClaimInsPaidSum";
 			this.textClaimInsPaidSum.ReadOnly = true;
 			this.textClaimInsPaidSum.Size = new System.Drawing.Size(110, 20);
 			this.textClaimInsPaidSum.TabIndex = 176;
@@ -342,11 +342,11 @@ namespace OpenDental{
 			this.labelEquation.Text = "Claim InsPaid Sum         -    Prov AdjAmt Sum           =    Pay Amount Calc";
 			this.labelEquation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// textProvAdjustmentTotal
+			// textProjAdjAmtSum
 			// 
 			this.textProjAdjAmtSum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textProjAdjAmtSum.Location = new System.Drawing.Point(137, 37);
-			this.textProjAdjAmtSum.Name = "textProvAdjustmentTotal";
+			this.textProjAdjAmtSum.Name = "textProjAdjAmtSum";
 			this.textProjAdjAmtSum.ReadOnly = true;
 			this.textProjAdjAmtSum.Size = new System.Drawing.Size(110, 20);
 			this.textProjAdjAmtSum.TabIndex = 178;
@@ -371,11 +371,11 @@ namespace OpenDental{
 			this.label20.Text = "=";
 			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textPaymentAmountCalc
+			// textPayAmountCalc
 			// 
 			this.textPayAmountCalc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textPayAmountCalc.Location = new System.Drawing.Point(265, 37);
-			this.textPayAmountCalc.Name = "textPaymentAmountCalc";
+			this.textPayAmountCalc.Name = "textPayAmountCalc";
 			this.textPayAmountCalc.ReadOnly = true;
 			this.textPayAmountCalc.Size = new System.Drawing.Size(110, 20);
 			this.textPayAmountCalc.TabIndex = 184;
@@ -392,6 +392,7 @@ namespace OpenDental{
 			this.gridProviderAdjustments.TabStop = false;
 			this.gridProviderAdjustments.Title = "Provider Adjustments";
 			this.gridProviderAdjustments.TranslationName = "FormEtrans835Edit";
+			this.gridProviderAdjustments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridProviderAdjustments_CellDoubleClick);
 			// 
 			// gridClaimDetails
 			// 
