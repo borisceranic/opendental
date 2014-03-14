@@ -10,7 +10,7 @@ namespace OpenDentBusiness{
 		public long MedicationPatNum;
 		///<summary>FK to patient.PatNum.</summary>
 		public long PatNum;
-		///<summary>FK to medication.MedicationNum.  If 0, implies that the medication order came from NewCrop.</summary>
+		///<summary>FK to medication.MedicationNum.  If 0, implies that the medication order came from NewCrop or was a Manual Rx order.  This was done to allow MU2 measures to be set by either creating a medication from the medical window, or by creating an manual prescription.</summary>
 		public long MedicationNum;
 		///<summary>Medication notes specific to this patient.</summary>
 		public string PatNote;
