@@ -1138,9 +1138,12 @@ Group By procdate Order by procdate desc
 				}
 				whereClin+=") ";
 			}
+			//Moved capitation writoff logic here to more closely match the Daily and Annual P&I report logic.
 			report.Query="SELECT "+DbHelper.DateColumn("procedurelog.ProcDate")+" ProcDate, "
 				+"SUM(procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)) "
+				+"-IFNULL(SUM(claimproc.WriteOff),0) "
 				+"FROM procedurelog "
+				+"LEFT JOIN claimproc ON procedurelog.procnum=claimproc.procnum AND claimproc.status='7' "
 				+"WHERE "+DbHelper.DateColumn("procedurelog.ProcDate")+" >= "+POut.Date(dateFrom)+" "
 				+"AND "+DbHelper.DateColumn("procedurelog.ProcDate")+" <= "+POut.Date(dateTo)+" "
 				+"AND procedurelog.ProcStatus = '2' "//complete
@@ -1150,54 +1153,55 @@ Group By procdate Order by procdate desc
 				+"ORDER BY "+DbHelper.DateColumn("procedurelog.ProcDate");
 			TableCharge=report.GetTempTable();
 
-//NEXT is TableCapWriteoff--------------------------------------------------------------------------
-/*
-SELECT DateCP, SUM(WriteOff) From claimproc
-WHERE Status='7'
-GROUP BY DateCP Order by DateCP  
-*/
-			report=new ReportSimpleGrid();
-			whereProv="";
-			if(!checkAllProv.Checked) {
-				for(int i=0;i<listProv.SelectedIndices.Count;i++){
-					if(i==0){
-						whereProv+=" AND (";
-					}
-					else{
-						whereProv+="OR ";
-					}
-					whereProv+="claimproc.ProvNum = "
-						+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+" ";
-				}
-				whereProv+=") ";
-			}
-			whereClin="";
-			if(!checkAllClin.Checked) {
-				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND (";
-					}
-					else {
-						whereClin+="OR ";
-					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="claimproc.ClinicNum = 0 ";
-					}
-					else {
-						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
-					}
-				}
-				whereClin+=") ";
-			}
-			report.Query="SELECT DateCP, SUM(WriteOff) FROM claimproc WHERE "
-				+"DateCP >= "+POut.Date(dateFrom)+" "
-				+"AND DateCP <= "+POut.Date(dateTo)+" "
-				+"AND Status = '7' "//CapComplete
-				+whereProv
-				+whereClin
-				+" GROUP BY DateCP "
-				+"ORDER BY DateCP"; 
-			TableCapWriteoff=report.GetTempTable();
+			//Capitation Writeoff Logic is now part of TableCharge (Production) logic.
+////NEXT is TableCapWriteoff--------------------------------------------------------------------------
+///*
+//SELECT DateCP, SUM(WriteOff) From claimproc
+//WHERE Status='7'
+//GROUP BY DateCP Order by DateCP  
+//*/
+//			report=new ReportSimpleGrid();
+//			whereProv="";
+//			if(!checkAllProv.Checked) {
+//				for(int i=0;i<listProv.SelectedIndices.Count;i++){
+//					if(i==0){
+//						whereProv+=" AND (";
+//					}
+//					else{
+//						whereProv+="OR ";
+//					}
+//					whereProv+="claimproc.ProvNum = "
+//						+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+" ";
+//				}
+//				whereProv+=") ";
+//			}
+//			whereClin="";
+//			if(!checkAllClin.Checked) {
+//				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+//					if(i==0) {
+//						whereClin+=" AND (";
+//					}
+//					else {
+//						whereClin+="OR ";
+//					}
+//					if(listClin.SelectedIndices[i]==0) {
+//						whereClin+="claimproc.ClinicNum = 0 ";
+//					}
+//					else {
+//						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+//					}
+//				}
+//				whereClin+=") ";
+//			}
+//			report.Query="SELECT DateCP, SUM(WriteOff) FROM claimproc WHERE "
+//				+"DateCP >= "+POut.Date(dateFrom)+" "
+//				+"AND DateCP <= "+POut.Date(dateTo)+" "
+//				+"AND Status = '7' "//CapComplete
+//				+whereProv
+//				+whereClin
+//				+" GROUP BY DateCP "
+//				+"ORDER BY DateCP"; 
+//			TableCapWriteoff=report.GetTempTable();
 
 //NEXT is TableInsWriteoff--------------------------------------------------------------------------
 /*
@@ -1517,11 +1521,11 @@ ORDER BY adjdate DESC
 		 			  production+=PIn.Decimal(TableCharge.Rows[j][1].ToString());
 					}
    			}
-				for(int j=0;j<TableCapWriteoff.Rows.Count;j++)  {
-				  if(dates[i]==(PIn.Date(TableCapWriteoff.Rows[j][0].ToString()))){
-		 			  production-=PIn.Decimal(TableCapWriteoff.Rows[j][1].ToString());
-					}
-   			}
+				//for(int j=0;j<TableCapWriteoff.Rows.Count;j++)  {
+				//	if(dates[i]==(PIn.Date(TableCapWriteoff.Rows[j][0].ToString()))){
+				//		production-=PIn.Decimal(TableCapWriteoff.Rows[j][1].ToString());
+				//	}
+				//}
 				for(int j=0; j<TableSched.Rows.Count; j++)  {
 				  if(dates[i]==(PIn.Date(TableSched.Rows[j][0].ToString()))){
 			 	    scheduled+=PIn.Decimal(TableSched.Rows[j][1].ToString());
