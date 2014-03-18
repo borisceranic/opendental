@@ -158,6 +158,12 @@ namespace OpenDental {
 
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 3 (Summary).</summary>
 		private void FillProviderAdjustmentDetails() {
+			if(_x835.ListProvAdjustments.Count==0) {
+				gridProviderAdjustments.Title="Provider Adjustments (None Reported)";
+			}
+			else {
+				gridProviderAdjustments.Title="Provider Adjustments";
+			}
 			const int colWidthNPI=88;
 			const int colWidthFiscalPeriod=80;
 			const int colWidthReasonCode=90;
@@ -175,10 +181,9 @@ namespace OpenDental {
 			gridProviderAdjustments.EndUpdate();
 			gridProviderAdjustments.BeginUpdate();
 			gridProviderAdjustments.Rows.Clear();
-			List<Hx835_ProvAdj> providerAdjustments=_x835.ListProvAdjustments;
 			_provAdjAmtSum=0;
-			for(int i=0;i<providerAdjustments.Count;i++) {
-				Hx835_ProvAdj provAdj=providerAdjustments[i];
+			for(int i=0;i<_x835.ListProvAdjustments.Count;i++) {
+				Hx835_ProvAdj provAdj=_x835.ListProvAdjustments[i];
 				ODGridRow row=new ODGridRow();
 				row.Tag=provAdj;
 				row.Cells.Add(new ODGridCell(provAdj.Npi));//NPI
@@ -187,7 +192,7 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell(provAdj.ReasonCode));//ReasonCode
 				row.Cells.Add(new ODGridCell(provAdj.RefIdentification));//RefIdent
 				row.Cells.Add(new ODGridCell(provAdj.AdjAmt.ToString("f2")));//AdjAmt
-				_provAdjAmtSum+=providerAdjustments[i].AdjAmt;
+				_provAdjAmtSum+=provAdj.AdjAmt;
 				gridProviderAdjustments.Rows.Add(row);
 			}
 			gridProviderAdjustments.EndUpdate();

@@ -75,9 +75,9 @@ namespace OpenDentBusiness {
 		///<summary>N4*PR N401</summary>
 		public string PayerCity { get { return _payerCity; } }
 		///<summary>N4*PR N402</summary>
-		public string PayerState;
+		public string PayerState { get { return _payerState; } }
 		///<summary>N4*PR N403</summary>
-		public string PayerZip;
+		public string PayerZip { get { return _payerZip; } }
 		///<summary>Represents all the data from the entire 1000A PER segment.</summary>
 		public string PayerContactInfo { get { return _payerContactInfo; } }
 		///<summary>N1*PE N102 loop 1000B.</summary>
@@ -110,30 +110,33 @@ namespace OpenDentBusiness {
 			ProcessTRN(1);
 			int segNum=2;
 			//CUR: Foreign Currency Information.  Situational.  Repeat 1.  Guide page 79.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CUR") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CUR") {
 				segNum++;
 			}
 			//REF*EV: Receiver Identification.  Situational.  Repeat 1.  Guide page 82.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="EV") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="EV") {
 				segNum++;
 			}
 			//REF*F2: Version Identification.  Situational.  Repeat 1.  Guide page 84.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="F2") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF" && _listSegments[segNum].Get(1)=="F2") {
 				segNum++;
 			}
 			//DTM: Production Date.  Situational.  Repeat 1.  Guide page 85.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
 				segNum++;
 			}
 			ProcessN1_PR(segNum);
-			ProcessN3_PR(segNum+1);
-			ProcessN4_PR(segNum+2);
+			segNum++;
+			ProcessN3_PR(segNum);
+			segNum++;
+			ProcessN4_PR(segNum);
+			segNum++;
 			//1000A REF: Additional Payer Identification.  Situational.  Repeat 4.  Guide page 92.  We do not use.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
 				segNum++;
 			}
 			//1000A PER*CX: Payer Business Contact Information.  Situational.  Repeat 1.  Guide page 94.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="CX") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="CX") {
 				segNum++;
 			}
 			//1000A PER*BL: Payer Technical Contact Information.  Required (but is not included in any of the examples, so we assume situational).  Repeat >1.  Guide page 97.  We only care about the first non-empty occurrence.
@@ -145,20 +148,20 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			//1000A PER*IC: Payer WEB Site.  Situational.  Repeat 1.  Guide page 100.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="IC") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER" && _listSegments[segNum].Get(1)=="IC") {
 				segNum++;
 			}
 			//1000B N1*PE: Payee Identification.  Required.  Repeat 1.  Guide page 102.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N1" && _listSegments[segNum].Get(1)=="PE") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N1" && _listSegments[segNum].Get(1)=="PE") {
 				ProcessN1_PE(segNum);
 				segNum++;
 			}
 			//1000B N3: Payee Address.  Situational.  Repeat 1.  Guide page 104.  We do not use because the payee already knows their own address, and because it is not required.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N3") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N3") {
 				segNum++;
 			}
 			//1000B N4: Payee City, State, ZIP Code.  Situational.  Repeat 1.  Guide page 105.  We do not use because the payee already knows their own address, and because it is not required.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N4") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="N4") {
 				segNum++;
 			}
 			//1000B REF: Payee Additional Identification.  Situational.  Repeat >1.  Guide page 107.  We do not use.
@@ -166,36 +169,43 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			//1000B RDM: Remittance Delivery Method.  Situational.  Repeat 1.  Guide page 109.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="RDM") {
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="RDM") {
 				segNum++;
 			}
 			//Table 2 - Detail
 			//Loop 2000 Header Number.  Repeat >1.  We do not need the information in this loop, because claim payments include the unique claim identifiers that we need to match to the claims one-by-one.
-			//2000 LX: Header Number.  Situational.  Repeat 1.  Guide page 111.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="LX") {
-				segNum++;
-			}
-			//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS3") {
-				segNum++;
-			}
-			//2000 TS2: Provider Supplemental Summary Infromation.  Guide page 117.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS2") {
-				segNum++;
-			}
-			_listProvAdjustments=new List<Hx835_ProvAdj>();
 			_listClaimEOBs=new List<Hx835_Claim>();
-			while(segNum<_listSegments.Count) {
-				X12Segment seg=_listSegments[segNum];				
-				//Loop 2100 Claim Payment Information.  Repeat >1.
-				if(seg.SegmentID=="CLP") {//The CLP segment only exists one time within the 2100 loop.
-					_listClaimEOBs.Add(ProcessCLP(segNum));
+			bool isLoop2000=true;
+			while(isLoop2000) {
+				isLoop2000=false;
+				//2000 LX: Header Number.  Situational.  Repeat 1.  Guide page 111.  We do not use.
+				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="LX") {
+					isLoop2000=true;
+					segNum++;
 				}
-				//Table 3 - Summary
-				if(seg.SegmentID=="PLB") {
-					//PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.
-					_listProvAdjustments.AddRange(ProcessPLB(segNum));
+				//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.  We do not use.
+				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS3") {
+					isLoop2000=true;
+					segNum++;
 				}
+				//2000 TS2: Provider Supplemental Summary Infromation.  Repeat 1.  Guide page 117.  We do not use.
+				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS2") {
+					isLoop2000=true;
+					segNum++;
+				}
+				//Loop 2100 Claim Payment Information.  Repeat 1.  Guide page 123.
+				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CLP") {
+					isLoop2000=true;
+					Hx835_Claim claimEob=ProcessCLP(segNum);
+					_listClaimEOBs.Add(claimEob);
+					segNum+=claimEob.SegmentCount;
+				}
+			}
+			//Table 3 - Summary
+			//PLB: Provider Admustment.  Situational.  Repeat >1.  Guide page 217.
+			_listProvAdjustments=new List<Hx835_ProvAdj>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PLB") {
+				_listProvAdjustments.AddRange(ProcessPLB(segNum));
 				segNum++;
 			}
 		}
@@ -297,6 +307,7 @@ namespace OpenDentBusiness {
 
 		///<summary>2100 CLP: Claim Payment Information.  Required.  Repeat 1.  Guide page 123.</summary>
 		private Hx835_Claim ProcessCLP(int segNum) {
+			int segNumCLP=segNum;
 			Hx835_Claim retVal=new Hx835_Claim();
 			X12Segment segCLP=_listSegments[segNum];
 			retVal.ClaimTrackingNumber=segCLP.Get(1);//CLP01
@@ -306,67 +317,83 @@ namespace OpenDentBusiness {
 			retVal.InsPaid=PIn.Decimal(segCLP.Get(4));//CLP04 Claim Payment Amount
 			retVal.PatientPortion=PIn.Decimal(segCLP.Get(5));//CLP05 Patient Portion Amount
 			segNum++;
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID!="CLP") {//Continue until either the end of the file or the next claim is located.
-				retVal.ListClaimAdjustments=new List<Hx835_Adj>();
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
-					//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.
-					retVal.ListClaimAdjustments.AddRange(ProcessCAS(segNum));
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1") {
-					//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.  We do not use.
-					//2100 NM1: Insured Name.  Situational.  Repeat 1.  Guide page 140.  We do not use.
-					//2100 NM1: Corrected Patient/Insured Name.  Situational.  Repeat 1.  Guide page 143.  We do not use.
-					//2100 NM1: Service Provider Name.  Situational.  Repeat 1.  Guide page 146.  We do not use.
-					//2100 NM1: Crossover Carrier Name.  Situational.  Repeat 1.  Guide page 150.  We do not use.
-					//2100 NM1: Corrected Priority Payer Name.  Situational.  Repeat 1.  Guide page 153.  We do not use.
-					//2100 NM1: Other Subscriber Name.  Situational.  Repeat 1.  Guide page 156.  We do not use.
-					segNum++;
-				}
-				retVal.ListAdjudicationInfo=new List<Hx835_Info>();
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MIA") {
-					//2100 MIA: Inpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 159. 
-					retVal.ListAdjudicationInfo.AddRange(ProcessMIA(segNum));
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MOA") {
-					//2100 MOA: Outpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 166.
-					retVal.ListAdjudicationInfo.AddRange(ProcessMOA(segNum));
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
-					//2100 REF: Other Claim Releated Identification.  Situational.  Repeat 5.  Guide page 169.  We do not use.
-					//2100 REF: Rendering Provider Identification.  Situational.  Repeat 10.  Guide page 171.  We do not use.
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
-					//2100 DTM: Statement From or To Date.  Situational.  Repeat 2.  Guide page 173.  We do not use.
-					//2100 DTM: Coverage Expiration Date.  Situational.  Repeat 1.  Guide page 175.  We do not use.
-					//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.  We do not use.
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER") {
-					//2100 PER: Claim Contact Information.  Situational.  Repeat 2.  Guide page 179.  We do not use.
-					segNum++;
-				}
-				retVal.ListSupplementalInfo=new List<Hx835_Info>();
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="AMT") {
-					//2100 AMT: Claim Supplemental Information.  Situational.  Repeat 13.  Guide page 182.
-					retVal.ListSupplementalInfo.Add(ProcessAMT(segNum));
-					segNum++;
-				}
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="QTY") {
-					//2100 QTY: Claim Supplemental Information Quantity.  Situational.  Repeat 14.  Guide page 184.  We do not use.
-					segNum++;
-				}
-				//===============================  PROCEDURES  =============================
-				retVal.ListProcs=new List<Hx835_Proc>();
-				while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="SVC") {
-					//2110 SVC Service Payment Information.  Situational.  Repeat 999.  Guide page 186.
-					retVal.ListProcs.Add(ProcessSVC(segNum));
-					segNum++;
-				}
+			retVal.ListClaimAdjustments=new List<Hx835_Adj>();
+			//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
+				retVal.ListClaimAdjustments.AddRange(ProcessCAS(segNum));
+				segNum++;
 			}
+			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.  We do not use.
+			segNum++;
+			//2100 NM1: Insured Name.  Situational.  Repeat 1.  Guide page 140.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="IL") {
+				segNum++;
+			}
+			//2100 NM1: Corrected Patient/Insured Name.  Situational.  Repeat 1.  Guide page 143.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="74") {
+				segNum++;
+			}
+			//2100 NM1: Service Provider Name.  Situational.  Repeat 1.  Guide page 146.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="82") {
+				segNum++;
+			}
+			//2100 NM1: Crossover Carrier Name.  Situational.  Repeat 1.  Guide page 150.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="TT") {
+				segNum++;
+			}
+			//2100 NM1: Corrected Priority Payer Name.  Situational.  Repeat 1.  Guide page 153.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="PR") {
+				segNum++;
+			}
+			//2100 NM1: Other Subscriber Name.  Situational.  Repeat 1.  Guide page 156.  We do not use.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="GB") {
+				segNum++;
+			}
+			//2100 MIA: Inpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 159. 
+			retVal.ListAdjudicationInfo=new List<Hx835_Info>();
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MIA") {
+				retVal.ListAdjudicationInfo.AddRange(ProcessMIA(segNum));
+				segNum++;
+			}
+			//2100 MOA: Outpatient Adjudication Information.  Situational.  Repeat 1.  Guide page 166.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="MOA") {
+				retVal.ListAdjudicationInfo.AddRange(ProcessMOA(segNum));
+				segNum++;
+			}
+			//2100 REF: Other Claim Releated Identification.  Situational.  Repeat 5.  Guide page 169.  We do not use.
+			//2100 REF: Rendering Provider Identification.  Situational.  Repeat 10.  Guide page 171.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {//We clump 2 segments into a single loop, because neither segment is used, and there are multiple REF01 choices for each.
+				segNum++;
+			}
+			//2100 DTM: Statement From or To Date.  Situational.  Repeat 2.  Guide page 173.  We do not use.
+			//2100 DTM: Coverage Expiration Date.  Situational.  Repeat 1.  Guide page 175.  We do not use.
+			//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {//We clump 3 segments into a single loop, because none of them are used.
+				segNum++;
+			}
+			//2100 PER: Claim Contact Information.  Situational.  Repeat 2.  Guide page 179.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="PER") {
+				segNum++;
+			}
+			//2100 AMT: Claim Supplemental Information.  Situational.  Repeat 13.  Guide page 182.
+			retVal.ListSupplementalInfo=new List<Hx835_Info>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="AMT") {
+				retVal.ListSupplementalInfo.Add(ProcessAMT(segNum));
+				segNum++;
+			}
+			//2100 QTY: Claim Supplemental Information Quantity.  Situational.  Repeat 14.  Guide page 184.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="QTY") {
+				segNum++;
+			}
+			//===============================  PROCEDURES  =============================
+			//2110 SVC Service Payment Information.  Situational.  Repeat 999.  Guide page 186.
+			retVal.ListProcs=new List<Hx835_Proc>();
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="SVC") {
+				Hx835_Proc proc=ProcessSVC(segNum);
+				retVal.ListProcs.Add(proc);
+				segNum+=proc.SegmentCount;
+			}
+			retVal.SegmentCount=segNum-segNumCLP;
 			return retVal;
 		}
 
@@ -675,26 +702,29 @@ namespace OpenDentBusiness {
 		}
 
 		private Hx835_Proc ProcessSVC(int segNum) {
+			int segNumSVC=segNum;
 			X12Segment segSVC=_listSegments[segNum];
 			Hx835_Proc proc=new Hx835_Proc();
 			proc.ProcCode=segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1];//SVC1-2
 			proc.ProcFee=PIn.Decimal(segSVC.Get(2));//SVC2
 			proc.InsPaid=PIn.Decimal(segSVC.Get(3));//SVC3
 			segNum++;
+			//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
-				//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
 				segNum++;
 			}
 			proc.ListProcAdjustments=new List<Hx835_Adj>();
+			//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
-				//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.
 				proc.ListProcAdjustments.AddRange(ProcessCAS(segNum));
 				segNum++;
 			}
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {
-				//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
+			//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
+			//2110 REF: Line Item Control Number.  Situational.  Repeat 1.  Guide page 206.
+			//2110 REF: Rendering Provider Information.  Situational.  Repeat 10.  Guide page 207.  We do not use.
+			//2110 REF: HealthCare Policy Identification.  Situational.  Repeat 5.  Guide page 209.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {//4 segment types clumped together, but we only care about REF*6R.
 				if(_listSegments[segNum].Get(1)=="6R") {
-					//2110 REF: Line Item Control Number.  Situational.  Repeat 1.  Guide page 206.
 					string strRef02=_listSegments[segNum].Get(2);
 					if(strRef02.StartsWith("p")) {
 						//If the control number is prefixed with a "p", then it is a ProcNum.
@@ -702,26 +732,25 @@ namespace OpenDentBusiness {
 						proc.ProcNum=PIn.Long(strRef02.Substring(1));//The entire value excluding the leading "p".
 					}	
 				}
-				//2110 REF: Rendering Provider Information.  Situational.  Repeat 10.  Guide page 207.  We do not use.
-				//2110 REF: HealthCare Policy Identification.  Situational.  Repeat 5.  Guide page 209.  We do not use.
 				segNum++;
 			}
 			proc.ListSupplementalInfo=new List<Hx835_Info>();
+			//2110 AMT: Service Supplemental Amount.  Situational.  Repeat 9.  Guide page 211.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="AMT") {
-				//2110 AMT: Service Supplemental Amount.  Situational.  Repeat 9.  Guide page 211.
 				proc.ListSupplementalInfo.Add(ProcessAMT(segNum));
 				segNum++;
 			}
+			//2110 QTY: Service Supplemental Quantity.  Situational.  Repeat 6.  Guide page 213.  We do not use.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="QTY") {
-				//2110 QTY: Service Supplemental Quantity.  Situational.  Repeat 6.  Guide page 213.  We do not use.
 				segNum++;
 			}
+			//2110 LQ: Health Care Remark Codes.  Repeat 99.  Guide page 215.
 			proc.ListRemarks=new List<string>();
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="LQ") {
-				//2110 LQ: Health Care Remark Codes.  Repeat 99.  Guide page 215.
 				proc.ListRemarks.Add(ProcessLQ(segNum));
 				segNum++;
-			}			
+			}
+			proc.SegmentCount=segNum-segNumSVC;
 			return proc;
 		}
 
@@ -2730,6 +2759,8 @@ namespace OpenDentBusiness {
 
 	///<summary>Information about a single EOB.  There can be many EOBs within a single 835.</summary>
 	public class Hx835_Claim {
+		///<summary>The number of X12 segments that this claim and all data within it span.</summary>
+		public int SegmentCount;
 		///<summary>CLP01 in loop 2100.  Referred to in this format as a Patient Control Number.
 		///The claim tracking numbers correspond to CLM01 exactly as submitted in the 837.
 		///We refer to CLM01 as the claim identifier on our end. We allow alphanumeric in our claim identifiers, so we must store as a string.</summary>
@@ -2757,6 +2788,8 @@ namespace OpenDentBusiness {
 
 	///<summary>Information about a single procedure on an EOB.  There can be many of these for each Hx835_Claim.</summary>
 	public class Hx835_Proc {
+		///<summary>The number of X12 segments that this claim and all data within it span.</summary>
+		public int SegmentCount;
 		public string ProcCode;
 		public decimal ProcFee;
 		public decimal InsPaid;

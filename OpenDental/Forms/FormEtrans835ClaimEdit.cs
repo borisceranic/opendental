@@ -226,7 +226,7 @@ namespace OpenDental {
 		}
 
 		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Hx835_Adj adj=(Hx835_Adj)gridProcedureBreakdown.Rows[e.Row].Tag;
+			Hx835_Adj adj=(Hx835_Adj)gridClaimAdjustments.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustDescript+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
 			msgbox.Show(this);
 		}
