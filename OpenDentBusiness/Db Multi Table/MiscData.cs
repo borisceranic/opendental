@@ -97,7 +97,7 @@ namespace OpenDentBusiness {
 			}
 			command="CREATE DATABASE "+newDb+" CHARACTER SET utf8";
 			dcon.NonQ(command);
-			command="SHOW TABLES";//Tables and views
+			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			table=dcon.GetTable(command);
 			string[] tableName=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {

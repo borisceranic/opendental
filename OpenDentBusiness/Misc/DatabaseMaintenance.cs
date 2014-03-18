@@ -31,7 +31,7 @@ namespace OpenDentBusiness {
 			}
 			command="DROP TABLE IF EXISTS `signal`";//Signal is keyword for MySQL 5.5.  Was renamed to signalod so drop if exists.
 			Db.NonQ(command);
-			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
+			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
 			int lastRow;
