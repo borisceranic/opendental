@@ -462,7 +462,7 @@ namespace OpenDental {
 		private string TestTemplate(bool verbose) {
 			StringBuilder retVal=new StringBuilder();
 			bool failed=true;
-			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE';";
+			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			DataTable qResult=MySql.Data.MySqlClient.MySqlHelper.ExecuteDataset(connString,command).Tables[0];
 			//or
 			MySql.Data.MySqlClient.MySqlDataReader mtDataReader;

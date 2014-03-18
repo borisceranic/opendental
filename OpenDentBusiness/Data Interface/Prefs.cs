@@ -223,7 +223,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
+			string command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			DataTable table=Db.GetTable(command);//not MySQL 4.1 compatible. Should not be a problem if following reccomended update process.
 			string[] tableNames=new string[table.Rows.Count];
 			for(int i=0;i<table.Rows.Count;i++) {

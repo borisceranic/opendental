@@ -78,7 +78,7 @@ namespace DatabaseIntegrityCheck {
 			MySqlCommand cmd=new MySqlCommand();
 			//int InsertID; 
 			cmd.Connection=con;
-			cmd.CommandText="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
+			cmd.CommandText="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			DataTable table=new DataTable();
 			try {
 				Cursor=Cursors.WaitCursor;

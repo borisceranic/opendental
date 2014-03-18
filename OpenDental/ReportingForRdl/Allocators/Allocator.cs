@@ -99,7 +99,7 @@ namespace OpenDental.Reporting.Allocators
 		bool TableExists()
 		{
 			bool rVal = false;
-			string cmd = "SHOW FULL TABLES WHERE Table_type='BASE TABLE'";
+			string cmd = "SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			string thistable = this.DbaseStorageTable.ToLower();
 			try
 			{
