@@ -166,7 +166,6 @@ namespace OpenDental{
 			// 
 			this.textFromAddress.Location = new System.Drawing.Point(278, 41);
 			this.textFromAddress.Name = "textFromAddress";
-			this.textFromAddress.ReadOnly = true;
 			this.textFromAddress.Size = new System.Drawing.Size(328, 20);
 			this.textFromAddress.TabIndex = 4;
 			// 
@@ -973,6 +972,11 @@ namespace OpenDental{
 				return;
 			}
 			EmailAddress emailAddressFrom=GetEmailAddress();
+			if(textFromAddress.Text!=emailAddressFrom.EmailUsername) {
+				//Without this block, encryption would fail with an obscure error message, because the from address would not match the digital signature of the sender.
+				MessageBox.Show(Lan.g(this,"From address must match email address username in email setup.")+"\r\n"+Lan.g(this,"From address must be exactly")+" "+emailAddressFrom.EmailUsername);
+				return;
+			}
 			if(emailAddressFrom.SMTPserver=="") {
 				MsgBox.Show(this,"The email address in email setup must have an SMTP server.");
 				return;
