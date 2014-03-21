@@ -99,7 +99,6 @@ namespace OpenDentBusiness{
 			}
 		}
 
-	
 
 
 

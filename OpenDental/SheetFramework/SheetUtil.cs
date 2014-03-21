@@ -121,7 +121,7 @@ namespace OpenDental{
 			sheet.PatNum=patNum;
 			sheet.Description=sheetDef.Description;
 			sheet.IsLandscape=sheetDef.IsLandscape;
-			sheet.SheetFields=CreateFieldList(sheetDef.SheetFieldDefs);
+			sheet.SheetFields=CreateFieldList(sheetDef.SheetFieldDefs);//Blank fields with no values. Values filled later from SheetFiller.FillFields()
 			sheet.Parameters=sheetDef.Parameters;
 			return sheet;
 		}
@@ -181,6 +181,19 @@ namespace OpenDental{
 				throw new ApplicationException("Must be using AtoZ folders.");
 			}
 			imagePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"SheetImages");
+			if(!Directory.Exists(imagePath)) {
+				Directory.CreateDirectory(imagePath);
+			}
+			return imagePath;
+		}
+
+		///<summary>Typically returns something similar to \\SERVER\OpenDentImages\SheetImages</summary>
+		public static string GetPatImagePath() {
+			string imagePath;
+			if(!PrefC.AtoZfolderUsed) {
+				throw new ApplicationException("Must be using AtoZ folders.");
+			}
+			imagePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"SheetPatImages");
 			if(!Directory.Exists(imagePath)) {
 				Directory.CreateDirectory(imagePath);
 			}

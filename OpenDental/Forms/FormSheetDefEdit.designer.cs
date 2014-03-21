@@ -183,7 +183,6 @@ namespace OpenDental{
 			this.butAddPatImage.TabIndex = 93;
 			this.butAddPatImage.TabStop = false;
 			this.butAddPatImage.Text = "Pat Image";
-			this.butAddPatImage.Visible = false;
 			this.butAddPatImage.Click += new System.EventHandler(this.butAddPatImage_Click);
 			// 
 			// butAddSigBox

@@ -715,6 +715,17 @@ namespace OpenDentBusiness {
 				if(documents[i]==null) {
 					continue;
 				}
+				//Check if document is referenced by a sheet. (PatImages)
+				List<Sheet> sheetRefList=Sheets.GetForDocument(documents[i].DocNum);
+				if(sheetRefList.Count!=0) {
+					//throw Exception with error message.
+					string msgText=Lans.g("ContrImages","Cannot delete image, it is referenced by sheets with the following dates")+":";
+					foreach(Sheet sheet in sheetRefList) {
+						msgText+="\r\n"+sheet.DateTimeSheet.ToShortDateString();
+					}
+					throw new Exception(msgText);
+				}
+				//Attempt to delete the file.
 				if(PrefC.AtoZfolderUsed) {
 					try {
 						string filePath = ODFileUtils.CombinePaths(patFolder,documents[i].FileName);
@@ -728,7 +739,7 @@ namespace OpenDentBusiness {
 				}
 				//Row from db.  This deletes the "image file" also if it's stored in db.
 				Documents.Delete(documents[i]);
-			}
+			}//end documents
 		}
 
 		///<summary>Also handles deletion of db object.</summary>

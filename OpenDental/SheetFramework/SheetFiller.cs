@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace OpenDental{
 	public class SheetFiller {
-		///<summary>Gets the data from the database and fills the fields.</summary>
+		///<summary>Gets the data from the database and fills the fields. Input should only be new sheets.</summary>
 		public static void FillFields(Sheet sheet){
 			foreach(SheetParameter param in sheet.Parameters){
 				if(param.IsRequired && param.ParamValue==null){
@@ -859,42 +859,31 @@ namespace OpenDental{
 			return phone.Substring(0,idx);
 		}
 
+
+		///<summary>For new sheets only. Sets sheetField.FieldValue=DocumentNum(FK) based on documentCategoryNum (stored in SheetField.FieldName) and pat.PatNum.
+		///<para>Example: if DocCategory=132 (PatImages) then FieldValue would be set equal to the DocNum of the most recent PatImage in the patient's image folder.  
+		///If there are no images in the patient's folder, FieldValue will be blank.</para></summary>
 		private static void FillPatientImages(Sheet sheet,Patient pat){
-			if(pat==null){
-				return;
+			Document[] docList=new Document[0];
+			if(pat!=null) {
+				docList=Documents.GetAllWithPat(pat.PatNum);
 			}
-			Document[] docList=Documents.GetAllWithPat(pat.PatNum);
-			long category;
-			//string fieldVal;//zoom and pan
-			//int x;
-			//int y;
-			//int w;
-			//int h;
-			float ratioObject;
-			//float ratioImage;
-			Image img;
 			foreach(SheetField field in sheet.SheetFields){
 				if(field.FieldType!=SheetFieldType.PatImage){
-					continue;
+					continue;//only examine PatImage fields
 				}
-				category=PIn.Long(field.FieldName);
-				field.FieldName="0";//in case we can't find an image, this will be 0.
 				field.FieldValue="";
-				//go backwards to find the latest date
-				for(int i=docList.Length-1;i>=0;i--){
-					if(docList[i].DocCategory!=category){
+				long categoryNum=PIn.Long(field.FieldName);
+				//itterate backwards to find most recent
+				for(int i=docList.Length-1;i>=0;i--) {
+					if(docList[i].DocCategory!=categoryNum) {
 						continue;
 					}
-					field.FieldName=docList[i].DocNum.ToString();
-					ratioObject=(float)field.Width/(float)field.Height;
-					img=Image.FromFile(  docList[i].FileName);
-					//ratioImage=(float)docList[i].wid  field.Width/(float)field.Height;
-//incomplete
-
-					field.FieldValue="";
+					//At this point we should have found the most recent document in the document category.
+					field.FieldValue=docList[i].DocNum.ToString();
 					break;
-				}
-			}
+				}//end docList
+			}//end foreach field
 		}
 
 		private static void FillFieldsForLabelPatient(Sheet sheet,Patient pat){

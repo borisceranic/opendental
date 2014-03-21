@@ -126,50 +126,54 @@ namespace OpenDental {
 			string txt;
 			SheetDefCur.SheetFieldDefs.Sort(CompareTabOrder);
 			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++){
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.StaticText){
-					listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldValue);
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Image){
-					listFields.Items.Add(Lan.g(this,"Image:")+SheetDefCur.SheetFieldDefs[i].FieldName);
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Line){
-					listFields.Items.Add(Lan.g(this,"Line:")
+				switch(SheetDefCur.SheetFieldDefs[i].FieldType) {
+					case SheetFieldType.StaticText:
+						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldValue);
+						break;
+					case SheetFieldType.Image:
+						listFields.Items.Add(Lan.g(this,"Image:")+SheetDefCur.SheetFieldDefs[i].FieldName);
+						break;
+					case SheetFieldType.PatImage:
+						listFields.Items.Add(Lan.g(this,"PatImg:")+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName)));
+						break;
+					case SheetFieldType.Line:
+						listFields.Items.Add(Lan.g(this,"Line:")
 						+SheetDefCur.SheetFieldDefs[i].XPos.ToString()+","
 						+SheetDefCur.SheetFieldDefs[i].YPos.ToString()+","
 						+"W:"+SheetDefCur.SheetFieldDefs[i].Width.ToString()+","
 						+"H:"+SheetDefCur.SheetFieldDefs[i].Height.ToString());
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Rectangle){
-					listFields.Items.Add(Lan.g(this,"Rect:")
+						break;
+					case SheetFieldType.Rectangle:
+						listFields.Items.Add(Lan.g(this,"Rect:")
 						+SheetDefCur.SheetFieldDefs[i].XPos.ToString()+","
 						+SheetDefCur.SheetFieldDefs[i].YPos.ToString()+","
 						+"W:"+SheetDefCur.SheetFieldDefs[i].Width.ToString()+","
 						+"H:"+SheetDefCur.SheetFieldDefs[i].Height.ToString());
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.SigBox){
-					listFields.Items.Add(Lan.g(this,"Signature Box"));
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.CheckBox){
-					txt=SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": ";
-					if(SheetDefCur.SheetFieldDefs[i].FieldName.StartsWith("allergy:")
-						|| SheetDefCur.SheetFieldDefs[i].FieldName.StartsWith("problem:")) 
-					{
-						txt+=SheetDefCur.SheetFieldDefs[i].FieldName.Remove(0,8);
-					}
-					else {
-						txt+=SheetDefCur.SheetFieldDefs[i].FieldName;
-					}
-					if(SheetDefCur.SheetFieldDefs[i].RadioButtonValue!="") {
-						txt+=" - "+SheetDefCur.SheetFieldDefs[i].RadioButtonValue;
-					}
-					listFields.Items.Add(txt);
-				}
-				else if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.InputField){
-					listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": "+SheetDefCur.SheetFieldDefs[i].FieldName);
-				}
-				else {
-					listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldName);
-				}
+						break;
+					case SheetFieldType.SigBox:
+						listFields.Items.Add(Lan.g(this,"Signature Box"));
+						break;
+					case SheetFieldType.CheckBox:
+						txt=SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": ";
+						if(SheetDefCur.SheetFieldDefs[i].FieldName.StartsWith("allergy:")
+						|| SheetDefCur.SheetFieldDefs[i].FieldName.StartsWith("problem:")) {
+							txt+=SheetDefCur.SheetFieldDefs[i].FieldName.Remove(0,8);
+						}
+						else {
+							txt+=SheetDefCur.SheetFieldDefs[i].FieldName;
+						}
+						if(SheetDefCur.SheetFieldDefs[i].RadioButtonValue!="") {
+							txt+=" - "+SheetDefCur.SheetFieldDefs[i].RadioButtonValue;
+						}
+						listFields.Items.Add(txt);
+						break;
+					case SheetFieldType.InputField:
+						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": "+SheetDefCur.SheetFieldDefs[i].FieldName);
+						break;
+					default:
+						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldName);
+						break;
+				}//end switch
 				if(ListSheetFieldDefsCopyPaste!=null) {//reselect pasted controls
 					for(int cp=0;cp<ListSheetFieldDefsCopyPaste.Count;cp++) {
 						if(SheetDefCur.SheetFieldDefs[i].SheetFieldDefNum==ListSheetFieldDefsCopyPaste[cp].SheetFieldDefNum) {
@@ -192,11 +196,26 @@ namespace OpenDental {
 			else if(def1.FieldType==SheetFieldType.Image) {//Always move images to the top of the list. This is because of the way the sheet is drawn.
 				return -1;
 			}
-			else if(def1.FieldType==SheetFieldType.Special) {//Move Special to the top of the list under special.
+			else if(def2.FieldType==SheetFieldType.Image) {//Always move images to the top of the list. This is because of the way the sheet is drawn.
+				return 1;
+			}
+			else if(def1.FieldType==SheetFieldType.PatImage) {//Move PatImage to the top of the list under images.
 				return -1;
 			}
-			else if(def1.FieldType==SheetFieldType.OutputText) {//Move Output text to the top of the list under images.
+			else if(def2.FieldType==SheetFieldType.PatImage) {//Move PatImage to the top of the list under images.
+				return 1;
+			}
+			else if(def1.FieldType==SheetFieldType.Special) {//Move Special to the top of the list under PatImages.
 				return -1;
+			}
+			else if(def2.FieldType==SheetFieldType.Special) {//Move Special to the top of the list under PatImages.
+				return 1;
+			}
+			else if(def1.FieldType==SheetFieldType.OutputText) {//Move Output text to the top of the list under Special.
+				return -1;
+			}
+			else if(def2.FieldType==SheetFieldType.OutputText) {//Move Output text to the top of the list under Special.
+				return 1;
 			}
 			if(def1.TabOrder-def2.TabOrder==0) {
 				int comp=(def1.FieldName+def1.RadioButtonValue).CompareTo(def2.FieldName+def2.RadioButtonValue);//RadioButtionValuecan be filled or ""
@@ -270,6 +289,21 @@ namespace OpenDental {
 				}
 				if(onlyDrawImages) {
 					continue;//Only draw the images for the background.
+				}
+				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.PatImage) {
+					if(listFields.SelectedIndices.Contains(i)) {
+						pen=penRed;
+						brush=brushRed;
+					}
+					else {
+						pen=penBlack;
+						brush=brushBlue;
+					}
+					g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+					g.DrawString("PatImage: "+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName))
+						,Font,brush,SheetDefCur.SheetFieldDefs[i].XPos+1,SheetDefCur.SheetFieldDefs[i].YPos+1);
+					continue;
 				}
 				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Line){
 					if(listFields.SelectedIndices.Contains(i)){
@@ -668,9 +702,10 @@ namespace OpenDental {
 				return;
 			}
 			//Font font=new Font(SheetDefCur.FontName,SheetDefCur.FontSize);
-			FormSheetFieldImage FormS=new FormSheetFieldImage();
+			FormSheetFieldPatImage FormS=new FormSheetFieldPatImage();
 			FormS.SheetDefCur=SheetDefCur;
 			FormS.SheetFieldDefCur=SheetFieldDef.NewImage("",0,0,100,100);
+			FormS.SheetFieldDefCur.FieldType=SheetFieldType.PatImage;
 			if(this.IsInternal) {
 				FormS.IsReadOnly=true;
 			}
@@ -769,6 +804,22 @@ namespace OpenDental {
 						return;
 					}
 					if(FormSI.SheetFieldDefCur==null) {
+						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
+					}
+					refreshBuffer=true;
+					break;
+				case SheetFieldType.PatImage:
+					FormSheetFieldPatImage FormSPI=new FormSheetFieldPatImage();
+					FormSPI.SheetDefCur=SheetDefCur;
+					FormSPI.SheetFieldDefCur=field;
+					if(this.IsInternal) {
+						FormSPI.IsReadOnly=true;
+					}
+					FormSPI.ShowDialog();
+					if(FormSPI.DialogResult!=DialogResult.OK) {
+						return;
+					}
+					if(FormSPI.SheetFieldDefCur==null) {
 						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
 					}
 					refreshBuffer=true;

@@ -29,16 +29,7 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.textFullPath = new System.Windows.Forms.TextBox();
-			this.label2 = new System.Windows.Forms.Label();
-			this.comboFieldName = new System.Windows.Forms.ComboBox();
-			this.textWidth2 = new System.Windows.Forms.TextBox();
-			this.textHeight2 = new System.Windows.Forms.TextBox();
-			this.pictureBox = new System.Windows.Forms.PictureBox();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.checkRatio = new System.Windows.Forms.CheckBox();
-			this.butShrink = new OpenDental.UI.Button();
-			this.butImport = new OpenDental.UI.Button();
+			this.comboImageCategory = new System.Windows.Forms.ComboBox();
 			this.butDelete = new OpenDental.UI.Button();
 			this.textHeight = new OpenDental.ValidNum();
 			this.textWidth = new OpenDental.ValidNum();
@@ -46,13 +37,11 @@ namespace OpenDental{
 			this.textXPos = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
-			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(70, 332);
+			this.label5.Location = new System.Drawing.Point(70, 44);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 90;
@@ -61,7 +50,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(70, 358);
+			this.label6.Location = new System.Drawing.Point(70, 70);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 92;
@@ -70,7 +59,7 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(70, 384);
+			this.label7.Location = new System.Drawing.Point(70, 96);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -79,7 +68,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(70, 410);
+			this.label8.Location = new System.Drawing.Point(70, 122);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -92,112 +81,17 @@ namespace OpenDental{
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(113, 16);
 			this.label1.TabIndex = 101;
-			this.label1.Text = "File Name";
+			this.label1.Text = "Image Category";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textFullPath
+			// comboImageCategory
 			// 
-			this.textFullPath.Location = new System.Drawing.Point(141, 43);
-			this.textFullPath.Name = "textFullPath";
-			this.textFullPath.ReadOnly = true;
-			this.textFullPath.Size = new System.Drawing.Size(434, 20);
-			this.textFullPath.TabIndex = 104;
-			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(26, 44);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(113, 16);
-			this.label2.TabIndex = 103;
-			this.label2.Text = "Full Path";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// comboFieldName
-			// 
-			this.comboFieldName.FormattingEnabled = true;
-			this.comboFieldName.Location = new System.Drawing.Point(141, 16);
-			this.comboFieldName.MaxDropDownItems = 100;
-			this.comboFieldName.Name = "comboFieldName";
-			this.comboFieldName.Size = new System.Drawing.Size(257, 21);
-			this.comboFieldName.TabIndex = 106;
-			this.comboFieldName.SelectionChangeCommitted += new System.EventHandler(this.comboFieldName_SelectionChangeCommitted);
-			this.comboFieldName.TextUpdate += new System.EventHandler(this.comboFieldName_TextUpdate);
-			// 
-			// textWidth2
-			// 
-			this.textWidth2.Location = new System.Drawing.Point(6, 14);
-			this.textWidth2.Name = "textWidth2";
-			this.textWidth2.ReadOnly = true;
-			this.textWidth2.Size = new System.Drawing.Size(51, 20);
-			this.textWidth2.TabIndex = 110;
-			// 
-			// textHeight2
-			// 
-			this.textHeight2.Location = new System.Drawing.Point(6, 40);
-			this.textHeight2.Name = "textHeight2";
-			this.textHeight2.ReadOnly = true;
-			this.textHeight2.Size = new System.Drawing.Size(51, 20);
-			this.textHeight2.TabIndex = 111;
-			// 
-			// pictureBox
-			// 
-			this.pictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pictureBox.Location = new System.Drawing.Point(141, 69);
-			this.pictureBox.Name = "pictureBox";
-			this.pictureBox.Size = new System.Drawing.Size(255, 255);
-			this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pictureBox.TabIndex = 112;
-			this.pictureBox.TabStop = false;
-			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.textWidth2);
-			this.groupBox1.Controls.Add(this.textHeight2);
-			this.groupBox1.Location = new System.Drawing.Point(198, 369);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(63, 66);
-			this.groupBox1.TabIndex = 113;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "File Size";
-			// 
-			// checkRatio
-			// 
-			this.checkRatio.Checked = true;
-			this.checkRatio.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkRatio.Location = new System.Drawing.Point(267, 413);
-			this.checkRatio.Name = "checkRatio";
-			this.checkRatio.Size = new System.Drawing.Size(104, 20);
-			this.checkRatio.TabIndex = 115;
-			this.checkRatio.Text = "Maintain Ratio";
-			this.checkRatio.UseVisualStyleBackColor = true;
-			// 
-			// butShrink
-			// 
-			this.butShrink.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butShrink.Autosize = true;
-			this.butShrink.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butShrink.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butShrink.CornerRadius = 4F;
-			this.butShrink.Location = new System.Drawing.Point(267, 381);
-			this.butShrink.Name = "butShrink";
-			this.butShrink.Size = new System.Drawing.Size(79, 24);
-			this.butShrink.TabIndex = 114;
-			this.butShrink.Text = "ShrinkToFit";
-			this.butShrink.Click += new System.EventHandler(this.butShrink_Click);
-			// 
-			// butImport
-			// 
-			this.butImport.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butImport.Autosize = true;
-			this.butImport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butImport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butImport.CornerRadius = 4F;
-			this.butImport.Location = new System.Drawing.Point(404, 14);
-			this.butImport.Name = "butImport";
-			this.butImport.Size = new System.Drawing.Size(75, 24);
-			this.butImport.TabIndex = 105;
-			this.butImport.Text = "Import";
-			this.butImport.Click += new System.EventHandler(this.butImport_Click);
+			this.comboImageCategory.FormattingEnabled = true;
+			this.comboImageCategory.Location = new System.Drawing.Point(141, 16);
+			this.comboImageCategory.MaxDropDownItems = 100;
+			this.comboImageCategory.Name = "comboImageCategory";
+			this.comboImageCategory.Size = new System.Drawing.Size(257, 21);
+			this.comboImageCategory.TabIndex = 106;
 			// 
 			// butDelete
 			// 
@@ -209,7 +103,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(15, 525);
+			this.butDelete.Location = new System.Drawing.Point(15, 167);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(77, 24);
 			this.butDelete.TabIndex = 100;
@@ -218,27 +112,25 @@ namespace OpenDental{
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(141, 409);
+			this.textHeight.Location = new System.Drawing.Point(141, 121);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = 1;
 			this.textHeight.Name = "textHeight";
 			this.textHeight.Size = new System.Drawing.Size(51, 20);
 			this.textHeight.TabIndex = 97;
-			this.textHeight.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textHeight_KeyUp);
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(141, 383);
+			this.textWidth.Location = new System.Drawing.Point(141, 95);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = 1;
 			this.textWidth.Name = "textWidth";
 			this.textWidth.Size = new System.Drawing.Size(51, 20);
 			this.textWidth.TabIndex = 95;
-			this.textWidth.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textWidth_KeyUp);
 			// 
 			// textYPos
 			// 
-			this.textYPos.Location = new System.Drawing.Point(141, 357);
+			this.textYPos.Location = new System.Drawing.Point(141, 69);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
@@ -247,7 +139,7 @@ namespace OpenDental{
 			// 
 			// textXPos
 			// 
-			this.textXPos.Location = new System.Drawing.Point(141, 331);
+			this.textXPos.Location = new System.Drawing.Point(141, 43);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
@@ -262,7 +154,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(514, 495);
+			this.butOK.Location = new System.Drawing.Point(420, 137);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -277,7 +169,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(514, 525);
+			this.butCancel.Location = new System.Drawing.Point(420, 167);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -287,15 +179,8 @@ namespace OpenDental{
 			// FormSheetFieldPatImage
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(601, 561);
-			this.Controls.Add(this.checkRatio);
-			this.Controls.Add(this.butShrink);
-			this.Controls.Add(this.groupBox1);
-			this.Controls.Add(this.pictureBox);
-			this.Controls.Add(this.comboFieldName);
-			this.Controls.Add(this.butImport);
-			this.Controls.Add(this.textFullPath);
-			this.Controls.Add(this.label2);
+			this.ClientSize = new System.Drawing.Size(507, 203);
+			this.Controls.Add(this.comboImageCategory);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textHeight);
@@ -313,9 +198,6 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Image Field";
 			this.Load += new System.EventHandler(this.FormSheetFieldPatImage_Load);
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
-			this.groupBox1.ResumeLayout(false);
-			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -335,15 +217,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label8;
 		private OpenDental.UI.Button butDelete;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textFullPath;
-		private System.Windows.Forms.Label label2;
-		private OpenDental.UI.Button butImport;
-		private System.Windows.Forms.ComboBox comboFieldName;
-		private System.Windows.Forms.TextBox textWidth2;
-		private System.Windows.Forms.TextBox textHeight2;
-		private System.Windows.Forms.PictureBox pictureBox;
-		private System.Windows.Forms.GroupBox groupBox1;
-		private OpenDental.UI.Button butShrink;
-		private System.Windows.Forms.CheckBox checkRatio;
+		private System.Windows.Forms.ComboBox comboImageCategory;
 	}
 }

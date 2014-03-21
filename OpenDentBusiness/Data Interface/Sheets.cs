@@ -116,6 +116,20 @@ namespace OpenDentBusiness{
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
+		///<summary>Get all sheets that reference a given document. Primarily used to prevent deleting an in use document.</summary>
+		/// <returns>List of sheets that have fields that reference the given DocNum. Returns empty list if document is not referenced.</returns>
+		public static List<Sheet> GetForDocument(long docNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Sheet>>(MethodBase.GetCurrentMethod(),docNum);
+			}
+			string command="SELECT sheet.* FROM sheet "
+				+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
+				+"WHERE FieldType = 10 "//PatImage
+				+"AND FieldValue = "+POut.Long(docNum)+" "//FieldName == DocCategory, which we do not care about here.
+				+"GROUP BY sheet.SheetNum";
+			return Crud.SheetCrud.SelectMany(command);
+		}
+
 		///<summary>Gets the most recent Exam Sheet based on description to fill a patient letter.</summary>
 		public static Sheet GetMostRecentExamSheet(long patNum,string examDescript) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
