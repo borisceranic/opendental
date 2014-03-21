@@ -29,6 +29,7 @@ namespace OpenDental{
 		private CheckBox checkEhr;
 		private CheckBox checkSuperFam;
 		private Label label1;
+		private CheckBox checkPatClone;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -84,6 +85,7 @@ namespace OpenDental{
 			this.checkEhr = new System.Windows.Forms.CheckBox();
 			this.checkSuperFam = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.checkPatClone = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -95,7 +97,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(377, 348);
+			this.butCancel.Location = new System.Drawing.Point(377, 372);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -110,7 +112,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(377, 307);
+			this.butOK.Location = new System.Drawing.Point(377, 331);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -143,7 +145,7 @@ namespace OpenDental{
 			// 
 			this.checkAdvancedIns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkAdvancedIns.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAdvancedIns.Location = new System.Drawing.Point(12, 352);
+			this.checkAdvancedIns.Location = new System.Drawing.Point(12, 376);
 			this.checkAdvancedIns.Name = "checkAdvancedIns";
 			this.checkAdvancedIns.Size = new System.Drawing.Size(258, 19);
 			this.checkAdvancedIns.TabIndex = 4;
@@ -283,11 +285,24 @@ namespace OpenDental{
 			this.label1.Text = "The following settings will affect all computers.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
+			// checkPatientClone
+			// 
+			this.checkPatClone.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPatClone.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPatClone.Location = new System.Drawing.Point(12, 352);
+			this.checkPatClone.Name = "checkPatientClone";
+			this.checkPatClone.Size = new System.Drawing.Size(258, 19);
+			this.checkPatClone.TabIndex = 17;
+			this.checkPatClone.Text = "Patient Clone";
+			this.checkPatClone.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPatClone.Click += new System.EventHandler(this.checkPatClone_Click);
+			// 
 			// FormShowFeatures
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(467, 393);
+			this.ClientSize = new System.Drawing.Size(467, 417);
+			this.Controls.Add(this.checkPatClone);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkSuperFam);
 			this.Controls.Add(this.checkEhr);
@@ -332,6 +347,7 @@ namespace OpenDental{
 			checkMedicalIns.Checked=PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance);
 			checkEhr.Checked=PrefC.GetBool(PrefName.ShowFeatureEhr);
 			checkSuperFam.Checked=PrefC.GetBool(PrefName.ShowFeatureSuperfamilies);
+			checkPatClone.Checked=PrefC.GetBool(PrefName.ShowFeaturePatientClone);
 		}
 
 		private void checkEhr_Click(object sender,EventArgs e) {
@@ -348,6 +364,13 @@ namespace OpenDental{
 				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
 			}
 		}
+
+		private void checkPatClone_Click(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)!=checkPatClone.Checked) {
+				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
+			}
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			Prefs.UpdateBool(PrefName.EasyHideCapitation,!checkCapitation.Checked);
 			Prefs.UpdateBool(PrefName.EasyHideMedicaid,!checkMedicaid.Checked);
@@ -362,6 +385,7 @@ namespace OpenDental{
 			Prefs.UpdateBool(PrefName.ShowFeatureMedicalInsurance,checkMedicalIns.Checked);
 			Prefs.UpdateBool(PrefName.ShowFeatureEhr,checkEhr.Checked);
 			Prefs.UpdateBool(PrefName.ShowFeatureSuperfamilies,checkSuperFam.Checked);
+			Prefs.UpdateBool(PrefName.ShowFeaturePatientClone,checkPatClone.Checked);
 			DataValid.SetInvalid(InvalidType.Prefs);
 			DialogResult=DialogResult.OK;
 		}
@@ -369,7 +393,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 
 		
 

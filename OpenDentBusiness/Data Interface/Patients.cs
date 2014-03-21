@@ -1374,6 +1374,70 @@ namespace OpenDentBusiness{
 			return Crud.PatientCrud.SelectMany(command);
 		}
 
+		///<summary>Finds any patients with the same first name, last name, and birthdate.  The birthdate must be a valid date, not 0001-01-01.
+		///<para>If patCur has all-caps first and last names and there is exactly one matching patient who does not have all-caps first and last names, then patClone is set to patCur, patNonClone is set to the matching patient, and listAmbiguousMatches will be an empty list.</para>
+		///<para>If the matching patient has an all-caps first and last name and patCur does not, then patClone will be set to the matching patient, patNonClone will be set to patCur, and listAmbiguousMatches will be an empty list.</para>
+		///<para>If there are no matching patients, patClone and patNonClone will be null and listAmbiguousMatches will be an empty list.</para>
+		///<para>If more than one patient has the same first and last name and birthdate, patClone and patNonClone will be null and listAmbiguousMatches will contain all the matching patients.</para>
+		///<para>If there is one match, but there is not an all-caps to not all-caps relationship (meaning both are all-caps or both are mixed case or both are lower), patClone and patNonClone will be null and listAmbiguousMatches will contain the matching patient.</para></summary>
+		public static void GetCloneAndNonClone(Patient patCur,out Patient patClone,out Patient patNonClone,out List<Patient> listAmbiguousMatches) {
+			//if niether of these is set after this method, the patient does not have a clone and is also not a clone
+			patClone=null;
+			patNonClone=null;
+			listAmbiguousMatches=new List<Patient>();
+			if(patCur==null) {
+				return;
+			}
+			if(patCur.Birthdate.Year<1880) {
+				return;//in order to clone a patient or synch two patients, the birthdate for the patients must be a valid date
+			}
+			//listAllMatches should only contain 0 or 1 patient
+			//if more than 1 other patient has the same first and last name and birthdate, then there is ambiguity that has to be fixed manually
+			List<Patient> listAllMatches=GetListByNameAndBirthdate(patCur.PatNum,patCur.LName,patCur.FName,patCur.Birthdate);
+			if(listAllMatches.Count==0) {
+				return;//no matches, not a clone and does not have a clone
+			}
+			if(listAllMatches.Count>1) {
+				for(int i=0;i<listAllMatches.Count;i++) {
+					listAmbiguousMatches.Add(listAllMatches[i]);
+				}
+				return;//more than one match, cannot determine which is supposed to be linked, return the list of patients to notify the user that there is ambiguity and to fix manually
+			}
+			//there must be one and only one match, so determine if patCur is the clone or the non-clone
+			//if patCur has all-caps first and last name, and the patient found does not, then patCur is the clone and the patient found is the non-clone
+			if(patCur.LName.ToUpper()==patCur.LName
+				&& patCur.FName.ToUpper()==patCur.FName
+				&& (listAllMatches[0].LName.ToUpper()!=listAllMatches[0].LName || listAllMatches[0].FName.ToUpper()!=listAllMatches[0].FName))//using an or here so a patient name A Smith can be cloned to A SMITH and found based on first names both being upper case, but last names not or vice versa
+			{
+				patClone=patCur.Copy();
+				patNonClone=listAllMatches[0].Copy();
+			}
+			//if patCur does not have all-caps first and last name, but the patient found does, then the patient found is the clone and patCur is the non-clone
+			else if((patCur.LName.ToUpper()!=patCur.LName || patCur.FName.ToUpper()!=patCur.FName)//using an or here so original can have all uppercase first or last name but not both.  So A Smith can be cloned to A SMITH and both uppercase A first names will be ok.
+				&& listAllMatches[0].LName.ToUpper()==listAllMatches[0].LName
+				&& listAllMatches[0].FName.ToUpper()==listAllMatches[0].FName)
+			{
+				patNonClone=patCur.Copy();
+				patClone=listAllMatches[0].Copy();
+			}
+			else {
+				//either both patCur and the patient found have all-caps first and last names or both have mixed case or all lower case first and last names
+				//either way, we do not know if patCur is a clone or has a clone, there is ambiguity
+				//return the patient found to notify user to fix manually if it is supposed to be linked
+				listAmbiguousMatches.Add(listAllMatches[0]);
+			}
+		}
+
+		///<summary>Used with GetCloneAndNonClone to find the non-clone and clone patients for the pateint sent in if they exist.  Returns a list of patients that have the same last name, first name, and birthdate, ignoring case sensitivity, but different patNum.  Used to find duplicate patients that may be clones of the patient identified by the patNum parameter, or are the non-clone version of the patient.  The Birthdate supplied is guaranteed to be a valid date, so this will not find any with 0001-01-01 birthdates.</summary>
+		public static List<Patient> GetListByNameAndBirthdate(long patNum,string lName,string fName,DateTime birthdate) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),lName,fName,birthdate);
+			}
+			string command="SELECT * FROM patient WHERE LName LIKE '"+POut.String(lName)+"' AND FName LIKE '"+POut.String(fName)+"' "//use like to ignore case-sensitivity
+				+"AND Birthdate="+POut.Date(birthdate,true)+" AND PatNum!="+POut.Long(patNum);
+			return Crud.PatientCrud.SelectMany(command);
+		}
+
 		public static void UpdateFamilyBillingType(long billingType,long Guarantor) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),billingType,Guarantor);

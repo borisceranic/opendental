@@ -398,6 +398,8 @@ namespace OpenDentBusiness {
 		ShowAccountFamilyCommEntries,
 		ShowFeatureEhr,
 		ShowFeatureMedicalInsurance,
+		///<summary>Set to 1 to enable the Synch Clone button and allow users to create clones of patients.</summary>
+		ShowFeaturePatientClone,
 		ShowFeatureSuperfamilies,
 		///<summary>0=None, 1=PatNum, 2=ChartNumber, 3=Birthdate</summary>
 		ShowIDinTitleBar,

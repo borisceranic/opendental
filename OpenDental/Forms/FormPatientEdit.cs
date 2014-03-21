@@ -3266,6 +3266,44 @@ namespace OpenDental{
 				}
 				Recalls.Synch(PatCur.PatNum);
 			}
+			//if pref for Patient Clone is enabled, check to see if this patient is part of a clone pair, either the clone or original
+			//if part of a clone pair and the name or birthdate has been changed, synch the clone if PatCur is the original
+			//warn the user if PatCur is the clone that the linkage will be broken and to fix the value changed on the clone patient to re-link
+			//we do not want to synch from clone to original, so they have to fix manually
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)
+				&& (PatCur.LName!=PatOld.LName || PatCur.FName!=PatOld.FName || PatCur.Birthdate!=PatOld.Birthdate)) {
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(PatOld,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(patClone!=null) {
+					if(PatOld.PatNum==patClone.PatNum) {//PatOld is the clone, message box warning the user that changing the name and/or birthdate will now break the clone linkage
+						MessageBox.Show(Lan.g(this,"Changing the name of this patient clone will unlink it from the following patient")
+							+":\r\n"+patNonClone.PatNum+" - "+Patients.GetNameFL(patNonClone.LName,patNonClone.FName,patNonClone.Preferred,patNonClone.MiddleI)+".\r\n"
+							+Lan.g(this,"To re-link, the birthdates must be matching valid dates and the first and last names must be identical with the clone name all uppercase."));
+					}
+					else {//PatOld must be the non-clone, synch the name and birthdate changes to the clone
+						Patient patCloneOld=patClone.Copy();
+						string strChngTo=Lan.g(this," changed to ");
+						string changeMsg=Lan.g(this,"The following changes were synched to the clone of this patient,\r\n")
+							+patClone.PatNum+" - "+Patients.GetNameFL(patClone.LName,patClone.FName,patClone.Preferred,patClone.MiddleI)+":";
+						if(PatCur.LName!=PatOld.LName) {
+							patClone.LName=PatCur.LName.ToUpper();
+							changeMsg+="\r\n"+patCloneOld.LName+strChngTo+patClone.LName;
+						}
+						if(PatCur.FName!=PatOld.FName) {
+							patClone.FName=PatCur.FName.ToUpper();
+							changeMsg+="\r\n"+patCloneOld.FName+strChngTo+patClone.FName;
+						}
+						if(PatCur.Birthdate!=PatOld.Birthdate) {
+							patClone.Birthdate=PatCur.Birthdate;
+							changeMsg+="\r\n"+patCloneOld.Birthdate.ToShortDateString()+strChngTo+patClone.Birthdate.ToShortDateString();
+						}
+						Patients.Update(patClone,patCloneOld);
+						MessageBox.Show(changeMsg);
+					}
+				}
+			}
 			DialogResult=DialogResult.OK;
 		}
 

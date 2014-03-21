@@ -278,6 +278,9 @@ namespace OpenDental{
 						gridIns.Width=this.Width-gridIns.Left;//254;
 					}
 				}
+				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+					ToolBarMain.Buttons["SynchClone"].Enabled=true;
+				}
 				ToolBarMain.Invalidate();
 			}
 			else{
@@ -298,6 +301,9 @@ namespace OpenDental{
 				if(!PrefC.GetBool(PrefName.EasyHideInsurance)){
 					ToolBarMain.Buttons["Ins"].Enabled=false;
 				}
+				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+					ToolBarMain.Buttons["SynchClone"].Enabled=false;
+				}
 				ToolBarMain.Invalidate();
 				//Patients.Cur=new Patient();
 			}
@@ -313,12 +319,14 @@ namespace OpenDental{
 				if(def.ShowDemographics!=HL7ShowDemographics.ChangeAndAdd) {
 					ToolBarMain.Buttons["Add"].Enabled=false;
 					ToolBarMain.Buttons["Delete"].Enabled=false;
+					ToolBarMain.Buttons["SynchClone"].Enabled=false;
 				}
 			}
 			else {
 				if(Programs.UsingEcwFullMode()) {
 					ToolBarMain.Buttons["Add"].Enabled=false;
 					ToolBarMain.Buttons["Delete"].Enabled=false;
+					ToolBarMain.Buttons["SynchClone"].Enabled=false;
 				}
 			}
 			FillPatientPicture();
@@ -379,6 +387,9 @@ namespace OpenDental{
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Delete"),3,Lan.g(this,"Delete Family Member"),"Delete"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Set Guarantor"),4,Lan.g(this,"Set as Guarantor"),"Guarantor"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Move"),5,Lan.g(this,"Move to Another Family"),"Move"));
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Synch Clone"),-1,Lan.g(this,"Synch information to the clone patient or create a clone of the currently selected patient if one does not exist"),"SynchClone"));
+			}
 			if(PrefC.GetBool(PrefName.ShowFeatureSuperfamilies)){
 				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 				button=new ODToolBarButton(Lan.g(this,"Super Family:"),-1,"","");
@@ -459,6 +470,9 @@ namespace OpenDental{
 						break;
 					case "DisbandSuper":
 						ToolButDisbandSuper_Click();
+						break;
+					case "SynchClone":
+						ToolButSynchClone_Click();
 						break;
 				}
 			}
@@ -1309,6 +1323,386 @@ namespace OpenDental{
 			ModuleSelected(PatCur.PatNum);
 		}
 
+		///<summary>Synch specific data from the non-clone to the clone of the pair the selected patient belongs to.  The non-clone will have a normally cased first and last name, while the clone will have an all-caps first and last name.  Both patients will belong to the same family, so the clone will be moved to the non-clone family.  The insurance plans currently attached will be updated to the clone.  The address, phone, and a few other demographics will be copied to the clone.  If no changes need to be made, the user will get a message that the patients are already in synch.  If any change happens to the clone, the user will see exactly what changes OD makes.  If the currently selected patient does not have a clone, a messsage box will ask the user if they want to create an all-caps clone of the patient.</summary>
+		private void ToolButSynchClone_Click() {
+			Patient patClone;
+			Patient patNonClone;
+			List<Patient> listAmbiguousMatches;
+			Patient patCloneOld;
+			Patients.GetCloneAndNonClone(PatCur,out patClone,out patNonClone,out listAmbiguousMatches);
+			string strDataUpdated="";
+			bool isNewClone=false;
+			if(patClone==null) {
+				if(listAmbiguousMatches.Count==0) {//no clone exists, ask if one should be created
+					if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"The currently selected patient does not have a clone, would you like to create one?")) {
+						return;
+					}
+					if(PatCur.LName==PatCur.LName.ToUpper() && PatCur.FName==PatCur.FName.ToUpper()) {
+						MsgBox.Show(this,"In order to create a clone, the selected patient cannot have an all upper case first and last name.");
+						return;
+					}
+					if(PatCur.Birthdate.Year<1880) {
+						MsgBox.Show(this,"In order to create a clone, the selected patient must have a valid birthdate.");
+						return;
+					}
+					//create clone
+					patNonClone=PatCur.Copy();
+					patClone=new Patient();
+					patClone.LName=patNonClone.LName.ToUpper();
+					patClone.FName=patNonClone.FName.ToUpper();
+					patClone.MiddleI=patNonClone.MiddleI.ToUpper();
+					patClone.Birthdate=patNonClone.Birthdate;
+					long patClonePatNum=Patients.Insert(patClone,false);
+					patClone=Patients.GetPat(patClonePatNum);//this is so the fields not set will be refreshed to their non-null default value, i.e. '' instead of null
+					strDataUpdated+=Lan.g(this,"The following patient was created")+": "
+						+patClone.PatNum+" - "+Patients.GetNameFL(patClone.LName,patClone.FName,patClone.Preferred,patClone.MiddleI)+".\r\n";
+					isNewClone=true;
+				}
+				else {
+					strDataUpdated=Lan.g(this,"The synch cannot take place due to an issue matching the name and/or birthdate with one and only one other patient.")+"\r\n"
+						+Lan.g(this,"The following patients are causing the ambiguity and must be corrected manually.")+"\r\n";
+					for(int i=0;i<listAmbiguousMatches.Count;i++) {
+						if(i>4) {//only show the first 5 matches, there may be a lot of matches.  One customer has a patient who cares for many other patients and is entered in the system 70 times.
+							break;
+						}
+						strDataUpdated+=listAmbiguousMatches[i].PatNum+" - "
+							+Patients.GetNameFL(listAmbiguousMatches[i].LName,listAmbiguousMatches[i].FName,listAmbiguousMatches[i].Preferred,listAmbiguousMatches[i].MiddleI)
+							+", Birthdate "+listAmbiguousMatches[i].Birthdate.ToShortDateString()+"\r\n";
+					}
+					MessageBox.Show(strDataUpdated);
+					return;
+				}
+			}
+			//either clone was found and patCloneOld has been set to patClone or no clone existed and a new patient was inserted to be the new clone patient
+			#region Synch Clone Data - Patient Demographics
+			patCloneOld=patClone.Copy();
+			string strPatCloneNumAndName=patClone.PatNum+" - "+Patients.GetNameFL(patClone.LName,patClone.FName,patClone.Preferred,patClone.MiddleI);
+			List<string[]> listFieldsUpdated=new List<string[]>();//this is a list of string arrays, where the arrays hold the three values field name, old value, and new value for the fields updated 
+			if(patClone.Title!=patNonClone.Title) {
+				listFieldsUpdated.Add(new string[3] { "Title",patClone.Title,patNonClone.Title });
+				patClone.Title=patNonClone.Title;
+			}
+			if(patClone.Preferred!=patNonClone.Preferred.ToUpper()) {
+				listFieldsUpdated.Add(new string[3] { "Preferred Name",patClone.Preferred,patNonClone.Preferred.ToUpper() });
+				patClone.Preferred=patNonClone.Preferred.ToUpper();
+			}
+			if(patClone.MiddleI!=patNonClone.MiddleI.ToUpper()) {
+				listFieldsUpdated.Add(new string[3] { "Middle Initial",patClone.MiddleI,patNonClone.MiddleI.ToUpper() });
+				patClone.MiddleI=patNonClone.MiddleI.ToUpper();
+			}
+			if(patClone.Guarantor!=patNonClone.Guarantor) {
+				Patient patCloneGuar=Patients.GetPat(patClone.Guarantor);
+				Patient patNonCloneGuar=Patients.GetPat(patNonClone.Guarantor);
+				string strPatCloneGuarName="";
+				string strPatNonCloneGuarName="";
+				if(patCloneGuar!=null) {
+					strPatCloneGuarName=Patients.GetNameFL(patCloneGuar.LName,patCloneGuar.FName,patCloneGuar.Preferred,patCloneGuar.MiddleI);
+				}
+				if(patNonCloneGuar!=null) {
+					strPatNonCloneGuarName=Patients.GetNameFL(patNonCloneGuar.LName,patNonCloneGuar.FName,patNonCloneGuar.Preferred,patNonCloneGuar.MiddleI);
+				}
+				listFieldsUpdated.Add(new string[3] { "Guarantor",patClone.Guarantor.ToString()+" - "+strPatCloneGuarName,patNonClone.Guarantor.ToString()+" - "+strPatNonCloneGuarName });
+				patClone.Guarantor=patNonClone.Guarantor;
+			}
+			if(patClone.ResponsParty!=patNonClone.ResponsParty) {
+				Patient patCloneRespPart=Patients.GetPat(patClone.ResponsParty);
+				Patient patNonCloneRespPart=Patients.GetPat(patNonClone.ResponsParty);
+				string strPatCloneRespPartName="";
+				string strPatNonCloneRespPartName="";
+				if(patCloneRespPart!=null) {
+					strPatCloneRespPartName=Patients.GetNameFL(patCloneRespPart.LName,patCloneRespPart.FName,patCloneRespPart.Preferred,patCloneRespPart.MiddleI);
+				}
+				if(patNonCloneRespPart!=null) {
+					strPatNonCloneRespPartName=Patients.GetNameFL(patNonCloneRespPart.LName,patNonCloneRespPart.FName,patNonCloneRespPart.Preferred,patNonCloneRespPart.MiddleI);
+				}
+				listFieldsUpdated.Add(new string[3] { "Responsible Party",patClone.ResponsParty.ToString()+" - "+strPatCloneRespPartName,patNonClone.ResponsParty.ToString()+" - "+strPatNonCloneRespPartName });
+				patClone.ResponsParty=patNonClone.ResponsParty;
+			}
+			if(patClone.SuperFamily!=patNonClone.SuperFamily) {
+				Patient patCloneSupFam=Patients.GetPat(patClone.SuperFamily);
+				Patient patNonCloneSupFam=Patients.GetPat(patNonClone.SuperFamily);
+				string strPatCloneSupFamName="";
+				string strPatNonCloneSupFamName="";
+				if(patCloneSupFam!=null) {
+					strPatCloneSupFamName=Patients.GetNameFL(patCloneSupFam.LName,patCloneSupFam.FName,patCloneSupFam.Preferred,patCloneSupFam.MiddleI);
+				}
+				if(patNonCloneSupFam!=null) {
+					strPatNonCloneSupFamName=Patients.GetNameFL(patNonCloneSupFam.LName,patNonCloneSupFam.FName,patNonCloneSupFam.Preferred,patNonCloneSupFam.MiddleI);
+				}
+				listFieldsUpdated.Add(new string[3] { "Super Family",patClone.SuperFamily.ToString()+" - "+strPatCloneSupFamName,patNonClone.SuperFamily.ToString()+" - "+strPatNonCloneSupFamName });
+				patClone.SuperFamily=patNonClone.SuperFamily;
+			}
+			if(patClone.PatStatus!=patNonClone.PatStatus) {
+				listFieldsUpdated.Add(new string[3] { "Patient Status",patClone.PatStatus.ToString(),patNonClone.PatStatus.ToString() });
+				patClone.PatStatus=patNonClone.PatStatus;
+			}
+			if(patClone.Gender!=patNonClone.Gender) {
+				listFieldsUpdated.Add(new string[3] { "Gender",patClone.Gender.ToString(),patNonClone.Gender.ToString() });
+				patClone.Gender=patNonClone.Gender;
+			}
+			if(patClone.Language!=patNonClone.Language) {
+				string strPatCloneLang="";
+				string strPatNonCloneLang="";
+				try {
+					strPatCloneLang=CodeBase.MiscUtils.GetCultureFromThreeLetter(patClone.Language).DisplayName;
+				}
+				catch {
+					strPatCloneLang=patClone.Language;
+				}
+				try {
+					strPatNonCloneLang=CodeBase.MiscUtils.GetCultureFromThreeLetter(patNonClone.Language).DisplayName;
+				}
+				catch {
+					strPatNonCloneLang=patClone.Language;
+				}
+				listFieldsUpdated.Add(new string[3] { "Language",strPatCloneLang,strPatNonCloneLang });
+				patClone.Language=patNonClone.Language;
+			}
+			if(patClone.Race!=patNonClone.Race) {
+				listFieldsUpdated.Add(new string[3] { "Race",patClone.Race.ToString(),patNonClone.Race.ToString() });
+				patClone.Race=patNonClone.Race;
+			}
+			if(patClone.SSN!=patNonClone.SSN) {
+				listFieldsUpdated.Add(new string[3] { "SSN",patClone.SSN,patNonClone.SSN });
+				patClone.SSN=patNonClone.SSN;
+			}
+			if(patClone.Position!=patNonClone.Position) {
+				listFieldsUpdated.Add(new string[3] { "Position",patClone.Position.ToString(),patNonClone.Position.ToString() });
+				patClone.Position=patNonClone.Position;
+			}
+			if(patClone.Address!=patNonClone.Address) {
+				listFieldsUpdated.Add(new string[3] { "Address",patClone.Address,patNonClone.Address });
+				patClone.Address=patNonClone.Address;
+			}
+			if(patClone.Address2!=patNonClone.Address2) {
+				listFieldsUpdated.Add(new string[3] { "Address2",patClone.Address2,patNonClone.Address2 });
+				patClone.Address2=patNonClone.Address2;
+			}
+			if(patClone.City!=patNonClone.City) {
+				listFieldsUpdated.Add(new string[3] { "City",patClone.City,patNonClone.City });
+				patClone.City=patNonClone.City;
+			}
+			if(patClone.State!=patNonClone.State) {
+				listFieldsUpdated.Add(new string[3] { "State",patClone.State,patNonClone.State });
+				patClone.State=patNonClone.State;
+			}
+			if(patClone.Zip!=patNonClone.Zip) {
+				listFieldsUpdated.Add(new string[3] { "Zip",patClone.Zip,patNonClone.Zip });
+				patClone.Zip=patNonClone.Zip;
+			}
+			if(patClone.County!=patNonClone.County) {
+				listFieldsUpdated.Add(new string[3] { "County",patClone.County,patNonClone.County });
+				patClone.County=patNonClone.County;
+			}
+			if(patClone.AddrNote!=patNonClone.AddrNote) {
+				listFieldsUpdated.Add(new string[3] { "Address Note",patClone.AddrNote,patNonClone.AddrNote });
+				patClone.AddrNote=patNonClone.AddrNote;
+			}
+			if(patClone.HmPhone!=patNonClone.HmPhone) {
+				listFieldsUpdated.Add(new string[3] { "Home Phone",patClone.HmPhone,patNonClone.HmPhone });
+				patClone.HmPhone=patNonClone.HmPhone;
+			}
+			if(patClone.WirelessPhone!=patNonClone.WirelessPhone) {
+				listFieldsUpdated.Add(new string[3] { "Wireless Phone",patClone.WirelessPhone,patNonClone.WirelessPhone });
+				patClone.WirelessPhone=patNonClone.WirelessPhone;
+			}
+			if(patClone.WkPhone!=patNonClone.WkPhone) {
+				listFieldsUpdated.Add(new string[3] { "Work Phone",patClone.WkPhone,patNonClone.WkPhone });
+				patClone.WkPhone=patNonClone.WkPhone;
+			}
+			if(patClone.Email!=patNonClone.Email) {
+				listFieldsUpdated.Add(new string[3] { "Email",patClone.Email,patNonClone.Email });
+				patClone.Email=patNonClone.Email;
+			}
+			if(patClone.TxtMsgOk!=patNonClone.TxtMsgOk) {
+				listFieldsUpdated.Add(new string[3] { "TxtMsgOk",patClone.TxtMsgOk.ToString(),patNonClone.TxtMsgOk.ToString() });
+				patClone.TxtMsgOk=patNonClone.TxtMsgOk;
+			}
+			if(patClone.BillingType!=patNonClone.BillingType) {
+				string cloneBillType="";
+				string nonCloneBillType="";
+				for(int i=0;i<DefC.Short[(int)DefCat.BillingTypes].Length;i++){
+					if(patClone.BillingType==DefC.Short[(int)DefCat.BillingTypes][i].DefNum) {
+						cloneBillType=DefC.Short[(int)DefCat.BillingTypes][i].ItemName;
+					}
+					if(patNonClone.BillingType==DefC.Short[(int)DefCat.BillingTypes][i].DefNum) {
+						nonCloneBillType=DefC.Short[(int)DefCat.BillingTypes][i].ItemName;
+					}
+				}
+				listFieldsUpdated.Add(new string[3] { "Billing Type",cloneBillType,nonCloneBillType });
+				patClone.BillingType=patNonClone.BillingType;
+			}
+			if(patClone.FeeSched!=patNonClone.FeeSched) {
+				string cloneFeeSched="";
+				string nonCloneFeeSched="";
+				for(int i=0;i<FeeSchedC.ListShort.Count;i++) {
+					if(patClone.FeeSched==FeeSchedC.ListShort[i].FeeSchedNum) {
+						cloneFeeSched=FeeSchedC.ListShort[i].Description;
+					}
+					if(patNonClone.FeeSched==FeeSchedC.ListShort[i].FeeSchedNum) {
+						nonCloneFeeSched=FeeSchedC.ListShort[i].Description;
+					}
+				}
+				listFieldsUpdated.Add(new string[3] { "Fee Schedule",cloneFeeSched,nonCloneFeeSched });
+				patClone.FeeSched=patNonClone.FeeSched;
+			}
+			if(patClone.CreditType!=patNonClone.CreditType) {
+				listFieldsUpdated.Add(new string[3] { "Credit Type",patClone.CreditType,patNonClone.CreditType });
+				patClone.CreditType=patNonClone.CreditType;
+			}
+			if(patClone.MedicaidID!=patNonClone.MedicaidID) {
+				listFieldsUpdated.Add(new string[3] { "Medicaid ID",patClone.MedicaidID,patNonClone.MedicaidID });
+				patClone.MedicaidID=patNonClone.MedicaidID;
+			}
+			if(patClone.MedUrgNote!=patNonClone.MedUrgNote) {
+				listFieldsUpdated.Add(new string[3] { "Medical Urgent Note",patClone.MedUrgNote,patNonClone.MedUrgNote });
+				patClone.MedUrgNote=patNonClone.MedUrgNote;
+			}
+			Patients.Update(patClone,patCloneOld);
+			if(!isNewClone && listFieldsUpdated.Count>0) {
+				strDataUpdated+=Lan.g(this,"The following patient demographic changes were made to the clone patient ")+strPatCloneNumAndName+":\r\n";
+			}
+			string strChngFrom=Lan.g(this," changed from ") ;
+			string strChngTo=Lan.g(this," to ");
+			string strBlank=Lan.g(this,"blank");
+			for(int i=0;i<listFieldsUpdated.Count;i++) {
+				if(isNewClone) {
+					break;
+				}
+				strDataUpdated+=listFieldsUpdated[i][0]+strChngFrom;
+				if(listFieldsUpdated[i][1]=="") {//blank filled with data
+					strDataUpdated+=strBlank;
+				}
+				else {
+					strDataUpdated+=listFieldsUpdated[i][1];
+				}
+				strDataUpdated+=strChngTo;
+				if(listFieldsUpdated[i][2]=="") {
+					strDataUpdated+=strBlank;
+				}
+				else {
+					strDataUpdated+=listFieldsUpdated[i][2]+"\r\n";
+				}
+			}
+			#endregion Synch Clone Data - Patient Demographics
+			#region Synch Clone Data - PatPlans
+			bool patPlansChanged=false;
+			List<PatPlan> listPatPlansNonClone=PatPlans.Refresh(patNonClone.PatNum);//ordered by ordinal
+			List<PatPlan> listPatPlansClone=PatPlans.Refresh(patClone.PatNum);//ordered by ordinal
+			List<Claim> claimList=Claims.Refresh(patClone.PatNum);//used to determine if the patplan we are going to drop is attached to a claim with today's date
+			for(int i=claimList.Count-1;i>-1;i--) {//remove any claims that do not have a date of today, we are only concerned with claims with today's date
+				if(claimList[i].DateService==DateTime.Today) {
+					continue;
+				}
+				claimList.RemoveAt(i);
+			}
+			//if the clone has more patplans than the non-clone, drop the additional patplans
+			//we will compute all estimates for the clone after all of the patplan adding/dropping/rearranging
+			for(int i=listPatPlansClone.Count-1;i>listPatPlansNonClone.Count-1;i--) {
+				InsSub insSubCloneCur=InsSubs.GetOne(listPatPlansClone[i].InsSubNum);
+				//we will drop the clone's patplan because the clone has more patplans than the non-clone
+				//before we can drop the plan, we have to make sure there is not a claim with today's date
+				bool isAttachedToClaim=false;
+				for(int j=0;j<claimList.Count;j++) {//claimList will only contain claims with DateService=Today
+					if(claimList[j].PlanNum!=insSubCloneCur.PlanNum) {//different insplan
+						continue;
+					}
+					strDataUpdated+=Lan.g(this,"The clone's currently attached insurance does not match.  Due to a claim with today's date we cannot synch the plans, the issue must be corrected manually on the following plan")+": "+InsPlans.GetDescript(insSubCloneCur.PlanNum,FamCur,PlanList,listPatPlansClone[i].InsSubNum,SubList)+".\r\n";
+					isAttachedToClaim=true;
+					break;
+				}
+				if(isAttachedToClaim) {//we will continue trying to drop non-clone additional plans, but only if no claim for today exists
+					continue;
+				}
+				strDataUpdated+=Lan.g(this,"The following insurance plan was dropped from the clone patient due to it not existing with the same ordinal on the original patient")+": "
+					+InsPlans.GetDescript(insSubCloneCur.PlanNum,FamCur,PlanList,listPatPlansClone[i].InsSubNum,SubList)+".\r\n";
+				patPlansChanged=true;
+				PatPlans.DeleteNonContiguous(listPatPlansClone[i].PatPlanNum);
+				listPatPlansClone.RemoveAt(i);
+			}
+			for(int i=0;i<listPatPlansNonClone.Count;i++) {
+				InsSub insSubNonCloneCur=InsSubs.GetOne(listPatPlansNonClone[i].InsSubNum);
+				string insPlanNonCloneDescriptCur=InsPlans.GetDescript(insSubNonCloneCur.PlanNum,FamCur,PlanList,listPatPlansNonClone[i].InsSubNum,SubList);
+				if(listPatPlansClone.Count<i+1) {//if there is not a PatPlan at this ordinal position for the clone, add a new one that is an exact copy, with correct PatNum of course
+					PatPlan patPlanNew=listPatPlansNonClone[i].Copy();
+					patPlanNew.PatNum=patClone.PatNum;
+					PatPlans.Insert(patPlanNew);
+					strDataUpdated+=Lan.g(this,"The following insurance was added to the clone patient")+": "+insPlanNonCloneDescriptCur+".\r\n";
+					patPlansChanged=true;
+					continue;
+				}
+				InsSub insSubCloneCur=InsSubs.GetOne(listPatPlansClone[i].InsSubNum);
+				string insPlanCloneDescriptCur=InsPlans.GetDescript(insSubCloneCur.PlanNum,FamCur,PlanList,listPatPlansClone[i].InsSubNum,SubList);
+				if(listPatPlansNonClone[i].InsSubNum!=listPatPlansClone[i].InsSubNum) {//both pats have a patplan at this ordinal, but the clone's is pointing to a different inssub
+					//we will drop the clone's patplan and add the non-clone's patplan
+					//before we can drop the plan, we have to make sure there is not a claim with today's date
+					bool isAttachedToClaim=false;
+					for(int j=0;j<claimList.Count;j++) {//claimList will only contain claims with DateService=Today
+						if(claimList[j].PlanNum!=insSubCloneCur.PlanNum) {//different insplan
+							continue;
+						}
+						strDataUpdated+=Lan.g(this,"The clone's currently attached insurance does not match.  Due to a claim with today's date we cannot synch the plans, the issue must be corrected manually on the following plan")+": "+insPlanCloneDescriptCur+".\r\n";
+						isAttachedToClaim=true;
+						break;
+					}
+					if(isAttachedToClaim) {//if we cannot change this plan to match the non-clone's plan at the same ordinal, we will synch the rest of the plans and let the user know to fix manually
+						continue;
+					}
+					strDataUpdated+=Lan.g(this,"The following plan was updated to match the original patient's plan")+": "+insPlanCloneDescriptCur+".\r\n";
+					patPlansChanged=true;
+					PatPlans.DeleteNonContiguous(listPatPlansClone[i].PatPlanNum);//we use the NonContiguous version because we are going to insert into this same ordinal, compute estimates will happen at the end of all the changes
+					PatPlan patPlanCopy=listPatPlansNonClone[i].Copy();
+					patPlanCopy.PatNum=patClone.PatNum;
+					PatPlans.Insert(patPlanCopy);
+				}
+				else {
+					//both clone and non-clone have the same patplan.InsSubNum at this position in their list, just make sure all data in the patplans match
+					if(listPatPlansNonClone[i].Ordinal!=listPatPlansClone[i].Ordinal) {
+						strDataUpdated+=Lan.g(this,"The ordinal of the clone patient's insurance plan ")+insPlanCloneDescriptCur
+							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].Ordinal.ToString()+".\r\n";
+						patPlansChanged=true;
+						listPatPlansClone[i].Ordinal=listPatPlansNonClone[i].Ordinal;
+					}
+					if(listPatPlansNonClone[i].IsPending!=listPatPlansClone[i].IsPending) {
+						strDataUpdated+=Lan.g(this,"The pending status of the clone patient's insurance plan ")+insPlanCloneDescriptCur
+							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].IsPending.ToString()+".\r\n";
+						patPlansChanged=true;
+						listPatPlansClone[i].IsPending=listPatPlansNonClone[i].IsPending;
+					}
+					if(listPatPlansNonClone[i].Relationship!=listPatPlansClone[i].Relationship) {
+						strDataUpdated+=Lan.g(this,"The relationship to the subscriber of the clone patient's insurance plan ")+insPlanCloneDescriptCur
+							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].Relationship.ToString()+".\r\n";
+						patPlansChanged=true;
+						listPatPlansClone[i].Relationship=listPatPlansNonClone[i].Relationship;
+					}
+					if(listPatPlansNonClone[i].PatID!=listPatPlansClone[i].PatID) {
+						strDataUpdated+=Lan.g(this,"The patient ID of the clone patient's insurance plan ")+insPlanCloneDescriptCur
+							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].PatID+".\r\n";
+						patPlansChanged=true;
+						listPatPlansClone[i].PatID=listPatPlansNonClone[i].PatID;
+					}
+					PatPlans.Update(listPatPlansClone[i]);
+				}
+			}
+			if(patPlansChanged) {
+				//compute all estimates for clone after making changes to the patplans
+				List<ClaimProc> claimProcs=ClaimProcs.Refresh(patClone.PatNum);
+				List<Procedure> procs=Procedures.Refresh(patClone.PatNum);
+				listPatPlansClone=PatPlans.Refresh(patClone.PatNum);
+				SubList=InsSubs.RefreshForFam(FamCur);
+				PlanList=InsPlans.RefreshForSubList(SubList);
+				BenefitList=Benefits.Refresh(listPatPlansClone,SubList);
+				Procedures.ComputeEstimatesForAll(patClone.PatNum,claimProcs,procs,PlanList,listPatPlansClone,BenefitList,patClone.Age,SubList);
+				Patients.SetHasIns(patClone.PatNum);
+			}
+			#endregion Synch Clone Data - PatPlans
+			RefreshModuleData(PatCur.PatNum);
+			RefreshModuleScreen();
+			if(strDataUpdated=="") {
+				strDataUpdated=Lan.g(this,"No changes were made, data already in synch.");
+			}
+			MessageBox.Show(this,strDataUpdated);
+		}
 		#endregion
 
 		#region gridRecall
