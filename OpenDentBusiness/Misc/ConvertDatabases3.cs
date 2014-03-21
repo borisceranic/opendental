@@ -4091,6 +4091,15 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE displayfield ADD PickList varchar2(4000)";
 					Db.NonQ(command);
 				}
+				//Blue theme
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ColorTheme','1')";//On by default
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ColorTheme','1')";//On by default
+					Db.NonQ(command);
+				}
 
 
 
@@ -4107,7 +4116,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
 
 
 

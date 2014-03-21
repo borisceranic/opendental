@@ -40,6 +40,7 @@ namespace OpenDental{
 		private Label label2;
 		private CheckBox checkTasksNewTrackedByUser;
 		private CheckBox checkShowOpenTickets;
+		private CheckBox checkColorTheme;
 		private Label label1;
 		//private List<Def> posAdjTypes;
 
@@ -93,6 +94,7 @@ namespace OpenDental{
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkColorTheme = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBoxTaskDefaults.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -108,7 +110,7 @@ namespace OpenDental{
 			// label3
 			// 
 			this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label3.Location = new System.Drawing.Point(41, 138);
+			this.label3.Location = new System.Drawing.Point(41, 152);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(333, 35);
 			this.label3.TabIndex = 56;
@@ -119,7 +121,7 @@ namespace OpenDental{
 			// label4
 			// 
 			this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label4.Location = new System.Drawing.Point(59, 183);
+			this.label4.Location = new System.Drawing.Point(59, 197);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(298, 17);
 			this.label4.TabIndex = 64;
@@ -243,7 +245,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.checkTaskListAlwaysShow);
 			this.groupBox2.Controls.Add(this.checkTasksCheckOnStartup);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(101, 240);
+			this.groupBox2.Location = new System.Drawing.Point(101, 254);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(364, 184);
 			this.groupBox2.TabIndex = 188;
@@ -360,7 +362,7 @@ namespace OpenDental{
 			// 
 			// textWebServiceServerName
 			// 
-			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 212);
+			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 226);
 			this.textWebServiceServerName.Name = "textWebServiceServerName";
 			this.textWebServiceServerName.Size = new System.Drawing.Size(165, 20);
 			this.textWebServiceServerName.TabIndex = 197;
@@ -368,7 +370,7 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(4, 213);
+			this.label2.Location = new System.Drawing.Point(4, 227);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(279, 17);
 			this.label2.TabIndex = 198;
@@ -382,7 +384,7 @@ namespace OpenDental{
 			this.butLanguages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLanguages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLanguages.CornerRadius = 4F;
-			this.butLanguages.Location = new System.Drawing.Point(360, 178);
+			this.butLanguages.Location = new System.Drawing.Point(360, 192);
 			this.butLanguages.Name = "butLanguages";
 			this.butLanguages.Size = new System.Drawing.Size(88, 24);
 			this.butLanguages.TabIndex = 63;
@@ -391,7 +393,7 @@ namespace OpenDental{
 			// 
 			// textSigInterval
 			// 
-			this.textSigInterval.Location = new System.Drawing.Point(375, 147);
+			this.textSigInterval.Location = new System.Drawing.Point(375, 161);
 			this.textSigInterval.MaxVal = 1000000;
 			this.textSigInterval.MinVal = 1;
 			this.textSigInterval.Name = "textSigInterval";
@@ -408,7 +410,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(487, 400);
+			this.butCancel.Location = new System.Drawing.Point(487, 421);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -423,17 +425,29 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(487, 362);
+			this.butOK.Location = new System.Drawing.Point(487, 383);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkColorTheme
+			// 
+			this.checkColorTheme.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkColorTheme.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkColorTheme.Location = new System.Drawing.Point(87, 132);
+			this.checkColorTheme.Name = "checkColorTheme";
+			this.checkColorTheme.Size = new System.Drawing.Size(362, 17);
+			this.checkColorTheme.TabIndex = 199;
+			this.checkColorTheme.Text = "Blue theme";
+			this.checkColorTheme.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormMisc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(579, 437);
+			this.ClientSize = new System.Drawing.Size(579, 458);
+			this.Controls.Add(this.checkColorTheme);
 			this.Controls.Add(this.textWebServiceServerName);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
@@ -471,6 +485,7 @@ namespace OpenDental{
 			else{
 				textSigInterval.Text=PrefC.GetLong(PrefName.ProcessSigsIntervalInSecs).ToString();
 			}
+			checkColorTheme.Checked=PrefC.GetBool(PrefName.ColorTheme);
 			textMainWindowTitle.Text=PrefC.GetString(PrefName.MainWindowTitle);
 			comboShowID.Items.Add(Lan.g(this,"None"));
 			comboShowID.Items.Add(Lan.g(this,"PatNum"));
@@ -556,6 +571,10 @@ namespace OpenDental{
 				)
 			{
 				changed=true;
+			}
+			if(Prefs.UpdateBool(PrefName.ColorTheme,checkColorTheme.Checked)) {
+				changed=true;
+				OpenDental.UI.ODToolBar.UseBlueTheme=checkColorTheme.Checked;
 			}
 			//task list------------------------------------------------------------------------------------------
 			if(ComputerPrefs.LocalComputer.TaskKeepListHidden!=checkBoxTaskKeepListHidden.Checked) {

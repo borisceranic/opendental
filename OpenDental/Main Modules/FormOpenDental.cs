@@ -1677,6 +1677,14 @@ namespace OpenDental{
 					}
 				}
 				Cursor=Cursors.WaitCursor;
+				//theme
+				try {
+					ODToolBar.UseBlueTheme=PrefC.GetBool(PrefName.ColorTheme);
+				}
+				catch {
+					//try/catch in case you are trying to convert from an older version of OD and need to update the DB.
+				}
+				this.Invalidate();//apply them at next repaint.
 				Plugins.LoadAllPlugins(this);//moved up from near RefreshLocalData(invalidTypes). New position might cause problems.
 				Splash=new FormSplash();
 				if(CommandLineArgs.Length==0) {
@@ -4331,6 +4339,8 @@ namespace OpenDental{
 			if(FormM.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
+			RecursiveInvalidate(this);
+			//this.Invalidate();
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
@@ -4344,6 +4354,14 @@ namespace OpenDental{
 				timerSignals.Enabled=true;
 			}
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Misc");
+		}
+
+		///<summary>Only used when blue theme is changed.</summary>
+		private void RecursiveInvalidate(Control control){
+			foreach(Control c in control.Controls) {
+				RecursiveInvalidate(c);
+			}
+			control.Invalidate();
 		}
 
 		private void menuItemModules_Click(object sender,EventArgs e) {
@@ -5728,7 +5746,6 @@ namespace OpenDental{
 			//This step is necessary so that graphics memory does not fill up.
 			Dispose();
 		}
-
 
 
 	

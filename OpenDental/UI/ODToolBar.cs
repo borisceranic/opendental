@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 
 namespace OpenDental.UI{
 	///<summary></summary>
@@ -23,13 +24,88 @@ namespace OpenDental.UI{
 		///<summary></summary>
 		[Category("Action"),Description("Occurs when a button is clicked.")]
 		public event ODToolBarButtonClickEventHandler ButtonClick=null;
-
+		private static LinearGradientBrush brushPushed;
+		private static LinearGradientBrush brushHover;
+		private static LinearGradientBrush brushMedium;
+		private static LinearGradientBrush brushDark;
+		private static Brush brushTextFore;
+		private static Brush brushText;
+		private static Brush brushTextDisabled;
+		private static Pen penLight;
+		private static Pen penOutline;
+		//private static Pen penDark;
+		private static Pen penDivider;
+		///<summary>This can be set from anywhere to affect all toolbars simultaneously.</summary>
+		private static bool _useBlueTheme;
 
 		///<summary></summary>
 		public ODToolBar(){
 			InitializeComponent();// This call is required by the Windows.Forms Form Designer.
+			ReloadBrushes();
 			toolTip1 = new ToolTip();
 			toolTip1.InitialDelay=1100;
+		}
+
+		public static bool UseBlueTheme {
+			get {
+				return _useBlueTheme;
+			}
+			set {
+				_useBlueTheme=value;
+				ReloadBrushes();
+			}
+		}
+
+		///<summary>Reloads brushes based on current theme.</summary>
+		private static void ReloadBrushes() {
+			Color cTopPushed=Color.FromArgb(248,248,248);
+			Color cBotPushed=Color.FromArgb(248,248,248);
+			Color cTopHover=Color.FromArgb(240,240,240);
+			Color cBotHover=Color.FromArgb(240,240,240);
+			Color cTopMedium=SystemColors.Control;
+			Color cBotMedium=SystemColors.Control;
+			Color cTopDark=Color.FromArgb(210,210,210);
+			Color cBotDark=Color.FromArgb(210,210,210);
+			Color cTextFore=DefaultForeColor;
+			Color cText=Color.DarkSlateGray;
+			Color cTextDisabled=SystemColors.GrayText;
+			//Color cPenLight=Color.SlateGray;
+			Color cPenOutline=Color.SlateGray;
+			//Color cPenDark=Color.DarkSlateGray;
+			Color cPenDivider=Color.FromArgb(180,180,180);
+			if(UseBlueTheme) {
+				//Static Blue colors
+				cTopMedium=Color.FromArgb(255,255,255);//<<--Change this value
+				cBotMedium=Color.FromArgb(192,202,240);//<<--Change this value
+				#region Dynamic Blue Colors
+				int l=10;//L for light. added to light values of shaded buttons
+				int d=-30;//D for dark. added to dark values of shadded buttons.
+				//Derived colors
+				cTopPushed=Color.FromArgb((byte)Math.Min(255,cTopMedium.R+2*l),(byte)Math.Min(255,cTopMedium.G+2*l),(byte)Math.Min(255,cTopMedium.B+2*l));
+				cBotPushed=Color.FromArgb((byte)Math.Min(255,cBotMedium.R+2*l),(byte)Math.Min(255,cBotMedium.G+2*l),(byte)Math.Min(255,cBotMedium.B+2*l));
+				cTopHover=cTopMedium;//Color.FromArgb((byte)Math.Min(255,cTopMedium.R+l),(byte)Math.Min(255,cTopMedium.G+l),(byte)Math.Min(255,cTopMedium.B+l));
+				cBotHover=cBotMedium;//Color.FromArgb((byte)Math.Min(255,cBotMedium.R+l),(byte)Math.Min(255,cBotMedium.G+l),(byte)Math.Min(255,cBotMedium.B+l));
+				cTopDark=Color.FromArgb((byte)Math.Min(255,cTopMedium.R+d),(byte)Math.Min(255,cTopMedium.G+d),(byte)Math.Min(255,cTopMedium.B+d));
+				cBotDark=Color.FromArgb((byte)Math.Min(255,cBotMedium.R+d),(byte)Math.Min(255,cBotMedium.G+d),(byte)Math.Min(255,cBotMedium.B+d));
+				cText=Color.Black;
+				//cPenLight=Color.FromArgb(180,195,243);
+				//cPenMedium=Color.FromArgb(180,195,243);
+				//cPenDark=Color.Black;
+				#endregion
+			}
+			//Brushes
+			brushPushed	=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopPushed,cBotPushed);
+			brushHover				=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopHover,cBotHover);
+			brushMedium				=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopMedium,cBotMedium);
+			brushDark					=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopDark,cBotDark);
+			brushTextFore			=new SolidBrush(cTextFore);
+			brushText					=new SolidBrush(cText);
+			brushTextDisabled	=new SolidBrush(cTextDisabled);
+			//Pens
+			//penLight	=new Pen(cPenLight,1);
+			penOutline	=new Pen(cPenOutline,1);
+			//penDark		=new Pen(cPenDark,1);
+			penDivider=new Pen(cPenDivider,1);
 		}
 
 		///<summary>Clean up any resources being used.</summary>
@@ -287,11 +363,11 @@ namespace OpenDental.UI{
 		///<summary>Runs any time the control is invalidated.</summary>
 		protected override void OnPaint(System.Windows.Forms.PaintEventArgs e){
 			if(DesignMode){
-				e.Graphics.DrawRectangle(Pens.SlateGray,0,0,Width-1,Height-1);
+				e.Graphics.DrawRectangle(penOutline,0,0,Width-1,Height-1);//draw toolbar
 				StringFormat format=new StringFormat();
 				format.Alignment=StringAlignment.Center;
 				format.LineAlignment=StringAlignment.Center;
-				e.Graphics.DrawString(this.Name,Font,Brushes.DarkSlateGray,new Rectangle(0,0,Width,Height),format);
+				e.Graphics.DrawString(this.Name,Font,brushText,new Rectangle(0,0,Width,Height),format);
 				return;
 			}
 			//e.ClipRectangle
@@ -300,10 +376,11 @@ namespace OpenDental.UI{
 				//check to see if bound are in the clipping rectangle
 				DrawButton(e.Graphics,button);
 			}
-			e.Graphics.DrawLine(Pens.SlateGray,0,Height-1,Width-1,Height-1);
+			e.Graphics.DrawLine(penOutline,0,Height-1,Width-1,Height-1);
 		}
 
-		private void DrawButton(Graphics g,ODToolBarButton button){
+		private void DrawButton(Graphics g,ODToolBarButton button) {
+			#region Separator
 			if(button.Style==ODToolBarButtonStyle.Separator){
 				//was 112,128,144
 				//medium stripe
@@ -317,47 +394,48 @@ namespace OpenDental.UI{
 					button.Bounds.Left+2,button.Bounds.Bottom-2);
 				return;
 			}
+			#endregion
 			//draw background
 			if(!button.Enabled){
-				g.FillRectangle(new SolidBrush(SystemColors.Control),button.Bounds);
+				g.FillRectangle(brushMedium,button.Bounds);
 			}
 			else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed){
-				g.FillRectangle(new SolidBrush(Color.FromArgb(248,248,248)),button.Bounds);
+				g.FillRectangle(brushPushed,button.Bounds);
 			}
 			else if(button.Style==ODToolBarButtonStyle.Label){
-				g.FillRectangle(new SolidBrush(SystemColors.Control),button.Bounds);
+				g.FillRectangle(brushMedium,button.Bounds);
 			}
 			else switch(button.State){
-				case ToolBarButtonState.Normal://Control is 224,223,227
-					g.FillRectangle(new SolidBrush(SystemColors.Control),button.Bounds);
+				case ToolBarButtonState.Normal://Control is 224,223,227 (==Ryan. This is not always true. Control is 240,240,240 for me.)
+					g.FillRectangle(brushMedium,button.Bounds);
 					break;
 				case ToolBarButtonState.Hover://this is lighter than control
-					g.FillRectangle(new SolidBrush(Color.FromArgb(240,240,240)),button.Bounds);
+					g.FillRectangle(brushHover,button.Bounds);
 					break;
 				case ToolBarButtonState.Pressed://slightly darker than control
-					g.FillRectangle(new SolidBrush(Color.FromArgb(210,210,210)),button.Bounds);
+					g.FillRectangle(brushDark,button.Bounds);
 					break;
 				case ToolBarButtonState.DropPressed:
 					//left half looks like hover:
-					g.FillRectangle(new SolidBrush(Color.FromArgb(240,240,240))
+					g.FillRectangle(brushHover
 						,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-15,button.Bounds.Height));
 					//right section looks like Pressed:
-					g.FillRectangle(new SolidBrush(Color.FromArgb(210,210,210))
+					g.FillRectangle(brushDark
 						,new Rectangle(button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
 						,15,button.Bounds.Height));
 					break;
 			}
 			//draw image and/or text
-			Color textColor=ForeColor;
+			//Color textColor=ForeColor;
 			Rectangle textRect;
 			int textWidth=button.Bounds.Width;
 			if(button.Style==ODToolBarButtonStyle.DropDownButton){
 				textWidth-=15;
 			}
-			if(!button.Enabled){
-				textColor=SystemColors.GrayText;
-			}
+			//if(!button.Enabled){
+			//	textColor=SystemColors.GrayText;
+			//}
 			if(imageList!=null && button.ImageIndex!=-1 && button.ImageIndex<imageList.Images.Count){//draw image and text
 				if(!button.Enabled){
 					System.Windows.Forms.ControlPaint.DrawImageDisabled(g,imageList.Images[button.ImageIndex]
@@ -396,43 +474,53 @@ namespace OpenDental.UI{
 				format=new StringFormat();
 				format.Alignment=StringAlignment.Near;
 				format.LineAlignment=StringAlignment.Center;
-				g.DrawString(button.Text,Font,new SolidBrush(textColor),textRect,format);
+				if(button.Enabled) {
+					g.DrawString(button.Text,Font,brushTextFore,textRect,format);
+				}
+				else {
+					g.DrawString(button.Text,Font,brushTextDisabled,textRect,format);
+				}
 			}
 			else{
 				format=new StringFormat();
 				format.Alignment=StringAlignment.Center;
 				format.LineAlignment=StringAlignment.Center;
-				g.DrawString(button.Text,Font,new SolidBrush(textColor),textRect,format);
+				if(button.Enabled) {
+					g.DrawString(button.Text,Font,brushTextFore,textRect,format);
+				}
+				else {
+					g.DrawString(button.Text,Font,brushTextDisabled,textRect,format);
+				}
 			}
 			//draw outline
-			Pen penR=new Pen(Color.FromArgb(180,180,180));
+			//Pen penR=penMedium;//new Pen(Color.FromArgb(180,180,180));
 			if(!button.Enabled){
 				//no outline
-				g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+				g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
 			}
 			else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed){
-				g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+				g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 					,button.Bounds.Width-1,button.Bounds.Height-1));
 			}
 			else if(button.Style==ODToolBarButtonStyle.Label){
 				//no outline
-				g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+				g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
 			}
 			else switch(button.State){
 				case ToolBarButtonState.Normal:
 					//no outline
-					g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+						g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
 					break;
 				case ToolBarButtonState.Hover:
-					g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 				case ToolBarButtonState.Pressed:
-					g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 				case ToolBarButtonState.DropPressed:
-					g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 			}
@@ -444,13 +532,178 @@ namespace OpenDental.UI{
 					,button.Bounds.Y+button.Bounds.Height/2-2);
 				triangle[2]=new Point(button.Bounds.X+button.Bounds.Width-8
 					,button.Bounds.Y+button.Bounds.Height/2+2);
-				g.FillPolygon(new SolidBrush(textColor),triangle);
+				if(button.Enabled) {
+					g.FillPolygon(brushTextFore,triangle);
+				}
+				else {
+					g.FillPolygon(brushTextDisabled,triangle);
+				}
 				if(button.State!=ToolBarButtonState.Normal && button.Enabled){
-					g.DrawLine(Pens.SlateGray,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
+					g.DrawLine(penOutline,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
 						,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y+button.Bounds.Height);
 				}
 			}
 		}
+
+		///<summary>Like DrawButton but only called when using blue theme.</summary>
+		//private void DrawButtonBlue(Graphics g,ODToolBarButton button) {
+		//	#region Separator
+		//	if(button.Style==ODToolBarButtonStyle.Separator) {
+		//		//was 112,128,144
+		//		//medium stripe
+		//		g.DrawLine(new Pen(Color.FromArgb(190,200,210)),button.Bounds.Left,button.Bounds.Top+1,
+		//			button.Bounds.Left,button.Bounds.Bottom-2);
+		//		//dark stripe
+		//		g.DrawLine(new Pen(Color.FromArgb(130,140,160)),button.Bounds.Left+1,button.Bounds.Top,
+		//			button.Bounds.Left+1,button.Bounds.Bottom-1);
+		//		//white stripe
+		//		g.DrawLine(new Pen(Color.FromArgb(255,255,255)),button.Bounds.Left+2,button.Bounds.Top+1,
+		//			button.Bounds.Left+2,button.Bounds.Bottom-2);
+		//		return;
+		//	}
+		//	#endregion
+		//	#region Background
+		//	//draw background
+		//	if(!button.Enabled) {
+		//		g.FillRectangle(new SolidBrush(BlueThemeBottom),button.Bounds);//SystemColors.Control  224,223,227
+		//	}
+		//	else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed) {
+		//		g.FillRectangle(LGBrush,button.Bounds);//Color.FromArgb(248,248,248)
+		//	}
+		//	else if(button.Style==ODToolBarButtonStyle.Label) {
+		//		g.FillRectangle(new SolidBrush(BlueThemeBottom),button.Bounds);//SystemColors.Control  224,223,227
+		//	}
+		//	else switch(button.State) {
+		//			case ToolBarButtonState.Normal://Control is 224,223,227
+		//				g.FillRectangle(LGBrush,button.Bounds);
+		//				break;
+		//			case ToolBarButtonState.Hover://this is lighter than control
+		//				g.FillRectangle(LGBrushLighter,button.Bounds);
+		//				break;
+		//			case ToolBarButtonState.Pressed://slightly darker than control
+		//				g.FillRectangle(LGBrushDarker,button.Bounds);
+		//				break;
+		//			case ToolBarButtonState.DropPressed:
+		//				//left half looks like hover:
+		//				g.FillRectangle(LGBrushLighter
+		//					,new Rectangle(button.Bounds.X,button.Bounds.Y
+		//					,button.Bounds.Width-15,button.Bounds.Height));
+		//				//right section looks like Pressed:
+		//				g.FillRectangle(LGBrushDarker
+		//					,new Rectangle(button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
+		//					,15,button.Bounds.Height));
+		//				break;
+		//		}
+		//	#endregion
+		//	#region Image and/or Text
+		//	//draw image and/or text
+		//	Color textColor=ForeColor;
+		//	Rectangle textRect;
+		//	int textWidth=button.Bounds.Width;
+		//	if(button.Style==ODToolBarButtonStyle.DropDownButton) {
+		//		textWidth-=15;
+		//	}
+		//	if(!button.Enabled) {
+		//		textColor=SystemColors.GrayText;
+		//	}
+		//	if(imageList!=null && button.ImageIndex!=-1 && button.ImageIndex<imageList.Images.Count) {//draw image and text
+		//		if(!button.Enabled) {
+		//			System.Windows.Forms.ControlPaint.DrawImageDisabled(g,imageList.Images[button.ImageIndex]
+		//				,button.Bounds.X+3,button.Bounds.Y+1,SystemColors.Control);
+		//			textRect=new Rectangle(button.Bounds.X+imageList.ImageSize.Width+3
+		//				,button.Bounds.Y,textWidth-imageList.ImageSize.Width-3,button.Bounds.Height);
+		//		}
+		//		else if(button.State==ToolBarButtonState.Pressed) {//draw slightly down and right
+		//			g.DrawImage(imageList.Images[button.ImageIndex],button.Bounds.X+4,button.Bounds.Y+2);
+		//			textRect=new Rectangle(button.Bounds.X+1+imageList.ImageSize.Width+3
+		//				,button.Bounds.Y+1,textWidth-imageList.ImageSize.Width-3,button.Bounds.Height);
+		//		}
+		//		else {
+		//			g.DrawImage(imageList.Images[button.ImageIndex],button.Bounds.X+3,button.Bounds.Y+1);
+		//			textRect=new Rectangle(button.Bounds.X+imageList.ImageSize.Width+3
+		//				,button.Bounds.Y,textWidth-imageList.ImageSize.Width-3,button.Bounds.Height);
+		//		}
+		//	}
+		//	else {//only draw text
+		//		if(button.Style==ODToolBarButtonStyle.Label) {
+		//			textRect=new Rectangle(button.Bounds.X,button.Bounds.Y
+		//				,textWidth,button.Bounds.Height);
+		//		}
+		//		else if(button.State==ToolBarButtonState.Pressed) {//draw slightly down and right
+		//			textRect=new Rectangle(button.Bounds.X+1,button.Bounds.Y+1
+		//				,textWidth,button.Bounds.Height);
+		//		}
+		//		else {
+		//			textRect=new Rectangle(button.Bounds.X,button.Bounds.Y
+		//				,textWidth,button.Bounds.Height);
+		//		}
+		//	}
+		//	StringFormat format;
+		//	if(imageList!=null && button.ImageIndex!=-1) {//if there is an image
+		//		//draw text very close to image
+		//		format=new StringFormat();
+		//		format.Alignment=StringAlignment.Near;
+		//		format.LineAlignment=StringAlignment.Center;
+		//		g.DrawString(button.Text,Font,new SolidBrush(textColor),textRect,format);
+		//	}
+		//	else {
+		//		format=new StringFormat();
+		//		format.Alignment=StringAlignment.Center;
+		//		format.LineAlignment=StringAlignment.Center;
+		//		g.DrawString(button.Text,Font,new SolidBrush(textColor),textRect,format);
+		//	}
+		//	#endregion
+		//	#region Outline
+		//	//draw outline
+		//	Pen penR=new Pen(Color.FromArgb(180,180,180));
+		//	if(!button.Enabled) {
+		//		//no outline
+		//		g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+		//	}
+		//	else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed) {
+		//		g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+		//			,button.Bounds.Width-1,button.Bounds.Height-1));
+		//	}
+		//	else if(button.Style==ODToolBarButtonStyle.Label) {
+		//		//no outline
+		//		g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+		//	}
+		//	else switch(button.State) {
+		//			case ToolBarButtonState.Normal:
+		//				//no outline
+		//				g.DrawLine(penR,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+		//				break;
+		//			case ToolBarButtonState.Hover:
+		//				g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+		//					,button.Bounds.Width-1,button.Bounds.Height-1));
+		//				break;
+		//			case ToolBarButtonState.Pressed:
+		//				g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+		//					,button.Bounds.Width-1,button.Bounds.Height-1));
+		//				break;
+		//			case ToolBarButtonState.DropPressed:
+		//				g.DrawRectangle(Pens.SlateGray,new Rectangle(button.Bounds.X,button.Bounds.Y
+		//					,button.Bounds.Width-1,button.Bounds.Height-1));
+		//				break;
+		//		}
+		//	if(button.Style==ODToolBarButtonStyle.DropDownButton) {
+		//		Point[] triangle=new Point[3];
+		//		triangle[0]=new Point(button.Bounds.X+button.Bounds.Width-11
+		//			,button.Bounds.Y+button.Bounds.Height/2-2);
+		//		triangle[1]=new Point(button.Bounds.X+button.Bounds.Width-4
+		//			,button.Bounds.Y+button.Bounds.Height/2-2);
+		//		triangle[2]=new Point(button.Bounds.X+button.Bounds.Width-8
+		//			,button.Bounds.Y+button.Bounds.Height/2+2);
+		//		g.FillPolygon(new SolidBrush(textColor),triangle);
+		//		if(button.State!=ToolBarButtonState.Normal && button.Enabled) {
+		//			g.DrawLine(Pens.SlateGray,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
+		//				,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y+button.Bounds.Height);
+		//		}
+		//	}
+		//	#endregion
+		//}
+
+		
 
 		
 
