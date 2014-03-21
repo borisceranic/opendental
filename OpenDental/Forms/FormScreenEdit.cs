@@ -468,8 +468,10 @@ namespace OpenDental{
 					radioF.Checked=true;
 					break;
 			}
+			listRace.Items.Clear();
 			listRace.Items.AddRange(Enum.GetNames(typeof(PatientRaceOld)));
 			listRace.SelectedIndex=(int)ScreenCur.Race;
+			comboGradeLevel.Items.Clear();
 			comboGradeLevel.Items.AddRange(Enum.GetNames(typeof(PatientGrade)));
 			comboGradeLevel.SelectedIndex=(int)ScreenCur.GradeLevel;
 			ArrayList items=new ArrayList();
@@ -477,6 +479,7 @@ namespace OpenDental{
 				textAge.Text="";
 			else
 				textAge.Text=ScreenCur.Age.ToString();
+			listUrgency.Items.Clear();
 			listUrgency.Items.AddRange(Enum.GetNames(typeof(TreatmentUrgency)));
 			listUrgency.SelectedIndex=(int)ScreenCur.Urgency;
 			SetCheckState(checkHasCaries,ScreenCur.HasCaries);
