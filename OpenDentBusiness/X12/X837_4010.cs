@@ -1745,14 +1745,14 @@ namespace OpenDentBusiness
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary SubscriberID");
+					strb.Append("Other Insurance SubscriberID");
 				}
 				Patient subscriber2=Patients.GetPat(sub2.Subscriber); //Always exists because validated in UI.
 				if(subscriber2.Birthdate.Year<1880) {
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Subscriber Birthdate");
+					strb.Append("Other Insurance Subscriber Birthdate");
 				}
 				if(subscriber2.PatNum!=patient.PatNum) {//Patient address is validated below, so we only need to check if subscriber is not the patient.
 					X12Validate.Subscriber2(subscriber2,strb);
@@ -1762,32 +1762,32 @@ namespace OpenDentBusiness
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Carrier Address");
+					strb.Append("Other Insurance Carrier Address");
 				}
 				if(carrier2.City.Trim().Length<2) {
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Carrier City");
+					strb.Append("Other Insurance Carrier City");
 				}
 				if(carrier2.State.Trim().Length!=2) {
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Carrier State(2 char)");
+					strb.Append("Other Insurance Carrier State(2 char)");
 				}
 				if(carrier2.Zip.Trim().Length<3) {
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Carrier Zip");
+					strb.Append("Other Insurance Carrier Zip");
 				}
 				if(claim.PatNum != sub2.Subscriber//if patient is not subscriber
 					&& claim.PatRelat2==Relat.Self) {//and relat is self
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
-					strb.Append("Secondary Relationship");
+					strb.Append("Other Insurance Relationship");
 				}
 			}
 			else { //other insurance not specified
