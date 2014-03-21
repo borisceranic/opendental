@@ -58,7 +58,14 @@ namespace OpenDental{
 		private TextBox textRateTwo2;
 		private Label labelRateTwo;
 		private TextBox textRateTwo;
+		private GroupBox groupEmployee;
+		private UI.Button butPrevEmp;
+		private UI.Button butNextEmp;
 		private bool cannotEdit;
+		///<summary>Used to determine the order to advance through employee timecards in this window.</summary>
+		public bool IsByLastName;
+		///<summary>Cached list of employees sorted based on IsByLastName</summary>
+		private List<Employee> _listEmp=new List<Employee>();
 
 		///<summary></summary>
 		public FormTimeCard()
@@ -103,6 +110,8 @@ namespace OpenDental{
 			this.textDatePaycheck = new System.Windows.Forms.TextBox();
 			this.textDateStop = new System.Windows.Forms.TextBox();
 			this.textDateStart = new System.Windows.Forms.TextBox();
+			this.butRight = new OpenDental.UI.Button();
+			this.butLeft = new OpenDental.UI.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.labelOvertime = new System.Windows.Forms.Label();
 			this.textOvertime = new System.Windows.Forms.TextBox();
@@ -119,11 +128,13 @@ namespace OpenDental{
 			this.butPrint = new OpenDental.UI.Button();
 			this.butCalcWeekOT = new OpenDental.UI.Button();
 			this.butAdj = new OpenDental.UI.Button();
-			this.butRight = new OpenDental.UI.Button();
-			this.butLeft = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.groupEmployee = new System.Windows.Forms.GroupBox();
+			this.butPrevEmp = new OpenDental.UI.Button();
+			this.butNextEmp = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
+			this.groupEmployee.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textTotal
@@ -182,7 +193,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Location = new System.Drawing.Point(18, 3);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(659, 51);
+			this.groupBox1.Size = new System.Drawing.Size(611, 51);
 			this.groupBox1.TabIndex = 14;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Pay Period";
@@ -210,6 +221,34 @@ namespace OpenDental{
 			this.textDateStart.ReadOnly = true;
 			this.textDateStart.Size = new System.Drawing.Size(100, 20);
 			this.textDateStart.TabIndex = 12;
+			// 
+			// butRight
+			// 
+			this.butRight.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRight.Autosize = true;
+			this.butRight.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRight.CornerRadius = 4F;
+			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
+			this.butRight.Location = new System.Drawing.Point(63, 18);
+			this.butRight.Name = "butRight";
+			this.butRight.Size = new System.Drawing.Size(39, 24);
+			this.butRight.TabIndex = 11;
+			this.butRight.Click += new System.EventHandler(this.butRight_Click);
+			// 
+			// butLeft
+			// 
+			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLeft.Autosize = true;
+			this.butLeft.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLeft.CornerRadius = 4F;
+			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
+			this.butLeft.Location = new System.Drawing.Point(13, 18);
+			this.butLeft.Name = "butLeft";
+			this.butLeft.Size = new System.Drawing.Size(39, 24);
+			this.butLeft.TabIndex = 10;
+			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
 			// label4
 			// 
@@ -401,34 +440,6 @@ namespace OpenDental{
 			this.butAdj.Text = "Add Adjustment";
 			this.butAdj.Click += new System.EventHandler(this.butAdj_Click);
 			// 
-			// butRight
-			// 
-			this.butRight.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRight.Autosize = true;
-			this.butRight.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRight.CornerRadius = 4F;
-			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
-			this.butRight.Location = new System.Drawing.Point(63, 18);
-			this.butRight.Name = "butRight";
-			this.butRight.Size = new System.Drawing.Size(39, 24);
-			this.butRight.TabIndex = 11;
-			this.butRight.Click += new System.EventHandler(this.butRight_Click);
-			// 
-			// butLeft
-			// 
-			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLeft.Autosize = true;
-			this.butLeft.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLeft.CornerRadius = 4F;
-			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
-			this.butLeft.Location = new System.Drawing.Point(13, 18);
-			this.butLeft.Name = "butLeft";
-			this.butLeft.Size = new System.Drawing.Size(39, 24);
-			this.butLeft.TabIndex = 10;
-			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
-			// 
 			// butClose
 			// 
 			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -444,10 +455,52 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// groupEmployee
+			// 
+			this.groupEmployee.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupEmployee.Controls.Add(this.butPrevEmp);
+			this.groupEmployee.Controls.Add(this.butNextEmp);
+			this.groupEmployee.Location = new System.Drawing.Point(635, 3);
+			this.groupEmployee.Name = "groupEmployee";
+			this.groupEmployee.Size = new System.Drawing.Size(106, 51);
+			this.groupEmployee.TabIndex = 121;
+			this.groupEmployee.TabStop = false;
+			this.groupEmployee.Text = "Employee";
+			this.groupEmployee.Visible = false;
+			// 
+			// butPrevEmp
+			// 
+			this.butPrevEmp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrevEmp.Autosize = true;
+			this.butPrevEmp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPrevEmp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPrevEmp.CornerRadius = 4F;
+			this.butPrevEmp.Image = global::OpenDental.Properties.Resources.Left;
+			this.butPrevEmp.Location = new System.Drawing.Point(8, 18);
+			this.butPrevEmp.Name = "butPrevEmp";
+			this.butPrevEmp.Size = new System.Drawing.Size(39, 24);
+			this.butPrevEmp.TabIndex = 127;
+			this.butPrevEmp.Click += new System.EventHandler(this.butBrowseEmp_Click);
+			// 
+			// butNextEmp
+			// 
+			this.butNextEmp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNextEmp.Autosize = true;
+			this.butNextEmp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNextEmp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNextEmp.CornerRadius = 4F;
+			this.butNextEmp.Image = global::OpenDental.Properties.Resources.Right;
+			this.butNextEmp.Location = new System.Drawing.Point(59, 18);
+			this.butNextEmp.Name = "butNextEmp";
+			this.butNextEmp.Size = new System.Drawing.Size(39, 24);
+			this.butNextEmp.TabIndex = 128;
+			this.butNextEmp.Click += new System.EventHandler(this.butBrowseEmp_Click);
+			// 
 			// FormTimeCard
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(891, 703);
+			this.Controls.Add(this.groupEmployee);
 			this.Controls.Add(this.textRateTwo2);
 			this.Controls.Add(this.labelRateTwo);
 			this.Controls.Add(this.textRateTwo);
@@ -476,6 +529,7 @@ namespace OpenDental{
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
+			this.groupEmployee.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -484,6 +538,23 @@ namespace OpenDental{
 
 		private void FormTimeCard_Load(object sender, System.EventArgs e){
 			Initialize(DateTimeOD.Today);
+			FillEmployeeList();
+			if(Security.IsAuthorized(Permissions.TimecardsEditAll,true)) {
+				groupEmployee.Visible=true;
+			}
+		}
+
+		public void FillEmployeeList() {
+			_listEmp=new List<Employee>();//clear items and initialize
+			for(int i=0;i<Employees.ListShort.Length;i++) {
+				_listEmp.Add(Employees.ListShort[i]);
+			}
+			if(IsByLastName) {
+				_listEmp.Sort(Employees.SortByLastName);
+			}
+			else {
+				_listEmp.Sort(Employees.SortByFirstName);
+			}
 		}
 
 		public void Initialize(DateTime dateInitial){
@@ -1109,6 +1180,28 @@ namespace OpenDental{
 			else {
 				e.HasMorePages=true;
 			}
+		}
+
+		private void butBrowseEmp_Click(object sender,EventArgs e) {
+			int empIndex=0;
+			for(int i=0;i<_listEmp.Count;i++) {
+				//find current employee index by Employeenum
+				if(EmployeeCur.EmployeeNum==_listEmp[i].EmployeeNum) {
+					if(sender.Equals(butPrevEmp)) {
+						empIndex=i-1;//go to previous employee in list
+					}
+					else {
+						empIndex=i+1;//go to next employee in list
+					}
+					empIndex=(empIndex+_listEmp.Count)%(_listEmp.Count);//allows wrapping at end of employee list.
+					break;
+				}
+			}
+			EmployeeCur=_listEmp[empIndex];
+			Text=Lan.g(this,"Time Card for")+" "+EmployeeCur.FName+" "+EmployeeCur.LName
+				+(cannotEdit?" - You cannot modify your timecard":"");
+			FillPayPeriod();
+			FillMain(true);
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {

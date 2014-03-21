@@ -136,6 +136,7 @@ namespace OpenDental {
 
 		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
 			FormTimeCard FormTC=new FormTimeCard();
+			FormTC.IsByLastName=true;
 			FormTC.EmployeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[e.Row]["EmployeeNum"].ToString()));
 			FormTC.SelectedPayPeriod=SelectedPayPeriod;
 			FormTC.ShowDialog();

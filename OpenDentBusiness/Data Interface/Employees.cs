@@ -234,6 +234,14 @@ namespace OpenDentBusiness{
 			}
 			return -1;
 		}
+
+		public static int SortByLastName(Employee x,Employee y) {
+			return x.LName.CompareTo(y.LName);
+		}
+
+		public static int SortByFirstName(Employee x,Employee y) {
+			return x.FName.CompareTo(y.FName);
+		}
 		
 		/// <summary>sorting class used to sort Employee in various ways</summary>
 		public class EmployeeComparer:IComparer<Employee> {
