@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -312,6 +313,18 @@ namespace OpenDental{
 				"Diagnosis2",
 				"Diagnosis3",
 				"Diagnosis4",
+				"DiagnosisA",
+				"DiagnosisB",
+				"DiagnosisC",
+				"DiagnosisD",
+				"DiagnosisE",
+				"DiagnosisF",
+				"DiagnosisG",
+				"DiagnosisH",
+				"DiagnosisI",
+				"DiagnosisJ",
+				"DiagnosisK",
+				"DiagnosisL",
 				//1
 				"P1Date",
 				"P1Area",
@@ -324,6 +337,7 @@ namespace OpenDental{
 				"P1TreatDentMedicaidID",
 				"P1PlaceNumericCode",
 				"P1Diagnosis",
+				"P1DiagnosisPoint",
 				"P1Lab",
 				"P1FeeMinusLab",
 				"P1ToothNumOrArea",
@@ -348,6 +362,7 @@ namespace OpenDental{
 				"P2TreatDentMedicaidID",
 				"P2PlaceNumericCode",
 				"P2Diagnosis",
+				"P2DiagnosisPoint",
 				"P2Lab",
 				"P2FeeMinusLab",
 				"P2ToothNumOrArea",
@@ -372,6 +387,7 @@ namespace OpenDental{
 				"P3TreatDentMedicaidID",
 				"P3PlaceNumericCode",
 				"P3Diagnosis",
+				"P3DiagnosisPoint",
 				"P3Lab",
 				"P3FeeMinusLab",
 				"P3ToothNumOrArea",
@@ -396,6 +412,7 @@ namespace OpenDental{
 				"P4TreatDentMedicaidID",
 				"P4PlaceNumericCode",
 				"P4Diagnosis",
+				"P4DiagnosisPoint",
 				"P4Lab",
 				"P4FeeMinusLab",
 				"P4ToothNumOrArea",
@@ -420,6 +437,7 @@ namespace OpenDental{
 				"P5TreatDentMedicaidID",
 				"P5PlaceNumericCode",
 				"P5Diagnosis",
+				"P5DiagnosisPoint",
 				"P5Lab",
 				"P5FeeMinusLab",
 				"P5ToothNumOrArea",
@@ -444,6 +462,7 @@ namespace OpenDental{
 				"P6TreatDentMedicaidID",
 				"P6PlaceNumericCode",
 				"P6Diagnosis",
+				"P6DiagnosisPoint",
 				"P6Lab",
 				"P6FeeMinusLab",
 				"P6ToothNumOrArea",

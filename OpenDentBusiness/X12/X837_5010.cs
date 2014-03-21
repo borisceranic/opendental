@@ -950,55 +950,37 @@ namespace OpenDentBusiness
 				#endregion Claim K3 NTE CRx
 				#region Claim HI HCP
 				//HI loops-------------------------------------------------------------------------------------------------------
-				List<string> diagnosisList=new List<string>();//princDiag will always be the first element.
-				if(medType==EnumClaimMedType.Medical || medType==EnumClaimMedType.Institutional){
-					for(int j=0;j<claimProcs.Count;j++) {
-						proc=Procedures.GetProcFromList(procList,claimProcs[j].ProcNum);
-						if(proc.DiagnosticCode=="") {
-							continue;
-						}
-						if(proc.IsPrincDiag) {
-							if(diagnosisList.Contains(proc.DiagnosticCode)) {
-								diagnosisList.Remove(proc.DiagnosticCode);
-							}
-							diagnosisList.Insert(0,proc.DiagnosticCode);//princDiag always goes first. There will always be one.
-						}
-						else {//not princDiag
-							if(!diagnosisList.Contains(proc.DiagnosticCode)) {
-								diagnosisList.Add(proc.DiagnosticCode);
-							}
-						}
-					}
-				}
-				//2300 HI: BK (medical,dental) Health Care Diagnosis Code. Situational. For OMS or anesthesiology.
-//todo: validate at least one diagnosis
-				if(medType==EnumClaimMedType.Institutional) {
+				List<string> listDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(claimProcs));
+				//2300 HI: BK (medical,institutional) Health Care Diagnosis Code. Situational. For OMS or anesthesiology.
+//todo: validate that diagnoses are actual ICD9 or ICD10 codes.
+				if(medType==EnumClaimMedType.Institutional && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
 					sw.Write("HI"+s
 						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
-						+Sout(diagnosisList[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
+						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
 					EndSegment(sw);
-				} 
+					//Institutional claims only support 1 diagnosis code here, the principal diagnosis.
+				}
 				else if(medType==EnumClaimMedType.Medical) {
 					sw.Write("HI"+s
 						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
-						+Sout(diagnosisList[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
-					for(int j=1;j<diagnosisList.Count;j++) {
-						if(j>11) {//maximum of 12 diagnoses
-							break;
+						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
+					for(int j=1;j<listDiagnoses.Count;j++) {//Validated below that there are 12 or fewer common diagnoses for the entire claim.
+						if(listDiagnoses[j]=="") {
+							continue;
 						}
 						sw.Write(s//this is the separator from the _previous_ field.
 							+"BF"+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9 Diagnosis
-							+Sout(diagnosisList[j].Replace(".",""),30));//HI0#-2 1/30 Industry Code: Diagnosis code. No periods.
+							+Sout(listDiagnoses[j].Replace(".",""),30));//HI0#-2 1/30 Industry Code: Diagnosis code. No periods.
 					}
 					EndSegment(sw);
 				}
 				//2300 HI: BP (medical) Anesthesia Related Procedure. Situational. We do not use.
 				//2300 HI: BJ (institutional) Admitting Diagnosis. Situational. Required for inpatient admission. We do not use.
 				//2300 HI: PR (institutional) Patient's Reason for Visit. Situational. Required for outpatient visits.
-				if(medType==EnumClaimMedType.Institutional) {
+				if(medType==EnumClaimMedType.Institutional && listDiagnoses[0]!="") {//Ensure at least one (principal) diagnosis exists.
 					sw.Write("HI"+s
 						+"PR"+isa16//HI01-1 1/3 Code List Qualifier Code: PR=ICD-9 Patient's Reason for Visit.
-						+Sout(diagnosisList[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: No periods. This is not really principal diagnosis but is close to the same, so someday we will add this field to claim.
+						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: No periods. This is not really principal diagnosis but is close to the same, so someday we will add this field to claim.
 					EndSegment(sw);
 				}
 				//2300 HI: BN (institutional) External Cause of Injury. Situational. We do not use.
@@ -1493,25 +1475,35 @@ namespace OpenDentBusiness
 						sw.Write(s//SV105 1/2 Facility Code Value: Place of Service Code if different from claim.
 							+s);//SV106 1/2 Service Type Code: Not used.
 						//SV107: Composite Diagnosis Code Pointer. Required when 2300HI(Health Care Diagnosis Code) is used (always).
-						//SV107-1: Primary diagnosis. Only allowed pointers 1-8 even though 2300HI supports 12 diagnoses.
-						//We don't validate that there are not more than 8 diagnoses on one claim.
-						//If the diagnosis we need is not in the first 8, then we will use the primary.
-						if(proc.DiagnosticCode=="") {//If the diagnosis is blank, we will use the primary.
-							sw.Write("1");//use primary.
+						//SV107-1: Primary diagnosis. Only allowed pointers 1-12.
+						//SV107-2 through SV107-4: Other diagnoses.
+						EndSegment(sw);
+						//If the diagnosis we need is not in the first 12, then we will use the primary.
+						if(proc.DiagnosticCode=="") {//If the all 4 procedure diagnoses are blank, we will use the primary diagnosis for entire claim.
+							if(listDiagnoses[0]!="") {//Ensure that a primary diagnosis exists.
+								sw.Write("1");//use primary.
+							}
 						}
-						else {
+						else {//There is at least one diagnostic code on the proc, and also at least one proc on the claim (at least the principal diagnosis).
 							int diagI=1;
-							for(int d=0;d<diagnosisList.Count;d++) {
-								if(d>7) {//we can't point to any except first 8.
+							int diagMatchCount=0;
+							for(int d=0;d<listDiagnoses.Count;d++) {//this list is filled with unique diagnosis codes so the following logic will create 4 correct entries.								
+								if(listDiagnoses[d]=="") {
 									continue;
 								}
-								if((string)diagnosisList[d]==proc.DiagnosticCode) {
-									diagI=d+1;
+								//Validation is performed below to ensure that here are no more than 12 unique diagnoses per claim.
+								if(listDiagnoses[d]==proc.DiagnosticCode || listDiagnoses[d]==proc.DiagnosticCode2 ||
+									listDiagnoses[d]==proc.DiagnosticCode3 || listDiagnoses[d]==proc.DiagnosticCode4)
+								{
+									if(diagMatchCount>0) {
+										sw.Write(isa16);
+									}
+									sw.Write(d+1);//1 through 12
+									diagMatchCount++;
 								}
 							}
 							sw.Write(diagI.ToString());
 						}
-						//SV107-2 through SV107-4: Other diagnoses, which we don't support yet.
 						EndSegment(sw);//SV108 through SV121 are not used or situational. We do not use.
 					}
 					else if(medType==EnumClaimMedType.Institutional) {
@@ -2778,6 +2770,10 @@ namespace OpenDentBusiness
 				strb.Append("No procedures attached please recreate claim");
 			}
 			List<Procedure> procList=Procedures.GetProcsFromClaimProcs(claimProcs);
+			if(Procedures.GetUniqueDiagnosticCodes(procList).Count>12) {
+				Comma(strb);
+				strb.Append("Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
+			}
 			Procedure proc;
 			ProcedureCode procCode;
 			bool princDiagExists=false;
@@ -2788,8 +2784,9 @@ namespace OpenDentBusiness
 				if(claim.MedType==EnumClaimMedType.Medical) {
 					if(proc.DiagnosticCode=="") {
 						Comma(strb);
-						strb.Append(procCode.AbbrDesc+"Procedure Diagnosis");
+						strb.Append(procCode.AbbrDesc+" Procedure Diagnosis 1");
 					}
+					//Diagnostic codes 2 through 4 are optional within the X12 specification.
 					if(proc.IsPrincDiag && proc.DiagnosticCode!="") {
 						princDiagExists=true;
 					}

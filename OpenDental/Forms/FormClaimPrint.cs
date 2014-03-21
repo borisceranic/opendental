@@ -54,6 +54,7 @@ namespace OpenDental{
 		private Claim ClaimCur;
 		///<summary>Always length of 4.</summary>
 		private string[] diagnoses;
+		private string[] arrayDiagnoses;
 		//private Claim[] ClaimsArray;
 		//private Claim[] MedClaimsArray;
 		private List<ClaimValCodeLog> ListClaimValCodeLog;
@@ -559,6 +560,7 @@ namespace OpenDental{
 				}
 				//There's still a chance that the diagnosis didn't get added, if there were more than 4.
 			}
+			arrayDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(ListClaimProcs)).ToArray();
 			Provider treatDent=ProviderC.ListLong[Providers.GetIndexLong(ClaimCur.ProvTreat)];
 			if(ClaimFormCur==null){
 				if(ClaimCur.ClaimForm>0){
@@ -1094,6 +1096,102 @@ namespace OpenDental{
 						}
 						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
 							displayStrings[i]=diagnoses[3].Replace(".","");
+						}
+						break;
+					case "DiagnosisA":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[0];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[0].Replace(".","");
+						}
+						break;
+					case "DiagnosisB":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[1];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[1].Replace(".","");
+						}
+						break;
+					case "DiagnosisC":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[2];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[2].Replace(".","");
+						}
+						break;
+					case "DiagnosisD":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[3];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[3].Replace(".","");
+						}
+						break;
+					case "DiagnosisE":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[4];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[4].Replace(".","");
+						}
+						break;
+					case "DiagnosisF":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[5];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[5].Replace(".","");
+						}
+						break;
+					case "DiagnosisG":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[6];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[6].Replace(".","");
+						}
+						break;
+					case "DiagnosisH":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[7];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[7].Replace(".","");
+						}
+						break;
+					case "DiagnosisI":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[8];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[8].Replace(".","");
+						}
+						break;
+					case "DiagnosisJ":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[9];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[9].Replace(".","");
+						}
+						break;
+					case "DiagnosisK":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[10];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[10].Replace(".","");
+						}
+						break;
+					case "DiagnosisL":
+						if(ClaimFormCur.Items[i].FormatString=="") {
+							displayStrings[i]=arrayDiagnoses[11];
+						}
+						else if(ClaimFormCur.Items[i].FormatString=="NoDec") {
+							displayStrings[i]=arrayDiagnoses[11].Replace(".","");
 						}
 						break;
 			//this is where the procedures used to be
@@ -1965,6 +2063,9 @@ namespace OpenDental{
 					case "P1Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",1+startProc);
 						break;
+					case "P1DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",1+startProc);
+						break;
 					case "P1Lab":
 						displayStrings[i]=GetProcInfo("Lab",1+startProc);
 						break;
@@ -2051,6 +2152,9 @@ namespace OpenDental{
 						break;
 					case "P2Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",2+startProc);
+						break;
+					case "P2DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",2+startProc);
 						break;
 					case "P2Lab":
 						displayStrings[i]=GetProcInfo("Lab",2+startProc);
@@ -2141,6 +2245,9 @@ namespace OpenDental{
 						break;
 					case "P3Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",3+startProc);
+						break;
+					case "P3DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",3+startProc);
 						break;
 					case "P3Lab":
 						displayStrings[i]=GetProcInfo("Lab",3+startProc);
@@ -2233,6 +2340,9 @@ namespace OpenDental{
 					case "P4Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",4+startProc);
 						break;
+					case "P4DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",4+startProc);
+						break;
 					case "P4Lab":
 						displayStrings[i]=GetProcInfo("Lab",4+startProc);
 						break;
@@ -2323,6 +2433,9 @@ namespace OpenDental{
 						break;
 					case "P5Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",5+startProc);
+						break;
+					case "P5DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",5+startProc);
 						break;
 					case "P5Lab":
 						displayStrings[i]=GetProcInfo("Lab",5+startProc);
@@ -2415,6 +2528,9 @@ namespace OpenDental{
 					case "P6Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",6+startProc);
 						break;
+					case "P6DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",6+startProc);
+						break;
 					case "P6Lab":
 						displayStrings[i]=GetProcInfo("Lab",6+startProc);
 						break;
@@ -2505,6 +2621,9 @@ namespace OpenDental{
 						break;
 					case "P7Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",7+startProc);
+						break;
+					case "P7DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",7+startProc);
 						break;
 					case "P7Lab":
 						displayStrings[i]=GetProcInfo("Lab",7+startProc);
@@ -2597,6 +2716,9 @@ namespace OpenDental{
 					case "P8Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",8+startProc);
 						break;
+					case "P8DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",8+startProc);
+						break;
 					case "P8Lab":
 						displayStrings[i]=GetProcInfo("Lab",8+startProc);
 						break;
@@ -2688,6 +2810,9 @@ namespace OpenDental{
 					case "P9Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",9+startProc);
 						break;
+					case "P9DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",9+startProc);
+						break;
 					case "P9Lab":
 						displayStrings[i]=GetProcInfo("Lab",9+startProc);
 						break;
@@ -2778,6 +2903,9 @@ namespace OpenDental{
 						break;
 					case "P10Diagnosis":
 						displayStrings[i]=GetProcInfo("Diagnosis",10+startProc);
+						break;
+					case "P10DiagnosisPoint":
+						displayStrings[i]=GetProcInfo("DiagnosisPoint",10+startProc);
 						break;
 					case "P10Lab":
 						displayStrings[i]=GetProcInfo("Lab",10+startProc);
@@ -3481,6 +3609,23 @@ namespace OpenDental{
 					}
 				}
 				return ProcCur.DiagnosticCode;
+			}
+			if(field=="DiagnosisPoint") {
+				if(ProcCur.DiagnosticCode=="") {
+					return "";//No diagnosis codes present on procedure.
+				}
+				string pointer="";//Output will be in alphabetical order.
+				for(int d=0;d<arrayDiagnoses.Length;d++) {
+					if(arrayDiagnoses[d]=="") {
+						continue;
+					}
+					if(arrayDiagnoses[d]==ProcCur.DiagnosticCode || arrayDiagnoses[d]==ProcCur.DiagnosticCode2 ||
+						arrayDiagnoses[d]==ProcCur.DiagnosticCode3 || arrayDiagnoses[d]==ProcCur.DiagnosticCode4) 
+					{
+						pointer+=(Char)(d+(int)('A'));//Characters A through L.
+					}
+				}
+				return pointer;
 			}
 			if(field=="Lab") {// && ProcCur.LabFee>0) {
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
