@@ -138,6 +138,9 @@ namespace OpenDental {
 				File.Copy(fileName,destinationPath);
 			}
 			FillGrid();
+			if(openFD.FileNames.Length==1) {//if importing exactly one image, select it upon returning.
+				textSearch.Text=Path.GetFileName(openFD.FileNames[0]);
+			}
 		}
 
 		private void textSearch_TextChanged(object sender,EventArgs e) {
