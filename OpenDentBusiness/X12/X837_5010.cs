@@ -2587,7 +2587,7 @@ namespace OpenDentBusiness
 				InsSub sub2=InsSubs.GetSub(claim.InsSubNum2,null);
 				if(sub2.SubscriberID.Length<2) {
 					Comma(strb);
-					strb.Append("Secondary SubscriberID");
+					strb.Append("Other Insurance SubscriberID");
 				}
 				Patient subscriber2=Patients.GetPat(sub2.Subscriber); //Always exists because validated in UI.
 				if(subscriber2.PatNum!=patient.PatNum) {//Patient address is validated below, so we only need to check if subscriber is not the patient.
@@ -2595,29 +2595,29 @@ namespace OpenDentBusiness
 				}
 				if(subscriber2.Birthdate.Year<1880) {
 					Comma(strb);
-					strb.Append("Secondary Subscriber Birthdate");
+					strb.Append("Other Insurance Subscriber Birthdate");
 				}
 				Carrier carrier2=Carriers.GetCarrier(insPlan2.CarrierNum);
 				if(carrier2.Address.Trim()=="") {
 					Comma(strb);
-					strb.Append("Secondary Carrier Address");
+					strb.Append("Other Insurance Carrier Address");
 				}
 				if(carrier2.City.Trim().Length<2) {
 					Comma(strb);
-					strb.Append("Secondary Carrier City");
+					strb.Append("Other Insurance Carrier City");
 				}
 				if(carrier2.State.Trim().Length!=2) {
 					Comma(strb);
-					strb.Append("Secondary Carrier State(2 char)");
+					strb.Append("Other Insurance Carrier State(2 char)");
 				}
 				if(carrier2.Zip.Trim().Length<3) {
 					Comma(strb);
-					strb.Append("Secondary Carrier Zip");
+					strb.Append("Other Insurance Carrier Zip");
 				}
 				if(claim.PatNum != sub2.Subscriber//if patient is not subscriber
 					&& claim.PatRelat2==Relat.Self) {//and relat is self
 					Comma(strb);
-					strb.Append("Secondary Relationship");
+					strb.Append("Other Insurance Relationship");
 				}
 				PatPlan patPlan2=PatPlans.GetFromList(patPlans,claim.InsSubNum2);//can be null
 				if(patPlan2!=null && patPlan2.PatID!="") {
