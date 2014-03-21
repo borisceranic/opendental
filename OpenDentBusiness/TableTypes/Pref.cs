@@ -120,6 +120,7 @@ namespace OpenDentBusiness {
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
 		ClearinghouseDefaultMed,
+		ColorTheme,
 		ConfirmEmailMessage,
 		ConfirmEmailSubject,
 		ConfirmPostcardMessage,
