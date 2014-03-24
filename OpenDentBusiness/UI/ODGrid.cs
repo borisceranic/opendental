@@ -102,8 +102,8 @@ namespace OpenDental.UI {
 		//(224,223,227);
 		private Color cBlueOutline=Color.FromArgb(119,119,146);
 		private static bool _useBlueTheme;
-		private static LinearGradientBrush brushTitleBackground;
-		private static SolidBrush brushTitleText;
+		private static LinearGradientBrush brushTitleBackground=new LinearGradientBrush(new Point(0,0),new Point(0,23),Color.FromArgb(104,136,232),Color.FromArgb(20,47,126));
+		private static SolidBrush brushTitleText=new SolidBrush(Color.White);
 
 		///<summary></summary>
 		public ODGrid() {
