@@ -33,7 +33,6 @@ namespace OpenDental.UI{
 		private static Brush brushTextDisabled;
 		private static Pen penLight;
 		private static Pen penOutline;
-		//private static Pen penDark;
 		private static Pen penDivider;
 		///<summary>This can be set from anywhere to affect all toolbars simultaneously.</summary>
 		private static bool _useBlueTheme;

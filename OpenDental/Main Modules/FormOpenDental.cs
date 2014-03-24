@@ -1680,6 +1680,7 @@ namespace OpenDental{
 				//theme
 				try {
 					ODToolBar.UseBlueTheme=PrefC.GetBool(PrefName.ColorTheme);
+					ODGrid.UseBlueTheme=PrefC.GetBool(PrefName.ColorTheme);
 				}
 				catch {
 					//try/catch in case you are trying to convert from an older version of OD and need to update the DB.

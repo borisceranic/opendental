@@ -575,6 +575,7 @@ namespace OpenDental{
 			if(Prefs.UpdateBool(PrefName.ColorTheme,checkColorTheme.Checked)) {
 				changed=true;
 				OpenDental.UI.ODToolBar.UseBlueTheme=checkColorTheme.Checked;
+				OpenDental.UI.ODGrid.UseBlueTheme=checkColorTheme.Checked;
 			}
 			//task list------------------------------------------------------------------------------------------
 			if(ComputerPrefs.LocalComputer.TaskKeepListHidden!=checkBoxTaskKeepListHidden.Checked) {
