@@ -15,7 +15,6 @@ namespace OpenDental {
 
 		private Hx835_Claim _claimEob;
 		private Claim _claim;
-		private Patient _pat;
 		private decimal _claimAdjAmtSum;
 		private decimal _procAdjAmtSum;
 
@@ -28,10 +27,8 @@ namespace OpenDental {
 		private void FormEtrans835ClaimEdit_Load(object sender,EventArgs e) {
 			long claimNum=Claims.GetClaimNumForIdentifier(_claimEob.ClaimTrackingNumber);
 			_claim=null;
-			_pat=null;
 			if(claimNum!=0) {
 				_claim=Claims.GetClaim(claimNum);
-				_pat=Patients.GetPat(_claim.PatNum);
 			}
 			FillAll();
 		}
@@ -52,12 +49,13 @@ namespace OpenDental {
 		}
 
 		private void FillHeader() {
-			if(_pat==null) {
-				textPatientName.Text="";
+			Text="Claim Explanation of Benefits (EOB)";
+			if(_claimEob.Npi!="") {
+				Text+=" - NPI: "+_claimEob.Npi;
 			}
-			else {
-				textPatientName.Text=_pat.GetNameFLFormal();
-			}
+			Text+=" - Patient: "+_claimEob.PatientName;
+			textSubscriberName.Text=_claimEob.SubscriberName;
+			textPatientName.Text=_claimEob.PatientName;
 			if(_claim==null) {
 				textDateService.Text="";
 			}
@@ -72,6 +70,9 @@ namespace OpenDental {
 			textInsPaid.Text=_claimEob.InsPaid.ToString("f2");
 			textInsPaidCalc.Text=(_claimEob.ClaimFee-_claimAdjAmtSum-_procAdjAmtSum).ToString("f2");
 			textPatientPortion.Text=_claimEob.PatientPortion.ToString("f2");
+			if(_claimEob.DatePayerReceived.Year>1880) {
+				textDatePayerReceived.Text=_claimEob.DatePayerReceived.ToShortDateString();
+			}
 		}
 
 		private void FillClaimAdjustments() {
@@ -247,6 +248,17 @@ namespace OpenDental {
 			Hx835_Info info=(Hx835_Info)gridSupplementalInfo.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
 			msgbox.Show(this);
+		}
+
+		private void butEditClaim_Click(object sender,EventArgs e) {
+			if(_claim==null) {
+				MsgBox.Show(this,"The original claim could not be located for the given claim identifier.");
+				return;
+			}
+			Patient pat=Patients.GetPat(_claim.PatNum);
+			Family fam=Patients.GetFamily(_claim.PatNum);
+			FormClaimEdit formCE=new FormClaimEdit(_claim,pat,fam);
+			formCE.ShowDialog();//Non-modal might be nice here, but would require a change in logic within the OK/Cancel button clicks inside of FormClaimEdit.
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

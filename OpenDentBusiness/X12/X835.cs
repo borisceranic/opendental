@@ -183,9 +183,11 @@ namespace OpenDentBusiness {
 					isLoop2000=true;
 					segNum++;
 				}
-				//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.  We do not use.
+				//2000 TS3: Provider Summary Information.  Repeat 1.  Guide page 112.
+				string npi="";
 				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="TS3") {
 					isLoop2000=true;
+					npi=_listSegments[segNum].Get(1);
 					segNum++;
 				}
 				//2000 TS2: Provider Supplemental Summary Infromation.  Repeat 1.  Guide page 117.  We do not use.
@@ -196,7 +198,7 @@ namespace OpenDentBusiness {
 				//Loop 2100 Claim Payment Information.  Repeat 1.  Guide page 123.
 				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CLP") {
 					isLoop2000=true;
-					Hx835_Claim claimEob=ProcessCLP(segNum);
+					Hx835_Claim claimEob=ProcessCLP(segNum,npi);
 					_listClaimEOBs.Add(claimEob);
 					segNum+=claimEob.SegmentCount;
 				}
@@ -253,14 +255,7 @@ namespace OpenDentBusiness {
 				_accountNumReceiving=_accountNumReceiving.Substring(_accountNumReceiving.Length-4);
 			}
 			//BPR16 Date EFT Effective or Date Check Issued.  Situational.
-			string strDateEffective=segBPR.Get(16);
-			_dateEffective=DateTime.MinValue;
-			if(strDateEffective.Length>=8) {
-				int dateEffectiveYear=int.Parse(strDateEffective.Substring(0,4));
-				int dateEffectiveMonth=int.Parse(strDateEffective.Substring(4,2));
-				int dateEffectiveDay=int.Parse(strDateEffective.Substring(6,2));
-				_dateEffective=new DateTime(dateEffectiveYear,dateEffectiveMonth,dateEffectiveDay);
-			}
+			_dateEffective=DtmToDateTime(segBPR.Get(16));
 			//BPR17 through BPR21 at not used in the format.
 		}
 
@@ -306,10 +301,11 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>2100 CLP: Claim Payment Information.  Required.  Repeat 1.  Guide page 123.</summary>
-		private Hx835_Claim ProcessCLP(int segNum) {
+		private Hx835_Claim ProcessCLP(int segNum,string npi) {
 			int segNumCLP=segNum;
 			Hx835_Claim retVal=new Hx835_Claim();
 			X12Segment segCLP=_listSegments[segNum];
+			retVal.Npi=npi;
 			retVal.ClaimTrackingNumber=segCLP.Get(1);//CLP01
 			retVal.PayorControlNumber=segCLP.Get(7);//CLP07 Payer Claim Control Number
 			retVal.StatusCodeDescript=GetDescriptForClaimStatusCode(segCLP.Get(2));//CLP02 Claim Status Code Description
@@ -323,10 +319,15 @@ namespace OpenDentBusiness {
 				retVal.ListClaimAdjustments.AddRange(ProcessCAS(segNum));
 				segNum++;
 			}
-			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.  We do not use.
-			segNum++;
-			//2100 NM1: Insured Name.  Situational.  Repeat 1.  Guide page 140.  We do not use.
+			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.
+			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="QC") {
+				retVal.PatientName=ProcessNM1_Person(segNum);
+				segNum++;
+			}
+			//2100 NM1: Insured Name.  Situational.  Required when different from the patient.  Repeat 1.  Guide page 140.
+			retVal.SubscriberName=retVal.PatientName;
 			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="IL") {
+				retVal.SubscriberName=ProcessNM1_Person(segNum);
 				segNum++;
 			}
 			//2100 NM1: Corrected Patient/Insured Name.  Situational.  Repeat 1.  Guide page 143.  We do not use.
@@ -366,9 +367,17 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			//2100 DTM: Statement From or To Date.  Situational.  Repeat 2.  Guide page 173.  We do not use.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && (_listSegments[segNum].Get(1)=="232" || _listSegments[segNum].Get(1)=="233")) {
+				segNum++;
+			}
 			//2100 DTM: Coverage Expiration Date.  Situational.  Repeat 1.  Guide page 175.  We do not use.
-			//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.  We do not use.
-			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {//We clump 3 segments into a single loop, because none of them are used.
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && _listSegments[segNum].Get(1)=="036") {
+				segNum++;
+			}
+			//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.
+			retVal.DatePayerReceived=DateTime.MinValue;
+			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && _listSegments[segNum].Get(1)=="050") {
+				retVal.DatePayerReceived=DtmToDateTime(_listSegments[segNum].Get(2));
 				segNum++;
 			}
 			//2100 PER: Claim Contact Information.  Situational.  Repeat 2.  Guide page 179.  We do not use.
@@ -640,6 +649,52 @@ namespace OpenDentBusiness {
 			//N407 Country Subdivision Code.  Required when the address is not in the United States.
 		}
 
+		///<summary>Converts an NM1 segment for a person into a single string containing their entire name and identfier.
+		///All fields are optional, thus this function returns what is available.</summary>
+		private string ProcessNM1_Person(int segNum) {
+			string name=_listSegments[segNum].Get(4);//First name
+			if(_listSegments[segNum].Get(5)!="") {//Middle Name
+				if(name!="") {
+					name+=" ";
+				}
+				name+=_listSegments[segNum].Get(5);
+			}
+			if(_listSegments[segNum].Get(3)!="") {//Last Name
+				if(name!="") {
+					name+=" ";
+				}
+				name+=_listSegments[segNum].Get(3);
+			}
+			if(_listSegments[segNum].Get(7)!="") {//Suffix
+				if(name!="") {
+					name+=" ";
+				}
+				name+=_listSegments[segNum].Get(7);
+			}
+			if(_listSegments[segNum].Get(8)!="") {
+				if(name!="") {
+					name+=" - ";
+				}
+				if(_listSegments[segNum].Get(8)=="34") {
+					name+="SSN: ";
+				}
+				else if(_listSegments[segNum].Get(8)=="HN") {
+					name+="HIC Number: ";
+				}
+				else if(_listSegments[segNum].Get(8)=="II") {
+					name+="SUHI: ";
+				}
+				else if(_listSegments[segNum].Get(8)=="MI") {
+					name+="Member ID: ";
+				}
+				else if(_listSegments[segNum].Get(8)=="MR") {
+					name+="Medicaid ID: ";
+				}
+				name+=_listSegments[segNum].Get(9);
+			}
+			return name;
+		}
+
 		///<summary>Gets the contact information from segment PER*BL appended into a single string.
 		///Phone/email in PER04 or the contact phone/email in PER06 or both.
 		///If neither PER04 nor PER06 are present, then returns empty string.</summary>
@@ -766,6 +821,18 @@ namespace OpenDentBusiness {
 
 		#endregion Segment Processing
 		#region Helpers
+
+		///<summary>Converts a date in string format YYYYMMDD into a DateTime object.</summary>
+		private DateTime DtmToDateTime(string strDtm) {
+			DateTime dateTime=DateTime.MinValue;
+			if(strDtm.Length>=8) {
+				int dtmYear=int.Parse(strDtm.Substring(0,4));
+				int dtmMonth=int.Parse(strDtm.Substring(4,2));
+				int dtmDay=int.Parse(strDtm.Substring(6,2));
+				dateTime=new DateTime(dtmYear,dtmMonth,dtmDay);
+			}
+			return dateTime;
+		}
 
 		public string GetHumanReadable() {
 			StringBuilder retVal=new StringBuilder();
@@ -2761,6 +2828,8 @@ namespace OpenDentBusiness {
 	public class Hx835_Claim {
 		///<summary>The number of X12 segments that this claim and all data within it span.</summary>
 		public int SegmentCount;
+		///<summary>TS301.  Situational.</summary>
+		public string Npi;
 		///<summary>CLP01 in loop 2100.  Referred to in this format as a Patient Control Number.
 		///The claim tracking numbers correspond to CLM01 exactly as submitted in the 837.
 		///We refer to CLM01 as the claim identifier on our end. We allow alphanumeric in our claim identifiers, so we must store as a string.</summary>
@@ -2775,6 +2844,12 @@ namespace OpenDentBusiness {
 		public decimal InsPaid;
 		///<summary>CLP05 A portion of the ChargeAmtTotal which the patient is responsible for.</summary>
 		public decimal PatientPortion;
+		///<summary>NM1*QC of loop 2100.  Required for Dental and Medical.  Optional for Pharmacy.  For our purposes (Dental and Medical), this data will always be provided.</summary>
+		public string PatientName;
+		///<summary>NM1*IL of loop 2100.  Required for Dental and Medical.  Optional for Pharmacy.  For our purposes (Dental and Medical), this data will always be provided.</summary>
+		public string SubscriberName;
+		///<summary>DTM*050 of loop 2100.  Optional.  Will be set to 0001/01/01 if not present for this claim.</summary>
+		public DateTime DatePayerReceived;
 		///<summary>CAS Adjustments made by the insurance company at the claim level.  These adjustments help explain part of the amount difference between the claim fee and the amount paid.
 		///There are also adjustments at the procedure level and the patient portion to account for when balancing.</summary>
 		public List<Hx835_Adj> ListClaimAdjustments;
@@ -2821,7 +2896,7 @@ namespace OpenDentBusiness {
 
 #region Examples
 
-//Example 1 From 835 Specification:
+//Example 1 From 835 Specification (modified to include an NM1*IL insured name segment):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*1234~
@@ -2839,6 +2914,7 @@ namespace OpenDentBusiness {
 //CLP*666123*1*211366.97*138018.4**MA*1999999444444*11*1~
 //CAS*CO*45*73348.57~
 //NM1*QC*1*JONES*SAM*O***HN*666666666A~
+//NM1*IL*1*JONES*FATHER*A***MI*ABC987654321~
 //MIA*0***138018.4~
 //DTM*232*20020816~
 //DTM*233*20020824~

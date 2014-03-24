@@ -103,19 +103,17 @@ namespace OpenDental {
 
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 2 (Detail).</summary>
 		private void FillClaimDetails() {
-			const int colWidthLname=150;
-			const int colWidthFname=100;
+			const int colWidthName=250;
 			const int colWidthDateService=80;
 			const int colWidthClaimId=100;
 			const int colWidthPayorControlNum=126;
 			const int colWidthClaimAmt=80;
 			const int colWidthPaidAmt=80;
 			const int colWidthPatAmt=80;
-			int colWidthVariable=gridClaimDetails.Width-colWidthLname-colWidthFname-colWidthDateService-colWidthClaimId-colWidthPayorControlNum-colWidthClaimAmt-colWidthPaidAmt-colWidthPatAmt;
+			int colWidthVariable=gridClaimDetails.Width-colWidthName-colWidthDateService-colWidthClaimId-colWidthPayorControlNum-colWidthClaimAmt-colWidthPaidAmt-colWidthPatAmt;
 			gridClaimDetails.BeginUpdate();
 			gridClaimDetails.Columns.Clear();
-			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"LName"),colWidthLname,HorizontalAlignment.Left));
-			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"FName"),colWidthFname,HorizontalAlignment.Left));
+			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"Patient"),colWidthName,HorizontalAlignment.Left));
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"DateService"),colWidthDateService,HorizontalAlignment.Center));
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"ClaimIdentifier"),colWidthClaimId,HorizontalAlignment.Left));
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"PayorControlNum"),colWidthPayorControlNum,HorizontalAlignment.Center));//Payer Claim Control Number (CLP07)
@@ -130,18 +128,13 @@ namespace OpenDental {
 				Hx835_Claim claimEob=listClaimEOBs[i];
 				ODGridRow row=new ODGridRow();
 				row.Tag=claimEob;
+				row.Cells.Add(new UI.ODGridCell(claimEob.PatientName));//Patient
 				long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[i].ClaimTrackingNumber);
-				Claim claim=null;
 				if(claimNum!=0) {
-					claim=Claims.GetClaim(claimNum);
-					Patient pat=Patients.GetPat(claim.PatNum);
-					row.Cells.Add(new UI.ODGridCell(pat.LName));//LName
-					row.Cells.Add(new UI.ODGridCell(pat.FName));//FName
+					Claim claim=Claims.GetClaim(claimNum);
 					row.Cells.Add(new UI.ODGridCell(claim.DateService.ToShortDateString()));//DateService
 				}
 				else {
-					row.Cells.Add(new UI.ODGridCell(""));//LName
-					row.Cells.Add(new UI.ODGridCell(""));//FName
 					row.Cells.Add(new UI.ODGridCell(""));//DateService
 				}
 				row.Cells.Add(new UI.ODGridCell(claimEob.ClaimTrackingNumber));//Claim Identfier
