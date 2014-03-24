@@ -4108,6 +4108,15 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ShowFeaturePatientClone','0')";
 					Db.NonQ(command);
 				}
+				//Add new SoftwareName preference for EHR report printing. Defaults to Open Dental Software.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SoftwareName','Open Dental Software')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SoftwareName','Open Dental Software')";
+					Db.NonQ(command);
+				}
 
 
 

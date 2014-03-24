@@ -620,7 +620,7 @@ namespace OpenDental{
 			SetMsiVisibility();
 			labelVersion.Text=Lan.g(this,"Using Version:")+" "+Application.ProductVersion;
 			//keeps the trailing year up to date
-			this.label10.Text=Lan.g(this, "This program Copyright 2003-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", Jordan S. Sparks, D.M.D.");
+			this.label10.Text=PrefC.GetString(PrefName.SoftwareName)+" "+Lan.g(this,"Copyright 2003-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", Jordan S. Sparks, D.M.D.");
 			this.label8.Text=Lan.g(this, "MySQL - Copyright 1995-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", www.mysql.com");
 			if(PrefC.GetBool(PrefName.UpdateWindowShowsClassicView)){
 				panelClassic.Visible=true;

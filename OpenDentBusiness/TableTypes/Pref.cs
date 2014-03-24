@@ -405,6 +405,8 @@ namespace OpenDentBusiness {
 		ShowIDinTitleBar,
 		ShowProgressNotesInsteadofCommLog,
 		ShowUrgFinNoteInProgressNotes,
+		/// <summary>Name of this Software.  Defaults to 'Open Dental Software'.</summary>
+		SoftwareName,
 		SolidBlockouts,
 		SpellCheckIsEnabled,
 		StatementAccountsUseChartNumber,

@@ -13,8 +13,8 @@ namespace OpenDental {
 	public partial class FormPatListResultsEHR2014:Form {
 		private List<EhrPatListElement2014> elementList;
 		private DataTable table;
-		private bool headingPrinted;
-		private int pagesPrinted;
+		private bool _headingPrinted;
+		private int _pagesPrinted;
 
 		public FormPatListResultsEHR2014(List<EhrPatListElement2014> ElementList) {
 			InitializeComponent();
@@ -22,6 +22,9 @@ namespace OpenDental {
 		}
 
 		private void FormPatListResults_Load(object sender,EventArgs e) {
+			if(PrefC.GetString(PrefName.SoftwareName)!="") {
+				this.Text+=" - "+PrefC.GetString(PrefName.SoftwareName);
+			}
 			FillGrid();
 		}
 
@@ -175,6 +178,8 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
+			_pagesPrinted=0;
+			_headingPrinted=false;
 			PrintDocument pd=new PrintDocument();
 			pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage);
 			pd.DefaultPageSettings.Margins=new Margins(25,25,40,40);
@@ -209,16 +214,30 @@ namespace OpenDental {
 			int yPos=bounds.Top;
 			int center=bounds.X+bounds.Width/2;
 			#region printHeading
-			if(!headingPrinted) {
+			if(!_headingPrinted) {
 				text="Patient List";
 				g.DrawString(text,headingFont,Brushes.Black,center-g.MeasureString(text,headingFont).Width/2,yPos);
 				yPos+=(int)g.MeasureString(text,headingFont).Height;
-				headingPrinted=true;
+				//Subheading required by some states for EHR reporting.  Shows software name, date the report was generated, and which provider is logged in at time of report.
+				string providerName="";
+				if(Security.CurUser.ProvNum != 0) {
+					providerName=Providers.GetProv(Security.CurUser.ProvNum).GetLongDesc(); //Used GetLongDesc to match the EHR measures printout.  In the future we may want to enhance to use Formal Name and NPI
+				}
+				text=providerName;
+				g.DrawString(text,subHeadingFont,Brushes.Black,center-g.MeasureString(text,subHeadingFont).Width/2,yPos);
+				yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
+				text=PrefC.GetString(PrefName.SoftwareName);
+				g.DrawString(text,subHeadingFont,Brushes.Black,center-g.MeasureString(text,subHeadingFont).Width/2,yPos);
+				yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
+				text=DateTime.Now.ToShortDateString();
+				g.DrawString(text,subHeadingFont,Brushes.Black,center-g.MeasureString(text,subHeadingFont).Width/2,yPos);
+				yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
+				_headingPrinted=true;
 				//headingPrintH=yPos;
 			}
 			#endregion
-			yPos=gridMain.PrintPage(g,pagesPrinted,bounds,yPos);
-			pagesPrinted++;
+			yPos=gridMain.PrintPage(g,_pagesPrinted,bounds,yPos);
+			_pagesPrinted++;
 			if(yPos==-1) {
 				e.HasMorePages=true;
 			}

@@ -22,6 +22,9 @@ namespace OpenDental {
 		}
 
 		private void FormEhrSettings_Load(object sender,EventArgs e) {
+			if(PrefC.GetString(PrefName.SoftwareName)!="") {
+				this.Text+=" - "+PrefC.GetString(PrefName.SoftwareName);
+			}
 			checkAlertHighSeverity.Checked=PrefC.GetBool(PrefName.EhrRxAlertHighSeverity);
 			checkMU2.Checked=PrefC.GetBool(PrefName.MeaningfulUseTwo);
 			#region DefaultEncounterGroup
