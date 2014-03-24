@@ -73,8 +73,10 @@ namespace OpenDental{
 			}
 #if TRIALONLY
 			//Trial users should never be able to update a database.
-			MsgBox.Show(this,"Trial versions cannot connect to live databases.  Please run the Setup.exe in the AtoZ folder to reinstall your original version.");
-			return false;
+			if(PrefC.GetString(PrefName.RegistrationKey)!="") {//Allow databases with no reg key to update.  Needed by our conversion department.
+				MsgBox.Show(this,"Trial versions cannot connect to live databases.  Please run the Setup.exe in the AtoZ folder to reinstall your original version.");
+				return false;
+			}
 #endif
 			if(PrefC.GetString(PrefName.WebServiceServerName)!="" //using web service
 				&& !ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower()))//and not on web server 
