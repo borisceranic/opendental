@@ -1381,7 +1381,8 @@ namespace OpenDentBusiness{
 		///<para>If more than one patient has the same first and last name and birthdate, patClone and patNonClone will be null and listAmbiguousMatches will contain all the matching patients.</para>
 		///<para>If there is one match, but there is not an all-caps to not all-caps relationship (meaning both are all-caps or both are mixed case or both are lower), patClone and patNonClone will be null and listAmbiguousMatches will contain the matching patient.</para></summary>
 		public static void GetCloneAndNonClone(Patient patCur,out Patient patClone,out Patient patNonClone,out List<Patient> listAmbiguousMatches) {
-			//if niether of these is set after this method, the patient does not have a clone and is also not a clone
+			//No need to check RemotingRole; no call to db.
+			//if niether patClone or patNonClone is set after this method, the patient does not have a clone and is also not a clone
 			patClone=null;
 			patNonClone=null;
 			listAmbiguousMatches=new List<Patient>();
@@ -1423,17 +1424,17 @@ namespace OpenDentBusiness{
 			else {
 				//either both patCur and the patient found have all-caps first and last names or both have mixed case or all lower case first and last names
 				//either way, we do not know if patCur is a clone or has a clone, there is ambiguity
-				//return the patient found to notify user to fix manually if it is supposed to be linked
+				//populate the ambiguous list with the patient found to notify user to fix manually if it is supposed to be linked
 				listAmbiguousMatches.Add(listAllMatches[0]);
 			}
 		}
 
-		///<summary>Used with GetCloneAndNonClone to find the non-clone and clone patients for the pateint sent in if they exist.  Returns a list of patients that have the same last name, first name, and birthdate, ignoring case sensitivity, but different patNum.  Used to find duplicate patients that may be clones of the patient identified by the patNum parameter, or are the non-clone version of the patient.  The Birthdate supplied is guaranteed to be a valid date, so this will not find any with 0001-01-01 birthdates.</summary>
+		///<summary>Returns a list of patients that have the same last name, first name, and birthdate, ignoring case sensitivity, but different patNum.  Used to find duplicate patients that may be clones of the patient identified by the patNum parameter, or are the non-clone version of the patient.  Currently only used with GetCloneAndNonClone to find the non-clone and clone patients for the pateint sent in if they exist.</summary>
 		public static List<Patient> GetListByNameAndBirthdate(long patNum,string lName,string fName,DateTime birthdate) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),lName,fName,birthdate);
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),patNum,lName,fName,birthdate);
 			}
-			string command="SELECT * FROM patient WHERE LName LIKE '"+POut.String(lName)+"' AND FName LIKE '"+POut.String(fName)+"' "//use like to ignore case-sensitivity
+			string command="SELECT * FROM patient WHERE LName LIKE '"+POut.String(lName)+"' AND FName LIKE '"+POut.String(fName)+"' "
 				+"AND Birthdate="+POut.Date(birthdate,true)+" AND PatNum!="+POut.Long(patNum);
 			return Crud.PatientCrud.SelectMany(command);
 		}

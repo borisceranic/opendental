@@ -1323,7 +1323,7 @@ namespace OpenDental{
 			ModuleSelected(PatCur.PatNum);
 		}
 
-		///<summary>Synch specific data from the non-clone to the clone of the pair the selected patient belongs to.  The non-clone will have a normally cased first and last name, while the clone will have an all-caps first and last name.  Both patients will belong to the same family, so the clone will be moved to the non-clone family.  The insurance plans currently attached will be updated to the clone.  The address, phone, and a few other demographics will be copied to the clone.  If no changes need to be made, the user will get a message that the patients are already in synch.  If any change happens to the clone, the user will see exactly what changes OD makes.  If the currently selected patient does not have a clone, a messsage box will ask the user if they want to create an all-caps clone of the patient.</summary>
+		///<summary>Synch specific data from the non-clone to the clone of the pair the selected patient belongs to.  The non-clone will have mixed case first and last names, while the clone will have all-caps.  The clone will be moved to the non-clone family.  The insurance plans currently attached to the non-clone will be updated to the clone.  The address, phone, and a few other demographics will be copied to the clone.  If no changes need to be made, the user will get a message that the patients are already in synch.  If any change happens to the clone, the user will see exactly what changes OD makes.  If the currently selected patient does not have a clone, a messsage box will ask the user if they want to create an all-caps clone of the patient.</summary>
 		private void ToolButSynchClone_Click() {
 			Patient patClone;
 			Patient patNonClone;
@@ -1560,10 +1560,10 @@ namespace OpenDental{
 			}
 			Patients.Update(patClone,patCloneOld);
 			if(!isNewClone && listFieldsUpdated.Count>0) {
-				strDataUpdated+=Lan.g(this,"The following patient demographic changes were made to the clone patient ")+strPatCloneNumAndName+":\r\n";
+				strDataUpdated+=Lan.g(this,"The following patient demographic changes were made to the clone patient")+" "+strPatCloneNumAndName+":\r\n";
 			}
-			string strChngFrom=Lan.g(this," changed from ") ;
-			string strChngTo=Lan.g(this," to ");
+			string strChngFrom=" "+Lan.g(this,"changed from")+" ";
+			string strChngTo=" "+Lan.g(this,"to")+" ";
 			string strBlank=Lan.g(this,"blank");
 			for(int i=0;i<listFieldsUpdated.Count;i++) {
 				if(isNewClone) {
@@ -1658,26 +1658,26 @@ namespace OpenDental{
 				else {
 					//both clone and non-clone have the same patplan.InsSubNum at this position in their list, just make sure all data in the patplans match
 					if(listPatPlansNonClone[i].Ordinal!=listPatPlansClone[i].Ordinal) {
-						strDataUpdated+=Lan.g(this,"The ordinal of the clone patient's insurance plan ")+insPlanCloneDescriptCur
-							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].Ordinal.ToString()+".\r\n";
+						strDataUpdated+=Lan.g(this,"The ordinal of the clone patient's insurance plan")+" "+insPlanCloneDescriptCur+" "
+							+Lan.g(this,"was updated to")+" "+listPatPlansNonClone[i].Ordinal.ToString()+".\r\n";
 						patPlansChanged=true;
 						listPatPlansClone[i].Ordinal=listPatPlansNonClone[i].Ordinal;
 					}
 					if(listPatPlansNonClone[i].IsPending!=listPatPlansClone[i].IsPending) {
-						strDataUpdated+=Lan.g(this,"The pending status of the clone patient's insurance plan ")+insPlanCloneDescriptCur
-							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].IsPending.ToString()+".\r\n";
+						strDataUpdated+=Lan.g(this,"The pending status of the clone patient's insurance plan")+" "+insPlanCloneDescriptCur+" "
+							+Lan.g(this,"was updated to")+" "+listPatPlansNonClone[i].IsPending.ToString()+".\r\n";
 						patPlansChanged=true;
 						listPatPlansClone[i].IsPending=listPatPlansNonClone[i].IsPending;
 					}
 					if(listPatPlansNonClone[i].Relationship!=listPatPlansClone[i].Relationship) {
-						strDataUpdated+=Lan.g(this,"The relationship to the subscriber of the clone patient's insurance plan ")+insPlanCloneDescriptCur
-							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].Relationship.ToString()+".\r\n";
+						strDataUpdated+=Lan.g(this,"The relationship to the subscriber of the clone patient's insurance plan")+" "+insPlanCloneDescriptCur+" "
+							+Lan.g(this,"was updated to")+" "+listPatPlansNonClone[i].Relationship.ToString()+".\r\n";
 						patPlansChanged=true;
 						listPatPlansClone[i].Relationship=listPatPlansNonClone[i].Relationship;
 					}
 					if(listPatPlansNonClone[i].PatID!=listPatPlansClone[i].PatID) {
-						strDataUpdated+=Lan.g(this,"The patient ID of the clone patient's insurance plan ")+insPlanCloneDescriptCur
-							+Lan.g(this," was updated to ")+listPatPlansNonClone[i].PatID+".\r\n";
+						strDataUpdated+=Lan.g(this,"The patient ID of the clone patient's insurance plan")+" "+insPlanCloneDescriptCur+" "
+							+Lan.g(this,"was updated to")+" "+listPatPlansNonClone[i].PatID+".\r\n";
 						patPlansChanged=true;
 						listPatPlansClone[i].PatID=listPatPlansNonClone[i].PatID;
 					}

@@ -3271,7 +3271,8 @@ namespace OpenDental{
 			//warn the user if PatCur is the clone that the linkage will be broken and to fix the value changed on the clone patient to re-link
 			//we do not want to synch from clone to original, so they have to fix manually
 			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)
-				&& (PatCur.LName!=PatOld.LName || PatCur.FName!=PatOld.FName || PatCur.Birthdate!=PatOld.Birthdate)) {
+				&& (PatCur.LName!=PatOld.LName || PatCur.FName!=PatOld.FName || PatCur.Birthdate!=PatOld.Birthdate)) 
+			{
 				Patient patClone;
 				Patient patNonClone;
 				List<Patient> listAmbiguousMatches;
@@ -3284,7 +3285,7 @@ namespace OpenDental{
 					}
 					else {//PatOld must be the non-clone, synch the name and birthdate changes to the clone
 						Patient patCloneOld=patClone.Copy();
-						string strChngTo=Lan.g(this," changed to ");
+						string strChngTo=" "+Lan.g(this,"changed to")+" ";
 						string changeMsg=Lan.g(this,"The following changes were synched to the clone of this patient,\r\n")
 							+patClone.PatNum+" - "+Patients.GetNameFL(patClone.LName,patClone.FName,patClone.Preferred,patClone.MiddleI)+":";
 						if(PatCur.LName!=PatOld.LName) {
