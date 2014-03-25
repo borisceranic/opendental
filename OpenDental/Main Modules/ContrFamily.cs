@@ -1521,12 +1521,12 @@ namespace OpenDental{
 			if(patClone.BillingType!=patNonClone.BillingType) {
 				string cloneBillType="";
 				string nonCloneBillType="";
-				for(int i=0;i<DefC.Short[(int)DefCat.BillingTypes].Length;i++){
-					if(patClone.BillingType==DefC.Short[(int)DefCat.BillingTypes][i].DefNum) {
-						cloneBillType=DefC.Short[(int)DefCat.BillingTypes][i].ItemName;
+				for(int i=0;i<DefC.Long[(int)DefCat.BillingTypes].Length;i++){
+					if(patClone.BillingType==DefC.Long[(int)DefCat.BillingTypes][i].DefNum) {
+						cloneBillType=DefC.Long[(int)DefCat.BillingTypes][i].ItemName;
 					}
-					if(patNonClone.BillingType==DefC.Short[(int)DefCat.BillingTypes][i].DefNum) {
-						nonCloneBillType=DefC.Short[(int)DefCat.BillingTypes][i].ItemName;
+					if(patNonClone.BillingType==DefC.Long[(int)DefCat.BillingTypes][i].DefNum) {
+						nonCloneBillType=DefC.Long[(int)DefCat.BillingTypes][i].ItemName;
 					}
 				}
 				listFieldsUpdated.Add(new string[3] { "Billing Type",cloneBillType,nonCloneBillType });
@@ -1535,12 +1535,12 @@ namespace OpenDental{
 			if(patClone.FeeSched!=patNonClone.FeeSched) {
 				string cloneFeeSched="";
 				string nonCloneFeeSched="";
-				for(int i=0;i<FeeSchedC.ListShort.Count;i++) {
-					if(patClone.FeeSched==FeeSchedC.ListShort[i].FeeSchedNum) {
-						cloneFeeSched=FeeSchedC.ListShort[i].Description;
+				for(int i=0;i<FeeSchedC.ListLong.Count;i++) {
+					if(patClone.FeeSched==FeeSchedC.ListLong[i].FeeSchedNum) {
+						cloneFeeSched=FeeSchedC.ListLong[i].Description;
 					}
-					if(patNonClone.FeeSched==FeeSchedC.ListShort[i].FeeSchedNum) {
-						nonCloneFeeSched=FeeSchedC.ListShort[i].Description;
+					if(patNonClone.FeeSched==FeeSchedC.ListLong[i].FeeSchedNum) {
+						nonCloneFeeSched=FeeSchedC.ListLong[i].Description;
 					}
 				}
 				listFieldsUpdated.Add(new string[3] { "Fee Schedule",cloneFeeSched,nonCloneFeeSched });
