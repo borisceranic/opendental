@@ -1627,7 +1627,6 @@ namespace OpenDental{
 				//	Recalls.SynchScheduledApptLazy(AptCur.PatNum,AptCur.AptDateTime,procCodes);//moved to closing event
 				//}
 			}
-			Recalls.Synch(AptCur.PatNum);//Maybe we should move this to the closing event?
 			//manually change existing table instead of refreshing from db?
 			DS.Tables.Remove("Procedure");
 			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
@@ -1659,7 +1658,6 @@ namespace OpenDental{
 				}
 				if(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString()==procNum.ToString()){
 					Procedures.AttachToApt(procNum,AptCur.AptNum,isPlanned);
-					Recalls.Synch(AptCur.PatNum);
 					DS.Tables.Remove("Procedure");
 					DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 					FillProcedures();
@@ -1719,13 +1717,11 @@ namespace OpenDental{
 				}
 			}
 			catch(Exception ex){
-				Recalls.Synch(AptCur.PatNum);//needs to be moved into Procedures.Delete
 				DS.Tables.Remove("Procedure");
 				DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 				FillProcedures();
 				MessageBox.Show(ex.Message);
 			}
-			Recalls.Synch(AptCur.PatNum);//needs to be moved into Procedures.Delete
 			DS.Tables.Remove("Procedure");
 			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 			FillProcedures();
@@ -1858,15 +1854,6 @@ namespace OpenDental{
 				}
 				return;
 			}
-			else if(Programs.UsingOrion) {
-				//No need to synch with Orion mode.
-			}
-			else {
-				//Default is set to TP, so Synch is usually not needed.
-				if(ProcCur.ProcStatus==ProcStat.C||ProcCur.ProcStatus==ProcStat.EC||ProcCur.ProcStatus==ProcStat.EO) {
-					Recalls.Synch(pat.PatNum);
-				}
-			}
 			/*
 			FormApptProcs FormAP=new FormApptProcs();
 			FormAP.AptCur=AptCur.Clone();
@@ -1889,7 +1876,6 @@ namespace OpenDental{
 			}*/
 			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
 			Procedures.AttachToApt(ProcCur.ProcNum,AptCur.AptNum,isPlanned);
-			Recalls.Synch(AptCur.PatNum);//might not be needed because TP?
 			DS.Tables.Remove("Procedure");
 			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 			FillProcedures();
@@ -2985,7 +2971,6 @@ namespace OpenDental{
 				}
 			}
 			Appointments.Delete(AptCur.AptNum);
-			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 			SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
 				"Delete for date/time: "+AptCur.AptDateTime.ToString(),
 				AptCur.AptNum);
@@ -3046,6 +3031,7 @@ namespace OpenDental{
 					Appointments.Delete(AptCur.AptNum);
 				}
 			}
+			Recalls.Synch(pat.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 		}
 		
