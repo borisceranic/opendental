@@ -59,6 +59,7 @@ namespace OpenDental {
 					row.Cells.Add(Table.Rows[i][c].ToString());
 				}
 				gridMain.Rows.Add(row);
+				gridMain.Rows[i].Tag=i;
 			}
 			gridMain.EndUpdate();
 			gridMain.Title=WikiListCurName;
@@ -67,7 +68,7 @@ namespace OpenDental {
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
 			FormWikiListItemEdit FormWLIE = new FormWikiListItemEdit();
 			FormWLIE.WikiListCurName=WikiListCurName;
-			FormWLIE.ItemNum=PIn.Long(Table.Rows[e.Row][0].ToString());
+			FormWLIE.ItemNum=PIn.Long(Table.Rows[(int)gridMain.Rows[e.Row].Tag][0].ToString());
 			FormWLIE.ShowDialog();
 			//saving occurs from within the form.
 			if(FormWLIE.DialogResult!=DialogResult.OK) {
