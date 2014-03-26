@@ -43,14 +43,27 @@ namespace OpenDental {
 		}
 
 		private void FillHeader() {
-			textProcDescript.Text="";
-			if(ProcedureCodes.IsValidCode(_proc.ProcCode)) {
-				textProcDescript.Text=ProcedureCodes.GetProcCode(_proc.ProcCode).AbbrDesc;
+			textProcAdjudicated.Text=_proc.ProcCodeAdjudicated;
+			if(ProcedureCodes.IsValidCode(_proc.ProcCodeAdjudicated)) {
+				textProcAdjudicated.Text=_proc.ProcCodeAdjudicated+" - "+ProcedureCodes.GetProcCode(_proc.ProcCodeAdjudicated).AbbrDesc;
 			}
-			textProcNum.Text=_proc.ProcNum.ToString();
-			textProcCode.Text=_proc.ProcCode;
-			textProcFee.Text=_proc.ProcFee.ToString("f2");
+			textProcSubmitted.Text=_proc.ProcCodeBilled;
+			if(ProcedureCodes.IsValidCode(_proc.ProcCodeBilled)) {
+				textProcSubmitted.Text=_proc.ProcCodeBilled+" - "+ProcedureCodes.GetProcCode(_proc.ProcCodeBilled).AbbrDesc;
+			}
+			textDateService.Text=_proc.DateServiceStart.ToShortDateString();
+			if(_proc.DateServiceEnd>_proc.DateServiceStart) {
+				textDateService.Text+=" to "+_proc.DateServiceEnd.ToShortDateString();
+				textDateService.Width=160;//Increase width to accout for extra text.
+			}
 			textInsPaid.Text=_proc.InsPaid.ToString("f2");
+			if(_proc.ProcNum==0) {
+				textProcNum.Text="";
+			}
+			else {
+				textProcNum.Text=_proc.ProcNum.ToString();
+			}
+			textProcFee.Text=_proc.ProcFee.ToString("f2");			
 			textInsPaidCalc.Text=(_proc.ProcFee-_patientPortionSum-_contractualObligationSum-_payorInitiatedReductionSum-_otherAdjustmentSum).ToString("f2");
 		}
 

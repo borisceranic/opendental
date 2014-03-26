@@ -38,7 +38,7 @@ namespace OpenDental {
 			gridProviderAdjustments.Width=butClose.Right-gridProviderAdjustments.Left;
 			FillProviderAdjustmentDetails();//Because the grid columns change size depending on the form size.
 			gridClaimDetails.Width=gridProviderAdjustments.Width;
-			gridClaimDetails.Height=labelEquation.Top-5-gridClaimDetails.Top;
+			gridClaimDetails.Height=labelPaymentAmount.Top-5-gridClaimDetails.Top;
 			FillClaimDetails();//Because the grid columns change size depending on the form size.
 		}
 
@@ -51,15 +51,8 @@ namespace OpenDental {
 			FillFooter();
 			//The following concepts should each be addressed as development progresses.
 			//*837 CLM01 -> 835 CLP01 (even for split claims)
-			//*Reassociation (pg. 19): 835 TRN = Reassociation Key Segment. See TRN02.
-			//*SVC02-(CAS03+CAS06+CAS09+CAS12+CAS15+CAS18)=SVC03
-			//When the service payment information loop is not present, then: CLP03-(CAS03+CAS06+CAS09+CAS12+CAS15+CAS18)=CLP04
-			//*Otherwise, CAS must also be considered from the service adjustment segment.
-			//*Reassociation (pg. 20): Use the trace # in TRN02 and the company ID number in TRN03 to uniquely identify the claim payment/data.
-			//*Institutional (pg. 23): CAS reason code 78 requires special handling.
-			//*Advance payments (pg. 23): in PLB segment with adjustment reason code PI. Can be yearly or monthly.
+			//*Advance payments (pg. 23): in PLB segment with adjustment reason code PI.  Can be yearly or monthly.  We need to find a way to pull provider level adjustments into a deposit.
 			//*Bundled procs (pg. 27): have the original proc listed in SV06. Use Line Item Control Number to identify the original proc line.
-			//*Line Item Control Number (pgs. 28 & 36): REF*6B or LX01 from 837 -> 2110REF in 835. We are not using REF*6B in 837, so we will get LX01 back in 835.
 			//*Predetermination (pg. 28): Identified by claim status code 25 in CLP02. Claim adjustment reason code is 101.
 			//*Claim reversals (pg. 30): Identified by code 22 in CLP02. The original claim adjustment codes can be found in CAS01 to negate the original claim.
 			//Use CLP07 to identify the original claim, or if different, get the original ref num from REF02 of 2040REF*F8.
@@ -68,7 +61,6 @@ namespace OpenDental {
 			//*Capitation and related payments or adjustments (pg. 34 & 52): Not many of our customers use capitation, so this will probably be our last concern.
 			//*Claim splits (pg. 36): MIA or MOA segments will exist to indicate the claim was split.
 			//*Service Line Splits (pg. 42): LQ segment with LQ01=HE and LQ02=N123 indicate the procedure was split.
-			//*PPOs (pg. 47): 2100CAS or 2110CAS will contain the value CO (Contractual Obligation) in CAS01. The PPO name is reported in REF02 of the Other Claim Related Information segment REF*CE.
 		}
 
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 1 (Header).</summary>
@@ -123,27 +115,24 @@ namespace OpenDental {
 			gridClaimDetails.Columns.Add(new ODGridColumn(Lan.g(this,"PatPortion"),colWidthPatAmt,HorizontalAlignment.Right));//Patient Responsibility Amount (CLP05)
 			gridClaimDetails.Rows.Clear();
 			_claimInsPaidSum=0;
-			List<Hx835_Claim> listClaimEOBs=_x835.ListClaimEOBs;
-			for(int i=0;i<listClaimEOBs.Count;i++) {
-				Hx835_Claim claimEob=listClaimEOBs[i];
+			List<Hx835_Claim> listClaimsPaid=_x835.ListClaimsPaid;
+			for(int i=0;i<listClaimsPaid.Count;i++) {
+				Hx835_Claim claimPaid=listClaimsPaid[i];
 				ODGridRow row=new ODGridRow();
-				row.Tag=claimEob;
-				row.Cells.Add(new UI.ODGridCell(claimEob.PatientName));//Patient
-				long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[i].ClaimTrackingNumber);
-				if(claimNum!=0) {
-					Claim claim=Claims.GetClaim(claimNum);
-					row.Cells.Add(new UI.ODGridCell(claim.DateService.ToShortDateString()));//DateService
+				row.Tag=claimPaid;
+				row.Cells.Add(new UI.ODGridCell(claimPaid.PatientName));//Patient
+				string strDateService=claimPaid.DateServiceStart.ToShortDateString();
+				if(claimPaid.DateServiceEnd>claimPaid.DateServiceStart) {
+					strDateService+=" to "+claimPaid.DateServiceEnd.ToShortDateString();
 				}
-				else {
-					row.Cells.Add(new UI.ODGridCell(""));//DateService
-				}
-				row.Cells.Add(new UI.ODGridCell(claimEob.ClaimTrackingNumber));//Claim Identfier
-				row.Cells.Add(new UI.ODGridCell(claimEob.PayorControlNumber));//PayorControlNum
-				row.Cells.Add(new UI.ODGridCell(claimEob.StatusCodeDescript));//Status
-				row.Cells.Add(new UI.ODGridCell(claimEob.ClaimFee.ToString("f2")));//ClaimFee
-				row.Cells.Add(new UI.ODGridCell(claimEob.InsPaid.ToString("f2")));//InsPaid
-				_claimInsPaidSum+=claimEob.InsPaid;
-				row.Cells.Add(new UI.ODGridCell(claimEob.PatientPortion.ToString("f2")));//PatPortion
+				row.Cells.Add(new UI.ODGridCell(strDateService));//DateService
+				row.Cells.Add(new UI.ODGridCell(claimPaid.ClaimTrackingNumber));//Claim Identfier
+				row.Cells.Add(new UI.ODGridCell(claimPaid.PayorControlNumber));//PayorControlNum
+				row.Cells.Add(new UI.ODGridCell(claimPaid.StatusCodeDescript));//Status
+				row.Cells.Add(new UI.ODGridCell(claimPaid.ClaimFee.ToString("f2")));//ClaimFee
+				row.Cells.Add(new UI.ODGridCell(claimPaid.InsPaid.ToString("f2")));//InsPaid
+				_claimInsPaidSum+=claimPaid.InsPaid;
+				row.Cells.Add(new UI.ODGridCell(claimPaid.PatientPortion.ToString("f2")));//PatPortion
 				gridClaimDetails.Rows.Add(row);
 			}
 			gridClaimDetails.EndUpdate();
@@ -214,9 +203,14 @@ namespace OpenDental {
 		}
 
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Hx835_Claim claimEob=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
-			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(claimEob);
+			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
+			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(claimPaid);
 			form.Show(this);
+		}
+
+		private void butPrint_Click(object sender,EventArgs e) {
+			FormEtrans835Print form=new FormEtrans835Print(_x835);
+			form.ShowDialog();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

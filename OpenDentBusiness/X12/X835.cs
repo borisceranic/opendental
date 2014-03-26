@@ -12,7 +12,7 @@ namespace OpenDentBusiness {
 		///<summary>The list of all provider level adjustments (one level above the claim level) within this 835.</summary>
 		private List<Hx835_ProvAdj> _listProvAdjustments;
 		///<summary>The list of all claim EOBs within this 835.</summary>
-		private List<Hx835_Claim> _listClaimEOBs;
+		private List<Hx835_Claim> _listClaimsPaid;
 		///<summary>BPR01 converted into a human readable form.</summary>
 		private string _transactionHandlingDescript;
 		///<summary>BPR02 converted to decimal.</summary>
@@ -51,7 +51,7 @@ namespace OpenDentBusiness {
 		///<summary>The list of all provider level adjustments (one level above the claim level) within this 835.</summary>
 		public List<Hx835_ProvAdj> ListProvAdjustments { get { return _listProvAdjustments; } }
 		///<summary>The list of all claim EOBs within this 835.</summary>
-		public List<Hx835_Claim> ListClaimEOBs { get { return _listClaimEOBs; } }
+		public List<Hx835_Claim> ListClaimsPaid { get { return _listClaimsPaid; } }
 		///<summary>BPR01 converted into a human readable form.</summary>
 		public string TransactionHandlingDescript { get { return _transactionHandlingDescript; } }
 		///<summary>BPR02 converted to decimal.</summary>
@@ -174,7 +174,7 @@ namespace OpenDentBusiness {
 			}
 			//Table 2 - Detail
 			//Loop 2000 Header Number.  Repeat >1.  We do not need the information in this loop, because claim payments include the unique claim identifiers that we need to match to the claims one-by-one.
-			_listClaimEOBs=new List<Hx835_Claim>();
+			_listClaimsPaid=new List<Hx835_Claim>();
 			bool isLoop2000=true;
 			while(isLoop2000) {
 				isLoop2000=false;
@@ -198,9 +198,9 @@ namespace OpenDentBusiness {
 				//Loop 2100 Claim Payment Information.  Repeat 1.  Guide page 123.
 				if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CLP") {
 					isLoop2000=true;
-					Hx835_Claim claimEob=ProcessCLP(segNum,npi);
-					_listClaimEOBs.Add(claimEob);
-					segNum+=claimEob.SegmentCount;
+					Hx835_Claim claimPaid=ProcessCLP(segNum,npi);
+					_listClaimsPaid.Add(claimPaid);
+					segNum+=claimPaid.SegmentCount;
 				}
 			}
 			//Table 3 - Summary
@@ -366,9 +366,23 @@ namespace OpenDentBusiness {
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {//We clump 2 segments into a single loop, because neither segment is used, and there are multiple REF01 choices for each.
 				segNum++;
 			}
-			//2100 DTM: Statement From or To Date.  Situational.  Repeat 2.  Guide page 173.  We do not use.
+			//2100 DTM: Statement From or To Date.  Situational.  Required if at least one service line is missing a service date.  Service line dates override this date.  Repeat 2.  Guide page 173.
+			retVal.DateServiceStart=DateTime.MinValue;
+			retVal.DateServiceEnd=DateTime.MinValue;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && (_listSegments[segNum].Get(1)=="232" || _listSegments[segNum].Get(1)=="233")) {
+				if(_listSegments[segNum].Get(1)=="232") {
+					retVal.DateServiceStart=DtmToDateTime(_listSegments[segNum].Get(2));
+				}
+				else {//_listSegments[segNum].Get(1)=="233"
+					retVal.DateServiceEnd=DtmToDateTime(_listSegments[segNum].Get(2));
+				}
 				segNum++;
+			}
+			if(retVal.DateServiceStart!=DateTime.MinValue && retVal.DateServiceEnd==DateTime.MinValue) {//Start date was provided, but end date was not.
+				retVal.DateServiceEnd=retVal.DateServiceStart;//The end date is the same as the start date.
+			}
+			else if(retVal.DateServiceStart==DateTime.MinValue && retVal.DateServiceEnd!=DateTime.MinValue) {//Start date not provided, but end date was.  Should not happen.  Just in case.
+				retVal.DateServiceStart=retVal.DateServiceEnd;
 			}
 			//2100 DTM: Coverage Expiration Date.  Situational.  Repeat 1.  Guide page 175.  We do not use.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && _listSegments[segNum].Get(1)=="036") {
@@ -398,9 +412,25 @@ namespace OpenDentBusiness {
 			//2110 SVC Service Payment Information.  Situational.  Repeat 999.  Guide page 186.
 			retVal.ListProcs=new List<Hx835_Proc>();
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="SVC") {
-				Hx835_Proc proc=ProcessSVC(segNum);
+				Hx835_Proc proc=ProcessSVC(segNum,retVal.DateServiceStart,retVal.DateServiceEnd);
 				retVal.ListProcs.Add(proc);
 				segNum+=proc.SegmentCount;
+			}
+			//Now modify the claim dates to encompass the procedure dates.  This step causes procedure dates to bubble up to the claim level when only service line dates are provided.
+			for(int i=0;i<retVal.ListProcs.Count;i++) {
+				Hx835_Proc proc=retVal.ListProcs[i];
+				if(retVal.DateServiceStart.Year<1880) {
+					retVal.DateServiceStart=proc.DateServiceStart;
+				}
+				else if(proc.DateServiceStart.Year>1880 && proc.DateServiceStart<retVal.DateServiceStart) {
+					retVal.DateServiceStart=proc.DateServiceStart;
+				}
+				if(retVal.DateServiceEnd.Year<1880) {
+					retVal.DateServiceEnd=proc.DateServiceEnd;
+				}
+				else if(proc.DateServiceEnd.Year>1880 && proc.DateServiceEnd>retVal.DateServiceEnd) {
+					retVal.DateServiceEnd=proc.DateServiceEnd;
+				}
 			}
 			retVal.SegmentCount=segNum-segNumCLP;
 			return retVal;
@@ -756,17 +786,37 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		private Hx835_Proc ProcessSVC(int segNum) {
+		private Hx835_Proc ProcessSVC(int segNum,DateTime dateClaimServiceStart,DateTime dateClaimServiceEnd) {
 			int segNumSVC=segNum;
 			X12Segment segSVC=_listSegments[segNum];
 			Hx835_Proc proc=new Hx835_Proc();
-			proc.ProcCode=segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1];//SVC1-2
+			proc.ProcCodeAdjudicated=segSVC.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1];//SVC1-2
 			proc.ProcFee=PIn.Decimal(segSVC.Get(2));//SVC2
 			proc.InsPaid=PIn.Decimal(segSVC.Get(3));//SVC3
+			if(segSVC.Get(6)=="") {
+				proc.ProcCodeBilled=proc.ProcCodeAdjudicated;
+			}
+			else {
+				proc.ProcCodeBilled=segSVC.Get(6).Split(new string[] { Separators.Subelement },StringSplitOptions.None)[1];//SVC6-2
+			}
 			segNum++;
-			//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.  We do not use.
+			//2110 DTM: Service Date.  Situational.  Repeat 2.  Guide page 194.
+			proc.DateServiceStart=dateClaimServiceStart;
+			proc.DateServiceEnd=dateClaimServiceEnd;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
+				if(_listSegments[segNum].Get(1)=="151") {//Service period end.
+					proc.DateServiceEnd=DtmToDateTime(_listSegments[segNum].Get(2));
+				}
+				else {//_listSegments[segNum].Get(1)=="150" || _listSegments[segNum].Get(1)=="472"//Service period start
+					proc.DateServiceStart=DtmToDateTime(_listSegments[segNum].Get(2));
+				}
 				segNum++;
+			}
+			if(proc.DateServiceStart!=DateTime.MinValue && proc.DateServiceEnd==DateTime.MinValue) {//Start date provided, but end date not provided.
+				proc.DateServiceEnd=proc.DateServiceStart;
+			}
+			else if(proc.DateServiceStart==DateTime.MinValue && proc.DateServiceEnd!=DateTime.MinValue) {//Start date not provided, but end date provided.  Should not happen.  Just in case.
+				proc.DateServiceStart=proc.DateServiceEnd;
 			}
 			proc.ListProcAdjustments=new List<Hx835_Adj>();
 			//2110 CAS: Service Adjustment.  Situational.  Repeat 99.  Guide page 196.
@@ -841,14 +891,14 @@ namespace OpenDentBusiness {
 			retVal.AppendLine("Amount: "+InsPaid);
 			retVal.AppendLine("Individual Claim Status List: ");
 			retVal.AppendLine("Status	ClaimFee	InsPaid	PatientPortion	PayerControlNum");
-			List<Hx835_Claim> listClaimEOBs=_listClaimEOBs;
-			for(int i=0;i<listClaimEOBs.Count;i++) {
-				Hx835_Claim claimEob=listClaimEOBs[i];
-				retVal.Append(claimEob.StatusCodeDescript+"\t");
-				retVal.Append(claimEob.ClaimFee.ToString("f2")+"\t");
-				retVal.Append(claimEob.InsPaid.ToString("f2")+"\t");
-				retVal.Append(claimEob.PatientPortion.ToString("f2")+"\t");
-				retVal.AppendLine(claimEob.PayorControlNumber);
+			List<Hx835_Claim> listClaimsPaid=_listClaimsPaid;
+			for(int i=0;i<listClaimsPaid.Count;i++) {
+				Hx835_Claim claimPaid=listClaimsPaid[i];
+				retVal.Append(claimPaid.StatusCodeDescript+"\t");
+				retVal.Append(claimPaid.ClaimFee.ToString("f2")+"\t");
+				retVal.Append(claimPaid.InsPaid.ToString("f2")+"\t");
+				retVal.Append(claimPaid.PatientPortion.ToString("f2")+"\t");
+				retVal.AppendLine(claimPaid.PayorControlNumber);
 			}
 			return retVal.ToString();
 		}
@@ -2848,7 +2898,11 @@ namespace OpenDentBusiness {
 		public string PatientName;
 		///<summary>NM1*IL of loop 2100.  Required for Dental and Medical.  Optional for Pharmacy.  For our purposes (Dental and Medical), this data will always be provided.</summary>
 		public string SubscriberName;
-		///<summary>DTM*050 of loop 2100.  Optional.  Will be set to 0001/01/01 if not present for this claim.</summary>
+		///<summary>DTM*232 of loop 2100.  Situational, but if not present, then service lines will include service dates.  Service line dates override this date when both are present.</summary>
+		public DateTime DateServiceStart;
+		///<summary>DTM*233 of loop 2100.  Situational, but if not present, then service lines will include service dates.  Service line dates override this date when both are present.</summary>
+		public DateTime DateServiceEnd;
+		///<summary>DTM*050 of loop 2100.  Situational.  Will be set to 0001/01/01 if not present for this claim.</summary>
 		public DateTime DatePayerReceived;
 		///<summary>CAS Adjustments made by the insurance company at the claim level.  These adjustments help explain part of the amount difference between the claim fee and the amount paid.
 		///There are also adjustments at the procedure level and the patient portion to account for when balancing.</summary>
@@ -2865,9 +2919,18 @@ namespace OpenDentBusiness {
 	public class Hx835_Proc {
 		///<summary>The number of X12 segments that this claim and all data within it span.</summary>
 		public int SegmentCount;
-		public string ProcCode;
+		///<summary>SVC1-2.  The adjudicated procedure code.  Can be different than the submitted procedure code in the case of bundling/unbundling and procedure splits.</summary>
+		public string ProcCodeAdjudicated;
+		///<summary>SVC2.</summary>
 		public decimal ProcFee;
+		///<summary>SVC3.</summary>
 		public decimal InsPaid;
+		///<summary>SVC6-2.  The procedure code submitted with the claim.  Helps identify the procedure the adjudication is regarding in case of bundling/unbundling and procedure splits.</summary>
+		public string ProcCodeBilled;
+		///<summary>DTM*150 or DTM*472 of loop 2110.  Situational.  If not present, then the procedure service start date is the same as the claim service start date.</summary>
+		public DateTime DateServiceStart;
+		///<summary>DTM*151 of loop 2110.  Situational.  If not present, then the procedure service end date is the same as the claim service end date.</summary>
+		public DateTime DateServiceEnd;
 		///<summary>REF*6R from the 837, or zero for older claims.</summary>
 		public long ProcNum;
 		public List<Hx835_Adj> ListProcAdjustments;
@@ -2896,7 +2959,8 @@ namespace OpenDentBusiness {
 
 #region Examples
 
-//Example 1 From 835 Specification (modified to include an NM1*IL insured name segment):
+//Example 1 From 835 Specification (modified to include an NM1*IL insured name segment).
+//The user would enter the claims in this EOB by total, since neither claim includes procedure detail:
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*1234~
@@ -2996,13 +3060,13 @@ namespace OpenDentBusiness {
 //NM1*82*2*SMITH JONES PA*****BS*34426~
 //DTM*232*20050106~
 //DTM*233*20050106~
-//SVC*HC>12345>26*166.5*30**1~
+//SVC*HC:12345:26*166.5*30**1~
 //DTM*472*20050106~
 //CAS*OA*23*136.50~
 //REF*6R*p1001~
 //REF*1B*43285~
 //AMT*AU*150~
-//SVC*HC>66543>26*585*280*220*1~
+//SVC*HC:66543:26*585*280*220*1~
 //DTM*472*20050106~
 //CAS*PR*1*150**2*70~
 //CAS*CO*42*85~
@@ -3013,7 +3077,7 @@ namespace OpenDentBusiness {
 //GE*1*1~
 //IEA*1*000000001~
 
-//Example 4 From 835 Specification:
+//Example 4 From 835 Specification (Modified such that submitted procedure code different than adjudicated procedure code):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
@@ -3033,7 +3097,7 @@ namespace OpenDentBusiness {
 //NM1*QC*1*ISLAND*ELLIS*E****MI*789123456~
 //NM1*82*2*JONES JONES ASSOCIATES*****BS*AB34U~
 //DTM*232*20050120~
-//SVC*HC*24599*1766.5*187.50**1~
+//SVC*HC:12345*3345.5*1766.5*187.50*1*HC:67890~
 //DTM*472*20050120~
 //CAS*OA*23*1579~
 //REF*1B*44280~
@@ -3063,7 +3127,7 @@ namespace OpenDentBusiness {
 //NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
 //DTM*232*20050202~
 //DTM*233*20050202~
-//SVC*HC>55669*541*34**1~
+//SVC*HC:55669*541*34**1~
 //DTM*472*20050202~
 //CAS*OA*23*516~
 //CAS*OA*94*-9~
