@@ -5725,17 +5725,20 @@ BMI 18.5-25.";
 				throw new ApplicationException("Invalid provider selected.");
 			}
 			_strOIDInternalRoot=OIDInternals.GetForType(IdentifierType.Root).IDRoot;
+			if(_strOIDInternalRoot=="") {
+				throw new ApplicationException("Internal OID root is missing.",new Exception("true"));//use inner exception to load the EHR OIDs Internal form from CQM form
+			}
 			_strOIDInternalCQMRoot=OIDInternals.GetForType(IdentifierType.CqmItem).IDRoot;
 			if(_strOIDInternalCQMRoot=="") {
-				throw new ApplicationException("Internal CQM item OID root is missing.  Go to Setup | EHR and add OIDs.");
+				throw new ApplicationException("Internal CQM item OID root is missing.",new Exception("true"));
 			}
 			_strOIDInternalProvRoot=OIDInternals.GetForType(IdentifierType.Provider).IDRoot;
 			if(_strOIDInternalProvRoot=="") {
-				throw new ApplicationException("Internal Provider OID root is missing.  Go to Setup | EHR and add OIDs.");
+				throw new ApplicationException("Internal Provider OID root is missing.",new Exception("true"));
 			}
 			_strOIDInternalPatRoot=OIDInternals.GetForType(IdentifierType.Patient).IDRoot;
 			if(_strOIDInternalPatRoot=="") {
-				throw new ApplicationException("Internal Patient OID root is missing.  Go to Setup | EHR and add OIDs.");
+				throw new ApplicationException("Internal Patient OID root is missing.",new Exception("true"));
 			}
 			_hashQrdaGuids=new HashSet<string>();//The GUIDs are only used to uniquely identify the documents themselves, for other IDs we are using the OIDInternal root and extension
 			//create a list of all CQM indexes that are considered stratifications or additional populations of a measure

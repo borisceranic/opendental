@@ -184,6 +184,10 @@ namespace OpenDental {
 			catch(Exception ex) {
 				Cursor=Cursors.Default;
 				MessageBox.Show(ex.Message);
+				if(ex.InnerException.Message=="true") {
+					FormOIDRegistryInternal FormOIDs=new FormOIDRegistryInternal();
+					FormOIDs.ShowDialog();
+				}
 				return;
 			}
 			Cursor=Cursors.Default;
