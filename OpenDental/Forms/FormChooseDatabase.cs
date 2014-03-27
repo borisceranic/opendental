@@ -431,6 +431,8 @@ namespace OpenDental{
 				DatabaseName="";
 				MySqlUser="";
 				MySqlPassword="";
+				comboComputerName.Enabled=false;
+				comboComputerName.Text=DataConnection.GetServerName();
 				comboDatabase.Enabled=false;
 				comboDatabase.Text=DataConnection.GetDatabaseName();
 			}
@@ -649,8 +651,8 @@ namespace OpenDental{
 				if(nav!=null) {
 					//If there is a DatabaseConnection, then use it.
 					groupServer.Enabled=false;
-					comboComputerName.Text=nav.SelectSingleNode("ComputerName").Value;
 					if(!IsAccessedFromMainMenu) {
+						comboComputerName.Text=nav.SelectSingleNode("ComputerName").Value;
 						comboDatabase.Text=nav.SelectSingleNode("Database").Value;
 					}
 					textUser.Text=nav.SelectSingleNode("User").Value;
