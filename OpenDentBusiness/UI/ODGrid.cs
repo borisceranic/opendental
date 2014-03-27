@@ -40,11 +40,7 @@ namespace OpenDental.UI {
 		private int titleHeight=18;
 		private int headerHeight=15;
 		private Color cGridLine=Color.FromArgb(180,180,180);
-		//Color.FromArgb(211,211,211);
-		//Color.FromArgb(192,192,192);
-		//Color.FromArgb(157,157,161);
 		private Color cTitleBackG=Color.FromArgb(210,210,210);
-		//(224,223,227);
 		private Color cBlueOutline=Color.FromArgb(119,119,146);
 		private System.Windows.Forms.VScrollBar vScroll;
 		private System.Windows.Forms.HScrollBar hScroll;
