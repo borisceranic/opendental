@@ -630,7 +630,11 @@ namespace OpenDental.UI {
 			//		Width,this.Height-titleHeight-headerHeight-1);
 			//}
 			//else{
-			g.FillRectangle(new SolidBrush(Color.FromArgb(224,223,227)),
+			Color cBackG=Color.FromArgb(224,223,227);
+			if(_useBlueTheme) {
+				cBackG=Color.FromArgb(202,212,222);//174,196,217);//151,180,196);
+			}
+			g.FillRectangle(new SolidBrush(cBackG),
 				0,titleHeight+headerHeight,
 				Width,Height-titleHeight-headerHeight);
 			//}
