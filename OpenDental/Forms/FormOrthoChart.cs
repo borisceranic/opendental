@@ -287,6 +287,23 @@ namespace OpenDental {
 			FillGrid();
 		}
 
+		private void butUseAutoNote_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedCell.X==-1) {
+				MsgBox.Show(this,"Please select a cell first.");
+				return;
+			}
+			FormAutoNoteCompose FormA=new FormAutoNoteCompose();
+			FormA.ShowDialog();
+			if(FormA.DialogResult==DialogResult.OK) {
+				//Add text to current focused cell				
+				gridMain.Rows[gridMain.SelectedCell.Y].Cells[gridMain.SelectedCell.X].Text=FormA.CompletedNote;
+				//Move data from grid to table
+				table.Rows[gridMain.SelectedCell.Y][gridMain.SelectedCell.X]=FormA.CompletedNote;
+				//Refresh grid
+				FillGrid();
+			}
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			Close();
 		}

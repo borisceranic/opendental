@@ -29,6 +29,7 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
+			this.butUseAutoNote = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// gridPat
@@ -103,10 +104,25 @@ namespace OpenDental{
 			this.label6.Text = "(All info is always saved automatically)";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
+			// butUseAutoNote
+			// 
+			this.butUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUseAutoNote.Autosize = true;
+			this.butUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUseAutoNote.CornerRadius = 4F;
+			this.butUseAutoNote.Location = new System.Drawing.Point(103, 634);
+			this.butUseAutoNote.Name = "butUseAutoNote";
+			this.butUseAutoNote.Size = new System.Drawing.Size(80, 23);
+			this.butUseAutoNote.TabIndex = 107;
+			this.butUseAutoNote.Text = "Auto Note";
+			this.butUseAutoNote.Click += new System.EventHandler(this.butUseAutoNote_Click);
+			// 
 			// FormOrthoChart
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(938, 665);
+			this.Controls.Add(this.butUseAutoNote);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butClose);
@@ -129,6 +145,7 @@ namespace OpenDental{
 		private UI.ODGrid gridPat;
 		private UI.ODGrid gridMain;
 		private System.Windows.Forms.Label label6;
+		private UI.Button butUseAutoNote;
 
 	}
 }
