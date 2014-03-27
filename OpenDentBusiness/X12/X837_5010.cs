@@ -1477,7 +1477,6 @@ namespace OpenDentBusiness
 						//SV107: Composite Diagnosis Code Pointer. Required when 2300HI(Health Care Diagnosis Code) is used (always).
 						//SV107-1: Primary diagnosis. Only allowed pointers 1-12.
 						//SV107-2 through SV107-4: Other diagnoses.
-						EndSegment(sw);
 						//If the diagnosis we need is not in the first 12, then we will use the primary.
 						if(proc.DiagnosticCode=="") {//If the all 4 procedure diagnoses are blank, we will use the primary diagnosis for entire claim.
 							if(listDiagnoses[0]!="") {//Ensure that a primary diagnosis exists.
@@ -1485,7 +1484,6 @@ namespace OpenDentBusiness
 							}
 						}
 						else {//There is at least one diagnostic code on the proc, and also at least one proc on the claim (at least the principal diagnosis).
-							int diagI=1;
 							int diagMatchCount=0;
 							for(int d=0;d<listDiagnoses.Count;d++) {//this list is filled with unique diagnosis codes so the following logic will create 4 correct entries.								
 								if(listDiagnoses[d]=="") {
@@ -1502,7 +1500,6 @@ namespace OpenDentBusiness
 									diagMatchCount++;
 								}
 							}
-							sw.Write(diagI.ToString());
 						}
 						EndSegment(sw);//SV108 through SV121 are not used or situational. We do not use.
 					}
@@ -2782,11 +2779,6 @@ namespace OpenDentBusiness
 				proc=Procedures.GetProcFromList(procList,claimProcs[i].ProcNum);
 				procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
 				if(claim.MedType==EnumClaimMedType.Medical) {
-					if(proc.DiagnosticCode=="") {
-						Comma(strb);
-						strb.Append(procCode.AbbrDesc+" Procedure Diagnosis 1");
-					}
-					//Diagnostic codes 2 through 4 are optional within the X12 specification.
 					if(proc.IsPrincDiag && proc.DiagnosticCode!="") {
 						princDiagExists=true;
 					}

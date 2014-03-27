@@ -4096,6 +4096,500 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SoftwareName','Open Dental Software')";
 					Db.NonQ(command);
 				}
+				//Add the 1500 claim form version 02/12 fields if the claim form does not already exist. The unique ID is OD12.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12') WHERE RowNum<=1";
+				}
+				DataTable tableClaimFormNum=Db.GetTable(command);
+				if(tableClaimFormNum.Rows.Count==0) {
+					long claimFormNum=0;
+					//The 1500 claim form version 02/12 does not exist, so safe to add.
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO claimform(Description,IsHidden,FontName,FontSize,UniqueID,PrintImages,OffsetX,OffsetY) "+
+							"VALUES ('1500_02_12',0,'Arial',9,'OD12',0,0,0)";
+						claimFormNum=Db.NonQ(command,true);
+					}
+					else {//oracle
+						command="INSERT INTO claimform(ClaimFormNum,Description,IsHidden,FontName,FontSize,UniqueID,PrintImages,OffsetX,OffsetY) "+
+							"VALUES ((SELECT MAX(ClaimFormNum)+1 FROM claimform),'1500',0,'Arial',9,'OD12',1,0,0)";
+						claimFormNum=Db.NonQ(command,true);
+					}
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'1500_02_12.gif','','','6','6','850','1170')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','AccidentST','','467','386','30','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentist','','531','984','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentist','','256','985','235','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistNPI','','260','1035','92','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistNPI','','531','1035','92','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistNumIsSSN','','189','951','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistNumIsTIN','','209','951','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistPh123','','680','968','40','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistPh456','','719','968','40','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistPh78910','','759','968','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','BillingDentistSSNorTIN','','39','949','131','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisA','','46','651','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisB','','176','651','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisC','','306','651','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisD','','436','651','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisE','','46','668','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisF','','176','668','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisG','','306','668','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisH','','436','668','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisI','','46','684','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisJ','','176','684','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisK','','306','684','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','DiagnosisL','','436','683','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','EmployerName','','540','386','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','GroupNum','','531','319','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','ICDindicator','','437','636','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsAutoAccident','','368','386','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsGroupHealthPlan','','326','154','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsMedicaidClaim','','96','154','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsNotAutoAccident','','428','385','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsNotOccupational','','428','352','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsNotOtherAccident','','428','418','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsOccupational','','368','352','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','IsOtherAccident','','368','418','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','OtherInsCarrierName','','36','450','245','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','OtherInsExists','','537','451','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','OtherInsGroupNum','','36','353','245','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','OtherInsNotExists','','588','451','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','OtherInsSubscrLastFirst','','36','320','245','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1Code','','274','752','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1CodeMod1','','340','752','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1CodeMod2','','375','752','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1CodeMod3','','405','752','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1CodeMod4','','435','752','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1Date','MM    dd    yy','32','752','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1Date','MM    dd     yy','122','752','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1DiagnosisPoint','','467','752','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1Fee','','598','752','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1PlaceNumericCode','','206','752','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1TreatProvNPI','','698','752','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P1UnitQty','','615','752','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2Code','','274','786','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2CodeMod1','','340','786','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2CodeMod2','','375','786','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2CodeMod3','','405','786','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2CodeMod4','','435','786','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2Date','MM    dd    yy','32','786','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2Date','MM    dd     yy','122','786','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2DiagnosisPoint','','467','786','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2Fee','','598','786','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2PlaceNumericCode','','206','786','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2TreatProvNPI','','698','786','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P2UnitQty','','615','786','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3Code','','274','818','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3CodeMod1','','340','818','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3CodeMod2','','375','818','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3CodeMod3','','405','818','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3CodeMod4','','435','818','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3Date','MM    dd    yy','32','818','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3Date','MM    dd     yy','121','818','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3DiagnosisPoint','','467','818','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3Fee','','598','818','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3PlaceNumericCode','','206','819','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3TreatProvNPI','','698','818','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P3UnitQty','','615','818','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4Code','','274','852','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4CodeMod1','','340','852','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4CodeMod2','','375','852','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4CodeMod3','','405','852','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4CodeMod4','','435','852','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4Date','MM    dd    yy','32','852','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4Date','MM    dd     yy','122','852','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4DiagnosisPoint','','467','852','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4Fee','','598','852','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4PlaceNumericCode','','206','853','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4TreatProvNPI','','698','852','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P4UnitQty','','615','852','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5Code','','274','885','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5CodeMod1','','340','885','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5CodeMod2','','375','885','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5CodeMod3','','405','885','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5CodeMod4','','435','885','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5Date','MM    dd    yy','32','885','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5Date','MM    dd     yy','122','885','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5DiagnosisPoint','','467','885','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5Fee','','598','885','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5PlaceNumericCode','','206','885','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5TreatProvNPI','','698','885','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P5UnitQty','','615','885','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6Code','','274','919','55','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6CodeMod1','','340','919','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6CodeMod2','','375','919','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6CodeMod3','','405','919','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6CodeMod4','','435','919','26','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6Date','MM    dd    yy','32','919','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6Date','MM    dd     yy','122','919','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6DiagnosisPoint','','467','919','48','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6Fee','','598','919','70','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6PlaceNumericCode','','206','919','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6TreatProvNPI','','698','919','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','P6UnitQty','','615','919','20','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientAddress','','37','216','245','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientAssignment','','577','512','210','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientCity','','37','251','200','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientDOB','MM    dd    yyyy','333','187','95','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientIsFemale','','487','186','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientIsMale','','437','186','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientLastFirst','','37','184','245','13')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientPhone','','169','286','120','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientRelease','','78','512','240','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientReleaseDate','MM/dd/yyyy','386','512','113','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientST','','281','253','30','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PatientZip','','37','287','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PayToDentistAddress','','531','1000','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PayToDentistCity','','531','1016','139','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PayToDentistST','','671','1016','30','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PayToDentistZip','','701','1016','80','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsAddress','','419','86','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsAddress2','','419','100','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsCarrierName','','419','72','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsCarrierName','','527','416','245','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsCity','','419','114','140','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsST','','560','114','30','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriInsZip','','590','114','79','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','PriorAuthString','','528','685','282','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','RelatIsChild','','437','218','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','RelatIsOther','','487','218','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','RelatIsSelf','','347','218','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','RelatIsSpouse','','397','218','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrAddress','','530','219','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrCity','','530','253','200','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrDOB','MM    dd     yyyy','554','353','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrID','','530','153','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrIsFemale','','769','352','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrIsMale','','699','352','0','0')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrLastFirst','','530','186','250','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrPhone','','672','287','120','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrST','','760','253','50','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','SubscrZip','','532','286','100','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TotalFee','','620','951','75','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistAddress','','256','999','235','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistCity','','256','1013','132','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistSigDate','','169','1025','74','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistSignature','','27','1010','142','30')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistST','','388','1013','28','14')";
+					Db.NonQ(command);
+					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistZip','','416','1013','75','14')";
+					Db.NonQ(command);
+				}
+
 
 
 
@@ -4104,8 +4598,18 @@ namespace OpenDentBusiness {
 			}
 			//To14_3_0();
 		}
-		
 
+		/////<summary>This is a helper method for the 14.2.1 conversion.  Without it, there would be an additional 1200 lines of code for the 1500 version 02/12 claim form.</summary>
+		//private static string GetClaimFormItemNum() {
+		//	if(DataConnection.DBtype==DatabaseType.Oracle) {
+		//		return "(SELECT MAX(ClaimFormItemNum)+1 FROM claimformitem)";
+		//	}
+		//	else {
+		//		//for mysql, this seems to be allowed and will automatically increment.
+		//		//Should work fine for both autoincrement and regular.
+		//		return "0";
+		//	}
+		//}
 
 
 

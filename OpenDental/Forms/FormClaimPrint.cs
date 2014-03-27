@@ -354,6 +354,10 @@ namespace OpenDental{
 						thisImage=CDT.Class1.GetADA2012();
 						extension=".gif";
 					}
+					else if(ClaimFormCur.Items[i].ImageFileName=="1500_02_12.gif") {
+						thisImage=Properties.Resources._1500_02_12;
+						extension=".gif";
+					}
 					else{
 						//In the case when the A to Z folders are not being used, an invalid form image path is returned
 						//and we simply print without the background image (just as if the background image were removed
@@ -1970,6 +1974,9 @@ namespace OpenDental{
 							displayStrings[i]="04";
 						}
 						break;
+					case "ICDindicator": //TODO: Allow 0 once ICD10 has been implemented
+						displayStrings[i]="9";
+						break;
 				}//switch
 				if(CultureInfo.CurrentCulture.Name=="nl-BE"	&& displayStrings[i]==""){//Dutch Belgium
 					displayStrings[i]="*   *   *";
@@ -3000,6 +3007,9 @@ namespace OpenDental{
 						else {
 							displayStrings[i]=dateService.ToString(ClaimFormCur.Items[i].FormatString);
 						}
+						break;
+					case "ICDindicator"://TODO: Allow 0 once ICD10 has been implemented
+						displayStrings[i]="9";
 						break;
 				}//switch
 				if(CultureInfo.CurrentCulture.Name=="nl-BE" && displayStrings[i]==""){//Dutch Belgium

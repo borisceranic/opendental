@@ -1495,15 +1495,17 @@ namespace OpenDentBusiness {
 				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),listProcs);
 			}
 			List<string> listDiagnosticCodes=new List<string>();
+			for(int i=0;i<listProcs.Count;i++) {//Ensure that the principal diagnosis is first in the list.
+				Procedure proc=listProcs[i];
+				if(proc.IsPrincDiag && proc.DiagnosticCode!="") {
+					listDiagnosticCodes.Add(proc.DiagnosticCode);
+					break;
+				}
+			}
 			for(int i=0;i<listProcs.Count;i++) {
 				Procedure proc=listProcs[i];
 				if(proc.DiagnosticCode!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode)) {
-					if(proc.IsPrincDiag) {
-						listDiagnosticCodes.Insert(0,proc.DiagnosticCode);
-					}
-					else {
-						listDiagnosticCodes.Add(proc.DiagnosticCode);
-					}
+					listDiagnosticCodes.Add(proc.DiagnosticCode);
 				}
 				if(proc.DiagnosticCode2!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode2)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode2);
