@@ -39,6 +39,7 @@ namespace OpenDental.UI {
 		private float cellFontSize=8.5f;
 		private int titleHeight=18;
 		private int headerHeight=15;
+		private Color cGridLine=Color.FromArgb(180,180,180);
 		private System.Windows.Forms.VScrollBar vScroll;
 		private System.Windows.Forms.HScrollBar hScroll;
 		private ODGridRowCollection rows;
@@ -94,16 +95,7 @@ namespace OpenDental.UI {
 		///<summary></summary>
 		private const int EDITABLE_ROW_HEIGHT=19;
 		private bool editableAcceptsCR;
-		private Color cGridLine=Color.FromArgb(180,180,180);
-		//Color.FromArgb(211,211,211);
-		//Color.FromArgb(192,192,192);
-		//Color.FromArgb(157,157,161);
-		private Color cTitleBackG=Color.FromArgb(210,210,210);
-		//(224,223,227);
-		private Color cBlueOutline=Color.FromArgb(119,119,146);
 		private static bool _useBlueTheme;
-		private static LinearGradientBrush brushTitleBackground=new LinearGradientBrush(new Point(0,0),new Point(0,23),Color.FromArgb(104,136,232),Color.FromArgb(20,47,126));
-		private static SolidBrush brushTitleText=new SolidBrush(Color.White);
 
 		///<summary></summary>
 		public ODGrid() {
@@ -132,29 +124,6 @@ namespace OpenDental.UI {
 			noteSpanStart=0;
 			noteSpanStop=0;
 			sortedByColumnIdx=-1;
-		}
-
-		public static bool UseBlueTheme {
-			get {
-				return _useBlueTheme;
-			}
-			set {
-				_useBlueTheme=value;
-				ReloadBrushes();
-			}
-		}
-
-		private static void ReloadBrushes() {
-			Color cTitleTop=Color.White;
-			Color cTitleBottom=Color.FromArgb(200,200,215);
-			Color cTitleText=Color.Black;
-			if(UseBlueTheme) {
-				cTitleTop=Color.FromArgb(104,136,232);
-				cTitleBottom=Color.FromArgb(20,47,126);
-				cTitleText=Color.White;
-			}
-			brushTitleBackground	=new LinearGradientBrush(new Point(0,0),new Point(0,23),cTitleTop,cTitleBottom);
-			brushTitleText	=new SolidBrush(cTitleText);
 		}
 
 		///<summary>Clean up any resources being used.</summary>
@@ -437,6 +406,17 @@ namespace OpenDental.UI {
 			}
 			set {
 				editableAcceptsCR=value;
+			}
+		}
+
+		///<summary>Container sets this for all grids simultaneously.</summary>
+		[Browsable(false)]
+		public static bool UseBlueTheme {
+			get {
+				return _useBlueTheme;
+			}
+			set {
+				_useBlueTheme=value;
 			}
 		}
 
@@ -870,12 +850,37 @@ namespace OpenDental.UI {
 
 		private void DrawTitleAndHeaders(Graphics g) {
 			//Title----------------------------------------------------------------------------------------------------
+			Color cTitleTop=Color.White;
+			Color cTitleBottom=Color.FromArgb(213,213,223);
+			Color cTitleText=Color.Black;
+			if(_useBlueTheme) {
+				cTitleTop=Color.FromArgb(114,136,201);//106,132,210);//109,129,191);//104,136,232);
+				cTitleBottom=Color.FromArgb(60,90,150);//35,55,115);//49,63,105);//(20,47,126);
+				cTitleText=Color.White;
+			}
+			LinearGradientBrush brushTitleBackground=new LinearGradientBrush(new Rectangle(0,0,Width,titleHeight),cTitleTop,cTitleBottom,LinearGradientMode.Vertical);
+			SolidBrush brushTitleText=new SolidBrush(cTitleText);
 			g.FillRectangle(brushTitleBackground,0,0,Width,titleHeight);
-			using(Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold)) {
-				g.DrawString(title,titleFont,brushTitleText,Width/2-g.MeasureString(title,titleFont).Width/2,2);
+			Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
+			g.DrawString(title,titleFont,brushTitleText,Width/2-g.MeasureString(title,titleFont).Width/2,2);
+			if(brushTitleBackground!=null) {
+				brushTitleBackground.Dispose();
+				brushTitleBackground=null;
+			}
+			if(brushTitleText!=null) {
+				brushTitleText.Dispose();
+				brushTitleText=null;
+			}
+			if(titleFont!=null) {
+				titleFont.Dispose();
+				titleFont=null;
 			}
 			//Column Headers-----------------------------------------------------------------------------------------
-			g.FillRectangle(new SolidBrush(this.cTitleBackG),0,titleHeight,Width,headerHeight);//background
+			Color cTitleBackG=Color.FromArgb(210,210,210);
+			if(_useBlueTheme){
+				cTitleBackG=Color.FromArgb(223,234,245);//208,225,242);//166,185,204);
+			}
+			g.FillRectangle(new SolidBrush(cTitleBackG),0,titleHeight,Width,headerHeight);//background
 			g.DrawLine(new Pen(Color.FromArgb(102,102,122)),0,titleHeight,Width,titleHeight);//line between title and headers
 			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold)) {
 				for(int i=0;i<columns.Count;i++) {
@@ -928,7 +933,13 @@ namespace OpenDental.UI {
 				g.FillRectangle(new SolidBrush(Color.FromKnownColor(KnownColor.Control)),Width-vScroll.Width-1,
 					Height-hScroll.Height-1,vScroll.Width,hScroll.Height);
 			}
-			g.DrawRectangle(new Pen(this.cBlueOutline),0,0,Width-1,Height-1);
+			Color cOutline=Color.FromArgb(119,119,146);
+			if(_useBlueTheme){
+				cOutline=Color.FromArgb(47,70,117);
+			}
+			using(Pen pen=new Pen(cOutline)) {
+				g.DrawRectangle(pen,0,0,Width-1,Height-1);
+			}
 		}
 		#endregion
 
