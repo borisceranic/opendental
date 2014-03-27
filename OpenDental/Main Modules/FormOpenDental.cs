@@ -5424,6 +5424,12 @@ namespace OpenDental{
 			if(PrefC.GetInt(PrefName.SecurityLogOffAfterMinutes)==0) {
 				return;
 			}
+			for(int f=Application.OpenForms.Count-1;f>=0;f--) {//This checks if any forms are open that make us not want to automatically log off. Currently only FormTerminal is checked for.
+				Form openForm=Application.OpenForms[f];
+				if(openForm.Name=="FormTerminal") {
+					return;
+				}
+			}
 			//Warning.  When debugging this, the ActiveForm will be impossible to determine by setting breakpoints.
 			//string activeFormText=Form.ActiveForm.Text;
 			//If a breakpoint is set below here, ActiveForm will erroneously show as null.
