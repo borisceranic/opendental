@@ -295,6 +295,10 @@ namespace OpenDentBusiness {
 				if(strAdjReasonCode!="") {
 					adj.ReasonDescript=GetDescriptFrom139(strAdjReasonCode);
 				}
+				adj.IsDeductible=false;
+				if(adjCode=="PR" && strAdjReasonCode=="1") {
+					adj.IsDeductible=true;
+				}
 				listAdjustments.Add(adj);
 			}
 			return listAdjustments;
@@ -307,7 +311,7 @@ namespace OpenDentBusiness {
 			X12Segment segCLP=_listSegments[segNum];
 			retVal.Npi=npi;
 			retVal.ClaimTrackingNumber=segCLP.Get(1);//CLP01
-			retVal.PayorControlNumber=segCLP.Get(7);//CLP07 Payer Claim Control Number
+			retVal.PayerControlNumber=segCLP.Get(7);//CLP07 Payer Claim Control Number
 			retVal.StatusCodeDescript=GetDescriptForClaimStatusCode(segCLP.Get(2));//CLP02 Claim Status Code Description
 			retVal.ClaimFee=PIn.Decimal(segCLP.Get(3));//CLP03 Total Claim Charge Amount
 			retVal.InsPaid=PIn.Decimal(segCLP.Get(4));//CLP04 Claim Payment Amount
@@ -318,6 +322,15 @@ namespace OpenDentBusiness {
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="CAS") {
 				retVal.ListClaimAdjustments.AddRange(ProcessCAS(segNum));
 				segNum++;
+			}
+			retVal.ClaimAdjustmentTotal=0;
+			retVal.Deductible=0;
+			for(int i=0;i<retVal.ListClaimAdjustments.Count;i++) {
+				Hx835_Adj adj=retVal.ListClaimAdjustments[i];
+				retVal.ClaimAdjustmentTotal+=adj.AdjAmt;
+				if(adj.IsDeductible) {
+					retVal.Deductible+=adj.AdjAmt;
+				}
 			}
 			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.
 			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="QC") {
@@ -415,6 +428,9 @@ namespace OpenDentBusiness {
 				Hx835_Proc proc=ProcessSVC(segNum,retVal.DateServiceStart,retVal.DateServiceEnd);
 				retVal.ListProcs.Add(proc);
 				segNum+=proc.SegmentCount;
+			}
+			for(int i=0;i<retVal.ListProcs.Count;i++) {//retVal.Deductible is initialized above with the summation of the deductible amounts from the claim level adjustments.
+				retVal.Deductible+=retVal.ListProcs[i].Deductible;
 			}
 			//Now modify the claim dates to encompass the procedure dates.  This step causes procedure dates to bubble up to the claim level when only service line dates are provided.
 			for(int i=0;i<retVal.ListProcs.Count;i++) {
@@ -824,6 +840,17 @@ namespace OpenDentBusiness {
 				proc.ListProcAdjustments.AddRange(ProcessCAS(segNum));
 				segNum++;
 			}
+			proc.Deductible=0;
+			proc.PatientResponsibility=0;
+			for(int i=0;i<proc.ListProcAdjustments.Count;i++) {
+				Hx835_Adj adj=proc.ListProcAdjustments[i];
+				if(adj.IsDeductible) {
+					proc.Deductible+=adj.AdjAmt;
+				}
+				if(adj.AdjCode=="PR") {
+					proc.PatientResponsibility+=adj.AdjAmt;
+				}
+			}
 			//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
 			//2110 REF: Line Item Control Number.  Situational.  Repeat 1.  Guide page 206.
 			//2110 REF: Rendering Provider Information.  Situational.  Repeat 10.  Guide page 207.  We do not use.
@@ -856,6 +883,8 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			proc.SegmentCount=segNum-segNumSVC;
+			proc.AllowedAmt=proc.InsPaid+proc.PatientResponsibility;
+			proc.Writeoff=proc.ProcFee-proc.InsPaid-proc.PatientResponsibility;
 			return proc;
 		}
 
@@ -898,7 +927,7 @@ namespace OpenDentBusiness {
 				retVal.Append(claimPaid.ClaimFee.ToString("f2")+"\t");
 				retVal.Append(claimPaid.InsPaid.ToString("f2")+"\t");
 				retVal.Append(claimPaid.PatientPortion.ToString("f2")+"\t");
-				retVal.AppendLine(claimPaid.PayorControlNumber);
+				retVal.AppendLine(claimPaid.PayerControlNumber);
 			}
 			return retVal.ToString();
 		}
@@ -2885,7 +2914,7 @@ namespace OpenDentBusiness {
 		///We refer to CLM01 as the claim identifier on our end. We allow alphanumeric in our claim identifiers, so we must store as a string.</summary>
 		public string ClaimTrackingNumber;
 		///<summary>CLP07 The claim control number used to identify the claim in the insurance company's database.</summary>
-		public string PayorControlNumber;
+		public string PayerControlNumber;
 		///<summary>CLP02 A human readable copy of the claim status code.</summary>
 		public string StatusCodeDescript;
 		///<summary>CLP03 The total amount charged by the dentist for the claim.</summary>
@@ -2913,6 +2942,10 @@ namespace OpenDentBusiness {
 		public List<Hx835_Info> ListSupplementalInfo;
 		///<summary>SVC segments.</summary>
 		public List<Hx835_Proc> ListProcs;
+		///<summary>The sum of all procedure deductibles in ListProcs, plus all deductible amounts from claim level adjustments in ListClaimAdjustments.</summary>
+		public decimal Deductible;
+		///<summary>The sum of all adjustment amounts from ListClaimAdjustments.</summary>
+		public decimal ClaimAdjustmentTotal;
 	}
 
 	///<summary>Information about a single procedure on an EOB.  There can be many of these for each Hx835_Claim.</summary>
@@ -2936,6 +2969,14 @@ namespace OpenDentBusiness {
 		public List<Hx835_Adj> ListProcAdjustments;
 		public List<Hx835_Info> ListSupplementalInfo;
 		public List<string> ListRemarks;
+		///<summary>The sum of all adjustment amounts in ListProcAdjustments where IsDeductible is true.</summary>
+		public decimal Deductible;
+		///<summary>Total of all adjustments in ListProcAdjustments where CAS01=PR, including deductible.</summary>
+		public decimal PatientResponsibility;
+		///<summary>Writeoff = (ProcFee)-(InsPay)-(Patient Responsibility)</summary>
+		public decimal Writeoff;
+		///<summary>AllowedAmt = (InsPay)+(Patient Responsibility)</summary>
+		public decimal AllowedAmt;
 	}
 
 	///<summary>Corresponds to a CAS segment.  Both the claim level and procedure level include CAS segments.</summary>
@@ -2943,8 +2984,10 @@ namespace OpenDentBusiness {
 		public string AdjustDescript;
 		public string ReasonDescript;
 		public decimal AdjAmt;
-		///<summary>Will be one of these 4 values: CO, PI, PR, OA.</summary>
+		///<summary>Will be one of these 4 values: CO=Contractual Obligations, PI=Payer Initiated Reduction, PR=Patient Responsibility, OA=Other Adjustment.</summary>
 		public string AdjCode;
+		///<summary>True when CAS01 = PR and (CAS02 or CAS05 or CAS08 or CAS11 or CAS14 or CAS17) is 1.</summary>
+		public bool IsDeductible;
 	}
 
 	///<summary>The values loaded into this class come from multiple segments, including the MIA, MOA, and AMT segments.</summary>
@@ -3123,6 +3166,192 @@ namespace OpenDentBusiness {
 //REF*PQ*11861~
 //LX*1~
 //CLP*0001000055*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//SE*38*0001~
+//GE*1*1~
+//IEA*1*000000001~
+
+//Example 6, copied from example 5 and modified: The claims are duplicated several times (with differing identifiers), as a way to test ERA printing on multiple pages.
+//Numbers may be off, the only purpose of this example is for multi-page printing and the content has not been sanity checked very deeply.
+//ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
+//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//ST*835*0001~
+//BPR*I*510.00*C*CHK************20050318~
+//TRN*1*0063158ABC*1566339911~
+//REF*EV*030240928~
+//DTM*405*20050318~
+//N1*PR*YOUR TAX DOLLARS AT WORK~
+//N3*481A00 DEER RUN ROAD~
+//N4*WEST PALM BCH*FL*11114~
+//N1*PE*ATONEWITHHEALTH*FI*3UR334563~
+//N3*3501 JOHNSON STREET~
+//N4*SUNSHINE*FL*12345~
+//REF*PQ*11861~
+//LX*1~
+//CLP*1/1*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*2/2*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*3/3*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*4/4*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*5/5*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*6/6*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*7/7*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*8/8*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*9/9*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*10/10*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*11/11*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*12/12*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*13/13*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*14/14*2*541*34**12*50650619501~
+//NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//DTM*232*20050202~
+//DTM*233*20050202~
+//SVC*HC:55669*541*34**1~
+//DTM*472*20050202~
+//CAS*OA*23*516~
+//CAS*OA*94*-9~
+//REF*1B*44280~
+//AMT*AU*550~
+//CLP*15/15*2*541*34**12*50650619501~
 //NM1*QC*1*BRUCK*RAYMOND*W***MI*987654321~
 //NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
 //DTM*232*20050202~

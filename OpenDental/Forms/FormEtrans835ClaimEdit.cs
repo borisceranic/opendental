@@ -62,7 +62,7 @@ namespace OpenDental {
 				textDateService.Width=160;//Increase width to accout for extra text.
 			}
 			textClaimIdentifier.Text=_claimPaid.ClaimTrackingNumber;
-			textPayorControlNum.Text=_claimPaid.PayorControlNumber;
+			textPayorControlNum.Text=_claimPaid.PayerControlNumber;
 			textStatus.Text=_claimPaid.StatusCodeDescript;
 			textClaimFee.Text=_claimPaid.ClaimFee.ToString("f2");
 			textClaimFee2.Text=_claimPaid.ClaimFee.ToString("f2");

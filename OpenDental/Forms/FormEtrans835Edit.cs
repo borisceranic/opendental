@@ -127,7 +127,7 @@ namespace OpenDental {
 				}
 				row.Cells.Add(new UI.ODGridCell(strDateService));//DateService
 				row.Cells.Add(new UI.ODGridCell(claimPaid.ClaimTrackingNumber));//Claim Identfier
-				row.Cells.Add(new UI.ODGridCell(claimPaid.PayorControlNumber));//PayorControlNum
+				row.Cells.Add(new UI.ODGridCell(claimPaid.PayerControlNumber));//PayorControlNum
 				row.Cells.Add(new UI.ODGridCell(claimPaid.StatusCodeDescript));//Status
 				row.Cells.Add(new UI.ODGridCell(claimPaid.ClaimFee.ToString("f2")));//ClaimFee
 				row.Cells.Add(new UI.ODGridCell(claimPaid.InsPaid.ToString("f2")));//InsPaid
