@@ -23,7 +23,7 @@ namespace OpenDental {
 		private void FormEhrProvKeyEditCust_Load(object sender,EventArgs e) {
 			textLName.Text=KeyCur.LName;
 			textFName.Text=KeyCur.FName;
-			checkHasReportAccess.Checked=KeyCur.HasReportAccess;
+			textCalYear.Text=POut.Long(KeyCur.YearValue);
 			textEhrKey.Text=KeyCur.ProvKey;
 			textFullTimeEquiv.Text=KeyCur.FullTimeEquiv.ToString();
 			textNotes.Text=KeyCur.Notes;
@@ -34,17 +34,15 @@ namespace OpenDental {
 				MessageBox.Show("Please enter firstname and lastname.");
 				return;
 			}
+			if(textCalYear.Text=="" || textCalYear.Text=="0") {
+				MsgBox.Show(this,"Please enter a calendar year.");
+				return;
+			}
 			//Path for testing:
 			//@"E:\My Documents\Shared Projects Subversion\EhrProvKeyGenerator\EhrProvKeyGenerator\bin\Debug\EhrProvKeyGenerator.exe"
 			string progPath=PrefC.GetString(PrefName.EhrProvKeyGeneratorPath);
 			ProcessStartInfo startInfo=new ProcessStartInfo(progPath);
-			string args="P \""+textLName.Text.Replace("\"","")+"\" \""+textFName.Text.Replace("\"","")+"\" ";
-			if(checkHasReportAccess.Checked) {
-				args+="1";
-			}
-			else {
-				args+="0";
-			}
+			string args="P \""+textLName.Text.Replace("\"","")+"\" \""+textFName.Text.Replace("\"","")+"\" "+textCalYear.Text.Replace("\"","").Trim();
 			startInfo.Arguments=args;
 			startInfo.UseShellExecute=false;
 			startInfo.RedirectStandardOutput=true;
@@ -89,14 +87,14 @@ namespace OpenDental {
 				return;
 			}
 			if(textEhrKey.Text!="") {
-				if(!FormEHR.ProvKeyIsValid(textLName.Text,textFName.Text,checkHasReportAccess.Checked,textEhrKey.Text)) {
+				if(!FormEHR.ProvKeyIsValid(textLName.Text,textFName.Text,PIn.Int(textCalYear.Text),textEhrKey.Text)) {
 					MessageBox.Show("Invalid provider key");
 					return;
 				}
 			}
 			KeyCur.LName=textLName.Text;
 			KeyCur.FName=textFName.Text;
-			KeyCur.HasReportAccess=checkHasReportAccess.Checked;
+			KeyCur.YearValue=PIn.Int(textCalYear.Text);
 			KeyCur.ProvKey=textEhrKey.Text;
 			KeyCur.FullTimeEquiv=PIn.Float(textFullTimeEquiv.Text);
 			KeyCur.Notes=textNotes.Text;

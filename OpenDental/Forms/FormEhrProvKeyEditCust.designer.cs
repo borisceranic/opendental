@@ -40,7 +40,9 @@ namespace OpenDental{
 			this.textNotes = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.checkHasReportAccess = new System.Windows.Forms.CheckBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.textCalYear = new OpenDental.ValidNumber();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -207,22 +209,40 @@ namespace OpenDental{
 			this.label4.Text = "Usually 1. For example, half-time would be .5 and 1 day a week would be about .25" +
     "\r\n0 may be used if the provider is no longer working";
 			// 
-			// checkHasReportAccess
+			// label5
 			// 
-			this.checkHasReportAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkHasReportAccess.Location = new System.Drawing.Point(15, 170);
-			this.checkHasReportAccess.Name = "checkHasReportAccess";
-			this.checkHasReportAccess.Size = new System.Drawing.Size(188, 18);
-			this.checkHasReportAccess.TabIndex = 127;
-			this.checkHasReportAccess.Text = "Has Report Access";
-			this.checkHasReportAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkHasReportAccess.UseVisualStyleBackColor = true;
+			this.label5.Location = new System.Drawing.Point(60, 172);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(127, 14);
+			this.label5.TabIndex = 128;
+			this.label5.Text = "Calendar Year";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(240, 172);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(127, 14);
+			this.label6.TabIndex = 129;
+			this.label6.Text = "Ex. YY";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// textCalYear
+			// 
+			this.textCalYear.Location = new System.Drawing.Point(188, 169);
+			this.textCalYear.MaxVal = 255;
+			this.textCalYear.MinVal = 0;
+			this.textCalYear.Name = "textCalYear";
+			this.textCalYear.Size = new System.Drawing.Size(46, 20);
+			this.textCalYear.TabIndex = 130;
 			// 
 			// FormEhrProvKeyEditCust
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(706, 458);
-			this.Controls.Add(this.checkHasReportAccess);
+			this.Controls.Add(this.textCalYear);
+			this.Controls.Add(this.label6);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.textNotes);
 			this.Controls.Add(this.label3);
@@ -267,6 +287,8 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textNotes;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.CheckBox checkHasReportAccess;
+		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.Label label6;
+		private ValidNumber textCalYear;
 	}
 }

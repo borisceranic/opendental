@@ -5104,8 +5104,7 @@ namespace OpenDental{
 								desc+="\r\n";
 							}
 							desc+=listProvKeys[i].LName+", "+listProvKeys[i].FName+", "
-								+(listProvKeys[i].HasReportAccess?"reports, ":"no reports, ")
-								+listProvKeys[i].ProvKey;
+								+listProvKeys[i].YearValue+", "+listProvKeys[i].ProvKey;
 						}
 						row.Cells.Add(desc);
 						row.ColorBackG=Color.PowderBlue;

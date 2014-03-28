@@ -33,7 +33,6 @@ namespace OpenDental{
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
-			this.checkHasReportAccess = new System.Windows.Forms.CheckBox();
 			this.butDelete = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
@@ -128,17 +127,6 @@ namespace OpenDental{
 			this.label8.Text = "First Name";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// checkHasReportAccess
-			// 
-			this.checkHasReportAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkHasReportAccess.Location = new System.Drawing.Point(18, 157);
-			this.checkHasReportAccess.Name = "checkHasReportAccess";
-			this.checkHasReportAccess.Size = new System.Drawing.Size(139, 18);
-			this.checkHasReportAccess.TabIndex = 128;
-			this.checkHasReportAccess.Text = "Has Report Access";
-			this.checkHasReportAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkHasReportAccess.UseVisualStyleBackColor = true;
-			// 
 			// butDelete
 			// 
 			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -161,7 +149,6 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(453, 269);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.checkHasReportAccess);
 			this.Controls.Add(this.textLName);
 			this.Controls.Add(this.textFName);
 			this.Controls.Add(this.label10);
@@ -192,7 +179,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textFName;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.CheckBox checkHasReportAccess;
 		private UI.Button butDelete;
 	}
 }

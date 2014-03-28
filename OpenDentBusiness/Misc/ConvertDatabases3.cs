@@ -4589,7 +4589,22 @@ namespace OpenDentBusiness {
 						+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','TreatingDentistZip','','416','1013','75','14')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ehrprovkey ADD YearValue int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ehrprovkey ADD YearValue number(11)";
+					Db.NonQ(command);
+					command="UPDATE ehrprovkey SET YearValue = 0 WHERE YearValue IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ehrprovkey MODIFY YearValue NOT NULL";
+					Db.NonQ(command);
+				}
+				command="ALTER TABLE provider DROP COLUMN EhrHasReportAccess";
+				Db.NonQ(command);
+				command="ALTER TABLE ehrprovkey DROP COLUMN HasReportAccess";
+				Db.NonQ(command);
 
 
 
@@ -4599,19 +4614,9 @@ namespace OpenDentBusiness {
 			//To14_3_0();
 		}
 
-		/////<summary>This is a helper method for the 14.2.1 conversion.  Without it, there would be an additional 1200 lines of code for the 1500 version 02/12 claim form.</summary>
-		//private static string GetClaimFormItemNum() {
-		//	if(DataConnection.DBtype==DatabaseType.Oracle) {
-		//		return "(SELECT MAX(ClaimFormItemNum)+1 FROM claimformitem)";
-		//	}
-		//	else {
-		//		//for mysql, this seems to be allowed and will automatically increment.
-		//		//Should work fine for both autoincrement and regular.
-		//		return "0";
-		//	}
-		//}
 
 
+		
 
 
 	}
@@ -4624,3 +4629,18 @@ namespace OpenDentBusiness {
 
 
 
+
+
+				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ehrprovkey ADD YearValue int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ehrprovkey ADD YearValue number(11)";
+					Db.NonQ(command);
+					command="UPDATE ehrprovkey SET YearValue = 0 WHERE YearValue IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ehrprovkey MODIFY YearValue NOT NULL";
+					Db.NonQ(command);
+				}
+				*/

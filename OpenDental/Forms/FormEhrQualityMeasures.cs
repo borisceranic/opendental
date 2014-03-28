@@ -28,7 +28,8 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			listProvsKeyed=new List<Provider>();
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				if(FormEHR.ProvKeyIsValid(ProviderC.ListShort[i].LName,ProviderC.ListShort[i].FName,true,ProviderC.ListShort[i].EhrKey)) {
+				//TODO:Change this to not rely on 14
+				if(FormEHR.ProvKeyIsValid(ProviderC.ListShort[i].LName,ProviderC.ListShort[i].FName,14,ProviderC.ListShort[i].EhrKey)) {
 					listProvsKeyed.Add(ProviderC.ListShort[i]);
 				}
 			}

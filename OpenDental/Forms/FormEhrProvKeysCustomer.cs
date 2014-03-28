@@ -31,7 +31,7 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"FName"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Reports"),60);
+			col=new ODGridColumn(Lan.g(this,"Year"),60);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Key"),100);
 			gridMain.Columns.Add(col);
@@ -50,7 +50,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(listKeys[i].LName);
 				row.Cells.Add(listKeys[i].FName);
-				row.Cells.Add(listKeys[i].HasReportAccess?"X":"");
+				row.Cells.Add(POut.Int(listKeys[i].YearValue));
 				row.Cells.Add(listKeys[i].ProvKey);
 				fee=(decimal)(60f*listKeys[i].FullTimeEquiv);
 				feeTotal+=fee;
@@ -84,7 +84,7 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void FillGridQ(){
+		private void FillGridQ() {
 			gridQ.BeginUpdate();
 			gridQ.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Practice Title"),120);
@@ -120,47 +120,47 @@ namespace OpenDental {
 		}
 
 		private void butAddQuarterly_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.EhrKeyAdd)){
+			if(!Security.IsAuthorized(Permissions.EhrKeyAdd)) {
 				return;
 			}
 			FormEhrQuarterlyKeyEditCust formK=new FormEhrQuarterlyKeyEditCust();
 			formK.KeyCur=new EhrQuarterlyKey();
 			formK.KeyCur.PatNum=Guarantor;
-			if(listKeysQuart.Count==0){
+			if(listKeysQuart.Count==0) {
 				formK.KeyCur.YearValue=DateTime.Today.Year-2000;
 				int quarter=1;
-				if(DateTime.Today.Month>=4 && DateTime.Today.Month<=6){
+				if(DateTime.Today.Month>=4 && DateTime.Today.Month<=6) {
 					quarter=2;
 				}
-				if(DateTime.Today.Month>=7 && DateTime.Today.Month<=9){
+				if(DateTime.Today.Month>=7 && DateTime.Today.Month<=9) {
 					quarter=3;
 				}
-				if(DateTime.Today.Month>=10){
+				if(DateTime.Today.Month>=10) {
 					quarter=4;
 				}
 				formK.KeyCur.QuarterValue=quarter;
 			}
-			else{
+			else {
 				formK.KeyCur.PracticeName=listKeysQuart[listKeysQuart.Count-1].PracticeName;
 				formK.KeyCur.YearValue=listKeysQuart[listKeysQuart.Count-1].YearValue;
 				formK.KeyCur.QuarterValue=listKeysQuart[listKeysQuart.Count-1].QuarterValue+1;
-				if(formK.KeyCur.QuarterValue==5){
+				if(formK.KeyCur.QuarterValue==5) {
 					formK.KeyCur.QuarterValue=1;
 					formK.KeyCur.YearValue++;
 				}
 				int monthOfQuarter=1;
-				if(formK.KeyCur.QuarterValue==2){
+				if(formK.KeyCur.QuarterValue==2) {
 					monthOfQuarter=4;
 				}
-				if(formK.KeyCur.QuarterValue==3){
+				if(formK.KeyCur.QuarterValue==3) {
 					monthOfQuarter=7;
 				}
-				if(formK.KeyCur.QuarterValue==4){
+				if(formK.KeyCur.QuarterValue==4) {
 					monthOfQuarter=10;
 				}
 				DateTime firstDayOfQuarter=new DateTime(2000+formK.KeyCur.YearValue,monthOfQuarter,1);
 				DateTime earliestReleaseDate=firstDayOfQuarter.AddMonths(-1);
-				if(DateTime.Today<earliestReleaseDate){
+				if(DateTime.Today<earliestReleaseDate) {
 					MessageBox.Show("Warning!  Quarterly keys cannot be released more than one month in advance.");
 				}
 			}

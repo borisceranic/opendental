@@ -28,12 +28,14 @@ namespace OpenDental {
 		private void FormCodeSystemsImport_Load(object sender,EventArgs e) {
 			_isMemberNation=false;
 			//This check is here to prevent Snomeds from being available in non-member nations.
-			List<EhrQuarterlyKey> ehrKeys=EhrQuarterlyKeys.GetAllKeys();
-			for(int i=0;i<ehrKeys.Count;i++) {
-				if(FormEHR.QuarterlyKeyIsValid(ehrKeys[i].YearValue.ToString(),ehrKeys[i].QuarterValue.ToString(),ehrKeys[i].PracticeName,ehrKeys[i].KeyValue)) {
-					_isMemberNation=true;
-					break;
-				}
+			Provider prov=Providers.GetProv(Security.CurUser.ProvNum);
+			if(prov==null) {
+				return;
+			}
+			string ehrKey=prov.EhrKey;
+			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,PIn.Int(DateTime.Now.ToString("YY")),prov.EhrKey)) {
+				//EHR has been valid.
+				_isMemberNation=true;
 			}
 			UpdateCodeSystemThread.Finished+=new EventHandler(UpdateCodeSystemThread_FinishedSafe);
 		}

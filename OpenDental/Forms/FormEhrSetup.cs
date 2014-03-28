@@ -36,7 +36,6 @@ namespace OpenDental {
 				butInboundEmail.Visible=false;
 				butReminderRules.Visible=false;
 				butEducationalResources.Visible=false;
-				butKeys.Visible=false;
 				menuItemSettings.Enabled=false;
 				butTimeSynch.Visible=false;
 				butEhrTriggers.Visible=false;
@@ -229,11 +228,6 @@ namespace OpenDental {
 		private void butTimeSynch_Click(object sender,EventArgs e) {
 			FormEhrTimeSynch formET = new FormEhrTimeSynch();
 			formET.ShowDialog();
-		}
-
-		private void butKeys_Click(object sender,EventArgs e) {
-			FormEhrQuarterlyKeys formK=new FormEhrQuarterlyKeys();
-			formK.ShowDialog();
 		}
 
 		private void butPortalSetup_Click(object sender,EventArgs e) {

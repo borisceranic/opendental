@@ -19,7 +19,6 @@ namespace OpenDental {
 		private void FormEhrProvKey_Load(object sender,EventArgs e) {
 			textLName.Text=ProvCur.LName;
 			textFName.Text=ProvCur.FName;
-			checkHasReportAccess.Checked=ProvCur.EhrHasReportAccess;
 			textEhrKey.Text=ProvCur.EhrKey;
 		}
 
@@ -36,11 +35,10 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(!FormEHR.ProvKeyIsValid(ProvCur.LName,ProvCur.FName,checkHasReportAccess.Checked,textEhrKey.Text)){
+			if(!FormEHR.ProvKeyIsValid(ProvCur.LName,ProvCur.FName,14,textEhrKey.Text)){
 				MsgBox.Show(this,"Invalid provider key.  Check capitalization, exact spelling, and report access status.");
 				return;
 			}
-			ProvCur.EhrHasReportAccess=checkHasReportAccess.Checked;
 			ProvCur.EhrKey=textEhrKey.Text;
 			DialogResult=DialogResult.OK;
 		}

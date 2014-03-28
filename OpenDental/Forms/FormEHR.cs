@@ -497,18 +497,18 @@ namespace OpenDental {
 			LaunchOrdersWindow();
 		}
 
-		public static bool ProvKeyIsValid(string lName,string fName,bool hasReportAccess,string provKey) {
-			try{
+		public static bool ProvKeyIsValid(string lName,string fName,int yearValue,string provKey) {
+			try {
 				#if EHRTEST //This pattern allows the code to compile without having the EHR code available.
-					return FormEhrMeasures.ProvKeyIsValid(lName,fName,hasReportAccess,provKey);
+				return FormEhrMeasures.ProvKeyIsValid(lName,fName,yearValue,provKey);
 				#else
-					constructObjFormEhrMeasuresHelper();
-					Type type=AssemblyEHR.GetType("EHR.FormEhrMeasures");//namespace.class
-					object[] args=new object[] { lName,fName,hasReportAccess,provKey };
-					return (bool)type.InvokeMember("ProvKeyIsValid",System.Reflection.BindingFlags.InvokeMethod,null,ObjFormEhrMeasures,args);
+				constructObjFormEhrMeasuresHelper();
+				Type type=AssemblyEHR.GetType("EHR.FormEhrMeasures");//namespace.class
+				object[] args=new object[] { lName,fName,yearValue,provKey };
+				return (bool)type.InvokeMember("ProvKeyIsValid",System.Reflection.BindingFlags.InvokeMethod,null,ObjFormEhrMeasures,args);
 				#endif
 			}
-			catch{
+			catch {
 				return false;
 			}
 		}
