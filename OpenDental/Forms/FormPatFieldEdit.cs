@@ -20,6 +20,7 @@ namespace OpenDental{
 		public bool IsNew;
 		private PatField Field;
 		private Label labelName;
+		private UI.Button butUseAutoNote;
 		private TextBox textValue;
 
 		///<summary></summary>
@@ -60,62 +61,79 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.labelName = new System.Windows.Forms.Label();
 			this.textValue = new System.Windows.Forms.TextBox();
+			this.butUseAutoNote = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(280,146);
+			this.butCancel.Location = new System.Drawing.Point(280, 147);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,25);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(186,146);
+			this.butOK.Location = new System.Drawing.Point(186, 147);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,25);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// labelName
 			// 
-			this.labelName.Location = new System.Drawing.Point(19,17);
+			this.labelName.Location = new System.Drawing.Point(19, 17);
 			this.labelName.Name = "labelName";
-			this.labelName.Size = new System.Drawing.Size(335,20);
+			this.labelName.Size = new System.Drawing.Size(335, 20);
 			this.labelName.TabIndex = 3;
 			this.labelName.Text = "Field Name";
 			this.labelName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textValue
 			// 
-			this.textValue.Location = new System.Drawing.Point(21,40);
+			this.textValue.Location = new System.Drawing.Point(21, 40);
 			this.textValue.Multiline = true;
 			this.textValue.Name = "textValue";
-			this.textValue.Size = new System.Drawing.Size(333,74);
+			this.textValue.Size = new System.Drawing.Size(333, 74);
 			this.textValue.TabIndex = 0;
+			// 
+			// butUseAutoNote
+			// 
+			this.butUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUseAutoNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butUseAutoNote.Autosize = true;
+			this.butUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUseAutoNote.CornerRadius = 4F;
+			this.butUseAutoNote.Location = new System.Drawing.Point(21, 147);
+			this.butUseAutoNote.Name = "butUseAutoNote";
+			this.butUseAutoNote.Size = new System.Drawing.Size(75, 24);
+			this.butUseAutoNote.TabIndex = 4;
+			this.butUseAutoNote.Text = "Auto Note";
+			this.butUseAutoNote.Click += new System.EventHandler(this.butUseAutoNote_Click);
 			// 
 			// FormPatFieldEdit
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(375,193);
+			this.ClientSize = new System.Drawing.Size(375, 193);
+			this.Controls.Add(this.butUseAutoNote);
 			this.Controls.Add(this.textValue);
 			this.Controls.Add(this.labelName);
 			this.Controls.Add(this.butOK);
@@ -127,8 +145,8 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Patient Field";
-			this.Load += new System.EventHandler(this.FormPatFieldEdit_Load);
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPatFieldDefEdit_FormClosing);
+			this.Load += new System.EventHandler(this.FormPatFieldEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -138,6 +156,14 @@ namespace OpenDental{
 		private void FormPatFieldEdit_Load(object sender, System.EventArgs e) {
 			labelName.Text=Field.FieldName;
 			textValue.Text=Field.FieldValue;
+		}
+
+		private void butUseAutoNote_Click(object sender,EventArgs e) {
+			FormAutoNoteCompose FormA=new FormAutoNoteCompose();
+			FormA.ShowDialog();
+			if(FormA.DialogResult==DialogResult.OK) {
+				textValue.AppendText(FormA.CompletedNote);
+			}
 		}
 
 		/*private void buttonDelete_Click(object sender,EventArgs e) {
@@ -176,7 +202,6 @@ namespace OpenDental{
 				PatFields.Delete(Field);
 			}*/
 		}
-
 	
 
 		
