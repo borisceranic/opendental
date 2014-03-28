@@ -138,6 +138,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RequestPatientPortalURL">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RequestPatientPortalURLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestPatientPortalURLResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestFeeSched">
         <s:complexType>
           <s:sequence>
@@ -177,6 +191,20 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="ValidatePatientPortalOfficeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ValidateWebLander">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ValidateWebLanderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ValidateWebLanderResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -252,6 +280,12 @@
   <wsdl:message name="RequestCustomerIDSoapOut">
     <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
   </wsdl:message>
+  <wsdl:message name="RequestPatientPortalURLSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestPatientPortalURL" />
+  </wsdl:message>
+  <wsdl:message name="RequestPatientPortalURLSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestPatientPortalURLResponse" />
+  </wsdl:message>
   <wsdl:message name="RequestFeeSchedSoapIn">
     <wsdl:part name="parameters" element="tns:RequestFeeSched" />
   </wsdl:message>
@@ -269,6 +303,12 @@
   </wsdl:message>
   <wsdl:message name="ValidatePatientPortalOfficeSoapOut">
     <wsdl:part name="parameters" element="tns:ValidatePatientPortalOfficeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ValidateWebLanderSoapIn">
+    <wsdl:part name="parameters" element="tns:ValidateWebLander" />
+  </wsdl:message>
+  <wsdl:message name="ValidateWebLanderSoapOut">
+    <wsdl:part name="parameters" element="tns:ValidateWebLanderResponse" />
   </wsdl:message>
   <wsdl:message name="PracticeTitleResetSoapIn">
     <wsdl:part name="parameters" element="tns:PracticeTitleReset" />
@@ -317,6 +357,10 @@
       <wsdl:input message="tns:RequestCustomerIDSoapIn" />
       <wsdl:output message="tns:RequestCustomerIDSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="RequestPatientPortalURL">
+      <wsdl:input message="tns:RequestPatientPortalURLSoapIn" />
+      <wsdl:output message="tns:RequestPatientPortalURLSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="RequestFeeSched">
       <wsdl:input message="tns:RequestFeeSchedSoapIn" />
       <wsdl:output message="tns:RequestFeeSchedSoapOut" />
@@ -328,6 +372,10 @@
     <wsdl:operation name="ValidatePatientPortalOffice">
       <wsdl:input message="tns:ValidatePatientPortalOfficeSoapIn" />
       <wsdl:output message="tns:ValidatePatientPortalOfficeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <wsdl:input message="tns:ValidateWebLanderSoapIn" />
+      <wsdl:output message="tns:ValidateWebLanderSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="PracticeTitleReset">
       <wsdl:input message="tns:PracticeTitleResetSoapIn" />
@@ -426,6 +474,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="RequestPatientPortalURL">
+      <soap:operation soapAction="http://open-dent.com/RequestPatientPortalURL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RequestFeeSched">
       <soap:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
       <wsdl:input>
@@ -446,6 +503,15 @@
     </wsdl:operation>
     <wsdl:operation name="ValidatePatientPortalOffice">
       <soap:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <soap:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -555,6 +621,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="RequestPatientPortalURL">
+      <soap12:operation soapAction="http://open-dent.com/RequestPatientPortalURL" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RequestFeeSched">
       <soap12:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
       <wsdl:input>
@@ -575,6 +650,15 @@
     </wsdl:operation>
     <wsdl:operation name="ValidatePatientPortalOffice">
       <soap12:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <soap12:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

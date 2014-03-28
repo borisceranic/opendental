@@ -28,13 +28,15 @@ namespace OpenDental{
 			this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
 			this.menuItemSettings = new System.Windows.Forms.MenuItem();
 			this.groupCodeSystems = new System.Windows.Forms.GroupBox();
+			this.butPortalSetup = new OpenDental.UI.Button();
+			this.butOIDs = new OpenDental.UI.Button();
+			this.butEhrTriggers = new OpenDental.UI.Button();
+			this.butTimeSynch = new OpenDental.UI.Button();
+			this.butLoincs = new OpenDental.UI.Button();
 			this.butCodeImport = new OpenDental.UI.Button();
 			this.butRxNorm = new OpenDental.UI.Button();
 			this.butICD9s = new OpenDental.UI.Button();
 			this.butSnomeds = new OpenDental.UI.Button();
-			this.butEhrTriggers = new OpenDental.UI.Button();
-			this.butTimeSynch = new OpenDental.UI.Button();
-			this.butLoincs = new OpenDental.UI.Button();
 			this.butKeys = new OpenDental.UI.Button();
 			this.butEducationalResources = new OpenDental.UI.Button();
 			this.butInboundEmail = new OpenDental.UI.Button();
@@ -46,7 +48,6 @@ namespace OpenDental{
 			this.butVaccineDef = new OpenDental.UI.Button();
 			this.butAllergies = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.butOIDs = new OpenDental.UI.Button();
 			this.groupCodeSystems.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -73,6 +74,76 @@ namespace OpenDental{
 			this.groupCodeSystems.TabIndex = 136;
 			this.groupCodeSystems.TabStop = false;
 			this.groupCodeSystems.Text = "Code Systems";
+			// 
+			// butPortalSetup
+			// 
+			this.butPortalSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPortalSetup.Autosize = true;
+			this.butPortalSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPortalSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPortalSetup.CornerRadius = 4F;
+			this.butPortalSetup.Location = new System.Drawing.Point(27, 323);
+			this.butPortalSetup.Name = "butPortalSetup";
+			this.butPortalSetup.Size = new System.Drawing.Size(128, 24);
+			this.butPortalSetup.TabIndex = 141;
+			this.butPortalSetup.Text = "Patient Portal";
+			this.butPortalSetup.Click += new System.EventHandler(this.butPortalSetup_Click);
+			// 
+			// butOIDs
+			// 
+			this.butOIDs.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOIDs.Autosize = true;
+			this.butOIDs.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOIDs.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOIDs.CornerRadius = 4F;
+			this.butOIDs.Location = new System.Drawing.Point(214, 285);
+			this.butOIDs.Name = "butOIDs";
+			this.butOIDs.Size = new System.Drawing.Size(128, 24);
+			this.butOIDs.TabIndex = 140;
+			this.butOIDs.Text = "Internal OID Registry";
+			this.butOIDs.Click += new System.EventHandler(this.butOIDs_Click);
+			// 
+			// butEhrTriggers
+			// 
+			this.butEhrTriggers.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEhrTriggers.Autosize = true;
+			this.butEhrTriggers.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEhrTriggers.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEhrTriggers.CornerRadius = 4F;
+			this.butEhrTriggers.Location = new System.Drawing.Point(214, 209);
+			this.butEhrTriggers.Name = "butEhrTriggers";
+			this.butEhrTriggers.Size = new System.Drawing.Size(128, 24);
+			this.butEhrTriggers.TabIndex = 138;
+			this.butEhrTriggers.Text = "EHR Triggers";
+			this.butEhrTriggers.Click += new System.EventHandler(this.butEhrTriggers_Click);
+			// 
+			// butTimeSynch
+			// 
+			this.butTimeSynch.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butTimeSynch.Autosize = true;
+			this.butTimeSynch.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butTimeSynch.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butTimeSynch.CornerRadius = 4F;
+			this.butTimeSynch.Location = new System.Drawing.Point(214, 247);
+			this.butTimeSynch.Name = "butTimeSynch";
+			this.butTimeSynch.Size = new System.Drawing.Size(128, 24);
+			this.butTimeSynch.TabIndex = 15;
+			this.butTimeSynch.Text = "Time Synchronization";
+			this.butTimeSynch.Click += new System.EventHandler(this.butTimeSynch_Click);
+			// 
+			// butLoincs
+			// 
+			this.butLoincs.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLoincs.Autosize = true;
+			this.butLoincs.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLoincs.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLoincs.CornerRadius = 4F;
+			this.butLoincs.Location = new System.Drawing.Point(214, 171);
+			this.butLoincs.Name = "butLoincs";
+			this.butLoincs.Size = new System.Drawing.Size(128, 24);
+			this.butLoincs.TabIndex = 11;
+			this.butLoincs.Text = "Loincs";
+			this.butLoincs.Click += new System.EventHandler(this.butLoincs_Click);
 			// 
 			// butCodeImport
 			// 
@@ -130,48 +201,6 @@ namespace OpenDental{
 			this.butSnomeds.TabIndex = 12;
 			this.butSnomeds.Text = "SNOMED CTs";
 			this.butSnomeds.Click += new System.EventHandler(this.butSnomeds_Click);
-			// 
-			// butEhrTriggers
-			// 
-			this.butEhrTriggers.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEhrTriggers.Autosize = true;
-			this.butEhrTriggers.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEhrTriggers.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEhrTriggers.CornerRadius = 4F;
-			this.butEhrTriggers.Location = new System.Drawing.Point(214, 209);
-			this.butEhrTriggers.Name = "butEhrTriggers";
-			this.butEhrTriggers.Size = new System.Drawing.Size(128, 24);
-			this.butEhrTriggers.TabIndex = 138;
-			this.butEhrTriggers.Text = "EHR Triggers";
-			this.butEhrTriggers.Click += new System.EventHandler(this.butEhrTriggers_Click);
-			// 
-			// butTimeSynch
-			// 
-			this.butTimeSynch.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTimeSynch.Autosize = true;
-			this.butTimeSynch.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTimeSynch.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTimeSynch.CornerRadius = 4F;
-			this.butTimeSynch.Location = new System.Drawing.Point(214, 247);
-			this.butTimeSynch.Name = "butTimeSynch";
-			this.butTimeSynch.Size = new System.Drawing.Size(128, 24);
-			this.butTimeSynch.TabIndex = 15;
-			this.butTimeSynch.Text = "Time Synchronization";
-			this.butTimeSynch.Click += new System.EventHandler(this.butTimeSynch_Click);
-			// 
-			// butLoincs
-			// 
-			this.butLoincs.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLoincs.Autosize = true;
-			this.butLoincs.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLoincs.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLoincs.CornerRadius = 4F;
-			this.butLoincs.Location = new System.Drawing.Point(214, 171);
-			this.butLoincs.Name = "butLoincs";
-			this.butLoincs.Size = new System.Drawing.Size(128, 24);
-			this.butLoincs.TabIndex = 11;
-			this.butLoincs.Text = "Loincs";
-			this.butLoincs.Click += new System.EventHandler(this.butLoincs_Click);
 			// 
 			// butKeys
 			// 
@@ -316,31 +345,18 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(461, 280);
+			this.butClose.Location = new System.Drawing.Point(453, 323);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 16;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// butOIDs
-			// 
-			this.butOIDs.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOIDs.Autosize = true;
-			this.butOIDs.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOIDs.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOIDs.CornerRadius = 4F;
-			this.butOIDs.Location = new System.Drawing.Point(214, 285);
-			this.butOIDs.Name = "butOIDs";
-			this.butOIDs.Size = new System.Drawing.Size(128, 24);
-			this.butOIDs.TabIndex = 140;
-			this.butOIDs.Text = "Internal OID Registry";
-			this.butOIDs.Click += new System.EventHandler(this.butOIDs_Click);
-			// 
 			// FormEhrSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(561, 331);
+			this.ClientSize = new System.Drawing.Size(561, 367);
+			this.Controls.Add(this.butPortalSetup);
 			this.Controls.Add(this.butOIDs);
 			this.Controls.Add(this.butEhrTriggers);
 			this.Controls.Add(this.butTimeSynch);
@@ -392,5 +408,6 @@ namespace OpenDental{
 		private UI.Button butTimeSynch;
 		private UI.Button butEhrTriggers;
 		private UI.Button butOIDs;
+		private UI.Button butPortalSetup;
 	}
 }

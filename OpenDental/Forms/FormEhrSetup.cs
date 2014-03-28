@@ -236,6 +236,10 @@ namespace OpenDental {
 			formK.ShowDialog();
 		}
 
+		private void butPortalSetup_Click(object sender,EventArgs e) {
+			new FormPatientPortalSetup().ShowDialog();			
+		}
+
 		private void butCodeImport_Click(object sender,EventArgs e) {
 			FormCodeSystemsImport FormCSI=new FormCodeSystemsImport();
 			FormCSI.ShowDialog();

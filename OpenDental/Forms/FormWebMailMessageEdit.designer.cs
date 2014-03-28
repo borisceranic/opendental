@@ -106,11 +106,12 @@ namespace OpenDental{
 			// 
 			// labelNotification
 			// 
-			this.labelNotification.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelNotification.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelNotification.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.labelNotification.Location = new System.Drawing.Point(86, 391);
+			this.labelNotification.Location = new System.Drawing.Point(12, 349);
 			this.labelNotification.Name = "labelNotification";
-			this.labelNotification.Size = new System.Drawing.Size(541, 14);
+			this.labelNotification.Size = new System.Drawing.Size(615, 14);
 			this.labelNotification.TabIndex = 17;
 			this.labelNotification.Text = "Warning: Patient email is not setup properly. No notification email will be sent " +
     "to this patient.";
@@ -155,7 +156,7 @@ namespace OpenDental{
 			this.butPreview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPreview.CornerRadius = 4F;
 			this.butPreview.Image = global::OpenDental.Properties.Resources.butPreview;
-			this.butPreview.Location = new System.Drawing.Point(44, 342);
+			this.butPreview.Location = new System.Drawing.Point(44, 300);
 			this.butPreview.Name = "butPreview";
 			this.butPreview.Size = new System.Drawing.Size(69, 24);
 			this.butPreview.TabIndex = 5;
@@ -170,7 +171,7 @@ namespace OpenDental{
 			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(633, 386);
+			this.butSend.Location = new System.Drawing.Point(633, 344);
 			this.butSend.Name = "butSend";
 			this.butSend.Size = new System.Drawing.Size(75, 24);
 			this.butSend.TabIndex = 6;
@@ -185,7 +186,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(714, 386);
+			this.butCancel.Location = new System.Drawing.Point(714, 344);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
@@ -203,14 +204,14 @@ namespace OpenDental{
 			this.textBody.Name = "textBody";
 			this.textBody.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBody.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBody.Size = new System.Drawing.Size(670, 254);
+			this.textBody.Size = new System.Drawing.Size(670, 212);
 			this.textBody.TabIndex = 4;
 			this.textBody.Text = "";
 			// 
 			// FormWebMailMessageEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(818, 422);
+			this.ClientSize = new System.Drawing.Size(818, 380);
 			this.Controls.Add(this.comboRegardingPatient);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.butPreview);
