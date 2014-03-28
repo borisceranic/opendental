@@ -26,10 +26,10 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOrthoChart));
 			this.gridPat = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.butAdd = new OpenDental.UI.Button();
-			this.butClose = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
 			this.butUseAutoNote = new OpenDental.UI.Button();
+			this.butAdd = new OpenDental.UI.Button();
+			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// gridPat
@@ -62,6 +62,31 @@ namespace OpenDental{
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// label6
+			// 
+			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.label6.Location = new System.Drawing.Point(722, 630);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(123, 27);
+			this.label6.TabIndex = 55;
+			this.label6.Text = "(All info is always saved automatically)";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
+			// butUseAutoNote
+			// 
+			this.butUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUseAutoNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butUseAutoNote.Autosize = true;
+			this.butUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUseAutoNote.CornerRadius = 4F;
+			this.butUseAutoNote.Location = new System.Drawing.Point(103, 634);
+			this.butUseAutoNote.Name = "butUseAutoNote";
+			this.butUseAutoNote.Size = new System.Drawing.Size(80, 23);
+			this.butUseAutoNote.TabIndex = 107;
+			this.butUseAutoNote.Text = "Auto Note";
+			this.butUseAutoNote.Click += new System.EventHandler(this.butUseAutoNote_Click);
+			// 
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -93,30 +118,6 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
-			// 
-			// label6
-			// 
-			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label6.Location = new System.Drawing.Point(722, 630);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(123, 27);
-			this.label6.TabIndex = 55;
-			this.label6.Text = "(All info is always saved automatically)";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-			// 
-			// butUseAutoNote
-			// 
-			this.butUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butUseAutoNote.Autosize = true;
-			this.butUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butUseAutoNote.CornerRadius = 4F;
-			this.butUseAutoNote.Location = new System.Drawing.Point(103, 634);
-			this.butUseAutoNote.Name = "butUseAutoNote";
-			this.butUseAutoNote.Size = new System.Drawing.Size(80, 23);
-			this.butUseAutoNote.TabIndex = 107;
-			this.butUseAutoNote.Text = "Auto Note";
-			this.butUseAutoNote.Click += new System.EventHandler(this.butUseAutoNote_Click);
 			// 
 			// FormOrthoChart
 			// 
