@@ -4114,7 +4114,7 @@ namespace OpenDentBusiness {
 					}
 					else {//oracle
 						command="INSERT INTO claimform(ClaimFormNum,Description,IsHidden,FontName,FontSize,UniqueID,PrintImages,OffsetX,OffsetY) "+
-							"VALUES ((SELECT MAX(ClaimFormNum)+1 FROM claimform),'1500',0,'Arial',9,'OD12',1,0,0)";
+							"VALUES ((SELECT MAX(ClaimFormNum)+1 FROM claimform),'1500_02_12',0,'Arial',9,'OD12',1,0,0)";
 						claimFormNum=Db.NonQ(command,true);
 					}
 					command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
