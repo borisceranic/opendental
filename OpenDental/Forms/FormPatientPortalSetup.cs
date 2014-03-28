@@ -35,12 +35,8 @@ namespace OpenDental {
 					writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
 					writer.WriteEndElement();
 				}
-#if DEBUG
-				localhost.Service1 portalService=new localhost.Service1();
-#else
 				OpenDental.customerUpdates.Service1 portalService=new OpenDental.customerUpdates.Service1();			
 				portalService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
-#endif
 				if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
 					IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
 					ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
