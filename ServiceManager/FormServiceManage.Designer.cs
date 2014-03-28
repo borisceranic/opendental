@@ -39,9 +39,9 @@
 			// 
 			// butRefresh
 			// 
-			this.butRefresh.Location = new System.Drawing.Point(377,80);
+			this.butRefresh.Location = new System.Drawing.Point(377, 80);
 			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(75,23);
+			this.butRefresh.Size = new System.Drawing.Size(75, 23);
 			this.butRefresh.TabIndex = 4;
 			this.butRefresh.Text = "Refresh";
 			this.butRefresh.UseVisualStyleBackColor = true;
@@ -49,9 +49,9 @@
 			// 
 			// butStop
 			// 
-			this.butStop.Location = new System.Drawing.Point(359,113);
+			this.butStop.Location = new System.Drawing.Point(359, 113);
 			this.butStop.Name = "butStop";
-			this.butStop.Size = new System.Drawing.Size(75,23);
+			this.butStop.Size = new System.Drawing.Size(75, 23);
 			this.butStop.TabIndex = 3;
 			this.butStop.Text = "Stop";
 			this.butStop.UseVisualStyleBackColor = true;
@@ -59,9 +59,9 @@
 			// 
 			// butStart
 			// 
-			this.butStart.Location = new System.Drawing.Point(278,113);
+			this.butStart.Location = new System.Drawing.Point(278, 113);
 			this.butStart.Name = "butStart";
-			this.butStart.Size = new System.Drawing.Size(75,23);
+			this.butStart.Size = new System.Drawing.Size(75, 23);
 			this.butStart.TabIndex = 2;
 			this.butStart.Text = "Start";
 			this.butStart.UseVisualStyleBackColor = true;
@@ -69,9 +69,9 @@
 			// 
 			// butUninstall
 			// 
-			this.butUninstall.Location = new System.Drawing.Point(197,113);
+			this.butUninstall.Location = new System.Drawing.Point(197, 113);
 			this.butUninstall.Name = "butUninstall";
-			this.butUninstall.Size = new System.Drawing.Size(75,23);
+			this.butUninstall.Size = new System.Drawing.Size(75, 23);
 			this.butUninstall.TabIndex = 1;
 			this.butUninstall.Text = "Uninstall";
 			this.butUninstall.UseVisualStyleBackColor = true;
@@ -79,9 +79,9 @@
 			// 
 			// butInstall
 			// 
-			this.butInstall.Location = new System.Drawing.Point(116,113);
+			this.butInstall.Location = new System.Drawing.Point(116, 113);
 			this.butInstall.Name = "butInstall";
-			this.butInstall.Size = new System.Drawing.Size(75,23);
+			this.butInstall.Size = new System.Drawing.Size(75, 23);
 			this.butInstall.TabIndex = 0;
 			this.butInstall.Text = "Install";
 			this.butInstall.UseVisualStyleBackColor = true;
@@ -89,58 +89,61 @@
 			// 
 			// textStatus
 			// 
-			this.textStatus.Location = new System.Drawing.Point(156,82);
+			this.textStatus.Location = new System.Drawing.Point(156, 82);
 			this.textStatus.Name = "textStatus";
 			this.textStatus.ReadOnly = true;
-			this.textStatus.Size = new System.Drawing.Size(217,20);
+			this.textStatus.Size = new System.Drawing.Size(217, 20);
 			this.textStatus.TabIndex = 3;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(106,83);
+			this.label2.Location = new System.Drawing.Point(106, 83);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(48,18);
+			this.label2.Size = new System.Drawing.Size(48, 18);
 			this.label2.TabIndex = 2;
 			this.label2.Text = "Status";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(51,31);
+			this.label1.Location = new System.Drawing.Point(51, 31);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(103,18);
+			this.label1.Size = new System.Drawing.Size(103, 18);
 			this.label1.TabIndex = 5;
 			this.label1.Text = "Service Name";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textName
 			// 
-			this.textName.Location = new System.Drawing.Point(156,30);
+			this.textName.Location = new System.Drawing.Point(156, 30);
 			this.textName.Name = "textName";
-			this.textName.Size = new System.Drawing.Size(217,20);
+			this.textName.Size = new System.Drawing.Size(217, 20);
 			this.textName.TabIndex = 6;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(6,57);
+			this.label3.Location = new System.Drawing.Point(6, 57);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(148,18);
+			this.label3.Size = new System.Drawing.Size(148, 18);
 			this.label3.TabIndex = 7;
-			this.label3.Text = "Path to OpenDentHL7.exe";
+			this.label3.Text = "Path to service";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textPathToExe
 			// 
-			this.textPathToExe.Location = new System.Drawing.Point(156,56);
+			this.textPathToExe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textPathToExe.Location = new System.Drawing.Point(156, 56);
 			this.textPathToExe.Name = "textPathToExe";
-			this.textPathToExe.Size = new System.Drawing.Size(448,20);
+			this.textPathToExe.Size = new System.Drawing.Size(470, 20);
 			this.textPathToExe.TabIndex = 8;
 			// 
 			// butBrowse
 			// 
-			this.butBrowse.Location = new System.Drawing.Point(608,55);
+			this.butBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butBrowse.Location = new System.Drawing.Point(630, 55);
 			this.butBrowse.Name = "butBrowse";
-			this.butBrowse.Size = new System.Drawing.Size(75,23);
+			this.butBrowse.Size = new System.Drawing.Size(75, 23);
 			this.butBrowse.TabIndex = 9;
 			this.butBrowse.Text = "Browse";
 			this.butBrowse.UseVisualStyleBackColor = true;
@@ -148,9 +151,9 @@
 			// 
 			// FormServiceManage
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(697,166);
+			this.ClientSize = new System.Drawing.Size(719, 166);
 			this.Controls.Add(this.butBrowse);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textPathToExe);
