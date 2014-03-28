@@ -858,7 +858,7 @@ namespace OpenDental.UI {
 			Color cTitleBottom=Color.FromArgb(213,213,223);
 			Color cTitleText=Color.Black;
 			if(_useBlueTheme) {
-				cTitleTop=Color.FromArgb(114,136,201);//106,132,210);//109,129,191);//104,136,232);
+				cTitleTop=Color.FromArgb(156,175,230);//191,205,245);//139,160,224);//114,136,201);//106,132,210);//109,129,191);//104,136,232);
 				cTitleBottom=Color.FromArgb(60,90,150);//35,55,115);//49,63,105);//(20,47,126);
 				cTitleText=Color.White;
 			}

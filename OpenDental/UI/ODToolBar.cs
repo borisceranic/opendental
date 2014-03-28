@@ -75,7 +75,7 @@ namespace OpenDental.UI{
 			if(UseBlueTheme) {
 				//Static Blue colors
 				cTopMedium=Color.FromArgb(255,255,255);//<<--Change this value
-				cBotMedium=Color.FromArgb(192,202,240);//<<--Change this value
+				cBotMedium=Color.FromArgb(171,181,209);//192,202,240);//<<--Change this value
 				#region Dynamic Blue Colors
 				int l=10;//L for light. added to light values of shaded buttons
 				int d=-30;//D for dark. added to dark values of shadded buttons.

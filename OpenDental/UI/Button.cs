@@ -22,7 +22,9 @@ namespace OpenDental.UI
 		private Color colorBorder;
 		private Color colorDisabledFore;
 		private Color colorShadow;
+		///<summary>Shading at lower and right borders</summary>
 		private Color colorDarkest;
+		///<summary>Overall main color of button.  All other colors are quite minor.</summary>
 		private Color colorMain;
 		private Color colorLightest;
 		private Color colorDarkDefault;
@@ -54,9 +56,9 @@ namespace OpenDental.UI
 			colorBorder      =Color.FromArgb(28,81,128);//150,190,210);
 			colorDisabledFore=Color.FromArgb(161,161,146);
 			colorShadow      =Color.FromArgb(180,180,180);
-			colorDarkest     =Color.FromArgb(157,164,196);//125,136,184);//87,102,166);//50,70,150);
+			colorDarkest     =Color.FromArgb(157,164,196);
 			colorLightest    =Color.FromArgb(255,255,255);
-			colorMain        =Color.FromArgb(200,202,220);
+			colorMain        =Color.FromArgb(223,224,235);//218,220,235);//200,202,220);
 			colorDarkDefault =Color.FromArgb(50,70,230);
 			colorHoverDark   =Color.FromArgb(255,190,100);//(255,165,0) is pure orange
 			colorHoverLight  =Color.FromArgb(255,210,130);//(255,223,163) is a fairly light orange
