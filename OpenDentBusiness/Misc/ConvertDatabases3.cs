@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.2.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.2.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -3920,11 +3920,11 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.1.8.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To14_2_0();
+			To14_2_1();
 		}
 
-		private static void To14_2_0() {
-			if(FromVersion<new Version("14.2.0.0")) {
+		private static void To14_2_1() {
+			if(FromVersion<new Version("14.2.1.0")) {
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('CustListenerPort','25255')";
@@ -4605,13 +4605,10 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="ALTER TABLE ehrprovkey DROP COLUMN HasReportAccess";
 				Db.NonQ(command);
-
-
-
-				command="UPDATE preference SET ValueString = '14.2.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '14.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To14_3_0();
+			//To14_2_X();
 		}
 
 
@@ -4630,17 +4627,3 @@ namespace OpenDentBusiness {
 
 
 
-
-				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE ehrprovkey ADD YearValue int NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE ehrprovkey ADD YearValue number(11)";
-					Db.NonQ(command);
-					command="UPDATE ehrprovkey SET YearValue = 0 WHERE YearValue IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE ehrprovkey MODIFY YearValue NOT NULL";
-					Db.NonQ(command);
-				}
-				*/
