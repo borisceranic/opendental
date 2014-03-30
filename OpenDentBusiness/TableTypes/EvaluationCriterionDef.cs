@@ -4,19 +4,23 @@ using System.Collections;
 using System.Drawing;
 
 namespace OpenDentBusiness{
-	///<summary></summary>
-	[Serializable()]
+	///<summary>Rows on an evaluation def.  The individual items that will be graded.</summary>
+	[Serializable]
 	public class EvaluationCriterionDef:TableBase{
-		///<summary>Primary key..</summary>
+		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long EvaluationCriterionDefNum;
-		///<summary>FK to evaluationdef.EvaluationDefNum</summary>
+		///<summary>FK to evaluationdef.EvaluationDefNum.</summary>
 		public long EvaluationDefNum;
-		///<summary>Category (is this a MySQL reserved word?). Evaluation criteria with the same category are listed together.</summary>
-		public string Category;
+		///<summary>This row will show in bold and will not have a grade attached to it.</summary>
+		public bool IsCategoryName;
+		///<summary>FK to gradingscale.GradingScaleNum.  The grading scale used for this criterion.  As a user builds an evaluationDef, each criterion should default to the GradingScaleNum of the EvaluationDef, and then the user can change if needed.  The individual criteria do not have to be the same scale as the evaluation.</summary>
+		public long GradingScaleNum;
+		///<summary>Defines the order that all the criteria show on the evaluation.  Copied to ItemOrder of actual criterion.</summary>
+		public int ItemOrder;
 
 		///<summary></summary>
-		public EvaluationCriterionDef Clone() {
+		public EvaluationCriterionDef Copy() {
 			return (EvaluationCriterionDef)this.MemberwiseClone();
 		}
 
