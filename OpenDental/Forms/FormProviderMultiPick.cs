@@ -9,6 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
+	///<summary>Only used in one place, when searching for an appt slot.  Could be rolled into FormProviderPick if done carefully.</summary>
 	public partial class FormProvidersMultiPick:Form {
 		public List<Provider> SelectedProviders;
 

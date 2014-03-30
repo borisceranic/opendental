@@ -4680,10 +4680,12 @@ namespace OpenDental{
 		}
 
 		private void menuItemProviders_Click(object sender, System.EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Providers)) {//formerly used Setup permission
+			if(!Security.IsAuthorized(Permissions.Providers,true) && !Security.IsAuthorized(Permissions.AdminDentalStudents,true)) {
+				MessageBox.Show(Lans.g("Security","Not authorized for")+"\r\n"
+					+GroupPermissions.GetDesc(Permissions.Providers)+" "+Lans.g("Security","or")+" "+GroupPermissions.GetDesc(Permissions.AdminDentalStudents));
 				return;
 			}
-			FormProviderSelect FormPS=new FormProviderSelect();
+			FormProviderSetup FormPS=new FormProviderSetup();
 			FormPS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Providers");		
 		}

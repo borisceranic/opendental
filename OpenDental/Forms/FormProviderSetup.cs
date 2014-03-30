@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProviderSelect:System.Windows.Forms.Form {
+	public class FormProviderSetup:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butDown;
 		private OpenDental.UI.Button butUp;
@@ -35,8 +35,8 @@ namespace OpenDental{
 		//private User user;
 		private DataTable table;
 
-		///<summary>This isn't actually a selection window anymore.  It's just the provider setup list.</summary>
-		public FormProviderSelect(){
+		///<summary>Not used for selection.  Use FormProviderPick or FormProviderMultiPick for that.</summary>
+		public FormProviderSetup(){
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -54,7 +54,7 @@ namespace OpenDental{
 		#region Windows Form Designer generated code
 
 		private void InitializeComponent(){
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProviderSelect));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProviderSetup));
 			this.butClose = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
@@ -159,7 +159,7 @@ namespace OpenDental{
 			this.gridMain.Size = new System.Drawing.Size(593, 642);
 			this.gridMain.TabIndex = 13;
 			this.gridMain.Title = "Providers";
-			this.gridMain.TranslationName = null;
+			this.gridMain.TranslationName = "TableProviderSetup";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// groupDentalSchools
@@ -324,7 +324,7 @@ namespace OpenDental{
 			this.butMove.Text = "Move";
 			this.butMove.Click += new System.EventHandler(this.butMove_Click);
 			// 
-			// FormProviderSelect
+			// FormProviderSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
@@ -340,12 +340,12 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "FormProviderSelect";
+			this.Name = "FormProviderSetup";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Providers";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormProviderSelect_Closing);
-			this.Load += new System.EventHandler(this.FormProviderSelect_Load);
+			this.Load += new System.EventHandler(this.FormProviderSetup_Load);
 			this.groupDentalSchools.ResumeLayout(false);
 			this.groupCreateUsers.ResumeLayout(false);
 			this.groupMovePats.ResumeLayout(false);
@@ -354,7 +354,8 @@ namespace OpenDental{
 		}
 		#endregion
 
-		private void FormProviderSelect_Load(object sender, System.EventArgs e) {
+		private void FormProviderSetup_Load(object sender, System.EventArgs e) {
+			//There are two permissions which allow access to this window: SecurityAdmin and AdminDentalStudents.
 			if(!Security.IsAuthorized(Permissions.SecurityAdmin,DateTime.MinValue,true)){
 				groupCreateUsers.Enabled=false;
 				groupMovePats.Enabled=false;
@@ -432,21 +433,21 @@ namespace OpenDental{
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableProviders","Abbrev"),90);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableProviderSetup","Abbrev"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","Last Name"),90);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Last Name"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","First Name"),90);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","First Name"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","User Name"),90);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","User Name"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","Hidden"),50,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Hidden"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				col=new ODGridColumn(Lan.g("TableProviders","Class"),100);
+				col=new ODGridColumn(Lan.g("TableProviderSetup","Class"),100);
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g("TableProviders","Patients"),50,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Patients"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;

@@ -129,7 +129,7 @@ namespace OpenDentBusiness{
 		ProcDelete,
 		///<summary>50 - Only used at OD HQ.  No user interface.</summary>
 		EhrKeyAdd,
-		///<summary>51</summary>
+		///<summary>51- Allows user to edit all providers. This is not fine-grained enough for extremely large organizations such as dental schools, so other permissions are being added as well.</summary>
 		Providers,
 		///<summary>52</summary>
 		EcwAppointmentRevise,
@@ -180,8 +180,9 @@ namespace OpenDentBusiness{
 		///<summary>75- There is no user interface in the security window for this permission.  It is only used for tracking.  Patient Portal access of patient information.  Required by EHR.</summary>
 		PatientPortal,
 		///<summary>76</summary>
-		RxEdit
-
+		RxEdit,
+		///<summary>77-Assign this permission to a staff person who will administer setting up and editing Dental School Students in the system.</summary>
+		AdminDentalStudents
 	}
 
 	
