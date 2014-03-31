@@ -19,7 +19,7 @@ namespace OpenDentBusiness{
 		public long EmployeeNum;
 		///<summary>FK to clinic.ClinicNum.  Has two purposes.  Firstly, it causes new patients to default to this clinic when entered by this user.  Also, if ClinicIsRestricted is set to be true, then it does not allow this user to have access to other clinics. If 0, then user had access to all clinics regardless of ClinicIsRestricted.</summary>
 		public long ClinicNum;
-		///<summary>FK to provider.ProvNum.  Cannot be used if EmployeeNum is used.</summary>
+		///<summary>FK to provider.ProvNum.  Cannot be used if EmployeeNum is used.  It is possible to have multiple userods attached to a single provider.</summary>
 		public long ProvNum;
 		///<summary>Set true to hide user from login list.</summary>
 		public bool IsHidden;

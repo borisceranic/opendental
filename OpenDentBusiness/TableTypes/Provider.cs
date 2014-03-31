@@ -145,7 +145,7 @@ namespace OpenDentBusiness{
 
 		///<Summary>For use in areas of the program where we have more room than just simple abbr.  Such as pick boxes in reports.  This will give Abbr - LName, FName (hidden).</Summary>
 		public string GetLongDesc(){
-			string retval=Abbr+" - "+LName+", "+FName;
+			string retval=Abbr+"- "+LName+", "+FName;
 			if(IsHidden){
 				retval+=" "+Lans.g("Providers","(hidden)");
 			}
