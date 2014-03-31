@@ -1275,6 +1275,7 @@ namespace OpenDental {
 				else {
 					menuItemGoto.Enabled=true;
 				}
+				menuItemSendToMe.Enabled=true;
 			}
 			else {
 				menuItemGoto.Enabled=false;//not a task
