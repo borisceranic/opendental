@@ -18,6 +18,7 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		///<summary></summary>
 		public bool IsNew;
+		public bool IsLaunchedFromOrtho;
 		private PatField Field;
 		private Label labelName;
 		private UI.Button butUseAutoNote;
@@ -125,6 +126,7 @@ namespace OpenDental{
 			this.butUseAutoNote.Size = new System.Drawing.Size(75, 24);
 			this.butUseAutoNote.TabIndex = 4;
 			this.butUseAutoNote.Text = "Auto Note";
+			this.butUseAutoNote.Visible = false;
 			this.butUseAutoNote.Click += new System.EventHandler(this.butUseAutoNote_Click);
 			// 
 			// FormPatFieldEdit
@@ -156,6 +158,9 @@ namespace OpenDental{
 		private void FormPatFieldEdit_Load(object sender, System.EventArgs e) {
 			labelName.Text=Field.FieldName;
 			textValue.Text=Field.FieldValue;
+			if(IsLaunchedFromOrtho) {
+				butUseAutoNote.Visible=true;
+			}
 		}
 
 		private void butUseAutoNote_Click(object sender,EventArgs e) {
