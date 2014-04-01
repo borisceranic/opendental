@@ -289,8 +289,8 @@ namespace OpenDental {
 		}
 
 		private void butUseAutoNote_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedCell.X==-1) {
-				MsgBox.Show(this,"Please select a cell first.");
+			if(gridMain.SelectedCell.X==-1 || gridMain.SelectedCell.X==0) {
+				MsgBox.Show(this,"Please select an editable Ortho Chart cell first.");
 				return;
 			}
 			FormAutoNoteCompose FormA=new FormAutoNoteCompose();
