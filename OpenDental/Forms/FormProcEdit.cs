@@ -1486,6 +1486,7 @@ namespace OpenDental{
 			this.comboProvNum.Size = new System.Drawing.Size(158, 21);
 			this.comboProvNum.TabIndex = 100;
 			this.comboProvNum.SelectionChangeCommitted += new System.EventHandler(this.comboProvNum_SelectionChangeCommitted);
+			this.comboProvNum.KeyUp += new System.Windows.Forms.KeyEventHandler(this.comboProvNum_KeyUp);
 			// 
 			// textUser
 			// 
@@ -4591,6 +4592,20 @@ namespace OpenDental{
 
 		private void comboProvNum_SelectionChangeCommitted(object sender,EventArgs e) {
 			ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
+			UpdateClaimProcsProv();//This seems unnecessary here.  Should probably move to OK click.
+		}
+
+		///<summary>Changes provider if user uses key shortcuts to change the dropdown.</summary>
+		private void comboProvNum_KeyUp(object sender,KeyEventArgs e) {
+			if(comboProvNum.SelectedIndex==-1) { //If loaded with a provider not in the list, and the provider wasn't changed
+				return;
+			}
+			ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
+			UpdateClaimProcsProv();//This seems unnecessary here.  Should probably move to OK click.
+		}
+
+		///<summary>Updates all claim procs for procedure based on ProcCur.ProvNum.</summary>
+		private void UpdateClaimProcsProv() {
 			for(int i=0;i<ClaimProcsForProc.Count;i++) {
 				ClaimProcsForProc[i].ProvNum=ProcCur.ProvNum;
 			}
