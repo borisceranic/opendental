@@ -4592,7 +4592,6 @@ namespace OpenDental{
 
 		private void Tool_EHR_Click(bool onLoadShowOrders) {
 			//Quarterly key check was removed from here so that any customer can use EHR tools
-			//But we require a EHR subscription for them to obtain their MU reports.
 			FormEHR FormE = new FormEHR();
 			FormE.PatNum=PatCur.PatNum;
 			FormE.PatNotCur=PatientNoteCur;
