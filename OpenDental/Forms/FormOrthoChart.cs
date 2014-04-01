@@ -197,6 +197,7 @@ namespace OpenDental {
 				field.FieldName=PatFieldDefs.List[e.Row].FieldName;
 				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
+					FormPF.IsLaunchedFromOrtho=true;
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
