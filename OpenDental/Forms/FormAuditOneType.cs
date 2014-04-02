@@ -93,6 +93,9 @@ namespace OpenDental{
 			else if(PermTypes.Contains(Permissions.InsPlanChangeCarrierName)) {
 				labelDisclaimer.Text=Lan.g(this,"Changes made to the carrier for this ins plan before the update to 13.2 were not tracked in the audit trail.");
 			}
+			else if(PermTypes.Contains(Permissions.RxEdit)) {
+				labelDisclaimer.Text=Lan.g(this,"Changes made to the carrier for this Rx before the update to 14.2 were not tracked in the audit trail.");
+			}
 			FillGrid();
 		}
 
