@@ -1,11 +1,8 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using System.IO;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -34,7 +31,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private CheckBox checkApptExclamation;
 		private CheckBox checkProviderIncomeShows;
-		//private ComputerPref computerPref;
 		private TextBox textClaimAttachPath;
 		private CheckBox checkAutoClearEntryStatus;
 		private CheckBox checkShowFamilyCommByDefault;
@@ -87,7 +83,7 @@ namespace OpenDental{
 		private Label label15;
 		private ComboBox comboCobRule;
 		private CheckBox checkMedicalFeeUsedForNewProcs;
-		private bool changed;
+		private bool _changed;
 		private CheckBox checkAccountShowPaymentNums;
 		private ComboBox comboTimeCardOvertimeFirstDayOfWeek;
 		private Label label16;
@@ -112,12 +108,22 @@ namespace OpenDental{
 		private CheckBox checkStatementShowAdjNotes;
 		private CheckBox checkProcLockingIsAllowed;
 		private CheckBox checkTimeCardADP;
-		private bool IsLoading;
+		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
+		private int _selectedTab;
 
-		///<summary></summary>
-		public FormModuleSetup() {
+		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
+		public FormModuleSetup():this(0) {
+		}
+
+		///<summary>Opens the form with the a specific tab selected.  Currently 0-6 are the only valid values.  Defaults to Appts tab if invalid value passed in.</summary>
+		///<param name="selectedTab">0=Appts, 1=Family, 2=Account, 3=Treat' Plan, 4=Chart, 5=Images, 6=Manage</param>
+		public FormModuleSetup(int selectedTab) {
 			InitializeComponent();
 			Lan.F(this);
+			if(selectedTab<0 || selectedTab>6) {
+				selectedTab=0;//Default to Appts tab.
+			}
+			_selectedTab=selectedTab;
 		}
 
 		///<summary></summary>
@@ -1427,12 +1433,14 @@ namespace OpenDental{
 				DialogResult=DialogResult.Abort;
 				return;
 			}
+			//Now that all the tabs are filled, use _selectedTab to open a specific tab that the user is trying to view.
+			tabControl1.SelectedTab=tabControl1.TabPages[_selectedTab];//Garunteed to be a valid tab.  Validated in constructor.
 			Plugins.HookAddCode(this,"FormModuleSetup.FormModuleSetup_Load_end");
 		}
 
 		private void FillControllsHelper() {
-			changed=false;
-			IsLoading=true;
+			_changed=false;
+			#region Appointment Module
 			//Appointment module---------------------------------------------------------------
 			checkSolidBlockouts.Checked=PrefC.GetBool(PrefName.SolidBlockouts);
 			checkBrokenApptNote.Checked=PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment);
@@ -1484,6 +1492,8 @@ namespace OpenDental{
 			}
 			comboSearchBehavior.SelectedIndex=PrefC.GetInt(PrefName.AppointmentSearchBehavior);
 			checkAppointmentTimeIsLocked.Checked=PrefC.GetBool(PrefName.AppointmentTimeIsLocked);
+			#endregion
+			#region Family Module
 			//Family module-----------------------------------------------------------------------
 			checkInsurancePlansShared.Checked=PrefC.GetBool(PrefName.InsurancePlansShared);
 			checkPPOpercentage.Checked=PrefC.GetBool(PrefName.InsDefaultPPOpercent);
@@ -1496,6 +1506,8 @@ namespace OpenDental{
 			}
 			comboCobRule.SelectedIndex=PrefC.GetInt(PrefName.InsDefaultCobRule);
 			checkTextMsgOkStatusTreatAsNo.Checked=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
+			#endregion
+			#region Account Module
 			//Account module-----------------------------------------------------------------------
 			checkBalancesDontSubtractIns.Checked=PrefC.GetBool(PrefName.BalancesDontSubtractIns);
 			checkAgingMonthly.Checked=PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily);
@@ -1509,10 +1521,14 @@ namespace OpenDental{
 			checkClaimsValidateACN.Checked=PrefC.GetBool(PrefName.ClaimsValidateACN);
 			checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked=PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical);
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
+			#endregion
+			#region TP Module
 			//TP module-----------------------------------------------------------------------
 			textTreatNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
 			checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
 			checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
+			#endregion
+			#region Chart Module
 			//Chart module-----------------------------------------------------------------------
 			comboToothNomenclature.Items.Add(Lan.g(this, "Universal (Common in the US, 1-32)"));
 			comboToothNomenclature.Items.Add(Lan.g(this, "FDI Notation (International, 11-48)"));
@@ -1531,8 +1547,12 @@ namespace OpenDental{
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
 			textICD9DefaultForNewProcs.Text=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			checkProcLockingIsAllowed.Checked=PrefC.GetBool(PrefName.ProcLockingIsAllowed);
+			#endregion
+			#region Image Module
 			//Image module-----------------------------------------------------------------------
 			checkImagesModuleTreeIsCollapsed.Checked=PrefC.GetBool(PrefName.ImagesModuleTreeIsCollapsed);
+			#endregion
+			#region Manage Module
 			//Manage module----------------------------------------------------------------------
 			checkRxSendNewToQueue.Checked=PrefC.GetBool(PrefName.RxSendNewToQueue);
 			for(int i=0;i<7;i++) {
@@ -1560,7 +1580,7 @@ namespace OpenDental{
 			textPayPlansBillInAdvanceDays.Text=PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString();
 			checkStatementSummaryShowInsInfo.Checked=PrefC.GetBool(PrefName.StatementSummaryShowInsInfo);
 			checkIntermingleDefault.Checked=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
-			IsLoading=false; 
+			#endregion
 		}
 
 		private void checkAllowedFeeSchedsAutomate_Click(object sender,EventArgs e) {
@@ -1608,7 +1628,7 @@ namespace OpenDental{
 				return;
 			}
 			if(Prefs.UpdateLong(PrefName.ProblemsIndicateNone,formD.SelectedDiseaseDefNum)) {
-				changed=true;
+				_changed=true;
 			}
 			textProblemsIndicateNone.Text=DiseaseDefs.GetName(formD.SelectedDiseaseDefNum);
 		}
@@ -1621,7 +1641,7 @@ namespace OpenDental{
 				return;
 			}
 			if(Prefs.UpdateLong(PrefName.MedicationsIndicateNone,formM.SelectedMedicationNum)) {
-				changed=true;
+				_changed=true;
 			}
 			textMedicationsIndicateNone.Text=Medications.GetDescription(formM.SelectedMedicationNum);
 		}
@@ -1634,7 +1654,7 @@ namespace OpenDental{
 				return;
 			}
 			if(Prefs.UpdateLong(PrefName.AllergiesIndicateNone,formA.SelectedAllergyDefNum)) {
-				changed=true;
+				_changed=true;
 			}
 			textAllergiesIndicateNone.Text=AllergyDefs.GetOne(formA.SelectedAllergyDefNum).Description;
 		}
@@ -1743,16 +1763,16 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
 				)
 			{
-				changed=true;
+				_changed=true;
 			}
 			if(textStatementsCalcDueDate.Text==""){
 				if(Prefs.UpdateLong(PrefName.StatementsCalcDueDate,-1)){
-					changed=true;
+					_changed=true;
 				}
 			}
 			else{
 				if(Prefs.UpdateLong(PrefName.StatementsCalcDueDate,PIn.Long(textStatementsCalcDueDate.Text))){
-					changed=true;
+					_changed=true;
 				}
 			}
 			long timeArrivedTrigger=0;
@@ -1760,21 +1780,21 @@ namespace OpenDental{
 				timeArrivedTrigger=DefC.Short[(int)DefCat.ApptConfirmed][comboTimeArrived.SelectedIndex-1].DefNum;
 			}
 			if(Prefs.UpdateLong(PrefName.AppointmentTimeArrivedTrigger,timeArrivedTrigger)){
-				changed=true;
+				_changed=true;
 			}
 			long timeSeatedTrigger=0;
 			if(comboTimeSeated.SelectedIndex>0){
 				timeSeatedTrigger=DefC.Short[(int)DefCat.ApptConfirmed][comboTimeSeated.SelectedIndex-1].DefNum;
 			}
 			if(Prefs.UpdateLong(PrefName.AppointmentTimeSeatedTrigger,timeSeatedTrigger)){
-				changed=true;
+				_changed=true;
 			}
 			long timeDismissedTrigger=0;
 			if(comboTimeDismissed.SelectedIndex>0){
 				timeDismissedTrigger=DefC.Short[(int)DefCat.ApptConfirmed][comboTimeDismissed.SelectedIndex-1].DefNum;
 			}
 			if(Prefs.UpdateLong(PrefName.AppointmentTimeDismissedTrigger,timeDismissedTrigger)){
-				changed=true;
+				_changed=true;
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -1784,7 +1804,7 @@ namespace OpenDental{
 		}
 
 		private void FormModuleSetup_FormClosing(object sender,FormClosingEventArgs e) {
-			if(changed){
+			if(_changed){
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 		}
