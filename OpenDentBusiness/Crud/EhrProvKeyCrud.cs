@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				ehrProvKey.FullTimeEquiv= PIn.Float (table.Rows[i]["FullTimeEquiv"].ToString());
 				ehrProvKey.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
 				ehrProvKey.YearValue    = PIn.Int   (table.Rows[i]["YearValue"].ToString());
+				ehrProvKey.ProvNum      = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				retVal.Add(ehrProvKey);
 			}
 			return retVal;
@@ -94,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EhrProvKeyNum,";
 			}
-			command+="PatNum,LName,FName,ProvKey,FullTimeEquiv,Notes,YearValue) VALUES(";
+			command+="PatNum,LName,FName,ProvKey,FullTimeEquiv,Notes,YearValue,ProvNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(ehrProvKey.EhrProvKeyNum)+",";
 			}
@@ -105,7 +106,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrProvKey.ProvKey)+"',"
 				+    POut.Float (ehrProvKey.FullTimeEquiv)+","
 				+"'"+POut.String(ehrProvKey.Notes)+"',"
-				+    POut.Int   (ehrProvKey.YearValue)+")";
+				+    POut.Int   (ehrProvKey.YearValue)+","
+				+    POut.Long  (ehrProvKey.ProvNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -124,7 +126,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProvKey      = '"+POut.String(ehrProvKey.ProvKey)+"', "
 				+"FullTimeEquiv=  "+POut.Float (ehrProvKey.FullTimeEquiv)+", "
 				+"Notes        = '"+POut.String(ehrProvKey.Notes)+"', "
-				+"YearValue    =  "+POut.Int   (ehrProvKey.YearValue)+" "
+				+"YearValue    =  "+POut.Int   (ehrProvKey.YearValue)+", "
+				+"ProvNum      =  "+POut.Long  (ehrProvKey.ProvNum)+" "
 				+"WHERE EhrProvKeyNum = "+POut.Long(ehrProvKey.EhrProvKeyNum);
 			Db.NonQ(command);
 		}
@@ -159,6 +162,10 @@ namespace OpenDentBusiness.Crud{
 			if(ehrProvKey.YearValue != oldEhrProvKey.YearValue) {
 				if(command!=""){ command+=",";}
 				command+="YearValue = "+POut.Int(ehrProvKey.YearValue)+"";
+			}
+			if(ehrProvKey.ProvNum != oldEhrProvKey.ProvNum) {
+				if(command!=""){ command+=",";}
+				command+="ProvNum = "+POut.Long(ehrProvKey.ProvNum)+"";
 			}
 			if(command==""){
 				return false;

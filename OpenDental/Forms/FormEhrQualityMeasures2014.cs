@@ -33,8 +33,15 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			listProvsKeyed=new List<Provider>();
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				//TODO: Change this to not rely on 14
-				if(FormEHR.ProvKeyIsValid(ProviderC.ListShort[i].LName,ProviderC.ListShort[i].FName,14,ProviderC.ListShort[i].EhrKey)) {
+				string ehrKey="";
+				int yearValue=0;
+				List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysForProv(ProviderC.ListShort[i].ProvNum);
+				if(listProvKeys.Count!=0) {
+					ehrKey=listProvKeys[0].ProvKey;
+					yearValue=listProvKeys[0].YearValue;
+				}
+				if(FormEHR.ProvKeyIsValid(ProviderC.ListShort[i].LName,ProviderC.ListShort[i].FName,yearValue,ehrKey)) {
+					//EHR has been valid.
 					listProvsKeyed.Add(ProviderC.ListShort[i]);
 				}
 			}

@@ -90,7 +90,7 @@ namespace OpenDental {
 			PatCur=Patients.GetPat(PatNum);
 			ProvPat=Providers.GetProv(PatCur.PriProv);
 			labelProvPat.Text=ProvPat.GetLongDesc();
-			if(ProvPat.EhrKey=="") {
+			if(EhrProvKeys.GetKeysForProv(ProvPat.ProvNum).Count==0) {
 				labelProvPat.Text+=" (no ehr provider key entered)";
 			}
 			if(Security.CurUser.ProvNum==0) {
@@ -99,7 +99,7 @@ namespace OpenDental {
 			else {
 				Provider provUser=Providers.GetProv(Security.CurUser.ProvNum);
 				labelProvUser.Text=Providers.GetLongDesc(provUser.ProvNum);
-				if(provUser.EhrKey=="") {
+				if(EhrProvKeys.GetKeysForProv(provUser.ProvNum).Count>0) {
 					labelProvUser.Text+=" (no ehr provider key entered)";
 				}
 			}

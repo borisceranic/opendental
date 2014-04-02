@@ -68,8 +68,6 @@ namespace OpenDentBusiness{
 		public bool IsCDAnet;
 		///<summary>The name of this field is bad and will soon be changed to MedicalSoftID.  This allows an ID field that can be used for HL7 synch with other software.  Before this field was added, we were using prov abbreviation, which did not work well.</summary>
 		public string EcwID;
-		///<summary>Allows using ehr module for this provider.  Tied to provider fname and lname.</summary>
-		public string EhrKey;
 		///<summary>Provider medical State ID.</summary>
 		public string StateRxID;
 		///<summary>Default is false because most providers are persons.  But some dummy providers used for practices or billing entities are not persons.  This is needed on 837s.</summary>

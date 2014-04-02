@@ -34,8 +34,8 @@ namespace OpenDental {
 				MessageBox.Show("Please enter firstname and lastname.");
 				return;
 			}
-			if(textCalYear.Text=="" || textCalYear.Text=="0") {
-				MsgBox.Show(this,"Please enter a calendar year.");
+			if(textCalYear.errorProvider1.GetError(textCalYear)!="") {
+				MessageBox.Show("Invalid year, must be two digits.");
 				return;
 			}
 			//Path for testing:

@@ -215,7 +215,7 @@ namespace OpenDental{
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(127, 14);
 			this.label5.TabIndex = 128;
-			this.label5.Text = "Calendar Year";
+			this.label5.Text = "Year";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label6
@@ -224,13 +224,13 @@ namespace OpenDental{
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(127, 14);
 			this.label6.TabIndex = 129;
-			this.label6.Text = "Ex. YY";
+			this.label6.Text = "Ex. 12";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textCalYear
 			// 
 			this.textCalYear.Location = new System.Drawing.Point(188, 169);
-			this.textCalYear.MaxVal = 255;
+			this.textCalYear.MaxVal = 99;
 			this.textCalYear.MinVal = 0;
 			this.textCalYear.Name = "textCalYear";
 			this.textCalYear.Size = new System.Drawing.Size(46, 20);

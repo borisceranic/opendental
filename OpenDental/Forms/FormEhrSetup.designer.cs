@@ -32,6 +32,7 @@ namespace OpenDental{
 			this.butRxNorm = new OpenDental.UI.Button();
 			this.butICD9s = new OpenDental.UI.Button();
 			this.butSnomeds = new OpenDental.UI.Button();
+			this.butProviderKeys = new OpenDental.UI.Button();
 			this.butPortalSetup = new OpenDental.UI.Button();
 			this.butOIDs = new OpenDental.UI.Button();
 			this.butEhrTriggers = new OpenDental.UI.Button();
@@ -130,6 +131,20 @@ namespace OpenDental{
 			this.butSnomeds.TabIndex = 12;
 			this.butSnomeds.Text = "SNOMED CTs";
 			this.butSnomeds.Click += new System.EventHandler(this.butSnomeds_Click);
+			// 
+			// butProviderKeys
+			// 
+			this.butProviderKeys.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butProviderKeys.Autosize = true;
+			this.butProviderKeys.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butProviderKeys.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butProviderKeys.CornerRadius = 4F;
+			this.butProviderKeys.Location = new System.Drawing.Point(27, 323);
+			this.butProviderKeys.Name = "butProviderKeys";
+			this.butProviderKeys.Size = new System.Drawing.Size(128, 24);
+			this.butProviderKeys.TabIndex = 142;
+			this.butProviderKeys.Text = "Provider Keys";
+			this.butProviderKeys.Click += new System.EventHandler(this.butProviderKeys_Click);
 			// 
 			// butPortalSetup
 			// 
@@ -330,7 +345,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(453, 323);
+			this.butClose.Location = new System.Drawing.Point(453, 332);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 16;
@@ -340,7 +355,8 @@ namespace OpenDental{
 			// FormEhrSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(561, 367);
+			this.ClientSize = new System.Drawing.Size(561, 374);
+			this.Controls.Add(this.butProviderKeys);
 			this.Controls.Add(this.butPortalSetup);
 			this.Controls.Add(this.butOIDs);
 			this.Controls.Add(this.butEhrTriggers);
@@ -392,5 +408,6 @@ namespace OpenDental{
 		private UI.Button butEhrTriggers;
 		private UI.Button butOIDs;
 		private UI.Button butPortalSetup;
+		private UI.Button butProviderKeys;
 	}
 }

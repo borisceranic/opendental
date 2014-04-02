@@ -3,13 +3,13 @@ using System.Collections;
 using System.Drawing;
 
 namespace OpenDentBusiness {
-	///<summary>Only used by OD customer support to store and track Ehr Provider Keys for customers.</summary>
+	///<summary>Used to store and track Ehr Provider Keys.  There can be multiple EhrProvKeys per provider.</summary>
 	[Serializable]
 	public class EhrProvKey:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long EhrProvKeyNum;
-		///<summary>FK to patient.PatNum. There can be multiple EhrProvKeys per patient/customer.</summary>
+		///<summary>FK to patient.PatNum.  Only used by HQ for generating keys for customers.  Will always be 0 for non-HQ users.</summary>
 		public long PatNum;
 		///<summary>The provider LName.</summary>
 		public string LName;
@@ -23,6 +23,8 @@ namespace OpenDentBusiness {
 		public string Notes;
 		///<summary>Required when generating a new provider key.  It is used to determine annual EHR eligibility.  Format will always be YY.</summary>
 		public int YearValue;
+		///<summary>FK to provider.ProvNum.  Only used by customers who had a key generated.  Will always be 0 for HQ.</summary>
+		public long ProvNum;
 
 		///<summary></summary>
 		public EhrProvKey Copy() {

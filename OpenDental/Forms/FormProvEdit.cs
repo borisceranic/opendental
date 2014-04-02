@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -887,8 +888,9 @@ namespace OpenDental{
 				textEcwID.Visible=false;
 			}
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
-				if(!String.IsNullOrEmpty(ProvCur.EhrKey)) {
-					textEhrKey.Text=ProvCur.EhrKey;
+				List<EhrProvKey> listProvKey=EhrProvKeys.GetKeysForProv(ProvCur.ProvNum);
+				if(listProvKey.Count!=0) {
+					textEhrKey.Text=listProvKey[0].ProvKey;
 					textLName.Enabled=false;
 					textFName.Enabled=false;
 				}
@@ -990,18 +992,14 @@ namespace OpenDental{
 		}
 
 		private void butEhrKey_Click(object sender,EventArgs e) {
-			FormEhrProvKey formK=new FormEhrProvKey();
-			formK.ProvCur=ProvCur;
-			formK.ShowDialog();
-			if(formK.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			textEhrKey.Text=ProvCur.EhrKey;
-			if(String.IsNullOrEmpty(ProvCur.EhrKey)) {
-				textLName.Enabled=true;
-				textFName.Enabled=true;
+			FormEhrProviderKeys FormEPK=new FormEhrProviderKeys(ProvCur);
+			FormEPK.ShowDialog();
+			List<EhrProvKey> listProvKey=EhrProvKeys.GetKeysForProv(ProvCur.ProvNum);
+			if(listProvKey.Count==0) {
+				textEhrKey.Text="";
 			}
 			else {
+				textEhrKey.Text=listProvKey[0].ProvKey;//The newest key in the list
 				textLName.Enabled=false;
 				textFName.Enabled=false;
 			}

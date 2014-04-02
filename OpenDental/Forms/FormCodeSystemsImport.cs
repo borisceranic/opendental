@@ -32,8 +32,14 @@ namespace OpenDental {
 			if(prov==null) {
 				return;
 			}
-			string ehrKey=prov.EhrKey;
-			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,PIn.Int(DateTime.Now.ToString("YY")),prov.EhrKey)) {
+			string ehrKey="";
+			int yearValue=0;
+			List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysForProv(Security.CurUser.ProvNum);
+			if(listProvKeys.Count!=0) {
+				ehrKey=listProvKeys[0].ProvKey;
+				yearValue=listProvKeys[0].YearValue;
+			}
+			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,yearValue,ehrKey)) {
 				//EHR has been valid.
 				_isMemberNation=true;
 			}

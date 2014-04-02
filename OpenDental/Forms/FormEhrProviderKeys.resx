@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label1.Text" xml:space="preserve">
-    <value>You must obtain an EHR key from customer service for each provider who will be making use of the EHR functionality.  The key is tied to the first name and last name of the provider.  A new key is required if the name changes.  A single key may be shared by multiple providers with the same name in order to handle dummy providers.  The keys are complex, and it's easiest to paste them in.</value>
+    <value>EHR reports will only be available for years with a valid key.  Yearly provider keys are provided from tech support via phone or email.  The keys are tied to the first and last name of the provider, as well as the reporting year.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

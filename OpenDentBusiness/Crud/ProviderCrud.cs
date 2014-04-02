@@ -74,7 +74,6 @@ namespace OpenDentBusiness.Crud{
 				provider.TaxonomyCodeOverride= PIn.String(table.Rows[i]["TaxonomyCodeOverride"].ToString());
 				provider.IsCDAnet            = PIn.Bool  (table.Rows[i]["IsCDAnet"].ToString());
 				provider.EcwID               = PIn.String(table.Rows[i]["EcwID"].ToString());
-				provider.EhrKey              = PIn.String(table.Rows[i]["EhrKey"].ToString());
 				provider.StateRxID           = PIn.String(table.Rows[i]["StateRxID"].ToString());
 				provider.IsNotPerson         = PIn.Bool  (table.Rows[i]["IsNotPerson"].ToString());
 				provider.StateWhereLicensed  = PIn.String(table.Rows[i]["StateWhereLicensed"].ToString());
@@ -151,7 +150,6 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(provider.TaxonomyCodeOverride)+"',"
 				+    POut.Bool  (provider.IsCDAnet)+","
 				+"'"+POut.String(provider.EcwID)+"',"
-				+"'"+POut.String(provider.EhrKey)+"',"
 				+"'"+POut.String(provider.StateRxID)+"',"
 				+    POut.Bool  (provider.IsNotPerson)+","
 				+"'"+POut.String(provider.StateWhereLicensed)+"',"
@@ -195,7 +193,6 @@ namespace OpenDentBusiness.Crud{
 				+"TaxonomyCodeOverride= '"+POut.String(provider.TaxonomyCodeOverride)+"', "
 				+"IsCDAnet            =  "+POut.Bool  (provider.IsCDAnet)+", "
 				+"EcwID               = '"+POut.String(provider.EcwID)+"', "
-				+"EhrKey              = '"+POut.String(provider.EhrKey)+"', "
 				+"StateRxID           = '"+POut.String(provider.StateRxID)+"', "
 				+"IsNotPerson         =  "+POut.Bool  (provider.IsNotPerson)+", "
 				+"StateWhereLicensed  = '"+POut.String(provider.StateWhereLicensed)+"', "
@@ -311,10 +308,6 @@ namespace OpenDentBusiness.Crud{
 			if(provider.EcwID != oldProvider.EcwID) {
 				if(command!=""){ command+=",";}
 				command+="EcwID = '"+POut.String(provider.EcwID)+"'";
-			}
-			if(provider.EhrKey != oldProvider.EhrKey) {
-				if(command!=""){ command+=",";}
-				command+="EhrKey = '"+POut.String(provider.EhrKey)+"'";
 			}
 			if(provider.StateRxID != oldProvider.StateRxID) {
 				if(command!=""){ command+=",";}

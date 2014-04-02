@@ -378,6 +378,18 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEhrProviderKeyEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEhrProviderKeyEdit.designer.cs">
+      <DependentUpon>FormEhrProviderKeyEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormEhrProviderKeys.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEhrProviderKeys.designer.cs">
+      <DependentUpon>FormEhrProviderKeys.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormDisplayFieldOrthoEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1442,12 +1454,6 @@
     </Compile>
     <Compile Include="Forms\FormOrthoChart.designer.cs">
       <DependentUpon>FormOrthoChart.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormEhrProvKey.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormEhrProvKey.designer.cs">
-      <DependentUpon>FormEhrProvKey.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormLogoffWarning.cs">
       <SubType>Form</SubType>
@@ -3397,6 +3403,14 @@
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEhrProviderKeyEdit.resx">
+      <DependentUpon>FormEhrProviderKeyEdit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEhrProviderKeys.resx">
+      <DependentUpon>FormEhrProviderKeys.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDisplayFieldOrthoEdit.resx">
       <DependentUpon>FormDisplayFieldOrthoEdit.cs</DependentUpon>
     </EmbeddedResource>
@@ -3988,10 +4002,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormOrthoChart.resx">
       <DependentUpon>FormOrthoChart.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormEhrProvKey.resx">
-      <DependentUpon>FormEhrProvKey.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormLogoffWarning.resx">

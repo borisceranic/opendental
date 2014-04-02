@@ -20,6 +20,26 @@ namespace OpenDentBusiness{
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 
+		///<summary>Get a list of all EhrProvKeys.  Used for keeping track of annual ehr keys.</summary>
+		public static List<EhrProvKey> Refresh() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT ehrprovkey.* FROM ehrprovkey";
+			return Crud.EhrProvKeyCrud.SelectMany(command);
+		}
+
+		///<summary>Get a list of all EhrProvKeys for a specific provider.  Ordered by year value.</summary>
+		public static List<EhrProvKey> GetKeysForProv(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT ehrprovkey.* FROM ehrprovkey"
+			+" WHERE ehrprovkey.ProvNum="+POut.Long(provNum)
+			+" ORDER BY ehrprovkey.YearValue DESC";
+			return Crud.EhrProvKeyCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(EhrProvKey ehrProvKey){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

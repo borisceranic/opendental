@@ -267,8 +267,7 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provs=Db.GetScalar(command);
 			string[] tempProv=provs.Split(',');
 			string provOID="";
@@ -278,8 +277,7 @@ namespace OpenDentBusiness{
 					provOID+=",";
 				}
 			}
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provNPIs=Db.GetScalar(command);
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
@@ -1454,8 +1452,7 @@ namespace OpenDentBusiness{
 			int retval=0;
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provs=Db.GetScalar(command);
 			switch(mtype) {
 				case EhrMeasureType.ProblemList:
@@ -2511,8 +2508,7 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provs=Db.GetScalar(command);
 			string[] tempProv=provs.Split(',');
 			string provOID="";
@@ -2521,9 +2517,8 @@ namespace OpenDentBusiness{
 				if(oi<tempProv.Length-1) {
 					provOID+=",";
 				}
-			}	
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			}
+			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provNPIs=Db.GetScalar(command);
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
@@ -3447,8 +3442,7 @@ namespace OpenDentBusiness{
 			int retval=0;
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
 			string provs=Db.GetScalar(command);
 			switch(mtype) {
 				#region CPOE_MedOrdersOnly

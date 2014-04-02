@@ -239,6 +239,11 @@ namespace OpenDental {
 			FormCSI.ShowDialog();
 		}
 
+		private void butProviderKeys_Click(object sender,EventArgs e) {
+			FormEhrProviderKeys formK=new FormEhrProviderKeys();
+			formK.ShowDialog();
+		}
+
 		//private void butEHRCodes_Click(object sender,EventArgs e) {
 		//	if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will import codes required for CQMs to function properly, and may take up to 5 minutes.  Before running this tool, you should use the code system import tool.")) {
 		//		return;
