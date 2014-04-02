@@ -66,7 +66,7 @@
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(100, 17);
 			this.label5.TabIndex = 29;
-			this.label5.Text = "Patient Portal URL";
+			this.label5.Text = "Patient Facing URL";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textPatientPortalURL
