@@ -108,6 +108,9 @@ namespace OpenDental{
 		private CheckBox checkStatementShowAdjNotes;
 		private CheckBox checkProcLockingIsAllowed;
 		private CheckBox checkTimeCardADP;
+		private GroupBox groupBox2;
+		private Label label19;
+		private UI.ContrWindowingSlider slider;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -220,6 +223,7 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabImages = new System.Windows.Forms.TabPage();
 			this.tabManage = new System.Windows.Forms.TabPage();
+			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.checkStatementShowAdjNotes = new System.Windows.Forms.CheckBox();
 			this.checkIntermingleDefault = new System.Windows.Forms.CheckBox();
@@ -238,7 +242,9 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.label19 = new System.Windows.Forms.Label();
+			this.slider = new OpenDental.UI.ContrWindowingSlider();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -248,6 +254,7 @@ namespace OpenDental{
 			this.tabImages.SuspendLayout();
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textTreatNote
@@ -725,7 +732,7 @@ namespace OpenDental{
 			// 
 			this.checkImagesModuleTreeIsCollapsed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkImagesModuleTreeIsCollapsed.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkImagesModuleTreeIsCollapsed.Location = new System.Drawing.Point(81, 7);
+			this.checkImagesModuleTreeIsCollapsed.Location = new System.Drawing.Point(81, 9);
 			this.checkImagesModuleTreeIsCollapsed.Name = "checkImagesModuleTreeIsCollapsed";
 			this.checkImagesModuleTreeIsCollapsed.Size = new System.Drawing.Size(359, 17);
 			this.checkImagesModuleTreeIsCollapsed.TabIndex = 47;
@@ -1148,6 +1155,7 @@ namespace OpenDental{
 			// tabImages
 			// 
 			this.tabImages.BackColor = System.Drawing.SystemColors.Window;
+			this.tabImages.Controls.Add(this.groupBox2);
 			this.tabImages.Controls.Add(this.checkImagesModuleTreeIsCollapsed);
 			this.tabImages.Location = new System.Drawing.Point(4, 22);
 			this.tabImages.Name = "tabImages";
@@ -1168,6 +1176,17 @@ namespace OpenDental{
 			this.tabManage.Size = new System.Drawing.Size(466, 479);
 			this.tabManage.TabIndex = 6;
 			this.tabManage.Text = "Manage";
+			// 
+			// checkTimeCardADP
+			// 
+			this.checkTimeCardADP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTimeCardADP.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTimeCardADP.Location = new System.Drawing.Point(82, 57);
+			this.checkTimeCardADP.Name = "checkTimeCardADP";
+			this.checkTimeCardADP.Size = new System.Drawing.Size(359, 17);
+			this.checkTimeCardADP.TabIndex = 198;
+			this.checkTimeCardADP.Text = "ADP export includes employee name";
+			this.checkTimeCardADP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// groupBox1
 			// 
@@ -1379,16 +1398,34 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkTimeCardADP
+			// groupBox2
 			// 
-			this.checkTimeCardADP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTimeCardADP.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTimeCardADP.Location = new System.Drawing.Point(82, 57);
-			this.checkTimeCardADP.Name = "checkTimeCardADP";
-			this.checkTimeCardADP.Size = new System.Drawing.Size(359, 17);
-			this.checkTimeCardADP.TabIndex = 198;
-			this.checkTimeCardADP.Text = "ADP export includes employee name";
-			this.checkTimeCardADP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.groupBox2.Controls.Add(this.label19);
+			this.groupBox2.Controls.Add(this.slider);
+			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.groupBox2.Location = new System.Drawing.Point(46, 30);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(407, 60);
+			this.groupBox2.TabIndex = 48;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Radiographs";
+			// 
+			// label19
+			// 
+			this.label19.Location = new System.Drawing.Point(7, 15);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(388, 17);
+			this.label19.TabIndex = 22;
+			this.label19.Text = "Default pixel windowing for new radiographs, both scanned and digital";
+			this.label19.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
+			// slider
+			// 
+			this.slider.Location = new System.Drawing.Point(201, 38);
+			this.slider.MaxVal = 128;
+			this.slider.Name = "slider";
+			this.slider.Size = new System.Drawing.Size(194, 14);
+			this.slider.TabIndex = 21;
 			// 
 			// FormModuleSetup
 			// 
@@ -1419,6 +1456,7 @@ namespace OpenDental{
 			this.tabManage.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			this.groupBox2.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -1551,6 +1589,8 @@ namespace OpenDental{
 			#region Image Module
 			//Image module-----------------------------------------------------------------------
 			checkImagesModuleTreeIsCollapsed.Checked=PrefC.GetBool(PrefName.ImagesModuleTreeIsCollapsed);
+			slider.MinVal=PrefC.GetInt(PrefName.ImageWindowingMin);
+			slider.MaxVal=PrefC.GetInt(PrefName.ImageWindowingMax);
 			#endregion
 			#region Manage Module
 			//Manage module----------------------------------------------------------------------
@@ -1749,6 +1789,8 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.AccountShowPaymentNums,checkAccountShowPaymentNums.Checked)
 				//| Prefs.UpdateBool(PrefName.ToothChartMoveMenuToRight,checkToothChartMoveMenuToRight.Checked)
 				| Prefs.UpdateBool(PrefName.ImagesModuleTreeIsCollapsed,checkImagesModuleTreeIsCollapsed.Checked)
+				| Prefs.UpdateLong(PrefName.ImageWindowingMin,slider.MinVal)
+				| Prefs.UpdateLong(PrefName.ImageWindowingMax,slider.MaxVal)
 				| Prefs.UpdateBool(PrefName.RxSendNewToQueue,checkRxSendNewToQueue.Checked)
 				| Prefs.UpdateInt(PrefName.AppointmentSearchBehavior,comboSearchBehavior.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.AppointmentTimeIsLocked,checkAppointmentTimeIsLocked.Checked)
@@ -1761,7 +1803,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
 				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
-				)
+				) 
 			{
 				_changed=true;
 			}
