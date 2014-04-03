@@ -33,7 +33,7 @@ namespace OpenDental {
 				return;
 			}
 			string ehrKey=prov.EhrKey;
-			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,PIn.Int(DateTime.Now.ToString("YY")),prov.EhrKey)) {
+			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,PIn.Int(DateTime.Now.ToString("yy")),prov.EhrKey)) {
 				//EHR has been valid.
 				_isMemberNation=true;
 			}
