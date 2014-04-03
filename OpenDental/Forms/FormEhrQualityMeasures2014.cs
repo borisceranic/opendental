@@ -35,7 +35,7 @@ namespace OpenDental {
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
 				string ehrKey="";
 				int yearValue=0;
-				List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysForProv(ProviderC.ListShort[i].ProvNum);
+				List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysByFLName(ProviderC.ListShort[i].LName,ProviderC.ListShort[i].FName);
 				if(listProvKeys.Count!=0) {
 					ehrKey=listProvKeys[0].ProvKey;
 					yearValue=listProvKeys[0].YearValue;

@@ -4615,24 +4615,8 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("14.3.0.0")) {
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE ehrprovkey ADD ProvNum bigint NOT NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE ehrprovkey ADD INDEX (ProvNum)";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE ehrprovkey ADD ProvNum number(20)";
-					Db.NonQ(command);
-					command="UPDATE ehrprovkey SET ProvNum = 0 WHERE ProvNum IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE ehrprovkey MODIFY ProvNum NOT NULL";
-					Db.NonQ(command);
-					command=@"CREATE INDEX ehrprovkey_ProvNum ON ehrprovkey (ProvNum)";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO ehrprovkey (LName,FName,YearValue,ProvKey,ProvNum)"
-					+" SELECT provider.LName,provider.FName,14,provider.EhrKey,provider.ProvNum"
+					command="INSERT INTO ehrprovkey (LName,FName,YearValue,ProvKey)"
+					+" SELECT provider.LName,provider.FName,14,provider.EhrKey"
 					+" FROM provider WHERE provider.EhrKey!=''";
 					Db.NonQ(command);
 				}

@@ -125,7 +125,6 @@ namespace OpenDental{
 			this.textLName.Location = new System.Drawing.Point(150, 104);
 			this.textLName.MaxLength = 100;
 			this.textLName.Name = "textLName";
-			this.textLName.ReadOnly = true;
 			this.textLName.Size = new System.Drawing.Size(161, 20);
 			this.textLName.TabIndex = 113;
 			// 
@@ -134,7 +133,6 @@ namespace OpenDental{
 			this.textFName.Location = new System.Drawing.Point(150, 127);
 			this.textFName.MaxLength = 100;
 			this.textFName.Name = "textFName";
-			this.textFName.ReadOnly = true;
 			this.textFName.Size = new System.Drawing.Size(161, 20);
 			this.textFName.TabIndex = 114;
 			// 

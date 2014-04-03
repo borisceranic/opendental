@@ -111,7 +111,8 @@ namespace OpenDental {
 					//TODO: The code above works, but ignores more recent lab results. Although the lab order my be unchanged there may be updated lab results.
 					//It would be better to check for updated results, unfortunately results have no unique identifiers.
 				}
-				if(Security.CurUser.ProvNum!=0 && EhrProvKeys.GetKeysForProv(Security.CurUser.ProvNum).Count>0) {//The user who is currently logged in is a provider and has a valid EHR key.
+				Provider prov=Providers.GetProv(Security.CurUser.ProvNum);
+				if(Security.CurUser.ProvNum!=0 && EhrProvKeys.GetKeysByFLName(prov.LName,prov.FName).Count>0) {//The user who is currently logged in is a provider and has a valid EHR key.
 					ListEhrLabs[i].IsCpoe=true;
 				}
 				listEhrLabs[i]=EhrLabs.SaveToDB(listEhrLabs[i]);//SAVE

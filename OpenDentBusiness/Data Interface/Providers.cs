@@ -224,6 +224,23 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets a provider from ListLong.  Returns null if none found.</summary>
+		public static Provider GetProvByFLName(string lName,string fName) {
+			//No need to check RemotingRole; no call to db.
+			if(lName=="" || fName=="") {
+				return null;
+			}
+			if(ProviderC.ListLong==null) {
+				RefreshCache();
+			}
+			for(int i=0;i<ProviderC.ListLong.Count;i++) {
+				if(ProviderC.ListLong[i].LName==lName || ProviderC.ListLong[i].FName==fName) {
+					return ProviderC.ListLong[i].Copy();
+				}
+			}
+			return null;
+		}
+
 		///<summary>Gets a provider from the List.  If EcwID is not found, then it returns null.</summary>
 		public static Provider GetProvByEcwID(string eID) {
 			//No need to check RemotingRole; no call to db.

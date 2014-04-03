@@ -23,8 +23,6 @@ namespace OpenDentBusiness {
 		public string Notes;
 		///<summary>Required when generating a new provider key.  It is used to determine annual EHR eligibility.  Format will always be YY.</summary>
 		public int YearValue;
-		///<summary>FK to provider.ProvNum.  Only used by customers who had a key generated.  Will always be 0 for HQ.</summary>
-		public long ProvNum;
 
 		///<summary></summary>
 		public EhrProvKey Copy() {

@@ -20,23 +20,25 @@ namespace OpenDentBusiness{
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 
-		///<summary>Get a list of all EhrProvKeys.  Used for keeping track of annual ehr keys.</summary>
-		public static List<EhrProvKey> Refresh() {
+		///<summary>Get a list of all EhrProvKeys. Ordered by LName and then YearValue.</summary>
+		public static List<EhrProvKey> GetAllKeys() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT ehrprovkey.* FROM ehrprovkey";
+			string command="SELECT ehrprovkey.* FROM ehrprovkey "
+			+"ORDER BY LName,YearValue";
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 
-		///<summary>Get a list of all EhrProvKeys for a specific provider.  Ordered by year value.</summary>
-		public static List<EhrProvKey> GetKeysForProv(long provNum) {
+		///<summary>Get a list of all EhrProvKeys for a provider matching the given first and last name.  Ordered by year value.</summary>
+		public static List<EhrProvKey> GetKeysByFLName(string lName, string fName) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod(),provNum);
+				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod(),lName,fName);
 			}
 			string command="SELECT ehrprovkey.* FROM ehrprovkey"
-			+" WHERE ehrprovkey.ProvNum="+POut.Long(provNum)
-			+" ORDER BY ehrprovkey.YearValue DESC";
+			+" WHERE ehrprovkey.LName='"+POut.String(lName)
+			+"' AND ehrprovkey.FName='"+POut.String(fName)
+			+"' ORDER BY ehrprovkey.YearValue DESC";
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 

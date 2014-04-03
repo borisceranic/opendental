@@ -41,7 +41,7 @@ namespace OpenDental {
 			}
 			string ehrKey="";
 			int yearValue=0;
-			List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysForProv(Security.CurUser.ProvNum);
+			List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysByFLName(prov.LName,prov.FName);
 			if(listProvKeys.Count!=0) {
 				ehrKey=listProvKeys[0].ProvKey;
 				yearValue=listProvKeys[0].YearValue;

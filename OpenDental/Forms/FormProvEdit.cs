@@ -70,9 +70,6 @@ namespace OpenDental{
 		private CheckBox checkIsCDAnet;
 		private TextBox textEcwID;
 		private Label labelEcwID;
-		private UI.Button butEhrKey;
-		private TextBox textEhrKey;
-		private Label labelEhrKey;
 		private TextBox textStateRxID;
 		private Label label12;
 		private CheckBox checkIsNotPerson;
@@ -163,9 +160,6 @@ namespace OpenDental{
 			this.checkIsCDAnet = new System.Windows.Forms.CheckBox();
 			this.textEcwID = new System.Windows.Forms.TextBox();
 			this.labelEcwID = new System.Windows.Forms.Label();
-			this.butEhrKey = new OpenDental.UI.Button();
-			this.textEhrKey = new System.Windows.Forms.TextBox();
-			this.labelEhrKey = new System.Windows.Forms.Label();
 			this.textStateRxID = new System.Windows.Forms.TextBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.checkIsNotPerson = new System.Windows.Forms.CheckBox();
@@ -717,38 +711,6 @@ namespace OpenDental{
 			this.labelEcwID.Text = "eCW ID";
 			this.labelEcwID.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// butEhrKey
-			// 
-			this.butEhrKey.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEhrKey.Autosize = true;
-			this.butEhrKey.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEhrKey.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEhrKey.CornerRadius = 4F;
-			this.butEhrKey.Location = new System.Drawing.Point(239, 352);
-			this.butEhrKey.Name = "butEhrKey";
-			this.butEhrKey.Size = new System.Drawing.Size(25, 22);
-			this.butEhrKey.TabIndex = 102;
-			this.butEhrKey.Text = "...";
-			this.butEhrKey.Click += new System.EventHandler(this.butEhrKey_Click);
-			// 
-			// textEhrKey
-			// 
-			this.textEhrKey.Location = new System.Drawing.Point(136, 353);
-			this.textEhrKey.MaxLength = 15;
-			this.textEhrKey.Name = "textEhrKey";
-			this.textEhrKey.ReadOnly = true;
-			this.textEhrKey.Size = new System.Drawing.Size(100, 20);
-			this.textEhrKey.TabIndex = 103;
-			// 
-			// labelEhrKey
-			// 
-			this.labelEhrKey.Location = new System.Drawing.Point(48, 357);
-			this.labelEhrKey.Name = "labelEhrKey";
-			this.labelEhrKey.Size = new System.Drawing.Size(88, 14);
-			this.labelEhrKey.TabIndex = 104;
-			this.labelEhrKey.Text = "EHR Key";
-			this.labelEhrKey.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
 			// textStateRxID
 			// 
 			this.textStateRxID.Location = new System.Drawing.Point(136, 273);
@@ -803,9 +765,6 @@ namespace OpenDental{
 			this.Controls.Add(this.checkIsNotPerson);
 			this.Controls.Add(this.textStateRxID);
 			this.Controls.Add(this.label12);
-			this.Controls.Add(this.textEhrKey);
-			this.Controls.Add(this.labelEhrKey);
-			this.Controls.Add(this.butEhrKey);
 			this.Controls.Add(this.textEcwID);
 			this.Controls.Add(this.labelEcwID);
 			this.Controls.Add(this.checkIsCDAnet);
@@ -887,18 +846,14 @@ namespace OpenDental{
 				labelEcwID.Visible=false;
 				textEcwID.Visible=false;
 			}
-			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
-				List<EhrProvKey> listProvKey=EhrProvKeys.GetKeysForProv(ProvCur.ProvNum);
-				if(listProvKey.Count!=0) {
-					textEhrKey.Text=listProvKey[0].ProvKey;
-					textLName.Enabled=false;
-					textFName.Enabled=false;
-				}
+			List<EhrProvKey> listProvKey=EhrProvKeys.GetKeysByFLName(ProvCur.LName,ProvCur.FName);
+			if(listProvKey.Count>0) {
+				textLName.Enabled=false;
+				textFName.Enabled=false;
 			}
 			else{
-				labelEhrKey.Visible=false;
-				textEhrKey.Visible=false;
-				butEhrKey.Visible=false;
+				textLName.Enabled=true;
+				textFName.Enabled=true;
 			}
 			//We'll just always show the Anesthesia fields since they are part of the standard database.
 			textAbbr.Text=ProvCur.Abbr;
@@ -989,20 +944,6 @@ namespace OpenDental{
 
 		private void radioTIN_Click(object sender, System.EventArgs e) {
 			ProvCur.UsingTIN=true;
-		}
-
-		private void butEhrKey_Click(object sender,EventArgs e) {
-			FormEhrProviderKeys FormEPK=new FormEhrProviderKeys(ProvCur);
-			FormEPK.ShowDialog();
-			List<EhrProvKey> listProvKey=EhrProvKeys.GetKeysForProv(ProvCur.ProvNum);
-			if(listProvKey.Count==0) {
-				textEhrKey.Text="";
-			}
-			else {
-				textEhrKey.Text=listProvKey[0].ProvKey;//The newest key in the list
-				textLName.Enabled=false;
-				textFName.Enabled=false;
-			}
 		}
 
 		private void FillProvIdent(){
@@ -1114,7 +1055,7 @@ namespace OpenDental{
 			ProvCur.IsCDAnet=checkIsCDAnet.Checked;
 			ProvCur.ProvColor=butColor.BackColor;
 			ProvCur.OutlineColor=butOutlineColor.BackColor;
-			if(comboSchoolClass.SelectedIndex==0) {//none
+			if(comboSchoolClass.SelectedIndex<1) {//none
 				ProvCur.SchoolClassNum=0;
 			}
 			else {

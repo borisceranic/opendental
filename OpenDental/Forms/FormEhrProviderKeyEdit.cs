@@ -8,10 +8,9 @@ namespace OpenDental {
 		private Provider _provCur;
 
 		///<summary>Only used from FormEhrProviderKeys.  keyCur can be a blank new key.  provCur and keyCur cannot be null.</summary>
-		public FormEhrProviderKeyEdit(Provider provCur, EhrProvKey keyCur) {
+		public FormEhrProviderKeyEdit(EhrProvKey keyCur) {
 			InitializeComponent();
 			Lan.F(this);
-			_provCur=provCur;
 			_keyCur=keyCur;
 		}
 
@@ -43,7 +42,7 @@ namespace OpenDental {
 				MessageBox.Show("Invalid year, must be two digits.");
 				return;
 			}
-			if(!FormEHR.ProvKeyIsValid(_provCur.LName,_provCur.FName,PIn.Int(textYear.Text),textKey.Text)) {
+			if(!FormEHR.ProvKeyIsValid(textLName.Text,textFName.Text,PIn.Int(textYear.Text),textKey.Text)) {
 				MsgBox.Show(this,"Invalid provider key");
 				return;
 			}
@@ -51,7 +50,6 @@ namespace OpenDental {
 			_keyCur.FName=textFName.Text;
 			_keyCur.YearValue=PIn.Int(textYear.Text);
 			_keyCur.ProvKey=textKey.Text;
-			_keyCur.ProvNum=_provCur.ProvNum;
 			if(_keyCur.IsNew) {
 				EhrProvKeys.Insert(_keyCur);
 			}
