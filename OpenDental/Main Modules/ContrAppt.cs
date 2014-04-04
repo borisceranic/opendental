@@ -2484,6 +2484,8 @@ namespace OpenDental {
 					}
 				}
 			}
+			//Appointment is ready to be placed on the schedule.  Refresh all appointments to avoid overlapping.
+			RefreshPeriod();
 			if(DoesOverlap(aptCur)) {
 				int startingOp=ApptDrawing.GetIndexOp(aptCur.Op);
 				bool stillOverlaps=true;
@@ -2657,7 +2659,32 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Called when releasing an appointment to make sure it does not overlap any other appointment.  Tests all appts for the day, even if not visible.</summary>
+		///<summary>Checks if the appointment's start time overlaps another appt.  Tests all appts for the day, even if not visible.  Call RefreshPeriod before calling this.</summary>
+		private bool HasValidStartTime(Appointment aptCur) {
+			DateTime aptDateTime;
+			for(int i=0;i<DS.Tables["Appointments"].Rows.Count;i++) {
+				if(DS.Tables["Appointments"].Rows[i]["AptNum"].ToString()==aptCur.AptNum.ToString()) {
+					continue;
+				}
+				if(DS.Tables["Appointments"].Rows[i]["Op"].ToString()!=aptCur.Op.ToString()) {
+					continue;
+				}
+				aptDateTime=PIn.DateT(DS.Tables["Appointments"].Rows[i]["AptDateTime"].ToString());
+				if(aptDateTime.Date!=aptCur.AptDateTime.Date) {
+					continue;
+				}
+				//tests start time
+				if(aptCur.AptDateTime.TimeOfDay >= aptDateTime.TimeOfDay
+					&& aptCur.AptDateTime.TimeOfDay < aptDateTime.TimeOfDay.Add(TimeSpan.FromMinutes(
+					DS.Tables["Appointments"].Rows[i]["Pattern"].ToString().Length*5))) 
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		///<summary>Called when releasing an appointment to make sure it does not overlap any other appointment.  Tests all appts for the day, even if not visible.  Recommended to RefreshPeriod before calling this.</summary>
 		private bool DoesOverlap(Appointment aptCur) {
 			DateTime aptDateTime;
 			for(int i=0;i<DS.Tables["Appointments"].Rows.Count;i++) {
@@ -3216,6 +3243,7 @@ namespace OpenDental {
 				PluginApptProvChangeQuestionEnd:{}
 				}
 			}
+			RefreshPeriod();
 			if(DoesOverlap(apt)) {
 				int startingOp=ApptDrawing.GetIndexOp(apt.Op);
 				bool stillOverlaps=true;
@@ -3639,13 +3667,29 @@ namespace OpenDental {
 					FormApptEdit FormAE=new FormApptEdit(apt.AptNum);//this is where security log entry is made
 					FormAE.IsNew=true;
 					FormAE.ShowDialog();
-					if(apt.IsNewPatient) {
-						AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,apt.PatNum);
-					}
 					if(FormAE.DialogResult==DialogResult.OK) {
+						if(apt.IsNewPatient) {
+							AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,apt.PatNum);
+						}
 						RefreshModuleDataPatient(PatCur.PatNum);
 						OnPatientSelected(PatCur);
 						//RefreshModulePatient(PatCurNum);
+						RefreshPeriod();
+						if(apt!=null && !HasValidStartTime(apt)) {
+							Appointment aptOld=apt.Clone();
+							MsgBox.Show(this,"Appointment start time would overlap another appointment.  Moving appointment to pinboard.");
+							SendToPinBoard(apt.AptNum);
+							apt.AptStatus=ApptStatus.UnschedList;
+							try {
+								Appointments.Update(apt,aptOld);
+							}
+							catch(ApplicationException ex) {
+								MessageBox.Show(ex.Message);
+							}
+							RefreshPeriod();
+							SetInvalid();
+							return;//It's ok to skip the rest of the method here. The appointment is now on the pinboard and must be rescheduled
+						}
 						if(apt!=null && DoesOverlap(apt)) {
 							Appointment aptOld=apt.Clone();
 							MsgBox.Show(this,"Appointment is too long and would overlap another appointment.  Automatically shortened to fit.");
@@ -3683,6 +3727,7 @@ namespace OpenDental {
 						}
 						//RefreshModuleDataPatient(FormAO.SelectedPatNum);//patient won't have changed
 						//OnPatientSelected(PatCur.PatNum,PatCur.GetNameLF(),PatCur.Email!="",PatCur.ChartNumber);
+						RefreshPeriod();
 						apt=Appointments.GetOneApt(ContrApptSingle.SelectedAptNum);
 						if(apt!=null && DoesOverlap(apt)) {
 							Appointment aptOld=apt.Clone();
@@ -3749,7 +3794,22 @@ namespace OpenDental {
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
 					OnPatientSelected(PatCur);
 					//RefreshModulePatient(FormAO.SelectedPatNum);
+					RefreshPeriod();
 					Appointment apt=Appointments.GetOneApt(ContrApptSingle.SelectedAptNum);
+					if(apt!=null && !HasValidStartTime(apt)) {
+						Appointment aptOld=apt.Clone();
+						MsgBox.Show(this,"Appointment start time would overlap another appointment.  Moving appointment to pinboard.");
+						SendToPinBoard(apt.AptNum);
+						apt.AptStatus=ApptStatus.UnschedList;
+						try {
+							Appointments.Update(apt,aptOld);
+						}
+						catch(ApplicationException ex) {
+							MessageBox.Show(ex.Message);
+						}
+						RefreshPeriod();
+						break;
+					}
 					if(apt!=null && DoesOverlap(apt)) {
 						Appointment aptOld=apt.Clone();
 						MsgBox.Show(this,"Appointment is too long and would overlap another appointment.  Automatically shortened to fit.");
