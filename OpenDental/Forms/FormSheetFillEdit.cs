@@ -181,13 +181,14 @@ namespace OpenDental {
 				float imgDrawWidth=field.Width;//drawn size of image
 				int adjustY=0;//added to YPos
 				int adjustX=0;//added to XPos
-				if(imgRatio>fieldRatio) {//image is too wide
+				//For patient images, we need to make sure the images will fit and can maintain aspect ratio.
+				if(field.FieldType==SheetFieldType.PatImage && imgRatio>fieldRatio) {//image is too wide
 					//X pos and width of field remain unchanged
 					//Y pos and height must change
 					imgDrawHeight=(float)img.Height*((float)field.Width/(float)img.Width);//img.Height*(width based scale) This also handles images that are too small.
 					adjustY=(int)((field.Height-imgDrawHeight)/2f);//adjustY= half of the unused vertical field space
 				}
-				else if(imgRatio<fieldRatio) {//image is too tall
+				else if(field.FieldType==SheetFieldType.PatImage && imgRatio<fieldRatio) {//image is too tall
 					//X pos and width must change
 					//Y pos and height remain unchanged
 					imgDrawWidth=(float)img.Width*((float)field.Height/(float)img.Height);//img.Height*(width based scale) This also handles images that are too small.
