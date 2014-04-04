@@ -146,7 +146,7 @@ namespace OpenDentBusiness{
 		public DateTime DateResent;
 		///<summary>X12 CLM05-3. Usually set to original, but can be used to resubmit claims.</summary>
 		public ClaimCorrectionType CorrectionType;
-		///<summary>X12 CLM01. Unique identifier for the claim within the current database. Defaults to PatNum/ClaimNum, but can be edited by user.</summary>
+		///<summary>X12 CLM01. Semi-unique identifier for the claim within the current database. Defaults to PatNum/ClaimNum, but can be edited by user, and is often modified by the clearinghouse to ensure uniqueness on their end.</summary>
 		public string ClaimIdentifier;
 		///<summary>X12 2300 REF (F8). Used when resending claims to refer to the original claim. The user must type this value in after reading it from the original claim response report.</summary>
 		public string OrigRefNum;

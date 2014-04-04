@@ -2220,7 +2220,6 @@ namespace OpenDental{
 			// 
 			this.textClaimIdentifier.Location = new System.Drawing.Point(139, 65);
 			this.textClaimIdentifier.Name = "textClaimIdentifier";
-			this.textClaimIdentifier.ReadOnly = true;
 			this.textClaimIdentifier.Size = new System.Drawing.Size(150, 20);
 			this.textClaimIdentifier.TabIndex = 156;
 			// 
@@ -3717,7 +3716,6 @@ namespace OpenDental{
 			if(IsNew){
 				//butCheckAdd.Enabled=false; //button was removed.
 				groupEnterPayment.Enabled=false;
-				textClaimIdentifier.ReadOnly=false;//Editable if new, read only for historic.  We cannot allow historic edits, because editing would break the link when X12 format 835 electronic EOB reports are received.
 			}
 			else if(ClaimCur.ClaimStatus=="S" || ClaimCur.ClaimStatus=="R"){//sent or received
 				if(!Security.IsAuthorized(Permissions.ClaimSentEdit,ClaimCur.DateSent)){
@@ -5236,6 +5234,7 @@ namespace OpenDental{
 			FormE.ShowDialog();
 		}
 
+		///<summary>Canada only.</summary>
 		private void butReverse_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			InsPlan insPlan=InsPlans.GetPlan(ClaimCur.PlanNum,null);
@@ -5479,10 +5478,11 @@ namespace OpenDental{
 				MsgBox.Show(this,"Correction type must be original when type of bill is not blank.");
 				return false;
 			}
-			//We allow the user to edit the claim identifier for new claims.  The claim identifier must be unique, or else X12 835 reports may associate electronic EOBs with the wrong eclaim.
-			//The default claim identifier is PatNum/ClaimNum, which is unique because it includes the primary key of the claim.
-			if(IsNew && Claims.GetClaimNumForIdentifier(textClaimIdentifier.Text)!=0) {
-				MsgBox.Show(this,"Claim identifier already exists.  Specify a different claim identifier, or recreate the claim to generate a brand new number.");
+			//Block the user from changing the claim identifier if the claim identifier was already included on an eclaim.
+			//When electronic EOBs are being imported, the claim identifier can be used to match a claim payment to a specific claim.
+			//We need to preserve the claim identifier after a claim is sent electronically in order to increase the chances of matching payment to a claim.
+			if(ClaimCur.ClaimIdentifier!="" && textClaimIdentifier.Text!=ClaimCur.ClaimIdentifier && ClaimCur.ClaimNum!=0 && Etranss.GetHistoryOneClaim(ClaimCur.ClaimNum).Count>0) {
+				MsgBox.Show(this,"Cannot change claim identifier because the claim has already been sent electronically.");
 				return false;
 			}
 			if(!CanadianWarnings()) {
