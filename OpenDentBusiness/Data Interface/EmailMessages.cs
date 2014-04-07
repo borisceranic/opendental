@@ -173,9 +173,12 @@ namespace OpenDentBusiness{
 
 		#region Sending
 
-		///<summary>Encrypts the message, verifies trust, locates the public encryption key for the To address (if already stored locally), etc.  emailMessage.  
+		///<summary>Encrypts the message, verifies trust, locates the public encryption key for the To address (if already stored locally), etc.
 		///Use this polymorphism when the attachments have already been saved to the email attachments folder in file form.  patNum can be 0.
-		///Returns an empty string upon success, or an error string if there were errors.  It is possible that the email was sent to some trusted recipients and not sent to untrusted recipients (in which case there would be errors but some recipients would receive successfully).
+		///Returns an empty string upon success, or an error string if there were errors.
+		///It is possible that the email was sent to some trusted recipients and not sent to untrusted recipients (in which case there would be errors but some recipients would receive successfully).
+		///Trust cannot be automatically added for the recipient addresses inside this function, because the patient portal uses this function and as soon as an address is trusted
+		///all patients can then forward their personal information to the recipient address.
 		///Surround with a try catch.</summary>
 		public static string SendEmailDirect(EmailMessage emailMessage,EmailAddress emailAddressFrom) {
 			//No need to check RemotingRole; no call to db.
