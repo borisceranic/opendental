@@ -76,6 +76,8 @@ namespace OpenDentBusiness{
 		public string StateWhereLicensed;
 		///<summary>FK to EmailAddress.EmailAddressNum.  Optional, can be 0.</summary>
 		public long EmailAddressNum;
+		///<summary>Default is false because most providers will not be instructors.  Used in Dental Schools</summary>
+		public bool IsInstructor;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProvColor",typeof(int))]

@@ -182,7 +182,9 @@ namespace OpenDentBusiness{
 		///<summary>76</summary>
 		RxEdit,
 		///<summary>77-Assign this permission to a staff person who will administer setting up and editing Dental School Students in the system.</summary>
-		AdminDentalStudents
+		AdminDentalStudents,
+		///<summary>78-Assign this permission to an instructor who will be allowed to assign Grades to Dental School Students as well as manage classes assigned to them.</summary>
+		AdminDentalInstructors
 	}
 
 	

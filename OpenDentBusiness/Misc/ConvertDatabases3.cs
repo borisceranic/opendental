@@ -4622,6 +4622,18 @@ namespace OpenDentBusiness {
 				}
 				command="ALTER TABLE provider DROP COLUMN EhrKey";
 				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider ADD IsInstructor tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider ADD IsInstructor number(3)";
+					Db.NonQ(command);
+					command="UPDATE provider SET IsInstructor = 0 WHERE IsInstructor IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE provider MODIFY IsInstructor NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
