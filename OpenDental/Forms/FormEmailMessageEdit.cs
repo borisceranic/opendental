@@ -918,6 +918,10 @@ namespace OpenDental{
 						return;
 					}
 				}
+				else {
+					MsgBox.Show(this,"Cannot decrypt message from untrusted sender.");
+					return;
+				}
 			}
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=GetEmailAddress();
@@ -981,7 +985,19 @@ namespace OpenDental{
 				MsgBox.Show(this,"The email address in email setup must have an SMTP server.");
 				return;
 			}
+			if(textToAddress.Text.Contains(",")) {
+				MsgBox.Show(this,"Multiple recipient addresses not allowed with encryption.");
+				return;
+			}
 			Cursor=Cursors.WaitCursor;
+			if(!EmailMessages.IsDirectAddressTrusted(textToAddress.Text)) {//Not trusted yet.
+				EmailMessages.TryAddTrustDirect(textToAddress.Text);
+				if(!EmailMessages.IsDirectAddressTrusted(textToAddress.Text)) {
+					Cursor=Cursors.Default;
+					MsgBox.Show(this,"Failed to trust recipient because a valid certificate could not be located.");
+					return;
+				}
+			}
 			MessageCur.SentOrReceived=EmailSentOrReceived.SentDirect;
 			SaveMsg();
 			try {
