@@ -588,28 +588,30 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
-		public static void TryAddTrustDirect(string strAddressTest) {
+		///<summary>Returns true if trust already exists or has just been established for the given email address.</summary>
+		public static bool TryAddTrustDirect(string strAddressTest) {
 			//No need to check RemotingRole; no call to db.
 			if(IsDirectAddressTrusted(strAddressTest)) {
-				return;//Already trusted.
+				return true;//Already trusted.
 			}
 			try {
 				if(FindPublicCertForAddress(strAddressTest)==0) {//Could not find certificate.
-					return;//Cannot trust because we need the certificate to trust.
+					return false;//Cannot trust because we need the certificate to trust.
 				}
 			}
 			catch {
-				return;//Possibly a network failure.
+				return false;//Possibly a network failure.
 			}
 			Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
 			X509Certificate2 cert=GetValidCertForAddressFromStore(storePublicCerts,strAddressTest,false);
 			if(cert==null) {
-				return;//Should never happen, but just in case.
+				return false;//Should never happen, but just in case.
 			}
 			Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
 			storeAnchors.Add(cert);//Adds to NHINDAnchors/Certificates within the windows certificate store manager (mmc).
 			//Clear all cached DirectAgent instances to force trust anchors to reload.
 			HashDirectAgents.Clear();
+			return true;
 		}
 
 		///<summary>Set isAddressSpecific if you need to allow/prefer domain certificates over email address specific certificates.</summary>
