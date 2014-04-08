@@ -79,7 +79,6 @@ namespace OpenDental{
 		private ComboBox comboSearchBehavior;
 		private CheckBox checkClaimMedTypeIsInstWhenInsPlanIsMedical;
 		private CheckBox checkProcGroupNoteDoesAggregate;
-		private CheckBox checkChartAddProcNoRefreshGrid;
 		private Label label15;
 		private ComboBox comboCobRule;
 		private CheckBox checkMedicalFeeUsedForNewProcs;
@@ -206,7 +205,6 @@ namespace OpenDental{
 			this.checkProcLockingIsAllowed = new System.Windows.Forms.CheckBox();
 			this.textICD9DefaultForNewProcs = new System.Windows.Forms.TextBox();
 			this.checkMedicalFeeUsedForNewProcs = new System.Windows.Forms.CheckBox();
-			this.checkChartAddProcNoRefreshGrid = new System.Windows.Forms.CheckBox();
 			this.checkProcGroupNoteDoesAggregate = new System.Windows.Forms.CheckBox();
 			this.butAllergiesIndicateNone = new OpenDental.UI.Button();
 			this.textAllergiesIndicateNone = new System.Windows.Forms.TextBox();
@@ -960,7 +958,6 @@ namespace OpenDental{
 			this.tabChart.Controls.Add(this.checkProcLockingIsAllowed);
 			this.tabChart.Controls.Add(this.textICD9DefaultForNewProcs);
 			this.tabChart.Controls.Add(this.checkMedicalFeeUsedForNewProcs);
-			this.tabChart.Controls.Add(this.checkChartAddProcNoRefreshGrid);
 			this.tabChart.Controls.Add(this.checkProcGroupNoteDoesAggregate);
 			this.tabChart.Controls.Add(this.butAllergiesIndicateNone);
 			this.tabChart.Controls.Add(this.textAllergiesIndicateNone);
@@ -987,7 +984,7 @@ namespace OpenDental{
 			// 
 			this.checkProcLockingIsAllowed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkProcLockingIsAllowed.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkProcLockingIsAllowed.Location = new System.Drawing.Point(59, 261);
+			this.checkProcLockingIsAllowed.Location = new System.Drawing.Point(59, 244);
 			this.checkProcLockingIsAllowed.Name = "checkProcLockingIsAllowed";
 			this.checkProcLockingIsAllowed.Size = new System.Drawing.Size(381, 15);
 			this.checkProcLockingIsAllowed.TabIndex = 210;
@@ -998,7 +995,7 @@ namespace OpenDental{
 			// 
 			// textICD9DefaultForNewProcs
 			// 
-			this.textICD9DefaultForNewProcs.Location = new System.Drawing.Point(358, 236);
+			this.textICD9DefaultForNewProcs.Location = new System.Drawing.Point(358, 219);
 			this.textICD9DefaultForNewProcs.Name = "textICD9DefaultForNewProcs";
 			this.textICD9DefaultForNewProcs.Size = new System.Drawing.Size(83, 20);
 			this.textICD9DefaultForNewProcs.TabIndex = 209;
@@ -1007,25 +1004,13 @@ namespace OpenDental{
 			// 
 			this.checkMedicalFeeUsedForNewProcs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkMedicalFeeUsedForNewProcs.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkMedicalFeeUsedForNewProcs.Location = new System.Drawing.Point(60, 216);
+			this.checkMedicalFeeUsedForNewProcs.Location = new System.Drawing.Point(60, 199);
 			this.checkMedicalFeeUsedForNewProcs.Name = "checkMedicalFeeUsedForNewProcs";
 			this.checkMedicalFeeUsedForNewProcs.Size = new System.Drawing.Size(381, 15);
 			this.checkMedicalFeeUsedForNewProcs.TabIndex = 208;
 			this.checkMedicalFeeUsedForNewProcs.Text = "Use medical fee for new procedures";
 			this.checkMedicalFeeUsedForNewProcs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkMedicalFeeUsedForNewProcs.UseVisualStyleBackColor = true;
-			// 
-			// checkChartAddProcNoRefreshGrid
-			// 
-			this.checkChartAddProcNoRefreshGrid.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkChartAddProcNoRefreshGrid.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkChartAddProcNoRefreshGrid.Location = new System.Drawing.Point(60, 199);
-			this.checkChartAddProcNoRefreshGrid.Name = "checkChartAddProcNoRefreshGrid";
-			this.checkChartAddProcNoRefreshGrid.Size = new System.Drawing.Size(381, 15);
-			this.checkChartAddProcNoRefreshGrid.TabIndex = 207;
-			this.checkChartAddProcNoRefreshGrid.Text = "Add Procedures Without Refreshing Entire Chart (Increase in speed)";
-			this.checkChartAddProcNoRefreshGrid.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkChartAddProcNoRefreshGrid.UseVisualStyleBackColor = true;
 			// 
 			// checkProcGroupNoteDoesAggregate
 			// 
@@ -1064,7 +1049,7 @@ namespace OpenDental{
 			// label17
 			// 
 			this.label17.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label17.Location = new System.Drawing.Point(106, 239);
+			this.label17.Location = new System.Drawing.Point(106, 222);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(246, 16);
 			this.label17.TabIndex = 203;
@@ -1543,7 +1528,7 @@ namespace OpenDental{
 			textMedicationsIndicateNone.Text=Medications.GetDescription(PrefC.GetLong(PrefName.MedicationsIndicateNone)); //DB maint to fix corruption
 			textAllergiesIndicateNone.Text	=AllergyDefs.GetDescription(PrefC.GetLong(PrefName.AllergiesIndicateNone)); //DB maint to fix corruption
 			checkProcGroupNoteDoesAggregate.Checked=PrefC.GetBool(PrefName.ProcGroupNoteDoesAggregate);
-			checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);
+			//checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);//Not implemented.  May revisit some day.
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
 			textICD9DefaultForNewProcs.Text=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			checkProcLockingIsAllowed.Checked=PrefC.GetBool(PrefName.ProcLockingIsAllowed);
@@ -1753,7 +1738,7 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.AppointmentSearchBehavior,comboSearchBehavior.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.AppointmentTimeIsLocked,checkAppointmentTimeIsLocked.Checked)
 				| Prefs.UpdateBool(PrefName.ProcGroupNoteDoesAggregate,checkProcGroupNoteDoesAggregate.Checked)
-				| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)
+				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
 				| Prefs.UpdateInt(PrefName.InsDefaultCobRule,comboCobRule.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.MedicalFeeUsedForNewProcs,checkMedicalFeeUsedForNewProcs.Checked)
 				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
