@@ -4634,6 +4634,27 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE provider MODIFY IsInstructor NOT NULL";
 					Db.NonQ(command);
 				}
+				command="SELECT ValueString FROM preference WHERE PrefName = 'EasyHideDentalSchools'";
+				string valueString=Db.GetScalar(command);
+				if(valueString=="0") {//Works for Oracle as well.
+					command="SELECT provider.ProvNum FROM provider "
+					+"INNER JOIN userod ON provider.ProvNum=userod.ProvNum "
+					+"INNER JOIN usergroup ON userod.UserGroupNum=userod.UserGroupNum "
+					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
+					+"WHERE grouppermission.PermType=3";//Permission - Setup
+					DataTable dt=Db.GetTable(command);
+					StringBuilder sb=new StringBuilder();
+					for(int i=0;i<dt.Rows.Count;i++) {
+						sb.Append("UPDATE provider SET IsInstructor = 1 WHERE provider.ProvNum="+POut.Long((long)dt.Rows[i][0])+";");
+					}
+					try {
+						Db.NonQ(sb.ToString());
+					}
+					catch(Exception ex) { 
+						//In the rare case that the StringBuilder is too large for the MySQL connector (very rare) we don't want the convert script to fail.
+						//Users can go manually set IsInstructor after the upgrade finishes.
+					}
+				}
 
 
 
