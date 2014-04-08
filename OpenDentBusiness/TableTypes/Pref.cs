@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 		public string Comments;
 	}
 
-	///<summary>Because this enum is stored in the database as strings rather than as numbers, we can do the order alphabetically and we can change it whenever we want.</summary>
+	///<summary>Because this enum is stored in the database as strings rather than as numbers, we can do the order alphabetically.  This enum must exactly match the prefs in the database.  Deprecated preferences will start with "Deprecated"</summary>
 	public enum PrefName {
 		AccountingCashIncomeAccount,
 		AccountingDepositAccounts,
@@ -112,7 +112,7 @@ namespace OpenDentBusiness {
 		///<summary>This is the hash of the password that is needed to open the Central Manager tool.</summary>
 		CentralManagerPassHash,
 		ChartQuickAddHideAmalgam,
-		///<summary>If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.
+		///<summary>Deprecated. If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.
 		///This preference was never fully implemented and should not be used.  We may revisit some day.</summary>
 		ChartAddProcNoRefreshGrid,
 		ClaimAttachExportPath,
