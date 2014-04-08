@@ -89,14 +89,14 @@ namespace OpenDental {
 						BlockSendSecureMessage("The patient's primary provider does not match the provider attached to the user currently logged in. Login as patient's primary provider to send message.");
 					}
 					else {
-						textFrom.Text=priProv.GetFormalName();					
+						textFrom.Text=priProv.GetFormalName();
 					}
 				}
 				if(patCur.Email=="") {
 					BlockSendNotificationMessage("Missing patient email. Setup patient email using Family module.");
 				}
 				if(patCur.OnlinePassword=="") {
-					BlockSendNotificationMessage("Patient has not been given online access. Setup patient online access using Family module.");
+					BlockSendNotificationMessage("Patient has not been given online access. Setup patient online access using Chart module.");
 				}
 			}
 			//We are replying to an existing message so verify that the provider linked to this message matches our currently logged in provider.  
@@ -144,9 +144,12 @@ namespace OpenDental {
 			notificationBodyNoUrl=PrefC.GetString(PrefName.PatientPortalNotifyBody);
 			notificationURL=PrefC.GetString(PrefName.PatientPortalURL);
 			_emailAddressSender=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
-			if(_emailAddressSender==null) {
+			if(_emailAddressSender==null 
+				|| _emailAddressSender.EmailAddressNum==0
+				|| _emailAddressSender.EmailUsername==""
+				|| _emailAddressSender.Pop3ServerIncoming=="") { //No default email setup for this practice yet.
 				BlockSendNotificationMessage("Practice email is not setup properly. Setup practice email in setup.");
-			}			
+			}
 			if(notificationSubject=="") {
 				BlockSendNotificationMessage("Missing notification email subject. Create a subject in setup.");
 			}
@@ -250,7 +253,6 @@ namespace OpenDental {
 			_secureMessage.BodyText=textBody.Text;
 			_secureMessage.MsgDateTime=DateTime.Now;
 			_secureMessage.PatNumSubj=GetPatNumSubj();
-			EmailMessages.Insert(_secureMessage);
 			if(_allowSendNotificationMessage) { 
 				//Send an insecure notification email to the patient.
 				_insecureMessage.MsgDateTime=DateTime.Now;
@@ -265,6 +267,8 @@ namespace OpenDental {
 					return;
 				}				
 			}
+			EmailMessages.Insert(_secureMessage);
+			MsgBox.Show(this,"Message Sent");
 			DialogResult=DialogResult.OK;
 		}
 
