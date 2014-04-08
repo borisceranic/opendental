@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
-using Microsoft.Win32;
 using System.IO;
+using System.ServiceProcess;
+using System.Windows.Forms;
+using Microsoft.Win32;
 
 
 namespace ServiceManager {
@@ -22,25 +17,40 @@ namespace ServiceManager {
 				return null;
 			}
 		}
-		public ServiceController ServControllerCur;
-		public List<ServiceController> allOpenDentServices;
 		
-		public FormServiceManage() {
+		///<summary>Pass in empty string to create a new service. Pass in OpenDent string to manage an existing service.</summary>
+		public FormServiceManage(string serviceName) {
 			InitializeComponent();
+			textName.Text=serviceName;
+			textPathToExe.Text=Directory.GetCurrentDirectory();				
 		}
 
-		private void FormServiceManager_Load(object sender,EventArgs e) {
-			allOpenDentServices=new List<ServiceController>();
+		public static List<ServiceController> GetAllOpenDentServices() {
+			List<ServiceController> serviceControllerList=new List<ServiceController>();
 			ServiceController[] serviceControllersAll=ServiceController.GetServices();
 			for(int i=0;i<serviceControllersAll.Length;i++) {
 				if(serviceControllersAll[i].ServiceName.StartsWith("OpenDent")) {
-					allOpenDentServices.Add(serviceControllersAll[i]);
+					serviceControllerList.Add(serviceControllersAll[i]);
 				}
 			}
-			if(ServControllerCur!=null) {//installed
-				textName.Text=ServControllerCur.ServiceName;
+			return serviceControllerList;
+		}
+
+		private static ServiceController GetOpenDentServiceByName(string serviceName) {
+			List<ServiceController> serviceControllersOpenDent=GetAllOpenDentServices();
+			for(int i=0;i<serviceControllersOpenDent.Count;i++) {
+				if(serviceControllersOpenDent[i].ServiceName==serviceName) {
+					return serviceControllersOpenDent[i];
+				}
+			}
+			return null;
+		}
+
+		private void FormServiceManager_Load(object sender,EventArgs e) {
+			ServiceController service=GetOpenDentServiceByName(textName.Text);			
+			if(service!=null) {//installed
 				RegistryKey hklm=Registry.LocalMachine;
-				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+ServControllerCur.ServiceName);
+				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+service.ServiceName);
 				textPathToExe.Text=hklm.GetValue("ImagePath").ToString().Replace("\"","");
 				textStatus.Text="Installed";
 				butInstall.Enabled=false;
@@ -48,7 +58,7 @@ namespace ServiceManager {
 				butBrowse.Enabled=false;
 				textPathToExe.ReadOnly=true;
 				textName.ReadOnly=true;
-				if(ServControllerCur.Status==ServiceControllerStatus.Running) {
+				if(service.Status==ServiceControllerStatus.Running) {
 					textStatus.Text+=", Running";
 					butStart.Enabled=false;
 					butStop.Enabled=true;
@@ -61,8 +71,6 @@ namespace ServiceManager {
 			}
 			else {
 				textStatus.Text="Not installed";
-				textPathToExe.Text=Directory.GetCurrentDirectory();
-				textName.Text="";
 				textName.ReadOnly=false;
 				textPathToExe.ReadOnly=false;
 				butInstall.Enabled=true;
@@ -81,7 +89,8 @@ namespace ServiceManager {
 				MessageBox.Show("Error.  Service name must begin with \"OpenDent\".");
 				return;
 			}
-			for(int i=0;i<allOpenDentServices.Count;i++) {//create list of all OpenDent service install paths to ensure only one service can be installed from each directory
+			List<ServiceController> allOpenDentServices=GetAllOpenDentServices();
+			for(int i=0;i<allOpenDentServices.Count;i++) { //create list of all OpenDent service install paths to ensure only one service can be installed from each directory				
 				if(textName.Text==allOpenDentServices[i].ServiceName) {
 					MessageBox.Show("Error.  A service with this name is already installed.  Names must be unique.");
 					return;
@@ -109,13 +118,7 @@ namespace ServiceManager {
 			}
 			catch {
 				MessageBox.Show("Error. Did not exit after 10 seconds.");
-			}
-			ServiceController[] serviceControllersAll=ServiceController.GetServices();
-			for(int i=0;i<serviceControllersAll.Length;i++) {
-				if(serviceControllersAll[i].ServiceName==textName.Text) {
-					ServControllerCur=serviceControllersAll[i];
-				}
-			}
+			}			
 			butRefresh_Click(this,e);
 		}
 
@@ -140,7 +143,6 @@ namespace ServiceManager {
 				MessageBox.Show("Error. Did not exit after 5 seconds.");
 				return;
 			}
-			ServControllerCur=null;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -151,7 +153,6 @@ namespace ServiceManager {
 				service.MachineName=Environment.MachineName;
 				service.Start();
 				service.WaitForStatus(ServiceControllerStatus.Running,new TimeSpan(0,0,7));
-				ServControllerCur=service;
 			}
 			catch(Exception ex) {
 				Cursor=Cursors.Default;
@@ -164,16 +165,19 @@ namespace ServiceManager {
 		private void butStop_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			try {
-				ServiceController service=new ServiceController(textName.Text);
+				ServiceController service=GetOpenDentServiceByName(textName.Text);
+				if(service==null) {
+					return;
+				}
 				service.Stop();
 				service.WaitForStatus(ServiceControllerStatus.Stopped,new TimeSpan(0,0,7));
-				ServControllerCur=service;
 			}
 			catch(Exception ex) {
-				Cursor=Cursors.Default;
 				MessageBox.Show(ex.Message);
 			}
-			Cursor=Cursors.Default;
+			finally {
+				Cursor=Cursors.Default;			
+			}
 			butRefresh_Click(this,e);
 		}
 

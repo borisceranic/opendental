@@ -10,8 +10,6 @@ using System.Windows.Forms;
 
 namespace ServiceManager {
 	public partial class FormMain:Form {
-		List<ServiceController> serviceControllerList;
-
 		public FormMain() {
 			InitializeComponent();
 		}
@@ -22,13 +20,9 @@ namespace ServiceManager {
 
 		private void FillList() {
 			listMain.Items.Clear();
-			serviceControllerList=new List<ServiceController>();
-			ServiceController[] serviceControllersAll=ServiceController.GetServices();
-			for(int i=0;i<serviceControllersAll.Length;i++) {
-				if(serviceControllersAll[i].ServiceName.StartsWith("OpenDent")) {
-					serviceControllerList.Add(serviceControllersAll[i]);
-					listMain.Items.Add(serviceControllersAll[i].ServiceName);
-				}
+			List<ServiceController> serviceControllersAll=FormServiceManage.GetAllOpenDentServices();
+			for(int i=0;i<serviceControllersAll.Count;i++) {
+				listMain.Items.Add(serviceControllersAll[i].ServiceName);
 			}
 		}
 
@@ -36,16 +30,13 @@ namespace ServiceManager {
 			if(listMain.SelectedIndex==-1) {
 				return;
 			}
-			FormServiceManage FormS=new FormServiceManage();
-			FormS.allOpenDentServices=serviceControllerList;
-			FormS.ServControllerCur=serviceControllerList[listMain.SelectedIndex];
+			FormServiceManage FormS=new FormServiceManage(listMain.SelectedItem.ToString());
 			FormS.ShowDialog();
 			FillList();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormServiceManage FormS=new FormServiceManage();
-			FormS.allOpenDentServices=serviceControllerList;
+			FormServiceManage FormS=new FormServiceManage("");
 			FormS.ShowDialog();
 			FillList();
 		}
