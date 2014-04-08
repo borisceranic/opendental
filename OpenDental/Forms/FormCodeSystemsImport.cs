@@ -214,12 +214,8 @@ namespace OpenDental {
 
 		///<summary>Returns a list of available code systems.  Throws exceptions, put in try catch block.</summary>
 		private static string RequestCodeSystemsXml() {
-#if DEBUG
-			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
-#else
 			OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
 			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
-#endif
 			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
 				IWebProxy proxy=new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
 				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
@@ -811,12 +807,8 @@ If the master term dictionary or software program containing the UCUM table, UCU
 					writer.WriteEndElement();
 					writer.WriteEndElement();
 				}
-#if DEBUG
-				OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
-#else
 				OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
 				updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
-#endif
 				if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
 					IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
 					ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
