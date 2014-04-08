@@ -113,8 +113,8 @@ namespace OpenDentBusiness {
 		CentralManagerPassHash,
 		ChartQuickAddHideAmalgam,
 		///<summary>If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.
-		///jsalmon - Commented out 04/08/2014 due to preference never being fully implemented.  We may revisit some day.</summary>
-		//ChartAddProcNoRefreshGrid,
+		///This preference was never fully implemented and should not be used.  We may revisit some day.</summary>
+		ChartAddProcNoRefreshGrid,
 		ClaimAttachExportPath,
 		ClaimFormTreatDentSaysSigOnFile,
 		ClaimMedTypeIsInstWhenInsPlanIsMedical,
