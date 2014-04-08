@@ -37,11 +37,8 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			FillGridEmailMessages();//Show what is in db.
 			Cursor=Cursors.Default;
-			if(AddressInbox.Pop3ServerIncoming=="") {//Email address not setup.
-				Text="Email Inbox";
-				AddressInbox=null;
-				//todo: Message Box is too instrusive, move this to a status label.
-				//MsgBox.Show(this,"Default email address has not been setup completely.");
+			if(AddressInbox.EmailUsername=="" || AddressInbox.Pop3ServerIncoming=="") {//Email address not setup.
+				Text="Email Inbox - Showing webmail messages only.  Either no email addresses have been setup or the default address is not setup fully.";
 				return 0;
 			}
 			Text="Email Inbox for "+AddressInbox.EmailUsername;
@@ -85,12 +82,7 @@ namespace OpenDental {
 
 		///<summary>Gets new emails and also shows older emails from the database.</summary>
 		private void FillGridEmailMessages() {
-			if(AddressInbox==null) {
-				ListEmailMessages=new List<EmailMessage>();
-			}
-			else {
-				ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
-			}
+			ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
 			if(gridEmailMessages.Columns.Count==0) {//Columns do not change.  We only need to set them once.
 				gridEmailMessages.BeginUpdate();
 				gridEmailMessages.Columns.Clear();
@@ -166,7 +158,7 @@ namespace OpenDental {
 			else {
 				FormEmailMessageEdit formEME=new FormEmailMessageEdit(emailMessage);
 				formEME.ShowDialog();
-				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Fetch from DB, in case changed to to decrypt.
+				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Fetch from DB, in case changed due to decrypt.
 				if(emailMessage!=null && emailMessage.SentOrReceived!=EmailSentOrReceived.ReceivedEncrypted) {//emailMessage could be null if the message was deleted in FormEmailMessageEdit().
 					EmailMessages.UpdateSentOrReceivedRead(emailMessage);
 				}
