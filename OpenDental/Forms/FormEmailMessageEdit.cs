@@ -55,7 +55,7 @@ namespace OpenDental{
 		private TextBox textSentOrReceived;
 		private Label label5;
 		private WebBrowser webBrowser;
-		private UI.Button butEncryptAndSend;
+		private UI.Button butDirectMessage;
 		private UI.Button butRawMessage;
 		///<summary>Used when attaching to get AtoZ folder, and when sending to get Clinic.</summary>
 		private Patient _patCur;
@@ -114,7 +114,7 @@ namespace OpenDental{
 			this.labelDecrypt = new System.Windows.Forms.Label();
 			this.textSentOrReceived = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.butEncryptAndSend = new OpenDental.UI.Button();
+			this.butDirectMessage = new OpenDental.UI.Button();
 			this.webBrowser = new System.Windows.Forms.WebBrowser();
 			this.butDecrypt = new OpenDental.UI.Button();
 			this.buttonFuchsMailDMF = new OpenDental.UI.Button();
@@ -344,20 +344,20 @@ namespace OpenDental{
 			this.label5.Text = "Sent/Received:";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// butEncryptAndSend
+			// butDirectMessage
 			// 
-			this.butEncryptAndSend.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEncryptAndSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEncryptAndSend.Autosize = true;
-			this.butEncryptAndSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEncryptAndSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEncryptAndSend.CornerRadius = 4F;
-			this.butEncryptAndSend.Location = new System.Drawing.Point(659, 635);
-			this.butEncryptAndSend.Name = "butEncryptAndSend";
-			this.butEncryptAndSend.Size = new System.Drawing.Size(106, 25);
-			this.butEncryptAndSend.TabIndex = 8;
-			this.butEncryptAndSend.Text = "Encrypt and Send";
-			this.butEncryptAndSend.Click += new System.EventHandler(this.butEncryptAndSend_Click);
+			this.butDirectMessage.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDirectMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butDirectMessage.Autosize = true;
+			this.butDirectMessage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDirectMessage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDirectMessage.CornerRadius = 4F;
+			this.butDirectMessage.Location = new System.Drawing.Point(659, 635);
+			this.butDirectMessage.Name = "butDirectMessage";
+			this.butDirectMessage.Size = new System.Drawing.Size(106, 25);
+			this.butDirectMessage.TabIndex = 8;
+			this.butDirectMessage.Text = "Direct Message";
+			this.butDirectMessage.Click += new System.EventHandler(this.butDirectMessage_Click);
 			// 
 			// webBrowser
 			// 
@@ -532,7 +532,7 @@ namespace OpenDental{
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(941, 672);
 			this.Controls.Add(this.butRawMessage);
-			this.Controls.Add(this.butEncryptAndSend);
+			this.Controls.Add(this.butDirectMessage);
 			this.Controls.Add(this.webBrowser);
 			this.Controls.Add(this.textSentOrReceived);
 			this.Controls.Add(this.label5);
@@ -590,7 +590,7 @@ namespace OpenDental{
 				textMsgDateTime.Text=MessageCur.MsgDateTime.ToString();
 				textMsgDateTime.ForeColor=Color.Black;
 				butAttach.Enabled=false;
-				butEncryptAndSend.Enabled=false;//not allowed to send again.
+				butDirectMessage.Enabled=false;//not allowed to send again.
 				butSend.Enabled=false;//not allowed to send again.
 				butSave.Enabled=false;//not allowed to save changes.
 				butCancel.Text="Close";//When opening an email from FormEmailInbox, the email status will change to read automatically, and changing the text on the cancel button helps convey that to the user.
@@ -968,7 +968,7 @@ namespace OpenDental{
 			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
 		}
 
-		private void butEncryptAndSend_Click(object sender,EventArgs e) {
+		private void butDirectMessage_Click(object sender,EventArgs e) {
 			//this will not be available if already sent.
 			if(textFromAddress.Text==""
 				|| textToAddress.Text=="") {
@@ -986,7 +986,7 @@ namespace OpenDental{
 				return;
 			}
 			if(textToAddress.Text.Contains(",")) {
-				MsgBox.Show(this,"Multiple recipient addresses not allowed with encryption.");
+				MsgBox.Show(this,"Multiple recipient addresses not allowed for direct messaging.");
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
@@ -1030,7 +1030,7 @@ namespace OpenDental{
 				return;
 			}
 			if(EhrCCD.HasCcdEmailAttachment(MessageCur)) {
-				MsgBox.Show(this,"The email has a summary of care attachment which may contain sensitive patient data.  Use the Encrypt and Send button instead.");
+				MsgBox.Show(this,"The email has a summary of care attachment which may contain sensitive patient data.  Use the Direct Message button instead.");
 				return;
 			}
 			EmailAddress emailAddress=GetEmailAddress();
