@@ -215,6 +215,14 @@ namespace OpenDental.UI {
 			ScrollValue=RowLocs[index];
 		}
 
+		///<summary>The index of the row that is the last row to be displayed on the ODGrid. Also sets ScrollValue.</summary>
+		public void ScrollToIndexBottom(int index) {
+			if(index>Rows.Count) {
+				return;
+			}
+			ScrollValue=((RowLocs[index]+RowHeights[index]+NoteHeights[index]+titleHeight+headerHeight)-Height)+3;//+3 accounts for the grid lines.
+		}
+
 		///<summary>Gets or sets the position of the vertical scrollbar.  Does all error checking and invalidates.</summary>
 		[Browsable(false)]
 		public int ScrollValue {

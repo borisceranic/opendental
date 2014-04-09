@@ -64,18 +64,6 @@ namespace OpenDental {
 				//this.textBox2
 			});
 			Lan.F(this);
-			//Grab all methods from the DatabaseMaintenance class to dynamically fill the grid.
-			_arrayDbmMethodsAll=(typeof(DatabaseMaintenance)).GetMethods();
-			//Sort the methods by name so that they are easier for users to find desired methods to run.
-			Array.Sort(_arrayDbmMethodsAll,new MethodInfoComparer());
-			_listDbmMethodsGrid=new List<MethodInfo>();
-			for(int i=0;i<_arrayDbmMethodsAll.Length;i++) {
-				object[] methAttr=_arrayDbmMethodsAll[i].GetCustomAttributes(typeof(DbmMethod),true);
-				if(methAttr.Length > 0) {
-					//This method was flagged to show in gridMain.  Add it to the list of methods used to populate gridMain.
-					_listDbmMethodsGrid.Add(_arrayDbmMethodsAll[i]);
-				}
-			}
 		}
 
 		/// <summary>
@@ -486,6 +474,18 @@ namespace OpenDental {
 		#endregion
 
 		private void FormDatabaseMaintenance_Load(object sender,System.EventArgs e) {
+			//Grab all methods from the DatabaseMaintenance class to dynamically fill the grid.
+			_arrayDbmMethodsAll=(typeof(DatabaseMaintenance)).GetMethods();
+			//Sort the methods by name so that they are easier for users to find desired methods to run.
+			Array.Sort(_arrayDbmMethodsAll,new MethodInfoComparer());
+			_listDbmMethodsGrid=new List<MethodInfo>();
+			for(int i=0;i<_arrayDbmMethodsAll.Length;i++) {
+				object[] methAttr=_arrayDbmMethodsAll[i].GetCustomAttributes(typeof(DbmMethod),true);
+				if(methAttr.Length > 0) {
+					//This method was flagged to show in gridMain.  Add it to the list of methods used to populate gridMain.
+					_listDbmMethodsGrid.Add(_arrayDbmMethodsAll[i]);
+				}
+			}
 			FillGrid();
 		}
 
@@ -499,7 +499,7 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			//_listDbmMethodsGrid has already been filled in the constructor with the correct methods to display in the grid.
+			//_listDbmMethodsGrid has already been filled on load with the correct methods to display in the grid.
 			for(int i=0;i<_listDbmMethodsGrid.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_listDbmMethodsGrid[i].Name);
@@ -709,6 +709,32 @@ namespace OpenDental {
 		}
 
 		private void Run(bool isCheck) {
+			Cursor=Cursors.WaitCursor;
+			if(gridMain.SelectedIndices.Length < 1) {
+				//No rows are selected so the user wants to run all checks.
+				gridMain.SetSelected(true);
+			}
+			int[] selectedIndices=gridMain.SelectedIndices;
+			object[] parameters=new object[]{ checkShow.Checked,isCheck };
+			for(int i=0;i<selectedIndices.Length;i++) {
+				gridMain.ScrollToIndexBottom(selectedIndices[i]);
+				UpdateResultTextForRow(selectedIndices[i],"Running...");
+				string result=(string)_listDbmMethodsGrid[selectedIndices[i]].Invoke(null,parameters);
+				UpdateResultTextForRow(selectedIndices[i],result);
+			}
+			gridMain.SetSelected(selectedIndices,true);//Reselect all rows that were originally selected.
+			Cursor=Cursors.Default;
+		}
+
+		/// <summary>Updates the result column for the specified row in gridMain with the text passed in.</summary>
+		private void UpdateResultTextForRow(int index,string text) {
+			gridMain.BeginUpdate();
+			gridMain.Rows[index].Cells[1].Text=text;
+			gridMain.EndUpdate();
+			Application.DoEvents();
+		}
+
+		private void Run_old(bool isCheck) {
 			Cursor=Cursors.WaitCursor;
 			bool verbose=checkShow.Checked;
 			StringBuilder strB=new StringBuilder();
