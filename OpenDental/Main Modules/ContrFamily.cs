@@ -319,14 +319,18 @@ namespace OpenDental{
 				if(def.ShowDemographics!=HL7ShowDemographics.ChangeAndAdd) {
 					ToolBarMain.Buttons["Add"].Enabled=false;
 					ToolBarMain.Buttons["Delete"].Enabled=false;
-					ToolBarMain.Buttons["SynchClone"].Enabled=false;
+					if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+						ToolBarMain.Buttons["SynchClone"].Enabled=false;
+					}
 				}
 			}
 			else {
 				if(Programs.UsingEcwFullMode()) {
 					ToolBarMain.Buttons["Add"].Enabled=false;
 					ToolBarMain.Buttons["Delete"].Enabled=false;
-					ToolBarMain.Buttons["SynchClone"].Enabled=false;
+					if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+						ToolBarMain.Buttons["SynchClone"].Enabled=false;
+					}
 				}
 			}
 			FillPatientPicture();
