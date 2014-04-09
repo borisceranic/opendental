@@ -161,25 +161,7 @@ namespace OpenDental {
 			Font font;
 			FontStyle fontstyle;
 			//first, draw images------------------------------------------------------------------------------------
-			foreach(SheetField field in sheet.SheetFields){
-				if(field.FieldType!=SheetFieldType.Image){
-					continue;
-				}
-				string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
-				Image img=null;//js consider switching this from an image to a bitmap
-				if(field.FieldName=="Patient Info.gif") {
-					img=Properties.Resources.Patient_Info;
-				}
-				else if(File.Exists(filePathAndName)) {
-					img=Image.FromFile(filePathAndName);
-				}
-				else {
-					continue;
-				}
-				g.DrawImage(img,field.XPos,field.YPos,field.Width,field.Height);
-				img.Dispose();
-				img=null;
-			}
+			DrawImages(sheet,g);
 			//then, drawings--------------------------------------------------------------------------------------------
 			Pen pen=new Pen(Brushes.Black,2f);
 			string[] pointStr;
@@ -305,38 +287,7 @@ namespace OpenDental {
 			XFont xfont;
 			XFontStyle xfontstyle;
 			//first, draw images--------------------------------------------------------------------------------------
-			foreach(SheetField field in sheet.SheetFields){
-				if(field.FieldType!=SheetFieldType.Image){
-					continue;
-				}
-				string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
-				Bitmap bitmapOriginal=null;
-				if(field.FieldName=="Patient Info.gif") {
-					bitmapOriginal=Properties.Resources.Patient_Info;
-				}
-				else if(File.Exists(filePathAndName)) {
-					bitmapOriginal=new Bitmap(filePathAndName);
-				}
-				else {
-					continue;
-				}
-				Bitmap bitmapResampled=(Bitmap)bitmapOriginal.Clone();
-				if(bitmapOriginal.HorizontalResolution!=96 || bitmapOriginal.VerticalResolution!=96){//to avoid slowdown for other pdfs
-					//The scaling on the XGraphics.DrawImage() function causes unreadable output unless the image is in 96 DPI native format.
-					//We use GDI here first to convert the image to the correct size and DPI, then pass the second image to XGraphics.DrawImage().
-					bitmapResampled.Dispose();
-					bitmapResampled=null;
-					bitmapResampled=new Bitmap(field.Width,field.Height);
-					Graphics gr=Graphics.FromImage(bitmapResampled);
-					gr.DrawImage(bitmapOriginal,0,0,field.Width,field.Height);
-					gr.Dispose();
-				}
-				g.DrawImage(bitmapResampled,p(field.XPos),p(field.YPos),p(field.Width),p(field.Height));
-				bitmapResampled.Dispose();
-				bitmapResampled=null;
-				bitmapOriginal.Dispose();
-				bitmapOriginal=null;
-			}
+			DrawImagesToPdf(sheet,g);
 			//then, drawings--------------------------------------------------------------------------------------------
 			XPen pen=new XPen(XColors.Black,p(2));
 			string[] pointStr;
@@ -428,6 +379,109 @@ namespace OpenDental {
 				}
 				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
 				g.DrawImage(sigBitmap,p(field.XPos),p(field.YPos),p(field.Width-2),p(field.Height-2));
+			}
+		}
+
+		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing and rendering the sheet fill edit window.</summary>
+		public static void DrawImages(Sheet sheet,Graphics graphic) {
+			DrawImages(sheet,graphic,null);
+		}
+
+		///<summary>Draws all images from the sheet onto the xgraphic passed in.  Used when exporting to pdfs.</summary>
+		public static void DrawImagesToPdf(Sheet sheet,XGraphics xgraphic) {
+			DrawImages(sheet,null,xgraphic);
+		}
+
+		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing, exporting to pdfs, or rendering the sheet fill edit window.  graphic should be null for pdfs and xgraphic should be null for printing and rendering the sheet fill edit window.</summary>
+		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic) {
+			Bitmap bmpOriginal=null;
+			foreach(SheetField field in sheet.SheetFields) {
+				#region Get the path for the image
+				string filePathAndName="";
+				switch(field.FieldType) {
+					case SheetFieldType.Image:
+						filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+						break;
+					case SheetFieldType.PatImage:
+						if(field.FieldValue=="") {
+							//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
+							filePathAndName="";
+							break;
+						}
+						Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
+						List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
+						if(paths.Count < 1) {//No path was found so we cannot draw the image.
+							continue;
+						}
+						filePathAndName=paths[0];
+						break;
+					default:
+						//not an image field
+						continue;
+				}
+				#endregion
+				#region Load the image into bmpOriginal
+				if(field.FieldName=="Patient Info.gif") {
+					bmpOriginal=Properties.Resources.Patient_Info;
+				}
+				else if(File.Exists(filePathAndName)) {
+					bmpOriginal=new Bitmap(filePathAndName);
+				}
+				else {
+					continue;
+				}
+				#endregion
+				#region Calculate the image ratio and location
+				//inscribe image in field while maintaining aspect ratio.
+				float imgRatio=(float)bmpOriginal.Width/(float)bmpOriginal.Height;
+				float fieldRatio=(float)field.Width/(float)field.Height;
+				float imgDrawHeight=field.Height;//drawn size of image
+				float imgDrawWidth=field.Width;//drawn size of image
+				int adjustY=0;//added to YPos
+				int adjustX=0;//added to XPos
+				//For patient images, we need to make sure the images will fit and can maintain aspect ratio.
+				if(field.FieldType==SheetFieldType.PatImage && imgRatio>fieldRatio) {//image is too wide
+					//X pos and width of field remain unchanged
+					//Y pos and height must change
+					imgDrawHeight=(float)bmpOriginal.Height*((float)field.Width/(float)bmpOriginal.Width);//img.Height*(width based scale) This also handles images that are too small.
+					adjustY=(int)((field.Height-imgDrawHeight)/2f);//adjustY= half of the unused vertical field space
+				}
+				else if(field.FieldType==SheetFieldType.PatImage && imgRatio<fieldRatio) {//image is too tall
+					//X pos and width must change
+					//Y pos and height remain unchanged
+					imgDrawWidth=(float)bmpOriginal.Width*((float)field.Height/(float)bmpOriginal.Height);//img.Height*(width based scale) This also handles images that are too small.
+					adjustX=(int)((field.Width-imgDrawWidth)/2f);//adjustY= half of the unused horizontal field space
+				}
+				else {//image ratio == field ratio
+					//do nothing
+				}
+				#endregion
+				#region Draw the image
+				if(xGraphic!=null) {//Drawing an image to a pdf.
+					Bitmap bmpResampled=(Bitmap)bmpOriginal.Clone();
+					if(bmpOriginal.HorizontalResolution!=96 || bmpOriginal.VerticalResolution!=96) {//to avoid slowdown for other pdfs
+						//The scaling on the XGraphics.DrawImage() function causes unreadable output unless the image is in 96 DPI native format.
+						//We use GDI here first to convert the image to the correct size and DPI, then pass the second image to XGraphics.DrawImage().
+						bmpResampled.Dispose();
+						bmpResampled=null;
+						bmpResampled=new Bitmap(field.Width,field.Height);
+						Graphics gr=Graphics.FromImage(bmpResampled);
+						gr.DrawImage(bmpOriginal,0,0,imgDrawWidth,imgDrawHeight);
+						gr.Dispose();
+						gr=null;
+					}
+					xGraphic.DrawImage(bmpResampled,p(field.XPos+adjustX),p(field.YPos+adjustY),p(imgDrawWidth),p(imgDrawHeight));
+					bmpResampled.Dispose();
+					bmpResampled=null;
+				}
+				else if(graphic!=null) {//Drawing an image to a printer or the sheet fill edit window.
+					graphic.DrawImage(bmpOriginal,field.XPos+adjustX,field.YPos+adjustY,imgDrawWidth,imgDrawHeight);
+				}
+				#endregion
+			}
+			if(bmpOriginal!=null) {
+				bmpOriginal.Dispose();
+				bmpOriginal=null;
 			}
 		}
 

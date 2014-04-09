@@ -139,66 +139,7 @@ namespace OpenDental {
 			panelMain.Controls.Add(pictDraw);
 			panelMain.SendToBack();
 			Graphics pictGraphics=Graphics.FromImage(imgDraw);
-			string filePathAndName;
-			Image img;
-			foreach(SheetField field in SheetCur.SheetFields) {
-				filePathAndName="";
-				img=null;
-				switch(field.FieldType) {
-					case SheetFieldType.Image:
-						filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
-						break;
-					case SheetFieldType.PatImage:
-						if(field.FieldValue==""){
-							//not document to display
-							filePathAndName="";
-							break;
-						}
-						Document PatDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
-						filePathAndName=Documents.GetPaths(new List<long> { PatDoc.DocNum },ImageStore.GetPreferredAtoZpath())[0];
-						break;
-					default:
-						//not an image field
-						continue;
-				}
-				if(field.FieldName=="Patient Info.gif") {
-					img=Properties.Resources.Patient_Info;
-				}
-				else if(File.Exists(filePathAndName)) {
-					img=Image.FromFile(filePathAndName);
-				}
-				else {
-					if(filePathAndName!="") {
-						MessageBox.Show(filePathAndName+Lans.g(this," is innacessible or missing."));
-					}
-					//image not found.
-					continue;
-				}
-				//inscribe image in field while maintaining aspect ratio.
-				float imgRatio=(float)img.Width/(float)img.Height;
-				float fieldRatio=(float)field.Width/(float)field.Height;
-				float imgDrawHeight=field.Height;//drawn size of image
-				float imgDrawWidth=field.Width;//drawn size of image
-				int adjustY=0;//added to YPos
-				int adjustX=0;//added to XPos
-				//For patient images, we need to make sure the images will fit and can maintain aspect ratio.
-				if(field.FieldType==SheetFieldType.PatImage && imgRatio>fieldRatio) {//image is too wide
-					//X pos and width of field remain unchanged
-					//Y pos and height must change
-					imgDrawHeight=(float)img.Height*((float)field.Width/(float)img.Width);//img.Height*(width based scale) This also handles images that are too small.
-					adjustY=(int)((field.Height-imgDrawHeight)/2f);//adjustY= half of the unused vertical field space
-				}
-				else if(field.FieldType==SheetFieldType.PatImage && imgRatio<fieldRatio) {//image is too tall
-					//X pos and width must change
-					//Y pos and height remain unchanged
-					imgDrawWidth=(float)img.Width*((float)field.Height/(float)img.Height);//img.Height*(width based scale) This also handles images that are too small.
-					adjustX=(int)((field.Width-imgDrawWidth)/2f);//adjustY= half of the unused horizontal field space
-				}
-				else {//image ratio == field ratio
-					//do nothing
-				}
-				pictGraphics.DrawImage(img,field.XPos+adjustX,field.YPos+adjustY,imgDrawWidth,imgDrawHeight);
-			}
+			SheetPrinting.DrawImages(SheetCur,pictGraphics);
 			pictGraphics.Dispose();
 			//Set mouse events for the pictDraw
 			pictDraw.MouseDown+=new MouseEventHandler(pictDraw_MouseDown);
