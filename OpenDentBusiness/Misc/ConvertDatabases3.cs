@@ -4641,7 +4641,7 @@ namespace OpenDentBusiness {
 					+"INNER JOIN userod ON provider.ProvNum=userod.ProvNum "
 					+"INNER JOIN usergroup ON userod.UserGroupNum=userod.UserGroupNum "
 					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
-					+"WHERE grouppermission.PermType=3";//Permission - Setup
+					+"WHERE grouppermission.PermType=8";//Permission - Setup
 					DataTable dt=Db.GetTable(command);
 					StringBuilder sb=new StringBuilder();
 					for(int i=0;i<dt.Rows.Count;i++) {
@@ -4654,6 +4654,22 @@ namespace OpenDentBusiness {
 						//In the rare case that the StringBuilder is too large for the MySQL connector (very rare) we don't want the convert script to fail.
 						//Users can go manually set IsInstructor after the upgrade finishes.
 					}
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SecurityGroupForStudents','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SecurityGroupForStudents','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SecurityGroupForInstructors','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SecurityGroupForInstructors','')";
+					Db.NonQ(command);
 				}
 
 

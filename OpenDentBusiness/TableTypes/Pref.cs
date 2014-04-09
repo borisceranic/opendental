@@ -393,6 +393,8 @@ namespace OpenDentBusiness {
 		ScannerResolution,
 		ScannerSuppressDialog,
 		ScheduleProvUnassigned,
+		SecurityGroupForInstructors,
+		SecurityGroupForStudents,
 		SecurityLockDate,
 		///<summary>Set to 0 to always grant permission. 1 means only today.</summary>
 		SecurityLockDays,
