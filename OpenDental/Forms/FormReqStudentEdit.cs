@@ -354,7 +354,7 @@ namespace OpenDental{
 			//There should only be two types of users who are allowed to get this far:
 			//Students editing their own req, and users with setup perm.  But we will double check.
 			Provider provUser=Providers.GetProv(Security.CurUser.ProvNum);
-			if(provUser!=null && provUser.SchoolClassNum!=0) {//A student is logged in
+			if(provUser!=null && !provUser.IsInstructor) {//A student is logged in
 				//the student only has permission to view/attach/detach their own requirements
 				if(provUser.ProvNum!=ReqCur.ProvNum) {
 					//but this should never happen
@@ -371,7 +371,7 @@ namespace OpenDental{
 				}
 			}
 			else {//A student is not logged in
-				if(!Security.IsAuthorized(Permissions.Setup,DateTime.MinValue,true)) {//suppress message
+				if(provUser!=null && provUser.IsInstructor) {//suppress message
 					butDelete.Enabled=false;
 					butOK.Enabled=false;
 				}
