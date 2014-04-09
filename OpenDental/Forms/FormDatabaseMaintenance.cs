@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Reflection;
 
 namespace OpenDental {
 	/// <summary>
@@ -17,19 +18,18 @@ namespace OpenDental {
 	public class FormDatabaseMaintenance:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.TextBox textBox1;
-		private OpenDental.UI.Button buttonCheck;
+		private OpenDental.UI.Button butCheck;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
 		private System.ComponentModel.Container components = null;
 		private System.Drawing.Printing.PrintDocument pd2;
 		private TextBox textLog;
-		private Label label1;
 		private CheckBox checkShow;
 		private UI.Button butFix;
 		private GroupBox groupBox1;
 		private Label label6;
-		private UI.Button butConvertDb;
+		private UI.Button butInnoDB;
 		private Label label5;
 		private Label label4;
 		private Label label3;
@@ -43,8 +43,15 @@ namespace OpenDental {
 		private OpenDental.UI.Button butPrint;
 		private Label label8;
 		private UI.Button butRemoveNulls;
+		private ODGrid gridMain;
+		private UI.Button butNone;
 		///<summary>Holds any text from the log that still needs to be printed when the log spans multiple pages.</summary>
 		private string LogTextPrint;
+		///<summary>An array of every single method in DatabaseMaintenance.cs.  It's an array because that's what reflection uses.</summary>
+		private MethodInfo[] _arrayDbmMethodsAll;
+		private TextBox textBox2;
+		///<summary>This is a filtered list of methods from DatabaseMaintenance.cs that have the DbmMethod attribute.  This is used to populate gridMain.</summary>
+		private List<MethodInfo> _listDbmMethodsGrid;
 
 		///<summary></summary>
 		public FormDatabaseMaintenance() {
@@ -57,6 +64,18 @@ namespace OpenDental {
 				//this.textBox2
 			});
 			Lan.F(this);
+			//Grab all methods from the DatabaseMaintenance class to dynamically fill the grid.
+			_arrayDbmMethodsAll=(typeof(DatabaseMaintenance)).GetMethods();
+			//Sort the methods by name so that they are easier for users to find desired methods to run.
+			Array.Sort(_arrayDbmMethodsAll,new MethodInfoComparer());
+			_listDbmMethodsGrid=new List<MethodInfo>();
+			for(int i=0;i<_arrayDbmMethodsAll.Length;i++) {
+				object[] methAttr=_arrayDbmMethodsAll[i].GetCustomAttributes(typeof(DbmMethod),true);
+				if(methAttr.Length > 0) {
+					//This method was flagged to show in gridMain.  Add it to the list of methods used to populate gridMain.
+					_listDbmMethodsGrid.Add(_arrayDbmMethodsAll[i]);
+				}
+			}
 		}
 
 		/// <summary>
@@ -80,10 +99,9 @@ namespace OpenDental {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormDatabaseMaintenance));
 			this.butClose = new OpenDental.UI.Button();
 			this.textBox1 = new System.Windows.Forms.TextBox();
-			this.buttonCheck = new OpenDental.UI.Button();
+			this.butCheck = new OpenDental.UI.Button();
 			this.pd2 = new System.Drawing.Printing.PrintDocument();
 			this.textLog = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
 			this.checkShow = new System.Windows.Forms.CheckBox();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butFix = new OpenDental.UI.Button();
@@ -93,7 +111,7 @@ namespace OpenDental {
 			this.label7 = new System.Windows.Forms.Label();
 			this.butTokens = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
-			this.butConvertDb = new OpenDental.UI.Button();
+			this.butInnoDB = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
@@ -102,6 +120,9 @@ namespace OpenDental {
 			this.butApptProcs = new OpenDental.UI.Button();
 			this.butOptimize = new OpenDental.UI.Button();
 			this.butInsPayFix = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butNone = new OpenDental.UI.Button();
+			this.textBox2 = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -128,25 +149,26 @@ namespace OpenDental {
 			this.textBox1.Location = new System.Drawing.Point(27, 12);
 			this.textBox1.Multiline = true;
 			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(847, 24);
+			this.textBox1.Size = new System.Drawing.Size(922, 28);
 			this.textBox1.TabIndex = 1;
 			this.textBox1.Text = "This tool will check the entire database for any improper settings, inconsistenci" +
-    "es, or corruption.  If any problems are found, they will be fixed.";
+    "es, or corruption.\r\nA log is automatically saved in RepairLog.txt if user has pe" +
+    "rmission.";
 			// 
-			// buttonCheck
+			// butCheck
 			// 
-			this.buttonCheck.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.buttonCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonCheck.Autosize = true;
-			this.buttonCheck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.buttonCheck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.buttonCheck.CornerRadius = 4F;
-			this.buttonCheck.Location = new System.Drawing.Point(670, 671);
-			this.buttonCheck.Name = "buttonCheck";
-			this.buttonCheck.Size = new System.Drawing.Size(75, 26);
-			this.buttonCheck.TabIndex = 5;
-			this.buttonCheck.Text = "C&heck";
-			this.buttonCheck.Click += new System.EventHandler(this.buttonCheck_Click);
+			this.butCheck.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCheck.Autosize = true;
+			this.butCheck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCheck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCheck.CornerRadius = 4F;
+			this.butCheck.Location = new System.Drawing.Point(670, 671);
+			this.butCheck.Name = "butCheck";
+			this.butCheck.Size = new System.Drawing.Size(75, 26);
+			this.butCheck.TabIndex = 5;
+			this.butCheck.Text = "C&heck";
+			this.butCheck.Click += new System.EventHandler(this.butCheck_Click);
 			// 
 			// textLog
 			// 
@@ -154,28 +176,19 @@ namespace OpenDental {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textLog.Location = new System.Drawing.Point(27, 77);
+			this.textLog.Location = new System.Drawing.Point(503, 596);
 			this.textLog.Multiline = true;
 			this.textLog.Name = "textLog";
 			this.textLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textLog.Size = new System.Drawing.Size(931, 419);
+			this.textLog.Size = new System.Drawing.Size(446, 39);
 			this.textLog.TabIndex = 14;
-			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(24, 53);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(361, 20);
-			this.label1.TabIndex = 15;
-			this.label1.Text = "Log (automatically saved in RepairLog.txt if user has permission)";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// checkShow
 			// 
 			this.checkShow.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShow.Location = new System.Drawing.Point(27, 35);
+			this.checkShow.Location = new System.Drawing.Point(27, 51);
 			this.checkShow.Name = "checkShow";
-			this.checkShow.Size = new System.Drawing.Size(847, 20);
+			this.checkShow.Size = new System.Drawing.Size(447, 20);
 			this.checkShow.TabIndex = 16;
 			this.checkShow.Text = "Show me everything in the log  (only for advanced users)";
 			// 
@@ -219,7 +232,7 @@ namespace OpenDental {
 			this.groupBox1.Controls.Add(this.label7);
 			this.groupBox1.Controls.Add(this.butTokens);
 			this.groupBox1.Controls.Add(this.label6);
-			this.groupBox1.Controls.Add(this.butConvertDb);
+			this.groupBox1.Controls.Add(this.butInnoDB);
 			this.groupBox1.Controls.Add(this.label5);
 			this.groupBox1.Controls.Add(this.label4);
 			this.groupBox1.Controls.Add(this.label3);
@@ -290,19 +303,19 @@ namespace OpenDental {
 			this.label6.Text = "Converts database storage engine to/from InnoDb.";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// butConvertDb
+			// butInnoDB
 			// 
-			this.butConvertDb.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butConvertDb.Autosize = true;
-			this.butConvertDb.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butConvertDb.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butConvertDb.CornerRadius = 4F;
-			this.butConvertDb.Location = new System.Drawing.Point(10, 120);
-			this.butConvertDb.Name = "butConvertDb";
-			this.butConvertDb.Size = new System.Drawing.Size(87, 26);
-			this.butConvertDb.TabIndex = 39;
-			this.butConvertDb.Text = "InnoDb";
-			this.butConvertDb.Click += new System.EventHandler(this.butConvertDb_Click);
+			this.butInnoDB.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butInnoDB.Autosize = true;
+			this.butInnoDB.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butInnoDB.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butInnoDB.CornerRadius = 4F;
+			this.butInnoDB.Location = new System.Drawing.Point(10, 120);
+			this.butInnoDB.Name = "butInnoDB";
+			this.butInnoDB.Size = new System.Drawing.Size(87, 26);
+			this.butInnoDB.TabIndex = 39;
+			this.butInnoDB.Text = "InnoDb";
+			this.butInnoDB.Click += new System.EventHandler(this.butInnoDB_Click);
 			// 
 			// label5
 			// 
@@ -396,19 +409,64 @@ namespace OpenDental {
 			this.butInsPayFix.Text = "Ins Pay Fix";
 			this.butInsPayFix.Click += new System.EventHandler(this.butInsPayFix_Click);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(27, 77);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.Size = new System.Drawing.Size(922, 419);
+			this.gridMain.TabIndex = 96;
+			this.gridMain.Title = "Database Checks";
+			this.gridMain.TranslationName = "TableClaimPaySplits";
+			// 
+			// butNone
+			// 
+			this.butNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butNone.Autosize = true;
+			this.butNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNone.CornerRadius = 4F;
+			this.butNone.Location = new System.Drawing.Point(874, 502);
+			this.butNone.Name = "butNone";
+			this.butNone.Size = new System.Drawing.Size(75, 26);
+			this.butNone.TabIndex = 98;
+			this.butNone.Text = "None";
+			this.butNone.Click += new System.EventHandler(this.butNone_Click);
+			// 
+			// textBox2
+			// 
+			this.textBox2.BackColor = System.Drawing.SystemColors.Control;
+			this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textBox2.Location = new System.Drawing.Point(503, 502);
+			this.textBox2.Multiline = true;
+			this.textBox2.Name = "textBox2";
+			this.textBox2.Size = new System.Drawing.Size(365, 26);
+			this.textBox2.TabIndex = 99;
+			this.textBox2.Text = "No selections will cause all database checks to run.\r\nOtherwise only selected che" +
+    "cks will run.\r\n";
+			this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
 			// FormDatabaseMaintenance
 			// 
-			this.AcceptButton = this.buttonCheck;
+			this.AcceptButton = this.butCheck;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(982, 707);
+			this.Controls.Add(this.textBox2);
+			this.Controls.Add(this.butNone);
+			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butFix);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.checkShow);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textLog);
-			this.Controls.Add(this.buttonCheck);
+			this.Controls.Add(this.butCheck);
 			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -427,19 +485,61 @@ namespace OpenDental {
 		}
 		#endregion
 
-		private void butClose_Click(object sender,System.EventArgs e) {
-			Close();
+		private void FormDatabaseMaintenance_Load(object sender,System.EventArgs e) {
+			FillGrid();
 		}
 
-		private void FormDatabaseMaintenance_Load(object sender,System.EventArgs e) {
+		private void FillGrid() {
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn(Lan.g(this,"Name"),300);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Results"),0);
+			gridMain.Columns.Add(col);
+			gridMain.Rows.Clear();
+			ODGridRow row;
+			//_listDbmMethodsGrid has already been filled in the constructor with the correct methods to display in the grid.
+			for(int i=0;i<_listDbmMethodsGrid.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(_listDbmMethodsGrid[i].Name);
+				row.Cells.Add("");
+				gridMain.Rows.Add(row);
+			}
+			gridMain.EndUpdate();
+		}
 
+		private void butNone_Click(object sender,EventArgs e) {
+			gridMain.SetSelected(false);
+		}
+
+		private void SaveLogToFile() {
+			string path=CodeBase.ODFileUtils.CombinePaths(Application.StartupPath,"RepairLog.txt");
+			try {
+				File.AppendAllText(path,textLog.Text);
+			}
+			catch(SecurityException) {
+				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
+			}
+			catch(UnauthorizedAccessException) {
+				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+
+		#region Database Tools
+
+		private void butInsPayFix_Click(object sender,EventArgs e) {
+			FormInsPayFix formIns=new FormInsPayFix();
+			formIns.ShowDialog();
 		}
 
 		private void butOptimize_Click(object sender,EventArgs e) {
 			if(MessageBox.Show(Lan.g("FormDatabaseMaintenance","This tool will backup, optimize, and repair all tables.")+"\r\n"+Lan.g("FormDatabaseMaintenance","Continue?")
 				,Lan.g("FormDatabaseMaintenance","Backup Optimize Repair")
-				,MessageBoxButtons.OKCancel)!=DialogResult.OK) 
-			{
+				,MessageBoxButtons.OKCancel)!=DialogResult.OK) {
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
@@ -458,29 +558,171 @@ namespace OpenDental {
 			Cursor=Cursors.Default;
 		}
 
-		private void buttonCheck_Click(object sender,System.EventArgs e) {
-			Run(true);
+		private void butApptProcs_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will fix procedure descriptions in the Appt module that aren't correctly showing tooth numbers.\r\nContinue?")) {
+				return;
+			}
+			Cursor=Cursors.WaitCursor;
+			//The ApptProcDescript region is also in FormProcEdit.SaveAndClose() and FormApptEdit.UpdateToDB()  Make any changes there as well.
+			#region ApptProcDescript
+			List<long> aptNums=new List<long>();
+			Appointment[] aptList=Appointments.GetForPeriod(DateTime.Now.Date.AddMonths(-6),DateTime.MaxValue.AddDays(-10));
+			for(int i=0;i<aptList.Length;i++) {
+				aptNums.Add(aptList[i].AptNum);
+			}
+			for(int i=0;i<aptList.Length;i++) {
+				//This gets the list of procedures in the correct order.
+				DataTable procTable=Appointments.GetProcTable(aptList[i].PatNum.ToString(),aptList[i].AptNum.ToString(),((int)aptList[i].AptStatus).ToString(),aptList[i].AptDateTime.ToString());
+				Appointment newApt=aptList[i].Clone();
+				newApt.ProcDescript="";
+				newApt.ProcsColored="";
+				int count=0;
+				for(int j=0;j<procTable.Rows.Count;j++) {
+					if(procTable.Rows[j]["attached"].ToString()!="1") {
+						continue;
+					}
+					string procDescOne="";
+					string procCode=procTable.Rows[j]["ProcCode"].ToString();
+					if(count>0) {
+						newApt.ProcDescript+=", ";
+					}
+					switch(procTable.Rows[j]["TreatArea"].ToString()) {
+						case "1"://TreatmentArea.Surf:
+							procDescOne+="#"+Tooth.GetToothLabel(procTable.Rows[j]["ToothNum"].ToString())+"-"
+								+procTable.Rows[j]["Surf"].ToString()+"-";//""#12-MOD-"
+							break;
+						case "2"://TreatmentArea.Tooth:
+							procDescOne+="#"+Tooth.GetToothLabel(procTable.Rows[j]["ToothNum"].ToString())+"-";//"#12-"
+							break;
+						default://area 3 or 0 (mouth)
+							break;
+						case "4"://TreatmentArea.Quad:
+							procDescOne+=procTable.Rows[j]["Surf"].ToString()+"-";//"UL-"
+							break;
+						case "5"://TreatmentArea.Sextant:
+							procDescOne+="S"+procTable.Rows[j]["Surf"].ToString()+"-";//"S2-"
+							break;
+						case "6"://TreatmentArea.Arch:
+							procDescOne+=procTable.Rows[j]["Surf"].ToString()+"-";//"U-"
+							break;
+						case "7"://TreatmentArea.ToothRange:
+							//strLine+=table.Rows[j][13].ToString()+" ";//don't show range
+							break;
+					}
+					procDescOne+=procTable.Rows[j]["AbbrDesc"].ToString();
+					newApt.ProcDescript+=procDescOne;
+					//Color and previous date are determined by ProcApptColor object
+					ProcApptColor pac=ProcApptColors.GetMatch(procCode);
+					System.Drawing.Color pColor=System.Drawing.Color.Black;
+					string prevDateString="";
+					if(pac!=null) {
+						pColor=pac.ColorText;
+						if(pac.ShowPreviousDate) {
+							prevDateString=Procedures.GetRecentProcDateString(newApt.PatNum,newApt.AptDateTime,pac.CodeRange);
+							if(prevDateString!="") {
+								prevDateString=" ("+prevDateString+")";
+							}
+						}
+					}
+					newApt.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
+					count++;
+				}
+				Appointments.Update(newApt,aptList[i]);
+			}
+			#endregion
+			Cursor=Cursors.Default;
+			MsgBox.Show(this,"Done. Please refresh Appt module to see the changes.");
 		}
 
-		private void butFix_Click(object sender,EventArgs e) {
-			Run(false);
+		private void butSpecChar_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This is only used if your mobile synch or middle tier is failing.  This cannot be undone.  Do you wish to continue?")) {
+				return;
+			}
+			InputBox box=new InputBox("In our online manual, on the database maintenance page, look for the password and enter it below.");
+			if(box.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			if(box.textResult.Text!="fix") {
+				MessageBox.Show("Wrong password.");
+				return;
+			}
+			StringBuilder strB=new StringBuilder();
+			strB.Append('-',65);
+			textLog.Text=DateTime.Now.ToString()+strB.ToString()+"\r\n";
+			Application.DoEvents();
+			DatabaseMaintenance.FixSpecialCharacters();
+			textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
+			Application.DoEvents();
+			MsgBox.Show(this,"Special Characters have been removed from Appointment Notes, Appointment Procedure Descriptions, Patient Address Notes, and Patient Family Financial Urgent Notes.  Invalid null characters have been removed from Adjustment Notes, Payment Notes, and Definition Names.");
 		}
 
-		private void Run(bool isCheck){
+		private void butInnoDB_Click(object sender,EventArgs e) {
+			FormInnoDb form=new FormInnoDb();
+			form.ShowDialog();
+		}
+
+		private void butTokens_Click(object sender,EventArgs e) {
+			FormXchargeTokenTool FormXCT=new FormXchargeTokenTool();
+			FormXCT.ShowDialog();
+		}
+
+		private void butRemoveNulls_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will replace ALL null strings in your database with empty strings.  This cannot be undone.  Do you wish to continue?")) {
+				return;
+			}
+			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+":"+DatabaseMaintenance.RemoveNullStrings());
+		}
+
+		#endregion
+
+		private void butTemp_Click(object sender,EventArgs e) {
+			FormDatabaseMaintTemp form=new FormDatabaseMaintTemp();
+			form.ShowDialog();
+		}
+
+		private void butPrint_Click(object sender,EventArgs e) {
+			LogTextPrint=textLog.Text;
+			pd2 = new PrintDocument();
+			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
+			pd2.DefaultPageSettings.Margins=new Margins(40,50,50,60);
+			try {
+#if DEBUG
+				FormPrintPreview printPreview=new FormPrintPreview(PrintSituation.Default,pd2,0,0,"Database Maintenance log printed");
+				printPreview.ShowDialog();
+#else
+				pd2.Print();
+#endif
+			}
+			catch {
+				MessageBox.Show("Printer not available");
+			}
+		}
+
+		private void pd2_PrintPage(object sender,PrintPageEventArgs ev) {//raised for each page to be printed.
+			int charsOnPage=0;
+			int linesPerPage=0;
+			Font font=new Font("Courier New",10);
+			ev.Graphics.MeasureString(LogTextPrint,font,ev.MarginBounds.Size,StringFormat.GenericTypographic,out charsOnPage,out linesPerPage);
+			ev.Graphics.DrawString(LogTextPrint,font,Brushes.Black,ev.MarginBounds,StringFormat.GenericTypographic);
+			LogTextPrint=LogTextPrint.Substring(charsOnPage);
+			ev.HasMorePages=(LogTextPrint.Length > 0);
+		}
+
+		private void Run(bool isCheck) {
 			Cursor=Cursors.WaitCursor;
 			bool verbose=checkShow.Checked;
 			StringBuilder strB=new StringBuilder();
 			strB.Append('-',65);
 			textLog.Text=DateTime.Now.ToString()+strB.ToString()+"\r\n";
 			Application.DoEvents();
-//#if DEBUG
-//      textLog.Text+=DatabaseMaintenance.AppointmentSpecialCharactersInNotes(verbose,isCheck);
-//      Application.DoEvents();
-//      textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
-//      SaveLogToFile();
-//      Cursor=Cursors.Default;
-//      return;
-//#endif
+			//#if DEBUG
+			//      textLog.Text+=DatabaseMaintenance.AppointmentSpecialCharactersInNotes(verbose,isCheck);
+			//      Application.DoEvents();
+			//      textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
+			//      SaveLogToFile();
+			//      Cursor=Cursors.Default;
+			//      return;
+			//#endif
 			textLog.Text+=DatabaseMaintenance.MySQLTables(verbose,isCheck);
 			if(!DatabaseMaintenance.GetSuccess()) {
 				Cursor=Cursors.Default;
@@ -495,7 +737,7 @@ namespace OpenDental {
 			Application.DoEvents();
 			//Now, methods that apply to specific tables----------------------------------------------------------------------------
 			textLog.Text+=DatabaseMaintenance.AppointmentCompleteWithTpAttached(verbose,isCheck);
-			Application.DoEvents();			
+			Application.DoEvents();
 			textLog.Text+=DatabaseMaintenance.AppointmentsNoPattern(verbose,isCheck);
 			Application.DoEvents();
 			textLog.Text+=DatabaseMaintenance.AppointmentsNoDateOrProcs(verbose,isCheck);
@@ -713,174 +955,32 @@ namespace OpenDental {
 			Cursor=Cursors.Default;
 		}
 
-		private void SaveLogToFile() {
-			string path=CodeBase.ODFileUtils.CombinePaths(Application.StartupPath,"RepairLog.txt");
-			try {
-				File.AppendAllText(path,textLog.Text);
-			}
-			catch(SecurityException) {
-				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
-			}
-			catch(UnauthorizedAccessException) {
-				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-			}
+		private void butCheck_Click(object sender,System.EventArgs e) {
+			Run(true);
 		}
 
-		private void butPrint_Click(object sender,EventArgs e) {
-			LogTextPrint=textLog.Text;
-			pd2 = new PrintDocument();
-			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
-			pd2.DefaultPageSettings.Margins=new Margins(40,50,50,60);
-			try {
-				#if DEBUG
-				FormPrintPreview printPreview=new FormPrintPreview(PrintSituation.Default,pd2,0,0,"Database Maintenance log printed");
-				printPreview.ShowDialog();
-				#else
-				pd2.Print();
-				#endif
-			}
-			catch {
-				MessageBox.Show("Printer not available");
-			}
+		private void butFix_Click(object sender,EventArgs e) {
+			Run(false);
 		}
 
-		private void pd2_PrintPage(object sender,PrintPageEventArgs ev) {//raised for each page to be printed.
-			int charsOnPage=0;
-			int linesPerPage=0;
-			Font font=new Font("Courier New",10);
-			ev.Graphics.MeasureString(LogTextPrint,font,ev.MarginBounds.Size,StringFormat.GenericTypographic,out charsOnPage,out linesPerPage);
-			ev.Graphics.DrawString(LogTextPrint,font,Brushes.Black,ev.MarginBounds,StringFormat.GenericTypographic);
-			LogTextPrint=LogTextPrint.Substring(charsOnPage);
-			ev.HasMorePages=(LogTextPrint.Length > 0);
-		}
-
-		private void butTemp_Click(object sender,EventArgs e) {
-			FormDatabaseMaintTemp form=new FormDatabaseMaintTemp();
-			form.ShowDialog();
-		}
-
-		private void butInsPayFix_Click(object sender,EventArgs e) {
-			FormInsPayFix formIns=new FormInsPayFix();
-			formIns.ShowDialog();
-		}
-
-		private void butApptProcs_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will fix procedure descriptions in the Appt module that aren't correctly showing tooth numbers.\r\nContinue?")) {
-				return;
-			}
-			Cursor=Cursors.WaitCursor;
-			//The ApptProcDescript region is also in FormProcEdit.SaveAndClose() and FormApptEdit.UpdateToDB()  Make any changes there as well.
-			#region ApptProcDescript
-			List<long> aptNums=new List<long>();
-			Appointment[] aptList=Appointments.GetForPeriod(DateTime.Now.Date.AddMonths(-6),DateTime.MaxValue.AddDays(-10));
-			for(int i=0;i<aptList.Length;i++) {
-				aptNums.Add(aptList[i].AptNum);
-			}
-			for(int i=0;i<aptList.Length;i++) {
-				//This gets the list of procedures in the correct order.
-				DataTable procTable=Appointments.GetProcTable(aptList[i].PatNum.ToString(),aptList[i].AptNum.ToString(),((int)aptList[i].AptStatus).ToString(),aptList[i].AptDateTime.ToString());
-				Appointment newApt=aptList[i].Clone();
-				newApt.ProcDescript="";
-				newApt.ProcsColored="";
-				int count=0;
-				for(int j=0;j<procTable.Rows.Count;j++) {
-					if(procTable.Rows[j]["attached"].ToString()!="1") {
-						continue;
-					}
-					string procDescOne="";
-					string procCode=procTable.Rows[j]["ProcCode"].ToString();
-					if(count>0) {
-						newApt.ProcDescript+=", ";
-					}
-					switch(procTable.Rows[j]["TreatArea"].ToString()) {
-						case "1"://TreatmentArea.Surf:
-							procDescOne+="#"+Tooth.GetToothLabel(procTable.Rows[j]["ToothNum"].ToString())+"-"
-								+procTable.Rows[j]["Surf"].ToString()+"-";//""#12-MOD-"
-							break;
-						case "2"://TreatmentArea.Tooth:
-							procDescOne+="#"+Tooth.GetToothLabel(procTable.Rows[j]["ToothNum"].ToString())+"-";//"#12-"
-							break;
-						default://area 3 or 0 (mouth)
-							break;
-						case "4"://TreatmentArea.Quad:
-							procDescOne+=procTable.Rows[j]["Surf"].ToString()+"-";//"UL-"
-							break;
-						case "5"://TreatmentArea.Sextant:
-							procDescOne+="S"+procTable.Rows[j]["Surf"].ToString()+"-";//"S2-"
-							break;
-						case "6"://TreatmentArea.Arch:
-							procDescOne+=procTable.Rows[j]["Surf"].ToString()+"-";//"U-"
-							break;
-						case "7"://TreatmentArea.ToothRange:
-							//strLine+=table.Rows[j][13].ToString()+" ";//don't show range
-							break;
-					}
-					procDescOne+=procTable.Rows[j]["AbbrDesc"].ToString();
-					newApt.ProcDescript+=procDescOne;
-					//Color and previous date are determined by ProcApptColor object
-					ProcApptColor pac=ProcApptColors.GetMatch(procCode);
-					System.Drawing.Color pColor=System.Drawing.Color.Black;
-					string prevDateString="";
-					if(pac!=null) {
-						pColor=pac.ColorText;
-						if(pac.ShowPreviousDate) {
-							prevDateString=Procedures.GetRecentProcDateString(newApt.PatNum,newApt.AptDateTime,pac.CodeRange);
-							if(prevDateString!="") {
-								prevDateString=" ("+prevDateString+")";
-							}
-						}
-					}
-					newApt.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
-					count++;
-				}
-				Appointments.Update(newApt,aptList[i]);
-			}
-			#endregion
-			Cursor=Cursors.Default;
-			MsgBox.Show(this,"Done. Please refresh Appt module to see the changes.");
-		}
-
-		private void butSpecChar_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This is only used if your mobile synch or middle tier is failing.  This cannot be undone.  Do you wish to continue?")) {
-				return;
-			}
-			InputBox box=new InputBox("In our online manual, on the database maintenance page, look for the password and enter it below.");
-			if(box.ShowDialog()!=DialogResult.OK) {
-				return;
-			}
-			if(box.textResult.Text!="fix") {
-				MessageBox.Show("Wrong password.");
-				return;
-			}
-			StringBuilder strB=new StringBuilder();
-			strB.Append('-',65);
-			textLog.Text=DateTime.Now.ToString()+strB.ToString()+"\r\n";
-			Application.DoEvents();
-			DatabaseMaintenance.FixSpecialCharacters();
-			textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
-			Application.DoEvents();
-			MsgBox.Show(this,"Special Characters have been removed from Appointment Notes, Appointment Procedure Descriptions, Patient Address Notes, and Patient Family Financial Urgent Notes.  Invalid null characters have been removed from Adjustment Notes, Payment Notes, and Definition Names.");
-		}
-
-		private void butRemoveNulls_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will replace ALL null strings in your database with empty strings.  This cannot be undone.  Do you wish to continue?")) {
-				return;
-			}
-			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+":"+DatabaseMaintenance.RemoveNullStrings());
-		}
-
-		private void butConvertDb_Click(object sender,EventArgs e) {
-			FormInnoDb form=new FormInnoDb();
-			form.ShowDialog();
-		}
-
-		private void butTokens_Click(object sender,EventArgs e) {
-			FormXchargeTokenTool FormXCT=new FormXchargeTokenTool();
-			FormXCT.ShowDialog();
+		private void butClose_Click(object sender,System.EventArgs e) {
+			Close();
 		}
 
 	}
+
+
+
+	///<summary>Sorting class used to sort a MethodInfo list by Name.</summary>
+	public class MethodInfoComparer:IComparer<MethodInfo> {
+
+		public MethodInfoComparer() {
+		}
+
+		public int Compare(MethodInfo x,MethodInfo y) {
+			return x.Name.CompareTo(y.Name);
+		}
+	}
+
+
 }

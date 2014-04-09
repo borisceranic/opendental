@@ -20,6 +20,7 @@ namespace OpenDentBusiness {
 			return DatabaseMaintenance.success; 
 		}
 
+		[DbmMethod]
 		public static string MySQLTables(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -88,6 +89,7 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		[DbmMethod]
 		///<summary>This method updates many invalid date columns to '0001-01-01' and a few invalid DateTStamp columns to '1970-01-01 00:00:01'.
 		///DateTStamp columns are TIMESTAMP data type.  The TIMESTAMP data type has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
 		///https://dev.mysql.com/doc/refman/5.0/en/datetime.html
@@ -200,6 +202,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string DecimalValues(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -228,7 +231,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		//also checks patient.AddrNote
+		[DbmMethod]
+		///<summary>also checks patient.AddrNote</summary>
 		public static string SpecialCharactersInNotes(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -307,6 +311,7 @@ namespace OpenDentBusiness {
 
 		//Methods that apply to specific tables----------------------------------------------------------------------------------
 
+		[DbmMethod]
 		public static string AppointmentCompleteWithTpAttached(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -339,7 +344,8 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
-		
+
+		[DbmMethod]
 		public static string AppointmentsNoPattern(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -380,6 +386,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AppointmentsNoDateOrProcs(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -408,6 +415,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AppointmentsNoPatients(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -445,6 +453,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AppoitmentNoteTooManyNewLines(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -480,6 +489,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AppointmentPlannedNoPlannedApt(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -510,6 +520,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AppointmentScheduledWithCompletedProcs(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -543,6 +554,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AutoCodeItemsWithNoAutoCode(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -578,6 +590,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AutoCodesDeleteWithNoItems(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -605,6 +618,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string AutomationTriggersWithNoSheetDefs(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -629,6 +643,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string BillingTypesInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -684,6 +699,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string CanadaCarriersCdaMissingInfo(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -888,6 +904,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimDeleteWithNoClaimProcs(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -913,6 +930,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimWithInvalidInsSubNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -969,6 +987,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		///<summary>Also fixes situations where PatNum=0</summary>
 		public static string ClaimWithInvalidPatNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1002,6 +1021,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimWriteoffSum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1037,6 +1057,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		///<Summary>also fixes resulting deposit misbalances.</Summary>
 		public static string ClaimPaymentCheckAmt(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1138,6 +1159,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimPaymentDetachMissingDeposit(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1165,6 +1187,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDateNotMatchCapComplete(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1188,6 +1211,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDateNotMatchPayment(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1243,6 +1267,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcWithInvalidClaimNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1290,6 +1315,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDeleteDuplicateEstimateForSameInsPlan(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1342,6 +1368,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDeleteWithInvalidClaimNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1368,6 +1395,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDeleteMismatchPatNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1397,6 +1425,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDeleteEstimateWithInvalidProcNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1426,6 +1455,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcDeleteCapEstimateWithProcComplete(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1460,6 +1490,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcEstNoBillIns(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1483,6 +1514,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcEstWithInsPaidAmt(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1506,6 +1538,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcPatNumMissing(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1528,6 +1561,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcProvNumMissing(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1559,6 +1593,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcPreauthNotMatchClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1581,6 +1616,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcStatusNotMatchClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1625,6 +1661,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcWithInvalidClaimPaymentNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1651,6 +1688,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClaimProcWriteOffNegative(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1692,6 +1730,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ClockEventInFuture(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1721,6 +1760,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string DocumentWithNoCategory(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1747,6 +1787,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string EduResourceInvalidDiseaseDefNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1774,6 +1815,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string FeeDeleteDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1810,6 +1852,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string GroupNoteWithInvalidAptNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1835,6 +1878,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string GroupNoteWithInvalidProcStatus(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1861,7 +1905,8 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
-		
+
+		[DbmMethod]
 		public static string InsPlanInvalidCarrier(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1890,6 +1935,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string InsPlanInvalidNum(bool verbose,bool isCheck) {
 			//Many sections removed because they are now fixed in InsSubNumMismatchPlanNum.
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -2014,6 +2060,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string InsPlanNoClaimForm(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2037,6 +2084,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string InsSubInvalidSubscriber(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2072,6 +2120,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string InsSubNumMismatchPlanNum(bool verbose,bool isCheck) {
 			//Checks for situations where there are valid InsSubNums, but mismatched PlanNums. 
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -2258,6 +2307,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string JournalEntryInvalidAccountNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2296,6 +2346,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string LabCaseWithInvalidLaboratory(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2330,6 +2381,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string LaboratoryWithInvalidSlip(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2352,6 +2404,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string MedicationPatDeleteWithInvalidMedNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2376,6 +2429,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string MessageButtonDuplicateButtonIndex(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2411,6 +2465,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatFieldsDeleteDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2463,6 +2518,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientBadGuarantor(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2488,6 +2544,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientBadGuarantorWithAnotherGuarantor(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2513,6 +2570,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientDeletedWithClinicNumSet(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2535,6 +2593,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientsNoClinicSet(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2566,6 +2625,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientPriProvHidden(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2598,6 +2658,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientPriProvMissing(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2622,6 +2683,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatientUnDeleteWithBalance(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2655,6 +2717,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatPlanDeleteWithInvalidInsSubNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2677,6 +2740,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatPlanDeleteWithInvalidPatNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2699,6 +2763,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatPlanOrdinalDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2725,6 +2790,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatPlanOrdinalZeroToOne(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2753,6 +2819,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PatPlanOrdinalTwoToOne(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2782,6 +2849,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PaymentDetachMissingDeposit(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2809,6 +2877,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PaymentMissingPaySplit(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2837,6 +2906,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PayPlanChargeGuarantorMatch(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2881,6 +2951,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PayPlanChargeProvNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2899,6 +2970,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PayPlanSetGuarantorToPatForIns(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2917,6 +2989,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PaySplitAttachedToPayPlan(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2937,6 +3010,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PaySplitWithInvalidPayNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2974,6 +3048,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PaySplitWithInvalidPayPlanNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2999,6 +3074,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PerioMeasureWithInvalidIntTooth(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3021,6 +3097,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferenceAllergiesIndicateNone(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3049,6 +3126,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferenceDateDepositsStarted(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3080,6 +3158,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferenceMedicationsIndicateNone(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3108,6 +3187,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferenceProblemsIndicateNone(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3136,6 +3216,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferenceTimeCardOvertimeFirstDayOfWeek(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3162,6 +3243,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string PreferencePracticeProv(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3192,6 +3274,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcButtonItemsDeleteWithInvalidAutoCode(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3219,6 +3302,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurecodeCategoryNotSet(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3252,6 +3336,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogAttachedToApptWithProcStatusDeleted(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3277,6 +3362,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogAttachedToWrongAppts(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3313,6 +3399,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogAttachedToWrongApptDate(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3357,6 +3444,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogBaseUnitsZero(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3399,6 +3487,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogCodeNumInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3434,6 +3523,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogLabAttachedToDeletedProc(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3487,6 +3577,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogProvNumMissing(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3511,6 +3602,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogToothNums(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3559,6 +3651,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogTpAttachedToClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3603,6 +3696,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogTpAttachedToCompleteLabFeesCanada(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3635,6 +3729,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProcedurelogUnitQtyZero(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3659,6 +3754,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProviderHiddenWithClaimPayments(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3693,6 +3789,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string ProviderWithInvalidFeeSched(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3717,6 +3814,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string RecallDuplicatesWarn(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3760,6 +3858,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string RecallTriggerDeleteBadCodeNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3786,6 +3885,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string RefAttachDeleteWithInvalidReferral(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3808,6 +3908,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string SchedulesBlockoutStopBeforeStart(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3830,6 +3931,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string SchedulesDeleteHiddenProviders(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3857,6 +3959,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string SchedulesDeleteShort(bool verbose,bool isCheck) {
 			//No need to check RemotingRole; no call to db.
 			string log="";
@@ -3900,6 +4003,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string SchedulesDeleteProvClosed(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3922,6 +4026,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string SignalInFuture(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3952,6 +4057,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string StatementDateRangeMax(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3974,6 +4080,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string TaskSubscriptionsInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3998,6 +4105,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		public static string TimeCardRuleEmployeeNumInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -4025,6 +4133,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		/// <summary>Only one user of a given UserName may be unhidden at a time. Warn the user and instruct them to hide extras.</summary>
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -4050,7 +4159,8 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
-		
+
+		[DbmMethod]
 		public static string UserodInvalidClinicNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -4073,6 +4183,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
 		/// <summary>userod has an invalid FK to usergroup</summary>
 		public static string UserodInvalidUserGroupNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -4554,8 +4665,15 @@ HAVING cnt>1";
 		}
 
 
-
-
-
 	}
+
+	///<summary>An attribute that should get applied to any method that needs to show up in the main grid of FormDatabaseMaintenance.</summary>
+	[System.AttributeUsage(System.AttributeTargets.Method)]
+	public class DbmMethod:System.Attribute {
+		//Currently empty because we do not need any additional parameters or variables.  We simply need to know if a method should be shown in dbm grid or not.
+	}
+
+
+
+
 }
