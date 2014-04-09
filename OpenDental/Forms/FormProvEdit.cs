@@ -75,6 +75,7 @@ namespace OpenDental{
 		private CheckBox checkIsNotPerson;
 		private Label label15;
 		private TextBox textStateWhereLicensed;
+		private CheckBox checkIsInstructor;
 		public Provider ProvCur;
 
 		///<summary></summary>
@@ -165,6 +166,7 @@ namespace OpenDental{
 			this.checkIsNotPerson = new System.Windows.Forms.CheckBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.textStateWhereLicensed = new System.Windows.Forms.TextBox();
+			this.checkIsInstructor = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupAnesthProvType.SuspendLayout();
@@ -181,7 +183,7 @@ namespace OpenDental{
 			// 
 			// labelColor
 			// 
-			this.labelColor.Location = new System.Drawing.Point(6, 396);
+			this.labelColor.Location = new System.Drawing.Point(7, 359);
 			this.labelColor.Name = "labelColor";
 			this.labelColor.Size = new System.Drawing.Size(129, 16);
 			this.labelColor.TabIndex = 10;
@@ -191,7 +193,7 @@ namespace OpenDental{
 			// butColor
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Location = new System.Drawing.Point(136, 393);
+			this.butColor.Location = new System.Drawing.Point(137, 356);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(30, 20);
 			this.butColor.TabIndex = 13;
@@ -544,7 +546,7 @@ namespace OpenDental{
 			// 
 			// label14
 			// 
-			this.label14.Location = new System.Drawing.Point(6, 418);
+			this.label14.Location = new System.Drawing.Point(7, 381);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(129, 16);
 			this.label14.TabIndex = 45;
@@ -554,7 +556,7 @@ namespace OpenDental{
 			// butOutlineColor
 			// 
 			this.butOutlineColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butOutlineColor.Location = new System.Drawing.Point(136, 415);
+			this.butOutlineColor.Location = new System.Drawing.Point(137, 378);
 			this.butOutlineColor.Name = "butOutlineColor";
 			this.butOutlineColor.Size = new System.Drawing.Size(30, 20);
 			this.butOutlineColor.TabIndex = 14;
@@ -563,7 +565,7 @@ namespace OpenDental{
 			// comboSchoolClass
 			// 
 			this.comboSchoolClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboSchoolClass.Location = new System.Drawing.Point(135, 437);
+			this.comboSchoolClass.Location = new System.Drawing.Point(136, 400);
 			this.comboSchoolClass.MaxDropDownItems = 30;
 			this.comboSchoolClass.Name = "comboSchoolClass";
 			this.comboSchoolClass.Size = new System.Drawing.Size(130, 21);
@@ -571,7 +573,7 @@ namespace OpenDental{
 			// 
 			// labelSchoolClass
 			// 
-			this.labelSchoolClass.Location = new System.Drawing.Point(8, 440);
+			this.labelSchoolClass.Location = new System.Drawing.Point(9, 403);
 			this.labelSchoolClass.Name = "labelSchoolClass";
 			this.labelSchoolClass.Size = new System.Drawing.Size(125, 16);
 			this.labelSchoolClass.TabIndex = 89;
@@ -754,12 +756,24 @@ namespace OpenDental{
 			this.textStateWhereLicensed.Size = new System.Drawing.Size(34, 20);
 			this.textStateWhereLicensed.TabIndex = 110;
 			// 
+			// checkIsInstructor
+			// 
+			this.checkIsInstructor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsInstructor.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkIsInstructor.Location = new System.Drawing.Point(15, 427);
+			this.checkIsInstructor.Name = "checkIsInstructor";
+			this.checkIsInstructor.Size = new System.Drawing.Size(134, 17);
+			this.checkIsInstructor.TabIndex = 111;
+			this.checkIsInstructor.Text = "Is Instructor";
+			this.checkIsInstructor.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormProvEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(811, 641);
+			this.Controls.Add(this.checkIsInstructor);
 			this.Controls.Add(this.textStateWhereLicensed);
 			this.Controls.Add(this.label15);
 			this.Controls.Add(this.checkIsNotPerson);
@@ -838,6 +852,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)){
 				labelSchoolClass.Visible=false;
 				comboSchoolClass.Visible=false;
+				checkIsInstructor.Visible=false;
 			}
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				textEcwID.Text=ProvCur.EcwID;
@@ -879,6 +894,7 @@ namespace OpenDental{
 			checkIsSecondary.Checked=ProvCur.IsSecondary;
 			checkSigOnFile.Checked=ProvCur.SigOnFile;
 			checkIsHidden.Checked=ProvCur.IsHidden;
+			checkIsInstructor.Checked=ProvCur.IsInstructor;
 			butColor.BackColor=ProvCur.ProvColor;
 			butOutlineColor.BackColor=ProvCur.OutlineColor;
 			comboSchoolClass.Items.Add(Lan.g(this,"none"));
@@ -1055,6 +1071,7 @@ namespace OpenDental{
 			ProvCur.IsCDAnet=checkIsCDAnet.Checked;
 			ProvCur.ProvColor=butColor.BackColor;
 			ProvCur.OutlineColor=butOutlineColor.BackColor;
+			ProvCur.IsInstructor=checkIsInstructor.Checked;
 			if(comboSchoolClass.SelectedIndex<1) {//none
 				ProvCur.SchoolClassNum=0;
 			}

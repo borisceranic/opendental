@@ -314,17 +314,20 @@ namespace OpenDentBusiness {
 			return hashedInput==hashedPass;
 		}		
 
-		///<summary>usertype can be 'all', 'prov', 'emp', or 'other'.</summary>
+		///<summary>usertype can be 'all', 'prov', 'emp', 'stu', 'inst', or 'other'.</summary>
 		public static List<Userod> RefreshSecurity(string usertype,long schoolClassNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Userod>>(MethodBase.GetCurrentMethod(),usertype,schoolClassNum);
 			}
 			string command;
-			if(usertype=="prov" && schoolClassNum>0){
+			if(usertype=="stu" || usertype=="inst") {
 				command="SELECT userod.* FROM userod,provider "
 					+"WHERE userod.ProvNum=provider.ProvNum "
-					+"AND SchoolClassNum="+POut.Long(schoolClassNum)
-					+" ORDER BY UserName";
+					+"AND provider.IsInstructor="+usertype=="inst"?"1 ":"0 ";
+				if(usertype=="stu" && schoolClassNum>0) {
+					command+="AND SchoolClassNum="+POut.Long(schoolClassNum)+" ";
+				}
+				command+="ORDER BY UserName";
 				return Crud.UserodCrud.SelectMany(command);
 			}
 			command="SELECT * FROM userod ";

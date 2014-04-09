@@ -89,22 +89,29 @@ namespace OpenDentBusiness{
 			return Db.GetTable(command);
 		}
 
-		///<summary>Gets table for main provider edit list when in dental school mode.  Always orders alphabetically, but there will be lots of filters to get the list shorter.  Must be very fast because refreshes while typing.</summary>
-		public static DataTable RefreshForDentalSchool(long schoolClass) {
+		///<summary>Gets table for main provider edit list when in dental school mode.  Always orders alphabetically, but there will be lots of filters to get the list shorter.  Must be very fast because refreshes while typing.  selectAll will trump selectInstructors and always return all providers.</summary>
+		public static DataTable RefreshForDentalSchool(long schoolClassNum,string lastName,bool selectInstructors,bool selectAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClass);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,selectInstructors,selectAll);
 			}
-			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,Descript,MAX(UserName) UserName, PatCount "//Max function used for Oracle compatability (some providers may have multiple user names).
+			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName, PatCount "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider LEFT JOIN schoolclass ON provider.SchoolClassNum=schoolclass.SchoolClassNum "
 				+"LEFT JOIN userod ON userod.ProvNum=provider.ProvNum "//there can be multiple userods attached to one provider
 				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCount FROM patient "
 					+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
-					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv  ";
-			if(schoolClass!=0) {
-				command+="WHERE provider.SchoolClassNum="+POut.Long(schoolClass)+" ";
+					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv  "
+					+"WHERE TRUE ";//This is here so that we can prevent nested if-statements
+			if(schoolClassNum>0) {
+				command+="AND provider.SchoolClassNum="+POut.Long(schoolClassNum)+" ";
 			}
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,Descript ";
-			command+="ORDER BY LName,FName";
+			if(lastName!="") {
+				command+="AND provider.LName LIKE '%"+POut.String(lastName)+"%' ";
+			}
+			if(!selectAll) {
+				command+="AND provider.IsInstructor="+POut.Bool(selectInstructors)+" ";
+			}
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript "
+				+"ORDER BY LName,FName";
 			return Db.GetTable(command);
 		}
 

@@ -169,6 +169,7 @@ namespace OpenDental{
 			this.comboSchoolClass.Name = "comboSchoolClass";
 			this.comboSchoolClass.Size = new System.Drawing.Size(168, 21);
 			this.comboSchoolClass.TabIndex = 90;
+			this.comboSchoolClass.Visible = false;
 			this.comboSchoolClass.SelectionChangeCommitted += new System.EventHandler(this.comboSchoolClass_SelectionChangeCommitted);
 			// 
 			// labelSchoolClass
@@ -179,6 +180,7 @@ namespace OpenDental{
 			this.labelSchoolClass.TabIndex = 91;
 			this.labelSchoolClass.Text = "Class";
 			this.labelSchoolClass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSchoolClass.Visible = false;
 			// 
 			// checkCannotEditOwn
 			// 
@@ -420,18 +422,14 @@ namespace OpenDental{
 			comboUsers.Items.Add(Lan.g(this,"All Users"));
 			comboUsers.Items.Add(Lan.g(this,"Providers"));
 			comboUsers.Items.Add(Lan.g(this,"Employees"));
+			comboUsers.Items.Add(Lan.g(this,"Students"));
+			comboUsers.Items.Add(Lan.g(this,"Instructors"));
 			comboUsers.Items.Add(Lan.g(this,"Other"));
 			comboUsers.SelectedIndex=0;
-			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)){
-				comboSchoolClass.Visible=false;
-				labelSchoolClass.Visible=false;
-			}
-			else{
-				comboSchoolClass.Items.Add(Lan.g(this,"All"));
-				comboSchoolClass.SelectedIndex=0;
-				for(int i=0;i<SchoolClasses.List.Length;i++) {
-					comboSchoolClass.Items.Add(SchoolClasses.GetDescript(SchoolClasses.List[i]));
-				}
+			comboSchoolClass.Items.Add(Lan.g(this,"All"));
+			comboSchoolClass.SelectedIndex=0;
+			for(int i=0;i<SchoolClasses.List.Length;i++) {
+				comboSchoolClass.Items.Add(SchoolClasses.GetDescript(SchoolClasses.List[i]));
 			}
 			FillTreePermissionsInitial();
 			FillUsers();
@@ -466,6 +464,10 @@ namespace OpenDental{
 				node2=SetNode(Permissions.Schedules);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Providers);
+					node3=SetNode(Permissions.AdminDentalInstructors);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.AdminDentalStudents);
+						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Blockouts);
 					node.Nodes.Add(node2);
@@ -659,9 +661,23 @@ namespace OpenDental{
 				usertype="emp";
 			}
 			if(comboUsers.SelectedIndex==3) {
+				usertype="stu";
+			}
+			if(comboUsers.SelectedIndex==4) {
+				usertype="inst";
+			}
+			if(comboUsers.SelectedIndex==5) {
 				usertype="other";
 			}
 			long classNum=0;
+			if(usertype=="stu") {
+				labelSchoolClass.Visible=true;
+				comboSchoolClass.Visible=true;
+			}
+			else {
+				labelSchoolClass.Visible=false;
+				comboSchoolClass.Visible=false;
+			}
 			if(comboSchoolClass.Visible && comboSchoolClass.SelectedIndex>0){
 				classNum=SchoolClasses.List[comboSchoolClass.SelectedIndex-1].SchoolClassNum;
 			}

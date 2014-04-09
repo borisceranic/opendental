@@ -34,7 +34,7 @@ namespace OpenDental{
 		private RadioButton radioStudents;
 		private RadioButton radioAll;
 		private Label label4;
-		private TextBox textName;
+		private TextBox textLastName;
 		private UI.Button butProvPick;
 		private TextBox textMoveTo;
 		//private User user;
@@ -71,6 +71,11 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
+			this.label4 = new System.Windows.Forms.Label();
+			this.textLastName = new System.Windows.Forms.TextBox();
+			this.radioInstructors = new System.Windows.Forms.RadioButton();
+			this.radioStudents = new System.Windows.Forms.RadioButton();
+			this.radioAll = new System.Windows.Forms.RadioButton();
 			this.comboClass = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butCreateUsers = new OpenDental.UI.Button();
@@ -78,17 +83,12 @@ namespace OpenDental{
 			this.comboUserGroup = new System.Windows.Forms.ComboBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupMovePats = new System.Windows.Forms.GroupBox();
+			this.butProvPick = new OpenDental.UI.Button();
+			this.textMoveTo = new System.Windows.Forms.TextBox();
 			this.butReassign = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.butMove = new OpenDental.UI.Button();
-			this.radioAll = new System.Windows.Forms.RadioButton();
-			this.radioStudents = new System.Windows.Forms.RadioButton();
-			this.radioInstructors = new System.Windows.Forms.RadioButton();
-			this.textName = new System.Windows.Forms.TextBox();
-			this.label4 = new System.Windows.Forms.Label();
-			this.textMoveTo = new System.Windows.Forms.TextBox();
-			this.butProvPick = new OpenDental.UI.Button();
 			this.groupDentalSchools.SuspendLayout();
 			this.groupCreateUsers.SuspendLayout();
 			this.groupMovePats.SuspendLayout();
@@ -181,7 +181,7 @@ namespace OpenDental{
 			// 
 			this.groupDentalSchools.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupDentalSchools.Controls.Add(this.label4);
-			this.groupDentalSchools.Controls.Add(this.textName);
+			this.groupDentalSchools.Controls.Add(this.textLastName);
 			this.groupDentalSchools.Controls.Add(this.radioInstructors);
 			this.groupDentalSchools.Controls.Add(this.radioStudents);
 			this.groupDentalSchools.Controls.Add(this.radioAll);
@@ -192,7 +192,63 @@ namespace OpenDental{
 			this.groupDentalSchools.Size = new System.Drawing.Size(273, 127);
 			this.groupDentalSchools.TabIndex = 14;
 			this.groupDentalSchools.TabStop = false;
-			this.groupDentalSchools.Text = "Dental Schools";
+			this.groupDentalSchools.Text = "Dental Schools Search by:";
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(8, 102);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(90, 18);
+			this.label4.TabIndex = 21;
+			this.label4.Text = "Last Name";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textName
+			// 
+			this.textLastName.Location = new System.Drawing.Point(98, 101);
+			this.textLastName.MaxLength = 15;
+			this.textLastName.Name = "textName";
+			this.textLastName.Size = new System.Drawing.Size(166, 20);
+			this.textLastName.TabIndex = 20;
+			this.textLastName.TextChanged += new System.EventHandler(this.textLastName_TextChanged);
+			// 
+			// radioInstructors
+			// 
+			this.radioInstructors.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioInstructors.Location = new System.Drawing.Point(6, 80);
+			this.radioInstructors.Name = "radioInstructors";
+			this.radioInstructors.Size = new System.Drawing.Size(104, 18);
+			this.radioInstructors.TabIndex = 19;
+			this.radioInstructors.Text = "Instructors";
+			this.radioInstructors.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioInstructors.UseVisualStyleBackColor = true;
+			this.radioInstructors.Click += new System.EventHandler(this.radioInstructors_Click);
+			// 
+			// radioStudents
+			// 
+			this.radioStudents.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioStudents.Location = new System.Drawing.Point(6, 63);
+			this.radioStudents.Name = "radioStudents";
+			this.radioStudents.Size = new System.Drawing.Size(104, 18);
+			this.radioStudents.TabIndex = 18;
+			this.radioStudents.Text = "Students";
+			this.radioStudents.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioStudents.UseVisualStyleBackColor = true;
+			this.radioStudents.Click += new System.EventHandler(this.radioStudents_Click);
+			// 
+			// radioAll
+			// 
+			this.radioAll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioAll.Checked = true;
+			this.radioAll.Location = new System.Drawing.Point(6, 46);
+			this.radioAll.Name = "radioAll";
+			this.radioAll.Size = new System.Drawing.Size(104, 18);
+			this.radioAll.TabIndex = 17;
+			this.radioAll.TabStop = true;
+			this.radioAll.Text = "All";
+			this.radioAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.radioAll.UseVisualStyleBackColor = true;
+			this.radioAll.Click += new System.EventHandler(this.radioAll_Click);
 			// 
 			// comboClass
 			// 
@@ -275,6 +331,30 @@ namespace OpenDental{
 			this.groupMovePats.TabStop = false;
 			this.groupMovePats.Text = "Move Patients";
 			// 
+			// butProvPick
+			// 
+			this.butProvPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butProvPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butProvPick.Autosize = true;
+			this.butProvPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butProvPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butProvPick.CornerRadius = 4F;
+			this.butProvPick.Location = new System.Drawing.Point(237, 17);
+			this.butProvPick.Name = "butProvPick";
+			this.butProvPick.Size = new System.Drawing.Size(27, 26);
+			this.butProvPick.TabIndex = 23;
+			this.butProvPick.Text = "...";
+			this.butProvPick.Click += new System.EventHandler(this.butProvPick_Click);
+			// 
+			// textMoveTo
+			// 
+			this.textMoveTo.Location = new System.Drawing.Point(98, 19);
+			this.textMoveTo.MaxLength = 15;
+			this.textMoveTo.Name = "textMoveTo";
+			this.textMoveTo.ReadOnly = true;
+			this.textMoveTo.Size = new System.Drawing.Size(135, 20);
+			this.textMoveTo.TabIndex = 22;
+			// 
 			// butReassign
 			// 
 			this.butReassign.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -323,82 +403,6 @@ namespace OpenDental{
 			this.butMove.Text = "Move";
 			this.butMove.Click += new System.EventHandler(this.butMove_Click);
 			// 
-			// radioAll
-			// 
-			this.radioAll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioAll.Checked = true;
-			this.radioAll.Location = new System.Drawing.Point(6, 46);
-			this.radioAll.Name = "radioAll";
-			this.radioAll.Size = new System.Drawing.Size(104, 18);
-			this.radioAll.TabIndex = 17;
-			this.radioAll.TabStop = true;
-			this.radioAll.Text = "All";
-			this.radioAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioAll.UseVisualStyleBackColor = true;
-			// 
-			// radioStudents
-			// 
-			this.radioStudents.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioStudents.Location = new System.Drawing.Point(6, 63);
-			this.radioStudents.Name = "radioStudents";
-			this.radioStudents.Size = new System.Drawing.Size(104, 18);
-			this.radioStudents.TabIndex = 18;
-			this.radioStudents.Text = "Students";
-			this.radioStudents.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioStudents.UseVisualStyleBackColor = true;
-			// 
-			// radioInstructors
-			// 
-			this.radioInstructors.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioInstructors.Location = new System.Drawing.Point(6, 80);
-			this.radioInstructors.Name = "radioInstructors";
-			this.radioInstructors.Size = new System.Drawing.Size(104, 18);
-			this.radioInstructors.TabIndex = 19;
-			this.radioInstructors.Text = "Instructors";
-			this.radioInstructors.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioInstructors.UseVisualStyleBackColor = true;
-			// 
-			// textName
-			// 
-			this.textName.Location = new System.Drawing.Point(98, 101);
-			this.textName.MaxLength = 15;
-			this.textName.Name = "textName";
-			this.textName.Size = new System.Drawing.Size(166, 20);
-			this.textName.TabIndex = 20;
-			this.textName.TextChanged += new System.EventHandler(this.textName_TextChanged);
-			// 
-			// label4
-			// 
-			this.label4.Location = new System.Drawing.Point(8, 102);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(90, 18);
-			this.label4.TabIndex = 21;
-			this.label4.Text = "Name";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textMoveTo
-			// 
-			this.textMoveTo.Location = new System.Drawing.Point(98, 19);
-			this.textMoveTo.MaxLength = 15;
-			this.textMoveTo.Name = "textMoveTo";
-			this.textMoveTo.Size = new System.Drawing.Size(135, 20);
-			this.textMoveTo.TabIndex = 22;
-			// 
-			// butProvPick
-			// 
-			this.butProvPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butProvPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butProvPick.Autosize = true;
-			this.butProvPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butProvPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butProvPick.CornerRadius = 4F;
-			this.butProvPick.Location = new System.Drawing.Point(237, 17);
-			this.butProvPick.Name = "butProvPick";
-			this.butProvPick.Size = new System.Drawing.Size(27, 26);
-			this.butProvPick.TabIndex = 23;
-			this.butProvPick.Text = "...";
-			this.butProvPick.Click += new System.EventHandler(this.butProvPick_Click);
-			// 
 			// FormProviderSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -433,6 +437,7 @@ namespace OpenDental{
 
 		private void FormProviderSetup_Load(object sender, System.EventArgs e) {
 			//There are two permissions which allow access to this window: Providers and AdminDentalStudents.  SecurityAdmin allows some extra functions.
+			Cache.Refresh(InvalidType.Providers);
 			if(Security.IsAuthorized(Permissions.SecurityAdmin,true)){
 				for(int i=0;i<UserGroups.List.Length;i++){
 					comboUserGroup.Items.Add(UserGroups.List[i].Description);
@@ -463,13 +468,12 @@ namespace OpenDental{
 				selectedProvNum=PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString());
 			}
 			int scroll=gridMain.ScrollValue;
-			Cache.Refresh(InvalidType.Providers);//this needs to go away for speed
 			if(groupDentalSchools.Visible) {
 				long schoolClass=0;
 				if(comboClass.SelectedIndex>0) {
 					schoolClass=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
 				}
-				table=Providers.RefreshForDentalSchool(schoolClass);
+				table=Providers.RefreshForDentalSchool(schoolClass,textLastName.Text,radioInstructors.Checked,radioAll.Checked);
 			}
 			else {
 				table=Providers.RefreshStandard();
@@ -504,6 +508,8 @@ namespace OpenDental{
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 				col=new ODGridColumn(Lan.g("TableProviderSetup","Class"),100);
 				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableProviderSetup","Instructor"),60,HorizontalAlignment.Center);
+				gridMain.Columns.Add(col);
 			}
 			col=new ODGridColumn(Lan.g("TableProviderSetup","Patients"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
@@ -528,6 +534,12 @@ namespace OpenDental{
 					else{
 						row.Cells.Add("");
 					}
+					if(table.Rows[i]["IsInstructor"].ToString()=="1") {
+						row.Cells.Add("X");
+					}
+					else {
+						row.Cells.Add("");
+					}
 				}
 				row.Cells.Add(table.Rows[i]["PatCount"].ToString());
 				//row.Tag
@@ -547,7 +559,19 @@ namespace OpenDental{
 			FillGrid();
 		}
 
-		private void textName_TextChanged(object sender,EventArgs e) {
+		private void textLastName_TextChanged(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void radioAll_Click(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void radioStudents_Click(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void radioInstructors_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -558,6 +582,7 @@ namespace OpenDental{
 				//don't worry about orders.
 			}
 			else {
+				Cache.Refresh(InvalidType.Providers);//Refresh the cache to get current information for the item orders
 				if(gridMain.SelectedIndices.Length>0) {//place new provider after the first selected index. No changes are made to DB until after provider is actually inserted.
 					FormP.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString())).ItemOrder;//now two with this itemorder
 				}
@@ -576,6 +601,7 @@ namespace OpenDental{
 			//new provider has already been inserted into DB from FormP.
 			Providers.MoveDownBelow(FormP.ProvCur);//safe to run even if none selected.
 			changed=true;
+			Cache.Refresh(InvalidType.Providers);//This refresh may be unnecessary, but it is here for safety reasons
 			FillGrid();
 			gridMain.ScrollToEnd();//should change this to scroll to the same place as before.
 			for(int i=0;i<table.Rows.Count;i++){//ProviderC.ListLong.Count;i++) {
@@ -596,6 +622,7 @@ namespace OpenDental{
 			if(gridMain.SelectedIndices[0]==0) {//already at top
 				return;
 			}
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			Provider prov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
 			Provider otherprov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]-1]["ProvNum"].ToString()));
 			prov.ItemOrder--;
@@ -617,6 +644,7 @@ namespace OpenDental{
 			if(gridMain.SelectedIndices[0]==ProviderC.ListLong.Count-1) {//already at bottom
 				return;
 			}
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			Provider prov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
 			Provider otherprov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]+1]["ProvNum"].ToString()));
 			prov.ItemOrder++;
@@ -630,6 +658,7 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			FormProvEdit FormP=new FormProvEdit();
 			FormP.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
 			FormP.ShowDialog();
@@ -642,6 +671,7 @@ namespace OpenDental{
 
 		private void butProvPick_Click(object sender,EventArgs e) {
 			//This button is used instead of a dropdown because the order of providers can frequently change in the grid.
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			FormProviderPick formPick=new FormProviderPick();
 			formPick.ShowDialog();
 			if(formPick.DialogResult!=DialogResult.OK) {
@@ -661,7 +691,8 @@ namespace OpenDental{
 			if(_provNumMoveTo==0){
 				MsgBox.Show(this,"You must pick a provider in the box above to move patients to.");
 				return;
-			}			
+			}
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			Provider provFrom=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
 			Provider provTo=Providers.GetProv(_provNumMoveTo);
 			string msg=Lan.g(this,"Move all patients from")+" "+provFrom.GetLongDesc()+" "+Lan.g(this,"to")+" "+provTo.GetLongDesc()+"?";

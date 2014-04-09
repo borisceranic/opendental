@@ -5185,18 +5185,21 @@ namespace OpenDental{
 
 		private void menuItemReqStudents_Click(object sender,EventArgs e) {
 			Provider prov=Providers.GetProv(Security.CurUser.ProvNum);
-			if(prov!=null && prov.SchoolClassNum!=0){//if a student is logged in
+			if(prov==null) {
+				MsgBox.Show(this,"The current user is not attached to a provider. Attach the user to a provider to gain access to this feature.");
+				return;
+			}
+			if(!prov.IsInstructor){//if a student is logged in
 				//the student always has permission to view their own requirements
 				FormReqStudentOne FormO=new FormReqStudentOne();
 				FormO.ProvNum=prov.ProvNum;
 				FormO.ShowDialog();
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
+			if(prov.IsInstructor) {
+				FormReqStudentsMany FormM=new FormReqStudentsMany();
+				FormM.ShowDialog();
 			}
-			FormReqStudentsMany FormM=new FormReqStudentsMany();
-			FormM.ShowDialog();	
 		}
 
 		private void menuItemWebForms_Click(object sender,EventArgs e) {
