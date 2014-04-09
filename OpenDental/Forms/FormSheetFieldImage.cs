@@ -218,12 +218,14 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a file name first.");
 				return;
 			}
-			try {//catch valid files that are not valid images.
-				Image.FromFile(textFullPath.Text);
-			}
-			catch {
-				MsgBox.Show(this,"Not a valid image type.");
-				return;
+			if(comboFieldName.Text!="Patient Info.gif") {
+				try {//catch valid files that are not valid images.
+					Image.FromFile(textFullPath.Text);
+				}
+				catch {
+					MsgBox.Show(this,"Not a valid image type.");
+					return;
+				}
 			}
 			if(!File.Exists(textFullPath.Text)
 				&& comboFieldName.Text!="Patient Info.gif") 
