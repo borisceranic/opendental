@@ -71,6 +71,15 @@ namespace OpenDentBusiness{
 			return Crud.LoincCrud.SelectMany(command);
 		}
 
+		///<summary>Returns the count of all LOINC codes.  LOINC codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM loinc";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		///<summary>Gets one Loinc from the db based on LoincCode, returns null if not found.</summary>
 		public static Loinc GetByCode(string loincCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

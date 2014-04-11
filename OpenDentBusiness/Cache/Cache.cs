@@ -112,6 +112,9 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.DisplayFields) || isAll) {
 				ds.Tables.Add(DisplayFields.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.EhrCodes) || isAll) {
+				EhrCodes.UpdateList();//Unusual pattern for an unusual "table".  Not really a table, but a mishmash of hard coded partial code systems that are needed for CQMs.
+			}
 			if(itypes.Contains((int)InvalidType.ElectIDs) || isAll) {
 				ds.Tables.Add(ElectIDs.RefreshCache());
 			}

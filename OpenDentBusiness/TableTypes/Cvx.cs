@@ -13,8 +13,8 @@ namespace OpenDentBusiness {
 		public string CvxCode;
 		///<summary>Short Description provided by Cvx documentation.</summary>
 		public string Description;
-		///<summary>1 if the code is an active code, 0 if the code is inactive.</summary>
-		public string IsActive;//might not need this column.
+		///<summary>Not currently in use.  Might not need this column.  If we use this in the future, then convert from string to bool.  1 if the code is an active code, 0 if the code is inactive.</summary>
+		public string IsActive;
 
 
 		///<summary></summary>

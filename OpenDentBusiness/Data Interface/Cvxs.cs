@@ -102,9 +102,10 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
+		///<summary>Returns the total count of CVX codes.  CVS codes cannot be hidden, but might in the future be set active/inactive using the IsActive flag.</summary>
 		public static long GetCodeCount() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<int>(MethodBase.GetCurrentMethod());
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT COUNT(*) FROM cvx";
 			return PIn.Long(Db.GetCount(command));

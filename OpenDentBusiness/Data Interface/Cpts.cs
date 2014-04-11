@@ -64,6 +64,14 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
+		///<summary>Returns the total count of CPT codes.  CPT codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM cpt";
+			return PIn.Long(Db.GetCount(command));
+		}
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.

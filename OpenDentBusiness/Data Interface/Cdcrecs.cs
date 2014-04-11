@@ -121,6 +121,15 @@ namespace OpenDentBusiness{
 			return retval;
 		}
 
+		///<summary>Returns the total count of CDCREC codes.  CDCREC codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM cdcrec";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 

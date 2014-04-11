@@ -4,9 +4,9 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	///<summary>Never insert or update, use cache pattern only.  This is not referencing a real table in the database, it is a static object filled by the contents of the EHR.dll.</summary>
-	public class EhrCodes{
+	public class EhrCodes {
 		#region CachePattern
 		//Atypical cache pattern. Cache is only filled when we have access to the EHR.dll file, otherwise listt will be an empty list of EHR codes (not null, just empty as if the table were there but with no codes in it.)
 
@@ -14,7 +14,7 @@ namespace OpenDentBusiness{
 		private static List<EhrCode> listt;
 
 		///<summary>A list of all EhrCodes.</summary>
-		public static List<EhrCode> Listt{
+		public static List<EhrCode> Listt {
 			get {
 				if(listt==null) {//instead of refreshing the cache using the normal pattern we must retrieve the cache from the EHR.dll. No call to DB.
 					object ObjEhrCodeList;
@@ -41,61 +41,147 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		/// <summary>If the CodeValue of the EhrCode exists in its respective code table (I.e. Snomed, Loinc, Cpt, etc.) this will set IsInDb=true otherwise false.</summary>
+		/// <summary>Forces an update to the in-memory list.</summary>
+		public static void UpdateList() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+			}
+			if(listt==null) {
+				List<EhrCode> tempList=Listt;//Forces data to be cached.
+			}
+			else {
+				updateCodeExistsHelper();
+			}
+		}
+
+		/// <summary>If the number of codes in the code tables (I.e. Snomed, Loinc, Cpt, etc.) are greater than the number we expect then this will set IsInDb=true otherwise false.</summary>
 		private static void updateCodeExistsHelper() {
 			//No need to check RemotingRole; no call to db.
-			if(listt.Count==0){
+			if(listt.Count==0) {
 				return;
 			}
 			//Cache lists of codes.
-			HashSet<string> cdcrecHS	= new HashSet<string>(Cdcrecs				.GetAllCodes());
-			HashSet<string> cdtHS			= new HashSet<string>(ProcedureCodes.GetAllCodes());
-			HashSet<string> cptHS			= new HashSet<string>(Cpts					.GetAllCodes());
-			HashSet<string> cvxHS			= new HashSet<string>(Cvxs					.GetAllCodes());
-			HashSet<string> hcpcsHS		= new HashSet<string>(Hcpcses				.GetAllCodes());
-			HashSet<string> icd10HS		= new HashSet<string>(Icd10s				.GetAllCodes());
-			HashSet<string> icd9HS		= new HashSet<string>(ICD9s					.GetAllCodes());
-			HashSet<string> loincHS		= new HashSet<string>(Loincs				.GetAllCodes());
-			HashSet<string> rxnormHS	= new HashSet<string>(RxNorms				.GetAllCodes());
-			HashSet<string> snomedHS	= new HashSet<string>(Snomeds				.GetAllCodes());
-			HashSet<string> sopHS			= new HashSet<string>(Sops					.GetAllCodes());
+			#region Count Variables
+			//Counts from the DB
+			long countCdcDB=-1;
+			long countCdtDB=-1;
+			long countCptDB=-1;
+			long countCvxDB=-1;
+			long countHcpcsDB=-1;
+			long countIcd9DB=-1;
+			long countIcd10DB=-1;
+			long countLoincDB=-1;
+			long countRxNormDB=-1;
+			long countSnomedDB=-1;
+			long countSopDB=-1;
+			//Counts hard-coded from the EhrCodes.Listt. Lowered slightly to give a buffer, in case we decide to remove some codes later.
+			const long countCdcList			=5;
+			const long countCdtList			=10;
+			const long countCptList			=300;
+			const long countCvxList			=5;
+			const long countHcpcsList		=20;
+			const long countIcd9List		=1500;
+			const long countIcd10List		=2000;
+			const long countLoincList		=20;
+			const long countRxNormList	=40;
+			const long countSnomedList	=700;
+			const long countSopList			=100;
+			#endregion
 			for(int i=0;i<listt.Count;i++) {
+				if(listt[i].IsInDb) {
+					continue;//The codes are already present in the database, so we don't need to check again.
+				}
 				switch(listt[i].CodeSystem) {
 					case "AdministrativeSex"://always "in DB", even though there is no DB table 
 						listt[i].IsInDb=true;
 						break;
 					case "CDCREC":
-						listt[i].IsInDb=cdcrecHS.Contains(listt[i].CodeValue);
+						if(countCdcDB==-1) {
+							countCdcDB=Cdcrecs.GetCodeCount();
+						}
+						if(countCdcDB>countCdcList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "CDT":
-						listt[i].IsInDb=cdtHS.Contains(listt[i].CodeValue);
+						if(countCdtDB==-1) {
+							countCdtDB=ProcedureCodes.GetCodeCount();
+						}
+						if(countCdtDB>countCdtList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "CPT":
-						listt[i].IsInDb=cptHS.Contains(listt[i].CodeValue);
+						if(countCptDB==-1) {
+							countCptDB=Cpts.GetCodeCount();
+						}
+						if(countCptDB>countCptList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "CVX":
-						listt[i].IsInDb=cvxHS.Contains(listt[i].CodeValue);
+						if(countCvxDB==-1) {
+							countCvxDB=Cvxs.GetCodeCount();
+						}
+						if(countCvxDB>countCvxList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "HCPCS":
-						listt[i].IsInDb=hcpcsHS.Contains(listt[i].CodeValue);
+						if(countHcpcsDB==-1) {
+							countHcpcsDB=Hcpcses.GetCodeCount();
+						}
+						if(countHcpcsDB>countHcpcsList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "ICD9CM":
-						listt[i].IsInDb=icd9HS.Contains(listt[i].CodeValue);
+						if(countIcd9DB==-1) {
+							countIcd9DB=ICD9s.GetCodeCount();
+						}
+						if(countIcd9DB>countIcd9List) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "ICD10CM":
-						listt[i].IsInDb=icd10HS.Contains(listt[i].CodeValue);
+						if(countIcd10DB==-1) {
+							countIcd10DB=Icd10s.GetCodeCount();
+						}
+						if(countIcd10DB>countIcd10List) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "LOINC":
-						listt[i].IsInDb=loincHS.Contains(listt[i].CodeValue);
+						if(countLoincDB==-1) {
+							countLoincDB=Loincs.GetCodeCount();
+						}
+						if(countLoincDB>countLoincList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "RXNORM":
-						listt[i].IsInDb=rxnormHS.Contains(listt[i].CodeValue);
+						if(countRxNormDB==-1) {
+							countRxNormDB=RxNorms.GetCodeCount();
+						}
+						if(countRxNormDB>countRxNormList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "SNOMEDCT":
-						listt[i].IsInDb=snomedHS.Contains(listt[i].CodeValue);
+						if(countSnomedDB==-1) {
+							countSnomedDB=Snomeds.GetCodeCount();
+						}
+						if(countSnomedDB>countSnomedList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 					case "SOP":
-						listt[i].IsInDb=sopHS.Contains(listt[i].CodeValue);
+						if(countSopDB==-1) {
+							countSopDB=Sops.GetCodeCount();
+						}
+						if(countSopDB>countSopList) {
+							listt[i].IsInDb=true;
+						}
 						break;
 				}
 			}
@@ -105,7 +191,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void FillCache(DataTable table){
+		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
 			listt=Crud.EhrCodeCrud.TableToList(table);
 		}

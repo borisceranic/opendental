@@ -72,6 +72,15 @@ namespace OpenDentBusiness{
 			return Crud.ICD9Crud.SelectMany(command);
 		}
 
+		///<summary>Returns the total count of ICD9 codes.  ICD9 codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM icd9";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		///<summary>Directly from db.</summary>
 		public static bool CodeExists(string iCD9Code) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

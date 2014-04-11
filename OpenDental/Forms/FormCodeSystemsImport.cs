@@ -15,8 +15,10 @@ namespace OpenDental {
 	public partial class FormCodeSystemsImport:Form {
 		///<summary>All code systems available.</summary>
 		private List<CodeSystem> _listCodeSystems;
-		///<summary>Indicates if quarterly EHR key is valid. If true then SNOMED CT codes will be made available for download.</summary>
+		///<summary>Indicates if provider EHR key is valid. If true then SNOMED CT codes will be made available for download.</summary>
 		private bool _isMemberNation;
+		///<summary>Indicates if user has downloaded codes while in the window.</summary>
+		private bool _hasDownloaded;
 		///<summary>Track current status of each code system.</summary>
 		private Dictionary<string,string> _mapCodeSystemStatus=new Dictionary<string /*code system name*/,string /*status to be printed to grid*/>();
 		
@@ -43,11 +45,15 @@ namespace OpenDental {
 		///<summary>If there are still import threads running then prompt the user to see if they want to abort the imports prematurely.</summary>
 		private void FormCodeSystemsImport_FormClosing(object sender,FormClosingEventArgs e) {
 			if(!UpdateCodeSystemThread.IsRunning) { //All done, exit.
+				if(_hasDownloaded) {
+					DataValid.SetInvalid(InvalidType.EhrCodes);//Update in-memory list of codes for all other workstations
+				}
 				return;
 			}
 			if(MsgBox.Show("CodeSystemImporter",true,"Import in progress. Would you like to abort?")) {
 				//User wants abort the threads.
 				UpdateCodeSystemThread.StopAll();
+				_hasDownloaded=false;
 				return;
 			}
 			//User elected to continue waiting so cancel the Close event.
@@ -203,6 +209,7 @@ namespace OpenDental {
 				butDownload.Enabled=false;
 				butCheckUpdates.Enabled=false;
 			}
+			_hasDownloaded=true;
 			FillGrid();
 		}
 
