@@ -61,6 +61,15 @@ namespace OpenDentBusiness{
 			Crud.ProcedureCodeCrud.Update(code);
 		}
 
+		///<summary>Counts all procedure codes, including hidden codes.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM procedurecode";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		///<summary>Returns the ProcedureCode for the supplied procCode such as such as D####.</summary>
 		public static ProcedureCode GetProcCode(string myCode){
 			//No need to check RemotingRole; no call to db.

@@ -272,7 +272,9 @@ namespace OpenDentBusiness{
 		///<summary>55. Caches the wiki master page and the wikiListHeaderWidths</summary>
 		Wiki,
 		///<summary>56. SourceOfPayment</summary>
-		Sops
+		Sops,
+		///<summary>57. In-Memory table used for hard-coded codes and CQMs</summary>
+		EhrCodes
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

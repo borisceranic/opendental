@@ -71,6 +71,15 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Returns the total count of HCPCS codes.  HCPCS codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM hcpcs";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		///<summary>Returns the Hcpcs of the code passed in by looking in cache.  If code does not exist, returns null.</summary>
 		public static Hcpcs GetByCode(string hcpcsCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

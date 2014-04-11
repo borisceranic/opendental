@@ -70,6 +70,15 @@ namespace OpenDentBusiness{
 			}
 			return retVal;
 		}
+
+		///<summary>Returns the total number of ICD10 codes.  Some rows in the ICD10 table based on the IsCode column.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM icd10 AND IsCode!=0";
+			return PIn.Long(Db.GetCount(command));
+		}
 		
 		///<summary>Gets one ICD10 object directly from the database by CodeValue.  If code does not exist, returns null.</summary>
 		public static Icd10 GetByCode(string Icd10Code) {

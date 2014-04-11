@@ -69,6 +69,15 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Returns the count of all SOP codes.  SOP codes cannot be hidden.</summary>
+		public static long GetCodeCount() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM sop";
+			return PIn.Long(Db.GetCount(command));
+		}
+
 		///<summary>Returns an Sop description based on the given payor type info.</summary>
 		public static string GetDescriptionFromCode(string sopCode) {
 			string desc="";
