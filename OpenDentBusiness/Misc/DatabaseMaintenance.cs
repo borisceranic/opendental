@@ -20,7 +20,6 @@ namespace OpenDentBusiness {
 			return DatabaseMaintenance.success; 
 		}
 
-		[DbmMethod]
 		public static string MySQLTables(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -311,7 +310,7 @@ namespace OpenDentBusiness {
 
 		//Methods that apply to specific tables----------------------------------------------------------------------------------
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string AppointmentCompleteWithTpAttached(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -325,21 +324,23 @@ namespace OpenDentBusiness {
 				+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" "
 				+"ORDER BY PatName";
 			table=Db.GetTable(command);
-			//Both check and fix need to alert the user to fix manually.
 			if(table.Rows.Count>0 || verbose) {
-				log+=Lans.g("FormDatabaseMaintenance","Completed appointments with treatment planned procedures attached")+": "+table.Rows.Count
-					+", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
-				for(int i=0;i<table.Rows.Count;i++) {
-					if(i>10) {
-						break;
-					}
-					log+="   "+table.Rows[i]["PatNum"].ToString()
-					+"-"+table.Rows[i]["PatName"].ToString()
-					+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
-					log+="\r\n";
+				log+=Lans.g("FormDatabaseMaintenance","Completed appointments with treatment planned procedures attached")+": "+table.Rows.Count;
+				if(isCheck) {
+					log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 				}
-				if(table.Rows.Count>0) {
-					log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+				else if(table.Rows.Count>0) {//Only show complete list of items when running the fix.
+					log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+					for(int i=0;i<table.Rows.Count;i++) {
+						//We use to limit to ten results here.  Now we show all rows in our query result.
+						log+="   "+table.Rows[i]["PatNum"].ToString()
+							+"-"+table.Rows[i]["PatName"].ToString()
+							+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
+						log+="\r\n";
+					}
+					if(table.Rows.Count>0) {
+						log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+					}
 				}
 			}
 			return log;
@@ -4668,9 +4669,23 @@ HAVING cnt>1";
 	}
 
 	///<summary>An attribute that should get applied to any method that needs to show up in the main grid of FormDatabaseMaintenance.</summary>
-	[System.AttributeUsage(System.AttributeTargets.Method)]
+	[System.AttributeUsage(System.AttributeTargets.Method,AllowMultiple=false)]
 	public class DbmMethod:System.Attribute {
-		//Currently empty because we do not need any additional parameters or variables.  We simply need to know if a method should be shown in dbm grid or not.
+		private bool hasBreakDown;
+		///<summary>Set to true if this dbm method needs to be able to show the user a list or break down of items that need manual attention.</summary>
+		public bool HasBreakDown {
+			get {
+				return hasBreakDown;
+			}
+			set {
+				hasBreakDown=value;
+			}
+		}
+
+		public DbmMethod() {
+			this.hasBreakDown=false;
+		}
+
 	}
 
 

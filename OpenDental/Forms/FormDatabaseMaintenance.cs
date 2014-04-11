@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
 using System.Reflection;
+using CodeBase;
 
 namespace OpenDental {
 	/// <summary>
@@ -24,7 +25,6 @@ namespace OpenDental {
 		/// </summary>
 		private System.ComponentModel.Container components = null;
 		private System.Drawing.Printing.PrintDocument pd2;
-		private TextBox textLog;
 		private CheckBox checkShow;
 		private UI.Button butFix;
 		private GroupBox groupBox1;
@@ -52,6 +52,8 @@ namespace OpenDental {
 		private TextBox textBox2;
 		///<summary>This is a filtered list of methods from DatabaseMaintenance.cs that have the DbmMethod attribute.  This is used to populate gridMain.</summary>
 		private List<MethodInfo> _listDbmMethodsGrid;
+		///<summary>Holds the date and time of the last time a Check or Fix was run.  Only used for printing.</summary>
+		private DateTime _dateTimeLastRun;
 
 		///<summary></summary>
 		public FormDatabaseMaintenance() {
@@ -89,7 +91,6 @@ namespace OpenDental {
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.butCheck = new OpenDental.UI.Button();
 			this.pd2 = new System.Drawing.Printing.PrintDocument();
-			this.textLog = new System.Windows.Forms.TextBox();
 			this.checkShow = new System.Windows.Forms.CheckBox();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butFix = new OpenDental.UI.Button();
@@ -157,19 +158,6 @@ namespace OpenDental {
 			this.butCheck.TabIndex = 5;
 			this.butCheck.Text = "C&heck";
 			this.butCheck.Click += new System.EventHandler(this.butCheck_Click);
-			// 
-			// textLog
-			// 
-			this.textLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textLog.Location = new System.Drawing.Point(503, 596);
-			this.textLog.Multiline = true;
-			this.textLog.Name = "textLog";
-			this.textLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textLog.Size = new System.Drawing.Size(446, 39);
-			this.textLog.TabIndex = 14;
 			// 
 			// checkShow
 			// 
@@ -411,6 +399,7 @@ namespace OpenDental {
 			this.gridMain.TabIndex = 96;
 			this.gridMain.Title = "Database Checks";
 			this.gridMain.TranslationName = "TableClaimPaySplits";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// butNone
 			// 
@@ -453,7 +442,6 @@ namespace OpenDental {
 			this.Controls.Add(this.butFix);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.checkShow);
-			this.Controls.Add(this.textLog);
 			this.Controls.Add(this.butCheck);
 			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.butClose);
@@ -509,24 +497,21 @@ namespace OpenDental {
 			gridMain.EndUpdate();
 		}
 
-		private void butNone_Click(object sender,EventArgs e) {
-			gridMain.SetSelected(false);
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(!MethodHasBreakDown(_listDbmMethodsGrid[e.Row])) {
+				return;
+			}
+			//We know that this method supports giving the user a break down and shall call the method's fix section where the break down results should be.
+			//TODO: Make sure that DBM methods with break downs ALWAYS have the break down in the fix section.
+			object[] parameters=new object[] { checkShow.Checked,false };//break downs are ALWAYS in the fix section of the method.
+			string result=(string)_listDbmMethodsGrid[e.Row].Invoke(null,parameters);
+			//Show the result of the dbm method in a simple copy paste msg box.
+			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);
+			msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.
 		}
 
-		private void SaveLogToFile() {
-			string path=CodeBase.ODFileUtils.CombinePaths(Application.StartupPath,"RepairLog.txt");
-			try {
-				File.AppendAllText(path,textLog.Text);
-			}
-			catch(SecurityException) {
-				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
-			}
-			catch(UnauthorizedAccessException) {
-				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-			}
+		private void butNone_Click(object sender,EventArgs e) {
+			gridMain.SetSelected(false);
 		}
 
 		#region Database Tools
@@ -543,18 +528,20 @@ namespace OpenDental {
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			textLog.Text=DateTime.Now.ToString()+"\r\n";
+			string result=DateTime.Now.ToString()+"\r\n";
 			try {
 				DatabaseMaintenance.BackupRepairAndOptimize();
 			}
 			catch(Exception ex) {
 				if(ex.Message!="") {
-					textLog.Text+=ex.Message+"\r\n";
+					result+=ex.Message+"\r\n";
 				}
-				textLog.Text+=Lan.g("FormDatabaseMaintenance","Backup failed.  Your database has not been altered.")+"\r\n";
+				result+=Lan.g("FormDatabaseMaintenance","Backup failed.  Your database has not been altered.")+"\r\n";
 			}
-			textLog.Text+=Lan.g("FormDatabaseMaintenance","Optimization Done");
-			SaveLogToFile();
+			result+=Lan.g("FormDatabaseMaintenance","Optimization Done");
+			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);
+			msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.
+			SaveLogToFile(result);
 			Cursor=Cursors.Default;
 		}
 
@@ -646,13 +633,7 @@ namespace OpenDental {
 				MessageBox.Show("Wrong password.");
 				return;
 			}
-			StringBuilder strB=new StringBuilder();
-			strB.Append('-',65);
-			textLog.Text=DateTime.Now.ToString()+strB.ToString()+"\r\n";
-			Application.DoEvents();
 			DatabaseMaintenance.FixSpecialCharacters();
-			textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
-			Application.DoEvents();
 			MsgBox.Show(this,"Special Characters have been removed from Appointment Notes, Appointment Procedure Descriptions, Patient Address Notes, and Patient Family Financial Urgent Notes.  Invalid null characters have been removed from Adjustment Notes, Payment Notes, and Definition Names.");
 		}
 
@@ -680,8 +661,108 @@ namespace OpenDental {
 			form.ShowDialog();
 		}
 
+		private void Run(bool isCheck) {
+			Cursor=Cursors.WaitCursor;
+			//Clear out the result column for all rows before every "run"
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				gridMain.Rows[i].Cells[1].Text="";//Don't use UpdateResultTextForRow here because users will see the rows clearing out one by one.
+			}
+			bool verbose=checkShow.Checked;
+			StringBuilder logText=new StringBuilder();
+			string result=DatabaseMaintenance.MySQLTables(verbose,isCheck);
+			logText.Append(result);//No database maintenance checks should be run unless this passes.
+			if(!DatabaseMaintenance.GetSuccess()) {
+				Cursor=Cursors.Default;
+				MessageBox.Show(result);//Result is already translated.  Use normal message box to display.
+				return;
+			}
+			if(gridMain.SelectedIndices.Length < 1) {
+				//No rows are selected so the user wants to run all checks.
+				gridMain.SetSelected(true);
+			}
+			int[] selectedIndices=gridMain.SelectedIndices;
+			for(int i=0;i<selectedIndices.Length;i++) {
+				bool isCheckParam=isCheck;
+				//Check if the method supports giving a break down
+				if(MethodHasBreakDown(_listDbmMethodsGrid[selectedIndices[i]])) {
+					//This method supports break down, we must always call the fix when filling the grid regardless if they clicked Check or Fix.
+					//Double clicking on the row will take them to a new window which will call the fix aka the break down results.
+					isCheckParam=true;
+				}
+				object[] parameters=new object[] { verbose,isCheckParam };
+				gridMain.ScrollToIndexBottom(selectedIndices[i]);
+				UpdateResultTextForRow(selectedIndices[i],Lan.g("FormDatabaseMaintenance","Running")+"...");
+				result=(string)_listDbmMethodsGrid[selectedIndices[i]].Invoke(null,parameters);
+				string status="";
+				if(result=="") {//Only possible if running a check / fix in non-verbose mode and nothing happened or needs to happen.
+					status=Lan.g("FormDatabaseMaintenance","Done.  No maintenance needed.");
+				}
+				UpdateResultTextForRow(selectedIndices[i],result+status);
+				logText.Append(result);
+			}
+			gridMain.SetSelected(selectedIndices,true);//Reselect all rows that were originally selected.
+			SaveLogToFile(logText.ToString());
+			Cursor=Cursors.Default;
+		}
+
+		/// <summary>Updates the result column for the specified row in gridMain with the text passed in.</summary>
+		private void UpdateResultTextForRow(int index,string text) {
+			gridMain.BeginUpdate();
+			gridMain.Rows[index].Cells[1].Text=text;
+			gridMain.EndUpdate();
+			Application.DoEvents();
+		}
+
+		///<summary>Returns true if the method passed in supports break down.</summary>
+		private bool MethodHasBreakDown(MethodInfo method) {
+			object[] methAttr=method.GetCustomAttributes(typeof(DbmMethod),true);
+			for(int i=0;i<methAttr.Length;i++) {//Loop through all DbmMethod attributes associated with this method.  
+				//There should only be one DbmMethod but this loop will take care of the case where multiple attributes are allowed.
+				if(!((DbmMethod)methAttr[i]).HasBreakDown) {
+					return false;//One of the DbmMethod attributes indicates that this method does NOT support break down.
+				}
+			}
+			return true;
+		}
+
+		private void SaveLogToFile(string logText) {
+			StringBuilder strB=new StringBuilder();
+			strB.Append(DateTime.Now.ToString());
+			strB.Append('-',65);
+			strB.AppendLine();//New line.
+			strB.Append(logText);
+			strB.AppendLine(Lan.g("FormDatabaseMaintenance","Done"));
+			string path=CodeBase.ODFileUtils.CombinePaths(Application.StartupPath,"RepairLog.txt");
+			try {
+				File.AppendAllText(path,strB.ToString());
+			}
+			catch(SecurityException) {
+				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
+			}
+			catch(UnauthorizedAccessException) {
+				MsgBox.Show(this,"Log not saved to Repairlog.txt because user does not have permission to access that file.");
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+
 		private void butPrint_Click(object sender,EventArgs e) {
-			LogTextPrint=textLog.Text;
+			if(_dateTimeLastRun==DateTime.MinValue) {
+				_dateTimeLastRun=DateTime.Now;
+			}
+			StringBuilder strB=new StringBuilder();
+			strB.Append(_dateTimeLastRun.ToString());
+			strB.Append('-',65);
+			strB.AppendLine();//New line.
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				string resultText=gridMain.Rows[i].Cells[1].Text;
+				if(resultText!="" && resultText!=Lan.g("FormDatabaseMaintenance","Done.  No maintenance needed.")) {
+					strB.Append(resultText);
+				}
+			}
+			strB.AppendLine(Lan.g("FormDatabaseMaintenance","Done"));
+			LogTextPrint=strB.ToString();
 			pd2 = new PrintDocument();
 			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
 			pd2.DefaultPageSettings.Margins=new Margins(40,50,50,60);
@@ -706,279 +787,6 @@ namespace OpenDental {
 			ev.Graphics.DrawString(LogTextPrint,font,Brushes.Black,ev.MarginBounds,StringFormat.GenericTypographic);
 			LogTextPrint=LogTextPrint.Substring(charsOnPage);
 			ev.HasMorePages=(LogTextPrint.Length > 0);
-		}
-
-		private void Run(bool isCheck) {
-			Cursor=Cursors.WaitCursor;
-			if(gridMain.SelectedIndices.Length < 1) {
-				//No rows are selected so the user wants to run all checks.
-				gridMain.SetSelected(true);
-			}
-			int[] selectedIndices=gridMain.SelectedIndices;
-			object[] parameters=new object[]{ checkShow.Checked,isCheck };
-			for(int i=0;i<selectedIndices.Length;i++) {
-				gridMain.ScrollToIndexBottom(selectedIndices[i]);
-				UpdateResultTextForRow(selectedIndices[i],"Running...");
-				string result=(string)_listDbmMethodsGrid[selectedIndices[i]].Invoke(null,parameters);
-				UpdateResultTextForRow(selectedIndices[i],result);
-			}
-			gridMain.SetSelected(selectedIndices,true);//Reselect all rows that were originally selected.
-			Cursor=Cursors.Default;
-		}
-
-		/// <summary>Updates the result column for the specified row in gridMain with the text passed in.</summary>
-		private void UpdateResultTextForRow(int index,string text) {
-			gridMain.BeginUpdate();
-			gridMain.Rows[index].Cells[1].Text=text;
-			gridMain.EndUpdate();
-			Application.DoEvents();
-		}
-
-		private void Run_old(bool isCheck) {
-			Cursor=Cursors.WaitCursor;
-			bool verbose=checkShow.Checked;
-			StringBuilder strB=new StringBuilder();
-			strB.Append('-',65);
-			textLog.Text=DateTime.Now.ToString()+strB.ToString()+"\r\n";
-			Application.DoEvents();
-			//#if DEBUG
-			//      textLog.Text+=DatabaseMaintenance.AppointmentSpecialCharactersInNotes(verbose,isCheck);
-			//      Application.DoEvents();
-			//      textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
-			//      SaveLogToFile();
-			//      Cursor=Cursors.Default;
-			//      return;
-			//#endif
-			textLog.Text+=DatabaseMaintenance.MySQLTables(verbose,isCheck);
-			if(!DatabaseMaintenance.GetSuccess()) {
-				Cursor=Cursors.Default;
-				return;
-			}
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.DatesNoZeros(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.DecimalValues(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SpecialCharactersInNotes(verbose,isCheck);
-			Application.DoEvents();
-			//Now, methods that apply to specific tables----------------------------------------------------------------------------
-			textLog.Text+=DatabaseMaintenance.AppointmentCompleteWithTpAttached(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppointmentsNoPattern(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppointmentsNoDateOrProcs(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppointmentsNoPatients(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppoitmentNoteTooManyNewLines(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppointmentPlannedNoPlannedApt(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AppointmentScheduledWithCompletedProcs(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AutoCodeItemsWithNoAutoCode(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AutoCodesDeleteWithNoItems(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.AutomationTriggersWithNoSheetDefs(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.BillingTypesInvalid(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.CanadaCarriersCdaMissingInfo(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimDeleteWithNoClaimProcs(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimWithInvalidInsSubNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimWithInvalidPatNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimWriteoffSum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimPaymentCheckAmt(verbose,isCheck);//also fixes resulting deposit misbalances.
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimPaymentDetachMissingDeposit(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDateNotMatchCapComplete(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDateNotMatchPayment(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcWithInvalidClaimNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDeleteDuplicateEstimateForSameInsPlan(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDeleteWithInvalidClaimNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDeleteMismatchPatNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDeleteEstimateWithInvalidProcNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcDeleteCapEstimateWithProcComplete(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcEstNoBillIns(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcEstWithInsPaidAmt(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcPatNumMissing(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcProvNumMissing(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcPreauthNotMatchClaim(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcStatusNotMatchClaim(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcWithInvalidClaimPaymentNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClaimProcWriteOffNegative(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ClockEventInFuture(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.DocumentWithNoCategory(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.EduResourceInvalidDiseaseDefNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.FeeDeleteDuplicates(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.GroupNoteWithInvalidAptNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.GroupNoteWithInvalidProcStatus(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.InsPlanInvalidCarrier(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.InsPlanNoClaimForm(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.InsPlanInvalidNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.InsSubInvalidSubscriber(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.InsSubNumMismatchPlanNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.JournalEntryInvalidAccountNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.LabCaseWithInvalidLaboratory(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.LaboratoryWithInvalidSlip(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.MedicationPatDeleteWithInvalidMedNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.MessageButtonDuplicateButtonIndex(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatFieldsDeleteDuplicates(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientBadGuarantor(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientBadGuarantorWithAnotherGuarantor(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientDeletedWithClinicNumSet(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientsNoClinicSet(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientPriProvHidden(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientPriProvMissing(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatientUnDeleteWithBalance(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatPlanDeleteWithInvalidInsSubNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatPlanDeleteWithInvalidPatNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatPlanOrdinalDuplicates(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatPlanOrdinalZeroToOne(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PatPlanOrdinalTwoToOne(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PaymentDetachMissingDeposit(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PaymentMissingPaySplit(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PayPlanChargeGuarantorMatch(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PayPlanChargeProvNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PayPlanSetGuarantorToPatForIns(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PaySplitWithInvalidPayNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PaySplitWithInvalidPayPlanNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PaySplitAttachedToPayPlan(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PerioMeasureWithInvalidIntTooth(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferenceAllergiesIndicateNone(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferenceDateDepositsStarted(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferenceMedicationsIndicateNone(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferenceProblemsIndicateNone(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferenceTimeCardOvertimeFirstDayOfWeek(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.PreferencePracticeProv(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcButtonItemsDeleteWithInvalidAutoCode(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurecodeCategoryNotSet(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogAttachedToApptWithProcStatusDeleted(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogAttachedToWrongAppts(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogAttachedToWrongApptDate(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogBaseUnitsZero(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogCodeNumInvalid(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogLabAttachedToDeletedProc(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogProvNumMissing(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogToothNums(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogTpAttachedToClaim(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogTpAttachedToCompleteLabFeesCanada(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProcedurelogUnitQtyZero(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProviderHiddenWithClaimPayments(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.ProviderWithInvalidFeeSched(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.RecallDuplicatesWarn(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.RecallTriggerDeleteBadCodeNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.RefAttachDeleteWithInvalidReferral(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SchedulesBlockoutStopBeforeStart(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SchedulesDeleteHiddenProviders(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SchedulesDeleteShort(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SchedulesDeleteProvClosed(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.SignalInFuture(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.StatementDateRangeMax(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.TaskSubscriptionsInvalid(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.TimeCardRuleEmployeeNumInvalid(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.UserodDuplicateUser(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.UserodInvalidClinicNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=DatabaseMaintenance.UserodInvalidUserGroupNum(verbose,isCheck);
-			Application.DoEvents();
-			textLog.Text+=Lan.g("FormDatabaseMaintenance","Done");
-			SaveLogToFile();
-			Cursor=Cursors.Default;
 		}
 
 		private void butCheck_Click(object sender,System.EventArgs e) {
