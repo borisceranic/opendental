@@ -67,6 +67,16 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Get all matching rows where input email is found in the Email column.</summary>
+		public static List<Referral> GetEmailMatch(string email) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Referral>>(MethodBase.GetCurrentMethod(),email);
+			}
+			string command= "SELECT * FROM referral "
+				+"WHERE IsDoctor=1 AND UPPER(EMail) LIKE '%"+email.ToUpper()+"%'";
+			return Crud.ReferralCrud.SelectMany(command);
+		}
+
 		private static Referral GetFromList(long referralNum) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<List.Length;i++) {
