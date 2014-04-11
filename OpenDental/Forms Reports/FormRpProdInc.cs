@@ -1136,6 +1136,8 @@ Group By procdate Order by procdate desc
 				}
 				whereClin+=") ";
 			}
+			//==Travis (04/11/2014): In the case that you have two capitation plans for a single patient the query below will cause a duplicate row, incorectly increasing your production.
+			//	We now state in the manual that having two capitation plans is not advised and will cause reporting to be off.
 			report.Query="SELECT "+DbHelper.DateColumn("procedurelog.ProcDate")+" ProcDate, "
 				+"SUM(procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)) "
 				+"-IFNULL(SUM(claimproc.WriteOff),0) "
@@ -1658,6 +1660,8 @@ ORDER BY adjdate DESC
 				}
 				whereClin+=") ";
 			}
+			//==Travis (04/11/2014): In the case that you have two capitation plans for a single patient the query below will cause a duplicate row, incorectly increasing your production.
+			//	We now state in the manual that having two capitation plans is not advised and will cause reporting to be off.
 			report.Query="SELECT "
 				+"procedurelog.ProcDate,"
 				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0) "
