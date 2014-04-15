@@ -29,12 +29,10 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.label6 = new System.Windows.Forms.Label();
-			this.labelDatabaseOutOfSynch = new System.Windows.Forms.Label();
-			this.labelLocalOutOfSynch = new System.Windows.Forms.Label();
-			this.labelAllSynched = new System.Windows.Forms.Label();
+			this.label7 = new System.Windows.Forms.Label();
+			this.textMessage = new OpenDental.ODtextBox();
 			this.textLocalTime = new OpenDental.ODtextBox();
 			this.textServerTime = new OpenDental.ODtextBox();
 			this.textNistTime = new OpenDental.ODtextBox();
@@ -79,14 +77,6 @@ namespace OpenDental{
 			this.label4.Text = "Local machine";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label5
-			// 
-			this.label5.Location = new System.Drawing.Point(28, 209);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(374, 111);
-			this.label5.TabIndex = 85;
-			this.label5.Text = resources.GetString("label5.Text");
-			// 
 			// timer1
 			// 
 			this.timer1.Interval = 4000;
@@ -100,35 +90,31 @@ namespace OpenDental{
 			this.label6.TabIndex = 87;
 			this.label6.Text = resources.GetString("label6.Text");
 			// 
-			// labelDatabaseOutOfSynch
+			// label7
 			// 
-			this.labelDatabaseOutOfSynch.ForeColor = System.Drawing.Color.DarkRed;
-			this.labelDatabaseOutOfSynch.Location = new System.Drawing.Point(309, 134);
-			this.labelDatabaseOutOfSynch.Name = "labelDatabaseOutOfSynch";
-			this.labelDatabaseOutOfSynch.Size = new System.Drawing.Size(187, 19);
-			this.labelDatabaseOutOfSynch.TabIndex = 88;
-			this.labelDatabaseOutOfSynch.Text = "Database time out of synch with local";
-			this.labelDatabaseOutOfSynch.Visible = false;
+			this.label7.Location = new System.Drawing.Point(28, 182);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(103, 20);
+			this.label7.TabIndex = 92;
+			this.label7.Text = "Message";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// labelLocalOutOfSynch
+			// textMessage
 			// 
-			this.labelLocalOutOfSynch.ForeColor = System.Drawing.Color.DarkRed;
-			this.labelLocalOutOfSynch.Location = new System.Drawing.Point(326, 160);
-			this.labelLocalOutOfSynch.Name = "labelLocalOutOfSynch";
-			this.labelLocalOutOfSynch.Size = new System.Drawing.Size(187, 19);
-			this.labelLocalOutOfSynch.TabIndex = 89;
-			this.labelLocalOutOfSynch.Text = "Local time out of synch with NIST";
-			this.labelLocalOutOfSynch.Visible = false;
-			// 
-			// labelAllSynched
-			// 
-			this.labelAllSynched.ForeColor = System.Drawing.Color.DarkRed;
-			this.labelAllSynched.Location = new System.Drawing.Point(294, 108);
-			this.labelAllSynched.Name = "labelAllSynched";
-			this.labelAllSynched.Size = new System.Drawing.Size(200, 19);
-			this.labelAllSynched.TabIndex = 90;
-			this.labelAllSynched.Text = "All times synchronized within one second";
-			this.labelAllSynched.Visible = false;
+			this.textMessage.AcceptsTab = true;
+			this.textMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textMessage.DetectUrls = false;
+			this.textMessage.ForeColor = System.Drawing.Color.DarkRed;
+			this.textMessage.Location = new System.Drawing.Point(137, 182);
+			this.textMessage.Name = "textMessage";
+			this.textMessage.QuickPasteType = OpenDentBusiness.QuickPasteType.MedicationEdit;
+			this.textMessage.ReadOnly = true;
+			this.textMessage.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textMessage.Size = new System.Drawing.Size(255, 84);
+			this.textMessage.TabIndex = 91;
+			this.textMessage.Text = "";
 			// 
 			// textLocalTime
 			// 
@@ -207,7 +193,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(438, 291);
+			this.butClose.Location = new System.Drawing.Point(438, 242);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -217,10 +203,9 @@ namespace OpenDental{
 			// FormEhrTimeSynch
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(538, 342);
-			this.Controls.Add(this.labelAllSynched);
-			this.Controls.Add(this.labelLocalOutOfSynch);
-			this.Controls.Add(this.labelDatabaseOutOfSynch);
+			this.ClientSize = new System.Drawing.Size(538, 293);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.textMessage);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
@@ -232,7 +217,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butRefreshTime);
 			this.Controls.Add(this.textNistUrl);
 			this.Controls.Add(this.butClose);
-			this.Controls.Add(this.label5);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrTimeSynch";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -254,11 +238,9 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Label labelDatabaseOutOfSynch;
-		private System.Windows.Forms.Label labelLocalOutOfSynch;
-		private System.Windows.Forms.Label labelAllSynched;
+		private ODtextBox textMessage;
+		private System.Windows.Forms.Label label7;
 	}
 }
