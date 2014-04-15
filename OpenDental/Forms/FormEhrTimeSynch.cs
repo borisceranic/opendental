@@ -37,7 +37,7 @@ namespace OpenDental {
 			textNistUrl.Text=PrefC.GetString(PrefName.NistTimeServerUrl);
 			double nistOffset=GetNistOffset();
 			if(nistOffset==double.MaxValue) { //Timed out
-				MsgBox.Show(this,"No response received from NIST time server.  Click refresh time after four seconds.");
+				MsgBox.Show(this,"No response received from NIST time server.  Click synch time after four seconds.");
 				this.Cursor=Cursors.Default;
 				return false;
 			}
@@ -161,9 +161,7 @@ namespace OpenDental {
 				textLocalTime.Text="";
 				textNistTime.Text="";
 				textServerTime.Text="";
-				labelDatabaseOutOfSynch.Visible=false;
-				labelLocalOutOfSynch.Visible=false;
-				labelAllSynched.Visible=false;
+				textMessage.Text="";
 				return;
 			}
 			textNistTime.Text=_timeNist.ToString("hh:mm:ss.fff tt");
@@ -171,14 +169,15 @@ namespace OpenDental {
 			textLocalTime.Text=_timeLocal.ToString("hh:mm:ss.fff tt");
 			//Update NistURL preference
 			Prefs.UpdateString(PrefName.NistTimeServerUrl,textNistUrl.Text);
-			//Display labels if out of synch.
-			labelDatabaseOutOfSynch.Visible=!ServerInSynch();
-			labelLocalOutOfSynch.Visible=!LocalInSynch();
-			if(labelDatabaseOutOfSynch.Visible || labelLocalOutOfSynch.Visible) {
-				labelAllSynched.Visible=false;
+			//Update message textbox
+			if(!LocalInSynch()) { //This should not happen, time is updated automatically. If you get to this point, you should have already had a message box pop up saying there was an error updating your local time.
+				textMessage.Text="Your local machine time is out of synch.  Please ensure Open Dental is running with Administrator Windows privileges.  If you have done this and you still see this message, please call Open Dental support.";
 			}
-			else {
-				labelAllSynched.Visible=true; //All times in synch
+			else if(!ServerInSynch()) {
+				textMessage.Text="Your database time is out of synch with your local machine.  Please start the Open Dental application on your database server and leave it running to keep times synchronized as required for EHR compliance.  If you have done this and you still see this message, please call Open Dental support.";
+			}
+			else {//All times in synch
+				textMessage.Text="All times synchronized within one second.  You may close this window.";
 			}
 		}
 
