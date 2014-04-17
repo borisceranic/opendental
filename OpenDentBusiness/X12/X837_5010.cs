@@ -451,10 +451,10 @@ namespace OpenDentBusiness
 				//In 4010s, at the request of Emdeon, we always include N3,N4,and DMG even if patient is not subscriber.  This did not make the transaction non-compliant, and they found it useful.
 				//In 5010s, we will follow the X12 specification for most clearinghouses and only include subsc address when subscriber=patient.
 				//But for any clearinghouse who requests it, we will always include, [js 3/14/13 even when subscriber!=patient].  List them here:
-				//ClaimConnect, EmdeonMed, EmdeonDent, LindsayTechnicalConsultants, OfficeAlly: Always include.
+				//Apex, ClaimConnect, EmdeonMed, EmdeonDent, LindsayTechnicalConsultants, OfficeAlly: Always include.
 				//PostNTrack, BCBSIdaho: Only include when subscriber=patient.
 				bool subscIncludeAddressAndGender=false;
-				if(IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse) || IsEmdeonMedical(clearhouse) || IsLindsayTechnicalConsultants(clearhouse) || IsOfficeAlly(clearhouse)) {
+				if(IsApex(clearhouse) || IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse) || IsEmdeonMedical(clearhouse) || IsLindsayTechnicalConsultants(clearhouse) || IsOfficeAlly(clearhouse)) {
 					subscIncludeAddressAndGender=true;
 				}
 				else {//X12 standard behavior for everyone else, including: BCBSIdaho, ColoradoMedicaid, Denti-Cal, PostNTrack, WashingtonMedicaid.
