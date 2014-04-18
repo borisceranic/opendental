@@ -1695,23 +1695,12 @@ Procedures
 				End("thead");
 				Start("tbody");
 				for(int i=0;i<listProcsFiltered.Count;i++) {
-					ProcedureCode procCode;
-					Snomed bodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);
-					Snomed procCodeSnomed;
-					if(listProcsFiltered[i].CodeNum==0) {
-						procCode=new ProcedureCode();
-						procCodeSnomed=new Snomed();
-					}
-					else {
-						procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
-						procCodeSnomed=Snomeds.GetByCode(procCode.ProcCode);
-					}
-					if(procCodeSnomed==null) {
-						procCodeSnomed=new Snomed();
-					}
+					ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
+					Snomed snomedCode=Snomeds.GetByCode(procCode.SnomedCode);//snomedCode can be null if procCode.SnomedCode is blank or invalid.
+					Snomed bodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);//snomedBodySite can be null if procCode.SnomedBodySite is blank or invalid.
 					Start("tr");
-					if(!String.IsNullOrEmpty(procCodeSnomed.SnomedCode)) {
-						_w.WriteElementString("td",procCodeSnomed.SnomedCode+" - "+procCode.Descript);
+					if(snomedCode!=null) {
+						_w.WriteElementString("td",snomedCode.SnomedCode+" - "+snomedCode.Description);
 					}
 					else if(!String.IsNullOrEmpty(procCode.MedicalCode)) {
 						_w.WriteElementString("td",procCode.MedicalCode+" - "+procCode.Descript);
@@ -1719,7 +1708,7 @@ Procedures
 					else {
 						_w.WriteElementString("td","");
 					}
-					if(bodySite==null || String.IsNullOrEmpty(bodySite.SnomedCode)) {
+					if(bodySite==null) {
 						_w.WriteElementString("td","");
 					}
 					else {
@@ -1745,19 +1734,8 @@ Procedures
 				listProcsFiltered.Add(proc);
 			}
 			for(int i=0;i<listProcsFiltered.Count;i++) {
-				ProcedureCode procCode;
-				Snomed procCodeSnomed;
-				if(listProcsFiltered[i].CodeNum==0) {
-					procCode=new ProcedureCode();
-					procCodeSnomed=new Snomed();
-				}
-				else {
-					procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
-					procCodeSnomed=Snomeds.GetByCode(procCode.ProcCode);
-				}
-				if(procCodeSnomed==null) {
-					procCodeSnomed=new Snomed();
-				}
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
+				Snomed snomedCode=Snomeds.GetByCode(procCode.SnomedCode);//snomedCode can be null if procCode.SnomedCode is blank or invalid.
 				Start("entry","typeCode","DRIV");
 				Start("procedure","classCode","PROC","moodCode","EVN");
 				TemplateId("2.16.840.1.113883.10.20.22.4.14");//Procedure Activity Section (Page 487).
@@ -1766,9 +1744,8 @@ Procedures
 				//"This code in a procedure activity SHOULD be selected from LOINC (codeSystem 2.16.840.1.113883.6.1) or SNOMED CT (CodeSystem: 2.16.840.1.113883.6.96),
 				//and MAY be selected from CPT-4 (CodeSystem: 2.16.840.1.113883.6.12), ICD9 Procedures (CodeSystem: 2.16.840.1.113883.6.104),
 				//ICD10 Procedure Coding System (CodeSystem: 2.16.840.1.113883.6.4) (CONF:7657)."
-				//We already have a place for CPT codes, and that is ProcedureCode.MedicalCode. We will simply use this field for now.
-				if(!String.IsNullOrEmpty(procCodeSnomed.SnomedCode)) {
-					StartAndEnd("code","code",procCodeSnomed.SnomedCode,"codeSystem",strCodeSystemSnomed,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameSnomed);
+				if(snomedCode!=null) {
+					StartAndEnd("code","code",snomedCode.SnomedCode,"codeSystem",strCodeSystemSnomed,"displayName",snomedCode.Description,"codeSystemName",strCodeSystemNameSnomed);
 				}
 				else if(!String.IsNullOrEmpty(procCode.MedicalCode)) {
 					StartAndEnd("code","code",procCode.MedicalCode,"codeSystem",strCodeSystemCpt4,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameCpt4);
