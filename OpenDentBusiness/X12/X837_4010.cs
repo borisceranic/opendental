@@ -1776,7 +1776,7 @@ namespace OpenDentBusiness {
 					}
 					strb.Append("Other Insurance Carrier State(2 char)");
 				}
-				if(carrier2.Zip.Trim().Length<3) {
+				if(!Regex.IsMatch(carrier2.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 					if(strb.Length!=0) {
 						strb.Append(",");
 					}
@@ -1844,7 +1844,7 @@ namespace OpenDentBusiness {
 				}
 				strb.Append("Patient State");
 			}
-			if(patient.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(patient.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				if(strb.Length!=0) {
 					strb.Append(",");
 				}

@@ -2453,9 +2453,9 @@ namespace OpenDentBusiness
 				}
 			}
 			if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
-				X12Validate.BillingAddress(strb);
+				X12Validate.BillingAddress(strb);//Tests for 5 or 9 digit zip.
 				string zip=PrefC.GetString(PrefName.PracticeBillingZip);
-				if(!Regex.IsMatch(zip,"^[0-9]{5}\\-?[0-9]{4}$")) {
+				if(Regex.IsMatch(zip,"^[0-9]{5}\\-?$")) {//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
 					Comma(strb);
 					strb.Append("Practice billing zip must contain nine digits");//this is more restrictive than in the check above.
 				}
@@ -2465,9 +2465,9 @@ namespace OpenDentBusiness
 				}
 			}
 			else if(clinic==null) {
-				X12Validate.PracticeAddress(strb);
+				X12Validate.PracticeAddress(strb);//Tests for 5 or 9 digit zip.
 				string zip=PrefC.GetString(PrefName.PracticeZip);
-				if(!Regex.IsMatch(zip,"^[0-9]{5}\\-?[0-9]{4}$")) {
+				if(Regex.IsMatch(zip,"^[0-9]{5}\\-?$")) {//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
 					Comma(strb);
 					strb.Append("Practice zip must contain nine digits");
 				}
@@ -2477,9 +2477,9 @@ namespace OpenDentBusiness
 				}
 			}
 			else {
-				X12Validate.Clinic(clinic,strb);
+				X12Validate.Clinic(clinic,strb);//Tests for 5 or 9 digit zip.
 				string zip=clinic.Zip;
-				if(!Regex.IsMatch(zip,"^[0-9]{5}\\-?[0-9]{4}$")) {
+				if(Regex.IsMatch(zip,"^[0-9]{5}\\-?$")) {//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
 					Comma(strb);
 					strb.Append("Clinic zip must contain nine digits");
 				}
@@ -2527,15 +2527,6 @@ namespace OpenDentBusiness
 			if(PrefC.GetString(PrefName.PracticeTitle)=="") {
 				Comma(strb);
 				strb.Append("Practice Title");
-			}
-			if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
-				X12Validate.BillingAddress(strb);
-			}
-			else if(clinic==null) {
-				X12Validate.PracticeAddress(strb);
-			}
-			else {
-				X12Validate.Clinic(clinic,strb);
 			}
 			if(!sub.ReleaseInfo) {
 				Comma(strb);
@@ -2601,7 +2592,7 @@ namespace OpenDentBusiness
 					Comma(strb);
 					strb.Append("Other Insurance Carrier State(2 char)");
 				}
-				if(carrier2.Zip.Trim().Length<3) {
+				if(!Regex.IsMatch(carrier2.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 					Comma(strb);
 					strb.Append("Other Insurance Carrier Zip");
 				}
@@ -2661,7 +2652,7 @@ namespace OpenDentBusiness
 				Comma(strb);
 				strb.Append("Patient State");
 			}
-			if(patient.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(patient.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Patient Zip");
 			}

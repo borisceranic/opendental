@@ -59,7 +59,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Carrier State(2 char)");
 			}
-			if(carrier.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(carrier.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Carrier Zip");
 			}
@@ -117,7 +117,7 @@ namespace OpenDentBusiness {
 
 		public static void PracticeAddress(StringBuilder strb) {
 			if(PrefC.GetString(PrefName.PracticePhone).Length!=10) {
-				//10 digit phone is required by WebMD and is universally assumed 
+				//10 digit phone is required by WebMD (Emdeon Dental) and is universally assumed
 				Comma(strb);
 				strb.Append("Practice Phone");
 			}
@@ -133,7 +133,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Practice State(2 char)");
 			}
-			if(PrefC.GetString(PrefName.PracticeZip).Trim().Length<3) {
+			if(!Regex.IsMatch(PrefC.GetString(PrefName.PracticeZip).Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Practice Zip");
 			}
@@ -157,7 +157,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Billing State(2 char)");
 			}
-			if(PrefC.GetString(PrefName.PracticeBillingZip).Trim().Length<3) {
+			if(!Regex.IsMatch(PrefC.GetString(PrefName.PracticeBillingZip).Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Billing Zip");
 			}
@@ -182,7 +182,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Clinic State(2 char)");
 			}
-			if(clinic.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(clinic.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Clinic Zip");
 			}
@@ -202,7 +202,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Subscriber State");
 			}
-			if(subscriber.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(subscriber.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Subscriber Zip");
 			}
@@ -222,7 +222,7 @@ namespace OpenDentBusiness {
 				Comma(strb);
 				strb.Append("Secondary Subscriber State");
 			}
-			if(subscriber2.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(subscriber2.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
 				strb.Append("Secondary Subscriber Zip");
 			}
