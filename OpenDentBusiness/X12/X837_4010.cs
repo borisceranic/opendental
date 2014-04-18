@@ -1842,7 +1842,7 @@ namespace OpenDentBusiness
 				}
 				strb.Append("Patient State");
 			}
-			if(patient.Zip.Trim().Length<3) {
+			if(!Regex.IsMatch(patient.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				if(strb.Length!=0) {
 					strb.Append(",");
 				}
