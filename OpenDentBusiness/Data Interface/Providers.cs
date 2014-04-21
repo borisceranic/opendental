@@ -51,6 +51,15 @@ namespace OpenDentBusiness{
 			return Crud.ProviderCrud.Insert(provider);
 		}
 
+		/// <summary>This checks for the maximum number of provnum in the database and then returns the one directly after.  Not guaranteed to be a unique primary key.</summary>
+		public static long GetNextAvailableProvNum() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT MAX(provNum) FROM provider";
+			return PIn.Long(Db.GetScalar(command))+1;
+		}
+
 		///<summary>Increments all (privider.ItemOrder)s that are >= the ItemOrder of the provider passed in 
 		///but does not change the item order of the provider passed in.</summary>
 		public static void MoveDownBelow(Provider provider) {
@@ -108,7 +117,11 @@ namespace OpenDentBusiness{
 				command+="AND provider.LName LIKE '%"+POut.String(lastName)+"%' ";
 			}
 			if(!selectAll) {
+				command+="AND username IS NOT NULL ";
 				command+="AND provider.IsInstructor="+POut.Bool(selectInstructors)+" ";
+				if(!selectInstructors) {
+					command+="AND provider.SchoolClassNum!=0 ";
+				}
 			}
 			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript "
 				+"ORDER BY LName,FName";
@@ -313,6 +326,16 @@ namespace OpenDentBusiness{
 			return -1;
 		}
 
+		public static List<Userod> GetAttachedUsers(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Userod>>(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT userod.* FROM userod,provider "
+					+"WHERE userod.ProvNum=provider.ProvNum "
+					+"AND provider.provNum="+POut.Long(provNum);
+			return Crud.UserodCrud.SelectMany(command);
+		}
+
 		///<summary>If useClinic, then clinicInsBillingProv will be used.  Otherwise, the pref for the practice.  Either way, there are three different choices for getting the billing provider.  One of the three is to use the treating provider, so supply that as an argument.  It will return a valid provNum unless the supplied treatProv was invalid.</summary>
 		public static long GetBillingProvNum(long treatProv,long clinicNum) {//,bool useClinic,int clinicInsBillingProv){
 			//No need to check RemotingRole; no call to db.
@@ -501,6 +524,19 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		public static bool IsAttachedToUser(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT COUNT(*) FROM userod,provider "
+					+"WHERE userod.ProvNum=provider.ProvNum "
+					+"AND provider.provNum="+POut.Long(provNum);
+			int count=PIn.Int(Db.GetCount(command));
+			if(count>0) {
+				return true;
+			}
+			return false;
+		}
 
 
 	}

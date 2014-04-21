@@ -323,7 +323,13 @@ namespace OpenDentBusiness {
 			if(usertype=="stu" || usertype=="inst") {
 				command="SELECT userod.* FROM userod,provider "
 					+"WHERE userod.ProvNum=provider.ProvNum "
-					+"AND provider.IsInstructor="+usertype=="inst"?"1 ":"0 ";
+					+"AND provider.IsInstructor=";
+				if(usertype=="inst") {
+					command+="1 ";
+				}
+				else {
+					command+="0 ";
+				}
 				if(usertype=="stu" && schoolClassNum>0) {
 					command+="AND SchoolClassNum="+POut.Long(schoolClassNum)+" ";
 				}
@@ -347,8 +353,37 @@ namespace OpenDentBusiness {
 			return Crud.UserodCrud.SelectMany(command);
 		}
 
+		///<summary>Updates all students/instructors to the specified user group.  Surround with try/catch because it can throw exceptions.</summary>
+		public static void UpdateUserGroupsForDentalSchools(UserGroup userGroup,bool isInstructor) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),userGroup,isInstructor);
+				return;
+			}
+			string command;
+			//Check if the user group that the students or instructors are trying to go to has the SecurityAdmin permission.
+			if(!GroupPermissions.HasPermission(userGroup.UserGroupNum,Permissions.SecurityAdmin)) {
+				//We need to make sure that moving these users to the new user group does not eliminate all SecurityAdmin users in db.
+				command="SELECT COUNT(*) FROM userod "
+					+"INNER JOIN usergroup ON userod.UserGroupNum=usergroup.UserGroupNum "
+					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
+					+"WHERE userod.UserNum NOT IN "
+					+"(SELECT userod.UserNum FROM userod,provider "
+						+"WHERE userod.ProvNum=provider.ProvNum "
+						+"AND provider.IsInstructor="+POut.Bool(isInstructor)+") "
+					+"AND grouppermission.PermType="+POut.Int((int)Permissions.SecurityAdmin)+" ";
+				int lastAdmin=PIn.Int(Db.GetCount(command));
+				if(lastAdmin==0) {
+					throw new Exception("Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.");
+				}
+			}
+			command="UPDATE userod INNER JOIN provider ON userod.ProvNum=provider.ProvNum "
+					+"SET UserGroupNum="+POut.Long(userGroup.UserGroupNum)+" "
+					+"WHERE provider.IsInstructor="+POut.Bool(isInstructor);
+			Db.NonQ(command);
+		}
+
 		///<summary>Surround with try/catch because it can throw exceptions.</summary>
-		public static void Update(Userod userod){
+		public static void Update(Userod userod) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),userod);
 				return;

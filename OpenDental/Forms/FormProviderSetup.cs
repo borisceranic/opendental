@@ -576,36 +576,70 @@ namespace OpenDental{
 		}
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
-			FormProvEdit FormP=new FormProvEdit();
-			FormP.ProvCur=new Provider();
+			FormProvEdit FormPE=new FormProvEdit();
+			FormPE.ProvCur=new Provider();
+			FormPE.ProvCur.IsNew=true;
+			FormProvStudentEdit FormPSE=new FormProvStudentEdit();
+			FormPSE.ProvStudent=new Provider();
+			FormPSE.ProvStudent.IsNew=true;
+			Provider provCur=new Provider();
 			if(groupDentalSchools.Visible) {
-				//don't worry about orders.
+				//Dental schools do not worry about item orders.
+				if(radioStudents.Checked) {
+					if(!Security.IsAuthorized(Permissions.AdminDentalStudents)) {
+						return;
+					}
+					if(comboClass.SelectedIndex==0) {
+						MsgBox.Show(this,"A class must be selected from the drop down box before a new student can be created");
+						return;
+					}
+					FormPSE.ProvStudent.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
+				}
+				if(radioInstructors.Checked && !Security.IsAuthorized(Permissions.AdminDentalInstructors)) {
+					return;
+				}
+				FormPE.ProvCur.IsInstructor=radioInstructors.Checked;
 			}
-			else {
+			else {//Not using Dental Schools feature.
 				Cache.Refresh(InvalidType.Providers);//Refresh the cache to get current information for the item orders
 				if(gridMain.SelectedIndices.Length>0) {//place new provider after the first selected index. No changes are made to DB until after provider is actually inserted.
-					FormP.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString())).ItemOrder;//now two with this itemorder
+					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString())).ItemOrder;//now two with this itemorder
 				}
 				else {
-					FormP.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.Rows.Count-1]["ProvNum"].ToString())).ItemOrder;
+					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.Rows.Count-1]["ProvNum"].ToString())).ItemOrder;
 				}
 			}
-			if(groupDentalSchools.Visible && comboClass.SelectedIndex>0){
-				FormP.ProvCur.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
+			if(!radioStudents.Checked) {
+				if(radioInstructors.Checked && PrefC.GetLong(PrefName.SecurityGroupForInstructors)==0) {
+					MsgBox.Show(this,"Security Group for Instructors must be set from the Dental School Setup window before adding instructors.");
+					return;
+				}
+				FormPE.IsNew=true;
+				FormPE.ShowDialog();
+				if(FormPE.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				provCur=FormPE.ProvCur;
 			}
-			FormP.IsNew=true;
-			FormP.ShowDialog();
-			if(FormP.DialogResult!=DialogResult.OK){
-				return;
+			else {
+				if(radioStudents.Checked && PrefC.GetLong(PrefName.SecurityGroupForStudents)==0) {
+					MsgBox.Show(this,"Security Group for Students must be set from the Dental School Setup window before adding students.");
+					return;
+				}
+				FormPSE.ShowDialog();
+				if(FormPSE.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				provCur=FormPSE.ProvStudent;
 			}
-			//new provider has already been inserted into DB from FormP.
-			Providers.MoveDownBelow(FormP.ProvCur);//safe to run even if none selected.
+			//new provider has already been inserted into DB from above
+			Providers.MoveDownBelow(provCur);//safe to run even if none selected.
 			changed=true;
 			Cache.Refresh(InvalidType.Providers);//This refresh may be unnecessary, but it is here for safety reasons
 			FillGrid();
 			gridMain.ScrollToEnd();//should change this to scroll to the same place as before.
-			for(int i=0;i<table.Rows.Count;i++){//ProviderC.ListLong.Count;i++) {
-				if(table.Rows[i]["ProvNum"].ToString()==FormP.ProvCur.ProvNum.ToString()){
+			for(int i=0;i<table.Rows.Count;i++) {//ProviderC.ListLong.Count;i++) {
+				if(table.Rows[i]["ProvNum"].ToString()==provCur.ProvNum.ToString()) {
 					//ProviderC.ListLong[i].ProvNum==FormP.ProvCur.ProvNum) {
 					gridMain.SetSelected(i,true);
 					break;
@@ -659,11 +693,39 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			FormProvEdit FormP=new FormProvEdit();
-			FormP.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
-			FormP.ShowDialog();
-			if(FormP.DialogResult!=DialogResult.OK) {
-				return;
+			Provider provSelected=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools) && Providers.IsAttachedToUser(provSelected.ProvNum)) {//Dental schools is turned on and the provider selected is attached to a user.
+				//provSelected could be a provider or a student at this point.
+				if(!provSelected.IsInstructor && !Security.IsAuthorized(Permissions.AdminDentalStudents)) {
+					return;
+				}
+				if(provSelected.IsInstructor && !Security.IsAuthorized(Permissions.AdminDentalInstructors)) {
+					return;
+				}
+				if(!radioStudents.Checked) {
+					FormProvEdit FormPE=new FormProvEdit();
+					FormPE.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+					FormPE.ShowDialog();
+					if(FormPE.DialogResult!=DialogResult.OK) {
+						return;
+					}
+				}
+				else {
+					FormProvStudentEdit FormPSE=new FormProvStudentEdit();
+					FormPSE.ProvStudent=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+					FormPSE.ShowDialog();
+					if(FormPSE.DialogResult!=DialogResult.OK) {
+						return;
+					}
+				}
+			}
+			else {//No Dental Schools or provider is not attached to a user
+				FormProvEdit FormPE=new FormProvEdit();
+				FormPE.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+				FormPE.ShowDialog();
+				if(FormPE.DialogResult!=DialogResult.OK) {
+					return;
+				}
 			}
 			changed=true;
 			FillGrid();
@@ -816,7 +878,7 @@ namespace OpenDental{
 
 		private void FormProviderSelect_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
 			string duplicates=Providers.GetDuplicateAbbrs();
-			if(duplicates!="") {
+			if(duplicates!="" && PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 				if(MessageBox.Show(Lan.g(this,"Warning.  The following abbreviations are duplicates.  Continue anyway?\r\n")+duplicates,
 					"",MessageBoxButtons.OKCancel)!=DialogResult.OK)
 				{

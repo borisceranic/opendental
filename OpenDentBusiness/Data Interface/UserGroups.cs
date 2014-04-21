@@ -68,6 +68,12 @@ namespace OpenDentBusiness{
 			if(table.Rows[0][0].ToString()!="0"){
 				throw new Exception(Lans.g("UserGroups","Must move users to another group first."));
 			}
+			if(PrefC.GetLong(PrefName.SecurityGroupForStudents)==group.UserGroupNum) {
+				throw new Exception(Lans.g("UserGroups","Group is the default group for students and cannot be deleted.  Change the default student group before deleting."));
+			}
+			if(PrefC.GetLong(PrefName.SecurityGroupForInstructors)==group.UserGroupNum) {
+				throw new Exception(Lans.g("UserGroups","Group is the default group for instructors and cannot be deleted.  Change the default instructors group before deleting."));
+			}
 			command= "DELETE FROM usergroup WHERE UserGroupNum='"
 				+POut.Long(group.UserGroupNum)+"'";
  			Db.NonQ(command);

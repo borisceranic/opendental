@@ -398,9 +398,19 @@ namespace OpenDental{
 				UserCur.EmployeeNum=Employees.ListShort[listEmployee.SelectedIndex-1].EmployeeNum;
 			}
 			if(listProv.SelectedIndex==0) {
+				Provider prov=Providers.GetProv(UserCur.ProvNum);
+				if(prov!=null) {
+					prov.IsInstructor=false;
+				}
+				Providers.Update(prov);
 				UserCur.ProvNum=0;
 			}
 			else {
+				Provider prov=Providers.GetProv(UserCur.ProvNum);
+				if(prov!=null && prov.ProvNum!=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum) {
+					prov.IsInstructor=false;
+				}
+				Providers.Update(prov);
 				UserCur.ProvNum=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum;
 			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {

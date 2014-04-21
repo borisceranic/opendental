@@ -393,7 +393,9 @@ namespace OpenDentBusiness {
 		ScannerResolution,
 		ScannerSuppressDialog,
 		ScheduleProvUnassigned,
+		///<summary>UserGroupNum for Instructors.  Set only for dental schools in dental school setup.</summary>
 		SecurityGroupForInstructors,
+		///<summary>UserGroupNum for Students.  Set only for dental schools in dental school setup.</summary>
 		SecurityGroupForStudents,
 		SecurityLockDate,
 		///<summary>Set to 0 to always grant permission. 1 means only today.</summary>
