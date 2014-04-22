@@ -170,7 +170,7 @@ namespace OpenDental{
 		private TextBox textMotherMaidenLname;
 		private Label labelMotherMaidenLname;
 		private List<Guardian> GuardianList;
-		private Label label30;
+		private Label labelDeceased;
 		private TextBox textDateDeceased;
 		private EhrPatient _ehrPatientCur;
 
@@ -376,7 +376,7 @@ namespace OpenDental{
 			this.labelMotherMaidenFname = new System.Windows.Forms.Label();
 			this.textMotherMaidenLname = new System.Windows.Forms.TextBox();
 			this.labelMotherMaidenLname = new System.Windows.Forms.Label();
-			this.label30 = new System.Windows.Forms.Label();
+			this.labelDeceased = new System.Windows.Forms.Label();
 			this.textDateDeceased = new System.Windows.Forms.TextBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -1705,14 +1705,15 @@ namespace OpenDental{
 			this.labelMotherMaidenLname.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.labelMotherMaidenLname.Visible = false;
 			// 
-			// label30
+			// labelDateTimeDeceased
 			// 
-			this.label30.Location = new System.Drawing.Point(2, 317);
-			this.label30.Name = "label30";
-			this.label30.Size = new System.Drawing.Size(156, 14);
-			this.label30.TabIndex = 0;
-			this.label30.Text = "Date Time Deceased";
-			this.label30.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelDeceased.Location = new System.Drawing.Point(2, 317);
+			this.labelDeceased.Name = "labelDateTimeDeceased";
+			this.labelDeceased.Size = new System.Drawing.Size(156, 14);
+			this.labelDeceased.TabIndex = 0;
+			this.labelDeceased.Text = "Date Time Deceased";
+			this.labelDeceased.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelDeceased.Visible = false;
 			// 
 			// textDateDeceased
 			// 
@@ -1721,6 +1722,7 @@ namespace OpenDental{
 			this.textDateDeceased.Name = "textDateDeceased";
 			this.textDateDeceased.Size = new System.Drawing.Size(177, 20);
 			this.textDateDeceased.TabIndex = 10;
+			this.textDateDeceased.Visible = false;
 			this.textDateDeceased.Validated += new System.EventHandler(this.textDateDeceased_Validated);
 			// 
 			// FormPatientEdit
@@ -1729,7 +1731,7 @@ namespace OpenDental{
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textDateDeceased);
-			this.Controls.Add(this.label30);
+			this.Controls.Add(this.labelDeceased);
 			this.Controls.Add(this.textMotherMaidenLname);
 			this.Controls.Add(this.labelMotherMaidenLname);
 			this.Controls.Add(this.textMotherMaidenFname);
@@ -1872,6 +1874,8 @@ namespace OpenDental{
 				labelMotherMaidenLname.Visible=true;
 				textMotherMaidenLname.Visible=true;
 				textMotherMaidenLname.Text=_ehrPatientCur.MotherMaidenLname;
+				labelDeceased.Visible=true;
+				textDateDeceased.Visible=true;
 			}
 			listStatus.Items.Add(Lan.g("enumPatientStatus","Patient"));
 			listStatus.Items.Add(Lan.g("enumPatientStatus","NonPatient"));
