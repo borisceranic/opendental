@@ -52,7 +52,6 @@ namespace OpenDentHL7 {
 		private static bool IsSendTCPConnected;
 		private static bool _ecwFileModeIsSending;
 		private static DateTime _ecwDateTimeOldMsgsDeleted;
-		private static bool _ecwTCPModeIsSending;
 
 		public ServiceHL7() {
 			InitializeComponent();
@@ -179,7 +178,6 @@ namespace OpenDentHL7 {
 			else {//TCP/IP
 				CreateIncomingTcpListener();
 				//start a timer to poll the database and to send messages as needed.  Every 6 seconds.  We increased the time between polling the database from 3 seconds to 6 seconds because we are now waiting 5 seconds for a message acknowledgment from eCW.
-				_ecwTCPModeIsSending=false;
 				TimerCallback timercallbackSendTCP=new TimerCallback(TimerCallbackSendTCP);
 				timerSendTCP=new System.Threading.Timer(timercallbackSendTCP,null,1800,6000);
 			}
@@ -444,12 +442,8 @@ namespace OpenDentHL7 {
 		}
 		
 		private void TimerCallbackSendTCP(Object stateInfo) {
-			if(_ecwTCPModeIsSending) {
-				return;
-			}
 			List<HL7Msg> list=HL7Msgs.GetOnePending();
 			for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
-				_ecwTCPModeIsSending=true;
 				string sendMsgControlId=HL7Msgs.GetControlId(list[i]);//could be empty string
 				Socket socket=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
 				string[] strIpPort=HL7DefEnabled.OutgoingIpPort.Split(':');//this was already validated in the HL7DefEdit window.
@@ -472,7 +466,6 @@ namespace OpenDentHL7 {
 						EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
 						IsSendTCPConnected=false;
 					}
-					_ecwTCPModeIsSending=false;
 					return;
 				}
 				string data=MLLP_START_CHAR+list[i].MsgText+MLLP_END_CHAR+MLLP_ENDMSG_CHAR;
@@ -541,29 +534,24 @@ namespace OpenDentHL7 {
 							list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nMessage NACK (negative acknowlegment) received. We will try to send again.\r\n";
 						}
 						HL7Msgs.Update(list[i]);//Add NACK note to hl7msg table entry
-						_ecwTCPModeIsSending=false;
 						return;//socket closed in finally
 					}
 					else {//ack received for control ID that does not match the control ID of message just sent
 						list[i].Note=list[i].Note+"Sent message control ID: "+sendMsgControlId+"\r\nAck message control ID: "+ackMsg.ControlId
 							+"\r\nAck received for message other than message just sent.  We will try to send again.\r\n";
 						HL7Msgs.Update(list[i]);
-						_ecwTCPModeIsSending=false;
 						return;
 					}
 				}
 				catch(SocketException ex) {
 					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket encountered an error when sending message or receiving acknowledgment.\r\nSocket Exception: "+ex.Message,EventLogEntryType.Warning);
-					_ecwTCPModeIsSending=false;
 					return;//Try again in 6 seconds. socket closed in finally
 				}
 				catch(Exception ex) {
 					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP encountered an error when sending message or receiving acknowledgment.\r\nException: "+ex.Message,EventLogEntryType.Warning);
-					_ecwTCPModeIsSending=false;
 					return;//socket closed in finally
 				}
 				finally {
-					_ecwTCPModeIsSending=false;
 					if(socket!=null) {
 						socket.Shutdown(SocketShutdown.Both);
 						socket.Close();
@@ -582,7 +570,6 @@ namespace OpenDentHL7 {
 					}
 				}
 			}
-			_ecwTCPModeIsSending=false;
 		}
 		
 		
