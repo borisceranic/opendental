@@ -466,7 +466,7 @@ namespace OpenDentHL7 {
 					{
 						//we will treat this as a complete message, because the endmsg char is optional.
 						strbAckMsg.Remove(0,1);//strip off the start char
-						strbAckMsg.Remove(strbFullMsg.Length-1,1);//strip off the end char
+						strbAckMsg.Remove(strbAckMsg.Length-1,1);//strip off the end char
 					}
 					else {
 						list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
