@@ -428,6 +428,22 @@ namespace OpenDental.UI {
 			}
 		}
 
+		///<summary>Returns current sort order.  Only used in PatientPortalManager.</summary>
+		[Browsable(false)]
+		public bool SortedIsAscending {
+			get {
+				return sortedIsAscending;
+			}
+		}
+
+		///<summary>Returns current sort column index.  Only used in PatientPortalManager.</summary>
+		[Browsable(false)]
+		public int SortedByColumnIdx {
+			get {
+				return sortedByColumnIdx;
+			}
+		}
+
 		#endregion Properties
 
 		#region Computations
@@ -1525,7 +1541,7 @@ namespace OpenDental.UI {
 		#endregion Scrolling
 
 		#region Sorting
-		///<summary>Set sortedByColIdx to -1 to clear sorting. Copied from SortByColumn. No need to call fill grid after calling this.</summary>
+		///<summary>Set sortedByColIdx to -1 to clear sorting. Copied from SortByColumn. No need to call fill grid after calling this.  Also used in PatientPortalManager.</summary>
 		public void SortForced(int sortedByColIdx,bool isAsc) {
 			sortedIsAscending=isAsc;
 			sortedByColumnIdx=sortedByColIdx;
@@ -1603,23 +1619,14 @@ namespace OpenDental.UI {
 			string raw2=row2.Cells[sortedByColumnIdx].Text;
 			DateTime date1=DateTime.MinValue;
 			DateTime date2=DateTime.MinValue;
-			if(raw1!="") {
-				try {
-					date1=DateTime.Parse(raw1);
-				}
-				catch {
-					return 0;//shouldn't happen
-				}
+			//TryParse is a much faster operation than Parse in the event that the input won't parse to a date.
+			if(DateTime.TryParse(raw1,out date1) &&
+				DateTime.TryParse(raw2,out date2)) {
+				return (sortedIsAscending?1:-1)*date1.CompareTo(date2);
 			}
-			if(raw2!="") {
-				try {
-					date2=DateTime.Parse(raw2);
-				}
-				catch {
-					return 0;//shouldn't happen
-				}
+			else { //One of the inputs is not a date so default string compare.
+				return SortStringCompare(row1,row2);
 			}
-			return (sortedIsAscending?1:-1)*date1.CompareTo(date2);
 		}
 
 		private int SortToothNumberParse(ODGridRow row1,ODGridRow row2) {
