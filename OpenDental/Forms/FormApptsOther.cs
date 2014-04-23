@@ -1017,6 +1017,7 @@ namespace OpenDental{
 			int currentSelection=e.Row;
 			int currentScroll=gridMain.ScrollValue;
 			FormApptEdit FormAE=new FormApptEdit(ApptList[e.Row].AptNum);
+			FormAE.IsInViewPatAppts=true;
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();
 			if(FormAE.DialogResult!=DialogResult.OK)

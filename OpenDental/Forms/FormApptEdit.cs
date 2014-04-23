@@ -117,6 +117,8 @@ namespace OpenDental{
 		private Label labelSyndromicObservations;
 		///<summary>True if appt was double clicked on from the chart module gridProg.  Currently only used to trigger an appointment overlap check.</summary>
 		public bool IsInChartModule;
+		///<summary>True if appt was double clicked on from the ApptsOther form.  Currently only used to trigger an appointment overlap check.</summary>
+		public bool IsInViewPatAppts;
 
 		///<summary></summary>
 		public FormApptEdit(long aptNum)
@@ -2394,7 +2396,8 @@ namespace OpenDental{
 			}
 			string aptPattern=Appointments.ConvertPatternTo5(strBTime.ToString());
 			//Only run appt overlap check if editing an appt from the chart module and eCW program link not enabled.
-			if(IsInChartModule && !Programs.UsingEcwTightOrFullMode()) {
+			if((IsInChartModule || IsInViewPatAppts) && !Programs.UsingEcwTightOrFullMode()) {
+				Appointments.RefreshPeriod(AptCur.AptDateTime,AptCur.AptDateTime);
 				List<Appointment> apptList=Appointments.GetForPeriodList(AptCur.AptDateTime,AptCur.AptDateTime);
 				if(DoesOverlap(aptPattern,apptList)) {
 					MsgBox.Show(this,"Appointment is too long and would overlap another appointment.  Automatically shortened to fit.");
