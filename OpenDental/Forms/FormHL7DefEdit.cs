@@ -330,18 +330,11 @@ namespace OpenDental {
 						MsgBox.Show(this,"The path for Incoming Folder is empty.");
 						return;
 					}
-					if(!Directory.Exists(textInPath.Text)) {
-						MsgBox.Show(this,"The path for Incoming Folder is invalid.");
-						return;
-					}
 					if(textOutPath.Text=="") {
 						MsgBox.Show(this,"The path for Outgoing Folder is empty.");
 						return;
 					}
-					if(!Directory.Exists(textOutPath.Text)) {
-						MsgBox.Show(this,"The path for Outgoing Folder is invalid.");
-						return;
-					}
+					//paths are checked when service starts, not when closing form, since paths are local paths but only exist on the ODHL7 server
 				}
 				else {//TcpIp mode
 					if(textInPort.Text=="") {
