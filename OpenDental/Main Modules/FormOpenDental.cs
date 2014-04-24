@@ -2096,13 +2096,14 @@ namespace OpenDental{
 						return;
 					}
 				}
-				if(PrefC.GetBool(PrefName.ShowFeatureEhr) && !_isTimeSynchThreadRunning) {
-					FormEhrTimeSynch FormEhrTS = new FormEhrTimeSynch();
-					FormEhrTS.IsAutoLaunch=true;
-					if(!FormEhrTS.TimesInSynchFast()) {
-						FormEhrTS.ShowDialog();
-					}
-				}
+				//==tg  Commented out on 04/24/2014 after discussion deciding it was not necessary to synchronize time on start-up. Timeouts and other errors were causing complaints from customers.
+				//if(PrefC.GetBool(PrefName.ShowFeatureEhr) && !_isTimeSynchThreadRunning) {
+				//	FormEhrTimeSynch FormEhrTS = new FormEhrTimeSynch();
+				//	FormEhrTS.IsAutoLaunch=true;
+				//	if(!FormEhrTS.TimesInSynchFast()) {
+				//		FormEhrTS.ShowDialog();
+				//	}
+				//}
 			#endif
 			FillPatientButton(null);
 			ThreadCommandLine=new Thread(new ThreadStart(Listen));
