@@ -76,7 +76,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT COUNT(*) FROM icd10 AND IsCode!=0";
+			string command="SELECT COUNT(*) FROM icd10 WHERE IsCode!=0";
 			return PIn.Long(Db.GetCount(command));
 		}
 		
