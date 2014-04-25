@@ -36,6 +36,7 @@ namespace OpenDental{
 			this.gridEmailMessages = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
 			this.odToolBarButton1 = new OpenDental.UI.ODToolBarButton();
+			this.butDelete = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// mainMenu1
@@ -52,7 +53,7 @@ namespace OpenDental{
 			// labelInboxComputerName
 			// 
 			this.labelInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxComputerName.Location = new System.Drawing.Point(9, 233);
+			this.labelInboxComputerName.Location = new System.Drawing.Point(286, 233);
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(410, 16);
 			this.labelInboxComputerName.TabIndex = 144;
@@ -62,7 +63,7 @@ namespace OpenDental{
 			// labelThisComputer
 			// 
 			this.labelThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelThisComputer.Location = new System.Drawing.Point(127, 249);
+			this.labelThisComputer.Location = new System.Drawing.Point(404, 249);
 			this.labelThisComputer.Name = "labelThisComputer";
 			this.labelThisComputer.Size = new System.Drawing.Size(292, 16);
 			this.labelThisComputer.TabIndex = 145;
@@ -174,10 +175,28 @@ namespace OpenDental{
 			this.odToolBarButton1.Text = "";
 			this.odToolBarButton1.ToolTipText = "";
 			// 
+			// butDelete
+			// 
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(12, 236);
+			this.butDelete.Name = "butDelete";
+			this.butDelete.Size = new System.Drawing.Size(83, 24);
+			this.butDelete.TabIndex = 147;
+			this.butDelete.Text = "&Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
+			// 
 			// FormEmailInbox
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(982, 287);
+			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butChangePat);
 			this.Controls.Add(this.labelThisComputer);
 			this.Controls.Add(this.labelInboxComputerName);
@@ -211,5 +230,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelInboxComputerName;
 		private System.Windows.Forms.Label labelThisComputer;
 		private UI.Button butChangePat;
+		private UI.Button butDelete;
 	}
 }

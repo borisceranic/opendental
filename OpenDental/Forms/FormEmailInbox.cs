@@ -208,6 +208,37 @@ namespace OpenDental {
 			GetMessages();
 		}
 
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(gridEmailMessages.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select email to delete.");
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Permanently delete all selected email?")) {
+				return;
+			}
+			Cursor=Cursors.WaitCursor;
+			int webMailCount=0;
+			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
+				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
+				//We currently don't allow deleting web mail messages.
+				if(emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived
+					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead
+					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailSent
+					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
+				{
+					webMailCount++;
+				}
+				else {//Not a web mail message.
+					EmailMessages.Delete(emailMessage);
+				}
+			}
+			FillGridEmailMessages();
+			Cursor=Cursors.Default;
+			if(webMailCount > 0) {
+				MsgBox.Show(this,"Not allowed to delete web mail messages.  Web mail messages skipped: "+webMailCount);
+			}
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
