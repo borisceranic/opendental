@@ -52,6 +52,10 @@ namespace OpenDentBusiness {
 		private const string strCodeSystemUnii="2.16.840.1.113883.4.9";
 		///<summary>UNII</summary>
 		private const string strCodeSystemNameUnii="UNII";
+		///<summary>OID: 2.16.840.1.113883.6.13</summary>
+		private const string strCodeSystemCdt="2.16.840.1.113883.6.13";
+		///<summary>CDT codes (ADA codes).</summary>
+		private const string strCodeSystemNameCdt="cdt-ADAcodes";
 
 		///<summary>Set each time GenerateCCD() is called. Used by helper functions to avoid sending the patient as a parameter to each helper function.</summary>
 		private Patient _patOutCcd=null;
@@ -1695,35 +1699,27 @@ Procedures
 				End("thead");
 				Start("tbody");
 				for(int i=0;i<listProcsFiltered.Count;i++) {
-					ProcedureCode procCode;
-					Snomed bodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);
-					Snomed procCodeSnomed;
-					if(listProcsFiltered[i].CodeNum==0) {
-						procCode=new ProcedureCode();
-						procCodeSnomed=new Snomed();
-					}
-					else {
-						procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
-						procCodeSnomed=Snomeds.GetByCode(procCode.ProcCode);
-					}
-					if(procCodeSnomed==null) {
-						procCodeSnomed=new Snomed();
-					}
+					ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
+					Snomed snomedBodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);//snomedBodySite can be null if procCode.SnomedBodySite is blank or invalid.
 					Start("tr");
-					if(!String.IsNullOrEmpty(procCodeSnomed.SnomedCode)) {
-						_w.WriteElementString("td",procCodeSnomed.SnomedCode+" - "+procCode.Descript);
+					if(Regex.IsMatch(procCode.ProcCode,"^D[0-9]{4}$")) {//CDT code (ADA code)
+						_w.WriteElementString("td",procCode.ProcCode+" - "+procCode.Descript);
 					}
-					else if(!String.IsNullOrEmpty(procCode.MedicalCode)) {
-						_w.WriteElementString("td",procCode.MedicalCode+" - "+procCode.Descript);
+					else if(Regex.IsMatch(procCode.ProcCode,"^[0-9]{5}$")) {//CPT-4 code (medical code)
+						_w.WriteElementString("td",procCode.ProcCode+" - "+procCode.Descript);
 					}
-					else {
+					else if(Snomeds.CodeExists(procCode.ProcCode)) {//The SNOMED CT code system contains numerical codes which are between 6 and 18 digits in length as far as we know. Should not overlap CPT codes.
+						Snomed snomed=Snomeds.GetByCode(procCode.ProcCode);
+						_w.WriteElementString("td",snomed.SnomedCode+" - "+snomed.Description);
+					}
+					else {//Unknown code.  Output a "blank" procedure row as required by CCD standard.
 						_w.WriteElementString("td","");
 					}
-					if(bodySite==null || String.IsNullOrEmpty(bodySite.SnomedCode)) {
+					if(snomedBodySite==null) {
 						_w.WriteElementString("td","");
 					}
 					else {
-						_w.WriteElementString("td",bodySite.SnomedCode+" - "+bodySite.Description);
+						_w.WriteElementString("td",snomedBodySite.SnomedCode+" - "+snomedBodySite.Description);
 					}
 					if(listProcsFiltered[i].ProcDate.Year<1880) {
 						_w.WriteElementString("td","");
@@ -1745,19 +1741,7 @@ Procedures
 				listProcsFiltered.Add(proc);
 			}
 			for(int i=0;i<listProcsFiltered.Count;i++) {
-				ProcedureCode procCode;
-				Snomed procCodeSnomed;
-				if(listProcsFiltered[i].CodeNum==0) {
-					procCode=new ProcedureCode();
-					procCodeSnomed=new Snomed();
-				}
-				else {
-					procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
-					procCodeSnomed=Snomeds.GetByCode(procCode.ProcCode);
-				}
-				if(procCodeSnomed==null) {
-					procCodeSnomed=new Snomed();
-				}
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
 				Start("entry","typeCode","DRIV");
 				Start("procedure","classCode","PROC","moodCode","EVN");
 				TemplateId("2.16.840.1.113883.10.20.22.4.14");//Procedure Activity Section (Page 487).
@@ -1766,14 +1750,19 @@ Procedures
 				//"This code in a procedure activity SHOULD be selected from LOINC (codeSystem 2.16.840.1.113883.6.1) or SNOMED CT (CodeSystem: 2.16.840.1.113883.6.96),
 				//and MAY be selected from CPT-4 (CodeSystem: 2.16.840.1.113883.6.12), ICD9 Procedures (CodeSystem: 2.16.840.1.113883.6.104),
 				//ICD10 Procedure Coding System (CodeSystem: 2.16.840.1.113883.6.4) (CONF:7657)."
-				//We already have a place for CPT codes, and that is ProcedureCode.MedicalCode. We will simply use this field for now.
-				if(!String.IsNullOrEmpty(procCodeSnomed.SnomedCode)) {
-					StartAndEnd("code","code",procCodeSnomed.SnomedCode,"codeSystem",strCodeSystemSnomed,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameSnomed);
+				//In November of 2013, ONC addopted CDT into EHR certification. http://ehrintelligence.com/2013/11/05/ehr-adoption-may-be-easier-for-dentists-with-new-onc-ruling/
+				//The CDT OID is 2.16.840.1.113883.6.13 and the code system description is cdt-ADAcodes.
+				if(Regex.IsMatch(procCode.ProcCode,"^D[0-9]{4}$")) {//CDT code (ADA code)
+					StartAndEnd("code","code",procCode.ProcCode,"codeSystem",strCodeSystemCdt,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameCdt);
 				}
-				else if(!String.IsNullOrEmpty(procCode.MedicalCode)) {
-					StartAndEnd("code","code",procCode.MedicalCode,"codeSystem",strCodeSystemCpt4,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameCpt4);
+				else if(Regex.IsMatch(procCode.ProcCode,"^[0-9]{5}$")) {//CPT-4 code (medical code)
+					StartAndEnd("code","code",procCode.ProcCode,"codeSystem",strCodeSystemCpt4,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameCpt4);
 				}
-				else {
+				else if(Snomeds.CodeExists(procCode.ProcCode)) {//The SNOMED CT code system contains numerical codes which are between 6 and 18 digits in length as far as we know. Should not overlap CPT codes.
+					Snomed snomed=Snomeds.GetByCode(procCode.ProcCode);
+					StartAndEnd("code","code",snomed.SnomedCode,"codeSystem",strCodeSystemSnomed,"displayName",snomed.Description,"codeSystemName",strCodeSystemNameSnomed);
+				}
+				else {//Unknown code.  Output a "blank" procedure row as required by CCD standard.
 					StartAndEnd("code","nullFlavor","UNK");
 				}
 				StartAndEnd("statusCode","code","completed");//Allowed values: completed, active, aborted, cancelled.
