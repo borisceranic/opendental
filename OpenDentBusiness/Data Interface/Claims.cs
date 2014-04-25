@@ -475,6 +475,28 @@ namespace OpenDentBusiness{
 			return PIn.Long(dtClaims.Rows[0][0].ToString());
 		}
 
+		///<summary>Returns the number of received claims attached to specified insplan.</summary>
+		public static int GetCountReceived(long planNum) {
+			//No need to check RemotingRole; no call to db.
+			return GetCountReceived(planNum,0);
+		}
+
+		///<summary>Returns the number of received claims attached to specified subscriber with specified insplan.  Set insSubNum to zero to check all claims for all patients for the plan.</summary>
+		public static int GetCountReceived(long planNum,long insSubNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),planNum,insSubNum);
+			}
+			string command;
+			command="SELECT COUNT(*) "
+				+"FROM claim "
+				+"WHERE claim.ClaimStatus='R' "
+				+"AND claim.PlanNum="+POut.Long(planNum)+" ";
+			if(insSubNum!=0) {
+				command+="AND claim.InsSubNum="+POut.Long(insSubNum);
+			}
+			return PIn.Int(Db.GetCount(command));
+		}
+
 	}//end class Claims
 
 	///<summary>This is an odd class.  It holds data for the X12 (4010 only) generation process.  It replaces an older multi-dimensional array, so the names are funny, but helpful to prevent bugs.  Not an actual database table.</summary>

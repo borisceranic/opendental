@@ -4084,6 +4084,43 @@ namespace OpenDental{
 			return true;
 		}
 
+		///<summary>Warns user if there are received claims for this plan.  Returns true if user wants to proceed, or if there are no received claims for this plan.  Returns false if the user aborts.</summary>
+		private bool CheckForReceivedClaims() {
+			long patNum=0;
+			if(PatPlanCur!=null) {//PatPlanCur will be null if editing insurance plans from Lists > Insurance Plans.
+				patNum=PatPlanCur.PatNum;
+			}
+			int claimCount=0;
+			if(patNum==0) {//Editing insurance plans from Lists > Insurance Plans.
+				//Check all claims for plan
+				claimCount=Claims.GetCountReceived(PlanCurOriginal.PlanNum);
+				if(claimCount!=0) {
+					if(MessageBox.Show(Lan.g(this,"There are")+" "+claimCount+" "+Lan.g(this,"received claims for this insurance plan that will have the carrier changed")+".  "+Lan.g(this,"You should NOT do this if the patient is changing insurance")+".  "+Lan.g(this,"Use the Drop button instead")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)==DialogResult.Cancel) {
+						return false; //abort
+					}
+				}
+			}
+			else {//Editing insurance plans from Family module.
+				if(radioChangeAll.Checked==true) {//Check radio button
+					claimCount=Claims.GetCountReceived(PlanCurOriginal.PlanNum);
+					if(claimCount!=0) {//Check all claims for plan
+						if(MessageBox.Show(Lan.g(this,"There are")+" "+claimCount+" "+Lan.g(this,"received claims for this insurance plan that will have the carrier changed")+".  "+Lan.g(this,"You should NOT do this if the patient is changing insurance")+".  "+Lan.g(this,"Use the Drop button instead")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)==DialogResult.Cancel) {
+							return false; //abort
+						}
+					}
+				}
+				else {//Check claims for plan and patient only
+					claimCount=Claims.GetCountReceived(PlanCurOriginal.PlanNum,PatPlanCur.InsSubNum);
+					if(claimCount!=0) {
+						if(MessageBox.Show(Lan.g(this,"There are")+" "+claimCount+" "+Lan.g(this,"received claims for this insurance plan that will have the carrier changed")+".  "+Lan.g(this,"You should NOT do this if the patient is changing insurance")+".  "+Lan.g(this,"Use the Drop button instead")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)==DialogResult.Cancel) {
+							return false; //abort
+						}
+					}
+				}
+			}
+			return true;
+		}
+
 		private void butAudit_Click(object sender,EventArgs e) {
 			List<Permissions> perms=new List<Permissions>();
 			perms.Add(Permissions.InsPlanChangeCarrierName);
@@ -4094,6 +4131,19 @@ namespace OpenDental{
 		private void butOK_Click(object sender,System.EventArgs e) {
 			if(!FillPlanCurFromForm()) {//also fills SubCur if not null
 				return;
+			}
+			if(PlanCur.CarrierNum!=PlanCurOriginal.CarrierNum) {
+				long patNum=0;
+				if(PatPlanCur!=null) {//PatPlanCur will be null if editing insurance plans from Lists > Insurance Plans.
+					patNum=PatPlanCur.PatNum;
+				}
+				string carrierNameOrig=Carriers.GetCarrier(PlanCurOriginal.CarrierNum).CarrierName;
+				string carrierNameNew=Carriers.GetCarrier(PlanCur.CarrierNum).CarrierName;
+				if(carrierNameOrig!=carrierNameNew) {//The CarrierNum could have changed but the CarrierName might not have changed.  Only warn the name changed.
+					if(!CheckForReceivedClaims()) {
+						return;
+					}
+				}
 			}
 			//PatPlan-------------------------------------------------------------------------------------------
 			if(PatPlanCur!=null) {
