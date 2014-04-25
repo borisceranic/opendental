@@ -74,7 +74,6 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.DrugNDC           = PIn.String(table.Rows[i]["DrugNDC"].ToString());
 				procedureCode.RevenueCodeDefault= PIn.String(table.Rows[i]["RevenueCodeDefault"].ToString());
 				procedureCode.ProvNumDefault    = PIn.Long  (table.Rows[i]["ProvNumDefault"].ToString());
-				procedureCode.SnomedCode        = PIn.String(table.Rows[i]["SnomedCode"].ToString());
 				retVal.Add(procedureCode);
 			}
 			return retVal;
@@ -115,7 +114,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,SnomedCode) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -146,8 +145,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (procedureCode.IsMultiVisit)+","
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
-				+    POut.Long  (procedureCode.ProvNumDefault)+","
-				+"'"+POut.String(procedureCode.SnomedCode)+"')";
+				+    POut.Long  (procedureCode.ProvNumDefault)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -186,8 +184,7 @@ namespace OpenDentBusiness.Crud{
 				+"IsMultiVisit      =  "+POut.Bool  (procedureCode.IsMultiVisit)+", "
 				+"DrugNDC           = '"+POut.String(procedureCode.DrugNDC)+"', "
 				+"RevenueCodeDefault= '"+POut.String(procedureCode.RevenueCodeDefault)+"', "
-				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+", "
-				+"SnomedCode        = '"+POut.String(procedureCode.SnomedCode)+"' "
+				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+" "
 				+"WHERE CodeNum = "+POut.Long(procedureCode.CodeNum);
 			Db.NonQ(command);
 		}
@@ -296,10 +293,6 @@ namespace OpenDentBusiness.Crud{
 			if(procedureCode.ProvNumDefault != oldProcedureCode.ProvNumDefault) {
 				if(command!=""){ command+=",";}
 				command+="ProvNumDefault = "+POut.Long(procedureCode.ProvNumDefault)+"";
-			}
-			if(procedureCode.SnomedCode != oldProcedureCode.SnomedCode) {
-				if(command!=""){ command+=",";}
-				command+="SnomedCode = '"+POut.String(procedureCode.SnomedCode)+"'";
 			}
 			if(command==""){
 				return false;
