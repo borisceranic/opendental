@@ -239,7 +239,7 @@ namespace OpenDental{
 		private TextBox textBillingNote;
 		private UI.Button butSearch;
 		private UI.Button butSnomedBodySiteSelect;
-		private Label label20;
+		private Label labelSnomedCtBodySite;
 		private TextBox textSnomedBodySite;
 		private List<Procedure> canadaLabFees;
 		private UI.Button butNoneSnomedBodySite;
@@ -463,7 +463,7 @@ namespace OpenDental{
 			this.label23 = new System.Windows.Forms.Label();
 			this.butNoneSnomedBodySite = new OpenDental.UI.Button();
 			this.butSnomedBodySiteSelect = new OpenDental.UI.Button();
-			this.label20 = new System.Windows.Forms.Label();
+			this.labelSnomedCtBodySite = new System.Windows.Forms.Label();
 			this.textSnomedBodySite = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.comboUnitType = new System.Windows.Forms.ComboBox();
@@ -1994,7 +1994,7 @@ namespace OpenDental{
 			this.tabPageMedical.Controls.Add(this.label23);
 			this.tabPageMedical.Controls.Add(this.butNoneSnomedBodySite);
 			this.tabPageMedical.Controls.Add(this.butSnomedBodySiteSelect);
-			this.tabPageMedical.Controls.Add(this.label20);
+			this.tabPageMedical.Controls.Add(this.labelSnomedCtBodySite);
 			this.tabPageMedical.Controls.Add(this.textSnomedBodySite);
 			this.tabPageMedical.Controls.Add(this.label17);
 			this.tabPageMedical.Controls.Add(this.comboUnitType);
@@ -2214,14 +2214,14 @@ namespace OpenDental{
 			this.butSnomedBodySiteSelect.Text = "...";
 			this.butSnomedBodySiteSelect.Click += new System.EventHandler(this.butSnomedBodySiteSelect_Click);
 			// 
-			// label20
+			// labelSnomedCtBodySite
 			// 
-			this.label20.Location = new System.Drawing.Point(236, 7);
-			this.label20.Name = "label20";
-			this.label20.Size = new System.Drawing.Size(172, 20);
-			this.label20.TabIndex = 178;
-			this.label20.Text = "SNOMED CT Body Site";
-			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSnomedCtBodySite.Location = new System.Drawing.Point(236, 7);
+			this.labelSnomedCtBodySite.Name = "labelSnomedCtBodySite";
+			this.labelSnomedCtBodySite.Size = new System.Drawing.Size(172, 20);
+			this.labelSnomedCtBodySite.TabIndex = 178;
+			this.labelSnomedCtBodySite.Text = "SNOMED CT Body Site";
+			this.labelSnomedCtBodySite.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSnomedBodySite
 			// 
@@ -2927,6 +2927,10 @@ namespace OpenDental{
 			}
 			else {
 				butSearch.Visible=false;
+				labelSnomedCtBodySite.Visible=false;
+				textSnomedBodySite.Visible=false;
+				butSnomedBodySiteSelect.Visible=false;
+				butNoneSnomedBodySite.Visible=false;
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				radioS1.Text="03";//Sextant 1 in the United States is sextant 03 in Canada.
