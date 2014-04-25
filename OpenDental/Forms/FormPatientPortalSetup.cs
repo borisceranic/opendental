@@ -69,7 +69,7 @@ namespace OpenDental {
 		private void butOK_Click(object sender,EventArgs e) {
 #if !DEBUG
 			if(!textPatientPortalURL.Text.ToUpper().StartsWith("HTTPS")) {
-				MsgBox.Show(this,"Patient Portal URL must start with HTTPS.");
+				MsgBox.Show(this,"Patient Facing URL must start with HTTPS.");
 				return;
 			}
 #endif

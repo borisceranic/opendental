@@ -38,11 +38,11 @@ namespace OpenDental{
 			this.label9 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.textListenerPort = new OpenDental.ValidNum();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.textPatientPortalURL = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.textListenerPort = new OpenDental.ValidNum();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -174,7 +174,7 @@ namespace OpenDental{
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(573, 17);
 			this.label7.TabIndex = 48;
-			this.label7.Text = "[URL] will be replaced with the value of \'Patient Portal URL\' as entered above.";
+			this.label7.Text = "[URL] will be replaced with the value of \'Patient Facing URL\' as entered above.";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// groupBox1
@@ -193,6 +193,15 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 49;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Open Dental Hosted";
+			// 
+			// textListenerPort
+			// 
+			this.textListenerPort.Location = new System.Drawing.Point(144, 73);
+			this.textListenerPort.MaxVal = 65535;
+			this.textListenerPort.MinVal = 0;
+			this.textListenerPort.Name = "textListenerPort";
+			this.textListenerPort.Size = new System.Drawing.Size(100, 20);
+			this.textListenerPort.TabIndex = 51;
 			// 
 			// label5
 			// 
@@ -229,15 +238,6 @@ namespace OpenDental{
 			this.label1.Size = new System.Drawing.Size(857, 184);
 			this.label1.TabIndex = 51;
 			this.label1.Text = resources.GetString("label1.Text");
-			// 
-			// textListenerPort
-			// 
-			this.textListenerPort.Location = new System.Drawing.Point(144, 73);
-			this.textListenerPort.MaxVal = 65535;
-			this.textListenerPort.MinVal = 0;
-			this.textListenerPort.Name = "textListenerPort";
-			this.textListenerPort.Size = new System.Drawing.Size(100, 20);
-			this.textListenerPort.TabIndex = 51;
 			// 
 			// FormPatientPortalSetup
 			// 
