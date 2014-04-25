@@ -1429,9 +1429,15 @@ namespace OpenDental{
 			  using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false))
 					//new FileStream(,FileMode.Create,FileAccess.Write,FileShare.Read)))
 				{
-					String line="";  
-					for(int i=0;i<report.ColCaption.Length;i++){
-						line+=report.ColCaption[i];
+					String line="";
+					for(int i=0;i<report.ColCaption.Length;i++) {
+						string columnCaption=report.ColCaption[i];
+						//Check for columns that start with special characters that spreadsheet programs treat differently than simply displaying them.
+						if(columnCaption.StartsWith("-") || columnCaption.StartsWith("=")) {
+							//Adding a space to the beginning of the cell will trick the spreadsheet program into not treating it uniquely.
+							columnCaption=" "+columnCaption;
+						}
+						line+=columnCaption;
 						if(i<report.TableQ.Columns.Count-1){
 							line+="\t";
 						}
