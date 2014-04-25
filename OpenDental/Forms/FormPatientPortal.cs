@@ -45,6 +45,11 @@ namespace OpenDental {
 
 		private void butGiveAccess_Click(object sender,EventArgs e) {
 			if(butGiveAccess.Text=="Provide Online Access") {//When form open opens with a blank password
+				if(PrefC.GetString(PrefName.PatientPortalURL)=="") {
+					//User probably hasn't set up the patient portal yet.
+					MsgBox.Show(this,"Patient Facing URL is required to be set before granting online access.  Click Setup to set the Patient Facing URL.");
+					return;
+				}
 				string error=ValidatePatientAccess();
 				if(error!="") {
 					MessageBox.Show(error);
