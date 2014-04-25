@@ -1689,18 +1689,27 @@ Procedures
 			_w.WriteElementString("title","Procedures");
 			Start("text");//The following text will be parsed as html with a style sheet to be human readable.
 			if(listProcsFiltered.Count>0 && hasProcedure) {
+				bool hasBodySite=false;
+				for(int i=0;i<listProcsFiltered.Count;i++) {
+					Snomed snomedBodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);//snomedBodySite can be null if procCode.SnomedBodySite is blank or invalid.
+					if(snomedBodySite!=null) {
+						hasBodySite=true;
+						break;
+					}
+				}
 				Start("table","width","100%","border","1");
 				Start("thead");
 				Start("tr");
 				_w.WriteElementString("th","Procedure");
-				_w.WriteElementString("th","Body Site");
+				if(hasBodySite) {
+					_w.WriteElementString("th","Body Site");
+				}
 				_w.WriteElementString("th","Date");
 				End("tr");
 				End("thead");
 				Start("tbody");
 				for(int i=0;i<listProcsFiltered.Count;i++) {
 					ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcsFiltered[i].CodeNum);
-					Snomed snomedBodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);//snomedBodySite can be null if procCode.SnomedBodySite is blank or invalid.
 					Start("tr");
 					if(Regex.IsMatch(procCode.ProcCode,"^D[0-9]{4}$")) {//CDT code (ADA code)
 						_w.WriteElementString("td",procCode.ProcCode+" - "+procCode.Descript);
@@ -1715,11 +1724,14 @@ Procedures
 					else {//Unknown code.  Output a "blank" procedure row as required by CCD standard.
 						_w.WriteElementString("td","");
 					}
-					if(snomedBodySite==null) {
-						_w.WriteElementString("td","");
-					}
-					else {
-						_w.WriteElementString("td",snomedBodySite.SnomedCode+" - "+snomedBodySite.Description);
+					if(hasBodySite) {
+						Snomed snomedBodySite=Snomeds.GetByCode(listProcsFiltered[i].SnomedBodySite);//snomedBodySite can be null if procCode.SnomedBodySite is blank or invalid.
+						if(snomedBodySite==null) {
+							_w.WriteElementString("td","");
+						}
+						else {
+							_w.WriteElementString("td",snomedBodySite.SnomedCode+" - "+snomedBodySite.Description);
+						}
 					}
 					if(listProcsFiltered[i].ProcDate.Year<1880) {
 						_w.WriteElementString("td","");
