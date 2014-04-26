@@ -505,6 +505,9 @@ namespace OpenDental {
 			//TODO: Make sure that DBM methods with break downs ALWAYS have the break down in the fix section.
 			object[] parameters=new object[] { checkShow.Checked,false };//break downs are ALWAYS in the fix section of the method.
 			string result=(string)_listDbmMethodsGrid[e.Row].Invoke(null,parameters);
+			if(result=="") {//Only possible if running a check / fix in non-verbose mode and nothing happened or needs to happen.
+				result=Lan.g("FormDatabaseMaintenance","Done.  No maintenance needed.");
+			}
 			//Show the result of the dbm method in a simple copy paste msg box.
 			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);
 			msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.

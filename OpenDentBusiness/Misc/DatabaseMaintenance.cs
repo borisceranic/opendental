@@ -201,7 +201,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		///<summary>Deprecated.</summary>
 		public static string DecimalValues(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -324,24 +324,23 @@ namespace OpenDentBusiness {
 				+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" "
 				+"ORDER BY PatName";
 			table=Db.GetTable(command);
-			if(table.Rows.Count>0 || verbose) {
-				log+=Lans.g("FormDatabaseMaintenance","Completed appointments with treatment planned procedures attached")+": "+table.Rows.Count;
-				if(isCheck) {
-					log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Completed appointments with treatment planned procedures attached")+": "+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   "+table.Rows[i]["PatNum"].ToString()
+						+"-"+table.Rows[i]["PatName"].ToString()
+						+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
+					log+="\r\n";
 				}
-				else if(table.Rows.Count>0) {//Only show complete list of items when running the fix.
-					log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
-					for(int i=0;i<table.Rows.Count;i++) {
-						//We use to limit to ten results here.  Now we show all rows in our query result.
-						log+="   "+table.Rows[i]["PatNum"].ToString()
-							+"-"+table.Rows[i]["PatName"].ToString()
-							+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
-						log+="\r\n";
-					}
-					if(table.Rows.Count>0) {
-						log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
-					}
-				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -521,7 +520,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string AppointmentScheduledWithCompletedProcs(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -535,22 +534,23 @@ namespace OpenDentBusiness {
 				+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 				+"ORDER BY PatName";
 			table=Db.GetTable(command);
-			//Both check and fix need to alert the user to fix manually.
-			if(table.Rows.Count>0 || verbose) {
-				log+=Lans.g("FormDatabaseMaintenance","Scheduled appointments with completed procedures attached")+": "+table.Rows.Count
-					+", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Scheduled appointments with completed procedures attached")+": "+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				for(int i=0;i<table.Rows.Count;i++) {
-					if(i>10) {
-						break;
-					}
 					log+="   "+table.Rows[i]["PatNum"].ToString()
-					+"-"+table.Rows[i]["PatName"].ToString()
-					+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
+						+"-"+table.Rows[i]["PatName"].ToString()
+						+"  Appt Date:"+PIn.DateT(table.Rows[i]["AptDateTime"].ToString()).ToShortDateString();
 					log+="\r\n";
 				}
-				if(table.Rows.Count>0) {
-					log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
-				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -1594,30 +1594,41 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ClaimProcPreauthNotMatchClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			command=@"SELECT claimproc.ClaimProcNum 
+			command=@"SELECT claim.PatNum,claim.DateService,claimproc.ProcDate,claimproc.CodeSent,claimproc.FeeBilled 
 				FROM claimproc,claim 
 				WHERE claimproc.ClaimNum=claim.ClaimNum
 				AND claim.ClaimType='PreAuth'
 				AND claimproc.Status!=2";
 			table=Db.GetTable(command);
-			if(isCheck){
-				if(table.Rows.Count>0 || verbose){
-					log+=Lans.g("FormDatabaseMaintenance","ClaimProcs for preauths with status not preauth fixed: ")+table.Rows.Count.ToString()+"\r\n";
-				}
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else{
-				//Take no action.  Use descriptive explanation.
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","ClaimProcs for preauths with status not preauth")+": "+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					Patient pat=Patients.GetPat(PIn.Long(table.Rows[i]["PatNum"].ToString()));
+					log+="   Patient: #"+pat.PatNum.ToString()+":"+pat.GetNameFirstOrPrefL()
+						+" ClaimDate: "+PIn.Date(table.Rows[i]["DateService"].ToString()).ToShortDateString()
+						+" ProcDate: "+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()
+						+" Code: "+table.Rows[i]["CodeSent"].ToString()+"\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ClaimProcStatusNotMatchClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1626,38 +1637,31 @@ namespace OpenDentBusiness {
 				return "";
 			}
 			string log="";
-			if(isCheck){
-				command=@"SELECT COUNT(*) FROM claimproc,claim
-					WHERE claimproc.ClaimNum=claim.ClaimNum
-					AND claim.ClaimStatus='R'
-					AND claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived);
-				int numFound=PIn.Int(Db.GetCount(command));
-				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with status not matching claim found: ")+numFound+"\r\n";
-				}
-			}
-			else{
-				//Take no action.  Use descriptive explanation.
-				command=@"SELECT claim.PatNum,claim.DateService,claimproc.ProcDate,claimproc.CodeSent,claimproc.FeeBilled
+			command=@"SELECT claim.PatNum,claim.DateService,claimproc.ProcDate,claimproc.CodeSent,claimproc.FeeBilled
 					FROM claimproc,claim
 					WHERE claimproc.ClaimNum=claim.ClaimNum
 					AND claim.ClaimStatus='R'
 					AND claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived);
-				table=Db.GetTable(command);
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with status not matching claim found: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				for(int i=0;i<table.Rows.Count;i++) {
 					Patient pat=Patients.GetPat(PIn.Long(table.Rows[i]["PatNum"].ToString()));
-					if(i==0) {
-						log+=Lans.g("FormDatabaseMaintenance","The following ClaimProc statuses do not match the claim")+":\r\n";
-					}
 					log+="   Patient: #"+pat.PatNum.ToString()+":"+pat.GetNameFirstOrPrefL()
 						+" ClaimDate: "+PIn.Date(table.Rows[i]["DateService"].ToString()).ToShortDateString()
 						+" ProcDate: "+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()
 						+" Code: "+table.Rows[i]["CodeSent"].ToString()
 						+" FeeBilled: "+PIn.Double(table.Rows[i]["FeeBilled"].ToString()).ToString("F")+"\r\n";
 				}
-				if(table.Rows.Count>0) {
-					log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
-				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -1689,44 +1693,42 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ClaimProcWriteOffNegative(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			if(isCheck){
-				command=@"SELECT COUNT(*) FROM claimproc WHERE WriteOff < 0";
-				int numFound=PIn.Int(Db.GetCount(command));
-				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Negative writeoffs found: ")+numFound+"\r\n";
-				}
-			}
-			else{
-				//Take no action.  Use descriptive explanation.
-				command=@"SELECT patient.LName,patient.FName,patient.MiddleI,claimproc.CodeSent,procedurelog.ProcFee,procedurelog.ProcDate,claimproc.WriteOff
+			command=@"SELECT patient.LName,patient.FName,patient.MiddleI,claimproc.CodeSent,procedurelog.ProcFee,procedurelog.ProcDate,claimproc.WriteOff
 					FROM claimproc 
 					LEFT JOIN patient ON claimproc.PatNum=patient.PatNum
 					LEFT JOIN procedurelog ON claimproc.ProcNum=procedurelog.ProcNum 
 					WHERE WriteOff<0";
-				table=Db.GetTable(command);
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Negative writeoffs found: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
 				string patientName;
 				string codeSent;
 				decimal writeOff;
 				decimal procFee;
 				DateTime procDate;
-				if(table.Rows.Count>0) {
-					log+=Lans.g("FormDatabaseMaintenance","List of patients with procedures that have negative writeoffs:\r\n");
-					for(int i=0;i<table.Rows.Count;i++) {
-						patientName=table.Rows[i]["LName"].ToString() + ", " + table.Rows[i]["FName"].ToString() + " " + table.Rows[i]["MiddleI"].ToString();
-						codeSent=table.Rows[i]["CodeSent"].ToString();
-						procDate=PIn.Date(table.Rows[i]["ProcDate"].ToString());
-						writeOff=PIn.Decimal(table.Rows[i]["WriteOff"].ToString());
-						procFee=PIn.Decimal(table.Rows[i]["ProcFee"].ToString());
-						log+=patientName+" "+codeSent+" fee:"+procFee.ToString("c")+" date:"+procDate.ToShortDateString()+" writeoff:"+writeOff.ToString("c")+"\r\n";
-					}
-					log+=Lans.g("FormDatabaseMaintenance","Go to the patients listed above and manually correct the writeoffs.\r\n");
+				log+=Lans.g("FormDatabaseMaintenance","List of patients with procedures that have negative writeoffs:\r\n");
+				for(int i=0;i<table.Rows.Count;i++) {
+					patientName=table.Rows[i]["LName"].ToString() + ", " + table.Rows[i]["FName"].ToString() + " " + table.Rows[i]["MiddleI"].ToString();
+					codeSent=table.Rows[i]["CodeSent"].ToString();
+					procDate=PIn.Date(table.Rows[i]["ProcDate"].ToString());
+					writeOff=PIn.Decimal(table.Rows[i]["WriteOff"].ToString());
+					procFee=PIn.Decimal(table.Rows[i]["ProcFee"].ToString());
+					log+=patientName+" "+codeSent+" fee:"+procFee.ToString("c")+" date:"+procDate.ToShortDateString()+" writeoff:"+writeOff.ToString("c")+"\r\n";
 				}
+				log+=Lans.g("FormDatabaseMaintenance","Go to the patients listed above and manually correct the writeoffs.\r\n");
 			}
 			return log;
 		}
@@ -2594,39 +2596,43 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string PatientsNoClinicSet(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			//same behavior whether check or fix
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				return log;
 			}
-			//Get the number of patients not assigned to a clinic:
-			command=@"SELECT COUNT(*) FROM patient WHERE ClinicNum=0 AND PatStatus!="+POut.Int((int)PatientStatus.Deleted);
-			int count=PIn.Int(Db.GetCount(command));
-			command=@"SELECT PatNum,LName,FName FROM patient WHERE ClinicNum=0 AND PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" LIMIT 30";
+			//Get patients not assigned to a clinic:
+			command=@"SELECT PatNum,LName,FName FROM patient WHERE ClinicNum=0 AND PatStatus!="+POut.Int((int)PatientStatus.Deleted);
 			table=Db.GetTable(command);
-			if(table.Rows.Count==0) {
+			if(table.Rows.Count==0 && !verbose) {
 				return log;
 			}
-			log+=Lans.g("FormDatabaseMaintenance","Patients with no Clinic assigned: ")+count.ToString()+Lans.g("FormDatabaseMaintenance",", including: ");
-			for(int i=0;i<table.Rows.Count;i++) {
-				//Start a new line and indent every three patients for printing purposes.
-				if(i%3==0) {
-					log+="\r\n   ";
-				}
-				log+=table.Rows[i]["PatNum"].ToString()+"-"
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Patients with no Clinic assigned: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					//Start a new line and indent every three patients for printing purposes.
+					if(i%3==0) {
+						log+="\r\n   ";
+					}
+					log+=table.Rows[i]["PatNum"].ToString()+"-"
 					+table.Rows[i]["LName"].ToString()+", "
 					+table.Rows[i]["FName"].ToString()+"; ";
+				}
 			}
 			log+="\r\n";
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string PatientPriProvHidden(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2634,9 +2640,17 @@ namespace OpenDentBusiness {
 			string log="";
 			command=@"SELECT ProvNum,Abbr FROM provider WHERE ProvNum IN (SELECT PriProv FROM patient WHERE patient.PriProv=provider.ProvNum) AND IsHidden=1";
 			table=Db.GetTable(command);
-			if(isCheck) {
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Hidden providers with patients: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				if(table.Rows.Count>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Hidden providers with patients: ")+table.Rows.Count+"\r\n";
 					DataTable patTable;
 					for(int i=0;i<table.Rows.Count;i++) {
 						log+="     "+table.Rows[i]["Abbr"].ToString()+": ";
@@ -2651,10 +2665,8 @@ namespace OpenDentBusiness {
 						}
 						log+="\r\n";
 					}
+					log+=Lans.g("FormDatabaseMaintenance","   Go to Lists | Providers to move all patients from the hidden provider to another provider.")+"\r\n";
 				}
-			}
-			else {//Currently no fix.
-				//Proposed fix is to add a tool to Lists>Providers and allow quick reassigning of patients and their providers.
 			}
 			return log;
 		}
@@ -2764,7 +2776,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string PatPlanOrdinalDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2776,17 +2788,20 @@ namespace OpenDentBusiness {
 				+"GROUP BY patplan.PatNum,patplan.Ordinal "
 				+"HAVING COUNT(*)>1";
 			table=Db.GetTable(command);
-			if(isCheck) {
-				if(table.Rows.Count>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","PatPlan duplicate ordinals: ")+table.Rows.Count+"\r\n";
-				}
-				for(int i=0;i<table.Rows.Count;i++) {
-					log+=Lans.g("FormDatabaseMaintenance","PatPlan duplicate ordinals for patient must be manually fixed: ")
-						+PIn.String(table.Rows[i]["FName"].ToString())+" "+PIn.String(table.Rows[i]["LName"].ToString())+"\r\n";
-				}
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else {
-				//No fix. User needs to fix manually.
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","PatPlan duplicate ordinals: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   #"+table.Rows[i]["PatNum"].ToString()+" - "+PIn.String(table.Rows[i]["FName"].ToString())+" "+PIn.String(table.Rows[i]["LName"].ToString())+"\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -2952,21 +2967,36 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string PayPlanChargeProvNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			if(isCheck) {
-				command="SELECT COUNT(*) FROM payplancharge WHERE ProvNum=0";
-				int numFound=PIn.Int(Db.GetCount(command));
-				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Pay plan charge providers missing: ")+numFound+"\r\n";
-				}
+			command="SELECT pat.PatNum AS 'PatNum',pat.LName AS 'PatLName',pat.FName AS 'PatFName',guar.PatNum AS 'GuarNum',guar.LName AS 'GuarLName',guar.FName AS 'GuarFName',payplan.PayPlanDate "
+				+"FROM payplancharge "
+				+"LEFT JOIN payplan ON payplancharge.PayPlanNum=payplan.PayPlanNum "
+				+"LEFT JOIN patient pat ON payplan.PatNum=pat.PatNum "
+				+"LEFT JOIN patient guar ON payplan.Guarantor=guar.PatNum "
+				+"WHERE payplancharge.ProvNum=0 "
+				+"GROUP BY payplancharge.PayPlanNum";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else {
-				//Take no action.  Use descriptive explanation.
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Pay plans with charges that have providers missing: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   "+Lans.g("FormDatabaseMaintenance","Pay Plan Date")+": "+PIn.DateT(table.Rows[i]["PayPlanDate"].ToString()).ToShortDateString()+"\r\n" 
+					+"      "+Lans.g("FormDatabaseMaintenance","Guarantor")+": #"+table.Rows[i]["PatNum"]+" - "+table.Rows[i]["PatFName"]+" "+table.Rows[i]["PatLName"]+"\r\n"
+					+"      "+Lans.g("FormDatabaseMaintenance","For Patient")+": #"+table.Rows[i]["GuarNum"]+" - "+table.Rows[i]["GuarFName"]+" "+table.Rows[i]["GuarLName"]+"\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -3652,7 +3682,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ProcedurelogTpAttachedToClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3668,20 +3698,27 @@ namespace OpenDentBusiness {
 				+"AND (claim.ClaimStatus='W' OR claim.ClaimStatus='S' OR claim.ClaimStatus='R') "//waiting, sent, or received
 				+"AND (claim.ClaimType='P' OR claim.ClaimType='S' OR claim.ClaimType='Other')";//pri, sec, or other.  Eliminates preauths.
 			table=Db.GetTable(command);
-			if(isCheck) {
-				if(table.Rows.Count>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Procedures attached to claims, but with status of TP: ")+table.Rows.Count+"\r\n";
-					for(int i=0;i<table.Rows.Count;i++) {
-						log+=Lans.g("FormDatabaseMaintenance","Patient")
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Procedures attached to claims with status of TP: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+=Lans.g("FormDatabaseMaintenance","Patient")
 							+" "+table.Rows[i]["FName"].ToString()
 							+" "+table.Rows[i]["LName"].ToString()
 							+" #"+table.Rows[i]["PatNum"].ToString()
 							+", for claim service date "+PIn.Date(table.Rows[i]["DateService"].ToString()).ToShortDateString()
 							+", procedure code "+table.Rows[i]["ProcCode"].ToString()+"\r\n";
-					}
 				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
-			else {
+			//else {
 				//Detach claimproc(s) from claim.
 
 				//for(int i=0;i<table.Rows.Count;i++) {
@@ -3693,11 +3730,11 @@ namespace OpenDentBusiness {
 				//  log+=Lans.g("FormDatabaseMaintenance","Procedures attached to claims, but with status of TP.  Status changed back to C: ")
 				//    +numberFixed.ToString()+"\r\n";
 				//}
-			}
+			//}
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ProcedurelogTpAttachedToCompleteLabFeesCanada(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3713,19 +3750,23 @@ namespace OpenDentBusiness {
 				+"INNER JOIN procedurecode pclab ON pclab.CodeNum=lab.CodeNum "
 				+"WHERE proc.ProcStatus="+POut.Long((int)ProcStat.TP);
 			table=Db.GetTable(command);
-			if(isCheck) {
-				if(table.Rows.Count>0 || verbose) {
-					for(int i=0;i<table.Rows.Count;i++) {
-						log+=Lans.g("FormDatabaseMaintenance","Completed lab fee")+" "+table.Rows[i]["ProcCodeLab"].ToString()+" "
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Completed lab fees with treatment planned procedures attached")+": "+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+=Lans.g("FormDatabaseMaintenance","Completed lab fee")+" "+table.Rows[i]["ProcCodeLab"].ToString()+" "
 							+Lans.g("FormDatabaseMaintenance","is attached to TP procedure")+" "+table.Rows[i]["ProcCode"].ToString()+" "
 							+Lans.g("FormDatabaseMaintenance","on date")+" "+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()+". "
-							+Lans.g("FormDatabaseMaintenance","PatNum: ")+table.Rows[i]["PatNum"].ToString()+" "
-							+Lans.g("FormDatabaseMaintenance","Fix manually from within the Chart module.")+"\r\n";
-					}
+							+Lans.g("FormDatabaseMaintenance","PatNum: ")+table.Rows[i]["PatNum"].ToString()+"\r\n";
 				}
-			}
-			else {
-				//User must fix manually.
+				log+=Lans.g("FormDatabaseMaintenance","   Fix manually from within the Chart module.")+"\r\n";
 			}
 			return log;
 		}
@@ -3768,24 +3809,19 @@ namespace OpenDentBusiness {
 				AND claimproc.InsPayAmt>0
 				GROUP BY provider.ProvNum";
 			table=Db.GetTable(command);
-			if(table.Rows.Count==0) {
-			  if(verbose) {
-			    log+=Lans.g("FormDatabaseMaintenance","Hidden providers checked for claim payments.")+"\r\n";
-			  }
+			if(table.Rows.Count==0 && !verbose) {
 				return log;
 			}
-			if(isCheck) {
-				Provider prov;
-				for(int i=0;i<table.Rows.Count;i++) {
-					prov=Providers.GetProv(PIn.Long(table.Rows[i][1].ToString()));
-					log+=Lans.g("FormDatabaseMaintenance","Warning!  Hidden provider ")+" "+prov.Abbr+" "
+			log+=Lans.g("FormDatabaseMaintenance","Hidden providers checked for claim payments")+": "+table.Rows.Count;
+			Provider prov;
+			for(int i=0;i<table.Rows.Count;i++) {
+				prov=Providers.GetProv(PIn.Long(table.Rows[i]["ProvNum"].ToString()));
+				log+=Lans.g("FormDatabaseMaintenance","Warning!  Hidden provider ")+" "+prov.Abbr+" "
 						+Lans.g("FormDatabaseMaintenance","has claim payments entered as recently as ")
-						+PIn.Date(table.Rows[i][0].ToString()).ToShortDateString()
-						+Lans.g("FormDatabaseMaintenance",".  This data will be missing on income reports.")+"\r\n";
-				}
+						+PIn.Date(table.Rows[i][0].ToString()).ToShortDateString();
 			}
-			else {
-				//No fix implemented.
+			if(table.Rows.Count>0) {
+				log+=Lans.g("FormDatabaseMaintenance","   This data will be missing on income reports.")+"\r\n";
 			}
 			return log;
 		}
@@ -3815,7 +3851,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string RecallDuplicatesWarn(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -3833,28 +3869,23 @@ namespace OpenDentBusiness {
 			  +"OR recall.RecallTypeNum="+POut.Long(RecallTypes.ProphyType)+") "
 			  +"GROUP BY FName,LName,patient.PatNum HAVING countDups>1";
 			table=Db.GetTable(command);
-			if(table.Rows.Count==0) {
-				if(verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Recalls checked for duplicates.")+"\r\n";
-				}
+			if(table.Rows.Count==0 && !verbose) {
 				return log;
 			}
-			if(isCheck) {
-				string patNames="";
-				for(int i=0;i<table.Rows.Count;i++) {
-					if(i>15) {
-						break;
-					}
-					if(i>0) {
-						patNames+=", ";
-					}
-					patNames+=table.Rows[i][0].ToString()+" "+table.Rows[i][1].ToString();
-				}
-				log+=Lans.g("FormDatabaseMaintenance","Warning!  Number of patients with duplicate recalls: ")+table.Rows.Count.ToString()+".  "
-					+Lans.g("FormDatabaseMaintenance","including: ")+patNames+"\r\n";
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Number of patients with duplicate recalls: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
-			else {
-				//No fix implemented.
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					if(i%3==0) {
+						log+="\r\n   ";
+					}
+					log+=table.Rows[i]["FName"].ToString()+" "+table.Rows[i]["LName"].ToString()+"; ";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -4134,29 +4165,30 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		/// <summary>Only one user of a given UserName may be unhidden at a time. Warn the user and instruct them to hide extras.</summary>
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			//check and fix are currently identical
-			if(isCheck) {//Give them a warning to hide all but one of these users.
-				command="SELECT UserName FROM userod WHERE IsHidden=0 GROUP BY UserName HAVING Count(*)>1;";
-				DataTable table=Db.GetTable(command);
-				for(int i=0;i<table.Rows.Count;i++) {
-					log+=Lans.g("FormDatabaseMaintenance","Warning! User ")+table.Rows[i]["UserName"].ToString()
-						+" has duplicates. Please go to Setup | Security and hide all but one of these users.\r\n";
-				}
+			command="SELECT UserName FROM userod WHERE IsHidden=0 GROUP BY UserName HAVING Count(*)>1;";
+			DataTable table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else {//Give them a warning to hide all but one of these users.
-				command="SELECT UserName FROM userod WHERE IsHidden=0 GROUP BY UserName HAVING Count(*)>1;";
-				DataTable table=Db.GetTable(command);
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Users with duplicates")+": "+table.Rows.Count;
+			//check and fix are currently identical
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				for(int i=0;i<table.Rows.Count;i++){
-					log+=Lans.g("FormDatabaseMaintenance","Warning! User ")+table.Rows[i]["UserName"].ToString()
-						+" has duplicates. Please go to Setup | Security and hide all but one of these users.\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","User")+" - "+table.Rows[i]["UserName"].ToString()+"\r\n";
 				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.  Please go to Setup | Security and hide all but one of each unique user.")+"\r\n";
 			}
 			return log;
 		}
