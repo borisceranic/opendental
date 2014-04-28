@@ -300,6 +300,7 @@ namespace OpenDental {
 							sheetfield.IsRequired=false;
 						}
 						sheetfield.TabOrder=sAnds.web_sheetfieldlist[i].TabOrder;
+						sheetfield.ReportableName=sAnds.web_sheetfieldlist[i].ReportableName;
 						sheetfield.RadioButtonGroup=sAnds.web_sheetfieldlist[i].RadioButtonGroup;
 						sheetfield.RadioButtonValue=sAnds.web_sheetfieldlist[i].RadioButtonValue;
 						sheetfield.GrowthBehavior=(GrowthBehaviorEnum)sAnds.web_sheetfieldlist[i].GrowthBehavior;

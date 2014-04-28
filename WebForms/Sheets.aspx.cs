@@ -50,7 +50,7 @@ namespace WebForms {
 				}
 				Logger.Information("Page requested from IpAddress="+HttpContext.Current.Request.UserHostAddress+" for  DentalOfficeID="+DentalOfficeID);
 				Panel2.Visible=true;
-				GeneratePage(DentalOfficeID,WebSheetDefID);
+				GeneratePage(DentalOfficeID,WebSheetDefID);				
 			}
 			catch(Exception ex) {
 				Logger.LogError("IpAddress="+HttpContext.Current.Request.UserHostAddress+" DentalOfficeID="+DentalOfficeID+" WebSheetDefID="+WebSheetDefID,ex);
@@ -620,6 +620,7 @@ namespace WebForms {
 					NewSheetfieldObj.RadioButtonValue=SheetFieldDefObj.RadioButtonValue;
 					NewSheetfieldObj.GrowthBehavior=SheetFieldDefObj.GrowthBehavior;
 					NewSheetfieldObj.TabOrder=SheetFieldDefObj.TabOrder;
+					NewSheetfieldObj.ReportableName=SheetFieldDefObj.ReportableName;
 					NewSheetfieldObj.FieldValue=SheetFieldDefObj.FieldValue;
 					long WebSheetFieldDefID=SheetFieldDefObj.WebSheetFieldDefID;
 					if(FormValuesHashTable.ContainsKey(WebSheetFieldDefID+"")) {
