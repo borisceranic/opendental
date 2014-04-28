@@ -1128,7 +1128,7 @@ namespace OpenDental{
 		private void FormApptEdit_Load(object sender, System.EventArgs e){
 			tbTime.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbTime_CellClicked);
 			if(IsNew){
-				if(!Security.IsAuthorized(Permissions.AppointmentCreate)){
+				if(!Security.IsAuthorized(Permissions.AppointmentCreate)) { //Should have been checked before appointment was inserted into DB and this form was loaded.  Left here just in case.
 					DialogResult=DialogResult.Cancel;
 					return;
 				}
@@ -3026,15 +3026,16 @@ namespace OpenDental{
 		}
 
 		private void FormApptEdit_FormClosing(object sender,FormClosingEventArgs e) {
+			//Do not use pat.PatNum here.  Use AptCur.PatNum instead.  Pat will be null in the case that the user does not have the appt create permission.
 			if(DialogResult!=DialogResult.OK) {
 				if(IsNew) {
-					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,
 						"Create cancel for date/time: "+AptCur.AptDateTime.ToString(),
 						AptCur.AptNum);
 					Appointments.Delete(AptCur.AptNum);
 				}
 			}
-			Recalls.Synch(pat.PatNum);
+			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 		}
 		
