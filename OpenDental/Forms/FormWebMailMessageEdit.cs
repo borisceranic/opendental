@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
 using System.Collections.Generic;
+using System.IO;
+using System.Diagnostics;
 
 namespace OpenDental {
 	///<summary>DialogResult will be Abort if message was unable to be read. If message is read successfully (Ok or Cancel), then caller is responsible for updating SentOrReceived to read (where applicable).</summary>
@@ -17,6 +19,8 @@ namespace OpenDental {
 		private bool _allowSendSecureMessage=true;
 		private bool _allowSendNotificationMessage=true;
 		private List<Patient> _listPatients=null;
+		///<summary>Attachment objects will be set right before inserting _secureMessage into db. Until then they will be held separate.</summary>
+		private List<EmailAttach> _listAttachments=new List<EmailAttach>();
 	
 		///<summary>Default ctor. This implies that we are composing a new message, NOT replying to an existing message. Provider attached to this message should be Security.CurUser.ProvNum</summary>
 		public FormWebMailMessageEdit(long patNum) : this(patNum,0) { }
@@ -31,6 +35,17 @@ namespace OpenDental {
 
 		private void FormWebMailMessageEdit_Load(object sender,EventArgs e) {
 			VerifyInputs();
+			listAttachments.ContextMenu=contextMenuAttachments;
+		}
+
+		private void FillAttachments() {
+			listAttachments.Items.Clear();
+			for(int i=0;i<_listAttachments.Count;i++) {
+				listAttachments.Items.Add(_listAttachments[i].DisplayedFileName);
+			}
+			if(_listAttachments.Count>0) {
+				listAttachments.SelectedIndex=0;
+			}
 		}
 
 		private void BlockSendSecureMessage(string reason) {
@@ -209,6 +224,53 @@ namespace OpenDental {
 			}
 		}
 
+		private void listAttachments_MouseDown(object sender,MouseEventArgs e) {
+			//A right click also needs to select an items so that the context menu will work properly.
+			if(e.Button==MouseButtons.Right) {
+				int clickedIndex=listAttachments.IndexFromPoint(e.X,e.Y);
+				if(clickedIndex!=-1) {
+					listAttachments.SelectedIndex=clickedIndex;
+				}
+			}
+		}
+
+		private void listAttachments_DoubleClick(object sender,EventArgs e) {
+			try {
+				if(listAttachments.SelectedIndex==-1) {
+					return;
+				}
+				string strFilePathAttach=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName);
+				//We have to create a copy of the file because the name is different.
+				//There is also a high probability that the attachment no longer exists if
+				//the A to Z folders are disabled, since the file will have originally been
+				//placed in the temporary directory.
+				string tempFile=ODFileUtils.CombinePaths(Path.GetTempPath(),_listAttachments[listAttachments.SelectedIndex].DisplayedFileName);
+				File.Copy(strFilePathAttach,tempFile,true);
+				Process.Start(tempFile);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+
+		private void menuItemAttachmentPreview_Click(object sender,EventArgs e) {
+			listAttachments_DoubleClick(sender,e);
+		}
+				
+		private void menuItemAttachmentRemove_Click(object sender,EventArgs e) {
+			try {
+				if(listAttachments.SelectedIndex==-1) {
+					return;
+				}
+				File.Delete(ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName));
+				_listAttachments.RemoveAt(listAttachments.SelectedIndex);
+				FillAttachments();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+
 		private void menuItemSetup_Click(object sender,EventArgs e) {
 			FormPatientPortalSetup formPPS=new FormPatientPortalSetup();
 			formPPS.ShowDialog();
@@ -236,6 +298,46 @@ namespace OpenDental {
 			sb.AppendLine(Lan.g(this,"Body")+": "+textBody.Text.Replace("\n","\r\n"));
 			MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(sb.ToString());
 			msgBox.ShowDialog();
+		}
+
+		private void butAttach_Click(object sender,EventArgs e) {
+			OpenFileDialog dlg=new OpenFileDialog();
+			dlg.Multiselect=true;
+			Patient patCur=Patients.GetPat(_patNum);
+			if(patCur!=null && patCur.ImageFolder!="") {
+				if(PrefC.AtoZfolderUsed) {
+					dlg.InitialDirectory=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
+																																				patCur.ImageFolder.Substring(0,1).ToUpper(),
+																																				patCur.ImageFolder);
+				}
+				else {
+					//Use the OS default directory for this type of file viewer.
+					dlg.InitialDirectory="";
+				}
+			}
+			if(dlg.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			Random rnd=new Random();
+			string newName;
+			EmailAttach attach;
+			string attachPath=EmailMessages.GetEmailAttachPath();
+			try {
+				for(int i=0;i<dlg.FileNames.Length;i++) {
+					//copy the file
+					newName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+Path.GetExtension(dlg.FileNames[i]);
+					File.Copy(dlg.FileNames[i],ODFileUtils.CombinePaths(attachPath,newName));
+					//create the attachment
+					attach=new EmailAttach();
+					attach.DisplayedFileName=Path.GetFileName(dlg.FileNames[i]);
+					attach.ActualFileName=newName;
+					_listAttachments.Add(attach);
+				}
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+			FillAttachments();
 		}
 
 		private void butSend_Click(object sender,EventArgs e) {
@@ -267,6 +369,7 @@ namespace OpenDental {
 					return;
 				}				
 			}
+			_secureMessage.Attachments=_listAttachments;
 			EmailMessages.Insert(_secureMessage);
 			MsgBox.Show(this,"Message Sent");
 			DialogResult=DialogResult.OK;
