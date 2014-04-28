@@ -126,9 +126,7 @@ namespace OpenDental {
 			ProvStudent.FName=textFirstName.Text;
 			ProvStudent.LName=textLastName.Text;
 			ProvStudent.Abbr=textAbbr.Text;
-			if(comboClass.SelectedIndex!=0) {
-				ProvStudent.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
-			}
+			ProvStudent.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex].SchoolClassNum;
 			Userod newUser=new Userod();
 			bool isAutoUserName=true;
 			if(!ProvStudent.IsNew || _autoUserName.ToString()!=textUserName.Text) {

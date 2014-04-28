@@ -368,9 +368,15 @@ namespace OpenDentBusiness {
 					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
 					+"WHERE userod.UserNum NOT IN "
 					+"(SELECT userod.UserNum FROM userod,provider "
-						+"WHERE userod.ProvNum=provider.ProvNum "
-						+"AND provider.IsInstructor="+POut.Bool(isInstructor)+") "
-					+"AND grouppermission.PermType="+POut.Int((int)Permissions.SecurityAdmin)+" ";
+						+"WHERE userod.ProvNum=provider.ProvNum ";
+				if(!isInstructor) {
+					command+="AND provider.IsInstructor="+POut.Bool(isInstructor)+" ";
+					command+="AND provider.SchoolClassNum!=0) ";
+				}
+				else {
+					command+="AND provider.IsInstructor="+POut.Bool(isInstructor)+") ";
+				}
+					command+="AND grouppermission.PermType="+POut.Int((int)Permissions.SecurityAdmin)+" ";
 				int lastAdmin=PIn.Int(Db.GetCount(command));
 				if(lastAdmin==0) {
 					throw new Exception("Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.");
@@ -379,6 +385,9 @@ namespace OpenDentBusiness {
 			command="UPDATE userod INNER JOIN provider ON userod.ProvNum=provider.ProvNum "
 					+"SET UserGroupNum="+POut.Long(userGroup.UserGroupNum)+" "
 					+"WHERE provider.IsInstructor="+POut.Bool(isInstructor);
+			if(!isInstructor) {
+				command+=" AND provider.SchoolClassNum!=0";
+			}
 			Db.NonQ(command);
 		}
 

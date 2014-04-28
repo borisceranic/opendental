@@ -77,13 +77,14 @@ namespace OpenDental{
 		private TextBox textStateWhereLicensed;
 		private CheckBox checkIsInstructor;
 		private GroupBox groupDentalSchools;
-		private TextBox textBox1;
-		private TextBox textBox2;
+		private TextBox textUserName;
+		private TextBox textPassword;
 		private TextBox textUniqueID;
 		private Label label17;
 		private Label label16;
 		private Label label18;
 		public Provider ProvCur;
+		private Userod _existingUser;
 
 		///<summary></summary>
 		public FormProvEdit(){
@@ -175,8 +176,8 @@ namespace OpenDental{
 			this.textStateWhereLicensed = new System.Windows.Forms.TextBox();
 			this.checkIsInstructor = new System.Windows.Forms.CheckBox();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
-			this.textBox1 = new System.Windows.Forms.TextBox();
-			this.textBox2 = new System.Windows.Forms.TextBox();
+			this.textUserName = new System.Windows.Forms.TextBox();
+			this.textPassword = new System.Windows.Forms.TextBox();
 			this.textUniqueID = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
@@ -585,15 +586,17 @@ namespace OpenDental{
 			this.comboSchoolClass.Name = "comboSchoolClass";
 			this.comboSchoolClass.Size = new System.Drawing.Size(130, 21);
 			this.comboSchoolClass.TabIndex = 15;
+			this.comboSchoolClass.Visible = false;
 			// 
 			// labelSchoolClass
 			// 
-			this.labelSchoolClass.Location = new System.Drawing.Point(36, 21);
+			this.labelSchoolClass.Location = new System.Drawing.Point(8, 21);
 			this.labelSchoolClass.Name = "labelSchoolClass";
-			this.labelSchoolClass.Size = new System.Drawing.Size(65, 16);
+			this.labelSchoolClass.Size = new System.Drawing.Size(93, 16);
 			this.labelSchoolClass.TabIndex = 89;
 			this.labelSchoolClass.Text = "Class";
 			this.labelSchoolClass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSchoolClass.Visible = false;
 			// 
 			// textNationalProvID
 			// 
@@ -776,17 +779,17 @@ namespace OpenDental{
 			this.checkIsInstructor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsInstructor.Enabled = false;
 			this.checkIsInstructor.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsInstructor.Location = new System.Drawing.Point(27, 42);
+			this.checkIsInstructor.Location = new System.Drawing.Point(6, 42);
 			this.checkIsInstructor.Name = "checkIsInstructor";
-			this.checkIsInstructor.Size = new System.Drawing.Size(86, 17);
+			this.checkIsInstructor.Size = new System.Drawing.Size(107, 17);
 			this.checkIsInstructor.TabIndex = 111;
 			this.checkIsInstructor.Text = "Is Instructor";
 			this.checkIsInstructor.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// groupDentalSchools
 			// 
-			this.groupDentalSchools.Controls.Add(this.textBox1);
-			this.groupDentalSchools.Controls.Add(this.textBox2);
+			this.groupDentalSchools.Controls.Add(this.textUserName);
+			this.groupDentalSchools.Controls.Add(this.textPassword);
 			this.groupDentalSchools.Controls.Add(this.textUniqueID);
 			this.groupDentalSchools.Controls.Add(this.label17);
 			this.groupDentalSchools.Controls.Add(this.label16);
@@ -801,22 +804,23 @@ namespace OpenDental{
 			this.groupDentalSchools.TabIndex = 112;
 			this.groupDentalSchools.TabStop = false;
 			this.groupDentalSchools.Text = "Dental Schools";
+			this.groupDentalSchools.Visible = false;
 			// 
-			// textBox1
+			// textUserName
 			// 
-			this.textBox1.Location = new System.Drawing.Point(102, 63);
-			this.textBox1.MaxLength = 100;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(129, 20);
-			this.textBox1.TabIndex = 113;
+			this.textUserName.Location = new System.Drawing.Point(102, 63);
+			this.textUserName.MaxLength = 100;
+			this.textUserName.Name = "textUserName";
+			this.textUserName.Size = new System.Drawing.Size(129, 20);
+			this.textUserName.TabIndex = 113;
 			// 
-			// textBox2
+			// textPassword
 			// 
-			this.textBox2.Location = new System.Drawing.Point(102, 83);
-			this.textBox2.MaxLength = 100;
-			this.textBox2.Name = "textBox2";
-			this.textBox2.Size = new System.Drawing.Size(129, 20);
-			this.textBox2.TabIndex = 114;
+			this.textPassword.Location = new System.Drawing.Point(102, 83);
+			this.textPassword.MaxLength = 100;
+			this.textPassword.Name = "textPassword";
+			this.textPassword.Size = new System.Drawing.Size(129, 20);
+			this.textPassword.TabIndex = 114;
 			// 
 			// textUniqueID
 			// 
@@ -838,9 +842,9 @@ namespace OpenDental{
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(99, 45);
+			this.label16.Location = new System.Drawing.Point(119, 45);
 			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(96, 14);
+			this.label16.Size = new System.Drawing.Size(76, 14);
 			this.label16.TabIndex = 112;
 			this.label16.Text = "Unique ID";
 			this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -936,11 +940,33 @@ namespace OpenDental{
 			//	Providers.InsertCur();
 				//one field handled from previous form
 			//}
-			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)){
-				groupDentalSchools.Visible=false;
-				labelSchoolClass.Visible=false;
-				comboSchoolClass.Visible=false;
-				checkIsInstructor.Visible=false;
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools) //Dental Schools is turned on
+				&& (ProvCur.SchoolClassNum!=0 || ProvCur.IsInstructor))//Adding/Editing Students or Instructors
+			{
+				groupDentalSchools.Visible=true;
+				if(!ProvCur.IsNew) {
+					textUniqueID.Text=ProvCur.ProvNum.ToString();
+					List<Userod> userList=Providers.GetAttachedUsers(ProvCur.ProvNum);
+					if(userList.Count>0) {
+						textUserName.Text=userList[0].UserName;//Should always happen if they are a student.
+						_existingUser=userList[0];
+					}
+				}
+				else {
+					textUserName.Text=Providers.GetNextAvailableProvNum().ToString();//User-names are suggested to be the ProvNum of the provider.  This can be changed at will.
+				}
+				for(int i=0;i<SchoolClasses.List.Length;i++) {
+					comboSchoolClass.Items.Add(SchoolClasses.List[i].GradYear.ToString()+"-"+SchoolClasses.List[i].Descript);
+					comboSchoolClass.SelectedIndex=0;
+					if(SchoolClasses.List[i].SchoolClassNum==ProvCur.SchoolClassNum) {
+						comboSchoolClass.SelectedIndex=i;
+						break;
+					}
+				}
+				if(ProvCur.SchoolClassNum!=0) {
+					labelSchoolClass.Visible=true;
+					comboSchoolClass.Visible=true;
+				}
 			}
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				textEcwID.Text=ProvCur.EcwID;
@@ -985,13 +1011,6 @@ namespace OpenDental{
 			checkIsInstructor.Checked=ProvCur.IsInstructor;
 			butColor.BackColor=ProvCur.ProvColor;
 			butOutlineColor.BackColor=ProvCur.OutlineColor;
-			comboSchoolClass.Items.Add(Lan.g(this,"none"));
-			comboSchoolClass.SelectedIndex=0;
-			for(int i=0;i<SchoolClasses.List.Length;i++){
-				comboSchoolClass.Items.Add(SchoolClasses.List[i].GradYear.ToString()+"-"+SchoolClasses.List[i].Descript);
-				if(SchoolClasses.List[i].SchoolClassNum==ProvCur.SchoolClassNum)
-					comboSchoolClass.SelectedIndex=i+1;
-			}
 			for(int i=0;i<FeeSchedC.ListShort.Count;i++){
 				this.listFeeSched.Items.Add(FeeSchedC.ListShort[i].Description);
 				if(FeeSchedC.ListShort[i].FeeSchedNum==ProvCur.FeeSched){
@@ -1138,6 +1157,12 @@ namespace OpenDental{
 				}
 				Providers.RemoveProvFromFutureSchedule(ProvCur.ProvNum);
 			}
+			if(ProvCur.IsInstructor || ProvCur.SchoolClassNum!=0) {//Is an Instructor or a Student
+				if(textUserName.Text=="") {
+					MsgBox.Show(this,"User Name is not allowed to be blank.");
+					return;
+				}
+			}
 			ProvCur.Abbr=textAbbr.Text;
 			ProvCur.LName=textLName.Text;
 			ProvCur.FName=textFName.Text;
@@ -1160,11 +1185,10 @@ namespace OpenDental{
 			ProvCur.ProvColor=butColor.BackColor;
 			ProvCur.OutlineColor=butOutlineColor.BackColor;
 			ProvCur.IsInstructor=checkIsInstructor.Checked;
-			if(comboSchoolClass.SelectedIndex<1) {//none
-				ProvCur.SchoolClassNum=0;
-			}
-			else {
-				ProvCur.SchoolClassNum=SchoolClasses.List[comboSchoolClass.SelectedIndex-1].SchoolClassNum;
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				if(ProvCur.SchoolClassNum!=0) {
+					ProvCur.SchoolClassNum=SchoolClasses.List[comboSchoolClass.SelectedIndex-1].SchoolClassNum;
+				}
 			}
 			if(listFeeSched.SelectedIndex!=-1) {
 				ProvCur.FeeSched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
@@ -1182,9 +1206,37 @@ namespace OpenDental{
 			}
 			ProvCur.IsNotPerson=checkIsNotPerson.Checked;
 			if(IsNew) {
-				Providers.Insert(ProvCur);
+				long provNum=Providers.Insert(ProvCur);
+				if(ProvCur.IsInstructor) {
+					Userod user=new Userod();
+					user.UserName=textUserName.Text;
+					user.Password=Userods.EncryptPassword(textPassword.Text);
+					user.ProvNum=provNum;
+					user.UserGroupNum=PrefC.GetLong(PrefName.SecurityGroupForInstructors);
+					try {
+						Userods.Insert(user);
+					}
+					catch(Exception ex) {
+						Providers.Delete(ProvCur);
+						MessageBox.Show(ex.Message);
+						return;
+					}
+				}
 			}
 			else {
+				try {
+					if(_existingUser!=null && (ProvCur.IsInstructor || ProvCur.SchoolClassNum!=0)) {
+						_existingUser.UserName=textUserName.Text;
+						if(textPassword.Text!="") {
+							_existingUser.Password=Userods.EncryptPassword(textPassword.Text);
+						}
+						Userods.Update(_existingUser);
+					}
+				}
+				catch(Exception ex) {
+					MessageBox.Show(ex.Message);
+					return;
+				}
 				Providers.Update(ProvCur);
 			}
 			DialogResult = DialogResult.OK;

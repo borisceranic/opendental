@@ -143,9 +143,12 @@ namespace OpenDentBusiness{
 		}
 
 
-		///<Summary>For use in areas of the program where we have more room than just simple abbr.  Such as pick boxes in reports.  This will give Abbr - LName, FName (hidden).</Summary>
+		///<Summary>For use in areas of the program where we have more room than just simple abbr.  Such as pick boxes in reports.  This will give Abbr - LName, FName (hidden).  If dental schools is turned on then the Abbr will be replaced with the ProvNum.</Summary>
 		public string GetLongDesc(){
 			string retval=Abbr+"- "+LName+", "+FName;
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				retval=ProvNum+"- "+LName+", "+FName;
+			}
 			if(IsHidden){
 				retval+=" "+Lans.g("Providers","(hidden)");
 			}

@@ -39,6 +39,12 @@ namespace OpenDental{
 		private TextBox textMoveTo;
 		//private User user;
 		private DataTable table;
+		private Label label7;
+		private TextBox textUniqueID;
+		private Label label6;
+		private TextBox textFirstName;
+		private UI.Button butStudBulkEdit;
+		private Label label8;
 		///<summary>Set when prov picker button is used.  textMoveTo shows this prov in human readable format.</summary>
 		private long _provNumMoveTo;
 
@@ -69,7 +75,6 @@ namespace OpenDental{
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.textLastName = new System.Windows.Forms.TextBox();
@@ -89,6 +94,13 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.butMove = new OpenDental.UI.Button();
+			this.label6 = new System.Windows.Forms.Label();
+			this.textFirstName = new System.Windows.Forms.TextBox();
+			this.label7 = new System.Windows.Forms.Label();
+			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butStudBulkEdit = new OpenDental.UI.Button();
+			this.label8 = new System.Windows.Forms.Label();
 			this.groupDentalSchools.SuspendLayout();
 			this.groupCreateUsers.SuspendLayout();
 			this.groupMovePats.SuspendLayout();
@@ -161,25 +173,14 @@ namespace OpenDental{
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(7, 12);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(688, 679);
-			this.gridMain.TabIndex = 13;
-			this.gridMain.Title = "Providers";
-			this.gridMain.TranslationName = "TableProviderSetup";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
 			// groupDentalSchools
 			// 
 			this.groupDentalSchools.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupDentalSchools.Controls.Add(this.label8);
+			this.groupDentalSchools.Controls.Add(this.label7);
+			this.groupDentalSchools.Controls.Add(this.textUniqueID);
+			this.groupDentalSchools.Controls.Add(this.label6);
+			this.groupDentalSchools.Controls.Add(this.textFirstName);
 			this.groupDentalSchools.Controls.Add(this.label4);
 			this.groupDentalSchools.Controls.Add(this.textLastName);
 			this.groupDentalSchools.Controls.Add(this.radioInstructors);
@@ -189,7 +190,7 @@ namespace OpenDental{
 			this.groupDentalSchools.Controls.Add(this.label1);
 			this.groupDentalSchools.Location = new System.Drawing.Point(703, 12);
 			this.groupDentalSchools.Name = "groupDentalSchools";
-			this.groupDentalSchools.Size = new System.Drawing.Size(273, 127);
+			this.groupDentalSchools.Size = new System.Drawing.Size(273, 174);
 			this.groupDentalSchools.TabIndex = 14;
 			this.groupDentalSchools.TabStop = false;
 			this.groupDentalSchools.Text = "Dental Schools Search by:";
@@ -203,11 +204,11 @@ namespace OpenDental{
 			this.label4.Text = "Last Name";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textName
+			// textLastName
 			// 
 			this.textLastName.Location = new System.Drawing.Point(98, 101);
 			this.textLastName.MaxLength = 15;
-			this.textLastName.Name = "textName";
+			this.textLastName.Name = "textLastName";
 			this.textLastName.Size = new System.Drawing.Size(166, 20);
 			this.textLastName.TabIndex = 20;
 			this.textLastName.TextChanged += new System.EventHandler(this.textLastName_TextChanged);
@@ -290,7 +291,7 @@ namespace OpenDental{
 			this.groupCreateUsers.Controls.Add(this.comboUserGroup);
 			this.groupCreateUsers.Controls.Add(this.label3);
 			this.groupCreateUsers.Controls.Add(this.butCreateUsers);
-			this.groupCreateUsers.Location = new System.Drawing.Point(703, 145);
+			this.groupCreateUsers.Location = new System.Drawing.Point(703, 192);
 			this.groupCreateUsers.Name = "groupCreateUsers";
 			this.groupCreateUsers.Size = new System.Drawing.Size(273, 76);
 			this.groupCreateUsers.TabIndex = 18;
@@ -324,7 +325,7 @@ namespace OpenDental{
 			this.groupMovePats.Controls.Add(this.label5);
 			this.groupMovePats.Controls.Add(this.label2);
 			this.groupMovePats.Controls.Add(this.butMove);
-			this.groupMovePats.Location = new System.Drawing.Point(703, 226);
+			this.groupMovePats.Location = new System.Drawing.Point(703, 273);
 			this.groupMovePats.Name = "groupMovePats";
 			this.groupMovePats.Size = new System.Drawing.Size(273, 132);
 			this.groupMovePats.TabIndex = 18;
@@ -403,11 +404,88 @@ namespace OpenDental{
 			this.butMove.Text = "Move";
 			this.butMove.Click += new System.EventHandler(this.butMove_Click);
 			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(8, 124);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(90, 18);
+			this.label6.TabIndex = 23;
+			this.label6.Text = "First Name";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textFirstName
+			// 
+			this.textFirstName.Location = new System.Drawing.Point(98, 123);
+			this.textFirstName.MaxLength = 15;
+			this.textFirstName.Name = "textFirstName";
+			this.textFirstName.Size = new System.Drawing.Size(166, 20);
+			this.textFirstName.TabIndex = 22;
+			this.textFirstName.TextChanged += new System.EventHandler(this.textFirstName_TextChanged);
+			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(8, 146);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(90, 18);
+			this.label7.TabIndex = 25;
+			this.label7.Text = "Unique ID";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textUniqueID
+			// 
+			this.textUniqueID.Location = new System.Drawing.Point(98, 145);
+			this.textUniqueID.MaxLength = 15;
+			this.textUniqueID.Name = "textUniqueID";
+			this.textUniqueID.Size = new System.Drawing.Size(166, 20);
+			this.textUniqueID.TabIndex = 24;
+			this.textUniqueID.TextChanged += new System.EventHandler(this.textUniqueID_TextChanged);
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = true;
+			this.gridMain.Location = new System.Drawing.Point(7, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.Size = new System.Drawing.Size(688, 679);
+			this.gridMain.TabIndex = 13;
+			this.gridMain.Title = "Providers";
+			this.gridMain.TranslationName = "TableProviderSetup";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butStudBulkEdit
+			// 
+			this.butStudBulkEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butStudBulkEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butStudBulkEdit.Autosize = true;
+			this.butStudBulkEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butStudBulkEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butStudBulkEdit.CornerRadius = 4F;
+			this.butStudBulkEdit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butStudBulkEdit.Location = new System.Drawing.Point(865, 554);
+			this.butStudBulkEdit.Name = "butStudBulkEdit";
+			this.butStudBulkEdit.Size = new System.Drawing.Size(102, 26);
+			this.butStudBulkEdit.TabIndex = 19;
+			this.butStudBulkEdit.Text = "Student Bulk Edit";
+			this.butStudBulkEdit.Click += new System.EventHandler(this.butStudBulkEdit_Click);
+			// 
+			// label8
+			// 
+			this.label8.Location = new System.Drawing.Point(116, 48);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(148, 50);
+			this.label8.TabIndex = 26;
+			this.label8.Text = "These selections will also affect the functionality of the add button.";
+			// 
 			// FormProviderSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(982, 707);
+			this.Controls.Add(this.butStudBulkEdit);
 			this.Controls.Add(this.groupMovePats);
 			this.Controls.Add(this.groupCreateUsers);
 			this.Controls.Add(this.butAdd);
@@ -449,6 +527,7 @@ namespace OpenDental{
 			}
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)){
 				groupDentalSchools.Visible=false;
+				butStudBulkEdit.Visible=false;
 			}
 			else{
 				comboClass.Items.Add(Lan.g(this,"All"));
@@ -473,7 +552,7 @@ namespace OpenDental{
 				if(comboClass.SelectedIndex>0) {
 					schoolClass=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
 				}
-				table=Providers.RefreshForDentalSchool(schoolClass,textLastName.Text,radioInstructors.Checked,radioAll.Checked);
+				table=Providers.RefreshForDentalSchool(schoolClass,textLastName.Text,textFirstName.Text,textUniqueID.Text,radioInstructors.Checked,radioAll.Checked);
 			}
 			else {
 				table=Providers.RefreshStandard();
@@ -495,7 +574,12 @@ namespace OpenDental{
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableProviderSetup","Abbrev"),90);
+			ODGridColumn col;
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				col=new ODGridColumn(Lan.g("TableProviderSetup","Unique ID"),60);
+				gridMain.Columns.Add(col);
+			}
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Abbrev"),90);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableProviderSetup","Last Name"),90);
 			gridMain.Columns.Add(col);
@@ -506,7 +590,7 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g("TableProviderSetup","Hidden"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				col=new ODGridColumn(Lan.g("TableProviderSetup","Class"),100);
+				col=new ODGridColumn(Lan.g("TableProviderSetup","Class"),90);
 				gridMain.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableProviderSetup","Instructor"),60,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
@@ -517,6 +601,9 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++){
 				row=new ODGridRow();
+				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+					row.Cells.Add(table.Rows[i]["ProvNum"].ToString());
+				}
 				row.Cells.Add(table.Rows[i]["Abbr"].ToString());
 				row.Cells.Add(table.Rows[i]["LName"].ToString());
 				row.Cells.Add(table.Rows[i]["FName"].ToString());
@@ -563,7 +650,16 @@ namespace OpenDental{
 			FillGrid();
 		}
 
+		private void textFirstName_TextChanged(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void textUniqueID_TextChanged(object sender,EventArgs e) {
+			FillGrid();
+		}
+
 		private void radioAll_Click(object sender,EventArgs e) {
+			comboClass.SelectedIndex=0;//Only students are attached to classes
 			FillGrid();
 		}
 
@@ -572,6 +668,7 @@ namespace OpenDental{
 		}
 
 		private void radioInstructors_Click(object sender,EventArgs e) {
+			comboClass.SelectedIndex=0;//Only students are attached to classes
 			FillGrid();
 		}
 
@@ -645,6 +742,14 @@ namespace OpenDental{
 					break;
 				}
 			}
+		}
+
+		private void butStudBulkEdit_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AdminDentalStudents)) {
+				return;
+			}
+			FormProvStudentBulkEdit FormPSBE=new FormProvStudentBulkEdit();
+			FormPSBE.ShowDialog();
 		}
 
 		///<summary>Won't be visible if using Dental Schools.  So list will be unfiltered and ItemOrders won't get messed up.</summary>
@@ -891,6 +996,8 @@ namespace OpenDental{
 			}
 			//SecurityLogs.MakeLogEntry("Providers","Altered Providers",user);
 		}
+
+
 
 		
 

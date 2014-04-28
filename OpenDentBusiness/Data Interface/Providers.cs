@@ -99,7 +99,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets table for main provider edit list when in dental school mode.  Always orders alphabetically, but there will be lots of filters to get the list shorter.  Must be very fast because refreshes while typing.  selectAll will trump selectInstructors and always return all providers.</summary>
-		public static DataTable RefreshForDentalSchool(long schoolClassNum,string lastName,bool selectInstructors,bool selectAll) {
+		public static DataTable RefreshForDentalSchool(long schoolClassNum,string lastName,string firstName,string provNum,bool selectInstructors,bool selectAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,selectInstructors,selectAll);
 			}
@@ -116,8 +116,13 @@ namespace OpenDentBusiness{
 			if(lastName!="") {
 				command+="AND provider.LName LIKE '%"+POut.String(lastName)+"%' ";
 			}
+			if(firstName!="") {
+				command+="AND provider.FName LIKE '%"+POut.String(firstName)+"%' ";
+			}
+			if(provNum!="") {
+				command+="AND provider.ProvNum LIKE '%"+POut.String(provNum)+"%' ";
+			}
 			if(!selectAll) {
-				command+="AND username IS NOT NULL ";
 				command+="AND provider.IsInstructor="+POut.Bool(selectInstructors)+" ";
 				if(!selectInstructors) {
 					command+="AND provider.SchoolClassNum!=0 ";
@@ -180,7 +185,7 @@ namespace OpenDentBusiness{
 			return retStr;
 		}
 
-		///<summary>Abbr - LName, FName (hidden).</summary>
+		///<summary>Abbr - LName, FName (hidden).  For dental schools -- ProvNum - LName, FName (hidden).</summary>
 		public static string GetLongDesc(long provNum) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<ProviderC.ListLong.Count;i++) {
