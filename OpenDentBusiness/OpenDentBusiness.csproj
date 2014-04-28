@@ -446,7 +446,13 @@
     </Compile>
     <Compile Include="Data Interface\EmailMessageUids.cs" />
     <Compile Include="Data Interface\Encounters.cs" />
+    <Compile Include="Data Interface\EvaluationCriterionDefs.cs" />
+    <Compile Include="Data Interface\EvaluationCriterions.cs" />
+    <Compile Include="Data Interface\EvaluationDefs.cs" />
+    <Compile Include="Data Interface\Evaluations.cs" />
     <Compile Include="Data Interface\FamilyHealths.cs" />
+    <Compile Include="Data Interface\GradingScaleItems.cs" />
+    <Compile Include="Data Interface\GradingScales.cs" />
     <Compile Include="Data Interface\Hcpcses.cs" />
     <Compile Include="Data Interface\Icd10s.cs" />
     <Compile Include="Data Interface\Interventions.cs" />

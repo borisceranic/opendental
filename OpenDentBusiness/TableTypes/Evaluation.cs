@@ -1,4 +1,3 @@
-/*
 using System;
 using System.Collections;
 using System.Drawing;
@@ -42,4 +41,3 @@ namespace OpenDentBusiness{
 
 
 
-*/

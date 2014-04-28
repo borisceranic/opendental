@@ -4671,6 +4671,199 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SecurityGroupForInstructors','')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS evaluation";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluation (
+						EvaluationNum bigint NOT NULL auto_increment PRIMARY KEY,
+						InstructNum bigint NOT NULL,
+						StudentNum bigint NOT NULL,
+						SchoolCourseNum bigint NOT NULL,
+						EvalTitle varchar(255) NOT NULL,
+						DateEval date NOT NULL DEFAULT '0001-01-01',
+						GradingScaleNum bigint NOT NULL,
+						OverallGradeShowing varchar(255) NOT NULL,
+						OverallGradeNumber float NOT NULL,
+						Notes text NOT NULL,
+						INDEX(InstructNum),
+						INDEX(StudentNum),
+						INDEX(SchoolCourseNum),
+						INDEX(GradingScaleNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE evaluation'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluation (
+						EvaluationNum number(20) NOT NULL,
+						InstructNum number(20) NOT NULL,
+						StudentNum number(20) NOT NULL,
+						SchoolCourseNum number(20) NOT NULL,
+						EvalTitle varchar2(255),
+						DateEval date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						GradingScaleNum number(20) NOT NULL,
+						OverallGradeShowing varchar2(255),
+						OverallGradeNumber number(38,8) NOT NULL,
+						Notes varchar2(2000),
+						CONSTRAINT evaluation_EvaluationNum PRIMARY KEY (EvaluationNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluation_InstructNum ON evaluation (InstructNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluation_StudentNum ON evaluation (StudentNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluation_SchoolCourseNum ON evaluation (SchoolCourseNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluation_GradingScaleNum ON evaluation (GradingScaleNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS evaluationcriterion";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationcriterion (
+						EvaluationCriterionNum bigint NOT NULL auto_increment PRIMARY KEY,
+						EvaluationNum bigint NOT NULL,
+						IsCategoryName tinyint NOT NULL,
+						GradingScaleNum bigint NOT NULL,
+						GradeShowing varchar(255) NOT NULL,
+						GradeNumber float NOT NULL,
+						Notes text NOT NULL,
+						ItemOrder int NOT NULL,
+						INDEX(EvaluationNum),
+						INDEX(GradingScaleNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE evaluationcriterion'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationcriterion (
+						EvaluationCriterionNum number(20) NOT NULL,
+						EvaluationNum number(20) NOT NULL,
+						IsCategoryName number(3) NOT NULL,
+						GradingScaleNum number(20) NOT NULL,
+						GradeShowing varchar2(255),
+						GradeNumber number(38,8) NOT NULL,
+						Notes varchar2(2000),
+						ItemOrder number(11) NOT NULL,
+						CONSTRAINT evaluationcriterion_Evaluation PRIMARY KEY (EvaluationCriterionNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationcriterion_Evaluation ON evaluationcriterion (EvaluationNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationcriterion_GradingSca ON evaluationcriterion (GradingScaleNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS evaluationcriteriondef";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationcriteriondef (
+						EvaluationCriterionDefNum bigint NOT NULL auto_increment PRIMARY KEY,
+						EvaluationDefNum bigint NOT NULL,
+						IsCategoryName tinyint NOT NULL,
+						GradingScaleNum bigint NOT NULL,
+						ItemOrder int NOT NULL,
+						INDEX(EvaluationDefNum),
+						INDEX(GradingScaleNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE evaluationcriteriondef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationcriteriondef (
+						EvaluationCriterionDefNum number(20) NOT NULL,
+						EvaluationDefNum number(20) NOT NULL,
+						IsCategoryName number(3) NOT NULL,
+						GradingScaleNum number(20) NOT NULL,
+						ItemOrder number(11) NOT NULL,
+						CONSTRAINT evaluationcriteriondef_Evaluat PRIMARY KEY (EvaluationCriterionDefNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationcriteriondef_Evaluat ON evaluationcriteriondef (EvaluationDefNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationcriteriondef_Grading ON evaluationcriteriondef (GradingScaleNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS evaluationdef";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationdef (
+						EvaluationDefNum bigint NOT NULL auto_increment PRIMARY KEY,
+						SchoolCourseNum bigint NOT NULL,
+						EvalTitle varchar(255) NOT NULL,
+						GradingScaleNum bigint NOT NULL,
+						INDEX(SchoolCourseNum),
+						INDEX(GradingScaleNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE evaluationdef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE evaluationdef (
+						EvaluationDefNum number(20) NOT NULL,
+						SchoolCourseNum number(20) NOT NULL,
+						EvalTitle varchar2(255),
+						GradingScaleNum number(20) NOT NULL,
+						CONSTRAINT evaluationdef_EvaluationDefNum PRIMARY KEY (EvaluationDefNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationdef_SchoolCourseNum ON evaluationdef (SchoolCourseNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX evaluationdef_GradingScaleNum ON evaluationdef (GradingScaleNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS gradingscale";
+					Db.NonQ(command);
+					command=@"CREATE TABLE gradingscale (
+						GradingScaleNum bigint NOT NULL auto_increment PRIMARY KEY,
+						IsPercentage tinyint NOT NULL,
+						Description varchar(255) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE gradingscale'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE gradingscale (
+						GradingScaleNum number(20) NOT NULL,
+						IsPercentage number(3) NOT NULL,
+						Description varchar2(255),
+						CONSTRAINT gradingscale_GradingScaleNum PRIMARY KEY (GradingScaleNum)
+						)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS gradingscaleitem";
+					Db.NonQ(command);
+					command=@"CREATE TABLE gradingscaleitem (
+						GradingScaleItemNum bigint NOT NULL auto_increment PRIMARY KEY,
+						GradingScaleNum bigint NOT NULL,
+						GradeShowing varchar(255) NOT NULL,
+						GradeNumber float NOT NULL,
+						Description varchar(255) NOT NULL,
+						INDEX(GradingScaleNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE gradingscaleitem'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE gradingscaleitem (
+						GradingScaleItemNum number(20) NOT NULL,
+						GradingScaleNum number(20) NOT NULL,
+						GradeShowing varchar2(255),
+						GradeNumber number(38,8) NOT NULL,
+						Description varchar2(255),
+						CONSTRAINT gradingscaleitem_GradingScaleI PRIMARY KEY (GradingScaleItemNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX gradingscaleitem_GradingScaleN ON gradingscaleitem (GradingScaleNum)";
+					Db.NonQ(command);
+				}
 
 
 
