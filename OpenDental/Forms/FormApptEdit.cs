@@ -2995,9 +2995,14 @@ namespace OpenDental{
 				return;
 			}
 			if(IsNew) {
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
-					"Create complete for date/time: "+AptCur.AptDateTime.ToString(),
-					AptCur.AptNum);
+				if(AptCur.AptStatus==ApptStatus.UnschedList && AptCur.AptDateTime==DateTime.MinValue) { //If new appt is being added directly to pinboard
+					//Do nothing.  Log will be created when appointment is dragged off the pinboard.
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,pat.PatNum,
+						AptCur.AptDateTime.ToString()+", "+AptCur.ProcDescript,
+						AptCur.AptNum);
+				}
 			}
 			else {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,

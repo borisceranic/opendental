@@ -2612,9 +2612,16 @@ namespace OpenDental {
 				aptCur.Confirmed=DefC.Short[(int)DefCat.ApptConfirmed][0].DefNum;//Causes the confirmation status to be reset.
 				try {
 					Appointments.Update(aptCur,aptOld);
-					SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,aptCur.PatNum,
-						aptCur.ProcDescript+", from "+aptOld.AptDateTime.ToString()+", to "+aptCur.AptDateTime.ToString(),
-						aptCur.AptNum);
+					if(aptOld.AptStatus==ApptStatus.UnschedList && aptOld.AptDateTime==DateTime.MinValue) { //If new appt is being added to schedule from pinboard
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
+							aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
+							aptCur.AptNum);
+					}
+					else { //If existing appt is being moved
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,aptCur.PatNum,
+							aptCur.ProcDescript+", from "+aptOld.AptDateTime.ToString()+", to "+aptCur.AptDateTime.ToString(),
+							aptCur.AptNum);
+					}
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);

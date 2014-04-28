@@ -753,7 +753,8 @@ namespace OpenDental{
 				else {
 					DateJumpToString=recall.DateDue.ToShortDateString();
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,apt.PatNum,apt.AptDateTime.ToString(),apt.AptNum);
+				//Log will be made when appointment dragged off of the pinboard.
+				//SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,apt.PatNum,apt.AptDateTime.ToString(),apt.AptNum);
 			}
 			string userMsg="";
 			if(noRecalls > 0){
@@ -936,9 +937,10 @@ namespace OpenDental{
 				MessageBox.Show(ex.Message);
 				return;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,AptCur.PatNum,
-				AptCur.AptDateTime.ToString()+", "+AptCur.ProcDescript,
-				AptCur.AptNum);
+			//This is done inside FormApptEdit.butOK_Click().  Don't want to make two create entries.
+			//SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,AptCur.PatNum,
+			//	AptCur.AptDateTime.ToString()+", "+AptCur.ProcDescript,
+			//	AptCur.AptNum);
 			FormApptEdit FormApptEdit2=new FormApptEdit(AptCur.AptNum);
 			FormApptEdit2.IsNew=true;
 			FormApptEdit2.ShowDialog();
