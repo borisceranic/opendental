@@ -1069,6 +1069,9 @@ namespace OpenDental{
 				//Procedures.UnattachProcsInPlannedAppt(ApptPlanned.Info.MyApt.AptNum);
 				AppointmentL.Delete(PIn.PInt(ApptPlanned.DataRoww["AptNum"].ToString()));
 			}*/
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			Appointment AptCur=new Appointment();
 			AptCur.PatNum=PatCur.PatNum;
 			AptCur.ProvNum=PatCur.PriProv;

@@ -957,6 +957,9 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select only one patient first.");
 				return;
 			}
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			SelectedPatNum=PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["PatNum"].ToString());
 			Family fam=Patients.GetFamily(SelectedPatNum);
 			Patient pat=fam.GetPatient(SelectedPatNum);
@@ -993,6 +996,9 @@ namespace OpenDental{
 			}
 			if(gridMain.SelectedIndices.Length>1) {
 				MsgBox.Show(this,"Please select only one patient first.");
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
 				return;
 			}
 			SelectedPatNum=PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["PatNum"].ToString());
