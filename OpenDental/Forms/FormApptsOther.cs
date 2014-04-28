@@ -629,6 +629,9 @@ namespace OpenDental{
 		}
 
 		private void butRecall_Click(object sender, System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			MakeRecallAppointment();
 		}
 
@@ -701,6 +704,9 @@ namespace OpenDental{
 		}
 
 		private void butRecallFamily_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			MakeRecallFamily();
 		}
 
@@ -774,6 +780,9 @@ namespace OpenDental{
 		}
 
 		private void butNote_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			Appointment AptCur=new Appointment();
 			AptCur.PatNum=PatCur.PatNum;
 			if(PatCur.DateFirstVisit.Year<1880
@@ -834,6 +843,9 @@ namespace OpenDental{
 		}
 
 		private void butNew_Click(object sender, System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			MakeAppointment();
 		}
 

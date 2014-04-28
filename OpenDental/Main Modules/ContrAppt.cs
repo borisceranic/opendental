@@ -4478,6 +4478,9 @@ namespace OpenDental {
 			if(PatCur==null) {
 				return;
 			}
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
+				return;
+			}
 			if(Appointments.HasPlannedEtc(PatCur.PatNum)) {
 				DisplayOtherDlg(false);
 				return;
@@ -4491,6 +4494,9 @@ namespace OpenDental {
 
 		private void butMakeRecall_Click(object sender,EventArgs e) {
 			if(PatCur==null) {
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
 				return;
 			}
 			if(Appointments.HasPlannedEtc(PatCur.PatNum)) {
@@ -4516,6 +4522,9 @@ namespace OpenDental {
 
 		private void butFamRecall_Click(object sender,EventArgs e) {
 			if(PatCur==null) {
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
 				return;
 			}
 			if(Appointments.HasPlannedEtc(PatCur.PatNum)) {
