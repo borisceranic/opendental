@@ -15,7 +15,7 @@ namespace OpenDental {
 	public partial class FormCodeSystemsImport:Form {
 		///<summary>All code systems available.</summary>
 		private List<CodeSystem> _listCodeSystems;
-		///<summary>Indicates if provider EHR key is valid. If true then SNOMED CT codes will be made available for download.</summary>
+		///<summary>If true then SNOMED CT codes will show in the list of available code systems for download.</summary>
 		private bool _isMemberNation;
 		///<summary>Indicates if user has downloaded codes while in the window.</summary>
 		private bool _hasDownloaded;
@@ -28,23 +28,7 @@ namespace OpenDental {
 		}
 
 		private void FormCodeSystemsImport_Load(object sender,EventArgs e) {
-			_isMemberNation=false;
-			//This check is here to prevent Snomeds from being available in non-member nations.
-			Provider prov=Providers.GetProv(Security.CurUser.ProvNum);
-			if(prov==null) {
-				return;
-			}
-			string ehrKey="";
-			int yearValue=0;
-			List<EhrProvKey> listProvKeys=EhrProvKeys.GetKeysByFLName(prov.LName,prov.FName);
-			if(listProvKeys.Count!=0) {
-				ehrKey=listProvKeys[0].ProvKey;
-				yearValue=listProvKeys[0].YearValue;
-			}
-			if(FormEHR.ProvKeyIsValid(prov.LName,prov.FName,yearValue,ehrKey)) {
-				//EHR has been valid.
-				_isMemberNation=true;
-			}
+			_isMemberNation=true;//Assume we show the SNOMED row. Handles validating on import instead of on load.
 			UpdateCodeSystemThread.Finished+=new EventHandler(UpdateCodeSystemThread_FinishedSafe);
 		}
 		
@@ -200,7 +184,54 @@ namespace OpenDental {
 					else {
 						#region Import all other codes
 						//Add a new thread. We will run these all in parallel once we have them all queued.
-						//This codes system file does not exist on the system so it will be downloaded before being imported.
+						//This code system file does not exist on the system so it will be downloaded before being imported.
+						if(codeSystem.CodeSystemName=="SNOMEDCT") {//SNOMEDCT codes cannot be given out to non-member nations.  We treat non-USA reg keys as non-member nations.
+							//Ensure customer has a valid USA registration key
+							#if DEBUG
+								OpenDental.localhost.Service1 regService=new OpenDental.localhost.Service1();
+							#else
+								OpenDental.customerUpdates.Service1 regService=new OpenDental.customerUpdates.Service1();
+								regService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+							#endif
+							if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
+								IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+								ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+								proxy.Credentials=cred;
+								regService.Proxy=proxy;
+							}
+							XmlWriterSettings settings = new XmlWriterSettings();
+							settings.Indent = true;
+							settings.IndentChars = ("    ");
+							StringBuilder strbuild=new StringBuilder();
+							using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+								writer.WriteStartElement("IsForeignRegKeyRequest");
+								writer.WriteStartElement("RegistrationKey");
+								writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+								writer.WriteEndElement();
+								writer.WriteEndElement();
+							}
+							string result=regService.IsForeignRegKey(strbuild.ToString());
+							XmlDocument doc=new XmlDocument();
+							doc.LoadXml(result);
+							XmlNode node=doc.SelectSingleNode("//IsForeign");
+							bool isForeignKey=true;
+							if(node!=null) {
+								if(node.InnerText=="false") {
+									isForeignKey=false;
+								}
+							}
+							if(isForeignKey) {
+								string errorMessage=Lan.g(this,"SNOMEDCT has been skipped")+":\r\n";
+								node=doc.SelectSingleNode("//ErrorMessage");
+								if(node!=null) {
+									errorMessage+=node.InnerText;
+								}
+								//The user will have to click OK on this message in order to continue downloading any additional code systems.
+								//In the future we might turn this into calling a delegate in order to update the affected SNOMED row's text instead of stopping the main thread.
+								MessageBox.Show(errorMessage);
+								continue;
+							}
+						}
 						UpdateCodeSystemThread.Add(_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe));
 						#endregion
 					}
