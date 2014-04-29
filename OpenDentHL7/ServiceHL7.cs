@@ -34,6 +34,7 @@ namespace OpenDentHL7 {
 		private System.Threading.Timer timerSendFiles;
 		private System.Threading.Timer timerReceiveFiles;
 		private System.Threading.Timer timerSendTCP;
+		private System.Threading.Timer timerSendConnectTCP;
 		private Socket socketIncomingMain;
 		//private Socket socketIncomingWorker;
 		///<summary></summary>
@@ -52,6 +53,8 @@ namespace OpenDentHL7 {
 		private static bool IsSendTCPConnected;
 		private static bool _ecwFileModeIsSending;
 		private static DateTime _ecwDateTimeOldMsgsDeleted;
+		private static bool _ecwTCPModeIsSending;
+		private static bool _ecwTCPSendSocketIsConnected;
 
 		public ServiceHL7() {
 			InitializeComponent();
@@ -177,9 +180,14 @@ namespace OpenDentHL7 {
 			}
 			else {//TCP/IP
 				CreateIncomingTcpListener();
-				//start a timer to poll the database and to send messages as needed.  Every 6 seconds.  We increased the time between polling the database from 3 seconds to 6 seconds because we are now waiting 5 seconds for a message acknowledgment from eCW.
-				TimerCallback timercallbackSendTCP=new TimerCallback(TimerCallbackSendTCP);
-				timerSendTCP=new System.Threading.Timer(timercallbackSendTCP,null,1800,6000);
+				_ecwTCPSendSocketIsConnected=false;
+				//start a timer to connect to the send socket every 6 seconds.  The socket will be reused, so if _ecwTCPSendSocketIsConnected is true, this will just return
+				TimerCallback timercallbackSendConnectTCP=new TimerCallback(TimerCallbackSendConnectTCP);
+				timerSendConnectTCP=new System.Threading.Timer(timercallbackSendConnectTCP,null,1800,6000);
+				////start a timer to poll the database and to send messages as needed.  Every 6 seconds.  We increased the time between polling the database from 3 seconds to 6 seconds because we are now waiting 5 seconds for a message acknowledgment from eCW.
+				//_ecwTCPModeIsSending=false;
+				//TimerCallback timercallbackSendTCP=new TimerCallback(TimerCallbackSendTCP);
+				//timerSendTCP=new System.Threading.Timer(timercallbackSendTCP,null,1800,6000);
 			}
 		}
 
@@ -345,13 +353,25 @@ namespace OpenDentHL7 {
 		///<summary>Runs in a separate thread</summary>
 		private void OnDataReceived(IAsyncResult asyncResult) {
 			StateObject state=(StateObject)asyncResult.AsyncState;
+			if(state==null) {
+				EventLog.WriteEntry("OpenDentalHL7","Error in OnDataReceived: The IAsyncResult parameter could not be cast to a StateObject.",EventLogEntryType.Error);
+				return;
+			}
 			Socket socketIncomingHandler=state.workSocket;
-			int byteCountReceived=socketIncomingHandler.EndReceive(asyncResult);//blocks until data is recieved.
-			//int byteCountReceived=socketIncomingWorker.EndReceive(asyncResult);
+			int byteCountReceived=0;
+			try {
+				byteCountReceived=socketIncomingHandler.EndReceive(asyncResult);//blocks until data is recieved.
+			}
+			catch(Exception ex) {
+				//Socket has been disposed or is null or something went wrong.
+				EventLog.WriteEntry("OpenDentalHL7","Error in OnDataReceived:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
+				return;
+			}
 			char[] chars=new char[byteCountReceived];
 			Decoder decoder=Encoding.UTF8.GetDecoder();
 			decoder.GetChars(state.buffer,0,byteCountReceived,chars,0);//doesn't necessarily get all bytes from the buffer because buffer could be half full.
 			state.strbFullMsg.Append(chars);//sb might already have partial data
+			Array.Clear(state.buffer,0,StateObject.BufferSize);//Clear the buffer, ready to receive more
 			//I think we are guaranteed to have received at least one char.
 			bool isFullMsg=false;
 			bool isMalformed=false;
@@ -388,17 +408,19 @@ namespace OpenDentHL7 {
 			}
 			//end of big if statement-------------------------------------------------
 			if(!isFullMsg) {
-				//I do not think this is necessary, the buffer is a new array at the start of this method
-				//dataBufferIncoming=new byte[8];//clear the buffer
-				//socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
-				socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
+				try {
+					//the buffer was cleared after appending the chars to the string builder
+					socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
+				}
+				catch(Exception ex) {
+					EventLog.WriteEntry("OpenDentalHL7","An error occurred with BeginReceive on an incoming TCP/IP HL7 message.\r\nException: "+ex.Message);
+				}
 				return;//get another block
 			}
 			//Prepare to save message to database if malformed and not processed
 			HL7Msg hl7Msg=new HL7Msg();
 			hl7Msg.MsgText=state.strbFullMsg.ToString();
-			//I do not think this is necessary, the StringBuilder is a new object at the start of this method			
-			//state.strbFullMsg.Clear();//ready for the next message
+			state.strbFullMsg.Clear();//just in case, ready for the next message
 			bool isProcessed=true;
 			string messageControlId="";
 			string ackEvent="";
@@ -429,133 +451,164 @@ namespace OpenDentHL7 {
 			if(IsVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Beginning to send ACK.\r\n"+MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR,EventLogEntryType.Information);
 			}
-			//socketIncomingWorker.Send(ackByteOutgoing);//this is a locking call
 			socketIncomingHandler.Send(ackByteOutgoing);//this is a locking call
 			//eCW uses the same worker socket to send the next message. Without this call to BeginReceive, they would attempt to send again
 			//and the send would fail since we were no longer listening in this thread. eCW would timeout after 30 seconds of waiting for their
 			//acknowledgement, then they would close their end and create a new socket for the next message. With this call, we can accept message
 			//after message without waiting for a new connection.
-			//I do not think this is necessary, the buffer is a new array at the start of this method			
-			//dataBufferIncoming=new byte[8];//clear the buffer
-			//socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
+			//the buffer was cleared after appending the chars to the string builder
+			//the string builder was cleared after setting the message text in the table
 			socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
 		}
-		
-		private void TimerCallbackSendTCP(Object stateInfo) {
-			List<HL7Msg> list=HL7Msgs.GetOnePending();
-			for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
-				string sendMsgControlId=HL7Msgs.GetControlId(list[i]);//could be empty string
-				Socket socket=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+
+		private void TimerCallbackSendConnectTCP(Object stateInfo) {
+			if(_ecwTCPSendSocketIsConnected) {
+				return;
+			}
+			_ecwTCPSendSocketIsConnected=true;
+			Socket socketObject=null;
+			IPEndPoint endpoint=null;
+			try {
+				socketObject=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
 				string[] strIpPort=HL7DefEnabled.OutgoingIpPort.Split(':');//this was already validated in the HL7DefEdit window.
 				IPAddress ipaddress=IPAddress.Parse(strIpPort[0]);//already validated
 				int port=int.Parse(strIpPort[1]);//already validated
-				//Socket socket=new Socket(AddressFamily.InterNetworkV6,SocketType.Stream,ProtocolType.Tcp);
-				//socket.SetSocketOption(SocketOptionLevel.IPv6,SocketOptionName.IPv6Only,false);
-				//IPAddress ipaddress=IPAddress.Parse(HL7DefEnabled.OutgoingIpPort);
-				//int port=int.Parse("5846");
-				IPEndPoint endpoint=new IPEndPoint(ipaddress,port);
-				try {
-					socket.Connect(endpoint);
-					if(!IsSendTCPConnected) {//Previous run failed to connect. This time connected so make log entry that connection was successful
-						EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect previously and was successful this time.",EventLogEntryType.Information);
-						IsSendTCPConnected=true;
-					}
+				endpoint=new IPEndPoint(ipaddress,port);
+			}
+			catch(Exception ex) {//not likely, but want to make sure to reset the bool that the send socket is connected
+				EventLog.WriteEntry("OpenDentalHL7","The HL7 send TCP/IP socket connection failed during IPEndPoint creation.\r\nException message: "+ex.Message,EventLogEntryType.Warning);
+				_ecwTCPSendSocketIsConnected=false;
+				return;//will try to create a socket again in 6 seconds
+			}
+			try {
+				socketObject.Connect(endpoint);
+				if(!IsSendTCPConnected) {//Previous run failed to connect. This time connected so make log entry that connection was successful
+					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect previously and was successful this time.",EventLogEntryType.Information);
+					IsSendTCPConnected=true;
 				}
-				catch(SocketException ex) {
-					if(IsSendTCPConnected) {//Previous run connected fine, make log entry and set bool to false
-						EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
-						IsSendTCPConnected=false;
-					}
-					return;
+			}
+			catch(SocketException ex) {
+				if(IsSendTCPConnected) {//Previous run connected fine, make log entry and set bool to false
+					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nSocket Exception: "+ex.Message,EventLogEntryType.Warning);
+					IsSendTCPConnected=false;
 				}
+				return;//will try to connect again in 6 seconds
+			}
+			catch(Exception ex) {
+				if(IsSendTCPConnected) {//Previous run connected fine, make log entry and set bool to false
+					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
+					IsSendTCPConnected=false;
+				}
+				return;//will try to connect again in 6 seconds
+			}
+			finally {
+				_ecwTCPSendSocketIsConnected=false;
+			}
+			//start a timer to poll the database and to send messages as needed.  Every 6 seconds.  We increased the time between polling the database from 3 seconds to 6 seconds because we are now waiting 5 seconds for a message acknowledgment from eCW.
+			_ecwTCPModeIsSending=false;
+			TimerCallback timercallbackSendTCP=new TimerCallback(TimerCallbackSendTCPHelper);
+			timerSendTCP=new System.Threading.Timer(timercallbackSendTCP,socketObject,1800,6000);
+		}
+
+		private void TimerCallbackSendTCPHelper(Object socketObject) {
+			Socket sendSocket=(Socket)socketObject;
+			if(sendSocket==null) {
+				timerSendTCP.Dispose();
+				_ecwTCPSendSocketIsConnected=false;
+				EventLog.WriteEntry("OpenDentalHL7","The TCP send socket has been closed.  A new socket connection attempt will occur within 6 seconds.",EventLogEntryType.Warning);
+				return;
+			}
+			try {
+				SendTCP(sendSocket);
+			}
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentalHL7","The TCP HL7 outgoing message socket encountered a problem during a send.  Another attempt to send will occur within 6 seconds.\r\nException message: "+ex.Message);
+				_ecwTCPModeIsSending=false;
+			}
+		}
+		
+		private void SendTCP(Socket sendSocket) {
+			if(_ecwTCPModeIsSending) {
+				return;
+			}
+			List<HL7Msg> list=HL7Msgs.GetOnePending();
+			for(int i=0;i<list.Count;i++) {//Right now, there will only be 0 or 1 item in the list.
+				_ecwTCPModeIsSending=true;
+				string sendMsgControlId=HL7Msgs.GetControlId(list[i]);//could be empty string
 				string data=MLLP_START_CHAR+list[i].MsgText+MLLP_END_CHAR+MLLP_ENDMSG_CHAR;
-				try {
-					byte[] byteData=Encoding.ASCII.GetBytes(data);
-					socket.Send(byteData);//this is a blocking call
-					//For MLLP V2, do a blocking Receive here, along with a timeout.
-					byte[] ackBuffer=new byte[256];//plenty big enough to receive the entire ack/nack response
-					socket.ReceiveTimeout=5000;//5 second timeout. Database is polled every 6 seconds for a new message to send, but if already sending and waiting for an ack, the new thread will just return
-					int byteCountReceived=socket.Receive(ackBuffer);//blocking Receive
-					char[] chars=new char[byteCountReceived];
-					Encoding.UTF8.GetDecoder().GetChars(ackBuffer,0,byteCountReceived,chars,0);
-					StringBuilder strbAckMsg=new StringBuilder();
-					strbAckMsg.Append(chars);
-					if(strbAckMsg.Length>0 && strbAckMsg[0]!=MLLP_START_CHAR) {
-						list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
-						HL7Msgs.Update(list[i]);
-						throw new Exception("Malformed acknowledgment.");
-					}
-					else if(strbAckMsg.Length>=3
-						&& strbAckMsg[strbAckMsg.Length-1]==MLLP_ENDMSG_CHAR//last char is the endmsg char.
-						&& strbAckMsg[strbAckMsg.Length-2]==MLLP_END_CHAR)//the second-to-the-last char is the end char.
-					{
-						//we have a complete message
-						strbAckMsg.Remove(0,1);//strip off the start char
-						strbAckMsg.Remove(strbAckMsg.Length-2,2);//strip off the end chars
-					}
-					else if(strbAckMsg.Length>=2//so that the next line won't crash
-						&& strbAckMsg[strbAckMsg.Length-1]==MLLP_END_CHAR)//the last char is the end char.
-					{
-						//we will treat this as a complete message, because the endmsg char is optional.
-						strbAckMsg.Remove(0,1);//strip off the start char
-						strbAckMsg.Remove(strbAckMsg.Length-1,1);//strip off the end char
-					}
-					else {
-						list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
-						HL7Msgs.Update(list[i]);
-						throw new Exception("Malformed acknowledgment.");
-					}
-					MessageHL7 ackMsg=new MessageHL7(strbAckMsg.ToString());
-					try {
-						MessageParser.ProcessAck(ackMsg,IsVerboseLogging);
-					}
-					catch(Exception ex) {
-						list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nError processing acknowledgment.\r\n";
-						HL7Msgs.Update(list[i]);
-						throw new Exception("Error processing acknowledgment.\r\n"+ex.Message);
-					}
-					if(ackMsg.AckCode=="" || ackMsg.ControlId=="") {
-						list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nInvalid ACK message.  Attempt to resend.\r\n";
-						HL7Msgs.Update(list[i]);
-						throw new Exception("Invalid ACK message received.");
-					}
-					if(ackMsg.ControlId==sendMsgControlId && ackMsg.AckCode=="AA") {//acknowledged received (Application acknowledgment: Accept)
-						list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nMessage ACK (acknowledgment) received.\r\n";
-					}
-					else if(ackMsg.ControlId==sendMsgControlId && ackMsg.AckCode!="AA") {//ACK received for this message, but ack code was not acknowledgment accepted
-						if(list[i].Note.Contains("NACK4")) {//this is the 5th negative acknowledgment, don't try again
-							list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nThis is NACK5, the message status has been changed to OutFailed. We will not attempt to send again.\r\n";
-							list[i].HL7Status=HL7MessageStatus.OutFailed;
-						}
-						else if(list[i].Note.Contains("NACK")) {//failed sending at least once already
-							list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nNACK"+list[i].Note.Split(new string[] { "NACK" },StringSplitOptions.None).Length+"\r\n";
-						}
-						else {
-							list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nMessage NACK (negative acknowlegment) received. We will try to send again.\r\n";
-						}
-						HL7Msgs.Update(list[i]);//Add NACK note to hl7msg table entry
-						return;//socket closed in finally
-					}
-					else {//ack received for control ID that does not match the control ID of message just sent
-						list[i].Note=list[i].Note+"Sent message control ID: "+sendMsgControlId+"\r\nAck message control ID: "+ackMsg.ControlId
-							+"\r\nAck received for message other than message just sent.  We will try to send again.\r\n";
-						HL7Msgs.Update(list[i]);
-						return;
-					}
+				byte[] byteData=Encoding.ASCII.GetBytes(data);
+				sendSocket.Send(byteData);//this is a blocking call
+				//For MLLP V2, do a blocking Receive here, along with a timeout.
+				byte[] ackBuffer=new byte[256];//plenty big enough to receive the entire ack/nack response
+				sendSocket.ReceiveTimeout=10000;//10 second timeout. Database is polled every 6 seconds for a new message to send, but if already sending and waiting for an ack, the new thread will just return
+				int byteCountReceived=sendSocket.Receive(ackBuffer);//blocking Receive
+				char[] chars=new char[byteCountReceived];
+				Encoding.UTF8.GetDecoder().GetChars(ackBuffer,0,byteCountReceived,chars,0);
+				StringBuilder strbAckMsg=new StringBuilder();
+				strbAckMsg.Append(chars);
+				if(strbAckMsg.Length>0 && strbAckMsg[0]!=MLLP_START_CHAR) {
+					list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
+					HL7Msgs.Update(list[i]);
+					throw new Exception("Malformed acknowledgment.");
 				}
-				catch(SocketException ex) {
-					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket encountered an error when sending message or receiving acknowledgment.\r\nSocket Exception: "+ex.Message,EventLogEntryType.Warning);
-					return;//Try again in 6 seconds. socket closed in finally
+				else if(strbAckMsg.Length>=3
+					&& strbAckMsg[strbAckMsg.Length-1]==MLLP_ENDMSG_CHAR//last char is the endmsg char.
+					&& strbAckMsg[strbAckMsg.Length-2]==MLLP_END_CHAR)//the second-to-the-last char is the end char.
+				{
+					//we have a complete message
+					strbAckMsg.Remove(0,1);//strip off the start char
+					strbAckMsg.Remove(strbAckMsg.Length-2,2);//strip off the end chars
+				}
+				else if(strbAckMsg.Length>=2//so that the next line won't crash
+					&& strbAckMsg[strbAckMsg.Length-1]==MLLP_END_CHAR)//the last char is the end char.
+				{
+					//we will treat this as a complete message, because the endmsg char is optional.
+					strbAckMsg.Remove(0,1);//strip off the start char
+					strbAckMsg.Remove(strbAckMsg.Length-1,1);//strip off the end char
+				}
+				else {
+					list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
+					HL7Msgs.Update(list[i]);
+					throw new Exception("Malformed acknowledgment.");
+				}
+				MessageHL7 ackMsg=new MessageHL7(strbAckMsg.ToString());
+				try {
+					MessageParser.ProcessAck(ackMsg,IsVerboseLogging);
 				}
 				catch(Exception ex) {
-					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP encountered an error when sending message or receiving acknowledgment.\r\nException: "+ex.Message,EventLogEntryType.Warning);
-					return;//socket closed in finally
+					list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nError processing acknowledgment.\r\n";
+					HL7Msgs.Update(list[i]);
+					throw new Exception("Error processing acknowledgment.\r\n"+ex.Message);
 				}
-				finally {
-					if(socket!=null) {
-						socket.Shutdown(SocketShutdown.Both);
-						socket.Close();
+				if(ackMsg.AckCode=="" || ackMsg.ControlId=="") {
+					list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nInvalid ACK message.  Attempt to resend.\r\n";
+					HL7Msgs.Update(list[i]);
+					throw new Exception("Invalid ACK message received.");
+				}
+				if(ackMsg.ControlId==sendMsgControlId && ackMsg.AckCode=="AA") {//acknowledged received (Application acknowledgment: Accept)
+					list[i].Note=list[i].Note+ackMsg.ToString()+"\r\nMessage ACK (acknowledgment) received.\r\n";
+				}
+				else if(ackMsg.ControlId==sendMsgControlId && ackMsg.AckCode!="AA") {//ACK received for this message, but ack code was not acknowledgment accepted
+					if(list[i].Note.Contains("NACK4")) {//this is the 5th negative acknowledgment, don't try again
+						list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nThis is NACK5, the message status has been changed to OutFailed. We will not attempt to send again.\r\n";
+						list[i].HL7Status=HL7MessageStatus.OutFailed;
 					}
+					else if(list[i].Note.Contains("NACK")) {//failed sending at least once already
+						list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nNACK"+list[i].Note.Split(new string[] { "NACK" },StringSplitOptions.None).Length+"\r\n";
+					}
+					else {
+						list[i].Note=list[i].Note+"Ack code: "+ackMsg.AckCode+"\r\nMessage NACK (negative acknowlegment) received. We will try to send again.\r\n";
+					}
+					HL7Msgs.Update(list[i]);//Add NACK note to hl7msg table entry
+					_ecwTCPModeIsSending=false;
+					return;
+				}
+				else {//ack received for control ID that does not match the control ID of message just sent
+					list[i].Note=list[i].Note+"Sent message control ID: "+sendMsgControlId+"\r\nAck message control ID: "+ackMsg.ControlId
+						+"\r\nAck received for message other than message just sent.  We will try to send again.\r\n";
+					HL7Msgs.Update(list[i]);
+					_ecwTCPModeIsSending=false;
+					return;
 				}
 				list[i].HL7Status=HL7MessageStatus.OutSent;
 				HL7Msgs.Update(list[i]);//set the status to sent and save ack message in Note field.
@@ -570,6 +623,7 @@ namespace OpenDentHL7 {
 					}
 				}
 			}
+			_ecwTCPModeIsSending=false;
 		}
 		
 		
