@@ -2617,7 +2617,7 @@ namespace OpenDentBusiness {
 			}
 			string log="";
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				return Lans.g("FormDatabaseMaintenance","Done.  Not using clinics.");
+				return log;
 			}
 			//Get patients not assigned to a clinic:
 			command=@"SELECT PatNum,LName,FName FROM patient WHERE ClinicNum=0 AND PatStatus!="+POut.Int((int)PatientStatus.Deleted);
@@ -3578,10 +3578,13 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ProcedurelogLabAttachedToDeletedProc(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				return "";
 			}
 			string log="";
 			if(isCheck) {
@@ -3589,7 +3592,8 @@ namespace OpenDentBusiness {
 					+"WHERE ProcStatus=2 AND ProcNumLab IN(SELECT ProcNum FROM procedurelog WHERE ProcStatus=6)";
 				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Completed procedure labs attached to deleted procedures: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Completed procedure labs attached to deleted procedures: ")+numFound;
+					log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Double click to run the fix and see a break down.")+"\r\n";
 				}
 			}
 			else {
@@ -3615,18 +3619,14 @@ namespace OpenDentBusiness {
 				}
 				long numberFixed=Db.NonQ(command);
 				if(numberFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Patients with completed lab procedures detached from deleted procedures: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Patients with completed lab procedures detached from deleted procedures: ")+numberFixed;
 					string patNames="";
 					for(int i=0;i<table.Rows.Count;i++) {
-						if(i>15) {
-							break;
+						if(i==0) {
+							log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 						}
-						if(i>0) {
-							patNames+=", ";
-						}
-						patNames+=table.Rows[i]["PatNum"].ToString()+":"+table.Rows[i]["FName"].ToString()+" "+table.Rows[i]["LName"].ToString();
+						patNames+="#"+table.Rows[i]["PatNum"].ToString()+":"+table.Rows[i]["FName"].ToString()+" "+table.Rows[i]["LName"].ToString()+"\r\n";
 					}
-					log+=Lans.g("FormDatabaseMaintenance","Including: ")+patNames+"\r\n";
 				}
 			}
 			return log;
