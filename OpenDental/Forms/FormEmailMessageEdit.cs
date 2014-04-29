@@ -955,6 +955,7 @@ namespace OpenDental{
 			//Notice that SentOrReceived does not change here.
 			if(IsNew) {
 				EmailMessages.Insert(MessageCur);
+				IsNew=false;//As soon as the message is saved to the database, it is no longer new because it has a primary key.  Prevents new email from being duplicated if saved multiple times.
 			}
 			else {
 				EmailMessages.Update(MessageCur);
