@@ -1040,10 +1040,11 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			MessageCur.SentOrReceived=EmailSentOrReceived.Sent;
 			SaveMsg();
 			try{
 				EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
+				MessageCur.SentOrReceived=EmailSentOrReceived.Sent;
+				EmailMessages.Update(MessageCur);
 				MsgBox.Show(this,"Sent");
 			}
 			catch(Exception ex){
