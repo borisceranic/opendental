@@ -1058,7 +1058,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		///<Summary>also fixes resulting deposit misbalances.</Summary>
 		public static string ClaimPaymentCheckAmt(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1075,49 +1075,50 @@ namespace OpenDentBusiness {
 					GROUP BY claimproc.ClaimPaymentNum,CheckAmt
 					HAVING _sumpay!=_checkamt";
 			table=Db.GetTable(command);
-			if(isCheck){
-				if(table.Rows.Count>0 || verbose){
-					log+=Lans.g("FormDatabaseMaintenance","Claim payment sums found incorrect: ")+table.Rows.Count.ToString()+"\r\n";
-				}
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else{
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Claim payment sums found incorrect: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				//Changing the claim payment sums automatically is dangerous so give the user enough information to investigate themselves.
-				if(table.Rows.Count>1) {
-					log=Lans.g("FormDatabaseMaintenance","The following claim payment sums are incorrect")+":\r\n";
-					for(int i=0;i<table.Rows.Count;i++) {
-						Patient pat=Patients.GetPat(PIn.Long(table.Rows[i]["PatNum"].ToString()));
-						command="SELECT CheckDate,CheckAmt,IsPartial FROM claimpayment WHERE ClaimPaymentNum="+table.Rows[i]["ClaimPaymentNum"].ToString();
-						DataTable claimPayTable=Db.GetTable(command);
-						if(pat==null) {
-							//insert pat
-							Patient dummyPatient=new Patient();
-							dummyPatient.PatNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
-							dummyPatient.Guarantor=dummyPatient.PatNum;
-							dummyPatient.FName="MISSING";
-							dummyPatient.LName="PATIENT";
-							dummyPatient.AddrNote="This patient was inserted due to claimprocs with invalid PatNum on "+DateTime.Now.ToShortDateString()+" while doing database maintenance.";
-							dummyPatient.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-							dummyPatient.PatStatus=PatientStatus.Archived;
-							dummyPatient.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
-							long dummyPatNum=Patients.Insert(dummyPatient,true);
-							pat=Patients.GetPat(dummyPatient.PatNum);
-						}
-						log+="   Patient: #"+table.Rows[i]["PatNum"].ToString()+":"+pat.GetNameFirstOrPrefL()
+				for(int i=0;i<table.Rows.Count;i++) {
+					Patient pat=Patients.GetPat(PIn.Long(table.Rows[i]["PatNum"].ToString()));
+					command="SELECT CheckDate,CheckAmt,IsPartial FROM claimpayment WHERE ClaimPaymentNum="+table.Rows[i]["ClaimPaymentNum"].ToString();
+					DataTable claimPayTable=Db.GetTable(command);
+					if(pat==null) {
+						//insert pat
+						Patient dummyPatient=new Patient();
+						dummyPatient.PatNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
+						dummyPatient.Guarantor=dummyPatient.PatNum;
+						dummyPatient.FName="MISSING";
+						dummyPatient.LName="PATIENT";
+						dummyPatient.AddrNote="This patient was inserted due to claimprocs with invalid PatNum on "+DateTime.Now.ToShortDateString()+" while doing database maintenance.";
+						dummyPatient.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
+						dummyPatient.PatStatus=PatientStatus.Archived;
+						dummyPatient.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
+						long dummyPatNum=Patients.Insert(dummyPatient,true);
+						pat=Patients.GetPat(dummyPatient.PatNum);
+					}
+					log+="   Patient: #"+table.Rows[i]["PatNum"].ToString()+":"+pat.GetNameFirstOrPrefL()
 							+" Date: "+PIn.Date(claimPayTable.Rows[0]["CheckDate"].ToString()).ToShortDateString()
 							+" Amount: "+PIn.Double(claimPayTable.Rows[0]["CheckAmt"].ToString()).ToString("F");
-						if(!PIn.Bool(claimPayTable.Rows[0]["IsPartial"].ToString())) {
-							command="UPDATE claimpayment SET IsPartial=1 WHERE ClaimPaymentNum="+PIn.Long(table.Rows[i]["ClaimPaymentNum"].ToString()).ToString();
-							Db.NonQ(command);
-							log+=" (row has been unlocked and marked as partial)";
-						}
-						log+="\r\n";
+					if(!PIn.Bool(claimPayTable.Rows[0]["IsPartial"].ToString())) {
+						command="UPDATE claimpayment SET IsPartial=1 WHERE ClaimPaymentNum="+PIn.Long(table.Rows[i]["ClaimPaymentNum"].ToString()).ToString();
+						Db.NonQ(command);
+						log+=" (row has been unlocked and marked as partial)";
 					}
-					log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+					log+="\r\n";
 				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 				/*
 				for(int i=0;i<table.Rows.Count;i++) {
 					command="UPDATE claimpayment SET CheckAmt='"+POut.Double(PIn.Double(table.Rows[i]["_sumpay"].ToString()))+"' "
-				    +"WHERE ClaimPaymentNum="+table.Rows[i]["ClaimPaymentNum"].ToString();
+						+"WHERE ClaimPaymentNum="+table.Rows[i]["ClaimPaymentNum"].ToString();
 					Db.NonQ(command);
 				}
 				int numberFixed=table.Rows.Count;
@@ -1132,12 +1133,26 @@ namespace OpenDentBusiness {
 				FROM deposit
 				HAVING ROUND(_sum,2) != ROUND(deposit.Amount,2)";
 			table=Db.GetTable(command);
-			if(isCheck){
-				if(table.Rows.Count>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Deposit sums found incorrect: ")+table.Rows.Count.ToString()+"\r\n";
-				}
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
 			}
-			else{
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Deposit sums found incorrect: ")+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					DateTime date=PIn.Date(table.Rows[i]["DateDeposit"].ToString());
+					Double oldval=PIn.Double(table.Rows[i]["Amount"].ToString());
+					Double newval=PIn.Double(table.Rows[i]["_sum"].ToString());
+					log+="   "+Lans.g("FormDatabaseMaintenance","Deposit Date: ")+date.ToShortDateString()
+						+", "+Lans.g("FormDatabaseMaintenance","Current Sum: ")+oldval.ToString("c")
+				    +", "+Lans.g("FormDatabaseMaintenance","Expected Sum:")+newval.ToString("c")+"\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+			}
 				/*
 				for(int i=0;i<table.Rows.Count;i++) {
 					if(i==0) {
@@ -1156,7 +1171,6 @@ namespace OpenDentBusiness {
 				if(numberFixed>0||verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","Deposit sums fixed: ")+numberFixed.ToString()+"\r\n";
 				}*/
-			}
 			return log;
 		}
 
@@ -2603,7 +2617,7 @@ namespace OpenDentBusiness {
 			}
 			string log="";
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				return log;
+				return Lans.g("FormDatabaseMaintenance","Done.  Not using clinics.");
 			}
 			//Get patients not assigned to a clinic:
 			command=@"SELECT PatNum,LName,FName FROM patient WHERE ClinicNum=0 AND PatStatus!="+POut.Int((int)PatientStatus.Deleted);
@@ -3006,16 +3020,21 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
+			command="SELECT COUNT(*) FROM payplan WHERE PlanNum>0 AND Guarantor != PatNum";
+			int numFound=PIn.Int(Db.GetCount(command));
 			string log="";
 			if(isCheck) {
-				command="SELECT COUNT(*) FROM payplan WHERE PlanNum>0 AND Guarantor != PatNum";
-				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","PayPlan Guarantors not equal to PatNum where used for insurance tracking: ")+numFound+"\r\n";
 				}
 			}
 			else {
 				//Too dangerous to do anything at all.  Just have a very descriptive explanation in the check.
+				//For now, tell the user that a fix is under development.
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","PayPlan Guarantors not equal to PatNum where used for insurance tracking: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","   A safe fix is under development.")+"\r\n";
+				}
 			}
 			return log;
 		}
@@ -3037,6 +3056,11 @@ namespace OpenDentBusiness {
 			}
 			else {
 				//Too dangerous to do anything at all.  Just have a very descriptive explanation in the check.
+				//For now, tell the user that a fix is under development.
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Paysplits found with patnum not matching payplan guarantor: ")+table.Rows.Count+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","   A safe fix is under development.")+"\r\n";
+				}
 			}
 			return log;
 		}
@@ -3614,21 +3638,26 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
+			command="SELECT COUNT(*) FROM procedurelog WHERE ProvNum=0";
+			int numFound=PIn.Int(Db.GetCount(command));
 			if(isCheck) {
-				command="SELECT COUNT(*) FROM procedurelog WHERE ProvNum=0";
-				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","Procedures with missing provnums found: ")+numFound+"\r\n";
 				}
 			}
 			else {
+				}
 				//Create a new provider and attach procedures.
 
 				//command="UPDATE procedurelog SET ProvNum="+PrefC.GetString(PrefName.PracticeDefaultProv)+" WHERE ProvNum=0";
 				//long numberFixed=Db.NonQ(command);
 				//if(numberFixed>0 || verbose) {
 				//  log+=Lans.g("FormDatabaseMaintenance","Procedures with missing provnums fixed: ")+numberFixed.ToString()+"\r\n";
-				//}
+			//}
+			//For now, tell the user that a fix is under development.
+			if(numFound>0 || verbose) {
+				log+=Lans.g("FormDatabaseMaintenance","Procedures with missing provnums found: ")+numFound+"\r\n";
+				log+=Lans.g("FormDatabaseMaintenance","   A safe fix is under development.")+"\r\n";
 			}
 			return log;
 		}
