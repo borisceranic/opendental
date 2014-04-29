@@ -3874,11 +3874,14 @@ namespace OpenDentBusiness{
 							if(dateT<DateTime.Now.AddYears(-1)) {//either no start date so not an order, or not within the last year so not during the reporting period
 								continue;
 							}
-							else if((ehrLabList[m].OrderingProviderID==pat.PriProv.ToString()
+							else if((ehrLabList[m].OrderingProviderID==pat.PriProv.ToString()	
 								|| ehrLabList[m].OrderingProviderID==Providers.GetProv(pat.PriProv).NationalProvID)
-								&& (loinc==null || !loinc.ClassType.Contains("%rad%"))) {//if there's a note and it was created by the patient's PriProv, then count as order created by this provider and would count toward the denominator for MU
+								&& (loinc==null || !loinc.ClassType.ToUpper().Contains("RAD"))) 
+							{
 								labOrderCount++;
-								labOrderCpoeCount++;
+								if(ehrLabList[m].IsCpoe) {
+									labOrderCpoeCount++;
+								}
 							}
 						}
 						if(labOrderCount==0) {
@@ -3898,9 +3901,6 @@ namespace OpenDentBusiness{
 						for(int m=0;m<ehrLabList.Count;m++) {
 							//Using the last year as the reporting period, following pattern in ElectronicCopy, ClinicalSummaries, Reminders...
 							Loinc loinc=Loincs.GetByCode(ehrLabList[m].UsiID);
-							if(loinc==null) {
-								continue;
-							}
 							string dateSt=ehrLabList[m].ObservationDateTimeStart.PadRight(8,'0').Substring(0,8);//stored in DB as yyyyMMddhhmmss-zzzz
 							DateTime dateT=PIn.Date(dateSt.Substring(4,2)+"/"+dateSt.Substring(6,2)+"/"+dateSt.Substring(0,4));
 							if(dateT<DateTime.Now.AddYears(-1)) {//either no start date so not an order, or not within the last year so not during the reporting period
@@ -3908,9 +3908,12 @@ namespace OpenDentBusiness{
 							}
 							else if((ehrLabList[m].OrderingProviderID==pat.PriProv.ToString() 
 								|| ehrLabList[m].OrderingProviderID==Providers.GetProv(pat.PriProv).NationalProvID)
-								&& loinc.ClassType.Contains("%rad%")) {//if there's a note and it was created by the patient's PriProv, then count as order created by this provider and would count toward the denominator for MU
+								&& (loinc!=null && loinc.ClassType.ToUpper().Contains("RAD"))) 
+							{
 								radOrderCount++;
-								radOrderCpoeCount++;
+								if(ehrLabList[m].IsCpoe) {
+									radOrderCpoeCount++;
+								}
 							}
 						}
 						if(radOrderCount==0) {
