@@ -218,6 +218,20 @@
       <s:element name="PracticeTitleResetResponse">
         <s:complexType />
       </s:element>
+      <s:element name="IsForeignRegKey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsForeignRegKeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="IsForeignRegKeyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="EstablishConnectionSoapIn">
@@ -316,6 +330,12 @@
   <wsdl:message name="PracticeTitleResetSoapOut">
     <wsdl:part name="parameters" element="tns:PracticeTitleResetResponse" />
   </wsdl:message>
+  <wsdl:message name="IsForeignRegKeySoapIn">
+    <wsdl:part name="parameters" element="tns:IsForeignRegKey" />
+  </wsdl:message>
+  <wsdl:message name="IsForeignRegKeySoapOut">
+    <wsdl:part name="parameters" element="tns:IsForeignRegKeyResponse" />
+  </wsdl:message>
   <wsdl:portType name="Service1Soap">
     <wsdl:operation name="EstablishConnection">
       <wsdl:input message="tns:EstablishConnectionSoapIn" />
@@ -380,6 +400,10 @@
     <wsdl:operation name="PracticeTitleReset">
       <wsdl:input message="tns:PracticeTitleResetSoapIn" />
       <wsdl:output message="tns:PracticeTitleResetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <wsdl:input message="tns:IsForeignRegKeySoapIn" />
+      <wsdl:output message="tns:IsForeignRegKeySoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="Service1Soap" type="tns:Service1Soap">
@@ -528,6 +552,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <soap:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="Service1Soap12" type="tns:Service1Soap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -668,6 +701,15 @@
     </wsdl:operation>
     <wsdl:operation name="PracticeTitleReset">
       <soap12:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <soap12:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
