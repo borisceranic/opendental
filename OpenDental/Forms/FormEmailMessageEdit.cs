@@ -999,7 +999,6 @@ namespace OpenDental{
 					return;
 				}
 			}
-			MessageCur.SentOrReceived=EmailSentOrReceived.SentDirect;
 			SaveMsg();
 			try {
 				string strErrors=EmailMessages.SendEmailDirect(MessageCur,emailAddressFrom);
@@ -1009,6 +1008,8 @@ namespace OpenDental{
 					return;
 				}
 				else {
+					MessageCur.SentOrReceived=EmailSentOrReceived.SentDirect;
+					EmailMessages.Update(MessageCur);
 					MsgBox.Show(this,"Sent");
 				}
 			}
