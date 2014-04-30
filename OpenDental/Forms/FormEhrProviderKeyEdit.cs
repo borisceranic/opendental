@@ -5,9 +5,8 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormEhrProviderKeyEdit:Form {
 		private EhrProvKey _keyCur;
-		private Provider _provCur;
 
-		///<summary>Only used from FormEhrProviderKeys.  keyCur can be a blank new key.  provCur and keyCur cannot be null.</summary>
+		///<summary>Only used from FormEhrProviderKeys.  keyCur can be a blank new key.  keyCur cannot be null.</summary>
 		public FormEhrProviderKeyEdit(EhrProvKey keyCur) {
 			InitializeComponent();
 			Lan.F(this);
@@ -17,8 +16,8 @@ namespace OpenDental {
 		private void FormEhrProviderKeyEdit_Load(object sender,EventArgs e) {
 			textYear.Text=_keyCur.YearValue.ToString();
 			textKey.Text=_keyCur.ProvKey;
-			textLName.Text=_provCur.LName;
-			textFName.Text=_provCur.FName;
+			textLName.Text=_keyCur.LName;
+			textFName.Text=_keyCur.FName;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
