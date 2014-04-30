@@ -3052,7 +3052,6 @@ namespace OpenDental{
 			}
 			textBillingNote.Text=ProcCur.BillingNote;
 			textNotes.Text=ProcCur.Note;
-			textNotes.Select(textNotes.Text.Length,0);
 			CheckForCompleteNote();
 			comboPlaceService.Items.Clear();
 			comboPlaceService.Items.AddRange(Enum.GetNames(typeof(PlaceOfService)));
