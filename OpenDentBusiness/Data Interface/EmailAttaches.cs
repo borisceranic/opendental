@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class EmailAttaches{
+	public class EmailAttaches {
 
 		public static long Insert(EmailAttach attach) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -24,6 +24,13 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectMany(command);
 		}
 
+		///<summary>Gets one EmailAttach from the db. Used by Patient Portal.</summary>
+		public static EmailAttach GetOne(long emailAttachNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<EmailAttach>(MethodBase.GetCurrentMethod(),emailAttachNum);
+			}
+			return Crud.EmailAttachCrud.SelectOne(emailAttachNum);
+		}
 	}
 
 	
