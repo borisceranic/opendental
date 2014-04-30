@@ -5326,30 +5326,30 @@ namespace OpenDental{
 		}
 
 		private void PhoneWebCamTickWorkerThread() {
-			List<Phone> phoneList=Phones.GetPhoneList();
-			List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
-			string ipaddressStr="";
-			IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
-			foreach(IPAddress ipaddress in iphostentry.AddressList) {
-				//if(ipaddress.ToString().Contains("192.168.0.2")) {
-				if(ipaddress.ToString().Contains("10.10.1.2")) {
-					ipaddressStr=ipaddress.ToString();
-				}
-			}
-			//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
-			int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
-			//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
-			//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
-			//(EG... incoming call, outgoing call, hangup, etc).
-			Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
-			bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
-			//send the results back to the UI layer for action.
 			try {
+				List<Phone> phoneList=Phones.GetPhoneList();
+				List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
+				string ipaddressStr="";
+				IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
+				foreach(IPAddress ipaddress in iphostentry.AddressList) {
+					//if(ipaddress.ToString().Contains("192.168.0.2")) {
+					if(ipaddress.ToString().Contains("10.10.1.2")) {
+						ipaddressStr=ipaddress.ToString();
+					}
+				}
+				//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
+				int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
+				//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
+				//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
+				//(EG... incoming call, outgoing call, hangup, etc).
+				Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
+				bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
+				//send the results back to the UI layer for action.
 				if(!this.IsDisposed) {
 					Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,phone,isTriageOperator });
 				}
 			}
-			catch { }//prevents crash on closing if FormOpenDental has already been disposed.
+			catch { }//prevents crash on closing if FormOpenDental has already been disposed or if MySQL connection has been lost
 		}
 
 		///<summary></summary>
@@ -5384,19 +5384,22 @@ namespace OpenDental{
 
 		/// <summary>This is set to 30 seconds</summary>
 		private void timerWebHostSynch_Tick(object sender,EventArgs e) {
-			string interval=PrefC.GetStringSilent(PrefName.MobileSyncIntervalMinutes);
-			if(interval=="" || interval=="0") {//not a paid customer or chooses not to synch
-				return;
+			try {
+				string interval=PrefC.GetStringSilent(PrefName.MobileSyncIntervalMinutes);
+				if(interval=="" || interval=="0") {//not a paid customer or chooses not to synch
+					return;
+				}
+				if(System.Environment.MachineName.ToUpper()!=PrefC.GetStringSilent(PrefName.MobileSyncWorkstationName).ToUpper()) {
+					//Since GetStringSilent returns "" before OD is connected to db, this gracefully loops out
+					return;
+				}
+				if(PrefC.GetDate(PrefName.MobileExcludeApptsBeforeDate).Year<1880) {
+					//full synch never run
+					return;
+				}
+				FormMobile.SynchFromMain(false);
 			}
-			if(System.Environment.MachineName.ToUpper()!=PrefC.GetStringSilent(PrefName.MobileSyncWorkstationName).ToUpper()) {
-				//Since GetStringSilent returns "" before OD is connected to db, this gracefully loops out
-				return;
-			}
-			if(PrefC.GetDate(PrefName.MobileExcludeApptsBeforeDate).Year<1880) {
-				//full synch never run
-				return;
-			}
-			FormMobile.SynchFromMain(false);
+			catch { }//If MySQL service has been lost will not automatically UE
 		}
 
 		private void timerReplicationMonitor_Tick(object sender,EventArgs e) {

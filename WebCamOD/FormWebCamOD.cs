@@ -61,123 +61,128 @@ namespace WebCamOD {
 		}
 
 		private void timerPhoneWebCam_Tick(object sender,EventArgs e) {
-			if(vidCapt==null) {
-				if(intPtrVideo != IntPtr.Zero) {// Release any previous buffer
-					Marshal.FreeCoTaskMem(intPtrVideo);
-					intPtrVideo=IntPtr.Zero;
+			try {
+				if(vidCapt==null) {
+					if(intPtrVideo != IntPtr.Zero) {// Release any previous buffer
+						Marshal.FreeCoTaskMem(intPtrVideo);
+						intPtrVideo=IntPtr.Zero;
+					}
+					int deviceCount=VideoCapture.GetDeviceCount();
+					if(deviceCount>0) {
+						try {
+							vidCapt=new VideoCapture(0,640,480,24,pictBoxVideo);
+							//image capture will now continue below if successful
+						}
+						catch {
+							Phones.SetWebCamImage(IpAddressCur,null,Environment.MachineName);
+							return;//haven't actually seen this happen since we started properly disposing of vidCapt
+						}
+					}
+					Phones.SetWebCamImage(IpAddressCur,null,Environment.MachineName);
 				}
-				int deviceCount=VideoCapture.GetDeviceCount();
-				if(deviceCount>0) {
+				if(vidCapt!=null) {
+					if(intPtrVideo != IntPtr.Zero) {// Release any previous buffer
+						Marshal.FreeCoTaskMem(intPtrVideo);
+						intPtrVideo=IntPtr.Zero;
+					}
+					Bitmap bitmapSmall=null;
 					try {
-						vidCapt=new VideoCapture(0,640,480,24,pictBoxVideo);
-						//image capture will now continue below if successful
+						intPtrVideo = vidCapt.Click();//will fail if camera unplugged
+						Bitmap bitmap= new Bitmap(vidCapt.Width,vidCapt.Height,vidCapt.Stride,PixelFormat.Format24bppRgb,intPtrVideo);
+						bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);// If the image is upsidedown
+						int w=50;
+						int h=(int)(((float)w)/640f*480f);
+						bitmapSmall = new Bitmap(w,h);
+						using(Graphics g = Graphics.FromImage(bitmapSmall)) {
+							g.DrawImage(bitmap,new Rectangle(0,0,bitmapSmall.Width,bitmapSmall.Height));
+						}
+						bitmap.Dispose();
+						bitmap=null;
 					}
 					catch {
-						Phones.SetWebCamImage(IpAddressCur,null,Environment.MachineName);
-						return;//haven't actually seen this happen since we started properly disposing of vidCapt
+						//bitmapSmall will remain null
+						vidCapt.Dispose();
+						vidCapt=null;//To prevent the above slow try/catch from happening again and again.
+					}
+					finally {
+						//Marshal.FreeCoTaskMem(intPtrVideo);
+					}
+					if(IpAddressCur!="") {//found entry in phone table matching this machine ip.
+						Phones.SetWebCamImage(IpAddressCur,bitmapSmall,Environment.MachineName);
+					}
+					if(bitmapSmall!=null) {
+						bitmapSmall.Dispose();
+						bitmapSmall=null;
 					}
 				}
-				Phones.SetWebCamImage(IpAddressCur,null,Environment.MachineName);
 			}
-			if(vidCapt!=null) {
-				if(intPtrVideo != IntPtr.Zero) {// Release any previous buffer
-					Marshal.FreeCoTaskMem(intPtrVideo);
-					intPtrVideo=IntPtr.Zero;
-				}
-				Bitmap bitmapSmall=null;
-				try {
-					intPtrVideo = vidCapt.Click();//will fail if camera unplugged
-					Bitmap bitmap= new Bitmap(vidCapt.Width,vidCapt.Height,vidCapt.Stride,PixelFormat.Format24bppRgb,intPtrVideo);
-					bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);// If the image is upsidedown
-					int w=50;
-					int h=(int)(((float)w)/640f*480f);
-					bitmapSmall = new Bitmap(w,h);
-					using(Graphics g = Graphics.FromImage(bitmapSmall)) {
-						g.DrawImage(bitmap,new Rectangle(0,0,bitmapSmall.Width,bitmapSmall.Height));
-					}
-					bitmap.Dispose();
-					bitmap=null;
-				}
-				catch {
-					//bitmapSmall will remain null
-					vidCapt.Dispose();
-					vidCapt=null;//To prevent the above slow try/catch from happening again and again.
-				}
-				finally {
-					//Marshal.FreeCoTaskMem(intPtrVideo);
-				}
-				if(IpAddressCur!="") {//found entry in phone table matching this machine ip.
-					Phones.SetWebCamImage(IpAddressCur,bitmapSmall,Environment.MachineName);
-				}
-				if(bitmapSmall!=null) {
-					bitmapSmall.Dispose();
-					bitmapSmall=null;
-				}
-			}
+			catch { }//Prevents UE from losing MySQL service
 		}
 
 		private void timerScreenShots_Tick(object sender,EventArgs e) {
 			//ticks every 5 minutes
-			int extension=Phones.IsOnClock(IpAddressCur,Environment.MachineName);
-			if(extension==0) {//if this person is on break
-				return;//don't save a screenshot
-			}
-			string folder=@"\\serverfiles\storage\My\Jordan\ScreenshotsByWorkstation\"+Environment.MachineName;
-			if(!Directory.Exists(folder)) {
-				Directory.CreateDirectory(folder);
-			}
-			if(datePurged.Date!=DateTime.Today) {
-				string[] files=Directory.GetFiles(folder);
-				for(int f=0;f<files.Length;f++) {
-					if(files[f].EndsWith("db")) {
-						continue;//skip thumbs.db
+			try {
+				int extension=Phones.IsOnClock(IpAddressCur,Environment.MachineName);
+				if(extension==0) {//if this person is on break
+					return;//don't save a screenshot
+				}
+				string folder=@"\\serverfiles\storage\My\Jordan\ScreenshotsByWorkstation\"+Environment.MachineName;
+				if(!Directory.Exists(folder)) {
+					Directory.CreateDirectory(folder);
+				}
+				if(datePurged.Date!=DateTime.Today) {
+					string[] files=Directory.GetFiles(folder);
+					for(int f=0;f<files.Length;f++) {
+						if(files[f].EndsWith("db")) {
+							continue;//skip thumbs.db
+						}
+						DateTime dtCreated=File.GetCreationTime(files[f]);
+						if(dtCreated.AddDays(7).Date < DateTime.Today) {
+							File.Delete(files[f]);
+						}
 					}
-					DateTime dtCreated=File.GetCreationTime(files[f]);
-					if(dtCreated.AddDays(7).Date < DateTime.Today) {
-						File.Delete(files[f]);
+					datePurged=DateTime.Today;
+				}
+				//create the image-----------------------------------------------------------------
+				Point origin=new Point(0,0);
+				int right=0;
+				int bottom=0;
+				//all screens together form a giant image.  We just need to know where origin is as well as size.
+				for(int s=0;s<System.Windows.Forms.Screen.AllScreens.Length;s++) {
+					if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X < origin.X 
+					|| System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y < origin.Y) {
+						//screen must be to top or left of primary.  Use its origin.
+						origin=new Point(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X,System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y);
+					}
+					if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Width > right) {
+						//screen must be to right of primary.  Use its right-most extension.
+						right=System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Width;
+					}
+					if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Height > bottom) {
+						//screen must be to bottom of primary.  Use its bottom-most extension.
+						bottom=System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Height;
 					}
 				}
-				datePurged=DateTime.Today;
-			}
-			//create the image-----------------------------------------------------------------
-			Point origin=new Point(0,0);
-			int right=0;
-			int bottom=0;
-			//all screens together form a giant image.  We just need to know where origin is as well as size.
-			for(int s=0;s<System.Windows.Forms.Screen.AllScreens.Length;s++) {
-				if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X < origin.X 
-					|| System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y < origin.Y) 
-				{
-					//screen must be to top or left of primary.  Use its origin.
-					origin=new Point(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X,System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y);
+				//calculate total width and height, remembering that origin can be negative
+				Size sizeAllScreens=new Size(right-origin.X,bottom-origin.Y);//example 100-(-20)=120, or 100-20=80.
+				Bitmap bmp=new Bitmap(sizeAllScreens.Width,sizeAllScreens.Height);
+				using(Graphics g=Graphics.FromImage(bmp)) {
+					g.CopyFromScreen(origin,new Point(0,0),sizeAllScreens);
 				}
-				if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Width > right) {
-					//screen must be to right of primary.  Use its right-most extension.
-					right=System.Windows.Forms.Screen.AllScreens[s].WorkingArea.X+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Width;
-				}
-				if(System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Height > bottom) {
-					//screen must be to bottom of primary.  Use its bottom-most extension.
-					bottom=System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Y+System.Windows.Forms.Screen.AllScreens[s].WorkingArea.Height;
-				}
+				//save the image----------------------------------------------------------------------
+				//I tried a variety of file types.  The resulting file sizes were very similar. 
+				string filename=folder+"\\"+DateTime.Now.ToString("yyyy-MM-dd-HHmmssff")+".jpg";
+				bmp.Save(filename);
+				//make a thumbnail with height of 50
+				int thumbW=(int)((double)bmp.Width/(double)bmp.Height*50d);
+				Bitmap bmpThumb=new Bitmap(thumbW,50);
+				Graphics gThumb=Graphics.FromImage(bmpThumb);
+				gThumb.DrawImage(bmp,0,0,thumbW,50);
+				gThumb.Dispose();
+				gThumb=null;
+				Phones.SetScreenshot(extension,filename,bmpThumb);//IpAddress192,bitmapSmall,Environment.MachineName);
 			}
-			//calculate total width and height, remembering that origin can be negative
-			Size sizeAllScreens=new Size(right-origin.X,bottom-origin.Y);//example 100-(-20)=120, or 100-20=80.
-			Bitmap bmp=new Bitmap(sizeAllScreens.Width,sizeAllScreens.Height);
-			using(Graphics g=Graphics.FromImage(bmp)) {
-				g.CopyFromScreen(origin,new Point(0,0),sizeAllScreens);
-			}
-			//save the image----------------------------------------------------------------------
-			//I tried a variety of file types.  The resulting file sizes were very similar. 
-			string filename=folder+"\\"+DateTime.Now.ToString("yyyy-MM-dd-HHmmssff")+".jpg";
-			bmp.Save(filename);
-			//make a thumbnail with height of 50
-			int thumbW=(int)((double)bmp.Width/(double)bmp.Height*50d);
-			Bitmap bmpThumb=new Bitmap(thumbW,50);
-			Graphics gThumb=Graphics.FromImage(bmpThumb);
-			gThumb.DrawImage(bmp,0,0,thumbW,50);
-			gThumb.Dispose();
-			gThumb=null;
-			Phones.SetScreenshot(extension,filename,bmpThumb);//IpAddress192,bitmapSmall,Environment.MachineName);
+			catch { }//Prevents UE from loss of MySQL service
 		}
 
 
