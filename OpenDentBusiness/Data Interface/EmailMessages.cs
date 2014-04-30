@@ -61,19 +61,27 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary></summary>
-		public static void Update(EmailMessage message){
+		///<summary>OD will call this version. It will automatically delete and restore attachments.</summary>
+		public static void Update(EmailMessage message) {
+			//No need to check RemotingRole; no call to db.
+			Update(message,true);
+		}
+
+		///<summary>Patient Portal will call this version. It allows attachments to be left in-tact. The Patient Portal will pass in an object with an empty attachment list, but that does not mean that the attachments should be deleted.</summary>
+		public static void Update(EmailMessage message,bool updateAttachments){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),message);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),message,updateAttachments);
 				return;
 			}
 			Crud.EmailMessageCrud.Update(message);
-			//now, delete all attachments and recreate.
-			string command="DELETE FROM emailattach WHERE EmailMessageNum="+POut.Long(message.EmailMessageNum);
-			Db.NonQ(command);
-			for(int i=0;i<message.Attachments.Count;i++) {
-				message.Attachments[i].EmailMessageNum=message.EmailMessageNum;
-				EmailAttaches.Insert(message.Attachments[i]);
+			if(updateAttachments) {
+				//now, delete all attachments and recreate.
+				string command="DELETE FROM emailattach WHERE EmailMessageNum="+POut.Long(message.EmailMessageNum);
+				Db.NonQ(command);
+				for(int i=0;i<message.Attachments.Count;i++) {
+					message.Attachments[i].EmailMessageNum=message.EmailMessageNum;
+					EmailAttaches.Insert(message.Attachments[i]);
+				}
 			}
 		}
 

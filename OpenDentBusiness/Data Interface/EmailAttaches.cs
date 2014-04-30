@@ -24,6 +24,14 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectMany(command);
 		}
 
+		///<summary>Gets one EmailAttach from the db. Used by Patient Portal.</summary>
+		public static EmailAttach GetOne(long emailAttachNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<EmailAttach>(MethodBase.GetCurrentMethod(),emailAttachNum);
+			}
+			return Crud.EmailAttachCrud.SelectOne(emailAttachNum);
+		}
+
 	}
 
 	
