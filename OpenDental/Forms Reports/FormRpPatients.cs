@@ -1159,7 +1159,7 @@ namespace OpenDental{
       UsingProcLogFirst.Add(false);
       UsingProcLogLast.Add(false);
 			UsingRecall.Add(false);
-
+			#region IsText
 			if(IsText){
 				if(DropListFilter.SelectedItem.ToString()=="Primary Carrier"){
 					if(ListConditions.SelectedIndex==0){
@@ -1210,9 +1210,11 @@ namespace OpenDental{
 						ListPrerequisites.Items.Add("patient."+DropListFilter.SelectedItem.ToString()+" "
 							+ListConditions.SelectedItem.ToString()+" '"+TextBox.Text+"'");
 					}
-        } 
-  		}//end if(isText)
- 			else if(DropListFilter.SelectedItem.ToString()=="Age"){
+				}
+			}
+			#endregion IsText
+			#region Age
+			else if(DropListFilter.SelectedItem.ToString()=="Age"){
         if(ListConditions.SelectedIndex==0){
          ListPrerequisites.Items.Add("patient.BirthDate LIKE '%"
 					 +DateTime.Now.AddYears(-Convert.ToInt32(TextValidAge.Text)).ToString("yyyy-MM-dd")+"%'"); 
@@ -1238,7 +1240,9 @@ namespace OpenDental{
 						+DateTime.Now.AddYears(-Convert.ToInt32(TextValidAge.Text)).ToString("yyyy-MM-dd")+"'");
 				}
 			}
- 			else if(IsDate){
+			#endregion Age
+			#region IsDate
+			else if(IsDate){
         if(DropListFilter.SelectedItem.ToString()=="First Visit Date"){
  					if(ListConditions.SelectedIndex==0){
 						//Add the HAVING statement to ListPrerequisites with a leading asterisk so that it shows up in the UI so that users can delete it.
@@ -1292,11 +1296,21 @@ namespace OpenDental{
 							+ListConditions.SelectedItem.ToString()+" "+POut.Date(DateTime.Parse(TextDate.Text)));      
 				  }
         }
-			}//end else if(isDate)
+			}
+			#endregion IsDate
+			#region IsDropDown
 			else if(IsDropDown){
 				if(DropListFilter.SelectedItem.ToString()=="FeeSched"){
 					sItem="";
-					for(int i=0;i<ComboBox.SelectedIndices.Count;i++){
+					for(int i=0;i<ComboBox.SelectedIndices.Count;i++) {
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(false);
+						}
 						if(i==0){
               sItem="(";
             }
@@ -1313,7 +1327,15 @@ namespace OpenDental{
 				}//end if
 				else if(DropListFilter.SelectedItem.ToString()=="BillingType"){
 					sItem="";
-					for(int i=0;i<ComboBox.SelectedIndices.Count;i++){
+					for(int i=0;i<ComboBox.SelectedIndices.Count;i++) {
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(false);
+						}
 						if(i==0){ 
               sItem="(";
             }
@@ -1330,7 +1352,16 @@ namespace OpenDental{
 				}
 				else if(DropListFilter.SelectedItem.ToString()=="RecallStatus"){
 					sItem="";
-					for(int i=0;i<ComboBox.SelectedIndices.Count;i++){
+					UsingRecall[UsingRecall.Count-1]=true;
+					for(int i=0;i<ComboBox.SelectedIndices.Count;i++) {
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(true);
+						}
 						if(i==0){ 
               sItem="(";
             } 
@@ -1345,11 +1376,18 @@ namespace OpenDental{
             } 
 						ListPrerequisites.Items.Add(sItem);
 					}
-					UsingRecall[UsingRecall.Count-1]=true;
 				}
 				else if(DropListFilter.SelectedItem.ToString()=="PriProv"){
 					sItem="";
-					for(int i=0;i<ComboBox.SelectedIndices.Count;i++){
+					for(int i=0;i<ComboBox.SelectedIndices.Count;i++) {
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(false);
+						}
 						if(i==0){ 
               sItem="(";
             }  
@@ -1366,7 +1404,15 @@ namespace OpenDental{
 				}
 				else if(DropListFilter.SelectedItem.ToString()=="SecProv"){
 					sItem="";
-					for(int i=0;i<ComboBox.SelectedIndices.Count;i++){
+					for(int i=0;i<ComboBox.SelectedIndices.Count;i++) {
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(false);
+						}
 						if(i==0){
               sItem="(";
             } 
@@ -1381,13 +1427,21 @@ namespace OpenDental{
 						ListPrerequisites.Items.Add(sItem);
 					}
 				}
-				else{
+				else {
 					//PatStatus
 					//Gender
 					//Position
 					//PriRelationship
 					//SecRelationship
           for(int i=0;i<ComboBox.SelectedItems.Count;i++){
+						if(i>0) {
+							UsingInsPlans.Add(false);
+							UsingRefDent.Add(false);
+							UsingRefPat.Add(false);
+							UsingProcLogFirst.Add(false);
+							UsingProcLogLast.Add(false);
+							UsingRecall.Add(false);
+						}
 						if(ListConditions.SelectedIndex==0){ 
 							ListPrerequisites.Items.Add(DropListFilter.SelectedItem.ToString()+" LIKE '%"
 								+ComboBox.SelectedIndices[i].ToString()+"%'");  
@@ -1401,7 +1455,8 @@ namespace OpenDental{
  				}
 				ComboBox.SelectedIndex=-1;
 				butAddFilter.Enabled=false;
-			}//end else if(isDropDown)
+			}
+			#endregion IsDropDown
       CreateSQL();
       FillSQLbox();
 			ListConditions.Enabled=true;
