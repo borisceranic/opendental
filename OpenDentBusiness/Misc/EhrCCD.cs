@@ -1764,7 +1764,10 @@ Procedures
 				//ICD10 Procedure Coding System (CodeSystem: 2.16.840.1.113883.6.4) (CONF:7657)."
 				//In November of 2013, ONC addopted CDT into EHR certification. http://ehrintelligence.com/2013/11/05/ehr-adoption-may-be-easier-for-dentists-with-new-onc-ruling/
 				//The CDT OID is 2.16.840.1.113883.6.13 and the code system description is cdt-ADAcodes.
-				if(Regex.IsMatch(procCode.ProcCode,"^D[0-9]{4}$")) {//CDT code (ADA code)
+				if(procCode.ProcCode==null) {//Happens when listProcsFiltered[i].CodeNum is invalid or 0 (we create a procedure with CodeNum=0 above this loop if the procedure list is empty).
+					StartAndEnd("code","nullFlavor","UNK");//Unknown code.  Output a "blank" procedure row as required by CCD standard.
+				}
+				else if(Regex.IsMatch(procCode.ProcCode,"^D[0-9]{4}$")) {//CDT code (ADA code)
 					StartAndEnd("code","code",procCode.ProcCode,"codeSystem",strCodeSystemCdt,"displayName",procCode.Descript,"codeSystemName",strCodeSystemNameCdt);
 				}
 				else if(Regex.IsMatch(procCode.ProcCode,"^[0-9]{5}$")) {//CPT-4 code (medical code)
