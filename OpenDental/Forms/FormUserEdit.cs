@@ -400,9 +400,8 @@ namespace OpenDental{
 			if(listProv.SelectedIndex==0) {
 				Provider prov=Providers.GetProv(UserCur.ProvNum);
 				if(prov!=null) {
-					prov.IsInstructor=false;
+					Providers.Update(prov);	
 				}
-				Providers.Update(prov);
 				UserCur.ProvNum=0;
 			}
 			else {
