@@ -281,6 +281,10 @@ namespace OpenDentBusiness{
 			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provNPIs=Db.GetScalar(command);
+			provNPIs.Trim(',');
+			if(provNPIs=="") {
+				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
+			}
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
@@ -706,7 +710,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2525,6 +2529,10 @@ namespace OpenDentBusiness{
 			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provNPIs=Db.GetScalar(command);
+			provNPIs.Trim(',');
+			if(provNPIs=="") {
+				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
+			}
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
@@ -2554,7 +2562,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2572,7 +2580,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2746,7 +2754,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')"; //Not sure if we need this since rad labs shouldnt be set to numeric results
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')"; //Not sure if we need this since rad labs shouldnt be set to numeric results
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
