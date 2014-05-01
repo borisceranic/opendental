@@ -18,6 +18,18 @@ namespace OpenDentBusiness{
 			return Crud.HL7MsgCrud.SelectMany(command);//Just 0 or 1 item in list for now.
 		}
 
+		///<summary>True if there is a pending message to send in the database, otherwise false.</summary>
+		public static bool IsMessagePending() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT COUNT(*) FROM hl7msg WHERE HL7Status="+POut.Long((int)HL7MessageStatus.OutPending);
+			if(Db.GetCount(command)=="0") {
+				return false;
+			}
+			return true;
+		}
+
 		///<summary>When called we will make sure to send a startDate and endDate.  Status parameter 0:All, 1:OutPending, 2:OutSent, 3:OutFailed, 4:InProcessed, 5:InFailed</summary>
 		public static List<HL7Msg> GetHL7Msgs(DateTime startDate,DateTime endDate,long patNum,int status) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
