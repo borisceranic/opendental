@@ -267,7 +267,10 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			Provider provCur=Providers.GetProv(provNum);
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"') ";
 			string provs=Db.GetScalar(command);
 			string[] tempProv=provs.Split(',');
 			string provOID="";
@@ -277,8 +280,15 @@ namespace OpenDentBusiness{
 					provOID+=",";
 				}
 			}
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"') "
+				+"AND provider.NationalProvID !='' AND provider.NationalProvID !=','";
 			string provNPIs=Db.GetScalar(command);
+			provNPIs.Trim(',');
+			if(provNPIs=="") {
+				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
+			}
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
@@ -704,7 +714,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -1452,7 +1462,10 @@ namespace OpenDentBusiness{
 			int retval=0;
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			Provider provCur=Providers.GetProv(provNum);
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"')";
 			string provs=Db.GetScalar(command);
 			switch(mtype) {
 				case EhrMeasureType.ProblemList:
@@ -2508,7 +2521,10 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			Provider provCur=Providers.GetProv(provNum);
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"')";
 			string provs=Db.GetScalar(command);
 			string[] tempProv=provs.Split(',');
 			string provOID="";
@@ -2518,8 +2534,15 @@ namespace OpenDentBusiness{
 					provOID+=",";
 				}
 			}
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"') "
+				+"AND provider.NationalProvID !='' AND provider.NationalProvID !=','";
 			string provNPIs=Db.GetScalar(command);
+			provNPIs.Trim(',');
+			if(provNPIs=="") {
+				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
+			}
 			//Some measures use a temp table.  Create a random number to tack onto the end of the temp table name to avoid possible table collisions.
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
@@ -2549,7 +2572,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2567,7 +2590,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')";
+							+"IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2741,7 +2764,7 @@ namespace OpenDentBusiness{
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
-							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%rad%')"; //Not sure if we need this since rad labs shouldnt be set to numeric results
+							+"NOT IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')"; //Not sure if we need this since rad labs shouldnt be set to numeric results
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -3442,7 +3465,10 @@ namespace OpenDentBusiness{
 			int retval=0;
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum="+POut.Long(provNum);
+			Provider provCur=Providers.GetProv(provNum);
+			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.ProvNum IN "
+				+"(SELECT ProvNum FROM provider pv, ehrprovkey epk WHERE pv.LName=epk.LName AND pv.FName=epk.FName "
+				+"AND epk.LName='"+POut.String(provCur.LName)+"' AND epk.FName='"+POut.String(provCur.FName)+"')";
 			string provs=Db.GetScalar(command);
 			switch(mtype) {
 				#region CPOE_MedOrdersOnly
