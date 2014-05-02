@@ -525,8 +525,10 @@ namespace OpenDentHL7 {
 
 				// Complete the connection.
 				client.EndConnect(ar);
-				// Signal that the connection has been made.
-				connectDone.Set();
+				if(client.Connected) {
+					// Signal that the connection has been made.
+					connectDone.Set();
+				}
 			}
 			catch(Exception ex) {
 				EventLog.WriteEntry("OpenDentalHL7","The TCP send socket encountered an issue attempting to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
