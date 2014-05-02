@@ -184,7 +184,10 @@ namespace OpenDentBusiness{
 		///<summary>77-Assign this permission to a staff person who will administer setting up and editing Dental School Students in the system.</summary>
 		AdminDentalStudents,
 		///<summary>78-Assign this permission to an instructor who will be allowed to assign Grades to Dental School Students as well as manage classes assigned to them.</summary>
-		AdminDentalInstructors
+		AdminDentalInstructors,
+		///<summary>79- Uses date restrictions.  Has a unique audit trail so that users can track specific ortho chart edits.  
+		///Also used for generically tracking changes to patient fields from within the ortho chart window.</summary>
+		OrthoChartEdit
 	}
 
 	

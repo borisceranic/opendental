@@ -4864,7 +4864,26 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX gradingscaleitem_GradingScaleN ON gradingscaleitem (GradingScaleNum)";
 					Db.NonQ(command);
 				}
-
+				//Add OrthoChartEdit permission to everyone------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				DataTable table=Db.GetTable(command);
+				long groupNum;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",79)";
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",79)";
+						Db.NonQ(command);
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
