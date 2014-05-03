@@ -142,6 +142,22 @@ namespace OpenDental {
 			gridPat.EndUpdate();
 		}
 
+		///<summary>Gets the OrthoChartNum of the selected ortho chart field if it exists in the database.  Returns 0 if not found.</summary>
+		private long GetOrthoChartNum(Point selectedCell) {
+			for(int i=0;i<listOrthoCharts.Count;i++) {
+				if(listOrthoCharts[i].DateService!=(DateTime)table.Rows[selectedCell.Y]["Date"]) {
+					continue;					
+				}
+				if(listOrthoCharts[i].FieldName!=gridMain.Columns[selectedCell.X].Heading) {
+					continue;
+				}
+				//We've found the corresponding cell that they want to see the audit trail for and it still exists in the database.
+				return listOrthoCharts[i].OrthoChartNum;
+			}
+			//The selected cell no longer exists in the database.  We cannot show the audit trail for this field because we do not have a FK.
+			return 0;
+		}
+
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			/*
 			if(e.Col==0){//cannot edit a date
@@ -305,6 +321,29 @@ namespace OpenDental {
 			}
 		}
 
+		private void butAudit_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedCell.X==-1 || gridMain.SelectedCell.X==0) {
+				MsgBox.Show(this,"Please select an ortho chart field to audit first.");
+				return;
+			}
+			if(gridMain.SelectedCell.Y>=listOrthoCharts.Count) {
+				//This is a new ortho chart and there will be no audit entries for it yet.
+				MsgBox.Show(this,"The selected ortho chart row is new and has no audit trail entries yet.");
+				return;
+			}
+			//We cannot show audit trails for deleted ortho charts because we delete entries in the ortho chart table.
+			//So we have to look and see if the ortho chart entry is in the db still and then use that PK to show the unique audit trail.
+			long orthoChartNum=GetOrthoChartNum(gridMain.SelectedCell);
+			if(orthoChartNum==0) {
+				MsgBox.Show(this,"Either this field has never had a value or it was deleted and can only be audited via Tools | Audit Trail.");
+				return;
+			}
+			List<Permissions> perms=new List<Permissions>();
+			perms.Add(Permissions.OrthoChartEdit);
+			FormAuditOneType FormA=new FormAuditOneType(PatCur.PatNum,perms,Lan.g(this,"Audit Trail for Ortho Chart"),orthoChartNum);
+			FormA.ShowDialog();
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			Close();
 		}
@@ -338,6 +377,11 @@ namespace OpenDental {
 							&& tempOrthoChartsFromDB[j].FieldName==tempOrthoChartsFromTable[i].FieldName) 
 						{
 							OrthoCharts.Delete(tempOrthoChartsFromDB[j].OrthoChartNum);
+							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,PatCur.PatNum
+								,Lan.g(this,"Ortho chart field deleted.  Field date")+": "+tempOrthoChartsFromDB[j].DateService.ToShortDateString()+"  "
+									+Lan.g(this,"Field name")+": "+tempOrthoChartsFromDB[j].FieldName+"\r\n"
+									+Lan.g(this,"Value before deletion")+": \""+tempOrthoChartsFromDB[j].FieldValue+"\""
+								,tempOrthoChartsFromDB[j].OrthoChartNum);
 							break;
 						}
 					}
@@ -355,6 +399,15 @@ namespace OpenDental {
 							&& tempOrthoChartsFromDB[j].FieldName==tempOrthoChartsFromTable[i].FieldName) 
 					{
 						tempOrthoChartsFromTable[i].OrthoChartNum=tempOrthoChartsFromDB[j].OrthoChartNum;
+						//Make a security log if the user has changed anything.
+						if(tempOrthoChartsFromTable[i].FieldValue!=tempOrthoChartsFromDB[j].FieldValue) {
+							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,PatCur.PatNum
+								,Lan.g(this,"Ortho chart field edited.  Field date")+": "+tempOrthoChartsFromDB[j].DateService.ToShortDateString()+"  "
+									+Lan.g(this,"Field name")+": "+tempOrthoChartsFromDB[j].FieldName+"\r\n"
+									+Lan.g(this,"Old value")+": \""+tempOrthoChartsFromDB[j].FieldValue+"\"  "
+									+Lan.g(this,"New value")+": \""+tempOrthoChartsFromTable[i].FieldValue+"\""
+								,tempOrthoChartsFromDB[j].OrthoChartNum);
+						}
 						OrthoCharts.Update(tempOrthoChartsFromTable[i]);
 						break;
 					}

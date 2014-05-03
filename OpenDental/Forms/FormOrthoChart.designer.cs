@@ -30,6 +30,7 @@ namespace OpenDental{
 			this.butUseAutoNote = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butAudit = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// gridPat
@@ -119,10 +120,26 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butAudit
+			// 
+			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAudit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAudit.Autosize = true;
+			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAudit.CornerRadius = 4F;
+			this.butAudit.Location = new System.Drawing.Point(429, 634);
+			this.butAudit.Name = "butAudit";
+			this.butAudit.Size = new System.Drawing.Size(80, 23);
+			this.butAudit.TabIndex = 108;
+			this.butAudit.Text = "Audit Trail";
+			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
+			// 
 			// FormOrthoChart
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(938, 665);
+			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.butUseAutoNote);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.butAdd);
@@ -147,6 +164,7 @@ namespace OpenDental{
 		private UI.ODGrid gridMain;
 		private System.Windows.Forms.Label label6;
 		private UI.Button butUseAutoNote;
+		private UI.Button butAudit;
 
 	}
 }

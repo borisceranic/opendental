@@ -181,6 +181,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Manage Module");
 				case Permissions.None:
 					return "";
+				case Permissions.OrthoChartEdit:
+					return Lans.g("enumPermissions","Ortho Chart Edit");
 				case Permissions.PaymentCreate:
 					return Lans.g("enumPermissions","Payment Create");
 				case Permissions.PaymentEdit:
@@ -246,22 +248,23 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static bool PermTakesDates(Permissions permType){
 			//No need to check RemotingRole; no call to db.
-			if(  permType==Permissions.AdjustmentEdit
+			if(permType==Permissions.AccountingCreate//prevents backdating
+				|| permType==Permissions.AccountingEdit
+				|| permType==Permissions.AdjustmentEdit
+				|| permType==Permissions.ClaimSentEdit
+				|| permType==Permissions.CommlogEdit
+				|| permType==Permissions.DepositSlips//prevents backdating
+				|| permType==Permissions.EquipmentDelete
+				|| permType==Permissions.ImageDelete
+				|| permType==Permissions.InsPayEdit
+				|| permType==Permissions.OrthoChartEdit
 				|| permType==Permissions.PaymentEdit
+				|| permType==Permissions.PerioEdit
 				|| permType==Permissions.ProcComplEdit
 				|| permType==Permissions.ProcDelete
-				|| permType==Permissions.InsPayEdit
-				|| permType==Permissions.ClaimSentEdit
-				|| permType==Permissions.AccountingEdit
-				|| permType==Permissions.AccountingCreate//prevents backdating
-				|| permType==Permissions.DepositSlips//prevents backdating
-				|| permType==Permissions.TreatPlanEdit
-				|| permType==Permissions.TimecardDeleteEntry
-				|| permType==Permissions.EquipmentDelete
-				|| permType==Permissions.CommlogEdit
 				|| permType==Permissions.SheetEdit
-				|| permType==Permissions.PerioEdit
-				|| permType==Permissions.ImageDelete
+				|| permType==Permissions.TimecardDeleteEntry
+				|| permType==Permissions.TreatPlanEdit
 				)
 			{
 				return true;

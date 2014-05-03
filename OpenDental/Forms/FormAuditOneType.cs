@@ -96,6 +96,9 @@ namespace OpenDental{
 			else if(PermTypes.Contains(Permissions.RxEdit)) {
 				labelDisclaimer.Text=Lan.g(this,"Changes made to the carrier for this Rx before the update to 14.2 were not tracked in the audit trail.");
 			}
+			else if(PermTypes.Contains(Permissions.OrthoChartEdit)) {
+				labelDisclaimer.Text=Lan.g(this,"Changes made to the ortho chart for this date before the update to 14.3 were not tracked in the audit trail.");
+			}
 			FillGrid();
 		}
 
