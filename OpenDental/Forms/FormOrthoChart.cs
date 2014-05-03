@@ -341,6 +341,12 @@ namespace OpenDental {
 			List<Permissions> perms=new List<Permissions>();
 			perms.Add(Permissions.OrthoChartEdit);
 			FormAuditOneType FormA=new FormAuditOneType(PatCur.PatNum,perms,Lan.g(this,"Audit Trail for Ortho Chart"),orthoChartNum);
+			SecurityLog[] orthoChartLogs=SecurityLogs.Refresh(PatCur.PatNum,new List<Permissions> { Permissions.OrthoChartEdit },orthoChartNum);
+			SecurityLog[] patientFieldLogs=SecurityLogs.Refresh(new DateTime(1,1,1),DateTime.Today,Permissions.PatientFieldEdit,PatCur.PatNum,0);
+			List<SecurityLog> listLogs=new List<SecurityLog>();
+			listLogs.AddRange(orthoChartLogs);//Show the ortho chart logs first.  There might be a lot of patient field logs.
+			listLogs.AddRange(patientFieldLogs);
+			FormA.LogList=listLogs.ToArray();
 			FormA.ShowDialog();
 		}
 

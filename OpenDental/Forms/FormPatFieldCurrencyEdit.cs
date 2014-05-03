@@ -10,17 +10,19 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormPatFieldCurrencyEdit:Form {
 		public bool IsNew;
-		private PatField Field;
+		private PatField _fieldCur;
+		private PatField _fieldOld;
 
 		public FormPatFieldCurrencyEdit(PatField field) {
 			InitializeComponent();
 			Lan.F(this);
-			Field=field;
+			_fieldCur=field;
+			_fieldOld=_fieldCur.Copy();
 		}
 
 		private void FormPatFieldCurrencyEdit_Load(object sender,EventArgs e) {
-			labelName.Text=Field.FieldName;
-			textFieldCurrency.Text=Field.FieldValue;
+			labelName.Text=_fieldCur.FieldName;
+			textFieldCurrency.Text=_fieldCur.FieldValue;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -28,21 +30,25 @@ namespace OpenDental {
 				MsgBox.Show(this,"Invalid currency");
 				return;
 			}
-			if(Field.FieldValue==""){//if blank, then delete
+			if(_fieldCur.FieldValue==""){//if blank, then delete
 				if(IsNew) {
 					DialogResult=DialogResult.Cancel;
 					return;
 				}
-				PatFields.Delete(Field);
+				PatFields.Delete(_fieldCur);
+				if(_fieldOld.FieldValue!="") {//We don't need to make a log for field values that were blank because the user simply clicked cancel.
+					PatFields.MakeDeleteLogEntry(_fieldOld);
+				}
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			Field.FieldValue=textFieldCurrency.Text;
+			_fieldCur.FieldValue=textFieldCurrency.Text;
 			if(IsNew){
-				PatFields.Insert(Field);
+				PatFields.Insert(_fieldCur);
 			}
 			else{
-				PatFields.Update(Field);
+				PatFields.Update(_fieldCur);
+				PatFields.MakeEditLogEntry(_fieldOld,_fieldCur);
 			}
 			DialogResult=DialogResult.OK;
 		}

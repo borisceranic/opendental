@@ -19,7 +19,8 @@ namespace OpenDental{
 		///<summary></summary>
 		public bool IsNew;
 		public bool IsLaunchedFromOrtho;
-		private PatField Field;
+		private PatField _fieldCur;
+		private PatField _fieldOld;
 		private Label labelName;
 		private UI.Button butUseAutoNote;
 		private TextBox textValue;
@@ -32,7 +33,8 @@ namespace OpenDental{
 			//
 			InitializeComponent();
 			Lan.F(this);
-			Field=field;
+			_fieldCur=field;
+			_fieldOld=_fieldCur.Copy();
 		}
 
 		/// <summary>
@@ -156,8 +158,8 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPatFieldEdit_Load(object sender, System.EventArgs e) {
-			labelName.Text=Field.FieldName;
-			textValue.Text=Field.FieldValue;
+			labelName.Text=_fieldCur.FieldName;
+			textValue.Text=_fieldCur.FieldValue;
 			if(IsLaunchedFromOrtho) {
 				butUseAutoNote.Visible=true;
 			}
@@ -176,21 +178,25 @@ namespace OpenDental{
 		}*/
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			Field.FieldValue=textValue.Text;
-			if(Field.FieldValue==""){//if blank, then delete
+			_fieldCur.FieldValue=textValue.Text;
+			if(_fieldCur.FieldValue==""){//if blank, then delete
 				if(IsNew) {
 					DialogResult=DialogResult.Cancel;
 					return;
 				}
-				PatFields.Delete(Field);
+				PatFields.Delete(_fieldCur);
+				if(_fieldOld.FieldValue!="") {//We don't need to make a log for field values that were blank because the user simply clicked cancel.
+					PatFields.MakeDeleteLogEntry(_fieldOld);
+				}
 				DialogResult=DialogResult.OK;
 				return;
 			}
 			if(IsNew){
-				PatFields.Insert(Field);
+				PatFields.Insert(_fieldCur);
 			}
 			else{
-				PatFields.Update(Field);
+				PatFields.Update(_fieldCur);
+				PatFields.MakeEditLogEntry(_fieldOld,_fieldCur);
 			}
 			DialogResult=DialogResult.OK;
 		}

@@ -19,7 +19,8 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		///<summary></summary>
 		public bool IsNew;
-		private PatField Field;
+		private PatField _fieldCur;
+		private PatField _fieldOld;
 		private Label labelName;
 		private CheckBox checkFieldValue;
 
@@ -31,7 +32,8 @@ namespace OpenDental{
 			//
 			InitializeComponent();
 			Lan.F(this);
-			Field=field;
+			_fieldCur=field;
+			_fieldOld=_fieldCur.Copy();
 		}
 
 		/// <summary>
@@ -136,8 +138,8 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPatFieldCheckEdit_Load(object sender, System.EventArgs e) {
-			labelName.Text=Field.FieldName;
-			checkFieldValue.Checked=PIn.Bool(Field.FieldValue);
+			labelName.Text=_fieldCur.FieldName;
+			checkFieldValue.Checked=PIn.Bool(_fieldCur.FieldValue);
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -146,17 +148,21 @@ namespace OpenDental{
 					DialogResult=DialogResult.Cancel;
 					return;
 				}
-				PatFields.Delete(Field);
+				PatFields.Delete(_fieldCur);
+				if(_fieldOld.FieldValue!="") {//We don't need to make a log for field values that were blank because the user simply clicked cancel.
+					PatFields.MakeDeleteLogEntry(_fieldOld);
+				}
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			Field.FieldValue="1";
+			_fieldCur.FieldValue="1";
 			if(IsNew){
-				PatFields.Insert(Field);
+				PatFields.Insert(_fieldCur);
 			}
 			else{
 				//this should never happen
-				PatFields.Update(Field);
+				PatFields.Update(_fieldCur);
+				PatFields.MakeEditLogEntry(_fieldOld,_fieldCur);
 			}
 			DialogResult=DialogResult.OK;
 		}

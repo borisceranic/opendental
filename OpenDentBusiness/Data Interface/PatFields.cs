@@ -55,6 +55,18 @@ namespace OpenDentBusiness {
 			return null;
 		}
 
+		///<summary>A helper method to make a security log entry for deletion.  Because we have several patient field edit windows, this will allow us to change them all at once.</summary>
+		public static void MakeDeleteLogEntry(PatField patField) {
+			SecurityLogs.MakeLogEntry(Permissions.PatientFieldEdit,patField.PatNum,"Deleted patient field "+patField.FieldName+".  Value before deletion: \""+patField.FieldValue+"\"");
+		}
+
+		///<summary>A helper method to make a security log entry for an edit.  Because we have several patient field edit windows, this will allow us to change them all at once.</summary>
+		public static void MakeEditLogEntry(PatField patFieldOld,PatField patFieldCur) {
+			SecurityLogs.MakeLogEntry(Permissions.PatientFieldEdit,patFieldCur.PatNum
+					,"Edited patient field "+patFieldCur.FieldName+"\r\n"
+					+"Old value"+": \""+patFieldOld.FieldValue+"\"  New value: \""+patFieldCur.FieldValue+"\"");
+		}
+
 	}
 
 		

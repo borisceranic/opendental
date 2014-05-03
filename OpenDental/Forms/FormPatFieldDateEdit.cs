@@ -19,7 +19,8 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		///<summary></summary>
 		public bool IsNew;
-		private PatField Field;
+		private PatField _fieldCur;
+		private PatField _fieldOld;
 		private ValidDate textFieldDate;
 		private Label labelName;
 
@@ -31,7 +32,8 @@ namespace OpenDental{
 			//
 			InitializeComponent();
 			Lan.F(this);
-			Field=field;
+			_fieldCur=field;
+			_fieldOld=_fieldCur.Copy();
 		}
 
 		/// <summary>
@@ -136,8 +138,8 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPatFieldDateEdit_Load(object sender, System.EventArgs e) {
-			labelName.Text=Field.FieldName;
-			textFieldDate.Text=Field.FieldValue;
+			labelName.Text=_fieldCur.FieldName;
+			textFieldDate.Text=_fieldCur.FieldValue;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -145,21 +147,25 @@ namespace OpenDental{
 				MsgBox.Show(this,"Invalid date");
 				return;
 			}
-			if(Field.FieldValue==""){//if blank, then delete
+			if(_fieldCur.FieldValue==""){//if blank, then delete
 				if(IsNew) {
 					DialogResult=DialogResult.Cancel;
 					return;
 				}
-				PatFields.Delete(Field);
+				PatFields.Delete(_fieldCur);
+				if(_fieldOld.FieldValue!="") {//We don't need to make a log for field values that were blank because the user simply clicked cancel.
+					PatFields.MakeDeleteLogEntry(_fieldOld);
+				}
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			Field.FieldValue=textFieldDate.Text;
+			_fieldCur.FieldValue=textFieldDate.Text;
 			if(IsNew){
-				PatFields.Insert(Field);
+				PatFields.Insert(_fieldCur);
 			}
 			else{
-				PatFields.Update(Field);
+				PatFields.Update(_fieldCur);
+				PatFields.MakeEditLogEntry(_fieldOld,_fieldCur);
 			}
 			DialogResult=DialogResult.OK;
 		}

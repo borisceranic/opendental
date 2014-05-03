@@ -15,6 +15,8 @@ namespace OpenDental{
 		private Label labelDisclaimer;
 		private List <Permissions> PermTypes;
 		private long FKey;
+		///<summary>LogList can be filled before loading the window with a custom log list or it will get automatically filled upon load if left emtpy.  Used for showing mixtures of generic audit entries and FK entries.  Viewing specific ortho chart visit audits need to always have patient field changes.</summary>
+		public SecurityLog[] LogList;
 
 		///<summary>Supply the patient, types, and title.</summary>
 		public FormAuditOneType(long patNum,List<Permissions> permTypes,string title,long fKey) {
@@ -103,7 +105,10 @@ namespace OpenDental{
 		}
 
 		private void FillGrid(){
-			SecurityLog[] logList=SecurityLogs.Refresh(PatNum,PermTypes,FKey);
+			//Fill the log if it wasn't filled outside of this window.
+			if(LogList.Length==0) {
+				LogList=SecurityLogs.Refresh(PatNum,PermTypes,FKey);
+			}
 			grid.BeginUpdate();
 			grid.Columns.Clear();
 			ODGridColumn col;
@@ -117,12 +122,12 @@ namespace OpenDental{
 			grid.Columns.Add(col);
 			grid.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<logList.Length;i++){
+			for(int i=0;i<LogList.Length;i++){
 				row=new ODGridRow();
-				row.Cells.Add(logList[i].LogDateTime.ToShortDateString()+" "+logList[i].LogDateTime.ToShortTimeString());
-				row.Cells.Add(Userods.GetUser(logList[i].UserNum).UserName);
-				row.Cells.Add(logList[i].PermType.ToString());
-				row.Cells.Add(logList[i].LogText);
+				row.Cells.Add(LogList[i].LogDateTime.ToShortDateString()+" "+LogList[i].LogDateTime.ToShortTimeString());
+				row.Cells.Add(Userods.GetUser(LogList[i].UserNum).UserName);
+				row.Cells.Add(LogList[i].PermType.ToString());
+				row.Cells.Add(LogList[i].LogText);
 				grid.Rows.Add(row);
 			}
 			grid.EndUpdate();
