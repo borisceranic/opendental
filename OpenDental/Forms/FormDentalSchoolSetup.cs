@@ -55,6 +55,11 @@ namespace OpenDental {
 			}
 		}
 
+		private void butEvaluation_Click(object sender,EventArgs e) {
+			FormEvaluationDefs FormED=new FormEvaluationDefs();
+			FormED.ShowDialog();
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.OK;
 		}

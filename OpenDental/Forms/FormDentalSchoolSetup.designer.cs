@@ -33,6 +33,7 @@ namespace OpenDental{
 			this.textStudents = new System.Windows.Forms.TextBox();
 			this.textInstructors = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
+			this.butEvaluation = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -43,7 +44,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(232, 119);
+			this.butOK.Location = new System.Drawing.Point(232, 184);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -58,7 +59,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(313, 119);
+			this.butCancel.Location = new System.Drawing.Point(313, 184);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -138,10 +139,25 @@ namespace OpenDental{
 			this.label3.Text = "These picker buttons will change the security user group for all users that are a" +
     " student or an instructor.";
 			// 
+			// butEvaluation
+			// 
+			this.butEvaluation.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEvaluation.Autosize = true;
+			this.butEvaluation.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEvaluation.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEvaluation.CornerRadius = 4F;
+			this.butEvaluation.Location = new System.Drawing.Point(202, 105);
+			this.butEvaluation.Name = "butEvaluation";
+			this.butEvaluation.Size = new System.Drawing.Size(105, 24);
+			this.butEvaluation.TabIndex = 113;
+			this.butEvaluation.Text = "Evaluations";
+			this.butEvaluation.Click += new System.EventHandler(this.butEvaluation_Click);
+			// 
 			// FormDentalSchoolSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(400, 155);
+			this.ClientSize = new System.Drawing.Size(400, 220);
+			this.Controls.Add(this.butEvaluation);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textInstructors);
 			this.Controls.Add(this.textStudents);
@@ -173,5 +189,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textStudents;
 		private System.Windows.Forms.TextBox textInstructors;
 		private System.Windows.Forms.Label label3;
+		private UI.Button butEvaluation;
 	}
 }

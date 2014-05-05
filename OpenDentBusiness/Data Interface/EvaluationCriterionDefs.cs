@@ -47,18 +47,26 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
-		///<summary></summary>
-		public static List<EvaluationCriterionDef> Refresh(long patNum){
+
+		///<summary>Gets a list of all possible EvaluationCriterion.</summary>
+		public static List<EvaluationCriterionDef> Refresh() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<EvaluationCriterionDef>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<EvaluationCriterionDef>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM evaluationcriteriondef WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM evaluationcriteriondef";
 			return Crud.EvaluationCriterionDefCrud.SelectMany(command);
 		}
 
+		///<summary>Gets a list of all EvaluationCriterion attached to an EvaluationDef.</summary>
+		public static List<EvaluationCriterionDef> Refresh(long evaluationDefNum){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EvaluationCriterionDef>>(MethodBase.GetCurrentMethod(),evaluationDefNum);
+			}
+			string command="SELECT * FROM evaluationcriteriondef WHERE EvaluationDefNum = "+POut.Long(evaluationDefNum);
+			return Crud.EvaluationCriterionDefCrud.SelectMany(command);
+		}
+/*
 		///<summary>Gets one EvaluationCriterionDef from the db.</summary>
 		public static EvaluationCriterionDef GetOne(long evaluationCriterionDefNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

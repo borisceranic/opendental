@@ -378,6 +378,36 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormGradingScaleItemEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormGradingScaleItemEdit.designer.cs">
+      <DependentUpon>FormGradingScaleItemEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormGradingScaleEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormGradingScaleEdit.designer.cs">
+      <DependentUpon>FormGradingScaleEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormGradingScales.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormGradingScales.designer.cs">
+      <DependentUpon>FormGradingScales.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationDefEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationDefEdit.designer.cs">
+      <DependentUpon>FormEvaluationDefEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationDefs.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationDefs.designer.cs">
+      <DependentUpon>FormEvaluationDefs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormProvStudentEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3423,6 +3453,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormGradingScaleItemEdit.resx">
+      <DependentUpon>FormGradingScaleItemEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormGradingScaleEdit.resx">
+      <DependentUpon>FormGradingScaleEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormGradingScales.resx">
+      <DependentUpon>FormGradingScales.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEvaluationDefEdit.resx">
+      <DependentUpon>FormEvaluationDefEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEvaluationDefs.resx">
+      <DependentUpon>FormEvaluationDefs.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProvStudentEdit.resx">
       <DependentUpon>FormProvStudentEdit.cs</DependentUpon>

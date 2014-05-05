@@ -47,15 +47,13 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
-		public static List<GradingScaleItem> Refresh(long patNum){
+		public static List<GradingScaleItem> Refresh(long gradingScaleNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<GradingScaleItem>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<GradingScaleItem>>(MethodBase.GetCurrentMethod(),gradingScaleNum);
 			}
-			string command="SELECT * FROM gradingscaleitem WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
 			return Crud.GradingScaleItemCrud.SelectMany(command);
 		}
 
@@ -94,7 +92,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM gradingscaleitem WHERE GradingScaleItemNum = "+POut.Long(gradingScaleItemNum);
 			Db.NonQ(command);
 		}
-		*/
 
 
 
