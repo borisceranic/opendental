@@ -56,6 +56,9 @@ namespace OpenDentBusiness{
 			Crud.OrthoChartCrud.Update(orthoChart);
 		}
 
+		/*
+		  
+		 
 		///<summary></summary>
 		public static void Delete(long orthoChartNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -65,7 +68,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM orthochart WHERE OrthoChartNum = "+POut.Long(orthoChartNum);
 			Db.NonQ(command);
 		}
-		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>

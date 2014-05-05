@@ -59,38 +59,32 @@ namespace OpenDentBusiness{
 
 		///<summary>Used when viewing various audit trails of specific types.  Only implemented Appointments,ProcFeeEdit,InsPlanChangeCarrierName so far. patNum only used for Appointments.  The other two are zero.</summary>
 		public static SecurityLog[] Refresh(long patNum,List<Permissions> permTypes,long fKey) {
+			//No need to check RemotingRole; no call to db.
+			return Refresh(patNum,permTypes,new List<long>(){ fKey });
+		}
+
+		///<summary>Used when viewing various audit trails of specific types.  This overload will return security logs for multiple objects (or fKeys).  Typically you will only need a specific type audit log for one type.  However, for things like ortho charts, each row (FK) in the database represents just one part of a larger ortho chart "object".  Thus, to get the full experience of a specific type audit trail window, we need to get security logs for multiple objects (FKs) that comprise the larger object (what the user sees).  Only implemented with ortho chart so far.</summary>
+		public static SecurityLog[] Refresh(long patNum,List<Permissions> permTypes,List<long> fKeys) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<SecurityLog[]>(MethodBase.GetCurrentMethod(),patNum,permTypes,fKey);
+				return Meth.GetObject<SecurityLog[]>(MethodBase.GetCurrentMethod(),patNum,permTypes,fKeys);
 			}
 			string types="";
-			for(int i=0;i<permTypes.Count;i++){
-				if(i>0){
+			for(int i=0;i<permTypes.Count;i++) {
+				if(i>0) {
 					types+=" OR";
 				}
 				types+=" PermType="+POut.Long((int)permTypes[i]);
 			}
 			string command="SELECT * FROM securitylog "
-				+"WHERE ("+types+") "
-				+"AND FKey="+POut.Long(fKey)+" ";
+				+"WHERE ("+types+") ";
+			if(fKeys.Count > 0) {
+				command+="AND FKey IN ("+String.Join(",",fKeys)+") ";
+			}
 			if(patNum!=0) {//appointments
 				command+=" AND PatNum="+POut.Long(patNum)+" ";
 			}
 			command+="ORDER BY LogDateTime";
 			return Crud.SecurityLogCrud.SelectMany(command).ToArray();
-			/*
-			DataTable table=Db.GetTable(command);
-			SecurityLog[] List=new SecurityLog[table.Rows.Count];
-			for(int i=0;i<List.Length;i++){
-				List[i]=new SecurityLog();
-				List[i].SecurityLogNum= PIn.Long   (table.Rows[i]["SecurityLogNum"].ToString());
-				List[i].PermType      = (Permissions)PIn.Long(table.Rows[i]["PermType"].ToString());
-				List[i].UserNum       = PIn.Long   (table.Rows[i]["UserNum"].ToString());
-				List[i].LogDateTime   = PIn.DateT (table.Rows[i]["LogDateTime"].ToString());	
-				List[i].LogText       = PIn.String(table.Rows[i]["LogText"].ToString());
-				List[i].PatNum        = PIn.Long   (table.Rows[i]["PatNum"].ToString());
-				List[i].FKey					= PIn.Long   (table.Rows[i]["FKey"].ToString());
-			}
-			return List;*/
 		}
 
 		///<summary>Returns one SecurityLog from the db.  Called from SecurityLogHashs.CreateSecurityLogHash()</summary>

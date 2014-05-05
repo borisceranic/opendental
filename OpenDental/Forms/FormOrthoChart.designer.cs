@@ -62,6 +62,7 @@ namespace OpenDental{
 			this.gridMain.Title = "Ortho Chart";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
 			// 
 			// label6
 			// 

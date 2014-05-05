@@ -13,12 +13,13 @@ namespace OpenDental {
 		private PatField[] listPatientFields;
 		private List<DisplayField> listOrthDisplayFields;
 		private List<OrthoChart> listOrthoCharts;
-		public Patient PatCur;
+		private Patient _patCur;
+		private List<string> _listDisplayFieldNames;
 		///<summary>Each row in this table has a date as the first cell.  There will be additional rows that are not yet in the db.  Each blank cell will be an empty string.  It will also store changes made by the user prior to closing the form.  When the form is closed, this table will be compared with the original listOrthoCharts and a synch process will take place to save to db.  An empty string in a cell will result in no db row or a deletion of existing db row.</summary>
 		DataTable table;
 
 		public FormOrthoChart(Patient patCur) {
-			PatCur = patCur;
+			_patCur = patCur;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -33,16 +34,16 @@ namespace OpenDental {
 				table.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
 			}
 			//define rows------------------------------------------------------------------------------------------------------------
-			listOrthoCharts=OrthoCharts.GetAllForPatient(PatCur.PatNum);
+			listOrthoCharts=OrthoCharts.GetAllForPatient(_patCur.PatNum);
 			List<DateTime> datesShowing=new List<DateTime>();
-			List<string> listDisplayFieldNames=new List<string>();
+			_listDisplayFieldNames=new List<string>();
 			for(int i=0;i<listOrthDisplayFields.Count;i++) {//fill listDisplayFieldNames to be used in comparison
-				listDisplayFieldNames.Add(listOrthDisplayFields[i].Description);
+				_listDisplayFieldNames.Add(listOrthDisplayFields[i].Description);
 			}
 			//start adding dates starting with today's date
 			datesShowing.Add(DateTime.Today);
 			for(int i=0;i<listOrthoCharts.Count;i++) {
-				if(!listDisplayFieldNames.Contains(listOrthoCharts[i].FieldName)) {//skip rows not in display fields
+				if(!_listDisplayFieldNames.Contains(listOrthoCharts[i].FieldName)) {//skip rows not in display fields
 					continue;
 				}
 				if(!datesShowing.Contains(listOrthoCharts[i].DateService)) {//add dates not already in date list
@@ -68,12 +69,12 @@ namespace OpenDental {
 				if(!datesShowing.Contains(listOrthoCharts[i].DateService)){
 					continue;
 				}
-				if(!listDisplayFieldNames.Contains(listOrthoCharts[i].FieldName)){
+				if(!_listDisplayFieldNames.Contains(listOrthoCharts[i].FieldName)){
 					continue;
 				}
 				for(int j=0;j<table.Rows.Count;j++) {
 					if(listOrthoCharts[i].DateService==(DateTime)table.Rows[j]["Date"]) {
-						table.Rows[j][listDisplayFieldNames.IndexOf(listOrthoCharts[i].FieldName)+1]=listOrthoCharts[i].FieldValue;
+						table.Rows[j][_listDisplayFieldNames.IndexOf(listOrthoCharts[i].FieldName)+1]=listOrthoCharts[i].FieldValue;
 					}
 				}
 			}
@@ -95,6 +96,7 @@ namespace OpenDental {
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
 				row=new ODGridRow();
+				//First column will always be the date.  gridMain_CellLeave() depends on this fact.
 				DateTime tempDate=(DateTime)table.Rows[i]["Date"];
 				row.Cells.Add(tempDate.ToShortDateString());
 				row.Tag=tempDate;
@@ -115,7 +117,7 @@ namespace OpenDental {
 			col=new ODGridColumn("Value",200);
 			gridPat.Columns.Add(col);
 			gridPat.Rows.Clear();
-			listPatientFields=PatFields.Refresh(PatCur.PatNum);
+			listPatientFields=PatFields.Refresh(_patCur.PatNum);
 			PatFieldDefs.RefreshCache();
 			ODGridRow row;
 			//define and fill rows in grid at the same time.
@@ -131,6 +133,9 @@ namespace OpenDental {
 						if(PatFieldDefs.List[i].FieldType==PatFieldType.Checkbox) {
 							row.Cells.Add("X");
 						}
+						else if(PatFieldDefs.List[i].FieldType==PatFieldType.Currency) {
+							row.Cells.Add(PIn.Double(listPatientFields[j].FieldValue).ToString("c"));
+						}
 						else {
 							row.Cells.Add(listPatientFields[j].FieldValue);
 						}
@@ -142,20 +147,20 @@ namespace OpenDental {
 			gridPat.EndUpdate();
 		}
 
-		///<summary>Gets the OrthoChartNum of the selected ortho chart field if it exists in the database.  Returns 0 if not found.</summary>
-		private long GetOrthoChartNum(Point selectedCell) {
+		///<summary>Gets all the OrthoChartNums for each field in the selected ortho chart row (if they exists in the database).  Returns list with 0 as an entry if none found.</summary>
+		private List<long> GetOrthoChartNumsForRow(int row) {
+			List<long> orthoChartNums=new List<long>() { 0 };
 			for(int i=0;i<listOrthoCharts.Count;i++) {
-				if(listOrthoCharts[i].DateService!=(DateTime)table.Rows[selectedCell.Y]["Date"]) {
-					continue;					
-				}
-				if(listOrthoCharts[i].FieldName!=gridMain.Columns[selectedCell.X].Heading) {
+				if(listOrthoCharts[i].DateService!=(DateTime)table.Rows[row]["Date"]) {
 					continue;
 				}
-				//We've found the corresponding cell that they want to see the audit trail for and it still exists in the database.
-				return listOrthoCharts[i].OrthoChartNum;
+				if(!_listDisplayFieldNames.Contains(listOrthoCharts[i].FieldName)) {
+					continue;//No need to audit columns that are not showing in the UI.
+				}
+				//This is a cell in the corresponding row that they want to see an audit trail for.
+				orthoChartNums.Add(listOrthoCharts[i].OrthoChartNum);
 			}
-			//The selected cell no longer exists in the database.  We cannot show the audit trail for this field because we do not have a FK.
-			return 0;
+			return orthoChartNums;
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -205,11 +210,40 @@ namespace OpenDental {
 			//FillGrid();
 		}
 
+		private void gridMain_CellLeave(object sender,ODGridClickEventArgs e) {
+			//Get the the date for the ortho chart that was just edited.
+			DateTime orthoDate=PIn.Date(gridMain.Rows[e.Row].Cells[0].Text);//First column will always be the date.
+			//Suppress the security message because it's crazy annoying if the user is simply clicking around in cells.  They might be copying a cell and not changing it.
+			if(Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
+				return;//The user has permission.  No need to waste time doing logic below.
+			}
+			//User is not authorized to edit this cell.  Check if they changed the old value and if they did, put it back to the way it was and warn them about security.
+			string oldText="";//If the selected cell is not in listOrthoCharts then it started out blank.  This will put it back to an empty string.
+			for(int i=0;i<listOrthoCharts.Count;i++) {
+				if(listOrthoCharts[i].DateService!=orthoDate) {
+					continue;
+				}
+				if(listOrthoCharts[i].FieldName!=gridMain.Columns[e.Col].Heading) {
+					continue;
+				}
+				//This is the cell that the user was editing and it had an entry in the database.  Put it back to the way it was.
+				oldText=listOrthoCharts[i].FieldValue;
+				break;
+			}
+			if(gridMain.Rows[e.Row].Cells[e.Col].Text!=oldText) {
+				//The user actually changed the cell's value and we need to change it back and warn them that they don't have permission.
+				gridMain.Rows[e.Row].Cells[e.Col].Text=oldText;
+				gridMain.Invalidate();
+				Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate);//This will pop up the message.
+			}			
+			return;
+		}
+
 		private void gridPat_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PatField field=PatFields.GetByName(PatFieldDefs.List[e.Row].FieldName,listPatientFields);
 			if(field==null) {
 				field=new PatField();
-				field.PatNum=PatCur.PatNum;
+				field.PatNum=_patCur.PatNum;
 				field.FieldName=PatFieldDefs.List[e.Row].FieldName;
 				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
@@ -322,27 +356,18 @@ namespace OpenDental {
 		}
 
 		private void butAudit_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedCell.X==-1 || gridMain.SelectedCell.X==0) {
-				MsgBox.Show(this,"Please select an ortho chart field to audit first.");
-				return;
-			}
-			if(gridMain.SelectedCell.Y>=listOrthoCharts.Count) {
-				//This is a new ortho chart and there will be no audit entries for it yet.
-				MsgBox.Show(this,"The selected ortho chart row is new and has no audit trail entries yet.");
+			if(gridMain.SelectedCell.X==-1) {
+				MsgBox.Show(this,"Please select an ortho chart field or date first.");
 				return;
 			}
 			//We cannot show audit trails for deleted ortho charts because we delete entries in the ortho chart table.
 			//So we have to look and see if the ortho chart entry is in the db still and then use that PK to show the unique audit trail.
-			long orthoChartNum=GetOrthoChartNum(gridMain.SelectedCell);
-			if(orthoChartNum==0) {
-				MsgBox.Show(this,"Either this field has never had a value or it was deleted and can only be audited via Tools | Audit Trail.");
-				return;
-			}
+			List<long> orthoChartNums=GetOrthoChartNumsForRow(gridMain.SelectedCell.Y);
 			List<Permissions> perms=new List<Permissions>();
 			perms.Add(Permissions.OrthoChartEdit);
-			FormAuditOneType FormA=new FormAuditOneType(PatCur.PatNum,perms,Lan.g(this,"Audit Trail for Ortho Chart"),orthoChartNum);
-			SecurityLog[] orthoChartLogs=SecurityLogs.Refresh(PatCur.PatNum,new List<Permissions> { Permissions.OrthoChartEdit },orthoChartNum);
-			SecurityLog[] patientFieldLogs=SecurityLogs.Refresh(new DateTime(1,1,1),DateTime.Today,Permissions.PatientFieldEdit,PatCur.PatNum,0);
+			FormAuditOneType FormA=new FormAuditOneType(_patCur.PatNum,perms,Lan.g(this,"Audit Trail for Ortho Chart"),0);
+			SecurityLog[] orthoChartLogs=SecurityLogs.Refresh(_patCur.PatNum,new List<Permissions> { Permissions.OrthoChartEdit },orthoChartNums);
+			SecurityLog[] patientFieldLogs=SecurityLogs.Refresh(new DateTime(1,1,1),DateTime.Today,Permissions.PatientFieldEdit,_patCur.PatNum,0);
 			List<SecurityLog> listLogs=new List<SecurityLog>();
 			listLogs.AddRange(orthoChartLogs);//Show the ortho chart logs first.  There might be a lot of patient field logs.
 			listLogs.AddRange(patientFieldLogs);
@@ -362,7 +387,7 @@ namespace OpenDental {
 					table.Rows[i][j+1]=gridMain.Rows[i].Cells[j+1].Text;
 				}
 			} 
-			List<OrthoChart> tempOrthoChartsFromDB=OrthoCharts.GetAllForPatient(PatCur.PatNum);
+			List<OrthoChart> tempOrthoChartsFromDB=OrthoCharts.GetAllForPatient(_patCur.PatNum);
 			List<OrthoChart> tempOrthoChartsFromTable=new List<OrthoChart>();
 			for(int r=0;r<table.Rows.Count;r++) {
 				for(int c=1;c<table.Columns.Count;c++) {//skip col 0
@@ -370,29 +395,12 @@ namespace OpenDental {
 					tempChart.DateService=(DateTime)table.Rows[r]["Date"];
 					tempChart.FieldName=listOrthDisplayFields[c-1].Description;
 					tempChart.FieldValue=table.Rows[r][c].ToString();
-					tempChart.PatNum=PatCur.PatNum;
+					tempChart.PatNum=_patCur.PatNum;
 					tempOrthoChartsFromTable.Add(tempChart);
 				}
 			}
-			//Check table list vs DB list for inserts, updates, and deletes.
+			//Check table list vs DB list for inserts and updates.
 			for(int i=0;i<tempOrthoChartsFromTable.Count;i++) {
-				//Either delete an existing record from the DB or ignore this non-entry.
-				if(tempOrthoChartsFromTable[i].FieldValue=="") {
-					for(int j=0;j<tempOrthoChartsFromDB.Count;j++) {
-						if(tempOrthoChartsFromDB[j].DateService==tempOrthoChartsFromTable[i].DateService 
-							&& tempOrthoChartsFromDB[j].FieldName==tempOrthoChartsFromTable[i].FieldName) 
-						{
-							OrthoCharts.Delete(tempOrthoChartsFromDB[j].OrthoChartNum);
-							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,PatCur.PatNum
-								,Lan.g(this,"Ortho chart field deleted.  Field date")+": "+tempOrthoChartsFromDB[j].DateService.ToShortDateString()+"  "
-									+Lan.g(this,"Field name")+": "+tempOrthoChartsFromDB[j].FieldName+"\r\n"
-									+Lan.g(this,"Value before deletion")+": \""+tempOrthoChartsFromDB[j].FieldValue+"\""
-								,tempOrthoChartsFromDB[j].OrthoChartNum);
-							break;
-						}
-					}
-					continue;//i loop
-				}
 				//Update the Record if it already exists or Insert if it's new.
 				for(int j=0;j<=tempOrthoChartsFromDB.Count;j++) {
 					//Insert if you've made it through the whole list.
@@ -407,7 +415,7 @@ namespace OpenDental {
 						tempOrthoChartsFromTable[i].OrthoChartNum=tempOrthoChartsFromDB[j].OrthoChartNum;
 						//Make a security log if the user has changed anything.
 						if(tempOrthoChartsFromTable[i].FieldValue!=tempOrthoChartsFromDB[j].FieldValue) {
-							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,PatCur.PatNum
+							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,_patCur.PatNum
 								,Lan.g(this,"Ortho chart field edited.  Field date")+": "+tempOrthoChartsFromDB[j].DateService.ToShortDateString()+"  "
 									+Lan.g(this,"Field name")+": "+tempOrthoChartsFromDB[j].FieldName+"\r\n"
 									+Lan.g(this,"Old value")+": \""+tempOrthoChartsFromDB[j].FieldValue+"\"  "
