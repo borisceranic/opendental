@@ -57,9 +57,9 @@ namespace OpenDentBusiness{
 		}
 
 		/*
+		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		  
-		 
-		///<summary></summary>
+		///<summary>Ortho charts should not be deleted due to audit trail logic.  jsalmon - 05/06/2014</summary>
 		public static void Delete(long orthoChartNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),orthoChartNum);
@@ -68,7 +68,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM orthochart WHERE OrthoChartNum = "+POut.Long(orthoChartNum);
 			Db.NonQ(command);
 		}
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
 		public static List<OrthoChart> Refresh(long patNum){

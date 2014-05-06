@@ -86,6 +86,7 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
+			//First column will always be the date.  gridMain_CellLeave() depends on this fact.
 			col=new ODGridColumn("Date",70);
 			gridMain.Columns.Add(col);
 			for(int i=0;i<listOrthDisplayFields.Count;i++) {
@@ -235,7 +236,7 @@ namespace OpenDental {
 				gridMain.Rows[e.Row].Cells[e.Col].Text=oldText;
 				gridMain.Invalidate();
 				Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate);//This will pop up the message.
-			}			
+			}
 			return;
 		}
 
