@@ -65,8 +65,8 @@ namespace OpenDentBusiness.HL7 {
 				int pidOrder=hl7defmsg.hl7DefSegments[s].ItemOrder;
 				//we found the PID segment in the def, make sure it exists in the msg
 				if(msg.Segments.Count<=pidOrder //If the number of segments in the message is less than the item order of the PID segment
-					|| msg.Segments[pidOrder].GetField(0).ToString()!="PID" //Or if the segment we expect to be the PID segment is not the PID segment
-				) {
+					|| msg.Segments[pidOrder].GetField(0).ToString()!="PID") //Or if the segment we expect to be the PID segment is not the PID segment
+				{
 					break;
 				}
 				isExistingPID=true;
@@ -137,9 +137,6 @@ namespace OpenDentBusiness.HL7 {
 			else {
 				patOld=pat.Copy();
 			}
-			//Update hl7msg table with correct PatNum for this message
-			HL7MsgCur.PatNum=pat.PatNum;
-			HL7Msgs.Update(HL7MsgCur);
 			//If this is a message that contains an SCH segment, loop through to find the AptNum.  Pass it to the other segments that will need it.
 			long aptNum=0;
 			for(int s=0;s<hl7defmsg.hl7DefSegments.Count;s++) {
@@ -169,6 +166,9 @@ namespace OpenDentBusiness.HL7 {
 				}
 				patOld=pat.Copy();
 			}
+			//Update hl7msg table with correct PatNum for this message
+			HL7MsgCur.PatNum=pat.PatNum;
+			HL7Msgs.Update(HL7MsgCur);
 			for(int i=0;i<hl7defmsg.hl7DefSegments.Count;i++) {
 				try {
 					SegmentHL7 seg=msg.GetSegment(hl7defmsg.hl7DefSegments[i].SegmentName,!hl7defmsg.hl7DefSegments[i].IsOptional);
