@@ -129,20 +129,25 @@ namespace OpenDental {
 			col=new ODGridColumn("Related Actions",142);
 			gridMu.Columns.Add(col);
 			//Always fill the grid regardless if the patient's provider has a valid ehr key.
-			//This is so that non-ehr providers can still use many of our ehr features.  E.g. vital signs.
-			//if(ProvPat.EhrKey=="") {
-			//	listMu=new List<EhrMu>();
-			//}
-			//else {
-			if(PrefC.GetBool(PrefName.MeaningfulUseTwo)) {
-				gridMu.Title="Stage 2 Meaningful Use for this patient";
-				listMu=EhrMeasures.GetMu2(PatCur);
+			//TODO: ProvPat may not be the primary provider in the future.
+			if(ProvPat.EhrMuStage==0) {//Use the global preference
+				if(PrefC.GetBool(PrefName.MeaningfulUseTwo)) {
+					gridMu.Title="Stage 2 Meaningful Use for this patient";
+					listMu=EhrMeasures.GetMu2(PatCur);
+				}
+				else {
+					gridMu.Title="Stage 1 Meaningful Use for this patient";
+					listMu=EhrMeasures.GetMu(PatCur);
+				}
 			}
-			else {
+			else if(ProvPat.EhrMuStage==1) {
 				gridMu.Title="Stage 1 Meaningful Use for this patient";
 				listMu=EhrMeasures.GetMu(PatCur);
 			}
-			//}
+			else if(ProvPat.EhrMuStage==2) {
+				gridMu.Title="Stage 2 Meaningful Use for this patient";
+				listMu=EhrMeasures.GetMu2(PatCur);
+			}
 			gridMu.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<listMu.Count;i++) {

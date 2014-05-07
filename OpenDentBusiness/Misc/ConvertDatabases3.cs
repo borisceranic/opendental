@@ -4884,6 +4884,19 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider ADD EhrMuStage tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider ADD EhrMuStage number(3)";
+					Db.NonQ(command);
+					command="UPDATE provider SET EhrMuStage = 0 WHERE EhrMuStage IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE provider MODIFY EhrMuStage NOT NULL";
+					Db.NonQ(command);
+				}
+
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";

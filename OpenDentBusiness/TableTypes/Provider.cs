@@ -78,6 +78,8 @@ namespace OpenDentBusiness{
 		public long EmailAddressNum;
 		///<summary>Default is false because most providers will not be instructors.  Used in Dental Schools</summary>
 		public bool IsInstructor;
+		///<summary>Used to determine which stage of MU the provider is shown. 0=Global preference(Default), 1=Stage 1, 2=Stage 2.</summary>
+		public int EhrMuStage;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProvColor",typeof(int))]
