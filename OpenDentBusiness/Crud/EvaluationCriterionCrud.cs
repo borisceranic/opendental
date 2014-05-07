@@ -48,6 +48,7 @@ namespace OpenDentBusiness.Crud{
 				evaluationCriterion=new EvaluationCriterion();
 				evaluationCriterion.EvaluationCriterionNum= PIn.Long  (table.Rows[i]["EvaluationCriterionNum"].ToString());
 				evaluationCriterion.EvaluationNum         = PIn.Long  (table.Rows[i]["EvaluationNum"].ToString());
+				evaluationCriterion.CriterionDescript     = PIn.String(table.Rows[i]["CriterionDescript"].ToString());
 				evaluationCriterion.IsCategoryName        = PIn.Bool  (table.Rows[i]["IsCategoryName"].ToString());
 				evaluationCriterion.GradingScaleNum       = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
 				evaluationCriterion.GradeShowing          = PIn.String(table.Rows[i]["GradeShowing"].ToString());
@@ -94,12 +95,13 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EvaluationCriterionNum,";
 			}
-			command+="EvaluationNum,IsCategoryName,GradingScaleNum,GradeShowing,GradeNumber,Notes,ItemOrder) VALUES(";
+			command+="EvaluationNum,CriterionDescript,IsCategoryName,GradingScaleNum,GradeShowing,GradeNumber,Notes,ItemOrder) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(evaluationCriterion.EvaluationCriterionNum)+",";
 			}
 			command+=
 				     POut.Long  (evaluationCriterion.EvaluationNum)+","
+				+"'"+POut.String(evaluationCriterion.CriterionDescript)+"',"
 				+    POut.Bool  (evaluationCriterion.IsCategoryName)+","
 				+    POut.Long  (evaluationCriterion.GradingScaleNum)+","
 				+"'"+POut.String(evaluationCriterion.GradeShowing)+"',"
@@ -119,6 +121,7 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(EvaluationCriterion evaluationCriterion){
 			string command="UPDATE evaluationcriterion SET "
 				+"EvaluationNum         =  "+POut.Long  (evaluationCriterion.EvaluationNum)+", "
+				+"CriterionDescript     = '"+POut.String(evaluationCriterion.CriterionDescript)+"', "
 				+"IsCategoryName        =  "+POut.Bool  (evaluationCriterion.IsCategoryName)+", "
 				+"GradingScaleNum       =  "+POut.Long  (evaluationCriterion.GradingScaleNum)+", "
 				+"GradeShowing          = '"+POut.String(evaluationCriterion.GradeShowing)+"', "
@@ -135,6 +138,10 @@ namespace OpenDentBusiness.Crud{
 			if(evaluationCriterion.EvaluationNum != oldEvaluationCriterion.EvaluationNum) {
 				if(command!=""){ command+=",";}
 				command+="EvaluationNum = "+POut.Long(evaluationCriterion.EvaluationNum)+"";
+			}
+			if(evaluationCriterion.CriterionDescript != oldEvaluationCriterion.CriterionDescript) {
+				if(command!=""){ command+=",";}
+				command+="CriterionDescript = '"+POut.String(evaluationCriterion.CriterionDescript)+"'";
 			}
 			if(evaluationCriterion.IsCategoryName != oldEvaluationCriterion.IsCategoryName) {
 				if(command!=""){ command+=",";}

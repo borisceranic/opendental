@@ -4724,6 +4724,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE evaluationcriterion (
 						EvaluationCriterionNum bigint NOT NULL auto_increment PRIMARY KEY,
 						EvaluationNum bigint NOT NULL,
+						CriterionDescript varchar(255) NOT NULL,
 						IsCategoryName tinyint NOT NULL,
 						GradingScaleNum bigint NOT NULL,
 						GradeShowing varchar(255) NOT NULL,
@@ -4741,6 +4742,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE evaluationcriterion (
 						EvaluationCriterionNum number(20) NOT NULL,
 						EvaluationNum number(20) NOT NULL,
+						CriterionDescript varchar(255) NOT NULL,
 						IsCategoryName number(3) NOT NULL,
 						GradingScaleNum number(20) NOT NULL,
 						GradeShowing varchar2(255),
@@ -4761,6 +4763,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE evaluationcriteriondef (
 						EvaluationCriterionDefNum bigint NOT NULL auto_increment PRIMARY KEY,
 						EvaluationDefNum bigint NOT NULL,
+						CriterionDescript varchar(255) NOT NULL,
 						IsCategoryName tinyint NOT NULL,
 						GradingScaleNum bigint NOT NULL,
 						ItemOrder int NOT NULL,
@@ -4775,6 +4778,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE evaluationcriteriondef (
 						EvaluationCriterionDefNum number(20) NOT NULL,
 						EvaluationDefNum number(20) NOT NULL,
+						CriterionDescript varchar(255) NOT NULL,
 						IsCategoryName number(3) NOT NULL,
 						GradingScaleNum number(20) NOT NULL,
 						ItemOrder number(11) NOT NULL,
@@ -4885,7 +4889,7 @@ namespace OpenDentBusiness {
 					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE provider ADD EhrMuStage tinyint NOT NULL";
+					command="ALTER TABLE provider ADD EhrMuStage int NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle

@@ -11,6 +11,8 @@ namespace OpenDentBusiness{
 		public long EvaluationCriterionNum;
 		///<summary>FK to evaluation.EvaluationNum</summary>
 		public long EvaluationNum;
+		///<summary>Description that is displayed for the criterion.</summary>
+		public string CriterionDescript;
 		///<summary>This row will show in bold and will not have a grade attached to it.</summary>
 		public bool IsCategoryName;
 		///<summary>FK to gradingscale.GradingScaleNum.  The grading scale used for this criterion.  Having this here allows the instructor to edit saved grades and also allows the evaluation overall grade to consider whether to include this criterion in the calculation.</summary>
