@@ -505,6 +505,9 @@ namespace OpenDental{
 		}
 
 		private void FormBilling_Activated(object sender,EventArgs e) {
+			if(IsDisposed) {//Attempted bug fix for an exception which occurred in FillGrid() when the grid was already disposed.
+				return;
+			}
 			//this gets fired very frequently, including right in the middle of printing a batch.
 			if(isPrinting){
 				return;
