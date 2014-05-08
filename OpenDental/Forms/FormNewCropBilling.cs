@@ -217,6 +217,7 @@ namespace OpenDental {
 					repeatCur.DateStart=dateNewCropCharge;
 					repeatCur.Note="NPI="+npi;
 					repeatCur.IsEnabled=true;
+					repeatCur.CopyNoteToProc=true;//Copy the billing note to the procedure note by default so that the customer can see the NPI the charge corresponds to. Can be unchecked by user if a private note is added later (rare).
 					RepeatCharges.Insert(repeatCur);
 					numChargesAdded++;
 				}
