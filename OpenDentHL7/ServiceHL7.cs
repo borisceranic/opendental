@@ -17,18 +17,6 @@ using OpenDentBusiness;
 using OpenDentBusiness.HL7;
 
 namespace OpenDentHL7 {
-	///<summary>State object for reading client data asynchronously</summary>
-	public class StateObject {
-		//Client socket
-		public Socket workSocket=null;
-		//Size of receive buffer
-		public const int BufferSize=256;
-		//Receive buffer
-		public byte[] buffer=new byte[BufferSize];
-		//Received data string
-		public StringBuilder strbFullMsg=new StringBuilder();
-	}
-
 	public partial class ServiceHL7:ServiceBase {
 		private bool IsVerboseLogging;
 		private System.Threading.Timer timerSendFiles;
@@ -319,9 +307,6 @@ namespace OpenDentHL7 {
 			try {
 				Socket socketIncomingHandler=socketIncomingMain.EndAccept(asyncResult);//end the BeginAccept.  Get reference to new Socket.
 				//Use the worker socket to wait for data.
-				//This is very short for testing.  Once we are confident in splicing together multiple chunks, lengthen this.
-				//dataBufferIncoming=new byte[8];
-				//strbFullMsg=new StringBuilder();
 				//We will keep reusing the same workerSocket instead of maintaining a list of worker sockets
 				//because this program is guaranteed to only have one incoming connection at a time.
 				if(IsVerboseLogging) {
@@ -330,7 +315,6 @@ namespace OpenDentHL7 {
 				StateObject state=new StateObject();
 				state.workSocket=socketIncomingHandler;
 				socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
-				//socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
 				//the main socket is now free to wait for another connection.
 				socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),socketIncomingMain);
 			}
@@ -526,6 +510,10 @@ namespace OpenDentHL7 {
 		}
 		
 		private void TimerCallbackSendTCP(Object socketObject) {
+			if(_ecwTCPModeIsSending) {
+				return;
+			}
+			_ecwTCPModeIsSending=true;
 			Socket socketWorker=(Socket)socketObject;
 			if(socketWorker==null//null socket object
 				|| !socketWorker.Connected//or socket object is no longer connected (based on last activity, like last send/receive)
@@ -536,10 +524,8 @@ namespace OpenDentHL7 {
 				timerSendTCP.Dispose();
 				socketWorker.Dispose();
 				EventLog.WriteEntry("OpenDentalHL7","The TCP send socket has been closed.  A new socket connection attempt will occur within 20 seconds.",EventLogEntryType.Warning);
+				_ecwTCPModeIsSending=false;
 				_ecwTCPSendSocketIsConnected=false;
-				return;
-			}
-			if(_ecwTCPModeIsSending) {
 				return;
 			}
 			try {
@@ -552,7 +538,6 @@ namespace OpenDentHL7 {
 		}
 
 		private void Send(Socket socketWorker) {
-			_ecwTCPModeIsSending=true;
 			List<HL7Msg> list=HL7Msgs.GetOnePending();
 			while(list.Count>0) {
 				string sendMsgControlId=HL7Msgs.GetControlId(list[0]);//could be empty string
@@ -673,5 +658,17 @@ namespace OpenDentHL7 {
 			}
 			sendDone.Set();
 		}		
+	}
+
+	///<summary>State object for reading client data asynchronously</summary>
+	public class StateObject {
+		//Client socket
+		public Socket workSocket=null;
+		//Size of receive buffer
+		public const int BufferSize=256;
+		//Receive buffer
+		public byte[] buffer=new byte[BufferSize];
+		//Received data string
+		public StringBuilder strbFullMsg=new StringBuilder();
 	}
 }
