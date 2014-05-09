@@ -1781,12 +1781,9 @@ FROM insplan";
 				"medicationpat.PatNum",
 				"mount.PatNum",
 				"orthochart.PatNum",
-				//Taken care of below
-				//"patfield.PatNum",
+				//"patfield.PatNum", //Taken care of below
 				"patient.ResponsParty",
-				//The patientnote table is ignored because only one record can exist for each patient. 
-				//The record in 'patFrom' remains so it can be accessed again if needed.
-				//"patientnote.PatNum"	
+				//"patientnote.PatNum"	//The patientnote table is ignored because only one record can exist for each patient.  The record in 'patFrom' remains so it can be accessed again if needed.
 				"patientrace.PatNum",
 				"patplan.PatNum",
 				"payment.PatNum",
@@ -1806,8 +1803,7 @@ FROM insplan";
 				"question.PatNum",
 				"recall.PatNum",
 				"refattach.PatNum",
-				//This is synched with the new information below.
-				//"referral.PatNum",
+				//"referral.PatNum",  //This is synched with the new information below.
 				"registrationkey.PatNum",
 				"repeatcharge.PatNum",
 				"reqstudent.PatNum",
@@ -1817,7 +1813,7 @@ FROM insplan";
 				"securitylog.PatNum",
 				"sheet.PatNum",
 				"statement.PatNum",
-				//task.KeyNum,//Taken care of in a seperate step, because it is not always a patnum.
+				//task.KeyNum,  //Taken care of in a seperate step, because it is not always a patnum.
 				"terminalactive.PatNum",
 				"toothinitial.PatNum",
 				"treatplan.PatNum",
@@ -1836,6 +1832,8 @@ FROM insplan";
 			//We need to test patfields before doing anything else because the user may wish to cancel and abort the merge.
 			PatField[] patToFields=PatFields.Refresh(patTo);
 			PatField[] patFromFields=PatFields.Refresh(patFrom);
+			List<PatField> patFieldsToDelete=new List<PatField>();
+			List<PatField> patFieldsToUpdate=new List<PatField>();
 			for(int i=0;i<patFromFields.Length;i++) {
 				bool hasMatch=false;
 				for(int j=0;j<patToFields.Length;j++) {
@@ -1851,8 +1849,8 @@ FROM insplan";
 							if(result==DialogResult.Yes) {
 								//User chose to use the merge from patient field info.
 								patFromFields[i].PatNum=patTo;
-								PatFields.Update(patFromFields[i]);
-								PatFields.Delete(patToFields[j]);
+								patFieldsToUpdate.Add(patFromFields[i]);
+								patFieldsToDelete.Add(patToFields[j]);
 							}
 							else if(result==DialogResult.Cancel) {
 								return false;
@@ -1862,8 +1860,18 @@ FROM insplan";
 				}
 				if(!hasMatch) {//The patient field does not exist in the merge into account.
 					patFromFields[i].PatNum=patTo;
-					PatFields.Update(patFromFields[i]);
+					patFieldsToUpdate.Add(patFromFields[i]);
 				}
+			}
+
+			//Do not allow the user to abort below this point.  Any checks that could let a user abort the merge should be done above.
+			#region Point of no return
+			//Update and remove all patfields that were added to the list above.
+			for(int i=0;i<patFieldsToDelete.Count;i++) {
+				PatFields.Delete(patFieldsToDelete[i]);
+			}
+			for(int j=0;j<patFieldsToUpdate.Count;j++) {
+				PatFields.Update(patFieldsToUpdate[j]);
 			}
 			//CustReference.  We need to combine patient from and patient into entries to have the into patient information from both.
 			CustReference custRefFrom=CustReferences.GetOneByPatNum(patientFrom.PatNum);
@@ -1982,6 +1990,7 @@ FROM insplan";
 					break;
 				}
 			}
+			#endregion
 			return true;
 		}
 
