@@ -3,6 +3,8 @@ using System.Collections;
 using System.Drawing;
 
 namespace OpenDentBusiness {
+	//NOTE: There was a bug before version 14.3 that would cause duplicate entries for patients if they were merged.  So it is possible that there is more than one entry for each patient.
+	//Since this is only for internal use, we fixed the issue manually at HQ.  To fix correctly for resellers, a DBM will have to be written.
 
 	///<summary>One to one relation with the patient table representing each customer as a reference.</summary>
 	[Serializable]

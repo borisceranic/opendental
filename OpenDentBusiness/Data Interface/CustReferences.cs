@@ -168,6 +168,23 @@ namespace OpenDentBusiness{
 			return Patients.GetNameFL(pat.LName,pat.FName,pat.Preferred,pat.MiddleI);
 		}
 
+		///<summary>Gets the most recent CustReference entry for that patient.  Returns null if none found.  There should be only one entry for each patient, but there was a bug before 14.3 that could have created multiple so we only get the more relevant entry.</summary>
+		public static CustReference GetOneByPatNum(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<CustReference>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * "
+						+"FROM custreference "
+						+"WHERE PatNum="+POut.Long(patNum)+" "
+						+"ORDER BY DateMostRecent DESC";
+			List<CustReference> custRefList=Crud.CustReferenceCrud.SelectMany(command);
+			if(custRefList.Count==0) {
+				return null;
+			}
+			else {
+				return custRefList[0];
+			}
+		}
 
 
 	}

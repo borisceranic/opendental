@@ -1752,7 +1752,9 @@ FROM insplan";
 				"claimproc.PatNum",
 				"commlog.PatNum",
 				"creditcard.PatNum",
-				"custreference.PatNum",
+				"custrefentry.PatNumCust",
+				"custrefentry.PatNumRef",
+				//"custreference.PatNum",  //This is handled below. We do not want to change patnum, the references form only shows entries for active patients.
 				"disease.PatNum",
 				"document.PatNum",
 				"ehrmeasureevent.PatNum",
@@ -1825,6 +1827,31 @@ FROM insplan";
 			Patient patientTo=Patients.GetPat(patTo);
 			string atozFrom=ImageStore.GetPatientFolder(patientFrom,atoZpath);
 			string atozTo=ImageStore.GetPatientFolder(patientTo,atoZpath);
+			//CustReference.  We need to combine patient from and patient into entries to have the into patient information from both.
+			CustReference custRefFrom=CustReferences.GetOneByPatNum(patientFrom.PatNum);
+			CustReference custRefTo=CustReferences.GetOneByPatNum(patientTo.PatNum);
+			if(custRefFrom!=null && custRefTo!=null) { //If either of these are null, do nothing.  This is an internal only table so we didn't bother fixing it/warning users here.
+				CustReference newCustRef=new CustReference();
+				newCustRef.CustReferenceNum=custRefTo.CustReferenceNum; //Use same primary key so we can update.
+				newCustRef.PatNum=patientTo.PatNum;
+				if(custRefTo.DateMostRecent > custRefFrom.DateMostRecent) {
+					newCustRef.DateMostRecent=custRefTo.DateMostRecent; //Use the most recent date.
+				}
+				else {
+					newCustRef.DateMostRecent=custRefFrom.DateMostRecent; //Use the most recent date.
+				}
+				if(custRefTo.Note=="") {
+					newCustRef.Note=custRefFrom.Note;
+				}
+				else if(custRefFrom.Note=="") {
+					newCustRef.Note=custRefTo.Note;
+				}
+				else {//Both entries have a note
+					newCustRef.Note=(custRefTo.Note+" | "+custRefFrom.Note); /*Combine in a | delimited string*/
+				}
+				newCustRef.IsBadRef=(custRefFrom.IsBadRef || custRefTo.IsBadRef);  //If either entry is a bad reference, count as a bad reference.
+				CustReferences.Update(newCustRef); //Overwrites the old custRefTo entry.
+			}
 			//We need to test patfields before doing anything else because the user may wish to cancel and abort the merge.
 			PatField[] patToFields=PatFields.Refresh(patTo);
 			PatField[] patFromFields=PatFields.Refresh(patFrom);
