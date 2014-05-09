@@ -1754,23 +1754,27 @@ FROM insplan";
 				"creditcard.PatNum",
 				"custrefentry.PatNumCust",
 				"custrefentry.PatNumRef",
-				//"custreference.PatNum",  //This is handled below. We do not want to change patnum, the references form only shows entries for active patients.
+				//"custreference.PatNum",  //This is handled below.  We do not want to change patnum, the references form only shows entries for active patients.
 				"disease.PatNum",
 				"document.PatNum",
+				"ehramendment.PatNum",
+				"ehrcareplan.PatNum",
+				"ehrlab.PatNum",
 				"ehrmeasureevent.PatNum",
 				"ehrnotperformed.PatNum",
 				"ehrprovkey.PatNum",
 				"ehrquarterlykey.PatNum",
 				"ehrsummaryccd.PatNum",
 				"emailmessage.PatNum",
+				"encounter.PatNum",
 				"erxlog.PatNum",
 				"etrans.PatNum",
 				"familyhealth.PatNum",
 				"formpat.PatNum",
 				"hl7msg.PatNum",
+				"inssub.Subscriber",
 				"installmentplan.PatNum",
 				"intervention.PatNum",
-				"inssub.Subscriber",
 				"labcase.PatNum",
 				"labpanel.PatNum",
 				"medicalorder.PatNum",
@@ -1819,6 +1823,8 @@ FROM insplan";
 				"treatplan.PatNum",
 				"treatplan.ResponsParty",
 				"vaccinepat.PatNum",
+				//vaccinepat.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the primary key.
+				//vaccineobs.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the FK to the vaccinepat.VaccinePatNum.
 				"vitalsign.PatNum",
 				"xchargetransaction.PatNum"
 			};
