@@ -540,7 +540,10 @@ namespace OpenDentBusiness.HL7 {
 						pat.MiddleI=seg.GetFieldComponent(itemOrder,2);
 						continue;
 					case "pat.PatNum":
-						if(pat.PatNum!=0 && pat.PatNum!=PIn.Long(seg.GetFieldComponent(itemOrder))) {
+						//pat.PatNum guaranteed to not be 0, a new patient will be inserted if the field component for PatNum is not an int, is 0, or is blank
+						//if(pat.PatNum!=0 && pat.PatNum!=PIn.Long(seg.GetFieldComponent(itemOrder))) {
+						//if field component is a valid number and the patient located is not the same as the patient with the PatNum in the segment, then throw the exception, message will fail.
+						if(PIn.Long(seg.GetFieldComponent(itemOrder))!=0 && pat.PatNum!=PIn.Long(seg.GetFieldComponent(itemOrder))) {
 							throw new Exception("Invalid PatNum");
 						}
 						continue;
