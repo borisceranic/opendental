@@ -1742,7 +1742,7 @@ FROM insplan";
 				return true;
 			}
 			string[] patNumForeignKeys=new string[]{
-				//This list is up to date as of 11/11/2013 up to version v13.3
+				//This list is up to date as of 05/09/2014 up to version v14.2.11
 				"adjustment.PatNum",
 				"allergy.PatNum",
 				"anestheticrecord.PatNum",
@@ -1752,36 +1752,38 @@ FROM insplan";
 				"claimproc.PatNum",
 				"commlog.PatNum",
 				"creditcard.PatNum",
-				"custreference.PatNum",
+				//"custreference.PatNum",  //We do not want duplicate entries.
 				"disease.PatNum",
 				"document.PatNum",
+				"ehramendment.PatNum",
+				"ehrcareplan.PatNum",
+				"ehrlab.PatNum",
 				"ehrmeasureevent.PatNum",
 				"ehrnotperformed.PatNum",
+				//"ehrpatient.PatNum",  //This is handled below.  We do not want to change patnum here because there can only be one entry per patient.
 				"ehrprovkey.PatNum",
 				"ehrquarterlykey.PatNum",
 				"ehrsummaryccd.PatNum",
 				"emailmessage.PatNum",
+				"encounter.PatNum",
 				"erxlog.PatNum",
 				"etrans.PatNum",
 				"familyhealth.PatNum",
 				"formpat.PatNum",
 				"hl7msg.PatNum",
+				"inssub.Subscriber",
 				"installmentplan.PatNum",
 				"intervention.PatNum",
-				"inssub.Subscriber",
 				"labcase.PatNum",
 				"labpanel.PatNum",
 				"medicalorder.PatNum",
 				"medicationpat.PatNum",
 				"mount.PatNum",
 				"orthochart.PatNum",
-				//Taken care of below
-				//"patfield.PatNum",
+				//"patfield.PatNum",  //Taken care of below
 				"patient.ResponsParty",
-				//The patientnote table is ignored because only one record can exist for each patient. 
-				//The record in 'patFrom' remains so it can be accessed again if needed.
-				//"patientnote.PatNum"	
-				"patientrace.PatNum",
+				//"patientnote.PatNum"  //The patientnote table is ignored because only one record can exist for each patient.  The record in 'patFrom' remains so it can be accessed again if needed.
+				//"patientrace.PatNum", //The patientrace table is ignored because we don't want duplicate races.  We could merge them but we would have to add specific code to stop duplicate races being inserted.
 				"patplan.PatNum",
 				"payment.PatNum",
 				"payortype.PatNum",
@@ -1800,8 +1802,7 @@ FROM insplan";
 				"question.PatNum",
 				"recall.PatNum",
 				"refattach.PatNum",
-				//This is synched with the new information below.
-				//"referral.PatNum",
+				//"referral.PatNum",  //This is synched with the new information below.
 				"registrationkey.PatNum",
 				"repeatcharge.PatNum",
 				"reqstudent.PatNum",
@@ -1811,12 +1812,14 @@ FROM insplan";
 				"securitylog.PatNum",
 				"sheet.PatNum",
 				"statement.PatNum",
-				//task.KeyNum,//Taken care of in a seperate step, because it is not always a patnum.
+				//task.KeyNum,  //Taken care of in a seperate step, because it is not always a patnum.
 				"terminalactive.PatNum",
 				"toothinitial.PatNum",
 				"treatplan.PatNum",
 				"treatplan.ResponsParty",
 				"vaccinepat.PatNum",
+				//vaccinepat.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the primary key.
+				//vaccineobs.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the FK to the vaccinepat.VaccinePatNum.
 				"vitalsign.PatNum",
 				"xchargetransaction.PatNum"
 			};
@@ -1828,6 +1831,8 @@ FROM insplan";
 			//We need to test patfields before doing anything else because the user may wish to cancel and abort the merge.
 			PatField[] patToFields=PatFields.Refresh(patTo);
 			PatField[] patFromFields=PatFields.Refresh(patFrom);
+			List<PatField> patFieldsToDelete=new List<PatField>();
+			List<PatField> patFieldsToUpdate=new List<PatField>();
 			for(int i=0;i<patFromFields.Length;i++) {
 				bool hasMatch=false;
 				for(int j=0;j<patToFields.Length;j++) {
@@ -1843,8 +1848,8 @@ FROM insplan";
 							if(result==DialogResult.Yes) {
 								//User chose to use the merge from patient field info.
 								patFromFields[i].PatNum=patTo;
-								PatFields.Update(patFromFields[i]);
-								PatFields.Delete(patToFields[j]);
+								patFieldsToUpdate.Add(patFromFields[i]);
+								patFieldsToDelete.Add(patToFields[j]);
 							}
 							else if(result==DialogResult.Cancel) {
 								return false;
@@ -1854,8 +1859,25 @@ FROM insplan";
 				}
 				if(!hasMatch) {//The patient field does not exist in the merge into account.
 					patFromFields[i].PatNum=patTo;
-					PatFields.Update(patFromFields[i]);
+					patFieldsToUpdate.Add(patFromFields[i]);
 				}
+			}
+
+			//Do not allow the user to abort below this point.  Any checks that could let a user abort the merge should be done above.
+			#region Point of no return
+			//Update and remove all patfields that were added to the list above.
+			for(int i=0;i<patFieldsToDelete.Count;i++) {
+				PatFields.Delete(patFieldsToDelete[i]);
+			}
+			for(int j=0;j<patFieldsToUpdate.Count;j++) {
+				PatFields.Update(patFieldsToUpdate[j]);
+			}
+			//Merge ehrpatient.  We only do something here if there is a FROM patient entry and no INTO patient entry, in which case we change the patnum on the row to bring it over.
+			EhrPatient ehrPatFrom=EhrPatients.GetOne(patientFrom.PatNum);
+			EhrPatient ehrPatTo=EhrPatients.GetOne(patientTo.PatNum);
+			if(ehrPatFrom!=null && ehrPatTo==null) {  //There is an entry for the FROM patient, but not the INTO patient.
+				ehrPatFrom.PatNum=patientTo.PatNum;
+				EhrPatients.Update(ehrPatFrom); //Bring the patfrom entry over to the new.
 			}
 			//Move the patient documents within the 'patFrom' A to Z folder to the 'patTo' A to Z folder.
 			//We have to be careful here of documents with the same name. We have to rename such documents
@@ -1949,6 +1971,7 @@ FROM insplan";
 					break;
 				}
 			}
+			#endregion
 			return true;
 		}
 
