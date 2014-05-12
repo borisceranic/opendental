@@ -1742,7 +1742,7 @@ FROM insplan";
 				return true;
 			}
 			string[] patNumForeignKeys=new string[]{
-				//This list is up to date as of 11/11/2013 up to version v13.3
+				//This list is up to date as of 05/09/2014 up to version v14.3.0
 				"adjustment.PatNum",
 				"allergy.PatNum",
 				"anestheticrecord.PatNum",
@@ -1761,7 +1761,8 @@ FROM insplan";
 				"ehrcareplan.PatNum",
 				"ehrlab.PatNum",
 				"ehrmeasureevent.PatNum",
-				"ehrnotperformed.PatNum",
+				"ehrnotperformed.PatNum",				
+				//"ehrpatient.PatNum",  //This is handled below.  We do not want to change patnum here because there can only be one entry per patient.
 				"ehrprovkey.PatNum",
 				"ehrquarterlykey.PatNum",
 				"ehrsummaryccd.PatNum",
@@ -1784,7 +1785,7 @@ FROM insplan";
 				//"patfield.PatNum", //Taken care of below
 				"patient.ResponsParty",
 				//"patientnote.PatNum"	//The patientnote table is ignored because only one record can exist for each patient.  The record in 'patFrom' remains so it can be accessed again if needed.
-				"patientrace.PatNum",
+				//"patientrace.PatNum", //The patientrace table is ignored because we don't want duplicate races.  We could merge them but we would have to add specific code to stop duplicate races being inserted.
 				"patplan.PatNum",
 				"payment.PatNum",
 				"payortype.PatNum",
@@ -1897,6 +1898,13 @@ FROM insplan";
 				}
 				newCustRef.IsBadRef=(custRefFrom.IsBadRef || custRefTo.IsBadRef);  //If either entry is a bad reference, count as a bad reference.
 				CustReferences.Update(newCustRef); //Overwrites the old custRefTo entry.
+			}
+			//Merge ehrpatient.  We only do something here if there is a FROM patient entry and no INTO patient entry, in which case we change the patnum on the row to bring it over.
+			EhrPatient ehrPatFrom=EhrPatients.GetOne(patientFrom.PatNum);
+			EhrPatient ehrPatTo=EhrPatients.GetOne(patientTo.PatNum);
+			if(ehrPatFrom!=null && ehrPatTo==null) {  //There is an entry for the FROM patient, but not the INTO patient.
+				ehrPatFrom.PatNum=patientTo.PatNum;
+				EhrPatients.Update(ehrPatFrom); //Bring the patfrom entry over to the new.
 			}
 			//Move the patient documents within the 'patFrom' A to Z folder to the 'patTo' A to Z folder.
 			//We have to be careful here of documents with the same name. We have to rename such documents

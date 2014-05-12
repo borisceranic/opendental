@@ -125,20 +125,31 @@ namespace OpenDentBusiness{
 				Db.NonQ(command);
 				return;
 			}
-			List<PatientRace> listPatientRaces;//Rename this variable and the listPatRaces variable so it is easier to indicate which is the "selected" list and which is the db list.
+			List<PatientRace> listPatientRacesDB;
 			command = "SELECT * FROM patientrace WHERE PatNum = "+POut.Long(patNum);
-			listPatientRaces = Crud.PatientRaceCrud.SelectMany(command);
+			listPatientRacesDB = Crud.PatientRaceCrud.SelectMany(command);
 			//delete excess rows
-			for(int i=0;i<listPatientRaces.Count;i++) {
-				if(!listPatRaces.Contains((PatRace)listPatientRaces[i].Race)) {//if there is a PatientRace row that does not match the new list of PatRaces, delete it
-					Crud.PatientRaceCrud.Delete(listPatientRaces[i].PatientRaceNum);
+			for(int i=0;i<listPatientRacesDB.Count;i++) {
+				if(!listPatRaces.Contains((PatRace)listPatientRacesDB[i].Race)) {//if there is a PatientRace row that does not match the new list of PatRaces, delete it
+					Crud.PatientRaceCrud.Delete(listPatientRacesDB[i].PatientRaceNum);
+				}
+			}
+			//delete duplicate rows
+			for(int i=0;i<listPatientRacesDB.Count;i++) {
+				if(!listPatRaces.Contains((PatRace)listPatientRacesDB[i].Race)){
+					continue; //It was already deleted earlier
+				}
+				for(int j=i+1;j<listPatientRacesDB.Count;j++) {
+					if(listPatientRacesDB[i].Race==listPatientRacesDB[j].Race) { //If there are duplicate races in the DB that weren't deleted before.
+						Crud.PatientRaceCrud.Delete(listPatientRacesDB[j].PatientRaceNum);
+					}
 				}
 			}
 			//insert new rows
 			for(int i=0;i<listPatRaces.Count;i++) {
 				bool insertNeeded=true;
-				for(int j=0;j<listPatientRaces.Count;j++) {
-					if(listPatRaces[i]==listPatientRaces[j].Race) {
+				for(int j=0;j<listPatientRacesDB.Count;j++) {
+					if(listPatRaces[i]==listPatientRacesDB[j].Race) {
 						insertNeeded=false;
 					}
 				}

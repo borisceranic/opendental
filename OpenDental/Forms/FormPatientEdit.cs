@@ -2094,6 +2094,15 @@ namespace OpenDental{
 				comboEthnicity.Items.Add(Lan.g(this,"Not Hispanic"));//2
 				comboEthnicity.Items.Add(Lan.g(this,"Hispanic"));//3
 				List<int> listPatRaces=PatientRaces.GetPatRaceList(PatCur.PatNum);
+				//Make sure there are no duplicates before filling.  This will get rid of the duplicates from the DB on the butOK_Click().
+				for(int i=listPatRaces.Count-1;i>0;i--) {
+					for(int j=i-1;j>=0;j--) {
+						if(listPatRaces[i]==listPatRaces[j]) { //If there is a duplicate race
+							listPatRaces.RemoveAt(i);
+							break;
+						}
+					}
+				}
 				comboEthnicity.SelectedIndex=0;//none
 				for(int i=0;i<listPatRaces.Count;i++) {
 					PatRace race=(PatRace)listPatRaces[i];
@@ -2142,6 +2151,15 @@ namespace OpenDental{
 				comboBoxMultiRace.Items.Add(Lan.g("enumPatRace","White"));//10
 				comboBoxMultiRace.Items.Add(Lan.g("enumPatRace","NotHispanic"));//11
 				List<int> listPatRaces=PatientRaces.GetPatRaceList(PatCur.PatNum);
+				//Make sure there are no duplicates before filling.  This will get rid of the duplicates from the DB on the butOK_Click().
+				for(int i=listPatRaces.Count-1;i>0;i--) {
+					for(int j=i-1;j>=0;j--) {
+						if(listPatRaces[i]==listPatRaces[j]) { //If there is a duplicate race
+							listPatRaces.RemoveAt(i);
+							break;
+						}
+					}
+				}
 				for(int i=0;i<listPatRaces.Count;i++) {
 					comboBoxMultiRace.SetSelected(listPatRaces[i]+1,true);//Offset by 1 because of none option at location 0.
 				}

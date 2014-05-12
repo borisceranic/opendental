@@ -44,6 +44,14 @@ namespace OpenDentBusiness{
 				//Fail Silently.
 			}
 		}
+
+		///<summary>Gets one EhrPatient from the db.  Returns null if there is no entry.</summary>
+		public static EhrPatient GetOne(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<EhrPatient>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			return Crud.EhrPatientCrud.SelectOne(patNum);
+		}
 	
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
@@ -55,14 +63,6 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM ehrpatient WHERE PatNum = "+POut.Long(patNum);
 			return Crud.EhrPatientCrud.SelectMany(command);
-		}
-
-		///<summary>Gets one EhrPatient from the db.</summary>
-		public static EhrPatient GetOne(long patNum){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<EhrPatient>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			return Crud.EhrPatientCrud.SelectOne(patNum);
 		}
 
 		///<summary></summary>
