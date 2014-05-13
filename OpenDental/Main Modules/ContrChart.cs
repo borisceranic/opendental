@@ -8330,8 +8330,17 @@ namespace OpenDental{
 					}
 					row.Cells.Add(text);
 				}
-				else {
-					row.Cells.Add(table.Rows[i]["dateSched"].ToString());
+				else {//Not Orion
+					ApptStatus aptStatus=(ApptStatus)(PIn.Long(table.Rows[i]["AptStatus"].ToString()));
+					if(aptStatus==ApptStatus.UnschedList) {
+						row.Cells.Add(Lan.g(this,"Unsched"));
+					}
+					else if(aptStatus==ApptStatus.Broken) {
+						row.Cells.Add(Lan.g(this,"Broken"));
+					}
+					else {//scheduled, complete and ASAP
+						row.Cells.Add(table.Rows[i]["dateSched"].ToString());
+					}
 				}
 				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
 				row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
