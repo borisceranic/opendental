@@ -93,7 +93,7 @@ namespace OpenDentBusiness{
 				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCount FROM patient "
 					+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
 					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv  ";
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum ";
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,PatCount ";
 			command+="ORDER BY ItemOrder";
 			return Db.GetTable(command);
 		}
@@ -128,7 +128,7 @@ namespace OpenDentBusiness{
 					command+="AND provider.SchoolClassNum!=0 ";
 				}
 			}
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript "
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,PatCount "
 				+"ORDER BY LName,FName";
 			return Db.GetTable(command);
 		}

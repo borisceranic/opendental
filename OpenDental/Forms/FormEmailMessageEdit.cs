@@ -830,10 +830,15 @@ namespace OpenDental{
 					}	
 				}
 				else if(detectORU_R01Message(strFilePathAttach)) {
-					FormEhrLabOrderImport FormELOI =new FormEhrLabOrderImport();
-					FormELOI.Hl7LabMessage=File.ReadAllText(strFilePathAttach);
-					FormELOI.ShowDialog();
-					return;
+					if(DataConnection.DBtype==DatabaseType.Oracle) {
+						MsgBox.Show(this,"Labs not supported with Oracle.  Opening raw file instead.");
+					}
+					else {
+						FormEhrLabOrderImport FormELOI =new FormEhrLabOrderImport();
+						FormELOI.Hl7LabMessage=File.ReadAllText(strFilePathAttach);
+						FormELOI.ShowDialog();
+						return;
+					}
 				}
 				//We have to create a copy of the file because the name is different.
 				//There is also a high probability that the attachment no longer exists if

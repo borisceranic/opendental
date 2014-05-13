@@ -20,12 +20,13 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<ProcNote>(MethodBase.GetCurrentMethod(),patNum,dateStart,dateEnd);
 			}
-			string command="SELECT procnote.* FROM procnote "
+			string query="SELECT procnote.* FROM procnote "
 				+"INNER JOIN procedurelog ON procedurelog.ProcNum=procnote.ProcNum "
 				+"WHERE procnote.PatNum="+POut.Long(patNum)+" "
 				+"AND procnote.EntryDateTime BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 				+"AND procedurelog.ProcStatus!="+POut.Int((int)ProcStat.D)+" "
-				+"ORDER BY procnote.EntryDateTime DESC LIMIT 1";
+				+"ORDER BY procnote.EntryDateTime DESC";
+			string command=DbHelper.LimitOrderBy(query,1);
 			return Crud.ProcNoteCrud.SelectOne(command);
 		}
 		

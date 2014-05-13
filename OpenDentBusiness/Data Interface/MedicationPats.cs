@@ -18,7 +18,8 @@ namespace OpenDentBusiness{
 			}
 			else {//exclude discontinued.  This is the default.
 				command+=" AND (DateStop < "+POut.Date(new DateTime(1880,1,1))//include all the meds that are not discontinued.
-					+" OR DateStop >= CURDATE())";//Show medications that are today or a future stopdate - they are not yet discontinued.
+					+" OR DateStop >= ";
+				command+=DbHelper.Curdate()+")";//Show medications that are today or a future stopdate - they are not yet discontinued.
 			}
 			return Crud.MedicationPatCrud.SelectMany(command);
 		}
