@@ -1158,6 +1158,7 @@ namespace OpenDentBusiness {
 			table.Columns.Add("Note");
 			table.Columns.Add("ProcDescript");
 			table.Columns.Add("PlannedApptNum");
+			table.Columns.Add("AptStatus");
 			//but we won't actually fill this table with rows until the very end.  It's more useful to use a List<> for now.
 			List<DataRow> rows=new List<DataRow>();
 			//The query below was causing a max join error for big offices.  It's fixed now, 
@@ -1200,6 +1201,7 @@ namespace OpenDentBusiness {
 				row=table.NewRow();
 				row["AptNum"]=aptRow["AptNum"].ToString();
 				dateSched=PIn.Date(rawPlannedAppts.Rows[i]["AptDateTime"].ToString());
+				row["AptStatus"]=PIn.Long(rawPlannedAppts.Rows[i]["AptStatus"].ToString());
 				//Colors----------------------------------------------------------------------------
 				aptStatus=(ApptStatus)PIn.Long(rawPlannedAppts.Rows[i]["AptStatus"].ToString());
 				//change color if completed, broken, or unscheduled no matter the date
