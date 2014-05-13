@@ -87,7 +87,7 @@ namespace OpenDentBusiness{
 			if(schoolClass!=0){
 				command+="WHERE provider.SchoolClassNum="+POut.Long(schoolClass)+" ";
 			}
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,Descript ";
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,Descript,PatCount ";
 			if(isAlph){
 				command+="ORDER BY GradYear,Descript,LName,FName";
 			}

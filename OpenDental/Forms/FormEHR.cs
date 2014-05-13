@@ -239,6 +239,10 @@ namespace OpenDental {
 						FillGridMu();
 						break;
 					case EhrMeasureType.Lab:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							MsgBox.Show(this,"Labs not supported with Oracle");
+							break;
+						}
 						FormEhrLabOrders FormLP=new FormEhrLabOrders();
 						FormLP.PatCur=PatCur;
 						FormLP.ShowDialog();
@@ -296,18 +300,30 @@ namespace OpenDental {
 						//Sign a Note
 						break;
 					case EhrMeasureType.CPOE_LabOrdersOnly:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							MsgBox.Show(this,"Labs not supported with Oracle");
+							break;
+						}
 						FormEhrLabOrders FormLab=new FormEhrLabOrders();
 						FormLab.PatCur=PatCur;
 						FormLab.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.CPOE_RadiologyOrdersOnly:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							MsgBox.Show(this,"Labs not supported with Oracle");
+							break;
+						}
 						FormEhrLabOrders FormRad=new FormEhrLabOrders();
 						FormRad.PatCur=PatCur;
 						FormRad.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.LabImages:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							MsgBox.Show(this,"Labs not supported with Oracle");
+							break;
+						}
 						FormEhrLabOrders FormLO=new FormEhrLabOrders();
 						FormLO.PatCur=PatCur;
 						FormLO.ShowDialog();
@@ -455,13 +471,6 @@ namespace OpenDental {
 			MessageBox.Show("This form was moved to the OpenDental project and should be launched from Reports ?");
 			//OpenDental.FormPatList2014 FormPL14=new OpenDental.FormPatList2014();
 			//FormPL14.ShowDialog();
-		}
-
-		private void butLabPanelLOINC_Click(object sender,EventArgs e) {
-			//TODO: Add this to the Grid instead of the button
-			FormEhrLabOrders FormEHRLO=new FormEhrLabOrders();
-			FormEHRLO.PatCur=PatCur;
-			FormEHRLO.ShowDialog();
 		}
 
 		private void butAmendments_Click(object sender,EventArgs e) {

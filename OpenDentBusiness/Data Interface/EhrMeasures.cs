@@ -267,7 +267,7 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
+			command="SELECT "+DbHelper.GroupConcat("provider.ProvNum")+" FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provs=Db.GetScalar(command);
 			string[] tempProv=provs.Split(',');
@@ -278,7 +278,7 @@ namespace OpenDentBusiness{
 					provOID+=",";
 				}
 			}
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
+			command="SELECT "+DbHelper.GroupConcat("provider.NationalProvID")+" FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provNPIs=Db.GetScalar(command);
 			provNPIs.Trim(',');
@@ -2056,6 +2056,11 @@ namespace OpenDentBusiness{
 					#endregion
 					#region Lab
 					case EhrMeasureType.Lab:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							mu.Details="Labs not supported with Oracle";
+							mu.Met=MuMet.False;
+							break;
+						}
 						List<EhrLab> listLabOrders=EhrLabs.GetAllForPatInDateRange(pat.PatNum,DateTime.Today.AddYears(-1),DateTime.Today);
 						if(listLabOrders.Count==0) {
 							mu.Details="No lab orders";
@@ -2319,29 +2324,34 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 				+POut.Int((int)EhrMeasureType.Reminders)+","
 				+POut.Int((int)EhrMeasureType.MedReconcile)+","
-				+POut.Int((int)EhrMeasureType.SummaryOfCare)+") "
-			+"ORDER BY FIELD(MeasureType,"
-				+POut.Int((int)EhrMeasureType.ProblemList)+","
-				+POut.Int((int)EhrMeasureType.MedicationList)+","
-				+POut.Int((int)EhrMeasureType.AllergyList)+","
-				+POut.Int((int)EhrMeasureType.Demographics)+","
-				+POut.Int((int)EhrMeasureType.Education)+","
-				+POut.Int((int)EhrMeasureType.TimelyAccess)+","
-				+POut.Int((int)EhrMeasureType.ProvOrderEntry)+","
-				+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
-				+POut.Int((int)EhrMeasureType.CPOE_PreviouslyOrdered)+","
-				+POut.Int((int)EhrMeasureType.Rx)+","
-				+POut.Int((int)EhrMeasureType.VitalSigns)+","
-				+POut.Int((int)EhrMeasureType.VitalSigns2014)+","
-				+POut.Int((int)EhrMeasureType.VitalSignsBMIOnly)+","
-				+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
-				+POut.Int((int)EhrMeasureType.Smoking)+","
-				+POut.Int((int)EhrMeasureType.Lab)+","
-				+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
-				+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
-				+POut.Int((int)EhrMeasureType.Reminders)+","
-				+POut.Int((int)EhrMeasureType.MedReconcile)+","
 				+POut.Int((int)EhrMeasureType.SummaryOfCare)+") ";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="ORDER BY FIELD(MeasureType,"
+					+POut.Int((int)EhrMeasureType.ProblemList)+","
+					+POut.Int((int)EhrMeasureType.MedicationList)+","
+					+POut.Int((int)EhrMeasureType.AllergyList)+","
+					+POut.Int((int)EhrMeasureType.Demographics)+","
+					+POut.Int((int)EhrMeasureType.Education)+","
+					+POut.Int((int)EhrMeasureType.TimelyAccess)+","
+					+POut.Int((int)EhrMeasureType.ProvOrderEntry)+","
+					+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
+					+POut.Int((int)EhrMeasureType.CPOE_PreviouslyOrdered)+","
+					+POut.Int((int)EhrMeasureType.Rx)+","
+					+POut.Int((int)EhrMeasureType.VitalSigns)+","
+					+POut.Int((int)EhrMeasureType.VitalSigns2014)+","
+					+POut.Int((int)EhrMeasureType.VitalSignsBMIOnly)+","
+					+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
+					+POut.Int((int)EhrMeasureType.Smoking)+","
+					+POut.Int((int)EhrMeasureType.Lab)+","
+					+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
+					+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
+					+POut.Int((int)EhrMeasureType.Reminders)+","
+					+POut.Int((int)EhrMeasureType.MedReconcile)+","
+					+POut.Int((int)EhrMeasureType.SummaryOfCare)+") ";
+			}
+			else {
+				//TODO: Order the measures nicely for Oracle users.
+			}
 			List<EhrMeasure> retVal=Crud.EhrMeasureCrud.SelectMany(command);
 			return retVal;
 		}
@@ -3743,30 +3753,35 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.SecureMessaging)+","
 				+POut.Int((int)EhrMeasureType.FamilyHistory)+","
 				+POut.Int((int)EhrMeasureType.ElectronicNote)+","
-				+POut.Int((int)EhrMeasureType.LabImages)+") "
-			+"ORDER BY FIELD(MeasureType,"
-				+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
-				+POut.Int((int)EhrMeasureType.CPOE_LabOrdersOnly)+","
-				+POut.Int((int)EhrMeasureType.CPOE_RadiologyOrdersOnly)+","
-				+POut.Int((int)EhrMeasureType.Rx)+","
-				+POut.Int((int)EhrMeasureType.Demographics)+","
-				+POut.Int((int)EhrMeasureType.VitalSigns)+","
-				+POut.Int((int)EhrMeasureType.VitalSignsBMIOnly)+","
-				+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
-				+POut.Int((int)EhrMeasureType.Smoking)+","
-				+POut.Int((int)EhrMeasureType.ElectronicCopyAccess)+","
-				+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
-				+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
-				+POut.Int((int)EhrMeasureType.Lab)+","
-				+POut.Int((int)EhrMeasureType.Reminders)+","
-				+POut.Int((int)EhrMeasureType.Education)+","
-				+POut.Int((int)EhrMeasureType.MedReconcile)+","
-				+POut.Int((int)EhrMeasureType.SummaryOfCare)+","
-				+POut.Int((int)EhrMeasureType.SummaryOfCareElectronic)+","
-				+POut.Int((int)EhrMeasureType.SecureMessaging)+","
-				+POut.Int((int)EhrMeasureType.FamilyHistory)+","
-				+POut.Int((int)EhrMeasureType.ElectronicNote)+","
-				+POut.Int((int)EhrMeasureType.LabImages)+") ";//Is always going to be excluded
+				+POut.Int((int)EhrMeasureType.LabImages)+") ";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="ORDER BY FIELD(MeasureType,"
+					+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
+					+POut.Int((int)EhrMeasureType.CPOE_LabOrdersOnly)+","
+					+POut.Int((int)EhrMeasureType.CPOE_RadiologyOrdersOnly)+","
+					+POut.Int((int)EhrMeasureType.Rx)+","
+					+POut.Int((int)EhrMeasureType.Demographics)+","
+					+POut.Int((int)EhrMeasureType.VitalSigns)+","
+					+POut.Int((int)EhrMeasureType.VitalSignsBMIOnly)+","
+					+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
+					+POut.Int((int)EhrMeasureType.Smoking)+","
+					+POut.Int((int)EhrMeasureType.ElectronicCopyAccess)+","
+					+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
+					+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
+					+POut.Int((int)EhrMeasureType.Lab)+","
+					+POut.Int((int)EhrMeasureType.Reminders)+","
+					+POut.Int((int)EhrMeasureType.Education)+","
+					+POut.Int((int)EhrMeasureType.MedReconcile)+","
+					+POut.Int((int)EhrMeasureType.SummaryOfCare)+","
+					+POut.Int((int)EhrMeasureType.SummaryOfCareElectronic)+","
+					+POut.Int((int)EhrMeasureType.SecureMessaging)+","
+					+POut.Int((int)EhrMeasureType.FamilyHistory)+","
+					+POut.Int((int)EhrMeasureType.ElectronicNote)+","
+					+POut.Int((int)EhrMeasureType.LabImages)+") ";//Is always going to be excluded
+			}
+			else {
+				//TODO: Order the measures nicely for Oracle users.
+			}
 			List<EhrMeasure> retVal=Crud.EhrMeasureCrud.SelectMany(command);
 			return retVal;
 		}
@@ -3782,7 +3797,10 @@ namespace OpenDentBusiness{
 			string explanation;
 			List<EhrMeasure> retVal=GetMU2List();
 			List<MedicationPat> medList=MedicationPats.Refresh(pat.PatNum,true);
-			List<EhrLab> ehrLabList=EhrLabs.GetAllForPat(pat.PatNum);
+			List<EhrLab> ehrLabList=new List<EhrLab>();
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				ehrLabList=EhrLabs.GetAllForPat(pat.PatNum);
+			}
 			List<EhrMeasureEvent> listMeasureEvents=EhrMeasureEvents.Refresh(pat.PatNum);
 			List<RefAttach> listRefAttach=RefAttaches.Refresh(pat.PatNum);
 			for(int i=0;i<retVal.Count;i++) {
@@ -3878,6 +3896,11 @@ namespace OpenDentBusiness{
 					#endregion
 					#region CPOE_LabOrdersOnly
 					case EhrMeasureType.CPOE_LabOrdersOnly:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							mu.Details="Labs not supported with Oracle";
+							mu.Met=MuMet.False;
+							break;
+						}
 						int labOrderCount=0;
 						int labOrderCpoeCount=0;
 						for(int m=0;m<ehrLabList.Count;m++) {
@@ -3910,6 +3933,11 @@ namespace OpenDentBusiness{
 					#endregion
 					#region CPOE_RadiologyOrdersOnly
 					case EhrMeasureType.CPOE_RadiologyOrdersOnly:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							mu.Details="Labs not supported with Oracle";
+							mu.Met=MuMet.False;
+							break;
+						}
 						int radOrderCount=0;
 						int radOrderCpoeCount=0;
 						for(int m=0;m<ehrLabList.Count;m++) {
@@ -4095,6 +4123,11 @@ namespace OpenDentBusiness{
 					#endregion
 					#region Lab
 					case EhrMeasureType.Lab:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							mu.Details="Labs not supported with Oracle";
+							mu.Met=MuMet.False;
+							break;
+						}
 						if(ehrLabList.Count==0) {
 							mu.Details="No lab orders";
 							mu.Met=MuMet.NA;
@@ -4401,6 +4434,11 @@ namespace OpenDentBusiness{
 					#endregion
 					#region LabImages
 					case EhrMeasureType.LabImages:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							mu.Details="Labs not supported with Oracle";
+							mu.Met=MuMet.False;
+							break;
+						}
 						int labCount=0;
 						int labCountImages=0;
 						List<EhrLab> listEhrLabs=EhrLabs.GetAllForPatInDateRange(pat.PatNum,DateTime.Now.AddYears(-1),DateTime.Now.AddDays(1));
