@@ -49,24 +49,25 @@ namespace OpenDentBusiness{
 		*/
 
 
-		///<summary>Gets a list of all possible EvaluationCriterion.</summary>
-		public static List<EvaluationCriterionDef> Refresh() {
+		///<summary>Gets a list of all possible EvaluationCriterionDefs.  Defs attached to an EvaluationDef are copies and will not be shown.</summary>
+		public static List<EvaluationCriterionDef> GetAvailableCriterionDefs() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EvaluationCriterionDef>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM evaluationcriteriondef";
+			string command="SELECT * FROM evaluationcriteriondef where EvaluationDefNum=0";
 			return Crud.EvaluationCriterionDefCrud.SelectMany(command);
 		}
 
-		///<summary>Gets a list of all EvaluationCriterion attached to an EvaluationDef.</summary>
-		public static List<EvaluationCriterionDef> Refresh(long evaluationDefNum){
+		///<summary>Gets a list of all EvaluationCriterion attached to an EvaluationDef.  Ordered by ItemOrder.</summary>
+		public static List<EvaluationCriterionDef> GetAllForEvaluationDef(long evaluationDefNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EvaluationCriterionDef>>(MethodBase.GetCurrentMethod(),evaluationDefNum);
 			}
-			string command="SELECT * FROM evaluationcriteriondef WHERE EvaluationDefNum = "+POut.Long(evaluationDefNum);
+			string command="SELECT * FROM evaluationcriteriondef WHERE EvaluationDefNum = "+POut.Long(evaluationDefNum)+" "
+				+"ORDER BY ItemOrder";
 			return Crud.EvaluationCriterionDefCrud.SelectMany(command);
 		}
-/*
+
 		///<summary>Gets one EvaluationCriterionDef from the db.</summary>
 		public static EvaluationCriterionDef GetOne(long evaluationCriterionDefNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -102,7 +103,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM evaluationcriteriondef WHERE EvaluationCriterionDefNum = "+POut.Long(evaluationCriterionDefNum);
 			Db.NonQ(command);
 		}
-		*/
 
 
 

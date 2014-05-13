@@ -21,86 +21,82 @@ namespace OpenDental {
 
 		private void FormEvaluationDefEdit_Load(object sender,EventArgs e) {
 			listCriterion.Height=412;
-			_criterionDefsForEval=EvaluationCriterionDefs.Refresh(_evalDefCur.EvaluationDefNum);
+			if(!_evalDefCur.IsNew) {
+				textTitle.Text=_evalDefCur.EvalTitle;
+				textCourse.Text=SchoolCourses.GetDescript(_evalDefCur.SchoolCourseNum);
+				textGradeScaleName.Text=GradingScales.GetOne(_evalDefCur.GradingScaleNum).Description;
+			}
+			_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
 			FillGrids();
 		}
 
 		private void FillGrids() {
-			_criterionDefsAvailable=EvaluationCriterionDefs.Refresh();
+			_criterionDefsAvailable=EvaluationCriterionDefs.GetAvailableCriterionDefs();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			//TODO: Discuss and brainstorm the correct columns for both of these grids. For now just using placeholders to test.
-			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),200);
+			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),180);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("FormDisplayFields","Grading Scale"),80);
+			col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Grading Scale"),80);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_criterionDefsForEval.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_criterionDefsForEval[i].EvaluationDefNum.ToString());
-				row.Cells.Add(_criterionDefsForEval[i].GradingScaleNum.ToString());
+				row.Cells.Add(_criterionDefsForEval[i].CriterionDescript);
+				row.Cells.Add(GradingScales.GetOne(_criterionDefsForEval[i].GradingScaleNum).Description);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			//Remove things from AvailList that are in the ListShowing.
-			for(int i=0;i<_criterionDefsForEval.Count;i++) {
-				for(int j=0;j<_criterionDefsAvailable.Count;j++) {
-					//Only removing one item from _criterionDefsAvailable per iteration of i, so RemoveAt() is safe without going backwards.
-					if(_criterionDefsForEval[i].EvaluationCriterionDefNum==_criterionDefsAvailable[j].EvaluationCriterionDefNum) {
-						_criterionDefsAvailable.RemoveAt(j);
-						break;
-					}
-				}
-			}
 			listCriterion.Items.Clear();
 			for(int i=0;i<_criterionDefsAvailable.Count;i++) {
-				listCriterion.Items.Add(_criterionDefsAvailable[i]);
+				listCriterion.Items.Add(_criterionDefsAvailable[i].CriterionDescript);
 			}
 		}
 
-		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {//TODO: Have this go to FormEvaluationCriterionDefEdit
-			//FormDisplayFieldEdit formD=new FormDisplayFieldEdit();
-			//formD.FieldCur=ListShowing[e.Row];
-			//DisplayField tempField=ListShowing[e.Row].Copy();
-			//formD.ShowDialog();
-			//if(formD.DialogResult!=DialogResult.OK) {
-			//	ListShowing[e.Row]=tempField.Copy();
-			//	return;
-			//}
-			//if(category==DisplayFieldCategory.OrthoChart) {
-			//	if(ListShowing[e.Row].Description=="") {
-			//		ListShowing[e.Row]=tempField.Copy();
-			//		MsgBox.Show(this,"Description cannot be blank.");
-			//		return;
-			//	}
-			//	for(int i=0;i<ListShowing.Count;i++) {//Check against ListShowing only
-			//		if(i==e.Row) {
-			//			continue;
-			//		}
-			//		if(ListShowing[e.Row].Description==ListShowing[i].Description) {
-			//			ListShowing[e.Row]=tempField;
-			//			MsgBox.Show(this,"That field name already exists.");
-			//			return;
-			//		}
-			//	}
-			//	for(int i=0;i<AvailList.Count;i++) {//check against AvailList only
-			//		if(ListShowing[e.Row].Description==AvailList[i].Description) {
-			//			ListShowing[e.Row]=tempField;
-			//			MsgBox.Show(this,"That field name already exists.");
-			//			return;
-			//		}
-			//	}
-			//}
-			//FillGrids();
-			//changed=true;
+		private void gridMain_DoubleClick(object sender,EventArgs e) {
+			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(_criterionDefsForEval[gridMain.GetSelectedIndex()]);
+			FormECDE.ShowDialog();
+			_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+			FillGrids();
+		}
+
+		private void listCriterion_DoubleClick(object sender,EventArgs e) {
+			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit((EvaluationCriterionDef)listCriterion.Items[listCriterion.SelectedIndex]);
+			FormECDE.ShowDialog();
+			FillGrids();
+		}
+
+		private void butCriterionAdd_Click(object sender,EventArgs e) {
+			if(_evalDefCur.GradingScaleNum==0) {
+				MsgBox.Show(this,"Please select a grading scale before adding criterion.");
+				return;
+			}
+			EvaluationCriterionDef evalCritDef=new EvaluationCriterionDef();
+			evalCritDef.GradingScaleNum=_evalDefCur.GradingScaleNum;
+			evalCritDef.IsNew=true;
+			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(evalCritDef);
+			FormECDE.ShowDialog();
+			FillGrids();
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {
 			FormGradingScales FormGS=new FormGradingScales();
 			FormGS.ShowDialog();
-			textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
+			if(FormGS.DialogResult==DialogResult.OK) {
+				textGradeScaleName.Text=FormGS.SelectedGradingScale.GradingScaleNum+"-"+FormGS.SelectedGradingScale.Description;
+			}
 			_evalDefCur.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
+		}
+
+		private void butCoursePicker_Click(object sender,EventArgs e) {
+			FormSchoolCourses FormSC=new FormSchoolCourses();
+			FormSC.IsSelectionMode=true;
+			FormSC.ShowDialog();
+			if(FormSC.DialogResult==DialogResult.OK) {
+				_evalDefCur.SchoolCourseNum=FormSC.CourseSelected.SchoolCourseNum;
+				textCourse.Text=FormSC.CourseSelected.Descript;
+			}
 		}
 
 		private void butLeft_Click(object sender,EventArgs e) {
@@ -108,20 +104,23 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please select an item in the list on the right first.");
 				return;
 			}
-			EvaluationCriterionDef field;
+			EvaluationCriterionDef critDefForEval;
 			for(int i=0;i<listCriterion.SelectedItems.Count;i++) {
-				field=(EvaluationCriterionDef)listCriterion.SelectedItems[i];
-				_criterionDefsForEval.Add(field);
+				critDefForEval=_criterionDefsAvailable[listCriterion.SelectedIndices[i]].Copy();
+				critDefForEval.EvaluationDefNum=_evalDefCur.EvaluationDefNum;
+				EvaluationCriterionDefs.Insert(critDefForEval);
+				_criterionDefsForEval.Add(critDefForEval);
 			}
 			FillGrids();
 		}
 
-		private void butRight_Click(object sender,EventArgs e) {
+		private void butRemove_Click(object sender,EventArgs e) {
 			if(gridMain.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select an item in the grid on the left first.");
+				MsgBox.Show(this,"Please select an item in the grid first.");
 				return;
 			}
 			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {//go backwards
+				EvaluationCriterionDefs.Delete(_criterionDefsForEval[gridMain.SelectedIndices[i]].EvaluationCriterionDefNum);
 				_criterionDefsForEval.RemoveAt(gridMain.SelectedIndices[i]);
 			}
 			FillGrids();
@@ -169,12 +168,33 @@ namespace OpenDental {
 			}
 		}
 
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(_evalDefCur.IsNew || MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the evaluation def. Is this ok?")) {
+				EvaluationDefs.Delete(_evalDefCur.EvaluationDefNum);
+			}
+			DialogResult=DialogResult.Cancel;
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
-			EvaluationDefs.SaveListForDef(_criterionDefsForEval,_evalDefCur);
+			if(_evalDefCur.SchoolCourseNum==0) {
+				MsgBox.Show(this,"A school course must be selected for this evaluation def before it can be saved.");
+			}
+			if(_evalDefCur.GradingScaleNum==0) {
+				MsgBox.Show(this,"A grading scale must be selected for this evaluation def before it can be saved.");
+			}
+			_evalDefCur.EvalTitle=textTitle.Text;
+			EvaluationDefs.Update(_evalDefCur);
+			for(int i=0;i<_criterionDefsForEval.Count;i++) {
+				_criterionDefsForEval[i].ItemOrder=i;
+				EvaluationCriterionDefs.Update(_criterionDefsForEval[i]);
+			}
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
+			if(_evalDefCur.IsNew) {
+				EvaluationDefs.Delete(_evalDefCur.EvaluationDefNum);
+			}
 			DialogResult=DialogResult.Cancel;
 		}
 

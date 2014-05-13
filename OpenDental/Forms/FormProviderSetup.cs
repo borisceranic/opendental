@@ -533,7 +533,7 @@ namespace OpenDental{
 				comboClass.Items.Add(Lan.g(this,"All"));
 				comboClass.SelectedIndex=0;
 				for(int i=0;i<SchoolClasses.List.Length;i++){
-					comboClass.Items.Add(SchoolClasses.GetDescript(SchoolClasses.List[i]));
+					comboClass.Items.Add(Lan.g(this,SchoolClasses.GetDescript(SchoolClasses.List[i])));
 				}
 				butUp.Visible=false;
 				butDown.Visible=false;

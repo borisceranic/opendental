@@ -13,6 +13,8 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.ListBox listMain;
 		private bool changed;
+		public bool IsSelectionMode;
+		public SchoolCourse CourseSelected;
 		
 		///<summary></summary>
 		public FormSchoolCourses(){
@@ -107,6 +109,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormSchoolCourses_Load(object sender, System.EventArgs e) {
+			if(IsSelectionMode) {
+				butAdd.Visible=false;
+			}
 			FillList();
 		}
 
@@ -139,8 +144,14 @@ namespace OpenDental{
 		}
 
 		private void listMain_DoubleClick(object sender, System.EventArgs e) {
-			if(listMain.SelectedIndex==-1)
+			if(listMain.SelectedIndex==-1) {
 				return;
+			}
+			if(IsSelectionMode) {
+				CourseSelected=SchoolCourses.List[listMain.SelectedIndex];
+				DialogResult=DialogResult.OK;
+				return;
+			}
 			FormSchoolCourseEdit FormS=new FormSchoolCourseEdit(SchoolCourses.List[listMain.SelectedIndex]);
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
@@ -151,7 +162,7 @@ namespace OpenDental{
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {
-			Close();
+			DialogResult=DialogResult.Cancel;
 		}
 
 		private void FormSchoolCourses_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

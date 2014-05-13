@@ -19,7 +19,10 @@ namespace OpenDental {
 		}
 
 		private void FormGradingScaleEdit_Load(object sender,EventArgs e) {
-			//Placeholder
+			if(!_gradingScaleCur.IsNew) {
+				textDescription.Text=_gradingScaleCur.Description;
+				FillGrid();
+			}
 		}
 
 		private void FillGrid() {
@@ -27,12 +30,18 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			//TODO: Determine correct columns
-			ODGridColumn col=new ODGridColumn(Lan.g("FormGradingScales","Description"),160);
+			ODGridColumn col=new ODGridColumn(Lan.g("FormGradingScaleEdit","Shown"),60);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormGradingScaleEdit","Number"),60);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormGradingScaleEdit","Description"),160);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_listGradingScaleItems.Count;i++) {
 				row=new ODGridRow();
+				row.Cells.Add(_listGradingScaleItems[i].GradeShowing);
+				row.Cells.Add(_listGradingScaleItems[i].GradeNumber.ToString());
 				row.Cells.Add(_listGradingScaleItems[i].Description);
 				gridMain.Rows.Add(row);
 			}
@@ -53,9 +62,18 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void butClose_Click(object sender,EventArgs e) {
+		private void butOK_Click(object sender,EventArgs e) {
+			_gradingScaleCur.Description=textDescription.Text;
+			_gradingScaleCur.IsPercentage=checkIsPercentage.Checked;
+			GradingScales.Update(_gradingScaleCur);
 			DialogResult=DialogResult.OK;
 		}
+
+		private void butCancel_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.Cancel;
+		}
+
+
 
 
 

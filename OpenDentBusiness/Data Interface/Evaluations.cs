@@ -47,8 +47,6 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
 		public static List<Evaluation> Refresh(long patNum){
@@ -65,6 +63,37 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<Evaluation>(MethodBase.GetCurrentMethod(),evaluationNum);
 			}
 			return Crud.EvaluationCrud.SelectOne(evaluationNum);
+		}
+
+		///<summary>Gets all Evaluations from the DB.  Multiple filters are available.  Dates must be valid before calling this.</summary>
+		public static DataTable GetFilteredList(DateTime dateStart,DateTime dateEnd,string lastName,string firstName,long uniqueID,long courseNum,long instructorNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,lastName,firstName,uniqueID,courseNum,instructorNum);
+			}
+			string command="SELECT evaluation.EvaluationNum,evaluation.EvalTitle,evaluation.DateEval,evaluation.StudentNum,evaluation.InstructorNum,"
+			+"provider.LName,provider.FName,schoolcourse.Descript,gradingscale.Description,evaluation.OverallGradeShowing FROM evaluation "
+				+"INNER JOIN provider ON provider.ProvNum=evaluation.InstructorNum || provider.ProvNum=evaluation.StudentNum) "
+				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluation.SchoolCourseNum "
+				+"INNER JOIN gradingscale ON gradingscale.GradingScaleNum=evaluation.GradingScaleNum "
+				+"WHERE TRUE";
+			if(!String.IsNullOrWhiteSpace(lastName)) {
+				command+=" AND provider.LName LIKE '%"+POut.String(lastName)+"%'";
+			}
+			if(!String.IsNullOrWhiteSpace(firstName)) {
+				command+=" AND provider.FName LIKE '%"+POut.String(firstName)+"%'";
+			}
+			if(uniqueID!=0) {
+				command+=" AND evaluation.StudentNum = '"+POut.Long(uniqueID)+"'";
+			}
+			if(courseNum!=0) {
+				command+=" AND schoolcourse.SchoolCourseNum = '"+POut.Long(courseNum)+"'";
+			}
+			if(instructorNum!=0) {
+				command+=" AND evaluation.InstructorNum = '"+POut.Long(instructorNum)+"'";
+			}
+			command+=" AND evaluation.DateEval BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
+			command+=" ORDER BY DateEval,LName";
+			return Db.GetTable(command);
 		}
 
 		///<summary></summary>
@@ -94,7 +123,7 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM evaluation WHERE EvaluationNum = "+POut.Long(evaluationNum);
 			Db.NonQ(command);
 		}
-		*/
+		
 
 
 

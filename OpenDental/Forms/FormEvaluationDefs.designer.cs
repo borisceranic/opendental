@@ -111,6 +111,7 @@ namespace OpenDental{
 			this.gridMain.TabIndex = 14;
 			this.gridMain.Title = "Evaluation Definitions";
 			this.gridMain.TranslationName = "TableEvaluationSetup";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// label1
 			// 

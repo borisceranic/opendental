@@ -25,6 +25,7 @@ namespace OpenDental {
 		private void butDelete_Click(object sender,EventArgs e) {
 			if(_gradingScaleItemCur.IsNew) {
 				DialogResult=DialogResult.Cancel;
+				return;
 			}
 			GradingScaleItems.Delete(_gradingScaleItemCur.GradingScaleItemNum);
 			DialogResult=DialogResult.Cancel;

@@ -20,7 +20,8 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
-			DataTable table=EvaluationDefs.RefreshByCourse(textCourseDescript.Text);
+			//TODO: Change the textbox here to a combobox.
+			DataTable table=EvaluationDefs.GetAllByCourse(textCourseDescript.Text);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluationSetup","Course"),90);
@@ -49,15 +50,32 @@ namespace OpenDental {
 			FillGrid();
 		}
 
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			EvaluationDef evalDef=EvaluationDefs.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString()));
+			FormEvaluationDefEdit FormEDE=new FormEvaluationDefEdit(evalDef);
+			FormEDE.ShowDialog();
+			FillGrid();
+		}
+
 		private void butDuplicate_Click(object sender,EventArgs e) {
-			EvaluationDef evalDefNew=EvaluationDefs.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString())).Copy();
+			EvaluationDef evalDefOld=EvaluationDefs.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString()));
+			EvaluationDef evalDefNew=evalDefOld.Copy();
 			evalDefNew.EvalTitle+="-copy";
-			EvaluationDefs.Insert(evalDefNew);
+			evalDefNew.EvaluationDefNum=EvaluationDefs.Insert(evalDefNew);
+			List<EvaluationCriterionDef> listCritDefs=EvaluationCriterionDefs.GetAllForEvaluationDef(evalDefOld.EvaluationDefNum);
+			for(int i=0;i<listCritDefs.Count;i++) {
+				EvaluationCriterionDef critDefCopy=listCritDefs[i].Copy();
+				critDefCopy.EvaluationDefNum=evalDefNew.EvaluationDefNum;
+				EvaluationCriterionDefs.Insert(critDefCopy);
+			}
 			FillGrid();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormEvaluationDefEdit FormEDE=new FormEvaluationDefEdit(new EvaluationDef());
+			EvaluationDef evalDef=new EvaluationDef();
+			evalDef.IsNew=true;
+			evalDef.EvaluationDefNum=EvaluationDefs.Insert(evalDef);
+			FormEvaluationDefEdit FormEDE=new FormEvaluationDefEdit(evalDef);
 			FormEDE.ShowDialog();
 			if(FormEDE.DialogResult==DialogResult.OK) {
 				FillGrid();
@@ -71,6 +89,7 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
+
 
 
 

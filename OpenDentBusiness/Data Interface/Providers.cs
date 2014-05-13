@@ -133,6 +133,20 @@ namespace OpenDentBusiness{
 			return Db.GetTable(command);
 		}
 
+		///<summary>Gets list of all instructors.  Returns an empty list if none are found.</summary>
+		public static List<Provider> GetInstructors() {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> provs=new List<Provider>();
+			if(ProviderC.ListLong==null) {
+				RefreshCache();
+			}
+			for(int i=0;i<ProviderC.ListLong.Count;i++) {
+				if(ProviderC.ListLong[i].IsInstructor) {
+					provs.Add(ProviderC.ListLong[i]);
+				}
+			}
+			return provs;
+		}
 		public static List<Provider> GetChangedSince(DateTime changedSince) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Provider>>(MethodBase.GetCurrentMethod(),changedSince);
