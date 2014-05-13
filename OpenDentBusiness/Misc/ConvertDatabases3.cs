@@ -2318,7 +2318,7 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="ALTER TABLE ehrmeasureevent ADD CodeValueResult varchar2(30)";
 					Db.NonQ(command);
-					command="CREATE INDEX ehrmeasureevent_CodeValueResult ON ehrmeasureevent (CodeValueResult)";
+					command="CREATE INDEX ehrmeasureevent_CodeValueResul ON ehrmeasureevent (CodeValueResult)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -2334,11 +2334,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE intervention CHANGE DateTimeEntry DateEntry date";
-					Db.NonQ(command);
-					command="UPDATE intervention SET DateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateEntry IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE intervention MODIFY DateEntry NOT NULL";
+					command="ALTER TABLE intervention RENAME COLUMN DateTimeEntry TO DateEntry";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -2599,6 +2595,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlab'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlab (
@@ -2674,6 +2674,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlab_TQ1SetId ON ehrlab (TQ1SetId)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlabresult";
@@ -2749,6 +2750,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlabresult'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlabresult (
@@ -2823,6 +2828,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlabresult_SetIdOBX ON ehrlabresult (SetIdOBX)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlab";
@@ -2895,6 +2901,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlab'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlab (
@@ -2967,6 +2977,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlab_TQ1SetId ON ehrlab (TQ1SetId)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlabclinicalinfo";
@@ -3107,6 +3118,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlabresult'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlabresult (
@@ -3181,6 +3196,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlabresult_SetIdOBX ON ehrlabresult (SetIdOBX)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlabresultscopyto";
@@ -3204,6 +3220,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlabresultscopyto'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlabresultscopyto (
@@ -3225,6 +3245,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlabresultscopyto_EhrLabNum ON ehrlabresultscopyto (EhrLabNum)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlabspecimen";
@@ -3289,6 +3310,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlabspecimencondition'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlabspecimencondition (
@@ -3306,6 +3331,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlabspecimencondition_EhrLab ON ehrlabspecimencondition (EhrLabSpecimenNum)";
 					Db.NonQ(command);
+					 */
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS ehrlabspecimenrejectreason";
@@ -3325,6 +3351,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ehrlabspecimenrejectreason'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE ehrlabspecimenrejectreason (
@@ -3342,6 +3372,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX ehrlabspecimenrejectreason_Ehr ON ehrlabspecimenrejectreason (EhrLabSpecimenNum)";
 					Db.NonQ(command);
+					 */
 				}
 				#endregion
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -3728,12 +3759,17 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="ALTER TABLE ehrlab ADD IsCpoe number(3)";
 					Db.NonQ(command);
 					command="UPDATE ehrlab SET IsCpoe = 0 WHERE IsCpoe IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE ehrlab MODIFY IsCpoe NOT NULL";
 					Db.NonQ(command);
+					 */
 				}
 				//Add additional EHR Measures to DB
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -3845,8 +3881,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
+					//EHR lab features have been hidden for Oracle users due to some column names exceeding the 30 character limit.
+					//TODO: Fix the column names to be less than 30 characters in the future.
+					//	This will require unhiding EHR lab features for Oracle users, altering the table types and columns in the both MySQL and Oracle.
+					/*
 					command="ALTER TABLE ehrlab ADD OriginalPIDSegment varchar2(4000)";
 					Db.NonQ(command);
+					 */
 				}
 				//Added TimeCardADPExportIncludesName preference
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -3904,9 +3945,9 @@ namespace OpenDentBusiness {
 				string command;
 				//add programproperty to eClinicalWorks program link for changing the cookie creation for the LBSESSIONID
 				//This is a fix for their version 10 so that the medical panel will work correctly
+				command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
+				int programNum=PIn.Int(Db.GetScalar(command));
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
-					int programNum=PIn.Int(Db.GetScalar(command));
 					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
 							+") VALUES("
 							+"'"+POut.Long(programNum)+"', "
@@ -3915,7 +3956,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					//eCW will never use Oracle.
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+							+") VALUES("
+							+"(SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+							+"'"+POut.Long(programNum)+"', "
+							+"'IsLBSessionIdExcluded', "
+							+"'0')";//set to 0 (false) by default so behavior of existing customers will not change
+					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '14.1.8.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -3923,6 +3970,7 @@ namespace OpenDentBusiness {
 			To14_2_1();
 		}
 
+		///<summary>Oracle compatible: 05/13/2014</summary>
 		private static void To14_2_1() {
 			if(FromVersion<new Version("14.2.1.0")) {
 				string command;
@@ -3951,12 +3999,23 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				//Add program property for Tigerview enchancement
-				command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
 				    +") VALUES("
 				    +"'"+POut.Long(Programs.GetProgramNum(ProgramName.TigerView))+"', "
 				    +"'TigerView EMR folder path', "
 				    +"'')";
-				Db.NonQ(command);
+					Db.NonQ(command);
+				}
+				else {
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+				    +"'"+POut.Long(Programs.GetProgramNum(ProgramName.TigerView))+"', "
+				    +"'TigerView EMR folder path', "
+				    +"'')";
+					Db.NonQ(command);
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) "
 									+"VALUES (32"+",'"+POut.String("Check")+"','0','')";
