@@ -762,7 +762,7 @@ namespace OpenDentBusiness{
 			else {//Oracle
 				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
 				+"patient.ApptModNote,AptDateTime,appointment.AptNum,AptStatus,Assistant,"
-				+"patient.BillingType,patient.BirthDate,"
+				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
 				+"carrier1.CarrierName,carrier2.CarrierName,"
 				+"patient.ChartNumber,patient.City,appointment.ColorOverride,Confirmed,patient.CreditType,"
 				+"DateTimeChecked,DateTimeDue,DateTimeRecd,DateTimeSent,DateTimeAskedToArrive,"

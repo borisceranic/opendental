@@ -144,7 +144,10 @@ namespace OpenDentBusiness {
 			//string rawHostName=DataConnection.GetServerName();//This could be a human readable name, or it might be "localhost" or "127.0.0.1" or another IP address.
 			//return Dns.GetHostEntry(rawHostName).HostName;//Return the human readable name (full domain name) corresponding to the rawHostName.
 			//Had to strip off the port, caused Dns.GetHostEntry to fail and is not needed to get the hostname
-			string rawHostName=DataConnection.GetServerName().Split(':')[0];//This could be a human readable name, or it might be "localhost" or "127.0.0.1" or another IP address.
+			string rawHostName=DataConnection.GetServerName();
+			if(rawHostName!=null) {//rawHostName will be null if the user used a custom ConnectionString when they chose their database.
+				rawHostName=rawHostName.Split(':')[0];//This could be a human readable name, or it might be "localhost" or "127.0.0.1" or another IP address.
+			}
 			string retval="";
 			try {
 				retval=Dns.GetHostEntry(rawHostName).HostName;//Return the human readable name (full domain name) corresponding to the rawHostName.
