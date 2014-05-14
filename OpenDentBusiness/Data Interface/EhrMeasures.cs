@@ -22,7 +22,8 @@ namespace OpenDentBusiness{
 			+POut.Int((int)EhrMeasureType.AllergyList)+","
 			+POut.Int((int)EhrMeasureType.Demographics)+","
 			+POut.Int((int)EhrMeasureType.Education)+","
-			+POut.Int((int)EhrMeasureType.TimelyAccess)+","
+			+POut.Int((int)EhrMeasureType.ElectronicCopyAccess)+","
+			//+POut.Int((int)EhrMeasureType.TimelyAccess)+"," //Deprecated in 2014.  V/D/T (patient portal) now required.  ElectronicCopyAccess used instead.
 			+POut.Int((int)EhrMeasureType.ProvOrderEntry)+","
 			+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
 			+POut.Int((int)EhrMeasureType.CPOE_PreviouslyOrdered)+","
@@ -33,7 +34,7 @@ namespace OpenDentBusiness{
 			+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
 			+POut.Int((int)EhrMeasureType.Smoking)+","
 			+POut.Int((int)EhrMeasureType.Lab)+","
-			+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
+			//+POut.Int((int)EhrMeasureType.ElectronicCopy)+"," //Deprecated in 2014.  V/D/T (patient portal) now required.  ElectronicCopyAccess used instead.
 			+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 			+POut.Int((int)EhrMeasureType.Reminders)+","
 			+POut.Int((int)EhrMeasureType.MedReconcile)+","
@@ -123,6 +124,8 @@ namespace OpenDentBusiness{
 					return "Record demographics: Preferred language, Gender, Race, Ethnicity, Date of Birth";
 				case EhrMeasureType.Education:
 					return "Use certified EHR technology to identify patient-specific education resources and provide those resources to the patient if appropriate.";
+				case EhrMeasureType.ElectronicCopyAccess:
+					return "Provide patients the ability to view online, download and transmit their health information within four business days of the information being available to the EP.";
 				case EhrMeasureType.TimelyAccess:
 					return "Provide patients with timely electronic access to their health information (including lab results, problem list, medication lists, medication allergies) within four business days of the information being available to the EP";
 				case EhrMeasureType.ProvOrderEntry:
@@ -175,6 +178,8 @@ namespace OpenDentBusiness{
 					return "More than 50% of all unique patients seen by the Provider have demographics recorded as structured data.";
 				case EhrMeasureType.Education:
 					return "More than 10% of all unique patients seen by the Provider during the EHR reporting period are provided patient-specific education resources.";
+				case EhrMeasureType.ElectronicCopyAccess:
+					return "More than 50% of all unique patients seen by the EP during the EHR reporting period are provided timely (available to the patient within 4 business days after the information is available to the EP) online access to their health information.";
 				case EhrMeasureType.TimelyAccess:
 					return "More than 10% of all unique patients seen by the Provider are provided timely (available to the patient within four business days of being updated in the certified EHR technology) electronic access to their health information subject to the Provider’s discretion to withhold certain information.";
 				case EhrMeasureType.ProvOrderEntry:
@@ -225,6 +230,8 @@ namespace OpenDentBusiness{
 					return 50;
 				case EhrMeasureType.Education:
 					return 10;
+				case EhrMeasureType.ElectronicCopyAccess:
+					return 50;
 				case EhrMeasureType.TimelyAccess:
 					return 10;
 				case EhrMeasureType.ProvOrderEntry:
@@ -448,7 +455,21 @@ namespace OpenDentBusiness{
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
-				#region TimelyAccess
+				#region ElectronicCopyAccess
+				case EhrMeasureType.ElectronicCopyAccess:
+					command="SELECT patient.PatNum,patient.LName,patient.FName,OnlineAccess.dateProvided,MIN(procedurelog.ProcDate) as leastRecentDate "
+						+"FROM patient "
+						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
+						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
+						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as dateProvided FROM ehrmeasureevent "
+						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.OnlineAccessProvided)+") "
+						+"OnlineAccess ON patient.PatNum=OnlineAccess.PatNum "
+						+"GROUP BY patient.PatNum";
+					tableRaw=Db.GetTable(command);
+					break;
+				#endregion
+				#region TimelyAccess (Deprecated)
 				case EhrMeasureType.TimelyAccess:
 					//denominator is patients
 					command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
@@ -718,7 +739,7 @@ namespace OpenDentBusiness{
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
-				#region ElectronicCopy
+				#region ElectronicCopy (Deprecated)
 				case EhrMeasureType.ElectronicCopy:
 					command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
 					Db.NonQ(command);
@@ -1072,15 +1093,33 @@ namespace OpenDentBusiness{
 						}
 						break;
 					#endregion
-					#region TimelyAccess
+					#region ElectronicCopyAccess
+					case EhrMeasureType.ElectronicCopyAccess:
+						DateTime recentDate=PIn.Date(tableRaw.Rows[i]["leastRecentDate"].ToString());
+						DateTime deadlineDate=PIn.Date(tableRaw.Rows[i]["leastRecentDate"].ToString());
+						DateTime providedDate=PIn.Date(tableRaw.Rows[i]["dateProvided"].ToString());
+						deadlineDate=deadlineDate.AddDays(4);
+						if(recentDate.DayOfWeek>DayOfWeek.Tuesday) {
+							deadlineDate=deadlineDate.AddDays(2);
+						}
+						if(providedDate<=deadlineDate && providedDate.Year>1880) {
+							explanation="Online access provided before "+deadlineDate.ToShortDateString();
+							row["met"]="X";
+						}
+						else {
+							explanation=recentDate.ToShortDateString()+" no online access provided";
+						}
+						break;
+					#endregion
+					#region TimelyAccess (Deprecated)
 					case EhrMeasureType.TimelyAccess:
 						DateTime lastVisitDate=PIn.Date(tableRaw.Rows[i]["lastVisitDate"].ToString());
-						DateTime deadlineDate=PIn.Date(tableRaw.Rows[i]["deadlineDate"].ToString());
+						DateTime deadlineDateOld=PIn.Date(tableRaw.Rows[i]["deadlineDate"].ToString());
 						if(tableRaw.Rows[i]["accessProvided"].ToString()=="0") {
 							explanation=lastVisitDate.ToShortDateString()+" no online access provided";
 						}
 						else {
-							explanation="Online access provided before "+deadlineDate.ToShortDateString();
+							explanation="Online access provided before "+deadlineDateOld.ToShortDateString();
 							row["met"]="X";
 						}
 						break;
@@ -1212,7 +1251,7 @@ namespace OpenDentBusiness{
 						}
 						break;
 					#endregion
-					#region ElectronicCopy
+					#region ElectronicCopy (Deprecated)
 					case EhrMeasureType.ElectronicCopy:
 						DateTime dateRequested=PIn.Date(tableRaw.Rows[i]["dateRequested"].ToString());
 						if(tableRaw.Rows[i]["copyProvided"].ToString()=="0") {
@@ -1315,6 +1354,8 @@ namespace OpenDentBusiness{
 					return "Patients with all required demographic elements recorded as structured data: language, gender, race, ethnicity, and birthdate.";
 				case EhrMeasureType.Education:
 					return "Patients provided patient-specific education resources, not dependent on requests.";
+				case EhrMeasureType.ElectronicCopyAccess:
+					return "Electronic copy received within 4 business days.";
 				case EhrMeasureType.TimelyAccess:
 					return "Electronic access of health information provided to seen patients within 4 business days of being entered into their EHR, not dependent on requests.";
 				case EhrMeasureType.ProvOrderEntry:
@@ -1367,6 +1408,8 @@ namespace OpenDentBusiness{
 					return "All unique patients with at least one completed procedure by the Provider during the reporting period.";
 				case EhrMeasureType.TimelyAccess:
 					return "All unique patients with at least one completed procedure by the Provider during the reporting period.";
+				case EhrMeasureType.ElectronicCopyAccess:
+					return "All unique patients with at least one completed procedure by the Provider during the reporting period.";
 				case EhrMeasureType.ProvOrderEntry:
 					return "All unique patients with at least one completed procedure by the Provider during the reporting period and with at least one medication in their medication list.";
 				case EhrMeasureType.CPOE_MedOrdersOnly:
@@ -1412,6 +1455,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.Demographics:
 				case EhrMeasureType.Education:
 					return "No exclusions.";
+				case EhrMeasureType.ElectronicCopyAccess:
+					return "Any Provider who neither orders nor creates any of the information listed for inclusion as part of both measures, except for Patient name and Provider's name and office contact information.";
 				case EhrMeasureType.TimelyAccess:
 					return "Any Provider that neither orders nor creates lab tests or information that would be contained in the problem list, medication list, or medication allergy list during the reporting period.";
 				case EhrMeasureType.ProvOrderEntry:
@@ -1473,6 +1518,7 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.AllergyList:
 				case EhrMeasureType.Demographics:
 				case EhrMeasureType.Education:
+				case EhrMeasureType.ElectronicCopyAccess:
 				case EhrMeasureType.VitalSignsBMIOnly:
 				case EhrMeasureType.ElectronicCopy:
 				case EhrMeasureType.Lab:
@@ -1589,6 +1635,7 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.AllergyList:
 				case EhrMeasureType.Demographics:
 				case EhrMeasureType.Education:
+				case EhrMeasureType.ElectronicCopyAccess:
 				case EhrMeasureType.VitalSignsBMIOnly:
 				case EhrMeasureType.ElectronicCopy:
 				case EhrMeasureType.Lab:
@@ -1760,14 +1807,29 @@ namespace OpenDentBusiness{
 						mu.Action="Provide education resources";
 						break;
 					#endregion
-					#region TimelyAccess
-					case EhrMeasureType.TimelyAccess:
+					#region ElectronicCopyAccess
+					//This used to be called TimelyAccess.  In 2014, CMS required offices use the new V/D/T measure (patient portal).  Electronic copy was removed as well due to this change.
+					case EhrMeasureType.ElectronicCopyAccess:
 						List<EhrMeasureEvent> listOnline=EhrMeasureEvents.RefreshByType(pat.PatNum,EhrMeasureEventType.OnlineAccessProvided);
 						if(listOnline.Count==0) {
 							mu.Details="No online access provided.";
 						}
 						else {
 							mu.Details="Online access provided: "+listOnline[listOnline.Count-1].DateTEvent.ToShortDateString();//most recent
+							mu.Met=MuMet.True;
+						}
+						mu.Action="Provide online Access";
+						break;
+					#endregion
+					#region TimelyAccess (Deprecated)
+					//This measure is now deprecated.  In 2014, CMS required offices use the new V/D/T measure (patient portal).  ElectronicCopyAccess is used instead.
+					case EhrMeasureType.TimelyAccess:
+						List<EhrMeasureEvent> listAccess=EhrMeasureEvents.RefreshByType(pat.PatNum,EhrMeasureEventType.OnlineAccessProvided);
+						if(listAccess.Count==0) {
+							mu.Details="No online access provided.";
+						}
+						else {
+							mu.Details="Online access provided: "+listAccess[listAccess.Count-1].DateTEvent.ToShortDateString();//most recent
 							mu.Met=MuMet.True;
 						}
 						mu.Action="Provide online Access";
@@ -2093,7 +2155,8 @@ namespace OpenDentBusiness{
 						mu.Action="Edit labs";
 						break;
 					#endregion
-					#region ElectronicCopy
+					#region ElectronicCopy (Deprecated)
+					//This measure is now deprecated.  In 2014, CMS required offices use the new V/D/T measure (patient portal) which is where the patient will get their "electronic copy".
 					case EhrMeasureType.ElectronicCopy:
 						List<EhrMeasureEvent> listRequests=EhrMeasureEvents.GetByType(listMeasureEvents,EhrMeasureEventType.ElectronicCopyRequested);
 						List<EhrMeasureEvent> listRequestsPeriod=new List<EhrMeasureEvent>();
@@ -2315,7 +2378,8 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.AllergyList)+","
 				+POut.Int((int)EhrMeasureType.Demographics)+","
 				+POut.Int((int)EhrMeasureType.Education)+","
-				+POut.Int((int)EhrMeasureType.TimelyAccess)+","
+				+POut.Int((int)EhrMeasureType.ElectronicCopyAccess)+","
+				//+POut.Int((int)EhrMeasureType.TimelyAccess)+"," //Deprecated in 2014.  V/D/T (patient portal) now required.  ElectronicCopyAccess used instead.
 				+POut.Int((int)EhrMeasureType.ProvOrderEntry)+","
 				+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
 				+POut.Int((int)EhrMeasureType.CPOE_PreviouslyOrdered)+","
@@ -2326,7 +2390,7 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
 				+POut.Int((int)EhrMeasureType.Smoking)+","
 				+POut.Int((int)EhrMeasureType.Lab)+","
-				+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
+				//+POut.Int((int)EhrMeasureType.ElectronicCopy)+"," //Deprecated in 2014.  V/D/T (patient portal) now required.  ElectronicCopyAccess used instead.
 				+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 				+POut.Int((int)EhrMeasureType.Reminders)+","
 				+POut.Int((int)EhrMeasureType.MedReconcile)+","
@@ -2338,7 +2402,8 @@ namespace OpenDentBusiness{
 					+POut.Int((int)EhrMeasureType.AllergyList)+","
 					+POut.Int((int)EhrMeasureType.Demographics)+","
 					+POut.Int((int)EhrMeasureType.Education)+","
-					+POut.Int((int)EhrMeasureType.TimelyAccess)+","
+					+POut.Int((int)EhrMeasureType.ElectronicCopyAccess)+","
+					//+POut.Int((int)EhrMeasureType.TimelyAccess)+","
 					+POut.Int((int)EhrMeasureType.ProvOrderEntry)+","
 					+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
 					+POut.Int((int)EhrMeasureType.CPOE_PreviouslyOrdered)+","
@@ -2349,7 +2414,7 @@ namespace OpenDentBusiness{
 					+POut.Int((int)EhrMeasureType.VitalSignsBPOnly)+","
 					+POut.Int((int)EhrMeasureType.Smoking)+","
 					+POut.Int((int)EhrMeasureType.Lab)+","
-					+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
+					//+POut.Int((int)EhrMeasureType.ElectronicCopy)+","
 					+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 					+POut.Int((int)EhrMeasureType.Reminders)+","
 					+POut.Int((int)EhrMeasureType.MedReconcile)+","
