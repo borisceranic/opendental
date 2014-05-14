@@ -5007,7 +5007,7 @@ namespace OpenDental{
 							referral="??";
 						}
 						row.Cells.Add(referral);
-						row.Tag=null;
+						row.Tag="Referral";
 						break;
 					case "Date First Visit":
 						if(PatCur.DateFirstVisit.Year<1880) {
