@@ -24,7 +24,7 @@ namespace OpenDentBusiness{
 				+"WHERE paysplit.PayNum=payment.PayNum and payment.PatNum='"+POut.Long(patNum)+"' "
 				+"UNION "
 				+"SELECT DISTINCT paysplit.* FROM paysplit,payment "
-				+"WHERE paysplit.PayNum = payment.PayNum AND paysplit.PatNum='"+POut.Long(patNum)+"') AS paysplitunion "
+				+"WHERE paysplit.PayNum = payment.PayNum AND paysplit.PatNum='"+POut.Long(patNum)+"') paysplitunion "
 				+"ORDER BY paysplitunion.ProcDate";
 			return Crud.PaySplitCrud.SelectMany(command).ToArray();
 		}
