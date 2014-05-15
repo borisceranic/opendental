@@ -53,8 +53,7 @@ namespace OpenDental{
 		public PhoneEmpDefault PedCur;
 		private UI.ODGrid gridGraph;
 		private UI.Button butAddPhoneGraphEntry;
-		///<summary>Will always be the override status upon load.</summary>
-		private PhoneEmpStatusOverride StatusOld;
+		private PhoneEmpDefault _pedOld;
 		
 		///<summary></summary>
 		public FormPhoneEmpDefaultEdit()
@@ -513,7 +512,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPhoneEmpDefaultEdit_Load(object sender, System.EventArgs e) {
-			StatusOld=PedCur.StatusOverride;//We use this for testing when user clicks OK.
+			_pedOld=PedCur.Clone();
 			if(!IsNew){
 				textEmployeeNum.ReadOnly=true;
 			}
@@ -658,13 +657,13 @@ namespace OpenDental{
 			//Using a switch statement in case we want special functionality for the other statuses later on.
 			switch((PhoneEmpStatusOverride)listStatusOverride.SelectedIndex) {
 				case PhoneEmpStatusOverride.None:
-					if(StatusOld==PhoneEmpStatusOverride.Unavailable) {
+					if(_pedOld.StatusOverride==PhoneEmpStatusOverride.Unavailable) {
 						MsgBox.Show(this,"Change your status from unavailable by using the small phone panel.");
 						return;
 					}
 					break;
 				case PhoneEmpStatusOverride.OfflineAssist:
-					if(StatusOld==PhoneEmpStatusOverride.Unavailable) {
+					if(_pedOld.StatusOverride==PhoneEmpStatusOverride.Unavailable) {
 						MsgBox.Show(this,"Change your status from unavailable by using the small phone panel.");
 						return;
 					}
@@ -765,7 +764,15 @@ namespace OpenDental{
 			if(extensionChange) {
 				//Phone extension has changed so update the phone table as well. 
 				//We have already guaranteed that this employee is Clocked Out (above) so set to home and update phone table.
-				Phones.SetPhoneStatus(ClockStatusEnum.Home,PedCur.PhoneExt,PedCur.EmployeeNum);			
+				Phones.SetPhoneStatus(ClockStatusEnum.Home,PedCur.PhoneExt,PedCur.EmployeeNum);
+			}
+			//Update the phone's ring group to Backup if the employee flagged themselves as "Triage Operator"
+			if(!_pedOld.IsTriageOperator && checkIsTriageOperator.Checked) {
+				PhoneAsterisks.SetRingGroups(PedCur.PhoneExt,AsteriskRingGroups.Backup);
+			}
+			else if(_pedOld.IsTriageOperator && !checkIsTriageOperator.Checked) {
+				//This user used to be a triage operator and they no longer want to be one.  Set their ring group back to their default.
+				PhoneAsterisks.SetToDefaultRingGroups(PedCur.PhoneExt,PedCur.EmployeeNum);
 			}
 			DialogResult=DialogResult.OK;
 		}
