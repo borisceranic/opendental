@@ -531,17 +531,21 @@ namespace OpenDental {
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			string result=DateTime.Now.ToString()+"\r\n";
+			string result="";
 			try {
 				DatabaseMaintenance.BackupRepairAndOptimize();
 			}
 			catch(Exception ex) {
+				result=DateTime.Now.ToString()+"\r\n";
 				if(ex.Message!="") {
 					result+=ex.Message+"\r\n";
 				}
 				result+=Lan.g("FormDatabaseMaintenance","Backup failed.  Your database has not been altered.")+"\r\n";
+				result+=Lan.g("FormDatabaseMaintenance","Please call support for help, a manual backup of your data must be made before trying to fix your database.")+"\r\n";
 			}
-			result+=Lan.g("FormDatabaseMaintenance","Optimization Done");
+			if(result=="") {//No errors occurred.
+				result=DateTime.Now.ToString()+"\r\n"+Lan.g("FormDatabaseMaintenance","Optimization Done");
+			}
 			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);
 			msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.
 			SaveLogToFile(result);
