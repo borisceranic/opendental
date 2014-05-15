@@ -269,6 +269,12 @@ namespace xCrudGenerator {
 		}
 
 		public static void ValidateColumn(string dbName,string tablename,FieldInfo field,DataTable table){
+			if(tablename!="ehrlab" && tablename!="ehrlabresult" && tablename!="ehrlabresultscopyto" && tablename!="ehrlabspecimencondition" && tablename!="ehrlabspecimenrejectreason") {
+				//The ehrlab tables have already been released with long column names.  We might fix later.
+				if(field.Name.Length>30) {
+					throw new ApplicationException("Column name longer than 30 characters.  Invalid for Oracle.  Shorten the column name.  See "+tablename+"."+field.Name);
+				}
+			}
 			//make sure the column exists
 			string dataTypeInDb="";
 			for(int i=0;i<table.Rows.Count;i++){
