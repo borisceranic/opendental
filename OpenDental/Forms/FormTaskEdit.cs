@@ -1275,7 +1275,6 @@ namespace OpenDental {
 				if(!SaveCur()) {
 					return;
 				}
-				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
 			else {//to an in-box
 				FormTaskSendUser FormT=new FormTaskSendUser();
@@ -1289,6 +1288,9 @@ namespace OpenDental {
 				if(!SaveCur()) {
 					return;
 				}
+			}
+			//Check for changes.  If something changed, send a signal.
+			if(notesChanged || !TaskCur.Equals(TaskOld) || StatusChanged) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
 			DialogResult=DialogResult.OK;
