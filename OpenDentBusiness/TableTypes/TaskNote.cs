@@ -9,9 +9,9 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long TaskNoteNum;
-		///<summary>FK to task. The task this tasknote is attached to.</summary>
+		///<summary>FK to task.TaskNum. The task this tasknote is attached to.</summary>
 		public long TaskNum;
-		///<summary>FK to user. The user who created this tasknote.</summary>
+		///<summary>FK to userod.UserNum. The user who created this tasknote.</summary>
 		public long UserNum;
 		///<summary>Date and time the note was created (editable).</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntryEditable)]
