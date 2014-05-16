@@ -43,7 +43,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<TaskList>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT tasklist.*,IFNULL(A.Num,0) "
+			string command="SELECT tasklist.*,"+DbHelper.IfNull("A.Num",0)+" "
 				+"FROM tasklist "
 				+"LEFT JOIN (SELECT tasklist.TaskListNum,COUNT(*) Num FROM tasklist,taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
 				+"AND task.TaskNum=taskancestor.TaskNum ";
