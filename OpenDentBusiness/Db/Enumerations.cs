@@ -718,7 +718,7 @@ namespace OpenDentBusiness{
 	}
 
 	///<summary>Used by QuickPasteCat to determine which category to default to when opening.</summary>
-	public enum QuickPasteType{
+	public enum QuickPasteType {
 		///<summary>0</summary>
 		None,
 		///<summary>1</summary>
@@ -764,15 +764,17 @@ namespace OpenDentBusiness{
 		///<summary>21</summary>
 		ChartTreatment,
 		///<summary>22</summary>
-    MedicalUrgent,
+		MedicalUrgent,
 		///<summary>23</summary>
-    Statement,
+		Statement,
 		///<summary>24</summary>
-    Recall,
+		Recall,
 		///<summary>25</summary>
 		Popup,
 		///<summary>26</summary>
-		TxtMsg
+		TxtMsg,
+		///<summary>27</summary>
+		Task
 	}
 
 	///<summary>For every type of electronic claim format that Open Dental can create, there will be an item in this enumeration.  All e-claim formats are hard coded due to complexity.</summary>

@@ -601,7 +601,7 @@ namespace OpenDental {
 			this.textDescript.DetectUrls = false;
 			this.textDescript.Location = new System.Drawing.Point(127, 73);
 			this.textDescript.Name = "textDescript";
-			this.textDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.Task;
 			this.textDescript.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textDescript.Size = new System.Drawing.Size(683, 121);
 			this.textDescript.TabIndex = 1;

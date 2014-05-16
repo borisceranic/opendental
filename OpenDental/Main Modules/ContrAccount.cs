@@ -1453,7 +1453,7 @@ namespace OpenDental {
 			this.textUrgFinNote.ForeColor = System.Drawing.Color.Red;
 			this.textUrgFinNote.Location = new System.Drawing.Point(0, 20);
 			this.textUrgFinNote.Name = "textUrgFinNote";
-			this.textUrgFinNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textUrgFinNote.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
 			this.textUrgFinNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textUrgFinNote.Size = new System.Drawing.Size(178, 77);
 			this.textUrgFinNote.TabIndex = 11;
