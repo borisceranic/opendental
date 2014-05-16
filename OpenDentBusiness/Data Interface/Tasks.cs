@@ -92,17 +92,32 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Task>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT task.*,1 AS IsUnread, "
-				//we fill the IsUnread column with 1's because we already know that they are all unread
-				+"(SELECT tasklist.Descript FROM tasklist WHERE task.TaskListNum=tasklist.TaskListNum) ParentDesc, "
+			string command="";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command="SELECT task.*,1 AS IsUnread,";//we fill the IsUnread column with 1's because we already know that they are all unread
+			}
+			else {//Oracle
+				//Since this statement has a GROUP BY clause and the table has a clob column, we have to do some Oracle magic with the descript column.
+				command="SELECT task.TaskNum,task.TaskListNum,task.DateTask,task.KeyNum,(SELECT Descript FROM task taskdesc WHERE task.TaskNum=taskdesc.TaskNum) Descript,task.TaskStatus"
+					+",task.IsRepeating,task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished"
+					+",1 AS IsUnread,";//we fill the IsUnread column with 1's because we already know that they are all unread
+			}				
+			command+="(SELECT tasklist.Descript FROM tasklist WHERE task.TaskListNum=tasklist.TaskListNum) ParentDesc, "
 				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
 				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
 				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
 				+"FROM task,taskunread "
 				+"WHERE task.TaskNum=taskunread.TaskNum "
-				+"AND taskunread.UserNum = "+POut.Long(userNum)+" "
-				+"GROUP BY task.TaskNum "//in case there are duplicate unreads
-				+"ORDER BY task.DateTimeEntry";
+				+"AND taskunread.UserNum = "+POut.Long(userNum)+" ";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="GROUP BY task.TaskNum ";//in case there are duplicate unreads
+			}
+			else {//Oracle
+				//in case there are duplicate unreads
+				command+="GROUP BY task.TaskNum,task.TaskListNum,task.DateTask,task.KeyNum,task.TaskStatus,task.IsRepeating"
+					+",task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished ";
+			}
+			command+="ORDER BY task.DateTimeEntry";
 			DataTable table=Db.GetTable(command);
 			return TableToList(table);
 		}
