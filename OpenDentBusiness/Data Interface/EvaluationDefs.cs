@@ -58,15 +58,15 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all EvaluationDefs from the DB that are attached to the specified course. If course is blank then it will get all of the defs.</summary>
-		public static DataTable GetAllByCourse(string courseDescript) {
+		public static DataTable GetAllByCourse(long schoolCourseNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),courseDescript);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolCourseNum);
 			}
 			string command="SELECT evaluationdef.EvaluationDefNum EvaluationDefNum, evaluationdef.EvalTitle EvalTitle, schoolcourse.Descript CourseDescript FROM evaluationdef "
 				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluationdef.SchoolCourseNum "
 				+"WHERE TRUE";
-			if(courseDescript!="") {
-				command+=" AND schoolcourse.Descript LIKE '%"+POut.String(courseDescript)+"%'";
+			if(schoolCourseNum!=0) {
+				command+=" AND schoolcourse.SchoolCourseNum = '"+POut.Long(schoolCourseNum)+"'";
 			}
 			command+=" ORDER BY CourseDescript,EvalTitle";
 			return Db.GetTable(command);

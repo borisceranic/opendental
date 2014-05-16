@@ -47,15 +47,13 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
-		///<summary></summary>
-		public static List<EvaluationCriterion> Refresh(long patNum){
+		///<summary>Get all Criterion attached to and Evaluation.</summary>
+		public static List<EvaluationCriterion> Refresh(long evaluationNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<EvaluationCriterion>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<EvaluationCriterion>>(MethodBase.GetCurrentMethod(),evaluationNum);
 			}
-			string command="SELECT * FROM evaluationcriterion WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM evaluationcriterion WHERE EvaluationNum = "+POut.Long(evaluationNum);
 			return Crud.EvaluationCriterionCrud.SelectMany(command);
 		}
 
@@ -94,7 +92,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM evaluationcriterion WHERE EvaluationCriterionNum = "+POut.Long(evaluationCriterionNum);
 			Db.NonQ(command);
 		}
-		*/
 
 
 

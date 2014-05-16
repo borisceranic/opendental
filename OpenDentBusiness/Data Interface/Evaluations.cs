@@ -47,7 +47,7 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-
+		/*
 		///<summary></summary>
 		public static List<Evaluation> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -56,7 +56,7 @@ namespace OpenDentBusiness{
 			string command="SELECT * FROM evaluation WHERE PatNum = "+POut.Long(patNum);
 			return Crud.EvaluationCrud.SelectMany(command);
 		}
-
+		*/
 		///<summary>Gets one Evaluation from the db.</summary>
 		public static Evaluation GetOne(long evaluationNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -70,17 +70,18 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,lastName,firstName,uniqueID,courseNum,instructorNum);
 			}
-			string command="SELECT evaluation.EvaluationNum,evaluation.EvalTitle,evaluation.DateEval,evaluation.StudentNum,evaluation.InstructorNum,"
-			+"provider.LName,provider.FName,schoolcourse.Descript,gradingscale.Description,evaluation.OverallGradeShowing FROM evaluation "
-				+"INNER JOIN provider ON provider.ProvNum=evaluation.InstructorNum || provider.ProvNum=evaluation.StudentNum) "
+			string command="SELECT evaluation.EvaluationNum,evaluation.EvalTitle,evaluation.DateEval,evaluation.StudentNum,evaluation.InstructNum,"
+			+"stu.LName,stu.FName,schoolcourse.Descript,gradingscale.Description,evaluation.OverallGradeShowing FROM evaluation "
+				+"INNER JOIN provider ins ON ins.ProvNum=evaluation.InstructNum "
+				+"INNER JOIN provider stu ON stu.ProvNum=evaluation.StudentNum "
 				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluation.SchoolCourseNum "
 				+"INNER JOIN gradingscale ON gradingscale.GradingScaleNum=evaluation.GradingScaleNum "
 				+"WHERE TRUE";
 			if(!String.IsNullOrWhiteSpace(lastName)) {
-				command+=" AND provider.LName LIKE '%"+POut.String(lastName)+"%'";
+				command+=" AND stu.LName LIKE '%"+POut.String(lastName)+"%'";
 			}
 			if(!String.IsNullOrWhiteSpace(firstName)) {
-				command+=" AND provider.FName LIKE '%"+POut.String(firstName)+"%'";
+				command+=" AND stu.FName LIKE '%"+POut.String(firstName)+"%'";
 			}
 			if(uniqueID!=0) {
 				command+=" AND evaluation.StudentNum = '"+POut.Long(uniqueID)+"'";
@@ -89,7 +90,7 @@ namespace OpenDentBusiness{
 				command+=" AND schoolcourse.SchoolCourseNum = '"+POut.Long(courseNum)+"'";
 			}
 			if(instructorNum!=0) {
-				command+=" AND evaluation.InstructorNum = '"+POut.Long(instructorNum)+"'";
+				command+=" AND evaluation.InstructNum = '"+POut.Long(instructorNum)+"'";
 			}
 			command+=" AND evaluation.DateEval BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
 			command+=" ORDER BY DateEval,LName";

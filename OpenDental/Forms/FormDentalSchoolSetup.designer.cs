@@ -47,7 +47,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(232, 184);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 6;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -62,7 +62,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(313, 184);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 7;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -85,7 +85,7 @@ namespace OpenDental{
 			this.butStudentPicker.Location = new System.Drawing.Point(329, 47);
 			this.butStudentPicker.Name = "butStudentPicker";
 			this.butStudentPicker.Size = new System.Drawing.Size(22, 22);
-			this.butStudentPicker.TabIndex = 106;
+			this.butStudentPicker.TabIndex = 2;
 			this.butStudentPicker.Text = "...";
 			this.butStudentPicker.Click += new System.EventHandler(this.butStudentPicker_Click);
 			// 
@@ -108,7 +108,7 @@ namespace OpenDental{
 			this.butInstructorPicker.Location = new System.Drawing.Point(329, 77);
 			this.butInstructorPicker.Name = "butInstructorPicker";
 			this.butInstructorPicker.Size = new System.Drawing.Size(22, 22);
-			this.butInstructorPicker.TabIndex = 109;
+			this.butInstructorPicker.TabIndex = 4;
 			this.butInstructorPicker.Text = "...";
 			this.butInstructorPicker.Click += new System.EventHandler(this.butInstructorPicker_Click);
 			// 
@@ -119,7 +119,7 @@ namespace OpenDental{
 			this.textStudents.Name = "textStudents";
 			this.textStudents.ReadOnly = true;
 			this.textStudents.Size = new System.Drawing.Size(121, 20);
-			this.textStudents.TabIndex = 110;
+			this.textStudents.TabIndex = 1;
 			// 
 			// textInstructors
 			// 
@@ -128,7 +128,7 @@ namespace OpenDental{
 			this.textInstructors.Name = "textInstructors";
 			this.textInstructors.ReadOnly = true;
 			this.textInstructors.Size = new System.Drawing.Size(121, 20);
-			this.textInstructors.TabIndex = 111;
+			this.textInstructors.TabIndex = 3;
 			// 
 			// label3
 			// 
@@ -149,7 +149,7 @@ namespace OpenDental{
 			this.butEvaluation.Location = new System.Drawing.Point(202, 105);
 			this.butEvaluation.Name = "butEvaluation";
 			this.butEvaluation.Size = new System.Drawing.Size(105, 24);
-			this.butEvaluation.TabIndex = 113;
+			this.butEvaluation.TabIndex = 5;
 			this.butEvaluation.Text = "Evaluations";
 			this.butEvaluation.Click += new System.EventHandler(this.butEvaluation_Click);
 			// 
@@ -168,7 +168,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(416, 258);
 			this.Name = "FormDentalSchoolSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Dental School Setup";

@@ -47,7 +47,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(314, 75);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 5;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -62,7 +62,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(314, 105);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 6;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -72,7 +72,7 @@ namespace OpenDental{
 			this.checkIsCategoryName.Location = new System.Drawing.Point(118, 81);
 			this.checkIsCategoryName.Name = "checkIsCategoryName";
 			this.checkIsCategoryName.Size = new System.Drawing.Size(190, 17);
-			this.checkIsCategoryName.TabIndex = 115;
+			this.checkIsCategoryName.TabIndex = 4;
 			this.checkIsCategoryName.Text = "(This will not show a grade)";
 			// 
 			// textDescript
@@ -81,7 +81,7 @@ namespace OpenDental{
 			this.textDescript.MaxLength = 255;
 			this.textDescript.Name = "textDescript";
 			this.textDescript.Size = new System.Drawing.Size(121, 20);
-			this.textDescript.TabIndex = 116;
+			this.textDescript.TabIndex = 1;
 			// 
 			// label1
 			// 
@@ -99,7 +99,7 @@ namespace OpenDental{
 			this.textGradeScaleName.Name = "textGradeScaleName";
 			this.textGradeScaleName.ReadOnly = true;
 			this.textGradeScaleName.Size = new System.Drawing.Size(121, 20);
-			this.textGradeScaleName.TabIndex = 118;
+			this.textGradeScaleName.TabIndex = 2;
 			// 
 			// butGradingScale
 			// 
@@ -111,7 +111,7 @@ namespace OpenDental{
 			this.butGradingScale.Location = new System.Drawing.Point(244, 53);
 			this.butGradingScale.Name = "butGradingScale";
 			this.butGradingScale.Size = new System.Drawing.Size(24, 24);
-			this.butGradingScale.TabIndex = 117;
+			this.butGradingScale.TabIndex = 3;
 			this.butGradingScale.Text = "...";
 			this.butGradingScale.Click += new System.EventHandler(this.butGradingScale_Click);
 			// 
@@ -146,7 +146,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 105);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 122;
+			this.butDelete.TabIndex = 7;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -165,7 +165,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(417, 179);
 			this.Name = "FormEvaluationCriterionDefEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Criterion Def Edit";

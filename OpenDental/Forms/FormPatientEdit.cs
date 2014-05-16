@@ -1986,7 +1986,12 @@ namespace OpenDental{
 				}
 			}
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboPriProv.Items.Add(ProviderC.ListShort[i].Abbr);
+				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+					comboPriProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
+				}
+				else {
+					comboPriProv.Items.Add(ProviderC.ListShort[i].Abbr);
+				}
 				if(ProviderC.ListShort[i].ProvNum==PatCur.PriProv) {
 					comboPriProv.SelectedIndex=i;
 				}
@@ -2005,7 +2010,12 @@ namespace OpenDental{
 			comboSecProv.Items.Add(Lan.g(this,"none"));
 			comboSecProv.SelectedIndex=0;
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboSecProv.Items.Add(ProviderC.ListShort[i].Abbr);
+				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+					comboSecProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
+				}
+				else {
+					comboSecProv.Items.Add(ProviderC.ListShort[i].Abbr);
+				}
 				if(ProviderC.ListShort[i].ProvNum==PatCur.SecProv)
 					comboSecProv.SelectedIndex=i+1;
 			}

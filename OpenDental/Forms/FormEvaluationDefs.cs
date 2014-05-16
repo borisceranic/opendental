@@ -9,6 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormEvaluationDefs:Form {
+		public bool IsSelectionMode=false;
 
 		public FormEvaluationDefs() {
 			InitializeComponent();
@@ -16,12 +17,24 @@ namespace OpenDental {
 		}
 
 		private void FormEvaluationDefs_Load(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				butDuplicate.Visible=false;
+				butAdd.Visible=false;
+			}
+			comboCourse.Items.Add("All");
+			for(int i=0;i<SchoolCourses.List.Length;i++) {
+				comboCourse.Items.Add(SchoolCourses.List[i].Descript);
+			}
+			comboCourse.SelectedIndex=0;
 			FillGrid();
 		}
 
 		private void FillGrid() {
-			//TODO: Change the textbox here to a combobox.
-			DataTable table=EvaluationDefs.GetAllByCourse(textCourseDescript.Text);
+			long courseNum=0;
+			if(comboCourse.SelectedIndex!=0) {
+				courseNum=SchoolCourses.List[comboCourse.SelectedIndex-1].SchoolCourseNum;
+			}
+			DataTable table=EvaluationDefs.GetAllByCourse(courseNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluationSetup","Course"),90);
@@ -40,20 +53,19 @@ namespace OpenDental {
 			gridMain.EndUpdate();
 		}
 
-		private void textCourseDescript_TextChanged(object sender,EventArgs e) {
-			timer1.Stop();
-			timer1.Start();
-		}
-
-		private void timer1_Tick(object sender,EventArgs e) {
-			timer1.Stop();
-			FillGrid();
-		}
-
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(IsSelectionMode) {
+				CopyDefToEvaluation();
+				DialogResult=DialogResult.OK;
+				return;
+			}
 			EvaluationDef evalDef=EvaluationDefs.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString()));
 			FormEvaluationDefEdit FormEDE=new FormEvaluationDefEdit(evalDef);
 			FormEDE.ShowDialog();
+			FillGrid();
+		}
+
+		private void comboCourse_SelectionChangeCommitted(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -82,7 +94,37 @@ namespace OpenDental {
 			}
 		}
 
+		/// <summary>The selected Def from the grid will be copied into a brand new Evaluation and saved to the DB. This includes all EvaluationCriterion as well. Used when creating a new Evaluation.</summary>
+		private void CopyDefToEvaluation() {
+			EvaluationDef evalDef=EvaluationDefs.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString()));
+			Evaluation evalNew=new Evaluation();
+			evalNew.DateEval=DateTime.Today;
+			evalNew.EvalTitle=evalDef.EvalTitle;
+			evalNew.GradingScaleNum=evalDef.GradingScaleNum;
+			evalNew.InstructNum=Security.CurUser.ProvNum;
+			evalNew.SchoolCourseNum=evalDef.SchoolCourseNum;
+			evalNew.EvaluationNum=Evaluations.Insert(evalNew);
+			List<EvaluationCriterionDef> evalCritDefs=EvaluationCriterionDefs.GetAllForEvaluationDef(evalDef.EvaluationDefNum);
+			EvaluationCriterion evalCrit;
+			for(int i=0;i<evalCritDefs.Count;i++) {
+				evalCrit=new EvaluationCriterion();
+				evalCrit.CriterionDescript=evalCritDefs[i].CriterionDescript;
+				evalCrit.EvaluationNum=evalNew.EvaluationNum;
+				evalCrit.GradingScaleNum=evalCritDefs[i].GradingScaleNum;
+				evalCrit.IsCategoryName=evalCritDefs[i].IsCategoryName;
+				evalCrit.ItemOrder=evalCritDefs[i].ItemOrder;
+				EvaluationCriterions.Insert(evalCrit);
+			}
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				if(gridMain.GetSelectedIndex()<0) {
+					DialogResult=DialogResult.Cancel;
+					return;
+				}
+				CopyDefToEvaluation();
+			}
 			DialogResult=DialogResult.OK;
 		}
 

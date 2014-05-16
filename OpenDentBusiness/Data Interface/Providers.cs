@@ -14,7 +14,10 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM provider ORDER BY ItemOrder";
+			string command="SELECT * FROM provider";
+			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				command+=" ORDER BY ItemOrder";
+			}
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="Provider";
 			FillCache(table);

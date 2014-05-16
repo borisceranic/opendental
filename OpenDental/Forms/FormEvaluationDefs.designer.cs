@@ -23,16 +23,14 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEvaluationDefs));
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDuplicate = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.comboCourse = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.textCourseDescript = new System.Windows.Forms.TextBox();
-			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -46,7 +44,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(375, 423);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 4;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -61,7 +59,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(375, 453);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -76,7 +74,7 @@ namespace OpenDental{
 			this.butDuplicate.Location = new System.Drawing.Point(374, 252);
 			this.butDuplicate.Name = "butDuplicate";
 			this.butDuplicate.Size = new System.Drawing.Size(75, 24);
-			this.butDuplicate.TabIndex = 4;
+			this.butDuplicate.TabIndex = 2;
 			this.butDuplicate.Text = "Duplicate";
 			this.butDuplicate.Click += new System.EventHandler(this.butDuplicate_Click);
 			// 
@@ -93,7 +91,7 @@ namespace OpenDental{
 			this.butAdd.Location = new System.Drawing.Point(375, 282);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
-			this.butAdd.TabIndex = 5;
+			this.butAdd.TabIndex = 3;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
@@ -113,35 +111,32 @@ namespace OpenDental{
 			this.gridMain.TranslationName = "TableEvaluationSetup";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// comboCourse
+			// 
+			this.comboCourse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboCourse.FormattingEnabled = true;
+			this.comboCourse.ItemHeight = 13;
+			this.comboCourse.Location = new System.Drawing.Point(284, 33);
+			this.comboCourse.Name = "comboCourse";
+			this.comboCourse.Size = new System.Drawing.Size(166, 21);
+			this.comboCourse.TabIndex = 1;
+			this.comboCourse.SelectionChangeCommitted += new System.EventHandler(this.comboCourse_SelectionChangeCommitted);
+			// 
 			// label1
 			// 
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label1.Location = new System.Drawing.Point(284, 12);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(166, 18);
-			this.label1.TabIndex = 18;
+			this.label1.Size = new System.Drawing.Size(93, 18);
+			this.label1.TabIndex = 24;
 			this.label1.Text = "Course";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// textCourseDescript
-			// 
-			this.textCourseDescript.Location = new System.Drawing.Point(287, 33);
-			this.textCourseDescript.MaxLength = 15;
-			this.textCourseDescript.Name = "textCourseDescript";
-			this.textCourseDescript.Size = new System.Drawing.Size(166, 20);
-			this.textCourseDescript.TabIndex = 21;
-			this.textCourseDescript.TextChanged += new System.EventHandler(this.textCourseDescript_TextChanged);
-			// 
-			// timer1
-			// 
-			this.timer1.Interval = 500;
-			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
 			// FormEvaluationDefs
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(461, 489);
-			this.Controls.Add(this.textCourseDescript);
+			this.Controls.Add(this.comboCourse);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
@@ -149,13 +144,12 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(477, 527);
 			this.Name = "FormEvaluationDefs";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Definitions";
 			this.Load += new System.EventHandler(this.FormEvaluationDefs_Load);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
@@ -166,8 +160,7 @@ namespace OpenDental{
 		private UI.Button butDuplicate;
 		private UI.Button butAdd;
 		private UI.ODGrid gridMain;
+		private System.Windows.Forms.ComboBox comboCourse;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textCourseDescript;
-		private System.Windows.Forms.Timer timer1;
 	}
 }

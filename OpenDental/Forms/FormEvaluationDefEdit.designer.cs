@@ -75,7 +75,7 @@ namespace OpenDental{
 			this.textGradeScaleName.Name = "textGradeScaleName";
 			this.textGradeScaleName.ReadOnly = true;
 			this.textGradeScaleName.Size = new System.Drawing.Size(121, 20);
-			this.textGradeScaleName.TabIndex = 112;
+			this.textGradeScaleName.TabIndex = 2;
 			// 
 			// label1
 			// 
@@ -101,7 +101,7 @@ namespace OpenDental{
 			this.textTitle.MaxLength = 255;
 			this.textTitle.Name = "textTitle";
 			this.textTitle.Size = new System.Drawing.Size(121, 20);
-			this.textTitle.TabIndex = 124;
+			this.textTitle.TabIndex = 1;
 			// 
 			// label3
 			// 
@@ -119,7 +119,7 @@ namespace OpenDental{
 			this.textCourse.Name = "textCourse";
 			this.textCourse.ReadOnly = true;
 			this.textCourse.Size = new System.Drawing.Size(121, 20);
-			this.textCourse.TabIndex = 127;
+			this.textCourse.TabIndex = 4;
 			// 
 			// gridMain
 			// 
@@ -134,7 +134,7 @@ namespace OpenDental{
 			this.gridMain.TabIndex = 60;
 			this.gridMain.Title = "Criterion Used";
 			this.gridMain.TranslationName = "FormEvaluationDefEdit";
-			this.gridMain.DoubleClick += new System.EventHandler(this.gridMain_DoubleClick);
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// butCoursePicker
 			// 
@@ -146,7 +146,7 @@ namespace OpenDental{
 			this.butCoursePicker.Location = new System.Drawing.Point(280, 65);
 			this.butCoursePicker.Name = "butCoursePicker";
 			this.butCoursePicker.Size = new System.Drawing.Size(24, 24);
-			this.butCoursePicker.TabIndex = 126;
+			this.butCoursePicker.TabIndex = 5;
 			this.butCoursePicker.Text = "...";
 			this.butCoursePicker.Click += new System.EventHandler(this.butCoursePicker_Click);
 			// 
@@ -163,7 +163,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(456, 542);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 123;
+			this.butDelete.TabIndex = 13;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -180,7 +180,7 @@ namespace OpenDental{
 			this.butCriterionAdd.Location = new System.Drawing.Point(566, 281);
 			this.butCriterionAdd.Name = "butCriterionAdd";
 			this.butCriterionAdd.Size = new System.Drawing.Size(75, 24);
-			this.butCriterionAdd.TabIndex = 113;
+			this.butCriterionAdd.TabIndex = 7;
 			this.butCriterionAdd.Text = "Add";
 			this.butCriterionAdd.Click += new System.EventHandler(this.butCriterionAdd_Click);
 			// 
@@ -194,13 +194,14 @@ namespace OpenDental{
 			this.butGradingScale.Location = new System.Drawing.Point(280, 39);
 			this.butGradingScale.Name = "butGradingScale";
 			this.butGradingScale.Size = new System.Drawing.Size(24, 24);
-			this.butGradingScale.TabIndex = 68;
+			this.butGradingScale.TabIndex = 3;
 			this.butGradingScale.Text = "...";
 			this.butGradingScale.Click += new System.EventHandler(this.butGradingScale_Click);
 			// 
 			// butRemove
 			// 
 			this.butRemove.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butRemove.Autosize = true;
 			this.butRemove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRemove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -208,7 +209,7 @@ namespace OpenDental{
 			this.butRemove.Location = new System.Drawing.Point(231, 512);
 			this.butRemove.Name = "butRemove";
 			this.butRemove.Size = new System.Drawing.Size(73, 24);
-			this.butRemove.TabIndex = 66;
+			this.butRemove.TabIndex = 10;
 			this.butRemove.Text = "Remove";
 			this.butRemove.Click += new System.EventHandler(this.butRemove_Click);
 			// 
@@ -223,7 +224,7 @@ namespace OpenDental{
 			this.butLeft.Location = new System.Drawing.Point(321, 281);
 			this.butLeft.Name = "butLeft";
 			this.butLeft.Size = new System.Drawing.Size(35, 24);
-			this.butLeft.TabIndex = 65;
+			this.butLeft.TabIndex = 6;
 			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
 			// butDown
@@ -239,7 +240,7 @@ namespace OpenDental{
 			this.butDown.Location = new System.Drawing.Point(109, 511);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(82, 24);
-			this.butDown.TabIndex = 62;
+			this.butDown.TabIndex = 9;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
@@ -256,7 +257,7 @@ namespace OpenDental{
 			this.butUp.Location = new System.Drawing.Point(12, 511);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(82, 24);
-			this.butUp.TabIndex = 61;
+			this.butUp.TabIndex = 8;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
@@ -271,7 +272,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(566, 512);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 11;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -286,7 +287,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(566, 542);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 12;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 

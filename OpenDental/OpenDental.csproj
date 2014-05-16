@@ -378,17 +378,17 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormEvaluationCriterionEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormEvaluationCriterionEdit.designer.cs">
-      <DependentUpon>FormEvaluationCriterionEdit.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormEvaluationEdit.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormEvaluationEdit.designer.cs">
       <DependentUpon>FormEvaluationEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationCriterionEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationCriterionEdit.designer.cs">
+      <DependentUpon>FormEvaluationCriterionEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormEvaluations.cs">
       <SubType>Form</SubType>
@@ -3478,11 +3478,11 @@
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormEvaluationCriterionEdit.resx">
-      <DependentUpon>FormEvaluationCriterionEdit.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEvaluationEdit.resx">
       <DependentUpon>FormEvaluationEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEvaluationCriterionEdit.resx">
+      <DependentUpon>FormEvaluationCriterionEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEvaluations.resx">
       <DependentUpon>FormEvaluations.cs</DependentUpon>

@@ -406,10 +406,12 @@ namespace OpenDental{
 			}
 			else {
 				Provider prov=Providers.GetProv(UserCur.ProvNum);
-				if(prov!=null && prov.ProvNum!=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum) {
-					prov.IsInstructor=false;
+				if(prov!=null) {
+					if(prov.ProvNum!=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum) {
+						prov.IsInstructor=false;
+					}
+					Providers.Update(prov);
 				}
-				Providers.Update(prov);
 				UserCur.ProvNum=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum;
 			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {

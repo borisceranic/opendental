@@ -22,6 +22,7 @@ namespace OpenDental{
 		private TextBox textUniqueID;
 		///<summary>This can be set ahead of time to preselect a provider.  After closing with OK, this will have the selected provider number.</summary>
 		public long SelectedProvNum;
+		public bool IsStudentPicker=false;
 		
 		///<summary></summary>
 		public FormProviderPick() {
@@ -166,6 +167,9 @@ namespace OpenDental{
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
+				if(IsStudentPicker && ProviderC.ListShort[i].SchoolClassNum==0) {
+					continue;
+				}
 				row=new ODGridRow();
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 					row.Cells.Add(ProviderC.ListShort[i].ProvNum.ToString());
@@ -174,6 +178,9 @@ namespace OpenDental{
 				row.Cells.Add(ProviderC.ListShort[i].LName);
 				row.Cells.Add(ProviderC.ListShort[i].FName);
 				//wanted to do a background color here, but grid couldn't handle it.
+				if(IsStudentPicker) {
+					row.Tag=ProviderC.ListShort[i].ProvNum;
+				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -181,6 +188,9 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			SelectedProvNum=ProviderC.ListShort[e.Row].ProvNum;
+			if(IsStudentPicker) {
+				SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
+			}
 			DialogResult=DialogResult.OK;
 		}
 
@@ -198,6 +208,9 @@ namespace OpenDental{
 				return;
 			}
 			SelectedProvNum=ProviderC.ListShort[gridMain.GetSelectedIndex()].ProvNum;
+			if(IsStudentPicker) {
+				SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
+			}
 			DialogResult=DialogResult.OK;
 		}
 

@@ -54,7 +54,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void gridMain_DoubleClick(object sender,EventArgs e) {
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(_criterionDefsForEval[gridMain.GetSelectedIndex()]);
 			FormECDE.ShowDialog();
 			_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
@@ -85,8 +85,8 @@ namespace OpenDental {
 			FormGS.ShowDialog();
 			if(FormGS.DialogResult==DialogResult.OK) {
 				textGradeScaleName.Text=FormGS.SelectedGradingScale.GradingScaleNum+"-"+FormGS.SelectedGradingScale.Description;
+				_evalDefCur.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
 			}
-			_evalDefCur.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
 		}
 
 		private void butCoursePicker_Click(object sender,EventArgs e) {

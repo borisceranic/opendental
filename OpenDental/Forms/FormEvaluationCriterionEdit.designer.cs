@@ -26,6 +26,17 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEvaluationCriterionEdit));
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.label7 = new System.Windows.Forms.Label();
+			this.textCriterionDescript = new System.Windows.Forms.TextBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.textGradingScale = new System.Windows.Forms.TextBox();
+			this.label6 = new System.Windows.Forms.Label();
+			this.textGradeShowing = new System.Windows.Forms.TextBox();
+			this.comboGradeNumber = new System.Windows.Forms.ComboBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.textGradeNumberPercent = new System.Windows.Forms.TextBox();
+			this.textNote = new OpenDental.ODtextBox();
+			this.labelApptNote = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -36,7 +47,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(887, 630);
+			this.butOK.Location = new System.Drawing.Point(315, 189);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -51,17 +62,130 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(887, 660);
+			this.butCancel.Location = new System.Drawing.Point(315, 219);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(12, 15);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(122, 17);
+			this.label7.TabIndex = 150;
+			this.label7.Text = "Description";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textCriterionDescript
+			// 
+			this.textCriterionDescript.Location = new System.Drawing.Point(135, 14);
+			this.textCriterionDescript.MaxLength = 255;
+			this.textCriterionDescript.Name = "textCriterionDescript";
+			this.textCriterionDescript.ReadOnly = true;
+			this.textCriterionDescript.Size = new System.Drawing.Size(121, 20);
+			this.textCriterionDescript.TabIndex = 149;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(12, 41);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(122, 17);
+			this.label5.TabIndex = 148;
+			this.label5.Text = "Grading Scale";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textGradingScale
+			// 
+			this.textGradingScale.Location = new System.Drawing.Point(135, 40);
+			this.textGradingScale.MaxLength = 255;
+			this.textGradingScale.Name = "textGradingScale";
+			this.textGradingScale.ReadOnly = true;
+			this.textGradingScale.Size = new System.Drawing.Size(121, 20);
+			this.textGradingScale.TabIndex = 145;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(12, 94);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(122, 17);
+			this.label6.TabIndex = 147;
+			this.label6.Text = "Grade Showing";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textGradeShowing
+			// 
+			this.textGradeShowing.Location = new System.Drawing.Point(135, 93);
+			this.textGradeShowing.MaxLength = 255;
+			this.textGradeShowing.Name = "textGradeShowing";
+			this.textGradeShowing.Size = new System.Drawing.Size(121, 20);
+			this.textGradeShowing.TabIndex = 146;
+			// 
+			// comboGradeNumber
+			// 
+			this.comboGradeNumber.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboGradeNumber.FormattingEnabled = true;
+			this.comboGradeNumber.ItemHeight = 13;
+			this.comboGradeNumber.Location = new System.Drawing.Point(135, 66);
+			this.comboGradeNumber.Name = "comboGradeNumber";
+			this.comboGradeNumber.Size = new System.Drawing.Size(133, 21);
+			this.comboGradeNumber.TabIndex = 152;
+			this.comboGradeNumber.SelectionChangeCommitted += new System.EventHandler(this.comboGradeNumber_SelectionChangeCommitted);
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(15, 66);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(118, 18);
+			this.label1.TabIndex = 151;
+			this.label1.Text = "Grade Number";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textGradeNumberPercent
+			// 
+			this.textGradeNumberPercent.Location = new System.Drawing.Point(135, 66);
+			this.textGradeNumberPercent.MaxLength = 255;
+			this.textGradeNumberPercent.Name = "textGradeNumberPercent";
+			this.textGradeNumberPercent.Size = new System.Drawing.Size(121, 20);
+			this.textGradeNumberPercent.TabIndex = 153;
+			// 
+			// textNote
+			// 
+			this.textNote.AcceptsTab = true;
+			this.textNote.DetectUrls = false;
+			this.textNote.Location = new System.Drawing.Point(49, 137);
+			this.textNote.Name = "textNote";
+			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Appointment;
+			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textNote.Size = new System.Drawing.Size(260, 106);
+			this.textNote.TabIndex = 155;
+			this.textNote.Text = "";
+			// 
+			// labelApptNote
+			// 
+			this.labelApptNote.Location = new System.Drawing.Point(48, 119);
+			this.labelApptNote.Name = "labelApptNote";
+			this.labelApptNote.Size = new System.Drawing.Size(197, 16);
+			this.labelApptNote.TabIndex = 154;
+			this.labelApptNote.Text = "Note";
+			this.labelApptNote.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormEvaluationCriterionEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.ClientSize = new System.Drawing.Size(402, 255);
+			this.Controls.Add(this.textNote);
+			this.Controls.Add(this.labelApptNote);
+			this.Controls.Add(this.textGradeNumberPercent);
+			this.Controls.Add(this.comboGradeNumber);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.textCriterionDescript);
+			this.Controls.Add(this.label5);
+			this.Controls.Add(this.textGradingScale);
+			this.Controls.Add(this.label6);
+			this.Controls.Add(this.textGradeShowing);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -69,7 +193,9 @@ namespace OpenDental{
 			this.Name = "FormEvaluationCriterionEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Criterion Edit";
+			this.Load += new System.EventHandler(this.FormEvaluationCriterionEdit_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -77,5 +203,16 @@ namespace OpenDental{
 
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.TextBox textCriterionDescript;
+		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.TextBox textGradingScale;
+		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.TextBox textGradeShowing;
+		private System.Windows.Forms.ComboBox comboGradeNumber;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.TextBox textGradeNumberPercent;
+		private ODtextBox textNote;
+		private System.Windows.Forms.Label labelApptNote;
 	}
 }

@@ -57,7 +57,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(664, 534);
+			this.butOK.Location = new System.Drawing.Point(887, 534);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -72,7 +72,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(664, 564);
+			this.butCancel.Location = new System.Drawing.Point(887, 564);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -89,10 +89,11 @@ namespace OpenDental{
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(450, 522);
+			this.gridMain.Size = new System.Drawing.Size(673, 522);
 			this.gridMain.TabIndex = 15;
 			this.gridMain.Title = "Evaluations";
 			this.gridMain.TranslationName = "TableEvaluationSetup";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// label1
 			// 
@@ -145,7 +146,7 @@ namespace OpenDental{
 			this.groupStudents.Controls.Add(this.textFirstName);
 			this.groupStudents.Controls.Add(this.label9);
 			this.groupStudents.Controls.Add(this.textLastName);
-			this.groupStudents.Location = new System.Drawing.Point(465, 62);
+			this.groupStudents.Location = new System.Drawing.Point(688, 62);
 			this.groupStudents.Name = "groupStudents";
 			this.groupStudents.Size = new System.Drawing.Size(273, 120);
 			this.groupStudents.TabIndex = 32;
@@ -213,33 +214,33 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(664, 340);
+			this.butAdd.Location = new System.Drawing.Point(887, 340);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 33;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
-			// validDateEnd
+			// textDateEnd
 			// 
 			this.textDateEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textDateEnd.Location = new System.Drawing.Point(638, 36);
-			this.textDateEnd.Name = "validDateEnd";
+			this.textDateEnd.Location = new System.Drawing.Point(861, 36);
+			this.textDateEnd.Name = "textDateEnd";
 			this.textDateEnd.Size = new System.Drawing.Size(100, 20);
 			this.textDateEnd.TabIndex = 2;
 			// 
-			// validDateBeginning
+			// textDateStart
 			// 
 			this.textDateStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textDateStart.Location = new System.Drawing.Point(509, 36);
-			this.textDateStart.Name = "validDateBeginning";
+			this.textDateStart.Location = new System.Drawing.Point(732, 36);
+			this.textDateStart.Name = "textDateStart";
 			this.textDateStart.Size = new System.Drawing.Size(100, 20);
 			this.textDateStart.TabIndex = 1;
 			// 
 			// label6
 			// 
 			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label6.Location = new System.Drawing.Point(610, 36);
+			this.label6.Location = new System.Drawing.Point(833, 36);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(23, 18);
 			this.label6.TabIndex = 38;
@@ -249,7 +250,7 @@ namespace OpenDental{
 			// label7
 			// 
 			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label7.Location = new System.Drawing.Point(465, 36);
+			this.label7.Location = new System.Drawing.Point(688, 36);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(40, 18);
 			this.label7.TabIndex = 39;
@@ -261,7 +262,7 @@ namespace OpenDental{
 			this.groupAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupAdmin.Controls.Add(this.comboInstructor);
 			this.groupAdmin.Controls.Add(this.label2);
-			this.groupAdmin.Location = new System.Drawing.Point(465, 183);
+			this.groupAdmin.Location = new System.Drawing.Point(688, 183);
 			this.groupAdmin.Name = "groupAdmin";
 			this.groupAdmin.Size = new System.Drawing.Size(273, 57);
 			this.groupAdmin.TabIndex = 40;
@@ -277,7 +278,7 @@ namespace OpenDental{
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
 			this.butRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butRefresh.Location = new System.Drawing.Point(664, 246);
+			this.butRefresh.Location = new System.Drawing.Point(887, 246);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 41;
@@ -287,7 +288,7 @@ namespace OpenDental{
 			// FormEvaluations
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(751, 600);
+			this.ClientSize = new System.Drawing.Size(974, 600);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.groupAdmin);
 			this.Controls.Add(this.label7);
@@ -300,7 +301,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(767, 638);
+			this.MinimumSize = new System.Drawing.Size(990, 638);
 			this.Name = "FormEvaluations";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluations";
