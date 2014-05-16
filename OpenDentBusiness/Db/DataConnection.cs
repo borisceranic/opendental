@@ -343,6 +343,9 @@ namespace OpenDentBusiness {
 				//PrepOracleConnection();
 				cmdOr.CommandText=command;
 				daOr=new OracleDataAdapter(cmdOr);
+#if DEBUG
+				daOr.Fill(table);//When in debug, don't log the error.  This also throws the error from here so that programmers can fix the issue as they occur instead of rebuilding after each fix.
+#else
 				try {
 					daOr.Fill(table);
 				}
@@ -350,7 +353,8 @@ namespace OpenDentBusiness {
 					Logger.openlog.LogMB("Oracle SQL Error: "+cmdOr.CommandText+"\r\n"+"Exception: "+e.ToString(),Logger.Severity.ERROR);
 					throw;//continue to pass the exception one level up.
 				}
-				conOr.Close();
+#endif
+				conOr.Close();	
 			}
 			else if(DBtype==DatabaseType.MySql) {
 				cmd.CommandText=command;
