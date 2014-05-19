@@ -8427,7 +8427,28 @@ namespace OpenDental{
 			}
 			List<long> aptNums=new List<long>();
 			for(int i=0;i<gridPlanned.SelectedIndices.Length;i++){
-				aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
+				ApptStatus aptStatus=(ApptStatus)(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptStatus"].ToString()));
+				if(aptStatus==ApptStatus.Complete) {
+					//Warn the user they are moving a completed appointment.
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"You are about to move an already completed appointment.  Continue?")) {
+						return;
+					}
+					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+				}
+				else if(aptStatus==ApptStatus.Scheduled || aptStatus==ApptStatus.ASAP) {
+					//Warn the user they are moving an already scheduled appointment.
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"You are about to move an appointment already on the schedule.  Continue?")) {
+						return;
+					}
+					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+				}
+				else if(aptStatus==ApptStatus.UnschedList || aptStatus==ApptStatus.Broken) {
+					//Dont need to warn user, just put onto the pinboard.
+					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+				}
+				else { //No appointment
+					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
+				}
 			}
 			GotoModule.PinToAppt(aptNums,0);
 		}
