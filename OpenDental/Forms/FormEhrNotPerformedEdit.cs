@@ -47,7 +47,7 @@ namespace OpenDental {
 			}
 			List<EhrCode> listEhrCodes=EhrCodes.GetForValueSetOIDs(listValueSetOIDs,true);
 			if(listEhrCodes.Count==0) {//This should only happen if the EHR.dll does not exist or if the codes in the ehrcode list do not exist in the corresponding table
-				MsgBox.Show(this,"The codes used for Not Performed items do not exist in the table in your database.  You should run the Code System Importer tool in Setup | EHR.");
+				MsgBox.Show(this,"The codes used for Not Performed items do not exist in the table in your database.  You should run the Code System Importer tool in Setup | Chart | EHR.");
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
@@ -160,7 +160,7 @@ namespace OpenDental {
 			}
 			listEhrCodesReason=EhrCodes.GetForValueSetOIDs(listValueSetOIDsReason,true);//these are all SNOMEDCT codes and will only show if they exist in the snomed table.
 			if(listEhrCodesReason.Count==0) {
-				MsgBox.Show(this,"There are no codes in the database for reasons not performed.  You must run the Code System Importer tool in Setup | EHR to import the SNOMEDCT table in order to enter a valid reason.");
+				MsgBox.Show(this,"There are no codes in the database for reasons not performed.  You must run the Code System Importer tool in Setup | Chart | EHR to import the SNOMEDCT table in order to enter a valid reason.");
 			}
 			comboCodeReason.Items.Clear();
 			comboCodeReason.Items.Add("none");

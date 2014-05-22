@@ -57,7 +57,7 @@ namespace OpenDental {
 				}
 			}
 			if(countNotInSnomedTable>0) {
-				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended encounter codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | EHR.");
+				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended encounter codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | Chart | EHR.");
 			}
 			if(comboEncCodes.SelectedIndex==-1) {//default enc code set to code not in recommended list and not 'none'
 				switch(defaultEncCodeSystem) {
@@ -119,7 +119,7 @@ namespace OpenDental {
 				}
 			}
 			if(countNotInSnomedTable>0) {
-				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended pregnancy codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | EHR.");
+				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended pregnancy codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | Chart | EHR.");
 			}
 			if(comboPregCodes.SelectedIndex==-1) {//default preg code set to code not in recommended list and not 'none'
 				switch(defaultPregCodeSystem) {

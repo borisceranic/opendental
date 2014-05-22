@@ -279,7 +279,7 @@ namespace OpenDental {
 			}
 			listWeightCodes.AddRange(listLoincs);
 			if(!isInLoincTable) {
-				MsgBox.Show(this,"The LOINC table does not contain one or more codes used to report vitalsign exam statistics.  The LOINC table should be updated by running the Code System Importer tool found in Setup | EHR.");
+				MsgBox.Show(this,"The LOINC table does not contain one or more codes used to report vitalsign exam statistics.  The LOINC table should be updated by running the Code System Importer tool found in Setup | Chart | EHR.");
 			}
 		}
 

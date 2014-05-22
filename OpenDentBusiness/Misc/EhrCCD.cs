@@ -2482,7 +2482,7 @@ Vital Signs
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing SNOMED codes.  Go to Setup | EHR | Code System Importer to download.";
+				strErrors+="Missing SNOMED codes.  Go to Setup | Chart | EHR | Code System Importer to download.";
 			}
 			if(Cvxs.GetCodeCount()==0) {
 				//TODO: We need to replace this check with a more extensive check which validates the CVX codes that will actually go out on the CCD to ensure they are in our database.
@@ -2491,7 +2491,7 @@ Vital Signs
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing CVX codes.  Go to Setup | EHR | Code System Importer to download.";
+				strErrors+="Missing CVX codes.  Go to Setup | Chart | EHR | Code System Importer to download.";
 			}
 			return strErrors;
 		}

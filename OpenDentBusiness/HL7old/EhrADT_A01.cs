@@ -591,25 +591,25 @@ namespace OpenDentBusiness.HL7 {
 					if(obs.ValCodeSystem.Trim().ToUpper()=="LOINC") {
 						Loinc loincVal=Loincs.GetByCode(obs.ValReported);
 						if(loincVal==null) {
-							WriteError(sb,"Loinc code not found '"+loincVal.LoincCode+"'.  Please add by going to Setup | EHR.");
+							WriteError(sb,"Loinc code not found '"+loincVal.LoincCode+"'.  Please add by going to Setup | Chart | EHR.");
 						}
 					}
 					else if(obs.ValCodeSystem.Trim().ToUpper()=="SNOMEDCT") {
 						Snomed snomedVal=Snomeds.GetByCode(obs.ValReported);
 						if(snomedVal==null) {
-							WriteError(sb,"Snomed code not found '"+snomedVal.SnomedCode+"'.  Please add by going to Setup | EHR.");
+							WriteError(sb,"Snomed code not found '"+snomedVal.SnomedCode+"'.  Please add by going to Setup | Chart | EHR.");
 						}
 					}
 					else if(obs.ValCodeSystem.Trim().ToUpper()=="ICD9") {
 						ICD9 icd9Val=ICD9s.GetByCode(obs.ValReported);
 						if(icd9Val==null) {
-							WriteError(sb,"ICD9 code not found '"+icd9Val.ICD9Code+"'.  Please add by going to Setup | EHR.");
+							WriteError(sb,"ICD9 code not found '"+icd9Val.ICD9Code+"'.  Please add by going to Setup | Chart | EHR.");
 						}
 					}
 					else if(obs.ValCodeSystem.Trim().ToUpper()=="ICD10") {
 						Icd10 icd10Val=Icd10s.GetByCode(obs.ValReported);
 						if(icd10Val==null) {
-							WriteError(sb,"ICD10 code not found '"+icd10Val.Icd10Code+"'.  Please add by going to Setup | EHR.");
+							WriteError(sb,"ICD10 code not found '"+icd10Val.Icd10Code+"'.  Please add by going to Setup | Chart | EHR.");
 						}
 					}
 				}

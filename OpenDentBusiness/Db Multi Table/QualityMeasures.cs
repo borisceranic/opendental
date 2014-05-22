@@ -8960,13 +8960,13 @@ BMI 18.5-25.";
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing SNOMED codes.  Go to Setup | EHR | Code System Importer to download.";
+				strErrors+="Missing SNOMED codes.  Go to Setup | Chart | EHR | Code System Importer to download.";
 			}
 			if(Cvxs.GetCodeCount()==0) {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing CVX codes.  Go to Setup | EHR | Code System Importer to download.";
+				strErrors+="Missing CVX codes.  Go to Setup | Chart | EHR | Code System Importer to download.";
 			}
 			return strErrors;
 		}
