@@ -65,6 +65,19 @@ namespace OpenDentBusiness{
 			return Crud.GradingScaleCrud.SelectOne(gradingScaleNum);
 		}
 
+		public static bool IsDupicateDescription(GradingScale gradingScaleCur) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),gradingScaleCur);
+			}
+			string command="SELECT COUNT(*) from gradingscale WHERE Description = '"+POut.String(gradingScaleCur.Description)+"' "
+				+"AND GradingScaleNum != "+POut.Long(gradingScaleCur.GradingScaleNum);
+			int count=PIn.Int(Db.GetCount(command));
+			if(count>0) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary></summary>
 		public static long Insert(GradingScale gradingScale){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

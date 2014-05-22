@@ -88,9 +88,10 @@ namespace OpenDental{
 			this.checkIsPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkIsPercentage.Location = new System.Drawing.Point(360, 415);
 			this.checkIsPercentage.Name = "checkIsPercentage";
-			this.checkIsPercentage.Size = new System.Drawing.Size(190, 17);
+			this.checkIsPercentage.Size = new System.Drawing.Size(112, 17);
 			this.checkIsPercentage.TabIndex = 128;
 			this.checkIsPercentage.Text = "Is Percentage";
+			this.checkIsPercentage.Click += new System.EventHandler(this.checkIsPercentage_Click);
 			// 
 			// label1
 			// 

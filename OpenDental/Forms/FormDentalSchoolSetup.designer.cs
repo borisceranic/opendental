@@ -24,7 +24,6 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormDentalSchoolSetup));
-			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butStudentPicker = new OpenDental.UI.Button();
@@ -34,22 +33,8 @@ namespace OpenDental{
 			this.textInstructors = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.butEvaluation = new OpenDental.UI.Button();
+			this.butGradingScales = new OpenDental.UI.Button();
 			this.SuspendLayout();
-			// 
-			// butOK
-			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Autosize = true;
-			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(232, 184);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 6;
-			this.butOK.Text = "&OK";
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
@@ -63,8 +48,8 @@ namespace OpenDental{
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
-			this.butCancel.Text = "&Cancel";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			this.butCancel.Text = "Close";
+			this.butCancel.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// label1
 			// 
@@ -146,17 +131,32 @@ namespace OpenDental{
 			this.butEvaluation.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butEvaluation.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butEvaluation.CornerRadius = 4F;
-			this.butEvaluation.Location = new System.Drawing.Point(202, 105);
+			this.butEvaluation.Location = new System.Drawing.Point(202, 135);
 			this.butEvaluation.Name = "butEvaluation";
 			this.butEvaluation.Size = new System.Drawing.Size(105, 24);
 			this.butEvaluation.TabIndex = 5;
 			this.butEvaluation.Text = "Evaluations";
 			this.butEvaluation.Click += new System.EventHandler(this.butEvaluation_Click);
 			// 
+			// butGradingScales
+			// 
+			this.butGradingScales.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butGradingScales.Autosize = true;
+			this.butGradingScales.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butGradingScales.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butGradingScales.CornerRadius = 4F;
+			this.butGradingScales.Location = new System.Drawing.Point(202, 105);
+			this.butGradingScales.Name = "butGradingScales";
+			this.butGradingScales.Size = new System.Drawing.Size(105, 24);
+			this.butGradingScales.TabIndex = 113;
+			this.butGradingScales.Text = "Grading Scales";
+			this.butGradingScales.Click += new System.EventHandler(this.butGradingScales_Click);
+			// 
 			// FormDentalSchoolSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(400, 220);
+			this.Controls.Add(this.butGradingScales);
 			this.Controls.Add(this.butEvaluation);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textInstructors);
@@ -165,7 +165,6 @@ namespace OpenDental{
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.butStudentPicker);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(416, 258);
@@ -180,7 +179,6 @@ namespace OpenDental{
 
 		#endregion
 
-		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label1;
 		private UI.Button butStudentPicker;
@@ -190,5 +188,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textInstructors;
 		private System.Windows.Forms.Label label3;
 		private UI.Button butEvaluation;
+		private UI.Button butGradingScales;
 	}
 }

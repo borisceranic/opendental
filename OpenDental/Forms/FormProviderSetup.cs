@@ -438,7 +438,7 @@ namespace OpenDental{
 			this.textUniqueID.Name = "textUniqueID";
 			this.textUniqueID.Size = new System.Drawing.Size(166, 20);
 			this.textUniqueID.TabIndex = 24;
-			this.textUniqueID.TextChanged += new System.EventHandler(this.textUniqueID_TextChanged);
+			this.textUniqueID.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
 			// 
 			// gridMain
 			// 
@@ -654,7 +654,7 @@ namespace OpenDental{
 			FillGrid();
 		}
 
-		private void textUniqueID_TextChanged(object sender,EventArgs e) {
+		private void textProvNum_TextChanged(object sender,EventArgs e) {
 			FillGrid();
 		}
 

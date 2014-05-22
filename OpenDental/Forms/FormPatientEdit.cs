@@ -172,6 +172,8 @@ namespace OpenDental{
 		private List<Guardian> GuardianList;
 		private Label labelDeceased;
 		private TextBox textDateDeceased;
+		private UI.Button butPickSecondary;
+		private UI.Button butPickPrimary;
 		private EhrPatient _ehrPatientCur;
 
 		///<summary></summary>
@@ -378,6 +380,8 @@ namespace OpenDental{
 			this.labelMotherMaidenLname = new System.Windows.Forms.Label();
 			this.labelDeceased = new System.Windows.Forms.Label();
 			this.textDateDeceased = new System.Windows.Forms.TextBox();
+			this.butPickSecondary = new OpenDental.UI.Button();
+			this.butPickPrimary = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -868,6 +872,8 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.butPickSecondary);
+			this.groupBox1.Controls.Add(this.butPickPrimary);
 			this.groupBox1.Controls.Add(this.label40);
 			this.groupBox1.Controls.Add(this.label39);
 			this.groupBox1.Controls.Add(this.label38);
@@ -947,7 +953,7 @@ namespace OpenDental{
 			this.comboSecProv.Location = new System.Drawing.Point(196, 219);
 			this.comboSecProv.MaxDropDownItems = 30;
 			this.comboSecProv.Name = "comboSecProv";
-			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
+			this.comboSecProv.Size = new System.Drawing.Size(180, 21);
 			this.comboSecProv.TabIndex = 13;
 			// 
 			// comboPriProv
@@ -957,7 +963,7 @@ namespace OpenDental{
 			this.comboPriProv.Location = new System.Drawing.Point(196, 198);
 			this.comboPriProv.MaxDropDownItems = 30;
 			this.comboPriProv.Name = "comboPriProv";
-			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
+			this.comboPriProv.Size = new System.Drawing.Size(180, 21);
 			this.comboPriProv.TabIndex = 12;
 			// 
 			// comboBillType
@@ -1705,10 +1711,10 @@ namespace OpenDental{
 			this.labelMotherMaidenLname.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.labelMotherMaidenLname.Visible = false;
 			// 
-			// labelDateTimeDeceased
+			// labelDeceased
 			// 
 			this.labelDeceased.Location = new System.Drawing.Point(2, 317);
-			this.labelDeceased.Name = "labelDateTimeDeceased";
+			this.labelDeceased.Name = "labelDeceased";
 			this.labelDeceased.Size = new System.Drawing.Size(156, 14);
 			this.labelDeceased.TabIndex = 0;
 			this.labelDeceased.Text = "Date Time Deceased";
@@ -1724,6 +1730,34 @@ namespace OpenDental{
 			this.textDateDeceased.TabIndex = 10;
 			this.textDateDeceased.Visible = false;
 			this.textDateDeceased.Validated += new System.EventHandler(this.textDateDeceased_Validated);
+			// 
+			// butPickSecondary
+			// 
+			this.butPickSecondary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickSecondary.Autosize = false;
+			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickSecondary.CornerRadius = 2F;
+			this.butPickSecondary.Location = new System.Drawing.Point(376, 219);
+			this.butPickSecondary.Name = "butPickSecondary";
+			this.butPickSecondary.Size = new System.Drawing.Size(18, 21);
+			this.butPickSecondary.TabIndex = 160;
+			this.butPickSecondary.Text = "...";
+			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
+			// 
+			// butPickPrimary
+			// 
+			this.butPickPrimary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickPrimary.Autosize = false;
+			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickPrimary.CornerRadius = 2F;
+			this.butPickPrimary.Location = new System.Drawing.Point(376, 198);
+			this.butPickPrimary.Name = "butPickPrimary";
+			this.butPickPrimary.Size = new System.Drawing.Size(18, 21);
+			this.butPickPrimary.TabIndex = 159;
+			this.butPickPrimary.Text = "...";
+			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
 			// 
 			// FormPatientEdit
 			// 
@@ -2954,6 +2988,30 @@ namespace OpenDental{
 				}
 			}
 			FillGuardians();
+		}
+
+		private void butPickPrimary_Click(object sender,EventArgs e) {
+			FormProviderPick formp=new FormProviderPick();
+			if(comboPriProv.SelectedIndex>-1) {
+				formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex].ProvNum;
+			}
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboPriProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum);
+		}
+
+		private void butPickSecondary_Click(object sender,EventArgs e) {
+			FormProviderPick formp=new FormProviderPick();
+			if(comboSecProv.SelectedIndex>0) {
+				formp.SelectedProvNum=ProviderC.ListShort[comboSecProv.SelectedIndex-1].ProvNum;
+			}
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboSecProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum)+1;
 		}
 
 		///<summary>Gets an employerNum based on the name entered. Called from FillCur</summary>

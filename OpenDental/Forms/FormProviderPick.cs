@@ -12,16 +12,25 @@ namespace OpenDental{
 ///<summary>Pick a provider from the list.</summary>
 	public class FormProviderPick:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butClose;
-		private System.ComponentModel.Container components = null;
+		private IContainer components;
 		private OpenDental.UI.ODGrid gridMain;
 		//private bool changed;
 		//private User user;
 		//private DataTable table;
 		private OpenDental.UI.Button butOK;
 		private Label labelUniqueID;
-		private TextBox textUniqueID;
+		private TextBox textProvNum;
 		///<summary>This can be set ahead of time to preselect a provider.  After closing with OK, this will have the selected provider number.</summary>
 		public long SelectedProvNum;
+		private GroupBox groupDentalSchools;
+		private TextBox textLName;
+		private Label label2;
+		private TextBox textFName;
+		private Label label1;
+		private Timer timer1;
+		private Label labelClass;
+		private ComboBox comboClass;
+		private List<SchoolClass> _schoolClasses;
 		public bool IsStudentPicker=false;
 		
 		///<summary></summary>
@@ -43,12 +52,22 @@ namespace OpenDental{
 		#region Windows Form Designer generated code
 
 		private void InitializeComponent(){
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProviderPick));
 			this.butClose = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butOK = new OpenDental.UI.Button();
 			this.labelUniqueID = new System.Windows.Forms.Label();
-			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.textProvNum = new System.Windows.Forms.TextBox();
+			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
+			this.textLName = new System.Windows.Forms.TextBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.textFName = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.comboClass = new System.Windows.Forms.ComboBox();
+			this.labelClass = new System.Windows.Forms.Label();
+			this.groupDentalSchools.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -60,7 +79,7 @@ namespace OpenDental{
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(411, 628);
+			this.butClose.Location = new System.Drawing.Point(491, 628);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(82, 24);
 			this.butClose.TabIndex = 3;
@@ -76,7 +95,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(16, 12);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(362, 642);
+			this.gridMain.Size = new System.Drawing.Size(345, 642);
 			this.gridMain.TabIndex = 13;
 			this.gridMain.Title = "Providers";
 			this.gridMain.TranslationName = null;
@@ -90,7 +109,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(411, 596);
+			this.butOK.Location = new System.Drawing.Point(491, 596);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(82, 24);
 			this.butOK.TabIndex = 14;
@@ -99,29 +118,106 @@ namespace OpenDental{
 			// 
 			// labelUniqueID
 			// 
-			this.labelUniqueID.Location = new System.Drawing.Point(384, 12);
+			this.labelUniqueID.Location = new System.Drawing.Point(6, 19);
 			this.labelUniqueID.Name = "labelUniqueID";
-			this.labelUniqueID.Size = new System.Drawing.Size(90, 18);
+			this.labelUniqueID.Size = new System.Drawing.Size(68, 18);
 			this.labelUniqueID.TabIndex = 27;
-			this.labelUniqueID.Text = "Unique ID";
-			this.labelUniqueID.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelUniqueID.Text = "ProvNum";
+			this.labelUniqueID.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textUniqueID
+			// textProvNum
 			// 
-			this.textUniqueID.Location = new System.Drawing.Point(384, 33);
-			this.textUniqueID.MaxLength = 15;
-			this.textUniqueID.Name = "textUniqueID";
-			this.textUniqueID.Size = new System.Drawing.Size(118, 20);
-			this.textUniqueID.TabIndex = 26;
-			this.textUniqueID.TextChanged += new System.EventHandler(this.textUniqueID_TextChanged);
+			this.textProvNum.Location = new System.Drawing.Point(76, 19);
+			this.textProvNum.MaxLength = 15;
+			this.textProvNum.Name = "textProvNum";
+			this.textProvNum.Size = new System.Drawing.Size(118, 20);
+			this.textProvNum.TabIndex = 26;
+			this.textProvNum.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
+			// 
+			// groupDentalSchools
+			// 
+			this.groupDentalSchools.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupDentalSchools.Controls.Add(this.labelClass);
+			this.groupDentalSchools.Controls.Add(this.comboClass);
+			this.groupDentalSchools.Controls.Add(this.textLName);
+			this.groupDentalSchools.Controls.Add(this.label2);
+			this.groupDentalSchools.Controls.Add(this.textFName);
+			this.groupDentalSchools.Controls.Add(this.label1);
+			this.groupDentalSchools.Controls.Add(this.textProvNum);
+			this.groupDentalSchools.Controls.Add(this.labelUniqueID);
+			this.groupDentalSchools.Location = new System.Drawing.Point(373, 12);
+			this.groupDentalSchools.Name = "groupDentalSchools";
+			this.groupDentalSchools.Size = new System.Drawing.Size(200, 110);
+			this.groupDentalSchools.TabIndex = 28;
+			this.groupDentalSchools.TabStop = false;
+			this.groupDentalSchools.Text = "Dental School Filters";
+			// 
+			// textLName
+			// 
+			this.textLName.Location = new System.Drawing.Point(76, 40);
+			this.textLName.MaxLength = 15;
+			this.textLName.Name = "textLName";
+			this.textLName.Size = new System.Drawing.Size(118, 20);
+			this.textLName.TabIndex = 28;
+			this.textLName.TextChanged += new System.EventHandler(this.textLName_TextChanged);
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(6, 40);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(68, 18);
+			this.label2.TabIndex = 31;
+			this.label2.Text = "LName";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textFName
+			// 
+			this.textFName.Location = new System.Drawing.Point(76, 61);
+			this.textFName.MaxLength = 15;
+			this.textFName.Name = "textFName";
+			this.textFName.Size = new System.Drawing.Size(118, 20);
+			this.textFName.TabIndex = 30;
+			this.textFName.TextChanged += new System.EventHandler(this.textFName_TextChanged);
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(6, 61);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(68, 18);
+			this.label1.TabIndex = 29;
+			this.label1.Text = "FName";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// timer1
+			// 
+			this.timer1.Interval = 500;
+			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+			// 
+			// comboClass
+			// 
+			this.comboClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClass.FormattingEnabled = true;
+			this.comboClass.Location = new System.Drawing.Point(76, 82);
+			this.comboClass.Name = "comboClass";
+			this.comboClass.Size = new System.Drawing.Size(118, 21);
+			this.comboClass.TabIndex = 32;
+			this.comboClass.SelectionChangeCommitted += new System.EventHandler(this.comboClass_SelectionChangeCommitted);
+			// 
+			// label5
+			// 
+			this.labelClass.Location = new System.Drawing.Point(6, 82);
+			this.labelClass.Name = "label5";
+			this.labelClass.Size = new System.Drawing.Size(68, 18);
+			this.labelClass.TabIndex = 33;
+			this.labelClass.Text = "Class";
+			this.labelClass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormProviderPick
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
-			this.ClientSize = new System.Drawing.Size(514, 670);
-			this.Controls.Add(this.labelUniqueID);
-			this.Controls.Add(this.textUniqueID);
+			this.ClientSize = new System.Drawing.Size(594, 670);
+			this.Controls.Add(this.groupDentalSchools);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
@@ -133,16 +229,31 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Providers";
 			this.Load += new System.EventHandler(this.FormProviderSelect_Load);
+			this.groupDentalSchools.ResumeLayout(false);
+			this.groupDentalSchools.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 		#endregion
 
 		private void FormProviderSelect_Load(object sender, System.EventArgs e) {
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				labelUniqueID.Visible=false;
-				textUniqueID.Visible=false;
+				groupDentalSchools.Visible=false;
+			}
+			else if(IsStudentPicker) {
+				this.Text="Student Picker";
+				gridMain.Title="Students";
+				_schoolClasses=new List<SchoolClass>(SchoolClasses.List);
+				for(int i=0;i<_schoolClasses.Count;i++) {
+					comboClass.Items.Add(_schoolClasses[i].GradYear+" "+_schoolClasses[i].Descript);
+				}
+				if(comboClass.Items.Count>0) {
+					comboClass.SelectedIndex=0;
+				}
+			}
+			else {
+				comboClass.Visible=false;
+				labelClass.Visible=false;
 			}
 			FillGrid();
 			if(SelectedProvNum!=0) {
@@ -151,35 +262,44 @@ namespace OpenDental{
 		}
 
 		private void FillGrid(){
+			long provNum;
+			if(!long.TryParse(textProvNum.Text,out provNum)) {
+				provNum=0;
+			}
+			long classNum=0;
+			if(IsStudentPicker) {
+				classNum=_schoolClasses[comboClass.SelectedIndex].SchoolClassNum;
+			}
+			List<Provider> listProvs=Providers.GetFilteredProviderList(provNum,textLName.Text,textFName.Text,classNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				col=new ODGridColumn(Lan.g("TableProviders","Unique ID"),60);
+				col=new ODGridColumn(Lan.g("TableProviders","ProvNum"),60);
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g("TableProviders","Abbrev"),90);
+			col=new ODGridColumn(Lan.g("TableProviders","Abbrev"),80);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","Last Name"),90);
+			col=new ODGridColumn(Lan.g("TableProviders","LName"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProviders","First Name"),90);
+			col=new ODGridColumn(Lan.g("TableProviders","FName"),100);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				if(IsStudentPicker && ProviderC.ListShort[i].SchoolClassNum==0) {
+			for(int i=0;i<listProvs.Count;i++) {
+				if(IsStudentPicker && listProvs[i].SchoolClassNum==0) {
 					continue;
 				}
 				row=new ODGridRow();
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-					row.Cells.Add(ProviderC.ListShort[i].ProvNum.ToString());
+					row.Cells.Add(listProvs[i].ProvNum.ToString());
 				}
-				row.Cells.Add(ProviderC.ListShort[i].Abbr);
-				row.Cells.Add(ProviderC.ListShort[i].LName);
-				row.Cells.Add(ProviderC.ListShort[i].FName);
+				row.Cells.Add(listProvs[i].Abbr);
+				row.Cells.Add(listProvs[i].LName);
+				row.Cells.Add(listProvs[i].FName);
 				//wanted to do a background color here, but grid couldn't handle it.
 				if(IsStudentPicker) {
-					row.Tag=ProviderC.ListShort[i].ProvNum;
+					row.Tag=listProvs[i].ProvNum;
 				}
 				gridMain.Rows.Add(row);
 			}
@@ -194,12 +314,28 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		private void textUniqueID_TextChanged(object sender,EventArgs e) {
-			long provNum=0;
-			if(long.TryParse(textUniqueID.Text,out provNum)) {
-				gridMain.SetSelected(Providers.GetIndex(provNum),true);
-				gridMain.ScrollToIndexBottom(Providers.GetIndex(provNum));
-			}
+		private void timer1_Tick(object sender,EventArgs e) {
+			timer1.Stop();
+			FillGrid();
+		}
+
+		private void textProvNum_TextChanged(object sender,EventArgs e) {
+			timer1.Stop();
+			timer1.Start();
+		}
+
+		private void textLName_TextChanged(object sender,EventArgs e) {
+			timer1.Stop();
+			timer1.Start();
+		}
+
+		private void textFName_TextChanged(object sender,EventArgs e) {
+			timer1.Stop();
+			timer1.Start();
+		}
+
+		private void comboClass_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGrid();
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

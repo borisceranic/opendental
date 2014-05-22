@@ -15,8 +15,14 @@ namespace OpenDental {
 				butInstructorPicker.Enabled=false;
 				butStudentPicker.Enabled=false;
 			}
-			textStudents.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForStudents)).Description;
-			textInstructors.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForInstructors)).Description;
+			UserGroup studentGroup=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForStudents));
+			UserGroup instructorGroup=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForInstructors));
+			if(studentGroup!=null) {
+				textStudents.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForStudents)).Description;
+			}
+			if(instructorGroup!=null) {
+				textInstructors.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForInstructors)).Description;
+			}
 		}
 
 		private void butStudentPicker_Click(object sender,EventArgs e) {
@@ -55,19 +61,19 @@ namespace OpenDental {
 			}
 		}
 
+		private void butGradingScales_Click(object sender,EventArgs e) {
+			FormGradingScales FormGS=new FormGradingScales();
+			FormGS.ShowDialog();
+		}
+
 		private void butEvaluation_Click(object sender,EventArgs e) {
 			FormEvaluationDefs FormED=new FormEvaluationDefs();
 			FormED.ShowDialog();
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.OK;
-		}
-
-		private void butCancel_Click(object sender,EventArgs e) {
+		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 
 	}
 }

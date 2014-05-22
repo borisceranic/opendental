@@ -11,13 +11,21 @@ namespace OpenDental {
 	public partial class FormGradingScales:Form {
 		private List<GradingScale> _listGradingScales;
 		public GradingScale SelectedGradingScale;
+		/// <summary>This is set before showing the window to determine the usage of the window.  Default is false.</summary>
+		public bool IsSelectionMode=false;
 
+		/// <summary>This window has two modes: Selection and Setup Mode.  By default the buttons and methods are in Setup mode.  Changing to Selection Mode will change the function of several actions in this window.  Most specifically, the grid's double click method.</summary>
 		public FormGradingScales() {
 			InitializeComponent();
 			Lan.F(this);
 		}
 
 		private void FormGradingScales_Load(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				butEdit.Visible=true;
+				butOK.Visible=true;
+				butCancel.Text="&Cancel";
+			}
 			FillGrid();
 		}
 
@@ -36,11 +44,17 @@ namespace OpenDental {
 			}
 			gridMain.EndUpdate();
 		}
-		private void gridMain_DoubleClick(object sender,EventArgs e) {
-			SelectedGradingScale=_listGradingScales[gridMain.GetSelectedIndex()];
-			DialogResult=DialogResult.OK;
-		}
 
+		private void gridMain_DoubleClick(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				SelectedGradingScale=_listGradingScales[gridMain.GetSelectedIndex()];
+				DialogResult=DialogResult.OK;
+				return;
+			}
+			FormGradingScaleEdit FormGSE=new FormGradingScaleEdit(_listGradingScales[gridMain.GetSelectedIndex()]);
+			FormGSE.ShowDialog();
+			FillGrid();
+		}
 
 		private void butEdit_Click(object sender,EventArgs e) {
 			FormGradingScaleEdit FormGSE=new FormGradingScaleEdit(_listGradingScales[gridMain.GetSelectedIndex()]);

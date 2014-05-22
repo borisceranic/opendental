@@ -62,13 +62,13 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolCourseNum);
 			}
-			string command="SELECT evaluationdef.EvaluationDefNum EvaluationDefNum, evaluationdef.EvalTitle EvalTitle, schoolcourse.Descript CourseDescript FROM evaluationdef "
+			string command="SELECT evaluationdef.EvaluationDefNum EvaluationDefNum, evaluationdef.EvalTitle EvalTitle, schoolcourse.CourseID CourseID FROM evaluationdef "
 				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluationdef.SchoolCourseNum "
 				+"WHERE TRUE";
 			if(schoolCourseNum!=0) {
 				command+=" AND schoolcourse.SchoolCourseNum = '"+POut.Long(schoolCourseNum)+"'";
 			}
-			command+=" ORDER BY CourseDescript,EvalTitle";
+			command+=" ORDER BY CourseID,EvalTitle";
 			return Db.GetTable(command);
 		}
 

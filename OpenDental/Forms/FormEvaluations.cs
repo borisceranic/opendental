@@ -41,7 +41,7 @@ namespace OpenDental {
 				comboInstructor.Items.Add(_listInstructor[i].GetLongDesc());
 			}
 			comboInstructor.SelectedIndex=0;
-			textDateStart.Text=DateTime.Today.AddMonths(-6).ToShortDateString();
+			textDateStart.Text=DateTime.Today.ToShortDateString();
 			textDateEnd.Text=DateTime.Today.ToShortDateString();
 			FillGrid();
 		}
@@ -49,7 +49,7 @@ namespace OpenDental {
 		private void FillGrid() {
 			long course=(comboCourse.SelectedIndex==0) ? 0:SchoolCourses.List[comboCourse.SelectedIndex-1].SchoolCourseNum;
 			long instructor=(comboInstructor.SelectedIndex==0) ? 0:_listInstructor[comboInstructor.SelectedIndex-1].ProvNum;
-			DataTable table=Evaluations.GetFilteredList(DateTime.Parse(textDateStart.Text),DateTime.Parse(textDateEnd.Text),textLastName.Text,textFirstName.Text,PIn.Long(textUniqueID.Text),course,instructor);
+			DataTable table=Evaluations.GetFilteredList(DateTime.Parse(textDateStart.Text),DateTime.Parse(textDateEnd.Text),textLastName.Text,textFirstName.Text,PIn.Long(textProvNum.Text),course,instructor);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluations","Date"),70);
@@ -58,7 +58,7 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Instructor"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEvaluations","Unique ID"),60);
+			col=new ODGridColumn(Lan.g("TableEvaluations","ProvNum"),60);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Last Name"),90);
 			gridMain.Columns.Add(col);
@@ -96,6 +96,10 @@ namespace OpenDental {
 			FillGrid();
 		}
 
+		private void comboCourse_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGrid();
+		}
+
 		private void butRefresh_Click(object sender,EventArgs e) {
 			if(textDateStart.errorProvider1.GetError(textDateStart)!="" || textDateEnd.errorProvider1.GetError(textDateEnd)!="") {
 				MsgBox.Show(this,"Please fix data entry errors first.");
@@ -117,11 +121,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.OK;
-		}
-
-		private void butCancel_Click(object sender,EventArgs e) {
+		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
 

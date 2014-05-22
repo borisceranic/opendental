@@ -512,6 +512,34 @@ namespace OpenDentBusiness{
 			return providerList;
 		}
 
+		/// <summary>Currently only used for Dental Schools and will only return ProviderC.ListShort if Dental Schools is not active.  Otherwise this will return a filtered provider list.</summary>
+		public static List<Provider> GetFilteredProviderList(long provNum,string lName,string fName,long classNum) {
+			//No need to check RemotingRole; no call to db.
+			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)) {//This is here to save doing the logic below for users who have no way to filter the provider picker list.
+				return ProviderC.ListShort;
+			}
+			List<Provider> listProvs=new List<Provider>(ProviderC.ListShort);
+			for(int i=listProvs.Count-1;i>=0;i--) {
+				if(provNum!=0 && !listProvs[i].ProvNum.ToString().Contains(provNum.ToString())) {
+					listProvs.Remove(listProvs[i]);
+					continue;
+				}
+				if(!String.IsNullOrWhiteSpace(lName) && !listProvs[i].LName.Contains(lName)) {
+					listProvs.Remove(listProvs[i]);
+					continue;
+				}
+				if(!String.IsNullOrWhiteSpace(fName) && !listProvs[i].FName.Contains(fName)) {
+					listProvs.Remove(listProvs[i]);
+					continue;
+				}
+				if(classNum!=0 && classNum!=listProvs[i].SchoolClassNum) {
+					listProvs.Remove(listProvs[i]);
+					continue;
+				}
+			}
+			return listProvs;
+		}
+
 		///<summary>Removes a provider from the future schedule.  Currently called after a provider is hidden.</summary>
 		public static void RemoveProvFromFutureSchedule(long provNum) {
 			//No need to check RemotingRole; no call to db.

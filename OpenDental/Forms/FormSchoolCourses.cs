@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -11,9 +12,9 @@ namespace OpenDental{
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;
 		private System.ComponentModel.Container components = null;
-		private System.Windows.Forms.ListBox listMain;
 		private bool changed;
 		public bool IsSelectionMode;
+		private UI.ODGrid gridMain;
 		public SchoolCourse CourseSelected;
 		
 		///<summary></summary>
@@ -37,41 +38,30 @@ namespace OpenDental{
 
 		private void InitializeComponent(){
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSchoolCourses));
-			this.listMain = new System.Windows.Forms.ListBox();
 			this.butClose = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.SuspendLayout();
-			// 
-			// listMain
-			// 
-			this.listMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.listMain.Location = new System.Drawing.Point(16,12);
-			this.listMain.Name = "listMain";
-			this.listMain.Size = new System.Drawing.Size(418,433);
-			this.listMain.TabIndex = 4;
-			this.listMain.DoubleClick += new System.EventHandler(this.listMain_DoubleClick);
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(362,473);
+			this.butClose.Location = new System.Drawing.Point(362, 473);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,26);
+			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 3;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -79,21 +69,36 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(16,472);
+			this.butAdd.Location = new System.Drawing.Point(16, 472);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(79,26);
+			this.butAdd.Size = new System.Drawing.Size(79, 26);
 			this.butAdd.TabIndex = 10;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(12, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.Size = new System.Drawing.Size(425, 444);
+			this.gridMain.TabIndex = 61;
+			this.gridMain.Title = "Courses";
+			this.gridMain.TranslationName = "FormEvaluationDefEdit";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
 			// FormSchoolCourses
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
-			this.ClientSize = new System.Drawing.Size(453,515);
+			this.ClientSize = new System.Drawing.Size(453, 515);
+			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butClose);
-			this.Controls.Add(this.listMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -101,8 +106,8 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Dental School Courses";
-			this.Load += new System.EventHandler(this.FormSchoolCourses_Load);
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormSchoolCourses_Closing);
+			this.Load += new System.EventHandler(this.FormSchoolCourses_Load);
 			this.ResumeLayout(false);
 
 		}
@@ -112,22 +117,30 @@ namespace OpenDental{
 			if(IsSelectionMode) {
 				butAdd.Visible=false;
 			}
-			FillList();
+			FillGrid();
 		}
 
-		private void FillList(){
+		private void FillGrid(){
 			long previousSelected=-1;
-			if(listMain.SelectedIndex!=-1){
-				previousSelected=SchoolCourses.List[listMain.SelectedIndex].SchoolCourseNum;
+			if(gridMain.GetSelectedIndex()!=-1){
+				previousSelected=SchoolCourses.List[gridMain.GetSelectedIndex()].SchoolCourseNum;
 			}
 			SchoolCourses.RefreshCache();
-			listMain.Items.Clear();
-			for(int i=0;i<SchoolCourses.List.Length;i++){
-				listMain.Items.Add(SchoolCourses.List[i].CourseID+"  "+SchoolCourses.List[i].Descript);
-				if(SchoolCourses.List[i].SchoolCourseNum==previousSelected){
-					listMain.SelectedIndex=i;
-				}
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			ODGridColumn col=new ODGridColumn(Lan.g("FormSchoolCourses","Course ID"),100);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),80);
+			gridMain.Columns.Add(col);
+			gridMain.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<SchoolCourses.List.Length;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(SchoolCourses.List[i].CourseID);
+				row.Cells.Add(SchoolCourses.List[i].Descript);
+				gridMain.Rows.Add(row);
 			}
+			gridMain.EndUpdate();
 		}
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
@@ -138,27 +151,26 @@ namespace OpenDental{
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;
 			}
-			changed=true;
-			FillList();
-			listMain.SelectedIndex=-1;
+			changed=true; 
+			FillGrid();
 		}
 
-		private void listMain_DoubleClick(object sender, System.EventArgs e) {
-			if(listMain.SelectedIndex==-1) {
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1) {
 				return;
 			}
 			if(IsSelectionMode) {
-				CourseSelected=SchoolCourses.List[listMain.SelectedIndex];
+				CourseSelected=SchoolCourses.List[gridMain.GetSelectedIndex()];
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			FormSchoolCourseEdit FormS=new FormSchoolCourseEdit(SchoolCourses.List[listMain.SelectedIndex]);
+			FormSchoolCourseEdit FormS=new FormSchoolCourseEdit(SchoolCourses.List[gridMain.GetSelectedIndex()]);
 			FormS.ShowDialog();
-			if(FormS.DialogResult!=DialogResult.OK){
+			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			changed=true;
-			FillList();
+			FillGrid();
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {

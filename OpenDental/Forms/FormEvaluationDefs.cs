@@ -37,15 +37,15 @@ namespace OpenDental {
 			DataTable table=EvaluationDefs.GetAllByCourse(courseNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluationSetup","Course"),90);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluationSetup","Course"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEvaluationSetup","Title"),90);
+			col=new ODGridColumn(Lan.g("TableEvaluationSetup","Evaluation Title"),180);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(table.Rows[i]["CourseDescript"].ToString());
+				row.Cells.Add(table.Rows[i]["CourseID"].ToString());
 				row.Cells.Add(table.Rows[i]["EvalTitle"].ToString());
 				row.Tag=table.Rows[i]["EvaluationDefNum"].ToString();
 				gridMain.Rows.Add(row);
@@ -115,17 +115,6 @@ namespace OpenDental {
 				evalCrit.ItemOrder=evalCritDefs[i].ItemOrder;
 				EvaluationCriterions.Insert(evalCrit);
 			}
-		}
-
-		private void butOK_Click(object sender,EventArgs e) {
-			if(IsSelectionMode) {
-				if(gridMain.GetSelectedIndex()<0) {
-					DialogResult=DialogResult.Cancel;
-					return;
-				}
-				CopyDefToEvaluation();
-			}
-			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {

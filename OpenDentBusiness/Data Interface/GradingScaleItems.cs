@@ -84,6 +84,16 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
+		public static void DeleteAllFromGradingScale(long gradingScaleNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleNum);
+				return;
+			}
+			string command= "DELETE FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
+			Db.NonQ(command);
+		}
+
+		///<summary></summary>
 		public static void Delete(long gradingScaleItemNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleItemNum);

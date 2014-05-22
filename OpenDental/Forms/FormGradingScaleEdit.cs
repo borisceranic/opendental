@@ -21,6 +21,11 @@ namespace OpenDental {
 		private void FormGradingScaleEdit_Load(object sender,EventArgs e) {
 			if(!_gradingScaleCur.IsNew) {
 				textDescription.Text=_gradingScaleCur.Description;
+				checkIsPercentage.Enabled=false;
+				checkIsPercentage.Checked=_gradingScaleCur.IsPercentage;
+				if(checkIsPercentage.Checked) {
+					butAdd.Visible=false;
+				}
 				FillGrid();
 			}
 		}
@@ -29,7 +34,6 @@ namespace OpenDental {
 			_listGradingScaleItems=GradingScaleItems.Refresh(_gradingScaleCur.GradingScaleNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			//TODO: Determine correct columns
 			ODGridColumn col=new ODGridColumn(Lan.g("FormGradingScaleEdit","Shown"),60);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormGradingScaleEdit","Number"),60);
@@ -62,22 +66,33 @@ namespace OpenDental {
 			FillGrid();
 		}
 
+		private void checkIsPercentage_Click(object sender,EventArgs e) {
+			if(checkIsPercentage.Checked) {
+				MsgBox.Show(this,"Leaving this checked will delete any grading scale items created for this grading scale when it is saved.  Grading scale items are not needed for percentage grading scales.");
+			}
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			_gradingScaleCur.Description=textDescription.Text;
 			_gradingScaleCur.IsPercentage=checkIsPercentage.Checked;
+			if(GradingScales.IsDupicateDescription(_gradingScaleCur)) {
+				MsgBox.Show(this,"The selected grading scale description is already used by another grading scale.  Please input a unique description.");
+				return;
+			}
+			if(checkIsPercentage.Checked) {
+				GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
+			}
 			GradingScales.Update(_gradingScaleCur);
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
+			if(_gradingScaleCur.IsNew) {
+				GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
+				GradingScales.Delete(_gradingScaleCur.GradingScaleNum);
+			}
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-
-
-
-
 
 
 

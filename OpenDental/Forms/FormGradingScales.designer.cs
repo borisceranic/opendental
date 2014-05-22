@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
-			this.butCancel.Text = "&Cancel";
+			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// gridMain
@@ -92,6 +92,7 @@ namespace OpenDental{
 			this.butEdit.Size = new System.Drawing.Size(75, 24);
 			this.butEdit.TabIndex = 6;
 			this.butEdit.Text = "Edit";
+			this.butEdit.Visible = false;
 			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
 			// 
 			// butOK
@@ -107,6 +108,7 @@ namespace OpenDental{
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
+			this.butOK.Visible = false;
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// FormGradingScales

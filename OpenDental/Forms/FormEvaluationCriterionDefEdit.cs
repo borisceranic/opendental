@@ -19,14 +19,15 @@ namespace OpenDental {
 		private void FormEvaluationCriterionDefEdit_Load(object sender,EventArgs e) {
 			textDescript.Text=_evalCritDef.CriterionDescript;
 			GradingScale gradeScale=GradingScales.GetOne(_evalCritDef.GradingScaleNum);
-			textGradeScaleName.Text=gradeScale.GradingScaleNum+"-"+gradeScale.Description;
+			textGradeScaleName.Text=gradeScale.Description;
 			checkIsCategoryName.Checked=_evalCritDef.IsCategoryName;
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {
 			FormGradingScales FormGS=new FormGradingScales();
+			FormGS.IsSelectionMode=true;
 			FormGS.ShowDialog();
-			textGradeScaleName.Text=FormGS.SelectedGradingScale.GradingScaleNum+"-"+FormGS.SelectedGradingScale.Description;
+			textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
 			_evalCritDef.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
 		}
 
