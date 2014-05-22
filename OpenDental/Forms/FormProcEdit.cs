@@ -2845,6 +2845,10 @@ namespace OpenDental{
 			}
 			textBillingNote.Text=ProcCur.BillingNote;
 			textNotes.Text=ProcCur.Note;
+			//Scroll to the end of the note for procedures for today (or completed today).
+			if(ProcCur.DateEntryC.Date==DateTime.Today) {
+				textNotes.Select(textNotes.Text.Length,0);
+			}
 			CheckForCompleteNote();
 			comboPlaceService.Items.Clear();
 			comboPlaceService.Items.AddRange(Enum.GetNames(typeof(PlaceOfService)));
