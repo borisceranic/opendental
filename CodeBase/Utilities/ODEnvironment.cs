@@ -25,7 +25,13 @@ namespace CodeBase{
 			if(Environment.MachineName.ToLower()==id){
 			  return true;
 			}
-			IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
+			IPHostEntry iphostentry;
+			try {
+				iphostentry=Dns.GetHostEntry(Environment.MachineName);
+			}
+			catch {
+				return false;
+			}
 			//Check against the local computer's IP addresses (does not include 127.0.0.1). Includes IPv4 and IPv6.
 			foreach(IPAddress ipaddress in iphostentry.AddressList){
 			  if(ipaddress.ToString()==id){
@@ -48,8 +54,14 @@ namespace CodeBase{
 					return true;
 				}
 			}
-			catch {}	//not a valid IP address
-			IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
+			catch { }	//not a valid IP address
+			IPHostEntry iphostentry;
+			try {
+				iphostentry=Dns.GetHostEntry(Environment.MachineName);
+			}
+			catch {
+				return false;
+			}
 			//Check against the local computer's IP addresses (does not include 127.0.0.1). Includes IPv4 and IPv6.
 			foreach(IPAddress ipaddress in iphostentry.AddressList) {
 				if(ipaddress.ToString()==servername) {
