@@ -850,7 +850,7 @@ namespace OpenDental{
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(69, 14);
 			this.label16.TabIndex = 112;
-			this.label16.Text = "Unique ID";
+			this.label16.Text = "ProvNum";
 			this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label18

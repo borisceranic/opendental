@@ -166,7 +166,7 @@ namespace OpenDental{
 			this.labelUniqueID.Name = "labelUniqueID";
 			this.labelUniqueID.Size = new System.Drawing.Size(105, 18);
 			this.labelUniqueID.TabIndex = 35;
-			this.labelUniqueID.Text = "Unique Provider ID";
+			this.labelUniqueID.Text = "ProvNum";
 			this.labelUniqueID.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelPassDescription
