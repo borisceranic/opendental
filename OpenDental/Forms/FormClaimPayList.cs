@@ -106,6 +106,9 @@ namespace OpenDental {
 			FormClaimPayBatch FormCPB=new FormClaimPayBatch(claimPayment);
 			//FormCPB.IsFromClaim=IsFromClaim;
 			FormCPB.ShowDialog();
+			if(IsDisposed) {//Auto-Logoff was causing an unhandled exception below.  Can't use dialogue result check here because we want to referesh the grid below even if user clicked cancel.
+				return; //Don't refresh the grid, as the form is already disposed.
+			}
 			if(FormCPB.GotoClaimNum!=0) {
 				GotoClaimNum=FormCPB.GotoClaimNum;
 				GotoPatNum=FormCPB.GotoPatNum;
