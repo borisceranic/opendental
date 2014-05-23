@@ -117,8 +117,8 @@ namespace OpenDentBusiness{
 				}
 			}
 			//there is no computername override entered by staff, so figure out what the extension should be
-			if(ipAddress.Contains("10.10.1.2")) {
-				return PIn.Int(ipAddress.ToString().Substring(8))-100;//eg 205-100=105
+			if(ipAddress.Contains("10.10.2")) {
+				return PIn.Int(ipAddress.ToString().Substring(8))+100;//eg 19+100=119
 			}
 			return 0;//couldn't find good extension
 		}

@@ -50,7 +50,7 @@ namespace WebCamOD {
 			//get ipaddress on startup
 			IpAddressCur="";
 			foreach(IPAddress ipaddress in iphostentry.AddressList) {
-				if(ipaddress.ToString().Contains("10.10.1")) {
+				if(ipaddress.ToString().Contains("10.10.2")) {
 					IpAddressCur=ipaddress.ToString();
 				}
 			}
