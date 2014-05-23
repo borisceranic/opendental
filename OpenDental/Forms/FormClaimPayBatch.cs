@@ -1058,6 +1058,9 @@ namespace OpenDental{
 			if(IsDeleting){//This is here because the delete button could also set this.
 				return;
 			}
+			if(IsDisposed) {//This should only happen if interupted by an Auto-Logoff.
+				return; //Leave the payment as partial so the user can come back and edit.
+			}
 			if(ClaimPaymentCur.IsPartial) {
 				if(textAmount.Text==textTotal.Text) {
 					if(ClaimsAttached.Count>0) {
