@@ -66,6 +66,8 @@ namespace OpenDental{
 		public bool IsByLastName;
 		///<summary>Cached list of employees sorted based on IsByLastName</summary>
 		private List<Employee> _listEmp=new List<Employee>();
+		///<summary>Filled when FillMain is called and fromDB=true.  If fromDB is false, we used this stored value from before instead to reduce calls to DB.  Because fillgrid does math on weekspan, this is a temporary cache of the last time we calculated it from the database.</summary>
+		private TimeSpan storedWeekSpan;
 
 		///<summary></summary>
 		public FormTimeCard()
@@ -525,6 +527,7 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Time Card";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormTimeCard_FormClosing);
 			this.Load += new System.EventHandler(this.FormTimeCard_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
@@ -718,8 +721,14 @@ namespace OpenDental{
 			TimeSpan oneOT;
 			TimeSpan daySpan=new TimeSpan(0);//used for daily totals.
 			TimeSpan weekSpan=new TimeSpan(0);//used for weekly totals.
-			if(mergedAL.Count>0){
-				weekSpan=ClockEvents.GetWeekTotal(EmployeeCur.EmployeeNum,GetDateForRow(0));
+			if(mergedAL.Count>0) {  //Have to check fromDB here because we dont want to call DB every timer tick
+				if(fromDB) {
+					weekSpan=ClockEvents.GetWeekTotal(EmployeeCur.EmployeeNum,GetDateForRow(0));
+					storedWeekSpan=weekSpan;
+				}
+				else {
+					weekSpan=storedWeekSpan;
+				}
 			}
 			TimeSpan periodSpan=new TimeSpan(0);//used to add up totals for entire page.
 			TimeSpan otspan=new TimeSpan(0);//overtime for the entire period
@@ -1212,6 +1221,10 @@ namespace OpenDental{
 			if(IsBreaks){
 				FillMain(false);
 			}
+		}
+
+		private void FormTimeCard_FormClosing(object sender,FormClosingEventArgs e) {
+			timer1.Enabled=false;  //This timer was never being disabled, so it would just keep ticking after the form was closed.
 		}
 
 		
