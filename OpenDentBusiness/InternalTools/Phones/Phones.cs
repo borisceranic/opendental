@@ -458,8 +458,8 @@ namespace OpenDentBusiness {
 			}
 			//there is no computername override entered by staff, so figure out what the extension should be
 			int extension=0;
-			if(ipAddress.Contains("10.10.1.2")) {
-				extension=PIn.Int(ipAddress.ToString().Substring(8))-100;//eg 205-100=105
+			if(ipAddress.Contains("10.10.2")) {
+				extension=PIn.Int(ipAddress.ToString().Substring(8))+100;//eg 19+100=119
 			}
 			if(extension==0) {
 				//we don't have a good extension
@@ -484,9 +484,8 @@ namespace OpenDentBusiness {
 				return ped.PhoneExt;
 			}
 			//there is no computername override entered by staff, so figure out what the extension should be
-			int extension=0;
-			if(ipAddress.Contains("10.10.1.2")) {
-				return PIn.Int(ipAddress.ToString().Substring(8))-100;//eg 205-100=105
+			if(ipAddress.Contains("10.10.2")) {
+				return PIn.Int(ipAddress.ToString().Substring(8))+100;//eg 19+100=119
 			}
 			return 0;//couldn't find good extension
 		}
@@ -537,8 +536,8 @@ namespace OpenDentBusiness {
 			}
 			//there is no computername override entered by staff, so figure out what the extension should be
 			int extension=0;
-			if(ipAddress.Contains("10.10.1.2")) {
-				extension=PIn.Int(ipAddress.ToString().Substring(8))-100;//eg 205-100=105
+			if(ipAddress.Contains("10.10.2")) {
+				extension=PIn.Int(ipAddress.ToString().Substring(8))+100;//eg 19+100=119
 			}
 			if(extension==0) {
 				//we don't have a good extension

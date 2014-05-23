@@ -5332,9 +5332,9 @@ namespace OpenDental{
 				string ipaddressStr="";
 				IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
 				foreach(IPAddress ipaddress in iphostentry.AddressList) {
-					//if(ipaddress.ToString().Contains("192.168.0.2")) {
-					if(ipaddress.ToString().Contains("10.10.1.2")) {
+					if(ipaddress.ToString().Contains("10.10.2")) {
 						ipaddressStr=ipaddress.ToString();
+						break;
 					}
 				}
 				//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
