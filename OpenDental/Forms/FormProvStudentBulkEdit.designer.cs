@@ -67,7 +67,7 @@ namespace OpenDental{
 			this.butClose.Location = new System.Drawing.Point(496, 458);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
-			this.butClose.TabIndex = 2;
+			this.butClose.TabIndex = 4;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -103,7 +103,7 @@ namespace OpenDental{
 			this.textUniqueID.MaxLength = 15;
 			this.textUniqueID.Name = "textUniqueID";
 			this.textUniqueID.Size = new System.Drawing.Size(166, 20);
-			this.textUniqueID.TabIndex = 28;
+			this.textUniqueID.TabIndex = 2;
 			this.textUniqueID.TextChanged += new System.EventHandler(this.textUniqueID_TextChanged);
 			// 
 			// comboClass
@@ -114,7 +114,7 @@ namespace OpenDental{
 			this.comboClass.Location = new System.Drawing.Point(405, 44);
 			this.comboClass.Name = "comboClass";
 			this.comboClass.Size = new System.Drawing.Size(166, 21);
-			this.comboClass.TabIndex = 26;
+			this.comboClass.TabIndex = 1;
 			this.comboClass.SelectionChangeCommitted += new System.EventHandler(this.comboClass_SelectionChangeCommitted);
 			// 
 			// label1
@@ -147,7 +147,7 @@ namespace OpenDental{
 			this.butOutlineColor.Location = new System.Drawing.Point(129, 38);
 			this.butOutlineColor.Name = "butOutlineColor";
 			this.butOutlineColor.Size = new System.Drawing.Size(30, 20);
-			this.butOutlineColor.TabIndex = 48;
+			this.butOutlineColor.TabIndex = 2;
 			this.butOutlineColor.Click += new System.EventHandler(this.butOutlineColor_Click);
 			// 
 			// labelColor
@@ -165,7 +165,7 @@ namespace OpenDental{
 			this.butColor.Location = new System.Drawing.Point(129, 18);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(30, 20);
-			this.butColor.TabIndex = 47;
+			this.butColor.TabIndex = 1;
 			this.butColor.Click += new System.EventHandler(this.butColor_Click);
 			// 
 			// groupCreateUsers
@@ -179,7 +179,7 @@ namespace OpenDental{
 			this.groupCreateUsers.Location = new System.Drawing.Point(406, 114);
 			this.groupCreateUsers.Name = "groupCreateUsers";
 			this.groupCreateUsers.Size = new System.Drawing.Size(165, 95);
-			this.groupCreateUsers.TabIndex = 50;
+			this.groupCreateUsers.TabIndex = 3;
 			this.groupCreateUsers.TabStop = false;
 			this.groupCreateUsers.Text = "Edit Students";
 			// 
@@ -199,7 +199,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridStudents);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(450, 283);
 			this.Name = "FormProvStudentBulkEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Student Bulk Edit";

@@ -60,13 +60,13 @@ namespace OpenDental{
 			this.labelUniqueID = new System.Windows.Forms.Label();
 			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
+			this.labelClass = new System.Windows.Forms.Label();
+			this.comboClass = new System.Windows.Forms.ComboBox();
 			this.textLName = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
-			this.comboClass = new System.Windows.Forms.ComboBox();
-			this.labelClass = new System.Windows.Forms.Label();
 			this.groupDentalSchools.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -112,7 +112,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(491, 596);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(82, 24);
-			this.butOK.TabIndex = 14;
+			this.butOK.TabIndex = 2;
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -131,7 +131,7 @@ namespace OpenDental{
 			this.textProvNum.MaxLength = 15;
 			this.textProvNum.Name = "textProvNum";
 			this.textProvNum.Size = new System.Drawing.Size(118, 20);
-			this.textProvNum.TabIndex = 26;
+			this.textProvNum.TabIndex = 1;
 			this.textProvNum.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
 			// 
 			// groupDentalSchools
@@ -148,9 +148,28 @@ namespace OpenDental{
 			this.groupDentalSchools.Location = new System.Drawing.Point(373, 12);
 			this.groupDentalSchools.Name = "groupDentalSchools";
 			this.groupDentalSchools.Size = new System.Drawing.Size(200, 110);
-			this.groupDentalSchools.TabIndex = 28;
+			this.groupDentalSchools.TabIndex = 1;
 			this.groupDentalSchools.TabStop = false;
 			this.groupDentalSchools.Text = "Dental School Filters";
+			// 
+			// labelClass
+			// 
+			this.labelClass.Location = new System.Drawing.Point(6, 82);
+			this.labelClass.Name = "labelClass";
+			this.labelClass.Size = new System.Drawing.Size(68, 18);
+			this.labelClass.TabIndex = 33;
+			this.labelClass.Text = "Class";
+			this.labelClass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboClass
+			// 
+			this.comboClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClass.FormattingEnabled = true;
+			this.comboClass.Location = new System.Drawing.Point(76, 82);
+			this.comboClass.Name = "comboClass";
+			this.comboClass.Size = new System.Drawing.Size(118, 21);
+			this.comboClass.TabIndex = 4;
+			this.comboClass.SelectionChangeCommitted += new System.EventHandler(this.comboClass_SelectionChangeCommitted);
 			// 
 			// textLName
 			// 
@@ -158,7 +177,7 @@ namespace OpenDental{
 			this.textLName.MaxLength = 15;
 			this.textLName.Name = "textLName";
 			this.textLName.Size = new System.Drawing.Size(118, 20);
-			this.textLName.TabIndex = 28;
+			this.textLName.TabIndex = 2;
 			this.textLName.TextChanged += new System.EventHandler(this.textLName_TextChanged);
 			// 
 			// label2
@@ -176,7 +195,7 @@ namespace OpenDental{
 			this.textFName.MaxLength = 15;
 			this.textFName.Name = "textFName";
 			this.textFName.Size = new System.Drawing.Size(118, 20);
-			this.textFName.TabIndex = 30;
+			this.textFName.TabIndex = 3;
 			this.textFName.TextChanged += new System.EventHandler(this.textFName_TextChanged);
 			// 
 			// label1
@@ -193,25 +212,6 @@ namespace OpenDental{
 			this.timer1.Interval = 500;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
-			// comboClass
-			// 
-			this.comboClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClass.FormattingEnabled = true;
-			this.comboClass.Location = new System.Drawing.Point(76, 82);
-			this.comboClass.Name = "comboClass";
-			this.comboClass.Size = new System.Drawing.Size(118, 21);
-			this.comboClass.TabIndex = 32;
-			this.comboClass.SelectionChangeCommitted += new System.EventHandler(this.comboClass_SelectionChangeCommitted);
-			// 
-			// label5
-			// 
-			this.labelClass.Location = new System.Drawing.Point(6, 82);
-			this.labelClass.Name = "label5";
-			this.labelClass.Size = new System.Drawing.Size(68, 18);
-			this.labelClass.TabIndex = 33;
-			this.labelClass.Text = "Class";
-			this.labelClass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormProviderPick
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -224,6 +224,7 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(481, 234);
 			this.Name = "FormProviderPick";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

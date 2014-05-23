@@ -31,6 +31,7 @@ namespace OpenDental{
 			this.groupStudents = new System.Windows.Forms.GroupBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.textProvNum = new System.Windows.Forms.TextBox();
+			this.butRefresh = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textFirstName = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
@@ -41,7 +42,6 @@ namespace OpenDental{
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupAdmin = new System.Windows.Forms.GroupBox();
-			this.butRefresh = new OpenDental.UI.Button();
 			this.comboCourse = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupStudents.SuspendLayout();
@@ -59,7 +59,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(887, 564);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 7;
 			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -87,7 +87,7 @@ namespace OpenDental{
 			this.comboInstructor.Location = new System.Drawing.Point(101, 19);
 			this.comboInstructor.Name = "comboInstructor";
 			this.comboInstructor.Size = new System.Drawing.Size(166, 21);
-			this.comboInstructor.TabIndex = 25;
+			this.comboInstructor.TabIndex = 1;
 			// 
 			// label2
 			// 
@@ -112,7 +112,7 @@ namespace OpenDental{
 			this.groupStudents.Location = new System.Drawing.Point(691, 85);
 			this.groupStudents.Name = "groupStudents";
 			this.groupStudents.Size = new System.Drawing.Size(273, 120);
-			this.groupStudents.TabIndex = 32;
+			this.groupStudents.TabIndex = 4;
 			this.groupStudents.TabStop = false;
 			this.groupStudents.Text = "Student Filters:";
 			// 
@@ -131,7 +131,23 @@ namespace OpenDental{
 			this.textProvNum.MaxLength = 15;
 			this.textProvNum.Name = "textProvNum";
 			this.textProvNum.Size = new System.Drawing.Size(166, 20);
-			this.textProvNum.TabIndex = 7;
+			this.textProvNum.TabIndex = 3;
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butRefresh.Location = new System.Drawing.Point(192, 90);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 24);
+			this.butRefresh.TabIndex = 4;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
 			// label5
 			// 
@@ -148,7 +164,7 @@ namespace OpenDental{
 			this.textFirstName.MaxLength = 15;
 			this.textFirstName.Name = "textFirstName";
 			this.textFirstName.Size = new System.Drawing.Size(166, 20);
-			this.textFirstName.TabIndex = 6;
+			this.textFirstName.TabIndex = 2;
 			// 
 			// label9
 			// 
@@ -165,7 +181,7 @@ namespace OpenDental{
 			this.textLastName.MaxLength = 15;
 			this.textLastName.Name = "textLastName";
 			this.textLastName.Size = new System.Drawing.Size(166, 20);
-			this.textLastName.TabIndex = 5;
+			this.textLastName.TabIndex = 1;
 			// 
 			// butAdd
 			// 
@@ -180,7 +196,7 @@ namespace OpenDental{
 			this.butAdd.Location = new System.Drawing.Point(883, 269);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
-			this.butAdd.TabIndex = 33;
+			this.butAdd.TabIndex = 6;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
@@ -228,25 +244,9 @@ namespace OpenDental{
 			this.groupAdmin.Location = new System.Drawing.Point(691, 206);
 			this.groupAdmin.Name = "groupAdmin";
 			this.groupAdmin.Size = new System.Drawing.Size(273, 57);
-			this.groupAdmin.TabIndex = 40;
+			this.groupAdmin.TabIndex = 5;
 			this.groupAdmin.TabStop = false;
 			this.groupAdmin.Text = "Admin Filters:";
-			// 
-			// butRefresh
-			// 
-			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butRefresh.Autosize = true;
-			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butRefresh.Location = new System.Drawing.Point(192, 90);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(75, 24);
-			this.butRefresh.TabIndex = 41;
-			this.butRefresh.Text = "Refresh";
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
 			// comboCourse
 			// 
@@ -257,7 +257,7 @@ namespace OpenDental{
 			this.comboCourse.Location = new System.Drawing.Point(741, 62);
 			this.comboCourse.Name = "comboCourse";
 			this.comboCourse.Size = new System.Drawing.Size(171, 21);
-			this.comboCourse.TabIndex = 43;
+			this.comboCourse.TabIndex = 3;
 			this.comboCourse.SelectionChangeCommitted += new System.EventHandler(this.comboCourse_SelectionChangeCommitted);
 			// 
 			// label1
@@ -286,7 +286,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(990, 638);
+			this.MinimumSize = new System.Drawing.Size(639, 369);
 			this.Name = "FormEvaluations";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluations";

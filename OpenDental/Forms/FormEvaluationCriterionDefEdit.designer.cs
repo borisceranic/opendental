@@ -47,7 +47,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(314, 75);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 5;
+			this.butOK.TabIndex = 6;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -62,7 +62,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(314, 105);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 6;
+			this.butCancel.TabIndex = 7;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -146,7 +146,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 105);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 7;
+			this.butDelete.TabIndex = 5;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 

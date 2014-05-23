@@ -9,6 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormEvaluationDefs:Form {
+		/// <summary>This mode is only used for picking an evaluationdef for a brand new evaluation.</summary>
 		public bool IsSelectionMode=false;
 
 		public FormEvaluationDefs() {
@@ -115,6 +116,9 @@ namespace OpenDental {
 				evalCrit.ItemOrder=evalCritDefs[i].ItemOrder;
 				EvaluationCriterions.Insert(evalCrit);
 			}
+			evalNew.IsNew=true;
+			FormEvaluationEdit FormEE=new FormEvaluationEdit(evalNew);
+			FormEE.ShowDialog();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {

@@ -146,7 +146,7 @@ namespace OpenDental{
 			this.checkTimecardSecurityEnabled.Location = new System.Drawing.Point(8, 606);
 			this.checkTimecardSecurityEnabled.Name = "checkTimecardSecurityEnabled";
 			this.checkTimecardSecurityEnabled.Size = new System.Drawing.Size(224, 16);
-			this.checkTimecardSecurityEnabled.TabIndex = 57;
+			this.checkTimecardSecurityEnabled.TabIndex = 6;
 			this.checkTimecardSecurityEnabled.Text = "TimecardSecurityEnabled";
 			this.checkTimecardSecurityEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkTimecardSecurityEnabled.Click += new System.EventHandler(this.checkTimecardSecurityEnabled_Click);
@@ -158,7 +158,7 @@ namespace OpenDental{
 			this.comboUsers.Location = new System.Drawing.Point(8, 5);
 			this.comboUsers.Name = "comboUsers";
 			this.comboUsers.Size = new System.Drawing.Size(182, 21);
-			this.comboUsers.TabIndex = 60;
+			this.comboUsers.TabIndex = 1;
 			this.comboUsers.SelectionChangeCommitted += new System.EventHandler(this.comboUsers_SelectionChangeCommitted);
 			// 
 			// comboSchoolClass
@@ -168,7 +168,7 @@ namespace OpenDental{
 			this.comboSchoolClass.MaxDropDownItems = 30;
 			this.comboSchoolClass.Name = "comboSchoolClass";
 			this.comboSchoolClass.Size = new System.Drawing.Size(168, 21);
-			this.comboSchoolClass.TabIndex = 90;
+			this.comboSchoolClass.TabIndex = 2;
 			this.comboSchoolClass.Visible = false;
 			this.comboSchoolClass.SelectionChangeCommitted += new System.EventHandler(this.comboSchoolClass_SelectionChangeCommitted);
 			// 
@@ -190,7 +190,7 @@ namespace OpenDental{
 			this.checkCannotEditOwn.Location = new System.Drawing.Point(8, 624);
 			this.checkCannotEditOwn.Name = "checkCannotEditOwn";
 			this.checkCannotEditOwn.Size = new System.Drawing.Size(224, 16);
-			this.checkCannotEditOwn.TabIndex = 92;
+			this.checkCannotEditOwn.TabIndex = 8;
 			this.checkCannotEditOwn.Text = "Users cannot edit their own timecard";
 			this.checkCannotEditOwn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -221,7 +221,7 @@ namespace OpenDental{
 			this.checkPasswordsMustBeStrong.Location = new System.Drawing.Point(238, 624);
 			this.checkPasswordsMustBeStrong.Name = "checkPasswordsMustBeStrong";
 			this.checkPasswordsMustBeStrong.Size = new System.Drawing.Size(224, 16);
-			this.checkPasswordsMustBeStrong.TabIndex = 96;
+			this.checkPasswordsMustBeStrong.TabIndex = 9;
 			this.checkPasswordsMustBeStrong.Text = "Passwords must be strong";
 			this.checkPasswordsMustBeStrong.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPasswordsMustBeStrong.Click += new System.EventHandler(this.checkPasswordsMustBeStrong_Click);
@@ -269,7 +269,7 @@ namespace OpenDental{
 			this.checkLogOffWindows.Location = new System.Drawing.Point(238, 606);
 			this.checkLogOffWindows.Name = "checkLogOffWindows";
 			this.checkLogOffWindows.Size = new System.Drawing.Size(224, 16);
-			this.checkLogOffWindows.TabIndex = 99;
+			this.checkLogOffWindows.TabIndex = 7;
 			this.checkLogOffWindows.Text = "Log off when Windows logs off";
 			this.checkLogOffWindows.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -279,7 +279,7 @@ namespace OpenDental{
 			this.textLogOffAfterMinutes.Location = new System.Drawing.Point(325, 581);
 			this.textLogOffAfterMinutes.Name = "textLogOffAfterMinutes";
 			this.textLogOffAfterMinutes.Size = new System.Drawing.Size(29, 20);
-			this.textLogOffAfterMinutes.TabIndex = 100;
+			this.textLogOffAfterMinutes.TabIndex = 5;
 			this.textLogOffAfterMinutes.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// label3
@@ -313,7 +313,7 @@ namespace OpenDental{
 			this.butChange.Location = new System.Drawing.Point(304, 664);
 			this.butChange.Name = "butChange";
 			this.butChange.Size = new System.Drawing.Size(70, 24);
-			this.butChange.TabIndex = 95;
+			this.butChange.TabIndex = 10;
 			this.butChange.Text = "Change";
 			this.butChange.Click += new System.EventHandler(this.butChange_Click);
 			// 
@@ -328,7 +328,7 @@ namespace OpenDental{
 			this.butSetAll.Location = new System.Drawing.Point(525, 672);
 			this.butSetAll.Name = "butSetAll";
 			this.butSetAll.Size = new System.Drawing.Size(79, 24);
-			this.butSetAll.TabIndex = 58;
+			this.butSetAll.TabIndex = 11;
 			this.butSetAll.Text = "Set All";
 			this.butSetAll.Click += new System.EventHandler(this.butSetAll_Click);
 			// 
@@ -343,7 +343,7 @@ namespace OpenDental{
 			this.butAddUser.Location = new System.Drawing.Point(118, 565);
 			this.butAddUser.Name = "butAddUser";
 			this.butAddUser.Size = new System.Drawing.Size(75, 24);
-			this.butAddUser.TabIndex = 0;
+			this.butAddUser.TabIndex = 4;
 			this.butAddUser.Text = "Add User";
 			this.butAddUser.Click += new System.EventHandler(this.butAddUser_Click);
 			// 
@@ -358,7 +358,7 @@ namespace OpenDental{
 			this.butAddGroup.Location = new System.Drawing.Point(8, 565);
 			this.butAddGroup.Name = "butAddGroup";
 			this.butAddGroup.Size = new System.Drawing.Size(75, 24);
-			this.butAddGroup.TabIndex = 1;
+			this.butAddGroup.TabIndex = 3;
 			this.butAddGroup.Text = "Edit Groups";
 			this.butAddGroup.Click += new System.EventHandler(this.butEditGroups_Click);
 			// 
@@ -373,7 +373,7 @@ namespace OpenDental{
 			this.butClose.Location = new System.Drawing.Point(812, 672);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
-			this.butClose.TabIndex = 0;
+			this.butClose.TabIndex = 12;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -406,8 +406,8 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(875, 337);
 			this.Name = "FormSecurity";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Security";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSecurity_FormClosing);
@@ -467,6 +467,8 @@ namespace OpenDental{
 					node3=SetNode(Permissions.AdminDentalInstructors);
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.AdminDentalStudents);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.AdminDentalEvaluations);
 						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Blockouts);

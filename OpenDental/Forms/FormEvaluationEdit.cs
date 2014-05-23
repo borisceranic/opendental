@@ -10,17 +10,15 @@ using OpenDental.UI;
 namespace OpenDental {
 	public partial class FormEvaluationEdit:Form {
 		private Evaluation _evalCur;
-		private bool _isAdminMode;	
 		private Provider _provInstructor;
 		private Provider _provStudent;
 		private List<EvaluationCriterion> _evalCrits;
 
 
-		public FormEvaluationEdit(Evaluation evalCur, bool isAdminMode) {
+		public FormEvaluationEdit(Evaluation evalCur) {
 			InitializeComponent();
 			Lan.F(this);
 			_evalCur=evalCur;
-			_isAdminMode=isAdminMode;
 		}
 
 		private void FormEvaluationEdit_Load(object sender,EventArgs e) {
@@ -34,6 +32,7 @@ namespace OpenDental {
 				textStudent.Text=_provStudent.GetLongDesc();
 			}
 			textCourse.Text=SchoolCourses.GetDescript(_evalCur.SchoolCourseNum);
+			textGradeNumber.Text=_evalCur.OverallGradeNumber.ToString();
 			textGradeShowing.Text=_evalCur.OverallGradeShowing;
 			FillGrid();
 		}
@@ -45,7 +44,13 @@ namespace OpenDental {
 			//TODO: Add more columns
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationEdit","Description"),180);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grading Scale"),80);
+			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grading Scale"),90);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grade Showing"),90);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grade Number"),90);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Has Note"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -53,6 +58,14 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(_evalCrits[i].CriterionDescript);
 				row.Cells.Add(GradingScales.GetOne(_evalCrits[i].GradingScaleNum).Description);
+				row.Cells.Add(_evalCrits[i].GradeShowing);
+				row.Cells.Add(_evalCrits[i].GradeNumber.ToString());
+				if(String.IsNullOrWhiteSpace(_evalCrits[i].Notes)) {
+					row.Cells.Add("");
+				}
+				else {
+					row.Cells.Add("X");
+				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -63,9 +76,37 @@ namespace OpenDental {
 			FormECE.ShowDialog();
 			if(FormECE.DialogResult==DialogResult.OK) {
 				FillGrid();
+				RecalculateGrades();
 			}
 		}
-		
+
+		private void RecalculateGrades() {
+			float gradeNumber=0;
+			int count=0;
+			for(int i=0;i<_evalCrits.Count;i++) {
+				if(_evalCrits[i].GradingScaleNum==_evalCur.GradingScaleNum) {
+					gradeNumber+=_evalCrits[i].GradeNumber;
+					count++;
+				}
+			}
+			if(count>0) {
+				gradeNumber=gradeNumber/count;
+			}
+			float dif=float.MaxValue;
+			float closestNumber=0;
+			string closestShowing="";
+			List<GradingScaleItem> listGradingScaleItem=GradingScaleItems.Refresh(_evalCur.GradingScaleNum);
+			for(int i=0;i<listGradingScaleItem.Count;i++) {
+				if(Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber) < dif) {
+					dif=Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber);
+					closestNumber=listGradingScaleItem[i].GradeNumber;
+					closestShowing=listGradingScaleItem[i].GradeShowing;
+				}
+			}
+			textGradeNumber.Text=closestNumber.ToString();
+			textGradeShowing.Text=closestShowing;
+		}
+
 		private void butStudentPicker_Click(object sender,EventArgs e) {
 			FormProviderPick FormPP=new FormProviderPick();
 			FormPP.IsStudentPicker=true;
@@ -92,6 +133,19 @@ namespace OpenDental {
 			}
 			_evalCur.DateEval=DateTime.Parse(textDate.Text);
 			_evalCur.StudentNum=_provStudent.ProvNum;
+			_evalCur.OverallGradeShowing=textGradeShowing.Text;
+			_evalCur.OverallGradeNumber=float.Parse(textGradeNumber.Text);
+			if(!String.IsNullOrWhiteSpace(textGradeShowingOverride.Text)) {
+				_evalCur.OverallGradeShowing=textGradeShowingOverride.Text;
+			}
+			if(!String.IsNullOrWhiteSpace(textGradeNumberOverride.Text)) {
+				float parsed=0;
+				if(!float.TryParse(textGradeNumberOverride.Text,out parsed)) {
+					MsgBox.Show(this,"The override for Overall Grade Number is not a valid number.  Please input a valid number to save the evaluation.");
+					return;
+				}
+				_evalCur.OverallGradeNumber=parsed;
+			}
 			Evaluations.Update(_evalCur);
 			DialogResult=DialogResult.OK;
 		}

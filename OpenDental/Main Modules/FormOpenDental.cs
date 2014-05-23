@@ -5162,6 +5162,10 @@ namespace OpenDental{
 		}
 
 		private void menuItemEvaluations_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AdminDentalEvaluations,true) && (Security.CurUser.ProvNum==0 || Providers.GetProv(Security.CurUser.ProvNum).SchoolClassNum!=0)) {
+				MsgBox.Show(this,"Only Instructors may view or edit evaluations.");
+				return;
+			}
 			FormEvaluations FormE=new FormEvaluations();
 			FormE.ShowDialog();
 		}

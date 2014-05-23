@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.textFirstName.MaxLength = 15;
 			this.textFirstName.Name = "textFirstName";
 			this.textFirstName.Size = new System.Drawing.Size(166, 20);
-			this.textFirstName.TabIndex = 22;
+			this.textFirstName.TabIndex = 2;
 			this.textFirstName.TextChanged += new System.EventHandler(this.textFirstName_TextChanged);
 			// 
 			// label1
@@ -78,7 +78,7 @@ namespace OpenDental{
 			this.textLastName.MaxLength = 15;
 			this.textLastName.Name = "textLastName";
 			this.textLastName.Size = new System.Drawing.Size(166, 20);
-			this.textLastName.TabIndex = 24;
+			this.textLastName.TabIndex = 3;
 			this.textLastName.TextChanged += new System.EventHandler(this.textLastName_TextChanged);
 			// 
 			// labelUser
@@ -96,7 +96,7 @@ namespace OpenDental{
 			this.textUserName.MaxLength = 15;
 			this.textUserName.Name = "textUserName";
 			this.textUserName.Size = new System.Drawing.Size(81, 20);
-			this.textUserName.TabIndex = 26;
+			this.textUserName.TabIndex = 5;
 			// 
 			// label3
 			// 
@@ -113,7 +113,7 @@ namespace OpenDental{
 			this.textAbbr.MaxLength = 15;
 			this.textAbbr.Name = "textAbbr";
 			this.textAbbr.Size = new System.Drawing.Size(48, 20);
-			this.textAbbr.TabIndex = 28;
+			this.textAbbr.TabIndex = 4;
 			this.textAbbr.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textAbbr_KeyUp);
 			// 
 			// comboClass
@@ -123,7 +123,7 @@ namespace OpenDental{
 			this.comboClass.Location = new System.Drawing.Point(117, 46);
 			this.comboClass.Name = "comboClass";
 			this.comboClass.Size = new System.Drawing.Size(166, 21);
-			this.comboClass.TabIndex = 30;
+			this.comboClass.TabIndex = 1;
 			// 
 			// label5
 			// 
@@ -149,7 +149,7 @@ namespace OpenDental{
 			this.textPassword.MaxLength = 15;
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(166, 20);
-			this.textPassword.TabIndex = 32;
+			this.textPassword.TabIndex = 6;
 			// 
 			// textUniqueID
 			// 
@@ -193,7 +193,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(329, 177);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -208,7 +208,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(329, 210);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 8;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -234,7 +234,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(432, 284);
 			this.Name = "FormProvStudentEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Student Edit";

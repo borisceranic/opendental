@@ -47,7 +47,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(313, 184);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 7;
+			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -70,7 +70,7 @@ namespace OpenDental{
 			this.butStudentPicker.Location = new System.Drawing.Point(329, 47);
 			this.butStudentPicker.Name = "butStudentPicker";
 			this.butStudentPicker.Size = new System.Drawing.Size(22, 22);
-			this.butStudentPicker.TabIndex = 2;
+			this.butStudentPicker.TabIndex = 1;
 			this.butStudentPicker.Text = "...";
 			this.butStudentPicker.Click += new System.EventHandler(this.butStudentPicker_Click);
 			// 
@@ -93,7 +93,7 @@ namespace OpenDental{
 			this.butInstructorPicker.Location = new System.Drawing.Point(329, 77);
 			this.butInstructorPicker.Name = "butInstructorPicker";
 			this.butInstructorPicker.Size = new System.Drawing.Size(22, 22);
-			this.butInstructorPicker.TabIndex = 4;
+			this.butInstructorPicker.TabIndex = 2;
 			this.butInstructorPicker.Text = "...";
 			this.butInstructorPicker.Click += new System.EventHandler(this.butInstructorPicker_Click);
 			// 
@@ -134,7 +134,7 @@ namespace OpenDental{
 			this.butEvaluation.Location = new System.Drawing.Point(202, 135);
 			this.butEvaluation.Name = "butEvaluation";
 			this.butEvaluation.Size = new System.Drawing.Size(105, 24);
-			this.butEvaluation.TabIndex = 5;
+			this.butEvaluation.TabIndex = 4;
 			this.butEvaluation.Text = "Evaluations";
 			this.butEvaluation.Click += new System.EventHandler(this.butEvaluation_Click);
 			// 
@@ -148,7 +148,7 @@ namespace OpenDental{
 			this.butGradingScales.Location = new System.Drawing.Point(202, 105);
 			this.butGradingScales.Name = "butGradingScales";
 			this.butGradingScales.Size = new System.Drawing.Size(105, 24);
-			this.butGradingScales.TabIndex = 113;
+			this.butGradingScales.TabIndex = 3;
 			this.butGradingScales.Text = "Grading Scales";
 			this.butGradingScales.Click += new System.EventHandler(this.butGradingScales_Click);
 			// 

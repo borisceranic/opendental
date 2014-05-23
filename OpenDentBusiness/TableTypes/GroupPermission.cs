@@ -188,7 +188,10 @@ namespace OpenDentBusiness{
 		///<summary>79- Uses date restrictions.  Has a unique audit trail so that users can track specific ortho chart edits.  FK to OrthoChartNum.</summary>
 		OrthoChartEdit,
 		///<summary>80- There is no user interface in the security window for this permission.  It is only used for tracking.  Mainly used for ortho clinics.</summary>
-		PatientFieldEdit
+		PatientFieldEdit,
+		///<summary>81-Assign this permission to a staff person who will edit evaluations in case of an emergency.  This is not meant to be a permanent permission given to a group.</summary>
+		AdminDentalEvaluations
+
 	}
 
 	

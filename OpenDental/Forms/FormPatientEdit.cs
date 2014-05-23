@@ -298,6 +298,8 @@ namespace OpenDental{
 			this.textChartNumber = new System.Windows.Forms.TextBox();
 			this.textBirthdate = new OpenDental.ValidDate();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butPickSecondary = new OpenDental.UI.Button();
+			this.butPickPrimary = new OpenDental.UI.Button();
 			this.label40 = new System.Windows.Forms.Label();
 			this.label39 = new System.Windows.Forms.Label();
 			this.label38 = new System.Windows.Forms.Label();
@@ -380,8 +382,6 @@ namespace OpenDental{
 			this.labelMotherMaidenLname = new System.Windows.Forms.Label();
 			this.labelDeceased = new System.Windows.Forms.Label();
 			this.textDateDeceased = new System.Windows.Forms.TextBox();
-			this.butPickSecondary = new OpenDental.UI.Button();
-			this.butPickPrimary = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -909,6 +909,34 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Address and Phone";
 			// 
+			// butPickSecondary
+			// 
+			this.butPickSecondary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickSecondary.Autosize = false;
+			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickSecondary.CornerRadius = 2F;
+			this.butPickSecondary.Location = new System.Drawing.Point(376, 219);
+			this.butPickSecondary.Name = "butPickSecondary";
+			this.butPickSecondary.Size = new System.Drawing.Size(18, 21);
+			this.butPickSecondary.TabIndex = 160;
+			this.butPickSecondary.Text = "...";
+			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
+			// 
+			// butPickPrimary
+			// 
+			this.butPickPrimary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickPrimary.Autosize = false;
+			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickPrimary.CornerRadius = 2F;
+			this.butPickPrimary.Location = new System.Drawing.Point(376, 198);
+			this.butPickPrimary.Name = "butPickPrimary";
+			this.butPickPrimary.Size = new System.Drawing.Size(18, 21);
+			this.butPickPrimary.TabIndex = 159;
+			this.butPickPrimary.Text = "...";
+			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
+			// 
 			// label40
 			// 
 			this.label40.Location = new System.Drawing.Point(6, 243);
@@ -1029,7 +1057,7 @@ namespace OpenDental{
 			this.checkSame.Location = new System.Drawing.Point(196, 15);
 			this.checkSame.Name = "checkSame";
 			this.checkSame.Size = new System.Drawing.Size(18, 21);
-			this.checkSame.TabIndex = 11;
+			this.checkSame.TabIndex = 1;
 			this.checkSame.TabStop = false;
 			// 
 			// textCountry
@@ -1730,34 +1758,6 @@ namespace OpenDental{
 			this.textDateDeceased.TabIndex = 10;
 			this.textDateDeceased.Visible = false;
 			this.textDateDeceased.Validated += new System.EventHandler(this.textDateDeceased_Validated);
-			// 
-			// butPickSecondary
-			// 
-			this.butPickSecondary.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPickSecondary.Autosize = false;
-			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPickSecondary.CornerRadius = 2F;
-			this.butPickSecondary.Location = new System.Drawing.Point(376, 219);
-			this.butPickSecondary.Name = "butPickSecondary";
-			this.butPickSecondary.Size = new System.Drawing.Size(18, 21);
-			this.butPickSecondary.TabIndex = 160;
-			this.butPickSecondary.Text = "...";
-			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
-			// 
-			// butPickPrimary
-			// 
-			this.butPickPrimary.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPickPrimary.Autosize = false;
-			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPickPrimary.CornerRadius = 2F;
-			this.butPickPrimary.Location = new System.Drawing.Point(376, 198);
-			this.butPickPrimary.Name = "butPickPrimary";
-			this.butPickPrimary.Size = new System.Drawing.Size(18, 21);
-			this.butPickPrimary.TabIndex = 159;
-			this.butPickPrimary.Text = "...";
-			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
 			// 
 			// FormPatientEdit
 			// 

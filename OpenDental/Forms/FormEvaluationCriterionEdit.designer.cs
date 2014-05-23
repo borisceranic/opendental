@@ -50,7 +50,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(315, 189);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 4;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -65,7 +65,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(315, 219);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -120,7 +120,7 @@ namespace OpenDental{
 			this.textGradeShowing.MaxLength = 255;
 			this.textGradeShowing.Name = "textGradeShowing";
 			this.textGradeShowing.Size = new System.Drawing.Size(121, 20);
-			this.textGradeShowing.TabIndex = 146;
+			this.textGradeShowing.TabIndex = 2;
 			// 
 			// comboGradeNumber
 			// 
@@ -130,7 +130,7 @@ namespace OpenDental{
 			this.comboGradeNumber.Location = new System.Drawing.Point(135, 66);
 			this.comboGradeNumber.Name = "comboGradeNumber";
 			this.comboGradeNumber.Size = new System.Drawing.Size(133, 21);
-			this.comboGradeNumber.TabIndex = 152;
+			this.comboGradeNumber.TabIndex = 1;
 			this.comboGradeNumber.SelectionChangeCommitted += new System.EventHandler(this.comboGradeNumber_SelectionChangeCommitted);
 			// 
 			// label1
@@ -148,18 +148,22 @@ namespace OpenDental{
 			this.textGradeNumberPercent.MaxLength = 255;
 			this.textGradeNumberPercent.Name = "textGradeNumberPercent";
 			this.textGradeNumberPercent.Size = new System.Drawing.Size(121, 20);
-			this.textGradeNumberPercent.TabIndex = 153;
+			this.textGradeNumberPercent.TabIndex = 1;
+			this.textGradeNumberPercent.Tag = "";
 			// 
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(49, 137);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Appointment;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(260, 106);
-			this.textNote.TabIndex = 155;
+			this.textNote.TabIndex = 3;
 			this.textNote.Text = "";
 			// 
 			// labelApptNote
@@ -189,7 +193,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(303, 240);
 			this.Name = "FormEvaluationCriterionEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Criterion Edit";

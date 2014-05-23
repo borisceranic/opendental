@@ -11,8 +11,6 @@ namespace OpenDental {
 	public partial class FormEvaluations:Form {
 		private Provider _userProv;
 		private List<Provider> _listInstructor;
-		private bool _isInstructorMode=false;
-		private bool _isAdminMode=false;
 
 		public FormEvaluations() {
 			InitializeComponent();
@@ -21,13 +19,11 @@ namespace OpenDental {
 
 		private void FormEvaluations_Load(object sender,EventArgs e) {
 			_userProv=Providers.GetProv(Security.CurUser.ProvNum);
-			//_UserProv will only be allowed to be null if the user is an admin. Checking for null in this block is not necessary.
-			if(!Security.IsAuthorized(Permissions.SecurityAdmin,true)) {//TODO: Add a new preference named AdminDentalEvaluations
+			//_userProv will only be allowed to be null if the user is an admin. Checking for null in this block is not necessary.
+			if(!Security.IsAuthorized(Permissions.AdminDentalEvaluations,true)) {
 				groupAdmin.Visible=false;
-				_isInstructorMode=true;
 			}
 			else {
-				_isAdminMode=true;
 				butAdd.Visible=false;
 			}
 			comboCourse.Items.Add("All");
@@ -90,8 +86,7 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			//TODO: Set false to check for the actual Admin setting once it is enabled
-			FormEvaluationEdit FormEE=new FormEvaluationEdit(Evaluations.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString())),false);
+			FormEvaluationEdit FormEE=new FormEvaluationEdit(Evaluations.GetOne(PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString())));
 			FormEE.ShowDialog();
 			FillGrid();
 		}

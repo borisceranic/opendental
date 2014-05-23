@@ -44,7 +44,7 @@ namespace OpenDental{
 			this.butAdd.Location = new System.Drawing.Point(396, 54);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
-			this.butAdd.TabIndex = 3;
+			this.butAdd.TabIndex = 2;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
@@ -59,7 +59,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(396, 215);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -90,7 +90,7 @@ namespace OpenDental{
 			this.butEdit.Location = new System.Drawing.Point(396, 24);
 			this.butEdit.Name = "butEdit";
 			this.butEdit.Size = new System.Drawing.Size(75, 24);
-			this.butEdit.TabIndex = 6;
+			this.butEdit.TabIndex = 1;
 			this.butEdit.Text = "Edit";
 			this.butEdit.Visible = false;
 			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
@@ -106,7 +106,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(396, 185);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 7;
+			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Visible = false;
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
@@ -121,7 +121,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(404, 191);
 			this.Name = "FormGradingScales";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Grading Scales";

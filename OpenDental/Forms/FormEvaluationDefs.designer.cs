@@ -97,6 +97,7 @@ namespace OpenDental{
 			// 
 			// comboCourse
 			// 
+			this.comboCourse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboCourse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboCourse.FormattingEnabled = true;
 			this.comboCourse.ItemHeight = 13;
@@ -127,7 +128,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butDuplicate);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(477, 527);
+			this.MinimumSize = new System.Drawing.Size(379, 388);
 			this.Name = "FormEvaluationDefs";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Definitions";

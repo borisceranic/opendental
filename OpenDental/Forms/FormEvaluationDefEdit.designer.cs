@@ -121,7 +121,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 560);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 13;
+			this.butDelete.TabIndex = 9;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -138,7 +138,7 @@ namespace OpenDental{
 			this.butCriterionAdd.Location = new System.Drawing.Point(229, 529);
 			this.butCriterionAdd.Name = "butCriterionAdd";
 			this.butCriterionAdd.Size = new System.Drawing.Size(75, 24);
-			this.butCriterionAdd.TabIndex = 7;
+			this.butCriterionAdd.TabIndex = 8;
 			this.butCriterionAdd.Text = "Add";
 			this.butCriterionAdd.Click += new System.EventHandler(this.butCriterionAdd_Click);
 			// 
@@ -169,7 +169,7 @@ namespace OpenDental{
 			this.butDown.Location = new System.Drawing.Point(109, 529);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(82, 24);
-			this.butDown.TabIndex = 9;
+			this.butDown.TabIndex = 7;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
@@ -186,7 +186,7 @@ namespace OpenDental{
 			this.butUp.Location = new System.Drawing.Point(12, 529);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(82, 24);
-			this.butUp.TabIndex = 8;
+			this.butUp.TabIndex = 6;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
@@ -217,7 +217,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(325, 530);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 11;
+			this.butOK.TabIndex = 10;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -232,7 +232,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(325, 560);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 12;
+			this.butCancel.TabIndex = 11;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -256,7 +256,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(428, 634);
+			this.MinimumSize = new System.Drawing.Size(390, 353);
 			this.Name = "FormEvaluationDefEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Definition Edit";

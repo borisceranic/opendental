@@ -48,7 +48,7 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary>Get all Criterion attached to and Evaluation.</summary>
+		///<summary>Get all Criterion attached to an Evaluation.</summary>
 		public static List<EvaluationCriterion> Refresh(long evaluationNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EvaluationCriterion>>(MethodBase.GetCurrentMethod(),evaluationNum);

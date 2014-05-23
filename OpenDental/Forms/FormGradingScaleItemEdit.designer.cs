@@ -48,7 +48,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(205, 92);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 5;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -63,21 +63,19 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(286, 92);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 6;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// textDescription
 			// 
-			this.textDescription.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.textDescription.Location = new System.Drawing.Point(131, 66);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(199, 20);
-			this.textDescription.TabIndex = 74;
+			this.textDescription.TabIndex = 3;
 			// 
 			// labelGradeNumber
 			// 
-			this.labelGradeNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.labelGradeNumber.Location = new System.Drawing.Point(6, 43);
 			this.labelGradeNumber.Name = "labelGradeNumber";
 			this.labelGradeNumber.Size = new System.Drawing.Size(125, 18);
@@ -87,15 +85,13 @@ namespace OpenDental{
 			// 
 			// textGradeShowing
 			// 
-			this.textGradeShowing.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.textGradeShowing.Location = new System.Drawing.Point(131, 20);
 			this.textGradeShowing.Name = "textGradeShowing";
 			this.textGradeShowing.Size = new System.Drawing.Size(61, 20);
-			this.textGradeShowing.TabIndex = 71;
+			this.textGradeShowing.TabIndex = 1;
 			// 
 			// labelGradeShowing
 			// 
-			this.labelGradeShowing.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.labelGradeShowing.Location = new System.Drawing.Point(6, 20);
 			this.labelGradeShowing.Name = "labelGradeShowing";
 			this.labelGradeShowing.Size = new System.Drawing.Size(125, 18);
@@ -114,7 +110,6 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.label1.Location = new System.Drawing.Point(198, 20);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(125, 18);
@@ -124,7 +119,6 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.label2.Location = new System.Drawing.Point(198, 43);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(125, 18);
@@ -134,16 +128,15 @@ namespace OpenDental{
 			// 
 			// textGradeNumber
 			// 
-			this.textGradeNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.textGradeNumber.Location = new System.Drawing.Point(131, 43);
 			this.textGradeNumber.Name = "textGradeNumber";
 			this.textGradeNumber.Size = new System.Drawing.Size(61, 20);
-			this.textGradeNumber.TabIndex = 77;
+			this.textGradeNumber.TabIndex = 2;
 			// 
 			// butDelete
 			// 
 			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -153,7 +146,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(6, 92);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(78, 24);
-			this.butDelete.TabIndex = 78;
+			this.butDelete.TabIndex = 4;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -173,7 +166,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(358, 161);
 			this.Name = "FormGradingScaleItemEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Grading Scale Item Edit";
