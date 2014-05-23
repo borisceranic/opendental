@@ -56,11 +56,9 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.groupExclusion = new System.Windows.Forms.GroupBox();
 			this.butChangeDefault = new System.Windows.Forms.Button();
-			this.textReasonDescript = new OpenDental.ODtextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.labelNotPerf = new System.Windows.Forms.Label();
 			this.textReasonCode = new System.Windows.Forms.TextBox();
-			this.textPregCodeDescript = new OpenDental.ODtextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.checkNotPerf = new System.Windows.Forms.CheckBox();
 			this.labelPregNotice = new System.Windows.Forms.Label();
@@ -70,6 +68,8 @@
 			this.textBMIPercentile = new System.Windows.Forms.TextBox();
 			this.labelBMIPercentile = new System.Windows.Forms.Label();
 			this.textBMIPercentileCode = new System.Windows.Forms.TextBox();
+			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
+			this.textReasonDescript = new System.Windows.Forms.TextBox();
 			this.groupExclusion.SuspendLayout();
 			this.groupInterventions.SuspendLayout();
 			this.SuspendLayout();
@@ -350,12 +350,12 @@
 			// 
 			// groupExclusion
 			// 
-			this.groupExclusion.Controls.Add(this.butChangeDefault);
 			this.groupExclusion.Controls.Add(this.textReasonDescript);
+			this.groupExclusion.Controls.Add(this.textPregCodeDescript);
+			this.groupExclusion.Controls.Add(this.butChangeDefault);
 			this.groupExclusion.Controls.Add(this.label4);
 			this.groupExclusion.Controls.Add(this.labelNotPerf);
 			this.groupExclusion.Controls.Add(this.textReasonCode);
-			this.groupExclusion.Controls.Add(this.textPregCodeDescript);
 			this.groupExclusion.Controls.Add(this.label3);
 			this.groupExclusion.Controls.Add(this.checkNotPerf);
 			this.groupExclusion.Controls.Add(this.labelPregNotice);
@@ -379,20 +379,6 @@
 			this.butChangeDefault.Text = "Change Default";
 			this.butChangeDefault.UseVisualStyleBackColor = true;
 			this.butChangeDefault.Click += new System.EventHandler(this.butChangeDefault_Click);
-			// 
-			// textReasonDescript
-			// 
-			this.textReasonDescript.AcceptsTab = true;
-			this.textReasonDescript.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textReasonDescript.DetectUrls = false;
-			this.textReasonDescript.Location = new System.Drawing.Point(377, 133);
-			this.textReasonDescript.Name = "textReasonDescript";
-			this.textReasonDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textReasonDescript.ReadOnly = true;
-			this.textReasonDescript.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textReasonDescript.Size = new System.Drawing.Size(195, 40);
-			this.textReasonDescript.TabIndex = 141;
-			this.textReasonDescript.Text = "";
 			// 
 			// label4
 			// 
@@ -420,20 +406,6 @@
 			this.textReasonCode.ReadOnly = true;
 			this.textReasonCode.Size = new System.Drawing.Size(100, 20);
 			this.textReasonCode.TabIndex = 139;
-			// 
-			// textPregCodeDescript
-			// 
-			this.textPregCodeDescript.AcceptsTab = true;
-			this.textPregCodeDescript.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textPregCodeDescript.DetectUrls = false;
-			this.textPregCodeDescript.Location = new System.Drawing.Point(377, 40);
-			this.textPregCodeDescript.Name = "textPregCodeDescript";
-			this.textPregCodeDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textPregCodeDescript.ReadOnly = true;
-			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textPregCodeDescript.Size = new System.Drawing.Size(195, 40);
-			this.textPregCodeDescript.TabIndex = 132;
-			this.textPregCodeDescript.Text = "";
 			// 
 			// label3
 			// 
@@ -529,6 +501,30 @@
 			this.textBMIPercentileCode.TabIndex = 164;
 			this.textBMIPercentileCode.Visible = false;
 			// 
+			// textPregCodeDescript
+			// 
+			this.textPregCodeDescript.AcceptsTab = true;
+			this.textPregCodeDescript.Location = new System.Drawing.Point(377, 40);
+			this.textPregCodeDescript.MaxLength = 2147483647;
+			this.textPregCodeDescript.Multiline = true;
+			this.textPregCodeDescript.Name = "textPregCodeDescript";
+			this.textPregCodeDescript.ReadOnly = true;
+			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textPregCodeDescript.Size = new System.Drawing.Size(195, 40);
+			this.textPregCodeDescript.TabIndex = 132;
+			// 
+			// textReasonDescript
+			// 
+			this.textReasonDescript.AcceptsTab = true;
+			this.textReasonDescript.Location = new System.Drawing.Point(377, 133);
+			this.textReasonDescript.MaxLength = 2147483647;
+			this.textReasonDescript.Multiline = true;
+			this.textReasonDescript.Name = "textReasonDescript";
+			this.textReasonDescript.ReadOnly = true;
+			this.textReasonDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textReasonDescript.Size = new System.Drawing.Size(195, 40);
+			this.textReasonDescript.TabIndex = 141;
+			// 
 			// FormVitalsignEdit2014
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -614,9 +610,7 @@
 		private System.Windows.Forms.GroupBox groupExclusion;
 		private System.Windows.Forms.CheckBox checkNotPerf;
 		private System.Windows.Forms.Label labelPregNotice;
-		private OpenDental.ODtextBox textPregCodeDescript;
 		private System.Windows.Forms.Label label3;
-		private OpenDental.ODtextBox textReasonDescript;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label labelNotPerf;
 		private System.Windows.Forms.TextBox textReasonCode;
@@ -627,5 +621,7 @@
 		private System.Windows.Forms.TextBox textBMIPercentile;
 		private System.Windows.Forms.Label labelBMIPercentile;
 		private System.Windows.Forms.TextBox textBMIPercentileCode;
+		private System.Windows.Forms.TextBox textReasonDescript;
+		private System.Windows.Forms.TextBox textPregCodeDescript;
 	}
 }

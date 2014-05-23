@@ -32,7 +32,6 @@ namespace OpenDental{
 			this.labelEncWarning = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textEncCodeValue = new System.Windows.Forms.TextBox();
-			this.textEncCodeDescript = new OpenDental.ODtextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
@@ -46,7 +45,6 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.textPregCodeValue = new System.Windows.Forms.TextBox();
-			this.textPregCodeDescript = new OpenDental.ODtextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.butPregIcd9 = new OpenDental.UI.Button();
 			this.butPregSnomed = new OpenDental.UI.Button();
@@ -58,6 +56,8 @@ namespace OpenDental{
 			this.checkAlertHighSeverity = new System.Windows.Forms.CheckBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.textEncCodeDescript = new System.Windows.Forms.TextBox();
+			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
 			this.groupEncounter.SuspendLayout();
 			this.groupPregnancy.SuspendLayout();
 			this.groupGlobalSettings.SuspendLayout();
@@ -78,13 +78,13 @@ namespace OpenDental{
 			// 
 			// groupEncounter
 			// 
+			this.groupEncounter.Controls.Add(this.textEncCodeDescript);
 			this.groupEncounter.Controls.Add(this.butEncCpt);
 			this.groupEncounter.Controls.Add(this.comboEncCodes);
 			this.groupEncounter.Controls.Add(this.label5);
 			this.groupEncounter.Controls.Add(this.labelEncWarning);
 			this.groupEncounter.Controls.Add(this.label6);
 			this.groupEncounter.Controls.Add(this.textEncCodeValue);
-			this.groupEncounter.Controls.Add(this.textEncCodeDescript);
 			this.groupEncounter.Controls.Add(this.label1);
 			this.groupEncounter.Controls.Add(this.label2);
 			this.groupEncounter.Controls.Add(this.label4);
@@ -160,20 +160,6 @@ namespace OpenDental{
 			this.textEncCodeValue.ReadOnly = true;
 			this.textEncCodeValue.Size = new System.Drawing.Size(158, 20);
 			this.textEncCodeValue.TabIndex = 126;
-			// 
-			// textEncCodeDescript
-			// 
-			this.textEncCodeDescript.AcceptsTab = true;
-			this.textEncCodeDescript.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textEncCodeDescript.DetectUrls = false;
-			this.textEncCodeDescript.Location = new System.Drawing.Point(124, 102);
-			this.textEncCodeDescript.Name = "textEncCodeDescript";
-			this.textEncCodeDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textEncCodeDescript.ReadOnly = true;
-			this.textEncCodeDescript.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textEncCodeDescript.Size = new System.Drawing.Size(323, 46);
-			this.textEncCodeDescript.TabIndex = 108;
-			this.textEncCodeDescript.Text = "";
 			// 
 			// label1
 			// 
@@ -255,12 +241,12 @@ namespace OpenDental{
 			// 
 			// groupPregnancy
 			// 
+			this.groupPregnancy.Controls.Add(this.textPregCodeDescript);
 			this.groupPregnancy.Controls.Add(this.comboPregCodes);
 			this.groupPregnancy.Controls.Add(this.labelPregWarning);
 			this.groupPregnancy.Controls.Add(this.label8);
 			this.groupPregnancy.Controls.Add(this.label9);
 			this.groupPregnancy.Controls.Add(this.textPregCodeValue);
-			this.groupPregnancy.Controls.Add(this.textPregCodeDescript);
 			this.groupPregnancy.Controls.Add(this.label10);
 			this.groupPregnancy.Controls.Add(this.butPregIcd9);
 			this.groupPregnancy.Controls.Add(this.butPregSnomed);
@@ -321,20 +307,6 @@ namespace OpenDental{
 			this.textPregCodeValue.ReadOnly = true;
 			this.textPregCodeValue.Size = new System.Drawing.Size(158, 20);
 			this.textPregCodeValue.TabIndex = 126;
-			// 
-			// textPregCodeDescript
-			// 
-			this.textPregCodeDescript.AcceptsTab = true;
-			this.textPregCodeDescript.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textPregCodeDescript.DetectUrls = false;
-			this.textPregCodeDescript.Location = new System.Drawing.Point(124, 102);
-			this.textPregCodeDescript.Name = "textPregCodeDescript";
-			this.textPregCodeDescript.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textPregCodeDescript.ReadOnly = true;
-			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textPregCodeDescript.Size = new System.Drawing.Size(323, 46);
-			this.textPregCodeDescript.TabIndex = 108;
-			this.textPregCodeDescript.Text = "";
 			// 
 			// label10
 			// 
@@ -468,6 +440,30 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// textEncCodeDescript
+			// 
+			this.textEncCodeDescript.AcceptsTab = true;
+			this.textEncCodeDescript.Location = new System.Drawing.Point(124, 102);
+			this.textEncCodeDescript.MaxLength = 2147483647;
+			this.textEncCodeDescript.Multiline = true;
+			this.textEncCodeDescript.Name = "textEncCodeDescript";
+			this.textEncCodeDescript.ReadOnly = true;
+			this.textEncCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textEncCodeDescript.Size = new System.Drawing.Size(323, 46);
+			this.textEncCodeDescript.TabIndex = 108;
+			// 
+			// textPregCodeDescript
+			// 
+			this.textPregCodeDescript.AcceptsTab = true;
+			this.textPregCodeDescript.Location = new System.Drawing.Point(124, 102);
+			this.textPregCodeDescript.MaxLength = 2147483647;
+			this.textPregCodeDescript.Multiline = true;
+			this.textPregCodeDescript.Name = "textPregCodeDescript";
+			this.textPregCodeDescript.ReadOnly = true;
+			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textPregCodeDescript.Size = new System.Drawing.Size(323, 46);
+			this.textPregCodeDescript.TabIndex = 131;
+			// 
 			// FormEhrSettings
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -501,7 +497,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox textEncCodeValue;
-		private ODtextBox textEncCodeDescript;
 		private System.Windows.Forms.Label label2;
 		private UI.Button butEncHcpcs;
 		private UI.Button butEncSnomed;
@@ -514,7 +509,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.TextBox textPregCodeValue;
-		private ODtextBox textPregCodeDescript;
 		private System.Windows.Forms.Label label10;
 		private UI.Button butPregIcd9;
 		private UI.Button butPregSnomed;
@@ -527,5 +521,7 @@ namespace OpenDental{
 		private System.Windows.Forms.ComboBox comboPregCodes;
 		private UI.Button butEncCpt;
 		private System.Windows.Forms.CheckBox checkAlertHighSeverity;
+		private System.Windows.Forms.TextBox textEncCodeDescript;
+		private System.Windows.Forms.TextBox textPregCodeDescript;
 	}
 }

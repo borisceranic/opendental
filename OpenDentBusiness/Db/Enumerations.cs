@@ -719,7 +719,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Used by QuickPasteCat to determine which category to default to when opening.</summary>
 	public enum QuickPasteType {
-		///<summary>0</summary>
+		///<summary>0 - None should never be used.  It is simply used as a "default" when adding a new control.  Searching for usage of "None" is an easy way to find spots where our pattern was not followed correctly.</summary>
 		None,
 		///<summary>1</summary>
 		Procedure,

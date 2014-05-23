@@ -33,7 +33,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.comboCodeSet = new System.Windows.Forms.ComboBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.textNote = new OpenDental.ODtextBox();
+			this.textNote = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// textDate
@@ -129,19 +129,19 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
-			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(90, 439);
+			this.textNote.MaxLength = 2147483647;
+			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
-			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textNote.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(550, 60);
 			this.textNote.TabIndex = 147;
-			this.textNote.Text = "";
 			// 
 			// FormInterventionEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(652, 548);
+			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.comboCodeSet);
@@ -149,7 +149,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label6);
-			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.textDate);
 			this.Controls.Add(this.label5);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -166,7 +165,6 @@ namespace OpenDental{
 
 		private System.Windows.Forms.TextBox textDate;
 		private System.Windows.Forms.Label label5;
-		private ODtextBox textNote;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Button butOK;
 		private System.Windows.Forms.Button butCancel;
@@ -174,5 +172,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox comboCodeSet;
 		private UI.ODGrid gridMain;
+		private System.Windows.Forms.TextBox textNote;
 	}
 }

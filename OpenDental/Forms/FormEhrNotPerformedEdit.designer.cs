@@ -27,7 +27,7 @@ namespace OpenDental{
 			this.textDate = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.groupItem = new System.Windows.Forms.GroupBox();
-			this.textDescription = new OpenDental.ODtextBox();
+			this.textDescription = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.labelBPsExamCode = new System.Windows.Forms.Label();
 			this.textCodeSystem = new System.Windows.Forms.TextBox();
@@ -41,13 +41,13 @@ namespace OpenDental{
 			this.radioPatReason = new System.Windows.Forms.RadioButton();
 			this.label4 = new System.Windows.Forms.Label();
 			this.comboCodeReason = new System.Windows.Forms.ComboBox();
-			this.textDescriptionReason = new OpenDental.ODtextBox();
 			this.textCodeSystemReason = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.butOK = new System.Windows.Forms.Button();
 			this.butCancel = new System.Windows.Forms.Button();
 			this.butDelete = new System.Windows.Forms.Button();
-			this.textNote = new OpenDental.ODtextBox();
+			this.textDescriptionReason = new System.Windows.Forms.TextBox();
+			this.textNote = new System.Windows.Forms.TextBox();
 			this.groupItem.SuspendLayout();
 			this.groupReason.SuspendLayout();
 			this.SuspendLayout();
@@ -86,16 +86,14 @@ namespace OpenDental{
 			// textDescription
 			// 
 			this.textDescription.AcceptsTab = true;
-			this.textDescription.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textDescription.DetectUrls = false;
 			this.textDescription.Location = new System.Drawing.Point(98, 65);
+			this.textDescription.MaxLength = 2147483647;
+			this.textDescription.Multiline = true;
 			this.textDescription.Name = "textDescription";
-			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textDescription.ReadOnly = true;
-			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textDescription.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textDescription.Size = new System.Drawing.Size(245, 51);
 			this.textDescription.TabIndex = 141;
-			this.textDescription.Text = "";
 			// 
 			// label3
 			// 
@@ -142,6 +140,7 @@ namespace OpenDental{
 			// 
 			// groupReason
 			// 
+			this.groupReason.Controls.Add(this.textDescriptionReason);
 			this.groupReason.Controls.Add(this.radioMedReason);
 			this.groupReason.Controls.Add(this.label1);
 			this.groupReason.Controls.Add(this.radioSysReason);
@@ -149,7 +148,6 @@ namespace OpenDental{
 			this.groupReason.Controls.Add(this.radioPatReason);
 			this.groupReason.Controls.Add(this.label4);
 			this.groupReason.Controls.Add(this.comboCodeReason);
-			this.groupReason.Controls.Add(this.textDescriptionReason);
 			this.groupReason.Controls.Add(this.textCodeSystemReason);
 			this.groupReason.Location = new System.Drawing.Point(12, 173);
 			this.groupReason.Name = "groupReason";
@@ -231,20 +229,6 @@ namespace OpenDental{
 			this.comboCodeReason.SelectionChangeCommitted += new System.EventHandler(this.comboReasonCode_SelectionChangeCommitted);
 			this.comboCodeReason.DropDownClosed += new System.EventHandler(this.comboCodeReason_DropDownClosed);
 			// 
-			// textDescriptionReason
-			// 
-			this.textDescriptionReason.AcceptsTab = true;
-			this.textDescriptionReason.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.textDescriptionReason.DetectUrls = false;
-			this.textDescriptionReason.Location = new System.Drawing.Point(98, 82);
-			this.textDescriptionReason.Name = "textDescriptionReason";
-			this.textDescriptionReason.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textDescriptionReason.ReadOnly = true;
-			this.textDescriptionReason.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textDescriptionReason.Size = new System.Drawing.Size(245, 34);
-			this.textDescriptionReason.TabIndex = 147;
-			this.textDescriptionReason.Text = "";
-			// 
 			// textCodeSystemReason
 			// 
 			this.textCodeSystemReason.Location = new System.Drawing.Point(98, 60);
@@ -296,27 +280,38 @@ namespace OpenDental{
 			this.butDelete.UseVisualStyleBackColor = true;
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
+			// textDescriptionReason
+			// 
+			this.textDescriptionReason.AcceptsTab = true;
+			this.textDescriptionReason.Location = new System.Drawing.Point(98, 82);
+			this.textDescriptionReason.MaxLength = 2147483647;
+			this.textDescriptionReason.Multiline = true;
+			this.textDescriptionReason.Name = "textDescriptionReason";
+			this.textDescriptionReason.ReadOnly = true;
+			this.textDescriptionReason.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textDescriptionReason.Size = new System.Drawing.Size(245, 34);
+			this.textDescriptionReason.TabIndex = 147;
+			// 
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
-			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(110, 305);
+			this.textNote.MaxLength = 2147483647;
+			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
-			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textNote.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(245, 60);
-			this.textNote.TabIndex = 147;
-			this.textNote.Text = "";
+			this.textNote.TabIndex = 148;
 			// 
 			// FormEhrNotPerformedEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(377, 414);
+			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label6);
-			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.groupReason);
 			this.Controls.Add(this.groupItem);
 			this.Controls.Add(this.textDate);
@@ -340,7 +335,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textDate;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.GroupBox groupItem;
-		private ODtextBox textDescription;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label labelBPsExamCode;
 		private System.Windows.Forms.TextBox textCodeSystem;
@@ -351,9 +345,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.ComboBox comboCodeReason;
-		private ODtextBox textDescriptionReason;
 		private System.Windows.Forms.TextBox textCodeSystemReason;
-		private ODtextBox textNote;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Button butOK;
 		private System.Windows.Forms.Button butCancel;
@@ -361,5 +353,8 @@ namespace OpenDental{
 		private System.Windows.Forms.RadioButton radioMedReason;
 		private System.Windows.Forms.RadioButton radioSysReason;
 		private System.Windows.Forms.RadioButton radioPatReason;
+		private System.Windows.Forms.TextBox textDescription;
+		private System.Windows.Forms.TextBox textDescriptionReason;
+		private System.Windows.Forms.TextBox textNote;
 	}
 }

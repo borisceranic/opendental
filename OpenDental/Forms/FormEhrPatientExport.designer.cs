@@ -33,14 +33,14 @@ namespace OpenDental{
 			this.labelLName = new System.Windows.Forms.Label();
 			this.labelFName = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.label1 = new System.Windows.Forms.Label();
+			this.textPatNum = new System.Windows.Forms.TextBox();
+			this.textLName = new System.Windows.Forms.TextBox();
+			this.textFName = new System.Windows.Forms.TextBox();
 			this.butSearch = new OpenDental.UI.Button();
 			this.butExport = new OpenDental.UI.Button();
-			this.textFName = new OpenDental.ODtextBox();
-			this.textLName = new OpenDental.ODtextBox();
 			this.butSelectAll = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.textPatNum = new OpenDental.ODtextBox();
 			this.SuspendLayout();
 			// 
 			// comboProv
@@ -99,9 +99,9 @@ namespace OpenDental{
 			// 
 			// labelLName
 			// 
-			this.labelLName.Location = new System.Drawing.Point(15, 32);
+			this.labelLName.Location = new System.Drawing.Point(15, 34);
 			this.labelLName.Name = "labelLName";
-			this.labelLName.Size = new System.Drawing.Size(70, 22);
+			this.labelLName.Size = new System.Drawing.Size(70, 21);
 			this.labelLName.TabIndex = 37;
 			this.labelLName.Text = "Last Name";
 			this.labelLName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -127,9 +127,45 @@ namespace OpenDental{
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
 			this.gridMain.Size = new System.Drawing.Size(590, 365);
-			this.gridMain.TabIndex = 4;
+			this.gridMain.TabIndex = 10;
 			this.gridMain.Title = "Patient Export List";
 			this.gridMain.TranslationName = null;
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(15, 56);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(70, 19);
+			this.label1.TabIndex = 40;
+			this.label1.Text = "Patnum";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPatNum
+			// 
+			this.textPatNum.Location = new System.Drawing.Point(87, 56);
+			this.textPatNum.MaxLength = 2147483647;
+			this.textPatNum.Multiline = true;
+			this.textPatNum.Name = "textPatNum";
+			this.textPatNum.Size = new System.Drawing.Size(160, 21);
+			this.textPatNum.TabIndex = 6;
+			// 
+			// textLName
+			// 
+			this.textLName.Location = new System.Drawing.Point(87, 34);
+			this.textLName.MaxLength = 2147483647;
+			this.textLName.Multiline = true;
+			this.textLName.Name = "textLName";
+			this.textLName.Size = new System.Drawing.Size(160, 21);
+			this.textLName.TabIndex = 5;
+			// 
+			// textFName
+			// 
+			this.textFName.Location = new System.Drawing.Point(87, 12);
+			this.textFName.MaxLength = 2147483647;
+			this.textFName.Multiline = true;
+			this.textFName.Name = "textFName";
+			this.textFName.Size = new System.Drawing.Size(160, 21);
+			this.textFName.TabIndex = 4;
 			// 
 			// butSearch
 			// 
@@ -161,32 +197,6 @@ namespace OpenDental{
 			this.butExport.Text = "Export Selected";
 			this.butExport.Click += new System.EventHandler(this.butExport_Click);
 			// 
-			// textFName
-			// 
-			this.textFName.AcceptsTab = true;
-			this.textFName.DetectUrls = false;
-			this.textFName.Location = new System.Drawing.Point(87, 12);
-			this.textFName.Multiline = false;
-			this.textFName.Name = "textFName";
-			this.textFName.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textFName.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textFName.Size = new System.Drawing.Size(160, 21);
-			this.textFName.TabIndex = 39;
-			this.textFName.Text = "";
-			// 
-			// textLName
-			// 
-			this.textLName.AcceptsTab = true;
-			this.textLName.DetectUrls = false;
-			this.textLName.Location = new System.Drawing.Point(87, 33);
-			this.textLName.Multiline = false;
-			this.textLName.Name = "textLName";
-			this.textLName.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textLName.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textLName.Size = new System.Drawing.Size(160, 21);
-			this.textLName.TabIndex = 38;
-			this.textLName.Text = "";
-			// 
 			// butSelectAll
 			// 
 			this.butSelectAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -217,41 +227,19 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(15, 54);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(70, 22);
-			this.label1.TabIndex = 40;
-			this.label1.Text = "Patnum";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textPatNum
-			// 
-			this.textPatNum.AcceptsTab = true;
-			this.textPatNum.DetectUrls = false;
-			this.textPatNum.Location = new System.Drawing.Point(87, 55);
-			this.textPatNum.Multiline = false;
-			this.textPatNum.Name = "textPatNum";
-			this.textPatNum.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textPatNum.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textPatNum.Size = new System.Drawing.Size(160, 21);
-			this.textPatNum.TabIndex = 41;
-			this.textPatNum.Text = "";
-			// 
 			// FormEhrPatientExport
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(626, 498);
-			this.Controls.Add(this.label1);
+			this.Controls.Add(this.textFName);
+			this.Controls.Add(this.textLName);
 			this.Controls.Add(this.textPatNum);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.butExport);
-			this.Controls.Add(this.textFName);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.labelLName);
 			this.Controls.Add(this.labelSite);
-			this.Controls.Add(this.textLName);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelFName);
 			this.Controls.Add(this.butSelectAll);
@@ -264,9 +252,10 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(611, 243);
 			this.Name = "FormEhrPatientExport";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Ehr Patient Export";
+			this.Text = "EHR Patient Export";
 			this.Load += new System.EventHandler(this.FormEhrPatientExport_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -285,9 +274,9 @@ namespace OpenDental{
 		private UI.Button butSearch;
 		private System.Windows.Forms.Label labelLName;
 		private System.Windows.Forms.Label labelFName;
-		private ODtextBox textFName;
-		private ODtextBox textLName;
 		private System.Windows.Forms.Label label1;
-		private ODtextBox textPatNum;
+		private System.Windows.Forms.TextBox textPatNum;
+		private System.Windows.Forms.TextBox textLName;
+		private System.Windows.Forms.TextBox textFName;
 	}
 }
