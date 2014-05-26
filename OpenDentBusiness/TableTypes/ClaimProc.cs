@@ -88,6 +88,8 @@ namespace OpenDentBusiness{
 		///<summary>Not a database column.  Used to help manage passing lists around.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public bool DoDelete;
+		///<summary>FK to payplan.PayPlanNum.  0 if not attached to a payplan.</summary>
+		public long PayPlanNum;
 		
 
 

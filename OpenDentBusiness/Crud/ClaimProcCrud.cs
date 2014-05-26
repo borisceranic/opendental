@@ -84,6 +84,7 @@ namespace OpenDentBusiness.Crud{
 				claimProc.ClinicNum           = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				claimProc.InsSubNum           = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
 				claimProc.PaymentRow          = PIn.Int   (table.Rows[i]["PaymentRow"].ToString());
+				claimProc.PayPlanNum          = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
 				retVal.Add(claimProc);
 			}
 			return retVal;
@@ -124,7 +125,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimProcNum,";
 			}
-			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow) VALUES(";
+			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claimProc.ClaimProcNum)+",";
 			}
@@ -165,7 +166,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(claimProc.WriteOffEstOverride)+"',"
 				+    POut.Long  (claimProc.ClinicNum)+","
 				+    POut.Long  (claimProc.InsSubNum)+","
-				+    POut.Int   (claimProc.PaymentRow)+")";
+				+    POut.Int   (claimProc.PaymentRow)+","
+				+    POut.Long  (claimProc.PayPlanNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -214,7 +216,8 @@ namespace OpenDentBusiness.Crud{
 				+"WriteOffEstOverride = '"+POut.Double(claimProc.WriteOffEstOverride)+"', "
 				+"ClinicNum           =  "+POut.Long  (claimProc.ClinicNum)+", "
 				+"InsSubNum           =  "+POut.Long  (claimProc.InsSubNum)+", "
-				+"PaymentRow          =  "+POut.Int   (claimProc.PaymentRow)+" "
+				+"PaymentRow          =  "+POut.Int   (claimProc.PaymentRow)+", "
+				+"PayPlanNum          =  "+POut.Long  (claimProc.PayPlanNum)+" "
 				+"WHERE ClaimProcNum = "+POut.Long(claimProc.ClaimProcNum);
 			Db.NonQ(command);
 		}
@@ -369,6 +372,10 @@ namespace OpenDentBusiness.Crud{
 			if(claimProc.PaymentRow != oldClaimProc.PaymentRow) {
 				if(command!=""){ command+=",";}
 				command+="PaymentRow = "+POut.Int(claimProc.PaymentRow)+"";
+			}
+			if(claimProc.PayPlanNum != oldClaimProc.PayPlanNum) {
+				if(command!=""){ command+=",";}
+				command+="PayPlanNum = "+POut.Long(claimProc.PayPlanNum)+"";
 			}
 			if(command==""){
 				return false;

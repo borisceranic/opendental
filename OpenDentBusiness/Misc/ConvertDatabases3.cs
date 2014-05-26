@@ -4959,6 +4959,22 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE provider MODIFY EhrMuStage NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimproc ADD PayPlanNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD INDEX (PayPlanNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimproc ADD PayPlanNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET PayPlanNum = 0 WHERE PayPlanNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc MODIFY PayPlanNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimproc_PayPlanNum ON claimproc (PayPlanNum)";
+					Db.NonQ(command);
+				}
 
 
 
