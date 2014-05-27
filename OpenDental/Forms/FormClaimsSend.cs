@@ -1136,7 +1136,21 @@ namespace OpenDental{
 			}
 			if(et.Etype==EtransType.ERA_835) {
 				FormEtrans835Edit Form835=new FormEtrans835Edit();
-				Form835.EtransCur=et;
+				Form835.MessageText835=EtransMessageTexts.GetMessageText(et.EtransMessageTextNum);
+				Form835.TranSetId835=et.TranSetId835;
+				if(et.TranSetId835=="") {//This etrans entry is an old entry from version 14.2.
+					X12object x835=new X12object(Form835.MessageText835);
+					List<string> listTranSetIds=X835.GetTranSetIds(x835);
+					Form835.TranSetId835=listTranSetIds[0];
+					if(listTranSetIds.Count>=2) {
+						FormEtrans835PickEob formPickEob=new FormEtrans835PickEob();
+						formPickEob.ListEobTranIds=listTranSetIds;
+						if(formPickEob.ShowDialog()==DialogResult.Cancel) {
+							return;
+						}
+						Form835.TranSetId835=formPickEob.SelectedTranId;
+					}
+				}
 				Form835.Show();
 				return;//No refresh needed because 835s are not editable, they are read only.
 			}

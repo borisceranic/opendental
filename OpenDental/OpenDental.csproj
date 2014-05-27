@@ -378,6 +378,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEtrans835PickEob.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEtrans835PickEob.designer.cs">
+      <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEvaluationEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3477,6 +3483,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans835PickEob.resx">
+      <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEvaluationEdit.resx">
       <DependentUpon>FormEvaluationEdit.cs</DependentUpon>

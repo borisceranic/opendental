@@ -142,7 +142,7 @@ namespace OpenDental.Eclaims {
 				return;
 			}
 			else if(etrans271.Etype==EtransType.ERA_835) {
-				X835 x835=new X835(x12response);
+				X835 x835=new X835(x12response,"");
 				string error835=x835.GetHumanReadable();
 				etrans.Note="Error: "+error835;//"Malformed document sent.  835 error returned.";
 				Etranss.Update(etrans);

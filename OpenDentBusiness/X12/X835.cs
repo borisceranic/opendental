@@ -7,6 +7,8 @@ namespace OpenDentBusiness {
 	///<summary>X12 835 Health Care Claim Payment/Advice. This transaction type is a response to an 837 claim submission. The 835 will always come after a 277 is received and a 277 will always come after a 999. Neither the 277 nor the 999 are required, so it is possible that an 835 will be received directly after the 837. The 835 is not required either, so it is possible that none of the 997, 999, 277 or 835 reports will be returned from the carrier.</summary>
 	public class X835:X12object {
 		
+		///<summary>ST02 Empty string if this instance corresponds to the first transaction (EOB) within the 835.  Otherwise, a specific Transaction Set Identifer for a particular transaction (EOB) within the 835.</summary>
+		private string _tranSetId;
 		///<summary>All segments within the 835 report.</summary>
     private List<X12Segment> _listSegments;
 		///<summary>The list of all provider level adjustments (one level above the claim level) within this 835.</summary>
@@ -87,7 +89,9 @@ namespace OpenDentBusiness {
 		///<summary>N1*PE N104 loop 1000B.  Usually the NPI number.</summary>
 		public string PayeeId { get { return _payeeId; } }
 
-    public static bool Is835(X12object xobj) {
+		#region Static Globals
+
+		public static bool Is835(X12object xobj) {
       if(xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
         return false;
       }
@@ -97,15 +101,41 @@ namespace OpenDentBusiness {
       return false;
     }
 
-		///<summary>See guide page 62 for format outline.</summary>
-    public X835(string messageText):base(messageText) {//Parsing happens in the base class.
+		///<summary>Returns the list of unique transaction set identifiers within the 835.
+		///The X835 is only capable of parsing a single transaction, because the X12 specification states that there will be exactly 1 transaction.
+		///ClaimConnect has already provided an example showing that they will return multiple transactions (one transaction per EOB, where an EOB contains a list of claims).
+		///Use this function to determine the number of X835 objects to create.</summary>
+		public static List<string> GetTranSetIds(X12object x835) {
+			if(!Is835(x835)) {
+				return new List<string>();
+			}
+			List<string> retVal=new List<string>();
+			for(int i=0;i<x835.FunctGroups[0].Transactions.Count;i++) {
+				string tranSetId=x835.FunctGroups[0].Transactions[i].Header.Get(2);
+				retVal.Add(tranSetId);
+			}
+			return retVal;
+		}
+
+		#endregion Static Globals
+
+		///<summary>See guide page 62 for format outline.  Specify a specific Transaction Set Identifier (ST02) for a particular EOB within the 835.
+		///Or set tranSetId to empty string to load the first EOB in the 835.  This class is only capable of loading a single transaction (EOB).</summary>
+		public X835(string messageText,string tranSetId):base(messageText) {//Parsing happens in the base class.
+			_tranSetId=tranSetId;
 			ProcessMessage();
-    }
+		}
 
 		private void ProcessMessage() {
 			//Table 1 - Header
 			//ST: Transaction Set Header.  Required.  Repeat 1.  Guide page 68.  The GS segment contains exactly one ST segment below it.
 			_listSegments=FunctGroups[0].Transactions[0].Segments;
+			for(int i=1;i<FunctGroups[0].Transactions.Count;i++) {
+				if(_tranSetId==FunctGroups[0].Transactions[i].Header.Get(2)) {
+					_listSegments=FunctGroups[0].Transactions[i].Segments;
+					break;
+				}
+			}
 			ProcessBPR(0);
 			ProcessTRN(1);
 			int segNum=2;
@@ -3005,7 +3035,7 @@ namespace OpenDentBusiness {
 //Example 1 From 835 Specification (modified to include an NM1*IL insured name segment).
 //The user would enter the claims in this EOB by total, since neither claim includes procedure detail:
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*1234~
 //BPR*C*150000*C*ACH*CTX*01*999999992*DA*123456*1512345678**01*999988880*DA*98765*20020913~
 //TRN*1*12345*1512345678~
@@ -3040,7 +3070,7 @@ namespace OpenDentBusiness {
 
 //Example 2 From 835 Specification (modified to include: claim supplemental info in AMT, procedure line item control number in REF*6R, procedure supplemental info in AMT, and procedure remarks in LQ):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*12233~
 //BPR*I*945*C*ACH*CCP*01*888999777*DA*24681012*1935665544**01*111333555*DA*144444*20020316~
 //TRN*1*71700666555*1935665544~
@@ -3076,7 +3106,7 @@ namespace OpenDentBusiness {
 
 //Example 3 From 835 Specification (modified to include a procedure line item control number in REF*6R):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
 //BPR*I*1222*C*CHK************20050412~
 //TRN*1*0012524965*1559123456~
@@ -3122,7 +3152,7 @@ namespace OpenDentBusiness {
 
 //Example 4 From 835 Specification (Modified such that submitted procedure code different than adjudicated procedure code):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
 //BPR*I*187.50*C*CHK************20050412~
 //TRN*1*0012524879*1559123456~
@@ -3151,7 +3181,7 @@ namespace OpenDentBusiness {
 
 //Example 5 From 835 Specification:
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
 //BPR*I*34.00*C*CHK************20050318~
 //TRN*1*0063158ABC*1566339911~
@@ -3183,7 +3213,7 @@ namespace OpenDentBusiness {
 //Example 6, copied from example 5 and modified: The claims are duplicated several times (with differing identifiers), as a way to test ERA printing on multiple pages.
 //Numbers may be off, the only purpose of this example is for multi-page printing and the content has not been sanity checked very deeply.
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
-//GS*HC*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
 //ST*835*0001~
 //BPR*I*510.00*C*CHK************20050318~
 //TRN*1*0063158ABC*1566339911~
@@ -3365,5 +3395,8 @@ namespace OpenDentBusiness {
 //SE*38*0001~
 //GE*1*1~
 //IEA*1*000000001~
+
+//Example 7: Provided and engineered by ClaimConnect.  The data is fake.  This example contains multiple transactions (ST segments) even though the X12 guide says there can only be 1.
+//See the example content in the file named TEST_DentalX.2030339.835.  Notice that the file extension is "835".
 
 #endregion Examples
