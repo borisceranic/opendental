@@ -65,6 +65,7 @@ namespace OpenDentBusiness.Crud{
 				etrans.AckEtransNum        = PIn.Long  (table.Rows[i]["AckEtransNum"].ToString());
 				etrans.PlanNum             = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
 				etrans.InsSubNum           = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
+				etrans.TranSetId835        = PIn.String(table.Rows[i]["TranSetId835"].ToString());
 				retVal.Add(etrans);
 			}
 			return retVal;
@@ -105,7 +106,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EtransNum,";
 			}
-			command+="DateTimeTrans,ClearingHouseNum,Etype,ClaimNum,OfficeSequenceNumber,CarrierTransCounter,CarrierTransCounter2,CarrierNum,CarrierNum2,PatNum,BatchNumber,AckCode,TransSetNum,Note,EtransMessageTextNum,AckEtransNum,PlanNum,InsSubNum) VALUES(";
+			command+="DateTimeTrans,ClearingHouseNum,Etype,ClaimNum,OfficeSequenceNumber,CarrierTransCounter,CarrierTransCounter2,CarrierNum,CarrierNum2,PatNum,BatchNumber,AckCode,TransSetNum,Note,EtransMessageTextNum,AckEtransNum,PlanNum,InsSubNum,TranSetId835) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(etrans.EtransNum)+",";
 			}
@@ -127,7 +128,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (etrans.EtransMessageTextNum)+","
 				+    POut.Long  (etrans.AckEtransNum)+","
 				+    POut.Long  (etrans.PlanNum)+","
-				+    POut.Long  (etrans.InsSubNum)+")";
+				+    POut.Long  (etrans.InsSubNum)+","
+				+"'"+POut.String(etrans.TranSetId835)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -157,7 +159,8 @@ namespace OpenDentBusiness.Crud{
 				+"EtransMessageTextNum=  "+POut.Long  (etrans.EtransMessageTextNum)+", "
 				+"AckEtransNum        =  "+POut.Long  (etrans.AckEtransNum)+", "
 				+"PlanNum             =  "+POut.Long  (etrans.PlanNum)+", "
-				+"InsSubNum           =  "+POut.Long  (etrans.InsSubNum)+" "
+				+"InsSubNum           =  "+POut.Long  (etrans.InsSubNum)+", "
+				+"TranSetId835        = '"+POut.String(etrans.TranSetId835)+"' "
 				+"WHERE EtransNum = "+POut.Long(etrans.EtransNum);
 			Db.NonQ(command);
 		}
@@ -236,6 +239,10 @@ namespace OpenDentBusiness.Crud{
 			if(etrans.InsSubNum != oldEtrans.InsSubNum) {
 				if(command!=""){ command+=",";}
 				command+="InsSubNum = "+POut.Long(etrans.InsSubNum)+"";
+			}
+			if(etrans.TranSetId835 != oldEtrans.TranSetId835) {
+				if(command!=""){ command+=",";}
+				command+="TranSetId835 = '"+POut.String(etrans.TranSetId835)+"'";
 			}
 			if(command==""){
 				return false;

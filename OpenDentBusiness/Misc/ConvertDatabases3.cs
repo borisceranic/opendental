@@ -4975,6 +4975,14 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX claimproc_PayPlanNum ON claimproc (PayPlanNum)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE etrans ADD TranSetId835 varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE etrans ADD TranSetId835 varchar2(255)";
+					Db.NonQ(command);
+				}
 
 
 

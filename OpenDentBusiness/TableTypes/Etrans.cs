@@ -46,6 +46,8 @@ namespace OpenDentBusiness{
 		public long PlanNum;
 		///<summary>FK to inssub.InsSubNum.  Used if EtransType.BenefitInquiry270 and BenefitResponse271 and Eligibility_CA.</summary>
 		public long InsSubNum;
+		///<summary>X12 ST02 Transaction Set Identifier for an 835.  If blank, then this etrans entry corresponds to the first transaction (EOB) within the 835 message.  If this value is not blank, then this etrans entry corresponds a different transaction (an EOB but not the first EOB) within the 835.  The X12 guide states that there is only one transaction (EOB) allowed per 835, but ClaimConnect returns multiple transactions (EOBs) within a single 835 and other clearinghouses probably do as well.  When an 835 is imported, it is examined to determine the number of transactions within it.  One etrans entry is created for each EOB within the 835.  We may have a similar issue with multiple transactions within 277s as well, but we have not seen any evidence yet.  Our current 277 implementation expects a single transaction, just as the X12 standard specifies.</summary>
+		public string TranSetId835;
 
 		///<summary></summary>
 		public Etrans Copy(){
