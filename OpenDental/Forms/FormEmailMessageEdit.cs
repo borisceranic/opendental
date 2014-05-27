@@ -357,6 +357,7 @@ namespace OpenDental{
 			this.butDirectMessage.Size = new System.Drawing.Size(106, 25);
 			this.butDirectMessage.TabIndex = 8;
 			this.butDirectMessage.Text = "Direct Message";
+			this.butDirectMessage.Visible = false;
 			this.butDirectMessage.Click += new System.EventHandler(this.butDirectMessage_Click);
 			// 
 			// webBrowser
@@ -578,6 +579,9 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.Setup,true)) {
 				butAdd.Enabled=false;
 				butDeleteTemplate.Enabled=false;
+			}
+			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				butDirectMessage.Visible=true;
 			}
 			Cursor=Cursors.WaitCursor;
 			RefreshAll();
