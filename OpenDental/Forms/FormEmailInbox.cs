@@ -130,9 +130,6 @@ namespace OpenDental {
 					row.Cells.Add(new UI.ODGridCell(pat.GetNameLF()));//Patient
 				}
 				string preview=ListEmailMessages[i].BodyText.Replace("\r\n"," ").Replace('\n',' ');//Replace newlines with spaces, in order to compress the preview.
-				if(preview.Length>50) {
-					preview=preview.Substring(0,50)+"...";
-				}
 				row.Cells.Add(new UI.ODGridCell(preview));//Preview
 				gridEmailMessages.Rows.Add(row);
 			}
@@ -156,6 +153,8 @@ namespace OpenDental {
 				}				
 			}
 			else {
+				//When an email is read from the database for display in the inbox, the BodyText is limited to 50 characters and the RawEmailIn is blank.
+				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Refresh the email from the database to include the full BodyText and RawEmailIn.
 				FormEmailMessageEdit formEME=new FormEmailMessageEdit(emailMessage);
 				formEME.ShowDialog();
 				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Fetch from DB, in case changed due to decrypt.

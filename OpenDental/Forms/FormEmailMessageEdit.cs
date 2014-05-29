@@ -629,8 +629,7 @@ namespace OpenDental{
 				textBodyText.ReadOnly=true;
 				textBodyText.SpellCheckIsEnabled=false;//Prevents slowness when resizing the window, because the spell checker runs each time the resize event is fired.
 				//If an html body is received, then we display the body using a webbrowser control, so the user sees the message formatted as intended.
-				if(MessageCur.BodyText.Trim().StartsWith("<html>")) {
-				//if(MessageCur.BodyText.ToLower().Contains("<html")) {//FIX to show more html documents inside the WebBrowser control. We should wait until the user has reply/forward capabilities, otherwise the fix might create more phone calls.
+				if(MessageCur.BodyText.ToLower().Contains("<html")) {
 					textBodyText.Visible=false;
 					webBrowser.DocumentText=MessageCur.BodyText;
 					webBrowser.Location=textBodyText.Location;
