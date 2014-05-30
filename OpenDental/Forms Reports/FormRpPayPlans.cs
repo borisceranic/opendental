@@ -132,12 +132,13 @@ namespace OpenDental
 			if(DataConnection.DBtype==DatabaseType.Oracle){
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
-			string command=@"SELECT FName,LName,MiddleI,PlanNum,Preferred,
+			string command=@"SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum,
 				(SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum
 				AND ChargeDate <= "+datesql+@") ""_accumDue"",
 				(SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum
 				AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@") ""_dueTen"",
 				(SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum) ""_paid"",
+				(SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5)) ""_insPaid"",
 				(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum) ""_principal""
 				FROM payplan
 				LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
@@ -153,7 +154,12 @@ namespace OpenDental
 			double dueTen;
 			for(int i=0;i<raw.Rows.Count;i++){
 				princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
-				paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
+				if(raw.Rows[i]["PlanNum"].ToString()=="0") {
+					paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
+				}
+				else {
+					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
+				}
 				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
 				dueTen=PIn.Double(raw.Rows[i]["_dueTen"].ToString());
 				row=table.NewRow();

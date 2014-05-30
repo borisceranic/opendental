@@ -1313,6 +1313,13 @@ namespace OpenDental{
 				}
 				//}
 			}
+			else if(table.Rows[e.Row]["ClaimNum"].ToString()!="0") {
+				Claim claimCur=Claims.GetClaim(PIn.Long(table.Rows[e.Row]["ClaimNum"].ToString()));
+				FormClaimEdit FormCE=new FormClaimEdit(claimCur,PatCur,FamCur);
+				FormCE.IsNew=false;
+				FormCE.ShowDialog();
+				//Cancel from FormClaimEdit does not cancel payment edits, fill grid every time
+			}
 			FillCharges();
 		}
 

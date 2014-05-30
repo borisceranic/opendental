@@ -132,6 +132,7 @@ namespace OpenDental
 		private double DeductibleOtherIns;
 		private bool SaveToDb;
 		private Label label6;
+		private CheckBox checkPayPlan;
 		private List<InsSub> SubList;
 
 		///<summary>procCur can be null if not editing from within an actual procedure.  If the save is to happen within this window, then set saveToDb true.  If the object is to be altered here, but saved in a different window, then saveToDb=false.</summary>
@@ -175,7 +176,8 @@ namespace OpenDental
 					this.labelInsPayEst,
 					this.labelInsPayAmt,
 					this.labelWriteOff,
-					this.labelDateEntry
+					this.labelDateEntry,
+					this.checkPayPlan
 					//this.butRecalc
 			});
 			Lan.C("All", new System.Windows.Forms.Control[] {
@@ -296,6 +298,7 @@ namespace OpenDental
 			this.comboProvider = new System.Windows.Forms.ComboBox();
 			this.comboStatus = new System.Windows.Forms.ComboBox();
 			this.label6 = new System.Windows.Forms.Label();
+			this.checkPayPlan = new System.Windows.Forms.CheckBox();
 			this.groupClaim.SuspendLayout();
 			this.panelClaimExtras.SuspendLayout();
 			this.panelEstimateInfo.SuspendLayout();
@@ -1167,10 +1170,21 @@ namespace OpenDental
 			this.label6.Text = "Values above change based on current insurance information.";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
+			// checkPayPlan
+			// 
+			this.checkPayPlan.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPayPlan.Location = new System.Drawing.Point(350, 600);
+			this.checkPayPlan.Name = "checkPayPlan";
+			this.checkPayPlan.Size = new System.Drawing.Size(250, 18);
+			this.checkPayPlan.TabIndex = 163;
+			this.checkPayPlan.Text = "Attached to Insurance Payment Plan";
+			this.checkPayPlan.Click += new System.EventHandler(this.checkPayPlan_Click);
+			// 
 			// FormClaimProc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(889, 632);
+			this.Controls.Add(this.checkPayPlan);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.comboStatus);
 			this.Controls.Add(this.butPickProv);
@@ -1409,6 +1423,12 @@ namespace OpenDental
 			textCodeSent.Text=ClaimProcCur.CodeSent;
 			textFeeBilled.Text=ClaimProcCur.FeeBilled.ToString("n");
 			textRemarks.Text=ClaimProcCur.Remarks;
+			if(ClaimProcCur.PayPlanNum==0) {
+				checkPayPlan.Checked=false;
+			}
+			else {
+				checkPayPlan.Checked=true;
+			}
 			FillInitialAmounts();
 			ComputeAmounts();
 			//MessageBox.Show(panelEstimateInfo.Visible.ToString());
@@ -1930,6 +1950,33 @@ namespace OpenDental
 
 		private void textWriteOff_Leave(object sender, System.EventArgs e) {
 			ComputeAmounts();
+		}
+
+		private void checkPayPlan_Click(object sender,EventArgs e) {
+			if(checkPayPlan.Checked) {
+				List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum);
+				if(payPlanList.Count==0) {//no valid plans
+					MsgBox.Show(this,"The patient does not have a payment plan with this insurance plan attached that has not been paid in full.");
+					checkPayPlan.Checked=false;
+					return;
+				}
+				if(payPlanList.Count==1) { //if there is only one valid payplan
+					ClaimProcCur.PayPlanNum=payPlanList[0].PayPlanNum;
+					return;
+				}
+				//more than one valid PayPlan
+				List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(ClaimProcCur.PatNum);
+				FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+				FormPPS.ShowDialog();
+				if(FormPPS.DialogResult==DialogResult.Cancel) {
+					checkPayPlan.Checked=false;
+					return;
+				}
+				ClaimProcCur.PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+			}
+			else {//payPlan unchecked
+				ClaimProcCur.PayPlanNum=0;
+			}
 		}
 
 		///<summary>Remember that this will never even happen unless this is just an estimate because the delete button will not be enabled.</summary>

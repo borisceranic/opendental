@@ -140,20 +140,35 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
-			//Paysplits
-			command="SELECT CheckNum,DatePay,paysplit.PatNum,PayAmt,paysplit.PayNum,PayPlanNum,"
-				+"PayType,ProcDate,ProvNum,SplitAmt "
-				+"FROM paysplit "
-				+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
-				+"WHERE ("
-				+"paysplit.PayPlanNum="+POut.Long(payPlanNum);
-			/*for(int i=0;i<fam.List.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="paysplit.PatNum ="+POut.PInt(fam.List[i].PatNum)+" ";
-			}*/
-			command+=") ORDER BY ProcDate";
+			PayPlan payPlanCur=PayPlans.GetOne(payPlanNum);
+			if(payPlanCur.PlanNum==0) {//not a insurance payment plan
+				//Paysplits
+				command="SELECT CheckNum,DatePay,paysplit.PatNum,PayAmt,paysplit.PayNum,PayPlanNum,"
+					+"PayType,ProcDate,ProvNum,SplitAmt "
+					+"FROM paysplit "
+					+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
+					+"WHERE ("
+					+"paysplit.PayPlanNum="+POut.Long(payPlanNum);
+				/*for(int i=0;i<fam.List.Length;i++){
+					if(i!=0){
+						command+="OR ";
+					}
+					command+="paysplit.PatNum ="+POut.PInt(fam.List[i].PatNum)+" ";
+				}*/
+				command+=") ORDER BY ProcDate";
+			}
+			else {
+				//Ins Payments
+				command="SELECT ClaimNum,MAX(CheckNum) CheckNum,DateCP,MAX(PatNum) PatNum,MAX(CheckAmt) CheckAmt,claimproc.ClaimPaymentNum,"
+					+"MAX(PayPlanNum) PayPlanNum,MAX(PayType) PayType,MAX(ProcDate) ProcDate,SUM(InsPayAmt) InsPayAmt,"
+					+"(SELECT ProvTreat FROM claim WHERE claimproc.ClaimNum=claim.ClaimNum) ProvNum "//MAX functions added to preserve behavior in Oracle.
+					+"FROM claimproc "
+					+"LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum=claimpayment.ClaimPaymentNum "
+					+"WHERE PayPlanNum="+POut.Long(payPlanNum)+" "
+					+"AND (Status=1 OR Status=4 OR Status=5) "//received or supplemental or capclaim
+					+"GROUP BY ClaimNum,DateCP,claimproc.ClaimPaymentNum "
+					+"ORDER BY ProcDate";
+			}
 			DataTable rawPay=dcon.GetTable(command);
 			decimal payamt;
 			decimal amt;
@@ -167,29 +182,65 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
-				amt=PIn.Decimal(rawPay.Rows[i]["SplitAmt"].ToString());
+				if(payPlanCur.PlanNum!=0) {//ins payments
+					row["ClaimNum"]=rawPay.Rows[i]["ClaimNum"].ToString();
+					row["ClaimPaymentNum"]=rawPay.Rows[i]["ClaimPaymentNum"].ToString();
+					row["colorText"]=DefC.Long[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
+				}
+				if(payPlanCur.PlanNum==0) {
+					amt=PIn.Decimal(rawPay.Rows[i]["SplitAmt"].ToString());
+				}
+				else {
+					amt=PIn.Decimal(rawPay.Rows[i]["InsPayAmt"].ToString());
+				}
 				row["creditsDouble"]=amt;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
-				dateT=PIn.DateT(rawPay.Rows[i]["ProcDate"].ToString());
+				if(payPlanCur.PlanNum==0) {
+					dateT=PIn.DateT(rawPay.Rows[i]["ProcDate"].ToString());
+				}
+				else {
+					dateT=PIn.DateT(rawPay.Rows[i]["DateCP"].ToString());//this may be changed to ProcDate in the future
+				}
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToShortDateString();
-				row["description"]=DefC.GetName(DefCat.PaymentTypes,PIn.Long(rawPay.Rows[i]["PayType"].ToString()));
+				if(payPlanCur.PlanNum==0) {
+					row["description"]=DefC.GetName(DefCat.PaymentTypes,PIn.Long(rawPay.Rows[i]["PayType"].ToString()));
+					payamt=PIn.Decimal(rawPay.Rows[i]["PayAmt"].ToString());
+				}
+				else {
+					row["description"]=DefC.GetName(DefCat.InsurancePaymentType,PIn.Long(rawPay.Rows[i]["PayType"].ToString()));
+					payamt=PIn.Decimal(rawPay.Rows[i]["CheckAmt"].ToString());
+				}
 				if(rawPay.Rows[i]["CheckNum"].ToString()!=""){
 					row["description"]+=" #"+rawPay.Rows[i]["CheckNum"].ToString();
 				}
-				payamt=PIn.Decimal(rawPay.Rows[i]["PayAmt"].ToString());
-				row["description"]+=" "+payamt.ToString("c");
-				if(payamt!=amt){
-					row["description"]+=" "+Lans.g("ContrAccount","(split)");
+				if(payPlanCur.PlanNum!=0 && rawPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {//attached to claim but no check (claimpayment) created
+					row["description"]=Lans.g("ContrAccount","No Insurance Check Created");
 				}
-				//we might use DatePay here to add to description
+				else {
+					row["description"]+=" "+payamt.ToString("c");
+					if(payamt!=amt){
+						row["description"]+=" "+Lans.g("ContrAccount","(split)");
+					}
+				}
+				//we might use DatePay/DateCP here to add to description
 				//row["extraDetail"]="";
 				row["patient"]="";
 				row["PatNum"]=rawPay.Rows[i]["PatNum"].ToString();
-				row["PayNum"]=rawPay.Rows[i]["PayNum"].ToString();
+				if(payPlanCur.PlanNum==0) {
+					row["PayNum"]=rawPay.Rows[i]["PayNum"].ToString();
+				}
+				else {
+					row["PayNum"]="0";
+				}
 				row["PayPlanNum"]="0";
 				row["PayPlanChargeNum"]="0";
-				row["ProcCode"]=Lans.g("AccountModule","Pay");
+				if(payPlanCur.PlanNum==0) {
+					row["ProcCode"]=Lans.g("AccountModule","Pay");
+				}
+				else {
+					row["ProcCode"]=Lans.g("AccountModule","InsPay");
+				}
 				row["ProcNum"]="0";
 				row["procsOnObj"]="";
 				row["prov"]=Providers.GetAbbr(PIn.Long(rawPay.Rows[i]["ProvNum"].ToString()));
@@ -484,15 +535,19 @@ namespace OpenDentBusiness {
 			decimal qty;
 			decimal amt;
 			string command;
+			#region Claimprocs
 			//claimprocs (ins payments)----------------------------------------------------------------------------
-			command="SELECT ClaimNum,MAX(ClaimPaymentNum) ClaimPaymentNum,MAX(ClinicNum) ClinicNum,DateCP,SUM(InsPayAmt) InsPayAmt_,MAX(PatNum) PatNum,MAX(ProcDate) ProcDate,"//MAX functions added to preserve behavior in Oracle.
+			command="SELECT ClaimNum,MAX(ClaimPaymentNum) ClaimPaymentNum,MAX(ClinicNum) ClinicNum,DateCP,"
+				+"SUM(CASE WHEN PayPlanNum=0 THEN InsPayAmt ELSE 0 END) InsPayAmt_,"//ins payments attached to payment plans tracked there
+				+"SUM(CASE WHEN PayPlanNum!=0 THEN InsPayAmt ELSE 0 END) InsPayAmtPayPlan,"
+				+"MAX(PatNum) PatNum,MAX(ProcDate) ProcDate,"//MAX functions added to preserve behavior in Oracle.
 				//+"MAX(ProvNum) ProvNum,
 				+"SUM(WriteOff) WriteOff_, "
 				//js 1/28/13  The following line has been the source of many complaints in the past.  
 				//When it was claim.ProvBill, it didn't match daily payment report or the account Claim row entry.
 				//When it was MAX(claimproc.ProvNum), the user had no control over it because it was one prov at random.
  				//By switching to claim.ProvTreat, we are more closely matching the P&I report and the account Claim row.  ProvBill is not very meaningful outside of the claim itself.
-				+"(SELECT ProvTreat FROM claim WHERE claimproc.ClaimNum=claim.ClaimNum) provNum_ "
+				+"(SELECT ProvTreat FROM claim WHERE claimproc.ClaimNum=claim.ClaimNum) provNum_,MAX(PayPlanNum) PayPlanNum "//MAX PayPlanNum will return 0 or the num of the payplan tracking the payments.  Every claim will only be allowed to have payments tracked by one payplan.
 				+"FROM claimproc "
 				+"WHERE (Status=1 OR Status=4 OR Status=5) "//received or supplemental or capclaim
 				+"AND (WriteOff>0 OR InsPayAmt!=0) "
@@ -523,8 +578,11 @@ namespace OpenDentBusiness {
 				//this is because it will frequently not be attached to an actual claim payment.
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaimPay.Rows[i]["ClinicNum"].ToString()));
 				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
-				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());
+				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
 				writeoff=PIn.Decimal(rawClaimPay.Rows[i]["WriteOff_"].ToString());
+				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" && amt+writeoff==0) {//payplan payments are tracked in the payplan, so nothing to display.
+					continue;
+				}
 				row["creditsDouble"]=amt+writeoff;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
 				dateT=PIn.DateT(rawClaimPay.Rows[i]["DateCP"].ToString());
@@ -532,10 +590,15 @@ namespace OpenDentBusiness {
 				row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
 				procdate=PIn.DateT(rawClaimPay.Rows[i]["ProcDate"].ToString());
 				row["description"]=Lans.g("AccountModule","Insurance Payment for Claim ")+procdate.ToShortDateString();
-				if(writeoff!=0){
-					row["description"]+="\r\n"+Lans.g("AccountModule","Payment:")+" "+amt.ToString("c")+"\r\n"
-						+Lans.g("AccountModule","Writeoff:")+" "+writeoff.ToString("c");
+				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0") {
+						row["description"]+="\r\n("+Lans.g("AccountModule","Payments Tracked in Payment Plan")+")";
 				}
+				if(writeoff!=0) {
+					if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()=="0") {
+						row["description"]+="\r\n"+Lans.g("AccountModule","Payment:")+" "+amt.ToString("c");
+					}
+					row["description"]+="\r\n"+Lans.g("AccountModule","Writeoff:")+" "+writeoff.ToString("c");
+				}				
 				//row["extraDetail"]="";
 				row["patient"]=fam.GetNameInFamFirst(PIn.Long(rawClaimPay.Rows[i]["PatNum"].ToString()));
 				row["PatNum"]=rawClaimPay.Rows[i]["PatNum"].ToString();
@@ -560,6 +623,8 @@ namespace OpenDentBusiness {
 				}
 				familyPatNums+=POut.Long(fam.ListPats[i].PatNum);
 			}
+			#endregion Claimprocs
+			#region Procedures
 			//Procedures------------------------------------------------------------------------------------------
 			command="SELECT "
 				+"(SELECT SUM(AdjAmt) FROM adjustment WHERE procedurelog.ProcNum=adjustment.ProcNum "
@@ -764,6 +829,8 @@ namespace OpenDentBusiness {
 					labRows.Add(row);//these will be added in the loop at the end
 				}
 			}
+			#endregion Procedures
+			#region Adjustments
 			//Adjustments---------------------------------------------------------------------------------------
 			command="SELECT AdjAmt,AdjDate,AdjNum,AdjType,ClinicNum,PatNum,ProvNum,AdjNote "
 				+"FROM adjustment "
@@ -833,6 +900,8 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			#endregion Adjustments
+			#region Paysplits
 			//paysplits-----------------------------------------------------------------------------------------
 			DataTable rawPay;
 			command="SELECT MAX(CheckNum) CheckNum,paysplit.ClinicNum,MAX(DatePay) DatePay,paysplit.PatNum,MAX(payment.PatNum) patNumPayment_,MAX(PayAmt) PayAmt,"//MAX function used to preserve behavior in Oracle.
@@ -930,6 +999,8 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			#endregion Paysplits
+			#region Claims
 			//claims (do not affect balance)-------------------------------------------------------------------------
 			DataTable rawClaim;
 			command="SELECT CarrierName,ClaimFee,claim.ClaimNum,ClaimStatus,ClaimType,claim.ClinicNum,DateReceived,DateService,"
@@ -1105,6 +1176,8 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			#endregion Claims
+			#region Statements
 			//Statement----------------------------------------------------------------------------------------
 			command="SELECT DateSent,IsSent,Mode_,StatementNum,PatNum,Note,NoteBold,IsInvoice "
 				+"FROM statement "
@@ -1187,6 +1260,8 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			#endregion Statements
+			#region Payment Plans
 			//Payment plans----------------------------------------------------------------------------------
 			string datesql="CURDATE()";
 			if(DataConnection.DBtype==DatabaseType.Oracle){
@@ -1270,6 +1345,8 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			#endregion Payment Plans
+			#region Installment Plans
 			//Installment plans----------------------------------------------------------------------------------
 			command="SELECT * FROM installmentplan WHERE ";
 			for(int i=0;i<fam.ListPats.Length;i++){
@@ -1280,11 +1357,12 @@ namespace OpenDentBusiness {
 			}
 			DataTable rawInstall=Db.GetTable(command);
 			if(statementNum==0) {
-				GetPayPlans(rawPayPlan,rawPay,rawInstall);
+				GetPayPlans(rawPayPlan,rawPay,rawInstall,rawClaimPay);
 			}
 			else {
-				GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient);
+				GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay);
 			}
+			#endregion Installment Plans
 			//Sorting-----------------------------------------------------------------------------------------
 			rows.Sort(new AccountLineComparer());
 			//Canadian lab procedures need to come immediately after their corresponding proc---------------------------------
@@ -1471,7 +1549,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case. </summary>
-		private static void GetPayPlans(DataTable rawPayPlan,DataTable rawPay,DataTable rawInstall){
+		private static void GetPayPlans(DataTable rawPayPlan,DataTable rawPay,DataTable rawInstall,DataTable rawClaimPay) {
 			//No need to check RemotingRole; no call to db.
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("payplan");
@@ -1512,6 +1590,11 @@ namespace OpenDentBusiness {
 				for(int p=0;p<rawPay.Rows.Count;p++){
 					if(rawPay.Rows[p]["PayPlanNum"].ToString()==rawPayPlan.Rows[i]["PayPlanNum"].ToString()){
 						paid+=PIn.Decimal(rawPay.Rows[p]["splitAmt_"].ToString());
+					}
+				}
+				for(int c=0;c<rawClaimPay.Rows.Count;c++) {
+					if(rawClaimPay.Rows[c]["PayPlanNum"].ToString()==rawPayPlan.Rows[i]["PayPlanNum"].ToString()) {
+						paid+=PIn.Decimal(rawClaimPay.Rows[c]["InsPayAmtPayPlan"].ToString());
 					}
 				}
 				princ=PIn.Decimal(rawPayPlan.Rows[i]["principal_"].ToString());
@@ -1578,7 +1661,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case.  fromDate and toDate are only used if isForStatement.  From date lets us restrict how many amortization items to show.  toDate is typically 10 days in the future.</summary>
-		private static void GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient){
+		private static void GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient,DataTable rawClaimPay){
 			//No need to check RemotingRole; no call to db.
 			//We may need to add installment plans to this grid some day.  No time right now.
 			DataTable table=new DataTable("payplan");
@@ -1595,6 +1678,11 @@ namespace OpenDentBusiness {
 				for(int p=0;p<rawPay.Rows.Count;p++){
 					if(rawPay.Rows[p]["PayPlanNum"].ToString()==rawPayPlan.Rows[i]["PayPlanNum"].ToString()){
 						bal-=PIn.Decimal(rawPay.Rows[p]["splitAmt_"].ToString());
+					}
+				}
+				for(int c=0;c<rawClaimPay.Rows.Count;c++) {
+					if(rawClaimPay.Rows[c]["PayPlanNum"].ToString()==rawPayPlan.Rows[i]["PayPlanNum"].ToString()) {
+						bal-=PIn.Decimal(rawClaimPay.Rows[c]["InsPayAmtPayPlan"].ToString());
 					}
 				}
 				//summary row----------------------------------------------------------------------

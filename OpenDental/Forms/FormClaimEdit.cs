@@ -4565,6 +4565,20 @@ namespace OpenDental{
 			ClaimProcCur.ProcDate=ClaimCur.DateService;
 			ClaimProcCur.DateEntry=DateTime.Now;//will get set anyway
 			ClaimProcCur.ClinicNum=ClaimCur.ClinicNum;
+			List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum);
+			ClaimProcCur.PayPlanNum=0;
+			if(payPlanList.Count==1) {
+				ClaimProcCur.PayPlanNum=payPlanList[0].PayPlanNum;
+			}
+			else if(payPlanList.Count>1) {
+				//more than one valid PayPlan
+				List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(ClaimProcCur.PatNum);
+				FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+				FormPPS.ShowDialog();
+				if(FormPPS.DialogResult==DialogResult.OK) {
+					ClaimProcCur.PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+				}
+			}
 			ClaimProcs.Insert(ClaimProcCur);
 			List<ClaimProcHist> loopList=null;
 			FormClaimProc FormCP=new FormClaimProc(ClaimProcCur,null,FamCur,PatCur,PlanList,null,ref loopList,PatPlanList,true,SubList);
@@ -4665,6 +4679,21 @@ namespace OpenDental{
 					cpList[i].Status=ClaimProcStatus.Received;
 					cpList[i].DateEntry=DateTime.Now;//date is was set rec'd
 					cpList[i].InsPayAmt=cpList[i].InsPayEst;
+					cpList[i].PayPlanNum=0;
+					//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
+					List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(cpList[i].PatNum,cpList[i].PlanNum,cpList[i].InsSubNum);
+					if(payPlanList.Count==1) {
+						cpList[i].PayPlanNum=payPlanList[0].PayPlanNum;
+					}
+					else if(payPlanList.Count>1) {
+						//more than one valid PayPlan
+						List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(cpList[i].PatNum);
+						FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+						FormPPS.ShowDialog();
+						if(FormPPS.DialogResult==DialogResult.OK) {
+							cpList[i].PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+						}
+					}
 				}
 				cpList[i].DateCP=DateTimeOD.Today;
 			}

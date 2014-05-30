@@ -231,7 +231,7 @@ namespace OpenDentBusiness{
 			command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
 				"SELECT cp.PatNum PatNum,"+
 						"cp.DateCp TranDate,"+//Always use DateCP rather than ProcDate to calculate the date of a claim payment.
-						"-cp.InsPayAmt-cp.Writeoff TranAmount "+
+						"(CASE WHEN cp.PayPlanNum=0 THEN -cp.InsPayAmt ELSE 0 END)-cp.Writeoff TranAmount "+//only InsPayAmts not attached to payment plans
 					"FROM claimproc cp "+
 					"WHERE cp.status IN (1,4,5,7) "+//received, supplemental, CapClaim or CapComplete.
 						(guarantor==0?"":(" AND cp.PatNum IN "+familyPatNums))+";";
@@ -346,6 +346,15 @@ namespace OpenDentBusiness{
 					(historic?(" AND ps.DatePay<="+DbHelper.DateColumn(asOfDate)+" "):"")+
 					"GROUP BY ps.PatNum) p "+
 				"SET a.PayPlanDue=a.PayPlanDue-p.PayPlanPayments "+
+					"WHERE p.PatNum=a.PatNum;";
+				command+="UPDATE "+tempAgingTableName+" a,"+
+					"(SELECT cp.PatNum,SUM(cp.InsPayAmt) PayPlanInsPayments "+
+					"FROM claimproc cp "+
+					"WHERE cp.PayPlanNum!=0 "+//only ins payments attached to payment plans
+					"AND cp.status IN (1,4,5) "+//received, supplemental, or CapClaim
+					(historic?(" AND cp.DateCP<="+DbHelper.DateColumn(asOfDate)+" "):"")+
+					"GROUP BY cp.PatNum) p "+
+					"SET a.PayPlanDue=a.PayPlanDue-p.PayPlanInsPayments "+
 					"WHERE p.PatNum=a.PatNum;";
 				//Calculate the total balance for each patient.
 				//In historical mode, only transactions on or before AsOfDate will be included.

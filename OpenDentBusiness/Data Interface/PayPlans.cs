@@ -37,6 +37,22 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanCrud.SelectMany(command);
 		}
 
+		///<summary>Get all payment plans for this patient with the insurance plan identified by PlanNum and InsSubNum attached (marked used for tracking expected insurance payments) that have not been paid in full.</summary>
+		public static List<PayPlan> GetValidInsPayPlans(long patNum,long planNum,long insSubNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT payplan.* FROM payplan"
+				+" LEFT JOIN claimproc ON claimproc.PayPlanNum=payplan.PayPlanNum"
+				+" WHERE payplan.PatNum="+POut.Long(patNum)
+				+" AND payplan.PlanNum="+POut.Long(planNum)
+				+" AND payplan.InsSubNum="+POut.Long(insSubNum)
+				+" GROUP BY payplan.PayPlanNum"
+				+" HAVING payplan.CompletedAmt>SUM(COALESCE(claimproc.InsPayAmt,0))"//has not been paid in full yet
+				+" ORDER BY payplan.PayPlanDate";
+			return Crud.PayPlanCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(PayPlan payPlan){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
