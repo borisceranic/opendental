@@ -916,9 +916,9 @@ namespace OpenDental{
 			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickSecondary.CornerRadius = 2F;
-			this.butPickSecondary.Location = new System.Drawing.Point(376, 219);
+			this.butPickSecondary.Location = new System.Drawing.Point(395, 219);
 			this.butPickSecondary.Name = "butPickSecondary";
-			this.butPickSecondary.Size = new System.Drawing.Size(18, 21);
+			this.butPickSecondary.Size = new System.Drawing.Size(23, 21);
 			this.butPickSecondary.TabIndex = 160;
 			this.butPickSecondary.Text = "...";
 			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
@@ -930,9 +930,9 @@ namespace OpenDental{
 			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickPrimary.CornerRadius = 2F;
-			this.butPickPrimary.Location = new System.Drawing.Point(376, 198);
+			this.butPickPrimary.Location = new System.Drawing.Point(395, 198);
 			this.butPickPrimary.Name = "butPickPrimary";
-			this.butPickPrimary.Size = new System.Drawing.Size(18, 21);
+			this.butPickPrimary.Size = new System.Drawing.Size(23, 21);
 			this.butPickPrimary.TabIndex = 159;
 			this.butPickPrimary.Text = "...";
 			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
@@ -981,7 +981,7 @@ namespace OpenDental{
 			this.comboSecProv.Location = new System.Drawing.Point(196, 219);
 			this.comboSecProv.MaxDropDownItems = 30;
 			this.comboSecProv.Name = "comboSecProv";
-			this.comboSecProv.Size = new System.Drawing.Size(180, 21);
+			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
 			this.comboSecProv.TabIndex = 13;
 			// 
 			// comboPriProv
@@ -991,7 +991,7 @@ namespace OpenDental{
 			this.comboPriProv.Location = new System.Drawing.Point(196, 198);
 			this.comboPriProv.MaxDropDownItems = 30;
 			this.comboPriProv.Name = "comboPriProv";
-			this.comboPriProv.Size = new System.Drawing.Size(180, 21);
+			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
 			this.comboPriProv.TabIndex = 12;
 			// 
 			// comboBillType
