@@ -376,6 +376,11 @@ namespace OpenDental{
 			refattach.ProcNum=ProcNum;
 			RefAttaches.Insert(refattach);
 			SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,PatNum,"Referred To "+Referrals.GetNameFL(refattach.ReferralNum));
+			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				FormRefAttachEdit FormRAE=new FormRefAttachEdit();
+				FormRAE.RefAttachCur=refattach;
+				FormRAE.ShowDialog();
+			}
 			FillGrid();
 			for(int i=0;i<RefAttachList.Count;i++) {
 				if(RefAttachList[i].ReferralNum==refattach.ReferralNum) {

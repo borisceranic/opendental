@@ -643,6 +643,11 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			if(RefAttachCur.IsFrom==false && PrefC.GetBool(PrefName.ShowFeatureEhr) && comboProvNum.SelectedIndex<0) {
+				if(!MsgBox.Show(this,true,"You must select a referring provider for this referral to show on the measure calculation report.  Continue?")) {
+					return;
+				}
+			}	
 			//this is an old pattern
 			try{
 				DataToCur();
