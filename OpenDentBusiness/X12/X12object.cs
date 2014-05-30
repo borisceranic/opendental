@@ -168,7 +168,15 @@ namespace OpenDentBusiness
 			return (X12Transaction)LastGroup().Transactions[LastGroup().Transactions.Count-1];
 		}
 
-		
+		///<summary>Returns the list of unique transaction set identifiers within the X12.</summary>
+		public List<string> GetTranSetIds() {
+			List<string> retVal=new List<string>();
+			for(int i=0;i<FunctGroups[0].Transactions.Count;i++) {
+				string tranSetId=FunctGroups[0].Transactions[i].Header.Get(2);
+				retVal.Add(tranSetId);
+			}
+			return retVal;
+		}
 
 	}
 

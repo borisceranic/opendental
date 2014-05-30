@@ -591,7 +591,7 @@ namespace OpenDentBusiness{
 				}
 				else if(X835.Is835(Xobj)) {
 					etrans.Etype=EtransType.ERA_835;
-					List <string> listTranSetIds=X835.GetTranSetIds(Xobj);
+					List <string> listTranSetIds=Xobj.GetTranSetIds();
 					for(int i=0;i<listTranSetIds.Count;i++) {
 						etrans.TranSetId835=listTranSetIds[i];
 						if(i>0) {

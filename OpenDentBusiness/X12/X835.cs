@@ -101,22 +101,6 @@ namespace OpenDentBusiness {
       return false;
     }
 
-		///<summary>Returns the list of unique transaction set identifiers within the 835.
-		///The X835 is only capable of parsing a single transaction, because the X12 specification states that there will be exactly 1 transaction.
-		///ClaimConnect has already provided an example showing that they will return multiple transactions (one transaction per EOB, where an EOB contains a list of claims).
-		///Use this function to determine the number of X835 objects to create.</summary>
-		public static List<string> GetTranSetIds(X12object x835) {
-			if(!Is835(x835)) {
-				return new List<string>();
-			}
-			List<string> retVal=new List<string>();
-			for(int i=0;i<x835.FunctGroups[0].Transactions.Count;i++) {
-				string tranSetId=x835.FunctGroups[0].Transactions[i].Header.Get(2);
-				retVal.Add(tranSetId);
-			}
-			return retVal;
-		}
-
 		#endregion Static Globals
 
 		///<summary>See guide page 62 for format outline.  Specify a specific Transaction Set Identifier (ST02) for a particular EOB within the 835.
