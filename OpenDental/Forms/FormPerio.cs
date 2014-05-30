@@ -1590,6 +1590,10 @@ namespace OpenDental{
 		}
 
 		private void butPrint_Click(object sender, System.EventArgs e) {
+			if(this.listExams.SelectedIndex<0) {
+				MsgBox.Show(this,"Please select an exam first.");
+				return;
+			}
 			pd2=new PrintDocument();
 			pd2.PrintPage+=new PrintPageEventHandler(this.pd2_PrintPage);
 			pd2.OriginAtMargins=true;
