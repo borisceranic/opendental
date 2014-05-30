@@ -18,7 +18,7 @@ namespace OpenDental{
 		//private User user;
 		//private DataTable table;
 		private OpenDental.UI.Button butOK;
-		private Label labelUniqueID;
+		private Label labelProvNum;
 		private TextBox textProvNum;
 		///<summary>This can be set ahead of time to preselect a provider.  After closing with OK, this will have the selected provider number.</summary>
 		public long SelectedProvNum;
@@ -57,7 +57,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butOK = new OpenDental.UI.Button();
-			this.labelUniqueID = new System.Windows.Forms.Label();
+			this.labelProvNum = new System.Windows.Forms.Label();
 			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
 			this.labelClass = new System.Windows.Forms.Label();
@@ -116,14 +116,14 @@ namespace OpenDental{
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// labelUniqueID
+			// labelProvNum
 			// 
-			this.labelUniqueID.Location = new System.Drawing.Point(6, 19);
-			this.labelUniqueID.Name = "labelUniqueID";
-			this.labelUniqueID.Size = new System.Drawing.Size(68, 18);
-			this.labelUniqueID.TabIndex = 27;
-			this.labelUniqueID.Text = "ProvNum";
-			this.labelUniqueID.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelProvNum.Location = new System.Drawing.Point(6, 19);
+			this.labelProvNum.Name = "labelProvNum";
+			this.labelProvNum.Size = new System.Drawing.Size(68, 18);
+			this.labelProvNum.TabIndex = 27;
+			this.labelProvNum.Text = "ProvNum";
+			this.labelProvNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textProvNum
 			// 
@@ -144,7 +144,7 @@ namespace OpenDental{
 			this.groupDentalSchools.Controls.Add(this.textFName);
 			this.groupDentalSchools.Controls.Add(this.label1);
 			this.groupDentalSchools.Controls.Add(this.textProvNum);
-			this.groupDentalSchools.Controls.Add(this.labelUniqueID);
+			this.groupDentalSchools.Controls.Add(this.labelProvNum);
 			this.groupDentalSchools.Location = new System.Drawing.Point(373, 12);
 			this.groupDentalSchools.Name = "groupDentalSchools";
 			this.groupDentalSchools.Size = new System.Drawing.Size(200, 110);

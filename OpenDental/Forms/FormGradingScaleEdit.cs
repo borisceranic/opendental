@@ -11,6 +11,8 @@ namespace OpenDental {
 	public partial class FormGradingScaleEdit:Form {
 		List<GradingScaleItem> _listGradingScaleItems;
 		private GradingScale _gradingScaleCur;
+		///<summary>False when grading scale is in use by an evaluation.</summary>
+		private bool _isEditable=true;
 
 		public FormGradingScaleEdit(GradingScale gradingScaleCur) {
 			InitializeComponent();
@@ -19,15 +21,26 @@ namespace OpenDental {
 		}
 
 		private void FormGradingScaleEdit_Load(object sender,EventArgs e) {
-			if(!_gradingScaleCur.IsNew) {
-				textDescription.Text=_gradingScaleCur.Description;
-				checkIsPercentage.Enabled=false;
-				checkIsPercentage.Checked=_gradingScaleCur.IsPercentage;
-				if(checkIsPercentage.Checked) {
-					butAdd.Visible=false;
-				}
-				FillGrid();
+			if(_gradingScaleCur.IsNew) {
+				return;
 			}
+			textDescription.Text=_gradingScaleCur.Description;
+			checkIsPercentage.Enabled=false;
+			checkIsPercentage.Checked=_gradingScaleCur.IsPercentage;
+			if(checkIsPercentage.Checked) {
+				butAdd.Visible=false;
+			}
+			if(GradingScales.IsInUseByEvaluation(_gradingScaleCur)) {
+				labelIsPercentage.Text=Lan.g(this,"Grading scale is not editable.  It is currently in use by an evaluation.");
+				labelIsPercentage.Visible=true;
+				_isEditable=false;
+				butAdd.Visible=false;
+				butOK.Visible=false;
+				butCancel.Text="Close";
+				checkIsPercentage.Enabled=false;
+				textDescription.ReadOnly=true;
+			}
+			FillGrid();
 		}
 
 		private void FillGrid() {
@@ -52,6 +65,9 @@ namespace OpenDental {
 			gridMain.EndUpdate();
 		}
 		private void gridMain_DoubleClick(object sender,EventArgs e) {
+			if(!_isEditable) {
+				return;
+			}
 			FormGradingScaleItemEdit FormGSIE=new FormGradingScaleItemEdit(_listGradingScaleItems[gridMain.GetSelectedIndex()]);
 			FormGSIE.ShowDialog();
 			FillGrid();
@@ -68,7 +84,12 @@ namespace OpenDental {
 
 		private void checkIsPercentage_Click(object sender,EventArgs e) {
 			if(checkIsPercentage.Checked) {
-				MsgBox.Show(this,"Leaving this checked will delete any grading scale items created for this grading scale when it is saved.  Grading scale items are not needed for percentage grading scales.");
+				labelIsPercentage.Visible=true;
+				butAdd.Enabled=false;
+			}
+			else {
+				labelIsPercentage.Visible=false;
+				butAdd.Enabled=true;
 			}
 		}
 

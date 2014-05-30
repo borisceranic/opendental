@@ -26,37 +26,38 @@ namespace OpenDental {
 			textNote.Text=_evalCritCur.Notes;
 			_listGradeItems=GradingScaleItems.Refresh(_evalCritCur.GradingScaleNum);
 			if(!_gradingScale.IsPercentage) {
-				textGradeNumberPercent.Visible=false;
-				textGradeShowing.ReadOnly=true;
+				textGradeNumber.ReadOnly=true;
+				textGradeShowingPercent.Visible=false;
 				for(int i=0;i<_listGradeItems.Count;i++) {
-					comboGradeNumber.Items.Add(_listGradeItems[i].GradeNumber);
-					if(_listGradeItems[i].GradeNumber==_evalCritCur.GradeNumber) {
-						comboGradeNumber.SelectedIndex=i;
-						textGradeShowing.Text=_evalCritCur.GradeShowing;
+					comboGradeShowing.Items.Add(_listGradeItems[i].GradeShowing);
+					if(_listGradeItems[i].GradeShowing==_evalCritCur.GradeShowing) {
+						comboGradeShowing.SelectedIndex=i;
+						textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
 					}
 				}
 			}
 			else {
-				comboGradeNumber.Visible=false;
-				textGradeNumberPercent.Text=_evalCritCur.GradeNumber.ToString();
-				textGradeShowing.Text=_evalCritCur.GradeShowing;
+				comboGradeShowing.Visible=false;
+				textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
+				textGradeShowingPercent.Text=_evalCritCur.GradeShowing;
 			}
 		}
 
 		private void comboGradeNumber_SelectionChangeCommitted(object sender,EventArgs e) {
-			_evalCritCur.GradeNumber=_listGradeItems[comboGradeNumber.SelectedIndex].GradeNumber;
-			_evalCritCur.GradeShowing=_listGradeItems[comboGradeNumber.SelectedIndex].GradeShowing;
-			textGradeShowing.Text=_evalCritCur.GradeShowing;
+			_evalCritCur.GradeNumber=_listGradeItems[comboGradeShowing.SelectedIndex].GradeNumber;
+			_evalCritCur.GradeShowing=_listGradeItems[comboGradeShowing.SelectedIndex].GradeShowing;
+			textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			float result;
 			if(_gradingScale.IsPercentage) {
-				if(!float.TryParse(textGradeNumberPercent.Text,out result)) {
+				if(!float.TryParse(textGradeNumber.Text,out result)) {
 					MsgBox.Show(this,"Grade number must be a valid percentage. Do not include '%' in the value.");
+					return;
 				}
 				_evalCritCur.GradeNumber=result;
-				_evalCritCur.GradeShowing=textGradeShowing.Text;
+				_evalCritCur.GradeShowing=textGradeShowingPercent.Text;
 			}
 			_evalCritCur.Notes=textNote.Text;
 			EvaluationCriterions.Update(_evalCritCur);

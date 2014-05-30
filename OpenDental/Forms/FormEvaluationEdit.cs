@@ -32,16 +32,16 @@ namespace OpenDental {
 				textStudent.Text=_provStudent.GetLongDesc();
 			}
 			textCourse.Text=SchoolCourses.GetDescript(_evalCur.SchoolCourseNum);
-			textGradeNumber.Text=_evalCur.OverallGradeNumber.ToString();
-			textGradeShowing.Text=_evalCur.OverallGradeShowing;
+			textGradeNumberOverride.Text=_evalCur.OverallGradeNumber.ToString();
+			textGradeShowingOverride.Text=_evalCur.OverallGradeShowing;
 			FillGrid();
+			RecalculateGrades();
 		}
 
 		private void FillGrid() {
 			_evalCrits=EvaluationCriterions.Refresh(_evalCur.EvaluationNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			//TODO: Add more columns
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationEdit","Description"),180);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grading Scale"),90);
@@ -50,21 +50,25 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Grade Number"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Has Note"),50,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Note"),120);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_evalCrits.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_evalCrits[i].CriterionDescript);
-				row.Cells.Add(GradingScales.GetOne(_evalCrits[i].GradingScaleNum).Description);
-				row.Cells.Add(_evalCrits[i].GradeShowing);
-				row.Cells.Add(_evalCrits[i].GradeNumber.ToString());
-				if(String.IsNullOrWhiteSpace(_evalCrits[i].Notes)) {
+				if(_evalCrits[i].IsCategoryName) {
+					row.Bold=true;
+					row.Cells.Add("");
+					row.Cells.Add("");
+					row.Cells.Add("");
 					row.Cells.Add("");
 				}
 				else {
-					row.Cells.Add("X");
+					row.Cells.Add(GradingScales.GetOne(_evalCrits[i].GradingScaleNum).Description);
+					row.Cells.Add(_evalCrits[i].GradeShowing);
+					row.Cells.Add(_evalCrits[i].GradeNumber.ToString());
+					row.Cells.Add(_evalCrits[i].Notes);
 				}
 				gridMain.Rows.Add(row);
 			}
@@ -72,6 +76,9 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(_evalCrits[gridMain.GetSelectedIndex()].IsCategoryName) {
+				return;
+			}
 			FormEvaluationCriterionEdit FormECE=new FormEvaluationCriterionEdit(_evalCrits[gridMain.GetSelectedIndex()]);
 			FormECE.ShowDialog();
 			if(FormECE.DialogResult==DialogResult.OK) {
@@ -84,6 +91,9 @@ namespace OpenDental {
 			float gradeNumber=0;
 			int count=0;
 			for(int i=0;i<_evalCrits.Count;i++) {
+				if(_evalCrits[i].IsCategoryName) {
+					continue;
+				}
 				if(_evalCrits[i].GradingScaleNum==_evalCur.GradingScaleNum) {
 					gradeNumber+=_evalCrits[i].GradeNumber;
 					count++;
@@ -92,19 +102,25 @@ namespace OpenDental {
 			if(count>0) {
 				gradeNumber=gradeNumber/count;
 			}
-			float dif=float.MaxValue;
-			float closestNumber=0;
-			string closestShowing="";
-			List<GradingScaleItem> listGradingScaleItem=GradingScaleItems.Refresh(_evalCur.GradingScaleNum);
-			for(int i=0;i<listGradingScaleItem.Count;i++) {
-				if(Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber) < dif) {
-					dif=Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber);
-					closestNumber=listGradingScaleItem[i].GradeNumber;
-					closestShowing=listGradingScaleItem[i].GradeShowing;
-				}
+			if(GradingScales.GetOne(_evalCur.GradingScaleNum).IsPercentage) {
+				textGradeNumber.Text=gradeNumber.ToString();
+				textGradeShowing.Text=gradeNumber.ToString();
 			}
-			textGradeNumber.Text=closestNumber.ToString();
-			textGradeShowing.Text=closestShowing;
+			else {
+				float dif=float.MaxValue;
+				float closestNumber=0;
+				string closestShowing="";
+				List<GradingScaleItem> listGradingScaleItem=GradingScaleItems.Refresh(_evalCur.GradingScaleNum);
+				for(int i=0;i<listGradingScaleItem.Count;i++) {
+					if(Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber) < dif) {
+						dif=Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber);
+						closestNumber=listGradingScaleItem[i].GradeNumber;
+						closestShowing=listGradingScaleItem[i].GradeShowing;
+					}
+				}
+				textGradeNumber.Text=closestNumber.ToString();
+				textGradeShowing.Text=closestShowing;
+			}
 		}
 
 		private void butStudentPicker_Click(object sender,EventArgs e) {

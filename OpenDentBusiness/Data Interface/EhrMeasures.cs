@@ -2334,7 +2334,7 @@ namespace OpenDentBusiness{
 					case EhrMeasureType.SummaryOfCare:
 						int countToRefPeriod=0;
 						for(int c=0;c<listRefAttach.Count;c++) {
-							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare) {
+							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare && listRefAttach[c].ProvNum!=0) {
 								if(listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) {//within the last year
 									countToRefPeriod++;
 								}
@@ -4381,7 +4381,7 @@ namespace OpenDentBusiness{
 					case EhrMeasureType.SummaryOfCare:
 						int countToRefPeriod=0;
 						for(int c=0;c<listRefAttach.Count;c++) {
-							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare) {
+							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare && listRefAttach[c].ProvNum!=0) {
 								if(listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) {//within the last year
 									countToRefPeriod++;
 								}
@@ -4412,7 +4412,7 @@ namespace OpenDentBusiness{
 					case EhrMeasureType.SummaryOfCareElectronic:
 						countToRefPeriod=0;
 						for(int c=0;c<listRefAttach.Count;c++) {
-							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare) {
+							if(!listRefAttach[c].IsFrom && listRefAttach[c].IsTransitionOfCare && listRefAttach[c].ProvNum!=0) {
 								if(listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) {//within the last year
 									countToRefPeriod++;
 								}

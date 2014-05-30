@@ -43,55 +43,55 @@ namespace OpenDental{
 			// 
 			// textGradeScaleName
 			// 
-			this.textGradeScaleName.Location = new System.Drawing.Point(154, 41);
+			this.textGradeScaleName.Location = new System.Drawing.Point(130, 41);
 			this.textGradeScaleName.MaxLength = 255;
 			this.textGradeScaleName.Name = "textGradeScaleName";
 			this.textGradeScaleName.ReadOnly = true;
-			this.textGradeScaleName.Size = new System.Drawing.Size(121, 20);
+			this.textGradeScaleName.Size = new System.Drawing.Size(145, 20);
 			this.textGradeScaleName.TabIndex = 2;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(11, 42);
+			this.label1.Location = new System.Drawing.Point(12, 42);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(137, 17);
+			this.label1.Size = new System.Drawing.Size(112, 17);
 			this.label1.TabIndex = 114;
 			this.label1.Text = "Grading Scale";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(11, 16);
+			this.label2.Location = new System.Drawing.Point(12, 16);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(137, 17);
+			this.label2.Size = new System.Drawing.Size(112, 17);
 			this.label2.TabIndex = 125;
-			this.label2.Text = "Evaluation Title";
+			this.label2.Text = "Title";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textTitle
 			// 
-			this.textTitle.Location = new System.Drawing.Point(154, 15);
+			this.textTitle.Location = new System.Drawing.Point(130, 15);
 			this.textTitle.MaxLength = 255;
 			this.textTitle.Name = "textTitle";
-			this.textTitle.Size = new System.Drawing.Size(121, 20);
+			this.textTitle.Size = new System.Drawing.Size(145, 20);
 			this.textTitle.TabIndex = 1;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(11, 68);
+			this.label3.Location = new System.Drawing.Point(12, 68);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(137, 17);
+			this.label3.Size = new System.Drawing.Size(112, 17);
 			this.label3.TabIndex = 128;
 			this.label3.Text = "Course";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textCourse
 			// 
-			this.textCourse.Location = new System.Drawing.Point(154, 67);
+			this.textCourse.Location = new System.Drawing.Point(130, 67);
 			this.textCourse.MaxLength = 255;
 			this.textCourse.Name = "textCourse";
 			this.textCourse.ReadOnly = true;
-			this.textCourse.Size = new System.Drawing.Size(121, 20);
+			this.textCourse.Size = new System.Drawing.Size(145, 20);
 			this.textCourse.TabIndex = 4;
 			// 
 			// butCoursePicker
@@ -118,7 +118,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 560);
+			this.butDelete.Location = new System.Drawing.Point(12, 411);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 9;
@@ -128,14 +128,14 @@ namespace OpenDental{
 			// butCriterionAdd
 			// 
 			this.butCriterionAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCriterionAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCriterionAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCriterionAdd.Autosize = true;
 			this.butCriterionAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCriterionAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCriterionAdd.CornerRadius = 4F;
 			this.butCriterionAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butCriterionAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCriterionAdd.Location = new System.Drawing.Point(229, 529);
+			this.butCriterionAdd.Location = new System.Drawing.Point(365, 93);
 			this.butCriterionAdd.Name = "butCriterionAdd";
 			this.butCriterionAdd.Size = new System.Drawing.Size(75, 24);
 			this.butCriterionAdd.TabIndex = 8;
@@ -159,16 +159,16 @@ namespace OpenDental{
 			// butDown
 			// 
 			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butDown.Autosize = true;
 			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(109, 529);
+			this.butDown.Location = new System.Drawing.Point(365, 239);
 			this.butDown.Name = "butDown";
-			this.butDown.Size = new System.Drawing.Size(82, 24);
+			this.butDown.Size = new System.Drawing.Size(75, 24);
 			this.butDown.TabIndex = 7;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
@@ -176,16 +176,16 @@ namespace OpenDental{
 			// butUp
 			// 
 			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 1);
-			this.butUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butUp.Autosize = true;
 			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(12, 529);
+			this.butUp.Location = new System.Drawing.Point(365, 209);
 			this.butUp.Name = "butUp";
-			this.butUp.Size = new System.Drawing.Size(82, 24);
+			this.butUp.Size = new System.Drawing.Size(75, 24);
 			this.butUp.TabIndex = 6;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
@@ -200,7 +200,7 @@ namespace OpenDental{
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(388, 430);
+			this.gridMain.Size = new System.Drawing.Size(347, 288);
 			this.gridMain.TabIndex = 60;
 			this.gridMain.Title = "Criteria Used";
 			this.gridMain.TranslationName = "FormEvaluationDefEdit";
@@ -214,7 +214,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(325, 530);
+			this.butOK.Location = new System.Drawing.Point(365, 381);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 10;
@@ -229,7 +229,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(325, 560);
+			this.butCancel.Location = new System.Drawing.Point(365, 411);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 11;
@@ -239,7 +239,7 @@ namespace OpenDental{
 			// FormEvaluationDefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(412, 596);
+			this.ClientSize = new System.Drawing.Size(452, 447);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textCourse);
 			this.Controls.Add(this.butCoursePicker);
@@ -256,7 +256,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(390, 353);
+			this.MinimumSize = new System.Drawing.Size(390, 372);
 			this.Name = "FormEvaluationDefEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Definition Edit";

@@ -464,12 +464,6 @@ namespace OpenDental{
 				node2=SetNode(Permissions.Schedules);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Providers);
-					node3=SetNode(Permissions.AdminDentalInstructors);
-						node2.Nodes.Add(node3);
-					node3=SetNode(Permissions.AdminDentalStudents);
-						node2.Nodes.Add(node3);
-					node3=SetNode(Permissions.AdminDentalEvaluations);
-						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Blockouts);
 					node.Nodes.Add(node2);
@@ -606,7 +600,15 @@ namespace OpenDental{
 				treePermissions.Nodes.Add(node);
 			node=SetNode("EHR");
 				node2=SetNode(Permissions.EhrEmergencyAccess);
-					node.Nodes.Add(node2);
+				node.Nodes.Add(node2);
+				treePermissions.Nodes.Add(node);
+			node=SetNode("Dental School");
+				node2=SetNode(Permissions.AdminDentalInstructors);
+				node.Nodes.Add(node2);
+				node2=SetNode(Permissions.AdminDentalStudents);
+				node.Nodes.Add(node2);
+				node2=SetNode(Permissions.AdminDentalEvaluations);
+				node.Nodes.Add(node2);
 				//node2=SetNode(Permissions.EhrInfoButton);
 				//	node.Nodes.Add(node2);
 				//node2=SetNode(Permissions.EhrShowCDS);
@@ -655,6 +657,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableSecurity","Strong"),80,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				col=new ODGridColumn(Lan.g("TableSecurity","Class"),100);
+				gridMain.Columns.Add(col);
+			}
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			string usertype="all";
@@ -700,7 +706,10 @@ namespace OpenDental{
 				row.Cells.Add(Clinics.GetDesc(ListUser[i].ClinicNum));
 				row.Cells.Add(ListUser[i].ClinicIsRestricted?"X":"");
 				row.Cells.Add(ListUser[i].PasswordIsStrong?"X":"");
-				gridMain.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+					row.Cells.Add(SchoolClasses.GetDescript(Providers.GetProv(ListUser[i].ProvNum).SchoolClassNum));
+					gridMain.Rows.Add(row);
+				}
 			}
 			gridMain.EndUpdate();	
 		}

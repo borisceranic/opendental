@@ -24,86 +24,54 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormGradingScaleEdit));
-			this.gridMain = new OpenDental.UI.ODGrid();
-			this.butAdd = new OpenDental.UI.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textDescription = new System.Windows.Forms.TextBox();
 			this.checkIsPercentage = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butAdd = new OpenDental.UI.Button();
+			this.labelIsPercentage = new System.Windows.Forms.Label();
 			this.SuspendLayout();
-			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 12);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(321, 494);
-			this.gridMain.TabIndex = 8;
-			this.gridMain.Title = "Grading Scale Items";
-			this.gridMain.TranslationName = null;
-			this.gridMain.DoubleClick += new System.EventHandler(this.gridMain_DoubleClick);
-			// 
-			// butAdd
-			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAdd.Autosize = true;
-			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
-			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(386, 236);
-			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75, 24);
-			this.butAdd.TabIndex = 2;
-			this.butAdd.Text = "Add";
-			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// label2
 			// 
-			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(339, 19);
+			this.label2.Location = new System.Drawing.Point(14, 20);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(122, 17);
 			this.label2.TabIndex = 127;
-			this.label2.Text = "Scale description";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.label2.Text = "Description";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textDescription
 			// 
-			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textDescription.Location = new System.Drawing.Point(340, 39);
+			this.textDescription.Location = new System.Drawing.Point(137, 19);
 			this.textDescription.MaxLength = 255;
 			this.textDescription.Name = "textDescription";
-			this.textDescription.Size = new System.Drawing.Size(121, 20);
+			this.textDescription.Size = new System.Drawing.Size(181, 20);
 			this.textDescription.TabIndex = 1;
 			// 
 			// checkIsPercentage
 			// 
-			this.checkIsPercentage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkIsPercentage.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsPercentage.Location = new System.Drawing.Point(360, 415);
+			this.checkIsPercentage.Location = new System.Drawing.Point(53, 45);
 			this.checkIsPercentage.Name = "checkIsPercentage";
-			this.checkIsPercentage.Size = new System.Drawing.Size(112, 17);
+			this.checkIsPercentage.Size = new System.Drawing.Size(96, 17);
 			this.checkIsPercentage.TabIndex = 3;
 			this.checkIsPercentage.Text = "Is Percentage";
+			this.checkIsPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsPercentage.Click += new System.EventHandler(this.checkIsPercentage_Click);
 			// 
 			// label1
 			// 
-			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label1.Location = new System.Drawing.Point(360, 370);
+			this.label1.Location = new System.Drawing.Point(155, 46);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(101, 42);
+			this.label1.Size = new System.Drawing.Size(235, 16);
 			this.label1.TabIndex = 129;
-			this.label1.Text = "Checking this assumes a 0-100% grading scale.";
+			this.label1.Text = "Assumes a 0-100% grading scale.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// butOK
 			// 
@@ -113,7 +81,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(386, 452);
+			this.butOK.Location = new System.Drawing.Point(234, 312);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 4;
@@ -128,17 +96,60 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(386, 482);
+			this.butCancel.Location = new System.Drawing.Point(315, 312);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(12, 76);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(378, 220);
+			this.gridMain.TabIndex = 8;
+			this.gridMain.Title = "Grading Scale Items";
+			this.gridMain.TranslationName = null;
+			this.gridMain.DoubleClick += new System.EventHandler(this.gridMain_DoubleClick);
+			// 
+			// butAdd
+			// 
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAdd.Autosize = true;
+			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAdd.CornerRadius = 4F;
+			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAdd.Location = new System.Drawing.Point(12, 312);
+			this.butAdd.Name = "butAdd";
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
+			this.butAdd.TabIndex = 2;
+			this.butAdd.Text = "Add";
+			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
+			// 
+			// labelIsPercentage
+			// 
+			this.labelIsPercentage.ForeColor = System.Drawing.Color.Red;
+			this.labelIsPercentage.Location = new System.Drawing.Point(93, 299);
+			this.labelIsPercentage.Name = "labelIsPercentage";
+			this.labelIsPercentage.Size = new System.Drawing.Size(135, 42);
+			this.labelIsPercentage.TabIndex = 130;
+			this.labelIsPercentage.Text = "Grading scale items are not needed for percentage based scales.";
+			this.labelIsPercentage.Visible = false;
+			// 
 			// FormGradingScaleEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(473, 518);
+			this.ClientSize = new System.Drawing.Size(402, 350);
+			this.Controls.Add(this.labelIsPercentage);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label1);
@@ -148,7 +159,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(357, 380);
+			this.MinimumSize = new System.Drawing.Size(418, 388);
 			this.Name = "FormGradingScaleEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Grading Scale Edit";
@@ -168,5 +179,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private UI.Button butOK;
 		private UI.Button butCancel;
+		private System.Windows.Forms.Label labelIsPercentage;
 	}
 }

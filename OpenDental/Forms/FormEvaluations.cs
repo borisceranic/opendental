@@ -28,7 +28,7 @@ namespace OpenDental {
 			}
 			comboCourse.Items.Add("All");
 			for(int i=0;i<SchoolCourses.List.Length;i++) {
-				comboCourse.Items.Add(SchoolCourses.List[i].Descript);
+				comboCourse.Items.Add(SchoolCourses.List[i].CourseID);
 			}
 			comboCourse.SelectedIndex=0;
 			_listInstructor=Providers.GetInstructors();
@@ -48,7 +48,7 @@ namespace OpenDental {
 			DataTable table=Evaluations.GetFilteredList(DateTime.Parse(textDateStart.Text),DateTime.Parse(textDateEnd.Text),textLastName.Text,textFirstName.Text,PIn.Long(textProvNum.Text),course,instructor);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluations","Date"),70);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableEvaluations","Date"),70,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Title"),90);
 			gridMain.Columns.Add(col);
@@ -76,7 +76,7 @@ namespace OpenDental {
 				row.Cells.Add(table.Rows[i]["StudentNum"].ToString());
 				row.Cells.Add(table.Rows[i]["LName"].ToString());
 				row.Cells.Add(table.Rows[i]["FName"].ToString());
-				row.Cells.Add(table.Rows[i]["Descript"].ToString());
+				row.Cells.Add(table.Rows[i]["CourseID"].ToString());
 				row.Cells.Add(table.Rows[i]["OverallgradeShowing"].ToString());
 				row.Cells.Add(table.Rows[i]["Description"].ToString());
 				row.Tag=table.Rows[i]["EvaluationNum"].ToString();//To keep the correct reference to the Evaluation even when filtering the list.
@@ -110,6 +110,7 @@ namespace OpenDental {
 		private void butAdd_Click(object sender,EventArgs e) {
 			FormEvaluationDefs FormED=new FormEvaluationDefs();
 			FormED.IsSelectionMode=true;
+			FormED.CourseIndex=comboCourse.SelectedIndex;
 			FormED.ShowDialog();
 			if(FormED.DialogResult==DialogResult.OK) {
 				FillGrid();

@@ -22,7 +22,6 @@ namespace OpenDental {
 
 		private void FormGradingScales_Load(object sender,EventArgs e) {
 			if(IsSelectionMode) {
-				butEdit.Visible=true;
 				butOK.Visible=true;
 				butCancel.Text="&Cancel";
 			}
@@ -56,13 +55,8 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void butEdit_Click(object sender,EventArgs e) {
-			FormGradingScaleEdit FormGSE=new FormGradingScaleEdit(_listGradingScales[gridMain.GetSelectedIndex()]);
-			FormGSE.ShowDialog();
-			FillGrid();
-		}
-
 		private void butAdd_Click(object sender,EventArgs e) {
+			//TODO: check other "is selection" mode windows.  I think this is a quick way to add new items and automatically "select" the added item.
 			GradingScale gradingScaleNew=new GradingScale();
 			gradingScaleNew.GradingScaleNum=GradingScales.Insert(gradingScaleNew);
 			gradingScaleNew.IsNew=true;
@@ -73,7 +67,7 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			if(gridMain.GetSelectedIndex()==-1) {
-				MsgBox.Show(this,"Select a grading scale for the evaluation.");
+				MsgBox.Show(this,"Select a grading scale first.");
 				return;
 			}
 			SelectedGradingScale=_listGradingScales[gridMain.GetSelectedIndex()];

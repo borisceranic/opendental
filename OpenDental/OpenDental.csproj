@@ -384,6 +384,18 @@
     <Compile Include="Forms\FormEtrans835PickEob.designer.cs">
       <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEvaluationReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEvaluationReport.designer.cs">
+      <DependentUpon>FormEvaluationReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormDispensary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormDispensary.designer.cs">
+      <DependentUpon>FormDispensary.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEvaluationEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3486,6 +3498,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835PickEob.resx">
       <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEvaluationReport.resx">
+      <DependentUpon>FormEvaluationReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormDispensary.resx">
+      <DependentUpon>FormDispensary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEvaluationEdit.resx">
       <DependentUpon>FormEvaluationEdit.cs</DependentUpon>

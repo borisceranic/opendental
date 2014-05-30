@@ -27,8 +27,10 @@ namespace OpenDental {
 			FormGradingScales FormGS=new FormGradingScales();
 			FormGS.IsSelectionMode=true;
 			FormGS.ShowDialog();
-			textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
-			_evalCritDef.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
+			if(FormGS.DialogResult==DialogResult.OK) {
+				textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
+				_evalCritDef.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
+			}
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -36,10 +38,10 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the criterion def. Is this ok?")) {
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the criterion def.  Continue?")) {
 				EvaluationCriterionDefs.Delete(_evalCritDef.EvaluationCriterionDefNum);
 			}
-			DialogResult=DialogResult.Cancel;
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

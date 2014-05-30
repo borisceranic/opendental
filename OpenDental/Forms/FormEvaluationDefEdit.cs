@@ -10,8 +10,9 @@ using OpenDental.UI;
 namespace OpenDental {
 	public partial class FormEvaluationDefEdit:Form {
 		private EvaluationDef _evalDefCur;
-		private List<EvaluationCriterionDef> _criterionDefsAvailable;
 		private List<EvaluationCriterionDef> _criterionDefsForEval;
+		private Dictionary<long,GradingScale> _gradingScales;
+		private List<long> _itemOrder;
 
 		public FormEvaluationDefEdit(EvaluationDef evalDefCur) {
 			InitializeComponent();
@@ -26,11 +27,19 @@ namespace OpenDental {
 				textGradeScaleName.Text=GradingScales.GetOne(_evalDefCur.GradingScaleNum).Description;
 			}
 			_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+			_itemOrder=new List<long>();
+			for(int j=0;j<_criterionDefsForEval.Count;j++) {
+				_itemOrder.Add(_criterionDefsForEval[j].EvaluationCriterionDefNum);
+			}
+			List<GradingScale> gradingScales=GradingScales.Refresh();
+			_gradingScales=new Dictionary<long,GradingScale>();
+			for(int i=0;i<gradingScales.Count;i++) {
+				_gradingScales.Add(gradingScales[i].GradingScaleNum,gradingScales[i]);
+			}
 			FillGrid();
 		}
 
 		private void FillGrid() {
-			_criterionDefsAvailable=EvaluationCriterionDefs.GetAvailableCriterionDefs();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),180);
@@ -42,7 +51,13 @@ namespace OpenDental {
 			for(int i=0;i<_criterionDefsForEval.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_criterionDefsForEval[i].CriterionDescript);
-				row.Cells.Add(GradingScales.GetOne(_criterionDefsForEval[i].GradingScaleNum).Description);
+				if(_criterionDefsForEval[i].IsCategoryName) {
+					row.Bold=true;
+					row.Cells.Add("");
+				}
+				else {
+					row.Cells.Add(_gradingScales[_criterionDefsForEval[i].GradingScaleNum].Description);
+				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -51,8 +66,10 @@ namespace OpenDental {
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(_criterionDefsForEval[gridMain.GetSelectedIndex()]);
 			FormECDE.ShowDialog();
-			_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
-			FillGrid();
+			if(FormECDE.DialogResult==DialogResult.OK) {
+				_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+				FillGrid();
+			}
 		}
 
 		private void butCriterionAdd_Click(object sender,EventArgs e) {
@@ -66,7 +83,15 @@ namespace OpenDental {
 			evalCritDef.IsNew=true;
 			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(evalCritDef);
 			FormECDE.ShowDialog();
-			FillGrid();
+			if(FormECDE.DialogResult==DialogResult.OK) {
+				_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+				FillGrid();
+			}
+		}
+
+		/// <summary>Used after adding or deleting an EvaluationCriterionDef.  Enables item order to persist.</summary>
+		private void SynchItemOrder() {
+			
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {
@@ -85,20 +110,8 @@ namespace OpenDental {
 			FormSC.ShowDialog();
 			if(FormSC.DialogResult==DialogResult.OK) {
 				_evalDefCur.SchoolCourseNum=FormSC.CourseSelected.SchoolCourseNum;
-				textCourse.Text=FormSC.CourseSelected.Descript;
+				textCourse.Text=FormSC.CourseSelected.CourseID;
 			}
-		}
-
-		private void butRemove_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select an item in the grid first.");
-				return;
-			}
-			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {//go backwards
-				EvaluationCriterionDefs.Delete(_criterionDefsForEval[gridMain.SelectedIndices[i]].EvaluationCriterionDefNum);
-				_criterionDefsForEval.RemoveAt(gridMain.SelectedIndices[i]);
-			}
-			FillGrid();
 		}
 
 		private void butUp_Click(object sender,EventArgs e) {
@@ -115,6 +128,7 @@ namespace OpenDental {
 			}
 			for(int i=0;i<selected.Length;i++) {
 				_criterionDefsForEval.Reverse(selected[i]-1,2);
+				_itemOrder.Reverse(selected[i]-1,2);
 			}
 			FillGrid();
 			for(int i=0;i<selected.Length;i++) {
@@ -136,6 +150,7 @@ namespace OpenDental {
 			}
 			for(int i=selected.Length-1;i>=0;i--) {//go backwards
 				_criterionDefsForEval.Reverse(selected[i],2);
+				_itemOrder.Reverse(selected[i],2);
 			}
 			FillGrid();
 			for(int i=0;i<selected.Length;i++) {
@@ -144,18 +159,20 @@ namespace OpenDental {
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(_evalDefCur.IsNew || MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the evaluation def. Is this ok?")) {
+			if(_evalDefCur.IsNew || MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the evaluation def.  Continue?")) {
 				EvaluationDefs.Delete(_evalDefCur.EvaluationDefNum);
+				DialogResult=DialogResult.Cancel;
 			}
-			DialogResult=DialogResult.Cancel;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			if(_evalDefCur.SchoolCourseNum==0) {
 				MsgBox.Show(this,"A school course must be selected for this evaluation def before it can be saved.");
+				return;
 			}
 			if(_evalDefCur.GradingScaleNum==0) {
 				MsgBox.Show(this,"A grading scale must be selected for this evaluation def before it can be saved.");
+				return;
 			}
 			_evalDefCur.EvalTitle=textTitle.Text;
 			EvaluationDefs.Update(_evalDefCur);

@@ -79,13 +79,14 @@ namespace OpenDental{
 		private GroupBox groupDentalSchools;
 		private TextBox textUserName;
 		private TextBox textPassword;
-		private TextBox textUniqueID;
+		private TextBox textProvNum;
 		private Label label17;
 		private Label label16;
 		private Label label18;
 		public Provider ProvCur;
-		private Label label19;
+		private Label labelEhrMU;
 		private ComboBox comboEhrMu;
+		private Label labelPassDescription;
 		private Userod _existingUser;
 
 		///<summary></summary>
@@ -180,12 +181,13 @@ namespace OpenDental{
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
 			this.textUserName = new System.Windows.Forms.TextBox();
 			this.textPassword = new System.Windows.Forms.TextBox();
-			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
-			this.label19 = new System.Windows.Forms.Label();
+			this.labelEhrMU = new System.Windows.Forms.Label();
 			this.comboEhrMu = new System.Windows.Forms.ComboBox();
+			this.labelPassDescription = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupAnesthProvType.SuspendLayout();
@@ -516,7 +518,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.label2);
 			this.groupBox2.Controls.Add(this.tbProvIdent);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(33, 459);
+			this.groupBox2.Location = new System.Drawing.Point(33, 451);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(496, 157);
 			this.groupBox2.TabIndex = 23;
@@ -588,7 +590,7 @@ namespace OpenDental{
 			this.comboSchoolClass.Location = new System.Drawing.Point(101, 20);
 			this.comboSchoolClass.MaxDropDownItems = 30;
 			this.comboSchoolClass.Name = "comboSchoolClass";
-			this.comboSchoolClass.Size = new System.Drawing.Size(130, 21);
+			this.comboSchoolClass.Size = new System.Drawing.Size(158, 21);
 			this.comboSchoolClass.TabIndex = 0;
 			this.comboSchoolClass.Visible = false;
 			// 
@@ -792,9 +794,10 @@ namespace OpenDental{
 			// 
 			// groupDentalSchools
 			// 
+			this.groupDentalSchools.Controls.Add(this.labelPassDescription);
 			this.groupDentalSchools.Controls.Add(this.textUserName);
 			this.groupDentalSchools.Controls.Add(this.textPassword);
-			this.groupDentalSchools.Controls.Add(this.textUniqueID);
+			this.groupDentalSchools.Controls.Add(this.textProvNum);
 			this.groupDentalSchools.Controls.Add(this.label17);
 			this.groupDentalSchools.Controls.Add(this.label16);
 			this.groupDentalSchools.Controls.Add(this.label18);
@@ -802,9 +805,9 @@ namespace OpenDental{
 			this.groupDentalSchools.Controls.Add(this.checkIsInstructor);
 			this.groupDentalSchools.Controls.Add(this.comboSchoolClass);
 			this.groupDentalSchools.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupDentalSchools.Location = new System.Drawing.Point(535, 459);
+			this.groupDentalSchools.Location = new System.Drawing.Point(535, 451);
 			this.groupDentalSchools.Name = "groupDentalSchools";
-			this.groupDentalSchools.Size = new System.Drawing.Size(237, 126);
+			this.groupDentalSchools.Size = new System.Drawing.Size(264, 135);
 			this.groupDentalSchools.TabIndex = 24;
 			this.groupDentalSchools.TabStop = false;
 			this.groupDentalSchools.Text = "Dental Schools";
@@ -815,7 +818,7 @@ namespace OpenDental{
 			this.textUserName.Location = new System.Drawing.Point(101, 62);
 			this.textUserName.MaxLength = 100;
 			this.textUserName.Name = "textUserName";
-			this.textUserName.Size = new System.Drawing.Size(129, 20);
+			this.textUserName.Size = new System.Drawing.Size(157, 20);
 			this.textUserName.TabIndex = 2;
 			// 
 			// textPassword
@@ -823,17 +826,17 @@ namespace OpenDental{
 			this.textPassword.Location = new System.Drawing.Point(101, 82);
 			this.textPassword.MaxLength = 100;
 			this.textPassword.Name = "textPassword";
-			this.textPassword.Size = new System.Drawing.Size(129, 20);
+			this.textPassword.Size = new System.Drawing.Size(157, 20);
 			this.textPassword.TabIndex = 3;
 			// 
-			// textUniqueID
+			// textProvNum
 			// 
-			this.textUniqueID.Location = new System.Drawing.Point(101, 42);
-			this.textUniqueID.MaxLength = 15;
-			this.textUniqueID.Name = "textUniqueID";
-			this.textUniqueID.ReadOnly = true;
-			this.textUniqueID.Size = new System.Drawing.Size(129, 20);
-			this.textUniqueID.TabIndex = 1;
+			this.textProvNum.Location = new System.Drawing.Point(101, 42);
+			this.textProvNum.MaxLength = 15;
+			this.textProvNum.Name = "textProvNum";
+			this.textProvNum.ReadOnly = true;
+			this.textProvNum.Size = new System.Drawing.Size(157, 20);
+			this.textProvNum.TabIndex = 1;
 			// 
 			// label17
 			// 
@@ -862,14 +865,14 @@ namespace OpenDental{
 			this.label18.Text = "Password";
 			this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label19
+			// labelEhrMU
 			// 
-			this.label19.Location = new System.Drawing.Point(9, 397);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(144, 16);
-			this.label19.TabIndex = 114;
-			this.label19.Text = "EHR Meaningful Use";
-			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelEhrMU.Location = new System.Drawing.Point(9, 397);
+			this.labelEhrMU.Name = "labelEhrMU";
+			this.labelEhrMU.Size = new System.Drawing.Size(144, 16);
+			this.labelEhrMU.TabIndex = 114;
+			this.labelEhrMU.Text = "EHR Meaningful Use";
+			this.labelEhrMU.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboEhrMu
 			// 
@@ -880,13 +883,22 @@ namespace OpenDental{
 			this.comboEhrMu.Size = new System.Drawing.Size(100, 21);
 			this.comboEhrMu.TabIndex = 15;
 			// 
+			// labelPassDescription
+			// 
+			this.labelPassDescription.Location = new System.Drawing.Point(120, 105);
+			this.labelPassDescription.Name = "labelPassDescription";
+			this.labelPassDescription.Size = new System.Drawing.Size(138, 27);
+			this.labelPassDescription.TabIndex = 248;
+			this.labelPassDescription.Text = "To keep the old password, leave the box empty.";
+			this.labelPassDescription.Visible = false;
+			// 
 			// FormProvEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(811, 628);
-			this.Controls.Add(this.label19);
+			this.Controls.Add(this.labelEhrMU);
 			this.Controls.Add(this.comboEhrMu);
 			this.Controls.Add(this.groupDentalSchools);
 			this.Controls.Add(this.textStateWhereLicensed);
@@ -971,13 +983,15 @@ namespace OpenDental{
 			comboEhrMu.SelectedIndex=ProvCur.EhrMuStage;
 			if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				comboEhrMu.Visible=false;
+				labelEhrMU.Visible=false;
 			}
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools) //Dental Schools is turned on
 				&& (ProvCur.SchoolClassNum!=0 || ProvCur.IsInstructor))//Adding/Editing Students or Instructors
 			{
 				groupDentalSchools.Visible=true;
 				if(!ProvCur.IsNew) {
-					textUniqueID.Text=ProvCur.ProvNum.ToString();
+					labelPassDescription.Visible=true;
+					textProvNum.Text=ProvCur.ProvNum.ToString();
 					List<Userod> userList=Providers.GetAttachedUsers(ProvCur.ProvNum);
 					if(userList.Count>0) {
 						textUserName.Text=userList[0].UserName;//Should always happen if they are a student.
@@ -992,7 +1006,6 @@ namespace OpenDental{
 					comboSchoolClass.SelectedIndex=0;
 					if(SchoolClasses.List[i].SchoolClassNum==ProvCur.SchoolClassNum) {
 						comboSchoolClass.SelectedIndex=i;
-						break;
 					}
 				}
 				if(ProvCur.SchoolClassNum!=0) {

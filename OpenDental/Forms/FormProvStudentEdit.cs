@@ -13,8 +13,6 @@ namespace OpenDental {
 		private Userod _existingUser;
 		///<summary>Set this when selecting a pre-existing Student.</summary>
 		public Provider ProvStudent;
-		///<summary>Set this when creating a new Student.  Used to automatically set the last name when window loads.</summary>
-		public string LastName;
 
 		public FormProvStudentEdit() {
 			InitializeComponent();
@@ -44,7 +42,8 @@ namespace OpenDental {
 					comboClass.SelectedIndex=i;
 					break;
 				}
-				textLastName.Text=LastName;
+				textFirstName.Text=ProvStudent.FName;
+				textLastName.Text=ProvStudent.LName;
 			}
 			//Double-Clicking an existing student
 			else {
@@ -64,7 +63,7 @@ namespace OpenDental {
 					textUserName.Text=userList[0].UserName;//Should always happen if they are a student.
 					_existingUser=userList[0];
 				}
-				textUniqueID.Text=POut.Long(ProvStudent.ProvNum);
+				textProvNum.Text=POut.Long(ProvStudent.ProvNum);
 			}
 		}
 

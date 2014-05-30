@@ -3464,10 +3464,10 @@ namespace OpenDental{
 		}
 
 		private void butReferral_Click(object sender,EventArgs e) {
-			FormReferralsPatient formRP=new FormReferralsPatient();
-			formRP.PatNum=ProcCur.PatNum;
-			formRP.ProcNum=ProcCur.ProcNum;
-			formRP.ShowDialog();
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=ProcCur.PatNum;
+			FormRP.ProcNum=ProcCur.ProcNum;
+			FormRP.ShowDialog();
 			FillReferral();
 		}
 

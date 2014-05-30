@@ -40,7 +40,7 @@ namespace OpenDental{
 		//private User user;
 		private DataTable table;
 		private Label label7;
-		private TextBox textUniqueID;
+		private TextBox textProvNum;
 		private Label label6;
 		private TextBox textFirstName;
 		private UI.Button butStudBulkEdit;
@@ -78,7 +78,7 @@ namespace OpenDental{
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
-			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textFirstName = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -178,7 +178,7 @@ namespace OpenDental{
 			this.groupDentalSchools.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupDentalSchools.Controls.Add(this.label8);
 			this.groupDentalSchools.Controls.Add(this.label7);
-			this.groupDentalSchools.Controls.Add(this.textUniqueID);
+			this.groupDentalSchools.Controls.Add(this.textProvNum);
 			this.groupDentalSchools.Controls.Add(this.label6);
 			this.groupDentalSchools.Controls.Add(this.textFirstName);
 			this.groupDentalSchools.Controls.Add(this.label4);
@@ -209,17 +209,17 @@ namespace OpenDental{
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(90, 18);
 			this.label7.TabIndex = 25;
-			this.label7.Text = "Unique ID";
+			this.label7.Text = "ProvNum";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textUniqueID
+			// textProvNum
 			// 
-			this.textUniqueID.Location = new System.Drawing.Point(98, 145);
-			this.textUniqueID.MaxLength = 15;
-			this.textUniqueID.Name = "textUniqueID";
-			this.textUniqueID.Size = new System.Drawing.Size(166, 20);
-			this.textUniqueID.TabIndex = 6;
-			this.textUniqueID.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
+			this.textProvNum.Location = new System.Drawing.Point(98, 145);
+			this.textProvNum.MaxLength = 15;
+			this.textProvNum.Name = "textProvNum";
+			this.textProvNum.Size = new System.Drawing.Size(166, 20);
+			this.textProvNum.TabIndex = 6;
+			this.textProvNum.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
 			// 
 			// label6
 			// 
@@ -553,7 +553,7 @@ namespace OpenDental{
 				if(comboClass.SelectedIndex>0) {
 					schoolClass=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
 				}
-				table=Providers.RefreshForDentalSchool(schoolClass,textLastName.Text,textFirstName.Text,textUniqueID.Text,radioInstructors.Checked,radioAll.Checked);
+				table=Providers.RefreshForDentalSchool(schoolClass,textLastName.Text,textFirstName.Text,textProvNum.Text,radioInstructors.Checked,radioAll.Checked);
 			}
 			else {
 				table=Providers.RefreshStandard();
@@ -577,7 +577,7 @@ namespace OpenDental{
 			gridMain.Columns.Clear();
 			ODGridColumn col;
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				col=new ODGridColumn(Lan.g("TableProviderSetup","Unique ID"),60);
+				col=new ODGridColumn(Lan.g("TableProviderSetup","ProvNum"),60);
 				gridMain.Columns.Add(col);
 			}
 			col=new ODGridColumn(Lan.g("TableProviderSetup","Abbrev"),90);
@@ -692,11 +692,15 @@ namespace OpenDental{
 						return;
 					}
 					FormPSE.ProvStudent.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
+					FormPSE.ProvStudent.FName=textFirstName.Text;
+					FormPSE.ProvStudent.LName=textLastName.Text;
 				}
 				if(radioInstructors.Checked && !Security.IsAuthorized(Permissions.AdminDentalInstructors)) {
 					return;
 				}
 				FormPE.ProvCur.IsInstructor=radioInstructors.Checked;
+				FormPE.ProvCur.FName=textFirstName.Text;
+				FormPE.ProvCur.LName=textLastName.Text;
 			}
 			else {//Not using Dental Schools feature.
 				Cache.Refresh(InvalidType.Providers);//Refresh the cache to get current information for the item orders

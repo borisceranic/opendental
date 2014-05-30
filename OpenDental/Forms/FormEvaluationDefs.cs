@@ -11,6 +11,7 @@ namespace OpenDental {
 	public partial class FormEvaluationDefs:Form {
 		/// <summary>This mode is only used for picking an evaluationdef for a brand new evaluation.</summary>
 		public bool IsSelectionMode=false;
+		public int CourseIndex;
 
 		public FormEvaluationDefs() {
 			InitializeComponent();
@@ -24,9 +25,9 @@ namespace OpenDental {
 			}
 			comboCourse.Items.Add("All");
 			for(int i=0;i<SchoolCourses.List.Length;i++) {
-				comboCourse.Items.Add(SchoolCourses.List[i].Descript);
+				comboCourse.Items.Add(SchoolCourses.List[i].CourseID);
 			}
-			comboCourse.SelectedIndex=0;
+			comboCourse.SelectedIndex=CourseIndex;
 			FillGrid();
 		}
 

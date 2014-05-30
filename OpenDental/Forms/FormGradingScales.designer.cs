@@ -27,7 +27,6 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.butEdit = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
@@ -41,7 +40,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(396, 54);
+			this.butAdd.Location = new System.Drawing.Point(233, 24);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 2;
@@ -56,7 +55,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(396, 215);
+			this.butCancel.Location = new System.Drawing.Point(233, 147);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 4;
@@ -72,28 +71,11 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(24, 24);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(340, 215);
+			this.gridMain.Size = new System.Drawing.Size(203, 147);
 			this.gridMain.TabIndex = 5;
 			this.gridMain.Title = "Grading Scales";
 			this.gridMain.TranslationName = null;
 			this.gridMain.DoubleClick += new System.EventHandler(this.gridMain_DoubleClick);
-			// 
-			// butEdit
-			// 
-			this.butEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEdit.Autosize = true;
-			this.butEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEdit.CornerRadius = 4F;
-			this.butEdit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butEdit.Location = new System.Drawing.Point(396, 24);
-			this.butEdit.Name = "butEdit";
-			this.butEdit.Size = new System.Drawing.Size(75, 24);
-			this.butEdit.TabIndex = 1;
-			this.butEdit.Text = "Edit";
-			this.butEdit.Visible = false;
-			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
 			// 
 			// butOK
 			// 
@@ -103,7 +85,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(396, 185);
+			this.butOK.Location = new System.Drawing.Point(233, 117);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -114,14 +96,13 @@ namespace OpenDental{
 			// FormGradingScales
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(483, 251);
+			this.ClientSize = new System.Drawing.Size(320, 183);
 			this.Controls.Add(this.butOK);
-			this.Controls.Add(this.butEdit);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(404, 191);
+			this.MinimumSize = new System.Drawing.Size(336, 221);
 			this.Name = "FormGradingScales";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Grading Scales";
@@ -135,7 +116,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butCancel;
 		private UI.ODGrid gridMain;
-		private UI.Button butEdit;
 		private UI.Button butOK;
 	}
 }

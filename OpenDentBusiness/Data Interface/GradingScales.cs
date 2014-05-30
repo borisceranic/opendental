@@ -78,6 +78,20 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		public static bool IsInUseByEvaluation(GradingScale gradingScaleCur) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),gradingScaleCur);
+			}
+			string command="SELECT COUNT(*) from evaluation,evaluationcriterion "
+				+"WHERE evaluation.GradingScaleNum = '"+POut.Long(gradingScaleCur.GradingScaleNum)+"' "
+				+"OR evaluationcriterion.GradingScaleNum = "+POut.Long(gradingScaleCur.GradingScaleNum);
+			int count=PIn.Int(Db.GetCount(command));
+			if(count>0) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary></summary>
 		public static long Insert(GradingScale gradingScale){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

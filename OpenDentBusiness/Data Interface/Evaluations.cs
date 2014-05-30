@@ -71,7 +71,7 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,lastName,firstName,uniqueID,courseNum,instructorNum);
 			}
 			string command="SELECT evaluation.EvaluationNum,evaluation.EvalTitle,evaluation.DateEval,evaluation.StudentNum,evaluation.InstructNum,"
-			+"stu.LName,stu.FName,schoolcourse.Descript,gradingscale.Description,evaluation.OverallGradeShowing FROM evaluation "
+			+"stu.LName,stu.FName,schoolcourse.CourseID,gradingscale.Description,evaluation.OverallGradeShowing FROM evaluation "
 				+"INNER JOIN provider ins ON ins.ProvNum=evaluation.InstructNum "
 				+"INNER JOIN provider stu ON stu.ProvNum=evaluation.StudentNum "
 				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluation.SchoolCourseNum "

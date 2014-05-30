@@ -29,7 +29,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.gridStudents = new OpenDental.UI.ODGrid();
 			this.label7 = new System.Windows.Forms.Label();
-			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.comboClass = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -53,7 +53,7 @@ namespace OpenDental{
 			this.butBulkEdit.Name = "butBulkEdit";
 			this.butBulkEdit.Size = new System.Drawing.Size(75, 24);
 			this.butBulkEdit.TabIndex = 3;
-			this.butBulkEdit.Text = "Bulk Edit";
+			this.butBulkEdit.Text = "Update";
 			this.butBulkEdit.Click += new System.EventHandler(this.butBulkEdit_Click);
 			// 
 			// butClose
@@ -93,18 +93,18 @@ namespace OpenDental{
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(90, 18);
 			this.label7.TabIndex = 29;
-			this.label7.Text = "Unique ID";
+			this.label7.Text = "ProvNum";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textUniqueID
 			// 
-			this.textUniqueID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textUniqueID.Location = new System.Drawing.Point(405, 88);
-			this.textUniqueID.MaxLength = 15;
-			this.textUniqueID.Name = "textUniqueID";
-			this.textUniqueID.Size = new System.Drawing.Size(166, 20);
-			this.textUniqueID.TabIndex = 2;
-			this.textUniqueID.TextChanged += new System.EventHandler(this.textUniqueID_TextChanged);
+			this.textProvNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textProvNum.Location = new System.Drawing.Point(405, 88);
+			this.textProvNum.MaxLength = 15;
+			this.textProvNum.Name = "textUniqueID";
+			this.textProvNum.Size = new System.Drawing.Size(166, 20);
+			this.textProvNum.TabIndex = 2;
+			this.textProvNum.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);
 			// 
 			// comboClass
 			// 
@@ -193,7 +193,7 @@ namespace OpenDental{
 			this.ClientSize = new System.Drawing.Size(583, 494);
 			this.Controls.Add(this.groupCreateUsers);
 			this.Controls.Add(this.label7);
-			this.Controls.Add(this.textUniqueID);
+			this.Controls.Add(this.textProvNum);
 			this.Controls.Add(this.comboClass);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.gridStudents);
@@ -216,7 +216,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butClose;
 		private UI.ODGrid gridStudents;
 		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.TextBox textUniqueID;
+		private System.Windows.Forms.TextBox textProvNum;
 		private System.Windows.Forms.ComboBox comboClass;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Timer timer1;

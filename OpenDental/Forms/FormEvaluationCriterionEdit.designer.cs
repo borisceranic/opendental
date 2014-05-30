@@ -31,12 +31,12 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.textGradingScale = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.textGradeShowing = new System.Windows.Forms.TextBox();
-			this.comboGradeNumber = new System.Windows.Forms.ComboBox();
+			this.textGradeShowingPercent = new System.Windows.Forms.TextBox();
+			this.comboGradeShowing = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.textGradeNumberPercent = new System.Windows.Forms.TextBox();
-			this.textNote = new OpenDental.ODtextBox();
+			this.textGradeNumber = new System.Windows.Forms.TextBox();
 			this.labelApptNote = new System.Windows.Forms.Label();
+			this.textNote = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -47,7 +47,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(315, 189);
+			this.butOK.Location = new System.Drawing.Point(315, 169);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 4;
@@ -62,7 +62,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(315, 219);
+			this.butCancel.Location = new System.Drawing.Point(315, 199);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 5;
@@ -111,27 +111,27 @@ namespace OpenDental{
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(122, 17);
 			this.label6.TabIndex = 147;
-			this.label6.Text = "Grade Showing";
+			this.label6.Text = "Grade";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textGradeShowing
+			// textGradeShowingPercent
 			// 
-			this.textGradeShowing.Location = new System.Drawing.Point(135, 93);
-			this.textGradeShowing.MaxLength = 255;
-			this.textGradeShowing.Name = "textGradeShowing";
-			this.textGradeShowing.Size = new System.Drawing.Size(121, 20);
-			this.textGradeShowing.TabIndex = 2;
+			this.textGradeShowingPercent.Location = new System.Drawing.Point(135, 93);
+			this.textGradeShowingPercent.MaxLength = 255;
+			this.textGradeShowingPercent.Name = "textGradeShowingPercent";
+			this.textGradeShowingPercent.Size = new System.Drawing.Size(121, 20);
+			this.textGradeShowingPercent.TabIndex = 2;
 			// 
-			// comboGradeNumber
+			// comboGradeShowing
 			// 
-			this.comboGradeNumber.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboGradeNumber.FormattingEnabled = true;
-			this.comboGradeNumber.ItemHeight = 13;
-			this.comboGradeNumber.Location = new System.Drawing.Point(135, 66);
-			this.comboGradeNumber.Name = "comboGradeNumber";
-			this.comboGradeNumber.Size = new System.Drawing.Size(133, 21);
-			this.comboGradeNumber.TabIndex = 1;
-			this.comboGradeNumber.SelectionChangeCommitted += new System.EventHandler(this.comboGradeNumber_SelectionChangeCommitted);
+			this.comboGradeShowing.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboGradeShowing.FormattingEnabled = true;
+			this.comboGradeShowing.ItemHeight = 13;
+			this.comboGradeShowing.Location = new System.Drawing.Point(135, 93);
+			this.comboGradeShowing.Name = "comboGradeShowing";
+			this.comboGradeShowing.Size = new System.Drawing.Size(133, 21);
+			this.comboGradeShowing.TabIndex = 2;
+			this.comboGradeShowing.SelectionChangeCommitted += new System.EventHandler(this.comboGradeNumber_SelectionChangeCommitted);
 			// 
 			// label1
 			// 
@@ -142,54 +142,48 @@ namespace OpenDental{
 			this.label1.Text = "Grade Number";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textGradeNumberPercent
+			// textGradeNumber
 			// 
-			this.textGradeNumberPercent.Location = new System.Drawing.Point(135, 66);
-			this.textGradeNumberPercent.MaxLength = 255;
-			this.textGradeNumberPercent.Name = "textGradeNumberPercent";
-			this.textGradeNumberPercent.Size = new System.Drawing.Size(121, 20);
-			this.textGradeNumberPercent.TabIndex = 1;
-			this.textGradeNumberPercent.Tag = "";
-			// 
-			// textNote
-			// 
-			this.textNote.AcceptsTab = true;
-			this.textNote.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textNote.DetectUrls = false;
-			this.textNote.Location = new System.Drawing.Point(49, 137);
-			this.textNote.Name = "textNote";
-			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Appointment;
-			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textNote.Size = new System.Drawing.Size(260, 106);
-			this.textNote.TabIndex = 3;
-			this.textNote.Text = "";
+			this.textGradeNumber.Location = new System.Drawing.Point(135, 66);
+			this.textGradeNumber.MaxLength = 255;
+			this.textGradeNumber.Name = "textGradeNumber";
+			this.textGradeNumber.Size = new System.Drawing.Size(121, 20);
+			this.textGradeNumber.TabIndex = 1;
+			this.textGradeNumber.Tag = "";
 			// 
 			// labelApptNote
 			// 
-			this.labelApptNote.Location = new System.Drawing.Point(48, 119);
+			this.labelApptNote.Location = new System.Drawing.Point(7, 120);
 			this.labelApptNote.Name = "labelApptNote";
-			this.labelApptNote.Size = new System.Drawing.Size(197, 16);
+			this.labelApptNote.Size = new System.Drawing.Size(126, 16);
 			this.labelApptNote.TabIndex = 154;
 			this.labelApptNote.Text = "Note";
-			this.labelApptNote.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelApptNote.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textNote
+			// 
+			this.textNote.Location = new System.Drawing.Point(135, 119);
+			this.textNote.MaxLength = 255;
+			this.textNote.Multiline = true;
+			this.textNote.Name = "textNote";
+			this.textNote.Size = new System.Drawing.Size(174, 105);
+			this.textNote.TabIndex = 155;
 			// 
 			// FormEvaluationCriterionEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(402, 255);
+			this.ClientSize = new System.Drawing.Size(402, 235);
+			this.Controls.Add(this.textGradeShowingPercent);
 			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.labelApptNote);
-			this.Controls.Add(this.textGradeNumberPercent);
-			this.Controls.Add(this.comboGradeNumber);
+			this.Controls.Add(this.textGradeNumber);
+			this.Controls.Add(this.comboGradeShowing);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.textCriterionDescript);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textGradingScale);
 			this.Controls.Add(this.label6);
-			this.Controls.Add(this.textGradeShowing);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -212,11 +206,11 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox textGradingScale;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.TextBox textGradeShowing;
-		private System.Windows.Forms.ComboBox comboGradeNumber;
+		private System.Windows.Forms.TextBox textGradeShowingPercent;
+		private System.Windows.Forms.ComboBox comboGradeShowing;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textGradeNumberPercent;
-		private ODtextBox textNote;
+		private System.Windows.Forms.TextBox textGradeNumber;
 		private System.Windows.Forms.Label labelApptNote;
+		private System.Windows.Forms.TextBox textNote;
 	}
 }

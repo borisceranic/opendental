@@ -30,11 +30,11 @@ namespace OpenDental {
 			if(comboClass.SelectedIndex>0) {
 				schoolClass=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
 			}
-			DataTable table=Providers.RefreshForDentalSchool(schoolClass,"","",textUniqueID.Text,false,false);
+			DataTable table=Providers.RefreshForDentalSchool(schoolClass,"","",textProvNum.Text,false,false);
 			gridStudents.BeginUpdate();
 			gridStudents.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn(Lan.g("TableProviderSetup","Unique ID"),60);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","ProvNum"),60);
 			gridStudents.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableProviderSetup","Last Name"),90);
 			gridStudents.Columns.Add(col);
@@ -73,7 +73,7 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void textUniqueID_TextChanged(object sender,EventArgs e) {
+		private void textProvNum_TextChanged(object sender,EventArgs e) {
 			timer1.Stop();
 			timer1.Start();
 		}

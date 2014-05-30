@@ -37,7 +37,7 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textPassword = new System.Windows.Forms.TextBox();
-			this.textUniqueID = new System.Windows.Forms.TextBox();
+			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.labelUniqueID = new System.Windows.Forms.Label();
 			this.labelPassDescription = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -47,7 +47,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(16, 73);
+			this.label4.Location = new System.Drawing.Point(16, 99);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(101, 18);
 			this.label4.TabIndex = 23;
@@ -56,7 +56,7 @@ namespace OpenDental{
 			// 
 			// textFirstName
 			// 
-			this.textFirstName.Location = new System.Drawing.Point(117, 73);
+			this.textFirstName.Location = new System.Drawing.Point(117, 99);
 			this.textFirstName.MaxLength = 15;
 			this.textFirstName.Name = "textFirstName";
 			this.textFirstName.Size = new System.Drawing.Size(166, 20);
@@ -65,7 +65,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(16, 99);
+			this.label1.Location = new System.Drawing.Point(16, 73);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(101, 18);
 			this.label1.TabIndex = 25;
@@ -74,7 +74,7 @@ namespace OpenDental{
 			// 
 			// textLastName
 			// 
-			this.textLastName.Location = new System.Drawing.Point(117, 99);
+			this.textLastName.Location = new System.Drawing.Point(117, 73);
 			this.textLastName.MaxLength = 15;
 			this.textLastName.Name = "textLastName";
 			this.textLastName.Size = new System.Drawing.Size(166, 20);
@@ -95,7 +95,7 @@ namespace OpenDental{
 			this.textUserName.Location = new System.Drawing.Point(117, 151);
 			this.textUserName.MaxLength = 15;
 			this.textUserName.Name = "textUserName";
-			this.textUserName.Size = new System.Drawing.Size(81, 20);
+			this.textUserName.Size = new System.Drawing.Size(166, 20);
 			this.textUserName.TabIndex = 5;
 			// 
 			// label3
@@ -112,7 +112,7 @@ namespace OpenDental{
 			this.textAbbr.Location = new System.Drawing.Point(117, 125);
 			this.textAbbr.MaxLength = 15;
 			this.textAbbr.Name = "textAbbr";
-			this.textAbbr.Size = new System.Drawing.Size(48, 20);
+			this.textAbbr.Size = new System.Drawing.Size(60, 20);
 			this.textAbbr.TabIndex = 4;
 			this.textAbbr.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textAbbr_KeyUp);
 			// 
@@ -153,12 +153,12 @@ namespace OpenDental{
 			// 
 			// textUniqueID
 			// 
-			this.textUniqueID.Location = new System.Drawing.Point(117, 21);
-			this.textUniqueID.MaxLength = 15;
-			this.textUniqueID.Name = "textUniqueID";
-			this.textUniqueID.ReadOnly = true;
-			this.textUniqueID.Size = new System.Drawing.Size(48, 20);
-			this.textUniqueID.TabIndex = 34;
+			this.textProvNum.Location = new System.Drawing.Point(117, 21);
+			this.textProvNum.MaxLength = 15;
+			this.textProvNum.Name = "textUniqueID";
+			this.textProvNum.ReadOnly = true;
+			this.textProvNum.Size = new System.Drawing.Size(60, 20);
+			this.textProvNum.TabIndex = 34;
 			// 
 			// labelUniqueID
 			// 
@@ -218,7 +218,7 @@ namespace OpenDental{
 			this.ClientSize = new System.Drawing.Size(416, 246);
 			this.Controls.Add(this.labelPassDescription);
 			this.Controls.Add(this.labelUniqueID);
-			this.Controls.Add(this.textUniqueID);
+			this.Controls.Add(this.textProvNum);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textPassword);
 			this.Controls.Add(this.comboClass);
@@ -260,7 +260,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textPassword;
-		private System.Windows.Forms.TextBox textUniqueID;
+		private System.Windows.Forms.TextBox textProvNum;
 		private System.Windows.Forms.Label labelUniqueID;
 		private System.Windows.Forms.Label labelPassDescription;
 		private System.Windows.Forms.Timer timer1;

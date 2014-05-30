@@ -11,53 +11,68 @@ namespace OpenDental {
 		}
 
 		private void FormDentalSchoolSetup_Load(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.SecurityAdmin)) {
-				butInstructorPicker.Enabled=false;
-				butStudentPicker.Enabled=false;
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
 			}
 			UserGroup studentGroup=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForStudents));
 			UserGroup instructorGroup=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForInstructors));
 			if(studentGroup!=null) {
-				textStudents.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForStudents)).Description;
+				textStudents.Text=studentGroup.Description;
 			}
 			if(instructorGroup!=null) {
-				textInstructors.Text=UserGroups.GetGroup(PrefC.GetLong(PrefName.SecurityGroupForInstructors)).Description;
+				textInstructors.Text=instructorGroup.Description;
 			}
 		}
 
 		private void butStudentPicker_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.SecurityAdmin)) {
+				return;
+			}
 			FormUserGroupPicker FormUGP=new FormUserGroupPicker();
 			FormUGP.ShowDialog();
-			if(FormUGP.DialogResult==DialogResult.OK) {
-				if(MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will change the security group for all students. Continue?")) {
-					try {
-						Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,false);
-						Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
-					}
-					catch {
-						MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
-						return;
-					}
-					textStudents.Text=FormUGP.UserGroup.Description;
+			if(FormUGP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			DialogResult diag=MessageBox.Show(Lan.g(this,"Would you also like to update all existing students to this user group?"),"",MessageBoxButtons.YesNoCancel);
+			if(diag==DialogResult.Cancel) {
+				return;
+			}
+			if(diag==DialogResult.Yes) {
+				try {
+					Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,false);
+				}
+				catch {
+					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
+					return;
 				}
 			}
+			Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
+			textStudents.Text=FormUGP.UserGroup.Description;
 		}
 
 		private void butInstructorPicker_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.SecurityAdmin)) {
+				return;
+			}
 			FormUserGroupPicker FormUGP=new FormUserGroupPicker();
 			FormUGP.ShowDialog();
-			if(FormUGP.DialogResult==DialogResult.OK) {
-				if(MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will change the security group for all instructors. Continue?")) {
-					try {
-						Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,true);
-						Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
-					}
-					catch {
-						MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
-						return;
-					}
-					textInstructors.Text=FormUGP.UserGroup.Description;
+			if(FormUGP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			DialogResult diag=MessageBox.Show(Lan.g(this,"Would you also like to update all existing instructors to this user group?"),"",MessageBoxButtons.YesNoCancel);
+			if(diag==DialogResult.Cancel) {
+				return;
+			}
+			if(diag==DialogResult.Yes) {
+				try {
+					Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,true);
 				}
+				catch {
+					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
+					return;
+				}
+				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
+				textInstructors.Text=FormUGP.UserGroup.Description;
 			}
 		}
 
