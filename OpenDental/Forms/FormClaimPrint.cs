@@ -228,6 +228,14 @@ namespace OpenDental{
 
 		///<summary>Only called from external forms without ever loading this form.  Prints without showing any print preview.  Returns true if printed successfully.  Make sure to call PrinterL.SetPrinter() before calling this method so that a printer name is set for when printing batch claims.</summary>
 		public bool PrintImmediate(PrinterSettings ps) {
+			if(PrintBlank) {
+				//Get the default claim form for the practice.
+				ClaimFormCur=ClaimForms.GetClaimForm(PrefC.GetLong(PrefName.DefaultClaimForm));
+				if(ClaimFormCur==null) {//Could happen if printing a blank form and no default claim form is set.
+					MsgBox.Show(this,"No default claim form set.  Set a default in Setup | Family / Insurance | Claim Forms.");
+					return false;
+				}
+			}
 			pd2=new PrintDocument();
 			pd2.PrinterSettings=ps;
 			pagesPrinted=0;
@@ -443,13 +451,6 @@ namespace OpenDental{
 		///<summary>Gets all necessary info from db based on ThisPatNum and ThisClaimNum.  Then fills displayStrings with the actual text that will display on claim.  The isRenaissance flag is very temporary.</summary>
 		private void FillDisplayStrings(bool isRenaissance){
 			if(PrintBlank){
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-					ClaimFormCur=ClaimForms.GetClaimFormByUniqueId("OD6");//CDA claim form
-				}
-				else { //Assume USA
-					ClaimFormCur=ClaimForms.GetClaimFormByUniqueId("OD8");//ADA claim form
-				}
-				//ClaimFormItems.GetListForForm(ClaimFormCur.ClaimFormNum);
 				displayStrings=new string[ClaimFormCur.Items.Length];
 				ListClaimProcs=new List<ClaimProc>();
 				return;
