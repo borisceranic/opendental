@@ -13,8 +13,8 @@ using CodeBase;
 namespace OpenDental {
 	public partial class FormEtrans835Edit:Form {
 
-		public Etrans EtransCur;
-		private string _messageText;
+		public string TranSetId835;
+		public string MessageText835;
 		private X835 _x835;
 		private decimal _claimInsPaidSum;
 		private decimal _provAdjAmtSum;
@@ -25,8 +25,7 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835Edit_Load(object sender,EventArgs e) {
-			_messageText=EtransMessageTexts.GetMessageText(EtransCur.EtransMessageTextNum);
-			_x835=new X835(_messageText);
+			_x835=new X835(MessageText835,TranSetId835);
 			FillAll();
 		}
 
@@ -187,7 +186,7 @@ namespace OpenDental {
 		}
 
 		private void butRawMessage_Click(object sender,EventArgs e) {
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_messageText);
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(MessageText835);
 			msgbox.ShowDialog();
 		}
 

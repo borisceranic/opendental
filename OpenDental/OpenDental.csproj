@@ -381,6 +381,12 @@
     <Compile Include="Forms\FormDisplayFieldOrthoEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\FormEtrans835PickEob.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEtrans835PickEob.designer.cs">
+      <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEtrans835Print.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3399,6 +3405,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDisplayFieldOrthoEdit.resx">
       <DependentUpon>FormDisplayFieldOrthoEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans835PickEob.resx">
+      <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835Print.resx">
       <DependentUpon>FormEtrans835Print.cs</DependentUpon>

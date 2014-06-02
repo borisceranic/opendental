@@ -590,24 +590,27 @@ namespace OpenDentBusiness{
 					//none of the other fields make sense, because this ack could refer to many claims.
 				}
 				else if(X835.Is835(Xobj)) {
-					X835 x835=new X835(messageText);
 					etrans.Etype=EtransType.ERA_835;
 					Etranss.Insert(etrans);
-					List<Hx835_Claim> listClaimEOBs=x835.ListClaimsPaid;
-					for(int i=0;i<listClaimEOBs.Count;i++) {
-						long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[i].ClaimTrackingNumber);
-						//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
-						//We overwrite existing acks from 997s, 999s, and 277s.
-						command="UPDATE etrans SET AckCode='A', "
-							+"AckEtransNum="+POut.Long(etrans.EtransNum)
-							+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
-							+" AND ClaimNum="+POut.Long(claimNum)
-							+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
-							+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
-							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
-						Db.NonQ(command);
+					List<string> listTranSetIds=Xobj.GetTranSetIds();
+					for(int i=0;i<listTranSetIds.Count;i++) {						
+						X835 x835=new X835(messageText,listTranSetIds[i]);
+						List<Hx835_Claim> listClaimEOBs=x835.ListClaimsPaid;
+						for(int j=0;j<listClaimEOBs.Count;j++) {
+							long claimNum=Claims.GetClaimNumForIdentifier(listClaimEOBs[j].ClaimTrackingNumber);
+							//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
+							//We overwrite existing acks from 997s, 999s, and 277s.
+							command="UPDATE etrans SET AckCode='A', "
+								+"AckEtransNum="+POut.Long(etrans.EtransNum)
+								+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
+								+" AND ClaimNum="+POut.Long(claimNum)
+								+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+								+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
+								+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
+							Db.NonQ(command);
+						}
+						//none of the other fields make sense, because this ack could refer to many claims.
 					}
-					//none of the other fields make sense, because this ack could refer to many claims.
 				}
 				else {//unknown type of X12 report.
 					etrans.Etype=EtransType.TextReport;
