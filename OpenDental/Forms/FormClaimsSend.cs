@@ -1138,7 +1138,7 @@ namespace OpenDental{
 				string messageText835=EtransMessageTexts.GetMessageText(et.EtransMessageTextNum);
 				X12object x835=new X12object(messageText835);
 				List<string> listTranSetIds=x835.GetTranSetIds();
-				if(listTranSetIds.Count>=2) {
+				if(et.TranSetId835=="" && listTranSetIds.Count>=2) {
 					FormEtrans835PickEob formPickEob=new FormEtrans835PickEob(listTranSetIds,messageText835);
 					formPickEob.ShowDialog();
 				}

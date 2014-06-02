@@ -529,14 +529,26 @@ namespace OpenDentBusiness{
 					//At this point, we know that the email is one which we have not downloaded yet.
 					try {
 						OpenPop.Mime.Message openPopMsg=client.GetMessage(msgIndex);//This is where the entire raw email is downloaded.
-						string strRawEmail=openPopMsg.MessagePart.BodyEncoding.GetString(openPopMsg.RawMessage);
-						EmailMessage emailMessage=ProcessRawEmailMessage(strRawEmail,0,emailAddressInbox);//Inserts to db.
+						bool isEmailFromInbox=true;
+						if(openPopMsg.Headers.From.ToString().ToLower().Contains(emailAddressInbox.EmailUsername.Trim())) {//The email Recipient and email From addresses are the same.
+							if(openPopMsg.Headers.To.ToString().ToLower().Contains(emailAddressInbox.EmailUsername.Trim())) {//The email Recipient and email To addresses are the same.
+								//Download this message because it was clearly sent from the user to theirself.
+							}
+							else {
+								//Gmail will report sent email as if it is part of the Inbox. These emails will have the From address as the Recipient address, but the To address will be a different address.
+								isEmailFromInbox=false;
+							}
+						}
+						if(isEmailFromInbox) {
+							string strRawEmail=openPopMsg.MessagePart.BodyEncoding.GetString(openPopMsg.RawMessage);
+							EmailMessage emailMessage=ProcessRawEmailMessage(strRawEmail,0,emailAddressInbox);//Inserts to db.
+							retVal.Add(emailMessage);
+							msgDownloadedCount++;
+						}
 						EmailMessageUid emailMessageUid=new EmailMessageUid();
-						emailMessageUid.RecipientAddress=emailMessage.RecipientAddress.Trim();
+						emailMessageUid.RecipientAddress=emailAddressInbox.EmailUsername.Trim();
 						emailMessageUid.MsgId=strMsgUid;
 						EmailMessageUids.Insert(emailMessageUid);//Remember Uid was downloaded, to avoid email duplication the next time the inbox is refreshed.
-						retVal.Add(emailMessage);
-						msgDownloadedCount++;
 					}
 					catch(ThreadAbortException) {
 						//This can happen if the application is exiting. We need to leave right away so the program does not lock up.
