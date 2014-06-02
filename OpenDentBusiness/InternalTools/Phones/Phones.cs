@@ -300,13 +300,14 @@ namespace OpenDentBusiness {
 				|| phoneEmpDefault==null
 				|| phone.ClockStatus==ClockStatusEnum.Home
 				|| phone.ClockStatus==ClockStatusEnum.None
-				|| phone.ClockStatus==ClockStatusEnum.Off) {
-					fontColor=colorScheme.ColorFontAway;
+				|| phone.ClockStatus==ClockStatusEnum.Off) 
+			{
+				fontColor=colorScheme.ColorFontAway;
 			}
 			else {
 				fontColor=colorScheme.ColorFontHere;
 			}
-			if(!forDualColorScheme && !phoneEmpDefault.HasColor) { //smaller color boxes need special colors
+			if(phoneEmpDefault==null || (!forDualColorScheme && !phoneEmpDefault.HasColor)) { //smaller color boxes need special colors
 				innerColor=Color.Black;
 				outerColor=Color.White;
 				return;

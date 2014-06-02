@@ -685,6 +685,10 @@ namespace OpenDental{
 			if(pedFromDatabase==null) {
 				pedFromDatabase=new PhoneEmpDefault();
 			}
+			else if(pedFromDatabase!=null && IsNew) {
+				MessageBox.Show("Employee Num already in use.\r\nEdit their current phone settings entry instead of creating a duplicate.");
+				return;
+			}
 			int newExtension=PIn.Int(textPhoneExt.Text);
 			bool extensionChange=pedFromDatabase.PhoneExt!=newExtension;
 			if(extensionChange) { //Only check when extension has changed and clocked in.
@@ -743,13 +747,15 @@ namespace OpenDental{
 			PedCur.IsTriageOperator=checkIsTriageOperator.Checked;
 			if(IsNew){
 				PhoneEmpDefaults.Insert(PedCur);
-				//insert the new Phone record to keep the 2 tables in sync
-				Phone phoneNew=new Phone();
-				phoneNew.EmployeeName=PedCur.EmpName;
-				phoneNew.EmployeeNum=PedCur.EmployeeNum;
-				phoneNew.Extension=PedCur.PhoneExt;
-				phoneNew.ClockStatus=ClockStatusEnum.Home;
-				Phones.Insert(phoneNew);
+				//insert a new Phone record to keep the 2 tables in sync an entry for the new extension if it is not zero and not already in the phone table.
+				if(PedCur.PhoneExt!=0 && Phones.GetPhoneForExtension(Phones.GetPhoneList(),PedCur.PhoneExt)==null) {
+					Phone phoneNew=new Phone();
+					phoneNew.EmployeeName=PedCur.EmpName;
+					phoneNew.EmployeeNum=PedCur.EmployeeNum;
+					phoneNew.Extension=PedCur.PhoneExt;
+					phoneNew.ClockStatus=ClockStatusEnum.Home;
+					Phones.Insert(phoneNew);
+				}
 			}
 			else{
 				PhoneEmpDefaults.Update(PedCur);
