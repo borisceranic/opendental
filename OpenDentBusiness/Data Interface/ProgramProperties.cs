@@ -42,18 +42,8 @@ namespace OpenDentBusiness {
 			return Crud.ProgramPropertyCrud.Insert(Cur);
 		}
 
-		
-		///<summary>This can only be called from ClassConversions. Users not allowed to delete properties so there is no user interface.</summary>
-		public static void Delete(ProgramProperty Cur){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),Cur);
-				return;
-			}
-			string command= "DELETE from programproperty WHERE programpropertynum = '"+Cur.ProgramPropertyNum.ToString()+"'";
-			Db.NonQ(command);
-		}
-
-		///<summary>Returns a List of programproperties attached to the specified programNum.  Does not include path overrides.</summary>
+		///<summary>Returns a List of programproperties attached to the specified programNum.  Does not include path overrides.
+		///DO NOT MODIFY the returned properties.  Read only.</summary>
 		public static List<ProgramProperty> GetListForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
 			List<ProgramProperty> listProgProp=new List<ProgramProperty>();
@@ -65,7 +55,8 @@ namespace OpenDentBusiness {
 			return listProgProp;
 		}
 
-		///<summary>Returns an ArrayList of programproperties attached to the specified programNum.  Does not include path overrides.</summary>
+		///<summary>Returns an ArrayList of programproperties attached to the specified programNum.  Does not include path overrides.
+		///DO NOT MODIFY the returned properties.  Read only.</summary>
 		public static ArrayList GetForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
 			ArrayList ForProgram=new ArrayList();
@@ -88,7 +79,7 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		///<summary>After GetForProgram has been run, this gets one of those properties.</summary>
+		///<summary>After GetForProgram has been run, this gets one of those properties.  DO NOT MODIFY the returned property.  Read only.</summary>
 		public static ProgramProperty GetCur(ArrayList ForProgram, string desc){
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<ForProgram.Count;i++){
@@ -113,19 +104,10 @@ namespace OpenDentBusiness {
 			throw new ApplicationException("Property not found: "+desc);
 		}
 
-		public static string GetPropVal(ProgramName progName,string propertyDesc) {
+		public static string GetPropVal(ProgramName progName,string desc) {
 			//No need to check RemotingRole; no call to db.
 			long programNum=Programs.GetProgramNum(progName);
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum!=programNum) {
-					continue;
-				}
-				if(ProgramPropertyC.Listt[i].PropertyDesc!=propertyDesc) {
-					continue;
-				}
-				return ProgramPropertyC.Listt[i].PropertyValue;
-			}
-			throw new ApplicationException("Property not found: "+propertyDesc);
+			return GetPropVal(programNum,desc);
 		}
 
 		///<summary>Used in FormUAppoint to get frequent and current data.</summary>
