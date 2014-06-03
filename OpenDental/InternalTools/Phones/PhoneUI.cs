@@ -8,7 +8,13 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public class PhoneUI {
 		private static string langThis="Phone";
-		public static string PathPhoneMsg=@"\\10.10.1.197\Voicemail\default\998\INBOX";
+
+		///<summary>The asterisk server ip setting can change at any time via the phone tracking server application.</summary>
+		public static string PathPhoneMsg {
+			get {
+				return @"\\"+PrefC.GetString(PrefName.AsteriskServerIp)+@"\Voicemail\default\998\INBOX";
+			}
+		}
 
 		public static void Manage(PhoneTile tile){
 			//if(selectedTile.PhoneCur==null) {//already validated
