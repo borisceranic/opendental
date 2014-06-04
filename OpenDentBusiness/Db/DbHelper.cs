@@ -528,7 +528,7 @@ namespace OpenDentBusiness {
 		///<summary>Helper for Oracle that will return equivalent of MySQL ISNULL().</summary>
 		public static string IfNull(string expr,int valWhenNull) {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "CASE WHEN ("+expr+") IS NULL THEN "+expr+" ELSE "+valWhenNull+" END";
+				return "CASE WHEN ("+expr+") IS NULL THEN "+valWhenNull+" ELSE "+expr+" END";
 			}
 			return "IFNULL("+expr+","+valWhenNull+")";
 		}
@@ -536,7 +536,7 @@ namespace OpenDentBusiness {
 		///<summary>Helper for Oracle that will return equivalent of MySQL ISNULL().  Automatically adds single quotes around valWhenNull so that it is treated as text in the query.</summary>
 		public static string IfNull(string expr,string valWhenNull) {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "CASE WHEN ("+expr+") IS NULL THEN "+expr+" ELSE '"+valWhenNull+"' END";
+				return "CASE WHEN ("+expr+") IS NULL THEN '"+valWhenNull+"' ELSE "+expr+" END";
 			}
 			return "IFNULL("+expr+",'"+valWhenNull+"')";
 		}
