@@ -1382,15 +1382,25 @@ namespace OpenDental{
 			patCloneOld=patClone.Copy();
 			string strPatCloneNumAndName=patClone.PatNum+" - "+Patients.GetNameFL(patClone.LName,patClone.FName,patClone.Preferred,patClone.MiddleI);
 			List<string[]> listFieldsUpdated=new List<string[]>();//this is a list of string arrays, where the arrays hold the three values field name, old value, and new value for the fields updated 
+			List<string> listFieldsCleared=new List<string>();
 			if(patClone.Title!=patNonClone.Title) {
+				if(patClone.Title!="" && patNonClone.Title=="") {
+					listFieldsCleared.Add("Title");
+				}
 				listFieldsUpdated.Add(new string[3] { "Title",patClone.Title,patNonClone.Title });
 				patClone.Title=patNonClone.Title;
 			}
 			if(patClone.Preferred!=patNonClone.Preferred.ToUpper()) {
+				if(patClone.Preferred!="" && patNonClone.Preferred=="") {
+					listFieldsCleared.Add("Preferred Name");
+				}
 				listFieldsUpdated.Add(new string[3] { "Preferred Name",patClone.Preferred,patNonClone.Preferred.ToUpper() });
 				patClone.Preferred=patNonClone.Preferred.ToUpper();
 			}
 			if(patClone.MiddleI!=patNonClone.MiddleI.ToUpper()) {
+				if(patClone.MiddleI!=""	&& patNonClone.MiddleI=="") {
+					listFieldsCleared.Add("Middle Initial");
+				}
 				listFieldsUpdated.Add(new string[3] { "Middle Initial",patClone.MiddleI,patNonClone.MiddleI.ToUpper() });
 				patClone.MiddleI=patNonClone.MiddleI.ToUpper();
 			}
@@ -1457,16 +1467,15 @@ namespace OpenDental{
 					strPatNonCloneLang=CodeBase.MiscUtils.GetCultureFromThreeLetter(patNonClone.Language).DisplayName;
 				}
 				catch {
-					strPatNonCloneLang=patClone.Language;
+					strPatNonCloneLang=patNonClone.Language;
 				}
 				listFieldsUpdated.Add(new string[3] { "Language",strPatCloneLang,strPatNonCloneLang });
 				patClone.Language=patNonClone.Language;
 			}
-			if(patClone.Race!=patNonClone.Race) {
-				listFieldsUpdated.Add(new string[3] { "Race",patClone.Race.ToString(),patNonClone.Race.ToString() });
-				patClone.Race=patNonClone.Race;
-			}
 			if(patClone.SSN!=patNonClone.SSN) {
+				if(patClone.SSN!=""	&& patNonClone.SSN=="") {
+					listFieldsCleared.Add("SSN");
+				}
 				listFieldsUpdated.Add(new string[3] { "SSN",patClone.SSN,patNonClone.SSN });
 				patClone.SSN=patNonClone.SSN;
 			}
@@ -1475,46 +1484,79 @@ namespace OpenDental{
 				patClone.Position=patNonClone.Position;
 			}
 			if(patClone.Address!=patNonClone.Address) {
+				if(patClone.Address!=""	&& patNonClone.Address=="") {
+					listFieldsCleared.Add("Address");
+				}
 				listFieldsUpdated.Add(new string[3] { "Address",patClone.Address,patNonClone.Address });
 				patClone.Address=patNonClone.Address;
 			}
 			if(patClone.Address2!=patNonClone.Address2) {
+				if(patClone.Address2!="" && patNonClone.Address2=="") {
+					listFieldsCleared.Add("Address2");
+				}
 				listFieldsUpdated.Add(new string[3] { "Address2",patClone.Address2,patNonClone.Address2 });
 				patClone.Address2=patNonClone.Address2;
 			}
 			if(patClone.City!=patNonClone.City) {
+				if(patClone.City!="" && patNonClone.City=="") {
+					listFieldsCleared.Add("City");
+				}
 				listFieldsUpdated.Add(new string[3] { "City",patClone.City,patNonClone.City });
 				patClone.City=patNonClone.City;
 			}
 			if(patClone.State!=patNonClone.State) {
+				if(patClone.State!=""	&& patNonClone.State=="") {
+					listFieldsCleared.Add("State");
+				}
 				listFieldsUpdated.Add(new string[3] { "State",patClone.State,patNonClone.State });
 				patClone.State=patNonClone.State;
 			}
 			if(patClone.Zip!=patNonClone.Zip) {
+				if(patClone.Zip!=""	&& patNonClone.Zip=="") {
+					listFieldsCleared.Add("Zip");
+				}
 				listFieldsUpdated.Add(new string[3] { "Zip",patClone.Zip,patNonClone.Zip });
 				patClone.Zip=patNonClone.Zip;
 			}
 			if(patClone.County!=patNonClone.County) {
+				if(patClone.County!=""	&& patNonClone.County=="") {
+					listFieldsCleared.Add("County");
+				}
 				listFieldsUpdated.Add(new string[3] { "County",patClone.County,patNonClone.County });
 				patClone.County=patNonClone.County;
 			}
 			if(patClone.AddrNote!=patNonClone.AddrNote) {
+				if(patClone.AddrNote!=""	&& patNonClone.AddrNote=="") {
+					listFieldsCleared.Add("Address Note");
+				}
 				listFieldsUpdated.Add(new string[3] { "Address Note",patClone.AddrNote,patNonClone.AddrNote });
 				patClone.AddrNote=patNonClone.AddrNote;
 			}
 			if(patClone.HmPhone!=patNonClone.HmPhone) {
+				if(patClone.HmPhone!=""	&& patNonClone.HmPhone=="") {
+					listFieldsCleared.Add("Home Phone");
+				}
 				listFieldsUpdated.Add(new string[3] { "Home Phone",patClone.HmPhone,patNonClone.HmPhone });
 				patClone.HmPhone=patNonClone.HmPhone;
 			}
 			if(patClone.WirelessPhone!=patNonClone.WirelessPhone) {
+				if(patClone.WirelessPhone!=""	&& patNonClone.WirelessPhone=="") {
+					listFieldsCleared.Add("Wireless Phone");
+				}
 				listFieldsUpdated.Add(new string[3] { "Wireless Phone",patClone.WirelessPhone,patNonClone.WirelessPhone });
 				patClone.WirelessPhone=patNonClone.WirelessPhone;
 			}
 			if(patClone.WkPhone!=patNonClone.WkPhone) {
+				if(patClone.WkPhone!=""	&& patNonClone.WkPhone=="") {
+					listFieldsCleared.Add("Work Phone");
+				}
 				listFieldsUpdated.Add(new string[3] { "Work Phone",patClone.WkPhone,patNonClone.WkPhone });
 				patClone.WkPhone=patNonClone.WkPhone;
 			}
 			if(patClone.Email!=patNonClone.Email) {
+				if(patClone.Email!=""	&& patNonClone.Email=="") {
+					listFieldsCleared.Add("Email");
+				}
 				listFieldsUpdated.Add(new string[3] { "Email",patClone.Email,patNonClone.Email });
 				patClone.Email=patNonClone.Email;
 			}
@@ -1551,16 +1593,33 @@ namespace OpenDental{
 				patClone.FeeSched=patNonClone.FeeSched;
 			}
 			if(patClone.CreditType!=patNonClone.CreditType) {
+				if(patClone.CreditType!=""	&& patNonClone.CreditType=="") {
+					listFieldsCleared.Add("Credit Type");
+				}
 				listFieldsUpdated.Add(new string[3] { "Credit Type",patClone.CreditType,patNonClone.CreditType });
 				patClone.CreditType=patNonClone.CreditType;
 			}
 			if(patClone.MedicaidID!=patNonClone.MedicaidID) {
+				if(patClone.MedicaidID!=""	&& patNonClone.MedicaidID=="") {
+					listFieldsCleared.Add("Medicaid ID");
+				}
 				listFieldsUpdated.Add(new string[3] { "Medicaid ID",patClone.MedicaidID,patNonClone.MedicaidID });
 				patClone.MedicaidID=patNonClone.MedicaidID;
 			}
 			if(patClone.MedUrgNote!=patNonClone.MedUrgNote) {
+				if(patClone.MedUrgNote!=""	&& patNonClone.MedUrgNote=="") {
+					listFieldsCleared.Add("Medical Urgent Note");
+				}
 				listFieldsUpdated.Add(new string[3] { "Medical Urgent Note",patClone.MedUrgNote,patNonClone.MedUrgNote });
 				patClone.MedUrgNote=patNonClone.MedUrgNote;
+			}
+			if(!isNewClone && listFieldsCleared.Count>0) {//fields for the clone have data that is about to be overwritten by empty strings, ask if the user is sure
+				string strMsg=Lan.g(this,"The following fields have data entered for the clone and will be overwritten with blanks from the original patient")+":\r\n";
+				strMsg+=string.Join("\r\n",listFieldsCleared);
+				strMsg+="\r\n"+Lan.g(this,"Are you sure you want to proceed?");
+				if(MessageBox.Show(strMsg,"",MessageBoxButtons.YesNo)==DialogResult.No) {
+					return;
+				}
 			}
 			Patients.Update(patClone,patCloneOld);
 			if(!isNewClone && listFieldsUpdated.Count>0) {
@@ -1582,7 +1641,7 @@ namespace OpenDental{
 				}
 				strDataUpdated+=strChngTo;
 				if(listFieldsUpdated[i][2]=="") {
-					strDataUpdated+=strBlank;
+					strDataUpdated+=strBlank+"\r\n";
 				}
 				else {
 					strDataUpdated+=listFieldsUpdated[i][2]+"\r\n";
@@ -1593,6 +1652,17 @@ namespace OpenDental{
 			bool patPlansChanged=false;
 			List<PatPlan> listPatPlansNonClone=PatPlans.Refresh(patNonClone.PatNum);//ordered by ordinal
 			List<PatPlan> listPatPlansClone=PatPlans.Refresh(patClone.PatNum);//ordered by ordinal
+			//the clone patient has more insurance plans entered than the original patient, ask the user if they are sure they want to make this change.
+			//There could be a plan entered on the clone instead of the original by accident and they might not want to lose that data.
+			if(listPatPlansClone.Count>listPatPlansNonClone.Count) {
+				string strMsg=Lan.g(this,"The clone patient has")+" "+listPatPlansClone.Count.ToString()+" "
+					+Lan.g(this,"insurance plan(s) attached while the original patient has")+" "+listPatPlansNonClone.Count.ToString()+" "
+					+Lan.g(this,"plan(s).  The clone patient's additional plan(s) will be dropped.")+"\r\n"
+					+Lan.g(this,"Are you sure you want to proceed?");
+				if(MessageBox.Show(strMsg,"",MessageBoxButtons.YesNo)==DialogResult.No) {
+					return;
+				}
+			}
 			List<Claim> claimList=Claims.Refresh(patClone.PatNum);//used to determine if the patplan we are going to drop is attached to a claim with today's date
 			for(int i=claimList.Count-1;i>-1;i--) {//remove any claims that do not have a date of today, we are only concerned with claims with today's date
 				if(claimList[i].DateService==DateTime.Today) {
