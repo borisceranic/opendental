@@ -165,8 +165,9 @@ namespace OpenDentBusiness{
 				//slow the calculation down slightly, but they significantly improve the speed when aging is being 
 				//calculated for all familes.
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					command+="CREATE INDEX "+tempAgingTableName.ToUpper()+"_PATNUM ON "+tempAgingTableName+" (PatNum);";
-					command+="CREATE INDEX "+tempAgingTableName.ToUpper()+"_GUAR ON "+tempAgingTableName+" (Guarantor);";
+					//Since the table name is already 30 chars long we cannot use the table name in the index names.
+					command+="CREATE INDEX TEMPAGING_PATNUM ON "+tempAgingTableName+" (PatNum);";
+					command+="CREATE INDEX TEMPAGING_GUAR ON "+tempAgingTableName+" (Guarantor);";
 				}
 				else {
 					command+="ALTER TABLE "+tempAgingTableName+" ADD INDEX IDX_"+tempAgingTableName.ToUpper()+"_PATNUM (PatNum);";
@@ -254,10 +255,10 @@ namespace OpenDentBusiness{
 					");";
 				command+="CREATE INDEX "+tempTotalsTableName.ToUpper()+"_PATNU ON "+tempTotalsTableName+" (PatNum);";
 				command+="INSERT INTO "+tempTotalsTableName+" "+
-					"SELECT PatNum,ROUND(SUM(TranAmount),2) FROM "+tempOdAgingTransTableName+
+					"SELECT PatNum,ROUND(SUM(TranAmount),2) FROM "+tempOdAgingTransTableName+" "+
 					"GROUP BY PatNum;";
 				command+="UPDATE patient p "+
-					"SET p.BalTotal=(SELECT t.BalTotal FROM "+tempTotalsTableName+" t WHERE t.PatNum=p.PatNum "+DbHelper.LimitAnd(1)+");";
+					"SET p.BalTotal="+DbHelper.IfNull("(SELECT t.BalTotal FROM "+tempTotalsTableName+" t WHERE t.PatNum=p.PatNum "+DbHelper.LimitAnd(1)+")",0)+";";
 				Db.NonQ(command);
 			}
 			else {
