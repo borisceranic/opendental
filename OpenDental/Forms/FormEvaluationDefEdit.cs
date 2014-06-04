@@ -174,6 +174,12 @@ namespace OpenDental {
 				MsgBox.Show(this,"A grading scale must be selected for this evaluation def before it can be saved.");
 				return;
 			}
+			if(!String.IsNullOrWhiteSpace(_evalDefCur.EvalTitle) 
+				&& _evalDefCur.EvalTitle!=textTitle.Text 
+				&& !MsgBox.Show(this,MsgBoxButtons.YesNo,"Changing the EvaluationDef titles during a term could interfere with grading reports.  Continue?")) 
+			{
+				return;
+			}
 			_evalDefCur.EvalTitle=textTitle.Text;
 			EvaluationDefs.Update(_evalDefCur);
 			for(int i=0;i<_criterionDefsForEval.Count;i++) {

@@ -97,6 +97,42 @@ namespace OpenDentBusiness{
 			return Db.GetTable(command);
 		}
 
+		///<summary>Gets all Evaluations from the DB.  List filters are available.</summary>
+		public static DataTable GetFilteredList(List<long> courseNums,List<long> instructorNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),courseNums,instructorNums);
+			}
+			string command="SELECT DISTINCT evaluation.StudentNum,stu.LName,stu.FName FROM evaluation "
+				+"INNER JOIN provider ins ON ins.ProvNum=evaluation.InstructNum "
+				+"INNER JOIN provider stu ON stu.ProvNum=evaluation.StudentNum "
+				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluation.SchoolCourseNum "
+				+"WHERE TRUE";
+			if(courseNums!=null && courseNums.Count!=0) {
+				command+=" AND schoolcourse.SchoolCourseNum IN (";
+				for(int i=0;i<courseNums.Count;i++) {
+					command+="'"+POut.Long(courseNums[i])+"'";
+					if(i!=courseNums.Count-1) {
+						command+=",";
+						continue;
+					}
+					command+=")";
+				}
+			}
+			if(instructorNums!=null && instructorNums.Count!=0) {
+				command+=" AND ins.ProvNum IN (";
+				for(int i=0;i<instructorNums.Count;i++) {
+					command+="'"+POut.Long(instructorNums[i])+"'";
+					if(i!=instructorNums.Count-1) {
+						command+=",";
+						continue;
+					}
+					command+=")";
+				}
+			}
+			command+=" ORDER BY LName,FName";
+			return Db.GetTable(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(Evaluation evaluation){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

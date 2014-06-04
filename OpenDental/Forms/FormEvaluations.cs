@@ -117,6 +117,11 @@ namespace OpenDental {
 			}
 		}
 
+		private void butReport_Click(object sender,EventArgs e) {
+			FormEvaluationReport FormER=new FormEvaluationReport();
+			FormER.ShowDialog();
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}

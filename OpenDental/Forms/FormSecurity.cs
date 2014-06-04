@@ -707,9 +707,15 @@ namespace OpenDental{
 				row.Cells.Add(ListUser[i].ClinicIsRestricted?"X":"");
 				row.Cells.Add(ListUser[i].PasswordIsStrong?"X":"");
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-					row.Cells.Add(SchoolClasses.GetDescript(Providers.GetProv(ListUser[i].ProvNum).SchoolClassNum));
-					gridMain.Rows.Add(row);
+					Provider prov=Providers.GetProv(ListUser[i].ProvNum);
+					if(prov==null) {
+						row.Cells.Add("");
+					}
+					else {
+						row.Cells.Add(SchoolClasses.GetDescript(prov.SchoolClassNum));
+					}
 				}
+				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();	
 		}

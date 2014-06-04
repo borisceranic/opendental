@@ -44,6 +44,7 @@ namespace OpenDental{
 			this.groupAdmin = new System.Windows.Forms.GroupBox();
 			this.comboCourse = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.butReport = new OpenDental.UI.Button();
 			this.groupStudents.SuspendLayout();
 			this.groupAdmin.SuspendLayout();
 			this.SuspendLayout();
@@ -56,7 +57,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(887, 564);
+			this.butCancel.Location = new System.Drawing.Point(883, 564);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
@@ -270,10 +271,27 @@ namespace OpenDental{
 			this.label1.Text = "Course";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// butReport
+			// 
+			this.butReport.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butReport.Autosize = true;
+			this.butReport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butReport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butReport.CornerRadius = 4F;
+			this.butReport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butReport.Location = new System.Drawing.Point(883, 395);
+			this.butReport.Name = "butReport";
+			this.butReport.Size = new System.Drawing.Size(75, 24);
+			this.butReport.TabIndex = 43;
+			this.butReport.Text = "Reports";
+			this.butReport.Click += new System.EventHandler(this.butReport_Click);
+			// 
 			// FormEvaluations
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 600);
+			this.Controls.Add(this.butReport);
 			this.Controls.Add(this.comboCourse);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.groupAdmin);
@@ -321,5 +339,6 @@ namespace OpenDental{
 		private UI.Button butRefresh;
 		private System.Windows.Forms.ComboBox comboCourse;
 		private System.Windows.Forms.Label label1;
+		private UI.Button butReport;
 	}
 }
