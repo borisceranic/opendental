@@ -7427,7 +7427,6 @@ namespace OpenDental{
 					return;
 				}
 			#endif 
-			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
 			bool isValid;
 			TreatmentArea tArea;
 			int quadCount=0;//automates quadrant codes.
@@ -7443,6 +7442,16 @@ namespace OpenDental{
 				autoCodeList=ProcButtonItems.GetAutoListForButton(procButtonNum);
 				//if(codeList.
 			}
+			//It is very important that we stop users here before entering any procedures or doing any automation.
+			for(int i=0;i<codeList.Length;i++) {
+				if(IsToothRangeWithPrimary(codeList[i])) {
+					//FormProcEdit does not currently allow you to select primary teeth for a tooth range procedure code.  We don't allow users to create these procedures because they would never be able to edit.
+					MsgBox.Show(this,"The tooth range treatment area doesn't allow primary teeth.  Please unselect any primary teeth.");
+					return;
+				}
+			}
+			//Do not return past this point---------------------------------------------------------------------------------
+			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
 			List<string> procCodes=new List<string>();
 			Procedure ProcCur=null;
 			//"Bug fix" for Dr. Lazar-------------
@@ -7741,6 +7750,12 @@ namespace OpenDental{
 				textProcCode.SelectionStart=textProcCode.Text.Length;
 				return;
 			}
+			if(IsToothRangeWithPrimary(ProcedureCodes.GetCodeNum(textProcCode.Text))) {
+				//FormProcEdit does not currently allow you to select primary teeth for a tooth range procedure code.  We don't allow users to create these procedures because they would never be able to edit.
+				MsgBox.Show(this,"The tooth range treatment area doesn't allow primary teeth.  Please unselect any primary teeth.");
+				return;
+			}
+			//Do not return past this point---------------------------------------------------------------------------------
 			List<string> procCodes=new List<string>();
 			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
 			TreatmentArea tArea;
@@ -7861,6 +7876,19 @@ namespace OpenDental{
 				}
 				AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodes,PatCur.PatNum);
 			}
+		}
+
+		///<summary>Returns true if the code's treatment area is "ToothRange" and if any selected teeth in the chart module are primary.</summary>
+		private bool IsToothRangeWithPrimary(long codeNum) {
+			if(ProcedureCodes.GetProcCode(codeNum).TreatArea==TreatmentArea.ToothRange) {
+				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
+					//Don't need to check the tooth nomenclature because the selected teeth are always the same letters/numbers.
+					if(Regex.IsMatch(toothChart.SelectedTeeth[i],"[A-Z]")) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 		#endregion EnterTx
 
