@@ -14,8 +14,14 @@ namespace OpenDentBusiness {
 			}
 			#if DEBUG
 				//Verify that it returns a DataTable
-				MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-				if(methodInfo.ReturnType != typeof(DataTable)) {
+				MethodInfo methodInfo=null;
+				try {
+					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+				}
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+				}
+				if(methodInfo!=null && methodInfo.ReturnType != typeof(DataTable)) {
 					throw new ApplicationException("Meth.GetTable calling class must return DataTable.");
 				}
 			#endif
@@ -50,8 +56,14 @@ namespace OpenDentBusiness {
 			}
 			#if DEBUG
 				//Verify that it returns a DataSet
-				MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-				if(methodInfo.ReturnType != typeof(DataSet)) {
+				MethodInfo methodInfo=null;
+				try {
+					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+				}
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+				}
+				if(methodInfo!=null && methodInfo.ReturnType != typeof(DataSet)) {
 					throw new ApplicationException("Meth.GetDS calling class must return DataSet.");
 				}
 			#endif
@@ -71,8 +83,14 @@ namespace OpenDentBusiness {
 			}
 			#if DEBUG
 				//Verify that it returns an int
-				MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-				if(methodInfo.ReturnType != typeof(long)) {
+				MethodInfo methodInfo=null;
+				try {
+					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+				}
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+				}
+				if(methodInfo!=null && (methodInfo.ReturnType != typeof(long)) {
 					throw new ApplicationException("Meth.GetLong calling class must return long.");
 				}
 			#endif
@@ -91,11 +109,17 @@ namespace OpenDentBusiness {
 				throw new ApplicationException("Meth.GetInt may only be used when RemotingRole is ClientWeb.");
 			}
 			#if DEBUG
-			//Verify that it returns an int
-			MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-			if(methodInfo.ReturnType != typeof(int)) {
-				throw new ApplicationException("Meth.GetInt calling class must return int.");
-			}
+				//Verify that it returns an int
+				MethodInfo methodInfo=null;
+				try {
+					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+				}
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+				}
+				if(methodInfo!=null && methodInfo.ReturnType != typeof(int)) {
+					throw new ApplicationException("Meth.GetInt calling class must return int.");
+				}
 			#endif
 			DtoGetInt dto=new DtoGetInt();
 			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
@@ -117,8 +141,8 @@ namespace OpenDentBusiness {
 				try {
 					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
 				}
-				catch {
-					//this is just a debugging tool for obvious mismatches.  Sometimes it will fail if there are two methods with the same name.
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
 				}
 				if(methodInfo!=null && methodInfo.ReturnType != typeof(void)) {
 					throw new ApplicationException("Meth.GetVoid calling class must return void.");
@@ -162,8 +186,14 @@ namespace OpenDentBusiness {
 			}
 			#if DEBUG
 				//Verify that it returns string
-				MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-				if(methodInfo.ReturnType != typeof(string)) {
+				MethodInfo methodInfo=null;
+				try {
+					methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+				}
+				catch(AmbiguousMatchException) {
+					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+				}
+				if(methodInfo!=null && methodInfo.ReturnType != typeof(string)) {
 					throw new ApplicationException("Meth.GetString calling class must return string.");
 				}
 			#endif
@@ -181,14 +211,6 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole!=RemotingRole.ClientWeb) {
 				throw new ApplicationException("Meth.GetBool may only be used when RemotingRole is ClientWeb.");
 			}
-			#if DEBUG
-			/*
-				//Verify that it returns string
-				MethodInfo methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
-				if(methodInfo.ReturnType != typeof(bool)) {
-					throw new ApplicationException("Meth.GetBool calling class must return bool.");
-				}*/
-			#endif
 			DtoGetBool dto=new DtoGetBool();
 			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
