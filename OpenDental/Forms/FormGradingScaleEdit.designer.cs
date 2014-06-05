@@ -26,18 +26,21 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormGradingScaleEdit));
 			this.label2 = new System.Windows.Forms.Label();
 			this.textDescription = new System.Windows.Forms.TextBox();
-			this.checkIsPercentage = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butAdd = new OpenDental.UI.Button();
 			this.labelIsPercentage = new System.Windows.Forms.Label();
+			this.comboScaleType = new System.Windows.Forms.ComboBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
+			this.textMaxPointsPossible = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(14, 20);
+			this.label2.Location = new System.Drawing.Point(14, 12);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(122, 17);
 			this.label2.TabIndex = 127;
@@ -46,32 +49,19 @@ namespace OpenDental{
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(137, 19);
+			this.textDescription.Location = new System.Drawing.Point(137, 11);
 			this.textDescription.MaxLength = 255;
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(181, 20);
 			this.textDescription.TabIndex = 1;
 			// 
-			// checkIsPercentage
-			// 
-			this.checkIsPercentage.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsPercentage.Location = new System.Drawing.Point(53, 45);
-			this.checkIsPercentage.Name = "checkIsPercentage";
-			this.checkIsPercentage.Size = new System.Drawing.Size(96, 17);
-			this.checkIsPercentage.TabIndex = 3;
-			this.checkIsPercentage.Text = "Is Percentage";
-			this.checkIsPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsPercentage.Click += new System.EventHandler(this.checkIsPercentage_Click);
-			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(155, 46);
+			this.label1.Location = new System.Drawing.Point(234, 34);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(235, 16);
+			this.label1.Size = new System.Drawing.Size(165, 27);
 			this.label1.TabIndex = 129;
 			this.label1.Text = "Assumes a 0-100% grading scale.";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// butOK
 			// 
@@ -81,7 +71,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(234, 312);
+			this.butOK.Location = new System.Drawing.Point(234, 337);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 4;
@@ -96,7 +86,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(315, 312);
+			this.butCancel.Location = new System.Drawing.Point(315, 337);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 5;
@@ -109,10 +99,10 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 76);
+			this.gridMain.Location = new System.Drawing.Point(12, 83);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(378, 220);
+			this.gridMain.Size = new System.Drawing.Size(378, 238);
 			this.gridMain.TabIndex = 8;
 			this.gridMain.Title = "Grading Scale Items";
 			this.gridMain.TranslationName = null;
@@ -128,7 +118,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(12, 312);
+			this.butAdd.Location = new System.Drawing.Point(12, 337);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 2;
@@ -138,22 +128,60 @@ namespace OpenDental{
 			// labelIsPercentage
 			// 
 			this.labelIsPercentage.ForeColor = System.Drawing.Color.Red;
-			this.labelIsPercentage.Location = new System.Drawing.Point(93, 299);
+			this.labelIsPercentage.Location = new System.Drawing.Point(93, 324);
 			this.labelIsPercentage.Name = "labelIsPercentage";
 			this.labelIsPercentage.Size = new System.Drawing.Size(135, 42);
 			this.labelIsPercentage.TabIndex = 130;
-			this.labelIsPercentage.Text = "Grading scale items are not needed for percentage based scales.";
+			this.labelIsPercentage.Text = "Grading scale items are only used for PickList scale types.";
 			this.labelIsPercentage.Visible = false;
+			// 
+			// comboScaleType
+			// 
+			this.comboScaleType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboScaleType.FormattingEnabled = true;
+			this.comboScaleType.Location = new System.Drawing.Point(137, 34);
+			this.comboScaleType.Name = "comboScaleType";
+			this.comboScaleType.Size = new System.Drawing.Size(91, 21);
+			this.comboScaleType.TabIndex = 131;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(17, 35);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(119, 18);
+			this.label3.TabIndex = 132;
+			this.label3.Text = "Scale Type";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(14, 60);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(122, 17);
+			this.label4.TabIndex = 134;
+			this.label4.Text = "Max Points";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textMaxPointsPossible
+			// 
+			this.textMaxPointsPossible.Location = new System.Drawing.Point(137, 59);
+			this.textMaxPointsPossible.MaxLength = 255;
+			this.textMaxPointsPossible.Name = "textMaxPointsPossible";
+			this.textMaxPointsPossible.Size = new System.Drawing.Size(91, 20);
+			this.textMaxPointsPossible.TabIndex = 133;
 			// 
 			// FormGradingScaleEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(402, 350);
+			this.ClientSize = new System.Drawing.Size(402, 375);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.textMaxPointsPossible);
+			this.Controls.Add(this.comboScaleType);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.labelIsPercentage);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.checkIsPercentage);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.gridMain);
@@ -175,10 +203,13 @@ namespace OpenDental{
 		private UI.Button butAdd;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textDescription;
-		private System.Windows.Forms.CheckBox checkIsPercentage;
 		private System.Windows.Forms.Label label1;
 		private UI.Button butOK;
 		private UI.Button butCancel;
 		private System.Windows.Forms.Label labelIsPercentage;
+		private System.Windows.Forms.ComboBox comboScaleType;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.TextBox textMaxPointsPossible;
 	}
 }

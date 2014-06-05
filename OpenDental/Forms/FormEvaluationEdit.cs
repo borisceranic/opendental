@@ -102,25 +102,25 @@ namespace OpenDental {
 			if(count>0) {
 				gradeNumber=gradeNumber/count;
 			}
-			if(GradingScales.GetOne(_evalCur.GradingScaleNum).IsPercentage) {
-				textGradeNumber.Text=gradeNumber.ToString();
-				textGradeShowing.Text=gradeNumber.ToString();
-			}
-			else {
-				float dif=float.MaxValue;
-				float closestNumber=0;
-				string closestShowing="";
-				List<GradingScaleItem> listGradingScaleItem=GradingScaleItems.Refresh(_evalCur.GradingScaleNum);
-				for(int i=0;i<listGradingScaleItem.Count;i++) {
-					if(Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber) < dif) {
-						dif=Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber);
-						closestNumber=listGradingScaleItem[i].GradeNumber;
-						closestShowing=listGradingScaleItem[i].GradeShowing;
-					}
-				}
-				textGradeNumber.Text=closestNumber.ToString();
-				textGradeShowing.Text=closestShowing;
-			}
+			//if(GradingScales.GetOne(_evalCur.GradingScaleNum).IsPercentage) {
+			//	textGradeNumber.Text=gradeNumber.ToString();
+			//	textGradeShowing.Text=gradeNumber.ToString();
+			//}
+			//else {
+			//	float dif=float.MaxValue;
+			//	float closestNumber=0;
+			//	string closestShowing="";
+			//	List<GradingScaleItem> listGradingScaleItem=GradingScaleItems.Refresh(_evalCur.GradingScaleNum);
+			//	for(int i=0;i<listGradingScaleItem.Count;i++) {
+			//		if(Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber) < dif) {
+			//			dif=Math.Abs(listGradingScaleItem[i].GradeNumber-gradeNumber);
+			//			closestNumber=listGradingScaleItem[i].GradeNumber;
+			//			closestShowing=listGradingScaleItem[i].GradeShowing;
+			//		}
+			//	}
+			//	textGradeNumber.Text=closestNumber.ToString();
+			//	textGradeShowing.Text=closestShowing;
+			//}
 		}
 
 		private void butStudentPicker_Click(object sender,EventArgs e) {

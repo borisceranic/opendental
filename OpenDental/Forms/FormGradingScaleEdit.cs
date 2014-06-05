@@ -25,11 +25,10 @@ namespace OpenDental {
 				return;
 			}
 			textDescription.Text=_gradingScaleCur.Description;
-			checkIsPercentage.Enabled=false;
-			checkIsPercentage.Checked=_gradingScaleCur.IsPercentage;
-			if(checkIsPercentage.Checked) {
-				butAdd.Visible=false;
+			for(int i=0;i<Enum.GetNames(typeof(ScaleType)).Length;i++) {
+				comboScaleType.Items.Add(Enum.GetNames(typeof(ScaleType))[i]);
 			}
+			comboScaleType.SelectedIndex=0;
 			if(GradingScales.IsInUseByEvaluation(_gradingScaleCur)) {
 				labelIsPercentage.Text=Lan.g(this,"Grading scale is not editable.  It is currently in use by an evaluation.");
 				labelIsPercentage.Visible=true;
@@ -37,7 +36,6 @@ namespace OpenDental {
 				butAdd.Visible=false;
 				butOK.Visible=false;
 				butCancel.Text="Close";
-				checkIsPercentage.Enabled=false;
 				textDescription.ReadOnly=true;
 			}
 			FillGrid();
@@ -83,26 +81,26 @@ namespace OpenDental {
 		}
 
 		private void checkIsPercentage_Click(object sender,EventArgs e) {
-			if(checkIsPercentage.Checked) {
-				labelIsPercentage.Visible=true;
-				butAdd.Enabled=false;
-			}
-			else {
-				labelIsPercentage.Visible=false;
-				butAdd.Enabled=true;
-			}
+			//if(checkIsPercentage.Checked) {
+			//	labelIsPercentage.Visible=true;
+			//	butAdd.Enabled=false;
+			//}
+			//else {
+			//	labelIsPercentage.Visible=false;
+			//	butAdd.Enabled=true;
+			//}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			_gradingScaleCur.Description=textDescription.Text;
-			_gradingScaleCur.IsPercentage=checkIsPercentage.Checked;
+			//_gradingScaleCur.IsPercentage=checkIsPercentage.Checked;
 			if(GradingScales.IsDupicateDescription(_gradingScaleCur)) {
 				MsgBox.Show(this,"The selected grading scale description is already used by another grading scale.  Please input a unique description.");
 				return;
 			}
-			if(checkIsPercentage.Checked) {
-				GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
-			}
+			//if(checkIsPercentage.Checked) {
+			//	GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
+			//}
 			GradingScales.Update(_gradingScaleCur);
 			DialogResult=DialogResult.OK;
 		}

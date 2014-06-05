@@ -9,10 +9,12 @@ namespace OpenDentBusiness{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long GradingScaleNum;
-		///<summary>Because we don't want users to have to enter in all 100 possible percentages into a grading scale, they can just set this bool instead.  For all other grading scale types, they will need to enter all possibilities.</summary>
-		public bool IsPercentage;
+		///<summary>Enum:ScaleType Used to determine method of assigning grades.  PickList will be the only type that has GradingScaleItems.</summary>
+		public ScaleType ScaleType;
 		///<summary>For example, A-F or Pass/Fail.</summary>
 		public string Description;
+		///<summary>For ScaleType=Points, this is just a default.  For percentages, this gets set to 100 and cannot be changed.  For PickList, 4 is a typical example.</summary>
+		public float MaxPointsPoss;
 
 		///<summary></summary>
 		public GradingScale Copy() {

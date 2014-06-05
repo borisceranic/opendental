@@ -25,22 +25,22 @@ namespace OpenDental {
 			textGradingScale.Text=_gradingScale.Description;
 			textNote.Text=_evalCritCur.Notes;
 			_listGradeItems=GradingScaleItems.Refresh(_evalCritCur.GradingScaleNum);
-			if(!_gradingScale.IsPercentage) {
-				textGradeNumber.ReadOnly=true;
-				textGradeShowingPercent.Visible=false;
-				for(int i=0;i<_listGradeItems.Count;i++) {
-					comboGradeShowing.Items.Add(_listGradeItems[i].GradeShowing);
-					if(_listGradeItems[i].GradeShowing==_evalCritCur.GradeShowing) {
-						comboGradeShowing.SelectedIndex=i;
-						textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
-					}
-				}
-			}
-			else {
-				comboGradeShowing.Visible=false;
-				textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
-				textGradeShowingPercent.Text=_evalCritCur.GradeShowing;
-			}
+			//if(!_gradingScale.IsPercentage) {
+			//	textGradeNumber.ReadOnly=true;
+			//	textGradeShowingPercent.Visible=false;
+			//	for(int i=0;i<_listGradeItems.Count;i++) {
+			//		comboGradeShowing.Items.Add(_listGradeItems[i].GradeShowing);
+			//		if(_listGradeItems[i].GradeShowing==_evalCritCur.GradeShowing) {
+			//			comboGradeShowing.SelectedIndex=i;
+			//			textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
+			//		}
+			//	}
+			//}
+			//else {
+			//	comboGradeShowing.Visible=false;
+			//	textGradeNumber.Text=_evalCritCur.GradeNumber.ToString();
+			//	textGradeShowingPercent.Text=_evalCritCur.GradeShowing;
+			//}
 		}
 
 		private void comboGradeNumber_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -51,14 +51,14 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			float result;
-			if(_gradingScale.IsPercentage) {
-				if(!float.TryParse(textGradeNumber.Text,out result)) {
-					MsgBox.Show(this,"Grade number must be a valid percentage. Do not include '%' in the value.");
-					return;
-				}
-				_evalCritCur.GradeNumber=result;
-				_evalCritCur.GradeShowing=textGradeShowingPercent.Text;
-			}
+			//if(_gradingScale.IsPercentage) {
+			//	if(!float.TryParse(textGradeNumber.Text,out result)) {
+			//		MsgBox.Show(this,"Grade number must be a valid percentage. Do not include '%' in the value.");
+			//		return;
+			//	}
+			//	_evalCritCur.GradeNumber=result;
+			//	_evalCritCur.GradeShowing=textGradeShowingPercent.Text;
+			//}
 			_evalCritCur.Notes=textNote.Text;
 			EvaluationCriterions.Update(_evalCritCur);
 			DialogResult=DialogResult.OK;

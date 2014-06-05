@@ -4883,7 +4883,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE gradingscale (
 						GradingScaleNum bigint NOT NULL auto_increment PRIMARY KEY,
-						IsPercentage tinyint NOT NULL,
 						Description varchar(255) NOT NULL
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
@@ -4893,7 +4892,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE gradingscale (
 						GradingScaleNum number(20) NOT NULL,
-						IsPercentage number(3) NOT NULL,
 						Description varchar2(255),
 						CONSTRAINT gradingscale_GradingScaleNum PRIMARY KEY (GradingScaleNum)
 						)";
@@ -4983,6 +4981,42 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE etrans ADD TranSetId835 varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE evaluationcriteriondef ADD MaxPointsPoss float NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE evaluationcriteriondef ADD MaxPointsPoss number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE evaluationcriteriondef SET MaxPointsPoss = 0 WHERE MaxPointsPoss IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE evaluationcriteriondef MODIFY MaxPointsPoss NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE gradingscale ADD ScaleType tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE gradingscale ADD ScaleType number(3)";
+					Db.NonQ(command);
+					command="UPDATE gradingscale SET ScaleType = 0 WHERE ScaleType IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE gradingscale MODIFY ScaleType NOT NULL";
+					Db.NonQ(command);
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE gradingscale ADD MaxPointsPoss float NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE gradingscale ADD MaxPointsPoss number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE gradingscale SET MaxPointsPoss = 0 WHERE MaxPointsPoss IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE gradingscale MODIFY MaxPointsPoss NOT NULL";
+					Db.NonQ(command);
+				}
+				
 
 
 

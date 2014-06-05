@@ -1233,7 +1233,7 @@ namespace OpenDental{
 			ProvCur.EhrMuStage=comboEhrMu.SelectedIndex;
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 				if(ProvCur.SchoolClassNum!=0) {
-					ProvCur.SchoolClassNum=SchoolClasses.List[comboSchoolClass.SelectedIndex-1].SchoolClassNum;
+					ProvCur.SchoolClassNum=SchoolClasses.List[comboSchoolClass.SelectedIndex].SchoolClassNum;
 				}
 			}
 			if(listFeeSched.SelectedIndex!=-1) {

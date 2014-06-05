@@ -47,8 +47,9 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				gradingScale=new GradingScale();
 				gradingScale.GradingScaleNum= PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				gradingScale.IsPercentage   = PIn.Bool  (table.Rows[i]["IsPercentage"].ToString());
+				gradingScale.ScaleType      = (ScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString());
 				gradingScale.Description    = PIn.String(table.Rows[i]["Description"].ToString());
+				gradingScale.MaxPointsPoss  = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
 				retVal.Add(gradingScale);
 			}
 			return retVal;
@@ -89,13 +90,14 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="GradingScaleNum,";
 			}
-			command+="IsPercentage,Description) VALUES(";
+			command+="ScaleType,Description,MaxPointsPoss) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(gradingScale.GradingScaleNum)+",";
 			}
 			command+=
-				     POut.Bool  (gradingScale.IsPercentage)+","
-				+"'"+POut.String(gradingScale.Description)+"')";
+				     POut.Int   ((int)gradingScale.ScaleType)+","
+				+"'"+POut.String(gradingScale.Description)+"',"
+				+    POut.Float (gradingScale.MaxPointsPoss)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -108,8 +110,9 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one GradingScale in the database.</summary>
 		public static void Update(GradingScale gradingScale){
 			string command="UPDATE gradingscale SET "
-				+"IsPercentage   =  "+POut.Bool  (gradingScale.IsPercentage)+", "
-				+"Description    = '"+POut.String(gradingScale.Description)+"' "
+				+"ScaleType      =  "+POut.Int   ((int)gradingScale.ScaleType)+", "
+				+"Description    = '"+POut.String(gradingScale.Description)+"', "
+				+"MaxPointsPoss  =  "+POut.Float (gradingScale.MaxPointsPoss)+" "
 				+"WHERE GradingScaleNum = "+POut.Long(gradingScale.GradingScaleNum);
 			Db.NonQ(command);
 		}
@@ -117,13 +120,17 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one GradingScale in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(GradingScale gradingScale,GradingScale oldGradingScale){
 			string command="";
-			if(gradingScale.IsPercentage != oldGradingScale.IsPercentage) {
+			if(gradingScale.ScaleType != oldGradingScale.ScaleType) {
 				if(command!=""){ command+=",";}
-				command+="IsPercentage = "+POut.Bool(gradingScale.IsPercentage)+"";
+				command+="ScaleType = "+POut.Int   ((int)gradingScale.ScaleType)+"";
 			}
 			if(gradingScale.Description != oldGradingScale.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(gradingScale.Description)+"'";
+			}
+			if(gradingScale.MaxPointsPoss != oldGradingScale.MaxPointsPoss) {
+				if(command!=""){ command+=",";}
+				command+="MaxPointsPoss = "+POut.Float(gradingScale.MaxPointsPoss)+"";
 			}
 			if(command==""){
 				return false;
