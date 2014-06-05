@@ -90,7 +90,7 @@ namespace OpenDentBusiness {
 				catch(AmbiguousMatchException) {
 					//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
 				}
-				if(methodInfo!=null && (methodInfo.ReturnType != typeof(long)) {
+				if(methodInfo!=null && (methodInfo.ReturnType != typeof(long))) {
 					throw new ApplicationException("Meth.GetLong calling class must return long.");
 				}
 			#endif
