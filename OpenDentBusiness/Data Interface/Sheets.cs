@@ -122,11 +122,24 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Sheet>>(MethodBase.GetCurrentMethod(),docNum);
 			}
-			string command="SELECT sheet.* FROM sheet "
-				+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
-				+"WHERE FieldType = 10 "//PatImage
-				+"AND FieldValue = "+POut.Long(docNum)+" "//FieldName == DocCategory, which we do not care about here.
-				+"GROUP BY sheet.SheetNum";
+			string command="";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command="SELECT sheet.* FROM sheet "
+					+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
+					+"WHERE FieldType = 10 "//PatImage
+					+"AND FieldValue = "+POut.Long(docNum)+" "//FieldName == DocCategory, which we do not care about here.
+					+"GROUP BY sheet.SheetNum";
+			}
+			else {//Oracle
+				//This query has so much unique Oracle problems that it made more sense to just rewrite it.
+				command="SELECT sheet.SheetNum,sheet.SheetType,sheet.PatNum,sheet.DateTimeSheet,sheet.FontSize,sheet.FontName,sheet.Width"
+					+",sheet.Height,sheet.IsLandscape,DBMS_LOB.SUBSTR(sheet.InternalNote,1000,1),sheet.Description,sheet.ShowInTerminal,sheet.IsWebForm FROM sheet "
+					+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
+					+"WHERE FieldType = 10 "//PatImage
+					+"AND TO_CHAR(FieldValue) = '"+POut.Long(docNum)+"' "//FieldName == DocCategory, which we do not care about here.
+					+"GROUP BY sheet.SheetNum,sheet.SheetType,sheet.PatNum,sheet.DateTimeSheet,sheet.FontSize,sheet.FontName,sheet.Width"
+					+",sheet.Height,sheet.IsLandscape,DBMS_LOB.SUBSTR(sheet.InternalNote,1000,1),sheet.Description,sheet.ShowInTerminal,sheet.IsWebForm";
+			}
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
