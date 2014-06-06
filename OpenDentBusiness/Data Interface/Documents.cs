@@ -536,6 +536,21 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
+		///<summary>Moves one document from one patient to another and updates the file name accordingly.
+		///Only call when physically storing images in a folder share and after the physical images have been successfully copied over to the "to patient" folder.</summary>
+		public static void MergePatientDocument(long patFrom,long patTo,string oldFileName,string newFileName) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patFrom,patTo,oldFileName,newFileName);
+				return;
+			}
+			string command="UPDATE document"
+				+" SET PatNum="+POut.Long(patTo)+","
+				+" FileName='"+POut.String(newFileName)+"'"
+				+" WHERE PatNum="+POut.Long(patFrom)
+				+" AND FileName='"+POut.String(oldFileName)+"'";
+			Db.NonQ(command);
+		}
+
 	}	
   
 }

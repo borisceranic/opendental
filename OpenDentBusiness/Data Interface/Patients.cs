@@ -1732,10 +1732,10 @@ FROM insplan";
 			return true;
 		}
 
-		///<summary>To prevent orphaned patients, if patFrom is a guarantor then all family members of patFrom are moved into the family patTo belongs to, and then the merge of the two specified accounts is performed.  Returns false if the merge was canceled by the user.</summary>
-		public static bool MergeTwoPatients(long patTo,long patFrom,string atoZpath){
+		///<summary>Updated 05/09/2014 v14.2.  To prevent orphaned patients, if patFrom is a guarantor then all family members of patFrom are moved into the family patTo belongs to, and then the merge of the two specified accounts is performed.  Returns false if the merge was canceled by the user.</summary>
+		public static bool MergeTwoPatients(long patTo,long patFrom){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),patTo,patFrom,atoZpath);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patTo,patFrom);
 			}
 			if(patTo==patFrom) {
 				//Do not merge the same patient onto itself.
@@ -1754,7 +1754,7 @@ FROM insplan";
 				"creditcard.PatNum",
 				//"custreference.PatNum",  //We do not want duplicate entries.
 				"disease.PatNum",
-				"document.PatNum",
+				//"document.PatNum",  //This is handled below when images are stored in the database and on the client side for images stored in the AtoZ folder due to the middle tier.
 				"ehramendment.PatNum",
 				"ehrcareplan.PatNum",
 				"ehrlab.PatNum",
@@ -1826,8 +1826,6 @@ FROM insplan";
 			string command="";
 			Patient patientFrom=Patients.GetPat(patFrom);
 			Patient patientTo=Patients.GetPat(patTo);
-			string atozFrom=ImageStore.GetPatientFolder(patientFrom,atoZpath);
-			string atozTo=ImageStore.GetPatientFolder(patientTo,atoZpath);
 			//We need to test patfields before doing anything else because the user may wish to cancel and abort the merge.
 			PatField[] patToFields=PatFields.Refresh(patTo);
 			PatField[] patFromFields=PatFields.Refresh(patFrom);
@@ -1852,7 +1850,7 @@ FROM insplan";
 								patFieldsToDelete.Add(patToFields[j]);
 							}
 							else if(result==DialogResult.Cancel) {
-								return false;
+								return false;//Completely cancels the entire merge.  No changes have been made at this point.
 							}
 						}
 					}
@@ -1879,34 +1877,16 @@ FROM insplan";
 				ehrPatFrom.PatNum=patientTo.PatNum;
 				EhrPatients.Update(ehrPatFrom); //Bring the patfrom entry over to the new.
 			}
-			//Move the patient documents within the 'patFrom' A to Z folder to the 'patTo' A to Z folder.
-			//We have to be careful here of documents with the same name. We have to rename such documents
-			//so that no documents are overwritten/lost.
-			string[] fromFiles=Directory.GetFiles(atozFrom);
-			for(int i=0;i<fromFiles.Length;i++) {
-				string fileName=Path.GetFileName(fromFiles[i]);
-				string destFilePath=ODFileUtils.CombinePaths(atozTo,fileName);
-				if(File.Exists(destFilePath)) {
-					//The file being copied has the same name as a possibly different file within the destination a to z folder.
-					//We need to copy the file under a unique file name and then make sure to update the document table to reflect
-					//the change.
-					destFilePath=ODFileUtils.CombinePaths(atozTo,patientFrom.PatNum.ToString()+"_"+fileName);
-					while(File.Exists(destFilePath)){
-						destFilePath=ODFileUtils.CombinePaths(atozTo,patientFrom.PatNum.ToString()+"_"+DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss")+"_"+fileName);
-					}
-					command="UPDATE document "
-						+"SET FileName='"+POut.String(Path.GetFileName(destFilePath))+"' "
-						+"WHERE FileName='"+POut.String(fileName)+"' AND PatNum="+POut.Long(patFrom)+" "+DbHelper.LimitAnd(1);
-					Db.NonQ(command);					
-				}
-				File.Copy(fromFiles[i],destFilePath);//Will throw exception if file already exists.
-				try {
-					File.Delete(fromFiles[i]);
-				} catch {
-					//If we were unable to delete the file then it is probably because someone has the document open currently.
-					//Just skip deleting the file. This means that occasionally there will be an extra file in their backup
-					//which is just clutter but at least the merge is guaranteed this way.
-				}
+			//Move the patient documents if they are stored in the database.
+			//We do not have to worry about documents having the same name when storing within the database, only physical documents need to be renamed.
+			//Physical documents are handled on the client side (not here) due to middle tier issues.
+			if(!PrefC.AtoZfolderUsed) {
+				//Storing documents in the database.  Simply update the PatNum column accordingly. 
+				//This query cannot be ran below where all the other tables are handled dyncamically because we do NOT want to update the PatNums in the case that documents are stored physically.
+				command="UPDATE document "
+					+"SET PatNum="+POut.Long(patTo)+" "
+					+"WHERE PatNum="+POut.Long(patFrom);
+				Db.NonQ(command);
 			}
 			//If the 'patFrom' had any ties to guardians, they should be deleted to prevent duplicate entries.
 			command="DELETE FROM guardian"
@@ -1926,6 +1906,11 @@ FROM insplan";
 			//Now modify all PatNum foreign keys from 'patFrom' to 'patTo' to complete the majority of the
 			//merge of the records between the two accounts.			
 			for(int i=0;i<patNumForeignKeys.Length;i++) {
+				if(DataConnection.DBtype==DatabaseType.Oracle 
+					&& patNumForeignKeys[i]=="ehrlab.PatNum") //Oracle does not currently support EHR labs.
+				{
+					continue;
+				}
 				string[] tableAndKeyName=patNumForeignKeys[i].Split(new char[] {'.'});
 				command="UPDATE "+tableAndKeyName[0]
 					+" SET "+tableAndKeyName[1]+"="+POut.Long(patTo)
