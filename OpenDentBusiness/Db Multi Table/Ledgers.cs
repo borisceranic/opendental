@@ -166,8 +166,8 @@ namespace OpenDentBusiness{
 				//calculated for all familes.
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
 					//Since the table name is already 30 chars long we cannot use the table name in the index names.
-					command+="CREATE INDEX TEMPAGING_PATNUM ON "+tempAgingTableName+" (PatNum);";
-					command+="CREATE INDEX TEMPAGING_GUAR ON "+tempAgingTableName+" (Guarantor);";
+					command+="CREATE INDEX "+tempTableSuffix+"_PATNUM1 ON "+tempAgingTableName+" (PatNum);";
+					command+="CREATE INDEX "+tempTableSuffix+"_GUAR1 ON "+tempAgingTableName+" (Guarantor);";
 				}
 				else {
 					command+="ALTER TABLE "+tempAgingTableName+" ADD INDEX IDX_"+tempAgingTableName.ToUpper()+"_PATNUM (PatNum);";
@@ -175,16 +175,26 @@ namespace OpenDentBusiness{
 				}
 			}
 			else {
-				//Manually create insert statements to avoid having the database system visit every patient record again.
-				//In my testing, this saves about 0.25 seconds on an individual family aging calculation on my machine in MySQL.
-				command+="INSERT INTO "+tempAgingTableName+" (PatNum,Guarantor) VALUES ";
-				for(int i=0;i<familyPatNumList.Count;i++){
-					if(i>0){
-						command+=",";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//Manually create insert statements to avoid having the database system visit every patient record again.
+					//In my testing, this saves about 0.25 seconds on an individual family aging calculation on my machine in MySQL.
+					command+="INSERT INTO "+tempAgingTableName+" (PatNum,Guarantor) VALUES ";
+					for(int i=0;i<familyPatNumList.Count;i++) {
+						if(i>0) {
+							command+=",";
+						}
+						command+="("+familyPatNumList[i]+","+guarantor+")";
 					}
-					command+="("+familyPatNumList[i]+","+guarantor+")";
+					command+=";";
 				}
-				command+=";";
+				else {//Oracle
+					//Manually create insert statements to avoid having the database system visit every patient record again.
+					command+="INSERT ALL ";
+					for(int i=0;i<familyPatNumList.Count;i++) {
+						command+="INTO "+tempAgingTableName+" (PatNum,Guarantor) VALUES ("+familyPatNumList[i]+","+guarantor+") ";
+					}
+					command+="SELECT 1 FROM dual;";//INSERT ALL requires a SELECT subquery. To get around that, SELECT 1 FROM DUAL is used to give a single row of dummy data.
+				}
 			}
 			//Create another temporary table which holds a very concise summary of the entire office transaction history, 
 			//so that all transactions can be treated as either a general credit or a general charge in the aging calculation.
@@ -253,7 +263,7 @@ namespace OpenDentBusiness{
 					"PatNum NUMBER DEFAULT 0,"+
 					"BalTotal NUMBER(38,8) DEFAULT 0"+
 					");";
-				command+="CREATE INDEX "+tempTotalsTableName.ToUpper()+"_PATNU ON "+tempTotalsTableName+" (PatNum);";
+				command+="CREATE INDEX "+tempTableSuffix+"_PATNUM2 ON "+tempTotalsTableName+" (PatNum);";
 				command+="INSERT INTO "+tempTotalsTableName+" "+
 					"SELECT PatNum,ROUND(SUM(TranAmount),2) FROM "+tempOdAgingTransTableName+" "+
 					"GROUP BY PatNum;";
