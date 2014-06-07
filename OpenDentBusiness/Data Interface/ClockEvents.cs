@@ -266,13 +266,15 @@ namespace OpenDentBusiness{
 			if(employeeClockingOut==null) {//should not get here
 				return;
 			}
-			if(employeeClockingOut.PhoneExt!=pedClockingOut.PhoneExt) {//Revert PhoneEmpDefault and Phone to the normally assigned extension for this employee.								
+			//Now check if the assigned extension is associated to a valid phone tile.
+			Phone phoneAssignedToEmp=Phones.GetPhoneForExtension(Phones.GetPhoneList(),employeeClockingOut.PhoneExt);
+			//If the employee is assigned to a valid phone tile (extension) and they are assigned to a different phone tile than the one they just clocked out of.
+			if(phoneAssignedToEmp!=null && employeeClockingOut.PhoneExt!=pedClockingOut.PhoneExt) {
+				//Revert PhoneEmpDefault and Phone to the normally assigned extension for this employee.	
 				//Start by setting this employee back to their normally assigned extension.
 				pedClockingOut.PhoneExt=employeeClockingOut.PhoneExt;
-				//Now check to see if we are about to steal yet a third employee's extension.
-				Phone phoneCurrentlyOccupiedBy=Phones.GetPhoneForExtension(Phones.GetPhoneList(),employeeClockingOut.PhoneExt);
-				if(phoneCurrentlyOccupiedBy!=null //There is yet a third employee who is currently occupying this extension.
-					&& ClockEvents.IsClockedIn(phoneCurrentlyOccupiedBy.EmployeeNum)) {
+				//Check if someone is currently using their assigned extension
+				if(ClockEvents.IsClockedIn(phoneAssignedToEmp.EmployeeNum)) {
 					//The third employee is clocked in so set our employee extension to 0.
 					//The currently clocked in employee will retain the extension for now.
 					//Our employee will retain the proper extension next time they clock in.
