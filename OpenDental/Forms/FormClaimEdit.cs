@@ -4565,7 +4565,9 @@ namespace OpenDental{
 			ClaimProcCur.ProcDate=ClaimCur.DateService;
 			ClaimProcCur.DateEntry=DateTime.Now;//will get set anyway
 			ClaimProcCur.ClinicNum=ClaimCur.ClinicNum;
-			List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum);
+			//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
+			//By sending in ClaimNum, we ensure that we only get the payplan a claimproc from this claim was already attached to or payplans with no claimprocs attached.
+			List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum,ClaimProcCur.ClaimNum);
 			ClaimProcCur.PayPlanNum=0;
 			if(payPlanList.Count==1) {
 				ClaimProcCur.PayPlanNum=payPlanList[0].PayPlanNum;
@@ -4680,19 +4682,25 @@ namespace OpenDental{
 					cpList[i].DateEntry=DateTime.Now;//date is was set rec'd
 					cpList[i].InsPayAmt=cpList[i].InsPayEst;
 					cpList[i].PayPlanNum=0;
-					//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
-					List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(cpList[i].PatNum,cpList[i].PlanNum,cpList[i].InsSubNum);
-					if(payPlanList.Count==1) {
-						cpList[i].PayPlanNum=payPlanList[0].PayPlanNum;
-					}
-					else if(payPlanList.Count>1) {
-						//more than one valid PayPlan
-						List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(cpList[i].PatNum);
-						FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
-						FormPPS.ShowDialog();
-						if(FormPPS.DialogResult==DialogResult.OK) {
-							cpList[i].PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+					if(i==0) {
+						//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
+						//By sending in ClaimNum, we ensure that we only get the payplan a claimproc from this claim was already attached to or payplans with no claimprocs attached.
+						List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(cpList[i].PatNum,cpList[i].PlanNum,cpList[i].InsSubNum,cpList[i].ClaimNum);
+						if(payPlanList.Count==1) {
+							cpList[i].PayPlanNum=payPlanList[0].PayPlanNum;
 						}
+						else if(payPlanList.Count>1) {
+							//more than one valid PayPlan
+							List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(cpList[i].PatNum);
+							FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+							FormPPS.ShowDialog();
+							if(FormPPS.DialogResult==DialogResult.OK) {
+								cpList[i].PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+							}
+						}
+					}
+					else {
+						cpList[i].PayPlanNum=cpList[0].PayPlanNum;//set all procs to the same payplan, they can change it later if not correct for each claimproc that is different
 					}
 				}
 				cpList[i].DateCP=DateTimeOD.Today;
@@ -4809,6 +4817,7 @@ namespace OpenDental{
 			//now this claim has been precisely duplicated, except it has a new ClaimNum.  So there are no attached claimprocs.
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
 				ClaimProcsForClaim[gridProc.SelectedIndices[i]].ClaimNum=newClaim.ClaimNum;
+				ClaimProcsForClaim[gridProc.SelectedIndices[i]].PayPlanNum=0;//detach from payplan if previously attached, claimprocs from two claims cannot be attached to the same payplan
 				ClaimProcs.Update(ClaimProcsForClaim[gridProc.SelectedIndices[i]]);//moves it to the new claim
 			}
 			//now, set Claims.Cur back to the originalClaim.  The new claim will now show on the account.

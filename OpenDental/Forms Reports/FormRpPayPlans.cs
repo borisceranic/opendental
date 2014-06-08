@@ -154,10 +154,10 @@ namespace OpenDental
 			double dueTen;
 			for(int i=0;i<raw.Rows.Count;i++){
 				princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
-				if(raw.Rows[i]["PlanNum"].ToString()=="0") {
+				if(raw.Rows[i]["PlanNum"].ToString()=="0") {//pat payplan
 					paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
 				}
-				else {
+				else {//ins payplan
 					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
 				}
 				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());

@@ -1175,7 +1175,7 @@ namespace OpenDental
 			this.checkPayPlan.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkPayPlan.Location = new System.Drawing.Point(350, 600);
 			this.checkPayPlan.Name = "checkPayPlan";
-			this.checkPayPlan.Size = new System.Drawing.Size(250, 18);
+			this.checkPayPlan.Size = new System.Drawing.Size(346, 18);
 			this.checkPayPlan.TabIndex = 163;
 			this.checkPayPlan.Text = "Attached to Insurance Payment Plan";
 			this.checkPayPlan.Click += new System.EventHandler(this.checkPayPlan_Click);
@@ -1954,9 +1954,9 @@ namespace OpenDental
 
 		private void checkPayPlan_Click(object sender,EventArgs e) {
 			if(checkPayPlan.Checked) {
-				List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum);
+				List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum,ClaimProcCur.ClaimNum);
 				if(payPlanList.Count==0) {//no valid plans
-					MsgBox.Show(this,"The patient does not have a payment plan with this insurance plan attached that has not been paid in full.");
+					MsgBox.Show(this,"The patient does not have a valid payment plan with this insurance plan attached that has not been paid in full and is not tracking expected payments for an existing claim already.");
 					checkPayPlan.Checked=false;
 					return;
 				}

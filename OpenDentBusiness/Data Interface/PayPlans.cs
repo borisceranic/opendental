@@ -37,24 +37,66 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanCrud.SelectMany(command);
 		}
 
-		///<summary>Get all payment plans for this patient with the insurance plan identified by PlanNum and InsSubNum attached (marked used for tracking expected insurance payments) that have not been paid in full.</summary>
-		public static List<PayPlan> GetValidInsPayPlans(long patNum,long planNum,long insSubNum) {
+		///<summary>Get all payment plans for this patient with the insurance plan identified by PlanNum and InsSubNum attached (marked used for tracking expected insurance payments) that have not been paid in full.  Only returns plans with no claimprocs currently attached or claimprocs from the claim identified by the claimNum sent in attached.  If claimNum is 0 all payment plans with planNum, insSubNum, and patNum not paid in full will be returned.</summary>
+		public static List<PayPlan> GetValidInsPayPlans(long patNum,long planNum,long insSubNum,long claimNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),patNum,planNum,insSubNum,claimNum);
 			}
-			string command="SELECT payplan.* FROM payplan"
+			string command="";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="SELECT payplan.*,MAX(claimproc.ClaimNum) ClaimNum";
+			}
+			else {
+				command+="SELECT payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,"
+					+"payplan.APR,payplan.Note,payplan.PlanNum,payplan.CompletedAmt,payplan.InsSubNum,MAX(claimproc.ClaimNum) ClaimNum";
+			}
+			command+=" FROM payplan"
 				+" LEFT JOIN claimproc ON claimproc.PayPlanNum=payplan.PayPlanNum"
 				+" WHERE payplan.PatNum="+POut.Long(patNum)
 				+" AND payplan.PlanNum="+POut.Long(planNum)
-				+" AND payplan.InsSubNum="+POut.Long(insSubNum)
-				+" GROUP BY payplan.PayPlanNum"
-				+" HAVING payplan.CompletedAmt>SUM(COALESCE(claimproc.InsPayAmt,0))"//has not been paid in full yet
-				+" ORDER BY payplan.PayPlanDate";
-			return Crud.PayPlanCrud.SelectMany(command);
+				+" AND payplan.InsSubNum="+POut.Long(insSubNum);
+			if(claimNum>0) {
+				command+=" AND (claimproc.ClaimNum IS NULL OR claimproc.ClaimNum="+POut.Long(claimNum)+")";//payplans with no claimprocs attached or only claimprocs from the same claim
+			}
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+=" GROUP BY payplan.PayPlanNum";
+			}
+			else {
+				command+=" GROUP BY payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,"
+					+"payplan.APR,payplan.Note,payplan.PlanNum,payplan.CompletedAmt,payplan.InsSubNum";
+			}
+			command+=" HAVING payplan.CompletedAmt>SUM(COALESCE(claimproc.InsPayAmt,0))";//has not been paid in full yet
+			if(claimNum==0) {//if current claimproc is not attached to a claim, do not return payplans with claimprocs from existing claims already attached
+				command+=" AND (MAX(claimproc.ClaimNum) IS NULL OR MAX(claimproc.ClaimNum)=0)";
+			}
+			command+=" ORDER BY payplan.PayPlanDate";
+			DataTable payPlansWithClaimNum=Db.GetTable(command);
+			List<PayPlan> retval=new List<PayPlan>();
+			for(int i=0;i<payPlansWithClaimNum.Rows.Count;i++) {
+				PayPlan planCur=new PayPlan();
+				planCur.PayPlanNum=PIn.Long(payPlansWithClaimNum.Rows[i]["PayPlanNum"].ToString());
+				planCur.PatNum=PIn.Long(payPlansWithClaimNum.Rows[i]["PatNum"].ToString());
+				planCur.Guarantor=PIn.Long(payPlansWithClaimNum.Rows[i]["Guarantor"].ToString());
+				planCur.PayPlanDate=PIn.Date(payPlansWithClaimNum.Rows[i]["PayPlanDate"].ToString());
+				planCur.APR=PIn.Double(payPlansWithClaimNum.Rows[i]["APR"].ToString());
+				planCur.Note=payPlansWithClaimNum.Rows[i]["Note"].ToString();
+				planCur.PlanNum=PIn.Long(payPlansWithClaimNum.Rows[i]["PlanNum"].ToString());
+				planCur.CompletedAmt=PIn.Double(payPlansWithClaimNum.Rows[i]["CompletedAmt"].ToString());
+				planCur.InsSubNum=PIn.Long(payPlansWithClaimNum.Rows[i]["InsSubNum"].ToString());
+				if(claimNum>0 && payPlansWithClaimNum.Rows[i]["ClaimNum"].ToString()==claimNum.ToString()) {
+					//if a payplan exists with claimprocs from the same claim as the current claimproc attached, always only return that one payplan
+					//claimprocs from one claim are not allowed to be attached to different payplans
+					retval.Clear();
+					retval.Add(planCur);
+					break;
+				}
+				retval.Add(planCur);
+			}
+			return retval;
 		}
 
 		///<summary></summary>
-		public static long Insert(PayPlan payPlan){
+		public static long Insert(PayPlan payPlan) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				payPlan.PayPlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),payPlan);
 				return payPlan.PayPlanNum;

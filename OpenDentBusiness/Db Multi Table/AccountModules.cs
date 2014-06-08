@@ -140,8 +140,12 @@ namespace OpenDentBusiness {
 				row["tth"]="";
 				rows.Add(row);
 			}
+			long payPlanPlanNum=0;
 			PayPlan payPlanCur=PayPlans.GetOne(payPlanNum);
-			if(payPlanCur.PlanNum==0) {//not a insurance payment plan
+			if(payPlanCur!=null) {
+				payPlanPlanNum=payPlanCur.PlanNum;
+			}
+			if(payPlanPlanNum==0) {//not a insurance payment plan
 				//Paysplits
 				command="SELECT CheckNum,DatePay,paysplit.PatNum,PayAmt,paysplit.PayNum,PayPlanNum,"
 					+"PayType,ProcDate,ProvNum,SplitAmt "
@@ -157,7 +161,7 @@ namespace OpenDentBusiness {
 				}*/
 				command+=") ORDER BY ProcDate";
 			}
-			else {
+			else {//insurance payment plan
 				//Ins Payments
 				command="SELECT ClaimNum,MAX(CheckNum) CheckNum,DateCP,MAX(PatNum) PatNum,MAX(CheckAmt) CheckAmt,claimproc.ClaimPaymentNum,"
 					+"MAX(PayPlanNum) PayPlanNum,MAX(PayType) PayType,MAX(ProcDate) ProcDate,SUM(InsPayAmt) InsPayAmt,"
@@ -182,12 +186,12 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
-				if(payPlanCur.PlanNum!=0) {//ins payments
+				if(payPlanPlanNum!=0) {//ins payments
 					row["ClaimNum"]=rawPay.Rows[i]["ClaimNum"].ToString();
 					row["ClaimPaymentNum"]=rawPay.Rows[i]["ClaimPaymentNum"].ToString();
 					row["colorText"]=DefC.Long[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
 				}
-				if(payPlanCur.PlanNum==0) {
+				if(payPlanPlanNum==0) {
 					amt=PIn.Decimal(rawPay.Rows[i]["SplitAmt"].ToString());
 				}
 				else {
@@ -195,7 +199,7 @@ namespace OpenDentBusiness {
 				}
 				row["creditsDouble"]=amt;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
-				if(payPlanCur.PlanNum==0) {
+				if(payPlanPlanNum==0) {
 					dateT=PIn.DateT(rawPay.Rows[i]["ProcDate"].ToString());
 				}
 				else {
@@ -203,7 +207,7 @@ namespace OpenDentBusiness {
 				}
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToShortDateString();
-				if(payPlanCur.PlanNum==0) {
+				if(payPlanPlanNum==0) {
 					row["description"]=DefC.GetName(DefCat.PaymentTypes,PIn.Long(rawPay.Rows[i]["PayType"].ToString()));
 					payamt=PIn.Decimal(rawPay.Rows[i]["PayAmt"].ToString());
 				}
@@ -214,8 +218,8 @@ namespace OpenDentBusiness {
 				if(rawPay.Rows[i]["CheckNum"].ToString()!=""){
 					row["description"]+=" #"+rawPay.Rows[i]["CheckNum"].ToString();
 				}
-				if(payPlanCur.PlanNum!=0 && rawPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {//attached to claim but no check (claimpayment) created
-					row["description"]=Lans.g("ContrAccount","No Insurance Check Created");
+				if(payPlanPlanNum!=0 && rawPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {//attached to claim but no check (claimpayment) created
+					row["description"]=Lans.g("AccountModule","No Insurance Check Created");
 				}
 				else {
 					row["description"]+=" "+payamt.ToString("c");
@@ -227,7 +231,7 @@ namespace OpenDentBusiness {
 				//row["extraDetail"]="";
 				row["patient"]="";
 				row["PatNum"]=rawPay.Rows[i]["PatNum"].ToString();
-				if(payPlanCur.PlanNum==0) {
+				if(payPlanPlanNum==0) {
 					row["PayNum"]=rawPay.Rows[i]["PayNum"].ToString();
 				}
 				else {
@@ -235,7 +239,7 @@ namespace OpenDentBusiness {
 				}
 				row["PayPlanNum"]="0";
 				row["PayPlanChargeNum"]="0";
-				if(payPlanCur.PlanNum==0) {
+				if(payPlanPlanNum==0) {
 					row["ProcCode"]=Lans.g("AccountModule","Pay");
 				}
 				else {
@@ -581,7 +585,7 @@ namespace OpenDentBusiness {
 				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
 				writeoff=PIn.Decimal(rawClaimPay.Rows[i]["WriteOff_"].ToString());
 				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" && amt+writeoff==0) {//payplan payments are tracked in the payplan, so nothing to display.
-					continue;
+					continue;//Does not add a row, so don't worry about setting the remaining columns.
 				}
 				row["creditsDouble"]=amt+writeoff;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
@@ -591,12 +595,12 @@ namespace OpenDentBusiness {
 				procdate=PIn.DateT(rawClaimPay.Rows[i]["ProcDate"].ToString());
 				row["description"]=Lans.g("AccountModule","Insurance Payment for Claim ")+procdate.ToShortDateString();
 				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0") {
-						row["description"]+="\r\n("+Lans.g("AccountModule","Payments Tracked in Payment Plan")+")";
+					row["description"]+="\r\n("+Lans.g("AccountModule","Payments Tracked in Payment Plan")+")";
+				}
+				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" || writeoff!=0) {
+					row["description"]+="\r\n"+Lans.g("AccountModule","Payment:")+" "+amt.ToString("c");
 				}
 				if(writeoff!=0) {
-					if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()=="0") {
-						row["description"]+="\r\n"+Lans.g("AccountModule","Payment:")+" "+amt.ToString("c");
-					}
 					row["description"]+="\r\n"+Lans.g("AccountModule","Writeoff:")+" "+writeoff.ToString("c");
 				}				
 				//row["extraDetail"]="";

@@ -1060,7 +1060,7 @@ namespace OpenDental{
 			if(textCompletedAmt.Text==""){
 				return;
 			}
-			if(textCompletedAmt.Text==textAmount.Text){
+			if(PIn.Double(textCompletedAmt.Text)==PIn.Double(textAmount.Text)){
 				return;
 			}
 			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change Tx Completed Amt to match?")){
@@ -1100,6 +1100,7 @@ namespace OpenDental{
 				|| textAPR.errorProvider1.GetError(textAPR)!=""
 				|| textTerm.errorProvider1.GetError(textTerm)!=""
 				|| textPeriodPayment.errorProvider1.GetError(textPeriodPayment)!=""
+				|| textCompletedAmt.errorProvider1.GetError(textCompletedAmt)!=""
 				){
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
@@ -1518,7 +1519,7 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e){
-			if(textCompletedAmt.Text!=textAmount.Text) {
+			if(PIn.Double(textCompletedAmt.Text)!=PIn.Double(textAmount.Text)){
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Tx Completed Amt and Total Amount do not match, continue?")) {
 					return;
 				}
