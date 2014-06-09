@@ -20,10 +20,17 @@ namespace OpenDentBusiness
 			if(messageText==null || messageText.Length<106){
 				return false;
 			}
-			if(messageText.Substring(0,3)=="ISA"){
-				return true;
+			if(messageText.Substring(0,3)!="ISA"){
+				return false;
 			}
-			return false;
+			try {
+				//Denti-cal sends us 835s, but they also send us "EOB" reports which start with "ISA" and look similar to X12 but are NOT X12.
+				new X12object(messageText);//Only an X12 object if we can parse it.  Denti-cal "EOB" reports fail this test, as they should.
+			}
+			catch {
+				return false;
+			}
+			return true;
 		}
 
 		///<summary>This override is never explicitly used.</summary>
