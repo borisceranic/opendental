@@ -1111,6 +1111,7 @@ namespace OpenDental{
 			//and they will never show again in the patient selection list.
 			//check for plans, appointments, procedures, etc.
 			List<Procedure> procList=Procedures.Refresh(PatCur.PatNum);
+			List<Appointment> apptList=Appointments.GetListForPat(PatCur.PatNum);
 			List<Claim> claimList=Claims.Refresh(PatCur.PatNum);
 			Adjustment[] AdjustmentList=Adjustments.Refresh(PatCur.PatNum);
 			PaySplit[] PaySplitList=PaySplits.Refresh(PatCur.PatNum);//
@@ -1126,6 +1127,7 @@ namespace OpenDental{
 			List<Sheet> sheetList=Sheets.GetForPatient(PatCur.PatNum);
 			RepeatCharge[] repeatChargeList=RepeatCharges.Refresh(PatCur.PatNum);
 			bool hasProcs=procList.Count>0;
+			bool hasAppt=apptList.Count>0;
 			bool hasClaims=claimList.Count>0;
 			bool hasAdj=AdjustmentList.Length>0;
 			bool hasPay=PaySplitList.Length>0;
@@ -1143,13 +1145,15 @@ namespace OpenDental{
 			bool hasRef=RefAttachList.Count>0;
 			bool hasSheets=sheetList.Count>0;
 			bool hasRepeat=repeatChargeList.Length>0;
-			if(hasProcs || hasClaims || hasAdj || hasPay || hasClaimProcs || hasComm || hasPayPlans
+			if(hasProcs || hasAppt || hasClaims || hasAdj || hasPay || hasClaimProcs || hasComm || hasPayPlans
 				|| hasInsPlans || hasRef || hasMeds || isSuperFamilyHead || hasSheets || hasRepeat)
 			{
 				string message=Lan.g(this,
 					"You cannot delete this patient without first deleting the following data:")+"\r";
 				if(hasProcs)
 					message+=Lan.g(this,"Procedures")+"\r";
+				if(hasAppt)
+					message+=Lan.g(this,"Appointments")+"\r";
 				if(hasClaims)
 					message+=Lan.g(this,"Claims")+"\r";
 				if(hasAdj)
