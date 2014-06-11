@@ -20,6 +20,9 @@ namespace OpenDentBusiness {
 				plan.PlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),plan,useExistingPK);
 				return plan.PlanNum;
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Crud.InsPlanCrud.Insert(plan);//Oracle ALWAYS uses existing PKs because they do not support auto-incrementing.
+			}
 			return Crud.InsPlanCrud.Insert(plan,useExistingPK);
 		}
 

@@ -83,6 +83,9 @@ namespace OpenDentBusiness{
 				insSub.InsSubNum=Meth.GetLong(MethodBase.GetCurrentMethod(),insSub,useExistingPK);
 				return insSub.InsSubNum;
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Crud.InsSubCrud.Insert(insSub);//Oracle ALWAYS uses existing PKs because they do not support auto-incrementing.
+			}
 			return Crud.InsSubCrud.Insert(insSub,useExistingPK);
 		}
 
