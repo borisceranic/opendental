@@ -5004,7 +5004,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE gradingscale MODIFY ScaleType NOT NULL";
 					Db.NonQ(command);
-				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE gradingscale ADD MaxPointsPoss float NOT NULL";
 					Db.NonQ(command);
 				}
@@ -5016,7 +5017,58 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE gradingscale MODIFY MaxPointsPoss NOT NULL";
 					Db.NonQ(command);
 				}
-				
+				//Insert HandyDentist bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'HandyDentist', "
+				    +"'HandyDentist from handycreate.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\HandyDentist\HandyDentist.exe")+"', "
+				    +"'"+POut.String(@"-no:[PatNum] -fname:[FName] -lname:[LName]")+"', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'HandyDentist')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'HandyDentist', "
+				    +"'HandyDentist from handycreate.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\HandyDentist\HandyDentist.exe")+"', "
+				    +"'"+POut.String(@"-no:[PatNum] -fname:[FName] -lname:[LName]")+"', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'HandyDentist')";
+					Db.NonQ(command);
+				}//end HandyDentist bridge
+
+
 
 
 

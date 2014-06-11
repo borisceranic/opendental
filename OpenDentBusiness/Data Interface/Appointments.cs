@@ -165,6 +165,7 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectMany(command).ToArray();
 		}
 
+		///<summary>Gets all appointments for a single patient ordered by AptDateTime.</summary>
 		public static List<Appointment> GetListForPat(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),patNum);
