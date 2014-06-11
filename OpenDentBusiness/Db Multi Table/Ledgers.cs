@@ -166,8 +166,8 @@ namespace OpenDentBusiness{
 				//calculated for all familes.
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
 					//Since the table name is already 30 chars long we cannot use the table name in the index names.
-					command+="CREATE INDEX "+tempTableSuffix+"_PATNUM1 ON "+tempAgingTableName+" (PatNum);";
-					command+="CREATE INDEX "+tempTableSuffix+"_GUAR1 ON "+tempAgingTableName+" (Guarantor);";
+					command+="CREATE INDEX PATNUM"+tempTableSuffix+"_1 ON "+tempAgingTableName+" (PatNum);";
+					command+="CREATE INDEX GUAR"+tempTableSuffix+"_1 ON "+tempAgingTableName+" (Guarantor);";
 				}
 				else {
 					command+="ALTER TABLE "+tempAgingTableName+" ADD INDEX IDX_"+tempAgingTableName.ToUpper()+"_PATNUM (PatNum);";
@@ -263,7 +263,7 @@ namespace OpenDentBusiness{
 					"PatNum NUMBER DEFAULT 0,"+
 					"BalTotal NUMBER(38,8) DEFAULT 0"+
 					");";
-				command+="CREATE INDEX "+tempTableSuffix+"_PATNUM2 ON "+tempTotalsTableName+" (PatNum);";
+				command+="CREATE INDEX PATNUM"+tempTableSuffix+"_2 ON "+tempTotalsTableName+" (PatNum);";
 				command+="INSERT INTO "+tempTotalsTableName+" "+
 					"SELECT PatNum,ROUND(SUM(TranAmount),2) FROM "+tempOdAgingTransTableName+" "+
 					"GROUP BY PatNum;";
