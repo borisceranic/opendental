@@ -74,59 +74,6 @@ namespace OpenDental.Bridges{
 }
 
 
-//Template code for ConvertDatabases2.cs
-////Insert AaTemplate Bridge
-//if(DataConnection.DBtype==DatabaseType.MySql) {
-//  command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-//    +") VALUES("
-//    +"'AaTemplate', "
-//    +"'AaTemplate from www.AaTemplate.com', "
-//    +"'0', "
-//    +"'"+POut.String(@"C:\Program Files (x86)\AaTemplate\AaTemplate.exe")+"',"
-//    +"'', "
-//    +"'')";
-//  long programNum=Db.NonQ(command,true);
-//  command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
-//    +") VALUES("
-//    +"'"+POut.Long(programNum)+"', "
-//    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
-//    +"'0')";
-//  Db.NonQ(command);
-//  command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
-//    +"VALUES ("
-//    +"'"+POut.Long(programNum)+"', "
-//    +"'"+POut.Int(((int)ToolBarsAvail.ChartModule))+"', "
-//    +"'AaTemplate')";
-//  Db.NonQ(command);
-//}
-//else {//oracle
-//  command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-//    +") VALUES("
-//    +"(SELECT MAX(ProgramNum)+1 FROM program),"
-//    +"'AaTemplate', "
-//    +"'AaTemplate from www.AaTemplate.com', "
-//    +"'0', "
-//    +"'"+POut.String(@"C:\Program Files (x86)\AaTemplate\AaTemplate.exe")+"',"
-//    +"'', "
-//    +"'')";
-//  long programNum=Db.NonQ(command,true);
-//  command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
-//    +") VALUES("
-//    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
-//    +"'"+POut.Long(programNum)+"', "
-//    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
-//    +"'0')";
-//  Db.NonQ(command);
-//  command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
-//    +"VALUES ("
-//    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
-//    +"'"+POut.Long(programNum)+"', "
-//    +"'"+POut.Int(((int)ToolBarsAvail.ChartModule))+"', "
-//    +"'AaTemplate')";
-//  Db.NonQ(command);
-//}//end AaTemplate bridge
-
-
 
 
 
