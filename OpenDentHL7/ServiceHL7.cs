@@ -449,7 +449,7 @@ namespace OpenDentHL7 {
 					StringBuilder strbAckMsg=new StringBuilder();
 					strbAckMsg.Append(chars);
 					if(strbAckMsg.Length>0 && strbAckMsg[0]!=MLLP_START_CHAR) {
-						list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
+						list[i].Note=list[i].Note+"Malformed acknowledgment (length "+strbAckMsg.Length+"):\r\n"+strbAckMsg.ToString()+"\r\n================\r\n";
 						HL7Msgs.Update(list[i]);
 						throw new Exception("Malformed acknowledgment.");
 					}
@@ -469,7 +469,7 @@ namespace OpenDentHL7 {
 						strbAckMsg.Remove(strbAckMsg.Length-1,1);//strip off the end char
 					}
 					else {
-						list[i].Note=list[i].Note+"Malformed acknowledgment.\r\n";
+						list[i].Note=list[i].Note+"Malformed acknowledgment (length "+strbAckMsg.Length+"):\r\n"+strbAckMsg.ToString()+"\r\n================\r\n";
 						HL7Msgs.Update(list[i]);
 						throw new Exception("Malformed acknowledgment.");
 					}
