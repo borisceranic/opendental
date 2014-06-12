@@ -58,6 +58,7 @@ namespace OpenDentBusiness{
 		EwooEZDent,
 		FloridaProbe,
 		Guru,
+		HandyDentist,
 		HouseCalls,
 		IAP,
 		iCat,

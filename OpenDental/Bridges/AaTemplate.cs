@@ -8,15 +8,15 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental.Bridges{
-	/// <summary>This class is just an example template that we use when we build a new bridge.  Start with a copy of this.</summary>
+	///<summary>This class is just an example template that we use when we build a new bridge.  Start with a copy of this.</summary>
 	public class AaTemplate {
 
-		/// <summary></summary>
+		///<summary></summary>
 		public AaTemplate(){
 			
 		}
 
-		/// <summary></summary>
+		///<summary></summary>
 		public static void SendData(Program ProgramCur,Patient pat) {
 			string path=Programs.GetProgramPath(ProgramCur);
 			if(pat==null) {

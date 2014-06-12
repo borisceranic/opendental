@@ -227,6 +227,7 @@ namespace OpenDentBusiness{
 			}
 			//FloridaProbe: Has no file paths containing outgoing patient data from Open Dental.
 			//Guru: Has no file paths containing outgoing patient data from Open Dental.
+			//HandyDentist: Has no file paths containing outgoing patient data from Open Dental.
 			//HouseCalls:
 			ScrubFileForProperty(ProgramName.HouseCalls,"Export Path","Appt.txt",true);//C:\HouseCalls\Appt.txt
 			//IAP: Has no file paths containing outgoing patient data from Open Dental.

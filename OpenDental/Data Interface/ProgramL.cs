@@ -130,6 +130,10 @@ namespace OpenDental{
 				Guru.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.HandyDentist.ToString()) {
+				HandyDentist.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.HouseCalls.ToString()) {
 				FormHouseCalls FormHC=new FormHouseCalls();
 				FormHC.ProgramCur=prog;
