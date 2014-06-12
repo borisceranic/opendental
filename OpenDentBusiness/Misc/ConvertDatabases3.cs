@@ -5025,7 +5025,7 @@ namespace OpenDentBusiness {
 				    +"'HandyDentist from handycreate.com', "
 				    +"'0', "
 				    +"'"+POut.String(@"C:\HandyDentist\HandyDentist.exe")+"', "
-				    +"'"+POut.String(@"-no:[PatNum] -fname:[FName] -lname:[LName]")+"', "
+				    +"'', "
 				    +"'')";
 					long programNum=Db.NonQ(command,true);
 					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
@@ -5049,7 +5049,7 @@ namespace OpenDentBusiness {
 				    +"'HandyDentist from handycreate.com', "
 				    +"'0', "
 				    +"'"+POut.String(@"C:\HandyDentist\HandyDentist.exe")+"', "
-				    +"'"+POut.String(@"-no:[PatNum] -fname:[FName] -lname:[LName]")+"', "
+				    +"'', "
 				    +"'')";
 					long programNum=Db.NonQ(command,true);
 					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
