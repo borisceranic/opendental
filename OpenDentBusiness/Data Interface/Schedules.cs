@@ -247,6 +247,8 @@ namespace OpenDentBusiness{
 			}
 			string command= "DELETE from schedule WHERE schedulenum = '"+POut.Long(sched.ScheduleNum)+"'";
  			Db.NonQ(command);
+			command="DELETE FROM scheduleop WHERE ScheduleNum="+POut.Long(sched.ScheduleNum);
+			Db.NonQ(command);
 			if(sched.SchedType==ScheduleType.Provider){
 				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,sched.ScheduleNum);
 			}
@@ -391,10 +393,24 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),date);
 				return;
 			}
-			string command="DELETE from schedule WHERE "
-				+"SchedDate="    +POut.Date(date)+" "
+			//Get ScheduleNums that are to be deleted so we can delete scheduleops
+			List<string> scheduleNums=new List<string>();  //Used for deleting scheduleops below
+			string command="SELECT ScheduleNum FROM schedule WHERE "
+				+"SchedDate="+POut.Date(date)+" "
+				+"AND SchedType='"+POut.Long((int)ScheduleType.Blockout)+"' ";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				scheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
+			}
+			command="DELETE FROM schedule WHERE "
+				+"SchedDate="+POut.Date(date)+" "
 				+"AND SchedType='"+POut.Long((int)ScheduleType.Blockout)+"' ";
 			Db.NonQ(command);
+			if(scheduleNums.Count>0) {
+				//Delete scheduleops for the deleted schedules.
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",scheduleNums))+")";
+				Db.NonQ(command);
+			}
 		}
 
 		public static bool DateIsHoliday(DateTime date){
@@ -577,13 +593,20 @@ namespace OpenDentBusiness{
 			string command="SELECT ScheduleNum FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
 				+"AND SchedType="+POut.Long((int)ScheduleType.Provider);
 			DataTable table=Db.GetTable(command);
+			List<string> scheduleNums=new List<string>();  //Used for deleting scheduleops below
 			for(int i=0;i<table.Rows.Count;i++){
-				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i][0].ToString()));
+				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i]["ScheduleNum"].ToString()));
+				scheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
 			}
 			//Then, bulk delete.
 			command="DELETE FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
 				+"AND (SchedType=0 OR SchedType=1 OR SchedType=3)";
 			Db.NonQ(command);
+			if(scheduleNums.Count>0) {
+				//Delete scheduleops for the deleted schedules.
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",scheduleNums))+")";
+				Db.NonQ(command);
+			}
 			for(int i=0;i<SchedList.Count;i++){
 				Insert(SchedList[i],false);
 			}
@@ -600,6 +623,7 @@ namespace OpenDentBusiness{
 			}
 			string command;
 			string orClause="";
+			List<string> scheduleNums=new List<string>();  //Used for deleting scheduleops below
 			//make deleted entries for synch purposes:
 			if(provNums.Count>0){
 				for(int i=0;i<provNums.Count;i++) {
@@ -616,6 +640,7 @@ namespace OpenDentBusiness{
 				DataTable table=Db.GetTable(command);
 				for(int i=0;i<table.Rows.Count;i++){
 					DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i][0].ToString()));
+					scheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
 				}
 			}
 			//Then, the usual deletion for everything
@@ -641,6 +666,11 @@ namespace OpenDentBusiness{
 			}
 			command+=orClause+")";
 			Db.NonQ(command);
+			if(scheduleNums.Count>0) {
+				//Delete scheduleops for the deleted schedules.
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",scheduleNums))+")";
+				Db.NonQ(command);
+			}
 		}
 
 		///<summary>Clears all Blockout schedule entries for the given date range and the given ops.</summary>
