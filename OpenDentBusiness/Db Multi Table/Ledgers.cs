@@ -63,6 +63,7 @@ namespace OpenDentBusiness{
 			string asOfDate=POut.Date(AsOfDate);
 			string billInAdvanceDate=POut.Date(AsOfDate.AddDays(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)));
 			if(historic){
+				//This if statement never really does anything.  The only places that call this function with historic=true don't look at the patient.payplandue amount, and patient aging gets reset after the reports are generated.  In the future if we start looking at payment plan due amounts when historic=true we may need to revaluate this if statement.
 				billInAdvanceDate=POut.Date(DateTime.Today.AddDays(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)));
 			}
 			string thirtyDaysAgo=POut.Date(AsOfDate.AddDays(-30));
