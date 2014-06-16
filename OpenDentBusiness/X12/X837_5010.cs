@@ -2283,7 +2283,13 @@ namespace OpenDentBusiness
 			*/
 		}
 
+		///<summary>Used in SV304 (dental only).</summary>
 		private static string GetArea(Procedure proc,ProcedureCode procCode) {
+			//"Required when the nomenclature associated with the procedure reported in SV301-2 refers to quadrant or arch
+			//and the area of the oral cavity is not uniquely defined by the procedure description.
+			//Report individual tooth numbers in one or more TOO segments.
+			//Do not use this element for reporting of individual teeth.
+			//If it is necessary to report one or more individual teeth, use the Tooth Information (TOO) segment in this loop."
 			if(procCode.TreatArea==TreatmentArea.Arch) {
 				if(proc.Surf=="U") {
 					return "01";
@@ -2310,23 +2316,16 @@ namespace OpenDentBusiness
 				}
 			}
 			if(procCode.TreatArea==TreatmentArea.Sextant) {
-				//we will assume that these are very rarely billed to ins
 				return "";
 			}
 			if(procCode.TreatArea==TreatmentArea.Surf) {
-				return "";//might need to enhance this
+				return "";
 			}
 			if(procCode.TreatArea==TreatmentArea.Tooth) {
-				return "";//might need to enhance this
+				return "";
 			}
 			if(procCode.TreatArea==TreatmentArea.ToothRange) {
-				//already checked for blank tooth range
-				if(Tooth.IsMaxillary(proc.ToothRange.Split(',')[0])) {
-					return "01";
-				}
-				else {
-					return "02";
-				}
+				return "";
 			}
 			return "";
 		}
