@@ -9,10 +9,26 @@ using CodeBase;
 namespace OpenDental{
 ///<summary></summary>
 	public class ValidDouble:System.Windows.Forms.TextBox {
+
+		private Double _maxVal=100000000;
+		private Double _minVal=-100000000;
+
 		///<summary></summary>
-		public Double MaxVal=100000000;
+		[Category("Data"),
+			Description("The maximum value that user can enter.")
+		]
+		public Double MaxVal {
+			get { return _maxVal; }
+			set { _maxVal=value; }
+		}
 		///<summary></summary>
-		public Double MinVal=-100000000;
+		[Category("Data"),
+			Description("The minimum value that user can enter.")
+		]
+		public Double MinVal {
+			get { return _minVal; }
+			set { _minVal=value; }
+		}
 		public ErrorProvider errorProvider1=new ErrorProvider();
 
 		///<summary></summary>
@@ -66,7 +82,7 @@ namespace OpenDental{
 					return;//Text="0";
 				}
 				if(System.Convert.ToDouble(this.Text)>MaxVal)
-					throw new Exception("Number must be less than "+(MaxVal+1).ToString());
+					throw new Exception("Number must be less than or equal to "+MaxVal.ToString());
 				if(System.Convert.ToDouble(this.Text)<MinVal)
 					throw new Exception("Number must be greater than or equal to "+(MinVal).ToString());
 				errorProvider1.SetError(this,"");
