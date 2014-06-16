@@ -4181,9 +4181,7 @@ namespace OpenDental{
 				try {
 					DirectoryInfo di=new DirectoryInfo(PhoneUI.PathPhoneMsg); //use this directory if you want to test with real files ===> @"\\10.10.1.197\Voicemail\default\998\Deleted"
 					if(!di.Exists) {
-						this.Invoke(new DelegateSetString(SetVoicemailMetrics),new Object[] { true,0,new TimeSpan(0) });
-						Thread.Sleep(240000);//4 minutes
-						continue;
+						throw new Exception();//Causes the thread to sleep for 4 minutes then try again.
 					}
 					DateTime oldestVoicemail=DateTime.MaxValue;
 					FileInfo[] fileInfos=di.GetFiles("*.txt");
@@ -4201,8 +4199,11 @@ namespace OpenDental{
 				catch(ThreadAbortException) {//OnClosing will abort the thread.
 					return;//Exits the loop.
 				}
-				catch(Exception ex){
-					throw ex;
+				catch(Exception ex) {
+					//Something went wrong with determining how many voicemails there are.  Sleep for 4 minutes than try again.
+					this.Invoke(new DelegateSetString(SetVoicemailMetrics),new Object[] { true,0,new TimeSpan(0) });
+					Thread.Sleep(240000);//4 minutes
+					continue;
 				}
 				Thread.Sleep(3000);
 			}
