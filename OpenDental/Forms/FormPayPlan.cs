@@ -1174,7 +1174,7 @@ namespace OpenDental{
 				ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed at the end.
 				PayPlanCharges.Insert(ppCharge);
 			}
-			double principal=PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text);
+			double principal=PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text);//Always >= 0 due to validation.
 			double APR=PIn.Double(textAPR.Text);
 			double periodRate;
 			decimal periodPayment;
@@ -1199,8 +1199,9 @@ namespace OpenDental{
 				}
 			}
 			int roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
+			int term=0;
 			if(textTerm.Text!=""){//Use term to determine period payment
-				double term=PIn.Double(textTerm.Text);
+				term=PIn.Int(textTerm.Text);
 				if(APR==0){
 					periodPayment=Decimal.Round((decimal)(principal/term),roundDec);
 				}
@@ -1211,11 +1212,10 @@ namespace OpenDental{
 			else{//Use period payment supplied
 				periodPayment=PIn.Decimal(textPeriodPayment.Text);
 			}
-			decimal principalDecrementing=(decimal)principal;//the principal which will be decreased to zero in the loop. 
-			decimal periodPrincipal;
+			decimal principalDecrementing=(decimal)principal;//The principal which will be decreased to zero in the loop.  Always starts >= 0, due to validation.
 			DateTime firstDate=PIn.Date(textDateFirstPay.Text);
 			int countCharges=0;
-			while(principalDecrementing!=0 && countCharges<100){//the 100 limit prevents infinite loop
+			while(principalDecrementing>0 && countCharges<100){//the 100 limit prevents infinite loop
 				ppCharge=new PayPlanCharge();
 				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
 				ppCharge.Guarantor=PayPlanCur.Guarantor;
@@ -1250,34 +1250,19 @@ namespace OpenDental{
 					ppCharge.ChargeDate=firstDate.AddMonths(3*countCharges);
 				}
 				ppCharge.Interest=Math.Round(((double)principalDecrementing*periodRate),roundDec);//2 decimals
-				periodPrincipal=periodPayment-(decimal)ppCharge.Interest;
-				ppCharge.Principal=(double)periodPrincipal;
+				ppCharge.Principal=(double)periodPayment-ppCharge.Interest;
 				ppCharge.ProvNum=PatCur.PriProv;
-				if(principalDecrementing<-.03m) {//principalDecrementing is a significantly negative number, so this charge does not get added.
-					//js not sure when this would ever happen.  Needs better comments some day.
-					//the negative amount instead gets subtracted from the previous charge entered.
-					//List<PayPlanCharge> ChargeListAll=PayPlanCharges.Refresh(PayPlanCur.Guarantor);
-					List<PayPlanCharge> ChargeList=PayPlanCharges.GetForPayPlan(PayPlanCur.PayPlanNum);
-					ppCharge=ChargeList[ChargeList.Count-1].Copy();
-					ppCharge.Principal+=(double)principalDecrementing;
-					PayPlanCharges.Update(ppCharge);
-					break;
+				if(term>0 && countCharges==(term-1)) {//Using # payments method and this is the last payment.
+					//The point of this code block is to fix any rounding issues.  Corrects principal when off by a few pennies.
+					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated (principal will increase by a few pennies).
+					ppCharge.Interest=((double)periodPayment)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
 				}
-				principalDecrementing-=periodPrincipal;  
-				if(principalDecrementing < periodPrincipal/3m){//we are on the last loop because the remaining princ will be less than 1/3 of a monthly payment.
-				//if(principalDecrementing<1m && principalDecrementing>-1m){
-					//If this is based on # of payments, the amount will be pennies,
-					//but if this is based on monthly amount, then the last payment could be any odd number at all.
-					//Alter this principal
-					periodPrincipal+=principalDecrementing;
-					ppCharge.Principal=(double)periodPrincipal;
-					//and alter the interest by the opposite amount to keep the payment the same.
-					//So in the end, the pennies got absorbed by changing the interest.
-					if(APR!=0){
-						ppCharge.Interest-=(double)principalDecrementing;
-					}
-					principalDecrementing=0;//this will prevent another loop
+				else if(term==0 && principalDecrementing+((decimal)ppCharge.Interest) <= periodPayment) {//Payment amount method, last payment.
+					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.
+					//Interest was calculated above.
 				}
+				principalDecrementing-=(decimal)ppCharge.Principal;
+				//If somehow principalDecrementing was slightly negative right here due to rounding errors, then at worst the last charge amount would wrong by a few pennies and the loop would immediately exit.
 				PayPlanCharges.Insert(ppCharge);
 				countCharges++;
 			}
