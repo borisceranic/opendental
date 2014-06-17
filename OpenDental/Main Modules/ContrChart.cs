@@ -9275,7 +9275,7 @@ namespace OpenDental{
 			}
 			//Multiple procedures------------------------------------------------------------------------------------------------------
 			if(!PrefC.GetBool(PrefName.AllowSettingProcsComplete)){
-				MsgBox.Show(this,"Only single appointments may be set complete.  If you want to be able to set procedures complete, you must turn on that option in Setup Modules.");
+				MsgBox.Show(this,"Only single appointments may be set complete.  If you want to be able to set procedures complete, you must turn on that option in Setup | Chart | Chart Preferences.");
 				return;
 			}
 			//check to make sure we don't have non-procedures
