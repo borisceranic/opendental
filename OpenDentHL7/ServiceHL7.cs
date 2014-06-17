@@ -40,6 +40,8 @@ namespace OpenDentHL7 {
 		private static bool IsSendTCPConnected;
 		private static bool _ecwFileModeIsSending;
 		private static DateTime _ecwDateTimeOldMsgsDeleted;
+		// ManualResetEvent instances signal completion.
+		private static ManualResetEvent receiveDone=new ManualResetEvent(false);
 
 		public ServiceHL7() {
 			InitializeComponent();
@@ -298,10 +300,11 @@ namespace OpenDentHL7 {
 				EventLog.WriteEntry("OpenDentHL7","Connection Accepted",EventLogEntryType.Information);
 			}
 			try {
+				receiveDone.Reset();//manual reset event to tell the main thread to accept an incoming connection
 				socketIncomingWorker=socketIncomingMain.EndAccept(asyncResult);//end the BeginAccept.  Get reference to new Socket.
 				//Use the worker socket to wait for data.
 				//This is very short for testing.  Once we are confident in splicing together multiple chunks, lengthen this.
-				dataBufferIncoming=new byte[8];
+				dataBufferIncoming=new byte[256];
 				strbFullMsg=new StringBuilder();
 				//We will keep reusing the same workerSocket instead of maintaining a list of worker sockets
 				//because this program is guaranteed to only have one incoming connection at a time.
@@ -309,6 +312,7 @@ namespace OpenDentHL7 {
 					EventLog.WriteEntry("OpenDentHL7","BeginReceive",EventLogEntryType.Information);
 				}
 				socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
+				receiveDone.WaitOne();//wait for OnDataReceived to return before accepting any new connections				
 				//the main socket is now free to wait for another connection.
 				socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),socketIncomingMain);
 			}
@@ -325,92 +329,102 @@ namespace OpenDentHL7 {
 
 		///<summary>Runs in a separate thread</summary>
 		private void OnDataReceived(IAsyncResult asyncResult) {
-			int byteCountReceived=socketIncomingWorker.EndReceive(asyncResult);//blocks until data is recieved.
-			char[] chars=new char[byteCountReceived];
-			Decoder decoder=Encoding.UTF8.GetDecoder();
-			decoder.GetChars(dataBufferIncoming,0,byteCountReceived,chars,0);//doesn't necessarily get all bytes from the buffer because buffer could be half full.
-			strbFullMsg.Append(chars);//strbFullMsg might already have partial data
-			//I think we are guaranteed to have received at least one char.
-			bool isFullMsg=false;
-			bool isMalformed=false;
-			if(strbFullMsg.Length==1 && strbFullMsg[0]==MLLP_ENDMSG_CHAR){//the only char in the message is the end char
-				strbFullMsg.Clear();//this must be the very end of a previously processed message.  Discard.
-				isFullMsg=false;
-			}
-			//else if(strbFullMsg[0]!=MLLP_START_CHAR) {
-			else if(strbFullMsg.Length>0 && strbFullMsg[0]!=MLLP_START_CHAR) {
-				//Malformed message. 
-				isFullMsg=true;//we're going to do this so that the error gets saved in the database further down.
-				isMalformed=true;
-			}
-			else if(strbFullMsg.Length>=3//so that the next two lines won't crash
-				&& strbFullMsg[strbFullMsg.Length-1]==MLLP_ENDMSG_CHAR//last char is the endmsg char.
-				&& strbFullMsg[strbFullMsg.Length-2]==MLLP_END_CHAR)//the second-to-the-last char is the end char.
-			{
-				//we have a complete message
-				strbFullMsg.Remove(0,1);//strip off the start char
-				strbFullMsg.Remove(strbFullMsg.Length-2,2);//strip off the end chars
-				isFullMsg=true;
-			}
-			else if(strbFullMsg.Length>=2//so that the next line won't crash
-				&& strbFullMsg[strbFullMsg.Length-1]==MLLP_END_CHAR)//the last char is the end char.
-			{
-				//we will treat this as a complete message, because the endmsg char is optional.
-				//if the endmsg char gets sent in a subsequent block, the code above will discard it.
-				strbFullMsg.Remove(0,1);//strip off the start char
-				strbFullMsg.Remove(strbFullMsg.Length-1,1);//strip off the end char
-				isFullMsg=true;
-			}
-			else {
-				isFullMsg=false;//this is an incomplete message.  Continue to receive more blocks.
-			}
-			//end of big if statement-------------------------------------------------
-			if(!isFullMsg) {
-				dataBufferIncoming=new byte[8];//clear the buffer
-				socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
-				return;//get another block
-			}
-			//Prepare to save message to database if malformed and not processed
-			HL7Msg hl7Msg=new HL7Msg();
-			hl7Msg.MsgText=strbFullMsg.ToString();		
-			strbFullMsg.Clear();//ready for the next message
-			bool isProcessed=true;
-			string messageControlId="";
-			string ackEvent="";
-			if(isMalformed){
-				hl7Msg.HL7Status=HL7MessageStatus.InFailed;
-				hl7Msg.Note="This message is malformed so it was not processed.";
-				HL7Msgs.Insert(hl7Msg);
-				isProcessed=false;
-			}
-			else{
-				MessageHL7 messageHl7Object=new MessageHL7(hl7Msg.MsgText);//this creates an entire heirarchy of objects.
-				try {
-					MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db
-					messageControlId=messageHl7Object.ControlId;
-					ackEvent=messageHl7Object.AckEvent;
+			try {
+				int byteCountReceived=socketIncomingWorker.EndReceive(asyncResult);//blocks until data is recieved.
+				char[] chars=new char[byteCountReceived];
+				Decoder decoder=Encoding.UTF8.GetDecoder();
+				decoder.GetChars(dataBufferIncoming,0,byteCountReceived,chars,0);//doesn't necessarily get all bytes from the buffer because buffer could be half full.
+				strbFullMsg.Append(chars);//strbFullMsg might already have partial data
+				//I think we are guaranteed to have received at least one char.
+				bool isFullMsg=false;
+				bool isMalformed=false;
+				if(strbFullMsg.Length==1 && strbFullMsg[0]==MLLP_ENDMSG_CHAR) {//the only char in the message is the end char
+					strbFullMsg.Clear();//this must be the very end of a previously processed message.  Discard.
+					isFullMsg=false;
 				}
-				catch(Exception ex) {
-					EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
+				//else if(strbFullMsg[0]!=MLLP_START_CHAR) {
+				else if(strbFullMsg.Length>0 && strbFullMsg[0]!=MLLP_START_CHAR) {
+					//Malformed message. 
+					isFullMsg=true;//we're going to do this so that the error gets saved in the database further down.
+					isMalformed=true;
+				}
+				else if(strbFullMsg.Length>=3//so that the next two lines won't crash
+					&& strbFullMsg[strbFullMsg.Length-1]==MLLP_ENDMSG_CHAR//last char is the endmsg char.
+					&& strbFullMsg[strbFullMsg.Length-2]==MLLP_END_CHAR)//the second-to-the-last char is the end char.
+				{
+					//we have a complete message
+					strbFullMsg.Remove(0,1);//strip off the start char
+					strbFullMsg.Remove(strbFullMsg.Length-2,2);//strip off the end chars
+					isFullMsg=true;
+				}
+				else if(strbFullMsg.Length>=2//so that the next line won't crash
+					&& strbFullMsg[strbFullMsg.Length-1]==MLLP_END_CHAR)//the last char is the end char.
+				{
+					//we will treat this as a complete message, because the endmsg char is optional.
+					//if the endmsg char gets sent in a subsequent block, the code above will discard it.
+					strbFullMsg.Remove(0,1);//strip off the start char
+					strbFullMsg.Remove(strbFullMsg.Length-1,1);//strip off the end char
+					isFullMsg=true;
+				}
+				else {
+					isFullMsg=false;//this is an incomplete message.  Continue to receive more blocks.
+				}
+				//end of big if statement-------------------------------------------------
+				if(!isFullMsg) {
+					dataBufferIncoming=new byte[256];//clear the buffer
+					try {
+						socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
+						return;//get another block
+					}
+					catch(Exception ex) {
+						throw new Exception("An error occurred with BeginReceive on an incoming TCP/IP HL7 message.\r\nException: "+ex.Message);
+					}
+				}
+				//Prepare to save message to database if malformed and not processed
+				HL7Msg hl7Msg=new HL7Msg();
+				hl7Msg.MsgText=strbFullMsg.ToString();
+				strbFullMsg.Clear();//ready for the next message
+				bool isProcessed=true;
+				string messageControlId="";
+				string ackEvent="";
+				if(isMalformed) {
+					hl7Msg.HL7Status=HL7MessageStatus.InFailed;
+					hl7Msg.Note="This message is malformed so it was not processed.";
+					HL7Msgs.Insert(hl7Msg);
 					isProcessed=false;
 				}
+				else {
+					MessageHL7 messageHl7Object=new MessageHL7(hl7Msg.MsgText);//this creates an entire heirarchy of objects.
+					try {
+						MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db
+						messageControlId=messageHl7Object.ControlId;
+						ackEvent=messageHl7Object.AckEvent;
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
+						isProcessed=false;
+					}
+				}
+				MessageHL7 hl7Ack=MessageConstructor.GenerateACK(messageControlId,isProcessed,ackEvent);
+				if(hl7Ack==null) {
+					throw new Exception("No ACK defined for the enabled HL7 definition or no HL7 definition enabled.");
+				}
+				byte[] ackByteOutgoing=Encoding.ASCII.GetBytes(MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Beginning to send ACK.\r\n"+MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR,EventLogEntryType.Information);
+				}
+				socketIncomingWorker.Send(ackByteOutgoing);//this is a locking call
+				//eCW uses the same worker socket to send the next message. Without this call to BeginReceive, they would attempt to send again
+				//and the send would fail since we were no longer listening in this thread. eCW would timeout after 30 seconds of waiting for their
+				//acknowledgement, then they would close their end and create a new socket for the next message. With this call, we can accept message
+				//after message without waiting for a new connection.
+				dataBufferIncoming=new byte[256];//clear the buffer
+				socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
 			}
-			MessageHL7 hl7Ack=MessageConstructor.GenerateACK(messageControlId,isProcessed,ackEvent);
-			if(hl7Ack==null) {
-				EventLog.WriteEntry("OpenDentHL7","No ACK defined for the enabled HL7 definition or no HL7 definition enabled.",EventLogEntryType.Information);
-				return;
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentalHL7",ex.Message,EventLogEntryType.Error);
+				receiveDone.Set();//this will trigger the main thread to accept a new incoming connection and try to receive data again
 			}
-			byte[] ackByteOutgoing=Encoding.ASCII.GetBytes(MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR);
-			if(IsVerboseLogging) {
-				EventLog.WriteEntry("OpenDentHL7","Beginning to send ACK.\r\n"+MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR,EventLogEntryType.Information);
-			}
-			socketIncomingWorker.Send(ackByteOutgoing);//this is a locking call
-			//eCW uses the same worker socket to send the next message. Without this call to BeginReceive, they would attempt to send again
-			//and the send would fail since we were no longer listening in this thread. eCW would timeout after 30 seconds of waiting for their
-			//acknowledgement, then they would close their end and create a new socket for the next message. With this call, we can accept message
-			//after message without waiting for a new connection.
-			dataBufferIncoming=new byte[8];//clear the buffer
-			socketIncomingWorker.BeginReceive(dataBufferIncoming,0,dataBufferIncoming.Length,SocketFlags.None,new AsyncCallback(OnDataReceived),null);
 		}
 		
 		private void TimerCallbackSendTCP(Object stateInfo) {
