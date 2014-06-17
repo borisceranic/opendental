@@ -139,6 +139,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			//there's not really a good place to put this function, so it's here.
 			long retVal=0;
+			//First, try getting the fee schedule from the insplan.
 			if(PatPlans.GetInsSubNum(patPlans,1)!=0){
 				InsSub SubCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlans,1),subList);
 				InsPlan PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
@@ -149,17 +150,13 @@ namespace OpenDentBusiness{
 					retVal=PlanCur.FeeSched;
 				}
 			}
-			if(retVal==0){
+			if(retVal==0){//Ins plan did not have a fee sched, check the patient.
 				if(pat.FeeSched!=0){
 					retVal=pat.FeeSched;
 				}
-				else{
-					if(pat.PriProv==0){
-						retVal=ProviderC.ListShort[0].FeeSched;
-					}
-					else{
-            //MessageBox.Show(Providers.GetIndex(Patients.Cur.PriProv).ToString());   
-						retVal=ProviderC.ListLong[Providers.GetIndexLong(pat.PriProv)].FeeSched;
+				else {//Patient did not have a fee sched, check the provider.
+					if(pat.PriProv!=0 && ProviderC.ListLong.Count>0) {
+						retVal=ProviderC.ListLong[Providers.GetIndexLong(pat.PriProv)].FeeSched;//Guaranteed to work because ProviderC.ListLong has at least one provider in the list.
 					}
 				}
 			}
