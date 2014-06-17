@@ -280,6 +280,7 @@ namespace OpenDentBusiness{
 			//VixWinBase41: Has no file paths containing outgoing patient data from Open Dental.
 			//VixWinOld: Has no file paths containing outgoing patient data from Open Dental.
 			//Xcharge: Has no file paths containing outgoing patient data from Open Dental.
+			//XVWeb: Has no file paths containing outgoing patient data from Open Dental.
 			ScrubFileForProperty(ProgramName.XDR,"InfoFile path","",true);//C:\XDRClient\Bin\infofile.txt
 		}
 

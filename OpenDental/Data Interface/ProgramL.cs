@@ -248,6 +248,10 @@ namespace OpenDental{
 				Dexis.SendData(prog,pat);//XDR uses the Dexis protocol
 				return;
 			}
+			else if(prog.ProgName==ProgramName.XVWeb.ToString()) {
+				XVWeb.SendData(prog,pat);
+				return;
+			}
 			//all remaining programs:
 			try{
 				string cmdline=prog.CommandLine;

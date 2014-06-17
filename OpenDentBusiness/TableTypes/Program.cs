@@ -97,7 +97,8 @@ namespace OpenDentBusiness{
 		VixWinBase41,
 		VixWinOld,
 		Xcharge,
-		XDR
+		XDR,
+		XVWeb
 	}
 
 	

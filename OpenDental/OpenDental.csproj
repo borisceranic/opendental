@@ -320,6 +320,7 @@
     <Compile Include="Bridges\TrophyEnhanced.cs" />
     <Compile Include="Bridges\VixWin.cs" />
     <Compile Include="Bridges\VixWinOld.cs" />
+    <Compile Include="Bridges\XVWeb.cs" />
     <Compile Include="Data Interface\AutomationL.cs" />
     <Compile Include="Data Interface\ClaimL.cs" />
     <Compile Include="Data Interface\ClearinghouseL.cs" />
