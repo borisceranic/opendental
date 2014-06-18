@@ -892,7 +892,10 @@ namespace OpenDental{
 			textDate.Text=PayPlanCur.PayPlanDate.ToShortDateString();
 			if(IsNew) {
 				textAmount.Text=TotalAmt.ToString("f");//it won't get filled in FillCharges because there are no charges yet
-				textDateFirstPay.Text=PayPlanCur.PayPlanDate.ToShortDateString();
+				//If a plan is created "today" with the customer making their first payment on the spot, they will over pay interest.  
+				//If there  is a larger gap than 1 month before the first payment, interest will be under calculated.
+				//For now, our temporary solution is to prefill the date of first payment box starting with next months date which is the most accurate for calculating interest.
+				textDateFirstPay.Text=DateTime.Now.AddMonths(1).ToShortDateString();
 			}
 			textAPR.Text=PayPlanCur.APR.ToString();
 			AmtPaid=PayPlans.GetAmtPaid(PayPlanCur.PayPlanNum);
