@@ -2288,12 +2288,11 @@ namespace OpenDental {
 //TODO: transition this to using the Tag object.
 			for(int i=0;i<table.Rows.Count;i++) {
 				//Skip commlog entries which belong to other family members per user option.
-//TODO: This does not handle jr./sr. family members. i.e. When there is a John and John Jr.
 				if(!this.checkShowFamilyComm.Checked										//show family not checked
 					&& !isSelectingFamily																	//family not selected
-					&& table.Rows[i]["patName"].ToString()!=PatCur.FName	//not this patient
-					&& table.Rows[i]["patName"].ToString()!=""						//No name; For example, formpat
-					) {
+					&& table.Rows[i]["PatNum"].ToString()!=PatCur.PatNum.ToString()	//not this patient
+					&& table.Rows[i]["patName"].ToString()!="")						//No name; For example, formpat 
+				{
 					continue;
 				}
 				row = new ODGridRow();
@@ -2304,7 +2303,7 @@ namespace OpenDental {
 				}
 				else {//one patient
 					//Matching FName is not perfect because children can have the same names as parents.
-					if(table.Rows[i]["patName"].ToString()==PatCur.FName) {//if this patient
+					if(table.Rows[i]["PatNum"].ToString()==PatCur.PatNum.ToString()) {//if this patient
 						row.Cells.Add("");
 					}
 					else {//other patient

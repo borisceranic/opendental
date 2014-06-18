@@ -276,6 +276,7 @@ namespace OpenDentBusiness {
 			table.Columns.Add("mode");
 			table.Columns.Add("Note");
 			table.Columns.Add("patName");
+			table.Columns.Add("PatNum");
 			table.Columns.Add("SheetNum");
 			//table.Columns.Add("sentOrReceived");			
 			//table.Columns.Add("");
@@ -314,13 +315,14 @@ namespace OpenDentBusiness {
 				//if(rawComm.Rows[i]["PatNum"].ToString()!=patNum.ToString()){
 				row["patName"]=rawComm.Rows[i]["FName"].ToString();
 				//}
+				row["PatNum"]=rawComm.Rows[i]["PatNum"].ToString();
 				row["SheetNum"]="0";
 				//row["sentOrReceived"]=Lans.g("enumCommSentOrReceived",
 				//	((CommSentOrReceived)PIn.PInt(rawComm.Rows[i]["SentOrReceived"].ToString())).ToString());
 				rows.Add(row);
 			}
 			//emailmessage---------------------------------------------------------------------------------------
-			command="SELECT p1.FName,MsgDateTime,SentOrReceived,Subject,EmailMessageNum "
+			command="SELECT p1.FName,MsgDateTime,SentOrReceived,Subject,EmailMessageNum,emailmessage.PatNum "
 				+"FROM emailmessage,patient p1,patient p2 "
 				+"WHERE emailmessage.PatNum=p1.PatNum "
 				+"AND p1.Guarantor=p2.Guarantor "
@@ -346,6 +348,7 @@ namespace OpenDentBusiness {
 				}
 				row["Note"]=txt+rawEmail.Rows[i]["Subject"].ToString();
 				row["patName"]=rawEmail.Rows[i]["FName"].ToString();
+				row["PatNum"]=rawEmail.Rows[i]["PatNum"].ToString();
 				row["SheetNum"]="0";
 				//if(rawEmail.Rows[i]["SentOrReceived"].ToString()=="0") {
 				//	row["sentOrReceived"]=Lans.g("AccountModule","Unsent");
@@ -375,12 +378,13 @@ namespace OpenDentBusiness {
 				row["mode"]="";
 				row["Note"]="";
 				row["patName"]="";
+				row["PatNum"]="0";//PatNum is not selected in the query and this is expected because the patName column will be blank which causes it to show in the comm log grid.
 				row["SheetNum"]="0";
 				//row["sentOrReceived"]="";
 				rows.Add(row);
 			}
 			//sheet---------------------------------------------------------------------------------------
-			command="SELECT p1.FName,DateTimeSheet,SheetNum,SheetType,Description "
+			command="SELECT p1.FName,DateTimeSheet,SheetNum,SheetType,Description,sheet.PatNum "
 				+"FROM sheet,patient p1,patient p2 "
 				+"WHERE sheet.PatNum =p1.PatNum "
 				+"AND p1.Guarantor=p2.Guarantor "
@@ -405,6 +409,7 @@ namespace OpenDentBusiness {
 				//sheetType=(SheetTypeEnum)PIn.Long(rawSheet.Rows[i]["SheetType"].ToString());
 				row["Note"]=rawSheet.Rows[i]["Description"].ToString();
 				row["patName"]=rawSheet.Rows[i]["FName"].ToString();
+				row["PatNum"]=rawSheet.Rows[i]["PatNum"].ToString();
 				row["SheetNum"]=rawSheet.Rows[i]["SheetNum"].ToString();
 				//row["sentOrReceived"]="";
 				rows.Add(row);
