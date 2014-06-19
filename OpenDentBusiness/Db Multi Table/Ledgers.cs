@@ -243,7 +243,7 @@ namespace OpenDentBusiness{
 			command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
 				"SELECT cp.PatNum PatNum,"+
 						"cp.DateCp TranDate,"+//Always use DateCP rather than ProcDate to calculate the date of a claim payment.
-						"(CASE WHEN cp.PayPlanNum=0 THEN -cp.InsPayAmt ELSE 0 END)-cp.Writeoff TranAmount "+//only InsPayAmts not attached to payment plans
+						"(CASE WHEN cp.PayPlanNum=0 THEN -cp.InsPayAmt ELSE 0 END)-cp.WriteOff TranAmount "+//only InsPayAmts not attached to payment plans
 					"FROM claimproc cp "+
 					"WHERE cp.status IN (1,4,5,7) "+//received, supplemental, CapClaim or CapComplete.
 						(guarantor==0?"":(" AND cp.PatNum IN "+familyPatNums))+";";
@@ -326,7 +326,7 @@ namespace OpenDentBusiness{
 				command+="UPDATE "+tempAgingTableName+" a,"+
 					//Calculate the insurance estimates for each patient and store the results into
 					//memory table 't'.
-					"(SELECT cp.PatNum,SUM(cp.InsPayEst+cp.Writeoff) InsEst "+
+					"(SELECT cp.PatNum,SUM(cp.InsPayEst+cp.WriteOff) InsEst "+
 							"FROM claimproc cp "+
 							"WHERE cp.PatNum<>0 "+
 							(historic?(" AND ((cp.Status=0 AND cp.ProcDate<="+DbHelper.DateColumn(asOfDate)+") OR "+
