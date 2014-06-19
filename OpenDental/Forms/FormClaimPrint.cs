@@ -52,8 +52,9 @@ namespace OpenDental{
 		//private InsPlan[] MedPlanList;
 		private List<PatPlan> ListPatPlans;
 		private Claim ClaimCur;
-		///<summary>Always length of 4.</summary>
+		///<summary>Filled with the first four diagnoses codes in the list of procedures associated with the claim. Always length of 4.</summary>
 		private string[] diagnoses;
+		///<summary>Complete list of all diagnoses.  Maximum unique length of array will be 12 due to the requirements of the medical 1500 (02-12) claim form.</summary>
 		private string[] arrayDiagnoses;
 		//private Claim[] ClaimsArray;
 		//private Claim[] MedClaimsArray;
@@ -564,7 +565,7 @@ namespace OpenDental{
 				}
 				//There's still a chance that the diagnosis didn't get added, if there were more than 4.
 			}
-			arrayDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(ListClaimProcs)).ToArray();
+			arrayDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(ListClaimProcs),true).ToArray();
 			Provider treatDent=ProviderC.ListLong[Providers.GetIndexLong(ClaimCur.ProvTreat)];
 			if(ClaimFormCur==null){
 				if(ClaimCur.ClaimForm>0){

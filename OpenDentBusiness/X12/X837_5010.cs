@@ -950,17 +950,17 @@ namespace OpenDentBusiness
 				#endregion Claim K3 NTE CRx
 				#region Claim HI HCP
 				//HI loops-------------------------------------------------------------------------------------------------------
-				List<string> listDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(claimProcs));
-				//2300 HI: BK (medical,institutional) Health Care Diagnosis Code. Situational. For OMS or anesthesiology.
+				List<string> listDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(claimProcs),false);
+				//2300 HI: BK (medical,institutional,dental) Health Care Diagnosis Code. Situational.  
 //todo: validate that diagnoses are actual ICD9 or ICD10 codes.
-				if(medType==EnumClaimMedType.Institutional && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
+				if(medType==EnumClaimMedType.Institutional && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
 					sw.Write("HI"+s
 						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
 					EndSegment(sw);
 					//Institutional claims only support 1 diagnosis code here, the principal diagnosis.
 				}
-				else if(medType==EnumClaimMedType.Medical) {
+				else if(medType==EnumClaimMedType.Medical) {//Validation guarantees there is at least one (principal) diagnosis code as required.
 					sw.Write("HI"+s
 						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
@@ -974,10 +974,24 @@ namespace OpenDentBusiness
 					}
 					EndSegment(sw);
 				}
+				else if(medType==EnumClaimMedType.Dental && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
+					sw.Write("HI"+s
+						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
+						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
+					for(int j=1;j<listDiagnoses.Count;j++) {//We allow up to 12 diagnosis codes per claim (for medical), but the dental format only allows up to 4 (see validation).
+						if(listDiagnoses[j]=="") {
+							continue;
+						}
+						sw.Write(s//this is the separator from the _previous_ field.
+							+"BF"+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9 Diagnosis
+							+Sout(listDiagnoses[j].Replace(".",""),30));//HI0#-2 1/30 Industry Code: Diagnosis code. No periods.
+					}
+					EndSegment(sw);
+				}
 				//2300 HI: BP (medical) Anesthesia Related Procedure. Situational. We do not use.
 				//2300 HI: BJ (institutional) Admitting Diagnosis. Situational. Required for inpatient admission. We do not use.
 				//2300 HI: PR (institutional) Patient's Reason for Visit. Situational. Required for outpatient visits.
-				if(medType==EnumClaimMedType.Institutional && listDiagnoses[0]!="") {//Ensure at least one (principal) diagnosis exists.
+				if(medType==EnumClaimMedType.Institutional && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one (principal) diagnosis exists.
 					sw.Write("HI"+s
 						+"PR"+isa16//HI01-1 1/3 Code List Qualifier Code: PR=ICD-9 Patient's Reason for Visit.
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: No periods. This is not really principal diagnosis but is close to the same, so someday we will add this field to claim.
@@ -1477,7 +1491,7 @@ namespace OpenDentBusiness
 						//SV107: Composite Diagnosis Code Pointer. Required when 2300HI(Health Care Diagnosis Code) is used (always).
 						//SV107-1: Primary diagnosis. Only allowed pointers 1-12.
 						//SV107-2 through SV107-4: Other diagnoses.
-						//If the diagnosis we need is not in the first 12, then we will use the primary.
+						//If the diagnosis we need is not in the first 12, then we will use the principal.
 						if(proc.DiagnosticCode=="") {//If the all 4 procedure diagnoses are blank, we will use the primary diagnosis for entire claim.
 							if(listDiagnoses[0]!="") {//Ensure that a primary diagnosis exists.
 								sw.Write("1");//use primary.
@@ -1565,19 +1579,56 @@ namespace OpenDentBusiness
 						if(IsColoradoMedicaid(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
 							includeUnits=true;
 						}
-						if(placeService!="" || area!="" || proc.Prosthesis!="" || includeUnits) {
+						bool isDiagnosisIncluded=false;
+						if(proc.DiagnosticCode!="" || proc.DiagnosticCode2!="" || proc.DiagnosticCode3!="" || proc.DiagnosticCode4!="") {
+							isDiagnosisIncluded=true;
+						}
+						if(placeService!="" || area!="" || proc.Prosthesis!="" || includeUnits || isDiagnosisIncluded) {
 							sw.Write(s+placeService);//SV303 1/2 Facility Code Value: Location Code if different from claim.
 						}
-						if(area!="" || proc.Prosthesis!="" || includeUnits) {
+						if(area!="" || proc.Prosthesis!="" || includeUnits || isDiagnosisIncluded) {
 							sw.Write(s+area);//SV304 Oral Cavity Designation: SV304-1 1/3 Oral Cavity Designation Code: Area. SV304-2 through SV304-5 are situational and we do not use.
 						}
-						if(proc.Prosthesis!="" || includeUnits) {
+						if(proc.Prosthesis!="" || includeUnits || isDiagnosisIncluded) {
 							sw.Write(s+proc.Prosthesis);//SV305 1/1 Prothesis, Crown or Inlay Code: I=Initial Placement. R=Replacement.
 						}
-						if(includeUnits) {
-							sw.Write(s+unitQty.ToString());//SV306 1/15 Quantity: Situational. Procedure count.
+						if(includeUnits || isDiagnosisIncluded) {
+							sw.Write(s);
+							if(includeUnits) {
+								sw.Write(unitQty.ToString());//SV306 1/15 Quantity: Situational. Procedure count.
+							}
 						}
-						EndSegment(sw);//SV307 throug SV311 are either not used or are situational and we do not use.
+						if(isDiagnosisIncluded) {
+							sw.Write(s);
+							//SV307 1/80 Description.  Not used.
+							sw.Write(s);
+							//SV308 1/1 Copay Status Code.  Not used.
+							sw.Write(s);
+							//SV309 1/1 Provider Agreement Code.  Not used.
+							sw.Write(s);
+							//SV310 1/1 Yes No Condition or Response Code.  Not used.
+							sw.Write(s);
+							//SV311 Composite Diagnosis Code Pointer.  Situational.  Use when diagnosis codes are needed to adjudicate the claim.
+							//SV311-1 through SV311-4 1/2 Diagnosis Code Pointer(s).
+							//If the diagnosis we need is not in the first 4, then we will use the principal.
+							int diagMatchCount=0;
+							for(int d=0;d<listDiagnoses.Count;d++) {//this list is filled with unique diagnosis codes so the following logic will create 4 correct entries.								
+								if(listDiagnoses[d]=="") {
+									continue;
+								}
+								//Validation is performed below to ensure that here are no more than 4 unique diagnoses per claim.
+								if(listDiagnoses[d]==proc.DiagnosticCode || listDiagnoses[d]==proc.DiagnosticCode2 ||
+									listDiagnoses[d]==proc.DiagnosticCode3 || listDiagnoses[d]==proc.DiagnosticCode4) 
+								{
+									if(diagMatchCount>0) {
+										sw.Write(isa16);
+									}
+									sw.Write(d+1);//1 through 12
+									diagMatchCount++;
+								}
+							}
+						}
+						EndSegment(sw);
 						//2400 TOO: Tooth Information. Number/Surface. Multiple iterations of the TOO segment are allowed only when the quantity reported in Loop ID-2400 SV306 is equal to one.
 						if(procCode.TreatArea==TreatmentArea.Tooth) {
 							sw.Write("TOO"+s
@@ -2766,7 +2817,11 @@ namespace OpenDentBusiness
 				strb.Append("No procedures attached please recreate claim");
 			}
 			List<Procedure> procList=Procedures.GetProcsFromClaimProcs(claimProcs);
-			if(Procedures.GetUniqueDiagnosticCodes(procList).Count>12) {
+			if(claim.MedType==EnumClaimMedType.Dental && Procedures.GetUniqueDiagnosticCodes(procList,false).Count>4) {
+				Comma(strb);
+				strb.Append("Claim has more than 4 unique diagnosis codes.  Create multiple claims instead.");
+			}
+			if(Procedures.GetUniqueDiagnosticCodes(procList,true).Count>12) {
 				Comma(strb);
 				strb.Append("Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
 			}

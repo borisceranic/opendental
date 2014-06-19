@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.2.1.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.2.18.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -4665,6 +4665,50 @@ namespace OpenDentBusiness {
 				command="ALTER TABLE ehrprovkey DROP COLUMN HasReportAccess";
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '14.2.1.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_2_18();
+		}
+
+		private static void To14_2_18() {
+			if(FromVersion<new Version("14.2.18.0")) {
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11') WHERE RowNum<=1";
+				}
+				long claimFormNum=PIn.Long(Db.GetScalar(command));
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P1DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P1Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P2DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P2Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P3DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P3Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P4DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P4Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P5DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P5Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P6DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P6Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P7DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P7Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P8DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P8Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P9DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P9Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P10DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P10Diagnosis'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisA' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis1'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisB' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis2'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisC' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis3'";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisD' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis4'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.2.18.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_2_X();
