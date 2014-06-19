@@ -35,7 +35,7 @@ namespace OpenDentBusiness{
 		public long PlanNum;
 		///<summary>This is the date that is used for payment reports and tracks the payment date.  Always exactly matches the date of the ClaimPayment it's attached to.  See the note under Ledgers.ComputePayments.  This will eventually not be used for aging. The ProcDate will instead be used. See ProcDate.</summary>
 		public DateTime DateCP;
-		///<summary>Amount not covered by ins which is written off.  The writeoff estimate goes in a different column.</summary>
+		///<summary>Amount not covered by ins which is written off.  The writeoff estimate goes in a different column.  This is filled with the WriteOffEst value when a claim is created.</summary>
 		public double WriteOff;
 		///<summary>The procedure code that was sent to insurance. This is not necessarily the usual procedure code.  It will already have been trimmed to 5 char if it started with "D", or it could be the alternate code.  Not allowed to be blank if it is procedure.</summary>
 		public string CodeSent;
