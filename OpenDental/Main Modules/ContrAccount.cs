@@ -2916,8 +2916,12 @@ namespace OpenDental {
 			for(int i=0;i<gridAccount.SelectedIndices.Length;i++) {
 				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
 				listProcs.Add(proc);
+			} 
+			if((claimType=="P" || claimType=="S") && Procedures.GetUniqueDiagnosticCodes(listProcs,false).Count>4) {
+				MsgBox.Show(this,"Claim has more than 4 unique diagnosis codes.  Create multiple claims instead.");
+				return new Claim();
 			}
-			if(Procedures.GetUniqueDiagnosticCodes(listProcs).Count>12) {
+			if(Procedures.GetUniqueDiagnosticCodes(listProcs,true).Count>12) {
 				MsgBox.Show(this,"Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
 				return new Claim();
 			}

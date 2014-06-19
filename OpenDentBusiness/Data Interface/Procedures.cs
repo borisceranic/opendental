@@ -1489,11 +1489,9 @@ namespace OpenDentBusiness {
 			//Reporting.Allocators.AllocatorCollection.CallAll_Allocators(pt.Guarantor);
 		}
 
-		//<summary>Returns all the unique diagnostic codes in the list.  If there is less than 12 unique codes then it will pad the list with empty entries.  Will always place the principal diagnosis as the first item in the list.</summary>
-		public static List<string> GetUniqueDiagnosticCodes(List<Procedure> listProcs) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),listProcs);
-			}
+		//<summary>Returns all the unique diagnostic codes in the list.  If there is less than 12 unique codes then it will pad the list with empty entries if isPadded is true.  Will always place the principal diagnosis as the first item in the list.</summary>
+		public static List<string> GetUniqueDiagnosticCodes(List<Procedure> listProcs,bool isPadded) {
+			//No need to check RemotingRole; no call to db.
 			List<string> listDiagnosticCodes=new List<string>();
 			for(int i=0;i<listProcs.Count;i++) {//Ensure that the principal diagnosis is first in the list.
 				Procedure proc=listProcs[i];
@@ -1515,9 +1513,9 @@ namespace OpenDentBusiness {
 				}
 				if(proc.DiagnosticCode4!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode4)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode4);
-				}				
+				}
 			}
-			while(listDiagnosticCodes.Count<12) {//Pad to at least 12 items.  Simplifies claim printing logic.
+			while(isPadded && listDiagnosticCodes.Count<12) {//Pad to at least 12 items.  Simplifies claim printing logic.
 				listDiagnosticCodes.Add("");
 			}
 			return listDiagnosticCodes;

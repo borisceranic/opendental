@@ -4667,6 +4667,50 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_2_18();
+		}
+
+		private static void To14_2_18() {
+			if(FromVersion<new Version("14.2.18.0")) {
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11') WHERE RowNum<=1";
+				}
+				long claimFormNum=PIn.Long(Db.GetScalar(command));
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P1DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P1Diagnosis' AND Xpos=440 AND YPos=483";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P2DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P2Diagnosis' AND Xpos=440 AND YPos=499";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P3DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P3Diagnosis' AND Xpos=440 AND YPos=516";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P4DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P4Diagnosis' AND Xpos=440 AND YPos=533";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P5DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P5Diagnosis' AND Xpos=440 AND YPos=550";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P6DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P6Diagnosis' AND Xpos=440 AND YPos=567";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P7DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P7Diagnosis' AND Xpos=440 AND YPos=584";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P8DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P8Diagnosis' AND Xpos=440 AND YPos=601";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P9DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P9Diagnosis' AND Xpos=440 AND YPos=617";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'P10DiagnosisPoint' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'P10Diagnosis' AND Xpos=440 AND YPos=633";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisA' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis1' AND Xpos=502 AND YPos=666";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisB' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis2' AND Xpos=502 AND YPos=683";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisC' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis3' AND Xpos=610 AND YPos=666";
+				Db.NonQ(command);
+				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisD' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis4' AND Xpos=610 AND YPos=683";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.2.18.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_3_0();
 		}
 
