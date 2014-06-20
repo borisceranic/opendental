@@ -394,6 +394,7 @@ namespace OpenDentBusiness{
 			//	X837 x837=new X837(messageText);
 			//	etrans.TransSetNum=x837.GetTransNum(claimNum);
 			//}
+			#region Canadians
 			if(etype==EtransType.Claim_CA || etype==EtransType.ClaimCOB_CA || etype==EtransType.Predeterm_CA || etype==EtransType.PredetermEOB_CA) {
 				etrans.OfficeSequenceNumber=0;
 				//find the next officeSequenceNumber
@@ -462,14 +463,11 @@ namespace OpenDentBusiness{
 					etrans.CarrierTransCounter2++;
 				}
 			}
+			#endregion
 			command="UPDATE claim SET ClaimStatus = 'S',"
 				+"DateSent= "+POut.Date(MiscData.GetNowDateTime())
 				+" WHERE claimnum = "+POut.Long(claimNum);
 			Db.NonQ(command);
-			EtransMessageText etransMessageText=new EtransMessageText();
-			etransMessageText.MessageText="";
-			EtransMessageTexts.Insert(etransMessageText);
-			etrans.EtransMessageTextNum=etransMessageText.EtransMessageTextNum;
 			Etranss.Insert(etrans);
 			return GetEtrans(etrans.EtransNum);//Since the DateTimeTrans is set upon insert, we need to read the record again in order to get the date.
 		}
