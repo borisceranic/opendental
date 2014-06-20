@@ -128,10 +128,15 @@ namespace OpenDental.Eclaims
 			if(clearhouse.Eformat==ElectronicClaimFormat.Renaissance){
 				etype=EtransType.Claim_Ren;
 			}
-			if(clearhouse.Eformat!=ElectronicClaimFormat.Canadian){
-				for(int j=0;j<queueItems.Count;j++){
+			if(clearhouse.Eformat!=ElectronicClaimFormat.Canadian) {
+				//Create the etransmessagetext that all claims in the batch will point to.
+				EtransMessageText etransMsgText=new EtransMessageText();
+				etransMsgText.MessageText=messageText;
+				EtransMessageTexts.Insert(etransMsgText);
+				for(int j=0;j<queueItems.Count;j++) {
 					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,clearhouse.ClearinghouseNum,etype,batchNum);
-					Etranss.SetMessage(etrans.EtransNum,messageText);
+					etrans.EtransMessageTextNum=etransMsgText.EtransMessageTextNum;
+					Etranss.Update(etrans);
 				}
 			}
 		}
