@@ -42,11 +42,12 @@ namespace OpenDentBusiness.HL7 {
 			}
 			HL7DefMessage hl7defmsg=null;
 			for(int i=0;i<def.hl7DefMessages.Count;i++) {
-				if(def.hl7DefMessages[i].MessageType==msg.MsgType) {//&& def.hl7DefMessages[i].EventType==msg.EventType) { //Ignoring event type for now, we will treat all ADT's and SIU's the same
+				if(def.hl7DefMessages[i].MessageType==msg.MsgType && def.hl7DefMessages[i].InOrOut==InOutHL7.Incoming) {//Ignoring event type for now, we will treat all ADT's and SIU's the same
 					hl7defmsg=def.hl7DefMessages[i];
+					break;
 				}
 			}
-			if(hl7defmsg==null) {//No message definition matches this message's MessageType and EventType
+			if(hl7defmsg==null) {//No message definition matches this message's MessageType and is Incoming
 				HL7MsgCur.Note="Could not process HL7 message.  No definition for this type of message in the enabled HL7Def.";
 				HL7Msgs.Update(HL7MsgCur);
 				throw new Exception("Could not process HL7 message.  No definition for this type of message in the enabled HL7Def.");
@@ -101,15 +102,16 @@ namespace OpenDentBusiness.HL7 {
 			if(patNum!=0) {
 				pat=Patients.GetPat(patNum);
 			}
-			if(def.InternalType!="eCWStandalone" && pat==null) {
+			if(def.InternalType!=HL7InternalType.eCWStandalone && pat==null) {
 				IsNewPat=true;
 			}
+			#region Standalone Only
 			//In eCWstandalone integration, if we couldn't locate patient by patNum or patNum was 0 then pat will still be null so try to locate by chartNum if chartNum is not null
-			if(def.InternalType=="eCWStandalone" && chartNum!=null) {
+			if(def.InternalType==HL7InternalType.eCWStandalone && chartNum!=null) {
 				pat=Patients.GetPatByChartNumber(chartNum);
 			}
 			//In eCWstandalone integration, if pat is still null we need to try to locate patient by name and birthdate
-			if(def.InternalType=="eCWStandalone" && pat==null) {
+			if(def.InternalType==HL7InternalType.eCWStandalone && pat==null) {
 				long patNumByName=Patients.GetPatNumByNameAndBirthday(patLName,patFName,birthdate);
 				//If patNumByName is 0 we couldn't locate by patNum, chartNum or name and birthdate so this message must be for a new patient
 				if(patNumByName==0) {
@@ -122,6 +124,7 @@ namespace OpenDentBusiness.HL7 {
 					Patients.Update(pat,patOld);
 				}
 			}
+			#endregion Standalone Only
 			if(IsNewPat) {
 				pat=new Patient();
 				if(chartNum!=null) {

@@ -59,7 +59,16 @@ namespace OpenDentBusiness.Crud{
 				hL7Def.RepetitionSeparator  = PIn.String(table.Rows[i]["RepetitionSeparator"].ToString());
 				hL7Def.EscapeCharacter      = PIn.String(table.Rows[i]["EscapeCharacter"].ToString());
 				hL7Def.IsInternal           = PIn.Bool  (table.Rows[i]["IsInternal"].ToString());
-				hL7Def.InternalType         = PIn.String(table.Rows[i]["InternalType"].ToString());
+				string internalType=table.Rows[i]["InternalType"].ToString();
+				if(internalType==""){
+					hL7Def.InternalType       =(HL7InternalType)0;
+				}
+				else try{
+					hL7Def.InternalType       =(HL7InternalType)Enum.Parse(typeof(HL7InternalType),internalType);
+				}
+				catch{
+					hL7Def.InternalType       =(HL7InternalType)0;
+				}
 				hL7Def.InternalTypeVersion  = PIn.String(table.Rows[i]["InternalTypeVersion"].ToString());
 				hL7Def.IsEnabled            = PIn.Bool  (table.Rows[i]["IsEnabled"].ToString());
 				hL7Def.Note                 = PIn.String(table.Rows[i]["Note"].ToString());
@@ -126,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7Def.RepetitionSeparator)+"',"
 				+"'"+POut.String(hL7Def.EscapeCharacter)+"',"
 				+    POut.Bool  (hL7Def.IsInternal)+","
-				+"'"+POut.String(hL7Def.InternalType)+"',"
+				+"'"+POut.String(hL7Def.InternalType.ToString())+"',"
 				+"'"+POut.String(hL7Def.InternalTypeVersion)+"',"
 				+    POut.Bool  (hL7Def.IsEnabled)+","
 				+DbHelper.ParamChar+"paramNote,"
@@ -164,7 +173,7 @@ namespace OpenDentBusiness.Crud{
 				+"RepetitionSeparator  = '"+POut.String(hL7Def.RepetitionSeparator)+"', "
 				+"EscapeCharacter      = '"+POut.String(hL7Def.EscapeCharacter)+"', "
 				+"IsInternal           =  "+POut.Bool  (hL7Def.IsInternal)+", "
-				+"InternalType         = '"+POut.String(hL7Def.InternalType)+"', "
+				+"InternalType         = '"+POut.String(hL7Def.InternalType.ToString())+"', "
 				+"InternalTypeVersion  = '"+POut.String(hL7Def.InternalTypeVersion)+"', "
 				+"IsEnabled            =  "+POut.Bool  (hL7Def.IsEnabled)+", "
 				+"Note                 =  "+DbHelper.ParamChar+"paramNote, "
@@ -235,7 +244,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(hL7Def.InternalType != oldHL7Def.InternalType) {
 				if(command!=""){ command+=",";}
-				command+="InternalType = '"+POut.String(hL7Def.InternalType)+"'";
+				command+="InternalType = '"+POut.String(hL7Def.InternalType.ToString())+"'";
 			}
 			if(hL7Def.InternalTypeVersion != oldHL7Def.InternalTypeVersion) {
 				if(command!=""){ command+=",";}

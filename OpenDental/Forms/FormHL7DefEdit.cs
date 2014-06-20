@@ -34,7 +34,7 @@ namespace OpenDental {
 			textDescription.Text=HL7DefCur.Description;
 			checkInternal.Checked=HL7DefCur.IsInternal;
 			checkEnabled.Checked=HL7DefCur.IsEnabled;
-			textInternalType.Text=HL7DefCur.InternalType;
+			textInternalType.Text=HL7DefCur.InternalType.ToString();
 			textInternalTypeVersion.Text=HL7DefCur.InternalTypeVersion;
 			textInPort.Text=HL7DefCur.IncomingPort;
 			textInPath.Text=HL7DefCur.IncomingFolder;
@@ -376,7 +376,8 @@ namespace OpenDental {
 			HL7DefCur.HL7Server=textHL7Server.Text;
 			HL7DefCur.HL7ServiceName=textHL7ServiceName.Text;
 			HL7DefCur.IsInternal=checkInternal.Checked;
-			HL7DefCur.InternalType=textInternalType.Text;
+			//this is read-only and cannot be changed, so no need to resave it.
+			//HL7DefCur.InternalType=(HL7InternalType)Enum.Parse(typeof(HL7InternalType),textInternalType.Text);
 			HL7DefCur.InternalTypeVersion=textInternalTypeVersion.Text;
 			HL7DefCur.Description=textDescription.Text;
 			HL7DefCur.FieldSeparator=textFieldSep.Text;

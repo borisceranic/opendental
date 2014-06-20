@@ -24,7 +24,7 @@ namespace OpenDentBusiness.HL7 {
 				def.RepetitionSeparator="~";
 				def.EscapeCharacter=@"\";
 				def.IsInternal=true;
-				def.InternalType="eCWFull";
+				def.InternalType=HL7InternalType.eCWFull;
 				def.InternalTypeVersion=Assembly.GetAssembly(typeof(Db)).GetName().Version.ToString();
 				def.IsEnabled=false;
 				def.Note="";

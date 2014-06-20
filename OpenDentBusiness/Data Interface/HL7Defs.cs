@@ -43,12 +43,12 @@ namespace OpenDentBusiness{
 		#endregion
 
 		///<summary>Gets an internal HL7Def from the database of the specified type.</summary>
-		public static HL7Def GetInternalFromDb(string internalType) {
+		public static HL7Def GetInternalFromDb(HL7InternalType internalType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<HL7Def>(MethodBase.GetCurrentMethod(),internalType);
 			}
 			string command="SELECT * FROM hl7def WHERE IsInternal=1 "
-				+"AND InternalType='"+POut.String(internalType)+"'";
+				+"AND InternalType='"+POut.String(internalType.ToString())+"'";
 			return Crud.HL7DefCrud.SelectOne(command);
 		}
 
@@ -79,17 +79,20 @@ namespace OpenDentBusiness{
 			}
 			List<HL7Def> listInternal=new List<HL7Def>();
 			HL7Def def;
-			def=GetInternalFromDb("eCWFull");//might be null
+			def=GetInternalFromDb(HL7InternalType.eCWFull);//might be null
 			def=InternalEcwFull.GetDeepInternal(def);
 			listInternal.Add(def);
-			def=GetInternalFromDb("eCWStandalone");
+			def=GetInternalFromDb(HL7InternalType.eCWStandalone);
 			def=InternalEcwStandalone.GetDeepInternal(def);
 			listInternal.Add(def);
-			def=GetInternalFromDb("eCWTight");
+			def=GetInternalFromDb(HL7InternalType.eCWTight);
 			def=InternalEcwTight.GetDeepInternal(def);
 			listInternal.Add(def);
-			def=GetInternalFromDb("Centricity");
+			def=GetInternalFromDb(HL7InternalType.Centricity);
 			def=InternalCentricity.GetDeepInternal(def);
+			listInternal.Add(def);
+			def=GetInternalFromDb(HL7InternalType.HL7v2_6);
+			def=InternalHL7v2_6.GetDeepInternal(def);
 			listInternal.Add(def);
 			//Add defs for other companies like Centricity here later.
 			return listInternal;
@@ -98,17 +101,20 @@ namespace OpenDentBusiness{
 		///<summary>Gets from C# internal code rather than db</summary>
 		private static void GetDeepForInternal(HL7Def def) {
 			//No need to check RemotingRole; no call to db.
-			if(def.InternalType=="eCWFull") {
+			if(def.InternalType==HL7InternalType.eCWFull) {
 				def=InternalEcwFull.GetDeepInternal(def);//def that we're passing in is guaranteed to not be null
 			}
-			else if(def.InternalType=="eCWStandalone") {
+			else if(def.InternalType==HL7InternalType.eCWStandalone) {
 				def=InternalEcwStandalone.GetDeepInternal(def);
 			}
-			else if(def.InternalType=="eCWTight") {
+			else if(def.InternalType==HL7InternalType.eCWTight) {
 				def=InternalEcwTight.GetDeepInternal(def);
 			}
-			else if(def.InternalType=="Centricity") {
+			else if(def.InternalType==HL7InternalType.Centricity) {
 				def=InternalCentricity.GetDeepInternal(def);
+			}
+			else if(def.InternalType==HL7InternalType.HL7v2_6) {
+				def=InternalHL7v2_6.GetDeepInternal(def);
 			}
 			//no need to return a def because the original reference won't have been lost.
 		}
@@ -156,7 +162,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Only used from Unit Tests.  Since we clear the db of hl7Defs we have to insert this internal def not update it.</summary>
-		public static void EnableInternalForTests(string internalType) {
+		public static void EnableInternalForTests(HL7InternalType internalType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),internalType);
 				return;

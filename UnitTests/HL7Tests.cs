@@ -26,15 +26,15 @@ namespace UnitTests {
 			//Enable the correct eCW program link or HL7Def
 			switch(hl7TestInterfaceEnum) {
 				case HL7TestInterfaceEnum.HL7DefEcwFull:
-					HL7Defs.EnableInternalForTests("eCWFull");
+					HL7Defs.EnableInternalForTests(HL7InternalType.eCWFull);
 					HL7Defs.RefreshCache();
 					break;
 				case HL7TestInterfaceEnum.HL7DefEcwStandalone:
-					HL7Defs.EnableInternalForTests("eCWStandalone");
+					HL7Defs.EnableInternalForTests(HL7InternalType.eCWStandalone);
 					HL7Defs.RefreshCache();
 					break;
 				case HL7TestInterfaceEnum.HL7DefEcwTight:
-					HL7Defs.EnableInternalForTests("eCWTight");
+					HL7Defs.EnableInternalForTests(HL7InternalType.eCWTight);
 					HL7Defs.RefreshCache();
 					break;
 			}

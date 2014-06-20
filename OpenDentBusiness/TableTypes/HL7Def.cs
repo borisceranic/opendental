@@ -35,8 +35,9 @@ namespace OpenDentBusiness{
 		public string EscapeCharacter;
 		///<summary>If this is set, then there will be no child tables. Internal types are fully defined within the C# code rather than in the database.</summary>
 		public bool IsInternal;
-		///<summary>This will always have a value because we always start with a copy of some internal type.</summary>
-		public string InternalType;
+		///<summary>Stored in db as string, but used in OD as enum HL7InternalType. Example: eCWTight.  This will always have a value because we always start with a copy of some internal type.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public HL7InternalType InternalType;
 		///<summary>Example: 12.2.14. This will be empty if IsInternal. This records the version at which they made their copy. We might have made significant improvements since their copy.</summary>
 		public string InternalTypeVersion;
 		///<summary>.</summary>
@@ -102,6 +103,32 @@ namespace OpenDentBusiness{
 		Change,
 		///<summary>Can change and add patients.  Might get overwritten by next incoming message.</summary>
 		ChangeAndAdd
+	}
+
+	///<summary>Stored in the database as a string.  The items in this enumeration can be freely rearranged without damaging the database.  But can't change spelling or remove existing items.</summary>
+	public enum HL7InternalType {
+		///<summary><para>Message structure is identical to eCWTight, minor changes in the program like showing patient demographics and the account module.</para>
+		///<para>Like eCWTight, eCW dictates the patients' PatNums in PID.2, so we try to locate the patient with that PatNum.</para>
+		///<para>If not found we do not attempt to use PID.4 ChartNumber or name, we assume new patient and insert.</para></summary>
+		eCWFull,
+		///<summary><para>Only Incoming ADT messages are processed, OD is responsible for adding patients so we assign PatNum.</para>
+		///<para>The incoming messages patient ID in PID.2 is stored as ChartNumber and PID.4 is not processed.</para>
+		///<para>The Account and Chart modules are visible and the users can change and add patients in OD.  No outgoing messages.</para></summary>
+		eCWStandalone,
+		///<summary><para>Patient demographics are hidden as well as account and appt modules.</para>
+		///<para>We let eCW dictate the PatNum values in PID.2 and trust that they are unique and longs (no string characters).</para>
+		///<para>Unlike Standalone, if the pat isn't found by PID.2 PatNum we don't try to locate the pat by PID.4 ChartNumber or name, we assume it's a new pat.</para></summary>
+		eCWTight,
+		///<summary><para>Account and Appointment modules are visible and users can change and add patients.</para>
+		///<para>Only outgoing DFT message defined, no incoming messages are processed.</para></summary>
+		Centricity,
+		///<summary><para>Our default behavior for processing and sending HL7 messages.</para>
+		///<para>Send and receive ADT and SIU messages, receive DFT messages.</para>
+		///<para>The v2.6 documentation claims both PID.2 and PID.4 are only retained for backward compatibility and PID.3 is now required and used for a list of patient IDs.</para>
+		///<para>We will still put ChartNumber in PID.2 (used to be referred to as 'external ID' by HL7 doc) for outgoing msgs and look for our PatNum in PID.2 for incoming msgs.</para>
+		///<para>We will now also check PID.3 for a repitition that contains our PatNum as part of the CX data type.</para>
+		///<para>Account and Appointments module are visible and users can change and add patients.</para></summary>
+		HL7v2_6
 	}
 
 	

@@ -125,6 +125,9 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<HL7Msg>>(MethodBase.GetCurrentMethod(),hl7Msg);
 			}
+			//Might want to change the following query to:
+			//string command="SELECT * FROM hl7msg WHERE HL7Status IN("+POut.Long((int)HL7MessageStatus.InProcessed)+","+POut.Long((int)HL7MessageStatus.OutSent)
+			//+") AND MsgText='"+POut.String(hl7Msg.MsgText)+"' "+DbHelper.LimitAnd(1);
 			string command="SELECT * FROM hl7msg WHERE MsgText='"+POut.String(hl7Msg.MsgText)+"' "+DbHelper.LimitAnd(1);
 			return Crud.HL7MsgCrud.SelectMany(command);//Just 0 or 1 item in list for now.
 		}
