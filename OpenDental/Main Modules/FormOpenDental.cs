@@ -3406,6 +3406,7 @@ namespace OpenDental{
 				//Need to add a test to this: do not play messages that are over 2 minutes old.
 				Thread newThread=new Thread(new ParameterizedThreadStart(PlaySounds));
 				newThread.Start(sigListButs);
+				Plugins.HookAddCode(this,"FormOpenDental.ProcessSignals_end",sigList);
 			}
 			catch {
 				signalLastRefreshed=DateTime.Now;
