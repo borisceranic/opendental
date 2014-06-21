@@ -1465,9 +1465,7 @@ namespace OpenDentBusiness {
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 					Procedures.SetCanadianLabFeesCompleteForProc(ProcList[i]);
 				}
-				if(RemotingClient.RemotingRole==RemotingRole.ClientDirect) {//this is a temporary safe fix
-					Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",ProcList[i],oldProc);
-				}
+				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",ProcList[i],oldProc);
 				Procedures.Update(ProcList[i],oldProc);
 				Procedures.ComputeEstimates(ProcList[i],apt.PatNum,ClaimProcList,false,PlanList,patPlans,benefitList,patientAge,subList);
 				ClaimProcs.SetProvForProc(ProcList[i],ClaimProcList);
