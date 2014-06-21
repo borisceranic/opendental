@@ -63,7 +63,8 @@ namespace OpenDentBusiness {
 				}
 				catch(Exception ex) {
 					//how to handle this for RemotingRole.ServerWeb?:
-					MessageBox.Show(ex.Message);
+					MessageBox.Show("Error loading Plugin:"+ProgramC.Listt[i].PluginDllName+"\r\n"
+						+ex.Message);
 					continue;//don't add it to plugin list.
 				}
 				PluginContainer container=new PluginContainer();
