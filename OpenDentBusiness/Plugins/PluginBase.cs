@@ -7,8 +7,8 @@ using System.Windows.Forms;
 namespace OpenDentBusiness {
 	public abstract class PluginBase {
 		private Form host;
-		
-		///<summary>This will be a refrence to the main FormOpenDental so that it can be used by    the plugin if needed.  It is set once on startup, so it's a good place to put startup code.</summary>
+
+		///<summary>This will be a refrence to the main FormOpenDental so that it can be used by    the plugin if needed.  It is set once on startup, so it's a good place to put startup code.   If this is the middle tier, then this will be null.</summary>
 		public virtual Form Host { 
 			get { 
 				return host; 
@@ -28,6 +28,7 @@ namespace OpenDentBusiness {
 			return false;
 		}
 
+		///<summary>Plugin button now supports no patient loaded, patNum=0.  Plugin writers may need to give error message to user in this situation.</summary>
 		public virtual void LaunchToolbarButton(long patNum) {
 
 		}

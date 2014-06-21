@@ -7,10 +7,11 @@ using System.Text;
 using System.Windows.Forms;
 using CodeBase;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	public class Plugins {
 		private static List<PluginContainer> PluginList;
 		//public static bool Active=false;
+
 		public static bool PluginsAreLoaded {
 			get {
 				if(PluginList==null) {
@@ -22,12 +23,14 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>If this is middle tier, pass in null.</summary>
 		public static void LoadAllPlugins(Form host) {
 			//No need to check RemotingRole; no call to db.
 			PluginList=new List<PluginContainer>();
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return;//no plugins will load.  So from now on, we can assume a direct connection.
-			}
+			//if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+			//  js 6/20/14 Don't do this.  We will now support plugins for middle tier.
+			//	return;//no plugins will load.  So from now on, we can assume a direct connection.
+			//}
 			for(int i=0;i<ProgramC.Listt.Count;i++) {
 				if(!ProgramC.Listt[i].Enabled) {
 					continue;
@@ -36,11 +39,14 @@ namespace OpenDentBusiness{
 					continue;
 				}
 				string dllPath=ODFileUtils.CombinePaths(Application.StartupPath,ProgramC.Listt[i].PluginDllName);
+				if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
+					dllPath=ODFileUtils.CombinePaths(System.Web.HttpContext.Current.Server.MapPath(null),ProgramC.Listt[i].PluginDllName);
+				}
 				if(dllPath.Contains("[VersionMajMin]")) {
 					Version vers=new Version(Application.ProductVersion);
 					string dllPathWithVersion=dllPath.Replace("[VersionMajMin]",vers.Major.ToString()+"."+vers.Minor.ToString());
 					dllPath=dllPath.Replace("[VersionMajMin]","");//now stripped clean
-					if(File.Exists(dllPathWithVersion)){
+					if(File.Exists(dllPathWithVersion)) {
 						File.Copy(dllPathWithVersion,dllPath,true);
 					}
 				}
@@ -56,6 +62,7 @@ namespace OpenDentBusiness{
 					plugin.Host=host;
 				}
 				catch(Exception ex) {
+					//how to handle this for RemotingRole.ServerWeb?:
 					MessageBox.Show(ex.Message);
 					continue;//don't add it to plugin list.
 				}
@@ -80,6 +87,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Adds code without disrupting existing code.</summary>
 		public static void HookAddCode(object sender,string hookName,params object[] parameters) {
+			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server..
+				LoadAllPlugins(null);
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				//if there are multiple plugins, we run them all
 				PluginList[i].Plugin.HookAddCode(sender,hookName,parameters);

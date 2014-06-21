@@ -35,7 +35,10 @@ namespace OpenDental{
 				}
 			}
 			if(prog.PluginDllName!="") {
-				if(pat!=null) {
+				if(pat==null) {
+					Plugins.LaunchToolbarButton(programNum,0);
+				}
+				else{
 					Plugins.LaunchToolbarButton(programNum,pat.PatNum);
 				}
 				return;
