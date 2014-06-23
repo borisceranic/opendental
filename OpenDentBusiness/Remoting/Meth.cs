@@ -171,7 +171,9 @@ namespace OpenDentBusiness {
 			else {
 				dto.ObjectType=typeof(T).FullName;
 			}
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			//dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -198,7 +200,9 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetString dto=new DtoGetString();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			//dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;

@@ -290,7 +290,7 @@ namespace OpenDentBusiness{
 				dto.Credentials=new Credentials();
 				dto.Credentials.Username=oduser;
 				dto.Credentials.Password=odpass;//Userods.EncryptPassword(password);
-				dto.MethodName="Security.LogInWeb";
+				dto.MethodName="OpenDentBusiness.Security.LogInWeb";
 				dto.ObjectType=typeof(Userod).FullName;
 				object[] parameters=new object[] { oduser,odpass,configPath,clientVersionStr,usingEcw };
 				Type[] objTypes=new Type[] { typeof(string),typeof(string),typeof(string),typeof(string),typeof(bool) };

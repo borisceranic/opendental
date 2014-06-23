@@ -131,15 +131,30 @@ namespace OpenDentalServer {
 				}
 				else if(type == typeof(DtoGetObject)) {
 					DtoGetObject dtoGetObject=(DtoGetObject)dto;
-					string className=dtoGetObject.MethodName.Split('.')[0];
-					string methodName=dtoGetObject.MethodName.Split('.')[1];
+					string assemblyName=dtoGetObject.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
+					string className=dtoGetObject.MethodName.Split('.')[1];
+					string methodName=dtoGetObject.MethodName.Split('.')[2];
 					if(className != "Security" || methodName != "LogInWeb") {//because credentials will be checked inside that method
 						Userods.CheckCredentials(dtoGetObject.Credentials);//will throw exception if fails.
 					}
-					string assemb=Assembly.GetAssembly(typeof(Db)).FullName;//any OpenDentBusiness class will do.
-					Type classType=Type.GetType("OpenDentBusiness."+className+","+assemb);
+					Type classType=null;
+					if(assemblyName!="OpenDentBusiness") {//plugin
+						Assembly ass=null;
+						try {
+							ass=Plugins.GetAssembly(assemblyName);
+						}
+						catch {
+							throw new ApplicationException("Plugin not loaded: "+assemblyName);
+						}
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
+					}
+					else {
+						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className+","+assemblyName);
+					}
 					DtoObject[] parameters=dtoGetObject.Params;
-					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemb);
+					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
 					MethodInfo methodInfo=classType.GetMethod(methodName,paramTypes);
 					if(methodInfo==null) {
 						throw new ApplicationException("Method not found with "+parameters.Length.ToString()+" parameters: "+dtoGetObject.MethodName);
@@ -157,12 +172,27 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetString)) {
 					DtoGetString dtoGetString=(DtoGetString)dto;
 					Userods.CheckCredentials(dtoGetString.Credentials);//will throw exception if fails.
-					string className=dtoGetString.MethodName.Split('.')[0];
-					string methodName=dtoGetString.MethodName.Split('.')[1];
-					string assemb=Assembly.GetAssembly(typeof(Db)).FullName;//any OpenDentBusiness class will do.
-					Type classType=Type.GetType("OpenDentBusiness."+className+","+assemb);
+					string assemblyName=dtoGetString.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
+					string className=dtoGetString.MethodName.Split('.')[1];
+					string methodName=dtoGetString.MethodName.Split('.')[2];
+					Type classType=null;
+					if(assemblyName!="OpenDentBusiness") {//plugin
+						Assembly ass=null;
+						try {
+							ass=Plugins.GetAssembly(assemblyName);
+						}
+						catch {
+							throw new ApplicationException("Plugin not loaded: "+assemblyName);
+						}
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
+					}
+					else {
+						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className+","+assemblyName);
+					}
 					DtoObject[] parameters=dtoGetString.Params;
-					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemb);
+					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
 					MethodInfo methodInfo=classType.GetMethod(methodName,paramTypes);
 					if(methodInfo==null) {
 						throw new ApplicationException("Method not found with "+parameters.Length.ToString()+" parameters: "+dtoGetString.MethodName);

@@ -54,9 +54,12 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				PluginBase plugin=null;
+				Assembly ass=null;
+				string assName="";
 				try {
-					Assembly ass=Assembly.LoadFile(dllPath);
-					string typeName=Path.GetFileNameWithoutExtension(dllPath)+".Plugin";
+					ass=Assembly.LoadFile(dllPath);
+					assName=Path.GetFileNameWithoutExtension(dllPath);
+					string typeName=assName+".Plugin";
 					Type type=ass.GetType(typeName);
 					plugin=(PluginBase)Activator.CreateInstance(type);
 					plugin.Host=host;
@@ -70,9 +73,22 @@ namespace OpenDentBusiness {
 				PluginContainer container=new PluginContainer();
 				container.Plugin=plugin;
 				container.ProgramNum=ProgramC.Listt[i].ProgramNum;
+				container.Assemb=ass;
+				container.Name=assName;
 				PluginList.Add(container);
-				//Active=true;
 			}
+		}
+
+		public static Assembly GetAssembly(string name) {
+			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server.
+				LoadAllPlugins(null);
+			}
+			for(int i=0;i<PluginList.Count;i++) {
+				if(PluginList[i].Name==name) {
+					return PluginList[0].Assemb;
+				}
+			}
+			throw new ApplicationException();//will bubble up
 		}
 
 		///<summary>Will return true if a plugin implements this method, replacing the default behavior.</summary>
@@ -88,7 +104,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Adds code without disrupting existing code.</summary>
 		public static void HookAddCode(object sender,string hookName,params object[] parameters) {
-			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server..
+			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server.
 				LoadAllPlugins(null);
 			}
 			for(int i=0;i<PluginList.Count;i++) {
