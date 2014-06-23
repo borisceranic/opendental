@@ -26,7 +26,8 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetTable dto=new DtoGetTable();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -68,7 +69,8 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetDS dto=new DtoGetDS();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -95,7 +97,8 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetLong dto=new DtoGetLong();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -122,7 +125,8 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetInt dto=new DtoGetInt();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -149,7 +153,8 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetVoid dto=new DtoGetVoid();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
@@ -171,7 +176,6 @@ namespace OpenDentBusiness {
 			else {
 				dto.ObjectType=typeof(T).FullName;
 			}
-			//dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
 				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
@@ -200,7 +204,6 @@ namespace OpenDentBusiness {
 				}
 			#endif
 			DtoGetString dto=new DtoGetString();
-			//dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
 				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
@@ -216,7 +219,8 @@ namespace OpenDentBusiness {
 				throw new ApplicationException("Meth.GetBool may only be used when RemotingRole is ClientWeb.");
 			}
 			DtoGetBool dto=new DtoGetBool();
-			dto.MethodName=methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
 			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
 			dto.Credentials=new Credentials();
 			dto.Credentials.Username=Security.CurUser.UserName;
