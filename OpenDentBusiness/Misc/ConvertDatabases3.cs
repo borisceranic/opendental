@@ -5173,7 +5173,56 @@ namespace OpenDentBusiness {
 						+"'XVWeb')";
 					Db.NonQ(command);
 				}//end XVWeb bridge
-
+				//Insert VixWinBase36 bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'VixWinBase36', "
+						+"'VixWin(Base36) from www.gendexxray.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\VixWin\VixWin.exe")+"',"
+						+"'', "
+						+"'This VixWin bridge uses base 36 PatNums.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+POut.Long(programNum)+", "
+						+"'Image Path', "
+						+"'')";//User will be required to set up image path before using bridge. If they try to use it they will get a warning message and the bridge will fail gracefully.
+					Db.NonQ32(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+POut.Long(programNum)+", "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'VixWinBase36')";
+					Db.NonQ32(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'VixWinBase36', "
+						+"'VixWin(Base36) from www.gendexxray.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\VixWin\VixWin.exe")+"',"
+						+"'', "
+						+"'This VixWin bridge uses base 36 PatNums.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+						+POut.Long(programNum)+", "
+						+"'Image Path', "
+						+"'')";//User will be required to set up image path before using bridge. If they try to use it they will get a warning message and the bridge will fail gracefully.
+					Db.NonQ32(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+						+POut.Long(programNum)+", "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'VixWinBase36')";
+					Db.NonQ32(command);
+				}//end VixWinBase36 bridge
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
