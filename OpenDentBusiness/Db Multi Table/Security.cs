@@ -250,11 +250,12 @@ namespace OpenDentBusiness{
 				//Environment.CurrentDirectory,"OpenDentalServerConfig.xml"));
 				//Then, check username and password
 				Userod user=Userods.CheckUserAndPassword(oduser,odpass,usingEcw);
-				#if DEBUG
+				/*#if DEBUG
 					if(oduser==""){
 						user=Userods.GetUserByName("Admin",usingEcw);//without checking password.  Makes debugging faster.
+						//No, don't do it this way.  This is the server, so need to pass it in properly from the client or Security.PasswordTyped will be absent on the server.
 					}
-				#endif
+				#endif*/
 				if(user==null) {
 					throw new Exception("Invalid username or password.");
 				}

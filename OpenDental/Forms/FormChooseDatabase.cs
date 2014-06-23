@@ -823,8 +823,15 @@ namespace OpenDental{
 					if(useEcwAlgorithm){
 						password=Userods.EncryptPassword(password,true);
 					}
+					string username=textUser2.Text;
+					#if DEBUG
+						if(username=="") {
+							username="Admin";
+							password="pass";
+						}
+					#endif
 					//ecw requires hash, but non-ecw requires actual password
-					Userod user=Security.LogInWeb(textUser2.Text,password,"",Application.ProductVersion,useEcwAlgorithm);
+					Userod user=Security.LogInWeb(username,password,"",Application.ProductVersion,useEcwAlgorithm);
 					Security.CurUser=user;
 					Security.PasswordTyped=password;//for ecw, this is already encrypted.//textPassword2.Text;
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
