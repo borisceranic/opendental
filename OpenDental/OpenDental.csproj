@@ -254,6 +254,7 @@
     <Compile Include="Bridges\RayMage.cs" />
     <Compile Include="Bridges\MiPACS.cs" />
     <Compile Include="Bridges\QuickBooks.cs" />
+    <Compile Include="Bridges\VixWinBase36.cs" />
     <Compile Include="Bridges\VixWinBase41.cs" />
     <Compile Include="Bridges\EvaSoft.cs" />
     <Compile Include="Bridges\Orion.cs" />

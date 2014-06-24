@@ -94,6 +94,7 @@ namespace OpenDentBusiness{
 		Vipersoft,
 		VistaDent,
 		VixWin,
+		VixWinBase36,
 		VixWinBase41,
 		VixWinOld,
 		Xcharge,

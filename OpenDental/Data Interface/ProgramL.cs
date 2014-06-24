@@ -239,6 +239,10 @@ namespace OpenDental{
 				VixWin.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.VixWinBase36.ToString()) {
+				VixWinBase36.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.VixWinBase41.ToString()) {
 				VixWinBase41.SendData(prog,pat);
 				return;
