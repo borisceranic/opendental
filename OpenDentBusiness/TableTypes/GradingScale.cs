@@ -9,11 +9,11 @@ namespace OpenDentBusiness{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long GradingScaleNum;
-		///<summary>Enum:ScaleType Used to determine method of assigning grades.  PickList will be the only type that has GradingScaleItems.</summary>
-		public ScaleType ScaleType;
+		///<summary>Enum:EnumScaleType Used to determine method of assigning grades.  PickList will be the only type that has GradingScaleItems.</summary>
+		public EnumScaleType ScaleType;
 		///<summary>For example, A-F or Pass/Fail.</summary>
 		public string Description;
-		///<summary>For ScaleType=Points, this is just a default.  For percentages, this gets set to 100 and cannot be changed.  For PickList, 4 is a typical example.</summary>
+		///<summary>For ScaleType=Points, this is just a default.  For percentages, this gets set to 100 and cannot be changed. PickList will not use this column.</summary>
 		public float MaxPointsPoss;
 
 		///<summary></summary>
@@ -21,9 +21,19 @@ namespace OpenDentBusiness{
 			return (GradingScale)this.MemberwiseClone();
 		}
 
+		
+
 	}
 
-	
+	///<summary>Used in GradingScale to determine how grades are assigned.</summary>
+		public enum EnumScaleType {
+			///<summary>0- User-Defined list of possible grades.  Grade is calculated as an average.</summary>
+			PickList,
+			///<summary>1- Percentage Scale 0-100.  Grade is calculated as an average.</summary>
+			Percentage,
+			///<summary>2- Allows point values for grades.  Grade is calculated as a sum of all points out of points possible.</summary>
+			Points
+		}
 }
 
 

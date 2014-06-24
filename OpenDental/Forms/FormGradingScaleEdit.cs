@@ -9,7 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormGradingScaleEdit:Form {
-		List<GradingScaleItem> _listGradingScaleItems;
+		private List<GradingScaleItem> _listGradingScaleItems;
 		private GradingScale _gradingScaleCur;
 		///<summary>False when grading scale is in use by an evaluation.</summary>
 		private bool _isEditable=true;
@@ -21,17 +21,27 @@ namespace OpenDental {
 		}
 
 		private void FormGradingScaleEdit_Load(object sender,EventArgs e) {
+			comboScaleType.SelectedIndex=-1;
+			for(int i=0;i<Enum.GetNames(typeof(EnumScaleType)).Length;i++) {
+				comboScaleType.Items.Add(Lan.g("FormGradingScaleEdit",Enum.GetNames(typeof(EnumScaleType))[i]));
+				if(i==(int)_gradingScaleCur.ScaleType) {
+					comboScaleType.SelectedIndex=i;
+				}
+			}
+			if(comboScaleType.SelectedIndex==(int)EnumScaleType.PickList) {
+				textMaxPointsPossible.ReadOnly=true;
+			}
+			textMaxPointsPossible.Text=_gradingScaleCur.MaxPointsPoss.ToString();
+			textDescription.Text=_gradingScaleCur.Description;
 			if(_gradingScaleCur.IsNew) {
 				return;
 			}
-			textDescription.Text=_gradingScaleCur.Description;
-			for(int i=0;i<Enum.GetNames(typeof(ScaleType)).Length;i++) {
-				comboScaleType.Items.Add(Enum.GetNames(typeof(ScaleType))[i]);
-			}
-			comboScaleType.SelectedIndex=0;
 			if(GradingScales.IsInUseByEvaluation(_gradingScaleCur)) {
-				labelIsPercentage.Text=Lan.g(this,"Grading scale is not editable.  It is currently in use by an evaluation.");
-				labelIsPercentage.Visible=true;
+				//Locking grading scales from being edited is necessary with the current schema since changing grading scales that are in use 
+				//would result in changing grades for previously filled out evaluations. 
+				//This could be changed later by creating copies of grading scales and attaching them to the evaluation/criterion similarly to evaluationdefs.
+				labelWarning.Text=Lan.g(this,"Grading scale is not editable.  It is currently in use by an evaluation.");
+				labelWarning.Visible=true;
 				_isEditable=false;
 				butAdd.Visible=false;
 				butOK.Visible=false;
@@ -62,6 +72,7 @@ namespace OpenDental {
 			}
 			gridMain.EndUpdate();
 		}
+
 		private void gridMain_DoubleClick(object sender,EventArgs e) {
 			if(!_isEditable) {
 				return;
@@ -80,35 +91,77 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void checkIsPercentage_Click(object sender,EventArgs e) {
-			//if(checkIsPercentage.Checked) {
-			//	labelIsPercentage.Visible=true;
-			//	butAdd.Enabled=false;
-			//}
-			//else {
-			//	labelIsPercentage.Visible=false;
-			//	butAdd.Enabled=true;
-			//}
+		private void comboScaleType_SelectionChangeCommitted(object sender,EventArgs e) {
+			//Maximum points isn't really used for anything besides points.  
+			//Later it may be useful to change maximum points to be on criterion instead and have this points grading scale
+			//be more like a flag that designates whether or not those criterion need to be given maximum points.
+			//For now MaximumPoints is used to determine a point max for the evaluation, it is still possible to give them less than the maximum.
+			if(comboScaleType.SelectedIndex==(int)EnumScaleType.PickList) {
+				textMaxPointsPossible.ReadOnly=true;
+				textMaxPointsPossible.Text="";
+				butAdd.Enabled=true;
+				labelWarning.Visible=false;
+				labelPercent.Visible=false;
+			}
+			else if(comboScaleType.SelectedIndex==(int)EnumScaleType.Percentage) {
+				textMaxPointsPossible.Text="100";
+				textMaxPointsPossible.ReadOnly=true;
+				butAdd.Enabled=false;
+				labelWarning.Visible=true;
+				labelPercent.Visible=true;
+			}
+			else {//ScaleType.Points
+				textMaxPointsPossible.ReadOnly=false;
+				butAdd.Enabled=false;
+				labelWarning.Visible=true;
+				labelPercent.Visible=false;
+			}
+		}
+
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the grading scale.  Continue?")) {
+				return;
+			}
+			try {
+				GradingScales.Delete(_gradingScaleCur.GradingScaleNum);
+				DialogResult=DialogResult.OK;
+			}
+			catch(Exception ex) {
+				MessageBox.Show(this,ex.Message);
+			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			_gradingScaleCur.Description=textDescription.Text;
-			//_gradingScaleCur.IsPercentage=checkIsPercentage.Checked;
-			if(GradingScales.IsDupicateDescription(_gradingScaleCur)) {
+			_gradingScaleCur.ScaleType=(EnumScaleType)comboScaleType.SelectedIndex;
+			if(GradingScales.IsDupicateDescription(_gradingScaleCur)) {//This will check it for like types.
 				MsgBox.Show(this,"The selected grading scale description is already used by another grading scale.  Please input a unique description.");
 				return;
 			}
-			//if(checkIsPercentage.Checked) {
-			//	GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
-			//}
+			float maxPoints=0;
+			if(_gradingScaleCur.ScaleType==EnumScaleType.Points && !float.TryParse(textMaxPointsPossible.Text,out maxPoints)) {//Points only matter for the Points system
+				MsgBox.Show(this,"The maximum point value is not in a valid number format.  Please input maximum points as a valid number.");
+				return;
+			}
+			_gradingScaleCur.Description=textDescription.Text;
+			_gradingScaleCur.ScaleType=(EnumScaleType)comboScaleType.SelectedIndex;
+			_gradingScaleCur.MaxPointsPoss=PIn.Long(textMaxPointsPossible.Text);
+			if(comboScaleType.SelectedIndex!=(int)EnumScaleType.PickList && comboScaleType.Visible) {//Deletes all items if not picklist scaletype.
+				GradingScaleItems.DeleteAllByGradingScale(_gradingScaleCur.GradingScaleNum);
+			}
 			GradingScales.Update(_gradingScaleCur);
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			if(_gradingScaleCur.IsNew) {
-				GradingScaleItems.DeleteAllFromGradingScale(_gradingScaleCur.GradingScaleNum);
-				GradingScales.Delete(_gradingScaleCur.GradingScaleNum);
+				try {
+					GradingScales.Delete(_gradingScaleCur.GradingScaleNum);
+				}
+				catch(Exception ex) {
+					MessageBox.Show(this,ex.Message);
+					return;
+				}
 			}
 			DialogResult=DialogResult.Cancel;
 		}

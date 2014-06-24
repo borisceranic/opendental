@@ -1477,15 +1477,6 @@ namespace OpenDentBusiness{
 		EZTEC_OTHER_DS_OPEN
 	}
 
-	///<summary>Used in GradingScale to determine how grades are assigned.</summary>
-	public enum ScaleType {
-		///<summary>0- User-Defined list of possible grades</summary>
-		PickList,
-		///<summary>1- Percentage Scale 0-100</summary>
-		Percentage,
-		///<summary>2- Allows point values for grades.</summary>
-		Points
-	}
 
 	
 }

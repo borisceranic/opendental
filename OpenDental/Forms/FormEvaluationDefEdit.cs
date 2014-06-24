@@ -31,7 +31,7 @@ namespace OpenDental {
 			for(int j=0;j<_criterionDefsForEval.Count;j++) {
 				_itemOrder.Add(_criterionDefsForEval[j].EvaluationCriterionDefNum);
 			}
-			List<GradingScale> gradingScales=GradingScales.Refresh();
+			List<GradingScale> gradingScales=GradingScales.RefreshList();
 			_gradingScales=new Dictionary<long,GradingScale>();
 			for(int i=0;i<gradingScales.Count;i++) {
 				_gradingScales.Add(gradingScales[i].GradingScaleNum,gradingScales[i]);
@@ -67,7 +67,11 @@ namespace OpenDental {
 			FormEvaluationCriterionDefEdit FormECDE=new FormEvaluationCriterionDefEdit(_criterionDefsForEval[gridMain.GetSelectedIndex()]);
 			FormECDE.ShowDialog();
 			if(FormECDE.DialogResult==DialogResult.OK) {
+				if(_criterionDefsForEval.Count!=_itemOrder.Count) {
+					_itemOrder.Remove(_criterionDefsForEval[gridMain.GetSelectedIndex()].EvaluationCriterionDefNum);//Must be called before refreshing.
+				}
 				_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+				SynchItemOrder();
 				FillGrid();
 			}
 		}
@@ -85,13 +89,24 @@ namespace OpenDental {
 			FormECDE.ShowDialog();
 			if(FormECDE.DialogResult==DialogResult.OK) {
 				_criterionDefsForEval=EvaluationCriterionDefs.GetAllForEvaluationDef(_evalDefCur.EvaluationDefNum);
+				_itemOrder.Add(evalCritDef.EvaluationCriterionDefNum);//Must be called after refreshing
+				SynchItemOrder();
 				FillGrid();
 			}
 		}
 
 		/// <summary>Used after adding or deleting an EvaluationCriterionDef.  Enables item order to persist.</summary>
 		private void SynchItemOrder() {
-			
+			List<EvaluationCriterionDef> tempList=new List<EvaluationCriterionDef>();
+			for(int i=0;i<_itemOrder.Count;i++) {
+				for(int j=0;j<_criterionDefsForEval.Count;j++) {
+					if(_itemOrder[i]==_criterionDefsForEval[j].EvaluationCriterionDefNum) {
+						tempList.Add(_criterionDefsForEval[j]);
+						break;
+					}
+				}
+			}
+			_criterionDefsForEval=tempList;
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {

@@ -24,6 +24,12 @@ namespace OpenDental {
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {
+			//Although there can be multiple grading scales on the same evaluation, it is highly discouraged. 
+			//The grades must be manually calculated since the only calculated grades are scales that match the evaluation.
+			//This could be changed later by forcing all scales to have point values and giving each EvaluationCriterion a "rubrick" gradingscale.
+			//This change would require that Evaluations be given a different kind of grading scale that allowed for percentage ranges.
+			//This would then be calculated into a grade for the reports that could use a similar grading scale.
+			//These changes may not be necessary if the customers prefers the current method.
 			FormGradingScales FormGS=new FormGradingScales();
 			FormGS.IsSelectionMode=true;
 			FormGS.ShowDialog();

@@ -49,11 +49,11 @@ namespace OpenDentBusiness{
 		*/
 
 		///<summary></summary>
-		public static List<GradingScale> Refresh(){
+		public static List<GradingScale> RefreshList(){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<GradingScale>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM gradingscale";
+			string command="SELECT * FROM gradingscale ";
 			return Crud.GradingScaleCrud.SelectMany(command);
 		}
 
@@ -69,7 +69,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),gradingScaleCur);
 			}
-			string command="SELECT COUNT(*) from gradingscale WHERE Description = '"+POut.String(gradingScaleCur.Description)+"' "
+			string command="SELECT COUNT(*) FROM gradingscale WHERE Description = '"+POut.String(gradingScaleCur.Description)+"' "
 				+"AND GradingScaleNum != "+POut.Long(gradingScaleCur.GradingScaleNum);
 			int count=PIn.Int(Db.GetCount(command));
 			if(count>0) {
@@ -82,8 +82,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),gradingScaleCur);
 			}
-			string command="SELECT COUNT(*) from evaluation,evaluationcriterion "
-				+"WHERE evaluation.GradingScaleNum = '"+POut.Long(gradingScaleCur.GradingScaleNum)+"' "
+			string command="SELECT COUNT(*) FROM evaluation,evaluationcriterion "
+				+"WHERE evaluation.GradingScaleNum = "+POut.Long(gradingScaleCur.GradingScaleNum)+" "
 				+"OR evaluationcriterion.GradingScaleNum = "+POut.Long(gradingScaleCur.GradingScaleNum);
 			int count=PIn.Int(Db.GetCount(command));
 			if(count>0) {
@@ -110,13 +110,34 @@ namespace OpenDentBusiness{
 			Crud.GradingScaleCrud.Update(gradingScale);
 		}
 
-		///<summary></summary>
+		///<summary>Also deletes attached GradeScaleItems.  Will throw an error if GradeScale is in use.  Be sure to surround with try-catch.</summary>
 		public static void Delete(long gradingScaleNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleNum);
 				return;
 			}
-			string command= "DELETE FROM gradingscale WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
+			string error="";
+			string command="SELECT COUNT(*) FROM evaluationdef WHERE GradingScaleNum="+POut.Long(gradingScaleNum);
+			if(Db.GetCount(command)!="0") {
+				error+=" EvaluationDef,";
+			}
+			command="SELECT COUNT(*) FROM evaluationcriteriondef WHERE GradingScaleNum="+POut.Long(gradingScaleNum);
+			if(Db.GetCount(command)!="0") {
+				error+=" EvaluationCriterionDef,";
+			}
+			command="SELECT COUNT(*) FROM evaluation WHERE GradingScaleNum="+POut.Long(gradingScaleNum);
+			if(Db.GetCount(command)!="0") {
+				error+=" Evaluation,";
+			}
+			command="SELECT COUNT(*) FROM evaluationcriterion WHERE GradingScaleNum="+POut.Long(gradingScaleNum);
+			if(Db.GetCount(command)!="0") {
+				error+=" EvaluationCriterion,";
+			}
+			if(error!="") {
+				throw new ApplicationException(Lans.g("GradingScaleEdit","Grading scale is in use by")+":"+error.TrimEnd(','));
+			}
+			GradingScaleItems.DeleteAllByGradingScale(gradingScaleNum);
+			command= "DELETE FROM gradingscale WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
 			Db.NonQ(command);
 		}
 

@@ -95,7 +95,7 @@ namespace OpenDental{
 			this.groupBox1.Location = new System.Drawing.Point(12, 12);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(311, 129);
-			this.groupBox1.TabIndex = 113;
+			this.groupBox1.TabIndex = 1;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Default User Groups";
 			// 
@@ -109,7 +109,7 @@ namespace OpenDental{
 			this.butStudentPicker.Location = new System.Drawing.Point(230, 61);
 			this.butStudentPicker.Name = "butStudentPicker";
 			this.butStudentPicker.Size = new System.Drawing.Size(22, 22);
-			this.butStudentPicker.TabIndex = 1;
+			this.butStudentPicker.TabIndex = 2;
 			this.butStudentPicker.Text = "...";
 			this.butStudentPicker.Click += new System.EventHandler(this.butStudentPicker_Click);
 			// 
@@ -123,7 +123,7 @@ namespace OpenDental{
 			this.butInstructorPicker.Location = new System.Drawing.Point(230, 87);
 			this.butInstructorPicker.Name = "butInstructorPicker";
 			this.butInstructorPicker.Size = new System.Drawing.Size(22, 22);
-			this.butInstructorPicker.TabIndex = 2;
+			this.butInstructorPicker.TabIndex = 4;
 			this.butInstructorPicker.Text = "...";
 			this.butInstructorPicker.Click += new System.EventHandler(this.butInstructorPicker_Click);
 			// 

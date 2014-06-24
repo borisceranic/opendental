@@ -29,7 +29,7 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
-			_listGradingScales=GradingScales.Refresh();
+			_listGradingScales=GradingScales.RefreshList();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormGradingScales","Description"),160);
@@ -56,7 +56,6 @@ namespace OpenDental {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			//TODO: check other "is selection" mode windows.  I think this is a quick way to add new items and automatically "select" the added item.
 			GradingScale gradingScaleNew=new GradingScale();
 			gradingScaleNew.GradingScaleNum=GradingScales.Insert(gradingScaleNew);
 			gradingScaleNew.IsNew=true;

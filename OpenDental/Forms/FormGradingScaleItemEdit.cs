@@ -40,8 +40,13 @@ namespace OpenDental {
 				MsgBox.Show(this,"Grade Number is a required field and cannot be empty.");
 				return;
 			}
+			float gradeNumber=0;//Just a placeholder
+			if(!float.TryParse(textGradeNumber.Text,out gradeNumber)) {//Fills gradeNumber
+				MsgBox.Show(this,"Grade Number is not in a valid format. Please type in a number.");
+				return;
+			}
+			_gradingScaleItemCur.GradeNumber=gradeNumber;
 			_gradingScaleItemCur.GradeShowing=textGradeShowing.Text;
-			_gradingScaleItemCur.GradeNumber=PIn.Float(textGradeNumber.Text);
 			_gradingScaleItemCur.Description=textDescription.Text;
 			if(_gradingScaleItemCur.IsNew) {
 				GradingScaleItems.Insert(_gradingScaleItemCur);

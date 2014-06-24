@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				gradingScale=new GradingScale();
 				gradingScale.GradingScaleNum= PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				gradingScale.ScaleType      = (ScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString());
+				gradingScale.ScaleType      = (EnumScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString());
 				gradingScale.Description    = PIn.String(table.Rows[i]["Description"].ToString());
 				gradingScale.MaxPointsPoss  = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
 				retVal.Add(gradingScale);

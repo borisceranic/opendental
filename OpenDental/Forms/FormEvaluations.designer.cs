@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(883, 564);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 7;
+			this.butCancel.TabIndex = 8;
 			this.butCancel.Text = "Close";
 			this.butCancel.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -283,8 +283,9 @@ namespace OpenDental{
 			this.butReport.Location = new System.Drawing.Point(883, 395);
 			this.butReport.Name = "butReport";
 			this.butReport.Size = new System.Drawing.Size(75, 24);
-			this.butReport.TabIndex = 43;
+			this.butReport.TabIndex = 7;
 			this.butReport.Text = "Reports";
+			this.butReport.Visible = false;
 			this.butReport.Click += new System.EventHandler(this.butReport_Click);
 			// 
 			// FormEvaluations

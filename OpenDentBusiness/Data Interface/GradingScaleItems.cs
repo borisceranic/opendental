@@ -48,12 +48,13 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary></summary>
+		///<summary>Gets all grading scale items ordered by GradeNumber descending.</summary>
 		public static List<GradingScaleItem> Refresh(long gradingScaleNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<GradingScaleItem>>(MethodBase.GetCurrentMethod(),gradingScaleNum);
 			}
-			string command="SELECT * FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
+			string command="SELECT * FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum)
+				+" ORDER BY GradeNumber DESC";
 			return Crud.GradingScaleItemCrud.SelectMany(command);
 		}
 
@@ -84,7 +85,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void DeleteAllFromGradingScale(long gradingScaleNum) {
+		public static void DeleteAllByGradingScale(long gradingScaleNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleNum);
 				return;

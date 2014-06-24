@@ -77,11 +77,13 @@ namespace OpenDental {
 		}
 
 		private void butGradingScales_Click(object sender,EventArgs e) {
+			//GradingScales can be edited and added from here.
 			FormGradingScales FormGS=new FormGradingScales();
 			FormGS.ShowDialog();
 		}
 
 		private void butEvaluation_Click(object sender,EventArgs e) {
+			//EvaluationDefs can be added and edited from here.
 			FormEvaluationDefs FormED=new FormEvaluationDefs();
 			FormED.ShowDialog();
 		}

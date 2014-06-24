@@ -21,6 +21,8 @@ namespace OpenDental {
 			_userProv=Providers.GetProv(Security.CurUser.ProvNum);
 			//_userProv will only be allowed to be null if the user is an admin. Checking for null in this block is not necessary.
 			if(!Security.IsAuthorized(Permissions.AdminDentalEvaluations,true)) {
+				//Admins are allowed to look at and edit all evaluations, but they cannot add new evaluations
+				//This could easily be added in the future if desired.
 				groupAdmin.Visible=false;
 			}
 			else {
@@ -58,11 +60,11 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Last Name"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEvaluations","First Name"),90);
+			col=new ODGridColumn(Lan.g("TableEvaluations","First Name"),80);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Course"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEvaluations","Grade"),40);
+			col=new ODGridColumn(Lan.g("TableEvaluations","Grade"),60);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableEvaluations","Grading Scale"),90);
 			gridMain.Columns.Add(col);
@@ -72,7 +74,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(DateTime.Parse(table.Rows[i]["DateEval"].ToString()).ToShortDateString());
 				row.Cells.Add(table.Rows[i]["EvalTitle"].ToString());
-				row.Cells.Add(Providers.GetLongDesc(PIn.Long(table.Rows[i]["InstructNum"].ToString())));
+				row.Cells.Add(table.Rows[i]["InstructNum"].ToString());
 				row.Cells.Add(table.Rows[i]["StudentNum"].ToString());
 				row.Cells.Add(table.Rows[i]["LName"].ToString());
 				row.Cells.Add(table.Rows[i]["FName"].ToString());
@@ -118,6 +120,7 @@ namespace OpenDental {
 		}
 
 		private void butReport_Click(object sender,EventArgs e) {
+			//This is currently hidden until it is finished.
 			FormEvaluationReport FormER=new FormEvaluationReport();
 			FormER.ShowDialog();
 		}

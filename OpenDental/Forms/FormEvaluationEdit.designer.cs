@@ -42,15 +42,16 @@ namespace OpenDental{
 			this.textGradeNumberOverride = new System.Windows.Forms.TextBox();
 			this.textGradeNumber = new System.Windows.Forms.TextBox();
 			this.textGradeShowing = new System.Windows.Forms.TextBox();
-			this.textDate = new OpenDental.ValidDate();
+			this.gridGrades = new OpenDental.UI.ODGrid();
 			this.butStudentPicker = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.textDate = new OpenDental.ValidDate();
 			this.SuspendLayout();
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(97, 62);
+			this.label3.Location = new System.Drawing.Point(158, 62);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(104, 17);
 			this.label3.TabIndex = 134;
@@ -59,7 +60,7 @@ namespace OpenDental{
 			// 
 			// textCourse
 			// 
-			this.textCourse.Location = new System.Drawing.Point(202, 61);
+			this.textCourse.Location = new System.Drawing.Point(263, 61);
 			this.textCourse.MaxLength = 255;
 			this.textCourse.Name = "textCourse";
 			this.textCourse.ReadOnly = true;
@@ -68,7 +69,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(334, 62);
+			this.label2.Location = new System.Drawing.Point(395, 62);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(137, 17);
 			this.label2.TabIndex = 133;
@@ -77,7 +78,7 @@ namespace OpenDental{
 			// 
 			// textTitle
 			// 
-			this.textTitle.Location = new System.Drawing.Point(472, 61);
+			this.textTitle.Location = new System.Drawing.Point(533, 61);
 			this.textTitle.MaxLength = 255;
 			this.textTitle.Name = "textTitle";
 			this.textTitle.ReadOnly = true;
@@ -86,7 +87,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(97, 36);
+			this.label1.Location = new System.Drawing.Point(158, 36);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(104, 17);
 			this.label1.TabIndex = 132;
@@ -95,7 +96,7 @@ namespace OpenDental{
 			// 
 			// textGradeScaleName
 			// 
-			this.textGradeScaleName.Location = new System.Drawing.Point(202, 35);
+			this.textGradeScaleName.Location = new System.Drawing.Point(263, 35);
 			this.textGradeScaleName.MaxLength = 255;
 			this.textGradeScaleName.Name = "textGradeScaleName";
 			this.textGradeScaleName.ReadOnly = true;
@@ -104,7 +105,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(97, 9);
+			this.label4.Location = new System.Drawing.Point(158, 9);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(104, 17);
 			this.label4.TabIndex = 140;
@@ -113,7 +114,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(329, 36);
+			this.label5.Location = new System.Drawing.Point(390, 36);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(137, 17);
 			this.label5.TabIndex = 139;
@@ -122,7 +123,7 @@ namespace OpenDental{
 			// 
 			// textInstructor
 			// 
-			this.textInstructor.Location = new System.Drawing.Point(472, 35);
+			this.textInstructor.Location = new System.Drawing.Point(533, 35);
 			this.textInstructor.MaxLength = 255;
 			this.textInstructor.Name = "textInstructor";
 			this.textInstructor.ReadOnly = true;
@@ -131,7 +132,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(329, 10);
+			this.label6.Location = new System.Drawing.Point(390, 10);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(137, 17);
 			this.label6.TabIndex = 138;
@@ -140,7 +141,7 @@ namespace OpenDental{
 			// 
 			// textStudent
 			// 
-			this.textStudent.Location = new System.Drawing.Point(472, 9);
+			this.textStudent.Location = new System.Drawing.Point(533, 9);
 			this.textStudent.MaxLength = 255;
 			this.textStudent.Name = "textStudent";
 			this.textStudent.ReadOnly = true;
@@ -150,7 +151,7 @@ namespace OpenDental{
 			// label7
 			// 
 			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label7.Location = new System.Drawing.Point(3, 419);
+			this.label7.Location = new System.Drawing.Point(3, 462);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(137, 17);
 			this.label7.TabIndex = 142;
@@ -160,32 +161,33 @@ namespace OpenDental{
 			// textGradeShowingOverride
 			// 
 			this.textGradeShowingOverride.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textGradeShowingOverride.Location = new System.Drawing.Point(202, 418);
+			this.textGradeShowingOverride.Location = new System.Drawing.Point(202, 461);
 			this.textGradeShowingOverride.MaxLength = 255;
 			this.textGradeShowingOverride.Name = "textGradeShowingOverride";
 			this.textGradeShowingOverride.Size = new System.Drawing.Size(60, 20);
-			this.textGradeShowingOverride.TabIndex = 2;
+			this.textGradeShowingOverride.TabIndex = 4;
 			// 
 			// gridMain
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 87);
+			this.gridMain.Location = new System.Drawing.Point(18, 87);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(694, 299);
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
+			this.gridMain.Size = new System.Drawing.Size(487, 342);
 			this.gridMain.TabIndex = 143;
 			this.gridMain.Title = "Criterion";
 			this.gridMain.TranslationName = "FormEvaluationDefEdit";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
+			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
+			this.gridMain.CellEnter += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellEnter);
 			// 
 			// label8
 			// 
 			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label8.Location = new System.Drawing.Point(3, 393);
+			this.label8.Location = new System.Drawing.Point(3, 436);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(137, 17);
 			this.label8.TabIndex = 147;
@@ -195,7 +197,7 @@ namespace OpenDental{
 			// textGradeNumberOverride
 			// 
 			this.textGradeNumberOverride.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textGradeNumberOverride.Location = new System.Drawing.Point(202, 392);
+			this.textGradeNumberOverride.Location = new System.Drawing.Point(202, 435);
 			this.textGradeNumberOverride.MaxLength = 255;
 			this.textGradeNumberOverride.Name = "textGradeNumberOverride";
 			this.textGradeNumberOverride.Size = new System.Drawing.Size(60, 20);
@@ -204,7 +206,7 @@ namespace OpenDental{
 			// textGradeNumber
 			// 
 			this.textGradeNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textGradeNumber.Location = new System.Drawing.Point(141, 392);
+			this.textGradeNumber.Location = new System.Drawing.Point(141, 435);
 			this.textGradeNumber.MaxLength = 255;
 			this.textGradeNumber.Name = "textGradeNumber";
 			this.textGradeNumber.ReadOnly = true;
@@ -214,19 +216,27 @@ namespace OpenDental{
 			// textGradeShowing
 			// 
 			this.textGradeShowing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textGradeShowing.Location = new System.Drawing.Point(141, 418);
+			this.textGradeShowing.Location = new System.Drawing.Point(141, 461);
 			this.textGradeShowing.MaxLength = 255;
 			this.textGradeShowing.Name = "textGradeShowing";
 			this.textGradeShowing.ReadOnly = true;
 			this.textGradeShowing.Size = new System.Drawing.Size(60, 20);
 			this.textGradeShowing.TabIndex = 148;
 			// 
-			// textDate
+			// gridGrades
 			// 
-			this.textDate.Location = new System.Drawing.Point(202, 9);
-			this.textDate.Name = "textDate";
-			this.textDate.Size = new System.Drawing.Size(121, 20);
-			this.textDate.TabIndex = 1;
+			this.gridGrades.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridGrades.HScrollVisible = false;
+			this.gridGrades.Location = new System.Drawing.Point(511, 87);
+			this.gridGrades.Name = "gridGrades";
+			this.gridGrades.ScrollValue = 0;
+			this.gridGrades.Size = new System.Drawing.Size(314, 342);
+			this.gridGrades.TabIndex = 150;
+			this.gridGrades.Title = "Grading Scale";
+			this.gridGrades.TranslationName = "FormEvaluationDefEdit";
+			this.gridGrades.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridGrades_CellClick);
 			// 
 			// butStudentPicker
 			// 
@@ -235,10 +245,10 @@ namespace OpenDental{
 			this.butStudentPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butStudentPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butStudentPicker.CornerRadius = 4F;
-			this.butStudentPicker.Location = new System.Drawing.Point(599, 6);
+			this.butStudentPicker.Location = new System.Drawing.Point(660, 6);
 			this.butStudentPicker.Name = "butStudentPicker";
 			this.butStudentPicker.Size = new System.Drawing.Size(24, 24);
-			this.butStudentPicker.TabIndex = 4;
+			this.butStudentPicker.TabIndex = 2;
 			this.butStudentPicker.Text = "...";
 			this.butStudentPicker.Click += new System.EventHandler(this.butStudentPicker_Click);
 			// 
@@ -250,7 +260,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(550, 415);
+			this.butOK.Location = new System.Drawing.Point(671, 458);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 5;
@@ -265,17 +275,25 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(631, 415);
+			this.butCancel.Location = new System.Drawing.Point(752, 458);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 6;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// textDate
+			// 
+			this.textDate.Location = new System.Drawing.Point(263, 9);
+			this.textDate.Name = "textDate";
+			this.textDate.Size = new System.Drawing.Size(121, 20);
+			this.textDate.TabIndex = 1;
+			// 
 			// FormEvaluationEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(721, 450);
+			this.ClientSize = new System.Drawing.Size(842, 493);
+			this.Controls.Add(this.gridGrades);
 			this.Controls.Add(this.textGradeNumber);
 			this.Controls.Add(this.textGradeShowing);
 			this.Controls.Add(this.label8);
@@ -299,7 +317,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(592, 321);
+			this.MinimumSize = new System.Drawing.Size(726, 370);
 			this.Name = "FormEvaluationEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Edit";
@@ -333,5 +351,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textGradeNumberOverride;
 		private System.Windows.Forms.TextBox textGradeNumber;
 		private System.Windows.Forms.TextBox textGradeShowing;
+		private UI.ODGrid gridGrades;
 	}
 }
