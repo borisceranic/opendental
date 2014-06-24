@@ -30,8 +30,10 @@ namespace OpenDental.UI {
 		[Category("Property Changed"),Description("Event used when cells are editable.  The TextChanged event is passed up from the textbox where the editing is taking place.")]
 		public event EventHandler CellTextChanged=null;
 		///<summary></summary>
-		[Category("Focus"),Description("Event used when cells are editable.  LostFocust event is passed up from the textbox where the editing is taking place.")]
+		[Category("Focus"),Description("Event used when cells are editable.  LostFocus event is passed up from the textbox where the editing is taking place.")]
 		public event ODGridClickEventHandler CellLeave=null;
+		[Category("Focus"),Description("Event used when cells are editable.  GotFocus event is passed up from the textbox where the editing is taking place.")]
+		public event ODGridClickEventHandler CellEnter=null;
 		private string title;
 		//private Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
 		//private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
@@ -1738,6 +1740,9 @@ namespace OpenDental.UI {
 					selectedCell=new Point(MouseDownCol,MouseDownRow);
 					if(Columns[selectedCell.X].IsEditable) {
 						CreateEditBox();
+						//When the edit text box was created, added to the control, and given focus, the chain of events stops and the OnClick event never gets fired.
+						//We can guarantee that the user did in fact click on a cell at this point in the mouse down event.
+						OnClick(e);
 					}
 					//}
 					break;
@@ -1813,6 +1818,7 @@ namespace OpenDental.UI {
 				-vScroll.Value+1+titleHeight+headerHeight+RowLocs[selectedCell.Y]);
 			editBox.Text=Rows[selectedCell.Y].Cells[selectedCell.X].Text;
 			editBox.TextChanged+=new EventHandler(editBox_TextChanged);
+			editBox.GotFocus+=new EventHandler(editBox_GotFocus);
 			editBox.LostFocus+=new EventHandler(editBox_LostFocus);
 			editBox.KeyDown+=new KeyEventHandler(editBox_KeyDown);
 			editBox.KeyUp+=new KeyEventHandler(editBox_KeyUp);
@@ -1839,6 +1845,10 @@ namespace OpenDental.UI {
 				editBox.Dispose();
 				editBox=null;
 			}
+		}
+
+		void editBox_GotFocus(object sender,EventArgs e) {
+			OnCellEnter(oldSelectedCell.X,oldSelectedCell.Y);//this is the only place where OnCellEnter gets called.
 		}
 
 		void editBox_KeyDown(object sender,KeyEventArgs e) {
@@ -2166,6 +2176,12 @@ namespace OpenDental.UI {
 		protected void OnCellLeave(int col,int row) {
 			if(CellLeave!=null) {
 				CellLeave(this,new ODGridClickEventArgs(col,row,MouseButtons.None));
+			}
+		}
+
+		protected void OnCellEnter(int col,int row) {
+			if(CellEnter!=null) {
+				CellEnter(this,new ODGridClickEventArgs(col,row,MouseButtons.None));
 			}
 		}
 		#endregion KeyEvents
