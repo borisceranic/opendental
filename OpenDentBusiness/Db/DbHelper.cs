@@ -8,6 +8,16 @@ namespace OpenDentBusiness {
 	///<summary>This class contains methods used to generate database independent SQL.</summary>
 	public class DbHelper {
 
+		///<summary>Returns a safe drop table string that does not need to be surrounded with a try catch.</summary>
+		public static string DropTableIfExist(string tableName) {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return "BEGIN EXECUTE IMMEDIATE 'DROP TABLE "+tableName+"'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+			}
+			else {
+				return "DROP TABLE IF EXISTS "+tableName;
+			}
+		}
+
 		///<summary>Use when you already have a WHERE clause in the query. Uses AND RowNum... for Oracle.</summary>
 		public static string LimitAnd(int n) {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -104,22 +104,10 @@ namespace OpenDentBusiness{
 			string tempAgingTableName="tempaging"+tempTableSuffix;
 			string tempOdAgingTransTableName="tempodagingtrans"+tempTableSuffix;
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				try {
-					//We would use DROP TEMPORARY TABLE IF EXISTS syntax here but no such syntax exists in Oracle.
-					command="DROP TEMPORARY TABLE "+tempAgingTableName+", "+tempOdAgingTransTableName;
-					Db.NonQ(command);
-				}
-				catch {
-					//The tables do not exist. Nothing to do.
-				}
-				try {
-					//We would use DROP TABLE IF EXISTS syntax here but no such syntax exists in Oracle.
-					command="DROP TABLE "+tempAgingTableName+", "+tempOdAgingTransTableName;
-					Db.NonQ(command);
-				}
-				catch {
-					//The tables do not exist. Nothing to do.
-				}
+				command=DbHelper.DropTableIfExist(tempAgingTableName);
+				Db.NonQ(command);
+				command=DbHelper.DropTableIfExist(tempOdAgingTransTableName);
+				Db.NonQ(command);
 			}
 			else {
 				command="DROP TEMPORARY TABLE IF EXISTS "+tempAgingTableName+", "+tempOdAgingTransTableName;
@@ -416,22 +404,10 @@ namespace OpenDentBusiness{
 				Db.NonQ(command);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				try {
-					//We would use DROP TEMPORARY TABLE IF EXISTS syntax here but no such syntax exists in Oracle.
-					command="DROP TEMPORARY TABLE "+tempAgingTableName+", "+tempOdAgingTransTableName;
-					Db.NonQ(command);
-				}
-				catch {
-					//The tables do not exist. Nothing to do.
-				}
-				try {
-					//We would use DROP TABLE IF EXISTS syntax here but no such syntax exists in Oracle.
-					command="DROP TABLE "+tempAgingTableName+", "+tempOdAgingTransTableName;
-					Db.NonQ(command);
-				}
-				catch {
-					//The tables do not exist. Nothing to do.
-				}
+				command=DbHelper.DropTableIfExist(tempAgingTableName);
+				Db.NonQ(command);
+				command=DbHelper.DropTableIfExist(tempOdAgingTransTableName);
+				Db.NonQ(command);
 			}
 			else {
 				command="DROP TEMPORARY TABLE IF EXISTS "+tempAgingTableName+", "+tempOdAgingTransTableName;
