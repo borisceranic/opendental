@@ -259,6 +259,8 @@ namespace OpenDentBusiness{
 				command+="UPDATE patient p "+
 					"SET p.BalTotal="+DbHelper.IfNull("(SELECT t.BalTotal FROM "+tempTotalsTableName+" t WHERE t.PatNum=p.PatNum "+DbHelper.LimitAnd(1)+")",0)+";";
 				Db.NonQ(command);
+				command=DbHelper.DropTableIfExist(tempTotalsTableName);
+				Db.NonQ(command);
 			}
 			else {
 				//Now that we have all of the pertinent transaction history, we will calculate all of the charges for
