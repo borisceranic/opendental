@@ -5159,8 +5159,9 @@ namespace OpenDentBusiness {
 						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
 						+"'0')";
 					Db.NonQ(command);
-					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
 						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Enter desired URL address for XVWeb', "
 						+"'https://demo2.apteryxweb.com/')";
