@@ -181,16 +181,18 @@ namespace OpenDentBusiness{
 		PatientPortal,
 		///<summary>76</summary>
 		RxEdit,
-		///<summary>77-Assign this permission to a staff person who will administer setting up and editing Dental School Students in the system.</summary>
+		///<summary>77- Assign this permission to a staff person who will administer setting up and editing Dental School Students in the system.</summary>
 		AdminDentalStudents,
-		///<summary>78-Assign this permission to an instructor who will be allowed to assign Grades to Dental School Students as well as manage classes assigned to them.</summary>
+		///<summary>78- Assign this permission to an instructor who will be allowed to assign Grades to Dental School Students as well as manage classes assigned to them.</summary>
 		AdminDentalInstructors,
 		///<summary>79- Uses date restrictions.  Has a unique audit trail so that users can track specific ortho chart edits.  FK to OrthoChartNum.</summary>
 		OrthoChartEdit,
 		///<summary>80- There is no user interface in the security window for this permission.  It is only used for tracking.  Mainly used for ortho clinics.</summary>
 		PatientFieldEdit,
-		///<summary>81-Assign this permission to a staff person who will edit evaluations in case of an emergency.  This is not meant to be a permanent permission given to a group.</summary>
-		AdminDentalEvaluations
+		///<summary>81- Assign this permission to a staff person who will edit evaluations in case of an emergency.  This is not meant to be a permanent permission given to a group.</summary>
+		AdminDentalEvaluations,
+		///<summary>82- Allows for editing the default discount percentage amount.  Only used from the treatment plan module.</summary>
+		TreatPlanDiscountEdit
 
 	}
 

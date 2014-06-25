@@ -451,6 +451,8 @@ namespace OpenDentBusiness {
 		///<summary>Deprecated.  Not used anywhere.</summary>
 		ToothChartMoveMenuToRight,
 		TreatmentPlanNote,
+		TreatPlanDiscountAdjustmentType,
+		TreatPlanDiscountPercent,
 		TreatPlanPriorityForDeclined,
 		TreatPlanShowCompleted,
 		TreatPlanShowGraphics,

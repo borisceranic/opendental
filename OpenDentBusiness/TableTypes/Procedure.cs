@@ -122,6 +122,8 @@ namespace OpenDentBusiness {
 		public string DiagnosticCode3;
 		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
 		public string DiagnosticCode4;
+		///<summary>Numeric value used to lessen the price of a procedure.</summary>
+		public double Discount;
 
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>

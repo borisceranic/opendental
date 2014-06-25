@@ -4740,22 +4740,27 @@ namespace OpenDentBusiness {
 				command="SELECT ValueString FROM preference WHERE PrefName = 'EasyHideDentalSchools'";
 				string valueString=Db.GetScalar(command);
 				if(valueString=="0") {//Works for Oracle as well.
-					command="SELECT provider.ProvNum FROM provider "
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="SELECT provider.ProvNum FROM provider "
 					+"INNER JOIN userod ON provider.ProvNum=userod.ProvNum "
-					+"INNER JOIN usergroup ON userod.UserGroupNum=userod.UserGroupNum "
+					+"INNER JOIN usergroup ON userod.UserGroupNum=usergroup.UserGroupNum "
 					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
 					+"WHERE grouppermission.PermType=8";//Permission - Setup
-					DataTable dt=Db.GetTable(command);
-					StringBuilder sb=new StringBuilder();
-					for(int i=0;i<dt.Rows.Count;i++) {
-						sb.Append("UPDATE provider SET IsInstructor = 1 WHERE provider.ProvNum="+POut.Long((long)dt.Rows[i][0])+";");
+						DataTable dt=Db.GetTable(command);
+						StringBuilder sb=new StringBuilder();
+						for(int i=0;i<dt.Rows.Count;i++) {
+							sb.Append("UPDATE provider SET IsInstructor = 1 WHERE provider.ProvNum="+POut.Long((long)dt.Rows[i][0])+";");
+						}
+						try {
+							Db.NonQ(sb.ToString());
+						}
+						catch(Exception ex) {
+							//In the rare case that the StringBuilder is too large for the MySQL connector (very rare) we don't want the convert script to fail.
+							//Users can go manually set IsInstructor after the upgrade finishes.
+						}
 					}
-					try {
-						Db.NonQ(sb.ToString());
-					}
-					catch(Exception ex) { 
-						//In the rare case that the StringBuilder is too large for the MySQL connector (very rare) we don't want the convert script to fail.
-						//Users can go manually set IsInstructor after the upgrade finishes.
+					else {//oracle
+						//Oracle does not allow calling multiple queries in one call. We are skipping adding this permission for Oracle users. They can still manually add this permission.
 					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -5224,6 +5229,54 @@ namespace OpenDentBusiness {
 						+"'VixWinBase36')";
 					Db.NonQ32(command);
 				}//end VixWinBase36 bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD Discount double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD Discount number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET Discount = 0 WHERE Discount IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY Discount NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountPercent','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountPercent','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountAdjustmentType','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountAdjustmentType','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT usergroup.UserGroupNum FROM usergroup "
+					+"INNER JOIN grouppermission ON grouppermission.UserGroupNum=usergroup.UserGroupNum "
+					+"WHERE grouppermission.PermType=17";//Permission - AdjustmentCreate
+					DataTable dts=Db.GetTable(command);
+					StringBuilder sbs=new StringBuilder();
+					for(int i=0;i<dts.Rows.Count;i++) {
+						sbs.Append("INSERT INTO grouppermission(UserGroupNum,PermType) VALUES("+POut.Long((long)dts.Rows[i][0])+",82);");//Permission - TreatPlanDiscountEdit
+					}
+					try {
+						Db.NonQ(sbs.ToString());
+					}
+					catch(Exception ex) {
+						//In the rare case that the StringBuilder is too large for the MySQL connector (very rare) we don't want the convert script to fail.
+						//Users can go manually set IsInstructor after the upgrade finishes.
+					}
+				}
+				else {//oracle
+					//Oracle does not allow calling multiple queries in one call. We are skipping adding this permission for Oracle users. They can still manually add this permission.
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
