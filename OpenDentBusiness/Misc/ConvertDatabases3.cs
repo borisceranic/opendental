@@ -5277,6 +5277,56 @@ namespace OpenDentBusiness {
 				else {//oracle
 					//Oracle does not allow calling multiple queries in one call. We are skipping adding this permission for Oracle users. They can still manually add this permission.
 				}
+				//Insert AudaxCeph bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'AudaxCeph', "
+						+"'AudaxCeph from www.audaxceph.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\AudaxCeph\AxCeph.exe")+"',"
+						+"'', "
+						+"'AudaxCeph needs to be running in the background for the bridge to work.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+						+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+POut.Long(programNum)+", "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'AudaxCeph')";
+					Db.NonQ32(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'AudaxCeph', "
+						+"'AudaxCeph from www.audaxceph.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\AudaxCeph\AxCeph.exe")+"',"
+						+"'', "
+						+"'AudaxCeph needs to be running in the background for the bridge to work.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+						+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+						+POut.Long(programNum)+", "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'AudaxCeph')";
+					Db.NonQ32(command);
+				}//end AudaxCeph bridge
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
