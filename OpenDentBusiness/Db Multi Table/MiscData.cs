@@ -223,10 +223,14 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command="SET GLOBAL sql_mode=''";//in case user did not use our my.ini file.
-			//A slightly more elegant approach could require less user permissions.  It could first check SELECT @@GLOBAL.sql_mode, 
-			//and then only attempt to set if it was not blank already.
-			Db.NonQ(command);
+			//The SHOW command is used because it was able to run with a user that had no permissions whatsoever.
+			string command="SHOW GLOBAL VARIABLES WHERE Variable_name='sql_mode'";
+			DataTable table=Db.GetTable(command);
+			//We want to run the SET GLOBAL command when no rows were returned (above query failed) or if the sql_mode is not blank (set to something that could cause errors).
+			if(table.Rows.Count<1 || table.Rows[0]["Value"].ToString()!="") {
+				command="SET GLOBAL sql_mode=''";//in case user did not use our my.ini file.  http://www.opendental.com/manual/mysqlservervariables.html
+				Db.NonQ(command);
+			}
 		}
 
 	}
