@@ -235,6 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bridges\Apteryx.cs" />
+    <Compile Include="Bridges\AudaxCeph.cs" />
     <Compile Include="Bridges\Cerec.cs" />
     <Compile Include="Bridges\Apixia.cs" />
     <Compile Include="Bridges\BioPAK.cs" />
@@ -380,12 +381,6 @@
     </Compile>
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormTreatPlanDiscount.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormTreatPlanDiscount.designer.cs">
-      <DependentUpon>FormTreatPlanDiscount.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormEtrans835PickEob.cs">
       <SubType>Form</SubType>
@@ -3504,9 +3499,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormTreatPlanDiscount.resx">
-      <DependentUpon>FormTreatPlanDiscount.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835PickEob.resx">
       <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>

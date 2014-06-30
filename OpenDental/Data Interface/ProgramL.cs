@@ -51,6 +51,10 @@ namespace OpenDental{
 				Apteryx.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.AudaxCeph.ToString()) {
+				AudaxCeph.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.BioPAK.ToString()) {
 				BioPAK.SendData(prog,pat);
 				return;

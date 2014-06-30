@@ -34,6 +34,7 @@ namespace OpenDentBusiness{
 		None,
 		Apixia,
 		Apteryx,
+		AudaxCeph,
 		BioPAK,
 		CallFire,
 		Camsight,
