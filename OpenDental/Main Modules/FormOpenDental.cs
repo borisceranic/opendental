@@ -293,6 +293,7 @@ namespace OpenDental{
 		private MenuItem menuItemProblems;
 		private MenuItem menuItemDentalSchools;
 		private MenuItem menuItemEvaluations;
+		private MenuItem menuItemEServices;
 		private AutoResetEvent _timeSynchSleep=new AutoResetEvent(false);
 
 		///<summary></summary>
@@ -570,6 +571,7 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
+			this.menuItemEServices = new System.Windows.Forms.MenuItem();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -677,6 +679,7 @@ namespace OpenDental{
             this.menuItemDefinitions,
             this.menuItemDentalSchools,
             this.menuItemDisplayFields,
+            this.menuItemEServices,
             this.menuItemFeeScheds,
             this.menuItemLaboratories,
             this.menuItemMisc,
@@ -1016,78 +1019,78 @@ namespace OpenDental{
 			// 
 			// menuItemFeeScheds
 			// 
-			this.menuItemFeeScheds.Index = 16;
+			this.menuItemFeeScheds.Index = 17;
 			this.menuItemFeeScheds.Text = "Fee Schedules";
 			this.menuItemFeeScheds.Click += new System.EventHandler(this.menuItemFeeScheds_Click);
 			// 
 			// menuItemLaboratories
 			// 
-			this.menuItemLaboratories.Index = 17;
+			this.menuItemLaboratories.Index = 18;
 			this.menuItemLaboratories.Text = "Laboratories";
 			this.menuItemLaboratories.Click += new System.EventHandler(this.menuItemLaboratories_Click);
 			// 
 			// menuItemMisc
 			// 
-			this.menuItemMisc.Index = 18;
+			this.menuItemMisc.Index = 19;
 			this.menuItemMisc.Text = "Miscellaneous";
 			this.menuItemMisc.Click += new System.EventHandler(this.menuItemMisc_Click);
 			// 
 			// menuItemModules
 			// 
-			this.menuItemModules.Index = 19;
+			this.menuItemModules.Index = 20;
 			this.menuItemModules.Text = "Module Preferences";
 			this.menuItemModules.Click += new System.EventHandler(this.menuItemModules_Click);
 			// 
 			// menuItemPractice
 			// 
-			this.menuItemPractice.Index = 20;
+			this.menuItemPractice.Index = 21;
 			this.menuItemPractice.Text = "Practice";
 			this.menuItemPractice.Click += new System.EventHandler(this.menuItemPractice_Click);
 			// 
 			// menuItemLinks
 			// 
-			this.menuItemLinks.Index = 21;
+			this.menuItemLinks.Index = 22;
 			this.menuItemLinks.Text = "Program Links";
 			this.menuItemLinks.Click += new System.EventHandler(this.menuItemLinks_Click);
 			// 
 			// menuItemRequirementsNeeded
 			// 
-			this.menuItemRequirementsNeeded.Index = 22;
+			this.menuItemRequirementsNeeded.Index = 23;
 			this.menuItemRequirementsNeeded.Text = "Requirements Needed";
 			this.menuItemRequirementsNeeded.Click += new System.EventHandler(this.menuItemRequirementsNeeded_Click);
 			// 
 			// menuItemSched
 			// 
-			this.menuItemSched.Index = 23;
+			this.menuItemSched.Index = 24;
 			this.menuItemSched.Text = "Schedules";
 			this.menuItemSched.Click += new System.EventHandler(this.menuItemSched_Click);
 			// 
 			// menuItemSecurity
 			// 
-			this.menuItemSecurity.Index = 24;
+			this.menuItemSecurity.Index = 25;
 			this.menuItemSecurity.Text = "Security";
 			this.menuItemSecurity.Click += new System.EventHandler(this.menuItemSecurity_Click);
 			// 
 			// menuItemSheets
 			// 
-			this.menuItemSheets.Index = 25;
+			this.menuItemSheets.Index = 26;
 			this.menuItemSheets.Text = "Sheets";
 			this.menuItemSheets.Click += new System.EventHandler(this.menuItemSheets_Click);
 			// 
 			// menuItemSpellCheck
 			// 
-			this.menuItemSpellCheck.Index = 26;
+			this.menuItemSpellCheck.Index = 27;
 			this.menuItemSpellCheck.Text = "Spell Check";
 			this.menuItemSpellCheck.Click += new System.EventHandler(this.menuItemSpellCheck_Click);
 			// 
 			// menuItem20
 			// 
-			this.menuItem20.Index = 27;
+			this.menuItem20.Index = 28;
 			this.menuItem20.Text = "-";
 			// 
 			// menuItemObsolete
 			// 
-			this.menuItemObsolete.Index = 28;
+			this.menuItemObsolete.Index = 29;
 			this.menuItemObsolete.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemLetters,
             this.menuItemQuestions});
@@ -1763,6 +1766,12 @@ namespace OpenDental{
 			this.lightSignalGrid1.TabIndex = 20;
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
+			// 
+			// menuItemEServices
+			// 
+			this.menuItemEServices.Index = 16;
+			this.menuItemEServices.Text = "eServices";
+			this.menuItemEServices.Click += new System.EventHandler(this.menuItemEServices_Click);
 			// 
 			// FormOpenDental
 			// 
@@ -5163,6 +5172,10 @@ namespace OpenDental{
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Database Maintenance");
 		}
 
+		private void menuItemEServices_Click(object sender,EventArgs e) {
+			new FormPatientPortalSetup().ShowDialog();
+		}
+
 		private void menuItemEvaluations_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.AdminDentalEvaluations,true) && (Security.CurUser.ProvNum==0 || Providers.GetProv(Security.CurUser.ProvNum).SchoolClassNum!=0)) {
 				MsgBox.Show(this,"Only Instructors may view or edit evaluations.");
@@ -5200,8 +5213,7 @@ namespace OpenDental{
 				return;
 			}
 			//MessageBox.Show("Not yet functional.");
-			FormMobile FormM=new FormMobile();
-			FormM.ShowDialog();
+			new FormPatientPortalSetup(FormPatientPortalSetup.SetTab.MobileOld).ShowDialog();
 			//SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Mobile Sync");
 		}
 
@@ -5672,7 +5684,7 @@ namespace OpenDental{
 					//full synch never run
 					return;
 				}
-				FormMobile.SynchFromMain(false);
+				FormPatientPortalSetup.SynchFromMain(false);
 			}
 			catch { }//If MySQL service has been lost will not automatically UE
 		}

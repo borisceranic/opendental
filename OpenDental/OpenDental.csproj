@@ -3304,6 +3304,7 @@
     <Compile Include="Main Modules\ProgramEntry.cs" />
     <Compile Include="Misc\ClassConvertDatabase.cs" />
     <Compile Include="Misc\ClassesShared.cs" />
+    <Compile Include="Misc\CustomerUpdatesProxy.cs" />
     <Compile Include="Misc\DataConnectionOld.cs" />
     <Compile Include="Misc\DateTimeOD.cs" />
     <Compile Include="Misc\EZTwain.cs">

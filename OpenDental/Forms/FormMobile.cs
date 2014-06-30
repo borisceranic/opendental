@@ -13,6 +13,7 @@ using OpenDentBusiness.Mobile;
 
 
 namespace OpenDental {
+	///<summary>THIS FORM HAS BEEN DEPRECATED!!! All functionality that previously existed in this form has been moved to FormPatientPortalSetup.</summary>
 	public partial class FormMobile:Form {
 		private static MobileWeb.Mobile mb=new MobileWeb.Mobile();
 		private static int BatchSize=100;

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label3.Text" xml:space="preserve">
-    <value>Only used when Open Dental is hosting your patient portal.  Listener Port is the port that must be forwarded by your router to the computer that is running the OpenDentCustListener service.  For more information, see our online manual.</value>
+    <value>Only used when Open Dental is hosting your patient portal.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
     <value>Every time secure web mail is sent to a patient, they will receive this email.
@@ -139,6 +139,12 @@ If Open Dental is hosting your Patient Portal:
 - OR type your redirect into 'Patient Facing URL' that redirects to the 'Hosted URL' listed above.
 
 For more information, see our online manual.</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>Listener Port is only used when Open Dental is hosting your eServices.  It is not used for Mobile Synch (old-style). It represents the port that must be forwarded by your router to the computer that is running the OpenDentCustListener service.  It is shared by all eServices that are being hosted by Open Dental on your behalf.  For more information, see our online manual.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
