@@ -13,8 +13,6 @@ namespace OpenDentBusiness{
 		public EnumScaleType ScaleType;
 		///<summary>For example, A-F or Pass/Fail.</summary>
 		public string Description;
-		///<summary>For ScaleType=Points, this is just a default.  For percentages, this gets set to 100 and cannot be changed. PickList will not use this column.</summary>
-		public float MaxPointsPoss;
 
 		///<summary></summary>
 		public GradingScale Copy() {
@@ -32,7 +30,7 @@ namespace OpenDentBusiness{
 			///<summary>1- Percentage Scale 0-100.  Grade is calculated as an average.</summary>
 			Percentage,
 			///<summary>2- Allows point values for grades.  Grade is calculated as a sum of all points out of points possible.</summary>
-			Points
+			Weighted
 		}
 }
 

@@ -39,6 +39,8 @@ namespace OpenDental{
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.labelTotalPoint = new System.Windows.Forms.Label();
+			this.textTotalPoints = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// textGradeScaleName
@@ -52,7 +54,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(12, 39);
+			this.label1.Location = new System.Drawing.Point(16, 39);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(112, 17);
 			this.label1.TabIndex = 114;
@@ -61,7 +63,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(12, 13);
+			this.label2.Location = new System.Drawing.Point(16, 13);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(112, 17);
 			this.label2.TabIndex = 125;
@@ -78,7 +80,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(12, 65);
+			this.label3.Location = new System.Drawing.Point(16, 65);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(112, 17);
 			this.label3.TabIndex = 128;
@@ -236,10 +238,30 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// labelTotalPoint
+			// 
+			this.labelTotalPoint.Location = new System.Drawing.Point(16, 388);
+			this.labelTotalPoint.Name = "labelTotalPoint";
+			this.labelTotalPoint.Size = new System.Drawing.Size(112, 17);
+			this.labelTotalPoint.TabIndex = 130;
+			this.labelTotalPoint.Text = "Total Points";
+			this.labelTotalPoint.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textTotalPoints
+			// 
+			this.textTotalPoints.Location = new System.Drawing.Point(130, 387);
+			this.textTotalPoints.MaxLength = 255;
+			this.textTotalPoints.Name = "textTotalPoints";
+			this.textTotalPoints.ReadOnly = true;
+			this.textTotalPoints.Size = new System.Drawing.Size(64, 20);
+			this.textTotalPoints.TabIndex = 129;
+			// 
 			// FormEvaluationDefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(452, 447);
+			this.Controls.Add(this.labelTotalPoint);
+			this.Controls.Add(this.textTotalPoints);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textCourse);
 			this.Controls.Add(this.butCoursePicker);
@@ -283,5 +305,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.TextBox textCourse;
 		private UI.Button butCoursePicker;
+		private System.Windows.Forms.Label labelTotalPoint;
+		private System.Windows.Forms.TextBox textTotalPoints;
 	}
 }

@@ -5055,15 +5055,15 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE gradingscale ADD MaxPointsPoss float NOT NULL";
+					command="ALTER TABLE evaluationcriterion ADD MaxPointsPoss float NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE gradingscale ADD MaxPointsPoss number(38,8)";
+					command="ALTER TABLE evaluationcriterion ADD MaxPointsPoss number(38,8)";
 					Db.NonQ(command);
-					command="UPDATE gradingscale SET MaxPointsPoss = 0 WHERE MaxPointsPoss IS NULL";
+					command="UPDATE evaluationcriterion SET MaxPointsPoss = 0 WHERE MaxPointsPoss IS NULL";
 					Db.NonQ(command);
-					command="ALTER TABLE gradingscale MODIFY MaxPointsPoss NOT NULL";
+					command="ALTER TABLE evaluationcriterion MODIFY MaxPointsPoss NOT NULL";
 					Db.NonQ(command);
 				}
 				//Insert HandyDentist bridge

@@ -466,7 +466,9 @@
     <Compile Include="Forms\FormProvStudentBulkEdit.designer.cs">
       <DependentUpon>FormProvStudentBulkEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormTreatPlanDiscount.cs" />
+    <Compile Include="Forms\FormTreatPlanDiscount.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FormTreatPlanDiscount.designer.cs">
       <DependentUpon>FormTreatPlanDiscount.cs</DependentUpon>
     </Compile>

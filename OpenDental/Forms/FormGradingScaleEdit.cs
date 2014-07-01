@@ -28,10 +28,9 @@ namespace OpenDental {
 					comboScaleType.SelectedIndex=i;
 				}
 			}
-			if(comboScaleType.SelectedIndex==(int)EnumScaleType.PickList) {
-				textMaxPointsPossible.ReadOnly=true;
+			if(comboScaleType.SelectedIndex==(int)EnumScaleType.Percentage) {
+				labelPercent.Visible=true;
 			}
-			textMaxPointsPossible.Text=_gradingScaleCur.MaxPointsPoss.ToString();
 			textDescription.Text=_gradingScaleCur.Description;
 			if(_gradingScaleCur.IsNew) {
 				return;
@@ -43,9 +42,9 @@ namespace OpenDental {
 				labelWarning.Text=Lan.g(this,"Grading scale is not editable.  It is currently in use by an evaluation.");
 				labelWarning.Visible=true;
 				_isEditable=false;
-				butAdd.Visible=false;
-				butOK.Visible=false;
-				butCancel.Text="Close";
+				butAdd.Enabled=false;
+				butOK.Enabled=false;
+				butDelete.Enabled=false;
 				textDescription.ReadOnly=true;
 			}
 			FillGrid();
@@ -97,21 +96,16 @@ namespace OpenDental {
 			//be more like a flag that designates whether or not those criterion need to be given maximum points.
 			//For now MaximumPoints is used to determine a point max for the evaluation, it is still possible to give them less than the maximum.
 			if(comboScaleType.SelectedIndex==(int)EnumScaleType.PickList) {
-				textMaxPointsPossible.ReadOnly=true;
-				textMaxPointsPossible.Text="";
 				butAdd.Enabled=true;
 				labelWarning.Visible=false;
 				labelPercent.Visible=false;
 			}
 			else if(comboScaleType.SelectedIndex==(int)EnumScaleType.Percentage) {
-				textMaxPointsPossible.Text="100";
-				textMaxPointsPossible.ReadOnly=true;
 				butAdd.Enabled=false;
 				labelWarning.Visible=true;
 				labelPercent.Visible=true;
 			}
 			else {//ScaleType.Points
-				textMaxPointsPossible.ReadOnly=false;
 				butAdd.Enabled=false;
 				labelWarning.Visible=true;
 				labelPercent.Visible=false;
@@ -132,6 +126,10 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
+			if(textDescription.Text=="") {
+				MsgBox.Show(this,"Please input a description.");
+				return;
+			}
 			_gradingScaleCur.Description=textDescription.Text;
 			_gradingScaleCur.ScaleType=(EnumScaleType)comboScaleType.SelectedIndex;
 			if(GradingScales.IsDupicateDescription(_gradingScaleCur)) {//This will check it for like types.
@@ -139,13 +137,8 @@ namespace OpenDental {
 				return;
 			}
 			float maxPoints=0;
-			if(_gradingScaleCur.ScaleType==EnumScaleType.Points && !float.TryParse(textMaxPointsPossible.Text,out maxPoints)) {//Points only matter for the Points system
-				MsgBox.Show(this,"The maximum point value is not in a valid number format.  Please input maximum points as a valid number.");
-				return;
-			}
 			_gradingScaleCur.Description=textDescription.Text;
 			_gradingScaleCur.ScaleType=(EnumScaleType)comboScaleType.SelectedIndex;
-			_gradingScaleCur.MaxPointsPoss=PIn.Long(textMaxPointsPossible.Text);
 			if(comboScaleType.SelectedIndex!=(int)EnumScaleType.PickList && comboScaleType.Visible) {//Deletes all items if not picklist scaletype.
 				GradingScaleItems.DeleteAllByGradingScale(_gradingScaleCur.GradingScaleNum);
 			}

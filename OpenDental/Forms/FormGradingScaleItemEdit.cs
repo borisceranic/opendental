@@ -32,10 +32,6 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(textGradeShowing.Text=="") {
-				MsgBox.Show(this,"Grade Showing is a required field and cannot be empty.");
-				return;
-			}
 			if(textGradeNumber.Text=="") {
 				MsgBox.Show(this,"Grade Number is a required field and cannot be empty.");
 				return;
@@ -45,8 +41,12 @@ namespace OpenDental {
 				MsgBox.Show(this,"Grade Number is not in a valid format. Please type in a number.");
 				return;
 			}
+			
 			_gradingScaleItemCur.GradeNumber=gradeNumber;
 			_gradingScaleItemCur.GradeShowing=textGradeShowing.Text;
+			if(textGradeShowing.Text=="") {
+				_gradingScaleItemCur.GradeShowing=gradeNumber.ToString();
+			}
 			_gradingScaleItemCur.Description=textDescription.Text;
 			if(_gradingScaleItemCur.IsNew) {
 				GradingScaleItems.Insert(_gradingScaleItemCur);

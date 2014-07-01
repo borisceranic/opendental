@@ -219,16 +219,17 @@ namespace OpenDental {
 					gradeNumberDisplay=gradeSum/critCount;
 				}
 			}
-			if(_evalGradeScale.ScaleType==EnumScaleType.Points) {
+			if(_evalGradeScale.ScaleType==EnumScaleType.Weighted) {
 				//This grade is calculated as a sum of all criterion grade numbers over the maximum points possible for the grading scale.
 				//This could cause some customer issues later since the maximum possible points must be determined before the evaluation is made.
 				//This means that the criterion "should" add up to the maximum possible point value, but it is not enforced because criterion are not given point values
 				//until they are being filled out. This could be improved by moving the maximum possible points column from the grading scale to the criterion.
 				//All criterion would add up to a maximum point value and that would be the value used for the evaluation. 
 				//Doing this after the system is in use would cause old evaluations to be in an invalid state and would need to be deleted or fixed.
-				if(_evalGradeScale.MaxPointsPoss!=0) {
-					gradeNumberDisplay=gradeSum;
-				}
+				//TODO: Fix this
+				//if(_evalGradeScale.MaxPointsPoss!=0) {
+				//	gradeNumberDisplay=gradeSum;
+				//}
 			}
 			if(_evalGradeScale.ScaleType==EnumScaleType.Percentage) {
 				textGradeNumber.Text=gradeNumberDisplay.ToString();
@@ -248,9 +249,10 @@ namespace OpenDental {
 				textGradeNumber.Text=closestNumber.ToString();
 				textGradeShowing.Text=closestShowing;
 			}
-			if(_evalGradeScale.ScaleType==EnumScaleType.Points) {
+			if(_evalGradeScale.ScaleType==EnumScaleType.Weighted) {
 				textGradeNumber.Text=gradeNumberDisplay.ToString();
-				textGradeShowing.Text=gradeNumberDisplay+"/"+_evalGradeScale.MaxPointsPoss;
+				//TODO: Fix this
+				//textGradeShowing.Text=gradeNumberDisplay+"/"+_evalGradeScale.MaxPointsPoss;
 			}
 		}
 
@@ -265,6 +267,13 @@ namespace OpenDental {
 			}
 		}
 
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(_evalCur.IsNew || MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the evaluation.  Continue?")) {
+				Evaluations.Delete(_evalCur.EvaluationNum);
+				DialogResult=DialogResult.Cancel;
+			}
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			if(textDate.errorProvider1.GetError(textDate)!="") {
 				MsgBox.Show(this,"Please fix data entry errors first.");
@@ -275,13 +284,14 @@ namespace OpenDental {
 				return;
 			}
 			if(_provStudent==null) {
-				MsgBox.Show(this,"The evaluation must be attached to a student to save grades.");
+				MsgBox.Show(this,"Please attach a student to this evaluation.");
 				return;
 			}
-			if(_evalGradeScale.ScaleType==EnumScaleType.Points && PIn.Float(textGradeNumber.Text)>_evalGradeScale.MaxPointsPoss) {
-				MsgBox.Show(this,"Total points given must not be greater than the maximum possible points.  Please change grades on the criterion.");
-				return;
-			}
+			//TODO: Fix this
+			//if(_evalGradeScale.ScaleType==EnumScaleType.Points && PIn.Float(textGradeNumber.Text)>_evalGradeScale.MaxPointsPoss) {
+			//	MsgBox.Show(this,"Total points given must not be greater than the maximum possible points.  Please change grades on the criterion.");
+			//	return;
+			//}
 			if(!String.IsNullOrWhiteSpace(textGradeNumberOverride.Text)) {
 				//Overrides are not saved to the database. They are found by comparing calculated grades to grades found in the database.
 				//If they are identical or blank then they have not been overwritten.
@@ -311,7 +321,6 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 
 	}
 }

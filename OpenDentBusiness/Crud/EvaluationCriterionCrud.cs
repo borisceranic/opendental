@@ -55,6 +55,7 @@ namespace OpenDentBusiness.Crud{
 				evaluationCriterion.GradeNumber           = PIn.Float (table.Rows[i]["GradeNumber"].ToString());
 				evaluationCriterion.Notes                 = PIn.String(table.Rows[i]["Notes"].ToString());
 				evaluationCriterion.ItemOrder             = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				evaluationCriterion.MaxPointsPoss         = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
 				retVal.Add(evaluationCriterion);
 			}
 			return retVal;
@@ -95,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EvaluationCriterionNum,";
 			}
-			command+="EvaluationNum,CriterionDescript,IsCategoryName,GradingScaleNum,GradeShowing,GradeNumber,Notes,ItemOrder) VALUES(";
+			command+="EvaluationNum,CriterionDescript,IsCategoryName,GradingScaleNum,GradeShowing,GradeNumber,Notes,ItemOrder,MaxPointsPoss) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(evaluationCriterion.EvaluationCriterionNum)+",";
 			}
@@ -107,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(evaluationCriterion.GradeShowing)+"',"
 				+    POut.Float (evaluationCriterion.GradeNumber)+","
 				+"'"+POut.String(evaluationCriterion.Notes)+"',"
-				+    POut.Int   (evaluationCriterion.ItemOrder)+")";
+				+    POut.Int   (evaluationCriterion.ItemOrder)+","
+				+    POut.Float (evaluationCriterion.MaxPointsPoss)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -127,7 +129,8 @@ namespace OpenDentBusiness.Crud{
 				+"GradeShowing          = '"+POut.String(evaluationCriterion.GradeShowing)+"', "
 				+"GradeNumber           =  "+POut.Float (evaluationCriterion.GradeNumber)+", "
 				+"Notes                 = '"+POut.String(evaluationCriterion.Notes)+"', "
-				+"ItemOrder             =  "+POut.Int   (evaluationCriterion.ItemOrder)+" "
+				+"ItemOrder             =  "+POut.Int   (evaluationCriterion.ItemOrder)+", "
+				+"MaxPointsPoss         =  "+POut.Float (evaluationCriterion.MaxPointsPoss)+" "
 				+"WHERE EvaluationCriterionNum = "+POut.Long(evaluationCriterion.EvaluationCriterionNum);
 			Db.NonQ(command);
 		}
@@ -166,6 +169,10 @@ namespace OpenDentBusiness.Crud{
 			if(evaluationCriterion.ItemOrder != oldEvaluationCriterion.ItemOrder) {
 				if(command!=""){ command+=",";}
 				command+="ItemOrder = "+POut.Int(evaluationCriterion.ItemOrder)+"";
+			}
+			if(evaluationCriterion.MaxPointsPoss != oldEvaluationCriterion.MaxPointsPoss) {
+				if(command!=""){ command+=",";}
+				command+="MaxPointsPoss = "+POut.Float(evaluationCriterion.MaxPointsPoss)+"";
 			}
 			if(command==""){
 				return false;

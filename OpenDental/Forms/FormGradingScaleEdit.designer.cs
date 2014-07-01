@@ -32,8 +32,6 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.comboScaleType = new System.Windows.Forms.ComboBox();
 			this.labelScaleType = new System.Windows.Forms.Label();
-			this.labelMaxPoints = new System.Windows.Forms.Label();
-			this.textMaxPointsPossible = new System.Windows.Forms.TextBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butDelete = new OpenDental.UI.Button();
 			this.labelWarning = new System.Windows.Forms.Label();
@@ -63,6 +61,7 @@ namespace OpenDental{
 			this.labelPercent.Size = new System.Drawing.Size(177, 17);
 			this.labelPercent.TabIndex = 129;
 			this.labelPercent.Text = "Assumes 0-100% scale.";
+			this.labelPercent.Visible = false;
 			// 
 			// butOK
 			// 
@@ -104,7 +103,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(336, 85);
+			this.butAdd.Location = new System.Drawing.Point(336, 58);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 4;
@@ -130,33 +129,16 @@ namespace OpenDental{
 			this.labelScaleType.Text = "Scale Type";
 			this.labelScaleType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// labelMaxPoints
-			// 
-			this.labelMaxPoints.Location = new System.Drawing.Point(12, 57);
-			this.labelMaxPoints.Name = "labelMaxPoints";
-			this.labelMaxPoints.Size = new System.Drawing.Size(124, 17);
-			this.labelMaxPoints.TabIndex = 134;
-			this.labelMaxPoints.Text = "Max Points";
-			this.labelMaxPoints.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textMaxPointsPossible
-			// 
-			this.textMaxPointsPossible.Location = new System.Drawing.Point(137, 56);
-			this.textMaxPointsPossible.MaxLength = 255;
-			this.textMaxPointsPossible.Name = "textMaxPointsPossible";
-			this.textMaxPointsPossible.Size = new System.Drawing.Size(91, 20);
-			this.textMaxPointsPossible.TabIndex = 3;
-			// 
 			// gridMain
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 85);
+			this.gridMain.Location = new System.Drawing.Point(12, 58);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(315, 221);
+			this.gridMain.Size = new System.Drawing.Size(315, 248);
 			this.gridMain.TabIndex = 8;
 			this.gridMain.Title = "Grading Scale Items";
 			this.gridMain.TranslationName = null;
@@ -195,8 +177,6 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(423, 371);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.labelMaxPoints);
-			this.Controls.Add(this.textMaxPointsPossible);
 			this.Controls.Add(this.comboScaleType);
 			this.Controls.Add(this.labelScaleType);
 			this.Controls.Add(this.labelWarning);
@@ -229,8 +209,6 @@ namespace OpenDental{
 		private UI.Button butCancel;
 		private System.Windows.Forms.ComboBox comboScaleType;
 		private System.Windows.Forms.Label labelScaleType;
-		private System.Windows.Forms.Label labelMaxPoints;
-		private System.Windows.Forms.TextBox textMaxPointsPossible;
 		private UI.Button butDelete;
 		private System.Windows.Forms.Label labelWarning;
 	}

@@ -49,7 +49,6 @@ namespace OpenDentBusiness.Crud{
 				gradingScale.GradingScaleNum= PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
 				gradingScale.ScaleType      = (EnumScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString());
 				gradingScale.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				gradingScale.MaxPointsPoss  = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
 				retVal.Add(gradingScale);
 			}
 			return retVal;
@@ -90,14 +89,13 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="GradingScaleNum,";
 			}
-			command+="ScaleType,Description,MaxPointsPoss) VALUES(";
+			command+="ScaleType,Description) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(gradingScale.GradingScaleNum)+",";
 			}
 			command+=
 				     POut.Int   ((int)gradingScale.ScaleType)+","
-				+"'"+POut.String(gradingScale.Description)+"',"
-				+    POut.Float (gradingScale.MaxPointsPoss)+")";
+				+"'"+POut.String(gradingScale.Description)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -111,8 +109,7 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(GradingScale gradingScale){
 			string command="UPDATE gradingscale SET "
 				+"ScaleType      =  "+POut.Int   ((int)gradingScale.ScaleType)+", "
-				+"Description    = '"+POut.String(gradingScale.Description)+"', "
-				+"MaxPointsPoss  =  "+POut.Float (gradingScale.MaxPointsPoss)+" "
+				+"Description    = '"+POut.String(gradingScale.Description)+"' "
 				+"WHERE GradingScaleNum = "+POut.Long(gradingScale.GradingScaleNum);
 			Db.NonQ(command);
 		}
@@ -127,10 +124,6 @@ namespace OpenDentBusiness.Crud{
 			if(gradingScale.Description != oldGradingScale.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(gradingScale.Description)+"'";
-			}
-			if(gradingScale.MaxPointsPoss != oldGradingScale.MaxPointsPoss) {
-				if(command!=""){ command+=",";}
-				command+="MaxPointsPoss = "+POut.Float(gradingScale.MaxPointsPoss)+"";
 			}
 			if(command==""){
 				return false;

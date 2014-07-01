@@ -34,7 +34,6 @@ namespace OpenDental{
 			this.labelNumber = new System.Windows.Forms.Label();
 			this.textGradeNumber = new System.Windows.Forms.TextBox();
 			this.butDelete = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -141,20 +140,10 @@ namespace OpenDental{
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(196, 10);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(205, 20);
-			this.label1.TabIndex = 77;
-			this.label1.Text = "*Required";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// FormGradingScaleItemEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(405, 147);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textGradeNumber);
 			this.Controls.Add(this.labelNumber);
@@ -188,6 +177,5 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelNumber;
 		private System.Windows.Forms.TextBox textGradeNumber;
 		private UI.Button butDelete;
-		private System.Windows.Forms.Label label1;
 	}
 }

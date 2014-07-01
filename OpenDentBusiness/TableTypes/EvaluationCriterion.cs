@@ -25,6 +25,8 @@ namespace OpenDentBusiness{
 		public string Notes;
 		///<summary>Copied from item order of def.  Defines the order that all the criteria show on the evaluation.  User not allowed to change here, only in the def.</summary>
 		public int ItemOrder;
+		///<summary>For ScaleType=Points, sets the maximum value of points for this criterion.</summary>
+		public float MaxPointsPoss;
 
 		///<summary></summary>
 		public EvaluationCriterion Copy() {

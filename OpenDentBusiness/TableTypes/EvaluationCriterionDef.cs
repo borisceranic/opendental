@@ -19,7 +19,7 @@ namespace OpenDentBusiness{
 		public long GradingScaleNum;
 		///<summary>Defines the order that all the criteria show on the evaluation.  Copied to ItemOrder of actual criterion.</summary>
 		public int ItemOrder;
-		///<summary>Copied from the selected GradingScale.  Can be overridden if using the Points ScaleType.</summary>
+		///<summary>For ScaleType=Points, sets the maximum value of points for this criterion.</summary>
 		public float MaxPointsPoss;
 
 		///<summary></summary>

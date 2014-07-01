@@ -34,6 +34,8 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
+			this.labelPoints = new System.Windows.Forms.Label();
+			this.textPoints = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -44,7 +46,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(233, 123);
+			this.butOK.Location = new System.Drawing.Point(233, 138);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 6;
@@ -59,7 +61,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(314, 123);
+			this.butCancel.Location = new System.Drawing.Point(314, 138);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
@@ -69,7 +71,7 @@ namespace OpenDental{
 			// checkIsCategoryName
 			// 
 			this.checkIsCategoryName.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsCategoryName.Location = new System.Drawing.Point(153, 77);
+			this.checkIsCategoryName.Location = new System.Drawing.Point(153, 103);
 			this.checkIsCategoryName.Name = "checkIsCategoryName";
 			this.checkIsCategoryName.Size = new System.Drawing.Size(190, 17);
 			this.checkIsCategoryName.TabIndex = 4;
@@ -126,7 +128,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(39, 76);
+			this.label3.Location = new System.Drawing.Point(39, 102);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(113, 17);
 			this.label3.TabIndex = 121;
@@ -143,17 +145,36 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 123);
+			this.butDelete.Location = new System.Drawing.Point(12, 138);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 5;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
+			// labelPoints
+			// 
+			this.labelPoints.Location = new System.Drawing.Point(36, 77);
+			this.labelPoints.Name = "labelPoints";
+			this.labelPoints.Size = new System.Drawing.Size(116, 17);
+			this.labelPoints.TabIndex = 123;
+			this.labelPoints.Text = "Points";
+			this.labelPoints.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPoints
+			// 
+			this.textPoints.Location = new System.Drawing.Point(153, 77);
+			this.textPoints.MaxLength = 255;
+			this.textPoints.Name = "textPoints";
+			this.textPoints.Size = new System.Drawing.Size(54, 20);
+			this.textPoints.TabIndex = 122;
+			// 
 			// FormEvaluationCriterionDefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(401, 159);
+			this.ClientSize = new System.Drawing.Size(401, 174);
+			this.Controls.Add(this.labelPoints);
+			this.Controls.Add(this.textPoints);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
@@ -187,5 +208,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		private UI.Button butDelete;
+		private System.Windows.Forms.Label labelPoints;
+		private System.Windows.Forms.TextBox textPoints;
 	}
 }

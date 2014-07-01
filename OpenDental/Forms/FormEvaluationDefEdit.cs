@@ -36,10 +36,14 @@ namespace OpenDental {
 			for(int i=0;i<gradingScales.Count;i++) {
 				_gradingScales.Add(gradingScales[i].GradingScaleNum,gradingScales[i]);
 			}
+			if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType!=EnumScaleType.Weighted) {
+				labelTotalPoint.Visible=false;
+				textTotalPoints.Visible=false;
+			}
 			FillGrid();
 		}
 
-		private void FillGrid() {
+		private void FillGrid() {//Also fills total points if necessary.
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),180);
@@ -48,6 +52,7 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			float points=0;
 			for(int i=0;i<_criterionDefsForEval.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_criterionDefsForEval[i].CriterionDescript);
@@ -59,8 +64,12 @@ namespace OpenDental {
 					row.Cells.Add(_gradingScales[_criterionDefsForEval[i].GradingScaleNum].Description);
 				}
 				gridMain.Rows.Add(row);
+				if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
+					points+=_criterionDefsForEval[i].MaxPointsPoss;
+				}
 			}
 			gridMain.EndUpdate();
+			textTotalPoints.Text=points.ToString();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -116,6 +125,10 @@ namespace OpenDental {
 			if(FormGS.DialogResult==DialogResult.OK) {
 				textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
 				_evalDefCur.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
+				if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
+					labelTotalPoint.Visible=true;
+					textTotalPoints.Visible=true;
+				}
 			}
 		}
 
