@@ -1020,6 +1020,8 @@ namespace OpenDental{
 					int rowsChanged=0;
 					for(int i=0;i<table.Rows.Count;i++){
 						if(table.Rows[i]["IsSent"].ToString()=="0"){
+							Procedures.DetachFromInvoice(PIn.Long(table.Rows[i]["StatementNum"].ToString()));
+							Adjustments.DetachFromInvoice(PIn.Long(table.Rows[i]["StatementNum"].ToString()));
 							Statements.DeleteObject(PIn.Long(table.Rows[i]["StatementNum"].ToString()));
 							rowsChanged++;
 						}
