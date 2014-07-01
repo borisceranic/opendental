@@ -77,6 +77,32 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Creates a new discount adjustment for the given procedure.</summary>
+		public static void CreateAdjustmentForDiscount(Procedure procedure) {
+			//No need to check RemotingRole; no call to db.
+			Adjustment AdjustmentCur=new Adjustment();
+			AdjustmentCur.DateEntry=DateTime.Today;
+			AdjustmentCur.AdjDate=DateTime.Today;
+			AdjustmentCur.ProcDate=procedure.ProcDate;
+			AdjustmentCur.ProvNum=procedure.ProvNum;
+			AdjustmentCur.PatNum=procedure.PatNum;
+			AdjustmentCur.AdjType=PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType);
+			AdjustmentCur.ClinicNum=procedure.ClinicNum;
+			AdjustmentCur.AdjAmt=-procedure.Discount;//Discount must be negative here.
+			AdjustmentCur.ProcNum=procedure.ProcNum;
+			Adjustments.Insert(AdjustmentCur);
+		}
+
+		///<summary>Deletes all adjustments for a procedure</summary>
+		public static void DeleteForProcedure(long procNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
+				return;
+			}
+			string command="DELETE FROM adjustment WHERE ProcNum = "+POut.Long(procNum);
+			Db.NonQ(command);
+		}
+
 		///<summary>Used from ContrAccount and ProcEdit to display and calculate adjustments attached to procs.</summary>
 		public static double GetTotForProc(long procNum,Adjustment[] List) {
 			//No need to check RemotingRole; no call to db.

@@ -35,7 +35,7 @@ namespace OpenDentBusiness{
 		public double SecInsAmt;
 		///<summary>The amount the patient is expected to pay. Never gets automatically updated.</summary>
 		public double PatAmt;
-		///<summary>The amount of discount.  Currently only used for PPOs.</summary>
+		///<summary>The amount of discount.  Used for PPOs and procedure level discounts.</summary>
 		public double Discount;
 		///<summary>Text from prognosis definition.  Can be changed by user at any time.</summary>
 		public string Prognosis;

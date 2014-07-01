@@ -5242,19 +5242,38 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountPercent','')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountPercent','0')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountPercent','')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountPercent','0')";
 					Db.NonQ(command);
+				}
+				//Make sure the database has a "Discount" definition because we are adding a new feature that needs a default discount adjustment type.
+				command="SELECT DefNum,IsHidden FROM definition WHERE Category=1 AND ItemName='Discount'";//1 - AdjTypes
+				table=Db.GetTable(command);
+				if(table.Rows.Count==0) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO definition(Category,ItemName,ItemValue) VALUES(1,'Discount','-')";//1 - AdjTypes, ItemValue of '-' makes it a subtraction type.	
+						Db.NonQ(command);
+					}
+					else {
+						command="INSERT INTO definition(DefNum,Category,ItemOrder,ItemColor,ItemName,ItemValue,IsHidden) VALUES((SELECT MAX(DefNum)+1,1,SELECT MAX(ItemOrder)+1,0,'Discount','-',0)";//1 - AdjTypes, ItemValue of '-' makes it a subtraction type.	
+						Db.NonQ(command);
+					}
+				}
+				else {
+					if(table.Rows[0]["IsHidden"]=="1") {
+						command="UPDATE definition SET IsHidden=0 WHERE DefNum="+table.Rows[0]["DefNum"];
+						Db.NonQ(command);
+					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountAdjustmentType','')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanDiscountAdjustmentType',"+table.Rows[0]["DefNum"]+")";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountAdjustmentType','')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanDiscountAdjustmentType',"+table.Rows[0]["DefNum"]+")";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {

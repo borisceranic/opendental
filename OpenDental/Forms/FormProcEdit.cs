@@ -257,6 +257,8 @@ namespace OpenDental{
 		private UI.Button butDiagnosisCode4;
 		private UI.Button butNoneDiagnosisCode3;
 		private UI.Button butDiagnosisCode3;
+		private Label label20;
+		private ValidDouble textDiscount;
 		private Snomed _snomedBodySite=null;
 		
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
@@ -497,6 +499,8 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.label20 = new System.Windows.Forms.Label();
+			this.textDiscount = new OpenDental.ValidDouble();
 			this.groupQuadrant.SuspendLayout();
 			this.groupArch.SuspendLayout();
 			this.panelSurfaces.SuspendLayout();
@@ -1102,6 +1106,8 @@ namespace OpenDental{
 			// textProcFee
 			// 
 			this.textProcFee.Location = new System.Drawing.Point(106, 155);
+			this.textProcFee.MaxVal = 100000000D;
+			this.textProcFee.MinVal = -100000000D;
 			this.textProcFee.Name = "textProcFee";
 			this.textProcFee.Size = new System.Drawing.Size(68, 20);
 			this.textProcFee.TabIndex = 6;
@@ -1894,6 +1900,8 @@ namespace OpenDental{
 			// 
 			// tabPageFinancial
 			// 
+			this.tabPageFinancial.Controls.Add(this.label20);
+			this.tabPageFinancial.Controls.Add(this.textDiscount);
 			this.tabPageFinancial.Controls.Add(this.butAddEstimate);
 			this.tabPageFinancial.Controls.Add(this.checkNoBillIns);
 			this.tabPageFinancial.Controls.Add(this.tbAdj);
@@ -2340,6 +2348,8 @@ namespace OpenDental{
 			// textCanadaLabFee2
 			// 
 			this.textCanadaLabFee2.Location = new System.Drawing.Point(421, 37);
+			this.textCanadaLabFee2.MaxVal = 100000000D;
+			this.textCanadaLabFee2.MinVal = -100000000D;
 			this.textCanadaLabFee2.Name = "textCanadaLabFee2";
 			this.textCanadaLabFee2.Size = new System.Drawing.Size(68, 20);
 			this.textCanadaLabFee2.TabIndex = 165;
@@ -2347,6 +2357,8 @@ namespace OpenDental{
 			// textCanadaLabFee1
 			// 
 			this.textCanadaLabFee1.Location = new System.Drawing.Point(421, 16);
+			this.textCanadaLabFee1.MaxVal = 100000000D;
+			this.textCanadaLabFee1.MinVal = -100000000D;
 			this.textCanadaLabFee1.Name = "textCanadaLabFee1";
 			this.textCanadaLabFee1.Size = new System.Drawing.Size(68, 20);
 			this.textCanadaLabFee1.TabIndex = 164;
@@ -2644,6 +2656,24 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// label20
+			// 
+			this.label20.Location = new System.Drawing.Point(807, 12);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(75, 16);
+			this.label20.TabIndex = 114;
+			this.label20.Text = "Discount";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDiscount
+			// 
+			this.textDiscount.Location = new System.Drawing.Point(883, 9);
+			this.textDiscount.MaxVal = 100000000D;
+			this.textDiscount.MinVal = -100000000D;
+			this.textDiscount.Name = "textDiscount";
+			this.textDiscount.Size = new System.Drawing.Size(68, 20);
+			this.textDiscount.TabIndex = 115;
+			// 
 			// FormProcEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2711,6 +2741,7 @@ namespace OpenDental{
 			this.groupCanadianProcTypeCode.ResumeLayout(false);
 			this.tabControl.ResumeLayout(false);
 			this.tabPageFinancial.ResumeLayout(false);
+			this.tabPageFinancial.PerformLayout();
 			this.tabPageMedical.ResumeLayout(false);
 			this.tabPageMedical.PerformLayout();
 			this.tabPageMisc.ResumeLayout(false);
@@ -3128,6 +3159,7 @@ namespace OpenDental{
 					groupProsth.Visible=false;
 				}
 			}
+			textDiscount.Text=ProcCur.Discount.ToString("f");
 			//medical
 			textMedicalCode.Text=ProcCur.MedicalCode;
 			textDiagnosticCode.Text=ProcCur.DiagnosticCode;
@@ -4764,6 +4796,7 @@ namespace OpenDental{
 				|| textDate.errorProvider1.GetError(textDate)!=""
 				|| textProcFee.errorProvider1.GetError(textProcFee)!=""
 				|| textDateOriginalProsth.errorProvider1.GetError(textDateOriginalProsth)!=""
+				|| textDiscount.errorProvider1.GetError(textDiscount)!=""
 				){
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return false;
@@ -4955,6 +4988,7 @@ namespace OpenDental{
 			ProcedureCode2=ProcedureCodes.GetProcCode(textProc.Text);
 			ProcCur.CodeNum=ProcedureCode2.CodeNum;
 			ProcCur.MedicalCode=textMedicalCode.Text;
+			ProcCur.Discount=PIn.Double(textDiscount.Text);
 			if(_snomedBodySite==null) {
 				ProcCur.SnomedBodySite="";
 			}
@@ -5005,6 +5039,12 @@ namespace OpenDental{
 				if(ProcCur.DiagnosticCode=="") {
 					ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 				}
+			}
+			else if(ProcOld.ProcStatus==ProcStat.C && ProcCur.ProcStatus!=ProcStat.C 
+				&& Adjustments.GetForProc(ProcCur.ProcNum,Adjustments.Refresh(ProcCur.PatNum)).Count!=0
+				&&!MsgBox.Show(this,MsgBoxButtons.YesNo,"This procedure has adjustments attached to it. Changing the status from completed will delete any adjustments for the procedure. Continue?")) 
+			{
+				return;
 			}
 			ProcCur.DateTP=PIn.Date(this.textDateTP.Text);
 			ProcCur.ProcDate=PIn.Date(this.textDate.Text);
@@ -5370,6 +5410,13 @@ namespace OpenDental{
 				Encounters.InsertDefaultEncounter(ProcCur.PatNum,ProcCur.ProvNum,ProcCur.ProcDate);
 			}
 			//Security logs------------------------------------------------------------------------------------------------------------------------------------
+			if(ProcCur.Discount!=ProcOld.Discount) {//Discount was changed
+				string message=Lan.g(this,"Discount created or changed from Proc Edit window for procedure")
+						+": "+ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode+"  "+Lan.g(this,"Dated")
+						+": "+ProcCur.ProcDate.ToShortDateString()+"  "+Lan.g(this,"With a Fee of")+": "+ProcCur.ProcFee.ToString("c")+".  "
+						+Lan.g(this,"Changed the discount value from")+" "+ProcOld.Discount.ToString("c")+" "+Lan.g(this,"to")+" "+ProcCur.Discount.ToString("c");
+				SecurityLogs.MakeLogEntry(Permissions.TreatPlanDiscountEdit,ProcCur.PatNum,message);
+			}
 			if(ProcOld.ProcStatus!=ProcStat.C && ProcCur.ProcStatus==ProcStat.C){
 				//if status was changed to complete
 				SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,

@@ -68,6 +68,7 @@ namespace OpenDental{
 		private TextBox textProblemsIndicateNone;
 		private Label label8;
 		private List<Def> posAdjTypes;
+		private List<Def> negAdjTypes;
 		private UI.Button butMedicationsIndicateNone;
 		private TextBox textMedicationsIndicateNone;
 		private Label label9;
@@ -107,6 +108,10 @@ namespace OpenDental{
 		private CheckBox checkStatementShowAdjNotes;
 		private CheckBox checkProcLockingIsAllowed;
 		private CheckBox checkTimeCardADP;
+		private TextBox textDiscountPercentage;
+		private Label labelDiscountPercentage;
+		private ComboBox comboProcDiscountType;
+		private Label label19;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -237,6 +242,10 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
+			this.label19 = new System.Windows.Forms.Label();
+			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
+			this.labelDiscountPercentage = new System.Windows.Forms.Label();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -942,6 +951,10 @@ namespace OpenDental{
 			// tabTreatPlan
 			// 
 			this.tabTreatPlan.BackColor = System.Drawing.SystemColors.Window;
+			this.tabTreatPlan.Controls.Add(this.textDiscountPercentage);
+			this.tabTreatPlan.Controls.Add(this.labelDiscountPercentage);
+			this.tabTreatPlan.Controls.Add(this.comboProcDiscountType);
+			this.tabTreatPlan.Controls.Add(this.label19);
 			this.tabTreatPlan.Controls.Add(this.label1);
 			this.tabTreatPlan.Controls.Add(this.textTreatNote);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanShowCompleted);
@@ -1375,6 +1388,43 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// comboProcDiscountType
+			// 
+			this.comboProcDiscountType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboProcDiscountType.FormattingEnabled = true;
+			this.comboProcDiscountType.Location = new System.Drawing.Point(277, 102);
+			this.comboProcDiscountType.MaxDropDownItems = 30;
+			this.comboProcDiscountType.Name = "comboProcDiscountType";
+			this.comboProcDiscountType.Size = new System.Drawing.Size(163, 21);
+			this.comboProcDiscountType.TabIndex = 201;
+			// 
+			// label19
+			// 
+			this.label19.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label19.Location = new System.Drawing.Point(55, 105);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(221, 15);
+			this.label19.TabIndex = 200;
+			this.label19.Text = "Procedure discount adj type";
+			this.label19.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDiscountPercentage
+			// 
+			this.textDiscountPercentage.Location = new System.Drawing.Point(387, 129);
+			this.textDiscountPercentage.Name = "textDiscountPercentage";
+			this.textDiscountPercentage.Size = new System.Drawing.Size(53, 20);
+			this.textDiscountPercentage.TabIndex = 211;
+			// 
+			// labelDiscountPercentage
+			// 
+			this.labelDiscountPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.labelDiscountPercentage.Location = new System.Drawing.Point(135, 132);
+			this.labelDiscountPercentage.Name = "labelDiscountPercentage";
+			this.labelDiscountPercentage.Size = new System.Drawing.Size(246, 16);
+			this.labelDiscountPercentage.TabIndex = 210;
+			this.labelDiscountPercentage.Text = "Procedure discount percentage";
+			this.labelDiscountPercentage.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1432,6 +1482,7 @@ namespace OpenDental{
 			checkApptBubbleDelay.Checked = PrefC.GetBool(PrefName.ApptBubbleDelay);
 			checkAppointmentBubblesDisabled.Checked=PrefC.GetBool(PrefName.AppointmentBubblesDisabled);
 			posAdjTypes=DefC.GetPositiveAdjTypes();
+			negAdjTypes=DefC.GetNegativeAdjTypes();
 			for(int i=0;i<posAdjTypes.Count;i++) {
 				comboFinanceChargeAdjType.Items.Add(posAdjTypes[i].ItemName);
 				if(PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)==posAdjTypes[i].DefNum) {
@@ -1446,6 +1497,13 @@ namespace OpenDental{
 					comboBrokenApptAdjType.SelectedIndex=i;
 				}
 			}
+			for(int i=0;i<negAdjTypes.Count;i++) {
+				comboProcDiscountType.Items.Add(negAdjTypes[i].ItemName);
+				if(PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)==negAdjTypes[i].DefNum) {
+					comboProcDiscountType.SelectedIndex=i;
+				}
+			}
+			textDiscountPercentage.Text=PrefC.GetDouble(PrefName.TreatPlanDiscountPercent).ToString();
 			checkApptExclamation.Checked=PrefC.GetBool(PrefName.ApptExclamationShowForUnsentIns);
 			comboTimeArrived.Items.Add(Lan.g(this,"none"));
 			comboTimeArrived.SelectedIndex=0;
@@ -1670,6 +1728,11 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			float percent=0;//Placeholder
+			if(!float.TryParse(textDiscountPercentage.Text,out percent)) {
+				MsgBox.Show(this,"Procedure discount percent is invalid. Please enter a valid number to continue.");
+				return;
+			}
 			if(comboBrokenApptAdjType.SelectedIndex==-1){
 				MsgBox.Show(this,"Please enter an adjustment type for broken appointments.");
 				return;
@@ -1746,6 +1809,8 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
 				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
+				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
+				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				)
 			{
 				_changed=true;

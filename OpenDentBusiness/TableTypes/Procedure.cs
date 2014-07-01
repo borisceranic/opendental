@@ -122,7 +122,7 @@ namespace OpenDentBusiness {
 		public string DiagnosticCode3;
 		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
 		public string DiagnosticCode4;
-		///<summary>Numeric value used to lessen the price of a procedure.</summary>
+		///<summary>Stores the dollar amount of the discount, not full price.  E.g.  for a 10% discount, Fee = $160 Discount = $16.</summary>
 		public double Discount;
 
 

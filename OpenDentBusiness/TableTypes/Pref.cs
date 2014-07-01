@@ -452,6 +452,7 @@ namespace OpenDentBusiness {
 		ToothChartMoveMenuToRight,
 		TreatmentPlanNote,
 		TreatPlanDiscountAdjustmentType,
+		///<summary>Set to 0 to clear out previous discounts.</summary>
 		TreatPlanDiscountPercent,
 		TreatPlanPriorityForDeclined,
 		TreatPlanShowCompleted,

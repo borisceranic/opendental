@@ -54,12 +54,17 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Updates only the changed columns.</summary>
-		public static void Update(Procedure procedure,Procedure oldProcedure) {
+		public static bool Update(Procedure procedure,Procedure oldProcedure) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),procedure,oldProcedure);
-				return;
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),procedure,oldProcedure);
 			}
-			Crud.ProcedureCrud.Update(procedure,oldProcedure);
+			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C && procedure.Discount!=0) {//Setting the procedure to complete
+				Adjustments.CreateAdjustmentForDiscount(procedure);
+			}
+			if(oldProcedure.ProcStatus==ProcStat.C && procedure.ProcStatus!=ProcStat.C) {//Setting a completed procedure to TP
+				Adjustments.DeleteForProcedure(procedure.ProcNum);
+			}
+			bool result=Crud.ProcedureCrud.Update(procedure,oldProcedure);
 			if(procedure.Note!=oldProcedure.Note
 				|| procedure.UserNum!=oldProcedure.UserNum
 				|| procedure.SigIsTopaz!=oldProcedure.SigIsTopaz
@@ -74,6 +79,7 @@ namespace OpenDentBusiness {
 				note.Signature=procedure.Signature;
 				ProcNotes.Insert(note);
 			}
+			return result;
 		}
 
 		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch.  Also deletes any claimProcs and adjustments.  This does not actually delete the procedure, but just changes the status to deleted.</summary>

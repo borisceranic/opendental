@@ -173,6 +173,17 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
+		///<summary></summary>
+		public static List<Def> GetNegativeAdjTypes() {
+			List<Def> retVal=new List<Def>();
+			for(int i=0;i<DefC.Short[(int)DefCat.AdjTypes].Length;i++) {
+				if(DefC.Short[(int)DefCat.AdjTypes][i].ItemValue=="-") {
+					retVal.Add(DefC.Short[(int)DefCat.AdjTypes][i]);
+				}
+			}
+			return retVal;
+		}
+
 		///<summary>Returns a DefNum for the special image category specified.  Returns 0 if no match found.</summary>
 		public static long GetImageCat(ImageCategorySpecial specialCat) {
 			Def[] defs=DefC.GetList(DefCat.ImageCats);

@@ -257,7 +257,7 @@ namespace OpenDental{
 			this.checkShowDiscount.Name = "checkShowDiscount";
 			this.checkShowDiscount.Size = new System.Drawing.Size(131,17);
 			this.checkShowDiscount.TabIndex = 25;
-			this.checkShowDiscount.Text = "Discount (PPO)";
+			this.checkShowDiscount.Text = "Discount";
 			this.checkShowDiscount.Click += new System.EventHandler(this.checkShowDiscount_Click);
 			// 
 			// checkShowTotals
@@ -807,6 +807,7 @@ namespace OpenDental{
 			ToolBarMain.Buttons.Clear();
 			//ODToolBarButton button;
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"PreAuthorization"),-1,"","PreAuth"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Discount"),-1,"","Discount"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Update Fees"),1,"","Update"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Save TP"),3,"","Create"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print TP"),2,"","Print"));
@@ -873,7 +874,6 @@ namespace OpenDental{
 				ToolBarMain.Invalidate();
 				if(PatPlanList.Count==0){//patient doesn't have insurance
 					checkShowIns.Checked=false;
-					checkShowDiscount.Checked=false;
 					checkShowMaxDed.Visible=false;
 				}
 				else{//patient has insurance
@@ -922,6 +922,9 @@ namespace OpenDental{
 				switch(e.Button.Tag.ToString()){
 					case "PreAuth":
 						ToolBarMainPreAuth_Click();
+						break;
+					case "Discount":
+						ToolBarMainDiscount_Click();
 						break;
 					case "Update":
 						ToolBarMainUpdate_Click();
@@ -1119,6 +1122,7 @@ namespace OpenDental{
 					subsecIns+=secIns;
 					totSecIns+=secIns;
 					discount=(decimal)ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,ProcListTP[i].ProcNum);
+					discount+=(decimal)ProcListTP[i].Discount;
 					subdiscount+=discount;
 					totDiscount+=discount;
 					pat=fee-priIns-secIns-discount;
@@ -2865,6 +2869,34 @@ namespace OpenDental{
 			FormCE.IsNew=true;//this causes it to delete the claim if cancelling.
 			FormCE.ShowDialog();
 			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void ToolBarMainDiscount_Click() {
+			if(gridPlans.SelectedIndices[0]!=0) {
+				MsgBox.Show(this,"You can only create discounts from the current TP, not a saved TP.");
+				return;
+			}
+			if(gridMain.SelectedIndices.Length==0) {
+				gridMain.SetSelected(true);
+			}
+			List<Procedure> listProcs=new List<Procedure>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
+					continue;//skip any hightlighted subtotal lines
+				}
+				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag.GetType()==typeof(Procedure)) {
+					listProcs.Add(((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag));
+				}
+			}
+			if(listProcs.Count<=0) {
+				MsgBox.Show(this,"There are no procedures in the default treatment plan. Please add procedures to the treatment plan before applying a discount");
+				return;
+			}
+			FormTreatmentPlanDiscount FormTPD=new FormTreatmentPlanDiscount(listProcs);
+			FormTPD.ShowDialog();
+			if(FormTPD.DialogResult==DialogResult.OK) {
+				ModuleSelected(PatCur.PatNum);
+			}
 		}
 
 		private void gridPreAuth_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
