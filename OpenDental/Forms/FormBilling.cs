@@ -1020,7 +1020,7 @@ namespace OpenDental{
 					int rowsChanged=0;
 					for(int i=0;i<table.Rows.Count;i++){
 						if(table.Rows[i]["IsSent"].ToString()=="0"){
-							Statements.DeleteObject(PIn.Long(table.Rows[i]["StatementNum"].ToString()));
+							Statements.Delete(PIn.Long(table.Rows[i]["StatementNum"].ToString()));
 							rowsChanged++;
 						}
 					}

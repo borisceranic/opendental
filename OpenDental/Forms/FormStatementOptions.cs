@@ -1361,9 +1361,7 @@ namespace OpenDental{
 						return;
 					}
 				}
-				Procedures.DetachFromInvoice(StmtCur.StatementNum);
-				Adjustments.DetachFromInvoice(StmtCur.StatementNum);
-				Statements.DeleteObject(StmtCur);
+				Statements.Delete(StmtCur);
 			}
 			else{//bulk edit
 				for(int i=0;i<StmtList.Count;i++){
@@ -1381,7 +1379,7 @@ namespace OpenDental{
 							return;
 						}
 					}
-					Statements.DeleteObject(StmtList[i]);
+					Statements.Delete(StmtList[i]);
 				}
 			}
 			DialogResult=DialogResult.OK;

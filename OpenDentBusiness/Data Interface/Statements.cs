@@ -39,21 +39,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void DeleteObject(Statement statement){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),statement);
-				return;
-			}
-			//validate that not already in use.
-			Crud.StatementCrud.Delete(statement.StatementNum);
-		}
-
-		public static void DeleteObject(long statementNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),statementNum);
-				return;
-			}
-			Crud.StatementCrud.Delete(statementNum);
+		public static void Delete(Statement statement) {
+			//No need to check RemotingRole; no call to db.
+			Delete(statement.StatementNum);
 		}
 
 		///<summary>For deleting a statement when user clicks Cancel.  No need to make entry in DeletedObject table.</summary>
@@ -62,6 +50,9 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),statementNum);
 				return;
 			}
+			//Removed dependencies from procedures and adjustments.
+			Procedures.DetachFromInvoice(statementNum);
+			Adjustments.DetachFromInvoice(statementNum);
 			Crud.StatementCrud.Delete(statementNum);
 		}
 

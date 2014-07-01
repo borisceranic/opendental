@@ -3758,9 +3758,7 @@ namespace OpenDental {
 						}
 					}
 					//delete statement
-					Procedures.DetachFromInvoice(stmt.StatementNum);
-					Adjustments.DetachFromInvoice(stmt.StatementNum);
-					Statements.DeleteObject(stmt);
+					Statements.Delete(stmt);
 				}
 			}
 			else {//not email
