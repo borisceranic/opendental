@@ -98,6 +98,7 @@ namespace OpenDental.UI {
 		private const int EDITABLE_ROW_HEIGHT=19;
 		private bool editableAcceptsCR;
 		private static bool _useBlueTheme;
+		private StringFormat _format;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -126,6 +127,9 @@ namespace OpenDental.UI {
 			noteSpanStart=0;
 			noteSpanStop=0;
 			sortedByColumnIdx=-1;
+			float[] arrayTabStops={50.0f};
+			_format=new StringFormat();
+			_format.SetTabStops(0.0f,arrayTabStops);
 		}
 
 		///<summary>Clean up any resources being used.</summary>
@@ -133,6 +137,10 @@ namespace OpenDental.UI {
 			if(disposing) {
 				if(components != null) {
 					components.Dispose();
+				}
+				if(_format!=null) {
+					_format.Dispose();
+					_format=null;
 				}
 			}
 			base.Dispose(disposing);
@@ -528,13 +536,13 @@ namespace OpenDental.UI {
 							for(int j=0;j<rows[i].Cells.Count;j++) {
 								if(HasEditableColumn) {
 									//doesn't seem to calculate right when it ends in a "\r\n". It doesn't make room for the new line. Make it, by adding another one for calculations.
-									cellH=(int)((1.03)*(float)(g.MeasureString(rows[i].Cells[j].Text+"\r\n",cellFont,columns[j].ColWidth).Height))+4;//because textbox will be bigger
+									cellH=(int)((1.03)*(float)(g.MeasureString(rows[i].Cells[j].Text+"\r\n",cellFont,columns[j].ColWidth,_format).Height))+4;//because textbox will be bigger
 									if(cellH < EDITABLE_ROW_HEIGHT) {
 										cellH=EDITABLE_ROW_HEIGHT;//only used for single line text
 									}
 								}
 								else {
-									cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
+									cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height+1;
 								}
 								//if(rows[i].Height==0) {//not set
 								//  cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
@@ -550,7 +558,7 @@ namespace OpenDental.UI {
 							//We will use the height of the string "Any" to determine a better row height so the user can see that it is an empty row.
 							//If, for whatever reason, their font really does return a row height less than 4, the following code will return that value anyway thus this change should be harmless.
 							if(RowHeights[i]<4) {
-								RowHeights[i]=(int)g.MeasureString("Any",cellFont,100).Height+1;
+								RowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
 							}
 						}
 						else {//text not wrapping
@@ -558,7 +566,7 @@ namespace OpenDental.UI {
 								RowHeights[i]=EDITABLE_ROW_HEIGHT;
 							}
 							else {
-								RowHeights[i]=(int)g.MeasureString("Any",cellFont,100).Height+1;
+								RowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
 							}
 							//if(rows[i].Height==0) {//not set
 							//	RowHeights[i]=(int)g.MeasureString("Any",cellFont,100).Height+1;
@@ -571,7 +579,7 @@ namespace OpenDental.UI {
 							RowHeights[i]=imageH;
 						}
 						if(noteW>0 && rows[i].Note!="") {
-							NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFont,noteW).Height;
+							NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFont,noteW,_format).Height;
 						}
 						if(i==0) {
 							RowLocs[i]=0;
@@ -694,7 +702,6 @@ namespace OpenDental.UI {
 		///<summary>Draws background, lines, image, and text for a single row.</summary>
 		private void DrawRow(int rowI,Graphics g,Font cellFont) {
 			RectangleF textRect;
-			StringFormat format=new StringFormat();
 			Pen gridPen=new Pen(this.cGridLine);
 			Pen lowerPen=new Pen(this.cGridLine);
 			if(rowI==rows.Count-1) {//last row
@@ -793,13 +800,13 @@ namespace OpenDental.UI {
 				}
 				switch(columns[i].TextAlign) {
 					case HorizontalAlignment.Left:
-						format.Alignment=StringAlignment.Near;
+						_format.Alignment=StringAlignment.Near;
 						break;
 					case HorizontalAlignment.Center:
-						format.Alignment=StringAlignment.Center;
+						_format.Alignment=StringAlignment.Center;
 						break;
 					case HorizontalAlignment.Right:
-						format.Alignment=StringAlignment.Far;
+						_format.Alignment=StringAlignment.Far;
 						break;
 				}
 				int vertical=-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1;
@@ -842,7 +849,7 @@ namespace OpenDental.UI {
 					}
 				}
 				if(columns[i].ImageList==null) {
-					g.DrawString(rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,format);
+					g.DrawString(rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,_format);
 				}
 				else {
 					int imageIndex=-1;
@@ -873,8 +880,8 @@ namespace OpenDental.UI {
 					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+1,
 					ColPos[NoteSpanStop]+columns[NoteSpanStop].ColWidth-ColPos[NoteSpanStart],
 					NoteHeights[rowI]);
-				format.Alignment=StringAlignment.Near;
-				g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,format);
+				_format.Alignment=StringAlignment.Near;
+				g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,_format);
 			}
 		}
 
@@ -1067,7 +1074,6 @@ namespace OpenDental.UI {
 			if((float)GridW<bounds.Width) {
 				xPos=(int)(bounds.Left+bounds.Width/2-(float)GridW/2);
 			}
-			StringFormat format=new StringFormat();
 			Pen gridPen;
 			Pen lowerPen;
 			SolidBrush textBrush;
@@ -1160,13 +1166,13 @@ namespace OpenDental.UI {
 							}
 							switch(columns[i].TextAlign) {
 								case HorizontalAlignment.Left:
-									format.Alignment=StringAlignment.Near;
+									_format.Alignment=StringAlignment.Near;
 									break;
 								case HorizontalAlignment.Center:
-									format.Alignment=StringAlignment.Center;
+									_format.Alignment=StringAlignment.Center;
 									break;
 								case HorizontalAlignment.Right:
-									format.Alignment=StringAlignment.Far;
+									_format.Alignment=StringAlignment.Far;
 									break;
 							}
 							if(rows[RowsPrinted].Cells[i].ColorText==Color.Empty) {
@@ -1204,7 +1210,7 @@ namespace OpenDental.UI {
 								textRect.Location=new PointF
 									(textRect.X+g.MeasureString(rows[RowsPrinted].Cells[i].Text,cellFont).Width/textRect.Width,
 									textRect.Y);
-								//g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,format);
+								//g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,_format);
 
 							}
 							else {
@@ -1213,9 +1219,9 @@ namespace OpenDental.UI {
 									yPos,
 									(float)columns[i].ColWidth,
 									(float)RowHeights[RowsPrinted]);
-								//g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,format);
+								//g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,_format);
 							}
-							g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,format);
+							g.DrawString(rows[RowsPrinted].Cells[i].Text,cellFont,textBrush,textRect,_format);
 						}
 						yPos+=(int)((float)RowHeights[RowsPrinted]);//Move yPos down the length of the row (not the note).
 					}
@@ -1229,14 +1235,14 @@ namespace OpenDental.UI {
 					//Figure out how much vertical distance the rest of the note will take up.
 					int noteHeight;
 					int noteW=0;
-					format.Alignment=StringAlignment.Near;
+					_format.Alignment=StringAlignment.Near;
 					for(int i=NoteSpanStart;i<=NoteSpanStop;i++) {
 						noteW+=(int)((float)columns[i].ColWidth);
 					}
 					if(NoteRemaining=="") {//We are not in the middle of a note.
 						NoteRemaining=rows[RowsPrinted].Note;//The note remaining is the whole note.
 					}
-					noteHeight=(int)g.MeasureString(NoteRemaining,cellFont,noteW,format).Height; //This is how much height the rest of the note will take.
+					noteHeight=(int)g.MeasureString(NoteRemaining,cellFont,noteW,_format).Height; //This is how much height the rest of the note will take.
 					bool roomForRestOfNote=false;
 					//Test to see if there's enough room on the page for the rest of the note.
 					if(yPos+noteHeight<bounds.Bottom) {
@@ -1288,7 +1294,7 @@ namespace OpenDental.UI {
 								yPos,
 								(float)ColPos[NoteSpanStop]+(float)columns[NoteSpanStop].ColWidth-(float)ColPos[NoteSpanStart],
 								noteHeight);
-							g.DrawString(NoteRemaining,cellFont,textBrush,textRect,format);
+							g.DrawString(NoteRemaining,cellFont,textBrush,textRect,_format);
 						}
 						NoteRemaining="";
 						RowsPrinted++;
@@ -1308,7 +1314,7 @@ namespace OpenDental.UI {
 						int linesFilled;
 						string noteFitted;//This is the part of the note we will print.
 						//js- I'd like to incorporate ,StringFormat.GenericTypographic into the MeasureString, but can't find the overload.
-						sizeF=g.MeasureString(NoteRemaining,cellFont,new SizeF(noteW,noteHeight-15),format,out charactersFitted,out linesFilled);//Text that fits will be NoteRemaining.Substring(0,charactersFitted).
+						sizeF=g.MeasureString(NoteRemaining,cellFont,new SizeF(noteW,noteHeight-15),_format,out charactersFitted,out linesFilled);//Text that fits will be NoteRemaining.Substring(0,charactersFitted).
 						noteFitted=NoteRemaining.Substring(0,charactersFitted);
 						//draw lines for the part of the note that fits on this page
 						if(noteHeight>0) {
@@ -1353,7 +1359,7 @@ namespace OpenDental.UI {
 								yPos,
 								(float)ColPos[NoteSpanStop]+(float)columns[NoteSpanStop].ColWidth-(float)ColPos[NoteSpanStart],
 								noteHeight);
-							g.DrawString(noteFitted,cellFont,textBrush,textRect,format);
+							g.DrawString(noteFitted,cellFont,textBrush,textRect,_format);
 						}
 						NoteRemaining=NoteRemaining.Substring(charactersFitted);
 						break;
