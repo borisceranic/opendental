@@ -4711,6 +4711,23 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.2.18.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_2_20();
+		}
+
+		private static void To14_2_20() {
+			if(FromVersion<new Version("14.2.20.0")) {
+				string command;
+				command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				long canadianNetworkNumTelusB=PIn.Long(Db.GetScalar(command));
+				command="UPDATE carrier SET "+
+					"CDAnetVersion='04',"+
+					"CanadianSupportedTypes=2044,"+//Claims, Reversals, Predeterminations, COBs.
+					"CanadianNetworkNum="+POut.Long((long)canadianNetworkNumTelusB)+" "+
+					"WHERE IsCDA<>0 AND ElectID='000016'";
+				Db.NonQ32(command);
+				command="UPDATE preference SET ValueString = '14.2.20.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_3_0();
 		}
 
