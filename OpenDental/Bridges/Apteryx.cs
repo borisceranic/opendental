@@ -24,7 +24,7 @@ namespace OpenDental.Bridges{
 				//We remove double-quotes from the first and last name of the patient so extra double-quotes don't
 				//cause confusion in the command line parameters for Apteryx.
 				string info="\""+pat.LName.Replace("\"","")+", "+pat.FName.Replace("\"","")+"::";
-				if(pat.SSN.Length==9){
+				if(pat.SSN.Length==9 && pat.SSN!="000000000"){//SSN is optional.  eCW customers often use 000-00-0000 for any patient that does not have an SSN (mostly young children).
 					info+=pat.SSN.Substring(0,3)+"-"
 						+pat.SSN.Substring(3,2)+"-"
 						+pat.SSN.Substring(5,4);
