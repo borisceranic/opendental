@@ -688,6 +688,10 @@ namespace OpenDental{
 			for(int i=0;i<grid.SelectedIndices.Length;i++) {
 				aptNums.Add(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()));
 			}
+			if(aptNums.Count==0) {
+				MsgBox.Show(this,"No postcards necessary because contact method is not set to Mail for anyone in the list.");
+				return;
+			}
 			AddrTable=Appointments.GetAddrTable(aptNums);
 			pagesPrinted=0;
 			patientsPrinted=0;
