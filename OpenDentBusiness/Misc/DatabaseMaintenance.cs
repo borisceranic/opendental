@@ -837,7 +837,7 @@ namespace OpenDentBusiness {
 				//standard life assurance company
 				"000020",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//sun life of canada
-				"000016",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
+				"000016",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
 				//survivance
 				"000080",1,"04",claimTypes,canadianNetworkNumCSI,
 				//syndicat des fonctionnaires municipaux mtl

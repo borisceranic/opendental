@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.2.18.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.2.20.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -4709,6 +4709,23 @@ namespace OpenDentBusiness {
 				command="UPDATE claimformitem SET claimformitem.FieldName = 'DiagnosisD' WHERE ClaimFormNum="+POut.Long(claimFormNum)+" AND claimformitem.FieldName = 'Diagnosis4'";
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '14.2.18.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_2_20();
+		}
+
+		private static void To14_2_20() {
+			if(FromVersion<new Version("14.2.20.0")) {
+				string command;
+				command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				long canadianNetworkNumTelusB=PIn.Long(Db.GetScalar(command));
+				command="UPDATE carrier SET "+
+					"CDAnetVersion='04',"+
+					"CanadianSupportedTypes=2044,"+//Claims, Reversals, Predeterminations, COBs.
+					"CanadianNetworkNum="+POut.Long((long)canadianNetworkNumTelusB)+" "+
+					"WHERE IsCDA<>0 AND ElectID='000016'";
+				Db.NonQ32(command);
+				command="UPDATE preference SET ValueString = '14.2.20.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_2_X();
