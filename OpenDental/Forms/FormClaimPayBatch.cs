@@ -1039,6 +1039,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Amounts do not match.");
 				return;
 			}
+			if(gridAttached.Rows.Count==0) {
+				MsgBox.Show(this,"At least one claim must be attached to this insurance payment.");
+				return;
+			}
 			//No need to prompt user about secondary claims because they already went into each Account individually.
 			DialogResult=DialogResult.OK;
 		}
