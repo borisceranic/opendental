@@ -40,20 +40,14 @@ namespace OpenDentalServer {
 					string className=dtoGetTable.MethodName.Split('.')[1];
 					string methodName=dtoGetTable.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetTable.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -82,20 +76,14 @@ namespace OpenDentalServer {
 					string className=dtoGetDS.MethodName.Split('.')[1];
 					string methodName=dtoGetDS.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetDS.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -115,20 +103,14 @@ namespace OpenDentalServer {
 					string className=dtoGetLong.MethodName.Split('.')[1];
 					string methodName=dtoGetLong.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetLong.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -147,20 +129,14 @@ namespace OpenDentalServer {
 					string className=dtoGetInt.MethodName.Split('.')[1];
 					string methodName=dtoGetInt.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetInt.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -179,20 +155,14 @@ namespace OpenDentalServer {
 					string className=dtoGetVoid.MethodName.Split('.')[1];
 					string methodName=dtoGetVoid.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetVoid.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -213,20 +183,17 @@ namespace OpenDentalServer {
 						Userods.CheckCredentials(dtoGetObject.Credentials);//will throw exception if fails.
 					}
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
+					Assembly ass=null;
+					if(className!="Security" || methodName!="LogInWeb") {//Do this for everything except Security.LogInWeb, because Plugins.GetAssembly will fail in that case.
+						ass=Plugins.GetAssembly(assemblyName);
 					}
-					else {
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetObject.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -251,20 +218,14 @@ namespace OpenDentalServer {
 					string className=dtoGetString.MethodName.Split('.')[1];
 					string methodName=dtoGetString.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetString.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
@@ -285,20 +246,14 @@ namespace OpenDentalServer {
 					string className=dtoGetBool.MethodName.Split('.')[1];
 					string methodName=dtoGetBool.MethodName.Split('.')[2];
 					Type classType=null;
-					if(assemblyName!="OpenDentBusiness") {//plugin
-						Assembly ass=null;
-						try {
-							ass=Plugins.GetAssembly(assemblyName);
-						}
-						catch {
-							throw new ApplicationException("Plugin not loaded: "+assemblyName);
-						}
-						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
-							+"."+className);
-					}
-					else {
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
 						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
 							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
 					}
 					DtoObject[] parameters=dtoGetBool.Params;
 					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);

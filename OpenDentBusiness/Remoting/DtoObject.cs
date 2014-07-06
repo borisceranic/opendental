@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 namespace OpenDentBusiness {
 	///<summary>Packages any object with a TypeName so that it can be serialized and deserialized better.</summary>
 	public class DtoObject:IXmlSerializable {
-		///<summary>Fully qualified name, including the namespace but not the assembly.  Examples: System.Int32, OpenDentBusiness.Patient, OpenDentBusiness.Patient[], List&lt;OpenDentBusiness.Patient&gt;.  When the xml element is created for the Obj, the namespace is not included.  So this field properly stores it.</summary>
+		///<summary>Fully qualified name, including the namespace but not the assembly.  Examples: System.Int32, OpenDentBusiness.Patient, OpenDentBusiness.Patient[], List&lt;OpenDentBusiness.Patient&gt;, PluginOC.OcContainer.  When the xml element is created for the Obj, the namespace is not included.  So this field properly stores it.</summary>
 		public string TypeName;
 		///<summary>The actual object.</summary>
 		public object Obj;
@@ -57,8 +57,8 @@ namespace OpenDentBusiness {
 				serializer.Serialize(writer,((Color)Obj).ToArgb());
 			}
 			else {
-				string assemb=Assembly.GetAssembly(typeof(Db)).FullName;
-				Type type=ConvertNameToType(TypeName,assemb);
+				//string assemb=Assembly.GetAssembly(typeof(Db)).FullName;//"OpenDentBusiness, Version=14.3.0.0, Culture=neutral, PublicKeyToken=null"
+				Type type=ConvertNameToType(TypeName);//,assemb);
 				XmlSerializer serializer = new XmlSerializer(type);
 				serializer.Serialize(writer,Obj);
 			}
@@ -87,19 +87,13 @@ namespace OpenDentBusiness {
 				reader.Read();
 			}
 			reader.ReadEndElement();//DtoObject
+			//Now, process what we read.
 			Type type=null;
-			if(TypeName.StartsWith("List<")) {
-				Type typeGen=Type.GetType(TypeName.Substring(5,TypeName.Length-6));
-				Type typeList=typeof(List<>);
-				type=typeList.MakeGenericType(typeGen);
-			}
-			else if(TypeName=="System.Drawing.Color") {
+			if(TypeName=="System.Drawing.Color") {
 				type=typeof(int);
 			}
-			else {
-				//This works fine for non-system types as well without specifying the assembly,
-				//because we are already in the OpenDentBusiness assembly.
-				type=Type.GetType(TypeName);
+			else{
+				type=ConvertNameToType(TypeName);
 			}
 			XmlSerializer serializer = new XmlSerializer(type);
 			//XmlReader reader2=XmlReader.Create(new StringReader(strObj));
@@ -135,36 +129,42 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		public static Type[] GenerateTypes(DtoObject[] parameters,string assemb) {
+		public static Type[] GenerateTypes(DtoObject[] parameters,string strAssembNameDeprecating) {
 			Type[] retVal=new Type[parameters.Length];
 			for(int i=0;i<parameters.Length;i++) {
-				retVal[i]=ConvertNameToType(parameters[i].TypeName,assemb);
+				retVal[i]=ConvertNameToType(parameters[i].TypeName);//,strAssembNameDeprecating);
 			}
 			return retVal;
 		}
 
-		private static Type ConvertNameToType(string FullName,string assemb) {
+		///<summary>Examples of strTypeName passed in: System.Int32, System.Drawing.Color, OpenDentBusiness.Patient, OpenDentBusiness.Patient[], List&lt;OpenDentBusiness.Patient&gt;, PluginOC.OcContainer</summary>
+		private static Type ConvertNameToType(string strTypeName){//,string strAssembDeprecating) {
 			Type typeObj=null;
-			if(FullName.StartsWith("List<")) {
-				string strTypeGenName=FullName.Substring(5,FullName.Length-6);//strips off the List<>
+			if(strTypeName.StartsWith("List<")) {
+				string strTypeGenName=strTypeName.Substring(5,strTypeName.Length-6);//strips off the List<>
 				Type typeGen=null;
-				if(strTypeGenName.StartsWith("OpenDentBusiness")) {
-					typeGen=Type.GetType(strTypeGenName+","+assemb);
+				Assembly assemb=Plugins.GetAssembly(strTypeGenName);//usually null, unless the type is for a plugin
+				if(assemb==null) {
+					typeGen=Type.GetType(strTypeGenName);//strTypeName includes the namespace, which we require to be same as assembly by convention
 				}
-				else {//system types
-					typeGen=Type.GetType(strTypeGenName);
+				else {//plugin was found
+					typeGen=assemb.GetType(strTypeGenName);//strTypeName includes the namespace, which we require to be same as assembly by convention
 				}
 				Type typeList=typeof(List<>);
 				typeObj=typeList.MakeGenericType(typeGen);
 			}
-			else if(FullName.StartsWith("OpenDentBusiness")) {
-				typeObj=Type.GetType(FullName+","+assemb);
-			}
-			else if(FullName=="System.Drawing.Color") {
+			else if(strTypeName=="System.Drawing.Color") {
 				typeObj=typeof(Color);
 			}
-			else {//system types
-				typeObj=Type.GetType(FullName);
+			else {//system types, OpenDentBusiness, and plugins
+				string strAssembName=strTypeName.Substring(0,strTypeName.IndexOf("."));//example: System.String: index=6, substring(0,6)="System"
+				Assembly assemb=Plugins.GetAssembly(strAssembName);//usually null, unless the type is for a plugin
+				if(assemb==null) {
+					typeObj=Type.GetType(strTypeName);//strTypeName includes the namespace, which we require to be same as assembly by convention
+				}
+				else {//plugin was found
+					typeObj=assemb.GetType(strTypeName);//strTypeName includes the namespace, which we require to be same as assembly by convention
+				}
 			}
 			return typeObj;
 		}

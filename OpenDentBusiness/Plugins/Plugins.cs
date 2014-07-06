@@ -79,16 +79,23 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>Returns null if no plugin assembly loaded with the given name.  So OpenDentBusiness can be passed through here quickly to return null.</summary>
 		public static Assembly GetAssembly(string name) {
-			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server.
-				LoadAllPlugins(null);
+			if(PluginList==null){
+				if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server.
+					LoadAllPlugins(null);
+				}
+				else {
+					//this is going to be rare.  Only during UnitTest and in the first Security.LogInWeb call.
+					return null;
+				}
 			}
 			for(int i=0;i<PluginList.Count;i++) {
 				if(PluginList[i].Name==name) {
-					return PluginList[0].Assemb;
+					return PluginList[i].Assemb;
 				}
 			}
-			throw new ApplicationException();//will bubble up
+			return null;
 		}
 
 		///<summary>Will return true if a plugin implements this method, replacing the default behavior.</summary>

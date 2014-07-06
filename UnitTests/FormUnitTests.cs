@@ -45,7 +45,7 @@ namespace UnitTests {
 			Cursor=Cursors.WaitCursor;
 			try{
 				if(!isOracle){
-					Userod user=Security.LogInWeb("Admin","","",Application.ProductVersion,false);//Userods.EncryptPassword("pass",false)
+					Userod user=Security.LogInWeb("Admin","pass","",Application.ProductVersion,false);//Userods.EncryptPassword("pass",false)
 					Security.CurUser=user;
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
 				}
