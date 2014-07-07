@@ -238,6 +238,9 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
+			}
 			string log="";
 			//this will run for fix or check, but will only fix if the special char button is used 
 			//Fix code is in a dedicated button "Spec Char"
@@ -316,6 +319,9 @@ namespace OpenDentBusiness {
 		public static string AppointmentCompleteWithTpAttached(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			command="SELECT DISTINCT appointment.PatNum, "+DbHelper.Concat("LName","\", \"","FName")+" AS PatName, AptDateTime "
@@ -710,6 +716,9 @@ namespace OpenDentBusiness {
 			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				return "";
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
+			}
 			command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
 			long canadianNetworkNumTelusB=PIn.Long(Db.GetScalar(command));
 			command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='CSI' LIMIT 1";
@@ -1030,7 +1039,7 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			//Sums for each claim---------------------------------------------------------------------
@@ -1066,8 +1075,8 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
-			if(DataConnection.DBtype==DatabaseType.Oracle){
-				return "";
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			//because of the way this is grouped, it will just get one of many patients for each
@@ -1649,9 +1658,6 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
-			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
-			}
 			string log="";
 			command=@"SELECT claim.PatNum,claim.DateService,claimproc.ProcDate,claimproc.CodeSent,claimproc.FeeBilled
 					FROM claimproc,claim
@@ -1755,7 +1761,7 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			if(isCheck){
@@ -1838,6 +1844,9 @@ namespace OpenDentBusiness {
 		public static string FeeDeleteDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			command="SELECT FeeNum,FeeSched,CodeNum,Amount FROM fee GROUP BY FeeSched,CodeNum HAVING COUNT(CodeNum)>1";
 			table=Db.GetTable(command);
@@ -2453,6 +2462,9 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
+			}
 			string log="";
 			string queryStr="SELECT COUNT(*) NumFound,SigButDefNum,ButtonIndex,ComputerName FROM sigbutdef GROUP BY ComputerName,ButtonIndex HAVING COUNT(*) > 1";
 			table=Db.GetTable(queryStr);
@@ -2490,7 +2502,7 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			//This code is only needed for older db's. New DB's created after 12.2.30 and 12.3.2 shouldn't need this.
@@ -2653,6 +2665,9 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
+			}
 			string log="";
 			command=@"SELECT ProvNum,Abbr FROM provider WHERE ProvNum IN (SELECT PriProv FROM patient WHERE patient.PriProv=provider.ProvNum) AND IsHidden=1";
 			table=Db.GetTable(command);
@@ -2796,6 +2811,9 @@ namespace OpenDentBusiness {
 		public static string PatPlanOrdinalDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			command="SELECT patient.PatNum,patient.LName,patient.FName,COUNT(*) "
@@ -2944,7 +2962,7 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			if(isCheck) {
@@ -2987,6 +3005,9 @@ namespace OpenDentBusiness {
 		public static string PayPlanChargeProvNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			command="SELECT pat.PatNum AS 'PatNum',pat.LName AS 'PatLName',pat.FName AS 'PatFName',guar.PatNum AS 'GuarNum',guar.LName AS 'GuarLName',guar.FName AS 'GuarFName',payplan.PayPlanDate "
@@ -3082,7 +3103,7 @@ namespace OpenDentBusiness {
 			}
 			else {
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					return "";
+					return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 				}
 				command="SELECT *,SUM(SplitAmt) SplitAmt_ FROM paysplit WHERE NOT EXISTS(SELECT * FROM payment WHERE paysplit.PayNum=payment.PayNum) GROUP BY PayNum";
 				DataTable table=Db.GetTable(command);
@@ -3119,9 +3140,6 @@ namespace OpenDentBusiness {
 				}
 			}
 			else {
-				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					return "";
-				}
 				command="UPDATE paysplit SET paysplit.PayPlanNum=0 WHERE paysplit.PayPlanNum!=0 AND paysplit.PayPlanNum NOT IN(SELECT payplan.PayPlanNum FROM payplan)";
 				long numFixed=Db.NonQ(command);
 				if(numFixed>0 || verbose) {
@@ -3888,7 +3906,7 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "";
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			if(RecallTypes.PerioType<1 || RecallTypes.ProphyType<1) {
@@ -4224,6 +4242,9 @@ namespace OpenDentBusiness {
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
 			string log="";
 			command="SELECT UserName FROM userod WHERE IsHidden=0 GROUP BY UserName HAVING Count(*)>1;";
