@@ -4714,6 +4714,7 @@ namespace OpenDentBusiness {
 			To14_2_20();
 		}
 
+		///<summary>Oracle compatible: 07/07/2014</summary>
 		private static void To14_2_20() {
 			if(FromVersion<new Version("14.2.20.0")) {
 				string command;
@@ -5371,7 +5372,7 @@ namespace OpenDentBusiness {
 					Db.NonQ32(command);
 				}//end AudaxCeph bridge
 				//Update any text based columns that are not CLOBs to allow NULL entries.  This is because Oracle treats empty strings as NULLs.
-				if(DataConnection.DBtype==DatabaseType.Oracle) {//Only for Oracle users
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
 					command=@"SELECT TABLE_NAME, COLUMN_NAME 
 						FROM USER_TAB_COLUMNS 
 						WHERE NULLABLE='N' AND DATA_TYPE LIKE '%CHAR%'";
