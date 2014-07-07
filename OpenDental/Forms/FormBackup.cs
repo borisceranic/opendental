@@ -46,6 +46,8 @@ namespace OpenDental{
 		private GroupBox groupBox2;
 		private CheckBox checkExcludeImages;
 		//private bool usesInternalImages;
+		///<summary>This message will only get filled when a backup attempt has failed.  It will hold the message text that we want to show to the user giving them more information about the failure.</summary>
+		private string _errorMessage;
 
 		///<summary></summary>
 		public FormBackup()
@@ -524,6 +526,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Backup TO path is invalid.");
 				return;
 			}
+			_errorMessage="";
 			FormP=new FormProgress();
 			FormP.MaxVal=100;//We will be setting maxVal from worker thread.  (double)fileSize/1024;
 			FormP.NumberMultiplication=100;
@@ -538,8 +541,13 @@ namespace OpenDental{
 				workerThread.Abort();
 				return;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.Copy,0,"Database backup created at "+PrefC.GetString(PrefName.BackupToPath));
-			MessageBox.Show(Lan.g(this,"Backup complete."));
+			if(_errorMessage=="") {
+				SecurityLogs.MakeLogEntry(Permissions.Copy,0,"Database backup created at "+PrefC.GetString(PrefName.BackupToPath));
+				MessageBox.Show(Lan.g(this,"Backup complete."));
+			}
+			else {//Backup failed for some reason.
+				MessageBox.Show(_errorMessage);
+			}
 			Close();
 		}
 
@@ -592,24 +600,33 @@ namespace OpenDental{
 				}
 			}
 			catch{//for instance, if abort.
+				//If the user aborted, FormP will return DialogResult.Cancel which will not cause this error text to be displayed to the user.  See butBackup_Click for more info.
+				Invoke(new ErrorMessageDelegate(SetErrorMessage),new object[] { Lan.g(this,"Backup failed.") });
+				//We now want to automatically close FormProgress.  This is done by clearing out the variables.
+				Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,"",0,"" });
 				return;
 			}
 			//A to Z folder------------------------------------------------------------------------------------
-			if(ShouldUseAtoZFolder()) {
-				string atozFull=ODFileUtils.RemoveTrailingSeparators(ImageStore.GetPreferredAtoZpath());
-				string atozDir=atozFull.Substring(atozFull.LastIndexOf(Path.DirectorySeparatorChar)+1);//OpenDentalData
-				Invoke(new PassProgressDelegate(PassProgressToDialog),new object [] { 0,
+			try {
+				if(ShouldUseAtoZFolder()) {
+					string atozFull=ODFileUtils.RemoveTrailingSeparators(ImageStore.GetPreferredAtoZpath());
+					string atozDir=atozFull.Substring(atozFull.LastIndexOf(Path.DirectorySeparatorChar)+1);//OpenDentalData
+					Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,
 					Lan.g(this,"Calculating size of files in A to Z folder."),
 					100,"" });//max of 100 keeps dlg from closing
-				int atozSize=GetFileSizes(ODFileUtils.CombinePaths(atozFull,""),
-					ODFileUtils.CombinePaths(new string[] {textBackupToPath.Text,atozDir,""}))/1024;
-				if(!Directory.Exists(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir))){// D:\OpenDentalData
-					Directory.CreateDirectory(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir));// D:\OpenDentalData
+					int atozSize=GetFileSizes(ODFileUtils.CombinePaths(atozFull,""),
+						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }))/1024;
+					if(!Directory.Exists(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir))) {// D:\OpenDentalData
+						Directory.CreateDirectory(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir));// D:\OpenDentalData
+					}
+					curVal=0;
+					CopyDirectoryIncremental(ODFileUtils.CombinePaths(atozFull,""),// C:\OpenDentalData\
+						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }),// D:\OpenDentalData\
+						atozSize);
 				}
-				curVal=0;
-				CopyDirectoryIncremental(ODFileUtils.CombinePaths(atozFull,""),// C:\OpenDentalData\
-					ODFileUtils.CombinePaths(new string[] {textBackupToPath.Text,atozDir,""}),// D:\OpenDentalData\
-					atozSize);
+			}
+			catch {
+				Invoke(new ErrorMessageDelegate(SetErrorMessage),new object[] { Lan.g(this,"Backing up A to Z images folder failed.  User might not have enough permissions or a file might be in use.") });
 			}
 			//force dialog to close even if no files copied or calculation was slightly off.
 			Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,"",0,"" });
@@ -636,6 +653,11 @@ namespace OpenDental{
 				atozSize);
 			//force dlg to close even if no files copied or calculation was slightly off.
 			Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,"",0,"" });
+		}
+
+		///<summary>This function gets invoked from the worker threads.</summary>
+		private void SetErrorMessage(string errorMessage) {
+			_errorMessage=errorMessage;
 		}
 
 		///<summary>This function gets invoked from the worker threads.</summary>
@@ -899,6 +921,9 @@ namespace OpenDental{
 		}		
 
 	}
+
+	///<summary>Backing up can fail at two points, when backing up the database or the A to Z images.  This delegate lets the backup thread manipulate a local variable so that we can let the user know at what point the backup failed.</summary>
+	public delegate void ErrorMessageDelegate(string errorMessage);
 }
 
 
