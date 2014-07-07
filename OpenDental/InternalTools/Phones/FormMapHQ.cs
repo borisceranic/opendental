@@ -209,6 +209,10 @@ namespace OpenDental {
 				labelTriageTimeSpan.ForeColor=Color.Red;
 				labelTriageTimeSpan.OuterColor=Color.Red;
 			}
+			else if(timeBehind>TimeSpan.FromMinutes(9)) { //we are approaching being behind
+				labelTriageTimeSpan.ForeColor=Color.Orange;
+				labelTriageTimeSpan.OuterColor=Color.Orange;
+			}
 			else { //we are ok
 				labelTriageTimeSpan.ForeColor=Color.Black;
 				labelTriageTimeSpan.OuterColor=Color.Black;
