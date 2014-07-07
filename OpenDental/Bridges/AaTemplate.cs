@@ -55,9 +55,13 @@ namespace OpenDental.Bridges{
 			else if(pat.Gender==PatientGender.Male) {
 				str+="M ";
 			}
-			//This pattern shows how to include an SSN when optional.
-			if(pat.SSN.Length==9 && pat.SSN!="000000000") {//SSN is optional.  eCW customers often use 000-00-0000 for any patient that does not have an SSN (mostly young children).
+			//If SSN is allowed by the bridge software, then it will always be optional, because SSNs are not common enough to require.
+			//Additionally, Open Dental does not require SSN when creating a patient, so we cannot guarantee that the SSN exists.
+			if(pat.SSN.Replace("0","").Trim()!="") {//An SSN which is all zeros will be treated as a blank SSN.  Needed for eCW, since eCW sets SSN to 000-00-0000 if the patient does not have an SSN.
+				//If dashes are required in the output, then:
 				str+=pat.SSN.Substring(0,3)+"-"+pat.SSN.Substring(3,2)+"-"+pat.SSN.Substring(5,4);
+				//Otherwise, output raw SSN:
+				str+=pat.SSN;
 			}
 			try {
 				Process.Start(path,str);
