@@ -4717,7 +4717,12 @@ namespace OpenDentBusiness {
 		private static void To14_2_20() {
 			if(FromVersion<new Version("14.2.20.0")) {
 				string command;
-				command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				}
+				else {
+					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' AND RowNum<=1";
+				}
 				long canadianNetworkNumTelusB=PIn.Long(Db.GetScalar(command));
 				command="UPDATE carrier SET "+
 					"CDAnetVersion='04',"+
