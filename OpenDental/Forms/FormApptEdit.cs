@@ -2395,8 +2395,8 @@ namespace OpenDental{
 				return false;
 			}
 			string aptPattern=Appointments.ConvertPatternTo5(strBTime.ToString());
-			//Only run appt overlap check if editing an appt from the chart module and eCW program link not enabled.
-			if((IsInChartModule || IsInViewPatAppts) && !Programs.UsingEcwTightOrFullMode()) {
+			//Only run appt overlap check if editing an appt not in unscheduled list and in chart module and eCW program link not enabled.
+			if((IsInChartModule || IsInViewPatAppts) && !Programs.UsingEcwTightOrFullMode() && AptCur.AptStatus!=ApptStatus.UnschedList) {
 				Appointments.RefreshPeriod(AptCur.AptDateTime,AptCur.AptDateTime);
 				List<Appointment> apptList=Appointments.GetForPeriodList(AptCur.AptDateTime,AptCur.AptDateTime);
 				if(DoesOverlap(aptPattern,apptList)) {
