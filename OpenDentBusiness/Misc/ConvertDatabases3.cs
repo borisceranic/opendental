@@ -4717,7 +4717,12 @@ namespace OpenDentBusiness {
 		private static void To14_2_20() {
 			if(FromVersion<new Version("14.2.20.0")) {
 				string command;
-				command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' LIMIT 1";
+				}
+				else {
+					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='TELUS B' AND RowNum<=1";
+				}
 				long canadianNetworkNumTelusB=PIn.Long(Db.GetScalar(command));
 				command="UPDATE carrier SET "+
 					"CDAnetVersion='04',"+
@@ -5365,6 +5370,25 @@ namespace OpenDentBusiness {
 						+"'AudaxCeph')";
 					Db.NonQ32(command);
 				}//end AudaxCeph bridge
+				//Update any text based columns that are not CLOBs to allow NULL entries.  This is because Oracle treats empty strings as NULLs.
+				if(DataConnection.DBtype==DatabaseType.Oracle) {//Only for Oracle users
+					command=@"SELECT TABLE_NAME, COLUMN_NAME 
+						FROM USER_TAB_COLUMNS 
+						WHERE NULLABLE='N' AND DATA_TYPE LIKE '%CHAR%'";
+					table=Db.GetTable(command);
+					for(int i=0;i<table.Rows.Count;i++) {
+						command="ALTER TABLE "+table.Rows[i]["TABLE_NAME"].ToString()+" MODIFY("+table.Rows[i]["COLUMN_NAME"].ToString()+" NULL)";
+						try {
+							Db.NonQ(command);
+						}
+						catch {
+							//This will only cause issues if the user tries to insert empty string into a NOT NULL text based column.
+							//Therefore, I'd rather the failure happen within the program instead of here in the convert script.
+						}
+					}
+				}
+
+
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
