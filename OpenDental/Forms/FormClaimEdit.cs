@@ -4877,7 +4877,27 @@ namespace OpenDental{
 			//ClaimList=Claims.Refresh(PatCur.PatNum);
 			//ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
 			//FillGrids();
+			//At this point we know the user just added an insurance payment.  Check to see if they want the provider transfer window to show.
+			ShowProviderTransferWindow();
 			DialogResult=DialogResult.OK;
+		}
+
+		///<summary>Helper method that shows the payment window if the user has the "Show provider income transfer window after entering insurance payment" preference enabled.
+		///This method should always be called after an insurance payment has been made.</summary>
+		private void ShowProviderTransferWindow() {
+			if(!PrefC.GetBool(PrefName.ProviderIncomeTransferShows)) {
+				return;
+			}
+			Payment PaymentCur=new Payment();
+			PaymentCur.PayDate=DateTimeOD.Today;
+			PaymentCur.PatNum=PatCur.PatNum;
+			PaymentCur.ClinicNum=PatCur.ClinicNum;
+			PaymentCur.PayType=0;//txfr
+			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
+			Payments.Insert(PaymentCur);
+			FormPayment Formp=new FormPayment(PatCur,FamCur,PaymentCur);
+			Formp.IsNew=true;
+			Formp.ShowDialog();
 		}
 
 		private void radioProsthN_Click(object sender, System.EventArgs e) {
@@ -5401,19 +5421,8 @@ namespace OpenDental{
 				//	Eclaims.Eclaims.SendBatches(queueItems);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
 				//}
 			}
-			if(comboClaimStatus.SelectedIndex==5){//Received
-				if(PrefC.GetBool(PrefName.ProviderIncomeTransferShows)){
-					Payment PaymentCur=new Payment();
-					PaymentCur.PayDate=DateTimeOD.Today;
-					PaymentCur.PatNum=PatCur.PatNum;
-					PaymentCur.ClinicNum=PatCur.ClinicNum;
-					PaymentCur.PayType=0;//txfr
-					PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
-					Payments.Insert(PaymentCur);
-					FormPayment Formp=new FormPayment(PatCur,FamCur,PaymentCur);
-					Formp.IsNew=true;
-					Formp.ShowDialog();
-				}
+			if(comboClaimStatus.SelectedIndex==5) {//Received
+				ShowProviderTransferWindow();
 			}
 			DialogResult=DialogResult.OK;
 		}
