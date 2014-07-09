@@ -27,6 +27,8 @@ namespace OpenDental{
 		private UI.Button butDuplicate;
 		private UI.Button butHistory;
 		List<HL7Def> ListCustom;
+		///<summary>This gets set externally beforehand.  This is passed to FormHL7Msgs for loading the HL7 messages for the currently selected patient.</summary>
+		public long CurPatNum;
 
 		///<summary></summary>
 		public FormHL7Defs()
@@ -316,6 +318,14 @@ namespace OpenDental{
 			grid1.SetSelected(false);
 		}
 
+		private void butHistory_Click(object sender,EventArgs e) {
+			FormHL7Msgs FormS=new FormHL7Msgs();
+			FormS.CurPatNum=CurPatNum;
+			FormS.ShowDialog();
+			FillGrid1();
+			FillGrid2();
+		}
+
 		private void grid1_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormHL7DefEdit FormS=new FormHL7DefEdit();
 			FormS.HL7DefCur=ListInternal[e.Row];
@@ -341,12 +351,6 @@ namespace OpenDental{
 			DataValid.SetInvalid(InvalidType.Prefs);
 		}
 
-		private void butHistory_Click(object sender,EventArgs e) {
-			FormHL7Msgs FormS=new FormHL7Msgs();
-			FormS.ShowDialog();
-			FillGrid1();
-			FillGrid2();
-		}
 	}
 }
 
