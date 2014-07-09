@@ -2839,8 +2839,10 @@ namespace OpenDental {
 				//again, in case missed in loop above:
 				ContrApptSingle.SelectedAptNum=ContrApptSingle.ClickedAptNum;
 				ContrApptSingle3[thisIndex].CreateShadow();
-				grfx.DrawImage(ContrApptSingle3[thisIndex].Shadow,ContrApptSingle3[thisIndex].Location.X
-					,ContrApptSingle3[thisIndex].Location.Y);
+				if(ContrApptSingle3[thisIndex].Shadow!=null) {
+					grfx.DrawImage(ContrApptSingle3[thisIndex].Shadow,ContrApptSingle3[thisIndex].Location.X
+								,ContrApptSingle3[thisIndex].Location.Y);
+				}
 				RefreshModuleDataPatient(PIn.Long(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
 				RefreshModuleScreenPatient();
 				OnPatientSelected(PatCur);
