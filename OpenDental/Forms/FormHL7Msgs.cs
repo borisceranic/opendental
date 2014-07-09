@@ -12,6 +12,8 @@ namespace OpenDental {
 	public partial class FormHL7Msgs:Form {
 		private long SelectedPatNum;
 		private List<HL7Msg> MsgList;
+		///<summary>This gets set externally beforehand.  Lets user quickly select the HL7 messages for the current patient.</summary>
+		public long CurPatNum;
 
 		public FormHL7Msgs() {
 			InitializeComponent();
@@ -19,7 +21,7 @@ namespace OpenDental {
 		}
 
 		private void FormHL7Msgs_Load(object sender,EventArgs e) {
-			textDateStart.Text=DateTime.Today.AddDays(-7).ToShortDateString();
+			textDateStart.Text=DateTime.Today.ToShortDateString();//Set both start and stop date to today to limit the number of messages that load immediately
 			textDateEnd.Text=DateTime.Today.ToShortDateString();
 			comboHL7Status.Items.Add(Lan.g(this,"All"));
 			comboHL7Status.SelectedIndex=0;
@@ -39,6 +41,9 @@ namespace OpenDental {
 			if(SelectedPatNum>0) {
 				Patient pat=Patients.GetLim(SelectedPatNum);
 				textPatient.Text=pat.GetNameLF();
+			}
+			else {
+				textPatient.Text="";
 			}
 			MsgList=HL7Msgs.GetHL7Msgs(PIn.Date(textDateStart.Text),PIn.Date(textDateEnd.Text),SelectedPatNum,comboHL7Status.SelectedIndex);
 			gridMain.BeginUpdate();
@@ -78,11 +83,23 @@ namespace OpenDental {
 			gridMain.EndUpdate();
 		}
 
-		private void butClose_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.OK;
+		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
+			FormHL7MsgEdit FormS=new FormHL7MsgEdit();
+			FormS.MsgCur=HL7Msgs.GetOne(MsgList[e.Row].HL7MsgNum);
+			FormS.ShowDialog();
+			FillGrid();
+		}
+
+		private void comboHL7Status_SelectedIndexChanged(object sender,EventArgs e) {
+			FillGrid();
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void butCurrent_Click(object sender,EventArgs e) {
+			SelectedPatNum=CurPatNum;
 			FillGrid();
 		}
 
@@ -97,21 +114,13 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void comboHL7Status_SelectedIndexChanged(object sender,EventArgs e) {
-			FillGrid();
-		}
-
-		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
-			FormHL7MsgEdit FormS=new FormHL7MsgEdit();
-			FormS.MsgCur=MsgList[e.Row];
-			FormS.ShowDialog();
-			FillGrid();
-		}
-
 		private void butAll_Click(object sender,EventArgs e) {
 			SelectedPatNum=0;
-			textPatient.Text="";
 			FillGrid();
+		}
+
+		private void butClose_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.OK;
 		}
 
 	}

@@ -18,13 +18,23 @@ namespace OpenDentBusiness{
 			return Crud.HL7MsgCrud.SelectMany(command);//Just 0 or 1 item in list for now.
 		}
 
-		///<summary>When called we will make sure to send a startDate and endDate.  Status parameter 0:All, 1:OutPending, 2:OutSent, 3:OutFailed, 4:InProcessed, 5:InFailed</summary>
+		///<summary>This will retrieve the hl7msg object from the database using the primary key Hl7MsgNum.  Used primarily for getting the MsgText of the referenced message, since we do not want to get that potentially large data unless we specifically need it.</summary>
+		public static HL7Msg GetOne(long hl7MsgNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<HL7Msg>(MethodBase.GetCurrentMethod(),hl7MsgNum);
+			}
+			string command="SELECT * FROM hl7msg WHERE HL7MsgNum="+POut.Long(hl7MsgNum);
+			return Crud.HL7MsgCrud.SelectOne(command);
+		}
+
+		///<summary>When called we will make sure to send a startDate and endDate.  Status parameter 0:All, 1:OutPending, 2:OutSent, 3:OutFailed, 4:InProcessed, 5:InFailed.  This will not return hl7msg.MsgText due to large size of text of many messages.  To see the message text of one of the returned rows, use GetOne(long hl7MsgNum) above.</summary>
 		public static List<HL7Msg> GetHL7Msgs(DateTime startDate,DateTime endDate,long patNum,int status) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<HL7Msg>>(MethodBase.GetCurrentMethod(),startDate,endDate,patNum,status);
 			}
 			//join with the patient table so we can display patient name instead of PatNum
-			string command=@"SELECT *	FROM hl7msg	WHERE DATE(hl7msg.DateTStamp) BETWEEN "+POut.Date(startDate)+" AND "+POut.Date(endDate)+" ";
+			string command=@"SELECT HL7MsgNum,HL7Status,'' AS MsgText,AptNum,DateTStamp,PatNum,Note	"
+				+"FROM hl7msg	WHERE "+DbHelper.DateColumn("hl7msg.DateTStamp")+" BETWEEN "+POut.Date(startDate)+" AND "+POut.Date(endDate)+" ";
 			if(patNum>0) {
 				command+="AND hl7msg.PatNum="+POut.Long(patNum)+" ";
 			}

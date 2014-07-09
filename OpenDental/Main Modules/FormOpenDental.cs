@@ -4271,6 +4271,7 @@ namespace OpenDental{
 				return;
 			}
 			FormHL7Defs FormH=new FormHL7Defs();
+			FormH.CurPatNum=CurPatNum;
 			FormH.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"HL7");
 		}
