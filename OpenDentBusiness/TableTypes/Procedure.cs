@@ -122,7 +122,10 @@ namespace OpenDentBusiness {
 		public string DiagnosticCode3;
 		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
 		public string DiagnosticCode4;
-
+		///<summary>Some procedures require a SNOMED code which indicates that site on the body at which this procedure was performed.</summary>
+		public string SnomedBodySite;
+		///<summary>FK to provider.ProvNum.  Ordering provider override.  Medical eclaims only.  Defaults to zero.  If set to zero, then the provider referenced by ProvNum (procedure treating provider) will go out on the eclaim instead.</summary>
+		public long ProvOrderOverride;
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
@@ -136,8 +139,6 @@ namespace OpenDentBusiness {
 		///<summary>Not a database column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public bool SigIsTopaz;
-		///<summary>Some procedures require a SNOMED code which indicates that site on the body at which this procedure was performed.</summary>
-		public string SnomedBodySite;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProcTime",typeof(long))]

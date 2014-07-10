@@ -1795,10 +1795,18 @@ namespace OpenDentBusiness
 						//2420C REF: (medical) Service Facility Location Secondary Identification. Situational. We do not use.
 						//2420D NM1: DQ (medical) Supervising Provider Name. Situational. We do not support.
 						//2420D REF: (medical) Supervising Provider Secondary Identification. Situational. We do not support.
-						//Emdeon Medical requires loop 2420E when the claim is sent to DMERC (Medicaid) carriers. This loop can only be used for a provider that is a person, not an organization, so we don't send this loop if not a person.
-						if(!provTreatProc.IsNotPerson) { //Treating provider is a person.
+						//Emdeon Medical requires loop 2420E when the claim is sent to DMERC (Medicaid) carriers.
+						//This loop can only be used for a provider that is a person, not an organization, so we don't send this loop if not a person.
+						Provider provOrderProc=provTreat;//Initialized to claim treating provider.
+						if(claim.ProvOrderOverride!=0) {
+							provOrderProc=Providers.GetProv(claim.ProvOrderOverride);//Override ordering provider at claim level.
+						}
+						if(proc.ProvOrderOverride!=0) {
+							provOrderProc=Providers.GetProv(proc.ProvOrderOverride);//Override ordering provider at procedure level.
+						}
+						if(!provOrderProc.IsNotPerson) { //Treating provider is a person.
 							//2420E NM1: DK (medical) Ordering Provider Name. Situational. Required to be a person.
-							WriteNM1Provider("DK",sw,provTreatProc);
+							WriteNM1Provider("DK",sw,provOrderProc);
 							//2420E N3: (medical) Ordering Provider Address. Situational.
 							sw.Write("N3"+s+Sout(billingAddress1,55));//N301 1/55 Address Information:
 							if(billingAddress2!="") {

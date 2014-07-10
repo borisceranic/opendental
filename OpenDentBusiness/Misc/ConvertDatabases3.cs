@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.2.20.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.2.21.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -4731,6 +4731,47 @@ namespace OpenDentBusiness {
 					"WHERE IsCDA<>0 AND ElectID='000016'";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '14.2.20.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_2_21();
+		}
+
+		private static void To14_2_21() {
+			if(FromVersion<new Version("14.2.21.0")) {
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claim ADD ProvOrderOverride bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD INDEX (ProvOrderOverride)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claim ADD ProvOrderOverride number(20)";
+					Db.NonQ(command);
+					command="UPDATE claim SET ProvOrderOverride = 0 WHERE ProvOrderOverride IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim MODIFY ProvOrderOverride NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claim_ProvOrderOverride ON claim (ProvOrderOverride)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD ProvOrderOverride bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog ADD INDEX (ProvOrderOverride)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD ProvOrderOverride number(20)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET ProvOrderOverride = 0 WHERE ProvOrderOverride IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY ProvOrderOverride NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX procedurelog_ProvOrderOverride ON procedurelog (ProvOrderOverride)";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.2.21.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_2_X();
