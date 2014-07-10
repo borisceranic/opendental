@@ -633,8 +633,14 @@ namespace OpenDental{
 				for(int i=0;i<listInsPayType.SelectedIndices.Count;i++) {
 					insPayTypes.Add(_insPayDefNums[listInsPayType.SelectedIndices[i]]);
 				}
-				PatPayList=Payments.GetForDeposit(dateStart,clinicNum,payTypes);
-				ClaimPayList=ClaimPayments.GetForDeposit(dateStart,clinicNum,insPayTypes);
+				PatPayList=new List<Payment>();
+				if(payTypes.Count!=0) {
+					PatPayList=Payments.GetForDeposit(dateStart,clinicNum,payTypes);
+				}
+				ClaimPayList=new ClaimPayment[0];
+				if(insPayTypes.Count!=0) {
+					ClaimPayList=ClaimPayments.GetForDeposit(dateStart,clinicNum,insPayTypes);
+				}
 			}
 			else{
 				PatPayList=Payments.GetForDeposit(DepositCur.DepositNum);
@@ -739,6 +745,14 @@ namespace OpenDental{
 			if(textDateStart.errorProvider1.GetError(textDate)!=""){
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
+			}
+			if(listInsPayType.SelectedIndices.Count==0 && listPayType.SelectedIndices.Count==0) {
+				for(int i=0;i<listInsPayType.Items.Count;i++) {
+					listInsPayType.SetSelected(i,true);
+				}
+				for(int j=0;j<listPayType.Items.Count;j++) {
+					listPayType.SetSelected(j,true);
+				}
 			}
 			FillGrids();
 			gridPat.SetSelected(true);
