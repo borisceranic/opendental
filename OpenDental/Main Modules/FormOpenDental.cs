@@ -295,6 +295,8 @@ namespace OpenDental{
 		private MenuItem menuItemEvaluations;
 		private MenuItem menuItemEServices;
 		private AutoResetEvent _timeSynchSleep=new AutoResetEvent(false);
+		///<summary>Used to stop threads from running during updates.  Currently only used to stop Mobile Synch.</summary>
+		private bool _isStartingUp;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -1801,6 +1803,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormOpenDental_Load(object sender, System.EventArgs e){
+			_isStartingUp=true;//Halts mobile synch during updates.
 			Splash.Dispose();
 			Version versionOd=Assembly.GetAssembly(typeof(FormOpenDental)).GetName().Version;
 			Version versionObBus=Assembly.GetAssembly(typeof(Db)).GetName().Version;
@@ -2021,6 +2024,7 @@ namespace OpenDental{
 				_threadTimeSynch=new Thread(new ThreadStart(ThreadTimeSynch_Synch));
 				_threadTimeSynch.Start();
 			}
+			_isStartingUp=false;//Used to allow Mobile Synch to continue
 			if(Security.CurUser==null) {//It could already be set if using web service because login from ChooseDatabase window.
 				if(Programs.UsingEcwTightOrFullMode() && odUser!="") {//only leave it null if a user was passed in on the commandline.  If starting OD manually, it will jump into the else.
 					//leave user as null
@@ -5672,6 +5676,9 @@ namespace OpenDental{
 
 		/// <summary>This is set to 30 seconds</summary>
 		private void timerWebHostSynch_Tick(object sender,EventArgs e) {
+			if(_isStartingUp) {//If the program is starting up it may be updating and we do not want to synch yet.
+				return;
+			}
 			try {
 				string interval=PrefC.GetStringSilent(PrefName.MobileSyncIntervalMinutes);
 				if(interval=="" || interval=="0") {//not a paid customer or chooses not to synch
