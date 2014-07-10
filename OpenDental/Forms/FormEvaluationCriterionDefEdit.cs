@@ -9,6 +9,7 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormEvaluationCriterionDefEdit:Form {
 		EvaluationCriterionDef _evalCritDef;
+		GradingScale _gradeScale;
 
 		public FormEvaluationCriterionDefEdit(EvaluationCriterionDef evalCritDef) {
 			InitializeComponent();
@@ -18,9 +19,14 @@ namespace OpenDental {
 
 		private void FormEvaluationCriterionDefEdit_Load(object sender,EventArgs e) {
 			textDescript.Text=_evalCritDef.CriterionDescript;
-			GradingScale gradeScale=GradingScales.GetOne(_evalCritDef.GradingScaleNum);
-			textGradeScaleName.Text=gradeScale.Description;
+			_gradeScale=GradingScales.GetOne(_evalCritDef.GradingScaleNum);
+			textGradeScaleName.Text=_gradeScale.Description;
 			checkIsCategoryName.Checked=_evalCritDef.IsCategoryName;
+			if(_gradeScale.ScaleType==EnumScaleType.Weighted) {
+				textPoints.Visible=true;
+				labelPoints.Visible=true;
+				textPoints.Text=_evalCritDef.MaxPointsPoss.ToString();
+			}
 		}
 
 		private void butGradingScale_Click(object sender,EventArgs e) {
@@ -35,7 +41,18 @@ namespace OpenDental {
 			FormGS.ShowDialog();
 			if(FormGS.DialogResult==DialogResult.OK) {
 				textGradeScaleName.Text=FormGS.SelectedGradingScale.Description;
-				_evalCritDef.GradingScaleNum=FormGS.SelectedGradingScale.GradingScaleNum;
+				_gradeScale=FormGS.SelectedGradingScale;
+				_evalCritDef.GradingScaleNum=_gradeScale.GradingScaleNum;
+				if(FormGS.SelectedGradingScale.ScaleType==EnumScaleType.Weighted) {
+					textPoints.Visible=true;
+					labelPoints.Visible=true;
+					textPoints.Text=_evalCritDef.MaxPointsPoss.ToString();
+				}
+				else {
+					textPoints.Visible=false;
+					labelPoints.Visible=false;
+					textPoints.Text="";
+				}
 			}
 		}
 
@@ -55,8 +72,14 @@ namespace OpenDental {
 				MsgBox.Show(this,"Description cannot be blank.");
 				return;
 			}
+			float points=0;
+			if(_gradeScale.ScaleType==EnumScaleType.Weighted && !float.TryParse(textPoints.Text,out points)) {
+				MsgBox.Show(this,"The specified point value is not a valid number.  Please input a valid number to save the criterion.");
+				return;
+			}
 			_evalCritDef.CriterionDescript=textDescript.Text;
 			_evalCritDef.IsCategoryName=checkIsCategoryName.Checked;
+			_evalCritDef.MaxPointsPoss=points;
 			if(_evalCritDef.IsNew) {
 				EvaluationCriterionDefs.Insert(_evalCritDef);
 			}

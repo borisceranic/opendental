@@ -240,7 +240,7 @@ namespace OpenDental{
 			// 
 			// labelTotalPoint
 			// 
-			this.labelTotalPoint.Location = new System.Drawing.Point(16, 388);
+			this.labelTotalPoint.Location = new System.Drawing.Point(162, 388);
 			this.labelTotalPoint.Name = "labelTotalPoint";
 			this.labelTotalPoint.Size = new System.Drawing.Size(112, 17);
 			this.labelTotalPoint.TabIndex = 130;
@@ -249,7 +249,7 @@ namespace OpenDental{
 			// 
 			// textTotalPoints
 			// 
-			this.textTotalPoints.Location = new System.Drawing.Point(130, 387);
+			this.textTotalPoints.Location = new System.Drawing.Point(276, 387);
 			this.textTotalPoints.MaxLength = 255;
 			this.textTotalPoints.Name = "textTotalPoints";
 			this.textTotalPoints.ReadOnly = true;

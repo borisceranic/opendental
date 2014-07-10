@@ -116,6 +116,7 @@ namespace OpenDental {
 				evalCrit.GradingScaleNum=evalCritDefs[i].GradingScaleNum;
 				evalCrit.IsCategoryName=evalCritDefs[i].IsCategoryName;
 				evalCrit.ItemOrder=evalCritDefs[i].ItemOrder;
+				evalCrit.MaxPointsPoss=evalCritDefs[i].MaxPointsPoss;
 				EvaluationCriterions.Insert(evalCrit);
 			}
 			evalNew.IsNew=true;

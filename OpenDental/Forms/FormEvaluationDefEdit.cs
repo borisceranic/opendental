@@ -46,10 +46,14 @@ namespace OpenDental {
 		private void FillGrid() {//Also fills total points if necessary.
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),180);
+			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Description"),140);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Grading Scale"),80);
+			col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Grading Scale"),100);
 			gridMain.Columns.Add(col);
+			if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
+				col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Max Points"),80);
+				gridMain.Columns.Add(col);
+			}
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			float points=0;
@@ -63,10 +67,17 @@ namespace OpenDental {
 				else {
 					row.Cells.Add(_gradingScales[_criterionDefsForEval[i].GradingScaleNum].Description);
 				}
-				gridMain.Rows.Add(row);
 				if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
 					points+=_criterionDefsForEval[i].MaxPointsPoss;
+					if(_criterionDefsForEval[i].IsCategoryName) {
+						row.Cells.Add("");
+					}
+					else {
+						row.Cells.Add(_criterionDefsForEval[i].MaxPointsPoss.ToString());
+					}
 				}
+				gridMain.Rows.Add(row);
+				
 			}
 			gridMain.EndUpdate();
 			textTotalPoints.Text=points.ToString();
@@ -128,6 +139,10 @@ namespace OpenDental {
 				if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
 					labelTotalPoint.Visible=true;
 					textTotalPoints.Visible=true;
+				}
+				else {
+					labelTotalPoint.Visible=false;
+					textTotalPoints.Visible=false;
 				}
 			}
 		}

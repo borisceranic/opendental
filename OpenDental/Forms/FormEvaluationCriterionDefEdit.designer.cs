@@ -160,6 +160,7 @@ namespace OpenDental{
 			this.labelPoints.TabIndex = 123;
 			this.labelPoints.Text = "Points";
 			this.labelPoints.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelPoints.Visible = false;
 			// 
 			// textPoints
 			// 
@@ -168,6 +169,7 @@ namespace OpenDental{
 			this.textPoints.Name = "textPoints";
 			this.textPoints.Size = new System.Drawing.Size(54, 20);
 			this.textPoints.TabIndex = 122;
+			this.textPoints.Visible = false;
 			// 
 			// FormEvaluationCriterionDefEdit
 			// 

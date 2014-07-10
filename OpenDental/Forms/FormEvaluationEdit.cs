@@ -108,6 +108,50 @@ namespace OpenDental {
 		}
 
 		private void FillGridGrading(long gradingScaleNum) {
+			if(_critGradeScales[gradingScaleNum].ScaleType==EnumScaleType.Weighted) {
+				FillGridGradingWithWeighted(gradingScaleNum);
+			}
+			else if(_critGradeScales[gradingScaleNum].ScaleType==EnumScaleType.Percentage) {
+				FillGridGradingWithPercentage(gradingScaleNum);
+			}
+			else {//PickList ScaleType
+				FillGridGradingWithPickList(gradingScaleNum);
+			}
+		}
+
+		private void FillGridGradingWithWeighted(long gradingScaleNum) {
+			gridGrades.BeginUpdate();
+			gridGrades.Columns.Clear();
+			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationEdit","Max Point Value"),100,HorizontalAlignment.Center);
+			gridGrades.Columns.Add(col);
+			gridGrades.Rows.Clear();
+			ODGridRow row=new ODGridRow();
+			if(_listEvalCrits[gridMain.SelectedCell.Y].IsCategoryName) {//Refill the grid with nothing if a category is selected.
+				gridGrades.EndUpdate();
+				return;
+			}
+			row.Cells.Add(_listEvalCrits[gridMain.SelectedCell.Y].MaxPointsPoss.ToString());
+			gridGrades.Rows.Add(row);
+			gridGrades.EndUpdate();
+		}
+
+		private void FillGridGradingWithPercentage(long gradingScaleNum) {
+			gridGrades.BeginUpdate();
+			gridGrades.Columns.Clear();
+			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationEdit","Percentage"),100,HorizontalAlignment.Center);
+			gridGrades.Columns.Add(col);
+			gridGrades.Rows.Clear();
+			ODGridRow row=new ODGridRow();
+			if(_listEvalCrits[gridMain.SelectedCell.Y].IsCategoryName) {//Refill the grid with nothing if a category is selected.
+				gridGrades.EndUpdate();
+				return;
+			}
+			row.Cells.Add(Lan.g("FormEvaluationEdit","0 to 100"));
+			gridGrades.Rows.Add(row);
+			gridGrades.EndUpdate();
+		}
+
+		private void FillGridGradingWithPickList(long gradingScaleNum) {
 			gridGrades.BeginUpdate();
 			gridGrades.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationEdit","Number"),60);
@@ -117,19 +161,19 @@ namespace OpenDental {
 			col=new ODGridColumn(Lan.g("FormEvaluationEdit","Description"),150);
 			gridGrades.Columns.Add(col);
 			gridGrades.Rows.Clear();
-			ODGridRow row;
+			ODGridRow row=new ODGridRow();
 			if(_listEvalCrits[gridMain.SelectedCell.Y].IsCategoryName) {//Refill the grid with nothing if a category is selected.
 				gridGrades.EndUpdate();
 				return;
 			}
 			for(int i=0;i<_critGradeItems[gradingScaleNum].Count;i++) {
-				row=new ODGridRow();				
+				row=new ODGridRow();
 				row.Cells.Add(_critGradeItems[gradingScaleNum][i].GradeNumber.ToString());
 				row.Cells.Add(_critGradeItems[gradingScaleNum][i].GradeShowing);
 				row.Cells.Add(_critGradeItems[gradingScaleNum][i].Description);
 				gridGrades.Rows.Add(row);
+				gridGrades.EndUpdate();
 			}
-			gridGrades.EndUpdate();
 		}
 
 		private void gridMain_CellEnter(object sender,ODGridClickEventArgs e) {
@@ -189,6 +233,11 @@ namespace OpenDental {
 		}
 
 		private void gridGrades_CellClick(object sender,ODGridClickEventArgs e) {
+			if(_critGradeScales[_listEvalCrits[gridMain.SelectedCell.Y].GradingScaleNum].ScaleType==EnumScaleType.Weighted
+				|| _critGradeScales[_listEvalCrits[gridMain.SelectedCell.Y].GradingScaleNum].ScaleType==EnumScaleType.Percentage) 
+			{
+					return;
+			}
 			_listEvalCrits[gridMain.SelectedCell.Y].GradeNumber=_critGradeItems[_listEvalCrits[gridMain.SelectedCell.Y].GradingScaleNum][gridGrades.GetSelectedIndex()].GradeNumber;
 			_listEvalCrits[gridMain.SelectedCell.Y].GradeShowing=_critGradeItems[_listEvalCrits[gridMain.SelectedCell.Y].GradingScaleNum][gridGrades.GetSelectedIndex()].GradeShowing;
 			Point oldSelectedCell=gridMain.SelectedCell;
@@ -204,10 +253,12 @@ namespace OpenDental {
 			float gradeNumberDisplay=0;
 			int critCount=0;
 			float gradeSum=0;
+			float maxPoints=0;
 			for(int i=0;i<_listEvalCrits.Count;i++) {
 				if(_evalGradeScale.ScaleType==_critGradeScales[_listEvalCrits[i].GradingScaleNum].ScaleType) {
 					critCount++;
 					gradeSum+=_listEvalCrits[i].GradeNumber;
+					maxPoints+=_listEvalCrits[i].MaxPointsPoss;
 				}
 			}
 			if(_evalGradeScale.ScaleType==EnumScaleType.PickList || _evalGradeScale.ScaleType==EnumScaleType.Percentage) {
@@ -220,16 +271,8 @@ namespace OpenDental {
 				}
 			}
 			if(_evalGradeScale.ScaleType==EnumScaleType.Weighted) {
-				//This grade is calculated as a sum of all criterion grade numbers over the maximum points possible for the grading scale.
-				//This could cause some customer issues later since the maximum possible points must be determined before the evaluation is made.
-				//This means that the criterion "should" add up to the maximum possible point value, but it is not enforced because criterion are not given point values
-				//until they are being filled out. This could be improved by moving the maximum possible points column from the grading scale to the criterion.
-				//All criterion would add up to a maximum point value and that would be the value used for the evaluation. 
-				//Doing this after the system is in use would cause old evaluations to be in an invalid state and would need to be deleted or fixed.
-				//TODO: Fix this
-				//if(_evalGradeScale.MaxPointsPoss!=0) {
-				//	gradeNumberDisplay=gradeSum;
-				//}
+				//This grade is calculated as a sum of all criterion grade numbers over the maximum points possible all the criterion.
+				gradeNumberDisplay=gradeSum;
 			}
 			if(_evalGradeScale.ScaleType==EnumScaleType.Percentage) {
 				textGradeNumber.Text=gradeNumberDisplay.ToString();
@@ -251,8 +294,7 @@ namespace OpenDental {
 			}
 			if(_evalGradeScale.ScaleType==EnumScaleType.Weighted) {
 				textGradeNumber.Text=gradeNumberDisplay.ToString();
-				//TODO: Fix this
-				//textGradeShowing.Text=gradeNumberDisplay+"/"+_evalGradeScale.MaxPointsPoss;
+				textGradeShowing.Text=gradeNumberDisplay+"/"+maxPoints;
 			}
 		}
 
@@ -287,11 +329,6 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please attach a student to this evaluation.");
 				return;
 			}
-			//TODO: Fix this
-			//if(_evalGradeScale.ScaleType==EnumScaleType.Points && PIn.Float(textGradeNumber.Text)>_evalGradeScale.MaxPointsPoss) {
-			//	MsgBox.Show(this,"Total points given must not be greater than the maximum possible points.  Please change grades on the criterion.");
-			//	return;
-			//}
 			if(!String.IsNullOrWhiteSpace(textGradeNumberOverride.Text)) {
 				//Overrides are not saved to the database. They are found by comparing calculated grades to grades found in the database.
 				//If they are identical or blank then they have not been overwritten.
