@@ -150,6 +150,8 @@ namespace OpenDentBusiness{
 		public string ClaimIdentifier;
 		///<summary>X12 2300 REF (F8). Used when resending claims to refer to the original claim. The user must type this value in after reading it from the original claim response report.</summary>
 		public string OrigRefNum;
+		///<summary>FK to provider.ProvNum.  Ordering provider override.  Medical eclaims only.  Defaults to zero.  If set to zero, then the ProvTreat will go out on the eclaim instead.</summary>
+		public long ProvOrderOverride;
 
 		///<summary>Not a data column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

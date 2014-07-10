@@ -259,7 +259,12 @@ namespace OpenDental{
 		private UI.Button butDiagnosisCode3;
 		private Label label20;
 		private ValidDouble textDiscount;
+		private UI.Button butNoneProvOrdering;
+		private UI.Button butPickProvOrdering;
+		private ComboBox comboProvNumOrdering;
+		private Label label95;
 		private Snomed _snomedBodySite=null;
+		private long _provNumOrderingSelected;
 		
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
 		public FormProcEdit(Procedure proc,Patient patCur,Family famCur){
@@ -443,12 +448,18 @@ namespace OpenDental{
 			this.labelClaimNote = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabPageFinancial = new System.Windows.Forms.TabPage();
+			this.label20 = new System.Windows.Forms.Label();
+			this.textDiscount = new OpenDental.ValidDouble();
 			this.butAddEstimate = new OpenDental.UI.Button();
 			this.tbAdj = new OpenDental.TableProcAdj();
 			this.tbPay = new OpenDental.TableProcPay();
 			this.butAddAdjust = new OpenDental.UI.Button();
 			this.gridIns = new OpenDental.UI.ODGrid();
 			this.tabPageMedical = new System.Windows.Forms.TabPage();
+			this.butNoneProvOrdering = new OpenDental.UI.Button();
+			this.butPickProvOrdering = new OpenDental.UI.Button();
+			this.comboProvNumOrdering = new System.Windows.Forms.ComboBox();
+			this.label95 = new System.Windows.Forms.Label();
 			this.butNoneDiagnosisCode1 = new OpenDental.UI.Button();
 			this.butDiagnosisCode1 = new OpenDental.UI.Button();
 			this.butNoneDiagnosisCode2 = new OpenDental.UI.Button();
@@ -499,8 +510,6 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.label20 = new System.Windows.Forms.Label();
-			this.textDiscount = new OpenDental.ValidDouble();
 			this.groupQuadrant.SuspendLayout();
 			this.groupArch.SuspendLayout();
 			this.panelSurfaces.SuspendLayout();
@@ -1916,6 +1925,24 @@ namespace OpenDental{
 			this.tabPageFinancial.Text = "Financial";
 			this.tabPageFinancial.UseVisualStyleBackColor = true;
 			// 
+			// label20
+			// 
+			this.label20.Location = new System.Drawing.Point(807, 12);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(75, 16);
+			this.label20.TabIndex = 114;
+			this.label20.Text = "Discount";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDiscount
+			// 
+			this.textDiscount.Location = new System.Drawing.Point(883, 9);
+			this.textDiscount.MaxVal = 100000000D;
+			this.textDiscount.MinVal = -100000000D;
+			this.textDiscount.Name = "textDiscount";
+			this.textDiscount.Size = new System.Drawing.Size(68, 20);
+			this.textDiscount.TabIndex = 115;
+			// 
 			// butAddEstimate
 			// 
 			this.butAddEstimate.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1987,6 +2014,10 @@ namespace OpenDental{
 			// 
 			// tabPageMedical
 			// 
+			this.tabPageMedical.Controls.Add(this.butNoneProvOrdering);
+			this.tabPageMedical.Controls.Add(this.butPickProvOrdering);
+			this.tabPageMedical.Controls.Add(this.comboProvNumOrdering);
+			this.tabPageMedical.Controls.Add(this.label95);
 			this.tabPageMedical.Controls.Add(this.butNoneDiagnosisCode1);
 			this.tabPageMedical.Controls.Add(this.butDiagnosisCode1);
 			this.tabPageMedical.Controls.Add(this.butNoneDiagnosisCode2);
@@ -2034,6 +2065,53 @@ namespace OpenDental{
 			this.tabPageMedical.TabIndex = 3;
 			this.tabPageMedical.Text = "Medical";
 			this.tabPageMedical.UseVisualStyleBackColor = true;
+			// 
+			// butNoneProvOrdering
+			// 
+			this.butNoneProvOrdering.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNoneProvOrdering.Autosize = true;
+			this.butNoneProvOrdering.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNoneProvOrdering.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNoneProvOrdering.CornerRadius = 4F;
+			this.butNoneProvOrdering.Location = new System.Drawing.Point(711, 134);
+			this.butNoneProvOrdering.Name = "butNoneProvOrdering";
+			this.butNoneProvOrdering.Size = new System.Drawing.Size(51, 22);
+			this.butNoneProvOrdering.TabIndex = 286;
+			this.butNoneProvOrdering.Text = "None";
+			this.butNoneProvOrdering.Click += new System.EventHandler(this.butNoneProvOrdering_Click);
+			// 
+			// butPickProvOrdering
+			// 
+			this.butPickProvOrdering.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickProvOrdering.Autosize = true;
+			this.butPickProvOrdering.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickProvOrdering.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickProvOrdering.CornerRadius = 4F;
+			this.butPickProvOrdering.Location = new System.Drawing.Point(686, 134);
+			this.butPickProvOrdering.Name = "butPickProvOrdering";
+			this.butPickProvOrdering.Size = new System.Drawing.Size(22, 22);
+			this.butPickProvOrdering.TabIndex = 285;
+			this.butPickProvOrdering.Text = "...";
+			this.butPickProvOrdering.Click += new System.EventHandler(this.butPickProvOrdering_Click);
+			// 
+			// comboProvNumOrdering
+			// 
+			this.comboProvNumOrdering.Location = new System.Drawing.Point(411, 135);
+			this.comboProvNumOrdering.MaxDropDownItems = 30;
+			this.comboProvNumOrdering.Name = "comboProvNumOrdering";
+			this.comboProvNumOrdering.Size = new System.Drawing.Size(272, 21);
+			this.comboProvNumOrdering.TabIndex = 284;
+			this.comboProvNumOrdering.SelectionChangeCommitted += new System.EventHandler(this.comboProvNumOrdering_SelectionChangeCommitted);
+			// 
+			// label95
+			// 
+			this.label95.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label95.Location = new System.Drawing.Point(260, 135);
+			this.label95.Name = "label95";
+			this.label95.Size = new System.Drawing.Size(151, 17);
+			this.label95.TabIndex = 283;
+			this.label95.Text = "Ordering Provider Override";
+			this.label95.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butNoneDiagnosisCode1
 			// 
@@ -2656,24 +2734,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// label20
-			// 
-			this.label20.Location = new System.Drawing.Point(807, 12);
-			this.label20.Name = "label20";
-			this.label20.Size = new System.Drawing.Size(75, 16);
-			this.label20.TabIndex = 114;
-			this.label20.Text = "Discount";
-			this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// textDiscount
-			// 
-			this.textDiscount.Location = new System.Drawing.Point(883, 9);
-			this.textDiscount.MaxVal = 100000000D;
-			this.textDiscount.MinVal = -100000000D;
-			this.textDiscount.Name = "textDiscount";
-			this.textDiscount.Size = new System.Drawing.Size(68, 20);
-			this.textDiscount.TabIndex = 115;
-			// 
 			// FormProcEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2971,6 +3031,14 @@ namespace OpenDental{
 				radioS4.Text="06";//Sextant 4 in the United States is sextant 06 in Canada.
 				radioS5.Text="07";//Sextant 5 in the United States is sextant 07 in Canada.
 				radioS6.Text="08";//Sextant 6 in the United States is sextant 08 in Canada.
+			}
+			_provNumOrderingSelected=ProcCur.ProvOrderOverride;
+			comboProvNumOrdering.Items.Clear();
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
+				comboProvNumOrdering.Items.Add(ProviderC.ListShort[i].GetLongDesc());//Only visible provs added to combobox.
+				if(ProviderC.ListShort[i].ProvNum==ProcCur.ProvOrderOverride) {
+					comboProvNumOrdering.SelectedIndex=i;//Sets combo text too.
+				}
 			}
 			IsStartingUp=true;
 			FillControlsOnStartup();
@@ -4767,6 +4835,28 @@ namespace OpenDental{
 			textDiagnosticCode4.Text="";
 		}
 
+		private void comboProvNumOrdering_SelectionChangeCommitted(object sender,EventArgs e) {
+			_provNumOrderingSelected=ProviderC.ListShort[comboProvNumOrdering.SelectedIndex].ProvNum;
+		}
+
+		private void butPickProvOrdering_Click(object sender,EventArgs e) {
+			FormProviderPick formP=new FormProviderPick();
+			if(comboProvNumOrdering.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
+				formP.SelectedProvNum=_provNumOrderingSelected;
+			}
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboProvNumOrdering.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
+			_provNumOrderingSelected=formP.SelectedProvNum;
+		}
+
+		private void butNoneProvOrdering_Click(object sender,EventArgs e) {
+			_provNumOrderingSelected=0;
+			comboProvNumOrdering.SelectedIndex=-1;
+		}
+
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			if(IsNew) {
 				DialogResult=DialogResult.Cancel;//verified that this triggers a delete when window closed from all places where FormProcEdit is used, and where proc could be new.
@@ -5025,6 +5115,7 @@ namespace OpenDental{
 				ProcCur.DiagnosticCode4=diagnosticCodes[3];
 			}
 			ProcCur.IsPrincDiag=checkIsPrincDiag.Checked;
+			ProcCur.ProvOrderOverride=_provNumOrderingSelected;
 			ProcCur.CodeMod1 = textCodeMod1.Text;
 			ProcCur.CodeMod2 = textCodeMod2.Text;
 			ProcCur.CodeMod3 = textCodeMod3.Text;
