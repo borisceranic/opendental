@@ -4771,6 +4771,10 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX procedurelog_ProvOrderOverride ON procedurelog (ProvOrderOverride)";
 					Db.NonQ(command);
 				}
+				//Users started to get a (403) Forbidden error when trying to update.
+				//Come to find out it was due to a redirect issue.  We're going to update the Uri to point to opendental.com instead of open-dent.com so that this doesn't happen again.
+				command=@"UPDATE preference SET ValueString='http://www.opendental.com/updates/' WHERE PrefName='UpdateWebsitePath' AND ValueString='http://www.open-dent.com/updates/'";
+				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '14.2.21.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
