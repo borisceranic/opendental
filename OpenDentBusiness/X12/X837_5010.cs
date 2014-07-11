@@ -1797,7 +1797,7 @@ namespace OpenDentBusiness
 						//2420D REF: (medical) Supervising Provider Secondary Identification. Situational. We do not support.
 						//Emdeon Medical requires loop 2420E when the claim is sent to DMERC (Medicaid) carriers.
 						//This loop can only be used for a provider that is a person, not an organization, so we don't send this loop if not a person.
-						Provider provOrderProc=provTreat;//Initialized to claim treating provider.
+						Provider provOrderProc=provTreatProc;//Initialized to claim treating provider.
 						if(claim.ProvOrderOverride!=0) {
 							provOrderProc=Providers.GetProv(claim.ProvOrderOverride);//Override ordering provider at claim level.
 						}
