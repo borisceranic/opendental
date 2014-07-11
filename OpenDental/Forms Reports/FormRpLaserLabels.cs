@@ -1139,7 +1139,7 @@ namespace OpenDental {
 					patStat+=",";
 				}
 				//patStat += "'" + listStatus.SelectedIndices[i] + "'";
-				switch(i) {
+				switch(listStatus.SelectedIndices[i]) {
 					case 0:
 						patStat+=(int)PatientStatus.Patient;
 						break;
