@@ -78,7 +78,7 @@ namespace OpenDental{
 								}
 							}
 							if(!addDateTime){
-								break;
+								continue;
 							}
 							if(addDateTime){// && SearchType==SearchBehaviorCriteria.ProviderTimeOperatory) {//check appointment against providers available for the given operatory
 								bool provAvail=false;
