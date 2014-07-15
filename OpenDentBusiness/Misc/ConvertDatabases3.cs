@@ -5466,6 +5466,56 @@ namespace OpenDentBusiness {
 				    +"'PandaPerio')";
 					Db.NonQ(command);
 				}//end PandaPerio bridge
+				//Insert DemandForce bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'DemandForce', "
+				    +"'DemandForce from www.demandforce.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"d3one.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter your DemandForce license key (required)', "
+				    +"'')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'7', "//ToolBarsAvail.ChartModule
+				    +"'DemandForce')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'DemandForce', "
+				    +"'DemandForce from www.demandforce.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"d3one.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter your DemandForce license key (required)', "
+				    +"'')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'7', "//ToolBarsAvail.ChartModule
+				    +"'DemandForce')";
+					Db.NonQ(command);
+				}//end DemandForce bridge
 				//Update any text based columns that are not CLOBs to allow NULL entries.  This is because Oracle treats empty strings as NULLs.
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
 					command=@"SELECT TABLE_NAME, COLUMN_NAME 
