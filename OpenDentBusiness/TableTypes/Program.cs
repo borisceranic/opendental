@@ -74,6 +74,7 @@ namespace OpenDentBusiness{
 		Orion,
 		OrthoPlex,
 		Owandy,
+		PandaPerio,
 		PayConnect,
 		Patterson,
 		PerioPal,

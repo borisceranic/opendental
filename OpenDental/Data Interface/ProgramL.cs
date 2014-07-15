@@ -171,6 +171,10 @@ namespace OpenDental{
 				Owandy.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.PandaPerio.ToString()) {
+				PandaPerio.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Patterson.ToString()) {
 				Patterson.SendData(prog,pat);
 				return;
