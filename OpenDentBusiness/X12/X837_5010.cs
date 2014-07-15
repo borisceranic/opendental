@@ -2824,6 +2824,14 @@ namespace OpenDentBusiness
 				Comma(strb);
 				strb.Append("No procedures attached please recreate claim");
 			}
+			if(claim.MedType==EnumClaimMedType.Institutional && claimProcs.Count>999) {
+				Comma(strb);
+				strb.Append("More than 999 procedures create multiple claims instead");
+			}
+			if((claim.MedType==EnumClaimMedType.Medical || claim.MedType==EnumClaimMedType.Dental) && claimProcs.Count>50) {
+				Comma(strb);
+				strb.Append("More than 50 procedures create multiple claims instead");
+			}
 			List<Procedure> procList=Procedures.GetProcsFromClaimProcs(claimProcs);
 			if(claim.MedType==EnumClaimMedType.Dental && Procedures.GetUniqueDiagnosticCodes(procList,false).Count>4) {
 				Comma(strb);
