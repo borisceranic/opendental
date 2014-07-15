@@ -1904,6 +1904,12 @@ namespace OpenDentBusiness {
 				}
 				strb.Append("No procedures attached please recreate claim");
 			}
+			if(claimProcs.Count>50) {
+				if(strb.Length!=0) {
+					strb.Append(",");
+				}
+				strb.Append("More than 50 procedures create multiple claims instead");
+			}
 			List<Procedure> procList=Procedures.GetProcsFromClaimProcs(claimProcs);
 			Procedure proc;
 			ProcedureCode procCode;
