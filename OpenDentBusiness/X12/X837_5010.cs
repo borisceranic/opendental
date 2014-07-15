@@ -2940,32 +2940,57 @@ namespace OpenDentBusiness
 				//  strb.Append("Proc place of service does not match claim "+procCode.ProcCode);
 				//}
 				//Providers
+				Provider provTreatProc=treatProv;
 				if(claim.ProvTreat!=proc.ProvNum && PrefC.GetBool(PrefName.EclaimsSeparateTreatProv)) {
-					treatProv=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvNum)];
-					if(treatProv.LName=="") {
+					provTreatProc=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvNum)];
+					if(provTreatProc.LName=="") {
 						Comma(strb);
 						strb.Append("Treat Prov LName for proc "+procCode.ProcCode);
 					}
-					if(treatProv.FName=="" && !treatProv.IsNotPerson) {
+					if(provTreatProc.FName=="" && !provTreatProc.IsNotPerson) {
 						Comma(strb);
 						strb.Append("Treat Prov FName for proc "+procCode.ProcCode);
 					}
-					if(treatProv.NationalProvID.Length<2) {
+					if(provTreatProc.NationalProvID.Length<2) {
 						Comma(strb);
 						strb.Append("Treat Prov NPI for proc "+procCode.ProcCode);
 					}
 					if(claim.MedType!=EnumClaimMedType.Institutional) { //Medical and Dental only. No where to send taxonomy code for instituational procedures.
-						if(treatProv.TaxonomyCodeOverride.Length>0 && treatProv.TaxonomyCodeOverride.Length!=10) {
+						if(provTreatProc.TaxonomyCodeOverride.Length>0 && provTreatProc.TaxonomyCodeOverride.Length!=10) {
 							Comma(strb);
 							strb.Append("Treating Prov Taxonomy Code for proc "+procCode.ProcCode+" must be 10 characters");
 						}
 					}
 					//Treating prov SSN/TIN is not sent on paper or eclaims. Do not verify or block.
-					if(!Regex.IsMatch(treatProv.NationalProvID,"^(80840)?[0-9]{10}$")) {
+					if(!Regex.IsMatch(provTreatProc.NationalProvID,"^(80840)?[0-9]{10}$")) {
 						Comma(strb);
 						strb.Append("Treat Prov NPI for proc "+procCode.ProcCode+" must be a 10 digit number with an optional prefix of 80840");
 					}
 					//will add any other checks as needed. Can't think of any others at the moment.
+				}
+				if(claim.MedType==EnumClaimMedType.Medical) {
+					Provider provOrderProc=provTreatProc;
+					if(claim.ProvOrderOverride!=0) {
+						provOrderProc=ProviderC.ListLong[Providers.GetIndexLong(claim.ProvOrderOverride)];
+					}
+					if(proc.ProvOrderOverride!=0) {
+						provOrderProc=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvOrderOverride)];
+					}
+					//Do not validate ordering provider override name or NPI if already validated elsewhere.
+					if(provOrderProc.ProvNum!=proc.ProvNum && provOrderProc.ProvNum!=claim.ProvTreat && provOrderProc.ProvNum!=claim.ProvBill) {
+						if(provOrderProc.LName=="") {
+							Comma(strb);
+							strb.Append("Ordering prov "+provOrderProc.Abbr+" LName for proc "+procCode.ProcCode);
+						}
+						if(provOrderProc.FName=="") {
+							Comma(strb);
+							strb.Append("Ordering prov "+provOrderProc.Abbr+" FName for proc "+procCode.ProcCode);
+						}
+						if(!Regex.IsMatch(provTreatProc.NationalProvID,"^(80840)?[0-9]{10}$")) {
+							Comma(strb);
+							strb.Append("Ordering Prov "+provOrderProc.Abbr+" NPI for proc "+procCode.ProcCode+" must be a 10 digit number with an optional prefix of 80840");
+						}
+					}
 				}
 			}//for int i claimProcs
 			if(claim.MedType==EnumClaimMedType.Medical && !princDiagExists) {
