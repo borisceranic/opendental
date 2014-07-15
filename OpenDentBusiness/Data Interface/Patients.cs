@@ -450,22 +450,10 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Patient[]>(MethodBase.GetCurrentMethod(),patNums);
 			}
-			//MessageBox.Show(patNums.Length.ToString());
-			string strPatNums="";
-			DataTable table;
-			if(patNums.Count>0){
-				for(int i=0;i<patNums.Count;i++){
-					if(i>0){
-						strPatNums+="OR ";
-					}
-					strPatNums+="PatNum='"+patNums[i].ToString()+"' ";
-				}
-				string command="SELECT * FROM patient WHERE "+strPatNums;
-				//MessageBox.Show(string command);
- 				table=Db.GetTable(command);
-			}
-			else{
-				table=new DataTable();
+			DataTable table=new DataTable();
+			if(patNums.Count>0) {
+				string command="SELECT * FROM patient WHERE PatNum IN ("+String.Join<long>(",",patNums)+") ";
+				table=Db.GetTable(command);
 			}
 			Patient[] multPats=Crud.PatientCrud.TableToList(table).ToArray();
 			return multPats;
