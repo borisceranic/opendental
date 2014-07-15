@@ -66,12 +66,10 @@ namespace OpenDentBusiness{
 			}
 			//startDate only applies if showing Done tasks.
 			string command="SELECT task.*,"
-				+"(SELECT COUNT(*) FROM taskunread WHERE task.TaskNum=taskunread.TaskNum "
-				+"AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, "
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
+					+"(SELECT COUNT(*) FROM taskunread WHERE task.TaskNum=taskunread.TaskNum AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, "
+					+"patient.LName,patient.FName,patient.Preferred "
 				+"FROM task "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"WHERE TaskListNum=0 "
 				+"AND DateTask < "+POut.Date(new DateTime(1880,01,01))+" "
 				+"AND IsRepeating=0";
@@ -101,21 +99,23 @@ namespace OpenDentBusiness{
 				command="SELECT task.TaskNum,task.TaskListNum,task.DateTask,task.KeyNum,(SELECT Descript FROM task taskdesc WHERE task.TaskNum=taskdesc.TaskNum) Descript,task.TaskStatus"
 					+",task.IsRepeating,task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished"
 					+",1 AS IsUnread,";//we fill the IsUnread column with 1's because we already know that they are all unread
-			}				
-			command+="(SELECT tasklist.Descript FROM tasklist WHERE task.TaskListNum=tasklist.TaskListNum) ParentDesc, "
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
-				+"FROM task,taskunread "
-				+"WHERE task.TaskNum=taskunread.TaskNum "
-				+"AND taskunread.UserNum = "+POut.Long(userNum)+" ";
+			}
+			command+="tasklist.Descript ParentDesc, "	/*Renamed to keep same column name as old query*/
+					+"patient.LName,patient.FName,patient.Preferred "
+				+"FROM task "
+				+"INNER JOIN taskunread ON task.TaskNum=taskunread.TaskNum "
+					+"AND taskunread.UserNum = "+POut.Long(userNum)+" "
+				+"LEFT JOIN tasklist ON task.TaskListNum=tasklist.TaskListNum "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum "
+					+"AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY task.TaskNum ";//in case there are duplicate unreads
 			}
 			else {//Oracle
 				//in case there are duplicate unreads
 				command+="GROUP BY task.TaskNum,task.TaskListNum,task.DateTask,task.KeyNum,task.TaskStatus,task.IsRepeating"
-					+",task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished ";
+					+",task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished "
+					+",tasklist.Descript, patient.LName, patient.FName, patient.Preferred ";
 			}
 			command+="ORDER BY task.DateTimeEntry";
 			DataTable table=Db.GetTable(command);
@@ -130,24 +130,22 @@ namespace OpenDentBusiness{
 			string command="SELECT task.*, "
 				+"(SELECT COUNT(*) FROM taskunread WHERE task.TaskNum=taskunread.TaskNum "
 				+"AND taskunread.UserNum="+POut.Long(userNum)+") AS IsUnread, "
-				+"(SELECT tasklist.Descript FROM tasklist WHERE task.TaskListNum=tasklist.TaskListNum) ParentDesc, "
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
+				+"tasklist.Descript AS ParentDesc, "
+				+"patient.LName,patient.FName,patient.Preferred "
 				+"FROM task "
-				+"WHERE NOT EXISTS(SELECT * FROM taskancestor,tasklist "
-				+"WHERE taskancestor.TaskNum=task.TaskNum "
-				+"AND tasklist.TaskListNum=taskancestor.TaskListNum "
-				+"AND tasklist.DateType!=0) "//if any ancestor is a dated list, then we don't want that task
-				//+"AND NOT EXISTS(SELECT * FROM taskancestor,tasksubscription "//a different set of ancestors
-				//+"WHERE taskancestor.TaskNum=task.TaskNum "
-				//+"AND tasksubscription.TaskListNum=taskancestor.TaskListNum "
-				//+"AND tasksubscription.UserNum="+POut.Long(userNum)+") "//if this user is subscribed to any ancestor list, then we won't include it
+				+"LEFT JOIN tasklist ON task.TaskListNum=tasklist.TaskListNum "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum "
+					+"AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
+				+"WHERE NOT EXISTS( "
+					+"SELECT * FROM taskancestor "
+					+"LEFT JOIN tasklist ON tasklist.TaskListNum=taskancestor.TaskListNum "
+						+"AND tasklist.DateType!=0 "//if any ancestor is a dated list, then we don't want that task
+					+"WHERE taskancestor.TaskNum=task.TaskNum) "
 				+"AND task.DateType=0 "//this only handles tasks directly in the dated trunks
 				+"AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"AND task.IsRepeating=0 "
 				+"AND task.UserNum="+POut.Long(userNum)+" "
-				+"AND TaskStatus != "+POut.Int((int)TaskStatusEnum.Done)+" "
+				+"AND TaskStatus!="+POut.Int((int)TaskStatusEnum.Done)+" "
 				+"ORDER BY DateTimeEntry";
 			DataTable table=Db.GetTable(command);
 			return TableToList(table);
@@ -159,10 +157,9 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<Task>>(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT task.*, "
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
+				+"patient.LName,patient.FName,patient.Preferred "
 				+"FROM task "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"WHERE TaskListNum=0 "
 				+"AND DateTask < "+POut.Date(new DateTime(1880,01,01))+" "
 				+"AND IsRepeating=1 "
@@ -190,10 +187,9 @@ namespace OpenDentBusiness{
 				//otherwise, restrict by current user
 				command+="AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, ";
 			}
-			command+="(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred ";
+			command+="patient.LName,patient.FName,patient.Preferred ";
 			command+="FROM task "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"WHERE TaskListNum="+POut.Long(listNum);
 			if(showDone){
 				command+=" AND (TaskStatus !="+POut.Long((int)TaskStatusEnum.Done)
@@ -216,10 +212,9 @@ namespace OpenDentBusiness{
 				"SELECT task.*, "
 				+"(SELECT COUNT(*) FROM taskunread WHERE task.TaskNum=taskunread.TaskNum "
 					+"AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, "//Not sure if this makes sense here
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
+				+"patient.LName,patient.FName,patient.Preferred "
 				+"FROM task "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"WHERE IsRepeating=1 "
 				+"AND DateType="+POut.Long((int)dateType)+" "
 				+"ORDER BY DateTimeEntry";
@@ -250,10 +245,9 @@ namespace OpenDentBusiness{
 				"SELECT task.*, "
 				+"(SELECT COUNT(*) FROM taskunread WHERE task.TaskNum=taskunread.TaskNum "
 					+"AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, "//Not sure if this makes sense here
-				+"(SELECT LName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") LName, "
-				+"(SELECT FName FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") FName, "
-				+"(SELECT Preferred FROM patient WHERE task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+") Preferred "
+				+"patient.LName,patient.FName,patient.Preferred "
 				+"FROM task "
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"WHERE DateTask >= "+POut.Date(dateFrom)
 				+" AND DateTask <= "+POut.Date(dateTo)
 				+" AND DateType="+POut.Long((int)dateType);
