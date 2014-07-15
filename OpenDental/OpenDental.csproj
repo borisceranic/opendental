@@ -383,6 +383,9 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEtrans835ClaimPay.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FormEtrans835PickEob.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3507,6 +3510,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans835ClaimPay.resx">
+      <DependentUpon>FormEtrans835ClaimPay.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835PickEob.resx">
       <DependentUpon>FormEtrans835PickEob.cs</DependentUpon>
