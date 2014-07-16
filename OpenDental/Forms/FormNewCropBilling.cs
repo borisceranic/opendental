@@ -204,6 +204,15 @@ namespace OpenDental {
 					int yearBilling=PIn.Int(yearMonth.Substring(0,4));//The year chosen by the OD employee when running the NewCrop Billing report.
 					int monthBilling=PIn.Int(yearMonth.Substring(4));//The month chosen by the OD employee when running the NewCrop Billing report.
 					int dayOtherCharges=GetChargeDayOfMonth(patNum);//The day of the month that the customer already has other repeating charges. Keeps their billing simple (one bill per month for all charges).
+					int daysInMonth=DateTime.DaysInMonth(yearBilling,monthBilling);
+					if(dayOtherCharges>daysInMonth) {
+						//The day that the user used NewCrop (signed up) was in a month that does not have the day of the other monthly charges in it.
+						//E.g.  dayOtherCharges = 31 and the user started a new NewCrop account in a month without 31 days.
+						//Therefore, we have to use the last day of the month that they started.
+						//This can introduce multiple statements being sent out which can potentially delay us (HQ) from getting paid in a timely fashion.
+						//A workaround for this would be to train our techs to never run billing after the 28th of every month that way incomplete statements are not sent.
+						dayOtherCharges=daysInMonth;
+					}
 					DateTime dateNewCropCharge=new DateTime(yearBilling,monthBilling,dayOtherCharges);
 					if(dateNewCropCharge<DateTime.Today.AddMonths(-3)) {//Just in case the user runs an older report.
 						numSkipped++;
