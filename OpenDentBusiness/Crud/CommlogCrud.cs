@@ -106,7 +106,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (commlog.PatNum)+","
 				+    POut.DateT (commlog.CommDateTime)+","
 				+    POut.Long  (commlog.CommType)+","
-				+"'"+POut.String(commlog.Note)+"',"
+				+DbHelper.ParamChar+"paramNote,"
 				+    POut.Int   ((int)commlog.Mode_)+","
 				+    POut.Int   ((int)commlog.SentOrReceived)+","
 				+    POut.Long  (commlog.UserNum)+","
@@ -114,11 +114,15 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (commlog.SigIsTopaz)+","
 				//DateTStamp can only be set by MySQL
 				+    POut.DateT (commlog.DateTimeEnd)+")";
+			if(commlog.Note==null) {
+				commlog.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,POut.StringNote(commlog.Note));
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramNote);
 			}
 			else {
-				commlog.CommlogNum=Db.NonQ(command,true);
+				commlog.CommlogNum=Db.NonQ(command,true,paramNote);
 			}
 			return commlog.CommlogNum;
 		}
@@ -129,7 +133,7 @@ namespace OpenDentBusiness.Crud{
 				+"PatNum        =  "+POut.Long  (commlog.PatNum)+", "
 				+"CommDateTime  =  "+POut.DateT (commlog.CommDateTime)+", "
 				+"CommType      =  "+POut.Long  (commlog.CommType)+", "
-				+"Note          = '"+POut.String(commlog.Note)+"', "
+				+"Note          =  "+DbHelper.ParamChar+"paramNote, "
 				+"Mode_         =  "+POut.Int   ((int)commlog.Mode_)+", "
 				+"SentOrReceived=  "+POut.Int   ((int)commlog.SentOrReceived)+", "
 				+"UserNum       =  "+POut.Long  (commlog.UserNum)+", "
@@ -138,7 +142,11 @@ namespace OpenDentBusiness.Crud{
 				//DateTStamp can only be set by MySQL
 				+"DateTimeEnd   =  "+POut.DateT (commlog.DateTimeEnd)+" "
 				+"WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
-			Db.NonQ(command);
+			if(commlog.Note==null) {
+				commlog.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,POut.StringNote(commlog.Note));
+			Db.NonQ(command,paramNote);
 		}
 
 		///<summary>Updates one Commlog in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -158,7 +166,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(commlog.Note != oldCommlog.Note) {
 				if(command!=""){ command+=",";}
-				command+="Note = '"+POut.String(commlog.Note)+"'";
+				command+="Note = "+DbHelper.ParamChar+"paramNote";
 			}
 			if(commlog.Mode_ != oldCommlog.Mode_) {
 				if(command!=""){ command+=",";}
@@ -188,9 +196,13 @@ namespace OpenDentBusiness.Crud{
 			if(command==""){
 				return false;
 			}
+			if(commlog.Note==null) {
+				commlog.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,POut.StringNote(commlog.Note));
 			command="UPDATE commlog SET "+command
 				+" WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramNote);
 			return true;
 		}
 

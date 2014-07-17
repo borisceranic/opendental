@@ -71,6 +71,8 @@ namespace OpenDentBusiness {
 		///<summary>For most C# TimeSpans, the default db type is TimeOfDay.  But for the few that need to use negative values or values greater than 24 hours, they get marked as this special type.  Handled differently in MySQL vs Oracle.</summary>
 		TimeSpanNeg,
 		///<summary>Many C# strings are varchar(255).  Most longer ones are mysql text or oracle varchar2.  But if they might go over 4000 char, then in oracle, they must be clob.  Clobs are handled significantly differently in oracle, so we are tracking those.  There is also a consideration for columns in mysql that might go over 65,000 char, but we do not need to track those in C#.</summary>
-		TextIsClob
+		TextIsClob,
+		///<summary>This mimics the behavior of the TextIsClob attribute with the following additional functionality.  If the text contains 50 or more consecutive new line characters, the insert and update crud calls will replace them with a single new line.  If the control tries to display a very large number of new line characters, graphics memory errors may occur when trying to measure the height of the string.  This attribute should only be used for large note fields that the user is allowed to type into manually.  Not for base64 text or other programatically generated text.</summary>
+		TextIsClobNote
 	}
 }

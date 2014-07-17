@@ -217,6 +217,18 @@ namespace OpenDentBusiness{
 			return strBuild.ToString();
 		}
 
+		///<summary>Used for large columns (larger than varchar, i.e. text, mediumtext, longtext) where it is possible to enter too many consecutive new line characters for the windows control to draw.  This can cause a graphics memory error.  If there are more than 50 consecutive new line characters, this will replace them with a single new line.  This is called for TextIsClob column types that are sent as parameters.  This does not escape any characters like POut.String does because escaping characters is not required when using parameters.</summary>
+		public static string StringNote(string myString) {
+			if(myString==null) {
+				return "";
+			}
+			myString=myString.Replace("\r\n","\n");
+			myString=myString.Replace("\r","\n");
+			myString=Regex.Replace(myString,@"[\n]{50,}","\n");
+			myString=myString.Replace("\n","\r\n");
+			return myString;
+		}
+
 		//<summary></summary>
 		//public static string PTimee (string myTime){
 		//	return DateTime.Parse(myTime).ToString("HH:mm:ss");

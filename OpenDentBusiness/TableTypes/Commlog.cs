@@ -17,6 +17,7 @@ namespace OpenDentBusiness{
 		///<summary>FK to definition.DefNum. This will be 0 if IsStatementSent.  Used to be an enumeration in previous versions.</summary>
 		public long CommType;
 		///<summary>Note for this commlog entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string Note;
 		///<summary>Enum:CommItemMode Phone, email, etc.</summary>
 		public CommItemMode Mode_;

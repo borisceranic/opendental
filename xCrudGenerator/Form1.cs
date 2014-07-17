@@ -431,9 +431,9 @@ using System.Drawing;"+rn);
 				else if(specialType==CrudSpecialColType.TimeSpanNeg) {
 					strb.Append("\"'\"+POut.TSpan ("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
 				}
-				else if(specialType==CrudSpecialColType.TextIsClob) {
+				else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
 					strb.Append("DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
-					paramList.Add(new OdSqlParameter(fieldsExceptPri[f].Name,OdDbType.Text,null));
+					paramList.Add(new OdSqlParameter(fieldsExceptPri[f].Name,OdDbType.Text,specialType));
 				}
 				else if(fieldsExceptPri[f].FieldType.IsEnum) {
 					strb.Append("    POut.Int   ((int)"+obj+"."+fieldsExceptPri[f].Name+")+\"");
@@ -498,7 +498,13 @@ using System.Drawing;"+rn);
 				//example: OdSqlParameter paramNote=new OdSqlParameter("paramNote",
 				//           OdDbType.Text,procNote.Note);
 				strb.Append(rn+t3+"OdSqlParameter param"+paramList[i].ParameterName+"=new OdSqlParameter(\"param"+paramList[i].ParameterName+"\","
-					+"OdDbType.Text,"+obj+"."+paramList[i].ParameterName+");");
+					+"OdDbType.Text,");
+				if((CrudSpecialColType)paramList[i].Value==CrudSpecialColType.TextIsClobNote) {
+					strb.Append("POut.StringNote("+obj+"."+paramList[i].ParameterName+"));");//This is where large amounts of consecutive newlines are stripped away.
+				}
+				else {
+					strb.Append(obj+"."+paramList[i].ParameterName+");");
+				}
 			}
 			string paramsString="";//example: ,paramNote,paramAltNote
 			for(int i=0;i<paramList.Count;i++){
@@ -562,7 +568,7 @@ using System.Drawing;"+rn);
 				else if(specialType==CrudSpecialColType.TimeSpanNeg) {
 					strb.Append("'\"+POut.TSpan ("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
 				}
-				else if(specialType==CrudSpecialColType.TextIsClob) {
+				else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
 					strb.Append(" \"+DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
 					//paramList is already set above
 				}
@@ -631,7 +637,13 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t4+""+obj+"."+paramList[i].ParameterName+"=\"\";");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"OdSqlParameter param"+paramList[i].ParameterName+"=new OdSqlParameter(\"param"+paramList[i].ParameterName+"\","
-					+"OdDbType.Text,"+obj+"."+paramList[i].ParameterName+");");
+					+"OdDbType.Text,");
+				if((CrudSpecialColType)paramList[i].Value==CrudSpecialColType.TextIsClobNote) {
+					strb.Append("POut.StringNote("+obj+"."+paramList[i].ParameterName+"));");//This is where large amounts of consecutive newlines are stripped away.
+				}
+				else {
+					strb.Append(obj+"."+paramList[i].ParameterName+");");
+				}
 			}
 			strb.Append(rn+t3+"Db.NonQ(command"+paramsString+");");
 			strb.Append(rn+t2+"}");
@@ -681,7 +693,7 @@ using System.Drawing;"+rn);
 					else if(specialType==CrudSpecialColType.TimeSpanNeg) {
 						strb.Append("'\"+POut.TSpan ("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
 					}
-					else if(specialType==CrudSpecialColType.TextIsClob) {
+					else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
 						strb.Append("\"+DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
 						//paramList is already set above
 					}
@@ -739,7 +751,13 @@ using System.Drawing;"+rn);
 					strb.Append(rn+t4+""+obj+"."+paramList[i].ParameterName+"=\"\";");
 					strb.Append(rn+t3+"}");
 					strb.Append(rn+t3+"OdSqlParameter param"+paramList[i].ParameterName+"=new OdSqlParameter(\"param"+paramList[i].ParameterName+"\","
-					+"OdDbType.Text,"+obj+"."+paramList[i].ParameterName+");");
+					+"OdDbType.Text,");
+					if((CrudSpecialColType)paramList[i].Value==CrudSpecialColType.TextIsClobNote) {
+						strb.Append("POut.StringNote("+obj+"."+paramList[i].ParameterName+"));");//This is where large amounts of consecutive newlines are stripped away.
+					}
+					else {
+						strb.Append(obj+"."+paramList[i].ParameterName+");");
+					}
 				}
 				strb.Append(rn+t3+"command=\"UPDATE "+tablename+" SET \"+command");
 				strb.Append(rn+t4+"+\" WHERE "+priKey.Name+" = \"+POut.Long("+obj+"."+priKey.Name+");");

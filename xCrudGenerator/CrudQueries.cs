@@ -84,7 +84,7 @@ namespace xCrudGenerator {
 					specialType=CrudGenHelper.GetSpecialType(newColumns[f]);
 					OdDbType odtype=GetOdDbTypeFromColType(newColumns[f].FieldType,specialType);
 					TextSizeMySqlOracle textsize=TextSizeMySqlOracle.Small;
-					if(specialType==CrudSpecialColType.TextIsClob){
+					if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote){
 						textsize=TextSizeMySqlOracle.Medium;
 					}
 					DbSchemaCol col=new DbSchemaCol(newColumns[f].Name,odtype,textsize);
@@ -116,7 +116,7 @@ namespace xCrudGenerator {
 			if(specialType==CrudSpecialColType.TimeSpanNeg) {
 				return OdDbType.TimeSpan;
 			}
-			if(specialType==CrudSpecialColType.TextIsClob) {
+			if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
 				return OdDbType.Text;
 			}
 			if(fieldType.IsEnum) {
@@ -167,7 +167,7 @@ namespace xCrudGenerator {
 				}
 				specialType=CrudGenHelper.GetSpecialType(fieldsExceptPri[f]);
 				TextSizeMySqlOracle textsize=TextSizeMySqlOracle.Small;
-				if(specialType==CrudSpecialColType.TextIsClob) {
+				if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
 					textsize=TextSizeMySqlOracle.Medium;
 				}
 				retVal.Add(new DbSchemaCol(fieldsExceptPri[f].Name,GetOdDbTypeFromColType(fieldsExceptPri[f].FieldType,specialType),textsize));
