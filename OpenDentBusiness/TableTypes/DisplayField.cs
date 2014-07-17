@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace OpenDentBusiness{
 	
-	///<summary>Allows customization of which fields display in various lists and grids.  For now, the only grid is ProgressNotes.  Will also eventually let users set column widths and translate titles.  For now, the selections are the same for all computers.</summary>
+	///<summary>Allows customization of which fields display in various lists and grids.  For now, the selections are the same for all computers.</summary>
 	[Serializable]
 	public class DisplayField:TableBase{
 		///<summary>Primary key.</summary>
