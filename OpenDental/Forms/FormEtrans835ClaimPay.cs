@@ -42,10 +42,15 @@ namespace OpenDental
 		private ODGrid gridClaimAdjustments;
 		private ODGrid gridProcedureBreakdown;
 		private List<InsSub> SubList;
+		private Hx835_Claim _claimPaid;
+		private decimal _claimAdjAmtSum;
+		private UI.Button butViewEobDetails;
+		private decimal _procAdjAmtSum;
 
 		///<summary></summary>
-		public FormEtrans835ClaimPay(Patient patCur,Family famCur,List <InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList){
+		public FormEtrans835ClaimPay(Hx835_Claim claimPaid,Patient patCur,Family famCur,List<InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList) {
 			InitializeComponent();// Required for Windows Form Designer support
+			_claimPaid=claimPaid;
 			FamCur=famCur;
 			PatCur=patCur;
 			PlanList=planList;
@@ -90,6 +95,7 @@ namespace OpenDental
 			this.butOK = new OpenDental.UI.Button();
 			this.gridClaimAdjustments = new OpenDental.UI.ODGrid();
 			this.gridProcedureBreakdown = new OpenDental.UI.ODGrid();
+			this.butViewEobDetails = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// textInsPayAllowed
@@ -136,7 +142,7 @@ namespace OpenDental
 			// label3
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label3.Location = new System.Drawing.Point(20, 563);
+			this.label3.Location = new System.Drawing.Point(20, 565);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(116, 34);
 			this.label3.TabIndex = 123;
@@ -146,7 +152,7 @@ namespace OpenDental
 			// label4
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label4.Location = new System.Drawing.Point(164, 569);
+			this.label4.Location = new System.Drawing.Point(164, 571);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(108, 29);
 			this.label4.TabIndex = 124;
@@ -177,7 +183,7 @@ namespace OpenDental
 			this.butWriteOff.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butWriteOff.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butWriteOff.CornerRadius = 4F;
-			this.butWriteOff.Location = new System.Drawing.Point(163, 604);
+			this.butWriteOff.Location = new System.Drawing.Point(163, 606);
 			this.butWriteOff.Name = "butWriteOff";
 			this.butWriteOff.Size = new System.Drawing.Size(90, 25);
 			this.butWriteOff.TabIndex = 121;
@@ -192,7 +198,7 @@ namespace OpenDental
 			this.butDeductible.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDeductible.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDeductible.CornerRadius = 4F;
-			this.butDeductible.Location = new System.Drawing.Point(23, 604);
+			this.butDeductible.Location = new System.Drawing.Point(23, 606);
 			this.butDeductible.Name = "butDeductible";
 			this.butDeductible.Size = new System.Drawing.Size(92, 25);
 			this.butDeductible.TabIndex = 120;
@@ -246,7 +252,7 @@ namespace OpenDental
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(881, 604);
+			this.butCancel.Location = new System.Drawing.Point(890, 606);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 25);
 			this.butCancel.TabIndex = 2;
@@ -261,7 +267,7 @@ namespace OpenDental
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(792, 604);
+			this.butOK.Location = new System.Drawing.Point(809, 606);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 25);
 			this.butOK.TabIndex = 1;
@@ -298,10 +304,26 @@ namespace OpenDental
 			this.gridProcedureBreakdown.Title = "EOB Procedure Breakdown";
 			this.gridProcedureBreakdown.TranslationName = "FormEtrans835Edit";
 			// 
+			// butViewEobDetails
+			// 
+			this.butViewEobDetails.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butViewEobDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butViewEobDetails.Autosize = true;
+			this.butViewEobDetails.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butViewEobDetails.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butViewEobDetails.CornerRadius = 4F;
+			this.butViewEobDetails.Location = new System.Drawing.Point(703, 606);
+			this.butViewEobDetails.Name = "butViewEobDetails";
+			this.butViewEobDetails.Size = new System.Drawing.Size(100, 25);
+			this.butViewEobDetails.TabIndex = 201;
+			this.butViewEobDetails.Text = "EOB Details";
+			this.butViewEobDetails.Click += new System.EventHandler(this.butViewEobDetails_Click);
+			// 
 			// FormEtrans835ClaimPay
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 643);
+			this.Controls.Add(this.butViewEobDetails);
 			this.Controls.Add(this.gridClaimAdjustments);
 			this.Controls.Add(this.gridProcedureBreakdown);
 			this.Controls.Add(this.gridMain);
@@ -336,7 +358,7 @@ namespace OpenDental
 
 		private void FormEtrans835ClaimPay_Load(object sender, System.EventArgs e) {
 			ProcList=Procedures.Refresh(PatCur.PatNum);
-			FillGrid();
+			FillGridProcedures();
 		}
 
 		private void FormEtrans835ClaimPay_Shown(object sender,EventArgs e) {
@@ -349,7 +371,113 @@ namespace OpenDental
 			}
 		}
 
-		private void FillGrid(){
+		private void FillGridClaimAdjustments() {
+			if(_claimPaid.ListClaimAdjustments.Count==0) {
+				gridClaimAdjustments.Title="Claim Adjustments (None Reported)";
+			}
+			else {
+				gridClaimAdjustments.Title="Claim Adjustments";
+			}
+			gridClaimAdjustments.BeginUpdate();
+			gridClaimAdjustments.Columns.Clear();
+			const int colWidthDescription=200;
+			const int colWidthAdjAmt=80;
+			int colWidthVariable=gridClaimAdjustments.Width-10-colWidthDescription-colWidthAdjAmt;
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Description",colWidthDescription,HorizontalAlignment.Left));
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridClaimAdjustments.Rows.Clear();
+			_claimAdjAmtSum=0;
+			for(int i=0;i<_claimPaid.ListClaimAdjustments.Count;i++) {
+				Hx835_Adj adj=_claimPaid.ListClaimAdjustments[i];
+				ODGridRow row=new ODGridRow();
+				row.Tag=adj;
+				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
+				row.Cells.Add(new ODGridCell(adj.ReasonDescript));//Reason
+				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//AdjAmt
+				_claimAdjAmtSum+=_claimPaid.ListClaimAdjustments[i].AdjAmt;
+				gridClaimAdjustments.Rows.Add(row);
+			}
+			gridClaimAdjustments.EndUpdate();
+		}
+
+		private void FillGridProcedureBreakdown() {
+			if(_claimPaid.ListProcs.Count==0) {
+				gridProcedureBreakdown.Title="Procedure Breakdown (None Reported)";
+			}
+			else {
+				gridProcedureBreakdown.Title="Procedure Breakdown";
+			}
+			gridProcedureBreakdown.BeginUpdate();
+			const int colWidthProcNum=80;
+			const int colWidthProcCode=80;
+			const int colWidthProcFee=80;
+			const int colWidthAdjAmt=80;
+			const int colWidthInsPaid=80;
+			int colWidthVariable=gridProcedureBreakdown.Width-10-colWidthProcNum-colWidthProcCode-colWidthProcFee-4*colWidthAdjAmt-colWidthInsPaid;
+			gridProcedureBreakdown.Columns.Clear();
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PatPortion",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Contractual",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PayorReduct",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("OtherAdjust",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPaid",colWidthInsPaid,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Rows.Clear();
+			_procAdjAmtSum=0;
+			for(int i=0;i<_claimPaid.ListProcs.Count;i++) {
+				Hx835_Proc proc=_claimPaid.ListProcs[i];
+				ODGridRow row=new ODGridRow();
+				row.Tag=proc;
+				if(proc.ProcNum==0) {
+					row.Cells.Add(new ODGridCell(""));//ProcNum
+				}
+				else {
+					row.Cells.Add(new ODGridCell(proc.ProcNum.ToString()));//ProcNum
+				}
+				row.Cells.Add(new ODGridCell(proc.ProcCodeAdjudicated));//ProcCode
+				string procDescript="";
+				if(ProcedureCodes.IsValidCode(proc.ProcCodeAdjudicated)) {
+					ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.ProcCodeAdjudicated);
+					procDescript=procCode.AbbrDesc;
+				}
+				row.Cells.Add(new ODGridCell(procDescript));//ProcDescript
+				row.Cells.Add(new ODGridCell(proc.ProcFee.ToString("f2")));//ProcFee
+				decimal adjAmtForProc=0;
+				decimal patPortionForProc=0;
+				decimal contractualForProc=0;
+				decimal payorInitReductForProc=0;
+				decimal otherAdjustForProc=0;
+				for(int j=0;j<proc.ListProcAdjustments.Count;j++) {
+					Hx835_Adj adj=proc.ListProcAdjustments[j];
+					if(adj.AdjCode=="PR") {//Patient Responsibility
+						patPortionForProc+=adj.AdjAmt;
+					}
+					else if(adj.AdjCode=="CO") {//Contractual Obligations
+						contractualForProc+=adj.AdjAmt;
+					}
+					else if(adj.AdjCode=="PI") {//Payor Initiated Reductions
+						payorInitReductForProc+=adj.AdjAmt;
+					}
+					else {//Other Adjustments
+						otherAdjustForProc+=adj.AdjAmt;
+					}
+					adjAmtForProc+=adj.AdjAmt;
+					_procAdjAmtSum+=adj.AdjAmt;
+				}
+				row.Cells.Add(new ODGridCell(patPortionForProc.ToString("f2")));//PatPortion
+				row.Cells.Add(new ODGridCell(contractualForProc.ToString("f2")));//Contractual
+				row.Cells.Add(new ODGridCell(payorInitReductForProc.ToString("f2")));//PayorReduct
+				row.Cells.Add(new ODGridCell(otherAdjustForProc.ToString("f2")));//OtherAdjust
+				row.Cells.Add(new ODGridCell(proc.InsPaid.ToString("f2")));//InsPaid
+				gridProcedureBreakdown.Rows.Add(row);
+			}
+			gridProcedureBreakdown.EndUpdate();
+		}
+
+		private void FillGridProcedures(){
 			//Changes made in this window do not get saved until after this window closes.
 			//But if you double click on a row, then you will end up saving.  That shouldn't hurt anything, but could be improved.
 			//also calculates totals for this "payment"
@@ -460,7 +588,7 @@ namespace OpenDental
 			if(FormCP.DialogResult!=DialogResult.OK){
 				return;
 			}
-			FillGrid();
+			FillGridProcedures();
 			FillTotals();
 		}
 
@@ -583,7 +711,7 @@ namespace OpenDental
 			ClaimProcsToEdit[gridMain.SelectedCell.Y].DedApplied=dedAmt;
 			ClaimProcsToEdit[gridMain.SelectedCell.Y].InsPayEst-=dedAmt;
 			ClaimProcsToEdit[gridMain.SelectedCell.Y].InsPayAmt-=dedAmt;
-			FillGrid();
+			FillGridProcedures();
 		}
 
 		private void butWriteOff_Click(object sender, System.EventArgs e) {
@@ -610,7 +738,7 @@ namespace OpenDental
 					ClaimProcsToEdit[i].WriteOff=unpaidAmt;
 				}
 			}
-			FillGrid();
+			FillGridProcedures();
 		}
 
 		private void SaveAllowedFees(){
@@ -676,6 +804,11 @@ namespace OpenDental
 			}
 			//Fees.Refresh();//redundant?
 			DataValid.SetInvalid(InvalidType.Fees);
+		}
+
+		private void butViewEobDetails_Click(object sender,EventArgs e) {
+			FormEtrans835ClaimEdit formE=new FormEtrans835ClaimEdit(_claimPaid);
+			formE.ShowDialog();
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
