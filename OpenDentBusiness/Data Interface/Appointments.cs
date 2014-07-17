@@ -653,10 +653,6 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,aptNum,isPlanned);
 			} 
-			//DateTime dateStart=PIn.PDate(strDateStart);
-			//DateTime dateEnd=PIn.PDate(strDateEnd);
-			//int aptNum=PIn.PInt(strAptNum);
-			//bool isPlanned=PIn.PBool(strIsPlanned);
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("Appointments");
 			DataRow row;
@@ -683,6 +679,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("contactMethods");
 			//table.Columns.Add("creditIns");
 			table.Columns.Add("CreditType");
+			table.Columns.Add("Email");
 			table.Columns.Add("famFinUrgNote");
 			table.Columns.Add("guardians");
 			table.Columns.Add("hasIns[I]");
@@ -692,6 +689,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("insToSend[!]");
 			table.Columns.Add("IsHygiene");
 			table.Columns.Add("lab");
+			table.Columns.Add("language");
 			table.Columns.Add("medOrPremed[+]");
 			table.Columns.Add("MedUrgNote");
 			table.Columns.Add("Note");
@@ -711,25 +709,30 @@ namespace OpenDentBusiness{
 			table.Columns.Add("provider");
 			table.Columns.Add("ProvHyg");
 			table.Columns.Add("ProvNum");
+			table.Columns.Add("referralFrom");
+			table.Columns.Add("referralTo");
 			table.Columns.Add("timeAskedToArrive");
 			table.Columns.Add("wkPhone");
 			table.Columns.Add("wirelessPhone");
 			table.Columns.Add("writeoffPPO");
-			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address,patient.Address2,patient.AddrNote,"
-				+"patient.ApptModNote,AptDateTime,appointment.AptNum,AptStatus,Assistant,"
-				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
+			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
+				+"patient.ApptModNote patApptModNote,appointment.AptDateTime apptAptDateTime,appointment.AptNum apptAptNum,appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
+				+"patient.BillingType patBillingType,patient.BirthDate patBirthDate,patient.DateTimeDeceased patDateTimeDeceased,"
 				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,"
-				+"patient.ChartNumber,patient.City,appointment.ColorOverride,Confirmed,patient.CreditType,DateTimeChecked,"
-				+"DateTimeDue,DateTimeRecd,DateTimeSent,DateTimeAskedToArrive,"
-				+"guar.FamFinUrgNote,patient.FName,patient.Guarantor,"
+				+"patient.ChartNumber patChartNumber,patient.City patCity,appointment.ColorOverride apptColorOverride,appointment.Confirmed apptConfirmed,"
+				+"patient.CreditType patCreditType,labcase.DateTimeChecked labcaseDateTimeChecked,"
+				+"labcase.DateTimeDue labcaseDateTimeDue,labcase.DateTimeRecd labcaseDateTimeRecd,labcase.DateTimeSent labcaseDateTimeSent,appointment.DateTimeAskedToArrive apptDateTimeAskedToArrive,"
+				+"patient.Email patEmail,guar.FamFinUrgNote guarFamFinUrgNote,patient.FName patFName,patient.Guarantor patGuarantor,"
 				+"COUNT(AllergyNum) hasAllergy,"
 				+"COUNT(DiseaseNum) hasDisease,"
-				+"patient.HmPhone,patient.ImageFolder,IsHygiene,IsNewPatient,"
-				+"LabCaseNum,patient.LName,patient.MedUrgNote,patient.MiddleI,Note,Op,appointment.PatNum,"
-				+"Pattern,COUNT(patplan.InsSubNum) hasIns,patient.PreferConfirmMethod,patient.PreferContactMethod,patient.Preferred,"
-				+"patient.PreferRecallMethod,patient.Premed,"
-				+"ProcDescript,ProcsColored,ProvHyg,appointment.ProvNum,"
-				+"patient.State,patient.WirelessPhone,patient.WkPhone,patient.Zip "
+				+"patient.HmPhone patHmPhone,patient.ImageFolder patImageFolder,appointment.IsHygiene apptIsHygiene,appointment.IsNewPatient apptIsNewPatient,"
+				+"labcase.LabCaseNum labcaseLabCaseNum,patient.Language patLanguage,patient.LName patLName,patient.MedUrgNote patMedUrgNote,"
+				+"patient.MiddleI patMiddleI,appointment.Note apptNote,appointment.Op apptOp,appointment.PatNum apptPatNum,"
+				+"appointment.Pattern apptPattern,COUNT(patplan.InsSubNum) hasIns,patient.PreferConfirmMethod patPreferConfirmMethod,"
+				+"patient.PreferContactMethod patPreferContactMethod,patient.Preferred patPreferred,"
+				+"patient.PreferRecallMethod patPreferRecallMethod,patient.Premed patPremed,"
+				+"appointment.ProcDescript apptProcDescript,appointment.ProcsColored apptProcsColored,appointment.ProvHyg apptProvHyg,appointment.ProvNum apptProvNum,"
+				+"patient.State patState,patient.WirelessPhone patWirelessPhone,patient.WkPhone patWkPhone,patient.Zip patZip "
 				+"FROM appointment "
 				+"LEFT JOIN patient ON patient.PatNum=appointment.PatNum "
 				+"LEFT JOIN provider p1 ON p1.ProvNum=appointment.ProvNum "
@@ -762,16 +765,16 @@ namespace OpenDentBusiness{
 			}
 			else {//Oracle
 				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
-				+"patient.ApptModNote,AptDateTime,appointment.AptNum,AptStatus,Assistant,"
+				+"patient.ApptModNote,AptDateTime,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
 				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
 				+"carrier1.CarrierName,carrier2.CarrierName,"
-				+"patient.ChartNumber,patient.City,appointment.ColorOverride,Confirmed,patient.CreditType,"
-				+"DateTimeChecked,DateTimeDue,DateTimeRecd,DateTimeSent,DateTimeAskedToArrive,"
-				+"guar.FamFinUrgNote,patient.FName,patient.Guarantor,patient.HmPhone,patient.ImageFolder,IsHygiene,IsNewPatient,"
-				+"LabCaseNum,patient.LName,patient.MedUrgNote,patient.MiddleI,Note,Op,appointment.PatNum,"
+				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
+				+"appointment.DateTimeChecked,appointment.DateTimeDue,appointment.DateTimeRecd,appointment.DateTimeSent,appointment.DateTimeAskedToArrive,"
+				+"patient.Email,guar.FamFinUrgNote,patient.FName,patient.Guarantor,patient.HmPhone,patient.ImageFolder,appointment.IsHygiene,appointment.IsNewPatient,"
+				+"labcase.LabCaseNum,patient.Language,patient.LName,patient.MedUrgNote,patient.MiddleI,appointment.Note,appointment.Op,appointment.PatNum,"
 				+"Pattern,patient.PreferConfirmMethod,patient.PreferContactMethod,patient.Preferred,"
 				+"patient.PreferRecallMethod,patient.Premed,"
-				+"ProcDescript,ProcsColored,ProvHyg,appointment.ProvNum,"
+				+"appointment.ProcDescript,appointment.ProcsColored,appointment.ProvHyg,appointment.ProvNum,"
 				+"patient.State,patient.WirelessPhone,patient.WkPhone,patient.Zip ";
 			}
 			DataTable raw=dcon.GetTable(command);
@@ -795,9 +798,7 @@ namespace OpenDentBusiness{
 					command+="SUM(CASE WHEN WriteOffEstOverride!=-1 THEN WriteOffEstOverride ELSE WriteOffEst END) writeoffPPO,";
 				}
 				command+="procedurelog.ProcNum "
-					//+"Surf,ToothNum,TreatArea  "
 					+"FROM procedurelog "
-					//+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
 					+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum "
 					+"AND (claimproc.WriteOffEst != -1 "
 					+"OR claimproc.WriteOffEstOverride != -1) "
@@ -814,10 +815,8 @@ namespace OpenDentBusiness{
 						if(a>0){
 							command+=",";
 						}
-						command+=raw.Rows[a]["AptNum"].ToString();
+						command+=raw.Rows[a]["apptAptNum"].ToString();
 					}
-					//command+="a.AptDateTime >= "+POut.PDate(dateStart)+" "
-					//	+"AND a.AptDateTime < "+POut.PDate(dateEnd.AddDays(1));
 				}
 				else {
 					command+=POut.Long(aptNum);
@@ -882,10 +881,42 @@ namespace OpenDentBusiness{
 				if(i>0) {
 					command+=",";
 				}
-				command+=raw.Rows[i]["PatNum"].ToString();
+				command+=raw.Rows[i]["apptPatNum"].ToString();
 			}
 			command+=") ORDER BY Relationship";
 			DataTable rawGuardians=dcon.GetTable(command);
+			string refFrom="";
+			string refTo="";
+			List<long> listPatNums=new List<long>();
+			List<long> listRefNums=new List<long>();
+			for(int i=0;i<raw.Rows.Count;i++) {
+				if(!listPatNums.Contains((long)raw.Rows[i]["apptPatNum"])) {
+					listPatNums.Add((long)raw.Rows[i]["apptPatNum"]);
+				}
+			}
+			List<RefAttach> listRefAttaches=RefAttaches.GetRefAttaches(listPatNums);
+			for(int i=0;i<listRefAttaches.Count;i++) {
+				if(!listRefNums.Contains(listRefAttaches[i].ReferralNum)) {
+					listRefNums.Add(listRefAttaches[i].ReferralNum);
+				}
+			}
+			List<Referral> listReferrals=Referrals.GetReferrals(listRefNums);
+			for(int j=0;j<listRefAttaches.Count;j++) {
+				string nameLF="";
+				for(int k=0;k<listReferrals.Count;k++) {
+					if(listRefAttaches[j].ReferralNum==listReferrals[k].ReferralNum) {
+						nameLF=listReferrals[k].LName+", "+listReferrals[k].FName;
+					}
+				}
+				if(listRefAttaches[j].IsFrom) {
+					refFrom+="Referred From: "+nameLF+"\r\n";
+				}
+				else {
+					refTo+="Referred To: "+nameLF+"\r\n";
+				}
+			}
+			refFrom.TrimEnd('\r','\n');
+			refTo.TrimEnd('\r','\n');
 			DateTime aptDate;
 			TimeSpan span;
 			int hours;
@@ -898,16 +929,16 @@ namespace OpenDentBusiness{
 			decimal writeoffPPO;
 			for(int i=0;i<raw.Rows.Count;i++) {
 				row=table.NewRow();
-				row["address"]=Patients.GetAddressFull(raw.Rows[i]["Address"].ToString(),raw.Rows[i]["Address2"].ToString(),
-					raw.Rows[i]["City"].ToString(),raw.Rows[i]["State"].ToString(),raw.Rows[i]["Zip"].ToString());
+				row["address"]=Patients.GetAddressFull(raw.Rows[i]["patAddress1"].ToString(),raw.Rows[i]["patAddress2"].ToString(),
+					raw.Rows[i]["patCity"].ToString(),raw.Rows[i]["patState"].ToString(),raw.Rows[i]["patZip"].ToString());
 				row["addrNote"]="";
-				if(raw.Rows[i]["AddrNote"].ToString()!=""){
-					row["addrNote"]=Lans.g("Appointments","AddrNote: ")+raw.Rows[i]["AddrNote"].ToString();
+				if(raw.Rows[i]["patAddrNote"].ToString()!=""){
+					row["addrNote"]=Lans.g("Appointments","AddrNote: ")+raw.Rows[i]["patAddrNote"].ToString();
 				}
-				aptDate=PIn.DateT(raw.Rows[i]["AptDateTime"].ToString());
+				aptDate=PIn.DateT(raw.Rows[i]["apptAptDateTime"].ToString());
 				row["AptDateTime"]=aptDate;
-				birthdate=PIn.Date(raw.Rows[i]["Birthdate"].ToString());
-				DateTime dateTimeDeceased=PIn.Date(raw.Rows[i]["DateTimeDeceased"].ToString());
+				birthdate=PIn.Date(raw.Rows[i]["patBirthdate"].ToString());
+				DateTime dateTimeDeceased=PIn.Date(raw.Rows[i]["patDateTimeDeceased"].ToString());
 				DateTime dateTimeTo=DateTime.Now;
 				if(dateTimeDeceased.Year>1880) {
 					dateTimeTo=dateTimeDeceased;
@@ -923,12 +954,12 @@ namespace OpenDentBusiness{
 					row["age"]+="?";
 				}
 				row["apptModNote"]="";
-				if(raw.Rows[i]["ApptModNote"].ToString()!="") {
-					row["apptModNote"]=Lans.g("Appointments","ApptModNote: ")+raw.Rows[i]["ApptModNote"].ToString();
+				if(raw.Rows[i]["patApptModNote"].ToString()!="") {
+					row["apptModNote"]=Lans.g("Appointments","ApptModNote: ")+raw.Rows[i]["patApptModNote"].ToString();
 				}
 				row["aptDate"]=aptDate.ToShortDateString();
 				row["aptDay"]=aptDate.ToString("dddd");
-				span=TimeSpan.FromMinutes(raw.Rows[i]["Pattern"].ToString().Length*5);
+				span=TimeSpan.FromMinutes(raw.Rows[i]["apptPattern"].ToString().Length*5);
 				hours=span.Hours;
 				minutes=span.Minutes;
 				if(hours==0){
@@ -943,66 +974,67 @@ namespace OpenDentBusiness{
 						+minutes.ToString()+Lans.g("Appointments"," Min");
 				}
 				row["aptTime"]=aptDate.ToShortTimeString();
-				row["AptNum"]=raw.Rows[i]["AptNum"].ToString();
-				row["AptStatus"]=raw.Rows[i]["AptStatus"].ToString();
-				row["Assistant"]=raw.Rows[i]["Assistant"].ToString();
+				row["AptNum"]=raw.Rows[i]["apptAptNum"].ToString();
+				row["AptStatus"]=raw.Rows[i]["apptAptStatus"].ToString();
+				row["Assistant"]=raw.Rows[i]["apptAssistant"].ToString();
 				row["assistantAbbr"]="";
 				if(row["Assistant"].ToString()!="0") {
-					row["assistantAbbr"]=Employees.GetAbbr(PIn.Long(row["Assistant"].ToString()));
+					row["assistantAbbr"]=Employees.GetAbbr(PIn.Long(row["apptAssistant"].ToString()));
 				}
-				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(raw.Rows[i]["BillingType"].ToString()));
-				row["chartNumber"]=raw.Rows[i]["ChartNumber"].ToString();
+				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(raw.Rows[i]["patBillingType"].ToString()));
+				row["chartNumber"]=raw.Rows[i]["patChartNumber"].ToString();
 				row["chartNumAndName"]="";
-				if(raw.Rows[i]["IsNewPatient"].ToString()=="1") {
+				if(raw.Rows[i]["apptIsNewPatient"].ToString()=="1") {
 					row["chartNumAndName"]="NP-";
 				}
-				row["chartNumAndName"]+=raw.Rows[i]["ChartNumber"].ToString()+" "
-					+PatientLogic.GetNameLF(raw.Rows[i]["LName"].ToString(),raw.Rows[i]["FName"].ToString(),
-					raw.Rows[i]["Preferred"].ToString(),raw.Rows[i]["MiddleI"].ToString());
-				row["ColorOverride"]=raw.Rows[i]["ColorOverride"].ToString();
-				row["confirmed"]=DefC.GetName(DefCat.ApptConfirmed,PIn.Long(raw.Rows[i]["Confirmed"].ToString()));
-				row["Confirmed"]=raw.Rows[i]["Confirmed"].ToString();
+				row["chartNumAndName"]+=raw.Rows[i]["patChartNumber"].ToString()+" "
+					+PatientLogic.GetNameLF(raw.Rows[i]["patLName"].ToString(),raw.Rows[i]["patFName"].ToString(),
+					raw.Rows[i]["patPreferred"].ToString(),raw.Rows[i]["patMiddleI"].ToString());
+				row["ColorOverride"]=raw.Rows[i]["apptColorOverride"].ToString();
+				row["confirmed"]=DefC.GetName(DefCat.ApptConfirmed,PIn.Long(raw.Rows[i]["apptConfirmed"].ToString()));
+				row["Confirmed"]=raw.Rows[i]["apptConfirmed"].ToString();
 				row["contactMethods"]="";
-				if(raw.Rows[i]["PreferConfirmMethod"].ToString()!="0"){
+				if(raw.Rows[i]["patPreferConfirmMethod"].ToString()!="0"){
 					row["contactMethods"]+=Lans.g("Appointments","Confirm Method: ")
-						+((ContactMethod)PIn.Long(raw.Rows[i]["PreferConfirmMethod"].ToString())).ToString();
+						+((ContactMethod)PIn.Long(raw.Rows[i]["patPreferConfirmMethod"].ToString())).ToString();
 				}
-				if(raw.Rows[i]["PreferContactMethod"].ToString()!="0"){
+				if(raw.Rows[i]["patPreferContactMethod"].ToString()!="0"){
 					if(row["contactMethods"].ToString()!="") {
 						row["contactMethods"]+="\r\n";
 					}
 					row["contactMethods"]+=Lans.g("Appointments","Contact Method: ")
-						+((ContactMethod)PIn.Long(raw.Rows[i]["PreferContactMethod"].ToString())).ToString();
+						+((ContactMethod)PIn.Long(raw.Rows[i]["patPreferContactMethod"].ToString())).ToString();
 				}
-				if(raw.Rows[i]["PreferRecallMethod"].ToString()!="0"){
+				if(raw.Rows[i]["patPreferRecallMethod"].ToString()!="0"){
 					if(row["contactMethods"].ToString()!="") {
 						row["contactMethods"]+="\r\n";
 					}
 					row["contactMethods"]+=Lans.g("Appointments","Recall Method: ")
-						+((ContactMethod)PIn.Long(raw.Rows[i]["PreferRecallMethod"].ToString())).ToString();
+						+((ContactMethod)PIn.Long(raw.Rows[i]["patPreferRecallMethod"].ToString())).ToString();
 				}
 				bool InsToSend=false;
 				if(rawInsProc!=null){
 					//figure out if pt's family has ins claims that need to be created
 					for(int j=0;j<rawInsProc.Rows.Count;j++){
 						if(raw.Rows[i]["hasIns"].ToString()!="0") {
-							if (raw.Rows[i]["Guarantor"].ToString()==rawInsProc.Rows[j]["Guarantor"].ToString() 
-								|| raw.Rows[i]["Guarantor"].ToString()==rawInsProc.Rows[j]["PatNum"].ToString())
+							if (raw.Rows[i]["patGuarantor"].ToString()==rawInsProc.Rows[j]["Guarantor"].ToString() 
+								|| raw.Rows[i]["patGuarantor"].ToString()==rawInsProc.Rows[j]["PatNum"].ToString())
 							{
 								InsToSend=true;
 							}
 						}
 					}
 				}
-				row["CreditType"]=raw.Rows[i]["CreditType"].ToString();
+				row["CreditType"]=raw.Rows[i]["patCreditType"].ToString();
+				row["Email"]=raw.Rows[i]["patEmail"].ToString();
 				row["famFinUrgNote"]="";
-				if(raw.Rows[i]["FamFinUrgNote"].ToString()!="") {
-					row["famFinUrgNote"]=Lans.g("Appointments","FamFinUrgNote: ")+raw.Rows[i]["FamFinUrgNote"].ToString();
+				if(raw.Rows[i]["guarFamFinUrgNote"].ToString()!="") {
+					row["famFinUrgNote"]=Lans.g("Appointments","FamFinUrgNote: ")+raw.Rows[i]["guarFamFinUrgNote"].ToString();
 				}
 				row["guardians"]="";
 				GuardianRelationship guardRelat;
 				for(int g=0;g<rawGuardians.Rows.Count;g++) {
-					if(raw.Rows[i]["PatNum"].ToString()==rawGuardians.Rows[g]["PatNumChild"].ToString()) {
+					if(raw.Rows[i]["apptPatNum"].ToString()==rawGuardians.Rows[g]["PatNumChild"].ToString()) {
 						if(row["guardians"].ToString()!="") {
 							row["guardians"]+=",";
 						}
@@ -1015,8 +1047,8 @@ namespace OpenDentBusiness{
 				if(raw.Rows[i]["hasIns"].ToString()!="0") {
 					row["hasIns[I]"]+="I";
 				}
-				row["hmPhone"]=Lans.g("Appointments","Hm: ")+raw.Rows[i]["HmPhone"].ToString();
-				row["ImageFolder"]=raw.Rows[i]["ImageFolder"].ToString();
+				row["hmPhone"]=Lans.g("Appointments","Hm: ")+raw.Rows[i]["patHmPhone"].ToString();
+				row["ImageFolder"]=raw.Rows[i]["patImageFolder"].ToString();
 				row["insurance"]="";
 				if(raw.Rows[i]["carrierName1"].ToString()!="") {
 					row["insurance"]+=raw.Rows[i]["carrierName1"].ToString();
@@ -1034,27 +1066,27 @@ namespace OpenDentBusiness{
 				if(InsToSend) {
 					row["insToSend[!]"]="!";
 				}
-				row["IsHygiene"]=raw.Rows[i]["IsHygiene"].ToString();
+				row["IsHygiene"]=raw.Rows[i]["apptIsHygiene"].ToString();
 				row["lab"]="";
-				if(raw.Rows[i]["LabCaseNum"].ToString()!=""){
-					labDate=PIn.DateT(raw.Rows[i]["DateTimeChecked"].ToString());
+				if(raw.Rows[i]["labcaseLabCaseNum"].ToString()!=""){
+					labDate=PIn.DateT(raw.Rows[i]["labcaseDateTimeChecked"].ToString());
 					if(labDate.Year>1880) {
 						row["lab"]=Lans.g("Appointments","Lab Quality Checked");
 					}
 					else {
-						labDate=PIn.DateT(raw.Rows[i]["DateTimeRecd"].ToString());
+						labDate=PIn.DateT(raw.Rows[i]["labcaseDateTimeRecd"].ToString());
 						if(labDate.Year>1880) {
 							row["lab"]=Lans.g("Appointments","Lab Received");
 						}
 						else {
-							labDate=PIn.DateT(raw.Rows[i]["DateTimeSent"].ToString());
+							labDate=PIn.DateT(raw.Rows[i]["labcaseDateTimeSent"].ToString());
 							if(labDate.Year>1880) {
 								row["lab"]=Lans.g("Appointments","Lab Sent");//sent but not received
 							}
 							else {
 								row["lab"]=Lans.g("Appointments","Lab Not Sent");
 							}
-							labDueDate=PIn.DateT(raw.Rows[i]["DateTimeDue"].ToString());
+							labDueDate=PIn.DateT(raw.Rows[i]["labcaseDateTimeDue"].ToString());
 							if(labDueDate.Year>1880) {
 								row["lab"]+=", "+Lans.g("Appointments","Due: ")//+dateDue.ToString("ddd")+" "
 									+labDueDate.ToShortDateString();//+" "+dateDue.ToShortTimeString();
@@ -1062,44 +1094,51 @@ namespace OpenDentBusiness{
 						}
 					}
 				}
+				CultureInfo culture=CodeBase.MiscUtils.GetCultureFromThreeLetter(raw.Rows[i]["patLanguage"].ToString());
+				if(culture==null) {//custom language
+					row["language"]=raw.Rows[i]["patLanguage"].ToString();
+				}
+				else {
+					row["language"]=culture.DisplayName;
+				}
 				row["medOrPremed[+]"]="";
-				if(raw.Rows[i]["MedUrgNote"].ToString()!="" || raw.Rows[i]["Premed"].ToString()=="1" || raw.Rows[i]["hasDisease"].ToString()!="0" || raw.Rows[i]["hasAllergy"].ToString()!="0") {
+				if(raw.Rows[i]["patMedUrgNote"].ToString()!="" || raw.Rows[i]["patPremed"].ToString()=="1" || raw.Rows[i]["hasDisease"].ToString()!="0" || raw.Rows[i]["hasAllergy"].ToString()!="0") {
 					row["medOrPremed[+]"]="+";
 				}
-				row["MedUrgNote"]=raw.Rows[i]["MedUrgNote"].ToString();
-				row["Note"]=raw.Rows[i]["Note"].ToString();
-				row["Op"]=raw.Rows[i]["Op"].ToString();
-				if(raw.Rows[i]["IsNewPatient"].ToString()=="1"){
+				row["MedUrgNote"]=raw.Rows[i]["patMedUrgNote"].ToString();
+				row["Note"]=raw.Rows[i]["apptNote"].ToString();
+				row["Op"]=raw.Rows[i]["apptOp"].ToString();
+				if(raw.Rows[i]["apptIsNewPatient"].ToString()=="1"){
 					row["patientName"]="NP-";
 				}
-				row["patientName"]+=PatientLogic.GetNameLF(raw.Rows[i]["LName"].ToString(),raw.Rows[i]["FName"].ToString(),
-					raw.Rows[i]["Preferred"].ToString(),raw.Rows[i]["MiddleI"].ToString());
-				row["patientNameF"]=raw.Rows[i]["FName"].ToString();
-				row["PatNum"]=raw.Rows[i]["PatNum"].ToString();
-				row["patNum"]="PatNum: "+raw.Rows[i]["PatNum"].ToString();
-				row["GuarNum"]=raw.Rows[i]["Guarantor"].ToString();
+				row["patientName"]+=PatientLogic.GetNameLF(raw.Rows[i]["patLName"].ToString(),raw.Rows[i]["patFName"].ToString(),
+					raw.Rows[i]["patPreferred"].ToString(),raw.Rows[i]["patMiddleI"].ToString());
+				row["patientNameF"]=raw.Rows[i]["patFName"].ToString();
+				row["PatNum"]=raw.Rows[i]["apptPatNum"].ToString();
+				row["patNum"]="PatNum: "+raw.Rows[i]["apptPatNum"].ToString();
+				row["GuarNum"]=raw.Rows[i]["patGuarantor"].ToString();
 				row["patNumAndName"]="";
-				if(raw.Rows[i]["IsNewPatient"].ToString()=="1") {
+				if(raw.Rows[i]["apptIsNewPatient"].ToString()=="1") {
 					row["patNumAndName"]="NP-";
 				}
-				row["patNumAndName"]+=raw.Rows[i]["PatNum"].ToString()+" "
-					+PatientLogic.GetNameLF(raw.Rows[i]["LName"].ToString(),raw.Rows[i]["FName"].ToString(),
-					raw.Rows[i]["Preferred"].ToString(),raw.Rows[i]["MiddleI"].ToString());
-				row["Pattern"]=raw.Rows[i]["Pattern"].ToString();
+				row["patNumAndName"]+=raw.Rows[i]["apptPatNum"].ToString()+" "
+					+PatientLogic.GetNameLF(raw.Rows[i]["patLName"].ToString(),raw.Rows[i]["patFName"].ToString(),
+					raw.Rows[i]["patPreferred"].ToString(),raw.Rows[i]["patMiddleI"].ToString());
+				row["Pattern"]=raw.Rows[i]["apptPattern"].ToString();
 				row["preMedFlag"]="";
-				if(raw.Rows[i]["Premed"].ToString()=="1"){
+				if(raw.Rows[i]["patPremed"].ToString()=="1") {
 					row["preMedFlag"]=Lans.g("Appointments","Premedicate");
 				}
-				row["procs"]=raw.Rows[i]["ProcDescript"].ToString();
-				row["procsColored"]+=raw.Rows[i]["ProcsColored"].ToString();
+				row["procs"]=raw.Rows[i]["apptProcDescript"].ToString();
+				row["procsColored"]+=raw.Rows[i]["apptProcsColored"].ToString();
 				production=0;
 				writeoffPPO=0;
 				if(rawProc!=null) {
 					for(int p=0;p<rawProc.Rows.Count;p++) {
-						if(isPlanned && raw.Rows[i]["AptNum"].ToString()!=rawProc.Rows[p]["PlannedAptNum"].ToString()) {
+						if(isPlanned && raw.Rows[i]["apptAptNum"].ToString()!=rawProc.Rows[p]["PlannedAptNum"].ToString()) {
 							continue;
 						}
-						else if(!isPlanned && raw.Rows[i]["AptNum"].ToString()!=rawProc.Rows[p]["AptNum"].ToString()) {
+						else if(!isPlanned && raw.Rows[i]["apptAptNum"].ToString()!=rawProc.Rows[p]["AptNum"].ToString()) {
 							continue;
 						}
 						production+=PIn.Decimal(rawProc.Rows[p]["ProcFee"].ToString());
@@ -1118,7 +1157,7 @@ namespace OpenDentBusiness{
 				}
 				row["production"]=production.ToString("c");//PIn.Double(raw.Rows[i]["Production"].ToString()).ToString("c");
 				row["productionVal"]=production.ToString();//raw.Rows[i]["Production"].ToString();
-				if(raw.Rows[i]["IsHygiene"].ToString()=="1"){
+				if(raw.Rows[i]["apptIsHygiene"].ToString()=="1"){
 					row["provider"]=raw.Rows[i]["HygAbbr"].ToString();
 					if(raw.Rows[i]["ProvAbbr"].ToString()!=""){
 						row["provider"]+=" ("+raw.Rows[i]["ProvAbbr"].ToString()+")";
@@ -1130,15 +1169,17 @@ namespace OpenDentBusiness{
 						row["provider"]+=" ("+raw.Rows[i]["HygAbbr"].ToString()+")";
 					}
 				}
-				row["ProvNum"]=raw.Rows[i]["ProvNum"].ToString();
-				row["ProvHyg"]=raw.Rows[i]["ProvHyg"].ToString();
+				row["ProvNum"]=raw.Rows[i]["apptProvNum"].ToString();
+				row["ProvHyg"]=raw.Rows[i]["apptProvHyg"].ToString();
+				row["referralFrom"]=refFrom;
+				row["referralTo"]=refTo;
 				row["timeAskedToArrive"]="";
-				timeAskedToArrive=PIn.DateT(raw.Rows[i]["DateTimeAskedToArrive"].ToString());
+				timeAskedToArrive=PIn.DateT(raw.Rows[i]["apptDateTimeAskedToArrive"].ToString());
 				if(timeAskedToArrive.Year>1880) {
 					row["timeAskedToArrive"]=timeAskedToArrive.ToString("H:mm");
 				}
-				row["wirelessPhone"]=Lans.g("Appointments","Cell: ")+raw.Rows[i]["WirelessPhone"].ToString();
-				row["wkPhone"]=Lans.g("Appointments","Wk: ")+raw.Rows[i]["WkPhone"].ToString();
+				row["wirelessPhone"]=Lans.g("Appointments","Cell: ")+raw.Rows[i]["patWirelessPhone"].ToString();
+				row["wkPhone"]=Lans.g("Appointments","Wk: ")+raw.Rows[i]["patWkPhone"].ToString();
 				row["writeoffPPO"]=writeoffPPO.ToString();
 				table.Rows.Add(row);
 			}

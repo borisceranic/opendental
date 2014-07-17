@@ -51,7 +51,7 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		///<Summary>Returns an ordered list for just one category.  Do not use with None, or it will malfunction.  These are display fields that the user has entered, which are stored in the db, and then are pulled into the cache.</Summary>
+		///<Summary>Returns an ordered list for just one category.  Do not use with None, or it will malfunction.  These are display fields that the user has entered, which are stored in the db, and then are pulled into the cache.  Categories with no display fields will return the default list.</Summary>
 		public static List<DisplayField> GetForCategory(DisplayFieldCategory category){
 			//No need to check RemotingRole; no call to db.
 			List<DisplayField> retVal=new List<DisplayField>();
@@ -281,6 +281,40 @@ namespace OpenDentBusiness {
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				//Ortho chart has no default columns.  User must explicitly set up columns.
 			}
+			else if(category==DisplayFieldCategory.AppointmentBubble) {
+				list.Add(new DisplayField("Patient Name",0,category));
+				list.Add(new DisplayField("Patient Picture",0,category));
+				list.Add(new DisplayField("Appt Day",0,category));
+				list.Add(new DisplayField("Appt Date",0,category));
+				list.Add(new DisplayField("Appt Time",0,category));
+				list.Add(new DisplayField("Appt Length",0,category));
+				list.Add(new DisplayField("Provider",0,category));
+				list.Add(new DisplayField("Production",0,category));
+				list.Add(new DisplayField("Confirmed",0,category));
+				list.Add(new DisplayField("Appt Status",0,category));
+				list.Add(new DisplayField("Med Flag",0,category));
+				list.Add(new DisplayField("Med Note",0,category));
+				list.Add(new DisplayField("Lab",0,category));
+				list.Add(new DisplayField("Procedures",0,category));
+				list.Add(new DisplayField("Note",0,category));
+				list.Add(new DisplayField("Horizontal Line",0,category));
+				list.Add(new DisplayField("PatNum",0,category));
+				list.Add(new DisplayField("ChartNum",0,category));
+				list.Add(new DisplayField("Billing Type",0,category));
+				list.Add(new DisplayField("Age",0,category));
+				list.Add(new DisplayField("Home Phone",0,category));
+				list.Add(new DisplayField("Work Phone",0,category));
+				list.Add(new DisplayField("Wireless Phone",0,category));
+				list.Add(new DisplayField("Contact Methods",0,category));
+				list.Add(new DisplayField("Insurance",0,category));
+				list.Add(new DisplayField("Address Note",0,category));
+				list.Add(new DisplayField("Fam Note",0,category));
+				list.Add(new DisplayField("Appt Mod Note",0,category));
+				//list.Add(new DisplayField("ReferralFrom",0,category));
+				//list.Add(new DisplayField("ReferralTo",0,category));
+				//list.Add(new DisplayField("Language",0,category));
+				//list.Add(new DisplayField("Email",0,category));
+			}
 			return list;
 		}
 
@@ -493,6 +527,40 @@ namespace OpenDentBusiness {
 						list.Add(df);
 					}
 				}
+			}
+			else if(category==DisplayFieldCategory.AppointmentBubble) {
+				list.Add(new DisplayField("Patient Name",0,category));
+				list.Add(new DisplayField("Patient Picture",0,category));
+				list.Add(new DisplayField("Appt Day",0,category));
+				list.Add(new DisplayField("Appt Date",0,category));
+				list.Add(new DisplayField("Appt Time",0,category));
+				list.Add(new DisplayField("Appt Length",0,category));
+				list.Add(new DisplayField("Provider",0,category));
+				list.Add(new DisplayField("Production",0,category));
+				list.Add(new DisplayField("Confirmed",0,category));
+				list.Add(new DisplayField("Appt Status",0,category));
+				list.Add(new DisplayField("Med Flag",0,category));
+				list.Add(new DisplayField("Med Note",0,category));
+				list.Add(new DisplayField("Lab",0,category));
+				list.Add(new DisplayField("Procedures",0,category));
+				list.Add(new DisplayField("Note",0,category));
+				list.Add(new DisplayField("Horizontal Line",0,category));
+				list.Add(new DisplayField("PatNum",0,category));
+				list.Add(new DisplayField("ChartNum",0,category));
+				list.Add(new DisplayField("Billing Type",0,category));
+				list.Add(new DisplayField("Age",0,category));
+				list.Add(new DisplayField("Home Phone",0,category));
+				list.Add(new DisplayField("Work Phone",0,category));
+				list.Add(new DisplayField("Wireless Phone",0,category));
+				list.Add(new DisplayField("Contact Methods",0,category));
+				list.Add(new DisplayField("Insurance",0,category));
+				list.Add(new DisplayField("Address Note",0,category));
+				list.Add(new DisplayField("Fam Note",0,category));
+				list.Add(new DisplayField("Appt Mod Note",0,category));
+				list.Add(new DisplayField("ReferralFrom",0,category));
+				list.Add(new DisplayField("ReferralTo",0,category));
+				list.Add(new DisplayField("Language",0,category));
+				list.Add(new DisplayField("Email",0,category));
 			}
 			return list;
 		}

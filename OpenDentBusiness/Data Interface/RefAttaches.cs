@@ -130,5 +130,20 @@ namespace OpenDentBusiness{
 			command=DbHelper.LimitOrderBy(command,1);
 			return PIn.Long(Db.GetScalar(command));
 		}
+
+		///<summary>Gets all RefAttaches for the patients in the list of PatNums.  Returns an empty list if no matches.</summary>
+		public static List<RefAttach> GetRefAttaches(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<RefAttach>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			if(listPatNums.Count==0) {
+				return new List<RefAttach>();
+			}
+			//MySQL can handle duplicate values within the IN criteria more efficiently than removing them in a loop.
+			List<long> uniqueNums=new List<long>();
+			string command="SELECT * FROM refattach "
+				+"WHERE refattach.PatNum IN ("+String.Join<long>(",",listPatNums)+")";
+			return Crud.RefAttachCrud.SelectMany(command);
+		}
 	}
 }

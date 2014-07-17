@@ -188,6 +188,21 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets all referrals by RefNum.  Returns an empty list if no matches.</summary>
+		public static List<Referral> GetReferrals(List<long> listRefNums) {
+			//No need to check RemotingRole; no call to db.
+			List<Referral> listRefs=new List<Referral>();
+			for(int i=0;i<listRefNums.Count;i++) {
+				for(int j=0;j<List.Length;j++) {
+					if(listRefNums[i]==List[j].ReferralNum) {
+						listRefs.Add(List[j]);
+						break;
+					}
+				}
+			}
+			return listRefs;
+		}
+
 
 
 	}

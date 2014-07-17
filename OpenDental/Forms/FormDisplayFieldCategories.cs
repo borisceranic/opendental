@@ -63,9 +63,9 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(23,14);
+			this.label1.Location = new System.Drawing.Point(23, 14);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(194,17);
+			this.label1.Size = new System.Drawing.Size(194, 17);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Select a category";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -73,46 +73,46 @@ namespace OpenDental{
 			// listCategory
 			// 
 			this.listCategory.FormattingEnabled = true;
-			this.listCategory.Location = new System.Drawing.Point(23,34);
+			this.listCategory.Location = new System.Drawing.Point(23, 34);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(155,108);
+			this.listCategory.Size = new System.Drawing.Size(155, 121);
 			this.listCategory.TabIndex = 57;
 			this.listCategory.DoubleClick += new System.EventHandler(this.listCategory_DoubleClick);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(92,170);
+			this.butOK.Location = new System.Drawing.Point(92, 170);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 56;
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(173,170);
+			this.butCancel.Location = new System.Drawing.Point(173, 170);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// FormDisplayFieldCategories
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(271,209);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(271, 209);
 			this.Controls.Add(this.listCategory);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label1);

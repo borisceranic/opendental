@@ -168,6 +168,7 @@ namespace OpenDental {
 		private UI.Button butMakeRecall;
 		private Panel panelMakeButtons;
 		private int pageColumn;
+		private List<DisplayField> _aptBubbleDefs;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -1314,6 +1315,7 @@ namespace OpenDental {
 
 		///<summary>Gets the entire DS for appointments and schedules.  Gets op and prov indices for current view.</summary>
 		private void RefreshModuleDataPeriod() {
+			_aptBubbleDefs=DisplayFields.GetForCategory(DisplayFieldCategory.AppointmentBubble);
 			bubbleAptNum=0;
 			DateTime startDate;
 			DateTime endDate;
@@ -3404,6 +3406,12 @@ namespace OpenDental {
 				bubbleTime=DateTime.Now;
 				bubbleAptNum=aptNum;
 				//most data is already present in DS.Appointment, but we do need to get the patient picture
+				bool hasPatientPicture=false;
+				for(int i=0;i<_aptBubbleDefs.Count;i++) {
+					if(_aptBubbleDefs[i].InternalName=="Patient Picture") {
+						hasPatientPicture=true;
+					}
+				}
 				infoBubble.BackgroundImage=new Bitmap(infoBubble.Width,800);
 				Image img=infoBubble.BackgroundImage;//alias
 				Graphics g=Graphics.FromImage(img);//infoBubble.BackgroundImage);
@@ -3416,121 +3424,246 @@ namespace OpenDental {
 						row=DS.Tables["Appointments"].Rows[i];
 					}
 				}
-				//row will never be null
-				Font font=new Font(FontFamily.GenericSansSerif,10f,FontStyle.Bold);
-				float y=0;
-				Brush brush=Brushes.Black;
-				g.DrawString(row["patientName"].ToString(),font,brush,8,y);
-				y+=(int)g.MeasureString("X",font).Height;
-				PicturePat.Image=null;
-				if(//PatCur==null ||
-					row["ImageFolder"].ToString()!=""
-					&& PrefC.AtoZfolderUsed)//Do not use patient image when A to Z folders are disabled.
-				//return;
-				{
-					try {
-						Bitmap patPict;
-						Documents.GetPatPict(PIn.Long(row["PatNum"].ToString()),
-							ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
-								row["ImageFolder"].ToString().Substring(0,1).ToUpper(),
-								row["ImageFolder"].ToString(),""),
-							out patPict);
-						PicturePat.Image=patPict;
+				if(!hasPatientPicture) {
+					infoBubble.Controls.Remove(PicturePat);
+				}
+				else {
+					if(!infoBubble.Controls.Contains(PicturePat)) {
+						infoBubble.Controls.Add(PicturePat);
 					}
-					catch { }
+					PicturePat.Image=null;
+					if(row["ImageFolder"].ToString()!=""
+						&& PrefC.AtoZfolderUsed)//Do not use patient image when A to Z folders are disabled.
+					{
+						try {
+							Bitmap patPict;
+							Documents.GetPatPict(PIn.Long(row["PatNum"].ToString()),
+								ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
+									row["ImageFolder"].ToString().Substring(0,1).ToUpper(),
+									row["ImageFolder"].ToString(),""),
+									out patPict);
+							PicturePat.Image=patPict;
+						}
+						catch { }
+					}
 				}
-				float x=110;
-				font=new Font(FontFamily.GenericSansSerif,9f);
+				Font font=new Font(FontFamily.GenericSansSerif,9f);
+				Brush brush=Brushes.Black;
+				float x=0;
+				float y=0;
+				float h=0;
 				float rowH=g.MeasureString("X",font).Height;
-				y-=3;
-				g.DrawString(row["aptDay"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["aptDate"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["aptTime"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["aptLength"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["provider"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["production"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["confirmed"].ToString(),font,brush,x,y);
-				y+=rowH;
-				y=120;
-				x=2;
-				if(row["AptStatus"].ToString()==((int)ApptStatus.ASAP).ToString()) {
-					g.DrawString(Lan.g("enumApptStatus","ASAP"),font,Brushes.Red,x,y);
-					y+=rowH;
-				}
-				if(row["preMedFlag"].ToString()!="") {
-					g.DrawString(row["preMedFlag"].ToString(),font,Brushes.Red,x,y);
-					y+=rowH;
-				}
-				float h;
-				if(row["MedUrgNote"].ToString()!="") {
-					h=g.MeasureString(row["MedUrgNote"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["MedUrgNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["lab"].ToString()!="") {
-					g.DrawString(row["lab"].ToString(),font,Brushes.Red,x,y);
-					y+=rowH;
-				}
-				if(row["procs"].ToString()!="") {
-					h=g.MeasureString(row["procs"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["procs"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["Note"].ToString()!="") {
-					h=g.MeasureString(row["Note"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["Note"].ToString(),font,Brushes.Blue,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				//patient info---------------------
-				y+=3;
-				g.DrawLine(new Pen(Brushes.Gray,1.5f),3,y,infoBubble.Width-3,y);
-				y+=2;
-				g.DrawString(row["patNum"].ToString(),font,brush,x,y);
-				y+=rowH;
-				if(row["chartNumber"].ToString()!="") {
-					g.DrawString(row["chartNumber"].ToString(),font,brush,x,y);
-					y+=rowH;
-				}
-				g.DrawString(row["billingType"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["age"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["hmPhone"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["wkPhone"].ToString(),font,brush,x,y);
-				y+=rowH;
-				g.DrawString(row["wirelessPhone"].ToString(),font,brush,x,y);
-				y+=rowH;
-				if(row["contactMethods"].ToString()!="") {
-					h=g.MeasureString(row["contactMethods"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["contactMethods"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["insurance"].ToString()!="") {//overkill since it's only one line
-					h=g.MeasureString(row["insurance"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["insurance"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["addrNote"].ToString()!="") {
-					h=g.MeasureString(row["addrNote"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["addrNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["famFinUrgNote"].ToString()!="") {
-					h=g.MeasureString(row["famFinUrgNote"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["famFinUrgNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
-				}
-				if(row["apptModNote"].ToString()!="") {
-					h=g.MeasureString(row["apptModNote"].ToString(),font,infoBubble.Width).Height;
-					g.DrawString(row["apptModNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width,h));
-					y+=h;
+				for(int i=0;i<_aptBubbleDefs.Count;i++) {
+					if(i==0) {
+						font=new Font(FontFamily.GenericSansSerif,10f,FontStyle.Bold);
+						x=8;
+						y=0;
+					}
+					if(i==1) {
+						font=new Font(FontFamily.GenericSansSerif,9f);
+						if(hasPatientPicture) {
+							x=110;
+						}
+						else {
+							x=2;
+						}
+						y-=3;
+					}
+					if(hasPatientPicture && y>=(PicturePat.Height+PicturePat.Location.Y)) {
+						x=2;
+					}
+					switch(_aptBubbleDefs[i].InternalName) {
+						case "Patient Name":
+							h=g.MeasureString(row["patientName"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["patientName"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Patient Picture":
+							//We have already dealt with this above.
+							continue;
+						case "Appt Day":
+							h=g.MeasureString(row["aptDay"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["aptDay"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Appt Date":
+							h=g.MeasureString(row["aptDate"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["aptDate"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Appt Time":
+							h=g.MeasureString(row["aptTime"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["aptTime"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Appt Length":
+							h=g.MeasureString(row["aptLength"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["aptLength"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Provider":
+							h=g.MeasureString(row["provider"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["provider"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Production":
+							h=g.MeasureString(row["production"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["production"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Confirmed":
+							h=g.MeasureString(row["confirmed"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["confirmed"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Appt Status":
+							if(row["AptStatus"].ToString()==((int)ApptStatus.ASAP).ToString()) {
+								h=g.MeasureString(Lan.g("enumApptStatus","ASAP"),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(Lan.g("enumApptStatus","ASAP"),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Med Flag":
+							if(row["preMedFlag"].ToString()!="") {
+								h=g.MeasureString(row["preMedFlag"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["preMedFlag"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Med Note":
+							if(row["MedUrgNote"].ToString()!="") {
+								h=g.MeasureString(row["MedUrgNote"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["MedUrgNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Lab":
+							if(row["lab"].ToString()!="") {
+								h=g.MeasureString(row["lab"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["lab"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Procedures":
+							if(row["procs"].ToString()!="") {
+								h=g.MeasureString(row["procs"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["procs"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Note":
+							if(row["Note"].ToString()!="") {
+								h=g.MeasureString(row["Note"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["Note"].ToString(),font,Brushes.Blue,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "PatNum":
+							h=g.MeasureString(row["patNum"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["patNum"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "ChartNum":
+							if(row["chartNumber"].ToString()!="") {
+								h=g.MeasureString(row["chartNumber"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["chartNumber"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Billing Type":
+							h=g.MeasureString(row["billingType"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["billingType"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Horizontal Line":
+							y+=3;
+							g.DrawLine(new Pen(Brushes.Gray,1.5f),3,y,infoBubble.Width-3,y);
+							y+=2;
+							continue;
+						case "Age":
+							h=g.MeasureString(row["age"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["age"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Home Phone":
+							h=g.MeasureString(row["hmPhone"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["hmPhone"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Work Phone":
+							h=g.MeasureString(row["wkPhone"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["wkPhone"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Wireless Phone":
+							h=g.MeasureString(row["wirelessPhone"].ToString(),font,infoBubble.Width-(int)x).Height;
+							g.DrawString(row["wirelessPhone"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							y+=h;
+							continue;
+						case "Contact Methods":
+							if(row["contactMethods"].ToString()!="") {
+								h=g.MeasureString(row["contactMethods"].ToString(),font,infoBubble.Width).Height;
+								g.DrawString(row["contactMethods"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width,h));
+								y+=h;
+							}
+							continue;
+						case "Insurance":
+							if(row["insurance"].ToString()!="") {//overkill since it's only one line
+								h=g.MeasureString(row["insurance"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["insurance"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Address Note":
+							if(row["addrNote"].ToString()!="") {
+								h=g.MeasureString(row["addrNote"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["addrNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Fam Note":
+							if(row["famFinUrgNote"].ToString()!="") {
+								h=g.MeasureString(row["famFinUrgNote"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["famFinUrgNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Appt Mod Note":
+							if(row["apptModNote"].ToString()!="") {
+								h=g.MeasureString(row["apptModNote"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["apptModNote"].ToString(),font,Brushes.Red,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "ReferralFrom":
+							if(row["referralFrom"].ToString()!="") {
+								h=g.MeasureString(row["referralFrom"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["referralFrom"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "ReferralTo":
+							if(row["referralTo"].ToString()!="") {
+								h=g.MeasureString(row["referralTo"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["referralTo"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Language":
+							if(row["Language"].ToString()!="") {
+								h=g.MeasureString(row["Language"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["Language"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+						case "Email":
+							if(row["Email"].ToString()!="") {
+								h=g.MeasureString(row["Email"].ToString(),font,infoBubble.Width-(int)x).Height;
+								g.DrawString(row["Email"].ToString(),font,brush,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+								y+=h;
+							}
+							continue;
+					}
 				}
 				//other family members?
 				g.DrawRectangle(Pens.Gray,0,0,infoBubble.Width-1,(int)y+4);
