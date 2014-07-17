@@ -24,6 +24,7 @@ namespace OpenDentBusiness {
 		///<summary>The only purpose of this column is to let you change the order in the HL7 Def windows.  It's just for convenience.</summary>
 		public int ItemOrder;
 		///<summary>text</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Note;
 //VendorCustomized, an enumeration.  Example: PDF TPs.

@@ -11,6 +11,7 @@ namespace OpenDentBusiness{
 		///<summary>Description of the Letter.</summary>
 		public string Description;
 		///<summary>Text of the letter</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string BodyText;
 	}

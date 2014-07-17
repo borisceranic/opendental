@@ -13,6 +13,7 @@ namespace OpenDentBusiness {
 		///<summary>FK to EhrLabResult.EhrLabResult.  May be 0 if this is a Lab Note, will be valued if this is an Ehr Lab Result Note.</summary>
 		public long EhrLabResultNum;
 		///<summary>Carret delimited list of comments.  Comments must be formatted text and cannot contain the following 6 characters |^&~\#  NTE.*.*</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Comments;
 

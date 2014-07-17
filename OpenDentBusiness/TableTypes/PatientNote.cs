@@ -18,6 +18,7 @@ namespace OpenDentBusiness{
 		///<summary>Service notes</summary>
 		public string Service;
 		///<summary>Complete current Medical History</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string MedicalComp;
 		///<summary>Shows in the Chart module just below the graphical tooth chart.</summary>

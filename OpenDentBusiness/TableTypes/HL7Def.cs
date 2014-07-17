@@ -43,6 +43,7 @@ namespace OpenDentBusiness{
 		///<summary>.</summary>
 		public bool IsEnabled;
 		///<summary></summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Note;
 		///<summary>The machine name of the computer where the OpenDentHL7 service for this def is running.</summary>

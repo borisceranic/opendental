@@ -17,6 +17,7 @@ namespace OpenDentBusiness{
 		///<summary>FK to patient.PatNum or appointment.AptNum. Only used when ObjectType is not 0.</summary>
 		public long KeyNum;
 		///<summary>The description of this task.  Might be very long.</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Descript;
 		///<summary>Enum:TaskStatusEnum New,Viewed,Done.  We may want to put an index on this column someday.</summary>

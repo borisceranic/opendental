@@ -18,6 +18,7 @@ namespace OpenDentBusiness {
 		///<summary>Subject line.</summary>
 		public string Subject;
 		///<summary>Body of the email</summary>
+//TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string BodyText;
 		///<summary>Date and time the message was sent. Automated at the UI level.</summary>
