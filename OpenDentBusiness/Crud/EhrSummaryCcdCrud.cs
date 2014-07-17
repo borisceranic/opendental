@@ -98,7 +98,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (ehrSummaryCcd.PatNum)+","
 				+    POut.Date  (ehrSummaryCcd.DateSummary)+","
-				+DbHelper.ParamChar+"paramContentSummary,"
+				+    DbHelper.ParamChar+"paramContentSummary,"
 				+    POut.Long  (ehrSummaryCcd.EmailAttachNum)+")";
 			if(ehrSummaryCcd.ContentSummary==null) {
 				ehrSummaryCcd.ContentSummary="";

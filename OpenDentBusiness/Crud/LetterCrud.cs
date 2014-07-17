@@ -95,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				 "'"+POut.String(letter.Description)+"',"
-				+DbHelper.ParamChar+"paramBodyText)";
+				+    DbHelper.ParamChar+"paramBodyText)";
 			if(letter.BodyText==null) {
 				letter.BodyText="";
 			}

@@ -108,7 +108,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (insSub.ReleaseInfo)+","
 				+    POut.Bool  (insSub.AssignBen)+","
 				+"'"+POut.String(insSub.SubscriberID)+"',"
-				+DbHelper.ParamChar+"paramBenefitNotes,"
+				+    DbHelper.ParamChar+"paramBenefitNotes,"
 				+"'"+POut.String(insSub.SubscNote)+"')";
 			if(insSub.BenefitNotes==null) {
 				insSub.BenefitNotes="";

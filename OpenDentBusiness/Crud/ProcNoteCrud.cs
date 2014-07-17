@@ -103,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (procNote.ProcNum)+","
 				+    DbHelper.Now()+","
 				+    POut.Long  (procNote.UserNum)+","
-				+DbHelper.ParamChar+"paramNote,"
+				+    DbHelper.ParamChar+"paramNote,"
 				+    POut.Bool  (procNote.SigIsTopaz)+","
 				+"'"+POut.String(procNote.Signature)+"')";
 			if(procNote.Note==null) {

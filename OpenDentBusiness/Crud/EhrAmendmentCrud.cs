@@ -108,7 +108,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)ehrAmendment.Source)+","
 				+"'"+POut.String(ehrAmendment.SourceName)+"',"
 				+"'"+POut.String(ehrAmendment.FileName)+"',"
-				+DbHelper.ParamChar+"paramRawBase64,"
+				+    DbHelper.ParamChar+"paramRawBase64,"
 				+    POut.DateT (ehrAmendment.DateTRequest)+","
 				+    POut.DateT (ehrAmendment.DateTAcceptDeny)+","
 				+    POut.DateT (ehrAmendment.DateTAppend)+")";

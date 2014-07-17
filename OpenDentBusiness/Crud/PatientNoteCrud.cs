@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(patientNote.ApptPhone)+"',"
 				+"'"+POut.String(patientNote.Medical)+"',"
 				+"'"+POut.String(patientNote.Service)+"',"
-				+DbHelper.ParamChar+"paramMedicalComp,"
+				+    DbHelper.ParamChar+"paramMedicalComp,"
 				+"'"+POut.String(patientNote.Treatment)+"')";
 			if(patientNote.MedicalComp==null) {
 				patientNote.MedicalComp="";

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7Def.InternalType.ToString())+"',"
 				+"'"+POut.String(hL7Def.InternalTypeVersion)+"',"
 				+    POut.Bool  (hL7Def.IsEnabled)+","
-				+DbHelper.ParamChar+"paramNote,"
+				+    DbHelper.ParamChar+"paramNote,"
 				+"'"+POut.String(hL7Def.HL7Server)+"',"
 				+"'"+POut.String(hL7Def.HL7ServiceName)+"',"
 				+    POut.Int   ((int)hL7Def.ShowDemographics)+","

@@ -112,7 +112,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (sheetFieldDef.SheetDefNum)+","
 				+    POut.Int   ((int)sheetFieldDef.FieldType)+","
 				+"'"+POut.String(sheetFieldDef.FieldName)+"',"
-				+DbHelper.ParamChar+"paramFieldValue,"
+				+    DbHelper.ParamChar+"paramFieldValue,"
 				+    POut.Float (sheetFieldDef.FontSize)+","
 				+"'"+POut.String(sheetFieldDef.FontName)+"',"
 				+    POut.Bool  (sheetFieldDef.FontIsBold)+","

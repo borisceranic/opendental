@@ -105,7 +105,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)dunning.InsIsPending)+","
 				+"'"+POut.String(dunning.MessageBold)+"',"
 				+"'"+POut.String(dunning.EmailSubject)+"',"
-				+DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody)";
 			if(dunning.EmailBody==null) {
 				dunning.EmailBody="";
 			}

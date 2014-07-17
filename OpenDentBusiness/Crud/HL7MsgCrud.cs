@@ -99,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				     POut.Int   ((int)hL7Msg.HL7Status)+","
-				+DbHelper.ParamChar+"paramMsgText,"
+				+    DbHelper.ParamChar+"paramMsgText,"
 				+    POut.Long  (hL7Msg.AptNum)+","
 				//DateTStamp can only be set by MySQL
 				+    POut.Long  (hL7Msg.PatNum)+","

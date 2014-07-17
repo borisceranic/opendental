@@ -432,7 +432,7 @@ using System.Drawing;"+rn);
 					strb.Append("\"'\"+POut.TSpan ("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
 				}
 				else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
-					strb.Append("DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
+					strb.Append("    DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
 					paramList.Add(new OdSqlParameter(fieldsExceptPri[f].Name,OdDbType.Text,specialType));
 				}
 				else if(fieldsExceptPri[f].FieldType.IsEnum) {

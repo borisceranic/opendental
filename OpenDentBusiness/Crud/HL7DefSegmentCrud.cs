@@ -112,7 +112,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (hL7DefSegment.CanRepeat)+","
 				+    POut.Bool  (hL7DefSegment.IsOptional)+","
 				+"'"+POut.String(hL7DefSegment.SegmentName.ToString())+"',"
-				+DbHelper.ParamChar+"paramNote)";
+				+    DbHelper.ParamChar+"paramNote)";
 			if(hL7DefSegment.Note==null) {
 				hL7DefSegment.Note="";
 			}

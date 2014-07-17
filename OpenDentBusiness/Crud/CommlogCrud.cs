@@ -106,7 +106,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (commlog.PatNum)+","
 				+    POut.DateT (commlog.CommDateTime)+","
 				+    POut.Long  (commlog.CommType)+","
-				+DbHelper.ParamChar+"paramNote,"
+				+    DbHelper.ParamChar+"paramNote,"
 				+    POut.Int   ((int)commlog.Mode_)+","
 				+    POut.Int   ((int)commlog.SentOrReceived)+","
 				+    POut.Long  (commlog.UserNum)+","

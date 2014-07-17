@@ -99,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (eobAttach.ClaimPaymentNum)+","
 				+    POut.DateT (eobAttach.DateTCreated)+","
 				+"'"+POut.String(eobAttach.FileName)+"',"
-				+DbHelper.ParamChar+"paramRawBase64)";
+				+    DbHelper.ParamChar+"paramRawBase64)";
 			if(eobAttach.RawBase64==null) {
 				eobAttach.RawBase64="";
 			}

@@ -127,7 +127,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (statement.IsInvoice)+","
 				+    POut.Bool  (statement.IsInvoiceCopy)+","
 				+"'"+POut.String(statement.EmailSubject)+"',"
-				+DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody)";
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
 			}

@@ -99,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(procButton.Description)+"',"
 				+    POut.Int   (procButton.ItemOrder)+","
 				+    POut.Long  (procButton.Category)+","
-				+DbHelper.ParamChar+"paramButtonImage)";
+				+    DbHelper.ParamChar+"paramButtonImage)";
 			if(procButton.ButtonImage==null) {
 				procButton.ButtonImage="";
 			}

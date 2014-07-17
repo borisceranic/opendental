@@ -99,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Date  (documentMisc.DateCreated)+","
 				+"'"+POut.String(documentMisc.FileName)+"',"
 				+    POut.Int   ((int)documentMisc.DocMiscType)+","
-				+DbHelper.ParamChar+"paramRawBase64)";
+				+    DbHelper.ParamChar+"paramRawBase64)";
 			if(documentMisc.RawBase64==null) {
 				documentMisc.RawBase64="";
 			}

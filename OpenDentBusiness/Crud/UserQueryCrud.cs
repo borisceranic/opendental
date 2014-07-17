@@ -97,7 +97,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				 "'"+POut.String(userQuery.Description)+"',"
 				+"'"+POut.String(userQuery.FileName)+"',"
-				+DbHelper.ParamChar+"paramQueryText)";
+				+    DbHelper.ParamChar+"paramQueryText)";
 			if(userQuery.QueryText==null) {
 				userQuery.QueryText="";
 			}

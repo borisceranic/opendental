@@ -121,7 +121,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7DefMessage.EventType.ToString())+"',"
 				+    POut.Int   ((int)hL7DefMessage.InOrOut)+","
 				+    POut.Int   (hL7DefMessage.ItemOrder)+","
-				+DbHelper.ParamChar+"paramNote)";
+				+    DbHelper.ParamChar+"paramNote)";
 			if(hL7DefMessage.Note==null) {
 				hL7DefMessage.Note="";
 			}

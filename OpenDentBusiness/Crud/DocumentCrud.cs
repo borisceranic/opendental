@@ -134,8 +134,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (document.WindowingMax)+","
 				+    POut.Long  (document.MountItemNum)+","
 				//DateTStamp can only be set by MySQL
-				+DbHelper.ParamChar+"paramRawBase64,"
-				+DbHelper.ParamChar+"paramThumbnail)";
+				+    DbHelper.ParamChar+"paramRawBase64,"
+				+    DbHelper.ParamChar+"paramThumbnail)";
 			if(document.RawBase64==null) {
 				document.RawBase64="";
 			}

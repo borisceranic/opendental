@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (sigElementDef.LightColor.ToArgb())+","
 				+    POut.Int   ((int)sigElementDef.SigElementType)+","
 				+"'"+POut.String(sigElementDef.SigText)+"',"
-				+DbHelper.ParamChar+"paramSound,"
+				+    DbHelper.ParamChar+"paramSound,"
 				+    POut.Int   (sigElementDef.ItemOrder)+")";
 			if(sigElementDef.Sound==null) {
 				sigElementDef.Sound="";

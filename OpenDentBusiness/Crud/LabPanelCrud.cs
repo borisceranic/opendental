@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				     POut.Long  (labPanel.PatNum)+","
-				+DbHelper.ParamChar+"paramRawMessage,"
+				+    DbHelper.ParamChar+"paramRawMessage,"
 				+"'"+POut.String(labPanel.LabNameAddress)+"',"
 				//DateTStamp can only be set by MySQL
 				+"'"+POut.String(labPanel.SpecimenCondition)+"',"

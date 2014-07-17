@@ -107,7 +107,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(emailMessage.ToAddress)+"',"
 				+"'"+POut.String(emailMessage.FromAddress)+"',"
 				+"'"+POut.String(emailMessage.Subject)+"',"
-				+DbHelper.ParamChar+"paramBodyText,"
+				+    DbHelper.ParamChar+"paramBodyText,"
 				+    POut.DateT (emailMessage.MsgDateTime)+","
 				+    POut.Int   ((int)emailMessage.SentOrReceived)+","
 				+"'"+POut.String(emailMessage.RecipientAddress)+"',"

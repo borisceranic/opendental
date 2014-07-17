@@ -97,7 +97,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				     POut.Long  (erxLog.PatNum)+","
-				+DbHelper.ParamChar+"paramMsgText,"
+				+    DbHelper.ParamChar+"paramMsgText,"
 				//DateTStamp can only be set by MySQL
 				+    POut.Long  (erxLog.ProvNum)+")";
 			if(erxLog.MsgText==null) {

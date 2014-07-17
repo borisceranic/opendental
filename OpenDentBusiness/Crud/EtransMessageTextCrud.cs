@@ -93,7 +93,7 @@ namespace OpenDentBusiness.Crud{
 				command+=POut.Long(etransMessageText.EtransMessageTextNum)+",";
 			}
 			command+=
-				 DbHelper.ParamChar+"paramMessageText)";
+				     DbHelper.ParamChar+"paramMessageText)";
 			if(etransMessageText.MessageText==null) {
 				etransMessageText.MessageText="";
 			}

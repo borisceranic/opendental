@@ -98,7 +98,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (ehrLabNote.EhrLabNum)+","
 				+    POut.Long  (ehrLabNote.EhrLabResultNum)+","
-				+DbHelper.ParamChar+"paramComments)";
+				+    DbHelper.ParamChar+"paramComments)";
 			if(ehrLabNote.Comments==null) {
 				ehrLabNote.Comments="";
 			}

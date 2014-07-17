@@ -116,7 +116,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (payment.ClinicNum)+","
 				+    DbHelper.Now()+","
 				+    POut.Long  (payment.DepositNum)+","
-				+DbHelper.ParamChar+"paramReceipt,"
+				+    DbHelper.ParamChar+"paramReceipt,"
 				+    POut.Bool  (payment.IsRecurringCC)+")";
 			if(payment.Receipt==null) {
 				payment.Receipt="";
