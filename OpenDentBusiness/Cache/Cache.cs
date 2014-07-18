@@ -213,7 +213,8 @@ namespace OpenDentBusiness {
 			}
 			if(itypes.Contains((int)InvalidType.Signals) || isAll) {
 				ds.Tables.Add(SigElementDefs.RefreshCache());
-				ds.Tables.Add(SigButDefs.RefreshCache());//includes SigButDefElements.Refresh()
+				ds.Tables.Add(SigButDefElements.RefreshCache());
+				ds.Tables.Add(SigButDefs.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.Sites) || isAll){
 				ds.Tables.Add(Sites.RefreshCache());
