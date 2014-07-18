@@ -4676,6 +4676,43 @@ HAVING cnt>1";
 			return changeCount;
 		}
 
+		///<summary>Makes a backup of the database, clears out etransmessagetext entries over a year old, and then runs optimize on just the etransmessagetext table.  Customers were calling in with the complaint that their etransmessagetext table is too big so we added this tool.</summary>
+		public static void ClearOldEtransMessageText() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			//Make a backup of DB before we change anything, especially because we will be running optimize at the end.
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return; //Several issues need to be addressed before supporting Oracle.  E.g. backing up, creating temporary tables with globally unique identifiers, etc.
+			}
+			#if !DEBUG
+				MiscData.MakeABackup();//Does not work for Oracle, due to some MySQL specific commands inside.
+			#endif
+			//Unlink etrans records from their etransmessagetext records if older than 1 year.
+			string command="UPDATE etrans "
+				+"SET EtransMessageTextNum=0 "
+				+"WHERE DATE(DateTimeTrans)<ADDDATE(CURDATE(),INTERVAL -1 YEAR)";
+			Db.NonQ(command);
+			//Create a temporary table to hold all of the EtransMessageTextNum foreign keys which are sill in use within etrans.  The temporary table speeds up the next query.
+			string tableName="tempetransnomessage"+MiscUtils.CreateRandomAlphaNumericString(8);//max size for a table name in oracle is 30 chars.
+			command="DROP TABLE IF EXISTS "+tableName+"; "
+				+"CREATE TABLE "+tableName+" "
+				+"SELECT DISTINCT EtransMessageTextNum FROM etrans WHERE EtransMessageTextNum!=0; "
+				+"ALTER TABLE "+tableName+" ADD INDEX (EtransMessageTextNum);";
+			Db.NonQ(command);
+			//Delete unlinked etransmessagetext entries.  Remember, multiple etrans records might point to a single etransmessagetext record.  Therefore, we must keep a particular etransmessagetext record if at least one etrans record needs it.
+			command="DELETE FROM etransmessagetext "
+				+"WHERE EtransMessageTextNum NOT IN (SELECT EtransMessageTextNum FROM "+tableName+");";
+			Db.NonQ(command);
+			//Remove the temporary table which is no longer needed.
+			command="DROP TABLE "+tableName+";";
+			Db.NonQ(command);
+			//To reclaim that space on the disk you have to do an Optimize.
+			command="OPTIMIZE TABLE etransmessagetext";
+			Db.NonQ(command);
+		}
+
 		///<summary>Return values look like 'MyISAM' or 'InnoDB'. Will return empty string on error.</summary>
 		public static string GetStorageEngineDefaultName() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

@@ -52,6 +52,8 @@ namespace OpenDental {
 		private TextBox textBox2;
 		///<summary>This is a filtered list of methods from DatabaseMaintenance.cs that have the DbmMethod attribute.  This is used to populate gridMain.</summary>
 		private List<MethodInfo> _listDbmMethodsGrid;
+		private Label label1;
+		private UI.Button butEtrans;
 		///<summary>Holds the date and time of the last time a Check or Fix was run.  Only used for printing.</summary>
 		private DateTime _dateTimeLastRun;
 
@@ -95,6 +97,8 @@ namespace OpenDental {
 			this.butPrint = new OpenDental.UI.Button();
 			this.butFix = new OpenDental.UI.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.butEtrans = new OpenDental.UI.Button();
 			this.label8 = new System.Windows.Forms.Label();
 			this.butRemoveNulls = new OpenDental.UI.Button();
 			this.label7 = new System.Windows.Forms.Label();
@@ -124,7 +128,7 @@ namespace OpenDental {
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(874, 671);
+			this.butClose.Location = new System.Drawing.Point(874, 697);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 0;
@@ -152,7 +156,7 @@ namespace OpenDental {
 			this.butCheck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCheck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCheck.CornerRadius = 4F;
-			this.butCheck.Location = new System.Drawing.Point(670, 671);
+			this.butCheck.Location = new System.Drawing.Point(670, 697);
 			this.butCheck.Name = "butCheck";
 			this.butCheck.Size = new System.Drawing.Size(75, 26);
 			this.butCheck.TabIndex = 5;
@@ -178,7 +182,7 @@ namespace OpenDental {
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrint;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(532, 671);
+			this.butPrint.Location = new System.Drawing.Point(532, 697);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(87, 26);
 			this.butPrint.TabIndex = 18;
@@ -193,7 +197,7 @@ namespace OpenDental {
 			this.butFix.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butFix.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butFix.CornerRadius = 4F;
-			this.butFix.Location = new System.Drawing.Point(750, 671);
+			this.butFix.Location = new System.Drawing.Point(750, 697);
 			this.butFix.Name = "butFix";
 			this.butFix.Size = new System.Drawing.Size(75, 26);
 			this.butFix.TabIndex = 20;
@@ -203,6 +207,8 @@ namespace OpenDental {
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupBox1.Controls.Add(this.label1);
+			this.groupBox1.Controls.Add(this.butEtrans);
 			this.groupBox1.Controls.Add(this.label8);
 			this.groupBox1.Controls.Add(this.butRemoveNulls);
 			this.groupBox1.Controls.Add(this.label7);
@@ -219,10 +225,34 @@ namespace OpenDental {
 			this.groupBox1.Controls.Add(this.butInsPayFix);
 			this.groupBox1.Location = new System.Drawing.Point(27, 502);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(470, 204);
+			this.groupBox1.Size = new System.Drawing.Size(470, 230);
 			this.groupBox1.TabIndex = 31;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Database Tools";
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(103, 202);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(355, 20);
+			this.label1.TabIndex = 46;
+			this.label1.Text = "Clear out etrans entries older than a year old.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// butEtrans
+			// 
+			this.butEtrans.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEtrans.Autosize = true;
+			this.butEtrans.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEtrans.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEtrans.CornerRadius = 4F;
+			this.butEtrans.Enabled = false;
+			this.butEtrans.Location = new System.Drawing.Point(10, 198);
+			this.butEtrans.Name = "butEtrans";
+			this.butEtrans.Size = new System.Drawing.Size(87, 26);
+			this.butEtrans.TabIndex = 45;
+			this.butEtrans.Text = "Etrans";
+			this.butEtrans.Click += new System.EventHandler(this.butEtrans_Click);
 			// 
 			// label8
 			// 
@@ -434,7 +464,7 @@ namespace OpenDental {
 			this.AcceptButton = this.butCheck;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
-			this.ClientSize = new System.Drawing.Size(982, 707);
+			this.ClientSize = new System.Drawing.Size(982, 733);
 			this.Controls.Add(this.textBox2);
 			this.Controls.Add(this.butNone);
 			this.Controls.Add(this.gridMain);
@@ -473,6 +503,11 @@ namespace OpenDental {
 					//This method was flagged to show in gridMain.  Add it to the list of methods used to populate gridMain.
 					_listDbmMethodsGrid.Add(_arrayDbmMethodsAll[i]);
 				}
+			}
+			//Users get stopped from launching FormDatabaseMaintenance when they do not have the Setup permission.
+			//Jordan wants some tools to only be accessible to users with the SecurityAdmin permission.
+			if(Security.IsAuthorized(Permissions.SecurityAdmin,true)){
+				butEtrans.Enabled=true;
 			}
 			FillGrid();
 		}
@@ -659,6 +694,18 @@ namespace OpenDental {
 				return;
 			}
 			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+":"+DatabaseMaintenance.RemoveNullStrings());
+		}
+
+		private void butEtrans_Click(object sender,EventArgs e) {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				MsgBox.Show(this,"Tool does not currently support Oracle.  Please call support to see if you need this fix.");
+				return;
+			}
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will clear out etrans message text entries over a year old.  An automatic backup of the database will be created before deleting any entries.  This process may take a while to run depending on the size of your database.  Continue?")) {
+				return;
+			}
+			DatabaseMaintenance.ClearOldEtransMessageText();
+			MsgBox.Show(this,"Etrans message text entries over a year old removed");
 		}
 
 		#endregion
