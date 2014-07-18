@@ -3521,7 +3521,7 @@ namespace OpenDental {
 					stmt.DateRangeFrom=PIn.Date(textDateStart.Text);
 				}
 			}
-			stmt.DateRangeTo=new DateTime(2200,1,1);
+			stmt.DateRangeTo=DateTimeOD.Today;//Needed for payplan accuracy.  Used to be setting to new DateTime(2200,1,1);
 			if(textDateEnd.errorProvider1.GetError(textDateEnd)==""){
 				if(textDateEnd.Text!=""){
 					stmt.DateRangeTo=PIn.Date(textDateEnd.Text);
