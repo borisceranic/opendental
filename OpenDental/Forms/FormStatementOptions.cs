@@ -1381,8 +1381,8 @@ namespace OpenDental{
 							return;
 						}
 					}
-					Procedures.DetachFromInvoice(StmtCur.StatementNum);
-					Adjustments.DetachFromInvoice(StmtCur.StatementNum);
+					Procedures.DetachFromInvoice(StmtList[i].StatementNum);
+					Adjustments.DetachFromInvoice(StmtList[i].StatementNum);
 					Statements.DeleteObject(StmtList[i]);
 				}
 			}
