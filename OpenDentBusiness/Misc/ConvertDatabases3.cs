@@ -5533,6 +5533,16 @@ namespace OpenDentBusiness {
 						}
 					}
 				}
+				//Added ReplicationUserQueryServer preference to stop CREATE TABLE or DROP TABLE user queries from being ran on any computer that is not the ReplicationUserQueryServer.
+				//This is set in the Replication Setup Window.  Defaults to empty string.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ReplicationUserQueryServer','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ReplicationUserQueryServer','')";
+					Db.NonQ(command);
+				}
 
 
 
