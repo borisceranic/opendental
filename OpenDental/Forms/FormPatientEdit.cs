@@ -215,7 +215,7 @@ namespace OpenDental{
 				labelSSN.Text="SIN";
 				labelZip.Text="Postal Code";
 				labelST.Text="Province";
-				butEditZip.Text="Edit Postal Code";
+				butEditZip.Text="Edit Postal";
 				labelCanadianEligibilityCode.Visible=true;
 				comboCanadianEligibilityCode.Visible=true;
 				radioStudentN.Visible=false;
