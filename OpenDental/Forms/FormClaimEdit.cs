@@ -4377,9 +4377,9 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Status"),50,HorizontalAlignment.Center);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Pmt"),40,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Pmt"),30,HorizontalAlignment.Center);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),145);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),0);
 			gridProc.Columns.Add(col);
 			gridProc.Rows.Clear();
 			ODGridRow row;
