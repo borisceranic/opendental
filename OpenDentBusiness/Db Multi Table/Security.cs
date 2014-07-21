@@ -73,6 +73,7 @@ namespace OpenDentBusiness{
 		///<summary>Will throw an error if not authorized and message not suppressed.</summary>
 		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage,long userGroupNum) {
 			//No need to check RemotingRole; no call to db.
+			date=date.Date; //Remove the time portion of date so we can compare strictly as a date later.
 			if(!GroupPermissions.HasPermission(userGroupNum,perm)){
 				if(!suppressMessage){
 					throw new Exception(Lans.g("Security","Not authorized for")+"\r\n"+GroupPermissions.GetDesc(perm));
