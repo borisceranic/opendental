@@ -155,6 +155,10 @@ namespace OpenDental{
 				ImageFX.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.iRYS.ToString()) {
+				Irys.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Lightyear.ToString()) {
 				Lightyear.SendData(prog,pat);
 				return;

@@ -64,6 +64,7 @@ namespace OpenDentBusiness{
 		IAP,
 		iCat,
 		ImageFX,
+		iRYS,
 		Lightyear,
 		MediaDent,
 		MiPACS,
