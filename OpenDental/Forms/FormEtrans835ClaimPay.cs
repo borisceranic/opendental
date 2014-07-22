@@ -7,22 +7,16 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
 
-namespace OpenDental
-{
-	/// <summary>
-	/// Summary description for FormEtrans835ClaimPay.
-	/// </summary>
-	public class FormEtrans835ClaimPay : System.Windows.Forms.Form
-	{
+namespace OpenDental {
+	///<summary></summary>
+	public class FormEtrans835ClaimPay : System.Windows.Forms.Form {
 		private OpenDental.ValidDouble textWriteOff;
 		private System.Windows.Forms.TextBox textInsPayAllowed;
 		private OpenDental.ValidDouble textInsPayAmt;
 		private System.Windows.Forms.TextBox textClaimFee;
 		private OpenDental.ValidDouble textDedApplied;
 		private System.Windows.Forms.Label label1;
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
+		///<summary>Required designer variable.</summary>
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
@@ -31,37 +25,35 @@ namespace OpenDental
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
-		///<summary></summary>
-		public ClaimProc[] ClaimProcsToEdit;
-		private List<Procedure> ProcList;
-		private Patient PatCur;
-		private Family FamCur;
 		private OpenDental.UI.ODGrid gridMain;
-		private List<InsPlan> PlanList;
-		private List<PatPlan> PatPlanList;
 		private ODGrid gridClaimAdjustments;
 		private ODGrid gridProcedureBreakdown;
-		private List<InsSub> SubList;
+		private UI.Button butViewEobDetails;
+		private List<Procedure> _listProcs;
+		private Patient _patCur;
+		private Family _famCur;
+		private List<InsPlan> _listPlans;
+		private List<PatPlan> _listPatPlans;		
+		private List<InsSub> _listInsSubs;
 		private Hx835_Claim _claimPaid;
 		private decimal _claimAdjAmtSum;
-		private UI.Button butViewEobDetails;
 		private decimal _procAdjAmtSum;
+		///<summary>The claim procs shown in the grid.  These procs are saved to/from the grid, but changes are not saved to the database unless the OK button is pressed or an individual claim proc is double-clicked for editing.</summary>
+		public ClaimProc[] ClaimProcsToEdit;
 
 		///<summary></summary>
 		public FormEtrans835ClaimPay(Hx835_Claim claimPaid,Patient patCur,Family famCur,List<InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList) {
-			InitializeComponent();// Required for Windows Form Designer support
+			InitializeComponent();
 			_claimPaid=claimPaid;
-			FamCur=famCur;
-			PatCur=patCur;
-			PlanList=planList;
-			SubList=subList;
-			PatPlanList=patPlanList;
+			_famCur=famCur;
+			_patCur=patCur;
+			_listPlans=planList;
+			_listInsSubs=subList;
+			_listPatPlans=patPlanList;
 			Lan.F(this);
 		}
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
+		///<summary>Clean up any resources being used.</summary>
 		protected override void Dispose(bool disposing) {
 			if(disposing) {
 				if(components!=null) {
@@ -357,12 +349,12 @@ namespace OpenDental
 		#endregion
 
 		private void FormEtrans835ClaimPay_Load(object sender, System.EventArgs e) {
-			ProcList=Procedures.Refresh(PatCur.PatNum);
+			_listProcs=Procedures.Refresh(_patCur.PatNum);
 			FillGridProcedures();
 		}
 
 		private void FormEtrans835ClaimPay_Shown(object sender,EventArgs e) {
-			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,PlanList);
+			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,_listPlans);
 			if(plan.AllowedFeeSched!=0){//allowed fee sched
 				gridMain.SetSelected(new Point(7,0));//Allowed, first row.
 			}
@@ -523,7 +515,7 @@ namespace OpenDental
 					row.Cells.Add(Lan.g(this,"Total Payment"));
 				}
 				else {
-					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
+					ProcCur=Procedures.GetProcFromList(_listProcs,ClaimProcsToEdit[i].ProcNum);
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
 					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
@@ -581,7 +573,7 @@ namespace OpenDental
 			}
 			List<ClaimProcHist> histList=null;
 			List<ClaimProcHist> loopList=null;
-			FormClaimProc FormCP=new FormClaimProc(ClaimProcsToEdit[e.Row],null,FamCur,PatCur,PlanList,histList,ref loopList,PatPlanList,false,SubList);
+			FormClaimProc FormCP=new FormClaimProc(ClaimProcsToEdit[e.Row],null,_famCur,_patCur,_listPlans,histList,ref loopList,_listPatPlans,false,_listInsSubs);
 			FormCP.IsInClaim=true;
 			//no need to worry about permissions here
 			FormCP.ShowDialog();
@@ -728,7 +720,7 @@ namespace OpenDental
 			}
 			//fix later: does not take into account other payments.
 			double unpaidAmt=0;
-			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
+			List<Procedure> ProcList=Procedures.Refresh(_patCur.PatNum);
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
 				unpaidAmt=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum).ProcFee
 					//((Procedure)Procedures.HList[ClaimProcsToEdit[i].ProcNum]).ProcFee
@@ -754,7 +746,7 @@ namespace OpenDental
 				return;
 			}
 			//if no allowed fee schedule, then nothing to do
-			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,PlanList);
+			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,_listPlans);
 			if(plan.AllowedFeeSched==0){//no allowed fee sched
 				//plan.PlanType!="p" && //not ppo, and 
 				return;
@@ -777,7 +769,7 @@ namespace OpenDental
 			}
 			Fee FeeCur=null;
 			long codeNum;
-			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
+			List<Procedure> ProcList=Procedures.Refresh(_patCur.PatNum);
 			Procedure proc;
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
 				//this gives error message if proc not found:
@@ -831,32 +823,5 @@ namespace OpenDental
 
 		}
 
-	
-		
-
-	
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
 	}
 }
-
-
-
-
-
-
-

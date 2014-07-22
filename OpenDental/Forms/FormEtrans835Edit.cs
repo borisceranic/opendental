@@ -203,8 +203,19 @@ namespace OpenDental {
 
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
-			FormEtrans835ClaimEdit form=new FormEtrans835ClaimEdit(claimPaid);
-			form.Show(this);
+			long claimNum=claimPaid.GetOriginalClaimNum();
+			if(claimNum==0) {//Original claim not found.
+				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
+				formC.Show(this);
+			}
+			else {//Original claim found.
+				Claim claim=Claims.GetClaim(claimNum);
+				Patient pat=Patients.GetPat(claim.PatNum);
+				Family fam=Patients.GetFamily(claim.PatNum);
+				//List <InsPlan> listPlans=InsPlans.get
+				//FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,pat,fam,);
+				//formP.show(this);
+			}			
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {

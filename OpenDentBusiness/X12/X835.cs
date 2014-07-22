@@ -2960,6 +2960,18 @@ namespace OpenDentBusiness {
 		public decimal Deductible;
 		///<summary>The sum of all adjustment amounts from ListClaimAdjustments.</summary>
 		public decimal ClaimAdjustmentTotal;
+
+		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835.  Returns 0 if not found.</summary>
+		public long GetOriginalClaimNum() {
+			long claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+			if(claimNum!=0) {
+				return claimNum;
+			}
+
+
+			return 0;
+		}
+
 	}
 
 	///<summary>Information about a single procedure on an EOB.  There can be many of these for each Hx835_Claim.</summary>
