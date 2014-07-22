@@ -167,6 +167,9 @@ namespace OpenDentBusiness
 			else if(IsDentiCal(clearhouse)) {
 				sw.Write("DENTICAL"+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
+			else if(IsETACTICS(clearhouse)) {
+				sw.Write("ETACTICSINC"+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
+			}
 			else {
 				sw.Write(Sout(clearhouse.Description,60)+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
@@ -177,6 +180,9 @@ namespace OpenDentBusiness
 				+"46"+s);//NM108 1/2 Identification Code Qualifier: 46=Electronic Transmitter Identification Number (ETIN).
 			if(IsDentiCal(clearhouse)) {
 				sw.Write("1941461312");//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
+			}
+			else if(IsETACTICS(clearhouse)) {
+				sw.Write("ETACTICSINC");//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
 			}
 			else {
 				sw.Write(Sout(clearhouse.ISA08,80,2));//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
@@ -1976,6 +1982,10 @@ namespace OpenDentBusiness
 
 		private static bool IsEMS(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="EMS");
+		}
+
+		private static bool IsETACTICS(Clearinghouse clearinghouse) {
+			return (clearinghouse.ISA08=="ETACTICSINC");
 		}
 
 		private static bool IsInmediata(Clearinghouse clearinghouse) {
