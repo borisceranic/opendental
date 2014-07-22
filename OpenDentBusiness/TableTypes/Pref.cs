@@ -385,6 +385,8 @@ namespace OpenDentBusiness {
 		RenaissanceLastBatchNumber,
 		///<summary>If replication has failed, this indicates the server_id.  No computer will be able to connect to this single server until this flag is cleared.</summary>
 		ReplicationFailureAtServer_id,
+		///<summary>A case insensitive computer name.  If using replication, do not allow "create table" or "drop table" commands in user queries except on this computer.</summary>
+		ReplicationUserQueryServer,
 		ReportFolderName,
 		ReportsPPOwriteoffDefaultToProcDate,
 		ReportsShowPatNum,

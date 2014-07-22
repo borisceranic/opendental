@@ -26,7 +26,7 @@ namespace OpenDental{
 		private System.Windows.Forms.RadioButton radioRaw;
 		///<summary></summary>
 		public System.Windows.Forms.RadioButton radioHuman;
-		private OpenDental.UI.Button butFormulate;
+		private OpenDental.UI.Button butFavorite;
 		private System.ComponentModel.Container components = null;// Required designer variable.
 		private OpenDental.UI.Button butAdd;
 		private DataGridTableStyle myGridTS;
@@ -109,7 +109,7 @@ namespace OpenDental{
 			this.textTitle = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butAdd = new OpenDental.UI.Button();
-			this.butFormulate = new OpenDental.UI.Button();
+			this.butFavorite = new OpenDental.UI.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.radioHuman = new System.Windows.Forms.RadioButton();
 			this.radioRaw = new System.Windows.Forms.RadioButton();
@@ -168,7 +168,7 @@ namespace OpenDental{
 			this.panelTop.Controls.Add(this.textTitle);
 			this.panelTop.Controls.Add(this.label1);
 			this.panelTop.Controls.Add(this.butAdd);
-			this.panelTop.Controls.Add(this.butFormulate);
+			this.panelTop.Controls.Add(this.butFavorite);
 			this.panelTop.Controls.Add(this.groupBox1);
 			this.panelTop.Controls.Add(this.butSubmit);
 			this.panelTop.Location = new System.Drawing.Point(0, 0);
@@ -178,6 +178,8 @@ namespace OpenDental{
 			// 
 			// textQuery
 			// 
+			this.textQuery.AcceptsTab = true;
+			this.textQuery.DetectUrls = false;
 			this.textQuery.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textQuery.Location = new System.Drawing.Point(2, 3);
 			this.textQuery.Name = "textQuery";
@@ -267,19 +269,19 @@ namespace OpenDental{
 			this.butAdd.Text = "Add To Favorites";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
-			// butFormulate
+			// butFavorite
 			// 
-			this.butFormulate.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butFormulate.Autosize = true;
-			this.butFormulate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butFormulate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butFormulate.CornerRadius = 4F;
-			this.butFormulate.Location = new System.Drawing.Point(556, 6);
-			this.butFormulate.Name = "butFormulate";
-			this.butFormulate.Size = new System.Drawing.Size(140, 23);
-			this.butFormulate.TabIndex = 2;
-			this.butFormulate.Text = "Favorites";
-			this.butFormulate.Click += new System.EventHandler(this.butFormulate_Click);
+			this.butFavorite.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butFavorite.Autosize = true;
+			this.butFavorite.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butFavorite.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butFavorite.CornerRadius = 4F;
+			this.butFavorite.Location = new System.Drawing.Point(556, 6);
+			this.butFavorite.Name = "butFavorite";
+			this.butFavorite.Size = new System.Drawing.Size(140, 23);
+			this.butFavorite.TabIndex = 2;
+			this.butFavorite.Text = "Favorites";
+			this.butFavorite.Click += new System.EventHandler(this.butFavorites_Click);
 			// 
 			// groupBox1
 			// 
@@ -570,7 +572,10 @@ namespace OpenDental{
 			}
 		}
 
-		private void butSubmit_Click(object sender, System.EventArgs e) {	
+		private void butSubmit_Click(object sender, System.EventArgs e) {
+			if(!IsSafeSql()) {
+				return;
+			}
 			report=new ReportSimpleGrid();
 			report.Query=textQuery.Text;
 			SubmitQuery();
@@ -1069,7 +1074,37 @@ namespace OpenDental{
 			return tableOut;
 		}
 
-		private void butFormulate_Click(object sender, System.EventArgs e) {//is now the 'Favorites' button
+		///<summary>Checks to see if the computer is allowed to use create table or drop table syntax queries.  Will return false if using replication and the computer OD is running on is not the ReplicationUserQueryServer set in replication setup.  Otherwise true.</summary>
+		private bool IsSafeSql() {
+			if(!PrefC.RandomKeys) {//If replication is disabled, then any command is safe.
+				return true;
+			}
+			bool isSafe=true;
+			if(Regex.IsMatch(textQuery.Text,".*CREATE[\\s]+TABLE.*",RegexOptions.IgnoreCase)) {
+				isSafe=false;
+			}
+			if(Regex.IsMatch(textQuery.Text,".*CREATE[\\s]+TEMPORARY[\\s]+TABLE.*",RegexOptions.IgnoreCase)) {
+				isSafe=false;
+			}
+			if(Regex.IsMatch(textQuery.Text,".*DROP[\\s]+TABLE.*",RegexOptions.IgnoreCase)) {
+				isSafe=false;
+			}
+			if(isSafe) {
+				return true;
+			}
+			//At this point we know that replication is enabled and the command is potentially unsafe.
+			if(PrefC.GetString(PrefName.ReplicationUserQueryServer)=="") {  //if no allowed ReplicationUserQueryServer set in replication setup
+				MsgBox.Show(this,"This query contains unsafe syntax that can crash replication.  There is currently no computer set that is allowed to run these types of queries.  This can be set in the replication setup window.");
+				return false;
+			}
+			else if(Environment.MachineName.ToLower()!=PrefC.GetString(PrefName.ReplicationUserQueryServer).ToLower()) { //if not running query from the ReplicationUserQueryServer set in replication setup 
+				MessageBox.Show(this,Lan.g(this,"This query contains unsafe syntax that can crash replication")+".  "+Lan.g(this,"The only computer allowed to run these queries is")+" "+PrefName.ReplicationUserQueryServer+".  "+Lan.g(this,"This can be changed in the replication setup window"+"."));
+				return false;
+			}
+			return true;
+		}
+
+		private void butFavorites_Click(object sender, System.EventArgs e) {
 			FormQueryFavorites FormQF=new FormQueryFavorites();
 			FormQF.UserQueryCur=UserQueryCur;
 			FormQF.ShowDialog();
@@ -1078,6 +1113,9 @@ namespace OpenDental{
 				//grid2.CaptionText=UserQueries.Cur.Description;
 				textTitle.Text=FormQF.UserQueryCur.Description;
 				UserQueryCur=FormQF.UserQueryCur;
+				if(!IsSafeSql()) {
+					return;
+				}
 				report=new ReportSimpleGrid();
 				report.Query=textQuery.Text;
 				SubmitQuery();

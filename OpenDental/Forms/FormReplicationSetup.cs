@@ -29,6 +29,7 @@ namespace OpenDental {
 				groupBoxReplicationFailure.Visible=true;
 				textReplicaitonFailureAtServer_id.Text=PrefC.GetInt(PrefName.ReplicationFailureAtServer_id).ToString();
 			}
+			textUserQueryServer.Text=PrefC.GetString(PrefName.ReplicationUserQueryServer);
 			FillGrid();
 		}
 
@@ -227,6 +228,9 @@ namespace OpenDental {
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
+			if(Prefs.UpdateString(PrefName.ReplicationUserQueryServer,textUserQueryServer.Text)) {
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
 			Close();
 		}
 
