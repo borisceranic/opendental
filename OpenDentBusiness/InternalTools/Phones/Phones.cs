@@ -307,7 +307,7 @@ namespace OpenDentBusiness {
 			else {
 				fontColor=colorScheme.ColorFontHere;
 			}
-			if(phoneEmpDefault==null || (!forDualColorScheme && !phoneEmpDefault.HasColor)) { //smaller color boxes need special colors
+			if(phoneEmpDefault==null || (!forDualColorScheme && !phoneEmpDefault.HasColor)) {//smaller color boxes need special colors
 				innerColor=Color.Black;
 				outerColor=Color.White;
 				return;
@@ -392,6 +392,16 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<phoneList.Count;i++) {
 				if(phoneList[i].Extension==extens) {
+					return phoneList[i];
+				}
+			}
+			return null;
+		}
+
+		public static Phone GetPhoneForEmployeeNum(List<Phone> phoneList,long employeeNum) {
+			//No need to check RemotingRole; no call to db.
+			for(int i=0;i<phoneList.Count;i++) {
+				if(phoneList[i].EmployeeNum==employeeNum) {
 					return phoneList[i];
 				}
 			}

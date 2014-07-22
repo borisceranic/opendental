@@ -57,6 +57,7 @@ namespace OpenDentBusiness.Crud{
 				phoneEmpDefault.ComputerName    = PIn.String(table.Rows[i]["ComputerName"].ToString());
 				phoneEmpDefault.IsPrivateScreen = PIn.Bool  (table.Rows[i]["IsPrivateScreen"].ToString());
 				phoneEmpDefault.IsTriageOperator= PIn.Bool  (table.Rows[i]["IsTriageOperator"].ToString());
+				phoneEmpDefault.EscalationOrder = PIn.Int   (table.Rows[i]["EscalationOrder"].ToString());
 				retVal.Add(phoneEmpDefault);
 			}
 			return retVal;
@@ -97,7 +98,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EmployeeNum,";
 			}
-			command+="IsGraphed,HasColor,RingGroups,EmpName,PhoneExt,StatusOverride,Notes,ComputerName,IsPrivateScreen,IsTriageOperator) VALUES(";
+			command+="IsGraphed,HasColor,RingGroups,EmpName,PhoneExt,StatusOverride,Notes,ComputerName,IsPrivateScreen,IsTriageOperator,EscalationOrder) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(phoneEmpDefault.EmployeeNum)+",";
 			}
@@ -111,7 +112,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(phoneEmpDefault.Notes)+"',"
 				+"'"+POut.String(phoneEmpDefault.ComputerName)+"',"
 				+    POut.Bool  (phoneEmpDefault.IsPrivateScreen)+","
-				+    POut.Bool  (phoneEmpDefault.IsTriageOperator)+")";
+				+    POut.Bool  (phoneEmpDefault.IsTriageOperator)+","
+				+    POut.Int   (phoneEmpDefault.EscalationOrder)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -133,7 +135,8 @@ namespace OpenDentBusiness.Crud{
 				+"Notes           = '"+POut.String(phoneEmpDefault.Notes)+"', "
 				+"ComputerName    = '"+POut.String(phoneEmpDefault.ComputerName)+"', "
 				+"IsPrivateScreen =  "+POut.Bool  (phoneEmpDefault.IsPrivateScreen)+", "
-				+"IsTriageOperator=  "+POut.Bool  (phoneEmpDefault.IsTriageOperator)+" "
+				+"IsTriageOperator=  "+POut.Bool  (phoneEmpDefault.IsTriageOperator)+", "
+				+"EscalationOrder =  "+POut.Int   (phoneEmpDefault.EscalationOrder)+" "
 				+"WHERE EmployeeNum = "+POut.Long(phoneEmpDefault.EmployeeNum);
 			Db.NonQ(command);
 		}
@@ -180,6 +183,10 @@ namespace OpenDentBusiness.Crud{
 			if(phoneEmpDefault.IsTriageOperator != oldPhoneEmpDefault.IsTriageOperator) {
 				if(command!=""){ command+=",";}
 				command+="IsTriageOperator = "+POut.Bool(phoneEmpDefault.IsTriageOperator)+"";
+			}
+			if(phoneEmpDefault.EscalationOrder != oldPhoneEmpDefault.EscalationOrder) {
+				if(command!=""){ command+=",";}
+				command+="EscalationOrder = "+POut.Int(phoneEmpDefault.EscalationOrder)+"";
 			}
 			if(command==""){
 				return false;

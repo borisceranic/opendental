@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Drawing;
+using System.Text;
 
 namespace OpenDental {
 	public partial class FormMapHQ:Form {
@@ -24,8 +25,7 @@ namespace OpenDental {
 
 		private void FormMapHQ_Load(object sender,EventArgs e) {
 			FillMapAreaPanel();
-			labelTriageOpsStaff.InnerColor=Phones.PhoneColorScheme.COLOR_DUAL_InnerTriageHere;
-			labelTriageOpsStaff.OuterColor=Phones.PhoneColorScheme.COLOR_DUAL_OuterTriage;
+			labelTriageOpsStaff.SetTriageColors();
 		}
 
 		///<summary>Setup the map panel with the cubicles and labels before filling with real-time data. Call this on load or anytime the cubicle layout has changed.</summary>
@@ -126,9 +126,40 @@ namespace OpenDental {
 					room.Invalidate(true);					
 				}
 				this.labelTriageOpsStaff.Text=triageStaffCount.ToString();
+				SetEscalationList(peds,phones);
 			}
 			catch {
 				//something failed unexpectedly
+			}
+		}
+
+		private void SetEscalationList(List<PhoneEmpDefault> peds,List<Phone> phones) {
+			try {
+				escalationView.BeginUpdate();
+				escalationView.Items.Clear();
+				List<PhoneEmpDefault> listSorted=new List<PhoneEmpDefault>(peds);
+				listSorted.Sort(new PhoneEmpDefaults.PhoneEmpDefaultComparer(PhoneEmpDefaults.PhoneEmpDefaultComparer.SortBy.escalation));
+				for(int i=0;i<listSorted.Count;i++) {
+					PhoneEmpDefault ped=listSorted[i];
+					if(ped.EscalationOrder<=0) { //Filter out employees that do not have an escalation order set.
+						continue;
+					}
+					Phone phone=Phones.GetPhoneForEmployeeNum(phones,ped.EmployeeNum);
+					if(phone==null || phone.Description!="") { //Filter out invalid employees or employees that are already on the phone.
+						continue;
+					}
+					if(phone.ClockStatus!=ClockStatusEnum.Available
+					&& phone.ClockStatus!=ClockStatusEnum.Backup) { //Employees must either be Available or Backup.
+						continue;
+					}
+					//We got this far so add the employee to the escalation list.
+					escalationView.Items.Add(ped.EmpName);
+				}
+			}
+			catch {
+			}
+			finally {
+				escalationView.EndUpdate();
 			}
 		}
 		
@@ -141,20 +172,16 @@ namespace OpenDental {
 				this.labelTriageRedTimeSpan.Text=timeBehind.ToStringmmss();
 			}
 			if(calls>1) { //we are behind
-				labelTriageRedCalls.InnerColor=Color.Red;
-				labelTriageRedCalls.ForeColor=Color.White;
+				labelTriageRedCalls.SetAlertColors();
 			}
 			else { //we are ok
-				labelTriageRedCalls.InnerColor=Color.White;
-				labelTriageRedCalls.ForeColor=Color.Black;
+				labelTriageRedCalls.SetNormalColors();
 			}
 			if(timeBehind>TimeSpan.FromMinutes(1)) { //we are behind
-				labelTriageRedTimeSpan.InnerColor=Color.Red;
-				labelTriageRedTimeSpan.ForeColor=Color.White;
+				labelTriageRedTimeSpan.SetAlertColors();
 			}
 			else { //we are ok
-				labelTriageRedTimeSpan.InnerColor=Color.White;
-				labelTriageRedTimeSpan.ForeColor=Color.Black;
+				labelTriageRedTimeSpan.SetNormalColors();
 			}
 		}
 
@@ -167,20 +194,16 @@ namespace OpenDental {
 				this.labelVoicemailTimeSpan.Text=timeBehind.ToStringmmss();
 			}
 			if(calls>5) { //we are behind
-				labelVoicemailCalls.InnerColor=Color.Red;
-				labelVoicemailCalls.ForeColor=Color.White;
+				labelVoicemailCalls.SetAlertColors();
 			}
 			else { //we are ok
-				labelVoicemailCalls.InnerColor=Color.White;
-				labelVoicemailCalls.ForeColor=Color.Black;
+				labelVoicemailCalls.SetNormalColors();
 			}
 			if(timeBehind>TimeSpan.FromMinutes(5)) { //we are behind
-				labelVoicemailTimeSpan.InnerColor=Color.Red;
-				labelVoicemailTimeSpan.ForeColor=Color.White;
+				labelVoicemailTimeSpan.SetAlertColors();
 			}
 			else { //we are ok
-				labelVoicemailTimeSpan.InnerColor=Color.White;
-				labelVoicemailTimeSpan.ForeColor=Color.Black;
+				labelVoicemailTimeSpan.SetNormalColors();
 			}
 		}
 		
@@ -198,25 +221,19 @@ namespace OpenDental {
 				this.labelTriageCalls.Text="("+callsWithNotes.ToString()+")";
 			}
 			if(callsWithNoNotes>10) { //we are behind
-				labelTriageCalls.InnerColor=Color.Red;
-				labelTriageCalls.ForeColor=Color.White;
+				labelTriageCalls.SetAlertColors();
 			}
 			else { //we are ok
-				labelTriageCalls.InnerColor=Color.White;
-				labelTriageCalls.ForeColor=Color.Black;
+				labelTriageCalls.SetNormalColors();
 			}
 			if(timeBehind>TimeSpan.FromMinutes(19)) { //we are behind
-				labelTriageTimeSpan.ForeColor=Color.Red;
-				labelTriageTimeSpan.OuterColor=Color.Red;
+				labelTriageTimeSpan.SetAlertColors();
 			}
 			else if(timeBehind>TimeSpan.FromMinutes(9)) { //we are approaching being behind
-				labelTriageTimeSpan.ForeColor=Color.Orange;
-				labelTriageTimeSpan.OuterColor=Color.Orange;
+				labelTriageTimeSpan.SetWarnColors();
 			}
 			else { //we are ok
-				labelTriageTimeSpan.ForeColor=Color.Black;
-				labelTriageTimeSpan.OuterColor=Color.Black;
-				labelTriageTimeSpan.InnerColor=Color.White;
+				labelTriageTimeSpan.SetNormalColors();
 			}
 		}
 
@@ -243,15 +260,24 @@ namespace OpenDental {
 			}
 		}
 
-		private void setupToolStripMenuItem_Click(object sender,EventArgs e) {
+		private void mapToolStripMenuItem_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
-			}
-			
+			}			
 			FormMapSetup FormMS=new FormMapSetup();
 			FormMS.ShowDialog();
 			FillMapAreaPanel();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"MapHQ layout changed");
-		}		
+		}
+
+		private void escalationToolStripMenuItem_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormPhoneEmpDefaultEscalationEdit FormE=new FormPhoneEmpDefaultEscalationEdit();
+			FormE.ShowDialog();
+			SetEscalationList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList());
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Escalation team changed");
+		}
 	}
 }

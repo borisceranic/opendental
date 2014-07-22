@@ -180,6 +180,22 @@ namespace OpenDentBusiness{
 			Crud.PhoneEmpDefaultCrud.Update(phoneEmpDefault);
 		}
 
+		///<summary>Invalidates all rows' EscalationOrder and updates to the escalation ordering as given in the listPED input argument.</summary>
+		/// <param name="listPED">The new list. EscalationOrder should be 1-based and ordered appropriately. Any employees that should not be included in escalation should have EscalationOrder==-1.</param>
+		public static void UpdateEscalationOrder(List<PhoneEmpDefault> listPED) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPED);
+				return;
+			}
+			//Invalidate all rows.
+			string command= "UPDATE PhoneEmpDefault SET EscalationOrder=-1";
+			Db.NonQ(command);
+			//Update all rows.
+			for(int i=0;i<listPED.Count;i++) {
+				Crud.PhoneEmpDefaultCrud.Update(listPED[i]);
+			}
+		}
+
 		///<summary></summary>
 		public static void Delete(long employeeNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -208,6 +224,9 @@ namespace OpenDentBusiness{
 					case SortBy.ext:
 						retVal=x.PhoneExt.CompareTo(y.PhoneExt); 
 						break;
+					case SortBy.escalation:
+						retVal=x.EscalationOrder.CompareTo(y.EscalationOrder);
+						break;
 					case SortBy.name:
 					default:
 						retVal=x.EmpName.CompareTo(y.EmpName);
@@ -226,11 +245,10 @@ namespace OpenDentBusiness{
 				///<summary>1 - By EmployeeNum.</summary>
 				empNum,
 				///<summary>2 - By Name.</summary>
-				name
+				name,
+				///<summary>3 - By Escalation Order.</summary>
+				escalation
 			};
 		}
-
-
-
 	}
 }
