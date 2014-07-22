@@ -29,21 +29,24 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
 			this.labelTriageCoordinator = new System.Windows.Forms.Label();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.mapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.escalationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.groupPhoneMetrics = new System.Windows.Forms.GroupBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.escalationView = new OpenDental.EscalationViewControl();
+			this.labelCurrentTime = new OpenDental.MapAreaRoomControl();
+			this.labelTriageOpsStaff = new OpenDental.MapAreaRoomControl();
 			this.labelTriageTimeSpan = new OpenDental.MapAreaRoomControl();
 			this.labelTriageRedCalls = new OpenDental.MapAreaRoomControl();
 			this.labelTriageRedTimeSpan = new OpenDental.MapAreaRoomControl();
 			this.labelVoicemailTimeSpan = new OpenDental.MapAreaRoomControl();
 			this.labelTriageCalls = new OpenDental.MapAreaRoomControl();
 			this.labelVoicemailCalls = new OpenDental.MapAreaRoomControl();
-			this.labelCurrentTime = new OpenDental.MapAreaRoomControl();
-			this.labelTriageOpsStaff = new OpenDental.MapAreaRoomControl();
 			this.mapAreaPanelHQ = new OpenDental.MapAreaPanel();
 			this.menuStrip.SuspendLayout();
 			this.groupPhoneMetrics.SuspendLayout();
@@ -99,21 +102,11 @@
 			this.label11.TabIndex = 16;
 			this.label11.Text = "Time";
 			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label12.Location = new System.Drawing.Point(193, 469);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(90, 46);
-			this.label12.TabIndex = 19;
-			this.label12.Text = "Staff";
-			// 
 			// label14
 			// 
 			this.label14.AutoSize = true;
 			this.label14.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label14.Location = new System.Drawing.Point(-2, 529);
+			this.label14.Location = new System.Drawing.Point(-2, 442);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(183, 46);
 			this.label14.TabIndex = 17;
@@ -139,21 +132,37 @@
             this.fullScreenToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip.Name = "menuStrip";
-			this.menuStrip.Size = new System.Drawing.Size(135, 24);
+			this.menuStrip.Size = new System.Drawing.Size(133, 24);
 			this.menuStrip.TabIndex = 24;
 			this.menuStrip.Text = "menuStrip1";
 			// 
 			// setupToolStripMenuItem
 			// 
+			this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mapToolStripMenuItem,
+            this.escalationToolStripMenuItem});
 			this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-			this.setupToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+			this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
 			this.setupToolStripMenuItem.Text = "Setup";
-			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
+			// 
+			// mapToolStripMenuItem
+			// 
+			this.mapToolStripMenuItem.Name = "mapToolStripMenuItem";
+			this.mapToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+			this.mapToolStripMenuItem.Text = "Map";
+			this.mapToolStripMenuItem.Click += new System.EventHandler(this.mapToolStripMenuItem_Click);
+			// 
+			// escalationToolStripMenuItem
+			// 
+			this.escalationToolStripMenuItem.Name = "escalationToolStripMenuItem";
+			this.escalationToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+			this.escalationToolStripMenuItem.Text = "Escalation";
+			this.escalationToolStripMenuItem.Click += new System.EventHandler(this.escalationToolStripMenuItem_Click);
 			// 
 			// fullScreenToolStripMenuItem
 			// 
 			this.fullScreenToolStripMenuItem.Name = "fullScreenToolStripMenuItem";
-			this.fullScreenToolStripMenuItem.Size = new System.Drawing.Size(77, 20);
+			this.fullScreenToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
 			this.fullScreenToolStripMenuItem.Text = "Full Screen";
 			this.fullScreenToolStripMenuItem.Click += new System.EventHandler(this.fullScreenToolStripMenuItem_Click);
 			// 
@@ -175,6 +184,78 @@
 			this.groupPhoneMetrics.Size = new System.Drawing.Size(499, 353);
 			this.groupPhoneMetrics.TabIndex = 25;
 			this.groupPhoneMetrics.TabStop = false;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label2.Location = new System.Drawing.Point(-2, 525);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(176, 46);
+			this.label2.TabIndex = 33;
+			this.label2.Text = "Escalation";
+			// 
+			// escalationView
+			// 
+			this.escalationView.BackColor = System.Drawing.Color.White;
+			this.escalationView.BorderThickness = 1;
+			this.escalationView.FadeAlphaIncrement = 20;
+			this.escalationView.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.escalationView.Items = ((System.ComponentModel.BindingList<string>)(resources.GetObject("escalationView.Items")));
+			this.escalationView.LinePadding = -6;
+			this.escalationView.Location = new System.Drawing.Point(180, 525);
+			this.escalationView.MinAlpha = 60;
+			this.escalationView.Name = "escalationView";
+			this.escalationView.OuterColor = System.Drawing.Color.Black;
+			this.escalationView.Size = new System.Drawing.Size(317, 356);
+			this.escalationView.StartFadeIndex = 0;
+			this.escalationView.TabIndex = 34;
+			// 
+			// labelCurrentTime
+			// 
+			this.labelCurrentTime.AllowDragging = false;
+			this.labelCurrentTime.AllowEdit = false;
+			this.labelCurrentTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelCurrentTime.BorderThickness = 2;
+			this.labelCurrentTime.Elapsed = null;
+			this.labelCurrentTime.EmployeeName = null;
+			this.labelCurrentTime.EmployeeNum = ((long)(0));
+			this.labelCurrentTime.Empty = false;
+			this.labelCurrentTime.Extension = null;
+			this.labelCurrentTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 39.75F);
+			this.labelCurrentTime.FontHeader = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelCurrentTime.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.labelCurrentTime.InnerColor = System.Drawing.SystemColors.Control;
+			this.labelCurrentTime.Location = new System.Drawing.Point(1717, 6);
+			this.labelCurrentTime.Name = "labelCurrentTime";
+			this.labelCurrentTime.OuterColor = System.Drawing.SystemColors.Control;
+			this.labelCurrentTime.PhoneImage = null;
+			this.labelCurrentTime.Size = new System.Drawing.Size(182, 61);
+			this.labelCurrentTime.Status = null;
+			this.labelCurrentTime.TabIndex = 32;
+			this.labelCurrentTime.Text = "12:45 PM";
+			// 
+			// labelTriageOpsStaff
+			// 
+			this.labelTriageOpsStaff.AllowDragging = false;
+			this.labelTriageOpsStaff.AllowEdit = false;
+			this.labelTriageOpsStaff.BorderThickness = 1;
+			this.labelTriageOpsStaff.Elapsed = null;
+			this.labelTriageOpsStaff.EmployeeName = null;
+			this.labelTriageOpsStaff.EmployeeNum = ((long)(0));
+			this.labelTriageOpsStaff.Empty = false;
+			this.labelTriageOpsStaff.Extension = null;
+			this.labelTriageOpsStaff.Font = new System.Drawing.Font("Calibri", 40F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTriageOpsStaff.FontHeader = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTriageOpsStaff.InnerColor = System.Drawing.Color.LightCyan;
+			this.labelTriageOpsStaff.Location = new System.Drawing.Point(182, 430);
+			this.labelTriageOpsStaff.Name = "labelTriageOpsStaff";
+			this.labelTriageOpsStaff.OuterColor = System.Drawing.Color.Blue;
+			this.labelTriageOpsStaff.PhoneImage = null;
+			this.labelTriageOpsStaff.Size = new System.Drawing.Size(107, 70);
+			this.labelTriageOpsStaff.Status = null;
+			this.labelTriageOpsStaff.TabIndex = 31;
+			this.labelTriageOpsStaff.Text = "0";
 			// 
 			// labelTriageTimeSpan
 			// 
@@ -313,52 +394,6 @@
 			this.labelVoicemailCalls.TabIndex = 13;
 			this.labelVoicemailCalls.Text = "0";
 			// 
-			// labelCurrentTime
-			// 
-			this.labelCurrentTime.AllowDragging = false;
-			this.labelCurrentTime.AllowEdit = false;
-			this.labelCurrentTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelCurrentTime.BorderThickness = 2;
-			this.labelCurrentTime.Elapsed = null;
-			this.labelCurrentTime.EmployeeName = null;
-			this.labelCurrentTime.EmployeeNum = ((long)(0));
-			this.labelCurrentTime.Empty = false;
-			this.labelCurrentTime.Extension = null;
-			this.labelCurrentTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 39.75F);
-			this.labelCurrentTime.FontHeader = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelCurrentTime.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.labelCurrentTime.InnerColor = System.Drawing.SystemColors.Control;
-			this.labelCurrentTime.Location = new System.Drawing.Point(1717, 6);
-			this.labelCurrentTime.Name = "labelCurrentTime";
-			this.labelCurrentTime.OuterColor = System.Drawing.SystemColors.Control;
-			this.labelCurrentTime.PhoneImage = null;
-			this.labelCurrentTime.Size = new System.Drawing.Size(182, 61);
-			this.labelCurrentTime.Status = null;
-			this.labelCurrentTime.TabIndex = 32;
-			this.labelCurrentTime.Text = "12:45 PM";
-			// 
-			// labelTriageOpsStaff
-			// 
-			this.labelTriageOpsStaff.AllowDragging = false;
-			this.labelTriageOpsStaff.AllowEdit = false;
-			this.labelTriageOpsStaff.BorderThickness = 1;
-			this.labelTriageOpsStaff.Elapsed = null;
-			this.labelTriageOpsStaff.EmployeeName = null;
-			this.labelTriageOpsStaff.EmployeeNum = ((long)(0));
-			this.labelTriageOpsStaff.Empty = false;
-			this.labelTriageOpsStaff.Extension = null;
-			this.labelTriageOpsStaff.Font = new System.Drawing.Font("Calibri", 40F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTriageOpsStaff.FontHeader = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTriageOpsStaff.InnerColor = System.Drawing.Color.LightCyan;
-			this.labelTriageOpsStaff.Location = new System.Drawing.Point(182, 517);
-			this.labelTriageOpsStaff.Name = "labelTriageOpsStaff";
-			this.labelTriageOpsStaff.OuterColor = System.Drawing.Color.Blue;
-			this.labelTriageOpsStaff.PhoneImage = null;
-			this.labelTriageOpsStaff.Size = new System.Drawing.Size(107, 70);
-			this.labelTriageOpsStaff.Status = null;
-			this.labelTriageOpsStaff.TabIndex = 31;
-			this.labelTriageOpsStaff.Text = "0";
-			// 
 			// mapAreaPanelHQ
 			// 
 			this.mapAreaPanelHQ.AllowDragging = false;
@@ -388,10 +423,11 @@
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1884, 1042);
+			this.Controls.Add(this.escalationView);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.labelCurrentTime);
 			this.Controls.Add(this.labelTriageOpsStaff);
 			this.Controls.Add(this.groupPhoneMetrics);
-			this.Controls.Add(this.label12);
 			this.Controls.Add(this.label14);
 			this.Controls.Add(this.mapAreaPanelHQ);
 			this.Controls.Add(this.menuStrip);
@@ -424,7 +460,6 @@
 		private MapAreaRoomControl labelTriageRedCalls;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Label labelTriageCoordinator;
 		private System.Windows.Forms.MenuStrip menuStrip;
@@ -434,5 +469,9 @@
 		private MapAreaRoomControl labelTriageOpsStaff;
 		private MapAreaRoomControl labelCurrentTime;
 		private MapAreaRoomControl labelTriageTimeSpan;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.ToolStripMenuItem mapToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem escalationToolStripMenuItem;
+		private EscalationViewControl escalationView;
 	}
 }

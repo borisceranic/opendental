@@ -398,6 +398,16 @@ namespace OpenDentBusiness {
 			return null;
 		}
 
+		public static Phone GetPhoneForEmployeeNum(List<Phone> phoneList,long employeeNum) {
+			//No need to check RemotingRole; no call to db.
+			for(int i=0;i<phoneList.Count;i++) {
+				if(phoneList[i].EmployeeNum==employeeNum) {
+					return phoneList[i];
+				}
+			}
+			return null;
+		}
+
 		///<summary>Gets the extension for the employee.  Returns 0 if employee cannot be found.</summary>
 		public static int GetExtensionForEmp(long employeeNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

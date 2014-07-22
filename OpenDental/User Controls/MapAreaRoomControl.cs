@@ -203,6 +203,28 @@ namespace OpenDental {
 			InnerColor=_innerColorRestore;
 		}
 
+		public void SetNormalColors() {
+			SetColors(Color.Black,Color.Black,Color.White);
+		}
+
+		public void SetWarnColors() {
+			SetColors(Color.White,Color.Black,Color.Orange);
+		}
+
+		public void SetAlertColors() {
+			SetColors(Color.White,Color.Black,Color.Red);
+		}
+
+		public void SetTriageColors() {
+			SetColors(Color.Black,Phones.PhoneColorScheme.COLOR_DUAL_OuterTriage,Phones.PhoneColorScheme.COLOR_DUAL_InnerTriageHere);
+		}
+
+		public void SetColors(Color foreColor,Color outerColor,Color innerColor) {
+			ForeColor=foreColor;
+			OuterColor=outerColor;
+			InnerColor=innerColor;
+		}
+
 		private void timerFlash_Tick(object sender,EventArgs e) {
 			//flip inner and outer colors
 			if(OuterColor==_outerColorRestore) {

@@ -30,6 +30,8 @@ namespace OpenDentBusiness{
 		public bool IsPrivateScreen;
 		///<summary>Used to launch a task window instead of a commlog window when user clicks on name/phone number on the bottom left.</summary>
 		public bool IsTriageOperator;
+		///<summary>Order of escalation importantance. Employees are ranked 1-n in order of importance. 1 is most important, 'n' is least important. -1 means employee is not included in escalation.</summary>
+		public int EscalationOrder;
 
 		///<summary></summary>
 		public PhoneEmpDefault Clone() {

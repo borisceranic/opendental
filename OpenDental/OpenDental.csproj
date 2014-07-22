@@ -3231,6 +3231,18 @@
     <Compile Include="Forms\FormTPsign.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="InternalTools\Phones\EscalationViewControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Phones\EscalationViewControl.Designer.cs">
+      <DependentUpon>EscalationViewControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Phones\FormPhoneEmpDefaultEscalationEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Phones\FormPhoneEmpDefaultEscalationEdit.Designer.cs">
+      <DependentUpon>FormPhoneEmpDefaultEscalationEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Phones\FormMapHQ.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -5517,6 +5529,12 @@
     <EmbeddedResource Include="Forms\FormTPsign.resx">
       <DependentUpon>FormTPsign.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Phones\EscalationViewControl.resx">
+      <DependentUpon>EscalationViewControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Phones\FormPhoneEmpDefaultEscalationEdit.resx">
+      <DependentUpon>FormPhoneEmpDefaultEscalationEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Phones\FormMapHQ.resx">
       <DependentUpon>FormMapHQ.cs</DependentUpon>
