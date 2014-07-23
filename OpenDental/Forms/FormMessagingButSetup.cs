@@ -187,6 +187,7 @@ namespace OpenDental{
 				listComputers.Items.Add(s);
 			}
 			listComputers.SelectedIndex=0;
+			SubList=SigButDefs.GetByComputer("");
 			FillList();
 		}
 
@@ -194,18 +195,14 @@ namespace OpenDental{
 			if(listComputers.SelectedIndex==-1){//although I don't know how this could happen
 				listComputers.SelectedIndex=0;
 			}
-			if(listComputers.SelectedIndex==0){
-				SubList=SigButDefs.GetByComputer("");
-			}
-			else{
-				//remember, defaults are mixed into this list unless overridden:
-				SubList=SigButDefs.GetByComputer(Computers.List[listComputers.SelectedIndex-1].CompName);
-			}
 			int selected=listButtons.SelectedIndex;
 			listButtons.Items.Clear();
 			SigButDef button;
 			SigButDefElement[] elements;
 			string s;
+			if(SigButDefs.UpdateButtonIndexIfChanged(SubList)) {
+				DataValid.SetInvalid(InvalidType.Signals);
+			}
 			for(int i=0;i<20;i++){
 				button=SigButDefs.GetByIndex(i,SubList);
 				if(button==null){
@@ -235,6 +232,17 @@ namespace OpenDental{
 		}
 
 		private void listComputers_Click(object sender,EventArgs e) {
+			//Cache needs to be saved to the database.
+			if(SigButDefs.UpdateButtonIndexIfChanged(SubList)) {
+				DataValid.SetInvalid(InvalidType.Signals);
+			}
+			if(listComputers.SelectedIndex==0) {
+				SubList=SigButDefs.GetByComputer("");
+			}
+			else {
+				//remember, defaults are mixed into this list unless overridden:
+				SubList=SigButDefs.GetByComputer(Computers.List[listComputers.SelectedIndex-1].CompName);
+			}
 			FillList();
 		}
 
@@ -242,20 +250,23 @@ namespace OpenDental{
 			if(listButtons.SelectedIndex==-1){//should never happen
 				return;
 			}
+			//Save any changes to the cache because the item order could have changed.
+			if(SigButDefs.UpdateButtonIndexIfChanged(SubList)) {
+				DataValid.SetInvalid(InvalidType.Signals);
+			}
 			int selected=listButtons.SelectedIndex;
 			SigButDef button=SigButDefs.GetByIndex(selected,SubList);
+			string computerName="";
 			if(button==null){//Add
 				FormSigButDefEdit FormS=new FormSigButDefEdit();
 				FormS.IsNew=true;
 				button=new SigButDef();
 				button.ElementList=new SigButDefElement[0];
 				button.ButtonIndex=selected;
-				if(listComputers.SelectedIndex==0){
-					button.ComputerName="";
+				if(listComputers.SelectedIndex!=0) {
+					computerName=Computers.List[listComputers.SelectedIndex-1].CompName;
 				}
-				else{
-					button.ComputerName=Computers.List[listComputers.SelectedIndex-1].CompName;
-				}
+				button.ComputerName=computerName;
 				FormS.ButtonCur=button.Copy();
 				FormS.ShowDialog();
 			}
@@ -272,6 +283,7 @@ namespace OpenDental{
 				FormS.ButtonCur=button.Copy();
 				FormS.ShowDialog();
 			}
+			SubList=SigButDefs.GetByComputer(computerName);//Refresh our local list to match the cache in case the user edited or added a new button item.
 			FillList();
 		}
 
@@ -288,7 +300,7 @@ namespace OpenDental{
 			if(button==null){
 				return;
 			}
-			SigButDefs.MoveUp(button,SubList);
+			SubList=SigButDefs.MoveUp(button,SubList);
 			FillList();
 			listButtons.SelectedIndex=selected-1;
 		}
@@ -306,7 +318,7 @@ namespace OpenDental{
 			if(button==null) {
 				return;
 			}
-			SigButDefs.MoveDown(button,SubList);
+			SubList=SigButDefs.MoveDown(button,SubList);
 			FillList();
 			listButtons.SelectedIndex=selected+1;
 		}
@@ -316,6 +328,7 @@ namespace OpenDental{
 		}
 
 		private void FormMessagingButSetup_FormClosing(object sender,FormClosingEventArgs e) {
+			SigButDefs.UpdateButtonIndexIfChanged(SubList);
 			DataValid.SetInvalid(InvalidType.Signals);
 		}
 

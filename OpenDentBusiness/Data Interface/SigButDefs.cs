@@ -95,7 +95,23 @@ namespace OpenDentBusiness {
 			return null;
 		}
 
-
+		///<summary>Loops through the SigButDefs passed in and updates the database if any of the ButtonIndexes chagned.  Returns true if any changes were made to the database so that the calling class can invalidate the cache.</summary>
+		public static bool UpdateButtonIndexIfChanged(SigButDef[] sigButDefs) {
+			bool hasChanges=false;
+			for(int i=0;i<Listt.Length;i++) {
+				for(int j=0;j<sigButDefs.Length;j++) {
+					if(Listt[i].SigButDefNum!=sigButDefs[j].SigButDefNum) {
+						continue;
+					}
+					//This is the same SigButDef
+					if(Listt[i].ButtonIndex!=sigButDefs[j].ButtonIndex) {
+						hasChanges=true;
+						Update(sigButDefs[j]);//Update the database with the new button index.
+					}
+				}
+			}
+			return hasChanges;
+		}
 
 
 		///<summary>Used in Setup.  The returned list also includes defaults if not overridden by one with a computername.  The supplied computer name can be blank for the default setup.</summary>
@@ -141,48 +157,66 @@ namespace OpenDentBusiness {
 			return x.ButtonIndex.CompareTo(y.ButtonIndex);
 		}
 
-		///<summary>Moves the selected item up in the supplied sub list.</summary>
-		public static void MoveUp(SigButDef selected,SigButDef[] subList) {
+		///<summary>Moves the selected item up in the supplied sub list.  Does not update the cache because the user could want to potentially move buttons around a lot.</summary>
+		public static SigButDef[] MoveUp(SigButDef selected,SigButDef[] subList) {
 			//No need to check RemotingRole; no call to db.
 			if(selected.ButtonIndex==0) {//already at top
-				return;
+				return subList;
 			}
 			SigButDef occupied=null;
+			int temp1=-1;
+			int temp2=-1;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
 					&& subList[i].ButtonIndex==selected.ButtonIndex-1)//and position occupied
 				{
 					occupied=subList[i].Copy();
+					temp1=i;
+				}
+				if(subList[i].SigButDefNum==selected.SigButDefNum) {
+					temp2=i;
 				}
 			}
-			if(occupied!=null) {
+			if(temp1>=0) {
 				occupied.ButtonIndex++;
-				Update(occupied);
+				subList[temp1+1]=occupied;
+				//Update(occupied);
 			}
 			selected.ButtonIndex--;
-			Update(selected);
+			subList[temp2]=selected;
+			//Update(selected);
+			return subList;
 		}
 
-		///<summary></summary>
-		public static void MoveDown(SigButDef selected,SigButDef[] subList) {
+		///<summary>Moves the selected item down in the supplied sub list.  Does not update the cache because the user could want to potentially move buttons around a lot.</summary>
+		public static SigButDef[] MoveDown(SigButDef selected,SigButDef[] subList) {
 			//No need to check RemotingRole; no call to db.
 			if(selected.ButtonIndex==20) {
 				throw new ApplicationException(Lans.g("SigButDefs","Max 20 buttons."));
 			}
+			int temp1=-1;
+			int temp2=-1;
 			SigButDef occupied=null;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
-					&& subList[i].ButtonIndex==selected.ButtonIndex+1)//and position occupied
+					&& (subList[i].ButtonIndex==selected.ButtonIndex+1))//and position occupied
 				{
 					occupied=subList[i].Copy();
+					temp1=i;
+				}
+				if(subList[i].SigButDefNum==selected.SigButDefNum) {
+					temp2=i;
 				}
 			}
 			if(occupied!=null) {
 				occupied.ButtonIndex--;
-				Update(occupied);
+				subList[temp1-1]=occupied;
+				//Update(occupied);
 			}
 			selected.ButtonIndex++;
-			Update(selected);
+			subList[temp2]=selected;
+			//Update(selected);
+			return subList;
 		}
 
 		///<summary>Returns the SigButDef with the specified buttonIndex.  Used from the setup page.  The supplied list will already have been filtered by computername.  Supply buttonIndex in 0-based format.</summary>
