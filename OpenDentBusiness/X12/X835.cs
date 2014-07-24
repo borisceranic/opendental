@@ -2967,8 +2967,7 @@ namespace OpenDentBusiness {
 			if(claimNum!=0) {
 				return claimNum;
 			}
-
-
+			//TODO: If matching by tracking number fails, then match by patient name, subscriber ID, and date of service.
 			return 0;
 		}
 

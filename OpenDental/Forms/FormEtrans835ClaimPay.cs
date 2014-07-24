@@ -93,20 +93,20 @@ namespace OpenDental {
 			// textInsPayAllowed
 			// 
 			this.textInsPayAllowed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textInsPayAllowed.Location = new System.Drawing.Point(453, 555);
+			this.textInsPayAllowed.Location = new System.Drawing.Point(455, 555);
 			this.textInsPayAllowed.Name = "textInsPayAllowed";
 			this.textInsPayAllowed.ReadOnly = true;
-			this.textInsPayAllowed.Size = new System.Drawing.Size(55, 20);
+			this.textInsPayAllowed.Size = new System.Drawing.Size(50, 20);
 			this.textInsPayAllowed.TabIndex = 116;
 			this.textInsPayAllowed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// textClaimFee
 			// 
 			this.textClaimFee.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textClaimFee.Location = new System.Drawing.Point(343, 555);
+			this.textClaimFee.Location = new System.Drawing.Point(339, 555);
 			this.textClaimFee.Name = "textClaimFee";
 			this.textClaimFee.ReadOnly = true;
-			this.textClaimFee.Size = new System.Drawing.Size(55, 20);
+			this.textClaimFee.Size = new System.Drawing.Size(62, 20);
 			this.textClaimFee.TabIndex = 118;
 			this.textClaimFee.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -114,7 +114,7 @@ namespace OpenDental {
 			// 
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(255, 558);
+			this.label1.Location = new System.Drawing.Point(251, 558);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(84, 16);
 			this.label1.TabIndex = 117;
@@ -200,12 +200,12 @@ namespace OpenDental {
 			// textWriteOff
 			// 
 			this.textWriteOff.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textWriteOff.Location = new System.Drawing.Point(563, 555);
+			this.textWriteOff.Location = new System.Drawing.Point(559, 555);
 			this.textWriteOff.MaxVal = 100000000D;
 			this.textWriteOff.MinVal = -100000000D;
 			this.textWriteOff.Name = "textWriteOff";
 			this.textWriteOff.ReadOnly = true;
-			this.textWriteOff.Size = new System.Drawing.Size(55, 20);
+			this.textWriteOff.Size = new System.Drawing.Size(54, 20);
 			this.textWriteOff.TabIndex = 119;
 			this.textWriteOff.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -213,12 +213,12 @@ namespace OpenDental {
 			// 
 			this.textInsPayAmt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textInsPayAmt.Location = new System.Drawing.Point(508, 555);
+			this.textInsPayAmt.Location = new System.Drawing.Point(505, 555);
 			this.textInsPayAmt.MaxVal = 100000000D;
 			this.textInsPayAmt.MinVal = -100000000D;
 			this.textInsPayAmt.Name = "textInsPayAmt";
 			this.textInsPayAmt.ReadOnly = true;
-			this.textInsPayAmt.Size = new System.Drawing.Size(55, 20);
+			this.textInsPayAmt.Size = new System.Drawing.Size(54, 20);
 			this.textInsPayAmt.TabIndex = 115;
 			this.textInsPayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -226,12 +226,12 @@ namespace OpenDental {
 			// 
 			this.textDedApplied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textDedApplied.Location = new System.Drawing.Point(398, 555);
+			this.textDedApplied.Location = new System.Drawing.Point(401, 555);
 			this.textDedApplied.MaxVal = 100000000D;
 			this.textDedApplied.MinVal = -100000000D;
 			this.textDedApplied.Name = "textDedApplied";
 			this.textDedApplied.ReadOnly = true;
-			this.textDedApplied.Size = new System.Drawing.Size(55, 20);
+			this.textDedApplied.Size = new System.Drawing.Size(54, 20);
 			this.textDedApplied.TabIndex = 114;
 			this.textDedApplied.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -476,31 +476,31 @@ namespace OpenDental {
 			//the payment itself is imaginary and is simply the sum of the claimprocs on this form
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableClaimProc","Date"),70);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableClaimProc","Date"),66);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Code"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),35);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),25);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Description"),120);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Description"),130);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Billed"),55,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Deduct"),55,HorizontalAlignment.Right,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Deduct"),54,HorizontalAlignment.Right,true);//A little wider because the dedutible total textbox contains bold text.
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Allowed"),55,HorizontalAlignment.Right,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Allowed"),50,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Pay"),55,HorizontalAlignment.Right,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Pay"),54,HorizontalAlignment.Right,true);//A little wider because the insurance payment total textbox contains bold text.
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Writeoff"),55,HorizontalAlignment.Right,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Writeoff"),54,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Status"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Pmt"),30,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),170,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),0,true);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;

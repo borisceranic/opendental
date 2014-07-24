@@ -203,19 +203,115 @@ namespace OpenDental {
 
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
+			bool isPaymentEntered=true;
+			if(!Security.IsAuthorized(Permissions.InsPayCreate)) {//date not checked here, but it will be checked when actually creating the check
+				isPaymentEntered=false;
+			}
+			else if(!EnterPayment(claimPaid)) {
+				isPaymentEntered=false;
+			}			
+			if(!isPaymentEntered) {
+				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
+				formC.ShowDialog(this);
+			}
+		}
+
+		///<summary>Returns true if the payment information was loaded into payment entry window, otherwise returns false if the payment could not be entered.</summary>
+		private bool EnterPayment(Hx835_Claim claimPaid) {
+			//TODO: Do not enter payment if the claim is a split claim.
+			//TODO: Do not enter by procedure if any procedures have been bundled/unbundled/split.
 			long claimNum=claimPaid.GetOriginalClaimNum();
 			if(claimNum==0) {//Original claim not found.
-				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
-				formC.Show(this);
+				return false;
 			}
-			else {//Original claim found.
-				Claim claim=Claims.GetClaim(claimNum);
-				Patient pat=Patients.GetPat(claim.PatNum);
-				Family fam=Patients.GetFamily(claim.PatNum);
-				//List <InsPlan> listPlans=InsPlans.get
-				//FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,pat,fam,);
-				//formP.show(this);
-			}			
+			Claim claim=Claims.GetClaim(claimNum);
+			Patient pat=Patients.GetPat(claim.PatNum);
+			Family fam=Patients.GetFamily(claim.PatNum);
+			List<InsSub> listInsSubs=InsSubs.RefreshForFam(fam);
+			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+			List<PatPlan> listPatPlans=PatPlans.Refresh(claim.PatNum);
+			List <ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
+			if(claimPaid.ListProcs.Count==0) {//Procedure detail not provided with payment.  Enter by total.
+				if(claim.ClaimType=="Cap") {
+					return false;//Capitation claims should not be entered by total because the insurance payment would affect the patient balance.
+				}
+				Double dedEst=0;
+				Double payEst=0;
+				for(int i=0;i<listClaimProcsForClaim.Count;i++) {
+					if(listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {
+						continue;
+					}
+					if(listClaimProcsForClaim[i].ProcNum==0) {
+						continue;//also ignore non-procedures.
+					}
+					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
+					dedEst+=listClaimProcsForClaim[i].DedApplied;
+					payEst+=listClaimProcsForClaim[i].InsPayEst;
+				}
+				ClaimProc ClaimProcCur=new ClaimProc();
+				//ClaimProcs.Cur.ProcNum 
+				ClaimProcCur.ClaimNum=claim.ClaimNum;
+				ClaimProcCur.PatNum=claim.PatNum;
+				ClaimProcCur.ProvNum=claim.ProvTreat;
+				//ClaimProcs.Cur.FeeBilled
+				//ClaimProcs.Cur.InsPayEst
+				ClaimProcCur.DedApplied=dedEst;
+				ClaimProcCur.Status=ClaimProcStatus.Received;
+				ClaimProcCur.InsPayAmt=payEst;
+				//remarks
+				//ClaimProcs.Cur.ClaimPaymentNum
+				ClaimProcCur.PlanNum=claim.PlanNum;
+				ClaimProcCur.InsSubNum=claim.InsSubNum;
+				ClaimProcCur.DateCP=DateTimeOD.Today;
+				ClaimProcCur.ProcDate=claim.DateService;
+				ClaimProcCur.DateEntry=DateTime.Now;//will get set anyway
+				ClaimProcCur.ClinicNum=claim.ClinicNum;
+				//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
+				//By sending in ClaimNum, we ensure that we only get the payplan a claimproc from this claim was already attached to or payplans with no claimprocs attached.
+				List<PayPlan> payPlanList=PayPlans.GetValidInsPayPlans(ClaimProcCur.PatNum,ClaimProcCur.PlanNum,ClaimProcCur.InsSubNum,ClaimProcCur.ClaimNum);
+				ClaimProcCur.PayPlanNum=0;
+				if(payPlanList.Count==1) {
+					ClaimProcCur.PayPlanNum=payPlanList[0].PayPlanNum;
+				}
+				else if(payPlanList.Count>1) {
+					//more than one valid PayPlan
+					List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(ClaimProcCur.PatNum);
+					FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+					FormPPS.ShowDialog();
+					if(FormPPS.DialogResult==DialogResult.OK) {
+						ClaimProcCur.PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+					}
+				}
+				ClaimProcs.Insert(ClaimProcCur);
+				FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,pat,fam,listInsPlans,listPatPlans,listInsSubs);
+				if(formP.ShowDialog()!=DialogResult.OK) {
+					ClaimProcs.Delete(ClaimProcCur);
+				}
+				else {//Payment was accepted by user.
+					for(int i=0;i<listClaimProcsForClaim.Count;i++) {
+						if(listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {
+							continue;
+						}
+						//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
+						listClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
+						if(listClaimProcsForClaim[i].DedApplied>0) {
+							listClaimProcsForClaim[i].InsPayEst+=listClaimProcsForClaim[i].DedApplied;
+							listClaimProcsForClaim[i].DedApplied=0;//because ded will show as part of payment now.
+						}
+						listClaimProcsForClaim[i].DateEntry=DateTime.Now;//the date is was switched to rec'd
+						ClaimProcs.Update(listClaimProcsForClaim[i]);
+					}
+				}
+				claim.ClaimStatus="R";//Received.
+				claim.DateReceived=DateTimeOD.Today;
+				Claims.Update(claim);
+			}
+			else {//Procedure detail provided.  Enter by procedure.
+				//TODO:
+			}
+			
+			
+			return true;
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
