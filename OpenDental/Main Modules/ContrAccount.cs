@@ -33,7 +33,6 @@ namespace OpenDental {
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private System.Windows.Forms.ImageList imageListMain;
 		private System.Windows.Forms.Panel panelSplitter;
-		private System.Windows.Forms.Panel panelCommButs;
 		private OpenDental.ODtextBox textFinNotes;
 		private System.Windows.Forms.ContextMenu contextMenuStatement;
 		private System.Windows.Forms.MenuItem menuItemStatementWalkout;
@@ -77,7 +76,6 @@ namespace OpenDental {
 		private Label label3;
 		private TextBox textOver90;
 		private Label label2;
-		private OpenDental.UI.Button butTrojan;
 		private MenuItem menuItemStatementEmail;
 		private Label labelBalanceAmt;
 		private TabControl tabControlShow;
@@ -111,6 +109,7 @@ namespace OpenDental {
 		private Label labelUnearned;
 		private Label labelInsRem;
 		private decimal PPBalanceTotal;
+		private PatField[] _patFieldList;
 
 		#region UserVariables
 		///<summary>This holds nearly all of the data needed for display.  It is retrieved in one call to the database.</summary>
@@ -133,7 +132,6 @@ namespace OpenDental {
 		///<summary>Set to true if this control is placed in the recall edit window. This affects the control behavior.</summary>
 		public bool ViewingInRecall=false;
 		private List<DisplayField> fieldsForMainGrid;
-		private OpenDental.UI.Button butComm;
 		private GroupBox groupBoxIndIns;
 		private TextBox textPriDed;
 		private TextBox textPriUsed;
@@ -169,7 +167,9 @@ namespace OpenDental {
 		private MenuItem menuItemReceipt;
 		private MenuItem menuItemRepeatCanada;
 		private MenuItem menuItemInvoice;
+		private ODGrid gridPatInfo;
 		private bool InitializedOnStartup;
+		private List<DisplayField> _patInfoDisplayFields;
 		#endregion UserVariables
 
 		///<summary></summary>
@@ -202,7 +202,6 @@ namespace OpenDental {
 			this.menuInsOther = new System.Windows.Forms.MenuItem();
 			this.imageListMain = new System.Windows.Forms.ImageList(this.components);
 			this.panelSplitter = new System.Windows.Forms.Panel();
-			this.panelCommButs = new System.Windows.Forms.Panel();
 			this.contextMenuStatement = new System.Windows.Forms.ContextMenu();
 			this.menuItemStatementWalkout = new System.Windows.Forms.MenuItem();
 			this.menuItemStatementEmail = new System.Windows.Forms.MenuItem();
@@ -215,6 +214,8 @@ namespace OpenDental {
 			this.menuItemRepeatMobile = new System.Windows.Forms.MenuItem();
 			this.menuItemRepeatCanada = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes = new System.Windows.Forms.Panel();
+			this.butShowNone = new OpenDental.UI.Button();
+			this.butShowAll = new OpenDental.UI.Button();
 			this.checkNotes = new System.Windows.Forms.CheckBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.checkShowTeeth = new System.Windows.Forms.CheckBox();
@@ -259,12 +260,22 @@ namespace OpenDental {
 			this.label2 = new System.Windows.Forms.Label();
 			this.tabControlShow = new System.Windows.Forms.TabControl();
 			this.tabMain = new System.Windows.Forms.TabPage();
+			this.butCreditCard = new OpenDental.UI.Button();
+			this.textUrgFinNote = new OpenDental.ODtextBox();
 			this.gridAcctPat = new OpenDental.UI.ODGrid();
+			this.textFinNotes = new OpenDental.ODtextBox();
 			this.tabShow = new System.Windows.Forms.TabPage();
 			this.checkShowFamilyComm = new System.Windows.Forms.CheckBox();
+			this.butToday = new OpenDental.UI.Button();
 			this.checkShowDetail = new System.Windows.Forms.CheckBox();
+			this.butDatesAll = new OpenDental.UI.Button();
+			this.but90days = new OpenDental.UI.Button();
+			this.but45days = new OpenDental.UI.Button();
+			this.butRefresh = new OpenDental.UI.Button();
 			this.labelEndDate = new System.Windows.Forms.Label();
 			this.labelStartDate = new System.Windows.Forms.Label();
+			this.textDateEnd = new OpenDental.ValidDate();
+			this.textDateStart = new OpenDental.ValidDate();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBoxIndIns = new System.Windows.Forms.GroupBox();
 			this.textPriDed = new System.Windows.Forms.TextBox();
@@ -300,22 +311,8 @@ namespace OpenDental {
 			this.gridRepeat = new OpenDental.UI.ODGrid();
 			this.gridAccount = new OpenDental.UI.ODGrid();
 			this.gridComm = new OpenDental.UI.ODGrid();
-			this.butCreditCard = new OpenDental.UI.Button();
-			this.textUrgFinNote = new OpenDental.ODtextBox();
-			this.textFinNotes = new OpenDental.ODtextBox();
-			this.butToday = new OpenDental.UI.Button();
-			this.butDatesAll = new OpenDental.UI.Button();
-			this.but90days = new OpenDental.UI.Button();
-			this.but45days = new OpenDental.UI.Button();
-			this.butRefresh = new OpenDental.UI.Button();
-			this.textDateEnd = new OpenDental.ValidDate();
-			this.textDateStart = new OpenDental.ValidDate();
-			this.butShowNone = new OpenDental.UI.Button();
-			this.butShowAll = new OpenDental.UI.Button();
-			this.butComm = new OpenDental.UI.Button();
-			this.butTrojan = new OpenDental.UI.Button();
+			this.gridPatInfo = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.panelCommButs.SuspendLayout();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -401,15 +398,6 @@ namespace OpenDental {
 			this.panelSplitter.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panelSplitter_MouseMove);
 			this.panelSplitter.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panelSplitter_MouseUp);
 			// 
-			// panelCommButs
-			// 
-			this.panelCommButs.Controls.Add(this.butComm);
-			this.panelCommButs.Controls.Add(this.butTrojan);
-			this.panelCommButs.Location = new System.Drawing.Point(749, 526);
-			this.panelCommButs.Name = "panelCommButs";
-			this.panelCommButs.Size = new System.Drawing.Size(163, 63);
-			this.panelCommButs.TabIndex = 69;
-			// 
 			// contextMenuStatement
 			// 
 			this.contextMenuStatement.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
@@ -493,6 +481,36 @@ namespace OpenDental {
 			this.panelProgNotes.Name = "panelProgNotes";
 			this.panelProgNotes.Size = new System.Drawing.Size(749, 227);
 			this.panelProgNotes.TabIndex = 211;
+			// 
+			// butShowNone
+			// 
+			this.butShowNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowNone.Autosize = true;
+			this.butShowNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowNone.CornerRadius = 4F;
+			this.butShowNone.Location = new System.Drawing.Point(677, 207);
+			this.butShowNone.Name = "butShowNone";
+			this.butShowNone.Size = new System.Drawing.Size(58, 16);
+			this.butShowNone.TabIndex = 216;
+			this.butShowNone.Text = "None";
+			this.butShowNone.Visible = false;
+			this.butShowNone.Click += new System.EventHandler(this.butShowNone_Click);
+			// 
+			// butShowAll
+			// 
+			this.butShowAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowAll.Autosize = true;
+			this.butShowAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowAll.CornerRadius = 4F;
+			this.butShowAll.Location = new System.Drawing.Point(614, 207);
+			this.butShowAll.Name = "butShowAll";
+			this.butShowAll.Size = new System.Drawing.Size(53, 16);
+			this.butShowAll.TabIndex = 215;
+			this.butShowAll.Text = "All";
+			this.butShowAll.Visible = false;
+			this.butShowAll.Click += new System.EventHandler(this.butShowAll_Click);
 			// 
 			// checkNotes
 			// 
@@ -987,6 +1005,38 @@ namespace OpenDental {
 			this.tabMain.Text = "Main";
 			this.tabMain.UseVisualStyleBackColor = true;
 			// 
+			// butCreditCard
+			// 
+			this.butCreditCard.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCreditCard.Autosize = true;
+			this.butCreditCard.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCreditCard.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCreditCard.CornerRadius = 4F;
+			this.butCreditCard.Location = new System.Drawing.Point(22, 103);
+			this.butCreditCard.Name = "butCreditCard";
+			this.butCreditCard.Size = new System.Drawing.Size(137, 26);
+			this.butCreditCard.TabIndex = 216;
+			this.butCreditCard.Text = "Credit Card Manage";
+			this.butCreditCard.UseVisualStyleBackColor = true;
+			this.butCreditCard.Click += new System.EventHandler(this.butCreditCard_Click);
+			// 
+			// textUrgFinNote
+			// 
+			this.textUrgFinNote.AcceptsTab = true;
+			this.textUrgFinNote.BackColor = System.Drawing.Color.White;
+			this.textUrgFinNote.DetectUrls = false;
+			this.textUrgFinNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textUrgFinNote.ForeColor = System.Drawing.Color.Red;
+			this.textUrgFinNote.Location = new System.Drawing.Point(0, 20);
+			this.textUrgFinNote.Name = "textUrgFinNote";
+			this.textUrgFinNote.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
+			this.textUrgFinNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textUrgFinNote.Size = new System.Drawing.Size(178, 77);
+			this.textUrgFinNote.TabIndex = 11;
+			this.textUrgFinNote.Text = "";
+			this.textUrgFinNote.TextChanged += new System.EventHandler(this.textUrgFinNote_TextChanged);
+			this.textUrgFinNote.Leave += new System.EventHandler(this.textUrgFinNote_Leave);
+			// 
 			// gridAcctPat
 			// 
 			this.gridAcctPat.HScrollVisible = false;
@@ -999,6 +1049,20 @@ namespace OpenDental {
 			this.gridAcctPat.Title = "Select Patient";
 			this.gridAcctPat.TranslationName = "TableAccountPat";
 			this.gridAcctPat.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAcctPat_CellClick);
+			// 
+			// textFinNotes
+			// 
+			this.textFinNotes.AcceptsTab = true;
+			this.textFinNotes.DetectUrls = false;
+			this.textFinNotes.Location = new System.Drawing.Point(0, 337);
+			this.textFinNotes.Name = "textFinNotes";
+			this.textFinNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
+			this.textFinNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textFinNotes.Size = new System.Drawing.Size(178, 134);
+			this.textFinNotes.TabIndex = 70;
+			this.textFinNotes.Text = "";
+			this.textFinNotes.TextChanged += new System.EventHandler(this.textFinNotes_TextChanged);
+			this.textFinNotes.Leave += new System.EventHandler(this.textFinNotes_Leave);
 			// 
 			// tabShow
 			// 
@@ -1017,7 +1081,7 @@ namespace OpenDental {
 			this.tabShow.Location = new System.Drawing.Point(4, 22);
 			this.tabShow.Name = "tabShow";
 			this.tabShow.Padding = new System.Windows.Forms.Padding(3);
-			this.tabShow.Size = new System.Drawing.Size(178, 569);
+			this.tabShow.Size = new System.Drawing.Size(178, 471);
 			this.tabShow.TabIndex = 1;
 			this.tabShow.Text = "Show";
 			this.tabShow.UseVisualStyleBackColor = true;
@@ -1033,6 +1097,20 @@ namespace OpenDental {
 			this.checkShowFamilyComm.UseVisualStyleBackColor = true;
 			this.checkShowFamilyComm.Click += new System.EventHandler(this.checkShowFamilyComm_Click);
 			// 
+			// butToday
+			// 
+			this.butToday.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butToday.Autosize = true;
+			this.butToday.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butToday.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butToday.CornerRadius = 4F;
+			this.butToday.Location = new System.Drawing.Point(95, 54);
+			this.butToday.Name = "butToday";
+			this.butToday.Size = new System.Drawing.Size(77, 24);
+			this.butToday.TabIndex = 220;
+			this.butToday.Text = "Today";
+			this.butToday.Click += new System.EventHandler(this.butToday_Click);
+			// 
 			// checkShowDetail
 			// 
 			this.checkShowDetail.Checked = true;
@@ -1044,6 +1122,62 @@ namespace OpenDental {
 			this.checkShowDetail.Text = "Show Proc Breakdowns";
 			this.checkShowDetail.UseVisualStyleBackColor = true;
 			this.checkShowDetail.Click += new System.EventHandler(this.checkShowDetail_Click);
+			// 
+			// butDatesAll
+			// 
+			this.butDatesAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDatesAll.Autosize = true;
+			this.butDatesAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDatesAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDatesAll.CornerRadius = 4F;
+			this.butDatesAll.Location = new System.Drawing.Point(95, 132);
+			this.butDatesAll.Name = "butDatesAll";
+			this.butDatesAll.Size = new System.Drawing.Size(77, 24);
+			this.butDatesAll.TabIndex = 218;
+			this.butDatesAll.Text = "All Dates";
+			this.butDatesAll.Click += new System.EventHandler(this.butDatesAll_Click);
+			// 
+			// but90days
+			// 
+			this.but90days.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.but90days.Autosize = true;
+			this.but90days.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.but90days.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.but90days.CornerRadius = 4F;
+			this.but90days.Location = new System.Drawing.Point(95, 106);
+			this.but90days.Name = "but90days";
+			this.but90days.Size = new System.Drawing.Size(77, 24);
+			this.but90days.TabIndex = 217;
+			this.but90days.Text = "Last 90 Days";
+			this.but90days.Click += new System.EventHandler(this.but90days_Click);
+			// 
+			// but45days
+			// 
+			this.but45days.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.but45days.Autosize = true;
+			this.but45days.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.but45days.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.but45days.CornerRadius = 4F;
+			this.but45days.Location = new System.Drawing.Point(95, 80);
+			this.but45days.Name = "but45days";
+			this.but45days.Size = new System.Drawing.Size(77, 24);
+			this.but45days.TabIndex = 216;
+			this.but45days.Text = "Last 45 Days";
+			this.but45days.Click += new System.EventHandler(this.but45days_Click);
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(95, 158);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(77, 24);
+			this.butRefresh.TabIndex = 214;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
 			// labelEndDate
 			// 
@@ -1062,6 +1196,22 @@ namespace OpenDental {
 			this.labelStartDate.TabIndex = 210;
 			this.labelStartDate.Text = "Start Date";
 			this.labelStartDate.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDateEnd
+			// 
+			this.textDateEnd.Location = new System.Drawing.Point(95, 31);
+			this.textDateEnd.Name = "textDateEnd";
+			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
+			this.textDateEnd.TabIndex = 213;
+			// 
+			// textDateStart
+			// 
+			this.textDateStart.BackColor = System.Drawing.SystemColors.Window;
+			this.textDateStart.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.textDateStart.Location = new System.Drawing.Point(95, 8);
+			this.textDateStart.Name = "textDateStart";
+			this.textDateStart.Size = new System.Drawing.Size(77, 20);
+			this.textDateStart.TabIndex = 212;
 			// 
 			// groupBoxIndIns
 			// 
@@ -1429,196 +1579,18 @@ namespace OpenDental {
 			this.gridComm.TranslationName = "TableCommLogAccount";
 			this.gridComm.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridComm_CellDoubleClick);
 			// 
-			// butCreditCard
+			// gridPatInfo
 			// 
-			this.butCreditCard.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCreditCard.Autosize = true;
-			this.butCreditCard.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCreditCard.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCreditCard.CornerRadius = 4F;
-			this.butCreditCard.Location = new System.Drawing.Point(22, 103);
-			this.butCreditCard.Name = "butCreditCard";
-			this.butCreditCard.Size = new System.Drawing.Size(137, 26);
-			this.butCreditCard.TabIndex = 216;
-			this.butCreditCard.Text = "Credit Card Manage";
-			this.butCreditCard.UseVisualStyleBackColor = true;
-			this.butCreditCard.Click += new System.EventHandler(this.butCreditCard_Click);
-			// 
-			// textUrgFinNote
-			// 
-			this.textUrgFinNote.AcceptsTab = true;
-			this.textUrgFinNote.BackColor = System.Drawing.Color.White;
-			this.textUrgFinNote.DetectUrls = false;
-			this.textUrgFinNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textUrgFinNote.ForeColor = System.Drawing.Color.Red;
-			this.textUrgFinNote.Location = new System.Drawing.Point(0, 20);
-			this.textUrgFinNote.Name = "textUrgFinNote";
-			this.textUrgFinNote.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
-			this.textUrgFinNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textUrgFinNote.Size = new System.Drawing.Size(178, 77);
-			this.textUrgFinNote.TabIndex = 11;
-			this.textUrgFinNote.Text = "";
-			this.textUrgFinNote.TextChanged += new System.EventHandler(this.textUrgFinNote_TextChanged);
-			this.textUrgFinNote.Leave += new System.EventHandler(this.textUrgFinNote_Leave);
-			// 
-			// textFinNotes
-			// 
-			this.textFinNotes.AcceptsTab = true;
-			this.textFinNotes.DetectUrls = false;
-			this.textFinNotes.Location = new System.Drawing.Point(0, 337);
-			this.textFinNotes.Name = "textFinNotes";
-			this.textFinNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
-			this.textFinNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textFinNotes.Size = new System.Drawing.Size(178, 134);
-			this.textFinNotes.TabIndex = 70;
-			this.textFinNotes.Text = "";
-			this.textFinNotes.TextChanged += new System.EventHandler(this.textFinNotes_TextChanged);
-			this.textFinNotes.Leave += new System.EventHandler(this.textFinNotes_Leave);
-			// 
-			// butToday
-			// 
-			this.butToday.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butToday.Autosize = true;
-			this.butToday.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butToday.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butToday.CornerRadius = 4F;
-			this.butToday.Location = new System.Drawing.Point(95, 54);
-			this.butToday.Name = "butToday";
-			this.butToday.Size = new System.Drawing.Size(77, 24);
-			this.butToday.TabIndex = 220;
-			this.butToday.Text = "Today";
-			this.butToday.Click += new System.EventHandler(this.butToday_Click);
-			// 
-			// butDatesAll
-			// 
-			this.butDatesAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDatesAll.Autosize = true;
-			this.butDatesAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDatesAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDatesAll.CornerRadius = 4F;
-			this.butDatesAll.Location = new System.Drawing.Point(95, 132);
-			this.butDatesAll.Name = "butDatesAll";
-			this.butDatesAll.Size = new System.Drawing.Size(77, 24);
-			this.butDatesAll.TabIndex = 218;
-			this.butDatesAll.Text = "All Dates";
-			this.butDatesAll.Click += new System.EventHandler(this.butDatesAll_Click);
-			// 
-			// but90days
-			// 
-			this.but90days.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.but90days.Autosize = true;
-			this.but90days.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.but90days.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.but90days.CornerRadius = 4F;
-			this.but90days.Location = new System.Drawing.Point(95, 106);
-			this.but90days.Name = "but90days";
-			this.but90days.Size = new System.Drawing.Size(77, 24);
-			this.but90days.TabIndex = 217;
-			this.but90days.Text = "Last 90 Days";
-			this.but90days.Click += new System.EventHandler(this.but90days_Click);
-			// 
-			// but45days
-			// 
-			this.but45days.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.but45days.Autosize = true;
-			this.but45days.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.but45days.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.but45days.CornerRadius = 4F;
-			this.but45days.Location = new System.Drawing.Point(95, 80);
-			this.but45days.Name = "but45days";
-			this.but45days.Size = new System.Drawing.Size(77, 24);
-			this.but45days.TabIndex = 216;
-			this.but45days.Text = "Last 45 Days";
-			this.but45days.Click += new System.EventHandler(this.but45days_Click);
-			// 
-			// butRefresh
-			// 
-			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Autosize = true;
-			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(95, 158);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(77, 24);
-			this.butRefresh.TabIndex = 214;
-			this.butRefresh.Text = "Refresh";
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
-			// 
-			// textDateEnd
-			// 
-			this.textDateEnd.Location = new System.Drawing.Point(95, 31);
-			this.textDateEnd.Name = "textDateEnd";
-			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
-			this.textDateEnd.TabIndex = 213;
-			// 
-			// textDateStart
-			// 
-			this.textDateStart.BackColor = System.Drawing.SystemColors.Window;
-			this.textDateStart.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.textDateStart.Location = new System.Drawing.Point(95, 8);
-			this.textDateStart.Name = "textDateStart";
-			this.textDateStart.Size = new System.Drawing.Size(77, 20);
-			this.textDateStart.TabIndex = 212;
-			// 
-			// butShowNone
-			// 
-			this.butShowNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butShowNone.Autosize = true;
-			this.butShowNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butShowNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butShowNone.CornerRadius = 4F;
-			this.butShowNone.Location = new System.Drawing.Point(677, 207);
-			this.butShowNone.Name = "butShowNone";
-			this.butShowNone.Size = new System.Drawing.Size(58, 16);
-			this.butShowNone.TabIndex = 216;
-			this.butShowNone.Text = "None";
-			this.butShowNone.Visible = false;
-			this.butShowNone.Click += new System.EventHandler(this.butShowNone_Click);
-			// 
-			// butShowAll
-			// 
-			this.butShowAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butShowAll.Autosize = true;
-			this.butShowAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butShowAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butShowAll.CornerRadius = 4F;
-			this.butShowAll.Location = new System.Drawing.Point(614, 207);
-			this.butShowAll.Name = "butShowAll";
-			this.butShowAll.Size = new System.Drawing.Size(53, 16);
-			this.butShowAll.TabIndex = 215;
-			this.butShowAll.Text = "All";
-			this.butShowAll.Visible = false;
-			this.butShowAll.Click += new System.EventHandler(this.butShowAll_Click);
-			// 
-			// butComm
-			// 
-			this.butComm.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butComm.Autosize = true;
-			this.butComm.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butComm.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butComm.CornerRadius = 4F;
-			this.butComm.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butComm.Location = new System.Drawing.Point(3, 31);
-			this.butComm.Name = "butComm";
-			this.butComm.Size = new System.Drawing.Size(98, 26);
-			this.butComm.TabIndex = 94;
-			this.butComm.Text = "Questionnaire";
-			this.butComm.Click += new System.EventHandler(this.butComm_Click);
-			// 
-			// butTrojan
-			// 
-			this.butTrojan.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTrojan.Autosize = true;
-			this.butTrojan.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTrojan.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTrojan.CornerRadius = 4F;
-			this.butTrojan.Location = new System.Drawing.Point(3, 3);
-			this.butTrojan.Name = "butTrojan";
-			this.butTrojan.Size = new System.Drawing.Size(146, 25);
-			this.butTrojan.TabIndex = 93;
-			this.butTrojan.Text = "Send Transaction to Trojan";
-			this.butTrojan.Click += new System.EventHandler(this.butTrojan_Click);
+			this.gridPatInfo.HScrollVisible = false;
+			this.gridPatInfo.Location = new System.Drawing.Point(751, 526);
+			this.gridPatInfo.Name = "gridPatInfo";
+			this.gridPatInfo.ScrollValue = 0;
+			this.gridPatInfo.SelectionMode = OpenDental.UI.GridSelectionMode.None;
+			this.gridPatInfo.Size = new System.Drawing.Size(182, 136);
+			this.gridPatInfo.TabIndex = 217;
+			this.gridPatInfo.Title = "Patient Information";
+			this.gridPatInfo.TranslationName = "TableAccountPat";
+			this.gridPatInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPatInfo_CellDoubleClick);
 			// 
 			// ToolBarMain
 			// 
@@ -1632,6 +1604,7 @@ namespace OpenDental {
 			// 
 			// ContrAccount
 			// 
+			this.Controls.Add(this.gridPatInfo);
 			this.Controls.Add(this.groupBoxIndIns);
 			this.Controls.Add(this.groupBoxFamilyIns);
 			this.Controls.Add(this.gridPayPlan);
@@ -1642,14 +1615,12 @@ namespace OpenDental {
 			this.Controls.Add(this.gridAccount);
 			this.Controls.Add(this.gridComm);
 			this.Controls.Add(this.panelSplitter);
-			this.Controls.Add(this.panelCommButs);
 			this.Controls.Add(this.ToolBarMain);
 			this.Name = "ContrAccount";
 			this.Size = new System.Drawing.Size(939, 732);
 			this.Load += new System.EventHandler(this.ContrAccount_Load);
 			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.ContrAccount_Layout);
 			this.Resize += new System.EventHandler(this.ContrAccount_Resize);
-			this.panelCommButs.ResumeLayout(false);
 			this.panelProgNotes.ResumeLayout(false);
 			this.groupBox7.ResumeLayout(false);
 			this.groupBox6.ResumeLayout(false);
@@ -1690,6 +1661,7 @@ namespace OpenDental {
 					gridAccount,
 					gridAcctPat,
 					gridComm,
+					gridPatInfo,
 					labelInsEst,
 					labelBalance,
 					labelPatEstBal,
@@ -1701,13 +1673,14 @@ namespace OpenDental {
 					but45days,
 					but90days,
 					butDatesAll,
-					butRefresh,
-					butComm
+					butRefresh
 				});
 			LayoutToolBar();
 			if(ViewingInRecall) {
 				panelSplitter.Top=300;//start the splitter higher for recall window.
 			}
+			//This just makes the patient information grid show up or not.
+			_patInfoDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.AccountPatientInformation);
 			LayoutPanels();
 			checkShowFamilyComm.Checked=PrefC.GetBoolSilent(PrefName.ShowAccountFamilyCommEntries,true);
 			Plugins.HookAddCode(this,"ContrAccount.InitializeOnStartup_end");
@@ -1744,6 +1717,14 @@ namespace OpenDental {
 			button.Style=ODToolBarButtonStyle.DropDownButton;
 			button.DropDownMenu=contextMenuStatement;
 			ToolBarMain.Buttons.Add(button);
+			if(PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Questionnaire"),-1,"","Questionnaire"));
+			}
+			if(PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"TrojanCollect"),-1,"","TrojanCollect"));
+			}
 			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.AccountModule);
 			for(int i=0;i<toolButItems.Count;i++) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
@@ -1772,6 +1753,14 @@ namespace OpenDental {
 			gridComm.Top=panelSplitter.Bottom-1;
 			gridComm.Height=Height-gridComm.Top;
 			gridComm.Invalidate();
+			if(_patInfoDisplayFields!=null && _patInfoDisplayFields.Count>0) {
+				gridPatInfo.Height=Height-gridPatInfo.Top;
+				gridPatInfo.Invalidate();
+				gridPatInfo.Visible=true;
+			}
+			else {
+				gridPatInfo.Visible=false;
+			}
 			//panelCommButs.Top=Height-63;//panelSplitter.Bottom-1;
 			panelProgNotes.Top=panelSplitter.Bottom-1;
 			panelProgNotes.Height=Height-panelProgNotes.Top;
@@ -1876,6 +1865,7 @@ namespace OpenDental {
 			FamCur=Patients.GetFamily(patNum);//for now, have to get family after dataset due to aging calc.
 			PatCur=FamCur.GetPatient(patNum);
 			PatientNoteCur=PatientNotes.Refresh(PatCur.PatNum,PatCur.Guarantor);
+			_patFieldList=PatFields.Refresh(patNum);
 			FillSummary();
 			Plugins.HookAddCode(this,"ContrAccount.RefreshModuleData_end",FamCur,PatCur,DataSetMain,PPBalanceTotal,isSelectingFamily);
 		}
@@ -1889,6 +1879,12 @@ namespace OpenDental {
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
 				ToolBarMain.Buttons["Statement"].Enabled=false;
+				if(PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
+					ToolBarMain.Buttons["Questionnaire"].Enabled=false;
+				}
+				if(PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
+					ToolBarMain.Buttons["TrojanCollect"].Enabled=false;
+				}
 				ToolBarMain.Invalidate();
 				textUrgFinNote.Enabled=false;
 				textFinNotes.Enabled=false;
@@ -1904,6 +1900,12 @@ namespace OpenDental {
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
 				ToolBarMain.Buttons["Statement"].Enabled=true;
+				if(PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
+					ToolBarMain.Buttons["Questionnaire"].Enabled=true;
+				}
+				if(PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
+					ToolBarMain.Buttons["TrojanCollect"].Enabled=true;
+				}
 				ToolBarMain.Invalidate();
 				textUrgFinNote.Enabled=true;
 				textFinNotes.Enabled=true;
@@ -1916,6 +1918,7 @@ namespace OpenDental {
 			FillRepeatCharges();//must be in this order. 1.
 			FillPaymentPlans();//2.
 			FillMain();//3.
+			FillPatInfo();
 			LayoutPanels();
 			if(ViewingInRecall || PrefC.GetBoolSilent(PrefName.FuchsOptionsOn,false)) {
 				panelProgNotes.Visible = true;
@@ -2261,10 +2264,8 @@ namespace OpenDental {
 				gridComm.BeginUpdate();
 				gridComm.Rows.Clear();
 				gridComm.EndUpdate();
-				panelCommButs.Enabled = false;
 				return;
 			}
-			panelCommButs.Enabled = true;
 			bool isSelectingFamily=gridAcctPat.GetSelectedIndex()==this.DataSetMain.Tables["patient"].Rows.Count-1;
 			gridComm.BeginUpdate();
 			gridComm.Columns.Clear();
@@ -2530,7 +2531,83 @@ namespace OpenDental {
 					textFamSecDed.Text=dedFam.ToString("F");
 				}
 			}
-		}		
+		}
+
+		private void FillPatInfo() {
+			if(PatCur==null) {
+				gridPatInfo.BeginUpdate();
+				gridPatInfo.Rows.Clear();
+				gridPatInfo.Columns.Clear();
+				gridPatInfo.EndUpdate();
+				return;
+			}
+			gridPatInfo.BeginUpdate();
+			gridPatInfo.Columns.Clear();
+			ODGridColumn col=new ODGridColumn("",80);
+			gridPatInfo.Columns.Add(col);
+			col=new ODGridColumn("",150);
+			gridPatInfo.Columns.Add(col);
+			gridPatInfo.Rows.Clear();
+			ODGridRow row;
+			_patInfoDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.AccountPatientInformation);
+			for(int f=0;f<_patInfoDisplayFields.Count;f++) {
+				row=new ODGridRow();
+				if(_patInfoDisplayFields[f].Description=="") {
+					if(_patInfoDisplayFields[f].InternalName=="PatFields") {
+						//don't add a cell
+					}
+					else {
+						row.Cells.Add(_patInfoDisplayFields[f].InternalName);
+					}
+				}
+				else {
+					if(_patInfoDisplayFields[f].InternalName=="PatFields") {
+						//don't add a cell
+					}
+					else {
+						row.Cells.Add(_patInfoDisplayFields[f].Description);
+					}
+				}
+				switch(_patInfoDisplayFields[f].InternalName) {
+					case "Billing Type":
+						row.Cells.Add(DefC.GetName(DefCat.BillingTypes,PatCur.BillingType));
+						break;
+					case "PatFields":
+						PatField field;
+						for(int i=0;i<PatFieldDefs.List.Length;i++) {
+							if(i>0) {
+								row=new ODGridRow();
+							}
+							row.Cells.Add(PatFieldDefs.List[i].FieldName);
+							field=PatFields.GetByName(PatFieldDefs.List[i].FieldName,_patFieldList);
+							if(field==null) {
+								row.Cells.Add("");
+							}
+							else {
+								if(PatFieldDefs.List[i].FieldType==PatFieldType.Checkbox) {
+									row.Cells.Add("X");
+								}
+								else if(PatFieldDefs.List[i].FieldType==PatFieldType.Currency) {
+									row.Cells.Add(PIn.Double(field.FieldValue).ToString("c"));
+								}
+								else {
+									row.Cells.Add(field.FieldValue);
+								}
+							}
+							row.Tag="PatField"+i.ToString();
+							gridPatInfo.Rows.Add(row);
+						}
+						break;
+				}
+				if(_patInfoDisplayFields[f].InternalName=="PatFields") {
+					//don't add the row here
+				}
+				else {
+					gridPatInfo.Rows.Add(row);
+				}
+			}
+			gridPatInfo.EndUpdate();
+		}
 
 		private void gridAccount_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			DataTable table=DataSetMain.Tables["account"];
@@ -2695,6 +2772,12 @@ namespace OpenDental {
 						break;
 					case "Statement":
 						toolBarButStatement_Click();
+						break;
+					case "Questionnaire":
+						toolBarButComm_Click();
+						break;
+					case "TrojanCollect":
+						toolBarButTrojan_Click();
 						break;
 				}
 			}
@@ -3936,7 +4019,7 @@ namespace OpenDental {
 			//tbAccount.LayoutTables();
 		}
 
-		private void butComm_Click(object sender, System.EventArgs e) {
+		private void toolBarButComm_Click() {
 			FormPat form=new FormPat();
 			form.PatNum=PatCur.PatNum;
 			form.FormDateTime=DateTime.Now;
@@ -3959,7 +4042,7 @@ namespace OpenDental {
 			FormCCM.ShowDialog();
 		}
 
-		private void butTrojan_Click(object sender,EventArgs e) {
+		private void toolBarButTrojan_Click() {
 			FormTrojanCollect FormT=new FormTrojanCollect();
 			FormT.PatNum=PatCur.PatNum;
 			FormT.ShowDialog();
@@ -4028,6 +4111,81 @@ namespace OpenDental {
 		private void gridRepeat_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			FormRepeatChargeEdit FormR=new FormRepeatChargeEdit(RepeatChargeList[e.Row]);
 			FormR.ShowDialog();
+			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void gridPatInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(TerminalActives.PatIsInUse(PatCur.PatNum)) {
+				MsgBox.Show(this,"Patient is currently entering info at a reception terminal.  Please try again later.");
+				return;
+			}
+			if(gridPatInfo.Rows[e.Row].Tag!=null) {
+				//patfield
+				string tag=gridPatInfo.Rows[e.Row].Tag.ToString();
+				tag=tag.Substring(8);//strips off all but the number: PatField1
+				int index=PIn.Int(tag);
+				PatField field=PatFields.GetByName(PatFieldDefs.List[index].FieldName,_patFieldList);
+				if(field==null) {
+					field=new PatField();
+					field.PatNum=PatCur.PatNum;
+					field.FieldName=PatFieldDefs.List[index].FieldName;
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Text) {
+						FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
+						FormPF.IsNew=true;
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.PickList) {
+						FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
+						FormPF.IsNew=true;
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Date) {
+						FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
+						FormPF.IsNew=true;
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Checkbox) {
+						FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
+						FormPF.IsNew=true;
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Currency) {
+						FormPatFieldCurrencyEdit FormPF=new FormPatFieldCurrencyEdit(field);
+						FormPF.IsNew=true;
+						FormPF.ShowDialog();
+					}
+				}
+				else {
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Text) {
+						FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.PickList) {
+						FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Date) {
+						FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Checkbox) {
+						FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
+						FormPF.ShowDialog();
+					}
+					if(PatFieldDefs.List[index].FieldType==PatFieldType.Currency) {
+						FormPatFieldCurrencyEdit FormPF=new FormPatFieldCurrencyEdit(field);
+						FormPF.ShowDialog();
+					}
+				}
+			}
+			else {
+				FormPatientEdit FormP=new FormPatientEdit(PatCur,FamCur);
+				FormP.IsNew=false;
+				FormP.ShowDialog();
+				if(FormP.DialogResult==DialogResult.OK) {
+					OnPatientSelected(PatCur);
+				}
+			}
 			ModuleSelected(PatCur.PatNum);
 		}
 

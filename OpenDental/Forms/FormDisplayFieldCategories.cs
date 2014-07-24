@@ -75,7 +75,7 @@ namespace OpenDental{
 			this.listCategory.FormattingEnabled = true;
 			this.listCategory.Location = new System.Drawing.Point(23, 34);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(155, 121);
+			this.listCategory.Size = new System.Drawing.Size(155, 134);
 			this.listCategory.TabIndex = 57;
 			this.listCategory.DoubleClick += new System.EventHandler(this.listCategory_DoubleClick);
 			// 
@@ -87,7 +87,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(92, 170);
+			this.butOK.Location = new System.Drawing.Point(92, 183);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 56;
@@ -102,7 +102,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(173, 170);
+			this.butCancel.Location = new System.Drawing.Point(173, 183);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -112,7 +112,7 @@ namespace OpenDental{
 			// FormDisplayFieldCategories
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(271, 209);
+			this.ClientSize = new System.Drawing.Size(271, 222);
 			this.Controls.Add(this.listCategory);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label1);
@@ -132,23 +132,65 @@ namespace OpenDental{
 		#endregion
 
 		private void FormDisplayFields_Load(object sender,EventArgs e) {
+			//Alphabetical order.  When new display fields are added this will need to be changed.
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountModule"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountPatientInformation"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AppointmentBubble"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ChartPatientInformation"));
 			//skip None because user not allowed to select that
-			for(int i=1;i<Enum.GetNames(typeof(DisplayFieldCategory)).Length;i++){
-				listCategory.Items.Add(Enum.GetNames(typeof(DisplayFieldCategory))[i]);
-			}
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","OrthoChart"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientInformation"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientSelect"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ProcedureGroupNote"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","RecallList"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","TreatmentPlanModule"));
 			listCategory.SelectedIndex=0;
 		}
 
 		private void listCategory_DoubleClick(object sender,EventArgs e) {
+			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
+			//When new display fields are added this switch statement will need to be changed to match the order set in the load.
+			switch(listCategory.SelectedIndex) {
+				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
+				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
+				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
+				case 3: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
+				case 4: selectedCategory=DisplayFieldCategory.OrthoChart; break;
+				case 5: selectedCategory=DisplayFieldCategory.PatientInformation; break;
+				case 6: selectedCategory=DisplayFieldCategory.PatientSelect; break;
+				case 7: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
+				case 8: selectedCategory=DisplayFieldCategory.RecallList; break;
+				case 9: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+			}
+			if(selectedCategory==DisplayFieldCategory.None) {
+				return;//This could happen if a programmer added a new item to the list and didn't include it in the switch statement above.
+			}
 			FormDisplayFields FormF=new FormDisplayFields();
-			FormF.category=(DisplayFieldCategory)listCategory.SelectedIndex+1;
+			FormF.Category=selectedCategory;
 			FormF.ShowDialog();
 			Close();
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
+			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
+			//When new display fields are added this switch statement will need to be changed to match the order set in the load.
+			switch(listCategory.SelectedIndex) {
+				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
+				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
+				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
+				case 3: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
+				case 4: selectedCategory=DisplayFieldCategory.OrthoChart; break;
+				case 5: selectedCategory=DisplayFieldCategory.PatientInformation; break;
+				case 6: selectedCategory=DisplayFieldCategory.PatientSelect; break;
+				case 7: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
+				case 8: selectedCategory=DisplayFieldCategory.RecallList; break;
+				case 9: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+			}
+			if(selectedCategory==DisplayFieldCategory.None) {  //This should never happen
+				return;
+			}
 			FormDisplayFields FormF=new FormDisplayFields();
-			FormF.category=(DisplayFieldCategory)listCategory.SelectedIndex+1;
+			FormF.Category=selectedCategory;
 			FormF.ShowDialog();
 			Close();
 		}

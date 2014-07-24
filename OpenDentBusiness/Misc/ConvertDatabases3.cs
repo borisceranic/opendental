@@ -5607,7 +5607,24 @@ namespace OpenDentBusiness {
 				else {//oracle
 					//eCW will never use Oracle.
 				}
-
+				//Added AccountShowQuestionnaire preference to show Questionnaire button in account module.  This is set in the Show Features window.  Defaults to false.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AccountShowQuestionnaire','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AccountShowQuestionnaire','0')";
+					Db.NonQ(command);
+				}
+				//Added AccountShowTrojanExpressCollect preference to show TrojanCollect button in account module.  This is set in the Show Features window.  Defaults to false.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AccountShowTrojanExpressCollect','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AccountShowTrojanExpressCollect','0')";
+					Db.NonQ(command);
+				}
 
 
 

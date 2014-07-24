@@ -313,7 +313,12 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("ReferralFrom",0,category));
 				//list.Add(new DisplayField("ReferralTo",0,category));
 				//list.Add(new DisplayField("Language",0,category));
-				//list.Add(new DisplayField("Email",0,category));
+				//list.Add(new DisplayField("Email",0,category));		
+			}
+			else if(category==DisplayFieldCategory.AccountPatientInformation) {
+				//AccountPatientInformation has no default columns.  User must explicitly set up columns.
+				//list.Add(new DisplayField("Billing Type",0,category));
+				//list.Add(new DisplayField("PatFields",0,category));
 			}
 			return list;
 		}
@@ -561,6 +566,10 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("ReferralTo",0,category));
 				list.Add(new DisplayField("Language",0,category));
 				list.Add(new DisplayField("Email",0,category));
+			}
+			else if(category==DisplayFieldCategory.AccountPatientInformation) {
+				list.Add(new DisplayField("Billing Type",0,category));
+				list.Add(new DisplayField("PatFields",0,category));
 			}
 			return list;
 		}

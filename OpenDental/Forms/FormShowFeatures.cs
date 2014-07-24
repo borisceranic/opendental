@@ -30,6 +30,8 @@ namespace OpenDental{
 		private CheckBox checkSuperFam;
 		private Label label1;
 		private CheckBox checkPatClone;
+		private CheckBox checkQuestionnaire;
+		private CheckBox checkTrojanCollect;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -86,6 +88,8 @@ namespace OpenDental{
 			this.checkSuperFam = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkPatClone = new System.Windows.Forms.CheckBox();
+			this.checkQuestionnaire = new System.Windows.Forms.CheckBox();
+			this.checkTrojanCollect = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -97,7 +101,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(377, 372);
+			this.butCancel.Location = new System.Drawing.Point(377, 422);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -112,7 +116,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(377, 331);
+			this.butOK.Location = new System.Drawing.Point(377, 381);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -145,7 +149,7 @@ namespace OpenDental{
 			// 
 			this.checkAdvancedIns.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkAdvancedIns.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAdvancedIns.Location = new System.Drawing.Point(12, 376);
+			this.checkAdvancedIns.Location = new System.Drawing.Point(12, 427);
 			this.checkAdvancedIns.Name = "checkAdvancedIns";
 			this.checkAdvancedIns.Size = new System.Drawing.Size(258, 19);
 			this.checkAdvancedIns.TabIndex = 4;
@@ -285,23 +289,47 @@ namespace OpenDental{
 			this.label1.Text = "The following settings will affect all computers.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
-			// checkPatientClone
+			// checkPatClone
 			// 
 			this.checkPatClone.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPatClone.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkPatClone.Location = new System.Drawing.Point(12, 352);
-			this.checkPatClone.Name = "checkPatientClone";
+			this.checkPatClone.Name = "checkPatClone";
 			this.checkPatClone.Size = new System.Drawing.Size(258, 19);
 			this.checkPatClone.TabIndex = 17;
 			this.checkPatClone.Text = "Patient Clone";
 			this.checkPatClone.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPatClone.Click += new System.EventHandler(this.checkPatClone_Click);
 			// 
+			// checkQuestionnaire
+			// 
+			this.checkQuestionnaire.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkQuestionnaire.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkQuestionnaire.Location = new System.Drawing.Point(12, 377);
+			this.checkQuestionnaire.Name = "checkQuestionnaire";
+			this.checkQuestionnaire.Size = new System.Drawing.Size(258, 19);
+			this.checkQuestionnaire.TabIndex = 18;
+			this.checkQuestionnaire.Text = "Questionnaire";
+			this.checkQuestionnaire.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkTrojanCollect
+			// 
+			this.checkTrojanCollect.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTrojanCollect.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTrojanCollect.Location = new System.Drawing.Point(12, 402);
+			this.checkTrojanCollect.Name = "checkTrojanCollect";
+			this.checkTrojanCollect.Size = new System.Drawing.Size(258, 19);
+			this.checkTrojanCollect.TabIndex = 19;
+			this.checkTrojanCollect.Text = "Trojan Express Collect";
+			this.checkTrojanCollect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormShowFeatures
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(467, 417);
+			this.ClientSize = new System.Drawing.Size(467, 467);
+			this.Controls.Add(this.checkTrojanCollect);
+			this.Controls.Add(this.checkQuestionnaire);
 			this.Controls.Add(this.checkPatClone);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkSuperFam);
@@ -348,6 +376,8 @@ namespace OpenDental{
 			checkEhr.Checked=PrefC.GetBool(PrefName.ShowFeatureEhr);
 			checkSuperFam.Checked=PrefC.GetBool(PrefName.ShowFeatureSuperfamilies);
 			checkPatClone.Checked=PrefC.GetBool(PrefName.ShowFeaturePatientClone);
+			checkQuestionnaire.Checked=PrefC.GetBool(PrefName.AccountShowQuestionnaire);
+			checkTrojanCollect.Checked=PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect);
 		}
 
 		private void checkEhr_Click(object sender,EventArgs e) {
@@ -386,6 +416,8 @@ namespace OpenDental{
 			Prefs.UpdateBool(PrefName.ShowFeatureEhr,checkEhr.Checked);
 			Prefs.UpdateBool(PrefName.ShowFeatureSuperfamilies,checkSuperFam.Checked);
 			Prefs.UpdateBool(PrefName.ShowFeaturePatientClone,checkPatClone.Checked);
+			Prefs.UpdateBool(PrefName.AccountShowQuestionnaire,checkQuestionnaire.Checked);
+			Prefs.UpdateBool(PrefName.AccountShowTrojanExpressCollect,checkTrojanCollect.Checked);
 			DataValid.SetInvalid(InvalidType.Prefs);
 			DialogResult=DialogResult.OK;
 		}

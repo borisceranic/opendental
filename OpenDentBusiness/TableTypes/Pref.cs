@@ -28,6 +28,10 @@ namespace OpenDentBusiness {
 		///<summary>Enum:AccountingSoftware 0=None, 1=Open Dental, 2=QuickBooks</summary>
 		AccountingSoftware,
 		AccountShowPaymentNums,
+		///<summary>Show questionnaire button in account module toolbar.  Set in FormShowFeatures.</summary>
+		AccountShowQuestionnaire,
+		///<summary>Show TrojanCollect button in account module toolbar.  Set in FormShowFeatures.</summary>
+		AccountShowTrojanExpressCollect,
 		ADAComplianceDateTime,
 		ADAdescriptionsReset,
 		///<summary>Enum:ADPCompanyCode Used to generate the export file from FormTimeCardManage. Set in FormTimeCardSetup.</summary>

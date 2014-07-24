@@ -69,7 +69,9 @@ namespace OpenDentBusiness{
 		///<summary>8</summary>
 		OrthoChart,
 		///<summary>9</summary>
-		AppointmentBubble
+		AppointmentBubble,
+		///<summary>10- Account module patient information</summary>
+		AccountPatientInformation
 	}
 	
 

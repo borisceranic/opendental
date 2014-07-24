@@ -29,7 +29,7 @@ namespace OpenDental{
 		private Label labelCategory;
 		private Label labelCustomField;
 		private TextBox textCustomField;
-		public DisplayFieldCategory category;
+		public DisplayFieldCategory Category;
 		///<summary>When this form opens, this is the list of display fields that the user has already explicitly set to be showing.  If the user did not set any to be showing yet, then this will start out as the default list.  Except in ortho, where there is no default list.  For non-ortho categories, this is a subset of AvailList.  As this window is used, items are added to this list but not saved until window closes with OK.  For ortho category, items are also added to this list as the window is used.</summary>
 		private List<DisplayField> ListShowing;
 		///<summary>This is the list of all possible display fields.  If ortho, this list is a combination of current display fields and historical orthochart.FieldNames.  Once the grids on the form are filled, this AvailList is only the items showing in the list at the right.</summary>
@@ -290,13 +290,13 @@ namespace OpenDental{
 		#endregion
 
 		private void FormDisplayFields_Load(object sender,EventArgs e) {
-			labelCategory.Text=category.ToString();
+			labelCategory.Text=Category.ToString();
 			textCustomField.Visible=false;
 			labelCustomField.Visible=false;
 			listAvailable.Height=412;
 			DisplayFields.RefreshCache();
-			ListShowing=DisplayFields.GetForCategory(category);
-			if(category==DisplayFieldCategory.OrthoChart) {
+			ListShowing=DisplayFields.GetForCategory(Category);
+			if(Category==DisplayFieldCategory.OrthoChart) {
 				labeldefault.Visible=false;
 				butDefault.Visible=false;
 				textCustomField.Visible=true;
@@ -308,11 +308,11 @@ namespace OpenDental{
 		}
 
 		private void FillGrids(){
-			AvailList=DisplayFields.GetAllAvailableList(category);//This one needs to be called repeatedly.
+			AvailList=DisplayFields.GetAllAvailableList(Category);//This one needs to be called repeatedly.
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			if(category==DisplayFieldCategory.OrthoChart) {
+			if(Category==DisplayFieldCategory.OrthoChart) {
 				col=new ODGridColumn(Lan.g("FormDisplayFields","Description"),200);
 				gridMain.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("FormDisplayFields","Width"),80);
@@ -330,7 +330,7 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=0;i<ListShowing.Count;i++){
 				row=new ODGridRow();
-				if(category!=DisplayFieldCategory.OrthoChart) {
+				if(Category!=DisplayFieldCategory.OrthoChart) {
 					row.Cells.Add(ListShowing[i].InternalName);
 				}
 				row.Cells.Add(ListShowing[i].Description);
@@ -342,7 +342,7 @@ namespace OpenDental{
 			for(int i=0;i<ListShowing.Count;i++){
 				for(int j=0;j<AvailList.Count;j++) {
 					//Only removing one item from AvailList per iteration of i, so RemoveAt() is safe without going backwards.
-					if(category==DisplayFieldCategory.OrthoChart) {
+					if(Category==DisplayFieldCategory.OrthoChart) {
 						//OrthoChart category does not use InternalNames.
 						if(ListShowing[i].Description==AvailList[j].Description) {
 							AvailList.RemoveAt(j);
@@ -358,7 +358,7 @@ namespace OpenDental{
 				}
 			}
 			listAvailable.Items.Clear();
-			if(category==DisplayFieldCategory.OrthoChart) {
+			if(Category==DisplayFieldCategory.OrthoChart) {
 				for(int i=0;i<AvailList.Count;i++) {
 					listAvailable.Items.Add(AvailList[i].Description);
 				}
@@ -379,7 +379,7 @@ namespace OpenDental{
 				ListShowing[e.Row]=tempField.Copy();
 				return;
 			}
-			if(category==DisplayFieldCategory.OrthoChart) {
+			if(Category==DisplayFieldCategory.OrthoChart) {
 				if(ListShowing[e.Row].Description=="") {
 					ListShowing[e.Row]=tempField.Copy();
 					MsgBox.Show(this,"Description cannot be blank.");
@@ -408,13 +408,13 @@ namespace OpenDental{
 		}
 
 		private void butDefault_Click(object sender,EventArgs e) {
-			ListShowing=DisplayFields.GetDefaultList(category);//empty for ortho
+			ListShowing=DisplayFields.GetDefaultList(Category);//empty for ortho
 			FillGrids();
 			changed=true;
 		}
 
 		private void butLeft_Click(object sender,EventArgs e) {
-			if(category==DisplayFieldCategory.OrthoChart) {//Ortho Chart
+			if(Category==DisplayFieldCategory.OrthoChart) {//Ortho Chart
 				if(listAvailable.SelectedItems.Count==0 && textCustomField.Text=="") {
 					MsgBox.Show(this,"Please select an item in the list on the right or create a new field first.");
 					return;
@@ -533,11 +533,11 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			if(category==DisplayFieldCategory.OrthoChart) {
+			if(Category==DisplayFieldCategory.OrthoChart) {
 				DisplayFields.SaveListForOrthoChart(ListShowing);
 			}
 			else {
-				DisplayFields.SaveListForCategory(ListShowing,category);
+				DisplayFields.SaveListForCategory(ListShowing,Category);
 			}
 			DataValid.SetInvalid(InvalidType.DisplayFields);
 			DialogResult=DialogResult.OK;
