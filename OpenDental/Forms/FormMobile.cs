@@ -626,7 +626,7 @@ namespace OpenDental {
 
 		/// <summary>For testing only</summary>
 		private static void CreateAppointments(int AppointmentCount) {
-			long[] patNumArray=Patients.GetAllPatNums();
+			long[] patNumArray=Patients.GetAllPatNums(true);
 			DateTime appdate= DateTime.Now;
 			for(int i=0;i<patNumArray.Length;i++) {
 				appdate=appdate.AddMinutes(20);
@@ -655,7 +655,7 @@ namespace OpenDental {
 
 		/// <summary>For testing only</summary>
 		private static void CreatePrescriptions(int PrescriptionCount) {
-			long[] patNumArray=Patients.GetAllPatNums();
+			long[] patNumArray=Patients.GetAllPatNums(true);
 			for(int i=0;i<patNumArray.Length;i++) {
 				for(int j=0;j<PrescriptionCount;j++) {
 					RxPat rxpat= new RxPat();
@@ -670,7 +670,7 @@ namespace OpenDental {
 		}
 
 		private static void CreateStatements(int StatementCount) {
-			long[] patNumArray=Patients.GetAllPatNums();
+			long[] patNumArray=Patients.GetAllPatNums(true);
 			for(int i=0;i<patNumArray.Length;i++) {
 				for(int j=0;j<StatementCount;j++) {
 					Statement st= new Statement();

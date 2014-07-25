@@ -20,7 +20,7 @@ namespace OpenDental{
 		///<summary></summary>
 		public double MaxVal;
 		private System.Windows.Forms.Label labelProgress;
-		///<summary></summary>
+		///<summary>Starts as 0.  Progresses to MaxVal.</summary>
 		public double CurrentVal;
 		///<summary>eg: ?currentVal MB of ?maxVal MB copied.  The two parameters will be replaced by numbers using the format based on NumberFormat.  If there are no parameters, then it will just display the text as is.</summary>
 		public string DisplayText;
@@ -30,7 +30,7 @@ namespace OpenDental{
 		public int NumberMultiplication;
 		private Label labelError;
 		public string ErrorMessage;
-		///<summary>Sets the number of milliseconds between ticks. Must be >0, default is 200.</summary>
+		///<summary>Sets the number of milliseconds between ticks.  Default is 0.  If 0, then a value of 200 will be used.</summary>
 		public int TickMS;
 
 		///<summary></summary>
@@ -159,7 +159,7 @@ namespace OpenDental{
 			}
 		}
 		
-		///<summary>Happens every 200 ms</summary>
+		///<summary>Happens every TickMS milliseconds.  Default is 200ms.</summary>
 		private void timer1_Tick(object sender, System.EventArgs e) {
 			Cursor=Cursors.Default;
 			if(!string.IsNullOrEmpty(ErrorMessage)) {

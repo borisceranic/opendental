@@ -1268,12 +1268,18 @@ namespace OpenDentBusiness{
 			return PrefC.GetLong(PrefName.PracticeDefaultProv);
 		}
 
-		///<summary>Gets the list of all valid patient primary keys. Used when checking for missing ADA procedure codes after a user has begun entering them manually. This function is necessary because not all patient numbers are necessarily consecutive (say if the database was created due to a conversion from another program and the customer wanted to keep their old patient ids after the conversion).</summary>
-		public static long[] GetAllPatNums() {
+		///<summary>Gets the list of all valid patient primary keys. Allows user to specify whether to include non-deleted patients. Used when checking for missing ADA procedure codes after a user has begun entering them manually. This function is necessary because not all patient numbers are necessarily consecutive (say if the database was created due to a conversion from another program and the customer wanted to keep their old patient ids after the conversion).</summary>
+		public static long[] GetAllPatNums(bool HasDeleted) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<long[]>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT PatNum From patient";
+			string command="";
+			if(HasDeleted) {
+				command="SELECT PatNum FROM patient";
+			}
+			else {
+				command="SELECT PatNum FROM patient WHERE patient.PatStatus!=4";
+			}
 			DataTable dt=Db.GetTable(command);
 			long[] patnums=new long[dt.Rows.Count];
 			for(int i=0;i<patnums.Length;i++){

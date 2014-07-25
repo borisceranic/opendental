@@ -43,6 +43,7 @@ namespace OpenDentBusiness{
 		CliniView,
 		ClioSoft,
 		DBSWin,
+		DemandForce,
 		DentalEye,
 		DentalStudio,
 		DentForms,

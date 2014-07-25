@@ -83,6 +83,10 @@ namespace OpenDental{
 				DBSWin.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.DemandForce.ToString()) {
+				DemandForce.SendData(prog,pat);
+				return;
+			}
 #if !DISABLE_WINDOWS_BRIDGES
 			else if(prog.ProgName==ProgramName.DentalEye.ToString()) {
 				DentalEye.SendData(prog,pat);

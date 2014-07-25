@@ -1926,6 +1926,60 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
+		///<summary>Returns a dictionary containing the last completed appointment date of each patient.</summary>
+		public static Dictionary<long,DateTime> GetDateLastVisit() {
+			Dictionary<long,DateTime> retVal=new Dictionary<long,DateTime>();
+			string command="SELECT PatNum,MAX(AptDateTime) DateLastAppt "
+					+"FROM appointment "
+					+"WHERE "+DbHelper.DateColumn("AptDateTime")+"<="+DbHelper.Curdate()+" "
+					+"GROUP BY PatNum";
+			DataTable tableLastVisit=Db.GetTable(command);
+			for(int i=0;i<tableLastVisit.Rows.Count;i++) {
+				long patNum=PIn.Long(tableLastVisit.Rows[i]["PatNum"].ToString());
+				DateTime dateLastAppt=PIn.DateT(tableLastVisit.Rows[i]["DateLastAppt"].ToString());
+				retVal.Add(patNum,dateLastAppt);
+			}
+			return retVal;
+		}
+
+		///<summary>Returns a dictionary containing all information of every scheduled, completed, and ASAP appointment made from all non-deleted patients.  Usually used for bridges.</summary>
+		public static Dictionary<long,List<Appointment>> GetAptsForPats(DateTime dateFrom,DateTime dateTo) {
+			Dictionary<long,List<Appointment>> retVal=new Dictionary<long,List<Appointment>>();
+			string command="SELECT * "
+					+"FROM appointment "
+					+"WHERE AptStatus IN (1,2,4) "//Scheduled, Complete, ASAP
+					+"AND "+DbHelper.DateColumn("AptDateTime")+">="+POut.Date(dateFrom)+" AND "+DbHelper.DateColumn("AptDateTime")+"<="+POut.Date(dateTo);
+			List<Appointment> listApts=Crud.AppointmentCrud.SelectMany(command);
+			for(int i=0;i<listApts.Count;i++) {
+				if(retVal.ContainsKey(listApts[i].PatNum)) {
+					retVal[listApts[i].PatNum].Add(listApts[i]);//Add the current appointment to the list of appointments for the patient.
+				}
+				else {
+					retVal.Add(listApts[i].PatNum,new List<Appointment> { listApts[i] });//Initialize the list of appointments for the current patient and include the current appoinment.
+				}
+			}
+			return retVal;
+		}
+
+		/// <summary>Get a dictionary of all procedure codes for all scheduled, ASAP, and completed appointments</summary>
+		public static Dictionary<long,List<long>> GetCodeNumsAllApts() {
+			Dictionary<long,List<long>> retVal=new Dictionary<long,List<long>>();
+			string command="SELECT appointment.AptNum,procedurelog.CodeNum "
+				+"FROM appointment "
+				+"LEFT JOIN procedurelog ON procedurelog.AptNum=appointment.AptNum";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				long aptNum=PIn.Long(table.Rows[i][0].ToString());
+				long codeNum=PIn.Long(table.Rows[i][1].ToString());
+				if(retVal.ContainsKey(aptNum)) {
+					retVal[aptNum].Add(codeNum);//Add the current CodeNum to the list of CodeNums for the appointment.
+				}
+				else {
+					retVal.Add(aptNum,new List<long> { codeNum });//Initialize the list of CodeNums for the current appointment and include the current CodeNum.
+				}
+			}
+			return retVal;
+		}
 
 	}
 }
