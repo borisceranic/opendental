@@ -3652,6 +3652,45 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod(HasBreakDown=true)]
+		public static string ProcedurelogMultipleClaimProcForInsSub(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT patient.PatNum,patient.LName,patient.FName,procedurelog.ProcDate,procedurecode.ProcCode "
+				+"FROM claimproc "
+				+"INNER JOIN procedurelog ON procedurelog.ProcNum=claimproc.ProcNum "
+				+"INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum "
+				+"INNER JOIN patient ON patient.PatNum=claimproc.PatNum "
+				+"WHERE (claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived)+" "
+				+"OR claimproc.Status="+POut.Int((int)ClaimProcStatus.Received)+" "
+				+"OR claimproc.Status="+POut.Int((int)ClaimProcStatus.Estimate)+") "
+				+"GROUP BY claimproc.ProcNum, claimproc.InsSubNum, claimproc.PlanNum "
+					+", patient.PatNum, patient.LName, patient.FName, procedurelog.ProcDate, procedurecode.ProcCode "//For Oracle.
+				+"HAVING COUNT(*)>1 "
+				+"ORDER BY patient.LName, patient.FName, procedurelog.ProcDate, procedurecode.ProcCode";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;   
+			}
+			//There is something to report OR the user has verbose mode on.   
+			log+=Lans.g("FormDatabaseMaintenance","Procedures with multiple claimprocs for the same insurance plan")+": "+table.Rows.Count;
+			if(isCheck) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   "+table.Rows[i]["PatNum"].ToString()+"-"+table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString()
+						+"  Procedure Date: "+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()+"  "+table.Rows[i]["ProcCode"];
+					log+="\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		public static string ProcedurelogProvNumMissing(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
