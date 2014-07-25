@@ -60,6 +60,7 @@ namespace OpenDental{
 		private CheckBox checkQuadAsToothNum;
 		private CheckBox checkLBSessionId;
 		private Label label12;
+		private CheckBox checkHideButChartRx;
 		private Label labelHL7FolderIn;
 
 		///<summary></summary>
@@ -135,6 +136,7 @@ namespace OpenDental{
 			this.checkQuadAsToothNum = new System.Windows.Forms.CheckBox();
 			this.checkLBSessionId = new System.Windows.Forms.CheckBox();
 			this.label12 = new System.Windows.Forms.Label();
+			this.checkHideButChartRx = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -147,7 +149,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(563, 551);
+			this.butCancel.Location = new System.Drawing.Point(563, 560);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -162,7 +164,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(482, 551);
+			this.butOK.Location = new System.Drawing.Point(482, 560);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -365,7 +367,7 @@ namespace OpenDental{
 			this.butDiagnostic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDiagnostic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDiagnostic.CornerRadius = 4F;
-			this.butDiagnostic.Location = new System.Drawing.Point(299, 551);
+			this.butDiagnostic.Location = new System.Drawing.Point(299, 560);
 			this.butDiagnostic.Name = "butDiagnostic";
 			this.butDiagnostic.Size = new System.Drawing.Size(90, 24);
 			this.butDiagnostic.TabIndex = 61;
@@ -501,7 +503,7 @@ namespace OpenDental{
 			// 
 			this.checkQuadAsToothNum.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkQuadAsToothNum.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkQuadAsToothNum.Location = new System.Drawing.Point(23, 521);
+			this.checkQuadAsToothNum.Location = new System.Drawing.Point(23, 519);
 			this.checkQuadAsToothNum.Name = "checkQuadAsToothNum";
 			this.checkQuadAsToothNum.Size = new System.Drawing.Size(199, 18);
 			this.checkQuadAsToothNum.TabIndex = 76;
@@ -528,11 +530,25 @@ namespace OpenDental{
 			this.label12.Text = "Check this box if the medical panel is not working.";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// checkHideButChartRx
+			// 
+			this.checkHideButChartRx.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideButChartRx.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkHideButChartRx.Location = new System.Drawing.Point(12, 538);
+			this.checkHideButChartRx.Name = "checkHideButChartRx";
+			this.checkHideButChartRx.Size = new System.Drawing.Size(211, 21);
+			this.checkHideButChartRx.TabIndex = 79;
+			this.checkHideButChartRx.Text = "Hide Chart Rx Buttons";
+			this.checkHideButChartRx.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideButChartRx.UseVisualStyleBackColor = true;
+			this.checkHideButChartRx.Click += new System.EventHandler(this.checkHideButChartRx_Click);
+			// 
 			// FormEClinicalWorks
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(650, 587);
+			this.ClientSize = new System.Drawing.Size(650, 596);
+			this.Controls.Add(this.checkHideButChartRx);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.checkLBSessionId);
 			this.Controls.Add(this.checkQuadAsToothNum);
@@ -604,6 +620,12 @@ namespace OpenDental{
 			textProgName.Text=ProgramCur.ProgName;
 			textProgDesc.Text=ProgramCur.ProgDesc;
 			checkEnabled.Checked=ProgramCur.Enabled;
+			if(GetProp("HideChartRxButtons")=="1") {
+				checkHideButChartRx.Checked=true;
+			}
+			else {
+				checkHideButChartRx.Checked=false;
+			}
 			SetModeRadioButtons(GetProp("eClinicalWorksMode"));
 			SetModeVisibilities();
 			textECWServer.Text=GetProp("eCWServer");
@@ -790,6 +812,12 @@ namespace OpenDental{
 			else {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","0");
 			}
+			if(checkHideButChartRx.Checked) {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","1");
+			}
+			else {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","0");
+			}
 			if(radioModeTight.Checked || radioModeFull.Checked) {
 				if(radioModeTight.Checked) {
 					ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eClinicalWorksMode","0");//Tight
@@ -823,6 +851,15 @@ namespace OpenDental{
 			}
 			DataValid.SetInvalid(InvalidType.Programs,InvalidType.Prefs);
 			return true;
+		}
+
+		private void checkHideButChartRx_Click(object sender,EventArgs e) {
+			if(checkHideButChartRx.Checked) {
+				checkHideButChartRx.Checked=true;
+			}
+			else {
+				checkHideButChartRx.Checked=false;
+			}
 		}
 
 		private void butDiagnostic_Click(object sender,EventArgs e) {

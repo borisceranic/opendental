@@ -1264,6 +1264,7 @@ namespace OpenDental {
 			else {
 				ev.HasMorePages = true;
 			}
+			g.Dispose();
 		}
 		//
 		// Build Label Display and Add Click to each Label
