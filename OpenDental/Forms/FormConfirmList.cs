@@ -733,7 +733,8 @@ namespace OpenDental{
 				text+=AddrTable.Rows[patientsPrinted]["City"].ToString()+", "
 					+AddrTable.Rows[patientsPrinted]["State"].ToString()+"   "
 					+AddrTable.Rows[patientsPrinted]["Zip"].ToString()+"\r\n";
-				g.DrawString(text,new Font(FontFamily.GenericSansSerif,11),Brushes.Black,xPos,yPos);
+				Rectangle rect=new Rectangle((int)xPos,(int)yPos,275,100);
+				MapAreaRoomControl.FitText(text,new Font(FontFamily.GenericSansSerif,11),Brushes.Black,rect,new StringFormat(),g);
 				//reposition for next label
 				xPos+=275;
 				if(xPos>850){//drop a line
@@ -751,6 +752,7 @@ namespace OpenDental{
 			else{
 				ev.HasMorePages=true;
 			}
+			g.Dispose();
 		}
 
 		///<summary>raised for each page to be printed.</summary>
