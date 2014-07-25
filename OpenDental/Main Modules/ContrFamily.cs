@@ -2057,7 +2057,7 @@ namespace OpenDental{
 				planIsNew=true;
 			}
 			else{
-				FormInsSelectSubscr FormISS=new FormInsSelectSubscr(subscriber.PatNum);
+				FormInsSelectSubscr FormISS=new FormInsSelectSubscr(subscriber.PatNum,PatCur.PatNum);
 				FormISS.ShowDialog();
 				if(FormISS.DialogResult==DialogResult.Cancel) {
 					return;

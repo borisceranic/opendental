@@ -19,11 +19,12 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private long Subscriber;
 		private List <InsSub> SubList;
+		private long _patNum;
 		///<summary>When dialogResult=OK, this will contain the InsSubNum of the selected plan.  If this is 0, then user has selected the 'New' option.</summary>
 		public long SelectedInsSubNum;
 
 		///<summary></summary>
-		public FormInsSelectSubscr(long subscriber)
+		public FormInsSelectSubscr(long subscriber, long patNum)
 		{
 			//
 			// Required for Windows Form Designer support
@@ -31,6 +32,7 @@ namespace OpenDental{
 			InitializeComponent();
 			Lan.F(this);
 			Subscriber=subscriber;
+			_patNum=patNum;
 		}
 
 		/// <summary>
@@ -160,6 +162,10 @@ namespace OpenDental{
 			if(listPlans.SelectedIndex==-1){
 				return;
 			}
+			if(PatPlans.GetCountForPatAndInsSub(SubList[listPlans.SelectedIndex].InsSubNum,_patNum)!=0) {
+				MsgBox.Show(this,"This patient already has this plan attached.  If you would like to add a new plan for the same subscriber and insurance carrier, click new plan.");
+				return;
+			}
 			SelectedInsSubNum=SubList[listPlans.SelectedIndex].InsSubNum;
 			DialogResult=DialogResult.OK;
 		}
@@ -172,6 +178,10 @@ namespace OpenDental{
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(listPlans.SelectedIndex==-1){
 				MsgBox.Show(this,"Please select a plan first.");
+				return;
+			}
+			if(PatPlans.GetCountForPatAndInsSub(SubList[listPlans.SelectedIndex].InsSubNum,_patNum)!=0) {
+				MsgBox.Show(this,"This patient already has this plan attached.  If you would like to add a new plan for the same subscriber and insurance carrier, click new plan.");
 				return;
 			}
 			SelectedInsSubNum=SubList[listPlans.SelectedIndex].InsSubNum;

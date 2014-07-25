@@ -224,6 +224,15 @@ namespace OpenDentBusiness{
 			return PIn.Int(Db.GetCount(command));
 		}
 
+		public static int GetCountForPatAndInsSub(long insSubNum, long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),insSubNum,patNum);
+			}
+			string command="SELECT COUNT(*) FROM patplan WHERE InsSubNum='"+POut.Long(insSubNum)+"' "
+				+"AND PatNum='"+POut.Long(patNum)+"'";
+			return PIn.Int(Db.GetCount(command));
+		}
+
 		///<summary>Will return null if none exists.</summary>
 		public static PatPlan GetPatPlan(long patNum,int ordinal) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
