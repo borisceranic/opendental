@@ -385,11 +385,12 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			if(emailAddress.ServerPort==465) {//implicit
 				//uses System.Web.Mail, which is marked as deprecated, but still supports implicit
+				//http://msdn.microsoft.com/en-us/library/ms877952(v=exchg.65).aspx
 				System.Web.Mail.MailMessage message=new System.Web.Mail.MailMessage();
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpserver",emailAddress.SMTPserver);
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpserverport","465");
-				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusing","2");//sendusing: cdoSendUsingPort, value 2, for sending the message using the network.
-				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate","1");//0=anonymous,1=clear text auth,2=context
+				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusing","2");//sendusing: 1=pickup, 2=port, 3=using microsoft exchange
+				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate","1");//0=anonymous,1=clear text auth,2=context (NTLM)
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusername",emailAddress.EmailUsername.Trim());
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendpassword",emailAddress.EmailPassword);
 				//if(PrefC.GetBool(PrefName.EmailUseSSL)) {
