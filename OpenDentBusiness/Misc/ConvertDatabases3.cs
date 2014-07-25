@@ -4779,6 +4779,19 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.2.21.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_2_23();
+		}
+
+		private static void To14_2_23() {
+			if(FromVersion<new Version("14.2.23.0")) {
+				string command;
+				//We fixed the (403) Forbidden error by getting rid of the redirect, changing the A record for open-dent.com and pointing it to HQ.
+				//Therefore, we now want users to be pointing to open-dent instead of opendental.  This simply undoes what happened at the end of the 14.2.21 method.
+				command=@"UPDATE preference SET ValueString='http://www.open-dent.com/updates/' WHERE PrefName='UpdateWebsitePath' AND ValueString='http://www.opendental.com/updates/'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.2.23.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_3_0();
 		}
 
