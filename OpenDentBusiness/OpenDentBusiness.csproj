@@ -1197,7 +1197,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ODGrid.resx">
@@ -1250,6 +1250,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ApptBackTest.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Patient Info.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

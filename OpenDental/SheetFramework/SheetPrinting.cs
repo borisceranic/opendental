@@ -419,7 +419,7 @@ namespace OpenDental {
 				#endregion
 				#region Load the image into bmpOriginal
 				if(field.FieldName=="Patient Info.gif") {
-					bmpOriginal=Properties.Resources.Patient_Info;
+					bmpOriginal=OpenDentBusiness.Properties.Resources.Patient_Info;
 				}
 				else if(File.Exists(filePathAndName)) {
 					bmpOriginal=new Bitmap(filePathAndName);

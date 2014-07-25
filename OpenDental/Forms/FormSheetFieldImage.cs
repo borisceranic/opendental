@@ -115,7 +115,7 @@ namespace OpenDental {
 				textHeight2.Text=pictureBox.Image.Height.ToString();
 			}
 			else if(comboFieldName.Text=="Patient Info.gif") {
-				pictureBox.Image=Properties.Resources.Patient_Info;
+				pictureBox.Image=OpenDentBusiness.Properties.Resources.Patient_Info;
 				textWidth2.Text=pictureBox.Image.Width.ToString();
 				textHeight2.Text=pictureBox.Image.Height.ToString();
 				textFullPath.Text="Patient Info.gif (internal)";
