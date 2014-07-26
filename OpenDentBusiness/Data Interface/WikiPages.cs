@@ -223,12 +223,12 @@ namespace OpenDentBusiness{
 			//Crud.WikiPageCrud.Update(wikiPage);
 		}*/
 
-		///<summary>Typically returns something similar to \\SERVER\OpenDentImages\Wiki</summary>
+		///<summary>Surround with try/catch.  Typically returns something similar to \\SERVER\OpenDentImages\Wiki</summary>
 		public static string GetWikiPath() {
 			//No need to check RemotingRole; no call to db.
 			string wikiPath;
 			if(!PrefC.AtoZfolderUsed) {
-				throw new ApplicationException("Must be using AtoZ folders.");
+				throw new ApplicationException(Lans.g("WikiPages","Must be using AtoZ folders."));
 			}
 			wikiPath=Path.Combine(ImageStore.GetPreferredAtoZpath(),"Wiki");
 			if(!Directory.Exists(wikiPath)) {
@@ -264,7 +264,14 @@ namespace OpenDentBusiness{
 			matches=Regex.Matches(s,@"\[\[(img:).+?\]\]");
 			foreach(Match match in matches) {
 				string imgName = match.Value.Substring(match.Value.IndexOf(":")+1).TrimEnd("]".ToCharArray());
-				string fullPath=CodeBase.ODFileUtils.CombinePaths(GetWikiPath(),POut.String(imgName));
+				string wikiPath="";
+				try {
+					wikiPath=GetWikiPath();
+				}
+				catch(Exception ex) {
+					throw;
+				}
+				string fullPath=CodeBase.ODFileUtils.CombinePaths(wikiPath,POut.String(imgName));
 				s=s.Replace(match.Value,"<img src=\"file:///"+fullPath.Replace("\\","/")+"\"></img>");//"\" />");
 			}
 			//[[keywords: key1, key2, etc.]]------------------------------------------------------------------------------------------------
@@ -352,9 +359,14 @@ namespace OpenDentBusiness{
 			//There are many ways to parse this.  Our strategy is to do it in a way that the generated xml is never invalid.
 			//As the user types, the above example will frequently be in a state of partial completeness, and the parsing should gracefully continue anyway.
 			//rigorous enforcement only happens when validating during a save, not here.
-			matches=Regex.Matches(s,@"\{\|(.+?)\|\}",RegexOptions.Singleline);
+			matches=Regex.Matches(s,@"(<body>?|[\r\n|\r|\n|]?)({\|(.+?)\|\})(</body>?|[\r\n|\r|\n]?)",RegexOptions.Singleline);//([\r\n|\r|\n]?) checks for a new line
 			foreach(Match match in matches) {
-				string tableStrOrig=match.Value;
+				//If there isn't a new line before the start of the table markup or after the end, the match group value will be an empty string
+				//Tables must start with "'newline'{|" and end with "|}'newline'"
+				if(match.Groups[1].Value=="" || match.Groups[4].Value=="") {
+					throw new ApplicationException(Lans.g("WikiPages","Tables must begin with a new line followed by {| and end with |} followed by a new line."));
+				}
+				string tableStrOrig=match.Groups[2].Value;
 				StringBuilder strbTable=new StringBuilder();
 				string[] lines=tableStrOrig.Split(new string[] { "{|\r\n","\r\n|-\r\n","\r\n|}" },StringSplitOptions.RemoveEmptyEntries);
 				strbTable.AppendLine("<table>");
@@ -419,7 +431,7 @@ namespace OpenDentBusiness{
 			while(true) {//loop to either construct a paragraph, or to immediately add the next tag to strbSnew.
 				iScanInParagraph=s.IndexOf("<",iScanInParagraph);//Advance the scanner to the start of the next tag
 				if(iScanInParagraph==-1) {//there aren't any more tags, so current paragraph goes to end of string.  This won't happen
-					throw new ApplicationException("No tags found.");
+					throw new ApplicationException(Lans.g("WikiPages","No tags found."));
 					//strbSnew.Append(ProcessParagraph(s));
 				}
 				if(s.Substring(iScanInParagraph).StartsWith("</body>")) {
@@ -434,12 +446,12 @@ namespace OpenDentBusiness{
 				tagCurMatch=Regex.Match(s.Substring(iScanInParagraph),"^<.*?>");//regMatch);//.*? means any char, zero or more, as few as possible
 				if(tagCurMatch==null) {
 					//shouldn't happen unless closing bracket is missing
-					throw new ApplicationException("Unexpected tag: "+s.Substring(iScanInParagraph));//message not seen by user, look in FormWikiEdit for relevant error messages.
+					throw new ApplicationException(Lans.g("WikiPages","Unexpected tag:")+" "+s.Substring(iScanInParagraph));
 				}
 				if(tagCurMatch.Value.Trim('<','>').EndsWith("/")) {
 					//self terminating tags NOT are allowed
 					//this should catch all non-allowed self-terminating tags i.e. <br />, <inherits />, etc...
-					throw new ApplicationException("All elements must have a beginning and ending tag. Unexpected tag: "+s.Substring(iScanInParagraph));//not seen by user
+					throw new ApplicationException(Lans.g("WikiPages","All elements must have a beginning and ending tag. Unexpected tag:")+" "+s.Substring(iScanInParagraph));
 				}
 				//Nesting of identical tags causes problems: 
 				//<h1><h1>some text</h1></h1>
@@ -453,7 +465,7 @@ namespace OpenDentBusiness{
 				//Another possible strategy might be to use regular expressions.
 				tagName=tagCurMatch.Value.Split(new string[] { "<"," ",">" },StringSplitOptions.RemoveEmptyEntries)[0];//works with tags like <i>, <span ...>, and <img .../>
 				if(s.IndexOf("</"+tagName+">")==-1) {//this will happen if no ending tag.
-					throw new ApplicationException("No ending tag: "+s.Substring(iScanInParagraph));
+					throw new ApplicationException(Lans.g("WikiPages","No ending tag:")+" "+s.Substring(iScanInParagraph));
 				}
 				switch(tagName){
 					case "a":
@@ -487,7 +499,7 @@ namespace OpenDentBusiness{
 						//scanning will start a totally new paragraph
 						break;
 					default:
-						throw new ApplicationException("Unexpected tag: "+s.Substring(iScanInParagraph));
+						throw new ApplicationException(Lans.g("WikiPages","Unexpected tag:")+" "+s.Substring(iScanInParagraph));
 				}
 			}
 			strbSnew.Append("</body>");
@@ -538,9 +550,16 @@ namespace OpenDentBusiness{
 			StringBuilder strb=null;//this will contain the final output enclosed in <ul> or <ol> tags.
 			for(int i=0;i<lines.Length;i++) {
 				if(blockOriginal==null) {//we are still hunting for the first line of a list.
-					if(lines[i].StartsWith(prefixChars)) {//we found the first line of a list.
-						blockOriginal=lines[i]+"\r\n";
+					if(lines[i].StartsWith(prefixChars) || lines[i].StartsWith("<body>"+prefixChars)) {//we found the first line of a list.
+						blockOriginal=lines[i];
+						if(!lines[i].EndsWith("</body>")) {//not the last line of the document, a list item can be on the last line, if it is, do not add the \r\n
+							blockOriginal+="\r\n";
+						}
 						strb=new StringBuilder();
+						if(lines[i].StartsWith("<body>")) {
+							strb.Append("<body>");
+							lines[i]=lines[i].Substring(6);//strip off body opening tag
+						}
 						if(prefixChars.Contains("*")) {
 							strb.Append("<ul>\r\n");
 						}
@@ -550,8 +569,27 @@ namespace OpenDentBusiness{
 						lines[i]=lines[i].Substring(prefixChars.Length);//strip off the prefixChars
 						strb.Append("<li><span class='ListItemContent'>");
 						//lines[i]=lines[i].Replace("  ","[[nbsp]][[nbsp]]");//handle extra spaces.  We may move this to someplace more global
-						strb.Append(lines[i]);
+						if(lines[i].EndsWith("</body>")) {
+							strb.Append(lines[i].Substring(0,lines[i].Length-7));
+						}
+						else {
+							strb.Append(lines[i]);
+						}
 						strb.Append("</span></li>\r\n");
+						if(lines[i].EndsWith("</body>")) {//ends with body tag, so last line is a list item, close the body and replace in original string
+							if(prefixChars.Contains("*")) {
+								strb.Append("</ul>");
+							}
+							else if(prefixChars.Contains("#")) {
+								strb.Append("</ol>");
+							}
+							strb.Append("</body>");
+							//manually replace just the first occurance of the identified list.
+							s=s.Substring(0,s.IndexOf(blockOriginal))
+							+strb.ToString()
+							+s.Substring(s.IndexOf(blockOriginal)+blockOriginal.Length);
+							blockOriginal=null;
+						}
 					}
 					else {//no list
 						//nothing to do
@@ -559,12 +597,34 @@ namespace OpenDentBusiness{
 				}
 				else {//we are already building our list
 					if(lines[i].StartsWith(prefixChars)) {//we found another line of a list.  Could be a middle line or the last line.
-						blockOriginal+=lines[i]+"\r\n";
+						blockOriginal+=lines[i];
+						if(!lines[i].EndsWith("</body>")) {
+							blockOriginal+="\r\n";
+						}
 						lines[i]=lines[i].Substring(prefixChars.Length);//strip off the prefixChars
 						strb.Append("<li><span class='ListItemContent'>");
 						//lines[i]=lines[i].Replace("  ","[[nbsp]][[nbsp]]");//handle extra spaces.  We may move this to someplace more global
-						strb.Append(lines[i]);
+						if(lines[i].EndsWith("</body>")) {
+							strb.Append(lines[i].Substring(0,lines[i].Length-7));
+						}
+						else {
+							strb.Append(lines[i]);
+						}
 						strb.Append("</span></li>\r\n");
+						if(lines[i].EndsWith("</body>")) {
+							if(prefixChars.Contains("*")) {
+								strb.Append("</ul>\r\n");
+							}
+							else if(prefixChars.Contains("#")) {
+								strb.Append("</ol>\r\n");
+							}
+							strb.Append("</body>");
+							//manually replace just the first occurance of the identified list.
+							s=s.Substring(0,s.IndexOf(blockOriginal))
+							+strb.ToString()
+							+s.Substring(s.IndexOf(blockOriginal)+blockOriginal.Length);
+							blockOriginal=null;
+						}
 					}
 					else {//end of list.  The previous line was the last line.
 						if(prefixChars.Contains("*")) {

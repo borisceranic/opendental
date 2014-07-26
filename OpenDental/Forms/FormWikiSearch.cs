@@ -31,12 +31,18 @@ namespace OpenDental {
 		private void LoadWikiPage(string WikiPageTitleCur) {
 			webBrowserWiki.AllowNavigation=true;
 			butRestore.Enabled=false;
-			if(checkDeletedOnly.Checked) {
-				webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPageHists.GetDeletedByTitle(WikiPageTitleCur).PageContent,true);
-				butRestore.Enabled=true;
+			try {
+				if(checkDeletedOnly.Checked) {
+					webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPageHists.GetDeletedByTitle(WikiPageTitleCur).PageContent,true);
+					butRestore.Enabled=true;
+				}
+				else {
+					webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPages.GetByTitle(WikiPageTitleCur).PageContent,true);
+				}
 			}
-			else {
-				webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPages.GetByTitle(WikiPageTitleCur).PageContent,true);
+			catch(Exception ex) {
+				webBrowserWiki.DocumentText="";
+				MessageBox.Show(this,Lan.g(this,"This page is broken and cannot be viewed.  Error message:")+" "+ex.Message);
 			}
 		}
 

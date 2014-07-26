@@ -31,7 +31,16 @@ namespace OpenDental {
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Image Name"),70);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
-			string[] fileNames=System.IO.Directory.GetFiles(WikiPages.GetWikiPath());//All files from the wiki file path, including images and other files.
+			string wikiPath="";
+			try {
+				wikiPath=WikiPages.GetWikiPath();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(this,ex.Message);
+				DialogResult=DialogResult.Cancel;
+				return;
+			}
+			string[] fileNames=System.IO.Directory.GetFiles(wikiPath);//All files from the wiki file path, including images and other files.
 			ImageNamesList=new List<string>();
 			for(int i=0;i<fileNames.Length;i++) {
 				//If the user has entered a search keyword, then only show file names which contain the keyword.
@@ -98,9 +107,17 @@ namespace OpenDental {
 				return;
 			}
 			Invalidate();
+			string wikiPath="";
+			try {
+				wikiPath=WikiPages.GetWikiPath();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(this,ex.Message);
+				return;
+			}
 			foreach(string fileName in openFD.FileNames) {
 				//check file types?
-				string destinationPath=WikiPages.GetWikiPath()+"\\"+Path.GetFileName(fileName);
+				string destinationPath=wikiPath+"\\"+Path.GetFileName(fileName);
 				if(File.Exists(destinationPath)){
 					switch(MessageBox.Show(Lan.g(this,"Overwrite Existing File")+": "+destinationPath,"",MessageBoxButtons.YesNoCancel)){
 						case DialogResult.No://rename, do not overwrite
@@ -111,7 +128,7 @@ namespace OpenDental {
 								continue;//cancel, next file.
 							}
 							bool cancel=false;
-							while(File.Exists(WikiPages.GetWikiPath()+"\\"+ip.textResult.Text) && !cancel){
+							while(File.Exists(wikiPath+"\\"+ip.textResult.Text) && !cancel){
 								MsgBox.Show(this,"File name already exists.");
 								if(ip.ShowDialog()!=DialogResult.OK) {
 									cancel=true;
@@ -120,7 +137,7 @@ namespace OpenDental {
 							if(cancel) {
 								continue;//cancel rename, and go to next file.
 							}
-							destinationPath=WikiPages.GetWikiPath()+"\\"+ip.textResult.Text;
+							destinationPath=wikiPath+"\\"+ip.textResult.Text;
 							break;//proceed to save file.
 						case DialogResult.Yes://overwrite
 							try {
