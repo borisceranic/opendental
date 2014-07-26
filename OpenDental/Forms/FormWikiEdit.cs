@@ -539,6 +539,14 @@ namespace OpenDental {
 		}
 
 		private void Image_Click() {
+			//if not using AtoZ folder, GetWikiPath with throw an exception, must be using AtoZ folder to use images in the wiki
+			try {
+				WikiPages.GetWikiPath();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(this,ex.Message);
+				return;
+			}
 			FormWikiImages FormWI = new FormWikiImages();
 			FormWI.ShowDialog();
 			if(FormWI.DialogResult!=DialogResult.OK) {
@@ -586,7 +594,13 @@ namespace OpenDental {
 				}
 			}
 			//image validation-----------------------------------------------------------------------------------------------------
-			string wikiImagePath=WikiPages.GetWikiPath();//this also creates folder if it's missing.
+			string wikiImagePath="";
+			try {
+				wikiImagePath=WikiPages.GetWikiPath();//this also creates folder if it's missing.
+			}
+			catch(Exception ex) {
+				//do nothing, the wikiImagePath is only important if the user adds an image to the wiki page and is checked below
+			}
 			MatchCollection matches=Regex.Matches(textContent.Text,@"\[\[(img:).*?\]\]");// [[img:myimage.jpg]]
 			if(matches.Count>0 && !PrefC.AtoZfolderUsed) {
 				MsgBox.Show(this,"Cannot use images in wiki if storing images in database.");
@@ -670,10 +684,18 @@ namespace OpenDental {
 			//|Cell A||Cell B||Cell C 
 			//|}
 			//Although this is rarely needed, it might still come in handy in certain cases, like paste, or when user doesn't add the |} until later, and other hacks.
-			matches=Regex.Matches(s,@"\{\|(.+?)\|\}",RegexOptions.Singleline);
+			matches=Regex.Matches(s,@"(<body>?|[\r\n|\r|\n]?)(\{\|(.+?)\|\})(</body>?|[\r\n|\r|\n]?)",RegexOptions.Singleline);
 			foreach(Match match in matches) {
-				lines=match.Value.Split(new string[] { "{|\r\n","\r\n|-\r\n","\r\n|}" },StringSplitOptions.RemoveEmptyEntries);
-				if(!match.Value.StartsWith("{|")) {
+				if(match.Groups[1].Value=="") {
+					MsgBox.Show(this,"A table markup section must begin with {| on a new line.");
+					return false;
+				}
+				if(match.Groups[4].Value=="") {
+					MsgBox.Show(this,"A table markup section must end with |} on a new line by itself.");
+					return false;
+				}
+				lines=match.Groups[2].Value.Split(new string[] { "{|\r\n","\r\n|-\r\n","\r\n|}" },StringSplitOptions.RemoveEmptyEntries);
+				if(!match.Groups[2].Value.StartsWith("{|")) {
 					MsgBox.Show(this,"The first line of a table markup section must be exactly {|, with no additional characters.");
 					return false;
 				}
@@ -704,8 +726,8 @@ namespace OpenDental {
 					//lines[i].in
 					//I guess we don't really care what they put in a row.  We can just interpret garbage as a single cell.
 				}
-				if(!match.Value.EndsWith("\r\n|}")) {
-					MsgBox.Show(this,"The last line of a table markup section must be exactly |}, with no additional characters.");//this doesn't work since the match stops after |}.
+				if(!match.Groups[2].Value.EndsWith("\r\n|}")) {
+					MsgBox.Show(this,"The last line of a table markup section must be exactly |}, with no additional characters.");
 					return false;
 				}
 			}

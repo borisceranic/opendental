@@ -79,7 +79,13 @@ namespace OpenDental {
 				return;
 			}
 			WikiPageCur=wpage;
-			webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPageCur.PageContent,false);
+			try {
+				webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPageCur.PageContent,false);
+			}
+			catch(Exception ex) {
+				webBrowserWiki.DocumentText="";
+				MessageBox.Show(this,Lan.g(this,"This page is broken and cannot be viewed.  Error message:")+" "+ex.Message);
+			}
 			Text="Wiki - "+WikiPageCur.PageTitle;
 			#region historyMaint
 			//This region is duplicated in webBrowserWiki_Navigating() for external links.  Modifications here will need to be reflected there.
