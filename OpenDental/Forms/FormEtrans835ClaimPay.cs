@@ -33,13 +33,13 @@ namespace OpenDental {
 		private Patient _patCur;
 		private Family _famCur;
 		private List<InsPlan> _listPlans;
-		private List<PatPlan> _listPatPlans;		
+		private List<PatPlan> _listPatPlans;
 		private List<InsSub> _listInsSubs;
 		private Hx835_Claim _claimPaid;
 		private decimal _claimAdjAmtSum;
 		private decimal _procAdjAmtSum;
 		///<summary>The claim procs shown in the grid.  These procs are saved to/from the grid, but changes are not saved to the database unless the OK button is pressed or an individual claim proc is double-clicked for editing.</summary>
-		public ClaimProc[] ClaimProcsToEdit;
+		private List <ClaimProc> _listClaimProcsForClaim;
 
 		///<summary></summary>
 		public FormEtrans835ClaimPay(Hx835_Claim claimPaid,Patient patCur,Family famCur,List<InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList) {
@@ -338,7 +338,7 @@ namespace OpenDental {
 			this.Name = "FormEtrans835ClaimPay";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Enter Payment";
+			this.Text = "Enter ERA Payment";
 			this.Activated += new System.EventHandler(this.FormEtrans835ClaimPay_Activated);
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimPay_Load);
 			this.Shown += new System.EventHandler(this.FormEtrans835ClaimPay_Shown);
@@ -354,7 +354,7 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835ClaimPay_Shown(object sender,EventArgs e) {
-			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,_listPlans);
+			InsPlan plan=InsPlans.GetPlan(_listClaimProcsForClaim[0].PlanNum,_listPlans);
 			if(plan.AllowedFeeSched!=0){//allowed fee sched
 				gridMain.SetSelected(new Point(7,0));//Allowed, first row.
 			}
@@ -505,32 +505,33 @@ namespace OpenDental {
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			Procedure ProcCur;
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
+			_listClaimProcsForClaim=ClaimProcs.RefreshForClaim(_claimPaid.GetOriginalClaimNum());
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
 				row=new ODGridRow();
-				row.Cells.Add(ClaimProcsToEdit[i].ProcDate.ToShortDateString());
-				row.Cells.Add(Providers.GetAbbr(ClaimProcsToEdit[i].ProvNum));
-				if(ClaimProcsToEdit[i].ProcNum==0) {
+				row.Cells.Add(_listClaimProcsForClaim[i].ProcDate.ToShortDateString());
+				row.Cells.Add(Providers.GetAbbr(_listClaimProcsForClaim[i].ProvNum));
+				if(_listClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");
 					row.Cells.Add("");
 					row.Cells.Add(Lan.g(this,"Total Payment"));
 				}
 				else {
-					ProcCur=Procedures.GetProcFromList(_listProcs,ClaimProcsToEdit[i].ProcNum);
+					ProcCur=Procedures.GetProcFromList(_listProcs,_listClaimProcsForClaim[i].ProcNum);
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
 					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
 				}
-				row.Cells.Add(ClaimProcsToEdit[i].FeeBilled.ToString("F"));
-				row.Cells.Add(ClaimProcsToEdit[i].DedApplied.ToString("F"));
-				if(ClaimProcsToEdit[i].AllowedOverride==-1){
+				row.Cells.Add(_listClaimProcsForClaim[i].FeeBilled.ToString("F"));
+				row.Cells.Add(_listClaimProcsForClaim[i].DedApplied.ToString("F"));
+				if(_listClaimProcsForClaim[i].AllowedOverride==-1){
 					row.Cells.Add("");
 				}
 				else{
-					row.Cells.Add(ClaimProcsToEdit[i].AllowedOverride.ToString("F"));
+					row.Cells.Add(_listClaimProcsForClaim[i].AllowedOverride.ToString("F"));
 				}
-				row.Cells.Add(ClaimProcsToEdit[i].InsPayAmt.ToString("F"));
-				row.Cells.Add(ClaimProcsToEdit[i].WriteOff.ToString("F"));
-				switch(ClaimProcsToEdit[i].Status){
+				row.Cells.Add(_listClaimProcsForClaim[i].InsPayAmt.ToString("F"));
+				row.Cells.Add(_listClaimProcsForClaim[i].WriteOff.ToString("F"));
+				switch(_listClaimProcsForClaim[i].Status){
 					case ClaimProcStatus.Received:
 						row.Cells.Add("Recd");
 						break;
@@ -550,13 +551,13 @@ namespace OpenDental {
 					//Estimate would never show here
 					//Cap would never show here
 				}
-				if(ClaimProcsToEdit[i].ClaimPaymentNum>0){
+				if(_listClaimProcsForClaim[i].ClaimPaymentNum>0){
 					row.Cells.Add("X");
 				}
 				else{
 					row.Cells.Add("");
 				}
-				row.Cells.Add(ClaimProcsToEdit[i].Remarks);
+				row.Cells.Add(_listClaimProcsForClaim[i].Remarks);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -573,7 +574,7 @@ namespace OpenDental {
 			}
 			List<ClaimProcHist> histList=null;
 			List<ClaimProcHist> loopList=null;
-			FormClaimProc FormCP=new FormClaimProc(ClaimProcsToEdit[e.Row],null,_famCur,_patCur,_listPlans,histList,ref loopList,_listPatPlans,false,_listInsSubs);
+			FormClaimProc FormCP=new FormClaimProc(_listClaimProcsForClaim[e.Row],null,_famCur,_patCur,_listPlans,histList,ref loopList,_listPatPlans,false,_listInsSubs);
 			FormCP.IsInClaim=true;
 			//no need to worry about permissions here
 			FormCP.ShowDialog();
@@ -597,7 +598,7 @@ namespace OpenDental {
 			double writeOff=0;
 			//double amt;
 			for(int i=0;i<gridMain.Rows.Count;i++){
-				claimFee+=ClaimProcsToEdit[i].FeeBilled;//5
+				claimFee+=_listClaimProcsForClaim[i].FeeBilled;//5
 				try{//6.deduct
 					dedApplied+=Convert.ToDouble(gridMain.Rows[i].Cells[6].Text);
 				}catch{}
@@ -659,17 +660,17 @@ namespace OpenDental {
 					}
 				}
 			}
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
-				ClaimProcsToEdit[i].DedApplied=PIn.Double(gridMain.Rows[i].Cells[6].Text);
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+				_listClaimProcsForClaim[i].DedApplied=PIn.Double(gridMain.Rows[i].Cells[6].Text);
 				if(gridMain.Rows[i].Cells[7].Text==""){
-					ClaimProcsToEdit[i].AllowedOverride=-1;
+					_listClaimProcsForClaim[i].AllowedOverride=-1;
 				}
 				else{
-					ClaimProcsToEdit[i].AllowedOverride=PIn.Double(gridMain.Rows[i].Cells[7].Text);
+					_listClaimProcsForClaim[i].AllowedOverride=PIn.Double(gridMain.Rows[i].Cells[7].Text);
 				}
-				ClaimProcsToEdit[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[8].Text);
-				ClaimProcsToEdit[i].WriteOff=PIn.Double(gridMain.Rows[i].Cells[9].Text);
-				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[12].Text;
+				_listClaimProcsForClaim[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[8].Text);
+				_listClaimProcsForClaim[i].WriteOff=PIn.Double(gridMain.Rows[i].Cells[9].Text);
+				_listClaimProcsForClaim[i].Remarks=gridMain.Rows[i].Cells[12].Text;
 			}
 		}
 
@@ -687,12 +688,12 @@ namespace OpenDental {
 			}
 			Double dedAmt=0;
 			//remove the existing deductible from each procedure and move it to dedAmt.
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
-				if(ClaimProcsToEdit[i].DedApplied > 0){
-					dedAmt+=ClaimProcsToEdit[i].DedApplied;
-					ClaimProcsToEdit[i].InsPayEst+=ClaimProcsToEdit[i].DedApplied;//dedAmt might be more
-					ClaimProcsToEdit[i].InsPayAmt+=ClaimProcsToEdit[i].DedApplied;
-					ClaimProcsToEdit[i].DedApplied=0;
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
+				if(_listClaimProcsForClaim[i].DedApplied > 0){
+					dedAmt+=_listClaimProcsForClaim[i].DedApplied;
+					_listClaimProcsForClaim[i].InsPayEst+=_listClaimProcsForClaim[i].DedApplied;//dedAmt might be more
+					_listClaimProcsForClaim[i].InsPayAmt+=_listClaimProcsForClaim[i].DedApplied;
+					_listClaimProcsForClaim[i].DedApplied=0;
 				}
 			}
 			if(dedAmt==0){
@@ -700,9 +701,9 @@ namespace OpenDental {
 				return;
 			}
 			//then move dedAmt to the selected proc
-			ClaimProcsToEdit[gridMain.SelectedCell.Y].DedApplied=dedAmt;
-			ClaimProcsToEdit[gridMain.SelectedCell.Y].InsPayEst-=dedAmt;
-			ClaimProcsToEdit[gridMain.SelectedCell.Y].InsPayAmt-=dedAmt;
+			_listClaimProcsForClaim[gridMain.SelectedCell.Y].DedApplied=dedAmt;
+			_listClaimProcsForClaim[gridMain.SelectedCell.Y].InsPayEst-=dedAmt;
+			_listClaimProcsForClaim[gridMain.SelectedCell.Y].InsPayAmt-=dedAmt;
 			FillGridProcedures();
 		}
 
@@ -721,13 +722,13 @@ namespace OpenDental {
 			//fix later: does not take into account other payments.
 			double unpaidAmt=0;
 			List<Procedure> ProcList=Procedures.Refresh(_patCur.PatNum);
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
-				unpaidAmt=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum).ProcFee
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
+				unpaidAmt=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum).ProcFee
 					//((Procedure)Procedures.HList[ClaimProcsToEdit[i].ProcNum]).ProcFee
-					-ClaimProcsToEdit[i].DedApplied
-					-ClaimProcsToEdit[i].InsPayAmt;
+					-_listClaimProcsForClaim[i].DedApplied
+					-_listClaimProcsForClaim[i].InsPayAmt;
 				if(unpaidAmt > 0){
-					ClaimProcsToEdit[i].WriteOff=unpaidAmt;
+					_listClaimProcsForClaim[i].WriteOff=unpaidAmt;
 				}
 			}
 			FillGridProcedures();
@@ -746,7 +747,7 @@ namespace OpenDental {
 				return;
 			}
 			//if no allowed fee schedule, then nothing to do
-			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,_listPlans);
+			InsPlan plan=InsPlans.GetPlan(_listClaimProcsForClaim[0].PlanNum,_listPlans);
 			if(plan.AllowedFeeSched==0){//no allowed fee sched
 				//plan.PlanType!="p" && //not ppo, and 
 				return;
@@ -771,9 +772,9 @@ namespace OpenDental {
 			long codeNum;
 			List<Procedure> ProcList=Procedures.Refresh(_patCur.PatNum);
 			Procedure proc;
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
 				//this gives error message if proc not found:
-				proc=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
+				proc=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
 				codeNum=proc.CodeNum;
 				if(codeNum==0){
 					continue;

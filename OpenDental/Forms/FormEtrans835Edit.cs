@@ -230,23 +230,15 @@ namespace OpenDental {
 			List<InsSub> listInsSubs=InsSubs.RefreshForFam(fam);
 			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
 			List<PatPlan> listPatPlans=PatPlans.Refresh(claim.PatNum);
-			List <ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
+			if(claim.ClaimStatus=="R") {
+				//Do not fill payments if the claim is already received.
+				FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,pat,fam,listInsPlans,listPatPlans,listInsSubs);
+				formP.ShowDialog();
+				return true;
+			}
 			if(claimPaid.ListProcs.Count==0) {//Procedure detail not provided with payment.  Enter by total.
 				if(claim.ClaimType=="Cap") {
 					return false;//Capitation claims should not be entered by total because the insurance payment would affect the patient balance.
-				}
-				Double dedEst=0;
-				Double payEst=0;
-				for(int i=0;i<listClaimProcsForClaim.Count;i++) {
-					if(listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {
-						continue;
-					}
-					if(listClaimProcsForClaim[i].ProcNum==0) {
-						continue;//also ignore non-procedures.
-					}
-					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					dedEst+=listClaimProcsForClaim[i].DedApplied;
-					payEst+=listClaimProcsForClaim[i].InsPayEst;
 				}
 				ClaimProc ClaimProcCur=new ClaimProc();
 				//ClaimProcs.Cur.ProcNum 
@@ -255,9 +247,9 @@ namespace OpenDental {
 				ClaimProcCur.ProvNum=claim.ProvTreat;
 				//ClaimProcs.Cur.FeeBilled
 				//ClaimProcs.Cur.InsPayEst
-				ClaimProcCur.DedApplied=dedEst;
+				ClaimProcCur.DedApplied=(double)claimPaid.Deductible;
 				ClaimProcCur.Status=ClaimProcStatus.Received;
-				ClaimProcCur.InsPayAmt=payEst;
+				ClaimProcCur.InsPayAmt=(double)claimPaid.InsPaid;
 				//remarks
 				//ClaimProcs.Cur.ClaimPaymentNum
 				ClaimProcCur.PlanNum=claim.PlanNum;
@@ -288,6 +280,7 @@ namespace OpenDental {
 					ClaimProcs.Delete(ClaimProcCur);
 				}
 				else {//Payment was accepted by user.
+					List<ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
 					for(int i=0;i<listClaimProcsForClaim.Count;i++) {
 						if(listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {
 							continue;
