@@ -154,6 +154,12 @@ namespace OpenDental.Bridges {
 							else {
 								writer.WriteAttributeString("status","3");
 							}
+							if(DefC.GetDef(DefCat.ApptConfirmed,apt.Confirmed).ItemName.ToLower()=="unconfirmed") {
+								writer.WriteAttributeString("confirmed","0");
+							}
+							else {
+								writer.WriteAttributeString("confirmed","1");
+							}
 							writer.WriteAttributeString("date",apt.AptDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffK"));
 							writer.WriteAttributeString("duration",(apt.Pattern.Length*5).ToString());
 							if(allAptProcNums.ContainsKey(apt.AptNum)) {
