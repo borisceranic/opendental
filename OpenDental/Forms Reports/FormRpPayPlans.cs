@@ -19,6 +19,7 @@ namespace OpenDental
 	public class FormRpPayPlans:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
+		private CheckBox checkHideCompletePlans;
 		//private int pagesPrinted;
 		private ErrorProvider errorProvider1=new ErrorProvider();
 		//private DataTable BirthdayTable;
@@ -46,44 +47,59 @@ namespace OpenDental
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpPayPlans));
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkHideCompletePlans = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(546,216);
+			this.butCancel.Location = new System.Drawing.Point(546, 216);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 44;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(546,176);
+			this.butOK.Location = new System.Drawing.Point(546, 176);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 43;
 			this.butOK.Text = "Report";
 			this.butOK.Click += new System.EventHandler(this.butReport_Click);
 			// 
+			// checkHideCompletePlans
+			// 
+			this.checkHideCompletePlans.AutoSize = true;
+			this.checkHideCompletePlans.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideCompletePlans.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkHideCompletePlans.Location = new System.Drawing.Point(167, 216);
+			this.checkHideCompletePlans.Name = "checkHideCompletePlans";
+			this.checkHideCompletePlans.Size = new System.Drawing.Size(180, 18);
+			this.checkHideCompletePlans.TabIndex = 45;
+			this.checkHideCompletePlans.Text = "Hide Completed Payment Plans";
+			this.checkHideCompletePlans.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideCompletePlans.UseVisualStyleBackColor = true;
+			// 
 			// FormRpPayPlans
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(660,264);
+			this.ClientSize = new System.Drawing.Size(660, 264);
+			this.Controls.Add(this.checkHideCompletePlans);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -92,12 +108,13 @@ namespace OpenDental
 			this.Text = "Payment Plans Report";
 			this.Load += new System.EventHandler(this.FormRpPayPlans_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 		#endregion
 
 		private void FormRpPayPlans_Load(object sender, System.EventArgs e){
-			
+			checkHideCompletePlans.Checked=true;
 		}
 
 		private void butReport_Click(object sender, System.EventArgs e){
@@ -144,7 +161,11 @@ namespace OpenDental
 				LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
 				//WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
 				//+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
-				+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ORDER BY LName,FName";
+				+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
+			if(checkHideCompletePlans.Checked) {
+				command+="HAVING _paid < _principal ";
+			}
+				command+="ORDER BY LName,FName";
 			DataTable raw=Reports.GetTable(command);
 			//DateTime payplanDate;
 			Patient pat;
