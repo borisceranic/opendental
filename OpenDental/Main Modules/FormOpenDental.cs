@@ -3597,6 +3597,12 @@ namespace OpenDental{
 							continue;//no sound or popup
 							//in other words, popups will always show for my inbox even if popups blocked.
 						}
+						if(tasksPopup[i].TaskListNum==Security.CurUser.TaskListInBox//if my inbox
+							&& Security.CurUser.InboxHidePopups)//and inbox popups blocked
+						{
+							continue;//no sound or popup
+							//in other words, popups will not show for my inbox if InboxHidePopups is enabled.
+						}
 						System.Media.SoundPlayer soundplay=new SoundPlayer(Properties.Resources.notify);
 						soundplay.Play();
 						this.BringToFront();//don't know if this is doing anything.

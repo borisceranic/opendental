@@ -27,12 +27,14 @@ namespace OpenDentBusiness{
 		public long TaskListInBox;
 		/// <summary> Defaults to 3 (regular user) unless specified. Helps populates the Anesthetist, Surgeon, Assistant and Circulator dropdowns properly on FormAnestheticRecord/// </summary>
 		public int AnesthProvType;
-		///<summary>If set to true, the hide popups button will start out pressed for this user.</summary>
+		///<summary>If set to true, the BlockSubsc button will start out pressed for this user.</summary>
 		public bool DefaultHidePopups;
 		///<summary>Gets set to true if strong passwords are turned on, and this user changes their password to a strong password.  We don't store actual passwords, so this flag is the only way to tell.</summary>
 		public bool PasswordIsStrong;
 		///<summary>Only used when userod.ClinicNum is set to not be zero.  Prevents user from having access to other clinics.</summary>
 		public bool ClinicIsRestricted;
+		///<summary>If set to true, the BlockInbox button will start out pressed for this user.</summary>
+		public bool InboxHidePopups;
 
 		public Userod(){
 

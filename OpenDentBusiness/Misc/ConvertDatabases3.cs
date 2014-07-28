@@ -5638,6 +5638,18 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AccountShowTrojanExpressCollect','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE userod ADD InboxHidePopups tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE userod ADD InboxHidePopups number(3)";
+					Db.NonQ(command);
+					command="UPDATE userod SET InboxHidePopups = 0 WHERE InboxHidePopups IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE userod MODIFY InboxHidePopups NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
@@ -5654,8 +5666,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
 
 
 

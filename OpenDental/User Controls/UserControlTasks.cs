@@ -163,11 +163,18 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Task"),1,"","AddTask"));
 			ODToolBarButton button=new ODToolBarButton();
 			button.Style=ODToolBarButtonStyle.ToggleButton;
-			button.Text=Lan.g(this,"BlockPopups");
-			button.ToolTipText=Lan.g(this,"Sounds will still play, but popups will be blocked.");
-			button.Tag="Block";
+			button.Text=Lan.g(this,"BlockSubsc");
+			button.ToolTipText=Lan.g(this,"Popups will be blocked for tasks sent to subscribed task lists.");
+			button.Tag="BlockSubsc";
 			button.Pushed=Security.CurUser.DefaultHidePopups;
 			ToolBarMain.Buttons.Add(button);
+			ODToolBarButton InboxButton=new ODToolBarButton();
+			InboxButton.Style=ODToolBarButtonStyle.ToggleButton;
+			InboxButton.Text=Lan.g(this,"BlockInbox");
+			InboxButton.ToolTipText=Lan.g(this,"Popups will be blocked for tasks sent to user's personal inbox.");
+			InboxButton.Tag="BlockInbox";
+			InboxButton.Pushed=Security.CurUser.InboxHidePopups;
+			ToolBarMain.Buttons.Add(InboxButton);
 			ToolBarMain.Invalidate();
 		}
 
@@ -633,8 +640,11 @@ namespace OpenDental {
 				case "AddTask":
 					AddTask_Clicked();
 					break;
-				case "Block":
-					Block_Clicked();
+				case "BlockSubsc":
+					BlockSubsc_Clicked();
+					break;
+				case "BlockInbox":
+					BlockInbox_Clicked();
 					break;
 			}
 		}
@@ -745,12 +755,29 @@ namespace OpenDental {
 			}
 		}
 
-		private void Block_Clicked() {
-			if(ToolBarMain.Buttons["Block"].Pushed) {
+		private void BlockSubsc_Clicked() {
+			if(ToolBarMain.Buttons["BlockSubsc"].Pushed) {
 				Security.CurUser.DefaultHidePopups=true;
 			}
 			else {
 				Security.CurUser.DefaultHidePopups=false;
+			}
+			try {
+				Userods.Update(Security.CurUser);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+				return;
+			}
+			DataValid.SetInvalid(InvalidType.Security);
+		}
+
+		private void BlockInbox_Clicked() {
+			if(ToolBarMain.Buttons["BlockInbox"].Pushed) {
+				Security.CurUser.InboxHidePopups=true;
+			}
+			else {
+				Security.CurUser.InboxHidePopups=false;
 			}
 			try {
 				Userods.Update(Security.CurUser);
