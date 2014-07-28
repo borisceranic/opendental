@@ -164,26 +164,26 @@ namespace OpenDentBusiness {
 				return subList;
 			}
 			SigButDef occupied=null;
-			int temp1=-1;
-			int temp2=-1;
+			int occupiedIdx=-1;
+			int selectedIdx=-1;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
 					&& subList[i].ButtonIndex==selected.ButtonIndex-1)//and position occupied
 				{
 					occupied=subList[i].Copy();
-					temp1=i;
+					occupiedIdx=i;
 				}
 				if(subList[i].SigButDefNum==selected.SigButDefNum) {
-					temp2=i;
+					selectedIdx=i;
 				}
 			}
-			if(temp1>=0) {
+			if(occupied!=null) {
 				occupied.ButtonIndex++;
-				subList[temp1+1]=occupied;
+				subList[occupiedIdx+1]=occupied;
 				//Update(occupied);
 			}
 			selected.ButtonIndex--;
-			subList[temp2]=selected;
+			subList[selectedIdx]=selected;
 			//Update(selected);
 			return subList;
 		}
@@ -194,27 +194,27 @@ namespace OpenDentBusiness {
 			if(selected.ButtonIndex==20) {
 				throw new ApplicationException(Lans.g("SigButDefs","Max 20 buttons."));
 			}
-			int temp1=-1;
-			int temp2=-1;
+			int occupiedIdx=-1;
+			int selectedIdx=-1;
 			SigButDef occupied=null;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
 					&& (subList[i].ButtonIndex==selected.ButtonIndex+1))//and position occupied
 				{
 					occupied=subList[i].Copy();
-					temp1=i;
+					occupiedIdx=i;
 				}
 				if(subList[i].SigButDefNum==selected.SigButDefNum) {
-					temp2=i;
+					selectedIdx=i;
 				}
 			}
 			if(occupied!=null) {
 				occupied.ButtonIndex--;
-				subList[temp1-1]=occupied;
+				subList[occupiedIdx-1]=occupied;
 				//Update(occupied);
 			}
 			selected.ButtonIndex++;
-			subList[temp2]=selected;
+			subList[selectedIdx]=selected;
 			//Update(selected);
 			return subList;
 		}
