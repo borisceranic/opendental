@@ -541,7 +541,6 @@ namespace OpenDental{
 			this.checkHideButChartRx.Text = "Hide Chart Rx Buttons";
 			this.checkHideButChartRx.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHideButChartRx.UseVisualStyleBackColor = true;
-			this.checkHideButChartRx.Click += new System.EventHandler(this.checkHideButChartRx_Click);
 			// 
 			// FormEClinicalWorks
 			// 
@@ -851,15 +850,6 @@ namespace OpenDental{
 			}
 			DataValid.SetInvalid(InvalidType.Programs,InvalidType.Prefs);
 			return true;
-		}
-
-		private void checkHideButChartRx_Click(object sender,EventArgs e) {
-			if(checkHideButChartRx.Checked) {
-				checkHideButChartRx.Checked=true;
-			}
-			else {
-				checkHideButChartRx.Checked=false;
-			}
 		}
 
 		private void butDiagnostic_Click(object sender,EventArgs e) {
