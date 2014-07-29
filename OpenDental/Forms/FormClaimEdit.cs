@@ -818,10 +818,10 @@ namespace OpenDental{
 			// 
 			// textInsPayEst
 			// 
-			this.textInsPayEst.Location = new System.Drawing.Point(511, 363);
+			this.textInsPayEst.Location = new System.Drawing.Point(535, 363);
 			this.textInsPayEst.Name = "textInsPayEst";
 			this.textInsPayEst.ReadOnly = true;
-			this.textInsPayEst.Size = new System.Drawing.Size(51, 20);
+			this.textInsPayEst.Size = new System.Drawing.Size(63, 20);
 			this.textInsPayEst.TabIndex = 40;
 			this.textInsPayEst.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -3387,7 +3387,7 @@ namespace OpenDental{
 			this.textLabFees.MinVal = -100000000D;
 			this.textLabFees.Name = "textLabFees";
 			this.textLabFees.ReadOnly = true;
-			this.textLabFees.Size = new System.Drawing.Size(51, 20);
+			this.textLabFees.Size = new System.Drawing.Size(63, 20);
 			this.textLabFees.TabIndex = 138;
 			this.textLabFees.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -3491,34 +3491,34 @@ namespace OpenDental{
 			// 
 			// textWriteOff
 			// 
-			this.textWriteOff.Location = new System.Drawing.Point(611, 363);
+			this.textWriteOff.Location = new System.Drawing.Point(659, 363);
 			this.textWriteOff.MaxVal = 100000000D;
 			this.textWriteOff.MinVal = -100000000D;
 			this.textWriteOff.Name = "textWriteOff";
 			this.textWriteOff.ReadOnly = true;
-			this.textWriteOff.Size = new System.Drawing.Size(55, 20);
+			this.textWriteOff.Size = new System.Drawing.Size(63, 20);
 			this.textWriteOff.TabIndex = 113;
 			this.textWriteOff.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// textInsPayAmt
 			// 
-			this.textInsPayAmt.Location = new System.Drawing.Point(561, 363);
+			this.textInsPayAmt.Location = new System.Drawing.Point(597, 363);
 			this.textInsPayAmt.MaxVal = 100000000D;
 			this.textInsPayAmt.MinVal = -100000000D;
 			this.textInsPayAmt.Name = "textInsPayAmt";
 			this.textInsPayAmt.ReadOnly = true;
-			this.textInsPayAmt.Size = new System.Drawing.Size(51, 20);
+			this.textInsPayAmt.Size = new System.Drawing.Size(63, 20);
 			this.textInsPayAmt.TabIndex = 6;
 			this.textInsPayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// textDedApplied
 			// 
-			this.textDedApplied.Location = new System.Drawing.Point(461, 363);
+			this.textDedApplied.Location = new System.Drawing.Point(473, 363);
 			this.textDedApplied.MaxVal = 100000000D;
 			this.textDedApplied.MinVal = -100000000D;
 			this.textDedApplied.Name = "textDedApplied";
 			this.textDedApplied.ReadOnly = true;
-			this.textDedApplied.Size = new System.Drawing.Size(51, 20);
+			this.textDedApplied.Size = new System.Drawing.Size(63, 20);
 			this.textDedApplied.TabIndex = 4;
 			this.textDedApplied.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -4364,16 +4364,16 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-				col=new ODGridColumn(Lan.g("TableClaimProc","Labs"),50,HorizontalAlignment.Right);
+				col=new ODGridColumn(Lan.g("TableClaimProc","Labs"),62,HorizontalAlignment.Right);
 				gridProc.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g("TableClaimProc","Deduct"),50,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Deduct"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Est"),50,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Est"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Pay"),50,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Pay"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","WriteOff"),54,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableClaimProc","WriteOff"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Status"),50,HorizontalAlignment.Center);
 			gridProc.Columns.Add(col);

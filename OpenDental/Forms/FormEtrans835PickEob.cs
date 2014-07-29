@@ -11,12 +11,14 @@ namespace OpenDental {
 
 		private string _messageText835;
 		private List<string> _listEobTranIds;
+		private Etrans _etrans;
 
-		public FormEtrans835PickEob(List <string> listEobTranIds,string messageText835) {
+		public FormEtrans835PickEob(List <string> listEobTranIds,string messageText835,Etrans etrans) {
 			InitializeComponent();
 			Lan.F(this);
 			_listEobTranIds=listEobTranIds;
 			_messageText835=messageText835;
+			_etrans=etrans;
 		}
 		
 		private void FormEtrans835PickEob_Load(object sender,EventArgs e) {
@@ -38,6 +40,7 @@ namespace OpenDental {
 
 		private void gridEobs_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
 			FormEtrans835Edit Form835=new FormEtrans835Edit();
+			Form835.EtransCur=_etrans;
 			Form835.MessageText835=_messageText835;
 			Form835.TranSetId835=_listEobTranIds[gridEobs.SelectedIndices[0]];
 			Form835.Show();
