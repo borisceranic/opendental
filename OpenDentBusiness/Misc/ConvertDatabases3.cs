@@ -5606,6 +5606,106 @@ namespace OpenDentBusiness {
 				    +"'iRYS')";
 					Db.NonQ(command);
 				}//end iRYS bridge
+				//Insert visOra bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'visOra', "
+				    +"'visOra from www.visoraimaging.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\Program Files\Cieos\Cieos Workstation\Cieos.Workstation.Shell.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'visOra')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'visOra', "
+				    +"'visOra from www.visoraimaging.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\Program Files\Cieos\Cieos Workstation\Cieos.Workstation.Shell.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'visOra')";
+					Db.NonQ(command);
+				}//end visOra bridge
+				//Insert Z-Image bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'Z-Image', "
+				    +"'Z-Image from www.visoraimaging.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\Program Files\Zuma\Zuma Workstation\Zuma.Workstation.Shell.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'Z-Image')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'Z-Image', "
+				    +"'Z-Image from www.visoraimaging.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"C:\Program Files\Zuma\Zuma Workstation\Zuma.Workstation.Shell.exe")+"', "
+				    +"'', "
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'Z-Image')";
+					Db.NonQ(command);
+				}//end Z-Image bridge
 				//Add option to hide Rx buttons in Chart Module for eClinicalWorks
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
