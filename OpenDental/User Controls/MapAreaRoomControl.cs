@@ -208,7 +208,7 @@ namespace OpenDental {
 		}
 
 		public void SetWarnColors() {
-			SetColors(Color.White,Color.Black,Color.Orange);
+			SetColors(Color.Black,Color.Black,Color.FromArgb(255,237,102));
 		}
 
 		public void SetAlertColors() {
