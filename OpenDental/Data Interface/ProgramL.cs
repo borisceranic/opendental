@@ -247,6 +247,10 @@ namespace OpenDental{
 				return;
 			}
 #endif
+			else if(prog.ProgName==ProgramName.visOra.ToString()) {
+				Visora.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.VistaDent.ToString()) {
 				VistaDent.SendData(prog,pat);
 				return;
@@ -273,6 +277,10 @@ namespace OpenDental{
 			}
 			else if(prog.ProgName==ProgramName.XVWeb.ToString()) {
 				XVWeb.SendData(prog,pat);
+				return;
+			}
+			else if(prog.ProgName==ProgramName.ZImage.ToString()) {
+				ZImage.SendData(prog,pat);
 				return;
 			}
 			//all remaining programs:

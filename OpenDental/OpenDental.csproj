@@ -249,6 +249,7 @@
     <Compile Include="Bridges\HandyDentist.cs" />
     <Compile Include="Bridges\Irys.cs" />
     <Compile Include="Bridges\PandaPerio.cs" />
+    <Compile Include="Bridges\Visora.cs" />
     <Compile Include="Bridges\VistaDent.cs" />
     <Compile Include="Bridges\DentalStudio.cs" />
     <Compile Include="Bridges\DivvyPostcardService.cs" />
@@ -328,6 +329,7 @@
     <Compile Include="Bridges\VixWin.cs" />
     <Compile Include="Bridges\VixWinOld.cs" />
     <Compile Include="Bridges\XVWeb.cs" />
+    <Compile Include="Bridges\ZImage.cs" />
     <Compile Include="Data Interface\AutomationL.cs" />
     <Compile Include="Data Interface\ClaimL.cs" />
     <Compile Include="Data Interface\ClearinghouseL.cs" />

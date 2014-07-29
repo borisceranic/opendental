@@ -96,6 +96,7 @@ namespace OpenDentBusiness{
 		Tscan,
 		UAppoint,
 		Vipersoft,
+		visOra,
 		VistaDent,
 		VixWin,
 		VixWinBase36,
@@ -103,7 +104,8 @@ namespace OpenDentBusiness{
 		VixWinOld,
 		Xcharge,
 		XDR,
-		XVWeb
+		XVWeb,
+		ZImage
 	}
 
 	
