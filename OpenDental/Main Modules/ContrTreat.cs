@@ -2181,16 +2181,18 @@ namespace OpenDental{
 				note=PlanList[gridPlans.SelectedIndices[0]-1].Note;
 			}
 			char nbsp='\u00A0';
-			//to prevent collapsing of multiple spaces to single spaces.  We only do double spaces to leave single spaces in place.
-			note=note.Replace("  ",nbsp.ToString()+nbsp.ToString());
-			MigraDocHelper.InsertSpacer(section,20);
-			par=section.AddParagraph(note);
-			par.Format.Font=bodyFontx;
-			par.Format.Borders.Color=Colors.Gray;
-			par.Format.Borders.DistanceFromLeft=Unit.FromInch(.05);
-			par.Format.Borders.DistanceFromRight=Unit.FromInch(.05);
-			par.Format.Borders.DistanceFromTop=Unit.FromInch(.05);
-			par.Format.Borders.DistanceFromBottom=Unit.FromInch(.05);
+			if(note!="") {
+				//to prevent collapsing of multiple spaces to single spaces.  We only do double spaces to leave single spaces in place.
+				note=note.Replace("  ",nbsp.ToString()+nbsp.ToString());
+				MigraDocHelper.InsertSpacer(section,20);
+				par=section.AddParagraph(note);
+				par.Format.Font=bodyFontx;
+				par.Format.Borders.Color=Colors.Gray;
+				par.Format.Borders.DistanceFromLeft=Unit.FromInch(.05);
+				par.Format.Borders.DistanceFromRight=Unit.FromInch(.05);
+				par.Format.Borders.DistanceFromTop=Unit.FromInch(.05);
+				par.Format.Borders.DistanceFromBottom=Unit.FromInch(.05);
+			}
 			#endregion
 			//Signature-----------------------------------------------------------------------------------------------------------
 			#region signature
