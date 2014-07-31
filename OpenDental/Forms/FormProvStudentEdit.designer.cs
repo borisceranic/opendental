@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.textFirstName.MaxLength = 15;
 			this.textFirstName.Name = "textFirstName";
 			this.textFirstName.Size = new System.Drawing.Size(166, 20);
-			this.textFirstName.TabIndex = 2;
+			this.textFirstName.TabIndex = 3;
 			this.textFirstName.TextChanged += new System.EventHandler(this.textFirstName_TextChanged);
 			// 
 			// label1
@@ -78,7 +78,7 @@ namespace OpenDental{
 			this.textLastName.MaxLength = 15;
 			this.textLastName.Name = "textLastName";
 			this.textLastName.Size = new System.Drawing.Size(166, 20);
-			this.textLastName.TabIndex = 3;
+			this.textLastName.TabIndex = 2;
 			this.textLastName.TextChanged += new System.EventHandler(this.textLastName_TextChanged);
 			// 
 			// labelUser
@@ -151,11 +151,11 @@ namespace OpenDental{
 			this.textPassword.Size = new System.Drawing.Size(166, 20);
 			this.textPassword.TabIndex = 6;
 			// 
-			// textUniqueID
+			// textProvNum
 			// 
 			this.textProvNum.Location = new System.Drawing.Point(117, 21);
 			this.textProvNum.MaxLength = 15;
-			this.textProvNum.Name = "textUniqueID";
+			this.textProvNum.Name = "textProvNum";
 			this.textProvNum.ReadOnly = true;
 			this.textProvNum.Size = new System.Drawing.Size(60, 20);
 			this.textProvNum.TabIndex = 34;

@@ -18,6 +18,7 @@ namespace OpenDental {
 		private bool _isInstructorSelected=false;
 		private List<SchoolCourse> _schoolCourses;
 		private List<Provider> _provInstructors;
+		private FormQuery FormQuery2;
 
 		public FormEvaluationReport() {
 			InitializeComponent();
@@ -25,9 +26,8 @@ namespace OpenDental {
 		}
 
 		private void FormEvaluationReport_Load(object sender,EventArgs e) {
-			//dateStart.SelectionStart=DateTime.Today.AddMonths(-4);
-			//dateStart.SelectionEnd=DateTime.Today.AddMonths(-4);
-			//dateEnd.SelectionStart=DateTime.Today;
+			textDateStart.Text=DateTime.Today.AddMonths(-4).ToShortDateString();
+			textDateEnd.Text=DateTime.Today.ToShortDateString();
 			FillCourses();
 		}
 
@@ -86,15 +86,15 @@ namespace OpenDental {
 				instructorProvNums.Add(PIn.Long(gridInstructors.Rows[index].Tag.ToString()));
 			}
 			DataTable table=Evaluations.GetFilteredList(schoolCourseNums,instructorProvNums);
-			gridStudent.BeginUpdate();
-			gridStudent.Columns.Clear();
+			gridStudents.BeginUpdate();
+			gridStudents.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormEvaluationReport - Students","ProvNum"),60);
-			gridStudent.Columns.Add(col);
+			gridStudents.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormEvaluationReport - Students","Last Name"),90);
-			gridStudent.Columns.Add(col);
+			gridStudents.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormEvaluationReport - Students","First Name"),90);
-			gridStudent.Columns.Add(col);
-			gridStudent.Rows.Clear();
+			gridStudents.Columns.Add(col);
+			gridStudents.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
 				row=new ODGridRow();
@@ -102,17 +102,9 @@ namespace OpenDental {
 				row.Cells.Add(table.Rows[i]["LName"].ToString());
 				row.Cells.Add(table.Rows[i]["FName"].ToString());
 				row.Tag=table.Rows[i]["StudentNum"].ToString();
-				gridStudent.Rows.Add(row);
+				gridStudents.Rows.Add(row);
 			}
-			gridStudent.EndUpdate();
-		}
-
-		private void checkAllStudents_CheckedChanged(object sender,EventArgs e) {
-			if(checkAllInstructors.Checked) {
-				gridStudent.SetSelected(true);
-				return;
-			}
-			gridStudent.SetSelected(false);
+			gridStudents.EndUpdate();
 		}
 
 		private void checkAllInstructors_CheckedChanged(object sender,EventArgs e) {
@@ -141,6 +133,10 @@ namespace OpenDental {
 			gridCourses.Visible=true;
 		}
 
+		private void butAllStudents_Click(object sender,EventArgs e) {
+			gridStudents.SetSelected(true);
+		}
+
 		private void gridCourses_CellClick(object sender,UI.ODGridClickEventArgs e) {
 			if(!_isCourseSelected) {
 				FillInstructors();
@@ -156,193 +152,137 @@ namespace OpenDental {
 			_isInstructorSelected=true;
 		}
 
-		private void butAverage_Click(object sender,EventArgs e) {
-			//DataTable TableReport=new DataTable();
-			//ReportSimpleGrid report=new ReportSimpleGrid();
-			//List<long> schoolCourseNums=new List<long>();
-			//List<long> instructorProvNums=new List<long>();
-			//for(int i=0;i<gridCourses.SelectedIndices.Length;i++) {
-			//	int index=gridCourses.SelectedIndices[i];
-			//	schoolCourseNums.Add(PIn.Long(gridCourses.Rows[index].Tag.ToString()));
-			//}
-			//for(int i=0;i<gridInstructors.SelectedIndices.Length;i++) {
-			//	int index=gridInstructors.SelectedIndices[i];
-			//	instructorProvNums.Add(PIn.Long(gridInstructors.Rows[index].Tag.ToString()));
-			//}
-			////TODO: Change this query to work with the average once we have decided how to quantify different grading scales
-			//string command="SELECT schoolcourse.CourseID,ins.ProvNum,ins.LName,ins.FName,"
-			//+"stu.ProvNum,stu.LName,stu.FName,gradingscale.Description,evaluation.OverallGradeShowing,evaluation.OverallGradeNumber FROM evaluation "
-			//	+"INNER JOIN provider ins ON ins.ProvNum=evaluation.InstructNum "
-			//	+"INNER JOIN provider stu ON stu.ProvNum=evaluation.StudentNum "
-			//	+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluation.SchoolCourseNum "
-			//	+"INNER JOIN gradingscale ON gradingscale.GradingScaleNum=evaluation.GradingScaleNum "
-			//	+"WHERE TRUE";
-			//if(schoolCourseNums!=null && schoolCourseNums.Count!=0) {
-			//	command+=" AND schoolcourse.SchoolCourseNum IN (";
-			//	for(int i=0;i<schoolCourseNums.Count;i++) {
-			//		command+="'"+POut.Long(schoolCourseNums[i])+"'";
-			//		if(i!=schoolCourseNums.Count-1) {
-			//			command+=",";
-			//			continue;
-			//		}
-			//		command+=")";
-			//	}
-			//}
-			//if(instructorProvNums!=null && instructorProvNums.Count!=0) {
-			//	command+=" AND ins.ProvNum IN (";
-			//	for(int i=0;i<instructorProvNums.Count;i++) {
-			//		command+="'"+POut.Long(instructorProvNums[i])+"'";
-			//		if(i!=instructorProvNums.Count-1) {
-			//			command+=",";
-			//			continue;
-			//		}
-			//		command+=")";
-			//	}
-			//}
-			//command+=" AND evaluation.DateEval BETWEEN "+POut.DateT(dateStart.SelectionStart)+" AND "+POut.DateT(dateEnd.SelectionStart);
-			//command+=" ORDER BY CourseID,ins.ProvNum";
-			//report.Query=command;
-			//FormQuery FormQuery2=new FormQuery(report);
-			//FormQuery2.IsReport=true;
-			//TableReport=report.GetTempTable();
-			//report.TableQ=new DataTable(null);//new table with 10 columns
-			//for(int i=0;i<10;i++) { //add columns
-			//	report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
-			//}
-			//report.InitializeColumns();
-			//float gradeNumber=0;
-			//for(int i=0;i<TableReport.Rows.Count;i++) {
-			//	DataRow row = report.TableQ.NewRow();
-			//	row[0]=TableReport.Rows[i][0];
-			//	row[1]=TableReport.Rows[i][1];
-			//	row[2]=TableReport.Rows[i][2];
-			//	row[3]=TableReport.Rows[i][3];
-			//	row[4]=TableReport.Rows[i][4];
-			//	row[5]=TableReport.Rows[i][5];
-			//	row[6]=TableReport.Rows[i][6];
-			//	row[7]=TableReport.Rows[i][7];
-			//	row[8]=TableReport.Rows[i][8];
-			//	row[9]=TableReport.Rows[i][9];
-			//	gradeNumber+=PIn.Float(TableReport.Rows[i][9].ToString());
-			//	report.TableQ.Rows.Add(row);  //adds row to table Q
-			//}
-			//report.ColTotal[9]=(decimal)gradeNumber/TableReport.Rows.Count;
-			//report.Title="Evaluation Average for Course";
-			//report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			//report.SubTitle.Add(dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString());
-			//FormQuery2.ResetGrid();//necessary won't work without
-			//report.ColPos[0]=10;
-			//report.ColPos[1]=80;
-			//report.ColPos[2]=160;
-			//report.ColPos[3]=260;
-			//report.ColPos[4]=370;
-			//report.ColPos[5]=440;
-			//report.ColPos[6]=530;
-			//report.ColPos[7]=620;
-			//report.ColPos[8]=710;
-			//report.ColPos[9]=770;
-			//report.ColPos[10]=800;
-			//report.ColCaption[0]=Lan.g(this,"Course");
-			//report.ColCaption[1]=Lan.g(this,"InstNum");
-			//report.ColCaption[2]=Lan.g(this,"InstLName");
-			//report.ColCaption[3]=Lan.g(this,"InstFName");
-			//report.ColCaption[4]=Lan.g(this,"StuNum");
-			//report.ColCaption[5]=Lan.g(this,"StuLName");
-			//report.ColCaption[6]=Lan.g(this,"StuFName");
-			//report.ColCaption[7]=Lan.g(this,"GradScale");
-			//report.ColCaption[8]=Lan.g(this,"Grade");
-			//report.ColCaption[8]=Lan.g(this,"Number");
-			//report.ColAlign[0]=HorizontalAlignment.Center;
-			//report.ColAlign[1]=HorizontalAlignment.Center;
-			//report.ColAlign[2]=HorizontalAlignment.Center;
-			//report.ColAlign[3]=HorizontalAlignment.Center;
-			//report.ColAlign[4]=HorizontalAlignment.Center;
-			//report.ColAlign[5]=HorizontalAlignment.Center;
-			//report.ColAlign[6]=HorizontalAlignment.Center;
-			//report.ColAlign[7]=HorizontalAlignment.Center;
-			//report.ColAlign[8]=HorizontalAlignment.Center;
-			//report.ColAlign[8]=HorizontalAlignment.Right;
-			//FormQuery2.ShowDialog();
-
-			////Now to fill Table Q from the temp tables
-			//report.TableQ=new DataTable(null);//new table with 9 columns
-			//for(int i=0;i<9;i++) { //add columns
-			//	report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
-			//}
-			//report.InitializeColumns();
-			//for(int i=0;i<TableReport.Rows.Count;i++) {
-			//	DataRow row = report.TableQ.NewRow();
-			//	row[0]=TableReport.Rows[i];
-			//	row[1]=dates[i].DayOfWeek.ToString();
-			//	row[2]=production.ToString("n");
-			//	row[3]=scheduled.ToString("n");
-			//	row[4]=adjust.ToString("n");
-			//	row[5]=inswriteoff.ToString("n"); //spk 5/19/05
-			//	row[6]=totalproduction.ToString("n");
-			//	row[7]=ptincome.ToString("n");				// spk
-			//	row[8]=insincome.ToString("n");
-			//	report.TableQ.Rows.Add(row);  //adds row to table Q
-			//}
-			//FormQuery FormQuery2=new FormQuery(report);
-			//FormQuery2.IsReport=true;
-			//FormQuery2.ResetGrid();//necessary won't work without
-			//report.Title="Evaluation Average for Course";
-			//report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			//report.SubTitle.Add(dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString());
-			////if(checkAllInstructors.Checked) {
-			////	report.SubTitle.Add(Lan.g(this,"All Instructors"));
-			////}
-			////else {
-			////	string str="";
-			////	for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-			////		if(i>0) {
-			////			str+=", ";
-			////		}
-			////		str+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
-			////	}
-			////	report.SubTitle.Add(str);
-			////}
-			////report.Summary.Add(
-			////	//=Lan.g(this,"Total Production (Production + Scheduled + Adjustments):")+" "
-			////	//+(colTotals[2]+colTotals[3]
-			////	//+colTotals[4]).ToString("c"); //spk 5/19/05
-			////	Lan.g(this,"Total Production (Production + Scheduled + Adj - Writeoff):")+" "
-			////	+(colTotals[2]+colTotals[3]+colTotals[4]
-			////	+colTotals[5]).ToString("c"));
-			////report.Summary.Add("");
-			////report.Summary.Add(
-			////	Lan.g(this,"Total Income (Pt Income + Ins Income):")+" "
-			////	+(colTotals[7]+colTotals[8]).ToString("c"));
-			//report.ColPos[0]=20;
-			//report.ColPos[1]=110;
-			//report.ColPos[2]=190;
-			//report.ColPos[3]=270;
-			//report.ColPos[4]=350;
-			//report.ColPos[5]=420;
-			//report.ColPos[6]=490;
-			//report.ColPos[7]=560;
-			//report.ColPos[8]=630;
-			//report.ColCaption[0]=Lan.g(this,"Course");
-			//report.ColCaption[1]=Lan.g(this,"InstructorNum");
-			//report.ColCaption[2]=Lan.g(this,"Instructor LName");
-			//report.ColCaption[3]=Lan.g(this,"Instructor FName");
-			//report.ColCaption[4]=Lan.g(this,"StudentNum");
-			//report.ColCaption[5]=Lan.g(this,"Student LName");		//spk 5/19/05
-			//report.ColCaption[6]=Lan.g(this,"Student FName");
-			//report.ColCaption[7]=Lan.g(this,"Grading Scale");		// spk
-			//report.ColCaption[8]=Lan.g(this,"Grade");		// spk
-			//report.ColAlign[2]=HorizontalAlignment.Right;
-			//report.ColAlign[3]=HorizontalAlignment.Right;
-			//report.ColAlign[4]=HorizontalAlignment.Right;
-			//report.ColAlign[5]=HorizontalAlignment.Right;
-			//report.ColAlign[6]=HorizontalAlignment.Right;
-			//report.ColAlign[7]=HorizontalAlignment.Right;
-			//report.ColAlign[8]=HorizontalAlignment.Right;
-			//FormQuery2.ShowDialog();
-		}
-
-		private void butStudent_Click(object sender,EventArgs e) {
-
+		private void butOK_Click(object sender,EventArgs e) {
+			if(textDateStart.errorProvider1.GetError(textDateStart)!="") {
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			if(textDateStart.Text=="") {
+				MsgBox.Show(this,"Please enter a start date.");
+				return;
+			}
+			if(textDateEnd.errorProvider1.GetError(textDateEnd)!="") {
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			if(textDateEnd.Text=="") {
+				MsgBox.Show(this,"Please enter an end date.");
+				return;
+			}
+			if(gridCourses.SelectedIndices.Length<1) {
+				MsgBox.Show(this,"At least one course must be selected to run a report.  Please select a row from the course grid.");
+				return;
+			}
+			if(gridInstructors.SelectedIndices.Length<1) {
+				MsgBox.Show(this,"At least one instructor must be selected to run a report.  Please select a row from the instructor grid.");
+				return;
+			}
+			if(gridStudents.SelectedIndices.Length<1) {
+				MsgBox.Show(this,"At least one student must be selected to run a report.  Please select a row from the student grid.");
+				return;
+			}
+			DateTime dateStart=PIn.Date(textDateStart.Text);
+			DateTime dateEnd=PIn.Date(textDateEnd.Text);
+			string whereCourses="";
+			if(!checkAllCourses.Checked) {
+				for(int i=0;i<gridCourses.SelectedIndices.Length;i++) {
+					if(i==0) {
+						whereCourses+=" AND evaluation.SchoolCourseNum IN(";
+					}
+					whereCourses+=gridCourses.Rows[gridCourses.SelectedIndices[i]].Tag;
+					if(i!=gridCourses.SelectedIndices.Length-1) {
+						whereCourses+=",";
+					}
+				}
+				whereCourses+=")";
+			}
+			string whereInstructors="";
+			if(!checkAllInstructors.Checked) {
+				for(int i=0;i<gridInstructors.SelectedIndices.Length;i++) {
+					if(i==0) {
+						whereInstructors+=" AND evaluation.InstructNum IN(";
+					}
+					whereInstructors+=gridInstructors.Rows[gridInstructors.SelectedIndices[i]].Tag;
+					if(i!=gridInstructors.SelectedIndices.Length-1) {
+						whereInstructors+=",";
+					}
+				}
+				whereInstructors+=")";
+			}
+			//No checkbox for students
+			string whereStudents=" AND evaluation.StudentNum IN(";
+			for(int i=0;i<gridStudents.SelectedIndices.Length;i++) {
+				whereStudents+=gridStudents.Rows[gridStudents.SelectedIndices[i]].Tag;
+				if(i!=gridStudents.SelectedIndices.Length-1) {
+					whereStudents+=",";
+				}
+			}
+			whereStudents+=")";
+			ReportSimpleGrid report=new ReportSimpleGrid();
+			//Evaluations------------------------------------------------------------------------------
+			report.Query="SELECT "+DbHelper.Concat("students.LName","', '","students.FName")+" StudentName,evaluation.DateEval,"
+				+"courses.CourseID,"+DbHelper.Concat("instructors.LName","', '","instructors.FName")+" InstructorName,"
+			  +"evaluation.EvalTitle,gradeScales.ScaleType,evaluation.OverallGradeShowing,evaluation.OverallGradeNumber";
+			report.Query+=" FROM evaluation"
+			  +" INNER JOIN provider students ON evaluation.StudentNum=students.ProvNum"
+				+" INNER JOIN provider instructors ON evaluation.InstructNum=instructors.ProvNum"
+				+" INNER JOIN gradingscale gradeScales ON evaluation.GradingScaleNum=gradeScales.GradingScaleNum"
+				+" INNER JOIN schoolcourse courses ON evaluation.SchoolCourseNum=courses.SchoolCourseNum"
+				+" WHERE evaluation.DateEval BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
+				+whereCourses
+				+whereInstructors
+				+whereStudents
+				+" ORDER BY StudentName,evaluation.DateEval";
+			FormQuery2=new FormQuery(report);
+			FormQuery2.IsReport=true;
+			DataTable table=report.GetTempTable();
+			report.TableQ=new DataTable();
+			int colI=10;
+			for(int i=0;i<colI;i++) { //add columns
+				report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
+			}
+			report.InitializeColumns();
+			DataRow row;
+			for(int i=0;i<table.Rows.Count;i++) {
+				row = report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
+				row[0]=table.Rows[i]["StudentName"].ToString();
+				row[1]=PIn.Date(table.Rows[i]["DateEval"].ToString()).ToShortDateString();
+				row[2]=table.Rows[i]["CourseID"].ToString();
+				row[3]=table.Rows[i]["InstructorName"].ToString();
+				row[4]=table.Rows[i]["EvalTitle"].ToString();
+				switch((EnumScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString())) {
+					case EnumScaleType.PickList:
+						row[5]=Enum.GetName(typeof(EnumScaleType),(int)EnumScaleType.PickList);
+						break;
+					case EnumScaleType.Percentage:
+						row[5]=Enum.GetName(typeof(EnumScaleType),(int)EnumScaleType.Percentage);
+						break;
+					case EnumScaleType.Weighted:
+						row[5]=Enum.GetName(typeof(EnumScaleType),(int)EnumScaleType.Weighted);
+						break;
+				}
+				row[6]=table.Rows[i]["OverallGradeShowing"].ToString();
+				row[7]=table.Rows[i]["OverallGradeNumber"].ToString();
+				report.TableQ.Rows.Add(row);
+			}
+			FormQuery2.ResetGrid();
+			report.Title=Lan.g(this,"Course Average");
+			report.SubTitle.Add(dateStart.ToShortDateString()+" - "+dateEnd.ToShortDateString());
+			if(checkAllInstructors.Checked) {
+				report.SubTitle.Add(Lan.g(this,"All Instructors"));
+			}
+			if(checkAllCourses.Checked) {
+				report.SubTitle.Add(Lan.g(this,"All Courses"));
+			}
+			report.SetColumn(this,0,"Student",120);
+			report.SetColumn(this,1,"Date",80);
+			report.SetColumn(this,2,"Course",100);
+			report.SetColumn(this,3,"Instructor",120);
+			report.SetColumn(this,4,"Evaluation",90);
+			report.SetColumn(this,5,"Scale Type",90);
+			report.SetColumn(this,6,"Grade Showing",100);
+			report.SetColumn(this,7,"Grade Number",100);
+			FormQuery2.ShowDialog();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {

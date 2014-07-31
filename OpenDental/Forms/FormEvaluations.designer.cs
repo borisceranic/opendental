@@ -285,7 +285,6 @@ namespace OpenDental{
 			this.butReport.Size = new System.Drawing.Size(75, 24);
 			this.butReport.TabIndex = 7;
 			this.butReport.Text = "Reports";
-			this.butReport.Visible = false;
 			this.butReport.Click += new System.EventHandler(this.butReport_Click);
 			// 
 			// FormEvaluations

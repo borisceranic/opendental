@@ -32,14 +32,10 @@ namespace OpenDental{
 			this.textDateEnd = new ODR.ValidDate();
 			this.gridCourses = new OpenDental.UI.ODGrid();
 			this.gridInstructors = new OpenDental.UI.ODGrid();
-			this.gridStudent = new OpenDental.UI.ODGrid();
-			this.butStudent = new OpenDental.UI.Button();
-			this.butAverage = new OpenDental.UI.Button();
+			this.gridStudents = new OpenDental.UI.ODGrid();
+			this.butAllStudents = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.butEvaluationSelect = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.textEvaluation = new System.Windows.Forms.TextBox();
-			this.button1 = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label7
@@ -100,9 +96,8 @@ namespace OpenDental{
 			// 
 			// gridCourses
 			// 
-			this.gridCourses.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridCourses.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridCourses.HScrollVisible = false;
 			this.gridCourses.Location = new System.Drawing.Point(12, 68);
 			this.gridCourses.Name = "gridCourses";
@@ -130,50 +125,49 @@ namespace OpenDental{
 			this.gridInstructors.TranslationName = null;
 			this.gridInstructors.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInstructors_CellClick);
 			// 
-			// gridStudent
+			// gridStudents
 			// 
-			this.gridStudent.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridStudents.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridStudent.HScrollVisible = false;
-			this.gridStudent.Location = new System.Drawing.Point(654, 68);
-			this.gridStudent.Name = "gridStudent";
-			this.gridStudent.ScrollValue = 0;
-			this.gridStudent.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridStudent.Size = new System.Drawing.Size(308, 362);
-			this.gridStudent.TabIndex = 14;
-			this.gridStudent.Title = "Students";
-			this.gridStudent.TranslationName = null;
+			this.gridStudents.HScrollVisible = false;
+			this.gridStudents.Location = new System.Drawing.Point(654, 68);
+			this.gridStudents.Name = "gridStudents";
+			this.gridStudents.ScrollValue = 0;
+			this.gridStudents.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridStudents.Size = new System.Drawing.Size(308, 362);
+			this.gridStudents.TabIndex = 14;
+			this.gridStudents.Title = "Students";
+			this.gridStudents.TranslationName = null;
 			// 
-			// butStudent
+			// butAllStudents
 			// 
-			this.butStudent.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butStudent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butStudent.Autosize = true;
-			this.butStudent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butStudent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butStudent.CornerRadius = 4F;
-			this.butStudent.Location = new System.Drawing.Point(434, 482);
-			this.butStudent.Name = "butStudent";
-			this.butStudent.Size = new System.Drawing.Size(93, 24);
-			this.butStudent.TabIndex = 20;
-			this.butStudent.Text = "Student Average";
-			this.butStudent.Click += new System.EventHandler(this.butStudent_Click);
+			this.butAllStudents.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAllStudents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAllStudents.Autosize = true;
+			this.butAllStudents.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAllStudents.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAllStudents.CornerRadius = 4F;
+			this.butAllStudents.Location = new System.Drawing.Point(769, 41);
+			this.butAllStudents.Name = "butAllStudents";
+			this.butAllStudents.Size = new System.Drawing.Size(78, 24);
+			this.butAllStudents.TabIndex = 62;
+			this.butAllStudents.Text = "All Students";
+			this.butAllStudents.Click += new System.EventHandler(this.butAllStudents_Click);
 			// 
-			// butAverage
+			// butOK
 			// 
-			this.butAverage.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAverage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAverage.Autosize = true;
-			this.butAverage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAverage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAverage.CornerRadius = 4F;
-			this.butAverage.Location = new System.Drawing.Point(434, 452);
-			this.butAverage.Name = "butAverage";
-			this.butAverage.Size = new System.Drawing.Size(93, 24);
-			this.butAverage.TabIndex = 19;
-			this.butAverage.Text = "Course Average";
-			this.butAverage.Click += new System.EventHandler(this.butAverage_Click);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(887, 452);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 24);
+			this.butOK.TabIndex = 19;
+			this.butOK.Text = "OK";
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butClose
 			// 
@@ -190,74 +184,24 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// butEvaluationSelect
-			// 
-			this.butEvaluationSelect.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEvaluationSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEvaluationSelect.Autosize = true;
-			this.butEvaluationSelect.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEvaluationSelect.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEvaluationSelect.CornerRadius = 4F;
-			this.butEvaluationSelect.Location = new System.Drawing.Point(204, 435);
-			this.butEvaluationSelect.Name = "butEvaluationSelect";
-			this.butEvaluationSelect.Size = new System.Drawing.Size(22, 21);
-			this.butEvaluationSelect.TabIndex = 58;
-			this.butEvaluationSelect.Text = "...";
-			// 
-			// label1
-			// 
-			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label1.Location = new System.Drawing.Point(12, 435);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(83, 18);
-			this.label1.TabIndex = 60;
-			this.label1.Text = "Evaluation";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textEvaluation
-			// 
-			this.textEvaluation.Location = new System.Drawing.Point(97, 436);
-			this.textEvaluation.MaxLength = 15;
-			this.textEvaluation.Name = "textEvaluation";
-			this.textEvaluation.Size = new System.Drawing.Size(105, 20);
-			this.textEvaluation.TabIndex = 61;
-			// 
-			// button1
-			// 
-			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Autosize = true;
-			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.button1.CornerRadius = 4F;
-			this.button1.Location = new System.Drawing.Point(769, 41);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(78, 24);
-			this.button1.TabIndex = 62;
-			this.button1.Text = "All Students";
-			// 
 			// FormEvaluationReport
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 518);
-			this.Controls.Add(this.button1);
-			this.Controls.Add(this.textEvaluation);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.butEvaluationSelect);
+			this.Controls.Add(this.butAllStudents);
 			this.Controls.Add(this.checkAllInstructors);
 			this.Controls.Add(this.checkAllCourses);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.textDateStart);
 			this.Controls.Add(this.textDateEnd);
-			this.Controls.Add(this.butStudent);
-			this.Controls.Add(this.butAverage);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.gridCourses);
 			this.Controls.Add(this.gridInstructors);
-			this.Controls.Add(this.gridStudent);
+			this.Controls.Add(this.gridStudents);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(870, 275);
 			this.Name = "FormEvaluationReport";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Report";
@@ -270,20 +214,16 @@ namespace OpenDental{
 		#endregion
 
 		private OpenDental.UI.Button butClose;
-		private UI.ODGrid gridStudent;
+		private UI.ODGrid gridStudents;
 		private UI.ODGrid gridInstructors;
 		private UI.ODGrid gridCourses;
-		private UI.Button butAverage;
-		private UI.Button butStudent;
+		private UI.Button butOK;
 		private System.Windows.Forms.Label label7;
 		private ODR.ValidDate textDateStart;
 		private ODR.ValidDate textDateEnd;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.CheckBox checkAllCourses;
 		private System.Windows.Forms.CheckBox checkAllInstructors;
-		private UI.Button butEvaluationSelect;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textEvaluation;
-		private UI.Button button1;
+		private UI.Button butAllStudents;
 	}
 }

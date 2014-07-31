@@ -240,6 +240,7 @@ namespace OpenDental{
 			// 
 			// labelTotalPoint
 			// 
+			this.labelTotalPoint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelTotalPoint.Location = new System.Drawing.Point(162, 388);
 			this.labelTotalPoint.Name = "labelTotalPoint";
 			this.labelTotalPoint.Size = new System.Drawing.Size(112, 17);
@@ -249,6 +250,7 @@ namespace OpenDental{
 			// 
 			// textTotalPoints
 			// 
+			this.textTotalPoints.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.textTotalPoints.Location = new System.Drawing.Point(276, 387);
 			this.textTotalPoints.MaxLength = 255;
 			this.textTotalPoints.Name = "textTotalPoints";

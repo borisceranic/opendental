@@ -188,7 +188,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(417, 179);
+			this.MinimumSize = new System.Drawing.Size(417, 197);
 			this.Name = "FormEvaluationCriterionDefEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Evaluation Criterion Def Edit";
