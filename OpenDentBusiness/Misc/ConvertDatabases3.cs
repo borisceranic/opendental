@@ -5750,6 +5750,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE userod MODIFY InboxHidePopups NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ChartNonPatientWarn','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ChartNonPatientWarn','1')";
+					Db.NonQ(command);
+				}
 
 
 

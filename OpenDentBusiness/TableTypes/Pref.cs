@@ -121,6 +121,8 @@ namespace OpenDentBusiness {
 		///<summary>Deprecated. If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.
 		///This preference was never fully implemented and should not be used.  We may revisit some day.</summary>
 		ChartAddProcNoRefreshGrid,
+		///<summary>Preference to warn users when they have a nonpatient selected.</summary>
+		ChartNonPatientWarn,
 		ClaimAttachExportPath,
 		ClaimFormTreatDentSaysSigOnFile,
 		ClaimMedTypeIsInstWhenInsPlanIsMedical,

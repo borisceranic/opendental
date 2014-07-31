@@ -112,6 +112,7 @@ namespace OpenDental{
 		private Label labelDiscountPercentage;
 		private ComboBox comboProcDiscountType;
 		private Label label19;
+		private CheckBox checkChartNonPatientWarn;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -206,6 +207,10 @@ namespace OpenDental{
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
 			this.tabTreatPlan = new System.Windows.Forms.TabPage();
+			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
+			this.labelDiscountPercentage = new System.Windows.Forms.Label();
+			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
+			this.label19 = new System.Windows.Forms.Label();
 			this.tabChart = new System.Windows.Forms.TabPage();
 			this.checkProcLockingIsAllowed = new System.Windows.Forms.CheckBox();
 			this.textICD9DefaultForNewProcs = new System.Windows.Forms.TextBox();
@@ -242,10 +247,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
-			this.label19 = new System.Windows.Forms.Label();
-			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
-			this.labelDiscountPercentage = new System.Windows.Forms.Label();
+			this.checkChartNonPatientWarn = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -965,9 +967,47 @@ namespace OpenDental{
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
 			// 
+			// textDiscountPercentage
+			// 
+			this.textDiscountPercentage.Location = new System.Drawing.Point(387, 129);
+			this.textDiscountPercentage.Name = "textDiscountPercentage";
+			this.textDiscountPercentage.Size = new System.Drawing.Size(53, 20);
+			this.textDiscountPercentage.TabIndex = 211;
+			// 
+			// labelDiscountPercentage
+			// 
+			this.labelDiscountPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.labelDiscountPercentage.Location = new System.Drawing.Point(135, 132);
+			this.labelDiscountPercentage.Name = "labelDiscountPercentage";
+			this.labelDiscountPercentage.Size = new System.Drawing.Size(246, 16);
+			this.labelDiscountPercentage.TabIndex = 210;
+			this.labelDiscountPercentage.Text = "Procedure discount percentage";
+			this.labelDiscountPercentage.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// comboProcDiscountType
+			// 
+			this.comboProcDiscountType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboProcDiscountType.FormattingEnabled = true;
+			this.comboProcDiscountType.Location = new System.Drawing.Point(277, 102);
+			this.comboProcDiscountType.MaxDropDownItems = 30;
+			this.comboProcDiscountType.Name = "comboProcDiscountType";
+			this.comboProcDiscountType.Size = new System.Drawing.Size(163, 21);
+			this.comboProcDiscountType.TabIndex = 201;
+			// 
+			// label19
+			// 
+			this.label19.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label19.Location = new System.Drawing.Point(55, 105);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(221, 15);
+			this.label19.TabIndex = 200;
+			this.label19.Text = "Procedure discount adj type";
+			this.label19.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// tabChart
 			// 
 			this.tabChart.BackColor = System.Drawing.SystemColors.Window;
+			this.tabChart.Controls.Add(this.checkChartNonPatientWarn);
 			this.tabChart.Controls.Add(this.checkProcLockingIsAllowed);
 			this.tabChart.Controls.Add(this.textICD9DefaultForNewProcs);
 			this.tabChart.Controls.Add(this.checkMedicalFeeUsedForNewProcs);
@@ -1388,42 +1428,19 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// comboProcDiscountType
+			// checkChartNonPatientWarn
 			// 
-			this.comboProcDiscountType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProcDiscountType.FormattingEnabled = true;
-			this.comboProcDiscountType.Location = new System.Drawing.Point(277, 102);
-			this.comboProcDiscountType.MaxDropDownItems = 30;
-			this.comboProcDiscountType.Name = "comboProcDiscountType";
-			this.comboProcDiscountType.Size = new System.Drawing.Size(163, 21);
-			this.comboProcDiscountType.TabIndex = 201;
-			// 
-			// label19
-			// 
-			this.label19.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label19.Location = new System.Drawing.Point(55, 105);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(221, 15);
-			this.label19.TabIndex = 200;
-			this.label19.Text = "Procedure discount adj type";
-			this.label19.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// textDiscountPercentage
-			// 
-			this.textDiscountPercentage.Location = new System.Drawing.Point(387, 129);
-			this.textDiscountPercentage.Name = "textDiscountPercentage";
-			this.textDiscountPercentage.Size = new System.Drawing.Size(53, 20);
-			this.textDiscountPercentage.TabIndex = 211;
-			// 
-			// labelDiscountPercentage
-			// 
-			this.labelDiscountPercentage.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.labelDiscountPercentage.Location = new System.Drawing.Point(135, 132);
-			this.labelDiscountPercentage.Name = "labelDiscountPercentage";
-			this.labelDiscountPercentage.Size = new System.Drawing.Size(246, 16);
-			this.labelDiscountPercentage.TabIndex = 210;
-			this.labelDiscountPercentage.Text = "Procedure discount percentage";
-			this.labelDiscountPercentage.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.checkChartNonPatientWarn.AutoSize = true;
+			this.checkChartNonPatientWarn.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkChartNonPatientWarn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkChartNonPatientWarn.Location = new System.Drawing.Point(309, 259);
+			this.checkChartNonPatientWarn.Name = "checkChartNonPatientWarn";
+			this.checkChartNonPatientWarn.Size = new System.Drawing.Size(131, 18);
+			this.checkChartNonPatientWarn.TabIndex = 211;
+			this.checkChartNonPatientWarn.Text = "Non Patient Warning";
+			this.checkChartNonPatientWarn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkChartNonPatientWarn.UseVisualStyleBackColor = true;
+			this.checkChartNonPatientWarn.Click += new System.EventHandler(this.checkChartNonPatientWarn_Click);
 			// 
 			// FormModuleSetup
 			// 
@@ -1586,6 +1603,7 @@ namespace OpenDental{
 			textMedicationsIndicateNone.Text=Medications.GetDescription(PrefC.GetLong(PrefName.MedicationsIndicateNone)); //DB maint to fix corruption
 			textAllergiesIndicateNone.Text	=AllergyDefs.GetDescription(PrefC.GetLong(PrefName.AllergiesIndicateNone)); //DB maint to fix corruption
 			checkProcGroupNoteDoesAggregate.Checked=PrefC.GetBool(PrefName.ProcGroupNoteDoesAggregate);
+			checkChartNonPatientWarn.Checked=PrefC.GetBool(PrefName.ChartNonPatientWarn);
 			//checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);//Not implemented.  May revisit some day.
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
 			textICD9DefaultForNewProcs.Text=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
@@ -1856,6 +1874,12 @@ namespace OpenDental{
 		private void FormModuleSetup_FormClosing(object sender,FormClosingEventArgs e) {
 			if(_changed){
 				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+		}
+
+		private void checkChartNonPatientWarn_Click(object sender,EventArgs e) {
+			if(Prefs.UpdateBool(PrefName.ChartNonPatientWarn,checkChartNonPatientWarn.Checked)) {
+				_changed=true;
 			}
 		}
 

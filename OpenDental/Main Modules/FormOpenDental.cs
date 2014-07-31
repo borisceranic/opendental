@@ -297,6 +297,8 @@ namespace OpenDental{
 		private AutoResetEvent _timeSynchSleep=new AutoResetEvent(false);
 		///<summary>Used to stop threads from running during updates.  Currently only used to stop Mobile Synch.</summary>
 		private bool _isStartingUp;
+		private long _previousPatNum;
+		private DateTime _datePopupDelay;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -2681,6 +2683,9 @@ namespace OpenDental{
 			if(!patChanged) {
 				return;
 			}
+			if(ContrChart2.Visible) {
+				TryNonPatientPopup();
+			}
 			//New patient selected.  Everything below here is for popups.
 			//First, remove all expired popups from the event list.
 			for(int i=PopupEventList.Count-1;i>=0;i--){//go backwards
@@ -3829,6 +3834,7 @@ namespace OpenDental{
 					else {
 						ContrChart2.ModuleSelected(CurPatNum);
 					}
+					TryNonPatientPopup();
 					break;
 				case 5:
 					ContrImages2.InitializeOnStartup();
@@ -5648,6 +5654,21 @@ namespace OpenDental{
 				}
 			}
 			catch { }//prevents crash on closing if FormOpenDental has already been disposed or if MySQL connection has been lost
+		}
+
+		private void TryNonPatientPopup() {
+			Patient patCur=Patients.GetPat(CurPatNum);
+			if(patCur!=null && _previousPatNum!=patCur.PatNum) {
+				_datePopupDelay=DateTime.Now;
+				_previousPatNum=patCur.PatNum;
+			}
+			if(PrefC.GetBool(PrefName.ChartNonPatientWarn) 
+						&& patCur!=null 
+						&& patCur.PatStatus.ToString()=="NonPatient"
+						&& _datePopupDelay<=DateTime.Now) {
+				MsgBox.Show(this,"A patient with the status NonPatient is currently selected.");
+				_datePopupDelay=DateTime.Now.AddMinutes(5);
+			}
 		}
 
 		///<summary></summary>
