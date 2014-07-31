@@ -23,7 +23,7 @@ namespace OpenDentHL7 {
 		private System.Threading.Timer timerReceiveFiles;
 		private System.Threading.Timer timerSendTCP;
 		private System.Threading.Timer timerSendConnectTCP;
-		private Socket socketIncomingMain;
+		private Socket _socketIncomingMain;
 		private string hl7FolderIn;
 		private string hl7FolderOut;
 		private static bool isReceivingFiles;
@@ -39,8 +39,8 @@ namespace OpenDentHL7 {
 		private static bool _ecwTCPModeIsSending;
 		private static bool _ecwTCPSendSocketIsConnected;
 		// ManualResetEvent instances signal completion.
+		private static bool _ecwTCPModeIsReceiving;//this is set to true right before an asynchronous BeginReceive call.  Right before closing the worker socket, it is set to false.  Otherwise the socket.Close() triggers the callback function and the EndReceive is referencing a disposed object.
 		private static ManualResetEvent connectDone=new ManualResetEvent(false);
-		private static ManualResetEvent sendDone=new ManualResetEvent(false);
 		private static ManualResetEvent receiveDone=new ManualResetEvent(false);
 
 		public ServiceHL7() {
@@ -166,7 +166,7 @@ namespace OpenDentHL7 {
 				timerSendFiles=new System.Threading.Timer(timercallbackSend,null,1800,1800);
 			}
 			else {//TCP/IP
-				CreateIncomingTcpListener();
+				CreateIncomingTcpListener();//this method spawns a new thread for receiving, the main thread returns to perform the sending below
 				_ecwTCPSendSocketIsConnected=false;
 				_ecwTCPModeIsSending=false;
 				//start a timer to connect to the send socket every 20 seconds.  The socket will be reused, so if _ecwTCPSendSocketIsConnected is true, this will just return
@@ -279,15 +279,15 @@ namespace OpenDentHL7 {
 			//Also in V2, every incoming message must be persisted by storing in our db.
 			//We will just start with version 1 and not do acks at first unless needed.
 			try {
-				socketIncomingMain=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+				_socketIncomingMain=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
 				IPEndPoint endpointLocal=new IPEndPoint(IPAddress.Any,int.Parse(HL7DefEnabled.IncomingPort));
-				socketIncomingMain.Bind(endpointLocal);
-				socketIncomingMain.Listen(1);//Listen for and queue incoming connection requests.  There should only be one.
+				_socketIncomingMain.Bind(endpointLocal);
+				_socketIncomingMain.Listen(1);//Listen for and queue incoming connection requests.  There should only be one.
 				if(IsVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Listening",EventLogEntryType.Information);
 				}
 				//Asynchronously process incoming connection attempts:
-				socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),socketIncomingMain);
+				_socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),_socketIncomingMain);
 			}
 			catch(Exception ex) {
 				EventLog.WriteEntry("OpenDentHL7","Error creating incoming TCP listener\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
@@ -296,14 +296,14 @@ namespace OpenDentHL7 {
 			}
 		}
 
-		///<summary>Runs in a separate thread</summary>
+		///<summary>Runs in a separate thread.  Considered the main thread for receiving messages.</summary>
 		private void OnConnectionAccepted(IAsyncResult asyncResult) {
 			if(IsVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Connection Accepted",EventLogEntryType.Information);
 			}
 			try {
 				receiveDone.Reset();//manual reset event to tell the main thread to accept an incoming connection
-				Socket socketIncomingHandler=socketIncomingMain.EndAccept(asyncResult);//end the BeginAccept.  Get reference to new Socket.
+				Socket socketIncomingHandler=((Socket)asyncResult.AsyncState).EndAccept(asyncResult);//end the BeginAccept.  Get reference to new Socket.
 				//Use the worker socket to wait for data.
 				//We will keep reusing the same workerSocket instead of maintaining a list of worker sockets
 				//because this program is guaranteed to only have one incoming connection at a time.
@@ -312,12 +312,29 @@ namespace OpenDentHL7 {
 				}
 				StateObject state=new StateObject();
 				state.workSocket=socketIncomingHandler;
+				_ecwTCPModeIsReceiving=true;
 				socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
-				receiveDone.WaitOne();//wait for OnDataReceived to return before accepting any new connections				
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","The main receive thread is waiting for the manual reset event to be set before accepting any new connections.",EventLogEntryType.Information);
+				}
+				if(!receiveDone.WaitOne(new TimeSpan(0,20,0))) {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","The main receive thread timed out waiting for the manual reset event to be set.  A new connection will be accepted.",EventLogEntryType.Information);
+					}
+					//the main receive thread will wait for OnDataReceived to set the manual reset event receiveDone before accepting any new connections
+					//if the receiveDone waits for 20 minutes and there is no reset event set, shutdown the socket and accept a new connection
+					socketIncomingHandler.Shutdown(SocketShutdown.Both);
+					_ecwTCPModeIsReceiving=false;
+					socketIncomingHandler.Close();
+				}
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","The manual reset event has been set.  The main receive thread is now accepting new connections.",EventLogEntryType.Information);
+				}
 				//the main socket is now free to wait for another connection.
-				socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),socketIncomingMain);
+				_socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),_socketIncomingMain);
 			}
-			catch(ObjectDisposedException) {
+			catch(ObjectDisposedException ex) {
+				EventLog.WriteEntry("OpenDentHL7","Error in OnConnectionAccepted.  Attempting to call CreateIncomingTcpListener again.\r\nException: "+ex.Message,EventLogEntryType.Warning);
 				//Socket has been closed.  Try to start over.
 				CreateIncomingTcpListener();//If this fails, service stops running
 			}
@@ -331,6 +348,9 @@ namespace OpenDentHL7 {
 		///<summary>Runs in a separate thread</summary>
 		private void OnDataReceived(IAsyncResult asyncResult) {
 			try {
+				if(!_ecwTCPModeIsReceiving) {//this will only be false if a socket.Close() call is made, which will trigger this call back function to finish, so just return if false
+					return;
+				}
 				StateObject state=(StateObject)asyncResult.AsyncState;
 				if(state==null) {
 					throw new Exception("Error in OnDataReceived: The IAsyncResult parameter could not be cast to a StateObject.");
@@ -338,10 +358,15 @@ namespace OpenDentHL7 {
 				Socket socketIncomingHandler=state.workSocket;
 				int byteCountReceived=0;
 				try {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","EndReceive is starting.",EventLogEntryType.Information);
+					}
 					byteCountReceived=socketIncomingHandler.EndReceive(asyncResult);//blocks until data is recieved.
 				}
 				catch(Exception ex) {
 					//Socket has been disposed or is null or something went wrong.
+					_ecwTCPModeIsReceiving=false;
+					socketIncomingHandler.Close();
 					throw new Exception("Error in OnDataReceived:\r\n"+ex.Message+"\r\n"+ex.StackTrace);
 				}
 				char[] chars=new char[byteCountReceived];
@@ -386,11 +411,31 @@ namespace OpenDentHL7 {
 				//end of big if statement-------------------------------------------------
 				if(!isFullMsg) {
 					try {
+						if(IsVerboseLogging) {
+							EventLog.WriteEntry("OpenDentHL7","Not a full message, BeginReceive called again.",EventLogEntryType.Information);
+						}
 						//the buffer was cleared after appending the chars to the string builder
-						socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
-						return;//get another block
+						_ecwTCPModeIsReceiving=true;
+						IAsyncResult inResultIncomplMsg=socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
+						if(!inResultIncomplMsg.AsyncWaitHandle.WaitOne(new TimeSpan(0,0,30))) {//WaitOne will return true if data was received, false if the timeout is reached with no data received
+							//if we have received part of a message and 30 seconds goes by with no additional data recieved
+							//close the socket and set the receiveDone manual reset event.  A new socket connection will be accepted.
+							if(IsVerboseLogging) {
+								EventLog.WriteEntry("OpenDentHL7","Setting manual reset event so the main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
+							}
+							inResultIncomplMsg.AsyncWaitHandle.Close();
+							_ecwTCPModeIsReceiving=false;
+							socketIncomingHandler.Close();
+							receiveDone.Set();
+						}
+						else {
+							inResultIncomplMsg.AsyncWaitHandle.Close();
+						}
+						return;//get another block or in the event the 30 second timeout is reached, a new socket will be created
 					}
 					catch(Exception ex) {
+						_ecwTCPModeIsReceiving=false;
+						socketIncomingHandler.Close();
 						throw new Exception("An error occurred with BeginReceive on an incoming TCP/IP HL7 message.\r\nException: "+ex.Message);
 					}
 				}
@@ -408,36 +453,72 @@ namespace OpenDentHL7 {
 					isProcessed=false;
 				}
 				else {
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","Create the HL7 Message Object from the message text.",EventLogEntryType.Information);
+					}
 					MessageHL7 messageHl7Object=new MessageHL7(hl7Msg.MsgText);//this creates an entire heirarchy of objects.
 					try {
-						MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db
+						if(IsVerboseLogging) {
+							EventLog.WriteEntry("OpenDentHL7","Process the HL7 message.",EventLogEntryType.Information);
+						}
 						messageControlId=messageHl7Object.ControlId;
 						ackEvent=messageHl7Object.AckEvent;
+						MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db
 					}
 					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
+						EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Information);
 						isProcessed=false;
 					}
 				}
 				MessageHL7 hl7Ack=MessageConstructor.GenerateACK(messageControlId,isProcessed,ackEvent);
 				if(hl7Ack==null) {
+					_ecwTCPModeIsReceiving=false;
+					socketIncomingHandler.Close();
 					throw new Exception("No ACK defined for the enabled HL7 definition or no HL7 definition enabled.");
 				}
 				byte[] ackByteOutgoing=Encoding.ASCII.GetBytes(MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR);
 				if(IsVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Beginning to send ACK.\r\n"+MLLP_START_CHAR+hl7Ack.ToString()+MLLP_END_CHAR+MLLP_ENDMSG_CHAR,EventLogEntryType.Information);
 				}
-				socketIncomingHandler.Send(ackByteOutgoing);//this is a locking call
+				socketIncomingHandler.SendTimeout=5000;//timeout after 5 seconds of trying to send an acknowledgment
+				try {
+					socketIncomingHandler.Send(ackByteOutgoing);//this is a blocking call, timeout in 5 seconds
+				}
+				catch(Exception ex) {
+					_ecwTCPModeIsReceiving=false;
+					socketIncomingHandler.Close();
+					throw new Exception("Timeout or other error waiting to send an acknowledgment.\r\nException: "+ex.Message);
+				}
 				//eCW uses the same worker socket to send the next message. Without this call to BeginReceive, they would attempt to send again
 				//and the send would fail since we were no longer listening in this thread. eCW would timeout after 30 seconds of waiting for their
 				//acknowledgement, then they would close their end and create a new socket for the next message. With this call, we can accept message
 				//after message without waiting for a new connection.
 				//the buffer was cleared after appending the chars to the string builder
 				//the string builder was cleared after setting the message text in the table
-				socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Message was received and acknowledgment was sent.  BeginReceive called again.",EventLogEntryType.Information);
+				}
+				_ecwTCPModeIsReceiving=true;
+				IAsyncResult inSocketResult=socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
+				if(!inSocketResult.AsyncWaitHandle.WaitOne(new TimeSpan(0,5,0))) {//WaitOne will return true if data was received, false if the timeout is reached with no data received
+					//if 5 minutes goes by with no recieved data, close the socket and set the receiveDone manual reset event.  A new socket connection will be accepted.
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","Setting manual reset event due to inactive timeout.  The main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
+					}
+					inSocketResult.AsyncWaitHandle.Close();
+					_ecwTCPModeIsReceiving=false;
+					socketIncomingHandler.Close();
+					receiveDone.Set();
+				}
+				else {
+					inSocketResult.AsyncWaitHandle.Close();
+				}
 			}
 			catch(Exception ex) {
-				EventLog.WriteEntry("OpenDentalHL7",ex.Message,EventLogEntryType.Error);
+				EventLog.WriteEntry("OpenDentHL7",ex.Message,EventLogEntryType.Warning);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Setting manual reset event so the main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
+				}
 				receiveDone.Set();//this will trigger the main thread to accept a new incoming connection and try to receive data again
 			}
 		}
@@ -456,17 +537,29 @@ namespace OpenDentHL7 {
 				endpoint=new IPEndPoint(ipaddress,port);
 			}
 			catch(Exception ex) {//not likely, but want to make sure to reset the bool that the send socket is connected
-				EventLog.WriteEntry("OpenDentalHL7","The HL7 send TCP/IP socket connection failed during IPEndPoint creation.\r\nException message: "+ex.Message,EventLogEntryType.Warning);
-				socketMain.Dispose();
+				EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed during IPEndPoint creation.\r\nException message: "+ex.Message,EventLogEntryType.Warning);
+				socketMain.Close();
 				_ecwTCPSendSocketIsConnected=false;
 				return;//will try to create a socket again in 20 seconds
 			}
 			try {
 				connectDone.Reset();
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","The send socket is beginning to connect.",EventLogEntryType.Information);
+				}
 				socketMain.BeginConnect(endpoint,new AsyncCallback(ConnectCallback),socketMain);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","The main send thread is waiting for the manual reset event to be set in the connect callback function before sending messages.",EventLogEntryType.Information);
+				}
 				connectDone.WaitOne();//connection attempt will timeout and set the manual reset event
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","The main send thread is now able to check the socket and if connected start sending.",EventLogEntryType.Information);
+				}
 				if(!socketMain.Connected) {
-					socketMain.Dispose();
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","The send socket was not connected.  Disposing of the socket object and signaling for a new socket to be connected.",EventLogEntryType.Information);
+					}
+					socketMain.Close();
 					_ecwTCPSendSocketIsConnected=false;
 					return;//will try to connect again in 20 seconds
 				}
@@ -480,7 +573,7 @@ namespace OpenDentHL7 {
 					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nSocket Exception: "+ex.Message,EventLogEntryType.Warning);
 					IsSendTCPConnected=false;
 				}
-				socketMain.Dispose();
+				socketMain.Close();
 				_ecwTCPSendSocketIsConnected=false;
 				return;//will try to connect again in 20 seconds
 			}
@@ -489,7 +582,7 @@ namespace OpenDentHL7 {
 					EventLog.WriteEntry("OpenDentHL7","The HL7 send TCP/IP socket connection failed to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
 					IsSendTCPConnected=false;
 				}
-				socketMain.Dispose();
+				socketMain.Close();
 				_ecwTCPSendSocketIsConnected=false;
 				return;//will try to connect again in 20 seconds
 			}
@@ -506,7 +599,7 @@ namespace OpenDentHL7 {
 				client.EndConnect(ar);
 			}
 			catch(Exception ex) {
-				EventLog.WriteEntry("OpenDentalHL7","The TCP send socket encountered an issue attempting to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
+				EventLog.WriteEntry("OpenDentHL7","The TCP send socket encountered an issue attempting to connect.\r\nException: "+ex.Message,EventLogEntryType.Warning);
 			}
 			connectDone.Set();
 		}
@@ -518,14 +611,14 @@ namespace OpenDentHL7 {
 			_ecwTCPModeIsSending=true;
 			Socket socketWorker=(Socket)socketObject;
 			if(socketWorker==null//null socket object
-				|| !socketWorker.Connected//or socket object is no longer connected (based on last activity, like last send/receive)
-				|| !socketWorker.Poll(500000,SelectMode.SelectWrite))//blocking poll (time in microseconds, so half a second) to attempt to write to socket.
+				|| !socketWorker.Connected)//or socket object is no longer connected (based on last activity, like last send/receive)
+			//|| !socketWorker.Poll(500000,SelectMode.SelectWrite))//blocking poll (time in microseconds, so half a second) to attempt to write to socket.
 			{
-				//If socket is null, or not connected, or poll fails, socket was likely not shutdown gracefully so we will dispose of the send timer and worker socket
+				//If socket is null, or not connected, socket was likely not shutdown gracefully so we will dispose of the send timer and worker socket
 				//the connect timer will initiate a new connection with a new socket every 20 seconds if _ecwTCPSendSocketIsConnected=false;
 				timerSendTCP.Dispose();
-				socketWorker.Dispose();
-				EventLog.WriteEntry("OpenDentalHL7","The TCP send socket has been closed.  A new socket connection attempt will occur within 20 seconds.",EventLogEntryType.Warning);
+				socketWorker.Close();
+				EventLog.WriteEntry("OpenDentHL7","The TCP send socket has been closed.  A new socket connection attempt will occur within 20 seconds.",EventLogEntryType.Warning);
 				_ecwTCPModeIsSending=false;
 				_ecwTCPSendSocketIsConnected=false;
 				return;
@@ -534,7 +627,7 @@ namespace OpenDentHL7 {
 				Send(socketWorker);
 			}
 			catch(Exception ex) {
-				EventLog.WriteEntry("OpenDentalHL7","The TCP HL7 outgoing message socket encountered a problem during a send.  Another attempt to send will occur within 6 seconds.\r\nException message: "+ex.Message);
+				EventLog.WriteEntry("OpenDentHL7","The TCP HL7 outgoing message socket encountered a problem during a send.  Another attempt to send will occur within 6 seconds.\r\nException message: "+ex.Message,EventLogEntryType.Warning);
 			}
 			_ecwTCPModeIsSending=false;
 		}
@@ -545,15 +638,13 @@ namespace OpenDentHL7 {
 				string sendMsgControlId=HL7Msgs.GetControlId(list[0]);//could be empty string
 				string data=MLLP_START_CHAR+list[0].MsgText+MLLP_END_CHAR+MLLP_ENDMSG_CHAR;
 				byte[] byteData=Encoding.ASCII.GetBytes(data);
+				socketWorker.SendTimeout=5000;//timeout in 5 seconds, send will retry after 6 second wait
 				try {
-					sendDone.Reset();
-					socketWorker.BeginSend(byteData,0,byteData.Length,SocketFlags.None,new AsyncCallback(SendCallback),socketWorker);
-					sendDone.WaitOne();
+					socketWorker.Send(byteData,byteData.Length,SocketFlags.None);//this is a blocking call, will timeout in 5 seconds
 				}
 				catch(Exception ex) {
-					throw new Exception("BeginSend exception: "+ex.Message);
+					throw new Exception("The outbound socket encountered a problem sending a message.\r\nException: "+ex.Message);
 				}
-				//sendSocket.Send(byteData);//this is a blocking call
 				#region RecieveAndProcessAck
 				//For MLLP V2, do a blocking Receive here, along with a timeout.
 				byte[] ackBuffer=new byte[256];//plenty big enough to receive the entire ack/nack response
@@ -603,7 +694,7 @@ namespace OpenDentHL7 {
 					HL7Msgs.Update(list[0]);
 					throw new Exception("Error processing acknowledgment.\r\n"+ex.Message);
 				}
-				if(ackMsg.AckCode=="" || ackMsg.ControlId=="") {
+				if(ackMsg.AckCode=="" || (sendMsgControlId!="" && ackMsg.ControlId=="")) {
 					list[0].Note=list[0].Note+ackMsg.ToString()+"\r\nInvalid ACK message.  Attempt to resend.\r\n";
 					HL7Msgs.Update(list[0]);
 					throw new Exception("Invalid ACK message received.");
@@ -646,19 +737,6 @@ namespace OpenDentHL7 {
 				}
 				list=HL7Msgs.GetOnePending();//returns 0 or 1 pending message
 			}
-		}
-
-		private void SendCallback(IAsyncResult ar) {
-			try {
-				// Retrieve the socket from the state object.
-				Socket socketWorker=(Socket)ar.AsyncState;
-				// Complete sending the data to the remote device.
-				socketWorker.EndSend(ar);
-			}
-			catch(Exception ex) {
-				EventLog.WriteEntry("OpenDentalHL7","A TCP send attempt failed in SendCallback.\r\nException: "+ex.Message,EventLogEntryType.Warning);
-			}
-			sendDone.Set();
 		}
 	}
 
