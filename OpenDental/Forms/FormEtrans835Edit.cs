@@ -263,7 +263,7 @@ namespace OpenDental {
 			List<ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
 			if(claimPaid.ListProcs.Count==0) {//Procedure detail not provided with payment.  Enter by total.
 				cpPayTotal=EnterPaymentByTotal(claim,(double)claimPaid.Deductible,(double)claimPaid.InsPaid);
-				listClaimProcsForClaim.Add(cpPayTotal);
+				listClaimProcsForClaim.Insert(0,cpPayTotal);//Add to the beginning of the list, so that the ins paid amount will be highlighted when FormEtrans835ClaimPay loads.
 			}
 			else {//claimPaid.ListProcs.Count>0.  Procedure detail provided.  Enter by procedure.
 				listClaimProcsForClaim=EnterPaymentByProcedure(listClaimProcsForClaim);
@@ -287,7 +287,7 @@ namespace OpenDental {
 			//ClaimProcs.Cur.FeeBilled
 			//ClaimProcs.Cur.InsPayEst
 			cpPayTotal.DedApplied=dedApplied;
-			cpPayTotal.Status=ClaimProcStatus.Received;
+			cpPayTotal.Status=ClaimProcStatus.NotReceived;//Will be marked received once the user accepts the payment amount by clicking OK in FormEtrans835ClaimPay.  Must be NotReceived, or will not be saved to database.
 			cpPayTotal.InsPayAmt=insPaid;
 			//remarks
 			//ClaimProcs.Cur.ClaimPaymentNum
@@ -454,8 +454,11 @@ namespace OpenDental {
 			}
 			if(isReceived) {
 				EtransCur.AckCode="Recd";
-				Etranss.Update(EtransCur);
 			}
+			else {
+				EtransCur.AckCode="";
+			}
+			Etranss.Update(EtransCur);
 			DialogResult=DialogResult.OK;
 			Close();
 		}

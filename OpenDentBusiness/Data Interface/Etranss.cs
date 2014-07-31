@@ -89,6 +89,12 @@ namespace OpenDentBusiness{
 				else if(table.Rows[i]["AckCode"].ToString()=="R") {
 					row["ack"]=Lans.g("Etrans","Rejected");
 				}
+				else if(table.Rows[i]["AckCode"].ToString()=="Recd") {
+					row["ack"]=Lans.g("Etrans","Received");
+				}
+				else {
+					row["ack"]="";
+				}
 				row["Note"]=table.Rows[i]["Note"].ToString();
 				tHist.Rows.Add(row);
 			}

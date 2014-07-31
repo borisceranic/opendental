@@ -339,11 +339,15 @@ namespace OpenDentBusiness {
 			}
 			retVal.ClaimAdjustmentTotal=0;
 			retVal.Deductible=0;
+			retVal.PatientResponsibility=0;
 			for(int i=0;i<retVal.ListClaimAdjustments.Count;i++) {
 				Hx835_Adj adj=retVal.ListClaimAdjustments[i];
 				retVal.ClaimAdjustmentTotal+=adj.AdjAmt;
 				if(adj.IsDeductible) {
 					retVal.Deductible+=adj.AdjAmt;
+				}
+				if(adj.AdjCode=="PR") {
+					retVal.PatientResponsibility+=adj.AdjAmt;
 				}
 			}
 			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.
@@ -2956,9 +2960,11 @@ namespace OpenDentBusiness {
 		public List<Hx835_Info> ListSupplementalInfo;
 		///<summary>SVC segments.</summary>
 		public List<Hx835_Proc> ListProcs;
-		///<summary>The sum of all procedure deductibles in ListProcs, plus all deductible amounts from claim level adjustments in ListClaimAdjustments.</summary>
+		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where IsDeductible is true, plus all procedure deductibles in ListProcs.</summary>
 		public decimal Deductible;
-		///<summary>The sum of all adjustment amounts from ListClaimAdjustments.</summary>
+		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where CAS01=PR, including but not limited to deductibles.</summary>
+		public decimal PatientResponsibility;
+		///<summary>The sum of all adjustment amounts in ListClaimAdjustments.</summary>
 		public decimal ClaimAdjustmentTotal;
 
 		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835.  Returns 0 if not found.</summary>
@@ -2996,7 +3002,7 @@ namespace OpenDentBusiness {
 		public List<string> ListRemarks;
 		///<summary>The sum of all adjustment amounts in ListProcAdjustments where IsDeductible is true.</summary>
 		public decimal Deductible;
-		///<summary>Total of all adjustments in ListProcAdjustments where CAS01=PR, including deductible.</summary>
+		///<summary>The sum of all adjustment amounts in ListProcAdjustments where CAS01=PR, including but not limited to deductibles.</summary>
 		public decimal PatientResponsibility;
 		///<summary>Writeoff = (ProcFee)-(InsPay)-(Patient Responsibility)</summary>
 		public decimal Writeoff;
@@ -3027,6 +3033,7 @@ namespace OpenDentBusiness {
 
 #region Examples
 
+#region Example 1
 //Example 1 From 835 Specification (modified to include an NM1*IL insured name segment).
 //The user would enter the claims in this EOB by total, since neither claim includes procedure detail:
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
@@ -3062,7 +3069,9 @@ namespace OpenDentBusiness {
 //SE*28*1234~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 1
 
+#region Example 2
 //Example 2 From 835 Specification (modified to include: claim supplemental info in AMT, procedure line item control number in REF*6R, procedure supplemental info in AMT, and procedure remarks in LQ):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
@@ -3098,7 +3107,9 @@ namespace OpenDentBusiness {
 //SE*25*112233~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 2
 
+#region Example 3
 //Example 3 From 835 Specification (modified to include a procedure line item control number in REF*6R):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
@@ -3144,7 +3155,9 @@ namespace OpenDentBusiness {
 //SE*38*0001~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 3
 
+#region Example 4
 //Example 4 From 835 Specification (Modified such that submitted procedure code different than adjudicated procedure code):
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
@@ -3173,7 +3186,9 @@ namespace OpenDentBusiness {
 //SE*38*0001~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 4
 
+#region Example 5
 //Example 5 From 835 Specification:
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
 //GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
@@ -3204,7 +3219,9 @@ namespace OpenDentBusiness {
 //SE*38*0001~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 5
 
+#region Example 6
 //Example 6, copied from example 5 and modified: The claims are duplicated several times (with differing identifiers), as a way to test ERA printing on multiple pages.
 //Numbers may be off, the only purpose of this example is for multi-page printing and the content has not been sanity checked very deeply.
 //ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
@@ -3390,8 +3407,11 @@ namespace OpenDentBusiness {
 //SE*38*0001~
 //GE*1*1~
 //IEA*1*000000001~
+#endregion Example 6
 
+#region Example 7
 //Example 7: Provided and engineered by ClaimConnect.  The data is fake.  This example contains multiple transactions (ST segments) even though the X12 guide says there can only be 1.
 //See the example content in the file named TEST_DentalX.2030339.835.  Notice that the file extension is "835".
+#endregion Example 7
 
 #endregion Examples

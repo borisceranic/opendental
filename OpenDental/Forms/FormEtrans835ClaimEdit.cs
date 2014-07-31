@@ -262,7 +262,7 @@ namespace OpenDental {
 			Patient pat=Patients.GetPat(_claim.PatNum);
 			Family fam=Patients.GetFamily(_claim.PatNum);
 			FormClaimEdit formCE=new FormClaimEdit(_claim,pat,fam);
-			formCE.ShowDialog();//Non-modal might be nice here, but would require a change in logic within the OK/Cancel button clicks inside of FormClaimEdit.
+			formCE.ShowDialog();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

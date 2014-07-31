@@ -913,11 +913,11 @@ namespace OpenDental{
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Clearinghouse"),90);
 				gridHistory.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableClaimHistory","Date"),70);
+				col=new ODGridColumn(Lan.g("TableClaimHistory","Date"),70,HorizontalAlignment.Center);
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Type"),100);
 				gridHistory.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableClaimHistory","AckCode"),100);
+				col=new ODGridColumn(Lan.g("TableClaimHistory","AckCode"),100,HorizontalAlignment.Center);
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Note"),100);
 				gridHistory.Columns.Add(col);
@@ -951,11 +951,11 @@ namespace OpenDental{
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Clearinghouse"),90);
 				gridHistory.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableClaimHistory","Date"),70);
+				col=new ODGridColumn(Lan.g("TableClaimHistory","Date"),70,HorizontalAlignment.Center);
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Type"),100);
 				gridHistory.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableClaimHistory","AckCode"),100);
+				col=new ODGridColumn(Lan.g("TableClaimHistory","AckCode"),100,HorizontalAlignment.Center);
 				gridHistory.Columns.Add(col);
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Note"),0);
 				gridHistory.Columns.Add(col);
@@ -1147,15 +1147,16 @@ namespace OpenDental{
 					Form835.EtransCur=et;
 					Form835.MessageText835=messageText835;
 					Form835.TranSetId835="";//Empty string will cause the first EOB in the 835 to display.
-					Form835.Show();
+					Form835.ShowDialog();
 				}
-				return;//No refresh needed because 835s are not editable, they are read only.
 			}
-			FormEtransEdit FormE=new FormEtransEdit();
-			FormE.EtransCur=et;
-			FormE.ShowDialog();
-			if(FormE.DialogResult!=DialogResult.OK){
-				return;
+			else {
+				FormEtransEdit FormE=new FormEtransEdit();
+				FormE.EtransCur=et;
+				FormE.ShowDialog();
+				if(FormE.DialogResult!=DialogResult.OK) {
+					return;
+				}
 			}
 			int scroll=gridHistory.ScrollValue;
 			FillHistory();
