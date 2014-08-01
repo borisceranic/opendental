@@ -63,12 +63,12 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.checkHidden = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.checkR = new System.Windows.Forms.CheckBox();
 			this.checkF = new System.Windows.Forms.CheckBox();
 			this.checkT = new System.Windows.Forms.CheckBox();
 			this.checkS = new System.Windows.Forms.CheckBox();
 			this.checkP = new System.Windows.Forms.CheckBox();
 			this.checkX = new System.Windows.Forms.CheckBox();
-			this.checkR = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -147,6 +147,18 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Usage";
 			// 
+			// checkR
+			// 
+			this.checkR.AutoSize = true;
+			this.checkR.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkR.Location = new System.Drawing.Point(8, 109);
+			this.checkR.Name = "checkR";
+			this.checkR.Size = new System.Drawing.Size(158, 18);
+			this.checkR.TabIndex = 9;
+			this.checkR.Text = "Treatment Plans (only one)";
+			this.checkR.UseVisualStyleBackColor = true;
+			this.checkR.CheckedChanged += new System.EventHandler(this.checkR_CheckedChanged);
+			// 
 			// checkF
 			// 
 			this.checkF.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -164,6 +176,7 @@ namespace OpenDental{
 			this.checkT.Size = new System.Drawing.Size(201, 18);
 			this.checkT.TabIndex = 7;
 			this.checkT.Text = "Graphical Tooth Charts (only one)";
+			this.checkT.CheckedChanged += new System.EventHandler(this.checkT_CheckedChanged);
 			// 
 			// checkS
 			// 
@@ -173,6 +186,7 @@ namespace OpenDental{
 			this.checkS.Size = new System.Drawing.Size(201, 18);
 			this.checkS.TabIndex = 6;
 			this.checkS.Text = "Statements (only one)";
+			this.checkS.CheckedChanged += new System.EventHandler(this.checkS_CheckedChanged);
 			// 
 			// checkP
 			// 
@@ -182,6 +196,7 @@ namespace OpenDental{
 			this.checkP.Size = new System.Drawing.Size(201, 18);
 			this.checkP.TabIndex = 5;
 			this.checkP.Text = "Patient Pictures (only one)";
+			this.checkP.CheckedChanged += new System.EventHandler(this.checkP_CheckedChanged);
 			// 
 			// checkX
 			// 
@@ -191,17 +206,6 @@ namespace OpenDental{
 			this.checkX.Size = new System.Drawing.Size(201, 18);
 			this.checkX.TabIndex = 4;
 			this.checkX.Text = "Show in Chart module";
-			// 
-			// checkR
-			// 
-			this.checkR.AutoSize = true;
-			this.checkR.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkR.Location = new System.Drawing.Point(8, 109);
-			this.checkR.Name = "checkR";
-			this.checkR.Size = new System.Drawing.Size(158, 18);
-			this.checkR.TabIndex = 9;
-			this.checkR.Text = "Treatment Plans (only one)";
-			this.checkR.UseVisualStyleBackColor = true;
 			// 
 			// FormDefEditImages
 			// 
@@ -294,6 +298,38 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void checkP_CheckedChanged(object sender,EventArgs e) {
+			if(checkP.Checked) {
+				checkS.Checked=false;
+				checkR.Checked=false;
+				checkT.Checked=false;
+			}
+		}
+
+		private void checkS_CheckedChanged(object sender,EventArgs e) {
+			if(checkS.Checked) {
+				checkP.Checked=false;
+				checkR.Checked=false;
+				checkT.Checked=false;
+			}
+		}
+
+		private void checkT_CheckedChanged(object sender,EventArgs e) {
+			if(checkT.Checked) {
+				checkS.Checked=false;
+				checkR.Checked=false;
+				checkP.Checked=false;
+			}
+		}
+
+		private void checkR_CheckedChanged(object sender,EventArgs e) {
+			if(checkR.Checked) {
+				checkS.Checked=false;
+				checkP.Checked=false;
+				checkT.Checked=false;
+			}
 		}
 
 		
