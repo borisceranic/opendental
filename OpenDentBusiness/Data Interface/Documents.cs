@@ -88,6 +88,14 @@ namespace OpenDentBusiness {
 			return doc.DocNum;
 		}
 
+		///<summary>This is a generic insert statement used to insert documents with custom file names.</summary>
+		public static long Insert(Document doc) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),doc);
+			}
+			return Crud.DocumentCrud.Insert(doc);
+		}
+
 		///<summary></summary>
 		public static void Update(Document doc){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

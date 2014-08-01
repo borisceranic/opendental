@@ -549,6 +549,12 @@ namespace OpenDental{
 				}
 				retVal+=Lan.g(this,"ToothChart");
 			}
+			if(itemValue.Contains("R")) {
+				if(retVal!="") {
+					retVal+=", ";
+				}
+				retVal+=Lan.g(this,"TreatPlans");
+			}
 			return retVal;
 		}
 

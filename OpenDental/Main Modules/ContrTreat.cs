@@ -1848,6 +1848,50 @@ namespace OpenDental{
 					printdoc.Print();
 				}
 			#endif
+			long category=0;
+			OpenDentBusiness.Document docSave = new OpenDentBusiness.Document();
+			//Check if there are any image category definitions with "TreatPlans"
+			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+				if(DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="R" && PrefC.AtoZfolderUsed) {
+					long docNum=Documents.Insert(docSave);
+					category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
+					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
+					string fileName="TPArchive"+docSave.DocNum;
+					//Then create a PDF and save it to the AtoZ folder if AtoZ pref is on.
+					MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
+					pdfRenderer.Document=doc;
+					pdfRenderer.RenderDocument();
+					byte[] rawData= { };
+					if(PrefC.AtoZfolderUsed) {
+						if(filePath.EndsWith("\\")) {
+						}
+						else {
+							filePath+="\\";
+						}
+						pdfRenderer.Save(filePath+fileName+".pdf");
+					}
+					//Currently never going to get hit because of AtoZ folder check above. This is due to AxAcroPDF functionality.
+					else {//saving to db
+						using(MemoryStream stream=new MemoryStream()) {
+							pdfRenderer.Save(stream,false);
+							rawData=stream.ToArray();
+							stream.Close();
+						}
+					}
+					docSave.ImgType=ImageType.Document;
+					docSave.DateCreated=DateTime.Today;
+					docSave.PatNum=PatCur.PatNum;
+					docSave.DocCategory=category;
+					docSave.Description=fileName;
+					if(!PrefC.AtoZfolderUsed) {
+						docSave.RawBase64=Convert.ToBase64String(rawData);
+					}
+					else {
+						docSave.FileName=fileName+".pdf";
+					}
+					Documents.Update(docSave);//creates filename and saves to db
+				}
+			}
 		}
 
 		private void ToolBarMainEmail_Click() {
