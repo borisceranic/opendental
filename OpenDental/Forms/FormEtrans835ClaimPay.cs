@@ -214,7 +214,7 @@ namespace OpenDental {
 			// textDedApplied
 			// 
 			this.textDedApplied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textDedApplied.Location = new System.Drawing.Point(393, 608);
 			this.textDedApplied.Name = "textDedApplied";
 			this.textDedApplied.ReadOnly = true;
@@ -225,7 +225,7 @@ namespace OpenDental {
 			// textInsPayAmt
 			// 
 			this.textInsPayAmt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textInsPayAmt.Location = new System.Drawing.Point(517, 608);
 			this.textInsPayAmt.Name = "textInsPayAmt";
 			this.textInsPayAmt.ReadOnly = true;
@@ -324,7 +324,7 @@ namespace OpenDental {
 			// textEobInsPayAmt
 			// 
 			this.textEobInsPayAmt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textEobInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textEobInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textEobInsPayAmt.Location = new System.Drawing.Point(517, 292);
 			this.textEobInsPayAmt.Name = "textEobInsPayAmt";
 			this.textEobInsPayAmt.ReadOnly = true;
@@ -335,7 +335,7 @@ namespace OpenDental {
 			// textEobDedApplied
 			// 
 			this.textEobDedApplied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textEobDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textEobDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textEobDedApplied.Location = new System.Drawing.Point(393, 292);
 			this.textEobDedApplied.Name = "textEobDedApplied";
 			this.textEobDedApplied.ReadOnly = true;
@@ -434,10 +434,10 @@ namespace OpenDental {
 			FillGridClaimAdjustments();
 			FillGridProcedureBreakdown();
 			textEobClaimFee.Text=_claimPaid.ClaimFee.ToString("F");
-			//textEobDedApplied.Text=;
-			//textEobInsPayAllowed.Text=;
+			textEobDedApplied.Text=_claimPaid.Deductible.ToString("F");
+			textEobInsPayAllowed.Text=_claimPaid.AllowedAmt.ToString("F");
 			textEobInsPayAmt.Text=_claimPaid.InsPaid.ToString("F");
-			//textEobWriteOff.Text=;
+			textEobWriteOff.Text=_claimPaid.Writeoff.ToString("F");
 			FillGridProcedures();
 		}
 

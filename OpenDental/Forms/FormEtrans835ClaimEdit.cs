@@ -254,17 +254,6 @@ namespace OpenDental {
 			msgbox.Show(this);
 		}
 
-		private void butEditClaim_Click(object sender,EventArgs e) {
-			if(_claim==null) {
-				MsgBox.Show(this,"The original claim could not be located for the given claim identifier.");
-				return;
-			}
-			Patient pat=Patients.GetPat(_claim.PatNum);
-			Family fam=Patients.GetFamily(_claim.PatNum);
-			FormClaimEdit formCE=new FormClaimEdit(_claim,pat,fam);
-			formCE.ShowDialog();
-		}
-
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.OK;
 			Close();

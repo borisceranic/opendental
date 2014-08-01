@@ -449,6 +449,7 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<retVal.ListProcs.Count;i++) {//retVal.Deductible is initialized above with the summation of the deductible amounts from the claim level adjustments.
 				retVal.Deductible+=retVal.ListProcs[i].Deductible;
+				retVal.PatientResponsibility+=retVal.ListProcs[i].PatientResponsibility;
 			}
 			//Now modify the claim dates to encompass the procedure dates.  This step causes procedure dates to bubble up to the claim level when only service line dates are provided.
 			for(int i=0;i<retVal.ListProcs.Count;i++) {
@@ -467,6 +468,8 @@ namespace OpenDentBusiness {
 				}
 			}
 			retVal.SegmentCount=segNum-segNumCLP;
+			retVal.Writeoff=retVal.ClaimFee-retVal.InsPaid-retVal.PatientResponsibility;
+			retVal.AllowedAmt=retVal.InsPaid+retVal.PatientResponsibility;
 			return retVal;
 		}
 
@@ -2960,21 +2963,39 @@ namespace OpenDentBusiness {
 		public List<Hx835_Info> ListSupplementalInfo;
 		///<summary>SVC segments.</summary>
 		public List<Hx835_Proc> ListProcs;
-		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where IsDeductible is true, plus all procedure deductibles in ListProcs.</summary>
-		public decimal Deductible;
-		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where CAS01=PR, including but not limited to deductibles.</summary>
-		public decimal PatientResponsibility;
 		///<summary>The sum of all adjustment amounts in ListClaimAdjustments.</summary>
 		public decimal ClaimAdjustmentTotal;
+		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where IsDeductible is true, plus all procedure deductibles in ListProcs.</summary>
+		public decimal Deductible;
+		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where CAS01=PR (including deductibles), plus all procedure PatientResponsibility in ListProcs.</summary>
+		public decimal PatientResponsibility;
+		///<summary>Writeoff = (ClaimFee)-(Claim InsPaid)-(Claim PatientResponsibility)</summary>
+		public decimal Writeoff;
+		///<summary>AllowedAmt = (Claim InsPaid)+(Claim PatientResponsibility)</summary>
+		public decimal AllowedAmt;
+		///<summary>Cached the first time GetOriginalClaimNum() is called, since GetOriginalClaimNum() might perform many database calls (especially as we add more matching options in the future).</summary>
+		private long _originalClaimNum=0;
 
 		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835.  Returns 0 if not found.</summary>
 		public long GetOriginalClaimNum() {
-			long claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
-			if(claimNum!=0) {
-				return claimNum;
+			if(_originalClaimNum==0) {
+				_originalClaimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
 			}
-			//TODO: If matching by tracking number fails, then match by patient name, subscriber ID, and date of service.
-			return 0;
+			if(_originalClaimNum==0) {
+				//TODO: If matching by tracking number fails, then match by patient name, subscriber ID, and date of service.
+			}
+			return _originalClaimNum;
+		}
+
+		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>
+		public List<Hx835_Proc> GetProcsByProcNum(long procNum) {
+			List<Hx835_Proc> listProcsForProcNum=new List<Hx835_Proc>();
+			for(int i=0;i<ListProcs.Count;i++) {
+				if(ListProcs[i].ProcNum==procNum) {
+					listProcsForProcNum.Add(ListProcs[i]);
+				}
+			}
+			return listProcsForProcNum;
 		}
 
 	}

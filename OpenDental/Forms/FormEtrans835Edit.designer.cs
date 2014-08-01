@@ -66,6 +66,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.groupBalancing = new System.Windows.Forms.GroupBox();
 			this.butPrint = new OpenDental.UI.Button();
+			this.butClaimDetails = new OpenDental.UI.Button();
 			this.groupBalancing.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -473,10 +474,26 @@ namespace OpenDental{
 			this.butPrint.Text = "&Print";
 			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
 			// 
+			// butClaimDetails
+			// 
+			this.butClaimDetails.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClaimDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butClaimDetails.Autosize = true;
+			this.butClaimDetails.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClaimDetails.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClaimDetails.CornerRadius = 4F;
+			this.butClaimDetails.Location = new System.Drawing.Point(9, 631);
+			this.butClaimDetails.Name = "butClaimDetails";
+			this.butClaimDetails.Size = new System.Drawing.Size(100, 25);
+			this.butClaimDetails.TabIndex = 213;
+			this.butClaimDetails.Text = "Claim Details";
+			this.butClaimDetails.Click += new System.EventHandler(this.butClaimDetails_Click);
+			// 
 			// FormEtrans835Edit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.butClaimDetails);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.groupBalancing);
 			this.Controls.Add(this.gridProviderAdjustments);
@@ -571,5 +588,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPayAmountCalc;
 		private System.Windows.Forms.GroupBox groupBalancing;
 		private UI.Button butPrint;
+		private UI.Button butClaimDetails;
 	}
 }

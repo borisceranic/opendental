@@ -58,7 +58,6 @@ namespace OpenDental{
 			this.label11 = new System.Windows.Forms.Label();
 			this.textSubscriberName = new System.Windows.Forms.TextBox();
 			this.label12 = new System.Windows.Forms.Label();
-			this.butEditClaim = new OpenDental.UI.Button();
 			this.groupBalancing.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -398,26 +397,10 @@ namespace OpenDental{
 			this.label12.Text = "Subscriber";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// butEditClaim
-			// 
-			this.butEditClaim.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEditClaim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEditClaim.Autosize = true;
-			this.butEditClaim.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEditClaim.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEditClaim.CornerRadius = 4F;
-			this.butEditClaim.Location = new System.Drawing.Point(450, 664);
-			this.butEditClaim.Name = "butEditClaim";
-			this.butEditClaim.Size = new System.Drawing.Size(75, 24);
-			this.butEditClaim.TabIndex = 216;
-			this.butEditClaim.Text = "Edit Claim";
-			this.butEditClaim.Click += new System.EventHandler(this.butEditClaim_Click);
-			// 
 			// FormEtrans835ClaimEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
-			this.Controls.Add(this.butEditClaim);
 			this.Controls.Add(this.textSubscriberName);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.textDatePayerReceived);
@@ -494,6 +477,5 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.TextBox textSubscriberName;
 		private System.Windows.Forms.Label label12;
-		private UI.Button butEditClaim;
 	}
 }
