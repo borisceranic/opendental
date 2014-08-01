@@ -1852,7 +1852,7 @@ namespace OpenDental{
 			OpenDentBusiness.Document docSave = new OpenDentBusiness.Document();
 			//Check if there are any image category definitions with "TreatPlans"
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
-				if(DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="R" && PrefC.AtoZfolderUsed) {
+				if((DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="R" || DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="XR") && PrefC.AtoZfolderUsed) {
 					long docNum=Documents.Insert(docSave);
 					category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
 					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
