@@ -26,10 +26,10 @@ namespace OpenDentBusiness {
 						case "4"://EO
 							xIdx=3;
 							break;
-						case "3"://EC
+						case "2"://C
 							xIdx=4;
 							break;
-						case "2"://C
+						case "3"://EC
 							xIdx=5;
 							break;
 						case "6"://D
@@ -50,10 +50,10 @@ namespace OpenDentBusiness {
 						case "4"://EO
 							yIdx=3;
 							break;
-						case "3"://EC
+						case "2"://C
 							yIdx=4;
 							break;
-						case "2"://C
+						case "3"://EC
 							yIdx=5;
 							break;
 						case "6"://D
