@@ -192,7 +192,9 @@ namespace OpenDentBusiness{
 		///<summary>81- Assign this permission to a staff person who will edit evaluations in case of an emergency.  This is not meant to be a permanent permission given to a group.</summary>
 		AdminDentalEvaluations,
 		///<summary>82- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
-		TreatPlanDiscountEdit
+		TreatPlanDiscountEdit,
+		///<summary>83- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
+		UserLogOnOff
 
 	}
 
