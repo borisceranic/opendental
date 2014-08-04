@@ -101,7 +101,7 @@ namespace OpenDental {
 				rowClaim.Cells.Add(new UI.ODGridCell(""));//Code
 				rowClaim.Cells.Add(new UI.ODGridCell(""));//CodeBilled
 				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.ClaimFee.ToString("f2")));//Billed
-				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.Deductible.ToString("f2")));//Deduct
+				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.PatientPortion.ToString("f2")));//Deduct
 				rowClaim.Cells.Add(new UI.ODGridCell(""));//Allowed
 				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.InsPaid.ToString("f2")));//InsPay
 				rowClaim.Cells.Add(new UI.ODGridCell(""));//Writeoff
@@ -119,7 +119,7 @@ namespace OpenDental {
 					rowProc.Cells.Add(new UI.ODGridCell(proc.ProcCodeAdjudicated));//Code
 					rowProc.Cells.Add(new UI.ODGridCell(proc.ProcCodeBilled));//CodeBilled
 					rowProc.Cells.Add(new UI.ODGridCell(proc.ProcFee.ToString("f2")));//Billed
-					rowProc.Cells.Add(new UI.ODGridCell(proc.Deductible.ToString("f2")));//Deduct
+					rowProc.Cells.Add(new UI.ODGridCell(proc.PatientPortion.ToString("f2")));//Deduct
 					rowProc.Cells.Add(new UI.ODGridCell(proc.AllowedAmt.ToString("f2")));//Allowed
 					rowProc.Cells.Add(new UI.ODGridCell(proc.InsPaid.ToString("f2")));//InsPay
 					rowProc.Cells.Add(new UI.ODGridCell(proc.Writeoff.ToString("f2")));//Writeoff

@@ -338,18 +338,6 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			retVal.ClaimAdjustmentTotal=0;
-			retVal.Deductible=0;
-			retVal.PatientResponsibility=0;
-			for(int i=0;i<retVal.ListClaimAdjustments.Count;i++) {
-				Hx835_Adj adj=retVal.ListClaimAdjustments[i];
-				retVal.ClaimAdjustmentTotal+=adj.AdjAmt;
-				if(adj.IsDeductible) {
-					retVal.Deductible+=adj.AdjAmt;
-				}
-				if(adj.AdjCode=="PR") {
-					retVal.PatientResponsibility+=adj.AdjAmt;
-				}
-			}
 			//2100 NM1: Patient Name.  Required.  Repeat 1.  Guide page 137.
 			if(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="NM1" && _listSegments[segNum].Get(1)=="QC") {
 				retVal.PatientName=ProcessNM1_Person(segNum);
@@ -447,10 +435,6 @@ namespace OpenDentBusiness {
 				retVal.ListProcs.Add(proc);
 				segNum+=proc.SegmentCount;
 			}
-			for(int i=0;i<retVal.ListProcs.Count;i++) {//retVal.Deductible is initialized above with the summation of the deductible amounts from the claim level adjustments.
-				retVal.Deductible+=retVal.ListProcs[i].Deductible;
-				retVal.PatientResponsibility+=retVal.ListProcs[i].PatientResponsibility;
-			}
 			//Now modify the claim dates to encompass the procedure dates.  This step causes procedure dates to bubble up to the claim level when only service line dates are provided.
 			for(int i=0;i<retVal.ListProcs.Count;i++) {
 				Hx835_Proc proc=retVal.ListProcs[i];
@@ -468,8 +452,8 @@ namespace OpenDentBusiness {
 				}
 			}
 			retVal.SegmentCount=segNum-segNumCLP;
-			retVal.Writeoff=retVal.ClaimFee-retVal.InsPaid-retVal.PatientResponsibility;
-			retVal.AllowedAmt=retVal.InsPaid+retVal.PatientResponsibility;
+			retVal.Writeoff=retVal.ClaimFee-retVal.InsPaid-retVal.PatientPortion;
+			retVal.AllowedAmt=retVal.InsPaid+retVal.PatientPortion;
 			return retVal;
 		}
 
@@ -861,15 +845,11 @@ namespace OpenDentBusiness {
 				proc.ListProcAdjustments.AddRange(ProcessCAS(segNum));
 				segNum++;
 			}
-			proc.Deductible=0;
-			proc.PatientResponsibility=0;
+			proc.PatientPortion=0;
 			for(int i=0;i<proc.ListProcAdjustments.Count;i++) {
 				Hx835_Adj adj=proc.ListProcAdjustments[i];
-				if(adj.IsDeductible) {
-					proc.Deductible+=adj.AdjAmt;
-				}
 				if(adj.AdjCode=="PR") {
-					proc.PatientResponsibility+=adj.AdjAmt;
+					proc.PatientPortion+=adj.AdjAmt;
 				}
 			}
 			//2110 REF: Service Identification.  Situational.  Repeat 8.  Guide page 204.  We do not use.
@@ -904,8 +884,8 @@ namespace OpenDentBusiness {
 				segNum++;
 			}
 			proc.SegmentCount=segNum-segNumSVC;
-			proc.AllowedAmt=proc.InsPaid+proc.PatientResponsibility;
-			proc.Writeoff=proc.ProcFee-proc.InsPaid-proc.PatientResponsibility;
+			proc.AllowedAmt=proc.InsPaid+proc.PatientPortion;
+			proc.Writeoff=proc.ProcFee-proc.InsPaid-proc.PatientPortion;
 			return proc;
 		}
 
@@ -2965,13 +2945,9 @@ namespace OpenDentBusiness {
 		public List<Hx835_Proc> ListProcs;
 		///<summary>The sum of all adjustment amounts in ListClaimAdjustments.</summary>
 		public decimal ClaimAdjustmentTotal;
-		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where IsDeductible is true, plus all procedure deductibles in ListProcs.</summary>
-		public decimal Deductible;
-		///<summary>The sum of all adjustment amounts in ListClaimAdjustments where CAS01=PR (including deductibles), plus all procedure PatientResponsibility in ListProcs.</summary>
-		public decimal PatientResponsibility;
-		///<summary>Writeoff = (ClaimFee)-(Claim InsPaid)-(Claim PatientResponsibility)</summary>
+		///<summary>Writeoff = (ClaimFee)-(Claim AllowedAmt) = (ClaimFee)-(Claim InsPaid)-(Claim PatientPortion)</summary>
 		public decimal Writeoff;
-		///<summary>AllowedAmt = (Claim InsPaid)+(Claim PatientResponsibility)</summary>
+		///<summary>AllowedAmt = (Claim InsPaid)+(Claim PatientPortion)</summary>
 		public decimal AllowedAmt;
 		///<summary>Cached the first time GetOriginalClaimNum() is called, since GetOriginalClaimNum() might perform many database calls (especially as we add more matching options in the future).</summary>
 		private long _originalClaimNum=0;
@@ -2988,14 +2964,44 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>
-		public List<Hx835_Proc> GetProcsByProcNum(long procNum) {
-			List<Hx835_Proc> listProcsForProcNum=new List<Hx835_Proc>();
+		public List<Hx835_Proc> GetPaymentsForClaimProc(ClaimProc claimProc) {
+			List<Hx835_Proc> listProcPayments=new List<Hx835_Proc>();
+			//First locate by unique identifier.  There will be no match for older procedures because we did not always send the procedure identifiers.
 			for(int i=0;i<ListProcs.Count;i++) {
-				if(ListProcs[i].ProcNum==procNum) {
-					listProcsForProcNum.Add(ListProcs[i]);
+				if(ListProcs[i].ProcNum==claimProc.ProcNum) {
+					listProcPayments.Add(ListProcs[i]);
 				}
 			}
-			return listProcsForProcNum;
+			if(listProcPayments.Count>0) {
+				return listProcPayments;
+			}
+			//No match was found using the unique ID.  Now try to locate by procedure code and procedure fee.
+			for(int i=0;i<ListProcs.Count;i++) {
+				Hx835_Proc procPaid=ListProcs[i];
+				if(procPaid.ProcFee!=(decimal)claimProc.FeeBilled) {
+					continue;
+				}
+				if(procPaid.ProcCodeBilled!=claimProc.CodeSent) {
+					continue;
+				}
+				listProcPayments.Add(procPaid);
+			}
+			if(listProcPayments.Count>1) {
+				listProcPayments.Clear();//If multiple procedures were matched by code and amount, then we are not certain where to place the payments.
+			}
+			return listProcPayments;
+		}
+
+		///<summary>Concats all adjustment descriptions from ListClaimAdjustments into a single string, separated by newlines.</summary>
+		public string GetRemarks() {
+			StringBuilder sb=new StringBuilder();
+			for(int i=0;i<ListClaimAdjustments.Count;i++) {
+				if(i>0) {
+					sb.Append("\r\n");
+				}
+				sb.Append(ListClaimAdjustments[i].AdjustDescript);
+			}
+			return sb.ToString();
 		}
 
 	}
@@ -3021,14 +3027,25 @@ namespace OpenDentBusiness {
 		public List<Hx835_Adj> ListProcAdjustments;
 		public List<Hx835_Info> ListSupplementalInfo;
 		public List<string> ListRemarks;
-		///<summary>The sum of all adjustment amounts in ListProcAdjustments where IsDeductible is true.</summary>
-		public decimal Deductible;
 		///<summary>The sum of all adjustment amounts in ListProcAdjustments where CAS01=PR, including but not limited to deductibles.</summary>
-		public decimal PatientResponsibility;
-		///<summary>Writeoff = (ProcFee)-(InsPay)-(Patient Responsibility)</summary>
+		public decimal PatientPortion;
+		///<summary>Writeoff = (ProcFee)-(AllowedAmt) = (ProcFee)-(InsPay)-(PatientPortion)</summary>
 		public decimal Writeoff;
-		///<summary>AllowedAmt = (InsPay)+(Patient Responsibility)</summary>
+		///<summary>AllowedAmt = (InsPay)+(PatientPortion)</summary>
 		public decimal AllowedAmt;
+
+		///<summary>Concats all remarks in ListRemarks into a single string.</summary>
+		public string GetRemarks() {
+			StringBuilder sb=new StringBuilder();
+			for(int i=0;i<ListRemarks.Count;i++) {
+				if(i>0) {
+					sb.Append("\r\n");
+				}
+				sb.Append(ListRemarks[i]);
+			}
+			return sb.ToString();
+		}
+
 	}
 
 	///<summary>Corresponds to a CAS segment.  Both the claim level and procedure level include CAS segments.</summary>

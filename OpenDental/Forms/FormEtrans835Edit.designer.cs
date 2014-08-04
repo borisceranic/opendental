@@ -461,13 +461,14 @@ namespace OpenDental{
 			// butPrint
 			// 
 			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butPrint.Autosize = true;
 			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(448, 662);
+			this.butPrint.Location = new System.Drawing.Point(448, 664);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(79, 26);
 			this.butPrint.TabIndex = 212;
@@ -477,12 +478,12 @@ namespace OpenDental{
 			// butClaimDetails
 			// 
 			this.butClaimDetails.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClaimDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butClaimDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butClaimDetails.Autosize = true;
 			this.butClaimDetails.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClaimDetails.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClaimDetails.CornerRadius = 4F;
-			this.butClaimDetails.Location = new System.Drawing.Point(9, 631);
+			this.butClaimDetails.Location = new System.Drawing.Point(9, 664);
 			this.butClaimDetails.Name = "butClaimDetails";
 			this.butClaimDetails.Size = new System.Drawing.Size(100, 25);
 			this.butClaimDetails.TabIndex = 213;

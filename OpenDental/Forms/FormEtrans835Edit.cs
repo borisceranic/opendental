@@ -270,38 +270,47 @@ namespace OpenDental {
 			List<PatPlan> listPatPlans=PatPlans.Refresh(claim.PatNum);
 			List<ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
 			ClaimProc cpByTotal=new ClaimProc();
-			cpByTotal.DedApplied=(double)claimPaid.Deductible;
+			cpByTotal.DedApplied=(double)claimPaid.PatientPortion;
 			cpByTotal.AllowedOverride=(double)claimPaid.AllowedAmt;
 			cpByTotal.InsPayAmt=(double)claimPaid.InsPaid;
 			cpByTotal.WriteOff=(double)claimPaid.Writeoff;
+			cpByTotal.Remarks=claimPaid.GetRemarks();
 			for(int i=0;i<listClaimProcsForClaim.Count;i++) {
 				ClaimProc claimProc=listClaimProcsForClaim[i];
-				List<Hx835_Proc> listProcsForProcNum=claimPaid.GetProcsByProcNum(claimProc.ProcNum);
-				//If listProcsForProcNum.Count==0, then procedure payment details were not not found.
-				//This can happen with procedures from older 837s, when we did not send out the procedure identifiers, in which case ProcNum would be 0.
-				//Since we cannot place detail on the service line, we will leave the amounts for the procedure on the total payment line.
-				//If listProcsForPorcNum.Count==1, then we know that the procedure was adjudicated as is or it might have been bundled, but we treat both situations the same way.
-				//The 835 is required to include one line for each bundled procedure, which gives is a direct manner in which to associate each line to its original procedure.
-				//If listProcForProcNum.Count > 1, then the procedure was either split or unbundled when it was adjudicated by the payer.
-				//We will not bother to modify the procedure codes on the claim, because the user can see how the procedure was split or unbunbled by viewing the 835 details.
-				//Instead, we will simply add up all of the partial payment lines for the procedure, and report the full payment amount on the original procedure.
-				if(claimProc.Status==ClaimProcStatus.Received || claimProc.Status==ClaimProcStatus.Supplemental || claimProc.Status==ClaimProcStatus.CapComplete) {//Already received for some reason.
-					//Do not modify the claimproc amounts, because they are historical now.
-				}
-				else {
-					claimProc.DedApplied=0;
-					claimProc.AllowedOverride=0;
-					claimProc.InsPayAmt=0;
-					claimProc.WriteOff=0;
-					for(int j=0;j<listProcsForProcNum.Count;j++) {
-						Hx835_Proc procPaidPartial=listProcsForProcNum[j];
-						claimProc.DedApplied+=(double)procPaidPartial.Deductible;
-						claimProc.AllowedOverride+=(double)procPaidPartial.AllowedAmt;
-						claimProc.InsPayAmt+=(double)procPaidPartial.InsPaid;
-						claimProc.WriteOff+=(double)procPaidPartial.Writeoff;
+				if(claimProc.ClaimProcNum>0) {//Procedure, not an existing total payment.
+					List<Hx835_Proc> listProcsForProcNum=claimPaid.GetPaymentsForClaimProc(claimProc);
+					//If listProcsForProcNum.Count==0, then procedure payment details were not not found.
+					//This can happen with procedures from older 837s, when we did not send out the procedure identifiers, in which case ProcNum would be 0.
+					//Since we cannot place detail on the service line, we will leave the amounts for the procedure on the total payment line.
+					//If listProcsForPorcNum.Count==1, then we know that the procedure was adjudicated as is or it might have been bundled, but we treat both situations the same way.
+					//The 835 is required to include one line for each bundled procedure, which gives is a direct manner in which to associate each line to its original procedure.
+					//If listProcForProcNum.Count > 1, then the procedure was either split or unbundled when it was adjudicated by the payer.
+					//We will not bother to modify the procedure codes on the claim, because the user can see how the procedure was split or unbunbled by viewing the 835 details.
+					//Instead, we will simply add up all of the partial payment lines for the procedure, and report the full payment amount on the original procedure.
+					if(claimProc.Status==ClaimProcStatus.Received || claimProc.Status==ClaimProcStatus.Supplemental || claimProc.Status==ClaimProcStatus.CapComplete) {//Already received this procedure for some reason.
+						//Do not modify the claimproc amounts, because they are historical now.
+					}
+					else {
+						claimProc.DedApplied=0;
+						claimProc.AllowedOverride=0;
+						claimProc.InsPayAmt=0;
+						claimProc.WriteOff=0;
+						StringBuilder sb=new StringBuilder();
+						for(int j=0;j<listProcsForProcNum.Count;j++) {
+							Hx835_Proc procPaidPartial=listProcsForProcNum[j];
+							claimProc.DedApplied+=(double)procPaidPartial.PatientPortion;
+							claimProc.AllowedOverride+=(double)procPaidPartial.AllowedAmt;
+							claimProc.InsPayAmt+=(double)procPaidPartial.InsPaid;
+							claimProc.WriteOff+=(double)procPaidPartial.Writeoff;
+							if(sb.Length>0) {
+								sb.Append("\r\n");
+							}
+							sb.Append(procPaidPartial.GetRemarks());
+						}
+						claimProc.Remarks=sb.ToString();
 					}
 				}
-				//Remove the procedure totals from the "by total" payment, since they have now been accounted for on the individual procedure line.  Totals will not be affected if no procedure details could be located.
+				//Displace the procedure totals from the "by total" payment, since they have now been accounted for on the individual procedure line.  Totals will not be affected if no procedure details could be located.
 				cpByTotal.DedApplied-=claimProc.DedApplied;
 				cpByTotal.AllowedOverride-=claimProc.AllowedOverride;
 				cpByTotal.InsPayAmt-=claimProc.InsPayAmt;
@@ -311,22 +320,10 @@ namespace OpenDental {
 			if(claimPaid.ListProcs.Count==0) {//No procedure detail was provided in the 835.  Force the total payment amount to show, even if all zeros.
 				isByTotal=true;
 			}
-			if(cpByTotal.DedApplied>0 || cpByTotal.AllowedOverride>0 || cpByTotal.InsPayAmt>0 || cpByTotal.WriteOff>0) {
+			if(cpByTotal.DedApplied!=0 || cpByTotal.AllowedOverride!=0 || cpByTotal.InsPayAmt!=0 || cpByTotal.WriteOff!=0) {
 				isByTotal=true;
 			}
 			if(isByTotal) {
-				if(cpByTotal.DedApplied<0) {//Could be negative if the user manually received a claimproc and specified a large amount.
-					cpByTotal.DedApplied=0;
-				}
-				if(cpByTotal.AllowedOverride<0) {//Could be negative if the user manually received a claimproc and specified a large amount.
-					cpByTotal.AllowedOverride=0;
-				}
-				if(cpByTotal.InsPayAmt<0) {//Could be negative if the user manually received a claimproc and specified a large amount.
-					cpByTotal.InsPayAmt=0;
-				}
-				if(cpByTotal.WriteOff<0) {//Could be negative if the user manually received a claimproc and specified a large amount.
-					cpByTotal.WriteOff=0;
-				}
 				cpByTotal.Status=ClaimProcStatus.NotReceived;//Will be marked received once the user accepts the payment amount by clicking OK in FormEtrans835ClaimPay.  Must be NotReceived, or will not be saved to database.
 				//ClaimProcs.Cur.ProcNum 
 				cpByTotal.ClaimNum=claim.ClaimNum;
@@ -363,7 +360,7 @@ namespace OpenDental {
 			FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,claim,pat,fam,listInsPlans,listPatPlans,listInsSubs);
 			formP.ListClaimProcsForClaim=listClaimProcsForClaim;
 			if(formP.ShowDialog()!=DialogResult.OK) {
-				if(cpByTotal!=null) {
+				if(cpByTotal.ClaimProcNum!=0) {
 					ClaimProcs.Delete(cpByTotal);
 				}
 			}
