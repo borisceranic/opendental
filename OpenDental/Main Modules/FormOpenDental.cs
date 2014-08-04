@@ -2054,6 +2054,7 @@ namespace OpenDental{
 						Userod adminUser=Userods.GetAdminUser();
 						if(adminUser.Password=="") {
 							Security.CurUser=adminUser.Copy();
+							SecurityLogs.MakeLogEntry(Permissions.None,0,"User: "+Security.CurUser.UserName+" has logged on.");
 						}
 						else {
 							FormLogOn_=new FormLogOn();
@@ -5845,6 +5846,7 @@ namespace OpenDental{
 		}
 
 		private void LogOffNow() {
+			SecurityLogs.MakeLogEntry(Permissions.None,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			for(int f=Application.OpenForms.Count-1;f>=0;f--) {//Loop backwards so we don't get an array out of bounds error
 				if(Application.OpenForms[f]==this) {// main form
 					continue;
@@ -6063,6 +6065,7 @@ namespace OpenDental{
 				_threadTimeSynch.Join();
 				_threadTimeSynch=null;
 			}
+				SecurityLogs.MakeLogEntry(Permissions.None,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			//if(PrefC.GetBool(PrefName.DistributorKey)) {//for OD HQ
 			//  for(int f=Application.OpenForms.Count-1;f>=0;f--) {
 			//    if(Application.OpenForms[f]==this) {// main form

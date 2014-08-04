@@ -204,6 +204,7 @@ namespace OpenDental{
 				}
 				Security.PasswordTyped=password;
 			}
+			SecurityLogs.MakeLogEntry(Permissions.None,0,"User: "+Security.CurUser.UserName+" has logged on.");
 			if(PrefC.GetBool(PrefName.TasksCheckOnStartup)){
 				int taskcount=Tasks.UserTasksCount(Security.CurUser.UserNum);
 				if(taskcount>0){
