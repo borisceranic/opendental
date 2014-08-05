@@ -5798,6 +5798,7 @@ namespace OpenDental{
 			DataTable table=DataSetMain.Tables["ProgNotes"];
 			List<ProcGroupItem> procGroupItems=ProcGroupItems.Refresh(PatCur.PatNum);
 			ProcList=new List<DataRow>();
+			Dictionary<long,ODGridRow> procGroupNote=new Dictionary<long,ODGridRow>();
 			List<long> procNumList=new List<long>();//a list of all procNums of procs that will be visible
 			bool showGroupNote;
 			if(checkShowTeeth.Checked) {
@@ -5994,7 +5995,30 @@ namespace OpenDental{
 				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
 				row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
 				row.Tag=table.Rows[i];
-				gridProg.Rows.Add(row);
+				bool checkNotGroupNote=true;
+				for(int j=0;j<procGroupItems.Count;j++) {//loop through all procGroupItems for the patient. 
+					if(procGroupItems[j].GroupNum==PIn.Long(table.Rows[i]["ProcNum"].ToString())) {//if this item is associated with this group note
+						procGroupNote.Add(PIn.Long(table.Rows[i]["ProcNum"].ToString()),row);
+						checkNotGroupNote=false;
+						break;
+					}
+				}
+				if(checkNotGroupNote) {
+					gridProg.Rows.Add(row);
+				}
+			}
+			int lastProcIdx=0;
+			for(int i=0;i<procGroupItems.Count;i++) {
+				if(Procedures.GetOneProc(procGroupItems[i].GroupNum,false).ProcStatus==ProcStat.D) {
+					continue;
+				}
+				ODGridRow curRow=procGroupNote[procGroupItems[i].GroupNum];
+				for(int j=0;j<gridProg.Rows.Count;j++) {
+					if(procGroupItems[i].ProcNum==PIn.Long(((DataRow)gridProg.Rows[j].Tag)["ProcNum"].ToString())) {
+						lastProcIdx=j;
+					}
+				}
+				gridProg.Rows.Insert(lastProcIdx+1,curRow);
 			}
 			ChartLayoutHelper.SetGridProgWidth(gridProg,ClientSize,panelEcw,textTreatmentNotes,toothChart);
 			gridProg.EndUpdate();
