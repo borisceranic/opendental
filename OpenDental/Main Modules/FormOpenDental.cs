@@ -6065,7 +6065,9 @@ namespace OpenDental{
 				_threadTimeSynch.Join();
 				_threadTimeSynch=null;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
+			if(Security.CurUser!=null) {
+				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
+			}
 			//if(PrefC.GetBool(PrefName.DistributorKey)) {//for OD HQ
 			//  for(int f=Application.OpenForms.Count-1;f>=0;f--) {
 			//    if(Application.OpenForms[f]==this) {// main form
