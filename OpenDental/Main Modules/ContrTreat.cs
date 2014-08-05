@@ -91,6 +91,7 @@ namespace OpenDental{
 		private Patient PatCur;
 		private System.Windows.Forms.CheckBox checkShowFees;
 		private OpenDental.UI.ODGrid gridMain;
+		private OpenDental.UI.ODGrid gridPrint;
 		private OpenDental.UI.ODGrid gridPreAuth;
 		private List<InsPlan> InsPlanList;
 		private List<InsSub> SubList;
@@ -204,6 +205,7 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.groupBoxIndIns = new System.Windows.Forms.GroupBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.gridPrint = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.gridPreAuth = new OpenDental.UI.ODGrid();
 			this.gridPlans = new OpenDental.UI.ODGrid();
@@ -1492,6 +1494,207 @@ namespace OpenDental{
 			gridMain.EndUpdate();
 		}
 
+		private void FillGridPrint() {
+			this.Controls.Add(gridPrint);
+			gridPrint.BeginUpdate();
+			gridPrint.Columns.Clear();
+			ODGridColumn col;
+			DisplayFields.RefreshCache();//probably needs to be removed.
+			List<DisplayField> fields=DisplayFields.GetForCategory(DisplayFieldCategory.TreatmentPlanModule);
+			for(int i=0;i<fields.Count;i++) {
+				if(fields[i].Description=="") {
+					col=new ODGridColumn(fields[i].InternalName,fields[i].ColumnWidth);
+				}
+				else {
+					col=new ODGridColumn(fields[i].Description,fields[i].ColumnWidth);
+				}
+				if(fields[i].InternalName=="Fee" && !checkShowFees.Checked) {
+					continue;
+				}
+				if((fields[i].InternalName=="Pri Ins" || fields[i].InternalName=="Sec Ins") && !checkShowIns.Checked) {
+					continue;
+				}
+				if(fields[i].InternalName=="Discount" && !checkShowDiscount.Checked) {
+					continue;
+				}
+				if(fields[i].InternalName=="Pat" && !checkShowIns.Checked) {
+					continue;
+				}
+				if(fields[i].InternalName=="Fee" 
+					|| fields[i].InternalName=="Pri Ins"
+					|| fields[i].InternalName=="Sec Ins"
+					|| fields[i].InternalName=="Discount"
+					|| fields[i].InternalName=="Pat") {
+					col.TextAlign=HorizontalAlignment.Right;
+				}
+				gridPrint.Columns.Add(col);
+			}
+			gridPrint.Rows.Clear();
+			if(PatCur==null) {
+				gridPrint.EndUpdate();
+				return;
+			}
+			ODGridRow row;
+			for(int i=0;i<RowsMain.Count;i++) {
+				row=new ODGridRow();
+				for(int j=0;j<fields.Count;j++) {
+					switch(fields[j].InternalName) {
+						case "Done":
+							if(RowsMain[i].Done!=null) {
+								row.Cells.Add(RowsMain[i].Done.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Priority":
+							if(RowsMain[i].Priority!=null) {
+								row.Cells.Add(RowsMain[i].Priority.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Tth":
+							if(RowsMain[i].Tth!=null) {
+								row.Cells.Add(RowsMain[i].Tth.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Surf":
+							if(RowsMain[i].Surf!=null) {
+								row.Cells.Add(RowsMain[i].Surf.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Code":
+							if(RowsMain[i].Code!=null) {
+								row.Cells.Add(RowsMain[i].Code.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Description":
+							if(RowsMain[i].Description!=null) {
+								row.Cells.Add(RowsMain[i].Description.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Fee":
+							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
+								if(checkShowFees.Checked) {
+									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
+								}
+							}
+							else {
+								if(checkShowFees.Checked && RowsMain[i].Description.ToString()=="Total") {
+									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
+								}
+								else {
+									row.Cells.Add("");
+								}
+							}
+							break;
+						case "Pri Ins":
+							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
+								if(checkShowIns.Checked) {
+									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
+								}
+							}
+							else {
+								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
+								}
+								else {
+									row.Cells.Add("");
+								}
+							}
+							break;
+						case "Sec Ins":
+							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
+								if(checkShowIns.Checked) {
+									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
+								}
+							}
+							else {
+								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
+								}
+								else {
+									row.Cells.Add("");
+								}
+							}
+							break;
+						case "Discount":
+							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
+								if(checkShowDiscount.Checked) {
+									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
+								}
+							}
+							else {
+								if(checkShowDiscount.Checked && RowsMain[i].Description.ToString()=="Total") {
+									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
+								}
+								else {
+									row.Cells.Add("");
+								}
+							}
+							break;
+						case "Pat":
+							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
+								if(checkShowIns.Checked) {
+									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
+								}
+							}
+							else {
+								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
+								}
+								else {
+									row.Cells.Add("");
+								}
+							}
+							break;
+						case "Prognosis":
+							if(RowsMain[i].Prognosis!=null) {
+								row.Cells.Add(RowsMain[i].Prognosis.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Dx":
+							if(RowsMain[i].Dx!=null) {
+								row.Cells.Add(RowsMain[i].Dx.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+					}
+				}
+				if(RowsMain[i].ColorText!=null) {
+					row.ColorText=RowsMain[i].ColorText;
+				}
+				if(RowsMain[i].ColorLborder!=null) {
+					row.ColorLborder=RowsMain[i].ColorLborder;
+				}
+				if(RowsMain[i].Tag!=null) {
+					row.Tag=RowsMain[i].Tag;
+				}
+				row.Bold=RowsMain[i].Bold;
+				gridPrint.Rows.Add(row);
+			}
+			gridPrint.EndUpdate();
+		}
+
 		private void FillSummary(){
 			textFamPriMax.Text="";
 			textFamPriDed.Text="";
@@ -1850,6 +2053,9 @@ namespace OpenDental{
 			#endif
 			long category=0;
 			OpenDentBusiness.Document docSave = new OpenDentBusiness.Document();
+			MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
+			pdfRenderer.Document=CreateDocument();
+			pdfRenderer.RenderDocument();
 			//Check if there are any image category definitions with "TreatPlans"
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 				if((DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="R" || DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="XR") && PrefC.AtoZfolderUsed) {
@@ -1858,9 +2064,6 @@ namespace OpenDental{
 					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
 					string fileName="TPArchive"+docSave.DocNum;
 					//Then create a PDF and save it to the AtoZ folder if AtoZ pref is on.
-					MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
-					pdfRenderer.Document=doc;
-					pdfRenderer.RenderDocument();
 					byte[] rawData= { };
 					if(PrefC.AtoZfolderUsed) {
 						if(filePath.EndsWith("\\")) {
@@ -2120,7 +2323,15 @@ namespace OpenDental{
 			}	
 			#endregion
 			MigraDocHelper.InsertSpacer(section,10);
-			MigraDocHelper.DrawGrid(section,gridMain);
+			if(!PrefC.GetBool(PrefName.TreatPlanItemized)) {
+				FillGridPrint();
+				MigraDocHelper.DrawGrid(section,gridPrint);
+				gridPrint.Visible=false;
+				FillMainDisplay();
+			}
+			else {
+				MigraDocHelper.DrawGrid(section,gridMain);
+			}
 			//Print benefits----------------------------------------------------------------------------------------------------
 			#region printBenefits
 			if(checkShowIns.Checked) {

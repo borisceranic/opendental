@@ -113,6 +113,7 @@ namespace OpenDental{
 		private ComboBox comboProcDiscountType;
 		private Label label19;
 		private CheckBox checkChartNonPatientWarn;
+		private CheckBox checkTreatPlanItemized;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -212,6 +213,7 @@ namespace OpenDental{
 			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
 			this.label19 = new System.Windows.Forms.Label();
 			this.tabChart = new System.Windows.Forms.TabPage();
+			this.checkChartNonPatientWarn = new System.Windows.Forms.CheckBox();
 			this.checkProcLockingIsAllowed = new System.Windows.Forms.CheckBox();
 			this.textICD9DefaultForNewProcs = new System.Windows.Forms.TextBox();
 			this.checkMedicalFeeUsedForNewProcs = new System.Windows.Forms.CheckBox();
@@ -247,7 +249,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkChartNonPatientWarn = new System.Windows.Forms.CheckBox();
+			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -953,6 +955,7 @@ namespace OpenDental{
 			// tabTreatPlan
 			// 
 			this.tabTreatPlan.BackColor = System.Drawing.SystemColors.Window;
+			this.tabTreatPlan.Controls.Add(this.checkTreatPlanItemized);
 			this.tabTreatPlan.Controls.Add(this.textDiscountPercentage);
 			this.tabTreatPlan.Controls.Add(this.labelDiscountPercentage);
 			this.tabTreatPlan.Controls.Add(this.comboProcDiscountType);
@@ -1032,6 +1035,20 @@ namespace OpenDental{
 			this.tabChart.Size = new System.Drawing.Size(466, 479);
 			this.tabChart.TabIndex = 4;
 			this.tabChart.Text = "Chart";
+			// 
+			// checkChartNonPatientWarn
+			// 
+			this.checkChartNonPatientWarn.AutoSize = true;
+			this.checkChartNonPatientWarn.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkChartNonPatientWarn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkChartNonPatientWarn.Location = new System.Drawing.Point(309, 259);
+			this.checkChartNonPatientWarn.Name = "checkChartNonPatientWarn";
+			this.checkChartNonPatientWarn.Size = new System.Drawing.Size(131, 18);
+			this.checkChartNonPatientWarn.TabIndex = 211;
+			this.checkChartNonPatientWarn.Text = "Non Patient Warning";
+			this.checkChartNonPatientWarn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkChartNonPatientWarn.UseVisualStyleBackColor = true;
+			this.checkChartNonPatientWarn.Click += new System.EventHandler(this.checkChartNonPatientWarn_Click);
 			// 
 			// checkProcLockingIsAllowed
 			// 
@@ -1428,19 +1445,19 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkChartNonPatientWarn
+			// checkTreatPlanItemized
 			// 
-			this.checkChartNonPatientWarn.AutoSize = true;
-			this.checkChartNonPatientWarn.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkChartNonPatientWarn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkChartNonPatientWarn.Location = new System.Drawing.Point(309, 259);
-			this.checkChartNonPatientWarn.Name = "checkChartNonPatientWarn";
-			this.checkChartNonPatientWarn.Size = new System.Drawing.Size(131, 18);
-			this.checkChartNonPatientWarn.TabIndex = 211;
-			this.checkChartNonPatientWarn.Text = "Non Patient Warning";
-			this.checkChartNonPatientWarn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkChartNonPatientWarn.UseVisualStyleBackColor = true;
-			this.checkChartNonPatientWarn.Click += new System.EventHandler(this.checkChartNonPatientWarn_Click);
+			this.checkTreatPlanItemized.AutoSize = true;
+			this.checkTreatPlanItemized.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanItemized.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTreatPlanItemized.Location = new System.Drawing.Point(300, 152);
+			this.checkTreatPlanItemized.Name = "checkTreatPlanItemized";
+			this.checkTreatPlanItemized.Size = new System.Drawing.Size(140, 18);
+			this.checkTreatPlanItemized.TabIndex = 212;
+			this.checkTreatPlanItemized.Text = "Itemize Treatment Plan";
+			this.checkTreatPlanItemized.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanItemized.UseVisualStyleBackColor = true;
+			this.checkTreatPlanItemized.Click += new System.EventHandler(this.checkTreatPlanItemized_Click);
 			// 
 			// FormModuleSetup
 			// 
@@ -1587,6 +1604,7 @@ namespace OpenDental{
 			textTreatNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
 			checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
 			checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
+			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized);
 			#endregion
 			#region Chart Module
 			//Chart module-----------------------------------------------------------------------
@@ -1718,6 +1736,18 @@ namespace OpenDental{
 				_changed=true;
 			}
 			textAllergiesIndicateNone.Text=AllergyDefs.GetOne(formA.SelectedAllergyDefNum).Description;
+		}
+
+		private void checkChartNonPatientWarn_Click(object sender,EventArgs e) {
+			if(Prefs.UpdateBool(PrefName.ChartNonPatientWarn,checkChartNonPatientWarn.Checked)) {
+				_changed=true;
+			}
+		}
+
+		private void checkTreatPlanItemized_Click(object sender,EventArgs e) {
+			if(Prefs.UpdateBool(PrefName.TreatPlanItemized,checkTreatPlanItemized.Checked)) {
+				_changed=true;
+			}
 		}
 
 		private void checkAppointmentTimeIsLocked_MouseUp(object sender,MouseEventArgs e) {
@@ -1874,12 +1904,6 @@ namespace OpenDental{
 		private void FormModuleSetup_FormClosing(object sender,FormClosingEventArgs e) {
 			if(_changed){
 				DataValid.SetInvalid(InvalidType.Prefs);
-			}
-		}
-
-		private void checkChartNonPatientWarn_Click(object sender,EventArgs e) {
-			if(Prefs.UpdateBool(PrefName.ChartNonPatientWarn,checkChartNonPatientWarn.Checked)) {
-				_changed=true;
 			}
 		}
 

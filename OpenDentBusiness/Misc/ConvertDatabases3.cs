@@ -5758,7 +5758,14 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ChartNonPatientWarn','1')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanItemized','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanItemized','1')";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";

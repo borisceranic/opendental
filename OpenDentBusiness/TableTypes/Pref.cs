@@ -462,6 +462,7 @@ namespace OpenDentBusiness {
 		TreatPlanDiscountAdjustmentType,
 		///<summary>Set to 0 to clear out previous discounts.</summary>
 		TreatPlanDiscountPercent,
+		TreatPlanItemized,
 		TreatPlanPriorityForDeclined,
 		TreatPlanShowCompleted,
 		TreatPlanShowGraphics,
