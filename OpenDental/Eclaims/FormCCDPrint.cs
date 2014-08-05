@@ -406,7 +406,7 @@ namespace OpenDental.Eclaims {
 			string msg=message.ToString();
 			if(msg.Length>0){
 				MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(msg);
-				msgBox.Text="Messages";
+				msgBox.Text=Lan.g(this,"Information from Insurance Carrier");
 				msgBox.ShowDialog();
 			}
 		}
