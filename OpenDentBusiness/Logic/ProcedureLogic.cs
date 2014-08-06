@@ -11,8 +11,9 @@ namespace OpenDentBusiness {
 			//first, by status
 			if(x.Table.Columns.Contains("ProcStatus") && y.Table.Columns.Contains("ProcStatus")) {
 				if(x["ProcStatus"].ToString()!=y["ProcStatus"].ToString()) {
-					//Cn,TP,R,EO,EC,C,D
-					//TODO: In the future this could be improved due to some issues that sorting the ODGrid has. Such as procedure "jumping" inconsistencies when sorting by date
+					//Cn,TP,R,EO,C,EC,D
+					//EC procs will draw below C procs of same date, but this is not a problem since C procs should always have a later date than non group note EC procs.
+					//EC must come after C so that group notes will come after their procedures in Progress Notes.
 					int xIdx=0;
 					switch(x["ProcStatus"].ToString()) {
 						case "7"://Cn
@@ -27,10 +28,10 @@ namespace OpenDentBusiness {
 						case "4"://EO
 							xIdx=3;
 							break;
-						case "3"://EC
+						case "2"://C
 							xIdx=4;
 							break;
-						case "2"://C
+						case "3"://EC
 							xIdx=5;
 							break;
 						case "6"://D
@@ -51,10 +52,10 @@ namespace OpenDentBusiness {
 						case "4"://EO
 							yIdx=3;
 							break;
-						case "3"://EC
+						case "2"://C
 							yIdx=4;
 							break;
-						case "2"://C
+						case "3"://EC
 							yIdx=5;
 							break;
 						case "6"://D
