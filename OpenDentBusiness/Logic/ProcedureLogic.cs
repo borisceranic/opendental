@@ -12,7 +12,8 @@ namespace OpenDentBusiness {
 			if(x.Table.Columns.Contains("ProcStatus") && y.Table.Columns.Contains("ProcStatus")) {
 				if(x["ProcStatus"].ToString()!=y["ProcStatus"].ToString()) {
 					//Cn,TP,R,EO,C,EC,D
-					//EC procs will draw below C procs of same date, but this is not a problem since C procs should always have a later date than non group note EC procs.
+					//EC procs will draw on top of C procs of same date in the 3D tooth chart, 
+					//but this is not a problem since C procs should always have a later date than EC procs.
 					//EC must come after C so that group notes will come after their procedures in Progress Notes.
 					int xIdx=0;
 					switch(x["ProcStatus"].ToString()) {
