@@ -71,89 +71,90 @@ namespace OpenDental{
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(592,514);
+			this.butCancel.Location = new System.Drawing.Point(592, 514);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 3;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(497,514);
+			this.butOK.Location = new System.Drawing.Point(497, 514);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 2;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// textNote
 			// 
-			this.textNote.Location = new System.Drawing.Point(38,62);
+			this.textNote.Location = new System.Drawing.Point(38, 62);
 			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
-			this.textNote.Size = new System.Drawing.Size(628,431);
+			this.textNote.Size = new System.Drawing.Size(628, 431);
 			this.textNote.TabIndex = 1;
+			this.textNote.TextChanged += new System.EventHandler(this.textNote_TextChanged);
 			// 
 			// butDelete
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(40,514);
+			this.butDelete.Location = new System.Drawing.Point(40, 514);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(79,26);
+			this.butDelete.Size = new System.Drawing.Size(79, 26);
 			this.butDelete.TabIndex = 4;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(37,44);
+			this.label1.Location = new System.Drawing.Point(37, 44);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(100,16);
+			this.label1.Size = new System.Drawing.Size(100, 16);
 			this.label1.TabIndex = 15;
 			this.label1.Text = "Note";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textAbbreviation
 			// 
-			this.textAbbreviation.Location = new System.Drawing.Point(38,22);
+			this.textAbbreviation.Location = new System.Drawing.Point(38, 22);
 			this.textAbbreviation.Name = "textAbbreviation";
-			this.textAbbreviation.Size = new System.Drawing.Size(252,20);
+			this.textAbbreviation.Size = new System.Drawing.Size(252, 20);
 			this.textAbbreviation.TabIndex = 0;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(37,4);
+			this.label2.Location = new System.Drawing.Point(37, 4);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(157,16);
+			this.label2.Size = new System.Drawing.Size(157, 16);
 			this.label2.TabIndex = 17;
 			this.label2.Text = "Abbreviation";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(293,13);
+			this.label3.Location = new System.Drawing.Point(293, 13);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(365,33);
+			this.label3.Size = new System.Drawing.Size(365, 33);
 			this.label3.TabIndex = 18;
 			this.label3.Text = "If you type a ? immediately followed by the abbreviation, your note will be inser" +
     "ted";
@@ -161,8 +162,8 @@ namespace OpenDental{
 			// 
 			// FormQuickPasteNoteEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(719,564);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(719, 564);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textAbbreviation);
@@ -228,6 +229,14 @@ namespace OpenDental{
 				QuickPasteNotes.Update(QuickNote);
 			}
 			DialogResult=DialogResult.OK;
+		}
+
+		private void textNote_TextChanged(object sender,EventArgs e) {
+			//We do not normally use TextChanged but we need to perform maintenance of the data when it loads, is saved, or is pasted to.
+			textNote.Text=textNote.Text.Replace("\r\n","\n")//convert windows to \n
+				.Replace("\r","\n")									//replace linux or other \n
+																			//Mac is already \n
+				.Replace("\n","\r\n");								//reset to Windows newline character		
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
