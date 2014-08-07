@@ -979,7 +979,7 @@ namespace OpenDentBusiness{
 				row["Assistant"]=raw.Rows[i]["apptAssistant"].ToString();
 				row["assistantAbbr"]="";
 				if(row["Assistant"].ToString()!="0") {
-					row["assistantAbbr"]=Employees.GetAbbr(PIn.Long(row["apptAssistant"].ToString()));
+					row["assistantAbbr"]=Employees.GetAbbr(PIn.Long(raw.Rows[i]["apptAssistant"].ToString()));
 				}
 				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(raw.Rows[i]["patBillingType"].ToString()));
 				row["chartNumber"]=raw.Rows[i]["patChartNumber"].ToString();
