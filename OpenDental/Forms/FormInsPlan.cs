@@ -1798,7 +1798,7 @@ namespace OpenDental{
 			}
 			if(IsNewPlan) {//Regardless of whether from big list or from individual patient.  Overrides above settings.
 				//radioCreateNew.Checked=true;//this logic needs to be repeated in OK.
-				groupChanges.Visible=false;//because it wouldn't make sense to apply anything to "all"
+				//groupChanges.Visible=false;//because it wouldn't make sense to apply anything to "all"
 				if(PrefC.GetBool(PrefName.InsDefaultPPOpercent)) {
 					PlanCur.PlanType="p";
 				}
@@ -4213,6 +4213,7 @@ namespace OpenDental{
 							else {//option is checked for "create new plan if needed"
 								PlanCur.PlanNum=PlanNumOriginal;
 								InsPlans.Update(PlanCur);
+								SubCur.PlanNum=PlanCur.PlanNum;
 								//no need to update PatPlan.  Same old PlanNum.
 								//When 'pick from list' button was pushed, benfitList was filled with benefits from the picked plan.
 								//benefitListOld was not touched and still contains the old benefits.  So the original benefits will be automatically deleted.
