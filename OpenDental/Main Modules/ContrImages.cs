@@ -232,6 +232,7 @@ namespace OpenDental {
 			this.menuPrefs = new System.Windows.Forms.MenuItem();
 			this.panelNote = new System.Windows.Forms.Panel();
 			this.labelInvalidSig = new System.Windows.Forms.Label();
+			this.sigBox = new OpenDental.UI.SignatureBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textNote = new System.Windows.Forms.TextBox();
@@ -240,13 +241,13 @@ namespace OpenDental {
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.ToolBarPaint = new OpenDental.UI.ODToolBar();
 			this.sliderBrightnessContrast = new OpenDental.UI.ContrWindowingSlider();
-			this.sigBox = new OpenDental.UI.SignatureBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
 			this.panelNote.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// treeDocuments
 			// 
+			this.treeDocuments.AllowDrop = true;
 			this.treeDocuments.ContextMenu = this.contextTree;
 			this.treeDocuments.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.treeDocuments.FullRowSelect = true;
@@ -261,6 +262,8 @@ namespace OpenDental {
 			this.treeDocuments.TabIndex = 0;
 			this.treeDocuments.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.TreeDocuments_AfterCollapse);
 			this.treeDocuments.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.TreeDocuments_AfterExpand);
+			this.treeDocuments.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeDocuments_DragDrop);
+			this.treeDocuments.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeDocuments_DragEnter);
 			this.treeDocuments.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TreeDocuments_MouseDoubleClick);
 			this.treeDocuments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TreeDocuments_MouseDown);
 			this.treeDocuments.MouseLeave += new System.EventHandler(this.TreeDocuments_MouseLeave);
@@ -400,6 +403,14 @@ namespace OpenDental {
 			this.labelInvalidSig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.labelInvalidSig.DoubleClick += new System.EventHandler(this.labelInvalidSig_DoubleClick);
 			// 
+			// sigBox
+			// 
+			this.sigBox.Location = new System.Drawing.Point(308, 20);
+			this.sigBox.Name = "sigBox";
+			this.sigBox.Size = new System.Drawing.Size(362, 79);
+			this.sigBox.TabIndex = 90;
+			this.sigBox.DoubleClick += new System.EventHandler(this.sigBox_DoubleClick);
+			// 
 			// label15
 			// 
 			this.label15.Location = new System.Drawing.Point(305, 0);
@@ -480,16 +491,9 @@ namespace OpenDental {
 			this.sliderBrightnessContrast.Scroll += new System.EventHandler(this.brightnessContrastSlider_Scroll);
 			this.sliderBrightnessContrast.ScrollComplete += new System.EventHandler(this.brightnessContrastSlider_ScrollComplete);
 			// 
-			// sigBox
-			// 
-			this.sigBox.Location = new System.Drawing.Point(308, 20);
-			this.sigBox.Name = "sigBox";
-			this.sigBox.Size = new System.Drawing.Size(362, 79);
-			this.sigBox.TabIndex = 90;
-			this.sigBox.DoubleClick += new System.EventHandler(this.sigBox_DoubleClick);
-			// 
 			// ContrImages
 			// 
+			this.AllowDrop = true;
 			this.Controls.Add(this.panelVertLine);
 			this.Controls.Add(this.panelUnderline);
 			this.Controls.Add(this.ToolBarMain);
@@ -3362,8 +3366,57 @@ namespace OpenDental {
 			InvalidateSettings(ImageSettingFlags.ALL,false,idxDocsToUpdate);
 		}
 
+		private void treeDocuments_DragEnter(object sender,DragEventArgs e) {
+			if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+				e.Effect=DragDropEffects.Copy;//Fills the DragEventArgs for DragDrop
+			}
+		}
 
-
+		private void treeDocuments_DragDrop(object sender,DragEventArgs e) {
+			TreeNode nodeOver=treeDocuments.GetNodeAt(treeDocuments.PointToClient(Cursor.Position));
+			if(nodeOver==null) {
+				return;
+			}
+			ImageNodeId nodeOverId=(ImageNodeId)nodeOver.Tag;
+			long nodeOverCategoryDefNum=0;
+			if(nodeOverId.NodeType==ImageNodeType.Category) {
+				nodeOverCategoryDefNum=DefC.Short[(int)DefCat.ImageCats][nodeOver.Index].DefNum;
+			}
+			else {
+				nodeOverCategoryDefNum=DefC.Short[(int)DefCat.ImageCats][nodeOver.Parent.Index].DefNum;
+			}
+			Document docSave=new Document();
+			ImageNodeId nodeId=new ImageNodeId();
+			string[] arrayFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+			string errorMessage="";
+			for(int i=0;i<arrayFiles.Length;i++) {
+				string draggedFilePath=arrayFiles[i];
+				string fileName=draggedFilePath.Substring(draggedFilePath.LastIndexOf("\\")+1);
+				if(Directory.Exists(draggedFilePath)) {
+					errorMessage+="\r\n"+fileName;
+					continue;
+				}
+				docSave=ImageStore.Import(draggedFilePath,nodeOverCategoryDefNum,PatCur);
+				FillDocList(false);
+				SelectTreeNode(GetNodeById(MakeIdDoc(docSave.DocNum)));
+				FormDocInfo FormD=new FormDocInfo(PatCur,docSave,GetCurrentFolderName(treeDocuments.SelectedNode));
+				FormD.ShowDialog();//some of the fields might get changed, but not the filename
+				if(FormD.DialogResult!=DialogResult.OK) {
+					DeleteSelection(false,false);
+				}
+				else {
+					nodeId=MakeIdDoc(docSave.DocNum);
+					DocSelected=docSave.Copy();
+				}
+			}
+			if(docSave!=null && !MakeIdDoc(docSave.DocNum).Equals(nodeId)) {
+				SelectTreeNode(GetNodeById(MakeIdDoc(docSave.DocNum)));
+			}
+			FillDocList(true);
+			if(errorMessage!="") {
+				MessageBox.Show(Lan.g(this,"The following items are directories and were not copied into the images folder for this patient.")+errorMessage);
+			}
+		}
 	}
 
 	///<summary>Because this is a struct, equivalency is based on values, not references.</summary>
