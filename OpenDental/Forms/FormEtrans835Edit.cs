@@ -131,7 +131,7 @@ namespace OpenDental {
 				else {
 					row.Cells.Add("");
 				}
-				row.Cells.Add(new UI.ODGridCell(claimPaid.PatientName));//Patient
+				row.Cells.Add(new UI.ODGridCell(claimPaid.PatientName.ToString()));//Patient
 				string strDateService=claimPaid.DateServiceStart.ToShortDateString();
 				if(claimPaid.DateServiceEnd>claimPaid.DateServiceStart) {
 					strDateService+=" to "+claimPaid.DateServiceEnd.ToShortDateString();
@@ -220,7 +220,6 @@ namespace OpenDental {
 				isPaymentEntry=false;
 			}
 			//TODO: Do not enter payment if the claim is a split claim.
-			//TODO: Do not enter by procedure if any procedures have been bundled/unbundled/split.
 			long claimNum=claimPaid.GetOriginalClaimNum();
 			Claim claim=null;
 			if(claimNum==0) {//Original claim not found.
@@ -236,21 +235,22 @@ namespace OpenDental {
 				Family fam=Patients.GetFamily(claim.PatNum);
 				FormClaimEdit formCE=new FormClaimEdit(claim,pat,fam);
 				formCE.ShowDialog();
-				return;
-			}
-			if(claimPaid.ListProcs.Count==0 && claim!=null && claim.ClaimType=="Cap") {//Procedure detail not provided with payment and the original claim is a capitation claim.
-				//Capitation claims should not be entered by total because the insurance payment would affect the patient balance.
-				isPaymentEntry=false;
-			}
-			if(isPaymentEntry) {
-				EnterPayment(claimPaid,claim);
 			}
 			else {
-				//Show EOB details (read only).
-				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
-				formC.ShowDialog(this);
-				if(claim!=null) {
-					claim=Claims.GetClaim(claim.ClaimNum);//The user might have edited the claim here.  We need to refresh from DB so we can check the status below.
+				if(claimPaid.ListProcs.Count==0 && claim!=null && claim.ClaimType=="Cap") {//Procedure detail not provided with payment and the original claim is a capitation claim.
+					//Capitation claims should not be entered by total because the insurance payment would affect the patient balance.
+					isPaymentEntry=false;
+				}
+				if(isPaymentEntry) {
+					EnterPayment(claimPaid,claim);
+				}
+				else {
+					//Show EOB details (read only).
+					FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
+					formC.ShowDialog(this);
+					if(claim!=null) {
+						claim=Claims.GetClaim(claim.ClaimNum);//The user might have edited the claim here.  We need to refresh from DB so we can check the status below.
+					}
 				}
 			}
 			if(claim!=null && claim.ClaimStatus=="R") {
@@ -316,12 +316,13 @@ namespace OpenDental {
 				cpByTotal.InsPayAmt-=claimProc.InsPayAmt;
 				cpByTotal.WriteOff-=claimProc.WriteOff;
 			}
-			bool isByTotal=false;
-			if(claimPaid.ListProcs.Count==0) {//No procedure detail was provided in the 835.  Force the total payment amount to show, even if all zeros.
-				isByTotal=true;
+			bool isByTotal=true;
+			if(claimPaid.ListProcs.Count>0) {//Procedure detail was provided in the 835.
+				isByTotal=false;
 			}
-			if(cpByTotal.DedApplied!=0 || cpByTotal.AllowedOverride!=0 || cpByTotal.InsPayAmt!=0 || cpByTotal.WriteOff!=0) {
-				isByTotal=true;
+			//Do not create a total payment if the payment contains all zero amounts because it would not be useful.  Written to account for potential rounding errors in the amounts.
+			if(Math.Round(cpByTotal.DedApplied,2)==0 && Math.Round(cpByTotal.AllowedOverride,2)==0 && Math.Round(cpByTotal.InsPayAmt,2)==0 && Math.Round(cpByTotal.WriteOff,2)==0) {
+				isByTotal=false;
 			}
 			if(isByTotal) {
 				cpByTotal.Status=ClaimProcStatus.NotReceived;//Will be marked received once the user accepts the payment amount by clicking OK in FormEtrans835ClaimPay.  Must be NotReceived, or will not be saved to database.

@@ -54,8 +54,8 @@ namespace OpenDental {
 				Text+=" - NPI: "+_claimPaid.Npi;
 			}
 			Text+=" - Patient: "+_claimPaid.PatientName;
-			textSubscriberName.Text=_claimPaid.SubscriberName;
-			textPatientName.Text=_claimPaid.PatientName;
+			textSubscriberName.Text=_claimPaid.SubscriberName.ToString();
+			textPatientName.Text=_claimPaid.PatientName.ToString();
 			textDateService.Text=_claimPaid.DateServiceStart.ToShortDateString();
 			if(_claimPaid.DateServiceEnd>_claimPaid.DateServiceStart) {
 				textDateService.Text+=" to "+_claimPaid.DateServiceEnd.ToShortDateString();

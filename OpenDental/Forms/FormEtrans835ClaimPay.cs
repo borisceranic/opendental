@@ -36,8 +36,6 @@ namespace OpenDental {
 		private List<InsSub> _listInsSubs;
 		private Hx835_Claim _claimPaid;
 		private Claim _claim;
-		private decimal _claimAdjAmtSum;
-		private decimal _procAdjAmtSum;
 		private TextBox textDedApplied;
 		private TextBox textInsPayAmt;
 		private TextBox textEobInsPayAmt;
@@ -465,7 +463,6 @@ namespace OpenDental {
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("",80,HorizontalAlignment.Center));
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Remarks",0,HorizontalAlignment.Left));
 			gridClaimAdjustments.Rows.Clear();
-			_claimAdjAmtSum=0;
 			for(int i=0;i<_claimPaid.ListClaimAdjustments.Count;i++) {
 				Hx835_Adj adj=_claimPaid.ListClaimAdjustments[i];
 				ODGridRow row=new ODGridRow();
@@ -476,7 +473,6 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//Writeoff
 				row.Cells.Add(new ODGridCell(""));//Blank
 				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
-				_claimAdjAmtSum+=_claimPaid.ListClaimAdjustments[i].AdjAmt;
 				gridClaimAdjustments.Rows.Add(row);
 			}
 			gridClaimAdjustments.EndUpdate();
@@ -503,7 +499,6 @@ namespace OpenDental {
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("",80,HorizontalAlignment.Center));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Remarks",0,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Rows.Clear();
-			_procAdjAmtSum=0;
 			for(int i=0;i<_claimPaid.ListProcs.Count;i++) {
 				Hx835_Proc proc=_claimPaid.ListProcs[i];
 				ODGridRow row=new ODGridRow();

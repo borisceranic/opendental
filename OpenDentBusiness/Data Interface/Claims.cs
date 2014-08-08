@@ -452,10 +452,10 @@ namespace OpenDentBusiness{
 			if(dtClaims.Rows.Count==0) { //No exact match for the claim identifier. This will happen with replication sometimes.
 				command="SELECT ClaimNum FROM claim WHERE ClaimIdentifier LIKE CONCAT('"+POut.String(claimIdentifier)+"','%')";
 				dtClaims=Db.GetTable(command);
-				//There is a slight chance that we will have more than one match, and in this case we will return 0.
-				if(dtClaims.Rows.Count!=1) {
-					return 0;
-				}
+			}
+			//There is a slight chance that we will have more than one match, and in this case we will return 0, because we are not sure which claim is the correct claim.  Returning the first item in the list would be misleading.
+			if(dtClaims.Rows.Count!=1) {
+				return 0;
 			}
 			return PIn.Long(dtClaims.Rows[0][0].ToString());
 		}

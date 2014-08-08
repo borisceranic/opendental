@@ -700,49 +700,16 @@ namespace OpenDentBusiness {
 			//N407 Country Subdivision Code.  Required when the address is not in the United States.
 		}
 
-		///<summary>Converts an NM1 segment for a person into a single string containing their entire name and identfier.
+		///<summary>Converts an NM1 segment for a person into a name object including the full name and identifier.
 		///All fields are optional, thus this function returns what is available.</summary>
-		private string ProcessNM1_Person(int segNum) {
-			string name=_listSegments[segNum].Get(4);//First name
-			if(_listSegments[segNum].Get(5)!="") {//Middle Name
-				if(name!="") {
-					name+=" ";
-				}
-				name+=_listSegments[segNum].Get(5);
-			}
-			if(_listSegments[segNum].Get(3)!="") {//Last Name
-				if(name!="") {
-					name+=" ";
-				}
-				name+=_listSegments[segNum].Get(3);
-			}
-			if(_listSegments[segNum].Get(7)!="") {//Suffix
-				if(name!="") {
-					name+=" ";
-				}
-				name+=_listSegments[segNum].Get(7);
-			}
-			if(_listSegments[segNum].Get(8)!="") {
-				if(name!="") {
-					name+=" - ";
-				}
-				if(_listSegments[segNum].Get(8)=="34") {
-					name+="SSN: ";
-				}
-				else if(_listSegments[segNum].Get(8)=="HN") {
-					name+="HIC Number: ";
-				}
-				else if(_listSegments[segNum].Get(8)=="II") {
-					name+="SUHI: ";
-				}
-				else if(_listSegments[segNum].Get(8)=="MI") {
-					name+="Member ID: ";
-				}
-				else if(_listSegments[segNum].Get(8)=="MR") {
-					name+="Medicaid ID: ";
-				}
-				name+=_listSegments[segNum].Get(9);
-			}
+		private Hx835_Name ProcessNM1_Person(int segNum) {
+			Hx835_Name name=new Hx835_Name();
+			name.Fname=_listSegments[segNum].Get(4);
+			name.Mname=_listSegments[segNum].Get(5);
+			name.Lname=_listSegments[segNum].Get(3);
+			name.Suffix=_listSegments[segNum].Get(7);
+			name.SubscriberId=_listSegments[segNum].Get(9);
+			name.SubscriberIdTypeDesc=_listSegments[segNum].Get(8);
 			return name;
 		}
 
@@ -2925,9 +2892,9 @@ namespace OpenDentBusiness {
 		///<summary>CLP05 A portion of the ChargeAmtTotal which the patient is responsible for.</summary>
 		public decimal PatientPortion;
 		///<summary>NM1*QC of loop 2100.  Required for Dental and Medical.  Optional for Pharmacy.  For our purposes (Dental and Medical), this data will always be provided.</summary>
-		public string PatientName;
+		public Hx835_Name PatientName;
 		///<summary>NM1*IL of loop 2100.  Required for Dental and Medical.  Optional for Pharmacy.  For our purposes (Dental and Medical), this data will always be provided.</summary>
-		public string SubscriberName;
+		public Hx835_Name SubscriberName;
 		///<summary>DTM*232 of loop 2100.  Situational, but if not present, then service lines will include service dates.  Service line dates override this date when both are present.</summary>
 		public DateTime DateServiceStart;
 		///<summary>DTM*233 of loop 2100.  Situational, but if not present, then service lines will include service dates.  Service line dates override this date when both are present.</summary>
@@ -2954,13 +2921,43 @@ namespace OpenDentBusiness {
 
 		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835.  Returns 0 if not found.</summary>
 		public long GetOriginalClaimNum() {
-			if(_originalClaimNum==0) {
-				_originalClaimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+			if(_originalClaimNum!=0) {//Cached?
+				return _originalClaimNum;
 			}
-			if(_originalClaimNum==0) {
-				//TODO: If matching by tracking number fails, then match by patient name, subscriber ID, and date of service.
+			_originalClaimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+			if(_originalClaimNum!=0) {
+				return _originalClaimNum;
 			}
-			return _originalClaimNum;
+			//If matching by tracking number fails, then match by patient name, subscriber ID, date of service, and claim fee.
+			List <Patient> listPatients=Patients.GetListByName(PatientName.Lname,PatientName.Fname,0);
+			for(int i=0;i<listPatients.Count;i++) {
+				Patient pat=listPatients[i];
+				List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+				for(int j=0;j<listPatPlans.Count;j++) {
+					PatPlan patPlan=listPatPlans[j];
+					InsSub insSub=InsSubs.GetOne(patPlan.InsSubNum);
+					if(insSub.SubscriberID!=PatientName.SubscriberId) {
+						continue;
+					}
+					List <Claim> listClaims=Claims.Refresh(pat.PatNum);
+					for(int k=0;k<listClaims.Count;k++) {
+						Claim claim=listClaims[k];
+						if(claim.InsSubNum!=insSub.InsSubNum && claim.InsSubNum2!=insSub.InsSubNum) {//Ensure that the claim is for the correct insurance plan and subscriber.
+							continue;
+						}
+						if(claim.DateService.Date!=DateServiceStart.Date) {
+							continue;
+						}
+						double claimFee=(double)ClaimFee;
+						if(claim.ClaimFee<claimFee-0.001 || claim.ClaimFee>claimFee+0.001) {//Allow for rounding errors.
+							continue;
+						}
+						_originalClaimNum=claim.ClaimNum;
+						return claim.ClaimNum;
+					}
+				}
+			}
+			return 0;
 		}
 
 		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>
@@ -3063,6 +3060,46 @@ namespace OpenDentBusiness {
 	public class Hx835_Info {
 		public string FieldName;
 		public string FieldValue;
+	}
+
+	///<summary>Corresponds to various NM1 segments.</summary>
+	public class Hx835_Name {
+		public string Fname;
+		public string Mname;
+		public string Lname;
+		public string Suffix;
+		public string SubscriberId;
+		public string SubscriberIdTypeDesc;
+
+		public override string ToString() {
+			string name=Fname;
+			if(Mname!="") {
+				if(name!="") {
+					name+=" ";
+				}
+				name+=Mname;
+			}
+			if(Lname!="") {
+				if(name!="") {
+					name+=" ";
+				}
+				name+=Lname;
+			}
+			if(Suffix!="") {
+				if(name!="") {
+					name+=" ";
+				}
+				name+=Suffix;
+			}
+			if(SubscriberId!="") {
+				if(name!="") {
+					name+=" - ";
+				}
+				name+=SubscriberIdTypeDesc+": "+SubscriberId;
+			}
+			return name;
+		}
+
 	}
 
 	#endregion Helper CLasses
