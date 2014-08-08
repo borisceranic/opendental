@@ -318,8 +318,8 @@ namespace OpenDentBusiness {
 			doc=Documents.GetByNum(doc.DocNum);
 			try {
 				SaveDocument(doc,pathImportFrom,patFolder);
-				if(PrefC.AtoZfolderUsed) {
-					Documents.Update(doc);
+				if(!PrefC.AtoZfolderUsed) {
+					Documents.Update(doc);//Because SaveDocument() modified doc.RawBase64
 				}
 			}
 			catch {
