@@ -157,7 +157,7 @@ namespace OpenDental{
 			this.textProvNum.MaxLength = 15;
 			this.textProvNum.Name = "textProvNum";
 			this.textProvNum.ReadOnly = true;
-			this.textProvNum.Size = new System.Drawing.Size(60, 20);
+			this.textProvNum.Size = new System.Drawing.Size(97, 20);
 			this.textProvNum.TabIndex = 34;
 			// 
 			// labelUniqueID

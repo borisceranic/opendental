@@ -131,7 +131,7 @@ namespace OpenDental {
 			if(!ProvStudent.IsNew || _autoUserName.ToString()!=textUserName.Text) {
 				isAutoUserName=false;
 			}
-			if(isAutoUserName) {//Is a new student using the default user name given
+			if(isAutoUserName && !PrefC.GetBool(PrefName.RandomPrimaryKeys)) {//Is a new student using the default user name given
 				long provNum=Providers.GetNextAvailableProvNum();
 				if(_autoUserName!=provNum) {
 					MsgBox.Show(this,"The default user name was already taken.  The next available user name was used.");

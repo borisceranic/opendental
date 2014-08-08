@@ -35,15 +35,15 @@ namespace OpenDental{
 			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.labelUniqueID = new System.Windows.Forms.Label();
 			this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
+			this.menuItemClose = new System.Windows.Forms.MenuItem();
 			this.menuItemSetup = new System.Windows.Forms.MenuItem();
-			this.gridMain = new OpenDental.UI.ODGrid();
+			this.gridStudents = new OpenDental.UI.ODGrid();
 			this.gridSupply = new OpenDental.UI.ODGrid();
 			this.gridDispSupply = new OpenDental.UI.ODGrid();
 			this.gridEquip = new OpenDental.UI.ODGrid();
-			this.menuItem1 = new System.Windows.Forms.MenuItem();
 			this.groupSupply = new System.Windows.Forms.GroupBox();
-			this.labelCategory = new System.Windows.Forms.Label();
-			this.comboCategory = new System.Windows.Forms.ComboBox();
+			this.butCheckOut = new OpenDental.UI.Button();
+			this.butCheckIn = new OpenDental.UI.Button();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.textBox2 = new System.Windows.Forms.TextBox();
@@ -51,6 +51,8 @@ namespace OpenDental{
 			this.textBox3 = new System.Windows.Forms.TextBox();
 			this.labelSupDescript = new System.Windows.Forms.Label();
 			this.butScan = new OpenDental.UI.Button();
+			this.labelCategory = new System.Windows.Forms.Label();
+			this.comboCategory = new System.Windows.Forms.ComboBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.textSupplier = new System.Windows.Forms.TextBox();
 			this.labelSupplier = new System.Windows.Forms.Label();
@@ -65,7 +67,6 @@ namespace OpenDental{
 			// 
 			// groupDentalSchools
 			// 
-			this.groupDentalSchools.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupDentalSchools.Controls.Add(this.labelClass);
 			this.groupDentalSchools.Controls.Add(this.comboClass);
 			this.groupDentalSchools.Controls.Add(this.textLName);
@@ -153,38 +154,47 @@ namespace OpenDental{
 			// mainMenu1
 			// 
 			this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItem1,
+            this.menuItemClose,
             this.menuItemSetup});
+			// 
+			// menuItemClose
+			// 
+			this.menuItemClose.Index = 0;
+			this.menuItemClose.Text = "Close";
+			this.menuItemClose.Click += new System.EventHandler(this.menuItemClose_Click);
 			// 
 			// menuItemSetup
 			// 
 			this.menuItemSetup.Index = 1;
 			this.menuItemSetup.Text = "Setup";
 			// 
-			// gridMain
+			// gridStudents
 			// 
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(0, 109);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(278, 321);
-			this.gridMain.TabIndex = 15;
-			this.gridMain.Title = "Students";
-			this.gridMain.TranslationName = null;
+			this.gridStudents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridStudents.HScrollVisible = false;
+			this.gridStudents.Location = new System.Drawing.Point(0, 109);
+			this.gridStudents.Name = "gridStudents";
+			this.gridStudents.ScrollValue = 0;
+			this.gridStudents.Size = new System.Drawing.Size(278, 321);
+			this.gridStudents.TabIndex = 15;
+			this.gridStudents.Title = "Students";
+			this.gridStudents.TranslationName = null;
 			// 
 			// gridSupply
 			// 
+			this.gridSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridSupply.HScrollVisible = false;
 			this.gridSupply.Location = new System.Drawing.Point(696, 109);
 			this.gridSupply.Name = "gridSupply";
 			this.gridSupply.ScrollValue = 0;
-			this.gridSupply.Size = new System.Drawing.Size(278, 165);
+			this.gridSupply.Size = new System.Drawing.Size(278, 321);
 			this.gridSupply.TabIndex = 16;
 			this.gridSupply.Title = "Supply";
 			this.gridSupply.TranslationName = null;
 			// 
 			// gridDispSupply
 			// 
+			this.gridDispSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridDispSupply.HScrollVisible = false;
 			this.gridDispSupply.Location = new System.Drawing.Point(0, 432);
 			this.gridDispSupply.Name = "gridDispSupply";
@@ -196,54 +206,61 @@ namespace OpenDental{
 			// 
 			// gridEquip
 			// 
+			this.gridEquip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridEquip.HScrollVisible = false;
-			this.gridEquip.Location = new System.Drawing.Point(696, 422);
+			this.gridEquip.Location = new System.Drawing.Point(696, 432);
 			this.gridEquip.Name = "gridEquip";
 			this.gridEquip.ScrollValue = 0;
-			this.gridEquip.Size = new System.Drawing.Size(278, 190);
+			this.gridEquip.Size = new System.Drawing.Size(278, 180);
 			this.gridEquip.TabIndex = 18;
 			this.gridEquip.Title = "Equipment";
 			this.gridEquip.TranslationName = null;
 			// 
-			// menuItem1
-			// 
-			this.menuItem1.Index = 0;
-			this.menuItem1.Text = "Close";
-			// 
 			// groupSupply
 			// 
-			this.groupSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupSupply.Controls.Add(this.butScan);
+			this.groupSupply.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.groupSupply.Controls.Add(this.butCheckOut);
+			this.groupSupply.Controls.Add(this.butCheckIn);
 			this.groupSupply.Controls.Add(this.textBox1);
 			this.groupSupply.Controls.Add(this.label4);
 			this.groupSupply.Controls.Add(this.textBox2);
 			this.groupSupply.Controls.Add(this.label5);
 			this.groupSupply.Controls.Add(this.textBox3);
 			this.groupSupply.Controls.Add(this.labelSupDescript);
-			this.groupSupply.Location = new System.Drawing.Point(382, 84);
+			this.groupSupply.Location = new System.Drawing.Point(384, 0);
 			this.groupSupply.Name = "groupSupply";
-			this.groupSupply.Size = new System.Drawing.Size(200, 140);
+			this.groupSupply.Size = new System.Drawing.Size(200, 118);
 			this.groupSupply.TabIndex = 19;
 			this.groupSupply.TabStop = false;
 			this.groupSupply.Text = "Supplies";
 			// 
-			// labelCategory
+			// butCheckOut
 			// 
-			this.labelCategory.Location = new System.Drawing.Point(6, 18);
-			this.labelCategory.Name = "labelCategory";
-			this.labelCategory.Size = new System.Drawing.Size(89, 18);
-			this.labelCategory.TabIndex = 33;
-			this.labelCategory.Text = "Category";
-			this.labelCategory.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.butCheckOut.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCheckOut.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.butCheckOut.Autosize = true;
+			this.butCheckOut.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCheckOut.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCheckOut.CornerRadius = 4F;
+			this.butCheckOut.Location = new System.Drawing.Point(119, 84);
+			this.butCheckOut.Name = "butCheckOut";
+			this.butCheckOut.Size = new System.Drawing.Size(75, 24);
+			this.butCheckOut.TabIndex = 33;
+			this.butCheckOut.Text = "Check-Out";
 			// 
-			// comboCategory
+			// butCheckIn
 			// 
-			this.comboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboCategory.FormattingEnabled = true;
-			this.comboCategory.Location = new System.Drawing.Point(98, 18);
-			this.comboCategory.Name = "comboCategory";
-			this.comboCategory.Size = new System.Drawing.Size(131, 21);
-			this.comboCategory.TabIndex = 4;
+			this.butCheckIn.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCheckIn.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.butCheckIn.Autosize = true;
+			this.butCheckIn.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCheckIn.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCheckIn.CornerRadius = 4F;
+			this.butCheckIn.Location = new System.Drawing.Point(9, 84);
+			this.butCheckIn.Name = "butCheckIn";
+			this.butCheckIn.Size = new System.Drawing.Size(75, 24);
+			this.butCheckIn.TabIndex = 32;
+			this.butCheckIn.Text = "Check-In";
 			// 
 			// textBox1
 			// 
@@ -304,11 +321,29 @@ namespace OpenDental{
 			this.butScan.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butScan.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butScan.CornerRadius = 4F;
-			this.butScan.Location = new System.Drawing.Point(119, 109);
+			this.butScan.Location = new System.Drawing.Point(449, 124);
 			this.butScan.Name = "butScan";
 			this.butScan.Size = new System.Drawing.Size(75, 24);
 			this.butScan.TabIndex = 20;
 			this.butScan.Text = "Scan";
+			// 
+			// labelCategory
+			// 
+			this.labelCategory.Location = new System.Drawing.Point(6, 18);
+			this.labelCategory.Name = "labelCategory";
+			this.labelCategory.Size = new System.Drawing.Size(89, 18);
+			this.labelCategory.TabIndex = 33;
+			this.labelCategory.Text = "Category";
+			this.labelCategory.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboCategory
+			// 
+			this.comboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboCategory.FormattingEnabled = true;
+			this.comboCategory.Location = new System.Drawing.Point(98, 18);
+			this.comboCategory.Name = "comboCategory";
+			this.comboCategory.Size = new System.Drawing.Size(131, 21);
+			this.comboCategory.TabIndex = 4;
 			// 
 			// groupBox1
 			// 
@@ -384,13 +419,14 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 612);
 			this.ControlBox = false;
+			this.Controls.Add(this.butScan);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.groupSupply);
 			this.Controls.Add(this.gridEquip);
 			this.Controls.Add(this.gridDispSupply);
 			this.Controls.Add(this.gridSupply);
 			this.Controls.Add(this.groupDentalSchools);
-			this.Controls.Add(this.gridMain);
+			this.Controls.Add(this.gridStudents);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -400,6 +436,7 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+			this.Load += new System.EventHandler(this.FormDispensary_Load);
 			this.groupDentalSchools.ResumeLayout(false);
 			this.groupDentalSchools.PerformLayout();
 			this.groupSupply.ResumeLayout(false);
@@ -421,10 +458,10 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textProvNum;
 		private System.Windows.Forms.Label labelUniqueID;
-		private UI.ODGrid gridMain;
+		private UI.ODGrid gridStudents;
 		private System.Windows.Forms.MainMenu mainMenu1;
 		private System.Windows.Forms.MenuItem menuItemSetup;
-		private System.Windows.Forms.MenuItem menuItem1;
+		private System.Windows.Forms.MenuItem menuItemClose;
 		private UI.ODGrid gridSupply;
 		private UI.ODGrid gridDispSupply;
 		private UI.ODGrid gridEquip;
@@ -445,5 +482,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelSupplyDescript;
 		private System.Windows.Forms.TextBox textSupplyNum;
 		private System.Windows.Forms.Label label7;
+		private UI.Button butCheckOut;
+		private UI.Button butCheckIn;
 	}
 }

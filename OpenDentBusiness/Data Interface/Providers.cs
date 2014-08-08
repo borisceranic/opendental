@@ -150,6 +150,7 @@ namespace OpenDentBusiness{
 			}
 			return provs;
 		}
+
 		public static List<Provider> GetChangedSince(DateTime changedSince) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Provider>>(MethodBase.GetCurrentMethod(),changedSince);

@@ -15,6 +15,7 @@ namespace OpenDental{
 		private bool changed;
 		public bool IsSelectionMode;
 		private UI.ODGrid gridMain;
+		private UI.Button butOK;
 		public SchoolCourse CourseSelected;
 		
 		///<summary></summary>
@@ -41,6 +42,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butOK = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -85,17 +87,35 @@ namespace OpenDental{
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(425, 444);
+			this.gridMain.Size = new System.Drawing.Size(425, 423);
 			this.gridMain.TabIndex = 61;
 			this.gridMain.Title = "Courses";
 			this.gridMain.TranslationName = "FormEvaluationDefEdit";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.butOK.Location = new System.Drawing.Point(362, 441);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 26);
+			this.butOK.TabIndex = 62;
+			this.butOK.Text = "&OK";
+			this.butOK.Visible = false;
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// FormSchoolCourses
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(453, 515);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butClose);
@@ -116,6 +136,8 @@ namespace OpenDental{
 		private void FormSchoolCourses_Load(object sender, System.EventArgs e) {
 			if(IsSelectionMode) {
 				butAdd.Visible=false;
+				butOK.Visible=true;
+				butClose.Text="Cancel";
 			}
 			FillGrid();
 		}
@@ -171,6 +193,17 @@ namespace OpenDental{
 			}
 			changed=true;
 			FillGrid();
+		}
+
+		private void butOK_Click(object sender,EventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a course.");
+				return;
+			}
+			if(IsSelectionMode) {
+				CourseSelected=SchoolCourses.List[gridMain.GetSelectedIndex()];
+				DialogResult=DialogResult.OK;
+			}
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {

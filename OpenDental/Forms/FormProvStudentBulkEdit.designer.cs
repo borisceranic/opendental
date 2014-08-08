@@ -53,7 +53,7 @@ namespace OpenDental{
 			this.butBulkEdit.Name = "butBulkEdit";
 			this.butBulkEdit.Size = new System.Drawing.Size(75, 24);
 			this.butBulkEdit.TabIndex = 3;
-			this.butBulkEdit.Text = "Update";
+			this.butBulkEdit.Text = "Save";
 			this.butBulkEdit.Click += new System.EventHandler(this.butBulkEdit_Click);
 			// 
 			// butClose
@@ -96,12 +96,12 @@ namespace OpenDental{
 			this.label7.Text = "ProvNum";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// textUniqueID
+			// textProvNum
 			// 
 			this.textProvNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.textProvNum.Location = new System.Drawing.Point(405, 88);
 			this.textProvNum.MaxLength = 15;
-			this.textProvNum.Name = "textUniqueID";
+			this.textProvNum.Name = "textProvNum";
 			this.textProvNum.Size = new System.Drawing.Size(166, 20);
 			this.textProvNum.TabIndex = 2;
 			this.textProvNum.TextChanged += new System.EventHandler(this.textProvNum_TextChanged);

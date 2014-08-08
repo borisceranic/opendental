@@ -44,10 +44,11 @@ namespace OpenDental {
 				catch {
 					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
 					return;
-				}
+				}			
+				Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
+				textStudents.Text=FormUGP.UserGroup.Description;
+				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
-			textStudents.Text=FormUGP.UserGroup.Description;
 		}
 
 		private void butInstructorPicker_Click(object sender,EventArgs e) {
@@ -73,6 +74,7 @@ namespace OpenDental {
 				}
 				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
 				textInstructors.Text=FormUGP.UserGroup.Description;
+				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 		}
 

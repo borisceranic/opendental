@@ -201,7 +201,7 @@ namespace OpenDental{
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(148, 50);
 			this.label8.TabIndex = 26;
-			this.label8.Text = "These selections will also affect the functionality of the add button.";
+			this.label8.Text = "These selections will also affect the functionality of the Add button.";
 			// 
 			// label7
 			// 
