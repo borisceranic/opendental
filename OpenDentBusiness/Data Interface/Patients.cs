@@ -1517,7 +1517,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),patNum,lName,fName,birthdate);
 			}
 			string command="SELECT * FROM patient WHERE LName LIKE '"+POut.String(lName)+"' AND FName LIKE '"+POut.String(fName)+"' "
-				+"AND Birthdate="+POut.Date(birthdate,true)+" AND PatNum!="+POut.Long(patNum);
+				+"AND Birthdate="+POut.Date(birthdate,true)+" AND PatNum!="+POut.Long(patNum) +" AND PatStatus!="+POut.Int((int)PatientStatus.Deleted);
 			return Crud.PatientCrud.SelectMany(command);
 		}
 
