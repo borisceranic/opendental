@@ -3058,6 +3058,9 @@ Vital Signs
 				List<XmlNode> listCodes=GetNodesByTagNameAndAttributesFromList(listProducts,"code");
 				for(int j=0;j<listCodes.Count;j++) {
 					XmlNode xmlNodeCode=listCodes[j];
+					if(xmlNodeCode.Attributes["nullFlavor"]!=null) {
+						continue;
+					}
 					string strCode=xmlNodeCode.Attributes["code"].Value;
 					string strMedDescript=xmlNodeCode.Attributes["displayName"].Value;
 					if(xmlNodeCode.Attributes["codeSystem"].Value!=strCodeSystemRxNorm) {
