@@ -899,7 +899,15 @@ namespace OpenDental {
 				MessageBox.Show(ex.Message);
 				return;
 			}
+			if(textEobClaimFee.Text!=textClaimFee.Text || textEobDedApplied.Text!=textDedApplied.Text || textEobInsPayAllowed.Text!=textInsPayAllowed.Text
+				|| textEobInsPayAmt.Text!=textInsPayAmt.Text || textEobWriteOff.Text!=textWriteOff.Text) 
+			{
+				if(MessageBox.Show(Lan.g(this,"Some of the EOB totals do not match the totals entered")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+					return;
+				}
+			}
 			SaveAllowedFees();
+			//Recalculate insurance paid, deductible, and writeoff amounts for the claim based on the final claimproc values, then save the results to the database.
 			_claim.InsPayAmt=0;
 			_claim.DedApplied=0;
 			_claim.WriteOff=0;
@@ -907,17 +915,7 @@ namespace OpenDental {
 				_claim.InsPayAmt+=ListClaimProcsForClaim[i].InsPayAmt;
 				_claim.DedApplied+=ListClaimProcsForClaim[i].DedApplied;
 				_claim.WriteOff+=ListClaimProcsForClaim[i].WriteOff;
-				if(ListClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {
-					continue;
-				}
-				//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-				ListClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
-				ListClaimProcsForClaim[i].DateEntry=DateTime.Now;//the date is was switched to rec'd
-				if(ListClaimProcsForClaim[i].ClaimProcNum==0) {//Total payment claimproc which has not been inserted yet.
-					if(ListClaimProcsForClaim[i].DedApplied>0) {
-						ListClaimProcsForClaim[i].InsPayEst+=ListClaimProcsForClaim[i].DedApplied;
-						ListClaimProcsForClaim[i].DedApplied=0;//because ded will show as part of payment now.
-					}
+				if(ListClaimProcsForClaim[i].ClaimProcNum==0) {//Total payment claimproc which was created in FormEtrans835Edit just before loading this window.
 					ClaimProcs.Insert(ListClaimProcsForClaim[i]);
 				}
 				else {//Procedure claimproc, because the estimate already existed before entering payment.

@@ -2916,17 +2916,17 @@ namespace OpenDentBusiness {
 		public decimal Writeoff;
 		///<summary>AllowedAmt = (Claim InsPaid)+(Claim PatientPortion)</summary>
 		public decimal AllowedAmt;
-		///<summary>Cached the first time GetOriginalClaimNum() is called, since GetOriginalClaimNum() might perform many database calls (especially as we add more matching options in the future).</summary>
-		private long _originalClaimNum=0;
+		///<summary>True if remark code MA15 is used in either segment MIA or MOA (if present).
+		///Claim splits are intended to expedite payment when one or two procedures on the original claim are pending for an extended period of time.</summary>
+		public bool IsSplitClaim;
+		///<summary>Cached the first time OriginalClaim is called, since OriginalClaim might perform many database calls (especially as we add more matching options in the future).</summary>
+		private Claim _claim=null;
 
-		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835.  Returns 0 if not found.</summary>
-		public long GetOriginalClaimNum() {
-			if(_originalClaimNum!=0) {//Cached?
-				return _originalClaimNum;
-			}
-			_originalClaimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
-			if(_originalClaimNum!=0) {
-				return _originalClaimNum;
+		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835 in the database.  Returns 0 if not found.</summary>
+		private long GetOriginalClaimNumFromDb() {
+			long claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+			if(claimNum!=0) {
+				return claimNum;
 			}
 			//If matching by tracking number fails, then match by patient name, subscriber ID, date of service, and claim fee.
 			List <Patient> listPatients=Patients.GetListByName(PatientName.Lname,PatientName.Fname,0);
@@ -2952,12 +2952,34 @@ namespace OpenDentBusiness {
 						if(claim.ClaimFee<claimFee-0.001 || claim.ClaimFee>claimFee+0.001) {//Allow for rounding errors.
 							continue;
 						}
-						_originalClaimNum=claim.ClaimNum;
 						return claim.ClaimNum;
 					}
 				}
 			}
 			return 0;
+		}
+
+		public Claim ClaimOriginal {
+			get {
+				if(_claim!=null) {
+					return _claim;
+				}
+				long claimNum=GetOriginalClaimNumFromDb();
+				if(claimNum!=0) {
+					_claim=Claims.GetClaim(claimNum);
+				}
+				return _claim;
+			}
+		}
+
+		public long ClaimNum {
+			get {
+				Claim claim=ClaimOriginal;
+				if(claim!=null) {
+					return claim.ClaimNum;
+				}
+				return 0;
+			}
 		}
 
 		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>

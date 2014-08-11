@@ -25,7 +25,7 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835ClaimEdit_Load(object sender,EventArgs e) {
-			long claimNum=_claimPaid.GetOriginalClaimNum();
+			long claimNum=_claimPaid.ClaimNum;
 			_claim=null;
 			if(claimNum!=0) {
 				_claim=Claims.GetClaim(claimNum);

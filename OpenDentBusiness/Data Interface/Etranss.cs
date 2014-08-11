@@ -605,7 +605,7 @@ namespace OpenDentBusiness{
 						X835 x835=new X835(messageText,etrans.TranSetId835);
 						List<Hx835_Claim> listClaimEOBs=x835.ListClaimsPaid;
 						for(int j=0;j<listClaimEOBs.Count;j++) {
-							long claimNum=listClaimEOBs[j].GetOriginalClaimNum();
+							long claimNum=listClaimEOBs[j].ClaimNum;
 							//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
 							//We overwrite existing acks from 997s, 999s, and 277s.
 							command="UPDATE etrans SET AckCode='A', "
