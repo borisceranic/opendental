@@ -4723,6 +4723,7 @@ namespace OpenDental{
 				return;
 			}
 			FormProcButtons FormPB=new FormProcButtons();
+			FormPB.Owner=this;
 			FormPB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Procedure Buttons");	
 		}

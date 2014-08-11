@@ -5766,6 +5766,35 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanItemized','1')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS procbuttonquick";
+					Db.NonQ(command);
+					command=@"CREATE TABLE procbuttonquick (
+						ProcButtonQuickNum bigint NOT NULL auto_increment PRIMARY KEY,
+						Description varchar(255) NOT NULL,
+						CodeValue varchar(255) NOT NULL,
+						Surf varchar(255) NOT NULL,
+						YPos int NOT NULL,
+						ItemOrder int NOT NULL,
+						IsLabel tinyint NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE procbuttonquick'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE procbuttonquick (
+						ProcButtonQuickNum number(20) NOT NULL,
+						Description varchar2(255),
+						CodeValue varchar2(255),
+						Surf varchar2(255),
+						YPos number(11) NOT NULL,
+						ItemOrder number(11) NOT NULL,
+						IsLabel number(3) NOT NULL,
+						CONSTRAINT procbuttonquick_ProcButtonQuic PRIMARY KEY (ProcButtonQuickNum)
+						)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -5781,6 +5810,7 @@ namespace OpenDentBusiness {
 
 	}
 }
+
 
 
 

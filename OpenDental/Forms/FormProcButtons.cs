@@ -4,6 +4,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDental.UI;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -26,6 +28,8 @@ namespace OpenDental{
 		private ImageList imageListProcButtons;
 		///<summary>This list of displayed buttons for the selected cat.</summary>
 		private ProcButton[] ButtonList;
+		private ODButtonPanel panelQuickButtons;
+		private List<ProcButtonQuick> listProcButtonQuicks;
 
 		///<summary></summary>
 		public FormProcButtons(){
@@ -52,7 +56,7 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.listCategories = new System.Windows.Forms.ListBox();
 			this.listViewButtons = new System.Windows.Forms.ListView();
-			this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.imageListProcButtons = new System.Windows.Forms.ImageList(this.components);
 			this.butEdit = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
@@ -60,31 +64,32 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(324,33);
+			this.label1.Location = new System.Drawing.Point(324, 33);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(237,22);
+			this.label1.Size = new System.Drawing.Size(237, 22);
 			this.label1.TabIndex = 36;
 			this.label1.Text = "Buttons for the selected category";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(36,33);
+			this.label2.Location = new System.Drawing.Point(36, 33);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(237,22);
+			this.label2.Size = new System.Drawing.Size(237, 22);
 			this.label2.TabIndex = 38;
 			this.label2.Text = "Button Categories";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listCategories
 			// 
-			this.listCategories.Location = new System.Drawing.Point(38,59);
+			this.listCategories.Location = new System.Drawing.Point(38, 59);
 			this.listCategories.Name = "listCategories";
-			this.listCategories.Size = new System.Drawing.Size(234,316);
+			this.listCategories.Size = new System.Drawing.Size(234, 316);
 			this.listCategories.TabIndex = 37;
 			this.listCategories.Click += new System.EventHandler(this.listCategories_Click);
 			// 
@@ -96,10 +101,10 @@ namespace OpenDental{
             this.columnHeader1});
 			this.listViewButtons.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.listViewButtons.HideSelection = false;
-			this.listViewButtons.Location = new System.Drawing.Point(326,59);
+			this.listViewButtons.Location = new System.Drawing.Point(326, 59);
 			this.listViewButtons.MultiSelect = false;
 			this.listViewButtons.Name = "listViewButtons";
-			this.listViewButtons.Size = new System.Drawing.Size(234,316);
+			this.listViewButtons.Size = new System.Drawing.Size(234, 316);
 			this.listViewButtons.SmallImageList = this.imageListProcButtons;
 			this.listViewButtons.TabIndex = 189;
 			this.listViewButtons.UseCompatibleStateImageBehavior = false;
@@ -114,11 +119,11 @@ namespace OpenDental{
 			// 
 			this.imageListProcButtons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListProcButtons.ImageStream")));
 			this.imageListProcButtons.TransparentColor = System.Drawing.Color.Transparent;
-			this.imageListProcButtons.Images.SetKeyName(0,"deposit.gif");
+			this.imageListProcButtons.Images.SetKeyName(0, "deposit.gif");
 			// 
 			// butEdit
 			// 
-			this.butEdit.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butEdit.Autosize = true;
 			this.butEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -126,16 +131,16 @@ namespace OpenDental{
 			this.butEdit.CornerRadius = 4F;
 			this.butEdit.Image = global::OpenDental.Properties.Resources.Add;
 			this.butEdit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butEdit.Location = new System.Drawing.Point(38,395);
+			this.butEdit.Location = new System.Drawing.Point(38, 395);
 			this.butEdit.Name = "butEdit";
-			this.butEdit.Size = new System.Drawing.Size(109,26);
+			this.butEdit.Size = new System.Drawing.Size(109, 26);
 			this.butEdit.TabIndex = 39;
 			this.butEdit.Text = "Edit Categories";
 			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
 			// 
 			// butDown
 			// 
-			this.butDown.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDown.Autosize = true;
 			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -143,16 +148,16 @@ namespace OpenDental{
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(478,433);
+			this.butDown.Location = new System.Drawing.Point(478, 433);
 			this.butDown.Name = "butDown";
-			this.butDown.Size = new System.Drawing.Size(82,26);
+			this.butDown.Size = new System.Drawing.Size(82, 26);
 			this.butDown.TabIndex = 34;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// butUp
 			// 
-			this.butUp.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butUp.Autosize = true;
 			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -160,16 +165,16 @@ namespace OpenDental{
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(478,395);
+			this.butUp.Location = new System.Drawing.Point(478, 395);
 			this.butUp.Name = "butUp";
-			this.butUp.Size = new System.Drawing.Size(82,26);
+			this.butUp.Size = new System.Drawing.Size(82, 26);
 			this.butUp.TabIndex = 35;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -177,16 +182,16 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(326,395);
+			this.butAdd.Location = new System.Drawing.Point(326, 395);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(82,26);
+			this.butAdd.Size = new System.Drawing.Size(82, 26);
 			this.butAdd.TabIndex = 32;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// butDelete
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -194,33 +199,44 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(326,433);
+			this.butDelete.Location = new System.Drawing.Point(326, 433);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(82,26);
+			this.butDelete.Size = new System.Drawing.Size(82, 26);
 			this.butDelete.TabIndex = 33;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(648,433);
+			this.butClose.Location = new System.Drawing.Point(648, 433);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,26);
+			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 8;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// panelQuickButtons
+			// 
+			this.panelQuickButtons.Location = new System.Drawing.Point(326, 59);
+			this.panelQuickButtons.Name = "panelQuickButtons";
+			this.panelQuickButtons.RowCount = 9;
+			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
+			this.panelQuickButtons.TabIndex = 203;
+			this.panelQuickButtons.UseBlueTheme = false;
+			this.panelQuickButtons.RowDoubleClick += new OpenDental.UI.ODButtonPanelEventHandler(this.panelQuickButtons_RowDoubleClick);
+			// 
 			// FormProcButtons
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(746,483);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(746, 483);
+			this.Controls.Add(this.panelQuickButtons);
 			this.Controls.Add(this.listViewButtons);
 			this.Controls.Add(this.butEdit);
 			this.Controls.Add(this.label2);
@@ -246,34 +262,93 @@ namespace OpenDental{
 		}
 		#endregion
 
-		private void FormChartProcedureEntry_Load(object sender, System.EventArgs e) { 
+		private void FormChartProcedureEntry_Load(object sender,System.EventArgs e) {
+			fillPanelQuickButtons();
+			ResizeControls();
 			FillCategories();
-		  FillButtons();
+			FillButtons();
+			SetVisibility(); 
+		}
+
+		private void SetVisibility() {
+			foreach(Control c in this.Controls) {//make all controls visible. Then hide below.
+				c.Visible=true;
+			}
+			if(listCategories.SelectedIndex==0) {
+				listViewButtons.Visible=false;
+				butAdd.Visible=false;
+				butDelete.Visible=false;
+				butUp.Visible=false;
+				butDown.Visible=false;
+			}
+			else {
+				panelQuickButtons.Visible=false;
+			}
+		}
+
+		///<summary>Make the QuickButtonGrid exactly the same size as it will display in the chart module.</summary>
+		private void ResizeControls() {
+			try {
+				Control[] controlArray=this.Owner.Controls.Find("ContrChart",true);
+				//force redraw and resize of control
+				((ContrChart)controlArray[0]).ModuleSelected(0);
+				controlArray=this.Owner.Controls.Find("gridQuickButtons",true);
+				//set display size to actual size in from the control module. This is a dynamically sized control.
+				panelQuickButtons.Size=controlArray[0].Size;
+			}
+			catch(Exception ex) {
+				//could not locate the gridquickbuttons control.
+			}
+
+		}
+
+		private void fillPanelQuickButtons() {
+			panelQuickButtons.BeginUpdate();
+			panelQuickButtons.Items.Clear();
+			listProcButtonQuicks=ProcButtonQuicks.GetAll();
+			listProcButtonQuicks.Sort(ProcButtonQuicks.sortYX);
+			ODPanelItem pItem;
+			for(int i=0;i<listProcButtonQuicks.Count;i++) {
+				pItem=new ODPanelItem();
+				pItem.Text=listProcButtonQuicks[i].Description;
+				pItem.YPos=listProcButtonQuicks[i].YPos;
+				pItem.ItemOrder=i;
+				pItem.ItemType=(listProcButtonQuicks[i].IsLabel?ODPanelItemType.Label:ODPanelItemType.Button);
+				pItem.Tags.Add(listProcButtonQuicks[i]);
+				panelQuickButtons.Items.Add(pItem);
+			}
+			panelQuickButtons.EndUpdate();
 		}
 
 		private void FillCategories(){
+			ProcButtonQuicks.ValidateAll();
 			listCategories.Items.Clear();
+			listCategories.Items.Add("Quick Buttons");//hardcoded category.
 			if(DefC.Short[(int)DefCat.ProcButtonCats].Length==0){
 				selectedCat=0;
-				MsgBox.Show(this,"You must have at least one category setup.");
+				listCategories.SelectedIndex=0;
 				return;
 			}
 			for(int i=0;i<DefC.Short[(int)DefCat.ProcButtonCats].Length;i++){
 				listCategories.Items.Add(DefC.Short[(int)DefCat.ProcButtonCats][i].ItemName);
 				if(selectedCat==DefC.Short[(int)DefCat.ProcButtonCats][i].DefNum){
-					listCategories.SelectedIndex=i;
+					listCategories.SelectedIndex=i+1;
 				}
 			}
 			if(listCategories.SelectedIndex==-1){//category was hidden, or just openning the form
 				listCategories.SelectedIndex=0;
+				selectedCat=0;
 			}
-			selectedCat=DefC.Short[(int)DefCat.ProcButtonCats][listCategories.SelectedIndex].DefNum;
+			if(listCategories.SelectedIndex>0) {//hardcoded category doesn't have a DefNum.
+				selectedCat=DefC.Short[(int)DefCat.ProcButtonCats][listCategories.SelectedIndex-1].DefNum;
+			}
 		}
 
-    private void FillButtons(){
+		private void FillButtons(){
 			listViewButtons.Items.Clear();
 			imageListProcButtons.Images.Clear();
 			if(selectedCat==0) {
+				//empty button list and return because we will be using and OD grid to display these buttons.
 				ButtonList=new ProcButton[0];
 				return;
 			}
@@ -303,10 +378,11 @@ namespace OpenDental{
     }
 
 		private void listViewButtons_DoubleClick(object sender,EventArgs e) {
-			if(listViewButtons.SelectedIndices.Count==0){
+			if(listViewButtons.SelectedIndices.Count==0 //Nothing selected
+				|| listViewButtons.SelectedIndices.Contains(0)){ //Quick Buttons Selected
 				return;
 			}
-			ProcButton but=ButtonList[listViewButtons.SelectedIndices[0]].Copy();
+			ProcButton but=ButtonList[listViewButtons.SelectedIndices[0]-1].Copy();
 			FormProcButtonEdit FormPBE=new FormProcButtonEdit(but);
 			FormPBE.ShowDialog();
 			changed=true;
@@ -317,7 +393,13 @@ namespace OpenDental{
 			if(listCategories.SelectedIndex==-1){
 				return;
 			}
-			selectedCat=DefC.Short[(int)DefCat.ProcButtonCats][listCategories.SelectedIndex].DefNum;
+			SetVisibility();
+			if(listCategories.SelectedIndex==0) {
+				selectedCat=0;
+			}
+			else {
+				selectedCat=DefC.Short[(int)DefCat.ProcButtonCats][listCategories.SelectedIndex-1].DefNum;
+			}
 			FillButtons();
 		}
 
@@ -332,8 +414,8 @@ namespace OpenDental{
 		}
 
 		private void butDown_Click(object sender, System.EventArgs e) {
-      int selected=0;
-		  if(listViewButtons.SelectedIndices.Count==0){
+		int selected=0;
+		if(listViewButtons.SelectedIndices.Count==0){
         return;
       }
       else if(listViewButtons.SelectedIndices[0]==listViewButtons.Items.Count-1){
@@ -401,7 +483,31 @@ namespace OpenDental{
 			FillButtons();
 		}
 
-		private void butClose_Click(object sender, System.EventArgs e) {
+		private void gridQuickButtons_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			//FormProcButtonQuickEdit FormPBQ=new FormProcButtonQuickEdit();
+			//ProcButtonQuick pbq;
+			//if(listProcButtonQuicks.Exists(p => p.IsLabel && p.YPos==e.Row)) {//selected a row that contains an existing label
+			//	pbq=listProcButtonQuicks.Find(p => p.IsLabel && p.YPos==e.Row);
+			//}
+			//else if(listProcButtonQuicks.Exists(p => p.XPos==e.Col && p.YPos==e.Row)) {//selected a cell that has a corresponding quick button
+			//	pbq=listProcButtonQuicks.Find(p => p.XPos==e.Col && p.YPos==e.Row);
+			//}
+			//else {//selecting blank cell
+			//	pbq=new ProcButtonQuick();
+			//	pbq.XPos=e.Col;
+			//	pbq.YPos=e.Row;
+			//	FormPBQ.IsNew=true;
+			//}
+			//FormPBQ.ProcButtonQuickCur=pbq;
+			//FormPBQ.ShowDialog();
+			//if(FormPBQ.DialogResult!=DialogResult.OK) {
+			//	return;
+			//}
+			//listProcButtonQuicks=ProcButtonQuicks.GetAll();
+			//fillGridQuickButtons();
+		}
+
+		private void butClose_Click(object sender,System.EventArgs e) {
 			Close();
 		}
 
@@ -409,6 +515,21 @@ namespace OpenDental{
 			if(changed){
 				DataValid.SetInvalid(InvalidType.ProcButtons);
 			}
+		}
+
+		private void panelQuickButtons_RowDoubleClick(object sender,ODButtonPanelEventArgs e) {
+			ProcButtonQuick pbqCur=new ProcButtonQuick();
+			if(e.Item==null) {//clicked on either a blank row or to the right of existing buttons on a row.
+				pbqCur.YPos=e.Row;
+				for(int i=0;i<listProcButtonQuicks.Count;i++){
+					if(listProcButtonQuicks[i].YPos!=pbqCur.YPos
+						&& listProcButtonQuicks[i].ItemOrder<pbqCur.ItemOrder) {
+							continue;
+					}
+					pbqCur.ItemOrder=listProcButtonQuicks[i].ItemOrder+1;//new PBQ should have the highest item order in the row.
+				}
+			}//end if null
+			//FormProcButt
 		}
 
 		

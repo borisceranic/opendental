@@ -3428,6 +3428,13 @@
     <Compile Include="Misc\Tooth.cs" />
     <Compile Include="Misc\VisiQuick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ODButtonPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ODButtonPanel.Designer.cs">
+      <DependentUpon>ODButtonPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ODPanelItem.cs" />
     <Compile Include="User Controls\ContrFamilyEcw.cs">
       <SubType>UserControl</SubType>
     </Compile>
