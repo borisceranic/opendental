@@ -1334,7 +1334,10 @@ namespace OpenDental {
 					pd.OriginAtMargins=true;
 					pd.DefaultPageSettings.Margins=new Margins(50,50,50,50);//Half-inch all around
 					pd.Print();
-					if(DocSelected.Description=="") {
+					if(((ImageNodeId)treeDocuments.SelectedNode.Tag).NodeType==ImageNodeType.Eob) { //This happens when printing an EOB from the Batch Ins Claim
+						SecurityLogs.MakeLogEntry(Permissions.Printing,0,"EOB printed");
+					}
+					else if(DocSelected.Description=="") {
 						SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.FileName+" printed");
 					}
 					else {
