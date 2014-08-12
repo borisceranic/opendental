@@ -380,6 +380,14 @@ namespace OpenDentBusiness {
 				retVal.ListAdjudicationInfo.AddRange(ProcessMOA(segNum));
 				segNum++;
 			}
+			retVal.IsSplitClaim=false;
+			for(int i=0;i<retVal.ListAdjudicationInfo.Count;i++) {
+				Hx835_Info info=retVal.ListAdjudicationInfo[i];
+				if(info.IsRemarkCode && info.FieldValueRaw=="MA15") {
+					retVal.IsSplitClaim=true;
+					break;
+				}
+			}
 			//2100 REF: Other Claim Releated Identification.  Situational.  Repeat 5.  Guide page 169.  We do not use.
 			//2100 REF: Rendering Provider Identification.  Situational.  Repeat 10.  Guide page 171.  We do not use.
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="REF") {//We clump 2 segments into a single loop, because neither segment is used, and there are multiple REF01 choices for each.
@@ -482,6 +490,8 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				Hx835_Info info=new Hx835_Info();
+				info.FieldValueRaw=segMIA.Get(i);
+				info.IsRemarkCode=false;
 				if(i==1) {
 					info.FieldName="Covered Days or Visits Count";
 					info.FieldValue=segMIA.Get(1);
@@ -501,6 +511,7 @@ namespace OpenDentBusiness {
 				else if(i==5) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMIA.Get(5));
+					info.IsRemarkCode=true;
 				}
 				else if(i==6) {
 					info.FieldName="Disproportionate Share Amount";
@@ -561,18 +572,22 @@ namespace OpenDentBusiness {
 				else if(i==20) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMIA.Get(20));
+					info.IsRemarkCode=true;
 				}
 				else if(i==21) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMIA.Get(21));
+					info.IsRemarkCode=true;
 				}
 				else if(i==22) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMIA.Get(22));
+					info.IsRemarkCode=true;
 				}
 				else if(i==23) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMIA.Get(23));
+					info.IsRemarkCode=true;
 				}
 				else if(i==24) {
 					info.FieldName="Prospective Payment System (PPS) Capital Exception Amount";
@@ -592,6 +607,8 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				Hx835_Info info=new Hx835_Info();
+				info.FieldValueRaw=segMOA.Get(i);
+				info.IsRemarkCode=false;
 				if(i==1) {
 					info.FieldName="Reimbursement Rate";
 					info.FieldValue=((PIn.Decimal(segMOA.Get(1))*100).ToString()+"%");
@@ -603,22 +620,27 @@ namespace OpenDentBusiness {
 				else if(i==3) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMOA.Get(3));
+					info.IsRemarkCode=true;
 				}
 				else if(i==4) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMOA.Get(4));
+					info.IsRemarkCode=true;
 				}
 				else if(i==5) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMOA.Get(5));
+					info.IsRemarkCode=true;
 				}
 				else if(i==6) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMOA.Get(6));
+					info.IsRemarkCode=true;
 				}
 				else if(i==7) {
 					info.FieldName="Claim Payment Remark";
 					info.FieldValue=GetDescriptFrom411(segMOA.Get(7));
+					info.IsRemarkCode=true;
 				}
 				else if(i==8) {
 					info.FieldName="End Stage Renal Disease (ESRD) Payment Amount";
@@ -2919,67 +2941,62 @@ namespace OpenDentBusiness {
 		///<summary>True if remark code MA15 is used in either segment MIA or MOA (if present).
 		///Claim splits are intended to expedite payment when one or two procedures on the original claim are pending for an extended period of time.</summary>
 		public bool IsSplitClaim;
-		///<summary>Cached the first time OriginalClaim is called, since OriginalClaim might perform many database calls (especially as we add more matching options in the future).</summary>
-		private Claim _claim=null;
+		private long _claimNum;
 
-		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835 in the database.  Returns 0 if not found.</summary>
-		private long GetOriginalClaimNumFromDb() {
-			long claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
-			if(claimNum!=0) {
-				return claimNum;
-			}
-			//If matching by tracking number fails, then match by patient name, subscriber ID, date of service, and claim fee.
-			List <Patient> listPatients=Patients.GetListByName(PatientName.Lname,PatientName.Fname,0);
-			for(int i=0;i<listPatients.Count;i++) {
-				Patient pat=listPatients[i];
-				List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
-				for(int j=0;j<listPatPlans.Count;j++) {
-					PatPlan patPlan=listPatPlans[j];
-					InsSub insSub=InsSubs.GetOne(patPlan.InsSubNum);
-					if(insSub.SubscriberID!=PatientName.SubscriberId) {
-						continue;
-					}
-					List <Claim> listClaims=Claims.Refresh(pat.PatNum);
-					for(int k=0;k<listClaims.Count;k++) {
-						Claim claim=listClaims[k];
-						if(claim.InsSubNum!=insSub.InsSubNum && claim.InsSubNum2!=insSub.InsSubNum) {//Ensure that the claim is for the correct insurance plan and subscriber.
-							continue;
-						}
-						if(claim.DateService.Date!=DateServiceStart.Date) {
-							continue;
-						}
-						double claimFee=(double)ClaimFee;
-						if(claim.ClaimFee<claimFee-0.001 || claim.ClaimFee>claimFee+0.001) {//Allow for rounding errors.
-							continue;
-						}
-						return claim.ClaimNum;
-					}
-				}
-			}
-			return 0;
-		}
-
-		public Claim ClaimOriginal {
-			get {
-				if(_claim!=null) {
-					return _claim;
-				}
-				long claimNum=GetOriginalClaimNumFromDb();
-				if(claimNum!=0) {
-					_claim=Claims.GetClaim(claimNum);
-				}
-				return _claim;
-			}
-		}
-
+		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835 in the database, or from cache.  Returns 0 if not found.</summary>
 		public long ClaimNum {
 			get {
-				Claim claim=ClaimOriginal;
-				if(claim!=null) {
-					return claim.ClaimNum;
+				if(_claimNum!=0) {
+					return _claimNum;
 				}
-				return 0;
+				//First match by patient name, subscriber ID, date of service, and claim fee.
+				//This must be done first, because split claims will all have the same Claim Identifier on the 835, and the only way we can possibly determine the correct claim is by claim fee.
+				List<Claim> listClaimsMatched=new List<Claim>();
+				List<Patient> listPatients=Patients.GetListByName(PatientName.Lname,PatientName.Fname,0);
+				for(int i=0;i<listPatients.Count;i++) {
+					Patient pat=listPatients[i];
+					List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+					for(int j=0;j<listPatPlans.Count;j++) {
+						PatPlan patPlan=listPatPlans[j];
+						InsSub insSub=InsSubs.GetOne(patPlan.InsSubNum);
+						if(insSub.SubscriberID!=PatientName.SubscriberId) {
+							continue;
+						}
+						List<Claim> listClaims=Claims.Refresh(pat.PatNum);
+						for(int k=0;k<listClaims.Count;k++) {
+							Claim claim=listClaims[k];
+							if(claim.InsSubNum!=insSub.InsSubNum && claim.InsSubNum2!=insSub.InsSubNum) {//Ensure that the claim is for the correct insurance plan and subscriber.
+								continue;
+							}
+							if(claim.DateService.Date!=DateServiceStart.Date) {
+								continue;
+							}
+							double claimFee=(double)ClaimFee;
+							if(claim.ClaimFee<claimFee-0.001 || claim.ClaimFee>claimFee+0.001) {//Allow for rounding errors.
+								continue;
+							}
+							listClaimsMatched.Add(claim);
+						}
+					}
+				}
+				//There could be more than one match for a split claim, but it is unlikely that each split will have the same fee.
+				if(listClaimsMatched.Count==1) {
+					_claimNum=listClaimsMatched[0].ClaimNum;
+				}
+				else {
+					//Claim Identifiers are unreliable, but this line gives the user a way to manually assign a claim to a paid claim on the 835.
+					_claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+				}
+				return _claimNum;
 			}
+		}
+
+		///<summary>Attempts to get the original claim from the database.  Returns null if not found.</summary>
+		public Claim GetClaimFromDb() {
+			if(ClaimNum==0) {
+				return null;
+			}
+			return Claims.GetClaim(ClaimNum);
 		}
 
 		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>
@@ -3081,7 +3098,12 @@ namespace OpenDentBusiness {
 	///<summary>The values loaded into this class come from multiple segments, including the MIA, MOA, and AMT segments.</summary>
 	public class Hx835_Info {
 		public string FieldName;
+		///<summary>The user display value of FieldValueRaw.</summary>
 		public string FieldValue;
+		///<summary>For logic, not for display.</summary>
+		public string FieldValueRaw;
+		///<summary>True if is a claim payment remark code.</summary>
+		public bool IsRemarkCode;
 	}
 
 	///<summary>Corresponds to various NM1 segments.</summary>
@@ -3510,5 +3532,40 @@ namespace OpenDentBusiness {
 //Example 7: Provided and engineered by ClaimConnect.  The data is fake.  This example contains multiple transactions (ST segments) even though the X12 guide says there can only be 1.
 //See the example content in the file named TEST_DentalX.2030339.835.  Notice that the file extension is "835".
 #endregion Example 7
+
+#region Example 8
+//This example is from page 45 in the X12 implementation guide. CLP through LQ segments are copied from the guide, but the rest of the example (the filler) is from example 3 to make the message complete.
+//ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//ST*835*0001~
+//BPR*I*1222*C*CHK************20020928~
+//TRN*1*0012524965*1559123456~
+//REF*EV*030240928~
+//DTM*405*20050412~
+//N1*PR*YOUR TAX DOLLARS AT WORK~
+//N3*481A00 DEER RUN ROAD~
+//N4*WEST PALM BCH*FL*11114~
+//N1*PE*ACME MEDICAL CENTER*FI*5999944521~
+//N3*PO BOX 863382~
+//N4*ORLANDO*FL*55115~
+//REF*PQ*10488~
+//LX*1~
+//CLP*9/26*1*740**MC~
+//NM1*QC*1*CAMPBELL*MAYA*R***MI*854216985~
+//NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
+//MOA***MA15~
+//SVC*NU:A*300*300**2~
+//REF*6R*1~
+//SVC*NU:B*400*400**4~
+//REF*6R*2~
+//SVC*NU:E*40*40**2~
+//DTM*150*20020928~
+//DTM*151*20020930~
+//REF*6R*5~
+//LQ*HE*N123~
+//SE*38*0001~
+//GE*1*1~
+//IEA*1*000000001~
+#endregion Example 8
 
 #endregion Examples

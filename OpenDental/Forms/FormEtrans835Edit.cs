@@ -215,45 +215,45 @@ namespace OpenDental {
 
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
-			bool isPaymentEntry=true;
-			if(!Security.IsAuthorized(Permissions.InsPayCreate)) {//date not checked here, but it will be checked when actually creating the check
-				isPaymentEntry=false;
+			Claim claim=claimPaid.GetClaimFromDb();
+			bool isReadOnly=true;
+			if(claim==null) {//Original claim not found.
+				MessageBox.Show(Lan.g(this,"Original claim not found")+". "+Lan.g(this,"The claim details from the EOB will be displayed instead")+". "
+					+Lan.g(this,"Locate the Claim Identifier on the EOB and manually edit the Claim Identifier of the original claim to match, then try again")+".");
 			}
-			//TODO: Do not enter payment if the claim is a split claim.
-			long claimNum=claimPaid.ClaimNum;
-			Claim claim=null;
-			if(claimNum==0) {//Original claim not found.
-				isPaymentEntry=false;
-			}
-			else {
-				claim=Claims.GetClaim(claimNum);
-			}
-			if(claim!=null && claim.ClaimStatus=="R") {
+			else if(claim.ClaimStatus=="R") {//Claim found and is already received.
 				//If the claim is already received, then we do not allow the user to enter payments.
-				//Returning false will cause the EOB details window to show, then the user can click on the Edit Claim button to change the status of the claim if they would like to enter the payment again.
+				//The user can edit the claim to change the status from received if they wish to enter the payments again.
 				Patient pat=Patients.GetPat(claim.PatNum);
 				Family fam=Patients.GetFamily(claim.PatNum);
 				FormClaimEdit formCE=new FormClaimEdit(claim,pat,fam);
 				formCE.ShowDialog();
+				isReadOnly=false;
 			}
-			else {
-				if(isPaymentEntry) {
-					EnterPayment(claimPaid,claim);
-				}
-				else {
-					//Show EOB details (read only).
-					FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
-					formC.ShowDialog(this);
-					if(claim!=null) {
-						claim=Claims.GetClaim(claim.ClaimNum);//The user might have edited the claim here.  We need to refresh from DB so we can check the status below.
+			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check
+				if(claimPaid.IsSplitClaim) {
+					if(MessageBox.Show(Lan.g(this,"The insurance carrier has split the claim")+". "
+						+Lan.g(this,"You must manually locate and split the claim before entering the payment information")+". "
+						+Lan.g(this,"Continue entering payment")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK)
+					{
+						return;
 					}
 				}
+				EnterPayment(claimPaid,claim);
+				isReadOnly=false;
 			}
-			if(claim!=null && claim.ClaimStatus=="R") {
-				gridClaimDetails.Rows[e.Row].Cells[0].Text="X";//Indicate that payment is received.
+			if(isReadOnly) {
+				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
+				formC.ShowDialog(this);
 			}
 			else {
-				gridClaimDetails.Rows[e.Row].Cells[0].Text="";//Indicate that payment is not received.
+				claim=claimPaid.GetClaimFromDb();//Since the claim status might have changed above.
+				if(claim.ClaimStatus=="R") {
+					gridClaimDetails.Rows[e.Row].Cells[0].Text="X";//Indicate that payment is Received.
+				}
+				else {
+					gridClaimDetails.Rows[e.Row].Cells[0].Text="";//Indicate that payment is not Received.
+				}
 			}
 		}
 

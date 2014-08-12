@@ -9,13 +9,13 @@ namespace OpenDentBusiness{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long ClaimProcNum;
-		///<summary>FK to procedurelog.ProcNum.</summary>
+		///<summary>FK to procedurelog.ProcNum.  Is 0 for payments by total.</summary>
 		public long ProcNum;
-		///<summary>FK to claim.ClaimNum.</summary>
+		///<summary>FK to claim.ClaimNum.  Is 0 for estimates, adjustments and capitation (CapClaim and CapComplete).</summary>
 		public long ClaimNum;
 		///<summary>FK to patient.PatNum.</summary>
 		public long PatNum;
-		///<summary>FK to provider.ProvNum.  At least one office has been manually setting their claimproc provider to a different provider when entering payments as a means to track provider income.  So we can't force this to always be the same as the procedure.  We also don't want to change any historical data, so only synched when setting appt complete or if an estimate.  Right now on e-claims, we are sending the prov from the procedure.  When we have time, we will change e-claims to send the proc from the ClaimProc.</summary>
+		///<summary>FK to provider.ProvNum.  At least one office has been manually setting their claimproc provider to a different provider when entering payments as a means to track provider income.  So we can't force this to always be the same as the procedure.  We also don't want to change any historical data, so only synched when setting appt complete or if an estimate.  Right now on e-claims, we are sending the prov from the procedure.  When we have time, we will change e-claims to send the prov from the ClaimProc.</summary>
 		public long ProvNum;
 		///<summary>Fee billed to insurance. Might not be the same as the actual fee.  The fee billed can be different than the actual procedure.  For instance, if you have set the insurance plan to bill insurance using UCR fees, then this field will contain the UCR fee instead of the fee that the patient was charged.</summary>
 		public double FeeBilled;
