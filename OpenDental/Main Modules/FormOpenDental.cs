@@ -4725,6 +4725,7 @@ namespace OpenDental{
 			FormProcButtons FormPB=new FormProcButtons();
 			FormPB.Owner=this;
 			FormPB.ShowDialog();
+			SetModuleSelected();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Procedure Buttons");	
 		}
 

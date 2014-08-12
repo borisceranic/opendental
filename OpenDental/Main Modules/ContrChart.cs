@@ -384,6 +384,7 @@ namespace OpenDental{
 			this.pd2 = new System.Drawing.Printing.PrintDocument();
 			this.tabProc = new System.Windows.Forms.TabControl();
 			this.tabEnterTx = new System.Windows.Forms.TabPage();
+			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
 			this.comboPrognosis = new System.Windows.Forms.ComboBox();
 			this.labelPrognosis = new System.Windows.Forms.Label();
 			this.butD = new OpenDental.UI.Button();
@@ -529,7 +530,6 @@ namespace OpenDental{
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.button1 = new OpenDental.UI.Button();
 			this.textTreatmentNotes = new OpenDental.ODtextBox();
-			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
 			this.groupBox2.SuspendLayout();
 			this.tabControlImages.SuspendLayout();
 			this.panelImages.SuspendLayout();
@@ -1073,6 +1073,16 @@ namespace OpenDental{
 			this.tabEnterTx.TabIndex = 0;
 			this.tabEnterTx.Text = "Enter Treatment";
 			this.tabEnterTx.UseVisualStyleBackColor = true;
+			// 
+			// panelQuickButtons
+			// 
+			this.panelQuickButtons.Location = new System.Drawing.Point(315, 45);
+			this.panelQuickButtons.Name = "panelQuickButtons";
+			this.panelQuickButtons.RowCount = 10;
+			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
+			this.panelQuickButtons.TabIndex = 202;
+			this.panelQuickButtons.UseBlueTheme = false;
+			this.panelQuickButtons.ItemClickBut += new OpenDental.UI.ODButtonPanelEventHandler(this.panelQuickButtons_ItemClickBut);
 			// 
 			// comboPrognosis
 			// 
@@ -2888,15 +2898,6 @@ namespace OpenDental{
 			this.textTreatmentNotes.Text = "";
 			this.textTreatmentNotes.TextChanged += new System.EventHandler(this.textTreatmentNotes_TextChanged);
 			this.textTreatmentNotes.Leave += new System.EventHandler(this.textTreatmentNotes_Leave);
-			// 
-			// panelQuickButtons
-			// 
-			this.panelQuickButtons.Location = new System.Drawing.Point(315, 45);
-			this.panelQuickButtons.Name = "panelQuickButtons";
-			this.panelQuickButtons.RowCount = 9;
-			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
-			this.panelQuickButtons.TabIndex = 202;
-			this.panelQuickButtons.UseBlueTheme = false;
 			// 
 			// ContrChart
 			// 
@@ -6020,7 +6021,7 @@ namespace OpenDental{
 		}
 
 		///<summary>Gets run with each ModuleSelected.  Fills Dx, Prognosis, Priorities, ProcButtons, Date, and Image categories</summary>
-    private void FillDxProcImage(){
+		private void FillDxProcImage(){
 			//if(textDate.errorProvider1.GetError(textDate)==""){
 			if(checkToday.Checked){//textDate.Text=="" || 
 				textDate.Text=DateTime.Today.ToShortDateString();
@@ -6133,16 +6134,16 @@ namespace OpenDental{
 		private void fillPanelQuickButtons(){
 			panelQuickButtons.BeginUpdate();
 			panelQuickButtons.Items.Clear();
-			List<ProcButtonQuick> listPBQ=ProcButtonQuicks.GetAll();
-			listPBQ.Sort(ProcButtonQuicks.sortYX);
+			listProcButtonQuicks=ProcButtonQuicks.GetAll();
+			listProcButtonQuicks.Sort(ProcButtonQuicks.sortYX);
 			ODPanelItem pItem;
-			for(int i=0;i<listPBQ.Count;i++) {
+			for(int i=0;i<listProcButtonQuicks.Count;i++) {
 				pItem=new ODPanelItem();
-				pItem.Text=listPBQ[i].Description;
-				pItem.YPos=listPBQ[i].YPos;
+				pItem.Text=listProcButtonQuicks[i].Description;
+				pItem.YPos=listProcButtonQuicks[i].YPos;
 				pItem.ItemOrder=i;
-				pItem.ItemType=(listPBQ[i].IsLabel?ODPanelItemType.Label:ODPanelItemType.Button);
-				pItem.Tags.Add(listPBQ[i]);
+				pItem.ItemType=(listProcButtonQuicks[i].IsLabel?ODPanelItemType.Label:ODPanelItemType.Button);
+				pItem.Tags.Add(listProcButtonQuicks[i]);
 				panelQuickButtons.Items.Add(pItem);
 			}
 			panelQuickButtons.EndUpdate();
@@ -7061,11 +7062,16 @@ namespace OpenDental{
 				return;
 			}
 			ProcButton ProcButtonCur=ProcButtonList[listViewButtons.SelectedIndices[0]];
-			ProcButtonClicked(ProcButtonCur.ProcButtonNum,"");
+			ProcButtonClicked(ProcButtonCur.ProcButtonNum);//,"");
 		}
 
-		///<summary>If quickbutton, then pass the code in and set procButtonNum to 0.</summary>
-		private void ProcButtonClicked(long procButtonNum,string quickcode) {
+		/////<summary>If quickbutton, then pass the code in and set procButtonNum to 0.</summary>
+		//private void ProcButtonClicked(long procButtonNum,string quickcode) {
+		//	ProcButtonClicked(procButtonNum,quickcode,null);
+		//}
+
+		///<summary>If quickbutton, then pass the PBQ in and set procButtonNum to 0.</summary>
+		private void ProcButtonClicked(long procButtonNum,ProcButtonQuick pbq=null) {
 			orionProvNum=0;
 			if(newStatus==ProcStat.C){
 				if(!Security.IsAuthorized(Permissions.ProcComplCreate,PIn.Date(textDate.Text))){
@@ -7085,7 +7091,11 @@ namespace OpenDental{
 			long[] autoCodeList;
 			if(procButtonNum==0){
 				codeList=new long[1];
-				codeList[0]=ProcedureCodes.GetCodeNum(quickcode);
+				codeList[0]=ProcedureCodes.GetCodeNum(pbq.CodeValue);
+				if(codeList[0]==0) {
+					MessageBox.Show(this,Lan.g(this,"Procedure code does not exist in database")+" : "+pbq.CodeValue);
+					return;
+				}
 				autoCodeList=new long[0];
 			}
 			else{
@@ -7119,7 +7129,7 @@ namespace OpenDental{
 			}
 			for(int i=0;i<codeList.Length;i++){
 				//needs to loop at least once, regardless of whether any teeth are selected.	
-				for(int n=0;n==0 || n<toothChart.SelectedTeeth.Count;n++) {
+				for(int n=0;n==0 || n<toothChart.SelectedTeeth.Count;n++) {//Consider changing to a Do{}While() loop.
 					isValid=true;
 					ProcCur=new Procedure();//insert, so no need to set CurOld
 					ProcCur.CodeNum=ProcedureCodes.GetProcCode(codeList[i]).CodeNum;
@@ -7151,6 +7161,10 @@ namespace OpenDental{
 							case 3: ProcCur.Surf="LR"; break;
 						}
 						quadCount++;
+						if(pbq!=null && !string.IsNullOrWhiteSpace(pbq.Surf)) {//from quick buttons only.
+							ProcCur.Surf=Tooth.SurfTidyFromDisplayToDb(pbq.Surf,ProcCur.ToothNum);
+							//ProcCur.Surf=pbq.Surf;
+						}
 						AddQuick(ProcCur);
 					}
 					else if(tArea==TreatmentArea.Surf){
@@ -7160,11 +7174,18 @@ namespace OpenDental{
 						else{
 							ProcCur.ToothNum=toothChart.SelectedTeeth[n];
 						}
-						if(textSurf.Text==""){
-							isValid=false;
+						if(textSurf.Text=="" && pbq==null){
+							isValid=false;// Pre-ODButtonPanel behavior
 						}
-						else{
+						else if(pbq!=null && pbq.Surf==""){
+							isValid=false; // ODButtonPanel behavior
+						}
+						else {
 							ProcCur.Surf=Tooth.SurfTidyFromDisplayToDb(textSurf.Text,ProcCur.ToothNum);//it's ok if toothnum is not valid.
+							if(pbq!=null && !string.IsNullOrWhiteSpace(pbq.Surf)) {//from quick buttons only.
+								ProcCur.Surf=Tooth.SurfTidyFromDisplayToDb(pbq.Surf,ProcCur.ToothNum);
+								//ProcCur.Surf=pbq.Surf;
+							}
 						}
 						if(isValid){
 							AddQuick(ProcCur);
@@ -10022,111 +10043,111 @@ namespace OpenDental{
 			butECWup.Visible=true;
 		}
 
-		#region Quick Buttons
-		private void panelQuickButtons_Paint(object sender,PaintEventArgs e) {
+		//#region Quick Buttons (Deprecated)
+		//private void panelQuickButtons_Paint(object sender,PaintEventArgs e) {
 
-		}
+		//}
 		
-		private void buttonCDO_Click(object sender,EventArgs e) {
-			textSurf.Text = "DO";
-			ProcButtonClicked(0,"D2392");
-		}
+		//private void buttonCDO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "DO";
+		//	ProcButtonClicked(0,"D2392");
+		//}
 
-		private void buttonCMOD_Click(object sender,EventArgs e) {
-			textSurf.Text = "MOD";
-			ProcButtonClicked(0,"D2393");
-		}
+		//private void buttonCMOD_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "MOD";
+		//	ProcButtonClicked(0,"D2393");
+		//}
 
-		private void buttonCO_Click(object sender,EventArgs e) {
-			textSurf.Text = "O";
-			ProcButtonClicked(0,"D2391");
-		}
+		//private void buttonCO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "O";
+		//	ProcButtonClicked(0,"D2391");
+		//}
 
-		private void buttonCMO_Click(object sender,EventArgs e) {
-			textSurf.Text = "MO";
-			ProcButtonClicked(0,"D2392");
-		}
+		//private void buttonCMO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "MO";
+		//	ProcButtonClicked(0,"D2392");
+		//}
 
-		private void butCOL_Click(object sender,EventArgs e) {
-			textSurf.Text = "OL";
-			ProcButtonClicked(0,"D2392");
-		}
+		//private void butCOL_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "OL";
+		//	ProcButtonClicked(0,"D2392");
+		//}
 
-		private void butCOB_Click(object sender,EventArgs e) {
-			textSurf.Text = "OB";
-			ProcButtonClicked(0,"D2392");
-		}
+		//private void butCOB_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "OB";
+		//	ProcButtonClicked(0,"D2392");
+		//}
 
-		private void butDL_Click(object sender,EventArgs e) {
-			textSurf.Text = "DL";
-			ProcButtonClicked(0,"D2331");
-		}
+		//private void butDL_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "DL";
+		//	ProcButtonClicked(0,"D2331");
+		//}
 
-		private void butML_Click(object sender,EventArgs e) {
-			textSurf.Text = "ML";
-			ProcButtonClicked(0,"D2331");
-		}
+		//private void butML_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "ML";
+		//	ProcButtonClicked(0,"D2331");
+		//}
 
-		private void buttonCSeal_Click(object sender,EventArgs e) {
-			textSurf.Text = "";
-			ProcButtonClicked(0,"D1351");
-		}
+		//private void buttonCSeal_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "";
+		//	ProcButtonClicked(0,"D1351");
+		//}
 
-		private void buttonADO_Click(object sender,EventArgs e) {
-			textSurf.Text = "DO";
-			ProcButtonClicked(0,"D2150");
-		}
+		//private void buttonADO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "DO";
+		//	ProcButtonClicked(0,"D2150");
+		//}
 
-		private void buttonAMOD_Click(object sender,EventArgs e) {
-			textSurf.Text = "MOD";
-			ProcButtonClicked(0,"D2160");
-		}
+		//private void buttonAMOD_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "MOD";
+		//	ProcButtonClicked(0,"D2160");
+		//}
 
-		private void buttonAO_Click(object sender,EventArgs e) {
-			textSurf.Text = "O";
-			ProcButtonClicked(0,"D2140");
-		}
+		//private void buttonAO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "O";
+		//	ProcButtonClicked(0,"D2140");
+		//}
 
-		private void buttonAMO_Click(object sender,EventArgs e) {
-			textSurf.Text = "MO";
-			ProcButtonClicked(0,"D2150");
-		}
+		//private void buttonAMO_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "MO";
+		//	ProcButtonClicked(0,"D2150");
+		//}
 
-		private void butCMDL_Click(object sender,EventArgs e) {
-			textSurf.Text = "MDL";
-			ProcButtonClicked(0,"D2332");
-		}
+		//private void butCMDL_Click(object sender,EventArgs e) {
+		//	textSurf.Text = "MDL";
+		//	ProcButtonClicked(0,"D2332");
+		//}
 
-		private void buttonAOL_Click(object sender, EventArgs e){
-			textSurf.Text = "OL";
-			ProcButtonClicked(0, "D2150");
-		}
+		//private void buttonAOL_Click(object sender, EventArgs e){
+		//	textSurf.Text = "OL";
+		//	ProcButtonClicked(0, "D2150");
+		//}
 
-		private void buttonAOB_Click(object sender, EventArgs e){
-			textSurf.Text = "OB";
-			ProcButtonClicked(0, "D2150");
-		}
+		//private void buttonAOB_Click(object sender, EventArgs e){
+		//	textSurf.Text = "OB";
+		//	ProcButtonClicked(0, "D2150");
+		//}
 
-		private void buttonAMODL_Click(object sender, EventArgs e){
-			textSurf.Text = "MODL";
-			ProcButtonClicked(0, "D2161");
-		}
+		//private void buttonAMODL_Click(object sender, EventArgs e){
+		//	textSurf.Text = "MODL";
+		//	ProcButtonClicked(0, "D2161");
+		//}
 
-		private void buttonAMODB_Click(object sender, EventArgs e){
-			textSurf.Text = "MODB";
-			ProcButtonClicked(0, "D2161");
-		}
+		//private void buttonAMODB_Click(object sender, EventArgs e){
+		//	textSurf.Text = "MODB";
+		//	ProcButtonClicked(0, "D2161");
+		//}
 
-		private void buttonCMODL_Click(object sender, EventArgs e){
-			textSurf.Text = "MODL";
-			ProcButtonClicked(0, "D2394");
-		}
+		//private void buttonCMODL_Click(object sender, EventArgs e){
+		//	textSurf.Text = "MODL";
+		//	ProcButtonClicked(0, "D2394");
+		//}
 
-		private void buttonCMODB_Click(object sender, EventArgs e){
-			textSurf.Text = "MODB";
-			ProcButtonClicked(0, "D2394");
-		}
-		#endregion Quick Buttons
+		//private void buttonCMODB_Click(object sender, EventArgs e){
+		//	textSurf.Text = "MODB";
+		//	ProcButtonClicked(0, "D2394");
+		//}
+		//#endregion Quick Buttons
 
 		private void butAddKey_Click(object sender,EventArgs e) {
 			RegistrationKey key=new RegistrationKey();
@@ -10253,6 +10274,21 @@ namespace OpenDental{
 			chartCustViewChanged=true; 
 			FillDateRange();
 			FillProgNotes();
+		}
+
+		///<summary>Handles single clicks that occur on button items. Not double clicks, not labels, and not empty space.</summary>
+		private void panelQuickButtons_ItemClickBut(object sender,ODButtonPanelEventArgs e) {
+			ProcButtonQuick pbq=null;
+			for(int i=0;i<e.Item.Tags.Count;i++){
+				if(e.Item.Tags[i].GetType()!=typeof(ProcButtonQuick)){
+					continue;
+				}
+				pbq=(ProcButtonQuick)e.Item.Tags[i];//should always happen
+			}
+			if(pbq==null){
+				return;//should never happen.
+			}
+			ProcButtonClicked(0,pbq);
 		}
 
 		

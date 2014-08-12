@@ -389,6 +389,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormProcButtonQuickEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormProcButtonQuickEdit.designer.cs">
+      <DependentUpon>FormProcButtonQuickEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEtrans835ClaimPay.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3535,6 +3541,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormProcButtonQuickEdit.resx">
+      <DependentUpon>FormProcButtonQuickEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835ClaimPay.resx">
       <DependentUpon>FormEtrans835ClaimPay.cs</DependentUpon>

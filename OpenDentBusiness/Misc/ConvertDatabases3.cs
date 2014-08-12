@@ -5795,6 +5795,56 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
+				//Fill ProckButton Quick with buttons to emulate current behavior with new ODButtonPanel
+				//MySQL and Oracle compatible
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (1,'Post. Composite','','',0,0,1)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (2,'MO','D2392','MO',0,1,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (3,'MOD','D2393','MOD',1,1,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (4,'O','D2391','O',2,1,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (5,'DO','D2392','DO',3,1,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (7,'        ','','',4,1,1)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (6,'Seal','D1351','',5,1,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (8,'OL','D2392','OL',0,2,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (9,'OB','D2392','OB',1,2,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (10,'MODL','D2394','MODL',2,2,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (11,'MODB','D2394','MODB',3,2,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (12,'Ant. Composite','','',0,4,1)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (13,'DL','D2331','',0,5,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (14,'MDL','D2332','',1,5,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (15,'ML','D2331','',2,5,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (16,'Amalgam','','',0,7,1)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (17,'MO','D2150','MO',0,8,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (18,'MOD','D2160','MOD',1,8,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (19,'O','D2140','O',2,8,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (20,'DO','D2150','DO',3,8,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (21,'OL','D2150','OL',0,9,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (22,'OB','D2150','OB',1,9,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (23,'MODL','D2161','MODL',2,9,0)";
+				Db.NonQ(command);
+				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (24,'MODB','D2161','MODB',3,9,0)";
+				Db.NonQ(command);
 
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";

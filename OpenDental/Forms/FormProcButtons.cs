@@ -290,9 +290,9 @@ namespace OpenDental{
 		private void ResizeControls() {
 			try {
 				Control[] controlArray=this.Owner.Controls.Find("ContrChart",true);
-				//force redraw and resize of control
+				//force redraw and resize of control, Also deselects current patient.
 				((ContrChart)controlArray[0]).ModuleSelected(0);
-				controlArray=this.Owner.Controls.Find("gridQuickButtons",true);
+				controlArray=this.Owner.Controls.Find("panelQuickButtons",true);
 				//set display size to actual size in from the control module. This is a dynamically sized control.
 				panelQuickButtons.Size=controlArray[0].Size;
 			}
@@ -312,7 +312,7 @@ namespace OpenDental{
 				pItem=new ODPanelItem();
 				pItem.Text=listProcButtonQuicks[i].Description;
 				pItem.YPos=listProcButtonQuicks[i].YPos;
-				pItem.ItemOrder=i;
+				pItem.ItemOrder=listProcButtonQuicks[i].ItemOrder;
 				pItem.ItemType=(listProcButtonQuicks[i].IsLabel?ODPanelItemType.Label:ODPanelItemType.Button);
 				pItem.Tags.Add(listProcButtonQuicks[i]);
 				panelQuickButtons.Items.Add(pItem);
@@ -483,30 +483,6 @@ namespace OpenDental{
 			FillButtons();
 		}
 
-		private void gridQuickButtons_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			//FormProcButtonQuickEdit FormPBQ=new FormProcButtonQuickEdit();
-			//ProcButtonQuick pbq;
-			//if(listProcButtonQuicks.Exists(p => p.IsLabel && p.YPos==e.Row)) {//selected a row that contains an existing label
-			//	pbq=listProcButtonQuicks.Find(p => p.IsLabel && p.YPos==e.Row);
-			//}
-			//else if(listProcButtonQuicks.Exists(p => p.XPos==e.Col && p.YPos==e.Row)) {//selected a cell that has a corresponding quick button
-			//	pbq=listProcButtonQuicks.Find(p => p.XPos==e.Col && p.YPos==e.Row);
-			//}
-			//else {//selecting blank cell
-			//	pbq=new ProcButtonQuick();
-			//	pbq.XPos=e.Col;
-			//	pbq.YPos=e.Row;
-			//	FormPBQ.IsNew=true;
-			//}
-			//FormPBQ.ProcButtonQuickCur=pbq;
-			//FormPBQ.ShowDialog();
-			//if(FormPBQ.DialogResult!=DialogResult.OK) {
-			//	return;
-			//}
-			//listProcButtonQuicks=ProcButtonQuicks.GetAll();
-			//fillGridQuickButtons();
-		}
-
 		private void butClose_Click(object sender,System.EventArgs e) {
 			Close();
 		}
@@ -518,18 +494,32 @@ namespace OpenDental{
 		}
 
 		private void panelQuickButtons_RowDoubleClick(object sender,ODButtonPanelEventArgs e) {
-			ProcButtonQuick pbqCur=new ProcButtonQuick();
-			if(e.Item==null) {//clicked on either a blank row or to the right of existing buttons on a row.
-				pbqCur.YPos=e.Row;
-				for(int i=0;i<listProcButtonQuicks.Count;i++){
-					if(listProcButtonQuicks[i].YPos!=pbqCur.YPos
-						&& listProcButtonQuicks[i].ItemOrder<pbqCur.ItemOrder) {
+			FormProcButtonQuickEdit FormPBQ=new FormProcButtonQuickEdit();
+
+			//Search through tags of the ODPanelItem for the PBQ.
+			for(int i=0;e.Item!=null && i<e.Item.Tags.Count;i++) {
+				if(e.Item.Tags[i].GetType()==typeof(ProcButtonQuick)){
+					FormPBQ.pbqCur=(ProcButtonQuick)e.Item.Tags[i];
+					break;
+				}
+			}
+			if(FormPBQ.pbqCur==null) {//clicked on either a blank row or to the right of existing buttons on a row.
+				FormPBQ.IsNew=true;
+				FormPBQ.pbqCur=new ProcButtonQuick();
+				FormPBQ.pbqCur.YPos=e.Row;//Set Row
+				for(int i=0;i<listProcButtonQuicks.Count;i++){ //Set ItemOrder
+					if(listProcButtonQuicks[i].YPos!=FormPBQ.pbqCur.YPos //Wrong row
+						|| FormPBQ.pbqCur.ItemOrder>listProcButtonQuicks[i].ItemOrder) { //Already have a larger item order
 							continue;
 					}
-					pbqCur.ItemOrder=listProcButtonQuicks[i].ItemOrder+1;//new PBQ should have the highest item order in the row.
+					FormPBQ.pbqCur.ItemOrder=listProcButtonQuicks[i].ItemOrder+1;//new PBQ should have the highest item order in the row.
 				}
-			}//end if null
-			//FormProcButt
+			}
+			FormPBQ.ShowDialog();
+			if(FormPBQ.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			fillPanelQuickButtons();
 		}
 
 		

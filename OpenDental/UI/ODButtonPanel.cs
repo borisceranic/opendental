@@ -53,7 +53,6 @@ namespace OpenDental.UI {
 		#endregion
 
 		#region Properties
-
 		///<summary>Based on Height of control. Getting or Setting this value will read or modify the Height of the control.</summary>
 		[Category("Layout"),Description("Based on Height of control. Getting or Setting this value will read or modify the Height of the control.")]
 		public int RowCount {
@@ -75,8 +74,6 @@ namespace OpenDental.UI {
 				_useBlueTheme=value;
 			}
 		}
-
-		
 		#endregion
 
 		public ODButtonPanel() {
@@ -104,7 +101,7 @@ namespace OpenDental.UI {
 				Items[i].CalculateWidth(g,_fontSize);
 				Items[i].Location.Y=Items[i].YPos*_rowHeight;
 				//Then set xPos using previous cell's position and width:
-				if(i>0 && Items[i].YPos==Items[i-1].YPos) {//Previous item was on the same row.
+				if(i>0 && Items[i].YPos==Items[i-1].YPos) {//Previous item was on the same row. First item on each row is 0
 					Items[i].Location.X=Items[i-1].Location.X+Items[i-1].ItemWidth;
 				}
 			}
@@ -156,7 +153,10 @@ namespace OpenDental.UI {
 			}
 			g.FillRectangle(new SolidBrush(cBackG),
 				0,0,
-				Width,Height);
+				Width,Height);//Creates a shadow on top and left of control.
+			g.FillRectangle(new SolidBrush(Color.White),
+				1,1,
+				Width-1,Height-1);
 		}
 
 		private void DrawItems(Graphics g) {
@@ -173,14 +173,14 @@ namespace OpenDental.UI {
 		}
 
 		private void DrawItemLabel(Graphics g,ODPanelItem item) {
-			Color cBack=Color.FromArgb(224,223,227);
+			Color cBack=Color.White;//FromArgb(224,223,227);
 			Color cText=Color.Black;
 			if(_useBlueTheme) {
 				//TODO:
 			}
 			RectangleF itemRect=new RectangleF(
 				item.Location.X,item.Location.Y,
-				item.Location.X+item.ItemWidth,_rowHeight);
+				item.ItemWidth,_rowHeight);
 			g.FillRectangle(new SolidBrush(cBack),itemRect);
 			g.DrawString(item.Text,Font,new SolidBrush(cText),itemRect,new StringFormat { Alignment=StringAlignment.Center,LineAlignment=StringAlignment.Center });//TODO, probably tweek this to draw text int he right spot.
 		}
@@ -215,197 +215,197 @@ namespace OpenDental.UI {
 			DrawItemButTextAndImage(g,item);
 			DrawItemButReflection(g,recOutline,radius);
 		}
-		#region Button Drawing Helper Functions
-		///<summary>Draws a rectangle with rounded edges.</summary>
-		public static void DrawRoundedRectangle(Graphics grfx,Pen pen,RectangleF rect,float round) {
-			SmoothingMode oldSmoothingMode = grfx.SmoothingMode;
-			grfx.SmoothingMode = SmoothingMode.AntiAlias;
-			//top
-			grfx.DrawLine(pen,rect.Left+round,rect.Top,rect.Right-round,rect.Top);
-			grfx.DrawArc(pen,rect.Right-round*2,rect.Top,round*2,round*2,270,90);
-			//
-			grfx.DrawLine(pen,rect.Right,rect.Top+round,rect.Right,rect.Bottom-round);
-			grfx.DrawArc(pen,rect.Right-round*2,rect.Bottom-round*2,round*2,round*2,0,90);
-			//
-			grfx.DrawLine(pen,rect.Right-round,rect.Bottom,rect.Left+round,rect.Bottom);
-			grfx.DrawArc(pen,rect.Left,rect.Bottom-round*2,round*2,round*2,90,90);
-			//
-			grfx.DrawLine(pen,rect.Left,rect.Bottom-round,rect.Left,rect.Top+round);
-			grfx.DrawArc(pen,rect.Left,rect.Top,round*2,round*2,180,90);
-			//
-			grfx.SmoothingMode = oldSmoothingMode;
-		}
-
-		private void DrawItemButReflection(Graphics g,RectangleF rect,float radius) {
-			//lower--------------------------------------------------------------------
-			Color clrDarkOverlay=Color.FromArgb(50,125,125,125);
-			LinearGradientBrush brush=new LinearGradientBrush(new PointF(rect.Left,rect.Bottom),
-				new PointF(rect.Left,rect.Top+rect.Height/2-radius*2f),Color.FromArgb(0,0,0,0),
-				Color.FromArgb(50,0,0,0));
-			GraphicsPath path=new GraphicsPath();
-			path.AddLine(rect.Left+radius,rect.Top+rect.Height/2f,rect.Right-radius*2f,rect.Top+rect.Height/2f);
-			path.AddArc(new RectangleF(rect.Right-(radius*4f),rect.Top+rect.Height/2f-radius*4f,radius*4f,radius*4f),90,-90);
-			path.AddLine(rect.Right,rect.Top+rect.Height/2f-radius,rect.Right,rect.Bottom);
-			path.AddLine(rect.Right,rect.Bottom,rect.Left,rect.Bottom);
-			path.AddLine(rect.Left,rect.Bottom,rect.Left,rect.Top+rect.Height/2f-radius/2f);
-			path.AddArc(new RectangleF(rect.Left,rect.Top+rect.Height/2f-radius,radius*2f,radius),180,-90);
-			//g.DrawPath(Pens.Red,path);
-			g.FillPath(brush,path);
-		}
-
-		private void DrawItemButBackground(Graphics g,RectangleF rect,float radius,Color clrDark,Color clrMain,Color clrLight) {
-			if(radius<0) {
-				radius=0;
+			#region Button Drawing Helper Functions
+			///<summary>Draws a rectangle with rounded edges.</summary>
+			public static void DrawRoundedRectangle(Graphics grfx,Pen pen,RectangleF rect,float round) {
+				SmoothingMode oldSmoothingMode = grfx.SmoothingMode;
+				grfx.SmoothingMode = SmoothingMode.AntiAlias;
+				//top
+				grfx.DrawLine(pen,rect.Left+round,rect.Top,rect.Right-round,rect.Top);
+				grfx.DrawArc(pen,rect.Right-round*2,rect.Top,round*2,round*2,270,90);
+				//
+				grfx.DrawLine(pen,rect.Right,rect.Top+round,rect.Right,rect.Bottom-round);
+				grfx.DrawArc(pen,rect.Right-round*2,rect.Bottom-round*2,round*2,round*2,0,90);
+				//
+				grfx.DrawLine(pen,rect.Right-round,rect.Bottom,rect.Left+round,rect.Bottom);
+				grfx.DrawArc(pen,rect.Left,rect.Bottom-round*2,round*2,round*2,90,90);
+				//
+				grfx.DrawLine(pen,rect.Left,rect.Bottom-round,rect.Left,rect.Top+round);
+				grfx.DrawArc(pen,rect.Left,rect.Top,round*2,round*2,180,90);
+				//
+				grfx.SmoothingMode = oldSmoothingMode;
 			}
-			LinearGradientBrush brush;
-			SolidBrush brushS=new SolidBrush(clrMain);
-			g.SmoothingMode = SmoothingMode.HighQuality;
-			//sin(45)=.85. But experimentally, .7 works much better.
-			//1/.85=1.18 But experimentally, 1.37 works better. What gives?
-			//top
-			brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top+radius),
-				new PointF(rect.Left+radius,rect.Top),
-				clrMain,clrLight);
-			g.FillRectangle(brushS,rect.Left+radius,rect.Top,rect.Width-(radius*2),radius);
-			//UR
-			//2 pies of 45 each.
-			brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Top),
-				new PointF(rect.Right-(radius/2f),rect.Top+(radius/2f)),
-				clrLight,clrMain);
-			g.FillPie(brushS,rect.Right-(radius*2),rect.Top,radius*2,radius*2,270,45);
-			brush=new LinearGradientBrush(new PointF(rect.Right-(radius/2f)-.5f,rect.Top+(radius/2f)-.5f),
-				new PointF(rect.Right,rect.Top+radius),
-				clrMain,clrDark);
-			g.FillPie(brush,rect.Right-(radius*2),rect.Top,radius*2,radius*2,315,45);
-			//right
-			brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Top+radius),
-				new PointF(rect.Right,rect.Top+radius),
-				clrMain,clrDark);
-			g.FillRectangle(brush,rect.Right-radius,rect.Top+radius-.5f,radius,rect.Height-(radius*2)+1f);
-			//LR
-			g.FillPie(new SolidBrush(clrDark),rect.Right-(radius*2),rect.Bottom-(radius*2),radius*2,radius*2,0,90);
-			brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Bottom-radius),
-				new PointF(rect.Right-(radius*.5f)+.5f,rect.Bottom-(radius*.5f)+.5f),
-				clrMain,clrDark);
-			g.FillPolygon(brush,new PointF[] {
-				new PointF(rect.Right-radius,rect.Bottom-radius),
-				new PointF(rect.Right,rect.Bottom-radius),
-				new PointF(rect.Right-radius,rect.Bottom)});
-			//bottom
-			brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Bottom-radius),
-				new PointF(rect.Left+radius,rect.Bottom),
-				clrMain,clrDark);
-			g.FillRectangle(brush,rect.Left+radius-.5f,rect.Bottom-radius,rect.Width-(radius*2)+1f,radius);
-			//LL
-			//2 pies of 45 each.
-			brush=new LinearGradientBrush(new PointF(rect.Left+(radius/2f),rect.Bottom-(radius/2f)),
-				new PointF(rect.Left+radius,rect.Bottom),
-				clrMain,clrDark);
-			g.FillPie(brush,rect.Left,rect.Bottom-(radius*2),radius*2,radius*2,90,45);
-			brush=new LinearGradientBrush(new PointF(rect.Left+(radius/2f),rect.Bottom-(radius/2f)),
-				new PointF(rect.Left,rect.Bottom-radius),
-				clrMain,clrLight);
-			g.FillPie(brushS,rect.Left,rect.Bottom-(radius*2),radius*2,radius*2,135,45);
-			//left
-			brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top),
-				new PointF(rect.Left,rect.Top),
-				clrMain,clrLight);
-			g.FillRectangle(brushS,rect.Left,rect.Top+radius,radius,rect.Height-(radius*2));
-			//UL
-			g.FillPie(//new SolidBrush(clrLight)
-				brushS,rect.Left,rect.Top,radius*2,radius*2,180,90);
-			brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top+radius),
-				new PointF(rect.Left+(radius/2f),rect.Top+(radius/2f)),
-				clrMain,clrLight);
-			//center
-			GraphicsPath path=new GraphicsPath();
-			path.AddEllipse(rect.Left-rect.Width/8f,rect.Top-rect.Height/2f,rect.Width,rect.Height*3f/2f);
-			PathGradientBrush pathBrush=new PathGradientBrush(path);
-			pathBrush.CenterColor=Color.FromArgb(255,255,255,255);
-			pathBrush.SurroundColors=new Color[] { Color.FromArgb(0,255,255,255) };
-			g.FillRectangle(new SolidBrush(clrMain),
-				rect.Left+radius-.5f,rect.Top+radius-.5f,
-				rect.Width-(radius*2)+1f,rect.Height-(radius*2)+1f);
-			g.FillRectangle(
-				pathBrush,
-				rect.Left+radius-.5f,rect.Top+radius-.5f,
-				rect.Width-(radius*2)+1f,rect.Height-(radius*2)+1f);
-			//highlights
-			brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top),
-				new PointF(rect.Left+radius+rect.Width*2f/3f,rect.Top),
-				clrLight,clrMain);
-			g.FillRectangle(brush,rect.Left+radius,rect.Y+radius*3f/8f,rect.Width/2f,radius/4f);
-			path=new GraphicsPath();
-			path.AddLine(rect.Left+radius,rect.Top+radius*3/8,rect.Left+radius,rect.Top+radius*5/8);
-			path.AddArc(new RectangleF(rect.Left+radius*5/8,rect.Top+radius*5/8,radius*3/4,radius*3/4),270,-90);
-			path.AddArc(new RectangleF(rect.Left+radius*3/8,rect.Top+radius*7/8,radius*1/4,radius*1/4),0,180);
-			path.AddArc(new RectangleF(rect.Left+radius*3/8,rect.Top+radius*3/8,radius*5/4,radius*5/4),180,90);
-			//g.DrawPath(Pens.Red,path);
-			g.FillPath(new SolidBrush(clrLight),path);
-		}
 
-		///<summary>Draws the text and image</summary>
-		private void DrawItemButTextAndImage(Graphics g,ODPanelItem item) {
-			g.SmoothingMode = SmoothingMode.HighQuality;
-			SolidBrush brushText=new SolidBrush(ForeColor);
-			SolidBrush brushGlow=new SolidBrush(Color.White);
-			StringFormat sf=DrawItemButGetStringFormat(ContentAlignment.MiddleCenter);
-			RectangleF recGlow1;
-			RectangleF recText;
-			recGlow1=new RectangleF(item.Location.X+.5f,item.Location.Y+.5f,item.ItemWidth,_rowHeight);
-			recText=new RectangleF(item.Location.X,item.Location.Y,item.ItemWidth,_rowHeight);
-			g.DrawString(item.Text,this.Font,brushGlow,recGlow1,sf);
-			g.DrawString(item.Text,this.Font,brushText,recText,sf);
-			brushText.Dispose();
-			sf.Dispose();
-		}
-
-		private StringFormat DrawItemButGetStringFormat(ContentAlignment contentAlignment) {
-			if(!Enum.IsDefined(typeof(ContentAlignment),(int)contentAlignment))
-				throw new System.ComponentModel.InvalidEnumArgumentException(
-					"contentAlignment",(int)contentAlignment,typeof(ContentAlignment));
-			StringFormat stringFormat = new StringFormat();
-			switch(contentAlignment) {
-				case ContentAlignment.MiddleCenter:
-					stringFormat.LineAlignment = StringAlignment.Center;
-					stringFormat.Alignment = StringAlignment.Center;
-					break;
-				case ContentAlignment.MiddleLeft:
-					stringFormat.LineAlignment = StringAlignment.Center;
-					stringFormat.Alignment = StringAlignment.Near;
-					break;
-				case ContentAlignment.MiddleRight:
-					stringFormat.LineAlignment = StringAlignment.Center;
-					stringFormat.Alignment = StringAlignment.Far;
-					break;
-				case ContentAlignment.TopCenter:
-					stringFormat.LineAlignment = StringAlignment.Near;
-					stringFormat.Alignment = StringAlignment.Center;
-					break;
-				case ContentAlignment.TopLeft:
-					stringFormat.LineAlignment = StringAlignment.Near;
-					stringFormat.Alignment = StringAlignment.Near;
-					break;
-				case ContentAlignment.TopRight:
-					stringFormat.LineAlignment = StringAlignment.Near;
-					stringFormat.Alignment = StringAlignment.Far;
-					break;
-				case ContentAlignment.BottomCenter:
-					stringFormat.LineAlignment = StringAlignment.Far;
-					stringFormat.Alignment = StringAlignment.Center;
-					break;
-				case ContentAlignment.BottomLeft:
-					stringFormat.LineAlignment = StringAlignment.Far;
-					stringFormat.Alignment = StringAlignment.Near;
-					break;
-				case ContentAlignment.BottomRight:
-					stringFormat.LineAlignment = StringAlignment.Far;
-					stringFormat.Alignment = StringAlignment.Far;
-					break;
+			private void DrawItemButReflection(Graphics g,RectangleF rect,float radius) {
+				//lower--------------------------------------------------------------------
+				Color clrDarkOverlay=Color.FromArgb(50,125,125,125);
+				LinearGradientBrush brush=new LinearGradientBrush(new PointF(rect.Left,rect.Bottom),
+					new PointF(rect.Left,rect.Top+rect.Height/2-radius*2f),Color.FromArgb(0,0,0,0),
+					Color.FromArgb(50,0,0,0));
+				GraphicsPath path=new GraphicsPath();
+				path.AddLine(rect.Left+radius,rect.Top+rect.Height/2f,rect.Right-radius*2f,rect.Top+rect.Height/2f);
+				path.AddArc(new RectangleF(rect.Right-(radius*4f),rect.Top+rect.Height/2f-radius*4f,radius*4f,radius*4f),90,-90);
+				path.AddLine(rect.Right,rect.Top+rect.Height/2f-radius,rect.Right,rect.Bottom);
+				path.AddLine(rect.Right,rect.Bottom,rect.Left,rect.Bottom);
+				path.AddLine(rect.Left,rect.Bottom,rect.Left,rect.Top+rect.Height/2f-radius/2f);
+				path.AddArc(new RectangleF(rect.Left,rect.Top+rect.Height/2f-radius,radius*2f,radius),180,-90);
+				//g.DrawPath(Pens.Red,path);
+				g.FillPath(brush,path);
 			}
-			return stringFormat;
-		}
-		#endregion Button Drawing Helper Functions
+
+			private void DrawItemButBackground(Graphics g,RectangleF rect,float radius,Color clrDark,Color clrMain,Color clrLight) {
+				if(radius<0) {
+					radius=0;
+				}
+				LinearGradientBrush brush;
+				SolidBrush brushS=new SolidBrush(clrMain);
+				g.SmoothingMode = SmoothingMode.HighQuality;
+				//sin(45)=.85. But experimentally, .7 works much better.
+				//1/.85=1.18 But experimentally, 1.37 works better. What gives?
+				//top
+				brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top+radius),
+					new PointF(rect.Left+radius,rect.Top),
+					clrMain,clrLight);
+				g.FillRectangle(brushS,rect.Left+radius,rect.Top,rect.Width-(radius*2),radius);
+				//UR
+				//2 pies of 45 each.
+				brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Top),
+					new PointF(rect.Right-(radius/2f),rect.Top+(radius/2f)),
+					clrLight,clrMain);
+				g.FillPie(brushS,rect.Right-(radius*2),rect.Top,radius*2,radius*2,270,45);
+				brush=new LinearGradientBrush(new PointF(rect.Right-(radius/2f)-.5f,rect.Top+(radius/2f)-.5f),
+					new PointF(rect.Right,rect.Top+radius),
+					clrMain,clrDark);
+				g.FillPie(brush,rect.Right-(radius*2),rect.Top,radius*2,radius*2,315,45);
+				//right
+				brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Top+radius),
+					new PointF(rect.Right,rect.Top+radius),
+					clrMain,clrDark);
+				g.FillRectangle(brush,rect.Right-radius,rect.Top+radius-.5f,radius,rect.Height-(radius*2)+1f);
+				//LR
+				g.FillPie(new SolidBrush(clrDark),rect.Right-(radius*2),rect.Bottom-(radius*2),radius*2,radius*2,0,90);
+				brush=new LinearGradientBrush(new PointF(rect.Right-radius,rect.Bottom-radius),
+					new PointF(rect.Right-(radius*.5f)+.5f,rect.Bottom-(radius*.5f)+.5f),
+					clrMain,clrDark);
+				g.FillPolygon(brush,new PointF[] {
+					new PointF(rect.Right-radius,rect.Bottom-radius),
+					new PointF(rect.Right,rect.Bottom-radius),
+					new PointF(rect.Right-radius,rect.Bottom)});
+				//bottom
+				brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Bottom-radius),
+					new PointF(rect.Left+radius,rect.Bottom),
+					clrMain,clrDark);
+				g.FillRectangle(brush,rect.Left+radius-.5f,rect.Bottom-radius,rect.Width-(radius*2)+1f,radius);
+				//LL
+				//2 pies of 45 each.
+				brush=new LinearGradientBrush(new PointF(rect.Left+(radius/2f),rect.Bottom-(radius/2f)),
+					new PointF(rect.Left+radius,rect.Bottom),
+					clrMain,clrDark);
+				g.FillPie(brush,rect.Left,rect.Bottom-(radius*2),radius*2,radius*2,90,45);
+				brush=new LinearGradientBrush(new PointF(rect.Left+(radius/2f),rect.Bottom-(radius/2f)),
+					new PointF(rect.Left,rect.Bottom-radius),
+					clrMain,clrLight);
+				g.FillPie(brushS,rect.Left,rect.Bottom-(radius*2),radius*2,radius*2,135,45);
+				//left
+				brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top),
+					new PointF(rect.Left,rect.Top),
+					clrMain,clrLight);
+				g.FillRectangle(brushS,rect.Left,rect.Top+radius,radius,rect.Height-(radius*2));
+				//UL
+				g.FillPie(//new SolidBrush(clrLight)
+					brushS,rect.Left,rect.Top,radius*2,radius*2,180,90);
+				brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top+radius),
+					new PointF(rect.Left+(radius/2f),rect.Top+(radius/2f)),
+					clrMain,clrLight);
+				//center
+				GraphicsPath path=new GraphicsPath();
+				path.AddEllipse(rect.Left-rect.Width/8f,rect.Top-rect.Height/2f,rect.Width,rect.Height*3f/2f);
+				PathGradientBrush pathBrush=new PathGradientBrush(path);
+				pathBrush.CenterColor=Color.FromArgb(255,255,255,255);
+				pathBrush.SurroundColors=new Color[] { Color.FromArgb(0,255,255,255) };
+				g.FillRectangle(new SolidBrush(clrMain),
+					rect.Left+radius-.5f,rect.Top+radius-.5f,
+					rect.Width-(radius*2)+1f,rect.Height-(radius*2)+1f);
+				g.FillRectangle(
+					pathBrush,
+					rect.Left+radius-.5f,rect.Top+radius-.5f,
+					rect.Width-(radius*2)+1f,rect.Height-(radius*2)+1f);
+				//highlights
+				brush=new LinearGradientBrush(new PointF(rect.Left+radius,rect.Top),
+					new PointF(rect.Left+radius+rect.Width*2f/3f,rect.Top),
+					clrLight,clrMain);
+				g.FillRectangle(brush,rect.Left+radius,rect.Y+radius*3f/8f,rect.Width/2f,radius/4f);
+				path=new GraphicsPath();
+				path.AddLine(rect.Left+radius,rect.Top+radius*3/8,rect.Left+radius,rect.Top+radius*5/8);
+				path.AddArc(new RectangleF(rect.Left+radius*5/8,rect.Top+radius*5/8,radius*3/4,radius*3/4),270,-90);
+				path.AddArc(new RectangleF(rect.Left+radius*3/8,rect.Top+radius*7/8,radius*1/4,radius*1/4),0,180);
+				path.AddArc(new RectangleF(rect.Left+radius*3/8,rect.Top+radius*3/8,radius*5/4,radius*5/4),180,90);
+				//g.DrawPath(Pens.Red,path);
+				g.FillPath(new SolidBrush(clrLight),path);
+			}
+
+			///<summary>Draws the text and image</summary>
+			private void DrawItemButTextAndImage(Graphics g,ODPanelItem item) {
+				g.SmoothingMode = SmoothingMode.HighQuality;
+				SolidBrush brushText=new SolidBrush(ForeColor);
+				SolidBrush brushGlow=new SolidBrush(Color.White);
+				StringFormat sf=DrawItemButGetStringFormat(ContentAlignment.MiddleCenter);
+				RectangleF recGlow1;
+				RectangleF recText;
+				recGlow1=new RectangleF(item.Location.X+.5f,item.Location.Y+.5f,item.ItemWidth,_rowHeight);
+				recText=new RectangleF(item.Location.X,item.Location.Y,item.ItemWidth,_rowHeight);
+				g.DrawString(item.Text,this.Font,brushGlow,recGlow1,sf);
+				g.DrawString(item.Text,this.Font,brushText,recText,sf);
+				brushText.Dispose();
+				sf.Dispose();
+			}
+
+			private StringFormat DrawItemButGetStringFormat(ContentAlignment contentAlignment) {
+				if(!Enum.IsDefined(typeof(ContentAlignment),(int)contentAlignment))
+					throw new System.ComponentModel.InvalidEnumArgumentException(
+						"contentAlignment",(int)contentAlignment,typeof(ContentAlignment));
+				StringFormat stringFormat = new StringFormat();
+				switch(contentAlignment) {
+					case ContentAlignment.MiddleCenter:
+						stringFormat.LineAlignment = StringAlignment.Center;
+						stringFormat.Alignment = StringAlignment.Center;
+						break;
+					case ContentAlignment.MiddleLeft:
+						stringFormat.LineAlignment = StringAlignment.Center;
+						stringFormat.Alignment = StringAlignment.Near;
+						break;
+					case ContentAlignment.MiddleRight:
+						stringFormat.LineAlignment = StringAlignment.Center;
+						stringFormat.Alignment = StringAlignment.Far;
+						break;
+					case ContentAlignment.TopCenter:
+						stringFormat.LineAlignment = StringAlignment.Near;
+						stringFormat.Alignment = StringAlignment.Center;
+						break;
+					case ContentAlignment.TopLeft:
+						stringFormat.LineAlignment = StringAlignment.Near;
+						stringFormat.Alignment = StringAlignment.Near;
+						break;
+					case ContentAlignment.TopRight:
+						stringFormat.LineAlignment = StringAlignment.Near;
+						stringFormat.Alignment = StringAlignment.Far;
+						break;
+					case ContentAlignment.BottomCenter:
+						stringFormat.LineAlignment = StringAlignment.Far;
+						stringFormat.Alignment = StringAlignment.Center;
+						break;
+					case ContentAlignment.BottomLeft:
+						stringFormat.LineAlignment = StringAlignment.Far;
+						stringFormat.Alignment = StringAlignment.Near;
+						break;
+					case ContentAlignment.BottomRight:
+						stringFormat.LineAlignment = StringAlignment.Far;
+						stringFormat.Alignment = StringAlignment.Far;
+						break;
+				}
+				return stringFormat;
+			}
+			#endregion Button Drawing Helper Functions
 
 		///<summary>Draws outline around entire control.</summary>
 		private void DrawOutline(Graphics g) {
@@ -537,7 +537,7 @@ namespace OpenDental.UI {
 			base.OnMouseUp(e);
 		}
 
-		///<summary>The purpose of this is to allow dragging to select multiple rows.  Only makes sense if selectionMode==MultiExtended.  Doesn't matter whether ctrl is down, because that only affects the mouse down event.</summary>
+		///<summary></summary>
 		protected override void OnMouseMove(MouseEventArgs e) {
 			base.OnMouseMove(e);
 		}
@@ -567,7 +567,6 @@ namespace OpenDental.UI {
 			Invalidate();
 		}
 		#endregion BeginEndUpdate
-
 
 	}
 	///<summary></summary>

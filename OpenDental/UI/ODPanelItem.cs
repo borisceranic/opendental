@@ -17,14 +17,14 @@ namespace OpenDental.UI {
 		///<summary>Used for attaching objects to this control. Potential uses: Images, procedures, delegate functions, etc. Will revisit later, maybe.</summary>
 		public List<object> Tags;
 		///<summary>Computed item width based on text, font, and graphics. Value is recalculated by ODButtonPanel when painting.</summary>
-		private int itemWidth;
+		private int _itemWidth;
 		public Point Location;
 
 		#region Properties 
 		///<summary>Computed item width based on text, font, and graphics. Value is recalculated by ODButtonPanel when painting.</summary>
 		public int ItemWidth {
 			get {
-				return itemWidth;
+				return _itemWidth;
 			}
 		}
 		#endregion
@@ -35,13 +35,17 @@ namespace OpenDental.UI {
 		}
 
 		public void CalculateWidth(Graphics g,float fontSize) {
+			if(string.IsNullOrWhiteSpace(Text)) {
+				_itemWidth=Text.Length*3+8;//measure each whitespace character as a fixed 3px width. +8px padding.
+				return;
+			}
 			using(Font fontCur=new Font(FontFamily.GenericSansSerif,fontSize)) {
 				switch(ItemType) {//switching on item type allows us to caluclate different margins for each.
 					case ODPanelItemType.Button:
-						itemWidth=(int)g.MeasureString(Text,fontCur).Width+8;
+						_itemWidth=(int)g.MeasureString(Text,fontCur).Width+8;
 						break;
 					case ODPanelItemType.Label:
-						itemWidth=(int)g.MeasureString(Text,fontCur).Width+8;
+						_itemWidth=(int)g.MeasureString(Text,fontCur).Width+8;
 						break;
 				}//end switch
 			}//end using
