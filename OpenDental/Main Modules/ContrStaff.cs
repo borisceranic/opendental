@@ -838,32 +838,39 @@ namespace OpenDental{
 			SecurityLogs.MakeLogEntry(Permissions.Billing,0,"");
 		}
 
-		///<summary>Shows FormBilling and displays warning message if needed.  Pass 0 to show all clinics.</summary>
+		///<summary>Shows FormBilling and displays warning message if needed.  Pass 0 to show all clinics.  Make sure to check for unsent bills before calling this method.</summary>
 		private void ShowBilling(long clinicNum) {
-			bool isFirstShow=false;
-			if(FormB==null || FormB.IsDisposed) {
-				isFirstShow=true;
-				FormB=new FormBilling();
-				FormB.GoToChanged += new PatientSelectedEventHandler(formBilling_GoToChanged);
-				FormB.ClinicNum=clinicNum;
+			bool hadListShowing=false;
+			//Check to see if there is an instance of the billing list window already open that needs to be closed.
+			//This can happen if multiple people are trying to send bills at the same time.
+			if(FormB!=null && !FormB.IsDisposed) {
+				hadListShowing=true;
+				//It does not hurt to always close this window before loading a new instance, because the unsent bills are saved in the database and the entire purpose of FormBilling is the Go To feature.
+				//Any statements that were showing in the old billing list window that we are about to close could potentially be stale and are now invalid and should not be sent.
+				//Another good reason to close the window is when using clinics.  It was possible to show a different clinic billing list than the one chosen.
+				if(FormB.ClinicNum!=clinicNum) {//For most users clinic nums will always be 0.
+					//The old billing list was showing a different clinic.  No need to show the warning message in this scenario.
+					hadListShowing=false;
+				}
+				FormB.Close();
 			}
-			FormB.Show();
+			FormB=new FormBilling();
+			FormB.GoToChanged += new PatientSelectedEventHandler(formBilling_GoToChanged);
+			FormB.ClinicNum=clinicNum;
+			FormB.Show();//FormBilling has a Go To option and is shown as a non-modal window so the user can view the patient account and the billing list at the same time.
 			FormB.BringToFront();
-			if(isFirstShow) {
+			if(hadListShowing) {
 				MsgBox.Show(this,"These unsent bills must either be sent or deleted before a new list can be created.");
 			}
 		}
 
-		///<summary>Shows FormBillingOptions and FormBilling if needed.  Pass 0 to show all clinics.</summary>
+		///<summary>Shows FormBillingOptions and FormBilling if needed.  Pass 0 to show all clinics.  Make sure to check for unsent bills before calling this method.</summary>
 		private void ShowBillingOptions(long clinicNum) {
 			FormBillingOptions FormBO=new FormBillingOptions();
 			FormBO.ClinicNum=clinicNum;
 			FormBO.ShowDialog();
 			if(FormBO.DialogResult==DialogResult.OK) {
-				FormB=new FormBilling();
-				FormB.GoToChanged += new PatientSelectedEventHandler(formBilling_GoToChanged);
-				FormB.ClinicNum=FormBO.ClinicNum;
-				FormB.Show();
+				ShowBilling(clinicNum);
 			}
 		}
 
