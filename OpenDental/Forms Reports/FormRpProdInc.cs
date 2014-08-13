@@ -1253,6 +1253,7 @@ GROUP BY SchedDate
 				}
 				whereClin+=") ";
 			}
+			//The reason ProcFee*(UnitQty+BaseUnits) is not used here is due to the inability to predict the UnitQty of something you have yet to do.
 			report.Query= "SELECT "+DbHelper.DateColumn("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) "
 				+"FROM (SELECT appointment.AptDateTime,IFNULL(procedurelog.ProcFee,0) Fee,";
 			if(PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO)) {
