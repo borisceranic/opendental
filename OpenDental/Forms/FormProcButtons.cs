@@ -226,7 +226,6 @@ namespace OpenDental{
 			// 
 			this.panelQuickButtons.Location = new System.Drawing.Point(326, 59);
 			this.panelQuickButtons.Name = "panelQuickButtons";
-			this.panelQuickButtons.RowCount = 9;
 			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
 			this.panelQuickButtons.TabIndex = 203;
 			this.panelQuickButtons.UseBlueTheme = false;

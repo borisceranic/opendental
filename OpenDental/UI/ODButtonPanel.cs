@@ -53,16 +53,6 @@ namespace OpenDental.UI {
 		#endregion
 
 		#region Properties
-		///<summary>Based on Height of control. Getting or Setting this value will read or modify the Height of the control.</summary>
-		[Category("Layout"),Description("Based on Height of control. Getting or Setting this value will read or modify the Height of the control.")]
-		public int RowCount {
-			get {
-				return Height/_rowHeight;//rounds down
-			}
-			set {
-				Height=value*_rowHeight;
-			}
-		}
 
 		[Category("Appearance"),Description("For future use."),
 		NotifyParentProperty(true), RefreshProperties(RefreshProperties.Repaint)]
@@ -80,6 +70,8 @@ namespace OpenDental.UI {
 			InitializeComponent();
 			Items=new List<ODPanelItem>();
 			SelectedRow=-1;
+			//might need parent form to doubel buffer.
+			DoubleBuffered=true;
 		}
 
 		///<summary></summary>
@@ -133,16 +125,10 @@ namespace OpenDental.UI {
 			if(Width<1 || Height<1) {
 				return;
 			}
-			Bitmap doubleBuffer=new Bitmap(Width,Height,e.Graphics);
-			using(Graphics g=Graphics.FromImage(doubleBuffer)) {
-				ComputeWidthsAndLocations(g);
-				DrawBackG(g);
-				DrawItems(g);
-				DrawOutline(g);
-				e.Graphics.DrawImageUnscaled(doubleBuffer,0,0);
-			}
-			doubleBuffer.Dispose();
-			doubleBuffer=null;
+			ComputeWidthsAndLocations(e.Graphics);
+			DrawBackG(e.Graphics);
+			DrawItems(e.Graphics);
+			DrawOutline(e.Graphics);
 		}
 
 		///<summary>Draws a solid gray background.</summary>
@@ -215,6 +201,7 @@ namespace OpenDental.UI {
 			DrawItemButTextAndImage(g,item);
 			DrawItemButReflection(g,recOutline,radius);
 		}
+
 			#region Button Drawing Helper Functions
 			///<summary>Draws a rectangle with rounded edges.</summary>
 			public static void DrawRoundedRectangle(Graphics grfx,Pen pen,RectangleF rect,float round) {
@@ -422,50 +409,28 @@ namespace OpenDental.UI {
 		#region Clicking
 
 		#region Single Click
-		///<summary></summary>
 		protected override void OnClick(EventArgs e) {
 			base.OnClick(e);
 			SelectedItem=PointToItem(_pointMouseClick);
 			SelectedRow=_pointMouseClick.Y/_rowHeight;
 			if(SelectedItem!=null) {
-				OnClickItem(SelectedItem);
+				//OnClickItem(SelectedItem);
 				switch(SelectedItem.ItemType) {
 					case ODPanelItemType.Button:
 						OnClickButton(SelectedItem);
 						break;
-					case ODPanelItemType.Label:
-						OnClickLabel(SelectedItem);
-						break;
+					//case ODPanelItemType.Label:
+					//	OnClickLabel(SelectedItem);
+					//	break;
 				}
 			}
-			OnRowClick(SelectedRow);
-		}
-
-		private void OnClickItem(ODPanelItem itemClick) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(ItemClick!=null) {
-				ItemClick(this,pArgs);
-			}
+			//OnRowClick(SelectedRow);
 		}
 
 		private void OnClickButton(ODPanelItem itemClick) {
 			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
 			if(ItemClickBut!=null) {
 				ItemClickBut(this,pArgs);
-			}
-		}
-
-		private void OnClickLabel(ODPanelItem itemClick) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(ItemClickLabel!=null) {
-				ItemClickLabel(this,pArgs);
-			}
-		}
-
-		private void OnRowClick(int p) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(RowClick!=null) {
-				RowClick(this,pArgs);
 			}
 		}
 		#endregion Single Click
@@ -476,39 +441,18 @@ namespace OpenDental.UI {
 			base.OnDoubleClick(e);
 			SelectedItem=PointToItem(_pointMouseClick);
 			SelectedRow=_pointMouseClick.Y/_rowHeight;
-			if(SelectedItem!=null) {
-				OnDoubleClickItem(SelectedItem);
-				switch(SelectedItem.ItemType) {
-					case ODPanelItemType.Button:
-						OnDoubleClickButton(SelectedItem);
-						break;
-					case ODPanelItemType.Label:
-						OnDoubleClickLabel(SelectedItem);
-						break;
-				}
-			}
+			//if(SelectedItem!=null) {
+			//	OnDoubleClickItem(SelectedItem);
+			//	switch(SelectedItem.ItemType) {
+			//		case ODPanelItemType.Button:
+			//			OnDoubleClickButton(SelectedItem);
+			//			break;
+			//		case ODPanelItemType.Label:
+			//			OnDoubleClickLabel(SelectedItem);
+			//			break;
+			//	}
+			//}
 			OnRowDoubleClick(_pointMouseClick.Y/_rowHeight);
-		}
-
-		private void OnDoubleClickItem(ODPanelItem SelectedItem) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(ItemDoubleClick!=null) {
-				ItemDoubleClick(this,pArgs);
-			}
-		}
-
-		private void OnDoubleClickButton(ODPanelItem SelectedItem) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(ItemDoubleClickBut!=null) {
-				ItemDoubleClickBut(this,pArgs);
-			}
-		}
-
-		private void OnDoubleClickLabel(ODPanelItem SelectedItem) {
-			ODButtonPanelEventArgs pArgs=new ODButtonPanelEventArgs(SelectedItem,SelectedRow,MouseButtons.Left);
-			if(ItemDoubleClickLabel!=null) {
-				ItemDoubleClickLabel(this,pArgs);
-			}
 		}
 
 		private void OnRowDoubleClick(int p) {
@@ -517,7 +461,6 @@ namespace OpenDental.UI {
 				RowDoubleClick(this,pArgs);
 			}
 		}
-
 		#endregion Double Click
 
 		#endregion Clicking
@@ -530,24 +473,6 @@ namespace OpenDental.UI {
 			_pointMouseClick=new Point(e.X,e.Y);
 			//ODPanelItem item=PointToItem(_pointMouseClick);
 			//int row=e.Y/_rowHeight;
-		}
-
-		///<summary></summary>
-		protected override void OnMouseUp(MouseEventArgs e) {
-			base.OnMouseUp(e);
-		}
-
-		///<summary></summary>
-		protected override void OnMouseMove(MouseEventArgs e) {
-			base.OnMouseMove(e);
-		}
-
-		protected override void OnMouseEnter(EventArgs e) {
-			base.OnMouseEnter(e);
-		}
-
-		protected override void OnMouseLeave(EventArgs e) {
-			base.OnMouseLeave(e);
 		}
 
 		#endregion MouseEvents
@@ -569,6 +494,7 @@ namespace OpenDental.UI {
 		#endregion BeginEndUpdate
 
 	}
+
 	///<summary></summary>
 	public class ODButtonPanelEventArgs {
 		private ODPanelItem item;
