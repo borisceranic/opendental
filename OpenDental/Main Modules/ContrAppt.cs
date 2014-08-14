@@ -3781,6 +3781,10 @@ namespace OpenDental {
 					AppointmentL.DateSelected=PIn.Date(FormAO.DateJumpToString);
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
 					OnPatientSelected(PatCur);
+					if(ApptDrawing.IsWeeklyView) {
+						WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;
+						WeekEndDate=WeekStartDate.AddDays(ApptDrawing.NumOfWeekDaysToDisplay-1).Date;
+					}
 					//RefreshModulePatient(FormAO.SelectedPatNum);
 					RefreshPeriod();
 					break;
