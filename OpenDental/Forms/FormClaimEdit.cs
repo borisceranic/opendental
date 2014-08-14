@@ -4901,15 +4901,32 @@ namespace OpenDental{
 				}
 			}
 			Claim newClaim=ClaimCur.Copy();
+			newClaim.ClaimFee=0;
+			newClaim.DedApplied=0;
+			newClaim.InsPayEst=0;
+			newClaim.InsPayAmt=0;
+			newClaim.WriteOff=0;
 			Claims.Insert(newClaim);
 			newClaim.ClaimIdentifier=newClaim.PatNum.ToString()+"/"+newClaim.ClaimNum.ToString();
-			Claims.Update(newClaim);
 			//now this claim has been precisely duplicated, except it has a new ClaimNum.  So there are no attached claimprocs.
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				ClaimProcsForClaim[gridProc.SelectedIndices[i]].ClaimNum=newClaim.ClaimNum;
-				ClaimProcsForClaim[gridProc.SelectedIndices[i]].PayPlanNum=0;//detach from payplan if previously attached, claimprocs from two claims cannot be attached to the same payplan
-				ClaimProcs.Update(ClaimProcsForClaim[gridProc.SelectedIndices[i]]);//moves it to the new claim
+				ClaimProc claimProc=ClaimProcsForClaim[gridProc.SelectedIndices[i]];
+				claimProc.ClaimNum=newClaim.ClaimNum;
+				claimProc.PayPlanNum=0;//detach from payplan if previously attached, claimprocs from two claims cannot be attached to the same payplan
+				ClaimProcs.Update(claimProc);//moves it to the new claim
+				newClaim.ClaimFee+=claimProc.FeeBilled;
+				newClaim.DedApplied+=claimProc.DedApplied;
+				newClaim.InsPayEst+=claimProc.InsPayEst;
+				newClaim.InsPayAmt+=claimProc.InsPayAmt;
+				newClaim.WriteOff+=claimProc.WriteOff;
 			}
+			Claims.Update(newClaim);
+			ClaimCur.ClaimFee-=newClaim.ClaimFee;
+			ClaimCur.DedApplied-=newClaim.DedApplied;
+			ClaimCur.InsPayEst-=newClaim.InsPayEst;
+			ClaimCur.InsPayAmt-=newClaim.InsPayAmt;
+			ClaimCur.WriteOff-=newClaim.WriteOff;
+			Claims.Update(ClaimCur);
 			//now, set Claims.Cur back to the originalClaim.  The new claim will now show on the account.
 			//ClaimCur=originalClaim;//.Clone()
 			ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
