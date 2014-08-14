@@ -4907,7 +4907,11 @@ namespace OpenDental{
 			newClaim.InsPayAmt=0;
 			newClaim.WriteOff=0;
 			Claims.Insert(newClaim);
-			newClaim.ClaimIdentifier=newClaim.PatNum.ToString()+"/"+newClaim.ClaimNum.ToString();
+			//Originally, we thought that giving the split claim a unique claim identifier was important, because we thought that the user would send the split claim similar to how the original claim was sent.
+			//Now all split claims will share the same claim identifier for the following reasons:
+			//1) In electronic remittance advice (X12 format 835), split claims all share the same claim identifier as the original claim.  Using the same claim identifier pattern as the ERAs makes claim matching easier when ERAs are received.
+			//2) When sending an eclaim, OD will block the user if the claim identifier is the same as another claim, which is good because we do not want split claims to be sent, only the original claim must be sent.
+			//newClaim.ClaimIdentifier=newClaim.PatNum.ToString()+"/"+newClaim.ClaimNum.ToString();
 			//now this claim has been precisely duplicated, except it has a new ClaimNum.  So there are no attached claimprocs.
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
 				ClaimProc claimProc=ClaimProcsForClaim[gridProc.SelectedIndices[i]];
