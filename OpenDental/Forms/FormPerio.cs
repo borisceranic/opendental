@@ -102,6 +102,8 @@ namespace OpenDental{
 		private Label labelPlaqueHistory;
 		private ListBox listPlaqueHistory;
 		private CheckBox checkGingMarg;
+		/// <summary>This control is located behind gridP in the upper left corner.  It is used to allow text voice activated perio charting.  This also allows text to be pasted in the perio chart.</summary>
+		private TextBox textInputBox;
 		private PerioExam PerioExamCur;
 
 		///<summary></summary>
@@ -152,15 +154,6 @@ namespace OpenDental{
 			this.butColorCalculus = new System.Windows.Forms.Button();
 			this.butColorPlaque = new System.Windows.Forms.Button();
 			this.checkThree = new System.Windows.Forms.CheckBox();
-			this.butSave = new OpenDental.UI.Button();
-			this.butCalcIndex = new OpenDental.UI.Button();
-			this.butCalculus = new OpenDental.UI.Button();
-			this.butPlaque = new OpenDental.UI.Button();
-			this.butSkip = new OpenDental.UI.Button();
-			this.butCount = new OpenDental.UI.Button();
-			this.butPus = new OpenDental.UI.Button();
-			this.butBleed = new OpenDental.UI.Button();
-			this.but10 = new OpenDental.UI.Button();
 			this.checkGingMarg = new System.Windows.Forms.CheckBox();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -200,10 +193,22 @@ namespace OpenDental{
 			this.pd2 = new System.Drawing.Printing.PrintDocument();
 			this.printDialog2 = new System.Windows.Forms.PrintDialog();
 			this.printPreviewDlg = new System.Windows.Forms.PrintPreviewDialog();
-			this.butGraphical = new OpenDental.UI.Button();
+			this.labelPlaqueHistory = new System.Windows.Forms.Label();
+			this.listPlaqueHistory = new System.Windows.Forms.ListBox();
+			this.textInputBox = new System.Windows.Forms.TextBox();
 			this.gridP = new OpenDental.ContrPerio();
+			this.butSave = new OpenDental.UI.Button();
+			this.butGraphical = new OpenDental.UI.Button();
+			this.butCalcIndex = new OpenDental.UI.Button();
+			this.butCalculus = new OpenDental.UI.Button();
+			this.butPlaque = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
+			this.butSkip = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
+			this.butCount = new OpenDental.UI.Button();
+			this.butPus = new OpenDental.UI.Button();
+			this.butBleed = new OpenDental.UI.Button();
+			this.but10 = new OpenDental.UI.Button();
 			this.but0 = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.but8 = new OpenDental.UI.Button();
@@ -216,8 +221,6 @@ namespace OpenDental{
 			this.but3 = new OpenDental.UI.Button();
 			this.but7 = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.labelPlaqueHistory = new System.Windows.Forms.Label();
-			this.listPlaqueHistory = new System.Windows.Forms.ListBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
@@ -356,141 +359,6 @@ namespace OpenDental{
 			this.checkThree.Text = "Triplets";
 			this.toolTip1.SetToolTip(this.checkThree, "Enter numbers three at a time");
 			this.checkThree.Click += new System.EventHandler(this.checkThree_Click);
-			// 
-			// butSave
-			// 
-			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSave.Autosize = true;
-			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSave.CornerRadius = 4F;
-			this.butSave.Location = new System.Drawing.Point(764, 616);
-			this.butSave.Name = "butSave";
-			this.butSave.Size = new System.Drawing.Size(88, 24);
-			this.butSave.TabIndex = 77;
-			this.butSave.Text = "Save to Images";
-			this.toolTip1.SetToolTip(this.butSave, "Toggle the selected teeth as skipped");
-			this.butSave.Click += new System.EventHandler(this.butSave_Click);
-			// 
-			// butCalcIndex
-			// 
-			this.butCalcIndex.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCalcIndex.Autosize = true;
-			this.butCalcIndex.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCalcIndex.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCalcIndex.CornerRadius = 4F;
-			this.butCalcIndex.Location = new System.Drawing.Point(863, 215);
-			this.butCalcIndex.Name = "butCalcIndex";
-			this.butCalcIndex.Size = new System.Drawing.Size(84, 24);
-			this.butCalcIndex.TabIndex = 74;
-			this.butCalcIndex.Text = "Calc Index %";
-			this.toolTip1.SetToolTip(this.butCalcIndex, "Calculate the Index for all four types");
-			this.butCalcIndex.Click += new System.EventHandler(this.butCalcIndex_Click);
-			// 
-			// butCalculus
-			// 
-			this.butCalculus.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCalculus.Autosize = true;
-			this.butCalculus.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCalculus.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCalculus.CornerRadius = 4F;
-			this.butCalculus.Location = new System.Drawing.Point(762, 272);
-			this.butCalculus.Name = "butCalculus";
-			this.butCalculus.Size = new System.Drawing.Size(88, 24);
-			this.butCalculus.TabIndex = 65;
-			this.butCalculus.Text = "Calculus";
-			this.toolTip1.SetToolTip(this.butCalculus, "C on your keyboard");
-			this.butCalculus.Click += new System.EventHandler(this.butCalculus_Click);
-			// 
-			// butPlaque
-			// 
-			this.butPlaque.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPlaque.Autosize = true;
-			this.butPlaque.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPlaque.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPlaque.CornerRadius = 4F;
-			this.butPlaque.Location = new System.Drawing.Point(762, 242);
-			this.butPlaque.Name = "butPlaque";
-			this.butPlaque.Size = new System.Drawing.Size(88, 24);
-			this.butPlaque.TabIndex = 64;
-			this.butPlaque.Text = "Plaque";
-			this.toolTip1.SetToolTip(this.butPlaque, "P on your keyboard");
-			this.butPlaque.Click += new System.EventHandler(this.butPlaque_Click);
-			// 
-			// butSkip
-			// 
-			this.butSkip.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSkip.Autosize = true;
-			this.butSkip.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSkip.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSkip.CornerRadius = 4F;
-			this.butSkip.Location = new System.Drawing.Point(764, 580);
-			this.butSkip.Name = "butSkip";
-			this.butSkip.Size = new System.Drawing.Size(88, 24);
-			this.butSkip.TabIndex = 61;
-			this.butSkip.Text = "SkipTeeth";
-			this.toolTip1.SetToolTip(this.butSkip, "Toggle the selected teeth as skipped");
-			this.butSkip.Click += new System.EventHandler(this.butSkip_Click);
-			// 
-			// butCount
-			// 
-			this.butCount.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCount.Autosize = true;
-			this.butCount.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCount.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCount.CornerRadius = 4F;
-			this.butCount.Location = new System.Drawing.Point(92, 18);
-			this.butCount.Name = "butCount";
-			this.butCount.Size = new System.Drawing.Size(84, 24);
-			this.butCount.TabIndex = 1;
-			this.butCount.Text = "Count Teeth";
-			this.toolTip1.SetToolTip(this.butCount, "Count all six types");
-			this.butCount.Click += new System.EventHandler(this.butCount_Click);
-			// 
-			// butPus
-			// 
-			this.butPus.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPus.Autosize = true;
-			this.butPus.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPus.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPus.CornerRadius = 4F;
-			this.butPus.Location = new System.Drawing.Point(762, 332);
-			this.butPus.Name = "butPus";
-			this.butPus.Size = new System.Drawing.Size(88, 24);
-			this.butPus.TabIndex = 42;
-			this.butPus.Text = "Suppuration";
-			this.toolTip1.SetToolTip(this.butPus, "S on your keyboard");
-			this.butPus.Click += new System.EventHandler(this.butPus_Click);
-			// 
-			// butBleed
-			// 
-			this.butBleed.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBleed.Autosize = true;
-			this.butBleed.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBleed.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBleed.CornerRadius = 4F;
-			this.butBleed.Location = new System.Drawing.Point(762, 302);
-			this.butBleed.Name = "butBleed";
-			this.butBleed.Size = new System.Drawing.Size(88, 24);
-			this.butBleed.TabIndex = 41;
-			this.butBleed.Text = "Bleeding";
-			this.toolTip1.SetToolTip(this.butBleed, "Space bar or B on your keyboard");
-			this.butBleed.Click += new System.EventHandler(this.butBleed_Click);
-			// 
-			// but10
-			// 
-			this.but10.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.but10.Autosize = true;
-			this.but10.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.but10.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.but10.CornerRadius = 4F;
-			this.but10.Location = new System.Drawing.Point(833, 173);
-			this.but10.Name = "but10";
-			this.but10.Size = new System.Drawing.Size(32, 32);
-			this.but10.TabIndex = 40;
-			this.but10.Text = "10";
-			this.toolTip1.SetToolTip(this.but10, "Or hold down the Ctrl key");
-			this.but10.Click += new System.EventHandler(this.but10_Click);
 			// 
 			// checkGingMarg
 			// 
@@ -837,6 +705,64 @@ namespace OpenDental{
 			this.printPreviewDlg.Name = "printPreviewDlg";
 			this.printPreviewDlg.Visible = false;
 			// 
+			// labelPlaqueHistory
+			// 
+			this.labelPlaqueHistory.Location = new System.Drawing.Point(5, 334);
+			this.labelPlaqueHistory.Name = "labelPlaqueHistory";
+			this.labelPlaqueHistory.Size = new System.Drawing.Size(126, 19);
+			this.labelPlaqueHistory.TabIndex = 78;
+			this.labelPlaqueHistory.Text = "Plaque Index History";
+			this.labelPlaqueHistory.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelPlaqueHistory.Visible = false;
+			// 
+			// listPlaqueHistory
+			// 
+			this.listPlaqueHistory.ItemHeight = 14;
+			this.listPlaqueHistory.Location = new System.Drawing.Point(7, 356);
+			this.listPlaqueHistory.Name = "listPlaqueHistory";
+			this.listPlaqueHistory.SelectionMode = System.Windows.Forms.SelectionMode.None;
+			this.listPlaqueHistory.Size = new System.Drawing.Size(124, 130);
+			this.listPlaqueHistory.TabIndex = 79;
+			this.listPlaqueHistory.Visible = false;
+			// 
+			// textInputBox
+			// 
+			this.textInputBox.Location = new System.Drawing.Point(168, 22);
+			this.textInputBox.Name = "textInputBox";
+			this.textInputBox.Size = new System.Drawing.Size(53, 20);
+			this.textInputBox.TabIndex = 81;
+			this.textInputBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.textInputBox.TextChanged += new System.EventHandler(this.textInputBox_TextChanged);
+			this.textInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textInputBox_KeyDown);
+			this.textInputBox.Leave += new System.EventHandler(this.textInputBox_Leave);
+			// 
+			// gridP
+			// 
+			this.gridP.BackColor = System.Drawing.SystemColors.Window;
+			this.gridP.Location = new System.Drawing.Point(157, 11);
+			this.gridP.Name = "gridP";
+			this.gridP.SelectedExam = 0;
+			this.gridP.Size = new System.Drawing.Size(595, 665);
+			this.gridP.TabIndex = 75;
+			this.gridP.Text = "contrPerio2";
+			this.gridP.DirectionChangedRight += new System.EventHandler(this.gridP_DirectionChangedRight);
+			this.gridP.DirectionChangedLeft += new System.EventHandler(this.gridP_DirectionChangedLeft);
+			// 
+			// butSave
+			// 
+			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSave.Autosize = true;
+			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSave.CornerRadius = 4F;
+			this.butSave.Location = new System.Drawing.Point(764, 616);
+			this.butSave.Name = "butSave";
+			this.butSave.Size = new System.Drawing.Size(88, 24);
+			this.butSave.TabIndex = 77;
+			this.butSave.Text = "Save to Images";
+			this.toolTip1.SetToolTip(this.butSave, "Toggle the selected teeth as skipped");
+			this.butSave.Click += new System.EventHandler(this.butSave_Click);
+			// 
 			// butGraphical
 			// 
 			this.butGraphical.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -852,17 +778,50 @@ namespace OpenDental{
 			this.butGraphical.Text = "Graphical";
 			this.butGraphical.Click += new System.EventHandler(this.butGraphical_Click);
 			// 
-			// gridP
+			// butCalcIndex
 			// 
-			this.gridP.BackColor = System.Drawing.SystemColors.Window;
-			this.gridP.Location = new System.Drawing.Point(157, 11);
-			this.gridP.Name = "gridP";
-			this.gridP.SelectedExam = 0;
-			this.gridP.Size = new System.Drawing.Size(595, 665);
-			this.gridP.TabIndex = 75;
-			this.gridP.Text = "contrPerio2";
-			this.gridP.DirectionChangedRight += new System.EventHandler(this.gridP_DirectionChangedRight);
-			this.gridP.DirectionChangedLeft += new System.EventHandler(this.gridP_DirectionChangedLeft);
+			this.butCalcIndex.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCalcIndex.Autosize = true;
+			this.butCalcIndex.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCalcIndex.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCalcIndex.CornerRadius = 4F;
+			this.butCalcIndex.Location = new System.Drawing.Point(863, 215);
+			this.butCalcIndex.Name = "butCalcIndex";
+			this.butCalcIndex.Size = new System.Drawing.Size(84, 24);
+			this.butCalcIndex.TabIndex = 74;
+			this.butCalcIndex.Text = "Calc Index %";
+			this.toolTip1.SetToolTip(this.butCalcIndex, "Calculate the Index for all four types");
+			this.butCalcIndex.Click += new System.EventHandler(this.butCalcIndex_Click);
+			// 
+			// butCalculus
+			// 
+			this.butCalculus.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCalculus.Autosize = true;
+			this.butCalculus.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCalculus.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCalculus.CornerRadius = 4F;
+			this.butCalculus.Location = new System.Drawing.Point(762, 272);
+			this.butCalculus.Name = "butCalculus";
+			this.butCalculus.Size = new System.Drawing.Size(88, 24);
+			this.butCalculus.TabIndex = 65;
+			this.butCalculus.Text = "Calculus";
+			this.toolTip1.SetToolTip(this.butCalculus, "C on your keyboard");
+			this.butCalculus.Click += new System.EventHandler(this.butCalculus_Click);
+			// 
+			// butPlaque
+			// 
+			this.butPlaque.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPlaque.Autosize = true;
+			this.butPlaque.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPlaque.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPlaque.CornerRadius = 4F;
+			this.butPlaque.Location = new System.Drawing.Point(762, 242);
+			this.butPlaque.Name = "butPlaque";
+			this.butPlaque.Size = new System.Drawing.Size(88, 24);
+			this.butPlaque.TabIndex = 64;
+			this.butPlaque.Text = "Plaque";
+			this.toolTip1.SetToolTip(this.butPlaque, "P on your keyboard");
+			this.butPlaque.Click += new System.EventHandler(this.butPlaque_Click);
 			// 
 			// butPrint
 			// 
@@ -880,6 +839,21 @@ namespace OpenDental{
 			this.butPrint.Text = "Print";
 			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
 			// 
+			// butSkip
+			// 
+			this.butSkip.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSkip.Autosize = true;
+			this.butSkip.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSkip.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSkip.CornerRadius = 4F;
+			this.butSkip.Location = new System.Drawing.Point(764, 580);
+			this.butSkip.Name = "butSkip";
+			this.butSkip.Size = new System.Drawing.Size(88, 24);
+			this.butSkip.TabIndex = 61;
+			this.butSkip.Text = "SkipTeeth";
+			this.toolTip1.SetToolTip(this.butSkip, "Toggle the selected teeth as skipped");
+			this.butSkip.Click += new System.EventHandler(this.butSkip_Click);
+			// 
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -895,6 +869,66 @@ namespace OpenDental{
 			this.butAdd.TabIndex = 53;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
+			// 
+			// butCount
+			// 
+			this.butCount.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCount.Autosize = true;
+			this.butCount.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCount.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCount.CornerRadius = 4F;
+			this.butCount.Location = new System.Drawing.Point(92, 18);
+			this.butCount.Name = "butCount";
+			this.butCount.Size = new System.Drawing.Size(84, 24);
+			this.butCount.TabIndex = 1;
+			this.butCount.Text = "Count Teeth";
+			this.toolTip1.SetToolTip(this.butCount, "Count all six types");
+			this.butCount.Click += new System.EventHandler(this.butCount_Click);
+			// 
+			// butPus
+			// 
+			this.butPus.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPus.Autosize = true;
+			this.butPus.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPus.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPus.CornerRadius = 4F;
+			this.butPus.Location = new System.Drawing.Point(762, 332);
+			this.butPus.Name = "butPus";
+			this.butPus.Size = new System.Drawing.Size(88, 24);
+			this.butPus.TabIndex = 42;
+			this.butPus.Text = "Suppuration";
+			this.toolTip1.SetToolTip(this.butPus, "S on your keyboard");
+			this.butPus.Click += new System.EventHandler(this.butPus_Click);
+			// 
+			// butBleed
+			// 
+			this.butBleed.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butBleed.Autosize = true;
+			this.butBleed.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butBleed.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butBleed.CornerRadius = 4F;
+			this.butBleed.Location = new System.Drawing.Point(762, 302);
+			this.butBleed.Name = "butBleed";
+			this.butBleed.Size = new System.Drawing.Size(88, 24);
+			this.butBleed.TabIndex = 41;
+			this.butBleed.Text = "Bleeding";
+			this.toolTip1.SetToolTip(this.butBleed, "Space bar or B on your keyboard");
+			this.butBleed.Click += new System.EventHandler(this.butBleed_Click);
+			// 
+			// but10
+			// 
+			this.but10.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.but10.Autosize = true;
+			this.but10.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.but10.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.but10.CornerRadius = 4F;
+			this.but10.Location = new System.Drawing.Point(833, 173);
+			this.but10.Name = "but10";
+			this.but10.Size = new System.Drawing.Size(32, 32);
+			this.but10.TabIndex = 40;
+			this.but10.Text = "10";
+			this.toolTip1.SetToolTip(this.but10, "Or hold down the Ctrl key");
+			this.but10.Click += new System.EventHandler(this.but10_Click);
 			// 
 			// but0
 			// 
@@ -1067,36 +1101,17 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// labelPlaqueHistory
-			// 
-			this.labelPlaqueHistory.Location = new System.Drawing.Point(5, 334);
-			this.labelPlaqueHistory.Name = "labelPlaqueHistory";
-			this.labelPlaqueHistory.Size = new System.Drawing.Size(126, 19);
-			this.labelPlaqueHistory.TabIndex = 78;
-			this.labelPlaqueHistory.Text = "Plaque Index History";
-			this.labelPlaqueHistory.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			this.labelPlaqueHistory.Visible = false;
-			// 
-			// listPlaqueHistory
-			// 
-			this.listPlaqueHistory.ItemHeight = 14;
-			this.listPlaqueHistory.Location = new System.Drawing.Point(7, 356);
-			this.listPlaqueHistory.Name = "listPlaqueHistory";
-			this.listPlaqueHistory.SelectionMode = System.Windows.Forms.SelectionMode.None;
-			this.listPlaqueHistory.Size = new System.Drawing.Size(124, 130);
-			this.listPlaqueHistory.TabIndex = 79;
-			this.listPlaqueHistory.Visible = false;
-			// 
 			// FormPerio
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(982, 700);
+			this.Controls.Add(this.gridP);
+			this.Controls.Add(this.textInputBox);
 			this.Controls.Add(this.checkGingMarg);
 			this.Controls.Add(this.listPlaqueHistory);
 			this.Controls.Add(this.labelPlaqueHistory);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.butGraphical);
-			this.Controls.Add(this.gridP);
 			this.Controls.Add(this.butCalcIndex);
 			this.Controls.Add(this.textIndexCalculus);
 			this.Controls.Add(this.textIndexBleeding);
@@ -1146,6 +1161,7 @@ namespace OpenDental{
 			this.Text = "Perio Chart";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormPerio_Closing);
 			this.Load += new System.EventHandler(this.FormPerio_Load);
+			this.Shown += new System.EventHandler(this.FormPerio_Shown);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
@@ -1177,6 +1193,11 @@ namespace OpenDental{
 			}
 			listExams.SelectedIndex=PerioExams.ListExams.Count-1;//this works even if no items.
 			FillGrid();
+		}
+
+		/// <summary>Used to force focus to the hidden textbox when showing this form.</summary>
+		private void FormPerio_Shown(object sender,EventArgs e) {
+			textInputBox.Focus();
 		}
 
 		///<summary>After this method runs, the selected index is usually set.</summary>
@@ -1225,6 +1246,14 @@ namespace OpenDental{
 		}
 
 		private void listExams_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
+			if(e.Button==MouseButtons.Left) {//TODO: add comment about why this is here.
+				try {
+					listExams.SelectedIndex=e.Y/listExams.ItemHeight;
+				}
+				catch {
+					return;//User might have clicked on some white space thus not selecting a valid item.
+				}
+			}
 			if(listExams.SelectedIndex==gridP.SelectedExam)
 				return;
 			//Only continues if clicked on other than current exam
@@ -1846,7 +1875,44 @@ namespace OpenDental{
 			gridP.Focus();
 		}
 
-		private void butClose_Click(object sender, System.EventArgs e) {
+		private void textInputBox_Leave(object sender,EventArgs e) {
+			textInputBox.Focus();
+		}
+
+		private void textInputBox_KeyDown(object sender,KeyEventArgs e) {
+			if(e.KeyCode==Keys.Left
+				|| e.KeyCode==Keys.Right
+				|| e.KeyCode==Keys.Up
+				|| e.KeyCode==Keys.Down
+				|| e.KeyCode==Keys.Delete
+				|| e.KeyCode==Keys.Back
+				|| e.Modifiers==Keys.Control) 
+			{
+				gridP.KeyPressed(e);
+			}
+		}
+
+		private void textInputBox_TextChanged(object sender,EventArgs e) {
+			Char[] arrInputChars=textInputBox.Text.ToLower().ToCharArray();
+			for(int i=0;i<arrInputChars.Length;i++) {
+				if(arrInputChars[i]>=48 && arrInputChars[i]<=57) {
+					NumberClicked(arrInputChars[i]-48);
+				}
+				else if(arrInputChars[i]=='b'
+					|| arrInputChars[i]=='c'
+					|| arrInputChars[i]=='s'
+					|| arrInputChars[i]=='p') 
+				{
+					gridP.ButtonPressed(arrInputChars[i].ToString());
+				}
+				else if(arrInputChars[i]==' ') {
+					gridP.ButtonPressed("b");
+				}
+			}
+			textInputBox.Clear();
+		}
+
+		private void butClose_Click(object sender,System.EventArgs e) {
 			Close();
 		}
 
@@ -1874,7 +1940,7 @@ namespace OpenDental{
 		
 
 		
-		
+
 
 		
 

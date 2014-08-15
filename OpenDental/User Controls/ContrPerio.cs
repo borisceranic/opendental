@@ -1437,6 +1437,10 @@ namespace OpenDental
 			//	return;
 			//}
 		}
+
+		public void KeyPressed(KeyEventArgs e) {
+			OnKeyDown(e);
+		}
  
 		///<summary>Accepts button clicks from window rather than the usual keyboard entry.  All validation MUST be done before the value is sent here.  Only valid values are b,s,p,or c. Numbers entered using overload.</summary>
 		public void ButtonPressed(string keyValue){
@@ -1936,6 +1940,15 @@ namespace OpenDental
 			//DrawCurCell(e);
 			DrawGridlines(e);
 			DrawText(e);
+		}
+
+		private void InitializeComponent() {
+			this.SuspendLayout();
+			// 
+			// ContrPerio
+			// 
+			this.ResumeLayout(false);
+
 		}
 
 
