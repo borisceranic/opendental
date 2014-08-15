@@ -203,19 +203,19 @@ namespace OpenDental{
 				if(fieldsSelected[i]=="AptDateTime"){
 					command+="appointment.AptDateTime";
 				}
-				else if(fieldsSelected[i]=="PriCarrier"){
+				else if(fieldsSelected[i]=="PriCarrier") {
 					command+="(SELECT carrier.CarrierName FROM patplan,inssub,insplan,carrier WHERE patplan.PatNum=patient.PatNum "
-						+"AND patplan.InsSubNum=inssub.InsSubNum AND inssub.PlanNum=insplan.PlanNum AND insplan.CarrierNum=carrier.CarrierNum AND patplan.Ordinal=1) PriCarrier";
+						+"AND patplan.InsSubNum=inssub.InsSubNum AND inssub.PlanNum=insplan.PlanNum AND insplan.CarrierNum=carrier.CarrierNum AND patplan.Ordinal=1 "+DbHelper.LimitAnd(1)+") PriCarrier";
 				}
 				else if(fieldsSelected[i]=="PriRelationship") {
-					command+="(SELECT Relationship FROM patplan WHERE patplan.PatNum=patient.PatNum AND patplan.Ordinal=1) PriRelationship";
+					command+="(SELECT Relationship FROM patplan WHERE patplan.PatNum=patient.PatNum AND patplan.Ordinal=1 "+DbHelper.LimitAnd(1)+") PriRelationship";
 				}
 				else if(fieldsSelected[i]=="SecCarrier") {
 					command+="(SELECT carrier.CarrierName FROM patplan,inssub,insplan,carrier WHERE patplan.PatNum=patient.PatNum "
-						+"AND patplan.InsSubNum=inssub.InsSubNum AND inssub.PlanNum=insplan.PlanNum AND insplan.CarrierNum=carrier.CarrierNum AND patplan.Ordinal=2) SecCarrier";
+						+"AND patplan.InsSubNum=inssub.InsSubNum AND inssub.PlanNum=insplan.PlanNum AND insplan.CarrierNum=carrier.CarrierNum AND patplan.Ordinal=2 "+DbHelper.LimitAnd(1)+") SecCarrier";
 				}
 				else if(fieldsSelected[i]=="SecRelationship") {
-					command+="(SELECT Relationship FROM patplan WHERE patplan.PatNum=patient.PatNum AND patplan.Ordinal=2) SecRelationship";
+					command+="(SELECT Relationship FROM patplan WHERE patplan.PatNum=patient.PatNum AND patplan.Ordinal=2 "+DbHelper.LimitAnd(1)+") SecRelationship";
 				}
 				else{
 					command+="patient."+fieldsSelected[i];
