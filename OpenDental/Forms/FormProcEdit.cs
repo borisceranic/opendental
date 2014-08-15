@@ -5540,6 +5540,10 @@ namespace OpenDental{
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && ProcCur.ProcStatus==ProcStat.C) {//Canada
 				Procedures.SetCanadianLabFeesCompleteForProc(ProcCur);
 			}
+			//Canadian lab fees not complete-----------------------------------------------------------------------------------------------------------------------
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && ProcCur.ProcStatus!=ProcStat.C) {//Canada
+				Procedures.SetCanadianLabFeesStatusForProc(ProcCur);
+			}
 			//Autocodes----------------------------------------------------------------------------------------------------------------------------------------
 			ProcOld=ProcCur.Copy();//in case we now make more changes.
 			//these areas have no autocodes

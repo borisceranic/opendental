@@ -1570,6 +1570,22 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		public static void SetCanadianLabFeesStatusForProc(Procedure proc) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),proc);
+				return;
+			}
+			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
+			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum;
+			List<Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
+			for(int i=0;i<labFeesForProc.Count;i++) {
+				Procedure labFeeNew=labFeesForProc[i];
+				Procedure labFeeOld=labFeeNew.Copy();
+				labFeeNew.ProcStatus=proc.ProcStatus;
+				Procedures.Update(labFeeNew,labFeeOld);
+			}
+		}
+
 		///<summary>Gets the number of procedures attached to a claim.</summary>
 		public static int GetCountForClaim(long claimNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
