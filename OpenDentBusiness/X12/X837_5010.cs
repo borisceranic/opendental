@@ -1154,7 +1154,7 @@ namespace OpenDentBusiness
 						sendClaimTreatProv=true;//Standard X12 behavior to only include the treating provider if it is different than the billing provider.
 					}
 					//The following clearinghouses always want the claim treating provider, even if it is the same as the billing provider.
-					if(IsOfficeAlly(clearhouse)) {
+					if(IsOfficeAlly(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
 						sendClaimTreatProv=true;
 					}
 					if(sendClaimTreatProv) {
