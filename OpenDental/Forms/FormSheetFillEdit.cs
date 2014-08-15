@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
+using System.Drawing.Printing;
 
 namespace OpenDental {
 	public partial class FormSheetFillEdit:Form {
@@ -23,6 +24,8 @@ namespace OpenDental {
 		public bool IsInTerminal;
 		///<summary>If set to true, then this form will poll the database every 4 seconds, listening for a signal to close itself.  This is useful if the receptionist accidentally loads up the wrong patient.</summary>
 		public bool TerminalListenShut;
+		///<summary>Only used here to draw the dashed margin lines.</summary>
+		private Margins _printMargin=new Margins(0,0,40,60);
 
 		public FormSheetFillEdit(Sheet sheet){
 			InitializeComponent();
@@ -70,6 +73,8 @@ namespace OpenDental {
 				panelMain.Width=SheetCur.Width;
 				panelMain.Height=SheetCur.Height;
 			}
+			//Some controls may be on subsequent pages if the SheetFieldDef is multipage.
+			panelMain.Height=SheetCur.HeightLastField+20;//+20 for Hscrollbar
 			textDateTime.Text=SheetCur.DateTimeSheet.ToShortDateString()+" "+SheetCur.DateTimeSheet.ToShortTimeString();
 			textDescription.Text=SheetCur.Description;
 			textNote.Text=SheetCur.InternalNote;
@@ -120,22 +125,24 @@ namespace OpenDental {
 			imgDraw=null;
 			pictDraw=new PictureBox();
 			if(SheetCur.IsLandscape) {
-				imgDraw=new Bitmap(SheetCur.Height,SheetCur.Width);
+				//imgDraw=new Bitmap(SheetCur.Height,SheetCur.Width);
 				pictDraw.Width=SheetCur.Height;
 				pictDraw.Height=SheetCur.Width;
 			}
 			else {
-				imgDraw=new Bitmap(SheetCur.Width,SheetCur.Height);
+				//imgDraw=new Bitmap(SheetCur.Width,SheetCur.Height);
 				pictDraw.Width=SheetCur.Width;
 				pictDraw.Height=SheetCur.Height;
 			}
+			pictDraw.Height=SheetCur.HeightLastField;
+			imgDraw=new Bitmap(pictDraw.Width,pictDraw.Height);
 			pictDraw.Location=new Point(0,0);
 			pictDraw.Image=(Image)imgDraw.Clone();
 			pictDraw.SizeMode=PictureBoxSizeMode.StretchImage;
 			panelMain.Controls.Add(pictDraw);
 			panelMain.SendToBack();
 			Graphics pictGraphics=Graphics.FromImage(imgDraw);
-			SheetPrinting.DrawImages(SheetCur,pictGraphics);
+			SheetPrinting.DrawImages(SheetCur,pictGraphics,true);
 			pictGraphics.Dispose();
 			//Set mouse events for the pictDraw
 			pictDraw.MouseDown+=new MouseEventHandler(pictDraw_MouseDown);
@@ -329,6 +336,13 @@ namespace OpenDental {
 			//the field height needs to change, so:
 			int amountOfGrowth=calcH-fld.Height;
 			fld.Height=calcH;
+			//Growth of entire form.
+			pictDraw.Height+=amountOfGrowth;
+			panelMain.Height+=amountOfGrowth;
+			int h=imgDraw.Height+amountOfGrowth;
+			int w=imgDraw.Width;
+			imgDraw.Dispose();
+			imgDraw=new Bitmap(w,h);
 			FillFieldsFromControls();//We already changed the value of this field manually, 
 				//but if the other fields don't get changed, they will erroneously 'reset'.
 			if(fld.GrowthBehavior==GrowthBehaviorEnum.DownGlobal) {
@@ -487,6 +501,17 @@ namespace OpenDental {
 						SheetCur.SheetFields[f].Height);
 				}
 			}
+			//Draw pagebreak
+			Pen pDashPage=new Pen(Color.Green);
+			pDashPage.DashPattern=new float[] { 4.0F,3.0F,2.0F,3.0F };
+			Pen pDashMargin=new Pen(Color.Green);
+			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
+			int pageCount=SheetCur.CalculatePageCount(_printMargin);
+			for(int i=1;i<pageCount;i++) {
+				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*SheetCur.HeightPage,SheetCur.WidthPage,i*SheetCur.HeightPage);
+				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage+_printMargin.Top,SheetCur.WidthPage,i*SheetCur.HeightPage+_printMargin.Top);
+			}//End Draw Page Break
 			pictDraw.Image=img;
 			g.Dispose();
 		}

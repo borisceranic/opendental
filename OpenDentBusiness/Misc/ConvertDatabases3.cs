@@ -5845,7 +5845,20 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="INSERT INTO procbuttonquick (ProcButtonQuickNum, Description, CodeValue, Surf, ItemOrder, YPos, IsLabel) VALUES (24,'MODB','D2161','MODB',3,9,0)";
 				Db.NonQ(command);
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetdef ADD PageCount int NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE sheetdef SET PageCount = 1";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetdef ADD PageCount number(11)";
+					Db.NonQ(command);
+					command="UPDATE sheetdef SET PageCount = 1 WHERE PageCount IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetdef MODIFY PageCount NOT NULL";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -5868,3 +5881,6 @@ namespace OpenDentBusiness {
 
 
 
+
+
+				

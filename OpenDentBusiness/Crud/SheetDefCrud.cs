@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				sheetDef.Width      = PIn.Int   (table.Rows[i]["Width"].ToString());
 				sheetDef.Height     = PIn.Int   (table.Rows[i]["Height"].ToString());
 				sheetDef.IsLandscape= PIn.Bool  (table.Rows[i]["IsLandscape"].ToString());
+				sheetDef.PageCount  = PIn.Int   (table.Rows[i]["PageCount"].ToString());
 				retVal.Add(sheetDef);
 			}
 			return retVal;
@@ -94,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetDefNum,";
 			}
-			command+="Description,SheetType,FontSize,FontName,Width,Height,IsLandscape) VALUES(";
+			command+="Description,SheetType,FontSize,FontName,Width,Height,IsLandscape,PageCount) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheetDef.SheetDefNum)+",";
 			}
@@ -105,7 +106,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheetDef.FontName)+"',"
 				+    POut.Int   (sheetDef.Width)+","
 				+    POut.Int   (sheetDef.Height)+","
-				+    POut.Bool  (sheetDef.IsLandscape)+")";
+				+    POut.Bool  (sheetDef.IsLandscape)+","
+				+    POut.Int   (sheetDef.PageCount)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -124,7 +126,8 @@ namespace OpenDentBusiness.Crud{
 				+"FontName   = '"+POut.String(sheetDef.FontName)+"', "
 				+"Width      =  "+POut.Int   (sheetDef.Width)+", "
 				+"Height     =  "+POut.Int   (sheetDef.Height)+", "
-				+"IsLandscape=  "+POut.Bool  (sheetDef.IsLandscape)+" "
+				+"IsLandscape=  "+POut.Bool  (sheetDef.IsLandscape)+", "
+				+"PageCount  =  "+POut.Int   (sheetDef.PageCount)+" "
 				+"WHERE SheetDefNum = "+POut.Long(sheetDef.SheetDefNum);
 			Db.NonQ(command);
 		}
@@ -159,6 +162,10 @@ namespace OpenDentBusiness.Crud{
 			if(sheetDef.IsLandscape != oldSheetDef.IsLandscape) {
 				if(command!=""){ command+=",";}
 				command+="IsLandscape = "+POut.Bool(sheetDef.IsLandscape)+"";
+			}
+			if(sheetDef.PageCount != oldSheetDef.PageCount) {
+				if(command!=""){ command+=",";}
+				command+="PageCount = "+POut.Int(sheetDef.PageCount)+"";
 			}
 			if(command==""){
 				return false;

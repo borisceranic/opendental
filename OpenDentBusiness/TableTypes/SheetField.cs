@@ -77,9 +77,6 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		
-
-
 
 	}
 }

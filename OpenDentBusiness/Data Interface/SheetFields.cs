@@ -99,6 +99,13 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		public static int SortBottomBounds(SheetField f1,SheetField f2) {
+			if(f1.Bounds.Bottom!=f2.Bounds.Bottom) {
+				return f1.Bounds.Bottom.CompareTo(f2.Bounds.Bottom);
+			}
+			return f1.XPos.CompareTo(f2.XPos);
+		}
+
 
 
 

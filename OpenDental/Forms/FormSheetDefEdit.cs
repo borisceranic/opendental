@@ -38,6 +38,10 @@ namespace OpenDental {
 		private Graphics GraphicsBackground;
 		///<summary>This stores the previous calculations so that we don't have to recal unless certain things have changed.  The key is the index of the sheetfield.  The data is an array of objects of different types as seen in the code.</summary>
 		private Hashtable HashRtfStringCache=new Hashtable();
+		///<summary>Arguments to draw fields such as pens, brushes, and fonts.</summary>
+		private DrawFieldArgs _argsDF;
+		///<summary>Only used here to draw the dashed margin lines.</summary>
+		private System.Drawing.Printing.Margins _printMargin=new System.Drawing.Printing.Margins(0,0,40,60);
 
 		///<summary>Some controls (panels in this case) do not pass key events to the parent (the form in this case) even when the property KeyPreview is set.  Instead, the default key functionality occurs.  An example would be the arrow keys.  By default, arrow keys set focus to the "next" control.  Instead, want all key presses on this form and all of it's child controls to always call the FormSheetDefEdit_KeyDown method.</summary>
 		protected override bool ProcessCmdKey(ref Message msg,Keys keyData) {
@@ -114,6 +118,7 @@ namespace OpenDental {
 				panelMain.Width=SheetDefCur.Width;
 				panelMain.Height=SheetDefCur.Height;
 			}
+			panelMain.Height=SheetDefCur.HeightTotal;
 			FillFieldList();
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
@@ -250,206 +255,244 @@ namespace OpenDental {
 
 		///<summary>If drawImages is true then only image fields will be drawn. Otherwise, all fields but images will be drawn.</summary>
 		private void DrawFields(Graphics g,bool onlyDrawImages){
+			SetGraphicsHelper(g);
+			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
+				if(onlyDrawImages){
+					if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Image) {
+						DrawImagesHelper(g,i);
+					}
+					continue;
+				}//end onlyDrawImages
+				switch(SheetDefCur.SheetFieldDefs[i].FieldType) {
+					case SheetFieldType.Parameter://Skip
+					case SheetFieldType.Image://Handled above
+						continue;
+					case SheetFieldType.PatImage:
+						DrawPatImageHelper(g,i);
+						continue;
+					case SheetFieldType.Line:
+						DrawLineHelper(g,i);
+						continue;
+					case SheetFieldType.Rectangle:
+						DrawRectangleHelper(g,i);
+						continue;
+					case SheetFieldType.CheckBox:
+						DrawCheckBoxHelper(g,i);
+						continue;
+					case SheetFieldType.SigBox:
+						DrawSigBoxHelper(g,i);
+						continue;
+					case SheetFieldType.Special:
+						DrawSpecialHelper(g,i);
+						continue;
+				}
+				DrawSelectionRectangle(g,i);
+				DrawStringHelper(g,i);
+				DrawTabModeHelper(g,i);
+			}
+			//Draw pagebreak
+			Pen pDashPage=new Pen(Color.Green);
+			pDashPage.DashPattern=new float[] { 4.0F,3.0F,2.0F,3.0F };
+			Pen pDashMargin=new Pen(Color.Green);
+			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
+			for(int i=1;i<SheetDefCur.PageCount;i++) {
+				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage-_printMargin.Bottom,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*SheetDefCur.HeightPage,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage);
+				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage+_printMargin.Top,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage+_printMargin.Top);
+			}
+			//End Draw Page Break
+		}
+
+		#region DrawFields Helpers
+		private void SetGraphicsHelper(Graphics g) {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.CompositingQuality=CompositingQuality.HighQuality;//This has to be here or the line thicknesses are wrong.
-			//g.InterpolationMode=InterpolationMode.High;//This doesn't seem to help
-			Pen penBlue=new Pen(Color.Blue);
-			Pen penRed=new Pen(Color.Red);
-			Pen penBlueThick=new Pen(Color.Blue,1.6f);
-			Pen penRedThick=new Pen(Color.Red,1.6f);
-			Pen penBlack=new Pen(Color.Black);
-			Pen penSelection=new Pen(Color.Black);
-			Pen pen;
-			Brush brush;
-			SolidBrush brushBlue=new SolidBrush(Color.Blue);
-			SolidBrush brushRed=new SolidBrush(Color.Red);
-			Font font;
-			FontStyle fontstyle;
-			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Parameter){
-					continue;
+			_argsDF=new DrawFieldArgs();//reset _argsDF
+		}
+
+		private void DrawImagesHelper(Graphics g,int i) {
+			string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),SheetDefCur.SheetFieldDefs[i].FieldName);
+			Image img=null;
+			if(SheetDefCur.SheetFieldDefs[i].FieldName=="Patient Info.gif") {
+				img=OpenDentBusiness.Properties.Resources.Patient_Info;
+			}
+			else if(File.Exists(filePathAndName)) {
+				img=Image.FromFile(filePathAndName);
+			}
+			else {
+				return;
+			}
+			g.DrawImage(img,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+		}
+
+		private void DrawPatImageHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlack;
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawString("PatImage: "+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName))
+				,Font/*NOT _argsDF.font*/,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos+1,SheetDefCur.SheetFieldDefs[i].YPos+1);
+		}
+
+		private void DrawLineHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlack;
+			}
+			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width,
+				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height);
+		}
+
+		private void DrawRectangleHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlack;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+		}
+
+		private void DrawCheckBoxHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRedThick;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlueThick;
+			}
+			//g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+			//	SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,
+				SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
+				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
+			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
+				SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].XPos,
+				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
+			if(IsTabMode) {
+				Rectangle tabRect = new Rectangle(
+					SheetDefCur.SheetFieldDefs[i].XPos-1,//X
+					SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
+					(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
+					12);//height
+				if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
+					g.FillRectangle(Brushes.White,tabRect);
+					g.DrawRectangle(Pens.Blue,tabRect);
+					g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
+					//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
 				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Image) {
-					if(onlyDrawImages) {
-						string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),SheetDefCur.SheetFieldDefs[i].FieldName);
-						Image img=null;
-						if(SheetDefCur.SheetFieldDefs[i].FieldName=="Patient Info.gif") {
-							img=OpenDentBusiness.Properties.Resources.Patient_Info;
-						}
-						else if(File.Exists(filePathAndName)) {
-							img=Image.FromFile(filePathAndName);
-						}
-						else {
-							continue;
-						}
-						g.DrawImage(img,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-							SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					}
-					continue;
-				}
-				if(onlyDrawImages) {
-					continue;//Only draw the images for the background.
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.PatImage) {
-					if(listFields.SelectedIndices.Contains(i)) {
-						pen=penRed;
-						brush=brushRed;
-					}
-					else {
-						pen=penBlack;
-						brush=brushBlue;
-					}
-					g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					g.DrawString("PatImage: "+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName))
-						,Font,brush,SheetDefCur.SheetFieldDefs[i].XPos+1,SheetDefCur.SheetFieldDefs[i].YPos+1);
-					continue;
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Line){
-					if(listFields.SelectedIndices.Contains(i)){
-						pen=penRed;
-					}
-					else{
-						pen=penBlack;
-					}
-					g.DrawLine(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width,
-						SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height);
-					continue;
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Rectangle){
-					if(listFields.SelectedIndices.Contains(i)){
-						pen=penRed;
-					}
-					else{
-						pen=penBlack;
-					}
-					g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					continue;
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.CheckBox){
-					if(listFields.SelectedIndices.Contains(i)){
-						pen=penRedThick;
-					}
-					else{
-						pen=penBlueThick;
-					}
-					//g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-					//	SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					g.DrawLine(pen,SheetDefCur.SheetFieldDefs[i].XPos,
-						SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
-						SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
-					g.DrawLine(pen,SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
-						SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].XPos,
-						SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
-					if(IsTabMode) {
-						Rectangle tabRect = new Rectangle(
-							SheetDefCur.SheetFieldDefs[i].XPos-1,//X
-							SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
-							(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
-							12);//height
-						if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
-							g.FillRectangle(Brushes.White,tabRect);
-							g.DrawRectangle(Pens.Blue,tabRect);
-							g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
-							//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
-						}
-						else {//Blue border, blue box, white letters
-							g.FillRectangle(brushBlue,tabRect);
-							g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
-							//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
-						}
-					}
-					continue;
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.SigBox){
-					//font=new Font(Font,
-					if(listFields.SelectedIndices.Contains(i)){
-						pen=penRed;
-						brush=brushRed;
-					}
-					else{
-						pen=penBlue;
-						brush=brushBlue;
-					}
-					g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					g.DrawString("(signature box)",Font,brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
-					continue;
-				}
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.Special) {
-					//TODO:
-					if(listFields.SelectedIndices.Contains(i)) {
-						pen=penRed;
-						brush=brushRed;
-					}
-					else {
-						pen=penBlue;
-						brush=brushBlue;
-					}
-					g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-					g.DrawString("(Special:Tooth Grid)",Font,brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
-					continue;
-				}
-				fontstyle=FontStyle.Regular;
-				if(SheetDefCur.SheetFieldDefs[i].FontIsBold){
-					fontstyle=FontStyle.Bold;
-				}
-				font=new Font(SheetDefCur.SheetFieldDefs[i].FontName,SheetDefCur.SheetFieldDefs[i].FontSize,fontstyle);
-				if(listFields.SelectedIndices.Contains(i)){
-					g.DrawRectangle(penRed,SheetDefCur.SheetFieldDefs[i].Bounds);
-					brush=brushRed;
-				}
-				else{
-					g.DrawRectangle(penBlue,SheetDefCur.SheetFieldDefs[i].Bounds);
-					brush=brushBlue;
-				}
-				string str;
-				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.StaticText){
-					str=SheetDefCur.SheetFieldDefs[i].FieldValue;
-					//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldValue,font,
-					//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
-				}
-				else{
-					str=SheetDefCur.SheetFieldDefs[i].FieldName;
-					//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldName,font,
-					//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
-				}
-				if(ClickedOnBlankSpace) {
-					g.DrawRectangle(penSelection,
-						//The math functions are used below to account for users clicking and dragging up, down, left, or right.
-						Math.Min(MouseOriginalPos.X,MouseCurrentPos.X),//X
-						Math.Min(MouseOriginalPos.Y,MouseCurrentPos.Y),//Y
-						Math.Abs(MouseCurrentPos.X-MouseOriginalPos.X),//Width
-						Math.Abs(MouseCurrentPos.Y-MouseOriginalPos.Y));//Height
-				}
-				//g.DrawString(str,font,brush,SheetDefCur.SheetFieldDefs[i].Bounds);//This was drawing differently than in RichTextBox, so problems with large text.
-				DrawRTFstring(i,str,font,brush,g);
-				//GraphicsHelper.DrawString(g,g,str,font,brush,SheetDefCur.SheetFieldDefs[i].Bounds);
-				if(IsTabMode && SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.InputField) {
-					Rectangle tabRect = new Rectangle(
-						SheetDefCur.SheetFieldDefs[i].XPos-1,//X
-						SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
-						(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
-						12);//height
-					if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
-						g.FillRectangle(Brushes.White,tabRect);
-						g.DrawRectangle(Pens.Blue,tabRect);
-						g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
-						//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
-					}
-					else {//Blue border, blue box, white letters
-						g.FillRectangle(brushBlue,tabRect);
-						g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
-						//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
-					}
+				else {//Blue border, blue box, white letters
+					g.FillRectangle(_argsDF.brushBlue,tabRect);
+					g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
+					//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
 				}
 			}
 		}
+
+		private void DrawSigBoxHelper(Graphics g,int i) {
+			//font=new Font(Font,
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlue;
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawString("(signature box)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+		}
+
+		private void DrawSpecialHelper(Graphics g,int i) {
+			//TODO:
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlue;
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawString("(Special:Tooth Grid)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+		}
+
+		private void DrawSelectionRectangle(Graphics g,int i) {
+			if(ClickedOnBlankSpace) {
+				g.DrawRectangle(_argsDF.penSelection,
+					//The math functions are used below to account for users clicking and dragging up, down, left, or right.
+					Math.Min(MouseOriginalPos.X,MouseCurrentPos.X),//X
+					Math.Min(MouseOriginalPos.Y,MouseCurrentPos.Y),//Y
+					Math.Abs(MouseCurrentPos.X-MouseOriginalPos.X),//Width
+					Math.Abs(MouseCurrentPos.Y-MouseOriginalPos.Y));//Height
+			}
+		}
+
+		private void DrawStringHelper(Graphics g,int i) {
+			_argsDF.fontstyle=FontStyle.Regular;
+			if(SheetDefCur.SheetFieldDefs[i].FontIsBold) {
+				_argsDF.fontstyle=FontStyle.Bold;
+			}
+			_argsDF.font=new Font(SheetDefCur.SheetFieldDefs[i].FontName,SheetDefCur.SheetFieldDefs[i].FontSize,_argsDF.fontstyle);
+			if(listFields.SelectedIndices.Contains(i)) {
+				g.DrawRectangle(_argsDF.penRed,SheetDefCur.SheetFieldDefs[i].Bounds);
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				g.DrawRectangle(_argsDF.penBlue,SheetDefCur.SheetFieldDefs[i].Bounds);
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			string str;
+			if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.StaticText) {
+				str=SheetDefCur.SheetFieldDefs[i].FieldValue;
+				//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldValue,font,
+				//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
+			}
+			else {
+				str=SheetDefCur.SheetFieldDefs[i].FieldName;
+				//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldName,font,
+				//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
+			}
+			//g.DrawString(str,font,brush,SheetDefCur.SheetFieldDefs[i].Bounds);//This was drawing differently than in RichTextBox, so problems with large text.
+			DrawRTFstring(i,str,_argsDF.font,_argsDF.brush,g);
+		}
+
+		private void DrawTabModeHelper(Graphics g,int i) {
+			if(!IsTabMode || SheetDefCur.SheetFieldDefs[i].FieldType!=SheetFieldType.InputField) {
+				return;
+			}
+			Rectangle tabRect = new Rectangle(
+				SheetDefCur.SheetFieldDefs[i].XPos-1,//X
+				SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
+				(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
+				12);//height
+			if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
+				g.FillRectangle(Brushes.White,tabRect);
+				g.DrawRectangle(Pens.Blue,tabRect);
+				g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
+				//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
+			}
+			else {//Blue border, blue box, white letters
+				g.FillRectangle(_argsDF.brushBlue,tabRect);
+				g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
+				//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
+			}
+		}
+		#endregion Draw Sheet Field Helpers
 
 		///<summary>We need this special function to draw strings just like the RichTextBox control does, because sheet text is displayed using RichTextBoxes within FormSheetFillEdit.
 		///Graphics.DrawString() uses a different font spacing than the RichTextBox control does.</summary>
@@ -525,6 +568,7 @@ namespace OpenDental {
 				panelMain.Width=SheetDefCur.Width;
 				panelMain.Height=SheetDefCur.Height;
 			}
+			panelMain.Height=SheetDefCur.HeightTotal;
 			FillFieldList();
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
@@ -1496,6 +1540,33 @@ namespace OpenDental {
 			panelMain.Refresh();
 		}
 
+		private void butPageAdd_Click(object sender,EventArgs e) {
+			if(SheetDefCur.PageCount>9) {
+				//Maximum PageCount 10, this is an arbitrary number. If this number gets too big there may be issues with the graphics trying to draw the sheet.
+				return;
+			}
+			SheetDefCur.PageCount++;
+			panelMain.Height=SheetDefCur.HeightTotal;
+			RefreshDoubleBuffer();
+			panelMain.Refresh();
+		}
+
+		private void butPageRemove_Click(object sender,EventArgs e) {
+			if(SheetDefCur.PageCount<2) {
+				//Minimum PageCount 1
+				return;
+			}
+			SheetDefCur.PageCount--;
+			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) {
+				MsgBox.Show(this,"Cannot remove pages that contain sheet fields.");
+				SheetDefCur.PageCount++;
+				return;
+			}
+			panelMain.Height=SheetDefCur.HeightTotal;
+			RefreshDoubleBuffer();
+			panelMain.Refresh();
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			if(!VerifyDesign()){
 				return;
@@ -1508,41 +1579,35 @@ namespace OpenDental {
 			DialogResult=DialogResult.Cancel;
 		}
 
-	
-
 
 		
 
 		
+	}
 
-		
+	public class DrawFieldArgs {
+			public Pen penBlue;
+			public Pen penRed;
+			public Pen penBlueThick;
+			public Pen penRedThick;
+			public Pen penBlack;
+			public Pen penSelection;
+			public Pen pen;
+			public Brush brush;
+			public SolidBrush brushBlue;
+			public SolidBrush brushRed;
+			public Font font;
+			public FontStyle fontstyle;
 
-		
-
-	
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
+			public DrawFieldArgs() {
+				penBlue=new Pen(Color.Blue);
+				penRed=new Pen(Color.Red);
+				penBlueThick=new Pen(Color.Blue,1.6f);
+				penRedThick=new Pen(Color.Red,1.6f);
+				penBlack=new Pen(Color.Black);
+				penSelection=new Pen(Color.Black);
+				brushBlue=new SolidBrush(Color.Blue);
+				brushRed=new SolidBrush(Color.Red);
+			}
 	}
 }

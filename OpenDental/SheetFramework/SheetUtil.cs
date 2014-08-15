@@ -60,7 +60,6 @@ namespace OpenDental{
 				}
 				else if(field.GrowthBehavior==GrowthBehaviorEnum.DownGlobal){
 					MoveAllDownBelowThis(sheet,field,amountOfGrowth);
-					
 				}
 			}
 			//g.Dispose();

@@ -41,9 +41,9 @@ namespace OpenDentBusiness{
 		public float FontSize;
 		///<summary>The default fontName for the sheet.  The actual font must still be saved with each sheetField.</summary>
 		public string FontName;
-		///<summary>Width of the sheet in pixels, 100 pixels per inch.</summary>
+		///<summary>Width of each page in the sheet in pixels, 100 pixels per inch.</summary>
 		public int Width;
-		///<summary>Height of the sheet in pixels, 100 pixels per inch.</summary>
+		///<summary>Height of each page in the sheet in pixels, 100 pixels per inch.</summary>
 		public int Height;
 		///<summary>.</summary>
 		public bool IsLandscape;
@@ -68,6 +68,57 @@ namespace OpenDentBusiness{
 		[CrudColumn(IsNotDbColumn=true)]
 		[XmlIgnore]
 		public List<SheetField> SheetFields;
+
+		///<summary>Vertical height per page taking into account the IsLandscape flag.</summary>
+		public int HeightPage {
+			get {
+				if(IsLandscape) {
+					return Width;
+				}
+				else {
+					return Height;
+				}
+			}
+		}
+
+		///<summary>Horizontal width per page taking into account the IsLandscape flag.</summary>
+		public int WidthPage {
+			get {
+				if(IsLandscape) {
+					return Height;
+				}
+				else {
+					return Width;
+				}
+			}
+		}
+
+		///<summary>Finds the lowest lower bound of all of the SheeFields. Recalculated every time this property is called.</summary>
+		public int HeightLastField {
+			get {
+				int retVal=0;
+				foreach(SheetField f in SheetFields) {
+					if(f.Bounds.Bottom>retVal)
+						retVal=f.Bounds.Bottom;
+				}
+				return retVal;
+			}
+		}
+
+		///<summary>This gives the number of pages required to print all fields without cutting any of them in half. This must be calculated ahead of time when creating multi page pdfs.</summary>
+		public int CalculatePageCount(System.Drawing.Printing.Margins m) {
+			int pageCount=1;
+			int CurYPos=0;
+			SheetFields.Sort(OpenDentBusiness.SheetFields.SortBottomBounds);
+			for(int i=0;i<SheetFields.Count;i++) {
+				if(SheetFields[i].Bounds.Bottom>CurYPos+HeightPage-m.Bottom //if field would spill onto next page
+					&& SheetFields[i].Height<HeightPage-m.Bottom) { //and field is not taller than the entire page
+					pageCount++;
+					CurYPos=Math.Min(SheetFields[i].YPos-m.Top,CurYPos+HeightPage);
+				}
+			}
+			return pageCount;
+		}
 
 		/*Parameters are not serialized as part of a sheet because it causes serialization to fail.
 		///<summary>Used only for serialization purposes</summary>
