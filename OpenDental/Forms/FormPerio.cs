@@ -1197,7 +1197,7 @@ namespace OpenDental{
 
 		/// <summary>Used to force focus to the hidden textbox when showing this form.</summary>
 		private void FormPerio_Shown(object sender,EventArgs e) {
-			textInputBox.Focus();
+			textInputBox.Focus();//This cannot go into load because focus must come after window has been shown.
 		}
 
 		///<summary>After this method runs, the selected index is usually set.</summary>
@@ -1246,7 +1246,8 @@ namespace OpenDental{
 		}
 
 		private void listExams_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
-			if(e.Button==MouseButtons.Left) {//TODO: add comment about why this is here.
+			//textInputBox has already gained focus before this so the selected index remains unchanged.
+			if(e.Button==MouseButtons.Left) {
 				try {
 					listExams.SelectedIndex=e.Y/listExams.ItemHeight;
 				}
@@ -1875,10 +1876,12 @@ namespace OpenDental{
 			gridP.Focus();
 		}
 
+		///<summary>This ensures that the textbox will always have focus when using FormPerio.</summary>
 		private void textInputBox_Leave(object sender,EventArgs e) {
 			textInputBox.Focus();
 		}
 
+		///<summary>Catches any non-alphanumeric keypresses so that they can be passed into the grid separately.</summary>
 		private void textInputBox_KeyDown(object sender,KeyEventArgs e) {
 			if(e.KeyCode==Keys.Left
 				|| e.KeyCode==Keys.Right
@@ -1892,6 +1895,7 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary>Used to force buttons to be pressed as characters are typed/dictated/pasted into the textbox.</summary>
 		private void textInputBox_TextChanged(object sender,EventArgs e) {
 			Char[] arrInputChars=textInputBox.Text.ToLower().ToCharArray();
 			for(int i=0;i<arrInputChars.Length;i++) {
