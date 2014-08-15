@@ -439,25 +439,85 @@ namespace OpenDentBusiness{
 			return (Db.GetTable(command).Rows[0][0].ToString()!="0");
 		}
 
-		///<summary>Returns the ClaimNum for the claim that has a claim identifier beginning with the specified claimIdentifier, but only if there is exactly one claim matched. Otherwise 0 is returned.</summary>
-		public static long GetClaimNumForIdentifier(string claimIdentifier) {
+		///<summary>Returns the claim with the specified fee, date of service, and beginning with the specified claimIdentifier, but only if there is exactly one claim matched.
+		///If there are multiple claims matched but only one is not received, then the not received claim will be returned.  Otherwise null is returned.</summary>
+		public static Claim GetClaimFromX12(string claimIdentifier,double claimFee,DateTime claimDateService,string patFname,string patLname,string subscriberId) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<long>(MethodBase.GetCurrentMethod(),claimIdentifier);
+				return Meth.GetObject<Claim>(MethodBase.GetCurrentMethod(),claimIdentifier);
 			}
-			//Our claim identifiers can be longer than 20 characters (mostly when using replication). When the claim identifier is sent out on the claim, it is truncated to 20
-			//characters. Therefore, if the claim identifier is longer than 20 characters, then it was truncated when sent out, so we have to look for claims beginning with the 
-			//claim identifier given if there is not an exact match.
-			string command="SELECT ClaimNum FROM claim WHERE ClaimIdentifier='"+POut.String(claimIdentifier)+"'";
+			//We always require the claim fee and date of service to match, then we use other criteria below to wisely choose from the shorter list of claims.
+			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.Lname,patient.Fname,inssub.SubscriberID "
+				+"FROM claim "
+				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
+				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
+				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum "
+				+"WHERE ClaimFee="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+"="+POut.Date(claimDateService);
 			DataTable dtClaims=Db.GetTable(command);
-			if(dtClaims.Rows.Count==0) { //No exact match for the claim identifier. This will happen with replication sometimes.
-				command="SELECT ClaimNum FROM claim WHERE ClaimIdentifier LIKE CONCAT('"+POut.String(claimIdentifier)+"','%')";
-				dtClaims=Db.GetTable(command);
+			if(dtClaims.Rows.Count==0) {
+				return null;//No matches found for the specific claim fee and date of service.  There is aboloutely no suitable match.
 			}
-			//There is a slight chance that we will have more than one match, and in this case we will return 0, because we are not sure which claim is the correct claim.  Returning the first item in the list would be misleading.
-			if(dtClaims.Rows.Count!=1) {
-				return 0;
+			//Look for a single exact match by claim identifier.  This step is first, so that the user can override claim association to the 835 or 277 by changing the claim identifier if desired.
+			List<int> listIndiciesForIdentifier=new List<int>();
+			for(int i=0;i<dtClaims.Rows.Count;i++) {
+				string claimId=PIn.String(dtClaims.Rows[i]["ClaimIdentifier"].ToString());
+				if(claimId==claimIdentifier) {
+					listIndiciesForIdentifier.Add(i);
+				}
 			}
-			return PIn.Long(dtClaims.Rows[0][0].ToString());
+			if(listIndiciesForIdentifier.Count==0) {//No exact match found.
+				//Our claim identifiers can be longer than 20 characters (mostly when using replication). When the claim identifier is sent out on the claim, it is truncated to 20
+				//characters. Therefore, if the claim identifier is longer than 20 characters, then it was truncated when sent out, so we have to look for claims beginning with the 
+				//claim identifier given if there is not an exact match.
+				for(int i=0;i<dtClaims.Rows.Count;i++) {
+					string claimId=PIn.String(dtClaims.Rows[i]["ClaimIdentifier"].ToString());
+					if(claimId.StartsWith(claimIdentifier)) {
+						listIndiciesForIdentifier.Add(i);
+					}
+				}
+			}
+			if(listIndiciesForIdentifier.Count==0) {
+				//No matches were found for the identifier.  Continue to more advanced matching below.
+			}
+			else if(listIndiciesForIdentifier.Count==1) {
+				//A single match based on claim identifier, claim date of service, and claim fee.
+				long claimNum=PIn.Long(dtClaims.Rows[listIndiciesForIdentifier[0]]["ClaimNum"].ToString());
+				return Claims.GetClaim(claimNum);
+			}
+			else if(listIndiciesForIdentifier.Count>1) {//Edge case.
+				//Multiple matches for the specified claim identifier AND date service AND fee.  The claim must have been split (rare because the split claims must have the same fee).
+				//Continue to more advanced matching below, although it probably will not help.  We could enhance by picking a claim based on the procedures attached, but that is not a guarantee either.
+			}
+			//Locate claims from the short list which match the patient name and subscriber ID.
+			List<int> listIndiciesForPatient=new List<int>();
+			patFname=patFname.ToLower();
+			patLname=patLname.ToLower();
+			for(int i=0;i<dtClaims.Rows.Count;i++) {
+				string lname=PIn.String(dtClaims.Rows[i]["Lname"].ToString()).ToLower();
+				string fname=PIn.String(dtClaims.Rows[i]["Fname"].ToString()).ToLower();
+				string subId=PIn.String(dtClaims.Rows[i]["SubscriberID"].ToString()).ToLower();
+				if(lname!=patLname) {
+					continue;
+				}
+				if(fname!=patFname) {
+					continue;
+				}
+				if(subId!=subscriberId) {
+					continue;
+				}
+				listIndiciesForPatient.Add(i);
+			}
+			if(listIndiciesForPatient.Count==0) {
+				return null;//No suitable matches.
+			}
+			else if(listIndiciesForPatient.Count==1) {
+				//A single match based on patient first name, patient last name, subscriber ID, claim date of service, and claim fee.
+				long claimNum=PIn.Long(dtClaims.Rows[listIndiciesForPatient[0]]["ClaimNum"].ToString());
+				return Claims.GetClaim(claimNum);
+			}
+			else if(listIndiciesForPatient.Count>1) {//Edge case.
+				//Multiple matches (rare).  We might be able to pick the right claim based on the attached procedures, but we can worry about this situation later if it happens more than we expect.
+			}
+			return null;
 		}
 
 		///<summary>Returns the number of received claims attached to specified insplan.</summary>

@@ -278,7 +278,7 @@ namespace OpenDentBusiness
 
 		///<summary>Result will contain strings in the following order: 0 Patient Last Name (NM103), 1 Patient First Name (NM104), 2 Patient Middle Name (NM105), 
 		///3 Claim Status (STC03), 4 Payor's Claim Control Number (REF02), 5 Institutional Type of Bill (REF02), 6 Claim Date Service Start (DTP03), 
-		///7 Claim Date Service End (DTP03), 8 Reason (STC01-2), 9 Amount (STC04)</summary>
+		///7 Claim Date Service End (DTP03), 8 Reason (STC01-2), 9 Amount (STC04), 10 SubscriberId (NM109)</summary>
 		public string[] GetClaimInfo(string trackingNumber) {
 			string[] result=new string[10];
 			for(int i=0;i<result.Length;i++) {
@@ -301,6 +301,7 @@ namespace OpenDentBusiness
 					result[0]=seg.Get(3);//NM103 Last Name
 					result[1]=seg.Get(4);//NM104 First Name
 					result[2]=seg.Get(5);//NM105 Middle Name
+					result[10]=seg.Get(9);//NM109 Identification Code.  Technically can be either patinet ID or subscriber ID from the original claim, but we never send patinet ID, so this will always end up being the subscriber ID.
 					segNum++;
 					seg=segments[segNum];//STC segment. At least one, maybe multiple, but we only care about the first one.
 					string[] stc01=seg.Get(1).Split(new string[] { Separators.Subelement },StringSplitOptions.None);

@@ -2946,46 +2946,13 @@ namespace OpenDentBusiness {
 		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835 in the database, or from cache.  Returns 0 if not found.</summary>
 		public long ClaimNum {
 			get {
+				//Return the cached value if set.
 				if(_claimNum!=0) {
 					return _claimNum;
 				}
-				//First match by patient name, subscriber ID, date of service, and claim fee.
-				//This must be done first, because split claims will all have the same Claim Identifier on the 835, and the only way we can possibly determine the correct claim is by claim fee.
-				List<Claim> listClaimsMatched=new List<Claim>();
-				List<Patient> listPatients=Patients.GetListByName(PatientName.Lname,PatientName.Fname,0);
-				for(int i=0;i<listPatients.Count;i++) {
-					Patient pat=listPatients[i];
-					List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
-					for(int j=0;j<listPatPlans.Count;j++) {
-						PatPlan patPlan=listPatPlans[j];
-						InsSub insSub=InsSubs.GetOne(patPlan.InsSubNum);
-						if(insSub.SubscriberID!=PatientName.SubscriberId) {
-							continue;
-						}
-						List<Claim> listClaims=Claims.Refresh(pat.PatNum);
-						for(int k=0;k<listClaims.Count;k++) {
-							Claim claim=listClaims[k];
-							if(claim.InsSubNum!=insSub.InsSubNum && claim.InsSubNum2!=insSub.InsSubNum) {//Ensure that the claim is for the correct insurance plan and subscriber.
-								continue;
-							}
-							if(claim.DateService.Date!=DateServiceStart.Date) {
-								continue;
-							}
-							double claimFee=(double)ClaimFee;
-							if(claim.ClaimFee<claimFee-0.001 || claim.ClaimFee>claimFee+0.001) {//Allow for rounding errors.
-								continue;
-							}
-							listClaimsMatched.Add(claim);
-						}
-					}
-				}
-				//There could be more than one match for a split claim, but it is unlikely that each split will have the same fee.
-				if(listClaimsMatched.Count==1) {
-					_claimNum=listClaimsMatched[0].ClaimNum;
-				}
-				else {
-					//Claim Identifiers are unreliable, but this line gives the user a way to manually assign a claim to a paid claim on the 835.
-					_claimNum=Claims.GetClaimNumForIdentifier(ClaimTrackingNumber);
+				Claim claim=Claims.GetClaimFromX12(ClaimTrackingNumber,(double)ClaimFee,DateServiceStart,PatientName.Fname,PatientName.Lname,SubscriberName.SubscriberId);
+				if(claim!=null) {
+					_claimNum=claim.ClaimNum;
 				}
 				return _claimNum;
 			}
@@ -3550,7 +3517,7 @@ namespace OpenDentBusiness {
 //N4*ORLANDO*FL*55115~
 //REF*PQ*10488~
 //LX*1~
-//CLP*9/26*1*740**MC~
+//CLP*9/26*1*740*740*MC~
 //NM1*QC*1*CAMPBELL*MAYA*R***MI*854216985~
 //NM1*82*2*PROFESSIONAL TEST 1*****BS*34426~
 //MOA***MA15~

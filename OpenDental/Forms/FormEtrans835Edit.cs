@@ -216,6 +216,13 @@ namespace OpenDental {
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
 			Claim claim=claimPaid.GetClaimFromDb();
+			if(claimPaid.IsSplitClaim && (claim==null || claim.ClaimStatus!="R")) {
+				if(MessageBox.Show(Lan.g(this,"The insurance carrier has split the claim")+". "
+						+Lan.g(this,"You must manually locate and split the claim before entering the payment information")+". "
+						+Lan.g(this,"Continue entering payment")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+					return;
+				}
+			}
 			bool isReadOnly=true;
 			if(claim==null) {//Original claim not found.
 				MessageBox.Show(Lan.g(this,"Original claim not found")+". "+Lan.g(this,"The claim details from the EOB will be displayed instead")+". "
@@ -231,14 +238,6 @@ namespace OpenDental {
 				isReadOnly=false;
 			}
 			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check
-				if(claimPaid.IsSplitClaim) {
-					if(MessageBox.Show(Lan.g(this,"The insurance carrier has split the claim")+". "
-						+Lan.g(this,"You must manually locate and split the claim before entering the payment information")+". "
-						+Lan.g(this,"Continue entering payment")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK)
-					{
-						return;
-					}
-				}
 				EnterPayment(claimPaid,claim);
 				isReadOnly=false;
 			}

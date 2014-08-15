@@ -576,16 +576,26 @@ namespace OpenDentBusiness{
 					X277 x277=new X277(messageText);
 					etrans.Etype=EtransType.StatusNotify_277;
 					Etranss.Insert(etrans);
-					List<string> claimTrackingNumbers=x277.GetClaimTrackingNumbers();
-					for(int i=0;i<claimTrackingNumbers.Count;i++) {
-						string ack=x277.GetClaimInfo(claimTrackingNumbers[i])[3];
-						long claimNum=Claims.GetClaimNumForIdentifier(claimTrackingNumbers[i]);
+					List<string> listClaimIdentifiers=x277.GetClaimTrackingNumbers();
+					for(int i=0;i<listClaimIdentifiers.Count;i++) {
+						string claimIdentifier=listClaimIdentifiers[i];
+						string[] arrayClaimInfo=x277.GetClaimInfo(claimIdentifier);
+						string patFname=PIn.String(arrayClaimInfo[0]);
+						string patLname=PIn.String(arrayClaimInfo[1]);
+						DateTime dateService=PIn.DateT(arrayClaimInfo[6]);
+						double claimFee=PIn.Double(arrayClaimInfo[9]);
+						string subscriberId=PIn.String(arrayClaimInfo[10]);
+						Claim claim=Claims.GetClaimFromX12(claimIdentifier,claimFee,dateService,patFname,patLname,subscriberId);
+						if(claim==null) {
+							continue;
+						}
+						string ack=arrayClaimInfo[3];
 						//Locate the latest etrans entries for the claim based on DateTimeTrans with EType of ClaimSent or Claim_Ren and update the AckCode and AckEtransNum.
 						//We overwrite existing acks from 997s, 999s and older 277s.
 						command="UPDATE etrans SET AckCode='"+ack+"', "
 							+"AckEtransNum="+POut.Long(etrans.EtransNum)
 							+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
-							+" AND ClaimNum="+POut.Long(claimNum)
+							+" AND ClaimNum="+POut.Long(claim.ClaimNum)
 							+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
 							+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
