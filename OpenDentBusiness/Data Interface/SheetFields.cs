@@ -100,6 +100,14 @@ namespace OpenDentBusiness{
 		}
 
 		public static int SortBottomBounds(SheetField f1,SheetField f2) {
+			if(f1.Bounds.Top<f2.Bounds.Top
+				&& f1.Bounds.Bottom>f2.Bounds.Bottom) {//f1 starts before and ends after f2 meaning it should be ordered before f2
+					return -1;
+			}
+			else if(f2.Bounds.Top<f1.Bounds.Top
+				&& f2.Bounds.Bottom>f1.Bounds.Bottom) {
+					return 1;
+			}
 			if(f1.Bounds.Bottom!=f2.Bounds.Bottom) {
 				return f1.Bounds.Bottom.CompareTo(f2.Bounds.Bottom);
 			}

@@ -134,7 +134,7 @@ namespace OpenDental {
 			#if DEBUG
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
 				FormPrintPreview printPreview;
-				printPreview=new FormPrintPreview(sit,pd,sheet.CalculatePageCount(_printMargin),sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
+				printPreview=new FormPrintPreview(sit,pd,Sheets.CalculatePageCount(sheet,_printMargin),sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 				printPreview.ShowDialog();
 			#else
 				try {
@@ -174,8 +174,12 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) { 
+					continue; //skip if on previous page
+				} 
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { 
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.Drawing) {
 					continue;
 				}
@@ -195,8 +199,12 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			Pen pen2=new Pen(Brushes.Black,1f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType==SheetFieldType.Rectangle) {
 					g.DrawRectangle(pen2,field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
 				}
@@ -210,8 +218,12 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.InputField
 				&& field.FieldType!=SheetFieldType.OutputText
 				&& field.FieldType!=SheetFieldType.StaticText) {
@@ -231,8 +243,12 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			Pen pen3=new Pen(Brushes.Black,1.6f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.CheckBox) {
 					continue;
 				}
@@ -243,8 +259,12 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.SigBox) {
 					continue;
 				}
@@ -276,7 +296,7 @@ namespace OpenDental {
 			}
 			pagesPrinted++;
 			g.Dispose();
-			if(pagesPrinted<sheet.CalculatePageCount(_printMargin)) {
+			if(pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
@@ -296,7 +316,7 @@ namespace OpenDental {
 		public static void CreatePdf(Sheet sheet,string fullFileName) {
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
-			int pageCount=sheet.CalculatePageCount(_printMargin);
+			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			for(int i=0;i<pageCount;i++) {
 				PdfPage page=document.AddPage();
 				CreatePdfPage(sheet,page);
@@ -329,8 +349,12 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.Drawing){
 					continue;
 				}
@@ -350,8 +374,12 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			XPen pen2=new XPen(XColors.Black,p(1));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType==SheetFieldType.Rectangle){
 					g.DrawRectangle(pen2,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
 				}
@@ -365,8 +393,12 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.InputField
 					&& field.FieldType!=SheetFieldType.OutputText
 					&& field.FieldType!=SheetFieldType.StaticText)
@@ -389,8 +421,12 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			XPen pen3=new XPen(XColors.Black,p(1.6f));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.CheckBox){
 					continue;
 				}
@@ -401,8 +437,12 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { break; } //Skip if on next page
+				if(field.YPos<_yPosPrint) {
+					continue; //skip if on previous page
+				}
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+					break; //Skip if on next page
+				} 
 				if(field.FieldType!=SheetFieldType.SigBox){
 					continue;
 				}
@@ -426,7 +466,8 @@ namespace OpenDental {
 			}
 			//Set the _yPosPrint for the next page
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
+					&& field.YPos!=_yPosPrint+_printMargin.Top) {
 					//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
 					_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
 					break;
@@ -448,12 +489,17 @@ namespace OpenDental {
 		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic,bool drawAll=false) {
 			Bitmap bmpOriginal=null;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!drawAll) {
-					if(field.YPos<_yPosPrint) { continue; } //skip if on previous page
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage) { break; } //Skip if on next page
-				}
-				else {//reset _yPosPrint because we are drawing all.
+				if(drawAll) {//reset _yPosPrint because we are drawing all.
 					_yPosPrint=0;
+				}
+				else {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
+						&& field.YPos!= _yPosPrint+_printMargin.Top) {
+						break; //Skip if on next page
+					} 
 				}
 				#region Get the path for the image
 				string filePathAndName="";
@@ -523,13 +569,9 @@ namespace OpenDental {
 						//We use GDI here first to convert the image to the correct size and DPI, then pass the second image to XGraphics.DrawImage().
 						bmpResampled.Dispose();
 						bmpResampled=null;
-						bmpResampled=new Bitmap(field.Width,field.Height);
-						Graphics gr=Graphics.FromImage(bmpResampled);
-						gr.DrawImage(bmpOriginal,0,0,imgDrawWidth,imgDrawHeight);
-						gr.Dispose();
-						gr=null;
+						bmpResampled=new Bitmap((Bitmap)bmpOriginal.Clone());//resample the resolution.
 					}
-					xGraphic.DrawImage(bmpResampled,p(field.XPos+adjustX),p(field.YPos+adjustY-_yPosPrint),p(imgDrawWidth),p(imgDrawHeight));
+					xGraphic.DrawImage(bmpResampled,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
 					bmpResampled.Dispose();
 					bmpResampled=null;
 				}

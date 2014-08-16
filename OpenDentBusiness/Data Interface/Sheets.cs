@@ -414,6 +414,21 @@ namespace OpenDentBusiness{
 			string command="UPDATE sheet SET ShowInTerminal=0 WHERE PatNum="+POut.Long(patNum);
 			Db.NonQ(command);
 		}
+
+		///<summary>This gives the number of pages required to print all fields without cutting any of them in half. This must be calculated ahead of time when creating multi page pdfs.</summary>
+		public static int CalculatePageCount(Sheet sheet,System.Drawing.Printing.Margins m) {
+			int pageCount=1;
+			int curYPos=0;
+			sheet.SheetFields.Sort(OpenDentBusiness.SheetFields.SortBottomBounds);
+			for(int i=0;i<sheet.SheetFields.Count;i++) {
+				if(sheet.SheetFields[i].Bounds.Bottom>curYPos+sheet.HeightPage-m.Bottom //if field would spill onto next page
+					&& sheet.SheetFields[i].Height<sheet.HeightPage-m.Bottom) { //and field is not taller than the entire page
+					pageCount++;
+					curYPos=Math.Min(sheet.SheetFields[i].YPos-m.Top,curYPos+sheet.HeightPage);
+				}
+			}
+			return pageCount;
+		}
 		
 
 		

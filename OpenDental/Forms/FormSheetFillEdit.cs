@@ -506,7 +506,7 @@ namespace OpenDental {
 			pDashPage.DashPattern=new float[] { 4.0F,3.0F,2.0F,3.0F };
 			Pen pDashMargin=new Pen(Color.Green);
 			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
-			int pageCount=SheetCur.CalculatePageCount(_printMargin);
+			int pageCount=Sheets.CalculatePageCount(SheetCur,_printMargin);
 			for(int i=1;i<pageCount;i++) {
 				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
 				g.DrawLine(pDashPage,0,i*SheetCur.HeightPage,SheetCur.WidthPage,i*SheetCur.HeightPage);
