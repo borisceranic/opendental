@@ -7,20 +7,31 @@ namespace OpenDentBusiness.HL7 {
 		///<summary></summary>
 		private string fullText;
 		///<summary>Not often used. Some HL7 fields are allowed to "repeat" multiple times. For example, in immunization messaging export (VXU messages), PID-3 repeats twice, once for patient ID and once for SSN.</summary>
-		private List<FieldHL7> _listRepeatFields=new List<FieldHL7>();
+		public List<FieldHL7> ListRepeatFields=new List<FieldHL7>();
 		public List<ComponentHL7> Components;
+		///<summary>Delimiter order: component separator, repetition separator, escape character, subcomponent separator.
+		///<para>Defaults: ^ component, ~ repetition, \ escape character, &amp; subcomponent.</para></summary>
+		private char[] _delimiters;
 
-		///<summary>Only use this constructor when generating a message instead of parsing a message.</summary>
-		internal FieldHL7(){
+		///<summary>Use this constructor when generating a message.</summary>
+		internal FieldHL7(char[] delimiters){
+			_delimiters=delimiters;
 			fullText="";
 			Components=new List<ComponentHL7>();
-			ComponentHL7 component;
-			component=new ComponentHL7("");
+			ComponentHL7 component=new ComponentHL7("");
 			Components.Add(component);
 			//add more components later if needed.
 		}
 
+		///<summary>Use this constructor when we have a message to parse.  Uses the default delimiters.</summary>
 		public FieldHL7(string fieldText) {
+			_delimiters=new char[] { '^','~','\\','&' };//default delimiters in this order:  component separator, repetition separator, escape character, subcomponent separator
+			FullText=fieldText;
+		}
+
+		///<summary>Use this constructor when we have a message to parse.  Uses the delimiters provided, retrieved from the enabled HL7 def if exists.</summary>
+		public FieldHL7(string fieldText,char[] delimiters) {
+			_delimiters=delimiters;
 			FullText=fieldText;
 		}
 
@@ -33,21 +44,39 @@ namespace OpenDentBusiness.HL7 {
 			get {
 				StringBuilder sb=new StringBuilder();
 				sb.Append(fullText);
-				for(int i=0;i<_listRepeatFields.Count;i++) {
-					sb.Append("~");//Field repitition separator.  Always before each repeat field, even if fullText is blank.
-					sb.Append(_listRepeatFields[i].FullText);
+				for(int i=0;i<ListRepeatFields.Count;i++) {
+					sb.Append(_delimiters[1]);//Field repitition separator.  Always before each repeat field, even if fullText is blank.
+					sb.Append(ListRepeatFields[i].FullText);
 				}
 				return sb.ToString();
 			}
 			set {
-				fullText=value;
-				Components=new List<ComponentHL7>();
-				//In the future, we could first split by ~ to get the repeating fields as needed, then split each field instance by the ^ character.
-				string[] components=fullText.Split(new string[] { "^" },StringSplitOptions.None);//leave empty entries in place
-				ComponentHL7 component;
-				for(int i=0;i<components.Length;i++) {
-					component=new ComponentHL7(components[i]);
-					Components.Add(component);
+				string[] repeats=value.Split(new char[] { _delimiters[1] },StringSplitOptions.None);//repetitionSeparator defaults to ~
+				FieldHL7 repeatField=null;
+				for(int r=0;r<repeats.Length;r++) {
+					string[] components=repeats[r].Split(new char[] { _delimiters[0] },StringSplitOptions.None);//leave empty entries in place, componentSeparator defaults to ^
+					ComponentHL7 component;
+					if(r==0) {
+						fullText=repeats[r];
+						Components=new List<ComponentHL7>();
+					}
+					else {
+						repeatField=new FieldHL7(_delimiters);//initializes the list of components and adds one empty string component
+						repeatField.fullText=repeats[r];
+						repeatField.Components=new List<ComponentHL7>();
+					}
+					for(int i=0;i<components.Length;i++) {
+						component=new ComponentHL7(components[i]);
+						if(r==0) {
+							Components.Add(component);
+						}
+						else {
+							repeatField.Components.Add(component);
+						}
+					}
+					if(r>0 && repeatField!=null) {
+						ListRepeatFields.Add(repeatField);
+					}
 				}
 			}
 		}
@@ -74,16 +103,16 @@ namespace OpenDentBusiness.HL7 {
 				Components.Add(component);
 				fullText+=values[i];
 				if(i<values.Length-1) {
-					fullText+="^";
+					fullText+=_delimiters[0];
 				}
 			}
 		}
 
 		///<summary>Not often used. Some HL7 fields are allowed to "repeat" multiple times. For example, in immunization messaging export (VXU messages), PID-3 repeats twice, once for patient ID and once for SSN.</summary>
 		public void RepeatVals(params string[] values) {
-			FieldHL7 field=new FieldHL7();
+			FieldHL7 field=new FieldHL7(_delimiters);
 			field.SetVals(values);
-			_listRepeatFields.Add(field);
+			ListRepeatFields.Add(field);
 		}
 		 
 	}

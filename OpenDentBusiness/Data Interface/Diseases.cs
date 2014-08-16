@@ -8,6 +8,7 @@ using System.Reflection;
 namespace OpenDentBusiness {
 	///<summary></summary>
 	public class Diseases {
+		///<summary>This returns a single disease, but a patient may have multiple instances of the same disease.  For example, they may have multiple pregnancy instances with the same DiseaseDefNum.  This will return a single instance of the disease, chosen at random by MySQL.  Would be better to use GetDiseasesForPatient below which returns a list of diseases with this DiseaseDefNum for the patient.</summary>
 		public static Disease GetSpecificDiseaseForPatient(long patNum,long diseaseDefNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Disease>(MethodBase.GetCurrentMethod(),patNum,diseaseDefNum);
@@ -15,6 +16,19 @@ namespace OpenDentBusiness {
 			string command="SELECT * FROM disease WHERE PatNum="+POut.Long(patNum)
 				+" AND DiseaseDefNum="+POut.Long(diseaseDefNum);
 			return Crud.DiseaseCrud.SelectOne(command);
+		}
+		
+		///<summary>Gets a list of every disease for the patient that has the specified DiseaseDefNum.  Set showActiveOnly true to only show active Diseases based on status (i.e. it could have a stop date but still be active, or marked inactive with no stop date).</summary>
+		public static List<Disease> GetDiseasesForPatient(long patNum,long diseaseDefNum,bool showActiveOnly) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Disease>>(MethodBase.GetCurrentMethod(),patNum,diseaseDefNum,showActiveOnly);
+			}
+			string command="SELECT * FROM disease WHERE PatNum="+POut.Long(patNum)
+				+" AND DiseaseDefNum="+POut.Long(diseaseDefNum);
+			if(showActiveOnly) {
+				command+=" AND ProbStatus="+POut.Int((int)ProblemStatus.Active);
+			}
+			return Crud.DiseaseCrud.SelectMany(command);
 		}
 
 		///<summary>Gets one disease by DiseaseNum from the db.</summary>
@@ -39,7 +53,7 @@ namespace OpenDentBusiness {
 			string command="SELECT disease.* FROM disease "
 				+"WHERE PatNum="+POut.Long(patNum);
 			if(showActiveOnly) {
-				command+=" AND ProbStatus=0";
+				command+=" AND ProbStatus="+POut.Int((int)ProblemStatus.Active);
 			}
 			return Crud.DiseaseCrud.SelectMany(command);
 		}
@@ -64,6 +78,15 @@ namespace OpenDentBusiness {
 				return;
 			}
 			Crud.DiseaseCrud.Update(disease);
+		}
+
+		///<summary></summary>
+		public static void Update(Disease disease,Disease oldDisease) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),disease,oldDisease);
+				return;
+			}
+			Crud.DiseaseCrud.Update(disease,oldDisease);
 		}
 
 		///<summary></summary>

@@ -299,7 +299,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Medication>(MethodBase.GetCurrentMethod(),rxcui);
 			}
-			string command="SELECT * FROM medication WHERE RxCui="+POut.Long(rxcui);
+			//an RxCui could be linked to multiple medications, the ORDER BY ensures we get the same medication every time we call this function
+			string command="SELECT * FROM medication WHERE RxCui="+POut.Long(rxcui)+" ORDER BY MedicationNum";
 			return Crud.MedicationCrud.SelectOne(command);
 		}
 

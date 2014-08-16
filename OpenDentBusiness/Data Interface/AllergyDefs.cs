@@ -219,5 +219,20 @@ namespace OpenDentBusiness{
 			return Crud.AllergyDefCrud.SelectOne(command);
 		}
 
+		///<summary>Returns the AllergyDef set to SnomedType 2 (DrugAllergy) or SnomedType 3 (DrugIntolerance) that is attached to a medication with this rxnorm.  Returns null if rxnorm is 0 or no allergydef for this rxnorm exists.  Used by HL7 service for inserting drug allergies for patients.</summary>
+		public static AllergyDef GetAllergyDefFromRxnorm(long rxnorm) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<AllergyDef>(MethodBase.GetCurrentMethod(),rxnorm);
+			}
+			if(rxnorm==0) {
+				return null;
+			}
+			string command="SELECT allergydef.* FROM allergydef "
+				+"INNER JOIN medication ON allergydef.AllergyDefNum=medication.AllergyDefNum "
+				+"AND medication.RxCui="+POut.Long(rxnorm)+" "
+				+"WHERE allergydef.SnomedType IN("+(int)SnomedAllergy.DrugAllergy+","+(int)SnomedAllergy.DrugIntolerance+") ";
+			return Crud.AllergyDefCrud.SelectOne(command);
+		}
+
 	}
 }

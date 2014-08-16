@@ -10,12 +10,30 @@ namespace OpenDentBusiness{
 		///<summary>Will return an OIDExternal if both the root and extension match exactly, returns null if not found.</summary>
 		/// <param name="root">The OID of the object.</param>
 		/// <param name="extension">If object is identified by only the root, this value should be an empty string.</param>
-		public static OIDExternal GetByRootAndExtention(string root,string extension) {
+		public static OIDExternal GetByRootAndExtension(string root,string extension) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<OIDExternal>(MethodBase.GetCurrentMethod(),root,extension);
 			}
 			string command="SELECT * FROM oidexternal WHERE rootExternal='"+POut.String(root)+"' AND IDExternal='"+POut.String(extension)+"'";
 			return Crud.OIDExternalCrud.SelectOne(command);
+		}
+
+		///<summary>Gets a list of all external ID's for the internal ID and type provided.  Used to construct outbound HL7 messages.</summary>
+		public static List<OIDExternal> GetByInternalIDAndType(string idInternal,IdentifierType idType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<OIDExternal>>(MethodBase.GetCurrentMethod(),idInternal,idType);
+			}
+			string command="SELECT * FROM oidexternal WHERE IDType='"+idType.ToString()+"' AND IDInternal='"+POut.String(idInternal)+"'";
+			return Crud.OIDExternalCrud.SelectMany(command);
+		}
+
+		///<summary></summary>
+		public static long Insert(OIDExternal oIDExternal) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				oIDExternal.OIDExternalNum=Meth.GetLong(MethodBase.GetCurrentMethod(),oIDExternal);
+				return oIDExternal.OIDExternalNum;
+			}
+			return Crud.OIDExternalCrud.Insert(oIDExternal);
 		}
 
 		/*
@@ -36,15 +54,6 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<OIDExternal>(MethodBase.GetCurrentMethod(),oIDExternalNum);
 			}
 			return Crud.OIDExternalCrud.SelectOne(oIDExternalNum);
-		}
-
-		///<summary></summary>
-		public static long Insert(OIDExternal oIDExternal){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				oIDExternal.OIDExternalNum=Meth.GetLong(MethodBase.GetCurrentMethod(),oIDExternal);
-				return oIDExternal.OIDExternalNum;
-			}
-			return Crud.OIDExternalCrud.Insert(oIDExternal);
 		}
 
 		///<summary></summary>

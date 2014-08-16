@@ -51,9 +51,24 @@ namespace OpenDentBusiness{
 		public static List<FieldNameAndType> GetFullList() {
 			List<FieldNameAndType> retVal=new List<FieldNameAndType>();
 			retVal.Add(new FieldNameAndType("ackCode",DataTypeHL7.ID,"0008"));
+			retVal.Add(new FieldNameAndType("allergenRxNorm",DataTypeHL7.CWE));//Example: RxNormCode^^RXNORM^^^^^^
+			retVal.Add(new FieldNameAndType("allergenType",DataTypeHL7.CWE,"0127"));//DA - Drug Allergy, FA - Food Allergy, MA - Miscellaneous Allergy
+			retVal.Add(new FieldNameAndType("apt.AptDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("apt.AptNum",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("apt.confirmStatus",DataTypeHL7.CWE,"0278"));
+			retVal.Add(new FieldNameAndType("apt.endAptDateTime",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("apt.externalAptID",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("apt.length",DataTypeHL7.CQ));
 			retVal.Add(new FieldNameAndType("apt.lengthStartEnd",DataTypeHL7.TQ));
-			retVal.Add(new FieldNameAndType("apt.Note",DataTypeHL7.CWE));
+			retVal.Add(new FieldNameAndType("apt.location",DataTypeHL7.PL));//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic), for inbound, used to set an apt.ClinicNum but not update pat.ClinicNum
+			retVal.Add(new FieldNameAndType("apt.Note",DataTypeHL7.FT));
+			retVal.Add(new FieldNameAndType("apt.operatory",DataTypeHL7.CWE));//Schedule ID
+			retVal.Add(new FieldNameAndType("apt.type",DataTypeHL7.CWE,"0277"));//Normal or Complete
+			retVal.Add(new FieldNameAndType("apt.userOD",DataTypeHL7.CWE));//Filler contact person and entered by person
+			retVal.Add(new FieldNameAndType("carrier.addressCityStateZip",DataTypeHL7.XAD));
+			retVal.Add(new FieldNameAndType("carrier.CarrierName",DataTypeHL7.XON));
+			retVal.Add(new FieldNameAndType("carrier.ElectID",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("carrier.Phone",DataTypeHL7.XTN));
 			retVal.Add(new FieldNameAndType("dateTime.Now",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("eventType",DataTypeHL7.ID,"0003"));
 			retVal.Add(new FieldNameAndType("guar.addressCityStateZip",DataTypeHL7.XAD));
@@ -65,6 +80,23 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("guar.PatNum",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("guar.SSN",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("guar.WkPhone",DataTypeHL7.XTN));
+			retVal.Add(new FieldNameAndType("guarIdList",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("insplan.cob",DataTypeHL7.IS,"0173"));//CO-Coordination, IN-Independent
+			retVal.Add(new FieldNameAndType("insplan.coverageType",DataTypeHL7.IS,"0309"));//M-Medical, D-Dental
+			retVal.Add(new FieldNameAndType("insplan.empName",DataTypeHL7.XON));
+			retVal.Add(new FieldNameAndType("insplan.GroupName",DataTypeHL7.XON));
+			retVal.Add(new FieldNameAndType("insplan.GroupNum",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("insplan.planNum",DataTypeHL7.CWE));//root.7.PlanNum
+			retVal.Add(new FieldNameAndType("insplan.PlanType",DataTypeHL7.IS,"0086"));//Category Percentage, PPO Percentage, Medicaid or Flat Copay, Capitation
+			retVal.Add(new FieldNameAndType("inssub.AssignBen",DataTypeHL7.IS,"0135"));//0-N, 1-Y
+			retVal.Add(new FieldNameAndType("inssub.DateEffective",DataTypeHL7.DT));
+			retVal.Add(new FieldNameAndType("inssub.DateTerm",DataTypeHL7.DT));
+			retVal.Add(new FieldNameAndType("inssub.ReleaseInfo",DataTypeHL7.IS,"0093"));//0-N, 1-Y
+			retVal.Add(new FieldNameAndType("inssub.subAddrCityStateZip",DataTypeHL7.XAD));
+			retVal.Add(new FieldNameAndType("inssub.subBirthdate",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("inssub.SubscriberID",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("inssub.subscriberName",DataTypeHL7.XPN));
+			retVal.Add(new FieldNameAndType("medicationRxNorm",DataTypeHL7.CWE));//code^descript^codeSystem, Example: RxNorm Code^^RXNORM, descript is ignored
 			retVal.Add(new FieldNameAndType("messageControlId",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("messageType",DataTypeHL7.MSG));
 			retVal.Add(new FieldNameAndType("pat.addressCityStateZip",DataTypeHL7.XAD));
@@ -72,23 +104,41 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("pat.ChartNumber",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("pat.FeeSched",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("pat.Gender",DataTypeHL7.IS,"0001"));//M,F,U,etc.
+			retVal.Add(new FieldNameAndType("pat.GradeLevel",DataTypeHL7.IS,"0004"));//integer in range 1-12
 			retVal.Add(new FieldNameAndType("pat.HmPhone",DataTypeHL7.XTN));
+			retVal.Add(new FieldNameAndType("pat.location",DataTypeHL7.PL));//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic), for inbound, will set both pat.ClinicNum and apt.ClinicNum if an appointment is identified in the message
 			retVal.Add(new FieldNameAndType("pat.nameLFM",DataTypeHL7.XPN));
 			retVal.Add(new FieldNameAndType("pat.PatNum",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("pat.Position",DataTypeHL7.CWE,"0002"));
 			retVal.Add(new FieldNameAndType("pat.Race",DataTypeHL7.CWE,"0005"));
+			retVal.Add(new FieldNameAndType("pat.site",DataTypeHL7.PL));//Example: ClinicDescript^OpName^^PracticeTitle^^s (s for site)
 			retVal.Add(new FieldNameAndType("pat.SSN",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("pat.WkPhone",DataTypeHL7.XTN));
+			retVal.Add(new FieldNameAndType("pat.Urgency",DataTypeHL7.IS,"0018"));//0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
+			retVal.Add(new FieldNameAndType("patientIdList",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("patplan.Ordinal",DataTypeHL7.ST));//1,2,3...
+			retVal.Add(new FieldNameAndType("patplan.policyNum",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("patplan.subRelationToPat",DataTypeHL7.CWE,"0063"));//SEL-Self, SPO-Spouse, DOM-LifePartner, CHD-Child (return PAR-Parent), EME-Employee (return EMR-Employer), DEP-HandicapDep (return GRD-Guardian), OTH-SignifOther, OTH-InjuredPlantiff, OTH-Dependent (return GRD-Guardian)
 			retVal.Add(new FieldNameAndType("pdfDescription",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("pdfDataAsBase64",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("problemAction",DataTypeHL7.ID,"0287"));//AD-ADD,CO-Correct,DE-Delete,LI-Link,UC-Unchanged,UN-Unlink,UP-Update.  AD/UP are currently supported
+			retVal.Add(new FieldNameAndType("problemCode",DataTypeHL7.CWE));
+			retVal.Add(new FieldNameAndType("problemStartDate",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("problemStopDate",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("problemUniqueId",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("proc.DiagnosticCode",DataTypeHL7.CWE,"0051"));
+			retVal.Add(new FieldNameAndType("proc.location",DataTypeHL7.PL));//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic), for outbound FT1 segments, clinic from proc unless not set then from patient
 			retVal.Add(new FieldNameAndType("proc.procDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("proc.ProcFee",DataTypeHL7.CP));
 			retVal.Add(new FieldNameAndType("proc.ProcNum",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("proc.toothSurfRange",DataTypeHL7.CNE,"0340"));
+			retVal.Add(new FieldNameAndType("proc.uniqueId",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("proccode.ProcCode",DataTypeHL7.CNE,"0088"));
-			retVal.Add(new FieldNameAndType("prov.provIdNameLFM",DataTypeHL7.XCN));//Provider id table is user defined table and different number depending on what segment it is pulled from.  Example: FT1 Performed By Code table is 0084, 
+			retVal.Add(new FieldNameAndType("prov.provIdNameLFM",DataTypeHL7.XCN));//Provider id table is user defined table and different number depending on what segment it is pulled from.  Example: FT1 Performed By Code table is 0084, PV1 Attending Doctor is table 0010
 			retVal.Add(new FieldNameAndType("prov.provIdName",DataTypeHL7.XCN));
+			retVal.Add(new FieldNameAndType("provType",DataTypeHL7.CWE,"0182"));//accepted values: 'd' or 'D' for dentist, 'h' or 'H' for hygienist
+			retVal.Add(new FieldNameAndType("segmentAction",DataTypeHL7.ID,"0206"));//A-Add/Insert, D-Delete, U-Update, X-No Change
+			retVal.Add(new FieldNameAndType("sendingApp",DataTypeHL7.HD,"0361"));//the Open Dental HL7 root assigned to the office and stored in the oidinternal table with the IDType of Root
 			retVal.Add(new FieldNameAndType("separators^~\\&",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("sequenceNum",DataTypeHL7.SI));
 			return retVal;
@@ -121,6 +171,8 @@ namespace OpenDentBusiness{
 		CNE,
 		///<summary>Composite price.  Example: 125.00</summary>
 		CP,
+		///<summary>Composite quantity with units.  Example: 123.7^kg</summary>
+		CQ,
 		///<summary>Coded with exceptions.  Example: Race: American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or Other Pacific,White, Hispanic,Other Race.</summary>
 		CWE,
 		///<summary>Extended composite ID with check digit.  Example: patient.PatNum or patient.ChartNumber or appointment.AptNum.</summary>
@@ -131,6 +183,8 @@ namespace OpenDentBusiness{
 		DTM,
 		///<summary>Entity identifier.  Example: appointment.AptNum</summary>
 		EI,
+		/// <summary>Formatted text data.  We support new lines identified by '\.br\' (where '\' is the defined escape char, \ is the default)</summary>
+		FT,
 		/// <summary>Hierarchic designator.  Application identifier.  Example: "OD" for OpenDental.</summary>
 		HD,
 		/// <summary>Coded value for HL7 defined tables.  Must include TableId.  Example: 0003 is eCW's event type table id.</summary>
@@ -141,6 +195,8 @@ namespace OpenDentBusiness{
 		MSG,
 		/// <summary>Numeric.  Example: transaction quantity of 1.0</summary>
 		NM,
+		/// <summary>Person Location.  ^^^^^Person Location Type^^^Location Description.  Example: ^^^^^S^^^West Salem Elementary.  S=site (or grade school) description.</summary>
+		PL,
 		/// <summary>Processing type.  Examples: P-Production, T-Test.</summary>
 		PT,
 		///<summary>Sequence ID.  Example: for repeating segments number that begins with 1.</summary>
@@ -155,6 +211,8 @@ namespace OpenDentBusiness{
 		XAD,
 		///<summary>Extended composite ID number and name for person.  Example: provider.EcwID^provider.LName^provider.FName^provider.MI</summary>
 		XCN,
+		///<summary>Extended composite ID number and name for organizations.</summary>
+		XON,
 		///<summary>Extended person name.  Composite data type.  Example: LName^FName^MI).</summary>
 		XPN,
 		///<summary>Extended telecommunication number.  Example: 5033635432</summary>

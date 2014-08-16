@@ -57,6 +57,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<OIDInternal>>(MethodBase.GetCurrentMethod());
 			}
+			InsertMissingValues();//there should always be one entry in the DB for each IdentifierType enumeration, insert any missing
 			string command="SELECT * FROM oidinternal";
 			return Crud.OIDInternalCrud.SelectMany(command);
 		}

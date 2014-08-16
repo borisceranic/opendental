@@ -373,6 +373,26 @@ namespace OpenDental {
 					}
 				}
 			}
+			if(textFieldSep.Text.Length!=1) {
+				MsgBox.Show(this,"The field separator must be a single character.");
+				return;
+			}
+			if(textRepSep.Text.Length!=1) {
+				MsgBox.Show(this,"The repetition separator must be a single character.");
+				return;
+			}
+			if(textCompSep.Text.Length!=1) {
+				MsgBox.Show(this,"The component separator must be a single character.");
+				return;
+			}
+			if(textSubcompSep.Text.Length!=1) {
+				MsgBox.Show(this,"The subcomponent separator must be a single character.");
+				return;
+			}
+			if(textEscChar.Text.Length!=1) {
+				MsgBox.Show(this,"The escape character must be a single character.");
+				return;
+			}
 			HL7DefCur.HL7Server=textHL7Server.Text;
 			HL7DefCur.HL7ServiceName=textHL7ServiceName.Text;
 			HL7DefCur.IsInternal=checkInternal.Checked;

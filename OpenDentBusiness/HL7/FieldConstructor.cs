@@ -11,84 +11,304 @@ using OpenDentBusiness.UI;
 namespace OpenDentBusiness.HL7 {
 	///<summary>This is the engine that will construct our outgoing HL7 message fields.</summary>
 	public class FieldConstructor {
+		private static bool _isEcwDef;
 
-		///<summary>apt, guar, proc, prov and pdfDataString can be null and will return an empty string if a field requires that object</summary>
-		public static string GenerateDFT(HL7Def def,string fieldName,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString) {
+		///<summary>apt, guar, proc, prov, pdfDataString, patplanCur, inssubCur, insplanCur, and carrierCur can be null and will return an empty string if a field requires that object</summary>
+		public static string GenerateDFT(HL7Def def,string fieldName,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
+			string retval="";
+			if(def.InternalType==HL7InternalType.eCWFull
+				|| def.InternalType==HL7InternalType.eCWTight
+				|| def.InternalType==HL7InternalType.eCWStandalone)
+			{
+				_isEcwDef=true;
+			}
 			//big long list of fieldnames that we support
-			switch(fieldName){
+			switch(fieldName) {
+				#region Appointment
 				case "apt.AptNum":
 					if(apt==null) {
 						return "";
 					}
-					else {
+					if(_isEcwDef) {
 						return apt.AptNum.ToString();
 					}
+					//We will use AptNum, with check digit scheme M11, with the OIDRoot for an appt object (set in oidinternal), ID Type 'HL7', and 'VN' for Visit Number
+					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.6&HL7^VN|
+					OIDInternal aptOid=OIDInternals.GetForType(IdentifierType.Appointment);
+					string aptOidRoot="";
+					if(aptOid!=null) {
+						aptOidRoot=aptOid.IDRoot;
+					}
+					string aptNumCheckDigitStr=MessageParser.M11CheckDigit(apt.AptNum.ToString()).ToString();
+					return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),aptNumCheckDigitStr,"M11",def.SubcomponentSeparator+aptOidRoot+def.SubcomponentSeparator+"HL7","VN");
+				case "apt.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					//use operatory and clinic from appt
+					if(apt==null) {
+						return "";
+					}
+					string aptClinicDescript=Clinics.GetDesc(apt.ClinicNum);
+					Operatory opCur=Operatories.GetOperatory(apt.Op);
+					string opName="";
+					if(opCur!=null) {
+						opName=opCur.OpName;
+					}
+					string practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,aptClinicDescript,opName,"",practiceName,"","","c");//all of these could be empty strings and it works fine
+				#endregion Appointment
+				#region Carrier
+				case "carrier.addressCityStateZip":
+					if(carrierCur==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,carrierCur.Address,carrierCur.Address2,carrierCur.City,carrierCur.State,carrierCur.Zip);
+				case "carrier.CarrierName":
+					if(carrierCur==null) {
+						return "";
+					}
+					return carrierCur.CarrierName;
+				case "carrier.ElectID":
+					if(carrierCur==null) {
+						return "";
+					}
+					return carrierCur.ElectID;
+				case "carrier.Phone":
+					//Example: ^WPN^PH^^^800^3635432
+					if(carrierCur==null) {
+						return "";
+					}
+					string carrierPh=gXTN(carrierCur.Phone,10);
+					if(carrierPh=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","WPN","PH","","",carrierPh.Substring(0,3),carrierPh.Substring(3));//carrierPh guaranteed to be 10 digits or blank
+				#endregion Carrier
 				case "dateTime.Now":
 					return gDTM(DateTime.Now,14);
 				case "eventType":
 					return eventType.ToString();
+				#region Guardian
 				case "guar.addressCityStateZip":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gConcat(def.ComponentSeparator,guar.Address,guar.Address2,guar.City,guar.State,guar.Zip);
+					retval=gConcat(def.ComponentSeparator,guar.Address,guar.Address2,guar.City,guar.State,guar.Zip);
+					if(!_isEcwDef) {
+						//Example: 123 Main St^Apt 1^Dallas^OR^97338^^^^^^^^^^^^^^^Emergency Contact: Mom Test1\.br\Mother\.br\(503)623-3072
+						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",pat.AddrNote.Replace("\r\n","\n").Replace("\n",def.EscapeCharacter+".br"+def.EscapeCharacter));
 					}
+					return retval;
 				case "guar.birthdateTime":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gDTM(guar.Birthdate,8);
-					}
+					return gDTM(guar.Birthdate,8);
 				case "guar.Gender":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gIS(guar);
-					}
+					return gIS(guar);
 				case "guar.HmPhone":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gXTN(guar.HmPhone,10);
+					string hmPh=gXTN(guar.HmPhone,10);
+					string cPh=gXTN(guar.WirelessPhone,10);
+					if(_isEcwDef) {
+						return hmPh;
 					}
+					//PRN stands for Primary Residence Number, equipment type: PH is Telephone, CP is Cell Phone, Internet is Internet Address (email)
+					//Example: ^PRN^PH^^^503^3635432~^PRN^Internet^someone@somewhere.com~^PRN^CP^^^503^6895555
+					if(hmPh!="") {
+						retval=gConcat(def.ComponentSeparator,"","PRN","PH","","",hmPh.Substring(0,3),hmPh.Substring(3));//hmPh guaranteed to be 10 digits if not blank
+					}
+					if(cPh!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","CP","","",cPh.Substring(0,3),cPh.Substring(3));//cPh guaranteed to be 10 digits if not blank
+					}
+					if(guar.Email!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","Internet",guar.Email);
+					}
+					return retval;
 				case "guar.nameLFM":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gConcat(def.ComponentSeparator,guar.LName,guar.FName,guar.MiddleI);
-					}
+					return gConcat(def.ComponentSeparator,guar.LName,guar.FName,guar.MiddleI);
 				case "guar.PatNum":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return guar.PatNum.ToString();
-					}
+					return guar.PatNum.ToString();
 				case "guar.SSN":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return guar.SSN;
-					}
+					return guar.SSN;
 				case "guar.WkPhone":
 					if(guar==null) {
 						return "";
 					}
-					else {
-						return gXTN(guar.WkPhone,10);
+					string wkPh=gXTN(guar.WkPhone,10);
+					if(_isEcwDef) {
+						return wkPh;
 					}
+					//WPN stands for Work Number, equipment type: PH is Telephone
+					//Example: ^WPN^PH^^^503^3635432
+					if(wkPh=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","WPN","PH","","",wkPh.Substring(0,3),wkPh.Substring(3));//wkPh guaranteed to be 10 digits if not blank
+				case "guarIdList":
+					if(guar==null) {
+						return "";
+					}
+					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
+					OIDInternal guarOid=OIDInternals.GetForType(IdentifierType.Patient);
+					string guarOidRoot="";
+					if(guarOid!=null) {
+						guarOidRoot=guarOid.IDRoot;
+					}
+					string guarIdCheckDigitStr=MessageParser.M11CheckDigit(guar.PatNum.ToString()).ToString();
+					retval=gConcat(def.ComponentSeparator,guar.PatNum.ToString(),guarIdCheckDigitStr,"M11",def.SubcomponentSeparator+guarOidRoot+def.SubcomponentSeparator+"HL7","PI");
+					List<OIDExternal> listGuarOidsExt=OIDExternals.GetByInternalIDAndType(guar.PatNum.ToString(),IdentifierType.Patient);
+					for(int i=0;i<listGuarOidsExt.Count;i++) {
+						guarIdCheckDigitStr=MessageParser.M11CheckDigit(listGuarOidsExt[i].IDExternal).ToString();
+						if(guarIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
+							retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listGuarOidsExt[i].IDExternal,"","",
+								def.SubcomponentSeparator+listGuarOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+							continue;
+						}
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listGuarOidsExt[i].IDExternal,guarIdCheckDigitStr,"M11",
+							def.SubcomponentSeparator+listGuarOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+					}
+					return retval;
+				#endregion Guardian
+				#region InsPlan
+				case "insplan.cob":
+					if(insplanCur==null) {
+						return "";
+					}
+					if(patplanCount>1) {
+						return "CO";
+					}
+					return "IN";
+				case "insplan.coverageType":
+					if(insplanCur==null) {
+						return "";
+					}
+					if(insplanCur.IsMedical) {
+						return "M";
+					}
+					return "D";
+				case "insplan.empName":
+					if(insplanCur==null) {
+						return "";
+					}
+					return Employers.GetName(insplanCur.EmployerNum);//will return empty string if EmployerNum=0 or not found
+				case "insplan.GroupName":
+					if(insplanCur==null) {
+						return "";
+					}
+					return insplanCur.GroupName;
+				case "insplan.GroupNum":
+					if(insplanCur==null) {
+						return "";
+					}
+					return insplanCur.GroupNum;
+				case "insplan.planNum":
+					//Example: 2.16.840.1.113883.3.4337.1486.6566.7.1234
+					//If OID for insplan is not set, then it will be ODInsPlan.1234 (where 1234=PlanNum)
+					if(insplanCur==null) {
+						return "";
+					}
+					OIDInternal insplanOid=OIDInternals.GetForType(IdentifierType.InsPlan);//returns root+".7" or whatever they have set in their oidinternal table for type InsPlan
+					string insplanOidRoot="ODInsPlan";
+					if(insplanOid!=null && insplanOid.IDRoot!="") {
+						insplanOidRoot=insplanOid.IDRoot;
+					}
+					return insplanOidRoot+"."+insplanCur.PlanNum;//tack on "."+PlanNum for extension
+				case "insplan.PlanType":
+					if(insplanCur==null) {
+						return "";
+					}
+					if(insplanCur.PlanType=="p") {
+						return "PPO Percentage";
+					}
+					if(insplanCur.PlanType=="f") {
+						return "Medicaid or Flat Copay";
+					}
+					if(insplanCur.PlanType=="c") {
+						return "Capitation";
+					}
+					return "Category Percentage";
+				#endregion InsPlan
+				#region InsSub
+				case "inssub.AssignBen":
+					if(inssubCur==null) {
+						return "";
+					}
+					if(inssubCur.AssignBen) {
+						return "Y";
+					}
+					return "N";
+				case "inssub.DateEffective":
+					if(inssubCur==null) {
+						return "";
+					}
+					return gDTM(inssubCur.DateEffective,8);
+				case "inssub.DateTerm":
+					if(inssubCur==null) {
+						return "";
+					}
+					return gDTM(inssubCur.DateTerm,8);
+				case "inssub.ReleaseInfo":
+					if(inssubCur==null) {
+						return "";
+					}
+					if(inssubCur.ReleaseInfo) {
+						return "Y";
+					}
+					return "N";
+				case "inssub.subAddrCityStateZip":
+					if(patSub==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,patSub.Address,patSub.Address2,patSub.City,patSub.State,patSub.Zip);
+				case "inssub.subBirthdate":
+					if(patSub==null) {
+						return "";
+					}
+					return gDTM(patSub.Birthdate,8);
+				case "inssub.SubscriberID":
+					if(inssubCur==null) {
+						return "";
+					}
+					return inssubCur.SubscriberID;
+				case "inssub.subscriberName":
+					if(patSub==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,patSub.LName,patSub.FName,patSub.MiddleI);
+				#endregion InsSub
 				case "messageControlId":
 					return Guid.NewGuid().ToString("N");
 				case "messageType":
-					return gConcat(def.ComponentSeparator,"DFT",eventType.ToString());
+					return gConcat(def.ComponentSeparator,"DFT",eventType.ToString(),"DFT_"+eventType.ToString());
+				#region Patient
 				case "pat.addressCityStateZip":
-					return gConcat(def.ComponentSeparator,pat.Address,pat.Address2,pat.City,pat.State,pat.Zip);
+					retval=gConcat(def.ComponentSeparator,pat.Address,pat.Address2,pat.City,pat.State,pat.Zip);
+					if(!_isEcwDef) {
+						//Example: 123 Main St^Apt 1^Dallas^OR^97338^^^^^^^^^^^^^^^Emergency Contact: Mom Test1\.br\Mother\.br\(503)623-3072
+						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",pat.AddrNote.Replace("\r\n","\n").Replace("\n",def.EscapeCharacter+".br"+def.EscapeCharacter));
+					}
+					return retval;
 				case "pat.birthdateTime":
 					return gDTM(pat.Birthdate,8);
 				case "pat.ChartNumber":
@@ -96,19 +316,143 @@ namespace OpenDentBusiness.HL7 {
 				case "pat.Gender":
 					return gIS(pat);
 				case "pat.HmPhone":
-					return gXTN(pat.HmPhone,10);
+					hmPh=gXTN(pat.HmPhone,10);
+					cPh=gXTN(pat.WirelessPhone,10);
+					if(_isEcwDef) {
+						return hmPh;
+					}
+					//PRN stands for Primary Residence Number, equipment type: PH is Telephone, CP is Cell Phone, Internet is Internet Address (email)
+					//Example: ^PRN^PH^^^503^3635432~^PRN^Internet^someone@somewhere.com~^PRN^CP^^^503^6895555
+					if(hmPh!="") {
+						retval=gConcat(def.ComponentSeparator,"","PRN","PH","","",hmPh.Substring(0,3),hmPh.Substring(3));//hmPh guaranteed to be 10 digits if not blank
+					}
+					if(cPh!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","CP","","",cPh.Substring(0,3),cPh.Substring(3));//cPh guaranteed to be 10 digits if not blank
+					}
+					if(pat.Email!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","Internet",pat.Email);
+					}
+					return retval;
+				case "pat.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					if(pat.ClinicNum==0) {
+						return "";
+					}
+					string patClinicDescript=Clinics.GetDesc(pat.ClinicNum);
+					practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,patClinicDescript,"","",practiceName,"","c");
 				case "pat.nameLFM":
 					return gConcat(def.ComponentSeparator,pat.LName,pat.FName,pat.MiddleI);
 				case "pat.PatNum":
 					return pat.PatNum.ToString();
 				case "pat.Position":
-					return gPos(pat);
+					if(_isEcwDef) {
+						return gPos(pat);
+					}
+					return gPos(pat).Substring(0,1);//S-Single, M-Married, D-Divorced, W-Widowed
 				case "pat.Race":
-					return gRace(pat);
+					if(_isEcwDef) {
+						return gRaceOld(pat);
+					}
+					return gRace(pat,def);
+				case "pat.site":
+					//Example: |^^^^^s^^^West Salem Elementary| ('S' or 's' - for site) and site.Description from pat.SiteNum
+					if(pat.SiteNum==0) {
+						return "";
+					}
+					string patSiteDescript=Sites.GetDescription(pat.SiteNum);
+					if(patSiteDescript=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","","","","","s","","",patSiteDescript);
 				case "pat.SSN":
 					return pat.SSN;
 				case "pat.WkPhone":
-					return gXTN(pat.WkPhone,10);
+					if(_isEcwDef) {
+						return gXTN(pat.WkPhone,10);
+					}
+					//WPN stands for Work Number, equipment type: PH is Telephone
+					//Example: ^WPN^PH^^^503^3635432
+					wkPh=gXTN(pat.WkPhone,10);
+					if(wkPh=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","WPN","PH","","",wkPh.Substring(0,3),wkPh.Substring(3));//wkPh guaranteed to be 10 digits if not blank
+				case "pat.Urgency":
+					//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0-Unknown, 1-NoProblems, 2-NeedsCare, 3-Urgent
+					return ((int)pat.Urgency).ToString();
+				case "patientIdList":
+					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
+					OIDInternal patOid=OIDInternals.GetForType(IdentifierType.Patient);
+					string patOidRoot="";
+					if(patOid!=null) {
+						patOidRoot=patOid.IDRoot;
+					}
+					string patIdCheckDigitStr=MessageParser.M11CheckDigit(pat.PatNum.ToString()).ToString();
+					retval=gConcat(def.ComponentSeparator,pat.PatNum.ToString(),patIdCheckDigitStr,"M11",def.SubcomponentSeparator+patOidRoot+def.SubcomponentSeparator+"HL7","PI");
+					List<OIDExternal> listPatOidsExt=OIDExternals.GetByInternalIDAndType(pat.PatNum.ToString(),IdentifierType.Patient);
+					for(int i=0;i<listPatOidsExt.Count;i++) {
+						patIdCheckDigitStr=MessageParser.M11CheckDigit(listPatOidsExt[i].IDExternal).ToString();
+						if(patIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
+							retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,"","",
+								def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+							continue;
+						}
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,patIdCheckDigitStr,"M11",
+							def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+					}
+					return retval;
+				#endregion Patient
+				#region PatPlan
+				case "patplan.Ordinal":
+					if(patplanCur==null) {
+						return "";
+					}
+					return patplanCur.Ordinal.ToString();
+				case "patplan.policyNum":
+					if(patplanCur==null || inssubCur==null) {
+						return "";
+					}
+					if(patplanCur.PatID!="") {
+						return patplanCur.PatID;
+					}
+					return inssubCur.SubscriberID;
+				case "patplan.subRelationToPat":
+					//SEL-Self, SPO-Spouse, DOM-LifePartner, CHD-Child (PAR-Parent), EME-Employee (EMR-Employer)
+					//DEP-HandicapDep (GRD-Guardian), DEP-Dependent, OTH-SignifOther (OTH-Other), OTH-InjuredPlantiff
+					//We store relationship to subscriber and they want subscriber's relationship to patient, therefore
+					//Relat.Child will return "PAR" for Parent, Relat.Employee will return "EMR" for Employer, and Relat.HandicapDep and Relat.Dependent will return "GRD" for Guardian
+					if(patplanCur==null) {
+						return "";
+					}
+					if(patplanCur.Relationship==Relat.Self) {
+						return "SEL";
+					}
+					if(patplanCur.Relationship==Relat.Spouse) {
+						return "SPO";
+					}
+					if(patplanCur.Relationship==Relat.LifePartner) {
+						return "DOM";//Life Partner
+					}
+					if(patplanCur.Relationship==Relat.Child) {
+						return "PAR";//Parent
+					}
+					if(patplanCur.Relationship==Relat.Employee) {
+						return "EMR";//Employer
+					}
+					if(patplanCur.Relationship==Relat.Dependent || patplanCur.Relationship==Relat.HandicapDep) {
+						return "GRD";//Guardian
+					}
+					//if Relat.SignifOther or Relat.InjuredPlaintiff or any others
+					return "OTH";
+				#endregion PatPlan
 				case "pdfDescription":
 					return pdfDescription;
 				case "pdfDataAsBase64":
@@ -118,58 +462,102 @@ namespace OpenDentBusiness.HL7 {
 					else {
 						return pdfDataString;
 					}
+				#region Procedure
+				case "proc.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
+						return "";
+					}
+					string procClinicDescript=Clinics.GetDesc(proc.ClinicNum);//could be blank if proc.ClinicNum is invalid
+					if(procClinicDescript=="") {
+						procClinicDescript=Clinics.GetDesc(pat.ClinicNum);//could be blank if pat.ClinicNum is invalid
+					}
+					string procOpName="";
+					if(apt!=null) {
+						Operatory procOp=Operatories.GetOperatory(apt.Op);
+						if(procOp!=null) {
+							procOpName=procOp.OpName;
+						}
+					}
+					practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",practiceName,"","c");
 				case "proc.DiagnosticCode":
 					if(proc==null) {
 						return "";
 					}
-					if(proc.DiagnosticCode==null) {
-						return "";
+					List<string> listDiagCodes=new List<string>();
+					if(proc.DiagnosticCode!=null && proc.DiagnosticCode!="") {
+						listDiagCodes.Add(proc.DiagnosticCode);
 					}
-					else {
-						return proc.DiagnosticCode;
+					if(proc.DiagnosticCode2!=null && proc.DiagnosticCode2!="") {
+						listDiagCodes.Add(proc.DiagnosticCode2);
 					}
+					if(proc.DiagnosticCode3!=null && proc.DiagnosticCode3!="") {
+						listDiagCodes.Add(proc.DiagnosticCode3);
+					}
+					if(proc.DiagnosticCode4!=null && proc.DiagnosticCode4!="") {
+						listDiagCodes.Add(proc.DiagnosticCode4);
+					}
+					for(int i=0;i<listDiagCodes.Count;i++) {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						ICD9 iCur=ICD9s.GetByCode(listDiagCodes[i]);
+						if(iCur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
+							retval+=listDiagCodes[i];
+							continue;
+						}
+						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],iCur.Description,"I9C","","","","31","","");
+					}
+					return retval;
 				case "proc.procDateTime":
 					if(proc==null) {
 						return "";
 					}
-					else {
-						return gDTM(proc.ProcDate,14);
-					}
+					return gDTM(proc.ProcDate,14);
 				case "proc.ProcFee":
 					if(proc==null) {
 						return "";
 					}
-					else {
-						return proc.ProcFee.ToString("F2");
-					}
+					return proc.ProcFee.ToString("F2");
 				case "proc.ProcNum":
 					if(proc==null) {
 						return "";
 					}
-					else {
-						return proc.ProcNum.ToString();
-					}
+					return proc.ProcNum.ToString();
 				case "proc.toothSurfRange":
 					if(proc==null) {
 						return "";
 					}
-					else {
-						return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
-					}
+					return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
 				case "proccode.ProcCode":
 					if(proc==null) {
 						return "";
 					}
-					else {
-						return gProcCode(proc);
+					if(_isEcwDef) {
+						return gProcCodeOld(proc);
 					}
+					//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
+					//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
+					return gProcCode(proc,def);
+				#endregion Procedure
+				#region Provider
 				case "prov.provIdNameLFM":
 					if(prov==null) {
 						return "";
 					}
-					else {
-						return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
+					return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
+				#endregion Provider
+				case "sendingApp":
+					//HD data type, Namespace ID^UniversalID^UniversalIDType
+					//UniversalID=oidinternal.IDRoot for IDType of Root, UniversalIDType=HL7
+					//If no value in oidinternal table, then revert to 'OD'
+					OIDInternal oidRoot=OIDInternals.GetForType(IdentifierType.Root);
+					if(oidRoot==null) {
+						return "OD";
 					}
+					return gConcat(def.ComponentSeparator,"",oidRoot.IDRoot,"HL7");
 				case "separators^~\\&":
 					return gSep(def);
 				case "sequenceNum":
@@ -207,7 +595,7 @@ namespace OpenDentBusiness.HL7 {
 			//Ack reject is a third possible response that we don't currently support
 		}
 
-		//Send in component separator for this def and the values in the order they should be in the message.
+		///<summary>Send in component separator for this def and the values in the order they should be in the message.</summary>
 		private static string gConcat(string componentSep,params string[] vals) {
 			string retVal="";
 			if(vals.Length==1) {
@@ -264,7 +652,7 @@ namespace OpenDentBusiness.HL7 {
 			}
 		}
 
-		private static string gProcCode(Procedure proc) {
+		private static string gProcCodeOld(Procedure proc) {
 			string retVal="";
 			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
 			if(procCode.ProcCode.Length>5 && procCode.ProcCode.StartsWith("D")) {
@@ -276,7 +664,14 @@ namespace OpenDentBusiness.HL7 {
 			return retVal;
 		}
 
-		private static string gRace(Patient pat) {
+		private static string gProcCode(Procedure proc,HL7Def def) {
+			//CNE data type, ProcNum^Descript^CD2^^^^2014^^LaymanTerm
+			//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
+			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
+			return gConcat(def.ComponentSeparator,procCode.ProcCode,procCode.Descript,"CD2","","","","2014","",procCode.LaymanTerm);			
+		}
+
+		private static string gRaceOld(Patient pat) {
 			switch(PatientRaces.GetPatientRaceOldFromPatientRaces(pat.PatNum)) { //Uses the deprecated PatientRaceOld enum converted from PatientRaces.GetPatientRaceOldFromPatientRaces()
 				case PatientRaceOld.AmericanIndian:
 					return "American Indian Or Alaska Native";
@@ -295,6 +690,51 @@ namespace OpenDentBusiness.HL7 {
 				default:
 					return "Other Race";
 			}
+		}
+
+		private static string gRace(Patient pat,HL7Def def) {
+			//Example: 2106-3^White^CDCREC^^^^1~2186-5^NotHispanic^CDCREC^^^^1
+			string retval="";
+			List<PatientRace> listPatRaces=PatientRaces.GetForPatient(pat.PatNum);
+			for(int i=0;i<listPatRaces.Count;i++) {
+				string raceCode="";
+				switch(listPatRaces[i].Race) { //Uses the deprecated PatientRaceOld enum converted from PatientRaces.GetPatientRaceOldFromPatientRaces()
+					case PatRace.AfricanAmerican:
+						raceCode="2054-5";
+						break;
+					case PatRace.AmericanIndian:
+						raceCode="1002-5";
+						break;
+					case PatRace.Asian:
+						raceCode="2028-9";
+						break;
+					case PatRace.HawaiiOrPacIsland:
+						raceCode="2076-8";
+						break;
+					case PatRace.Hispanic:
+						raceCode="2135-2";
+						break;
+					case PatRace.NotHispanic:
+						raceCode="2186-5";
+						break;
+					case PatRace.Other:
+						raceCode="2131-1";
+						break;
+					case PatRace.White:
+						raceCode="2106-3";
+						break;
+					default:
+						break;
+				}
+				if(raceCode=="") {
+					continue;
+				}
+				if(retval!="") {
+					retval+=def.RepetitionSeparator;
+				}
+				retval+=gConcat(def.ComponentSeparator,raceCode,listPatRaces[i].Race.ToString(),"CDCREC","","","","1");
+			}
+			return retval;
 		}
 
 		private static string gTreatArea(string componentSep,Procedure proc,bool isQuadAsToothNum) {
@@ -320,17 +760,18 @@ namespace OpenDentBusiness.HL7 {
 		private static string gXTN(string phone,int numDigits) {
 			string retVal="";
 			for(int i=0;i<phone.Length;i++) {
-				if(Char.IsNumber(phone,i)) {
-					if(retVal=="" && phone.Substring(i,1)=="1") {
-						continue;//skip leading 1.
-					}
-					retVal+=phone.Substring(i,1);
+				if(!Char.IsNumber(phone,i)) {
+					continue;
 				}
-				if(retVal.Length==numDigits) {
-					return retVal;
+				if(retVal=="" && phone.Substring(i,1)=="1") {
+					continue;//skip leading 1.
 				}
+				retVal+=phone.Substring(i,1);
 			}
-			//never made it to 10
+			if(retVal.Length==numDigits) {
+				return retVal;
+			}
+			//not a 10 digit number
 			return "";
 		}
 	}

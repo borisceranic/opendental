@@ -71,6 +71,10 @@ namespace OpenDentBusiness {
 		AIL,
 		///<summary>Personnel Resource Appointment Information</summary>
 		AIP,
+		///<summary>Allergy Information</summary>
+		AL1,
+		///<summary>Appointment Request Information</summary>
+		ARQ,
 		///<summary>Diagnosis Information</summary>
 		DG1,
 		///<summary>Event Type</summary>
@@ -87,6 +91,8 @@ namespace OpenDentBusiness {
 		MSH,
 		///<summary>Next of Kin</summary>
 		NK1,
+		///<summary>Notes and Comments</summary>
+		NTE,
 		///<summary>Observations Request</summary>
 		OBR,
 		///<summary>Observation Related to OBR</summary>
@@ -97,14 +103,22 @@ namespace OpenDentBusiness {
 		PID,
 		///<summary>Patient additional demographics</summary>
 		PD1,
+		///<summary>Procedures</summary>
+		PR1,
+		///<summary>Problem Detail</summary>
+		PRB,
 		///<summary>Patient Visit</summary>
 		PV1,
+		///<summary>Resource Group Segment</summary>
+		RGS,
 		///<summary>Pharmacy Administration Segment</summary>
 		RXA,
 		///<summary>Pharmacy/Treatment Route</summary>
 		RXR,
 		///<summary>Scheduling Activity Information</summary>
 		SCH,
+		///<summary>Timing/Quantity</summary>
+		TQ1,
 		///<summary>This can happen for unsupported segments.</summary>
 		Unknown,
 		///<summary>We use for PDF Data</summary>

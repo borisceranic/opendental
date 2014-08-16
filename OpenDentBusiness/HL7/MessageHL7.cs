@@ -12,6 +12,8 @@ namespace OpenDentBusiness.HL7 {
 		public string AckCode;
 		///<summary>We will grab the event type sent to us to echo back to eCW in acknowledgment. All ADT's and SIU's will be treated the same, so while they may send an event type we do not have in our enumeration, we still want to process it and send back the ACK with the correct event type.</summary>
 		public string AckEvent;
+		///<summary>The default delimiters are: ^ component separator, ~ repetition separator, \ escape character, and &amp; subcomponent separator.  In that order.</summary>
+		public char[] Delimiters;
 
 		///<summary>Only use this constructor when generating a message instead of parsing a message.</summary>
 		internal MessageHL7(MessageTypeHL7 msgType) {
@@ -20,6 +22,16 @@ namespace OpenDentBusiness.HL7 {
 			ControlId="";
 			AckCode="";
 			AckEvent="";
+			Delimiters=new char[] { '^','~','\\','&' };//this is the default delimiters
+			//if def is enabled, set delimiters to user defined values
+			HL7Def enabledDef=HL7Defs.GetOneDeepEnabled();
+			if(enabledDef!=null) {
+				Delimiters=new char[4];
+				Delimiters[0]=enabledDef.ComponentSeparator.ToCharArray()[0];//the enabled def is forced to have a component separator that is a single character
+				Delimiters[1]=enabledDef.RepetitionSeparator.ToCharArray()[0];//the enabled def is forced to have a repetition separator that is a single character
+				Delimiters[2]=enabledDef.EscapeCharacter.ToCharArray()[0];//the enabled def is forced to have an escape character that is a single character
+				Delimiters[3]=enabledDef.SubcomponentSeparator.ToCharArray()[0];//the enabled def is forced to have a subcomponent separator that is a single character
+			}
 		}
 
 		public MessageHL7(string msgtext) {
@@ -29,9 +41,20 @@ namespace OpenDentBusiness.HL7 {
 			originalMsgText=msgtext;
 			Segments=new List<SegmentHL7>();
 			string[] rows=msgtext.Split(new string[] { "\r","\n" },StringSplitOptions.RemoveEmptyEntries);
+			//We need to get the separator characters in order to create the field objects.
+			//The separators are part of the MSH segment and we force users to leave them in position 1 for incoming messages.
+			Delimiters=new char[] { '^','~','\\','&' };//this is the default, but we will get them from the MSH segment of the incoming message in case they are using something unique.
+			for(int i=0;i<rows.Length;i++) {
+				string[] fields=rows[i].Split(new string[] { "|" },StringSplitOptions.None);
+				if(fields.Length>1 && fields[0]=="MSH" && fields[1].Length>0) {
+					//Encoding characters are in the following order:  component separator, repetition separator, escape character, subcomponent separator
+					Delimiters=fields[1].ToCharArray();//we force users to leave the delimiters in position 1 of the MSH segment
+					break;
+				}
+			}
 			SegmentHL7 segment;
 			for(int i=0;i<rows.Length;i++) {
-				segment=new SegmentHL7(rows[i]);//this creates the field objects.
+				segment=new SegmentHL7(rows[i],Delimiters);//this creates the field objects.
 				Segments.Add(segment);
 				if(i==0 && segment.Name==SegmentNameHL7.MSH) {
 //js 7/3/12 Make this more intelligent because we also now need the suffix
@@ -45,20 +68,32 @@ namespace OpenDentBusiness.HL7 {
 					else if(msgtype==MessageTypeHL7.ACK.ToString()) {
 						MsgType=MessageTypeHL7.ACK;
 					}
-					else if(msgtype==MessageTypeHL7.SIU.ToString()) {
-						MsgType=MessageTypeHL7.SIU;
-					}
 					else if(msgtype==MessageTypeHL7.DFT.ToString()) {
 						MsgType=MessageTypeHL7.DFT;
 					}
-					if(evnttype==EventTypeHL7.A04.ToString()) {
+					else if(msgtype==MessageTypeHL7.PPR.ToString()) {
+						MsgType=MessageTypeHL7.PPR;
+					}
+					else if(msgtype==MessageTypeHL7.SIU.ToString()) {
+						MsgType=MessageTypeHL7.SIU;
+					}
+					else if(msgtype==MessageTypeHL7.SRM.ToString()) {
+						MsgType=MessageTypeHL7.SRM;
+					}
+					if(evnttype=="A04" || evnttype=="A08") {
 						EventType=EventTypeHL7.A04;
 					}
 					else if(evnttype==EventTypeHL7.P03.ToString()) {
 						EventType=EventTypeHL7.P03;
 					}
-					else if(evnttype==EventTypeHL7.S12.ToString()) {
+					else if(evnttype=="S12" || evnttype=="S13" || evnttype=="S14" || evnttype=="S15" || evnttype=="S17") {
 						EventType=EventTypeHL7.S12;
+					}
+					else if(evnttype=="PC1" || evnttype=="PC2") {
+						EventType=EventTypeHL7.PC1_PC2;
+					}
+					else if(evnttype=="S03" || evnttype=="S04") {
+						EventType=EventTypeHL7.S03_S04;
 					}
 				}
 			}
@@ -76,7 +111,7 @@ namespace OpenDentBusiness.HL7 {
 			return retVal;
 		}
 
-		///<summary>If an optional segment is not present, it will return null.</summary>
+		///<summary>If an optional segment is not present, this will return null.  If a required segment is missing, this will throw an exception.</summary>
 		public SegmentHL7 GetSegment(SegmentNameHL7 segmentName,bool isRequired) {
 			for(int i=0;i<Segments.Count;i++) {
 				if(Segments[i].Name==segmentName) {
@@ -89,21 +124,20 @@ namespace OpenDentBusiness.HL7 {
 			return null;
 		}
 
-		/*
-		///<summary>The list will be ordered by sequence number.</summary>
-		public List<SegmentHL7> GetSegments(SegmentName segmentName) {
+		///<summary>If an optional segment is not present, this will return an empty list.  If a required segment is missing, this will throw an exception.</summary>
+		public List<SegmentHL7> GetSegments(SegmentNameHL7 segmentName,bool isRequired) {
 			List<SegmentHL7> retVal=new List<SegmentHL7>();
 			for(int i=0;i<Segments.Count;i++) {
 				if(Segments[i].Name!=segmentName) {
 					continue;
 				}
-				if(Segments[i].GetFieldFullText(1) != (retVal.Count+1).ToString()){//wrong sequence number
-					continue;
-				}
 				retVal.Add(Segments[i]);
 			}
+			if(isRequired && retVal.Count==0) {
+				throw new ApplicationException(segmentName+" segment is missing.");
+			}
 			return retVal;
-		}*/
+		}
 
 	}
 

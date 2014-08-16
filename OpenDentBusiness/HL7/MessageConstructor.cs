@@ -30,16 +30,36 @@ namespace OpenDentBusiness.HL7 {
 			if(hl7DefMessage==null) {//DFT message type is not defined so do nothing and return
 				return null;
 			}
+			List<PatPlan> patplanList=PatPlans.Refresh(pat.PatNum);
 			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
 				int countRepeat=1;
 				if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.FT1) {
 					countRepeat=procList.Count;
 				}
+				else if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
+					countRepeat=patplanList.Count;
+				}
 				//for example, countRepeat can be zero in the case where we are only sending a PDF of the TP to eCW, and no procs.
-				for(int repeat=0;repeat<countRepeat;repeat++) {//FT1 is optional and can repeat so add as many FT1's as procs in procList
-					//if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.FT1) {
+				//or the patient does not have any current insplans for IN1 segments
+				for(int repeat=0;repeat<countRepeat;repeat++) {//FT1 is optional and can repeat so add as many FT1's as procs in procList, IN1 is optional and can repeat as well, repeat for the number of patplans in patplanList
 					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.FT1 && procList.Count>repeat) {
 						prov=Providers.GetProv(procList[repeat].ProvNum);
+					}
+					Procedure proc=null;
+					if(procList.Count>repeat) {//procList could be an empty list
+						proc=procList[repeat];
+					}
+					PatPlan patplanCur=null;
+					InsPlan insplanCur=null;
+					InsSub inssubCur=null;
+					Carrier carrierCur=null;
+					Patient patSub=null;
+					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1 && patplanList.Count>repeat) {
+						patplanCur=patplanList[repeat];
+						inssubCur=InsSubs.GetOne(patplanCur.InsSubNum);
+						insplanCur=InsPlans.RefreshOne(inssubCur.PlanNum);
+						carrierCur=Carriers.GetCarrier(insplanCur.CarrierNum);
+						patSub=Patients.GetPat(inssubCur.Subscriber);
 					}
 					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
 					seg.SetField(0,hl7DefMessage.hl7DefSegments[s].SegmentName.ToString());
@@ -51,12 +71,9 @@ namespace OpenDentBusiness.HL7 {
 						else {
 							//seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,
 							//FieldConstructor.GenerateDFT(hl7Def,fieldName,pat,prov,procList[repeat],guar,apt,repeat+1,eventType,pdfDescription,pdfDataString));
-							Procedure proc=null;
-							if(procList.Count>repeat) {//procList could be an empty list
-								proc=procList[repeat];
-							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,
-								FieldConstructor.GenerateDFT(hl7Def,fieldName,pat,prov,proc,guar,apt,repeat+1,eventType,pdfDescription,pdfDataString));
+								FieldConstructor.GenerateDFT(hl7Def,fieldName,pat,prov,proc,guar,apt,repeat+1,eventType,pdfDescription,pdfDataString,
+								patplanCur,inssubCur,insplanCur,carrierCur,patplanList.Count,patSub));
 						}
 					}
 					messageHL7.Segments.Add(seg);

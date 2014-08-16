@@ -40,7 +40,7 @@ namespace OpenDentBusiness{
 				return Patients.GetPat(PIn.Long(IDNumber));
 			}
 			else {
-				OIDExternal oidExt=OIDExternals.GetByRootAndExtention(OID,IDNumber);
+				OIDExternal oidExt=OIDExternals.GetByRootAndExtension(OID,IDNumber);
 				if(oidExt==null || oidExt.IDType!=IdentifierType.Patient) {
 					return null;//OID either not found, or does not represent a patient.
 				}

@@ -215,6 +215,17 @@ namespace OpenDentBusiness{
 			return -1;
 		}
 
+		///<summary>Used by HL7 when parsing incoming messages.  Returns the ClinicNum of the clinic with Description matching exactly (not case sensitive) the description provided.  Returns 0 if no clinic is found with this exact description.  There may be more than one clinic with the same description, but this will return the first one in the list.</summary>
+		public static long GetByDesc(string description) {
+			//No need to check RemotingRole; no call to db.
+			for(int i=0;i<List.Length;i++) {
+				if(List[i].Description.ToLower()==description.ToLower()) {
+					return List[i].ClinicNum;
+				}
+			}
+			return 0;
+		}
+
 	}
 	
 

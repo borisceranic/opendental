@@ -267,6 +267,24 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets a list of providers from ListLong.  If none found or if either lName or fName are an empty string, returns an empty list.  There may be more than on provider with the same FName and LName so we will return a list of all such providers.  Usually only one will exist with the FName and LName provided so list returned will have count 0 or 1 normally.  Matches name case-insensitive.</summary>
+		public static List<Provider> GetProvsByFLName(string lName,string fName) {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> retval=new List<Provider>();
+			if(lName=="" || lName==null || fName=="" || fName==null) {
+				return retval;
+			}
+			if(ProviderC.ListLong==null) {
+				RefreshCache();
+			}
+			for(int i=0;i<ProviderC.ListLong.Count;i++) {
+				if(ProviderC.ListLong[i].LName.ToLower()==lName.ToLower() && ProviderC.ListLong[i].FName.ToLower()==fName.ToLower()) {
+					retval.Add(ProviderC.ListLong[i].Copy());
+				}
+			}
+			return retval;
+		}
+
 		///<summary>Gets a provider from the List.  If EcwID is not found, then it returns null.</summary>
 		public static Provider GetProvByEcwID(string eID) {
 			//No need to check RemotingRole; no call to db.

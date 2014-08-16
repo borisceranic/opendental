@@ -245,6 +245,20 @@ namespace OpenDentBusiness {
 			return 0;
 		}
 
+		///<summary>Returns the DiseaseDefNum based on SNOMEDCode.  If no match or if SnomedCode is an empty string returns 0.  Only matches SNOMEDCode, not ICD9 or ICD10.</summary>
+		public static long GetNumFromSnomed(string SnomedCode) {
+			//No need to check RemotingRole; no call to db.
+			if(SnomedCode=="") {
+				return 0;
+			}
+			for(int i=0;i<ListLong.Length;i++) {
+				if(ListLong[i].SnomedCode==SnomedCode) {
+					return ListLong[i].DiseaseDefNum;
+				}
+			}
+			return 0;
+		}
+
 		///<summary>Returns the diseaseDef with the specified num.  Will match hidden diseasedefs.</summary>
 		public static DiseaseDef GetItem(long diseaseDefNum) {
 			//No need to check RemotingRole; no call to db.
