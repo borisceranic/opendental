@@ -79,6 +79,8 @@ namespace OpenDentBusiness {
 		SIU,
 		///<summary>Schedule Request Message - Event types S01 through S11.  Currently only S03 and S04 events are supported.  Not used for eCW, inbound for other interfaces.</summary>
 		SRM,
+		///<summary>Schedule Request Response - Event types S01 through S11.  Currently only S03 and S04 events are supported.  Not used for eCW, inbound for other interfaces.</summary>
+		SRR,
 		///<summary>Unsolicited Vaccination Record Update - V04</summary>
 		VXU
 	}

@@ -248,6 +248,7 @@ namespace OpenDental {
 				Patient patOld=newPat.Copy();
 				newPat.Guarantor=newPat.PatNum;
 				Patients.Update(newPat,patOld);
+//Cameron_ Create outbound ADT message
 			}
 			catch(Exception e) {
 				gridMain.EndUpdate();

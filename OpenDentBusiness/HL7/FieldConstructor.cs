@@ -13,8 +13,31 @@ namespace OpenDentBusiness.HL7 {
 	public class FieldConstructor {
 		private static bool _isEcwDef;
 
-		///<summary>apt, guar, proc, prov, pdfDataString, patplanCur, inssubCur, insplanCur, and carrierCur can be null and will return an empty string if a field requires that object</summary>
-		public static string GenerateDFT(HL7Def def,string fieldName,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
+		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
+		public static string GenerateFieldDFT(HL7Def def,string fieldName,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
+			return GenerateField(def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,sequenceNum,eventType,pdfDescription,pdfDataString,
+				patplanCur,inssubCur,insplanCur,carrierCur,patplanCount,patSub,null,false,null);
+		}
+		
+		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
+		public static string GenerateFieldADT(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,int sequenceNum,EventTypeHL7 eventType,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
+			return GenerateField(def,fieldName,MessageTypeHL7.ADT,pat,prov,null,guar,null,sequenceNum,eventType,null,null,
+				patplanCur,inssubCur,insplanCur,carrierCur,patplanCount,patSub,null,false,null);
+		}
+		
+		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
+		public static string GenerateFieldSIU(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType) {
+			return GenerateField(def,fieldName,MessageTypeHL7.SIU,pat,prov,null,guar,apt,sequenceNum,eventType,null,null,null,null,null,null,-1,null,null,false,null);
+		}
+		
+		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
+		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,EventTypeHL7 eventType,string controlId,bool isAck,string ackEvent) {
+			string s=null;
+			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,-1,eventType,null,null,null,null,null,null,-1,null,controlId,isAck,ackEvent);
+		}
+
+		///<summary>apt, guar, proc, prov, pdfDescription, pdfDataString, patplanCur, inssubCur, insplanCur, carrierCur, and patSub can be null and will return an empty string if a field requires that object</summary>
+		public static string GenerateField(HL7Def def,string fieldName,MessageTypeHL7 msgType,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub,string controlId,bool isAck,string ackEvent) {
 			string retval="";
 			if(def.InternalType==HL7InternalType.eCWFull
 				|| def.InternalType==HL7InternalType.eCWTight
@@ -24,6 +47,11 @@ namespace OpenDentBusiness.HL7 {
 			}
 			//big long list of fieldnames that we support
 			switch(fieldName) {
+				case "ackCode":
+					if(ackEvent==null) {
+						return "";//ackCode is only valid when ackEvent is provided, otherwise return empty string
+					}
+					return gAck(isAck);
 				#region Appointment
 				case "apt.AptNum":
 					if(apt==null) {
@@ -88,7 +116,7 @@ namespace OpenDentBusiness.HL7 {
 					return gDTM(DateTime.Now,14);
 				case "eventType":
 					return eventType.ToString();
-				#region Guardian
+				#region Guarantor
 				case "guar.addressCityStateZip":
 					if(guar==null) {
 						return "";
@@ -189,7 +217,7 @@ namespace OpenDentBusiness.HL7 {
 							def.SubcomponentSeparator+listGuarOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
 					}
 					return retval;
-				#endregion Guardian
+				#endregion Guarantor
 				#region InsPlan
 				case "insplan.cob":
 					if(insplanCur==null) {
@@ -298,9 +326,12 @@ namespace OpenDentBusiness.HL7 {
 					return gConcat(def.ComponentSeparator,patSub.LName,patSub.FName,patSub.MiddleI);
 				#endregion InsSub
 				case "messageControlId":
+					if(controlId!=null) {
+						return controlId;
+					}
 					return Guid.NewGuid().ToString("N");
 				case "messageType":
-					return gConcat(def.ComponentSeparator,"DFT",eventType.ToString(),"DFT_"+eventType.ToString());
+					return gConcat(def.ComponentSeparator,msgType.ToString(),eventType.ToString(),msgType.ToString()+"_"+eventType.ToString());
 				#region Patient
 				case "pat.addressCityStateZip":
 					retval=gConcat(def.ComponentSeparator,pat.Address,pat.Address2,pat.City,pat.State,pat.Zip);
@@ -454,6 +485,9 @@ namespace OpenDentBusiness.HL7 {
 					return "OTH";
 				#endregion PatPlan
 				case "pdfDescription":
+					if(pdfDescription==null) {
+						return "";
+					}
 					return pdfDescription;
 				case "pdfDataAsBase64":
 					if(pdfDataString==null) {
@@ -567,8 +601,7 @@ namespace OpenDentBusiness.HL7 {
 			}
 		}
 
-		public static string GenerateACK(HL7Def def,string fieldName,string controlId,bool isAck,string ackEvent) {
-			//big long list of fieldnames that we support
+		public static string GenerateFieldACK(HL7Def def,string fieldName,string controlId,bool isAck,string ackEvent) {
 			switch(fieldName) {
 				case "ackCode":
 					return gAck(isAck);

@@ -3395,6 +3395,7 @@ namespace OpenDental{
 					}
 				}
 			}
+//Cameron_ Create outbound ADT message
 			DialogResult=DialogResult.OK;
 		}
 

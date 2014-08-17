@@ -1917,6 +1917,7 @@ namespace OpenDental {
 				PatPlans.Insert(patplan);
 			}
 			SelectedPatNum=guar.PatNum;
+//Cameron_ Create outbound ADT message(s) for all new patients
 			MessageBox.Show("Done");
 			DialogResult=DialogResult.OK;
 		}

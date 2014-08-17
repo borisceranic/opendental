@@ -409,6 +409,29 @@ namespace OpenDentBusiness.HL7 {
 			}
 			HL7MsgCur.HL7Status=HL7MessageStatus.InProcessed;
 			HL7Msgs.Update(HL7MsgCur);
+			//Schedule Request Messages require a Schedule Request Response if the data requested to be changed was successful
+			//We only allow changing the appt note, setting the dentist and hygienist, updating the confirmation status, and changing the ClinicNum.
+			//We also allow setting the appt status to broken if the EventType is S04 - Request Appointment Cancellation.
+			//We will generate the SRR if we get here, since we will have processed the message properly.
+			//The SRM will be ACK'd after returning from this Process method in ServiceHL7.
+			//Our SRR will also be ACK'd by the receiving software.
+			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM) {
+				if(aptCur==null) {
+					return;//we cannot generate an SRR without an appointment
+				}
+				if(msg.AckEvent=="S04") {
+					Appointment aptOld=aptCur.Clone();
+					aptCur.AptStatus=ApptStatus.Broken;
+					Appointments.Update(aptCur,aptOld);
+				}
+				MessageHL7 hl7SRR=MessageConstructor.GenerateSRR(pat,aptCur,msg.EventType,msg.ControlId,true,msg.AckEvent);
+				HL7Msg hl7Msg=new HL7Msg();
+				hl7Msg.AptNum=aptCur.AptNum;
+				hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+				hl7Msg.MsgText=hl7SRR.ToString();
+				hl7Msg.PatNum=pat.PatNum;
+				HL7Msgs.Insert(hl7Msg);
+			}
 		}
 
 		public static void ProcessAck(MessageHL7 msg,bool isVerboseLogging) {
@@ -453,7 +476,7 @@ namespace OpenDentBusiness.HL7 {
 					ProcessAL1(pat,segDef,seg);
 					return;
 				case SegmentNameHL7.ARQ:
-					ProcessARQ(pat,apt,segDef,seg);
+					ProcessARQ(pat,apt,segDef,seg,msg);
 					return;
 				case SegmentNameHL7.GT1:
 					ProcessGT1(pat,segDef,seg,msg);
@@ -670,8 +693,8 @@ namespace OpenDentBusiness.HL7 {
 			return;
 		}
 
-		///<summary>Appointment request segment.  Included in inbound SRM, Schedule Request Messages.  When OD is the filler application, this will identify the appointment that the placer or auxiliary aplication is trying to update.  We only support event S03 - Appt Modification requests or event S04 - Appt Cancellation requests for now.  If an appointment cannot be located by the </summary>
-		public static void ProcessARQ(Patient pat,Appointment apt,HL7DefSegment segDef,SegmentHL7 seg) {
+		///<summary>Appointment request segment.  Included in inbound SRM, Schedule Request Messages.  When OD is the filler application, this will identify the appointment that the placer or auxiliary aplication is trying to update.  We only support event S03 - Appt Modification requests or event S04 - Appt Cancellation requests for now.</summary>
+		public static void ProcessARQ(Patient pat,Appointment apt,HL7DefSegment segDef,SegmentHL7 seg,MessageHL7 msg) {
 			long aptNum=0;
 			string externAptID="";
 			string externRoot="";
