@@ -419,7 +419,7 @@ namespace OpenDentBusiness{
 		public static int CalculatePageCount(Sheet sheet,System.Drawing.Printing.Margins m) {
 			int pageCount=1;
 			int curYPos=0;
-			sheet.SheetFields.Sort(OpenDentBusiness.SheetFields.SortBottomBounds);
+			sheet.SheetFields.Sort(OpenDentBusiness.SheetFields.SortDrawingOrder);
 			for(int i=0;i<sheet.SheetFields.Count;i++) {
 				if(sheet.SheetFields[i].Bounds.Bottom>curYPos+sheet.HeightPage-m.Bottom //if field would spill onto next page
 					&& sheet.SheetFields[i].Height<sheet.HeightPage-m.Bottom) { //and field is not taller than the entire page

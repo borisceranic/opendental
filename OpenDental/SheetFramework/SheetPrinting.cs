@@ -14,22 +14,24 @@ using PdfSharp.Pdf;
 namespace OpenDental {
 	public class SheetPrinting {
 		///<summary>If there is only one sheet, then this will stay 0.</Summary>
-		private static int sheetsPrinted;
+		private static int _sheetsPrinted;
 		///<summary>Pages printed on current sheet. Only used for printing, not for generating PDFs.</summary>
-		private static int pagesPrinted;
+		private static int _pagesPrinted;
 		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
 		private static int _yPosPrint;
 		///<summary>Print margin of the default printer. only used in page break calulations, and only top and bottom are used.</summary>
 		private static Margins _printMargin=new Margins(0,0,40,60);
 		///<summary>If not a batch, then there will just be one sheet in the list.</summary>
-		private static List<Sheet> SheetList;
+		private static List<Sheet> _sheetList;
+		///<summary>Used to force old single page behavior. Used for labels.</summary>
+		private static bool _forceSinglePage;
 
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch){
 			//currently no validation for parameters in a batch because of the way it was created.
 			//could validate field names here later.
-			SheetList=sheetBatch;
-			sheetsPrinted=0;
+			_sheetList=sheetBatch;
+			_sheetsPrinted=0;
 			_yPosPrint=0;
 			PrintDocument pd=new PrintDocument();
 			pd.OriginAtMargins=true;
@@ -52,7 +54,12 @@ namespace OpenDental {
 			//later: add a check here for print preview.
 			#if DEBUG
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
-				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,SheetList.Count,0,"Batch of "+sheetBatch[0].Description+" printed");
+				int pageCount=0;
+				foreach(Sheet s in _sheetList) {
+					SetForceSinglePage(s);
+					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+				}
+				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
 				printPreview.ShowDialog();
 			#else
 				try {
@@ -87,11 +94,11 @@ namespace OpenDental {
 		public static void Print(Sheet sheet,int copies,bool isRxControlled){
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
-			SheetList=new List<Sheet>();
+			_sheetList=new List<Sheet>();
 			for(int i=0;i<copies;i++){
-				SheetList.Add(sheet.Copy());
+				_sheetList.Add(sheet.Copy());
 			}
-			sheetsPrinted=0;
+			_sheetsPrinted=0;
 			_yPosPrint=0;
 			PrintDocument pd=new PrintDocument();
 			pd.OriginAtMargins=true;
@@ -109,6 +116,7 @@ namespace OpenDental {
 					pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height);
 				}
 			}
+			SetForceSinglePage(sheet);
 			PrintSituation sit=PrintSituation.Default;
 			pd.DefaultPageSettings.Landscape=sheet.IsLandscape;
 			switch(sheet.SheetType){
@@ -134,7 +142,12 @@ namespace OpenDental {
 			#if DEBUG
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
 				FormPrintPreview printPreview;
-				printPreview=new FormPrintPreview(sit,pd,Sheets.CalculatePageCount(sheet,_printMargin),sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
+				int pageCount=0;
+				foreach(Sheet s in _sheetList) {
+					SetForceSinglePage(s);
+					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+				}
+				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 				printPreview.ShowDialog();
 			#else
 				try {
@@ -158,11 +171,37 @@ namespace OpenDental {
 			#endif
 		}
 
+		private static void SetForceSinglePage(Sheet sheet) {
+			switch(sheet.SheetType) {
+				case SheetTypeEnum.DepositSlip:
+				case SheetTypeEnum.LabelAppointment:
+				case SheetTypeEnum.LabelPatient:
+				case SheetTypeEnum.LabelCarrier:
+				case SheetTypeEnum.LabelReferral:
+				case SheetTypeEnum.Rx:
+					_forceSinglePage=true;
+					break;
+				case SheetTypeEnum.Consent:
+				case SheetTypeEnum.ExamSheet:
+				case SheetTypeEnum.MedicalHistory:
+				case SheetTypeEnum.PatientForm:
+				case SheetTypeEnum.PatientLetter:
+				case SheetTypeEnum.ReferralLetter:
+				case SheetTypeEnum.ReferralSlip:
+				case SheetTypeEnum.RoutingSlip:
+				case SheetTypeEnum.LabSlip:
+				default:
+					_forceSinglePage=false;
+					break;
+			}
+		}
+
 		private static void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Graphics g=e.Graphics;
 			g.SmoothingMode=SmoothingMode.HighQuality;
-			Sheet sheet=SheetList[sheetsPrinted];
+			Sheet sheet=_sheetList[_sheetsPrinted];
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
+			SetForceSinglePage(sheet);
 			Font font;
 			FontStyle fontstyle;
 			//first, draw images------------------------------------------------------------------------------------
@@ -174,12 +213,14 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) { 
-					continue; //skip if on previous page
-				} 
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) { 
-					break; //Skip if on next page
-				} 
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
+				}
 				if(field.FieldType!=SheetFieldType.Drawing) {
 					continue;
 				}
@@ -199,12 +240,14 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			Pen pen2=new Pen(Brushes.Black,1f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType==SheetFieldType.Rectangle) {
 					g.DrawRectangle(pen2,field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
 				}
@@ -218,12 +261,14 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.InputField
 				&& field.FieldType!=SheetFieldType.OutputText
 				&& field.FieldType!=SheetFieldType.StaticText) {
@@ -243,12 +288,14 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			Pen pen3=new Pen(Brushes.Black,1.6f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.CheckBox) {
 					continue;
 				}
@@ -259,12 +306,14 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.SigBox) {
 					continue;
 				}
@@ -286,29 +335,31 @@ namespace OpenDental {
 				Bitmap sigBitmap=wrapper.GetSigImage();
 				g.DrawImage(sigBitmap,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
 			}
-			//Set the _yPosPrint for the next page
-			foreach(SheetField field in sheet.SheetFields) {
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
-					_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
-					break;
+			if(!_forceSinglePage) {
+				//Set the _yPosPrint for the next page
+				foreach(SheetField field in sheet.SheetFields) {
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
+						_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
+						break;
+					}
 				}
+				_pagesPrinted++;
 			}
-			pagesPrinted++;
 			g.Dispose();
-			if(pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
+			if(!_forceSinglePage && _pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
-				pagesPrinted=0;
-				sheetsPrinted++;
+				_pagesPrinted=0;
+				_sheetsPrinted++;
 				//heightsCalculated=false;
-				if(sheetsPrinted<SheetList.Count){
+				if(_sheetsPrinted<_sheetList.Count){
 					e.HasMorePages=true;
 				}
 				else{
 					e.HasMorePages=false;
-					sheetsPrinted=0;
+					_sheetsPrinted=0;
 				}	
 			}
 		}
@@ -316,7 +367,8 @@ namespace OpenDental {
 		public static void CreatePdf(Sheet sheet,string fullFileName) {
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
-			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
+			SetForceSinglePage(sheet);
+			int pageCount=(_forceSinglePage?1:Sheets.CalculatePageCount(sheet,_printMargin));
 			for(int i=0;i<pageCount;i++) {
 				PdfPage page=document.AddPage();
 				CreatePdfPage(sheet,page);
@@ -339,7 +391,7 @@ namespace OpenDental {
 			//already done?:SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
 			XFont xfont;
 			XFontStyle xfontstyle;
-			sheet.SheetFields.Sort(SheetFields.SortBottomBounds);
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);
 			//first, draw images--------------------------------------------------------------------------------------
 			DrawImagesToPdf(sheet,g);
 			//then, drawings--------------------------------------------------------------------------------------------
@@ -349,12 +401,14 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.Drawing){
 					continue;
 				}
@@ -374,12 +428,14 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			XPen pen2=new XPen(XColors.Black,p(1));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType==SheetFieldType.Rectangle){
 					g.DrawRectangle(pen2,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
 				}
@@ -393,12 +449,14 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.InputField
 					&& field.FieldType!=SheetFieldType.OutputText
 					&& field.FieldType!=SheetFieldType.StaticText)
@@ -421,12 +479,14 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			XPen pen3=new XPen(XColors.Black,p(1.6f));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.CheckBox){
 					continue;
 				}
@@ -437,12 +497,14 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.YPos<_yPosPrint) {
-					continue; //skip if on previous page
+				if(!_forceSinglePage) {
+					if(field.YPos<_yPosPrint) {
+						continue; //skip if on previous page
+					}
+					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
+						break; //Skip if on next page
+					}
 				}
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-					break; //Skip if on next page
-				} 
 				if(field.FieldType!=SheetFieldType.SigBox){
 					continue;
 				}
@@ -463,6 +525,9 @@ namespace OpenDental {
 				}
 				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
 				g.DrawImage(sigBitmap,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
+			}
+			if(_forceSinglePage) {
+				return;
 			}
 			//Set the _yPosPrint for the next page
 			foreach(SheetField field in sheet.SheetFields) {
@@ -488,11 +553,11 @@ namespace OpenDental {
 		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing, exporting to pdfs, or rendering the sheet fill edit window.  graphic should be null for pdfs and xgraphic should be null for printing and rendering the sheet fill edit window.</summary>
 		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic,bool drawAll=false) {
 			Bitmap bmpOriginal=null;
+			if(drawAll || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
+				_yPosPrint=0;
+			}
 			foreach(SheetField field in sheet.SheetFields) {
-				if(drawAll) {//reset _yPosPrint because we are drawing all.
-					_yPosPrint=0;
-				}
-				else {
+				if(!drawAll && !_forceSinglePage) {
 					if(field.YPos<_yPosPrint) {
 						continue; //skip if on previous page
 					}
