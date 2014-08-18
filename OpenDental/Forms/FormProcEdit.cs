@@ -3307,7 +3307,8 @@ namespace OpenDental{
 					//sigBox.SetSigCompressionMode(0);
 					//sigBox.SetEncryptionMode(0);
 					sigBox.SetKeyString("0000000000000000");
-					sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
+					//Note.Replace("\r\n","\n") will only revert the changes Middle Tier made to the note back it's original form, which would invalidate this signature. No effect when not using Middle Tier.
+					sigBox.SetAutoKeyData(ProcCur.Note.Replace("\r\n","\n")+ProcCur.UserNum.ToString());
 					//sigBox.SetEncryptionMode(2);//high encryption
 					//sigBox.SetSigCompressionMode(2);//high compression
 					sigBox.SetSigString(ProcCur.Signature);
