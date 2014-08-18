@@ -971,7 +971,7 @@ namespace OpenDental{
 						grid.SetSelected(i,true);
 					}
 				}
-				MsgBox.Show(this,"Some emails failed to send.");
+				MsgBox.Show(this,"Some emails failed to send.  All failed email confirmations have been selected in the confirmation list.");
 				return;
 			}
 			//none failed
