@@ -476,8 +476,8 @@ namespace OpenDental{
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(310, 29);
 			this.label18.TabIndex = 54;
-			this.label18.Text = "Optional.  If using on e-claims, cannot be a PO Box.  Overrides the practice addr" +
-    "ess on statements.";
+			this.label18.Text = "Optional.  Cannot be a PO Box if Use on Claims is checked.  Also overrides the pr" +
+    "actice address on EHG statements.";
 			// 
 			// checkUseBillingAddressOnClaims
 			// 
