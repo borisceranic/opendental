@@ -416,7 +416,6 @@ namespace OpenDental {
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = " ";
-			this.Activated += new System.EventHandler(this.FormEtrans835ClaimPay_Activated);
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimPay_Load);
 			this.Shown += new System.EventHandler(this.FormEtrans835ClaimPay_Shown);
 			this.ResumeLayout(false);
@@ -440,10 +439,10 @@ namespace OpenDental {
 		private void FormEtrans835ClaimPay_Shown(object sender,EventArgs e) {
 			InsPlan plan=InsPlans.GetPlan(ListClaimProcsForClaim[0].PlanNum,_listPlans);
 			if(plan.AllowedFeeSched!=0){//allowed fee sched
-				gridPayments.SetSelected(new Point(7,0));//Allowed, first row.
+				gridPayments.SetSelected(new Point(7,0));//Allowed column of the first row.
 			}
 			else{
-				gridPayments.SetSelected(new Point(8,0));//InsPay, first row.
+				gridPayments.SetSelected(new Point(8,0));//InsPay column of the first row.
 			}
 		}
 
@@ -930,10 +929,6 @@ namespace OpenDental {
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}
-
-		private void FormEtrans835ClaimPay_Activated(object sender,EventArgs e) {
-
 		}
 
 	}

@@ -237,7 +237,7 @@ namespace OpenDental {
 				formCE.ShowDialog();
 				isReadOnly=false;
 			}
-			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check
+			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check.
 				EnterPayment(claimPaid,claim);
 				isReadOnly=false;
 			}
@@ -246,7 +246,7 @@ namespace OpenDental {
 				formC.ShowDialog(this);
 			}
 			else {
-				claim=claimPaid.GetClaimFromDb();//Since the claim status might have changed above.
+				claim=claimPaid.GetClaimFromDb();//Refresh the claim, since the claim status might have changed above.
 				if(claim.ClaimStatus=="R") {
 					gridClaimDetails.Rows[e.Row].Cells[0].Text="X";//Indicate that payment is Received.
 				}
@@ -256,7 +256,8 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Enter either by total and/or by procedure, depending on whether or not procedure detail was provided in the 835 for this claim.</summary>
+		///<summary>Enter either by total and/or by procedure, depending on whether or not procedure detail was provided in the 835 for this claim.
+		///This function creates the payment claimprocs and displays the payment entry window.</summary>
 		private void EnterPayment(Hx835_Claim claimPaid,Claim claim) {
 			Patient pat=Patients.GetPat(claim.PatNum);
 			Family fam=Patients.GetFamily(claim.PatNum);
@@ -288,25 +289,33 @@ namespace OpenDental {
 					}
 				}
 			}
-			//First try to include the claimprocs which are not received.
+			//Choose the claimprocs which are not received.
 			for(int i=0;i<listClaimProcsForClaim.Count;i++) {
-				if(listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived && listClaimProcsForClaim[i].ProcNum>0) {
-					listClaimProcsToEdit.Add(listClaimProcsForClaim[i]);
+				if(listClaimProcsForClaim[i].ProcNum==0) {//Exclude any "by total" claimprocs.  Choose claimprocs for procedures only.
+					continue;
 				}
+				if(listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived) {//Ignore procedures already received.
+					continue;
+				}
+				listClaimProcsToEdit.Add(listClaimProcsForClaim[i]);//Procedures not yet received.
 			}
-			//Then try to include claimprocs if not paid on.
+			//If all claimprocs are received, then choose claimprocs if not paid on.
 			if(listClaimProcsToEdit.Count==0) {
 				for(int i=0;i<listClaimProcsForClaim.Count;i++) {
-					if(listClaimProcsForClaim[i].ClaimPaymentNum==0 && listClaimProcsForClaim[i].ProcNum>0) {
-						listClaimProcsToEdit.Add(listClaimProcsForClaim[i]);
+					if(listClaimProcsForClaim[i].ProcNum==0) {//Exclude any "by total" claimprocs.  Choose claimprocs for procedures only.
+						continue;
 					}
+					if(listClaimProcsForClaim[i].ClaimPaymentNum!=0) {//Exclude claimprocs already paid.
+						continue;
+					}
+					listClaimProcsToEdit.Add(listClaimProcsForClaim[i]);//Procedures not paid yet.
 				}
 			}
-			//For each unpaid procedure on the claim where the procedure information can be successfully located on the EOB, enter the payment information.
+			//For each NotReceived/unpaid procedure on the claim where the procedure information can be successfully located on the EOB, enter the payment information.
 			for(int i=0;i<listClaimProcsToEdit.Count;i++) {
 				ClaimProc claimProc=listClaimProcsToEdit[i];
 				List<Hx835_Proc> listProcsForProcNum=claimPaid.GetPaymentsForClaimProc(claimProc);
-				//If listProcsForProcNum.Count==0, then procedure payment details were not not found.
+				//If listProcsForProcNum.Count==0, then procedure payment details were not not found for this one specific procedure.
 				//This can happen with procedures from older 837s, when we did not send out the procedure identifiers, in which case ProcNum would be 0.
 				//Since we cannot place detail on the service line, we will leave the amounts for the procedure on the total payment line.
 				//If listProcsForPorcNum.Count==1, then we know that the procedure was adjudicated as is or it might have been bundled, but we treat both situations the same way.
@@ -335,12 +344,12 @@ namespace OpenDental {
 					claimProc.Status=ClaimProcStatus.Preauth;
 				}
 				else if(claim.ClaimType=="Cap") {
-					;//do nothing.  The claimprocstatus will remain Capitation.
+					//Do nothing.  The claimprocstatus will remain Capitation.
 				}
 				else {
 					claimProc.Status=ClaimProcStatus.Received;
-					claimProc.DateEntry=DateTime.Now;//date is was set rec'd
-					claimProc.PayPlanNum=insPayPlanNum;
+					claimProc.DateEntry=DateTime.Now;//Date is was set rec'd
+					claimProc.PayPlanNum=insPayPlanNum;//Payment plans do not exist for PreAuths or Capitation claims, by definition.
 				}
 				claimProc.DateCP=DateTimeOD.Today;
 			}
@@ -354,7 +363,7 @@ namespace OpenDental {
 				cpByTotal.WriteOff-=claimProc.WriteOff;
 			}
 			bool isByTotalIncluded=true;
-			//Do not create a total payment if the payment contains all zero amounts because it would not be useful.  Written to account for potential rounding errors in the amounts.
+			//Do not create a total payment if the payment contains all zero amounts, because it would not be useful.  Written to account for potential rounding errors in the amounts.
 			if(Math.Round(cpByTotal.DedApplied,2)==0 && Math.Round(cpByTotal.AllowedOverride,2)==0 && Math.Round(cpByTotal.InsPayAmt,2)==0 && Math.Round(cpByTotal.WriteOff,2)==0) {
 				isByTotalIncluded=false;
 			}
@@ -379,7 +388,8 @@ namespace OpenDental {
 				cpByTotal.ClinicNum=claim.ClinicNum;
 				cpByTotal.Remarks=claimPaid.GetRemarks();
 				cpByTotal.PayPlanNum=insPayPlanNum;
-				listClaimProcsForClaim.Insert(0,cpByTotal);//Add to the beginning of the list, so that the ins paid amount will be highlighted when FormEtrans835ClaimPay loads.
+				//Add the total payment to the beginning of the list, so that the ins paid amount for the total payment will be highlighted when FormEtrans835ClaimPay loads.
+				listClaimProcsForClaim.Insert(0,cpByTotal);
 			}
 			FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,claim,pat,fam,listInsPlans,listPatPlans,listInsSubs);
 			formP.ListClaimProcsForClaim=listClaimProcsForClaim;

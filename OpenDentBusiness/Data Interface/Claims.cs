@@ -439,22 +439,23 @@ namespace OpenDentBusiness{
 			return (Db.GetTable(command).Rows[0][0].ToString()!="0");
 		}
 
-		///<summary>Returns the claim with the specified fee, date of service, and beginning with the specified claimIdentifier, but only if there is exactly one claim matched.
-		///If there are multiple claims matched but only one is not received, then the not received claim will be returned.  Otherwise null is returned.</summary>
+		///<summary>Returns the claim with the specified fee and date of service.  The returned claim will also either begin with the specified claimIdentifier, or
+		///will be for the patient name and subscriber ID specified.  If no match was found, or multiple matches were found, then null is returned.</summary>
 		public static Claim GetClaimFromX12(string claimIdentifier,double claimFee,DateTime claimDateService,string patFname,string patLname,string subscriberId) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Claim>(MethodBase.GetCurrentMethod(),claimIdentifier);
+				return Meth.GetObject<Claim>(MethodBase.GetCurrentMethod(),claimIdentifier,claimFee,claimDateService,patFname,patLname,subscriberId);
 			}
 			//We always require the claim fee and date of service to match, then we use other criteria below to wisely choose from the shorter list of claims.
+			//The list of claims with matching fee and date of service should be very short.  Worst case, the list would contain all of the appointments for a single day if every claim had the same fee (rare).
 			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.Lname,patient.Fname,inssub.SubscriberID "
 				+"FROM claim "
 				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
 				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
-				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum "
-				+"WHERE ClaimFee="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+"="+POut.Date(claimDateService);
+				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum AND claim.PlanNum=inssub.PlanNum "
+				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+"="+POut.Date(claimDateService);
 			DataTable dtClaims=Db.GetTable(command);
 			if(dtClaims.Rows.Count==0) {
-				return null;//No matches found for the specific claim fee and date of service.  There is aboloutely no suitable match.
+				return null;//No matches found for the specific claim fee and date of service.  Aboloutely no suitable matches.
 			}
 			//Look for a single exact match by claim identifier.  This step is first, so that the user can override claim association to the 835 or 277 by changing the claim identifier if desired.
 			List<int> listIndiciesForIdentifier=new List<int>();
@@ -464,10 +465,11 @@ namespace OpenDentBusiness{
 					listIndiciesForIdentifier.Add(i);
 				}
 			}
-			if(listIndiciesForIdentifier.Count==0) {//No exact match found.
+			if(listIndiciesForIdentifier.Count==0 && claimIdentifier.Length>15) {//No exact match found.  Look for similar claim identifiers if the identifer was possibly truncated when sent out.
 				//Our claim identifiers can be longer than 20 characters (mostly when using replication). When the claim identifier is sent out on the claim, it is truncated to 20
 				//characters. Therefore, if the claim identifier is longer than 20 characters, then it was truncated when sent out, so we have to look for claims beginning with the 
-				//claim identifier given if there is not an exact match.
+				//claim identifier given if there is not an exact match.  We also send shorter identifiers for some clearinghouses.  For example, the maximum claim identifier length
+				//for Denti-Cal is 17 characters.
 				for(int i=0;i<dtClaims.Rows.Count;i++) {
 					string claimId=PIn.String(dtClaims.Rows[i]["ClaimIdentifier"].ToString());
 					if(claimId.StartsWith(claimIdentifier)) {
@@ -485,7 +487,7 @@ namespace OpenDentBusiness{
 			}
 			else if(listIndiciesForIdentifier.Count>1) {//Edge case.
 				//Multiple matches for the specified claim identifier AND date service AND fee.  The claim must have been split (rare because the split claims must have the same fee).
-				//Continue to more advanced matching below, although it probably will not help.  We could enhance by picking a claim based on the procedures attached, but that is not a guarantee either.
+				//Continue to more advanced matching below, although it probably will not help.  We could enhance this specific scenario by picking a claim based on the procedures attached, but that is not a guarantee either.
 			}
 			//Locate claims from the short list which match the patient name and subscriber ID.
 			List<int> listIndiciesForPatient=new List<int>();
@@ -494,7 +496,7 @@ namespace OpenDentBusiness{
 			for(int i=0;i<dtClaims.Rows.Count;i++) {
 				string lname=PIn.String(dtClaims.Rows[i]["Lname"].ToString()).ToLower();
 				string fname=PIn.String(dtClaims.Rows[i]["Fname"].ToString()).ToLower();
-				string subId=PIn.String(dtClaims.Rows[i]["SubscriberID"].ToString()).ToLower();
+				string subId=PIn.String(dtClaims.Rows[i]["SubscriberID"].ToString());
 				if(lname!=patLname) {
 					continue;
 				}
@@ -515,7 +517,7 @@ namespace OpenDentBusiness{
 				return Claims.GetClaim(claimNum);
 			}
 			else if(listIndiciesForPatient.Count>1) {//Edge case.
-				//Multiple matches (rare).  We might be able to pick the right claim based on the attached procedures, but we can worry about this situation later if it happens more than we expect.
+				//Multiple matches (rare).  We might be able to pick the correct claim based on the attached procedures, but we can worry about this situation later if it happens more than we expect.
 			}
 			return null;
 		}
