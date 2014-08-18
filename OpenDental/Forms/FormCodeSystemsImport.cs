@@ -163,7 +163,7 @@ namespace OpenDental {
 						using(ZipFile unzipped=ZipFile.Read(fdlg.FileName)) {
 							for(int unzipIndex=0;unzipIndex<unzipped.Count;unzipIndex++) {//unzip/write all files to the temp directory
 								ZipEntry ze=unzipped[unzipIndex];
-								if(!ze.FileName.ToLower().EndsWith("medu.txt.txt")) {
+								if(!ze.FileName.ToLower().Contains("medu.txt")) {  //This file used to be called "medu.txt.txt" and is now called "medu.txt".  Uses .Contains() to catch both cases.
 									continue;
 								}
 								ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
