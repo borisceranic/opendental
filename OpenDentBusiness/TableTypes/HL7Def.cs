@@ -70,20 +70,20 @@ namespace OpenDentBusiness{
 			return (HL7Def)this.MemberwiseClone();
 		}
 
-		public void AddMessage(HL7DefMessage msg,MessageTypeHL7 messageType,EventTypeHL7 eventType,InOutHL7 inOrOut,int itemOrder,string note) {
+		public void AddMessage(HL7DefMessage msg,MessageTypeHL7 messageType,MessageStructureHL7 messageStructure,InOutHL7 inOrOut,int itemOrder,string note) {
 			if(hl7DefMessages==null) {
 				hl7DefMessages=new List<HL7DefMessage>();
 			}
 			msg.MessageType=messageType;
-			msg.EventType=eventType;
+			msg.MessageStructure=messageStructure;
 			msg.InOrOut=inOrOut;
 			msg.ItemOrder=itemOrder;
 			msg.Note=note;
 			this.hl7DefMessages.Add(msg);
 		}
 
-		public void AddMessage(HL7DefMessage msg,MessageTypeHL7 messageType,EventTypeHL7 eventType,InOutHL7 inOrOut,int itemOrder) {
-			AddMessage(msg,messageType,eventType,inOrOut,itemOrder,"");
+		public void AddMessage(HL7DefMessage msg,MessageTypeHL7 messageType,MessageStructureHL7 messageStructure,InOutHL7 inOrOut,int itemOrder) {
+			AddMessage(msg,messageType,messageStructure,inOrOut,itemOrder,"");
 		}
 
 	}

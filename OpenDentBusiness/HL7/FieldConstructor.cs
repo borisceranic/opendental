@@ -12,32 +12,24 @@ namespace OpenDentBusiness.HL7 {
 	///<summary>This is the engine that will construct our outgoing HL7 message fields.</summary>
 	public class FieldConstructor {
 		private static bool _isEcwDef;
-
-		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldDFT(HL7Def def,string fieldName,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
-			return GenerateField(def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,sequenceNum,eventType,pdfDescription,pdfDataString,
-				patplanCur,inssubCur,insplanCur,carrierCur,patplanCount,patSub,null,false,null);
-		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldADT(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,int sequenceNum,EventTypeHL7 eventType,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
-			return GenerateField(def,fieldName,MessageTypeHL7.ADT,pat,prov,null,guar,null,sequenceNum,eventType,null,null,
-				patplanCur,inssubCur,insplanCur,carrierCur,patplanCount,patSub,null,false,null);
+		public static string GenerateFieldADT(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,int sequenceNum,EventTypeHL7 eventType) {
+			return GenerateField(def,fieldName,MessageTypeHL7.ADT,pat,prov,null,guar,null,sequenceNum,eventType,null,null,MessageStructureHL7.ADT_A01);
 		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
 		public static string GenerateFieldSIU(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType) {
-			return GenerateField(def,fieldName,MessageTypeHL7.SIU,pat,prov,null,guar,apt,sequenceNum,eventType,null,null,null,null,null,null,-1,null,null,false,null);
+			return GenerateField(def,fieldName,MessageTypeHL7.SIU,pat,prov,null,guar,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SIU_S12);
 		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,EventTypeHL7 eventType,string controlId,bool isAck,string ackEvent) {
-			string s=null;
-			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,-1,eventType,null,null,null,null,null,null,-1,null,controlId,isAck,ackEvent);
+		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,EventTypeHL7 eventType) {
+			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,-1,eventType,null,null,MessageStructureHL7.SRR_S01);
 		}
 
 		///<summary>apt, guar, proc, prov, pdfDescription, pdfDataString, patplanCur, inssubCur, insplanCur, carrierCur, and patSub can be null and will return an empty string if a field requires that object</summary>
-		public static string GenerateField(HL7Def def,string fieldName,MessageTypeHL7 msgType,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub,string controlId,bool isAck,string ackEvent) {
+		public static string GenerateField(HL7Def def,string fieldName,MessageTypeHL7 msgType,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,MessageStructureHL7 msgStructure) {
 			string retval="";
 			if(def.InternalType==HL7InternalType.eCWFull
 				|| def.InternalType==HL7InternalType.eCWTight
@@ -47,12 +39,12 @@ namespace OpenDentBusiness.HL7 {
 			}
 			//big long list of fieldnames that we support
 			switch(fieldName) {
-				case "ackCode":
-					if(ackEvent==null) {
-						return "";//ackCode is only valid when ackEvent is provided, otherwise return empty string
-					}
-					return gAck(isAck);
 				#region Appointment
+				case "apt.AptDateTime":
+					if(apt==null) {
+						return "";
+					}
+					return gDTM(apt.AptDateTime,14);
 				case "apt.AptNum":
 					if(apt==null) {
 						return "";
@@ -69,6 +61,37 @@ namespace OpenDentBusiness.HL7 {
 					}
 					string aptNumCheckDigitStr=MessageParser.M11CheckDigit(apt.AptNum.ToString()).ToString();
 					return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),aptNumCheckDigitStr,"M11",def.SubcomponentSeparator+aptOidRoot+def.SubcomponentSeparator+"HL7","VN");
+				case "apt.aptStatus":
+					if(apt==null) {
+						return "";
+					}
+					if(apt.AptStatus==ApptStatus.Complete) {
+						return "Complete";
+					}
+					if(apt.AptStatus==ApptStatus.UnschedList || apt.AptStatus==ApptStatus.Broken) {
+						return "Cancelled";
+					}
+					if(eventType==EventTypeHL7.S17) {//S17 is event type for outbound SIU messages when we delete an appointment
+						return "Deleted";
+					}
+					//apt.AptStatus==ApptStatus.Scheduled or apt.AptStatus==ApptStatus.ASAP or other status that triggers an SCH segment
+					return "Booked";
+				case "apt.endAptDateTime":
+					if(apt==null) {
+						return "";
+					}
+					return gDTM(apt.AptDateTime.AddMinutes(5*apt.Pattern.Length),14);
+				case "apt.externalAptID":
+					//EntityID^NamespaceID^UniversalID^UniversalIDType
+					//Example: |12345^^OtherSoftware.Root^|
+					if(apt==null) {
+						return "";
+					}
+					List<OIDExternal> listAptOidsExt=OIDExternals.GetByInternalIDAndType(apt.AptNum.ToString(),IdentifierType.Appointment);
+					if(listAptOidsExt.Count==0) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,listAptOidsExt[0].IDExternal,"",listAptOidsExt[0].rootExternal,"");
 				case "apt.location":
 					//Point of Care^Room^^Facility^^Person Location Type
 					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
@@ -83,35 +106,48 @@ namespace OpenDentBusiness.HL7 {
 						opName=opCur.OpName;
 					}
 					string practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,aptClinicDescript,opName,"",practiceName,"","","c");//all of these could be empty strings and it works fine
+					return gConcat(def.ComponentSeparator,aptClinicDescript,opName,"",practiceName,"","c");//all of these could be empty strings and it works fine
+				case "apt.length":
+					//Example: 60^min&&ANS+, ANS+ is the name of the coding system
+					if(apt==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,(5*apt.Pattern.Length).ToString(),gConcat(def.SubcomponentSeparator,"min","","ANS+"));
+				case "apt.Note":
+					//As in the address note field (see PID.11) we will accept '\.br\' (where the '\' is the defined escape char, \ by default) to signal a new line.
+					if(apt==null) {
+						return "";
+					}
+					return gNewLines(def.EscapeCharacter,apt.Note);
+				case "apt.operatory":
+					if(apt==null) {
+						return "";
+					}
+					opCur=Operatories.GetOperatory(apt.Op);
+					if(opCur==null) {
+						return "";
+					}
+					return opCur.OpName;
+				case "apt.type":
+					//Suggested values are Normal - Routine schedule request type, Tentative, or Complete - Request to add a completed appt
+					//We will send Normal for all appointment statuses except complete.
+					if(apt==null) {
+						return "";
+					}
+					if(apt.AptStatus==ApptStatus.Complete) {
+						return "Complete";
+					}
+					return "Normal";
+				case "apt.userOD":
+					//The OD user who created/modified the appointment
+					if(apt==null) {
+						return "";
+					}
+					if(Security.CurUser==null) {
+						return Security.CurUser.UserName;
+					}
+					return "";
 				#endregion Appointment
-				#region Carrier
-				case "carrier.addressCityStateZip":
-					if(carrierCur==null) {
-						return "";
-					}
-					return gConcat(def.ComponentSeparator,carrierCur.Address,carrierCur.Address2,carrierCur.City,carrierCur.State,carrierCur.Zip);
-				case "carrier.CarrierName":
-					if(carrierCur==null) {
-						return "";
-					}
-					return carrierCur.CarrierName;
-				case "carrier.ElectID":
-					if(carrierCur==null) {
-						return "";
-					}
-					return carrierCur.ElectID;
-				case "carrier.Phone":
-					//Example: ^WPN^PH^^^800^3635432
-					if(carrierCur==null) {
-						return "";
-					}
-					string carrierPh=gXTN(carrierCur.Phone,10);
-					if(carrierPh=="") {
-						return "";
-					}
-					return gConcat(def.ComponentSeparator,"","WPN","PH","","",carrierPh.Substring(0,3),carrierPh.Substring(3));//carrierPh guaranteed to be 10 digits or blank
-				#endregion Carrier
 				case "dateTime.Now":
 					return gDTM(DateTime.Now,14);
 				case "eventType":
@@ -124,7 +160,7 @@ namespace OpenDentBusiness.HL7 {
 					retval=gConcat(def.ComponentSeparator,guar.Address,guar.Address2,guar.City,guar.State,guar.Zip);
 					if(!_isEcwDef) {
 						//Example: 123 Main St^Apt 1^Dallas^OR^97338^^^^^^^^^^^^^^^Emergency Contact: Mom Test1\.br\Mother\.br\(503)623-3072
-						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",pat.AddrNote.Replace("\r\n","\n").Replace("\n",def.EscapeCharacter+".br"+def.EscapeCharacter));
+						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",gNewLines(def.EscapeCharacter,guar.AddrNote));
 					}
 					return retval;
 				case "guar.birthdateTime":
@@ -218,6 +254,299 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return retval;
 				#endregion Guarantor
+				case "messageControlId":
+					return Guid.NewGuid().ToString("N");
+				case "messageType":
+					return gConcat(def.ComponentSeparator,msgType.ToString(),eventType.ToString(),msgStructure.ToString());
+				#region Patient
+				case "pat.addressCityStateZip":
+					retval=gConcat(def.ComponentSeparator,pat.Address,pat.Address2,pat.City,pat.State,pat.Zip);
+					if(!_isEcwDef) {
+						//Example: 123 Main St^Apt 1^Dallas^OR^97338^^^^^^^^^^^^^^^Emergency Contact: Mom Test1\.br\Mother\.br\(503)623-3072
+						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",gNewLines(def.EscapeCharacter,pat.AddrNote));
+					}
+					return retval;
+				case "pat.birthdateTime":
+					return gDTM(pat.Birthdate,8);
+				case "pat.ChartNumber":
+					return pat.ChartNumber;
+				case "pat.Gender":
+					return gIS(pat);
+				case "pat.HmPhone":
+					hmPh=gXTN(pat.HmPhone,10);
+					cPh=gXTN(pat.WirelessPhone,10);
+					if(_isEcwDef) {
+						return hmPh;
+					}
+					//PRN stands for Primary Residence Number, equipment type: PH is Telephone, CP is Cell Phone, Internet is Internet Address (email)
+					//Example: ^PRN^PH^^^503^3635432~^PRN^Internet^someone@somewhere.com~^PRN^CP^^^503^6895555
+					if(hmPh!="") {
+						retval=gConcat(def.ComponentSeparator,"","PRN","PH","","",hmPh.Substring(0,3),hmPh.Substring(3));//hmPh guaranteed to be 10 digits if not blank
+					}
+					if(cPh!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","CP","","",cPh.Substring(0,3),cPh.Substring(3));//cPh guaranteed to be 10 digits if not blank
+					}
+					if(pat.Email!="") {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						retval+=gConcat(def.ComponentSeparator,"","PRN","Internet",pat.Email);
+					}
+					return retval;
+				case "pat.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					if(pat.ClinicNum==0) {
+						return "";
+					}
+					string patClinicDescript=Clinics.GetDesc(pat.ClinicNum);
+					practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,patClinicDescript,"","",practiceName,"","c");
+				case "pat.nameLFM":
+					return gConcat(def.ComponentSeparator,pat.LName,pat.FName,pat.MiddleI);
+				case "pat.PatNum":
+					return pat.PatNum.ToString();
+				case "pat.Position":
+					if(_isEcwDef) {
+						return gPos(pat);
+					}
+					return gPos(pat).Substring(0,1);//S-Single, M-Married, D-Divorced, W-Widowed
+				case "pat.Race":
+					if(_isEcwDef) {
+						return gRaceOld(pat);
+					}
+					return gRace(pat,def);
+				case "pat.site":
+					//Example: |^^^^^s^^^West Salem Elementary| ('S' or 's' - for site) and site.Description from pat.SiteNum
+					if(pat.SiteNum==0) {
+						return "";
+					}
+					string patSiteDescript=Sites.GetDescription(pat.SiteNum);
+					if(patSiteDescript=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","","","","","s","","",patSiteDescript);
+				case "pat.SSN":
+					return pat.SSN;
+				case "pat.WkPhone":
+					if(_isEcwDef) {
+						return gXTN(pat.WkPhone,10);
+					}
+					//WPN stands for Work Number, equipment type: PH is Telephone
+					//Example: ^WPN^PH^^^503^3635432
+					wkPh=gXTN(pat.WkPhone,10);
+					if(wkPh=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","WPN","PH","","",wkPh.Substring(0,3),wkPh.Substring(3));//wkPh guaranteed to be 10 digits if not blank
+				case "pat.Urgency":
+					//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0-Unknown, 1-NoProblems, 2-NeedsCare, 3-Urgent
+					return ((int)pat.Urgency).ToString();
+				case "patientIdList":
+					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
+					OIDInternal patOid=OIDInternals.GetForType(IdentifierType.Patient);
+					string patOidRoot="";
+					if(patOid!=null) {
+						patOidRoot=patOid.IDRoot;
+					}
+					string patIdCheckDigitStr=MessageParser.M11CheckDigit(pat.PatNum.ToString()).ToString();
+					retval=gConcat(def.ComponentSeparator,pat.PatNum.ToString(),patIdCheckDigitStr,"M11",def.SubcomponentSeparator+patOidRoot+def.SubcomponentSeparator+"HL7","PI");
+					List<OIDExternal> listPatOidsExt=OIDExternals.GetByInternalIDAndType(pat.PatNum.ToString(),IdentifierType.Patient);
+					for(int i=0;i<listPatOidsExt.Count;i++) {
+						patIdCheckDigitStr=MessageParser.M11CheckDigit(listPatOidsExt[i].IDExternal).ToString();
+						if(patIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
+							retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,"","",
+								def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+							continue;
+						}
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,patIdCheckDigitStr,"M11",
+							def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
+					}
+					return retval;
+				#endregion Patient
+				case "pdfDescription":
+					if(pdfDescription==null) {
+						return "";
+					}
+					return pdfDescription;
+				case "pdfDataAsBase64":
+					if(pdfDataString==null) {
+						return "";
+					}
+					else {
+						return pdfDataString;
+					}
+				#region Procedure
+				case "proc.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
+						return "";
+					}
+					string procClinicDescript=Clinics.GetDesc(proc.ClinicNum);//could be blank if proc.ClinicNum is invalid
+					if(procClinicDescript=="") {
+						procClinicDescript=Clinics.GetDesc(pat.ClinicNum);//could be blank if pat.ClinicNum is invalid
+					}
+					string procOpName="";
+					if(apt!=null) {
+						Operatory procOp=Operatories.GetOperatory(apt.Op);
+						if(procOp!=null) {
+							procOpName=procOp.OpName;
+						}
+					}
+					practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",practiceName,"","c");
+				case "proc.DiagnosticCode":
+					if(proc==null) {
+						return "";
+					}
+					List<string> listDiagCodes=new List<string>();
+					if(proc.DiagnosticCode!=null && proc.DiagnosticCode!="") {
+						listDiagCodes.Add(proc.DiagnosticCode);
+					}
+					if(proc.DiagnosticCode2!=null && proc.DiagnosticCode2!="") {
+						listDiagCodes.Add(proc.DiagnosticCode2);
+					}
+					if(proc.DiagnosticCode3!=null && proc.DiagnosticCode3!="") {
+						listDiagCodes.Add(proc.DiagnosticCode3);
+					}
+					if(proc.DiagnosticCode4!=null && proc.DiagnosticCode4!="") {
+						listDiagCodes.Add(proc.DiagnosticCode4);
+					}
+					for(int i=0;i<listDiagCodes.Count;i++) {
+						if(retval!="") {
+							retval+=def.RepetitionSeparator;
+						}
+						ICD9 iCur=ICD9s.GetByCode(listDiagCodes[i]);
+						if(iCur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
+							retval+=listDiagCodes[i];
+							continue;
+						}
+						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],iCur.Description,"I9C","","","","31","","");
+					}
+					return retval;
+				case "proc.procDateTime":
+					if(proc==null) {
+						return "";
+					}
+					return gDTM(proc.ProcDate,14);
+				case "proc.ProcFee":
+					if(proc==null) {
+						return "";
+					}
+					return proc.ProcFee.ToString("F2");
+				case "proc.ProcNum":
+					if(proc==null) {
+						return "";
+					}
+					return proc.ProcNum.ToString();
+				case "proc.toothSurfRange":
+					if(proc==null) {
+						return "";
+					}
+					return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
+				case "proccode.ProcCode":
+					if(proc==null) {
+						return "";
+					}
+					if(_isEcwDef) {
+						return gProcCodeOld(proc);
+					}
+					//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
+					//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
+					return gProcCode(proc,def);
+				#endregion Procedure
+				#region Provider
+				case "prov.provIdNameLFM":
+					if(prov==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
+				case "prov.provType":
+					if(prov==null) {
+						return "";
+					}
+					if(apt==null) {
+						if(prov.IsSecondary) {
+							return "h";
+						}
+						return "d";
+					}
+					//if we have an appt, return 'd' if prov is the dentist and 'h' if prov is the hygienist, regardless of whether they are marked secondary or not
+					if(prov.ProvNum==apt.ProvHyg) {
+						return "h";
+					}
+					return "d";//default to 'd' - dentist
+				#endregion Provider
+				case "segmentAction":
+					//This is currently only supported for SIU and SRR messages in the RSG, AIL, and AIP segments
+					//A-Add/Insert, D-Delete, U-Update, X-No Change
+					//SIU.S12 - Create Appt, S13 - Appt Rescheduling, S14 - Appt Modification, S15 - Appt Cancellation, S17 - Appt Deletion
+					//SRR.S03 - Request Appointment Modification, S04 - Request Appointment Cancellation
+					if(msgType==MessageTypeHL7.SIU && eventType==EventTypeHL7.S12) {
+						return "A";
+					}
+					if(msgType==MessageTypeHL7.SRR //all SRR messages are for updating existing appts, 'U'
+						|| (msgType==MessageTypeHL7.SIU
+						&& (eventType==EventTypeHL7.S13 || eventType==EventTypeHL7.S14 || eventType==EventTypeHL7.S15))) //SIU's with event type S13, S14, or S15 are for updating existing appts
+					{
+						return "U";
+					}
+					if(msgType==MessageTypeHL7.SIU && eventType==EventTypeHL7.S17) {
+						return "D";
+					}
+					return "";//if not an SIU or SRR or if it is not one of these event types, return empty string
+				case "sendingApp":
+					//HD data type, Namespace ID^UniversalID^UniversalIDType
+					//UniversalID=oidinternal.IDRoot for IDType of Root, UniversalIDType=HL7
+					//If no value in oidinternal table, then revert to 'OD'
+					OIDInternal oidRoot=OIDInternals.GetForType(IdentifierType.Root);
+					if(oidRoot==null) {
+						return "OD";
+					}
+					return gConcat(def.ComponentSeparator,"",oidRoot.IDRoot,"HL7");
+				case "separators^~\\&":
+					return gSep(def);
+				case "sequenceNum":
+					return sequenceNum.ToString();
+				default:
+					return "";
+			}
+		}
+
+		///<summary>Only for creating the IN1 segment(s).</summary>
+		public static string GenerateFieldIN1(HL7Def def,string fieldName,int sequenceNum,PatPlan patplanCur,InsSub inssubCur,InsPlan insplanCur,Carrier carrierCur,int patplanCount,Patient patSub) {
+			switch(fieldName) {
+				#region Carrier
+				case "carrier.addressCityStateZip":
+					if(carrierCur==null) {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,carrierCur.Address,carrierCur.Address2,carrierCur.City,carrierCur.State,carrierCur.Zip);
+				case "carrier.CarrierName":
+					if(carrierCur==null) {
+						return "";
+					}
+					return carrierCur.CarrierName;
+				case "carrier.ElectID":
+					if(carrierCur==null) {
+						return "";
+					}
+					return carrierCur.ElectID;
+				case "carrier.Phone":
+					//Example: ^WPN^PH^^^800^3635432
+					if(carrierCur==null) {
+						return "";
+					}
+					string carrierPh=gXTN(carrierCur.Phone,10);
+					if(carrierPh=="") {
+						return "";
+					}
+					return gConcat(def.ComponentSeparator,"","WPN","PH","","",carrierPh.Substring(0,3),carrierPh.Substring(3));//carrierPh guaranteed to be 10 digits or blank
+				#endregion Carrier
 				#region InsPlan
 				case "insplan.cob":
 					if(insplanCur==null) {
@@ -325,122 +654,6 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return gConcat(def.ComponentSeparator,patSub.LName,patSub.FName,patSub.MiddleI);
 				#endregion InsSub
-				case "messageControlId":
-					if(controlId!=null) {
-						return controlId;
-					}
-					return Guid.NewGuid().ToString("N");
-				case "messageType":
-					return gConcat(def.ComponentSeparator,msgType.ToString(),eventType.ToString(),msgType.ToString()+"_"+eventType.ToString());
-				#region Patient
-				case "pat.addressCityStateZip":
-					retval=gConcat(def.ComponentSeparator,pat.Address,pat.Address2,pat.City,pat.State,pat.Zip);
-					if(!_isEcwDef) {
-						//Example: 123 Main St^Apt 1^Dallas^OR^97338^^^^^^^^^^^^^^^Emergency Contact: Mom Test1\.br\Mother\.br\(503)623-3072
-						retval=gConcat(def.ComponentSeparator,retval,"","","","","","","","","","","","","","",pat.AddrNote.Replace("\r\n","\n").Replace("\n",def.EscapeCharacter+".br"+def.EscapeCharacter));
-					}
-					return retval;
-				case "pat.birthdateTime":
-					return gDTM(pat.Birthdate,8);
-				case "pat.ChartNumber":
-					return pat.ChartNumber;
-				case "pat.Gender":
-					return gIS(pat);
-				case "pat.HmPhone":
-					hmPh=gXTN(pat.HmPhone,10);
-					cPh=gXTN(pat.WirelessPhone,10);
-					if(_isEcwDef) {
-						return hmPh;
-					}
-					//PRN stands for Primary Residence Number, equipment type: PH is Telephone, CP is Cell Phone, Internet is Internet Address (email)
-					//Example: ^PRN^PH^^^503^3635432~^PRN^Internet^someone@somewhere.com~^PRN^CP^^^503^6895555
-					if(hmPh!="") {
-						retval=gConcat(def.ComponentSeparator,"","PRN","PH","","",hmPh.Substring(0,3),hmPh.Substring(3));//hmPh guaranteed to be 10 digits if not blank
-					}
-					if(cPh!="") {
-						if(retval!="") {
-							retval+=def.RepetitionSeparator;
-						}
-						retval+=gConcat(def.ComponentSeparator,"","PRN","CP","","",cPh.Substring(0,3),cPh.Substring(3));//cPh guaranteed to be 10 digits if not blank
-					}
-					if(pat.Email!="") {
-						if(retval!="") {
-							retval+=def.RepetitionSeparator;
-						}
-						retval+=gConcat(def.ComponentSeparator,"","PRN","Internet",pat.Email);
-					}
-					return retval;
-				case "pat.location":
-					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
-					if(pat.ClinicNum==0) {
-						return "";
-					}
-					string patClinicDescript=Clinics.GetDesc(pat.ClinicNum);
-					practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,patClinicDescript,"","",practiceName,"","c");
-				case "pat.nameLFM":
-					return gConcat(def.ComponentSeparator,pat.LName,pat.FName,pat.MiddleI);
-				case "pat.PatNum":
-					return pat.PatNum.ToString();
-				case "pat.Position":
-					if(_isEcwDef) {
-						return gPos(pat);
-					}
-					return gPos(pat).Substring(0,1);//S-Single, M-Married, D-Divorced, W-Widowed
-				case "pat.Race":
-					if(_isEcwDef) {
-						return gRaceOld(pat);
-					}
-					return gRace(pat,def);
-				case "pat.site":
-					//Example: |^^^^^s^^^West Salem Elementary| ('S' or 's' - for site) and site.Description from pat.SiteNum
-					if(pat.SiteNum==0) {
-						return "";
-					}
-					string patSiteDescript=Sites.GetDescription(pat.SiteNum);
-					if(patSiteDescript=="") {
-						return "";
-					}
-					return gConcat(def.ComponentSeparator,"","","","","","s","","",patSiteDescript);
-				case "pat.SSN":
-					return pat.SSN;
-				case "pat.WkPhone":
-					if(_isEcwDef) {
-						return gXTN(pat.WkPhone,10);
-					}
-					//WPN stands for Work Number, equipment type: PH is Telephone
-					//Example: ^WPN^PH^^^503^3635432
-					wkPh=gXTN(pat.WkPhone,10);
-					if(wkPh=="") {
-						return "";
-					}
-					return gConcat(def.ComponentSeparator,"","WPN","PH","","",wkPh.Substring(0,3),wkPh.Substring(3));//wkPh guaranteed to be 10 digits if not blank
-				case "pat.Urgency":
-					//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0-Unknown, 1-NoProblems, 2-NeedsCare, 3-Urgent
-					return ((int)pat.Urgency).ToString();
-				case "patientIdList":
-					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
-					OIDInternal patOid=OIDInternals.GetForType(IdentifierType.Patient);
-					string patOidRoot="";
-					if(patOid!=null) {
-						patOidRoot=patOid.IDRoot;
-					}
-					string patIdCheckDigitStr=MessageParser.M11CheckDigit(pat.PatNum.ToString()).ToString();
-					retval=gConcat(def.ComponentSeparator,pat.PatNum.ToString(),patIdCheckDigitStr,"M11",def.SubcomponentSeparator+patOidRoot+def.SubcomponentSeparator+"HL7","PI");
-					List<OIDExternal> listPatOidsExt=OIDExternals.GetByInternalIDAndType(pat.PatNum.ToString(),IdentifierType.Patient);
-					for(int i=0;i<listPatOidsExt.Count;i++) {
-						patIdCheckDigitStr=MessageParser.M11CheckDigit(listPatOidsExt[i].IDExternal).ToString();
-						if(patIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
-							retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,"","",
-								def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
-							continue;
-						}
-						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listPatOidsExt[i].IDExternal,patIdCheckDigitStr,"M11",
-							def.SubcomponentSeparator+listPatOidsExt[i].rootExternal+def.SubcomponentSeparator,"PI");
-					}
-					return retval;
-				#endregion Patient
 				#region PatPlan
 				case "patplan.Ordinal":
 					if(patplanCur==null) {
@@ -484,116 +697,6 @@ namespace OpenDentBusiness.HL7 {
 					//if Relat.SignifOther or Relat.InjuredPlaintiff or any others
 					return "OTH";
 				#endregion PatPlan
-				case "pdfDescription":
-					if(pdfDescription==null) {
-						return "";
-					}
-					return pdfDescription;
-				case "pdfDataAsBase64":
-					if(pdfDataString==null) {
-						return "";
-					}
-					else {
-						return pdfDataString;
-					}
-				#region Procedure
-				case "proc.location":
-					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
-					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
-						return "";
-					}
-					string procClinicDescript=Clinics.GetDesc(proc.ClinicNum);//could be blank if proc.ClinicNum is invalid
-					if(procClinicDescript=="") {
-						procClinicDescript=Clinics.GetDesc(pat.ClinicNum);//could be blank if pat.ClinicNum is invalid
-					}
-					string procOpName="";
-					if(apt!=null) {
-						Operatory procOp=Operatories.GetOperatory(apt.Op);
-						if(procOp!=null) {
-							procOpName=procOp.OpName;
-						}
-					}
-					practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",practiceName,"","c");
-				case "proc.DiagnosticCode":
-					if(proc==null) {
-						return "";
-					}
-					List<string> listDiagCodes=new List<string>();
-					if(proc.DiagnosticCode!=null && proc.DiagnosticCode!="") {
-						listDiagCodes.Add(proc.DiagnosticCode);
-					}
-					if(proc.DiagnosticCode2!=null && proc.DiagnosticCode2!="") {
-						listDiagCodes.Add(proc.DiagnosticCode2);
-					}
-					if(proc.DiagnosticCode3!=null && proc.DiagnosticCode3!="") {
-						listDiagCodes.Add(proc.DiagnosticCode3);
-					}
-					if(proc.DiagnosticCode4!=null && proc.DiagnosticCode4!="") {
-						listDiagCodes.Add(proc.DiagnosticCode4);
-					}
-					for(int i=0;i<listDiagCodes.Count;i++) {
-						if(retval!="") {
-							retval+=def.RepetitionSeparator;
-						}
-						ICD9 iCur=ICD9s.GetByCode(listDiagCodes[i]);
-						if(iCur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
-							retval+=listDiagCodes[i];
-							continue;
-						}
-						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],iCur.Description,"I9C","","","","31","","");
-					}
-					return retval;
-				case "proc.procDateTime":
-					if(proc==null) {
-						return "";
-					}
-					return gDTM(proc.ProcDate,14);
-				case "proc.ProcFee":
-					if(proc==null) {
-						return "";
-					}
-					return proc.ProcFee.ToString("F2");
-				case "proc.ProcNum":
-					if(proc==null) {
-						return "";
-					}
-					return proc.ProcNum.ToString();
-				case "proc.toothSurfRange":
-					if(proc==null) {
-						return "";
-					}
-					return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
-				case "proccode.ProcCode":
-					if(proc==null) {
-						return "";
-					}
-					if(_isEcwDef) {
-						return gProcCodeOld(proc);
-					}
-					//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
-					//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
-					return gProcCode(proc,def);
-				#endregion Procedure
-				#region Provider
-				case "prov.provIdNameLFM":
-					if(prov==null) {
-						return "";
-					}
-					return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
-				#endregion Provider
-				case "sendingApp":
-					//HD data type, Namespace ID^UniversalID^UniversalIDType
-					//UniversalID=oidinternal.IDRoot for IDType of Root, UniversalIDType=HL7
-					//If no value in oidinternal table, then revert to 'OD'
-					OIDInternal oidRoot=OIDInternals.GetForType(IdentifierType.Root);
-					if(oidRoot==null) {
-						return "OD";
-					}
-					return gConcat(def.ComponentSeparator,"",oidRoot.IDRoot,"HL7");
-				case "separators^~\\&":
-					return gSep(def);
 				case "sequenceNum":
 					return sequenceNum.ToString();
 				default:
@@ -666,6 +769,10 @@ namespace OpenDentBusiness.HL7 {
 				return "M";
 			}
 			return "U";
+		}
+
+		private static string gNewLines(string escapeChar,string note) {
+			return note.Replace("\r\n","\n").Replace("\r","\n").Replace("\n",escapeChar+".br"+escapeChar);
 		}
 
 		private static string gPos(Patient pat) {

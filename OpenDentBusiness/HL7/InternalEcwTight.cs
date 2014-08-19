@@ -39,7 +39,7 @@ namespace OpenDentBusiness.HL7 {
 			//======================================================================================================================
 			//eCW incoming patient information (ADT).
 			HL7DefMessage msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.ADT,EventTypeHL7.A04,InOutHL7.Incoming,0);
+			def.AddMessage(msg,MessageTypeHL7.ADT,MessageStructureHL7.ADT_A01,InOutHL7.Incoming,0);
 			//MSH segment------------------------------------------------------------------
 			HL7DefSegment seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);
@@ -96,7 +96,7 @@ namespace OpenDentBusiness.HL7 {
 			//======================================================================================================================
 			//eCW incoming appointment information (SIU - Schedule information unsolicited).
 			msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.SIU,EventTypeHL7.S12,InOutHL7.Incoming,1);
+			def.AddMessage(msg,MessageTypeHL7.SIU,MessageStructureHL7.SIU_S12,InOutHL7.Incoming,1);
 			//MSH segment------------------------------------------------------------------
 			seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);
@@ -153,7 +153,7 @@ namespace OpenDentBusiness.HL7 {
 			//=======================================================================================================================
 			//Acknowledgment message (ACK)
 			msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.ACK,EventTypeHL7.A04,InOutHL7.Incoming,2);
+			def.AddMessage(msg,MessageTypeHL7.ACK,MessageStructureHL7.ADT_A01,InOutHL7.Incoming,2);
 			//MSH segment------------------------------------------------------------------
 			seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);
@@ -169,7 +169,7 @@ namespace OpenDentBusiness.HL7 {
 			//=======================================================================================================================
 			//Detail financial transaction (DFT)
 			msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.DFT,EventTypeHL7.P03,InOutHL7.Outgoing,3);
+			def.AddMessage(msg,MessageTypeHL7.DFT,MessageStructureHL7.DFT_P03,InOutHL7.Outgoing,3);
 			//MSH (Message Header) segment-------------------------------------------------
 			seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);
@@ -272,7 +272,7 @@ namespace OpenDentBusiness.HL7 {
 			//=======================================================================================================================
 			//Message Acknowledgment (ACK)
 			msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.ACK,EventTypeHL7.A04,InOutHL7.Outgoing,4);
+			def.AddMessage(msg,MessageTypeHL7.ACK,MessageStructureHL7.ADT_A01,InOutHL7.Outgoing,4);
 			//MSH (Message Header) segment-------------------------------------------------
 			seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);

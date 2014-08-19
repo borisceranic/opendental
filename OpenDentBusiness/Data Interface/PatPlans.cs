@@ -34,6 +34,7 @@ namespace OpenDentBusiness{
 				patPlan.PatPlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),patPlan);
 				return patPlan.PatPlanNum;
 			}
+//Cameron_ Possibly create outbound ADT message to update insurance info
 			return Crud.PatPlanCrud.Insert(patPlan);
 		}
 
@@ -167,6 +168,7 @@ namespace OpenDentBusiness{
 			command="UPDATE patplan SET Ordinal="+POut.Long(newOrdinal)
 				+" WHERE PatPlanNum="+POut.Long(patPlanNum);
 			Db.NonQ(command);
+//Cameron_ Possibly create outbound ADT message to update insurance info
 			return newOrdinal;
 		}
 
@@ -282,6 +284,7 @@ namespace OpenDentBusiness{
 			List<Benefit> benList=Benefits.Refresh(patPlans,subList);
 			Procedures.ComputeEstimatesForAll(patNum,claimProcs,procs,planList,patPlans,benList,pat.Age,subList);
 			Patients.SetHasIns(patNum);
+//Cameron_ Possibly create outbound ADT message to update insurance info
 		}
 
 		///<summary>Deletes the patplan and benefits with the specified patPlanNum.  Does not rearrange the other patplans for the patient.  A patplan must be inserted after this function is called to take the place of the patplan being deleted.</summary>

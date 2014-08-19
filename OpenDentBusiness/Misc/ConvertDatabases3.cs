@@ -5859,6 +5859,23 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE sheetdef MODIFY PageCount NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7defmessage ADD MessageStructure varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7defmessage ADD MessageStructure varchar2(255)";
+					Db.NonQ(command);
+				}
+				//Oracle compatible
+				command="UPDATE hl7defmessage SET MessageStructure='ADT_A01' WHERE EventType='A04'";//All ADT's and ACK messages are event type A04 in the db
+				Db.NonQ(command);
+				command="UPDATE hl7defmessage SET MessageStructure='SIU_S12' WHERE EventType='S12'";//All SIU's are event type S12 in the db
+				Db.NonQ(command);
+				command="UPDATE hl7defmessage SET MessageStructure='DFT_P03' WHERE EventType='P03'";//All DFT's are event type P03 in the db
+				Db.NonQ(command);
+				command="UPDATE hl7defmessage SET MessageStructure='NotDefined' WHERE EventType='NotDefined' OR EventType=''";//Any messages with NotDefined or blank event type
+				Db.NonQ(command);
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

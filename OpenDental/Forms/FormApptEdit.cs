@@ -2556,6 +2556,23 @@ namespace OpenDental{
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
 					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S15 - Appt Cancellation event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S15,AptCur);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=AptCur.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 				if(PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment)) {
 					Commlog CommlogCur=new Commlog();
 					CommlogCur.PatNum=pat.PatNum;
@@ -2972,6 +2989,23 @@ namespace OpenDental{
 						Commlogs.Insert(CommlogCur);
 					}
 				}
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S17 - Appt Deletion event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S17,AptCur);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=AptCur.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 			}
 			Appointments.Delete(AptCur.AptNum);
 			SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
@@ -2994,6 +3028,8 @@ namespace OpenDental{
 			if(!UpdateToDB()){
 				return;
 			}
+			bool isCreateAppt=false;
+			bool sendHL7=false;
 			if(IsNew) {
 				if(AptCur.AptStatus==ApptStatus.UnschedList && AptCur.AptDateTime==DateTime.MinValue) { //If new appt is being added directly to pinboard
 					//Do nothing.  Log will be created when appointment is dragged off the pinboard.
@@ -3002,12 +3038,38 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,pat.PatNum,
 						AptCur.AptDateTime.ToString()+", "+AptCur.ProcDescript,
 						AptCur.AptNum);
+					sendHL7=true;
+					isCreateAppt=true;
 				}
 			}
 			else {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
 					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript,
 					AptCur.AptNum);
+				sendHL7=true;
+			}
+			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+			if(sendHL7 && HL7Defs.IsExistingHL7Enabled()) {
+				//S14 - Appt Modification event, S12 - New Appt Booking event
+				MessageHL7 messageHL7=null;
+				if(isCreateAppt) {
+					messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S12,AptCur);
+				}
+				else {
+					messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S14,AptCur);
+				}
+				//Will be null if there is no outbound SIU message defined, so do nothing
+				if(messageHL7!=null) {
+					HL7Msg hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=AptCur.AptNum;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=messageHL7.ToString();
+					hl7Msg.PatNum=pat.PatNum;
+					HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+					MessageBox.Show(this,messageHL7.ToString());
+#endif
+				}
 			}
 			List<string> procCodes=new List<string>();
 			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {

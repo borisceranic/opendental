@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDentBusiness.HL7;
 
 namespace OpenDental {
 	public partial class FormPatientAddAll:Form {
@@ -1917,7 +1918,89 @@ namespace OpenDental {
 				PatPlans.Insert(patplan);
 			}
 			SelectedPatNum=guar.PatNum;
-//Cameron_ Create outbound ADT message(s) for all new patients
+			//If there is an existing HL7 def enabled, send an ADT message for each patient inserted if there is an outbound ADT message defined
+			if(HL7Defs.IsExistingHL7Enabled()) {
+				if(guar!=null) {
+					//new patients get the A04 ADT, updating existing patients we send an A08
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(guar,guar,EventTypeHL7.A04);
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=guar.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
+				if(pat2!=null) {
+					//new patients get the A04 ADT, updating existing patients we send an A08
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat2,guar,EventTypeHL7.A04);
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat2.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
+				if(pat3!=null) {
+					//new patients get the A04 ADT, updating existing patients we send an A08
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat3,guar,EventTypeHL7.A04);
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat3.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
+				if(pat4!=null) {
+					//new patients get the A04 ADT, updating existing patients we send an A08
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat4,guar,EventTypeHL7.A04);
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat4.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
+				if(pat5!=null) {
+					//new patients get the A04 ADT, updating existing patients we send an A08
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat5,guar,EventTypeHL7.A04);
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat5.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
+			}
 			MessageBox.Show("Done");
 			DialogResult=DialogResult.OK;
 		}

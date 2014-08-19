@@ -38,7 +38,7 @@ namespace OpenDentBusiness.HL7 {
 			HL7DefSegment seg=new HL7DefSegment();
 			//=======================================================================================================================
 			//Detail financial transaction (DFT)
-			def.AddMessage(msg,MessageTypeHL7.DFT,EventTypeHL7.P03,InOutHL7.Outgoing,2);
+			def.AddMessage(msg,MessageTypeHL7.DFT,MessageStructureHL7.DFT_P03,InOutHL7.Outgoing,2);
 			//MSH (Message Header) segment-------------------------------------------------
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);
 			//HL7 documentation says field 1 is Field Separator.  "This field contains the separator between the segment ID and the first real field.  As such it serves as the separator and defines the character to be used as a separator for the rest of the message." (HL7 v2.6 documentation) The separator is usually | (pipes) and is part of field 0, which is the segment ID followed by a |.  Encoding Characters is the first real field, so it will be numbered starting with 1 in our def.

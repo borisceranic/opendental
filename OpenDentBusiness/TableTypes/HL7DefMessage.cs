@@ -16,7 +16,7 @@ namespace OpenDentBusiness {
 		///<summary>Stored in db as string, but used in OD as enum MessageTypeHL7. Example: ADT</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public MessageTypeHL7 MessageType;
-		///<summary>Stored in db as string, but used in OD as enum EventTypeHL7. Example: A04, which is only used iwth ADT/ACK.</summary>
+		///<summary>Stored in db as string, but used in OD as enum EventTypeHL7. Example: A04, which is only used with ADT/ACK.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public EventTypeHL7 EventType;
 		///<summary>Enum:InOutHL7 Incoming, Outgoing</summary>
@@ -27,6 +27,9 @@ namespace OpenDentBusiness {
 //TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Note;
+		///<summary>Stored in db as string, but used in OD as enum MessageStructure. Example: ADT_A01, which is the structure used for event types A01, A04, A08, and A13.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public MessageStructureHL7 MessageStructure;
 //VendorCustomized, an enumeration.  Example: PDF TPs.
 
 		///<Summary>List of segments associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>
@@ -90,10 +93,10 @@ namespace OpenDentBusiness {
 		///<summary>Use this for unsupported event types</summary>
 		NotDefined,
 		///<summary>Only used with ADT/ACK.
-		///<para>A04 - Register a Patient, A08 - Update Patient Info</para>
+		///<para>A04 - Register a Patient</para>
 		///<para>For eCW, the A04 and A08 are inbound messages and are processed the same.  We attempt to locate the patient, if not found we insert one.</para>
 		///<para>For other interfaces, the same method of locating a patient and if not found inserting one will be used for inbound ADT^A04 and ADT^A08 messages.</para>
-		///<para>Outbound messages will have an A04 event type if a new patient is added, A08 if a current patient's info is updated.</para></summary>
+		///<para>Outbound messages will have an A04 event type if a new patient is added</para></summary>
 		A04,
 		///<summary>Only used with ADT/ACK.
 		///<para>A08 - Update Patient Info</para>
@@ -103,23 +106,28 @@ namespace OpenDentBusiness {
 		/////<para>Not used for eCW.</para>
 		/////<para>A40 - Merge Patient - Patient Identifier List.  Two PID.3 ID's have been merged into one.</para></summary>
 		//A40,
-		///<summary>Only used with DFT/Ack.</summary>
+		///<summary>Only used with DFT/ACK.</summary>
 		P03,
-		///<summary>Only used with PPR/Ack (Patient Problem messages).
+		///<summary>Only used with PPR/ACK (Patient Problem messages).
 		///<para>Not used for eCW.</para>
 		///<para>These are inbound messages for adding/updating patient problems.</para>
-		///<para>PC1 is the Add event, PC2 is the Update event.  Add and Update events will be handled the same for now.</para></summary>
-		PC1_PC2,
-		/////<summary>Only used with PPR/Ack (Patient Problem messages).  PC3 is the Delete event.  Not currently supported.</summary>
+		///<para>PC1 is the Add event.  Add and Update events will be handled the same for now.</para></summary>
+		PC1,
+		///<summary>Only used with PPR/ACK (Patient Problem messages).
+		///<para>Not used for eCW.</para>
+		///<para>PC2 is the Update event.  Add and Update events will be handled the same for now.</para></summary>
+		PC2,
+		/////<summary>Only used with PPR/ACK (Patient Problem messages).  PC3 is the Delete event.  Not currently supported.</summary>
 		//PC3,
-		/////<summary>S01, S02, and S05-S11 are not currently supported.</summary>
-		//S01_S02,
-		//S05_S11,
-		///<summary>Only used with SRM/ACK.  S03 - Request Appointment Modification, S04 - Request Appointment Cancellation.
+		///<summary>Only used with SRM/SRR/ACK.  S03 - Request Appointment Modification.
 		///<para>Not used for eCW.</para>
 		///<para>These will be inbound and are used for updating a limited amount of information for an existing appointment.</para>
-		///<para>S03 messages are used to update appointments.  S04 messages are used to set an appointment.AptStatus to ApptStatus.Broken.</para></summary>
-		S03_S04,
+		///<para>S03 messages are used to update appointments.  </para></summary>
+		S03,
+		///<summary>Only used with SRM/SRR/ACK.  S04 - Request Appointment Cancellation.
+		///<para>Not used for eCW.</para>
+		///<para>S04 messages are used to set an appointment.AptStatus to ApptStatus.Broken.</para></summary>
+		S04,
 		///<summary>Only used with SIU/ACK.
 		///<para>S12 - New Appt</para>
 		///<para>For eCW, these are inbound, OD is considered an auxiliary application, and S12 and S14 messages are processed the same.</para>
@@ -138,9 +146,7 @@ namespace OpenDentBusiness {
 		S15,
 		///<summary>Only used with SIU/ACK.
 		///<para>S17 - Appt Deletion</para></summary>
-		S17//,
-		/////<summary>Not currently supported as inbound or outbound message events.</summary>
-		//S18_S26
+		S17
 	}
 
 	public enum InOutHL7 {
@@ -148,6 +154,37 @@ namespace OpenDentBusiness {
 		Incoming,
 		///<summary>1</summary>
 		Outgoing
+	}
+
+	public enum MessageStructureHL7 {
+		///<summary>Use this for unsupported message structures</summary>
+		NotDefined,
+		///<summary>Used for ADT/ACK event types A01, A04, A08, and A13.
+		///<para>We currently only support A04 and A08 event types, both will use this structure.</para></summary>
+		ADT_A01,
+		///<summary>Used for DFT/ACK event type P03.
+		///<para>All outbound DFT's are this structure.</para></summary>
+		DFT_P03,
+		///<summary>Used for PPR/ACK event types PC1, PC2, and PC3.
+		///<para>We currently only support PC1 (add problem) and PC2 (update problem), both use this structure.</para></summary>
+		PPR_PC1,
+		///<summary>Used for SIU/ACK event types S12 through S24 and S26.
+		///<para>We currently only support S12 through S17.</para>
+		///<para>Inbound SIU's are all treated the same, regardless of the event type.</para>
+		///<para>We send different event types in outbound SIU's depending on the action that causes the message.</para>
+		///<para>All SIU's, inbound or outbound, use this message structure.</para></summary>
+		SIU_S12,
+		///<summary>Used for SRM/ACK event types S01 through S11.
+		///<para>We currently only support S03 (update appt request) and S04 (cancel appt request).</para>
+		///<para>SRM's are inbound and when the action of updating or cancelling the appt is completed, an SRR is sent.</para>
+		///<para>SRM's and SRR's still require ACK's.  i.e. SRM received, ACK sent, action completed leads to SRR sent, ACK received.</para>
+		///<para>SRM's and SRR's will all use this message structure.</para></summary>
+		SRM_S01,
+		///<summary>Used for SRR/ACK event types S01 through S11.
+		///<para>We currently only support S03 and S04 (see SRM_S01).</para>
+		///<para>SRR's are outbound and sent when an SRM is processed correctly.</para></summary>
+		SRR_S01
+		
 	}
 
 }

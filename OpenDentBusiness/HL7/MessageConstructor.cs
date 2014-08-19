@@ -28,6 +28,15 @@ namespace OpenDentBusiness.HL7 {
 			if(hl7DefMessage==null) {//DFT message type is not defined so do nothing and return
 				return null;
 			}
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(pat,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(patNonClone!=null) {
+					pat=patNonClone;
+				}
+			}
 			Provider prov=Providers.GetProv(Patients.GetProvNum(pat));
 			Appointment apt=Appointments.GetOneApt(aptNum);
 			List<PatPlan> listPatplans=PatPlans.Refresh(pat.PatNum);
@@ -54,7 +63,7 @@ namespace OpenDentBusiness.HL7 {
 					InsSub inssubCur=null;
 					Carrier carrierCur=null;
 					Patient patSub=null;
-					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1 && listPatplans.Count>repeat) {
+					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
 						patplanCur=listPatplans[repeat];
 						inssubCur=InsSubs.GetOne(patplanCur.InsSubNum);
 						insplanCur=InsPlans.RefreshOne(inssubCur.PlanNum);
@@ -69,8 +78,14 @@ namespace OpenDentBusiness.HL7 {
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
 						}
 						else {
-							string fieldValue=FieldConstructor.GenerateFieldDFT(hl7Def,fieldName,pat,prov,proc,guar,apt,repeat+1,eventType,
-								pdfDescription,pdfDataString,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							string fieldValue="";
+							if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
+								FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							}
+							else {
+								FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,repeat+1,eventType,
+								 pdfDescription,pdfDataString,MessageStructureHL7.DFT_P03);
+							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
 						}
 					}
@@ -97,6 +112,15 @@ namespace OpenDentBusiness.HL7 {
 			}
 			if(hl7DefMessage==null) {//ADT message type is not defined so do nothing and return
 				return null;
+			}
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(pat,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(patNonClone!=null) {
+					pat=patNonClone;
+				}
 			}
 			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.ADT);
 			Provider prov=Providers.GetProv(Patients.GetProvNum(pat));
@@ -135,8 +159,13 @@ namespace OpenDentBusiness.HL7 {
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
 						}
 						else {
-							string fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,repeat+1,eventType,
-								patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							string fieldValue="";
+							if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
+								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							}
+							else {
+								fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,repeat+1,eventType);
+							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
 						}
 					}
@@ -166,6 +195,15 @@ namespace OpenDentBusiness.HL7 {
 			}
 			if(apt==null) {//SIU messages must have an appointment
 				return null;
+			}
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(pat,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(patNonClone!=null) {
+					pat=patNonClone;
+				}
 			}
 			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.SIU);
 			Provider prov=Providers.GetProv(apt.ProvNum);
@@ -255,8 +293,14 @@ namespace OpenDentBusiness.HL7 {
 			if(hl7DefMessage==null) {//SRR message type is not defined so do nothing and return
 				return null;
 			}
-			if(apt==null) {//SRR messages must have an appointment
-				return null;
+			if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(pat,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(patNonClone!=null) {
+					pat=patNonClone;
+				}
 			}
 			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.SRR);
 			//go through each segment in the def
@@ -269,7 +313,13 @@ namespace OpenDentBusiness.HL7 {
 						seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
 					}
 					else {
-						string fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,eventType,controlId,isAck,ackEvent);
+						string fieldValue="";
+						if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.MSA) {
+							fieldValue=FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent);
+						}
+						else {
+							fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,eventType);
+						}
 						seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
 					}
 				}

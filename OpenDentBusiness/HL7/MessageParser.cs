@@ -276,7 +276,13 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			IsNewPat=pat==null;
-			if(msg.MsgType==MessageTypeHL7.SRM && IsNewPat) {//SRM messages must refer to existing appointments, so there must be an existing patient as well
+			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM && IsNewPat) {//SRM messages must refer to existing appointments, so there must be an existing patient as well
+				MessageHL7 hl7SRR=MessageConstructor.GenerateSRR(pat,null,msg.EventType,msg.ControlId,false,msg.AckEvent);//use false to indicate AE - Application Error in SRR.MSA segment
+				HL7Msg hl7Msg=new HL7Msg();
+				hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+				hl7Msg.MsgText=hl7SRR.ToString();
+				hl7Msg.Note="Could not process HL7 SRM message due to an invalid or missing patient ID in the PID segment.";
+				HL7Msgs.Insert(hl7Msg);
 				throw new Exception("Could not process HL7 SRM message due to an invalid or missing patient ID in the PID segment.");
 			}
 			if(IsNewPat) {
@@ -333,20 +339,33 @@ namespace OpenDentBusiness.HL7 {
 			Appointment aptCur=Appointments.GetOneApt(aptNum);//if aptNum=0, aptCur will be null
 			//SRM messages are only for interfaces where OD is considered the 'filler' application
 			//Not valid for eCW where OD is considered an 'auxiliary' application and we receive SIU messages instead.
-			if(msg.MsgType==MessageTypeHL7.SRM) {
-				if(aptCur==null) {//The SRM message must refer to a valid AptNum
+			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM) {
+				MessageHL7 hl7SRR=null;
+				HL7Msg hl7Msg=null;
+				if(aptCur==null) {
+					hl7SRR=MessageConstructor.GenerateSRR(pat,aptCur,msg.EventType,msg.ControlId,false,msg.AckEvent);//use false to indicate AE - Application Error in SRR.MSA segment
+					hl7Msg=new HL7Msg();
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=hl7SRR.ToString();
+					hl7Msg.PatNum=pat.PatNum;
+					hl7Msg.Note="Could not process HL7 SRM message due to an invalid or missing appointment ID in the ARQ segment.  Appointment ID attempted: "+aptNum.ToString();
+					HL7Msgs.Insert(hl7Msg);
 					throw new Exception("Could not process HL7 SRM message due to an invalid or missing appointment ID in the ARQ segment.  Appointment ID attempted: "+aptNum.ToString());
 				}
 				if(pat.PatNum!=aptCur.PatNum) {//an SRM must refer to a valid appt, therefore the patient cannot be new and must have a PatNum
+					hl7SRR=MessageConstructor.GenerateSRR(pat,aptCur,msg.EventType,msg.ControlId,false,msg.AckEvent);//use false to indicate AE - Application Error in SRR.MSA segment
+					hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=aptCur.AptNum;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=hl7SRR.ToString();
+					hl7Msg.PatNum=pat.PatNum;
+					hl7Msg.Note="Could not process HL7 SRM message.\r\n"
+						+"The patient identified in the PID segment is not the same as the patient on the appointment identified in the ARQ segment.\r\n"
+						+"Appointment PatNum: "+aptCur.PatNum.ToString()+".  PID segment PatNum: "+pat.PatNum.ToString()+".";
+					HL7Msgs.Insert(hl7Msg);
 					throw new Exception("Could not process HL7 SRM message.\r\n"
 						+"The patient identified in the PID segment is not the same as the patient on the appointment identified in the ARQ segment.\r\n"
 						+"Appointment PatNum: "+aptCur.PatNum.ToString()+".  PID segment PatNum: "+pat.PatNum.ToString()+".");
-				}
-				if(msg.AckEvent=="S04") {//appointment cancellation message, we will set the AptStatus to Broken
-					//msg.EventType will be S03_S04 since the message structure for both messages will be the same, but S04 will be the AckEvent and will signal an appt cancellation
-					Appointment aptOld=aptCur.Clone();
-					aptCur.AptStatus=ApptStatus.Broken;
-					Appointments.Update(aptCur,aptOld);
 				}
 			}
 			//We now have a patient object , either loaded from the db or new, and an appointment (could be null) so process this message for this patient
@@ -389,26 +408,37 @@ namespace OpenDentBusiness.HL7 {
 				catch(ApplicationException ex) {//Required segment was missing, or other error.
 					HL7MsgCur.Note="Could not process this HL7 message.  "+ex;
 					HL7Msgs.Update(HL7MsgCur);
-					throw new Exception("Could not process HL7 message.  "+ex);
+					if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM) {//SRM messages require sending an SRR response, this will be with Ack Code AE - Application Error
+						MessageHL7 hl7SRR=MessageConstructor.GenerateSRR(pat,aptCur,msg.EventType,msg.ControlId,false,msg.AckEvent);//use false to indicate AE - Application Error in SRR.MSA segment
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=aptCur.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=hl7SRR.ToString();
+						hl7Msg.Note="Could not process an HL7 SRM message.  Send SRR for the request.  "+ex;
+						hl7Msg.PatNum=pat.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+					}
+					throw new Exception("Could not process an HL7 message.  "+ex);
 				}
 			}
-			//We have processed the message so now update or insert the patient
+			//We have processed the message so now update the patient
 			if(pat.FName=="" || pat.LName=="") {
 				EventLog.WriteEntry("OpenDentHL7","Patient demographics not processed due to missing first or last name. PatNum:"+pat.PatNum.ToString()
 					,EventLogEntryType.Information);
 				HL7MsgCur.Note="Patient demographics not processed due to missing first or last name. PatNum:"+pat.PatNum.ToString();
 				HL7Msgs.Update(HL7MsgCur);
-				return;
 			}
-			if(IsNewPat && pat.Guarantor==0) {
+			else {
+				if(IsNewPat && pat.Guarantor==0) {
 					pat.Guarantor=pat.PatNum;
+				}
+				Patients.Update(pat,patOld);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Updated patient "+pat.GetNameFLnoPref(),EventLogEntryType.Information);
+				}
+				HL7MsgCur.HL7Status=HL7MessageStatus.InProcessed;
+				HL7Msgs.Update(HL7MsgCur);
 			}
-			Patients.Update(pat,patOld);
-			if(IsVerboseLogging) {
-				EventLog.WriteEntry("OpenDentHL7","Updated patient "+pat.GetNameFLnoPref(),EventLogEntryType.Information);
-			}
-			HL7MsgCur.HL7Status=HL7MessageStatus.InProcessed;
-			HL7Msgs.Update(HL7MsgCur);
 			//Schedule Request Messages require a Schedule Request Response if the data requested to be changed was successful
 			//We only allow changing the appt note, setting the dentist and hygienist, updating the confirmation status, and changing the ClinicNum.
 			//We also allow setting the appt status to broken if the EventType is S04 - Request Appointment Cancellation.
@@ -416,13 +446,13 @@ namespace OpenDentBusiness.HL7 {
 			//The SRM will be ACK'd after returning from this Process method in ServiceHL7.
 			//Our SRR will also be ACK'd by the receiving software.
 			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM) {
-				if(aptCur==null) {
-					return;//we cannot generate an SRR without an appointment
-				}
 				if(msg.AckEvent=="S04") {
 					Appointment aptOld=aptCur.Clone();
 					aptCur.AptStatus=ApptStatus.Broken;
 					Appointments.Update(aptCur,aptOld);
+					if(IsVerboseLogging) {
+						EventLog.WriteEntry("OpenDentHL7","Appointment broken due to inbound SRM message with event type S04 for patient "+pat.GetNameFLnoPref(),EventLogEntryType.Information);
+					}
 				}
 				MessageHL7 hl7SRR=MessageConstructor.GenerateSRR(pat,aptCur,msg.EventType,msg.ControlId,true,msg.AckEvent);
 				HL7Msg hl7Msg=new HL7Msg();
@@ -547,7 +577,7 @@ namespace OpenDentBusiness.HL7 {
 						}
 						//provNum may still be 0
 						continue;
-					case "provType":
+					case "prov.provType":
 						strProvType=seg.GetFieldComponent(intItemOrder);
 						//provType could still be an empty string, which is treated the same as 'd' or 'D' for dentist
 						continue;

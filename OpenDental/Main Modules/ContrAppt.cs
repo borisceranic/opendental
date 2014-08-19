@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDentBusiness.UI;
+using OpenDentBusiness.HL7;
 using CodeBase;
 
 namespace OpenDental {
@@ -2578,6 +2579,23 @@ namespace OpenDental {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
 					aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
 					aptCur.AptNum);
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S12 - New Appt Booking event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(PatCur,Patients.GetPat(PatCur.Guarantor),EventTypeHL7.S12,aptCur);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=aptCur.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=PatCur.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 				List<Procedure> ProcList=Procedures.Refresh(aptCur.PatNum);
 				bool procAlreadyAttached=false;
 				for(int i=0;i<ProcList.Count;i++) {
@@ -2614,15 +2632,40 @@ namespace OpenDental {
 				aptCur.Confirmed=DefC.Short[(int)DefCat.ApptConfirmed][0].DefNum;//Causes the confirmation status to be reset.
 				try {
 					Appointments.Update(aptCur,aptOld);
+					bool isCreate=false;
 					if(aptOld.AptStatus==ApptStatus.UnschedList && aptOld.AptDateTime==DateTime.MinValue) { //If new appt is being added to schedule from pinboard
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
 							aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
 							aptCur.AptNum);
+						isCreate=true;
 					}
 					else { //If existing appt is being moved
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,aptCur.PatNum,
 							aptCur.ProcDescript+", from "+aptOld.AptDateTime.ToString()+", to "+aptCur.AptDateTime.ToString(),
 							aptCur.AptNum);
+					}
+					//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+					if(HL7Defs.IsExistingHL7Enabled()) {
+						//S12 - New Appt Booking event, S13 - Appt Rescheduling
+						MessageHL7 messageHL7=null;
+						if(isCreate) {
+							messageHL7=MessageConstructor.GenerateSIU(PatCur,Patients.GetPat(PatCur.Guarantor),EventTypeHL7.S12,aptCur);
+						}
+						else {
+							messageHL7=MessageConstructor.GenerateSIU(PatCur,Patients.GetPat(PatCur.Guarantor),EventTypeHL7.S13,aptCur);
+						}
+						//Will be null if there is no outbound SIU message defined, so do nothing
+						if(messageHL7!=null) {
+							HL7Msg hl7Msg=new HL7Msg();
+							hl7Msg.AptNum=aptCur.AptNum;
+							hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+							hl7Msg.MsgText=messageHL7.ToString();
+							hl7Msg.PatNum=PatCur.PatNum;
+							HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+							MessageBox.Show(this,messageHL7.ToString());
+#endif
+						}
 					}
 				}
 				catch(ApplicationException ex) {
@@ -3340,6 +3383,23 @@ namespace OpenDental {
 			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,apt.PatNum,
 				apt.ProcDescript+" from "+aptOld.AptDateTime.ToString()+", to "+apt.AptDateTime.ToString(),
 				apt.AptNum);
+			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+			if(HL7Defs.IsExistingHL7Enabled()) {
+				//S13 - Appt Rescheduling
+				MessageHL7 messageHL7=MessageConstructor.GenerateSIU(PatCur,Patients.GetPat(PatCur.Guarantor),EventTypeHL7.S13,apt);
+				//Will be null if there is no outbound SIU message defined, so do nothing
+				if(messageHL7!=null) {
+					HL7Msg hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=apt.AptNum;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=messageHL7.ToString();
+					hl7Msg.PatNum=PatCur.PatNum;
+					HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+					MessageBox.Show(this,messageHL7.ToString());
+#endif
+				}
+			}
 			RefreshModuleDataPatient(PatCur.PatNum);
 			OnPatientSelected(PatCur);
 			//RefreshModulePatient(PatCurNum);
@@ -4762,6 +4822,23 @@ namespace OpenDental {
 			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,
 				ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Sent to Unscheduled List",
 				PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+			if(HL7Defs.IsExistingHL7Enabled()) {
+				//S15 - Appt Cancellation event
+				MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,Patients.GetPat(pat.Guarantor),EventTypeHL7.S15,apt);
+				//Will be null if there is no outbound SIU message defined, so do nothing
+				if(messageHL7!=null) {
+					HL7Msg hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=apt.AptNum;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=messageHL7.ToString();
+					hl7Msg.PatNum=pat.PatNum;
+					HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+					MessageBox.Show(this,messageHL7.ToString());
+#endif
+				}
+			}
 			ModuleSelected(pat.PatNum);
 			SetInvalid();
 			Recalls.SynchScheduledApptFull(apt.PatNum);
@@ -4795,6 +4872,23 @@ namespace OpenDental {
 			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,
 				ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
 				PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+			if(HL7Defs.IsExistingHL7Enabled()) {
+				//S15 - Appt Cancellation event
+				MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,Patients.GetPat(pat.Guarantor),EventTypeHL7.S15,apt);
+				//Will be null if there is no outbound SIU message defined, so do nothing
+				if(messageHL7!=null) {
+					HL7Msg hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=apt.AptNum;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=messageHL7.ToString();
+					hl7Msg.PatNum=pat.PatNum;
+					HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+					MessageBox.Show(this,messageHL7.ToString());
+#endif
+				}
+			}
 			long provNum=PIn.Long(ContrApptSingle3[thisI].DataRoww["ProvNum"].ToString());//remember before ModuleSelected
 			ModuleSelected(pat.PatNum);
 			SetInvalid();
@@ -4868,6 +4962,23 @@ namespace OpenDental {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,
 					ContrApptSingle3[GetIndex(apt.AptNum)].DataRoww["procs"].ToString()+", "+ apt.AptDateTime.ToString()+", Set Complete",
 					apt.AptNum);
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S14 - Appt Modification event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S14,apt);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=apt.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=pat.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 			}
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 			ModuleSelected(pat.PatNum);
@@ -4933,6 +5044,23 @@ namespace OpenDental {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,PatCur.PatNum,
 					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", "+"Deleted",
 					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S17 - Appt Deletion event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(PatCur,Patients.GetPat(PatCur.Guarantor),EventTypeHL7.S17,apt);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=apt.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=PatCur.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 			}
 			Appointments.Delete(selectedAptNum);
 			ContrApptSingle.SelectedAptNum=-1;

@@ -26,7 +26,7 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormHL7DefMessageEdit));
 			this.radioOut = new System.Windows.Forms.RadioButton();
 			this.radioIn = new System.Windows.Forms.RadioButton();
-			this.comboEventType = new System.Windows.Forms.ComboBox();
+			this.comboMessageStructure = new System.Windows.Forms.ComboBox();
 			this.comboMsgType = new System.Windows.Forms.ComboBox();
 			this.labelItemOrder = new System.Windows.Forms.Label();
 			this.textNote = new System.Windows.Forms.TextBox();
@@ -68,13 +68,13 @@ namespace OpenDental{
 			// 
 			// comboEventType
 			// 
-			this.comboEventType.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.comboEventType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboEventType.Location = new System.Drawing.Point(164, 42);
-			this.comboEventType.MaxDropDownItems = 100;
-			this.comboEventType.Name = "comboEventType";
-			this.comboEventType.Size = new System.Drawing.Size(138, 21);
-			this.comboEventType.TabIndex = 13;
+			this.comboMessageStructure.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.comboMessageStructure.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboMessageStructure.Location = new System.Drawing.Point(164, 42);
+			this.comboMessageStructure.MaxDropDownItems = 100;
+			this.comboMessageStructure.Name = "comboEventType";
+			this.comboMessageStructure.Size = new System.Drawing.Size(138, 21);
+			this.comboMessageStructure.TabIndex = 13;
 			// 
 			// comboMsgType
 			// 
@@ -133,7 +133,7 @@ namespace OpenDental{
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(125, 18);
 			this.label8.TabIndex = 11;
-			this.label8.Text = "Event Type";
+			this.label8.Text = "Message Structure";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelDelete
@@ -249,7 +249,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.radioOut);
 			this.Controls.Add(this.radioIn);
-			this.Controls.Add(this.comboEventType);
+			this.Controls.Add(this.comboMessageStructure);
 			this.Controls.Add(this.comboMsgType);
 			this.Controls.Add(this.labelItemOrder);
 			this.Controls.Add(this.textNote);
@@ -276,7 +276,7 @@ namespace OpenDental{
 		private UI.ODGrid gridMain;
 		private System.Windows.Forms.RadioButton radioOut;
 		private System.Windows.Forms.RadioButton radioIn;
-		private System.Windows.Forms.ComboBox comboEventType;
+		private System.Windows.Forms.ComboBox comboMessageStructure;
 		private System.Windows.Forms.ComboBox comboMsgType;
 		private System.Windows.Forms.Label labelItemOrder;
 		private System.Windows.Forms.TextBox textNote;

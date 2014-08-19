@@ -86,7 +86,7 @@ namespace OpenDental {
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Message"),110);
+			ODGridColumn col=new ODGridColumn(Lan.g(this,"Message"),150);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Seg"),35);
 			gridMain.Columns.Add(col);
@@ -96,7 +96,7 @@ namespace OpenDental {
 			if(HL7DefCur!=null && HL7DefCur.hl7DefMessages!=null) {
 				for(int i=0;i<HL7DefCur.hl7DefMessages.Count;i++) {
 					ODGridRow row=new ODGridRow();
-					row.Cells.Add(HL7DefCur.hl7DefMessages[i].MessageType.ToString()+"-"+HL7DefCur.hl7DefMessages[i].EventType.ToString()+", "+HL7DefCur.hl7DefMessages[i].InOrOut.ToString());
+					row.Cells.Add(HL7DefCur.hl7DefMessages[i].MessageType.ToString()+", "+HL7DefCur.hl7DefMessages[i].MessageStructure.ToString()+", "+HL7DefCur.hl7DefMessages[i].InOrOut.ToString());
 					row.Cells.Add("");
 					row.Cells.Add(HL7DefCur.hl7DefMessages[i].Note);
 					row.Tag=HL7DefCur.hl7DefMessages[i];

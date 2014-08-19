@@ -39,7 +39,7 @@ namespace OpenDentBusiness.HL7 {
 			//----------------------------------------------------------------------------------------------------------------------------------
 			//eCW incoming patient information (ADT).
 			HL7DefMessage msg=new HL7DefMessage();
-			def.AddMessage(msg,MessageTypeHL7.ADT,EventTypeHL7.A04,InOutHL7.Incoming,0);
+			def.AddMessage(msg,MessageTypeHL7.ADT,MessageStructureHL7.ADT_A01,InOutHL7.Incoming,0);
 			//MSH segment------------------------------------------------------------------
 			HL7DefSegment seg=new HL7DefSegment();
 			msg.AddSegment(seg,0,SegmentNameHL7.MSH);

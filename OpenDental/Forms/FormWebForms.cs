@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Reflection;
 using OpenDental.UI;
 using OpenDentBusiness;
+using OpenDentBusiness.HL7;
 using System.Threading;
 
 namespace OpenDental {
@@ -248,7 +249,22 @@ namespace OpenDental {
 				Patient patOld=newPat.Copy();
 				newPat.Guarantor=newPat.PatNum;
 				Patients.Update(newPat,patOld);
-//Cameron_ Create outbound ADT message
+				//If there is an existing HL7 def enabled, send an ADT message if there is an outbound ADT message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(newPat,newPat,EventTypeHL7.A04);//patient is guarantor
+					//Will be null if there is no outbound ADT message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=0;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=newPat.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 			}
 			catch(Exception e) {
 				gridMain.EndUpdate();

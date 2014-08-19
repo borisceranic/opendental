@@ -8,6 +8,7 @@ namespace OpenDentBusiness.HL7 {
 		private string originalMsgText;//We'll store this for now, but I don't think we'll use it.
 		public MessageTypeHL7 MsgType;
 		public EventTypeHL7 EventType;
+		public MessageStructureHL7 MsgStructure;
 		public string ControlId;
 		public string AckCode;
 		///<summary>We will grab the event type sent to us to echo back to eCW in acknowledgment. All ADT's and SIU's will be treated the same, so while they may send an event type we do not have in our enumeration, we still want to process it and send back the ACK with the correct event type.</summary>
@@ -60,40 +61,26 @@ namespace OpenDentBusiness.HL7 {
 //js 7/3/12 Make this more intelligent because we also now need the suffix
 					string msgtype=segment.GetFieldComponent(8,0);//We force the user to leave the 'messageType' field in this position, position 8 of the MSH segment
 					string evnttype=segment.GetFieldComponent(8,1);
+					string msgStructure=segment.GetFieldComponent(8,2);
 					AckEvent=evnttype;//We will use this when constructing the acknowledgment to echo back to sender the same event type sent to us
 					//If message type or event type are not in this list, they will default to the not supported type and will not be processed
-					if(msgtype==MessageTypeHL7.ADT.ToString()) {
-						MsgType=MessageTypeHL7.ADT;
+					try {
+						MsgType=(MessageTypeHL7)Enum.Parse(typeof(MessageTypeHL7),msgtype,true);
 					}
-					else if(msgtype==MessageTypeHL7.ACK.ToString()) {
-						MsgType=MessageTypeHL7.ACK;
+					catch(Exception ex) {
+						MsgType=MessageTypeHL7.NotDefined;
 					}
-					else if(msgtype==MessageTypeHL7.DFT.ToString()) {
-						MsgType=MessageTypeHL7.DFT;
+					try {
+						EventType=(EventTypeHL7)Enum.Parse(typeof(EventTypeHL7),evnttype,true);
 					}
-					else if(msgtype==MessageTypeHL7.PPR.ToString()) {
-						MsgType=MessageTypeHL7.PPR;
+					catch(Exception ex) {
+						EventType=EventTypeHL7.NotDefined;
 					}
-					else if(msgtype==MessageTypeHL7.SIU.ToString()) {
-						MsgType=MessageTypeHL7.SIU;
+					try {
+						MsgStructure=(MessageStructureHL7)Enum.Parse(typeof(MessageStructureHL7),msgStructure,true);
 					}
-					else if(msgtype==MessageTypeHL7.SRM.ToString()) {
-						MsgType=MessageTypeHL7.SRM;
-					}
-					if(evnttype=="A04" || evnttype=="A08") {
-						EventType=EventTypeHL7.A04;
-					}
-					else if(evnttype==EventTypeHL7.P03.ToString()) {
-						EventType=EventTypeHL7.P03;
-					}
-					else if(evnttype=="S12" || evnttype=="S13" || evnttype=="S14" || evnttype=="S15" || evnttype=="S17") {
-						EventType=EventTypeHL7.S12;
-					}
-					else if(evnttype=="PC1" || evnttype=="PC2") {
-						EventType=EventTypeHL7.PC1_PC2;
-					}
-					else if(evnttype=="S03" || evnttype=="S04") {
-						EventType=EventTypeHL7.S03_S04;
+					catch(Exception ex) {
+						MsgStructure=MessageStructureHL7.NotDefined;
 					}
 				}
 			}

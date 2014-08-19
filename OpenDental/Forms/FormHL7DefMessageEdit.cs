@@ -26,12 +26,12 @@ namespace OpenDental {
 			for(int i=1;i<Enum.GetNames(typeof(MessageTypeHL7)).Length;i++) {//Start at enum 1, 0 is NotDefined and is not displayed for user to select.  Used for unsupported message types
 				comboMsgType.Items.Add(Lan.g("enumMessageTypeHL7",Enum.GetName(typeof(MessageTypeHL7), i).ToString()));
 			}
-			for(int i=1;i<Enum.GetNames(typeof(EventTypeHL7)).Length;i++) {//start at enum 1, 0 is NotDefined and is not displayed for user to select.  Used for unsupported event types
-				comboEventType.Items.Add(Lan.g("enumEventTypeHL7",Enum.GetName(typeof(EventTypeHL7),i).ToString()));
+			for(int i=1;i<Enum.GetNames(typeof(MessageStructureHL7)).Length;i++) {//start at enum 1, 0 is NotDefined and is not displayed for user to select.  Used for unsupported message structures
+				comboMessageStructure.Items.Add(Lan.g("enumMessageStructureHL7",Enum.GetName(typeof(MessageStructureHL7),i).ToString()));
 			}
 			if(HL7DefMesCur!=null) {
 				comboMsgType.SelectedIndex=(int)HL7DefMesCur.MessageType-1;//enum 0 is the NotDefined message type and is not in the list to select, so minus 1
-				comboEventType.SelectedIndex=(int)HL7DefMesCur.EventType-1;//enum 0 is the NotDefined event type and is not in the list to select, so minus 1
+				comboMessageStructure.SelectedIndex=(int)HL7DefMesCur.MessageStructure-1;//enum 0 is the NotDefined event type and is not in the list to select, so minus 1
 				textItemOrder.Text=HL7DefMesCur.ItemOrder.ToString();
 				textNote.Text=HL7DefMesCur.Note;
 				if(HL7DefMesCur.InOrOut==InOutHL7.Incoming) {
@@ -123,7 +123,7 @@ namespace OpenDental {
 				return;
 			}
 			HL7DefMesCur.MessageType=(MessageTypeHL7)comboMsgType.SelectedIndex+1;//+1 because 0 is NotDefined and is not displayed for user to select
-			HL7DefMesCur.EventType=(EventTypeHL7)comboEventType.SelectedIndex+1;//+1 because 0 is NotDefined and is not displayed for user to select
+			HL7DefMesCur.MessageStructure=(MessageStructureHL7)comboMessageStructure.SelectedIndex+1;//+1 because 0 is NotDefined and is not displayed for user to select
 			if(radioIn.Checked) {
 				HL7DefMesCur.InOrOut=InOutHL7.Incoming;
 			}

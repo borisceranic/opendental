@@ -55,6 +55,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("allergenType",DataTypeHL7.CWE,"0127"));//DA - Drug Allergy, FA - Food Allergy, MA - Miscellaneous Allergy
 			retVal.Add(new FieldNameAndType("apt.AptDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("apt.AptNum",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("apt.aptStatus",DataTypeHL7.CWE,"0278"));
 			retVal.Add(new FieldNameAndType("apt.confirmStatus",DataTypeHL7.CWE,"0278"));
 			retVal.Add(new FieldNameAndType("apt.endAptDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("apt.externalAptID",DataTypeHL7.EI));
@@ -136,7 +137,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("proccode.ProcCode",DataTypeHL7.CNE,"0088"));
 			retVal.Add(new FieldNameAndType("prov.provIdNameLFM",DataTypeHL7.XCN));//Provider id table is user defined table and different number depending on what segment it is pulled from.  Example: FT1 Performed By Code table is 0084, PV1 Attending Doctor is table 0010
 			retVal.Add(new FieldNameAndType("prov.provIdName",DataTypeHL7.XCN));
-			retVal.Add(new FieldNameAndType("provType",DataTypeHL7.CWE,"0182"));//accepted values: 'd' or 'D' for dentist, 'h' or 'H' for hygienist
+			retVal.Add(new FieldNameAndType("prov.provType",DataTypeHL7.CWE,"0182"));//accepted values: 'd' or 'D' for dentist, 'h' or 'H' for hygienist
 			retVal.Add(new FieldNameAndType("segmentAction",DataTypeHL7.ID,"0206"));//A-Add/Insert, D-Delete, U-Update, X-No Change
 			retVal.Add(new FieldNameAndType("sendingApp",DataTypeHL7.HD,"0361"));//the Open Dental HL7 root assigned to the office and stored in the oidinternal table with the IDType of Root
 			retVal.Add(new FieldNameAndType("separators^~\\&",DataTypeHL7.ST));

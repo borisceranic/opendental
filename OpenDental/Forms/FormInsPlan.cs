@@ -3205,7 +3205,6 @@ namespace OpenDental{
 
 					//detach subscriber.
 					try {
-//Cameron_ Create outbound ADT message (InsSubs.Delete calls PatPlans.Delete. That is where we should handle the ADT message creation. Covers Drop as well.)
 						InsSubs.Delete(SubCur.InsSubNum);//Checks dependencies first;  If none, deletes the inssub, claimprocs, patplans, and recomputes all estimates.
 					}
 					catch(ApplicationException ex) {
@@ -3253,7 +3252,6 @@ namespace OpenDental{
 				return;
 			}
 			PatPlans.Delete(PatPlanCur.PatPlanNum);//Estimates recomputed within Delete()
-//Cameron_ Create outbound ADT message (ADT message creation should be handled in PatPlans.Delete to cover Delete above.)
 			//PlanCur.ComputeEstimatesForCur();
 			DialogResult=DialogResult.OK;
 		}
@@ -4156,7 +4154,6 @@ namespace OpenDental{
 				PatPlanCur.Relationship=(Relat)comboRelationship.SelectedIndex;
 				PatPlanCur.PatID=textPatID.Text;
 				PatPlans.Update(PatPlanCur);
-//Cameron_ Create outbound ADT message (maybe?)
 			}
 			//InsPlan-----------------------------------------------------------------------------------------
 			if(SubCur==null) {//editing from big list.  No subscriber.  'pick from list' button not visible, making logic easier.

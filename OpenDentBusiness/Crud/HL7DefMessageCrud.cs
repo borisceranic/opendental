@@ -71,6 +71,16 @@ namespace OpenDentBusiness.Crud{
 				hL7DefMessage.InOrOut         = (InOutHL7)PIn.Int(table.Rows[i]["InOrOut"].ToString());
 				hL7DefMessage.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				hL7DefMessage.Note            = PIn.String(table.Rows[i]["Note"].ToString());
+				string messageStructure=table.Rows[i]["MessageStructure"].ToString();
+				if(messageStructure==""){
+					hL7DefMessage.MessageStructure=(MessageStructureHL7)0;
+				}
+				else try{
+					hL7DefMessage.MessageStructure=(MessageStructureHL7)Enum.Parse(typeof(MessageStructureHL7),messageStructure);
+				}
+				catch{
+					hL7DefMessage.MessageStructure=(MessageStructureHL7)0;
+				}
 				retVal.Add(hL7DefMessage);
 			}
 			return retVal;
@@ -111,7 +121,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="HL7DefMessageNum,";
 			}
-			command+="HL7DefNum,MessageType,EventType,InOrOut,ItemOrder,Note) VALUES(";
+			command+="HL7DefNum,MessageType,EventType,InOrOut,ItemOrder,Note,MessageStructure) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(hL7DefMessage.HL7DefMessageNum)+",";
 			}
@@ -121,7 +131,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7DefMessage.EventType.ToString())+"',"
 				+    POut.Int   ((int)hL7DefMessage.InOrOut)+","
 				+    POut.Int   (hL7DefMessage.ItemOrder)+","
-				+    DbHelper.ParamChar+"paramNote)";
+				+    DbHelper.ParamChar+"paramNote,"
+				+"'"+POut.String(hL7DefMessage.MessageStructure.ToString())+"')";
 			if(hL7DefMessage.Note==null) {
 				hL7DefMessage.Note="";
 			}
@@ -143,7 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+"EventType       = '"+POut.String(hL7DefMessage.EventType.ToString())+"', "
 				+"InOrOut         =  "+POut.Int   ((int)hL7DefMessage.InOrOut)+", "
 				+"ItemOrder       =  "+POut.Int   (hL7DefMessage.ItemOrder)+", "
-				+"Note            =  "+DbHelper.ParamChar+"paramNote "
+				+"Note            =  "+DbHelper.ParamChar+"paramNote, "
+				+"MessageStructure= '"+POut.String(hL7DefMessage.MessageStructure.ToString())+"' "
 				+"WHERE HL7DefMessageNum = "+POut.Long(hL7DefMessage.HL7DefMessageNum);
 			if(hL7DefMessage.Note==null) {
 				hL7DefMessage.Note="";
@@ -178,6 +190,10 @@ namespace OpenDentBusiness.Crud{
 			if(hL7DefMessage.Note != oldHL7DefMessage.Note) {
 				if(command!=""){ command+=",";}
 				command+="Note = "+DbHelper.ParamChar+"paramNote";
+			}
+			if(hL7DefMessage.MessageStructure != oldHL7DefMessage.MessageStructure) {
+				if(command!=""){ command+=",";}
+				command+="MessageStructure = '"+POut.String(hL7DefMessage.MessageStructure.ToString())+"'";
 			}
 			if(command==""){
 				return false;

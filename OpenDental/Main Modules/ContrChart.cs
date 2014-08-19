@@ -8939,6 +8939,23 @@ namespace OpenDental{
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit, apt.PatNum,
 					apt.ProcDescript+", "+apt.AptDateTime.ToString()+", Set Complete",
 					apt.AptNum);
+				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+				if(HL7Defs.IsExistingHL7Enabled()) {
+					//S14 - Appt Modification event
+					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(PatCur,FamCur.GetPatient(PatCur.Guarantor),EventTypeHL7.S14,apt);
+					//Will be null if there is no outbound SIU message defined, so do nothing
+					if(messageHL7!=null) {
+						HL7Msg hl7Msg=new HL7Msg();
+						hl7Msg.AptNum=apt.AptNum;
+						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+						hl7Msg.MsgText=messageHL7.ToString();
+						hl7Msg.PatNum=PatCur.PatNum;
+						HL7Msgs.Insert(hl7Msg);
+#if DEBUG
+						MessageBox.Show(this,messageHL7.ToString());
+#endif
+					}
+				}
 				Recalls.Synch(PatCur.PatNum);
 				Recalls.SynchScheduledApptFull(PatCur.PatNum);
 				ModuleSelected(PatCur.PatNum);
