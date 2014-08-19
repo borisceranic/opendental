@@ -890,22 +890,9 @@ namespace OpenDental {
 			formE.ShowDialog();
 		}
 
-		private void butOK_Click(object sender,System.EventArgs e) {
-			try {
-				SaveGridChanges();
-			}
-			catch(ApplicationException ex) {
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			if(textEobClaimFee.Text!=textClaimFee.Text || textEobDedApplied.Text!=textDedApplied.Text || textEobInsPayAllowed.Text!=textInsPayAllowed.Text
-				|| textEobInsPayAmt.Text!=textInsPayAmt.Text || textEobWriteOff.Text!=textWriteOff.Text) 
-			{
-				if(MessageBox.Show(Lan.g(this,"Some of the EOB totals do not match the totals entered")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
-					return;
-				}
-			}
-			SaveAllowedFees();
+		///<summary>Called when OK is clicked to receive the claim and to set the claim dates and totals properly.
+		///Public so it can also be used for automatic payment entry.</summary>
+		public void ReceivePayment() {
 			//Recalculate insurance paid, deductible, and writeoff amounts for the claim based on the final claimproc values, then save the results to the database.
 			_claim.InsPayAmt=0;
 			_claim.DedApplied=0;
@@ -924,6 +911,25 @@ namespace OpenDental {
 			_claim.ClaimStatus="R";//Received.
 			_claim.DateReceived=DateTimeOD.Today;
 			Claims.Update(_claim);
+		}
+
+		private void butOK_Click(object sender,System.EventArgs e) {
+			try {
+				SaveGridChanges();
+			}
+			catch(ApplicationException ex) {
+				MessageBox.Show(ex.Message);
+				return;
+			}
+			if(textEobClaimFee.Text!=textClaimFee.Text || textEobDedApplied.Text!=textDedApplied.Text || textEobInsPayAllowed.Text!=textInsPayAllowed.Text
+				|| textEobInsPayAmt.Text!=textInsPayAmt.Text || textEobWriteOff.Text!=textWriteOff.Text) 
+			{
+				if(MessageBox.Show(Lan.g(this,"Some of the EOB totals do not match the totals entered")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+					return;
+				}
+			}
+			SaveAllowedFees();
+			ReceivePayment();
 			DialogResult=DialogResult.OK;
 		}
 

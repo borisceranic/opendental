@@ -238,7 +238,7 @@ namespace OpenDental {
 				isReadOnly=false;
 			}
 			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check.
-				EnterPayment(claimPaid,claim);
+				EnterPayment(claimPaid,claim,false);
 				isReadOnly=false;
 			}
 			if(isReadOnly) {
@@ -258,7 +258,7 @@ namespace OpenDental {
 
 		///<summary>Enter either by total and/or by procedure, depending on whether or not procedure detail was provided in the 835 for this claim.
 		///This function creates the payment claimprocs and displays the payment entry window.</summary>
-		private void EnterPayment(Hx835_Claim claimPaid,Claim claim) {
+		public static void EnterPayment(Hx835_Claim claimPaid,Claim claim,bool isAutomatic) {
 			Patient pat=Patients.GetPat(claim.PatNum);
 			Family fam=Patients.GetFamily(claim.PatNum);
 			List<InsSub> listInsSubs=InsSubs.RefreshForFam(fam);
@@ -279,8 +279,8 @@ namespace OpenDental {
 				if(listPayPlans.Count==1) {
 					insPayPlanNum=listPayPlans[0].PayPlanNum;
 				}
-				else if(listPayPlans.Count>1) {
-					//More than one valid PayPlan.
+				else if(listPayPlans.Count>1 && !isAutomatic) {
+					//More than one valid PayPlan.  Cannot show this prompt when entering automatically, because it would disrupt workflow.
 					List<PayPlanCharge> listPayPlanCharges=PayPlanCharges.Refresh(claim.PatNum);
 					FormPayPlanSelect FormPPS=new FormPayPlanSelect(listPayPlans,listPayPlanCharges);
 					FormPPS.ShowDialog();
@@ -393,7 +393,10 @@ namespace OpenDental {
 			}
 			FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,claim,pat,fam,listInsPlans,listPatPlans,listInsSubs);
 			formP.ListClaimProcsForClaim=listClaimProcsForClaim;
-			if(formP.ShowDialog()!=DialogResult.OK) {
+			if(isAutomatic) {
+				formP.ReceivePayment();
+			}
+			else if(formP.ShowDialog()!=DialogResult.OK) {
 				if(cpByTotal.ClaimProcNum!=0) {
 					ClaimProcs.Delete(cpByTotal);
 				}
