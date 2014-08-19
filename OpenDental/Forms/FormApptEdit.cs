@@ -117,8 +117,12 @@ namespace OpenDental{
 		private Label labelSyndromicObservations;
 		///<summary>True if appt was double clicked on from the chart module gridProg.  Currently only used to trigger an appointment overlap check.</summary>
 		public bool IsInChartModule;
+		private ComboBox comboApptType;
+		private Label label10;
 		///<summary>True if appt was double clicked on from the ApptsOther form.  Currently only used to trigger an appointment overlap check.</summary>
 		public bool IsInViewPatAppts;
+		///<summary>Matches list of appointments in comboAppointmentType. Does not include hidden types unless current appointment is of that type.</summary>
+		private List<AppointmentType> _listAppointmentType;
 
 		///<summary></summary>
 		public FormApptEdit(long aptNum)
@@ -232,6 +236,8 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
+			this.comboApptType = new System.Windows.Forms.ComboBox();
+			this.label10 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -476,14 +482,14 @@ namespace OpenDental{
 			// 
 			// textTimeAskedToArrive
 			// 
-			this.textTimeAskedToArrive.Location = new System.Drawing.Point(114, 245);
+			this.textTimeAskedToArrive.Location = new System.Drawing.Point(114, 269);
 			this.textTimeAskedToArrive.Name = "textTimeAskedToArrive";
 			this.textTimeAskedToArrive.Size = new System.Drawing.Size(126, 20);
 			this.textTimeAskedToArrive.TabIndex = 146;
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(-1, 247);
+			this.label8.Location = new System.Drawing.Point(-1, 271);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(113, 18);
 			this.label8.TabIndex = 160;
@@ -511,6 +517,8 @@ namespace OpenDental{
 			// 
 			this.panel1.AutoScroll = true;
 			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.comboApptType);
+			this.panel1.Controls.Add(this.label10);
 			this.panel1.Controls.Add(this.labelSyndromicObservations);
 			this.panel1.Controls.Add(this.butSyndromicObservations);
 			this.panel1.Controls.Add(this.label9);
@@ -563,7 +571,7 @@ namespace OpenDental{
 			// 
 			// labelSyndromicObservations
 			// 
-			this.labelSyndromicObservations.Location = new System.Drawing.Point(63, 462);
+			this.labelSyndromicObservations.Location = new System.Drawing.Point(63, 486);
 			this.labelSyndromicObservations.Name = "labelSyndromicObservations";
 			this.labelSyndromicObservations.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.labelSyndromicObservations.Size = new System.Drawing.Size(174, 16);
@@ -579,7 +587,7 @@ namespace OpenDental{
 			this.butSyndromicObservations.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSyndromicObservations.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSyndromicObservations.CornerRadius = 4F;
-			this.butSyndromicObservations.Location = new System.Drawing.Point(15, 460);
+			this.butSyndromicObservations.Location = new System.Drawing.Point(15, 484);
 			this.butSyndromicObservations.Name = "butSyndromicObservations";
 			this.butSyndromicObservations.Size = new System.Drawing.Size(46, 20);
 			this.butSyndromicObservations.TabIndex = 180;
@@ -621,7 +629,7 @@ namespace OpenDental{
 			// 
 			// textRequirement
 			// 
-			this.textRequirement.Location = new System.Drawing.Point(63, 408);
+			this.textRequirement.Location = new System.Drawing.Point(63, 432);
 			this.textRequirement.Multiline = true;
 			this.textRequirement.Name = "textRequirement";
 			this.textRequirement.ReadOnly = true;
@@ -636,7 +644,7 @@ namespace OpenDental{
 			this.butRequirement.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRequirement.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRequirement.CornerRadius = 4F;
-			this.butRequirement.Location = new System.Drawing.Point(15, 408);
+			this.butRequirement.Location = new System.Drawing.Point(15, 432);
 			this.butRequirement.Name = "butRequirement";
 			this.butRequirement.Size = new System.Drawing.Size(46, 20);
 			this.butRequirement.TabIndex = 163;
@@ -650,7 +658,7 @@ namespace OpenDental{
 			this.butInsPlan2.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butInsPlan2.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butInsPlan2.CornerRadius = 2F;
-			this.butInsPlan2.Location = new System.Drawing.Point(222, 387);
+			this.butInsPlan2.Location = new System.Drawing.Point(222, 411);
 			this.butInsPlan2.Name = "butInsPlan2";
 			this.butInsPlan2.Size = new System.Drawing.Size(18, 20);
 			this.butInsPlan2.TabIndex = 176;
@@ -664,7 +672,7 @@ namespace OpenDental{
 			this.butInsPlan1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butInsPlan1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butInsPlan1.CornerRadius = 2F;
-			this.butInsPlan1.Location = new System.Drawing.Point(222, 366);
+			this.butInsPlan1.Location = new System.Drawing.Point(222, 390);
 			this.butInsPlan1.Name = "butInsPlan1";
 			this.butInsPlan1.Size = new System.Drawing.Size(18, 20);
 			this.butInsPlan1.TabIndex = 175;
@@ -673,7 +681,7 @@ namespace OpenDental{
 			// 
 			// textInsPlan2
 			// 
-			this.textInsPlan2.Location = new System.Drawing.Point(63, 387);
+			this.textInsPlan2.Location = new System.Drawing.Point(63, 411);
 			this.textInsPlan2.Name = "textInsPlan2";
 			this.textInsPlan2.ReadOnly = true;
 			this.textInsPlan2.Size = new System.Drawing.Size(158, 20);
@@ -681,7 +689,7 @@ namespace OpenDental{
 			// 
 			// labelInsPlan2
 			// 
-			this.labelInsPlan2.Location = new System.Drawing.Point(2, 389);
+			this.labelInsPlan2.Location = new System.Drawing.Point(2, 413);
 			this.labelInsPlan2.Name = "labelInsPlan2";
 			this.labelInsPlan2.Size = new System.Drawing.Size(59, 16);
 			this.labelInsPlan2.TabIndex = 173;
@@ -690,7 +698,7 @@ namespace OpenDental{
 			// 
 			// textInsPlan1
 			// 
-			this.textInsPlan1.Location = new System.Drawing.Point(63, 366);
+			this.textInsPlan1.Location = new System.Drawing.Point(63, 390);
 			this.textInsPlan1.Name = "textInsPlan1";
 			this.textInsPlan1.ReadOnly = true;
 			this.textInsPlan1.Size = new System.Drawing.Size(158, 20);
@@ -698,7 +706,7 @@ namespace OpenDental{
 			// 
 			// labelInsPlan1
 			// 
-			this.labelInsPlan1.Location = new System.Drawing.Point(2, 368);
+			this.labelInsPlan1.Location = new System.Drawing.Point(2, 392);
 			this.labelInsPlan1.Name = "labelInsPlan1";
 			this.labelInsPlan1.Size = new System.Drawing.Size(59, 16);
 			this.labelInsPlan1.TabIndex = 171;
@@ -707,14 +715,14 @@ namespace OpenDental{
 			// 
 			// textTimeDismissed
 			// 
-			this.textTimeDismissed.Location = new System.Drawing.Point(114, 305);
+			this.textTimeDismissed.Location = new System.Drawing.Point(114, 329);
 			this.textTimeDismissed.Name = "textTimeDismissed";
 			this.textTimeDismissed.Size = new System.Drawing.Size(126, 20);
 			this.textTimeDismissed.TabIndex = 170;
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(-1, 307);
+			this.label7.Location = new System.Drawing.Point(-1, 331);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(113, 16);
 			this.label7.TabIndex = 169;
@@ -723,14 +731,14 @@ namespace OpenDental{
 			// 
 			// textTimeSeated
 			// 
-			this.textTimeSeated.Location = new System.Drawing.Point(114, 285);
+			this.textTimeSeated.Location = new System.Drawing.Point(114, 309);
 			this.textTimeSeated.Name = "textTimeSeated";
 			this.textTimeSeated.Size = new System.Drawing.Size(126, 20);
 			this.textTimeSeated.TabIndex = 168;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(-1, 287);
+			this.label1.Location = new System.Drawing.Point(-1, 311);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(113, 16);
 			this.label1.TabIndex = 166;
@@ -739,14 +747,14 @@ namespace OpenDental{
 			// 
 			// textTimeArrived
 			// 
-			this.textTimeArrived.Location = new System.Drawing.Point(114, 265);
+			this.textTimeArrived.Location = new System.Drawing.Point(114, 289);
 			this.textTimeArrived.Name = "textTimeArrived";
 			this.textTimeArrived.Size = new System.Drawing.Size(126, 20);
 			this.textTimeArrived.TabIndex = 167;
 			// 
 			// labelTimeArrived
 			// 
-			this.labelTimeArrived.Location = new System.Drawing.Point(-1, 267);
+			this.labelTimeArrived.Location = new System.Drawing.Point(-1, 291);
 			this.labelTimeArrived.Name = "labelTimeArrived";
 			this.labelTimeArrived.Size = new System.Drawing.Size(113, 16);
 			this.labelTimeArrived.TabIndex = 165;
@@ -756,7 +764,7 @@ namespace OpenDental{
 			// textLabCase
 			// 
 			this.textLabCase.AcceptsReturn = true;
-			this.textLabCase.Location = new System.Drawing.Point(63, 330);
+			this.textLabCase.Location = new System.Drawing.Point(63, 354);
 			this.textLabCase.Multiline = true;
 			this.textLabCase.Name = "textLabCase";
 			this.textLabCase.ReadOnly = true;
@@ -771,7 +779,7 @@ namespace OpenDental{
 			this.butLab.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLab.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLab.CornerRadius = 4F;
-			this.butLab.Location = new System.Drawing.Point(15, 330);
+			this.butLab.Location = new System.Drawing.Point(15, 354);
 			this.butLab.Name = "butLab";
 			this.butLab.Size = new System.Drawing.Size(46, 20);
 			this.butLab.TabIndex = 161;
@@ -1082,6 +1090,25 @@ namespace OpenDental{
 			this.butText.Text = "Text";
 			this.butText.Click += new System.EventHandler(this.butText_Click);
 			// 
+			// comboApptType
+			// 
+			this.comboApptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboApptType.Location = new System.Drawing.Point(114, 246);
+			this.comboApptType.MaxDropDownItems = 30;
+			this.comboApptType.Name = "comboApptType";
+			this.comboApptType.Size = new System.Drawing.Size(126, 21);
+			this.comboApptType.TabIndex = 183;
+			this.comboApptType.SelectionChangeCommitted += new System.EventHandler(this.comboApptType_SelectionChangeCommitted);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(13, 249);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(98, 16);
+			this.label10.TabIndex = 182;
+			this.label10.Text = "Appointment Type";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormApptEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1379,6 +1406,21 @@ namespace OpenDental{
 				}
 				else {
 					butText.Enabled=(pat.TxtMsgOk==YN.Yes);
+				}
+			}
+			//AppointmentType
+			_listAppointmentType=new List<AppointmentType>();
+			comboApptType.Items.Add("none");
+			comboApptType.SelectedIndex=0;
+			for(int i=0;i<AppointmentTypes.Listt.Count;i++) {
+				if(AppointmentTypes.Listt[i].IsHidden
+					&& AppointmentTypes.Listt[i].AppointmentTypeNum!=AptCur.AppointmentTypeNum){
+					continue;
+				}
+				_listAppointmentType.Add(AppointmentTypes.Listt[i]);
+				comboApptType.Items.Add(AppointmentTypes.Listt[i].AppointmentTypeName);
+				if(AppointmentTypes.Listt[i].AppointmentTypeNum==AptCur.AppointmentTypeNum) {
+					comboApptType.SelectedIndex=_listAppointmentType.Count;//-1 for 0 index, +1 for adding none to list.
 				}
 			}
 			FillProcedures();
@@ -2521,6 +2563,12 @@ namespace OpenDental{
 			}
 			#endregion
 			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
+			if(comboApptType.SelectedIndex==0) {//0 index = none.
+				AptCur.AppointmentTypeNum=0;
+			}
+			else {
+				AptCur.AppointmentTypeNum=_listAppointmentType[comboApptType.SelectedIndex-1].AppointmentTypeNum;
+			}
 			try {
 				Appointments.Update(AptCur,AptOld);
 				//Appointments.UpdateAttached(AptCur.AptNum,procNums,isPlanned);
@@ -2946,6 +2994,17 @@ namespace OpenDental{
 				return;
 			PinClicked=true;
 			DialogResult=DialogResult.OK;
+		}
+
+		///<summary>Only catches user changes, not programatic changes. For instance this does not fire when loading the form.</summary>
+		private void comboApptType_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboApptType.SelectedIndex==0){
+				//We will leave the color override alone, because we do not want to remove an override that the user has already chosen
+				//and they can always use the none button to clear the color anyway.
+			}
+			else{
+				butColor.BackColor=_listAppointmentType[comboApptType.SelectedIndex-1].AppointmentTypeColor;
+			}
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {

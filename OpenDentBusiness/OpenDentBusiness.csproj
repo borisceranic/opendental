@@ -158,6 +158,7 @@
     <Compile Include="Crud\AllergyDefCrud.cs" />
     <Compile Include="Crud\AppointmentCrud.cs" />
     <Compile Include="Crud\AppointmentRuleCrud.cs" />
+    <Compile Include="Crud\AppointmentTypeCrud.cs" />
     <Compile Include="Crud\ApptFieldCrud.cs" />
     <Compile Include="Crud\ApptFieldDefCrud.cs" />
     <Compile Include="Crud\ApptViewCrud.cs" />
@@ -420,6 +421,7 @@
     <Compile Include="Crud\ZipCodeCrud.cs" />
     <Compile Include="Data Interface\Allergies.cs" />
     <Compile Include="Data Interface\AllergyDefs.cs" />
+    <Compile Include="Data Interface\AppointmentTypes.cs" />
     <Compile Include="Data Interface\ApptFieldDefs.cs" />
     <Compile Include="Data Interface\ApptFields.cs" />
     <Compile Include="Data Interface\AutomationConditions.cs" />
@@ -867,6 +869,7 @@
     <Compile Include="Plugins\PluginContainer.cs" />
     <Compile Include="Plugins\Plugins.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
+    <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ProcButtonQuick.cs" />
     <Compile Include="TableTypes\EhrAptObs.cs" />
     <Compile Include="TableTypes\EhrLabImage.cs" />

@@ -5875,7 +5875,48 @@ namespace OpenDentBusiness {
 				command="UPDATE hl7defmessage SET MessageStructure='DFT_P03' WHERE EventType='P03'";//All DFT's are event type P03 in the db
 				Db.NonQ(command);
 				command="UPDATE hl7defmessage SET MessageStructure='NotDefined' WHERE EventType='NotDefined' OR EventType=''";//Any messages with NotDefined or blank event type
-				Db.NonQ(command);
+				Db.NonQ(command); 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE appointment ADD AppointmentTypeNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment ADD INDEX (AppointmentTypeNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE appointment ADD AppointmentTypeNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE appointment SET AppointmentTypeNum = 0 WHERE AppointmentTypeNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment MODIFY AppointmentTypeNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX appointment_AppointmentTypeNum ON appointment (AppointmentTypeNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS appointmenttype";
+					Db.NonQ(command);
+					command=@"CREATE TABLE appointmenttype (
+						AppointmentTypeNum bigint NOT NULL auto_increment PRIMARY KEY,
+						AppointmentTypeName varchar(255) NOT NULL,
+						AppointmentTypeColor int NOT NULL,
+						ItemOrder int NOT NULL,
+						IsHidden tinyint NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE appointmenttype'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE appointmenttype (
+						AppointmentTypeNum number(20) NOT NULL,
+						AppointmentTypeName varchar2(255),
+						AppointmentTypeColor number(11) NOT NULL,
+						ItemOrder number(11) NOT NULL,
+						IsHidden number(3) NOT NULL,
+						CONSTRAINT appointmenttype_AppointmentTyp PRIMARY KEY (AppointmentTypeNum)
+						)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

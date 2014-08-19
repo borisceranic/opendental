@@ -276,7 +276,9 @@ namespace OpenDentBusiness{
 		///<summary>56. SourceOfPayment</summary>
 		Sops,
 		///<summary>57. In-Memory table used for hard-coded codes and CQMs</summary>
-		EhrCodes
+		EhrCodes,
+		///<summary>58. Used to override appointment color.  Might be used for other appointment attributes in the future.</summary>
+		AppointmentTypes
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

@@ -299,6 +299,7 @@ namespace OpenDental{
 		private bool _isStartingUp;
 		private long _previousPatNum;
 		private MenuItem menuItemDispensary;
+		private MenuItem menuItemApptTypes;
 		private DateTime _datePopupDelay;
 
 		///<summary></summary>
@@ -578,6 +579,7 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
+			this.menuItemApptTypes = new System.Windows.Forms.MenuItem();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -710,6 +712,7 @@ namespace OpenDental{
             this.menuItem8,
             this.menuApptFieldDefs,
             this.menuItemApptRules,
+            this.menuItemApptTypes,
             this.menuItemApptViews,
             this.menuItemOperatories,
             this.menuItemRecall,
@@ -741,25 +744,25 @@ namespace OpenDental{
 			// 
 			// menuItemApptViews
 			// 
-			this.menuItemApptViews.Index = 4;
+			this.menuItemApptViews.Index = 5;
 			this.menuItemApptViews.Text = "Appointment Views";
 			this.menuItemApptViews.Click += new System.EventHandler(this.menuItemApptViews_Click);
 			// 
 			// menuItemOperatories
 			// 
-			this.menuItemOperatories.Index = 5;
+			this.menuItemOperatories.Index = 6;
 			this.menuItemOperatories.Text = "Operatories";
 			this.menuItemOperatories.Click += new System.EventHandler(this.menuItemOperatories_Click);
 			// 
 			// menuItemRecall
 			// 
-			this.menuItemRecall.Index = 6;
+			this.menuItemRecall.Index = 7;
 			this.menuItemRecall.Text = "Recall";
 			this.menuItemRecall.Click += new System.EventHandler(this.menuItemRecall_Click);
 			// 
 			// menuItemRecallTypes
 			// 
-			this.menuItemRecallTypes.Index = 7;
+			this.menuItemRecallTypes.Index = 8;
 			this.menuItemRecallTypes.Text = "RecallTypes";
 			this.menuItemRecallTypes.Click += new System.EventHandler(this.menuItemRecallTypes_Click);
 			// 
@@ -1785,6 +1788,12 @@ namespace OpenDental{
 			this.lightSignalGrid1.TabIndex = 20;
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
+			// 
+			// menuItem4
+			// 
+			this.menuItemApptTypes.Index = 4;
+			this.menuItemApptTypes.Text = "Appointment Types";
+			this.menuItemApptTypes.Click += new System.EventHandler(this.menuItemApptTypes_Click);
 			// 
 			// FormOpenDental
 			// 
@@ -4387,6 +4396,15 @@ namespace OpenDental{
 			FormApptRules FormA=new FormApptRules();
 			FormA.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Appointment Rules");
+		}
+
+		private void menuItemApptTypes_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormApptTypes FormA=new FormApptTypes();
+			FormA.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Appointment Types");
 		}
 
 		private void menuItemApptViews_Click(object sender, System.EventArgs e) {

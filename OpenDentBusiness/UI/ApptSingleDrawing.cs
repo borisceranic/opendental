@@ -45,6 +45,11 @@ namespace OpenDentBusiness.UI {
 			else if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
 				backColor=Color.FromArgb(PIn.Int(dataRoww["ColorOverride"].ToString()));
 			}
+			//Do not use the code block below. We do not want to draw appt color based on appointment type. Logic for that is handled with the color override column.
+			//else if(PIn.Long(dataRoww["AppointmentTypeNum"].ToString()) != 0) {
+			//	AppointmentType t = AppointmentTypes.GetOne(PIn.Long(dataRoww["AppointmentTypeNum"].ToString()));
+			//	backColor=t.AppointmentTypeColor;
+			//}
 			else {
 				backColor=provColor;
 				//We might want to do something interesting here.

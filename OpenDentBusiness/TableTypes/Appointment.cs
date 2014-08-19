@@ -70,6 +70,8 @@ namespace OpenDentBusiness{
 		///<summary>If set to anything but 0, then this will override the graphic color for the appointment.</summary>
 		[XmlIgnore]
 		public Color ColorOverride;
+		///<summary>FK to appointmenttype.AppointmentTypeNum.</summary>
+		public long AppointmentTypeNum;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ColorOverride",typeof(int))]

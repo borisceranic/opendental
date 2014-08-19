@@ -69,6 +69,9 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {
 				ds.Tables.Add(AccountingAutoPays.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.AppointmentTypes) || isAll) {
+				ds.Tables.Add(AppointmentTypes.RefreshCache());
+			}
 			if(itypes.Contains((int)InvalidType.AutoCodes) || isAll){
 				ds.Tables.Add(AutoCodes.RefreshCache());
 				ds.Tables.Add(AutoCodeItems.RefreshCache());
@@ -263,6 +266,9 @@ namespace OpenDentBusiness {
 			}
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {
 				AccountingAutoPays.FillCache(ds.Tables["AccountingAutoPay"]);
+			}
+			if(itypes.Contains((int)InvalidType.AppointmentTypes) || isAll) {
+				AppointmentTypes.FillCache(ds.Tables["AppointmentType"]);
 			}
 			if(itypes.Contains((int)InvalidType.AutoCodes) || isAll) {
 				AutoCodes.FillCache(ds.Tables["AutoCode"]);

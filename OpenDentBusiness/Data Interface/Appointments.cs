@@ -661,6 +661,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("address");
 			table.Columns.Add("addrNote");
 			table.Columns.Add("apptModNote");
+			table.Columns.Add("AppointmentTypeNum");
 			table.Columns.Add("aptDate");
 			table.Columns.Add("aptDay");
 			table.Columns.Add("aptLength");
@@ -716,7 +717,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("wirelessPhone");
 			table.Columns.Add("writeoffPPO");
 			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
-				+"patient.ApptModNote patApptModNote,appointment.AptDateTime apptAptDateTime,appointment.AptNum apptAptNum,appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
+				+"patient.ApptModNote patApptModNote,appointment.AppointmentTypeNum,appointment.AptDateTime apptAptDateTime,appointment.AptNum apptAptNum,appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
 				+"patient.BillingType patBillingType,patient.BirthDate patBirthDate,patient.DateTimeDeceased patDateTimeDeceased,"
 				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,"
 				+"patient.ChartNumber patChartNumber,patient.City patCity,appointment.ColorOverride apptColorOverride,appointment.Confirmed apptConfirmed,"
@@ -765,7 +766,7 @@ namespace OpenDentBusiness{
 			}
 			else {//Oracle
 				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
-				+"patient.ApptModNote,AptDateTime,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
+				+"patient.ApptModNote,appointment.AppointmentTypeNum,AptDateTime,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
 				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
 				+"carrier1.CarrierName,carrier2.CarrierName,"
 				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
@@ -981,6 +982,7 @@ namespace OpenDentBusiness{
 				if(row["Assistant"].ToString()!="0") {
 					row["assistantAbbr"]=Employees.GetAbbr(PIn.Long(raw.Rows[i]["apptAssistant"].ToString()));
 				}
+				row["AppointmentTypeNum"]=raw.Rows[i]["AppointmentTypeNum"].ToString();
 				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(raw.Rows[i]["patBillingType"].ToString()));
 				row["chartNumber"]=raw.Rows[i]["patChartNumber"].ToString();
 				row["chartNumAndName"]="";
