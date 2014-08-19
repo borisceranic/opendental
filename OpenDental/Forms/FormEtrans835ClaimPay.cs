@@ -630,8 +630,8 @@ namespace OpenDental {
 
 		private void gridProcedureBreakdown_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Proc proc=(Hx835_Proc)gridProcedureBreakdown.Rows[e.Row].Tag;
-			FormEtrans835ProcEdit form=new FormEtrans835ProcEdit(proc);
-			form.Show();
+			FormEtrans835ProcEdit Form=new FormEtrans835ProcEdit(proc);
+			Form.Show();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
@@ -652,18 +652,6 @@ namespace OpenDental {
 			if(FormCP.DialogResult!=DialogResult.OK){
 				return;
 			}
-			////Remove the claimproc from the list if it was deleted:
-			//bool isDeleted=true;
-			//List <ClaimProc> listClaimProcsForPat=ClaimProcs.Refresh(_claim.PatNum);
-			//for(int i=0;i<listClaimProcsForPat.Count;i++) {
-			//	if(listClaimProcsForPat[i].ClaimProcNum==claimProc.ClaimProcNum) {
-			//		isDeleted=false;
-			//		break;
-			//	}
-			//}
-			//if(isDeleted) {
-			//	ListClaimProcsForClaim.Remove(claimProc);
-			//}
 			FillGridProcedures();
 			FillTotals();
 		}
@@ -682,18 +670,10 @@ namespace OpenDental {
 			//double amt;
 			for(int i=0;i<gridPayments.Rows.Count;i++){
 				claimFee+=ListClaimProcsForClaim[i].FeeBilled;//5
-				try{//6.deduct
-					dedApplied+=Convert.ToDouble(gridPayments.Rows[i].Cells[6].Text);
-				}catch{}
-				try{//7.allowed
-					insPayAmtAllowed+=Convert.ToDouble(gridPayments.Rows[i].Cells[7].Text);
-				}catch{}
-				try{//8.inspayest
-					insPayAmt+=Convert.ToDouble(gridPayments.Rows[i].Cells[8].Text);
-				}catch{}
-				try{//9.writeoff
-					writeOff+=Convert.ToDouble(gridPayments.Rows[i].Cells[9].Text);
-				}catch{}
+				dedApplied+=PIn.Double(gridPayments.Rows[i].Cells[6].Text);//6.deduct
+				insPayAmtAllowed+=PIn.Double(gridPayments.Rows[i].Cells[7].Text);//7.allowed
+				insPayAmt+=PIn.Double(gridPayments.Rows[i].Cells[8].Text);//8.inspayest
+				writeOff+=PIn.Double(gridPayments.Rows[i].Cells[9].Text);//9.writeoff
 			}
 			textClaimFee.Text=claimFee.ToString("F");
 			textDedApplied.Text=dedApplied.ToString("F");
@@ -844,50 +824,44 @@ namespace OpenDental {
 			}
 			//select the feeSchedule
 			long feeSched=-1;
-			//if(plan.PlanType=="p"){//ppo
-			//	feeSched=plan.FeeSched;
-			//}
-			//else if(plan.AllowedFeeSched!=0){//an allowed fee schedule exists
 			feeSched=plan.AllowedFeeSched;
-			//}
 			if(FeeScheds.GetIsHidden(feeSched)){
 				MsgBox.Show(this,"Allowed fee schedule is hidden, so no changes can be made.");
 				return;
 			}
-			Fee FeeCur=null;
+			Fee feeCur=null;
 			long codeNum;
-			List<Procedure> ProcList=Procedures.Refresh(_patCur.PatNum);
+			List<Procedure> listProcs=Procedures.Refresh(_patCur.PatNum);
 			Procedure proc;
 			for(int i=0;i<ListClaimProcsForClaim.Count;i++) {
 				//this gives error message if proc not found:
-				proc=Procedures.GetProcFromList(ProcList,ListClaimProcsForClaim[i].ProcNum);
+				proc=Procedures.GetProcFromList(listProcs,ListClaimProcsForClaim[i].ProcNum);
 				codeNum=proc.CodeNum;
 				if(codeNum==0){
 					continue;
 				}
-				FeeCur=Fees.GetFee(codeNum,feeSched);
-				if(FeeCur==null){
-					FeeCur=new Fee();
-					FeeCur.FeeSched=feeSched;
-					FeeCur.CodeNum=codeNum;
-					FeeCur.Amount=PIn.Double(gridPayments.Rows[i].Cells[7].Text);
-					Fees.Insert(FeeCur);
+				feeCur=Fees.GetFee(codeNum,feeSched);
+				if(feeCur==null){
+					feeCur=new Fee();
+					feeCur.FeeSched=feeSched;
+					feeCur.CodeNum=codeNum;
+					feeCur.Amount=PIn.Double(gridPayments.Rows[i].Cells[7].Text);
+					Fees.Insert(feeCur);
 				}
 				else{
-					FeeCur.Amount=PIn.Double(gridPayments.Rows[i].Cells[7].Text);
-					Fees.Update(FeeCur);
+					feeCur.Amount=PIn.Double(gridPayments.Rows[i].Cells[7].Text);
+					Fees.Update(feeCur);
 				}
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(FeeCur.CodeNum)
-					+", "+Lan.g(this,"Fee: ")+""+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(FeeCur.FeeSched)
-					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),FeeCur.CodeNum);
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(feeCur.CodeNum)
+					+", "+Lan.g(this,"Fee: ")+""+feeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(feeCur.FeeSched)
+					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),feeCur.CodeNum);
 			}
-			//Fees.Refresh();//redundant?
 			DataValid.SetInvalid(InvalidType.Fees);
 		}
 
 		private void butViewEobDetails_Click(object sender,EventArgs e) {
-			FormEtrans835ClaimEdit formE=new FormEtrans835ClaimEdit(_claimPaid);
-			formE.ShowDialog();
+			FormEtrans835ClaimEdit FormE=new FormEtrans835ClaimEdit(_claimPaid);
+			FormE.ShowDialog();
 		}
 
 		///<summary>Called when OK is clicked to receive the claim and to set the claim dates and totals properly.

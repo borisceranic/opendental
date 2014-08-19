@@ -447,7 +447,7 @@ namespace OpenDentBusiness{
 			}
 			//We always require the claim fee and date of service to match, then we use other criteria below to wisely choose from the shorter list of claims.
 			//The list of claims with matching fee and date of service should be very short.  Worst case, the list would contain all of the appointments for a single day if every claim had the same fee (rare).
-			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.Lname,patient.Fname,inssub.SubscriberID "
+			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.LName,patient.FName,inssub.SubscriberID "
 				+"FROM claim "
 				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
 				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
@@ -494,8 +494,8 @@ namespace OpenDentBusiness{
 			patFname=patFname.ToLower();
 			patLname=patLname.ToLower();
 			for(int i=0;i<dtClaims.Rows.Count;i++) {
-				string lname=PIn.String(dtClaims.Rows[i]["Lname"].ToString()).ToLower();
-				string fname=PIn.String(dtClaims.Rows[i]["Fname"].ToString()).ToLower();
+				string lname=PIn.String(dtClaims.Rows[i]["LName"].ToString()).ToLower();
+				string fname=PIn.String(dtClaims.Rows[i]["FName"].ToString()).ToLower();
 				string subId=PIn.String(dtClaims.Rows[i]["SubscriberID"].ToString());
 				if(lname!=patLname) {
 					continue;

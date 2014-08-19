@@ -364,7 +364,11 @@ namespace OpenDental {
 			}
 			bool isByTotalIncluded=true;
 			//Do not create a total payment if the payment contains all zero amounts, because it would not be useful.  Written to account for potential rounding errors in the amounts.
-			if(Math.Round(cpByTotal.DedApplied,2)==0 && Math.Round(cpByTotal.AllowedOverride,2)==0 && Math.Round(cpByTotal.InsPayAmt,2)==0 && Math.Round(cpByTotal.WriteOff,2)==0) {
+			if(Math.Round(cpByTotal.DedApplied,2,MidpointRounding.AwayFromZero)==0
+				&& Math.Round(cpByTotal.AllowedOverride,2,MidpointRounding.AwayFromZero)==0
+				&& Math.Round(cpByTotal.InsPayAmt,2,MidpointRounding.AwayFromZero)==0
+				&& Math.Round(cpByTotal.WriteOff,2,MidpointRounding.AwayFromZero)==0)
+			{
 				isByTotalIncluded=false;
 			}
 			if(claim.ClaimType=="PreAuth") {
@@ -391,12 +395,12 @@ namespace OpenDental {
 				//Add the total payment to the beginning of the list, so that the ins paid amount for the total payment will be highlighted when FormEtrans835ClaimPay loads.
 				listClaimProcsForClaim.Insert(0,cpByTotal);
 			}
-			FormEtrans835ClaimPay formP=new FormEtrans835ClaimPay(claimPaid,claim,pat,fam,listInsPlans,listPatPlans,listInsSubs);
-			formP.ListClaimProcsForClaim=listClaimProcsForClaim;
+			FormEtrans835ClaimPay FormP=new FormEtrans835ClaimPay(claimPaid,claim,pat,fam,listInsPlans,listPatPlans,listInsSubs);
+			FormP.ListClaimProcsForClaim=listClaimProcsForClaim;
 			if(isAutomatic) {
-				formP.ReceivePayment();
+				FormP.ReceivePayment();
 			}
-			else if(formP.ShowDialog()!=DialogResult.OK) {
+			else if(FormP.ShowDialog()!=DialogResult.OK) {
 				if(cpByTotal.ClaimProcNum!=0) {
 					ClaimProcs.Delete(cpByTotal);
 				}
