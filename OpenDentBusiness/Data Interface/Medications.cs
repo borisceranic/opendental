@@ -99,7 +99,7 @@ namespace OpenDentBusiness{
 		///<summary>Returns a string if medication is in use in medicationpat, allergydef, eduresources, or preference.MedicationsIndicateNone. The string will explain where the medication is in use.</summary>
 		public static string IsInUse(Medication med) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),med.MedicationNum);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),med);
 			}
 			string[] brands;
 			if(med.MedicationNum==med.GenericNum) {
