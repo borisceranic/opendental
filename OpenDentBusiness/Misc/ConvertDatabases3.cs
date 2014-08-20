@@ -5917,6 +5917,17 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE etrans ADD INDEX (etransmessagetextnum)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX etrans_etransmessagetextnum ON etrans (etransmessagetextnum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 
 				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
