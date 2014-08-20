@@ -11,7 +11,7 @@ namespace OpenDentBusiness.HL7 {
 		public static MessageHL7 GenerateDFT(List<Procedure> listProcs,EventTypeHL7 eventType,Patient pat,Patient guar,long aptNum,string pdfDescription,string pdfDataString) {
 			//In \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02_Control_M4_JAN2007.doc
 			//On page 28, there is a Message Construction Pseudocode as well as a flowchart which might help.
-			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.DFT);
+			MessageHL7 msgHl7=new MessageHL7(MessageTypeHL7.DFT);
 			HL7Def hl7Def=HL7Defs.GetOneDeepEnabled();
 			if(hl7Def==null) {
 				return null;
@@ -39,60 +39,60 @@ namespace OpenDentBusiness.HL7 {
 			}
 			Provider prov=Providers.GetProv(Patients.GetProvNum(pat));
 			Appointment apt=Appointments.GetOneApt(aptNum);
-			List<PatPlan> listPatplans=PatPlans.Refresh(pat.PatNum);
-			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
-				int countRepeat=1;
-				if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.FT1) {
-					countRepeat=listProcs.Count;
+			List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+			for(int i=0;i<hl7DefMessage.hl7DefSegments.Count;i++) {
+				int repeatCount=1;
+				if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.FT1) {
+					repeatCount=listProcs.Count;
 				}
-				else if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-					countRepeat=listPatplans.Count;
+				else if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {
+					repeatCount=listPatPlans.Count;
 				}
 				//for example, countRepeat can be zero in the case where we are only sending a PDF of the TP to eCW, and no procs.
 				//or the patient does not have any current insplans for IN1 segments
-				for(int repeat=0;repeat<countRepeat;repeat++) {//FT1 is optional and can repeat so add as many FT1's as procs in procList, IN1 is optional and can repeat as well, repeat for the number of patplans in patplanList
-					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.FT1 && listProcs.Count>repeat) {
-						prov=Providers.GetProv(listProcs[repeat].ProvNum);
+				for(int j=0;j<repeatCount;j++) {//FT1 is optional and can repeat so add as many FT1's as procs in procList, IN1 is optional and can repeat as well, repeat for the number of patplans in patplanList
+					if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.FT1 && listProcs.Count>j) {
+						prov=Providers.GetProv(listProcs[j].ProvNum);
 					}
 					Procedure proc=null;
-					if(listProcs.Count>repeat) {//procList could be an empty list
-						proc=listProcs[repeat];
+					if(listProcs.Count>j) {//procList could be an empty list
+						proc=listProcs[j];
 					}
-					PatPlan patplanCur=null;
-					InsPlan insplanCur=null;
-					InsSub inssubCur=null;
+					PatPlan patPlanCur=null;
+					InsPlan insPlanCur=null;
+					InsSub insSubCur=null;
 					Carrier carrierCur=null;
-					Patient patSub=null;
-					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-						patplanCur=listPatplans[repeat];
-						inssubCur=InsSubs.GetOne(patplanCur.InsSubNum);
-						insplanCur=InsPlans.RefreshOne(inssubCur.PlanNum);
-						carrierCur=Carriers.GetCarrier(insplanCur.CarrierNum);
-						patSub=Patients.GetPat(inssubCur.Subscriber);
+					Patient subscriber=null;
+					if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {
+						patPlanCur=listPatPlans[j];
+						insSubCur=InsSubs.GetOne(patPlanCur.InsSubNum);
+						insPlanCur=InsPlans.RefreshOne(insSubCur.PlanNum);
+						carrierCur=Carriers.GetCarrier(insPlanCur.CarrierNum);
+						subscriber=Patients.GetPat(insSubCur.Subscriber);
 					}
-					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
-					seg.SetField(0,hl7DefMessage.hl7DefSegments[s].SegmentName.ToString());
-					for(int f=0;f<hl7DefMessage.hl7DefSegments[s].hl7DefFields.Count;f++) {
-						string fieldName=hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FieldName;
+					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
+					seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
+					for(int f=0;f<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;f++) {
+						string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[f].FieldName;
 						if(fieldName=="") {//If fixed text instead of field name just add text to segment
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[f].FixedText);
 						}
 						else {
 							string fieldValue="";
-							if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {
+								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,j+1,patPlanCur,insSubCur,insPlanCur,carrierCur,listPatPlans.Count,subscriber);
 							}
 							else {
-								fieldValue=FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,repeat+1,eventType,
+								fieldValue=FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,j+1,eventType,
 								 pdfDescription,pdfDataString,MessageStructureHL7.DFT_P03);
 							}
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[f].OrdinalPos,fieldValue);
 						}
 					}
-					messageHL7.Segments.Add(seg);
+					msgHl7.Segments.Add(seg);
 				}
 			}
-			return messageHL7;
+			return msgHl7;
 		}
 
 		///<summary>Returns null if there is no HL7Def enabled or if there is no outbound ADT defined for the enabled HL7Def.</summary>
@@ -124,23 +124,23 @@ namespace OpenDentBusiness.HL7 {
 			}
 			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.ADT);
 			Provider prov=Providers.GetProv(Patients.GetProvNum(pat));
-			List<PatPlan> listPatplans=PatPlans.Refresh(pat.PatNum);
-			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
+			List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+			for(int i=0;i<hl7DefMessage.hl7DefSegments.Count;i++) {
 				int countRepeat=1;
 				//IN1 segment can repeat, get the number of current insurance plans attached to the patient
-				if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-					countRepeat=listPatplans.Count;
+				if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {
+					countRepeat=listPatPlans.Count;
 				}
 				//countRepeat is usually 1, but for repeatable/optional fields, it may be 0 or greater than 1
 				//for example, countRepeat can be zero if the patient does not have any current insplans, in which case no IN1 segments will be included
-				for(int repeat=0;repeat<countRepeat;repeat++) {//IN1 is optional and can repeat so add as many as listPatplans
+				for(int j=0;j<countRepeat;j++) {//IN1 is optional and can repeat so add as many as listPatplans
 					PatPlan patplanCur=null;
 					InsPlan insplanCur=null;
 					InsSub inssubCur=null;
 					Carrier carrierCur=null;
 					Patient patSub=null;
-					if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {//index repeat is guaranteed to be less than listPatplans.Count
-						patplanCur=listPatplans[repeat];
+					if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {//index repeat is guaranteed to be less than listPatplans.Count
+						patplanCur=listPatPlans[j];
 						inssubCur=InsSubs.GetOne(patplanCur.InsSubNum);
 						insplanCur=InsPlans.RefreshOne(inssubCur.PlanNum);
 						carrierCur=Carriers.GetCarrier(insplanCur.CarrierNum);
@@ -151,22 +151,22 @@ namespace OpenDentBusiness.HL7 {
 							patSub=Patients.GetPat(inssubCur.Subscriber);
 						}
 					}
-					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
-					seg.SetField(0,hl7DefMessage.hl7DefSegments[s].SegmentName.ToString());
-					for(int f=0;f<hl7DefMessage.hl7DefSegments[s].hl7DefFields.Count;f++) {
-						string fieldName=hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FieldName;
+					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
+					seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
+					for(int k=0;k<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;k++) {
+						string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FieldName;
 						if(fieldName=="") {//If fixed text instead of field name just add text to segment
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FixedText);
 						}
 						else {
 							string fieldValue="";
-							if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+							if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.IN1) {
+								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,j+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatPlans.Count,patSub);
 							}
 							else {
-								fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,repeat+1,eventType);
+								fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,j+1,eventType);
 							}
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,fieldValue);
 						}
 					}
 					messageHL7.Segments.Add(seg);
@@ -207,29 +207,29 @@ namespace OpenDentBusiness.HL7 {
 			}
 			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.SIU);
 			Provider prov=Providers.GetProv(apt.ProvNum);
-			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
-				int countRepeat=1;
+			for(int i=0;i<hl7DefMessage.hl7DefSegments.Count;i++) {
+				int repeatCount=1;
 				//AIP segment can repeat, once for the dentist on the appt and once for the hygienist
-				if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.AIP && apt.ProvHyg>0) {
-					countRepeat=2;
+				if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.AIP && apt.ProvHyg>0) {
+					repeatCount=2;
 				}
-				for(int repeat=0;repeat<countRepeat;repeat++) {//AIP will be repeated if there is a dentist and a hygienist on the appt
-					if(repeat>0) {
+				for(int j=0;j<repeatCount;j++) {//AIP will be repeated if there is a dentist and a hygienist on the appt
+					if(j>0) {
 						prov=Providers.GetProv(apt.ProvHyg);
 						if(prov==null) {
 							break;//shouldn't happen, apt.ProvHyg would have to be set to an invalid ProvNum on the appt, just in case
 						}
 					}
-					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
-					seg.SetField(0,hl7DefMessage.hl7DefSegments[s].SegmentName.ToString());
-					for(int f=0;f<hl7DefMessage.hl7DefSegments[s].hl7DefFields.Count;f++) {
-						string fieldName=hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FieldName;
+					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
+					seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
+					for(int k=0;k<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;k++) {
+						string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FieldName;
 						if(fieldName=="") {//If fixed text instead of field name just add text to segment
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FixedText);
 						}
 						else {
-							string fieldValue=FieldConstructor.GenerateFieldSIU(hl7Def,fieldName,pat,prov,guar,apt,repeat+1,eventType);
-							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
+							string fieldValue=FieldConstructor.GenerateFieldSIU(hl7Def,fieldName,pat,prov,guar,apt,j+1,eventType);
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,fieldValue);
 						}
 					}
 					messageHL7.Segments.Add(seg);
@@ -255,9 +255,9 @@ namespace OpenDentBusiness.HL7 {
 			if(hl7DefMessage==null) {//ACK message type is not defined so do nothing and return
 				return null;
 			}
-			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.ACK);
-			messageHL7.ControlId=controlId;
-			messageHL7.AckEvent=ackEvent;
+			MessageHL7 msgHl7=new MessageHL7(MessageTypeHL7.ACK);
+			msgHl7.ControlId=controlId;
+			msgHl7.AckEvent=ackEvent;
 			//go through each segment in the def
 			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
 				SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
@@ -271,9 +271,9 @@ namespace OpenDentBusiness.HL7 {
 						seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent));
 					}
 				}
-				messageHL7.Segments.Add(seg);
+				msgHl7.Segments.Add(seg);
 			}
-			return messageHL7;
+			return msgHl7;
 		}
 
 		///<summary>Returns null if no HL7 def is enabled or no SRR is defined in the enabled def.  An SRR - Schedule Request Response message is sent when an SRM - Schedule Request Message is received.  The SRM is acknowledged just like any inbound message, but the SRR notifies the placer application that the requested modification took place.  Currently the only appointment modifications allowed are updating the appt note, setting the dentist and hygienist, updating the confirmation status, and changing the ClinicNum.  Setting the appointment status to Broken is also supported.</summary>
@@ -302,30 +302,30 @@ namespace OpenDentBusiness.HL7 {
 					pat=patNonClone;
 				}
 			}
-			MessageHL7 messageHL7=new MessageHL7(MessageTypeHL7.SRR);
+			MessageHL7 msgHl7=new MessageHL7(MessageTypeHL7.SRR);
 			//go through each segment in the def
-			for(int s=0;s<hl7DefMessage.hl7DefSegments.Count;s++) {
-				SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[s].SegmentName);
-				seg.SetField(0,hl7DefMessage.hl7DefSegments[s].SegmentName.ToString());
-				for(int f=0;f<hl7DefMessage.hl7DefSegments[s].hl7DefFields.Count;f++) {
-					string fieldName=hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FieldName;
+			for(int i=0;i<hl7DefMessage.hl7DefSegments.Count;i++) {
+				SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
+				seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
+				for(int j=0;j<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;j++) {
+					string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].FieldName;
 					if(fieldName=="") {//If fixed text instead of field name just add text to segment
-						seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].FixedText);
+						seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].FixedText);
 					}
 					else {
 						string fieldValue="";
-						if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.MSA) {
+						if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.MSA) {
 							fieldValue=FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent);
 						}
 						else {
 							fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,eventType);
 						}
-						seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);
+						seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].OrdinalPos,fieldValue);
 					}
 				}
-				messageHL7.Segments.Add(seg);
+				msgHl7.Segments.Add(seg);
 			}
-			return messageHL7;
+			return msgHl7;
 		}
 
 	}

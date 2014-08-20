@@ -344,7 +344,7 @@ namespace OpenDentBusiness.HL7 {
 				case "pat.Urgency":
 					//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0-Unknown, 1-NoProblems, 2-NeedsCare, 3-Urgent
 					return ((int)pat.Urgency).ToString();
-				case "patientIdList":
+				case "patientIds":
 					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
 					OIDInternal patOid=OIDInternals.GetForType(IdentifierType.Patient);
 					string patOidRoot="";
@@ -419,12 +419,12 @@ namespace OpenDentBusiness.HL7 {
 						if(retval!="") {
 							retval+=def.RepetitionSeparator;
 						}
-						ICD9 iCur=ICD9s.GetByCode(listDiagCodes[i]);
-						if(iCur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
+						ICD9 icd9Cur=ICD9s.GetByCode(listDiagCodes[i]);
+						if(icd9Cur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
 							retval+=listDiagCodes[i];
 							continue;
 						}
-						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],iCur.Description,"I9C","","","","31","","");
+						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd9Cur.Description,"I9C","","","","31","","");
 					}
 					return retval;
 				case "proc.procDateTime":
@@ -923,5 +923,6 @@ namespace OpenDentBusiness.HL7 {
 			//not a 10 digit number
 			return "";
 		}
+
 	}
 }

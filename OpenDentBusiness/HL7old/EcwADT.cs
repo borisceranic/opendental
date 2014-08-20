@@ -70,7 +70,8 @@ namespace OpenDentBusiness.HL7 {
 			else{
 				patOld=pat.Copy();
 			}
-			EcwSegmentPID.ProcessPID(pat,seg,isStandalone);
+			List<PatRace> listPatRaces=new List<PatRace>();
+			EcwSegmentPID.ProcessPID(pat,seg,isStandalone,listPatRaces);
 			//PV1-patient visit---------------------------
 			//seg=message.GetSegment(SegmentName.PV1,false);
 			//if(seg!=null) {//this seg is optional
@@ -98,7 +99,7 @@ namespace OpenDentBusiness.HL7 {
 				if(isVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Inserted patient: "+pat.FName+" "+pat.LName,EventLogEntryType.Information);
 				}
-				Patients.Insert(pat,true);
+				pat.PatNum=Patients.Insert(pat,!isStandalone);//use existing PK if not standalone, standalone will have PatNum=0, so set PatNum here
 				if(pat.Guarantor==0) {
 					patOld=pat.Copy();
 					pat.Guarantor=pat.PatNum;
@@ -110,7 +111,9 @@ namespace OpenDentBusiness.HL7 {
 					EventLog.WriteEntry("OpenDentHL7","Updated patient: "+pat.FName+" "+pat.LName,EventLogEntryType.Information);
 				}
 				Patients.Update(pat,patOld);
-			}				
+			}
+			//had to move this reconcile here since we might not have a PatNum for new patients until after the insert
+			PatientRaces.Reconcile(pat.PatNum,listPatRaces);
 		}
 
 		public static void ProcessPD1(Patient pat,SegmentHL7 seg) {

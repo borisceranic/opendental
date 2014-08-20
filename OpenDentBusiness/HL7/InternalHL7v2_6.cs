@@ -83,7 +83,7 @@ namespace OpenDentBusiness.HL7 {
 						//The Patient ID CX type will also have the Identifier Type Code of 'PI', Patient internal identifier.
 						//Once located, PatNum is the first component
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for ChartNumber in the past and will continue to use this as a backup method for locating a patient if the ID in PID.2 is not present
 						//or if no patient can be found using that value.
@@ -249,7 +249,7 @@ namespace OpenDentBusiness.HL7 {
 						//The Patient ID CX type will also have the Identifier Type Code of 'PI', Patient internal identifier.
 						//Once located, PatNum is the first component
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for ChartNumber in the past and will continue to use this as a backup method for locating a patient if the ID in PID.2 is not present
 						//or if no patient can be found using that value.
@@ -391,7 +391,7 @@ namespace OpenDentBusiness.HL7 {
 						//The Patient ID CX type will also have the Identifier Type Code of 'PI', Patient internal identifier.
 						//Once located, PatNum is the first component
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for ChartNumber in the past and will continue to use this as a backup method for locating a patient if the ID in PID.2 is not present
 						//or if no patient can be found using that value.
@@ -658,7 +658,7 @@ namespace OpenDentBusiness.HL7 {
 						//The IDTypeCode will be 'PI', Patient internal identifier.
 						//We will also get all of the identifiers in the oidexternals table for the patient and create repetitions for each external ID using the IDExternal and RootExternal
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for sending the OD PatNum in the past and will continue to send this in PID.4
 						seg.AddField(4,"pat.PatNum");
@@ -869,7 +869,7 @@ namespace OpenDentBusiness.HL7 {
 						//The IDTypeCode will be 'PI', Patient internal identifier.
 						//We will also get all of the identifiers in the oidexternals table for the patient and create repetitions for each external ID using the IDExternal and RootExternal
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for sending the OD PatNum in the past and will continue to send this in PID.4
 						seg.AddField(4,"pat.PatNum");
@@ -1160,7 +1160,7 @@ namespace OpenDentBusiness.HL7 {
 						//The IDTypeCode will be 'PI', Patient internal identifier.
 						//We will also get all of the identifiers in the oidexternals table for the patient and create repetitions for each external ID using the IDExternal and RootExternal
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for sending the OD PatNum in the past and will continue to send this in PID.4
 						seg.AddField(4,"pat.PatNum");
@@ -1387,7 +1387,7 @@ namespace OpenDentBusiness.HL7 {
 						//The IDTypeCode will be 'PI', Patient internal identifier.
 						//We will also get all of the identifiers in the oidexternals table for the patient and create repetitions for each external ID using the IDExternal and RootExternal
 						//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&^PI|
-						seg.AddField(3,"patientIdList");
+						seg.AddField(3,"patientIds");
 						//PID.4, Alternate Patient ID, (retained for backward compatibility only).
 						//We've used PID.4 for sending the OD PatNum in the past and will continue to send this in PID.4
 						seg.AddField(4,"pat.PatNum");

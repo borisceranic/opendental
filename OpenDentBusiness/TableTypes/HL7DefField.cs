@@ -116,7 +116,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("pat.SSN",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("pat.WkPhone",DataTypeHL7.XTN));
 			retVal.Add(new FieldNameAndType("pat.Urgency",DataTypeHL7.IS,"0018"));//0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
-			retVal.Add(new FieldNameAndType("patientIdList",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("patientIds",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("patplan.Ordinal",DataTypeHL7.ST));//1,2,3...
 			retVal.Add(new FieldNameAndType("patplan.policyNum",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("patplan.subRelationToPat",DataTypeHL7.CWE,"0063"));//SEL-Self, SPO-Spouse, DOM-LifePartner, CHD-Child (return PAR-Parent), EME-Employee (return EMR-Employer), DEP-HandicapDep (return GRD-Guardian), OTH-SignifOther, OTH-InjuredPlantiff, OTH-Dependent (return GRD-Guardian)

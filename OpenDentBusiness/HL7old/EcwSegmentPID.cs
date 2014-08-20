@@ -7,7 +7,7 @@ namespace OpenDentBusiness.HL7 {
 	/// <summary>(and GT1 and PV1)</summary>
 	public class EcwSegmentPID {
 		///<summary>PatNum will not be altered here.  The pat passed in must either have PatNum=0, or must have a PatNum matching the segment.  The reason that isStandalone is passed in is because if using tight integration mode (isStandalone=false), then we need to store the "alternate patient id" aka Account No. that comes in on PID.4 in the ChartNumber field so we can pass it back in PID.2 of the DFT charge message.  However, if not using tight integration (isStandalone=true), the ChartNumber field is already occupied by the eCW patient ID, and we do not want to overwrite it.</summary>
-		public static void ProcessPID(Patient pat,SegmentHL7 seg,bool isStandalone) {
+		public static void ProcessPID(Patient pat,SegmentHL7 seg,bool isStandalone,List<PatRace> listPatRaces) {
 			long patNum=PIn.Long(seg.GetFieldFullText(2));
 			//if(pat.PatNum==0) {
 			//	pat.PatNum=patNum;
@@ -27,8 +27,8 @@ namespace OpenDentBusiness.HL7 {
 			pat.Birthdate=DateParse(seg.GetFieldFullText(7));
 			pat.Gender=GenderParse(seg.GetFieldFullText(8));
 			PatientRaceOld patientRaceOld=RaceParse(seg.GetFieldFullText(10));
-			//Converts PatientRaceOld to new Patient Races, and adds them o the PatientRace table.
-			PatientRaces.Reconcile(pat.PatNum,PatientRaces.GetPatRacesFromPatientRaceOld(patientRaceOld));
+			//Converts PatientRaceOld to new Patient Races, and adds them to the PatientRace table.
+			listPatRaces.AddRange(PatientRaces.GetPatRacesFromPatientRaceOld(patientRaceOld));
 			pat.Address=seg.GetFieldComponent(11,0);
 			pat.Address2=seg.GetFieldComponent(11,1);
 			pat.City=seg.GetFieldComponent(11,2);

@@ -21,7 +21,8 @@ namespace OpenDentBusiness.HL7 {
 			else {
 				patOld=pat.Copy();
 			}
-			EcwSegmentPID.ProcessPID(pat,seg,false);//IsStandalone=false because should never make it this far.
+			List<PatRace> listPatRaces=new List<PatRace>();
+			EcwSegmentPID.ProcessPID(pat,seg,false,listPatRaces);//IsStandalone=false because should never make it this far.
 			//PV1-patient visit---------------------------
 			//seg=message.GetSegment(SegmentName.PV1,false);
 			//if(seg!=null) {
@@ -94,6 +95,8 @@ namespace OpenDentBusiness.HL7 {
 				}
 				Patients.Update(pat,patOld);
 			}
+			//had to move this reconcile here since we might not have a PatNum for new patients until after the insert
+			PatientRaces.Reconcile(pat.PatNum,listPatRaces);
 			if(isNewApt) {
 				if(isVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Inserted appointment for: "+pat.FName+" "+pat.LName,EventLogEntryType.Information);
