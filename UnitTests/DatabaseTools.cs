@@ -116,6 +116,7 @@ namespace UnitTests {
 				DELETE FROM hl7msg;
 				DELETE FROM insplan;
 				DELETE FROM patient;
+				DELETE FROM patientrace;
 				DELETE FROM patplan;
 				DELETE FROM payperiod;
 				DELETE FROM procedurelog;

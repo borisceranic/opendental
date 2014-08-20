@@ -318,7 +318,7 @@ namespace UnitTests {
 			return "Test 3: Passed.\r\n";
 		}
 
-		/// <summary>Test 4: -Insert two new patients, patient from PID and guarantor from GT1.  If birthdate is less than 8 digits, set to MinValue of 0001-01-01.  If birthdate is 8 digits or more, set to the correct precision with yyyyMMddHHmmss format and HHmmss... all optional.  patient.Birthdate=0001-01-01.  guarantor.Birthdate=1977-07-03 7:11 AM but inserted as date 1977-07-03.</summary>
+		/// <summary>Test 4: Insert two new patients, patient from PID and guarantor from GT1.  If birthdate is less than 8 digits, set to MinValue of 0001-01-01.  If birthdate is 8 digits or more, set to the correct precision with yyyyMMddHHmmss format and HHmmss... all optional.  patient.Birthdate=0001-01-01.  guarantor.Birthdate=1977-07-03 7:11 AM but inserted as date 1977-07-03.</summary>
 		public static string Test4(HL7TestInterfaceEnum hl7TestInterfaceEnum) {
 			string msgtext=@"MSH|^~\&|||||20120901100000||ADT^A04||P|2.3"+"\r\n"
 				+"EVN|A04|20120901100000||\r\n"
@@ -394,6 +394,7 @@ namespace UnitTests {
 						EcwSIU.ProcessMessage(msg,false);
 						break;
 					case HL7TestInterfaceEnum.EcwOldStandalone:
+					case HL7TestInterfaceEnum.HL7DefEcwStandalone:
 						return "Test 5: Passed.\r\n";
 					default:
 						MessageParser.Process(msg,false);
@@ -402,9 +403,6 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				return "Test 5: Message processing error: "+ex+"\r\n";
-			}
-			if(hl7TestInterfaceEnum==HL7TestInterfaceEnum.HL7DefEcwStandalone) {
-				return "Test 5: Passed.\r\n";
 			}
 			Patient pat=Patients.GetPat(30);
 			if(pat==null) {
@@ -452,6 +450,7 @@ namespace UnitTests {
 						EcwSIU.ProcessMessage(msg,false);
 						break;
 					case HL7TestInterfaceEnum.EcwOldStandalone:
+					case HL7TestInterfaceEnum.HL7DefEcwStandalone:
 						return "Test 6: Passed.\r\n";
 					default:
 						MessageParser.Process(msg,false);
@@ -460,9 +459,6 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				return "Test 6: Message processing error: "+ex+"\r\n";
-			}
-			if(hl7TestInterfaceEnum==HL7TestInterfaceEnum.HL7DefEcwStandalone) {
-				return "Test 6: Passed.\r\n";
 			}
 			Patient pat=null;
 			Patient guar=null;
@@ -568,7 +564,7 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				//Catch the exception and if it is the expected exception that would normally get logged in event log just move on.
-				if(ex.ToString().Substring(18,35)!="Appointment does not match patient:") {
+				if(ex.ToString().Substring(18,35)!="Appointment does not match patient ") {
 					return "Test 7: Message processing error: "+ex+"\r\n";
 				}
 			}
@@ -669,6 +665,7 @@ namespace UnitTests {
 						EcwSIU.ProcessMessage(msg,false);
 						break;
 					case HL7TestInterfaceEnum.EcwOldStandalone:
+					case HL7TestInterfaceEnum.HL7DefEcwStandalone:
 						return "Test 9: Passed.\r\n";
 					default:
 						MessageParser.Process(msg,false);
@@ -677,9 +674,6 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				return "Test 9: Message processing error: "+ex+"\r\n";
-			}
-			if(hl7TestInterfaceEnum==HL7TestInterfaceEnum.HL7DefEcwStandalone) {
-				return "Test 9: Passed.\r\n";
 			}
 			Patient pat=null;
 			pat=Patients.GetPat(30);
@@ -744,6 +738,7 @@ namespace UnitTests {
 						EcwSIU.ProcessMessage(msg,false);
 						break;
 					case HL7TestInterfaceEnum.EcwOldStandalone:
+					case HL7TestInterfaceEnum.HL7DefEcwStandalone:
 						return "Test 10: Passed.\r\n";
 					default:
 						MessageParser.Process(msg,false);
@@ -752,9 +747,6 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				return "Test 10: Message processing error: "+ex+"\r\n";
-			}
-			if(hl7TestInterfaceEnum==HL7TestInterfaceEnum.HL7DefEcwStandalone) {
-				return "Test 10: Passed.\r\n";
 			}
 			Patient pat=null;
 			pat=Patients.GetPat(30);
@@ -847,7 +839,8 @@ namespace UnitTests {
 			apt.ProvNum=Providers.GetProvByEcwID("DOC1").ProvNum;
 			long aptNum=Appointments.InsertIncludeAptNum(apt,true);
 			long provNum=apt.ProvNum;
-			Patient pat=Patients.GetPat(10); if(pat==null) {
+			Patient pat=Patients.GetPat(10);
+			if(pat==null) {
 				return "Test 11: Couldn't locate patient.\r\n";
 			}
 			Patient oldPat=pat.Copy();
@@ -880,6 +873,7 @@ namespace UnitTests {
 				return "Test 11: Message creation error. "+ex+".\r\n";
 			}
 			string provField="";
+			string msgStructure="";
 			switch(hl7TestInterfaceEnum) {
 				case HL7TestInterfaceEnum.EcwOldFull:
 				case HL7TestInterfaceEnum.EcwOldTight:
@@ -887,9 +881,10 @@ namespace UnitTests {
 					break;
 				default:
 					provField="DOC1^Albert^Brian^S";
+					msgStructure="^DFT_P03";
 					break;
 			}
-			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03||P|2.3\r\n"
+			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03"+msgStructure+"|"+msg.Segments[0].GetFieldFullText(9)+"|P|2.3\r\n"
 				+"EVN|P03|"+msg.Segments[1].GetFieldFullText(2)+"|\r\n"
 				+"PID|1|A11|10||Smith^Jane^N||19760205|F||White|421 Main St^Apt 17^Dallas^OR^97338||5035554045|5035554234||Married|||111224444|||\r\n"
 				+"PV1|||||||"+provField+"||||||||||||500|||||||||||||||||||||||||||||||\r\n"
@@ -972,6 +967,7 @@ namespace UnitTests {
 			}
 			string provField="";
 			string provField2="";
+			string msgStructure="";
 			switch(hl7TestInterfaceEnum) {
 				case HL7TestInterfaceEnum.EcwOldFull:
 				case HL7TestInterfaceEnum.EcwOldTight:
@@ -981,9 +977,10 @@ namespace UnitTests {
 				default:
 					provField="DOC1^Albert^Brian^S";
 					provField2="DOC2^Lexington^Sarah^J";
+					msgStructure="^DFT_P03";
 					break;
 			}
-			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03||P|2.3\r\n"
+			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03"+msgStructure+"|"+msg.Segments[0].GetFieldFullText(9)+"|P|2.3\r\n"
 			  +"EVN|P03|"+msg.Segments[1].GetFieldFullText(2)+"|\r\n"
 			  +"PID|1|A11|10||Smith^Jane^N||19760205|F||White|421 Main St^Apt 17^Dallas^OR^97338||5035554045|5035554234||Married|||111224444|||\r\n"
 			  +"PV1|||||||"+provField+"||||||||||||500|||||||||||||||||||||||||||||||\r\n"
@@ -1080,6 +1077,7 @@ namespace UnitTests {
 				return "Test 13: Message creation error. "+ex+".\r\n";
 			}
 			string provField="";
+			string msgStructure="";
 			switch(hl7TestInterfaceEnum) {
 				case HL7TestInterfaceEnum.EcwOldFull:
 				case HL7TestInterfaceEnum.EcwOldTight:
@@ -1087,9 +1085,10 @@ namespace UnitTests {
 					break;
 				default:
 					provField="DOC1^Albert^Brian^S";
+					msgStructure="^DFT_P03";
 					break;
 			}
-			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03||P|2.3\r\n"
+			string msgtext=@"MSH|^~\&|OD||ECW||"+msg.Segments[0].GetFieldFullText(6)+"||DFT^P03"+msgStructure+"|"+msg.Segments[0].GetFieldFullText(9)+"|P|2.3\r\n"
 			  +"EVN|P03|"+msg.Segments[1].GetFieldFullText(2)+"|\r\n"
 			  +"PID|1|A11|10||Smith^Jane^N||19760205|F||White|421 Main St^Apt 17^Dallas^OR^97338||5035554045|5035554234||Married|||111224444|||\r\n"
 			  +"PV1|||||||"+provField+"||||||||||||600|||||||||||||||||||||||||||||||\r\n"
@@ -1177,6 +1176,7 @@ namespace UnitTests {
 						EcwSIU.ProcessMessage(msg,false);
 						break;
 					case HL7TestInterfaceEnum.EcwOldStandalone:
+					case HL7TestInterfaceEnum.HL7DefEcwStandalone:
 						return "Test 15: Passed.\r\n";
 					default:
 						MessageParser.Process(msg,false);
@@ -1185,9 +1185,6 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				return "Test 15: Message processing error: "+ex+"\r\n";
-			}
-			if(hl7TestInterfaceEnum==HL7TestInterfaceEnum.HL7DefEcwStandalone) {
-				return "Test 15: Passed.\r\n";
 			}
 			Provider prov=Providers.GetProvByEcwID("DOC3");
 			if(prov==null) {
