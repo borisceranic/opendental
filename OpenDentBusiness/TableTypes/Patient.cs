@@ -141,7 +141,7 @@ namespace OpenDentBusiness{
 		public DateTime AdmitDate;
 		/// <summary>Includes any punctuation.  For example, Mr., Mrs., Miss, Dr., etc.  There is no selection mechanism yet for user; they must simply type it in.</summary>
 		public string Title;
-		/// <summary>.</summary>
+		/// <summary>Amount "due now" for all payment plans such that someone in this family is the payment plan guarantor.  This is the total of all payment plan charges past due (taking into account the PayPlansBillInAdvanceDays setting) subtract the amount already paid for the payment plans.  Only stored with family guarantor.</summary>
 		public double PayPlanDue;
 		///<summary>FK to site.SiteNum. Can be zero. Replaces the old GradeSchool field with a proper foreign key.</summary>
 		public long SiteNum;
