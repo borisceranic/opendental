@@ -228,7 +228,7 @@ namespace OpenDentBusiness{
 				return null;
 			}
 			string command="SELECT allergydef.* FROM allergydef "
-				+"INNER JOIN medication ON allergydef.AllergyDefNum=medication.AllergyDefNum "
+				+"INNER JOIN medication ON allergydef.MedicationNum=medication.MedicationNum "
 				+"AND medication.RxCui="+POut.Long(rxnorm)+" "
 				+"WHERE allergydef.SnomedType IN("+(int)SnomedAllergy.DrugAllergy+","+(int)SnomedAllergy.DrugIntolerance+") ";
 			return Crud.AllergyDefCrud.SelectOne(command);

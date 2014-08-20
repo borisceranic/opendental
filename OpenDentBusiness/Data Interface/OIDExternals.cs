@@ -19,11 +19,11 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets a list of all external ID's for the internal ID and type provided.  Used to construct outbound HL7 messages.</summary>
-		public static List<OIDExternal> GetByInternalIDAndType(string idInternal,IdentifierType idType) {
+		public static List<OIDExternal> GetByInternalIDAndType(long idInternal,IdentifierType idType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<OIDExternal>>(MethodBase.GetCurrentMethod(),idInternal,idType);
 			}
-			string command="SELECT * FROM oidexternal WHERE IDType='"+idType.ToString()+"' AND IDInternal='"+POut.String(idInternal)+"'";
+			string command="SELECT * FROM oidexternal WHERE IDType='"+idType.ToString()+"' AND IDInternal="+POut.Long(idInternal);
 			return Crud.OIDExternalCrud.SelectMany(command);
 		}
 

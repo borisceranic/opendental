@@ -124,7 +124,7 @@ namespace OpenDentBusiness.HL7 {
 					#endregion PID - Patient Identification
 					#region PV1 - Patient Visit
 					seg=new HL7DefSegment();
-					msg.AddSegment(seg,3,false,true,SegmentNameHL7.PV1);
+					msg.AddSegment(seg,3,SegmentNameHL7.PV1);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PV1.2, Patient Class, IS data type (coded value for user-defined tables)
 						//If this field is populated, it will set the patient.GradeLevel if the field can be converted to an integer between 1 and 12
@@ -135,6 +135,8 @@ namespace OpenDentBusiness.HL7 {
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, XCN data type, ProviderId^LastName^FirstName^MI
 						//In the PV1 segment, the primary provider will be set for the patient
+						//The ProviderID component will hold the office's OID for a provider+"."+ProvNum if they send us a ProviderID that we have previously sent them
+						//If the first component is not the provider root, we will assume this is an external ID and store it in the oidexternals linked to our internal ProvNum
 						seg.AddField(7,"prov.provIdNameLFM");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
 						//Using the location type field to identify this field as a "Site (or Grade School)", we will attempt to match the description to a site.Description in the db
@@ -316,14 +318,17 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PRB.1, Action Code, AD-ADD,CO-Correct,DE-Delete,LI-Link,UC-Unchanged,UN-Unlink,UP-Update.  AD/UP are currently supported and are treated the same
 						seg.AddField(1,"problemAction");
+						//PRB.2, Action Date/Time, DTM data type
+						seg.AddField(2,"dateTime.Now");
 						//PRB.3, Problem ID, CWE data type
 						//Currently only SNOMEDCT codes are supported, code^descript^codeSystem (descript is not required and is ignored)
 						//Example: 1234^^SNM
 						seg.AddField(3,"problemCode");
 						//PRB.4, Problem Instance ID, EI data type
-						//Uniquely identifies this instance of a problem, FK to disease.DiseaseNum
-						//We are using the oidinternal table to store an OID root for problems (root+".5"), used with the primary key it is a unique ID
-						//Example: |1234^^2.16.840.1.113883.3.4337.1486.6566.5|  (where 1234 is the disease.DiseaseNum)
+						//Uniquely identifies this instance of a problem
+						//If we were to send this, it would be the oidinternal root for problems (root+".5") with the disease.DiseaseNum as the ID
+						//We expect the sending software to send an ID with an assigning authority root ID and we will link that to our disease.DiseaseNum in the oidexternals table
+						//Example: |76543^^OtherSoftwareRoot.OID|
 						seg.AddField(4,"problemUniqueId");
 						//PRB.7, Problem Established Date/Time
 						seg.AddField(7,"problemStartDate");
@@ -691,7 +696,7 @@ namespace OpenDentBusiness.HL7 {
 					#endregion PID - Patient Identification
 					#region PV1 - Patient Visit
 					seg=new HL7DefSegment();
-					msg.AddSegment(seg,3,false,true,SegmentNameHL7.PV1);
+					msg.AddSegment(seg,3,SegmentNameHL7.PV1);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PV1.1, Set ID - PV1
 						//See the comment above for the Sequence Number of the PID segment.  Always 1 since we only send one PV1 segment per ADT message.
@@ -1118,7 +1123,7 @@ namespace OpenDentBusiness.HL7 {
 					#endregion SCH - Schedule Activity Information
 					#region TQ1 - Timing/Quantity
 					seg=new HL7DefSegment();
-					msg.AddSegment(seg,2,SegmentNameHL7.TQ1);
+					msg.AddSegment(seg,2,false,true,SegmentNameHL7.TQ1);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//TQ1.1, Set ID, SI data type
 						//Always 1, only one timing specification in our outbound SIU messages
@@ -1323,7 +1328,7 @@ namespace OpenDentBusiness.HL7 {
 					#endregion MSA - Message Acknowledgment
 					#region SCH - Schedule Activity Information
 					seg=new HL7DefSegment();
-					msg.AddSegment(seg,2,SegmentNameHL7.SCH);
+					msg.AddSegment(seg,2,false,true,SegmentNameHL7.SCH);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//SCH.1, Placer Appointment ID, EI data type, OD is the filler application
 						//We will store the exernalAptId from an incoming SRM message ARQ segment if they send it to us, so send it here if we have one

@@ -31,30 +31,30 @@ namespace OpenDentBusiness.HL7 {
 			//remember that the "field quantity" is one more than the last index, because 0-based.
 			//All fields are initially added with just one component
 			//This can all probably be removed now since we add fields dynamically as needed:
-			if(name==SegmentNameHL7.MSA) {
-				AddFields(3);
-			}
-			if(name==SegmentNameHL7.MSH) {
-				AddFields(12);
-			}
-			if(name==SegmentNameHL7.EVN) {
-				AddFields(4);
-			}
-			if(name==SegmentNameHL7.PID) {
-				AddFields(23);
-			}
-			if(name==SegmentNameHL7.PV1) {
-				AddFields(51);
-			}
-			if(name==SegmentNameHL7.FT1) {
-				AddFields(27);
-			}
-			if(name==SegmentNameHL7.DG1) {
-				AddFields(5);
-			}
-			if(name==SegmentNameHL7.ZX1) {
-				AddFields(6);
-			}
+			//if(name==SegmentNameHL7.MSA) {
+			//	AddFields(3);
+			//}
+			//if(name==SegmentNameHL7.MSH) {
+			//	AddFields(12);
+			//}
+			//if(name==SegmentNameHL7.EVN) {
+			//	AddFields(4);
+			//}
+			//if(name==SegmentNameHL7.PID) {
+			//	AddFields(23);
+			//}
+			//if(name==SegmentNameHL7.PV1) {
+			//	AddFields(51);
+			//}
+			//if(name==SegmentNameHL7.FT1) {
+			//	AddFields(27);
+			//}
+			//if(name==SegmentNameHL7.DG1) {
+			//	AddFields(5);
+			//}
+			//if(name==SegmentNameHL7.ZX1) {
+			//	AddFields(6);
+			//}
 		}
 
 		private void AddFields(int quantity) {

@@ -52,15 +52,14 @@ namespace OpenDentBusiness.HL7 {
 					if(_isEcwDef) {
 						return apt.AptNum.ToString();
 					}
-					//We will use AptNum, with check digit scheme M11, with the OIDRoot for an appt object (set in oidinternal), ID Type 'HL7', and 'VN' for Visit Number
-					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.6&HL7^VN|
+					//We will use AptNum, with the OIDRoot for an appt object (set in oidinternal), and ID Type 'HL7'
+					//Example: |1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7|
 					OIDInternal aptOid=OIDInternals.GetForType(IdentifierType.Appointment);
 					string aptOidRoot="";
 					if(aptOid!=null) {
 						aptOidRoot=aptOid.IDRoot;
 					}
-					string aptNumCheckDigitStr=MessageParser.M11CheckDigit(apt.AptNum.ToString()).ToString();
-					return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),aptNumCheckDigitStr,"M11",def.SubcomponentSeparator+aptOidRoot+def.SubcomponentSeparator+"HL7","VN");
+					return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),"",aptOidRoot,"HL7");
 				case "apt.aptStatus":
 					if(apt==null) {
 						return "";
@@ -87,7 +86,7 @@ namespace OpenDentBusiness.HL7 {
 					if(apt==null) {
 						return "";
 					}
-					List<OIDExternal> listAptOidsExt=OIDExternals.GetByInternalIDAndType(apt.AptNum.ToString(),IdentifierType.Appointment);
+					List<OIDExternal> listAptOidsExt=OIDExternals.GetByInternalIDAndType(apt.AptNum,IdentifierType.Appointment);
 					if(listAptOidsExt.Count==0) {
 						return "";
 					}
@@ -114,7 +113,7 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return gConcat(def.ComponentSeparator,(5*apt.Pattern.Length).ToString(),gConcat(def.SubcomponentSeparator,"min","","ANS+"));
 				case "apt.Note":
-					//As in the address note field (see PID.11) we will accept '\.br\' (where the '\' is the defined escape char, \ by default) to signal a new line.
+					//As in the address note field (see PID.11) we will send '\.br\' (where the '\' is the defined escape char, \ by default) to signal a new line.
 					if(apt==null) {
 						return "";
 					}
@@ -143,7 +142,7 @@ namespace OpenDentBusiness.HL7 {
 					if(apt==null) {
 						return "";
 					}
-					if(Security.CurUser==null) {
+					if(Security.CurUser!=null) {
 						return Security.CurUser.UserName;
 					}
 					return "";
@@ -241,7 +240,7 @@ namespace OpenDentBusiness.HL7 {
 					}
 					string guarIdCheckDigitStr=MessageParser.M11CheckDigit(guar.PatNum.ToString()).ToString();
 					retval=gConcat(def.ComponentSeparator,guar.PatNum.ToString(),guarIdCheckDigitStr,"M11",def.SubcomponentSeparator+guarOidRoot+def.SubcomponentSeparator+"HL7","PI");
-					List<OIDExternal> listGuarOidsExt=OIDExternals.GetByInternalIDAndType(guar.PatNum.ToString(),IdentifierType.Patient);
+					List<OIDExternal> listGuarOidsExt=OIDExternals.GetByInternalIDAndType(guar.PatNum,IdentifierType.Patient);
 					for(int i=0;i<listGuarOidsExt.Count;i++) {
 						guarIdCheckDigitStr=MessageParser.M11CheckDigit(listGuarOidsExt[i].IDExternal).ToString();
 						if(guarIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
@@ -320,7 +319,7 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return gRace(pat,def);
 				case "pat.site":
-					//Example: |^^^^^s^^^West Salem Elementary| ('S' or 's' - for site) and site.Description from pat.SiteNum
+					//Example: |West Salem Elementary^^^^^s| ('s' for site)
 					if(pat.SiteNum==0) {
 						return "";
 					}
@@ -328,7 +327,7 @@ namespace OpenDentBusiness.HL7 {
 					if(patSiteDescript=="") {
 						return "";
 					}
-					return gConcat(def.ComponentSeparator,"","","","","","s","","",patSiteDescript);
+					return gConcat(def.ComponentSeparator,patSiteDescript,"","","","","","s");
 				case "pat.SSN":
 					return pat.SSN;
 				case "pat.WkPhone":
@@ -354,7 +353,7 @@ namespace OpenDentBusiness.HL7 {
 					}
 					string patIdCheckDigitStr=MessageParser.M11CheckDigit(pat.PatNum.ToString()).ToString();
 					retval=gConcat(def.ComponentSeparator,pat.PatNum.ToString(),patIdCheckDigitStr,"M11",def.SubcomponentSeparator+patOidRoot+def.SubcomponentSeparator+"HL7","PI");
-					List<OIDExternal> listPatOidsExt=OIDExternals.GetByInternalIDAndType(pat.PatNum.ToString(),IdentifierType.Patient);
+					List<OIDExternal> listPatOidsExt=OIDExternals.GetByInternalIDAndType(pat.PatNum,IdentifierType.Patient);
 					for(int i=0;i<listPatOidsExt.Count;i++) {
 						patIdCheckDigitStr=MessageParser.M11CheckDigit(listPatOidsExt[i].IDExternal).ToString();
 						if(patIdCheckDigitStr=="-1") {//could not get a check digit from the external ID, could contain characters that are not numbers
@@ -464,7 +463,17 @@ namespace OpenDentBusiness.HL7 {
 					if(prov==null) {
 						return "";
 					}
-					return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
+					if(_isEcwDef) {
+						return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
+					}
+					//Will return all provider IDs in the oidexternals table linked to this provider as repetitions
+					//Example: 2.16.840.1.113883.3.4337.1486.6566.3.1^Abbott^Sarah^L~OtherSoftware.Root.Provider.ProvID^Abbott^Sarah^L
+					List<OIDExternal> listProvOidExt=OIDExternals.GetByInternalIDAndType(prov.ProvNum,IdentifierType.Provider);
+					retval=gConcat(def.ComponentSeparator,OIDInternals.GetForType(IdentifierType.Provider).IDRoot+"."+prov.ProvNum,prov.LName,prov.FName,prov.MI);
+					for(int i=0;i<listProvOidExt.Count;i++) {
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listProvOidExt[i].rootExternal+"."+listProvOidExt[i].IDExternal,prov.LName,prov.FName,prov.MI);
+					}
+					return retval;
 				case "prov.provType":
 					if(prov==null) {
 						return "";
@@ -616,12 +625,12 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return "N";
 				case "inssub.DateEffective":
-					if(inssubCur==null) {
+					if(inssubCur==null || inssubCur.DateEffective==DateTime.MinValue) {
 						return "";
 					}
 					return gDTM(inssubCur.DateEffective,8);
 				case "inssub.DateTerm":
-					if(inssubCur==null) {
+					if(inssubCur==null || inssubCur.DateTerm==DateTime.MinValue) {
 						return "";
 					}
 					return gDTM(inssubCur.DateTerm,8);

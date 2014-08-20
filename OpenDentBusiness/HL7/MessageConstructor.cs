@@ -80,10 +80,10 @@ namespace OpenDentBusiness.HL7 {
 						else {
 							string fieldValue="";
 							if(hl7DefMessage.hl7DefSegments[s].SegmentName==SegmentNameHL7.IN1) {
-								FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
+								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,repeat+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatplans.Count,patSub);
 							}
 							else {
-								FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,repeat+1,eventType,
+								fieldValue=FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,repeat+1,eventType,
 								 pdfDescription,pdfDataString,MessageStructureHL7.DFT_P03);
 							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[s].hl7DefFields[f].OrdinalPos,fieldValue);

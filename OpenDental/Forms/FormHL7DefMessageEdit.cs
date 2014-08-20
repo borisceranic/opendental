@@ -84,7 +84,7 @@ namespace OpenDental {
 			FormHL7DefSegmentEdit FormS=new FormHL7DefSegmentEdit();
 			FormS.HL7DefSegCur=HL7DefMesCur.hl7DefSegments[e.Row];
 			FormS.IsHL7DefInternal=IsHL7DefInternal;
-			FormS.ShowDialog();
+		FormS.ShowDialog();
 			FillGrid();
 		}
 

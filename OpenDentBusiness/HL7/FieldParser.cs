@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Diagnostics;
 
 namespace OpenDentBusiness.HL7 {
 	///<summary>Parses a single incoming HL7 field.</summary>
@@ -179,22 +180,109 @@ namespace OpenDentBusiness.HL7 {
 			return prov.ProvNum;
 		}
 
-		///<summary>This field could be a CWE data type or a XCN data type, depending on if it came from an AIG segment, an AIP segment, or a PV1 segment.  The AIG segment would have this as a CWE data type in the format ProvNum^LName, FName^^Abbr.  For the AIP and PV1 segments, the data type is XCN and the format would be ProvNum^LName^FName^^^Abbr.  This will return 0 if the field or segName are null or if no provider can be found.  A new provider will not be inserted with the information provided if not found by ProvNum or name and abbr.</summary>
-		public static long ProvParse(FieldHL7 field,SegmentNameHL7 segName) {
+		///<summary>This field could be a CWE data type or a XCN data type, depending on if it came from an AIG segment, an AIP segment, or a PV1 segment.  The AIG segment would have this as a CWE data type in the format ProvID^LName, FName^^Abbr.  For the AIP and PV1 segments, the data type is XCN and the format would be ProvID^LName^FName^^^Abbr.  This will return 0 if the field or segName are null or if no provider can be found.  A new provider will not be inserted with the information provided if not found by ProvID or name and abbr.  This field is repeatable, so we will check all repetitions for valid provider ID's or name/abbr combinations.</summary>
+		public static long ProvParse(FieldHL7 field,SegmentNameHL7 segName,bool isVerbose) {
 			long provNum=0;
+			List<OIDExternal> listOidExt=new List<OIDExternal>();
 			if(field==null) {
 				return 0;
 			}
-			try {
-				provNum=PIn.Long(field.GetComponentVal(0));//if component is empty string, provNum will be 0
+			#region Attempt to Get Provider From ProvIDs
+			//Example of an ID using the hierarchic designation would be 2.16.840.1.113883.3.4337.1486.6566.3.1
+			//Where 2.16.840.1.113883.3.4337.1486.6566 is the office oidroot, the .3 is to identify this as a provider
+			//2.16.840.1.113883.3.4337.1486.6566.3 would be the office's oidinternal entry for IDType=Provider
+			//The .1 is "."+ProvNum, where the ProvNum in this example is 1 and is considered the extension
+			//We will strip off the ProvNum and if it is connected to the office's oidinternal entry for a provider, we will use it as the OD ProvNum
+			//If it is attached to a different hierarchic root, we will try to find it in the oidexternals table linked to an OD ProvNum
+			string [] provIdHierarch=field.GetComponentVal(0).Split(new string[] {"."},StringSplitOptions.RemoveEmptyEntries);
+			string strProvId="";
+			string strProvIdRoot="";
+			if(provIdHierarch.Length>1) {//must have a root and an ID
+				strProvId=provIdHierarch[provIdHierarch.Length-1];
+				strProvIdRoot=field.GetComponentVal(0).Substring(0,field.GetComponentVal(0).Length-strProvId.Length-1);//-1 for the last "."
 			}
-			catch(Exception ex) {
-				//PIn.Long failed to convert the component to a long, provNum will remain 0 and we will attempt to get by name and abbr below
-			}			
-			if(Providers.GetProv(provNum)!=null) {//if provNum=0 or invalid, GetProv will return null and we will attempt to find the provider by name and abbr
+			if(strProvId!="" && strProvIdRoot!="") {
+				if(strProvIdRoot==OIDInternals.GetForType(IdentifierType.Provider).IDRoot) {//The office's root OID for a provider object, ProvId should be the OD ProvNum
+					try {
+						if(Providers.GetProv(PIn.Long(strProvId))!=null) {
+							provNum=PIn.Long(strProvId);//if component is empty string, provNum will be 0
+						}
+					}
+					catch(Exception ex) {
+						//PIn.Long failed to convert the component to a long, provNum will remain 0 and we will attempt to get by name and abbr below
+					}
+				}
+				else {//there was a ProvID and a ProvID root, but the root is not the office's root OID for a provider object, check the oidexternals table
+					OIDExternal oidExtProv=OIDExternals.GetByRootAndExtension(strProvIdRoot,strProvId);
+					if(oidExtProv==null) {//add to the list of oid's to add to the oidexternal table if we find a provider
+						OIDExternal oidExtCur=new OIDExternal();
+						oidExtCur.IDType=IdentifierType.Provider;
+						oidExtCur.rootExternal=strProvIdRoot;
+						oidExtCur.IDExternal=strProvId;
+						//oidExtCur.IDInteral may not have been found yet
+						listOidExt.Add(oidExtCur);
+					}
+					if(oidExtProv!=null && oidExtProv.IDType==IdentifierType.Provider) {
+						//possibly some other validation of name match?
+						provNum=oidExtProv.IDInternal;
+					}
+				}
+			}
+			for(int i=0;i<field.ListRepeatFields.Count;i++) {//could be repetitions of this field with other IDs
+				strProvId="";
+				strProvIdRoot="";
+				provIdHierarch=field.ListRepeatFields[i].GetComponentVal(0).Split(new string[] { "." },StringSplitOptions.RemoveEmptyEntries);
+				if(provIdHierarch.Length<2) {//must be a root and an ID
+					continue;
+				}
+				strProvId=provIdHierarch[provIdHierarch.Length-1];
+				strProvIdRoot=field.ListRepeatFields[i].GetComponentVal(0).Substring(0,field.ListRepeatFields[i].GetComponentVal(0).Length-strProvId.Length-1);//-1 for the last "."
+				if(strProvId=="" || strProvIdRoot=="") {
+					continue;
+				}
+				if(provNum==0 && strProvIdRoot==OIDInternals.GetForType(IdentifierType.Provider).IDRoot) {//The office's root OID for a provider object, ProvId should be the OD ProvNum
+					try {
+						if(Providers.GetProv(PIn.Long(strProvId))!=null) {
+							provNum=PIn.Long(strProvId);//if component is empty string, provNum will be 0
+						}
+					}
+					catch(Exception ex) {
+						//PIn.Long failed to convert the component to a long, provNum will remain 0 and we will attempt to get by name and abbr below
+					}
+				}
+				else if(strProvIdRoot!=OIDInternals.GetForType(IdentifierType.Provider).IDRoot) {//there was a ProvID and a ProvID root, but the root is not the office's root OID for a provider object, check the oidexternals table
+					OIDExternal oidExtProv=OIDExternals.GetByRootAndExtension(strProvIdRoot,strProvId);
+					if(oidExtProv==null) {//add to the list of oid's to add to the oidexternal table if we find a provider
+						OIDExternal oidExtCur=new OIDExternal();
+						oidExtCur.IDType=IdentifierType.Provider;
+						oidExtCur.rootExternal=strProvIdRoot;
+						oidExtCur.IDExternal=strProvId;
+						//oidExtCur.IDInteral may not have been found yet
+						listOidExt.Add(oidExtCur);
+					}
+					else {
+						if(provNum==0 && oidExtProv.IDType==IdentifierType.Provider) {
+							//possibly some other validation of name match?
+							provNum=oidExtProv.IDInternal;
+						}
+					}
+				}
+			}
+			if(provNum>0) {
+				string verboseMsg="";
+				for(int i=0;i<listOidExt.Count;i++) {
+					listOidExt[i].IDInternal=provNum;
+					OIDExternals.Insert(listOidExt[i]);
+					verboseMsg+="\r\nProvNum: "+provNum.ToString()+", External root: "+strProvIdRoot+", External Provider ID: "+strProvId;
+				}
+				if(isVerbose) {
+					EventLog.WriteEntry("OpenDentHL7","Added an external provider ID to the oidexternals table due to an incoming "
+						+segName.ToString()+" segment."+verboseMsg+".",EventLogEntryType.Information);
+				}
 				return provNum;
 			}
-			provNum=0;//just in case we had a valid long in the ProvNum component but it was not a valid provNum
+			#endregion Attempt to Get Provider From ProvIDs
+			#region Attempt to Get Provider From Name and Abbr
 			//Couldn't find the provider with the ProvNum provided, we will attempt to find by FName, LName, and Abbr
 			string provLName="";
 			string provFName="";
@@ -215,18 +303,65 @@ namespace OpenDentBusiness.HL7 {
 				provFName=field.GetComponentVal(2);
 				provAbbr=field.GetComponentVal(5);
 			}
-			if(provAbbr=="") {
-				return 0;//there has to be a LName, FName, and Abbr if we are trying to match without a ProvNum.  LName and FName empty string check happens in GetProvsByFLName
-			}
-			List<Provider> listProvs=Providers.GetProvsByFLName(provLName,provFName);
-			for(int i=0;i<listProvs.Count;i++) {
-				if(listProvs[i].Abbr.ToLower()==provAbbr.ToLower()) {
-					//There should be only one provider with this Abbr, although we only warn them about the duplication and allow them to have more than one with the same Abbr.
-					//With the LName, FName, and Abbr we can be more certain we retrieve the correct provider.
-					provNum=listProvs[i].ProvNum;
-					break;
+			if(provAbbr!="") {
+				List<Provider> listProvs=Providers.GetProvsByFLName(provLName,provFName);
+				for(int i=0;i<listProvs.Count;i++) {
+					if(listProvs[i].Abbr.ToLower()==provAbbr.ToLower()) {
+						//There should be only one provider with this Abbr, although we only warn them about the duplication and allow them to have more than one with the same Abbr.
+						//With the LName, FName, and Abbr we can be more certain we retrieve the correct provider.
+						provNum=listProvs[i].ProvNum;
+					}
 				}
 			}
+			//provider not found by provID, or first name/abbr combination, try the name/abbr combos in the repetitions.
+			for(int i=0;i<field.ListRepeatFields.Count;i++) {//could be repetitions of this field with other IDs
+				if(provNum>0) {
+					break;
+				}
+				provLName="";
+				provFName="";
+				provAbbr="";
+				if(segName==SegmentNameHL7.AIG) {
+					string[] components=field.ListRepeatFields[i].GetComponentVal(1).Split(new char[] { ' ' },StringSplitOptions.RemoveEmptyEntries);
+					if(components.Length>0) {
+						provLName=components[0].TrimEnd(',');
+					}
+					if(components.Length>1) {
+						provFName=components[1];
+					}
+					provAbbr=field.ListRepeatFields[i].GetComponentVal(3);
+				}
+				else if(segName==SegmentNameHL7.AIP || segName==SegmentNameHL7.PV1) {//AIP and PV1 are the data type XCN with the format ProvNum^LName^FName^^^Abbr
+					provLName=field.ListRepeatFields[i].GetComponentVal(1);
+					provFName=field.ListRepeatFields[i].GetComponentVal(2);
+					provAbbr=field.ListRepeatFields[i].GetComponentVal(5);
+				}
+				if(provAbbr=="") {
+					continue;//there has to be a LName, FName, and Abbr if we are trying to match without a ProvNum.  LName and FName empty string check happens in GetProvsByFLName
+				}
+				List<Provider> listProvs=Providers.GetProvsByFLName(provLName,provFName);
+				for(int p=0;p<listProvs.Count;p++) {
+					if(listProvs[p].Abbr.ToLower()==provAbbr.ToLower()) {
+						//There should be only one provider with this Abbr, although we only warn them about the duplication and allow them to have more than one with the same Abbr.
+						//With the LName, FName, and Abbr we can be more certain we retrieve the correct provider.
+						provNum=listProvs[p].ProvNum;
+						break;
+					}
+				}
+			}
+			if(provNum>0) {
+				string verboseMsg="";
+				for(int i=0;i<listOidExt.Count;i++) {
+					listOidExt[i].IDInternal=provNum;
+					OIDExternals.Insert(listOidExt[i]);
+					verboseMsg+="\r\nProvNum: "+provNum.ToString()+", External root: "+strProvIdRoot+", External Provider ID: "+strProvId;
+				}
+				if(isVerbose) {
+					EventLog.WriteEntry("OpenDentHL7","Added an external provider ID to the oidexternals table due to an incoming "
+						+segName.ToString()+" segment."+verboseMsg+".",EventLogEntryType.Information);
+				}
+			}
+			#endregion Attempt to Get Provider From Name and Abbr
 			return provNum;
 		}
 
@@ -302,10 +437,6 @@ namespace OpenDentBusiness.HL7 {
 		///<summary>A string supplied with new line escape commands (\.br\) will be converted to a string with \r\n in it.  The escapeChar supplied will have been retrieved from the escape characters defined in the message, usually "\".  Example: string supplied - line 1\.br\line2\.br\line3; string returned - line 1\r\nline2\r\nline3.</summary>
 		public static string StringNewLineParse(string str,char escapeChar) {
 			string strToReplace=escapeChar+".br"+escapeChar;
-			if(escapeChar=='\\') {
-				//double \'s are required if \ is the escapeChar for the string to replace
-				strToReplace=escapeChar+strToReplace+escapeChar;
-			}
 			return str.Replace(strToReplace,"\r\n");
 		}
 	}

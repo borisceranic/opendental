@@ -176,8 +176,7 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					}
 					for(int r=0;r<fieldPatIdList.ListRepeatFields.Count;r++) {
-						if(fieldPatIdList.ListRepeatFields[r].Components.Count<7
-							|| fieldPatIdList.ListRepeatFields[r].GetComponentVal(6).ToLower()!="pi")
+						if(fieldPatIdList.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")
 						{
 							continue;
 						}
@@ -260,7 +259,7 @@ namespace OpenDentBusiness.HL7 {
 			if(pat==null) {
 				for(int i=0;i<listOIDs.Count;i++) {
 					OIDExternal oidExternalCur=OIDExternals.GetByRootAndExtension(listOIDs[i].rootExternal,listOIDs[i].IDExternal);
-					if(oidExternalCur==null || oidExternalCur.IDInternal==0) {
+					if(oidExternalCur==null || oidExternalCur.IDInternal==0 || oidExternalCur.IDType!=IdentifierType.Patient) {//must have an IDType of patient
 						continue;
 					}
 					if(patNumFromExternal==0) {
@@ -573,7 +572,7 @@ namespace OpenDentBusiness.HL7 {
 							//for all other interfaces, we will only accept provider ID's that match the OD ProvNum
 							//if not found by ProvNum, we will attempt to match LName, FName, and Abbr
 							//if still not found, we will not set the provider on the appt
-							provNum=FieldParser.ProvParse(seg.GetField(intItemOrder),segDef.SegmentName);
+							provNum=FieldParser.ProvParse(seg.GetField(intItemOrder),segDef.SegmentName,IsVerboseLogging);
 						}
 						//provNum may still be 0
 						continue;
@@ -772,6 +771,10 @@ namespace OpenDentBusiness.HL7 {
 			if(msg.Delimiters.Length>2) {//it is possible they did not send all 4 of the delimiter chars, in which case we will use the default \
 				escapeChar=msg.Delimiters[2];
 			}
+			char subcompSeparator='&';
+			if(msg.Delimiters.Length>3) {
+				subcompSeparator=msg.Delimiters[3];
+			}
 			#region Get And Validate Definition Field Ordinals
 			//Find the position of the guarNum, guarChartNum, guarName, and guarBirthdate in this HL7 segment based on the definition of a GT1
 			int intGuarPatNumOrdinal=-1;
@@ -851,9 +854,9 @@ namespace OpenDentBusiness.HL7 {
 			}
 			if(intGuarIdListOrdinal!=-1) {//if OIDInternal root for a patient object is not defined, guarIdListOrdinal will be -1
 				FieldHL7 fieldGuarIdList=seg.GetField(intGuarIdListOrdinal);
-				//Example field: |1234^3^M11^^2.16.840.1.113883.3.4337.1486.6566.2^HL7^PI~7684^8^M11^^Other.Software.OID^OIDType^MR|
+				//Example field: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^PI|
 				//field component values will be the first repetition, repeats will be in field.ListRepeatFields
-				if(fieldGuarIdList.GetComponentVal(6).ToLower()=="pi") {//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
+				if(fieldGuarIdList.GetComponentVal(4).ToLower()=="pi") {//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
 					int intCheckDigit=-1;
 					try {
 						intCheckDigit=PIn.Int(fieldGuarIdList.GetComponentVal(1));
@@ -869,7 +872,7 @@ namespace OpenDentBusiness.HL7 {
 						|| (fieldGuarIdList.GetComponentVal(2).ToLower()!="m10"
 						&& fieldGuarIdList.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
 					{
-						if(fieldGuarIdList.GetComponentVal(4).ToLower()==patOIDRoot.ToLower()) {
+						if(fieldGuarIdList.GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1].ToLower()==patOIDRoot.ToLower()) {
 							try {
 								guarPatNumFromList=PIn.Long(fieldGuarIdList.GetComponentVal(0));
 							}
@@ -881,14 +884,13 @@ namespace OpenDentBusiness.HL7 {
 							OIDExternal oidCur=new OIDExternal();
 							oidCur.IDType=IdentifierType.Patient;
 							oidCur.IDExternal=fieldGuarIdList.GetComponentVal(0);
-							oidCur.rootExternal=fieldGuarIdList.GetComponentVal(4);
+							oidCur.rootExternal=fieldGuarIdList.GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1];
 							listOIDs.Add(oidCur);
 						}
 					}
 				}
 				for(int r=0;r<fieldGuarIdList.ListRepeatFields.Count;r++) {
-					if(fieldGuarIdList.ListRepeatFields[r].Components.Count<7
-						|| fieldGuarIdList.ListRepeatFields[r].GetComponentVal(6).ToLower()!="pi")
+					if(fieldGuarIdList.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")
 					{
 						continue;
 					}
@@ -910,7 +912,7 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					}
 					//if not using the M10 or M11 check digit scheme or if the check digit is good, trust the ID in component 0 to be valid and attempt to use
-					if(fieldGuarIdList.ListRepeatFields[r].GetComponentVal(4).ToLower()==patOIDRoot.ToLower()) {
+					if(fieldGuarIdList.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1].ToLower()==patOIDRoot.ToLower()) {
 						try {
 							guarPatNumFromList=PIn.Long(fieldGuarIdList.ListRepeatFields[r].GetComponentVal(0));
 						}
@@ -922,7 +924,7 @@ namespace OpenDentBusiness.HL7 {
 						OIDExternal oidCur=new OIDExternal();
 						oidCur.IDType=IdentifierType.Patient;
 						oidCur.IDExternal=fieldGuarIdList.ListRepeatFields[r].GetComponentVal(0);
-						oidCur.rootExternal=fieldGuarIdList.ListRepeatFields[r].GetComponentVal(4);
+						oidCur.rootExternal=fieldGuarIdList.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1];
 						listOIDs.Add(oidCur);
 					}
 				}
@@ -953,7 +955,7 @@ namespace OpenDentBusiness.HL7 {
 			else if(guarPatNumFromList!=0) {
 				guar=Patients.GetPat(guarPatNumFromList);
 			}
-			else if(guar.ChartNumber!="") {//guarPatNum and guarPatNumFromList was 0 so try to get guar by guar.ChartNumber or name and birthdate
+			else if(guarChartNum!="") {//guarPatNum and guarPatNumFromList was 0 so try to get guar by guar.ChartNumber or name and birthdate
 				//try to find guarantor using chartNumber
 				guar=Patients.GetPatByChartNumber(guarChartNum);
 				if(guar==null) {
@@ -979,7 +981,7 @@ namespace OpenDentBusiness.HL7 {
 				//Only trust the external IDs if all OIDs refer to the same patient
 				for(int i=0;i<listOIDs.Count;i++) {
 					OIDExternal oidExternalCur=OIDExternals.GetByRootAndExtension(listOIDs[i].rootExternal,listOIDs[i].IDExternal);
-					if(oidExternalCur==null || oidExternalCur.IDInternal==0) {
+					if(oidExternalCur==null || oidExternalCur.IDInternal==0 || oidExternalCur.IDType!=IdentifierType.Patient) {//must have an IDType of Patient
 						continue;
 					}
 					if(guarPatNumFromExternal==0) {
@@ -1043,7 +1045,46 @@ namespace OpenDentBusiness.HL7 {
 						guar.Gender=FieldParser.GenderParse(seg.GetFieldComponent(intItemOrder));
 						continue;
 					case "guar.HmPhone":
-						guar.HmPhone=FieldParser.PhoneParse(seg.GetFieldComponent(intItemOrder));
+						if(seg.GetFieldComponent(intItemOrder,2)=="" && seg.GetField(intItemOrder).ListRepeatFields.Count==0) {
+							//either no component 2 or left blank, and there are no repetitions, process the old way
+							//the first repetition is considered the primary number, but if the primary number is not sent then it will be blank followed by the list of other numbers
+							guar.HmPhone=FieldParser.PhoneParse(seg.GetFieldComponent(intItemOrder));
+						}
+						else {
+							//XTN data type, repeatable.
+							//Component 2 values: PH-Phone, FX-Fax, MD-Modem, CP-Cell Phone, Internet-Internet Address, X.400-X.400 email address, TDD-Tel Device for the Deaf, TTY-Teletypewriter.
+							//We will support PH for pat.HmPhone, CP for pat.WirelessPhone, and Internet for pat.Email
+							//Component 5 is area code, 6 is number
+							//Component 3 will be Email if the type is Internet
+							//Example: ^PRN^PH^^^503^3635432~^PRN^Internet^someone@somewhere.com
+							FieldHL7 phField=seg.GetField(intItemOrder);
+							if(phField==null) {
+								continue;
+							}
+							string strPhType=seg.GetFieldComponent(intItemOrder,2);
+							string strPhNum=seg.GetFieldComponent(intItemOrder,5)+seg.GetFieldComponent(intItemOrder,6);
+							string strEmail=seg.GetFieldComponent(intItemOrder,3);
+							for(int p=-1;p<phField.ListRepeatFields.Count;p++) {
+								if(p>=0) {
+									strPhType=phField.ListRepeatFields[p].GetComponentVal(2);
+									strPhNum=phField.ListRepeatFields[p].GetComponentVal(5)+phField.ListRepeatFields[p].GetComponentVal(6);
+									strEmail=phField.ListRepeatFields[p].GetComponentVal(3);
+								}
+								switch(strPhType) {
+									case "PH":
+										guar.HmPhone=FieldParser.PhoneParse(strPhNum);
+										continue;
+									case "CP":
+										guar.WirelessPhone=FieldParser.PhoneParse(strPhNum);
+										continue;
+									case "Internet":
+										guar.Email=strEmail;
+										continue;
+									default:
+										continue;
+								}
+							}
+						}
 						continue;
 					case "guar.nameLFM":
 						guar.LName=seg.GetFieldComponent(intItemOrder,0);
@@ -1055,6 +1096,14 @@ namespace OpenDentBusiness.HL7 {
 						guar.SSN=seg.GetFieldComponent(intItemOrder);
 						continue;
 					case "guar.WkPhone":
+						if(seg.GetFieldComponent(intItemOrder,2)=="PH") {
+							//Component 2 value: PH-Phone
+							//Component 5 is area code, 6 is number
+							//Example: ^WPN^PH^^^503^3635432
+							guar.WkPhone=FieldParser.PhoneParse(seg.GetFieldComponent(intItemOrder,5)+seg.GetFieldComponent(intItemOrder,6));
+							continue;
+						}
+						//either no component 2 or left blank, process the old way
 						guar.WkPhone=FieldParser.PhoneParse(seg.GetFieldComponent(intItemOrder));
 						continue;
 					default:
@@ -1452,12 +1501,12 @@ namespace OpenDentBusiness.HL7 {
 								//checkDigit will remain -1
 							}
 							if(fieldCur.ListRepeatFields[r].GetComponentVal(2).ToLower()=="m10"
-								&& (intCheckDigit==-1 || M10CheckDigit(fieldCur.GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either an invalid check digit was received or it doesn't match our calc
+								&& (intCheckDigit==-1 || M10CheckDigit(fieldCur.ListRepeatFields[r].GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either an invalid check digit was received or it doesn't match our calc
 							{
 								continue;
 							}
 							if(fieldCur.ListRepeatFields[r].GetComponentVal(2).ToLower()=="m11"
-								&& (intCheckDigit==-1 || M11CheckDigit(fieldCur.GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either an invalid check digit was received or it doesn't match our calc
+								&& (intCheckDigit==-1 || M11CheckDigit(fieldCur.ListRepeatFields[r].GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either an invalid check digit was received or it doesn't match our calc
 							{
 								continue;
 							}
@@ -1538,7 +1587,7 @@ namespace OpenDentBusiness.HL7 {
 						//Id^^UniversalId
 						strOidExt=seg.GetFieldComponent(intItemOrder,0);
 						strOidExtRoot=seg.GetFieldComponent(intItemOrder,2);
-						if(strOidExt!="" && strOidExtRoot!="" && OIDExternals.GetByRootAndExtension(strOidExt,strOidExtRoot)!=null) {
+						if(strOidExt!="" && strOidExtRoot!="" && OIDExternals.GetByRootAndExtension(strOidExtRoot,strOidExt)!=null) {
 							//the universal ID and root are already in the oidexternals table, do not insert another procedure, must be a duplicate
 							EventLog.WriteEntry("OpenDentHL7","A procedure was not added for patient "+pat.GetNameFLnoPref()
 								+".  The universal ID and root supplied in the PR1 segment refers to an existing procedure."
@@ -1902,7 +1951,7 @@ namespace OpenDentBusiness.HL7 {
 							provNum=FieldParser.ProvProcessEcw(seg.GetField(intItemOrder));
 						}
 						else {
-							provNum=FieldParser.ProvParse(seg.GetField(intItemOrder),SegmentNameHL7.PV1);
+							provNum=FieldParser.ProvParse(seg.GetField(intItemOrder),SegmentNameHL7.PV1,IsVerboseLogging);
 						}
 						if(provNum==0) {//This segment didn't have valid provider information in it, so do nothing
 							continue;
@@ -1942,7 +1991,9 @@ namespace OpenDentBusiness.HL7 {
 			if(IsVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated patient "+pat.GetNameFLnoPref()+" due to an incoming PV1 segment.",EventLogEntryType.Information);
 			}
-			Appointments.Update(apt,aptOld);
+			if(apt!=null) {
+				Appointments.Update(apt,aptOld);
+			}
 			if(IsVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated appointment for patient "+pat.GetNameFLnoPref()+" due to an incoming PV1 segment.",EventLogEntryType.Information);
 			}
