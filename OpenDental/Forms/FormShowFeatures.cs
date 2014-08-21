@@ -211,6 +211,7 @@ namespace OpenDental{
 			this.checkDentalSchools.TabIndex = 9;
 			this.checkDentalSchools.Text = "Dental Schools";
 			this.checkDentalSchools.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDentalSchools.Click += new System.EventHandler(this.checkDentalSchools_Click);
 			// 
 			// checkRepeatCharges
 			// 
@@ -378,6 +379,12 @@ namespace OpenDental{
 			checkPatClone.Checked=PrefC.GetBool(PrefName.ShowFeaturePatientClone);
 			checkQuestionnaire.Checked=PrefC.GetBool(PrefName.AccountShowQuestionnaire);
 			checkTrojanCollect.Checked=PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect);
+		}
+
+		private void checkDentalSchools_Click(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.EasyHideDentalSchools) && checkDentalSchools.Checked) {
+				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
+			}
 		}
 
 		private void checkEhr_Click(object sender,EventArgs e) {
