@@ -2378,6 +2378,35 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		public static string MedicationWithInvalidGenericNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command=@"SELECT COUNT(*) FROM medication WHERE GenericNum NOT IN (SELECT MedicationNum FROM medication)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Medications with missing generic brand found: ")+numFound+"\r\n";
+				}
+			}
+			else {
+				List<Medication> listMeds;
+				//Select into list because the following query is not valid in MySQL
+				//UPDATE medication SET GenericNum=MedicationNum WHERE GenericNum NOT IN (SELECT MedicationNum FROM medication)
+				command="SELECT * FROM medication WHERE GenericNum NOT IN (SELECT MedicationNum FROM medication)";
+				listMeds=Crud.MedicationCrud.SelectMany(command);
+				for(int i=0;i<listMeds.Count;i++) {
+					listMeds[i].GenericNum=listMeds[i].MedicationNum;
+					Medications.Update(listMeds[i]);
+				}
+				if(listMeds.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Medications with missing generic brand fixed: ")+listMeds.Count.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
 		public static string MessageButtonDuplicateButtonIndex(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
