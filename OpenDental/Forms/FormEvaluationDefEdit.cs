@@ -36,7 +36,7 @@ namespace OpenDental {
 			for(int i=0;i<gradingScales.Count;i++) {
 				_gradingScales.Add(gradingScales[i].GradingScaleNum,gradingScales[i]);
 			}
-			if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType!=EnumScaleType.Weighted) {
+			if(_gradingScales.Count!=0 && _gradingScales[_evalDefCur.GradingScaleNum].ScaleType!=EnumScaleType.Weighted) {
 				labelTotalPoint.Visible=false;
 				textTotalPoints.Visible=false;
 			}
