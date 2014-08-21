@@ -429,6 +429,7 @@ namespace OpenDental{
 			this.menuItem8 = new System.Windows.Forms.MenuItem();
 			this.menuApptFieldDefs = new System.Windows.Forms.MenuItem();
 			this.menuItemApptRules = new System.Windows.Forms.MenuItem();
+			this.menuItemApptTypes = new System.Windows.Forms.MenuItem();
 			this.menuItemApptViews = new System.Windows.Forms.MenuItem();
 			this.menuItemOperatories = new System.Windows.Forms.MenuItem();
 			this.menuItemRecall = new System.Windows.Forms.MenuItem();
@@ -579,7 +580,6 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
-			this.menuItemApptTypes = new System.Windows.Forms.MenuItem();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -741,6 +741,12 @@ namespace OpenDental{
 			this.menuItemApptRules.Index = 3;
 			this.menuItemApptRules.Text = "Appointment Rules";
 			this.menuItemApptRules.Click += new System.EventHandler(this.menuItemApptRules_Click);
+			// 
+			// menuItemApptTypes
+			// 
+			this.menuItemApptTypes.Index = 4;
+			this.menuItemApptTypes.Text = "Appointment Types";
+			this.menuItemApptTypes.Click += new System.EventHandler(this.menuItemApptTypes_Click);
 			// 
 			// menuItemApptViews
 			// 
@@ -1440,6 +1446,7 @@ namespace OpenDental{
 			// 
 			this.menuItemDispensary.Index = 9;
 			this.menuItemDispensary.Text = "Dispensary";
+			this.menuItemDispensary.Visible = false;
 			this.menuItemDispensary.Click += new System.EventHandler(this.menuItemDispensary_Click);
 			// 
 			// menuItemEvaluations
@@ -1788,12 +1795,6 @@ namespace OpenDental{
 			this.lightSignalGrid1.TabIndex = 20;
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
-			// 
-			// menuItem4
-			// 
-			this.menuItemApptTypes.Index = 4;
-			this.menuItemApptTypes.Text = "Appointment Types";
-			this.menuItemApptTypes.Click += new System.EventHandler(this.menuItemApptTypes_Click);
 			// 
 			// FormOpenDental
 			// 
