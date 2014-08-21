@@ -3488,6 +3488,7 @@ namespace OpenDental {
 					infoBubble.Controls.Remove(PicturePat);
 				}
 				else {
+					PicturePat.Location=new Point(6,17);
 					if(!infoBubble.Controls.Contains(PicturePat)) {
 						infoBubble.Controls.Add(PicturePat);
 					}
@@ -3521,13 +3522,14 @@ namespace OpenDental {
 					}
 					if(i==1) {
 						font=new Font(FontFamily.GenericSansSerif,9f);
+						y-=3;
 						if(hasPatientPicture) {
 							x=110;
+							PicturePat.Location=new Point(PicturePat.Location.X,(int)y+5);
 						}
 						else {
 							x=2;
 						}
-						y-=3;
 					}
 					if(hasPatientPicture && y>=(PicturePat.Height+PicturePat.Location.Y)) {
 						x=2;
@@ -3726,6 +3728,9 @@ namespace OpenDental {
 					}
 				}
 				//other family members?
+				if(hasPatientPicture && y<PicturePat.Height+PicturePat.Location.Y) {
+					y=PicturePat.Height+PicturePat.Location.Y;
+				}
 				g.DrawRectangle(Pens.Gray,0,0,infoBubble.Width-1,(int)y+4);
 				g.Dispose();
 				infoBubble.Size=new Size(infoBubble.Width,(int)y+5);
