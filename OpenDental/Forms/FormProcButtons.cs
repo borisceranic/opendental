@@ -29,6 +29,7 @@ namespace OpenDental{
 		///<summary>This list of displayed buttons for the selected cat.</summary>
 		private ProcButton[] ButtonList;
 		private ODButtonPanel panelQuickButtons;
+		private Label labelEdit;
 		private List<ProcButtonQuick> listProcButtonQuicks;
 
 		///<summary></summary>
@@ -65,6 +66,7 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
+			this.labelEdit = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -231,10 +233,20 @@ namespace OpenDental{
 			this.panelQuickButtons.UseBlueTheme = false;
 			this.panelQuickButtons.RowDoubleClick += new OpenDental.UI.ODButtonPanelEventHandler(this.panelQuickButtons_RowDoubleClick);
 			// 
+			// labelEdit
+			// 
+			this.labelEdit.Location = new System.Drawing.Point(326, 244);
+			this.labelEdit.Name = "labelEdit";
+			this.labelEdit.Size = new System.Drawing.Size(235, 74);
+			this.labelEdit.TabIndex = 204;
+			this.labelEdit.Text = "Quickbuttons is a special category that allows custom placement of multiple butto" +
+    "ns and labels per row.  Double click panel above to add or edit an item.";
+			// 
 			// FormProcButtons
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(746, 483);
+			this.Controls.Add(this.labelEdit);
 			this.Controls.Add(this.panelQuickButtons);
 			this.Controls.Add(this.listViewButtons);
 			this.Controls.Add(this.butEdit);
@@ -282,6 +294,7 @@ namespace OpenDental{
 			}
 			else {
 				panelQuickButtons.Visible=false;
+				labelEdit.Visible=false;
 			}
 		}
 
@@ -294,6 +307,7 @@ namespace OpenDental{
 				controlArray=this.Owner.Controls.Find("panelQuickButtons",true);
 				//set display size to actual size in from the control module. This is a dynamically sized control.
 				panelQuickButtons.Size=controlArray[0].Size;
+				labelEdit.Location=new Point(panelQuickButtons.Location.X,panelQuickButtons.Bounds.Bottom+3);
 			}
 			catch(Exception ex) {
 				//could not locate the gridquickbuttons control.
