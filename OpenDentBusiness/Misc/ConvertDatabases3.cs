@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -4792,11 +4792,11 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.2.23.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To14_3_0();
+			To14_3_1();
 		}
 
-		private static void To14_3_0() {
-			if(FromVersion<new Version("14.3.0.0")) {
+		private static void To14_3_1() {
+			if(FromVersion<new Version("14.3.1.0")) {
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO ehrprovkey (LName,FName,YearValue,ProvKey)"
@@ -5928,11 +5928,10 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
-
-				command="UPDATE preference SET ValueString = '14.3.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '14.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To14_4_0();
+			//To14_3_X();
 		}
 
 
