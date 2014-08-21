@@ -188,7 +188,7 @@ namespace OpenDental.UI {
 			//Graphics g=p.Graphics;
 			Rectangle recOutline=new Rectangle(item.Location.X,item.Location.Y,item.ItemWidth-1,_rowHeight-1);
 			float radius=4;
-			DrawItemButBackground(g,recOutline,radius,colorDarkDefault,colorMain,colorLightest);
+			DrawItemButBackground(g,recOutline,radius,colorDarkest/*colorDarkDefault*/,colorMain,colorLightest);
 			float diagonalLength=(float)Math.Sqrt(recOutline.Height*recOutline.Height+recOutline.Width*recOutline.Width);
 			////unit vector representing direction of diagonal
 			//float unitvectorx=recOutline.Width/diagonalLength;
