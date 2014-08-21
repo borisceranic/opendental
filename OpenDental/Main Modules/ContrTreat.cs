@@ -1588,13 +1588,8 @@ namespace OpenDental{
 							}
 							break;
 						case "Fee":
-							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
-								if(checkShowFees.Checked) {
-									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
-								}
-							}
-							else {
-								if(checkShowFees.Checked && RowsMain[i].Description.ToString()=="Total") {
+							if(checkShowFees.Checked) {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
 									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
 								}
 								else {
@@ -1603,13 +1598,8 @@ namespace OpenDental{
 							}
 							break;
 						case "Pri Ins":
-							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
-								if(checkShowIns.Checked) {
-									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
-								}
-							}
-							else {
-								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+							if(checkShowIns.Checked) {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
 									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
 								}
 								else {
@@ -1618,13 +1608,8 @@ namespace OpenDental{
 							}
 							break;
 						case "Sec Ins":
-							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
-								if(checkShowIns.Checked) {
-									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
-								}
-							}
-							else {
-								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+							if(checkShowIns.Checked) {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
 									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
 								}
 								else {
@@ -1633,13 +1618,8 @@ namespace OpenDental{
 							}
 							break;
 						case "Discount":
-							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
-								if(checkShowDiscount.Checked) {
-									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
-								}
-							}
-							else {
-								if(checkShowDiscount.Checked && RowsMain[i].Description.ToString()=="Total") {
+							if(checkShowDiscount.Checked) {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
 									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
 								}
 								else {
@@ -1648,13 +1628,8 @@ namespace OpenDental{
 							}
 							break;
 						case "Pat":
-							if(PrefC.GetBool(PrefName.TreatPlanItemized)) {
-								if(checkShowIns.Checked) {
-									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
-								}
-							}
-							else {
-								if(checkShowIns.Checked && RowsMain[i].Description.ToString()=="Total") {
+							if(checkShowIns.Checked) {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
 									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
 								}
 								else {
