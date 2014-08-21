@@ -129,8 +129,8 @@ namespace OpenDental{
 			this.labelEdit.Name = "labelEdit";
 			this.labelEdit.Size = new System.Drawing.Size(235, 75);
 			this.labelEdit.TabIndex = 205;
-			this.labelEdit.Text = "Quickbuttons is a special category that allows custom placement of multiple butto" +
-    "ns and labels per row.  Double click panel above to add or edit an item.";
+			this.labelEdit.Text = "The Quick Buttons category allows custom placement of buttons and labels.  Double" +
+    " click anywhere on panel above to add or edit an item.";
 			// 
 			// panelQuickButtons
 			// 
@@ -307,7 +307,7 @@ namespace OpenDental{
 				controlArray=this.Owner.Controls.Find("panelQuickButtons",true);
 				//set display size to actual size in from the control module. This is a dynamically sized control.
 				panelQuickButtons.Size=controlArray[0].Size;
-				labelEdit.Location=new Point(panelQuickButtons.Location.X,panelQuickButtons.Bounds.Bottom+3);
+				labelEdit.Location=new Point(panelQuickButtons.Location.X,panelQuickButtons.Bounds.Bottom+20);
 			}
 			catch(Exception ex) {
 				//could not locate the gridquickbuttons control.
@@ -508,7 +508,6 @@ namespace OpenDental{
 
 		private void panelQuickButtons_RowDoubleClick(object sender,ODButtonPanelEventArgs e) {
 			FormProcButtonQuickEdit FormPBQ=new FormProcButtonQuickEdit();
-
 			//Search through tags of the ODPanelItem for the PBQ.
 			for(int i=0;e.Item!=null && i<e.Item.Tags.Count;i++) {
 				if(e.Item.Tags[i].GetType()==typeof(ProcButtonQuick)){
