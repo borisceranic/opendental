@@ -10,7 +10,9 @@ namespace OpenDentBusiness{
 		public long MedicationNum;
 		///<summary>Name of the medication.  User can change this.  If an RxCui is present, the RxNorm string can be pulled from the in-memory table for UI display in addition to the MedName.</summary>
 		public string MedName;
-		///<summary>FK to medication.MedicationNum.  If this is a generic drug, then the GenericNum will be the same as the MedicationNum.</summary>
+		///<summary>FK to medication.MedicationNum.  Cannot be zero.
+		///If this is a generic drug, then the GenericNum will be the same as the MedicationNum.
+		///Otherwise, if this is a brand drug, then the GenericNum will be a non-zero value corresponding to another medicaiton.</summary>
 		public long GenericNum;
 		///<summary>Notes.</summary>
 		public string Notes;
