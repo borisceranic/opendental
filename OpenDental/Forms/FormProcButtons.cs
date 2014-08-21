@@ -59,14 +59,14 @@ namespace OpenDental{
 			this.listViewButtons = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.imageListProcButtons = new System.Windows.Forms.ImageList(this.components);
+			this.labelEdit = new System.Windows.Forms.Label();
+			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
 			this.butEdit = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.panelQuickButtons = new OpenDental.UI.ODButtonPanel();
-			this.labelEdit = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -122,6 +122,24 @@ namespace OpenDental{
 			this.imageListProcButtons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListProcButtons.ImageStream")));
 			this.imageListProcButtons.TransparentColor = System.Drawing.Color.Transparent;
 			this.imageListProcButtons.Images.SetKeyName(0, "deposit.gif");
+			// 
+			// labelEdit
+			// 
+			this.labelEdit.Location = new System.Drawing.Point(326, 244);
+			this.labelEdit.Name = "labelEdit";
+			this.labelEdit.Size = new System.Drawing.Size(235, 72);
+			this.labelEdit.TabIndex = 204;
+			this.labelEdit.Text = "The Quick Buttons category allows custom placement of buttons and labels.  Double" +
+    " click anywhere on panel above to add or edit an item.";
+			// 
+			// panelQuickButtons
+			// 
+			this.panelQuickButtons.Location = new System.Drawing.Point(326, 59);
+			this.panelQuickButtons.Name = "panelQuickButtons";
+			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
+			this.panelQuickButtons.TabIndex = 203;
+			this.panelQuickButtons.UseBlueTheme = false;
+			this.panelQuickButtons.RowDoubleClick += new OpenDental.UI.ODButtonPanelEventHandler(this.panelQuickButtons_RowDoubleClick);
 			// 
 			// butEdit
 			// 
@@ -224,24 +242,6 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// panelQuickButtons
-			// 
-			this.panelQuickButtons.Location = new System.Drawing.Point(326, 59);
-			this.panelQuickButtons.Name = "panelQuickButtons";
-			this.panelQuickButtons.Size = new System.Drawing.Size(195, 182);
-			this.panelQuickButtons.TabIndex = 203;
-			this.panelQuickButtons.UseBlueTheme = false;
-			this.panelQuickButtons.RowDoubleClick += new OpenDental.UI.ODButtonPanelEventHandler(this.panelQuickButtons_RowDoubleClick);
-			// 
-			// labelEdit
-			// 
-			this.labelEdit.Location = new System.Drawing.Point(326, 244);
-			this.labelEdit.Name = "labelEdit";
-			this.labelEdit.Size = new System.Drawing.Size(235, 74);
-			this.labelEdit.TabIndex = 204;
-			this.labelEdit.Text = "Quickbuttons is a special category that allows custom placement of multiple butto" +
-    "ns and labels per row.  Double click panel above to add or edit an item.";
-			// 
 			// FormProcButtons
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -307,7 +307,7 @@ namespace OpenDental{
 				controlArray=this.Owner.Controls.Find("panelQuickButtons",true);
 				//set display size to actual size in from the control module. This is a dynamically sized control.
 				panelQuickButtons.Size=controlArray[0].Size;
-				labelEdit.Location=new Point(panelQuickButtons.Location.X,panelQuickButtons.Bounds.Bottom+3);
+				labelEdit.Location=new Point(panelQuickButtons.Location.X,panelQuickButtons.Bounds.Bottom+20);
 			}
 			catch(Exception ex) {
 				//could not locate the gridquickbuttons control.
@@ -508,7 +508,6 @@ namespace OpenDental{
 
 		private void panelQuickButtons_RowDoubleClick(object sender,ODButtonPanelEventArgs e) {
 			FormProcButtonQuickEdit FormPBQ=new FormProcButtonQuickEdit();
-
 			//Search through tags of the ODPanelItem for the PBQ.
 			for(int i=0;e.Item!=null && i<e.Item.Tags.Count;i++) {
 				if(e.Item.Tags[i].GetType()==typeof(ProcButtonQuick)){

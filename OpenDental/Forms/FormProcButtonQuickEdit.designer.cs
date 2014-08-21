@@ -43,7 +43,7 @@ namespace OpenDental{
 			this.checkIsLabel.Location = new System.Drawing.Point(84, 91);
 			this.checkIsLabel.Name = "checkIsLabel";
 			this.checkIsLabel.Size = new System.Drawing.Size(111, 16);
-			this.checkIsLabel.TabIndex = 56;
+			this.checkIsLabel.TabIndex = 3;
 			this.checkIsLabel.Text = "Display as Label";
 			this.checkIsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsLabel.UseVisualStyleBackColor = true;
@@ -54,7 +54,7 @@ namespace OpenDental{
 			this.textProcedureCode.Location = new System.Drawing.Point(181, 38);
 			this.textProcedureCode.Name = "textProcedureCode";
 			this.textProcedureCode.Size = new System.Drawing.Size(167, 20);
-			this.textProcedureCode.TabIndex = 57;
+			this.textProcedureCode.TabIndex = 1;
 			// 
 			// label2
 			// 
@@ -70,7 +70,7 @@ namespace OpenDental{
 			this.textDescript.Location = new System.Drawing.Point(181, 12);
 			this.textDescript.Name = "textDescript";
 			this.textDescript.Size = new System.Drawing.Size(167, 20);
-			this.textDescript.TabIndex = 59;
+			this.textDescript.TabIndex = 0;
 			// 
 			// label3
 			// 
@@ -104,7 +104,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 139);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(81, 26);
-			this.butDelete.TabIndex = 61;
+			this.butDelete.TabIndex = 6;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -119,7 +119,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(273, 141);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 4;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -134,7 +134,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(354, 141);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -152,7 +152,7 @@ namespace OpenDental{
 			this.textSurfaces.Location = new System.Drawing.Point(181, 64);
 			this.textSurfaces.Name = "textSurfaces";
 			this.textSurfaces.Size = new System.Drawing.Size(167, 20);
-			this.textSurfaces.TabIndex = 54;
+			this.textSurfaces.TabIndex = 2;
 			// 
 			// FormProcButtonQuickEdit
 			// 
