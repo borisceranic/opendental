@@ -136,6 +136,7 @@ namespace OpenDental{
 		private TextBox textFamPriMax;
 		private List<ClaimProcHist> LoopList;
 		private bool checkShowInsNotAutomatic;
+		private bool checkShowDiscountNotAutomatic;
 		private List<TpRow> RowsMain;
 
 		///<summary></summary>
@@ -792,14 +793,11 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyHideInsurance)){
 				checkShowIns.Visible=false;
 				checkShowIns.Checked=false;
-				checkShowDiscount.Visible=false;
-				checkShowDiscount.Checked=false;
 				checkShowMaxDed.Visible=false;
 				//checkShowMaxDed.Checked=false;
 			}
 			else{
 				checkShowIns.Visible=true;
-				checkShowDiscount.Visible=true;
 				checkShowMaxDed.Visible=true;
 			}
 		}
@@ -887,12 +885,6 @@ namespace OpenDental{
 							}
 							InsSub sub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
 							InsPlan plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
-							if(plan.PlanType=="p" || plan.PlanType=="c"){//ppo or cap
-								checkShowDiscount.Checked=true;
-							}
-							else{
-								checkShowDiscount.Checked=false;
-							}
 						}
 					}
 				}
@@ -1064,7 +1056,16 @@ namespace OpenDental{
 				ClaimProcs.Synch(ref ClaimProcList,claimProcListOld);
 				//claimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
 				string estimateNote;
+				if(!checkShowDiscountNotAutomatic) {
+					checkShowDiscount.Checked=false;
+				}
 				for(int i=0;i<ProcListTP.Length;i++) {
+					if(!checkShowDiscountNotAutomatic 
+						&& !checkShowDiscount.Checked 
+						&& ProcListTP[i].Discount!=0) 
+					{
+						checkShowDiscount.Checked=true;
+					}
 					row=new TpRow();
 					fee=(decimal)ProcListTP[i].ProcFee;
 					int qty=ProcListTP[i].BaseUnits + ProcListTP[i].UnitQty;
@@ -1956,9 +1957,9 @@ namespace OpenDental{
 				if(!checkShowInsNotAutomatic){
 					checkShowIns.Checked=true;
 				}
-				//if(PrefC.GetBool(PrefName.TreatPlanShowDiscount")){
-				checkShowDiscount.Checked=true;
-				//}
+				if(!checkShowDiscountNotAutomatic) {
+					checkShowDiscount.Checked=true;
+				}
 				checkShowSubtotals.Checked=true;
 				checkShowTotals.Checked=true;
 			}
@@ -1967,7 +1968,9 @@ namespace OpenDental{
 				if(!checkShowInsNotAutomatic){
 					checkShowIns.Checked=false;
 				}
-				checkShowDiscount.Checked=false;
+				if(!checkShowDiscountNotAutomatic) {
+					checkShowDiscount.Checked=false;
+				}
 				checkShowSubtotals.Checked=false;
 				checkShowTotals.Checked=false;
 			}
@@ -1988,6 +1991,11 @@ namespace OpenDental{
 		}
 
 		private void checkShowDiscount_Click(object sender,EventArgs e) {
+			if(!checkShowDiscount.Checked) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Turn off automatic checking of this box for the rest of this session?")) {
+					checkShowDiscountNotAutomatic=true;
+				}
+			}
 			FillMain();
 		}
 
@@ -2002,7 +2010,7 @@ namespace OpenDental{
 		private void ToolBarMainPrint_Click() {
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				if(checkShowDiscount.Checked || checkShowIns.Checked) {
-					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and PPO discounts from printed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
+					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and discounts from printed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
 						checkShowDiscount.Checked=false;
 						checkShowIns.Checked=false;
 						FillMain();
@@ -2075,7 +2083,7 @@ namespace OpenDental{
 		private void ToolBarMainEmail_Click() {
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				if(checkShowDiscount.Checked || checkShowIns.Checked) {
-					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and PPO discounts from e-mailed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
+					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and discounts from e-mailed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
 						checkShowDiscount.Checked=false;
 						checkShowIns.Checked=false;
 						FillMain();
