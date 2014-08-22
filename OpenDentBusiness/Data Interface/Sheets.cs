@@ -214,17 +214,21 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Loops through all the fields in the sheet and appends together all the FieldValues.  It obviously excludes all SigBox fieldtypes.  It does include Drawing fieldtypes, so any change at all to any drawing will invalidate the signature.  It does include Image fieldtypes, although that's just a filename and does not really have any meaningful data about the image itself.  The order is absolutely critical.</summary>
-		public static string GetSignatureKey(Sheet sheet){
+		public static string GetSignatureKey(Sheet sheet) {
 			//No need to check RemotingRole; no call to db
 			StringBuilder strBuild=new StringBuilder();
-			for(int i=0;i<sheet.SheetFields.Count;i++){
-				if(sheet.SheetFields[i].FieldValue==""){
+			//The order of sheet fields is absolutely critical when it comes to the signature key.
+			//Therefore, we will make a local copy of the sheet fields and sort them how we want them here just in case their order has changed for any other reason.
+			List<SheetField> sheetFields=sheet.Copy().SheetFields;
+			sheetFields.Sort(SheetFields.SortPrimaryKey);
+			for(int i=0;i<sheetFields.Count;i++) {
+				if(sheetFields[i].FieldValue=="") {
 					continue;
 				}
-				if(sheet.SheetFields[i].FieldType==SheetFieldType.SigBox){
+				if(sheetFields[i].FieldType==SheetFieldType.SigBox) {
 					continue;
 				}
-				strBuild.Append(sheet.SheetFields[i].FieldValue);
+				strBuild.Append(sheetFields[i].FieldValue);
 			}
 			return strBuild.ToString();
 		}
