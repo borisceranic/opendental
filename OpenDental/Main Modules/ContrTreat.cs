@@ -1062,7 +1062,8 @@ namespace OpenDental{
 				for(int i=0;i<ProcListTP.Length;i++) {
 					if(!checkShowDiscountNotAutomatic 
 						&& !checkShowDiscount.Checked 
-						&& ProcListTP[i].Discount!=0) 
+						&& (ProcListTP[i].Discount!=0
+						|| ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,ProcListTP[i].ProcNum)!=0)) 
 					{
 						checkShowDiscount.Checked=true;
 					}
