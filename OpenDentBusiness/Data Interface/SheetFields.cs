@@ -114,6 +114,10 @@ namespace OpenDentBusiness{
 			return f1.XPos.CompareTo(f2.XPos);
 		}
 
+		///<summary>Sorts the sheet fields by SheetFieldNum.  This is used when creating a signature key and is absolutely critical that it not change.</summary>
+		public static int SortPrimaryKey(SheetField f1,SheetField f2) {
+			return f1.SheetFieldNum.CompareTo(f2.SheetFieldNum);
+		}
 
 
 
