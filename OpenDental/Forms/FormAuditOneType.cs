@@ -106,7 +106,7 @@ namespace OpenDental{
 
 		private void FillGrid(){
 			//Fill the log if it wasn't filled outside of this window.
-			if(LogList.Length==0) {
+			if(LogList==null) {
 				LogList=SecurityLogs.Refresh(PatNum,PermTypes,FKey);
 			}
 			grid.BeginUpdate();
