@@ -49,7 +49,7 @@ namespace OpenDentBusiness{
 				retVal[i].Measure=GetMeasure(retVal[i].MeasureType);
 				retVal[i].PercentThreshold=GetThreshold(retVal[i].MeasureType);
 				DataTable table=GetTable(retVal[i].MeasureType,dateStart,dateEnd,provNum);
-				if(table==null) {
+				if(table==null) {//GetTable() does not return null, so this conditional should never happen.
 					retVal[i].Numerator=-1;
 					retVal[i].Denominator=-1;
 				}
@@ -81,7 +81,7 @@ namespace OpenDentBusiness{
 				retVal[i].Measure=GetMeasureMu2(retVal[i].MeasureType);
 				retVal[i].PercentThreshold=GetThresholdMu2(retVal[i].MeasureType);
 				DataTable table=GetTableMu2(retVal[i].MeasureType,dateStart,dateEnd,provNum);
-				if(table==null) {
+				if(table==null) {//GetTableMU2() does not return null, so this conditional should never happen.
 					retVal[i].Numerator=-1;
 					retVal[i].Denominator=-1;
 				}
@@ -274,17 +274,10 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
+			//Get all providers using the same EhrKey as the selected provider.  Ehr key was already checked that it was not blank.
 			command="SELECT "+DbHelper.GroupConcat("provider.ProvNum")+" FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provs=Db.GetScalar(command);
-			string[] tempProv=provs.Split(',');
-			string provOID="";
-			for(int oi=0;oi<tempProv.Length;oi++) {
-				provOID=provOID+tempProv[oi];
-				if(oi<tempProv.Length-1) {
-					provOID+=",";
-				}
-			}
 			command="SELECT "+DbHelper.GroupConcat("provider.NationalProvID")+" FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provNPIs=Db.GetScalar(command);
@@ -727,7 +720,7 @@ namespace OpenDentBusiness{
 							+"WHEN ehrlab.OrderingProviderIdentifierTypeCode='PRN' THEN ( " //When the lab is using provider number to determine provider.
 								+"CASE WHEN ehrlab.OrderingProviderAssigningAuthorityUniversalID=( " //If the AssigningAuthority is OpenDental.
 									+"SELECT IDRoot FROM oidinternal WHERE IDType='Provider' GROUP BY IDType "
-								+") THEN ehrlab.OrderingProviderID IN('"+POut.String(provOID)+"') END) " //Use the ProvNum to determine provider.
+								+") THEN ehrlab.OrderingProviderID IN("+POut.String(provs)+") END) " //Use the ProvNums (ProvOids) to determine provider.
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
@@ -2590,17 +2583,10 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
+			//Get all providers using the same EhrKey as the selected provider.  Ehr key was already checked that it was not blank.
 			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provs=Db.GetScalar(command);
-			string[] tempProv=provs.Split(',');
-			string provOID="";
-			for(int oi=0;oi<tempProv.Length;oi++) {
-				provOID=provOID+tempProv[oi];
-				if(oi<tempProv.Length-1) {
-					provOID+=",";
-				}
-			}	
 			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
 				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provNPIs=Db.GetScalar(command);
@@ -2633,7 +2619,7 @@ namespace OpenDentBusiness{
 							+"WHEN ehrlab.OrderingProviderIdentifierTypeCode='PRN' THEN ( " //When the lab is using provider number to determine provider.
 								+"CASE WHEN ehrlab.OrderingProviderAssigningAuthorityUniversalID=( " //If the AssigningAuthority is OpenDental.
 									+"SELECT IDRoot FROM oidinternal WHERE IDType='Provider' GROUP BY IDType "
-								+") THEN ehrlab.OrderingProviderID IN('"+POut.String(provOID)+"') END) " //Use the ProvNum to determine provider.
+								+") THEN ehrlab.OrderingProviderID IN("+POut.String(provs)+") END) "  //Use the ProvNums (ProvOids) to determine provider.
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
@@ -2651,7 +2637,7 @@ namespace OpenDentBusiness{
 							+"WHEN ehrlab.OrderingProviderIdentifierTypeCode='PRN' THEN ( " //When the lab is using provider number to determine provider.
 								+"CASE WHEN ehrlab.OrderingProviderAssigningAuthorityUniversalID=( " //If the AssigningAuthority is OpenDental.
 									+"SELECT IDRoot FROM oidinternal WHERE IDType='Provider' GROUP BY IDType "
-								+") THEN ehrlab.OrderingProviderID IN('"+POut.String(provOID)+"') END) " //Use the ProvNum to determine provider.
+								+") THEN ehrlab.OrderingProviderID IN("+POut.String(provs)+") END) " //Use the ProvNums (ProvOids) to determine provider.
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
@@ -2825,7 +2811,7 @@ namespace OpenDentBusiness{
 							+"WHEN ehrlab.OrderingProviderIdentifierTypeCode='PRN' THEN ( " //When the lab is using provider number to determine provider.
 								+"CASE WHEN ehrlab.OrderingProviderAssigningAuthorityUniversalID=( " //If the AssigningAuthority is OpenDental.
 									+"SELECT IDRoot FROM oidinternal WHERE IDType='Provider' GROUP BY IDType "
-								+") THEN ehrlab.OrderingProviderID IN('"+POut.String(provOID)+"') END) " //Use the ProvNum to determine provider.
+								+") THEN ehrlab.OrderingProviderID IN("+POut.String(provs)+") END) " //Use the ProvNums (ProvOids) to determine provider.
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
@@ -2997,7 +2983,7 @@ namespace OpenDentBusiness{
 								+"WHEN ehrlab.OrderingProviderIdentifierTypeCode='PRN' THEN ( " //When the lab is using provider number to determine provider.
 								+"CASE WHEN ehrlab.OrderingProviderAssigningAuthorityUniversalID=( " //If the AssigningAuthority is OpenDental.
 									+"SELECT IDRoot FROM oidinternal WHERE IDType='Provider' GROUP BY IDType "
-								+") THEN ehrlab.OrderingProviderID IN('"+POut.String(provOID)+"') END) " //Use the ProvNum to determine provider.
+								+") THEN ehrlab.OrderingProviderID IN("+POut.String(provs)+") END) " //Use the ProvNums (ProvOids) to determine provider.
 							+"ELSE FALSE END) " //If the AssigningAuthority is not OpenDental, we have no way to tell who the provider is.
 							+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+") as labsTable "
