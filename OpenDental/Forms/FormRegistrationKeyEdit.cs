@@ -563,7 +563,7 @@ namespace OpenDental{
 			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
 				writer.WriteStartElement("PracticeTitleReset");
 					writer.WriteStartElement("RegistrationKey");
-						writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+						writer.WriteString(RegKey.RegKey);
 					writer.WriteEndElement();
 				writer.WriteEndElement();
 			}
