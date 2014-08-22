@@ -391,11 +391,10 @@ namespace OpenDental{
     }
 
 		private void listViewButtons_DoubleClick(object sender,EventArgs e) {
-			if(listViewButtons.SelectedIndices.Count==0 //Nothing selected
-				|| listViewButtons.SelectedIndices.Contains(0)){ //Quick Buttons Selected
+			if(listViewButtons.SelectedIndices.Count==0) {//Nothing selected
 				return;
 			}
-			ProcButton but=ButtonList[listViewButtons.SelectedIndices[0]-1].Copy();
+			ProcButton but=ButtonList[listViewButtons.SelectedIndices[0]].Copy();
 			FormProcButtonEdit FormPBE=new FormProcButtonEdit(but);
 			FormPBE.ShowDialog();
 			changed=true;
