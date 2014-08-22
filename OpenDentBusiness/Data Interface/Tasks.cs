@@ -139,8 +139,8 @@ namespace OpenDentBusiness{
 				+"WHERE NOT EXISTS( "
 					+"SELECT * FROM taskancestor "
 					+"LEFT JOIN tasklist ON tasklist.TaskListNum=taskancestor.TaskListNum "
-						+"AND tasklist.DateType!=0 "//if any ancestor is a dated list, then we don't want that task
-					+"WHERE taskancestor.TaskNum=task.TaskNum) "
+					+"WHERE taskancestor.TaskNum=task.TaskNum "
+					+"AND tasklist.DateType!=0) "//if any ancestor is a dated list, then we don't want that task
 				+"AND task.DateType=0 "//this only handles tasks directly in the dated trunks
 				+"AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
 				+"AND task.IsRepeating=0 "
