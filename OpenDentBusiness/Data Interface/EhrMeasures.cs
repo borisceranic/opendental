@@ -775,45 +775,64 @@ namespace OpenDentBusiness{
 				#endregion
 				#region ClinicalSummaries
 				case EhrMeasureType.ClinicalSummaries:
-					command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
-					Db.NonQ(command);
-					command="CREATE TABLE tempehrmeasure"+rndStr+@" (
-						TempEhrMeasureNum bigint NOT NULL auto_increment PRIMARY KEY,
-						PatNum bigint NOT NULL,
-						LName varchar(255) NOT NULL,
-						FName varchar(255) NOT NULL,
-						visitDate date NOT NULL,
-						deadlineDate date NOT NULL,
-						summaryProvided tinyint NOT NULL,
-						INDEX(PatNum)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-					command="INSERT INTO tempehrmeasure"+rndStr+" (PatNum,LName,FName,visitDate) SELECT patient.PatNum,LName,FName,ProcDate "
-						+"FROM procedurelog "
-						+"LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum "
-						+"WHERE ProcDate >= "+POut.Date(dateStart)+" "
-						+"AND ProcDate <= "+POut.Date(dateEnd)+" "
-						//+"AND procedurelog.ProvNum="+POut.Long(provNum)+" "
-						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
-						+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
-						+"GROUP BY procedurelog.PatNum,ProcDate";
-					Db.NonQ(command);
-					command="UPDATE tempehrmeasure"+rndStr+" "
-						+"SET deadlineDate = ADDDATE(visitDate, INTERVAL 3 DAY)";
-					Db.NonQ(command);
-					command="UPDATE tempehrmeasure"+rndStr+" "
-						+"SET DeadlineDate = ADDDate(deadlineDate, INTERVAL 2 DAY) "//add 2 more days for weekend
-						+"WHERE DAYOFWEEK(visitDate) IN(4,5,6)";//wed, thur, fri
-					Db.NonQ(command);
-					command="UPDATE tempehrmeasure"+rndStr+",ehrmeasureevent SET summaryProvided = 1 "
-						+"WHERE ehrmeasureevent.PatNum=tempehrmeasure"+rndStr+".PatNum AND EventType="+POut.Int((int)EhrMeasureEventType.ClinicalSummaryProvidedToPt)+" "
-						+"AND DATE(ehrmeasureevent.DateTEvent) >= visitDate "
-						+"AND DATE(ehrmeasureevent.DateTEvent) <= deadlineDate";
-					Db.NonQ(command);
-					command="SELECT * FROM tempehrmeasure"+rndStr;
+					//command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
+					//Db.NonQ(command);
+					//command="CREATE TABLE tempehrmeasure"+rndStr+@" (
+					//	TempEhrMeasureNum bigint NOT NULL auto_increment PRIMARY KEY,
+					//	PatNum bigint NOT NULL,
+					//	LName varchar(255) NOT NULL,
+					//	FName varchar(255) NOT NULL,
+					//	visitDate date NOT NULL,
+					//	deadlineDate date NOT NULL,
+					//	summaryProvided tinyint NOT NULL,
+					//	INDEX(PatNum)
+					//	) DEFAULT CHARSET=utf8";
+					//Db.NonQ(command);
+					//command="INSERT INTO tempehrmeasure"+rndStr+" (PatNum,LName,FName,visitDate) SELECT patient.PatNum,LName,FName,ProcDate "
+					//	+"FROM procedurelog "
+					//	+"LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum "
+					//	+"WHERE ProcDate >= "+POut.Date(dateStart)+" "
+					//	+"AND ProcDate <= "+POut.Date(dateEnd)+" "
+					//	//+"AND procedurelog.ProvNum="+POut.Long(provNum)+" "
+					//	+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
+					//	+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+					//	+"GROUP BY procedurelog.PatNum,ProcDate";
+					//Db.NonQ(command);
+					//command="UPDATE tempehrmeasure"+rndStr+" "
+					//	+"SET deadlineDate = ADDDATE(visitDate, INTERVAL 3 DAY)";
+					//Db.NonQ(command);
+					//command="UPDATE tempehrmeasure"+rndStr+" "
+					//	+"SET DeadlineDate = ADDDate(deadlineDate, INTERVAL 2 DAY) "//add 2 more days for weekend
+					//	+"WHERE DAYOFWEEK(visitDate) IN(4,5,6)";//wed, thur, fri
+					//Db.NonQ(command);
+					//command="UPDATE tempehrmeasure"+rndStr+",ehrmeasureevent SET summaryProvided = 1 "
+					//	+"WHERE ehrmeasureevent.PatNum=tempehrmeasure"+rndStr+".PatNum AND EventType="+POut.Int((int)EhrMeasureEventType.ClinicalSummaryProvidedToPt)+" "
+					//	+"AND DATE(ehrmeasureevent.DateTEvent) >= visitDate "
+					//	+"AND DATE(ehrmeasureevent.DateTEvent) <= deadlineDate";
+					//Db.NonQ(command);
+					//command="SELECT * FROM tempehrmeasure"+rndStr;
+					//tableRaw=Db.GetTable(command);
+					//command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
+					//Db.NonQ(command);
+					//We no longer have a TempEhrMeasureNum because it was never being used in this table.
+					command="SELECT Procs.*, (CASE WHEN ISNULL(ehrmeasureevent.EhrMeasureEventNum) THEN 0 ELSE 1 END) AS summaryProvided "
+							+"FROM ( "
+								+"SELECT patient.PatNum,LName,FName,ProcDate AS visitDate, "
+								+"(CASE WHEN DAYOFWEEK(ProcDate) IN (4,5,6) THEN "+DbHelper.DateAddDay("ProcDate","5") +" ELSE "+DbHelper.DateAddDay("ProcDate","3")+" END) AS 'DeadlineDate' "
+								+"FROM procedurelog "
+								+"LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum "
+								+"WHERE ProcDate >= "+POut.Date(dateStart)+" "
+								+"AND ProcDate <= "+POut.Date(dateEnd)+" "
+								+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
+								+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+								+"GROUP BY procedurelog.PatNum,ProcDate "
+							+") Procs "
+							+"LEFT JOIN ehrmeasureevent ON ehrmeasureevent.PatNum=Procs.PatNum "
+								+"AND EventType="+POut.Int((int)EhrMeasureEventType.ClinicalSummaryProvidedToPt)+" "
+								+"AND "+DbHelper.DateColumn("ehrmeasureevent.DateTEvent")+" >= Procs.visitDate "
+								+"AND "+DbHelper.DateColumn("ehrmeasureevent.DateTEvent")+" <= Procs.deadlineDate "
+							+"GROUP BY Procs.PatNum,Procs.visitDate;";
 					tableRaw=Db.GetTable(command);
-					command="DROP TABLE IF EXISTS tempehrmeasure"+rndStr;
-					Db.NonQ(command);
 					break;
 				#endregion
 				#region Reminders
