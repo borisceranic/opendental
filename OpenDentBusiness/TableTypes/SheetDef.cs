@@ -29,7 +29,9 @@ namespace OpenDentBusiness{
 		///<summary>Set to true to print landscape.</summary>
 		public bool IsLandscape;
 		///<summary>Amount of editable space. Actual size when filling sheet may be different.</summary>
-		public int PageCount; 
+        public int PageCount;
+        ///<summary>Force old single page behavior.</summary>
+        public bool IsSinglePage; 
 
 		///<Summary>A collection of all parameters for this sheetdef.  There's usually only one parameter.  The first parameter will be a List long if it's a batch.  If a sheet has already been filled, saved to the database, and printed, then there is no longer any need for the parameters in order to fill the data.  So a retrieved sheet will have no parameters, signalling a skip in the fill phase.  There will still be parameters tucked away in the Field data in the database, but they won't become part of the sheet.</Summary>
 		[CrudColumn(IsNotDbColumn=true)]

@@ -172,6 +172,10 @@ namespace OpenDental {
 		}
 
 		private static void SetForceSinglePage(Sheet sheet) {
+            if (sheet.IsSinglePage) {
+                _forceSinglePage = true;
+                return;
+            }
 			switch(sheet.SheetType) {
 				case SheetTypeEnum.DepositSlip:
 				case SheetTypeEnum.LabelAppointment:

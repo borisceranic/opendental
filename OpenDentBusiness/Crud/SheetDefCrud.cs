@@ -46,15 +46,16 @@ namespace OpenDentBusiness.Crud{
 			SheetDef sheetDef;
 			for(int i=0;i<table.Rows.Count;i++) {
 				sheetDef=new SheetDef();
-				sheetDef.SheetDefNum= PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
-				sheetDef.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				sheetDef.SheetType  = (SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
-				sheetDef.FontSize   = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				sheetDef.FontName   = PIn.String(table.Rows[i]["FontName"].ToString());
-				sheetDef.Width      = PIn.Int   (table.Rows[i]["Width"].ToString());
-				sheetDef.Height     = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheetDef.IsLandscape= PIn.Bool  (table.Rows[i]["IsLandscape"].ToString());
-				sheetDef.PageCount  = PIn.Int   (table.Rows[i]["PageCount"].ToString());
+				sheetDef.SheetDefNum = PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
+				sheetDef.Description = PIn.String(table.Rows[i]["Description"].ToString());
+				sheetDef.SheetType   = (SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
+				sheetDef.FontSize    = PIn.Float (table.Rows[i]["FontSize"].ToString());
+				sheetDef.FontName    = PIn.String(table.Rows[i]["FontName"].ToString());
+				sheetDef.Width       = PIn.Int   (table.Rows[i]["Width"].ToString());
+				sheetDef.Height      = PIn.Int   (table.Rows[i]["Height"].ToString());
+				sheetDef.IsLandscape = PIn.Bool  (table.Rows[i]["IsLandscape"].ToString());
+				sheetDef.PageCount   = PIn.Int   (table.Rows[i]["PageCount"].ToString());
+				sheetDef.IsSinglePage= PIn.Bool  (table.Rows[i]["IsSinglePage"].ToString());
 				retVal.Add(sheetDef);
 			}
 			return retVal;
@@ -95,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetDefNum,";
 			}
-			command+="Description,SheetType,FontSize,FontName,Width,Height,IsLandscape,PageCount) VALUES(";
+			command+="Description,SheetType,FontSize,FontName,Width,Height,IsLandscape,PageCount,IsSinglePage) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheetDef.SheetDefNum)+",";
 			}
@@ -107,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (sheetDef.Width)+","
 				+    POut.Int   (sheetDef.Height)+","
 				+    POut.Bool  (sheetDef.IsLandscape)+","
-				+    POut.Int   (sheetDef.PageCount)+")";
+				+    POut.Int   (sheetDef.PageCount)+","
+				+    POut.Bool  (sheetDef.IsSinglePage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -120,14 +122,15 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one SheetDef in the database.</summary>
 		public static void Update(SheetDef sheetDef){
 			string command="UPDATE sheetdef SET "
-				+"Description= '"+POut.String(sheetDef.Description)+"', "
-				+"SheetType  =  "+POut.Int   ((int)sheetDef.SheetType)+", "
-				+"FontSize   =  "+POut.Float (sheetDef.FontSize)+", "
-				+"FontName   = '"+POut.String(sheetDef.FontName)+"', "
-				+"Width      =  "+POut.Int   (sheetDef.Width)+", "
-				+"Height     =  "+POut.Int   (sheetDef.Height)+", "
-				+"IsLandscape=  "+POut.Bool  (sheetDef.IsLandscape)+", "
-				+"PageCount  =  "+POut.Int   (sheetDef.PageCount)+" "
+				+"Description = '"+POut.String(sheetDef.Description)+"', "
+				+"SheetType   =  "+POut.Int   ((int)sheetDef.SheetType)+", "
+				+"FontSize    =  "+POut.Float (sheetDef.FontSize)+", "
+				+"FontName    = '"+POut.String(sheetDef.FontName)+"', "
+				+"Width       =  "+POut.Int   (sheetDef.Width)+", "
+				+"Height      =  "+POut.Int   (sheetDef.Height)+", "
+				+"IsLandscape =  "+POut.Bool  (sheetDef.IsLandscape)+", "
+				+"PageCount   =  "+POut.Int   (sheetDef.PageCount)+", "
+				+"IsSinglePage=  "+POut.Bool  (sheetDef.IsSinglePage)+" "
 				+"WHERE SheetDefNum = "+POut.Long(sheetDef.SheetDefNum);
 			Db.NonQ(command);
 		}
@@ -166,6 +169,10 @@ namespace OpenDentBusiness.Crud{
 			if(sheetDef.PageCount != oldSheetDef.PageCount) {
 				if(command!=""){ command+=",";}
 				command+="PageCount = "+POut.Int(sheetDef.PageCount)+"";
+			}
+			if(sheetDef.IsSinglePage != oldSheetDef.IsSinglePage) {
+				if(command!=""){ command+=",";}
+				command+="IsSinglePage = "+POut.Bool(sheetDef.IsSinglePage)+"";
 			}
 			if(command==""){
 				return false;

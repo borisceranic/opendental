@@ -119,7 +119,8 @@ namespace OpenDental{
 			sheet.Width=sheetDef.Width;
 			sheet.PatNum=patNum;
 			sheet.Description=sheetDef.Description;
-			sheet.IsLandscape=sheetDef.IsLandscape;
+            sheet.IsLandscape = sheetDef.IsLandscape;
+            sheet.IsSinglePage = sheetDef.IsSinglePage;
 			sheet.SheetFields=CreateFieldList(sheetDef.SheetFieldDefs);//Blank fields with no values. Values filled later from SheetFiller.FillFields()
 			sheet.Parameters=sheetDef.Parameters;
 			return sheet;
