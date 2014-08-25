@@ -5931,7 +5931,51 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To14_4_0();
+			To14_3_2();
+		}
+
+		private static void To14_3_2() {
+			if(FromVersion<new Version("14.3.2.0")) {
+                string command; 
+                if (DataConnection.DBtype == DatabaseType.MySql)
+                {
+                    command = "ALTER TABLE sheet ADD IsSinglePage tinyint NOT NULL";
+                    Db.NonQ(command);
+                    command = "UPDATE sheet SET IsSinglePage = 1";
+                    Db.NonQ(command);
+                }
+                else
+                {//oracle
+                    command = "ALTER TABLE sheet ADD IsSinglePage number(3)";
+                    Db.NonQ(command);
+                    command = "UPDATE sheet SET IsSinglePage = 1 WHERE IsSinglePage IS NULL";
+                    Db.NonQ(command);
+                    command = "ALTER TABLE sheet MODIFY IsSinglePage NOT NULL";
+                    Db.NonQ(command);
+                }
+                if (DataConnection.DBtype == DatabaseType.MySql)
+                {
+                    command = "ALTER TABLE sheetdef ADD IsSinglePage tinyint NOT NULL";
+                    Db.NonQ(command);
+                    command = "UPDATE sheetdef SET IsSinglePage = 1";
+                    Db.NonQ(command);
+                }
+                else
+                {//oracle
+                    command = "ALTER TABLE sheetdef ADD IsSinglePage number(3)";
+                    Db.NonQ(command);
+                    command = "UPDATE sheetdef SET IsSinglePage = 1 WHERE IsSinglePage IS NULL";
+                    Db.NonQ(command);
+                    command = "ALTER TABLE sheetdef MODIFY IsSinglePage NOT NULL";
+                    Db.NonQ(command);
+                }
+
+
+
+				command="UPDATE preference SET ValueString = '14.3.2.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+            To14_4_0();
 		}
 
 		private static void To14_4_0() {

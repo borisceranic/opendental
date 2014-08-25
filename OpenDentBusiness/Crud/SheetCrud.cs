@@ -59,6 +59,7 @@ namespace OpenDentBusiness.Crud{
 				sheet.Description   = PIn.String(table.Rows[i]["Description"].ToString());
 				sheet.ShowInTerminal= PIn.Byte  (table.Rows[i]["ShowInTerminal"].ToString());
 				sheet.IsWebForm     = PIn.Bool  (table.Rows[i]["IsWebForm"].ToString());
+				sheet.IsSinglePage  = PIn.Bool  (table.Rows[i]["IsSinglePage"].ToString());
 				retVal.Add(sheet);
 			}
 			return retVal;
@@ -99,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetNum,";
 			}
-			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm) VALUES(";
+			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsSinglePage) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheet.SheetNum)+",";
 			}
@@ -115,7 +116,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheet.InternalNote)+"',"
 				+"'"+POut.String(sheet.Description)+"',"
 				+    POut.Byte  (sheet.ShowInTerminal)+","
-				+    POut.Bool  (sheet.IsWebForm)+")";
+				+    POut.Bool  (sheet.IsWebForm)+","
+				+    POut.Bool  (sheet.IsSinglePage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -139,7 +141,8 @@ namespace OpenDentBusiness.Crud{
 				+"InternalNote  = '"+POut.String(sheet.InternalNote)+"', "
 				+"Description   = '"+POut.String(sheet.Description)+"', "
 				+"ShowInTerminal=  "+POut.Byte  (sheet.ShowInTerminal)+", "
-				+"IsWebForm     =  "+POut.Bool  (sheet.IsWebForm)+" "
+				+"IsWebForm     =  "+POut.Bool  (sheet.IsWebForm)+", "
+				+"IsSinglePage  =  "+POut.Bool  (sheet.IsSinglePage)+" "
 				+"WHERE SheetNum = "+POut.Long(sheet.SheetNum);
 			Db.NonQ(command);
 		}
@@ -194,6 +197,10 @@ namespace OpenDentBusiness.Crud{
 			if(sheet.IsWebForm != oldSheet.IsWebForm) {
 				if(command!=""){ command+=",";}
 				command+="IsWebForm = "+POut.Bool(sheet.IsWebForm)+"";
+			}
+			if(sheet.IsSinglePage != oldSheet.IsSinglePage) {
+				if(command!=""){ command+=",";}
+				command+="IsSinglePage = "+POut.Bool(sheet.IsSinglePage)+"";
 			}
 			if(command==""){
 				return false;

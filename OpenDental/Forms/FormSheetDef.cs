@@ -46,6 +46,7 @@ namespace OpenDental {
 			textWidth.Text=SheetDefCur.Width.ToString();
 			textHeight.Text=SheetDefCur.Height.ToString();
 			checkIsLandscape.Checked=SheetDefCur.IsLandscape;
+            checkIsSinglePage.Checked = SheetDefCur.IsSinglePage;
 		}
 
 		private void listSheetType_Click(object sender,EventArgs e) {
@@ -130,6 +131,7 @@ namespace OpenDental {
 			SheetDefCur.Width=PIn.Int(textWidth.Text);
 			SheetDefCur.Height=PIn.Int(textHeight.Text);
 			SheetDefCur.IsLandscape=checkIsLandscape.Checked;
+            SheetDefCur.IsSinglePage = checkIsSinglePage.Checked;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;
 		}

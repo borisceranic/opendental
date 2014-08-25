@@ -55,6 +55,9 @@ namespace OpenDentBusiness{
 		public byte ShowInTerminal;
 		///<summary>True if this sheet was downloaded from the webforms service.</summary>
 		public bool IsWebForm;
+        ///<summary>Force old single page behavior.</summary>
+        public bool IsSinglePage;
+
 		
 		public Sheet Copy(){
 			return (Sheet)this.MemberwiseClone();
