@@ -274,14 +274,22 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			//Get all providers using the same EhrKey as the selected provider.  Ehr key was already checked that it was not blank.
-			command="SELECT "+DbHelper.GroupConcat("provider.ProvNum")+" FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
-			string provs=Db.GetScalar(command);
-			command="SELECT "+DbHelper.GroupConcat("provider.NationalProvID")+" FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
-			string provNPIs=Db.GetScalar(command);
-			provNPIs.Trim(',');
+			Provider provCur=Providers.GetProv(provNum);
+			string provs="";
+			string provNPIs="";
+			if(provCur.EhrKey=="") {
+				//If no EHR key entered, just use currently selected provider.  Do not want to run for all providers without an EHR key.
+				provs=provCur.ProvNum.ToString();
+				provNPIs=provCur.NationalProvID;
+			}
+			else {
+				//Get all providers using the same EhrKey as the selected provider.
+				command="SELECT "+DbHelper.GroupConcat("provider.ProvNum")+" FROM provider WHERE provider.EhrKey='"+POut.String(provCur.EhrKey)+"'";
+				provs=Db.GetScalar(command);
+				command="SELECT "+DbHelper.GroupConcat("provider.NationalProvID")+" FROM provider WHERE provider.EhrKey='"+POut.String(provCur.EhrKey)+"' "
+					+"AND provider.NationalProvID!=''";
+				provNPIs=Db.GetScalar(command);
+			}
 			if(provNPIs=="") {
 				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
 			}
@@ -2583,13 +2591,22 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			DataTable tableRaw=new DataTable();
-			//Get all providers using the same EhrKey as the selected provider.  Ehr key was already checked that it was not blank.
-			command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
-			string provs=Db.GetScalar(command);
-			command="SELECT GROUP_CONCAT(provider.NationalProvID) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
-			string provNPIs=Db.GetScalar(command);
+			Provider provCur=Providers.GetProv(provNum);
+			string provs="";
+			string provNPIs="";
+			if(provCur.EhrKey=="") {
+				//If no EHR key entered, just use currently selected provider.  Do not want to run for all providers without an EHR key.
+				provs=provCur.ProvNum.ToString();
+				provNPIs=provCur.NationalProvID;
+			}
+			else {
+				//Get all providers using the same EhrKey as the selected provider.
+				command="SELECT "+DbHelper.GroupConcat("provider.ProvNum")+" FROM provider WHERE provider.EhrKey='"+POut.String(provCur.EhrKey)+"'";
+				provs=Db.GetScalar(command);
+				command="SELECT "+DbHelper.GroupConcat("provider.NationalProvID")+" FROM provider WHERE provider.EhrKey='"+POut.String(provCur.EhrKey)+"' "
+					+"AND provider.NationalProvID!=''";
+				provNPIs=Db.GetScalar(command);
+			}
 			provNPIs.Trim(',');
 			if(provNPIs=="") {
 				provNPIs="NULL";//No NPI entered, queries below use IN statements and require at least one value.
