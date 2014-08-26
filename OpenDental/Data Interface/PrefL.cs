@@ -111,6 +111,14 @@ namespace OpenDental {
 				database=MiscData.GetCurrentDatabase();
 			}
 			if(storedVersion<currentVersion) {
+#if TRIALONLY
+				if(PrefC.GetString(PrefName.RegistrationKey)!="") {//Allow databases with no reg key to continue.  Needed by our conversion department.
+					//Trial users should never be able to update a database, not even the ProgramVersion preference.
+					MsgBox.Show("PrefL","Trial versions cannot connect to live databases.  Please run the Setup.exe in the AtoZ folder to reinstall your original version.");
+					Application.Exit();
+					return false;//Should not get to this line.  Just in case.
+				}
+#endif
 				//There are two different situations where this might happen.
 				if(PrefC.GetString(PrefName.UpdateInProgressOnComputerName)==""){//1. Just performed an update from this workstation on another database.
 					//This is very common for admins when viewing slighly older databases.
