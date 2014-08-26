@@ -124,8 +124,8 @@ namespace OpenDentBusiness{
 			}
 			string command="";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command="SELECT sheet.* FROM sheet "
-					+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
+				command="SELECT sheet.* FROM sheetfield "
+					+"LEFT JOIN sheet ON sheet.SheetNum = sheetfield.SheetNum "
 					+"WHERE FieldType = 10 "//PatImage
 					+"AND FieldValue = "+POut.Long(docNum)+" "//FieldName == DocCategory, which we do not care about here.
 					+"GROUP BY sheet.SheetNum";
