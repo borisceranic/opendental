@@ -153,7 +153,8 @@ namespace OpenDental.UI {
 					return;//no need to do anything because no signature
 				}
 			}
-			labelInvalidSig.Visible=true;	
+			labelInvalidSig.Visible=true;
+			labelInvalidSig.BringToFront();
 		}
 
 		public bool IsValid{
