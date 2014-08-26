@@ -219,16 +219,19 @@ namespace OpenDentBusiness{
 			StringBuilder strBuild=new StringBuilder();
 			//The order of sheet fields is absolutely critical when it comes to the signature key.
 			//Therefore, we will make a local copy of the sheet fields and sort them how we want them here just in case their order has changed for any other reason.
-			List<SheetField> sheetFields=sheet.Copy().SheetFields;
-			sheetFields.Sort(SheetFields.SortPrimaryKey);
-			for(int i=0;i<sheetFields.Count;i++) {
-				if(sheetFields[i].FieldValue=="") {
+			List<SheetField> sheetFieldsCopy=new List<SheetField>();
+			for(int i=0;i<sheet.SheetFields.Count;i++) {
+				sheetFieldsCopy.Add(sheet.SheetFields[i]);
+			}
+			sheetFieldsCopy.Sort(SheetFields.SortPrimaryKey);
+			for(int i=0;i<sheetFieldsCopy.Count;i++) {
+				if(sheetFieldsCopy[i].FieldValue=="") {
 					continue;
 				}
-				if(sheetFields[i].FieldType==SheetFieldType.SigBox) {
+				if(sheetFieldsCopy[i].FieldType==SheetFieldType.SigBox) {
 					continue;
 				}
-				strBuild.Append(sheetFields[i].FieldValue);
+				strBuild.Append(sheetFieldsCopy[i].FieldValue);
 			}
 			return strBuild.ToString();
 		}
