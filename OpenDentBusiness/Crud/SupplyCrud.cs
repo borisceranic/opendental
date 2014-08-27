@@ -46,15 +46,19 @@ namespace OpenDentBusiness.Crud{
 			Supply supply;
 			for(int i=0;i<table.Rows.Count;i++) {
 				supply=new Supply();
-				supply.SupplyNum    = PIn.Long  (table.Rows[i]["SupplyNum"].ToString());
-				supply.SupplierNum  = PIn.Long  (table.Rows[i]["SupplierNum"].ToString());
-				supply.CatalogNumber= PIn.String(table.Rows[i]["CatalogNumber"].ToString());
-				supply.Descript     = PIn.String(table.Rows[i]["Descript"].ToString());
-				supply.Category     = PIn.Long  (table.Rows[i]["Category"].ToString());
-				supply.ItemOrder    = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				supply.LevelDesired = PIn.Float (table.Rows[i]["LevelDesired"].ToString());
-				supply.IsHidden     = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				supply.Price        = PIn.Double(table.Rows[i]["Price"].ToString());
+				supply.SupplyNum       = PIn.Long  (table.Rows[i]["SupplyNum"].ToString());
+				supply.SupplierNum     = PIn.Long  (table.Rows[i]["SupplierNum"].ToString());
+				supply.CatalogNumber   = PIn.String(table.Rows[i]["CatalogNumber"].ToString());
+				supply.Descript        = PIn.String(table.Rows[i]["Descript"].ToString());
+				supply.Category        = PIn.Long  (table.Rows[i]["Category"].ToString());
+				supply.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				supply.LevelDesired    = PIn.Float (table.Rows[i]["LevelDesired"].ToString());
+				supply.IsHidden        = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				supply.Price           = PIn.Double(table.Rows[i]["Price"].ToString());
+				supply.BarCodeOrID     = PIn.String(table.Rows[i]["BarCodeOrID"].ToString());
+				supply.DispDefaultQuant= PIn.Float (table.Rows[i]["DispDefaultQuant"].ToString());
+				supply.DispUnitsCount  = PIn.Int   (table.Rows[i]["DispUnitsCount"].ToString());
+				supply.DispUnitDesc    = PIn.String(table.Rows[i]["DispUnitDesc"].ToString());
 				retVal.Add(supply);
 			}
 			return retVal;
@@ -95,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SupplyNum,";
 			}
-			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price) VALUES(";
+			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(supply.SupplyNum)+",";
 			}
@@ -107,7 +111,11 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (supply.ItemOrder)+","
 				+    POut.Float (supply.LevelDesired)+","
 				+    POut.Bool  (supply.IsHidden)+","
-				+"'"+POut.Double(supply.Price)+"')";
+				+"'"+POut.Double(supply.Price)+"',"
+				+"'"+POut.String(supply.BarCodeOrID)+"',"
+				+    POut.Float (supply.DispDefaultQuant)+","
+				+    POut.Int   (supply.DispUnitsCount)+","
+				+"'"+POut.String(supply.DispUnitDesc)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -120,14 +128,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Supply in the database.</summary>
 		public static void Update(Supply supply){
 			string command="UPDATE supply SET "
-				+"SupplierNum  =  "+POut.Long  (supply.SupplierNum)+", "
-				+"CatalogNumber= '"+POut.String(supply.CatalogNumber)+"', "
-				+"Descript     = '"+POut.String(supply.Descript)+"', "
-				+"Category     =  "+POut.Long  (supply.Category)+", "
-				+"ItemOrder    =  "+POut.Int   (supply.ItemOrder)+", "
-				+"LevelDesired =  "+POut.Float (supply.LevelDesired)+", "
-				+"IsHidden     =  "+POut.Bool  (supply.IsHidden)+", "
-				+"Price        = '"+POut.Double(supply.Price)+"' "
+				+"SupplierNum     =  "+POut.Long  (supply.SupplierNum)+", "
+				+"CatalogNumber   = '"+POut.String(supply.CatalogNumber)+"', "
+				+"Descript        = '"+POut.String(supply.Descript)+"', "
+				+"Category        =  "+POut.Long  (supply.Category)+", "
+				+"ItemOrder       =  "+POut.Int   (supply.ItemOrder)+", "
+				+"LevelDesired    =  "+POut.Float (supply.LevelDesired)+", "
+				+"IsHidden        =  "+POut.Bool  (supply.IsHidden)+", "
+				+"Price           = '"+POut.Double(supply.Price)+"', "
+				+"BarCodeOrID     = '"+POut.String(supply.BarCodeOrID)+"', "
+				+"DispDefaultQuant=  "+POut.Float (supply.DispDefaultQuant)+", "
+				+"DispUnitsCount  =  "+POut.Int   (supply.DispUnitsCount)+", "
+				+"DispUnitDesc    = '"+POut.String(supply.DispUnitDesc)+"' "
 				+"WHERE SupplyNum = "+POut.Long(supply.SupplyNum);
 			Db.NonQ(command);
 		}
@@ -166,6 +178,22 @@ namespace OpenDentBusiness.Crud{
 			if(supply.Price != oldSupply.Price) {
 				if(command!=""){ command+=",";}
 				command+="Price = '"+POut.Double(supply.Price)+"'";
+			}
+			if(supply.BarCodeOrID != oldSupply.BarCodeOrID) {
+				if(command!=""){ command+=",";}
+				command+="BarCodeOrID = '"+POut.String(supply.BarCodeOrID)+"'";
+			}
+			if(supply.DispDefaultQuant != oldSupply.DispDefaultQuant) {
+				if(command!=""){ command+=",";}
+				command+="DispDefaultQuant = "+POut.Float(supply.DispDefaultQuant)+"";
+			}
+			if(supply.DispUnitsCount != oldSupply.DispUnitsCount) {
+				if(command!=""){ command+=",";}
+				command+="DispUnitsCount = "+POut.Int(supply.DispUnitsCount)+"";
+			}
+			if(supply.DispUnitDesc != oldSupply.DispUnitDesc) {
+				if(command!=""){ command+=",";}
+				command+="DispUnitDesc = '"+POut.String(supply.DispUnitDesc)+"'";
 			}
 			if(command==""){
 				return false;

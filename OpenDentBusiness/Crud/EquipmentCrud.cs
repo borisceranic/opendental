@@ -46,16 +46,20 @@ namespace OpenDentBusiness.Crud{
 			Equipment equipment;
 			for(int i=0;i<table.Rows.Count;i++) {
 				equipment=new Equipment();
-				equipment.EquipmentNum = PIn.Long  (table.Rows[i]["EquipmentNum"].ToString());
-				equipment.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				equipment.SerialNumber = PIn.String(table.Rows[i]["SerialNumber"].ToString());
-				equipment.ModelYear    = PIn.String(table.Rows[i]["ModelYear"].ToString());
-				equipment.DatePurchased= PIn.Date  (table.Rows[i]["DatePurchased"].ToString());
-				equipment.DateSold     = PIn.Date  (table.Rows[i]["DateSold"].ToString());
-				equipment.PurchaseCost = PIn.Double(table.Rows[i]["PurchaseCost"].ToString());
-				equipment.MarketValue  = PIn.Double(table.Rows[i]["MarketValue"].ToString());
-				equipment.Location     = PIn.String(table.Rows[i]["Location"].ToString());
-				equipment.DateEntry    = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
+				equipment.EquipmentNum     = PIn.Long  (table.Rows[i]["EquipmentNum"].ToString());
+				equipment.Description      = PIn.String(table.Rows[i]["Description"].ToString());
+				equipment.SerialNumber     = PIn.String(table.Rows[i]["SerialNumber"].ToString());
+				equipment.ModelYear        = PIn.String(table.Rows[i]["ModelYear"].ToString());
+				equipment.DatePurchased    = PIn.Date  (table.Rows[i]["DatePurchased"].ToString());
+				equipment.DateSold         = PIn.Date  (table.Rows[i]["DateSold"].ToString());
+				equipment.PurchaseCost     = PIn.Double(table.Rows[i]["PurchaseCost"].ToString());
+				equipment.MarketValue      = PIn.Double(table.Rows[i]["MarketValue"].ToString());
+				equipment.Location         = PIn.String(table.Rows[i]["Location"].ToString());
+				equipment.DateEntry        = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
+				equipment.ProvNumCheckedOut= PIn.Long  (table.Rows[i]["ProvNumCheckedOut"].ToString());
+				equipment.DateCheckedOut   = PIn.Date  (table.Rows[i]["DateCheckedOut"].ToString());
+				equipment.DateExpectedBack = PIn.Date  (table.Rows[i]["DateExpectedBack"].ToString());
+				equipment.DispenseNote     = PIn.String(table.Rows[i]["DispenseNote"].ToString());
 				retVal.Add(equipment);
 			}
 			return retVal;
@@ -96,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EquipmentNum,";
 			}
-			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry) VALUES(";
+			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(equipment.EquipmentNum)+",";
 			}
@@ -109,12 +113,20 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(equipment.PurchaseCost)+"',"
 				+"'"+POut.Double(equipment.MarketValue)+"',"
 				+"'"+POut.String(equipment.Location)+"',"
-				+    POut.Date  (equipment.DateEntry)+")";
+				+    POut.Date  (equipment.DateEntry)+","
+				+    POut.Long  (equipment.ProvNumCheckedOut)+","
+				+    POut.Date  (equipment.DateCheckedOut)+","
+				+    POut.Date  (equipment.DateExpectedBack)+","
+				+    DbHelper.ParamChar+"paramDispenseNote)";
+			if(equipment.DispenseNote==null) {
+				equipment.DispenseNote="";
+			}
+			OdSqlParameter paramDispenseNote=new OdSqlParameter("paramDispenseNote",OdDbType.Text,POut.StringNote(equipment.DispenseNote));
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDispenseNote);
 			}
 			else {
-				equipment.EquipmentNum=Db.NonQ(command,true);
+				equipment.EquipmentNum=Db.NonQ(command,true,paramDispenseNote);
 			}
 			return equipment.EquipmentNum;
 		}
@@ -122,17 +134,25 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Equipment in the database.</summary>
 		public static void Update(Equipment equipment){
 			string command="UPDATE equipment SET "
-				+"Description  = '"+POut.String(equipment.Description)+"', "
-				+"SerialNumber = '"+POut.String(equipment.SerialNumber)+"', "
-				+"ModelYear    = '"+POut.String(equipment.ModelYear)+"', "
-				+"DatePurchased=  "+POut.Date  (equipment.DatePurchased)+", "
-				+"DateSold     =  "+POut.Date  (equipment.DateSold)+", "
-				+"PurchaseCost = '"+POut.Double(equipment.PurchaseCost)+"', "
-				+"MarketValue  = '"+POut.Double(equipment.MarketValue)+"', "
-				+"Location     = '"+POut.String(equipment.Location)+"', "
-				+"DateEntry    =  "+POut.Date  (equipment.DateEntry)+" "
+				+"Description      = '"+POut.String(equipment.Description)+"', "
+				+"SerialNumber     = '"+POut.String(equipment.SerialNumber)+"', "
+				+"ModelYear        = '"+POut.String(equipment.ModelYear)+"', "
+				+"DatePurchased    =  "+POut.Date  (equipment.DatePurchased)+", "
+				+"DateSold         =  "+POut.Date  (equipment.DateSold)+", "
+				+"PurchaseCost     = '"+POut.Double(equipment.PurchaseCost)+"', "
+				+"MarketValue      = '"+POut.Double(equipment.MarketValue)+"', "
+				+"Location         = '"+POut.String(equipment.Location)+"', "
+				+"DateEntry        =  "+POut.Date  (equipment.DateEntry)+", "
+				+"ProvNumCheckedOut=  "+POut.Long  (equipment.ProvNumCheckedOut)+", "
+				+"DateCheckedOut   =  "+POut.Date  (equipment.DateCheckedOut)+", "
+				+"DateExpectedBack =  "+POut.Date  (equipment.DateExpectedBack)+", "
+				+"DispenseNote     =  "+DbHelper.ParamChar+"paramDispenseNote "
 				+"WHERE EquipmentNum = "+POut.Long(equipment.EquipmentNum);
-			Db.NonQ(command);
+			if(equipment.DispenseNote==null) {
+				equipment.DispenseNote="";
+			}
+			OdSqlParameter paramDispenseNote=new OdSqlParameter("paramDispenseNote",OdDbType.Text,POut.StringNote(equipment.DispenseNote));
+			Db.NonQ(command,paramDispenseNote);
 		}
 
 		///<summary>Updates one Equipment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -174,12 +194,32 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(equipment.DateEntry)+"";
 			}
+			if(equipment.ProvNumCheckedOut != oldEquipment.ProvNumCheckedOut) {
+				if(command!=""){ command+=",";}
+				command+="ProvNumCheckedOut = "+POut.Long(equipment.ProvNumCheckedOut)+"";
+			}
+			if(equipment.DateCheckedOut != oldEquipment.DateCheckedOut) {
+				if(command!=""){ command+=",";}
+				command+="DateCheckedOut = "+POut.Date(equipment.DateCheckedOut)+"";
+			}
+			if(equipment.DateExpectedBack != oldEquipment.DateExpectedBack) {
+				if(command!=""){ command+=",";}
+				command+="DateExpectedBack = "+POut.Date(equipment.DateExpectedBack)+"";
+			}
+			if(equipment.DispenseNote != oldEquipment.DispenseNote) {
+				if(command!=""){ command+=",";}
+				command+="DispenseNote = "+DbHelper.ParamChar+"paramDispenseNote";
+			}
 			if(command==""){
 				return false;
 			}
+			if(equipment.DispenseNote==null) {
+				equipment.DispenseNote="";
+			}
+			OdSqlParameter paramDispenseNote=new OdSqlParameter("paramDispenseNote",OdDbType.Text,POut.StringNote(equipment.DispenseNote));
 			command="UPDATE equipment SET "+command
 				+" WHERE EquipmentNum = "+POut.Long(equipment.EquipmentNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramDispenseNote);
 			return true;
 		}
 

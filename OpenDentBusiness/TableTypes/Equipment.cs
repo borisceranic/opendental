@@ -27,6 +27,17 @@ namespace OpenDentBusiness{
 		public string Location;
 		///<summary>Security uses this date to lock older entries from accidental deletion.  Date, no time.</summary>
 		public DateTime DateEntry;
+		///<summary>FK to provider.ProvNum. Only filled in if equipment has been checked out, otherwise 0.</summary>
+		public long ProvNumCheckedOut;
+		///<summary>Only used when equipment has been checked out.</summary>
+		public DateTime DateCheckedOut;
+		///<summary>Only used when equipment has been checked out.  Defaults to same day as check out.</summary>
+		public DateTime DateExpectedBack;
+		///<summary>Any notes regarding the equipment checked out.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
+		public string DispenseNote;
+
+
 	}
 
 

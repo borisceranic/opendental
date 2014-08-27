@@ -24,6 +24,14 @@ namespace OpenDentBusiness{
 		public bool IsHidden;
 		/// <summary>The price per unit that the supplier charges for this supply.  If this is 0.00, then no price will be displayed.</summary>
 		public double Price;
+		/// <summary>Scanned code from a reader.</summary>
+		public string BarCodeOrID;
+		/// <summary>Only used for dental schools.  This is the typical quantity dispensed at the window.</summary>
+		public float DispDefaultQuant;
+		/// <summary>Only used in dental schools.  For example, 20 capsules composite per container.</summary>
+		public int DispUnitsCount;
+		/// <summary>Only used in dental schools.  Description of the units when dispensing for use.  For example: Capsule, cartridge, carpule, glove, or needle.</summary>
+		public string DispUnitDesc;
 
 		///<summary></summary>
 		public Supply Copy() {

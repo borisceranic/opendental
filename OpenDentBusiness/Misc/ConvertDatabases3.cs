@@ -5985,7 +5985,127 @@ namespace OpenDentBusiness {
 		private static void To14_4_0() {
 			if(FromVersion<new Version("14.4.0.0")) {
 				string command;
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS dispsupply";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dispsupply (
+						DispSupplyNum bigint NOT NULL auto_increment PRIMARY KEY,
+						SupplyNum bigint NOT NULL,
+						ProvNum bigint NOT NULL,
+						DateDispensed date NOT NULL DEFAULT '0001-01-01',
+						DispQuantity float NOT NULL,
+						Note text NOT NULL,
+						INDEX(SupplyNum),
+						INDEX(ProvNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE dispsupply'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dispsupply (
+						DispSupplyNum number(20) NOT NULL,
+						SupplyNum number(20) NOT NULL,
+						ProvNum number(20) NOT NULL,
+						DateDispensed date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						DispQuantity number(38,8) NOT NULL,
+						Note clob,
+						CONSTRAINT dispsupply_DispSupplyNum PRIMARY KEY (DispSupplyNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX dispsupply_SupplyNum ON dispsupply (SupplyNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX dispsupply_ProvNum ON dispsupply (ProvNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE equipment ADD ProvNumCheckedOut bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE equipment ADD INDEX (ProvNumCheckedOut)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE equipment ADD ProvNumCheckedOut number(20)";
+					Db.NonQ(command);
+					command="UPDATE equipment SET ProvNumCheckedOut = 0 WHERE ProvNumCheckedOut IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE equipment MODIFY ProvNumCheckedOut NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX equipment_ProvNumCheckedOut ON equipment (ProvNumCheckedOut)";
+					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE equipment ADD DateCheckedOut date NOT NULL DEFAULT '0001-01-01')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE equipment ADD DateCheckedOut date";
+					Db.NonQ(command);
+					command="UPDATE equipment SET DateCheckedOut = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateCheckedOut IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE equipment MODIFY DateCheckedOut NOT NULL";
+					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE equipment ADD DateExpectedBack date NOT NULL DEFAULT '0001-01-01')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE equipment ADD DateExpectedBack date";
+					Db.NonQ(command);
+					command="UPDATE equipment SET DateExpectedBack = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateExpectedBack IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE equipment MODIFY DateExpectedBack NOT NULL";
+					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE equipment ADD DispenseNote text NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE equipment ADD DispenseNote clob";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE supply ADD BarCodeOrID varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE supply ADD BarCodeOrID varchar2(255)";
+					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE supply ADD DispDefaultQuant float NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE supply ADD DispDefaultQuant number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE supply SET DispDefaultQuant = 0 WHERE DispDefaultQuant IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE supply MODIFY DispDefaultQuant NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE supply ADD DispUnitsCount int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE supply ADD DispUnitsCount number(11)";
+					Db.NonQ(command);
+					command="UPDATE supply SET DispUnitsCount = 0 WHERE DispUnitsCount IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE supply MODIFY DispUnitsCount NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE supply ADD DispUnitDesc varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE supply ADD DispUnitDesc varchar2(255)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
