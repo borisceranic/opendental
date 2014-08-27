@@ -196,7 +196,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (patient.BillingType)+","
 				+"'"+POut.String(patient.ImageFolder)+"',"
 				+"'"+POut.String(patient.AddrNote)+"',"
-				+"'"+POut.String(patient.FamFinUrgNote)+"',"
+				+    DbHelper.ParamChar+"paramFamFinUrgNote,"
 				+"'"+POut.String(patient.MedUrgNote)+"',"
 				+"'"+POut.String(patient.ApptModNote)+"',"
 				+"'"+POut.String(patient.StudentStatus)+"',"
@@ -244,11 +244,15 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(patient.SmokingSnoMed)+"',"
 				+"'"+POut.String(patient.Country)+"',"
 				+    POut.DateT (patient.DateTimeDeceased)+")";
+			if(patient.FamFinUrgNote==null) {
+				patient.FamFinUrgNote="";
+			}
+			OdSqlParameter paramFamFinUrgNote=new OdSqlParameter("paramFamFinUrgNote",OdDbType.Text,POut.StringNote(patient.FamFinUrgNote));
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramFamFinUrgNote);
 			}
 			else {
-				patient.PatNum=Db.NonQ(command,true);
+				patient.PatNum=Db.NonQ(command,true,paramFamFinUrgNote);
 			}
 			return patient.PatNum;
 		}
@@ -284,7 +288,7 @@ namespace OpenDentBusiness.Crud{
 				+"BillingType              =  "+POut.Long  (patient.BillingType)+", "
 				+"ImageFolder              = '"+POut.String(patient.ImageFolder)+"', "
 				+"AddrNote                 = '"+POut.String(patient.AddrNote)+"', "
-				+"FamFinUrgNote            = '"+POut.String(patient.FamFinUrgNote)+"', "
+				+"FamFinUrgNote            =  "+DbHelper.ParamChar+"paramFamFinUrgNote, "
 				+"MedUrgNote               = '"+POut.String(patient.MedUrgNote)+"', "
 				+"ApptModNote              = '"+POut.String(patient.ApptModNote)+"', "
 				+"StudentStatus            = '"+POut.String(patient.StudentStatus)+"', "
@@ -333,7 +337,11 @@ namespace OpenDentBusiness.Crud{
 				+"Country                  = '"+POut.String(patient.Country)+"', "
 				+"DateTimeDeceased         =  "+POut.DateT (patient.DateTimeDeceased)+" "
 				+"WHERE PatNum = "+POut.Long(patient.PatNum);
-			Db.NonQ(command);
+			if(patient.FamFinUrgNote==null) {
+				patient.FamFinUrgNote="";
+			}
+			OdSqlParameter paramFamFinUrgNote=new OdSqlParameter("paramFamFinUrgNote",OdDbType.Text,POut.StringNote(patient.FamFinUrgNote));
+			Db.NonQ(command,paramFamFinUrgNote);
 		}
 
 		///<summary>Updates one Patient in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -453,7 +461,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(patient.FamFinUrgNote != oldPatient.FamFinUrgNote) {
 				if(command!=""){ command+=",";}
-				command+="FamFinUrgNote = '"+POut.String(patient.FamFinUrgNote)+"'";
+				command+="FamFinUrgNote = "+DbHelper.ParamChar+"paramFamFinUrgNote";
 			}
 			if(patient.MedUrgNote != oldPatient.MedUrgNote) {
 				if(command!=""){ command+=",";}
@@ -643,9 +651,13 @@ namespace OpenDentBusiness.Crud{
 			if(command==""){
 				return false;
 			}
+			if(patient.FamFinUrgNote==null) {
+				patient.FamFinUrgNote="";
+			}
+			OdSqlParameter paramFamFinUrgNote=new OdSqlParameter("paramFamFinUrgNote",OdDbType.Text,POut.StringNote(patient.FamFinUrgNote));
 			command="UPDATE patient SET "+command
 				+" WHERE PatNum = "+POut.Long(patient.PatNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramFamFinUrgNote);
 			return true;
 		}
 

@@ -70,6 +70,7 @@ namespace OpenDentBusiness{
 		/// <summary>Address or phone note.  Unlimited length in order to handle data from other programs during a conversion.</summary>
 		public string AddrNote;
 		/// <summary>Family financial urgent note.  Only stored with guarantor, and shared for family.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string FamFinUrgNote;
 		/// <summary>Individual patient note for Urgent medical.</summary>
 		public string MedUrgNote;
