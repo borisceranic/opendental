@@ -734,7 +734,7 @@ namespace OpenDentBusiness {
 						}
 					}
 					catch {
-						throw new Exception(Lans.g("ContrImages","Could not delete file, it may be in use."));
+						throw new Exception(Lans.g("ContrImages","Could not delete file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions."));
 					}
 				}
 				//Row from db.  This deletes the "image file" also if it's stored in db.
