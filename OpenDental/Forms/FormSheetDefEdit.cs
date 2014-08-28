@@ -90,6 +90,7 @@ namespace OpenDental {
 				butOK.Visible=false;
 				butCancel.Text=Lan.g(this,"Close");
 				groupAddNew.Visible=false;
+				groupPage.Visible=false;
 				butAlignLeft.Visible=false;
 				butAlignTop.Visible=false;
 				linkLabelTips.Visible=false;
@@ -1546,6 +1547,7 @@ namespace OpenDental {
 				return;
 			}
 			SheetDefCur.PageCount++;
+			SheetDefCur.IsMultiPage=true;
 			panelMain.Height=SheetDefCur.HeightTotal;
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
@@ -1553,11 +1555,15 @@ namespace OpenDental {
 
 		private void butPageRemove_Click(object sender,EventArgs e) {
 			if(SheetDefCur.PageCount<2) {
+				SheetDefCur.IsMultiPage=false;
 				//Minimum PageCount 1
 				return;
 			}
 			SheetDefCur.PageCount--;
-			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) {
+			if(SheetDefCur.PageCount==1) {
+				SheetDefCur.IsMultiPage=false;
+			}
+			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) {//Find all fields that have a YPos greater than the bottom of the page.
 				MsgBox.Show(this,"Cannot remove pages that contain sheet fields.");
 				SheetDefCur.PageCount++;
 				return;

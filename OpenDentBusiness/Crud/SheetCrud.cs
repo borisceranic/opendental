@@ -59,7 +59,7 @@ namespace OpenDentBusiness.Crud{
 				sheet.Description   = PIn.String(table.Rows[i]["Description"].ToString());
 				sheet.ShowInTerminal= PIn.Byte  (table.Rows[i]["ShowInTerminal"].ToString());
 				sheet.IsWebForm     = PIn.Bool  (table.Rows[i]["IsWebForm"].ToString());
-				sheet.IsSinglePage  = PIn.Bool  (table.Rows[i]["IsSinglePage"].ToString());
+				sheet.IsMultiPage   = PIn.Bool  (table.Rows[i]["IsMultiPage"].ToString());
 				retVal.Add(sheet);
 			}
 			return retVal;
@@ -100,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetNum,";
 			}
-			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsSinglePage) VALUES(";
+			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheet.SheetNum)+",";
 			}
@@ -117,7 +117,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheet.Description)+"',"
 				+    POut.Byte  (sheet.ShowInTerminal)+","
 				+    POut.Bool  (sheet.IsWebForm)+","
-				+    POut.Bool  (sheet.IsSinglePage)+")";
+				+    POut.Bool  (sheet.IsMultiPage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 				+"Description   = '"+POut.String(sheet.Description)+"', "
 				+"ShowInTerminal=  "+POut.Byte  (sheet.ShowInTerminal)+", "
 				+"IsWebForm     =  "+POut.Bool  (sheet.IsWebForm)+", "
-				+"IsSinglePage  =  "+POut.Bool  (sheet.IsSinglePage)+" "
+				+"IsMultiPage   =  "+POut.Bool  (sheet.IsMultiPage)+" "
 				+"WHERE SheetNum = "+POut.Long(sheet.SheetNum);
 			Db.NonQ(command);
 		}
@@ -198,9 +198,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsWebForm = "+POut.Bool(sheet.IsWebForm)+"";
 			}
-			if(sheet.IsSinglePage != oldSheet.IsSinglePage) {
+			if(sheet.IsMultiPage != oldSheet.IsMultiPage) {
 				if(command!=""){ command+=",";}
-				command+="IsSinglePage = "+POut.Bool(sheet.IsSinglePage)+"";
+				command+="IsMultiPage = "+POut.Bool(sheet.IsMultiPage)+"";
 			}
 			if(command==""){
 				return false;
