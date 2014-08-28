@@ -149,21 +149,22 @@ namespace OpenDental
 			if(DataConnection.DBtype==DatabaseType.Oracle){
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
-			string command=@"SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum,
-				(SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum
-				AND ChargeDate <= "+datesql+@") ""_accumDue"",
-				(SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum
-				AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@") ""_dueTen"",
-				(SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum) ""_paid"",
-				(SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5)) ""_insPaid"",
-				(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum) ""_principal""
-				FROM payplan
-				LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
+			//Oracle TODO:  Either put entire query without GROUP BY in SUBSELECT and then GROUP BY outside, or rewrite query to use joins instead of subselects.
+			string command="SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum, "
+				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', "
+				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@"),0) '_dueTen', "
+				+"COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum),0) '_paid', "
+				+"COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5)),0) '_insPaid', "
+				+"COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal' "
+				+"FROM payplan "
+				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
 				//WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
 				//+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
 				+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
 			if(checkHideCompletePlans.Checked) {
-				command+="HAVING _paid < _principal ";
+				command+="HAVING _paid+_insPaid < _principal ";
 			}
 				command+="ORDER BY LName,FName";
 			DataTable raw=Reports.GetTable(command);
