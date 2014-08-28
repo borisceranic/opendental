@@ -5669,6 +5669,8 @@ namespace OpenDental{
 			try {
 				List<Phone> phoneList=Phones.GetPhoneList();
 				List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
+				//HQ Only - 'Office Down' TaskListNum = 2576.
+				List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
 				string ipaddressStr="";
 				IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
 				foreach(IPAddress ipaddress in iphostentry.AddressList) {
@@ -5686,7 +5688,7 @@ namespace OpenDental{
 				bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
 				//send the results back to the UI layer for action.
 				if(!this.IsDisposed) {
-					Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,phone,isTriageOperator });
+					Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
 				}
 			}
 			catch { }//prevents crash on closing if FormOpenDental has already been disposed or if MySQL connection has been lost
@@ -5708,10 +5710,10 @@ namespace OpenDental{
 		}
 
 		///<summary></summary>
-		protected delegate void PhoneWebCamTickDisplayDelegate(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,Phone phone,bool isTriageOperator);
+		protected delegate void PhoneWebCamTickDisplayDelegate(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator);
 
 		///<summary>phoneList is the list of all phone rows just pulled from the database.  phone is the one that we should display here, and it can be null.</summary>
-		public void PhoneWebCamTickDisplay(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,Phone phone,bool isTriageOperator) {
+		public void PhoneWebCamTickDisplay(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator) {
 			try {
 				//Send the phoneList to the 2 places where it's needed.
 				//1) Send to the small display in the main OD form (quick-glance).
@@ -5721,6 +5723,7 @@ namespace OpenDental{
 				}
 				if(formMapHQ!=null && !formMapHQ.IsDisposed) { //3) Send to the map hq if it is open.
 					formMapHQ.SetPhoneList(phoneEmpDefaultList,phoneList);
+					formMapHQ.SetOfficesDownList(listOfficesDown);
 				}
 				//Now set the small display's current phone extension info.
 				if(phone==null) {
