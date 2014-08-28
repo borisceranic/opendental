@@ -48,6 +48,8 @@
 			this.labelTriageCalls = new OpenDental.MapAreaRoomControl();
 			this.labelVoicemailCalls = new OpenDental.MapAreaRoomControl();
 			this.mapAreaPanelHQ = new OpenDental.MapAreaPanel();
+			this.officesDownView = new OpenDental.EscalationViewControl();
+			this.label3 = new System.Windows.Forms.Label();
 			this.menuStrip.SuspendLayout();
 			this.groupPhoneMetrics.SuspendLayout();
 			this.SuspendLayout();
@@ -207,7 +209,7 @@
 			this.escalationView.MinAlpha = 60;
 			this.escalationView.Name = "escalationView";
 			this.escalationView.OuterColor = System.Drawing.Color.Black;
-			this.escalationView.Size = new System.Drawing.Size(317, 356);
+			this.escalationView.Size = new System.Drawing.Size(317, 329);
 			this.escalationView.StartFadeIndex = 0;
 			this.escalationView.TabIndex = 34;
 			// 
@@ -419,10 +421,38 @@
 			this.mapAreaPanelHQ.Size = new System.Drawing.Size(1374, 973);
 			this.mapAreaPanelHQ.TabIndex = 5;
 			// 
+			// officesDownView
+			// 
+			this.officesDownView.BackColor = System.Drawing.Color.White;
+			this.officesDownView.BorderThickness = 1;
+			this.officesDownView.FadeAlphaIncrement = 0;
+			this.officesDownView.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.officesDownView.Items = ((System.ComponentModel.BindingList<string>)(resources.GetObject("officesDownView.Items")));
+			this.officesDownView.LinePadding = -6;
+			this.officesDownView.Location = new System.Drawing.Point(180, 860);
+			this.officesDownView.MinAlpha = 60;
+			this.officesDownView.Name = "officesDownView";
+			this.officesDownView.OuterColor = System.Drawing.Color.Black;
+			this.officesDownView.Size = new System.Drawing.Size(317, 140);
+			this.officesDownView.StartFadeIndex = 0;
+			this.officesDownView.TabIndex = 38;
+			// 
+			// label3
+			// 
+			this.label3.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label3.Location = new System.Drawing.Point(-2, 860);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(176, 111);
+			this.label3.TabIndex = 37;
+			this.label3.Text = "Offices\r\nDown";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			// 
 			// FormMapHQ
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1884, 1042);
+			this.Controls.Add(this.officesDownView);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.escalationView);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.labelCurrentTime);
@@ -473,5 +503,7 @@
 		private System.Windows.Forms.ToolStripMenuItem mapToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem escalationToolStripMenuItem;
 		private EscalationViewControl escalationView;
+		private EscalationViewControl officesDownView;
+		private System.Windows.Forms.Label label3;
 	}
 }

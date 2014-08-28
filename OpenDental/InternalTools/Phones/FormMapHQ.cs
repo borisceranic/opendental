@@ -162,7 +162,32 @@ namespace OpenDental {
 				escalationView.EndUpdate();
 			}
 		}
-		
+
+		public void SetOfficesDownList(List<Task> listOfficesDown) {
+			try {
+				officesDownView.BeginUpdate();
+				officesDownView.Items.Clear();
+				//Sort list by oldest.
+				listOfficesDown.Sort(delegate(Task t1,Task t2) {
+					return Comparer<DateTime>.Default.Compare(t1.DateTimeEntry,t2.DateTimeEntry);
+				});
+				for(int i=0;i<listOfficesDown.Count;i++) {
+					Task task=listOfficesDown[i];
+					if(task.TaskStatus==TaskStatusEnum.Done) { //Filter out old tasks. Should not be any but just in case.
+						continue;
+					}
+					TimeSpan timeActive=DateTime.Now.Subtract(task.DateTimeEntry);
+					//We got this far so the office is down.
+					officesDownView.Items.Add(timeActive.ToStringHmmss()+" - "+task.TaskNum.ToString());
+				}
+			}
+			catch {
+			}
+			finally {
+				officesDownView.EndUpdate();
+			}
+		}
+
 		public void SetTriageUrgent(int calls,TimeSpan timeBehind) {
 			this.labelTriageRedCalls.Text=calls.ToString();
 			if(timeBehind==TimeSpan.Zero) { //format the string special for this case
