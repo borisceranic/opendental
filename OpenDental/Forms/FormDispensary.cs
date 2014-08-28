@@ -16,8 +16,6 @@ namespace OpenDental {
 		}
 
 		private void FormDispensary_Load(object sender,EventArgs e) {
-			this.Size=System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
-			this.Location=new Point(0,0);
 			comboClass.Items.Add(Lan.g(this,"All"));
 			comboClass.SelectedIndex=0;
 			for(int i=0;i<SchoolClasses.List.Length;i++) {

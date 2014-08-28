@@ -172,7 +172,7 @@ namespace OpenDental{
 			// 
 			this.gridStudents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridStudents.HScrollVisible = false;
-			this.gridStudents.Location = new System.Drawing.Point(0, 109);
+			this.gridStudents.Location = new System.Drawing.Point(0, 67);
 			this.gridStudents.Name = "gridStudents";
 			this.gridStudents.ScrollValue = 0;
 			this.gridStudents.Size = new System.Drawing.Size(278, 321);
@@ -184,7 +184,7 @@ namespace OpenDental{
 			// 
 			this.gridSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridSupply.HScrollVisible = false;
-			this.gridSupply.Location = new System.Drawing.Point(696, 109);
+			this.gridSupply.Location = new System.Drawing.Point(696, 67);
 			this.gridSupply.Name = "gridSupply";
 			this.gridSupply.ScrollValue = 0;
 			this.gridSupply.Size = new System.Drawing.Size(278, 321);
@@ -196,7 +196,7 @@ namespace OpenDental{
 			// 
 			this.gridDispSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridDispSupply.HScrollVisible = false;
-			this.gridDispSupply.Location = new System.Drawing.Point(0, 432);
+			this.gridDispSupply.Location = new System.Drawing.Point(0, 390);
 			this.gridDispSupply.Name = "gridDispSupply";
 			this.gridDispSupply.ScrollValue = 0;
 			this.gridDispSupply.Size = new System.Drawing.Size(278, 180);
@@ -208,7 +208,7 @@ namespace OpenDental{
 			// 
 			this.gridEquip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridEquip.HScrollVisible = false;
-			this.gridEquip.Location = new System.Drawing.Point(696, 432);
+			this.gridEquip.Location = new System.Drawing.Point(696, 390);
 			this.gridEquip.Name = "gridEquip";
 			this.gridEquip.ScrollValue = 0;
 			this.gridEquip.Size = new System.Drawing.Size(278, 180);
@@ -418,7 +418,6 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 612);
-			this.ControlBox = false;
 			this.Controls.Add(this.butScan);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.groupSupply);
@@ -427,15 +426,12 @@ namespace OpenDental{
 			this.Controls.Add(this.gridSupply);
 			this.Controls.Add(this.groupDentalSchools);
 			this.Controls.Add(this.gridStudents);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
 			this.Menu = this.mainMenu1;
-			this.MinimizeBox = false;
 			this.Name = "FormDispensary";
 			this.ShowInTaskbar = false;
-			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+			this.Text = "Dispensary";
 			this.Load += new System.EventHandler(this.FormDispensary_Load);
 			this.groupDentalSchools.ResumeLayout(false);
 			this.groupDentalSchools.PerformLayout();

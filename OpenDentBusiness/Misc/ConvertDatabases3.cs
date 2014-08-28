@@ -6035,7 +6035,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}				
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE equipment ADD DateCheckedOut date NOT NULL DEFAULT '0001-01-01')";
+					command="ALTER TABLE equipment ADD DateCheckedOut date NOT NULL DEFAULT '0001-01-01'";
 					Db.NonQ(command);
 				}
 				else {//oracle
@@ -6047,7 +6047,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}				
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE equipment ADD DateExpectedBack date NOT NULL DEFAULT '0001-01-01')";
+					command="ALTER TABLE equipment ADD DateExpectedBack date NOT NULL DEFAULT '0001-01-01'";
 					Db.NonQ(command);
 				}
 				else {//oracle
