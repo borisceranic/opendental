@@ -172,10 +172,10 @@ namespace OpenDental {
 		}
 
 		private static void SetForceSinglePage(Sheet sheet) {
-            if (sheet.IsSinglePage) {
-                _forceSinglePage = true;
-                return;
-            }
+			if(!sheet.IsMultiPage) {
+				_forceSinglePage=true;
+				return;
+			}
 			switch(sheet.SheetType) {
 				case SheetTypeEnum.DepositSlip:
 				case SheetTypeEnum.LabelAppointment:
@@ -185,15 +185,15 @@ namespace OpenDental {
 				case SheetTypeEnum.Rx:
 					_forceSinglePage=true;
 					break;
-				case SheetTypeEnum.Consent:
-				case SheetTypeEnum.ExamSheet:
-				case SheetTypeEnum.MedicalHistory:
-				case SheetTypeEnum.PatientForm:
-				case SheetTypeEnum.PatientLetter:
-				case SheetTypeEnum.ReferralLetter:
-				case SheetTypeEnum.ReferralSlip:
-				case SheetTypeEnum.RoutingSlip:
-				case SheetTypeEnum.LabSlip:
+				//case SheetTypeEnum.Consent:
+				//case SheetTypeEnum.ExamSheet:
+				//case SheetTypeEnum.MedicalHistory:
+				//case SheetTypeEnum.PatientForm:
+				//case SheetTypeEnum.PatientLetter:
+				//case SheetTypeEnum.ReferralLetter:
+				//case SheetTypeEnum.ReferralSlip:
+				//case SheetTypeEnum.RoutingSlip:
+				//case SheetTypeEnum.LabSlip:
 				default:
 					_forceSinglePage=false;
 					break;

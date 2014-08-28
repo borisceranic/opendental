@@ -5937,32 +5937,28 @@ namespace OpenDentBusiness {
 		private static void To14_3_3() {
 			if(FromVersion < new Version("14.3.3.0")) {
 				string command;
-				if(DataConnection.DBtype == DatabaseType.MySql) {
-					command = "ALTER TABLE sheet ADD IsSinglePage tinyint NOT NULL";
-					Db.NonQ(command);
-					command = "UPDATE sheet SET IsSinglePage = 1";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheet ADD IsMultiPage tinyint NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command = "ALTER TABLE sheet ADD IsSinglePage number(3)";
+					command="ALTER TABLE sheet ADD IsMultiPage number(3)";
 					Db.NonQ(command);
-					command = "UPDATE sheet SET IsSinglePage = 1 WHERE IsSinglePage IS NULL";
+					command="UPDATE sheet SET IsMultiPage = 0 WHERE IsMultiPage IS NULL";
 					Db.NonQ(command);
-					command = "ALTER TABLE sheet MODIFY IsSinglePage NOT NULL";
+					command="ALTER TABLE sheet MODIFY IsMultiPage NOT NULL";
 					Db.NonQ(command);
 				}
-				if(DataConnection.DBtype == DatabaseType.MySql) {
-					command = "ALTER TABLE sheetdef ADD IsSinglePage tinyint NOT NULL";
-					Db.NonQ(command);
-					command = "UPDATE sheetdef SET IsSinglePage = 1";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetdef ADD IsMultiPage tinyint NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command = "ALTER TABLE sheetdef ADD IsSinglePage number(3)";
+					command="ALTER TABLE sheetdef ADD IsMultiPage number(3)";
 					Db.NonQ(command);
-					command = "UPDATE sheetdef SET IsSinglePage = 1 WHERE IsSinglePage IS NULL";
+					command="UPDATE sheetdef SET IsMultiPage = 0 WHERE IsMultiPage IS NULL";
 					Db.NonQ(command);
-					command = "ALTER TABLE sheetdef MODIFY IsSinglePage NOT NULL";
+					command="ALTER TABLE sheetdef MODIFY IsMultiPage NOT NULL";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {

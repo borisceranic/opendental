@@ -54,9 +54,9 @@ namespace OpenDentBusiness{
 		///<summary>The order that this sheet will show in the patient terminal for the patient to fill out.  Or zero if not set.</summary>
 		public byte ShowInTerminal;
 		///<summary>True if this sheet was downloaded from the webforms service.</summary>
-        public bool IsWebForm;
-        ///<summary>Force old single page behavior.</summary>
-        public bool IsSinglePage;
+		public bool IsWebForm;
+		///<summary>Forces old single page behavior, ignoring page breaks.</summary>
+		public bool IsMultiPage;
 		
 		public Sheet Copy(){
 			return (Sheet)this.MemberwiseClone();
