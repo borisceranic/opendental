@@ -57,6 +57,7 @@ namespace OpenDental {
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
 					SetForceSinglePage(s);
+					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)));
 					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
 				}
 				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
@@ -258,7 +259,7 @@ namespace OpenDental {
 				if(field.FieldType==SheetFieldType.Line) {
 					g.DrawLine(pen2,field.XPos,field.YPos-_yPosPrint,
 						field.XPos+field.Width,
-						field.YPos+field.Height);
+						field.YPos-_yPosPrint+field.Height);
 				}
 			}
 			//then, draw text-----------------------------------------------------------------------------------------------
@@ -446,7 +447,7 @@ namespace OpenDental {
 				if(field.FieldType==SheetFieldType.Line){
 					g.DrawLine(pen2,p(field.XPos),p(field.YPos-_yPosPrint),
 						p(field.XPos+field.Width),
-						p(field.YPos+field.Height));
+						p(field.YPos-_yPosPrint+field.Height));
 				}
 			}
 			//then, draw text--------------------------------------------------------------------------------------------
@@ -495,8 +496,8 @@ namespace OpenDental {
 					continue;
 				}
 				if(field.FieldValue=="X"){
-					g.DrawLine(pen3,p(field.XPos),p(field.YPos-_yPosPrint),p(field.XPos+field.Width),p(field.YPos+field.Height));
-					g.DrawLine(pen3,p(field.XPos+field.Width),p(field.YPos-_yPosPrint),p(field.XPos),p(field.YPos+field.Height));
+					g.DrawLine(pen3,p(field.XPos),p(field.YPos-_yPosPrint),p(field.XPos+field.Width),p(field.YPos-_yPosPrint+field.Height));
+					g.DrawLine(pen3,p(field.XPos+field.Width),p(field.YPos-_yPosPrint),p(field.XPos),p(field.YPos-_yPosPrint+field.Height));
 				}
 			}
 			//then signature boxes----------------------------------------------------------------------
