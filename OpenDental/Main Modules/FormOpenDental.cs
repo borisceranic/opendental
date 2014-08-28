@@ -2525,10 +2525,11 @@ namespace OpenDental{
 			if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Commlog"),1,Lan.g(this,"New Commlog Entry"),"Commlog"));
 				button=new ODToolBarButton(Lan.g(this,"E-mail"),2,Lan.g(this,"Send E-mail"),"Email");
-				ToolBarMain.Buttons.Add(button);
-				button=new ODToolBarButton("",-1,"","EmailDropdown");
 				button.Style=ODToolBarButtonStyle.DropDownButton;
 				button.DropDownMenu=menuEmail;
+				ToolBarMain.Buttons.Add(button);
+				button=new ODToolBarButton(Lan.g(this,"WebMail"),2,Lan.g(this,"Secure WebMail"),"WebMail");
+				button.Enabled=true;//Always enabled.  If the patient does not have an email address, then the user will be blocked from the FormWebMailMessageEdit window.
 				ToolBarMain.Buttons.Add(button);
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Text"),5,Lan.g(this,"Send Text Message"),"Text"));
 				button=new ODToolBarButton(Lan.g(this,"Letter"),-1,Lan.g(this,"Quick Letter"),"Letter");
@@ -2576,6 +2577,9 @@ namespace OpenDental{
 						break;
 					case "Email":
 						OnEmail_Click();
+						break;
+					case "WebMail":
+						OnWebMail_Click();
 						break;
 					case "Text":
 						OnTxtMsg_Click();
@@ -2653,7 +2657,6 @@ namespace OpenDental{
 			if(CurPatNum==0) {//Only on startup, I think.
 				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Email"].Enabled=false;
-					ToolBarMain.Buttons["EmailDropdown"].Enabled=false;
 					ToolBarMain.Buttons["Text"].Enabled=false;
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
 					ToolBarMain.Buttons["Letter"].Enabled=false;
@@ -2683,7 +2686,6 @@ namespace OpenDental{
 							ToolBarMain.Buttons["Text"].Enabled=(pat.TxtMsgOk==YN.Yes);
 						}
 					}
-					ToolBarMain.Buttons["EmailDropdown"].Enabled=true;
 					ToolBarMain.Buttons["Letter"].Enabled=true;
 					ToolBarMain.Buttons["Form"].Enabled=true;
 					ToolBarMain.Buttons["Tasklist"].Enabled=true;
@@ -2762,7 +2764,6 @@ namespace OpenDental{
 
 		private void menuEmail_Popup(object sender,EventArgs e) {
 			menuEmail.MenuItems.Clear();
-			menuEmail.MenuItems.Add(new MenuItem(Lan.g(this,"Secure Web Mail"),menuWebMail_Click));			
 			MenuItem menuItem;
 			menuItem=new MenuItem(Lan.g(this,"Referrals:"));
 			menuItem.Tag=null;
@@ -2792,7 +2793,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void menuWebMail_Click(object sender,System.EventArgs e) {
+		private void OnWebMail_Click() {
 			FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(CurPatNum);
 			FormWMME.ShowDialog();
 		}
