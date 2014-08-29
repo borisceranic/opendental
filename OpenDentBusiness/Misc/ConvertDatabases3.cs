@@ -6134,6 +6134,19 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE supply ADD DispUnitDesc varchar2(255)";
 					Db.NonQ(command);
 				}
+				//Add index to claimproc table to speed up ClaimProcs.AttachAllOutstandingToPayment() query.  Added because of slowness with AppleTree.
+				//Using new multi-column naming pattern.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE claimproc ADD INDEX indexCPNSIPA (ClaimPaymentNum, STATUS, InsPayAmt)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX claimproc_CPNSIPA ON claimproc (ClaimPaymentNum, STATUS, InsPayAmt)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
