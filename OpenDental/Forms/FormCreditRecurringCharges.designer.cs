@@ -211,6 +211,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butSend);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.KeyPreview = true;
 			this.Name = "FormCreditRecurringCharges";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Credit Card Recurring Charges";
