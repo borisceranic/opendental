@@ -6138,11 +6138,11 @@ namespace OpenDentBusiness {
 				//Using new multi-column naming pattern.
 				try {
 					if(DataConnection.DBtype==DatabaseType.MySql) {
-						command="ALTER TABLE claimproc ADD INDEX indexCPNSIPA (ClaimPaymentNum, STATUS, InsPayAmt)";
+						command="ALTER TABLE claimproc ADD INDEX indexCPNSIPA (ClaimPaymentNum, Status, InsPayAmt)";
 						Db.NonQ(command);
 					}
 					else {//oracle
-						command=@"CREATE INDEX claimproc_CPNSIPA ON claimproc (ClaimPaymentNum, STATUS, InsPayAmt)";
+						command=@"CREATE INDEX claimproc_CPNSIPA ON claimproc (ClaimPaymentNum, Status, InsPayAmt)";
 						Db.NonQ(command);
 					}
 				}
