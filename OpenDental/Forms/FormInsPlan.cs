@@ -3450,7 +3450,8 @@ namespace OpenDental{
 				MsgBox.Show(this,"No clearinghouse is set as default.");
 				return;
 			}
-			if(clearhouse.CommBridge!=EclaimsCommBridge.ClaimConnect
+			if((clearhouse.CommBridge!=EclaimsCommBridge.ClaimConnect 
+				&& clearhouse.CommBridge!=EclaimsCommBridge.EDS)
 				&& clearhouse.Eformat!=ElectronicClaimFormat.Canadian)
 			{
 				MsgBox.Show(this,"So far, eligibility checks only work with ClaimConnect and CDAnet.");

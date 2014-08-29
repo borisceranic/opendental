@@ -846,7 +846,9 @@ namespace OpenDentBusiness{
 		///<summary>15 Canadian clearinghouse.</summary>
 		Claimstream,
 		///<summary>16 UK clearinghouse.</summary>
-		NHS
+		NHS,
+		///<summary>17</summary>
+		EDS
 	}
 
 	///<summary></summary>
