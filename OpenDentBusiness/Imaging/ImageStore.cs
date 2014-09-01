@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 		///<summary>Remembers the computerpref.AtoZpath.  Set to empty string on startup.  If set to something else, this path will override all other paths.</summary>
 		public static string LocalAtoZpath=null;
 
-		///<summary>Only makes a call to the database on startup.  After that, just uses cached data.  Does not validate that the path exists except if the main one is used.  ONLY used from Client layer; no S classes.</summary>
+		///<summary>Only makes a call to the database on startup.  After that, just uses cached data.  Does not validate that the path exists except if the main one is used.  ONLY used from Client layer or S class methods that have "No need to check RemotingRole; no call to db" and which also make sure PrefC.AtoZfolderUsed.</summary>
 		public static string GetPreferredAtoZpath() {
 			if(!PrefC.AtoZfolderUsed) {
 				return null;
