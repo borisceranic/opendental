@@ -50,12 +50,12 @@ namespace OpenDentBusiness {
 						File.Copy(dllPathWithVersion,dllPath,true);
 					}
 					else{
-						//try the UpdateFiles folder
+						//try the Plugins folder
 						if(PrefC.AtoZfolderUsed) {//must be using AtoZ folder
-							string dllPathVersionUpdates=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles",
+							string dllPathVersionCentral=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"Plugins",
 								ProgramC.Listt[i].PluginDllName.Replace("[VersionMajMin]",vers.Major.ToString()+"."+vers.Minor.ToString()));
-							if(File.Exists(dllPathVersionUpdates)) {
-								File.Copy(dllPathVersionUpdates,dllPath,true);
+							if(File.Exists(dllPathVersionCentral)) {
+								File.Copy(dllPathVersionCentral,dllPath,true);
 							}
 						}
 					}
