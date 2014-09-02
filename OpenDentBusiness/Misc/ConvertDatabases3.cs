@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.1.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.3.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -5875,7 +5875,7 @@ namespace OpenDentBusiness {
 				command="UPDATE hl7defmessage SET MessageStructure='DFT_P03' WHERE EventType='P03'";//All DFT's are event type P03 in the db
 				Db.NonQ(command);
 				command="UPDATE hl7defmessage SET MessageStructure='NotDefined' WHERE EventType='NotDefined' OR EventType=''";//Any messages with NotDefined or blank event type
-				Db.NonQ(command); 
+				Db.NonQ(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE appointment ADD AppointmentTypeNum bigint NOT NULL";
 					Db.NonQ(command);
@@ -5930,9 +5930,9 @@ namespace OpenDentBusiness {
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 				command="UPDATE preference SET ValueString = '14.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
-            }
-            To14_3_3();
-        }
+			}
+			To14_3_3();
+		}
 
 		private static void To14_3_3() {
 			if(FromVersion < new Version("14.3.3.0")) {
@@ -5969,9 +5969,6 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX sheetfield_FieldType ON sheetfield (FieldType)";
 					Db.NonQ(command);
 				}
-
-
-
 				command = "UPDATE preference SET ValueString = '14.3.3.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
