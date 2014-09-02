@@ -5875,7 +5875,7 @@ namespace OpenDentBusiness {
 				command="UPDATE hl7defmessage SET MessageStructure='DFT_P03' WHERE EventType='P03'";//All DFT's are event type P03 in the db
 				Db.NonQ(command);
 				command="UPDATE hl7defmessage SET MessageStructure='NotDefined' WHERE EventType='NotDefined' OR EventType=''";//Any messages with NotDefined or blank event type
-				Db.NonQ(command); 
+				Db.NonQ(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE appointment ADD AppointmentTypeNum bigint NOT NULL";
 					Db.NonQ(command);
@@ -5961,9 +5961,6 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE sheetdef MODIFY IsMultiPage NOT NULL";
 					Db.NonQ(command);
 				}
-
-
-
 				command="UPDATE preference SET ValueString = '14.3.3.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
