@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental{
-///<summary></summary>
+	///<summary>This report is never referenced and is poorly named.  Appears that this form is a copy of the screen report and was never modified or finished.</summary>
 	public class FormRpPHRawProc : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
@@ -127,7 +127,7 @@ namespace OpenDental{
 		private void butOK_Click(object sender, System.EventArgs e) {
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=@"SELECT ScreenDate,ProvName,County,county.CountyCode,
-				GradeSchool,school.SchoolCode,PlaceService,GradeLevel,Age,Birthdate,Race,Gender,Urgency,
+				GradeSchool,school.SchoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,
 				HasCaries,EarlyChildCaries,CariesExperience,ExistingSealants,NeedsSealants,MissingAllTeeth,
 				Comments FROM screen
 				LEFT JOIN school ON screen.GradeSchool=school.SchoolName

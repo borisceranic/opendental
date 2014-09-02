@@ -90,7 +90,6 @@ namespace OpenDentBusiness.Crud{
 				patient.BalTotal                 = PIn.Double(table.Rows[i]["BalTotal"].ToString());
 				patient.EmployerNum              = PIn.Long  (table.Rows[i]["EmployerNum"].ToString());
 				patient.EmploymentNote           = PIn.String(table.Rows[i]["EmploymentNote"].ToString());
-				patient.Race                     = (PatientRaceOld)PIn.Int(table.Rows[i]["Race"].ToString());
 				patient.County                   = PIn.String(table.Rows[i]["County"].ToString());
 				patient.GradeLevel               = (PatientGrade)PIn.Int(table.Rows[i]["GradeLevel"].ToString());
 				patient.Urgency                  = (TreatmentUrgency)PIn.Int(table.Rows[i]["Urgency"].ToString());
@@ -163,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PatNum,";
 			}
-			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,Race,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased) VALUES(";
+			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(patient.PatNum)+",";
 			}
@@ -211,7 +210,6 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(patient.BalTotal)+"',"
 				+    POut.Long  (patient.EmployerNum)+","
 				+"'"+POut.String(patient.EmploymentNote)+"',"
-				+    POut.Int   ((int)patient.Race)+","
 				+"'"+POut.String(patient.County)+"',"
 				+    POut.Int   ((int)patient.GradeLevel)+","
 				+    POut.Int   ((int)patient.Urgency)+","
@@ -303,7 +301,6 @@ namespace OpenDentBusiness.Crud{
 				+"BalTotal                 = '"+POut.Double(patient.BalTotal)+"', "
 				+"EmployerNum              =  "+POut.Long  (patient.EmployerNum)+", "
 				+"EmploymentNote           = '"+POut.String(patient.EmploymentNote)+"', "
-				+"Race                     =  "+POut.Int   ((int)patient.Race)+", "
 				+"County                   = '"+POut.String(patient.County)+"', "
 				+"GradeLevel               =  "+POut.Int   ((int)patient.GradeLevel)+", "
 				+"Urgency                  =  "+POut.Int   ((int)patient.Urgency)+", "
@@ -518,10 +515,6 @@ namespace OpenDentBusiness.Crud{
 			if(patient.EmploymentNote != oldPatient.EmploymentNote) {
 				if(command!=""){ command+=",";}
 				command+="EmploymentNote = '"+POut.String(patient.EmploymentNote)+"'";
-			}
-			if(patient.Race != oldPatient.Race) {
-				if(command!=""){ command+=",";}
-				command+="Race = "+POut.Int   ((int)patient.Race)+"";
 			}
 			if(patient.County != oldPatient.County) {
 				if(command!=""){ command+=",";}

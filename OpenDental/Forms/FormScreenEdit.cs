@@ -470,7 +470,7 @@ namespace OpenDental{
 			}
 			listRace.Items.Clear();
 			listRace.Items.AddRange(Enum.GetNames(typeof(PatientRaceOld)));
-			listRace.SelectedIndex=(int)ScreenCur.Race;
+			listRace.SelectedIndex=(int)ScreenCur.RaceOld;
 			comboGradeLevel.Items.Clear();
 			comboGradeLevel.Items.AddRange(Enum.GetNames(typeof(PatientGrade)));
 			comboGradeLevel.SelectedIndex=(int)ScreenCur.GradeLevel;
@@ -623,7 +623,7 @@ namespace OpenDental{
 			else if(radioF.Checked) {
 				ScreenCur.Gender=PatientGender.Female;
 			}
-			ScreenCur.Race=(PatientRaceOld)listRace.SelectedIndex;
+			ScreenCur.RaceOld=(PatientRaceOld)listRace.SelectedIndex;
 			ScreenCur.GradeLevel=(PatientGrade)comboGradeLevel.SelectedIndex;
 			ScreenCur.Age=PIn.Byte(textAge.Text);//"" is OK
 			ScreenCur.Urgency=(TreatmentUrgency)listUrgency.SelectedIndex;

@@ -450,7 +450,7 @@ namespace OpenDental{
 			listPatSelect.Items.Add("InsEst");
 			listPatSelect.Items.Add("BalTotal");
 			listPatSelect.Items.Add("EmployerNum");
-			listPatSelect.Items.Add("Race");
+			listPatSelect.Items.Add("Race"); //Race is depricated in the patient table, we get it from the PatientRace table entries converted into a PatientRaceOld enum value.
 			listPatSelect.Items.Add("County");
 			listPatSelect.Items.Add("GradeSchool");
 			listPatSelect.Items.Add("GradeLevel");

@@ -84,6 +84,9 @@ namespace OpenDentBusiness {
 				else if(letter.Fields[i].StartsWith("referral.")) {
 					command+="MAX(referral."+letter.Fields[i].Substring(9)+") "+letter.Fields[i].Substring(9);
 				}
+				else if(letter.Fields[i]=="Race") {//This is to accomodate the depricated patient.Race column that no longer exists
+					command+="'"+POut.String(string.Join(",",PatientRaces.GetPatRaceList(PatCur.PatNum)))+"'"+" Race";//gets comma delimited list of PatRace values as ints stored in the patientrace table.  MakeReadable is called on the results of this query and this value is converted into a comma delimited list of race strings.
+				}
 				else {
 					command+="MAX(patient."+letter.Fields[i]+") "+letter.Fields[i];
 				}

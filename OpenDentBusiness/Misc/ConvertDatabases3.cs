@@ -6144,7 +6144,17 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screen CHANGE Race RaceOld tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screen RENAME COLUMN Race TO RaceOld";
+					Db.NonQ(command);
+				}
+				//oracle compatible
+				command="ALTER TABLE patient DROP COLUMN Race";
+				Db.NonQ(command);
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -6168,4 +6178,4 @@ namespace OpenDentBusiness {
 
 
 
-				
+

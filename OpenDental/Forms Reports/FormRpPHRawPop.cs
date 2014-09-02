@@ -184,9 +184,12 @@ namespace OpenDental{
 				SELECT patient.PatNum,MIN(procedurelog.ProcDate) AS ProcDate,
 				CONCAT(CONCAT(provider.LName,', '),provider.FName) as ProvName,
 				County,county.CountyCode,
-				site.Description AS gradeschool,site.Note AS schoolCode,GradeLevel,Birthdate,Race,Gender,Urgency,BillingType,
+				site.Description AS gradeschool,site.Note AS schoolCode,GradeLevel,Birthdate,"
+				+DbHelper.GroupConcat("patientrace.Race",true)//distinct races from the patient race table in a comma delimited list of ints
+				+@" Race,Gender,Urgency,BillingType,
 				patient.PlannedIsDone,tempbroken.NumberBroken
 				FROM patient
+				LEFT JOIN patientrace ON patient.PatNum=patientrace.PatNum
 				LEFT JOIN procedurelog ON procedurelog.PatNum=patient.PatNum
 				LEFT JOIN provider ON procedurelog.ProvNum=provider.ProvNum
 				LEFT JOIN site ON patient.SiteNum=site.SiteNum

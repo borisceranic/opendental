@@ -128,7 +128,7 @@ namespace OpenDental{
 		private void butOK_Click(object sender, System.EventArgs e) {
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=@"SELECT ScreenDate,ProvName,County,county.CountyCode,
-				site.Description AS schoolName,site.Note AS schoolCode,PlaceService,GradeLevel,Age,Birthdate,Race,Gender,Urgency,
+				site.Description AS schoolName,site.Note AS schoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,
 				HasCaries,EarlyChildCaries,CariesExperience,ExistingSealants,NeedsSealants,MissingAllTeeth,
 				Comments FROM screen
 				LEFT JOIN site ON screen.GradeSchool=site.Description

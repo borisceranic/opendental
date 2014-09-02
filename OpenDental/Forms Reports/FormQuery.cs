@@ -1023,7 +1023,14 @@ namespace OpenDental{
 								=((DayOfWeek)PIn.Long(tableOut.Rows[i][j].ToString())).ToString();
 							break;
 						case "race":
-							//TODO: Update this to return the patient's race(s) in a comma delimited list.  Very important to bring this to Jordan's attention when reviewing.
+							//We expect a comma separated list of integers representing the patient races.  When designing custom queries, the query writer must use GROUP_CONCAT() and should leave the race values in their raw state.
+							string[] arrayRaceDescripts=tableOut.Rows[i][j].ToString().Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
+							for(int r=0;r<arrayRaceDescripts.Length;r++) {
+								arrayRaceDescripts[r]=((PatRace)PIn.Long(arrayRaceDescripts[r].Trim())).ToString();
+							}
+							tableOut.Rows[i][j]=string.Join(", ",arrayRaceDescripts);
+							continue;
+						case "raceOld":
 							tableOut.Rows[i][j]
 								=((PatientRaceOld)PIn.Long(tableOut.Rows[i][j].ToString())).ToString();
 							break;

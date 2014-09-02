@@ -51,6 +51,7 @@ namespace OpenDental.Bridges{
 				patID=pat.ChartNumber;
 			}
 			try{
+				PatientRaceOld raceOld=PatientRaces.GetPatientRaceOldFromPatientRaces(pat.PatNum);
 				List<RefAttach> referalList=RefAttaches.Refresh(pat.PatNum);
 				Provider prov=Providers.GetProv(Patients.GetProvNum(pat));
 				string provName=prov.FName+" "+prov.MI+" "+prov.LName+" "+prov.Suffix;
@@ -70,7 +71,7 @@ namespace OpenDental.Bridges{
 					relat="Unknown";
 				}
 				VBbridges.DrCephNew.Launch(patID,pat.FName,pat.MiddleI,pat.LName,pat.Address,pat.Address2,pat.City,
-					pat.State,pat.Zip,pat.HmPhone,pat.SSN,pat.Gender.ToString(),pat.Race.ToString(),"",pat.Birthdate.ToString(),
+					pat.State,pat.Zip,pat.HmPhone,pat.SSN,pat.Gender.ToString(),raceOld.ToString(),"",pat.Birthdate.ToString(),
 					DateTime.Today.ToShortDateString(),RefAttachL.GetReferringDr(referalList),provName,
 					guar.GetNameFL(),guar.Address,guar.Address2,guar.City,guar.State,guar.Zip,guar.HmPhone,relat);
 			}

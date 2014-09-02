@@ -197,7 +197,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(632, 583);
+			this.butOK.Location = new System.Drawing.Point(682, 583);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(70, 24);
 			this.butOK.TabIndex = 24;
@@ -250,7 +250,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(307, 613);
+			this.butAdd.Location = new System.Drawing.Point(357, 613);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(78, 24);
 			this.butAdd.TabIndex = 146;
@@ -265,7 +265,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(632, 613);
+			this.butCancel.Location = new System.Drawing.Point(682, 613);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(70, 24);
 			this.butCancel.TabIndex = 24;
@@ -297,7 +297,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(2, 162);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(710, 415);
+			this.gridMain.Size = new System.Drawing.Size(760, 415);
 			this.gridMain.TabIndex = 147;
 			this.gridMain.Title = "Screenings";
 			this.gridMain.TranslationName = null;
@@ -306,7 +306,7 @@ namespace OpenDental{
 			// FormScreenGroupEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(714, 641);
+			this.ClientSize = new System.Drawing.Size(764, 641);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.textProvName);
@@ -387,6 +387,7 @@ namespace OpenDental{
 			comboPlaceService.SelectedIndex=(int)ScreenGroupCur.PlaceService;
 		}
 
+		///<summary>This is never run.  It is only called when PrefName.PublicHealthScreeningUsePat is set to true.  The pref is set to 0 when added in convertdatabase and there is currently no UI to change it.  See note in Pref.cs pertaining to this.</summary>
 		private void FillGridScreenPat() {
 			ListScreenPats=ScreenPats.GetForScreenGroup(ScreenGroupCur.ScreenGroupNum);
 			ListPats=Patients.GetPatsForScreenGroup(ScreenGroupCur.ScreenGroupNum);
@@ -400,7 +401,7 @@ namespace OpenDental{
 //todo: birthdate
 			col=new ODGridColumn(Lan.g(this,"Age"),80);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Race"),80);
+			col=new ODGridColumn(Lan.g(this,"Race"),105);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Gender"),80);
 			gridMain.Columns.Add(col);
@@ -411,7 +412,7 @@ namespace OpenDental{
 				row.Cells.Add(ListPats[i].PatNum.ToString());
 				row.Cells.Add(ListPats[i].GetNameLF());
 				row.Cells.Add(ListPats[i].Age.ToString());
-				row.Cells.Add(ListPats[i].Race.ToString());
+				row.Cells.Add(PatientRaces.GetPatientRaceOldFromPatientRaces(ListPats[i].PatNum).ToString());
 				row.Cells.Add(ListPats[i].Gender.ToString());
 				gridMain.Rows.Add(row);
 			}
@@ -429,23 +430,23 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Age"),40);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Race"),60);
+			col=new ODGridColumn(Lan.g(this,"Race"),105);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Sex"),40);
+			col=new ODGridColumn(Lan.g(this,"Sex"),45);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Urgency"),55);
+			col=new ODGridColumn(Lan.g(this,"Urgency"),70);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Caries"),45);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"ECC"),50);
+			col=new ODGridColumn(Lan.g(this,"ECC"),30);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"CarExp"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"ExSeal"),50);
+			col=new ODGridColumn(Lan.g(this,"ExSeal"),45);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"NeedSeal"),60);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"NoTeeth"),60);
+			col=new ODGridColumn(Lan.g(this,"NoTeeth"),55);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Comments"),100);
 			gridMain.Columns.Add(col);
@@ -456,7 +457,7 @@ namespace OpenDental{
 				row.Cells.Add(ScreenList[i].ScreenGroupOrder.ToString());
 				row.Cells.Add(ScreenList[i].GradeLevel.ToString());
 				row.Cells.Add(ScreenList[i].Age.ToString());
-				row.Cells.Add(ScreenList[i].Race.ToString());
+				row.Cells.Add(ScreenList[i].RaceOld.ToString());
 				row.Cells.Add(ScreenList[i].Gender.ToString());
 				row.Cells.Add(ScreenList[i].Urgency.ToString());
 				row.Cells.Add(getX(ScreenList[i].HasCaries));

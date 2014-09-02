@@ -54,7 +54,7 @@ namespace OpenDentBusiness.Crud{
 				screen.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				screen.ProvName        = PIn.String(table.Rows[i]["ProvName"].ToString());
 				screen.Gender          = (PatientGender)PIn.Int(table.Rows[i]["Gender"].ToString());
-				screen.Race            = (PatientRaceOld)PIn.Int(table.Rows[i]["Race"].ToString());
+				screen.RaceOld         = (PatientRaceOld)PIn.Int(table.Rows[i]["RaceOld"].ToString());
 				screen.GradeLevel      = (PatientGrade)PIn.Int(table.Rows[i]["GradeLevel"].ToString());
 				screen.Age             = PIn.Byte  (table.Rows[i]["Age"].ToString());
 				screen.Urgency         = (TreatmentUrgency)PIn.Int(table.Rows[i]["Urgency"].ToString());
@@ -108,7 +108,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScreenNum,";
 			}
-			command+="ScreenDate,GradeSchool,County,PlaceService,ProvNum,ProvName,Gender,Race,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments) VALUES(";
+			command+="ScreenDate,GradeSchool,County,PlaceService,ProvNum,ProvName,Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(screen.ScreenNum)+",";
 			}
@@ -120,7 +120,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (screen.ProvNum)+","
 				+"'"+POut.String(screen.ProvName)+"',"
 				+    POut.Int   ((int)screen.Gender)+","
-				+    POut.Int   ((int)screen.Race)+","
+				+    POut.Int   ((int)screen.RaceOld)+","
 				+    POut.Int   ((int)screen.GradeLevel)+","
 				+    POut.Byte  (screen.Age)+","
 				+    POut.Int   ((int)screen.Urgency)+","
@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"ProvNum         =  "+POut.Long  (screen.ProvNum)+", "
 				+"ProvName        = '"+POut.String(screen.ProvName)+"', "
 				+"Gender          =  "+POut.Int   ((int)screen.Gender)+", "
-				+"Race            =  "+POut.Int   ((int)screen.Race)+", "
+				+"RaceOld         =  "+POut.Int   ((int)screen.RaceOld)+", "
 				+"GradeLevel      =  "+POut.Int   ((int)screen.GradeLevel)+", "
 				+"Age             =  "+POut.Byte  (screen.Age)+", "
 				+"Urgency         =  "+POut.Int   ((int)screen.Urgency)+", "
@@ -202,9 +202,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Gender = "+POut.Int   ((int)screen.Gender)+"";
 			}
-			if(screen.Race != oldScreen.Race) {
+			if(screen.RaceOld != oldScreen.RaceOld) {
 				if(command!=""){ command+=",";}
-				command+="Race = "+POut.Int   ((int)screen.Race)+"";
+				command+="RaceOld = "+POut.Int   ((int)screen.RaceOld)+"";
 			}
 			if(screen.GradeLevel != oldScreen.GradeLevel) {
 				if(command!=""){ command+=",";}

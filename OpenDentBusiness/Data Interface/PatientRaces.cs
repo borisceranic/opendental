@@ -33,7 +33,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<int> races=GetPatRaceList(patNum);
 			if(races.Count==0) {
-				return(PatientRaceOld.Unknown);//Unknown is default for PatientRaceOld
+				return PatientRaceOld.Unknown;//Unknown is default for PatientRaceOld
 			}
 			if(races.Contains((int)PatRace.White)) {
 				if(races.Contains((int)PatRace.Hispanic)) {
