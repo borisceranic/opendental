@@ -30,7 +30,8 @@ namespace OpenDental {
 			if(comboClass.SelectedIndex>0) {
 				schoolClass=SchoolClasses.List[comboClass.SelectedIndex-1].SchoolClassNum;
 			}
-			DataTable table=Providers.RefreshForDentalSchool(schoolClass,"","",textProvNum.Text,false,false);
+			long.TryParse(textProvNum.Text,out selectedProvNum);
+			DataTable table=Providers.RefreshForDentalSchool(schoolClass,textLName.Text,textFName.Text,textProvNum.Text,false,false);
 			gridStudents.BeginUpdate();
 			gridStudents.Columns.Clear();
 			ODGridColumn col;
@@ -46,9 +47,7 @@ namespace OpenDental {
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
 				row=new ODGridRow();
-				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-					row.Cells.Add(table.Rows[i]["ProvNum"].ToString());
-				}
+				row.Cells.Add(table.Rows[i]["ProvNum"].ToString());
 				row.Cells.Add(table.Rows[i]["LName"].ToString());
 				row.Cells.Add(table.Rows[i]["FName"].ToString());
 				if(table.Rows[i]["GradYear"].ToString()!="") {
@@ -57,7 +56,7 @@ namespace OpenDental {
 				else {
 					row.Cells.Add("");
 				}
-
+				row.Tag=table.Rows[i]["ProvNum"];
 				gridStudents.Rows.Add(row);
 			}
 			gridStudents.EndUpdate();
@@ -67,6 +66,38 @@ namespace OpenDental {
 					break;
 				}
 			}
+		}
+
+		private void FillDispSupply() {
+			long selectedProvNum=0;
+			long.TryParse(gridStudents.Rows[gridStudents.GetSelectedIndex()].Tag.ToString(),out selectedProvNum);
+			DataTable table=DispSupplies.RefreshDispensary(PIn.Long(textProvNum.Text));
+			gridDispSupply.BeginUpdate();
+			gridDispSupply.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn(Lan.g("TableProviderSetup","DateDispensed"),100);
+			gridDispSupply.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Description"),90);
+			gridDispSupply.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Qty"),40);
+			gridDispSupply.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","Note"),100);
+			gridDispSupply.Columns.Add(col);
+			gridDispSupply.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<table.Rows.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(table.Rows[i]["DateDispensed"].ToString());
+				row.Cells.Add(table.Rows[i]["Descript"].ToString());
+				row.Cells.Add(table.Rows[i]["DispQuantity"].ToString());
+				row.Cells.Add(table.Rows[i]["Note"].ToString());
+				gridDispSupply.Rows.Add(row);
+			}
+			gridDispSupply.EndUpdate();
+		}
+
+		private void gridStudents_CellClick(object sender,ODGridClickEventArgs e) {
+			FillDispSupply();
 		}
 
 		private void menuItemClose_Click(object sender,EventArgs e) {
