@@ -1226,8 +1226,10 @@ namespace OpenDental{
 						Recalls.Update(RecallList[i]);
 					}
 				}
-				ModuleSelected(PatOld.Guarantor);
+				ModuleSelected(PatOld.Guarantor);//Sets PatCur to PatOld guarantor.
+				OnPatientSelected(PatCur);//PatCur is now the Guarantor.
 			}
+			PatientL.RemoveFromMenu(PatOld.GetNameLF(),PatOld.PatNum);//Always remove deleted patients from the dropdown menu.
 		}
 
 		//private void butSetGuar_Click(object sender,System.EventArgs e){

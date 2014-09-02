@@ -17,6 +17,13 @@ namespace OpenDental{
 		///<summary>Collection of PatNums. The last five patients. Used when clicking on dropdown button.</summary>
 		private static List<long> buttonLastFivePatNums;
 
+		///<summary>Removes a patient from the dropdown menu.  Only used when Delete Patient is called.</summary>
+		public static void RemoveFromMenu(string nameLF,long patNum) {
+			//No need to check RemotingRole; no call to db.
+			buttonLastFivePatNums.Remove(patNum);
+			buttonLastFiveNames.Remove(nameLF);
+		}
+
 		///<summary>The current patient will already be on the button.  This adds the family members when user clicks dropdown arrow. Can handle null values for pat and fam.  Need to supply the menu to fill as well as the EventHandler to set for each item (all the same).</summary>
 		public static void AddFamilyToMenu(ContextMenu menu,EventHandler onClick,long patNum,Family fam) {
 			//No need to check RemotingRole; no call to db.
@@ -51,6 +58,11 @@ namespace OpenDental{
 				return false;
 			}
 			//Patient has changed
+			int idx=buttonLastFivePatNums.IndexOf(patNum);
+			if(idx>-1) {//It exists in this list of patnums
+				buttonLastFivePatNums.Remove(patNum);
+				buttonLastFiveNames.Remove(nameLF);
+			}
 			buttonLastFivePatNums.Insert(0,patNum);
 			buttonLastFiveNames.Insert(0,nameLF);
 			if(buttonLastFivePatNums.Count>5) {
