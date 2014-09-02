@@ -1205,12 +1205,15 @@ namespace OpenDental{
 			int term=0;
 			if(textTerm.Text!=""){//Use term to determine period payment
 				term=PIn.Int(textTerm.Text);
+				double periodExactAmt=0;
 				if(APR==0){
-					periodPayment=Decimal.Round((decimal)(principal/term),roundDec);
+					periodExactAmt=principal/term;
 				}
 				else{
-					periodPayment=Decimal.Round((decimal)(principal*periodRate/(1-Math.Pow(1+periodRate,-term))),roundDec);
+					periodExactAmt=principal*periodRate/(1-Math.Pow(1+periodRate,-term));
 				}
+				//Round up to the nearest penny (or international equivalent).  This causes the principal on the last payment to be less than or equal to the other principal amounts.
+				periodPayment=(decimal)(Math.Ceiling(periodExactAmt*Math.Pow(10,roundDec))/Math.Pow(10,roundDec));
 			}
 			else{//Use period payment supplied
 				periodPayment=PIn.Decimal(textPeriodPayment.Text);
@@ -1256,9 +1259,11 @@ namespace OpenDental{
 				ppCharge.Principal=(double)periodPayment-ppCharge.Interest;
 				ppCharge.ProvNum=PatCur.PriProv;
 				if(term>0 && countCharges==(term-1)) {//Using # payments method and this is the last payment.
-					//The point of this code block is to fix any rounding issues.  Corrects principal when off by a few pennies.
-					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated (principal will increase by a few pennies).
-					ppCharge.Interest=((double)periodPayment)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
+					//The purpose of this code block is to fix any rounding issues.  Corrects principal when off by a few pennies.  Principal will decrease slightly and interest will increase slightly to keep payment amounts consistent.
+					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated.
+					if(periodRate!=0) {//Interest amount on last entry must stay zero for payment plans with zero APR. When APR is zero, the interest amount is set to zero above, and the last payment amount might be less than the other payment amounts.
+						ppCharge.Interest=((double)periodPayment)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
+					}
 				}
 				else if(term==0 && principalDecrementing+((decimal)ppCharge.Interest) <= periodPayment) {//Payment amount method, last payment.
 					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.
