@@ -88,6 +88,9 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
 				return;
 			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				Procedures.DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
+			}
 			//Test to see if any payment at all has been received for this proc
 			string command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
 				+" AND InsPayAmt > 0 AND Status != "+POut.Long((int)ClaimProcStatus.Preauth);
@@ -1551,7 +1554,7 @@ namespace OpenDentBusiness {
 				return;
 			}
 			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
-			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum;
+			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
 			List <Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
 			for(int i=0;i<labFeesForProc.Count;i++) {
 				Procedure labFeeNew=labFeesForProc[i];
@@ -1576,13 +1579,21 @@ namespace OpenDentBusiness {
 				return;
 			}
 			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
-			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum;
+			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
 			List<Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
 			for(int i=0;i<labFeesForProc.Count;i++) {
 				Procedure labFeeNew=labFeesForProc[i];
 				Procedure labFeeOld=labFeeNew.Copy();
 				labFeeNew.ProcStatus=proc.ProcStatus;
 				Procedures.Update(labFeeNew,labFeeOld);
+			}
+		}
+
+		public static void DeleteCanadianLabFeesForProcCode(long ProcNum) {
+			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
+			List<Procedure> labFeeProcs=Crud.ProcedureCrud.SelectMany(command);
+			for(int i=0;i<labFeeProcs.Count;i++) {
+				Procedures.Delete(labFeeProcs[i].ProcNum);
 			}
 		}
 
