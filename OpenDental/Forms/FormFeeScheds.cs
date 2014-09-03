@@ -368,7 +368,7 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormFeeSchedEdit FormF=new FormFeeSchedEdit();
-			FormF.FeeSchedCur=FeeSchedC.ListLong[e.Row];
+			FormF.FeeSchedCur=FeeSchedsForType[e.Row];
 			FormF.ShowDialog();
 			FillGrid();
 			changed=true;
