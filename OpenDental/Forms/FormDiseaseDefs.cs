@@ -207,6 +207,8 @@ namespace OpenDental{
 		private void FormDiseaseDefs_Load(object sender, System.EventArgs e) {
 			if(IsSelectionMode){
 				butClose.Text=Lan.g(this,"Cancel");
+				butDown.Visible=false;
+				butUp.Visible=false;
 				if(IsMultiSelect) {
 					gridMain.SelectionMode=GridSelectionMode.MultiExtended;
 				}
