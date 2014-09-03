@@ -178,7 +178,7 @@ namespace OpenDental {
 					}
 					TimeSpan timeActive=DateTime.Now.Subtract(task.DateTimeEntry);
 					//We got this far so the office is down.
-					officesDownView.Items.Add(timeActive.ToStringHmmss()+" - "+task.TaskNum.ToString());
+					officesDownView.Items.Add(timeActive.ToStringHmmss()+" - "+task.KeyNum.ToString());
 				}
 			}
 			catch {
