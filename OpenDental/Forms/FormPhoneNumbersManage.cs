@@ -24,6 +24,7 @@ namespace OpenDental {
 			textWkPhone.Text=Pat.WkPhone;
 			textHmPhone.Text=Pat.HmPhone;
 			textWirelessPhone.Text=Pat.WirelessPhone;
+			textAddrNotes.Text=Pat.AddrNote;
 			FillList();
 		}
 
