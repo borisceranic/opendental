@@ -5889,6 +5889,9 @@ namespace OpenDental{
 				if(Application.OpenForms[f]==this) {// main form
 					continue;
 				}
+				if(Plugins.HookMethod(this,"FormOpenDental.LogOffNow_loopingforms",Application.OpenForms[f])) {
+					continue;//if some criteria are met in the hook, don't close a certain form
+				}
 				Form openForm=Application.OpenForms[f];//Copy so we have a reference to it after we close it.
 				openForm.Hide();
 				//Currently there is no way to tell if LogOffNow got called from a user initiating the log off, or if this is the auto log off feature.
