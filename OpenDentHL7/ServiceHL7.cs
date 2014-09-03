@@ -461,9 +461,9 @@ namespace OpenDentHL7 {
 						if(IsVerboseLogging) {
 							EventLog.WriteEntry("OpenDentHL7","Process the HL7 message.",EventLogEntryType.Information);
 						}
-						messageControlId=messageHl7Object.ControlId;
 						ackEvent=messageHl7Object.AckEvent;
-						MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db
+						MessageParser.Process(messageHl7Object,IsVerboseLogging);//also saves the message to the db and retrieves the control ID from the MSH segment
+						messageControlId=messageHl7Object.ControlId;
 					}
 					catch(Exception ex) {
 						EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Information);

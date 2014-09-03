@@ -36,8 +36,8 @@ namespace OpenDentBusiness.HL7 {
 			def.hl7DefMessages=new List<HL7DefMessage>();
 			HL7DefMessage msg=new HL7DefMessage();
 			HL7DefSegment seg=new HL7DefSegment();
-			#region Incoming Messages
-				#region ACK - Acknowledgment Message
+			#region Inbound Messages
+				#region ACK - General Acknowledgment
 				def.AddMessage(msg,MessageTypeHL7.ACK,MessageStructureHL7.ADT_A01,InOutHL7.Incoming,0);
 					#region MSH - Message Header
 					msg.AddSegment(seg,0,SegmentNameHL7.MSH);
@@ -54,8 +54,8 @@ namespace OpenDentBusiness.HL7 {
 						//MSA.2, Message Control ID
 						seg.AddField(2,"messageControlId");
 					#endregion MSA - Message Acknowledgment
-				#endregion ACK - Acknowledgment Message
-				#region ADT - Patient Demographics Message (Admits, Discharges, and Transfers)
+				#endregion ACK - General Acknowledgment
+				#region ADT - Patient Demographics (Admits, Discharges, and Transfers)
 				msg=new HL7DefMessage();
 				def.AddMessage(msg,MessageTypeHL7.ADT,MessageStructureHL7.ADT_A01,InOutHL7.Incoming,1);
 					#region MSH - Message Header
@@ -130,7 +130,8 @@ namespace OpenDentBusiness.HL7 {
 						//If this field is populated, it will set the patient.GradeLevel if the field can be converted to an integer between 1 and 12
 						seg.AddField(2,"pat.GradeLevel");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						//Used to set patient.ClinicNum if the location description matches clinic.Description
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, XCN data type, ProviderId^LastName^FirstName^MI
@@ -141,7 +142,7 @@ namespace OpenDentBusiness.HL7 {
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
 						//Using the location type field to identify this field as a "Site (or Grade School)", we will attempt to match the description to a site.Description in the db
 						//If exact match is found, set the patient.SiteNum=site.SiteNum
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
 						//Stored in the patient.Urgency field for treatment urgnecy, used in public health screening
@@ -221,8 +222,8 @@ namespace OpenDentBusiness.HL7 {
 						//This field could be blank and we will insert a new procedure every time, regardless of whether or not there is already a procedure with this code for this patient.
 						seg.AddField(19,"proc.uniqueId");
 					#endregion PR1 - Procedures
-				#endregion ADT - Patient Demographics Message (Admits, Discharges, and Transfers)
-				#region PPR - Patient Problem Message
+				#endregion ADT - Patient Demographics (Admits, Discharges, and Transfers)
+				#region PPR - Patient Problem
 				msg=new HL7DefMessage();
 				def.AddMessage(msg,MessageTypeHL7.PPR,MessageStructureHL7.PPR_PC1,InOutHL7.Incoming,2);
 					#region MSH - Message Header
@@ -296,7 +297,8 @@ namespace OpenDentBusiness.HL7 {
 						//If this field is populated, it will set the patient.GradeLevel if the field can be converted to an integer between 1 and 12
 						seg.AddField(2,"pat.GradeLevel");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						//Used to set patient.ClinicNum if the location description matches clinic.Description
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, XCN data type, ProviderId^LastName^FirstName^MI^^Abbr
@@ -306,7 +308,7 @@ namespace OpenDentBusiness.HL7 {
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
 						//Using the location type field to identify this field as a "Site (or Grade School)", we will attempt to match the description to a site.Description in the db
 						//If exact match is found, set the patient.SiteNum=site.SiteNum
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
 						//Stored in the patient.Urgency field for treatment urgnecy, used in public health screening
@@ -335,12 +337,12 @@ namespace OpenDentBusiness.HL7 {
 						//PRB.9, Actual Problem Resolution Date/Time
 						seg.AddField(9,"problemStopDate");
 					#endregion PRB - Problem Detail
-				#endregion PPR - Patient Problem Message
+				#endregion PPR - Patient Problem
+				#region SRM - Schedule Request
 				//The only incoming SRM event types we will accept by default will be S03 - Request Appointment Modification or S04 - Request Appointment Cancellation (for now)
 				//The message must refer to an appointment already existing in OD by AptNum
 				//The S03 message will only be allowed to modify a limited amount of information about the appointment
 				//The S04 message will set the appointment status to Broken (enum 5)
-				#region SRM - Schedule Request Message
 				msg=new HL7DefMessage();
 				def.AddMessage(msg,MessageTypeHL7.SRM,MessageStructureHL7.SRM_S01,InOutHL7.Incoming,3);
 					#region MSH - Message Header
@@ -364,6 +366,8 @@ namespace OpenDentBusiness.HL7 {
 						seg.AddField(1,"apt.externalAptID");
 						//ARQ.2, Filler Appointment ID, EI data type, EntityID^NamespaceID^UniversalID^UniversalIDType
 						//We will expect the first component to be our AptNum
+						//We could check to make sure the UniversalID is our OID for an appointment, but for this incoming segment we won't enforce it for now and just accept the first component as AptNum
+						//Example: 1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7
 						seg.AddField(2,"apt.AptNum");
 					#endregion ARQ - Appointment Request Information
 					#region NTE - Notes and Comments
@@ -438,7 +442,8 @@ namespace OpenDentBusiness.HL7 {
 						//If this field is populated, it will set the patient.GradeLevel if the field can be converted to an integer between 1 and 12
 						seg.AddField(2,"pat.GradeLevel");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						//Used to set patient.ClinicNum if the location description matches clinic.Description
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, XCN data type, ProviderId^LastName^FirstName^MI
@@ -448,7 +453,7 @@ namespace OpenDentBusiness.HL7 {
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
 						//Using the location type field to identify this field as a "Site (or Grade School)", we will attempt to match the description to a site.Description in the db
 						//If exact match is found, set the patient.SiteNum=site.SiteNum
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
 						//Stored in the patient.Urgency field for treatment urgnecy, used in public health screening
@@ -489,7 +494,8 @@ namespace OpenDentBusiness.HL7 {
 					msg.AddSegment(seg,6,false,true,SegmentNameHL7.AIL);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//AIL.3, Location Resource ID, PL data type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						//Room-Operatory (not set from inbound messages), Facility-Practice (not set from inbound messages), Building-Clinic (used to set apt.ClinicNum)
 						//Used to set the appointment.ClinicNum if this is included in the message
 						seg.AddField(3,"apt.location");
@@ -526,10 +532,10 @@ namespace OpenDentBusiness.HL7 {
 						//Example: |^Appointment Confirmed|
 						seg.AddField(12,"apt.confirmStatus");
 					#endregion AIP - Appointment Information - Personnel Resource
-				#endregion SRM - Schedule Request Message
-			#endregion Incoming Messages
-			#region Outgoing Messages
-				#region ACK - General Acknowledgment Message
+				#endregion SRM - Schedule Request
+			#endregion Inbound Messages
+			#region Outbound Messages
+				#region ACK - General Acknowledgment
 				msg=new HL7DefMessage();
 				def.AddMessage(msg,MessageTypeHL7.ACK,MessageStructureHL7.ADT_A01,InOutHL7.Outgoing,4);
 					#region MSH - Message Header
@@ -578,8 +584,8 @@ namespace OpenDentBusiness.HL7 {
 						//MSA.2, Message Control ID
 						seg.AddField(2,"messageControlId");
 					#endregion MSA - Message Acknowledgment
-				#endregion ACK - General Acknowledgment Message
-				#region ADT - Patient Demographics Message (Admits, Discharges, and Transfers)
+				#endregion ACK - General Acknowledgment
+				#region ADT - Patient Demographics (Admits, Discharges, and Transfers)
 				//Outbound ADT messages will be triggered when specific data is changed in OD, but not if the data change is due to an inbound HL7 message.
 				//ADT's created when:
 				//1. Pressing OK from FormPatientEdit
@@ -635,8 +641,8 @@ namespace OpenDentBusiness.HL7 {
 						//Retained for backward compatibility only, we will not add this field by default
 						//EVN.2, Recorded Date/Time
 						seg.AddField(2,"dateTime.Now");
-						//EVN.3, Event Reason Code (01 - Patient request; 02 - Physician/health practitioner order;03 - Census Management;O - Other;U - Unknown)
-						seg.AddField(3,"0062",DataTypeHL7.IS,"","01");
+						//EVN.4, Event Reason Code (01 - Patient request; 02 - Physician/health practitioner order;03 - Census Management;O - Other;U - Unknown)
+						seg.AddField(4,"0062",DataTypeHL7.IS,"","01");
 					#endregion EVN - Event Type
 					#region PID - Patient Identification
 					seg=new HL7DefSegment();
@@ -706,14 +712,15 @@ namespace OpenDentBusiness.HL7 {
 						//We will defualt to send 'O' for outpatient for outbound messages, but for incoming we will use this field for pat.GradeLevel if it's an integer from 1-12
 						seg.AddField(2,"0004",DataTypeHL7.IS,"","O");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, ProviderId^LastName^FirstName^MI
 						seg.AddField(7,"0010",DataTypeHL7.XCN,"prov.provIdNameLFM","");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
-						//Filled with the "Site (or Grade School)" value in the database, using 's' to designate the location type site and the site.Description value
+						//Filled with the "Site (or Grade School)" value in the database, using 'S' to designate the location type site and the site.Description value
 						//If no site assigned in OD, this will be blank as it is optional
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, IS data type (coded value for user-defined tables)
 						//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
@@ -795,7 +802,7 @@ namespace OpenDentBusiness.HL7 {
 						//IN1.49, Insured's ID Number, CX data type
 						seg.AddField(49,"inssub.SubscriberID");
 					#endregion IN1 - Insurance
-				#endregion ADT - Patient Demographics Message (Admits, Discharges, and Transfers)
+				#endregion ADT - Patient Demographics (Admits, Discharges, and Transfers)
 				#region DFT - Detailed Financial Transaction
 				//Outbound DFT messages will be triggered by pressing the tool bar button for this enabled definition.
 				//In the future there may be automation for sending these when procedures are set complete.
@@ -846,8 +853,8 @@ namespace OpenDentBusiness.HL7 {
 						//Retained for backward compatibility only, we will not add this field by default
 						//EVN.2, Recorded Date/Time
 						seg.AddField(2,"dateTime.Now");
-						//EVN.3, Event Reason Code (01 - Patient request; 02 - Physician/health practitioner order;03 - Census Management;O - Other;U - Unknown)
-						seg.AddField(3,"0062",DataTypeHL7.IS,"","01");
+						//EVN.4, Event Reason Code (01 - Patient request; 02 - Physician/health practitioner order;03 - Census Management;O - Other;U - Unknown)
+						seg.AddField(4,"0062",DataTypeHL7.IS,"","01");
 					#endregion EVN - Event Type
 					#region PID - Patient Identification
 					seg=new HL7DefSegment();
@@ -917,14 +924,15 @@ namespace OpenDentBusiness.HL7 {
 						//We will defualt to send 'O' for outpatient for outbound messages, but for incoming we will use this field for pat.GradeLevel if it's an integer from 1-12
 						seg.AddField(2,"0004",DataTypeHL7.IS,"","O");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"pat.location");
 						//PV1.7, Attending/Primary Care Doctor, ProviderId^LastName^FirstName^MI
 						seg.AddField(7,"0010",DataTypeHL7.XCN,"prov.provIdNameLFM","");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
-						//Filled with the "Site (or Grade School)" value in the database, using 's' to designate the location type site and the site.Description value
+						//Filled with the "Site (or Grade School)" value in the database, using 'S' to designate the location type site and the site.Description value
 						//If no site assigned in OD, this will be blank as it is optional
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, IS data type (coded value for user-defined tables)
 						//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
@@ -936,9 +944,55 @@ namespace OpenDentBusiness.HL7 {
 						//PV1.44, Admit Date/Time
 						seg.AddField(44,"proc.procDateTime");
 					#endregion PV1 - Patient Visit
+					#region FT1 - Financial Transaction Information
+					seg=new HL7DefSegment();
+					msg.AddSegment(seg,4,true,true,SegmentNameHL7.FT1);
+						//Fields-------------------------------------------------------------------------------------------------------------
+						//FT1.1, Sequence Number (starts with 1)
+						seg.AddField(1,"sequenceNum");
+						//FT1.2, Transaction ID
+						seg.AddField(2,"proc.ProcNum");
+						//FT1.4, Transaction Date (YYYYMMDDHHMMSS)
+						seg.AddField(4,"proc.procDateTime");
+						//FT1.5, Transaction Posting Date (YYYYMMDDHHMMSS)
+						seg.AddField(5,"proc.procDateTime");
+						//FT1.6, Transaction Type
+						seg.AddFieldFixed(6,DataTypeHL7.IS,"CG");
+						//FT1.7, Transaction Code, CWE data type
+						//This is a required field and should contain "the code assigned by the institution for the purpose of uniquely identifying the transaction based on the Transaction Type (FT1-6)".
+						//We will just send the ProcNum, not sure if any receiving application will use it
+						seg.AddField(7,"proc.ProcNum");
+						//FT1.10, Transaction Quantity
+						seg.AddFieldFixed(10,DataTypeHL7.NM,"1.0");
+						//FT1.11, Transaction Amount Extended, CP data type
+						//Total fee to charge for this procedure, independent of transaction quantity
+						seg.AddField(11,"proc.ProcFee");
+						//FT1.12, Transaction Amount Unit, CP data type
+						//Fee for this procedure for each transaction quantity
+						seg.AddField(12,"proc.ProcFee");
+						//FT1.16, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
+						//In the FT1 segment, we will get the clinic from the specific procedure, but if not set (0) we will get it from the patient
+						//If no clinic on the proc or assigned to the patient, this will be blank
+						seg.AddField(16,"proc.location");
+						//FT1.19, Diagnosis Code, CWE data type, repeatable if they have more than 1 code on the proc (currently 4 allowed)
+						//Example: |520.2^Abnormal tooth size/form^I9C^^^^31^^~521.81^Cracked tooth^I9C^^^^31^^|
+						seg.AddField(19,"proc.DiagnosticCode");
+						//FT1.21, Ordering Provider
+						seg.AddField(21,"prov.provIdNameLFM");
+						//FT1.22, Unit Cost (procedure fee)
+						seg.AddField(22,"proc.ProcFee");
+						//FT1.25, Procedure Code, CNE data type
+						//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
+						//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
+						seg.AddField(25,"proccode.ProcCode");
+						//FT1.26, Modifiers (treatment area)
+						seg.AddField(26,"proc.toothSurfRange");
+					#endregion FT1 - Financial Transaction Information
 					#region IN1 - Insurance (global across all FT1s)
 					seg=new HL7DefSegment();
-					msg.AddSegment(seg,4,true,true,SegmentNameHL7.IN1);
+					msg.AddSegment(seg,5,true,true,SegmentNameHL7.IN1);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//IN1.1, Set ID (starts with 1)
 						//This will be 1 for primary ins and increment for additional repetitions for secondary ins etc.
@@ -1006,49 +1060,8 @@ namespace OpenDentBusiness.HL7 {
 						//IN1.49, Insured's ID Number, CX data type
 						seg.AddField(49,"inssub.SubscriberID");
 					#endregion IN1 - Insurance (global across all FT1s)
-					#region FT1 - Financial Transaction Information
-					seg=new HL7DefSegment();
-					msg.AddSegment(seg,5,true,true,SegmentNameHL7.FT1);
-						//Fields-------------------------------------------------------------------------------------------------------------
-						//FT1.1, Sequence Number (starts with 1)
-						seg.AddField(1,"sequenceNum");
-						//FT1.2, Transaction ID
-						seg.AddField(2,"proc.ProcNum");
-						//FT1.4, Transaction Date (YYYYMMDDHHMMSS)
-						seg.AddField(4,"proc.procDateTime");
-						//FT1.5, Transaction Posting Date (YYYYMMDDHHMMSS)
-						seg.AddField(5,"proc.procDateTime");
-						//FT1.6, Transaction Type
-						seg.AddFieldFixed(6,DataTypeHL7.IS,"CG");
-						//FT1.10, Transaction Quantity
-						seg.AddFieldFixed(10,DataTypeHL7.NM,"1.0");
-						//FT1.11, Transaction Amount Extended, CP data type
-						//Total fee to charge for this procedure, independent of transaction quantity
-						seg.AddField(11,"proc.ProcFee");
-						//FT1.12, Transaction Amount Unit, CP data type
-						//Fee for this procedure for each transaction quantity
-						seg.AddField(12,"proc.ProcFee");
-						//FT1.16, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
-						//In the FT1 segment, we will get the clinic from the specific procedure, but if not set (0) we will get it from the patient
-						//If no clinic on the proc or assigned to the patient, this will be blank
-						seg.AddField(16,"proc.location");
-						//FT1.19, Diagnosis Code, CWE data type, repeatable if they have more than 1 code on the proc (currently 4 allowed)
-						//Example: |520.2^Abnormal tooth size/form^I9C^^^^31^^~521.81^Cracked tooth^I9C^^^^31^^|
-						seg.AddField(19,"proc.DiagnosticCode");
-						//FT1.21, Ordering Provider
-						seg.AddField(21,"prov.provIdNameLFM");
-						//FT1.22, Unit Cost (procedure fee)
-						seg.AddField(22,"proc.ProcFee");
-						//FT1.25, Procedure Code, CNE data type
-						//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
-						//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
-						seg.AddField(25,"proccode.ProcCode");
-						//FT1.26, Modifiers (treatment area)
-						seg.AddField(26,"proc.toothSurfRange");
-					#endregion FT1 - Financial Transaction Information
 				#endregion DFT - Detailed Financial Transaction
-				#region SIU - Schedule Information Unsolicited Message
+				#region SIU - Schedule Information Unsolicited
 				//Outbound SIU messages will be triggered when specific data is changed in OD, but not if the data change is due to an inbound HL7 message.
 				//SIU's created when creating/modifying/cancelling/breaking an appointment
 				msg=new HL7DefMessage();
@@ -1098,8 +1111,8 @@ namespace OpenDentBusiness.HL7 {
 						//We will store the exernalAptId from an incoming SRM message ARQ segment if they send it to us, so send it here if we have one
 						seg.AddField(1,"apt.externalAptID");
 						//SCH.2, Filler Appointment ID, EI data type, OD is the filler application
-						//AptNum^^AssignAuthorityID^IDType
-						//Example: |1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7|  root.6 is appointment
+						//We will populate the first component with the AptNum, the third with the OID for an appointment object, the fourth with "HL7"
+						//Example: 1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7
 						seg.AddField(2,"apt.AptNum");
 						//SCH.5, Schedule ID, CWE data type
 						//We will use this to send the operatory name
@@ -1208,14 +1221,15 @@ namespace OpenDentBusiness.HL7 {
 						//We will defualt to send 'O' for outpatient for outbound messages, but for incoming we will use this field for pat.GradeLevel if it's an integer from 1-12
 						seg.AddField(2,"0004",DataTypeHL7.IS,"","O");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
 						//PV1.7, Attending/Primary Care Doctor, ProviderId^LastName^FirstName^MI
 						seg.AddField(7,"0010",DataTypeHL7.XCN,"prov.provIdNameLFM","");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
-						//Filled with the "Site (or Grade School)" value in the database, using 's' to designate the location type site and the site.Description value
+						//Filled with the "Site (or Grade School)" value in the database, using 'S' to designate the location type site and the site.Description value
 						//If no site assigned in OD, this will be blank as it is optional
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, IS data type (coded value for user-defined tables)
 						//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
@@ -1250,7 +1264,8 @@ namespace OpenDentBusiness.HL7 {
 						//A-Add/Insert, D-Delete, U-Update, X-No Change
 						seg.AddField(2,"segmentAction");
 						//AIL.3, Location Resource ID, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
 					#endregion AIL - Appointment Information - Location Resource
 					#region AIP - Appointment Information - Personnel Resource
@@ -1276,7 +1291,7 @@ namespace OpenDentBusiness.HL7 {
 						//We will send 'd' for dentist (apt.ProvNum) and 'h' for hygienist (apt.ProvHyg)
 						seg.AddField(4,"prov.provType");
 					#endregion AIP - Appointment Information - Personnel Resource
-				#endregion SIU - Schedule Information Unsolicited Message
+				#endregion SIU - Schedule Information Unsolicited
 				#region SRR - Schedule Request Response
 				msg=new HL7DefMessage();
 				def.AddMessage(msg,MessageTypeHL7.SRR,MessageStructureHL7.SRR_S01,InOutHL7.Outgoing,8);
@@ -1435,14 +1450,15 @@ namespace OpenDentBusiness.HL7 {
 						//We will defualt to send 'O' for outpatient for outbound messages, but for incoming we will use this field for pat.GradeLevel if it's an integer from 1-15
 						seg.AddField(2,"0004",DataTypeHL7.IS,"","O");
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
 						//PV1.7, Attending/Primary Care Doctor, ProviderId^LastName^FirstName^MI
 						seg.AddField(7,"0010",DataTypeHL7.XCN,"prov.provIdNameLFM","");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
-						//Filled with the "Site (or Grade School)" value in the database, using 's' to designate the location type site and the site.Description value
+						//Filled with the "Site (or Grade School)" value in the database, using 'S' to designate the location type site and the site.Description value
 						//If no site assigned in OD, this will be blank as it is optional
-						//Example: |West Salem Elementary^^^^^s| ('s' for site)
+						//Example: |West Salem Elementary^^^^^S| ('S' for site)
 						seg.AddField(11,"pat.site");
 						//PV1.18, Patient Type, IS data type (coded value for user-defined tables)
 						//We will send one of the following values retrieved from the patient.Urgency field for treatment urgency: 0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
@@ -1477,7 +1493,8 @@ namespace OpenDentBusiness.HL7 {
 						//A-Add/Insert, D-Delete, U-Update, X-No Change
 						seg.AddField(2,"segmentAction");
 						//AIL.3, Location Resource ID, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
-						//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
+						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
 					#endregion AIL - Appointment Information - Location Resource
 					#region AIP - Appointment Information - Personnel Resource
@@ -1504,7 +1521,7 @@ namespace OpenDentBusiness.HL7 {
 						seg.AddField(4,"prov.provType");
 					#endregion AIP - Appointment Information - Personnel Resource
 				#endregion SRR - Schedule Request Response
-			#endregion Outgoing Messages
+			#endregion Outbound Messages
 			return def;
 		}
 

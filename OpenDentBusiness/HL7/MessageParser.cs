@@ -331,7 +331,7 @@ namespace OpenDentBusiness.HL7 {
 					if(hl7defmsg.hl7DefSegments[i].hl7DefFields[j].FieldName=="apt.AptNum") {
 						int aptNumOrdinal=hl7defmsg.hl7DefSegments[i].hl7DefFields[j].OrdinalPos;
 						try {
-							aptNum=PIn.Long(msg.Segments[segOrder].Fields[aptNumOrdinal].ToString());
+							aptNum=PIn.Long(msg.Segments[segOrder].GetFieldComponent(aptNumOrdinal,0).ToString());
 						}
 						catch(Exception ex) {//PIn.Long will throw an exception if a value is not able to be parsed into a long
 							//do nothing, aptNum will remain 0
@@ -597,11 +597,11 @@ namespace OpenDentBusiness.HL7 {
 					case "apt.confirmStatus":
 						long aptConfirmDefNum=0;
 						Def[] listConfirmStats=DefC.GetList(DefCat.ApptConfirmed);
-						for(int s=0;s<listConfirmStats.Length;s++) {
-							if(seg.GetFieldComponent(itemOrder,1).ToLower()==listConfirmStats[s].ItemName.ToLower()//ItemName is the confirmation name
-								|| (listConfirmStats[s].ItemValue!="" && seg.GetFieldComponent(itemOrder,1).ToLower()==listConfirmStats[s].ItemValue.ToLower()))//ItemValue is the confirmation abbreviation, which may be blank
+						for(int j=0;j<listConfirmStats.Length;j++) {
+							if(seg.GetFieldComponent(itemOrder,1).ToLower()==listConfirmStats[j].ItemName.ToLower()//ItemName is the confirmation name
+								|| (listConfirmStats[j].ItemValue!="" && seg.GetFieldComponent(itemOrder,1).ToLower()==listConfirmStats[j].ItemValue.ToLower()))//ItemValue is the confirmation abbreviation, which may be blank
 							{
-								aptConfirmDefNum=listConfirmStats[i].DefNum;
+								aptConfirmDefNum=listConfirmStats[j].DefNum;
 								break;
 							}
 						}
@@ -625,6 +625,7 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			Appointments.Update(apt,aptOld);
+			_aptProcessed=apt;
 			if(_isVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated appointment for patient "+pat.GetNameFLnoPref()+" due to an incoming AIG or AIP segment.",EventLogEntryType.Information);
 			}
@@ -643,11 +644,11 @@ namespace OpenDentBusiness.HL7 {
 					case "apt.confirmStatus":
 						long aptConfirmDefNum=0;
 						Def[] listConfirmStats=DefC.GetList(DefCat.ApptConfirmed);
-						for(int s=0;s<listConfirmStats.Length;s++) {
-							if(seg.GetFieldComponent(intItemOrder,1).ToLower()==listConfirmStats[s].ItemName.ToLower()//ItemName is the confirmation name
-								|| (listConfirmStats[s].ItemValue!="" && seg.GetFieldComponent(intItemOrder,1).ToLower()==listConfirmStats[s].ItemValue.ToLower()))//ItemValue is the confirmation abbreviation, which may be blank
+						for(int j=0;j<listConfirmStats.Length;j++) {
+							if(seg.GetFieldComponent(intItemOrder,1).ToLower()==listConfirmStats[j].ItemName.ToLower()//ItemName is the confirmation name
+								|| (listConfirmStats[j].ItemValue!="" && seg.GetFieldComponent(intItemOrder,1).ToLower()==listConfirmStats[j].ItemValue.ToLower()))//ItemValue is the confirmation abbreviation, which may be blank
 							{
-								aptConfirmDefNum=listConfirmStats[i].DefNum;
+								aptConfirmDefNum=listConfirmStats[j].DefNum;
 								break;
 							}
 						}
@@ -669,6 +670,7 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			Appointments.Update(apt,aptOld);
+			_aptProcessed=apt;
 			if(_isVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated appointment for patient "+pat.GetNameFLnoPref()+" due to an incoming AIL segment.",EventLogEntryType.Information);
 			}
@@ -750,13 +752,13 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					case "apt.AptNum":
 						try {
-							aptNum=PIn.Long(seg.GetFieldComponent(intItemOrder));
+							aptNum=PIn.Long(seg.GetFieldComponent(intItemOrder,0));
 						}
 						catch(Exception ex) {
 							//do nothing, aptNum will remain 0
 						}
 						if(apt!=null && apt.AptNum!=aptNum) {
-							//an appointment was located from the inbound message, but the AptNum on the appointment is not the same as the AptNum in this SCH segment (should never happen)
+							//an appointment was located from the inbound message, but the AptNum on the appointment is not the same as the AptNum in this ARQ segment (should never happen)
 							throw new Exception("Invalid appointment number.");
 						}
 						continue;
@@ -776,6 +778,12 @@ namespace OpenDentBusiness.HL7 {
 						+"AptNum: "+apt.AptNum.ToString()+", External AptID: "+externAptId+", External root: "+externRoot+".",EventLogEntryType.Information);
 				}
 			}
+			_hl7MsgCur.AptNum=apt.AptNum;
+			HL7Msgs.Update(_hl7MsgCur);
+			if(_isVerboseLogging) {
+				EventLog.WriteEntry("OpenDentHL7","Updated hl7msg to include AptNum for "+pat.GetNameFLnoPref()+" due to an incoming SCH segment.",EventLogEntryType.Information);
+			}
+			_aptProcessed=apt;
 			return;
 		}
 
@@ -1205,7 +1213,7 @@ namespace OpenDentBusiness.HL7 {
 			if(msgControlIdOrder==0) {
 				return;
 			}
-			msg.ControlId=seg.Fields[msgControlIdOrder].ToString();
+			msg.ControlId=seg.GetFieldComponent(msgControlIdOrder,0).ToString();
 		}
 		
 		///<summary>So far this is only used in SRM messages and saves data to the appointment note field.  If apt is null this does nothing.  The note in the NTE segment will be appended to the existing appointment note unless the existing note already contains the exact note we are attempting to append.</summary>
@@ -1237,6 +1245,7 @@ namespace OpenDentBusiness.HL7 {
 			Appointment aptOld=apt.Clone();
 			apt.Note+="\r\n"+strAptNote;
 			Appointments.Update(apt,aptOld);
+			_aptProcessed=apt;
 			if(_isVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated appointment for patient "+pat.GetNameFLnoPref()+" due to an incoming NTE segment.",EventLogEntryType.Information);
 			}
@@ -2007,6 +2016,7 @@ namespace OpenDentBusiness.HL7 {
 			}
 			if(apt!=null) {
 				Appointments.Update(apt,aptOld);
+				_aptProcessed=apt;
 			}
 			if(_isVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","Updated appointment for patient "+pat.GetNameFLnoPref()+" due to an incoming PV1 segment.",EventLogEntryType.Information);
@@ -2029,7 +2039,7 @@ namespace OpenDentBusiness.HL7 {
 				switch(segDef.hl7DefFields[i].FieldName) {
 					case "apt.AptNum":
 						try {
-							aptNum=PIn.Long(seg.GetFieldComponent(itemOrder));
+							aptNum=PIn.Long(seg.GetFieldComponent(itemOrder,0));
 						}
 						catch(Exception ex) {
 							//do nothing, aptNum will remain 0
@@ -2098,27 +2108,29 @@ namespace OpenDentBusiness.HL7 {
 			return aptNum;
 		}
 
-		///<summary>This uses the Mod11 check digit algorithm to calculate and return the checkDigit for the supplied patID.
+		///<summary>This uses the Mod11 check digit algorithm to calculate and return the checkDigit for the supplied objectID.
 		///<para>(see \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02A_DataTypes_M4_JAN2007.doc page 23)</para>
-		///<para>If patId is an empty string, this will return -1.</para>
+		///<para>If objectId is an empty string, this will return -1.</para>
 		///<para>Returns the calculated check digit to compare to check digit received or use in constructing a message.</para>
 		///<para>M11 algorithm: d	=	digit of number starting from units digit, followed by 10’s position, followed by 100’s position, etc.</para>
-		///<para>w	=	weight of digit position starting with the units position, followed by 10’s position, followed by 100’s position etc. Values for w = 2,3,4,5,6,7,2,3,4,5,6,7,etc. (repeats for each group of 6 digits)</para>
+		///<para>w	=	weight of digit position starting with the units position, followed by 10’s position, followed by 100’s position etc.</para>
+		///<para>Values for w = 2,3,4,5,6,7,2,3,4,5,6,7,etc. (repeats for each group of 6 digits)</para>
 		///<para>c	=	check digit</para>
-		///<para>(Step 1) m = sum of (d*w) starting at units position for d=digit value starting with units position to highest order, for w=weight value from 2 to 7 for every 6 positions starting with units digit</para>
+		///<para>(Step 1) m = sum of (d*w) starting at units position for d=digit value starting with units position to highest order,</para>
+		///<para>for w=weight value from 2 to 7 for every 6 positions starting with units digit</para>
 		///<para>(Step 2) c1 = m mod 11</para>
 		///<para>(Step 3) if c1 = 0 then c1 = 1</para>
 		///<para>(Step 4) c = (11 - c1) mod 10</para>
 		///<para>Example: 1234567, check digit is 4; m=(7*2)+(6*3)+(5*4)+(4*5)+(3*6)+(2*7)+(1*2)=106; 106 mod 11=7; (11-7) mod 10=4.</para></summary>
-		public static int M11CheckDigit(string patId) {
-			if(patId=="") {
+		public static int M11CheckDigit(string objectId) {
+			if(objectId=="") {
 				return -1;
 			}
 			//Contains the characters of the patId, converted to integers, in reverse order
-			int[] arrayIds=new int[patId.Length];
-			for(int i=0;i<patId.Length;i++) {
+			int[] arrayIds=new int[objectId.Length];
+			for(int i=0;i<objectId.Length;i++) {
 				try {
-					arrayIds[patId.Length-(1+i)]=PIn.Int(patId[i].ToString());
+					arrayIds[objectId.Length-(1+i)]=PIn.Int(objectId[i].ToString());
 				}
 				catch {
 					//if a character in the patId is not an integer, return false
@@ -2142,24 +2154,29 @@ namespace OpenDentBusiness.HL7 {
 			return checkDigitCalc;
 		}
 
-		///<summary>This uses the Mod10 check digit algorithm to calculate and return the checkDigit for the supplied patID.
-		///<para>(see \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02A_DataTypes_M4_JAN2007.doc page 22)</para>
-		///<para>If patId is an empty string, this will return -1.</para>
+		///<summary>This uses the Mod11 check digit algorithm to calculate and return the checkDigit for the supplied objectID.
+		///<para>(see \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02A_DataTypes_M4_JAN2007.doc page 23)</para>
+		///<para>If objectId is an empty string, this will return -1.</para>
 		///<para>Returns the calculated check digit to compare to check digit received or use in constructing a message.</para>
-		///<para>M10 algorithm: (Step 1) Take the odd digit positions starting from the right and append them into a single number.</para>
-		///<para>(Step 2) Multiply value from step 1 by 2.</para>
-		///<para>(Step 3) Take the even digit positions starting from the right (of the original number) and prepend these to the value from step 2.</para>
-		///<para>(Step 4) Add all of the digits together and subtract the total from the next highest multiple of 10.  If it is a multiple of 10, check digit is 0.</para>
-		///<para>Example: 12345, check digit is 5; Step 1: 531; Step 2: 531*2=1062; Step 3: 421062; Step 4: 4+2+1+0+6+2=15; 20-15=5.</para></summary>
-		public static int M10CheckDigit(string patId) {
-			if(patId=="") {
+		///<para>M11 algorithm: d	=	digit of number starting from units digit, followed by 10’s position, followed by 100’s position, etc.</para>
+		///<para>w	=	weight of digit position starting with the units position, followed by 10’s position, followed by 100’s position etc.</para>
+		///<para>Values for w = 2,3,4,5,6,7,2,3,4,5,6,7,etc. (repeats for each group of 6 digits)</para>
+		///<para>c	=	check digit</para>
+		///<para>(Step 1) m = sum of (d*w) starting at units position for d=digit value starting with units position to highest order,</para>
+		///<para>for w=weight value from 2 to 7 for every 6 positions starting with units digit</para>
+		///<para>(Step 2) c1 = m mod 11</para>
+		///<para>(Step 3) if c1 = 0 then c1 = 1</para>
+		///<para>(Step 4) c = (11 - c1) mod 10</para>
+		///<para>Example: 1234567, check digit is 4; m=(7*2)+(6*3)+(5*4)+(4*5)+(3*6)+(2*7)+(1*2)=106; 106 mod 11=7; (11-7) mod 10=4.</para></summary>
+		public static int M10CheckDigit(string objectId) {
+			if(objectId=="") {
 				return -1;
 			}
 			//idIntsOddPos will contain the odd positioned chars of patId, converted to ints, the right-most positioned char (i.e. the 1's digit) will be in pos 0 of the array
 			//char[] idIntsOddPos=new char[patId.Length/2+(patId.Length%2)];
 			string idIntsOddPos="";
 			int step4Tot=0;
-			char[] arrayPatIdCharsReversed=patId.ToCharArray();
+			char[] arrayPatIdCharsReversed=objectId.ToCharArray();
 			Array.Reverse(arrayPatIdCharsReversed);
 			for(int i=0;i<arrayPatIdCharsReversed.Length;i++) {
 				try {

@@ -14,22 +14,22 @@ namespace OpenDentBusiness.HL7 {
 		private static bool _isEcwDef;
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldADT(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,int sequenceNum,EventTypeHL7 eventType) {
-			return GenerateField(def,fieldName,MessageTypeHL7.ADT,pat,prov,null,guar,null,sequenceNum,eventType,null,null,MessageStructureHL7.ADT_A01);
+		public static string GenerateFieldADT(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,int sequenceNum,EventTypeHL7 eventType,SegmentNameHL7 segName) {
+			return GenerateField(def,fieldName,MessageTypeHL7.ADT,pat,prov,null,guar,null,sequenceNum,eventType,null,null,MessageStructureHL7.ADT_A01,segName);
 		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldSIU(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType) {
-			return GenerateField(def,fieldName,MessageTypeHL7.SIU,pat,prov,null,guar,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SIU_S12);
+		public static string GenerateFieldSIU(HL7Def def,string fieldName,Patient pat,Provider prov,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,SegmentNameHL7 segName) {
+			return GenerateField(def,fieldName,MessageTypeHL7.SIU,pat,prov,null,guar,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SIU_S12,segName);
 		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,EventTypeHL7 eventType) {
-			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,-1,eventType,null,null,MessageStructureHL7.SRR_S01);
+		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,int sequenceNum,EventTypeHL7 eventType,SegmentNameHL7 segName) {
+			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SRR_S01,segName);
 		}
 
 		///<summary>apt, guar, proc, prov, pdfDescription, pdfDataString, patplanCur, inssubCur, insplanCur, carrierCur, and patSub can be null and will return an empty string if a field requires that object</summary>
-		public static string GenerateField(HL7Def def,string fieldName,MessageTypeHL7 msgType,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,MessageStructureHL7 msgStructure) {
+		public static string GenerateField(HL7Def def,string fieldName,MessageTypeHL7 msgType,Patient pat,Provider prov,Procedure proc,Patient guar,Appointment apt,int sequenceNum,EventTypeHL7 eventType,string pdfDescription,string pdfDataString,MessageStructureHL7 msgStructure,SegmentNameHL7 segName) {
 			string retval="";
 			if(def.InternalType==HL7InternalType.eCWFull
 				|| def.InternalType==HL7InternalType.eCWTight
@@ -53,12 +53,25 @@ namespace OpenDentBusiness.HL7 {
 						return apt.AptNum.ToString();
 					}
 					//We will use AptNum, with the OIDRoot for an appt object (set in oidinternal), and ID Type 'HL7'
-					//Example: |1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7|
 					OIDInternal aptOid=OIDInternals.GetForType(IdentifierType.Appointment);
 					string aptOidRoot="";
 					if(aptOid!=null) {
 						aptOidRoot=aptOid.IDRoot;
 					}
+					//For PV1 segments, the data type is a CX, which has the AptNum, check digit, check digit scheme, assigning authority - &universalID&universalIDType, IDType
+					//We will use the check digit scheme M11, their appt OID with "HL7" as the type for assigning authority, and the ID type is VN - Visit Number
+					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.6&HL7^VN|
+					if(segName==SegmentNameHL7.PV1) {
+						string strCheckDigit=MessageParser.M11CheckDigit(apt.AptNum.ToString()).ToString();
+						string strCheckDigitScheme="M11";
+						if(strCheckDigit=="-1") {
+							strCheckDigit="";
+							strCheckDigitScheme="";
+						}
+						return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),strCheckDigit,strCheckDigitScheme,gConcat(def.SubcomponentSeparator,"",aptOidRoot,"HL7"),"VN");
+					}
+					//For segments other than PV1 (currently SCH or ARQ segments) the data type is EI
+					//Example: |1234^^2.16.840.1.113883.3.4337.1486.6566.6^HL7|
 					return gConcat(def.ComponentSeparator,apt.AptNum.ToString(),"",aptOidRoot,"HL7");
 				case "apt.aptStatus":
 					if(apt==null) {
@@ -93,7 +106,7 @@ namespace OpenDentBusiness.HL7 {
 					return gConcat(def.ComponentSeparator,listAptOidsExt[0].IDExternal,"",listAptOidsExt[0].rootExternal,"");
 				case "apt.location":
 					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 					//use operatory and clinic from appt
 					if(apt==null) {
 						return "";
@@ -105,7 +118,7 @@ namespace OpenDentBusiness.HL7 {
 						opName=opCur.OpName;
 					}
 					string practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,aptClinicDescript,opName,"",practiceName,"","c");//all of these could be empty strings and it works fine
+					return gConcat(def.ComponentSeparator,aptClinicDescript,opName,"",def.SubcomponentSeparator+practiceName,"","C");//all of these could be empty strings and it works fine
 				case "apt.length":
 					//Example: 60^min&&ANS+, ANS+ is the name of the coding system
 					if(apt==null) {
@@ -141,6 +154,10 @@ namespace OpenDentBusiness.HL7 {
 					//The OD user who created/modified the appointment
 					if(apt==null) {
 						return "";
+					}
+					//SRR messages are generated from the service in response to SRM messages, therefore we do not have a user logged in.
+					if(msgType==MessageTypeHL7.SRR) {
+						return "OpenDentalHL7";
 					}
 					if(Security.CurUser!=null) {
 						return Security.CurUser.UserName;
@@ -297,13 +314,13 @@ namespace OpenDentBusiness.HL7 {
 					return retval;
 				case "pat.location":
 					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 					if(pat.ClinicNum==0) {
 						return "";
 					}
 					string patClinicDescript=Clinics.GetDesc(pat.ClinicNum);
 					practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,patClinicDescript,"","",practiceName,"","c");
+					return gConcat(def.ComponentSeparator,patClinicDescript,"","",def.SubcomponentSeparator+practiceName,"","C");
 				case "pat.nameLFM":
 					return gConcat(def.ComponentSeparator,pat.LName,pat.FName,pat.MiddleI);
 				case "pat.PatNum":
@@ -319,7 +336,7 @@ namespace OpenDentBusiness.HL7 {
 					}
 					return gRace(pat,def);
 				case "pat.site":
-					//Example: |West Salem Elementary^^^^^s| ('s' for site)
+					//Example: |West Salem Elementary^^^^^S| ('S' for site)
 					if(pat.SiteNum==0) {
 						return "";
 					}
@@ -327,7 +344,7 @@ namespace OpenDentBusiness.HL7 {
 					if(patSiteDescript=="") {
 						return "";
 					}
-					return gConcat(def.ComponentSeparator,patSiteDescript,"","","","","","s");
+					return gConcat(def.ComponentSeparator,patSiteDescript,"","","","","","S");
 				case "pat.SSN":
 					return pat.SSN;
 				case "pat.WkPhone":
@@ -381,7 +398,7 @@ namespace OpenDentBusiness.HL7 {
 				#region Procedure
 				case "proc.location":
 					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^PracticeTitle^^c  (c for clinic)
+					//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
 						return "";
 					}
@@ -397,7 +414,7 @@ namespace OpenDentBusiness.HL7 {
 						}
 					}
 					practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",practiceName,"","c");
+					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",def.SubcomponentSeparator+practiceName,"","C");
 				case "proc.DiagnosticCode":
 					if(proc==null) {
 						return "";
@@ -471,7 +488,8 @@ namespace OpenDentBusiness.HL7 {
 					List<OIDExternal> listProvOidExt=OIDExternals.GetByInternalIDAndType(prov.ProvNum,IdentifierType.Provider);
 					retval=gConcat(def.ComponentSeparator,OIDInternals.GetForType(IdentifierType.Provider).IDRoot+"."+prov.ProvNum,prov.LName,prov.FName,prov.MI);
 					for(int i=0;i<listProvOidExt.Count;i++) {
-						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listProvOidExt[i].rootExternal+"."+listProvOidExt[i].IDExternal,prov.LName,prov.FName,prov.MI);
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listProvOidExt[i].rootExternal+"."+listProvOidExt[i].IDExternal,
+							prov.LName,prov.FName,prov.MI,prov.Suffix,prov.Abbr);
 					}
 					return retval;
 				case "prov.provType":
@@ -480,15 +498,15 @@ namespace OpenDentBusiness.HL7 {
 					}
 					if(apt==null) {
 						if(prov.IsSecondary) {
-							return "h";
+							return "H";
 						}
-						return "d";
+						return "D";
 					}
-					//if we have an appt, return 'd' if prov is the dentist and 'h' if prov is the hygienist, regardless of whether they are marked secondary or not
+					//if we have an appt, return 'D' if prov is the dentist and 'H' if prov is the hygienist, regardless of whether they are marked secondary or not
 					if(prov.ProvNum==apt.ProvHyg) {
-						return "h";
+						return "H";
 					}
-					return "d";//default to 'd' - dentist
+					return "D";//default to 'D' - dentist
 				#endregion Provider
 				case "segmentAction":
 					//This is currently only supported for SIU and SRR messages in the RSG, AIL, and AIP segments
@@ -821,7 +839,7 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		private static string gRaceOld(Patient pat) {
-			switch(PatientRaces.GetPatientRaceOldFromPatientRaces(pat.PatNum)) { //Uses the deprecated PatientRaceOld enum converted from PatientRaces.GetPatientRaceOldFromPatientRaces()
+			switch(PatientRaces.GetPatientRaceOldFromPatientRaces(pat.PatNum)) {//Uses the PatientRaceOld enum converted from the patient's current list of PatientRaces
 				case PatientRaceOld.AmericanIndian:
 					return "American Indian Or Alaska Native";
 				case PatientRaceOld.Asian:
@@ -846,42 +864,13 @@ namespace OpenDentBusiness.HL7 {
 			string retval="";
 			List<PatientRace> listPatRaces=PatientRaces.GetForPatient(pat.PatNum);
 			for(int i=0;i<listPatRaces.Count;i++) {
-				string raceCode="";
-				switch(listPatRaces[i].Race) { //Uses the deprecated PatientRaceOld enum converted from PatientRaces.GetPatientRaceOldFromPatientRaces()
-					case PatRace.AfricanAmerican:
-						raceCode="2054-5";
-						break;
-					case PatRace.AmericanIndian:
-						raceCode="1002-5";
-						break;
-					case PatRace.Asian:
-						raceCode="2028-9";
-						break;
-					case PatRace.HawaiiOrPacIsland:
-						raceCode="2076-8";
-						break;
-					case PatRace.Hispanic:
-						raceCode="2135-2";
-						break;
-					case PatRace.NotHispanic:
-						raceCode="2186-5";
-						break;
-					case PatRace.Other:
-						raceCode="2131-1";
-						break;
-					case PatRace.White:
-						raceCode="2106-3";
-						break;
-					default:
-						break;
-				}
-				if(raceCode=="") {
+				if(listPatRaces[i].CdcrecCode=="") {
 					continue;
 				}
 				if(retval!="") {
 					retval+=def.RepetitionSeparator;
 				}
-				retval+=gConcat(def.ComponentSeparator,raceCode,listPatRaces[i].Race.ToString(),"CDCREC","","","","1");
+				retval+=gConcat(def.ComponentSeparator,listPatRaces[i].CdcrecCode,listPatRaces[i].Race.ToString(),"CDCREC","","","","1");
 			}
 			return retval;
 		}
