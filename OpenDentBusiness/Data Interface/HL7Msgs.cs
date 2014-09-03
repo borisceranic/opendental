@@ -84,6 +84,7 @@ namespace OpenDentBusiness{
 			for(int i=0;i<msgHl7.Segments.Count;i++) {//get control ID from message located in MSH segment with field determined above
 				if(msgHl7.Segments[i].Name==SegmentNameHL7.MSH) {
 					retval=msgHl7.Segments[i].Fields[controlIdOrder].ToString();
+					break;
 				}
 			}
 			return retval;

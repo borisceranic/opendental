@@ -84,7 +84,7 @@ namespace OpenDentBusiness.HL7 {
 							}
 							else {
 								fieldValue=FieldConstructor.GenerateField(hl7Def,fieldName,MessageTypeHL7.DFT,pat,prov,proc,guar,apt,j+1,eventType,
-								 pdfDescription,pdfDataString,MessageStructureHL7.DFT_P03);
+								 pdfDescription,pdfDataString,MessageStructureHL7.DFT_P03,seg.Name);
 							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[f].OrdinalPos,fieldValue);
 						}
@@ -164,7 +164,7 @@ namespace OpenDentBusiness.HL7 {
 								fieldValue=FieldConstructor.GenerateFieldIN1(hl7Def,fieldName,j+1,patplanCur,inssubCur,insplanCur,carrierCur,listPatPlans.Count,patSub);
 							}
 							else {
-								fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,j+1,eventType);
+								fieldValue=FieldConstructor.GenerateFieldADT(hl7Def,fieldName,pat,prov,guar,j+1,eventType,seg.Name);
 							}
 							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,fieldValue);
 						}
@@ -228,7 +228,7 @@ namespace OpenDentBusiness.HL7 {
 							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FixedText);
 						}
 						else {
-							string fieldValue=FieldConstructor.GenerateFieldSIU(hl7Def,fieldName,pat,prov,guar,apt,j+1,eventType);
+							string fieldValue=FieldConstructor.GenerateFieldSIU(hl7Def,fieldName,pat,prov,guar,apt,j+1,eventType,seg.Name);
 							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,fieldValue);
 						}
 					}
@@ -318,7 +318,7 @@ namespace OpenDentBusiness.HL7 {
 							fieldValue=FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent);
 						}
 						else {
-							fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,eventType);
+							fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,j+1,eventType,seg.Name);
 						}
 						seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].OrdinalPos,fieldValue);
 					}
