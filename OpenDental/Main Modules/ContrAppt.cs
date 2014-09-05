@@ -3747,6 +3747,8 @@ namespace OpenDental {
 			of what seemed to be inconsistencies in the timer function */
 			if(DateTime.Now.AddMilliseconds(-280) > bubbleTime | !PrefC.GetBool(PrefName.ApptBubbleDelay)) {
 				infoBubble.Visible=true;
+				//Something may have changed so we need to refresh the bubble.
+				infoBubble.Invalidate();
 			}
 			else {
 				infoBubble.Visible=false;
