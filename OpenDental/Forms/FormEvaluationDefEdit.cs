@@ -36,7 +36,10 @@ namespace OpenDental {
 			for(int i=0;i<gradingScales.Count;i++) {
 				_gradingScales.Add(gradingScales[i].GradingScaleNum,gradingScales[i]);
 			}
-			if(_gradingScales.Count!=0 && _gradingScales[_evalDefCur.GradingScaleNum].ScaleType!=EnumScaleType.Weighted) {
+			if(_gradingScales.Count!=0 
+				&& !_evalDefCur.IsNew
+				&& _gradingScales[_evalDefCur.GradingScaleNum].ScaleType!=EnumScaleType.Weighted) 
+			{
 				labelTotalPoint.Visible=false;
 				textTotalPoints.Visible=false;
 			}
@@ -50,7 +53,9 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Grading Scale"),100);
 			gridMain.Columns.Add(col);
-			if(_gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) {
+			if(!_evalDefCur.IsNew
+				&& _gradingScales[_evalDefCur.GradingScaleNum].ScaleType==EnumScaleType.Weighted) 
+			{
 				col=new ODGridColumn(Lan.g("FormEvaluationDefEdit","Max Points"),80);
 				gridMain.Columns.Add(col);
 			}

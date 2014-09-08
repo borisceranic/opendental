@@ -29,6 +29,7 @@ namespace OpenDental {
 				return;
 			}
 			FormUserGroupPicker FormUGP=new FormUserGroupPicker();
+			FormUGP.IsAdminMode=false;
 			FormUGP.ShowDialog();
 			if(FormUGP.DialogResult!=DialogResult.OK) {
 				return;
@@ -56,6 +57,7 @@ namespace OpenDental {
 				return;
 			}
 			FormUserGroupPicker FormUGP=new FormUserGroupPicker();
+			FormUGP.IsAdminMode=false;
 			FormUGP.ShowDialog();
 			if(FormUGP.DialogResult!=DialogResult.OK) {
 				return;
