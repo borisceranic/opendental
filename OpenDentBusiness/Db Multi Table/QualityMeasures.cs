@@ -2258,8 +2258,9 @@ namespace OpenDentBusiness {
 				return Meth.GetObject<QualityMeasure>(MethodBase.GetCurrentMethod(),qtype,dateStart,dateEnd,provNum);
 			}
 			//these queries only work for mysql
-			string command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider WHERE provider.EhrKey="
-				+"(SELECT pv.EhrKey FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
+			string command="SELECT GROUP_CONCAT(provider.ProvNum) FROM provider "
+				+"WHERE provider.LName=(SELECT pv.LName FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")"
+				+"AND provider.FName=(SELECT pv.FName FROM provider pv WHERE pv.ProvNum="+POut.Long(provNum)+")";
 			string provs=Db.GetScalar(command);
 			QualityMeasure measureCur=new QualityMeasure();
 			List<string> listOneOfEncOIDs=new List<string>();
@@ -3048,7 +3049,7 @@ namespace OpenDentBusiness {
 			return retval;
 		}
 
-		///<summary>The string command will retrieve all unique encounters in the date range, for the provider (based on provider.EhrKey, so may be more than one ProvNum), with age limitation or other restrictions applied.  The encounters will then be required to belong to the value sets identified by the oneOf and twoOf lists of OID's (Object Identifiers), and the patient will have to have had one or more of the oneOf encounters or two or more of the two of encounters in the list returned by the string command.  We will return a dictionary with PatNum as the key that links to a list of all EhrCqmEncounter objects for that patient with all of the required elements for creating the QRDA Category I and III documents.</summary>
+		///<summary>The string command will retrieve all unique encounters in the date range, for the provider (based on first and last name, so may be more than one ProvNum), with age limitation or other restrictions applied.  The encounters will then be required to belong to the value sets identified by the oneOf and twoOf lists of OID's (Object Identifiers), and the patient will have to have had one or more of the oneOf encounters or two or more of the two of encounters in the list returned by the string command.  We will return a dictionary with PatNum as the key that links to a list of all EhrCqmEncounter objects for that patient with all of the required elements for creating the QRDA Category I and III documents.</summary>
 		private static Dictionary<long,List<EhrCqmEncounter>> GetEncountersWithOneOfAndTwoOfOIDs(string command,List<string> listOneOfEncOIDs,List<string> listTwoOfEncOIDs) {
 			Dictionary<long,List<EhrCqmEncounter>> retval=new Dictionary<long,List<EhrCqmEncounter>>();
 			List<Encounter> listEncs=Crud.EncounterCrud.SelectMany(command);
