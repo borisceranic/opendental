@@ -11,6 +11,8 @@ namespace OpenDental{
 		private UI.Button butOK;
 		private UI.Button butCancel;
 		public UserGroup UserGroup;
+		/// <summary>Set to true by default. If false usergroups with security admin permission will not show.</summary>
+		public bool IsAdminMode=true;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -120,7 +122,12 @@ namespace OpenDental{
 		private void FillList(){
 			UserGroups.RefreshCache();
 			listGroups.Items.Clear();
-			for(int i=0;i<UserGroups.List.Length;i++){
+			for(int i=0;i<UserGroups.List.Length;i++) {
+				if(!IsAdminMode
+					&& GroupPermissions.HasPermission(UserGroups.List[i].UserGroupNum,Permissions.SecurityAdmin)) 
+				{
+					continue;
+				}
 				listGroups.Items.Add(UserGroups.List[i].Description);
 			}
 		}
