@@ -56,9 +56,11 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn(Lan.g(this,"User Name"),300);
+			col=new ODGridColumn(Lan.g(this,"User Name"),270);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Default"),20);
+			col=new ODGridColumn(Lan.g(this,"Default"),50,HorizontalAlignment.Center);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Notify"),0,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -66,6 +68,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(EmailAddresses.Listt[i].EmailUsername);
 				row.Cells.Add((EmailAddresses.Listt[i].EmailAddressNum==PrefC.GetLong(PrefName.EmailDefaultAddressNum))?"X":"");
+				row.Cells.Add((EmailAddresses.Listt[i].EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum))?"X":"");
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -77,6 +80,17 @@ namespace OpenDental {
 				return;
 			}
 			if(Prefs.UpdateLong(PrefName.EmailDefaultAddressNum,EmailAddresses.Listt[gridMain.GetSelectedIndex()].EmailAddressNum)) {
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+			FillGrid();
+		}
+
+		private void butWebMailNotify_Click(object sender,EventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a row first.");
+				return;
+			}
+			if(Prefs.UpdateLong(PrefName.EmailNotifyAddressNum,EmailAddresses.Listt[gridMain.GetSelectedIndex()].EmailAddressNum)) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 			FillGrid();
@@ -137,7 +151,6 @@ namespace OpenDental {
 				DataValid.SetInvalid(InvalidType.Email);
 			}
 		}
-
 
 	}
 }
