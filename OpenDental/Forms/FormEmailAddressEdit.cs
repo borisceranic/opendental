@@ -432,6 +432,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Cannot delete the default email address.");
 				return;
 			}
+			if(EmailAddressCur.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum)) {
+				MsgBox.Show(this,"Cannot delete the notify email address.");
+				return;
+			}
 			for(int i=0;i<Clinics.List.Length;i++) {
 				Clinic clinic=Clinics.List[i];
 				if(clinic.EmailAddressNum==EmailAddressCur.EmailAddressNum) {

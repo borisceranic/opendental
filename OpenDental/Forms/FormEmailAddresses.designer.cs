@@ -35,6 +35,10 @@ namespace OpenDental{
 			this.butThisComputer = new OpenDental.UI.Button();
 			this.textInboxComputerName = new System.Windows.Forms.TextBox();
 			this.textInboxCheckInterval = new System.Windows.Forms.TextBox();
+			this.groupEmailPrefs = new System.Windows.Forms.GroupBox();
+			this.button1 = new OpenDental.UI.Button();
+			this.label1 = new System.Windows.Forms.Label();
+			this.groupEmailPrefs.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// gridMain
@@ -62,7 +66,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(435, 136);
+			this.butAdd.Location = new System.Drawing.Point(431, 220);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 3;
@@ -77,9 +81,9 @@ namespace OpenDental{
 			this.butSetDefault.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSetDefault.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSetDefault.CornerRadius = 4F;
-			this.butSetDefault.Location = new System.Drawing.Point(435, 56);
+			this.butSetDefault.Location = new System.Drawing.Point(5, 106);
 			this.butSetDefault.Name = "butSetDefault";
-			this.butSetDefault.Size = new System.Drawing.Size(75, 24);
+			this.butSetDefault.Size = new System.Drawing.Size(90, 24);
 			this.butSetDefault.TabIndex = 3;
 			this.butSetDefault.Text = "Set Default";
 			this.butSetDefault.Click += new System.EventHandler(this.butSetDefault_Click);
@@ -92,7 +96,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(435, 516);
+			this.butCancel.Location = new System.Drawing.Point(431, 516);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -107,7 +111,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(435, 472);
+			this.butOK.Location = new System.Drawing.Point(431, 472);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 2;
@@ -179,10 +183,47 @@ namespace OpenDental{
 			this.textInboxCheckInterval.Size = new System.Drawing.Size(30, 24);
 			this.textInboxCheckInterval.TabIndex = 8;
 			// 
+			// groupEmailPrefs
+			// 
+			this.groupEmailPrefs.Controls.Add(this.label1);
+			this.groupEmailPrefs.Controls.Add(this.button1);
+			this.groupEmailPrefs.Controls.Add(this.butSetDefault);
+			this.groupEmailPrefs.Location = new System.Drawing.Point(418, 5);
+			this.groupEmailPrefs.Name = "groupEmailPrefs";
+			this.groupEmailPrefs.Size = new System.Drawing.Size(102, 163);
+			this.groupEmailPrefs.TabIndex = 3;
+			this.groupEmailPrefs.TabStop = false;
+			// 
+			// button1
+			// 
+			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.button1.Autosize = true;
+			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.button1.CornerRadius = 4F;
+			this.button1.Location = new System.Drawing.Point(5, 133);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(90, 24);
+			this.button1.TabIndex = 3;
+			this.button1.Text = "WebMail Notify";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(6, 12);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(90, 88);
+			this.label1.TabIndex = 5;
+			this.label1.Text = "Highlight an email address in the grid, then use one of these buttons.  Not requi" +
+    "red.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEmailAddresses
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(529, 558);
+			this.Controls.Add(this.groupEmailPrefs);
 			this.Controls.Add(this.textInboxCheckInterval);
 			this.Controls.Add(this.textInboxComputerName);
 			this.Controls.Add(this.butThisComputer);
@@ -191,7 +232,6 @@ namespace OpenDental{
 			this.Controls.Add(this.labelInboxComputerName);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
-			this.Controls.Add(this.butSetDefault);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -200,6 +240,7 @@ namespace OpenDental{
 			this.Text = "Email Addresses";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormEmailAddresses_FormClosing);
 			this.Load += new System.EventHandler(this.FormEmailAddresses_Load);
+			this.groupEmailPrefs.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -218,5 +259,8 @@ namespace OpenDental{
 		private UI.Button butThisComputer;
 		private System.Windows.Forms.TextBox textInboxComputerName;
 		private System.Windows.Forms.TextBox textInboxCheckInterval;
+		private System.Windows.Forms.GroupBox groupEmailPrefs;
+		private System.Windows.Forms.Label label1;
+		private UI.Button button1;
 	}
 }

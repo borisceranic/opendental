@@ -158,7 +158,7 @@ namespace OpenDental {
 			notificationSubject=PrefC.GetString(PrefName.PatientPortalNotifySubject);
 			notificationBodyNoUrl=PrefC.GetString(PrefName.PatientPortalNotifyBody);
 			notificationURL=PrefC.GetString(PrefName.PatientPortalURL);
-			_emailAddressSender=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
+			_emailAddressSender=EmailAddresses.GetOne(PrefC.GetLong(PrefName.EmailNotifyAddressNum));//Webmail notification email address.  One notification email per database (not clinic specific).
 			if(_emailAddressSender==null 
 				|| _emailAddressSender.EmailAddressNum==0
 				|| _emailAddressSender.EmailUsername==""

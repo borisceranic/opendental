@@ -196,6 +196,8 @@ namespace OpenDentBusiness {
 		EmailInboxComputerName,
 		///<summary>Time interval in minutes describing how often to automatically check the email inbox for new messages. Default is 5 minutes.</summary>
 		EmailInboxCheckInterval,
+		///<summary>FK to EmailAddress.EmailAddressNum. Used for notifications (ie. Patient Portal)</summary>
+		EmailNotifyAddressNum,
 		/// <summary>Deprecated. Use emailaddress.EmailPassword instead.</summary>
 		EmailPassword,
 		/// <summary>Deprecated. Use emailaddress.ServerPort instead.</summary>
