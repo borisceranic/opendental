@@ -1257,7 +1257,7 @@ namespace OpenDental {
 			if(e.Button != MouseButtons.Left) {
 				return;
 			}
-			if(textAmount.Text=="") {
+			if(textAmount.Text=="" || PIn.Double(textAmount.Text)==0) {
 				MsgBox.Show(this,"Please enter an amount first.");
 				return;
 			}
