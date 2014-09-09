@@ -5720,17 +5720,26 @@ namespace OpenDental{
 			//		sigBoxTopaz.Dispose();
 			//	}
 			//}
-			if(DialogResult==DialogResult.OK){
+			if(DialogResult==DialogResult.OK) {
 				//this catches date,prov,fee,status,etc for all claimProcs attached to this proc.
 				if(!StartedAttachedToClaim
-					&& Procedures.IsAttachedToClaim(ProcCur.ProcNum))
+					&& Procedures.IsAttachedToClaim(ProcCur.ProcNum)) 
 				{
 					return;//unless they got attached to a claim while this window was open.  Then it doesn't touch them.
+				}
+				if(StartedAttachedToClaim
+					&& !Procedures.IsAttachedToClaim(ProcCur.ProcNum)) 
+				{
+					return;//We don't want to allow ComputeEstimates to reattach the procedure to the old claim which could have deleted.
+				}
+				//Now we have to double check that every single claimproc is attached to the same claim that they were originally attached to.
+				if(ClaimProcs.IsAttachedToDifferentClaim(ProcCur.ProcNum,ClaimProcsForProc)) {
+					return;//The claimproc is not attached to the same claim it was originally pointing to.  Do not run ComputeEstimates which would point it back to the old (potentially deleted) claim.
 				}
 				Procedures.ComputeEstimates(ProcCur,PatCur.PatNum,ClaimProcsForProc,false,PlanList,PatPlanList,BenefitList,PatCur.Age,SubList);
 				return;
 			}
-			if(IsNew){//if cancelling on a new procedure
+			if(IsNew) {//if cancelling on a new procedure
 				//delete any newly created claimprocs
 				for(int i=0;i<ClaimProcsForProc.Count;i++) {
 					//if(ClaimProcsForProc[i].ProcNum==ProcCur.ProcNum) {

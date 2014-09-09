@@ -6137,29 +6137,43 @@ namespace OpenDental{
 			DialogResult=DialogResult.Cancel;
 		}
 
-		private void FormClaimEdit_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+		private void FormClaimEdit_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
 			if(DialogResult==DialogResult.OK) {
 				return;
 			}
-			if(IsNew){
-				if(ClaimCur.InsPayAmt>0) {
-					MsgBox.Show(this,"Not allowed to cancel because an insurance payment was entered.  Either click OK, or zero out the insurance payments.");
-					e.Cancel=true;
-					return;
-				}
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.CapClaim || ClaimProcsForClaim[i].Status==ClaimProcStatus.Preauth){
-						ClaimProcs.Delete(ClaimProcsForClaim[i]);
-					}
-					else if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
-						ClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
-						ClaimProcsForClaim[i].ClaimNum=0;
-						ClaimProcsForClaim[i].InsPayEst=0;
-						ClaimProcs.Update(ClaimProcsForClaim[i]);
-					}
-				}
-				Claims.Delete(ClaimCur);//does not do any validation.  Also deletes the claimcanadian.
+			if(!IsNew) {
+				return;
 			}
+			if(ClaimCur.InsPayAmt>0) {
+				MsgBox.Show(this,"Not allowed to cancel because an insurance payment was entered.  Either click OK, or zero out the insurance payments.");
+				e.Cancel=true;
+				return;
+			}
+			//The following claimproc statuses are not probable at this point.  One possible way to have these claimproc statuses is if the user manually edits the claimproc and forces a status change.
+			//Adjustment - Never attached to a claim (not even available to manual switch to).
+			//Supplemental - Supplemental button is grayed out for new claims.
+			//Total payment - By Total button is grayed out for new claims.
+			//Estimate - When the claimprocs are attached to a claim, their status is changed from Estimate to NotReceived or to PreAuth.
+			//CapComplete - Never attached to a claim, because the status is changed to CapClaim when attached to a claim.
+			//CapEstimate - Never attached to a claim, because the status is changed to CapComplete, then to CapClaim when attached to the claim.
+			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
+				if(ClaimProcsForClaim[i].Status==ClaimProcStatus.CapClaim 
+					|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Preauth) 
+				{
+					ClaimProcs.Delete(ClaimProcsForClaim[i]);
+				}
+				else {//All other claimprocs need to be detached from the claim.
+					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived
+						|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Received)//Can only happen if a user manually changed the claimproc status.
+					{
+						ClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;//Force it back to estimate so that it can be attached to a new claim.
+						ClaimProcsForClaim[i].InsPayEst=0;
+					}
+					ClaimProcsForClaim[i].ClaimNum=0;
+					ClaimProcs.Update(ClaimProcsForClaim[i]);
+				}
+			}
+			Claims.Delete(ClaimCur);//does not do any validation.  Also deletes the claimcanadian.
 		}
 
 	

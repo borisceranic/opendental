@@ -1342,6 +1342,23 @@ namespace OpenDentBusiness{
 			return PIn.Double(Db.GetScalar(command));
 		}
 
+		///<summary>Pass in a cached or potentially "stale" list of claim procs and this method will check the ClaimNum against the num stored in the database to make sure they still match.  Returns true if any of the claim procs are not pointing to the same claim.</summary>
+		public static bool IsAttachedToDifferentClaim(long procNum,List<ClaimProc> listClaimProcsFromCache) {
+			//No need to check RemotingRole; no call to db.
+			List<ClaimProc> listClaimProcsFromDB=RefreshForProc(procNum);
+			for(int i=0;i<listClaimProcsFromCache.Count;i++) {
+				for(int j=0;j<listClaimProcsFromDB.Count;j++) {
+					if(listClaimProcsFromCache[i].ClaimProcNum!=listClaimProcsFromDB[j].ClaimProcNum) {
+						continue;
+					}
+					if(listClaimProcsFromCache[i].ClaimNum!=listClaimProcsFromDB[j].ClaimNum) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
 
 	}
 
