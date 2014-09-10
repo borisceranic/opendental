@@ -68,23 +68,21 @@ namespace OpenDentBusiness{
 			return retVal;
 		}*/
 
-		///<summary>Returns header widths for list sorted in the same order as the columns appear in the DB. Uses cache.</summary>
+		///<summary>Returns header widths for list sorted in the same order as the columns appear in the DB.  Uses cache.</summary>
 		public static List<WikiListHeaderWidth> GetForList(string listName) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<WikiListHeaderWidth>>(MethodBase.GetCurrentMethod(),listName);
 			}
-			List<WikiListHeaderWidth> retVal = new List<WikiListHeaderWidth>();
-			string command="DESCRIBE wikilist_"+POut.String(listName);
-			DataTable tableListDescription=Db.GetTable(command);
-			for(int i=0;i<tableListDescription.Rows.Count;i++) {
+			List<WikiListHeaderWidth> retVal=new List<WikiListHeaderWidth>();
+			string command="DESCRIBE wikilist_"+POut.String(listName);//TODO: Oracle compatible?
+			DataTable tableDescripts=Db.GetTable(command);
+			for(int i=0;i<tableDescripts.Rows.Count;i++) {
 				for(int j=0;j<Listt.Count;j++) {
-					//Add WikiListHeaderWidth from tempList to retVal if it is the next row in listDescription.
-					if(tableListDescription.Rows[i][0].ToString()==Listt[j].ColName) {
+					if(tableDescripts.Rows[i][0].ToString()==Listt[j].ColName) {
 						retVal.Add(Listt[j]);
 						break;
 					}
 				}
-				//next description row.
 			}
 			return retVal;
 		}
@@ -166,6 +164,18 @@ namespace OpenDentBusiness{
 			RefreshCache();
 		}
 
+		public static List<WikiListHeaderWidth> GetFromListHist(WikiListHist wikiListHist) {
+			List<WikiListHeaderWidth> retVal=new List<WikiListHeaderWidth>();
+			string[] arrayHeaders=wikiListHist.ListHeaders.Split(';');
+			for(int i=0;i<arrayHeaders.Length;i++) {
+				WikiListHeaderWidth hw=new WikiListHeaderWidth();
+				hw.ListName=wikiListHist.ListName;
+				hw.ColName=arrayHeaders[i].Split(',')[0];
+				hw.ColWidth=PIn.Int(arrayHeaders[i].Split(',')[1]);
+				retVal.Add(hw);
+			}
+			return retVal;
+		}
 
 	}
 }

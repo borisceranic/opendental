@@ -25,20 +25,21 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWikiListEdit));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.textSearch = new System.Windows.Forms.TextBox();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.butHistory = new OpenDental.UI.Button();
+			this.butRenameList = new OpenDental.UI.Button();
+			this.butAddItem = new OpenDental.UI.Button();
+			this.butDelete = new OpenDental.UI.Button();
 			this.butColumnDelete = new OpenDental.UI.Button();
 			this.butHeaders = new OpenDental.UI.Button();
 			this.butColumnInsert = new OpenDental.UI.Button();
 			this.butColumnRight = new OpenDental.UI.Button();
 			this.butColumnLeft = new OpenDental.UI.Button();
-			this.butAddItem = new OpenDental.UI.Button();
-			this.butDelete = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.textSearch = new System.Windows.Forms.TextBox();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.butRenameList = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -52,12 +53,114 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.butColumnInsert);
 			this.groupBox1.Controls.Add(this.butColumnRight);
 			this.groupBox1.Controls.Add(this.butColumnLeft);
-			this.groupBox1.Location = new System.Drawing.Point(861, 84);
+			this.groupBox1.Location = new System.Drawing.Point(861, 114);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(87, 141);
 			this.groupBox1.TabIndex = 28;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Columns";
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(12, 9);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(120, 16);
+			this.label1.TabIndex = 38;
+			this.label1.Text = "Search";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textSearch
+			// 
+			this.textSearch.Location = new System.Drawing.Point(135, 6);
+			this.textSearch.Name = "textSearch";
+			this.textSearch.Size = new System.Drawing.Size(218, 20);
+			this.textSearch.TabIndex = 37;
+			this.textSearch.TextChanged += new System.EventHandler(this.textSearch_TextChanged);
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox2.Controls.Add(this.butAddItem);
+			this.groupBox2.Location = new System.Drawing.Point(861, 261);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(87, 51);
+			this.groupBox2.TabIndex = 35;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Rows";
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox3.Controls.Add(this.butHistory);
+			this.groupBox3.Controls.Add(this.butRenameList);
+			this.groupBox3.Location = new System.Drawing.Point(861, 27);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(87, 81);
+			this.groupBox3.TabIndex = 36;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "List";
+			// 
+			// butHistory
+			// 
+			this.butHistory.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butHistory.Autosize = true;
+			this.butHistory.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butHistory.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butHistory.CornerRadius = 4F;
+			this.butHistory.Location = new System.Drawing.Point(8, 49);
+			this.butHistory.Name = "butHistory";
+			this.butHistory.Size = new System.Drawing.Size(71, 24);
+			this.butHistory.TabIndex = 32;
+			this.butHistory.Text = "History";
+			this.butHistory.Click += new System.EventHandler(this.butHistory_Click);
+			// 
+			// butRenameList
+			// 
+			this.butRenameList.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRenameList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRenameList.Autosize = true;
+			this.butRenameList.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRenameList.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRenameList.CornerRadius = 4F;
+			this.butRenameList.Location = new System.Drawing.Point(8, 19);
+			this.butRenameList.Name = "butRenameList";
+			this.butRenameList.Size = new System.Drawing.Size(71, 24);
+			this.butRenameList.TabIndex = 31;
+			this.butRenameList.Text = "Rename";
+			this.butRenameList.Click += new System.EventHandler(this.butRenameList_Click);
+			// 
+			// butAddItem
+			// 
+			this.butAddItem.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAddItem.Autosize = true;
+			this.butAddItem.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddItem.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddItem.CornerRadius = 4F;
+			this.butAddItem.Location = new System.Drawing.Point(8, 19);
+			this.butAddItem.Name = "butAddItem";
+			this.butAddItem.Size = new System.Drawing.Size(71, 24);
+			this.butAddItem.TabIndex = 31;
+			this.butAddItem.Text = "Add";
+			this.butAddItem.Click += new System.EventHandler(this.butAddItem_Click);
+			// 
+			// butDelete
+			// 
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(12, 589);
+			this.butDelete.Name = "butDelete";
+			this.butDelete.Size = new System.Drawing.Size(75, 24);
+			this.butDelete.TabIndex = 36;
+			this.butDelete.Text = "Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// butColumnDelete
 			// 
@@ -129,38 +232,6 @@ namespace OpenDental{
 			this.butColumnLeft.Text = "L";
 			this.butColumnLeft.Click += new System.EventHandler(this.butColumnLeft_Click);
 			// 
-			// butAddItem
-			// 
-			this.butAddItem.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAddItem.Autosize = true;
-			this.butAddItem.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAddItem.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAddItem.CornerRadius = 4F;
-			this.butAddItem.Location = new System.Drawing.Point(8, 19);
-			this.butAddItem.Name = "butAddItem";
-			this.butAddItem.Size = new System.Drawing.Size(71, 24);
-			this.butAddItem.TabIndex = 31;
-			this.butAddItem.Text = "Add";
-			this.butAddItem.Click += new System.EventHandler(this.butAddItem_Click);
-			// 
-			// butDelete
-			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Autosize = true;
-			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDelete.CornerRadius = 4F;
-			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
-			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 589);
-			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 36;
-			this.butDelete.Text = "Delete";
-			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
-			// 
 			// gridMain
 			// 
 			this.gridMain.AllowSortingByColumn = true;
@@ -195,60 +266,6 @@ namespace OpenDental{
 			this.butClose.TabIndex = 20;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
-			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(12, 9);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(120, 16);
-			this.label1.TabIndex = 38;
-			this.label1.Text = "Search";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// textSearch
-			// 
-			this.textSearch.Location = new System.Drawing.Point(135, 6);
-			this.textSearch.Name = "textSearch";
-			this.textSearch.Size = new System.Drawing.Size(218, 20);
-			this.textSearch.TabIndex = 37;
-			this.textSearch.TextChanged += new System.EventHandler(this.textSearch_TextChanged);
-			// 
-			// groupBox2
-			// 
-			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox2.Controls.Add(this.butAddItem);
-			this.groupBox2.Location = new System.Drawing.Point(861, 231);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(87, 51);
-			this.groupBox2.TabIndex = 35;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Rows";
-			// 
-			// groupBox3
-			// 
-			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox3.Controls.Add(this.butRenameList);
-			this.groupBox3.Location = new System.Drawing.Point(861, 27);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(87, 51);
-			this.groupBox3.TabIndex = 36;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "List";
-			// 
-			// butRenameList
-			// 
-			this.butRenameList.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRenameList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butRenameList.Autosize = true;
-			this.butRenameList.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRenameList.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRenameList.CornerRadius = 4F;
-			this.butRenameList.Location = new System.Drawing.Point(8, 19);
-			this.butRenameList.Name = "butRenameList";
-			this.butRenameList.Size = new System.Drawing.Size(71, 24);
-			this.butRenameList.TabIndex = 31;
-			this.butRenameList.Text = "Rename";
-			this.butRenameList.Click += new System.EventHandler(this.butRenameList_Click);
 			// 
 			// FormWikiListEdit
 			// 
@@ -293,6 +310,7 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private UI.Button butRenameList;
+		private UI.Button butHistory;
 
 
 	}

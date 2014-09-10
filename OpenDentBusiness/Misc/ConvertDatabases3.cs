@@ -6173,6 +6173,37 @@ namespace OpenDentBusiness {
 				//oracle compatible
 				command="ALTER TABLE patient DROP COLUMN Race";
 				Db.NonQ(command);
+				//				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS wikilisthist";
+					Db.NonQ(command);
+					command=@"CREATE TABLE wikilisthist (
+						WikiListHistNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNum bigint NOT NULL,
+						ListName varchar(255) NOT NULL,
+						ListHeaders text NOT NULL,
+						ListContent mediumtext NOT NULL,
+						DateTimeSaved datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						INDEX(UserNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE wikilisthist'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE wikilisthist (
+						WikiListHistNum number(20) NOT NULL,
+						UserNum number(20) NOT NULL,
+						ListName varchar2(255),
+						ListHeaders varchar2(4000),
+						ListContent clob,
+						DateTimeSaved date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CONSTRAINT wikilisthist_WikiListHistNum PRIMARY KEY (WikiListHistNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX wikilisthist_UserNum ON wikilisthist (UserNum)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

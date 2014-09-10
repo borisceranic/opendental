@@ -17,7 +17,9 @@ namespace OpenDental {
 		///<summary>Name of the wiki list being manipulated. This does not include the "wikilist" prefix. i.e. "networkdevices" not "wikilistnetworkdevices"</summary>
 		public string WikiListCurName;
 		public bool IsNew;
-		private DataTable Table;
+		private DataTable _table;
+		private WikiListHist _wikiListOld;
+		private bool _isEdited;
 
 		public FormWikiListEdit() {
 			InitializeComponent();
@@ -29,7 +31,11 @@ namespace OpenDental {
 				IsNew=true;
 				WikiLists.CreateNewWikiList(WikiListCurName);
 			}
-			Table=WikiLists.GetByName(WikiListCurName);
+			_table=WikiLists.GetByName(WikiListCurName);
+			_wikiListOld=WikiListHists.GenerateFromName(WikiListCurName);
+			if(_wikiListOld==null) {
+				_wikiListOld=new WikiListHist();
+			}
 			FillGrid();
 			ActiveControl=textSearch;//start in search box.
 		}
@@ -40,23 +46,23 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			for(int c=0;c<Table.Columns.Count;c++){
+			for(int c=0;c<_table.Columns.Count;c++){
 				int colWidth = 100;//100 = default value in case something is malformed in the database.
 				foreach(WikiListHeaderWidth colHead in colHeaderWidths) {
-					if(colHead.ColName==Table.Columns[c].ColumnName) {
+					if(colHead.ColName==_table.Columns[c].ColumnName) {
 						colWidth=colHead.ColWidth;
 						break;
 					}
 				}
-				col=new ODGridColumn(Table.Columns[c].ColumnName,colWidth,false);
+				col=new ODGridColumn(_table.Columns[c].ColumnName,colWidth,false);
 				gridMain.Columns.Add(col);
 			}
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<Table.Rows.Count;i++){
+			for(int i=0;i<_table.Rows.Count;i++){
 				row=new ODGridRow();
-				for(int c=0;c<Table.Columns.Count;c++) {
-					row.Cells.Add(Table.Rows[i][c].ToString());
+				for(int c=0;c<_table.Columns.Count;c++) {
+					row.Cells.Add(_table.Rows[i][c].ToString());
 				}
 				gridMain.Rows.Add(row);
 				gridMain.Rows[i].Tag=i;
@@ -68,13 +74,14 @@ namespace OpenDental {
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
 			FormWikiListItemEdit FormWLIE = new FormWikiListItemEdit();
 			FormWLIE.WikiListCurName=WikiListCurName;
-			FormWLIE.ItemNum=PIn.Long(Table.Rows[(int)gridMain.Rows[e.Row].Tag][0].ToString());
+			FormWLIE.ItemNum=PIn.Long(_table.Rows[(int)gridMain.Rows[e.Row].Tag][0].ToString());
 			FormWLIE.ShowDialog();
 			//saving occurs from within the form.
 			if(FormWLIE.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			Table=WikiLists.GetByName(WikiListCurName);
+			SetIsEdited();
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 		}
 
@@ -113,10 +120,11 @@ namespace OpenDental {
 			if(gridMain.SelectedCell.X==-1){
 				return;
 			}
+			SetIsEdited();
 			Point pointNewSelectedCell=gridMain.SelectedCell;
 			pointNewSelectedCell.X=Math.Max(1,pointNewSelectedCell.X-1);
-			WikiLists.ShiftColumnLeft(WikiListCurName,Table.Columns[gridMain.SelectedCell.X].ColumnName);
-			Table=WikiLists.GetByName(WikiListCurName);
+			WikiLists.ShiftColumnLeft(WikiListCurName,_table.Columns[gridMain.SelectedCell.X].ColumnName);
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 			gridMain.SetSelected(pointNewSelectedCell);
 		}
@@ -128,10 +136,11 @@ namespace OpenDental {
 			if(gridMain.SelectedCell.X==-1) {
 				return;
 			}
+			SetIsEdited();
 			Point pointNewSelectedCell=gridMain.SelectedCell;
 			pointNewSelectedCell.X=Math.Min(gridMain.Columns.Count-1,pointNewSelectedCell.X+1);
-			WikiLists.ShiftColumnRight(WikiListCurName,Table.Columns[gridMain.SelectedCell.X].ColumnName);
-			Table=WikiLists.GetByName(WikiListCurName);
+			WikiLists.ShiftColumnRight(WikiListCurName,_table.Columns[gridMain.SelectedCell.X].ColumnName);
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 			gridMain.SetSelected(pointNewSelectedCell);
 		}
@@ -146,7 +155,8 @@ namespace OpenDental {
 			if(FormWLH.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			Table=WikiLists.GetByName(WikiListCurName);
+			SetIsEdited();
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 		}
 
@@ -154,8 +164,9 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.WikiListSetup)) {//gives a message box if no permission
 				return;
 			}
+			SetIsEdited();
 			WikiLists.AddColumn(WikiListCurName);
-			Table=WikiLists.GetByName(WikiListCurName);
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 		}
 
@@ -167,12 +178,13 @@ namespace OpenDental {
 				MsgBox.Show(this,"Select cell in column to be deleted first.");
 				return;
 			}
-			if(!WikiLists.CheckColumnEmpty(WikiListCurName,Table.Columns[gridMain.SelectedCell.X].ColumnName)){
+			if(!WikiLists.CheckColumnEmpty(WikiListCurName,_table.Columns[gridMain.SelectedCell.X].ColumnName)){
 				MsgBox.Show(this,"Column cannot be deleted because it conatins data.");
 				return;
 			}
-			WikiLists.DeleteColumn(WikiListCurName,Table.Columns[gridMain.SelectedCell.X].ColumnName);
-			Table=WikiLists.GetByName(WikiListCurName);
+			SetIsEdited();
+			WikiLists.DeleteColumn(WikiListCurName,_table.Columns[gridMain.SelectedCell.X].ColumnName);
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 		}
 
@@ -185,7 +197,8 @@ namespace OpenDental {
 				WikiLists.DeleteItem(FormWLIE.WikiListCurName,FormWLIE.ItemNum);//delete new item because dialog was not OK'ed.
 				return;
 			}
-			Table=WikiLists.GetByName(WikiListCurName);
+			SetIsEdited();
+			_table=WikiLists.GetByName(WikiListCurName);
 			FillGrid();
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				if(gridMain.Rows[i].Cells[0].Text==FormWLIE.ItemNum.ToString()) {
@@ -241,13 +254,24 @@ namespace OpenDental {
 			}
 			try {
 				WikiLists.Rename(WikiListCurName,inputListName.textResult.Text);
+				SetIsEdited();
+				WikiListHists.Rename(WikiListCurName,inputListName.textResult.Text);
 				WikiListCurName=inputListName.textResult.Text;
-				Table=WikiLists.GetByName(WikiListCurName);
+				_table=WikiLists.GetByName(WikiListCurName);
 				FillGrid();
 			}
 			catch(Exception ex) {
 				MessageBox.Show(this,ex.Message);
 			}
+		}
+
+		///<summary>Set the _isEdited bool to true and saves a copy of the list. This only happens once. This prevents spamming of updates.</summary>
+		private void SetIsEdited() {
+			if(_isEdited || IsNew) {//Dont save a wikiListHist entry if this is a new list, or we have already saved an entry prior to a previous edit.
+				return;
+			}
+			_wikiListOld.WikiListHistNum=WikiListHists.Insert(_wikiListOld);
+			_isEdited=true;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -261,9 +285,25 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete this entire list and all references to it?")) {
 				return;
 			}
+			SetIsEdited();
 			WikiLists.DeleteList(WikiListCurName);
 			//Someday, if we have links to lists, then this is where we would update all the wikipages containing those links.  Remove links to data that was contained in the table.
 			DialogResult=DialogResult.OK;
+		}
+
+		private void butHistory_Click(object sender,EventArgs e) {
+			FormWikiListHistory FormWLH=new FormWikiListHistory();
+			FormWLH.ListNameCur=WikiListCurName;
+			FormWLH.ShowDialog();
+			if(!FormWLH.IsReverted) {
+				return;
+			}
+			//Reversion has already saved a copy of the current revision.
+			_wikiListOld=WikiListHists.GenerateFromName(WikiListCurName);
+			_table=WikiLists.GetByName(WikiListCurName);
+			FillGrid();
+			_isEdited=false;
+			IsNew=false;
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
