@@ -69,7 +69,7 @@ namespace OpenDental {
 					//	continue;
 					//}
 					transCheck=XChargeTransactions.GetOneByBatchItem(trans.BatchNum,trans.ItemNum);
-					if(transCheck!=null && trans.Result!="AP DUPE" && trans.TransType!="CCVoid") {
+					if(transCheck!=null && trans.Result!="AP DUPE") {
 						XChargeTransactions.Delete(transCheck.XChargeTransactionNum);
 						XChargeTransactions.Insert(trans);
 					}
@@ -86,7 +86,7 @@ namespace OpenDental {
 		private void butViewImported_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,CASE WHEN ResultCode=0 THEN Amount ELSE Amount=0 END AS Amount "
+			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,CASE WHEN ResultCode='000' OR ResultCode='010' THEN Amount ELSE Amount=0 END AS Amount "
 				+"FROM xchargetransaction "
 				+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart);
 			FormQuery FormQuery2=new FormQuery(report);
