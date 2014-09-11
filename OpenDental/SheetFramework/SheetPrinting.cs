@@ -64,6 +64,9 @@ namespace OpenDental {
 				printPreview.ShowDialog();
 			#else
 				try {
+					foreach(Sheet s in _sheetList) {
+						s.SheetFields.Sort(OpenDentBusiness.SheetFields.SortDrawingOrder);
+					}
 					if(!PrinterL.SetPrinter(pd,sit,0,"Batch of "+sheetBatch[0].Description+" printed")) {
 						return;
 					}
@@ -74,7 +77,7 @@ namespace OpenDental {
 					throw ex;
 					//MessageBox.Show(Lan.g("Sheet","Printer not available"));
 				}
-			#endif
+#endif
 		}
 
 		public static void PrintRx(Sheet sheet,bool isControlled){
