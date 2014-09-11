@@ -5980,11 +5980,18 @@ namespace OpenDentBusiness {
 				string command;
 				//adding EmailNotifyAddressNum preference
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('EmailNotifyAddressNum','"+PrefC.GetLong(PrefName.EmailDefaultAddressNum)+"')";
+					command="SELECT ValueString FROM preference WHERE PrefName='EmailDefaultAddressNum' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ValueString FROM preference WHERE PrefName='EmailDefaultAddressNum') WHERE RowNum<=1";
+				}
+				long emailDefaultAddressNum=PIn.Long(Db.GetScalar(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('EmailNotifyAddressNum','"+POut.Long(emailDefaultAddressNum)+"')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'EmailNotifyAddressNum','"+PrefC.GetLong(PrefName.EmailDefaultAddressNum)+"')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'EmailNotifyAddressNum','"+POut.Long(emailDefaultAddressNum)+"')";
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '14.3.4.0' WHERE PrefName = 'DataBaseVersion'";
