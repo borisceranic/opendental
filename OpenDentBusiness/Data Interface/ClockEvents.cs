@@ -370,7 +370,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),startDate,stopDate);
 			}
 			//Construct empty table------------------------------------------------------------------------------------------------------------------------
-			DataTable retVal=new DataTable();
+			DataTable retVal=new DataTable("TimeCardManage");
 			retVal.Columns.Add("PayrollID");
 			retVal.Columns.Add("EmployeeNum");
 			retVal.Columns.Add("firstName");
