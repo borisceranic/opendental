@@ -989,7 +989,10 @@ namespace OpenDental{
 		private void FormSecurity_FormClosing(object sender,FormClosingEventArgs e) {
 			if(textLogOffAfterMinutes.Text!="") {
 				try {
-					Int32.Parse(textLogOffAfterMinutes.Text);
+					int logOffMinutes=Int32.Parse(textLogOffAfterMinutes.Text);
+					if(logOffMinutes<0) {//Automatic log off must be a positive numerical value.
+						throw new Exception();
+					}
 				}
 				catch {
 					MsgBox.Show(this,"Log off after minutes is invalid.");
