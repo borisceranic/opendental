@@ -1294,54 +1294,6 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
-		public static string ClaimProcWithInvalidClaimNum(bool verbose,bool isCheck) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
-			}
-			string log="";
-			if(isCheck){
-				command="SELECT COUNT(*) FROM claimproc WHERE claimproc.ClaimNum!=0 "
-				  +"AND NOT EXISTS(SELECT * FROM claim WHERE claim.ClaimNum=claimproc.ClaimNum) "
-					+"AND (claimproc.InsPayAmt!=0 OR claimproc.WriteOff!=0)";
-				int numFound=PIn.Int(Db.GetCount(command));
-				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claimprocs found with invalid ClaimNum: ")+numFound+"\r\n";
-				}
-			}
-			else{//fix
-				//We can't touch those claimprocs because it would mess up the accounting.
- 				//We will create dummy claims for all claimprocs with invalid ClaimNums if those claimprocs have amounts entered in the InsPayAmt or Writeoff columns, otherwise you could not delete the procedure or create a new claim
-				command="SELECT * FROM claimproc WHERE claimproc.ClaimNum!=0 "
-				  +"AND NOT EXISTS(SELECT * FROM claim WHERE claim.ClaimNum=claimproc.ClaimNum) "
-					+"AND (claimproc.InsPayAmt!=0 OR claimproc.WriteOff!=0) "
-					+"GROUP BY claimproc.ClaimNum";
-				table=Db.GetTable(command);
-				List<ClaimProc> cpList=Crud.ClaimProcCrud.TableToList(table);
-				Claim claim;
-				for(int i=0;i<cpList.Count;i++) {
-					claim=new Claim();
-					claim.ClaimNum=cpList[i].ClaimNum;
-					claim.PatNum=cpList[i].PatNum;
-					claim.ClinicNum=cpList[i].ClinicNum;
-					if(cpList[i].Status==ClaimProcStatus.Received) {
-						claim.ClaimStatus="R";//Status received because we know it's been paid on and the claimproc status is received
-					}
-					else {
-						claim.ClaimStatus="W";
-					}
-					claim.PlanNum=cpList[i].PlanNum;
-					claim.InsSubNum=cpList[i].InsSubNum;
-					claim.ProvTreat=cpList[i].ProvNum;
-					Crud.ClaimCrud.Insert(claim,true);//Allows us to use a primary key that was "used".
-					Patient pat=Patients.GetLim(claim.PatNum);
-					log+=Lans.g("FormDatabaseMaintenance","Claim created due to claimprocs with invalid ClaimNums for patient: ")
-						+pat.PatNum+" - "+Patients.GetNameFL(pat.LName,pat.FName,pat.Preferred,pat.MiddleI)+"\r\n";
-				}
-			}
-			return log;
-		}
-
-		[DbmMethod]
 		public static string ClaimProcDeleteDuplicateEstimateForSameInsPlan(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1684,6 +1636,88 @@ namespace OpenDentBusiness {
 						+" FeeBilled: "+PIn.Double(table.Rows[i]["FeeBilled"].ToString()).ToString("F")+"\r\n";
 				}
 				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string ClaimProcTotalPaymentWithInvalidDate(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT ClaimProcNum FROM claimproc,claim"
+				+" WHERE claimproc.ProcNum=0"//Total payments
+				+" AND claimproc.ProcDate < "+POut.Date(new DateTime(1880,1,1))//which have invalid dates
+				+" AND claimproc.ClaimNum=claim.ClaimNum"
+				+" AND claim.DateService > "+POut.Date(new DateTime(1880,1,1));//but have valid date of service on the claim
+			table=Db.GetTable(command);
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Total claim payments with invalid date found")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			else {
+				if(table.Rows.Count>0) {
+					command="UPDATE claimproc,claim SET claimproc.ProcDate=claim.DateService"//Resets date for total payments to DateService
+						+" WHERE claimproc.ProcNum=0"//Total payments
+						+" AND claimproc.ProcDate < "+POut.Date(new DateTime(1880,1,1))//which have invalid dates
+						+" AND claimproc.ClaimNum=claim.ClaimNum"
+						+" AND claim.DateService > "+POut.Date(new DateTime(1880,1,1));//but have valid date of service on the claim
+					Db.NonQ(command);
+				}
+				int numberFixed=table.Rows.Count;
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Total claim payments with invalid date fixed")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string ClaimProcWithInvalidClaimNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM claimproc WHERE claimproc.ClaimNum!=0 "
+				  +"AND NOT EXISTS(SELECT * FROM claim WHERE claim.ClaimNum=claimproc.ClaimNum) "
+					+"AND (claimproc.InsPayAmt!=0 OR claimproc.WriteOff!=0)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Claimprocs found with invalid ClaimNum: ")+numFound+"\r\n";
+				}
+			}
+			else {//fix
+				//We can't touch those claimprocs because it would mess up the accounting.
+				//We will create dummy claims for all claimprocs with invalid ClaimNums if those claimprocs have amounts entered in the InsPayAmt or Writeoff columns, otherwise you could not delete the procedure or create a new claim
+				command="SELECT * FROM claimproc WHERE claimproc.ClaimNum!=0 "
+				  +"AND NOT EXISTS(SELECT * FROM claim WHERE claim.ClaimNum=claimproc.ClaimNum) "
+					+"AND (claimproc.InsPayAmt!=0 OR claimproc.WriteOff!=0) "
+					+"GROUP BY claimproc.ClaimNum";
+				table=Db.GetTable(command);
+				List<ClaimProc> cpList=Crud.ClaimProcCrud.TableToList(table);
+				Claim claim;
+				for(int i=0;i<cpList.Count;i++) {
+					claim=new Claim();
+					claim.ClaimNum=cpList[i].ClaimNum;
+					claim.PatNum=cpList[i].PatNum;
+					claim.ClinicNum=cpList[i].ClinicNum;
+					if(cpList[i].Status==ClaimProcStatus.Received) {
+						claim.ClaimStatus="R";//Status received because we know it's been paid on and the claimproc status is received
+					}
+					else {
+						claim.ClaimStatus="W";
+					}
+					claim.PlanNum=cpList[i].PlanNum;
+					claim.InsSubNum=cpList[i].InsSubNum;
+					claim.ProvTreat=cpList[i].ProvNum;
+					Crud.ClaimCrud.Insert(claim,true);//Allows us to use a primary key that was "used".
+					Patient pat=Patients.GetLim(claim.PatNum);
+					log+=Lans.g("FormDatabaseMaintenance","Claim created due to claimprocs with invalid ClaimNums for patient: ")
+						+pat.PatNum+" - "+Patients.GetNameFL(pat.LName,pat.FName,pat.Preferred,pat.MiddleI)+"\r\n";
+				}
 			}
 			return log;
 		}
