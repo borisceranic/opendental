@@ -2701,6 +2701,7 @@ namespace OpenDental {
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0){
+					OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 					ModuleSelected(FormPayPlan2.GotoPatNum,false);
 					return;
 				}
@@ -2716,6 +2717,7 @@ namespace OpenDental {
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0) {
+					OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 					ModuleSelected(FormPayPlan2.GotoPatNum,false);
 					return;
 				}
@@ -3419,7 +3421,8 @@ namespace OpenDental {
 			FormPP.TotalAmt=PatCur.EstBalance;
 			FormPP.IsNew=true;
 			FormPP.ShowDialog();
-			if(FormPP.GotoPatNum!=0){
+			if(FormPP.GotoPatNum!=0) {
+				OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 				ModuleSelected(FormPP.GotoPatNum);//switches to other patient.
 			}
 			else{
