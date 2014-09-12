@@ -30,10 +30,13 @@ namespace OpenDentBusiness{
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 
-		///<summary>Get a list of all EhrProvKeys for a provider matching the given first and last name.  Ordered by year value.</summary>
+		///<summary>Get a list of all EhrProvKeys for a provider matching the given first and last name.  Ordered by year value.  Returns empty list if lName or fName is empty.</summary>
 		public static List<EhrProvKey> GetKeysByFLName(string lName, string fName) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod(),lName,fName);
+			}
+			if(lName.Trim()=="" || fName.Trim()=="") {
+				return new List<EhrProvKey>();
 			}
 			string command="SELECT ehrprovkey.* FROM ehrprovkey"
 			+" WHERE ehrprovkey.LName='"+POut.String(lName)
