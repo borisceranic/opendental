@@ -932,7 +932,12 @@ namespace OpenDental{
 						}
 						break;
 					case "IsStudent":
-						if(PatCur.StudentStatus=="P" || PatCur.StudentStatus=="F") {
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")//Canadian. en-CA or fr-CA
+							&& (PatCur.CanadianEligibilityCode=='1' || PatCur.CanadianEligibilityCode=='3'))//Patient is a student
+						{
+							displayStrings[i]="X";
+						}
+						else if(PatCur.StudentStatus=="P" || PatCur.StudentStatus=="F") {
 							displayStrings[i]="X";
 						}
 						break;
