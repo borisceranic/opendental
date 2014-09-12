@@ -1689,6 +1689,40 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string ClaimProcTotalPaymentWithInvalidDate(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT ClaimProcNum FROM claimproc,claim"
+				+" WHERE claimproc.ProcNum=0"
+				+" AND claimproc.ProcDate < "+POut.Date(new DateTime(1880,1,1))
+				+" AND claimproc.ClaimNum=claim.ClaimNum"
+				+" AND claim.DateService > "+POut.Date(new DateTime(1880,1,1));
+			table=Db.GetTable(command);
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Total claim payments with invalid date found")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			else {
+				if(table.Rows.Count>0) {
+					command="UPDATE claimproc,claim SET claimproc.ProcDate=claim.DateService"//Resets date for total payments to DateService
+						+" WHERE claimproc.ProcNum=0"//Total payments
+						+" AND claimproc.ProcDate < "+POut.Date(new DateTime(1880,1,1))//which have invalid dates
+						+" AND claimproc.ClaimNum=claim.ClaimNum"
+						+" AND claim.DateService > "+POut.Date(new DateTime(1880,1,1));//but have valid date of service on the claim
+					Db.NonQ(command);
+				}
+				int numberFixed=table.Rows.Count;
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Total claim payments with invalid date fixed")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ClaimProcWithInvalidClaimPaymentNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
