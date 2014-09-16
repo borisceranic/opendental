@@ -2286,7 +2286,6 @@ namespace OpenDental {
 			gridComm.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
 			DataTable table = DataSetMain.Tables["Commlog"];
-//TODO: transition this to using the Tag object.
 			for(int i=0;i<table.Rows.Count;i++) {
 				//Skip commlog entries which belong to other family members per user option.
 				if(!this.checkShowFamilyComm.Checked										//show family not checked
@@ -2314,6 +2313,7 @@ namespace OpenDental {
 				row.Cells.Add(table.Rows[i]["mode"].ToString());
 				//row.Cells.Add(table.Rows[i]["sentOrReceived"].ToString());
 				row.Cells.Add(table.Rows[i]["Note"].ToString());
+				row.Tag=i;
 				gridComm.Rows.Add(row);
 			}
 			gridComm.EndUpdate();
@@ -4049,22 +4049,7 @@ namespace OpenDental {
 		}
 
 		private void gridComm_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
-			//TODO: transition this to checking the Tag object.
-			int row=e.Row;
-			if(!this.checkShowFamilyComm.Checked) {//if only showing entries for one patient instead of intermingled family entries
-				int i;
-				for(row=0,i=0;row<DataSetMain.Tables["Commlog"].Rows.Count;row++) {
-					//Matching FName is not perfect because children can have the same names as parents.
-					//But it does currently match the logic for display, so it will at least select the right row when double clicked.
-					if(DataSetMain.Tables["Commlog"].Rows[row]["patName"].ToString()==PatCur.FName
-						|| DataSetMain.Tables["Commlog"].Rows[row]["patName"].ToString()=="") {
-						if(i==e.Row) {
-							break;
-						}
-						i++;
-					}
-				}
-			}
+			int row=(int)gridComm.Rows[e.Row].Tag;
 			if(DataSetMain.Tables["Commlog"].Rows[row]["CommlogNum"].ToString()!="0") {
 				Commlog CommlogCur=
 					Commlogs.GetOne(PIn.Long(DataSetMain.Tables["Commlog"].Rows[row]["CommlogNum"].ToString()));
