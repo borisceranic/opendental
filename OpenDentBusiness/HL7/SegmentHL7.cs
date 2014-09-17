@@ -112,9 +112,9 @@ namespace OpenDentBusiness.HL7 {
 			return Fields[indexPos].FullText;
 		}
 
-		///<summary>Really just a handy shortcut.  Identical to getting component 0 or to GetFieldFullText.</summary>
+		///<summary>Really just a handy shortcut.  Identical to getting component 0 or to GetFieldFullText if there is only one component.</summary>
 		public string GetFieldComponent(int fieldIndex) {
-			return GetFieldFullText(fieldIndex);
+			return GetFieldComponent(fieldIndex,0);
 		}
 
 		public string GetFieldComponent(int fieldIndex,int componentIndex) {

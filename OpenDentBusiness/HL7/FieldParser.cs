@@ -64,32 +64,32 @@ namespace OpenDentBusiness.HL7 {
 
 		public static PatientPosition MaritalStatusParse(string str) {
 			switch(str.ToLower()) {
-				case "single":
-				case "s"://Single
-				case "unknown":
-				case "u"://Unknown
-				case "partner":
-				case "p"://Domestic partner
-				case "g"://Living together
-				case "r"://Registered domestic partner
 				case "b"://Unmarried
+				case "g"://Living together
+				case "n"://Annulled
 				case "o"://Other
+				case "p"://Domestic partner
+				case "partner":
+				case "r"://Registered domestic partner
+				case "s"://Single
+				case "single":
 				case "t"://Unreported
+				case "u"://Unknown
+				case "unknown":
 					return PatientPosition.Single;
-				case "married":
-				case "m"://Married
-				case "legally separated":
-				case "e"://Legally Separated
 				case "a"://Separated
 				case "c"://Common law
+				case "e"://Legally Separated
 				case "i"://Interlocutory (divorce is not yet final)
+				case "legally separated":
+				case "m"://Married
+				case "married":
 					return PatientPosition.Married;
-				case "divorced":
 				case "d"://Divorced
-				case "n"://Annulled
+				case "divorced":
 					return PatientPosition.Divorced;
-				case "widowed":
 				case "w"://Widowed
+				case "widowed":
 					return PatientPosition.Widowed;
 				default:
 					return PatientPosition.Single;

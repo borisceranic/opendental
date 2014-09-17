@@ -1197,8 +1197,8 @@ namespace OpenDentBusiness.HL7 {
 				return;
 			}
 			//set msg.AckCode to value in position located in def of ackcode in seg
-			msg.AckCode=seg.Fields[ackCodeOrder].ToString();
-			msg.ControlId=seg.Fields[msgControlIdOrder].ToString();
+			msg.AckCode=seg.GetFieldComponent(ackCodeOrder).ToString();
+			msg.ControlId=seg.GetFieldComponent(msgControlIdOrder).ToString();
 		}
 
 		public static void ProcessMSH(HL7DefSegment segDef,SegmentHL7 seg,MessageHL7 msg) {
@@ -1213,7 +1213,7 @@ namespace OpenDentBusiness.HL7 {
 			if(msgControlIdOrder==0) {
 				return;
 			}
-			msg.ControlId=seg.GetFieldComponent(msgControlIdOrder,0).ToString();
+			msg.ControlId=seg.GetFieldComponent(msgControlIdOrder).ToString();
 		}
 		
 		///<summary>So far this is only used in SRM messages and saves data to the appointment note field.  If apt is null this does nothing.  The note in the NTE segment will be appended to the existing appointment note unless the existing note already contains the exact note we are attempting to append.</summary>
@@ -2039,7 +2039,7 @@ namespace OpenDentBusiness.HL7 {
 				switch(segDef.hl7DefFields[i].FieldName) {
 					case "apt.AptNum":
 						try {
-							aptNum=PIn.Long(seg.GetFieldComponent(itemOrder,0));
+							aptNum=PIn.Long(seg.GetFieldComponent(itemOrder));
 						}
 						catch(Exception ex) {
 							//do nothing, aptNum will remain 0
@@ -2154,20 +2154,15 @@ namespace OpenDentBusiness.HL7 {
 			return checkDigitCalc;
 		}
 
-		///<summary>This uses the Mod11 check digit algorithm to calculate and return the checkDigit for the supplied objectID.
-		///<para>(see \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02A_DataTypes_M4_JAN2007.doc page 23)</para>
+		///<summary>This uses the Mod10 check digit algorithm to calculate and return the checkDigit for the supplied objectId.
+		///<para>(see \\SERVERFILES\storage\OPEN DENTAL\Programmers Documents\Standards (X12, ADA, etc)\HL7\Version2.6\V26_CH02A_DataTypes_M4_JAN2007.doc page 22)</para>
 		///<para>If objectId is an empty string, this will return -1.</para>
 		///<para>Returns the calculated check digit to compare to check digit received or use in constructing a message.</para>
-		///<para>M11 algorithm: d	=	digit of number starting from units digit, followed by 10’s position, followed by 100’s position, etc.</para>
-		///<para>w	=	weight of digit position starting with the units position, followed by 10’s position, followed by 100’s position etc.</para>
-		///<para>Values for w = 2,3,4,5,6,7,2,3,4,5,6,7,etc. (repeats for each group of 6 digits)</para>
-		///<para>c	=	check digit</para>
-		///<para>(Step 1) m = sum of (d*w) starting at units position for d=digit value starting with units position to highest order,</para>
-		///<para>for w=weight value from 2 to 7 for every 6 positions starting with units digit</para>
-		///<para>(Step 2) c1 = m mod 11</para>
-		///<para>(Step 3) if c1 = 0 then c1 = 1</para>
-		///<para>(Step 4) c = (11 - c1) mod 10</para>
-		///<para>Example: 1234567, check digit is 4; m=(7*2)+(6*3)+(5*4)+(4*5)+(3*6)+(2*7)+(1*2)=106; 106 mod 11=7; (11-7) mod 10=4.</para></summary>
+		///<para>M10 algorithm: (Step 1) Take the odd positioned digits starting from the right and append them into a single number.</para>
+		///<para>(Step 2) Multiply value from step 1 by 2.</para>
+		///<para>(Step 3) Take the even digit positions starting from the right (of the original number) and prepend these to the value from step 2.</para>
+		///<para>(Step 4) Add all of the digits together and subtract the total from the next highest multiple of 10.  If it is a multiple of 10, check digit is 0.</para>
+		///<para>Example: 12345, check digit is 5; Step 1: 531; Step 2: 531*2=1062; Step 3: 421062; Step 4: 4+2+1+0+6+2=15; 20-15=5.</para></summary>
 		public static int M10CheckDigit(string objectId) {
 			if(objectId=="") {
 				return -1;

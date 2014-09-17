@@ -323,25 +323,33 @@ namespace OpenDentHL7 {
 					}
 					//the main receive thread will wait for OnDataReceived to set the manual reset event receiveDone before accepting any new connections
 					//if the receiveDone waits for 20 minutes and there is no reset event set, shutdown the socket and accept a new connection
-					socketIncomingHandler.Shutdown(SocketShutdown.Both);
-					_ecwTCPModeIsReceiving=false;
+					try {
+						socketIncomingHandler.Shutdown(SocketShutdown.Both);
+					}
+					catch {
+						//Do nothing if the shutdown command fails, just begin accepting incoming connection attempts again.
+					}
 					socketIncomingHandler.Close();
 				}
 				if(IsVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","The manual reset event has been set.  The main receive thread is now accepting new connections.",EventLogEntryType.Information);
 				}
 				//the main socket is now free to wait for another connection.
+				_ecwTCPModeIsReceiving=false;
 				_socketIncomingMain.BeginAccept(new AsyncCallback(OnConnectionAccepted),_socketIncomingMain);
 			}
 			catch(ObjectDisposedException ex) {
-				EventLog.WriteEntry("OpenDentHL7","Error in OnConnectionAccepted.  Attempting to call CreateIncomingTcpListener again.\r\nException: "+ex.Message,EventLogEntryType.Warning);
+				EventLog.WriteEntry("OpenDentHL7","Error in OnConnectionAccepted.  Attempting to call CreateIncomingTcpListener again.\r\nException: "+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Warning);
 				//Socket has been closed.  Try to start over.
+				_socketIncomingMain.Close();
+				_ecwTCPModeIsReceiving=false;
 				CreateIncomingTcpListener();//If this fails, service stops running
 			}
 			catch(Exception ex) {
-				//not sure what went wrong.
-				EventLog.WriteEntry("OpenDentHL7","Error in OnConnectionAccpeted:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Error);
-				throw;//service will stop working at this point.
+				EventLog.WriteEntry("OpenDentHL7","Error in OnConnectionAccpeted:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Warning);
+				_socketIncomingMain.Close();
+				_ecwTCPModeIsReceiving=false;
+				CreateIncomingTcpListener();//If this fails, service stops running
 			}
 		}
 
@@ -436,7 +444,7 @@ namespace OpenDentHL7 {
 					catch(Exception ex) {
 						_ecwTCPModeIsReceiving=false;
 						socketIncomingHandler.Close();
-						throw new Exception("An error occurred with BeginReceive on an incoming TCP/IP HL7 message.\r\nException: "+ex.Message);
+						throw new Exception("An error occurred with BeginReceive on an incoming TCP/IP HL7 message.\r\nException: "+ex.Message+"\r\n"+ex.StackTrace);
 					}
 				}
 				//Prepare to save message to database if malformed and not processed
@@ -487,7 +495,7 @@ namespace OpenDentHL7 {
 				catch(Exception ex) {
 					_ecwTCPModeIsReceiving=false;
 					socketIncomingHandler.Close();
-					throw new Exception("Timeout or other error waiting to send an acknowledgment.\r\nException: "+ex.Message);
+					throw new Exception("Timeout or other error waiting to send an acknowledgment.\r\nException: "+ex.Message+"\r\n"+ex.StackTrace);
 				}
 				//eCW uses the same worker socket to send the next message. Without this call to BeginReceive, they would attempt to send again
 				//and the send would fail since we were no longer listening in this thread. eCW would timeout after 30 seconds of waiting for their
@@ -515,10 +523,12 @@ namespace OpenDentHL7 {
 				}
 			}
 			catch(Exception ex) {
-				EventLog.WriteEntry("OpenDentHL7",ex.Message,EventLogEntryType.Warning);
+				EventLog.WriteEntry("OpenDentHL7","Error in OnDataReceived.  Setting receiveDone manual reset event for main thread to accept new incoming connections.\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Warning);
 				if(IsVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Setting manual reset event so the main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
 				}
+				_ecwTCPModeIsReceiving=false;
+				((StateObject)asyncResult.AsyncState).workSocket.Close();
 				receiveDone.Set();//this will trigger the main thread to accept a new incoming connection and try to receive data again
 			}
 		}
