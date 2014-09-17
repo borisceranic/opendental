@@ -650,7 +650,7 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PID.1, Set ID, SI data type
 						//"This field contains the number that identifies this transaction.  For the first occurrence of the segment, the sequence number shall be one" (HL7 v2.6 documentation)
-						//We only send 1 PID segment in DFT's so this number will always be 1.
+						//We only send 1 PID segment in ADT's so this number will always be 1.
 						seg.AddFieldFixed(1,DataTypeHL7.SI,"1");
 						//PID.2, Patient ID (retained for backward compatibility only).  Defined as 'external' ID, we've always sent the ChartNumber in this field as the eCW patient ID
 						//The standard will be to continue to use PID.2 for sending the ChartNumber, which was set from PID.4 of an incoming message.  This could be the other software patient ID.
@@ -1159,7 +1159,7 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PID.1, Set ID, SI data type
 						//"This field contains the number that identifies this transaction.  For the first occurrence of the segment, the sequence number shall be one" (HL7 v2.6 documentation)
-						//We only send 1 PID segment in DFT's so this number will always be 1.
+						//We only send 1 PID segment in SIU's so this number will always be 1.
 						seg.AddFieldFixed(1,DataTypeHL7.SI,"1");
 						//PID.2, Patient ID (retained for backward compatibility only).  Defined as 'external' ID, we've always sent the ChartNumber in this field as the eCW patient ID
 						//The standard will be to continue to use PID.2 for sending the ChartNumber, which was set from PID.4 of an incoming message.  This could be the other software patient ID.
@@ -1388,7 +1388,7 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//PID.1, Set ID, SI data type
 						//"This field contains the number that identifies this transaction.  For the first occurrence of the segment, the sequence number shall be one" (HL7 v2.6 documentation)
-						//We only send 1 PID segment in DFT's so this number will always be 1.
+						//We only send 1 PID segment in SRR's so this number will always be 1.
 						seg.AddFieldFixed(1,DataTypeHL7.SI,"1");
 						//PID.2, Patient ID (retained for backward compatibility only).  Defined as 'external' ID, we've always sent the ChartNumber in this field as the eCW patient ID
 						//The standard will be to continue to use PID.2 for sending the ChartNumber, which was set from PID.4 of an incoming message.  This could be the other software patient ID.
