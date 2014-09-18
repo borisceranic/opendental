@@ -56,13 +56,15 @@ namespace OpenDental {
 				}
 				row.Cells.Add(PopupList[i].Description);
 				gridMain.Rows.Add(row);
+				row.Tag=i;
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormPopupEdit FormPE=new FormPopupEdit();
-			FormPE.PopupCur=PopupList[e.Row];
+			int rowIndex=(int)gridMain.Rows[e.Row].Tag;
+			FormPE.PopupCur=PopupList[rowIndex];
 			FormPE.ShowDialog();
 			if(FormPE.DialogResult==DialogResult.OK) {
 				FillGrid();
