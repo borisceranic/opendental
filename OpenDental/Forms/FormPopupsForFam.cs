@@ -55,8 +55,9 @@ namespace OpenDental {
 					row.Cells.Add(PopupList[i].IsArchived?"X":"");
 				}
 				row.Cells.Add(PopupList[i].Description);
-				gridMain.Rows.Add(row);
 				row.Tag=i;
+				gridMain.Rows.Add(row);
+				
 			}
 			gridMain.EndUpdate();
 		}
