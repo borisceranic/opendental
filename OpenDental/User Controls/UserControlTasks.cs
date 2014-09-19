@@ -227,7 +227,6 @@ namespace OpenDental {
 			checkShowFinished.Top=gridMain.Top+1;
 			textStartDate.Top=gridMain.Top;
 			labelStartDate.Top=gridMain.Top+1;
-			gridMain.Height=this.ClientSize.Height-gridMain.Top-3;
 		}
 
 		private void textStartDate_KeyPress(object sender,KeyPressEventArgs e) {
@@ -258,6 +257,7 @@ namespace OpenDental {
 				parent=0;
 				date=cal.SelectionStart;
 			}
+			gridMain.Height=this.ClientSize.Height-gridMain.Top-3;
 			RefreshMainLists(parent,date);
 			#region dated trunk automation
 			//dated trunk automation-----------------------------------------------------------------------------
