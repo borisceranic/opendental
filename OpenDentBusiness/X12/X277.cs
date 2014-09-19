@@ -280,7 +280,7 @@ namespace OpenDentBusiness
 		///3 Claim Status (STC03), 4 Payor's Claim Control Number (REF02), 5 Institutional Type of Bill (REF02), 6 Claim Date Service Start (DTP03), 
 		///7 Claim Date Service End (DTP03), 8 Reason (STC01-2), 9 Amount (STC04), 10 SubscriberId (NM109)</summary>
 		public string[] GetClaimInfo(string trackingNumber) {
-			string[] result=new string[10];
+			string[] result=new string[11];
 			for(int i=0;i<result.Length;i++) {
 				result[i]="";
 			}

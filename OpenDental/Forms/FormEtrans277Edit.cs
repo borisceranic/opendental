@@ -69,7 +69,7 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			int variableWidth=this.Width-2*gridMain.Left;
+			int variableWidth=this.Width-2*gridMain.Left-10;
 			if(showServiceDateRange) {
 				const int serviceDateFromWidth=86;
 				col=new ODGridColumn(Lan.g(this,"ServDateFrom"),serviceDateFromWidth,HorizontalAlignment.Center);
