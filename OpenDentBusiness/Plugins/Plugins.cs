@@ -69,6 +69,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Will return true if a plugin implements this method, replacing the default behavior.</summary>
 		public static bool HookMethod(object sender,string hookName,params object[] parameters) {
+			if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
+				return false;//Plugins aren't supported for the middle tier until v14.3
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				//if there are multiple plugins, we use the first implementation that we come to.
 				if(PluginList[i].Plugin.HookMethod(sender,hookName,parameters)) {
@@ -80,6 +83,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Adds code without disrupting existing code.</summary>
 		public static void HookAddCode(object sender,string hookName,params object[] parameters) {
+			if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
+				return;//Plugins aren't supported for the middle tier until v14.3
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				//if there are multiple plugins, we run them all
 				PluginList[i].Plugin.HookAddCode(sender,hookName,parameters);
@@ -87,6 +93,9 @@ namespace OpenDentBusiness{
 		}
 
 		public static void LaunchToolbarButton(long programNum,long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
+				return;//Plugins aren't supported for the middle tier until v14.3
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				if(PluginList[i].ProgramNum==programNum) {
 					PluginList[i].Plugin.LaunchToolbarButton(patNum);
