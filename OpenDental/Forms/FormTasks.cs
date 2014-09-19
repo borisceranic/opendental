@@ -17,6 +17,7 @@ namespace OpenDental{
 		/////<summary>After closing, if this is not zero, then it will jump to the specified patient.</summary>
 		//public long GotoKeyNum;
 		private bool IsTriage;
+		private FormWindowState windowStateOld;
 	
 		///<summary></summary>
 		public FormTasks()
@@ -62,6 +63,7 @@ namespace OpenDental{
 			this.userControlTasks1.Size = new System.Drawing.Size(885, 671);
 			this.userControlTasks1.TabIndex = 0;
 			this.userControlTasks1.GoToChanged += new System.EventHandler(this.userControlTasks1_GoToChanged);
+			this.userControlTasks1.Resize += new System.EventHandler(this.userControlTasks1_Resize);
 			// 
 			// FormTasks
 			// 
@@ -79,6 +81,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormTasks_Load(object sender,EventArgs e) {
+			windowStateOld=WindowState;
 			userControlTasks1.InitializeOnStartup();
 		}
 		
@@ -133,6 +136,19 @@ namespace OpenDental{
 			if(userControlTasks1!=null && !userControlTasks1.IsDisposed) {
 				userControlTasks1.RefreshTasks();
 			}
+		}
+
+		private void userControlTasks1_Resize(object sender,EventArgs e) {
+			if(WindowState==FormWindowState.Minimized) {//Form currently minimized.
+				windowStateOld=WindowState;
+				return;//The window is invisble when minimized, so no need to refresh.
+			}
+			if(windowStateOld==FormWindowState.Minimized) {//Form was previously minimized (invisible) and is now in normal state or maximized state.
+				RefreshUserControlTasks();//Refresh the grid height because the form height might have changed.
+				windowStateOld=WindowState;
+				return;
+			}
+			windowStateOld=WindowState;//Set the window state after every resize.
 		}
 
 		/* private void timer1_Tick(object sender,EventArgs e) {
