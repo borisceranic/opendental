@@ -209,6 +209,7 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);//should always be sorted.
 			SetForceSinglePage(sheet);
 			Font font;
 			FontStyle fontstyle;
