@@ -782,16 +782,29 @@ namespace OpenDental{
 		}
 
 		private void butRepeat_Click(object sender,EventArgs e) {
+			bool isWeek=false;
+			if(DateCopyStart!=DateCopyEnd) {
+				isWeek=true;
+			}
 			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
 				|| textDateTo.errorProvider1.GetError(textDateTo)!="") {
 				MsgBox.Show(this,"Please fix errors first.");
 				return;
 			}
+			int repeatCount;
 			try{
-				int.Parse(textRepeat.Text);
+				repeatCount=PIn.Int(textRepeat.Text);
 			}
 			catch{
 				MsgBox.Show(this,"Please fix number box first.");
+				return;
+			}
+			if(repeatCount>1250 && !isWeek) {
+				MsgBox.Show(this,"Please enter a number of days less than 1250.");
+				return;
+			}
+			if(repeatCount>250 && isWeek) {
+				MsgBox.Show(this,"Please enter a number of weeks less than 250.");
 				return;
 			}
 			if(gridMain.SelectedCell.X==-1) {
@@ -809,7 +822,6 @@ namespace OpenDental{
 			//calculate which day or week is currently selected.
 			DateTime dateSelectedStart;
 			DateTime dateSelectedEnd;
-			bool isWeek=DateCopyStart!=DateCopyEnd;
 			if(isWeek) {
 				int startI=1;
 				if(checkWeekend.Checked) {
