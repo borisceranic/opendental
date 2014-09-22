@@ -585,6 +585,9 @@ namespace OpenDentBusiness.HL7 {
 				WriteError(sb,"Missing date time deceased.");
 			}			
 			List<EhrAptObs> listObservations=EhrAptObses.Refresh(appt.AptNum);
+			if(listObservations.Count==0) {
+				WriteError(sb,"Missing observation.");
+			}
 			for(int i=0;i<listObservations.Count;i++) {
 				EhrAptObs obs=listObservations[i];
 				if(obs.ValType==EhrAptObsType.Coded) {
