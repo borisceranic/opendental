@@ -94,6 +94,11 @@ namespace OpenDental {
 			Print(sheet,copies,false);
 		}
 
+		public static void SetZero() {
+			_sheetsPrinted=0;
+			_yPosPrint=0;
+		}
+
 		///<Summary></Summary>
 		public static void Print(Sheet sheet,int copies,bool isRxControlled){
 			//parameter null check moved to SheetFiller.
@@ -209,6 +214,7 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);//should always be sorted.
 			SetForceSinglePage(sheet);
 			Font font;
 			FontStyle fontstyle;
