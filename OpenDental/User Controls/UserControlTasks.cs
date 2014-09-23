@@ -1022,7 +1022,13 @@ namespace OpenDental {
 			}
 			try {
 				Tasks.Update(task,oldTask);
-				DataValid.SetInvalidTask(task.TaskNum,true);
+				//At HQ the refresh interval wasn't quick enough for the task to pop up.
+				//We will immediately show the task instead of waiting for the refresh interval.
+				DataValid.SetInvalidTask(task.TaskNum,false);
+				FormTaskEdit FormT=new FormTaskEdit(task,task.Copy());
+				FormT.IsPopup=true;
+				FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
+				FormT.Show();//non-modal
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
