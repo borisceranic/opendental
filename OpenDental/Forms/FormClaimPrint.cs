@@ -946,6 +946,9 @@ namespace OpenDental{
 					case "PatientLastFirst":
 						displayStrings[i]=PatCur.LName+", "+PatCur.FName+" "+PatCur.MiddleI;
 						break;
+					case "PatientLastFirstMiCommas"://Medical required format for UB04 printed claims
+						displayStrings[i]=PatCur.LName+", "+PatCur.FName+(PatCur.MiddleI==""?"":(", "+PatCur.MiddleI[0]));
+						break;
 					case "PatientFirstMiddleLast":
 						displayStrings[i]=PatCur.FName+" "+PatCur.MiddleI+" "+PatCur.LName;
 						break;
