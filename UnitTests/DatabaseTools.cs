@@ -17,25 +17,30 @@ namespace UnitTests {
 
 		///<summary>This is analogous to FormChooseDatabase.TryToConnect.  Empty string is allowed.</summary>
 		public static bool SetDbConnection(string dbName,bool isOracle){
+			return SetDbConnection(dbName,"localhost","","root","",isOracle);
+		}
+
+		//<summary>This function allows connecting to a specific server.</summary>
+		public static bool SetDbConnection(string dbName,string serverAddr,string port,string userName,string password,bool isOracle) {
 			OpenDentBusiness.DataConnection dcon;
 			//Try to connect to the database directly
 			try {
 				if(!isOracle) {
 					DataConnection.DBtype=DatabaseType.MySql;
 					dcon=new OpenDentBusiness.DataConnection(DataConnection.DBtype);
-					dcon.SetDb("Server=localhost;Database="+dbName+";User ID=root;Password=;CharSet=utf8;Treat Tiny As Boolean=false","",DataConnection.DBtype,true);
+					dcon.SetDb("Server="+serverAddr+";Port="+port+";Database="+dbName+";User ID="+userName+";Password="+password+";CharSet=utf8;Treat Tiny As Boolean=false","",DataConnection.DBtype,true);
 					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
 					return true;
 				}
-				else { 
+				else {
 					DataConnection.DBtype=DatabaseType.Oracle;
 					dcon=new OpenDentBusiness.DataConnection(DataConnection.DBtype);
-					dcon.SetDb("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=Jason)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)));User Id=unittest;Password=unittest;","",DataConnection.DBtype,true);
+					dcon.SetDb("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST="+serverAddr+")(PORT="+port+"))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)));User Id="+userName+";Password="+password+";","",DataConnection.DBtype,true);
 					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
 					return true;
 				}
 			}
-			catch(Exception ex){
+			catch(Exception ex) {
 				//throw new Exception(ex.Message);
 				//MessageBox.Show(ex.Message);
 				//textResults.Text="Make a copy of any OD db and rename it to unittest.";
@@ -46,7 +51,7 @@ namespace UnitTests {
 			}
 		}
 
-		public static string FreshFromDump(bool isOracle) {
+		public static string FreshFromDump(string serverAddr,string port,string userName,string password,bool isOracle) {
 			if(!isOracle) {
 				string command="DROP DATABASE IF EXISTS unittest";
 				try {
@@ -57,7 +62,7 @@ namespace UnitTests {
 				}
 				command="CREATE DATABASE unittest";
 				DataCore.NonQ(command);
-				SetDbConnection("unittest",false);
+				SetDbConnection("unittest",serverAddr,port,userName,password,false);
 				command=Properties.Resources.dump;
 				DataCore.NonQ(command);
 				string toVersion=Assembly.GetAssembly(typeof(OpenDental.PrefL)).GetName().Version.ToString();

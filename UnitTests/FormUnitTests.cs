@@ -71,7 +71,7 @@ namespace UnitTests {
 			textResults.Text="";
 			Application.DoEvents();
 			if(radioSchema1.Checked) {
-				textResults.Text+=SchemaT.TestProposedCrud(isOracle);
+				textResults.Text+=SchemaT.TestProposedCrud(textAddr.Text,textPort.Text,textUserName.Text,textPassword.Text,isOracle);
 			}
 			else {
 				textResults.Text+=SchemaT.CompareProposedToGenerated(isOracle);
@@ -83,7 +83,7 @@ namespace UnitTests {
 			Cursor=Cursors.WaitCursor;
 			textResults.Text="";
 			Application.DoEvents();
-			textResults.Text+=CoreTypesT.CreateTempTable(isOracle);
+			textResults.Text+=CoreTypesT.CreateTempTable(textAddr.Text,textPort.Text,textUserName.Text,textPassword.Text,isOracle);
 			Application.DoEvents();
 			textResults.Text+=CoreTypesT.RunAll();
 			//}
@@ -106,23 +106,39 @@ namespace UnitTests {
 			Application.DoEvents();
 			Cursor=Cursors.WaitCursor;
 			if(!isOracle) {
-				if(!DatabaseTools.SetDbConnection("",isOracle)) {
+				string serverAddr=textAddr.Text;
+				string serverPort=textPort.Text;
+				if(serverAddr=="") {
+					serverAddr="localhost";
+				}
+				if(serverPort=="") {
+					serverPort="3306";
+				}
+				if(!DatabaseTools.SetDbConnection("",serverAddr,serverPort,textUserName.Text,textPassword.Text,isOracle)) {
 					MessageBox.Show("Could not connect");
 					return;
 				}
 			}
-			DatabaseTools.FreshFromDump(isOracle);
+			DatabaseTools.FreshFromDump(textAddr.Text,textPort.Text,textUserName.Text,textPassword.Text,isOracle);
 			textResults.Text+="Fresh database loaded from sql dump.";
 			Cursor=Cursors.Default;
 		}
 
 		private void butRun_Click(object sender,EventArgs e) {
 			textResults.Text="";
+			string serverAddr=textAddr.Text;
+			string serverPort=textPort.Text;
+			if(serverAddr=="") {
+				serverAddr="localhost";
+			}
+			if(serverPort=="") {
+				serverPort="3306";
+			}
 			Application.DoEvents();
 			Cursor=Cursors.WaitCursor;
-			if(!DatabaseTools.SetDbConnection("unittest",false)) {//if database doesn't exist
-				DatabaseTools.SetDbConnection("",false);
-				textResults.Text+=DatabaseTools.FreshFromDump(false);//this also sets database to be unittest.
+			if(!DatabaseTools.SetDbConnection("unittest",serverAddr,serverPort,textUserName.Text,textPassword.Text,false)) {//if database doesn't exist
+				DatabaseTools.SetDbConnection("",serverAddr,serverPort,textUserName.Text,textPassword.Text,false);
+				textResults.Text+=DatabaseTools.FreshFromDump(textAddr.Text,textPort.Text,textUserName.Text,textPassword.Text,false);//this also sets database to be unittest.
 			}
 			else {
 				textResults.Text+=DatabaseTools.ClearDb();
@@ -385,11 +401,19 @@ namespace UnitTests {
 
 		private void butHL7_Click(object sender,EventArgs e) {
 			textResults.Text="";
+			string serverAddr=textAddr.Text;
+			string serverPort=textPort.Text;
+			if(serverAddr=="") {
+				serverAddr="localhost";
+			}
+			if(serverPort=="") {
+				serverPort="3306";
+			}
 			Application.DoEvents();
 			Cursor=Cursors.WaitCursor;
-			if(!DatabaseTools.SetDbConnection("unittest",false)) {//if database doesn't exist
-				DatabaseTools.SetDbConnection("",false);
-				textResults.Text+=DatabaseTools.FreshFromDump(false);//this also sets database to be unittest.
+			if(!DatabaseTools.SetDbConnection("unittest",serverAddr,serverPort,textUserName.Text,textPassword.Text,false)) {//if database doesn't exist
+				DatabaseTools.SetDbConnection("",serverAddr,serverPort,textUserName.Text,textPassword.Text,false);
+				textResults.Text+=DatabaseTools.FreshFromDump(textAddr.Text,textPort.Text,textUserName.Text,textPassword.Text,false);//this also sets database to be unittest.
 			}
 			foreach(HL7TestInterfaceEnum hl7TestInterfaceEnum in Enum.GetValues(typeof(HL7TestInterfaceEnum))) {
 				textResults.Text+=DatabaseTools.ClearDb();
@@ -400,25 +424,5 @@ namespace UnitTests {
 			textResults.Text+="Done\r\n";
 			Cursor=Cursors.Default;
 		}
-
-	
-
-	
-
-		
-
-		
-
-	
-
-
-
-		
-
-	
-
-
-
-
 	}
 }

@@ -44,6 +44,16 @@ namespace UnitTests {
 			this.butTopaz = new System.Windows.Forms.Button();
 			this.label8 = new System.Windows.Forms.Label();
 			this.butHL7 = new System.Windows.Forms.Button();
+			this.textAddr = new System.Windows.Forms.TextBox();
+			this.label9 = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
+			this.textPort = new System.Windows.Forms.TextBox();
+			this.labelPassword = new System.Windows.Forms.Label();
+			this.textPassword = new System.Windows.Forms.TextBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textUserName = new System.Windows.Forms.TextBox();
+			this.groupDatabase = new System.Windows.Forms.GroupBox();
+			this.groupDatabase.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textResults
@@ -51,16 +61,16 @@ namespace UnitTests {
 			this.textResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textResults.Location = new System.Drawing.Point(12, 208);
+			this.textResults.Location = new System.Drawing.Point(12, 304);
 			this.textResults.Multiline = true;
 			this.textResults.Name = "textResults";
 			this.textResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textResults.Size = new System.Drawing.Size(733, 587);
+			this.textResults.Size = new System.Drawing.Size(733, 491);
 			this.textResults.TabIndex = 1;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(10, 34);
+			this.label1.Location = new System.Drawing.Point(10, 130);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(347, 18);
 			this.label1.TabIndex = 3;
@@ -69,7 +79,7 @@ namespace UnitTests {
 			// 
 			// butNewDb
 			// 
-			this.butNewDb.Location = new System.Drawing.Point(12, 154);
+			this.butNewDb.Location = new System.Drawing.Point(12, 250);
 			this.butNewDb.Name = "butNewDb";
 			this.butNewDb.Size = new System.Drawing.Size(75, 23);
 			this.butNewDb.TabIndex = 0;
@@ -79,7 +89,7 @@ namespace UnitTests {
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(92, 156);
+			this.label2.Location = new System.Drawing.Point(92, 252);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(505, 18);
 			this.label2.TabIndex = 6;
@@ -89,7 +99,7 @@ namespace UnitTests {
 			// 
 			// butRun
 			// 
-			this.butRun.Location = new System.Drawing.Point(12, 179);
+			this.butRun.Location = new System.Drawing.Point(12, 275);
 			this.butRun.Name = "butRun";
 			this.butRun.Size = new System.Drawing.Size(75, 23);
 			this.butRun.TabIndex = 7;
@@ -99,7 +109,7 @@ namespace UnitTests {
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(92, 181);
+			this.label3.Location = new System.Drawing.Point(92, 277);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(90, 18);
 			this.label3.TabIndex = 8;
@@ -108,14 +118,14 @@ namespace UnitTests {
 			// 
 			// textSpecificTest
 			// 
-			this.textSpecificTest.Location = new System.Drawing.Point(177, 181);
+			this.textSpecificTest.Location = new System.Drawing.Point(177, 277);
 			this.textSpecificTest.Name = "textSpecificTest";
 			this.textSpecificTest.Size = new System.Drawing.Size(74, 20);
 			this.textSpecificTest.TabIndex = 9;
 			// 
 			// butWebService
 			// 
-			this.butWebService.Location = new System.Drawing.Point(12, 5);
+			this.butWebService.Location = new System.Drawing.Point(12, 101);
 			this.butWebService.Name = "butWebService";
 			this.butWebService.Size = new System.Drawing.Size(75, 23);
 			this.butWebService.TabIndex = 10;
@@ -125,7 +135,7 @@ namespace UnitTests {
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(92, 7);
+			this.label4.Location = new System.Drawing.Point(92, 103);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(600, 18);
 			this.label4.TabIndex = 11;
@@ -135,7 +145,7 @@ namespace UnitTests {
 			// 
 			// butCore
 			// 
-			this.butCore.Location = new System.Drawing.Point(12, 79);
+			this.butCore.Location = new System.Drawing.Point(12, 175);
 			this.butCore.Name = "butCore";
 			this.butCore.Size = new System.Drawing.Size(75, 23);
 			this.butCore.TabIndex = 12;
@@ -145,7 +155,7 @@ namespace UnitTests {
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(93, 82);
+			this.label5.Location = new System.Drawing.Point(93, 178);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(547, 18);
 			this.label5.TabIndex = 13;
@@ -155,8 +165,9 @@ namespace UnitTests {
 			// 
 			// listType
 			// 
+			this.listType.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.listType.FormattingEnabled = true;
-			this.listType.Location = new System.Drawing.Point(646, 63);
+			this.listType.Location = new System.Drawing.Point(501, 50);
 			this.listType.Name = "listType";
 			this.listType.Size = new System.Drawing.Size(99, 30);
 			this.listType.TabIndex = 22;
@@ -164,7 +175,8 @@ namespace UnitTests {
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(643, 42);
+			this.label7.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.label7.Location = new System.Drawing.Point(498, 29);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(99, 18);
 			this.label7.TabIndex = 21;
@@ -173,7 +185,7 @@ namespace UnitTests {
 			// 
 			// butSchema
 			// 
-			this.butSchema.Location = new System.Drawing.Point(12, 54);
+			this.butSchema.Location = new System.Drawing.Point(12, 150);
 			this.butSchema.Name = "butSchema";
 			this.butSchema.Size = new System.Drawing.Size(75, 23);
 			this.butSchema.TabIndex = 23;
@@ -184,7 +196,7 @@ namespace UnitTests {
 			// radioSchema1
 			// 
 			this.radioSchema1.Checked = true;
-			this.radioSchema1.Location = new System.Drawing.Point(97, 57);
+			this.radioSchema1.Location = new System.Drawing.Point(97, 153);
 			this.radioSchema1.Name = "radioSchema1";
 			this.radioSchema1.Size = new System.Drawing.Size(133, 18);
 			this.radioSchema1.TabIndex = 24;
@@ -194,7 +206,7 @@ namespace UnitTests {
 			// 
 			// radioSchema2
 			// 
-			this.radioSchema2.Location = new System.Drawing.Point(234, 57);
+			this.radioSchema2.Location = new System.Drawing.Point(234, 153);
 			this.radioSchema2.Name = "radioSchema2";
 			this.radioSchema2.Size = new System.Drawing.Size(189, 18);
 			this.radioSchema2.TabIndex = 25;
@@ -203,7 +215,7 @@ namespace UnitTests {
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(93, 107);
+			this.label6.Location = new System.Drawing.Point(93, 203);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(547, 18);
 			this.label6.TabIndex = 27;
@@ -212,7 +224,7 @@ namespace UnitTests {
 			// 
 			// butTopaz
 			// 
-			this.butTopaz.Location = new System.Drawing.Point(12, 104);
+			this.butTopaz.Location = new System.Drawing.Point(12, 200);
 			this.butTopaz.Name = "butTopaz";
 			this.butTopaz.Size = new System.Drawing.Size(75, 23);
 			this.butTopaz.TabIndex = 26;
@@ -222,7 +234,7 @@ namespace UnitTests {
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(92, 131);
+			this.label8.Location = new System.Drawing.Point(92, 227);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(445, 18);
 			this.label8.TabIndex = 29;
@@ -231,7 +243,7 @@ namespace UnitTests {
 			// 
 			// butHL7
 			// 
-			this.butHL7.Location = new System.Drawing.Point(12, 129);
+			this.butHL7.Location = new System.Drawing.Point(12, 225);
 			this.butHL7.Name = "butHL7";
 			this.butHL7.Size = new System.Drawing.Size(75, 23);
 			this.butHL7.TabIndex = 28;
@@ -239,11 +251,110 @@ namespace UnitTests {
 			this.butHL7.UseVisualStyleBackColor = true;
 			this.butHL7.Click += new System.EventHandler(this.butHL7_Click);
 			// 
+			// textAddr
+			// 
+			this.textAddr.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.textAddr.Location = new System.Drawing.Point(132, 32);
+			this.textAddr.Multiline = true;
+			this.textAddr.Name = "textAddr";
+			this.textAddr.Size = new System.Drawing.Size(150, 20);
+			this.textAddr.TabIndex = 1;
+			this.textAddr.Text = "localhost";
+			// 
+			// label9
+			// 
+			this.label9.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(132, 16);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(94, 13);
+			this.label9.TabIndex = 31;
+			this.label9.Text = "Database Address";
+			// 
+			// label10
+			// 
+			this.label10.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(133, 57);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(66, 13);
+			this.label10.TabIndex = 32;
+			this.label10.Text = "Port Number";
+			// 
+			// textPort
+			// 
+			this.textPort.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.textPort.Location = new System.Drawing.Point(133, 74);
+			this.textPort.Name = "textPort";
+			this.textPort.Size = new System.Drawing.Size(150, 20);
+			this.textPort.TabIndex = 2;
+			this.textPort.Text = "3306";
+			// 
+			// labelPassword
+			// 
+			this.labelPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.labelPassword.AutoSize = true;
+			this.labelPassword.Location = new System.Drawing.Point(302, 57);
+			this.labelPassword.Name = "labelPassword";
+			this.labelPassword.Size = new System.Drawing.Size(53, 13);
+			this.labelPassword.TabIndex = 35;
+			this.labelPassword.Text = "Password";
+			// 
+			// textPassword
+			// 
+			this.textPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.textPassword.Location = new System.Drawing.Point(302, 73);
+			this.textPassword.Multiline = true;
+			this.textPassword.Name = "textPassword";
+			this.textPassword.Size = new System.Drawing.Size(150, 20);
+			this.textPassword.TabIndex = 4;
+			// 
+			// label11
+			// 
+			this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(302, 16);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(29, 13);
+			this.label11.TabIndex = 37;
+			this.label11.Text = "User";
+			// 
+			// textUserName
+			// 
+			this.textUserName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.textUserName.Location = new System.Drawing.Point(302, 32);
+			this.textUserName.Multiline = true;
+			this.textUserName.Name = "textUserName";
+			this.textUserName.Size = new System.Drawing.Size(150, 20);
+			this.textUserName.TabIndex = 3;
+			this.textUserName.Text = "root";
+			// 
+			// groupDatabase
+			// 
+			this.groupDatabase.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.groupDatabase.Controls.Add(this.label9);
+			this.groupDatabase.Controls.Add(this.label11);
+			this.groupDatabase.Controls.Add(this.label7);
+			this.groupDatabase.Controls.Add(this.textUserName);
+			this.groupDatabase.Controls.Add(this.listType);
+			this.groupDatabase.Controls.Add(this.labelPassword);
+			this.groupDatabase.Controls.Add(this.textAddr);
+			this.groupDatabase.Controls.Add(this.textPassword);
+			this.groupDatabase.Controls.Add(this.label10);
+			this.groupDatabase.Controls.Add(this.textPort);
+			this.groupDatabase.Location = new System.Drawing.Point(12, 0);
+			this.groupDatabase.Name = "groupDatabase";
+			this.groupDatabase.Size = new System.Drawing.Size(733, 100);
+			this.groupDatabase.TabIndex = 38;
+			this.groupDatabase.TabStop = false;
+			this.groupDatabase.Text = "Connection Settings";
+			// 
 			// FormUnitTests
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(757, 807);
+			this.Controls.Add(this.groupDatabase);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.butHL7);
 			this.Controls.Add(this.label6);
@@ -251,8 +362,6 @@ namespace UnitTests {
 			this.Controls.Add(this.radioSchema2);
 			this.Controls.Add(this.radioSchema1);
 			this.Controls.Add(this.butSchema);
-			this.Controls.Add(this.listType);
-			this.Controls.Add(this.label7);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.butCore);
 			this.Controls.Add(this.label4);
@@ -269,6 +378,8 @@ namespace UnitTests {
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "FormUnitTests";
 			this.Load += new System.EventHandler(this.FormUnitTests_Load);
+			this.groupDatabase.ResumeLayout(false);
+			this.groupDatabase.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -296,6 +407,15 @@ namespace UnitTests {
 		private System.Windows.Forms.Button butTopaz;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Button butHL7;
+		private System.Windows.Forms.TextBox textAddr;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.TextBox textPort;
+		private System.Windows.Forms.Label labelPassword;
+		private System.Windows.Forms.TextBox textPassword;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.TextBox textUserName;
+		private System.Windows.Forms.GroupBox groupDatabase;
 	}
 }
 

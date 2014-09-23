@@ -23,9 +23,9 @@ namespace UnitTests {
 		//   c. Code is also generated from the CrudGenerator interface to be copied and pasted into the ConvertDatabases class.
 		//      This can be done through the UI, or for more complex situations, by setting up some C# in CrudGenerator.
 
-		public static string TestProposedCrud(bool isOracle) {
+		public static string TestProposedCrud(string serverAddr,string port,string userName,string password,bool isOracle) {
 			string retVal="";
-			DatabaseTools.SetDbConnection("unittest",isOracle);
+			DatabaseTools.SetDbConnection("unittest",serverAddr,port,userName,password,isOracle);
 			SchemaCrudProposedTest.AddTableTempcore();
 			SchemaCrudProposedTest.AddColumnEndClob();
 			SchemaCrudProposedTest.AddColumnEndInt();

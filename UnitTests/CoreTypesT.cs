@@ -10,9 +10,9 @@ using System.Drawing.Imaging;
 namespace UnitTests {
 	public class CoreTypesT {
 		/// <summary></summary>
-		public static string CreateTempTable(bool isOracle) {
+		public static string CreateTempTable(string serverAddr, string port, string userName, string password, bool isOracle) {
 			string retVal="";
-			DatabaseTools.SetDbConnection("unittest",isOracle);
+			DatabaseTools.SetDbConnection("unittest",serverAddr,port,userName,password,isOracle);
 			string command;
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command="DROP TABLE IF EXISTS tempcore";
