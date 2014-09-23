@@ -153,6 +153,9 @@ namespace OpenDental.Bridges {
 				else {
 					fulldesc=tth+" "+descript;
 				}
+				if(fulldesc=="") {
+					fulldesc=" ";
+				}
 				lineArray=fulldesc.Split(new string[] { "\r\n" },StringSplitOptions.RemoveEmptyEntries);
 				lines=new List<string>(lineArray);
 				//The specs say that the line limit is 30 char.  But in testing, it will take 50 char.
