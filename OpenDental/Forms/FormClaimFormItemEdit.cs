@@ -285,6 +285,7 @@ namespace OpenDental{
 				"IsStudent",
 				"CollegeName",
 				"PatientLastFirst",
+				"PatientLastFirstMiCommas",//Medical required format for UB04 printed claims
 				"PatientFirstMiddleLast",
 				"PatientFirstName",
 				"PatientMiddleName",
