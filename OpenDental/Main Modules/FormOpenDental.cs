@@ -1689,7 +1689,7 @@ namespace OpenDental{
 			this.panelPhoneSmall.Controls.Add(this.labelTriage);
 			this.panelPhoneSmall.Location = new System.Drawing.Point(71, 333);
 			this.panelPhoneSmall.Name = "panelPhoneSmall";
-			this.panelPhoneSmall.Size = new System.Drawing.Size(150, 321);
+			this.panelPhoneSmall.Size = new System.Drawing.Size(173, 321);
 			this.panelPhoneSmall.TabIndex = 56;
 			// 
 			// labelFieldType
@@ -1708,7 +1708,7 @@ namespace OpenDental{
 			this.comboTriageCoordinator.Location = new System.Drawing.Point(0, 42);
 			this.comboTriageCoordinator.MaxDropDownItems = 10;
 			this.comboTriageCoordinator.Name = "comboTriageCoordinator";
-			this.comboTriageCoordinator.Size = new System.Drawing.Size(150, 21);
+			this.comboTriageCoordinator.Size = new System.Drawing.Size(173, 21);
 			this.comboTriageCoordinator.TabIndex = 87;
 			this.comboTriageCoordinator.SelectionChangeCommitted += new System.EventHandler(this.comboTriageCoordinator_SelectionChangeCommitted);
 			// 
@@ -1730,7 +1730,7 @@ namespace OpenDental{
 			this.butMapPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMapPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMapPhones.CornerRadius = 4F;
-			this.butMapPhones.Location = new System.Drawing.Point(132, 0);
+			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
 			this.butMapPhones.Name = "butMapPhones";
 			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
 			this.butMapPhones.TabIndex = 54;
@@ -1744,7 +1744,7 @@ namespace OpenDental{
 			this.butTriage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butTriage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butTriage.CornerRadius = 4F;
-			this.butTriage.Location = new System.Drawing.Point(94, 0);
+			this.butTriage.Location = new System.Drawing.Point(116, 0);
 			this.butTriage.Name = "butTriage";
 			this.butTriage.Size = new System.Drawing.Size(18, 24);
 			this.butTriage.TabIndex = 52;
@@ -1758,7 +1758,7 @@ namespace OpenDental{
 			this.butBigPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butBigPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butBigPhones.CornerRadius = 4F;
-			this.butBigPhones.Location = new System.Drawing.Point(113, 0);
+			this.butBigPhones.Location = new System.Drawing.Point(135, 0);
 			this.butBigPhones.Name = "butBigPhones";
 			this.butBigPhones.Size = new System.Drawing.Size(18, 24);
 			this.butBigPhones.TabIndex = 52;
@@ -1769,7 +1769,7 @@ namespace OpenDental{
 			// 
 			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
-			this.labelWaitTime.Location = new System.Drawing.Point(67, 2);
+			this.labelWaitTime.Location = new System.Drawing.Point(89, 2);
 			this.labelWaitTime.Name = "labelWaitTime";
 			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
 			this.labelWaitTime.TabIndex = 53;
@@ -1780,7 +1780,7 @@ namespace OpenDental{
 			// 
 			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelTriage.ForeColor = System.Drawing.Color.Black;
-			this.labelTriage.Location = new System.Drawing.Point(30, 2);
+			this.labelTriage.Location = new System.Drawing.Point(41, 2);
 			this.labelTriage.Name = "labelTriage";
 			this.labelTriage.Size = new System.Drawing.Size(41, 20);
 			this.labelTriage.TabIndex = 53;
@@ -1798,7 +1798,7 @@ namespace OpenDental{
 			// 
 			// FormOpenDental
 			// 
-			this.ClientSize = new System.Drawing.Size(982, 529);
+			this.ClientSize = new System.Drawing.Size(982, 424);
 			this.Controls.Add(this.panelPhoneSmall);
 			this.Controls.Add(this.panelSplitter);
 			this.Controls.Add(this.lightSignalGrid1);

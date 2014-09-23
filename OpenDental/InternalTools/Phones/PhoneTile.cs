@@ -175,16 +175,17 @@ namespace OpenDental {
 					labelCustomer.TextAlign=ContentAlignment.MiddleLeft;
 				}
 				else{//vertical
-					pictureWebCam.Location=new Point(51,3);
-					pictureInUse.Location=new Point(14,43);
-					labelExtensionName.Location=new Point(37,43);
-					labelStatusAndNote.Location=new Point(0,61);
+					pictureWebCam.Location=new Point(63,3);
+					pictureInUse.Location=new Point(26,43);
+					labelExtensionName.Location=new Point(49,43);
+					labelStatusAndNote.Location=new Point(12,61);
 					labelStatusAndNote.TextAlign=ContentAlignment.MiddleCenter;
 					labelStatusAndNote.Size=new Size(150,16);
 					labelTime.Location=new Point(0,81);
-					labelTime.Size=new Size(150,16);
+					labelTime.TextAlign=ContentAlignment.MiddleCenter;
+					labelTime.Size=new Size(173,17);
 					labelCustomer.Location=new Point(0,99);
-					labelCustomer.Size=new Size(150,16);
+					labelCustomer.Size=new Size(173,16);
 					labelCustomer.TextAlign=ContentAlignment.MiddleCenter;
 				}
 			}

@@ -63,7 +63,7 @@ namespace OpenDental {
 				return;
 			}
 			int rows=7;
-			int columns=7;
+			int columns=8;
 			float boxWidth=21.4f;
 			float boxHeight=17f;
 			float hTot=boxHeight*rows;
