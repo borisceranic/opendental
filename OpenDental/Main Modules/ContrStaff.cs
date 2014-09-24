@@ -74,6 +74,7 @@ namespace OpenDental{
 		//private bool InitializedOnStartup;
 		///<summary>This is public so that FormOpenDental can access it.</summary>
 		public FormTasks FormT;
+		public FormAccounting FormA;
 
 		///<summary></summary>
 		public ContrStaff(){
@@ -891,8 +892,14 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.Accounting)) {
 				return;
 			}
-			FormAccounting FormA=new FormAccounting();
+			if(FormA==null || FormA.IsDisposed) {
+				FormA=new FormAccounting();
+			}
 			FormA.Show();
+			if(FormA.WindowState==FormWindowState.Minimized) {
+				FormA.WindowState=FormWindowState.Normal;
+			}
+			FormA.BringToFront();
 		}
 
 		private void butBackup_Click(object sender, System.EventArgs e) {
