@@ -152,6 +152,7 @@ namespace OpenDental{
 			this.checkIsLandscape.Text = "Landscape";
 			this.checkIsLandscape.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsLandscape.UseVisualStyleBackColor = true;
+			this.checkIsLandscape.Click += new System.EventHandler(this.checkIsLandscape_Click);
 			// 
 			// textHeight
 			// 

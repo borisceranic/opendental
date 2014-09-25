@@ -29,6 +29,7 @@ namespace OpenDental {
 		}
 
 		private void FormSheetFieldCheckBox_Load(object sender,EventArgs e) {
+			textYPos.MaxVal=SheetDefCur.HeightTotal-1;//The maximum y-value of the sheet field must be within the page vertically.
 			labelReportableName.Visible=false;
 			textReportableName.Visible=false;
 			if(SheetFieldDefCur.FieldName.StartsWith("misc")) {

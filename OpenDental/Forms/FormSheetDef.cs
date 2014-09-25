@@ -23,6 +23,7 @@ namespace OpenDental {
 		}
 
 		private void FormSheetDef_Load(object sender,EventArgs e) {
+			setHeightWidthMin();
 			if(IsReadOnly){
 				butOK.Enabled=false;
 			}
@@ -47,6 +48,37 @@ namespace OpenDental {
 			textHeight.Text=SheetDefCur.Height.ToString();
 			checkIsLandscape.Checked=SheetDefCur.IsLandscape;
 			checkIsMultiPage.Checked=SheetDefCur.IsMultiPage;
+		}
+
+		///<summary>Sets the minimum valid value (used for validation only) of the appropriate Height or Width field based on the bottom of the lowest field. 
+		///Max values are set in the designer.</summary>
+		private void setHeightWidthMin() {
+			textHeight.MinVal=-100;//default values from designer
+			textWidth.MinVal=-100;//default values from designer
+			if(SheetDefCur.SheetFieldDefs==null) {
+				//New sheet
+				return;
+			}
+			int minVal=int.MaxValue;
+			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
+				minVal=Math.Min(minVal,SheetDefCur.SheetFieldDefs[i].Bounds.Bottom/SheetDefCur.PageCount);
+			}
+			if(minVal==int.MaxValue) {
+				//Sheet has no sheet fields.
+				return;
+			}
+			if(checkIsLandscape.Checked) {
+				//Because Width is used to measure vertical sheet size.
+				textWidth.MinVal=minVal;
+			}
+			else {
+				//Because Height is used to measure vertical sheet size.
+				textHeight.MinVal=minVal;
+			}
+		}
+
+		private void checkIsLandscape_Click(object sender,EventArgs e) {
+			setHeightWidthMin();
 		}
 
 		private void listSheetType_Click(object sender,EventArgs e) {
