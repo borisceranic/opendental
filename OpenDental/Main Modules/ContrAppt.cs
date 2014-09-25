@@ -1069,8 +1069,7 @@ namespace OpenDental {
 			// 
 			// tabControl
 			// 
-			this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.tabControl.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.tabControl.Controls.Add(this.tabWaiting);
 			this.tabControl.Controls.Add(this.tabSched);
 			this.tabControl.Location = new System.Drawing.Point(665, 521);
@@ -1717,9 +1716,15 @@ namespace OpenDental {
 			panelAptInfo.Location=new Point(ClientSize.Width-panelCalendar.Width-2,ToolBarMain.Height+panelCalendar.Height);
 			//butOther.Location=new Point(panelAptInfo.Location.X+32,panelAptInfo.Location.Y+84);
 			panelMakeButtons.Location=new Point(panelAptInfo.Right+2,panelAptInfo.Top);
-			tabControl.Location=new Point(panelAptInfo.Left,panelAptInfo.Bottom+1);
 			panelSheet.Width=ClientSize.Width-panelCalendar.Width-2;
 			panelSheet.Height=ClientSize.Height-panelSheet.Location.Y;
+			tabControl.Location=new Point(panelAptInfo.Left,panelAptInfo.Bottom+1);
+			if(tabControl.Top>panelSheet.Bottom) {
+				tabControl.Height=0;
+			}
+			else {
+				tabControl.Height=panelSheet.Height-tabControl.Top+21;
+			}
 			if(!DefC.DefShortIsNull) {
 				ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
 				ApptDrawing.ApptSheetWidth=panelSheet.Width-vScrollBar1.Width;
