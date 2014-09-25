@@ -239,7 +239,7 @@ namespace OpenDental{
 			// textYPos
 			// 
 			this.textYPos.Location = new System.Drawing.Point(141, 357);
-			this.textYPos.MaxVal = 2000;
+			this.textYPos.MaxVal = 20000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
 			this.textYPos.Size = new System.Drawing.Size(51, 20);

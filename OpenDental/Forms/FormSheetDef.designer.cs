@@ -55,20 +55,23 @@ namespace OpenDental{
 			// 
 			// listSheetType
 			// 
+			this.listSheetType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.listSheetType.FormattingEnabled = true;
 			this.listSheetType.Location = new System.Drawing.Point(154, 38);
 			this.listSheetType.Name = "listSheetType";
-			this.listSheetType.Size = new System.Drawing.Size(142, 147);
+			this.listSheetType.Size = new System.Drawing.Size(142, 212);
 			this.listSheetType.TabIndex = 85;
 			this.listSheetType.Click += new System.EventHandler(this.listSheetType_Click);
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupBox1.Controls.Add(this.textFontSize);
 			this.groupBox1.Controls.Add(this.label4);
 			this.groupBox1.Controls.Add(this.comboFontName);
 			this.groupBox1.Controls.Add(this.label3);
-			this.groupBox1.Location = new System.Drawing.Point(74, 196);
+			this.groupBox1.Location = new System.Drawing.Point(74, 261);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(283, 72);
 			this.groupBox1.TabIndex = 88;
@@ -110,7 +113,8 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(83, 275);
+			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label7.Location = new System.Drawing.Point(83, 340);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -119,7 +123,8 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(83, 301);
+			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label8.Location = new System.Drawing.Point(83, 366);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -144,18 +149,21 @@ namespace OpenDental{
 			// 
 			// checkIsLandscape
 			// 
+			this.checkIsLandscape.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkIsLandscape.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsLandscape.Location = new System.Drawing.Point(42, 326);
+			this.checkIsLandscape.Location = new System.Drawing.Point(42, 391);
 			this.checkIsLandscape.Name = "checkIsLandscape";
 			this.checkIsLandscape.Size = new System.Drawing.Size(126, 20);
 			this.checkIsLandscape.TabIndex = 100;
 			this.checkIsLandscape.Text = "Landscape";
 			this.checkIsLandscape.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsLandscape.UseVisualStyleBackColor = true;
+			this.checkIsLandscape.CheckedChanged += new System.EventHandler(this.checkIsLandscape_Click);
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(154, 300);
+			this.textHeight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textHeight.Location = new System.Drawing.Point(154, 365);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = -100;
 			this.textHeight.Name = "textHeight";
@@ -164,7 +172,8 @@ namespace OpenDental{
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(154, 274);
+			this.textWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textWidth.Location = new System.Drawing.Point(154, 339);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = -100;
 			this.textWidth.Name = "textWidth";
@@ -179,7 +188,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(319, 354);
+			this.butOK.Location = new System.Drawing.Point(319, 419);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -194,7 +203,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(409, 354);
+			this.butCancel.Location = new System.Drawing.Point(409, 419);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -203,8 +212,9 @@ namespace OpenDental{
 			// 
 			// checkIsMultiPage
 			// 
+			this.checkIsMultiPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkIsMultiPage.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsMultiPage.Location = new System.Drawing.Point(42, 348);
+			this.checkIsMultiPage.Location = new System.Drawing.Point(42, 413);
 			this.checkIsMultiPage.Name = "checkIsMultiPage";
 			this.checkIsMultiPage.Size = new System.Drawing.Size(126, 20);
 			this.checkIsMultiPage.TabIndex = 101;
@@ -215,7 +225,7 @@ namespace OpenDental{
 			// FormSheetDef
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(496, 390);
+			this.ClientSize = new System.Drawing.Size(496, 455);
 			this.Controls.Add(this.checkIsMultiPage);
 			this.Controls.Add(this.checkIsLandscape);
 			this.Controls.Add(this.textDescription);

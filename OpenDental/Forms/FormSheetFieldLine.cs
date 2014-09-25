@@ -22,6 +22,7 @@ namespace OpenDental {
 		}
 
 		private void FormSheetFieldLine_Load(object sender,EventArgs e) {
+			textYPos.MaxVal=SheetDefCur.HeightTotal-1;//The maximum y-value of the sheet field must be within the page vertically.
 			if(IsReadOnly){
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
