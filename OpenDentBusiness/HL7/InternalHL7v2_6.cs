@@ -330,7 +330,7 @@ namespace OpenDentBusiness.HL7 {
 						//Uniquely identifies this instance of a problem
 						//If we were to send this, it would be the oidinternal root for problems (root+".5") with the disease.DiseaseNum as the ID
 						//We expect the sending software to send an ID with an assigning authority root ID and we will link that to our disease.DiseaseNum in the oidexternals table
-						//Example: |76543^^OtherSoftwareRoot.OID|
+						//Example: |76543^^OtherSoftwareRoot.ProblemOID|
 						seg.AddField(4,"problemUniqueId");
 						//PRB.7, Problem Established Date/Time
 						seg.AddField(7,"problemStartDate");

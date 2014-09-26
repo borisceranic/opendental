@@ -412,20 +412,16 @@ namespace OpenDentBusiness{
 			table.Columns.Add("TxtMsgOk");
 			table.Columns.Add("WirelessPhone");
 			List<DataRow> rows=new List<DataRow>();
-			string command="SELECT patient.PatNum,"
-				+"patient.LName,"
-				+"patient.FName,patient.Preferred,patient.LName, "
-				+"patient.Guarantor,AptDateTime,patient.Birthdate,patient.ClinicNum,patient.HmPhone,patient.TxtMsgOk,"
-				+"patient.WkPhone,patient.WirelessPhone,ProcDescript,Confirmed,Note,"
-				+"patient.AddrNote,AptNum,patient.MedUrgNote,patient.PreferConfirmMethod,"
-				+"guar.Email guarEmail,patient.Email,patient.Premed,DateTimeAskedToArrive "
+			string command="SELECT patient.PatNum,patient.LName,patient.FName,patient.Preferred,patient.LName,patient.Guarantor,"
+				+"AptDateTime,patient.Birthdate,patient.ClinicNum,patient.HmPhone,patient.TxtMsgOk,patient.WkPhone,"
+				+"patient.WirelessPhone,ProcDescript,Confirmed,Note,patient.AddrNote,AptNum,patient.MedUrgNote,"
+				+"patient.PreferConfirmMethod,guar.Email guarEmail,patient.Email,patient.Premed,DateTimeAskedToArrive "
 				+"FROM patient,appointment,patient guar "
 				+"WHERE patient.PatNum=appointment.PatNum "
 				+"AND patient.Guarantor=guar.PatNum "
 				+"AND AptDateTime > "+POut.Date(dateFrom)+" "
-				+"AND AptDateTime < "+POut.Date(dateTo.AddDays(1))+" "
-				+"AND (AptStatus=1 "//scheduled
-				+"OR AptStatus=4) ";//ASAP
+				+"AND AptDateTime <= "+POut.Date(dateTo)+" "
+				+"AND AptStatus IN(1,4) ";//scheduled,ASAP
 			if(provNum>0){
 				command+="AND ((appointment.ProvNum="+POut.Long(provNum)+" AND appointment.IsHygiene=0) "//only include doc if it's not a hyg appt
 					//"AND (appointment.ProvNum="+POut.Long(provNum)
@@ -436,16 +432,26 @@ namespace OpenDentBusiness{
 				command+="AND appointment.ClinicNum="+POut.Long(clinicNum)+" ";
 			}
 			if(showRecall && !showNonRecall) {
-				command+="AND AptNum IN ("
-					+"SELECT AptNum FROM procedurelog "
+				command+="AND appointment.AptNum IN ("
+					+"SELECT procedurelog.AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"AND procedurecode.IsHygiene=1) ";
+					+"AND procedurecode.IsHygiene=1 "//recall appt if there is 1 or more procedure on the appt that is marked IsHygiene
+					+"WHERE procedurelog.ProcStatus=1) "
+					+"AND patient.PatNum IN ("
+					+"SELECT DISTINCT procedurelog.PatNum "
+					+"FROM procedurelog USE INDEX(indexPatNum) "
+					+"WHERE procedurelog.ProcStatus=2) ";//and the patient has had a procedure completed in the office (i.e. not the patient's first appt)
 			}
 			else if(!showRecall && showNonRecall) {
-			  command+="AND AptNum NOT IN ("
+				command+="AND (appointment.AptNum NOT IN ("
 					+"SELECT AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"AND procedurecode.IsHygiene=1) ";
+					+"AND procedurecode.IsHygiene=1 "//include if the appointment does not have a procedure marked IsHygiene
+					+"WHERE procedurelog.ProcStatus=1) "
+					+"OR patient.PatNum NOT IN ("
+					+"SELECT DISTINCT procedurelog.PatNum "
+					+"FROM procedurelog USE INDEX(indexPatNum) "
+					+"WHERE procedurelog.ProcStatus=2)) ";//or if the patient has never had a completed procedure (new patient appts)
 			}
 			command+="ORDER BY AptDateTime";
 			DataTable rawtable=Db.GetTable(command);
