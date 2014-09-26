@@ -1793,6 +1793,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter an adjustment type for billing charges.");
 				return;
 			}
+			if(comboProcDiscountType.SelectedIndex==-1) {
+				MsgBox.Show(this,"Please enter an adjustment type for procedure discounts.");
+				return;
+			}
 			if(textStatementsCalcDueDate.errorProvider1.GetError(textStatementsCalcDueDate)!=""
 				| textPayPlansBillInAdvanceDays.errorProvider1.GetError(textPayPlansBillInAdvanceDays)!="")
 			{
