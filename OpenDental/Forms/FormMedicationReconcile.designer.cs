@@ -37,6 +37,7 @@ namespace OpenDental{
 			this.butAddEvent = new OpenDental.UI.Button();
 			this.gridReconcileEvents = new OpenDental.UI.ODGrid();
 			this.label2 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.pictBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -222,10 +223,20 @@ namespace OpenDental{
     "y entries that are inaccurate.";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(6, 640);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(815, 27);
+			this.label3.TabIndex = 79;
+			this.label3.Text = resources.GetString("label3.Text");
+			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormMedicationReconcile
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(918, 676);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.splitContainer1);
 			this.Controls.Add(this.butPickRxListImage);
 			this.Controls.Add(this.butAdd);
@@ -264,5 +275,6 @@ namespace OpenDental{
 		private UI.ODGrid gridReconcileEvents;
 		private UI.Button butAddEvent;
 		private UI.Button butDelete;
+		private System.Windows.Forms.Label label3;
 	}
 }
