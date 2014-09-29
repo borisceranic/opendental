@@ -20,6 +20,10 @@ namespace OpenDental {
 			_ccd="";
 		}
 
+		private void FormEhrExportCCD_Load(object sender,EventArgs e) {
+			textDate.Text=DateTimeOD.Today.ToShortDateString();
+		}
+
 		private void butCheckAll_Click(object sender,EventArgs e) {
 			checkAllergy.Checked=true;
 			checkEncounter.Checked=true;
@@ -52,10 +56,15 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			try {
-				_ccd=EhrCCD.GenerateClinicalSummary(_patCur,checkAllergy.Checked,checkEncounter.Checked,checkFunctionalStatus.Checked,checkImmunization.Checked,checkMedication.Checked,checkPlanOfCare.Checked,checkProblem.Checked,checkProcedure.Checked,checkReferral.Checked,checkResult.Checked,checkSocialHistory.Checked,checkVitalSign.Checked,textInstructions.Text);
+				if(textDate.errorProvider1.GetError(textDate)!="") {
+					MsgBox.Show(this,"Invalid date");
+					return;
+				}
+				DateTime date=PIn.Date(textDate.Text);
+				_ccd=EhrCCD.GenerateClinicalSummary(_patCur,checkAllergy.Checked,checkEncounter.Checked,checkFunctionalStatus.Checked,checkImmunization.Checked,checkMedication.Checked,checkPlanOfCare.Checked,checkProblem.Checked,checkProcedure.Checked,checkReferral.Checked,checkResult.Checked,checkSocialHistory.Checked,checkVitalSign.Checked,textInstructions.Text,date);
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g(this,ex.Message));
+				MessageBox.Show(ex.Message);
 				return;
 			}
 			DialogResult=DialogResult.OK;
