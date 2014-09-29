@@ -16,6 +16,8 @@ namespace OpenDental {
 		private System.ComponentModel.Container components = null;
 		///<summary></summary>
 		public bool IsSelectionMode;
+		///<summary>Used when coming from FormEHR if a Transition of Care is needed for a reconcile.</summary>
+		public bool IsDoctorSelectionMode;
 		private OpenDental.UI.Button butAdd;
 		private List<Referral> listRef;
 		private UI.ODGrid gridMain;
@@ -318,6 +320,12 @@ namespace OpenDental {
 				return;
 			}
 			if(IsSelectionMode) {
+				if(IsDoctorSelectionMode && !FormRE2.RefCur.IsDoctor) {
+					MsgBox.Show(this,"Please select a doctor referral.");
+					gridMain.SetSelected(false);//Remove selection to prevent caching issue on OK click.  This line is an attempted fix.
+					FillTable();
+					return;
+				}
 				SelectedReferral=FormRE2.RefCur;
 				DialogResult=DialogResult.OK;
 				return;
@@ -344,6 +352,10 @@ namespace OpenDental {
 			if(IsSelectionMode) {
 				if(gridMain.GetSelectedIndex()==-1) {
 					MsgBox.Show(this,"Please select a referral first");
+					return;
+				}
+				if(IsDoctorSelectionMode && listRef[gridMain.GetSelectedIndex()].IsDoctor==false) {
+					MsgBox.Show(this,"Please select a doctor referral.");
 					return;
 				}
 				SelectedReferral=(Referral)listRef[gridMain.GetSelectedIndex()];

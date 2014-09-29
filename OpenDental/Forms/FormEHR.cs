@@ -274,6 +274,37 @@ namespace OpenDental {
 						FillGridMu();
 						break;
 					case EhrMeasureType.MedReconcile:
+						int compare=EhrMeasures.CompareReferralsToReconciles(PatNum);
+						if(compare==1 || compare==0) {//Referral count is less than reconcile count or both are zero.
+							FormReferralSelect FormRS=new FormReferralSelect();
+							FormRS.IsDoctorSelectionMode=true;
+							FormRS.IsSelectionMode=true;
+							FormRS.ShowDialog();
+							if(FormRS.DialogResult!=DialogResult.OK) {
+								return;
+							}
+							List<RefAttach> RefAttachList=RefAttaches.RefreshFiltered(PatNum,false,0);
+							RefAttach refattach=new RefAttach();
+							refattach.ReferralNum=FormRS.SelectedReferral.ReferralNum;
+							refattach.PatNum=PatNum;
+							refattach.IsFrom=true;
+							refattach.RefDate=DateTimeOD.Today;
+							if(FormRS.SelectedReferral.IsDoctor) {//whether using ehr or not
+								refattach.IsTransitionOfCare=true;
+							}
+							int order=0;
+							for(int i=0;i<RefAttachList.Count;i++) {
+								if(RefAttachList[i].ItemOrder > order) {
+									order=RefAttachList[i].ItemOrder;
+								}
+							}
+							refattach.ItemOrder=order+1;
+							RefAttaches.Insert(refattach);
+							SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,PatNum,"Referred From "+Referrals.GetNameFL(refattach.ReferralNum));
+						}
+						else if(compare==-1) {//The referral count is greater than the reconcile count.
+							//So we do not need to show the referral window, we just need to reconcile below.
+						}
 						FormEhrSummaryOfCare FormMedRec=new FormEhrSummaryOfCare();
 						FormMedRec.PatCur=PatCur;
 						FormMedRec.ShowDialog();
@@ -339,9 +370,43 @@ namespace OpenDental {
 			if(e.Col==4) {
 				switch(listMu[e.Row].MeasureType) {
 					case EhrMeasureType.MedReconcile:
-						FormReferralsPatient FormRefMed=new FormReferralsPatient();
-						FormRefMed.PatNum=PatCur.PatNum;
-						FormRefMed.ShowDialog();
+							int compare=EhrMeasures.CompareReferralsToReconciles(PatNum);
+						if(compare==1 || compare==0) {
+							FormReferralSelect FormRS=new FormReferralSelect();
+							FormRS.IsDoctorSelectionMode=true;
+							FormRS.IsSelectionMode=true;
+							FormRS.ShowDialog();
+							if(FormRS.DialogResult==DialogResult.OK) {
+								List<RefAttach> RefAttachList=RefAttaches.RefreshFiltered(PatNum,false,0);
+								RefAttach refattach=new RefAttach();
+								refattach.ReferralNum=FormRS.SelectedReferral.ReferralNum;
+								refattach.PatNum=PatNum;
+								refattach.IsFrom=true;
+								refattach.RefDate=DateTimeOD.Today;
+								if(FormRS.SelectedReferral.IsDoctor) {//whether using ehr or not
+									//we're not going to ask.  That's stupid.
+									//if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Is this an incoming transition of care from another provider?")){
+									refattach.IsTransitionOfCare=true;
+								}
+								int order=0;
+								for(int i=0;i<RefAttachList.Count;i++) {
+									if(RefAttachList[i].ItemOrder > order) {
+										order=RefAttachList[i].ItemOrder;
+									}
+								}
+								refattach.ItemOrder=order+1;
+								RefAttaches.Insert(refattach);
+								SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,PatNum,"Referred From "+Referrals.GetNameFL(refattach.ReferralNum));
+								FormMedicationReconcile FormMedRec=new FormMedicationReconcile();
+								FormMedRec.PatCur=PatCur;
+								FormMedRec.ShowDialog();
+							}
+						}
+						else if(compare==-1) {
+							FormMedicationReconcile FormMedRec=new FormMedicationReconcile();
+							FormMedRec.PatCur=PatCur;
+							FormMedRec.ShowDialog();
+						}
 						FillGridMu();
 						//ResultOnClosing=EhrFormResult.Referrals;
 						//Close();
