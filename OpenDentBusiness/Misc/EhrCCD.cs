@@ -97,11 +97,11 @@ namespace OpenDentBusiness {
 
 		#region CCD Creation
 
-		///<summary>Generates a Clinical Summary XML document with an appropriate referral string. Throws an exception if validation fails.</summary>
-		public static string GenerateClinicalSummary(Patient pat,bool hasAllergy,bool hasEncounter,bool hasFunctionalStatus,bool hasImmunization,bool hasMedication,bool hasPlanOfCare,bool hasProblem,bool hasProcedure,bool hasReferral,bool hasResult,bool hasSocialHistory,bool hasVitalSign,string instructions) {
+		///<summary>Generates a Clinical Summary XML document with an appropriate referral string.  Sections can be included/excluded.  Output is for the date specified, but only applied to specific sections.  Throws an exception if validation fails.</summary>
+		public static string GenerateClinicalSummary(Patient pat,bool hasAllergy,bool hasEncounter,bool hasFunctionalStatus,bool hasImmunization,bool hasMedication,bool hasPlanOfCare,bool hasProblem,bool hasProcedure,bool hasReferral,bool hasResult,bool hasSocialHistory,bool hasVitalSign,string instructions,DateTime date) {
 			string referralReason="Summary of previous appointment requested.";
 			EhrCCD ccd=new EhrCCD();
-			return ccd.GenerateCCD(pat,referralReason,hasAllergy,hasEncounter,hasFunctionalStatus,hasImmunization,hasMedication,hasPlanOfCare,hasProblem,hasProcedure,hasReferral,hasResult,hasSocialHistory,hasVitalSign,instructions);
+			return ccd.GenerateCCD(pat,referralReason,hasAllergy,hasEncounter,hasFunctionalStatus,hasImmunization,hasMedication,hasPlanOfCare,hasProblem,hasProcedure,hasReferral,hasResult,hasSocialHistory,hasVitalSign,instructions,date);
 		}
 
 		///<summary>Generates a Summary of Care XML document with an appropriate referral string. Throws an exception if validation fails.</summary>
@@ -125,13 +125,13 @@ namespace OpenDentBusiness {
 		///<summary>Throws an exception if validation fails.</summary>
 		private static string GenerateCCD(Patient pat,string referralReason) {
 			EhrCCD ccd=new EhrCCD();
-			return ccd.GenerateCCD(pat,referralReason,true,true,true,true,true,true,true,true,true,true,true,true,null);
+			return ccd.GenerateCCD(pat,referralReason,true,true,true,true,true,true,true,true,true,true,true,true,null,DateTime.MinValue);
 		}
 
 		///<summary>Throws an exception if validation fails.</summary>
-		private string GenerateCCD(Patient pat,string referralReason,bool hasAllergy,bool hasEncounter,bool hasFunctionalStatus,bool hasImmunization,bool hasMedication,bool hasPlanOfCare,bool hasProblem,bool hasProcedure,bool hasReferral,bool hasResult,bool hasSocialHistory,bool hasVitalSign,string instructions) {
+		private string GenerateCCD(Patient pat,string referralReason,bool hasAllergy,bool hasEncounter,bool hasFunctionalStatus,bool hasImmunization,bool hasMedication,bool hasPlanOfCare,bool hasProblem,bool hasProcedure,bool hasReferral,bool hasResult,bool hasSocialHistory,bool hasVitalSign,string instructions,DateTime date) {
 			Medications.Refresh();
-			string strErrors=ValidateAll(pat);
+			string strErrors=ValidateAll(pat,date);
 			if(strErrors!="") {
 				throw new ApplicationException(strErrors);
 			}
@@ -2404,21 +2404,21 @@ Vital Signs
 		}
 
 		///<summary>Does validation on the filtered lists. NEEDS TO BE ENHANCED.</summary>
-		private static string ValidateAll(Patient pat) {
+		private static string ValidateAll(Patient pat,DateTime date) {
 			string err="";
 			err=err+ValidateSettings();
 			err=err+ValidatePatient(pat);
 			err=err+ValidateAllergy(pat);
-			err=err+ValidateEncounter(pat);
+			err=err+ValidateEncounter(pat,date);
 			err=err+ValidateFunctionalStatus(pat);
 			err=err+ValidateImmunization(pat);
 			err=err+ValidateLabResults(pat);
 			err=err+ValidateMedication(pat);
-			err=err+ValidatePlanOfCare(pat);
+			err=err+ValidatePlanOfCare(pat,date);
 			err=err+ValidateProblem(pat);
-			err=err+ValidateProcedure(pat);
+			err=err+ValidateProcedure(pat,date);
 			err=err+ValidateSocialHistory(pat);
-			err=err+ValidateVitalsSign(pat);
+			err=err+ValidateVitalsSign(pat,date);
 			return err;
 		}
 
@@ -2664,19 +2664,22 @@ Vital Signs
 		}
 
 		///<summary>Does validation on the filtered list. NEEDS TO BE ENHANCED.</summary>
-		private static string ValidateEncounter(Patient pat) {
-			FilterEncounter(pat);
+		private static string ValidateEncounter(Patient pat,DateTime date) {
+			FilterEncounter(pat,date);
 			//TODO: Add validation
 			return "";
 		}
 
 		///<summary>Filters list of encounters. Also runs validation.</summary>
-		private static void FilterEncounter(Patient patCur) {
+		private static void FilterEncounter(Patient patCur,DateTime date) {
 			List<Encounter> listEncountersAll=Encounters.Refresh(patCur.PatNum);
 			List<Encounter> listEncountersFiltered=new List<Encounter>();
 			for(int i=0;i<listEncountersAll.Count;i++) {
 				if(listEncountersAll[i].CodeSystem!="SNOMEDCT") {
 					continue;//The format only allows SNOMED codes and ICD10 codes. We do not have a way to enter ICD10 codes, and SNOMED appears to be the preferred code system anyway.
+				}
+				if(date!=DateTime.MinValue && listEncountersAll[i].DateEncounter.Date!=date.Date) {
+					continue;//If there is a date restriction, then ignore encounters which are not on the given date.
 				}
 				listEncountersFiltered.Add(listEncountersAll[i]);
 			}
@@ -2744,18 +2747,20 @@ Vital Signs
 		}
 
 		///<summary>Does validation on the filtered list. NEEDS TO BE ENHANCED.</summary>
-		private static string ValidatePlanOfCare(Patient pat) {
-			FilterPlanOfCare(pat);
+		private static string ValidatePlanOfCare(Patient pat,DateTime date) {
+			FilterPlanOfCare(pat,date);
 			//TODO: Add validation
 			return "";
 		}
 
 		///<summary>Filters list of care plans. Also runs validation.</summary>
-		private static void FilterPlanOfCare(Patient patCur) {
+		private static void FilterPlanOfCare(Patient patCur,DateTime date) {
 			List<EhrCarePlan> listEhrCarePlansAll=EhrCarePlans.Refresh(patCur.PatNum);
 			List<EhrCarePlan> listEhrCarePlansFiltered=new List<EhrCarePlan>();
 			for(int i=0;i<listEhrCarePlansAll.Count;i++) {
-				//No filters yet. This loop is here to match our pattern. If we need to add filters later, the change will be safer and more obvious.
+				if(date!=DateTime.MinValue && listEhrCarePlansAll[i].DatePlanned.Date<date.Date) {
+					continue;//Exclude care plans which are in the past if a date limitation is specified.
+				}
 				listEhrCarePlansFiltered.Add(listEhrCarePlansAll[i]);
 			}
 			_listEhrCarePlansFiltered=listEhrCarePlansFiltered;
@@ -2786,14 +2791,14 @@ Vital Signs
 		}
 
 		///<summary>Does validation on the filtered list. NEEDS TO BE ENHANCED.</summary>
-		private static string ValidateProcedure(Patient pat) {
-			FilterProcedure(pat);
+		private static string ValidateProcedure(Patient pat,DateTime date) {
+			FilterProcedure(pat,date);
 			//TODO: Add validation
 			return "";
 		}
 
 		///<summary>Filters list of procedures. Also runs validation.</summary>
-		private static void FilterProcedure(Patient patCur) {
+		private static void FilterProcedure(Patient patCur,DateTime date) {
 			List<Procedure> listProcsAll=Procedures.Refresh(patCur.PatNum);
 			List<Procedure> listProcsFiltered=new List<Procedure>();
 			for(int i=0;i<listProcsAll.Count;i++) {
@@ -2806,6 +2811,9 @@ Vital Signs
 				}
 				if(listProcsAll[i].ProcStatus==ProcStat.R) {
 					continue;//Ignore procedures referred out.  It is the responsibility of the treating dentist to record work they have performed.
+				}
+				if(date!=DateTime.MinValue && listProcsAll[i].ProcDate.Date!=date.Date) {
+					continue;//Ignore procedures which are not on the given date if a date limitation was specified.
 				}
 				listProcsFiltered.Add(listProcsAll[i]);
 			}
@@ -2856,14 +2864,14 @@ Vital Signs
 		}
 
 		///<summary>Does validation on the filtered list. NEEDS TO BE ENHANCED.</summary>
-		private static string ValidateVitalsSign(Patient pat) {
-			FilterVitalSign(pat);
+		private static string ValidateVitalsSign(Patient pat,DateTime date) {
+			FilterVitalSign(pat,date);
 			//TODO: Add validation
 			return "";
 		}
 
 		///<summary>Filters list of procedures. Also runs validation.</summary>
-		private static void FilterVitalSign(Patient patCur) {
+		private static void FilterVitalSign(Patient patCur,DateTime date) {
 			List<Vitalsign> listVitalSignsAll=Vitalsigns.Refresh(patCur.PatNum);
 			List<Vitalsign> listVitalSignsFiltered=new List<Vitalsign>();
 			for(int i=0;i<listVitalSignsAll.Count;i++) {
@@ -2872,6 +2880,9 @@ Vital Signs
 				float bmi=Vitalsigns.CalcBMI(vitalsign.Weight,vitalsign.Height);//will be 0 if either wight is 0 or height is 0.
 				if(vitalsign.Height==0 && vitalsign.Weight==0 && bmi==0 && (vitalsign.BpSystolic==0 || vitalsign.BpDiastolic==0)) {
 					continue;//Nothing to report.
+				}
+				if(date!=DateTime.MinValue && vitalsign.DateTaken.Date!=date.Date) {
+					continue;//Ignore vital signs which are not on the given date if a date limitation was specified.
 				}
 				listVitalSignsFiltered.Add(listVitalSignsAll[i]);
 			}
