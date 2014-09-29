@@ -2337,8 +2337,8 @@ namespace OpenDentBusiness{
 								mu.Met=MuMet.True;
 							}
 						}
-						mu.Action="Reconcile from received CCD";
-						mu.Action2="Enter Referrals";
+						mu.Action="Electronic Reconciliation";
+						mu.Action2="Manual Reconciliation";
 						break;
 					#endregion
 					#region SummaryOfCare
@@ -4384,8 +4384,8 @@ namespace OpenDentBusiness{
 								mu.Met=MuMet.True;
 							}
 						}
-						mu.Action="Reconcile from received CCD";
-						mu.Action2="Enter Referrals";
+						mu.Action="Electronic Reconciliation";
+						mu.Action2="Manual Reconciliation";
 						break;
 					#endregion
 					#region SummaryOfCare
@@ -4559,6 +4559,40 @@ namespace OpenDentBusiness{
 			}
 			return list;
 		}
+		#endregion
+		#region Helper Methods
+		/// <summary>Returns an int comparison of count when comparing reconciles and referrals. If reconciles are greater than or equal to referrals, returns 1. If referrals are greater than reconciles, returns -1. If there are no referrals, returns 0.</summary>
+		public static int CompareReferralsToReconciles(long patNum) {
+			List<RefAttach> listRefAttach=RefAttaches.Refresh(patNum);
+			List<EhrMeasureEvent> listMeasureEvents=EhrMeasureEvents.Refresh(patNum);
+			int refFromCount=0;
+			int refFromPeriodCount=0;
+			for(int i=0;i<listRefAttach.Count;i++) {
+				if(listRefAttach[i].IsFrom && listRefAttach[i].IsTransitionOfCare) {
+					refFromCount++;
+					if(listRefAttach[i].RefDate > DateTime.Now.AddYears(-1)) {//within the last year
+						refFromPeriodCount++;
+					}
+				}
+			}
+			if(refFromPeriodCount==0) {
+				return 0;
+			}
+			else {
+				List<EhrMeasureEvent> listReconciles=EhrMeasureEvents.GetByType(listMeasureEvents,EhrMeasureEventType.MedicationReconcile);
+				int reconcileCount=0;//during reporting period.
+				for(int i=0;i<listReconciles.Count;i++) {
+					if(listReconciles[i].DateTEvent > DateTime.Now.AddYears(-1)) {//within the same period as the count for referrals.
+						reconcileCount++;
+					}
+				}
+				if(refFromPeriodCount>reconcileCount) {
+					return -1;
+				}
+				return 1;//countReconciles is greater than or equal to countFromRefPeriod
+			}
+		}
+
 		#endregion
 	}
 
