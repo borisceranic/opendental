@@ -435,22 +435,20 @@ namespace OpenDentBusiness{
 				command+="AND appointment.AptNum IN ("
 					+"SELECT procedurelog.AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"AND procedurecode.IsHygiene=1 "//recall appt if there is 1 or more procedure on the appt that is marked IsHygiene
-					+"WHERE procedurelog.ProcStatus=1) "
+					+"AND procedurecode.IsHygiene=1) "//recall appt if there is 1 or more procedure on the appt that is marked IsHygiene
 					+"AND patient.PatNum IN ("
 					+"SELECT DISTINCT procedurelog.PatNum "
-					+"FROM procedurelog USE INDEX(indexPatNum) "
+					+"FROM procedurelog "
 					+"WHERE procedurelog.ProcStatus=2) ";//and the patient has had a procedure completed in the office (i.e. not the patient's first appt)
 			}
 			else if(!showRecall && showNonRecall) {
 				command+="AND (appointment.AptNum NOT IN ("
 					+"SELECT AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"AND procedurecode.IsHygiene=1 "//include if the appointment does not have a procedure marked IsHygiene
-					+"WHERE procedurelog.ProcStatus=1) "
+					+"AND procedurecode.IsHygiene=1) "//include if the appointment does not have a procedure marked IsHygiene
 					+"OR patient.PatNum NOT IN ("
 					+"SELECT DISTINCT procedurelog.PatNum "
-					+"FROM procedurelog USE INDEX(indexPatNum) "
+					+"FROM procedurelog "
 					+"WHERE procedurelog.ProcStatus=2)) ";//or if the patient has never had a completed procedure (new patient appts)
 			}
 			command+="ORDER BY AptDateTime";
