@@ -175,19 +175,24 @@ namespace OpenDentBusiness{
 			return ProviderC.ListLong[Providers.GetIndexLong(patPriProvNum)].FeeSched;
 		}
 
-        ///<summary>Gets the fee schedule from the primary MEDICAL insurance plan, the patient, or the provider in that order.</summary>
+		///<summary>Gets the fee schedule from the primary MEDICAL insurance plan, the first insurance plan, the patient, or the provider in that order.</summary>
 		public static long GetMedFeeSched(Patient pat,List<InsPlan> planList,List<PatPlan> patPlans,List<InsSub> subList) {
 			//No need to check RemotingRole; no call to db. ??
 			long retVal = 0;
 			if(PatPlans.GetInsSubNum(patPlans,1) != 0){
 				//Pick the medinsplan with the ordinal closest to zero
 				int planOrdinal=10; //This is a hack, but I doubt anyone would have more than 10 plans
+				bool hasMedIns=false; //Keep track of whether we found a medical insurance plan, if not use dental insurance fee schedule.
 				InsSub subCur;
 				foreach(PatPlan patplan in patPlans){
 					subCur=InsSubs.GetSub(patplan.InsSubNum,subList);
 					if(patplan.Ordinal<planOrdinal && InsPlans.GetPlan(subCur.PlanNum,planList).IsMedical) {
 						planOrdinal=patplan.Ordinal;
+						hasMedIns=true;
 					}
+				}
+				if(!hasMedIns) { //If this patient doesn't have medical insurance (under ordinal 10)
+					return GetFeeSched(pat,planList,patPlans,subList);  //Use dental insurance fee schedule
 				}
 				subCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlans,planOrdinal),subList);
 				InsPlan PlanCur = InsPlans.GetPlan(subCur.PlanNum, planList);
