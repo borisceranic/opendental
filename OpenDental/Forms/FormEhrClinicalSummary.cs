@@ -81,11 +81,71 @@ namespace OpenDental {
 			MessageBox.Show("Exported");	
 		}
 
-		private void butSendEmail_Click(object sender,EventArgs e) {
-			MsgBox.Show(this,
-				"Clinical summaries cannot be emailed to patients due to security concerns.\r\n"+
-				"Instruct the patient to access their information in the patient portal.\r\n"+
-				"If you are trying to send the patient information directly to another provider, then go to Chart | EHR | Send/Receive summary of care.");
+		private void butSendToPortal_Click(object sender,EventArgs e) {
+			//Validate
+			string strCcdValidationErrors=EhrCCD.ValidateSettings();
+			if(strCcdValidationErrors!="") {//Do not even try to export if global settings are invalid.
+				MessageBox.Show(strCcdValidationErrors);//We do not want to use translations here, because the text is dynamic. The errors are generated in the business layer, and Lan.g() is not available there.
+				return;
+			}
+			strCcdValidationErrors=EhrCCD.ValidatePatient(PatCur);//Patient cannot be null, because a patient must be selected before the EHR dashboard will open.
+			if(strCcdValidationErrors!="") {
+				MessageBox.Show(strCcdValidationErrors);//We do not want to use translations here, because the text is dynamic. The errors are generated in the business layer, and Lan.g() is not available there.
+				return;
+			}
+			Provider prov=null;
+			if(Security.CurUser.ProvNum!=0) {//If the current user is a provider.
+				prov=Providers.GetProv(Security.CurUser.ProvNum);
+			}
+			else {
+				prov=Providers.GetProv(PatCur.PriProv);//PriProv is not 0, because EhrCCD.ValidatePatient() will block if PriProv is 0.
+			}
+			try {
+				//Create the Clinical Summary.
+				FormEhrExportCCD FormEEC=new FormEhrExportCCD(PatCur);
+				FormEEC.ShowDialog();
+				if(FormEEC.DialogResult!=DialogResult.OK) {//Canceled
+					return;
+				}
+				//Save the clinical summary (ccd.xml) and style sheet (ccd.xsl) as webmail message attachments.
+				Random rnd=new Random();
+				string attachPath=EmailMessages.GetEmailAttachPath();
+				List<EmailAttach> listAttachments=new List<EmailAttach>();
+				EmailAttach attachCcd=new EmailAttach();
+				attachCcd.DisplayedFileName="ccd.xml";
+				attachCcd.ActualFileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".xml";
+				listAttachments.Add(attachCcd);
+				File.WriteAllText(ODFileUtils.CombinePaths(attachPath,attachCcd.ActualFileName),FormEEC.CCD);//Save Clinical Summary to file in the email attachments folder.
+				EmailAttach attachSs=new EmailAttach();//Style sheet attachment.
+				attachSs.DisplayedFileName="ccd.xsl";
+				attachSs.ActualFileName=attachCcd.ActualFileName.Substring(0,attachCcd.ActualFileName.Length-4)+".xsl";//Same base name as the CCD.  The base names must match or the file will not display properly in internet browsers.
+				listAttachments.Add(attachSs);
+				File.WriteAllText(ODFileUtils.CombinePaths(attachPath,attachSs.ActualFileName),FormEHR.GetEhrResource("CCD"));
+				//Create and save the webmail message containing the attachments.
+				EmailMessage msgWebMail=new EmailMessage();				
+				msgWebMail.FromAddress=prov.GetFormalName();
+				msgWebMail.ToAddress=PatCur.GetNameFL();
+				msgWebMail.PatNum=PatCur.PatNum;
+				msgWebMail.SentOrReceived=EmailSentOrReceived.WebMailSent;
+				msgWebMail.ProvNumWebMail=prov.ProvNum;
+				msgWebMail.Subject="Clinical Summary";
+				msgWebMail.BodyText="Please see the attached clinical summary document.";
+				msgWebMail.MsgDateTime=DateTime.Now;
+				msgWebMail.PatNumSubj=PatCur.PatNum;
+				msgWebMail.Attachments=listAttachments;
+				EmailMessages.Insert(msgWebMail);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+				return;
+			}
+			EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
+			newMeasureEvent.DateTEvent=DateTime.Now;
+			newMeasureEvent.EventType=EhrMeasureEventType.ClinicalSummaryProvidedToPt;
+			newMeasureEvent.PatNum=PatCur.PatNum;
+			EhrMeasureEvents.Insert(newMeasureEvent);
+			FillGridEHRMeasureEvents();//This will cause the measure event to show in the grid below the popup message on the next line.  Reassures the user that the event was immediately recorded.
+			MsgBox.Show(this,"Clinical Summary Sent");
 		}
 
 		private void butShowXhtml_Click(object sender,EventArgs e) {
