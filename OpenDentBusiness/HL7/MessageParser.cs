@@ -1397,6 +1397,7 @@ namespace OpenDentBusiness.HL7 {
 						pat.LName=seg.GetFieldComponent(itemOrder,0);
 						pat.FName=seg.GetFieldComponent(itemOrder,1);
 						pat.MiddleI=seg.GetFieldComponent(itemOrder,2);
+						pat.Title=seg.GetFieldComponent(itemOrder,4);
 						continue;
 					case "pat.PatNum":
 						//pat.PatNum guaranteed to not be 0, a new patient will be inserted if the field component for PatNum is not an int, is 0, or is blank

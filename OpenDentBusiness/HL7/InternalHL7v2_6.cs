@@ -89,6 +89,8 @@ namespace OpenDentBusiness.HL7 {
 						//or if no patient can be found using that value.
 						seg.AddField(4,"pat.ChartNumber");
 						//PID.5, Patient Name
+						//This will contain the last, first, and middle names as well as the title
+						//Example:  LName^FName^MiddleI^^Title
 						seg.AddField(5,"pat.nameLFM");
 						//PID.7, Date/Time of Birth
 						seg.AddField(7,"pat.birthdateTime");

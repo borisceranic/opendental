@@ -2249,7 +2249,7 @@ namespace OpenDental{
 			}
 			par.AddText(text);
 			par.AddLineBreak();
-			text=PatCur.GetNameFL()+", DOB "+PatCur.Birthdate.ToShortDateString();
+			text=PatCur.GetNameFLFormal()+", DOB "+PatCur.Birthdate.ToShortDateString();
 			par.AddText(text);
 			par.AddLineBreak();
 			if(gridPlans.SelectedIndices[0]>0){//not the default plan
