@@ -25,7 +25,7 @@
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrClinicalSummary));
 			this.butClose = new System.Windows.Forms.Button();
-			this.butSendEmail = new System.Windows.Forms.Button();
+			this.butSendToPortal = new System.Windows.Forms.Button();
 			this.gridEHRMeasureEvents = new OpenDental.UI.ODGrid();
 			this.butDelete = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -49,15 +49,15 @@
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// butSendEmail
+			// butSendToPortal
 			// 
-			this.butSendEmail.Location = new System.Drawing.Point(109, 19);
-			this.butSendEmail.Name = "butSendEmail";
-			this.butSendEmail.Size = new System.Drawing.Size(84, 23);
-			this.butSendEmail.TabIndex = 11;
-			this.butSendEmail.Text = "by E-mail";
-			this.butSendEmail.UseVisualStyleBackColor = true;
-			this.butSendEmail.Click += new System.EventHandler(this.butSendEmail_Click);
+			this.butSendToPortal.Location = new System.Drawing.Point(109, 19);
+			this.butSendToPortal.Name = "butSendToPortal";
+			this.butSendToPortal.Size = new System.Drawing.Size(84, 23);
+			this.butSendToPortal.TabIndex = 11;
+			this.butSendToPortal.Text = "to Portal";
+			this.butSendToPortal.UseVisualStyleBackColor = true;
+			this.butSendToPortal.Click += new System.EventHandler(this.butSendToPortal_Click);
 			// 
 			// gridEHRMeasureEvents
 			// 
@@ -120,7 +120,7 @@
 			// 
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.Controls.Add(this.butExport);
-			this.groupBox2.Controls.Add(this.butSendEmail);
+			this.groupBox2.Controls.Add(this.butSendToPortal);
 			this.groupBox2.Location = new System.Drawing.Point(39, 10);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(201, 91);
@@ -170,7 +170,7 @@
 		#endregion
 
 		private System.Windows.Forms.Button butClose;
-		private System.Windows.Forms.Button butSendEmail;
+		private System.Windows.Forms.Button butSendToPortal;
         private OpenDental.UI.ODGrid gridEHRMeasureEvents;
 				private System.Windows.Forms.Button butDelete;
 				private System.Windows.Forms.GroupBox groupBox1;
