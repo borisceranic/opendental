@@ -76,7 +76,7 @@ namespace OpenDentBusiness{
 		public string MedUrgNote;
 		/// <summary>Individual patient note for Appointment module note.</summary>
 		public string ApptModNote;
-		/// <summary>Single char for Nonstudent, Parttime, or Fulltime.  Blank also=Nonstudent</summary>
+		/// <summary>Single char.  Nonstudent='N' or blank, Parttime='P', Fulltime='F'.</summary>
 		public string StudentStatus;
 		/// <summary>College name.  If Canadian, then this is field C10 and must be filled if C9 (patient.CanadianEligibilityCode) is 1 and patient is 18 or older.</summary>
 		public string SchoolName;
