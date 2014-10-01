@@ -180,7 +180,7 @@ namespace OpenDentBusiness.HL7 {
 			return prov.ProvNum;
 		}
 
-		///<summary>This field could be a CWE data type or a XCN data type, depending on if it came from an AIG segment, an AIP segment, or a PV1 segment.  The AIG segment would have this as a CWE data type in the format ProvID^LName, FName^^Abbr.  For the AIP and PV1 segments, the data type is XCN and the format would be ProvID^LName^FName^^^Abbr.  This will return 0 if the field or segName are null or if no provider can be found.  A new provider will not be inserted with the information provided if not found by ProvID or name and abbr.  This field is repeatable, so we will check all repetitions for valid provider ID's or name/abbr combinations.</summary>
+		///<summary>This field could be a CWE data type or a XCN data type, depending on if it came from an AIG segment, an AIP segment, or a PV1 segment.  The AIG segment would have this as a CWE data type in the format ProvID^LName, FName MI^^Abbr.  For the AIP and PV1 segments, the data type is XCN and the format would be ProvID^LName^FName^MI^^Abbr.  This will return 0 if the field or segName are null or if no provider can be found.  A new provider will not be inserted with the information provided if not found by ProvID or name and abbr.  This field is repeatable, so we will check all repetitions for valid provider ID's or name/abbr combinations.</summary>
 		public static long ProvParse(FieldHL7 field,SegmentNameHL7 segName,bool isVerbose) {
 			long provNum=0;
 			List<OIDExternal> listOidExt=new List<OIDExternal>();
