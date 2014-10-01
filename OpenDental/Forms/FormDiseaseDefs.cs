@@ -29,6 +29,8 @@ namespace OpenDental{
 		public List<long> SelectedDiseaseDefNums;
 		private ODGrid gridMain;
 		private bool IsChanged;
+		///<summary>A complete list of disease defs including hidden.  Only used when not in selection mode (item orders can change).  It's main purpose is to keep track of the item order for the life of the window so that we do not have to make unnecessary update calls to the database every time the up and down buttons are clicked.</summary>
+		private List<DiseaseDef> _listDiseaseDefs;
 
 		///<summary></summary>
 		public FormDiseaseDefs()
@@ -216,11 +218,49 @@ namespace OpenDental{
 			else{
 				butOK.Visible=false;
 			}
+			RefreshList();
 			FillGrid();
 		}
 
-		private void FillGrid(){
+		///<summary>Simply fills and orders the list of disease defs.  Can be called at any time.</summary>
+		private void RefreshList() {
+			//We need to keep track of the current item orders.
+			Dictionary<long,int> _dictItemOrder=new Dictionary<long,int>();
+			if(_listDiseaseDefs!=null) {
+				for(int i=0;i<_listDiseaseDefs.Count;i++) {
+					_dictItemOrder.Add(_listDiseaseDefs[i].DiseaseDefNum,i);
+				}
+			}
+			//When the cache is refreshed, the item orders and what items are present in the list could have changed.  E.g. deleted, added, or have old ordering.
 			DiseaseDefs.RefreshCache();
+			if(_listDiseaseDefs==null) {//The first time loading the window this list will be null so we simply need to fill it and trust that it is already in the correct order.
+				_listDiseaseDefs=new List<DiseaseDef>(DiseaseDefs.ListLong);
+				return;
+			}
+			//At this point we don't know if the user changed the order of the list and then deleted or added a disease def.  
+			//Therefore we have to use our dictionary of the "old" item orders and reorder the list from the cache.
+			_listDiseaseDefs=new List<DiseaseDef>();
+			for(int j=0;j<_dictItemOrder.Count;j++) {
+				//Find the matching disease def and force it into the order that it was last in.
+				for(int k=0;k<DiseaseDefs.ListLong.Length;k++) {
+					if(_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[k].DiseaseDefNum)
+						&& _dictItemOrder[DiseaseDefs.ListLong[k].DiseaseDefNum]==j) 
+					{
+						_listDiseaseDefs.Add(DiseaseDefs.ListLong[k]);
+						break;
+					}
+					//If no disease def match is found, then that means the user has deleted the disease def and it will not get added to _listDiseaseDefs.
+				}
+			}
+			//Now we need to add any new disease defs (only one can be added at a time but should work for multiple if it is enhanced in the future) to the end of _listDiseasesDefs.
+			for(int i=0;i<DiseaseDefs.ListLong.Length;i++) {
+				if(!_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[i].DiseaseDefNum)) {
+					_listDiseaseDefs.Add(DiseaseDefs.ListLong[i]);
+				}
+			}
+		}
+
+		private void FillGrid() {
 			//listMain.SelectionMode=SelectionMode.MultiExtended;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -250,13 +290,13 @@ namespace OpenDental{
 				}
 			}
 			else {//Not selection mode - show hidden
-				for(int i=0;i<DiseaseDefs.ListLong.Length;i++) {
+				for(int i=0;i<_listDiseaseDefs.Count;i++) {
 					row=new ODGridRow();
-					row.Cells.Add(DiseaseDefs.ListLong[i].ICD9Code);
-					row.Cells.Add(DiseaseDefs.ListLong[i].Icd10Code);
-					row.Cells.Add(DiseaseDefs.ListLong[i].SnomedCode);
-					row.Cells.Add(DiseaseDefs.ListLong[i].DiseaseName);
-					row.Cells.Add(DiseaseDefs.ListLong[i].IsHidden?"X":"");
+					row.Cells.Add(_listDiseaseDefs[i].ICD9Code);
+					row.Cells.Add(_listDiseaseDefs[i].Icd10Code);
+					row.Cells.Add(_listDiseaseDefs[i].SnomedCode);
+					row.Cells.Add(_listDiseaseDefs[i].DiseaseName);
+					row.Cells.Add(_listDiseaseDefs[i].IsHidden?"X":"");
 					gridMain.Rows.Add(row);
 				}
 			}
@@ -282,12 +322,13 @@ namespace OpenDental{
 				return;
 			}
 			//everything below this point is _not_ selection mode.  User guaranteed to have permission for ProblemEdit.
-			FormDiseaseDefEdit FormD=new FormDiseaseDefEdit(DiseaseDefs.ListLong[gridMain.GetSelectedIndex()]);
+			FormDiseaseDefEdit FormD=new FormDiseaseDefEdit(_listDiseaseDefs[gridMain.GetSelectedIndex()]);
 			FormD.ShowDialog();
 			//Security log entry made inside that form.
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			RefreshList();
 			IsChanged=true;
 			FillGrid();
 		}
@@ -297,7 +338,7 @@ namespace OpenDental{
 				return;
 			}
 			DiseaseDef def=new DiseaseDef();
-			def.ItemOrder=DiseaseDefs.ListLong.Length;
+			def.ItemOrder=_listDiseaseDefs.Count;
 			FormDiseaseDefEdit FormD=new FormDiseaseDefEdit(def);
 			FormD.IsNew=true;
 			FormD.ShowDialog();
@@ -305,46 +346,47 @@ namespace OpenDental{
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			RefreshList();
 			IsChanged=true;
 			FillGrid();
 		}
 
 		private void butUp_Click(object sender,EventArgs e) {
-			//These aren't yet optimized for multiselection.
-			int selected=gridMain.GetSelectedIndex();
-			try{
-				DiseaseDefs.MoveUp(gridMain.GetSelectedIndex());
-			}
-			catch(ApplicationException ex){
-				MessageBox.Show(ex.Message);
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an item in the grid first.");
 				return;
 			}
-			FillGrid();
-			if(selected==0) {
-				gridMain.SetSelected(0,true);
+			int[] selected=new int[gridMain.SelectedIndices.Length];
+			Array.Copy(gridMain.SelectedIndices,selected,gridMain.SelectedIndices.Length);
+			if(selected[0]==0) {
+				return;
 			}
-			else{
-				gridMain.SetSelected(selected-1,true);
+			for(int i=0;i<selected.Length;i++) {
+				_listDiseaseDefs.Reverse(selected[i]-1,2);
+			}
+			FillGrid();
+			for(int i=0;i<selected.Length;i++) {
+				gridMain.SetSelected(selected[i]-1,true);
 			}
 			IsChanged=true;
 		}
 
 		private void butDown_Click(object sender,EventArgs e) {
-			//These aren't yet optimized for multiselection.
-			int selected=gridMain.GetSelectedIndex();
-			try {
-				DiseaseDefs.MoveDown(gridMain.GetSelectedIndex());
-			}
-			catch(ApplicationException ex) {
-				MessageBox.Show(ex.Message);
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an item in the grid first.");
 				return;
 			}
-			FillGrid();
-			if(selected==DiseaseDefs.ListLong.Length-1) {
-				gridMain.GetSelectedIndex();
+			int[] selected=new int[gridMain.SelectedIndices.Length];
+			Array.Copy(gridMain.SelectedIndices,selected,gridMain.SelectedIndices.Length);
+			if(selected[selected.Length-1]==_listDiseaseDefs.Count-1) {
+				return;
 			}
-			else{
-				gridMain.SetSelected(selected+1,true);
+			for(int i=selected.Length-1;i>=0;i--) {//go backwards
+				_listDiseaseDefs.Reverse(selected[i],2);
+			}
+			FillGrid();
+			for(int i=0;i<selected.Length;i++) {
+				gridMain.SetSelected(selected[i]+1,true);
 			}
 			IsChanged=true;
 		}
@@ -365,13 +407,24 @@ namespace OpenDental{
 				SelectedDiseaseDefNum=DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum;
 			}
 			else {
-				SelectedDiseaseDefNum=DiseaseDefs.ListLong[gridMain.GetSelectedIndex()].DiseaseDefNum;
+				SelectedDiseaseDefNum=_listDiseaseDefs[gridMain.GetSelectedIndex()].DiseaseDefNum;
 			}
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {
-			DialogResult=DialogResult.Cancel;//also closes if not IsSelectionMode
+			if(IsSelectionMode) {//Never update disease defs in selection mode.
+				DialogResult=DialogResult.Cancel;
+			}
+			//Only update the defs that changed their item order.
+			for(int i=0;i<_listDiseaseDefs.Count;i++) {
+				if(_listDiseaseDefs[i].ItemOrder!=i) {
+					_listDiseaseDefs[i].ItemOrder=i;
+					DiseaseDefs.Update(_listDiseaseDefs[i]);
+					IsChanged=true;//Just in case?  This should already be flagged as true by this point.
+				}
+			}
+			DialogResult=DialogResult.Cancel;
 		}
 
 		private void FormDiseaseDefs_FormClosing(object sender,FormClosingEventArgs e) {
@@ -382,47 +435,7 @@ namespace OpenDental{
 
 		
 
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
 
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
