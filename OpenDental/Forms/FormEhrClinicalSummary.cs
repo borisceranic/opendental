@@ -108,6 +108,8 @@ namespace OpenDental {
 					return;
 				}
 				//Save the clinical summary (ccd.xml) and style sheet (ccd.xsl) as webmail message attachments.
+				//TODO: It would be more patient friendly if we instead generated a PDF file containing the Clinical Summary printout, or if we simply displayed the Clinical Summary in the portal.
+				//The CMS definition does not prohibit sending human readable files, and sending a PDF to the portal mimics printing the Clinical Summary and handing to patient.
 				Random rnd=new Random();
 				string attachPath=EmailMessages.GetEmailAttachPath();
 				List<EmailAttach> listAttachments=new List<EmailAttach>();
@@ -129,7 +131,7 @@ namespace OpenDental {
 				msgWebMail.SentOrReceived=EmailSentOrReceived.WebMailSent;
 				msgWebMail.ProvNumWebMail=prov.ProvNum;
 				msgWebMail.Subject="Clinical Summary";
-				msgWebMail.BodyText="Please see the attached clinical summary document.";
+				msgWebMail.BodyText="To view the clinical summary:\r\n1) Download all attachments to the same folder.  Do not rename the files.\r\n2) Open the ccd.xml file in an internet browser.";
 				msgWebMail.MsgDateTime=DateTime.Now;
 				msgWebMail.PatNumSubj=PatCur.PatNum;
 				msgWebMail.Attachments=listAttachments;
