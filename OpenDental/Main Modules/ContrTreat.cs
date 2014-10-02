@@ -865,6 +865,7 @@ namespace OpenDental{
 				groupShow.Enabled=true;
 				listSetPr.Enabled=true;
 				//panelSide.Enabled=true;
+				ToolBarMain.Buttons["Discount"].Enabled=true;
 				ToolBarMain.Buttons["PreAuth"].Enabled=true;
 				ToolBarMain.Buttons["Update"].Enabled=true;
 				ToolBarMain.Buttons["Create"].Enabled=true;
@@ -894,6 +895,7 @@ namespace OpenDental{
 				groupShow.Enabled=false;
 				listSetPr.Enabled=false;
 				//panelSide.Enabled=false;
+				ToolBarMain.Buttons["Discount"].Enabled=false;
 				ToolBarMain.Buttons["PreAuth"].Enabled=false;
 				ToolBarMain.Buttons["Update"].Enabled=false;
 				ToolBarMain.Buttons["Create"].Enabled=false;
