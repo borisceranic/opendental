@@ -2797,7 +2797,7 @@ namespace OpenDentBusiness{
 				#endregion
 				#region ElectronicCopy
 				case EhrMeasureType.ElectronicCopy:
-					command="SELECT patient.PatNum,patient.LName,patient.FName,OnlineAccess.dateRequested,MIN(procedurelog.ProcDate) as leastRecentDate "
+					command="SELECT patient.PatNum,patient.LName,patient.FName,OnlineAccess.dateRequested "
 						+"FROM patient "
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
@@ -3221,13 +3221,12 @@ namespace OpenDentBusiness{
 					#endregion
 					#region ElectronicCopy
 					case EhrMeasureType.ElectronicCopy:
-						DateTime visitDate2=PIn.Date(tableRaw.Rows[i]["leastRecentDate"].ToString());
 						DateTime dateRequested=PIn.Date(tableRaw.Rows[i]["dateRequested"].ToString());
-						if(dateRequested<visitDate2) {
-							explanation=visitDate2.ToShortDateString()+" no requests after this date.";
+						if(dateRequested>dateEnd) {
+							explanation="No requests in or before specified period.";
 						}
-						else {
-							explanation=visitDate2.ToShortDateString()+" requests after this date";
+						else if(dateRequested.Year>1880) {
+							explanation="Requested on "+dateRequested.ToShortDateString();
 							row["met"]="X";
 						}
 						break;
