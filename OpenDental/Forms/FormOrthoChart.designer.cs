@@ -26,11 +26,11 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOrthoChart));
 			this.gridPat = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.label6 = new System.Windows.Forms.Label();
 			this.butUseAutoNote = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
-			this.butClose = new OpenDental.UI.Button();
+			this.butCancel = new OpenDental.UI.Button();
 			this.butAudit = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// gridPat
@@ -62,17 +62,8 @@ namespace OpenDental{
 			this.gridMain.Title = "Ortho Chart";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellTextChanged += new System.EventHandler(this.gridMain_CellTextChanged);
 			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
-			// 
-			// label6
-			// 
-			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label6.Location = new System.Drawing.Point(722, 630);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(123, 27);
-			this.label6.TabIndex = 55;
-			this.label6.Text = "(All info is always saved automatically)";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// butUseAutoNote
 			// 
@@ -105,21 +96,21 @@ namespace OpenDental{
 			this.butAdd.UseVisualStyleBackColor = true;
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
-			// butClose
+			// butCancel
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butClose.Autosize = true;
-			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(851, 634);
-			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75, 23);
-			this.butClose.TabIndex = 7;
-			this.butClose.Text = "Close";
-			this.butClose.UseVisualStyleBackColor = true;
-			this.butClose.Click += new System.EventHandler(this.butClose_Click);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(851, 634);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(75, 23);
+			this.butCancel.TabIndex = 7;
+			this.butCancel.Text = "&Cancel";
+			this.butCancel.UseVisualStyleBackColor = true;
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butAudit
 			// 
@@ -136,15 +127,31 @@ namespace OpenDental{
 			this.butAudit.Text = "Audit Trail";
 			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
 			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(770, 634);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 23);
+			this.butOK.TabIndex = 109;
+			this.butOK.Text = "&OK";
+			this.butOK.UseVisualStyleBackColor = true;
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
 			// FormOrthoChart
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(938, 665);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.butUseAutoNote);
-			this.Controls.Add(this.label6);
 			this.Controls.Add(this.butAdd);
-			this.Controls.Add(this.butClose);
+			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.gridPat);
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -160,12 +167,12 @@ namespace OpenDental{
 		#endregion
 
 		private UI.Button butAdd;
-		private UI.Button butClose;
+		private UI.Button butCancel;
 		private UI.ODGrid gridPat;
 		private UI.ODGrid gridMain;
-		private System.Windows.Forms.Label label6;
 		private UI.Button butUseAutoNote;
 		private UI.Button butAudit;
+		private UI.Button butOK;
 
 	}
 }
