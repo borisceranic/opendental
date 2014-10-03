@@ -80,7 +80,7 @@ namespace OpenDental {
 			string notificationSubject;
 			string notificationBodyNoUrl;
 			string notificationURL;
-			Family family=null;
+			List<Patient> listPatsForFamily=Patients.GetPatientsForPhi(_patNum);
 			Patient patCur=Patients.GetPat(_patNum);
 			comboRegardingPatient.Items.Clear();
 			if(patCur==null) {
@@ -88,7 +88,6 @@ namespace OpenDental {
 				_listPatients=null;
 			}
 			else {			
-				family=Patients.GetFamily(_patNum);				
 				textTo.Text=patCur.GetNameFL();
 				Provider priProv=Providers.GetProv(patCur.PriProv);
 				if(priProv==null) {
@@ -128,30 +127,29 @@ namespace OpenDental {
 					textSubject.Text="RE: "+textSubject.Text;
 				}
 				patNumSubj=replyToEmailMessage.PatNumSubj;
-				Patient patRegarding=Patients.GetOnePat(family.ListPats,patNumSubj);
+				Patient patRegarding=Patients.GetOnePat(listPatsForFamily.ToArray(),patNumSubj);
+				if(patRegarding.PatNum==0) {
+					BlockSendNotificationMessage("Patient who sent this message cannot access PHI for regarding patient.");
+				}
 				textBody.Text="\r\n\r\n-----"+Lan.g(this,"Original Message")+"-----\r\n"
-					+(patRegarding == null ? "" : (Lan.g(this,"Regarding Patient")+": "+patRegarding.GetNameFL()+"\r\n"))
+					+(patRegarding.PatNum==0 ? "" : (Lan.g(this,"Regarding Patient")+": "+patRegarding.GetNameFL()+"\r\n"))
 					+Lan.g(this,"From")+": "+replyToEmailMessage.FromAddress+"\r\n"
 					+Lan.g(this,"Sent")+": "+replyToEmailMessage.MsgDateTime.ToShortDateString()+" "+replyToEmailMessage.MsgDateTime.ToShortTimeString()+"\r\n"
 					+Lan.g(this,"To")+": "+replyToEmailMessage.ToAddress+"\r\n"
 					+Lan.g(this,"Subject")+": "+replyToEmailMessage.Subject
-					+"\r\n\r\n"+replyToEmailMessage.BodyText;		
-				
+					+"\r\n\r\n"+replyToEmailMessage.BodyText;						
 			}
-			if(patCur==null || family==null) {
+			if(patCur==null || listPatsForFamily.Count==0) {
 				BlockSendSecureMessage("Patient's family not setup propertly. Make sure guarantor is valid.");
 			}
 			else {
 				_listPatients=new List<Patient>();
-				bool isGuar=patCur.Guarantor==patCur.PatNum;
-				for(int i=0;i<family.ListPats.Length;i++) {
-					Patient patFamilyMember=family.ListPats[i];
-					if(isGuar || patFamilyMember.PatNum==patNumSubj) {
-						_listPatients.Add(patFamilyMember);
-						comboRegardingPatient.Items.Add(patFamilyMember.GetNameFL());
-						if(patFamilyMember.PatNum==patNumSubj) {
-							comboRegardingPatient.SelectedIndex=(comboRegardingPatient.Items.Count-1);
-						}
+				for(int i=0;i<listPatsForFamily.Count;i++) {
+					Patient patFamilyMember=listPatsForFamily[i];
+					_listPatients.Add(patFamilyMember);
+					comboRegardingPatient.Items.Add(patFamilyMember.GetNameFL());
+					if(patFamilyMember.PatNum==patNumSubj) {
+						comboRegardingPatient.SelectedIndex=(comboRegardingPatient.Items.Count-1);
 					}
 				}
 			}
