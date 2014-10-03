@@ -207,6 +207,8 @@ namespace OpenDentBusiness {
 		EhrProvKeyGeneratorPath,
 		EnableAnesthMod,
 		ExportPath,
+		///<summary>Allows guarantor access to all family health information in the patient portal.  Default is 1.</summary>
+		FamPhiAccess,
 		FinanceChargeAdjustmentType,
 		FinanceChargeAPR,
 		FinanceChargeLastRun,

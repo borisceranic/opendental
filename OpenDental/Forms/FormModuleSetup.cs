@@ -112,6 +112,7 @@ namespace OpenDental{
 		private CheckBox checkStatementShowAdjNotes;
 		private CheckBox checkProcLockingIsAllowed;
 		private CheckBox checkTimeCardADP;
+		private CheckBox checkFamPhiAccess;
 		private bool IsLoading;
 
 		///<summary></summary>
@@ -214,6 +215,7 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabImages = new System.Windows.Forms.TabPage();
 			this.tabManage = new System.Windows.Forms.TabPage();
+			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.checkStatementShowAdjNotes = new System.Windows.Forms.CheckBox();
 			this.checkIntermingleDefault = new System.Windows.Forms.CheckBox();
@@ -232,7 +234,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
+			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -814,6 +816,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkFamPhiAccess);
 			this.tabFamily.Controls.Add(this.checkInsDefaultAssignmentOfBenefits);
 			this.tabFamily.Controls.Add(this.checkTextMsgOkStatusTreatAsNo);
 			this.tabFamily.Controls.Add(this.label15);
@@ -1163,6 +1166,17 @@ namespace OpenDental{
 			this.tabManage.TabIndex = 6;
 			this.tabManage.Text = "Manage";
 			// 
+			// checkTimeCardADP
+			// 
+			this.checkTimeCardADP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTimeCardADP.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTimeCardADP.Location = new System.Drawing.Point(82, 57);
+			this.checkTimeCardADP.Name = "checkTimeCardADP";
+			this.checkTimeCardADP.Size = new System.Drawing.Size(359, 17);
+			this.checkTimeCardADP.TabIndex = 198;
+			this.checkTimeCardADP.Text = "ADP export includes employee name";
+			this.checkTimeCardADP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.checkStatementShowAdjNotes);
@@ -1373,16 +1387,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkTimeCardADP
+			// checkFamPhiAccess
 			// 
-			this.checkTimeCardADP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTimeCardADP.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTimeCardADP.Location = new System.Drawing.Point(82, 57);
-			this.checkTimeCardADP.Name = "checkTimeCardADP";
-			this.checkTimeCardADP.Size = new System.Drawing.Size(359, 17);
-			this.checkTimeCardADP.TabIndex = 198;
-			this.checkTimeCardADP.Text = "ADP export includes employee name";
-			this.checkTimeCardADP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkFamPhiAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkFamPhiAccess.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkFamPhiAccess.Location = new System.Drawing.Point(27, 167);
+			this.checkFamPhiAccess.Name = "checkFamPhiAccess";
+			this.checkFamPhiAccess.Size = new System.Drawing.Size(413, 17);
+			this.checkFamPhiAccess.TabIndex = 205;
+			this.checkFamPhiAccess.Text = "Allow Guarantor access to family health information in patient portal.";
+			this.checkFamPhiAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1496,6 +1510,7 @@ namespace OpenDental{
 			}
 			comboCobRule.SelectedIndex=PrefC.GetInt(PrefName.InsDefaultCobRule);
 			checkTextMsgOkStatusTreatAsNo.Checked=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
+			checkFamPhiAccess.Checked=PrefC.GetBool(PrefName.FamPhiAccess);
 			//Account module-----------------------------------------------------------------------
 			checkBalancesDontSubtractIns.Checked=PrefC.GetBool(PrefName.BalancesDontSubtractIns);
 			checkAgingMonthly.Checked=PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily);
@@ -1741,6 +1756,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
 				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
+				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				)
 			{
 				changed=true;
