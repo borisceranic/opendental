@@ -2441,7 +2441,43 @@ FROM insplan";
 			return (Db.GetTable(command));
 		}
 
+		///<summary>Returns a list of Patients of which this PatNum is eligible to view given PHI constraints.</summary>
+		public static List<Patient> GetPatientsForPhi(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			List<long> listPatNums=GetPatNumsForPhi(patNum);
+			//If there are duplicates in listPatNums, then they will be removed because of the IN statement in the query below.
+			string command="SELECT * FROM patient WHERE PatNum IN ("+string.Join(",",listPatNums)+")";
+			return Crud.PatientCrud.SelectMany(command);
+		}
 
+		///<summary>Returns a list of PatNum(s) of which this PatNum is eligible to view given PHI constraints.  Used internally and also used by Patient Portal.</summary>
+		public static List<long> GetPatNumsForPhi(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			List<long> listPatNums=new List<long>();
+			listPatNums.Add(patNum);
+			if(OpenDentBusiness.PrefC.GetBool(OpenDentBusiness.PrefName.FamPhiAccess)) { //Include guarantor's family if pref is set.
+				//Include any patient where this PatNum is the Guarantor.
+				DataTable tablePatientsG=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE Guarantor = "+OpenDentBusiness.POut.Long(patNum));
+				for(int i=0;i<tablePatientsG.Rows.Count;i++) {
+					listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsG.Rows[i]["PatNum"].ToString()));
+				}
+			}
+			//Include any patient where the given patient is the responsible party.
+			DataTable tablePatientsR=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE ResponsParty = "+OpenDentBusiness.POut.Long(patNum));
+			for(int i=0;i<tablePatientsR.Rows.Count;i++) {
+				listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsR.Rows[i]["PatNum"].ToString()));
+			}
+			//Include any patient where this patient is the guardian.
+			DataTable tablePatientsD=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE PatNum IN (SELECT guardian.PatNumChild FROM guardian WHERE guardian.IsGuardian = 1 AND guardian.PatNumGuardian="+OpenDentBusiness.POut.Long(patNum)+") ");
+			for(int i=0;i<tablePatientsD.Rows.Count;i++) {
+				listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsD.Rows[i]["PatNum"].ToString()));
+			}
+			return listPatNums;//There might be dupliates, but the list should be short enough that it does not matter.
+		}
 	}
 
 	///<summary>Not a database table.  Just used in billing and finance charges.</summary>
