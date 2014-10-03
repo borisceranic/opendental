@@ -99,7 +99,7 @@ namespace OpenDental {
 			else {
 				Provider provUser=Providers.GetProv(Security.CurUser.ProvNum);
 				labelProvUser.Text=Providers.GetLongDesc(provUser.ProvNum);
-				if(EhrProvKeys.GetKeysByFLName(provUser.LName,provUser.FName).Count>0) {
+				if(EhrProvKeys.GetKeysByFLName(provUser.LName,provUser.FName).Count==0) {
 					labelProvUser.Text+=" (no ehr provider key entered)";
 				}
 			}
