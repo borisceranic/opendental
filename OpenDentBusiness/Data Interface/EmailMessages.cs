@@ -903,15 +903,15 @@ namespace OpenDentBusiness{
 			}
 			for(int i=0;i<listMimeAttachParts.Count;i++) {
 				Health.Direct.Common.Mime.MimeEntity mimePartAttach=listMimeAttachParts[i];
-				string strAttachText=mimePartAttach.Body.Text;
+				byte[] arrayData=Encoding.UTF8.GetBytes(mimePartAttach.Body.Text);
 				try {
 					if(mimePartAttach.ContentTransferEncoding.ToLower().Contains("base64")) {
-						strAttachText=Encoding.UTF8.GetString(Convert.FromBase64String(mimePartAttach.Body.Text));
+						arrayData=Convert.FromBase64String(mimePartAttach.Body.Text);
 					}
 				}
 				catch {
 				}
-				EmailAttach emailAttach=CreateAttachInAttachPath(mimePartAttach.ParsedContentType.Name,strAttachText);
+				EmailAttach emailAttach=CreateAttachInAttachPath(mimePartAttach.ParsedContentType.Name,arrayData);
 				if(mimePartAttach.ParsedContentType.Name.ToLower()=="smime.p7m") {//encrypted attachment
 					message.ContentType="application/pkcs7-mime; name=smime.p7m; boundary="+strTextPartBoundary+";";
 				}
@@ -987,7 +987,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file, but with EmailMessageNum set to zero so it can be set later.</summary>
-		private static EmailAttach CreateAttachInAttachPath(string strAttachFileName,string strAttachText) {
+		private static EmailAttach CreateAttachInAttachPath(string strAttachFileName,byte[] arrayData) {
 			//No need to check RemotingRole; no call to db.
 			string strAttachFileNameAdjusted=strAttachFileName;
 			if(String.IsNullOrEmpty(strAttachFileName)) {
@@ -998,7 +998,7 @@ namespace OpenDentBusiness{
 			while(File.Exists(strAttachFile)) {
 				strAttachFile=ODFileUtils.CombinePaths(strAttachPath,DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+"_"+strAttachFileNameAdjusted);
 			}
-			File.WriteAllText(strAttachFile,strAttachText);
+			File.WriteAllBytes(strAttachFile,arrayData);
 			EmailAttach emailAttach=new EmailAttach();
 			emailAttach.ActualFileName=Path.GetFileName(strAttachFile);
 			emailAttach.DisplayedFileName=Path.GetFileName(strAttachFileNameAdjusted);//shorter name, excludes date and time stamp info.
@@ -1099,11 +1099,11 @@ namespace OpenDentBusiness{
 			emailMessage.Subject=subjectAndBody;
 			emailMessage.BodyText=subjectAndBody;
 			if(attachName1!="") {
-				EmailAttach emailAttach=CreateAttachInAttachPath(attachName1,attachContents1);
+				EmailAttach emailAttach=CreateAttachInAttachPath(attachName1,Encoding.UTF8.GetBytes(attachContents1));
 				emailMessage.Attachments.Add(emailAttach);
 			}
 			if(attachName2!="") {
-				EmailAttach emailAttach=CreateAttachInAttachPath(attachName2,attachContents2);
+				EmailAttach emailAttach=CreateAttachInAttachPath(attachName2,Encoding.UTF8.GetBytes(attachContents2));
 				emailMessage.Attachments.Add(emailAttach);
 			}
 			SendEmailUnsecure(emailMessage,emailAddressFrom);
