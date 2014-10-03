@@ -114,6 +114,7 @@ namespace OpenDental{
 		private Label label19;
 		private CheckBox checkChartNonPatientWarn;
 		private CheckBox checkTreatPlanItemized;
+		private CheckBox checkFamPhiAccess;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -199,6 +200,7 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
 			this.checkInsDefaultAssignmentOfBenefits = new System.Windows.Forms.CheckBox();
 			this.checkTextMsgOkStatusTreatAsNo = new System.Windows.Forms.CheckBox();
 			this.label15 = new System.Windows.Forms.Label();
@@ -208,6 +210,7 @@ namespace OpenDental{
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
 			this.tabTreatPlan = new System.Windows.Forms.TabPage();
+			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
 			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
 			this.labelDiscountPercentage = new System.Windows.Forms.Label();
 			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
@@ -249,7 +252,6 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -831,6 +833,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkFamPhiAccess);
 			this.tabFamily.Controls.Add(this.checkInsDefaultAssignmentOfBenefits);
 			this.tabFamily.Controls.Add(this.checkTextMsgOkStatusTreatAsNo);
 			this.tabFamily.Controls.Add(this.label15);
@@ -847,6 +850,17 @@ namespace OpenDental{
 			this.tabFamily.Size = new System.Drawing.Size(466, 479);
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
+			// 
+			// checkFamPhiAccess
+			// 
+			this.checkFamPhiAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkFamPhiAccess.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkFamPhiAccess.Location = new System.Drawing.Point(27, 167);
+			this.checkFamPhiAccess.Name = "checkFamPhiAccess";
+			this.checkFamPhiAccess.Size = new System.Drawing.Size(413, 17);
+			this.checkFamPhiAccess.TabIndex = 206;
+			this.checkFamPhiAccess.Text = "Allow Guarantor access to family health information in patient portal";
+			this.checkFamPhiAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkInsDefaultAssignmentOfBenefits
 			// 
@@ -969,6 +983,20 @@ namespace OpenDental{
 			this.tabTreatPlan.Size = new System.Drawing.Size(466, 479);
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
+			// 
+			// checkTreatPlanItemized
+			// 
+			this.checkTreatPlanItemized.AutoSize = true;
+			this.checkTreatPlanItemized.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanItemized.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTreatPlanItemized.Location = new System.Drawing.Point(300, 152);
+			this.checkTreatPlanItemized.Name = "checkTreatPlanItemized";
+			this.checkTreatPlanItemized.Size = new System.Drawing.Size(140, 18);
+			this.checkTreatPlanItemized.TabIndex = 212;
+			this.checkTreatPlanItemized.Text = "Itemize Treatment Plan";
+			this.checkTreatPlanItemized.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanItemized.UseVisualStyleBackColor = true;
+			this.checkTreatPlanItemized.Click += new System.EventHandler(this.checkTreatPlanItemized_Click);
 			// 
 			// textDiscountPercentage
 			// 
@@ -1445,20 +1473,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkTreatPlanItemized
-			// 
-			this.checkTreatPlanItemized.AutoSize = true;
-			this.checkTreatPlanItemized.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTreatPlanItemized.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTreatPlanItemized.Location = new System.Drawing.Point(300, 152);
-			this.checkTreatPlanItemized.Name = "checkTreatPlanItemized";
-			this.checkTreatPlanItemized.Size = new System.Drawing.Size(140, 18);
-			this.checkTreatPlanItemized.TabIndex = 212;
-			this.checkTreatPlanItemized.Text = "Itemize Treatment Plan";
-			this.checkTreatPlanItemized.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTreatPlanItemized.UseVisualStyleBackColor = true;
-			this.checkTreatPlanItemized.Click += new System.EventHandler(this.checkTreatPlanItemized_Click);
-			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1583,6 +1597,7 @@ namespace OpenDental{
 			}
 			comboCobRule.SelectedIndex=PrefC.GetInt(PrefName.InsDefaultCobRule);
 			checkTextMsgOkStatusTreatAsNo.Checked=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
+			checkFamPhiAccess.Checked=PrefC.GetBool(PrefName.FamPhiAccess);
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -1863,6 +1878,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
+				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				)
 			{
 				_changed=true;

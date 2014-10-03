@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.4.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.9.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -4792,6 +4792,23 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.2.23.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_2_32();
+		}
+
+		private static void To14_2_32() {
+			if(FromVersion<new Version("14.2.32.0")) {
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('FamPhiAccess','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'FamPhiAccess','1')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.2.32.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_3_1();
 		}
 
@@ -5995,6 +6012,32 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '14.3.4.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_3_9();
+		}
+
+		private static void To14_3_9() {
+			if(FromVersion<new Version("14.3.9.0")) {
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT COUNT(*) FROM preference WHERE PrefName='FamPhiAccess' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT COUNT(*) FROM (SELECT ValueString FROM preference WHERE PrefName='FamPhiAccess') WHERE RowNum<=1";
+				}
+				long hasFamPhiAccess=PIn.Long(Db.GetCount(command));
+				if(hasFamPhiAccess==0) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO preference(PrefName,ValueString) VALUES('FamPhiAccess','1')";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'FamPhiAccess','1')";
+						Db.NonQ(command);
+					}
+				}
+				command="UPDATE preference SET ValueString = '14.3.9.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_3_X();
