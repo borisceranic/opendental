@@ -930,6 +930,7 @@ namespace OpenDental{
 			List<long> patNumsSelected=new List<long>();
 			List<long> patNumsFailed=new List<long>();
 			EmailAddress emailAddress;
+			string errors="";
 			for(int i=0;i<grid.SelectedIndices.Length;i++){
 				message=new EmailMessage();
 				message.PatNum=PIn.Long(Table.Rows[grid.SelectedIndices[i]]["PatNum"].ToString());
@@ -947,8 +948,11 @@ namespace OpenDental{
 				try {
 					EmailMessages.SendEmailUnsecure(message,emailAddress);
 				}
-				catch {
+				catch (Exception ex){
 					patNumsFailed.Add(message.PatNum);
+					if(!errors.Contains(ex.Message)) {//unique messages only.
+						errors+=("Message send fail for Patnum:"+message.PatNum+":  "+ex.Message+"\r\n");
+					}
 					continue;
 				}
 				message.MsgDateTime=DateTime.Now;
@@ -959,7 +963,11 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 			if(patNumsFailed.Count==grid.SelectedIndices.Length){ //all failed
 				//no need to refresh
-				MsgBox.Show(this,"All emails failed. Possibly due to invalid email addresses, a loss of connectivity, or a firewall blocking communication.");//msg: all failed
+				if(DialogResult.Yes != MessageBox.Show(Lan.g(this,"All emails failed. Possibly due to invalid email addresses, a loss of connectivity, or a firewall blocking communication.  Would you like to see additional details?"),"",MessageBoxButtons.YesNo)){
+					return;
+				}
+				CodeBase.MsgBoxCopyPaste msgbox=new CodeBase.MsgBoxCopyPaste(errors);
+				msgbox.ShowDialog();
 				return;
 			}
 			else if(patNumsFailed.Count>0){//if some failed
@@ -971,7 +979,11 @@ namespace OpenDental{
 						grid.SetSelected(i,true);
 					}
 				}
-				MsgBox.Show(this,"Some emails failed to send.");
+				if(DialogResult.Yes != MessageBox.Show(Lan.g(this,"Some emails failed to send.  All failed email confirmations have been selected in the confirmation list.  Would you like to see additional details?"),"",MessageBoxButtons.YesNo)) {
+					return;
+				}
+				CodeBase.MsgBoxCopyPaste msgbox=new CodeBase.MsgBoxCopyPaste(errors);
+				msgbox.ShowDialog();
 				return;
 			}
 			//none failed
