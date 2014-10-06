@@ -950,7 +950,7 @@ namespace OpenDental{
 				}
 				catch (Exception ex){
 					patNumsFailed.Add(message.PatNum);
-					if(!errors.Contains(ex.Message)) {//unique messages only.
+					if(!errors.Contains("Message send fail for Patnum:"+message.PatNum+":  "+ex.Message)) {//unique messages only.
 						errors+=("Message send fail for Patnum:"+message.PatNum+":  "+ex.Message+"\r\n");
 					}
 					continue;
