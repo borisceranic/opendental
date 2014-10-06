@@ -35,7 +35,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EhrProvKey>>(MethodBase.GetCurrentMethod(),lName,fName);
 			}
-			if(lName.Trim()=="" || fName.Trim()=="") {
+			if(lName==null || fName==null || 
+				lName.Trim()=="" || fName.Trim()=="") {
 				return new List<EhrProvKey>();
 			}
 			string command="SELECT ehrprovkey.* FROM ehrprovkey"
