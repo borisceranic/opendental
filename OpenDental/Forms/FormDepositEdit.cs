@@ -893,9 +893,14 @@ namespace OpenDental{
 			//amount already handled.
 			DepositCur.BankAccountInfo=PIn.String(textBankAccountInfo.Text);
 			DepositCur.Memo=PIn.String(textMemo.Text);
-			if(IsNew){
-				if(gridPat.SelectedIndices.Length+gridIns.SelectedIndices.Length>18){
+			if(IsNew) {
+				if(gridPat.SelectedIndices.Length+gridIns.SelectedIndices.Length>18 && IsQuickBooks) {
 					if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"No more than 18 items will fit on a QuickBooks deposit slip. Continue anyway?")) {
+						return false;
+					}
+				}
+				else if(gridPat.SelectedIndices.Length+gridIns.SelectedIndices.Length>32) {
+					if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"No more than 32 items will fit on a deposit slip. Continue anyway?")) {
 						return false;
 					}
 				}
