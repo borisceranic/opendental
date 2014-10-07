@@ -2898,49 +2898,78 @@ namespace OpenDental{
 				}
 				Guardians.DeleteForFamily(PatCur.Guarantor);
 			}
-			List<Patient> adults=new List<Patient>();
-			List<Patient> children=new List<Patient>();
+			List<Patient> listAdults=new List<Patient>();
+			List<Patient> listChildren=new List<Patient>();
 			PatientPosition pos;
-			for(int p=0;p<FamCur.ListPats.Length;p++){
+			for(int p=0;p<FamCur.ListPats.Length;p++) {
 				if(FamCur.ListPats[p].PatNum==PatCur.PatNum) {
 					pos=(PatientPosition)listPosition.SelectedIndex;
 				}
 				else {
 					pos=FamCur.ListPats[p].Position;
 				}
-				if(pos==PatientPosition.Child){
-					children.Add(FamCur.ListPats[p]);
+				if(pos==PatientPosition.Child) {
+					listChildren.Add(FamCur.ListPats[p]);
 				}
-				else if(pos==PatientPosition.Single) {
-					//ignore these family members completely.
-				}
-				else{
-					adults.Add(FamCur.ListPats[p]);
+				else {
+					listAdults.Add(FamCur.ListPats[p]);
 				}
 			}
-			if(adults.Count<1){
+			Patient eldestMaleAdult=null;
+			Patient eldestFemaleAdult=null;
+			for(int i=0;i<listAdults.Count;i++) {
+				if(listAdults[i].Gender==PatientGender.Male 
+					&& (eldestMaleAdult==null || listAdults[i].Age>eldestMaleAdult.Age)) {
+					eldestMaleAdult=listAdults[i];
+				}
+				if(listAdults[i].Gender==PatientGender.Female
+					&& (eldestFemaleAdult==null || listAdults[i].Age>eldestFemaleAdult.Age)) {
+					eldestFemaleAdult=listAdults[i];
+				}
+				//Do not do anything for the other genders.
+			}
+			if(listAdults.Count<1) {
 				MsgBox.Show(this,"No adults found.");
 				return;
 			}
-			if(children.Count<1) {
+			if(listChildren.Count<1) {
 				MsgBox.Show(this,"No children found.");
 				return;
 			}
-			for(int c=0;c<children.Count;c++){
-				for(int a=0;a<adults.Count;a++){
-					Guardian guardian=new Guardian();
-					guardian.PatNumChild=children[c].PatNum;
-					guardian.PatNumGuardian=adults[a].PatNum;
-					if(adults[a].Gender==PatientGender.Male){
-						guardian.Relationship=GuardianRelationship.Father;
-					}
-					else if(adults[a].Gender==PatientGender.Female){
-						guardian.Relationship=GuardianRelationship.Mother;
-					}
-					else{
-						break;
-					}
-					Guardians.Insert(guardian);
+			if(eldestFemaleAdult==null && eldestMaleAdult==null) {
+				MsgBox.Show(this,"No male or female adults found.");
+				return;
+			}
+			for(int i=0;i<listChildren.Count;i++) {
+				if(eldestFemaleAdult!=null) {
+					//Create Parent=>Child relationship
+					Guardian motherGuard=new Guardian();
+					motherGuard.PatNumChild=eldestFemaleAdult.PatNum;
+					motherGuard.PatNumGuardian=listChildren[i].PatNum;
+					motherGuard.Relationship=GuardianRelationship.Child;
+					Guardians.Insert(motherGuard);
+					//Create Child=>Parent relationship
+					Guardian childGuard=new Guardian();
+					childGuard.PatNumChild=listChildren[i].PatNum;
+					childGuard.PatNumGuardian=eldestFemaleAdult.PatNum;
+					childGuard.Relationship=GuardianRelationship.Mother;
+					childGuard.IsGuardian=true;
+					Guardians.Insert(childGuard);
+				}
+				if(eldestMaleAdult!=null) {
+					//Create Parent=>Child relationship
+					Guardian fatherGuard=new Guardian();
+					fatherGuard.PatNumChild=eldestMaleAdult.PatNum;
+					fatherGuard.PatNumGuardian=listChildren[i].PatNum;
+					fatherGuard.Relationship=GuardianRelationship.Child;
+					Guardians.Insert(fatherGuard);
+					//Create Child=>Parent relationship
+					Guardian childGuard=new Guardian();
+					childGuard.PatNumChild=listChildren[i].PatNum;
+					childGuard.PatNumGuardian=eldestMaleAdult.PatNum;
+					childGuard.Relationship=GuardianRelationship.Father;
+					childGuard.IsGuardian=true;
+					Guardians.Insert(childGuard);
 				}
 			}
 			FillGuardians();
