@@ -82,8 +82,14 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
 				return;
 			}
-			//Test to see if any payment at all has been received for this proc
+			//Test to see if the procedure is attached to a claim
 			string command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
+				+" AND ClaimNum > 0";
+			if(Db.GetCount(command)!="0") {
+				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure that is attached to a claim or a pre-auth."));
+			}
+			//Test to see if any payment at all has been received for this proc
+			command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
 				+" AND InsPayAmt > 0 AND Status != "+POut.Long((int)ClaimProcStatus.Preauth);
 			if(Db.GetCount(command)!="0") {
 				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure that is attached to an insurance payment."));
