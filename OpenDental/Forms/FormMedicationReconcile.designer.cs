@@ -29,10 +29,10 @@ namespace OpenDental{
 			this.checkDiscontinued = new System.Windows.Forms.CheckBox();
 			this.pictBox = new System.Windows.Forms.PictureBox();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.label2 = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butAddEvent = new OpenDental.UI.Button();
 			this.gridReconcileEvents = new OpenDental.UI.ODGrid();
+			this.label2 = new System.Windows.Forms.Label();
 			this.gridMeds = new OpenDental.UI.ODGrid();
 			this.butPickRxListImage = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
@@ -109,16 +109,6 @@ namespace OpenDental{
 			this.splitContainer1.SplitterDistance = 460;
 			this.splitContainer1.TabIndex = 77;
 			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(133, 396);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(311, 27);
-			this.label2.TabIndex = 66;
-			this.label2.Text = "This is a historical record of medication reconciles for this patient.  Delete an" +
-    "y entries that are inaccurate.";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
 			// butDelete
 			// 
 			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -162,6 +152,16 @@ namespace OpenDental{
 			this.gridReconcileEvents.TabIndex = 67;
 			this.gridReconcileEvents.Title = "Reconciles";
 			this.gridReconcileEvents.TranslationName = "gridReconcile";
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(133, 396);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(311, 27);
+			this.label2.TabIndex = 66;
+			this.label2.Text = "This is a historical record of medication reconciles for this patient.  Delete an" +
+    "y entries that are inaccurate.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// gridMeds
 			// 
@@ -244,6 +244,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkDiscontinued);
 			this.Controls.Add(this.butClose);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormMedicationReconcile";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
