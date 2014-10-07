@@ -6119,6 +6119,9 @@ namespace OpenDental{
 			}
 			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
 				Procedure proc=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
+				if(proc.ProcNum==0) {
+					continue;//ignores payments, etc
+				}
 				if(proc.PlaceService!=ClaimCur.PlaceService) {
 					Procedure oldProc=proc.Copy();
 					proc.PlaceService=ClaimCur.PlaceService;
