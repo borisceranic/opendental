@@ -40,6 +40,7 @@ namespace OpenDental.Eclaims {
 			ProcedureCode procCode;
 			//ProcedureCode procCode;
 			for(int i=0;i<claimProcsForClaim.Count;i++) {
+				//claimProcsForClaim already excludes any claimprocs with ProcNum=0, so no payments etc.
 				proc=Procedures.GetProcFromList(procList,claimProcsForClaim[i].ProcNum);
 				//procCode=Pro
 				strb.Append(provBill.SSN+t);//110

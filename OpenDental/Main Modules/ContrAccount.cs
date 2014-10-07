@@ -2866,6 +2866,7 @@ namespace OpenDental {
 					if((decimal)table.Rows[i]["chargesDouble"]==0){
 						continue;//ignore zero fee procedures, but user can explicitly select them
 					}
+					//payment rows skipped
 					Procedure proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[i]["ProcNum"].ToString()));
 					ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
 					if(procCode.IsCanadianLab) {

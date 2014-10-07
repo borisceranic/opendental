@@ -195,7 +195,7 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		///<summary>Gets one procedure directly from the db.  Option to include the note.</summary>
+		///<summary>Gets one procedure directly from the db.  Option to include the note.  If the procNum is 0 or if the procNum does not exist in the database, this will return a new Procedure object with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
 		public static Procedure GetOneProc(long procNum,bool includeNote) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Procedure>(MethodBase.GetCurrentMethod(),procNum,includeNote);
@@ -388,7 +388,7 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary>Used in FormClaimEdit,FormClaimPrint,FormClaimPayTotal,ContrAccount etc to get description of procedure. Procedure list needs to include the procedure we are looking for.</summary>
+		///<summary>Used in FormClaimEdit,FormClaimPrint,FormClaimPayTotal,ContrAccount etc to get description of procedure. Procedure list needs to include the procedure we are looking for.  If procNum could be 0 (e.g. total payment claimprocs) or if the list does not contain the procNum, this will return a new Procedure with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
 		public static Procedure GetProcFromList(List<Procedure> list,long procNum) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<list.Count;i++) {

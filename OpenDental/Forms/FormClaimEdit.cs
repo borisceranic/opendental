@@ -4404,6 +4404,7 @@ namespace OpenDental{
 						row.Cells.Add(Lan.g(this,"Total Payment"));
 				}
 				else {
+					//claimProcsForClaim list already handles ProcNum=0 above
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
 					row.Cells.Add(ClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
@@ -5501,6 +5502,7 @@ namespace OpenDental{
 					//so only changed back to estimate if attached to a proc
 					ClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
 					ClaimProcsForClaim[i].ClaimNum=0;
+					//already handled the case where claimproc.ProcNum=0 for payments etc. above
 					proc=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
 					//We're not going to bother to also get paidOtherInsBaseEst:
 					double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(ClaimProcsForClaim[i],PatPlanList);
@@ -6119,6 +6121,9 @@ namespace OpenDental{
 			}
 			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
 				Procedure proc=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
+				if(proc.ProcNum==0) {
+					continue;//ignores payments, etc
+				}
 				if(proc.PlaceService!=ClaimCur.PlaceService) {
 					Procedure oldProc=proc.Copy();
 					proc.PlaceService=ClaimCur.PlaceService;

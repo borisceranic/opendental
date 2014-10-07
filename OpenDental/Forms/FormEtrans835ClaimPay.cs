@@ -834,9 +834,9 @@ namespace OpenDental {
 			List<Procedure> listProcs=Procedures.Refresh(_patCur.PatNum);
 			Procedure proc;
 			for(int i=0;i<ListClaimProcsForClaim.Count;i++) {
-				//this gives error message if proc not found:
 				proc=Procedures.GetProcFromList(listProcs,ListClaimProcsForClaim[i].ProcNum);
 				codeNum=proc.CodeNum;
+				//skip total payments
 				if(codeNum==0){
 					continue;
 				}

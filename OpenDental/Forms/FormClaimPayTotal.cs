@@ -666,6 +666,7 @@ namespace OpenDental
 			double unpaidAmt=0;
 			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
+				//ClaimProcsToEdit guaranteed to only contain claimprocs for procedures before this form loads, payments are not in the list
 				unpaidAmt=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum).ProcFee
 					//((Procedure)Procedures.HList[ClaimProcsToEdit[i].ProcNum]).ProcFee
 					-ClaimProcsToEdit[i].DedApplied
@@ -716,9 +717,9 @@ namespace OpenDental
 			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
 			Procedure proc;
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
-				//this gives error message if proc not found:
 				proc=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 				codeNum=proc.CodeNum;
+				//ProcNum not found or 0 for payments
 				if(codeNum==0){
 					continue;
 				}
