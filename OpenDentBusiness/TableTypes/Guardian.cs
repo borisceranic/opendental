@@ -20,7 +20,7 @@ namespace OpenDentBusiness{
 		///<summary>Enum:GuardianRelationship .</summary>
 		public GuardianRelationship Relationship;
 		///<summary>True if this specifies a guardian relationship, or false if any other relationship.
-		///When this flag is true, the relationship will show in the "Guardians" appointment view field and in the family module "Guardians" display field for the patient.</summary>
+		///When this flag is true, the relationship will show in the "Guardians" appointment view field and in the family module "Guardians" display field for the patient.  This also grants PHI access in the patient portal to the specific patient designated via PatNumChild.</summary>
 		public bool IsGuardian;
 
 		///<summary></summary>
