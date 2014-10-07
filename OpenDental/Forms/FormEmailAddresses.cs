@@ -13,6 +13,7 @@ namespace OpenDental {
 	public partial class FormEmailAddresses:Form {
 		public bool IsSelectionMode;
 		public long EmailAddressNum;
+		///<summary>If true, a signal for invalid Email cache will be sent out upon closing.</summary>
 		public bool IsChanged;
 
 		public FormEmailAddresses() {
@@ -46,6 +47,7 @@ namespace OpenDental {
 				FormEAE.EmailAddressCur=EmailAddresses.Listt[e.Row];
 				FormEAE.ShowDialog();
 				if(FormEAE.DialogResult==DialogResult.OK) {
+					IsChanged=true; 
 					FillGrid();
 				}
 			}
