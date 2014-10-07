@@ -274,7 +274,7 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g(this,"Description"),250);
 			gridMain.Columns.Add(col);
 			if(!IsSelectionMode) {
-				col=new ODGridColumn(Lan.g(this,"Hidden"),50);
+				col=new ODGridColumn(Lan.g(this,"Hidden"),50,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
 			}
 			gridMain.Rows.Clear();
