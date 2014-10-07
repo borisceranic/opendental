@@ -433,7 +433,7 @@ namespace OpenDentBusiness{
 
 		public static bool ClaimIdentifierInUse(string claimIdentifier,long claimNumExclude) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),claimIdentifier);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),claimIdentifier,claimNumExclude);
 			}
 			string command="SELECT COUNT(*) FROM claim WHERE ClaimIdentifier='"+POut.String(claimIdentifier)+"' AND ClaimNum<>"+POut.Long(claimNumExclude);
 			return (Db.GetTable(command).Rows[0][0].ToString()!="0");
