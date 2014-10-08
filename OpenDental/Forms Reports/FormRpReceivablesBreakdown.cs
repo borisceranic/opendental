@@ -431,6 +431,7 @@ namespace OpenDental {
                 + "Status IN (1,4,5,7) "//Received, supplemental, capclaim, capcomplete.
                 + "AND DateCP >= '" + bDate + "' "
                 + "AND DateCP < '" + eDate + "' "
+								+ "AND PayPlanNum=0 "
                 + whereProv
                 + " GROUP BY DateCP ORDER BY DateCP";
 				TableIns = report.GetTempTable();
