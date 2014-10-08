@@ -6009,6 +6009,7 @@ namespace OpenDentBusiness {
 			To14_3_9();
 		}
 
+		///<summary>Oracle compatible: 10/08/2014</summary>
 		private static void To14_3_9() {
 			if(FromVersion<new Version("14.3.9.0")) {
 				string command;
