@@ -330,8 +330,12 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e){
-			if(textDate.errorProvider1.GetError(textDate)!="" || textDate.Text=="") {
+			if(textDate.errorProvider1.GetError(textDate)!="") {
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
+				return;
+			}
+			if(textDate.Text=="") {
+				MsgBox.Show(this,"Please enter a date.");
 				return;
 			}
 			//We had a security bug where users could change the date to a more recent date, and then subsequently delete.
