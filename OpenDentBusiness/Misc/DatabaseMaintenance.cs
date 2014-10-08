@@ -1804,7 +1804,7 @@ namespace OpenDentBusiness {
 				command=@"SELECT COUNT(*) FROM clockevent WHERE TimeDisplayed2 > "+DbHelper.Now()+"+INTERVAL 15 MINUTE";
 				numFound+=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Timecard entries invalid: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Timecard entries invalid")+": "+numFound+"\r\n";
 				}
 			}
 			else{
@@ -1813,7 +1813,33 @@ namespace OpenDentBusiness {
 				command=@"UPDATE clockevent SET TimeDisplayed2="+DbHelper.Now()+" WHERE TimeDisplayed2 > "+DbHelper.Now()+"+INTERVAL 15 MINUTE";
 				numberFixed+=Db.NonQ(command);
 				if(numberFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Future timecard entry times fixed: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Future timecard entry times fixed")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string DocumentWithInvalidDate(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			//Gets a list of documents with dates that are invalid (0001-01-01). The list should be blank. If not, then the document's date will be set to 001-01-02 which will allow deletion.
+			command="SELECT COUNT(*) FROM document WHERE DateCreated="+POut.Date(new DateTime(1,1,1));
+			int numFound=PIn.Int(Db.GetCount(command));
+			if(isCheck) {
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Documents with invalid dates found")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			else {//fix
+				if(numFound>0) {
+					command="UPDATE document SET DateCreated="+POut.Date(new DateTime(1,1,2))+" WHERE DateCreated="+POut.Date(new DateTime(1,1,1));
+					Db.NonQ(command);
+				}
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Documents with invalid dates fixed")+": "+numFound.ToString()+"\r\n";
 				}
 			}
 			return log;
