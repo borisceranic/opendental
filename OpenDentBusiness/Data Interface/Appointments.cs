@@ -774,7 +774,7 @@ namespace OpenDentBusiness{
 				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
 				+"carrier1.CarrierName,carrier2.CarrierName,"
 				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
-				+"appointment.DateTimeChecked,appointment.DateTimeDue,appointment.DateTimeRecd,appointment.DateTimeSent,appointment.DateTimeAskedToArrive,"
+				+"labcase.DateTimeChecked,labcase.DateTimeDue,labcase.DateTimeRecd,labcase.DateTimeSent,appointment.DateTimeAskedToArrive,"
 				+"patient.Email,guar.FamFinUrgNote,patient.FName,patient.Guarantor,patient.HmPhone,patient.ImageFolder,appointment.IsHygiene,appointment.IsNewPatient,"
 				+"labcase.LabCaseNum,patient.Language,patient.LName,patient.MedUrgNote,patient.MiddleI,appointment.Note,appointment.Op,appointment.PatNum,"
 				+"Pattern,patient.PreferConfirmMethod,patient.PreferContactMethod,patient.Preferred,"
