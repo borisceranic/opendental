@@ -4973,7 +4973,7 @@ namespace OpenDental {
 				ProcedureL.SetCompleteInAppt(apt,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList);//loops through each proc
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,
 					ContrApptSingle3[GetIndex(apt.AptNum)].DataRoww["procs"].ToString()+", "+ apt.AptDateTime.ToString()+", Set Complete",
-					apt.AptNum);
+					apt.AptNum);//Log showing the appt. is set complete
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S14 - Appt Modification event
@@ -4995,8 +4995,6 @@ namespace OpenDental {
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 			ModuleSelected(pat.PatNum);
 			SetInvalid();
-			SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,pat.PatNum,
-				apt.ProcDescript+", "+apt.AptDateTime.ToShortDateString()+", Procedures automatically set complete due to appt being set complete",0);
 		}
 
 		private void OnDelete_Click() {
