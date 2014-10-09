@@ -9,6 +9,9 @@ namespace OpenDental {
 		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,List<InsSub> subList) {
 			List<Procedure> procsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
 			Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,procsInAppt,subList);
+			for(int i=0;i<procsInAppt.Count();i++) {
+				LogProcComplCreate(apt.PatNum,procsInAppt[i],procsInAppt[i].ToothNum);
+			}
 			if(Programs.UsingOrion) {
 				OrionProcs.SetCompleteInAppt(procsInAppt);
 			}
@@ -64,6 +67,21 @@ namespace OpenDental {
 				info=Lan.g("ProcedureL","Duplicate procedures")+": "+info;
 			}
 			return info;
+		}
+
+		///<summary>Creates securitylog entry for a completed procedure.  Set toothNum to empty string and it will be omitted from the log entry. toothNums can be null or empty.</summary>
+		public static void LogProcComplCreate(long patNum,Procedure procCur,string toothNums) {
+			//No need to check RemotingRole; no call to db.
+			if(procCur==null) {
+				return;//Nothing to do.  Should never happen.
+			}
+			ProcedureCode procCode=ProcedureCodes.GetProcCode(procCur.CodeNum);
+			string logText=procCode.ProcCode+", ";
+			if(toothNums!=null && toothNums.Trim()!="") {
+				logText+=Lans.g("Procedures","Teeth")+": "+toothNums+", ";
+			}
+			logText+=Lans.g("Procedures","Fee")+": "+procCur.ProcFee.ToString("F")+", "+procCode.Descript;
+			SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,patNum,logText);
 		}
 
 	}

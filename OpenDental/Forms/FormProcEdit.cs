@@ -5511,24 +5511,23 @@ namespace OpenDental{
 			}
 			if(ProcOld.ProcStatus!=ProcStat.C && ProcCur.ProcStatus==ProcStat.C){
 				//if status was changed to complete
-				SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,
-					ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode+", "
-					+ProcCur.ProcFee.ToString("c"));
+				ProcedureL.LogProcComplCreate(PatCur.PatNum,ProcCur,ProcCur.ToothNum);
 				List<string> procCodeList=new List<string>();
 				procCodeList.Add(ProcedureCodes.GetStringProcCode(ProcCur.CodeNum));
 				AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodeList,ProcCur.PatNum);
 			}
 			else if(IsNew && ProcCur.ProcStatus==ProcStat.C){
 				//if new procedure is complete
-				SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,
-					ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode+", "
-					+ProcCur.ProcFee.ToString("c"));
+				ProcedureL.LogProcComplCreate(PatCur.PatNum,ProcCur,ProcCur.ToothNum);
 			}
 			else if(!IsNew){
-				if(ProcOld.ProcStatus==ProcStat.C){
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,
-						ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode+", "
-						+ProcCur.ProcFee.ToString("c"));
+				if(ProcOld.ProcStatus==ProcStat.C){//If was complete before the window loaded.
+					string logText=ProcedureCode2.ProcCode+", ";
+					if(listBoxTeeth.Text!=null && listBoxTeeth.Text.Trim()!="") {
+						logText+=Lan.g("FormProcEdit","Teeth")+": "+listBoxTeeth.Text+", ";
+					}
+					logText+=Lan.g("FormProcEdit","Fee")+": "+ProcCur.ProcFee.ToString("F")+", "+ProcedureCode2.Descript;
+					SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,logText);
 				}
 			}
 			if((ProcCur.ProcStatus==ProcStat.C || ProcCur.ProcStatus==ProcStat.EC || ProcCur.ProcStatus==ProcStat.EO)
@@ -5627,9 +5626,12 @@ namespace OpenDental{
 				Procedures.Update(ProcCur,ProcOld);
 				Recalls.Synch(ProcCur.PatNum);
 				if(ProcCur.ProcStatus==ProcStat.C){
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,
-						PatCur.GetNameLF()+", "+ProcedureCode2.ProcCode+", "
-						+ProcCur.ProcFee.ToString("c"));
+					string logText=ProcedureCode2.ProcCode+", ";
+					if(listBoxTeeth.Text!=null && listBoxTeeth.Text.Trim()!="") {
+						logText+=Lan.g("FormProcEdit","Teeth")+": "+listBoxTeeth.Text+", ";
+					}
+					logText+=Lan.g("FormProcEdit","Fee")+": "+ProcCur.ProcFee.ToString("F")+", "+ProcedureCode2.Descript;
+					SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,logText);
 				}
 			}
       DialogResult=DialogResult.OK;

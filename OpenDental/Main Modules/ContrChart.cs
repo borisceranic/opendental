@@ -6785,6 +6785,7 @@ namespace OpenDental{
 					}
 					catch(Exception ex){
 						MessageBox.Show(ex.Message);
+						return;
 					}
 				}
 				else{
@@ -6792,6 +6793,7 @@ namespace OpenDental{
 					//Recalls.Synch(PatCur.PatNum);
 				}
 			}
+			logComplCreate(ProcCur);
 		}
 
 		private void butAddProc_Click(object sender,System.EventArgs e) {
@@ -6907,30 +6909,11 @@ namespace OpenDental{
 				procCodes.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
 			}//for n
 			//this was requiring too many irrelevant queries and going too slowly   //ModuleSelected(PatCur.PatNum);
-			string teeth = "";
-			if(newStatus==ProcStat.C) {
-				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
-					if(i>0) {
-						teeth+=", ";
-					}
-					teeth+=toothChart.SelectedTeeth[i].ToString();
-				}
-			}
 			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
 			FillToothChart(false);
 			ClearButtons();
 			FillProgNotes();
 			if(newStatus==ProcStat.C) {
-				string descript="";
-				if(procCodes.Count!=0) {//probably overkill
-					descript=ProcedureCodes.GetProcCode(procCodes[0]).Descript;
-				}
-				if(teeth!="") {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript+" created for the following teeth: "+teeth);
-				}
-				else {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript);
-				}
 				AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodes,PatCur.PatNum);
 			}
 		}
@@ -7340,31 +7323,12 @@ namespace OpenDental{
 				}//n selected teeth
 				//orionProvNum=ProcCur.ProvNum;
 			}//for i
-			//this was requiring too many irrelevant queries and going too slowly   //ModuleSelected(PatCur.PatNum);
-			string teeth = "";
-			if(newStatus==ProcStat.C) {
-				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
-					if(i>0) {
-						teeth+=", ";
-					}
-					teeth+=toothChart.SelectedTeeth[i].ToString();
-				}
-			}
+			//this was requiring too many irrelevant queries and going too slowly   //ModuleSelected(PatCur.PatNum);			
 			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
 			FillToothChart(false);
 			ClearButtons();
 			FillProgNotes();
 			if(newStatus==ProcStat.C){
-				string descript="";
-				if(ProcCur!=null) {//probably overkill
-					descript=ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript;
-				}
-				if(teeth!="") {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript+" created for the following teeth: "+teeth);
-				}
-				else {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript);
-				}
 				AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodes,PatCur.PatNum);
 			}
 		}
@@ -7517,17 +7481,7 @@ namespace OpenDental{
 				}
 				procCodes.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
 			}//n selected teeth
-			//this was requiring too many irrelevant queries and going too slowly   //ModuleSelected(PatCur.PatNum);
-			string teeth = "";
-			if(newStatus==ProcStat.C) {
-				//string teeth = "";
-				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
-					if(i>0) {
-						teeth+=", ";
-					}
-					teeth+=toothChart.SelectedTeeth[i].ToString();
-				}
-			}
+			//this was requiring too many irrelevant queries and going too slowly   //ModuleSelected(PatCur.PatNum);			
 			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
 			FillToothChart(false);
 			ClearButtons();
@@ -7535,16 +7489,6 @@ namespace OpenDental{
 			textProcCode.Text="";
 			textProcCode.Select();
 			if(newStatus==ProcStat.C) {
-				string descript="";
-				if(procCodes.Count!=0) {//probably overkill
-					descript=ProcedureCodes.GetProcCode(procCodes[0]).Descript;
-				}
-				if(teeth!="") {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript+" created for the following teeth: "+teeth);
-				}
-				else {
-					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,PatCur.PatNum,descript);
-				}
 				AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodes,PatCur.PatNum);
 			}
 		}
@@ -8935,7 +8879,7 @@ namespace OpenDental{
 				InsSub sub1=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,PlanList,SubList)),SubList);
 				InsSub sub2=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,PlanList,SubList)),SubList);
 				Appointments.SetAptStatusComplete(apt.AptNum,sub1.PlanNum,sub2.PlanNum);
-				ProcedureL.SetCompleteInAppt(apt,PlanList,PatPlanList,PatCur.SiteNum,PatCur.Age,SubList);//loops through each proc
+				ProcedureL.SetCompleteInAppt(apt,PlanList,PatPlanList,PatCur.SiteNum,PatCur.Age,SubList);//loops through each proc, also makes completed security logs
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit, apt.PatNum,
 					apt.ProcDescript+", "+apt.AptDateTime.ToString()+", Set Complete",
 					apt.AptNum);
@@ -9042,6 +8986,7 @@ namespace OpenDental{
 				}
 				Plugins.HookAddCode(this,"ContrChart.menuItemSetComplete_Click_procLoop",procCur,procOld);
 				Procedures.Update(procCur,procOld);
+				ProcedureL.LogProcComplCreate(PatCur.PatNum,procCur,procCur.ToothNum);
 				//Tried to move it to the business layer, but too complex for now.
 				//Procedures.SetComplete(
 				//	((Procedure)gridProg.Rows[gridProg.SelectedIndices[i]].Tag).ProcNum,PIn.PDate(textDate.Text));
@@ -10307,6 +10252,14 @@ namespace OpenDental{
 			ProcButtonClicked(0,pbq);
 		}
 
+		///<summary>Creates log entries for completed procedures</summary>
+		private void logComplCreate(Procedure procCur) {
+			if(newStatus!=ProcStat.C) {
+				return;
+			}
+			string teeth=String.Join(", ",toothChart.SelectedTeeth);
+			ProcedureL.LogProcComplCreate(PatCur.PatNum,procCur,teeth);
+		}
 		
 
 		
