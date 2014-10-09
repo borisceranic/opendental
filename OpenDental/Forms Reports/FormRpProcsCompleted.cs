@@ -124,7 +124,11 @@ namespace OpenDental{
 			date2.SelectionStart=new DateTime(today.Year,today.Month,1).AddDays(-1);
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
+		private void butOK_Click(object sender,System.EventArgs e) {
+			if(date2.SelectionStart<date1.SelectionStart) {
+				MsgBox.Show(this,"End date cannot be before start date.");
+				return;
+			}
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=@"SELECT ScreenDate,ProvName,County,county.CountyCode,
 				GradeSchool,school.SchoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,

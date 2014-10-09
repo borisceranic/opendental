@@ -39,6 +39,10 @@ namespace OpenDental {
 			}
 			DateFrom=PIn.Date(textDateFrom.Text);
 			DateTo=PIn.Date(textDateTo.Text);
+			if(DateTo<DateFrom) {
+				MsgBox.Show(this,"Date To cannot be before Date From.");
+				return;
+			}
 //todo: checkbox
 			RefAttachList=RefAttaches.RefreshForReferralProcTrack(DateFrom,DateTo,checkComplete.Checked);
 			Table=Procedures.GetReferred(DateFrom,DateTo,checkComplete.Checked);

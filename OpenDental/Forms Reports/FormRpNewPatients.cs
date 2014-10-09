@@ -358,6 +358,10 @@ namespace OpenDental{
 			}
 			DateTime dateFrom=PIn.Date(textDateFrom.Text);
 			DateTime dateTo=PIn.Date(textDateTo.Text);
+			if(dateTo<dateFrom) {
+				MsgBox.Show(this,"To date cannot be before From date.");
+				return;
+			}
 			string whereProv="";
 			if(listProv.SelectedIndices[0]!=0){
 				for(int i=0;i<listProv.SelectedIndices.Count;i++){

@@ -2038,6 +2038,10 @@ ORDER BY adjdate DESC
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
+			if(dateTo<dateFrom) {
+				MsgBox.Show(this,"To date cannot be before From date.");
+				return;
+			}
 			if(radioDaily.Checked){
 				RunDaily();
 			}
