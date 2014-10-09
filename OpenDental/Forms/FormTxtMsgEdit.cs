@@ -25,25 +25,29 @@ namespace OpenDental {
 		}
 
 		/// <summary>May be called from other parts of the program without showing this form. You must still create an instance of this form though. Checks CallFire bridge, if it is OK to send a text, etc. (Buttons to load this form are usually  disabled if it is not OK, but this is needed for Confirmations, Recalls, etc.) </summary>
-		public void SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk) {
+		public bool SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk) {
 			if(Plugins.HookMethod(this,"FormTxtMsgEdit.SendText_Start",patNum,wirelessPhone,message,txtMsgOk)) {
-				return;
+				return false;
 			}
 			if(wirelessPhone=="") {
 				MsgBox.Show(this,"Please enter a phone number.");
-				return;
+				return false;
 			}
 			if(!Programs.IsEnabled(ProgramName.CallFire)) {
 				MsgBox.Show(this,"CallFire Program Link must be enabled.");
-				return;
+				return false;
 			}
 			if(txtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)){
 				MsgBox.Show(this,"It is not OK to text this patient.");
-				return;
+				return false;
 			}
 			if(txtMsgOk==YN.No){
 				MsgBox.Show(this,"It is not OK to text this patient.");
-				return;
+				return false;
+			}
+			if(message.Length>160) {
+				MsgBox.Show(this,"Text length must be less than 160 characters.");
+				return false;
 			}
 			string key=ProgramProperties.GetPropVal(ProgramName.CallFire,"Key From CallFire");
 			string msg=wirelessPhone+","+message.Replace(",","");//ph#,msg Commas in msg cause error.
@@ -56,7 +60,7 @@ namespace OpenDental {
 			}
 			catch(Exception ex) {
 				MsgBox.Show(this,"Error sending text message.\r\n\r\n"+ex.Message);
-				return;
+				return false;
 			}
 			Commlog commlog=new Commlog();
 			commlog.CommDateTime=DateTime.Now;
@@ -70,6 +74,7 @@ namespace OpenDental {
 			commlog.DateTimeEnd=DateTime.Now;
 			Commlogs.Insert(commlog);
 			SecurityLogs.MakeLogEntry(Permissions.CommlogEdit,commlog.PatNum,"Insert Text Message");
+			return true;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -77,7 +82,9 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a message first.");
 				return;
 			}
-			SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk);
+			if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk)) {
+				return;//Allow the user to try again.  A message was already shown to the user inside SendText().
+			}
 			DialogResult=DialogResult.OK;
 		}
 

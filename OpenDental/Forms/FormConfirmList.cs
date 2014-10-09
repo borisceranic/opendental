@@ -1073,8 +1073,9 @@ namespace OpenDental{
 				message=message.Replace("[NameFL]",Table.Rows[grid.SelectedIndices[i]]["nameFL"].ToString());
 				message=message.Replace("[date]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
 				message=message.Replace("[time]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
-				FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk);
-				Appointments.SetConfirmed(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
+				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk)) {
+					Appointments.SetConfirmed(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
+				}
 			}
 			FillMain();
 			Cursor=Cursors.Default;
