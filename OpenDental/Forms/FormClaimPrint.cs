@@ -3581,11 +3581,12 @@ namespace OpenDental{
 					return "N4"+procCode.DrugNDC+drugUnit+drugQty.ToString("f3");
 				}
 				else {
-					if(procCode.TreatArea==TreatmentArea.Quad) {
-						return ProcCur.Surf+" "+procCode.Descript;
+					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ListClaimProcs[procIndex].CodeSent);
+					if(procCodeSent.TreatArea==TreatmentArea.Quad) {
+						return ProcCur.Surf+" "+procCodeSent.Descript;
 					}
 					else {
-						return procCode.Descript;
+						return procCodeSent.Descript;
 					}
 				}
 			}
