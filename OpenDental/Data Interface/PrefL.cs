@@ -32,6 +32,10 @@ namespace OpenDental {
 		}
 
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent) {
+			if(MessageBox.Show("Would you like to copy files to the server?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+				Application.Exit();
+				return false;//If user clicks cancel, then exit program
+			}
 			string folderUpdate="";
 			if(PrefC.AtoZfolderUsed) {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
@@ -100,6 +104,7 @@ namespace OpenDental {
 
 		///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
 		public static bool CheckProgramVersion() {
+			bool downgrade=false;
 			if(PrefC.GetBool(PrefName.UpdateWindowShowsClassicView)) {
 				return CheckProgramVersionClassic();
 			}
@@ -110,7 +115,26 @@ namespace OpenDental {
 			if(DataConnection.DBtype==DatabaseType.MySql){
 				database=MiscData.GetCurrentDatabase();
 			}
-			if(storedVersion<currentVersion) {
+			//Give option to downgrade to server if client version > server version and both the WebServiceServerName isn't blank and the current computer ID is not the same as the WebServiceServerName
+			if(storedVersion<currentVersion 
+				&& PrefC.GetString(PrefName.WebServiceServerName)!="" 
+				&& !ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower()))
+			{
+				//Offer to downgrade
+				string message=Lan.g("Prefs","Your version is more recent than the server version.");
+				message+="\r\n"+Lan.g("Prefs","Updates are only allowed from the web server")+": "+PrefC.GetString(PrefName.WebServiceServerName);
+				message+="\r\n"+Lan.g("Prefs","Do you want to downgrade to the server version?");
+				if(MessageBox.Show(message,"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+					Application.Exit();
+					return false;//If user clicks cancel, then exit program
+				}
+				downgrade=true;
+			}
+			//Push update to server if client version > server version and either the WebServiceServerName is blank or the current computer ID is the same as the WebServiceServerName
+				//At this point we know 100% it's going to be an upgrade
+			else	if(storedVersion<currentVersion 
+				&& (PrefC.GetString(PrefName.WebServiceServerName)=="" || ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower())))
+			{
 #if TRIALONLY
 				if(PrefC.GetString(PrefName.RegistrationKey)!="") {//Allow databases with no reg key to continue.  Needed by our conversion department.
 					//Trial users should never be able to update a database, not even the ProgramVersion preference.
@@ -119,22 +143,24 @@ namespace OpenDental {
 					return false;//Should not get to this line.  Just in case.
 				}
 #endif
+				//This has been commented out because it was deemed unnecessary: 10/10/14 per Jason and Derek
 				//There are two different situations where this might happen.
-				if(PrefC.GetString(PrefName.UpdateInProgressOnComputerName)==""){//1. Just performed an update from this workstation on another database.
-					//This is very common for admins when viewing slighly older databases.
-					//There should be no annoying behavior here.  So do nothing.
-					#if !DEBUG
-						//Excluding this in debug allows us to view slightly older databases without accidentally altering them.
-						Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
-						Cache.Refresh(InvalidType.Prefs);
-					#endif
-					return true;
-				}
+				//if(PrefC.GetString(PrefName.UpdateInProgressOnComputerName)==""){//1. Just performed an update from this workstation on another database.
+				//	//This is very common for admins when viewing slighly older databases.
+				//	//There should be no annoying behavior here.  So do nothing.
+				//	#if !DEBUG
+				//		//Excluding this in debug allows us to view slightly older databases without accidentally altering them.
+				//		Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
+				//		Cache.Refresh(InvalidType.Prefs);
+				//	#endif
+				//	return true;
+				//}
 				//and 2a. Just performed an update from this workstation on this database.  
 				//or 2b. Just performed an update from this workstation for multiple databases.
 				//In both 2a and 2b, we already downloaded Setup file to correct location for this db, so skip 1 above.
 				//This computer just performed an update, but none of the other computers has updated yet.
 				//So attempt to stash all files that are in the Application directory.
+				//At this point we know that we are going to perform an update.
 				if(!CopyFromHereToUpdateFiles(currentVersion)) {
 					Application.Exit();
 					return false;
@@ -143,7 +169,8 @@ namespace OpenDental {
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
 				Cache.Refresh(InvalidType.Prefs);
 			}
-			if(storedVersion>currentVersion) {
+			if(storedVersion>currentVersion || downgrade) {
+				//performs both upgrades and downgrades by recopying update files from ODI folder to local program path.
 				//This is the update sequence for both a direct workstation, and for a ClientWeb workstation.
 				string folderUpdate="";
 				if(PrefC.AtoZfolderUsed) {
