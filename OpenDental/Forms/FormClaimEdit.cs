@@ -4407,7 +4407,8 @@ namespace OpenDental{
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
 					row.Cells.Add(ClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
-					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
+					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ClaimProcsForClaim[i].CodeSent);
+					row.Cells.Add(procCodeSent.Descript);
 				}
 				row.Cells.Add(ClaimProcsForClaim[i].FeeBilled.ToString("F"));
 				decimal claimProcInsEst=(decimal)ClaimProcsForClaim[i].InsPayEst;
