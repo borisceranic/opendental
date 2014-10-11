@@ -100,11 +100,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Microsoft.DirectX.Direct3DX.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="Tao.FreeGlut, Version=2.4.0.1, Culture=neutral, PublicKeyToken=6e602a6ad6c0d06d, processorArchitecture=MSIL">
       <HintPath>..\Required dlls\Tao.FreeGlut.dll</HintPath>
@@ -118,6 +121,8 @@
       <HintPath>..\Required dlls\Tao.Platform.Windows.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Face.cs" />
@@ -135,6 +140,12 @@
     <Compile Include="ToothChartDirectX.Designer.cs">
       <DependentUpon>ToothChartDirectX.cs</DependentUpon>
     </Compile>
+    <Compile Include="ToothChartWpf.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ToothChartWpf.Designer.cs">
+      <DependentUpon>ToothChartWpf.cs</DependentUpon>
+    </Compile>
     <Compile Include="Vertex3f.cs" />
     <Compile Include="ToothChartWrapper.cs">
       <SubType>UserControl</SubType>
@@ -144,6 +155,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WPF\D3Helper.cs" />
+    <Compile Include="WPF\D3Object.cs" />
+    <Compile Include="WPF\D3ObjectGroup.cs" />
+    <Compile Include="WPF\Wpf3dControl.xaml.cs">
+      <DependentUpon>Wpf3dControl.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ToothChartWpf.resx">
+      <DependentUpon>ToothChartWpf.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ToothChartWrapper.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ToothChartWrapper.cs</DependentUpon>
@@ -260,6 +280,12 @@
       <DependentUpon>ToothChartDirectX.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="WPF\Wpf3dControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
