@@ -236,7 +236,9 @@ namespace OpenDental {
 				MessageBox.Show("Password required. Please generate a new password.");
 				return;
 			}
-			if(!PasswordIsValid()) {//this gives a messagebox if invalid
+			string error=Patients.IsPortalPasswordValid(textOnlinePassword.Text);
+			if(error!="") {//Non-empty string means it was invalid.
+				MessageBox.Show(this,error);
 				return;
 			}
 			WasPrinted=true;
@@ -290,28 +292,7 @@ namespace OpenDental {
 			g.Dispose();
 			e.HasMorePages=false;
 		}
-
-		///<summary>Used when click OK, and also when the Synch or Print buttons are clicked.</summary>
-		private bool PasswordIsValid() {
-			if(textOnlinePassword.Text.Length<8) {
-				MessageBox.Show(this,"Password must be at least 8 characters long.");
-				return false;
-			}
-			if(!Regex.IsMatch(textOnlinePassword.Text,"[A-Z]+")) {
-				MessageBox.Show(this,"Password must contain an uppercase letter.");
-				return false;
-			}
-			if(!Regex.IsMatch(textOnlinePassword.Text,"[a-z]+")) {
-				MessageBox.Show(this,"Password must contain an lowercase letter.");
-				return false;
-			}
-			if(!Regex.IsMatch(textOnlinePassword.Text,"[0-9]+")) {
-				MessageBox.Show(this,"Password must contain a number.");
-				return false;
-			}
-			return true;
-		}
-
+		
 		private string ValidatePatientAccess() {
 			string strErrors="";
 			if(PatCur.FName.Trim()=="") {
@@ -361,7 +342,9 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			if(textOnlinePassword.Text!="" && textOnlinePassword.Text!="********") {
-				if(!PasswordIsValid()) {
+				string error=Patients.IsPortalPasswordValid(textOnlinePassword.Text);
+				if(error!="") {//Non-empty string means it was invalid.
+					MessageBox.Show(this,error);
 					return;
 				}
 				if(!WasPrinted) {

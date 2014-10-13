@@ -2478,6 +2478,23 @@ FROM insplan";
 			}
 			return listPatNums;//There might be dupliates, but the list should be short enough that it does not matter.
 		}
+
+		///<summary>Validate password against strong password rules. Currently only used for patient portal passwords. Requirements: 8 characters, 1 uppercase character, 1 lowercase character, 1 number. Returns non-empty string if validation failed. Return string will be translated.</summary>
+		public static string IsPortalPasswordValid(string newPassword) {
+			if(newPassword.Length<8) {
+				return Lans.g("FormPatientPortal","Password must be at least 8 characters long.");
+			}
+			if(!Regex.IsMatch(newPassword,"[A-Z]+")) {
+				return Lans.g("FormPatientPortal","Password must contain an uppercase letter.");
+			}
+			if(!Regex.IsMatch(newPassword,"[a-z]+")) {
+				return Lans.g("FormPatientPortal","Password must contain an lowercase letter.");
+			}
+			if(!Regex.IsMatch(newPassword,"[0-9]+")) {
+				return Lans.g("FormPatientPortal","Password must contain a number.");
+			}
+			return "";
+		}
 	}
 
 	///<summary>Not a database table.  Just used in billing and finance charges.</summary>
