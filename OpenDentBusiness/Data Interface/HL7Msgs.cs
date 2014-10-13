@@ -108,20 +108,22 @@ namespace OpenDentBusiness{
 			Crud.HL7MsgCrud.Update(hL7Msg);
 		}
 
-		///<summary></summary>
+		///<summary>This is only used when using eCW tight or full to determine whether the Finish & Send button should say Revise instead in FormApptEdit.  Finds hl7msg entries with matching AptNum and HL7Status of OutSent or OutPending.  If any exist, this returns true, otherwise false.</summary>
 		public static bool MessageWasSent(long aptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),aptNum);
 			}
-			//string command="SELECT COUNT(*) FROM hl7msg WHERE AptNum="+POut.Long(aptNum);
-			string command="SELECT COUNT(*) FROM hl7msg WHERE AptNum="+POut.Long(aptNum)+" AND MsgText LIKE '%DFT%'";
+			//Any outbound messages in eCW tight and full are DFT messages
+			//so if there is an OutSent or OutPending messages with matching AptNum, the button should say Revise so we will return true if count>0
+			string command="SELECT COUNT(*) FROM hl7msg WHERE AptNum="+POut.Long(aptNum)+" "
+				+"AND (HL7Status="+POut.Int((int)HL7MessageStatus.OutSent)+" OR HL7Status="+POut.Int((int)HL7MessageStatus.OutPending)+")";
 			if(Db.GetCount(command)=="0") {
 				return false;
 			}
 			return true;
 		}
 
-		///<summary>Doesn't delete the old messages, but just the text of the message.  This avoids breaking MessageWasSent().  Only affects messages that are at least four months old, regardless of status.</summary>
+		///<summary>Doesn't delete the old messages, but just the text of the message.  This avoids breaking MessageWasSent().  Only affects messages that are at least four months old, regardless of status.  The hl7msg rows should not be deleted because we do not want the "complete" button to show up again for old appointments.</summary>
 		public static void DeleteOldMsgText() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
