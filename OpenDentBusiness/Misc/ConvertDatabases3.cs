@@ -6352,18 +6352,22 @@ namespace OpenDentBusiness {
 						+"'SMARTDent')";
 					Db.NonQ(command);
 				}//end SMARTDent bridge
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					if(!IndexExists("hl7msg","MsgText")) {//only add this index if it has not already been added
-						//this could be slow on a very large hl7msg table, however most of the rows in a table will have empty MsgText fields due to old message text being deleted.
-						//on a table with 870,000 rows, 145,000 filled with MsgText, with hl7msg.MYD file size of over 9 GB, this query took 10 minutes to run on my local PC
-						//on our local test eCW server with 1690 rows, 500 with message text the query took 2 seconds.
-						command="ALTER TABLE hl7msg ADD INDEX (MsgText(100))";
-						Db.NonQ(command);
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("hl7msg","MsgText")) {//only add this index if it has not already been added
+							//this could be slow on a very large hl7msg table, however most of the rows in a table will have empty MsgText fields due to old message text being deleted.
+							//on a table with 870,000 rows, 145,000 filled with MsgText, with hl7msg.MYD file size of over 9 GB, this query took 10 minutes to run on my local PC
+							//on our local test eCW server with 1690 rows, 500 with message text the query took 2 seconds.
+							command="ALTER TABLE hl7msg ADD INDEX (MsgText(100))";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						//Cannot index a clob column in oracle.  Not likely that an oracle user will also be using HL7.
 					}
 				}
-				else {//oracle
-					//Cannot index a clob column in oracle.  Not likely that an oracle user will also be using HL7.
-				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+
 
 
 
