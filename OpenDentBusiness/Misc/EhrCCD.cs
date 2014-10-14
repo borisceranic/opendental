@@ -3130,6 +3130,9 @@ Vital Signs
 				List<XmlNode> listProbObs=GetParentNodes(listProblemObservTemplate);
 				List<XmlNode> listTypeCodes=GetNodesByTagNameAndAttributesFromList(listProbObs,"code");
 				List<XmlNode> listCodes=GetNodesByTagNameAndAttributesFromList(listProbObs,"value");
+				if(listCodes[0].Attributes["nullFlavor"]!=null) {
+					continue;
+				}
 				string probType=listTypeCodes[0].Attributes["code"].Value;
 				string probCode=listCodes[0].Attributes["code"].Value;
 				string probName=listCodes[0].Attributes["displayName"].Value;
@@ -3189,6 +3192,9 @@ Vital Signs
 				if(listCodesActive.Count>0) {
 					listCodes.Remove(listCodesActive[0]);
 					XmlNode xmlNodeCode=listCodesActive[0];
+					if(xmlNodeCode.Attributes["nullFlavor"]!=null) {
+						continue;
+					}
 					strStatus=xmlNodeCode.Attributes["code"].Value;
 					if(xmlNodeCode.Attributes["codeSystem"].Value!=strCodeSystemSnomed) {
 						continue;//We can only import Snomeds
