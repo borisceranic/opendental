@@ -30,6 +30,6 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 
-[assembly: AssemblyVersion("14.3.11.0")]
+[assembly: AssemblyVersion("14.3.12.0")]
 
 //[assembly: AssemblyFileVersion("1.0.0.0")]
