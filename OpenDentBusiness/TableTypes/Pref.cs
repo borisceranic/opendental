@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 		public string Comments;
 	}
 
-	///<summary>Because this enum is stored in the database as strings rather than as numbers, we can do the order alphabetically.  This enum must exactly match the prefs in the database.  Deprecated preferences will start with "Deprecated"</summary>
+	///<summary>Because this enum is stored in the database as strings rather than as numbers, we can do the order alphabetically.  This enum must exactly match the prefs in the database.  Deprecated preferences will start with "Deprecated" in the summary section.</summary>
 	public enum PrefName {
 		AccountingCashIncomeAccount,
 		AccountingDepositAccounts,
@@ -377,6 +377,12 @@ namespace OpenDentBusiness {
 		RecallPostcardMessage2,
 		RecallPostcardMessage3,
 		RecallPostcardsPerSheet,
+		RecallSchedulerMessage,
+		RecallSchedulerMessage2,
+		RecallSchedulerMessage3,
+		///<summary>Boolean. 0 by default. True when recall scheduler service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
+		RecallSchedulerService,
+		RecallSchedulerSubject,
 		RecallShowIfDaysFirstReminder,
 		RecallShowIfDaysSecondReminder,
 		RecallStatusEmailed,

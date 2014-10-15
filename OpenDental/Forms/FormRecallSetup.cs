@@ -661,7 +661,7 @@ namespace OpenDental{
 			ODGridColumn col;
 			col=new ODGridColumn(Lan.g("TableRecallMsgs","Remind#"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecallMsgs","Mode"),50);
+			col=new ODGridColumn(Lan.g("TableRecallMsgs","Mode"),61);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("",300);
 			gridMain.Columns.Add(col);
@@ -669,6 +669,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			#region 1st Reminder
 			//
 			row=new ODGridRow();
 			row.Cells.Add("1");
@@ -709,6 +710,8 @@ namespace OpenDental{
 			row.Cells.Add(PrefC.GetString(PrefName.RecallPostcardFamMsg));//old
 			row.Tag="RecallPostcardFamMsg";
 			gridMain.Rows.Add(row);
+			#endregion
+			#region 2nd Reminder
 			//2---------------------------------------------------------------------------------------------
 			//
 			row=new ODGridRow();
@@ -750,6 +753,8 @@ namespace OpenDental{
 			row.Cells.Add(PrefC.GetString(PrefName.RecallPostcardFamMsg2));
 			row.Tag="RecallPostcardFamMsg2";
 			gridMain.Rows.Add(row);
+			#endregion
+			#region 3rd Reminder
 			//3---------------------------------------------------------------------------------------------
 			//
 			row=new ODGridRow();
@@ -791,6 +796,8 @@ namespace OpenDental{
 			row.Cells.Add(PrefC.GetString(PrefName.RecallPostcardFamMsg3));
 			row.Tag="RecallPostcardFamMsg3";
 			gridMain.Rows.Add(row);
+			#endregion
+			#region Confirmation
 			//Confirmation---------------------------------------------------------------------------------------------
 			row=new ODGridRow();
 			row.Cells.Add("");
@@ -815,6 +822,8 @@ namespace OpenDental{
 			row.Cells.Add(PrefC.GetString(PrefName.ConfirmEmailMessage));
 			row.Tag="ConfirmEmailMessage";
 			gridMain.Rows.Add(row);
+			#endregion
+			#region Text Messaging
 			//Text Messaging----------------------------------------------------------------------------------------------
 			row=new ODGridRow();
 			row.Cells.Add("");
@@ -823,6 +832,42 @@ namespace OpenDental{
 			row.Cells.Add(PrefC.GetString(PrefName.ConfirmTextMessage));
 			row.Tag="ConfirmTextMessage";
 			gridMain.Rows.Add(row);
+			#endregion
+			#region Recall Scheduler
+			//Recall Scheduler--------------------------------------------------------------------------------------------
+			//
+			row=new ODGridRow();
+			row.Cells.Add("");
+			row.Cells.Add(Lan.g(this,"WebSched"));
+			row.Cells.Add(Lan.g(this,"Subject line"));
+			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerSubject));
+			row.Tag="RecallSchedulerSubject";
+			gridMain.Rows.Add(row);
+			//
+			row=new ODGridRow();
+			row.Cells.Add("1");
+			row.Cells.Add(Lan.g(this,"WebSched"));
+			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage));
+			row.Tag="RecallSchedulerMessage";
+			gridMain.Rows.Add(row);
+			//
+			row=new ODGridRow();
+			row.Cells.Add("2");
+			row.Cells.Add(Lan.g(this,"WebSched"));
+			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage2));
+			row.Tag="RecallSchedulerMessage2";
+			gridMain.Rows.Add(row);
+			//
+			row=new ODGridRow();
+			row.Cells.Add("3");
+			row.Cells.Add(Lan.g(this,"WebSched"));
+			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage3));
+			row.Tag="RecallSchedulerMessage3";
+			gridMain.Rows.Add(row);
+			#endregion
 			gridMain.EndUpdate();
 		}
 
