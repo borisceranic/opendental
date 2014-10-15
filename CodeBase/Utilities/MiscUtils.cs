@@ -27,6 +27,30 @@ namespace CodeBase {
 			return result;
 		}
 
+		///<summary>Encrypts signature text and returns a base 64 string so that it can go directly into the database.</summary>
+		public static string Encrypt(string encrypt) {
+			UTF8Encoding enc=new UTF8Encoding();
+			byte[] arrayEncryptBytes=Encoding.UTF8.GetBytes(encrypt);
+			MemoryStream ms=new MemoryStream();
+			CryptoStream cs=null;
+			Aes aes=new AesManaged();
+			aes.Key=enc.GetBytes("AKQjlLUjlcABVbqp");
+			aes.IV=new byte[16];
+			ICryptoTransform encryptor=aes.CreateEncryptor(aes.Key,aes.IV);
+			cs=new CryptoStream(ms,encryptor,CryptoStreamMode.Write);
+			cs.Write(arrayEncryptBytes,0,arrayEncryptBytes.Length);
+			cs.FlushFinalBlock();
+			byte[] retval=new byte[ms.Length];
+			ms.Position=0;
+			ms.Read(retval,0,(int)ms.Length);
+			cs.Dispose();
+			ms.Dispose();
+			if(aes!=null) {
+				aes.Clear();
+			}
+			return Convert.ToBase64String(retval);
+		}
+
 		public static string Decrypt(string encString) {
 			try {
 				byte[] encrypted=Convert.FromBase64String(encString);
@@ -35,7 +59,7 @@ namespace CodeBase {
 				StreamReader sr=null;
 				Aes aes=new AesManaged();
 				UTF8Encoding enc=new UTF8Encoding();
-				aes.Key=enc.GetBytes("AKQjlLUjlcABVbqp");//Random string will be key
+				aes.Key=enc.GetBytes("AKQjlLUjlcABVbqp");
 				aes.IV=new byte[16];
 				ICryptoTransform decryptor=aes.CreateDecryptor(aes.Key,aes.IV);
 				ms=new MemoryStream(encrypted);

@@ -73,7 +73,7 @@ namespace OpenDental {
 						}
 					}
 					string user=ProgramProperties.GetPropVal(prog.ProgramNum,"Username");
-					string password=ProgramProperties.GetPropVal(prog.ProgramNum,"Password");
+					string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
 					ProcessStartInfo info=new ProcessStartInfo(path);
 					string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
 					File.Delete(resultfile);//delete the old result file.

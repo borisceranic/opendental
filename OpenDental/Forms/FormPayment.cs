@@ -1357,7 +1357,7 @@ namespace OpenDental {
 			info.Arguments+="\"/CLERK:"+Security.CurUser.UserName+"\" /LOCKCLERK ";
 			info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
 			info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-			info.Arguments+="/PASSWORD:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Password")+" ";
+			info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
 			info.Arguments+="/PARTIALAPPROVALSUPPORT:T ";
 			info.Arguments+="/AUTOCLOSE ";
 			info.Arguments+="/HIDEMAINWINDOW ";
@@ -1515,7 +1515,7 @@ namespace OpenDental {
 			info.Arguments+="\"/CLERK:"+Security.CurUser.UserName+"\" /LOCKCLERK ";
 			info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
 			info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-			info.Arguments+="/PASSWORD:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Password")+" ";
+			info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
 			info.Arguments+="/AUTOCLOSE ";
 			info.Arguments+="/HIDEMAINWINDOW /SMALLWINDOW ";
 			if(!isDebit) {

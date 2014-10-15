@@ -205,7 +205,7 @@ namespace OpenDental {
 						info.Arguments+="/XCACCOUNTID:"+CreditCardCur.XChargeToken+" ";
 						info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
 						info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-						info.Arguments+="/PASSWORD:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Password")+" ";
+						info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
 						info.Arguments+="/AUTOPROCESS ";
 						info.Arguments+="/AUTOCLOSE ";
 						CreditCardCur.XChargeToken="";//Clear the XChargeToken in our db.
@@ -218,7 +218,7 @@ namespace OpenDental {
 						}
 						info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
 						info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-						info.Arguments+="/PASSWORD:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Password")+" ";
+						info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
 						info.Arguments+="/AUTOPROCESS ";
 						info.Arguments+="/AUTOCLOSE ";
 					}

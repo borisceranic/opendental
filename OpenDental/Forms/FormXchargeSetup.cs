@@ -174,6 +174,7 @@ namespace OpenDental{
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(410, 20);
 			this.textPassword.TabIndex = 6;
+			this.textPassword.UseSystemPasswordChar = true;
 			// 
 			// labelPassword
 			// 
@@ -258,7 +259,7 @@ namespace OpenDental{
 			pathOverrideOld=ProgramProperties.GetLocalPathOverrideForProgram(prog.ProgramNum);
 			textOverride.Text=pathOverrideOld;
 			textUser.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"Username");
-			textPassword.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"Password");
+			textPassword.Text=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
 			string paymentType=ProgramProperties.GetPropVal(prog.ProgramNum,"PaymentType");
 			for(int i=0;i<DefC.Short[(int)DefCat.PaymentTypes].Length;i++) {
 				comboPaymentType.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
@@ -300,7 +301,7 @@ namespace OpenDental{
 			string paymentType=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
 			ProgramProperties.SetProperty(prog.ProgramNum,"PaymentType",paymentType);
 			ProgramProperties.SetProperty(prog.ProgramNum,"Username",textUser.Text);
-			ProgramProperties.SetProperty(prog.ProgramNum,"Password",textPassword.Text);
+			ProgramProperties.SetProperty(prog.ProgramNum,"Password",CodeBase.MiscUtils.Encrypt(textPassword.Text));
 			DataValid.SetInvalid(InvalidType.Programs);
 			DialogResult=DialogResult.OK;
 		}

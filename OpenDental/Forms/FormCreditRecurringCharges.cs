@@ -256,7 +256,7 @@ namespace OpenDental {
 			int failed=0;
 			int success=0;
 			string user=ProgramProperties.GetPropVal(prog.ProgramNum,"Username");
-			string password=ProgramProperties.GetPropVal(prog.ProgramNum,"Password");
+			string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
 			#region Card Charge Loop
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				#region X-Charge

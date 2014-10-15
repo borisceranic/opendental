@@ -4,10 +4,41 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Text;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
 		public static System.Version LatestVersion=new Version("14.4.0.0");//This value must be changed when a new conversion is to be triggered.
+
+		#region Helper Functions
+
+		///<summary>Encrypts signature text and returns a base 64 string so that it can go directly into the database.
+		///Copied from MiscUtils.Encrypt() so that the data conversion will never change historically.</summary>
+		public static string Encrypt(string encrypt) {
+			UTF8Encoding enc=new UTF8Encoding();
+			byte[] arrayEncryptBytes=Encoding.UTF8.GetBytes(encrypt);
+			MemoryStream ms=new MemoryStream();
+			CryptoStream cs=null;
+			Aes aes=new AesManaged();
+			aes.Key=enc.GetBytes("AKQjlLUjlcABVbqp");
+			aes.IV=new byte[16];
+			ICryptoTransform encryptor=aes.CreateEncryptor(aes.Key,aes.IV);
+			cs=new CryptoStream(ms,encryptor,CryptoStreamMode.Write);
+			cs.Write(arrayEncryptBytes,0,arrayEncryptBytes.Length);
+			cs.FlushFinalBlock();
+			byte[] retval=new byte[ms.Length];
+			ms.Position=0;
+			ms.Read(retval,0,(int)ms.Length);
+			cs.Dispose();
+			ms.Dispose();
+			if(aes!=null) {
+				aes.Clear();
+			}
+			return Convert.ToBase64String(retval);
+		}
+
+		#endregion Helper Functions
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -6367,6 +6398,22 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ProgramNum FROM program WHERE ProgName='Xcharge' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ProgramNum FROM program WHERE ProgName='Xcharge') WHERE RowNum<=1";
+				}
+				long ProgramNum=PIn.Long(Db.GetScalar(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT PropertyValue FROM programproperty WHERE ProgramNum="+POut.Long(ProgramNum)+" AND PropertyDesc='Password' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT PropertyValue FROM programproperty WHERE ProgramNum="+POut.Long(ProgramNum)+" AND PropertyDesc='Password') WHERE RowNum<=1";
+				}
+				string pw=PIn.String(Db.GetScalar(command));
+				command="UPDATE programproperty SET PropertyValue='"+Encrypt(pw)+"' WHERE ProgramNum="+POut.Long(ProgramNum)+" AND PropertyDesc='Password'";//Oracle doesn't have any rescrictions with this query.
+				Db.NonQ(command);
 
 
 
