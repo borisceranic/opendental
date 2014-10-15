@@ -11,67 +11,40 @@ using System.Collections.Generic;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup. Currently inludes Patient Portal, MobileWeb (new-style), Mobile Synch (old-style).</summary>
-	public partial class FormPatientPortalSetup:Form {
-		#region data
+	public partial class FormEServicesSetup:Form {
 		private static MobileWeb.Mobile mb=new MobileWeb.Mobile();
-		private static int BatchSize=100;
+		private static int _batchSize=100;
 		///<summary>All statements of a patient are not uploaded. The limit is defined by the recent [statementLimitPerPatient] records</summary>
-		private static int statementLimitPerPatient=5;
+		private static int _statementLimitPerPatient=5;
 		///<summary>This variable prevents the synching methods from being called when a previous synch is in progress.</summary>
-		private static bool IsSynching;
+		private static bool _isSynching;
 		///<summary>This variable prevents multiple error message boxes from popping up if mobile synch server is not available.</summary>
-		private static bool IsServerAvail=true;
+		private static bool _isServerAvail=true;
 		///<summary>True if a pref was saved and the other workstations need to have their cache refreshed when this form closes.</summary>
-		private bool changed;
+		private bool _changed;
 		///<summary>If this variable is true then records are uploaded one at a time so that an error in uploading can be traced down to a single record</summary>
-		private static bool IsTroubleshootMode=false;
+		private static bool _isTroubleshootMode=false;
 		private static FormProgress FormP;
 
-		private enum SynchEntity {
-			patient,
-			appointment,
-			prescription,
-			provider,
-			pharmacy,
-			labpanel,
-			labresult,
-			medication,
-			medicationpat,
-			allergy,
-			allergydef,
-			disease,
-			diseasedef,
-			icd9,
-			statement,
-			document,
-			recall,
-			deletedobject,
-			patientdel
+		///<summary>Launches the eServices Setup window defaulted to the patient portal tab.</summary>
+		public FormEServicesSetup():this(EService.PatientPortal){ 		
 		}
 
-		///<summary>Used in ctor to determine which tab should be activated be default.</summary>
-		public enum SetTab { 
-			PatientPortal, 
-			MobileOld, 
-			MobileNew 
-		}
-		#endregion
-
-		#region init
-		public FormPatientPortalSetup():this(SetTab.PatientPortal){ 		
-		}
-		
-		public FormPatientPortalSetup(SetTab setTab) {
+		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
+		public FormEServicesSetup(EService setTab) {
 			InitializeComponent();
 			Lan.F(this);
 			switch(setTab) {
-				case SetTab.MobileOld:
+				case EService.MobileOld:
 					tabControl.SelectTab(tabMobileOld);
 					break;
-				case SetTab.MobileNew:
+				case EService.MobileNew:
 					tabControl.SelectTab(tabMobileNew);
 					break;
-				case SetTab.PatientPortal:
+				case EService.RecallScheduler:
+					tabControl.SelectTab(tabRecallScheduler);
+					break;
+				case EService.PatientPortal:
 				default:
 					tabControl.SelectTab(tabPatientPortal);
 					break;
@@ -114,7 +87,6 @@ namespace OpenDental {
 			textListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
 			butSaveListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
 		}
-		#endregion
 
 		#region patient portal
 		private void butGetUrlPatientPortal_Click(object sender,EventArgs e) {
@@ -155,8 +127,9 @@ namespace OpenDental {
 			}
 			if(Prefs.UpdateString(PrefName.PatientPortalURL,textRedirectUrlPatientPortal.Text)
 				| Prefs.UpdateString(PrefName.PatientPortalNotifySubject,textBoxNotificationSubject.Text)
-				| Prefs.UpdateString(PrefName.PatientPortalNotifyBody,textBoxNotificationBody.Text)) {
-				DataValid.SetInvalid(InvalidType.Prefs);
+				| Prefs.UpdateString(PrefName.PatientPortalNotifyBody,textBoxNotificationBody.Text)) 
+			{
+				_changed=true;//Sends invalid signal upon closing the form.
 			}
 			MsgBox.Show(this,"Patient Portal Info Saved");
 			butSaveListenerPort_Click(sender,e);
@@ -255,9 +228,9 @@ namespace OpenDental {
 				| Prefs.UpdateInt(PrefName.MobileSyncIntervalMinutes,PIn.Int(textSynchMinutes.Text))//blank entry allowed
 				| Prefs.UpdateString(PrefName.MobileExcludeApptsBeforeDate,POut.Date(PIn.Date(textDateBefore.Text),false))//blank 
 				| Prefs.UpdateString(PrefName.MobileSyncWorkstationName,textMobileSynchWorkStation.Text)
-				| Prefs.UpdateString(PrefName.MobileUserName,textMobileUserName.Text)) {
-				changed=true;
-				Prefs.RefreshCache();
+				| Prefs.UpdateString(PrefName.MobileUserName,textMobileUserName.Text)) 
+			{
+				_changed=true;
 			}
 			//Username and password-----------------------------------------------------------------------------
 			mb.SetMobileWebUserPassword(PrefC.GetString(PrefName.RegistrationKey),textMobileUserName.Text.Trim(),textMobilePassword.Text.Trim());
@@ -295,7 +268,7 @@ namespace OpenDental {
 			if(!SavePrefs()) {
 				return;
 			}
-			if(IsSynching) {
+			if(_isSynching) {
 				MsgBox.Show(this,"A Synch is in progress at the moment. Please try again later.");
 				return;
 			}
@@ -311,7 +284,7 @@ namespace OpenDental {
 			if(!SavePrefs()) {
 				return;
 			}
-			if(IsSynching) {
+			if(_isSynching) {
 				MsgBox.Show(this,"A Synch is in progress at the moment. Please try again later.");
 				return;
 			}
@@ -325,10 +298,10 @@ namespace OpenDental {
 
 		private void ShowProgressForm(DateTime changedSince) {
 			if(checkTroubleshooting.Checked) {
-				IsTroubleshootMode=true;
+				_isTroubleshootMode=true;
 			}
 			else {
-				IsTroubleshootMode=false;
+				_isTroubleshootMode=false;
 			}
 			DateTime timeSynchStarted=MiscData.GetNowDateTime();
 			FormP=new FormProgress();
@@ -345,7 +318,7 @@ namespace OpenDental {
 			if(FormP.DialogResult==DialogResult.Cancel) {
 				workerThread.Abort();
 			}
-			changed=true;
+			_changed=true;
 			textDateTimeLastRun.Text=PrefC.GetDateT(PrefName.MobileSyncDateTimeLastRun).ToShortDateString()+" "+PrefC.GetDateT(PrefName.MobileSyncDateTimeLastRun).ToShortTimeString();
 		}
 
@@ -415,7 +388,7 @@ namespace OpenDental {
 					FormP.Invoke(new PassProgressDelegate(PassProgressToDialog),
 						new object[] { currentVal,"?currentVal of ?maxVal records uploaded",totalCount,"" });
 				}
-				IsSynching=true;
+				_isSynching=true;
 				SynchGeneric(patNumList,SynchEntity.patient,totalCount,ref currentVal);
 				SynchGeneric(aptNumList,SynchEntity.appointment,totalCount,ref currentVal);
 				SynchGeneric(rxNumList,SynchEntity.prescription,totalCount,ref currentVal);
@@ -450,10 +423,10 @@ namespace OpenDental {
 					Prefs.UpdateBool(PrefName.MobileSynchNewTables121Done,true);
 				}
 				Prefs.UpdateDateT(PrefName.MobileSyncDateTimeLastRun,timeSynchStarted);
-				IsSynching=false;
+				_isSynching=false;
 			}
 			catch(Exception e) {
-				IsSynching=false;// this will ensure that the synch can start again. If this variable remains true due to an exception then a synch will never take place automatically.
+				_isSynching=false;// this will ensure that the synch can start again. If this variable remains true due to an exception then a synch will never take place automatically.
 				if(Application.OpenForms["FormProgress"]!=null) {// without this line the following error is thrown: "Invoke or BeginInvoke cannot be called on a control until the window handle has been created." or a null pointer exception is thrown when an automatic synch is done by the system.
 					FormP.Invoke(new PassProgressDelegate(PassProgressToDialog),
 						new object[] { 0,"?currentVal of ?maxVal records uploaded",totalCount,e.Message });
@@ -465,8 +438,8 @@ namespace OpenDental {
 		private static void SynchGeneric(List<long> PKNumList,SynchEntity entity,double totalCount,ref double currentVal) {
 			//Dennis: a try catch block here has been avoid on purpose.
 			List<long> BlockPKNumList=null;
-			int localBatchSize=BatchSize;
-			if(IsTroubleshootMode) {
+			int localBatchSize=_batchSize;
+			if(_isTroubleshootMode) {
 				localBatchSize=1;
 			}
 			string AtoZpath=ImageStore.GetPreferredAtoZpath();
@@ -561,7 +534,7 @@ namespace OpenDental {
 					}
 				}
 				catch(Exception e) {
-					if(IsTroubleshootMode) {
+					if(_isTroubleshootMode) {
 						string errorMessage=entity+ " with Primary Key = "+BlockPKNumList[0].ToString()+" failed to synch. "+"\n"+e.Message;
 						throw new Exception(errorMessage);
 					}
@@ -634,7 +607,7 @@ namespace OpenDental {
 			if(!isPaidCustomer) {
 				textSynchMinutes.Text="0";
 				Prefs.UpdateInt(PrefName.MobileSyncIntervalMinutes,0);
-				changed=true;
+				_changed=true;
 				MsgBox.Show(this,"This feature requires a separate monthly payment.  Please call customer support.");
 				return false;
 			}
@@ -646,7 +619,7 @@ namespace OpenDental {
 			if(Application.OpenForms["FormPatientPortalSetup"]!=null) {//tested.  This prevents main synch whenever this form is open.
 				return;
 			}
-			if(IsSynching) {
+			if(_isSynching) {
 				return;
 			}
 			DateTime timeSynchStarted=MiscData.GetNowDateTime();
@@ -661,8 +634,8 @@ namespace OpenDental {
 			}
 			if(!TestWebServiceExists()) {
 				if(!doForce) {//if being used from FormOpenDental as part of timer
-					if(IsServerAvail) {//this will only happen the first time to prevent multiple windows.
-						IsServerAvail=false;
+					if(_isServerAvail) {//this will only happen the first time to prevent multiple windows.
+						_isServerAvail=false;
 						DialogResult res=MessageBox.Show("Mobile synch server not available.  Synch failed.  Turn off synch?","",MessageBoxButtons.YesNo);
 						if(res==DialogResult.Yes) {
 							Prefs.UpdateInt(PrefName.MobileSyncIntervalMinutes,0);
@@ -672,7 +645,7 @@ namespace OpenDental {
 				return;
 			}
 			else {
-				IsServerAvail=true;
+				_isServerAvail=true;
 			}
 			DateTime changedSince=PrefC.GetDateT(PrefName.MobileSyncDateTimeLastRun);
 			//FormProgress FormP=new FormProgress();//but we won't display it.
@@ -799,7 +772,7 @@ namespace OpenDental {
 				return;
 			}
 			if(Prefs.UpdateString(PrefName.CustListenerPort,textListenerPort.Text)) {
-				DataValid.SetInvalid(InvalidType.Prefs);
+				_changed=true;//Sends invalid signal upon closing the form.
 			}
 			MsgBox.Show(this,"Listener Port Saved");
 		}
@@ -809,9 +782,39 @@ namespace OpenDental {
 		}
 
 		private void FormPatientPortalSetup_FormClosed(object sender,FormClosedEventArgs e) {
-			if(changed) {
+			if(_changed) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
+		}
+
+		private enum SynchEntity {
+			patient,
+			appointment,
+			prescription,
+			provider,
+			pharmacy,
+			labpanel,
+			labresult,
+			medication,
+			medicationpat,
+			allergy,
+			allergydef,
+			disease,
+			diseasedef,
+			icd9,
+			statement,
+			document,
+			recall,
+			deletedobject,
+			patientdel
+		}
+
+		///<summary>Typically used in ctor determine which tab should be activated be default.</summary>
+		public enum EService {
+			PatientPortal,
+			MobileOld,
+			MobileNew,
+			RecallScheduler
 		}
 	}
 }

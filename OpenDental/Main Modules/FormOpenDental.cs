@@ -5231,7 +5231,7 @@ namespace OpenDental{
 		}
 
 		private void menuItemEServices_Click(object sender,EventArgs e) {
-			new FormPatientPortalSetup().ShowDialog();
+			new FormEServicesSetup().ShowDialog();
 		}
 
 		private void menuItemEvaluations_Click(object sender,EventArgs e) {
@@ -5271,7 +5271,7 @@ namespace OpenDental{
 				return;
 			}
 			//MessageBox.Show("Not yet functional.");
-			new FormPatientPortalSetup(FormPatientPortalSetup.SetTab.MobileOld).ShowDialog();
+			new FormEServicesSetup(FormEServicesSetup.EService.MobileOld).ShowDialog();
 			//SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Mobile Sync");
 		}
 
@@ -5763,7 +5763,7 @@ namespace OpenDental{
 					//full synch never run
 					return;
 				}
-				FormPatientPortalSetup.SynchFromMain(false);
+				FormEServicesSetup.SynchFromMain(false);
 			}
 			catch { }//If MySQL service has been lost will not automatically UE
 		}

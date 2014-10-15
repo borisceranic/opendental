@@ -231,7 +231,7 @@ namespace OpenDental {
 		}
 
 		private void butPortalSetup_Click(object sender,EventArgs e) {
-			new FormPatientPortalSetup().ShowDialog();			
+			new FormEServicesSetup().ShowDialog();			
 		}
 
 		private void butCodeImport_Click(object sender,EventArgs e) {

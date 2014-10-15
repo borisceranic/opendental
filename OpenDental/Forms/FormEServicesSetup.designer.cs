@@ -1,5 +1,5 @@
 namespace OpenDental{
-	partial class FormPatientPortalSetup {
+	partial class FormEServicesSetup {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPatientPortalSetup));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEServicesSetup));
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.textOpenDentalUrlPatientPortal = new System.Windows.Forms.TextBox();
@@ -77,6 +77,7 @@ namespace OpenDental{
 			this.butSaveListenerPort = new OpenDental.UI.Button();
 			this.textListenerPort = new OpenDental.ValidNum();
 			this.butClose = new OpenDental.UI.Button();
+			this.tabRecallScheduler = new System.Windows.Forms.TabPage();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -255,6 +256,7 @@ namespace OpenDental{
 			this.tabControl.Controls.Add(this.tabPatientPortal);
 			this.tabControl.Controls.Add(this.tabMobileNew);
 			this.tabControl.Controls.Add(this.tabMobileOld);
+			this.tabControl.Controls.Add(this.tabRecallScheduler);
 			this.tabControl.Location = new System.Drawing.Point(12, 40);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
@@ -681,7 +683,16 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// FormPatientPortalSetup
+			// tabRecallScheduler
+			// 
+			this.tabRecallScheduler.BackColor = System.Drawing.SystemColors.Control;
+			this.tabRecallScheduler.Location = new System.Drawing.Point(4, 22);
+			this.tabRecallScheduler.Name = "tabRecallScheduler";
+			this.tabRecallScheduler.Size = new System.Drawing.Size(944, 588);
+			this.tabRecallScheduler.TabIndex = 3;
+			this.tabRecallScheduler.Text = "Recall Scheduler";
+			// 
+			// FormEServicesSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 692);
@@ -692,7 +703,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.tabControl);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Name = "FormPatientPortalSetup";
+			this.Name = "FormEServicesSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "eServices Setup";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormPatientPortalSetup_FormClosed);
@@ -770,6 +781,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label19;
 		private UI.Button butFullSync;
 		private UI.Button butSync;
+		private System.Windows.Forms.TabPage tabRecallScheduler;
 
 	}
 }

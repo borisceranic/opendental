@@ -1132,11 +1132,11 @@
     <Compile Include="Forms\FormXChargeReconcile.designer.cs">
       <DependentUpon>FormXChargeReconcile.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormPatientPortalSetup.cs">
+    <Compile Include="Forms\FormEServicesSetup.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormPatientPortalSetup.designer.cs">
-      <DependentUpon>FormPatientPortalSetup.cs</DependentUpon>
+    <Compile Include="Forms\FormEServicesSetup.designer.cs">
+      <DependentUpon>FormEServicesSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormPatientPortal.cs">
       <SubType>Form</SubType>
@@ -3954,8 +3954,8 @@
     <EmbeddedResource Include="Forms\FormXChargeReconcile.resx">
       <DependentUpon>FormXChargeReconcile.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormPatientPortalSetup.resx">
-      <DependentUpon>FormPatientPortalSetup.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormEServicesSetup.resx">
+      <DependentUpon>FormEServicesSetup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPatientPortal.resx">
       <DependentUpon>FormPatientPortal.cs</DependentUpon>

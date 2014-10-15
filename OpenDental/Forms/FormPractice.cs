@@ -927,7 +927,7 @@ namespace OpenDental{
 			if(changed){
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			FormPatientPortalSetup.UploadPreference(PrefName.PracticeTitle);
+			FormEServicesSetup.UploadPreference(PrefName.PracticeTitle);
 			DialogResult=DialogResult.OK;
 		}
 
