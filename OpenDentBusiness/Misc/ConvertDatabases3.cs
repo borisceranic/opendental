@@ -6456,6 +6456,30 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				//End recall scheduler preferences------
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						//This index was added to the primary key of the table in To6_1_1() when the table was created.
+						//It is redundant to add an index to the primary key.
+						command="ALTER TABLE anesthmedsgiven DROP INDEX AnestheticMedNum";
+						Db.NonQ(command);
+					}
+					else {
+						//table not added in oracle and oracle does not allow adding an index to the same column twice like MySQL, even if named differently
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						//The procedurelog table does not have the column ChartNum.
+						//This index is incorrectly named and is on the PatNum column, which already has an index named indexPatNum.
+						command="ALTER TABLE procedurelog DROP INDEX ChartNum";
+						Db.NonQ(command);
+					}
+					else {
+						//oracle does not allow adding an index to the same column twice like MySQL, even if named differently
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
