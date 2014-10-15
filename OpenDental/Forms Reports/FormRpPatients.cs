@@ -598,7 +598,7 @@ namespace OpenDental{
       ALpatFilter.Add("Position");  
       ALpatFilter.Add("Preferred"); 
       //ALpatFilter.Add("Primary Carrier"); 
-      //ALpatFilter.Add("PriProv"); 
+      ALpatFilter.Add("PriProv"); 
       //ALpatFilter.Add("PriRelationship"); 
       //ALpatFilter.Add("RecallInterval"); 
       ALpatFilter.Add("RecallStatus");
