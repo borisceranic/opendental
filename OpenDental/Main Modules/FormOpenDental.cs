@@ -2498,13 +2498,18 @@ namespace OpenDental{
 				string imagePath=ImageStore.GetPreferredAtoZpath();
 				string reportFolderName=PrefC.GetString(PrefName.ReportFolderName);
 				string reportDir=ODFileUtils.CombinePaths(imagePath,reportFolderName);
-				if(Directory.Exists(reportDir)) {
-					DirectoryInfo infoDir=new DirectoryInfo(reportDir);
-					FileInfo[] filesRdl=infoDir.GetFiles("*.rdl");
-					for(int i=0;i<filesRdl.Length;i++) {
-						string itemName=Path.GetFileNameWithoutExtension(filesRdl[i].Name);
-						menuItemCustomReports.MenuItems.Add(itemName,new System.EventHandler(this.menuItemRDLReport_Click));
+				try {
+					if(Directory.Exists(reportDir)) {
+						DirectoryInfo infoDir=new DirectoryInfo(reportDir);
+						FileInfo[] filesRdl=infoDir.GetFiles("*.rdl");
+						for(int i=0;i<filesRdl.Length;i++) {
+							string itemName=Path.GetFileNameWithoutExtension(filesRdl[i].Name);
+							menuItemCustomReports.MenuItems.Add(itemName,new System.EventHandler(this.menuItemRDLReport_Click));
+						}
 					}
+				}
+				catch {
+					MsgBox.Show(this,"Failed to retreive custom reports.");
 				}
 			}
 			if(menuItemCustomReports.MenuItems.Count==0) {
