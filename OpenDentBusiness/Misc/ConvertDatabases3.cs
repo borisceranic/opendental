@@ -6414,8 +6414,48 @@ namespace OpenDentBusiness {
 				string pw=PIn.String(Db.GetScalar(command));
 				command="UPDATE programproperty SET PropertyValue='"+Encrypt(pw)+"' WHERE ProgramNum="+POut.Long(ProgramNum)+" AND PropertyDesc='Password'";//Oracle doesn't have any rescrictions with this query.
 				Db.NonQ(command);
-
-
+				//Recall scheduler preferences-----------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerService','0')";//Service will be off by default
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerService','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerSubject','Continuing Care Reminder')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerSubject','Continuing Care Reminder')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage2','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage2','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage3','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage3','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					Db.NonQ(command);
+				}
+				//End recall scheduler preferences------
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
