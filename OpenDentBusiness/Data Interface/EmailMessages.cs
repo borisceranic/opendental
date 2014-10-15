@@ -371,12 +371,20 @@ namespace OpenDentBusiness{
 		///<summary>Call to cleanup newlines within a string before including in an email. The RFC 822 guide states that every single line in a raw email message must end with \r\n, also known as CRLF.
 		///Certain email providers will reject outgoing email from us if we have any lines ending with \n or \r. Email providers that we know care: Prosites. Other email providers seem to handle
 		///all different types of newlines, even though \r or \n by itself is not standard. This function replaces all \r and \n with \r\n.</summary>
-		public static string Tidy(string str) {
+		public static string BodyTidy(string str) {
 			//This function assumes the worst case, which is a string that has all 3 types of newlines: \r, \n and \r\n
 			//We will first convert \r\n and \r into \n so that all our line endings are the same. Then replace \n with \r\n to make the newlines proper.
 			string retVal=str.Replace("\r\n","\n");//We must replace the two character newline first so that our following replacements do not create extra newlines.
 			retVal=retVal.Replace("\r","\n");//After this step, all newlines are in the form \n.
 			retVal=retVal.Replace("\n","\r\n");//After this step, all newlines will be in form \r\n.
+			return retVal;
+		}
+
+		/// <summary>Replaces new lines with a space. Emails with new line characters in the subject won't send.</summary>
+		public static string SubjectTidy(string str) {
+			string retVal=str.Replace("\r\n"," ");
+			retVal=retVal.Replace("\r"," ");
+			retVal=retVal.Replace("\n"," ");
 			return retVal;
 		}
 
@@ -397,8 +405,8 @@ namespace OpenDentBusiness{
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpusessl","true");//false was also tested and does not work
 				message.From=emailMessage.FromAddress.Trim();
 				message.To=emailMessage.ToAddress.Trim();
-				message.Subject=Tidy(emailMessage.Subject);
-				message.Body=Tidy(emailMessage.BodyText);
+				message.Subject=SubjectTidy(emailMessage.Subject);
+				message.Body=BodyTidy(emailMessage.BodyText);
 				//message.Cc=;
 				//message.Bcc=;
 				//message.UrlContentBase=;
@@ -434,8 +442,8 @@ namespace OpenDentBusiness{
 				MailMessage message=new MailMessage();
 				message.From=new MailAddress(emailMessage.FromAddress.Trim());
 				message.To.Add(emailMessage.ToAddress.Trim());
-				message.Subject=Tidy(emailMessage.Subject);
-				message.Body=Tidy(emailMessage.BodyText);
+				message.Subject=SubjectTidy(emailMessage.Subject);
+				message.Body=BodyTidy(emailMessage.BodyText);
 				message.IsBodyHtml=false;
 				if(nameValueCollectionHeaders!=null) {
 					message.Headers.Add(nameValueCollectionHeaders);//Needed for Direct Acks to work.
@@ -865,7 +873,7 @@ namespace OpenDentBusiness{
 			else {//Sending the email.
 				emailMessage.MsgDateTime=DateTime.Now;
 			}
-			emailMessage.Subject=Tidy(message.SubjectValue);
+			emailMessage.Subject=SubjectTidy(message.SubjectValue);
 			emailMessage.ToAddress=message.ToValue.Trim();
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeParts=new List<Health.Direct.Common.Mime.MimeEntity>();//We want to treat one part and multiple part emails the same way below, so we make our own list.  If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
 			Health.Direct.Common.Mime.MimeEntity mimeEntity=null;
@@ -941,7 +949,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			//We need to use emailAddressFrom.Username instead of emailAddressFrom.SenderAddress, because of how strict encryption is for matching the name to the certificate.
 			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message(emailMessage.ToAddress.Trim(),emailMessage.FromAddress.Trim());
-			string subject=Tidy(emailMessage.Subject);
+			string subject=SubjectTidy(emailMessage.Subject);
 			if(subject!="") {
 				Health.Direct.Common.Mime.Header headerSubject=new Health.Direct.Common.Mime.Header("Subject",subject);
 				message.Headers.Add(headerSubject);
@@ -956,7 +964,7 @@ namespace OpenDentBusiness{
 			message.AssignMessageID();//http://tools.ietf.org/html/rfc5322#section-3.6.4
 			string strBoundry="";
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeParts=new List<Health.Direct.Common.Mime.MimeEntity>();
-			string bodyText=Tidy(emailMessage.BodyText);
+			string bodyText=BodyTidy(emailMessage.BodyText);
 			if(bodyText.Trim().Length>4 && bodyText.Trim().StartsWith("--") && bodyText.Trim().EndsWith("--")) {//The body text is multi-part.
 				strBoundry=bodyText.Trim().Split(new string[] { "\r\n","\r","\n" },StringSplitOptions.None)[0];
 				string[] arrayBodyTextParts=bodyText.Trim().TrimEnd('-').Split(new string[] { strBoundry },StringSplitOptions.RemoveEmptyEntries);
