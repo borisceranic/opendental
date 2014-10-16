@@ -9,6 +9,8 @@ using System.Net.Mime;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
+
 using System.Threading;
 using System.Xml;
 using CodeBase;
@@ -731,7 +733,17 @@ namespace OpenDentBusiness{
 				inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmail);//Used to parse all email (encrypted or not).
 			}
 			catch(Exception ex) {
-				throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+				if(ex.Message=="Error=MissingHeaderValue") {
+					//The "Welcome to Email" message from GoDaddy has a blank CC field which causes the IncomingMessage() constructor to throw an exception.
+					//The TO header can be blank because it is not required, since the user could put all destination addresses in either CC or BCC alone.  We tested this.
+					strRawEmail=Regex.Replace(strRawEmail,@"TO:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the TO header if it is any number of spaces or tabs followed by exactly one newline.
+					strRawEmail=Regex.Replace(strRawEmail,@"CC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the CC header if it is any number of spaces or tabs followed by exactly one newline.
+					strRawEmail=Regex.Replace(strRawEmail,@"BCC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Probably overkill, but does not hurt.
+					inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmail);
+				}
+				else {
+					throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+				}
 			}
 			bool isEncrypted=false;
 			if(inMsg.Message.ContentType.ToLower().Contains("application/pkcs7-mime")) {//The email MIME/body is encrypted (known as S/MIME). Treated as a Direct message.
@@ -827,9 +839,12 @@ namespace OpenDentBusiness{
 			emailMessage.FromAddress=message.FromValue.Trim();
 			if(message.DateValue!=null) {//Is null when sending, but should not be null when receiving.
 				//The received email message date must be in a very specific format and must match the RFC822 standard.  Is a required field for RFC822.  http://tools.ietf.org/html/rfc822
-				//We need the received time from the server, so we can quickly identify messages which have already been downloaded and to avoid downloading duplicates.
+				//We show the datetime that the email landed onto the email server instead of the datetime that the email was downloaded.
 				//Examples: "3 Dec 2013 17:10:37 -0800", "10 Dec 2013 17:10:37 -0800", "Tue, 5 Nov 2013 17:10:37 +0000 (UTC)", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
-				if(message.DateValue.Contains(",")) {//The day-of-week, comma and following space are optional. Examples: "Tue, 3 Dec 2013 17:10:37 +0000", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
+				if(message.DateValue.Contains("GMT")) {//Examples: Tue, 09 Sep 2014 23:16:36 GMT
+					emailMessage.MsgDateTime=DateTime.Parse(message.DateValue);
+				}
+				else if(message.DateValue.Contains(",")) {//The day-of-week, comma and following space are optional. Examples: "Tue, 3 Dec 2013 17:10:37 +0000", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
 					try {
 						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,31),"ddd, d MMM yyyy HH:mm:ss zzz",System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat);
 					}
@@ -850,7 +865,12 @@ namespace OpenDentBusiness{
 				emailMessage.MsgDateTime=DateTime.Now;
 			}
 			emailMessage.Subject=Tidy(message.SubjectValue);
-			emailMessage.ToAddress=message.ToValue.Trim();
+			if(message.ToValue==null) {//Sent by CC or BCC
+				emailMessage.ToAddress="";
+			}
+			else {
+				emailMessage.ToAddress=message.ToValue.Trim();
+			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeParts=new List<Health.Direct.Common.Mime.MimeEntity>();//We want to treat one part and multiple part emails the same way below, so we make our own list.  If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
 			Health.Direct.Common.Mime.MimeEntity mimeEntity=null;
 			try {
