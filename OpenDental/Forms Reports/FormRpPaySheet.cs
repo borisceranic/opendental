@@ -6,9 +6,9 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
-namespace OpenDental{
-///<summary></summary>
-	public class FormRpPaySheet : System.Windows.Forms.Form{
+namespace OpenDental {
+	///<summary></summary>
+	public class FormRpPaySheet:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.MonthCalendar date2;
@@ -20,30 +20,31 @@ namespace OpenDental{
 		private GroupBox groupBox1;
 		private RadioButton radioPatient;
 		private RadioButton radioCheck;
-		private CheckBox checkAllTypes;
-		private ListBox listTypes;
-		private CheckBox checkIns;
+		private CheckBox checkPatientTypes;
+		private ListBox listPatientTypes;
+		private CheckBox checkInsuranceTypes;
 		private CheckBox checkAllClin;
 		private ListBox listClin;
 		private Label labelClin;
 		private Label label2;
+		private ListBox listInsuranceTypes;
 		private CheckBox checkAllProv;
 		//private FormQuery FormQuery2;
 
 		///<summary></summary>
-		public FormRpPaySheet(){
+		public FormRpPaySheet() {
 			InitializeComponent();
- 			Lan.F(this);
+			Lan.F(this);
 		}
 
 		///<summary></summary>
-		protected override void Dispose( bool disposing ){
-			if( disposing ){
-				if(components != null){
+		protected override void Dispose(bool disposing) {
+			if(disposing) {
+				if(components != null) {
 					components.Dispose();
 				}
 			}
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
 		#region Windows Form Designer generated code
@@ -51,8 +52,7 @@ namespace OpenDental{
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpPaySheet));
 			this.date2 = new System.Windows.Forms.MonthCalendar();
 			this.date1 = new System.Windows.Forms.MonthCalendar();
@@ -61,17 +61,18 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkAllProv = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label2 = new System.Windows.Forms.Label();
 			this.radioPatient = new System.Windows.Forms.RadioButton();
 			this.radioCheck = new System.Windows.Forms.RadioButton();
-			this.checkAllTypes = new System.Windows.Forms.CheckBox();
-			this.listTypes = new System.Windows.Forms.ListBox();
-			this.checkIns = new System.Windows.Forms.CheckBox();
+			this.checkPatientTypes = new System.Windows.Forms.CheckBox();
+			this.listPatientTypes = new System.Windows.Forms.ListBox();
+			this.checkInsuranceTypes = new System.Windows.Forms.CheckBox();
 			this.checkAllClin = new System.Windows.Forms.CheckBox();
 			this.listClin = new System.Windows.Forms.ListBox();
 			this.labelClin = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.listInsuranceTypes = new System.Windows.Forms.ListBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -98,7 +99,7 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(530,55);
+			this.listProv.Location = new System.Drawing.Point(524,54);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listProv.Size = new System.Drawing.Size(163,199);
@@ -107,7 +108,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(528,16);
+			this.label1.Location = new System.Drawing.Point(522,15);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(104,16);
 			this.label1.TabIndex = 35;
@@ -119,7 +120,7 @@ namespace OpenDental{
 			this.checkAllProv.Checked = true;
 			this.checkAllProv.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllProv.Location = new System.Drawing.Point(531,35);
+			this.checkAllProv.Location = new System.Drawing.Point(525,34);
 			this.checkAllProv.Name = "checkAllProv";
 			this.checkAllProv.Size = new System.Drawing.Size(95,16);
 			this.checkAllProv.TabIndex = 43;
@@ -137,6 +138,14 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 44;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Group By";
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(5,60);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(163,29);
+			this.label2.TabIndex = 55;
+			this.label2.Text = "Either way, provider splits will still show separately.";
 			// 
 			// radioPatient
 			// 
@@ -160,41 +169,42 @@ namespace OpenDental{
 			// 
 			// checkAllTypes
 			// 
-			this.checkAllTypes.Checked = true;
-			this.checkAllTypes.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkAllTypes.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllTypes.Location = new System.Drawing.Point(286,251);
-			this.checkAllTypes.Name = "checkAllTypes";
-			this.checkAllTypes.Size = new System.Drawing.Size(177,16);
-			this.checkAllTypes.TabIndex = 47;
-			this.checkAllTypes.Text = "All patient payment types";
-			this.checkAllTypes.Click += new System.EventHandler(this.checkAllTypes_Click);
+			this.checkPatientTypes.Checked = true;
+			this.checkPatientTypes.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkPatientTypes.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPatientTypes.Location = new System.Drawing.Point(382,263);
+			this.checkPatientTypes.Name = "checkAllTypes";
+			this.checkPatientTypes.Size = new System.Drawing.Size(166,16);
+			this.checkPatientTypes.TabIndex = 47;
+			this.checkPatientTypes.Text = "All patient payment types";
+			this.checkPatientTypes.Click += new System.EventHandler(this.checkAllTypes_Click);
 			// 
 			// listTypes
 			// 
-			this.listTypes.Location = new System.Drawing.Point(285,271);
-			this.listTypes.Name = "listTypes";
-			this.listTypes.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listTypes.Size = new System.Drawing.Size(163,199);
-			this.listTypes.TabIndex = 46;
+			this.listPatientTypes.Location = new System.Drawing.Point(382,285);
+			this.listPatientTypes.Name = "listTypes";
+			this.listPatientTypes.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listPatientTypes.Size = new System.Drawing.Size(163,186);
+			this.listPatientTypes.TabIndex = 46;
 			// 
 			// checkIns
 			// 
-			this.checkIns.Checked = true;
-			this.checkIns.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkIns.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIns.Location = new System.Drawing.Point(286,232);
-			this.checkIns.Name = "checkIns";
-			this.checkIns.Size = new System.Drawing.Size(177,16);
-			this.checkIns.TabIndex = 48;
-			this.checkIns.Text = "Insurance payments";
+			this.checkInsuranceTypes.Checked = true;
+			this.checkInsuranceTypes.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkInsuranceTypes.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkInsuranceTypes.Location = new System.Drawing.Point(210,263);
+			this.checkInsuranceTypes.Name = "checkIns";
+			this.checkInsuranceTypes.Size = new System.Drawing.Size(166,16);
+			this.checkInsuranceTypes.TabIndex = 48;
+			this.checkInsuranceTypes.Text = "All insurance payment types";
+			this.checkInsuranceTypes.Click += new System.EventHandler(this.checkIns_Click);
 			// 
 			// checkAllClin
 			// 
 			this.checkAllClin.Checked = true;
 			this.checkAllClin.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllClin.Location = new System.Drawing.Point(530,304);
+			this.checkAllClin.Location = new System.Drawing.Point(554,305);
 			this.checkAllClin.Name = "checkAllClin";
 			this.checkAllClin.Size = new System.Drawing.Size(95,16);
 			this.checkAllClin.TabIndex = 54;
@@ -203,7 +213,7 @@ namespace OpenDental{
 			// 
 			// listClin
 			// 
-			this.listClin.Location = new System.Drawing.Point(530,323);
+			this.listClin.Location = new System.Drawing.Point(554,324);
 			this.listClin.Name = "listClin";
 			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listClin.Size = new System.Drawing.Size(154,147);
@@ -212,20 +222,12 @@ namespace OpenDental{
 			// 
 			// labelClin
 			// 
-			this.labelClin.Location = new System.Drawing.Point(527,286);
+			this.labelClin.Location = new System.Drawing.Point(551,287);
 			this.labelClin.Name = "labelClin";
 			this.labelClin.Size = new System.Drawing.Size(104,16);
 			this.labelClin.TabIndex = 52;
 			this.labelClin.Text = "Clinics";
 			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(5,60);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(163,29);
-			this.label2.TabIndex = 55;
-			this.label2.Text = "Either way, provider splits will still show separately.";
 			// 
 			// butCancel
 			// 
@@ -257,16 +259,25 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// listInsuranceTypes
+			// 
+			this.listInsuranceTypes.Location = new System.Drawing.Point(210,285);
+			this.listInsuranceTypes.Name = "listInsuranceTypes";
+			this.listInsuranceTypes.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listInsuranceTypes.Size = new System.Drawing.Size(163,186);
+			this.listInsuranceTypes.TabIndex = 55;
+			// 
 			// FormRpPaySheet
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
 			this.ClientSize = new System.Drawing.Size(818,495);
+			this.Controls.Add(this.listInsuranceTypes);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.listClin);
 			this.Controls.Add(this.labelClin);
-			this.Controls.Add(this.checkIns);
-			this.Controls.Add(this.checkAllTypes);
-			this.Controls.Add(this.listTypes);
+			this.Controls.Add(this.checkInsuranceTypes);
+			this.Controls.Add(this.checkPatientTypes);
+			this.Controls.Add(this.listPatientTypes);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.checkAllProv);
 			this.Controls.Add(this.listProv);
@@ -290,7 +301,7 @@ namespace OpenDental{
 		}
 		#endregion
 
-		private void FormPaymentSheet_Load(object sender, System.EventArgs e) {
+		private void FormPaymentSheet_Load(object sender,System.EventArgs e) {
 			date1.SelectionStart=DateTime.Today;
 			date2.SelectionStart=DateTime.Today;
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
@@ -308,9 +319,13 @@ namespace OpenDental{
 				}
 			}
 			for(int i=0;i<DefC.Short[(int)DefCat.PaymentTypes].Length;i++) {
-				listTypes.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
+				listPatientTypes.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
 			}
-			listTypes.Visible=false;
+			listPatientTypes.Visible=false;
+			for(int i=0;i<DefC.Short[(int)DefCat.InsurancePaymentType].Length;i++) {
+				listInsuranceTypes.Items.Add(DefC.Short[(int)DefCat.InsurancePaymentType][i].ItemName);
+			}
+			listInsuranceTypes.Visible=false;
 		}
 
 		private void checkAllProv_Click(object sender,EventArgs e) {
@@ -338,15 +353,24 @@ namespace OpenDental{
 		}
 
 		private void checkAllTypes_Click(object sender,EventArgs e) {
-			if(checkAllTypes.Checked){
-				listTypes.Visible=false;
+			if(checkPatientTypes.Checked) {
+				listPatientTypes.Visible=false;
 			}
-			else{
-				listTypes.Visible=true;
+			else {
+				listPatientTypes.Visible=true;
 			}
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
+		private void checkIns_Click(object sender,EventArgs e) {
+			if(checkInsuranceTypes.Checked) {
+				listInsuranceTypes.Visible=false;
+			}
+			else {
+				listInsuranceTypes.Visible=true;
+			}
+		}
+
+		private void butOK_Click(object sender,System.EventArgs e) {
 			if(!checkAllProv.Checked && listProv.SelectedIndices.Count==0) {
 				MsgBox.Show(this,"At least one provider must be selected.");
 				return;
@@ -357,7 +381,7 @@ namespace OpenDental{
 					return;
 				}
 			}
-			if(!checkAllTypes.Checked && listTypes.SelectedIndices.Count==0 && !checkIns.Checked) {
+			if(!checkPatientTypes.Checked && listPatientTypes.SelectedIndices.Count==0 && !checkInsuranceTypes.Checked && listInsuranceTypes.SelectedIndices.Count==0) {
 				MsgBox.Show(this,"At least one type must be selected.");
 				return;
 			}
@@ -409,16 +433,26 @@ WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
 				+whereProv
 				+whereClin
 				+"AND claimpayment.CheckDate >= "+POut.Date(date1.SelectionStart)+" "
-				+"AND claimpayment.CheckDate <= "+POut.Date(date2.SelectionStart)+" "
-+@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),
+				+"AND claimpayment.CheckDate <= "+POut.Date(date2.SelectionStart)+" ";
+			if(!checkInsuranceTypes.Checked && listInsuranceTypes.SelectedIndices.Count>0) {
+				queryIns+="AND claimpayment.PayType IN (";
+				for(int i=0;i<listInsuranceTypes.SelectedIndices.Count;i++) {
+					if(i>0) {
+						queryIns+=",";
+					}
+					queryIns+=POut.Long(DefC.Short[(int)DefCat.InsurancePaymentType][listInsuranceTypes.SelectedIndices[i]].DefNum);
+				}
+				queryIns+=") ";
+			}
+			queryIns+=@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),
 claimproc.ClaimPaymentNum,provider.ProvNum,
 claimproc.ClinicNum,carrier.CarrierName,provider.Abbr,
 clinic.Description,claimpayment.CheckNum";
-			if(radioPatient.Checked){
+			if(radioPatient.Checked) {
 				queryIns+=",patient.PatNum";
 			}
 			queryIns+=" ORDER BY claimproc.DateCP,lfname";
-			if(!checkIns.Checked){
+			if(!checkInsuranceTypes.Checked && listInsuranceTypes.SelectedIndices.Count==0) {
 				queryIns=DbHelper.LimitOrderBy(queryIns,0);
 			}
 			//patient payments-----------------------------------------------------------------------------------------
@@ -471,24 +505,24 @@ WHERE 1 "
 				+whereClin
 				+"AND paysplit.DatePay >= "+POut.Date(date1.SelectionStart)+" "
 				+"AND paysplit.DatePay <= "+POut.Date(date2.SelectionStart)+" ";
-			if(listTypes.SelectedIndices.Count>0){
+			if(!checkPatientTypes.Checked && listPatientTypes.SelectedIndices.Count>0) {
 				queryPat+="AND (";
-				for(int i=0;i<listTypes.SelectedIndices.Count;i++) {
+				for(int i=0;i<listPatientTypes.SelectedIndices.Count;i++) {
 					if(i>0) {
 						queryPat+="OR ";
 					}
-					queryPat+="payment.PayType = "+POut.Long(DefC.Short[(int)DefCat.PaymentTypes][listTypes.SelectedIndices[i]].DefNum)+" ";
+					queryPat+="payment.PayType = "+POut.Long(DefC.Short[(int)DefCat.PaymentTypes][listPatientTypes.SelectedIndices[i]].DefNum)+" ";
 				}
 				queryPat+=") ";
 			}
 			queryPat+=@"GROUP BY "
 				+"payment.PayNum,payment.PayDate,provider.ProvNum,payment.ClinicNum"
 				+",provider.Abbr,clinic.Description,payment.CheckNum,definition.ItemName";
-			if(radioPatient.Checked){
+			if(radioPatient.Checked) {
 				queryPat+=",patient.PatNum";
 			}
 			queryPat+=" ORDER BY paysplit.DatePay,lfname";
-			if(!checkAllTypes.Checked && listTypes.SelectedIndices.Count==0){
+			if(!checkPatientTypes.Checked && listPatientTypes.SelectedIndices.Count==0) {
 				queryPat=DbHelper.LimitOrderBy(queryPat,0);
 			}
 			DataTable tableIns=Reports.GetTable(queryIns);
@@ -537,18 +571,8 @@ WHERE 1 "
 			FormR.RdlReport.DataSets["DataPatPay"].SetData(tablePat);
 			FormR.RdlReport.DataSets["DataPracticeTitle"].SetData(tablePref);
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;		
+			DialogResult=DialogResult.OK;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
 
 	}
 }
