@@ -33,6 +33,12 @@ namespace OpenDental.localhost {
         
         private System.Threading.SendOrPostCallback RequestUpdateOperationCompleted;
         
+        private System.Threading.SendOrPostCallback RequestCustomerIDOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback PracticeTitleResetOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback IsForeignRegKeyOperationCompleted;
+        
         private System.Threading.SendOrPostCallback RequestCodeSystemsOperationCompleted;
         
         private System.Threading.SendOrPostCallback RequestCodeSystemDownloadOperationCompleted;
@@ -47,21 +53,17 @@ namespace OpenDental.localhost {
         
         private System.Threading.SendOrPostCallback FeatureRequestDiscussGetListOperationCompleted;
         
-        private System.Threading.SendOrPostCallback RequestCustomerIDOperationCompleted;
+        private System.Threading.SendOrPostCallback RequestFeeSchedOperationCompleted;
         
         private System.Threading.SendOrPostCallback RequestPatientPortalURLOperationCompleted;
         
-        private System.Threading.SendOrPostCallback RequestFeeSchedOperationCompleted;
+        private System.Threading.SendOrPostCallback ValidatePatientPortalOfficeOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback ValidateRecallSchedulerOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidateResellerCredentialsOperationCompleted;
         
-        private System.Threading.SendOrPostCallback ValidatePatientPortalOfficeOperationCompleted;
-        
         private System.Threading.SendOrPostCallback ValidateWebLanderOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback PracticeTitleResetOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback IsForeignRegKeyOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -108,6 +110,15 @@ namespace OpenDental.localhost {
         public event RequestUpdateCompletedEventHandler RequestUpdateCompleted;
         
         /// <remarks/>
+        public event RequestCustomerIDCompletedEventHandler RequestCustomerIDCompleted;
+        
+        /// <remarks/>
+        public event PracticeTitleResetCompletedEventHandler PracticeTitleResetCompleted;
+        
+        /// <remarks/>
+        public event IsForeignRegKeyCompletedEventHandler IsForeignRegKeyCompleted;
+        
+        /// <remarks/>
         public event RequestCodeSystemsCompletedEventHandler RequestCodeSystemsCompleted;
         
         /// <remarks/>
@@ -129,28 +140,22 @@ namespace OpenDental.localhost {
         public event FeatureRequestDiscussGetListCompletedEventHandler FeatureRequestDiscussGetListCompleted;
         
         /// <remarks/>
-        public event RequestCustomerIDCompletedEventHandler RequestCustomerIDCompleted;
+        public event RequestFeeSchedCompletedEventHandler RequestFeeSchedCompleted;
         
         /// <remarks/>
         public event RequestPatientPortalURLCompletedEventHandler RequestPatientPortalURLCompleted;
         
         /// <remarks/>
-        public event RequestFeeSchedCompletedEventHandler RequestFeeSchedCompleted;
+        public event ValidatePatientPortalOfficeCompletedEventHandler ValidatePatientPortalOfficeCompleted;
+        
+        /// <remarks/>
+        public event ValidateRecallSchedulerCompletedEventHandler ValidateRecallSchedulerCompleted;
         
         /// <remarks/>
         public event ValidateResellerCredentialsCompletedEventHandler ValidateResellerCredentialsCompleted;
         
         /// <remarks/>
-        public event ValidatePatientPortalOfficeCompletedEventHandler ValidatePatientPortalOfficeCompleted;
-        
-        /// <remarks/>
         public event ValidateWebLanderCompletedEventHandler ValidateWebLanderCompleted;
-        
-        /// <remarks/>
-        public event PracticeTitleResetCompletedEventHandler PracticeTitleResetCompleted;
-        
-        /// <remarks/>
-        public event IsForeignRegKeyCompletedEventHandler IsForeignRegKeyCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/EstablishConnection", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -205,6 +210,92 @@ namespace OpenDental.localhost {
             if ((this.RequestUpdateCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.RequestUpdateCompleted(this, new RequestUpdateCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestCustomerID", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string RequestCustomerID(string officeData) {
+            object[] results = this.Invoke("RequestCustomerID", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void RequestCustomerIDAsync(string officeData) {
+            this.RequestCustomerIDAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void RequestCustomerIDAsync(string officeData, object userState) {
+            if ((this.RequestCustomerIDOperationCompleted == null)) {
+                this.RequestCustomerIDOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRequestCustomerIDOperationCompleted);
+            }
+            this.InvokeAsync("RequestCustomerID", new object[] {
+                        officeData}, this.RequestCustomerIDOperationCompleted, userState);
+        }
+        
+        private void OnRequestCustomerIDOperationCompleted(object arg) {
+            if ((this.RequestCustomerIDCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RequestCustomerIDCompleted(this, new RequestCustomerIDCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/PracticeTitleReset", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void PracticeTitleReset(string officeData) {
+            this.Invoke("PracticeTitleReset", new object[] {
+                        officeData});
+        }
+        
+        /// <remarks/>
+        public void PracticeTitleResetAsync(string officeData) {
+            this.PracticeTitleResetAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void PracticeTitleResetAsync(string officeData, object userState) {
+            if ((this.PracticeTitleResetOperationCompleted == null)) {
+                this.PracticeTitleResetOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPracticeTitleResetOperationCompleted);
+            }
+            this.InvokeAsync("PracticeTitleReset", new object[] {
+                        officeData}, this.PracticeTitleResetOperationCompleted, userState);
+        }
+        
+        private void OnPracticeTitleResetOperationCompleted(object arg) {
+            if ((this.PracticeTitleResetCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PracticeTitleResetCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/IsForeignRegKey", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string IsForeignRegKey(string officeData) {
+            object[] results = this.Invoke("IsForeignRegKey", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void IsForeignRegKeyAsync(string officeData) {
+            this.IsForeignRegKeyAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void IsForeignRegKeyAsync(string officeData, object userState) {
+            if ((this.IsForeignRegKeyOperationCompleted == null)) {
+                this.IsForeignRegKeyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsForeignRegKeyOperationCompleted);
+            }
+            this.InvokeAsync("IsForeignRegKey", new object[] {
+                        officeData}, this.IsForeignRegKeyOperationCompleted, userState);
+        }
+        
+        private void OnIsForeignRegKeyOperationCompleted(object arg) {
+            if ((this.IsForeignRegKeyCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.IsForeignRegKeyCompleted(this, new IsForeignRegKeyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -412,31 +503,31 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestCustomerID", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string RequestCustomerID(string officeData) {
-            object[] results = this.Invoke("RequestCustomerID", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestFeeSched", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string RequestFeeSched(string officeData) {
+            object[] results = this.Invoke("RequestFeeSched", new object[] {
                         officeData});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void RequestCustomerIDAsync(string officeData) {
-            this.RequestCustomerIDAsync(officeData, null);
+        public void RequestFeeSchedAsync(string officeData) {
+            this.RequestFeeSchedAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void RequestCustomerIDAsync(string officeData, object userState) {
-            if ((this.RequestCustomerIDOperationCompleted == null)) {
-                this.RequestCustomerIDOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRequestCustomerIDOperationCompleted);
+        public void RequestFeeSchedAsync(string officeData, object userState) {
+            if ((this.RequestFeeSchedOperationCompleted == null)) {
+                this.RequestFeeSchedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRequestFeeSchedOperationCompleted);
             }
-            this.InvokeAsync("RequestCustomerID", new object[] {
-                        officeData}, this.RequestCustomerIDOperationCompleted, userState);
+            this.InvokeAsync("RequestFeeSched", new object[] {
+                        officeData}, this.RequestFeeSchedOperationCompleted, userState);
         }
         
-        private void OnRequestCustomerIDOperationCompleted(object arg) {
-            if ((this.RequestCustomerIDCompleted != null)) {
+        private void OnRequestFeeSchedOperationCompleted(object arg) {
+            if ((this.RequestFeeSchedCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RequestCustomerIDCompleted(this, new RequestCustomerIDCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.RequestFeeSchedCompleted(this, new RequestFeeSchedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -470,31 +561,60 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestFeeSched", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string RequestFeeSched(string officeData) {
-            object[] results = this.Invoke("RequestFeeSched", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidatePatientPortalOffice", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ValidatePatientPortalOffice(string officeData) {
+            object[] results = this.Invoke("ValidatePatientPortalOffice", new object[] {
                         officeData});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void RequestFeeSchedAsync(string officeData) {
-            this.RequestFeeSchedAsync(officeData, null);
+        public void ValidatePatientPortalOfficeAsync(string officeData) {
+            this.ValidatePatientPortalOfficeAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void RequestFeeSchedAsync(string officeData, object userState) {
-            if ((this.RequestFeeSchedOperationCompleted == null)) {
-                this.RequestFeeSchedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRequestFeeSchedOperationCompleted);
+        public void ValidatePatientPortalOfficeAsync(string officeData, object userState) {
+            if ((this.ValidatePatientPortalOfficeOperationCompleted == null)) {
+                this.ValidatePatientPortalOfficeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidatePatientPortalOfficeOperationCompleted);
             }
-            this.InvokeAsync("RequestFeeSched", new object[] {
-                        officeData}, this.RequestFeeSchedOperationCompleted, userState);
+            this.InvokeAsync("ValidatePatientPortalOffice", new object[] {
+                        officeData}, this.ValidatePatientPortalOfficeOperationCompleted, userState);
         }
         
-        private void OnRequestFeeSchedOperationCompleted(object arg) {
-            if ((this.RequestFeeSchedCompleted != null)) {
+        private void OnValidatePatientPortalOfficeOperationCompleted(object arg) {
+            if ((this.ValidatePatientPortalOfficeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RequestFeeSchedCompleted(this, new RequestFeeSchedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.ValidatePatientPortalOfficeCompleted(this, new ValidatePatientPortalOfficeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateRecallScheduler", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ValidateRecallScheduler(string officeData) {
+            object[] results = this.Invoke("ValidateRecallScheduler", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ValidateRecallSchedulerAsync(string officeData) {
+            this.ValidateRecallSchedulerAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void ValidateRecallSchedulerAsync(string officeData, object userState) {
+            if ((this.ValidateRecallSchedulerOperationCompleted == null)) {
+                this.ValidateRecallSchedulerOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateRecallSchedulerOperationCompleted);
+            }
+            this.InvokeAsync("ValidateRecallScheduler", new object[] {
+                        officeData}, this.ValidateRecallSchedulerOperationCompleted, userState);
+        }
+        
+        private void OnValidateRecallSchedulerOperationCompleted(object arg) {
+            if ((this.ValidateRecallSchedulerCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ValidateRecallSchedulerCompleted(this, new ValidateRecallSchedulerCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -528,35 +648,6 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidatePatientPortalOffice", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string ValidatePatientPortalOffice(string officeData) {
-            object[] results = this.Invoke("ValidatePatientPortalOffice", new object[] {
-                        officeData});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void ValidatePatientPortalOfficeAsync(string officeData) {
-            this.ValidatePatientPortalOfficeAsync(officeData, null);
-        }
-        
-        /// <remarks/>
-        public void ValidatePatientPortalOfficeAsync(string officeData, object userState) {
-            if ((this.ValidatePatientPortalOfficeOperationCompleted == null)) {
-                this.ValidatePatientPortalOfficeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidatePatientPortalOfficeOperationCompleted);
-            }
-            this.InvokeAsync("ValidatePatientPortalOffice", new object[] {
-                        officeData}, this.ValidatePatientPortalOfficeOperationCompleted, userState);
-        }
-        
-        private void OnValidatePatientPortalOfficeOperationCompleted(object arg) {
-            if ((this.ValidatePatientPortalOfficeCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.ValidatePatientPortalOfficeCompleted(this, new ValidatePatientPortalOfficeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateWebLander", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public string ValidateWebLander(string officeData) {
             object[] results = this.Invoke("ValidateWebLander", new object[] {
@@ -582,63 +673,6 @@ namespace OpenDental.localhost {
             if ((this.ValidateWebLanderCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ValidateWebLanderCompleted(this, new ValidateWebLanderCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/PracticeTitleReset", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void PracticeTitleReset(string officeData) {
-            this.Invoke("PracticeTitleReset", new object[] {
-                        officeData});
-        }
-        
-        /// <remarks/>
-        public void PracticeTitleResetAsync(string officeData) {
-            this.PracticeTitleResetAsync(officeData, null);
-        }
-        
-        /// <remarks/>
-        public void PracticeTitleResetAsync(string officeData, object userState) {
-            if ((this.PracticeTitleResetOperationCompleted == null)) {
-                this.PracticeTitleResetOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPracticeTitleResetOperationCompleted);
-            }
-            this.InvokeAsync("PracticeTitleReset", new object[] {
-                        officeData}, this.PracticeTitleResetOperationCompleted, userState);
-        }
-        
-        private void OnPracticeTitleResetOperationCompleted(object arg) {
-            if ((this.PracticeTitleResetCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.PracticeTitleResetCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/IsForeignRegKey", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string IsForeignRegKey(string officeData) {
-            object[] results = this.Invoke("IsForeignRegKey", new object[] {
-                        officeData});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void IsForeignRegKeyAsync(string officeData) {
-            this.IsForeignRegKeyAsync(officeData, null);
-        }
-        
-        /// <remarks/>
-        public void IsForeignRegKeyAsync(string officeData, object userState) {
-            if ((this.IsForeignRegKeyOperationCompleted == null)) {
-                this.IsForeignRegKeyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsForeignRegKeyOperationCompleted);
-            }
-            this.InvokeAsync("IsForeignRegKey", new object[] {
-                        officeData}, this.IsForeignRegKeyOperationCompleted, userState);
-        }
-        
-        private void OnIsForeignRegKeyOperationCompleted(object arg) {
-            if ((this.IsForeignRegKeyCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.IsForeignRegKeyCompleted(this, new IsForeignRegKeyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -700,6 +734,62 @@ namespace OpenDental.localhost {
         private object[] results;
         
         internal RequestUpdateCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void RequestCustomerIDCompletedEventHandler(object sender, RequestCustomerIDCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RequestCustomerIDCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RequestCustomerIDCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void PracticeTitleResetCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void IsForeignRegKeyCompletedEventHandler(object sender, IsForeignRegKeyCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class IsForeignRegKeyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal IsForeignRegKeyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -897,17 +987,17 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void RequestCustomerIDCompletedEventHandler(object sender, RequestCustomerIDCompletedEventArgs e);
+    public delegate void RequestFeeSchedCompletedEventHandler(object sender, RequestFeeSchedCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RequestCustomerIDCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class RequestFeeSchedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal RequestCustomerIDCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal RequestFeeSchedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -949,17 +1039,43 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void RequestFeeSchedCompletedEventHandler(object sender, RequestFeeSchedCompletedEventArgs e);
+    public delegate void ValidatePatientPortalOfficeCompletedEventHandler(object sender, ValidatePatientPortalOfficeCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RequestFeeSchedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class ValidatePatientPortalOfficeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal RequestFeeSchedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal ValidatePatientPortalOfficeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void ValidateRecallSchedulerCompletedEventHandler(object sender, ValidateRecallSchedulerCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ValidateRecallSchedulerCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ValidateRecallSchedulerCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -1001,32 +1117,6 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void ValidatePatientPortalOfficeCompletedEventHandler(object sender, ValidatePatientPortalOfficeCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ValidatePatientPortalOfficeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal ValidatePatientPortalOfficeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     public delegate void ValidateWebLanderCompletedEventHandler(object sender, ValidateWebLanderCompletedEventArgs e);
     
     /// <remarks/>
@@ -1038,36 +1128,6 @@ namespace OpenDental.localhost {
         private object[] results;
         
         internal ValidateWebLanderCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void PracticeTitleResetCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void IsForeignRegKeyCompletedEventHandler(object sender, IsForeignRegKeyCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class IsForeignRegKeyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal IsForeignRegKeyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

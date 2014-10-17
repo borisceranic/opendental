@@ -6424,35 +6424,35 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerSubject','Continuing Care Reminder')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerSubject','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerSubject','Continuing Care Reminder')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerSubject','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage2','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage2','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage2','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage2','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage3','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallSchedulerMessage3','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage3','[NameF] is due for their regular dental check-up.  Please visit our online scheduler or call our office today in order to schedule an appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecallSchedulerMessage3','You or your family member is due for a regular dental check-upon on [DueDate].  Please visit our online scheduler link below or call our office today at [office phone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				//End recall scheduler preferences------

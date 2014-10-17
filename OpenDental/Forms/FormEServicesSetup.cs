@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using OpenDentBusiness.Mobile;
 using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup. Currently inludes Patient Portal, MobileWeb (new-style), Mobile Synch (old-style).</summary>
@@ -70,7 +71,14 @@ namespace OpenDental {
 			//Web server is not contacted when loading this form.  That would be too slow.
 			//CreateAppointments(5);
 			#endregion
-			SetControlEnabledState();			
+			#region recall scheduler
+			labelRecallSchedEnable.Text="";
+			if(PrefC.GetBool(PrefName.RecallSchedulerService)) {
+				butRecallSchedEnable.Enabled=false;
+				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service already enabled.");
+			}
+			#endregion
+			SetControlEnabledState();
 		}
 
 		private void SetControlEnabledState() {
@@ -760,6 +768,82 @@ namespace OpenDental {
 
 		#endregion Testing
 
+		#endregion
+
+		#region recall scheduler
+		private void butRecallSchedEnable_Click(object sender,EventArgs e) {
+			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
+			#region Web Service Settings
+#if DEBUG
+			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
+#else
+			OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
+			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
+				IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+				proxy.Credentials=cred;
+				updateService.Proxy=proxy;
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+			}
+			#endregion
+			string result=updateService.ValidateRecallScheduler(strbuild.ToString());
+			XmlDocument doc=new XmlDocument();
+			doc.LoadXml(result);
+			XmlNode node=doc.SelectSingleNode("//ValidateRecallSchedulerResponse");
+			if(node==null) {
+				//There should always be a ValidateRecallSchedulerResponse node.  If there isn't, something went wrong.
+				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");
+				return;
+			}
+			if(node.InnerText=="Valid") {
+				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
+				butRecallSchedEnable.Enabled=false;
+				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service has been enabled.");
+				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
+				if(Prefs.UpdateBool(PrefName.RecallSchedulerService,true)) {
+					_changed=true;
+				}
+				return;
+			}
+			#region Error Handling
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable 
+			XmlNode nodeError=doc.SelectSingleNode("//Error");
+			XmlNode nodeErrorCode=doc.SelectSingleNode("//ErrorCode");
+			if(nodeError==null || nodeErrorCode==null) {
+				//Something went wronger than wrong.
+				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");
+				return;
+			}
+			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for RecallScheduler monthly service", etc.
+			if(nodeErrorCode.InnerText=="110") {//Customer not registered for RecallScheduler monthly service
+				//We want to launch our recall scheduler page if the user is not signed up:
+				try {
+					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+				}
+				catch(Exception) {
+					MessageBox.Show(Lan.g(this,"You are not signed up for the recall scheduler service.  Please give us a call or visit our web page to see more information about signing up for this service.")
+						+"/r/n"+"http://www.opendental.com/"); //TODO: replace with URL to recall scheduler service.
+				}
+				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
+				labelRecallSchedEnable.Text=Lan.g(this,"Please give us a call or visit our web page to see more information about signing up for this service.")
+					+"\r\n"+"http://www.opendental.com/";//TODO: replace with URL to recall scheduler service.
+				return;
+			}
+			//For every other error message returned, we'll simply show it to the user.
+			//Inner text can be exception text if something goes very wrong.  Do not translate.
+			MessageBox.Show(Lan.g(this,"Error")+": "+nodeError.InnerText);
+			#endregion
+		}
 		#endregion
 
 		private void tabControl_SelectedIndexChanged(object sender,EventArgs e) {

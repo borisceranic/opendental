@@ -26,6 +26,44 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RequestCustomerID">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RequestCustomerIDResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestCustomerIDResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PracticeTitleReset">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PracticeTitleResetResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="IsForeignRegKey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsForeignRegKeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="IsForeignRegKeyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestCodeSystems">
         <s:complexType>
           <s:sequence>
@@ -124,17 +162,17 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="RequestCustomerID">
+      <s:element name="RequestFeeSched">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="RequestCustomerIDResponse">
+      <s:element name="RequestFeeSchedResponse">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="RequestCustomerIDResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="RequestFeeSchedResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -152,17 +190,31 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="RequestFeeSched">
+      <s:element name="ValidatePatientPortalOffice">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="RequestFeeSchedResponse">
+      <s:element name="ValidatePatientPortalOfficeResponse">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="RequestFeeSchedResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ValidatePatientPortalOfficeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ValidateRecallScheduler">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ValidateRecallSchedulerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ValidateRecallSchedulerResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -180,20 +232,6 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="ValidatePatientPortalOffice">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="ValidatePatientPortalOfficeResponse">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="ValidatePatientPortalOfficeResult" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
       <s:element name="ValidateWebLander">
         <s:complexType>
           <s:sequence>
@@ -205,30 +243,6 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="ValidateWebLanderResult" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="PracticeTitleReset">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="PracticeTitleResetResponse">
-        <s:complexType />
-      </s:element>
-      <s:element name="IsForeignRegKey">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="IsForeignRegKeyResponse">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="IsForeignRegKeyResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -245,6 +259,24 @@
   </wsdl:message>
   <wsdl:message name="RequestUpdateSoapOut">
     <wsdl:part name="parameters" element="tns:RequestUpdateResponse" />
+  </wsdl:message>
+  <wsdl:message name="RequestCustomerIDSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestCustomerID" />
+  </wsdl:message>
+  <wsdl:message name="RequestCustomerIDSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="PracticeTitleResetSoapIn">
+    <wsdl:part name="parameters" element="tns:PracticeTitleReset" />
+  </wsdl:message>
+  <wsdl:message name="PracticeTitleResetSoapOut">
+    <wsdl:part name="parameters" element="tns:PracticeTitleResetResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsForeignRegKeySoapIn">
+    <wsdl:part name="parameters" element="tns:IsForeignRegKey" />
+  </wsdl:message>
+  <wsdl:message name="IsForeignRegKeySoapOut">
+    <wsdl:part name="parameters" element="tns:IsForeignRegKeyResponse" />
   </wsdl:message>
   <wsdl:message name="RequestCodeSystemsSoapIn">
     <wsdl:part name="parameters" element="tns:RequestCodeSystems" />
@@ -288,11 +320,11 @@
   <wsdl:message name="FeatureRequestDiscussGetListSoapOut">
     <wsdl:part name="parameters" element="tns:FeatureRequestDiscussGetListResponse" />
   </wsdl:message>
-  <wsdl:message name="RequestCustomerIDSoapIn">
-    <wsdl:part name="parameters" element="tns:RequestCustomerID" />
+  <wsdl:message name="RequestFeeSchedSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestFeeSched" />
   </wsdl:message>
-  <wsdl:message name="RequestCustomerIDSoapOut">
-    <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
+  <wsdl:message name="RequestFeeSchedSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestFeeSchedResponse" />
   </wsdl:message>
   <wsdl:message name="RequestPatientPortalURLSoapIn">
     <wsdl:part name="parameters" element="tns:RequestPatientPortalURL" />
@@ -300,11 +332,17 @@
   <wsdl:message name="RequestPatientPortalURLSoapOut">
     <wsdl:part name="parameters" element="tns:RequestPatientPortalURLResponse" />
   </wsdl:message>
-  <wsdl:message name="RequestFeeSchedSoapIn">
-    <wsdl:part name="parameters" element="tns:RequestFeeSched" />
+  <wsdl:message name="ValidatePatientPortalOfficeSoapIn">
+    <wsdl:part name="parameters" element="tns:ValidatePatientPortalOffice" />
   </wsdl:message>
-  <wsdl:message name="RequestFeeSchedSoapOut">
-    <wsdl:part name="parameters" element="tns:RequestFeeSchedResponse" />
+  <wsdl:message name="ValidatePatientPortalOfficeSoapOut">
+    <wsdl:part name="parameters" element="tns:ValidatePatientPortalOfficeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ValidateRecallSchedulerSoapIn">
+    <wsdl:part name="parameters" element="tns:ValidateRecallScheduler" />
+  </wsdl:message>
+  <wsdl:message name="ValidateRecallSchedulerSoapOut">
+    <wsdl:part name="parameters" element="tns:ValidateRecallSchedulerResponse" />
   </wsdl:message>
   <wsdl:message name="ValidateResellerCredentialsSoapIn">
     <wsdl:part name="parameters" element="tns:ValidateResellerCredentials" />
@@ -312,29 +350,11 @@
   <wsdl:message name="ValidateResellerCredentialsSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateResellerCredentialsResponse" />
   </wsdl:message>
-  <wsdl:message name="ValidatePatientPortalOfficeSoapIn">
-    <wsdl:part name="parameters" element="tns:ValidatePatientPortalOffice" />
-  </wsdl:message>
-  <wsdl:message name="ValidatePatientPortalOfficeSoapOut">
-    <wsdl:part name="parameters" element="tns:ValidatePatientPortalOfficeResponse" />
-  </wsdl:message>
   <wsdl:message name="ValidateWebLanderSoapIn">
     <wsdl:part name="parameters" element="tns:ValidateWebLander" />
   </wsdl:message>
   <wsdl:message name="ValidateWebLanderSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateWebLanderResponse" />
-  </wsdl:message>
-  <wsdl:message name="PracticeTitleResetSoapIn">
-    <wsdl:part name="parameters" element="tns:PracticeTitleReset" />
-  </wsdl:message>
-  <wsdl:message name="PracticeTitleResetSoapOut">
-    <wsdl:part name="parameters" element="tns:PracticeTitleResetResponse" />
-  </wsdl:message>
-  <wsdl:message name="IsForeignRegKeySoapIn">
-    <wsdl:part name="parameters" element="tns:IsForeignRegKey" />
-  </wsdl:message>
-  <wsdl:message name="IsForeignRegKeySoapOut">
-    <wsdl:part name="parameters" element="tns:IsForeignRegKeyResponse" />
   </wsdl:message>
   <wsdl:portType name="Service1Soap">
     <wsdl:operation name="EstablishConnection">
@@ -344,6 +364,18 @@
     <wsdl:operation name="RequestUpdate">
       <wsdl:input message="tns:RequestUpdateSoapIn" />
       <wsdl:output message="tns:RequestUpdateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerID">
+      <wsdl:input message="tns:RequestCustomerIDSoapIn" />
+      <wsdl:output message="tns:RequestCustomerIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <wsdl:input message="tns:PracticeTitleResetSoapIn" />
+      <wsdl:output message="tns:PracticeTitleResetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <wsdl:input message="tns:IsForeignRegKeySoapIn" />
+      <wsdl:output message="tns:IsForeignRegKeySoapOut" />
     </wsdl:operation>
     <wsdl:operation name="RequestCodeSystems">
       <wsdl:input message="tns:RequestCodeSystemsSoapIn" />
@@ -373,37 +405,29 @@
       <wsdl:input message="tns:FeatureRequestDiscussGetListSoapIn" />
       <wsdl:output message="tns:FeatureRequestDiscussGetListSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="RequestCustomerID">
-      <wsdl:input message="tns:RequestCustomerIDSoapIn" />
-      <wsdl:output message="tns:RequestCustomerIDSoapOut" />
+    <wsdl:operation name="RequestFeeSched">
+      <wsdl:input message="tns:RequestFeeSchedSoapIn" />
+      <wsdl:output message="tns:RequestFeeSchedSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <wsdl:input message="tns:RequestPatientPortalURLSoapIn" />
       <wsdl:output message="tns:RequestPatientPortalURLSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="RequestFeeSched">
-      <wsdl:input message="tns:RequestFeeSchedSoapIn" />
-      <wsdl:output message="tns:RequestFeeSchedSoapOut" />
+    <wsdl:operation name="ValidatePatientPortalOffice">
+      <wsdl:input message="tns:ValidatePatientPortalOfficeSoapIn" />
+      <wsdl:output message="tns:ValidatePatientPortalOfficeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ValidateRecallScheduler">
+      <wsdl:input message="tns:ValidateRecallSchedulerSoapIn" />
+      <wsdl:output message="tns:ValidateRecallSchedulerSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="ValidateResellerCredentials">
       <wsdl:input message="tns:ValidateResellerCredentialsSoapIn" />
       <wsdl:output message="tns:ValidateResellerCredentialsSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="ValidatePatientPortalOffice">
-      <wsdl:input message="tns:ValidatePatientPortalOfficeSoapIn" />
-      <wsdl:output message="tns:ValidatePatientPortalOfficeSoapOut" />
-    </wsdl:operation>
     <wsdl:operation name="ValidateWebLander">
       <wsdl:input message="tns:ValidateWebLanderSoapIn" />
       <wsdl:output message="tns:ValidateWebLanderSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <wsdl:input message="tns:PracticeTitleResetSoapIn" />
-      <wsdl:output message="tns:PracticeTitleResetSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="IsForeignRegKey">
-      <wsdl:input message="tns:IsForeignRegKeySoapIn" />
-      <wsdl:output message="tns:IsForeignRegKeySoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="Service1Soap" type="tns:Service1Soap">
@@ -419,6 +443,33 @@
     </wsdl:operation>
     <wsdl:operation name="RequestUpdate">
       <soap:operation soapAction="http://open-dent.com/RequestUpdate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerID">
+      <soap:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <soap:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <soap:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -489,8 +540,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="RequestCustomerID">
-      <soap:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+    <wsdl:operation name="RequestFeeSched">
+      <soap:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -507,8 +558,17 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="RequestFeeSched">
-      <soap:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
+    <wsdl:operation name="ValidatePatientPortalOffice">
+      <soap:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateRecallScheduler">
+      <soap:operation soapAction="http://open-dent.com/ValidateRecallScheduler" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -525,35 +585,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidatePatientPortalOffice">
-      <soap:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="ValidateWebLander">
       <soap:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <soap:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="IsForeignRegKey">
-      <soap:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -575,6 +608,33 @@
     </wsdl:operation>
     <wsdl:operation name="RequestUpdate">
       <soap12:operation soapAction="http://open-dent.com/RequestUpdate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerID">
+      <soap12:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <soap12:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsForeignRegKey">
+      <soap12:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -645,8 +705,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="RequestCustomerID">
-      <soap12:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+    <wsdl:operation name="RequestFeeSched">
+      <soap12:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -663,8 +723,17 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="RequestFeeSched">
-      <soap12:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
+    <wsdl:operation name="ValidatePatientPortalOffice">
+      <soap12:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateRecallScheduler">
+      <soap12:operation soapAction="http://open-dent.com/ValidateRecallScheduler" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -681,35 +750,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidatePatientPortalOffice">
-      <soap12:operation soapAction="http://open-dent.com/ValidatePatientPortalOffice" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="ValidateWebLander">
       <soap12:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <soap12:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="IsForeignRegKey">
-      <soap12:operation soapAction="http://open-dent.com/IsForeignRegKey" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

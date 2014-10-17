@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDental.DivvyConnect;
+using System.Net;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -72,6 +73,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butGotoFamily;
 		private OpenDental.UI.Button butUndo;
 		private UI.Button butECards;
+		private Panel panelRecallScheduler;
 		private MenuItem menuItemSeeAccount;
 		//<summary>Only used if PinClicked=true</summary>
 		//public List<long> AptNumsSelected;
@@ -141,6 +143,7 @@ namespace OpenDental{
 			this.butGotoFamily = new OpenDental.UI.Button();
 			this.butUndo = new OpenDental.UI.Button();
 			this.butECards = new OpenDental.UI.Button();
+			this.panelRecallScheduler = new System.Windows.Forms.Panel();
 			this.groupBox1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
@@ -503,7 +506,7 @@ namespace OpenDental{
 			// 
 			// labelPatientCount
 			// 
-			this.labelPatientCount.Location = new System.Drawing.Point(759, 669);
+			this.labelPatientCount.Location = new System.Drawing.Point(857, 71);
 			this.labelPatientCount.Name = "labelPatientCount";
 			this.labelPatientCount.Size = new System.Drawing.Size(114, 14);
 			this.labelPatientCount.TabIndex = 61;
@@ -623,11 +626,21 @@ namespace OpenDental{
 			this.butECards.Visible = false;
 			this.butECards.Click += new System.EventHandler(this.butECards_Click);
 			// 
+			// panelRecallScheduler
+			// 
+			this.panelRecallScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.panelRecallScheduler.Location = new System.Drawing.Point(762, 663);
+			this.panelRecallScheduler.Name = "panelRecallScheduler";
+			this.panelRecallScheduler.Size = new System.Drawing.Size(120, 24);
+			this.panelRecallScheduler.TabIndex = 119;
+			this.panelRecallScheduler.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelRecallScheduler_MouseClick);
+			// 
 			// FormRecallList
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(975, 691);
+			this.Controls.Add(this.panelRecallScheduler);
 			this.Controls.Add(this.butUndo);
 			this.Controls.Add(this.butGotoFamily);
 			this.Controls.Add(this.butCommlog);
@@ -1032,6 +1045,36 @@ namespace OpenDental{
 			//no securitylog entry needed.  It will be made as each appt is dragged off pinboard.
 			gridMain.SetSelected(false);
 			FillMain(excludePatNums);
+		}
+
+		private void panelRecallScheduler_MouseClick(object sender,MouseEventArgs e) {
+			//TODO: check the new RecallSchedulerService preference and if disable, redirect the user to a URL that tells them about how amazing the feature is and how to enable it (by calling us).
+			if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
+				//Office has yet to enable the recall scheduler service.  Send them to our web site so that they can learn about how great it is.
+				try {
+					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+				}
+				catch(Exception) {
+					MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/" //TODO: replace with URL to recall scheduler service.
+						+"\r\n"+Lan.g(this,"Please set up a default web browser."));
+				}
+			}
+#if DEBUG
+			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
+#else
+			OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
+			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
+				IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+				proxy.Credentials=cred;
+				updateService.Proxy=proxy;
+			}
+			string result=updateService.ValidateRecallScheduler(PrefC.GetString(PrefName.RegistrationKey));
+			//If the preference is turned on, it needs to send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
+			//If not valid, do the URL redirect like above.
+			//If the pref is on and the customer is active and paying us, then send an email to the patients that they have selected (following the current email pattern in that window)
 		}
 
 		private void checkGroupFamilies_Click(object sender,EventArgs e) {
