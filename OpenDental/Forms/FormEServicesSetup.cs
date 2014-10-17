@@ -773,6 +773,7 @@ namespace OpenDental {
 		#region recall scheduler
 		private void butRecallSchedEnable_Click(object sender,EventArgs e) {
 			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
+			Cursor.Current=Cursors.WaitCursor;
 			#region Web Service Settings
 #if DEBUG
 			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
@@ -797,15 +798,10 @@ namespace OpenDental {
 			}
 			#endregion
 			string result=updateService.ValidateRecallScheduler(strbuild.ToString());
-			XmlDocument doc=new XmlDocument();
-			doc.LoadXml(result);
-			XmlNode node=doc.SelectSingleNode("//ValidateRecallSchedulerResponse");
-			if(node==null) {
-				//There should always be a ValidateRecallSchedulerResponse node.  If there isn't, something went wrong.
-				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");
-				return;
-			}
-			if(node.InnerText=="Valid") {
+			Cursor.Current=Cursors.Default;
+			string error="";
+			int errorCode=0;
+			if(Recalls.IsRecallSchedulerResponseValid(result, out error, out errorCode)) {
 				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
 				butRecallSchedEnable.Enabled=false;
 				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service has been enabled.");
@@ -816,32 +812,26 @@ namespace OpenDental {
 				return;
 			}
 			#region Error Handling
-			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable 
-			XmlNode nodeError=doc.SelectSingleNode("//Error");
-			XmlNode nodeErrorCode=doc.SelectSingleNode("//ErrorCode");
-			if(nodeError==null || nodeErrorCode==null) {
-				//Something went wronger than wrong.
-				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");
-				return;
-			}
-			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for RecallScheduler monthly service", etc.
-			if(nodeErrorCode.InnerText=="110") {//Customer not registered for RecallScheduler monthly service
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
+			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
 				//We want to launch our recall scheduler page if the user is not signed up:
 				try {
 					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
 				}
 				catch(Exception) {
-					MessageBox.Show(Lan.g(this,"You are not signed up for the recall scheduler service.  Please give us a call or visit our web page to see more information about signing up for this service.")
-						+"/r/n"+"http://www.opendental.com/"); //TODO: replace with URL to recall scheduler service.
+					//Do nothing.
 				}
 				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
-				labelRecallSchedEnable.Text=Lan.g(this,"Please give us a call or visit our web page to see more information about signing up for this service.")
-					+"\r\n"+"http://www.opendental.com/";//TODO: replace with URL to recall scheduler service.
+				labelRecallSchedEnable.Text=error;
 				return;
 			}
-			//For every other error message returned, we'll simply show it to the user.
-			//Inner text can be exception text if something goes very wrong.  Do not translate.
-			MessageBox.Show(Lan.g(this,"Error")+": "+nodeError.InnerText);
+			else if(errorCode==120) {
+				labelRecallSchedEnable.Text=error;
+				return;
+			}
+			//For every other error message returned, we'll simply show it to the user in a pop up.
+			labelRecallSchedEnable.Text="";
+			MessageBox.Show(error);
 			#endregion
 		}
 		#endregion

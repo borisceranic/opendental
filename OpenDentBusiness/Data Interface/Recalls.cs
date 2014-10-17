@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
+using System.Xml;
 
 namespace OpenDentBusiness{
 	
@@ -1048,9 +1050,56 @@ namespace OpenDentBusiness{
 			return recallList;
 		}
 
-
-
-
+		///<summary>Validates the results of our ValidateRecallScheduler web service call.  Returns true if they are valid, false if the office is not allowed to use the recall scheduler or if there was an error with the web service.  Error will be empty and ErrorCode will be 0 for valid responses and filled with error text if office is not valid or if something went wrong with the web service call.</summary>
+		///<param name="response">This should be the result string that was received from WebServiceCustomerUpdates.ValidateRecallScheduler()</param>
+		///<param name="error">Empty unless the customer is not valid for the recall scheduler service or there was an error with the web service response.</param>
+		///<param name="errorCode">0=no errors. 110=No recall scheduler repeating charge. 120=Invalid web service response. 190=All other errors.</param>
+		///<returns>True if user is an active customer and they have an active RecallScheduler repeating charge.</returns>
+		public static bool IsRecallSchedulerResponseValid(string response, out string error, out int errorCode) {
+			error="";
+			errorCode=0;
+			XmlDocument doc=new XmlDocument();
+			XmlNode node=null;
+			try {
+				doc.LoadXml(response);
+				node=doc.SelectSingleNode("//ValidateRecallSchedulerResponse");
+			}
+			catch {
+				//Invalid web service response passed in.  Node will be null and will return false correctly.
+			}
+			if(node==null) {
+				//There should always be a ValidateRecallSchedulerResponse node.  If there isn't, something went wrong.
+				error=Lans.g("Recalls","Invalid web service response.  Please try again or give us a call.");
+				errorCode=120;
+				return false;
+			}
+			if(node.InnerText=="Valid") {
+				return true;
+			}
+			#region Error Handling
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable 
+			XmlNode nodeError=doc.SelectSingleNode("//Error");
+			XmlNode nodeErrorCode=doc.SelectSingleNode("//ErrorCode");
+			if(nodeError==null || nodeErrorCode==null) {
+				//Something went wronger than wrong.
+				error=Lans.g("Recalls","Invalid web service response.  Please try again or give us a call.");
+				errorCode=120;
+				return false;
+			}
+			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for RecallScheduler monthly service", etc.
+			if(nodeErrorCode.InnerText=="110") {//Customer not registered for RecallScheduler monthly service
+				error=Lans.g("Recalls","Please give us a call or visit our web page to see more information about signing up for this service.")
+					+"\r\n"+"http://www.opendental.com/";//TODO: replace with URL to recall scheduler service.
+				errorCode=110;
+				return false;
+			}
+			//For every other error message returned, we'll simply show it to the user.
+			//Inner text can be exception text if something goes very wrong.  Do not translate.
+			error=Lans.g("Recalls","Error")+": "+nodeError.InnerText;
+			errorCode=190;
+			return false;
+			#endregion
+		}
 	}
 
 	///<summary>The supplied DataRows must include the following columns: Guarantor, PatNum, guarLName, guarFName, LName, FName, DateDue, maxDateDue, billingType.  maxDateDue is the most recent DateDue for all family members in the list and needs to be the same for all family members.  This date will be used for better grouping.</summary>

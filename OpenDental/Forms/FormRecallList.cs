@@ -17,6 +17,8 @@ using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDental.DivvyConnect;
 using System.Net;
+using System.Xml;
+using System.Text;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -1059,6 +1061,11 @@ namespace OpenDental{
 						+"\r\n"+Lan.g(this,"Please set up a default web browser."));
 				}
 			}
+			//If the preference is turned on, it needs to send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
+			//If not valid, do the URL redirect like above.
+			//If the pref is on and the customer is active and paying us, then send an email to the patients that they have selected (following the current email pattern in that window)
+			Cursor.Current=Cursors.WaitCursor;
+			#region Web Service Settings
 #if DEBUG
 			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
 #else
@@ -1071,10 +1078,51 @@ namespace OpenDental{
 				proxy.Credentials=cred;
 				updateService.Proxy=proxy;
 			}
-			string result=updateService.ValidateRecallScheduler(PrefC.GetString(PrefName.RegistrationKey));
-			//If the preference is turned on, it needs to send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
-			//If not valid, do the URL redirect like above.
-			//If the pref is on and the customer is active and paying us, then send an email to the patients that they have selected (following the current email pattern in that window)
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+			}
+			#endregion
+			string result=updateService.ValidateRecallScheduler(strbuild.ToString());
+			Cursor.Current=Cursors.Default;
+			string error="";
+			int errorCode=0;
+			if(Recalls.IsRecallSchedulerResponseValid(result,out error,out errorCode)) {
+				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
+				SendRecallSchedulerNotifications();
+				return;
+			}
+			#region Error Handling
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
+			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
+				//We want to launch our recall scheduler page if the user is not signed up:
+				try {
+					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+				}
+				catch(Exception) {
+					//Do nothing.
+				}
+				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
+				//labelRecallSchedEnable.Text=error;
+				return;
+			}
+			else if(errorCode==120) {
+				//labelRecallSchedEnable.Text=error;
+				return;
+			}
+			//For every other error message returned, we'll simply show it to the user in a pop up.
+			MessageBox.Show(error);
+			#endregion
+		}
+
+		///<summary>Sends a payload to the web service to get obfuscated URLs for the selected patients.  Once the obfuscated URLs are returned it emails each patient their recall reminder.</summary>
+		private void SendRecallSchedulerNotifications() {
+			//TODO: web call to get URLs
 		}
 
 		private void checkGroupFamilies_Click(object sender,EventArgs e) {
