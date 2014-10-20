@@ -1446,6 +1446,7 @@ namespace OpenDental{
 			// 
 			this.menuItemDispensary.Index = 9;
 			this.menuItemDispensary.Text = "Dispensary";
+			this.menuItemDispensary.Visible = false;
 			this.menuItemDispensary.Click += new System.EventHandler(this.menuItemDispensary_Click);
 			// 
 			// menuItemEvaluations

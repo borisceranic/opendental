@@ -33,10 +33,6 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.textProvNum = new System.Windows.Forms.TextBox();
 			this.labelUniqueID = new System.Windows.Forms.Label();
-			this.gridStudents = new OpenDental.UI.ODGrid();
-			this.gridSupply = new OpenDental.UI.ODGrid();
-			this.gridDispSupply = new OpenDental.UI.ODGrid();
-			this.gridEquip = new OpenDental.UI.ODGrid();
 			this.groupSupply = new System.Windows.Forms.GroupBox();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -53,6 +49,10 @@ namespace OpenDental{
 			this.labelSupplyDescript = new System.Windows.Forms.Label();
 			this.textSupplyNum = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
+			this.gridEquip = new OpenDental.UI.ODGrid();
+			this.gridDispSupply = new OpenDental.UI.ODGrid();
+			this.gridSupply = new OpenDental.UI.ODGrid();
+			this.gridStudents = new OpenDental.UI.ODGrid();
 			this.butScan = new OpenDental.UI.Button();
 			this.butCheckOut = new OpenDental.UI.Button();
 			this.butCheckIn = new OpenDental.UI.Button();
@@ -146,55 +146,6 @@ namespace OpenDental{
 			this.labelUniqueID.TabIndex = 27;
 			this.labelUniqueID.Text = "ProvNum";
 			this.labelUniqueID.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// gridStudents
-			// 
-			this.gridStudents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridStudents.HScrollVisible = false;
-			this.gridStudents.Location = new System.Drawing.Point(0, 114);
-			this.gridStudents.Name = "gridStudents";
-			this.gridStudents.ScrollValue = 0;
-			this.gridStudents.Size = new System.Drawing.Size(378, 310);
-			this.gridStudents.TabIndex = 15;
-			this.gridStudents.Title = "Students";
-			this.gridStudents.TranslationName = null;
-			this.gridStudents.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridStudents_CellClick);
-			// 
-			// gridSupply
-			// 
-			this.gridSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridSupply.HScrollVisible = false;
-			this.gridSupply.Location = new System.Drawing.Point(590, 114);
-			this.gridSupply.Name = "gridSupply";
-			this.gridSupply.ScrollValue = 0;
-			this.gridSupply.Size = new System.Drawing.Size(372, 310);
-			this.gridSupply.TabIndex = 16;
-			this.gridSupply.Title = "Supply";
-			this.gridSupply.TranslationName = null;
-			// 
-			// gridDispSupply
-			// 
-			this.gridDispSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridDispSupply.HScrollVisible = false;
-			this.gridDispSupply.Location = new System.Drawing.Point(0, 426);
-			this.gridDispSupply.Name = "gridDispSupply";
-			this.gridDispSupply.ScrollValue = 0;
-			this.gridDispSupply.Size = new System.Drawing.Size(378, 180);
-			this.gridDispSupply.TabIndex = 17;
-			this.gridDispSupply.Title = "Dispensed Supply";
-			this.gridDispSupply.TranslationName = null;
-			// 
-			// gridEquip
-			// 
-			this.gridEquip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridEquip.HScrollVisible = false;
-			this.gridEquip.Location = new System.Drawing.Point(590, 426);
-			this.gridEquip.Name = "gridEquip";
-			this.gridEquip.ScrollValue = 0;
-			this.gridEquip.Size = new System.Drawing.Size(372, 180);
-			this.gridEquip.TabIndex = 18;
-			this.gridEquip.Title = "Equipment";
-			this.gridEquip.TranslationName = null;
 			// 
 			// groupSupply
 			// 
@@ -351,6 +302,55 @@ namespace OpenDental{
 			this.label7.TabIndex = 27;
 			this.label7.Text = "SupplyNum";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// gridEquip
+			// 
+			this.gridEquip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridEquip.HScrollVisible = false;
+			this.gridEquip.Location = new System.Drawing.Point(590, 426);
+			this.gridEquip.Name = "gridEquip";
+			this.gridEquip.ScrollValue = 0;
+			this.gridEquip.Size = new System.Drawing.Size(372, 180);
+			this.gridEquip.TabIndex = 18;
+			this.gridEquip.Title = "Equipment";
+			this.gridEquip.TranslationName = null;
+			// 
+			// gridDispSupply
+			// 
+			this.gridDispSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridDispSupply.HScrollVisible = false;
+			this.gridDispSupply.Location = new System.Drawing.Point(0, 426);
+			this.gridDispSupply.Name = "gridDispSupply";
+			this.gridDispSupply.ScrollValue = 0;
+			this.gridDispSupply.Size = new System.Drawing.Size(378, 180);
+			this.gridDispSupply.TabIndex = 17;
+			this.gridDispSupply.Title = "Dispensed Supply";
+			this.gridDispSupply.TranslationName = null;
+			// 
+			// gridSupply
+			// 
+			this.gridSupply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridSupply.HScrollVisible = false;
+			this.gridSupply.Location = new System.Drawing.Point(590, 114);
+			this.gridSupply.Name = "gridSupply";
+			this.gridSupply.ScrollValue = 0;
+			this.gridSupply.Size = new System.Drawing.Size(372, 310);
+			this.gridSupply.TabIndex = 16;
+			this.gridSupply.Title = "Supply";
+			this.gridSupply.TranslationName = null;
+			// 
+			// gridStudents
+			// 
+			this.gridStudents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridStudents.HScrollVisible = false;
+			this.gridStudents.Location = new System.Drawing.Point(0, 114);
+			this.gridStudents.Name = "gridStudents";
+			this.gridStudents.ScrollValue = 0;
+			this.gridStudents.Size = new System.Drawing.Size(378, 310);
+			this.gridStudents.TabIndex = 15;
+			this.gridStudents.Title = "Students";
+			this.gridStudents.TranslationName = null;
+			this.gridStudents.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridStudents_CellClick);
 			// 
 			// butScan
 			// 
