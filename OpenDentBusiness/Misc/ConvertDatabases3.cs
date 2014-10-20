@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.12.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.14.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -6088,15 +6088,29 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To14_4_0();
+			To14_3_14();
 		}
 
-
+		private static void To14_3_14() {
+			if(FromVersion<new Version("14.3.14.0")) {
+				string command;
+				command="UPDATE carrier SET "+
+					"CDAnetVersion='04',"+
+					"CanadianSupportedTypes=2040 "+//Claims, Reversals, Predeterminations.
+					"WHERE IsCDA<>0 AND ElectID='610047'";
+				Db.NonQ32(command);
+				command="UPDATE preference SET ValueString = '14.3.14.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			//To14_4_0();
+		}
 		
 
 
 
-			}
+
+
+	}
 }
 
 
