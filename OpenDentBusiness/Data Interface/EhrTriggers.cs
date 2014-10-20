@@ -88,15 +88,24 @@ namespace OpenDentBusiness{
 					+" WHERE ProblemDefNumList LIKE '% "+POut.String(diseaseDef.DiseaseDefNum.ToString())+" %'";// '% <code> %' so that we can get exact matches.
 					if(diseaseDef.ICD9Code!="") {
 						command+=" OR ProblemIcd9List LIKE '% "+POut.String(diseaseDef.ICD9Code)+" %'";
-						triggerObjectMessage+="  -"+diseaseDef.ICD9Code+"(Icd9)  "+ICD9s.GetByCode(diseaseDef.ICD9Code).Description+"\r\n";
+						ICD9 icd10Cur=ICD9s.GetByCode(diseaseDef.ICD9Code);
+						if(icd10Cur!=null){
+							triggerObjectMessage+="  -"+diseaseDef.ICD9Code+"(Icd9)  "+icd10Cur.Description+"\r\n";
+						}
 					}
 					if(diseaseDef.Icd10Code!="") {
 						command+=" OR ProblemIcd10List LIKE '% "+POut.String(diseaseDef.Icd10Code)+" %'";
-						triggerObjectMessage+="  -"+diseaseDef.Icd10Code+"(Icd10)  "+Icd10s.GetByCode(diseaseDef.Icd10Code).Description+"\r\n";
+						Icd10 icd10Cur=Icd10s.GetByCode(diseaseDef.Icd10Code);
+						if(icd10Cur!=null) {
+							triggerObjectMessage+="  -"+diseaseDef.Icd10Code+"(Icd10)  "+icd10Cur.Description+"\r\n";
+						}
 					}
 					if(diseaseDef.SnomedCode!="") {
 						command+=" OR ProblemSnomedList LIKE '% "+POut.String(diseaseDef.SnomedCode)+" %'";
-						triggerObjectMessage+="  -"+diseaseDef.SnomedCode+"(Snomed)  "+Snomeds.GetByCode(diseaseDef.SnomedCode).Description+"\r\n";
+						Snomed snomedCur=Snomeds.GetByCode(diseaseDef.SnomedCode);
+						if(snomedCur!=null) {
+							triggerObjectMessage+="  -"+diseaseDef.SnomedCode+"(Snomed)  "+snomedCur.Description+"\r\n";
+						}
 					}
 					break;
 				case "ICD9":
@@ -119,7 +128,10 @@ namespace OpenDentBusiness{
 					break;
 				case "Medication":
 					medication=(Medication)triggerObject;
-					triggerObjectMessage="  - "+medication.MedName+(medication.RxCui==0?"":" (RxCui:"+RxNorms.GetByRxCUI(medication.RxCui.ToString()).RxCui+")")+"\r\n";
+					RxNorm rxNormCur=RxNorms.GetByRxCUI(medication.RxCui.ToString());
+					if(rxNormCur!=null) {
+						triggerObjectMessage="  - "+medication.MedName+(medication.RxCui==0?"":" (RxCui:"+rxNormCur.RxCui+")")+"\r\n";
+					}
 					command="SELECT * FROM ehrtrigger"
 					+" WHERE MedicationNumList LIKE '% "+POut.String(medication.MedicationNum.ToString())+" %'";// '% <code> %' so that we can get exact matches.
 					if(medication.RxCui!=0) {
@@ -383,8 +395,11 @@ namespace OpenDentBusiness{
 						//Allergy
 						for(int a=0;a<ListAllergy.Count;a++) {
 							if(listEhrTriggers[i].AllergyDefNumList.Contains(" "+ListAllergy[a].AllergyDefNum+" ")) {
-								ListObjectMatches.Add(AllergyDefs.GetOne(ListAllergy[a].AllergyDefNum));
-								triggerMessage+="  -(Allergy) "+AllergyDefs.GetOne(ListAllergy[a].AllergyDefNum).Description+"\r\n";
+								AllergyDef allergyDefCur=AllergyDefs.GetOne(ListAllergy[a].AllergyDefNum);
+								if(allergyDefCur!=null) {
+									ListObjectMatches.Add(allergyDefCur);
+									triggerMessage+="  -(Allergy) "+allergyDefCur.Description+"\r\n";
+								}
 								continue;
 							}
 						}
@@ -393,20 +408,29 @@ namespace OpenDentBusiness{
 							if(ListDiseaseDef[d].ICD9Code!=""
 								&& listEhrTriggers[i].ProblemIcd9List.Contains(" "+ListDiseaseDef[d].ICD9Code+" ")) 
 							{
-								ListObjectMatches.Add(ListDiseaseDef[d]);
-								triggerMessage+="  -(ICD9) "+ICD9s.GetByCode(ListDiseaseDef[d].ICD9Code).Description+"\r\n";
+								ICD9 currentICD9=ICD9s.GetByCode(ListDiseaseDef[d].ICD9Code);
+								if(currentICD9!=null) {
+									ListObjectMatches.Add(ListDiseaseDef[d]);
+									triggerMessage+="  -(ICD9) "+currentICD9.Description+"\r\n";
+								}
 								continue;
 							}
 							if(ListDiseaseDef[d].Icd10Code!=""
 								&& listEhrTriggers[i].ProblemIcd10List.Contains(" "+ListDiseaseDef[d].Icd10Code+" ")) {
-								ListObjectMatches.Add(ListDiseaseDef[d]);
-								triggerMessage+="  -(Icd10) "+Icd10s.GetByCode(ListDiseaseDef[d].Icd10Code).Description+"\r\n";
+								Icd10 icd10Cur=Icd10s.GetByCode(ListDiseaseDef[d].Icd10Code);
+								if(icd10Cur!=null) {
+									ListObjectMatches.Add(ListDiseaseDef[d]);
+									triggerMessage+="  -(Icd10) "+icd10Cur.Description+"\r\n";
+								}
 								continue;
 							}
 							if(ListDiseaseDef[d].SnomedCode!=""
 								&& listEhrTriggers[i].ProblemSnomedList.Contains(" "+ListDiseaseDef[d].SnomedCode+" ")) {
-								ListObjectMatches.Add(ListDiseaseDef[d]);
-								triggerMessage+="  -(Snomed) "+Snomeds.GetByCode(ListDiseaseDef[d].SnomedCode).Description+"\r\n";
+								Snomed snomedCur=Snomeds.GetByCode(ListDiseaseDef[d].SnomedCode);
+								if(snomedCur!=null) {
+									ListObjectMatches.Add(ListDiseaseDef[d]);
+									triggerMessage+="  -(Snomed) "+snomedCur.Description+"\r\n";
+								}
 								continue;
 							}
 							if(listEhrTriggers[i].ProblemDefNumList.Contains(" "+ListDiseaseDef[d].DiseaseDefNum+" ")) {
@@ -428,11 +452,13 @@ namespace OpenDentBusiness{
 									|| listEhrTriggers[i].LabLoincList.Contains(" "+ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierIDAlt+" ")) 
 								{
 									ListObjectMatches.Add(ListEhrLab[l].ListEhrLabResults[r]);
-									if (ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierID!=""){//should almost always be the case.
-										triggerMessage+="  -(LOINC) "+Loincs.GetByCode(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierID).NameShort+"\r\n";
+									if(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierID!="") {//should almost always be the case.
+										Loinc loincCur=Loincs.GetByCode(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierID);
+										triggerMessage+="  -(LOINC) "+loincCur.NameShort+"\r\n";
 									}
-									else if (ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierID!="") {
-										triggerMessage+="  -(LOINC) "+Loincs.GetByCode(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierIDAlt).NameShort+"\r\n";
+									else if(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierIDAlt!="") {
+										Loinc loincCur=Loincs.GetByCode(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierIDAlt);
+										triggerMessage+="  -(LOINC) "+loincCur.NameShort+"\r\n";
 									}
 									else if(ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierText!="") {
 										triggerMessage+="  -(LOINC) "+ListEhrLab[l].ListEhrLabResults[r].ObservationIdentifierText+"\r\n";

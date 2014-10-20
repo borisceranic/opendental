@@ -316,7 +316,13 @@ namespace OpenDental{
 					SelectedDiseaseDefNums.Add(DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum);
 				}
 				else {
-					SelectedDiseaseDefNum=DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum;
+					if(Snomeds.GetByCode(DiseaseDefs.List[gridMain.GetSelectedIndex()].SnomedCode)!=null) {
+						SelectedDiseaseDefNum=DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum;
+					}
+					else {
+						MsgBox.Show(this,"You have selected a problem with an unofficial SNOMED CT code.  Please correct the problem definition by going to Lists | Problems and choosing an official code from the SNOMED CT list.");
+						return;
+					}
 				}
 				DialogResult=DialogResult.OK;
 				return;
@@ -404,7 +410,13 @@ namespace OpenDental{
 				}
 			}
 			else if(IsSelectionMode) {
-				SelectedDiseaseDefNum=DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum;
+				if(Snomeds.GetByCode(DiseaseDefs.List[gridMain.GetSelectedIndex()].SnomedCode)!=null) {
+					SelectedDiseaseDefNum=DiseaseDefs.List[gridMain.GetSelectedIndex()].DiseaseDefNum;
+				}
+				else {
+					MsgBox.Show(this,"You have selected a problem containing an invalid SNOMED CT.");
+					return;
+				}
 			}
 			else {
 				SelectedDiseaseDefNum=_listDiseaseDefs[gridMain.GetSelectedIndex()].DiseaseDefNum;
