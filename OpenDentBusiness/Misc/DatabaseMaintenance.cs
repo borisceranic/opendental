@@ -833,7 +833,7 @@ namespace OpenDentBusiness {
 				//mdm
 				"601052",1,"02",claimTypes|reversalTypes|predeterminationTypes|eligibilityTypes,canadianNetworkNumTelusB,
 				//medavie blue cross
-				"610047",1,"02",claimTypes|predeterminationTypes,canadianNetworkNumTelusB,
+				"610047",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//nexgenrx
 				"610634",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//nihb
