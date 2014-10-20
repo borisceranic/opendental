@@ -555,7 +555,7 @@ namespace OpenDentBusiness{
 						}
 						if(isEmailFromInbox) {
 							string strRawEmail=openPopMsg.MessagePart.BodyEncoding.GetString(openPopMsg.RawMessage);
-							EmailMessage emailMessage=ProcessRawEmailMessage(strRawEmail,0,emailAddressInbox);//Inserts to db.
+							EmailMessage emailMessage=ProcessRawEmailMessage(strRawEmail,0,emailAddressInbox,true);//Inserts to db.
 							retVal.Add(emailMessage);
 							msgDownloadedCount++;
 						}
@@ -752,8 +752,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Converts any raw email message (encrypted or not) into an EmailMessage object, and saves any email attachments to the emailattach table in the db.
 		///The emailMessageNum will be used to set EmailMessage.EmailMessageNum.  If emailMessageNum is 0, then the EmailMessage will be inserted into the db, otherwise the EmailMessage will be updated in the db.
-		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.  If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.</summary>
-		public static EmailMessage ProcessRawEmailMessage(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver) {
+		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.  
+		///If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.
+		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
+		public static EmailMessage ProcessRawEmailMessage(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=null;
 			try {
@@ -851,7 +853,7 @@ namespace OpenDentBusiness{
 				ehrSummaryCcd.EmailAttachNum=emailMessage.Attachments[(int)ehrSummaryCcd.EmailAttachNum].EmailAttachNum;
 				EhrSummaryCcds.Insert(ehrSummaryCcd);
 			}
-			if(isEncrypted) {
+			if(isEncrypted && isAck) {
 				//Send a Message Disposition Notification (MDN) message to the sender, as required by the Direct messaging specifications.
 				//The MDN will be attached to the same patient as the incoming message.
 				SendAckDirect(inMsg,emailAddressReceiver,emailMessage.PatNum);

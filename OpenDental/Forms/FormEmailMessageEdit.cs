@@ -57,6 +57,7 @@ namespace OpenDental{
 		private WebBrowser webBrowser;
 		private UI.Button butDirectMessage;
 		private UI.Button butRawMessage;
+		private UI.Button butRefresh;
 		///<summary>Used when attaching to get AtoZ folder, and when sending to get Clinic.</summary>
 		private Patient _patCur;
 
@@ -126,6 +127,7 @@ namespace OpenDental{
 			this.butSend = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butRawMessage = new OpenDental.UI.Button();
+			this.butRefresh = new OpenDental.UI.Button();
 			this.panelTemplates.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -528,10 +530,26 @@ namespace OpenDental{
 			this.butRawMessage.Visible = false;
 			this.butRawMessage.Click += new System.EventHandler(this.butRawMessage_Click);
 			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(356, 635);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 25);
+			this.butRefresh.TabIndex = 38;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.UseVisualStyleBackColor = true;
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
 			// FormEmailMessageEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(941, 672);
+			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.butRawMessage);
 			this.Controls.Add(this.butDirectMessage);
 			this.Controls.Add(this.webBrowser);
@@ -611,9 +629,11 @@ namespace OpenDental{
 			}			
 			labelDecrypt.Visible=false;
 			butDecrypt.Visible=false;
+			butRefresh.Visible=true;
 			if(MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted) {
 				labelDecrypt.Visible=true;
 				butDecrypt.Visible=true;
+				butRefresh.Visible=false;
 			}
 			//For all email received types, we disable most of the controls and put the form into a mostly read-only state.
 			//There is no reason a user should ever edit a received message. The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
@@ -935,7 +955,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=GetEmailAddress();
 			try {
-				MessageCur=EmailMessages.ProcessRawEmailMessage(MessageCur.BodyText,MessageCur.EmailMessageNum,emailAddress);//If decryption is successful, sets status to ReceivedDirect.
+				MessageCur=EmailMessages.ProcessRawEmailMessage(MessageCur.BodyText,MessageCur.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
 				//The Direct message was decrypted.
 				EmailMessages.UpdateSentOrReceivedRead(MessageCur);//Mark read, because we are already viewing the message within the current window.					
 				RefreshAll();
@@ -976,6 +996,33 @@ namespace OpenDental{
 				return EmailAddresses.GetByClinic(0);//gets the practice default address
 			}
 			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+		}
+
+		private void butRefresh_Click(object sender,EventArgs e) {
+			List<EmailAttach> listEmailAttachOld=MessageCur.Attachments;
+			Cursor=Cursors.WaitCursor;
+			EmailAddress emailAddress=GetEmailAddress();
+			try {
+				MessageCur=EmailMessages.ProcessRawEmailMessage(MessageCur.RawEmailIn,MessageCur.EmailMessageNum,emailAddress,false);
+				EmailMessages.UpdateSentOrReceivedRead(MessageCur);//Mark read, because we are already viewing the message within the current window.
+				RefreshAll();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g(this,"Refreshing failed.")+"\r\n"+ex.Message);
+				Cursor=Cursors.Default;
+				return;
+			}
+			Cursor=Cursors.Default;
+			string attachPath=EmailMessages.GetEmailAttachPath();
+			for(int i=0;i<listEmailAttachOld.Count;i++) {//For each old attachment, attempt to delete.  The new attachments were created with different names in ProcessRawEmailMessage().
+				string filePath=ODFileUtils.CombinePaths(attachPath,listEmailAttachOld[i].ActualFileName);
+				try {
+					File.Delete(filePath);//Deleting old file. If it fails there was no file, or permission problems.
+				}
+				catch {
+					//The file will take a little bit of extra hard drive space, but the file is not referened and cannot hurt anything.
+				}
+			}
 		}
 
 		private void butDirectMessage_Click(object sender,EventArgs e) {
