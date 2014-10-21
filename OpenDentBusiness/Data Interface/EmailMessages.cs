@@ -254,7 +254,16 @@ namespace OpenDentBusiness{
 			//The memory stream for the alternate view must be mime (not an entire email), based on AlternateView use example http://msdn.microsoft.com/en-us/library/system.net.mail.mailmessage.alternateviews.aspx
 			AlternateView alternateView=new AlternateView(ms,outMsgEncrypted.Message.ContentType);//Causes the receiver to recognize this email as an encrypted email.
 			alternateView.TransferEncoding=TransferEncoding.SevenBit;
-			SendEmailUnsecure(emailMessageEncrypted,emailAddressFrom,nameValueCollectionHeaders,alternateView);//Not really unsecure in this spot, because the message is already encrypted.
+			if(emailAddressFrom.ServerPort==465) {//Implicit SSL
+				//See comments inside SendEmailUnsecure() regarding why this does not work.
+				if(strErrors!="") {
+					strErrors+="\r\n";
+				}
+				strErrors+=Lans.g("EmailMessages","Direct messages cannot be sent over implicit SSL.");
+			}
+			else {
+				SendEmailUnsecure(emailMessageEncrypted,emailAddressFrom,nameValueCollectionHeaders,alternateView);//Not really unsecure in this spot, because the message is already encrypted.
+			}
 			ms.Dispose();
 			return strErrors;
 		}
