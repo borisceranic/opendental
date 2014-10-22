@@ -1173,7 +1173,7 @@ namespace OpenDental{
 				recallNums.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["RecallNum"].ToString()));
 			}
 			//Send off a web request to WebServiceCustomersUpdates to get the obfuscated URLs for the selected patients.
-			#region Web Service Settings
+			#region Send Web Service Request For URLs
 #if DEBUG
 			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
 #else
@@ -1205,48 +1205,47 @@ namespace OpenDental{
 			Dictionary<long,string> dictRecallSchedulerURLs=new Dictionary<long,string>();
 			#region Parse Response
 			XmlDocument doc=new XmlDocument();
-			XmlNode node=null;
+			XmlNode nodeError=null;
+			XmlNode nodeResponse=null;
+			XmlNodeList nodeURLs=null;
 			try {
 				doc.LoadXml(response);
-				node=doc.SelectSingleNode("//ValidRecallSchedulerURLResponse");
+				nodeError=doc.SelectSingleNode("//Error");
+				nodeResponse=doc.SelectSingleNode("//GetRecallSchedulerURLsResponse");
 			}
 			catch {
 				//Invalid web service response passed in.  Node will be null and will return false correctly.
 			}
 			#region Error Handling
-			if(node==null) {
-				string error=Lans.g(this,"Invalid web service response.  Please try again or give us a call.");
+			if(nodeError!=null || nodeResponse==null) {
+				string error=Lans.g(this,"There was an error with the web request.  Please try again or give us a call.");
 				//Either something went wrong or someone tried to get cute and use our recall scheduler service when they weren't supposed to.
-				node=doc.SelectSingleNode("//Error");
-				if(node!=null) {
-					error=node.InnerText;
+				if(nodeError!=null) {
+					error+="\r\n"+Lan.g(this,"Error Details")+":\r\n" +nodeError.InnerText;
 				}
 				Cursor.Current=Cursors.Default;
 				MessageBox.Show(error);
 				return;
 			}
 			#endregion
-			//At this point we can assume we got a valid response from the web service so we need to parse out the response to fill dictRecallSchedulerURLs.
-			XmlNode nodeRecallNums=doc.SelectSingleNode("//RecallNums");
-			XmlNode nodeURLs=doc.SelectSingleNode("//URLs");
-			if(nodeRecallNums==null || nodeURLs==null) {
-				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");//Just in case
-				return;
-			}
-			string[] resultRecallNumsStr=nodeRecallNums.InnerText.Split('|');
-			string[] resultURLsStr=nodeURLs.InnerText.Split('|');
-			if(resultRecallNumsStr.Length!=resultURLsStr.Length
-				|| resultRecallNumsStr.Length!=recallNums.Count) 
-			{
-				//There should always be a 1 to 1 relationship with recall nums and URLs and between recall nums sent and received.
-				MsgBox.Show(this,"Invalid number of URLs returned.  Please try again or give us a call.");
-				return;
-			}
-			for(int i=0;i<resultRecallNumsStr.Length;i++) {
-				dictRecallSchedulerURLs.Add(PIn.Long(resultRecallNumsStr[i]),resultURLsStr[i]);
+			//At this point we know we got a valid response from our web service.
+			dictRecallSchedulerURLs.Clear();
+			nodeURLs=doc.GetElementsByTagName("URL");
+			if(nodeURLs!=null) {
+				//Loop through all the URL nodes that were returned.
+				//Each URL node will contain an RN attribute which will be the corresponding recall num.
+				for(int i=0;i<nodeURLs.Count;i++) {
+					long recallNum=0;
+					XmlAttribute attributeRecallNum=nodeURLs[i].Attributes["RN"];
+					if(attributeRecallNum!=null) {
+						recallNum=PIn.Long(attributeRecallNum.Value);
+					}
+					dictRecallSchedulerURLs.Add(recallNum,nodeURLs[i].InnerText);
+				}
 			}
 			#endregion
-			//Now that the web service response has been validated, parsed, and our dictionary filled.  We now can loop through the selected patients and send off the emails.
+			/*
+			//Now that the web service response has been validated, parsed, and our dictionary filled, we now can loop through the selected patients and send off the emails.
 			RecallListSort sortBy=(RecallListSort)comboSort.SelectedIndex;
 			addrTable=Recalls.GetAddrTable(recallNums,checkGroupFamilies.Checked,sortBy);
 			EmailMessage message;
@@ -1322,6 +1321,7 @@ namespace OpenDental{
 				}
 			}
 			FillMain(null);
+			 * */
 			Cursor=Cursors.Default;
 		}
 
