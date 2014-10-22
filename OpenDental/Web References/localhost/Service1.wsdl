@@ -176,6 +176,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="ValidateWebLander">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ValidateWebLanderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ValidateWebLanderResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestPatientPortalURL">
         <s:complexType>
           <s:sequence>
@@ -218,6 +232,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetRecallSchedulerURLs">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetRecallSchedulerURLsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetRecallSchedulerURLsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="ValidateResellerCredentials">
         <s:complexType>
           <s:sequence>
@@ -229,20 +257,6 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="ValidateResellerCredentialsResult" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="ValidateWebLander">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="ValidateWebLanderResponse">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="ValidateWebLanderResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -326,6 +340,12 @@
   <wsdl:message name="RequestFeeSchedSoapOut">
     <wsdl:part name="parameters" element="tns:RequestFeeSchedResponse" />
   </wsdl:message>
+  <wsdl:message name="ValidateWebLanderSoapIn">
+    <wsdl:part name="parameters" element="tns:ValidateWebLander" />
+  </wsdl:message>
+  <wsdl:message name="ValidateWebLanderSoapOut">
+    <wsdl:part name="parameters" element="tns:ValidateWebLanderResponse" />
+  </wsdl:message>
   <wsdl:message name="RequestPatientPortalURLSoapIn">
     <wsdl:part name="parameters" element="tns:RequestPatientPortalURL" />
   </wsdl:message>
@@ -344,17 +364,17 @@
   <wsdl:message name="ValidateRecallSchedulerSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateRecallSchedulerResponse" />
   </wsdl:message>
+  <wsdl:message name="GetRecallSchedulerURLsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetRecallSchedulerURLs" />
+  </wsdl:message>
+  <wsdl:message name="GetRecallSchedulerURLsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetRecallSchedulerURLsResponse" />
+  </wsdl:message>
   <wsdl:message name="ValidateResellerCredentialsSoapIn">
     <wsdl:part name="parameters" element="tns:ValidateResellerCredentials" />
   </wsdl:message>
   <wsdl:message name="ValidateResellerCredentialsSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateResellerCredentialsResponse" />
-  </wsdl:message>
-  <wsdl:message name="ValidateWebLanderSoapIn">
-    <wsdl:part name="parameters" element="tns:ValidateWebLander" />
-  </wsdl:message>
-  <wsdl:message name="ValidateWebLanderSoapOut">
-    <wsdl:part name="parameters" element="tns:ValidateWebLanderResponse" />
   </wsdl:message>
   <wsdl:portType name="Service1Soap">
     <wsdl:operation name="EstablishConnection">
@@ -409,6 +429,10 @@
       <wsdl:input message="tns:RequestFeeSchedSoapIn" />
       <wsdl:output message="tns:RequestFeeSchedSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <wsdl:input message="tns:ValidateWebLanderSoapIn" />
+      <wsdl:output message="tns:ValidateWebLanderSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <wsdl:input message="tns:RequestPatientPortalURLSoapIn" />
       <wsdl:output message="tns:RequestPatientPortalURLSoapOut" />
@@ -421,13 +445,13 @@
       <wsdl:input message="tns:ValidateRecallSchedulerSoapIn" />
       <wsdl:output message="tns:ValidateRecallSchedulerSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="GetRecallSchedulerURLs">
+      <wsdl:input message="tns:GetRecallSchedulerURLsSoapIn" />
+      <wsdl:output message="tns:GetRecallSchedulerURLsSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="ValidateResellerCredentials">
       <wsdl:input message="tns:ValidateResellerCredentialsSoapIn" />
       <wsdl:output message="tns:ValidateResellerCredentialsSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="ValidateWebLander">
-      <wsdl:input message="tns:ValidateWebLanderSoapIn" />
-      <wsdl:output message="tns:ValidateWebLanderSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="Service1Soap" type="tns:Service1Soap">
@@ -549,6 +573,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <soap:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <soap:operation soapAction="http://open-dent.com/RequestPatientPortalURL" style="document" />
       <wsdl:input>
@@ -576,8 +609,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateResellerCredentials">
-      <soap:operation soapAction="http://open-dent.com/ValidateResellerCredentials" style="document" />
+    <wsdl:operation name="GetRecallSchedulerURLs">
+      <soap:operation soapAction="http://open-dent.com/GetRecallSchedulerURLs" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -585,8 +618,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateWebLander">
-      <soap:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
+    <wsdl:operation name="ValidateResellerCredentials">
+      <soap:operation soapAction="http://open-dent.com/ValidateResellerCredentials" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -714,6 +747,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ValidateWebLander">
+      <soap12:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <soap12:operation soapAction="http://open-dent.com/RequestPatientPortalURL" style="document" />
       <wsdl:input>
@@ -741,8 +783,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateResellerCredentials">
-      <soap12:operation soapAction="http://open-dent.com/ValidateResellerCredentials" style="document" />
+    <wsdl:operation name="GetRecallSchedulerURLs">
+      <soap12:operation soapAction="http://open-dent.com/GetRecallSchedulerURLs" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -750,8 +792,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateWebLander">
-      <soap12:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
+    <wsdl:operation name="ValidateResellerCredentials">
+      <soap12:operation soapAction="http://open-dent.com/ValidateResellerCredentials" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

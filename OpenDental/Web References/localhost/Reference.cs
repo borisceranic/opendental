@@ -55,15 +55,17 @@ namespace OpenDental.localhost {
         
         private System.Threading.SendOrPostCallback RequestFeeSchedOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ValidateWebLanderOperationCompleted;
+        
         private System.Threading.SendOrPostCallback RequestPatientPortalURLOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidatePatientPortalOfficeOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidateRecallSchedulerOperationCompleted;
         
-        private System.Threading.SendOrPostCallback ValidateResellerCredentialsOperationCompleted;
+        private System.Threading.SendOrPostCallback GetRecallSchedulerURLsOperationCompleted;
         
-        private System.Threading.SendOrPostCallback ValidateWebLanderOperationCompleted;
+        private System.Threading.SendOrPostCallback ValidateResellerCredentialsOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -143,6 +145,9 @@ namespace OpenDental.localhost {
         public event RequestFeeSchedCompletedEventHandler RequestFeeSchedCompleted;
         
         /// <remarks/>
+        public event ValidateWebLanderCompletedEventHandler ValidateWebLanderCompleted;
+        
+        /// <remarks/>
         public event RequestPatientPortalURLCompletedEventHandler RequestPatientPortalURLCompleted;
         
         /// <remarks/>
@@ -152,10 +157,10 @@ namespace OpenDental.localhost {
         public event ValidateRecallSchedulerCompletedEventHandler ValidateRecallSchedulerCompleted;
         
         /// <remarks/>
-        public event ValidateResellerCredentialsCompletedEventHandler ValidateResellerCredentialsCompleted;
+        public event GetRecallSchedulerURLsCompletedEventHandler GetRecallSchedulerURLsCompleted;
         
         /// <remarks/>
-        public event ValidateWebLanderCompletedEventHandler ValidateWebLanderCompleted;
+        public event ValidateResellerCredentialsCompletedEventHandler ValidateResellerCredentialsCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/EstablishConnection", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -532,6 +537,35 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateWebLander", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ValidateWebLander(string officeData) {
+            object[] results = this.Invoke("ValidateWebLander", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ValidateWebLanderAsync(string officeData) {
+            this.ValidateWebLanderAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void ValidateWebLanderAsync(string officeData, object userState) {
+            if ((this.ValidateWebLanderOperationCompleted == null)) {
+                this.ValidateWebLanderOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateWebLanderOperationCompleted);
+            }
+            this.InvokeAsync("ValidateWebLander", new object[] {
+                        officeData}, this.ValidateWebLanderOperationCompleted, userState);
+        }
+        
+        private void OnValidateWebLanderOperationCompleted(object arg) {
+            if ((this.ValidateWebLanderCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ValidateWebLanderCompleted(this, new ValidateWebLanderCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestPatientPortalURL", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public string RequestPatientPortalURL(string officeData) {
             object[] results = this.Invoke("RequestPatientPortalURL", new object[] {
@@ -619,6 +653,35 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/GetRecallSchedulerURLs", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetRecallSchedulerURLs(string officeData) {
+            object[] results = this.Invoke("GetRecallSchedulerURLs", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetRecallSchedulerURLsAsync(string officeData) {
+            this.GetRecallSchedulerURLsAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void GetRecallSchedulerURLsAsync(string officeData, object userState) {
+            if ((this.GetRecallSchedulerURLsOperationCompleted == null)) {
+                this.GetRecallSchedulerURLsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetRecallSchedulerURLsOperationCompleted);
+            }
+            this.InvokeAsync("GetRecallSchedulerURLs", new object[] {
+                        officeData}, this.GetRecallSchedulerURLsOperationCompleted, userState);
+        }
+        
+        private void OnGetRecallSchedulerURLsOperationCompleted(object arg) {
+            if ((this.GetRecallSchedulerURLsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetRecallSchedulerURLsCompleted(this, new GetRecallSchedulerURLsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateResellerCredentials", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public string ValidateResellerCredentials(string officeData) {
             object[] results = this.Invoke("ValidateResellerCredentials", new object[] {
@@ -644,35 +707,6 @@ namespace OpenDental.localhost {
             if ((this.ValidateResellerCredentialsCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ValidateResellerCredentialsCompleted(this, new ValidateResellerCredentialsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateWebLander", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string ValidateWebLander(string officeData) {
-            object[] results = this.Invoke("ValidateWebLander", new object[] {
-                        officeData});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void ValidateWebLanderAsync(string officeData) {
-            this.ValidateWebLanderAsync(officeData, null);
-        }
-        
-        /// <remarks/>
-        public void ValidateWebLanderAsync(string officeData, object userState) {
-            if ((this.ValidateWebLanderOperationCompleted == null)) {
-                this.ValidateWebLanderOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateWebLanderOperationCompleted);
-            }
-            this.InvokeAsync("ValidateWebLander", new object[] {
-                        officeData}, this.ValidateWebLanderOperationCompleted, userState);
-        }
-        
-        private void OnValidateWebLanderOperationCompleted(object arg) {
-            if ((this.ValidateWebLanderCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.ValidateWebLanderCompleted(this, new ValidateWebLanderCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -1013,6 +1047,32 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void ValidateWebLanderCompletedEventHandler(object sender, ValidateWebLanderCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ValidateWebLanderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ValidateWebLanderCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     public delegate void RequestPatientPortalURLCompletedEventHandler(object sender, RequestPatientPortalURLCompletedEventArgs e);
     
     /// <remarks/>
@@ -1091,17 +1151,17 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void ValidateResellerCredentialsCompletedEventHandler(object sender, ValidateResellerCredentialsCompletedEventArgs e);
+    public delegate void GetRecallSchedulerURLsCompletedEventHandler(object sender, GetRecallSchedulerURLsCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ValidateResellerCredentialsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class GetRecallSchedulerURLsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal ValidateResellerCredentialsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal GetRecallSchedulerURLsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -1117,17 +1177,17 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void ValidateWebLanderCompletedEventHandler(object sender, ValidateWebLanderCompletedEventArgs e);
+    public delegate void ValidateResellerCredentialsCompletedEventHandler(object sender, ValidateResellerCredentialsCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ValidateWebLanderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class ValidateResellerCredentialsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal ValidateWebLanderCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal ValidateResellerCredentialsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

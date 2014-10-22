@@ -1050,7 +1050,6 @@ namespace OpenDental{
 		}
 
 		private void panelRecallScheduler_MouseClick(object sender,MouseEventArgs e) {
-			//TODO: check the new RecallSchedulerService preference and if disable, redirect the user to a URL that tells them about how amazing the feature is and how to enable it (by calling us).
 			if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
 				//Office has yet to enable the recall scheduler service.  Send them to our web site so that they can learn about how great it is.
 				try {
@@ -1059,11 +1058,10 @@ namespace OpenDental{
 				catch(Exception) {
 					MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/" //TODO: replace with URL to recall scheduler service.
 						+"\r\n"+Lan.g(this,"Please set up a default web browser."));
+					return;
 				}
 			}
-			//If the preference is turned on, it needs to send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
-			//If not valid, do the URL redirect like above.
-			//If the pref is on and the customer is active and paying us, then send an email to the patients that they have selected (following the current email pattern in that window)
+			//Send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
 			Cursor.Current=Cursors.WaitCursor;
 			#region Web Service Settings
 #if DEBUG
@@ -1094,6 +1092,7 @@ namespace OpenDental{
 			int errorCode=0;
 			if(Recalls.IsRecallSchedulerResponseValid(result,out error,out errorCode)) {
 				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
+				//Send recall notifications to the selected patients.
 				SendRecallSchedulerNotifications();
 				return;
 			}
@@ -1107,22 +1106,223 @@ namespace OpenDental{
 				catch(Exception) {
 					//Do nothing.
 				}
-				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
-				//labelRecallSchedEnable.Text=error;
-				return;
 			}
-			else if(errorCode==120) {
-				//labelRecallSchedEnable.Text=error;
-				return;
-			}
-			//For every other error message returned, we'll simply show it to the user in a pop up.
+			//For every error message returned, we'll simply show it to the user in a pop up.
 			MessageBox.Show(error);
 			#endregion
 		}
 
 		///<summary>Sends a payload to the web service to get obfuscated URLs for the selected patients.  Once the obfuscated URLs are returned it emails each patient their recall reminder.</summary>
 		private void SendRecallSchedulerNotifications() {
-			//TODO: web call to get URLs
+			#region Recall List Validation
+			if(gridMain.Rows.Count < 1){
+        MessageBox.Show(Lan.g(this,"There are no Patients in the Recall table.  Must have at least one."));    
+        return;
+			}
+			if(!EmailAddresses.ExistsValidEmail()) {
+				MsgBox.Show(this,"You need to enter an SMTP server name in e-mail setup before you can send e-mail.");
+				return;
+			}
+			if(PrefC.GetLong(PrefName.RecallStatusEmailed)==0){//TODO: Ask Nathan if we want to have a separate status; RecallStatusWebSched?
+				MsgBox.Show(this,"You need to set a status first in the Recall Setup window.");
+				return;
+			}
+			if(gridMain.SelectedIndices.Length==0) {
+				//TODO: Ask Nathan if we want to make sure the preferred contact method is email?
+				//TODO: Are we going to simply loop through the list and select all patients with an email address entered?
+				ContactMethod cmeth;
+				for(int i=0;i<table.Rows.Count;i++) {
+					cmeth=(ContactMethod)PIn.Long(table.Rows[i]["PreferRecallMethod"].ToString());
+					if(cmeth!=ContactMethod.Email) {
+						continue;
+					}
+					if(table.Rows[i]["Email"].ToString()=="") {
+						continue;
+					}
+					gridMain.SetSelected(i,true);
+				}
+				if(gridMain.SelectedIndices.Length==0) {
+					MsgBox.Show(this,"No patients of email type.");
+					return;
+				}
+			}
+			else {//deselect the ones that do not have email addresses specified
+				int skipped=0;
+				for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {
+					if(table.Rows[gridMain.SelectedIndices[i]]["Email"].ToString()=="") {
+						skipped++;
+						gridMain.SetSelected(gridMain.SelectedIndices[i],false);
+					}
+				}
+				if(gridMain.SelectedIndices.Length==0) {
+					MsgBox.Show(this,"None of the selected patients had email addresses entered.");
+					return;
+				}
+				if(skipped>0) {
+					MessageBox.Show(Lan.g(this,"Selected patients skipped due to missing email addresses: ")+skipped.ToString());
+				}
+			}
+			#endregion
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Send recall scheduler emails to all of the selected patients?")) {
+				return;
+			}
+			Cursor.Current=Cursors.WaitCursor;
+			//Loop through all selected patients and grab their corresponding RecallNum.
+			List<long> recallNums=new List<long>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				recallNums.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["RecallNum"].ToString()));
+			}
+			//Send off a web request to WebServiceCustomersUpdates to get the obfuscated URLs for the selected patients.
+			#region Web Service Settings
+#if DEBUG
+			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
+#else
+			OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
+			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
+				IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+				proxy.Credentials=cred;
+				updateService.Proxy=proxy;
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("RSData");
+					writer.WriteStartElement("RegistrationKey");
+					writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+					writer.WriteEndElement();
+					writer.WriteStartElement("RecallNums");
+					writer.WriteString(String.Join("|",recallNums));//A pipe delimited list of recall nums. E.g. 3|2|1|4
+					writer.WriteEndElement();
+				writer.WriteEndElement();
+			}
+			#endregion
+			string response=updateService.GetRecallSchedulerURLs(strbuild.ToString());
+			Dictionary<long,string> dictRecallSchedulerURLs=new Dictionary<long,string>();
+			#region Parse Response
+			XmlDocument doc=new XmlDocument();
+			XmlNode node=null;
+			try {
+				doc.LoadXml(response);
+				node=doc.SelectSingleNode("//ValidRecallSchedulerURLResponse");
+			}
+			catch {
+				//Invalid web service response passed in.  Node will be null and will return false correctly.
+			}
+			#region Error Handling
+			if(node==null) {
+				string error=Lans.g(this,"Invalid web service response.  Please try again or give us a call.");
+				//Either something went wrong or someone tried to get cute and use our recall scheduler service when they weren't supposed to.
+				node=doc.SelectSingleNode("//Error");
+				if(node!=null) {
+					error=node.InnerText;
+				}
+				Cursor.Current=Cursors.Default;
+				MessageBox.Show(error);
+				return;
+			}
+			#endregion
+			//At this point we can assume we got a valid response from the web service so we need to parse out the response to fill dictRecallSchedulerURLs.
+			XmlNode nodeRecallNums=doc.SelectSingleNode("//RecallNums");
+			XmlNode nodeURLs=doc.SelectSingleNode("//URLs");
+			if(nodeRecallNums==null || nodeURLs==null) {
+				MsgBox.Show(this,"Invalid web service response.  Please try again or give us a call.");//Just in case
+				return;
+			}
+			string[] resultRecallNumsStr=nodeRecallNums.InnerText.Split('|');
+			string[] resultURLsStr=nodeURLs.InnerText.Split('|');
+			if(resultRecallNumsStr.Length!=resultURLsStr.Length
+				|| resultRecallNumsStr.Length!=recallNums.Count) 
+			{
+				//There should always be a 1 to 1 relationship with recall nums and URLs and between recall nums sent and received.
+				MsgBox.Show(this,"Invalid number of URLs returned.  Please try again or give us a call.");
+				return;
+			}
+			for(int i=0;i<resultRecallNumsStr.Length;i++) {
+				dictRecallSchedulerURLs.Add(PIn.Long(resultRecallNumsStr[i]),resultURLsStr[i]);
+			}
+			#endregion
+			//Now that the web service response has been validated, parsed, and our dictionary filled.  We now can loop through the selected patients and send off the emails.
+			RecallListSort sortBy=(RecallListSort)comboSort.SelectedIndex;
+			addrTable=Recalls.GetAddrTable(recallNums,checkGroupFamilies.Checked,sortBy);
+			EmailMessage message;
+			string str="";
+			string[] recallNumArray;
+			string[] patNumArray;
+			EmailAddress emailAddress;
+			for(int i=0;i<addrTable.Rows.Count;i++) {
+				message=new EmailMessage();
+				message.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
+				message.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
+				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				message.FromAddress=emailAddress.SenderAddress;
+				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
+					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject);
+				}
+				else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
+					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject2);
+				}
+				else {
+					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject3);
+				}
+				//family
+				if(checkGroupFamilies.Checked	&& addrTable.Rows[i]["famList"].ToString()!="") {
+					if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
+						str=PrefC.GetString(PrefName.RecallEmailFamMsg);
+					}
+					else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
+						str=PrefC.GetString(PrefName.RecallEmailFamMsg2);
+					}
+					else {
+						str=PrefC.GetString(PrefName.RecallEmailFamMsg3);
+					}
+					str=str.Replace("[FamilyList]",addrTable.Rows[i]["famList"].ToString());
+				}
+				//single
+				else {
+					if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
+						str=PrefC.GetString(PrefName.RecallEmailMessage);
+					}
+					else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
+						str=PrefC.GetString(PrefName.RecallEmailMessage2);
+					}
+					else {
+						str=PrefC.GetString(PrefName.RecallEmailMessage3);
+					}
+					str=str.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
+					str=str.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
+					str=str.Replace("[NameFL]",addrTable.Rows[i]["patientNameFL"].ToString());
+				}
+				message.BodyText=str;
+				try {
+					EmailMessages.SendEmailUnsecure(message,emailAddress);
+				}
+				catch(Exception ex) {
+					Cursor=Cursors.Default;
+					str=ex.Message+"\r\n";
+					if(ex.GetType()==typeof(System.ArgumentException)) {
+						str+="Go to Setup, Recall.  The subject for an email may not be multiple lines.\r\n";
+					}
+					MessageBox.Show(str+"Patient:"+addrTable.Rows[i]["patientNameFL"].ToString());
+					break;
+				}
+				message.MsgDateTime=DateTime.Now;
+				message.SentOrReceived=EmailSentOrReceived.Sent;
+				EmailMessages.Insert(message);
+				recallNumArray=addrTable.Rows[i]["recallNums"].ToString().Split(',');
+				patNumArray=addrTable.Rows[i]["patNums"].ToString().Split(',');
+				for(int r=0;r<recallNumArray.Length;r++) {
+					Commlogs.InsertForRecall(PIn.Long(patNumArray[r]),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
+						PrefC.GetLong(PrefName.RecallStatusEmailed));
+					Recalls.UpdateStatus(PIn.Long(recallNumArray[r]),PrefC.GetLong(PrefName.RecallStatusEmailed));
+				}
+			}
+			FillMain(null);
+			Cursor=Cursors.Default;
 		}
 
 		private void checkGroupFamilies_Click(object sender,EventArgs e) {
