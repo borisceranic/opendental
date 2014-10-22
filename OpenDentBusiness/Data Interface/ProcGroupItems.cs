@@ -13,7 +13,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ProcGroupItem>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM procgroupitem WHERE GroupNum IN (SELECT ProcNum FROM procedurelog WHERE PatNum = "+POut.Long(patNum)+")";
+			string command="SELECT procgroupitem.* FROM procgroupitem "
+					+"INNER JOIN procedurelog ON procedurelog.ProcNum=procgroupitem.GroupNum AND procedurelog.PatNum="+POut.Long(patNum);
 			return Crud.ProcGroupItemCrud.SelectMany(command);
 		}
 
