@@ -2655,6 +2655,13 @@ namespace OpenDental{
 				itemNo++;*/
 				#endregion Canadian Lab Fees
 			}
+			ModuleSelected(PatCur.PatNum);
+			for(int i=0;i<PlanList.Length;i++){
+				if(PlanList[i].TreatPlanNum==tp.TreatPlanNum){
+					gridPlans.SetSelected(i+1,true);
+					FillMain();
+				}
+			}
 			//Send TP DFT HL7 message to ECW with embedded PDF when using tight or full integration only.
 			if(Programs.UsingEcwTightOrFullMode() && Bridges.ECW.AptNum!=0){
 				PrepImageForPrinting();
@@ -2686,13 +2693,6 @@ namespace OpenDental{
 				}
 				else {
 					Bridges.ECW.SendHL7(Bridges.ECW.AptNum,PatCur.PriProv,PatCur,pdfDataStr,"treatment",true);
-				}
-			}
-			ModuleSelected(PatCur.PatNum);
-			for(int i=0;i<PlanList.Length;i++){
-				if(PlanList[i].TreatPlanNum==tp.TreatPlanNum){
-					gridPlans.SetSelected(i+1,true);
-					FillMain();
 				}
 			}
 		}
