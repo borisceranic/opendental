@@ -626,15 +626,9 @@ namespace OpenDental{
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedIndices.Length==0) {
-				if(!MsgBox.Show(this,true,"Are you sure you want to delete the entire schedule for this day?")) {
-					return;
-				}
+			if(gridMain.SelectedIndices.Length==0){
 				SchedList.Clear();
 				FillGrid();
-				return;
-			}
-			if(!MsgBox.Show(this,true,"Are you sure you want to delete the selected entries?")) {
 				return;
 			}
 			//loop backwards:
