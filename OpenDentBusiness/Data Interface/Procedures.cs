@@ -232,13 +232,15 @@ namespace OpenDentBusiness {
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
-		///<summary>Gets all Procedures for a single date for the specified patient directly from the database</summary>
+		///<summary>Gets all Procedures for a single date for the specified patient directly from the database.  Excludes deleted procs.</summary>
 		public static List<Procedure> GetProcsForPatByDate(long patNum,DateTime date) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),patNum,date);
 			}
-			string command="SELECT * FROM procedurelog "+
-				"WHERE PatNum='"+POut.Long(patNum)+"' AND (ProcDate="+POut.Date(date)+" OR DateEntryC="+POut.Date(date)+")";
+			string command="SELECT * FROM procedurelog "
+				+"WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND (ProcDate="+POut.Date(date)+" OR DateEntryC="+POut.Date(date)+") "
+				+"AND ProcStatus!="+POut.Int((int)ProcStat.D);//exclude deleted procs
 			List<Procedure> result=Crud.ProcedureCrud.SelectMany(command);
 			for(int i=0;i<result.Count;i++){
 				command="SELECT * FROM procnote WHERE ProcNum="+POut.Long(result[i].ProcNum)+" ORDER BY EntryDateTime DESC";
