@@ -503,7 +503,20 @@ namespace OpenDentBusiness{
 				if(fname!=patFname) {
 					continue;
 				}
-				if(subId!=subscriberId) {
+				//subId is the ID currently on the insurance plan, and subscriberId is the ID from the ERA 835.
+				if(subId==subscriberId) {
+					//Exact subscriber ID match is preferred.
+				}
+				else if(subId.Length>=3 && (subscriberId==subId.Substring(0,subId.Length-1) || subscriberId==subId.Substring(0,subId.Length-2))) {
+					//Partial subscriber ID matches are somewhat common.
+					//Insurance companies sometimes create a base subscriber ID for all family members, then append a one or two digit number to make IDs unique for each family member.
+					//We have seen at least one real world example where the ERA contained the base subscriber ID instead of the patient specific ID.
+					//We also check that the subscriber ID in OD is at least 3 characters long, because we must allow for the 2 optional ending characters and we require an extra leading character to avoid matching blank IDs.
+				}
+				else if(subscriberId.Length>=3 && (subId==subscriberId.Substring(0,subscriberId.Length-1) || subId==subscriberId.Substring(0,subscriberId.Length-2))) {
+					//Partial match in the other direction.  Comparable to the scenario above.
+				}
+				else {
 					continue;
 				}
 				listIndiciesForPatient.Add(i);
