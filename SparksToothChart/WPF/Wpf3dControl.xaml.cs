@@ -45,15 +45,17 @@ namespace SparksToothChart {
 		///<summary>Objects are added in this step as all gray.  Colors are set in a separate step.</summary>
 		public void AddObjectGroup(D3ObjectGroup group) {
 			_model3Dgroup=new Model3DGroup();		
-			DirectionalLight light=new DirectionalLight(Colors.WhiteSmoke,new Vector3D(-3,-3,-3));
+			DirectionalLight light=new DirectionalLight(Colors.Gray,new Vector3D(-3,-3,-3));
 			_model3Dgroup.Children.Add(light);
-			DirectionalLight light2=new DirectionalLight(Colors.LightGray,new Vector3D(2.8,-3,-3));
+			DirectionalLight light2=new DirectionalLight(Colors.Gray,new Vector3D(2.8,-3,-3));
 			_model3Dgroup.Children.Add(light2);
-			//AmbientLight ambientLight=new AmbientLight(Colors.DarkGray);
-			//_model3Dgroup.Children.Add(ambientLight);
+			AmbientLight ambientLight=new AmbientLight(Colors.Black);//only affects solid objects, not textured objects
+			_model3Dgroup.Children.Add(ambientLight);
 			objectNames=new List<string>();
+			//to maintain 1:1
 			objectNames.Add("light1");
-			objectNames.Add("light2");//to maintain 1:1
+			objectNames.Add("light2");
+			objectNames.Add("light3");
 			for(int i=0;i<group.D3Objects.Count;i++) {
 				MeshGeometry3D meshGeometry3D=new MeshGeometry3D();
 				Point3DCollection points=group.D3Objects[i].GenerateVertices();
@@ -68,6 +70,7 @@ namespace SparksToothChart {
 				geometryModel3D.Geometry=meshGeometry3D;
 				//materials
 				MaterialGroup materialGroup=new MaterialGroup();
+				//wpf only allows one diffusematerial.  Can't blend texture and diffuse, so use emmissive.
 				DiffuseMaterial diffuseMaterial=new DiffuseMaterial();
 				if(group.D3Objects[i].TextureMap!=null) {
 					ImageBrush imageBrush=new ImageBrush(D3Helper.ConvertImage(group.D3Objects[i].TextureMap));
@@ -95,12 +98,17 @@ namespace SparksToothChart {
 					diffuseMaterial.Brush=new SolidColorBrush(Colors.Gray);
 					//diffuseMaterial.Color=Colors.Gray;//this didn't work.  Needs brush.
 				}
+				diffuseMaterial.AmbientColor=Colors.White;
 				materialGroup.Children.Add(diffuseMaterial);
 				//specular material at 1
 				SpecularMaterial specularMaterial=new SpecularMaterial();
 				specularMaterial.Brush=new SolidColorBrush(Colors.White);
 				specularMaterial.SpecularPower=150;//smaller numbers give more reflection.  150 is minimal specular.
 				materialGroup.Children.Add(specularMaterial);
+				//emissive material
+				EmissiveMaterial emissiveMaterial=new EmissiveMaterial();
+				emissiveMaterial.Brush=new SolidColorBrush(Colors.Black);
+				materialGroup.Children.Add(emissiveMaterial);
 				geometryModel3D.Material=materialGroup;
 				_model3Dgroup.Children.Add(geometryModel3D);
 				objectNames.Add(group.D3Objects[i].Name);
@@ -133,14 +141,27 @@ namespace SparksToothChart {
 			material.SpecularPower=specularPower;
 		}
 
-		///<summary>Of the diffuse material, whether solid or texture.</summary>
+		///<summary>Use this to blend a color into a texture.  There's no other way to have textured objects respond to light.</summary>
+		public void SetEmissive(string objName,System.Drawing.Color color) {
+			if(!objectNames.Contains(objName)) {
+				return;
+			}
+			Color colorw=Color.FromArgb(color.A,color.R,color.G,color.B);
+			MaterialGroup materialGroup=(MaterialGroup)((GeometryModel3D)_model3Dgroup.Children[objectNames.IndexOf(objName)]).Material;
+			EmissiveMaterial material=(EmissiveMaterial)materialGroup.Children[2];//by convention, our emissive material is at 2
+			material.Brush=new SolidColorBrush(colorw);
+		}
+
+		///<summary>Of the diffuse material, whether solid or texture.  Simultaneously sets opacity of emissive.</summary>
 		public void SetOpacity(string objName,double opacity) {
 			if(!objectNames.Contains(objName)) {
 				return;
 			}
 			MaterialGroup materialGroup=(MaterialGroup)((GeometryModel3D)_model3Dgroup.Children[objectNames.IndexOf(objName)]).Material;
-			DiffuseMaterial material=(DiffuseMaterial)materialGroup.Children[0];//by convention, our diffuse material is at 0
-			material.Brush.Opacity=opacity;
+			DiffuseMaterial diffuseMaterial=(DiffuseMaterial)materialGroup.Children[0];//by convention, our diffuse material is at 0
+			diffuseMaterial.Brush.Opacity=opacity;
+			EmissiveMaterial emissiveMaterial=(EmissiveMaterial)materialGroup.Children[2];//by convention, our emissive material is at 2
+			emissiveMaterial.Brush.Opacity=opacity;
 		}
 
 		///<summary>Rotate not included yet.  Completely overrides existing instead of any additive effect.</summary>
