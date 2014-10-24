@@ -2928,11 +2928,11 @@ namespace OpenDentBusiness
 					if(procCode.IsProsth) {
 						if(proc.Prosthesis=="") {//they didn't enter whether Initial or Replacement
 							Comma(strb);
-							strb.Append(procCode.AbbrDesc+" Prosthesis");
+							strb.Append("procedure "+procCode.ProcCode+" must indicate prosthesis Initial or Replacement");
 						}
 						if(proc.Prosthesis=="R"	&& proc.DateOriginalProsth.Year<1880) {//if a replacement, they didn't enter a date
 							Comma(strb);
-							strb.Append(procCode.AbbrDesc+" Prosth Date");
+							strb.Append("procedure "+procCode.ProcCode+" must indicate prosthesis Original Date");
 						}
 					}
 				}
