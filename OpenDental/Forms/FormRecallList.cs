@@ -19,6 +19,7 @@ using OpenDental.DivvyConnect;
 using System.Net;
 using System.Xml;
 using System.Text;
+using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -1086,7 +1087,13 @@ namespace OpenDental{
 				writer.WriteEndElement();
 			}
 			#endregion
-			string result=updateService.ValidateRecallScheduler(strbuild.ToString());
+			string result="";
+			try {
+				result=updateService.ValidateRecallScheduler(strbuild.ToString());
+			}
+			catch { 
+				//Do nothing.  Leaving result empty will display correct error messages later on.
+			}
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
@@ -1167,8 +1174,10 @@ namespace OpenDental{
 				return;
 			}
 			Cursor.Current=Cursors.WaitCursor;
-			//Loop through all selected patients and grab their corresponding RecallNum.
+			string response="";
+			Dictionary<long,string> dictRecallSchedulerURLs=new Dictionary<long,string>();
 			List<long> recallNums=new List<long>();
+			//Loop through all selected patients and grab their corresponding RecallNum.
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				recallNums.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["RecallNum"].ToString()));
 			}
@@ -1200,9 +1209,13 @@ namespace OpenDental{
 					writer.WriteEndElement();
 				writer.WriteEndElement();
 			}
+			try {
+				response=updateService.GetRecallSchedulerURLs(strbuild.ToString());
+			}
+			catch {
+				//Do nothing.  Leaving result empty will display correct error messages later on.
+			}
 			#endregion
-			string response=updateService.GetRecallSchedulerURLs(strbuild.ToString());
-			Dictionary<long,string> dictRecallSchedulerURLs=new Dictionary<long,string>();
 			#region Parse Response
 			XmlDocument doc=new XmlDocument();
 			XmlNode nodeError=null;
@@ -1244,84 +1257,78 @@ namespace OpenDental{
 				}
 			}
 			#endregion
-			/*
 			//Now that the web service response has been validated, parsed, and our dictionary filled, we now can loop through the selected patients and send off the emails.
 			RecallListSort sortBy=(RecallListSort)comboSort.SelectedIndex;
-			addrTable=Recalls.GetAddrTable(recallNums,checkGroupFamilies.Checked,sortBy);
-			EmailMessage message;
-			string str="";
-			string[] recallNumArray;
-			string[] patNumArray;
+			addrTable=Recalls.GetAddrTableForRecallScheduler(recallNums,checkGroupFamilies.Checked,sortBy);
+			EmailMessage emailMessage;
 			EmailAddress emailAddress;
 			for(int i=0;i<addrTable.Rows.Count;i++) {
-				message=new EmailMessage();
-				message.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
-				message.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
+				#region Send Email Notification
+				string emailBody="";
+				string emailSubject="";
+				emailMessage=new EmailMessage();
+				emailMessage.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
+				emailMessage.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
 				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
-				message.FromAddress=emailAddress.SenderAddress;
+				emailMessage.FromAddress=emailAddress.SenderAddress;
+				emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject);//TODO: ask Nathan if he wants the ability to have separate subjects per # of reminders.
+				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
+				emailMessage.Subject=emailSubject;
 				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
-					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject);
+					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage);
 				}
 				else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
-					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject2);
+					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage2);
 				}
 				else {
-					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject3);
+					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage3);
 				}
-				//family
-				if(checkGroupFamilies.Checked	&& addrTable.Rows[i]["famList"].ToString()!="") {
-					if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
-						str=PrefC.GetString(PrefName.RecallEmailFamMsg);
-					}
-					else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
-						str=PrefC.GetString(PrefName.RecallEmailFamMsg2);
-					}
-					else {
-						str=PrefC.GetString(PrefName.RecallEmailFamMsg3);
-					}
-					str=str.Replace("[FamilyList]",addrTable.Rows[i]["famList"].ToString());
-				}
-				//single
-				else {
-					if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
-						str=PrefC.GetString(PrefName.RecallEmailMessage);
-					}
-					else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
-						str=PrefC.GetString(PrefName.RecallEmailMessage2);
-					}
-					else {
-						str=PrefC.GetString(PrefName.RecallEmailMessage3);
-					}
-					str=str.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
-					str=str.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
-					str=str.Replace("[NameFL]",addrTable.Rows[i]["patientNameFL"].ToString());
-				}
-				message.BodyText=str;
+				emailBody=emailBody.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
+				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
+				string URL="";
 				try {
-					EmailMessages.SendEmailUnsecure(message,emailAddress);
+					dictRecallSchedulerURLs.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
 				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
-					str=ex.Message+"\r\n";
-					if(ex.GetType()==typeof(System.ArgumentException)) {
-						str+="Go to Setup, Recall.  The subject for an email may not be multiple lines.\r\n";
-					}
-					MessageBox.Show(str+"Patient:"+addrTable.Rows[i]["patientNameFL"].ToString());
+					string error=ex.Message+"\r\n";
+					MessageBox.Show(error+Lan.g(this,"Problem getting recall scheduler URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
 					break;
 				}
-				message.MsgDateTime=DateTime.Now;
-				message.SentOrReceived=EmailSentOrReceived.Sent;
-				EmailMessages.Insert(message);
-				recallNumArray=addrTable.Rows[i]["recallNums"].ToString().Split(',');
-				patNumArray=addrTable.Rows[i]["patNums"].ToString().Split(',');
-				for(int r=0;r<recallNumArray.Length;r++) {
-					Commlogs.InsertForRecall(PIn.Long(patNumArray[r]),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
-						PrefC.GetLong(PrefName.RecallStatusEmailed));
-					Recalls.UpdateStatus(PIn.Long(recallNumArray[r]),PrefC.GetLong(PrefName.RecallStatusEmailed));
+				emailBody=emailBody.Replace("[URL]",URL);
+				emailBody=emailBody.Replace("[OfficePhone]","!!TODO: OFFICE PHONE!!");
+				emailMessage.BodyText=emailBody;
+				try {
+					//TODO: uncomment once done testing.
+					//EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
+					//TODO remove section after testing complete.
+					string test="From: "+emailMessage.FromAddress+"\r\n"
+						+"To: "+emailMessage.ToAddress+"\r\n"
+						+"Subject: "+emailMessage.Subject+"\r\n"
+						+"Body: "+emailMessage.BodyText;
+					MsgBoxCopyPaste MsgBoxCP=new MsgBoxCopyPaste(test);
+					MsgBoxCP.Show();
 				}
+				catch(Exception ex) {
+					Cursor=Cursors.Default;
+					string error=ex.Message+"\r\n";
+					if(ex.GetType()==typeof(System.ArgumentException)) {
+						error+=Lan.g(this,"Go to Setup | Appointments | Recall.  The subject for WebSched notifications must not span multiple lines.")+"\r\n";
+					}
+					MessageBox.Show(error+Lan.g(this,"Patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
+					break;
+				}
+				emailMessage.MsgDateTime=DateTime.Now;
+				emailMessage.SentOrReceived=EmailSentOrReceived.Sent;
+				EmailMessages.Insert(emailMessage);
+				#endregion
+				#region Insert Commlog
+				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
+					PrefC.GetLong(PrefName.RecallStatusEmailed));
+				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));//TODO: ask Nathan if he wants a recall scheduler status?
+				#endregion
 			}
 			FillMain(null);
-			 * */
 			Cursor=Cursors.Default;
 		}
 

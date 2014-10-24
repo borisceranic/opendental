@@ -773,65 +773,8 @@ namespace OpenDentBusiness{
 
 		/// <summary></summary>
 		public static DataTable GetAddrTable(List<long> recallNums,bool groupByFamily,RecallListSort sortBy) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),recallNums,groupByFamily,sortBy);
-			}
-			//get maxDateDue for each family.
-			string command=@"DROP TABLE IF EXISTS temprecallmaxdate;
-				CREATE table temprecallmaxdate(
-					Guarantor bigint NOT NULL,
-					MaxDateDue date NOT NULL,
-					PRIMARY KEY (Guarantor)
-				);
-				INSERT INTO temprecallmaxdate 
-				SELECT patient.Guarantor,MAX(recall.DateDue) maxDateDue
-				FROM patient
-				LEFT JOIN recall ON patient.PatNum=recall.PatNum
-				AND (";
-			for(int i=0;i<recallNums.Count;i++){
-				if(i>0){
-					command+=" OR ";
-				}
-				command+="recall.RecallNum="+POut.Long(recallNums[i]);
-			}
-			command+=") GROUP BY patient.Guarantor";
-			Db.NonQ(command);
-			command=@"SELECT patient.Address,patguar.Address guarAddress,
-				patient.Address2,patguar.Address2 guarAddress2,
-				patient.City,patguar.City guarCity,patient.ClinicNum,patguar.ClinicNum guarClinicNum,
-				recall.DateDue,patient.Email,patguar.Email guarEmail,
-				patient.FName,patguar.FName guarFName,patient.Guarantor,
-				patient.LName,patguar.LName guarLName,temprecallmaxdate.MaxDateDue maxDateDue,
-				patient.MiddleI,
-				COUNT(commlog.CommlogNum) numberOfReminders,
-				patient.PatNum,patient.Preferred,recall.RecallNum,
-				patient.State,patguar.State guarState,patient.Zip,patguar.Zip guarZip
-				FROM recall 
-				LEFT JOIN patient ON patient.PatNum=recall.PatNum 
-				LEFT JOIN patient patguar ON patient.Guarantor=patguar.PatNum
-				LEFT JOIN commlog ON commlog.PatNum=recall.PatNum
-				AND CommType="+POut.Long(Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL))+" "
-				//+"AND SentOrReceived = "+POut.Long((int)CommSentOrReceived.Sent)+" "
-				+"AND CommDateTime > recall.DatePrevious "
-				+"LEFT JOIN temprecallmaxdate ON temprecallmaxdate.Guarantor=patient.Guarantor "
-				+"WHERE ";
-      for(int i=0;i<recallNums.Count;i++){
-        if(i>0){
-					command+=" OR ";
-				}
-        command+="recall.RecallNum="+POut.Long(recallNums[i]);
-      }
-			command+=@" GROUP BY patient.Address,patguar.Address,
-				patient.Address2,patguar.Address2,
-				patient.City,patguar.City,patient.ClinicNum,patguar.ClinicNum,
-				recall.DateDue,patient.Email,patguar.Email,
-				patient.FName,patguar.FName,patient.Guarantor,
-				patient.LName,patguar.LName,temprecallmaxdate.MaxDateDue,
-				patient.MiddleI,patient.PatNum,patient.Preferred,recall.RecallNum,
-				patient.State,patguar.State,patient.Zip,patguar.Zip";
-			DataTable rawTable=Db.GetTable(command);
-			command="DROP TABLE IF EXISTS temprecallmaxdate";
-			Db.NonQ(command);
+			//No need to check RemotingRole; no call to db.
+			DataTable rawTable=GetAddrTableRaw(recallNums);
 			List<DataRow> rawRows=new List<DataRow>();
 			for(int i=0;i<rawTable.Rows.Count;i++){
 				rawRows.Add(rawTable.Rows[i]);
@@ -988,6 +931,126 @@ namespace OpenDentBusiness{
 				table.Rows.Add(rows[i]);
 			}
 			return table;
+		}
+
+		///<summary></summary>
+		public static DataTable GetAddrTableForRecallScheduler(List<long> recallNums,bool groupByFamily,RecallListSort sortBy) {
+			//No need to check RemotingRole; no call to db.
+			DataTable rawTable=GetAddrTableRaw(recallNums);
+			List<DataRow> rawRows=new List<DataRow>();
+			for(int i=0;i<rawTable.Rows.Count;i++) {
+				rawRows.Add(rawTable.Rows[i]);
+			}
+			RecallComparer comparer=new RecallComparer();
+			comparer.GroupByFamilies=groupByFamily;
+			comparer.SortBy=sortBy;
+			rawRows.Sort(comparer);
+			DataTable table=new DataTable();
+			table.Columns.Add("clinicNum");//will be the guar clinicNum if grouped.
+			table.Columns.Add("dateDue");
+			table.Columns.Add("email");//will be guar if grouped by family
+			table.Columns.Add("emailPatNum");//will be guar if grouped by family
+			table.Columns.Add("numberOfReminders");//for a family, this will be the max for the family
+			table.Columns.Add("patientNameF");
+			table.Columns.Add("patientNameFL");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("RecallNum");
+			DataRow row;
+			List<DataRow> rows=new List<DataRow>();
+			Patient pat;
+			for(int i=0;i<rawRows.Count;i++) {
+				row=table.NewRow();
+				if(groupByFamily) {
+					//Use guarantors clinic and email for all notifications.
+					row["clinicNum"]=rawRows[i]["guarClinicNum"].ToString();
+					row["email"]=rawRows[i]["guarEmail"].ToString();
+					row["emailPatNum"]=rawRows[i]["Guarantor"].ToString();
+				}
+				else {
+					row["clinicNum"]=rawRows[i]["ClinicNum"].ToString();
+					row["email"]=rawRows[i]["Email"].ToString();
+					row["emailPatNum"]=rawRows[i]["PatNum"].ToString();
+				}
+				row["dateDue"]=PIn.Date(rawRows[i]["DateDue"].ToString()).ToShortDateString();
+				row["numberOfReminders"]=PIn.Long(rawRows[i]["numberOfReminders"].ToString()).ToString();
+				row["PatNum"]=rawRows[i]["PatNum"].ToString();
+				pat=new Patient();
+				pat.LName=rawRows[i]["LName"].ToString();
+				pat.FName=rawRows[i]["FName"].ToString();
+				pat.Preferred=rawRows[i]["Preferred"].ToString();
+				row["patientNameF"]=pat.GetNameFirstOrPreferred();
+				row["patientNameFL"]=pat.GetNameFLnoPref();
+				row["RecallNum"]=rawRows[i]["RecallNum"].ToString();
+				rows.Add(row);
+			}
+			for(int i=0;i<rows.Count;i++) {
+				table.Rows.Add(rows[i]);
+			}
+			return table;
+		}
+
+		///<summary>Gets a base table used for creating </summary>
+		private static DataTable GetAddrTableRaw(List<long> recallNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),recallNums);
+			}
+			//get maxDateDue for each family.
+			string command=@"DROP TABLE IF EXISTS temprecallmaxdate;
+				CREATE table temprecallmaxdate(
+					Guarantor bigint NOT NULL,
+					MaxDateDue date NOT NULL,
+					PRIMARY KEY (Guarantor)
+				);
+				INSERT INTO temprecallmaxdate 
+				SELECT patient.Guarantor,MAX(recall.DateDue) maxDateDue
+				FROM patient
+				LEFT JOIN recall ON patient.PatNum=recall.PatNum
+				AND (";
+			for(int i=0;i<recallNums.Count;i++) {
+				if(i>0) {
+					command+=" OR ";
+				}
+				command+="recall.RecallNum="+POut.Long(recallNums[i]);
+			}
+			command+=") GROUP BY patient.Guarantor";
+			Db.NonQ(command);
+			command=@"SELECT patient.Address,patguar.Address guarAddress,
+				patient.Address2,patguar.Address2 guarAddress2,
+				patient.City,patguar.City guarCity,patient.ClinicNum,patguar.ClinicNum guarClinicNum,
+				recall.DateDue,patient.Email,patguar.Email guarEmail,
+				patient.FName,patguar.FName guarFName,patient.Guarantor,
+				patient.LName,patguar.LName guarLName,temprecallmaxdate.MaxDateDue maxDateDue,
+				patient.MiddleI,
+				COUNT(commlog.CommlogNum) numberOfReminders,
+				patient.PatNum,patient.Preferred,recall.RecallNum,
+				patient.State,patguar.State guarState,patient.Zip,patguar.Zip guarZip
+				FROM recall 
+				LEFT JOIN patient ON patient.PatNum=recall.PatNum 
+				LEFT JOIN patient patguar ON patient.Guarantor=patguar.PatNum
+				LEFT JOIN commlog ON commlog.PatNum=recall.PatNum
+				AND CommType="+POut.Long(Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL))+" "
+				//+"AND SentOrReceived = "+POut.Long((int)CommSentOrReceived.Sent)+" "
+				+"AND CommDateTime > recall.DatePrevious "
+				+"LEFT JOIN temprecallmaxdate ON temprecallmaxdate.Guarantor=patient.Guarantor "
+				+"WHERE ";
+			for(int i=0;i<recallNums.Count;i++) {
+				if(i>0) {
+					command+=" OR ";
+				}
+				command+="recall.RecallNum="+POut.Long(recallNums[i]);
+			}
+			command+=@" GROUP BY patient.Address,patguar.Address,
+				patient.Address2,patguar.Address2,
+				patient.City,patguar.City,patient.ClinicNum,patguar.ClinicNum,
+				recall.DateDue,patient.Email,patguar.Email,
+				patient.FName,patguar.FName,patient.Guarantor,
+				patient.LName,patguar.LName,temprecallmaxdate.MaxDateDue,
+				patient.MiddleI,patient.PatNum,patient.Preferred,recall.RecallNum,
+				patient.State,patguar.State,patient.Zip,patguar.Zip";
+			DataTable rawTable=Db.GetTable(command);
+			command="DROP TABLE IF EXISTS temprecallmaxdate";
+			Db.NonQ(command);
+			return rawTable;
 		}
 
 		/// <summary></summary>

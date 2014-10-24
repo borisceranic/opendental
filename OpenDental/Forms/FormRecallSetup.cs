@@ -839,7 +839,7 @@ namespace OpenDental{
 			row=new ODGridRow();
 			row.Cells.Add("");
 			row.Cells.Add(Lan.g(this,"WebSched"));
-			row.Cells.Add(Lan.g(this,"Subject line"));
+			row.Cells.Add(Lan.g(this,"Subject line.  Available variables")+": [NameF]");
 			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerSubject));
 			row.Tag="RecallSchedulerSubject";
 			gridMain.Rows.Add(row);
@@ -847,7 +847,7 @@ namespace OpenDental{
 			row=new ODGridRow();
 			row.Cells.Add("1");
 			row.Cells.Add(Lan.g(this,"WebSched"));
-			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
 			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage));
 			row.Tag="RecallSchedulerMessage";
 			gridMain.Rows.Add(row);
@@ -855,7 +855,7 @@ namespace OpenDental{
 			row=new ODGridRow();
 			row.Cells.Add("2");
 			row.Cells.Add(Lan.g(this,"WebSched"));
-			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
 			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage2));
 			row.Tag="RecallSchedulerMessage2";
 			gridMain.Rows.Add(row);
@@ -863,7 +863,7 @@ namespace OpenDental{
 			row=new ODGridRow();
 			row.Cells.Add("3");
 			row.Cells.Add(Lan.g(this,"WebSched"));
-			row.Cells.Add(Lan.g(this,"Available variables: [NameF], [URL]"));
+			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
 			row.Cells.Add(PrefC.GetString(PrefName.RecallSchedulerMessage3));
 			row.Tag="RecallSchedulerMessage3";
 			gridMain.Rows.Add(row);
