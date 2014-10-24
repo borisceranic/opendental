@@ -31,6 +31,7 @@ namespace OpenDental{
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
+			Plugins.HookAddCode(this,"FormLogOn.InitializeComponent_end");
 			Lan.F(this);
 		}
 
