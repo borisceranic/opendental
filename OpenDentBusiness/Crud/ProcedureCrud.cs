@@ -103,6 +103,7 @@ namespace OpenDentBusiness.Crud{
 				procedure.Discount          = PIn.Double(table.Rows[i]["Discount"].ToString());
 				procedure.SnomedBodySite    = PIn.String(table.Rows[i]["SnomedBodySite"].ToString());
 				procedure.ProvOrderOverride = PIn.Long  (table.Rows[i]["ProvOrderOverride"].ToString());
+				procedure.IsDateProsthEst   = PIn.Bool  (table.Rows[i]["IsDateProsthEst"].ToString());
 				retVal.Add(procedure);
 			}
 			return retVal;
@@ -143,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -203,7 +204,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedure.DiagnosticCode4)+"',"
 				+"'"+POut.Double(procedure.Discount)+"',"
 				+"'"+POut.String(procedure.SnomedBodySite)+"',"
-				+    POut.Long  (procedure.ProvOrderOverride)+")";
+				+    POut.Long  (procedure.ProvOrderOverride)+","
+				+    POut.Bool  (procedure.IsDateProsthEst)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -271,7 +273,8 @@ namespace OpenDentBusiness.Crud{
 				+"DiagnosticCode4   = '"+POut.String(procedure.DiagnosticCode4)+"', "
 				+"Discount          = '"+POut.Double(procedure.Discount)+"', "
 				+"SnomedBodySite    = '"+POut.String(procedure.SnomedBodySite)+"', "
-				+"ProvOrderOverride =  "+POut.Long  (procedure.ProvOrderOverride)+" "
+				+"ProvOrderOverride =  "+POut.Long  (procedure.ProvOrderOverride)+", "
+				+"IsDateProsthEst   =  "+POut.Bool  (procedure.IsDateProsthEst)+" "
 				+"WHERE ProcNum = "+POut.Long(procedure.ProcNum);
 			Db.NonQ(command);
 		}
@@ -499,6 +502,10 @@ namespace OpenDentBusiness.Crud{
 			if(procedure.ProvOrderOverride != oldProcedure.ProvOrderOverride) {
 				if(command!=""){ command+=",";}
 				command+="ProvOrderOverride = "+POut.Long(procedure.ProvOrderOverride)+"";
+			}
+			if(procedure.IsDateProsthEst != oldProcedure.IsDateProsthEst) {
+				if(command!=""){ command+=",";}
+				command+="IsDateProsthEst = "+POut.Bool(procedure.IsDateProsthEst)+"";
 			}
 			if(command==""){
 				return false;

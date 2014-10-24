@@ -264,6 +264,7 @@ namespace OpenDental{
 		private ComboBox comboProvNumOrdering;
 		private Label label95;
 		private Snomed _snomedBodySite=null;
+		private CheckBox checkIsDateProsthEst;
 		private long _provNumOrderingSelected;
 		
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
@@ -419,6 +420,7 @@ namespace OpenDental{
 			this.label4 = new System.Windows.Forms.Label();
 			this.listProsth = new System.Windows.Forms.ListBox();
 			this.groupProsth = new System.Windows.Forms.GroupBox();
+			this.checkIsDateProsthEst = new System.Windows.Forms.CheckBox();
 			this.textDateOriginalProsth = new OpenDental.ValidDate();
 			this.checkTypeCodeA = new System.Windows.Forms.CheckBox();
 			this.checkTypeCodeB = new System.Windows.Forms.CheckBox();
@@ -1616,6 +1618,7 @@ namespace OpenDental{
 			// 
 			// groupProsth
 			// 
+			this.groupProsth.Controls.Add(this.checkIsDateProsthEst);
 			this.groupProsth.Controls.Add(this.listProsth);
 			this.groupProsth.Controls.Add(this.textDateOriginalProsth);
 			this.groupProsth.Controls.Add(this.label4);
@@ -1627,6 +1630,15 @@ namespace OpenDental{
 			this.groupProsth.TabIndex = 7;
 			this.groupProsth.TabStop = false;
 			this.groupProsth.Text = "Prosthesis Replacement";
+			// 
+			// checkIsDateProsthEst
+			// 
+			this.checkIsDateProsthEst.Location = new System.Drawing.Point(169, 61);
+			this.checkIsDateProsthEst.Name = "checkIsDateProsthEst";
+			this.checkIsDateProsthEst.Size = new System.Drawing.Size(96, 16);
+			this.checkIsDateProsthEst.TabIndex = 181;
+			this.checkIsDateProsthEst.Text = "Is Estimated";
+			this.checkIsDateProsthEst.UseVisualStyleBackColor = true;
 			// 
 			// textDateOriginalProsth
 			// 
@@ -3222,6 +3234,7 @@ namespace OpenDental{
 					if(ProcCur.DateOriginalProsth.Year>1880){
 						textDateOriginalProsth.Text=ProcCur.DateOriginalProsth.ToShortDateString();
 					}
+					checkIsDateProsthEst.Checked=ProcCur.IsDateProsthEst;
 				}
 				else{
 					groupProsth.Visible=false;
@@ -5371,10 +5384,12 @@ namespace OpenDental{
 							break;
 					}
 					ProcCur.DateOriginalProsth=PIn.Date(textDateOriginalProsth.Text);
+					ProcCur.IsDateProsthEst=checkIsDateProsthEst.Checked;
 				}
 				else {
 					ProcCur.Prosthesis="";
 					ProcCur.DateOriginalProsth=DateTime.MinValue;
+					ProcCur.IsDateProsthEst=false;
 				}
 			}
 			ProcCur.ClaimNote=textClaimNote.Text;

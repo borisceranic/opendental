@@ -128,6 +128,8 @@ namespace OpenDentBusiness {
 		public string SnomedBodySite;
 		///<summary>FK to provider.ProvNum.  Ordering provider override.  Medical eclaims only.  Defaults to zero.  If set to zero, then the provider referenced by ProvNum (procedure treating provider) will go out on the eclaim instead.</summary>
 		public long ProvOrderOverride;
+		///<summary>For prosthesis replacement procedures on 5010 eclaims only.  If true, indicates that the DateOriginalProsth is an estimated date.  Estimated dates are often used when the original prosthesis was performed by another doctor.</summary>
+		public bool IsDateProsthEst;
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

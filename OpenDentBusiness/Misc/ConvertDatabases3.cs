@@ -6480,6 +6480,18 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD IsDateProsthEst tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD IsDateProsthEst number(3)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET IsDateProsthEst = 0 WHERE IsDateProsthEst IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY IsDateProsthEst NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";

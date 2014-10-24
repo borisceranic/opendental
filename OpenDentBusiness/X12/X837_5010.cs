@@ -1698,7 +1698,7 @@ namespace OpenDentBusiness
 					//2400 DTP: 139/441 (dental) Date Prior Placement. Situational. Required when replacement.
 					if(proc.Prosthesis=="R") {//already validated date
 						sw.Write("DTP"+s
-							+"441"+s//DTP01 3/3 Date/Time Qualifier: 441=Prior Placement.
+							+(proc.IsDateProsthEst?"139":"441")+s//DTP01 3/3 Date/Time Qualifier: 139=Estimated, 441=Prior Placement.
 							+"D8"+s//DTP02 2/3 Date Time Period Format Qualifier: D8=Date Expressed in Format CCYYMMDD.
 							+proc.DateOriginalProsth.ToString("yyyyMMdd"));//DTP03 1/35 Date Time Period:
 						EndSegment(sw);
