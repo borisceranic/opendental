@@ -1947,14 +1947,14 @@ namespace OpenDentBusiness {
 						if(strb.Length!=0) {
 							strb.Append(",");
 						}
-						strb.Append(procCode.AbbrDesc+" Prosthesis");
+						strb.Append("procedure "+procCode.ProcCode+" must indicate prosthesis Initial or Replacement");
 					}
 					if(proc.Prosthesis=="R"
 						&& proc.DateOriginalProsth.Year<1880) {//if a replacement, they didn't enter a date
 						if(strb.Length!=0) {
 							strb.Append(",");
 						}
-						strb.Append(procCode.AbbrDesc+" Prosth Date");
+						strb.Append("procedure "+procCode.ProcCode+" must indicate prosthesis Original Date");
 					}
 				}
 				//if(proc.PlaceService!=claim.PlaceService) {
