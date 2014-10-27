@@ -883,7 +883,7 @@ namespace OpenDental {
 				}
 			}
 			_claim.ClaimStatus="R";//Received.
-			_claim.DateReceived=DateTimeOD.Today;
+			_claim.DateReceived=_claimPaid.DateReceived;
 			Claims.Update(_claim);
 		}
 

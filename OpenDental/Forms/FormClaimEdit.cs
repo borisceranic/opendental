@@ -4995,7 +4995,7 @@ namespace OpenDental{
 				return;
 			}
 			ClaimPayment claimPayment=new ClaimPayment();
-			claimPayment.CheckDate=DateTime.Now;
+			claimPayment.CheckDate=ClaimCur.DateReceived;//This date is validated and parsed from the UI when UpdateClaim() is called above.
 			claimPayment.IsPartial=true;
 			claimPayment.ClinicNum=PatCur.ClinicNum;
 			claimPayment.CarrierName=Carriers.GetName(InsPlans.GetPlan(ClaimCur.PlanNum,PlanList).CarrierNum);
