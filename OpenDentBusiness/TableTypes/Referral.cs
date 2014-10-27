@@ -53,6 +53,8 @@ namespace OpenDentBusiness{
 		public long Slip;
 		///<summary>True if another dentist or physician.  Cannot be a patient.</summary>
 		public bool IsDoctor;
+		///<summary>True if checkbox E-mail Trust for Direct is checked.</summary>
+		public bool IsTrustedDirect;
 
 		///<summary>Returns a copy of this Referral.</summary>
 		public Referral Copy(){

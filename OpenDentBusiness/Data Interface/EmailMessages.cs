@@ -626,6 +626,9 @@ namespace OpenDentBusiness{
 		}
 
 		public static bool IsDirectAddressTrusted(string strAddressTest) {
+			if(strAddressTest.Trim()=="") {
+				return false;
+			}
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
 			if(GetValidCertForAddressFromStore(storeAnchors,strAddressTest,false)==null) {//Look for domain level and address level trust certificates (anchors).
@@ -636,6 +639,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns true if trust already exists or has just been established for the given email address.</summary>
 		public static bool TryAddTrustDirect(string strAddressTest) {
+			if(strAddressTest.Trim()=="") {
+				return false;
+			}
 			//No need to check RemotingRole; no call to db.
 			if(IsDirectAddressTrusted(strAddressTest)) {
 				return true;//Already trusted.

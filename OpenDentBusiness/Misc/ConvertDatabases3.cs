@@ -6492,6 +6492,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE procedurelog MODIFY IsDateProsthEst NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE referral ADD IsTrustedDirect tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE referral ADD IsTrustedDirect number(3)";
+					Db.NonQ(command);
+					command="UPDATE referral SET IsTrustedDirect = 0 WHERE IsTrustedDirect IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE referral MODIFY IsTrustedDirect NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";

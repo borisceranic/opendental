@@ -46,29 +46,30 @@ namespace OpenDentBusiness.Crud{
 			Referral referral;
 			for(int i=0;i<table.Rows.Count;i++) {
 				referral=new Referral();
-				referral.ReferralNum   = PIn.Long  (table.Rows[i]["ReferralNum"].ToString());
-				referral.LName         = PIn.String(table.Rows[i]["LName"].ToString());
-				referral.FName         = PIn.String(table.Rows[i]["FName"].ToString());
-				referral.MName         = PIn.String(table.Rows[i]["MName"].ToString());
-				referral.SSN           = PIn.String(table.Rows[i]["SSN"].ToString());
-				referral.UsingTIN      = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
-				referral.Specialty     = (DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
-				referral.ST            = PIn.String(table.Rows[i]["ST"].ToString());
-				referral.Telephone     = PIn.String(table.Rows[i]["Telephone"].ToString());
-				referral.Address       = PIn.String(table.Rows[i]["Address"].ToString());
-				referral.Address2      = PIn.String(table.Rows[i]["Address2"].ToString());
-				referral.City          = PIn.String(table.Rows[i]["City"].ToString());
-				referral.Zip           = PIn.String(table.Rows[i]["Zip"].ToString());
-				referral.Note          = PIn.String(table.Rows[i]["Note"].ToString());
-				referral.Phone2        = PIn.String(table.Rows[i]["Phone2"].ToString());
-				referral.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				referral.NotPerson     = PIn.Bool  (table.Rows[i]["NotPerson"].ToString());
-				referral.Title         = PIn.String(table.Rows[i]["Title"].ToString());
-				referral.EMail         = PIn.String(table.Rows[i]["EMail"].ToString());
-				referral.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				referral.NationalProvID= PIn.String(table.Rows[i]["NationalProvID"].ToString());
-				referral.Slip          = PIn.Long  (table.Rows[i]["Slip"].ToString());
-				referral.IsDoctor      = PIn.Bool  (table.Rows[i]["IsDoctor"].ToString());
+				referral.ReferralNum    = PIn.Long  (table.Rows[i]["ReferralNum"].ToString());
+				referral.LName          = PIn.String(table.Rows[i]["LName"].ToString());
+				referral.FName          = PIn.String(table.Rows[i]["FName"].ToString());
+				referral.MName          = PIn.String(table.Rows[i]["MName"].ToString());
+				referral.SSN            = PIn.String(table.Rows[i]["SSN"].ToString());
+				referral.UsingTIN       = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
+				referral.Specialty      = (DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				referral.ST             = PIn.String(table.Rows[i]["ST"].ToString());
+				referral.Telephone      = PIn.String(table.Rows[i]["Telephone"].ToString());
+				referral.Address        = PIn.String(table.Rows[i]["Address"].ToString());
+				referral.Address2       = PIn.String(table.Rows[i]["Address2"].ToString());
+				referral.City           = PIn.String(table.Rows[i]["City"].ToString());
+				referral.Zip            = PIn.String(table.Rows[i]["Zip"].ToString());
+				referral.Note           = PIn.String(table.Rows[i]["Note"].ToString());
+				referral.Phone2         = PIn.String(table.Rows[i]["Phone2"].ToString());
+				referral.IsHidden       = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				referral.NotPerson      = PIn.Bool  (table.Rows[i]["NotPerson"].ToString());
+				referral.Title          = PIn.String(table.Rows[i]["Title"].ToString());
+				referral.EMail          = PIn.String(table.Rows[i]["EMail"].ToString());
+				referral.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
+				referral.NationalProvID = PIn.String(table.Rows[i]["NationalProvID"].ToString());
+				referral.Slip           = PIn.Long  (table.Rows[i]["Slip"].ToString());
+				referral.IsDoctor       = PIn.Bool  (table.Rows[i]["IsDoctor"].ToString());
+				referral.IsTrustedDirect= PIn.Bool  (table.Rows[i]["IsTrustedDirect"].ToString());
 				retVal.Add(referral);
 			}
 			return retVal;
@@ -109,7 +110,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ReferralNum,";
 			}
-			command+="LName,FName,MName,SSN,UsingTIN,Specialty,ST,Telephone,Address,Address2,City,Zip,Note,Phone2,IsHidden,NotPerson,Title,EMail,PatNum,NationalProvID,Slip,IsDoctor) VALUES(";
+			command+="LName,FName,MName,SSN,UsingTIN,Specialty,ST,Telephone,Address,Address2,City,Zip,Note,Phone2,IsHidden,NotPerson,Title,EMail,PatNum,NationalProvID,Slip,IsDoctor,IsTrustedDirect) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(referral.ReferralNum)+",";
 			}
@@ -135,7 +136,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (referral.PatNum)+","
 				+"'"+POut.String(referral.NationalProvID)+"',"
 				+    POut.Long  (referral.Slip)+","
-				+    POut.Bool  (referral.IsDoctor)+")";
+				+    POut.Bool  (referral.IsDoctor)+","
+				+    POut.Bool  (referral.IsTrustedDirect)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -148,28 +150,29 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Referral in the database.</summary>
 		public static void Update(Referral referral){
 			string command="UPDATE referral SET "
-				+"LName         = '"+POut.String(referral.LName)+"', "
-				+"FName         = '"+POut.String(referral.FName)+"', "
-				+"MName         = '"+POut.String(referral.MName)+"', "
-				+"SSN           = '"+POut.String(referral.SSN)+"', "
-				+"UsingTIN      =  "+POut.Bool  (referral.UsingTIN)+", "
-				+"Specialty     =  "+POut.Int   ((int)referral.Specialty)+", "
-				+"ST            = '"+POut.String(referral.ST)+"', "
-				+"Telephone     = '"+POut.String(referral.Telephone)+"', "
-				+"Address       = '"+POut.String(referral.Address)+"', "
-				+"Address2      = '"+POut.String(referral.Address2)+"', "
-				+"City          = '"+POut.String(referral.City)+"', "
-				+"Zip           = '"+POut.String(referral.Zip)+"', "
-				+"Note          = '"+POut.String(referral.Note)+"', "
-				+"Phone2        = '"+POut.String(referral.Phone2)+"', "
-				+"IsHidden      =  "+POut.Bool  (referral.IsHidden)+", "
-				+"NotPerson     =  "+POut.Bool  (referral.NotPerson)+", "
-				+"Title         = '"+POut.String(referral.Title)+"', "
-				+"EMail         = '"+POut.String(referral.EMail)+"', "
-				+"PatNum        =  "+POut.Long  (referral.PatNum)+", "
-				+"NationalProvID= '"+POut.String(referral.NationalProvID)+"', "
-				+"Slip          =  "+POut.Long  (referral.Slip)+", "
-				+"IsDoctor      =  "+POut.Bool  (referral.IsDoctor)+" "
+				+"LName          = '"+POut.String(referral.LName)+"', "
+				+"FName          = '"+POut.String(referral.FName)+"', "
+				+"MName          = '"+POut.String(referral.MName)+"', "
+				+"SSN            = '"+POut.String(referral.SSN)+"', "
+				+"UsingTIN       =  "+POut.Bool  (referral.UsingTIN)+", "
+				+"Specialty      =  "+POut.Int   ((int)referral.Specialty)+", "
+				+"ST             = '"+POut.String(referral.ST)+"', "
+				+"Telephone      = '"+POut.String(referral.Telephone)+"', "
+				+"Address        = '"+POut.String(referral.Address)+"', "
+				+"Address2       = '"+POut.String(referral.Address2)+"', "
+				+"City           = '"+POut.String(referral.City)+"', "
+				+"Zip            = '"+POut.String(referral.Zip)+"', "
+				+"Note           = '"+POut.String(referral.Note)+"', "
+				+"Phone2         = '"+POut.String(referral.Phone2)+"', "
+				+"IsHidden       =  "+POut.Bool  (referral.IsHidden)+", "
+				+"NotPerson      =  "+POut.Bool  (referral.NotPerson)+", "
+				+"Title          = '"+POut.String(referral.Title)+"', "
+				+"EMail          = '"+POut.String(referral.EMail)+"', "
+				+"PatNum         =  "+POut.Long  (referral.PatNum)+", "
+				+"NationalProvID = '"+POut.String(referral.NationalProvID)+"', "
+				+"Slip           =  "+POut.Long  (referral.Slip)+", "
+				+"IsDoctor       =  "+POut.Bool  (referral.IsDoctor)+", "
+				+"IsTrustedDirect=  "+POut.Bool  (referral.IsTrustedDirect)+" "
 				+"WHERE ReferralNum = "+POut.Long(referral.ReferralNum);
 			Db.NonQ(command);
 		}
@@ -264,6 +267,10 @@ namespace OpenDentBusiness.Crud{
 			if(referral.IsDoctor != oldReferral.IsDoctor) {
 				if(command!=""){ command+=",";}
 				command+="IsDoctor = "+POut.Bool(referral.IsDoctor)+"";
+			}
+			if(referral.IsTrustedDirect != oldReferral.IsTrustedDirect) {
+				if(command!=""){ command+=",";}
+				command+="IsTrustedDirect = "+POut.Bool(referral.IsTrustedDirect)+"";
 			}
 			if(command==""){
 				return false;
