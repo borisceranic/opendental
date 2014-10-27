@@ -21,6 +21,8 @@ namespace OpenDentBusiness {
 		private decimal _insPaid;
 		///<summary>BPR03 converted to bool.</summary>
 		private bool _isCredit;
+		///<summary>BPR04 Payment Method Code.  Required.</summary>
+		public string _paymentMethodCode;
 		///<summary>BPR04 converted into a human readable form.</summary>
 		private string _payMethodDescript;
 		///<summary>BPR15 As many as 4 trailing digits of the account the payment was deposited into (only if payment was made electronically).  If not present, will be blank.</summary>
@@ -64,7 +66,7 @@ namespace OpenDentBusiness {
 		public string PayMethodDescript { get { return _payMethodDescript; } }
 		///<summary>BPR15 As many as 4 trailing digits of the account the payment was deposited into (only if payment was made electronically).</summary>
 		public string AccountNumReceiving { get { return _accountNumReceiving; } }
-		///<summary>BPR16 The date of EFT of the date the check was printed.  If not present, will be set to 01/01/0001.</summary>
+		///<summary>BPR16 The date of EFT or the date the check was printed.  If not present, will be set to 01/01/0001.</summary>
 		public DateTime DateEffective { get { return _dateEffective; } }
 		///<summary>TRN02 Even through TRN02 is called the transaction reference number, it can include other characters besides digits.</summary>
 		public string TransRefNum { get { return _transRefNum; } }
@@ -88,6 +90,30 @@ namespace OpenDentBusiness {
 		public string PayeeIdType { get { return _payeeIdType; } }
 		///<summary>N1*PE N104 loop 1000B.  Usually the NPI number.</summary>
 		public string PayeeId { get { return _payeeId; } }
+
+		///<summary>If the 835 was paid electronically (EFT), then will return the effective date.  Otherwise, for physical checks, returns today's date.</summary>
+		public DateTime DateReceived {
+			get {
+				if(_paymentMethodCode=="NON") {//No payment
+					return DateTime.Today;
+				}
+				if(_paymentMethodCode=="ACH" && DateEffective.Year>1980) {//Electronic check
+					return DateEffective;
+				}
+				if(_paymentMethodCode=="BOP" && DateEffective.Year>1980) {//Financial institution option.
+					//I doubt we will ever see this status on our end.  A bank will usually see this status, then strip it out and replace it before it gets to us.
+					//Safe to assume most banks will probably choose electronic deposit.
+					return DateEffective;
+				}
+				if(_paymentMethodCode=="CHK") {//Physical check
+					return DateTime.Today;
+				}
+				if(_paymentMethodCode=="FWT" && DateEffective.Year>1980) {//Wire transfer
+					return DateEffective;
+				}
+				return DateTime.Today;
+			}
+		}
 
 		#region Static Globals
 
@@ -250,7 +276,8 @@ namespace OpenDentBusiness {
 				_isCredit=true;
 			}
 			//BPR04 Payment Method Code.  Required.
-			_payMethodDescript=GetDescriptForPaymentMethodCode(segBPR.Get(4));
+			_paymentMethodCode=segBPR.Get(4);
+			_payMethodDescript=GetDescriptForPaymentMethodCode(_paymentMethodCode);
 			//BPR05 Payment Format Code.  Situational.  We do not use.
 			//BPR06 (DFI) ID Number Qualifier.  Situational.  We do not use.
 			//BPR07 (DFI) Identification Number.  Situational.  We do not use.
@@ -330,6 +357,7 @@ namespace OpenDentBusiness {
 			retVal.ClaimFee=PIn.Decimal(segCLP.Get(3));//CLP03 Total Claim Charge Amount
 			retVal.InsPaid=PIn.Decimal(segCLP.Get(4));//CLP04 Claim Payment Amount
 			retVal.PatientPortion=PIn.Decimal(segCLP.Get(5));//CLP05 Patient Portion Amount
+			retVal.DateReceived=DateReceived;
 			segNum++;
 			retVal.ListClaimAdjustments=new List<Hx835_Adj>();
 			//2100 CAS: Claim Adjustment.  Situational.  Repeat 99.  Guide page 129.
@@ -2942,6 +2970,8 @@ namespace OpenDentBusiness {
 		///Claim splits are intended to expedite payment when one or two procedures on the original claim are pending for an extended period of time.</summary>
 		public bool IsSplitClaim;
 		private long _claimNum;
+		///<summary>Does not correspond to a particular segment in the 835, internally created based on 835 payment method and date effective.</summary>
+		public DateTime DateReceived;
 
 		///<summary>Attempts to get the original ClaimNum corresponding to claim from the 835 in the database, or from cache.  Returns 0 if not found.</summary>
 		public long ClaimNum {
