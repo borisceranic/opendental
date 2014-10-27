@@ -6942,6 +6942,9 @@ namespace OpenDental{
 			int skippedComlog=0;
 			int skippedLabCases=0;
 			int skippedSheets=0;
+			int skippedApts=0;
+			int skippedEmails=0;
+			int skippedTasks=0;
 			DataRow row;
 			for(int i=0;i<gridProg.SelectedIndices.Length;i++){
 				row=(DataRow)gridProg.Rows[gridProg.SelectedIndices[i]].Tag;
@@ -6981,6 +6984,15 @@ namespace OpenDental{
 				else if(row["SheetNum"].ToString()!="0") {
 					skippedSheets++;
 				}
+				else if(row["AptNum"].ToString()!="0") {
+					skippedApts++;
+				}
+				else if(row["EmailMessageNum"].ToString()!="0") {
+					skippedEmails++;
+				}
+				else if(row["TaskNum"].ToString()!="0") {
+					skippedTasks++;
+				}
 			}
 			Recalls.Synch(PatCur.PatNum);
 			if(skippedC>0){
@@ -7002,6 +7014,18 @@ namespace OpenDental{
 			if(skippedSheets>0) {
 				MessageBox.Show(Lan.g(this,"Not allowed to delete sheets from here.")+"\r"
 					+skippedSheets.ToString()+" "+Lan.g(this,"item(s) skipped."));
+			}
+			if(skippedApts>0) {
+				MessageBox.Show(Lan.g(this,"Not allowed to delete appointments from here.")+"\r"
+					+skippedApts.ToString()+" "+Lan.g(this,"item(s) skipped."));
+			}
+			if(skippedEmails>0) {
+				MessageBox.Show(Lan.g(this,"Not allowed to delete emails from here.")+"\r"
+					+skippedEmails.ToString()+" "+Lan.g(this,"item(s) skipped."));
+			}
+			if(skippedTasks>0) {
+				MessageBox.Show(Lan.g(this,"Not allowed to delete tasks from here.")+"\r"
+					+skippedTasks.ToString()+" "+Lan.g(this,"item(s) skipped."));
 			}
 			ModuleSelected(PatCur.PatNum);
 		}
