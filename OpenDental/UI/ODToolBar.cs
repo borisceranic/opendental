@@ -24,16 +24,8 @@ namespace OpenDental.UI{
 		///<summary></summary>
 		[Category("Action"),Description("Occurs when a button is clicked.")]
 		public event ODToolBarButtonClickEventHandler ButtonClick=null;
-		private static LinearGradientBrush brushPushed;
-		private static LinearGradientBrush brushHover;
-		private static LinearGradientBrush brushMedium;
-		private static LinearGradientBrush brushDark;
-		private static Brush brushTextFore;
-		private static Brush brushText;
-		private static Brush brushTextDisabled;
-		private static Pen penLight;
-		private static Pen penOutline;
-		private static Pen penDivider;
+		private static ODPaintTools _paintToolboxDefault; //Default toolbar colors. (Blue or Grey)
+		private static ODPaintTools _paintToolboxError; //Color only used when button.IsRed=true. (Red)
 		///<summary>This can be set from anywhere to affect all toolbars simultaneously.</summary>
 		private static bool _useBlueTheme;
 
@@ -57,54 +49,11 @@ namespace OpenDental.UI{
 
 		///<summary>Reloads brushes based on current theme.</summary>
 		private static void ReloadBrushes() {
-			Color cTopPushed=Color.FromArgb(248,248,248);
-			Color cBotPushed=Color.FromArgb(248,248,248);
-			Color cTopHover=Color.FromArgb(240,240,240);
-			Color cBotHover=Color.FromArgb(240,240,240);
-			Color cTopMedium=SystemColors.Control;
-			Color cBotMedium=SystemColors.Control;
-			Color cTopDark=Color.FromArgb(210,210,210);
-			Color cBotDark=Color.FromArgb(210,210,210);
-			Color cTextFore=DefaultForeColor;
-			Color cText=Color.DarkSlateGray;
-			Color cTextDisabled=SystemColors.GrayText;
-			//Color cPenLight=Color.SlateGray;
-			Color cPenOutline=Color.SlateGray;
-			//Color cPenDark=Color.DarkSlateGray;
-			Color cPenDivider=Color.FromArgb(180,180,180);
+			_paintToolboxDefault=new ODPaintTools(DefaultForeColor);//(Usually Grey)
 			if(UseBlueTheme) {
-				//Static Blue colors
-				cTopMedium=Color.FromArgb(255,255,255);//<<--Change this value
-				cBotMedium=Color.FromArgb(171,181,209);//192,202,240);//<<--Change this value
-				#region Dynamic Blue Colors
-				int l=10;//L for light. added to light values of shaded buttons
-				int d=-30;//D for dark. added to dark values of shadded buttons.
-				//Derived colors
-				cTopPushed=Color.FromArgb((byte)Math.Min(255,cTopMedium.R+2*l),(byte)Math.Min(255,cTopMedium.G+2*l),(byte)Math.Min(255,cTopMedium.B+2*l));
-				cBotPushed=Color.FromArgb((byte)Math.Min(255,cBotMedium.R+2*l),(byte)Math.Min(255,cBotMedium.G+2*l),(byte)Math.Min(255,cBotMedium.B+2*l));
-				cTopHover=cTopMedium;//Color.FromArgb((byte)Math.Min(255,cTopMedium.R+l),(byte)Math.Min(255,cTopMedium.G+l),(byte)Math.Min(255,cTopMedium.B+l));
-				cBotHover=cBotMedium;//Color.FromArgb((byte)Math.Min(255,cBotMedium.R+l),(byte)Math.Min(255,cBotMedium.G+l),(byte)Math.Min(255,cBotMedium.B+l));
-				cTopDark=Color.FromArgb((byte)Math.Min(255,cTopMedium.R+d),(byte)Math.Min(255,cTopMedium.G+d),(byte)Math.Min(255,cTopMedium.B+d));
-				cBotDark=Color.FromArgb((byte)Math.Min(255,cBotMedium.R+d),(byte)Math.Min(255,cBotMedium.G+d),(byte)Math.Min(255,cBotMedium.B+d));
-				cText=Color.Black;
-				//cPenLight=Color.FromArgb(180,195,243);
-				//cPenMedium=Color.FromArgb(180,195,243);
-				//cPenDark=Color.Black;
-				#endregion
+				_paintToolboxDefault=new ODPaintTools(DefaultForeColor,Color.FromArgb(255,255,255),Color.FromArgb(171,181,209));//(White and Blue)
 			}
-			//Brushes
-			brushPushed	=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopPushed,cBotPushed);
-			brushHover				=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopHover,cBotHover);
-			brushMedium				=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopMedium,cBotMedium);
-			brushDark					=new LinearGradientBrush(new Point(0,0),new Point(0,25),cTopDark,cBotDark);
-			brushTextFore			=new SolidBrush(cTextFore);
-			brushText					=new SolidBrush(cText);
-			brushTextDisabled	=new SolidBrush(cTextDisabled);
-			//Pens
-			//penLight	=new Pen(cPenLight,1);
-			penOutline	=new Pen(cPenOutline,1);
-			//penDark		=new Pen(cPenDark,1);
-			penDivider=new Pen(cPenDivider,1);
+			_paintToolboxError=new ODPaintTools(DefaultForeColor,Color.FromArgb(255,192,192),Color.FromArgb(255,98,98));//Color.FromArgb(255,255,255),Color.FromArgb(255,98,98));//Color.FromArgb(255,192,192));//(Red)
 		}
 
 		///<summary>Clean up any resources being used.</summary>
@@ -361,12 +310,13 @@ namespace OpenDental.UI{
 	  
 		///<summary>Runs any time the control is invalidated.</summary>
 		protected override void OnPaint(System.Windows.Forms.PaintEventArgs e){
+			ODPaintTools paintToolboxCur=_paintToolboxDefault;
 			if(DesignMode){
-				e.Graphics.DrawRectangle(penOutline,0,0,Width-1,Height-1);//draw toolbar
+				e.Graphics.DrawRectangle(paintToolboxCur.PenOutline,0,0,Width-1,Height-1);//draw toolbar
 				StringFormat format=new StringFormat();
 				format.Alignment=StringAlignment.Center;
 				format.LineAlignment=StringAlignment.Center;
-				e.Graphics.DrawString(this.Name,Font,brushText,new Rectangle(0,0,Width,Height),format);
+				e.Graphics.DrawString(this.Name,Font,paintToolboxCur.BrushText,new Rectangle(0,0,Width,Height),format);
 				return;
 			}
 			//e.ClipRectangle
@@ -375,10 +325,14 @@ namespace OpenDental.UI{
 				//check to see if bound are in the clipping rectangle
 				DrawButton(e.Graphics,button);
 			}
-			e.Graphics.DrawLine(penOutline,0,Height-1,Width-1,Height-1);
+			e.Graphics.DrawLine(paintToolboxCur.PenOutline,0,Height-1,Width-1,Height-1);
 		}
 
 		private void DrawButton(Graphics g,ODToolBarButton button) {
+			ODPaintTools paintToolboxCur=_paintToolboxDefault;
+			if(button.IsRed) {
+				paintToolboxCur=_paintToolboxError;
+			}
 			#region Separator
 			if(button.Style==ODToolBarButtonStyle.Separator){
 				//was 112,128,144
@@ -396,31 +350,31 @@ namespace OpenDental.UI{
 			#endregion
 			//draw background
 			if(!button.Enabled){
-				g.FillRectangle(brushMedium,button.Bounds);
+				g.FillRectangle(paintToolboxCur.BrushMedium,button.Bounds);
 			}
 			else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed){
-				g.FillRectangle(brushPushed,button.Bounds);
+				g.FillRectangle(paintToolboxCur.BrushPushed,button.Bounds);
 			}
 			else if(button.Style==ODToolBarButtonStyle.Label){
-				g.FillRectangle(brushMedium,button.Bounds);
+				g.FillRectangle(paintToolboxCur.BrushMedium,button.Bounds);
 			}
 			else switch(button.State){
 				case ToolBarButtonState.Normal://Control is 224,223,227 (==Ryan. This is not always true. Control is 240,240,240 for me.)
-					g.FillRectangle(brushMedium,button.Bounds);
+					g.FillRectangle(paintToolboxCur.BrushMedium,button.Bounds);
 					break;
 				case ToolBarButtonState.Hover://this is lighter than control
-					g.FillRectangle(brushHover,button.Bounds);
+					g.FillRectangle(paintToolboxCur.BrushHover,button.Bounds);
 					break;
 				case ToolBarButtonState.Pressed://slightly darker than control
-					g.FillRectangle(brushDark,button.Bounds);
+					g.FillRectangle(paintToolboxCur.BrushDark,button.Bounds);
 					break;
 				case ToolBarButtonState.DropPressed:
 					//left half looks like hover:
-					g.FillRectangle(brushHover
+					g.FillRectangle(paintToolboxCur.BrushHover
 						,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-15,button.Bounds.Height));
 					//right section looks like Pressed:
-					g.FillRectangle(brushDark
+					g.FillRectangle(paintToolboxCur.BrushDark
 						,new Rectangle(button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
 						,15,button.Bounds.Height));
 					break;
@@ -474,10 +428,10 @@ namespace OpenDental.UI{
 				format.Alignment=StringAlignment.Near;
 				format.LineAlignment=StringAlignment.Center;
 				if(button.Enabled) {
-					g.DrawString(button.Text,Font,brushTextFore,textRect,format);
+					g.DrawString(button.Text,Font,paintToolboxCur.BrushTextFore,textRect,format);
 				}
 				else {
-					g.DrawString(button.Text,Font,brushTextDisabled,textRect,format);
+					g.DrawString(button.Text,Font,paintToolboxCur.BrushTextDisabled,textRect,format);
 				}
 			}
 			else{
@@ -485,41 +439,41 @@ namespace OpenDental.UI{
 				format.Alignment=StringAlignment.Center;
 				format.LineAlignment=StringAlignment.Center;
 				if(button.Enabled) {
-					g.DrawString(button.Text,Font,brushTextFore,textRect,format);
+					g.DrawString(button.Text,Font,paintToolboxCur.BrushTextFore,textRect,format);
 				}
 				else {
-					g.DrawString(button.Text,Font,brushTextDisabled,textRect,format);
+					g.DrawString(button.Text,Font,paintToolboxCur.BrushTextDisabled,textRect,format);
 				}
 			}
 			//draw outline
 			//Pen penR=penMedium;//new Pen(Color.FromArgb(180,180,180));
 			if(!button.Enabled){
 				//no outline
-				g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
+				g.DrawLine(paintToolboxCur.PenDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
 			}
 			else if(button.Style==ODToolBarButtonStyle.ToggleButton && button.Pushed){
-				g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
+				g.DrawRectangle(paintToolboxCur.PenOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 					,button.Bounds.Width-1,button.Bounds.Height-1));
 			}
 			else if(button.Style==ODToolBarButtonStyle.Label){
 				//no outline
-				g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
+				g.DrawLine(paintToolboxCur.PenDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);//vertical line on the right side
 			}
 			else switch(button.State){
 				case ToolBarButtonState.Normal:
 					//no outline
-						g.DrawLine(penDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
+						g.DrawLine(paintToolboxCur.PenDivider,button.Bounds.Right-1,button.Bounds.Top,button.Bounds.Right-1,button.Bounds.Bottom-1);
 					break;
 				case ToolBarButtonState.Hover:
-					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(paintToolboxCur.PenOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 				case ToolBarButtonState.Pressed:
-					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(paintToolboxCur.PenOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 				case ToolBarButtonState.DropPressed:
-					g.DrawRectangle(penOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
+					g.DrawRectangle(paintToolboxCur.PenOutline,new Rectangle(button.Bounds.X,button.Bounds.Y
 						,button.Bounds.Width-1,button.Bounds.Height-1));
 					break;
 			}
@@ -532,13 +486,13 @@ namespace OpenDental.UI{
 				triangle[2]=new Point(button.Bounds.X+button.Bounds.Width-8
 					,button.Bounds.Y+button.Bounds.Height/2+2);
 				if(button.Enabled) {
-					g.FillPolygon(brushTextFore,triangle);
+					g.FillPolygon(paintToolboxCur.BrushTextFore,triangle);
 				}
 				else {
-					g.FillPolygon(brushTextDisabled,triangle);
+					g.FillPolygon(paintToolboxCur.BrushTextDisabled,triangle);
 				}
 				if(button.State!=ToolBarButtonState.Normal && button.Enabled){
-					g.DrawLine(penOutline,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
+					g.DrawLine(paintToolboxCur.PenOutline,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
 						,button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y+button.Bounds.Height);
 				}
 			}

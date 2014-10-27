@@ -3454,6 +3454,7 @@
     <Compile Include="Misc\Tooth.cs" />
     <Compile Include="Misc\VisiQuick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ODPaintTools.cs" />
     <Compile Include="UI\ODButtonPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

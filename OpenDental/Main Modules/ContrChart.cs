@@ -293,8 +293,6 @@ namespace OpenDental{
 		private bool IsDistributorKey;
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
-		///<summary>Reset each time a new instance of OD is launched.  If NewCrop data fails to refresh and the last failure message was over an hour ago, then we show a popup reminding the user about the failure.</summary>
-		private DateTime _dateNewCropRefreshFail;
 		private List<ProcButtonQuick> listProcButtonQuicks;
 	
 		///<summary></summary>
@@ -311,7 +309,6 @@ namespace OpenDental{
 				menuItemLabFee.Visible=false;
 				menuItemLabFeeDetach.Visible=false;
 			}
-			_dateNewCropRefreshFail=DateTime.MinValue;
 		}
 
 		///<summary></summary>
@@ -3566,6 +3563,7 @@ namespace OpenDental{
 		///<summary>Returns true if new information was pulled back from NewCrop.</summary>
 		private bool NewCropRefreshPrescriptions() {
 			Program programNewCrop=Programs.GetCur(ProgramName.NewCrop);
+			ToolBarMain.Buttons["eRx"].IsRed=false; //Set the eRx button back to default color.
 			if(!programNewCrop.Enabled) {
 				return false;
 			}
@@ -3631,19 +3629,16 @@ namespace OpenDental{
 			//The includeSchema parameter is useful for first-time debugging, but in release mode, we should pass N for no.
 			wsNewCrop.Timeout=3000;//3 second. The default is 100 seconds, but we cannot wait that long, because prescriptions are checked each time the Chart is refreshed. 1 second is too little, 2 seconds works most of the time. 3 seconds is safe.
 			try {
-				//throw new Exception("Test communication error in debug mode.");
+				throw new Exception("Test communication error in debug mode.");
 				response=wsNewCrop.GetPatientFullMedicationHistory6(credentials,accountRequest,patientRequest,prescriptionHistoryRequest,patientInfoRequester,"","N");
 			}
 			catch { //An exception is thrown when the timeout is reached, or when the NewCrop servers are not accessible (because the servers are down, or because local internet is down).
 				//We used to show a popup here each time the refresh failed, but users found it annoying when the NewCrop severs were down, because the popup would show each time they visited the Chart and impeded user workflow.
 				//We tried silently logging a warning message into the Application log within system Event Viewer, but we found out that a decent number of users do not have permission to write to the Application log, which causes UEs sometimes.
-				//Now we have decided to show a popup exactly 1 time for each instance of OD launched, to avoid the permission issue, and to prevent the popup from impeding workflow, while still letting the user know that there was a refresh issue.
-				if((DateTime.Now-_dateNewCropRefreshFail).TotalHours>=1) {
-					_dateNewCropRefreshFail=DateTime.Now;
-					MsgBox.Show(this,"Failed to communicate with NewCrop to retrieve completed prescription information.  A firewall or antivirus application might be blocking Open Dental, "
-						+"or this computer might not be able to see secure.newcropaccounts.com due to a network name resolution (DNS) issue.  "
-						+"If you do not use electronic prescriptions, consider disabling the NewCrop program link in Setup | Program Links.");
-				}
+				//We tried showing a popup exactly 1 time for each instance of OD launched, to avoid the permission issue, but users were still complaining about it popping up and they didn't know what to do to fix it.
+				//We now change the background color of the eRx button red, and show an error message when user click the eRx button to alert them that interactions may be out of date. 
+				ToolBarMain.Buttons["eRx"].IsRed=true; //Marks the eRx button to be drawn with a red color.
+				ToolBarMain.Invalidate();
 				return false;
 			}
 			//response.Message = Error message if error.
