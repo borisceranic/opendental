@@ -3629,7 +3629,7 @@ namespace OpenDental{
 			//The includeSchema parameter is useful for first-time debugging, but in release mode, we should pass N for no.
 			wsNewCrop.Timeout=3000;//3 second. The default is 100 seconds, but we cannot wait that long, because prescriptions are checked each time the Chart is refreshed. 1 second is too little, 2 seconds works most of the time. 3 seconds is safe.
 			try {
-				throw new Exception("Test communication error in debug mode.");
+				//throw new Exception("Test communication error in debug mode.");
 				response=wsNewCrop.GetPatientFullMedicationHistory6(credentials,accountRequest,patientRequest,prescriptionHistoryRequest,patientInfoRequester,"","N");
 			}
 			catch { //An exception is thrown when the timeout is reached, or when the NewCrop servers are not accessible (because the servers are down, or because local internet is down).
