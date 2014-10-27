@@ -2937,8 +2937,7 @@ namespace OpenDental{
 					return;
 				}
 				if(textNote.Text != "") {
-					if(MessageBox.Show(Lan.g(this, "Save a copy of this note in CommLog? " + "\r\n" + "\r\n" + textNote.Text), "Question...",
-							MessageBoxButtons.YesNo) == DialogResult.Yes) {
+					if(MessageBox.Show(Commlogs.GetDeleteApptCommlogMessage(textNote.Text,AptCur.AptStatus), "Question...",MessageBoxButtons.YesNo) == DialogResult.Yes) {
 						Commlog CommlogCur = new Commlog();
 						CommlogCur.PatNum = AptCur.PatNum;
 						CommlogCur.CommDateTime = DateTime.Now;
@@ -2955,15 +2954,14 @@ namespace OpenDental{
 				if (MessageBox.Show(Lan.g(this, "Delete appointment?"), "", MessageBoxButtons.OKCancel) != DialogResult.OK) {
 					return;
 				}
-				if (textNote.Text != "") {
-					if (MessageBox.Show(Lan.g(this, "Save appointment note in CommLog? " + "\r\n" + "\r\n" + textNote.Text), "Question...",
-							MessageBoxButtons.YesNo) == DialogResult.Yes) {
+				if(textNote.Text != "") {
+					if(MessageBox.Show(Commlogs.GetDeleteApptCommlogMessage(textNote.Text,AptCur.AptStatus),"Question...",MessageBoxButtons.YesNo) == DialogResult.Yes) {
 						Commlog CommlogCur = new Commlog();
 						CommlogCur.PatNum = AptCur.PatNum;
 						CommlogCur.CommDateTime = DateTime.Now;
 						CommlogCur.CommType = Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
 						CommlogCur.Note = "Deleted Appt. & saved note: ";
-						if (AptCur.ProcDescript != "") {
+						if(AptCur.ProcDescript != "") {
 							CommlogCur.Note += AptCur.ProcDescript + ": ";
 						}
 						CommlogCur.Note += textNote.Text;
