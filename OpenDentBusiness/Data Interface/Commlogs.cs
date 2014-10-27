@@ -156,6 +156,24 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Returns the message used to ask if the user would like to save the appointment/patient note as a commlog when deleting an appointment/patient note.  Only returns up to the first 30 characters of the note.</summary>
+		public static string GetDeleteApptCommlogMessage(string noteText,ApptStatus apptStatus) {
+			//No need to check RemotingRole; no call to db.
+			string commlogMsgText="";
+			if(noteText!="") {
+				if(apptStatus==ApptStatus.PtNote || apptStatus==ApptStatus.PtNoteCompleted){
+					commlogMsgText=Lans.g("Commlogs","Save patient note in CommLog?")+"\r\n"+"\r\n";
+				}
+				else{
+					commlogMsgText=Lans.g("Commlogs","Save appointment note in CommLog?")+"\r\n"+"\r\n";
+				}
+				//Show up to 30 characters of the note because they can get rather large thus pushing the buttons off the screen.
+				commlogMsgText+=noteText.Substring(0,Math.Min(noteText.Length,30));
+				commlogMsgText+=(noteText.Length>30)?"...":"";//Append ... to the end of the message so that they know there is more to the note than what is displayed.
+			}
+			return commlogMsgText;
+		}
+
 		///<summary>Gets all commlogs for family that contain a DateTimeEnd entry.  Used internally to keep track of how long calls lasted.</summary>
 		public static List<Commlog> GetTimedCommlogsForPat(long guarantor) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
