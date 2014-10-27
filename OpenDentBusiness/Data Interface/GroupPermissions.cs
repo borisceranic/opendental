@@ -99,6 +99,99 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		///<summary>Gets permissions that actually generate audit trail entries.</summary>
+		public static bool HasAuditTrail(Permissions permType) {
+			//No need to check RemotingRole; no call to db.
+			switch(permType) {//If commented, has an audit trail. In the order they appear in Permissions enumeration
+				case Permissions.None:
+				//case Permissions.AppointmentsModule:
+				//case Permissions.FamilyModule:
+				//case Permissions.AccountModule:
+				//case Permissions.TPModule:
+				//case Permissions.ChartModule:
+				//case Permissions.ImagesModule:
+				case Permissions.ManageModule:
+				//case Permissions.Setup:
+				//case Permissions.RxCreate:
+				//case Permissions.ProcComplEdit:
+				//case Permissions.ChooseDatabase:
+				//case Permissions.Schedules:
+				//case Permissions.Blockouts:
+				//case Permissions.ClaimSentEdit:
+				//case Permissions.PaymentCreate:
+				//case Permissions.PaymentEdit:
+				//case Permissions.AdjustmentCreate:
+				//case Permissions.AdjustmentEdit:
+				//case Permissions.UserQuery:
+				case Permissions.StartupSingleUserOld:
+				case Permissions.StartupMultiUserOld:
+				//case Permissions.Reports:
+				//case Permissions.ProcComplCreate:
+				//case Permissions.SecurityAdmin:
+				//case Permissions.AppointmentCreate:
+				//case Permissions.AppointmentMove:
+				//case Permissions.AppointmentEdit:
+				case Permissions.Backup:
+				case Permissions.TimecardsEditAll:
+				//case Permissions.DepositSlips:
+				//case Permissions.AccountingEdit:
+				//case Permissions.AccountingCreate:
+				case Permissions.Accounting:
+				case Permissions.AnesthesiaIntakeMeds:
+				case Permissions.AnesthesiaControlMeds:
+				case Permissions.InsPayCreate:
+				//case Permissions.InsPayEdit:
+				//case Permissions.TreatPlanEdit:
+				//case Permissions.ReportProdInc:
+				//case Permissions.TimecardDeleteEntry:
+				case Permissions.EquipmentDelete:
+				//case Permissions.SheetEdit:
+				//case Permissions.CommlogEdit:
+				case Permissions.ImageDelete:
+				case Permissions.PerioEdit:
+				case Permissions.ProcEditShowFee:
+				case Permissions.AdjustmentEditZero:
+				case Permissions.EhrEmergencyAccess:
+				//case Permissions.ProcDelete:
+				case Permissions.EhrKeyAdd:
+				case Permissions.Providers:
+				case Permissions.EcwAppointmentRevise:
+				case Permissions.ProcedureNote:
+				case Permissions.ReferralAdd:
+				case Permissions.InsPlanChangeSubsc:
+				//case Permissions.RefAttachAdd:
+				//case Permissions.RefAttachDelete:
+				case Permissions.CarrierCreate:
+				case Permissions.ReportDashboard:
+				case Permissions.AutoNoteQuickNoteEdit:
+				case Permissions.EquipmentSetup:
+				//case Permissions.Billing:
+				//case Permissions.ProblemEdit:
+				//case Permissions.ProcFeeEdit:
+				//case Permissions.InsPlanChangeCarrierName:
+				case Permissions.TaskEdit:
+				case Permissions.WikiListSetup:
+				case Permissions.Copy:
+				case Permissions.Printing:
+				//case Permissions.MedicalInfoViewed:
+				//case Permissions.PatProblemListEdit:
+				//case Permissions.PatMedicationListEdit:
+				//case Permissions.PatAllergyListEdit:
+				case Permissions.PatFamilyHealthEdit:
+				case Permissions.PatientPortal:
+				//case Permissions.RxEdit:
+				case Permissions.AdminDentalStudents:
+				case Permissions.AdminDentalInstructors:
+				//case Permissions.OrthoChartEdit:
+				//case Permissions.PatientFieldEdit:
+				case Permissions.AdminDentalEvaluations:
+				case Permissions.TreatPlanDiscountEdit:
+				//case Permissions.UserLogOnOff:
+				return false;//Does not have audit Trail.
+			}
+			return true;
+		}
+
 		///<summary>Gets the description for the specified permisssion.  Already translated.</summary>
 		public static string GetDesc(Permissions perm){
 			//No need to check RemotingRole; no call to db.

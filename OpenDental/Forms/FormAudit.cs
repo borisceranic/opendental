@@ -49,10 +49,12 @@ namespace OpenDental{
 			//
 			InitializeComponent();
 			Lan.F(this);
-			string[] enumArray=Enum.GetNames(typeof(Permissions));
+			Permissions[] permArray=(Permissions[])Enum.GetValues(typeof(Permissions));
 			permissionsAlphabetic=new List<string>();
-			for(int i=1;i<enumArray.Length;i++){
-				permissionsAlphabetic.Add(enumArray[i]);
+			for(int i=1;i<permArray.Length;i++){
+				if(GroupPermissions.HasAuditTrail(permArray[i])) {
+					permissionsAlphabetic.Add(permArray[i].ToString());
+				}
 			}
 			permissionsAlphabetic.Sort();
 			permissionsAlphabetic.Insert(0,Permissions.None.ToString());
