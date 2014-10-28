@@ -57,6 +57,7 @@ namespace OpenDentBusiness {
 		///<summary>0-100. Quality of jpeg after compression when scanning documents.  100 indicates full quality.  Opposite of compression.</summary>
 		public byte ScanDocQuality;
 
+		//Default values for these columns are found in ComputerPrefs.GetForLocalComputer()
 
 		public ComputerPref Copy(){
 			return (ComputerPref)MemberwiseClone();
