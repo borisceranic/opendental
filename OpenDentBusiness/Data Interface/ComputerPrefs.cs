@@ -45,6 +45,12 @@ namespace OpenDentBusiness {
 			computerPref.TaskY=625;
 			computerPref.ComputerName=computerName;
 			computerPref.DirectXFormat="";
+			computerPref.ScanDocSelectSource=false;
+			computerPref.ScanDocShowOptions=false;
+			computerPref.ScanDocDuplex=false;
+			computerPref.ScanDocGrayscale=false;
+			computerPref.ScanDocResolution=150;//default suggested in FormImagingSetup
+			computerPref.ScanDocQuality=40;//default suggested in FormImagingSetup
 			computerPref.GraphicsSimple=DrawingMode.DirectX;
 			DataTable table=GetPrefsForComputer(computerName);
 			if(table==null){
