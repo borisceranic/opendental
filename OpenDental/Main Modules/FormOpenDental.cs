@@ -2013,6 +2013,19 @@ namespace OpenDental{
 					Application.CurrentCulture=cInfo;
 				}
 			}
+			//For EHR users we want to load up the EHR code list from the obfuscated dll in a background thread because it takes roughly 11 seconds to load up.
+			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				try {
+					Thread threadPreloadEhrCodeList=new Thread((ThreadStart)EhrCodes.UpdateList);//Background loading of the EHR.dll code list.
+					threadPreloadEhrCodeList.IsBackground=true;
+					threadPreloadEhrCodeList.Start();
+				}
+				catch { 
+					//This should never happen.  It would most likely be due to a corrupt dll issue but I don't want to stop the start up sequence.
+					//Users could theoretically use Open Dental for an entire day and never hit the code that utilizes the EhrCodes class.
+					//Therefore, we do not want to cause any issues and the worst case scenario is the users has to put up with the 11 second delay (old behavior).
+				}
+			}
 			if(!File.Exists("Help.chm")){
 				menuItemHelpWindows.Visible=false;
 			}

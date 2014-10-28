@@ -41,11 +41,8 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		/// <summary>Forces an update to the in-memory list.</summary>
+		///<summary>Forces an update to the in-memory list.  The list is filled from an in-memory list that is inside our oubfuscated EHR.dll.  For future reference, this method should never call the database because it is called by a background thread during startup.</summary>
 		public static void UpdateList() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod());
-			}
 			if(listt==null) {
 				List<EhrCode> tempList=Listt;//Forces data to be cached.
 			}
