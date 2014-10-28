@@ -2023,7 +2023,7 @@ namespace OpenDental{
 				catch { 
 					//This should never happen.  It would most likely be due to a corrupt dll issue but I don't want to stop the start up sequence.
 					//Users could theoretically use Open Dental for an entire day and never hit the code that utilizes the EhrCodes class.
-					//Therefore, we do not want to cause any issues and the worst case scenario is the users has to put up with the 11 second delay (old behavior).
+					//Therefore, we do not want to cause any issues and the worst case scenario is the users has to put up with the 11 second delay (old behavior). 
 				}
 			}
 			if(!File.Exists("Help.chm")){
