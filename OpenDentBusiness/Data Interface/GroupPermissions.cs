@@ -103,6 +103,8 @@ namespace OpenDentBusiness{
 		public static bool HasAuditTrail(Permissions permType) {
 			//No need to check RemotingRole; no call to db.
 			switch(permType) {//If commented, has an audit trail. In the order they appear in Permissions enumeration
+				//Normal pattern is to comment out the FALSE cases. 
+				//This is the opposite so that the default behavior for new security permissions to be to show in the audit trail. In case it wasn't added to this function.
 				case Permissions.None:
 				//case Permissions.AppointmentsModule:
 				//case Permissions.FamilyModule:
