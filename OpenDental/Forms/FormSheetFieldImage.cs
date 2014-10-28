@@ -220,6 +220,7 @@ namespace OpenDental {
 				return;
 			}
 			if(comboFieldName.Text!="Patient Info.gif") {
+				GC.Collect();
 				try {//catch valid files that are not valid images.
 					Image.FromFile(textFullPath.Text);
 				}

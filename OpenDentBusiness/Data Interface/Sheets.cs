@@ -424,16 +424,21 @@ namespace OpenDentBusiness{
 
 		///<summary>This gives the number of pages required to print all fields without cutting any of them in half. This must be calculated ahead of time when creating multi page pdfs.</summary>
 		public static int CalculatePageCount(Sheet sheet,System.Drawing.Printing.Margins m) {
-			int pageCount=1;
-			int curYPos=0;
-			sheet.SheetFields.Sort(OpenDentBusiness.SheetFields.SortDrawingOrder);
-			for(int i=0;i<sheet.SheetFields.Count;i++) {
-				if(sheet.SheetFields[i].Bounds.Bottom>curYPos+sheet.HeightPage-m.Bottom //if field would spill onto next page
-					&& sheet.SheetFields[i].Height<sheet.HeightPage-m.Bottom) { //and field is not taller than the entire page
-					pageCount++;
-					curYPos=Math.Min(sheet.SheetFields[i].YPos-m.Top,curYPos+sheet.HeightPage);
-				}
+			if(sheet.HeightLastField<sheet.HeightPage) {
+				return 1;//if all of the fields are less than one page, even if some of the fields fall within the margin of the first page.
 			}
+			int pageCount=1;
+			int printableHeightPerPage=(sheet.HeightPage-(m.Top+m.Bottom));
+			if(printableHeightPerPage<1) {
+				return 1;//otherwise we get negative, infinite, or thousands of pages.
+			}
+			int maxY=0;
+			for(int i=0;i<sheet.SheetFields.Count;i++) {
+				maxY=Math.Max(maxY,sheet.SheetFields[i].Bounds.Bottom);
+			}
+			maxY-=m.Top;//adjust for ignoring the top margin of the first page.
+			pageCount=Convert.ToInt32(Math.Ceiling((double)maxY/printableHeightPerPage));
+			pageCount=Math.Max(pageCount,1);//minimum of at least one page.
 			return pageCount;
 		}
 		

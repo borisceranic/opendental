@@ -507,12 +507,18 @@ namespace OpenDental {
 			Pen pDashMargin=new Pen(Color.Green);
 			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
 			int pageCount=Sheets.CalculatePageCount(SheetCur,_printMargin);
+			int margins=(_printMargin.Top+_printMargin.Bottom);
 			for(int i=1;i<pageCount;i++) {
-				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
-				g.DrawLine(pDashPage,0,i*SheetCur.HeightPage,SheetCur.WidthPage,i*SheetCur.HeightPage);
-				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage+_printMargin.Top,SheetCur.WidthPage,i*SheetCur.HeightPage+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*(SheetCur.HeightPage-margins)+_printMargin.Top,SheetCur.WidthPage,i*(SheetCur.HeightPage-margins)+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage+_printMargin.Top,SheetCur.WidthPage,i*SheetCur.HeightPage+_printMargin.Top);
 			}//End Draw Page Break
+			pictDraw.Image.Dispose();
 			pictDraw.Image=img;
+			pen.Dispose();
+			pen2.Dispose();
+			pDashPage.Dispose();
+			pDashMargin.Dispose();
 			g.Dispose();
 		}
 

@@ -285,20 +285,27 @@ namespace OpenDental {
 					case SheetFieldType.Special:
 						DrawSpecialHelper(g,i);
 						continue;
-				}
-				DrawSelectionRectangle(g,i);
-				DrawStringHelper(g,i);
-				DrawTabModeHelper(g,i);
+					case SheetFieldType.InputField:
+					case SheetFieldType.StaticText:
+					case SheetFieldType.OutputText:
+					default:
+						DrawStringHelper(g,i);
+						DrawTabModeHelper(g,i);
+						//throw new ApplicationException("Unsupported sheet field type : "+SheetDefCur.SheetFieldDefs[i].FieldType.ToString());
+						continue;
+				}//end switch
 			}
+			DrawSelectionRectangle(g);
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
 			pDashPage.DashPattern=new float[] { 4.0F,3.0F,2.0F,3.0F };
 			Pen pDashMargin=new Pen(Color.Green);
 			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
+			int margins=(_printMargin.Top+_printMargin.Bottom);
 			for(int i=1;i<SheetDefCur.PageCount;i++) {
-				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage-_printMargin.Bottom,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage-_printMargin.Bottom);
-				g.DrawLine(pDashPage,0,i*SheetDefCur.HeightPage,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage);
-				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage+_printMargin.Top,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage-_printMargin.Bottom,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*(SheetDefCur.HeightPage-margins)+_printMargin.Top,SheetDefCur.WidthPage,i*(SheetDefCur.HeightPage-margins)+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage+_printMargin.Top,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage+_printMargin.Top);
 			}
 			//End Draw Page Break
 		}
@@ -324,6 +331,8 @@ namespace OpenDental {
 			}
 			g.DrawImage(img,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
 				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			img.Dispose();
+			img=null;
 		}
 
 		private void DrawPatImageHelper(Graphics g,int i) {
@@ -431,7 +440,7 @@ namespace OpenDental {
 			g.DrawString("(Special:Tooth Grid)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
 		}
 
-		private void DrawSelectionRectangle(Graphics g,int i) {
+		private void DrawSelectionRectangle(Graphics g) {
 			if(ClickedOnBlankSpace) {
 				g.DrawRectangle(_argsDF.penSelection,
 					//The math functions are used below to account for users clicking and dragging up, down, left, or right.
