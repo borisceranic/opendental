@@ -301,6 +301,10 @@ namespace OpenDental{
 		private MenuItem menuItemDispensary;
 		private MenuItem menuItemApptTypes;
 		private DateTime _datePopupDelay;
+		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the Chart module have been changed.</summary>
+		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
+		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
+		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -2286,7 +2290,7 @@ namespace OpenDental{
 		}
 		
 		///<summary>Performs a few tasks that must be done when local data is changed.</summary>
-		private void RefreshLocalDataPostCleanup(List<int> itypeList,bool isAll,params InvalidType[] itypes) {
+		private void RefreshLocalDataPostCleanup(List<int> itypeList,bool isAll,params InvalidType[] itypes) {//This is where the flickering and reset of windows happens
 			#region IvalidType.Prefs
 			if(itypeList.Contains((int)InvalidType.Prefs) || isAll) {
 				if(PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
@@ -2340,54 +2344,58 @@ namespace OpenDental{
 					menuItemNewCropBilling.Visible=true;
 				}
 				CheckCustomReports();
-				ContrChart2.InitializeLocalData();
-				if(PrefC.GetBool(PrefName.TaskListAlwaysShowsAtBottom)) {
-					//separate if statement to prevent database call if not showing task list at bottom to begin with
-					//ComputerPref computerPref = ComputerPrefs.GetForLocalComputer();
-					if(ComputerPrefs.LocalComputer.TaskKeepListHidden) {
+				if(NeedsRedraw("ChartModule")) {
+					ContrChart2.InitializeLocalData();
+				}
+				if(NeedsRedraw("TaskLists")) {
+					if(PrefC.GetBool(PrefName.TaskListAlwaysShowsAtBottom)) {
+						//separate if statement to prevent database call if not showing task list at bottom to begin with
+						//ComputerPref computerPref = ComputerPrefs.GetForLocalComputer();
+						if(ComputerPrefs.LocalComputer.TaskKeepListHidden) {
+							userControlTasks1.Visible = false;
+						}
+						else if(this.WindowState!=FormWindowState.Minimized) {//task list show and window is not minimized.
+							userControlTasks1.Visible = true;
+							userControlTasks1.InitializeOnStartup();
+							if(ComputerPrefs.LocalComputer.TaskDock == 0) {//bottom
+								menuItemDockBottom.Checked = true;
+								menuItemDockRight.Checked = false;
+								panelSplitter.Cursor=Cursors.HSplit;
+								panelSplitter.Height=7;
+								int splitterNewY=540;
+								if(ComputerPrefs.LocalComputer.TaskY!=0) {
+									splitterNewY=ComputerPrefs.LocalComputer.TaskY;
+									if(splitterNewY<300) {
+										splitterNewY=300;//keeps it from going too high
+									}
+									if(splitterNewY>ClientSize.Height-50) {
+										splitterNewY=ClientSize.Height-panelSplitter.Height-50;//keeps it from going off the bottom edge
+									}
+								}
+								panelSplitter.Location=new Point(myOutlookBar.Width,splitterNewY);
+							}
+							else {//right
+								menuItemDockRight.Checked = true;
+								menuItemDockBottom.Checked = false;
+								panelSplitter.Cursor=Cursors.VSplit;
+								panelSplitter.Width=7;
+								int splitterNewX=900;
+								if(ComputerPrefs.LocalComputer.TaskX!=0) {
+									splitterNewX=ComputerPrefs.LocalComputer.TaskX;
+									if(splitterNewX<300) {
+										splitterNewX=300;//keeps it from going too far to the left
+									}
+									if(splitterNewX>ClientSize.Width-50) {
+										splitterNewX=ClientSize.Width-panelSplitter.Width-50;//keeps it from going off the right edge
+									}
+								}
+								panelSplitter.Location=new Point(splitterNewX,ToolBarMain.Height);
+							}
+						}
+					}
+					else {
 						userControlTasks1.Visible = false;
 					}
-					else if(this.WindowState!=FormWindowState.Minimized) {//task list show and window is not minimized.
-						userControlTasks1.Visible = true;
-						userControlTasks1.InitializeOnStartup();
-						if(ComputerPrefs.LocalComputer.TaskDock == 0) {//bottom
-							menuItemDockBottom.Checked = true;
-							menuItemDockRight.Checked = false;
-							panelSplitter.Cursor=Cursors.HSplit;
-							panelSplitter.Height=7;
-							int splitterNewY=540;
-							if(ComputerPrefs.LocalComputer.TaskY!=0) {
-								splitterNewY=ComputerPrefs.LocalComputer.TaskY;
-								if(splitterNewY<300) {
-									splitterNewY=300;//keeps it from going too high
-								}
-								if(splitterNewY>ClientSize.Height-50) {
-									splitterNewY=ClientSize.Height-panelSplitter.Height-50;//keeps it from going off the bottom edge
-								}
-							}
-							panelSplitter.Location=new Point(myOutlookBar.Width,splitterNewY);
-						}
-						else {//right
-							menuItemDockRight.Checked = true;
-							menuItemDockBottom.Checked = false;
-							panelSplitter.Cursor=Cursors.VSplit;
-							panelSplitter.Width=7;
-							int splitterNewX=900;
-							if(ComputerPrefs.LocalComputer.TaskX!=0) {
-								splitterNewX=ComputerPrefs.LocalComputer.TaskX;
-								if(splitterNewX<300) {
-									splitterNewX=300;//keeps it from going too far to the left
-								}
-								if(splitterNewX>ClientSize.Width-50) {
-									splitterNewX=ClientSize.Width-panelSplitter.Width-50;//keeps it from going off the right edge
-								}
-							}
-							panelSplitter.Location=new Point(splitterNewX,ToolBarMain.Height);
-						}
-					}
-				}
-				else {
-					userControlTasks1.Visible = false;
 				}
 				LayoutControls();
 			}
@@ -2488,7 +2496,67 @@ namespace OpenDental{
 				}
 			}
 			#endregion
+			//TODO: If there are still issues with TP refreshing, include TP prefs in needsRedraw()
 			ContrTreat2.InitializeLocalData();//easier to leave this here for now than to split it.
+			dictChartPrefsCache.Clear();
+			dictTaskListPrefsCache.Clear();
+			//Chart Drawing Prefs
+			dictChartPrefsCache.Add(PrefName.DistributorKey.ToString(),PrefC.GetBool(PrefName.DistributorKey));
+			dictChartPrefsCache.Add(PrefName.UseInternationalToothNumbers.ToString(),PrefC.GetInt(PrefName.UseInternationalToothNumbers));
+			dictChartPrefsCache.Add("GraphicsUseHardware",ComputerPrefs.LocalComputer.GraphicsUseHardware);
+			dictChartPrefsCache.Add("PreferredPixelFormatNum",ComputerPrefs.LocalComputer.PreferredPixelFormatNum);
+			dictChartPrefsCache.Add("GraphicsSimple",ComputerPrefs.LocalComputer.GraphicsSimple);
+			dictChartPrefsCache.Add(PrefName.ShowFeatureEhr.ToString(),PrefC.GetBool(PrefName.ShowFeatureEhr));
+			dictChartPrefsCache.Add("DirectXFormat",ComputerPrefs.LocalComputer.DirectXFormat);
+			//Task list drawing prefs
+			dictTaskListPrefsCache.Add("TaskDock",ComputerPrefs.LocalComputer.TaskDock);
+			dictTaskListPrefsCache.Add("TaskY",ComputerPrefs.LocalComputer.TaskY);
+			dictTaskListPrefsCache.Add("TaskX",ComputerPrefs.LocalComputer.TaskX);
+			dictTaskListPrefsCache.Add(PrefName.TaskListAlwaysShowsAtBottom.ToString(),PrefC.GetBool(PrefName.TaskListAlwaysShowsAtBottom));
+			dictTaskListPrefsCache.Add(PrefName.TasksCheckOnStartup.ToString(),PrefC.GetBool(PrefName.TasksCheckOnStartup));
+			dictTaskListPrefsCache.Add(PrefName.TasksNewTrackedByUser.ToString(),PrefC.GetBool(PrefName.TasksNewTrackedByUser));
+			dictTaskListPrefsCache.Add(PrefName.TasksShowOpenTickets.ToString(),PrefC.GetBool(PrefName.TasksShowOpenTickets));
+			dictTaskListPrefsCache.Add("TaskKeepListHidden",ComputerPrefs.LocalComputer.TaskKeepListHidden);
+		}
+
+		///<summary>Compares preferences related to sections of the program that require redraws and returns true if a redraw is necessary, false otherwise.  If anything goes wrong with checking the status of any preference this method will return true.</summary>
+		private bool NeedsRedraw(string section) {
+			try {
+				switch(section) {
+					case "ChartModule":
+						if(dictChartPrefsCache.Count==0
+							|| PrefC.GetBool(PrefName.DistributorKey)!=(bool)dictChartPrefsCache["DistributorKey"]
+							|| PrefC.GetInt(PrefName.UseInternationalToothNumbers)!=(int)dictChartPrefsCache["UseInternationalToothNumbers"]
+							|| ComputerPrefs.LocalComputer.GraphicsUseHardware!=(bool)dictChartPrefsCache["GraphicsUseHardware"]
+							|| ComputerPrefs.LocalComputer.PreferredPixelFormatNum!=(int)dictChartPrefsCache["PreferredPixelFormatNum"]
+							|| ComputerPrefs.LocalComputer.GraphicsSimple!=(DrawingMode)dictChartPrefsCache["GraphicsSimple"]
+							|| PrefC.GetBool(PrefName.ShowFeatureEhr)!=(bool)dictChartPrefsCache["ShowFeatureEhr"]
+							|| ComputerPrefs.LocalComputer.DirectXFormat!=(string)dictChartPrefsCache["DirectXFormat"]) {
+							return true;
+						}
+						break;
+					case "TaskLists":
+						if(dictTaskListPrefsCache.Count==0
+							|| ComputerPrefs.LocalComputer.TaskDock!=(int)dictTaskListPrefsCache["TaskDock"] //Checking for task list redrawing
+							|| ComputerPrefs.LocalComputer.TaskY!=(int)dictTaskListPrefsCache["TaskY"]
+							|| ComputerPrefs.LocalComputer.TaskX!=(int)dictTaskListPrefsCache["TaskX"]
+							|| PrefC.GetBool(PrefName.TaskListAlwaysShowsAtBottom)!=(bool)dictTaskListPrefsCache["TaskListAlwaysShowsAtBottom"]
+							|| PrefC.GetBool(PrefName.TasksCheckOnStartup)!=(bool)dictTaskListPrefsCache["TasksCheckOnStartup"]
+							|| PrefC.GetBool(PrefName.TasksNewTrackedByUser)!=(bool)dictTaskListPrefsCache["TasksNewTrackedByUser"]
+							|| PrefC.GetBool(PrefName.TasksShowOpenTickets)!=(bool)dictTaskListPrefsCache["TasksShowOpenTickets"]
+							|| ComputerPrefs.LocalComputer.TaskKeepListHidden!=(bool)dictTaskListPrefsCache["TaskKeepListHidden"]) {
+							return true;
+						}
+						break;
+					//case "TreatmentPlan":
+					//	//If needed implement this section
+					//	break;
+				}//end switch
+				return false;
+			}
+			catch {
+				return true;//Should never happen.  Would most likely be caused by invalid preferences within the database.
+			}
 		}
 
 		///<summary>Sets up the custom reports list in the main menu when certain requirements are met, or disables the custom reports menu item when those same conditions are not met. This function is called during initialization, and on the event that the A to Z folder usage has changed.</summary>
