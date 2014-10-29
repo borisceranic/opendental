@@ -234,6 +234,7 @@ namespace OpenDental{
 			// checkIsPrivateScreen
 			// 
 			this.checkIsPrivateScreen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsPrivateScreen.Enabled = false;
 			this.checkIsPrivateScreen.Location = new System.Drawing.Point(3, 389);
 			this.checkIsPrivateScreen.Name = "checkIsPrivateScreen";
 			this.checkIsPrivateScreen.Size = new System.Drawing.Size(155, 20);
@@ -531,7 +532,7 @@ namespace OpenDental{
 			listStatusOverride.SelectedIndex=(int)PedCur.StatusOverride;
 			textNotes.Text=PedCur.Notes;
 			textComputerName.Text=PedCur.ComputerName;
-			checkIsPrivateScreen.Checked=PedCur.IsPrivateScreen;
+			checkIsPrivateScreen.Checked=true;//we no longer capture screen shots.
 			checkIsTriageOperator.Checked=PedCur.IsTriageOperator;
 			FillGrid();
 		}
@@ -743,7 +744,7 @@ namespace OpenDental{
 			PedCur.StatusOverride=(PhoneEmpStatusOverride)listStatusOverride.SelectedIndex;
 			PedCur.Notes=textNotes.Text;
 			PedCur.ComputerName=textComputerName.Text;
-			PedCur.IsPrivateScreen=checkIsPrivateScreen.Checked;
+			PedCur.IsPrivateScreen=true;//we no longer capture screen shots.
 			PedCur.IsTriageOperator=checkIsTriageOperator.Checked;
 			if(IsNew){
 				PhoneEmpDefaults.Insert(PedCur);
