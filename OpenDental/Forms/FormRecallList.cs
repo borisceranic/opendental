@@ -1175,7 +1175,7 @@ namespace OpenDental{
 			}
 			Cursor.Current=Cursors.WaitCursor;
 			string response="";
-			Dictionary<long,string> dictRecallSchedulerURLs=new Dictionary<long,string>();
+			Dictionary<long,string> dictRecallSchedulerParameters=new Dictionary<long,string>();
 			List<long> recallNums=new List<long>();
 			//Loop through all selected patients and grab their corresponding RecallNum.
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
@@ -1242,7 +1242,7 @@ namespace OpenDental{
 			}
 			#endregion
 			//At this point we know we got a valid response from our web service.
-			dictRecallSchedulerURLs.Clear();
+			dictRecallSchedulerParameters.Clear();
 			nodeURLs=doc.GetElementsByTagName("URL");
 			if(nodeURLs!=null) {
 				//Loop through all the URL nodes that were returned.
@@ -1253,7 +1253,7 @@ namespace OpenDental{
 					if(attributeRecallNum!=null) {
 						recallNum=PIn.Long(attributeRecallNum.Value);
 					}
-					dictRecallSchedulerURLs.Add(recallNum,nodeURLs[i].InnerText);
+					dictRecallSchedulerParameters.Add(recallNum,nodeURLs[i].InnerText);
 				}
 			}
 			#endregion
@@ -1262,6 +1262,7 @@ namespace OpenDental{
 			addrTable=Recalls.GetAddrTableForRecallScheduler(recallNums,checkGroupFamilies.Checked,sortBy);
 			EmailMessage emailMessage;
 			EmailAddress emailAddress;
+			string URL="http://opendental.com";//TODO: replace with the correct URL
 			for(int i=0;i<addrTable.Rows.Count;i++) {
 				#region Send Email Notification
 				string emailBody="";
@@ -1285,9 +1286,9 @@ namespace OpenDental{
 				}
 				emailBody=emailBody.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
 				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
-				string URL="";
+				string parameters="";
 				try {
-					dictRecallSchedulerURLs.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
+					dictRecallSchedulerParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out parameters);
 				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
@@ -1295,8 +1296,16 @@ namespace OpenDental{
 					MessageBox.Show(error+Lan.g(this,"Problem getting recall scheduler URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
 					break;
 				}
-				emailBody=emailBody.Replace("[URL]",URL);
-				emailBody=emailBody.Replace("[OfficePhone]","!!TODO: OFFICE PHONE!!");
+				emailBody=emailBody.Replace("[URL]",URL+parameters);
+				string officePhone=PrefC.GetString(PrefName.PracticePhone);
+				Clinic clinic=Clinics.GetClinic(PIn.Long(addrTable.Rows[i]["clinicNum"].ToString()));
+				if(clinic!=null && !String.IsNullOrEmpty(clinic.Phone)) {
+					officePhone=clinic.Phone;
+				}
+				if(CultureInfo.CurrentCulture.Name=="en-US" && officePhone.Length==10) {
+					officePhone="("+officePhone.Substring(0,3)+")"+officePhone.Substring(3,3)+"-"+officePhone.Substring(6);
+				}
+				emailBody=emailBody.Replace("[OfficePhone]",officePhone);
 				emailMessage.BodyText=emailBody;
 				try {
 					//TODO: uncomment once done testing.
