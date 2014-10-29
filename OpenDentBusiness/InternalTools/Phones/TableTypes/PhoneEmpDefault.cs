@@ -26,7 +26,7 @@ namespace OpenDentBusiness{
 		public string Notes;
 		///<summary>This is used by the cameras.  Only necessary when the ip address doesn't match the 10.10.1.2xx pattern that we normally use.  For example, if Jordan sets this value to JORDANS, then the camera on JORDANS(.186) will send its images to the phone table where extension=104.  The second consequence is that .204 will not send any camera images.  This is used heavily by remote users working from home.  If a staff floats to another .2xx workstation, then this does not need to be set since it will match their changed extension with their current workstation ip address because if follows the normal pattern.  If there are multiple ip addresses, and the camera picks up the wrong one, setting this field can fix it.</summary>
 		public string ComputerName;
-		///<summary>Can only be used by management when handling personnel issues.</summary>
+		///<summary>Deprecated.  Always set to true because we no longer capture screen shots.</summary>
 		public bool IsPrivateScreen;
 		///<summary>Used to launch a task window instead of a commlog window when user clicks on name/phone number on the bottom left.</summary>
 		public bool IsTriageOperator;
