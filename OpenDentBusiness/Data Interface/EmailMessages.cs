@@ -203,6 +203,17 @@ namespace OpenDentBusiness{
 			return strErrors;
 		}
 
+		///<summary>Refreshes our cached copy of the public key certificate store from the Windows certificate store.</summary>
+		private static void RefreshCertStoreExternal(EmailAddress emailAddressLocal) {
+			string strSenderAddress=emailAddressLocal.EmailUsername.Trim();//Cannot be emailAddressFrom.SenderAddress, or else will not find the right encryption certificate.
+			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(strSenderAddress);
+			string strSenderDomain=strSenderAddress.Substring(strSenderAddress.IndexOf("@")+1);//For example, if strSenderAddress is ehr@opendental.com, then this will be opendental.com
+			//Refresh the directAgent class using the updated list of public certs while leaving everything else alone. This must be done, or else the certificate will not be found when encrypting the outgoing email.
+			directAgent=new Health.Direct.Agent.DirectAgent(strSenderDomain,directAgent.PrivateCertResolver,Health.Direct.Common.Certificates.SystemX509Store.OpenExternal().CreateResolver(),directAgent.TrustAnchors);
+			directAgent.EncryptMessages=true;
+			HashDirectAgents[strSenderDomain]=directAgent;
+		}
+
 		///<summary>outMsgDirect must be unencrypted, because this function will encrypt.  Encrypts the message, verifies trust, locates the public encryption key for the To address (if already stored locally), etc.
 		///patNum can be zero.  emailSentOrReceived must be either SentDirect or a Direct Ack type such as AckDirectProcessed.
 		///Returns an empty string upon success, or an error string if there were errors.  It is possible that the email was sent to some trusted recipients and not sent to untrusted recipients (in which case there would be errors but some recipients would receive successfully).</summary>
@@ -219,11 +230,7 @@ namespace OpenDentBusiness{
 				try {
 					int certNewCount=FindPublicCertForAddress(outMsgUnencrypted.Recipients[i].Address.Trim());
 					if(certNewCount!=0) {//If the certificate is already in the local public store or if one was discovered over the internet.
-						string strSenderDomain=strSenderAddress.Substring(strSenderAddress.IndexOf("@")+1);//For example, if strSenderAddress is ehr@opendental.com, then this will be opendental.com
-						//Refresh the directAgent class using the updated list of public certs while leaving everything else alone. This must be done, or else the certificate will not be found when encrypting the outgoing email.
-						directAgent=new Health.Direct.Agent.DirectAgent(strSenderDomain,directAgent.PrivateCertResolver,Health.Direct.Common.Certificates.SystemX509Store.OpenExternal().CreateResolver(),directAgent.TrustAnchors);
-						directAgent.EncryptMessages=true;
-						HashDirectAgents[strSenderDomain]=directAgent;
+						RefreshCertStoreExternal(emailAddressFrom);
 					}
 				}
 				catch(Exception ex) {
@@ -664,6 +671,42 @@ namespace OpenDentBusiness{
 			//Clear all cached DirectAgent instances to force trust anchors to reload.
 			HashDirectAgents.Clear();
 			return true;
+		}
+
+		///<summary>Throws exceptions.  The subjectSigFilePath must point to a smime.p7s file.  The subjectEmailAddress must correspond to the subject name contained inside the signature file.</summary>
+		public static void TryAddTrustForSignature(string subjectSigFilePath,string subjectEmailAddress,EmailAddress emailAddressLocal) {
+			X509Certificate2 signedCert2=null;
+			try {
+				X509Certificate signedCert1=X509Certificate2.CreateFromSignedFile(subjectSigFilePath);//This is a public encryption key.
+				signedCert2=new X509Certificate2(signedCert1);
+			}
+			catch(Exception ex) {
+				throw new Exception(Lans.g("EmailMessages","Failed to load signature file")+". "+ex.Message);
+			}
+			string subjectNameExpected="E="+subjectEmailAddress;//The E= verifies that the certificate was created for email encryption purposes, and not for another purpose, such as HTTPS in IIS.
+			if(signedCert2.SubjectName.Name.ToLower()!=subjectNameExpected.ToLower()) {
+				throw new Exception("The subject email address does not match the email address built into the signature.");
+			}
+			try {
+				Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
+				storePublicCerts.Add(signedCert2);//Write the pubic encryption certificate to the Windows certificate store.
+				Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
+				storeAnchors.Add(signedCert2);//Adds to NHINDAnchors/Certificates within the windows certificate store manager (mmc).
+			}
+			catch(Exception ex) {
+				throw new Exception(Lans.g("EmailMessages","Failed to save subject signature to public certificate store")+". "+ex.Message);
+			}
+			RefreshCertStoreExternal(emailAddressLocal);
+		}
+
+		///<summary>Sometimes an email From address will contain the person's name along with their email adress.  This function strips out the person's name if present.</summary>
+		public static string GetFromAddressSimple(string formAddress) {
+			if(formAddress.Contains("<")) {
+				int startIndex=formAddress.IndexOf("<")+1;
+				int endIndex=formAddress.IndexOf(">")-1;
+				return formAddress.Substring(startIndex,endIndex-startIndex+1);
+			}
+			return formAddress;
 		}
 
 		///<summary>Set isAddressSpecific if you need to allow/prefer domain certificates over email address specific certificates.</summary>

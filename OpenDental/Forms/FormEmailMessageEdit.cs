@@ -864,6 +864,28 @@ namespace OpenDental{
 						return;
 					}
 				}
+				else if(MessageCur.Attachments[listAttachments.SelectedIndex].DisplayedFileName.ToLower()=="smime.p7s") {
+					string fromAddress=EmailMessages.GetFromAddressSimple(MessageCur.FromAddress);
+					if(EmailMessages.IsDirectAddressTrusted(fromAddress)) {
+						MsgBox.Show(this,"This sender is currently trusted for email encryption.");
+					}
+					else {
+						string strTrustMessage=Lan.g(this,"You have clicked on the sender's encryption signature")
+							+".  "+Lan.g(this,"Adding an email address to the trusted list of addresses will enable email encryption to and from that address")
+							+".  "+Lan.g(this,"Add")+" "+MessageCur.FromAddress+" "+Lan.g(this,"to trusted addresses for email encryption")+"?";
+						if(MessageBox.Show(strTrustMessage,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
+							Cursor=Cursors.WaitCursor;
+							try {
+								EmailMessages.TryAddTrustForSignature(strFilePathAttach,fromAddress,GetEmailAddress());
+							}
+							catch(Exception ex) {
+								MessageBox.Show(Lan.g(this,"Failed to add the sender to the trusted address list")+". "+ex.Message);
+							}
+							Cursor=Cursors.Default;							
+						}
+					}
+					return;//Prevent the user from ever opening smime.p7s attachments.
+				}
 				//We have to create a copy of the file because the name is different.
 				//There is also a high probability that the attachment no longer exists if
 				//the A to Z folders are disabled, since the file will have originally been
