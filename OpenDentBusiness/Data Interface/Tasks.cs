@@ -200,7 +200,11 @@ namespace OpenDentBusiness{
 			}
 			command+=" ORDER BY DateTimeEntry";
 			DataTable table=Db.GetTable(command);
-			return TableToList(table);
+			List<Task> taskList=TableToList(table);
+			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				taskList.Sort(new TaskComparer());
+			}
+			return taskList;
 		}
 
 		///<summary>All repeating items for one date type with no heirarchy.</summary>
@@ -449,29 +453,54 @@ namespace OpenDentBusiness{
 	
 	}
 
-	
+	///<summary>Takes two tasks and compares which needs to be higher or lower based first on their coloration, then on their date.</summary>
+	public class TaskComparer:IComparer<Task> {
+		public int Compare(Task x,Task y) {
+			int xTaskColor=FindTaskColor(x);
+			int yTaskColor=FindTaskColor(y);
+			if(xTaskColor==yTaskColor) {//Case 1: Tasks have same colors, sort by date.
+				return CompareTimes(x,y);
+			}
+			else {//Case 2: Tasks have different colors, sort by priority.
+				if(xTaskColor>yTaskColor) {
+					return -1;
+				}
+				else {
+					return 1;
+				}
+			}
+		}
 
-	
+		///<summary>Figures out what the current color of the task passed is and returns an int based on color priority.  0 = white, 1 = blue, 2 = red</summary>
+		public int FindTaskColor(Task task) {
+			int taskColor=0;//Default white
+			List<TaskNote> taskNoteList=new List<TaskNote>();
+			taskNoteList=TaskNotes.GetForTask(task.TaskNum);
+			if(task.Descript.Contains("CUSTOMER")
+				|| task.Descript.Contains("DOWN")
+				|| task.Descript.Contains("URGENT")
+				|| task.Descript.Contains("CONFERENCE")
+				|| task.Descript.Contains("!!"))
+			{
+				taskColor=2;//red
+			}
+			else if(taskNoteList.Count==0 || task.Descript.Contains("@@")) 
+			{
+				taskColor=1;//blue
+			}
+			return taskColor;
+		}
 
-
+		public int CompareTimes(Task x,Task y) {
+			if(x.DateTimeEntry<y.DateTimeEntry) {
+				return -1;
+			}
+			else if(x.DateTimeEntry>y.DateTimeEntry) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
