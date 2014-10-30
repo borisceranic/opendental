@@ -2021,7 +2021,6 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				try {
 					Thread threadPreloadEhrCodeList=new Thread((ThreadStart)EhrCodes.UpdateList);//Background loading of the EHR.dll code list.
-					threadPreloadEhrCodeList.IsBackground=true;
 					threadPreloadEhrCodeList.Start();
 				}
 				catch { 
