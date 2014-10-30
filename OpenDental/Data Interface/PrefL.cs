@@ -104,6 +104,9 @@ namespace OpenDental {
 
 		///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
 		public static bool CheckProgramVersion() {
+#if DEBUG
+			return true;//Development mode never needs to check versions or copy files to other directories.  Simply return true at this point.
+#endif
 			bool downgrade=false;
 			if(PrefC.GetBool(PrefName.UpdateWindowShowsClassicView)) {
 				return CheckProgramVersionClassic();
