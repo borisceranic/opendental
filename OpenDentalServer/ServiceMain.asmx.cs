@@ -36,9 +36,10 @@ namespace OpenDentalServer {
 				if(type == typeof(DtoGetTable)) {
 					DtoGetTable dtoGetTable=(DtoGetTable)dto;
 					Userods.CheckCredentials(dtoGetTable.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetTable.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetTable.MethodName.Split('.')[1];
-					string methodName=dtoGetTable.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetTable.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -72,9 +73,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetDS)) {
 					DtoGetDS dtoGetDS=(DtoGetDS)dto;
 					Userods.CheckCredentials(dtoGetDS.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetDS.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetDS.MethodName.Split('.')[1];
-					string methodName=dtoGetDS.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetDS.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -99,9 +101,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetLong)) {
 					DtoGetLong dtoGetLong=(DtoGetLong)dto;
 					Userods.CheckCredentials(dtoGetLong.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetLong.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetLong.MethodName.Split('.')[1];
-					string methodName=dtoGetLong.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetLong.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -125,9 +128,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetInt)) {
 					DtoGetInt dtoGetInt=(DtoGetInt)dto;
 					Userods.CheckCredentials(dtoGetInt.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetInt.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetInt.MethodName.Split('.')[1];
-					string methodName=dtoGetInt.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetInt.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -151,9 +155,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetVoid)) {
 					DtoGetVoid dtoGetVoid=(DtoGetVoid)dto;
 					Userods.CheckCredentials(dtoGetVoid.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetVoid.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetVoid.MethodName.Split('.')[1];
-					string methodName=dtoGetVoid.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetVoid.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -176,9 +181,10 @@ namespace OpenDentalServer {
 				}
 				else if(type == typeof(DtoGetObject)) {
 					DtoGetObject dtoGetObject=(DtoGetObject)dto;
-					string assemblyName=dtoGetObject.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetObject.MethodName.Split('.')[1];
-					string methodName=dtoGetObject.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetObject.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					if(className != "Security" || methodName != "LogInWeb") {//because credentials will be checked inside that method
 						Userods.CheckCredentials(dtoGetObject.Credentials);//will throw exception if fails.
 					}
@@ -214,9 +220,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetString)) {
 					DtoGetString dtoGetString=(DtoGetString)dto;
 					Userods.CheckCredentials(dtoGetString.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetString.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetString.MethodName.Split('.')[1];
-					string methodName=dtoGetString.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetString.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -242,9 +249,10 @@ namespace OpenDentalServer {
 				else if(type == typeof(DtoGetBool)) {
 					DtoGetBool dtoGetBool=(DtoGetBool)dto;
 					Userods.CheckCredentials(dtoGetBool.Credentials);//will throw exception if fails.
-					string assemblyName=dtoGetBool.MethodName.Split('.')[0];//OpenDentBusiness or else a plugin name
-					string className=dtoGetBool.MethodName.Split('.')[1];
-					string methodName=dtoGetBool.MethodName.Split('.')[2];
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetBool.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
 					Type classType=null;
 					Assembly ass=Plugins.GetAssembly(assemblyName);
 					if(ass==null) {
@@ -279,6 +287,14 @@ namespace OpenDentalServer {
 				}
 				return exception.Serialize();
 			}
+		}
+
+		///<summary>Helper function to handle full method name with 2 components or 3 components.  Versions prior to 14.3 will send 2 components.  14.3 and above will send the assembly name OpenDentBusiness or plugin assembly name.  If only 2 components are received, we will prepend OpenDentBusiness so this will be backward compatible with versions prior to 14.3.</summary>
+		private string[] GetComponentsFromDtoMeth(string methodName) {
+			if(methodName.Split('.').Length==2) {
+				methodName="OpenDentBusiness."+methodName;
+			}
+			return methodName.Split('.');
 		}
 
 		
