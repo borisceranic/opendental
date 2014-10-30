@@ -88,7 +88,8 @@ namespace OpenDental {
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,CASE WHEN ResultCode='000' OR ResultCode='010' THEN Amount ELSE Amount=0 END AS Amount "
 				+"FROM xchargetransaction "
-				+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart);
+				+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
+				+"AND TransType!='CCVoid'";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();
@@ -114,7 +115,7 @@ namespace OpenDental {
 			report.Query="SET @pos=0; "
 				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt,PayType "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
-				+"WHERE PayType="+paymentType+" AND (DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
+				+"WHERE PayType="+paymentType+" AND (PayDate BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
 				+"ORDER BY Count ASC";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
