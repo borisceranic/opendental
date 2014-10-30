@@ -12,32 +12,37 @@ namespace OpenDentBusiness {
 
 		///<summary>A list of all EhrCodes.</summary>
 		private static List<EhrCode> listt;
+		private static object lockListt=new object();
 
 		///<summary>A list of all EhrCodes.</summary>
 		public static List<EhrCode> Listt {
 			get {
-				if(listt==null) {//instead of refreshing the cache using the normal pattern we must retrieve the cache from the EHR.dll. No call to DB.
-					object ObjEhrCodeList;
-					Assembly AssemblyEHR;
-					string dllPathEHR=CodeBase.ODFileUtils.CombinePaths(System.Windows.Forms.Application.StartupPath,"EHR.dll");
-					ObjEhrCodeList=null;
-					AssemblyEHR=null;
-					if(System.IO.File.Exists(dllPathEHR)) {//EHR.dll is available, so load it up
-						AssemblyEHR=Assembly.LoadFile(dllPathEHR);
-						Type type=AssemblyEHR.GetType("EHR.EhrCodeList");//namespace.class
-						ObjEhrCodeList=Activator.CreateInstance(type);
-						object[] args=null;
-						listt=Crud.EhrCodeCrud.TableToList((DataTable)type.InvokeMember("GetListt",System.Reflection.BindingFlags.InvokeMethod,null,ObjEhrCodeList,args));
+				lock(lockListt) {
+					if(listt==null) {//instead of refreshing the cache using the normal pattern we must retrieve the cache from the EHR.dll. No call to DB.
+						object ObjEhrCodeList;
+						Assembly AssemblyEHR;
+						string dllPathEHR=CodeBase.ODFileUtils.CombinePaths(System.Windows.Forms.Application.StartupPath,"EHR.dll");
+						ObjEhrCodeList=null;
+						AssemblyEHR=null;
+						if(System.IO.File.Exists(dllPathEHR)) {//EHR.dll is available, so load it up
+							AssemblyEHR=Assembly.LoadFile(dllPathEHR);
+							Type type=AssemblyEHR.GetType("EHR.EhrCodeList");//namespace.class
+							ObjEhrCodeList=Activator.CreateInstance(type);
+							object[] args=null;
+							listt=Crud.EhrCodeCrud.TableToList((DataTable)type.InvokeMember("GetListt",System.Reflection.BindingFlags.InvokeMethod,null,ObjEhrCodeList,args));
+						}
+						else {//no EHR.dll. "Return" empty list.
+							listt=new List<EhrCode>();
+						}
+						updateCodeExistsHelper();
 					}
-					else {//no EHR.dll. "Return" empty list.
-						listt=new List<EhrCode>();
-					}
-					updateCodeExistsHelper();
+					return listt;
 				}
-				return listt;
 			}
 			set {
-				listt=value;
+				lock(lockListt) {
+					listt=value;
+				}
 			}
 		}
 
