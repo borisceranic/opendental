@@ -23,8 +23,8 @@ namespace OpenDental {
 		private static Margins _printMargin=new Margins(0,0,40,60);
 		///<summary>If not a batch, then there will just be one sheet in the list.</summary>
 		private static List<Sheet> _sheetList;
-		///<summary>Used to force old single page behavior. Used for labels.</summary>
-		private static bool _forceSinglePage;
+		/////<summary>Used to force old single page behavior. Used for labels.</summary>
+		//private static bool _forceSinglePage;
 
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch){
@@ -56,9 +56,9 @@ namespace OpenDental {
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
-					SetForceSinglePage(s);
+					//SetForceSinglePage(s);
 					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)));
-					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+					pageCount+=Sheets.CalculatePageCount(s,_printMargin);
 				}
 				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
 				printPreview.ShowDialog();
@@ -120,7 +120,7 @@ namespace OpenDental {
 					pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height);
 				}
 			}
-			SetForceSinglePage(sheet);
+			//SetForceSinglePage(sheet);
 			PrintSituation sit=PrintSituation.Default;
 			pd.DefaultPageSettings.Landscape=sheet.IsLandscape;
 			switch(sheet.SheetType){
@@ -148,8 +148,8 @@ namespace OpenDental {
 				FormPrintPreview printPreview;
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
-					SetForceSinglePage(s);
-					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+					//SetForceSinglePage(s);
+					pageCount+=Sheets.CalculatePageCount(s,_printMargin);
 				}
 				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 				printPreview.ShowDialog();
@@ -175,42 +175,14 @@ namespace OpenDental {
 			#endif
 		}
 
-		private static void SetForceSinglePage(Sheet sheet) {
-			if(!sheet.IsMultiPage) {
-				_forceSinglePage=true;
-				return;
-			}
-			switch(sheet.SheetType) {
-				case SheetTypeEnum.DepositSlip:
-				case SheetTypeEnum.LabelAppointment:
-				case SheetTypeEnum.LabelPatient:
-				case SheetTypeEnum.LabelCarrier:
-				case SheetTypeEnum.LabelReferral:
-				case SheetTypeEnum.Rx:
-					_forceSinglePage=true;
-					break;
-				//case SheetTypeEnum.Consent:
-				//case SheetTypeEnum.ExamSheet:
-				//case SheetTypeEnum.MedicalHistory:
-				//case SheetTypeEnum.PatientForm:
-				//case SheetTypeEnum.PatientLetter:
-				//case SheetTypeEnum.ReferralLetter:
-				//case SheetTypeEnum.ReferralSlip:
-				//case SheetTypeEnum.RoutingSlip:
-				//case SheetTypeEnum.LabSlip:
-				default:
-					_forceSinglePage=false;
-					break;
-			}
-		}
-
 		private static void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Graphics g=e.Graphics;
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
+			Sheets.SetPageMargin(sheet,_printMargin);
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
 			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);//should always be sorted.
-			SetForceSinglePage(sheet);
+			//SetForceSinglePage(sheet);
 			Font font;
 			FontStyle fontstyle;
 			//first, draw images------------------------------------------------------------------------------------
@@ -222,7 +194,7 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.Drawing) {
@@ -244,7 +216,7 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			Pen pen2=new Pen(Brushes.Black,1f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType==SheetFieldType.Rectangle) {
@@ -260,7 +232,7 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.InputField
@@ -283,7 +255,7 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			Pen pen3=new Pen(Brushes.Black,1.6f);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.CheckBox) {
@@ -296,7 +268,7 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.SigBox) {
@@ -320,15 +292,16 @@ namespace OpenDental {
 				Bitmap sigBitmap=wrapper.GetSigImage();
 				g.DrawImage(sigBitmap,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
 			}
+			#if DEBUG
+				//drawCalibration(sheet,g,e,null,null);//draw calibration under header/footer.
+			#endif
 			drawHeader(sheet,g,null);
 			drawFooter(sheet,g,null);
-			if(!_forceSinglePage) {
-				//Set the _yPosPrint for the next page
-				_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
-				_pagesPrinted++;
-			}
+			//Set the _yPosPrint for the next page
+			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
+			_pagesPrinted++;
 			g.Dispose();
-			if(!_forceSinglePage && _pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
+			if(_pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
@@ -372,14 +345,124 @@ namespace OpenDental {
 				gx.DrawRectangle(XPens.White,Brushes.White,p(0),p(sheet.HeightPage-_printMargin.Bottom),p(sheet.WidthPage),p(sheet.HeightPage));
 			}
 		}
+
+		private static void drawCalibration(Sheet sheet,Graphics g,PrintPageEventArgs e,XGraphics gx,PdfPage page) {
+			Font font=new Font("Calibri",10f,FontStyle.Regular);
+			XFont xfont=new XFont("Calibri",p(10f),XFontStyle.Regular);
+			int sLineSize=15;
+			int mLineSize=45;
+			int lLineSize=90;
+			for(int pass=0;pass<3;pass++) {
+				int xO=0;//xOrigin
+				int yO=0;//yOrigin
+				switch(pass) {
+					case 0: xO=yO=0; break;
+					case 1: xO=sheet.WidthPage/2; yO=sheet.HeightPage/2; break;
+					case 2: xO=sheet.WidthPage; yO=sheet.HeightPage; break;
+				}
+				for(int i=-100;i<2000;i++) {
+					if(i%100==0 && pass==0) {
+						//label Axis
+						if(g!=null) {
+							if(i==0) {
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(4,4));//label 0
+							}//don't draw the zero twice
+							else {
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(xO+75,i+2));//label Y-axis
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(i+2,yO+75));//label X-axis
+							}
+						}
+						else {
+							if(i==0) {
+
+							}//don't draw the zero twice
+							else {
+								gx.DrawString(i.ToString(),xfont,XBrushes.Black,p(xO+75),p(i+2));//label Y-axis
+								gx.DrawString(i.ToString(),xfont,XBrushes.Black,p(i+2),p(yO+75));//label X-axis
+							}
+						}
+					}
+					if(i%100==0) {
+						//draw large lines and label txt
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-lLineSize+xO,i),new Point(+lLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-lLineSize+yO),new Point(i,+lLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-lLineSize+xO),p(i),p(+lLineSize+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-lLineSize+yO),p(i),p(+lLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%50==0) {
+						//draw 50px lines
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-mLineSize+xO,i),new Point(+mLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-mLineSize+yO),new Point(i,+mLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-mLineSize+xO),p(i),p(+mLineSize+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-mLineSize+yO),p(i),p(+mLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%10==0) {
+						//draw small lines
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-sLineSize+xO,i),new Point(+sLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-sLineSize+yO),new Point(i,+sLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,new Point(-sLineSize+xO,i),new Point(+sLineSize+xO,i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-sLineSize+yO),p(i),p(+sLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%2==0) {
+						//draw dots
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-1+xO,i),new Point(+1+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-1+yO),new Point(i,+1+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-1+xO),p(i),p(+1+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-1+yO),p(i),p(+1+yO));//Allong X-axis
+						}
+					}
+				}//end i -100=>2000
+			}//end pass
+			//infoBlock
+			PrinterSettings settings = new PrinterSettings();
+			if(g!=null) {
+				g.FillRectangle(Brushes.White,110,110,480,100);
+				g.DrawRectangle(Pens.Black,110,110,480,100);
+				g.DrawString("Sheet Height = "+sheet.HeightPage.ToString(),font,Brushes.Black,112,112);
+				g.DrawString("Sheet Width = "+sheet.WidthPage.ToString(),font,Brushes.Black,112,124);//12px per line
+				g.DrawString("DefaultPrinter = "+settings.PrinterName,font,Brushes.Black,112,136);
+				g.DrawString("HardMarginX = "+e.PageSettings.HardMarginX,font,Brushes.Black,112,148);
+				g.DrawString("HardMarginY = "+e.PageSettings.HardMarginY,font,Brushes.Black,112,160);
+			}
+			else {
+				gx.DrawRectangle(XPens.Black,Brushes.White,p(110),p(110),p(480),p(100));
+				gx.DrawRectangle(XPens.Black,p(110),p(110),p(480),p(100));
+				gx.DrawString("Sheet Height = "+sheet.HeightPage.ToString(),xfont,XBrushes.Black,p(112),p(112));
+				gx.DrawString("Sheet Width = "+sheet.WidthPage.ToString(),xfont,XBrushes.Black,p(112),p(124));//12px per line
+				gx.DrawString("DefaultPrinter = "+settings.PrinterName,xfont,XBrushes.Black,p(112),p(136));
+				gx.DrawString("HardMarginX = "+settings.DefaultPageSettings.HardMarginX,xfont,XBrushes.Black,p(112),p(148));
+				gx.DrawString("HardMarginY = "+settings.DefaultPageSettings.HardMarginY,xfont,XBrushes.Black,p(112),p(160));
+				gx.DrawString("PDF TrimMargins ^v<> = "+page.TrimMargins.Top+","+page.TrimMargins.Bottom+","+page.TrimMargins.Left+","+page.TrimMargins.Right,xfont,XBrushes.Black,p(112),p(172));
+			}
+			font.Dispose();
+			font=null;
+			xfont=null;
+			GC.Collect();
+		}
 		#endregion
 
 		public static void CreatePdf(Sheet sheet,string fullFileName) {
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
-			SetForceSinglePage(sheet);
-			int pageCount=(_forceSinglePage?1:Sheets.CalculatePageCount(sheet,_printMargin));
+			//SetForceSinglePage(sheet);
+			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			for(int i=0;i<pageCount;i++) {
+				_pagesPrinted=i;
 				PdfPage page=document.AddPage();
 				CreatePdfPage(sheet,page);
 			}
@@ -392,6 +475,7 @@ namespace OpenDental {
 			if(sheet.IsLandscape){
 				page.Orientation=PageOrientation.Landscape;
 			}
+			Sheets.SetPageMargin(sheet,_printMargin);
 			XGraphics g=XGraphics.FromPdfPage(page);
 			g.SmoothingMode=XSmoothingMode.HighQuality;
 			//g.PageUnit=XGraphicsUnit. //wish they had pixel
@@ -411,7 +495,7 @@ namespace OpenDental {
 			Point point;
 			string[] xy;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.Drawing){
@@ -433,7 +517,7 @@ namespace OpenDental {
 			//then, rectangles and lines----------------------------------------------------------------------------------
 			XPen pen2=new XPen(XColors.Black,p(1));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType==SheetFieldType.Rectangle){
@@ -449,7 +533,7 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.InputField
@@ -475,7 +559,7 @@ namespace OpenDental {
 			//then, checkboxes----------------------------------------------------------------------------------
 			XPen pen3=new XPen(XColors.Black,p(1.6f));
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.CheckBox){
@@ -488,7 +572,7 @@ namespace OpenDental {
 			}
 			//then signature boxes----------------------------------------------------------------------
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				if(field.FieldType!=SheetFieldType.SigBox){
@@ -511,9 +595,6 @@ namespace OpenDental {
 				}
 				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
 				g.DrawImage(sigBitmap,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
-			}
-			if(_forceSinglePage) {
-				return;
 			}
 			drawHeader(sheet,null,g);
 			drawFooter(sheet,null,g);
@@ -548,11 +629,11 @@ namespace OpenDental {
 			GC.Collect();
 			Bitmap bmpOriginal=null;
 			Bitmap bmpDraw=null;
-			if(drawAll || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
+			if(drawAll || Sheets.SheetTypeIsSinglePage(sheet.SheetType)) {//reset _yPosPrint because we are drawing all.
 				_yPosPrint=0;
 			}
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				#region Get the path for the image

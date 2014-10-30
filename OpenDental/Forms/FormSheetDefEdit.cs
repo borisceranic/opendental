@@ -90,6 +90,7 @@ namespace OpenDental {
 				butOK.Visible=false;
 				butCancel.Text=Lan.g(this,"Close");
 				groupAddNew.Visible=false;
+				groupPage.Visible=false;
 				butAlignLeft.Visible=false;
 				butAlignTop.Visible=false;
 				linkLabelTips.Visible=false;
@@ -103,6 +104,9 @@ namespace OpenDental {
 				//butAlignTop.Visible=true;
 				//butCopy.Visible=true;
 				//butPaste.Visible=true;
+			}
+			if(Sheets.SheetTypeIsSinglePage(SheetDefCur.SheetType)) {
+				groupPage.Visible=false;
 			}
 			if(SheetDefCur.SheetType==SheetTypeEnum.DepositSlip
 				|| SheetDefCur.SheetType==SheetTypeEnum.LabelCarrier) 
@@ -577,7 +581,7 @@ namespace OpenDental {
 				panelMain.Width=SheetDefCur.Width;
 				panelMain.Height=SheetDefCur.Height;
 			}
-			panelMain.Height=SheetDefCur.HeightTotal;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			FillFieldList();
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
@@ -1555,28 +1559,28 @@ namespace OpenDental {
 				return;
 			}
 			SheetDefCur.PageCount++;
-			SheetDefCur.IsMultiPage=true;
-			panelMain.Height=SheetDefCur.HeightTotal;
+			//SheetDefCur.IsMultiPage=true;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
 		}
 
 		private void butPageRemove_Click(object sender,EventArgs e) {
 			if(SheetDefCur.PageCount<2) {
-				SheetDefCur.IsMultiPage=false;
+				//SheetDefCur.IsMultiPage=false;
 				//Minimum PageCount 1
 				return;
 			}
 			SheetDefCur.PageCount--;
 			if(SheetDefCur.PageCount==1) {
-				SheetDefCur.IsMultiPage=false;
+				//SheetDefCur.IsMultiPage=false;
 			}
 			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) {//Find all fields that have a YPos greater than the bottom of the page.
 				MsgBox.Show(this,"Cannot remove pages that contain sheet fields.");
 				SheetDefCur.PageCount++;
 				return;
 			}
-			panelMain.Height=SheetDefCur.HeightTotal;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
 		}

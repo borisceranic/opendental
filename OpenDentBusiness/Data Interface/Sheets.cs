@@ -427,6 +427,10 @@ namespace OpenDentBusiness{
 			if(sheet.HeightLastField<sheet.HeightPage) {
 				return 1;//if all of the fields are less than one page, even if some of the fields fall within the margin of the first page.
 			}
+			if(SheetTypeIsSinglePage(sheet.SheetType)) {
+				return 1;//labels and RX forms are always single pages
+			}
+			SetPageMargin(sheet,m);
 			int pageCount=1;
 			int printableHeightPerPage=(sheet.HeightPage-(m.Top+m.Bottom));
 			if(printableHeightPerPage<1) {
@@ -441,7 +445,36 @@ namespace OpenDentBusiness{
 			pageCount=Math.Max(pageCount,1);//minimum of at least one page.
 			return pageCount;
 		}
-		
+
+		public static void SetPageMargin(Sheet sheet,System.Drawing.Printing.Margins m) {
+			if(SheetTypeIsSinglePage(sheet.SheetType)) {
+				m=new System.Drawing.Printing.Margins(0,0,0,0);
+				return;
+			}
+		}
+
+		public static bool SheetTypeIsSinglePage(SheetTypeEnum sheetType) {
+			switch(sheetType) {
+				case SheetTypeEnum.LabelPatient:
+				case SheetTypeEnum.LabelCarrier:
+				case SheetTypeEnum.LabelReferral:
+				//case SheetTypeEnum.ReferralSlip:
+				case SheetTypeEnum.LabelAppointment:
+				case SheetTypeEnum.Rx:
+				//case SheetTypeEnum.Consent:
+				//case SheetTypeEnum.PatientLetter:
+				//case SheetTypeEnum.ReferralLetter:
+				//case SheetTypeEnum.PatientForm:
+				//case SheetTypeEnum.RoutingSlip:
+				//case SheetTypeEnum.MedicalHistory:
+				//case SheetTypeEnum.LabSlip:
+				//case SheetTypeEnum.ExamSheet:
+				case SheetTypeEnum.DepositSlip:
+					return true;
+			}
+			return false;
+		}
+
 
 		
 
