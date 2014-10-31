@@ -334,6 +334,7 @@ namespace OpenDentBusiness {
 		PregnancyDefaultCodeSystem,
 		///<summary>FK to diseasedef.DiseaseDefNum</summary>
 		ProblemsIndicateNone,
+		ProblemListIsAlpabetical,
 		///<summary>In FormProcCodes, this is the default for the ShowHidden checkbox.</summary>
 		ProcCodeListShowHidden,
 		ProcLockingIsAllowed,

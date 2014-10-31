@@ -48,6 +48,26 @@ namespace OpenDentBusiness {
 			return table;
 		}
 
+		///<summary>Fixes item orders in DB if needed. Returns true if changes were made.</summary>
+		public static bool FixItemOrders() {
+			bool retVal=false;
+			List<DiseaseDef> listDD=new List<DiseaseDef>();
+			listDD.AddRange(ListLong);
+			listDD.Sort(DiseaseDefs.SortItemOrder);
+			for(int i=0;i<listDD.Count;i++) {
+				if(listDD[i].ItemOrder==i) {
+					continue;
+				}
+				listDD[i].ItemOrder=i;
+				DiseaseDefs.Update(listDD[i]);
+				retVal=true;
+			}
+			if(retVal) {
+				DiseaseDefs.RefreshCache();
+			}
+			return retVal;
+		}
+
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
@@ -76,7 +96,22 @@ namespace OpenDentBusiness {
 				def.DiseaseDefNum=Meth.GetLong(MethodBase.GetCurrentMethod(),def);
 				return def.DiseaseDefNum;
 			}
-			return Crud.DiseaseDefCrud.Insert(def);
+			long retVal=Crud.DiseaseDefCrud.Insert(def);
+			if(!PrefC.GetBool(PrefName.ProblemListIsAlpabetical)){
+				//Not alphabetizing problem list, just return inserted index.
+				return retVal;
+			}
+			//ProblemListIsAlpabetical==TRUE
+			def.DiseaseDefNum=retVal;
+			List<DiseaseDef> listDD=new List<DiseaseDef>();
+			listDD.AddRange(ListLong);
+			listDD.Add(def);
+			listDD.Sort(DiseaseDefs.SortAlphabetically);
+			def.ItemOrder=listDD.IndexOf(def);
+			string command="UPDATE diseasedef SET ItemOrder=ItemOrder+1 WHERE ItemOrder>="+POut.Int(def.ItemOrder);
+			Db.NonQ(command);
+			DiseaseDefs.Update(def);//Updates item order.
+			return retVal;
 		}
 
 		///<summary>Surround with try/catch, because it will throw an exception if any patient is using this def.</summary>
@@ -144,8 +179,23 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
+		///<summary>Irreversibly alphabetizes diseasedefs in the DB. Up to 5 seconds first time it is run on large DB on large databases, surround with Cursors.Wait.</summary>
+		public static void AlphabetizeDB() {
+			List<DiseaseDef> listDD=new List<DiseaseDef>();
+			listDD.AddRange(ListLong);
+			listDD.Sort(DiseaseDefs.SortAlphabetically);
+			for(int i=0;i<listDD.Count;i++) {
+				if(listDD[i].ItemOrder==i) {
+					continue;
+				}
+				listDD[i].ItemOrder=i;
+				DiseaseDefs.Update(listDD[i]);
+			}
+			RefreshCache();
+		}
+
 		///<summary>Moves the selected item up in the listLong.</summary>
-		public static void MoveUp(int selected){
+		public static void MoveUp(int selected) {
 			//No need to check RemotingRole; no call to db.
 			if(selected<0) {
 				throw new ApplicationException(Lans.g("DiseaseDefs","Please select an item first."));
@@ -398,6 +448,22 @@ namespace OpenDentBusiness {
 			}
 			return retval;
 		}
+
+		///<summary>Sorts alphabetically by DiseaseName, then by PK.</summary>
+		public static int SortAlphabetically(DiseaseDef x,DiseaseDef y) {
+			if(x.DiseaseName!=y.DiseaseName) {
+				return x.DiseaseName.CompareTo(y.DiseaseName);
+			}
+			return x.DiseaseDefNum.CompareTo(y.DiseaseDefNum);
+		}
+
+		public static int SortItemOrder(DiseaseDef x,DiseaseDef y) {
+			if(x.ItemOrder!=y.ItemOrder) {
+				return x.ItemOrder.CompareTo(y.ItemOrder);
+			}
+			return x.DiseaseDefNum.CompareTo(y.DiseaseDefNum);
+		}
+
 
 		/*public static DiseaseDef GetByICD9Code(string ICD9Code) {///<summary>Returns the diseasedef that has a name exactly matching the specified string. Returns null if no match.  Does not match hidden diseases.</summary>
 			//No need to check RemotingRole; no call to db.

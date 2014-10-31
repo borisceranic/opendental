@@ -29,6 +29,7 @@ namespace OpenDental{
 		public List<long> SelectedDiseaseDefNums;
 		private ODGrid gridMain;
 		private bool IsChanged;
+		private CheckBox checkAlpha;
 		///<summary>A complete list of disease defs including hidden.  Only used when not in selection mode (item orders can change).  It's main purpose is to keep track of the item order for the life of the window so that we do not have to make unnecessary update calls to the database every time the up and down buttons are clicked.</summary>
 		private List<DiseaseDef> _listDiseaseDefs;
 
@@ -74,6 +75,7 @@ namespace OpenDental{
 			this.butUp = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
+			this.checkAlpha = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -181,10 +183,22 @@ namespace OpenDental{
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
+			// checkIns
+			// 
+			this.checkAlpha.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAlpha.Location = new System.Drawing.Point(441,11);
+			this.checkAlpha.Name = "checkIns";
+			this.checkAlpha.Size = new System.Drawing.Size(222,18);
+			this.checkAlpha.TabIndex = 18;
+			this.checkAlpha.Text = "Keep problem list alphabetized";
+			this.checkAlpha.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAlpha.CheckedChanged += new System.EventHandler(this.checkAlpha_CheckedChanged);
+			// 
 			// FormDiseaseDefs
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(682, 675);
+			this.Controls.Add(this.checkAlpha);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butDown);
@@ -207,10 +221,15 @@ namespace OpenDental{
 		#endregion
 
 		private void FormDiseaseDefs_Load(object sender, System.EventArgs e) {
+			if(DiseaseDefs.FixItemOrders()) {
+				DataValid.SetInvalid(InvalidType.Diseases);
+			}
+			//checkProcLockingIsAllowed.Checked=PrefC.GetBool(PrefName.ProcLockingIsAllowed);
 			if(IsSelectionMode){
 				butClose.Text=Lan.g(this,"Cancel");
 				butDown.Visible=false;
 				butUp.Visible=false;
+				checkAlpha.Visible=false;
 				if(IsMultiSelect) {
 					gridMain.SelectionMode=GridSelectionMode.MultiExtended;
 				}
@@ -218,47 +237,54 @@ namespace OpenDental{
 			else{
 				butOK.Visible=false;
 			}
-			RefreshList();
+			checkAlpha.Checked=PrefC.GetBool(PrefName.ProblemListIsAlpabetical);
+			if(PrefC.GetBool(PrefName.ProblemListIsAlpabetical)) {
+				butUp.Visible=false;
+				butDown.Visible=false;
+			}
+			_listDiseaseDefs=new List<DiseaseDef>();
+			_listDiseaseDefs.AddRange(DiseaseDefs.ListLong);
+			//RefreshList();
 			FillGrid();
 		}
 
-		///<summary>Simply fills and orders the list of disease defs.  Can be called at any time.</summary>
-		private void RefreshList() {
-			//We need to keep track of the current item orders.
-			Dictionary<long,int> _dictItemOrder=new Dictionary<long,int>();
-			if(_listDiseaseDefs!=null) {
-				for(int i=0;i<_listDiseaseDefs.Count;i++) {
-					_dictItemOrder.Add(_listDiseaseDefs[i].DiseaseDefNum,i);
-				}
-			}
-			//When the cache is refreshed, the item orders and what items are present in the list could have changed.  E.g. deleted, added, or have old ordering.
-			DiseaseDefs.RefreshCache();
-			if(_listDiseaseDefs==null) {//The first time loading the window this list will be null so we simply need to fill it and trust that it is already in the correct order.
-				_listDiseaseDefs=new List<DiseaseDef>(DiseaseDefs.ListLong);
-				return;
-			}
-			//At this point we don't know if the user changed the order of the list and then deleted or added a disease def.  
-			//Therefore we have to use our dictionary of the "old" item orders and reorder the list from the cache.
-			_listDiseaseDefs=new List<DiseaseDef>();
-			for(int j=0;j<_dictItemOrder.Count;j++) {
-				//Find the matching disease def and force it into the order that it was last in.
-				for(int k=0;k<DiseaseDefs.ListLong.Length;k++) {
-					if(_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[k].DiseaseDefNum)
-						&& _dictItemOrder[DiseaseDefs.ListLong[k].DiseaseDefNum]==j) 
-					{
-						_listDiseaseDefs.Add(DiseaseDefs.ListLong[k]);
-						break;
-					}
-					//If no disease def match is found, then that means the user has deleted the disease def and it will not get added to _listDiseaseDefs.
-				}
-			}
-			//Now we need to add any new disease defs (only one can be added at a time but should work for multiple if it is enhanced in the future) to the end of _listDiseasesDefs.
-			for(int i=0;i<DiseaseDefs.ListLong.Length;i++) {
-				if(!_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[i].DiseaseDefNum)) {
-					_listDiseaseDefs.Add(DiseaseDefs.ListLong[i]);
-				}
-			}
-		}
+		/////<summary>Simply fills and orders the list of disease defs.  Can be called at any time.</summary>
+		//private void RefreshListOld() {
+		//	//We need to keep track of the current item orders.
+		//	Dictionary<long,int> _dictItemOrder=new Dictionary<long,int>();
+		//	if(_listDiseaseDefs!=null) {
+		//		for(int i=0;i<_listDiseaseDefs.Count;i++) {
+		//			_dictItemOrder.Add(_listDiseaseDefs[i].DiseaseDefNum,i);
+		//		}
+		//	}
+		//	//When the cache is refreshed, the item orders and what items are present in the list could have changed.  E.g. deleted, added, or have old ordering.
+		//	DiseaseDefs.RefreshCache();
+		//	if(_listDiseaseDefs==null) {//The first time loading the window this list will be null so we simply need to fill it and trust that it is already in the correct order.
+		//		_listDiseaseDefs=new List<DiseaseDef>(DiseaseDefs.ListLong);
+		//		return;
+		//	}
+		//	//At this point we don't know if the user changed the order of the list and then deleted or added a disease def.  
+		//	//Therefore we have to use our dictionary of the "old" item orders and reorder the list from the cache.
+		//	_listDiseaseDefs=new List<DiseaseDef>();
+		//	for(int j=0;j<_dictItemOrder.Count;j++) {
+		//		//Find the matching disease def and force it into the order that it was last in.
+		//		for(int k=0;k<DiseaseDefs.ListLong.Length;k++) {
+		//			if(_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[k].DiseaseDefNum)
+		//				&& _dictItemOrder[DiseaseDefs.ListLong[k].DiseaseDefNum]==j) 
+		//			{
+		//				_listDiseaseDefs.Add(DiseaseDefs.ListLong[k]);
+		//				break;
+		//			}
+		//			//If no disease def match is found, then that means the user has deleted the disease def and it will not get added to _listDiseaseDefs.
+		//		}
+		//	}
+		//	//Now we need to add any new disease defs (only one can be added at a time but should work for multiple if it is enhanced in the future) to the end of _listDiseasesDefs.
+		//	for(int i=0;i<DiseaseDefs.ListLong.Length;i++) {
+		//		if(!_dictItemOrder.ContainsKey(DiseaseDefs.ListLong[i].DiseaseDefNum)) {
+		//			_listDiseaseDefs.Add(DiseaseDefs.ListLong[i]);
+		//		}
+		//	}
+		//}
 
 		private void FillGrid() {
 			//listMain.SelectionMode=SelectionMode.MultiExtended;
@@ -334,7 +360,7 @@ namespace OpenDental{
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			RefreshList();
+			//RefreshList();
 			IsChanged=true;
 			FillGrid();
 		}
@@ -345,15 +371,51 @@ namespace OpenDental{
 			}
 			DiseaseDef def=new DiseaseDef();
 			def.ItemOrder=_listDiseaseDefs.Count;
-			FormDiseaseDefEdit FormD=new FormDiseaseDefEdit(def);
+			FormDiseaseDefEdit FormD=new FormDiseaseDefEdit(def);//also sets ItemOrder correctly if using alphabetical during the insert diseaseDef call.
 			FormD.IsNew=true;
 			FormD.ShowDialog();
 			//Security log entry made inside that form.
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			RefreshList();
+			//Items are already in the right order in the DB, re-order in memory list to match
+			for(int i=0;i<_listDiseaseDefs.Count;i++) {
+				if(_listDiseaseDefs[i].ItemOrder>=def.ItemOrder) {
+					_listDiseaseDefs[i].ItemOrder++;
+				}
+			}
+			_listDiseaseDefs.Add(def);
+			_listDiseaseDefs.Sort(DiseaseDefs.SortItemOrder);
+			//RefreshList();
 			IsChanged=true;
+			FillGrid();
+		}
+
+		private void checkAlpha_CheckedChanged(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.ProblemListIsAlpabetical)==checkAlpha.Checked) {
+				return;//when loading form.
+			}
+			if(!checkAlpha.Checked) {
+				butUp.Visible=true;
+				butDown.Visible=true;
+				Prefs.UpdateBool(PrefName.ProblemListIsAlpabetical,checkAlpha.Checked);
+				return;//turned off alphabetizing
+			}
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Problems will be reordered, this cannot be undone.")) {
+				checkAlpha.Checked=false;
+				return;
+			}
+			Prefs.UpdateBool(PrefName.ProblemListIsAlpabetical,checkAlpha.Checked);
+			butUp.Visible=false;
+			butDown.Visible=false;
+			//_listDiseaseDefs.Sort(DiseaseDefs.SortAlphabetically);//Sort in memory list
+			Cursor=Cursors.WaitCursor;
+			DiseaseDefs.AlphabetizeDB();//Sort DB list
+			Cursor=Cursors.Default;
+			_listDiseaseDefs.Clear();
+			_listDiseaseDefs.AddRange(DiseaseDefs.ListLong);
+			IsChanged=true;
+			//RefreshList();
 			FillGrid();
 		}
 
@@ -369,6 +431,9 @@ namespace OpenDental{
 			}
 			for(int i=0;i<selected.Length;i++) {
 				_listDiseaseDefs.Reverse(selected[i]-1,2);
+			}
+			for(int i=0;i<_listDiseaseDefs.Count;i++) {
+				_listDiseaseDefs[i].ItemOrder=i;//change itemOrder to reflect order changes.
 			}
 			FillGrid();
 			for(int i=0;i<selected.Length;i++) {
@@ -389,6 +454,9 @@ namespace OpenDental{
 			}
 			for(int i=selected.Length-1;i>=0;i--) {//go backwards
 				_listDiseaseDefs.Reverse(selected[i],2);
+			}
+			for(int i=0;i<_listDiseaseDefs.Count;i++) {
+				_listDiseaseDefs[i].ItemOrder=i;//change itemOrder to reflect order changes.
 			}
 			FillGrid();
 			for(int i=0;i<selected.Length;i++) {
@@ -428,14 +496,14 @@ namespace OpenDental{
 			if(IsSelectionMode) {//Never update disease defs in selection mode.
 				DialogResult=DialogResult.Cancel;
 			}
-			//Only update the defs that changed their item order.
-			for(int i=0;i<_listDiseaseDefs.Count;i++) {
-				if(_listDiseaseDefs[i].ItemOrder!=i) {
-					_listDiseaseDefs[i].ItemOrder=i;
-					DiseaseDefs.Update(_listDiseaseDefs[i]);
-					IsChanged=true;//Just in case?  This should already be flagged as true by this point.
-				}
-			}
+			////Only update the defs that changed their item order.
+			//for(int i=0;i<_listDiseaseDefs.Count;i++) {
+			//	if(_listDiseaseDefs[i].ItemOrder!=i) {
+			//		_listDiseaseDefs[i].ItemOrder=i;
+			//		DiseaseDefs.Update(_listDiseaseDefs[i]);
+			//		IsChanged=true;//Just in case?  This should already be flagged as true by this point.
+			//	}
+			//}
 			DialogResult=DialogResult.Cancel;
 		}
 

@@ -6504,6 +6504,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE referral MODIFY IsTrustedDirect NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ProblemListIsAlpabetical',FALSE)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProblemListIsAlpabetical',FALSE)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -6546,3 +6554,9 @@ namespace OpenDentBusiness {
 
 
 
+
+
+
+
+				
+				
