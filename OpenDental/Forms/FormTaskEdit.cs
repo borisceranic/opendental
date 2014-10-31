@@ -721,7 +721,7 @@ namespace OpenDental {
 				//textDescript always editable
 			}
 			else {//trying to edit an existing task, so need to block some things
-				if(!Security.IsAuthorized(Permissions.TaskEdit,true)) {//but only need to block them if they don't have TaskEdit permission
+				if(!Security.IsAuthorized(Permissions.TaskNoteEdit,true)) {//but only need to block them if they don't have TaskNoteEdit permission
 					if(TaskCur.UserNum!=Security.CurUser.UserNum) {//current user didn't write this task, so block them.
 						butDelete.Enabled=false;
 						textDescript.ReadOnly=true;

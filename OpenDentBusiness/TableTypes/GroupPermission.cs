@@ -159,8 +159,8 @@ namespace OpenDentBusiness{
 		ProcFeeEdit,
 		///<summary>65- There is no user interface in the security window for this permission.  It is only used for tracking.  Only tracks changes to carriername, not any other carrier info.  FK to PlanNum for tracking.</summary>
 		InsPlanChangeCarrierName,
-		///<summary>66- When editing an existing task: delete the task, edit original description, or double click on note rows.  Even if you don't have the permission, you can still edit your own task description (but not the notes) as long as it's in your inbox and as long as nobody but you has added any notes.</summary>
-		TaskEdit,
+		///<summary>66- (Was named TaskEdit prior to version 14.2.39) When editing an existing task: delete the task, edit original description, or double click on note rows.  Even if you don't have the permission, you can still edit your own task description (but not the notes) as long as it's in your inbox and as long as nobody but you has added any notes. </summary>
+		TaskNoteEdit,
 		///<summary>67- Add or delete lists and list columns..</summary>
 		WikiListSetup,
 		///<summary>68- There is no user interface in the security window for this permission.  It is only used for tracking.  Tracks copying of patient information.  Required by EHR.</summary>

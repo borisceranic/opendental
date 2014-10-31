@@ -171,7 +171,7 @@ namespace OpenDentBusiness{
 				//case Permissions.ProblemEdit:
 				//case Permissions.ProcFeeEdit:
 				//case Permissions.InsPlanChangeCarrierName:
-				case Permissions.TaskEdit:
+				case Permissions.TaskNoteEdit:
 				case Permissions.WikiListSetup:
 				case Permissions.Copy:
 				case Permissions.Printing:
@@ -334,8 +334,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Reports - Production and Income, Aging");
 				case Permissions.ReportDashboard:
 					return Lans.g("enumPermissions","Reports - Dashboard");
-				case Permissions.TaskEdit:
-					return Lans.g("enumPermissions","Task Edit");
+				case Permissions.TaskNoteEdit:
+					return Lans.g("enumPermissions","Task Note Edit");
 				case Permissions.WikiListSetup:
 					return Lans.g("enumPermissions","Wiki List Setup");
 			}

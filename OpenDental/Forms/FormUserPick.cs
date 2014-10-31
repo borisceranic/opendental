@@ -29,7 +29,7 @@ namespace OpenDental {
 			if(listUser.SelectedIndex==-1) {
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
+			if(!Security.IsAuthorized(Permissions.TaskNoteEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}
@@ -42,7 +42,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please pick a user first.");
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
+			if(!Security.IsAuthorized(Permissions.TaskNoteEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}

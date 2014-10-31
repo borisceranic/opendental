@@ -28,7 +28,7 @@ namespace OpenDental {
 			if(TaskNoteCur.IsNew) {
 				textDateTime.ReadOnly=true;
 			}
-			else if(!Security.IsAuthorized(Permissions.TaskEdit)) {//Tasknotes are not editable unless user has TaskEdit permission.
+			else if(!Security.IsAuthorized(Permissions.TaskNoteEdit)) {//Tasknotes are not editable unless user has TaskNoteEdit permission.
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
