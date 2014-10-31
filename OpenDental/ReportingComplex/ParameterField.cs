@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary>Holds information about a parameter used in the report.</summary>
 	///<remarks>A parameter is a string that can be used in a query that will be replaced by user-provided data before the query is sent.  For instance, "?date1" might be replaced with "(ProcDate = '2004-02-17' OR ProcDate = '2004-02-18')".  The output value can be multiple items connected with OR's as in the example, or it can be a single value.  The Snippet represents one of the multiple values.  In this example, it would be "ProcDate = '?'".  The ? in the Snippet will be replaced by the values provided by the user.</remarks>

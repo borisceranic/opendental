@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental{

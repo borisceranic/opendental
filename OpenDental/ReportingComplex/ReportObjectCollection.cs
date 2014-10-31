@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary>Contains the ReportObject objects for every report object in the report.</summary>
 	public class ReportObjectCollection:CollectionBase{

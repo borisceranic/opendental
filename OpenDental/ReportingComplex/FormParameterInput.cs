@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 
-namespace OpenDental.ReportingOld2{
+namespace OpenDental.ReportingComplex{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>

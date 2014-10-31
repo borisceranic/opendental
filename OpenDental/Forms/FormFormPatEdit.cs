@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental{

@@ -12,18 +12,19 @@ using System.Reflection;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary></summary>
-	public class FormReportLikeCrystal : System.Windows.Forms.Form{
+	public class FormReportComplex : System.Windows.Forms.Form{
 		private System.Windows.Forms.Panel panel1;
 		private System.ComponentModel.IContainer components;
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butPrint;
 		private System.Drawing.Printing.PrintDocument pd2;
 		///<summary>The report to display.</summary>
-		private ReportLikeCrystal MyReport;
+		private ReportComplex MyReport;
 		private OpenDental.UI.Button butSetup;
 		private System.Windows.Forms.PageSetupDialog setupDialog2;
 		///<summary>The y position printed through so far in the current section.</summary>
@@ -40,9 +41,10 @@ namespace OpenDental.ReportingOld2
 		private System.Windows.Forms.ImageList imageListMain;
 		private System.Windows.Forms.PrintPreviewControl printPreviewControl2;
 		private int pagesPrinted;
+		private int _heightRemaining=0;
 
 		///<summary></summary>
-		public FormReportLikeCrystal(ReportLikeCrystal myReport){
+		public FormReportComplex(ReportComplex myReport){
 			InitializeComponent();// Required for Windows Form Designer support
 			MyReport=myReport;
 		}
@@ -68,7 +70,7 @@ namespace OpenDental.ReportingOld2
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportLikeCrystal));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportComplex));
 			this.butClose = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
@@ -365,7 +367,7 @@ namespace OpenDental.ReportingOld2
 						yPos+=section.Height;
 						if(section.Height>printableHeight){//this can happen if the reportHeader takes up the full page
 							//if there are no other sections to print
-							if(MyReport.ReportTable==null){
+							if(MyReport.ReportTables==null){
 								//this will keep the second page from printing:
 								lastSectionPrinted="Report Footer";
 							}
@@ -379,7 +381,7 @@ namespace OpenDental.ReportingOld2
 				}
 				//If the size of pageheader+one detail+pagefooter is taller than page, then we might later display an error. But for now, they will all still be laid out, and whatever goes off the bottom edge will just not show.  This will not be an issue for normal reports:
 				if(MyReport.GetSectionHeight("Page Header")
-					+MyReport.GetSectionHeight("Detail")
+					+MyReport.GetSectionHeight("Query")
 					+MyReport.GetSectionHeight("Page Footer")
 					>printableHeight){
 					//nothing for now.
@@ -388,7 +390,7 @@ namespace OpenDental.ReportingOld2
 				if(pagesPrinted==0
 					&& MyReport.GetSectionHeight("Report Header")
 					+MyReport.GetSectionHeight("Page Header")
-					+MyReport.GetSectionHeight("Detail")
+					+MyReport.GetSectionHeight("Query")
 					+MyReport.GetSectionHeight("Page Footer")
 					>printableHeight)
 				{
@@ -401,35 +403,44 @@ namespace OpenDental.ReportingOld2
 					yPos+=section.Height;
 				}
 				//calculate if there is room for all elements including the reportfooter on this page.
-				int rowsRemaining=0;
-				if(MyReport.ReportTable!=null){
-					rowsRemaining=MyReport.ReportTable.Rows.Count-rowsPrinted;
-				}
-				int totalDetailsHeight=rowsRemaining*MyReport.GetSectionHeight("Detail");
+				//int rowsRemaining=0;
+				//QueryObject query=(QueryObject)MyReport.ReportObjects["Query"];
+				//rowsRemaining=query.ReportTable.Rows.Count-rowsPrinted;
+				//int totalQueryHeight=rowsRemaining*query.GetTotalHeight();
+				//bool isRoomForReportFooter=true;
+				//if(yLimit-yPos
+				//	-MyReport.GetSectionHeight("Report Footer")
+				//	-MyReport.GetSectionHeight("Page Footer")
+				//	-totalQueryHeight < 0){
+				//	isRoomForReportFooter=false;
+				//}
+				////calculate how many rows of detail to print
+				//int rowsToPrint=rowsRemaining;
+				//section=MyReport.Sections["Query"];
+				//if(!isRoomForReportFooter){
+				//	int actualDetailsHeight=yLimit-yPos
+				//		-MyReport.GetSectionHeight("Report Footer")
+				//		-MyReport.GetSectionHeight("Page Footer")
+				//		-query.GetSectionHeight("Group Header")
+				//		-query.GetSectionHeight("Group Footer");
+				//	rowsToPrint=(int)(actualDetailsHeight
+				//		/query.GetSectionHeight("Detail"));
+				//	if(rowsToPrint<1)
+				//		rowsToPrint=1;//Always print at least one row.
+				//}
+				////print the query section
+				//PrintQuerySection(grfx,section,xPos,yPos,rowsToPrint);
+				//if(rowsToPrint==rowsRemaining)//if all remaining rows were printed
+				//	lastSectionPrinted="Query";//mark this section as printed.
+				//yPos+=section.Height*rowsToPrint;
+				_heightRemaining=yLimit-yPos-MyReport.GetSectionHeight("Page Footer");
+				section=MyReport.Sections["Query"];
+				PrintQuerySection(grfx,section,xPos,yPos);
+				yPos+=section.Height;
 				bool isRoomForReportFooter=true;
-				if(yLimit-yPos
-					-MyReport.GetSectionHeight("Report Footer")
-					-MyReport.GetSectionHeight("Page Footer")
-					-totalDetailsHeight < 0){
+				if(_heightRemaining-MyReport.GetSectionHeight("Report Footer")<=0) {
 					isRoomForReportFooter=false;
 				}
-				//calculate how many rows of detail to print
-				int rowsToPrint=rowsRemaining;
-				section=MyReport.Sections["Detail"];
-				if(!isRoomForReportFooter){
-					int actualDetailsHeight=yLimit-yPos
-						-MyReport.GetSectionHeight("Report Footer")
-						-MyReport.GetSectionHeight("Page Footer");
-					rowsToPrint=(int)(actualDetailsHeight
-						/MyReport.GetSectionHeight("Detail"));
-					if(rowsToPrint<1)
-						rowsToPrint=1;//Always print at least one row.
-				}
-				//print the detail section
-				PrintDetailsSection(grfx,section,xPos,yPos,rowsToPrint);
-				if(rowsToPrint==rowsRemaining)//if all remaining rows were printed
-					lastSectionPrinted="Detail";//mark this section as printed.
-				yPos+=section.Height*rowsToPrint;
 				//print the reportfooter section if there is room
 				if(isRoomForReportFooter){
 					if(MyReport.Sections.Contains("Report Footer")){
@@ -470,8 +481,8 @@ namespace OpenDental.ReportingOld2
 		private void PrintSection(Graphics g,Section section,int xPos,int yPos){
 			ReportObject textObject;
 			ReportObject fieldObject;
-			//LineObject lineObject;
-			//BoxObject boxObject;
+			ReportObject lineObject;
+			ReportObject boxObject;
 			StringFormat strFormat;//used each time text is drawn to handle alignment issues
 			//string rawText="";//the raw text for a given field as taken from the database
 			string displayText="";//The formatted text to print
@@ -487,6 +498,9 @@ namespace OpenDental.ReportingOld2
 						,yPos+textObject.Location.Y
 						,textObject.Size.Width,textObject.Size.Height);
 					g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
+					if(textObject.IsUnderlined) {
+						g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+					}
 				}
 				else if(reportObject.ObjectKind==ReportObjectKind.FieldObject){
 					fieldObject=reportObject;
@@ -495,11 +509,11 @@ namespace OpenDental.ReportingOld2
 						,yPos+fieldObject.Location.Y
 						,fieldObject.Size.Width,fieldObject.Size.Height);
 					displayText="";
-					if(fieldObject.FieldKind==FieldDefKind.SummaryField){
-						displayText=fieldObject.GetSummaryValue
-							(MyReport.ReportTable,MyReport.DataFields.IndexOf
-							(fieldObject.SummarizedField))
-							.ToString(fieldObject.FormatString);
+					if(fieldObject.FieldKind==FieldDefKind.SummaryField) {
+						//displayText=fieldObject.GetSummaryValue
+						//	(MyReport.ReportTables,MyReport.DataFields.IndexOf
+						//	(fieldObject.SummarizedField))
+						//	.ToString(fieldObject.FormatString);
 					}
 					else if(fieldObject.FieldKind==FieldDefKind.SpecialField){
 						if(fieldObject.SpecialType==SpecialFieldType.PageNofM){//not functional yet
@@ -512,106 +526,386 @@ namespace OpenDental.ReportingOld2
 					}
 					g.DrawString(displayText,fieldObject.Font,Brushes.Black,layoutRect,strFormat);
 				}
-				//incomplete: else if lines
-				//incomplete: else if boxes.
-			}//foreach reportObject
-			//sectionsPrinted=sectionIndex+1;//mark current section as printed.
-			//MessageBox.Show(pagesPrinted.ToString()+","+sectionsPrinted.ToString());
-			//yPos+=section.Height;//set current yPos to the bottom of the section just printed.
+				else if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+					boxObject=reportObject;
+					int x1=xPos+boxObject.OffSetX;
+					int x2=xPos-boxObject.OffSetX;
+					int y1=yPos+boxObject.OffSetY;
+					int y2=yPos-boxObject.OffSetY;
+					int maxHorizontalLength=1100;
+					if(!MyReport.IsLandscape) {
+						maxHorizontalLength=850;
+					}
+					x2+=maxHorizontalLength;
+					y2+=MyReport.GetSectionHeight(boxObject.SectionName);
+					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+				}
+				else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+					lineObject=reportObject;
+					int length;
+					int x=lineObject.OffSetX;
+					int y=yPos+lineObject.OffSetY;
+					int maxHorizontalLength=1100;
+					if(!MyReport.IsLandscape) {
+						maxHorizontalLength=850;
+					}
+					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
+						length=maxHorizontalLength*lineObject.LinePercent/100;
+						if(lineObject.LinePosition==LinePosition.Bottom) {
+							y+=MyReport.GetSectionHeight(lineObject.SectionName);
+						}
+						else if(lineObject.LinePosition==LinePosition.Top) {
+							//Do Nothing Here
+						}
+						else if(lineObject.LinePosition==LinePosition.Center) {
+							y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2);
+						}
+						else {
+							continue;
+						}
+						x+=(maxHorizontalLength/2)-(length/2);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+					}
+					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
+						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+						if(lineObject.LinePosition==LinePosition.Left) {
+							//Do Nothing Here
+						}
+						else if(lineObject.LinePosition==LinePosition.Right) {
+							x+=maxHorizontalLength;
+						}
+						else if(lineObject.LinePosition==LinePosition.Center) {
+							x+=maxHorizontalLength/2;
+						}
+						else {
+							continue;
+						}
+						y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+					}
+				}
+			}
 		}
 
 		///<summary>Prints some rows of the details section at the specified x and y position on the page.  The math to decide how many rows to print is done ahead of time.  The number of rows printed so far is kept global so that it can be used in calculating the layout of this section.</summary>
-		private void PrintDetailsSection(Graphics g,Section section,int xPos,int yPos,int rowsToPrint){
+		private void PrintQuerySection(Graphics g,Section section,int xPos,int yPos) {
+			section.Height=0;
+			ReportObject textObject;
+			ReportObject lineObject;
+			ReportObject boxObject;
+			QueryObject queryObject;
+			StringFormat strFormat;//used each time text is drawn to handle alignment issues
+			#region Lines And Boxes
+			foreach(ReportObject reportObject in MyReport.ReportObjects) {
+				if(reportObject.SectionName!=section.Name) {
+					//skip any reportObjects that are not in this section
+					continue;
+				}
+
+				if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+					boxObject=reportObject;
+					int x1=xPos+boxObject.OffSetX;
+					int x2=xPos-boxObject.OffSetX;
+					int y1=yPos+boxObject.OffSetY;
+					int y2=yPos-boxObject.OffSetY;
+					int maxHorizontalLength=1100;
+					if(!MyReport.IsLandscape) {
+						maxHorizontalLength=850;
+					}
+					x2+=maxHorizontalLength-xPos;
+					y2+=_heightRemaining*MyReport.GetSectionHeight(boxObject.SectionName);
+					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+				}
+				else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+					lineObject=reportObject;
+					int length;
+					int x=lineObject.OffSetX;
+					int y=yPos+lineObject.OffSetY;
+					int maxHorizontalLength=1100;
+					if(!MyReport.IsLandscape) {
+						maxHorizontalLength=850;
+					}
+					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
+						length=maxHorizontalLength*lineObject.LinePercent/100;
+						if(lineObject.LinePosition==LinePosition.Bottom) {
+							y+=MyReport.GetSectionHeight(lineObject.SectionName);
+						}
+						else if(lineObject.LinePosition==LinePosition.Top) {
+							//Do Nothing Here
+						}
+						else if(lineObject.LinePosition==LinePosition.Center) {
+							y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2);
+						}
+						else {
+							continue;
+						}
+						x+=(maxHorizontalLength/2)-(length/2);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+					}
+					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
+						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+						if(lineObject.LinePosition==LinePosition.Left) {
+							//Do Nothing Here
+						}
+						else if(lineObject.LinePosition==LinePosition.Right) {
+							x=maxHorizontalLength;
+						}
+						else if(lineObject.LinePosition==LinePosition.Center) {
+							x=maxHorizontalLength/2;
+						}
+						else {
+							continue;
+						}
+						y=y+(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+					}
+					else {
+						//Do nothing since it has already been done for each row.
+					}
+				}
+			}
+			#endregion
+			foreach(ReportObject reportObject in MyReport.ReportObjects) {
+				if(reportObject.SectionName!=section.Name) {
+					//skip any reportObjects that are not in this section
+					continue;
+				}
+				if(reportObject.ObjectKind==ReportObjectKind.TextObject) {
+					//not typical to print textobject in details section, but allowed
+					textObject=reportObject;
+					strFormat=ReportObject.GetStringFormat(textObject.TextAlign);
+					RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
+						,yPos+textObject.Location.Y
+						,textObject.Size.Width,textObject.Size.Height);
+					g.DrawString(textObject.StaticText,textObject.Font
+						,new SolidBrush(textObject.ForeColor),layoutRect,strFormat);
+					if(textObject.IsUnderlined) {
+						g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+					}
+				}
+				else if(reportObject.ObjectKind==ReportObjectKind.QueryObject) {
+					queryObject=(QueryObject)reportObject;
+					for(int j=0;j<queryObject.Sections.Count;j++) {
+						if(_heightRemaining!=0) {
+							PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Header"],xPos,yPos);
+							yPos+=queryObject.Sections["Group Header"].Height;
+							section.Height+=queryObject.Sections["Group Header"].Height;
+						}
+						if(_heightRemaining!=0) {
+							PrintQueryObjectSection(queryObject,g,queryObject.Sections["Detail"],xPos,yPos);
+							yPos+=queryObject.Sections["Detail"].Height;
+							section.Height+=queryObject.Sections["Detail"].Height;
+						}
+						if(_heightRemaining!=0) {
+							PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Footer"],xPos,yPos);
+							yPos+=queryObject.Sections["Group Footer"].Height;
+							section.Height+=queryObject.Sections["Group Footer"].Height;
+						}
+						if(_heightRemaining==0) {
+							return;
+						}
+					}
+				}
+			}
+		}
+
+		///<summary>Prints sections inside a QueryObject</summary>
+		private void PrintQueryObjectSection(QueryObject queryObj,Graphics g,Section section,int xPos,int yPos) {
+			section.Height=0;
 			ReportObject textObject;
 			ReportObject fieldObject;
-			//LineObject lineObject;
-			//BoxObject boxObject;
-			StringFormat strFormat;//used each time text is drawn to handle alignment issues
+			ReportObject lineObject;
+			ReportObject boxObject;
 			string rawText="";//the raw text for a given field as taken from the database
 			string displayText="";//The formatted text to print
-			string prevDisplayText="";//The formatted text of the previous row. Used to test suppress dupl.
+			string prevDisplayText="";//The formatted text of the previous row. Used to test suppress dupl.	
+			StringFormat strFormat;//used each time text is drawn to handle alignment issues
+			int yPosAdd=0;
 			//loop through each row in the table
-			for(int i=rowsPrinted;i<rowsPrinted+rowsToPrint;i++){
-				foreach(ReportObject reportObject in MyReport.ReportObjects){
-					//todo later: check for lines and boxes that span multiple sections.
-					if(reportObject.SectionName!=section.Name){
-						//skip any reportObjects that are not in this section
+			for(int i=rowsPrinted;i<queryObj.ReportTable.Rows.Count;i++) {
+				int greatestCellHeight=0;
+				foreach(ReportObject reportObject in queryObj.ReportObjects) {
+					if(section.Name!="Detail" || reportObject.SectionName!="Detail") {
 						continue;
 					}
-					if(reportObject.ObjectKind==ReportObjectKind.TextObject){
-						//not typical to print textobject in details section, but allowed
+					rawText=queryObj.ReportTable.Rows
+								[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString();
+					List<string> listString=GetDisplayString(rawText,prevDisplayText,reportObject,i,queryObj);
+					displayText=listString[0];
+					prevDisplayText=listString[1];
+					int curCellHeight=(int)g.MeasureString(displayText,reportObject.Font,reportObject.Size.Width,ReportObject.GetStringFormat(reportObject.TextAlign)).Height;
+					if(curCellHeight>greatestCellHeight) {
+						greatestCellHeight=curCellHeight;
+					}
+					if(greatestCellHeight>_heightRemaining) {
+						_heightRemaining=0;
+						return;
+					}
+				}
+				int greatestObjectHeight=0;
+				foreach(ReportObject reportObject in queryObj.ReportObjects) {
+					if(reportObject.Size.Height>_heightRemaining) {
+						_heightRemaining=0;
+						return;
+					}
+					if(reportObject.SectionName!=section.Name) {
+						continue;
+					}
+					if(reportObject.ObjectKind==ReportObjectKind.TextObject) {
 						textObject=reportObject;
 						strFormat=ReportObject.GetStringFormat(textObject.TextAlign);
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
 							,yPos+textObject.Location.Y
 							,textObject.Size.Width,textObject.Size.Height);
-						g.DrawString(textObject.StaticText,textObject.Font
-							,new SolidBrush(textObject.ForeColor),layoutRect,strFormat);
+						g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
+						if(textObject.IsUnderlined) {
+							g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+						}
+						if(greatestObjectHeight<textObject.Size.Height) {
+							greatestObjectHeight=textObject.Size.Height;
+						}
 					}
-					else if(reportObject.ObjectKind==ReportObjectKind.FieldObject){
+					else if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+						boxObject=reportObject;
+						int x1=xPos+boxObject.OffSetX;
+						int x2=xPos-boxObject.OffSetX;
+						int y1=yPos+boxObject.OffSetY;
+						int y2=yPos-boxObject.OffSetY;
+						int maxHorizontalLength=1100;
+						if(!MyReport.IsLandscape) {
+							maxHorizontalLength=850;
+						}
+						x2+=maxHorizontalLength;
+						y2+=queryObj.GetSectionHeight(boxObject.SectionName);
+						g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+						if(greatestObjectHeight<boxObject.Size.Height) {
+							greatestObjectHeight=boxObject.Size.Height;
+						}
+					}
+					else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+						lineObject=reportObject;
+						int length;
+						int x=lineObject.OffSetX;
+						int y=yPos+lineObject.OffSetY;
+						int maxHorizontalLength=1100;
+						if(!MyReport.IsLandscape) {
+							maxHorizontalLength=850;
+						}
+						if(lineObject.LineOrientation==LineOrientation.Horizontal) {
+							length=maxHorizontalLength*lineObject.LinePercent/100;
+							if(lineObject.LinePosition==LinePosition.Bottom) {
+								y+=queryObj.GetSectionHeight(lineObject.SectionName);
+							}
+							else if(lineObject.LinePosition==LinePosition.Top) {
+								//Do Nothing Here
+							}
+							else if(lineObject.LinePosition==LinePosition.Center) {
+								y+=(queryObj.GetSectionHeight(lineObject.SectionName)/2);
+							}
+							else {
+								continue;
+							}
+							x+=(maxHorizontalLength/2)-(length/2);
+							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+						}
+						else if(lineObject.LineOrientation==LineOrientation.Vertical) {
+							length=queryObj.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+							if(lineObject.LinePosition==LinePosition.Left) {
+								//Do Nothing Here
+							}
+							else if(lineObject.LinePosition==LinePosition.Right) {
+								x+=maxHorizontalLength;
+							}
+							else if(lineObject.LinePosition==LinePosition.Center) {
+								x+=maxHorizontalLength/2;
+							}
+							else {
+								continue;
+							}
+							y+=(queryObj.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+						}
+						if(greatestObjectHeight<lineObject.Size.Height) {
+							greatestObjectHeight=lineObject.Size.Height;
+						}
+					}
+					else if(reportObject.ObjectKind==ReportObjectKind.FieldObject) {
 						fieldObject=reportObject;
 						strFormat=ReportObject.GetStringFormat(fieldObject.TextAlign);
-						RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,fieldObject.Size.Height);
-						if(fieldObject.FieldKind==FieldDefKind.DataTableField){
-							rawText=MyReport.ReportTable.Rows
-								[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString();
+						RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,greatestCellHeight);
+						if(MyReport.HasGridLines()) {
+							g.DrawRectangle(new Pen(Brushes.Black),Rectangle.Round(layoutRect));
+						}
+						if(fieldObject.FieldKind==FieldDefKind.DataTableField) {
+							rawText=queryObj.ReportTable.Rows
+								[i][queryObj.DataFields.IndexOf(fieldObject.DataField)].ToString();
 							displayText=rawText;
-							if(fieldObject.ValueType==FieldValueType.Age){
-								displayText=Patients.AgeToString(Patients.DateToAge(PIn.Date(MyReport.ReportTable.Rows[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString())));//(fieldObject.FormatString);
-							}
-							else if(fieldObject.ValueType==FieldValueType.Boolean){
-								displayText=PIn.Bool(MyReport.ReportTable.Rows[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString();//(fieldObject.FormatString);
-								if(i>0 && fieldObject.SuppressIfDuplicate){
-									prevDisplayText=PIn.Bool(MyReport.ReportTable.Rows[i-1][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString();
-								}
-							}
-							else if(fieldObject.ValueType==FieldValueType.Date){
-								displayText=PIn.DateT(MyReport.ReportTable.Rows[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								if(i>0 && fieldObject.SuppressIfDuplicate){
-									prevDisplayText=PIn.DateT(MyReport.ReportTable.Rows[i-1][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								}
-							}
-							else if(fieldObject.ValueType==FieldValueType.Integer){
-								displayText=PIn.Long(MyReport.ReportTable.Rows[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								if(i>0 && fieldObject.SuppressIfDuplicate){
-									prevDisplayText=PIn.Long(MyReport.ReportTable.Rows[i-1][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								}
-							}
-							else if(fieldObject.ValueType==FieldValueType.Number){
-								displayText=PIn.Double(MyReport.ReportTable.Rows[i][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								if(i>0 && fieldObject.SuppressIfDuplicate){
-									prevDisplayText=PIn.Double(MyReport.ReportTable.Rows[i-1][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString()).ToString(fieldObject.FormatString);
-								}
-							}
-							else if(fieldObject.ValueType==FieldValueType.String){
-								displayText=rawText;
-								if(i>0 && fieldObject.SuppressIfDuplicate){
-									prevDisplayText=MyReport.ReportTable.Rows[i-1][MyReport.DataFields.IndexOf(fieldObject.DataField)].ToString();
-								}
-							}
+							List<string> listString=GetDisplayString(displayText,prevDisplayText,fieldObject,i,queryObj);
+							displayText=listString[0];
+							prevDisplayText=listString[1];
 							//suppress if duplicate:
-							if(i>0 && fieldObject.SuppressIfDuplicate && displayText==prevDisplayText){
+							if(i>0 && fieldObject.SuppressIfDuplicate && displayText==prevDisplayText) {
 								displayText="";
 							}
 						}
-						else if(fieldObject.FieldKind==FieldDefKind.FormulaField){
-							//can't do formulas yet
-						}
-						else if(fieldObject.FieldKind==FieldDefKind.SpecialField){
-							
-						}
-						else if(fieldObject.FieldKind==FieldDefKind.SummaryField){
-							
-						}
 						g.DrawString(displayText,fieldObject.Font
-							,new SolidBrush(fieldObject.ForeColor),layoutRect,strFormat);
+						,new SolidBrush(fieldObject.ForeColor),new RectangleF(layoutRect.X+1,layoutRect.Y+1,layoutRect.Width-1,layoutRect.Height-1),strFormat);
+						yPosAdd=(int)layoutRect.Height;
 					}
-					//incomplete: else if lines
-					//incomplete: else if boxes.
-				}//foreach reportObject
-				yPos+=section.Height;
-			}//for i rows
-			rowsPrinted+=rowsToPrint;
+				}
+				if(section.Kind==AreaSectionKind.GroupHeader || section.Kind==AreaSectionKind.GroupFooter) {
+					section.Height=greatestObjectHeight;
+					_heightRemaining-=section.Height;
+					break;
+				}
+				if(section.Kind==AreaSectionKind.Detail) {
+					rowsPrinted++;
+					yPos+=yPosAdd;
+					_heightRemaining-=yPosAdd;
+					section.Height+=yPosAdd;
+				}
+			}
+		}
+
+		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i,QueryObject queryObj) {
+			string displayText="";
+			List<string> retVals=new List<string>();
+			if(reportObject.ValueType==FieldValueType.Age) {
+				displayText=Patients.AgeToString(Patients.DateToAge(PIn.Date(rawText)));//(fieldObject.FormatString);
+			}
+			else if(reportObject.ValueType==FieldValueType.Boolean) {
+				displayText=PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString();//(fieldObject.FormatString);
+				if(i>0 && reportObject.SuppressIfDuplicate) {
+					prevDisplayText=PIn.Bool(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
+				}
+			}
+			else if(reportObject.ValueType==FieldValueType.Date) {
+				displayText=PIn.DateT(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				if(i>0 && reportObject.SuppressIfDuplicate) {
+					prevDisplayText=PIn.DateT(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				}
+			}
+			else if(reportObject.ValueType==FieldValueType.Integer) {
+				displayText=PIn.Long(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				if(i>0 && reportObject.SuppressIfDuplicate) {
+					prevDisplayText=PIn.Long(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				}
+			}
+			else if(reportObject.ValueType==FieldValueType.Number) {
+				displayText=PIn.Double(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				if(i>0 && reportObject.SuppressIfDuplicate) {
+					prevDisplayText=PIn.Double(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+				}
+			}
+			else if(reportObject.ValueType==FieldValueType.String) {
+				displayText=rawText;
+				if(i>0 && reportObject.SuppressIfDuplicate) {
+					prevDisplayText=queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString();
+				}
+			}
+			retVals.Add(displayText);
+			retVals.Add(prevDisplayText);
+			return retVals;
 		}
 
 		private void butSetup_Click(object sender, System.EventArgs e) {
@@ -646,61 +940,61 @@ namespace OpenDental.ReportingOld2
 		}
 
 		private void OnExport_Click(){
-			SaveFileDialog saveFileDialog2=new SaveFileDialog();
-      saveFileDialog2.AddExtension=true;
-			//saveFileDialog2.Title=Lan.g(this,"Select Folder to Save File To");
-			saveFileDialog2.FileName=MyReport.ReportName+".txt";
-			if(!Directory.Exists(PrefC.GetString(PrefName.ExportPath))){
-				try{
-					Directory.CreateDirectory(PrefC.GetString(PrefName.ExportPath));
-					saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
-				}
-				catch{
-					//initialDirectory will be blank
-				}
-			}
-			else{
-				saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
-			}
-			//saveFileDialog2.DefaultExt="txt";
-			saveFileDialog2.Filter="Text files(*.txt)|*.txt|Excel Files(*.xls)|*.xls|All files(*.*)|*.*";
-      saveFileDialog2.FilterIndex=0;
-		  if(saveFileDialog2.ShowDialog()!=DialogResult.OK){
-	   	  return;
-			}
-			try{
-			  using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false)){
-					String line="";  
-					for(int i=0;i<MyReport.ReportTable.Columns.Count;i++){
-						line+=MyReport.ReportTable.Columns[i].Caption;
-						if(i<MyReport.ReportTable.Columns.Count-1){
-							line+="\t";
-						}
-					}
-					sw.WriteLine(line);
-					string cell;
-					for(int i=0;i<MyReport.ReportTable.Rows.Count;i++){
-						line="";
-						for(int j=0;j<MyReport.ReportTable.Columns.Count;j++){
-							cell=MyReport.ReportTable.Rows[i][j].ToString();
-							cell=cell.Replace("\r","");
-							cell=cell.Replace("\n","");
-							cell=cell.Replace("\t","");
-							cell=cell.Replace("\"","");
-							line+=cell;
-							if(j<MyReport.ReportTable.Columns.Count-1){
-								line+="\t";
-							}
-						}
-						sw.WriteLine(line);
-					}
-				}//using
-      }
-      catch{
-        MessageBox.Show(Lan.g(this,"File in use by another program.  Close and try again."));
-				return;
-			}
-			MessageBox.Show(Lan.g(this,"File created successfully"));
+			//SaveFileDialog saveFileDialog2=new SaveFileDialog();
+			//saveFileDialog2.AddExtension=true;
+			////saveFileDialog2.Title=Lan.g(this,"Select Folder to Save File To");
+			//saveFileDialog2.FileName=MyReport.ReportName+".txt";
+			//if(!Directory.Exists(PrefC.GetString(PrefName.ExportPath))){
+			//	try{
+			//		Directory.CreateDirectory(PrefC.GetString(PrefName.ExportPath));
+			//		saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
+			//	}
+			//	catch{
+			//		//initialDirectory will be blank
+			//	}
+			//}
+			//else{
+			//	saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
+			//}
+			////saveFileDialog2.DefaultExt="txt";
+			//saveFileDialog2.Filter="Text files(*.txt)|*.txt|Excel Files(*.xls)|*.xls|All files(*.*)|*.*";
+			//saveFileDialog2.FilterIndex=0;
+			//if(saveFileDialog2.ShowDialog()!=DialogResult.OK){
+			//	return;
+			//}
+			//try{
+			//	using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false)){
+			//		String line="";  
+			//		for(int i=0;i<MyReport.ReportTables.Columns.Count;i++){
+			//			line+=MyReport.ReportTables.Columns[i].Caption;
+			//			if(i<MyReport.ReportTables.Columns.Count-1){
+			//				line+="\t";
+			//			}
+			//		}
+			//		sw.WriteLine(line);
+			//		string cell;
+			//		for(int i=0;i<MyReport.ReportTables.Rows.Count;i++){
+			//			line="";
+			//			for(int j=0;j<MyReport.ReportTables.Columns.Count;j++){
+			//				cell=MyReport.ReportTables.Rows[i][j].ToString();
+			//				cell=cell.Replace("\r","");
+			//				cell=cell.Replace("\n","");
+			//				cell=cell.Replace("\t","");
+			//				cell=cell.Replace("\"","");
+			//				line+=cell;
+			//				if(j<MyReport.ReportTables.Columns.Count-1){
+			//					line+="\t";
+			//				}
+			//			}
+			//			sw.WriteLine(line);
+			//		}
+			//	}//using
+			//}
+			//catch{
+			//	MessageBox.Show(Lan.g(this,"File in use by another program.  Close and try again."));
+			//	return;
+			//}
+			//MessageBox.Show(Lan.g(this,"File created successfully"));
 		}
 
 		private void OnClose_Click() {

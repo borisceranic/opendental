@@ -4,7 +4,7 @@ using System.Drawing.Printing;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 //using System.IO;
@@ -123,75 +123,75 @@ namespace OpenDental{
 		}
 
 		private void ExecuteReport(){
-			ReportLikeCrystal report=new ReportLikeCrystal();
-			report.IsLandscape=true;
-			report.AddTitle("CAPITATION UTILIZATION");
-			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-//incomplete: Need more flexible default values, eg based on current date instead of fixed date:
-			DateTime DateTimeFirst=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
-			report.AddParameter("carrier",FieldValueType.String,""
-				,"Enter a few letters of the name of the insurance carrier"
-				,"carrier.CarrierName LIKE '%?%'"); // SPK 8/04
-			report.AddParameter("date1",FieldValueType.Date,DateTimeFirst
-				,"From Date"
-				,"procedurelog.ProcDate >= '?'");
-			report.AddParameter("date2",FieldValueType.Date
-				,DateTimeFirst.AddMonths(1).AddDays(-1)
-				,"To Date"
-				,"procedurelog.ProcDate <= '?'");		// added carrierNum, SPK
-			report.Query=@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
-				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
-				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
-				,procedurelog.ToothNum,procedurelog.Surf,procedurelog.ProcDate
-				,procedurelog.ProcFee,procedurelog.ProcFee-claimproc.WriteOff
-				FROM procedurelog,patient AS patSub,patient AS patPat
-				,insplan,inssub,carrier,procedurecode,claimproc
-				WHERE procedurelog.PatNum = patPat.PatNum
-				AND claimproc.InsSubNum = inssub.InsSubNum
-				AND procedurelog.ProcNum = claimproc.ProcNum
-				AND claimproc.PlanNum = insplan.PlanNum
-				AND claimproc.Status = 7
-				AND claimproc.NoBillIns = 0 
-				AND inssub.Subscriber = patSub.PatNum
-				AND insplan.CarrierNum = carrier.CarrierNum	
-				AND procedurelog.CodeNum = procedurecode.CodeNum
-				AND ?carrier
-				AND ?date1
-				AND ?date2
-				AND insplan.PlanType = 'c'
-				AND procedurelog.ProcStatus = 2";
-			report.AddColumn("Carrier",150,FieldValueType.String);
-			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-			report.AddColumn("Subscriber",120,FieldValueType.String);
-			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-			report.AddColumn("Subsc SSN",70,FieldValueType.String);
-			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-			report.AddColumn("Patient",120,FieldValueType.String);
-			report.AddColumn("Pat DOB",80,FieldValueType.Date);
-			report.AddColumn("Code",50,FieldValueType.String);
-			report.AddColumn("Proc Description",120,FieldValueType.String);
-			report.AddColumn("Tth",30,FieldValueType.String);
-			report.AddColumn("Surf",40,FieldValueType.String);
-			report.AddColumn("Date",80,FieldValueType.Date);
-			report.AddColumn("UCR Fee",70,FieldValueType.Number);
-			report.AddColumn("Co-Pay",70,FieldValueType.Number);
-			report.AddPageNum();
-      if(!report.SubmitQuery()){
-				DialogResult=DialogResult.Cancel;
-				return;
-			}
-//incomplete: Add functionality for using parameter values in textObjects, probably using inline XML:
-			report.AddSubTitle(((DateTime)report.ParameterFields["date1"].CurrentValues[0]).ToShortDateString()+" - "+((DateTime)report.ParameterFields["date2"].CurrentValues[0]).ToShortDateString());
-//incomplete: Implement formulas for situations like this:
-			for(int i=0;i<report.ReportTable.Rows.Count;i++){
-				if(PIn.Double(report.ReportTable.Rows[i][11].ToString())==-1){
-					report.ReportTable.Rows[i][11]="0";
-				}
-			}
-			FormReportLikeCrystal FormR=new FormReportLikeCrystal(report);
-			//FormR.MyReport=report;
-			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+//			ReportComplex report=new ReportComplex();
+//			report.IsLandscape=true;
+//			report.AddTitle("CAPITATION UTILIZATION");
+//			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
+////incomplete: Need more flexible default values, eg based on current date instead of fixed date:
+//			DateTime DateTimeFirst=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
+//			report.AddParameter("carrier",FieldValueType.String,""
+//				,"Enter a few letters of the name of the insurance carrier"
+//				,"carrier.CarrierName LIKE '%?%'"); // SPK 8/04
+//			report.AddParameter("date1",FieldValueType.Date,DateTimeFirst
+//				,"From Date"
+//				,"procedurelog.ProcDate >= '?'");
+//			report.AddParameter("date2",FieldValueType.Date
+//				,DateTimeFirst.AddMonths(1).AddDays(-1)
+//				,"To Date"
+//				,"procedurelog.ProcDate <= '?'");		// added carrierNum, SPK
+//			report.Queries=@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
+//				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
+//				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
+//				,procedurelog.ToothNum,procedurelog.Surf,procedurelog.ProcDate
+//				,procedurelog.ProcFee,procedurelog.ProcFee-claimproc.WriteOff
+//				FROM procedurelog,patient AS patSub,patient AS patPat
+//				,insplan,inssub,carrier,procedurecode,claimproc
+//				WHERE procedurelog.PatNum = patPat.PatNum
+//				AND claimproc.InsSubNum = inssub.InsSubNum
+//				AND procedurelog.ProcNum = claimproc.ProcNum
+//				AND claimproc.PlanNum = insplan.PlanNum
+//				AND claimproc.Status = 7
+//				AND claimproc.NoBillIns = 0 
+//				AND inssub.Subscriber = patSub.PatNum
+//				AND insplan.CarrierNum = carrier.CarrierNum	
+//				AND procedurelog.CodeNum = procedurecode.CodeNum
+//				AND ?carrier
+//				AND ?date1
+//				AND ?date2
+//				AND insplan.PlanType = 'c'
+//				AND procedurelog.ProcStatus = 2";
+//			report.AddColumn("Carrier",150,FieldValueType.String);
+//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
+//			report.AddColumn("Subscriber",120,FieldValueType.String);
+//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
+//			report.AddColumn("Subsc SSN",70,FieldValueType.String);
+//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
+//			report.AddColumn("Patient",120,FieldValueType.String);
+//			report.AddColumn("Pat DOB",80,FieldValueType.Date);
+//			report.AddColumn("Code",50,FieldValueType.String);
+//			report.AddColumn("Proc Description",120,FieldValueType.String);
+//			report.AddColumn("Tth",30,FieldValueType.String);
+//			report.AddColumn("Surf",40,FieldValueType.String);
+//			report.AddColumn("Date",80,FieldValueType.Date);
+//			report.AddColumn("UCR Fee",70,FieldValueType.Number);
+//			report.AddColumn("Co-Pay",70,FieldValueType.Number);
+//			report.AddPageNum();
+//			if(!report.SubmitQueries()){
+//				DialogResult=DialogResult.Cancel;
+//				return;
+//			}
+////incomplete: Add functionality for using parameter values in textObjects, probably using inline XML:
+//			report.AddSubTitle(((DateTime)report.ParameterFields["date1"].CurrentValues[0]).ToShortDateString()+" - "+((DateTime)report.ParameterFields["date2"].CurrentValues[0]).ToShortDateString());
+////incomplete: Implement formulas for situations like this:
+//			for(int i=0;i<report.ReportTables.Rows.Count;i++){
+//				if(PIn.Double(report.ReportTables.Rows[i][11].ToString())==-1){
+//					report.ReportTables.Rows[i][11]="0";
+//				}
+//			}
+//			FormReportComplex FormR=new FormReportComplex(report);
+//			//FormR.MyReport=report;
+//			FormR.ShowDialog();
+//			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {

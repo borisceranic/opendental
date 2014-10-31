@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary>Every ReportObject in a ODReport must be attached to a Section.</summary>
 	public class Section{
@@ -24,16 +24,23 @@ namespace OpenDental.ReportingOld2
 				case AreaSectionKind.PageHeader:
 					name="Page Header";
 					break;
-				//case AreaSectionKind.GroupHeader:
+				case AreaSectionKind.GroupHeader:
+					name="Group Header";
+					break;
 				case AreaSectionKind.Detail:
 					name="Detail";
 					break;
-				//case AreaSectionKind.GroupFooter:
+				case AreaSectionKind.GroupFooter:
+					name="Group Footer";
+					break;
 				case AreaSectionKind.PageFooter:
 					name="Page Footer";
 					break;
 				case AreaSectionKind.ReportFooter:
 					name="Report Footer";
+					break;
+				case AreaSectionKind.Query:
+					name="Query";
 					break;
 			}
 			height=myHeight;
@@ -95,6 +102,8 @@ namespace OpenDental.ReportingOld2
 		PageFooter,
 		///<summary>Prints at the bottom of the report, but before the page footer for the last page.</summary>
 		ReportFooter,
+		///<summary>Query Section</summary>
+		Query
 		
 		
 		

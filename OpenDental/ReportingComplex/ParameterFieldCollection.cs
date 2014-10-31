@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary>Strongly typed collection of type ParameterDef.</summary>
 	public class ParameterFieldCollection:CollectionBase{

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
-namespace OpenDental.ReportingOld2
+namespace OpenDental.ReportingComplex
 {
 	///<summary>There is one ReportObject for each element of an ODReport that gets printed on the page.  There are many different kinds of reportObjects</summary>
 	public class ReportObject{
@@ -26,6 +26,12 @@ namespace OpenDental.ReportingOld2
 		private FieldValueType valueType;
 		private SpecialFieldType specialType;
 		private SummaryOperation operation;
+		private LineOrientation lineOrientation;
+		private LinePosition linePosition;
+		private int linePercent;
+		private int offSetX;
+		private int offSetY;
+		private bool isUnderlined;
 		private string summarizedField;
 		private string dataField;
 		
@@ -158,6 +164,60 @@ namespace OpenDental.ReportingOld2
 				lineThickness=value;
 			}
 		}
+		///<summary>Used to determine whether the line is vertical or horizontal.</summary>
+		public LineOrientation LineOrientation {
+			get {
+				return lineOrientation;
+			}
+			set {
+				lineOrientation=value;
+			}
+		}
+		///<summary>Used to determine intial starting position of the line.</summary>
+		public LinePosition LinePosition {
+			get {
+				return linePosition;
+			}
+			set {
+				linePosition=value;
+			}
+		}
+		///<summary>Used to determine what percentage of the section the line will draw on.</summary>
+		public int LinePercent {
+			get {
+				return linePercent;
+			}
+			set {
+				linePercent=value;
+			}
+		}
+		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
+		public int OffSetX {
+			get {
+				return offSetX;
+			}
+			set {
+				offSetX=value;
+			}
+		}
+		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
+		public int OffSetY {
+			get {
+				return offSetY;
+			}
+			set {
+				offSetY=value;
+			}
+		}
+		///<summary>Used to underline text objects and titles.</summary>
+		public bool IsUnderlined {
+			get {
+				return isUnderlined;
+			}
+			set {
+				isUnderlined=value;
+			}
+		}
 		///<summary>The kind of field, like FormulaField, SummaryField, or DataTableField.</summary>
 		public FieldDefKind FieldKind{
 			get{
@@ -220,7 +280,8 @@ namespace OpenDental.ReportingOld2
 		}
 
 		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string thisSectionName,Point thisLocation,Size thisSize,string thisStaticText,Font thisFont,ContentAlignment thisTextAlign){
+		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize,string thisStaticText,Font thisFont,ContentAlignment thisTextAlign){
+			name=thisName;
 			sectionName=thisSectionName;
 			location=thisLocation;
 			size=thisSize;
@@ -231,10 +292,36 @@ namespace OpenDental.ReportingOld2
 			objectKind=ReportObjectKind.TextObject;
 		}
 
+		///<summary>Overload for BoxObject.</summary>
+		public ReportObject(string thisName,string thisSectionName,Color thisColor,float thisLineThickness,int thisOffSetX,int thisOffSetY) {
+			name=thisName;
+			sectionName=thisSectionName;
+			foreColor=thisColor;
+			lineThickness=thisLineThickness;
+			offSetX=thisOffSetX;
+			offSetY=thisOffSetY;
+			objectKind=ReportObjectKind.BoxObject;
+		}
+
+		///<summary>Overload for LineObject.</summary>
+		public ReportObject(string thisName,string thisSectionName,Color thisColor,float thisLineThickness,LineOrientation thisLineOrientation,LinePosition thisLinePosition,int thisLinePercent,int thisOffSetX,int thisOffSetY) {
+			name=thisName;
+			sectionName=thisSectionName;
+			foreColor=thisColor;
+			lineThickness=thisLineThickness;
+			lineOrientation=thisLineOrientation;
+			linePosition=thisLinePosition;
+			linePercent=thisLinePercent;
+			offSetX=thisOffSetX;
+			offSetY=thisOffSetY;
+			objectKind=ReportObjectKind.LineObject;
+		}
+
 		///<summary>Overload for DataTableField ReportObject</summary>
-		public ReportObject(string thisSectionName,Point thisLocation,Size thisSize
+		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
 			,string thisDataField,FieldValueType thisValueType
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString){
+			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
+			name=thisName;
 			sectionName=thisSectionName;
 			location=thisLocation;
 			size=thisSize;
@@ -250,9 +337,10 @@ namespace OpenDental.ReportingOld2
 		}
 
 		///<summary>Overload for SummaryField ReportObject</summary>
-		public ReportObject(string thisSectionName,Point thisLocation,Size thisSize
+		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
 			,SummaryOperation thisOperation,string thisSummarizedField
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString){
+			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
+			name=thisName;
 			sectionName=thisSectionName;
 			location=thisLocation;
 			size=thisSize;
@@ -269,9 +357,10 @@ namespace OpenDental.ReportingOld2
 		}
 
 		///<summary>Overload for SpecialField ReportObject</summary>
-		public ReportObject(string thisSectionName,Point thisLocation,Size thisSize
+		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
 			,FieldValueType thisValueType,SpecialFieldType thisSpecialType
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString){
+			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
+			name=thisName;
 			sectionName=thisSectionName;
 			location=thisLocation;
 			size=thisSize;
@@ -386,7 +475,9 @@ namespace OpenDental.ReportingOld2
 		//PictureObject Object is a picture. 
 		//SubreportObject Object is a subreport.
 		///<summary>Object is a text object. </summary>
-		TextObject
+		TextObject,
+		///<summary>Object is a text object. </summary>
+		QueryObject
 	}
 
 	///<summary>Specifies the special field type in the SpecialType property of the ReportObject class.</summary>
@@ -411,6 +502,28 @@ namespace OpenDental.ReportingOld2
 		//Percentage Summary returns as a percentage of the grand total summary. 
 		///<summary>Summary returns the total of all the values for the field.</summary>
 		Sum
+	}
+
+	///<summary>Used to determine how a line draws in a section.</summary>
+	public enum LineOrientation{
+		///<summary></summary>
+		Horizontal,
+		///<summary></summary>
+		Vertical
+	}
+
+	///<summary>Used to determine where a line draws in a section.</summary>
+	public enum LinePosition{
+		///<summary>Used in Horizontal and Vertical Orientation</summary>
+		Center,
+		///<summary>Used in Vertical Orientation</summary>
+		Left,
+		///<summary>Used in Vertical Orientation</summary>
+		Right,
+		///<summary>Used in Horizontal Orientation</summary>
+		Top,
+		///<summary>Used in Horizontal Orientation</summary>
+		Bottom
 	}
 
 	

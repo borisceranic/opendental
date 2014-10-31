@@ -4,7 +4,7 @@ using System.Drawing.Printing;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 //using System.IO;
@@ -123,52 +123,52 @@ namespace OpenDental{
 		}
 
 		private void ExecuteReport(){
-			ReportLikeCrystal report=new ReportLikeCrystal();
-			report.AddTitle("INCOMPLETE PROCEDURE NOTES");
-			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-			report.Query=@"(SELECT procedurelog.ProcDate,
-				CONCAT(CONCAT(patient.LName,', '),patient.FName),
-				procedurecode.ProcCode,procedurecode.Descript,
-				procedurelog.ToothNum,procedurelog.Surf
-				FROM procedurelog,patient,procedurecode,procnote n1
-				WHERE procedurelog.PatNum = patient.PatNum
-				AND procedurelog.CodeNum = procedurecode.CodeNum
-				AND procedurelog.ProcStatus = "+POut.Int((int)ProcStat.C)+@"
-				AND procedurelog.ProcNum=n1.ProcNum "
-				+"AND n1.Note LIKE '%\"\"%' "//looks for ""
-				+@"AND n1.EntryDateTime=(SELECT MAX(n2.EntryDateTime)
-				FROM procnote n2
-				WHERE n1.ProcNum = n2.ProcNum))
-				UNION ALL
-				(SELECT procedurelog.ProcDate,
-				CONCAT(CONCAT(patient.LName,', '),patient.FName),
-				procedurecode.ProcCode,procedurecode.Descript,
-				procedurelog.ToothNum,procedurelog.Surf
-				FROM procedurelog,patient,procedurecode,procnote n1
-				WHERE procedurelog.PatNum = patient.PatNum
-				AND procedurelog.CodeNum = procedurecode.CodeNum
-				AND procedurelog.ProcStatus = "+POut.Int((int)ProcStat.EC)+@"
-				AND procedurelog.ProcNum=n1.ProcNum "
-				+"AND n1.Note LIKE '%\"\"%' "//looks for ""
-				+@"AND n1.EntryDateTime=(SELECT MAX(n2.EntryDateTime)
-				FROM procnote n2
-				WHERE n1.ProcNum = n2.ProcNum)
-				AND procedurecode.ProcCode='~GRP~')
-				ORDER BY ProcDate";
-			report.AddColumn("Date",80,FieldValueType.Date);
-			report.AddColumn("Patient",120,FieldValueType.String);
-			report.AddColumn("Code",50,FieldValueType.String);
-			report.AddColumn("Description",120,FieldValueType.String);
-			report.AddColumn("Tth",30,FieldValueType.String);
-			report.AddColumn("Surf",40,FieldValueType.String);
-			report.AddPageNum();
-      if(!report.SubmitQuery()){
-				DialogResult=DialogResult.Cancel;
-				return;
-			}
-			FormReportLikeCrystal FormR=new FormReportLikeCrystal(report);
-			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+//			ReportComplex report=new ReportComplex();
+//			report.AddTitle("INCOMPLETE PROCEDURE NOTES");
+//			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
+//			report.Queries=@"(SELECT procedurelog.ProcDate,
+//				CONCAT(CONCAT(patient.LName,', '),patient.FName),
+//				procedurecode.ProcCode,procedurecode.Descript,
+//				procedurelog.ToothNum,procedurelog.Surf
+//				FROM procedurelog,patient,procedurecode,procnote n1
+//				WHERE procedurelog.PatNum = patient.PatNum
+//				AND procedurelog.CodeNum = procedurecode.CodeNum
+//				AND procedurelog.ProcStatus = "+POut.Int((int)ProcStat.C)+@"
+//				AND procedurelog.ProcNum=n1.ProcNum "
+//				+"AND n1.Note LIKE '%\"\"%' "//looks for ""
+//				+@"AND n1.EntryDateTime=(SELECT MAX(n2.EntryDateTime)
+//				FROM procnote n2
+//				WHERE n1.ProcNum = n2.ProcNum))
+//				UNION ALL
+//				(SELECT procedurelog.ProcDate,
+//				CONCAT(CONCAT(patient.LName,', '),patient.FName),
+//				procedurecode.ProcCode,procedurecode.Descript,
+//				procedurelog.ToothNum,procedurelog.Surf
+//				FROM procedurelog,patient,procedurecode,procnote n1
+//				WHERE procedurelog.PatNum = patient.PatNum
+//				AND procedurelog.CodeNum = procedurecode.CodeNum
+//				AND procedurelog.ProcStatus = "+POut.Int((int)ProcStat.EC)+@"
+//				AND procedurelog.ProcNum=n1.ProcNum "
+//				+"AND n1.Note LIKE '%\"\"%' "//looks for ""
+//				+@"AND n1.EntryDateTime=(SELECT MAX(n2.EntryDateTime)
+//				FROM procnote n2
+//				WHERE n1.ProcNum = n2.ProcNum)
+//				AND procedurecode.ProcCode='~GRP~')
+//				ORDER BY ProcDate";
+//			report.AddColumn("Date",80,FieldValueType.Date);
+//			report.AddColumn("Patient",120,FieldValueType.String);
+//			report.AddColumn("Code",50,FieldValueType.String);
+//			report.AddColumn("Description",120,FieldValueType.String);
+//			report.AddColumn("Tth",30,FieldValueType.String);
+//			report.AddColumn("Surf",40,FieldValueType.String);
+//			report.AddPageNum();
+//			if(!report.SubmitQueries()){
+//				DialogResult=DialogResult.Cancel;
+//				return;
+//			}
+//			FormReportComplex FormR=new FormReportComplex(report);
+//			FormR.ShowDialog();
+//			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {

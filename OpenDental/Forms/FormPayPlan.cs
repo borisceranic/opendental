@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Forms;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDental.UI;
 using OpenDentBusiness;
 
@@ -1367,99 +1367,99 @@ namespace OpenDental{
 			if(!SaveData()){
 				return;
 			}
-			ReportLikeCrystal report=new ReportLikeCrystal();
-			report.AddTitle("Payment Plan Terms");
-			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-			report.AddSubTitle(DateTime.Today.ToShortDateString());
-			string sectName="Report Header";
-			Section section=report.Sections["Report Header"];
-			//int sectIndex=report.Sections.GetIndexOfKind(AreaSectionKind.ReportHeader);
-			Size size=new Size(300,20);//big enough for any text
-			Font font=new Font("Tahoma",9);
-			ContentAlignment alignL=ContentAlignment.MiddleLeft;
-			ContentAlignment alignR=ContentAlignment.MiddleRight;
-			int yPos=140;
-			int space=30;
-			int x1=175;
-			int x2=275;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Patient",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,textPatient.Text,font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Guarantor",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,textGuarantor.Text,font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Date of Agreement",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,PayPlanCur.PayPlanDate.ToString("d"),font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Principal",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,TotPrinc.ToString("n"),font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Annual Percentage Rate",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,PayPlanCur.APR.ToString("f1"),font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Total Finance Charges",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,TotInt.ToString("n"),font,alignR));
-			yPos+=space;
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x1,yPos),size,"Total Cost of Loan",font,alignL));
-			report.ReportObjects.Add(new ReportObject
-				(sectName,new Point(x2,yPos),size,TotPrincInt.ToString("n"),font,alignR));
-			yPos+=space;
-			section.Height=yPos+30;
-			report.AddColumn("ChargeDate",80,FieldValueType.Date);
-			//move the first column more to the middle
-			report.GetLastRO(ReportObjectKind.TextObject).Location=new Point(150,0);
-			report.GetLastRO(ReportObjectKind.TextObject).StaticText="Date";
-			report.GetLastRO(ReportObjectKind.FieldObject).Location=new Point(150,0);
-			report.AddColumn("Description",150,FieldValueType.String);
-			report.AddColumn("Charges",70,FieldValueType.Number);
-			report.AddColumn("Credits",70,FieldValueType.Number);
-			report.AddColumn("Balance",70,FieldValueType.String);
-			//report.AddColumn("Note",300,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).Location=new Point(report.GetLastRO(ReportObjectKind.TextObject).Location.X+20,0);
-			report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
-			report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.Query="SELECT ChargeDate,Principal,Interest,Principal+Interest,Note "
-			//	+"FROM payplancharge WHERE PayPlanNum="+POut.PInt(PayPlanCur.PayPlanNum)
-			//	+" ORDER BY ChargeDate";
-			//if(!report.SubmitQuery()){
-			//	return;
+			//ReportComplex report=new ReportComplex();
+			//report.AddTitle("Payment Plan Terms");
+			//report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
+			//report.AddSubTitle(DateTime.Today.ToShortDateString());
+			//string sectName="Report Header";
+			//Section section=report.Sections["Report Header"];
+			////int sectIndex=report.Sections.GetIndexOfKind(AreaSectionKind.ReportHeader);
+			//Size size=new Size(300,20);//big enough for any text
+			//Font font=new Font("Tahoma",9);
+			//ContentAlignment alignL=ContentAlignment.MiddleLeft;
+			//ContentAlignment alignR=ContentAlignment.MiddleRight;
+			//int yPos=140;
+			//int space=30;
+			//int x1=175;
+			//int x2=275;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Patient",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,textPatient.Text,font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Guarantor",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,textGuarantor.Text,font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Date of Agreement",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,PayPlanCur.PayPlanDate.ToString("d"),font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Principal",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,TotPrinc.ToString("n"),font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Annual Percentage Rate",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,PayPlanCur.APR.ToString("f1"),font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Total Finance Charges",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,TotInt.ToString("n"),font,alignR));
+			//yPos+=space;
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x1,yPos),size,"Total Cost of Loan",font,alignL));
+			//report.ReportObjects.Add(new ReportObject
+			//	(sectName,new Point(x2,yPos),size,TotPrincInt.ToString("n"),font,alignR));
+			//yPos+=space;
+			//section.Height=yPos+30;
+			//report.AddColumn("ChargeDate",80,FieldValueType.Date);
+			////move the first column more to the middle
+			//report.GetLastRO(ReportObjectKind.TextObject).Location=new Point(150,0);
+			//report.GetLastRO(ReportObjectKind.TextObject).StaticText="Date";
+			//report.GetLastRO(ReportObjectKind.FieldObject).Location=new Point(150,0);
+			//report.AddColumn("Description",150,FieldValueType.String);
+			//report.AddColumn("Charges",70,FieldValueType.Number);
+			//report.AddColumn("Credits",70,FieldValueType.Number);
+			//report.AddColumn("Balance",70,FieldValueType.String);
+			////report.AddColumn("Note",300,FieldValueType.String);
+			////report.GetLastRO(ReportObjectKind.TextObject).Location=new Point(report.GetLastRO(ReportObjectKind.TextObject).Location.X+20,0);
+			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
+			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
+			////report.Query="SELECT ChargeDate,Principal,Interest,Principal+Interest,Note "
+			////	+"FROM payplancharge WHERE PayPlanNum="+POut.PInt(PayPlanCur.PayPlanNum)
+			////	+" ORDER BY ChargeDate";
+			////if(!report.SubmitQuery()){
+			////	return;
+			////}
+			////report.Sections[
+			//DataTable tbl=new DataTable();
+			//tbl.Columns.Add("date");
+			//tbl.Columns.Add("description");
+			//tbl.Columns.Add("charges");
+			//tbl.Columns.Add("credits");
+			//tbl.Columns.Add("balance");
+			//DataRow row;
+			//for(int i=0;i<table.Rows.Count;i++){
+			//	row=tbl.NewRow();
+			//	row["date"]=table.Rows[i]["date"].ToString();
+			//	row["description"]=table.Rows[i]["description"].ToString();
+			//	row["charges"]=table.Rows[i]["charges"].ToString();
+			//	row["credits"]=table.Rows[i]["credits"].ToString();
+			//	row["balance"]=table.Rows[i]["balance"].ToString();
+			//	tbl.Rows.Add(row);
 			//}
-			//report.Sections[
-			DataTable tbl=new DataTable();
-			tbl.Columns.Add("date");
-			tbl.Columns.Add("description");
-			tbl.Columns.Add("charges");
-			tbl.Columns.Add("credits");
-			tbl.Columns.Add("balance");
-			DataRow row;
-			for(int i=0;i<table.Rows.Count;i++){
-				row=tbl.NewRow();
-				row["date"]=table.Rows[i]["date"].ToString();
-				row["description"]=table.Rows[i]["description"].ToString();
-				row["charges"]=table.Rows[i]["charges"].ToString();
-				row["credits"]=table.Rows[i]["credits"].ToString();
-				row["balance"]=table.Rows[i]["balance"].ToString();
-				tbl.Rows.Add(row);
-			}
-			report.ReportTable=tbl;
-			//yPos+=60;
-			report.ReportObjects.Add(new ReportObject
-				("Report Footer",new Point(x1,70),size,"Signature of Guarantor:",font,alignL));
-			FormReportLikeCrystal FormR=new FormReportLikeCrystal(report);
-			FormR.ShowDialog();
+			//report.ReportTables=tbl;
+			////yPos+=60;
+			//report.ReportObjects.Add(new ReportObject
+			//	("Report Footer",new Point(x1,70),size,"Signature of Guarantor:",font,alignL));
+			//FormReportComplex FormR=new FormReportComplex(report);
+			//FormR.ShowDialog();
 		}
 
 		private void pd2_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e) {

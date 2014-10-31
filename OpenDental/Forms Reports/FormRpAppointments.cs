@@ -4,7 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Data;
-using OpenDental.ReportingOld2;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental
@@ -312,63 +312,54 @@ namespace OpenDental
 			}
 			whereProv += ")) ";
 			//create the report
-			ReportLikeCrystal report=new ReportLikeCrystal();
+			ReportComplex report=new ReportComplex("Appointments","",true,true);
 			report.IsLandscape=true;
 			report.ReportName="Appointments";
-			report.AddTitle("Appointments");
-			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-			report.AddSubTitle(dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
+			report.GetTitle().IsUnderlined=true;
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
+			report.GetObjectByName("PracName").IsUnderlined=true;
+			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
 			//setup query
-			report.Query=@"SELECT appointment.AptDateTime, 
-				trim(CONCAT(CONCAT(CONCAT(CONCAT(concat(patient.LName,', '),case when length(patient.Preferred) > 0 
-				then CONCAT(CONCAT('(',patient.Preferred),') ') else '' end),patient.fname), ' '),patient.middlei))
-				AS PatName,
-				patient.Birthdate,
-				appointment.AptDateTime,
-				length(appointment.Pattern)*5,
-				appointment.ProcDescript,
-				patient.HmPhone, patient.WkPhone, patient.WirelessPhone
-				FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum
-				WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
-				+POut.Date(dateTo.AddDays(1)) + " AND " +
-				"AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " +
-				"AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
+			QueryObject query;
+			query=report.AddQuery(@"SELECT appointment.AptDateTime,trim(CONCAT(CONCAT(CONCAT(CONCAT(concat(patient.LName,', '),"
+			  +"case when length(patient.Preferred) > 0 then CONCAT(CONCAT('(',patient.Preferred),') ') else '' end),patient.fname), ' '),"
+				+"patient.middlei)) AS PatName,patient.Birthdate,appointment.AptDateTime,length(appointment.Pattern)*5,appointment.ProcDescript,patient.HmPhone, patient.WkPhone, patient.WirelessPhone"
+				+" FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
+				+POut.Date(dateTo.AddDays(1)) + " AND " + "AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " + "AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
 				whereProv + " " +
-				"ORDER BY appointment.AptDateTime, 2";
+				"ORDER BY appointment.AptDateTime, 2","");
 			// add columns to report
-			report.AddColumn("Date", 75, FieldValueType.Date);
-			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate = true;
-			report.GetLastRO(ReportObjectKind.FieldObject).FormatString="d";
-			report.AddColumn("Patient", 175, FieldValueType.String);
-			report.AddColumn("Age", 45, FieldValueType.Age);
-			// remove the total column
-			//if(report.ReportObjects[report.ReportObjects.Count-1].SummarizedField == "Age")
-			//	report.ReportObjects.RemoveAt(report.ReportObjects.Count-1);
-			//report.GetLastRO(ReportObjectKind.FieldObject).FormatString = "###0";
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign = ContentAlignment.MiddleCenter;
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign = ContentAlignment.MiddleCenter;
-			report.AddColumn("Time", 65, FieldValueType.Date);
-			report.GetLastRO(ReportObjectKind.FieldObject).FormatString="t";
-			report.GetLastRO(ReportObjectKind.TextObject).TextAlign = ContentAlignment.MiddleRight;
-			report.GetLastRO(ReportObjectKind.FieldObject).TextAlign = ContentAlignment.MiddleRight;
-			report.AddColumn("Length", 60, FieldValueType.Integer);
-			report.GetLastRO(ReportObjectKind.TextObject).Location=new Point(
-				report.GetLastRO(ReportObjectKind.TextObject).Location.X+6,
-				report.GetLastRO(ReportObjectKind.TextObject).Location.Y);
-			report.GetLastRO(ReportObjectKind.FieldObject).Location=new Point(
-				report.GetLastRO(ReportObjectKind.FieldObject).Location.X+8,
-				report.GetLastRO(ReportObjectKind.FieldObject).Location.Y);
-			report.AddColumn("Description", 170, FieldValueType.String);
-			report.AddColumn("Home Ph.", 120, FieldValueType.String);
-			report.AddColumn("Work Ph.", 120, FieldValueType.String);
-			report.AddColumn("Cell Ph.", 120, FieldValueType.String);
+			query.AddColumn("Date", 75, FieldValueType.Date);
+			query.GetColumnDetail("Date").SuppressIfDuplicate = true;
+			query.GetColumnDetail("Date").FormatString="d";
+			query.AddColumn("Patient",175,FieldValueType.String);
+			query.AddColumn("Age",45,FieldValueType.Age);
+			query.AddColumn("Time",65,FieldValueType.Date);
+			query.GetColumnDetail("Time").FormatString="t";
+			query.GetColumnDetail("Time").TextAlign = ContentAlignment.MiddleRight;
+			query.GetColumnHeader("Time").TextAlign = ContentAlignment.MiddleRight;
+			query.AddColumn("Length",60,FieldValueType.Integer);
+			query.GetColumnHeader("Length").Location=new Point(
+				query.GetColumnHeader("Length").Location.X,
+				query.GetColumnHeader("Length").Location.Y);
+			query.GetColumnHeader("Length").TextAlign = ContentAlignment.MiddleCenter;
+			query.GetColumnDetail("Length").TextAlign = ContentAlignment.MiddleCenter;
+			query.GetColumnDetail("Length").Location=new Point(
+				query.GetColumnDetail("Length").Location.X,
+				query.GetColumnDetail("Length").Location.Y);
+			query.AddColumn("Description",170,FieldValueType.String);
+			query.AddColumn("Home Ph.",120,FieldValueType.String);
+			query.AddColumn("Work Ph.",120,FieldValueType.String);
+			query.AddColumn("Cell Ph.",120,FieldValueType.String);
+			report.AddLine("Line","Report Header",Color.Red,3,LineOrientation.Horizontal,LinePosition.Top,100,0,0);
 			report.AddPageNum();
+			report.AddGridLines();
 			// execute query
-			if(!report.SubmitQuery()){
+			if(!report.SubmitQueries()){
 				return;
 			}
 			// display report
-			FormReportLikeCrystal FormR=new FormReportLikeCrystal(report);
+			FormReportComplex FormR=new FormReportComplex(report);
 			//FormR.MyReport=report;
 			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
