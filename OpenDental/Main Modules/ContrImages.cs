@@ -909,7 +909,7 @@ namespace OpenDental {
 								pictureBoxMain.Visible=false;
 							}
 						}
-						catch {
+						catch(Exception ex) {
 							//An exception can happen if they do not have Adobe Acrobat Reader version 8.0 or later installed.
 							//Simply ignore this exception and do nothing. We never used to display .pdf files anyway, so we
 							//essentially revert back to the old behavior in this case.
