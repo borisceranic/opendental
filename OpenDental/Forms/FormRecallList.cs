@@ -1262,7 +1262,6 @@ namespace OpenDental{
 			addrTable=Recalls.GetAddrTableForRecallScheduler(recallNums,checkGroupFamilies.Checked,sortBy);
 			EmailMessage emailMessage;
 			EmailAddress emailAddress;
-			string URL="http://opendental.com";//TODO: replace with the correct URL
 			for(int i=0;i<addrTable.Rows.Count;i++) {
 				#region Send Email Notification
 				string emailBody="";
@@ -1272,23 +1271,24 @@ namespace OpenDental{
 				emailMessage.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
 				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
 				emailMessage.FromAddress=emailAddress.SenderAddress;
-				emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject);//TODO: ask Nathan if he wants the ability to have separate subjects per # of reminders.
-				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
-				emailMessage.Subject=emailSubject;
 				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
+					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject);
 					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage);
 				}
 				else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
+					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject2);
 					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage2);
 				}
 				else {
+					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject3);
 					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage3);
 				}
+				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
 				emailBody=emailBody.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
 				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
-				string parameters="";
+				string URL="";
 				try {
-					dictRecallSchedulerParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out parameters);
+					dictRecallSchedulerParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
 				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
@@ -1296,7 +1296,7 @@ namespace OpenDental{
 					MessageBox.Show(error+Lan.g(this,"Problem getting recall scheduler URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
 					break;
 				}
-				emailBody=emailBody.Replace("[URL]",URL+parameters);
+				emailBody=emailBody.Replace("[URL]",URL);
 				string officePhone=PrefC.GetString(PrefName.PracticePhone);
 				Clinic clinic=Clinics.GetClinic(PIn.Long(addrTable.Rows[i]["clinicNum"].ToString()));
 				if(clinic!=null && !String.IsNullOrEmpty(clinic.Phone)) {
@@ -1306,6 +1306,7 @@ namespace OpenDental{
 					officePhone="("+officePhone.Substring(0,3)+")"+officePhone.Substring(3,3)+"-"+officePhone.Substring(6);
 				}
 				emailBody=emailBody.Replace("[OfficePhone]",officePhone);
+				emailMessage.Subject=emailSubject;
 				emailMessage.BodyText=emailBody;
 				try {
 					//TODO: uncomment once done testing.
