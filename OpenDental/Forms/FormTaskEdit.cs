@@ -1021,6 +1021,8 @@ namespace OpenDental {
 			else if(color==butRed.Name) {
 				textDescript.Text+=" !!";
 			}
+			//Should be logged due to Task Description changing.
+			//Tasks.TaskEditCreateLog(Lan.g(this,"Task color changed to")+" "+color,TaskCur);
 		}
 
 		private void listObjectType_MouseDown(object sender,System.Windows.Forms.MouseEventArgs e) {
@@ -1095,6 +1097,7 @@ namespace OpenDental {
 				taskText+="=="+Userods.GetName(NoteList[i].UserNum)+" - "+NoteList[i].DateTimeNote.ToShortDateString()+" "+NoteList[i].DateTimeNote.ToShortTimeString()+" - "+NoteList[i].Note;
 			}
 			System.Windows.Forms.Clipboard.SetText(taskText);
+			Tasks.TaskEditCreateLog(Lan.g(this,"Copied Task Note"),TaskCur);
 		}
 
 		private bool SaveCur() {
@@ -1177,6 +1180,7 @@ namespace OpenDental {
 			//Cur.KeyNum already handled
 			try {
 				if(IsNew) {
+					TaskCur.IsNew=true;
 					Tasks.Update(TaskCur,TaskOld);
 				}
 				else {
@@ -1202,6 +1206,7 @@ namespace OpenDental {
 					return;
 				}
 			}
+			Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task from tasklist")+" "+TaskLists.GetOne(TaskCur.TaskListNum).Descript,TaskCur);
 			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all three tables
 			DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			DialogResult=DialogResult.OK;
@@ -1302,14 +1307,6 @@ namespace OpenDental {
 				MsgBox.Show(this,"One or more task note edit windows are open and must be closed.");
 				return;
 			}
-			if(!SaveCur()) {//If user clicked OK without changing anything, then this will have no effect.
-				return;
-			}
-			if(!notesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
-				DialogResult=DialogResult.OK;
-				Close();
-				return;
-			}
 			if(IsNew) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
@@ -1318,6 +1315,14 @@ namespace OpenDental {
 			}
 			else {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
+			}
+			if(!SaveCur()) {//If user clicked OK without changing anything, then this will have no effect.
+				return;
+			}
+			if(!notesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
+				DialogResult=DialogResult.OK;
+				Close();
+				return;
 			}
 			DialogResult=DialogResult.OK;
 			Close();

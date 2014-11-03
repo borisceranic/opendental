@@ -194,7 +194,9 @@ namespace OpenDentBusiness{
 		///<summary>82- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
 		TreatPlanDiscountEdit,
 		///<summary>83- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
-		UserLogOnOff
+		UserLogOnOff,
+		///<summary>84- There is no user interface in the sercurity window for this permission.</summary>
+		TaskEdit
 
 	}
 

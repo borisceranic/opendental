@@ -189,6 +189,7 @@ namespace OpenDentBusiness{
 				case Permissions.AdminDentalEvaluations:
 				case Permissions.TreatPlanDiscountEdit:
 				//case Permissions.UserLogOnOff:
+				//case Permissions.TaskEdit:
 				return false;//Does not have audit Trail.
 			}
 			return true;
@@ -338,6 +339,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Task Note Edit");
 				case Permissions.WikiListSetup:
 					return Lans.g("enumPermissions","Wiki List Setup");
+				case Permissions.TaskEdit:
+					return Lans.g("enumPermissions","Task Edit");
 			}
 			return "";//should never happen
 		}

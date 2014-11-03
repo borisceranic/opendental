@@ -319,6 +319,37 @@ namespace OpenDentBusiness{
 			if(WasTaskAltered(oldTask)){
 				throw new Exception(Lans.g("Tasks","Not allowed to save changes because the task has been altered by someone else."));
 			}
+			if(task.IsNew) {
+				TaskEditCreateLog(Lans.g("Tasks","New task added"),task);
+				task.IsNew=false;
+			}
+			else {
+				if(task.TaskStatus!=oldTask.TaskStatus) {
+					if(task.TaskStatus==TaskStatusEnum.Done) {
+						TaskEditCreateLog(Lans.g("Tasks","Task marked done"),task);
+					}
+					if(task.TaskStatus==TaskStatusEnum.New) {
+						TaskEditCreateLog(Lans.g("Tasks","Task marked new"),task);
+					}
+					//Nothinng for case when Not New and Not Done. Put here in future is wanted
+				}
+				if(task.Descript!=oldTask.Descript) {
+					TaskEditCreateLog(Lans.g("Tasks","Task description edited"),task);
+				}
+				if(task.UserNum!=oldTask.UserNum) {
+					TaskEditCreateLog(Lans.g("Tasks","Changed user from")+" "+Userods.GetName(oldTask.UserNum),task);//+" To "+Userods.GetName(task.UserNum)),task);
+				}
+				if(task.KeyNum!=oldTask.KeyNum) {
+					long newPat=(task.ObjectType==TaskObjectType.Patient?task.KeyNum:Appointments.GetOneApt(task.KeyNum).PatNum);
+					long oldPat=(oldTask.ObjectType==TaskObjectType.Patient?oldTask.KeyNum:Appointments.GetOneApt(oldTask.KeyNum).PatNum);
+					if(newPat!=oldPat){
+						TaskEditCreateLog(Lans.g("tasks","Attached patient changed from")+" "+oldPat.ToString(),task);//+" to "+newPat.ToString()),task);					
+					}
+				}
+				if(task.TaskListNum!=oldTask.TaskListNum) {
+					TaskEditCreateLog(Lans.g("tasks","Task moved from "+TaskLists.GetOne(oldTask.TaskListNum).Descript),task);
+				}
+			}
 			Crud.TaskCrud.Update(task);
 			if(task.TaskListNum!=oldTask.TaskListNum) {
 				TaskAncestors.Synch(task);
@@ -448,9 +479,20 @@ namespace OpenDentBusiness{
 				+"AND TaskStatus != "+POut.Int((int)TaskStatusEnum.Done);
 			return PIn.Int(Db.GetCount(command));
 		}
-	
 
-	
+		public static void TaskEditCreateLog(string logText,Task task) {
+			long patNum=0;//Task type of none defaults to 0.
+			if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
+				patNum=task.KeyNum;
+				//logText+=". Attached patient: "+task.PatientName;
+			}
+			else if(task.ObjectType==TaskObjectType.Appointment) {//Task type of appointment we have to look up the patient from the apt.
+				Appointment AptCur=Appointments.GetOneApt(task.KeyNum);
+				patNum=AptCur.PatNum;
+				//logText+=". Attached patient: "+task.PatientName+" from an appointment";
+			}
+			SecurityLogs.MakeLogEntry(Permissions.TaskEdit,patNum,logText,task.TaskNum);
+		}	
 	}
 
 	///<summary>Takes two tasks and compares which needs to be higher or lower based first on their coloration, then on their date.</summary>
