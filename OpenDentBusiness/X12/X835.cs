@@ -2980,7 +2980,7 @@ namespace OpenDentBusiness {
 				if(_claimNum!=0) {
 					return _claimNum;
 				}
-				Claim claim=Claims.GetClaimFromX12(ClaimTrackingNumber,(double)ClaimFee,DateServiceStart,PatientName.Fname,PatientName.Lname,SubscriberName.SubscriberId);
+				Claim claim=Claims.GetClaimFromX12(ClaimTrackingNumber,(double)ClaimFee,DateServiceStart,DateServiceEnd,PatientName.Fname,PatientName.Lname,SubscriberName.SubscriberId);
 				if(claim!=null) {
 					_claimNum=claim.ClaimNum;
 				}

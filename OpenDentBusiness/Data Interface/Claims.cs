@@ -439,20 +439,26 @@ namespace OpenDentBusiness{
 			return (Db.GetTable(command).Rows[0][0].ToString()!="0");
 		}
 
-		///<summary>Returns the claim with the specified fee and date of service.  The returned claim will also either begin with the specified claimIdentifier, or
+		///<summary>Returns the claim with the specified fee and dates of service.  The returned claim will also either begin with the specified claimIdentifier, or
 		///will be for the patient name and subscriber ID specified.  If no match was found, or multiple matches were found, then null is returned.</summary>
-		public static Claim GetClaimFromX12(string claimIdentifier,double claimFee,DateTime claimDateService,string patFname,string patLname,string subscriberId) {
+		public static Claim GetClaimFromX12(string claimIdentifier,double claimFee,DateTime dateServiceStart,DateTime dateServiceEnd,string patFname,string patLname,string subscriberId) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Claim>(MethodBase.GetCurrentMethod(),claimIdentifier,claimFee,claimDateService,patFname,patLname,subscriberId);
+				return Meth.GetObject<Claim>(MethodBase.GetCurrentMethod(),claimIdentifier,claimFee,dateServiceStart,dateServiceEnd,patFname,patLname,subscriberId);
 			}
-			//We always require the claim fee and date of service to match, then we use other criteria below to wisely choose from the shorter list of claims.
-			//The list of claims with matching fee and date of service should be very short.  Worst case, the list would contain all of the appointments for a single day if every claim had the same fee (rare).
+			if(dateServiceStart.Year<1880 || dateServiceEnd.Year<1880) {
+				//Service dates are required for us to continue.
+				//In 227s, the claim dates of service are required and should be present.
+				//In 835s, pull the procedure dates up into the claim dates of service if the claim dates are of service are not present.
+				return null;
+			}
+			//We always require the claim fee and dates of service to match, then we use other criteria below to wisely choose from the shorter list of claims.
+			//The list of claims with matching fee and date of service should be very short.  Worst case, the list would contain all of the appointments for a few days if every claim had the same fee (rare).
 			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.LName,patient.FName,inssub.SubscriberID "
 				+"FROM claim "
 				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
 				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
 				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum AND claim.PlanNum=inssub.PlanNum "
-				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+"="+POut.Date(claimDateService);
+				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+">="+POut.Date(dateServiceStart)+" AND "+DbHelper.DateColumn("DateService")+"<="+POut.Date(dateServiceEnd);
 			DataTable dtClaims=Db.GetTable(command);
 			if(dtClaims.Rows.Count==0) {
 				return null;//No matches found for the specific claim fee and date of service.  Aboloutely no suitable matches.
