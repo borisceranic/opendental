@@ -582,10 +582,11 @@ namespace OpenDentBusiness{
 						string[] arrayClaimInfo=x277.GetClaimInfo(claimIdentifier);
 						string patFname=PIn.String(arrayClaimInfo[0]);
 						string patLname=PIn.String(arrayClaimInfo[1]);
-						DateTime dateService=PIn.DateT(arrayClaimInfo[6]);
+						DateTime dateServiceStart=PIn.DateT(arrayClaimInfo[6]);
+						DateTime dateServiceEnd=PIn.DateT(arrayClaimInfo[7]);
 						double claimFee=PIn.Double(arrayClaimInfo[9]);
 						string subscriberId=PIn.String(arrayClaimInfo[10]);
-						Claim claim=Claims.GetClaimFromX12(claimIdentifier,claimFee,dateService,patFname,patLname,subscriberId);
+						Claim claim=Claims.GetClaimFromX12(claimIdentifier,claimFee,dateServiceStart,dateServiceEnd,patFname,patLname,subscriberId);
 						if(claim==null) {
 							continue;
 						}

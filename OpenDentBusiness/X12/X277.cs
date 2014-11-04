@@ -346,6 +346,7 @@ namespace OpenDentBusiness
 						int dateServiceStartMonth=PIn.Int(dateServiceStr.Substring(4,2));
 						int dateServiceStartDay=PIn.Int(dateServiceStr.Substring(6,2));
 						result[6]=(new DateTime(dateServiceStartYear,dateServiceStartMonth,dateServiceStartDay)).ToShortDateString();
+						result[7]=result[6];//End date equals start date if the end date is not specifically defined.
 						if(dateServiceStr.Length==17) { //Date range.
 							int dateServiceEndYear=PIn.Int(dateServiceStr.Substring(9,4));
 							int dateServiceEndMonth=PIn.Int(dateServiceStr.Substring(13,2));
