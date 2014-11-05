@@ -1897,7 +1897,7 @@ namespace OpenDental {
 			//PaymentCur.ClinicNum already handled
 			if(SplitList.Count==0) {
 				if(Payments.AllocationRequired(PaymentCur.PayAmt,PaymentCur.PatNum)
-					&& MsgBox.Show(this,true,"Apply part of payment to other family members?")) {
+					&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {
 					SplitList=Payments.Allocate(PaymentCur);//PayAmt needs to be set first
 				}
 				else {//Either no allocation required, or user does not want to allocate.  Just add one split.
