@@ -305,6 +305,7 @@ namespace OpenDental {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
+				_yPosPrint=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
 				//heightsCalculated=false;
