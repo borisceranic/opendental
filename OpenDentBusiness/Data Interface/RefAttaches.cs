@@ -145,5 +145,17 @@ namespace OpenDentBusiness{
 				+"WHERE refattach.PatNum IN ("+String.Join<long>(",",listPatNums)+")";
 			return Crud.RefAttachCrud.SelectMany(command);
 		}
+
+		///<summary>Gets all the possible RefAttaches, for the patient, that are in the denominator of the summary of care measure.</summary>
+		public static List<RefAttach> GetRefAttachesForSummaryOfCareForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<RefAttach>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM refattach "
+				+"WHERE PatNum = "+POut.Long(patNum)+" "
+				+"AND IsFrom=0 AND IsTransitionOfCare=1 "
+				+"ORDER BY ItemOrder";
+			return Crud.RefAttachCrud.SelectMany(command);
+		}
 	}
 }

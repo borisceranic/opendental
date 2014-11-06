@@ -10,8 +10,8 @@ using OpenDental.UI;
 namespace OpenDental {
 	public partial class FormEhrSummaryOfCare:Form {
 		public Patient PatCur;
-		private List<EhrMeasureEvent> listHistorySent;
-		private List<EhrSummaryCcd> listCcdRec;
+		private List<EhrMeasureEvent> _listHistorySent;
+		private List<EhrSummaryCcd> _listCcdRec;
 
 		public FormEhrSummaryOfCare() {
 			InitializeComponent();
@@ -23,19 +23,47 @@ namespace OpenDental {
 		}
 
 		private void FillGridSent() {
+			List<RefAttach> listRefAttaches;
 			gridSent.BeginUpdate();
 			gridSent.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("DateTime",140,HorizontalAlignment.Center);
+			ODGridColumn col=new ODGridColumn("DateTime",130,HorizontalAlignment.Center);
 			gridSent.Columns.Add(col);
-			listHistorySent=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.SummaryOfCareProvidedToDr);
+			col=new ODGridColumn("Meets",140,HorizontalAlignment.Center);
+			gridSent.Columns.Add(col);
+			_listHistorySent=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.SummaryOfCareProvidedToDr);
+			listRefAttaches=RefAttaches.GetRefAttachesForSummaryOfCareForPat(PatCur.PatNum);
 			gridSent.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<listHistorySent.Count;i++) {
+			for(int i=0;i<_listHistorySent.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(listHistorySent[i].DateTEvent.ToString());
+				row.Cells.Add(_listHistorySent[i].DateTEvent.ToString());
+				if(_listHistorySent[i].FKey==0) {
+					row.Cells.Add("");
+				}
+				else {
+					//Only add an X in the grid for the measure events that meet the summary of care measure so that users can see which ones meet.
+					for(int j=0;j<listRefAttaches.Count;j++) {
+						if(listRefAttaches[j].RefAttachNum==_listHistorySent[i].FKey) {
+							row.Cells.Add("X");
+							break;
+						}
+					}
+				}
 				gridSent.Rows.Add(row);
 			}
 			gridSent.EndUpdate();
+		}
+
+		private void gridSent_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=PatCur.PatNum;
+			FormRP.IsSelectionMode=true;
+			if(FormRP.ShowDialog()==DialogResult.Cancel) {
+				return;
+			}
+			_listHistorySent[gridSent.GetSelectedIndex()].FKey=FormRP.RefAttachNum;
+			EhrMeasureEvents.Update(_listHistorySent[gridSent.GetSelectedIndex()]);
+			FillGridSent();
 		}
 
 		private void FillGridRec() {
@@ -43,19 +71,19 @@ namespace OpenDental {
 			gridRec.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("DateTime",140,HorizontalAlignment.Center);
 			gridRec.Columns.Add(col);
-			listCcdRec=EhrSummaryCcds.Refresh(PatCur.PatNum);
+			_listCcdRec=EhrSummaryCcds.Refresh(PatCur.PatNum);
 			gridRec.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<listCcdRec.Count;i++) {
+			for(int i=0;i<_listCcdRec.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(listCcdRec[i].DateSummary.ToShortDateString());
+				row.Cells.Add(_listCcdRec[i].DateSummary.ToShortDateString());
 				gridRec.Rows.Add(row);
 			}
 			gridRec.EndUpdate();
 		}
 
 		private void gridRec_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			string xmltext=listCcdRec[gridRec.GetSelectedIndex()].ContentSummary;
+			string xmltext=_listCcdRec[gridRec.GetSelectedIndex()].ContentSummary;
 			DisplayCCD(xmltext,PatCur);
 		}
 
@@ -229,6 +257,13 @@ namespace OpenDental {
 		}
 
 		private void butShowXhtml_Click(object sender,EventArgs e) {
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=PatCur.PatNum;
+			FormRP.IsSelectionMode=true;
+			if(FormRP.ShowDialog()==DialogResult.Cancel) {
+				MessageBox.Show("Summary of Care not shown.");
+				return;
+			}
 			string ccd="";
 			try {
 				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
@@ -243,6 +278,7 @@ namespace OpenDental {
 				EhrMeasureEvent measureEvent = new EhrMeasureEvent();
 				measureEvent.DateTEvent = DateTime.Now;
 				measureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
+				measureEvent.FKey=FormRP.RefAttachNum;
 				measureEvent.PatNum = PatCur.PatNum;
 				EhrMeasureEvents.Insert(measureEvent);
 				FillGridSent();
@@ -289,7 +325,7 @@ namespace OpenDental {
 				return;
 			}
 			for(int i=0;i<gridSent.SelectedIndices.Length;i++) {
-				EhrMeasureEvents.Delete(listHistorySent[gridSent.SelectedIndices[i]].EhrMeasureEventNum);
+				EhrMeasureEvents.Delete(_listHistorySent[gridSent.SelectedIndices[i]].EhrMeasureEventNum);
 			}
 			FillGridSent();
 		}

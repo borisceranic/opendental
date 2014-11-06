@@ -9,7 +9,6 @@ namespace OpenDental{
 	public class FormReferralsPatient : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butClose;
 		private UI.Button butOK;
-		private UI.Button butNone;
 		private OpenDental.UI.Button butAddFrom;
 		private OpenDental.UI.ODGrid gridMain;
 		/// <summary>
@@ -68,7 +67,6 @@ namespace OpenDental{
 			this.butAddFrom = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.butNone = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// gridMain
@@ -176,27 +174,10 @@ namespace OpenDental{
 			this.butOK.Visible = false;
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// butNone
-			// 
-			this.butNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butNone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butNone.Autosize = true;
-			this.butNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butNone.CornerRadius = 4F;
-			this.butNone.Location = new System.Drawing.Point(394, 317);
-			this.butNone.Name = "butNone";
-			this.butNone.Size = new System.Drawing.Size(75, 24);
-			this.butNone.TabIndex = 94;
-			this.butNone.Text = "None";
-			this.butNone.Visible = false;
-			this.butNone.Click += new System.EventHandler(this.butNone_Click);
-			// 
 			// FormReferralsPatient
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(863, 352);
-			this.Controls.Add(this.butNone);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.checkShowAll);
 			this.Controls.Add(this.butAddTo);
@@ -223,7 +204,6 @@ namespace OpenDental{
 				gridMain.SelectionMode=GridSelectionMode.One;
 				butClose.Text="Cancel";
 				butOK.Visible=true;
-				butNone.Visible=true;
 			}
 			if(ProcNum!=0) {
 				Text=Lan.g(this,"Referrals");
@@ -411,10 +391,6 @@ namespace OpenDental{
 			FormSheetFillEdit FormS=new FormSheetFillEdit(sheet);
 			FormS.ShowDialog();
 			//grid will not be refilled, so no need to reselect.
-		}
-
-		private void butNone_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

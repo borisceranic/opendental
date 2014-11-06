@@ -2359,8 +2359,19 @@ namespace OpenDentBusiness{
 							List<EhrMeasureEvent> listCcds=EhrMeasureEvents.GetByType(listMeasureEvents,EhrMeasureEventType.SummaryOfCareProvidedToDr);
 							int countCcds=0;//during reporting period.
 							for(int r=0;r<listCcds.Count;r++) {
-								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1)) {//within the same period as the count for referrals.
-									countCcds++;
+								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1) && listCcds[r].FKey!=0) {//Quick filter for measure events that do not meet the criterion.
+									//Loop through all ref attaches and only count the ones that meet all measure requirements.
+									for(int c=0;c<listRefAttach.Count;c++) {
+										if(!listRefAttach[c].IsFrom  
+											&& listRefAttach[c].RefAttachNum==listCcds[r].FKey
+											&& listRefAttach[c].IsTransitionOfCare 
+											&& listRefAttach[c].ProvNum!=0 
+											&& listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) 
+										{
+											countCcds++;
+											break;
+										}
+									}
 								}
 							}
 							mu.Details="Referrals:"+countToRefPeriod.ToString()+", Summaries:"+countCcds.ToString();
@@ -4405,8 +4416,19 @@ namespace OpenDentBusiness{
 							List<EhrMeasureEvent> listCcds=EhrMeasureEvents.GetByType(listMeasureEvents,EhrMeasureEventType.SummaryOfCareProvidedToDr);
 							int countCcds=0;//during reporting period.
 							for(int r=0;r<listCcds.Count;r++) {
-								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1)) {//within the same period as the count for referrals.
-									countCcds++;
+								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1) && listCcds[r].FKey!=0) {//Quick filter for measure events that do not meet the criterion.
+									//Loop through all ref attaches and only count the ones that meet all measure requirements.
+									for(int c=0;c<listRefAttach.Count;c++) {
+										if(!listRefAttach[c].IsFrom  
+											&& listRefAttach[c].RefAttachNum==listCcds[r].FKey
+											&& listRefAttach[c].IsTransitionOfCare 
+											&& listRefAttach[c].ProvNum!=0 
+											&& listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) 
+										{
+											countCcds++;
+											break;
+										}
+									}
 								}
 							}
 							mu.Details="Referrals:"+countToRefPeriod.ToString()+", Summaries:"+countCcds.ToString();
@@ -4436,8 +4458,19 @@ namespace OpenDentBusiness{
 							List<EhrMeasureEvent> listCcds=EhrMeasureEvents.GetByType(listMeasureEvents,EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic);
 							int countCcds=0;//during reporting period.
 							for(int r=0;r<listCcds.Count;r++) {
-								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1)) {//within the same period as the count for referrals.
-									countCcds++;
+								if(listCcds[r].DateTEvent > DateTime.Now.AddYears(-1) && listCcds[r].FKey!=0) {//Quick filter for measure events that do not meet the criterion.
+									//Loop through all ref attaches and only count the ones that meet all measure requirements.
+									for(int c=0;c<listRefAttach.Count;c++) {
+										if(!listRefAttach[c].IsFrom  
+											&& listRefAttach[c].RefAttachNum==listCcds[r].FKey
+											&& listRefAttach[c].IsTransitionOfCare 
+											&& listRefAttach[c].ProvNum!=0 
+											&& listRefAttach[c].RefDate > DateTime.Now.AddYears(-1)) 
+										{
+											countCcds++;
+											break;
+										}
+									}
 								}
 							}
 							mu.Details="Referrals:"+countToRefPeriod.ToString()+", Summaries:"+countCcds.ToString();

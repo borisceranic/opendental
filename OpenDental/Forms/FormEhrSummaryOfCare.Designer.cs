@@ -134,6 +134,7 @@
 			this.gridSent.TabIndex = 16;
 			this.gridSent.Title = "Sent";
 			this.gridSent.TranslationName = null;
+			this.gridSent.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSent_CellDoubleClick);
 			// 
 			// groupBox2
 			// 
