@@ -40,6 +40,44 @@ namespace OpenDental{
 			Font font;
 			FontStyle fontstyle;
 			foreach(SheetField field in sheet.SheetFields) {
+				if(field.FieldType==SheetFieldType.Image 
+					||field.FieldType==SheetFieldType.PatImage) 
+				{
+					#region Get the path for the image
+					string filePathAndName="";
+					switch(field.FieldType) {
+						case SheetFieldType.Image:
+							filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+							break;
+						case SheetFieldType.PatImage:
+							if(field.FieldValue=="") {
+								//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
+								filePathAndName="";
+								break;
+							}
+							Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
+							List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
+							if(paths.Count < 1) {//No path was found so we cannot draw the image.
+								continue;
+							}
+							filePathAndName=paths[0];
+							break;
+						default:
+							//not an image field
+							continue;
+					}
+					#endregion
+					#region Set height based on img accesibility
+					if(field.FieldName=="Patient Info.gif"//embeded image
+						||File.Exists(filePathAndName)) 
+					{
+						continue;//do not resize field.
+					}
+					else {//img doesn't exist or we do not have access to it.
+						field.Height=0;//Set height to zero so that it will not cause extra pages to print.
+					}
+					#endregion
+				}//end if image
 				if(field.GrowthBehavior==GrowthBehaviorEnum.None){
 					continue;
 				}

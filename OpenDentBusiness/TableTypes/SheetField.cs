@@ -40,7 +40,7 @@ namespace OpenDentBusiness{
 		public int YPos;
 		///<summary>The field will be constrained horizontally to this size.  Not allowed to be zero.</summary>
 		public int Width;
-		///<summary>The field will be constrained vertically to this size.  Not allowed to be 0.  It's not allowed to be zero so that it will be visible on the designer.</summary>
+		///<summary>The field will be constrained vertically to this size.  Not allowed to be stored as 0.  It's not allowed to be zero so that it will be visible on the designer. Set to 0 in memory by SheetUtil.CalculateHeights if image is innacessible for printing.</summary>
 		public int Height;
 		///<summary>Enum:GrowthBehaviorEnum</summary>
 		public GrowthBehaviorEnum GrowthBehavior;
