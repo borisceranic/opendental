@@ -115,7 +115,8 @@ namespace OpenDental {
 			report.Query="SET @pos=0; "
 				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt,PayType "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
-				+"WHERE PayType="+paymentType+" AND (PayDate BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
+				//Must be DateEntry here. PayDate will not work with recurring charges
+				+"WHERE PayType="+paymentType+" AND (DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
 				+"ORDER BY Count ASC";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
