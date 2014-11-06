@@ -414,6 +414,9 @@ namespace OpenDental{
 		}
 
 		private void butNone_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will cause this summary of care to not count towards EHR measures. Continue?")) {
+				return;
+			}
 			DialogResult=DialogResult.OK;
 		}
 
