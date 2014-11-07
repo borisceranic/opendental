@@ -1169,7 +1169,7 @@ namespace OpenDentBusiness
 						//2310B PRV: PE (dental) Rendering Provider Specialty Information.
 						WritePRV_PE(sw,provTreat);
 						//2310B REF: (dental) Rendering Provider Secondary Identification. Situational. Not required because we always send NPI. Max repeat of 4.
-						if(IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse)) {
+						if(IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse) || IsTesia(clearhouse)) {
 							//The state licence number can be anywhere between 4 and 14 characters depending on state, and most states have more than one state license format. 
 							//Therefore, we only validate that the state license is present or not.
 							if(provTreat.StateLicense!="") { 
