@@ -305,6 +305,10 @@ namespace OpenDental{
 		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
 		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
+		///<summary>Will be set to true if the STOP SLAVE SQL was run on the replication server for which the local replication monitor is watching.
+		///Replicaiton is NOT broken when this flag is true, because the user can re-enable replicaiton using the START SLAVE SQL without any ill effects.
+		///This flag is used to display a warning to the user, but will not ever block the user from using OD.</summary>
+		private bool _isReplicationSlaveStopped=false;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -5871,6 +5875,19 @@ namespace OpenDental{
 			}
 			string status=table.Rows[0]["Slave_SQL_Running"].ToString();
 			if(status=="Yes") {
+				_isReplicationSlaveStopped=false;
+				return;
+			}
+			if(table.Rows[0]["Last_Errno"].ToString()=="0" && table.Rows[0]["Last_Error"].ToString()=="") {
+				//The slave SQL is not running, but there was not an error.
+				//This happens when the slave is manually stopped with an SQL statement, but stopping the slave does not hurt anything, so we should not prevent the user from using OD.
+				if(!_isReplicationSlaveStopped) {
+					_isReplicationSlaveStopped=true;
+					MessageBox.Show(Lan.g(this,"Warning: Replication data receive is off at server ")+ReplicationServers.GetForLocalComputer().Descript+".\r\n"
+						+Lan.g(this,"The server will not receive updates until the slave is started again.")+"\r\n"
+						+Lan.g(this,"Contact your IT admin to run the SQL command SLAVE START.")
+						);
+				}
 				return;
 			}
 			//Shut down all copies of OD and set ReplicationFailureAtServer_id to this server_id
