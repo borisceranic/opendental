@@ -3528,7 +3528,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton("EHR",-1,"","EHR"));
 			}
-			if(HL7Defs.IsExistingHL7Enabled()) {
+			if(HL7Defs.IsExistingHL7Enabled() && !UsingEcwTightOrFull()) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(HL7Defs.GetOneDeepEnabled().Description,-1,"","HL7"));
 			}
 			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ChartModule);
