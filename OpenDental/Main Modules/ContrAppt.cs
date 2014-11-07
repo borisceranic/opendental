@@ -1971,7 +1971,7 @@ namespace OpenDental {
 				butFwd.Enabled=true;
 				butBack.Enabled=true;
 			}
-			WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;
+			WeekStartDate=AppointmentL.DateSelected.AddDays(0-(int)AppointmentL.DateSelected.DayOfWeek).Date;
 			WeekEndDate=WeekStartDate.AddDays(ApptDrawing.NumOfWeekDaysToDisplay-1).Date;
 			ApptDrawing.IsWeeklyView=isWeeklyView;
 			if(!InitializedOnStartup) {
