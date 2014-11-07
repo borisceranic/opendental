@@ -3563,7 +3563,10 @@ namespace OpenDental{
 		///<summary>Returns true if new information was pulled back from NewCrop.</summary>
 		private bool NewCropRefreshPrescriptions() {
 			Program programNewCrop=Programs.GetCur(ProgramName.NewCrop);
-			ToolBarMain.Buttons["eRx"].IsRed=false; //Set the eRx button back to default color.
+			if(ToolBarMain.Buttons["eRx"]!=null) {//Hidden for eCW
+				ToolBarMain.Buttons["eRx"].IsRed=false; //Set the eRx button back to default color.
+				ToolBarMain.Invalidate();
+			}
 			if(!programNewCrop.Enabled) {
 				return false;
 			}
@@ -3636,9 +3639,11 @@ namespace OpenDental{
 				//We used to show a popup here each time the refresh failed, but users found it annoying when the NewCrop severs were down, because the popup would show each time they visited the Chart and impeded user workflow.
 				//We tried silently logging a warning message into the Application log within system Event Viewer, but we found out that a decent number of users do not have permission to write to the Application log, which causes UEs sometimes.
 				//We tried showing a popup exactly 1 time for each instance of OD launched, to avoid the permission issue, but users were still complaining about it popping up and they didn't know what to do to fix it.
-				//We now change the background color of the eRx button red, and show an error message when user click the eRx button to alert them that interactions may be out of date. 
-				ToolBarMain.Buttons["eRx"].IsRed=true; //Marks the eRx button to be drawn with a red color.
-				ToolBarMain.Invalidate();
+				//We now change the background color of the eRx button red, and show an error message when user click the eRx button to alert them that interactions may be out of date.
+				if(ToolBarMain.Buttons["eRx"]!=null) {//Hidden for eCW
+					ToolBarMain.Buttons["eRx"].IsRed=true; //Marks the eRx button to be drawn with a red color.
+					ToolBarMain.Invalidate();
+				}
 				return false;
 			}
 			//response.Message = Error message if error.
