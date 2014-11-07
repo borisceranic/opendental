@@ -2917,6 +2917,7 @@ namespace OpenDental{
 				if(!UpdateToDB()) {
 					return;
 				}
+				procs=Procedures.GetProcsForSingle(AptCur.AptNum,false);
 				//Send DFT to eCW containing the attached procedures for this appointment in a .pdf file.				
 				string pdfDataStr=GenerateProceduresIntoPdf();
 				if(HL7Defs.IsExistingHL7Enabled()) {
