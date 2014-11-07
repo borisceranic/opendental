@@ -4698,6 +4698,7 @@ namespace OpenDental{
 							row.Cells.Add(Lan.g("TableChartPtInfo","Registration Key"));
 							string str=keys[i].RegKey.Substring(0,4)+"-"+keys[i].RegKey.Substring(4,4)+"-"
 								+keys[i].RegKey.Substring(8,4)+"-"+keys[i].RegKey.Substring(12,4);
+							str+="  |  PatNum: "+keys[i].PatNum.ToString();//Always show the PatNum
 							if(keys[i].IsForeign) {
 								str+="\r\nForeign";
 							}
