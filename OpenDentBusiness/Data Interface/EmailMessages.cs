@@ -673,25 +673,57 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
-		///<summary>Throws exceptions.  The subjectSigFilePath must point to a smime.p7s file.  The subjectEmailAddress must correspond to the subject name contained inside the signature file.</summary>
-		public static void TryAddTrustForSignature(string subjectSigFilePath,string subjectEmailAddress,EmailAddress emailAddressLocal) {
+		///<summary>Throws exceptions.  The smimeP7sFilePath must point to a smime.p7s file.</summary>
+		public static X509Certificate2 GetEmailSignatureFromSmimeP7sFile(string smimeP7sFilePath) {
 			X509Certificate2 signedCert2=null;
 			try {
-				X509Certificate signedCert1=X509Certificate2.CreateFromSignedFile(subjectSigFilePath);//This is a public encryption key.
+				X509Certificate signedCert1=X509Certificate2.CreateFromSignedFile(smimeP7sFilePath);//This is a public encryption key.
 				signedCert2=new X509Certificate2(signedCert1);
 			}
 			catch(Exception ex) {
 				throw new Exception(Lans.g("EmailMessages","Failed to load signature file")+". "+ex.Message);
 			}
-			string subjectNameExpected="E="+subjectEmailAddress;//The E= verifies that the certificate was created for email encryption purposes, and not for another purpose, such as HTTPS in IIS.
-			if(signedCert2.SubjectName.Name.ToLower()!=subjectNameExpected.ToLower()) {
+			return signedCert2;
+		}
+
+		///<summary>Returns the SMIME signature (encryption certificate) for the specified emailAddress from the store of public certificates, or returns null if none found.</summary>
+		public static X509Certificate2 GetEmailSignatureFromStore(string emailAddress) {
+			Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternal();//Open for reading.  Corresponds to NHINDExternal/Certificates.
+			X509Certificate2Collection collectionCerts=storePublicCerts.GetAllCertificates();
+			string emailAddressSimple=GetFromAddressSimple(emailAddress).ToLower();
+			foreach(X509Certificate2 cert in collectionCerts) {
+				string subjectName=GetSubjectEmailNameFromSignature(cert).ToLower();
+				if(subjectName==emailAddressSimple) {
+					return cert;
+				}
+			}
+			return null;
+		}
+
+		///<summary>Returns the subject name intended for email security from the given signed certificate.
+		///Returns empty string if a subject name was not found for email security, which would imply that the certificate is not for email encryption use.</summary>
+		public static string GetSubjectEmailNameFromSignature(X509Certificate2 signedCert) {
+			string[] arraySubjectNames=signedCert.SubjectName.Name.Split(',');
+			for(int i=0;i<arraySubjectNames.Length;i++) {
+				string typeAndName=arraySubjectNames[i].Trim();
+				if(typeAndName.ToUpper().StartsWith("E=")) {
+					string name=typeAndName.Substring(2);
+					return name;
+				}
+			}
+			return "";
+		}
+
+		///<summary>Throws exceptions.  The subjectEmailAddress must correspond to the subject name contained inside the signature file.</summary>
+		public static void TryAddTrustForSignature(X509Certificate2 signedCert,string subjectEmailAddress,EmailAddress emailAddressLocal) {
+			if(subjectEmailAddress.ToLower()!=GetSubjectEmailNameFromSignature(signedCert).ToLower()) {
 				throw new Exception("The subject email address does not match the email address built into the signature.");
 			}
 			try {
 				Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
-				storePublicCerts.Add(signedCert2);//Write the pubic encryption certificate to the Windows certificate store.
+				storePublicCerts.Add(signedCert);//Write the pubic encryption certificate to the Windows certificate store.
 				Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
-				storeAnchors.Add(signedCert2);//Adds to NHINDAnchors/Certificates within the windows certificate store manager (mmc).
+				storeAnchors.Add(signedCert);//Adds to NHINDAnchors/Certificates within the windows certificate store manager (mmc).
 			}
 			catch(Exception ex) {
 				throw new Exception(Lans.g("EmailMessages","Failed to save subject signature to public certificate store")+". "+ex.Message);
