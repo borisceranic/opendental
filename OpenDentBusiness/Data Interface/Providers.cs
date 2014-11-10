@@ -90,13 +90,16 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,MAX(UserName) UserName, PatCount "//Max function used for Oracle compatability (some providers may have multiple user names).
+			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,MAX(UserName) UserName,PatCountPri,PatCountSec "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider "
 				+"LEFT JOIN userod ON userod.ProvNum=provider.ProvNum "//there can be multiple userods attached to one provider
-				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCount FROM patient "
+				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCountPri FROM patient "
 					+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
-					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv  ";
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,PatCount ";
+					+"GROUP BY PriProv) patPri ON provider.ProvNum=patPri.PriProv  ";
+			command+="LEFT JOIN (SELECT SecProv,COUNT(*) PatCountSec FROM patient "
+				+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
+				+"GROUP BY SecProv) patSec ON provider.ProvNum=patSec.SecProv ";
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,PatCountPri,PatCountSec ";
 			command+="ORDER BY ItemOrder";
 			return Db.GetTable(command);
 		}
@@ -106,13 +109,16 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,selectInstructors,selectAll);
 			}
-			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName, PatCount "//Max function used for Oracle compatability (some providers may have multiple user names).
+			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName,PatCountPri,PatCountSec "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider LEFT JOIN schoolclass ON provider.SchoolClassNum=schoolclass.SchoolClassNum "
 				+"LEFT JOIN userod ON userod.ProvNum=provider.ProvNum "//there can be multiple userods attached to one provider
-				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCount FROM patient "
+				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCountPri FROM patient "
 					+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
-					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv  "
-					+"WHERE TRUE ";//This is here so that we can prevent nested if-statements
+					+"GROUP BY PriProv) pat ON provider.ProvNum=pat.PriProv ";
+			command+="LEFT JOIN (SELECT SecProv,COUNT(*) PatCountSec FROM patient "
+				+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted)+" AND patient.PatStatus!="+POut.Int((int)PatientStatus.Deceased)+" "
+				+"GROUP BY SecProv) patSec ON provider.ProvNum=patSec.SecProv ";
+			command+="WHERE TRUE ";//This is here so that we can prevent nested if-statements
 			if(schoolClassNum>0) {
 				command+="AND provider.SchoolClassNum="+POut.Long(schoolClassNum)+" ";
 			}
@@ -131,7 +137,7 @@ namespace OpenDentBusiness{
 					command+="AND provider.SchoolClassNum!=0 ";
 				}
 			}
-			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,PatCount "
+			command+="GROUP BY Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,PatCountPri,PatCountSec "
 				+"ORDER BY LName,FName";
 			return Db.GetTable(command);
 		}

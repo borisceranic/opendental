@@ -32,6 +32,9 @@ namespace OpenDental{
 		private ComboBox comboClass;
 		private List<SchoolClass> _schoolClasses;
 		public bool IsStudentPicker=false;
+		private UI.Button butSelectNone;
+		///<summary>Setting to true will show a none button and will allow 0 to be returned in the SelectedProvNum variable.  It will be -1 if the user cancels out of the window.</summary>
+		public bool IsNoneAvailable=false;
 		
 		///<summary></summary>
 		public FormProviderPick() {
@@ -67,6 +70,7 @@ namespace OpenDental{
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.butSelectNone = new OpenDental.UI.Button();
 			this.groupDentalSchools.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -212,11 +216,27 @@ namespace OpenDental{
 			this.timer1.Interval = 500;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
+			// butSelectNone
+			// 
+			this.butSelectNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSelectNone.Autosize = true;
+			this.butSelectNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSelectNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSelectNone.CornerRadius = 4F;
+			this.butSelectNone.Location = new System.Drawing.Point(491, 323);
+			this.butSelectNone.Name = "butSelectNone";
+			this.butSelectNone.Size = new System.Drawing.Size(82, 24);
+			this.butSelectNone.TabIndex = 14;
+			this.butSelectNone.Text = "None";
+			this.butSelectNone.UseVisualStyleBackColor = true;
+			this.butSelectNone.Click += new System.EventHandler(this.butSelectNone_Click);
+			// 
 			// FormProviderPick
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(594, 670);
+			this.Controls.Add(this.butSelectNone);
 			this.Controls.Add(this.groupDentalSchools);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.gridMain);
@@ -259,6 +279,11 @@ namespace OpenDental{
 			FillGrid();
 			if(SelectedProvNum!=0) {
 				gridMain.SetSelected(Providers.GetIndex(SelectedProvNum),true);
+			}
+			butSelectNone.Visible=IsNoneAvailable;
+			if(IsNoneAvailable) {
+				//Default value for the selected provider when none is an option is always -1
+				SelectedProvNum=-1;
 			}
 		}
 
@@ -353,6 +378,11 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void butSelectNone_Click(object sender,EventArgs e) {
+			SelectedProvNum=0;
+			DialogResult=DialogResult.OK;
 		}
 		
 

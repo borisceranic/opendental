@@ -2194,7 +2194,7 @@ FROM insplan";
 		}
 
 		/// <summary>Change preferred provider for all patients with provNumFrom to provNumTo.</summary>
-		public static void ChangeProviders(long provNumFrom,long provNumTo) {
+		public static void ChangePrimaryProviders(long provNumFrom,long provNumTo) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),provNumFrom,provNumTo);
 				return;
@@ -2203,6 +2203,18 @@ FROM insplan";
 				"UPDATE patient " 
 				+"SET PriProv = '"+provNumTo+"' "
 				+"WHERE PriProv = '"+provNumFrom+"'";
+			Db.NonQ(command);
+		}
+
+		///<summary>Change secondary provider for all patients with provNumFrom to provNumTo.</summary>
+		public static void ChangeSecondaryProviders(long provNumFrom,long provNumTo) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),provNumFrom,provNumTo);
+				return;
+			}
+			string command="UPDATE patient " 
+				+"SET SecProv = '"+provNumTo+"' "
+				+"WHERE SecProv = '"+provNumFrom+"'";
 			Db.NonQ(command);
 		}
 		

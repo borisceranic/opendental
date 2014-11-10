@@ -27,7 +27,7 @@ namespace OpenDental{
 		private ComboBox comboUserGroup;
 		private GroupBox groupMovePats;
 		private Label label2;
-		private UI.Button butMove;
+		private UI.Button butMovePri;
 		private UI.Button butReassign;
 		private Label label5;
 		private RadioButton radioInstructors;
@@ -45,15 +45,16 @@ namespace OpenDental{
 		private TextBox textFirstName;
 		private UI.Button butStudBulkEdit;
 		private Label label8;
+		private UI.Button butMoveSec;
 		///<summary>Set when prov picker button is used.  textMoveTo shows this prov in human readable format.</summary>
-		private long _provNumMoveTo;
+		private long _provNumMoveTo=-1;
 
 		///<summary>Not used for selection.  Use FormProviderPick or FormProviderMultiPick for that.</summary>
 		public FormProviderSetup(){
 			InitializeComponent();
 			Lan.F(this);
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-				this.Width=796;
+				this.Width=841;
 			}
 		}
 
@@ -93,12 +94,13 @@ namespace OpenDental{
 			this.comboUserGroup = new System.Windows.Forms.ComboBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupMovePats = new System.Windows.Forms.GroupBox();
+			this.butMoveSec = new OpenDental.UI.Button();
 			this.butProvPick = new OpenDental.UI.Button();
 			this.textMoveTo = new System.Windows.Forms.TextBox();
 			this.butReassign = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.butMove = new OpenDental.UI.Button();
+			this.butMovePri = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butStudBulkEdit = new OpenDental.UI.Button();
 			this.groupDentalSchools.SuspendLayout();
@@ -363,18 +365,35 @@ namespace OpenDental{
 			// groupMovePats
 			// 
 			this.groupMovePats.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupMovePats.Controls.Add(this.butMoveSec);
 			this.groupMovePats.Controls.Add(this.butProvPick);
 			this.groupMovePats.Controls.Add(this.textMoveTo);
 			this.groupMovePats.Controls.Add(this.butReassign);
 			this.groupMovePats.Controls.Add(this.label5);
 			this.groupMovePats.Controls.Add(this.label2);
-			this.groupMovePats.Controls.Add(this.butMove);
+			this.groupMovePats.Controls.Add(this.butMovePri);
 			this.groupMovePats.Location = new System.Drawing.Point(703, 273);
 			this.groupMovePats.Name = "groupMovePats";
 			this.groupMovePats.Size = new System.Drawing.Size(273, 132);
 			this.groupMovePats.TabIndex = 3;
 			this.groupMovePats.TabStop = false;
 			this.groupMovePats.Text = "Move Patients";
+			// 
+			// butMoveSec
+			// 
+			this.butMoveSec.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMoveSec.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butMoveSec.Autosize = true;
+			this.butMoveSec.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMoveSec.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMoveSec.CornerRadius = 4F;
+			this.butMoveSec.Location = new System.Drawing.Point(182, 46);
+			this.butMoveSec.Name = "butMoveSec";
+			this.butMoveSec.Size = new System.Drawing.Size(82, 26);
+			this.butMoveSec.TabIndex = 15;
+			this.butMoveSec.Text = "Move Sec";
+			this.butMoveSec.UseVisualStyleBackColor = true;
+			this.butMoveSec.Click += new System.EventHandler(this.butMoveSec_Click);
 			// 
 			// butProvPick
 			// 
@@ -417,12 +436,12 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(8, 104);
+			this.label5.Location = new System.Drawing.Point(8, 98);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(168, 15);
+			this.label5.Size = new System.Drawing.Size(168, 31);
 			this.label5.TabIndex = 18;
-			this.label5.Text = "Reassign by most-used provider";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.label5.Text = "Reassigns primary provider to most-used provider\r\n";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label2
 			// 
@@ -433,20 +452,20 @@ namespace OpenDental{
 			this.label2.Text = "To Provider";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// butMove
+			// butMovePri
 			// 
-			this.butMove.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butMove.Autosize = true;
-			this.butMove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMove.CornerRadius = 4F;
-			this.butMove.Location = new System.Drawing.Point(182, 46);
-			this.butMove.Name = "butMove";
-			this.butMove.Size = new System.Drawing.Size(82, 26);
-			this.butMove.TabIndex = 15;
-			this.butMove.Text = "Move";
-			this.butMove.Click += new System.EventHandler(this.butMove_Click);
+			this.butMovePri.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMovePri.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butMovePri.Autosize = true;
+			this.butMovePri.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMovePri.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMovePri.CornerRadius = 4F;
+			this.butMovePri.Location = new System.Drawing.Point(94, 46);
+			this.butMovePri.Name = "butMovePri";
+			this.butMovePri.Size = new System.Drawing.Size(82, 26);
+			this.butMovePri.TabIndex = 15;
+			this.butMovePri.Text = "Move Pri";
+			this.butMovePri.Click += new System.EventHandler(this.butMovePri_Click);
 			// 
 			// gridMain
 			// 
@@ -596,7 +615,9 @@ namespace OpenDental{
 				col=new ODGridColumn(Lan.g("TableProviderSetup","Instructor"),60,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g("TableProviderSetup","Patients"),50,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","PriPats"),50,HorizontalAlignment.Center);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableProviderSetup","SecPats"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -629,7 +650,8 @@ namespace OpenDental{
 						row.Cells.Add("");
 					}
 				}
-				row.Cells.Add(table.Rows[i]["PatCount"].ToString());
+				row.Cells.Add(table.Rows[i]["PatCountPri"].ToString());
+				row.Cells.Add(table.Rows[i]["PatCountSec"].ToString());
 				//row.Tag
 				gridMain.Rows.Add(row);
 			}
@@ -845,31 +867,73 @@ namespace OpenDental{
 			//This button is used instead of a dropdown because the order of providers can frequently change in the grid.
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			FormProviderPick formPick=new FormProviderPick();
+			formPick.IsNoneAvailable=true;
 			formPick.ShowDialog();
 			if(formPick.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			_provNumMoveTo=formPick.SelectedProvNum;
-			Provider provTo=Providers.GetProv(_provNumMoveTo);
-			textMoveTo.Text=provTo.GetLongDesc();
+			if(_provNumMoveTo>0) {
+				Provider provTo=Providers.GetProv(_provNumMoveTo);
+				textMoveTo.Text=provTo.GetLongDesc();
+			}
+			else {
+				textMoveTo.Text="None";
+			}
 		}
 
 		///<summary>Not possible if no security admin.</summary>
-		private void butMove_Click(object sender,EventArgs e) {
+		private void butMovePri_Click(object sender,EventArgs e) {
 			if(gridMain.SelectedIndices.Length!=1) {
 				MsgBox.Show(this,"You must select exactly one provider to move patients from.");
 				return;
 			}
-			if(_provNumMoveTo==0){
+			if(_provNumMoveTo==-1){
+				MsgBox.Show(this,"You must pick a To provider in the box above to move patients to.");
+				return;
+			}
+			if(_provNumMoveTo==0) {
+				MsgBox.Show(this,"None is not a valid primary provider.");
+				return;
+			}
+			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
+			Provider provFrom=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+			Provider provTo=Providers.GetProv(_provNumMoveTo);
+			string msg=Lan.g(this,"Move all primary patients from")+" "+provFrom.GetLongDesc()+" "+Lan.g(this,"to")+" "+provTo.GetLongDesc()+"?";
+			if(MessageBox.Show(msg,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
+				Patients.ChangePrimaryProviders(provFrom.ProvNum,provTo.ProvNum);
+			}
+			changed=true;
+			FillGrid();
+		}
+
+		///<summary>Not possible if no security admin.</summary>
+		private void butMoveSec_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length!=1) {
+				MsgBox.Show(this,"You must select exactly one provider to move patients from.");
+				return;
+			}
+			if(_provNumMoveTo==-1) {
 				MsgBox.Show(this,"You must pick a provider in the box above to move patients to.");
 				return;
 			}
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
 			Provider provFrom=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
 			Provider provTo=Providers.GetProv(_provNumMoveTo);
-			string msg=Lan.g(this,"Move all patients from")+" "+provFrom.GetLongDesc()+" "+Lan.g(this,"to")+" "+provTo.GetLongDesc()+"?";
+			string msg;
+			if(provTo==null) {
+				msg=Lan.g(this,"Remove all secondary patients from")+" "+provFrom.GetLongDesc()+"?";
+			}
+			else {
+				msg=Lan.g(this,"Move all secondary patients from")+" "+provFrom.GetLongDesc()+" "+Lan.g(this,"to")+" "+provTo.GetLongDesc()+"?";
+			}
 			if(MessageBox.Show(msg,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
-				Patients.ChangeProviders(provFrom.ProvNum,provTo.ProvNum);
+				if(provTo!=null) {
+					Patients.ChangeSecondaryProviders(provFrom.ProvNum,provTo.ProvNum);
+				}
+				else {
+					Patients.ChangeSecondaryProviders(provFrom.ProvNum,0);
+				}
 			}
 			changed=true;
 			FillGrid();
