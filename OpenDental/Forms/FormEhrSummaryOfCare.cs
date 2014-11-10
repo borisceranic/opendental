@@ -229,6 +229,13 @@ namespace OpenDental {
 		}
 
 		private void butShowXhtml_Click(object sender,EventArgs e) {
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=PatCur.PatNum;
+			FormRP.IsSelectionMode=true;
+			if(FormRP.ShowDialog()==DialogResult.Cancel) {
+				MessageBox.Show("Summary of Care not shown.");
+				return;
+			}
 			string ccd="";
 			try {
 				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
@@ -243,10 +250,11 @@ namespace OpenDental {
 				EhrMeasureEvent measureEvent = new EhrMeasureEvent();
 				measureEvent.DateTEvent = DateTime.Now;
 				measureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
+				measureEvent.FKey=FormRP.RefAttachNum;
 				measureEvent.PatNum = PatCur.PatNum;
 				EhrMeasureEvents.Insert(measureEvent);
 				FillGridSent();
-			}		
+			}
 		}
 
 		private void butShowXml_Click(object sender,EventArgs e) {
