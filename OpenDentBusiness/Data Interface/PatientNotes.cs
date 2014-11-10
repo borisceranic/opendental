@@ -58,6 +58,12 @@ namespace OpenDentBusiness{
 			try {
 				string command = "INSERT INTO patientnote (patnum"
 					+") VALUES('"+patNum+"')";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//We may need to do this in Oracle in the future as well.
+					//If using Replication, then we need to watch for duplicate errors, because the insert is lazy.
+					//Replication servers can insert a patient note with a primary key belonging to another replication server's key range.
+					command+=" ON DUPLICATE KEY UPDATE PatNum='"+patNum+"'";
+				}
 				Db.NonQ(command);
 			}
 			catch {
