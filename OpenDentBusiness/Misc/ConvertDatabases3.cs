@@ -6528,7 +6528,30 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProblemListIsAlpabetical',FALSE)";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12'";
+					DataTable Table=Db.GetTable(command);
+					List<long> ListClaimFormNums=new List<long>();
+					for(int i=0;i<Table.Rows.Count;i++) {
+						ListClaimFormNums.Add(PIn.Long(Table.Rows[i]["ClaimFormNum"].ToString()));
+					}
+					for(int i=0;i<ListClaimFormNums.Count;i++) {
+						command="UPDATE claimformitem SET width='250' WHERE ClaimFormNum='"+POut.Long(ListClaimFormNums[i])+"' AND FieldName='SubscrID'";
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12'";
+					DataTable Table=Db.GetTable(command);
+					List<long> ListClaimFormNums=new List<long>();
+					for(int i=0;i<Table.Rows.Count;i++) {
+						ListClaimFormNums.Add(PIn.Long(Table.Rows[i]["ClaimFormNum"].ToString()));
+					}
+					for(int i=0;i<ListClaimFormNums.Count;i++) {
+						command="UPDATE claimformitem SET width='250' WHERE ClaimFormNum='"+POut.Long(ListClaimFormNums[i])+"' AND FieldName='SubscrID'";
+						Db.NonQ(command);
+					}
+				}
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -6552,8 +6575,6 @@ namespace OpenDentBusiness {
 			}
 			return true;
 		}
-
-
 		
 
 
