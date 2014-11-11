@@ -116,7 +116,7 @@ namespace OpenDentBusiness.UI {
 						g.FillRectangle(holidayBrush,TimeWidth+1+d*ColDayWidth,0,ColDayWidth,ApptSheetHeight);
 					}
 					//this is a workaround because we start on Monday:
-					DayOfWeek dayofweek;
+					DayOfWeek dayofweek;//When d==0 we want it to be monday(1).  When d==6 we want it to be sunday(0)
 					if(d==6) {
 						dayofweek=(DayOfWeek)(0);
 					}
