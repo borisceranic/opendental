@@ -1971,7 +1971,12 @@ namespace OpenDental {
 				butFwd.Enabled=true;
 				butBack.Enabled=true;
 			}
-			WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;
+			if((int)AppointmentL.DateSelected.DayOfWeek==0) {//if sunday
+				WeekStartDate=AppointmentL.DateSelected.AddDays(-6).Date;//go back to previous monday
+			}
+			else {
+				WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;//go back to current monday
+			}
 			WeekEndDate=WeekStartDate.AddDays(ApptDrawing.NumOfWeekDaysToDisplay-1).Date;
 			ApptDrawing.IsWeeklyView=isWeeklyView;
 			if(!InitializedOnStartup) {
@@ -4049,7 +4054,12 @@ namespace OpenDental {
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
 					OnPatientSelected(PatCur);
 					if(ApptDrawing.IsWeeklyView) {
-						WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;
+						if((int)AppointmentL.DateSelected.DayOfWeek==0) {//if sunday
+							WeekStartDate=AppointmentL.DateSelected.AddDays(-6).Date;//go back to the previous monday
+						}
+						else {
+							WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;//go back to current monday
+						} 
 						WeekEndDate=WeekStartDate.AddDays(ApptDrawing.NumOfWeekDaysToDisplay-1).Date;
 					}
 					//RefreshModulePatient(FormAO.SelectedPatNum);
