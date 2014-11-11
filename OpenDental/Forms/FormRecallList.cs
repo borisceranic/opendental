@@ -513,8 +513,8 @@ namespace OpenDental{
 			// 
 			// labelPatientCount
 			// 
-			this.labelPatientCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelPatientCount.Location = new System.Drawing.Point(857, 71);
+			this.labelPatientCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelPatientCount.Location = new System.Drawing.Point(857, 635);
 			this.labelPatientCount.Name = "labelPatientCount";
 			this.labelPatientCount.Size = new System.Drawing.Size(114, 14);
 			this.labelPatientCount.TabIndex = 61;
@@ -1062,14 +1062,20 @@ namespace OpenDental{
 
 		private void panelRecallScheduler_MouseClick(object sender,MouseEventArgs e) {
 			if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
-				//Office has yet to enable the recall scheduler service.  Send them to our web site so that they can learn about how great it is.
+				//Office has yet to enable the recall scheduler service.
+				//Send them to a promotional web site so that they can learn about how great it is.
 				try {
 					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
 				}
 				catch(Exception) {
-					MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/" //TODO: replace with URL to recall scheduler service.
-						+"\r\n"+Lan.g(this,"Please set up a default web browser."));
-					return;
+					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
+				}
+				//Now take them to the eService Setup window so that they can click the Enable button if they are signed up.
+				FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.RecallScheduler);
+				FormESS.ShowDialog();
+				//User could have enabled the recall scheduler right here, only return if they still do not have the feature enabled.
+				if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
+					return;//No need to waste the time calling our web service.
 				}
 			}
 			//Send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  

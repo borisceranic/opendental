@@ -73,6 +73,7 @@ namespace OpenDental{
 			this.butFullSync = new OpenDental.UI.Button();
 			this.butSync = new OpenDental.UI.Button();
 			this.tabRecallScheduler = new System.Windows.Forms.TabPage();
+			this.butRecallSchedEnable = new OpenDental.UI.Button();
 			this.labelRecallSchedEnable = new System.Windows.Forms.Label();
 			this.labelRecallSchedSetup = new System.Windows.Forms.Label();
 			this.butRecallSchedSetup = new OpenDental.UI.Button();
@@ -82,7 +83,6 @@ namespace OpenDental{
 			this.butSaveListenerPort = new OpenDental.UI.Button();
 			this.textListenerPort = new OpenDental.ValidNum();
 			this.butClose = new OpenDental.UI.Button();
-			this.butRecallSchedEnable = new OpenDental.UI.Button();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -641,10 +641,22 @@ namespace OpenDental{
 			this.tabRecallScheduler.TabIndex = 3;
 			this.tabRecallScheduler.Text = "Recall Scheduler";
 			// 
+			// butRecallSchedEnable
+			// 
+			this.butRecallSchedEnable.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRecallSchedEnable.Autosize = true;
+			this.butRecallSchedEnable.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRecallSchedEnable.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRecallSchedEnable.CornerRadius = 4F;
+			this.butRecallSchedEnable.Location = new System.Drawing.Point(41, 80);
+			this.butRecallSchedEnable.Name = "butRecallSchedEnable";
+			this.butRecallSchedEnable.Size = new System.Drawing.Size(73, 24);
+			this.butRecallSchedEnable.TabIndex = 246;
+			this.butRecallSchedEnable.Text = "Enable";
+			this.butRecallSchedEnable.Click += new System.EventHandler(this.butRecallSchedEnable_Click);
+			// 
 			// labelRecallSchedEnable
 			// 
-			this.labelRecallSchedEnable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelRecallSchedEnable.Location = new System.Drawing.Point(38, 107);
 			this.labelRecallSchedEnable.Name = "labelRecallSchedEnable";
 			this.labelRecallSchedEnable.Size = new System.Drawing.Size(869, 52);
@@ -653,8 +665,6 @@ namespace OpenDental{
 			// 
 			// labelRecallSchedSetup
 			// 
-			this.labelRecallSchedSetup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelRecallSchedSetup.Location = new System.Drawing.Point(120, 162);
 			this.labelRecallSchedSetup.Name = "labelRecallSchedSetup";
 			this.labelRecallSchedSetup.Size = new System.Drawing.Size(466, 24);
@@ -665,7 +675,6 @@ namespace OpenDental{
 			// butRecallSchedSetup
 			// 
 			this.butRecallSchedSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRecallSchedSetup.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
 			this.butRecallSchedSetup.Autosize = true;
 			this.butRecallSchedSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRecallSchedSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -678,8 +687,6 @@ namespace OpenDental{
 			// 
 			// labelRecallSchedDesc
 			// 
-			this.labelRecallSchedDesc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelRecallSchedDesc.Location = new System.Drawing.Point(38, 12);
 			this.labelRecallSchedDesc.Name = "labelRecallSchedDesc";
 			this.labelRecallSchedDesc.Size = new System.Drawing.Size(869, 49);
@@ -748,21 +755,6 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
-			// 
-			// butRecallSchedEnable
-			// 
-			this.butRecallSchedEnable.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRecallSchedEnable.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.butRecallSchedEnable.Autosize = true;
-			this.butRecallSchedEnable.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRecallSchedEnable.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRecallSchedEnable.CornerRadius = 4F;
-			this.butRecallSchedEnable.Location = new System.Drawing.Point(41, 80);
-			this.butRecallSchedEnable.Name = "butRecallSchedEnable";
-			this.butRecallSchedEnable.Size = new System.Drawing.Size(73, 24);
-			this.butRecallSchedEnable.TabIndex = 246;
-			this.butRecallSchedEnable.Text = "Enable";
-			this.butRecallSchedEnable.Click += new System.EventHandler(this.butRecallSchedEnable_Click);
 			// 
 			// FormEServicesSetup
 			// 
