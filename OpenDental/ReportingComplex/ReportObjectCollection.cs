@@ -4,7 +4,7 @@ using System.Collections;
 namespace OpenDental.ReportingComplex
 {
 	///<summary>Contains the ReportObject objects for every report object in the report.</summary>
-	public class ReportObjectCollection:CollectionBase{
+	public class ReportObjectCollection:CollectionBase {
 
 		///<summary>Returns the ReportObject with the given index.</summary>
 		public ReportObject this[int index]{
@@ -41,7 +41,6 @@ namespace OpenDental.ReportingComplex
 		public void Insert(int index,ReportObject value){
 			List.Insert(index,value);
 		}
-
 	}
 
 }

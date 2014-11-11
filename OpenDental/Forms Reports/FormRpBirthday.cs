@@ -512,48 +512,37 @@ namespace OpenDental
 		}
 
 		private void butReport_Click(object sender, System.EventArgs e){
-			//if(errorProvider1.GetError(textDateFrom) != ""
-			//	|| errorProvider1.GetError(textDateTo) != "") 
-			//{
-			//	MsgBox.Show(this,"Please fix data entry errors first.");
-			//	return;
-			//}
-			//DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
-			//DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
-			//if(dateTo < dateFrom) 
-			//{
-			//	MsgBox.Show(this,"To date cannot be before From date.");
-			//	return;
-			//}
-			//ReportComplex report=new ReportComplex();
-			//report.ReportName=Lan.g(this,"Birthdays");
-			//report.AddTitle(Lan.g(this,"Birthdays"));
-			//report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-			//report.AddSubTitle(dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat));
-			///*report.Query=@"SELECT LName,FName,Address,Address2,City,State,Zip,Birthdate,Birthdate
-			//	FROM patient 
-			//	WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
-			//	+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
-			//	+"AND PatStatus=0	ORDER BY LName,FName";*/
-			//report.AddColumn("LName",90,FieldValueType.String);
-			//report.AddColumn("FName",90,FieldValueType.String);
-			//report.AddColumn("Preferred",90,FieldValueType.String);
-			//report.AddColumn("Address",90,FieldValueType.String);
-			//report.AddColumn("Address2",90,FieldValueType.String);
-			//report.AddColumn("City",75,FieldValueType.String);
-			//report.AddColumn("State",60,FieldValueType.String);
-			//report.AddColumn("Zip",75,FieldValueType.String);
-			//report.AddColumn("Birthdate", 75, FieldValueType.Date);
-			//report.GetLastRO(ReportObjectKind.FieldObject).FormatString="d";
-			//report.AddColumn("Age", 45, FieldValueType.Integer);
-			//report.AddPageNum();
-			//report.ReportTables=Patients.GetBirthdayList(dateFrom,dateTo);
-			////if(!report.SubmitQuery()){
-			////	return;
-			////}
-			//FormReportComplex FormR=new FormReportComplex(report);
-			//FormR.ShowDialog();
-			//DialogResult=DialogResult.OK;
+			if(errorProvider1.GetError(textDateFrom) != ""
+				|| errorProvider1.GetError(textDateTo) != "") {
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			if(dateTo < dateFrom) {
+				MsgBox.Show(this,"To date cannot be before From date.");
+				return;
+			}
+			ReportComplex report=new ReportComplex(Lan.g(this,"Birthdays"),PrefC.GetString(PrefName.PracticeTitle),false,true);
+			report.ReportName=Lan.g(this,"Birthdays");
+			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat));
+			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"Birthdays","",SplitByKind.None);
+			query.AddColumn("LName",90,FieldValueType.String);
+			query.AddColumn("FName",90,FieldValueType.String);
+			query.AddColumn("Preferred",90,FieldValueType.String);
+			query.AddColumn("Address",90,FieldValueType.String);
+			query.AddColumn("Address2",90,FieldValueType.String);
+			query.AddColumn("City",75,FieldValueType.String);
+			query.AddColumn("State",60,FieldValueType.String);
+			query.AddColumn("Zip",75,FieldValueType.String);
+			query.AddColumn("Birthdate",75,FieldValueType.Date);
+			query.GetColumnDetail("Birthdate").FormatString="d";
+			query.AddColumn("Age",45,FieldValueType.Integer);
+			report.AddPageNum();
+			report.SubmitQueries();
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		

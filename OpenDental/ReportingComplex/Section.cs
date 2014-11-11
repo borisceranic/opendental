@@ -1,83 +1,85 @@
 using System;
 
-namespace OpenDental.ReportingComplex
-{
-	///<summary>Every ReportObject in a ODReport must be attached to a Section.</summary>
+namespace OpenDental.ReportingComplex {
+	///<summary>Every ReportObject in an ODReport must be attached to a Section.</summary>
 	public class Section{
 		///<summary></summary>
-		private string name;
+		private string _name;
 		///<summary></summary>
-		private int height;
+		private int _height;
 		///<summary>Width is usually the entire page unless set differently here.</summary>
-		private int width;
+		private int _width;
 		///<summary>Specifies which kind, like ReportHeader, or GroupFooter.</summary>
-		private AreaSectionKind kind;
+		private AreaSectionKind _kind;
 
 		///<summary></summary>
-		public Section(AreaSectionKind myKind,int myHeight){
-			kind=myKind;
+		public Section(AreaSectionKind kind,int height){
+			_kind=kind;
 			//name is not user editable, so:
-			switch(kind){
+			switch(_kind){
 				case AreaSectionKind.ReportHeader:
-					name="Report Header";
+					_name="Report Header";
 					break;
 				case AreaSectionKind.PageHeader:
-					name="Page Header";
+					_name="Page Header";
+					break;
+				case AreaSectionKind.GroupTitle:
+					_name="Group Title";
 					break;
 				case AreaSectionKind.GroupHeader:
-					name="Group Header";
+					_name="Group Header";
 					break;
 				case AreaSectionKind.Detail:
-					name="Detail";
+					_name="Detail";
 					break;
 				case AreaSectionKind.GroupFooter:
-					name="Group Footer";
+					_name="Group Footer";
 					break;
 				case AreaSectionKind.PageFooter:
-					name="Page Footer";
+					_name="Page Footer";
 					break;
 				case AreaSectionKind.ReportFooter:
-					name="Report Footer";
+					_name="Report Footer";
 					break;
 				case AreaSectionKind.Query:
-					name="Query";
+					_name="Query";
 					break;
 			}
-			height=myHeight;
+			_height=height;
 		}
 
 #region Properties
 		///<summary>Not user editable.</summary>
 		public string Name{
 			get{
-				return name;
+				return _name;
 			}
 		}
 		///<summary></summary>
 		public int Height{
 			get{
-				return height;
+				return _height;
 			}
 			set{
-				height=value;
+				_height=value;
 			}
 		}
 		///<summary></summary>
 		public int Width{
 			get{
-				return width;
+				return _width;
 			}
 			set{
-				width=value;
+				_width=value;
 			}
 		}
 		///<summary></summary>
 		public AreaSectionKind Kind{
 			get{
-				return kind;
+				return _kind;
 			}
 			set{
-				kind=value;
+				_kind=value;
 			}
 		}
 #endregion
@@ -92,25 +94,23 @@ namespace OpenDental.ReportingComplex
 		ReportHeader,
 		///<summary>Printed at the top of each page.</summary>
 		PageHeader,
-		///<summary>Not implemented yet. Will print at the top of a specific group.</summary>
+		///<summary>Title of a specific group</summary>
+		GroupTitle,
+		///<summary>Will print at the top of a specific group.</summary>
 		GroupHeader,
 		///<summary>This is the data of the report and represents one row of data.  This section gets printed once for each record in the datatable.</summary>
 		Detail,
-		///<summary>Not implemented yet.</summary>
+		///<summary>Contains a buffer and/or a total of a column</summary>
 		GroupFooter,
 		///<summary>Prints at the bottom of each page, including after the reportFooter</summary>
 		PageFooter,
 		///<summary>Prints at the bottom of the report, but before the page footer for the last page.</summary>
 		ReportFooter,
-		///<summary>Query Section</summary>
+		///<summary>Query Section, contains groups of queries.</summary>
 		Query
-		
-		
-		
-		
-		
-		
 	}
+
+
 
 }
 

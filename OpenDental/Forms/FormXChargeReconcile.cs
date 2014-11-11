@@ -2,6 +2,9 @@ using System;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.IO;
+using OpenDental.ReportingComplex;
+using System.Data;
+using System.Drawing;
 
 namespace OpenDental {
 	public partial class FormXChargeReconcile:Form {
@@ -138,32 +141,30 @@ namespace OpenDental {
 		private void butMissing_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
-			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,xchargetransaction.PatNum,CreditCardNum,Expiration,Result,Amount "
-				+" FROM xchargetransaction LEFT JOIN ("
-					+" SELECT patient.PatNum,LName,FName,DateEntry,PayDate,PayAmt,PayNote"
-					+" FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum"
-					+" WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)
-				+" ) AS P ON xchargetransaction.PatNum=P.PatNum AND DATE(xchargetransaction.TransactionDateTime)=P.DateEntry AND xchargetransaction.Amount=P.PayAmt "
-				+" WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)
-				+" AND P.PatNum IS NULL"
-				+" AND xchargetransaction.ResultCode=0;";//Valid entries to count have result code 0
-			FormQuery FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-			FormQuery2.SubmitReportQuery();
-			report.Title="XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString();
-			report.SubTitle.Add("No Matching Transaction Found in Open Dental");
-			report.SetColumn(this,0,"Transaction Date/Time",170);
-			report.SetColumn(this,1,"Transaction Type",120);
-			report.SetColumn(this,2,"Clerk ID",80);
-			report.SetColumn(this,3,"Item#",50);
-			report.SetColumn(this,4,"Pat",50);//This name is used to ensure FormQuery does not replace the patnum with the patient name.
-			report.SetColumn(this,5,"Credit Card Num",140);
-			report.SetColumn(this,6,"Exp",50);
-			report.SetColumn(this,7,"Result",50);
-			report.SetColumn(this,8,"Amount",60,HorizontalAlignment.Right);
-			Cursor=Cursors.Default;
-			FormQuery2.ShowDialog();
+			ReportComplex report=new ReportComplex("XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),"No Matching Transaction Found in Open Dental",true,true);
+			report.ReportName="Missing";
+			report.GetTitle().IsUnderlined=true;
+			QueryObject query;
+			DataTable dt=XChargeTransactions.GetMissingTable(programNum,date1.SelectionStart,date2.SelectionStart);
+			query=report.AddQuery(dt,"Missing Payments","",SplitByKind.None);//Valid entries to count have result code 0
+			query.AddColumn("Transaction Date/Time",170,FieldValueType.Date);
+			query.AddColumn("Transaction Type",120,FieldValueType.String);
+			query.AddColumn("Clerk ID",80,FieldValueType.String);
+			query.AddColumn("Item#",50,FieldValueType.String);
+			query.AddColumn("Pat",50,FieldValueType.String);//This name is used to ensure FormQuery does not replace the patnum with the patient name.
+			query.AddColumn("Credit Card Num",140,FieldValueType.String);
+			query.AddColumn("Exp",50,FieldValueType.String);
+			query.AddColumn("Result",50,FieldValueType.String);
+			query.AddColumn("Amount",60,FieldValueType.Number);
+			query.GetColumnHeader("Amount").TextAlign=ContentAlignment.MiddleRight;
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			// display report
+			FormReportComplex FormR=new FormReportComplex(report);
+			//FormR.MyReport=report;
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butExtra_Click(object sender,EventArgs e) {

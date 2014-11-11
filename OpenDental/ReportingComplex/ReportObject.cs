@@ -4,272 +4,271 @@ using System.Drawing;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
-namespace OpenDental.ReportingComplex
-{
-	///<summary>There is one ReportObject for each element of an ODReport that gets printed on the page.  There are many different kinds of reportObjects</summary>
+namespace OpenDental.ReportingComplex {
+	///<summary>There is one ReportObject for each element of an ODReport that gets printed on the page.  There are many different kinds of reportObjects.</summary>
 	public class ReportObject{
-		private string sectionName;
-		private Point location;
-		private Size size;
-		private string name;
-		private ReportObjectKind objectKind;
-		private Font font;
-		private ContentAlignment textAlign;
-		private Color foreColor;
-		private string staticText;
-		private string formatString;
-		private bool suppressIfDuplicate;
-		private string endSectionName;
-		private Point locationLowerRight;
-		private float lineThickness;
-		private FieldDefKind fieldKind;
-		private FieldValueType valueType;
-		private SpecialFieldType specialType;
-		private SummaryOperation operation;
-		private LineOrientation lineOrientation;
-		private LinePosition linePosition;
-		private int linePercent;
-		private int offSetX;
-		private int offSetY;
-		private bool isUnderlined;
-		private string summarizedField;
-		private string dataField;
+		private string _sectionName;
+		private Point _location;
+		private Size _size;
+		private string _name;
+		private ReportObjectKind _objectKind;
+		private Font _font;
+		private ContentAlignment _textAlign;
+		private Color _foreColor;
+		private string _staticText;
+		private string _formatString;
+		private bool _suppressIfDuplicate;
+		private string _endSectionName;
+		private Point _locationLowerRight;
+		private float _lineThickness;
+		private FieldDefKind _fieldKind;
+		private FieldValueType _valueType;
+		private SpecialFieldType _specialType;
+		private SummaryOperation _operation;
+		private LineOrientation _lineOrientation;
+		private LinePosition _linePosition;
+		private int _linePercent;
+		private int _offSetX;
+		private int _offSetY;
+		private bool _isUnderlined;
+		private string _summarizedField;
+		private string _dataField;
 		
 
 #region Properties
 		///<summary>The name of the section to which this object is attached.  For lines and boxes that span multiple sections, this is the section in which the upper part of the object resides.</summary>
 		public string SectionName{
 			get{
-				return sectionName;
+				return _sectionName;
 			}
 			set{
-				sectionName=value;
+				_sectionName=value;
 			}
 		}
 		///<summary>Location within the section. Frequently, y=0</summary>
 		public Point Location{
 			get{
-				return location;
+				return _location;
 			}
 			set{
-				location=value;
+				_location=value;
 			}
 		}
 		///<summary></summary>
 		public Size Size{
 			get{
-				return size;
+				return _size;
 			}
 			set{
-				size=value;
+				_size=value;
 			}
 		}
 		///<summary>The unique name of the ReportObject.</summary>
 		public string Name{
 			get{
-				return name;
+				return _name;
 			}
 			set{
-				name=value;
+				_name=value;
 			}
 		}
 		///<summary>For instance, FieldObject, or TextObject.</summary>
 		public ReportObjectKind ObjectKind{
 			get{
-				return objectKind;
+				return _objectKind;
 			}
 			set{
-				objectKind=value;
+				_objectKind=value;
 			}
 		}
 		///<summary></summary>
 		public Font Font{
 			get{
-				return font;
+				return _font;
 			}
 			set{
-				font=value;
+				_font=value;
 			}
 		}
 		///<summary>Horizontal alignment of the text.</summary>
 		public ContentAlignment TextAlign{
 			get{
-				return textAlign;
+				return _textAlign;
 			}
 			set{
-				textAlign=value;
+				_textAlign=value;
 			}
 		}
 		///<summary>Can be used for text color or for line color.</summary>
 		public Color ForeColor{
 			get{
-				return foreColor;
+				return _foreColor;
 			}
 			set{
-				foreColor=value;
+				_foreColor=value;
 			}
 		}
 		///<summary>The text to display for a TextObject.  Will later include XML formatting markup.</summary>
 		public string StaticText{
 			get{
-				return staticText;
+				return _staticText;
 			}
 			set{
-				staticText=value;
+				_staticText=value;
 			}
 		}
 		///<summary>For a FieldObject, a C# format string that specifies how to print dates, times, numbers, and currency based on the country or on a custom format.</summary>
 		///<remarks>There are a LOT of options for this string.  Look in C# help under Standard Numeric Format Strings, Custom Numeric Format Strings, Standard DateTime Format Strings, Custom DateTime Format Strings, and Enumeration Format Strings.  Once users are allowed to edit reports, we will assemble a help page with all of the common options. The best options are "n" for number, and "d" for date.</remarks>
 		public string FormatString{
 			get{
-				return formatString;
+				return _formatString;
 			}
 			set{
-				formatString=value;
+				_formatString=value;
 			}
 		}
-		///<summary>Suppresses this field if the field for the previous record was the same.</summary>
+		///<summary>Suppresses this field if the field for the previous record was the same.  Only used with data fields.  E.g. So that a query ordered by a date column doesn't print the same date over and over.</summary>
 		public bool SuppressIfDuplicate{
 			get{
-				return suppressIfDuplicate;
+				return _suppressIfDuplicate;
 			}
 			set{
-				suppressIfDuplicate=value;
+				_suppressIfDuplicate=value;
 			}
 		}
 		///<summary>For graphics, the name of the Section to which the lower part of the object extends.  This will normally be the same as the sectionName unless the object spans multiple sections.  The object will then be drawn across all sections in between.</summary>
 		public string EndSectionName{
 			get{
-				return endSectionName;
+				return _endSectionName;
 			}
 			set{
-				endSectionName=value;
+				_endSectionName=value;
 			}
 		}
 		///<summary>The position of the lower right corner of the box or line in the coordinates of the endSection.</summary>
 		public Point LocationLowerRight{
 			get{
-				return locationLowerRight;
+				return _locationLowerRight;
 			}
 			set{
-				locationLowerRight=value;
+				_locationLowerRight=value;
 			}
 		}
 		///<summary></summary>
 		public float LineThickness{
 			get{
-				return lineThickness;
+				return _lineThickness;
 			}
 			set{
-				lineThickness=value;
+				_lineThickness=value;
 			}
 		}
 		///<summary>Used to determine whether the line is vertical or horizontal.</summary>
 		public LineOrientation LineOrientation {
 			get {
-				return lineOrientation;
+				return _lineOrientation;
 			}
 			set {
-				lineOrientation=value;
+				_lineOrientation=value;
 			}
 		}
 		///<summary>Used to determine intial starting position of the line.</summary>
 		public LinePosition LinePosition {
 			get {
-				return linePosition;
+				return _linePosition;
 			}
 			set {
-				linePosition=value;
+				_linePosition=value;
 			}
 		}
 		///<summary>Used to determine what percentage of the section the line will draw on.</summary>
 		public int LinePercent {
 			get {
-				return linePercent;
+				return _linePercent;
 			}
 			set {
-				linePercent=value;
+				_linePercent=value;
 			}
 		}
 		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
 		public int OffSetX {
 			get {
-				return offSetX;
+				return _offSetX;
 			}
 			set {
-				offSetX=value;
+				_offSetX=value;
 			}
 		}
 		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
 		public int OffSetY {
 			get {
-				return offSetY;
+				return _offSetY;
 			}
 			set {
-				offSetY=value;
+				_offSetY=value;
 			}
 		}
 		///<summary>Used to underline text objects and titles.</summary>
 		public bool IsUnderlined {
 			get {
-				return isUnderlined;
+				return _isUnderlined;
 			}
 			set {
-				isUnderlined=value;
+				_isUnderlined=value;
 			}
 		}
 		///<summary>The kind of field, like FormulaField, SummaryField, or DataTableField.</summary>
 		public FieldDefKind FieldKind{
 			get{
-				return fieldKind;
+				return _fieldKind;
 			}
 			set{
-				fieldKind=value;
+				_fieldKind=value;
 			}
 		}
 		///<summary>The value type of field, like string or datetime.</summary>
 		public FieldValueType ValueType{
 			get{
-				return valueType;
+				return _valueType;
 			}
 			set{
-				valueType=value;
+				_valueType=value;
 			}
 		}
 		///<summary>For FieldKind=FieldDefKind.SpecialField, this is the type.  eg. pagenumber</summary>
 		public SpecialFieldType SpecialType{
 			get{
-				return specialType;
+				return _specialType;
 			}
 			set{
-				specialType=value;
+				_specialType=value;
 			}
 		}
 		///<summary>For FieldKind=FieldDefKind.SummaryField, the summary operation type.</summary>
 		public SummaryOperation Operation{
 			get{
-				return operation;
+				return _operation;
 			}
 			set{
-				operation=value;
+				_operation=value;
 			}
 		}
 		///<summary>For FieldKind=FieldDefKind.SummaryField, the name of the dataField that is being summarized.  This might later be changed to refer to a ReportObject name instead (or maybe not).</summary>
 		public string SummarizedField{
 			get{
-				return summarizedField;
+				return _summarizedField;
 			}
 			set{
-				summarizedField=value;
+				_summarizedField=value;
 			}
 		}
 		///<summary>For objectKind=ReportObjectKind.FieldObject, the name of the dataField column.</summary>
 		public string DataField{
 			get{
-				return dataField;
+				return _dataField;
 			}
 			set{
-				dataField=value;
+				_dataField=value;
 			}
 		}
 #endregion
@@ -280,107 +279,101 @@ namespace OpenDental.ReportingComplex
 		}
 
 		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize,string thisStaticText,Font thisFont,ContentAlignment thisTextAlign){
-			name=thisName;
-			sectionName=thisSectionName;
-			location=thisLocation;
-			size=thisSize;
-			staticText=thisStaticText;
-			font=thisFont;
-			textAlign=thisTextAlign;
-			foreColor=Color.Black;
-			objectKind=ReportObjectKind.TextObject;
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign){
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_staticText=staticText;
+			_font=font;
+			_textAlign=textAlign;
+			_foreColor=Color.Black;
+			_objectKind=ReportObjectKind.TextObject;
 		}
 
 		///<summary>Overload for BoxObject.</summary>
-		public ReportObject(string thisName,string thisSectionName,Color thisColor,float thisLineThickness,int thisOffSetX,int thisOffSetY) {
-			name=thisName;
-			sectionName=thisSectionName;
-			foreColor=thisColor;
-			lineThickness=thisLineThickness;
-			offSetX=thisOffSetX;
-			offSetY=thisOffSetY;
-			objectKind=ReportObjectKind.BoxObject;
+		public ReportObject(string name,string sectionName,Color color,float lineThickness,int offSetX,int offSetY) {
+			_name=name;
+			_sectionName=sectionName;
+			_foreColor=color;
+			_lineThickness=lineThickness;
+			_offSetX=offSetX;
+			_offSetY=offSetY;
+			_objectKind=ReportObjectKind.BoxObject;
 		}
 
 		///<summary>Overload for LineObject.</summary>
-		public ReportObject(string thisName,string thisSectionName,Color thisColor,float thisLineThickness,LineOrientation thisLineOrientation,LinePosition thisLinePosition,int thisLinePercent,int thisOffSetX,int thisOffSetY) {
-			name=thisName;
-			sectionName=thisSectionName;
-			foreColor=thisColor;
-			lineThickness=thisLineThickness;
-			lineOrientation=thisLineOrientation;
-			linePosition=thisLinePosition;
-			linePercent=thisLinePercent;
-			offSetX=thisOffSetX;
-			offSetY=thisOffSetY;
-			objectKind=ReportObjectKind.LineObject;
+		public ReportObject(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
+			_name=name;
+			_sectionName=sectionName;
+			_foreColor=color;
+			_lineThickness=lineThickness;
+			_lineOrientation=lineOrientation;
+			_linePosition=linePosition;
+			_linePercent=linePercent;
+			_offSetX=offSetX;
+			_offSetY=offSetY;
+			_objectKind=ReportObjectKind.LineObject;
 		}
 
 		///<summary>Overload for DataTableField ReportObject</summary>
-		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
+		public ReportObject(string name,string sectionName,Point location,Size size
 			,string thisDataField,FieldValueType thisValueType
 			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
-			name=thisName;
-			sectionName=thisSectionName;
-			location=thisLocation;
-			size=thisSize;
-			font=thisFont;
-			textAlign=thisTextAlign;
-			formatString=thisFormatString;
-			fieldKind=FieldDefKind.DataTableField;
-			dataField=thisDataField;
-			valueType=thisValueType;
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_font=thisFont;
+			_textAlign=thisTextAlign;
+			_formatString=thisFormatString;
+			_fieldKind=FieldDefKind.DataTableField;
+			_dataField=thisDataField;
+			_valueType=thisValueType;
 			//defaults:
-			foreColor=Color.Black;
-			objectKind=ReportObjectKind.FieldObject;
+			_foreColor=Color.Black;
+			_objectKind=ReportObjectKind.FieldObject;
 		}
 
 		///<summary>Overload for SummaryField ReportObject</summary>
-		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
-			,SummaryOperation thisOperation,string thisSummarizedField
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
-			name=thisName;
-			sectionName=thisSectionName;
-			location=thisLocation;
-			size=thisSize;
-			font=thisFont;
-			textAlign=thisTextAlign;
-			formatString=thisFormatString;
-			fieldKind=FieldDefKind.SummaryField;
-			valueType=FieldValueType.Number;
-			operation=thisOperation;
-			summarizedField=thisSummarizedField;
+		public ReportObject(string name,string sectionName,Point location,Size size,SummaryOperation operation,string summarizedField,Font font,ContentAlignment textAlign,string formatString) {
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_font=font;
+			_textAlign=textAlign;
+			_formatString=formatString;
+			_fieldKind=FieldDefKind.SummaryField;
+			_valueType=FieldValueType.Number;
+			_operation=operation;
+			_summarizedField=summarizedField;
 			//defaults:
-			foreColor=Color.Black;
-			objectKind=ReportObjectKind.FieldObject;
+			_foreColor=Color.Black;
+			_objectKind=ReportObjectKind.FieldObject;
 		}
 
 		///<summary>Overload for SpecialField ReportObject</summary>
-		public ReportObject(string thisName,string thisSectionName,Point thisLocation,Size thisSize
-			,FieldValueType thisValueType,SpecialFieldType thisSpecialType
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
-			name=thisName;
-			sectionName=thisSectionName;
-			location=thisLocation;
-			size=thisSize;
-			font=thisFont;
-			textAlign=thisTextAlign;
-			formatString=thisFormatString;
-			fieldKind=FieldDefKind.SpecialField;
-			valueType=thisValueType;
-			specialType=thisSpecialType;
+		public ReportObject(string name,string sectionName,Point location,Size size,FieldValueType valueType,SpecialFieldType specialType,Font font,ContentAlignment textAlign,string formatString) {
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_font=font;
+			_textAlign=textAlign;
+			_formatString=formatString;
+			_fieldKind=FieldDefKind.SpecialField;
+			_valueType=valueType;
+			_specialType=specialType;
 			//defaults:
-			foreColor=Color.Black;
-			objectKind=ReportObjectKind.FieldObject;
+			_foreColor=Color.Black;
+			_objectKind=ReportObjectKind.FieldObject;
 		}
 
 
 
-		///<summary>Converts contentAlignment into a combination of StringAlignments.  More arguments will later be added for other formatting options.  This method is called by FormReport when drawing text for a reportObject.</summary>
-		///<param name="contentAlignment"></param>
-		///<returns></returns>
-		public static StringFormat GetStringFormat(ContentAlignment contentAlignment){
+		///<summary>Converts contentAlignment into a combination of StringAlignments used to format strings.  This method is mostly called for drawing text on reportObjects.</summary>
+		public static StringFormat GetStringFormatAlignment(ContentAlignment contentAlignment){
 			if(!Enum.IsDefined(typeof(ContentAlignment),(int)contentAlignment))
 				throw new System.ComponentModel.InvalidEnumArgumentException(
 					"contentAlignment",(int)contentAlignment,typeof(ContentAlignment));
@@ -426,16 +419,43 @@ namespace OpenDental.ReportingComplex
 			return stringFormat;
 		}
 
-		///<summary>Once a dataTable has been set, this method can be run to get the summary value of this field.  It will still need to be formatted. It loops through all records to get this value.  This will be changed soon to refer to the ReportObject rather than the dataTable field when summarizing.</summary>
+		public ReportObject DeepCopyReportObject() {
+			ReportObject reportObj=new ReportObject();
+			reportObj._sectionName=this._sectionName;
+			reportObj._location=new Point(this._location.X,this._location.Y);
+			reportObj._size=new Size(this._size.Width,this._size.Height);
+			reportObj._name=this._name;
+			reportObj._objectKind=this._objectKind;
+			reportObj._font=(Font)this._font.Clone();
+			reportObj._textAlign=this._textAlign;
+			reportObj._foreColor=this._foreColor;
+			reportObj._staticText=this._staticText;
+			reportObj._formatString=this._formatString;
+			reportObj._suppressIfDuplicate=this._suppressIfDuplicate;
+			reportObj._endSectionName=this._endSectionName;
+			reportObj._locationLowerRight=new Point(this._locationLowerRight.X,this._locationLowerRight.Y);
+			reportObj._lineThickness=this._lineThickness;
+			reportObj._fieldKind=this._fieldKind;
+			reportObj._valueType=this._valueType;
+			reportObj._specialType=this._specialType;
+			reportObj._operation=this._operation;
+			reportObj._lineOrientation=this._lineOrientation;
+			reportObj._linePosition=this._linePosition;
+			reportObj._linePercent=this._linePercent;
+			reportObj._offSetX=this._offSetX;
+			reportObj._offSetY=this._offSetY;
+			reportObj._isUnderlined=this._isUnderlined;
+			reportObj._summarizedField=this._summarizedField;
+			reportObj._dataField=this._dataField;
+			return reportObj;
+		}
+
+		///<summary>Once a dataTable has been set, this method can be run to get the summary value of this field.  It will still need to be formatted.  It loops through all records to get this value.</summary>
 		public double GetSummaryValue(DataTable dataTable,int col){
-			//if(SummarizedField.FieldKind!=FieldDefKind.DataTableField){
-			//	return 0;
-			//}
 			double retVal=0;
 			for(int i=0;i<dataTable.Rows.Count;i++){
 				if(Operation==SummaryOperation.Sum){
 					retVal+=PIn.Double(dataTable.Rows[i][col].ToString());
-						//PIn.PDouble(Report.ReportTable.Rows[i][Report.DataFields.IndexOf(fieldObject.DataSource.Name)].ToString())
 				}
 				else if(Operation==SummaryOperation.Count){
 					retVal++;
@@ -524,6 +544,16 @@ namespace OpenDental.ReportingComplex
 		Top,
 		///<summary>Used in Horizontal Orientation</summary>
 		Bottom
+	}
+
+	///<summary>This determines what type of column the table will be splitting on. Default is none.</summary>
+	public enum SplitByKind {
+		///<summary>0</summary>
+		None,
+		///<summary>1</summary>
+		Date,
+		///<summary>2</summary>
+		Enum
 	}
 
 	
