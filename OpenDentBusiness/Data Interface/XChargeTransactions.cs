@@ -56,6 +56,21 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM xchargetransaction WHERE XChargeTransactionNum = "+POut.Long(xChargeTransactionNum);
 			Db.NonQ(command);
 		}
+
+		public static DataTable GetMissingTable(string programNum,DateTime dateStart,DateTime dateEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod());
+			}
+			return Db.GetTable("SELECT TransactionDateTime,TransType,ClerkID,ItemNum,xchargetransaction.PatNum,CreditCardNum,Expiration,Result,Amount "
+				+" FROM xchargetransaction LEFT JOIN ("
+					+" SELECT patient.PatNum,LName,FName,DateEntry,PayDate,PayAmt,PayNote"
+					+" FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum"
+					+" WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
+				+" ) AS P ON xchargetransaction.PatNum=P.PatNum AND DATE(xchargetransaction.TransactionDateTime)=P.DateEntry AND xchargetransaction.Amount=P.PayAmt "
+				+" WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
+				+" AND P.PatNum IS NULL"
+				+" AND xchargetransaction.ResultCode=0;");
+		}
 	
 
 
