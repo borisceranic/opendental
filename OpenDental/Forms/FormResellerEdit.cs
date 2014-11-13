@@ -29,7 +29,11 @@ namespace OpenDental {
 				textPassword.ReadOnly=true;
 			}
 			textUserName.Text=ResellerCur.UserName;
-			textPassword.Text=ResellerCur.ResellerPassword;
+			string password="";
+			if(ResellerCur.ResellerPassword.Trim()!="") {
+				password="********";//Don't show the password hash.
+			}
+			textPassword.Text=password;
 			FillGridMain();
 			FillGridServices();
 		}
@@ -179,7 +183,9 @@ namespace OpenDental {
 				return;
 			}
 			ResellerCur.UserName=textUserName.Text;
-			ResellerCur.ResellerPassword=textPassword.Text;
+			if(textPassword.Text!="********") {
+				ResellerCur.ResellerPassword=Userods.EncryptPassword(textPassword.Text,false);
+			}
 			Resellers.Update(ResellerCur);
 			DialogResult=DialogResult.OK;
 		}
