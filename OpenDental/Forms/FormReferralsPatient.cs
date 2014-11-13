@@ -26,6 +26,8 @@ namespace OpenDental{
 		public bool IsSelectionMode;
 		///<summary>This number is normally zero.  If in selection mode, this will be the PK of the selected refattach.</summary>
 		public long RefAttachNum;
+		///<summary>This number is normally zero.  If form is opened by double clicking a summary of care event then this will be filled with the current FKey of that measure event.</summary>
+		public long DefaultRefAttachNum;
 
 		///<summary></summary>
 		public FormReferralsPatient()
@@ -243,20 +245,20 @@ namespace OpenDental{
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			//Referral referral;
-			for(int i=0;i<RefAttachList.Count;i++){
+			for(int i=0;i<RefAttachList.Count;i++) {
 				row=new ODGridRow();
-				if(RefAttachList[i].IsFrom){
+				if(RefAttachList[i].IsFrom) {
 					row.Cells.Add(Lan.g(this,"From"));
 				}
-				else{
+				else {
 					row.Cells.Add(Lan.g(this,"To"));
 				}
 				row.Cells.Add(Referrals.GetNameFL(RefAttachList[i].ReferralNum));
 				//referral=ReferralL.GetReferral(RefAttachList[i].ReferralNum);
-				if(RefAttachList[i].RefDate.Year < 1880){
+				if(RefAttachList[i].RefDate.Year < 1880) {
 					row.Cells.Add("");
 				}
-				else{
+				else {
 					row.Cells.Add(RefAttachList[i].RefDate.ToShortDateString());
 				}
 				row.Cells.Add(Lan.g("enumReferralToStatus",RefAttachList[i].RefToStatus.ToString()));
@@ -274,6 +276,12 @@ namespace OpenDental{
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<RefAttachList.Count;i++) {
+				if(RefAttachList[i].RefAttachNum==DefaultRefAttachNum) {
+					gridMain.SetSelected(i,true);
+					break;
+				}
+			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -354,6 +362,18 @@ namespace OpenDental{
 			}
 			refattach.ItemOrder=order+1;
 			refattach.ProcNum=ProcNum;
+			//We want to help EHR users meet their measures.  Therefore, we are going to make an educated guess as to who is making this referral.
+			//We are doing this for non-EHR users as well because we think it might be nice automation.
+			long provNumLastAppt=Appointments.GetProvNumFromLastApptForPat(PatNum);
+			if(Security.CurUser.ProvNum!=0) {
+				refattach.ProvNum=Security.CurUser.ProvNum;
+			}
+			else if(provNumLastAppt!=0) {
+				refattach.ProvNum=provNumLastAppt;
+			}
+			else {
+				refattach.ProvNum=Patients.GetPat(PatNum).PriProv;
+			}
 			RefAttaches.Insert(refattach);
 			SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,PatNum,"Referred To "+Referrals.GetNameFL(refattach.ReferralNum));
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
