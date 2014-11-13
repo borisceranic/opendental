@@ -60,8 +60,8 @@ namespace OpenDental{
 			//Patient has changed
 			int idx=buttonLastFivePatNums.IndexOf(patNum);
 			if(idx>-1) {//It exists in this list of patnums
-				buttonLastFivePatNums.Remove(patNum);
-				buttonLastFiveNames.Remove(nameLF);
+				buttonLastFivePatNums.RemoveAt(idx);
+				buttonLastFiveNames.RemoveAt(idx);
 			}
 			buttonLastFivePatNums.Insert(0,patNum);
 			buttonLastFiveNames.Insert(0,nameLF);
