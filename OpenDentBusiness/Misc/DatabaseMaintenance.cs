@@ -4314,6 +4314,51 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string SummaryOfCaresWithoutReferralsAttached(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT * FROM refattach WHERE RefAttachNum NOT IN ("
+					+"SELECT FKey FROM ehrmeasureevent WHERE EventType="+POut.Int((int)EhrMeasureEventType.SummaryOfCareProvidedToDr)+" "
+					+"OR EventType="+POut.Int((int)EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic)+") "
+				+"AND IsFrom=0 "
+				+"AND IsTransitionOfCare=1 ";
+			//We want to fix as many measure events as we can even if they aren't good enough to count towards the actual measure. 
+			//+"AND ProvNum!=0";//E.g. we will link measure events to refattaches even if the ref attach has no provider.  This way, they only have to fix the ref attach in order for their measures to show.
+			List<RefAttach> refAttaches=Crud.RefAttachCrud.SelectMany(command);
+			command="SELECT * FROM ehrmeasureevent WHERE FKey NOT IN (SELECT RefAttachNum FROM refattach WHERE IsFrom=0 AND IsTransitionOfCare=1) "
+				+"AND EventType="+POut.Int((int)EhrMeasureEventType.SummaryOfCareProvidedToDr)+" "
+				+"OR EventType="+POut.Int((int)EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic)+" "
+				+"ORDER BY DateTEvent";
+			List<EhrMeasureEvent> measureEvents=Crud.EhrMeasureEventCrud.SelectMany(command);
+			int numberFixed=0;
+			for(int i=0;i<refAttaches.Count;i++) {
+				for(int j=0;j<measureEvents.Count;j++) {
+					if(refAttaches[i].PatNum==measureEvents[j].PatNum 
+							&& measureEvents[j].FKey==0
+							&& measureEvents[j].DateTEvent>=refAttaches[i].RefDate.AddDays(-3) 
+							&& measureEvents[j].DateTEvent<=refAttaches[i].RefDate.AddDays(1)) {
+						if(!isCheck) {
+							measureEvents[j].FKey=refAttaches[i].RefAttachNum;
+							EhrMeasureEvents.Update(measureEvents[j]);
+						}
+						measureEvents.RemoveAt(j);
+						numberFixed++;
+						break;
+					}
+				}
+			}
+			if(isCheck && (numberFixed>0 || verbose)) {
+				log+=Lans.g("FormDatabaseMaintenance","Summary of cares with no referrals attached")+": "+numberFixed.ToString()+"\r\n";
+			}
+			else if(!isCheck && (numberFixed>0 || verbose)) {
+				log+=Lans.g("FormDatabaseMaintenance","Summary of cares that had a referral attached")+": "+numberFixed.ToString()+"\r\n";
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string TaskSubscriptionsInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
