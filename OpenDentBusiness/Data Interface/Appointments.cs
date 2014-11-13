@@ -1912,6 +1912,22 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Gets the ProvNum for the last completed appointment for a patient. If none, returns 0.</summary>
+		public static long GetProvNumFromLastApptForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT ProvNum FROM appointment WHERE AptStatus IN ("+(int)ApptStatus.Complete+","+(int)ApptStatus.Scheduled+")"
+				+" AND AptDateTime<="+POut.DateT(System.DateTime.Now)
+				+" AND PatNum="+POut.Long(patNum)
+				+" ORDER BY AptDateTime DESC LIMIT 1";
+			string result=Db.GetScalar(command);
+			if(String.IsNullOrWhiteSpace(result)) {
+				return 0;
+			}
+			return PIn.Long(result);
+		}
+
 		///<summary>Returns true if the patient has any broken appointments, future appointments, unscheduled appointments, or unsched planned appointments.  This adds intelligence when user attempts to schedule an appointment by only showing the appointments for the patient when needed rather than always.</summary>
 		public static bool HasPlannedEtc(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

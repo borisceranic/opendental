@@ -56,6 +56,7 @@ namespace OpenDental {
 
 		private void gridSent_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.DefaultRefAttachNum=_listHistorySent[gridSent.GetSelectedIndex()].FKey;
 			FormRP.PatNum=PatCur.PatNum;
 			FormRP.IsSelectionMode=true;
 			if(FormRP.ShowDialog()==DialogResult.Cancel) {
