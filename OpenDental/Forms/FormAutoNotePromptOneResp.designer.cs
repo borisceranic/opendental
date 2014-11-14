@@ -49,8 +49,8 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.listMain.FormattingEnabled = true;
+			this.listMain.HorizontalScrollbar = true;
 			this.listMain.Location = new System.Drawing.Point(15, 62);
-			this.listMain.MultiColumn = true;
 			this.listMain.Name = "listMain";
 			this.listMain.Size = new System.Drawing.Size(382, 212);
 			this.listMain.TabIndex = 115;
