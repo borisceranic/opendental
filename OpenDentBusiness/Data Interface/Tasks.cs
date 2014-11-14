@@ -491,16 +491,23 @@ namespace OpenDentBusiness{
 			return taskColor;
 		}
 
+		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>
 		public int CompareTimes(Task x,Task y) {
-			if(x.DateTimeEntry<y.DateTimeEntry) {
-				return -1;
+			List<TaskNote> xNoteList=TaskNotes.GetForTask(x.TaskNum);
+			List<TaskNote> yNoteList=TaskNotes.GetForTask(y.TaskNum);
+			DateTime xMaxDateTime=x.DateTimeEntry;
+			DateTime yMaxDateTime=y.DateTimeEntry;
+			for(int i=0;i<xNoteList.Count;i++) {//Finding max xNote Date (if exists)
+				if(xNoteList[i].DateTimeNote>xMaxDateTime) {
+					xMaxDateTime=xNoteList[i].DateTimeNote;
+				}
 			}
-			else if(x.DateTimeEntry>y.DateTimeEntry) {
-				return 1;
+			for(int i=0;i<yNoteList.Count;i++) {//Finding max yNote Date (if exists)
+				if(yNoteList[i].DateTimeNote>yMaxDateTime) {
+					yMaxDateTime=yNoteList[i].DateTimeNote;
+				}
 			}
-			else {
-				return 0;
-			}
+			return xMaxDateTime.CompareTo(yMaxDateTime);
 		}
 	}
 }
