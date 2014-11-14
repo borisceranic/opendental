@@ -153,7 +153,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM refattach "
 				+"WHERE PatNum = "+POut.Long(patNum)+" "
-				+"AND IsFrom=0 AND IsTransitionOfCare=1 "
+				+"AND IsFrom=0 AND IsTransitionOfCare=1 AND ProvNum!=0 "
 				+"ORDER BY ItemOrder";
 			return Crud.RefAttachCrud.SelectMany(command);
 		}
