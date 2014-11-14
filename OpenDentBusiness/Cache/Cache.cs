@@ -117,6 +117,8 @@ namespace OpenDentBusiness {
 			}
 			if(itypes.Contains((int)InvalidType.EhrCodes) || isAll) {
 				EhrCodes.UpdateList();//Unusual pattern for an unusual "table".  Not really a table, but a mishmash of hard coded partial code systems that are needed for CQMs.
+				ds.Tables.Add(ICD9s.RefreshCache());
+				ds.Tables.Add(Sops.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.ElectIDs) || isAll) {
 				ds.Tables.Add(ElectIDs.RefreshCache());
@@ -222,7 +224,7 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.Sites) || isAll){
 				ds.Tables.Add(Sites.RefreshCache());
 			}
-			if(itypes.Contains((int)InvalidType.Sops) || isAll) {
+			if(itypes.Contains((int)InvalidType.Sops) || isAll) {  //InvalidType.Sops is currently never used 11/14/2014
 				ds.Tables.Add(Sops.RefreshCache());
 			}
 			//InvalidTypes.Tasks not handled here.
