@@ -134,7 +134,21 @@ namespace OpenDentBusiness{
 			return result;
 		}
 
-
-
+		///<summary>Takes an int value from the FeeSchedType enum and returns a string of the name.  Replaces the "Allowed" enum type with "Out of Network Coverage" or "OutNetwork".  This needs to be kept in sync with the FeeSchedType enumeration.</summary>
+		public static string GetFeeSchedTypeName(int enumeration,bool isGrid) {
+			switch(enumeration) {
+				case 0:
+					return "Normal";
+				case 1:
+					return "Copay";
+				case 2://Enum says Allowed, but we want "Out of Network Coverage" to be displayed in the UI
+					if(isGrid) {
+						return "OutNetwork";
+					}
+					return "Out of Network Coverage";
+				default:
+					return "Not Found";
+			}
+		}
 	}
 }

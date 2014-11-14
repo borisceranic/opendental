@@ -68,27 +68,27 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormFeeScheds));
 			this.listType = new System.Windows.Forms.ListBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
-			this.butIns = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.butSort = new OpenDental.UI.Button();
-			this.butDown = new OpenDental.UI.Button();
-			this.butUp = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.butAdd = new OpenDental.UI.Button();
-			this.butClose = new OpenDental.UI.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.labelCleanUp = new System.Windows.Forms.Label();
 			this.butCleanUp = new OpenDental.UI.Button();
+			this.butSort = new OpenDental.UI.Button();
+			this.butIns = new OpenDental.UI.Button();
+			this.butDown = new OpenDental.UI.Button();
+			this.butUp = new OpenDental.UI.Button();
+			this.butAdd = new OpenDental.UI.Button();
+			this.butClose = new OpenDental.UI.Button();
 			this.groupBox7.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// listType
 			// 
 			this.listType.FormattingEnabled = true;
-			this.listType.Location = new System.Drawing.Point(318,26);
+			this.listType.Location = new System.Drawing.Point(318, 26);
 			this.listType.Name = "listType";
-			this.listType.Size = new System.Drawing.Size(120,56);
+			this.listType.Size = new System.Drawing.Size(130, 56);
 			this.listType.TabIndex = 12;
 			this.listType.Click += new System.EventHandler(this.listType_Click);
 			// 
@@ -97,170 +97,170 @@ namespace OpenDental{
 			this.groupBox7.Controls.Add(this.butIns);
 			this.groupBox7.Controls.Add(this.label6);
 			this.groupBox7.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox7.Location = new System.Drawing.Point(17,570);
+			this.groupBox7.Location = new System.Drawing.Point(17, 570);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(340,58);
+			this.groupBox7.Size = new System.Drawing.Size(340, 58);
 			this.groupBox7.TabIndex = 17;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Check Ins Plan Fee Schedules";
 			// 
-			// butIns
-			// 
-			this.butIns.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butIns.Autosize = true;
-			this.butIns.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butIns.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butIns.CornerRadius = 4F;
-			this.butIns.Location = new System.Drawing.Point(248,19);
-			this.butIns.Name = "butIns";
-			this.butIns.Size = new System.Drawing.Size(75,24);
-			this.butIns.TabIndex = 4;
-			this.butIns.Text = "Go";
-			this.butIns.Click += new System.EventHandler(this.butIns_Click);
-			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(6,16);
+			this.label6.Location = new System.Drawing.Point(6, 16);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(229,39);
+			this.label6.Size = new System.Drawing.Size(229, 39);
 			this.label6.TabIndex = 5;
 			this.label6.Text = "This tool will help make sure your insurance plans have the right fee schedules s" +
     "et.";
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(315,5);
+			this.label1.Location = new System.Drawing.Point(315, 5);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(100,18);
+			this.label1.Size = new System.Drawing.Size(100, 18);
 			this.label1.TabIndex = 18;
 			this.label1.Text = "Type";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// gridMain
+			// 
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(17, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(278, 552);
+			this.gridMain.TabIndex = 11;
+			this.gridMain.Title = "FeeSchedules";
+			this.gridMain.TranslationName = "TableFeeScheds";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(315, 241);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(123, 44);
+			this.label2.TabIndex = 20;
+			this.label2.Text = "Sorts by type and alphabetically";
+			// 
+			// labelCleanUp
+			// 
+			this.labelCleanUp.Location = new System.Drawing.Point(315, 511);
+			this.labelCleanUp.Name = "labelCleanUp";
+			this.labelCleanUp.Size = new System.Drawing.Size(161, 44);
+			this.labelCleanUp.TabIndex = 22;
+			this.labelCleanUp.Text = "Deletes any allowed fee schedules that are not in use.";
+			// 
+			// butCleanUp
+			// 
+			this.butCleanUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCleanUp.Autosize = true;
+			this.butCleanUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCleanUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCleanUp.CornerRadius = 4F;
+			this.butCleanUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butCleanUp.Location = new System.Drawing.Point(318, 484);
+			this.butCleanUp.Name = "butCleanUp";
+			this.butCleanUp.Size = new System.Drawing.Size(99, 24);
+			this.butCleanUp.TabIndex = 21;
+			this.butCleanUp.Text = "Clean Up Allowed";
+			this.butCleanUp.Click += new System.EventHandler(this.butCleanUp_Click);
+			// 
 			// butSort
 			// 
-			this.butSort.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butSort.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butSort.Autosize = true;
 			this.butSort.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSort.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSort.CornerRadius = 4F;
 			this.butSort.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butSort.Location = new System.Drawing.Point(318,214);
+			this.butSort.Location = new System.Drawing.Point(318, 214);
 			this.butSort.Name = "butSort";
-			this.butSort.Size = new System.Drawing.Size(75,24);
+			this.butSort.Size = new System.Drawing.Size(75, 24);
 			this.butSort.TabIndex = 19;
 			this.butSort.Text = "Sort";
 			this.butSort.Click += new System.EventHandler(this.butSort_Click);
 			// 
+			// butIns
+			// 
+			this.butIns.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butIns.Autosize = true;
+			this.butIns.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butIns.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butIns.CornerRadius = 4F;
+			this.butIns.Location = new System.Drawing.Point(248, 19);
+			this.butIns.Name = "butIns";
+			this.butIns.Size = new System.Drawing.Size(75, 24);
+			this.butIns.TabIndex = 4;
+			this.butIns.Text = "Go";
+			this.butIns.Click += new System.EventHandler(this.butIns_Click);
+			// 
 			// butDown
 			// 
-			this.butDown.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDown.Autosize = true;
 			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(318,144);
+			this.butDown.Location = new System.Drawing.Point(318, 144);
 			this.butDown.Name = "butDown";
-			this.butDown.Size = new System.Drawing.Size(75,24);
+			this.butDown.Size = new System.Drawing.Size(75, 24);
 			this.butDown.TabIndex = 16;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// butUp
 			// 
-			this.butUp.AdjustImageLocation = new System.Drawing.Point(0,1);
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 1);
 			this.butUp.Autosize = true;
 			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(318,112);
+			this.butUp.Location = new System.Drawing.Point(318, 112);
 			this.butUp.Name = "butUp";
-			this.butUp.Size = new System.Drawing.Size(75,24);
+			this.butUp.Size = new System.Drawing.Size(75, 24);
 			this.butUp.TabIndex = 15;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
-			// gridMain
-			// 
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(17,12);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(278,552);
-			this.gridMain.TabIndex = 11;
-			this.gridMain.Title = "FeeSchedules";
-			this.gridMain.TranslationName = "TableFeeScheds";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(318,437);
+			this.butAdd.Location = new System.Drawing.Point(318, 437);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75,24);
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 10;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(412,604);
+			this.butClose.Location = new System.Drawing.Point(412, 604);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,24);
+			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(315,241);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(123,44);
-			this.label2.TabIndex = 20;
-			this.label2.Text = "Sorts by type and alphabetically";
-			// 
-			// labelCleanUp
-			// 
-			this.labelCleanUp.Location = new System.Drawing.Point(315,511);
-			this.labelCleanUp.Name = "labelCleanUp";
-			this.labelCleanUp.Size = new System.Drawing.Size(161,44);
-			this.labelCleanUp.TabIndex = 22;
-			this.labelCleanUp.Text = "Deletes any allowed fee schedules that are not in use.";
-			// 
-			// butCleanUp
-			// 
-			this.butCleanUp.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butCleanUp.Autosize = true;
-			this.butCleanUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCleanUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCleanUp.CornerRadius = 4F;
-			this.butCleanUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCleanUp.Location = new System.Drawing.Point(318,484);
-			this.butCleanUp.Name = "butCleanUp";
-			this.butCleanUp.Size = new System.Drawing.Size(99,24);
-			this.butCleanUp.TabIndex = 21;
-			this.butCleanUp.Text = "Clean Up Allowed";
-			this.butCleanUp.Click += new System.EventHandler(this.butCleanUp_Click);
-			// 
 			// FormFeeScheds
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(515,644);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(515, 644);
 			this.Controls.Add(this.labelCleanUp);
 			this.Controls.Add(this.butCleanUp);
 			this.Controls.Add(this.label2);
@@ -291,7 +291,7 @@ namespace OpenDental{
 		private void FormFeeSchedules_Load(object sender, System.EventArgs e) {
 			listType.Items.Add(Lan.g(this,"all"));
 			for(int i=0;i<Enum.GetNames(typeof(FeeScheduleType)).Length;i++){
-				listType.Items.Add(((FeeScheduleType)i).ToString());
+				listType.Items.Add(FeeScheds.GetFeeSchedTypeName(i,false));
 			}
 			listType.SelectedIndex=0;
 			if(!Security.IsAuthorized(Permissions.SecurityAdmin,true)){
@@ -336,7 +336,7 @@ namespace OpenDental{
 			for(int i=0;i<FeeSchedsForType.Count;i++){
 				row=new ODGridRow();
 				row.Cells.Add(FeeSchedsForType[i].Description);
-				row.Cells.Add(FeeSchedsForType[i].FeeSchedType.ToString());
+				row.Cells.Add(FeeScheds.GetFeeSchedTypeName((int)FeeSchedsForType[i].FeeSchedType,true));
 				if(FeeSchedsForType[i].IsHidden){
 					row.Cells.Add("X");
 				}
