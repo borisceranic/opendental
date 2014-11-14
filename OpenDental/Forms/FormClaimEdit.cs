@@ -5543,6 +5543,11 @@ namespace OpenDental{
 						if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
 							//ClaimProcs.Cur=(ClaimProc)ClaimProcs.ForClaim[i];
 							ClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
+							//We set the DateCP to Today's date when the user presses the buttons By Total, By Proc or Supplemental.
+							//When there is a no payment claim, the user might simply change the claim status to received and press OK instead of entering payments the normal way, since there is no check.
+							//Logically, we are changing claimproc status to received, and the claimproc will now be treated as a payment in the reports.
+							//If we did not update DateCP, then DateCP for a zero payment claim would still be the procedure treatment planned date as much as a year ago, so the claimproc writeoffs (if present) would be accidentally back dated.
+							ClaimProcsForClaim[i].DateCP=DateTimeOD.Today;
 							ClaimProcsForClaim[i].DateEntry=DateTime.Now;//date it was set rec'd
 							ClaimProcs.Update(ClaimProcsForClaim[i]);
 						}
