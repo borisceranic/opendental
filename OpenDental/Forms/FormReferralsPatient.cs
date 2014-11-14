@@ -445,6 +445,30 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a referral first");
 				return;
 			}
+			if(IsSelectionMode && PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				string warning="";
+				if(RefAttachList[gridMain.GetSelectedIndex()].ProvNum==0) {
+					warning+=Lans.g(this,"Selected patient referral does not have a referring provider set.");
+				}
+				if(RefAttachList[gridMain.GetSelectedIndex()].IsFrom) {
+					if(warning!="") {
+						warning+="\r\n";
+					}
+					warning+=Lans.g(this,"Selected patient referral is not an outgoing referral.");
+				}
+				if(!RefAttachList[gridMain.GetSelectedIndex()].IsTransitionOfCare) {
+					if(warning!="") {
+						warning+="\r\n";
+					}
+					warning+=Lans.g(this,"Selected patient referral is not flagged as a transition of care.");
+				}
+				if(warning!="") {
+					warning+="\r\n"+Lans.g(this,"It does not meet the EHR summary of care requirements.")+"  "+Lans.g(this,"Continue anyway?");
+					if(MessageBox.Show(warning,Lans.g(this,"EHR Measure Warning"),MessageBoxButtons.OKCancel)==DialogResult.Cancel) {
+						return;
+					}
+				}
+			}
 			RefAttachNum=RefAttachList[gridMain.GetSelectedIndex()].RefAttachNum;
 			DialogResult=DialogResult.OK;
 		}

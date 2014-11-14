@@ -643,11 +643,25 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			if(RefAttachCur.IsFrom==false && PrefC.GetBool(PrefName.ShowFeatureEhr) && comboProvNum.SelectedIndex<0) {
-				if(!MsgBox.Show(this,true,"You must select a referring provider for this referral to show on the measure calculation report.  Continue?")) {
-					return;
+			//We want to help EHR users meet their summary of care measure.  So all outgoing patient referrals should warn them if they didn't enter data correctly.
+			if(listFromTo.SelectedIndex==1 && PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				string warning="";
+				if(comboProvNum.SelectedIndex<0) {
+					warning+=Lans.g(this,"Selected patient referral does not have a referring provider set.");
 				}
-			}	
+				if(!checkIsTransitionOfCare.Checked) {
+					if(warning!="") {
+						warning+="\r\n";
+					}
+					warning+=Lans.g(this,"Selected patient referral is not flagged as a transition of care.");
+				}
+				if(warning!="") {
+					warning+="\r\n"+Lans.g(this,"It will not meet the EHR summary of care requirements.")+"  "+Lans.g(this,"Continue anyway?");
+					if(MessageBox.Show(warning,Lans.g(this,"EHR Measure Warning"),MessageBoxButtons.OKCancel)==DialogResult.Cancel) {
+						return;
+					}
+				}
+			}
 			//this is an old pattern
 			try{
 				DataToCur();
