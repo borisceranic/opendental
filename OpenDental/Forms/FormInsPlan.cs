@@ -1877,7 +1877,7 @@ namespace OpenDental{
 			}
 			FeeSchedsStandard=FeeScheds.GetListForType(FeeScheduleType.Normal,false);
 			FeeSchedsCopay=FeeScheds.GetListForType(FeeScheduleType.CoPay,false);
-			FeeSchedsAllowed=FeeScheds.GetListForType(FeeScheduleType.Allowed,false);
+			FeeSchedsAllowed=FeeScheds.GetListForType(FeeScheduleType.OutNetwork,false);
 			//Clearinghouse clearhouse=Clearinghouses.GetDefault();
 			//if(clearhouse==null || clearhouse.CommBridge!=EclaimsCommBridge.ClaimConnect) {
 			//	butEligibility.Visible=false;
@@ -4043,11 +4043,11 @@ namespace OpenDental{
 					&& PlanCur.PlanType==""//percentage
 					&& PrefC.GetBool(PrefName.AllowedFeeSchedsAutomate)){
 					//add a fee schedule if needed
-					FeeSched sched=FeeScheds.GetByExactName(CarrierCur.CarrierName,FeeScheduleType.Allowed);
+					FeeSched sched=FeeScheds.GetByExactName(CarrierCur.CarrierName,FeeScheduleType.OutNetwork);
 					if(sched==null){
 						sched=new FeeSched();
 						sched.Description=CarrierCur.CarrierName;
-						sched.FeeSchedType=FeeScheduleType.Allowed;
+						sched.FeeSchedType=FeeScheduleType.OutNetwork;
 						//sched.IsNew=true;
 						sched.ItemOrder=FeeSchedC.ListLong.Count;
 						FeeScheds.Insert(sched);

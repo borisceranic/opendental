@@ -68,6 +68,7 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormFeeScheds));
 			this.listType = new System.Windows.Forms.ListBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
+			this.butIns = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -75,7 +76,6 @@ namespace OpenDental{
 			this.labelCleanUp = new System.Windows.Forms.Label();
 			this.butCleanUp = new OpenDental.UI.Button();
 			this.butSort = new OpenDental.UI.Button();
-			this.butIns = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
@@ -88,7 +88,7 @@ namespace OpenDental{
 			this.listType.FormattingEnabled = true;
 			this.listType.Location = new System.Drawing.Point(318, 26);
 			this.listType.Name = "listType";
-			this.listType.Size = new System.Drawing.Size(130, 56);
+			this.listType.Size = new System.Drawing.Size(120, 56);
 			this.listType.TabIndex = 12;
 			this.listType.Click += new System.EventHandler(this.listType_Click);
 			// 
@@ -103,6 +103,20 @@ namespace OpenDental{
 			this.groupBox7.TabIndex = 17;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Check Ins Plan Fee Schedules";
+			// 
+			// butIns
+			// 
+			this.butIns.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butIns.Autosize = true;
+			this.butIns.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butIns.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butIns.CornerRadius = 4F;
+			this.butIns.Location = new System.Drawing.Point(248, 19);
+			this.butIns.Name = "butIns";
+			this.butIns.Size = new System.Drawing.Size(75, 24);
+			this.butIns.TabIndex = 4;
+			this.butIns.Text = "Go";
+			this.butIns.Click += new System.EventHandler(this.butIns_Click);
 			// 
 			// label6
 			// 
@@ -179,20 +193,6 @@ namespace OpenDental{
 			this.butSort.TabIndex = 19;
 			this.butSort.Text = "Sort";
 			this.butSort.Click += new System.EventHandler(this.butSort_Click);
-			// 
-			// butIns
-			// 
-			this.butIns.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butIns.Autosize = true;
-			this.butIns.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butIns.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butIns.CornerRadius = 4F;
-			this.butIns.Location = new System.Drawing.Point(248, 19);
-			this.butIns.Name = "butIns";
-			this.butIns.Size = new System.Drawing.Size(75, 24);
-			this.butIns.TabIndex = 4;
-			this.butIns.Text = "Go";
-			this.butIns.Click += new System.EventHandler(this.butIns_Click);
 			// 
 			// butDown
 			// 
@@ -290,8 +290,15 @@ namespace OpenDental{
 
 		private void FormFeeSchedules_Load(object sender, System.EventArgs e) {
 			listType.Items.Add(Lan.g(this,"all"));
-			for(int i=0;i<Enum.GetNames(typeof(FeeScheduleType)).Length;i++){
-				listType.Items.Add(FeeScheds.GetFeeSchedTypeName(i,false));
+			Array arrayValues=Enum.GetValues(typeof(FeeScheduleType));
+			for(int i=0;i<arrayValues.Length;i++) {
+				FeeScheduleType feeSchedType=((FeeScheduleType)arrayValues.GetValue(i));
+				if(feeSchedType==FeeScheduleType.OutNetwork) {
+					listType.Items.Add("Out of Network");
+				}
+				else {
+					listType.Items.Add(arrayValues.GetValue(i).ToString());
+				}
 			}
 			listType.SelectedIndex=0;
 			if(!Security.IsAuthorized(Permissions.SecurityAdmin,true)){
@@ -336,7 +343,7 @@ namespace OpenDental{
 			for(int i=0;i<FeeSchedsForType.Count;i++){
 				row=new ODGridRow();
 				row.Cells.Add(FeeSchedsForType[i].Description);
-				row.Cells.Add(FeeScheds.GetFeeSchedTypeName((int)FeeSchedsForType[i].FeeSchedType,true));
+				row.Cells.Add(FeeSchedsForType[i].FeeSchedType.ToString());
 				if(FeeSchedsForType[i].IsHidden){
 					row.Cells.Add("X");
 				}

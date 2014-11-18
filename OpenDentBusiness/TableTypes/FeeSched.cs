@@ -27,8 +27,8 @@ namespace OpenDentBusiness{
 		Normal,
 		///<summary>1</summary>
 		CoPay,
-		///<summary>2</summary>
-		Allowed
+		///<summary>2, Formerly named "Allowed"</summary>
+		OutNetwork
 	}
 }
 

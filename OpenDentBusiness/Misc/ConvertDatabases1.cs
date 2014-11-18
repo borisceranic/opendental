@@ -8181,7 +8181,7 @@ namespace OpenDentBusiness{
 							+table.Rows[i]["DefNum"].ToString()+","
 							+"'"+POut.String(table.Rows[i]["ItemName"].ToString())+"',";
 						if(table.Rows[i]["ItemValue"].ToString()=="A") {
-							command+=POut.Long((int)FeeScheduleType.Allowed)+",";
+							command+=POut.Long((int)FeeScheduleType.OutNetwork)+",";
 						}
 						else if(table.Rows[i]["ItemValue"].ToString()=="C") {
 							command+=POut.Long((int)FeeScheduleType.CoPay)+",";

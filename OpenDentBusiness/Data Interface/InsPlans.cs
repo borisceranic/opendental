@@ -667,8 +667,8 @@ namespace OpenDentBusiness {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),carrierName,carrierNameNot,feeSchedWithout,feeSchedWith,feeSchedType);
 			}
 			string pFeeSched="FeeSched";
-			if(feeSchedType==FeeScheduleType.Allowed){
-				pFeeSched="AllowedFeeSched";
+			if(feeSchedType==FeeScheduleType.OutNetwork){
+				pFeeSched="AllowedFeeSched";//This is the name of a column in the insplan table and cannot be changed to OutNetworkFeeSched
 			}
 			if(feeSchedType==FeeScheduleType.CoPay){
 				pFeeSched="CopayFeeSched";
@@ -727,7 +727,7 @@ namespace OpenDentBusiness {
 				command+="insplan.FeeSched ="+POut.Long(feeSchedNum)
 					+" WHERE insplan.FeeSched !="+POut.Long(feeSchedNum);
 			}
-			else if(feeSchedType==FeeScheduleType.Allowed){
+			else if(feeSchedType==FeeScheduleType.OutNetwork){
 				command+="insplan.AllowedFeeSched ="+POut.Long(feeSchedNum)
 					+" WHERE insplan.AllowedFeeSched !="+POut.Long(feeSchedNum);
 			}
@@ -782,11 +782,11 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				//add a fee schedule if needed
-				sched=FeeScheds.GetByExactName(carrierName,FeeScheduleType.Allowed);
+				sched=FeeScheds.GetByExactName(carrierName,FeeScheduleType.OutNetwork);
 				if(sched==null){
 					sched=new FeeSched();
 					sched.Description=carrierName;
-					sched.FeeSchedType=FeeScheduleType.Allowed;
+					sched.FeeSchedType=FeeScheduleType.OutNetwork;
 					//sched.IsNew=true;
 					sched.ItemOrder=itemOrder;
 					FeeScheds.Insert(sched);

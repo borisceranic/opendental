@@ -96,7 +96,7 @@ namespace OpenDental{
 			this.listType.FormattingEnabled = true;
 			this.listType.Location = new System.Drawing.Point(160, 46);
 			this.listType.Name = "listType";
-			this.listType.Size = new System.Drawing.Size(130, 43);
+			this.listType.Size = new System.Drawing.Size(120, 43);
 			this.listType.TabIndex = 12;
 			// 
 			// checkIsHidden
@@ -171,9 +171,16 @@ namespace OpenDental{
 			if(!FeeSchedCur.IsNew){
 				listType.Enabled=false;
 			}
-			for(int i=0;i<Enum.GetNames(typeof(FeeScheduleType)).Length;i++){
-				listType.Items.Add(FeeScheds.GetFeeSchedTypeName(i,false));
-				if((int)FeeSchedCur.FeeSchedType==i){
+			Array arrayValues=Enum.GetValues(typeof(FeeScheduleType));
+			for(int i=0;i<arrayValues.Length;i++) {
+				FeeScheduleType feeSchedType=((FeeScheduleType)arrayValues.GetValue(i));
+				if(feeSchedType==FeeScheduleType.OutNetwork) {
+					listType.Items.Add("Out of Network");
+				}
+				else {
+					listType.Items.Add(arrayValues.GetValue(i).ToString());
+				}
+				if(FeeSchedCur.FeeSchedType==feeSchedType) {
 					listType.SetSelected(i,true);
 				}
 			}
@@ -230,13 +237,13 @@ namespace OpenDental{
 			DialogResult=DialogResult.Cancel;
 		}
 
-		
 
-		
 
-		
 
-		
+
+
+
+
 
 
 	}

@@ -199,7 +199,7 @@ namespace OpenDental{
 			this.listType.FormattingEnabled = true;
 			this.listType.Location = new System.Drawing.Point(13, 25);
 			this.listType.Name = "listType";
-			this.listType.Size = new System.Drawing.Size(130, 43);
+			this.listType.Size = new System.Drawing.Size(120, 43);
 			this.listType.TabIndex = 29;
 			this.listType.Click += new System.EventHandler(this.listType_Click);
 			// 
@@ -298,8 +298,15 @@ namespace OpenDental{
 		#endregion
 
 		private void FormFeesForIns_Load(object sender,EventArgs e) {
-			for(int i=0;i<Enum.GetNames(typeof(FeeScheduleType)).Length;i++){
-				listType.Items.Add(FeeScheds.GetFeeSchedTypeName(i,false));
+			Array arrayValues=Enum.GetValues(typeof(FeeScheduleType));
+			for(int i=0;i<arrayValues.Length;i++) {
+				FeeScheduleType feeSchedType=((FeeScheduleType)arrayValues.GetValue(i));
+				if(feeSchedType==FeeScheduleType.OutNetwork) {
+					listType.Items.Add("Out of Network");
+				}
+				else {
+					listType.Items.Add(arrayValues.GetValue(i).ToString());
+				}
 			}
 			listType.SelectedIndex=0;
 			ResetSelections();

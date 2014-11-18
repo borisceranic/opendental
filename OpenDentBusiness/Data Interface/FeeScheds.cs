@@ -125,30 +125,13 @@ namespace OpenDentBusiness{
 			//Delete unattached FeeSchedules.
 			command="DELETE FROM feesched "
 				+"WHERE FeeSchedNum NOT IN (SELECT AllowedFeeSched FROM insplan) "
-				+"AND FeeSchedType="+POut.Int((int)FeeScheduleType.Allowed);
+				+"AND FeeSchedType="+POut.Int((int)FeeScheduleType.OutNetwork);
 			result=Db.NonQ(command);
 			//Delete all orphaned fees.
 			command="DELETE FROM fee "
 				+"WHERE FeeSched NOT IN (SELECT FeeSchedNum FROM feesched)";
 			Db.NonQ(command);
 			return result;
-		}
-
-		///<summary>Takes an int value from the FeeSchedType enum and returns a string of the name.  Replaces the "Allowed" enum type with "Out of Network Coverage" or "OutNetwork".  This needs to be kept in sync with the FeeSchedType enumeration.</summary>
-		public static string GetFeeSchedTypeName(int enumeration,bool isGrid) {
-			switch(enumeration) {
-				case 0:
-					return "Normal";
-				case 1:
-					return "Copay";
-				case 2://Enum says Allowed, but we want "Out of Network Coverage" to be displayed in the UI
-					if(isGrid) {
-						return "OutNetwork";
-					}
-					return "Out of Network Coverage";
-				default:
-					return "Not Found";
-			}
 		}
 	}
 }
