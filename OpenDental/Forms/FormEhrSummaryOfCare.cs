@@ -203,6 +203,9 @@ namespace OpenDental {
 		}
 
 		private void butSendEmail_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				return;
+			}
 			FormReferralsPatient FormRP=new FormReferralsPatient();
 			FormRP.PatNum=PatCur.PatNum;
 			FormRP.IsSelectionMode=true;

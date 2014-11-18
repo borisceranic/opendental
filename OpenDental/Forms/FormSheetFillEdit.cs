@@ -609,6 +609,10 @@ namespace OpenDental {
 			}
 			//Graphics g=this.CreateGraphics();
 			if(FormS.EmailPatOrLab){
+				if(!Security.IsAuthorized(Permissions.EmailSend,false)) {//Still need to return after printing, but not send emails.
+					DialogResult=DialogResult.OK;
+					return;
+				}
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
 				SheetPrinting.CreatePdf(SheetCur,filePathAndName);
@@ -631,6 +635,10 @@ namespace OpenDental {
 				|| SheetCur.SheetType==SheetTypeEnum.ReferralLetter)
 				&& FormS.Email2)
 			{
+				if(!Security.IsAuthorized(Permissions.EmailSend,false)) {//Still need to return after printing, but not send emails.
+					DialogResult=DialogResult.OK;
+					return;
+				}
 				//email referral
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);

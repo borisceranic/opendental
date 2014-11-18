@@ -873,6 +873,9 @@ namespace OpenDental{
 		}
 
 		private void butEmail_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)){
+				return;
+			}
 			if(grid.Rows.Count==0) {
 				MsgBox.Show(this,"There are no Patients in the table.  Must have at least one.");
 				return;
@@ -927,8 +930,8 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			EmailMessage message;
 			string str="";
-			List<long> patNumsSelected=new List<long>();
-			List<long> patNumsFailed=new List<long>();
+			List<long> listPatNumsSelected=new List<long>();
+			List<long> listPatNumsFailed=new List<long>();
 			EmailAddress emailAddress;
 			string errors="";
 			for(int i=0;i<grid.SelectedIndices.Length;i++){
@@ -938,7 +941,7 @@ namespace OpenDental{
 				emailAddress=EmailAddresses.GetByClinic(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["ClinicNum"].ToString()));
 				message.FromAddress=emailAddress.SenderAddress;				
 				message.Subject=PrefC.GetString(PrefName.ConfirmEmailSubject);
-				patNumsSelected.Add(message.PatNum);
+				listPatNumsSelected.Add(message.PatNum);
 				str=PrefC.GetString(PrefName.ConfirmEmailMessage);
 				str=str.Replace("[NameF]",Table.Rows[grid.SelectedIndices[i]]["nameF"].ToString());
 				str=str.Replace("[NameFL]",Table.Rows[grid.SelectedIndices[i]]["nameFL"].ToString());
@@ -949,7 +952,7 @@ namespace OpenDental{
 					EmailMessages.SendEmailUnsecure(message,emailAddress);
 				}
 				catch (Exception ex){
-					patNumsFailed.Add(message.PatNum);
+					listPatNumsFailed.Add(message.PatNum);
 					if(!errors.Contains("Message send fail for Patnum:"+message.PatNum+":  "+ex.Message)) {//unique messages only.
 						errors+=("Message send fail for Patnum:"+message.PatNum+":  "+ex.Message+"\r\n");
 					}
@@ -961,7 +964,7 @@ namespace OpenDental{
 				Appointments.SetConfirmed(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusEmailed));
 			}
 			Cursor=Cursors.Default;
-			if(patNumsFailed.Count==grid.SelectedIndices.Length){ //all failed
+			if(listPatNumsFailed.Count==grid.SelectedIndices.Length){ //all failed
 				//no need to refresh
 				if(DialogResult.Yes != MessageBox.Show(Lan.g(this,"All emails failed. Possibly due to invalid email addresses, a loss of connectivity, or a firewall blocking communication.  Would you like to see additional details?"),"",MessageBoxButtons.YesNo)){
 					return;
@@ -970,12 +973,12 @@ namespace OpenDental{
 				msgbox.ShowDialog();
 				return;
 			}
-			else if(patNumsFailed.Count>0){//if some failed
+			else if(listPatNumsFailed.Count>0){//if some failed
 				FillMain();
 				//reselect only the failed ones
 				for(int i=0;i<Table.Rows.Count;i++) { //table.Rows.Count=grid.Rows.Count
 					long patNum=PIn.Long(Table.Rows[i]["PatNum"].ToString());
-					if(patNumsFailed.Contains(patNum)) {
+					if(listPatNumsFailed.Contains(patNum)) {
 						grid.SetSelected(i,true);
 					}
 				}
@@ -984,14 +987,16 @@ namespace OpenDental{
 				}
 				CodeBase.MsgBoxCopyPaste msgbox=new CodeBase.MsgBoxCopyPaste(errors);
 				msgbox.ShowDialog();
+				SecurityLogs.MakeLogEntry(Permissions.EmailSend,0,"Confirmation Emails Sent: "+(listPatNumsSelected.Count-listPatNumsFailed.Count));
 				return;
 			}
 			//none failed
+			SecurityLogs.MakeLogEntry(Permissions.EmailSend,0,"Confirmation Emails Sent: "+listPatNumsSelected.Count);
 			FillMain();
 			//reselect the original list 
 			for(int i=0;i<Table.Rows.Count;i++) {
 				long patNum=PIn.Long(Table.Rows[i]["PatNum"].ToString());
-				if(patNumsSelected.Contains(patNum)) {
+				if(listPatNumsSelected.Contains(patNum)) {
 					grid.SetSelected(i,true);
 				}
 			}

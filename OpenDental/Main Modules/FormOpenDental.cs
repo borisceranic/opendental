@@ -2841,6 +2841,9 @@ namespace OpenDental{
 
 		private void OnEmail_Click() {
 			//this button item will be disabled if pat does not have email address
+			if(!Security.IsAuthorized(Permissions.EmailSend)){
+				return;
+			}
 			EmailMessage message=new EmailMessage();
 			message.PatNum=CurPatNum;
 			Patient pat=Patients.GetPat(CurPatNum);
@@ -2886,6 +2889,9 @@ namespace OpenDental{
 		}
 
 		private void OnWebMail_Click() {
+			if(!Security.IsAuthorized(Permissions.WebmailSend)) {
+				return;
+			}
 			FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(CurPatNum);
 			FormWMME.ShowDialog();
 		}

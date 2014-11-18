@@ -37,6 +37,22 @@ namespace OpenDental {
 				checkEmail2.Visible=false;
 				textEmail2.Visible=false;
 			}
+			if(!Security.IsAuthorized(Permissions.EmailSend,true)) {
+				textEmail2.Enabled=false;
+				textEmailPat.Enabled=false;
+			}
+		}
+
+		private void checkEmailPat_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				checkEmailPat.Checked=false;
+			}
+		}
+
+		private void checkEmail2_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				checkEmail2.Checked=false;
+			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

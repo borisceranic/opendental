@@ -39,8 +39,8 @@ namespace OpenDental{
 			this.comboRegardingPatient = new System.Windows.Forms.ComboBox();
 			this.listAttachments = new System.Windows.Forms.ListBox();
 			this.contextMenuAttachments = new System.Windows.Forms.ContextMenu();
-			this.menuItemAttachmentRemove = new System.Windows.Forms.MenuItem();
 			this.menuItemAttachmentPreview = new System.Windows.Forms.MenuItem();
+			this.menuItemAttachmentRemove = new System.Windows.Forms.MenuItem();
 			this.butAttach = new OpenDental.UI.Button();
 			this.butPreview = new OpenDental.UI.Button();
 			this.textBody = new OpenDental.ODtextBox();
@@ -170,17 +170,17 @@ namespace OpenDental{
             this.menuItemAttachmentPreview,
             this.menuItemAttachmentRemove});
 			// 
-			// menuItemAttachmentRemove
-			// 
-			this.menuItemAttachmentRemove.Index = 1;
-			this.menuItemAttachmentRemove.Text = "Remove";
-			this.menuItemAttachmentRemove.Click += new System.EventHandler(this.menuItemAttachmentRemove_Click);
-			// 
 			// menuItemAttachmentPreview
 			// 
 			this.menuItemAttachmentPreview.Index = 0;
 			this.menuItemAttachmentPreview.Text = "Open";
 			this.menuItemAttachmentPreview.Click += new System.EventHandler(this.menuItemAttachmentPreview_Click);
+			// 
+			// menuItemAttachmentRemove
+			// 
+			this.menuItemAttachmentRemove.Index = 1;
+			this.menuItemAttachmentRemove.Text = "Remove";
+			this.menuItemAttachmentRemove.Click += new System.EventHandler(this.menuItemAttachmentRemove_Click);
 			// 
 			// butAttach
 			// 

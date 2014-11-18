@@ -405,9 +405,13 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		/// <summary>This is used from wherever email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.  nameValueCollectionHeaders can be null.</summary>
+		/// <summary>Throws exceptions.  This is used from wherever email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.  nameValueCollectionHeaders can be null.</summary>
 		private static void SendEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress,NameValueCollection nameValueCollectionHeaders,params AlternateView[] arrayAlternateViews) {
 			//No need to check RemotingRole; no call to db.
+			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
+			if(!Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)){//This overload throws an exception if user is not authorized.
+				return;
+			}
 			if(emailAddress.ServerPort==465) {//implicit
 				//uses System.Web.Mail, which is marked as deprecated, but still supports implicit
 				//http://msdn.microsoft.com/en-us/library/ms877952(v=exchg.65).aspx
@@ -478,6 +482,7 @@ namespace OpenDentBusiness{
 					message.Attachments.Add(attach);
 				}
 				client.Send(message);
+				SecurityLogs.MakeLogEntry(Permissions.EmailSend,emailMessage.PatNum,"Email Sent");
 			}
 		}
 

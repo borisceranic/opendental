@@ -339,6 +339,9 @@ namespace OpenDental {
 		}
 
 		private void butSend_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.WebmailSend,false)) {
+				return;
+			}
 			if(!_allowSendSecureMessage) {
 				MsgBox.Show(this,"Send not permitted");
 				return;
@@ -370,6 +373,7 @@ namespace OpenDental {
 			_secureMessage.Attachments=_listAttachments;
 			EmailMessages.Insert(_secureMessage);
 			MsgBox.Show(this,"Message Sent");
+			SecurityLogs.MakeLogEntry(Permissions.WebmailSend,0,"Webmail Sent");
 			DialogResult=DialogResult.OK;
 		}
 

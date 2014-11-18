@@ -51,6 +51,7 @@ namespace OpenDental{
 			this.checkEmailPat.TabIndex = 85;
 			this.checkEmailPat.Text = "E-mail to patient (not recommended for sensitive information):";
 			this.checkEmailPat.UseVisualStyleBackColor = true;
+			this.checkEmailPat.Click += new System.EventHandler(this.checkEmailPat_Click);
 			// 
 			// textEmailPat
 			// 
@@ -74,6 +75,7 @@ namespace OpenDental{
 			this.checkEmail2.TabIndex = 87;
 			this.checkEmail2.Text = "E-mail to referral (not recommended for sensitive information):";
 			this.checkEmail2.UseVisualStyleBackColor = true;
+			this.checkEmail2.Click += new System.EventHandler(this.checkEmail2_Click);
 			// 
 			// textPaperCopies
 			// 

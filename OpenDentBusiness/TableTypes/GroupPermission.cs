@@ -196,7 +196,11 @@ namespace OpenDentBusiness{
 		///<summary>83- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
 		UserLogOnOff,
 		///<summary>84- There is no user interface in the sercurity window for this permission.</summary>
-		TaskEdit
+		TaskEdit,
+		///<summary>85- Allows user to send unsecured email</summary>
+		EmailSend,
+		///<summary>86- Allows user to send webmail</summary>
+		WebmailSend
 
 	}
 

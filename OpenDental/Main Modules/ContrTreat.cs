@@ -2084,6 +2084,9 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMainEmail_Click() {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				return;
+			}
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				if(checkShowDiscount.Checked || checkShowIns.Checked) {
 					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and discounts from e-mailed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {

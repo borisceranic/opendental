@@ -1738,6 +1738,9 @@ namespace OpenDental{
 		}
 
 		private void butEmail_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				return;
+			}
 			if(gridMain.Rows.Count < 1){
         MessageBox.Show(Lan.g(this,"There are no Patients in the Recall table.  Must have at least one."));    
         return;
@@ -1798,6 +1801,7 @@ namespace OpenDental{
 			string[] recallNumArray;
 			string[] patNumArray;
 			EmailAddress emailAddress;
+			int sentEmailCount=0;
 			for(int i=0;i<addrTable.Rows.Count;i++){
 				message=new EmailMessage();
 				message.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
@@ -1844,6 +1848,7 @@ namespace OpenDental{
 				message.BodyText=str;
 				try{
 					EmailMessages.SendEmailUnsecure(message,emailAddress);
+					sentEmailCount++;
 				}
 				catch(Exception ex){
 					Cursor=Cursors.Default;
@@ -1866,6 +1871,9 @@ namespace OpenDental{
 				}
 			}
 			FillMain(null);
+			if(sentEmailCount>0) {
+				SecurityLogs.MakeLogEntry(Permissions.EmailSend,0,"Recall Emails Sent: "+sentEmailCount);
+			}
 			Cursor=Cursors.Default;
 		}
 

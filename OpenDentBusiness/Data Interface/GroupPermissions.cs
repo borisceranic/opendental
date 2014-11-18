@@ -190,6 +190,8 @@ namespace OpenDentBusiness{
 				case Permissions.TreatPlanDiscountEdit:
 				//case Permissions.UserLogOnOff:
 				//case Permissions.TaskEdit:
+				//case Permissions.EmailSend:
+				//case Permissions.WebmailSend:
 				return false;//Does not have audit Trail.
 			}
 			return true;
@@ -341,6 +343,10 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Wiki List Setup");
 				case Permissions.TaskEdit:
 					return Lans.g("enumPermissions","Task Edit");
+				case Permissions.EmailSend:
+					return Lans.g("enumPermissions","Email Send");
+				case Permissions.WebmailSend:
+					return Lans.g("enumPermissions","Webmail Send");
 			}
 			return "";//should never happen
 		}
