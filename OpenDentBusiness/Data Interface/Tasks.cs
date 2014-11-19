@@ -188,21 +188,44 @@ namespace OpenDentBusiness{
 				command+="AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, ";
 			}
 			command+="patient.LName,patient.FName,patient.Preferred ";
+			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
+				command+=",COALESCE(MAX(tasknote.DateTimeNote),task.DateTimeEntry) AS 'LastUpdated',"
+					+"CASE WHEN tasknote.TaskNoteNum IS NULL THEN 0 ELSE 1 END AS 'HasNotes' ";
+			}
 			command+="FROM task "
-				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
-				+"WHERE TaskListNum="+POut.Long(listNum);
-			if(showDone){
+				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" ";
+			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
+				command+="LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum ";
+			}
+			command+="WHERE TaskListNum="+POut.Long(listNum);
+			if(showDone) {
 				command+=" AND (TaskStatus !="+POut.Long((int)TaskStatusEnum.Done)
 					+" OR DateTimeFinished > "+POut.Date(startDate)+")";//of if done, then restrict date
 			}
-			else{
+			else {
 				command+=" AND TaskStatus !="+POut.Long((int)TaskStatusEnum.Done);
+			}
+			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
+				command+=" GROUP BY task.TaskNum";//Sorting happens below
 			}
 			command+=" ORDER BY DateTimeEntry";
 			DataTable table=Db.GetTable(command);
-			List<Task> taskList=TableToList(table);
-			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				taskList.Sort(new TaskComparer());
+			List<Task> taskList=new List<Task>();
+			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
+				List<DataRow> listRows=new List<DataRow>();
+				for(int i=0;i<table.Rows.Count;i++) {
+					listRows.Add(table.Rows[i]);
+				}
+				listRows.Sort(TaskComparer);//We can only sort a list because the sort function requires input data.
+				DataTable tableSorted=table.Clone();//Easy way to copy the columns.
+				tableSorted.Rows.Clear();
+				for(int i=0;i<listRows.Count;i++) {
+					tableSorted.Rows.Add(listRows[i].ItemArray);
+				}
+				taskList=TableToList(tableSorted);
+			}
+			else {//Not special triage sorting
+				taskList=TableToList(table);
 			}
 			return taskList;
 		}
@@ -492,14 +515,11 @@ namespace OpenDentBusiness{
 				//logText+=". Attached patient: "+task.PatientName+" from an appointment";
 			}
 			SecurityLogs.MakeLogEntry(Permissions.TaskEdit,patNum,logText,task.TaskNum);
-		}	
-	}
+		}
 
-	///<summary>Takes two tasks and compares which needs to be higher or lower based first on their coloration, then on their note dates.</summary>
-	public class TaskComparer:IComparer<Task> {
-		public int Compare(Task x,Task y) {
-			int xTaskColor=FindTaskColor(x);
-			int yTaskColor=FindTaskColor(y);
+		public static int TaskComparer(DataRow x,DataRow y) {
+			int xTaskColor=FindTaskColor(x["Descript"].ToString(),PIn.Bool(x["HasNotes"].ToString()));
+			int yTaskColor=FindTaskColor(y["Descript"].ToString(),PIn.Bool(y["HasNotes"].ToString()));
 			if(xTaskColor==yTaskColor) {//Case 1: Tasks have same colors, sort by date.
 				return CompareTimes(x,y);
 			}
@@ -514,42 +534,32 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Figures out what the current color of the task passed is and returns an int based on color priority.  0 = white, 1 = blue, 2 = red</summary>
-		public int FindTaskColor(Task task) {
+		public static int FindTaskColor(string taskDescript,bool hasTaskNotes) {
 			int taskColor=0;//Default white
-			List<TaskNote> taskNoteList=new List<TaskNote>();
-			taskNoteList=TaskNotes.GetForTask(task.TaskNum);
-			if(task.Descript.Contains("CUSTOMER")
-				|| task.Descript.Contains("DOWN")
-				|| task.Descript.Contains("URGENT")
-				|| task.Descript.Contains("CONFERENCE")
-				|| task.Descript.Contains("!!"))
+			if(taskDescript.Contains("CUSTOMER")
+				|| taskDescript.Contains("DOWN")
+				|| taskDescript.Contains("URGENT")
+				|| taskDescript.Contains("CONFERENCE")
+				|| taskDescript.Contains("!!")) 
 			{
 				taskColor=2;//red
 			}
-			else if(taskNoteList.Count==0 || task.Descript.Contains("@@")) 
-			{
+			else if(!hasTaskNotes || taskDescript.Contains("@@")) {
 				taskColor=1;//blue
 			}
 			return taskColor;
 		}
 
 		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>
-		public int CompareTimes(Task x,Task y) {
-			List<TaskNote> xNoteList=TaskNotes.GetForTask(x.TaskNum);
-			List<TaskNote> yNoteList=TaskNotes.GetForTask(y.TaskNum);
-			DateTime xMaxDateTime=x.DateTimeEntry;
-			DateTime yMaxDateTime=y.DateTimeEntry;
-			for(int i=0;i<xNoteList.Count;i++) {//Finding max xNote Date (if exists)
-				if(xNoteList[i].DateTimeNote>xMaxDateTime) {
-					xMaxDateTime=xNoteList[i].DateTimeNote;
-				}
-			}
-			for(int i=0;i<yNoteList.Count;i++) {//Finding max yNote Date (if exists)
-				if(yNoteList[i].DateTimeNote>yMaxDateTime) {
-					yMaxDateTime=yNoteList[i].DateTimeNote;
-				}
-			}
+		public static int CompareTimes(DataRow x,DataRow y) {
+			DateTime xMaxDateTime=PIn.DateT(x["LastUpdated"].ToString());
+			DateTime yMaxDateTime=PIn.DateT(y["LastUpdated"].ToString());
 			return xMaxDateTime.CompareTo(yMaxDateTime);
 		}
+
+
+
 	}
+
+
 }
