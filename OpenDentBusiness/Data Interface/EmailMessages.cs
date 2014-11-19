@@ -215,7 +215,6 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>outMsgDirect must be unencrypted, because this function will encrypt.  Encrypts the message, verifies trust, locates the public encryption key for the To address (if already stored locally), etc.
-		///patNum can be zero.  emailSentOrReceived must be either SentDirect or a Direct Ack type such as AckDirectProcessed.
 		///Returns an empty string upon success, or an error string if there were errors.  It is possible that the email was sent to some trusted recipients and not sent to untrusted recipients (in which case there would be errors but some recipients would receive successfully).</summary>
 		private static string SendEmailDirect(Health.Direct.Agent.OutgoingMessage outMsgUnencrypted,EmailAddress emailAddressFrom) {
 			//No need to check RemotingRole; no call to db.
@@ -242,7 +241,7 @@ namespace OpenDentBusiness{
 			}
 			Health.Direct.Agent.OutgoingMessage outMsgEncrypted=null;
 			try {
-				outMsgEncrypted=directAgent.ProcessOutgoing(outMsgUnencrypted);//This is where encryption and trust verification occurs.
+				outMsgEncrypted=directAgent.ProcessOutgoing(outMsgUnencrypted);//This is where encryption, signing, and trust verification occurs.
 			}
 			catch(Exception ex) {
 				if(strErrors!="") {
@@ -271,7 +270,7 @@ namespace OpenDentBusiness{
 				strErrors+=Lans.g("EmailMessages","Direct messages cannot be sent over implicit SSL.");
 			}
 			else {
-				SendEmailUnsecure(emailMessageEncrypted,emailAddressFrom,nameValueCollectionHeaders,alternateView);//Not really unsecure in this spot, because the message is already encrypted.
+				WireEmailUnsecure(emailMessageEncrypted,emailAddressFrom,nameValueCollectionHeaders,alternateView);//Not really unsecure in this spot, because the message is already encrypted.
 			}
 			ms.Dispose();
 			return strErrors;
@@ -405,8 +404,95 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		/// <summary>Throws exceptions.  This is used from wherever email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.  nameValueCollectionHeaders can be null.</summary>
-		private static void SendEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress,NameValueCollection nameValueCollectionHeaders,params AlternateView[] arrayAlternateViews) {
+		///<summary>Throws exceptions.  Attempts to physically send the message over the network wire.
+		///Perfect for signed or encrypted email, because the MIME Content-Type is strictly defined for these types of emails.
+		///Does not work for implicit SSL, but works for all other email settings, including explicit SSL.
+		///If a message must be encrypted, then encrypt it before calling this function.
+		///The patNum can be 0, but should be included if known, for auditing purposes.</summary>
+		private static void WireEmailUnsecure(Health.Direct.Agent.OutgoingMessage msgOut,EmailAddress emailAddress,long patNum) {
+			//No need to check RemotingRole; no call to db.
+			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
+			if(!Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)) {//This overload throws an exception if user is not authorized.
+				return;
+			}
+			if(emailAddress.IsImplicitSsl) {
+				//The poor Content-Type header treatment by the System.Web.Mail.MailMessage class is the reason why both encrypted messages (Direct) and also signed unencrypted messages do not work though implicit SSL.
+				//The System.Web.Mail.MailMessage class only understands plain text and html messages.
+				//For a signed unencrypted message, the Content-Type header in the msgOut is "Content-Type: multipart/signed; boundary=PartA; protocol="application/pkcs7-signature"; micalg=sha1"
+				//If the Content-Type header is added to the System.Web.Mail.MailMessage.Headers,
+				//the Content-Type is modified to the following by C# when sending: "Content-Type: text/plain; boundary=PartA; protocol="application/pkcs7-signature"; micalg=sha1"
+				throw new Exception(Lans.g("EmailMessages","Cannot send this type of message over implicit SSL."));
+			}
+			SmtpClient client=new SmtpClient(emailAddress.SMTPserver,emailAddress.ServerPort);
+			//The default credentials are not used by default, according to: 
+			//http://msdn2.microsoft.com/en-us/library/system.net.mail.smtpclient.usedefaultcredentials.aspx
+			client.Credentials=new NetworkCredential(emailAddress.EmailUsername.Trim(),emailAddress.EmailPassword);
+			client.DeliveryMethod=SmtpDeliveryMethod.Network;
+			client.EnableSsl=emailAddress.UseSSL;
+			client.Timeout=180000;//3 minutes
+			MailMessage message=new MailMessage();
+			string contentType="text/plain";//This is the default value that C# would use if we did not specify a Content-Type.  However we need to specify the Content-Type for the AlternateView.
+			for(int i=0;i<msgOut.Message.Headers.Count;i++) {//This copies all headers, including but not limited to: From/To/Subject/Date/MessageID/etc...
+				string name=msgOut.Message.Headers[i].Name;
+				string val=msgOut.Message.Headers[i].ValueRaw;
+				if(name.ToUpper()=="BCC") {
+					message.Bcc.Add(val.Trim());
+				}
+				else if(name.ToUpper()=="CC") {
+					message.CC.Add(val.Trim());
+				}
+				else if(name.ToUpper()=="CONTENT-TYPE") {
+					contentType=val;
+				}
+				else if(name.ToUpper()=="FROM") {
+					message.From=new MailAddress(val.Trim());
+				}
+				else if(name.ToUpper()=="PRIORITY") {
+					message.Priority=MailPriority.Normal;
+					if(val.ToLower()=="high") {
+						message.Priority=MailPriority.High;
+					}
+					else if(val.ToLower()=="low") {
+						message.Priority=MailPriority.Low;
+					}
+				}
+				else if(name.ToUpper()=="REPLY-TO") {
+					message.ReplyTo=new MailAddress(val.Trim());
+				}
+				else if(name.ToUpper()=="REPLY-TO-LIST") {
+					string[] arrayReplyTo=val.Split(',');
+					for(int j=0;j<arrayReplyTo.Length;j++) {
+						message.ReplyToList.Add(arrayReplyTo[j].Trim());
+					}
+				}
+				else if(name.ToUpper()=="SENDER") {
+					message.Sender=new MailAddress(val.Trim());
+				}
+				else if(name.ToUpper()=="SUBJECT") {
+					message.Subject=SubjectTidy(val);
+				}
+				else if(name.ToUpper()=="TO") {
+					message.To.Add(val.Trim());
+				}
+				else {//Other headers, such as MessageID, which is needed for Direct messaging, but is not part of the standard MailMessage object.
+					message.Headers.Add(name,val);//Add to header verbatim.
+				}
+			}
+			//Using an AlternateView is the only way to specify a custom Content-Type.  Both encrypted email and signed email messages have special Content-Types.  Necessary for Direct messaging.
+			byte[] arrayContentBytes=Encoding.UTF8.GetBytes(msgOut.Message.Body.Text);//This includes the body and all attachments.  Should have already been formatted properly by the Direct library.
+			MemoryStream msEmailContent=new MemoryStream(arrayContentBytes);
+			msEmailContent.Position=0;
+			AlternateView alternateView=new AlternateView(msEmailContent,contentType);
+			alternateView.TransferEncoding=TransferEncoding.SevenBit;//Default is base64, but 7bit is much easier to read/debug.
+			message.AlternateViews.Add(alternateView);
+			client.Send(message);
+			msEmailContent.Dispose();
+			SecurityLogs.MakeLogEntry(Permissions.EmailSend,patNum,"Email Sent");
+		}
+
+		///<summary>Throws exceptions.  Attempts to physically send the message over the network wire.
+		///This is used from wherever email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.  nameValueCollectionHeaders can be null.</summary>
+		private static void WireEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress,NameValueCollection nameValueCollectionHeaders,params AlternateView[] arrayAlternateViews) {
 			//No need to check RemotingRole; no call to db.
 			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
 			if(!Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)){//This overload throws an exception if user is not authorized.
@@ -446,7 +532,7 @@ namespace OpenDentBusiness{
 				//foreach (string sSubstr in sAttach.Split(delim)){
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
 					attach=new System.Web.Mail.MailAttachment(ODFileUtils.CombinePaths(attachPath,emailMessage.Attachments[i].ActualFileName));
-					//no way to set displayed filename
+					//No way to set displayed filename on the MailAttachment object itself.  TODO: Copy the file to the temp directory in order to rename, then the attachment will go out with the correct name.
 					message.Attachments.Add(attach);
 				}
 				System.Web.Mail.SmtpMail.SmtpServer=emailAddress.SMTPserver+":465";//"smtp.gmail.com:465";
@@ -486,11 +572,28 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Throws exceptions.  Uses the Direct library to sign the message, so that our unencrypted/signed messages are built the same way as our encrypted/signed messages.
+		///The provided certificate must contain a private key, or else the signing will fail (exception) when computing the signature digest.</summary>
+		public static void SendEmailUnsecureWithSig(EmailMessage emailMessage,EmailAddress emailAddressFrom,X509Certificate2 certPrivate) {
+			if(emailAddressFrom.IsImplicitSsl) {
+				throw new Exception(Lans.g("EmailMessages","Digitally signed messages cannot be sent over implicit SSL."));//See detailed comments in the private version of SendEmailUnsecure().
+			}
+			//No need to check RemotingRole; no call to db.
+			emailMessage.FromAddress=emailAddressFrom.EmailUsername.Trim();//Cannot be emailAddressFrom.SenderAddress, or else will not find the correct signing certificate.  Used in ConvertEmailMessageToMessage().
+			Health.Direct.Common.Mail.Message msg=ConvertEmailMessageToMessage(emailMessage,true);
+			Health.Direct.Agent.MessageEnvelope msgEnvelope=new Health.Direct.Agent.MessageEnvelope(msg);
+			Health.Direct.Agent.OutgoingMessage msgOut=new Health.Direct.Agent.OutgoingMessage(msgEnvelope);
+			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(emailMessage.FromAddress);
+			Health.Direct.Common.Cryptography.SignedEntity signedEntity=directAgent.Cryptographer.Sign(msgOut.Message,certPrivate);//Compute the signature digest.  A hash of the certificate against the raw email content.
+			msgOut.Message.UpdateBody(signedEntity);//Modify the relevant message headers as well as the entire message body to include the signature digest.
+			WireEmailUnsecure(msgOut,emailAddressFrom,emailMessage.PatNum);
+		}
+
 		/// <summary>This is used from wherever unencrypted email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.
 		///Surround with a try catch.</summary>
 		public static void SendEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress) {
 			//No need to check RemotingRole; no call to db.
-			SendEmailUnsecure(emailMessage,emailAddress,null);
+			WireEmailUnsecure(emailMessage,emailAddress,null);
 		}
 
 		#endregion Sending
@@ -691,10 +794,12 @@ namespace OpenDentBusiness{
 			return signedCert2;
 		}
 
-		///<summary>Returns the SMIME signature (encryption certificate) for the specified emailAddress from the store of public certificates, or returns null if none found.</summary>
-		public static X509Certificate2 GetEmailSignatureFromStore(string emailAddress) {
-			Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternal();//Open for reading.  Corresponds to NHINDExternal/Certificates.
-			X509Certificate2Collection collectionCerts=storePublicCerts.GetAllCertificates();
+		///<summary>Returns the encryption/decryption certificate for the specified emailAddress from the store of private certificates, or returns null if none found.
+		///Used for creating a signing signature in email encryption, which requires the private key (the public key alone is not enough, we tried it and an exception is thrown by Dot NET).
+		///IMPORTANT: Be careful what you do with the private certificate.  It must never be shared with another party.</summary>
+		public static X509Certificate2 GetCertFromPrivateStore(string emailAddress) {
+			Health.Direct.Common.Certificates.SystemX509Store storeCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenPrivate();//Open for reading.  Corresponds to NHINDPrivate/Certificates.
+			X509Certificate2Collection collectionCerts=storeCerts.GetAllCertificates();
 			string emailAddressSimple=GetFromAddressSimple(emailAddress).ToLower();
 			foreach(X509Certificate2 cert in collectionCerts) {
 				string subjectName=GetSubjectEmailNameFromSignature(cert).ToLower();
@@ -995,7 +1100,9 @@ namespace OpenDentBusiness{
 			else {
 				emailMessage.ToAddress=message.ToValue.Trim();
 			}
-			List<Health.Direct.Common.Mime.MimeEntity> listMimeParts=new List<Health.Direct.Common.Mime.MimeEntity>();//We want to treat one part and multiple part emails the same way below, so we make our own list.  If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
+			//Think of the mime structure as a tree.
+			//We want to treat one part and multi-part emails the same way below, so we make our own list of leaf node mime parts (mime parts which have no children, also know as single part).
+			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=new List<Health.Direct.Common.Mime.MimeEntity>();
 			Health.Direct.Common.Mime.MimeEntity mimeEntity=null;
 			try {
 				mimeEntity=message.ExtractMimeEntity();
@@ -1004,18 +1111,29 @@ namespace OpenDentBusiness{
 				emailMessage.BodyText=ProcessMimeTextPart(message.Body.Text);
 				return emailMessage;
 			}
+			//If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
 			if(message.IsMultiPart) {
-				foreach(Health.Direct.Common.Mime.MimeEntity mimePart in mimeEntity.GetParts()) {
-					listMimeParts.Add(mimePart);
+				List<Health.Direct.Common.Mime.MimeEntity> listMimeMultiPart=new List<Health.Direct.Common.Mime.MimeEntity>();
+				listMimeMultiPart.Add(mimeEntity);
+				while(listMimeMultiPart.Count>0) {
+					foreach(Health.Direct.Common.Mime.MimeEntity mimePart in listMimeMultiPart[0].GetParts()) {
+						if(mimePart.IsMultiPart) {
+							listMimeMultiPart.Add(mimePart);
+						}
+						else {
+							listMimePartLeafNodes.Add(mimePart);
+						}
+					}
+					listMimeMultiPart.RemoveAt(0);
 				}
 			}
 			else {//Single body part.
-				listMimeParts.Add(mimeEntity);
+				listMimePartLeafNodes.Add(mimeEntity);
 			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeBodyTextParts=new List<Health.Direct.Common.Mime.MimeEntity>();
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeAttachParts=new List<Health.Direct.Common.Mime.MimeEntity>();
-			for(int i=0;i<listMimeParts.Count;i++) {
-				Health.Direct.Common.Mime.MimeEntity mimePart=listMimeParts[i];
+			for(int i=0;i<listMimePartLeafNodes.Count;i++) {
+				Health.Direct.Common.Mime.MimeEntity mimePart=listMimePartLeafNodes[i];
 				if(mimePart.ContentDisposition==null || !mimePart.ContentDisposition.ToLower().Contains("attachment")) {//Not an email attachment.  Treat as body text.
 					listMimeBodyTextParts.Add(mimePart);
 				}
@@ -1068,7 +1186,7 @@ namespace OpenDentBusiness{
 		private static Health.Direct.Common.Mail.Message ConvertEmailMessageToMessage(EmailMessage emailMessage,bool hasAttachments) {
 			//No need to check RemotingRole; no call to db.
 			//We need to use emailAddressFrom.Username instead of emailAddressFrom.SenderAddress, because of how strict encryption is for matching the name to the certificate.
-			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message(emailMessage.ToAddress.Trim(),emailMessage.FromAddress.Trim());
+			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message(emailMessage.ToAddress.Trim(),emailMessage.FromAddress.Trim(),"","text/plain");//Body is set below.  Setting the default type helps with signing.
 			string subject=SubjectTidy(emailMessage.Subject);
 			if(subject!="") {
 				Health.Direct.Common.Mime.Header headerSubject=new Health.Direct.Common.Mime.Header("Subject",subject);

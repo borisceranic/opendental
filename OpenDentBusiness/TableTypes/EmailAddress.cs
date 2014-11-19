@@ -26,6 +26,16 @@ namespace OpenDentBusiness {
 		///<summary>Usually 110, sometimes 995.</summary>
 		public int ServerPortIncoming;
 
+		///<summary>We assume the email settings are implicit if the server port is 465.</summary>
+		public bool IsImplicitSsl {
+			get {
+				if(ServerPort==465) {
+					return true;
+				}
+				return false;
+			}
+		}
+
 		///<summary></summary>
 		public EmailAddress Clone() {
 			return (EmailAddress)this.MemberwiseClone();

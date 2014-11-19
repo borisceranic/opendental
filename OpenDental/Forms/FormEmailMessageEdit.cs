@@ -658,7 +658,7 @@ namespace OpenDental{
 		private void RefreshAll() {
 			if(MessageCur.SentOrReceived==EmailSentOrReceived.Neither) {//Composing a message
 				_isComposing=true;
-				SetSig(EmailMessages.GetEmailSignatureFromStore(MessageCur.FromAddress));
+				SetSig(EmailMessages.GetCertFromPrivateStore(MessageCur.FromAddress));
 			}
 			else {//sent or received (not composing)
 				_isComposing=false;
@@ -827,14 +827,14 @@ namespace OpenDental{
 			if(!_isComposing) {
 				return;
 			}
-			SetSig(EmailMessages.GetEmailSignatureFromStore(textFromAddress.Text));
+			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
 		}
 
 		private void textFromAddress_Leave(object sender,EventArgs e) {
 			if(!_isComposing) {
 				return;
 			}
-			SetSig(EmailMessages.GetEmailSignatureFromStore(textFromAddress.Text));
+			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
 		}
 
 		private void butSig_Click(object sender,EventArgs e) {
@@ -872,8 +872,8 @@ namespace OpenDental{
 			if(_patCur.ImageFolder!=""){
 				if(PrefC.AtoZfolderUsed){
 					dlg.InitialDirectory=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
-																																				_patCur.ImageFolder.Substring(0,1).ToUpper(),
-																																				_patCur.ImageFolder);
+						_patCur.ImageFolder.Substring(0,1).ToUpper(),
+						_patCur.ImageFolder);
 				}
 				else{
 					//Use the OS default directory for this type of file viewer.
@@ -1221,15 +1221,15 @@ namespace OpenDental{
 				MsgBox.Show(this,"The email address in email setup must have an SMTP server.");
 				return;
 			}
-			if(_certSig!=null) {
-				byte[] arrayBytesRawSig=_certSig.Export(X509ContentType.Cert);
-				//TODO: Attach signature to email.
-				//File.WriteAllBytes("",arrayBytesRawSig);
-			}
 			Cursor=Cursors.WaitCursor;
 			SaveMsg();
 			try{
-				EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
+				if(_certSig==null) {
+					EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
+				}
+				else {
+					EmailMessages.SendEmailUnsecureWithSig(MessageCur,emailAddress,_certSig);
+				}
 				MessageCur.SentOrReceived=EmailSentOrReceived.Sent;
 				EmailMessages.Update(MessageCur);
 				MsgBox.Show(this,"Sent");
