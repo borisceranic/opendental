@@ -118,122 +118,116 @@ namespace OpenDental
 		}
 
 		private void butReport_Click(object sender, System.EventArgs e){
-			////if(errorProvider1.GetError(textDateFrom) != ""
-			////	|| errorProvider1.GetError(textDateTo) != "") 
-			////{
-			////	MsgBox.Show(this,"Please fix data entry errors first.");
-			////	return;
-			////}
-			////DateTime dateFrom=PIn.PDate(textDateFrom.Text);
-			////DateTime dateTo=PIn.PDate(textDateTo.Text);
-			////if(dateTo < dateFrom) 
-			////{
-			////	MsgBox.Show(this,"To date cannot be before From date.");
-			////	return;
-			////}
-			//ReportComplex report=new ReportComplex();
-			//report.ReportName=Lan.g(this,"PaymentPlans");
-			//report.AddTitle(Lan.g(this,"Payment Plans"));
-			//report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-			//report.AddSubTitle(DateTime.Today.ToShortDateString());
-			//DataTable table=new DataTable();
-			////table.Columns.Add("date");
-			//table.Columns.Add("guarantor");
-			//table.Columns.Add("ins");
-			//table.Columns.Add("princ");
-			//table.Columns.Add("paid");
-			//table.Columns.Add("due");
-			//table.Columns.Add("dueTen");
-			//DataRow row;
-			//string datesql="CURDATE()";
-			//if(DataConnection.DBtype==DatabaseType.Oracle){
-			//	datesql="(SELECT CURRENT_DATE FROM dual)";
+			//if(errorProvider1.GetError(textDateFrom) != ""
+			//	|| errorProvider1.GetError(textDateTo) != "") 
+			//{
+			//	MsgBox.Show(this,"Please fix data entry errors first.");
+			//	return;
 			//}
-			////Oracle TODO:  Either put entire query without GROUP BY in SUBSELECT and then GROUP BY outside, or rewrite query to use joins instead of subselects.
-			//string command="SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum, "
-			//	+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-			//		+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', "
-			//	+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-			//		+"AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@"),0) '_dueTen', "
-			//	+"COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum),0) '_paid', "
-			//	+"COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5)),0) '_insPaid', "
-			//	+"COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal' "
-			//	+"FROM payplan "
-			//	+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
-			//	//WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
-			//	//+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
-			//	+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
-			//if(checkHideCompletePlans.Checked) {
-			//	command+="HAVING _paid+_insPaid < _principal ";
+			//DateTime dateFrom=PIn.PDate(textDateFrom.Text);
+			//DateTime dateTo=PIn.PDate(textDateTo.Text);
+			//if(dateTo < dateFrom) 
+			//{
+			//	MsgBox.Show(this,"To date cannot be before From date.");
+			//	return;
 			//}
-			//	command+="ORDER BY LName,FName";
-			//DataTable raw=Reports.GetTable(command);
-			////DateTime payplanDate;
-			//Patient pat;
-			//double princ;
-			//double paid;
-			//double accumDue;
-			//double dueTen;
-			//for(int i=0;i<raw.Rows.Count;i++){
-			//	princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
-			//	if(raw.Rows[i]["PlanNum"].ToString()=="0") {//pat payplan
-			//		paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
-			//	}
-			//	else {//ins payplan
-			//		paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
-			//	}
-			//	accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
-			//	dueTen=PIn.Double(raw.Rows[i]["_dueTen"].ToString());
-			//	row=table.NewRow();
-			//	//payplanDate=PIn.PDate(raw.Rows[i]["PayPlanDate"].ToString());
-			//	//row["date"]=raw.Rows[i]["PayPlanDate"].ToString();//payplanDate.ToShortDateString();
-			//	pat=new Patient();
-			//	pat.LName=raw.Rows[i]["LName"].ToString();
-			//	pat.FName=raw.Rows[i]["FName"].ToString();
-			//	pat.MiddleI=raw.Rows[i]["MiddleI"].ToString();
-			//	pat.Preferred=raw.Rows[i]["Preferred"].ToString();
-			//	row["guarantor"]=pat.GetNameLF();
-			//	if(raw.Rows[i]["PlanNum"].ToString()=="0"){
-			//		row["ins"]="";
-			//	}
-			//	else{
-			//		row["ins"]="X";
-			//	}
-			//	row["princ"]=princ.ToString("f");
-			//	row["paid"]=paid.ToString("f");
-			//	row["due"]=(accumDue-paid).ToString("f");
-			//	row["dueTen"]=(dueTen-paid).ToString("f");
-			//	table.Rows.Add(row);
-			//}
-			//report.ReportTables.Add(table);
-			////report.AddColumn("Date",90,FieldValueType.Date);			
-			//report.AddColumn("Guarantor",160,FieldValueType.String);
-			//report.AddColumn("Ins",40,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleCenter;
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleCenter;
-			//report.AddColumn("Princ",100,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.AddColumn("Paid",100,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.AddColumn("Due Now",100,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.AddColumn("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-			//	+" Days",100,FieldValueType.String);
-			//report.GetLastRO(ReportObjectKind.TextObject).TextAlign=ContentAlignment.MiddleRight;
-			//report.GetLastRO(ReportObjectKind.FieldObject).TextAlign=ContentAlignment.MiddleRight;
-			////report.GetLastRO(ReportObjectKind.FieldObject).FormatString="d";
-			//report.AddPageNum();
-			////report.SubmitQuery();
-			////report.ReportTable=Patients.GetBirthdayList(dateFrom,dateTo);
-			////if(!report.SubmitQuery()){
-			////	return;
-			////}
-			//FormReportComplex FormR=new FormReportComplex(report);
-			//FormR.ShowDialog();
-			//DialogResult=DialogResult.OK;
+			ReportComplex report=new ReportComplex(Lan.g(this,"Payment Plans"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+			report.ReportName=Lan.g(this,"PaymentPlans");
+			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString());
+			DataTable table=new DataTable();
+			table.Columns.Add("guarantor");
+			table.Columns.Add("ins");
+			table.Columns.Add("princ");
+			table.Columns.Add("paid");
+			table.Columns.Add("due");
+			table.Columns.Add("dueTen");
+			DataRow row;
+			string datesql="CURDATE()";
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				datesql="(SELECT CURRENT_DATE FROM dual)";
+			}
+			//Oracle TODO:  Either put entire query without GROUP BY in SUBSELECT and then GROUP BY outside, or rewrite query to use joins instead of subselects.
+			string command="SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum, "
+				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', "
+				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@"),0) '_dueTen', "
+				+"COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum),0) '_paid', "
+				+"COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5)),0) '_insPaid', "
+				+"COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal' "
+				+"FROM payplan "
+				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
+				//WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
+				//+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
+				+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
+			if(checkHideCompletePlans.Checked) {
+				command+="HAVING _paid+_insPaid < _principal ";
+			}
+			command+="ORDER BY LName,FName";
+			DataTable raw=Reports.GetTable(command);
+			//DateTime payplanDate;
+			Patient pat;
+			double princ;
+			double paid;
+			double accumDue;
+			double dueTen;
+			for(int i=0;i<raw.Rows.Count;i++) {
+				princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
+				if(raw.Rows[i]["PlanNum"].ToString()=="0") {//pat payplan
+					paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
+				}
+				else {//ins payplan
+					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
+				}
+				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
+				dueTen=PIn.Double(raw.Rows[i]["_dueTen"].ToString());
+				row=table.NewRow();
+				//payplanDate=PIn.PDate(raw.Rows[i]["PayPlanDate"].ToString());
+				//row["date"]=raw.Rows[i]["PayPlanDate"].ToString();//payplanDate.ToShortDateString();
+				pat=new Patient();
+				pat.LName=raw.Rows[i]["LName"].ToString();
+				pat.FName=raw.Rows[i]["FName"].ToString();
+				pat.MiddleI=raw.Rows[i]["MiddleI"].ToString();
+				pat.Preferred=raw.Rows[i]["Preferred"].ToString();
+				row["guarantor"]=pat.GetNameLF();
+				if(raw.Rows[i]["PlanNum"].ToString()=="0") {
+					row["ins"]="";
+				}
+				else {
+					row["ins"]="X";
+				}
+				row["princ"]=princ.ToString("f");
+				row["paid"]=paid.ToString("f");
+				row["due"]=(accumDue-paid).ToString("f");
+				row["dueTen"]=(dueTen-paid).ToString("f");
+				table.Rows.Add(row);
+			}
+			QueryObject query=report.AddQuery(table,"","",SplitByKind.None);
+			query.AddColumn("Guarantor",160,FieldValueType.String);
+			query.AddColumn("Ins",40,FieldValueType.String);
+			query.GetColumnHeader("Ins").TextAlign=ContentAlignment.MiddleCenter;
+			query.GetColumnDetail("Ins").TextAlign=ContentAlignment.MiddleCenter;
+			query.AddColumn("Princ",100,FieldValueType.String);
+			query.GetColumnHeader("Princ").TextAlign=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Princ").TextAlign=ContentAlignment.MiddleRight;
+			query.AddColumn("Paid",100,FieldValueType.String);
+			query.GetColumnHeader("Paid").TextAlign=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Paid").TextAlign=ContentAlignment.MiddleRight;
+			query.AddColumn("Due Now",100,FieldValueType.String);
+			query.GetColumnHeader("Due Now").TextAlign=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Due Now").TextAlign=ContentAlignment.MiddleRight;
+			query.AddColumn("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
+				+" Days",100,FieldValueType.String);
+			query.GetColumnHeader("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
+				+" Days").TextAlign=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
+				+" Days").TextAlign=ContentAlignment.MiddleRight;
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		

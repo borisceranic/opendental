@@ -523,10 +523,10 @@ namespace OpenDental
 				MsgBox.Show(this,"To date cannot be before From date.");
 				return;
 			}
-			ReportComplex report=new ReportComplex(Lan.g(this,"Birthdays"),PrefC.GetString(PrefName.PracticeTitle),false,true);
+			ReportComplex report=new ReportComplex(Lan.g(this,"Birthdays"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
 			report.ReportName=Lan.g(this,"Birthdays");
 			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat));
-			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"Birthdays","",SplitByKind.None);
+			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"","",SplitByKind.None);
 			query.AddColumn("LName",90,FieldValueType.String);
 			query.AddColumn("FName",90,FieldValueType.String);
 			query.AddColumn("Preferred",90,FieldValueType.String);
@@ -539,7 +539,9 @@ namespace OpenDental
 			query.GetColumnDetail("Birthdate").FormatString="d";
 			query.AddColumn("Age",45,FieldValueType.Integer);
 			report.AddPageNum();
-			report.SubmitQueries();
+			if(!report.SubmitQueries()) {
+				return;
+			}
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;

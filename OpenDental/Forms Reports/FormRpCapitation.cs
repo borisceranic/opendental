@@ -18,6 +18,12 @@ namespace OpenDental{
 	public class FormRpCapitation : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
+		private ValidDate textDateStart;
+		private Label label2;
+		private ValidDate textDateEnd;
+		private Label label1;
+		public TextBox textCarrier;
+		private Label label3;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -61,42 +67,104 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpCapitation));
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.textDateStart = new OpenDental.ValidDate();
+			this.label2 = new System.Windows.Forms.Label();
+			this.textDateEnd = new OpenDental.ValidDate();
+			this.label1 = new System.Windows.Forms.Label();
+			this.textCarrier = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(510,338);
+			this.butCancel.Location = new System.Drawing.Point(518, 112);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(510,297);
+			this.butOK.Location = new System.Drawing.Point(427, 112);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// textDateStart
+			// 
+			this.textDateStart.Location = new System.Drawing.Point(308, 45);
+			this.textDateStart.Name = "textDateStart";
+			this.textDateStart.Size = new System.Drawing.Size(100, 20);
+			this.textDateStart.TabIndex = 45;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(222, 47);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(82, 18);
+			this.label2.TabIndex = 44;
+			this.label2.Text = "From Date";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDateEnd
+			// 
+			this.textDateEnd.Location = new System.Drawing.Point(308, 71);
+			this.textDateEnd.Name = "textDateEnd";
+			this.textDateEnd.Size = new System.Drawing.Size(100, 20);
+			this.textDateEnd.TabIndex = 47;
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(222, 73);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(82, 18);
+			this.label1.TabIndex = 46;
+			this.label1.Text = "To Date";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textCarrier
+			// 
+			this.textCarrier.Location = new System.Drawing.Point(308, 16);
+			this.textCarrier.Name = "textCarrier";
+			this.textCarrier.Size = new System.Drawing.Size(285, 20);
+			this.textCarrier.TabIndex = 48;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(7, 19);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(295, 13);
+			this.label3.TabIndex = 49;
+			this.label3.Text = "Enter a few letters of the name of the insurance carrier";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormRpCapitation
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(605,386);
+			this.ClientSize = new System.Drawing.Size(605, 150);
+			this.Controls.Add(this.textCarrier);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.textDateEnd);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.textDateStart);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -108,90 +176,82 @@ namespace OpenDental{
 			this.Text = "Capitation Utilization Report";
 			this.Load += new System.EventHandler(this.FormRpCapitation_Load);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 		#endregion
 
 		private void FormRpCapitation_Load(object sender, System.EventArgs e) {
-			//the user never sees this dialog.
-			ExecuteReport();
-			Close();
+			DateTime today = DateTime.Today;
+			DateTime endOfMonth = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+			textDateStart.Text=new DateTime(today.Year,today.Month,1).ToShortDateString();
+			textDateEnd.Text=endOfMonth.ToShortDateString();
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-
+			ExecuteReport();
 		}
 
 		private void ExecuteReport(){
-//			ReportComplex report=new ReportComplex();
-//			report.IsLandscape=true;
-//			report.AddTitle("CAPITATION UTILIZATION");
-//			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-////incomplete: Need more flexible default values, eg based on current date instead of fixed date:
-//			DateTime DateTimeFirst=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
-//			report.AddParameter("carrier",FieldValueType.String,""
-//				,"Enter a few letters of the name of the insurance carrier"
-//				,"carrier.CarrierName LIKE '%?%'"); // SPK 8/04
-//			report.AddParameter("date1",FieldValueType.Date,DateTimeFirst
-//				,"From Date"
-//				,"procedurelog.ProcDate >= '?'");
-//			report.AddParameter("date2",FieldValueType.Date
-//				,DateTimeFirst.AddMonths(1).AddDays(-1)
-//				,"To Date"
-//				,"procedurelog.ProcDate <= '?'");		// added carrierNum, SPK
-//			report.Queries=@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
-//				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
-//				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
-//				,procedurelog.ToothNum,procedurelog.Surf,procedurelog.ProcDate
-//				,procedurelog.ProcFee,procedurelog.ProcFee-claimproc.WriteOff
-//				FROM procedurelog,patient AS patSub,patient AS patPat
-//				,insplan,inssub,carrier,procedurecode,claimproc
-//				WHERE procedurelog.PatNum = patPat.PatNum
-//				AND claimproc.InsSubNum = inssub.InsSubNum
-//				AND procedurelog.ProcNum = claimproc.ProcNum
-//				AND claimproc.PlanNum = insplan.PlanNum
-//				AND claimproc.Status = 7
-//				AND claimproc.NoBillIns = 0 
-//				AND inssub.Subscriber = patSub.PatNum
-//				AND insplan.CarrierNum = carrier.CarrierNum	
-//				AND procedurelog.CodeNum = procedurecode.CodeNum
-//				AND ?carrier
-//				AND ?date1
-//				AND ?date2
-//				AND insplan.PlanType = 'c'
-//				AND procedurelog.ProcStatus = 2";
-//			report.AddColumn("Carrier",150,FieldValueType.String);
-//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-//			report.AddColumn("Subscriber",120,FieldValueType.String);
-//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-//			report.AddColumn("Subsc SSN",70,FieldValueType.String);
-//			report.GetLastRO(ReportObjectKind.FieldObject).SuppressIfDuplicate=true;
-//			report.AddColumn("Patient",120,FieldValueType.String);
-//			report.AddColumn("Pat DOB",80,FieldValueType.Date);
-//			report.AddColumn("Code",50,FieldValueType.String);
-//			report.AddColumn("Proc Description",120,FieldValueType.String);
-//			report.AddColumn("Tth",30,FieldValueType.String);
-//			report.AddColumn("Surf",40,FieldValueType.String);
-//			report.AddColumn("Date",80,FieldValueType.Date);
-//			report.AddColumn("UCR Fee",70,FieldValueType.Number);
-//			report.AddColumn("Co-Pay",70,FieldValueType.Number);
-//			report.AddPageNum();
-//			if(!report.SubmitQueries()){
-//				DialogResult=DialogResult.Cancel;
-//				return;
-//			}
-////incomplete: Add functionality for using parameter values in textObjects, probably using inline XML:
-//			report.AddSubTitle(((DateTime)report.ParameterFields["date1"].CurrentValues[0]).ToShortDateString()+" - "+((DateTime)report.ParameterFields["date2"].CurrentValues[0]).ToShortDateString());
-////incomplete: Implement formulas for situations like this:
-//			for(int i=0;i<report.ReportTables.Rows.Count;i++){
-//				if(PIn.Double(report.ReportTables.Rows[i][11].ToString())==-1){
-//					report.ReportTables.Rows[i][11]="0";
-//				}
-//			}
-//			FormReportComplex FormR=new FormReportComplex(report);
-//			//FormR.MyReport=report;
-//			FormR.ShowDialog();
-//			DialogResult=DialogResult.OK;
+			DateTime dateStart;
+			DateTime dateEnd;
+			if(!DateTime.TryParse(textDateStart.Text,out dateStart)) {
+				MsgBox.Show(this,"Please input a valid date.");
+				return;
+			}
+			if(!DateTime.TryParse(textDateEnd.Text,out dateEnd)) {
+				MsgBox.Show(this,"Please input a valid date.");
+				return;
+			}
+			if(String.IsNullOrWhiteSpace(textCarrier.Text)) {
+				MsgBox.Show(this,"Carrier can not be blank. Please input a value for carrier.");
+				return;
+			}
+			ReportComplex report=new ReportComplex("Capitation Utilization",PrefC.GetString(PrefName.PracticeTitle),true,true,true);
+			report.AddSubTitle("Date",textDateStart.Text+" - "+textDateEnd.Text);
+			QueryObject query=report.AddQuery(@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
+				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
+				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
+				,procedurelog.ToothNum,procedurelog.Surf,procedurelog.ProcDate
+				,procedurelog.ProcFee,procedurelog.ProcFee-claimproc.WriteOff
+				FROM procedurelog,patient AS patSub,patient AS patPat
+				,insplan,inssub,carrier,procedurecode,claimproc
+				WHERE procedurelog.PatNum = patPat.PatNum
+				AND claimproc.InsSubNum = inssub.InsSubNum
+				AND procedurelog.ProcNum = claimproc.ProcNum
+				AND claimproc.PlanNum = insplan.PlanNum
+				AND claimproc.Status = 7
+				AND claimproc.NoBillIns = 0 
+				AND inssub.Subscriber = patSub.PatNum
+				AND insplan.CarrierNum = carrier.CarrierNum	
+				AND procedurelog.CodeNum = procedurecode.CodeNum "
+				+"AND carrier.CarrierName LIKE '%"+POut.String(textCarrier.Text)+"%' "
+				+"AND procedurelog.ProcDate >= "+POut.Date(dateStart)+" "
+				+"AND procedurelog.ProcDate <= "+POut.Date(dateEnd)+" "
+				+"AND insplan.PlanType = 'c' "
+				+"AND procedurelog.ProcStatus = 2","","",SplitByKind.None);
+			query.AddColumn("Carrier",150,FieldValueType.String);
+			query.GetColumnDetail("Carrier").SuppressIfDuplicate=true;
+			query.AddColumn("Subscriber",120,FieldValueType.String);
+			query.GetColumnDetail("Subscriber").SuppressIfDuplicate=true;
+			query.AddColumn("Subsc SSN",70,FieldValueType.String);
+			query.GetColumnDetail("Subsc SSN").SuppressIfDuplicate=true;
+			query.AddColumn("Patient",120,FieldValueType.String);
+			query.AddColumn("Pat DOB",80,FieldValueType.Date);
+			query.AddColumn("Code",50,FieldValueType.String);
+			query.AddColumn("Proc Description",120,FieldValueType.String);
+			query.AddColumn("Tth",30,FieldValueType.String);
+			query.AddColumn("Surf",40,FieldValueType.String);
+			query.AddColumn("Date",80,FieldValueType.Date);
+			query.AddColumn("UCR Fee",70,FieldValueType.Number);
+			query.AddColumn("Co-Pay",70,FieldValueType.Number);
+			if(!report.SubmitQueries()) {
+				//DialogResult=DialogResult.Cancel;
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {

@@ -1,12 +1,6 @@
 using System;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
-using System.Data;
-using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental

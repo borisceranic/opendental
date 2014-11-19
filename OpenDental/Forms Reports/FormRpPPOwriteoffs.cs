@@ -272,134 +272,136 @@ namespace OpenDental{
 		}
 
 		private void ExecuteIndividual(){
-//			ReportComplex report=new ReportComplex();
-//			report.AddTitle(Lan.g(this,"PPO WRITEOFFS"));
-//			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-//			report.AddSubTitle(date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
-//			report.AddSubTitle(Lan.g(this,"Individual Claims"));
-//			if(textCarrier.Text!=""){
-//				report.AddSubTitle(Lan.g(this,"Carrier like: ")+textCarrier.Text);
-//			}
-//			report.Queries="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
-//				+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';";
-//			if(radioWriteoffPay.Checked){
-//				report.Queries+=@"SELECT claimproc.DateCP,
-//					CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI),
-//					carrier.CarrierName,
-//					provider.Abbr,
-//					SUM(claimproc.FeeBilled),
-//					SUM(claimproc.FeeBilled-claimproc.WriteOff),
-//					SUM(claimproc.WriteOff),
-//					claimproc.ClaimNum
-//					FROM claimproc,insplan,patient,carrier,provider
-//					WHERE provider.ProvNum = claimproc.ProvNum
-//					AND claimproc.PlanNum = insplan.PlanNum
-//					AND claimproc.PatNum = patient.PatNum
-//					AND carrier.CarrierNum = insplan.CarrierNum
-//					AND (claimproc.Status=1 OR claimproc.Status=4) /*received or supplemental*/
-//					AND claimproc.DateCP >= @DateFrom
-//					AND claimproc.DateCP <= @DateTo
-//					AND insplan.PlanType='p'
-//					AND carrier.CarrierName LIKE @CarrierName
-//					GROUP BY claimproc.ClaimNum 
-//					ORDER BY claimproc.DateCP";
-//			}
-//			else{//use procedure date
-//				report.Queries+=@"SELECT claimproc.ProcDate,
-//					CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI),
-//					carrier.CarrierName,
-//					provider.Abbr,
-//					SUM(claimproc.FeeBilled),
-//					SUM(claimproc.FeeBilled-claimproc.WriteOff),
-//					SUM(claimproc.WriteOff),
-//					claimproc.ClaimNum
-//					FROM claimproc,insplan,patient,carrier,provider
-//					WHERE provider.ProvNum = claimproc.ProvNum
-//					AND claimproc.PlanNum = insplan.PlanNum
-//					AND claimproc.PatNum = patient.PatNum
-//					AND carrier.CarrierNum = insplan.CarrierNum
-//					AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) /*received or supplemental or notreceived*/
-//					AND claimproc.ProcDate >= @DateFrom
-//					AND claimproc.ProcDate <= @DateTo
-//					AND insplan.PlanType='p'
-//					AND carrier.CarrierName LIKE @CarrierName
-//					GROUP BY claimproc.ClaimNum 
-//					ORDER BY claimproc.ProcDate";
-//			}
-//			report.AddColumn("Date",80,FieldValueType.Date);
-//			report.AddColumn("Patient",120,FieldValueType.String);
-//			report.AddColumn("Carrier",150,FieldValueType.String);
-//			report.AddColumn("Provider",60,FieldValueType.String);
-//			report.AddColumn("Stand Fee",80,FieldValueType.Number);
-//			report.AddColumn("PPO Fee",80,FieldValueType.Number);
-//			report.AddColumn("Writeoff",80,FieldValueType.Number);
-//			if(!report.SubmitQueries()){
-//				DialogResult=DialogResult.Cancel;
-//				return;
-//			}
-//			FormReportComplex FormR=new FormReportComplex(report);
-//			FormR.ShowDialog();
-//			DialogResult=DialogResult.OK;
+			ReportComplex report=new ReportComplex(Lan.g(this,"PPO Writeoffs"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
+			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"));
+			if(textCarrier.Text!="") {
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+			}
+			string queryText="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
+				+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';";
+			if(radioWriteoffPay.Checked) {
+				queryText+=@"SELECT claimproc.DateCP,
+					CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI),
+					carrier.CarrierName,
+					provider.Abbr,
+					SUM(claimproc.FeeBilled),
+					SUM(claimproc.FeeBilled-claimproc.WriteOff),
+					SUM(claimproc.WriteOff),
+					claimproc.ClaimNum
+					FROM claimproc,insplan,patient,carrier,provider
+					WHERE provider.ProvNum = claimproc.ProvNum
+					AND claimproc.PlanNum = insplan.PlanNum
+					AND claimproc.PatNum = patient.PatNum
+					AND carrier.CarrierNum = insplan.CarrierNum
+					AND (claimproc.Status=1 OR claimproc.Status=4) /*received or supplemental*/
+					AND claimproc.DateCP >= @DateFrom
+					AND claimproc.DateCP <= @DateTo
+					AND insplan.PlanType='p'
+					AND carrier.CarrierName LIKE @CarrierName
+					GROUP BY claimproc.ClaimNum 
+					ORDER BY claimproc.DateCP";
+			}
+			else {//use procedure date
+				queryText+=@"SELECT claimproc.ProcDate,
+					CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI),
+					carrier.CarrierName,
+					provider.Abbr,
+					SUM(claimproc.FeeBilled),
+					SUM(claimproc.FeeBilled-claimproc.WriteOff),
+					SUM(claimproc.WriteOff),
+					claimproc.ClaimNum
+					FROM claimproc,insplan,patient,carrier,provider
+					WHERE provider.ProvNum = claimproc.ProvNum
+					AND claimproc.PlanNum = insplan.PlanNum
+					AND claimproc.PatNum = patient.PatNum
+					AND carrier.CarrierNum = insplan.CarrierNum
+					AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) /*received or supplemental or notreceived*/
+					AND claimproc.ProcDate >= @DateFrom
+					AND claimproc.ProcDate <= @DateTo
+					AND insplan.PlanType='p'
+					AND carrier.CarrierName LIKE @CarrierName
+					GROUP BY claimproc.ClaimNum 
+					ORDER BY claimproc.ProcDate";
+			}
+			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None);
+			query.AddColumn("Date",80,FieldValueType.Date);
+			query.AddColumn("Patient",120,FieldValueType.String);
+			query.AddColumn("Carrier",150,FieldValueType.String);
+			query.AddColumn("Provider",60,FieldValueType.String);
+			query.AddColumn("Stand Fee",80,FieldValueType.Number);
+			query.AddColumn("PPO Fee",80,FieldValueType.Number);
+			query.AddColumn("Writeoff",80,FieldValueType.Number);
+			if(!report.SubmitQueries()) {
+				DialogResult=DialogResult.Cancel;
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		private void ExecuteGroup() {
-//			ReportComplex report=new ReportComplex();
-//			report.AddTitle(Lan.g(this,"PPO WRITEOFFS"));
-//			report.AddSubTitle(PrefC.GetString(PrefName.PracticeTitle));
-//			report.AddSubTitle(date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
-//			report.AddSubTitle(Lan.g(this,"Grouped by Carrier"));
-//			if(textCarrier.Text!="") {
-//				report.AddSubTitle(Lan.g(this,"Carrier like: ")+textCarrier.Text);
-//			}
-//			if(radioWriteoffPay.Checked){
-//				report.Queries="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
-//					+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';"
-//					+@"SELECT carrier.CarrierName,
-//					SUM(claimproc.FeeBilled),
-//					SUM(claimproc.FeeBilled-claimproc.WriteOff),
-//					SUM(claimproc.WriteOff),
-//					claimproc.ClaimNum
-//					FROM claimproc,insplan,carrier
-//					WHERE claimproc.PlanNum = insplan.PlanNum
-//					AND carrier.CarrierNum = insplan.CarrierNum
-//					AND (claimproc.Status=1 OR claimproc.Status=4) /*received or supplemental*/
-//					AND claimproc.DateCP >= @DateFrom
-//					AND claimproc.DateCP <= @DateTo
-//					AND insplan.PlanType='p'
-//					AND carrier.CarrierName LIKE @CarrierName
-//					GROUP BY carrier.CarrierNum 
-//					ORDER BY carrier.CarrierName";
-//			}
-//			else{
-//				report.Queries="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
-//					+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';"
-//					+@"SELECT carrier.CarrierName,
-//					SUM(claimproc.FeeBilled),
-//					SUM(claimproc.FeeBilled-claimproc.WriteOff),
-//					SUM(claimproc.WriteOff),
-//					claimproc.ClaimNum
-//					FROM claimproc,insplan,carrier
-//					WHERE claimproc.PlanNum = insplan.PlanNum
-//					AND carrier.CarrierNum = insplan.CarrierNum
-//					AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) /*received or supplemental or notreceived*/
-//					AND claimproc.ProcDate >= @DateFrom
-//					AND claimproc.ProcDate <= @DateTo
-//					AND insplan.PlanType='p'
-//					AND carrier.CarrierName LIKE @CarrierName
-//					GROUP BY carrier.CarrierNum 
-//					ORDER BY carrier.CarrierName";
-//			}
-//			report.AddColumn("Carrier",180,FieldValueType.String);
-//			report.AddColumn("Stand Fee",80,FieldValueType.Number);
-//			report.AddColumn("PPO Fee",80,FieldValueType.Number);
-//			report.AddColumn("Writeoff",80,FieldValueType.Number);
-//			if(!report.SubmitQueries()) {
-//				DialogResult=DialogResult.Cancel;
-//				return;
-//			}
-//			FormReportComplex FormR=new FormReportComplex(report);
-//			FormR.ShowDialog();
-//			DialogResult=DialogResult.OK;
+			ReportComplex report=new ReportComplex(Lan.g(this,"PPO Writeoffs"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
+			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"));
+			if(textCarrier.Text!="") {
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+			}
+			if(textCarrier.Text!="") {
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+			}
+			string queryText="";
+			if(radioWriteoffPay.Checked) {
+				queryText="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
+					+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';"
+					+@"SELECT carrier.CarrierName,
+					SUM(claimproc.FeeBilled),
+					SUM(claimproc.FeeBilled-claimproc.WriteOff),
+					SUM(claimproc.WriteOff),
+					claimproc.ClaimNum
+					FROM claimproc,insplan,carrier
+					WHERE claimproc.PlanNum = insplan.PlanNum
+					AND carrier.CarrierNum = insplan.CarrierNum
+					AND (claimproc.Status=1 OR claimproc.Status=4) /*received or supplemental*/
+					AND claimproc.DateCP >= @DateFrom
+					AND claimproc.DateCP <= @DateTo
+					AND insplan.PlanType='p'
+					AND carrier.CarrierName LIKE @CarrierName
+					GROUP BY carrier.CarrierNum 
+					ORDER BY carrier.CarrierName";
+			}
+			else {
+				queryText="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
+					+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';"
+					+@"SELECT carrier.CarrierName,
+					SUM(claimproc.FeeBilled),
+					SUM(claimproc.FeeBilled-claimproc.WriteOff),
+					SUM(claimproc.WriteOff),
+					claimproc.ClaimNum
+					FROM claimproc,insplan,carrier
+					WHERE claimproc.PlanNum = insplan.PlanNum
+					AND carrier.CarrierNum = insplan.CarrierNum
+					AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) /*received or supplemental or notreceived*/
+					AND claimproc.ProcDate >= @DateFrom
+					AND claimproc.ProcDate <= @DateTo
+					AND insplan.PlanType='p'
+					AND carrier.CarrierName LIKE @CarrierName
+					GROUP BY carrier.CarrierNum 
+					ORDER BY carrier.CarrierName";
+			}
+			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None);
+			query.AddColumn("Carrier",180,FieldValueType.String);
+			query.AddColumn("Stand Fee",80,FieldValueType.Number);
+			query.AddColumn("PPO Fee",80,FieldValueType.Number);
+			query.AddColumn("Writeoff",80,FieldValueType.Number);
+			if(!report.SubmitQueries()) {
+				DialogResult=DialogResult.Cancel;
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {

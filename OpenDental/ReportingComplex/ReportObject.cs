@@ -279,7 +279,22 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign){
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign,int offSetX,int offSetY){
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_staticText=staticText;
+			_font=font;
+			_textAlign=textAlign;
+			_offSetX=offSetX;
+			_offSetY=offSetY;
+			_foreColor=Color.Black;
+			_objectKind=ReportObjectKind.TextObject;
+		}
+
+		///<summary>Overload for TextObject.</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
@@ -351,6 +366,25 @@ namespace OpenDental.ReportingComplex {
 			//defaults:
 			_foreColor=Color.Black;
 			_objectKind=ReportObjectKind.FieldObject;
+		}
+
+		///<summary>Overload for ReportSummary ReportObject</summary>
+		public ReportObject(string name,string sectionName,Color color,string summarizedField,SummaryOperation operation,int offSetX,int offSetY) {
+			_name=name;
+			_sectionName=sectionName;
+			_location=new Point(0,0);
+			_size=new Size(0,0);
+			_font=new Font(FontFamily.GenericSansSerif,9);
+			_fieldKind=FieldDefKind.SummaryField;
+			_valueType=FieldValueType.Number;
+			_operation=operation;
+			_summarizedField=summarizedField;
+			_offSetX=offSetX;
+			_offSetY=offSetY;
+			//defaults:
+			_textAlign=ContentAlignment.MiddleLeft;
+			_foreColor=color;
+			_objectKind=ReportObjectKind.TextObject;
 		}
 
 		///<summary>Overload for SpecialField ReportObject</summary>
@@ -553,7 +587,9 @@ namespace OpenDental.ReportingComplex {
 		///<summary>1</summary>
 		Date,
 		///<summary>2</summary>
-		Enum
+		Enum,
+		///<summary>3</summary>
+		Definition
 	}
 
 	

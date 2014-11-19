@@ -249,8 +249,7 @@ namespace OpenDental
 		}
 
 		private void SetTomorrow(){
-			//TODO: change back to AddDays(1)
-			textDateFrom.Text = DateTime.Today.AddYears(-1).ToShortDateString();//DateTime.Today.AddDays(1).ToShortDateString();
+			textDateFrom.Text = DateTime.Today.AddDays(1).ToShortDateString();
 			textDateTo.Text = DateTime.Today.AddDays(1).ToShortDateString();
 		}
 
@@ -315,12 +314,9 @@ namespace OpenDental
 			}
 			whereProv += ")) ";
 			//create the report
-			ReportComplex report=new ReportComplex("Appointments","",true,true);
-			report.IsLandscape=true;
+			ReportComplex report=new ReportComplex("Appointments","",true,true,true);
 			report.ReportName="Appointments";
-			report.GetTitle().IsUnderlined=true;
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
-			report.GetObjectByName("PracName").IsUnderlined=true;
 			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
 			//setup query
 			QueryObject query;
@@ -330,7 +326,7 @@ namespace OpenDental
 				+" FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
 				+POut.Date(dateTo.AddDays(1)) + " AND " + "AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " + "AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
 				whereProv + " " +
-				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","Appointments","AptStatus",SplitByKind.Enum,new List<string>(Enum.GetNames(typeof(ApptStatus))));
+				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","","AptStatus",SplitByKind.Enum,new List<string>(Enum.GetNames(typeof(ApptStatus))));
 			// add columns to report
 			query.AddColumn("Date", 75, FieldValueType.Date);
 			query.GetColumnDetail("Date").SuppressIfDuplicate = true;
@@ -355,23 +351,6 @@ namespace OpenDental
 			query.AddColumn("Work Ph.",120,FieldValueType.String);
 			query.AddColumn("Cell Ph.",120,FieldValueType.String);
 			query.ReportObjects.Add(new ReportObject("Buffer","Group Footer",new Point(0,0),new Size(1,50),"",new Font("Tahoma",9),ContentAlignment.MiddleCenter));
-
-			DateTime dateFrom2=DateTime.ParseExact("01/01","MM/dd",CultureInfo.CurrentCulture);
-			DateTime dateTo2=DateTime.ParseExact("12/31","MM/dd",CultureInfo.CurrentCulture);
-			query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"Birthdays","",SplitByKind.None);
-			query.AddColumn("LName",90,FieldValueType.String);
-			query.AddColumn("FName",90,FieldValueType.String);
-			query.AddColumn("Preferred",90,FieldValueType.String);
-			query.AddColumn("Address",90,FieldValueType.String);
-			query.AddColumn("Address2",90,FieldValueType.String);
-			query.AddColumn("City",75,FieldValueType.String);
-			query.AddColumn("State",60,FieldValueType.String);
-			query.AddColumn("Zip",75,FieldValueType.String);
-			query.AddColumn("Birthdate",75,FieldValueType.Date);
-			query.GetColumnDetail("Birthdate").FormatString="d";
-			query.AddColumn("Age",45,FieldValueType.Integer);
-
-			report.AddLine("Line","Report Header",Color.Red,3,LineOrientation.Horizontal,LinePosition.Top,100,0,0);
 			report.AddPageNum();
 			report.AddGridLines();
 			// execute query

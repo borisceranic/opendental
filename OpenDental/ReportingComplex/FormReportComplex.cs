@@ -71,47 +71,21 @@ namespace OpenDental.ReportingComplex
 		{
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportComplex));
-			this.butClose = new OpenDental.UI.Button();
-			this.butPrint = new OpenDental.UI.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.button1 = new OpenDental.UI.Button();
 			this.labelTotPages = new System.Windows.Forms.Label();
+			this.pd2 = new System.Drawing.Printing.PrintDocument();
+			this.setupDialog2 = new System.Windows.Forms.PageSetupDialog();
+			this.imageListMain = new System.Windows.Forms.ImageList(this.components);
+			this.printPreviewControl2 = new System.Windows.Forms.PrintPreviewControl();
+			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.button1 = new OpenDental.UI.Button();
 			this.butBack = new OpenDental.UI.Button();
 			this.butFwd = new OpenDental.UI.Button();
 			this.butSetup = new OpenDental.UI.Button();
-			this.pd2 = new System.Drawing.Printing.PrintDocument();
-			this.setupDialog2 = new System.Windows.Forms.PageSetupDialog();
-			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.imageListMain = new System.Windows.Forms.ImageList(this.components);
-			this.printPreviewControl2 = new System.Windows.Forms.PrintPreviewControl();
+			this.butPrint = new OpenDental.UI.Button();
+			this.butClose = new OpenDental.UI.Button();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// butClose
-			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butClose.Autosize = true;
-			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(239,2);
-			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,23);
-			this.butClose.TabIndex = 1;
-			this.butClose.Text = "&Close";
-			// 
-			// butPrint
-			// 
-			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butPrint.Autosize = true;
-			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPrint.CornerRadius = 4F;
-			this.butPrint.Location = new System.Drawing.Point(1,2);
-			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(75,23);
-			this.butPrint.TabIndex = 2;
-			this.butPrint.Text = "&Print";
 			// 
 			// panel1
 			// 
@@ -122,115 +96,141 @@ namespace OpenDental.ReportingComplex
 			this.panel1.Controls.Add(this.butSetup);
 			this.panel1.Controls.Add(this.butPrint);
 			this.panel1.Controls.Add(this.butClose);
-			this.panel1.Location = new System.Drawing.Point(-1,178);
+			this.panel1.Location = new System.Drawing.Point(-1, 178);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(831,35);
+			this.panel1.Size = new System.Drawing.Size(831, 35);
 			this.panel1.TabIndex = 4;
 			this.panel1.Visible = false;
 			// 
-			// button1
-			// 
-			this.button1.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.button1.Autosize = true;
-			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.button1.CornerRadius = 4F;
-			this.button1.Location = new System.Drawing.Point(501,8);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75,23);
-			this.button1.TabIndex = 4;
-			this.button1.Text = "Test";
-			this.button1.Visible = false;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
-			// 
 			// labelTotPages
 			// 
-			this.labelTotPages.Font = new System.Drawing.Font("Microsoft Sans Serif",9F,System.Drawing.FontStyle.Bold,System.Drawing.GraphicsUnit.Point,((byte)(0)));
-			this.labelTotPages.Location = new System.Drawing.Point(137,4);
+			this.labelTotPages.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTotPages.Location = new System.Drawing.Point(137, 4);
 			this.labelTotPages.Name = "labelTotPages";
-			this.labelTotPages.Size = new System.Drawing.Size(54,18);
+			this.labelTotPages.Size = new System.Drawing.Size(54, 18);
 			this.labelTotPages.TabIndex = 19;
 			this.labelTotPages.Text = "1 / 2";
 			this.labelTotPages.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			// 
-			// butBack
-			// 
-			this.butBack.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butBack.Autosize = true;
-			this.butBack.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBack.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBack.CornerRadius = 4F;
-			this.butBack.Image = global::OpenDental.Properties.Resources.Left;
-			this.butBack.Location = new System.Drawing.Point(115,1);
-			this.butBack.Name = "butBack";
-			this.butBack.Size = new System.Drawing.Size(18,23);
-			this.butBack.TabIndex = 20;
-			// 
-			// butFwd
-			// 
-			this.butFwd.AdjustImageLocation = new System.Drawing.Point(1,0);
-			this.butFwd.Autosize = true;
-			this.butFwd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butFwd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butFwd.CornerRadius = 4F;
-			this.butFwd.Image = global::OpenDental.Properties.Resources.Right;
-			this.butFwd.Location = new System.Drawing.Point(193,1);
-			this.butFwd.Name = "butFwd";
-			this.butFwd.Size = new System.Drawing.Size(18,23);
-			this.butFwd.TabIndex = 21;
-			// 
-			// butSetup
-			// 
-			this.butSetup.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butSetup.Autosize = true;
-			this.butSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSetup.CornerRadius = 4F;
-			this.butSetup.Location = new System.Drawing.Point(590,2);
-			this.butSetup.Name = "butSetup";
-			this.butSetup.Size = new System.Drawing.Size(75,23);
-			this.butSetup.TabIndex = 3;
-			this.butSetup.Text = "&Setup";
-			this.butSetup.Visible = false;
-			this.butSetup.Click += new System.EventHandler(this.butSetup_Click);
-			// 
-			// ToolBarMain
-			// 
-			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
-			this.ToolBarMain.ImageList = this.imageListMain;
-			this.ToolBarMain.Location = new System.Drawing.Point(0,0);
-			this.ToolBarMain.Name = "ToolBarMain";
-			this.ToolBarMain.Size = new System.Drawing.Size(831,25);
-			this.ToolBarMain.TabIndex = 5;
-			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
 			// imageListMain
 			// 
 			this.imageListMain.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListMain.ImageStream")));
 			this.imageListMain.TransparentColor = System.Drawing.Color.Transparent;
-			this.imageListMain.Images.SetKeyName(0,"");
-			this.imageListMain.Images.SetKeyName(1,"");
-			this.imageListMain.Images.SetKeyName(2,"");
-			this.imageListMain.Images.SetKeyName(3,"");
+			this.imageListMain.Images.SetKeyName(0, "");
+			this.imageListMain.Images.SetKeyName(1, "");
+			this.imageListMain.Images.SetKeyName(2, "");
+			this.imageListMain.Images.SetKeyName(3, "");
 			// 
 			// printPreviewControl2
 			// 
 			this.printPreviewControl2.AutoZoom = false;
 			this.printPreviewControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.printPreviewControl2.Location = new System.Drawing.Point(0,0);
+			this.printPreviewControl2.Location = new System.Drawing.Point(0, 0);
 			this.printPreviewControl2.Name = "printPreviewControl2";
-			this.printPreviewControl2.Size = new System.Drawing.Size(831,570);
+			this.printPreviewControl2.Size = new System.Drawing.Size(831, 570);
 			this.printPreviewControl2.TabIndex = 6;
 			// 
-			// FormReportLikeCrystal
+			// ToolBarMain
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(831,570);
+			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
+			this.ToolBarMain.ImageList = this.imageListMain;
+			this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
+			this.ToolBarMain.Name = "ToolBarMain";
+			this.ToolBarMain.Size = new System.Drawing.Size(831, 25);
+			this.ToolBarMain.TabIndex = 5;
+			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
+			// 
+			// button1
+			// 
+			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.button1.Autosize = true;
+			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.button1.CornerRadius = 4F;
+			this.button1.Location = new System.Drawing.Point(501, 8);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 4;
+			this.button1.Text = "Test";
+			this.button1.Visible = false;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// butBack
+			// 
+			this.butBack.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butBack.Autosize = true;
+			this.butBack.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butBack.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butBack.CornerRadius = 4F;
+			this.butBack.Image = global::OpenDental.Properties.Resources.Left;
+			this.butBack.Location = new System.Drawing.Point(115, 1);
+			this.butBack.Name = "butBack";
+			this.butBack.Size = new System.Drawing.Size(18, 23);
+			this.butBack.TabIndex = 20;
+			// 
+			// butFwd
+			// 
+			this.butFwd.AdjustImageLocation = new System.Drawing.Point(1, 0);
+			this.butFwd.Autosize = true;
+			this.butFwd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butFwd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butFwd.CornerRadius = 4F;
+			this.butFwd.Image = global::OpenDental.Properties.Resources.Right;
+			this.butFwd.Location = new System.Drawing.Point(193, 1);
+			this.butFwd.Name = "butFwd";
+			this.butFwd.Size = new System.Drawing.Size(18, 23);
+			this.butFwd.TabIndex = 21;
+			// 
+			// butSetup
+			// 
+			this.butSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSetup.Autosize = true;
+			this.butSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSetup.CornerRadius = 4F;
+			this.butSetup.Location = new System.Drawing.Point(590, 2);
+			this.butSetup.Name = "butSetup";
+			this.butSetup.Size = new System.Drawing.Size(75, 23);
+			this.butSetup.TabIndex = 3;
+			this.butSetup.Text = "&Setup";
+			this.butSetup.Visible = false;
+			this.butSetup.Click += new System.EventHandler(this.butSetup_Click);
+			// 
+			// butPrint
+			// 
+			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrint.Autosize = true;
+			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPrint.CornerRadius = 4F;
+			this.butPrint.Location = new System.Drawing.Point(1, 2);
+			this.butPrint.Name = "butPrint";
+			this.butPrint.Size = new System.Drawing.Size(75, 23);
+			this.butPrint.TabIndex = 2;
+			this.butPrint.Text = "&Print";
+			// 
+			// butClose
+			// 
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClose.Autosize = true;
+			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClose.CornerRadius = 4F;
+			this.butClose.Location = new System.Drawing.Point(239, 2);
+			this.butClose.Name = "butClose";
+			this.butClose.Size = new System.Drawing.Size(75, 23);
+			this.butClose.TabIndex = 1;
+			this.butClose.Text = "&Close";
+			// 
+			// FormReportComplex
+			// 
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(831, 570);
 			this.Controls.Add(this.ToolBarMain);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.printPreviewControl2);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Name = "FormReportOld2";
+			this.Name = "FormReportComplex";
 			this.ShowInTaskbar = false;
 			this.Text = "Report";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -452,13 +452,43 @@ namespace OpenDental.ReportingComplex
 				}
 				if(reportObject.ObjectKind==ReportObjectKind.TextObject){
 					textObject=reportObject;
+					Font newFont=textObject.Font;
 					strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
-					RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
-						,yPos+textObject.Location.Y
-						,textObject.Size.Width,textObject.Size.Height);
-					g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
-					if(textObject.IsUnderlined) {
-						g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+					if(section.Name=="Report Footer") {
+						if(textObject.Name=="ReportSummaryText") {
+							xPos+=MyReport.ReportObjects["ReportSummaryLabel"].Size.Width;
+							if(textObject.IsUnderlined) {
+								newFont=new Font(textObject.Font.FontFamily,textObject.Font.Size,FontStyle.Bold|FontStyle.Underline);
+							}
+							else {
+								newFont=new Font(textObject.Font.FontFamily,textObject.Font.Size,FontStyle.Bold);
+							}
+							SizeF size=g.MeasureString(textObject.StaticText,newFont);
+							textObject.Size=new Size((int)size.Width+1,(int)size.Height+1);
+						}
+						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X+textObject.OffSetX
+							,yPos+textObject.Location.Y+textObject.OffSetY
+							,textObject.Size.Width,textObject.Size.Height);
+						if(textObject.IsUnderlined) {
+							g.DrawString(textObject.StaticText,new Font(textObject.Font.FontFamily,textObject.Font.Size,textObject.Font.Style|FontStyle.Underline),Brushes.Black,layoutRect,strFormat);
+						}
+						else {
+							g.DrawString(textObject.StaticText,newFont,Brushes.Black,layoutRect,strFormat);
+							//g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X+textObject.OffSetX,yPos+textObject.Location.Y+textObject.OffSetY+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+						}
+					}
+					else {
+						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
+							,yPos+textObject.Location.Y
+							,textObject.Size.Width,textObject.Size.Height);
+						if(textObject.IsUnderlined) {
+							g.DrawString(textObject.StaticText,new Font(textObject.Font.FontFamily,textObject.Font.Size,textObject.Font.Style|FontStyle.Underline),Brushes.Black,layoutRect,strFormat);
+						}
+						else {
+							g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
+						}
 					}
 				}
 				else if(reportObject.ObjectKind==ReportObjectKind.FieldObject){
@@ -691,7 +721,6 @@ namespace OpenDental.ReportingComplex
 			}
 			//loop through each row in the table and make sure that the row can fit.  If it can fit, print it.  Otherwise go to next page.
 			for(int i=rowsPrinted;i<queryObj.ReportTable.Rows.Count;i++) {
-				//TODO: Enhance the calculation for the next greatest row height so we never have only the header display on a page.
 				//Figure out the current row height
 				if(section.Name=="Detail" && queryObj.RowHeights[i]>_heightRemaining) {
 					_heightRemaining=0;
@@ -702,8 +731,8 @@ namespace OpenDental.ReportingComplex
 					int titleHeight=0;
 					int headerHeight=0;
 					foreach(ReportObject reportObject in queryObj.ReportObjects) {
-						if(reportObject.SectionName=="Group Title" && reportObject.Size.Height>titleHeight) {
-							titleHeight=reportObject.Size.Height;
+						if(reportObject.SectionName=="Group Title") {
+							titleHeight+=reportObject.Size.Height;
 						}
 						else if(reportObject.SectionName=="Group Header" && reportObject.Size.Height>headerHeight) {
 							headerHeight=reportObject.Size.Height;
@@ -716,6 +745,7 @@ namespace OpenDental.ReportingComplex
 					}
 				}
 				int greatestObjectHeight=0;
+				int summaryHeight=0;
 				//Now figure out if anything in the header, footer, or title sections can still fit on the page
 				foreach(ReportObject reportObject in queryObj.ReportObjects) {
 					if(reportObject.Size.Height>_heightRemaining) {
@@ -731,12 +761,18 @@ namespace OpenDental.ReportingComplex
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
 							,yPos+textObject.Location.Y
 							,textObject.Size.Width,textObject.Size.Height);
-						g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
 						if(textObject.IsUnderlined) {
-							g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
+							g.DrawString(textObject.StaticText,new Font(textObject.Font.FontFamily,textObject.Font.Size,textObject.Font.Style|FontStyle.Underline),Brushes.Black,layoutRect,strFormat);
+						}
+						else {
+							g.DrawString(textObject.StaticText,textObject.Font,Brushes.Black,layoutRect,strFormat);
 						}
 						if(greatestObjectHeight<textObject.Size.Height) {
 							greatestObjectHeight=textObject.Size.Height;
+						}
+						summaryHeight+=textObject.Size.Height;
+						if(section.Name=="Group Title") {
+							yPos+=textObject.Size.Height;
 						}
 					}
 					else if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
@@ -755,6 +791,7 @@ namespace OpenDental.ReportingComplex
 						if(greatestObjectHeight<boxObject.Size.Height) {
 							greatestObjectHeight=boxObject.Size.Height;
 						}
+						summaryHeight+=boxObject.Size.Height;
 					}
 					else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
 						lineObject=reportObject;
@@ -802,13 +839,14 @@ namespace OpenDental.ReportingComplex
 						if(greatestObjectHeight<lineObject.Size.Height) {
 							greatestObjectHeight=lineObject.Size.Height;
 						}
+						summaryHeight+=lineObject.Size.Height;
 					}
 					else if(reportObject.ObjectKind==ReportObjectKind.FieldObject) {
 						fieldObject=reportObject;
 						strFormat=ReportObject.GetStringFormatAlignment(fieldObject.TextAlign);
 						RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeights[i]);
 						if(MyReport.HasGridLines()) {
-							g.DrawRectangle(new Pen(Brushes.Black),Rectangle.Round(layoutRect));
+							g.DrawRectangle(new Pen(Brushes.LightGray),Rectangle.Round(layoutRect));
 						}
 						if(fieldObject.FieldKind==FieldDefKind.DataTableField) {
 							rawText=queryObj.ReportTable.Rows
@@ -822,12 +860,26 @@ namespace OpenDental.ReportingComplex
 								displayText="";
 							}
 						}
+						else {
+							displayText=fieldObject.GetSummaryValue(queryObj.ReportTable,queryObj.DataFields.IndexOf(fieldObject.SummarizedField)).ToString(fieldObject.FormatString);
+						}
 						g.DrawString(displayText,fieldObject.Font
 						,new SolidBrush(fieldObject.ForeColor),new RectangleF(layoutRect.X+1,layoutRect.Y+1,layoutRect.Width-1,layoutRect.Height-1),strFormat);
 						yPosAdd=(int)layoutRect.Height;
 					}
 				}
-				if(section.Kind==AreaSectionKind.GroupTitle || section.Kind==AreaSectionKind.GroupHeader || section.Kind==AreaSectionKind.GroupFooter) {
+				if(section.Kind==AreaSectionKind.GroupFooter) {
+					section.Height+=yPosAdd;
+					_heightRemaining-=section.Height;
+					yPos+=yPosAdd;
+					break;
+				}
+				else if(section.Kind==AreaSectionKind.GroupTitle) {
+					section.Height+=summaryHeight;
+					_heightRemaining-=section.Height;
+					break;
+				}
+				else if(section.Kind==AreaSectionKind.GroupHeader) {
 					section.Height=greatestObjectHeight;
 					_heightRemaining-=section.Height;
 					break;
@@ -901,15 +953,22 @@ namespace OpenDental.ReportingComplex
 		}
 
 		private void OnBack_Click(){
+			PrevPage();
+		}
+
+		private void OnFwd_Click(){
+			NextPage();
+		}
+
+		private void PrevPage() {
 			if(printPreviewControl2.StartPage==0) return;
 			printPreviewControl2.StartPage--;
 			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
 				+" / "+totalPages.ToString();
 			ToolBarMain.Invalidate();
-			//labelTotPages.Text=
 		}
 
-		private void OnFwd_Click(){
+		private void NextPage() {
 			if(printPreviewControl2.StartPage==totalPages-1) return;
 			printPreviewControl2.StartPage++;
 			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
@@ -979,7 +1038,7 @@ namespace OpenDental.ReportingComplex
 			this.Close();
 		}
 
-		private void button1_Click(object sender, System.EventArgs e) {
+		private void button1_Click(object sender,System.EventArgs e) {
 			//ScriptEngine.FormulaCode = 
 			/*string functionCode=
 			@"using System.Windows.Forms;
@@ -1024,11 +1083,5 @@ namespace OpenDental.ReportingComplex
 		
 
 		
-
-		
-
-		
-
-
 	}
 }
