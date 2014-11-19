@@ -12,7 +12,7 @@ namespace OpenDentBusiness{
 		///<summary>Not user editable.  Server time.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
-		///<summary>FK to user.UserNum.</summary>
+		///<summary>FK to userod.UserNum.</summary>
 		public long UserNum;
 		///<summary>FK to deposit.DepositNum.  Will eventually be replaced by a source document table, and deposits will just be one of many types.</summary>
 		public long DepositNum;
