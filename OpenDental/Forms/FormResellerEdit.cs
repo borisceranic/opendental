@@ -73,8 +73,10 @@ namespace OpenDental {
 				double fee=PIn.Double(TableCustomers.Rows[i]["Fee"].ToString());
 				row.Cells.Add(fee.ToString("F"));
 				total+=fee;
-				row.Cells.Add(PIn.Date(TableCustomers.Rows[i]["DateStart"].ToString()).ToShortDateString());
-				row.Cells.Add(PIn.Date(TableCustomers.Rows[i]["DateStop"].ToString()).ToShortDateString());
+				DateTime dateStart=PIn.Date(TableCustomers.Rows[i]["DateStart"].ToString());
+				row.Cells.Add(dateStart.Year>1880 ? dateStart.ToShortDateString() : "");
+				DateTime dateStop=PIn.Date(TableCustomers.Rows[i]["DateStop"].ToString());
+				row.Cells.Add(dateStop.Year>1880 ? dateStop.ToShortDateString() : "");
 				row.Cells.Add(TableCustomers.Rows[i]["Note"].ToString());
 				gridMain.Rows.Add(row);
 			}
