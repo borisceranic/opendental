@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type="text/xsl" href="OpenDentalDocumentation.xsl"?>
-<database version="14.2.29">
+<database version="14.2.43">
     <table name="account">
         <summary>Used in the accounting section in chart of accounts.  Not related to patient accounts in any way.</summary>
         <column order="0" name="AccountNum" type="bigint(20)">
@@ -7790,8 +7790,8 @@
                 <EnumValue name="RxEdit">76</EnumValue>
             </Enumeration>
         </column>
-        <column order="2" name="UserNum" type="bigint(20)" fk="user">
-            <summary>FK to user.UserNum</summary>
+        <column order="2" name="UserNum" type="bigint(20)" fk="userod">
+            <summary>FK to userod.UserNum</summary>
         </column>
         <column order="3" name="LogDateTime" type="datetime">
             <summary>The date and time of the entry.  It's value is set when inserting and can never change.  Even if a user changes the date on their ocmputer, this remains accurate because it uses server time.</summary>
@@ -8516,8 +8516,8 @@
         <column order="10" name="DateTimeEntry" type="datetime">
             <summary>The date and time that this task was added.  Used to sort the list by the order entered.</summary>
         </column>
-        <column order="11" name="UserNum" type="bigint(20)" fk="user">
-            <summary>FK to user.UserNum.  The person who created the task.</summary>
+        <column order="11" name="UserNum" type="bigint(20)" fk="userod">
+            <summary>FK to userod.UserNum.  The person who created the task.</summary>
         </column>
         <column order="12" name="DateTimeFinished" type="datetime">
             <summary>The date and time that this task was marked "done".</summary>
@@ -8864,8 +8864,8 @@
         <column order="1" name="DateTimeEntry" type="datetime">
             <summary>Not user editable.  Server time.</summary>
         </column>
-        <column order="2" name="UserNum" type="bigint(20)" fk="user">
-            <summary>FK to user.UserNum.</summary>
+        <column order="2" name="UserNum" type="bigint(20)" fk="userod">
+            <summary>FK to userod.UserNum.</summary>
         </column>
         <column order="3" name="DepositNum" type="bigint(20)" fk="deposit">
             <summary>FK to deposit.DepositNum.  Will eventually be replaced by a source document table, and deposits will just be one of many types.</summary>
