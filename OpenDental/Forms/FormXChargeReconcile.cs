@@ -141,7 +141,7 @@ namespace OpenDental {
 		private void butMissing_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
-			ReportComplex report=new ReportComplex("XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),"No Matching Transaction Found in Open Dental",true,true);
+			ReportComplex report=new ReportComplex("XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),"No Matching Transaction Found in Open Dental",true,true,false);
 			report.ReportName="Missing";
 			report.GetTitle().IsUnderlined=true;
 			QueryObject query;
