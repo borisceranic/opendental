@@ -132,8 +132,10 @@ namespace OpenDentBusiness{
 			}
 			command+="AND recall.DateDue >= "+POut.Date(fromDate)+" "
 				+"AND recall.DateDue <= "+POut.Date(toDate)+" "
-				+"AND recall.IsDisabled = 0 "
-				+"AND recall.RecallTypeNum IN("+PrefC.GetString(PrefName.RecallTypesShowingInList)+") ";
+				+"AND recall.IsDisabled = 0 ";
+			if(PrefC.GetString(PrefName.RecallTypesShowingInList)!="") {
+				command+="AND recall.RecallTypeNum IN("+PrefC.GetString(PrefName.RecallTypesShowingInList)+") ";
+			}
 			if(PrefC.GetBool(PrefName.RecallExcludeIfAnyFutureAppt)) {
 				string datesql="CURDATE()";
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
