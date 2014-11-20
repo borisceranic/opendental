@@ -4745,7 +4745,7 @@ namespace OpenDental{
 		///<summary>This button is only visible when proc IsLocked.</summary>
 		private void butInvalidate_Click(object sender,EventArgs e) {
 			//What this will really do is "delete" the procedure.
-			if(!Security.IsAuthorized(Permissions.ProcDelete,ProcCur.DateEntryC)) {
+			if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC)) {
 				return;
 			}
 			if(Procedures.IsAttachedToClaim(ProcCur,ClaimProcsForProc)) {
@@ -4759,8 +4759,8 @@ namespace OpenDental{
 				MessageBox.Show(ex.Message);
 				return;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.ProcDelete,PatCur.PatNum,Lan.g(this,"Invalidated: ")+
-				ProcedureCodes.GetStringProcCode(ProcCur.CodeNum).ToString()+", "+ProcCur.ProcDate.ToShortDateString()+", "+ProcCur.ProcFee.ToString("c"));
+			SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,Lan.g(this,"Invalidated: ")+
+				ProcedureCodes.GetStringProcCode(ProcCur.CodeNum).ToString()+", "+ProcCur.ProcDate.ToShortDateString()+", "+ProcCur.ProcFee.ToString("c")+", Deleted");
 			DialogResult=DialogResult.OK;
 		}
 
@@ -4877,7 +4877,10 @@ namespace OpenDental{
 				return;
 			}
 			//If this is an existing completed proc, then this delete button is only enabled if the user has permission for ProcComplEdit based on the DateEntryC.
-			if(!Security.IsAuthorized(Permissions.ProcDelete,ProcCur.DateEntryC)) {//This should be a much more lenient permission since completed procedures are already safeguarded.
+			if(ProcOld.ProcStatus!=ProcStat.C && !Security.IsAuthorized(Permissions.ProcDelete,ProcCur.DateEntryC)) {//This should be a much more lenient permission since completed procedures are already safeguarded.
+				return;
+			}
+			if(ProcOld.ProcStatus==ProcStat.C && !Security.IsAuthorized(Permissions.ProcComplEdit,ProcOld.DateEntryC)) {
 				return;
 			}
 			if(MessageBox.Show(Lan.g(this,"Delete Procedure?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
@@ -4886,7 +4889,12 @@ namespace OpenDental{
 			try{
 				Procedures.Delete(ProcCur.ProcNum);//also deletes the claimProcs and adjustments. Might throw exception.
 				Recalls.Synch(ProcCur.PatNum);//needs to be moved into Procedures.Delete
-				SecurityLogs.MakeLogEntry(Permissions.ProcDelete,ProcCur.PatNum,ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode+", "+ProcCur.ProcFee.ToString("c"));
+				if(ProcOld.ProcStatus==ProcStat.C) {
+					SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,ProcOld.PatNum,ProcedureCodes.GetProcCode(ProcOld.CodeNum).ProcCode+", "+ProcOld.ProcFee.ToString("c")+", Deleted");
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.ProcDelete,ProcOld.PatNum,ProcedureCodes.GetProcCode(ProcOld.CodeNum).ProcCode+", "+ProcOld.ProcFee.ToString("c"));
+				}
 				DialogResult=DialogResult.OK;
 				Plugins.HookAddCode(this,"FormProcEdit.butDelete_Click_end",ProcCur);
 			}
