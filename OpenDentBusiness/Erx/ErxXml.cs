@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using System.Security;
 
 namespace OpenDentBusiness {
 	public class ErxXml {
@@ -77,7 +78,7 @@ namespace OpenDentBusiness {
 			}
 			ncScript.Destination=new DestinationType();
 			ncScript.Destination.requestedPage=RequestedPageType.compose;//This is the tab that the user will want 90% of the time.
-			string practiceTitle=PrefC.GetString(PrefName.PracticeTitle);//May be blank.
+			string practiceTitle=Tidy(PrefC.GetString(PrefName.PracticeTitle));//May be blank.
 			string practicePhone=PrefC.GetString(PrefName.PracticePhone);//Validated to be 10 digits within the chart.
 			string practiceFax=PrefC.GetString(PrefName.PracticeFax);//Validated to be 10 digits within the chart.
 			string practiceAddress=PrefC.GetString(PrefName.PracticeAddress);//Validated to exist in chart.
@@ -250,6 +251,12 @@ namespace OpenDentBusiness {
 			xmlSerializer.Serialize(memoryStream,ncScript);
 			byte[] memoryStreamInBytes=memoryStream.ToArray();
 			return Encoding.UTF8.GetString(memoryStreamInBytes,0,memoryStreamInBytes.Length);
+		}
+
+		/// <summary>Cleans supplied string to conform to XML standards.</summary>
+		public static string Tidy(string input) {
+			string result=SecurityElement.Escape(input);//SecurityElement.Escape escapes characters into valid XML components
+			return result;
 		}
 
 	}
