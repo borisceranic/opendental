@@ -354,12 +354,12 @@ namespace OpenDental {
 			FormA.ShowDialog();
 			if(FormA.DialogResult==DialogResult.OK) {
 				//Add text to current focused cell				
-				gridMain.Rows[gridMain.SelectedCell.Y].Cells[gridMain.SelectedCell.X].Text=FormA.CompletedNote;
-				//Move data from grid to table
-				table.Rows[gridMain.SelectedCell.Y][gridMain.SelectedCell.X]=FormA.CompletedNote;
-				//Refresh grid
+				gridMain.Rows[gridMain.SelectedCell.Y].Cells[gridMain.SelectedCell.X].Text+=FormA.CompletedNote;
+				//Since the redrawing of the row height is dependent on the edit text box built into the ODGrid, we have to manually tell the grid to redraw.
+				//This will essentially "refresh" the grid.  We do not want to call FillGrid() because that will lose data in other cells that have not been saved to datatable.
+				gridMain.BeginUpdate();
+				gridMain.EndUpdate();
 				_hasChanged=true;
-				FillGrid();
 			}
 		}
 
