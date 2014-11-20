@@ -1581,34 +1581,36 @@ namespace OpenDentBusiness{
 			table.Columns.Add("treatmentPlan");
 			table.Columns.Add("carrierName");
 			List<DataRow> rows=new List<DataRow>();
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
 			string command=@"
-				DROP TABLE IF EXISTS tempused;
-				DROP TABLE IF EXISTS temppending;
-				DROP TABLE IF EXISTS tempplanned;
-				DROP TABLE IF EXISTS tempannualmax;
+				DROP TABLE IF EXISTS tempused"+rndStr+@";
+				DROP TABLE IF EXISTS temppending"+rndStr+@";
+				DROP TABLE IF EXISTS tempplanned"+rndStr+@";
+				DROP TABLE IF EXISTS tempannualmax"+rndStr+@";
 
-				CREATE TABLE tempused(
+				CREATE TABLE tempused"+rndStr+@"(
 				PatPlanNum bigint unsigned NOT NULL,
 				AmtUsed double NOT NULL,
 				PRIMARY KEY (PatPlanNum));
 
-				CREATE TABLE temppending(
+				CREATE TABLE temppending"+rndStr+@"(
 				PatPlanNum bigint unsigned NOT NULL,
 				PendingAmt double NOT NULL,
 				PRIMARY KEY (PatPlanNum));
 
-				CREATE TABLE tempplanned(
+				CREATE TABLE tempplanned"+rndStr+@"(
 				PatNum bigint unsigned NOT NULL,
 				AmtPlanned double NOT NULL,
 				PRIMARY KEY (PatNum));
 
-				CREATE TABLE tempannualmax(
+				CREATE TABLE tempannualmax"+rndStr+@"(
 				PlanNum bigint unsigned NOT NULL,
 				AnnualMax double,
 				PRIMARY KEY (PlanNum));";
 			Db.NonQ(command);
 			DateTime renewDate=BenefitLogic.ComputeRenewDate(DateTime.Now,monthStart);
-			command=@"INSERT INTO tempused
+			command=@"INSERT INTO tempused"+rndStr+@"
 SELECT patplan.PatPlanNum,
 SUM(IFNULL(claimproc.InsPayAmt,0))
 FROM claimproc
@@ -1619,7 +1621,7 @@ AND claimproc.ProcDate >= "+POut.Date(renewDate)+" "  //  MAKEDATE("+renewDate.Y
 +"AND claimproc.ProcDate < "+POut.Date(renewDate.AddYears(1))+" "   //MAKEDATE("+renewDate.Year+"+1, "+renewDate.Month+") "
 +"GROUP BY patplan.PatPlanNum";
 			Db.NonQ(command);
-			command=@"INSERT INTO temppending
+			command=@"INSERT INTO temppending"+rndStr+@"
 SELECT patplan.PatPlanNum,
 SUM(IFNULL(claimproc.InsPayEst,0))
 FROM claimproc
@@ -1631,7 +1633,7 @@ AND claimproc.ProcDate >= "+POut.Date(renewDate)+@"
 AND claimproc.ProcDate < "+POut.Date(renewDate.AddYears(1))+@" 
 GROUP BY patplan.PatPlanNum";
 			Db.NonQ(command);
-			command=@"INSERT INTO tempplanned
+			command=@"INSERT INTO tempplanned"+rndStr+@"
 SELECT PatNum, SUM(ProcFee)
 FROM procedurelog
 LEFT JOIN procedurecode ON procedurecode.CodeNum = procedurelog.CodeNum
@@ -1645,7 +1647,7 @@ WHERE ProcStatus = 1 /*treatment planned*/";
 			command+="AND procedurelog.ProcDate>"+POut.DateT(dateSince)+" "
 				+"GROUP BY PatNum";
 			Db.NonQ(command);
-			command=@"INSERT INTO tempannualmax
+			command=@"INSERT INTO tempannualmax"+rndStr+@"
 SELECT insplan.PlanNum, 
 (SELECT MAX(MonetaryAmt)/*for oracle in case there's more than one*/
 FROM benefit
@@ -1667,22 +1669,22 @@ FROM insplan";
 				patient.WirelessPhone, patient.WkPhone, patient.Address,
 				patient.Address2, patient.City, patient.State, patient.Zip,
 				patient.PriProv, patient.BillingType,
-				tempannualmax.AnnualMax ""$AnnualMax"",
-				tempused.AmtUsed ""$AmountUsed"",
-				temppending.PendingAmt ""$AmountPending"",
-				tempannualmax.AnnualMax-IFNULL(tempused.AmtUsed,0)-IFNULL(temppending.PendingAmt,0) ""$AmtRemaining"",
-				tempplanned.AmtPlanned ""$TreatmentPlan"", carrier.CarrierName
+				tempannualmax"+rndStr+@".AnnualMax ""$AnnualMax"",
+				tempused"+rndStr+@".AmtUsed ""$AmountUsed"",
+				temppending"+rndStr+@".PendingAmt ""$AmountPending"",
+				tempannualmax"+rndStr+@".AnnualMax-IFNULL(tempused"+rndStr+@".AmtUsed,0)-IFNULL(temppending"+rndStr+@".PendingAmt,0) ""$AmtRemaining"",
+				tempplanned"+rndStr+@".AmtPlanned ""$TreatmentPlan"", carrier.CarrierName
 				FROM patient
-				LEFT JOIN tempplanned ON tempplanned.PatNum=patient.PatNum
+				LEFT JOIN tempplanned"+rndStr+@" ON tempplanned"+rndStr+@".PatNum=patient.PatNum
 				LEFT JOIN patplan ON patient.PatNum=patplan.PatNum
 				LEFT JOIN inssub ON patplan.InsSubNum=inssub.InsSubNum
 				LEFT JOIN insplan ON insplan.PlanNum=inssub.PlanNum
 				LEFT JOIN carrier ON insplan.CarrierNum=carrier.CarrierNum
-				LEFT JOIN tempused ON tempused.PatPlanNum=patplan.PatPlanNum
-				LEFT JOIN temppending ON temppending.PatPlanNum=patplan.PatPlanNum
-				LEFT JOIN tempannualmax ON tempannualmax.PlanNum=inssub.PlanNum
-				AND (tempannualmax.AnnualMax IS NOT NULL AND tempannualmax.AnnualMax>0)/*may not be necessary*/
-				WHERE tempplanned.AmtPlanned>0 ";
+				LEFT JOIN tempused"+rndStr+@" ON tempused"+rndStr+@".PatPlanNum=patplan.PatPlanNum
+				LEFT JOIN temppending"+rndStr+@" ON temppending"+rndStr+@".PatPlanNum=patplan.PatPlanNum
+				LEFT JOIN tempannualmax"+rndStr+@" ON tempannualmax"+rndStr+@".PlanNum=inssub.PlanNum
+				AND (tempannualmax"+rndStr+@".AnnualMax IS NOT NULL AND tempannualmax"+rndStr+@".AnnualMax>0)/*may not be necessary*/
+				WHERE tempplanned"+rndStr+@".AmtPlanned>0 ";
 			if(!noIns) {//if we don't want patients without insurance
 				command+=@"AND patplan.Ordinal=1 AND insplan.MonthRenew="+POut.Int(monthStart)+" ";
 			}
@@ -1690,7 +1692,7 @@ FROM insplan";
 				command+=@"AND patient.PatNum NOT IN (SELECT PatNum FROM appointment WHERE AptStatus IN (1,4) AND "+DbHelper.DateColumn("AptDateTime")+">"+DbHelper.Curdate()+") ";//Scheduled and ASAP appointments.
 			}
 			if(aboveAmount>0) {
-				command+=@"AND (tempannualmax.AnnualMax IS NULL OR tempannualmax.AnnualMax-IFNULL(tempused.AmtUsed,0)>"+POut.Double(aboveAmount)+") ";
+				command+=@"AND (tempannualmax"+rndStr+@".AnnualMax IS NULL OR tempannualmax"+rndStr+@".AnnualMax-IFNULL(tempused"+rndStr+@".AmtUsed,0)>"+POut.Double(aboveAmount)+") ";
 			}
 			for(int i=0;i<providerFilter.Count;i++) {
 				if(i==0) {
@@ -1718,12 +1720,12 @@ FROM insplan";
 			}
 			command+=@"
 				AND patient.PatStatus =0
-				ORDER BY tempplanned.AmtPlanned DESC";
+				ORDER BY tempplanned"+rndStr+@".AmtPlanned DESC";
 			DataTable rawtable=Db.GetTable(command);
-			command=@"DROP TABLE tempused;
-				DROP TABLE temppending;
-				DROP TABLE tempplanned;
-				DROP TABLE tempannualmax;";
+			command=@"DROP TABLE tempused"+rndStr+@";
+				DROP TABLE temppending"+rndStr+@";
+				DROP TABLE tempplanned"+rndStr+@";
+				DROP TABLE tempannualmax"+rndStr+@";";
 			Db.NonQ(command);
 			ContactMethod contmeth;
 			for(int i=0;i<rawtable.Rows.Count;i++) {
