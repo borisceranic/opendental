@@ -4982,6 +4982,7 @@ namespace OpenDental{
 			}
 			UpdateClaim();
 			bool existsReceived=false;
+			bool isSupplemental=false;
 			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
 				if((ClaimProcsForClaim[i].Status==ClaimProcStatus.Received
 					|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental)
@@ -4989,13 +4990,22 @@ namespace OpenDental{
 				{
 					existsReceived=true;
 				}
+				//Supplemental, has an insurance payment amount entered, and is not attached to a check yet, therefore it will be attached to the check below.
+				if(ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental && ClaimProcsForClaim[i].InsPayAmt!=0 && ClaimProcsForClaim[i].ClaimPaymentNum==0) {
+					isSupplemental=true;
+				}
 			}
 			if(!existsReceived) {
 				MessageBox.Show(Lan.g(this,"There are no valid received payments for this claim."));
 				return;
 			}
 			ClaimPayment claimPayment=new ClaimPayment();
-			claimPayment.CheckDate=ClaimCur.DateReceived;//This date is validated and parsed from the UI when UpdateClaim() is called above.
+			if(isSupplemental) {
+				claimPayment.CheckDate=DateTimeOD.Today;//We cannot use the date the claim was received, because the claim received date corresponds to the first check.
+			}
+			else {
+				claimPayment.CheckDate=ClaimCur.DateReceived;//This date is validated and parsed from the UI when UpdateClaim() is called above.
+			}
 			claimPayment.IsPartial=true;
 			claimPayment.ClinicNum=PatCur.ClinicNum;
 			claimPayment.CarrierName=Carriers.GetName(InsPlans.GetPlan(ClaimCur.PlanNum,PlanList).CarrierNum);
