@@ -730,23 +730,25 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
 			//First, create a temp table with operatories for all blockouts
-			string command="DROP TABLE IF EXISTS tempBlockoutOps";
+			string command="DROP TABLE IF EXISTS tempBlockoutOps"+rndStr+@"";
 			Db.NonQ(command);
-			command=@"CREATE TABLE tempBlockoutOps
+			command=@"CREATE TABLE tempBlockoutOps"+rndStr+@"
 				SELECT ScheduleNum,
 				(SELECT "+DbHelper.GroupConcat("so1.OperatoryNum",false,true)+@" FROM scheduleop so1 WHERE so1.ScheduleNum=schedule.ScheduleNum) AS ops
 				FROM schedule
 				WHERE SchedType=2
 				GROUP BY ScheduleNum";
 			Db.NonQ(command);
-			command="ALTER TABLE tempBlockoutOps ADD INDEX (ScheduleNum)";
+			command="ALTER TABLE tempBlockoutOps"+rndStr+@" ADD INDEX (ScheduleNum)";
 			Db.NonQ(command);
 			//Get a list of scheduleNums that have duplicates
 			//A duplicate is defined as a matching opsList and matching times
 			//The result list will contain one random scheduleNum out of the many duplicates
 			command=@"SELECT SchedDate,MAX(ScheduleNum),StartTime,StopTime,"//MAX on id. Cannot GROUP BY id without splitting up duplicates.
-				+@"(SELECT ops FROM tempBlockoutOps WHERE tempBlockoutOps.ScheduleNum=schedule.ScheduleNum) ops_______________ops,
+				+@"(SELECT ops FROM tempBlockoutOps"+rndStr+@" WHERE tempBlockoutOps"+rndStr+@".ScheduleNum=schedule.ScheduleNum) ops_______________ops,
 				COUNT(*) countDups
 				FROM schedule
 				WHERE SchedType=2
@@ -769,10 +771,10 @@ namespace OpenDentBusiness{
 					+"AND ScheduleNum != "+POut.Long(scheduleNum)+" "
 					+"AND StartTime = "+POut.Time(startTime.TimeOfDay)+" "
 					+"AND StopTime = "+POut.Time(stopTime.TimeOfDay)+" "
-					+"AND (SELECT ops FROM tempBlockoutOps WHERE tempBlockoutOps.ScheduleNum=schedule.ScheduleNum) = '"+POut.String(ops)+"' ";
+					+"AND (SELECT ops FROM tempBlockoutOps"+rndStr+@" WHERE tempBlockoutOps"+rndStr+@".ScheduleNum=schedule.ScheduleNum) = '"+POut.String(ops)+"' ";
 				Db.NonQ(command);
 			}
-			command="DROP TABLE IF EXISTS tempBlockoutOps";
+			command="DROP TABLE IF EXISTS tempBlockoutOps"+rndStr+@"";
 			Db.NonQ(command);
 			//clear all the orphaned scheduleops
 			command="DELETE FROM scheduleop WHERE NOT EXISTS(SELECT * FROM schedule WHERE scheduleop.ScheduleNum=schedule.ScheduleNum)";

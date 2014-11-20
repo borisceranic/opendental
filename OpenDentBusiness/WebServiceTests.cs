@@ -121,12 +121,16 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod());
 			}
-			string command="DROP TABLE IF EXISTS tempdt;"
-				+"CREATE TABLE tempdt (TString VARCHAR(50),TDecimal DECIMAL(10,2),TDateTime DATETIME);"
-				+"INSERT INTO tempdt (TString,TDecimal,TDateTime) VALUES ('string',123.45,DATE('2013-04-11'));";
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
+			string command="DROP TABLE IF EXISTS tempdt"+rndStr+@";"
+				+"CREATE TABLE tempdt"+rndStr+@" (TString VARCHAR(50),TDecimal DECIMAL(10,2),TDateTime DATETIME);"
+				+"INSERT INTO tempdt"+rndStr+@" (TString,TDecimal,TDateTime) VALUES ('string',123.45,DATE('2013-04-11'));";
 			Db.NonQ(command);
-			command="SELECT * FROM tempdt;";
+			command="SELECT * FROM tempdt"+rndStr+@";";
 			DataTable table=Db.GetTable(command);
+			command="DROP TABLE IF EXISTS tempdt"+rndStr+@";";
+			Db.NonQ(command);
 			return table;
 		}
 

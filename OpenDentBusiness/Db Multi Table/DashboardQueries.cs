@@ -11,69 +11,71 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dt);
 			}
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
 			string command;
-			command="DROP TABLE IF EXISTS tempdash;";
+			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
-			command=@"CREATE TABLE tempdash (
+			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				ProvNum bigint NOT NULL PRIMARY KEY,
 				production decimal NOT NULL,
 				income decimal NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
 			//providers
-			command=@"INSERT INTO tempdash (ProvNum)
+			command=@"INSERT INTO tempdash"+rndStr+@" (ProvNum)
 				SELECT ProvNum
 				FROM provider WHERE IsHidden=0
 				ORDER BY ItemOrder";
 			Db.NonQ(command);
 			//production--------------------------------------------------------------------
 			//procs
-			command=@"UPDATE tempdash 
+			command=@"UPDATE tempdash"+rndStr+@" 
 				SET production=(SELECT SUM(ProcFee*(UnitQty+BaseUnits)) FROM procedurelog 
-				WHERE procedurelog.ProvNum=tempdash.ProvNum
+				WHERE procedurelog.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+@"
 				AND ProcDate="+POut.Date(dt)+")";
 			Db.NonQ(command);
 			//capcomplete writeoffs were skipped
 			//adjustments
-			command=@"UPDATE tempdash 
+			command=@"UPDATE tempdash"+rndStr+@" 
 				SET production=production+(SELECT IFNULL(SUM(AdjAmt),0) FROM adjustment 
-				WHERE adjustment.ProvNum=tempdash.ProvNum
+				WHERE adjustment.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND AdjDate="+POut.Date(dt)+")";
 			Db.NonQ(command);
 			//insurance writeoffs
 			if(PrefC.GetBool(PrefName.ReportsPPOwriteoffDefaultToProcDate)) {//use procdate
-				command=@"UPDATE tempdash 
+				command=@"UPDATE tempdash"+rndStr+@" 
 					SET production=production-(SELECT IFNULL(SUM(WriteOff),0) FROM claimproc 
-					WHERE claimproc.ProvNum=tempdash.ProvNum
+					WHERE claimproc.ProvNum=tempdash"+rndStr+@".ProvNum
 					AND ProcDate="+POut.Date(dt)+@" 
 					AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) )";//received or supplemental or notreceived
 			}
 			else {
-				command=@"UPDATE tempdash 
+				command=@"UPDATE tempdash"+rndStr+@" 
 					SET production=production-(SELECT IFNULL(SUM(WriteOff),0) FROM claimproc 
-					WHERE claimproc.ProvNum=tempdash.ProvNum
+					WHERE claimproc.ProvNum=tempdash"+rndStr+@".ProvNum
 					AND DateCP="+POut.Date(dt)+@" 
 					AND (claimproc.Status=1 OR claimproc.Status=4) )";//received or supplemental 
 			}
 			Db.NonQ(command);
 			//income------------------------------------------------------------------------
 			//patient income
-			command=@"UPDATE tempdash 
+			command=@"UPDATE tempdash"+rndStr+@" 
 				SET income=(SELECT SUM(SplitAmt) FROM paysplit 
-				WHERE paysplit.ProvNum=tempdash.ProvNum
+				WHERE paysplit.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND DatePay="+POut.Date(dt)+")";
 			Db.NonQ(command);
 			//ins income
-			command=@"UPDATE tempdash 
+			command=@"UPDATE tempdash"+rndStr+@" 
 				SET income=income+(SELECT IFNULL(SUM(InsPayAmt),0) FROM claimproc 
-				WHERE claimproc.ProvNum=tempdash.ProvNum
+				WHERE claimproc.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND DateCP="+POut.Date(dt)+")";
 			Db.NonQ(command);
 			//final queries
-			command="SELECT * FROM tempdash";
+			command="SELECT * FROM tempdash"+rndStr+@"";
 			DataTable table=Db.GetTable(command);
-			command="DROP TABLE IF EXISTS tempdash;";
+			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
 			return table;
 		}
@@ -99,18 +101,20 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<List<int>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
 			}
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
 			string command;
-			command="DROP TABLE IF EXISTS tempdash;";
+			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
 			//this table will contain approx 12x3xProv rows if there was production for each prov in each month.
-			command=@"CREATE TABLE tempdash (
+			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				DatePeriod date NOT NULL,
 				ProvNum bigint NOT NULL,
 				production decimal NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
 			//procs. Inserts approx 12xProv rows
-			command=@"INSERT INTO tempdash
+			command=@"INSERT INTO tempdash"+rndStr+@"
 				SELECT procedurelog.ProcDate,procedurelog.ProvNum,
 				SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0)
 				FROM procedurelog
@@ -127,10 +131,10 @@ namespace OpenDentBusiness {
 
 			//get all the data as 12xProv rows
 			command=@"SELECT DatePeriod,ProvNum,SUM(production) prod
-				FROM tempdash 
+				FROM tempdash"+rndStr+@" 
 				GROUP BY ProvNum,MONTH(DatePeriod)";//this fails with date issue
 			DataTable tableProd=Db.GetTable(command);
-			command="DROP TABLE IF EXISTS tempdash;";
+			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
 			command=@"SELECT ProvNum
 				FROM provider WHERE IsHidden=0
@@ -326,23 +330,25 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<List<int>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
 			}
+			Random rnd=new Random();
+			string rndStr=rnd.Next(1000000).ToString();
 			string command;
-			command="DROP TABLE IF EXISTS tempdash;";
+			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
-			command=@"CREATE TABLE tempdash (
+			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				PatNum bigint NOT NULL PRIMARY KEY,
 				dateFirstProc datetime NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
 			//table full of individual patients and their dateFirstProcs.
-			command=@"INSERT INTO tempdash 
+			command=@"INSERT INTO tempdash"+rndStr+@" 
 				SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
 				WHERE ProcStatus=2 GROUP BY PatNum
 				HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
 				+"AND dateFirstProc <= "+POut.Date(dateTo);
 			Db.NonQ(command);
 			command="SELECT dateFirstProc,COUNT(*) "
-				+"FROM tempdash "
+				+"FROM tempdash"+rndStr+@" "
 				+"GROUP BY MONTH(dateFirstProc)";
 			DataTable tableCounts=Db.GetTable(command);
 			List<int> listInt=new List<int>();
