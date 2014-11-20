@@ -475,6 +475,15 @@ namespace OpenDentBusiness{
 		public static int TaskComparer(DataRow x,DataRow y) {
 			int xTaskColor=FindTaskColor(x["Descript"].ToString(),PIn.Bool(x["HasNotes"].ToString()));
 			int yTaskColor=FindTaskColor(y["Descript"].ToString(),PIn.Bool(y["HasNotes"].ToString()));
+			//All tasks that are currently blue NEED to use the task date time and not the most recent task note time.
+			//We do this here because it is too complicated to update the query to consider the color of tasks.
+			if(xTaskColor==1) {//blue
+				x["LastUpdated"]=x["DateTimeEntry"];
+			}
+			if(yTaskColor==1) {//blue
+				y["LastUpdated"]=y["DateTimeEntry"];
+			}
+			//Now compare the times of tasks that share the same color.
 			if(xTaskColor==yTaskColor) {//Case 1: Tasks have same colors, sort by date.
 				return CompareTimes(x,y);
 			}
