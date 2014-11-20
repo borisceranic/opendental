@@ -116,7 +116,7 @@
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(411, 18);
 			this.label4.TabIndex = 25;
-			this.label4.Text = "The history is used for calculating Tabacco Assessment and Cessation CQMs";
+			this.label4.Text = "The history is used for calculating Tobacco Assessment and Cessation CQMs";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboAssessmentType
