@@ -5605,13 +5605,6 @@ namespace OpenDental{
 				MsgBox.Show(this,"Correction type must be original when type of bill is not blank.");
 				return false;
 			}
-			//Block the user from changing the claim identifier if the claim identifier was already included on an eclaim.
-			//When electronic EOBs are being imported, the claim identifier can be used to match a claim payment to a specific claim.
-			//We need to preserve the claim identifier after a claim is sent electronically in order to increase the chances of matching payment to a claim.
-			if(ClaimCur.ClaimIdentifier!="" && textClaimIdentifier.Text!=ClaimCur.ClaimIdentifier && ClaimCur.ClaimNum!=0 && Etranss.GetHistoryOneClaim(ClaimCur.ClaimNum).Count>0) {
-				MsgBox.Show(this,"Cannot change claim identifier because the claim has already been sent electronically.");
-				return false;
-			}
 			if(!CanadianWarnings()) {
 				return false;
 			}
