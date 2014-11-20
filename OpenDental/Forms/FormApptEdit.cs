@@ -1708,14 +1708,24 @@ namespace OpenDental{
 							continue;
 						}
 					}
-					if(!Security.IsAuthorized(Permissions.ProcDelete,proc.DateEntryC,true)) {
+					if(proc.ProcStatus!=ProcStat.C && !Security.IsAuthorized(Permissions.ProcDelete,proc.DateEntryC,true)) {
+						skippedSecurity++;
+						continue;
+					}
+					if(proc.ProcStatus==ProcStat.C && !Security.IsAuthorized(Permissions.ProcComplEdit,proc.DateEntryC,true)) {
 						skippedSecurity++;
 						continue;
 					}
 					//also deletes the claimProcs and adjustments. Might throw exception.
 					Procedures.Delete(PIn.Long(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcNum"].ToString()));
-					SecurityLogs.MakeLogEntry(Permissions.ProcDelete,AptCur.PatNum,DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString()
+					if(proc.ProcStatus==ProcStat.C) {
+						SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,AptCur.PatNum,DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString()
+						+", "+proc.ProcFee.ToString("c")+", Deleted");
+					}
+					else {
+						SecurityLogs.MakeLogEntry(Permissions.ProcDelete,AptCur.PatNum,DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString()
 						+", "+proc.ProcFee.ToString("c"));
+					}
 				}
 			}
 			catch(Exception ex){
