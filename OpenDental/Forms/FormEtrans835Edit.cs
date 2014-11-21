@@ -37,7 +37,7 @@ namespace OpenDental {
 			if(_x835==null) {
 				return;
 			}
-			gridProviderAdjustments.Width=butClose.Right-gridProviderAdjustments.Left;
+			gridProviderAdjustments.Width=butOK.Right-gridProviderAdjustments.Left;
 			FillProviderAdjustmentDetails();//Because the grid columns change size depending on the form size.
 			gridClaimDetails.Width=gridProviderAdjustments.Width;
 			gridClaimDetails.Height=labelPaymentAmount.Top-5-gridClaimDetails.Top;
@@ -93,6 +93,7 @@ namespace OpenDental {
 				textDateEffective.Text=_x835.DateEffective.ToShortDateString();
 			}
 			textCheckNumOrRefNum.Text=_x835.TransRefNum;
+			textNote.Text=EtransCur.Note;
 		}
 
 		///<summary>Reads the X12 835 text in the MessageText variable and displays the information from Table 2 (Detail).</summary>
@@ -422,7 +423,8 @@ namespace OpenDental {
 			form.ShowDialog();
 		}
 
-		private void butClose_Click(object sender,EventArgs e) {
+		private void butOK_Click(object sender,EventArgs e) {
+			EtransCur.Note=textNote.Text;
 			bool isReceived=true;
 			for(int i=0;i<gridClaimDetails.Rows.Count;i++) {
 				if(gridClaimDetails.Rows[i].Cells[0].Text=="") {
@@ -439,6 +441,10 @@ namespace OpenDental {
 			Etranss.Update(EtransCur);
 			DialogResult=DialogResult.OK;
 			Close();
+		}
+
+		private void butCancel_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.Cancel;
 		}
 		
 	}
