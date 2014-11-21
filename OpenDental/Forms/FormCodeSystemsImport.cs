@@ -159,6 +159,7 @@ namespace OpenDental {
 						}
 						//Unzip the compressed file-----------------------------------------------------------------------------------------------------
 						bool foundFile=false;
+						string meduFileExtention=".txt";  //Assume the the extention is going be .txt and not .txt.txt until it is found
 						MemoryStream ms=new MemoryStream();
 						using(ZipFile unzipped=ZipFile.Read(fdlg.FileName)) {
 							for(int unzipIndex=0;unzipIndex<unzipped.Count;unzipIndex++) {//unzip/write all files to the temp directory
@@ -166,17 +167,20 @@ namespace OpenDental {
 								if(!ze.FileName.ToLower().Contains("medu.txt")) {  //This file used to be called "medu.txt.txt" and is now called "medu.txt".  Uses .Contains() to catch both cases.
 									continue;
 								}
+								if(ze.FileName.ToLower().EndsWith(".txt.txt")) {
+									meduFileExtention=".txt.txt";  //The file we're looking for is .txt.txt, used to build file name for import later.
+								}
 								ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
 								foundFile=true;
 							}
 						}
 						if(!foundFile) {
-							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","MEDU.txt.txt file not found in zip archive.");
+							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","MEDU.txt file not found in zip archive.");  //Used to be MEDU.txt.txt, For error purposes we'll just show .txt
 							continue;
 						}
 						//Add a new thread. We will run these all in parallel once we have them all queued.
 						//MEDU.txt.txt is not a typo. That is litterally how the resource file is realeased to the public!
-						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(Path.GetTempPath(),"MEDU.txt.txt"),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe));
+						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(Path.GetTempPath(),"MEDU"+meduFileExtention),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe));
 						//We got this far so the local file was retreived successfully. No initial status to report.
 						_mapCodeSystemStatus[codeSystem.CodeSystemName]="";
 						#endregion
