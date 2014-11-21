@@ -6268,6 +6268,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\webSched_PV_Button.png" />
     <None Include="Resources\HICF2012.jpg" />
     <None Include="Resources\phoneInUse.png" />
     <None Include="Resources\splashCanada.jpg" />

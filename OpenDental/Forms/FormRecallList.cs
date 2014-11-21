@@ -640,6 +640,7 @@ namespace OpenDental{
 			// panelRecallScheduler
 			// 
 			this.panelRecallScheduler.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.panelRecallScheduler.BackgroundImage = global::OpenDental.Properties.Resources.webSched_PV_Button;
 			this.panelRecallScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.panelRecallScheduler.Location = new System.Drawing.Point(762, 663);
 			this.panelRecallScheduler.Name = "panelRecallScheduler";
