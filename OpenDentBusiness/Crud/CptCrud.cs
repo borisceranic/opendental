@@ -49,6 +49,7 @@ namespace OpenDentBusiness.Crud{
 				cpt.CptNum     = PIn.Long  (table.Rows[i]["CptNum"].ToString());
 				cpt.CptCode    = PIn.String(table.Rows[i]["CptCode"].ToString());
 				cpt.Description= PIn.String(table.Rows[i]["Description"].ToString());
+				cpt.VersionIDs = PIn.String(table.Rows[i]["VersionIDs"].ToString());
 				retVal.Add(cpt);
 			}
 			return retVal;
@@ -89,13 +90,14 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CptNum,";
 			}
-			command+="CptCode,Description) VALUES(";
+			command+="CptCode,Description,VersionIDs) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(cpt.CptNum)+",";
 			}
 			command+=
 				 "'"+POut.String(cpt.CptCode)+"',"
-				+"'"+POut.String(cpt.Description)+"')";
+				+"'"+POut.String(cpt.Description)+"',"
+				+"'"+POut.String(cpt.VersionIDs)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -109,7 +111,8 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(Cpt cpt){
 			string command="UPDATE cpt SET "
 				+"CptCode    = '"+POut.String(cpt.CptCode)+"', "
-				+"Description= '"+POut.String(cpt.Description)+"' "
+				+"Description= '"+POut.String(cpt.Description)+"', "
+				+"VersionIDs = '"+POut.String(cpt.VersionIDs)+"' "
 				+"WHERE CptNum = "+POut.Long(cpt.CptNum);
 			Db.NonQ(command);
 		}
@@ -124,6 +127,10 @@ namespace OpenDentBusiness.Crud{
 			if(cpt.Description != oldCpt.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(cpt.Description)+"'";
+			}
+			if(cpt.VersionIDs != oldCpt.VersionIDs) {
+				if(command!=""){ command+=",";}
+				command+="VersionIDs = '"+POut.String(cpt.VersionIDs)+"'";
 			}
 			if(command==""){
 				return false;

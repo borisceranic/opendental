@@ -32,24 +32,6 @@ namespace OpenDental {
 			UpdateCodeSystemThread.Finished+=new EventHandler(UpdateCodeSystemThread_FinishedSafe);
 		}
 		
-		///<summary>If there are still import threads running then prompt the user to see if they want to abort the imports prematurely.</summary>
-		private void FormCodeSystemsImport_FormClosing(object sender,FormClosingEventArgs e) {
-			if(!UpdateCodeSystemThread.IsRunning) { //All done, exit.
-				if(_hasDownloaded) {
-					DataValid.SetInvalid(InvalidType.EhrCodes);//Update in-memory list of codes for all other workstations
-				}
-				return;
-			}
-			if(MsgBox.Show("CodeSystemImporter",true,"Import in progress. Would you like to abort?")) {
-				//User wants abort the threads.
-				UpdateCodeSystemThread.StopAll();
-				_hasDownloaded=false;
-				return;
-			}
-			//User elected to continue waiting so cancel the Close event.
-			e.Cancel=true;
-		}
-		
 		private void FillGrid() {
 			_listCodeSystems=CodeSystems.GetForCurrentVersion(_isMemberNation);
 			gridMain.BeginUpdate();
@@ -138,14 +120,14 @@ namespace OpenDental {
 					if(codeSystem.CodeSystemName=="CPT") {
 						#region Import CPT codes
 						//Default status for CPT codes. We will clear this below if the file is selected and unzipped succesfully.
-						_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","To purchase CPT 2014 codes go to https://commerce.ama-assn.org/store/");
-						if(!MsgBox.Show("CodeSystemImporter",MsgBoxButtons.OKCancel,"CPT 2014 codes must be purchased from the American Medical Association seperately in the data file format and must be named \"cpt-2014-data-files-download.zip\". "
-							+"More information can be found in the online manual. "
+						_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","To purchase CPT codes go to https://commerce.ama-assn.org/store/");
+						if(!MsgBox.Show("CodeSystemImporter",MsgBoxButtons.OKCancel,"CPT codes must be purchased from the American Medical Association separately in the data file format. "
+							+"Please consult the online manual to help determine if you should purchase these codes and how to purchase them. Most offices are not required to purchase these codes. "
 							+"If you have already purchased the code file click OK to browse to the downloaded file.")) {
 							continue;
 						}
 						OpenFileDialog fdlg=new OpenFileDialog();
-						fdlg.Title=Lan.g("CodeSystemImporter","Choose cpt-2014-data-files-download.zip CPT File");
+						fdlg.Title=Lan.g("CodeSystemImporter","Choose CPT .zip file");
 						fdlg.InitialDirectory=Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 						fdlg.Filter="zip|*.zip";
 						fdlg.RestoreDirectory=true;
@@ -153,12 +135,15 @@ namespace OpenDental {
 						if(fdlg.ShowDialog()!=DialogResult.OK) {
 							continue;
 						}
-						if(!fdlg.FileName.ToLower().Contains("cpt-2014-data-files-download.zip")) {
-							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","Could not locate cpt-2014-data-files-download.zip in specified folder.");
+						if(!fdlg.FileName.ToLower().Contains("cpt-2014-data-files-download.zip") && !fdlg.FileName.ToLower().Contains("cpt-2015-data-files.zip")) { //This check will need to be changed every year once we know what the new file is called.
+							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","Could not locate .zip file in specified folder.");
 							continue;
 						}
+						string[] filename=fdlg.FileName.ToLower().Split('\\');
+						string versionID=filename[filename.Length-1].Split('-')[1];
 						//Unzip the compressed file-----------------------------------------------------------------------------------------------------
 						bool foundFile=false;
+						string meduFileExtention=".txt";  //Assume the the extention is going be .txt and not .txt.txt until it is found
 						MemoryStream ms=new MemoryStream();
 						using(ZipFile unzipped=ZipFile.Read(fdlg.FileName)) {
 							for(int unzipIndex=0;unzipIndex<unzipped.Count;unzipIndex++) {//unzip/write all files to the temp directory
@@ -166,17 +151,20 @@ namespace OpenDental {
 								if(!ze.FileName.ToLower().Contains("medu.txt")) {  //This file used to be called "medu.txt.txt" and is now called "medu.txt".  Uses .Contains() to catch both cases.
 									continue;
 								}
+								if(ze.FileName.ToLower().EndsWith(".txt.txt")) {
+									meduFileExtention=".txt.txt";  //The file we're looking for is .txt.txt, used to build file name for import later.
+								}
 								ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
 								foundFile=true;
 							}
 						}
 						if(!foundFile) {
-							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","MEDU.txt.txt file not found in zip archive.");
+							_mapCodeSystemStatus[codeSystem.CodeSystemName]=Lan.g("CodeSystemImporter","MEDU.txt file not found in zip archive.");  //Used to be MEDU.txt.txt, For error purposes we'll just show .txt
 							continue;
 						}
 						//Add a new thread. We will run these all in parallel once we have them all queued.
 						//MEDU.txt.txt is not a typo. That is litterally how the resource file is realeased to the public!
-						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(Path.GetTempPath(),"MEDU.txt.txt"),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe));
+						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(Path.GetTempPath(),"MEDU"+meduFileExtention),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe),versionID);
 						//We got this far so the local file was retreived successfully. No initial status to report.
 						_mapCodeSystemStatus[codeSystem.CodeSystemName]="";
 						#endregion
@@ -511,6 +499,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 		///<summary>Do not call this directly from external thread. Use UpdateCodeSystemThread_UpdateSafe.</summary>
 		private void UpdateCodeSystemThread_UpdateUnsafe(CodeSystem codeSystem,string status,double percentDone,bool done,bool success) {
 			//This is called a lot from the import threads so don't bother with the full FillGrid. Just find our row and column and update the cell's text.
+			gridMain.BeginUpdate();
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				if(gridMain.Rows[i].Tag==null 
 					|| !(gridMain.Rows[i].Tag is CodeSystem)
@@ -520,7 +509,9 @@ If the master term dictionary or software program containing the UCUM table, UCU
 				string cellText=((int)percentDone)+"%"+" -- "+status;
 				if(done) {
 					if(success) {
-						cellText=Lan.g("CodeSystemImporter","Import complete")+"!";
+						//If done==true percentDone is the number of codes that were imported, not the percent done.  
+						//This is done so we don't have to change the signatures of exisiting functions but can still alert the user when no codes were actually imported.
+						cellText=Lan.g("CodeSystemImporter","Import complete")+"! -- "+Lan.g("CodeSystemImporter","Number of codes imported")+": "+Convert.ToInt32(percentDone).ToString();
 					}
 					else {
 						cellText=Lan.g("CodeSystemImporter","Import failed")+"! -- "+status;
@@ -528,7 +519,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 				}
 				gridMain.Rows[i].Cells[3].Text=cellText;
 			}
-			gridMain.Invalidate();
+			gridMain.EndUpdate();  //Need to call this instead of gridMain.Invalidate() because we need text wrapping to happen if there was a long error message.
 		}
 		#endregion
 
@@ -546,7 +537,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			private CodeSystem _codeSystem;			
 			///<summary>Download and import functions will check this flag occasionally to see if they should abort prematurely.</summary>
 			private bool _quit=false;
-			///<summary>Function signature required to send an update.</summary>			
+			///<summary>Function signature required to send an update.  When done==true, percentDone is the number of codes imported.</summary>			
 			public delegate void UpdateCodeSystemArgs(CodeSystem codeSystem,string status,double percentDone,bool done,bool success);			
 			///<summary>Required by ctor. Used to keep main thread aware of update progress.</summary>			
 			private UpdateCodeSystemArgs _updateHandler;
@@ -554,6 +545,8 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			public static EventHandler Finished;
 			///<summary>If this is a CPT import then the file must exist localally and the file location will be provided by the user. All other code system files are held behind the Customer Update web service and will be downloaded to a temp file location in order to be imported.</summary>
 			private string _localFilePath;
+			///<summary>The version of the code system being imported.  Currently only used for CPT codes.
+			private string _versionID;
 
 			///<summary>Aborts the thread. Only called by StopAll.</summary>
 			private void Quit() {
@@ -570,10 +563,11 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			}
 
 			///<summary>Private ctor. Will only be used internally by Add. If localFilePath is set here then it is assumed that the file exists locally and file download will be skipped before importing data from the file. This will only happen for the CPT code system.</summary>
-			private UpdateCodeSystemThread(string localFilePath,CodeSystem codeSystem,UpdateCodeSystemArgs onUpdateHandler) {
+			private UpdateCodeSystemThread(string localFilePath,CodeSystem codeSystem,UpdateCodeSystemArgs onUpdateHandler, string versionID) {
 				_localFilePath=localFilePath;
 				_codeSystem=codeSystem;
 				_updateHandler+=onUpdateHandler;
+				_versionID=versionID;
 			}
 			
 			///<summary>Provide a nice ledgible identifier.</summary>
@@ -587,8 +581,8 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			}
 
 			///<summary>Add a thread to the queue. These threads will not be started until StartAll is called subsequent to adding all necessary threads. If localFilePath is set here then it is assumed that the file exists locally and file download will be skipped before importing data from the file. This will only happen for the CPT code system.</summary>
-			public static void Add(string localFilePath,CodeSystem codeSystem,UpdateCodeSystemArgs onUpdateHandler) {
-				UpdateCodeSystemThread thread=new UpdateCodeSystemThread(localFilePath,codeSystem,onUpdateHandler);
+			public static void Add(string localFilePath,CodeSystem codeSystem,UpdateCodeSystemArgs onUpdateHandler, string versionID) {
+				UpdateCodeSystemThread thread=new UpdateCodeSystemThread(localFilePath,codeSystem,onUpdateHandler,versionID);
 				lock(_lock) {
 					_threads.Add(thread);
 				}
@@ -596,7 +590,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 
 			///<summary>Add a thread to the queue. These threads will not be started until StartAll is called subsequent to adding all necessary threads. This version assures that code system file will be downloaded before import. Use for all code system except CPT.</summary>
 			public static void Add(CodeSystem codeSystem,UpdateCodeSystemArgs onUpdateHandler) {
-				Add("",codeSystem,onUpdateHandler);
+				Add("",codeSystem,onUpdateHandler,"");
 			}
 
 			///<summary>Use this to start the threads once all threads have been added using Add.</summary>
@@ -624,8 +618,8 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			}
 
 			///<summary>Called internally each time time a thread has completed. Will trigger the Finished event if this is the last thread to complete.</summary>
-			private void Done(string status,bool success) {
-				_updateHandler(_codeSystem,status,100,true,success);
+			private void Done(string status,bool success, int numCodesImported) {
+				_updateHandler(_codeSystem,status,Convert.ToDouble(numCodesImported),true,success);  //Pass in the number of codes imported as percentDone.  This was done so can display the number of codes imported withouth having to add a new perameter to the delegate function.
 				bool finished=false;
 				lock(_lock) {
 					if(_threads.Contains(this)) {
@@ -662,22 +656,28 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			private void Run() {
 				try {
 					string failText="";
-					if(!RequestCodeSystemDownloadHelper(ref failText)) {
+					int _numCodesImported=0;
+					if(!RequestCodeSystemDownloadHelper(ref failText,ref _numCodesImported)) {
 						throw new Exception(failText);						
 					}
 					//set current version=available version
-					CodeSystems.UpdateCurrentVersion(_codeSystem);
+					if(_codeSystem.CodeSystemName=="CPT") {
+						CodeSystems.UpdateCurrentVersion(_codeSystem, _versionID);
+					}
+					else {
+						CodeSystems.UpdateCurrentVersion(_codeSystem);
+					}
 					//All good!
-					Done(Lan.g("CodeSystemImporter","Import Complete"),true);
+					Done(Lan.g("CodeSystemImporter","Import Complete"),true,_numCodesImported);
 				}
 				catch(Exception ex) {
 					//Something failed!
-					Done(Lan.g("CodeSystemImporter","Error")+": "+ex.Message,false);
+					Done(Lan.g("CodeSystemImporter","Error")+": "+ex.Message,false,0);
 				}
 			}
 
 			///<summary>Will request, download, and import codeSystem from webservice. Returns false if unsuccessful.</summary>
-			private bool RequestCodeSystemDownloadHelper(ref string failText) {
+			private bool RequestCodeSystemDownloadHelper(ref string failText,ref int numCodesImported) {
 				try {
 					//If local file was not provided then try to download it from Customer Update web service. 
 					//Local file will only be provided for CPT code system.
@@ -701,37 +701,37 @@ If the master term dictionary or software program containing the UCUM table, UCU
 					}
 					switch(_codeSystem.CodeSystemName) {
 						case "CDCREC":
-							CodeSystems.ImportCdcrec(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportCdcrec(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "CVX":
-							CodeSystems.ImportCvx(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportCvx(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "HCPCS":
-							CodeSystems.ImportHcpcs(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportHcpcs(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "ICD10CM":
-							CodeSystems.ImportIcd10(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportIcd10(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "ICD9CM":
-							CodeSystems.ImportIcd9(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportIcd9(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "LOINC":
-							CodeSystems.ImportLoinc(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportLoinc(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "RXNORM":
-							CodeSystems.ImportRxNorm(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportRxNorm(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "SNOMEDCT":
-							CodeSystems.ImportSnomed(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportSnomed(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "SOP":
-							CodeSystems.ImportSop(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportSop(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "UCUM":
-							CodeSystems.ImportUcum(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportUcum(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported);
 							break;
 						case "CPT":
-							CodeSystems.ImportCpt(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit);
+							CodeSystems.ImportCpt(_localFilePath,new CodeSystems.ProgressArgs(ImportProgress),ref _quit,ref numCodesImported,_versionID);
 							break;
 						case "CDT":  //import not supported
 						case "AdministrativeSex":  //import not supported
@@ -864,6 +864,24 @@ If the master term dictionary or software program containing the UCUM table, UCU
 		
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}		
+		}
+
+		///<summary>If there are still import threads running then prompt the user to see if they want to abort the imports prematurely.</summary>
+		private void FormCodeSystemsImport_FormClosing(object sender,FormClosingEventArgs e) {
+			if(!UpdateCodeSystemThread.IsRunning) { //All done, exit.
+				if(_hasDownloaded) {
+					DataValid.SetInvalid(InvalidType.EhrCodes);//Update in-memory list of codes for all other workstations
+				}
+				return;
+			}
+			if(MsgBox.Show("CodeSystemImporter",true,"Import in progress. Would you like to abort?")) {
+				//User wants abort the threads.
+				UpdateCodeSystemThread.StopAll();
+				_hasDownloaded=false;
+				return;
+			}
+			//User elected to continue waiting so cancel the Close event.
+			e.Cancel=true;
+		}
 	}
 }

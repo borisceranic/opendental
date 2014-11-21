@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using CodeBase;
 
 namespace OpenDentBusiness{
@@ -57,11 +58,24 @@ namespace OpenDentBusiness{
 			Crud.CodeSystemCrud.Update(codeSystem);
 		}
 
+		///<summary>Updates VersionCurrent to the versionID passed in. Used by code system importer after successful import.  Currently only used for CPT.</summary>
+		public static void UpdateCurrentVersion(CodeSystem codeSystem, string versionID) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),codeSystem,versionID);
+				return;
+			}
+			if(string.Compare(codeSystem.VersionCur,versionID)>0) {  //If versionCur is newer than the version you just imported, don't update it.
+				return;
+			}
+			codeSystem.VersionCur=versionID;
+			Crud.CodeSystemCrud.Update(codeSystem);
+		}
+
 		///<summary>Called after file is downloaded.  Throws exceptions.</summary>
 	//public static void ImportAdministrativeSex(string tempFileName) ... not necessary.
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportCdcrec(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportCdcrec(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -84,6 +98,7 @@ namespace OpenDentBusiness{
 				cdcrec.HeirarchicalCode	=arrayCDCREC[1];
 				cdcrec.Description			=arrayCDCREC[2];
 				Cdcrecs.Insert(cdcrec);
+				numCodesImported++;
 			}
 		}
 
@@ -91,11 +106,12 @@ namespace OpenDentBusiness{
 	//public static void ImportCDT(string tempFileName) ... not necessary.
 
 		///<summary>Called after user provides resource file.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportCpt(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportCpt(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported,string versionID) {
 			if(tempFileName==null) {
 				return;
 			}
 			HashSet<string> codeHash=new HashSet<string>(Cpts.GetAllCodes());
+			Regex regx=new Regex(@"^([\d]{4}[\d\w])\s+(.+?)$");//Regex = "At the beginning of the string, find five numbers, followed by a white space (tab or space) followed by one or more characters (but as few as possible) to the end of the line."
 			string[] lines=File.ReadAllLines(tempFileName);
 			string[] arrayCpt;
 			bool isHeader=true;
@@ -108,23 +124,29 @@ namespace OpenDentBusiness{
 					progress(i+1,lines.Length);
 				}
 				if(isHeader) {
-					if(!lines[i].Contains("\t")) {
+					if(!regx.IsMatch(lines[i])) {  					//if(!lines[i].Contains("\t")) {	
 						continue;//Copyright info is present at the head of the file.
 					}
 					isHeader=false;
 				}
-				arrayCpt=lines[i].Split('\t');
+				arrayCpt=new string[2];
+				arrayCpt[0]=regx.Match(lines[i]).Groups[1].Value;//First five alphanumeric characters
+				arrayCpt[1]=regx.Match(lines[i]).Groups[2].Value;//Everything after the 6th character
 				if(codeHash.Contains(arrayCpt[0])) {//code already exists
-					continue;
+					Cpts.UpdateDescription(arrayCpt[0],arrayCpt[1],versionID);
 				}
-				cpt.CptCode			=arrayCpt[0];
-				cpt.Description	=arrayCpt[1];
-				Cpts.Insert(cpt);
+				else {
+					cpt.CptCode			=arrayCpt[0];
+					cpt.Description	=arrayCpt[1];
+					cpt.VersionIDs	=versionID;
+					Cpts.Insert(cpt);
+					numCodesImported++;
+				}
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportCvx(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportCvx(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -146,11 +168,12 @@ namespace OpenDentBusiness{
 				cvx.CvxCode			=arrayCvx[0];
 				cvx.Description	=arrayCvx[1];
 				Cvxs.Insert(cvx);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportHcpcs(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportHcpcs(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -172,11 +195,12 @@ namespace OpenDentBusiness{
 				hcpcs.HcpcsCode					=arrayHCPCS[0];
 				hcpcs.DescriptionShort	=arrayHCPCS[1];
 				Hcpcses.Insert(hcpcs);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportIcd10(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportIcd10(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -199,11 +223,12 @@ namespace OpenDentBusiness{
 				icd10.Description	=arrayICD10[1];
 				icd10.IsCode			=arrayICD10[2];
 				Icd10s.Insert(icd10);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportIcd9(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportIcd9(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -232,11 +257,12 @@ namespace OpenDentBusiness{
 				icd9.ICD9Code		=arrayICD9[0];
 				icd9.Description=arrayICD9[1];
 				ICD9s.Insert(icd9);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportLoinc(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportLoinc(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -274,11 +300,12 @@ namespace OpenDentBusiness{
 				loinc.RankCommonTests					=PIn.Int(arrayLoinc[16]);
 				loinc.RankCommonOrders				=PIn.Int(arrayLoinc[17]);
 				Loincs.Insert(loinc);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportRxNorm(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportRxNorm(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -301,11 +328,12 @@ namespace OpenDentBusiness{
 				rxNorm.MmslCode			=arrayRxNorm[1];
 				rxNorm.Description	=arrayRxNorm[2];
 				RxNorms.Insert(rxNorm);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportSnomed(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportSnomed(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -327,11 +355,12 @@ namespace OpenDentBusiness{
 				snomed.SnomedCode		=arraySnomed[0];
 				snomed.Description	=arraySnomed[1];
 				Snomeds.Insert(snomed);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportSop(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportSop(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -353,11 +382,12 @@ namespace OpenDentBusiness{
 				sop.SopCode			=arraySop[0];
 				sop.Description	=arraySop[1];
 				Sops.Insert(sop);
+				numCodesImported++;
 			}
 		}
 
 		///<summary>Called after file is downloaded.  Throws exceptions.  It is assumed that this is called from a worker thread.  Progress delegate will be called every 100th iteration to inform thread of current progress. Quit flag can be set at any time in order to quit importing prematurely.</summary>
-		public static void ImportUcum(string tempFileName,ProgressArgs progress,ref bool quit) {
+		public static void ImportUcum(string tempFileName,ProgressArgs progress,ref bool quit,ref int numCodesImported) {
 			if(tempFileName==null) {
 				return;
 			}
@@ -380,6 +410,7 @@ namespace OpenDentBusiness{
 				ucum.Description	=arrayUcum[1];
 				ucum.IsInUse			=false;
 				Ucums.Insert(ucum);
+				numCodesImported++;
 			}
 		}
 

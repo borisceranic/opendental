@@ -73,6 +73,33 @@ namespace OpenDentBusiness{
 			return PIn.Long(Db.GetCount(command));
 		}
 
+		///<summary>Updates an existing CPT code description if versionID is newer than current versionIDs.  If versionID is different than existing versionIDs, it will be added to the comma delimited list.</summary>
+		public static void UpdateDescription(string cptCode, string description, string versionID) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),cptCode, description, versionID);
+				return;
+			}
+			Cpt cpt=Cpts.GetByCode(POut.String(cptCode));
+			string[] versionIDs=cpt.VersionIDs.Split(',');
+			bool versionIDFound=false;
+			string maxVersionID="";
+			for(int i=0;i<versionIDs.Length;i++) {
+				if(string.Compare(versionIDs[i],maxVersionID)>0) {//Find max versionID in list
+					maxVersionID=versionIDs[i];
+				}
+				if(versionIDs[i]==versionID) {//Find if versionID is already in list
+					versionIDFound=true;
+				}
+			}
+			if(!versionIDFound) {//If the current version isn't already in the list
+				cpt.VersionIDs+=','+versionID;  //VersionID should never be blank for an existing code... should we check?
+			}
+			if(string.Compare(versionID,maxVersionID)>=0) { //If newest version
+				cpt.Description=description;
+			}
+			Crud.CptCrud.Update(cpt);
+		}
+
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.

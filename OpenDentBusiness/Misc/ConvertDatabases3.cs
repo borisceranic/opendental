@@ -6598,6 +6598,21 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//START CPT column VersionIDs-------------------------------
+				//Add new column to cpt table for keeping track of the years the cpt code existed in.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE cpt ADD VersionIDs varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE cpt ADD VersionIDs varchar2(255)";
+					Db.NonQ(command);
+				}
+				//Update every current cpt code to verion 2014.  Importing of 2015 codes was not implemented until this OD version or later.
+				//oracle compatible
+				command="UPDATE cpt SET VersionIDs='2014'";
+				Db.NonQ(command);
+				//END CPT column VersionIDs
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -6640,6 +6655,3 @@ namespace OpenDentBusiness {
 
 
 
-
-				
-				
