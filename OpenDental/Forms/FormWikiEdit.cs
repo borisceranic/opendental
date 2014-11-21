@@ -217,6 +217,7 @@ namespace OpenDental {
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Bold"),12,"","Bold"));
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Italic"),13,"","Italic"));
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Color"),14,"","Color"));
+			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Font"),17,"","Font"));
 		}
 
 		private void ToolBarMain_ButtonClick(object sender,OpenDental.UI.ODToolBarButtonClickEventArgs e) {
@@ -280,6 +281,9 @@ namespace OpenDental {
 				case "Color":
 					Color_Click();
 					break;
+				case "Font":
+					Font_Click();
+					break;
 			}
 		}
 
@@ -318,7 +322,8 @@ namespace OpenDental {
 					|| match.Value.StartsWith("[[file:")
 					|| match.Value.StartsWith("[[folder:")
 					|| match.Value.StartsWith("[[list:")
-					|| match.Value.StartsWith("[[color:")) 
+					|| match.Value.StartsWith("[[color:")
+ 					|| match.Value.StartsWith("[[font:"))
 				{
 					continue;//we don't care about these.  We are only checking internal links
 				}
@@ -512,6 +517,22 @@ namespace OpenDental {
 			//RefreshHtml();
 		}
 
+		private void Font_Click() {
+			int tempStart=textContent.SelectionStart;
+			int tempLength=textContent.SelectionLength;
+			string s="[[font:courier|"+textContent.SelectedText+"]]";
+			textContent.Paste(s);
+			textContent.Focus();
+			if(tempLength==0) {//nothing selected, place cursor in middle of new tags
+				textContent.SelectionStart=tempStart+15+tempLength;
+			}
+			else {
+				textContent.SelectionStart=tempStart+s.Length;
+				textContent.SelectionLength=0;
+			}
+			//RefreshHtml();
+		}
+
 		///<summary>Works for a new table and for an existing table.</summary>
 		private void Table_Click() {
 			int idx=textContent.SelectionStart;
@@ -664,7 +685,8 @@ namespace OpenDental {
 					|| match.Value.StartsWith("[[file:")
 					|| match.Value.StartsWith("[[folder:")
 					|| match.Value.StartsWith("[[list:")
-					|| match.Value.StartsWith("[[color:")) 
+					|| match.Value.StartsWith("[[color:")
+ 					|| match.Value.StartsWith("[[font:"))
 				{
 					//other tags
 				}

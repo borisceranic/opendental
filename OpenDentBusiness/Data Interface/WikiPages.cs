@@ -319,6 +319,29 @@ namespace OpenDentBusiness{
 				tempText+="</span>";
 				s=s.Replace(match.Value,tempText);
 			}
+			//[[font-family:courier|text]]----------------------------------------------------------------------------------------------------------------
+			matches = Regex.Matches(s,@"\[\[(font:).*?\]\]");//.*? matches as few as possible.
+			foreach(Match match in matches) {
+				//string[] paragraphs = match.Value.Split(new string[] { "\r\n" },StringSplitOptions.None);
+				string tempText="<span style=\"font-family:";
+				string[] tokens = match.Value.Split('|');
+				if(tokens.Length<2) {//not enough tokens
+					continue;
+				}
+				if(tokens[0].Split(':').Length!=2) {//Must have a color token and a color value seperated by a colon, no more no less.
+					continue;
+				}
+				for(int i=0;i<tokens.Length;i++) {
+					if(i==0) {
+						tempText+=tokens[0].Split(':')[1]+";\">";//close <span> tag
+						continue;
+					}
+					tempText+=(i>1?"|":"")+tokens[i];
+				}
+				tempText=tempText.TrimEnd(']');
+				tempText+="</span>";
+				s=s.Replace(match.Value,tempText);
+			}
 			//[[InternalLink]]--------------------------------------------------------------------------------------------------------------
 			matches=Regex.Matches(s,@"\[\[.+?\]\]");
 			List<string> pageNamesToCheck=new List<string>();
