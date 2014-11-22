@@ -156,7 +156,7 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		///<summary>After a refresh, this is used to determine whether the Current user has received any new tasks through subscription.  Must supply the current usernum as well as the recently retrieved signal list.  The signal list will include any task changes including status changes and deletions.  This will be called twice, once with isPopup=true and once with isPopup=false.</summary>
+		///<summary>After a refresh, this is used to determine whether the Current user has received any new tasks through subscription.  Must supply the current usernum as well as the recently retrieved signal list.  The signal list will include any task changes including status changes and deletions.</summary>
 		public static List<Task> GetNewTaskPopupsThisUser(List<Signalod> signalList,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Task>>(MethodBase.GetCurrentMethod(),signalList,userNum);
@@ -183,9 +183,17 @@ namespace OpenDentBusiness{
 				command+="task.TaskNum= "+POut.Long(sigListFiltered[i].TaskNum);
 			}
 			command+=")";
+			////The signals are checked on a time interval.  If a task was edited twice in the same interval, then there can be multiple instances of the same task in the list.  Group by the task num to get unique results.
+			//if(DataConnection.DBtype==DatabaseType.MySql) {
+			//	command+="GROUP BY task.TaskNum";
+			//}
+			//else {//oracle
+			//	command+="GROUP BY task.TaskNum,task.TaskListNum,task.DateTask,task.KeyNum,task.Descript,task.TaskStatus,"
+			//		+"task.IsRepeating,task.DateType,task.FromNum,task.ObjectType,task.DateTimeEntry,task.UserNum,task.DateTimeFinished";
+			//}
 			return Crud.TaskCrud.SelectMany(command);
 		}
-
+	
 		///<summary>After a refresh, this is used to get a list containing all flags of types that need to be refreshed.   Types of Date and Task are not included.  Because type are an enumeration, the returned list is int32, not int64.</summary>
 		public static List<int> GetInvalidTypes(List<Signalod> signalodList) {
 			//No need to check RemotingRole; no call to db.

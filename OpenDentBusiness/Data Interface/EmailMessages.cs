@@ -204,7 +204,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Refreshes our cached copy of the public key certificate store from the Windows certificate store.</summary>
-		private static void RefreshCertStoreExternal(EmailAddress emailAddressLocal) {
+		public static void RefreshCertStoreExternal(EmailAddress emailAddressLocal) {
 			string strSenderAddress=emailAddressLocal.EmailUsername.Trim();//Cannot be emailAddressFrom.SenderAddress, or else will not find the right encryption certificate.
 			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(strSenderAddress);
 			string strSenderDomain=strSenderAddress.Substring(strSenderAddress.IndexOf("@")+1);//For example, if strSenderAddress is ehr@opendental.com, then this will be opendental.com
@@ -825,9 +825,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Throws exceptions.  The subjectEmailAddress must correspond to the subject name contained inside the signature file.</summary>
-		public static void TryAddTrustForSignature(X509Certificate2 signedCert,string subjectEmailAddress,EmailAddress emailAddressLocal) {
+		public static void TryAddTrustForSignature(X509Certificate2 signedCert,string subjectEmailAddress) {
 			if(subjectEmailAddress.ToLower()!=GetSubjectEmailNameFromSignature(signedCert).ToLower()) {
-				throw new Exception("The subject email address does not match the email address built into the signature.");
+				throw new Exception(Lans.g("EmailMessages","The subject email address does not match the email address built into the signature."));
 			}
 			try {
 				Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
@@ -838,7 +838,6 @@ namespace OpenDentBusiness{
 			catch(Exception ex) {
 				throw new Exception(Lans.g("EmailMessages","Failed to save subject signature to public certificate store")+". "+ex.Message);
 			}
-			RefreshCertStoreExternal(emailAddressLocal);
 		}
 
 		///<summary>Sometimes an email From address will contain the person's name along with their email adress.  This function strips out the person's name if present.</summary>

@@ -391,6 +391,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEmailDigitalSignature.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEmailDigitalSignature.designer.cs">
+      <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormWikiListHistory.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3560,6 +3566,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEmailDigitalSignature.resx">
+      <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormWikiListHistory.resx">
       <DependentUpon>FormWikiListHistory.cs</DependentUpon>

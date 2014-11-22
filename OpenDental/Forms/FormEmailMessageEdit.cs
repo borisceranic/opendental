@@ -838,29 +838,10 @@ namespace OpenDental{
 		}
 
 		private void butSig_Click(object sender,EventArgs e) {
-			string fromAddress=EmailMessages.GetFromAddressSimple(MessageCur.FromAddress);
-			if(_isComposing) {
-				//TODO: Show signature details.
-			}
-			else {
-				if(EmailMessages.IsDirectAddressTrusted(fromAddress)) {
-					MsgBox.Show(this,"Trusted for email encryption.");
-				}
-				else {
-					string strTrustMessage=Lan.g(this,"You have clicked on the sender's encryption signature")
-						+".  "+Lan.g(this,"Adding an email address to the trusted list of addresses will enable email encryption to and from that address")
-						+".  "+Lan.g(this,"Add")+" "+MessageCur.FromAddress+" "+Lan.g(this,"to trusted addresses for email encryption")+"?";
-					if(MessageBox.Show(strTrustMessage,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
-						Cursor=Cursors.WaitCursor;
-						try {
-							EmailMessages.TryAddTrustForSignature(_certSig,fromAddress,GetEmailAddress());
-						}
-						catch(Exception ex) {
-							MessageBox.Show(Lan.g(this,"Failed to add the sender to the trusted address list")+". "+ex.Message);
-						}
-						Cursor=Cursors.Default;
-					}
-				}
+			FormEmailDigitalSignature form=new FormEmailDigitalSignature(_certSig);
+			if(form.ShowDialog()==DialogResult.OK) {
+				//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
+				EmailMessages.RefreshCertStoreExternal(GetEmailAddress());
 			}
 		}
 
