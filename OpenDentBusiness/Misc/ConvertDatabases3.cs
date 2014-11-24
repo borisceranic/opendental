@@ -6613,6 +6613,8 @@ namespace OpenDentBusiness {
 				command="UPDATE cpt SET VersionIDs='2014'";
 				Db.NonQ(command);
 				//END CPT column VersionIDs
+				command="DELETE FROM grouppermission WHERE usergroupNum NOT IN (SELECT usergroupnum FROM usergroup);";//remove any orphaned grouppermissions; Oracle compatable
+				Db.NonQ(command);
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

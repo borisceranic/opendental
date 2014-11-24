@@ -53,6 +53,15 @@ namespace OpenDentBusiness{
 					throw new Exception(Lans.g("GroupPermissions","This type of permission may not have a date or days set."));
 				}
 			}
+			if(gp.PermType==Permissions.SecurityAdmin) {
+				//Make sure there are no hidden users in the group that is about to get the Security Admin permission.
+				string command="SELECT COUNT(*) FROM userod WHERE IsHidden=1"
+				+" AND UserGroupNum="+gp.UserGroupNum;
+				int count=PIn.Int(Db.GetCount(command));
+				if(count!=0) {//there are hidden users in this group
+					throw new Exception(Lans.g("FormSecurity","Hidden users cannot have the Security Admin permission."));
+				}
+			}
 			return Crud.GroupPermissionCrud.Insert(gp);
 		}
 
@@ -65,10 +74,12 @@ namespace OpenDentBusiness{
 			string command;
 			if(permType==Permissions.SecurityAdmin){
 				//need to make sure that at least one other user has this permission
-				command="SELECT COUNT(*) FROM grouppermission WHERE PermType='"+POut.Long((int)permType)+"'";
-				DataTable table=Db.GetTable(command);
-				if(table.Rows[0][0].ToString()=="1"){//only one, so this would delete the last one.
-					throw new Exception(Lans.g("FormSecurity","At least one group must have Security Admin permission."));
+				command="SELECT COUNT(*) FROM (SELECT DISTINCT grouppermission.UserGroupNum "
+					+"FROM grouppermission "
+					+"INNER JOIN userod ON userod.UserGroupNum=grouppermission.UserGroupNum AND userod.IsHidden=0 "
+					+"WHERE PermType='"+POut.Long((int)permType)+"') t";//This query is Oracle compatable
+				if(Db.GetScalar(command)=="1") {//only one, so this would delete the last one.
+					throw new Exception(Lans.g("FormSecurity","There must always be at least one user in a user group that has the Security Admin permission."));
 				}
 			}
 			command="DELETE from grouppermission WHERE UserGroupNum='"+POut.Long(groupNum)+"' "

@@ -76,7 +76,10 @@ namespace OpenDentBusiness{
 			}
 			command= "DELETE FROM usergroup WHERE UserGroupNum='"
 				+POut.Long(group.UserGroupNum)+"'";
- 			Db.NonQ(command);
+			Db.NonQ(command);
+			command="DELETE FROM grouppermission WHERE UserGroupNum='"
+				+POut.Long(group.UserGroupNum)+"'";
+			Db.NonQ(command);
 		}
 
 		///<summary></summary>
