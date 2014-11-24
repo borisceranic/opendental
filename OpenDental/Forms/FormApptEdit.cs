@@ -195,6 +195,8 @@ namespace OpenDental{
 			this.listQuickAdd = new System.Windows.Forms.ListBox();
 			this.labelQuickAdd = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.comboApptType = new System.Windows.Forms.ComboBox();
+			this.label10 = new System.Windows.Forms.Label();
 			this.labelSyndromicObservations = new System.Windows.Forms.Label();
 			this.butSyndromicObservations = new OpenDental.UI.Button();
 			this.label9 = new System.Windows.Forms.Label();
@@ -236,8 +238,6 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
-			this.comboApptType = new System.Windows.Forms.ComboBox();
-			this.label10 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -568,6 +568,25 @@ namespace OpenDental{
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(260, 447);
 			this.panel1.TabIndex = 164;
+			// 
+			// comboApptType
+			// 
+			this.comboApptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboApptType.Location = new System.Drawing.Point(114, 246);
+			this.comboApptType.MaxDropDownItems = 30;
+			this.comboApptType.Name = "comboApptType";
+			this.comboApptType.Size = new System.Drawing.Size(126, 21);
+			this.comboApptType.TabIndex = 183;
+			this.comboApptType.SelectionChangeCommitted += new System.EventHandler(this.comboApptType_SelectionChangeCommitted);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(13, 249);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(98, 16);
+			this.label10.TabIndex = 182;
+			this.label10.Text = "Appointment Type";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelSyndromicObservations
 			// 
@@ -1090,25 +1109,6 @@ namespace OpenDental{
 			this.butText.Text = "Text";
 			this.butText.Click += new System.EventHandler(this.butText_Click);
 			// 
-			// comboApptType
-			// 
-			this.comboApptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboApptType.Location = new System.Drawing.Point(114, 246);
-			this.comboApptType.MaxDropDownItems = 30;
-			this.comboApptType.Name = "comboApptType";
-			this.comboApptType.Size = new System.Drawing.Size(126, 21);
-			this.comboApptType.TabIndex = 183;
-			this.comboApptType.SelectionChangeCommitted += new System.EventHandler(this.comboApptType_SelectionChangeCommitted);
-			// 
-			// label10
-			// 
-			this.label10.Location = new System.Drawing.Point(13, 249);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(98, 16);
-			this.label10.TabIndex = 182;
-			this.label10.Text = "Appointment Type";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormApptEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1170,6 +1170,8 @@ namespace OpenDental{
 					listQuickAdd.Enabled=false;
 					butAdd.Enabled=false;
 					butDeleteProc.Enabled=false;
+					butInsPlan1.Enabled=false;
+					butInsPlan2.Enabled=false;
 				}
 			}
 			//The four objects below are needed when adding procs to this appt.
@@ -1188,14 +1190,6 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				labelClinic.Visible=false;
 				comboClinic.Visible=false;
-			}
-			if(PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
-				labelInsPlan1.Visible=false;
-				textInsPlan1.Visible=false;
-				butInsPlan1.Visible=false;
-				labelInsPlan2.Visible=false;
-				textInsPlan2.Visible=false;
-				butInsPlan2.Visible=false;
 			}
 			if(!PinIsVisible){
 				butPin.Visible=false;
@@ -1331,8 +1325,25 @@ namespace OpenDental{
 			if(AptCur.DateTimeDismissed.TimeOfDay>TimeSpan.FromHours(0)){
 				textTimeDismissed.Text=AptCur.DateTimeDismissed.ToShortTimeString();
 			}
-			textInsPlan1.Text=InsPlans.GetCarrierName(AptCur.InsPlan1,PlanList);
-			textInsPlan2.Text=InsPlans.GetCarrierName(AptCur.InsPlan2,PlanList);
+			if(AptCur.AptStatus==ApptStatus.Complete
+				|| AptCur.AptStatus==ApptStatus.Broken
+				|| AptCur.AptStatus==ApptStatus.PtNote
+				|| AptCur.AptStatus==ApptStatus.PtNoteCompleted) 
+			{
+				textInsPlan1.Text=InsPlans.GetCarrierName(AptCur.InsPlan1,PlanList);
+				textInsPlan2.Text=InsPlans.GetCarrierName(AptCur.InsPlan2,PlanList);
+			}
+			else {//Get the current ins plans for the patient.
+				butInsPlan1.Enabled=false;
+				butInsPlan2.Enabled=false;
+				List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+				InsSub sub1=InsSubs.GetSub(PatPlans.GetInsSubNum(listPatPlans,PatPlans.GetOrdinal(PriSecMed.Primary,listPatPlans,PlanList,SubList)),SubList);
+				InsSub sub2=InsSubs.GetSub(PatPlans.GetInsSubNum(listPatPlans,PatPlans.GetOrdinal(PriSecMed.Secondary,listPatPlans,PlanList,SubList)),SubList);
+				AptCur.InsPlan1=sub1.PlanNum;
+				AptCur.InsPlan2=sub2.PlanNum;
+				textInsPlan1.Text=InsPlans.GetCarrierName(AptCur.InsPlan1,PlanList);
+				textInsPlan2.Text=InsPlans.GetCarrierName(AptCur.InsPlan2,PlanList);
+			}
 			textRequirement.Text=DS.Tables["Misc"].Rows[0]["requirements"].ToString();
 			//IsNewPatient is set well before opening this form.
 			checkIsNewPatient.Checked=AptCur.IsNewPatient;
@@ -2397,6 +2408,22 @@ namespace OpenDental{
 		///<summary>Called from butOK_Click and butPin_Click</summary>
 		private bool UpdateToDB(){
 			DateTime dateTimeAskedToArrive=DateTime.MinValue;
+			if((AptOld.AptStatus==ApptStatus.Complete && comboStatus.SelectedIndex!=1)
+				|| (AptOld.AptStatus==ApptStatus.Broken && comboStatus.SelectedIndex!=4)) //Un-completing or un-breaking the appt.  We must use selectedindex due to AptCur gets updated later UpdateDB()
+			{
+				//If the insurance plans have changed since this appt was completed, warn the user that the historical data will be neutralized.
+				List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+				InsSub sub1=InsSubs.GetSub(PatPlans.GetInsSubNum(listPatPlans,PatPlans.GetOrdinal(PriSecMed.Primary,listPatPlans,PlanList,SubList)),SubList);
+				InsSub sub2=InsSubs.GetSub(PatPlans.GetInsSubNum(listPatPlans,PatPlans.GetOrdinal(PriSecMed.Secondary,listPatPlans,PlanList,SubList)),SubList);
+				if(sub1.PlanNum!=AptCur.InsPlan1 || sub2.PlanNum!=AptCur.InsPlan2) {
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"The current insurance plans for this patient are different than the plans associated to this appointment.  They will be updated to the patient's current insurance plans.  Continue?")) {
+						return false;
+					}
+					//Update the ins plans associated to this appointment so that they're the most accurate at this time.
+					AptCur.InsPlan1=sub1.PlanNum;
+					AptCur.InsPlan2=sub2.PlanNum;
+				}
+			}
 			if(textTimeAskedToArrive.Text!=""){
 				try{
 					dateTimeAskedToArrive=AptCur.AptDateTime.Date+DateTime.Parse(textTimeAskedToArrive.Text).TimeOfDay;
@@ -3111,9 +3138,36 @@ namespace OpenDental{
 				}
 			}
 			else {
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
-					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript,
-					AptCur.AptNum);
+				string logEntryMessage="";
+				if(AptCur.AptStatus==ApptStatus.Complete) {
+					string newCarrierName1=InsPlans.GetCarrierName(AptCur.InsPlan1,PlanList);
+					string newCarrierName2=InsPlans.GetCarrierName(AptCur.InsPlan2,PlanList);
+					string oldCarrierName1=InsPlans.GetCarrierName(AptOld.InsPlan1,PlanList);
+					string oldCarrierName2=InsPlans.GetCarrierName(AptOld.InsPlan2,PlanList);
+					if(AptOld.InsPlan1!=AptCur.InsPlan1) {
+						if(AptCur.InsPlan1==0) {
+							logEntryMessage+="\r\nRemoved "+oldCarrierName1+" for InsPlan1";
+						}
+						else if(AptOld.InsPlan1==0) {
+							logEntryMessage+="\r\nAdded "+newCarrierName1+" for InsPlan1";
+						}
+						else {
+							logEntryMessage+="\r\nChanged "+oldCarrierName1+" to "+newCarrierName1+" for InsPlan1";
+						}
+					}
+					if(AptOld.InsPlan2!=AptCur.InsPlan2) {
+						if(AptCur.InsPlan2==0) {
+							logEntryMessage+="\r\nRemoved "+oldCarrierName2+" for InsPlan2";
+						}
+						else if(AptOld.InsPlan2==0) {
+							logEntryMessage+="\r\nAdded "+newCarrierName2+" for InsPlan2";
+						}
+						else {
+							logEntryMessage+="\r\nChanged "+oldCarrierName2+" to "+newCarrierName2+" for InsPlan2";
+						}
+					}
+				}
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
 				sendHL7=true;
 			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined

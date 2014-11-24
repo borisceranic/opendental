@@ -263,6 +263,14 @@ namespace OpenDentBusiness.UI {
 							text=dataRoww["hmPhone"].ToString();
 						}
 						break;
+					case "Insurance":
+						if(isNote) {
+							text="";
+						}
+						else {
+							text=dataRoww["insurance"].ToString();
+						}
+						break;
 					case "InsToSend[!]":
 						text=dataRoww["insToSend[!]"].ToString();
 						break;

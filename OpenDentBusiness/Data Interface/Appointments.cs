@@ -365,6 +365,21 @@ namespace OpenDentBusiness{
 			Crud.AppointmentCrud.Update(appointment,oldAppointment);
 		}
 
+		///<summary>Updates InsPlan1 and InsPlan2 for every appointment that isn't completed, broken, or a patient note for the patient passed in.</summary>
+		public static void UpdateInsPlansForPat(long patNum,long planNum1,long planNum2) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,planNum1,planNum2);
+				return;
+			}
+			string command="UPDATE appointment SET appointment.InsPlan1="+planNum1+",appointment.InsPlan2="+planNum2
+				+" WHERE appointment.AptStatus NOT IN ("+POut.Int((int)ApptStatus.Complete)
+					+","+POut.Int((int)ApptStatus.Broken)
+					+","+POut.Int((int)ApptStatus.PtNote)
+					+","+POut.Int((int)ApptStatus.PtNoteCompleted)+")"
+				+" AND appointment.PatNum="+patNum;
+			Db.NonQ(command);
+		}
+
 		///<summary>Used in Chart module to test whether a procedure is attached to an appointment with today's date. The procedure might have a different date if still TP status.  ApptList should include all appointments for this patient. Does not make a call to db.</summary>
 		public static bool ProcIsToday(Appointment[] apptList,Procedure proc){
 			//No need to check RemotingRole; no call to db.
@@ -1057,12 +1072,12 @@ namespace OpenDentBusiness{
 				row["ImageFolder"]=raw.Rows[i]["patImageFolder"].ToString();
 				row["insurance"]="";
 				if(raw.Rows[i]["carrierName1"].ToString()!="") {
-					row["insurance"]+=raw.Rows[i]["carrierName1"].ToString();
+					row["insurance"]+="Ins1: "+raw.Rows[i]["carrierName1"].ToString();
 					if(raw.Rows[i]["carrierName2"].ToString()!="") {
 						//if(row["insurance"].ToString()!="") {
 						row["insurance"]+="\r\n";
 						//}
-						row["insurance"]+=raw.Rows[i]["carrierName2"].ToString();
+						row["insurance"]+="Ins2: "+raw.Rows[i]["carrierName2"].ToString();
 					}
 				}
 				else if(raw.Rows[i]["hasIns"].ToString()!="0") {

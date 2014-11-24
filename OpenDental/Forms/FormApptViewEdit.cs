@@ -635,6 +635,7 @@ namespace OpenDental{
 			elementsAll.Add("HasIns[I]");
 			elementsAll.Add("HmPhone");
 			elementsAll.Add("InsToSend[!]");
+			elementsAll.Add("Insurance");
 			elementsAll.Add("Lab");
 			elementsAll.Add("MedOrPremed[+]");
 			elementsAll.Add("MedUrgNote");

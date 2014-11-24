@@ -183,6 +183,9 @@ namespace OpenDental{
 		private Label label20;
 		private UI.Button butAudit;
 		private CheckBox checkIsHidden;
+		private bool _hasDropped=false;
+		private bool _hasOrdinalChanged=false;
+		private bool _hasCarrierChanged=false;
 		//<summary>This is a field that is accessed only by clicking on the button because there's not room for it otherwise.  This variable should be treated just as if it was a visible textBox.</summary>
 		//private string BenefitNotes;
 
@@ -3253,6 +3256,7 @@ namespace OpenDental{
 			}
 			PatPlans.Delete(PatPlanCur.PatPlanNum);//Estimates recomputed within Delete()
 			//PlanCur.ComputeEstimatesForCur();
+			_hasDropped=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -4150,6 +4154,7 @@ namespace OpenDental{
 			if(PatPlanCur!=null) {
 				if(PIn.Long(textOrdinal.Text)!=PatPlanCur.Ordinal){//if ordinal changed
 					PatPlanCur.Ordinal=(byte)(PatPlans.SetOrdinal(PatPlanCur.PatPlanNum,PIn.Int(textOrdinal.Text)));
+					_hasOrdinalChanged=true;
 				}
 				PatPlanCur.IsPending=checkIsPending.Checked;
 				PatPlanCur.Relationship=(Relat)comboRelationship.SelectedIndex;
@@ -4325,6 +4330,7 @@ namespace OpenDental{
 			}
 			//Check for changes in the carrier
 			if(PlanCur.CarrierNum!=PlanCurOriginal.CarrierNum) {
+				_hasCarrierChanged=true;
 				long patNum=0;
 				if(PatPlanCur!=null) {//PatPlanCur will be null if editing insurance plans from Lists > Insurance Plans.
 					patNum=PatPlanCur.PatNum;
@@ -4345,6 +4351,20 @@ namespace OpenDental{
 
 		private void FormInsPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
 			if(DialogResult==DialogResult.OK) {
+				if(_hasDropped || _hasOrdinalChanged || _hasCarrierChanged || IsNewPatPlan || IsNewPlan) {
+					List<PatPlan> listPatPlans=PatPlans.Refresh(PatPlanCur.PatNum);
+					InsSub sub1=new InsSub();
+					InsSub sub2=new InsSub();
+					sub1.PlanNum=0;
+					sub2.PlanNum=0;
+					if(listPatPlans.Count>=1) {
+						sub1=InsSubs.GetOne(listPatPlans[0].InsSubNum);
+					}
+					if(listPatPlans.Count>=2) {
+						sub2=InsSubs.GetOne(listPatPlans[1].InsSubNum);
+					}
+					Appointments.UpdateInsPlansForPat(PatPlanCur.PatNum,sub1.PlanNum,sub2.PlanNum);
+				}
 				return;
 			}
 			//So, user cancelled a new entry
