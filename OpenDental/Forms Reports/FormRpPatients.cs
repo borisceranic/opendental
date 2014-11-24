@@ -592,7 +592,7 @@ namespace OpenDental{
 			ALpatFilter.Add("LName"); 
       ALpatFilter.Add("MedUrgNote"); 
       ALpatFilter.Add("MiddleI");
-      ALpatFilter.Add("NextAptNum");
+      //ALpatFilter.Add("NextAptNum");
 			ALpatFilter.Add("PatNum");
       ALpatFilter.Add("PatStatus"); 
       ALpatFilter.Add("Position");  
