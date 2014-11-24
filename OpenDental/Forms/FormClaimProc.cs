@@ -100,7 +100,7 @@ namespace OpenDental
 		private ValidDouble textInsEstTotal;
 		private Label label17;
 		private ValidDouble textInsEstTotalOverride;
-		private ValidNumber textPaidOtherInsOverride;
+		private ValidDouble textPaidOtherInsOverride;
 		private ValidDouble textPatPortion1;
 		private Label labelPatPortion1;
 		private ValidDouble textPatPortion2;
@@ -251,7 +251,7 @@ namespace OpenDental
 			this.label3 = new System.Windows.Forms.Label();
 			this.textPatPortion1 = new OpenDental.ValidDouble();
 			this.labelPatPortion1 = new System.Windows.Forms.Label();
-			this.textPaidOtherInsOverride = new OpenDental.ValidNumber();
+			this.textPaidOtherInsOverride = new OpenDental.ValidDouble();
 			this.textInsEstTotalOverride = new OpenDental.ValidDouble();
 			this.textInsEstTotal = new OpenDental.ValidDouble();
 			this.label17 = new System.Windows.Forms.Label();
