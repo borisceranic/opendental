@@ -348,7 +348,7 @@ namespace OpenDentBusiness{
 			List<bool> pageNamesExist=new List<bool>();
 			if(!isPreviewOnly) {
 				foreach(Match match in matches) {
-					pageNamesToCheck.Add(match.Value.Trim('[',']'));
+					pageNamesToCheck.Add(match.Value.Trim('[',']').Replace("&amp;","&"));  //The '&' was replaced with '&amp;' above, so we change it back before looking for a wiki page with that name.
 				}
 				if(pageNamesToCheck.Count>0) {
 					pageNamesExist=CheckPageNamesExist(pageNamesToCheck);//this gets a list of bools for all pagenames in one shot.  One query.
@@ -357,7 +357,7 @@ namespace OpenDentBusiness{
 			foreach(Match match in matches) {
 				string styleNotExists="";
 				if(!isPreviewOnly) {
-					string pageName=match.Value.Trim('[',']');
+					string pageName=match.Value.Trim('[',']').Replace("&amp;","&");  //The '&' was replaced with '&amp;' above, so we change it back before looking for a wiki page with that name.
 					int idx=pageNamesToCheck.IndexOf(pageName);
 					if(!pageNamesExist[idx]){
 						styleNotExists="class='PageNotExists' ";
