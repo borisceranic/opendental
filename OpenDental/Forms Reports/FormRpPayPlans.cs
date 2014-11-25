@@ -202,7 +202,7 @@ namespace OpenDental
 				row["dueTen"]=(dueTen-paid).ToString("f");
 				table.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(table,"","",SplitByKind.None);
+			QueryObject query=report.AddQuery(table,"","",SplitByKind.None,1,true);
 			query.AddColumn("Guarantor",160,FieldValueType.String);
 			query.AddColumn("Ins",40,FieldValueType.String);
 			query.GetColumnHeader("Ins").TextAlign=ContentAlignment.MiddleCenter;

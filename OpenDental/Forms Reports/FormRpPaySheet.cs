@@ -574,7 +574,10 @@ WHERE 1 "
 			for(int i=0;i<patDefs.Count;i++) {
 				dictPatDefNames.Add(patDefs[i].DefNum,patDefs[i].ItemName);
 			}
-			QueryObject query=report.AddQuery(tableIns,"Insurance Payments","PayType",SplitByKind.Definition,dictInsDefNames);
+			int[] summaryGroups1= { 1 };
+			int[] summaryGroups2= { 2 };
+			int[] summaryGroups3= { 1,2 };
+			QueryObject query=report.AddQuery(tableIns,"Insurance Payments","PayType",SplitByKind.Definition,1,true,dictInsDefNames);
 			query.AddColumn("Date",90,FieldValueType.Date);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").FormatString="d";
@@ -584,7 +587,8 @@ WHERE 1 "
 			query.AddColumn("Clinic",120,FieldValueType.String);
 			query.AddColumn("Check#",75,FieldValueType.String);
 			query.AddColumn("Amount",90,FieldValueType.Number);
-			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,dictPatDefNames);
+			query.AddGroupSummaryField(Color.Black,"Total Insurance Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),-20,50);
+			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,2,true,dictPatDefNames);
 			query.AddColumn("Date",90,FieldValueType.Date);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").FormatString="d";
@@ -593,8 +597,9 @@ WHERE 1 "
 			query.AddColumn("Clinic",120,FieldValueType.String);
 			query.AddColumn("Check#",75,FieldValueType.String);
 			query.AddColumn("Amount",90,FieldValueType.Number);
+			query.AddGroupSummaryField(Color.Black,"Total Patient Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),-20,30);
+			query.AddGroupSummaryField(Color.Black,"Total All Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups3),-20,70);
 			report.AddPageNum();
-			report.AddReportSummaryField(Color.Black,"Total All Payments","amt",SummaryOperation.Sum,560,50);
 			report.AddGridLines();
 			if(!report.SubmitQueries()) {
 				return;

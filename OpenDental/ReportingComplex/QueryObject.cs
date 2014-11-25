@@ -24,6 +24,11 @@ namespace OpenDental.ReportingComplex {
 		private List<string> _enumNames;
 		private Dictionary<long,string> _dictDefNames;
 		private SplitByKind _splitByKind;
+		private int _queryGroupValue;
+		private int _queryWidth;
+		private bool _isCentered;
+		private bool _suppressHeaders;
+		private bool _isLastSplit;
 		public bool IsPrinted;
 
 		public SectionCollection Sections {
@@ -57,7 +62,7 @@ namespace OpenDental.ReportingComplex {
 				return _reportTable;
 			}
 			set {
-				_reportTable=ReportTable;
+				_reportTable=value;
 			}
 		}
 
@@ -84,7 +89,52 @@ namespace OpenDental.ReportingComplex {
 				return _rowHeights;
 			}
 			set {
-				_rowHeights=RowHeights;
+				_rowHeights=value;
+			}
+		}
+
+		public int QueryGroup {
+			get {
+				return _queryGroupValue;
+			}
+			set {
+				_queryGroupValue=value;
+			}
+		}
+
+		public bool IsCentered {
+			get {
+				return _isCentered;
+			}
+			set {
+				_isCentered=value;
+			}
+		}
+
+		public int QueryWidth {
+			get {
+				return _queryWidth;
+			}
+			set {
+				_queryWidth=value;
+			}
+		}
+
+		public bool SuppressHeaders {
+			get {
+				return _suppressHeaders;
+			}
+			set {
+				_suppressHeaders=value;
+			}
+		}
+
+		public bool IsLastSplit {
+			get {
+				return _isLastSplit;
+			}
+			set {
+				_isLastSplit=value;
 			}
 		}
 
@@ -92,7 +142,7 @@ namespace OpenDental.ReportingComplex {
 		public QueryObject() {
 		}
 
-		public QueryObject(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,List<string> enumNames,Dictionary<long,string> dictDefNames) {
+		public QueryObject(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Dictionary<long,string> dictDefNames) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_query=query;
@@ -101,6 +151,8 @@ namespace OpenDental.ReportingComplex {
 			_splitByKind=splitByKind;
 			_enumNames=enumNames;
 			_dictDefNames=dictDefNames;
+			_queryGroupValue=queryGroup;
+			_isCentered=isCentered;
 			ObjectKind=ReportObjectKind.QueryObject;
 			_sections.Add(new Section(AreaSectionKind.GroupTitle,0));
 			Font font=new Font("Tahoma",14);
@@ -109,10 +161,13 @@ namespace OpenDental.ReportingComplex {
 			_sections.Add(new Section(AreaSectionKind.GroupHeader,0));
 			_sections.Add(new Section(AreaSectionKind.Detail,0));
 			_sections.Add(new Section(AreaSectionKind.GroupFooter,0));
+			_queryWidth=0;
+			_suppressHeaders=true;
+			_isLastSplit=true;
 			grfx.Dispose();
 		}
 
-		public QueryObject(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,List<string> enumNames,Dictionary<long,string> dictDefNames) {
+		public QueryObject(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Dictionary<long,string> dictDefNames) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_reportTable=query;
@@ -121,6 +176,8 @@ namespace OpenDental.ReportingComplex {
 			_splitByKind=splitByKind;
 			_enumNames=enumNames;
 			_dictDefNames=dictDefNames;
+			_queryGroupValue=queryGroup;
+			_isCentered=isCentered;
 			ObjectKind=ReportObjectKind.QueryObject;
 			_sections.Add(new Section(AreaSectionKind.GroupTitle,0));
 			Font font=new Font("Tahoma",14);
@@ -129,14 +186,19 @@ namespace OpenDental.ReportingComplex {
 			_sections.Add(new Section(AreaSectionKind.GroupHeader,0));
 			_sections.Add(new Section(AreaSectionKind.Detail,0));
 			_sections.Add(new Section(AreaSectionKind.GroupFooter,0));
+			_queryWidth=0;
+			_suppressHeaders=true;
+			_isLastSplit=true;
 			grfx.Dispose();
 		}
 
-		public QueryObject(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind):this(query,title,columnNameToSplitOn,splitByKind,null,null) {
+		public QueryObject(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered)
+			: this(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,null) {
 			
 		}
 
-		public QueryObject(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind):this(query,title,columnNameToSplitOn,splitByKind,null,null) {
+		public QueryObject(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered)
+			: this(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,null) {
 			
 		}
 
@@ -160,9 +222,10 @@ namespace OpenDental.ReportingComplex {
 			if(valueType==FieldValueType.Date) {
 				formatString="d";
 			}
+			_queryWidth+=width;
 			//add textobject for column header
 			font=new System.Drawing.Font("Tahoma",8,System.Drawing.FontStyle.Bold);
-			size=new Size((int)(grfx.MeasureString(dataField,font,width).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(dataField,font,width).Height/grfx.DpiY*100+2));
+			size=new Size((int)grfx.MeasureString(dataField,font,(int)(width/grfx.DpiX*100+2)).Width,(int)grfx.MeasureString(dataField,font,(int)(width/grfx.DpiY*100+2)).Height);
 			int xPos=0;
 			//find next available xPos
 			foreach(ReportObject reportObject in _reportObjects) {
@@ -194,12 +257,84 @@ namespace OpenDental.ReportingComplex {
 			return;
 		}
 
+		///<summary>Add a label to a summaryfield based on the orientation given.</summary>
+		public void AddSummaryLabel(string dataField,string summaryText,SummaryOrientation orientation,bool hasWordWrap) {
+			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
+			ReportObject summaryField=GetObjectByName(dataField+"Footer");
+			Size size;
+			if(hasWordWrap) {
+				size=new Size(summaryField.Size.Width,(int)(grfx.MeasureString(summaryText,summaryField.Font,summaryField.Size.Width).Height/grfx.DpiY*100+2));
+			}
+			else {
+				size=new Size((int)(grfx.MeasureString(summaryText,summaryField.Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(summaryText,summaryField.Font).Height/grfx.DpiY*100+2));
+			}
+			if(orientation==SummaryOrientation.North) {
+				ReportObject summaryLabel=new ReportObject(dataField+"Label","Group Footer"
+						,summaryField.Location
+						,size
+						,summaryText
+						,summaryField.Font
+						,summaryField.TextAlign);
+				summaryLabel.DataField=dataField;
+				summaryLabel.SummaryOrientation=orientation;
+				_reportObjects.Insert(_reportObjects.IndexOf(summaryField),summaryLabel);
+			}
+			else if(orientation==SummaryOrientation.South) {
+				ReportObject summaryLabel=new ReportObject(dataField+"Label","Group Footer"
+						,summaryField.Location
+						,size
+						,summaryText
+						,summaryField.Font
+						,summaryField.TextAlign);
+				summaryLabel.DataField=dataField;
+				summaryLabel.SummaryOrientation=orientation;
+				_reportObjects.Add(summaryLabel);
+			}
+			else if(orientation==SummaryOrientation.West) {
+				ReportObject summaryLabel=new ReportObject(dataField+"Label","Group Footer"
+						,new Point(summaryField.Location.X-size.Width)
+						,size
+						,summaryText
+						,summaryField.Font
+						,summaryField.TextAlign);
+				summaryLabel.DataField=dataField;
+				summaryLabel.SummaryOrientation=orientation;
+				_reportObjects.Insert(_reportObjects.IndexOf(summaryField),summaryLabel);
+			}
+			else {
+				ReportObject summaryLabel=new ReportObject(dataField+"Label","Group Footer"
+						,new Point(summaryField.Location.X+size.Width+summaryField.Size.Width)
+						,size
+						,summaryText
+						,summaryField.Font
+						,summaryField.TextAlign);
+				summaryLabel.DataField=dataField;
+				summaryLabel.SummaryOrientation=orientation;
+				_reportObjects.Insert(_reportObjects.IndexOf(summaryField)+1,summaryLabel);
+			}
+			grfx.Dispose();
+		}
+
 		///<summary>Do not use. Only used when splitting a table on a column.</summary>
 		public void AddInitialHeader(string title,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			Font newFont=new Font(font.FontFamily,font.Size+2,font.Style);
 			_reportObjects.Insert(0,new ReportObject("Initial Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,newFont).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,newFont).Height/grfx.DpiY*100+2)),title,newFont,ContentAlignment.MiddleLeft));
 			_reportObjects["Initial Group Title"].IsUnderlined=true;
+			grfx.Dispose();
+		}
+
+		public void AddGroupSummaryField(Color color,string staticText,string columnName,string dataFieldName,SummaryOperation operation,List<int> queryGroups,int offSetX,int offSetY) {
+			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
+			Point location=GetObjectByName(columnName+"Header").Location;
+			Size labelSize=new Size((int)(grfx.MeasureString(staticText,new Font("Tahoma",9,FontStyle.Bold)).Width/grfx.DpiX*100+2)
+				,(int)(grfx.MeasureString(staticText,new Font("Tahoma",9,FontStyle.Bold)).Height/grfx.DpiY*100+2));
+			int i=_reportObjects.Add(new ReportObject("GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,new Font("Tahoma",9,FontStyle.Bold),ContentAlignment.MiddleLeft,offSetX,offSetY));
+			_reportObjects[i].DataField=dataFieldName;
+			_reportObjects[i].SummaryGroups=queryGroups;
+			_sections["Group Footer"].Height+=(int)((grfx.MeasureString(staticText,new Font("Tahoma",9,FontStyle.Bold))).Height/grfx.DpiY*100+2)+offSetY;
+			i=_reportObjects.Add(new ReportObject("GroupSummaryText","Group Footer",location,new Size(0,0),color,dataFieldName,operation,offSetX,offSetY));
+			_reportObjects[i].SummaryGroups=queryGroups;
 			grfx.Dispose();
 		}
 
@@ -238,7 +373,7 @@ namespace OpenDental.ReportingComplex {
 						List<string> listString=GetDisplayString(rawText,prevDisplayText,reportObject,i);
 						displayText=listString[0];
 						prevDisplayText=listString[1];
-						int curCellHeight=(int)(g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width/g.DpiX*100+2),ReportObject.GetStringFormatAlignment(reportObject.TextAlign))).Height;
+						int curCellHeight=(int)(g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),ReportObject.GetStringFormatAlignment(reportObject.TextAlign))).Height;
 						if(curCellHeight>rowHeight) {
 							rowHeight=curCellHeight;
 						}
@@ -338,6 +473,16 @@ namespace OpenDental.ReportingComplex {
 			queryObj.ObjectKind=this.ObjectKind;//Doesn't need to be a deep copy.
 			queryObj._sections=this._sections;//Doesn't need to be a deep copy.
 			queryObj._dataFields=this._dataFields;//Doesn't need to be a deep copy.
+			queryObj._queryGroupValue=this._queryGroupValue;//Doesn't need to be a deep copy.
+			queryObj._isCentered=this._isCentered;//Doesn't need to be a deep copy.
+			queryObj._queryWidth=this._queryWidth;//Doesn't need to be a deep copy.
+			queryObj._suppressHeaders=this._suppressHeaders;//Doesn't need to be a deep copy.
+			queryObj._columnNameToSplitOn=this._columnNameToSplitOn;//Doesn't need to be a deep copy.
+			queryObj._splitByKind=this._splitByKind;//Doesn't need to be a deep copy.
+			queryObj.IsPrinted=this.IsPrinted;//Doesn't need to be a deep copy.
+			queryObj.SummaryOrientation=this.SummaryOrientation;//Doesn't need to be a deep copy.
+			queryObj.SummaryGroups=this.SummaryGroups;//Doesn't need to be a deep copy.
+			queryObj._isLastSplit=this._isLastSplit;//Doesn't need to be a deep copy.
 			queryObj._rowHeights=new List<int>();
 			for(int i=0;i<this._rowHeights.Count;i++) {
 				queryObj._rowHeights.Add(this._rowHeights[i]);
@@ -347,7 +492,6 @@ namespace OpenDental.ReportingComplex {
 				reportObjectsNew.Add(_reportObjects[i].DeepCopyReportObject());
 			}
 			queryObj._reportObjects=reportObjectsNew;
-			queryObj._columnNameToSplitOn=_columnNameToSplitOn;
 			//queryObj._query=this._query;
 			queryObj._reportTable=new DataTable();
 			//We only care about column headers at this point.  There is no easy way to copy an entire DataTable.
@@ -368,8 +512,6 @@ namespace OpenDental.ReportingComplex {
 				}
 			}
 			queryObj._dictDefNames=defNamesNew;
-			queryObj._splitByKind=this._splitByKind;
-			queryObj.IsPrinted=this.IsPrinted;
 			return queryObj;
 		}
 

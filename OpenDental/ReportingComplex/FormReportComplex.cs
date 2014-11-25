@@ -677,6 +677,14 @@ namespace OpenDental.ReportingComplex
 					if(queryObject.IsPrinted==true) {
 						continue;
 					}
+					if(queryObject.IsCentered) {
+						if(MyReport.IsLandscape) {
+							xPos=1100/2-(queryObject.QueryWidth/2);
+						}
+						else {
+							xPos=850/2-(queryObject.QueryWidth/2);
+						}
+					}
 					if(_heightRemaining>0) {
 						PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Title"],xPos,yPos);
 						yPos+=queryObject.Sections["Group Title"].Height;
@@ -716,7 +724,9 @@ namespace OpenDental.ReportingComplex
 			string prevDisplayText="";//The formatted text of the previous row. Used to test suppress dupl.	
 			StringFormat strFormat;//used each time text is drawn to handle alignment issues
 			int yPosAdd=0;
-			if(section.Kind==AreaSectionKind.GroupTitle && rowsPrinted>0) {
+			if(queryObj.SuppressIfDuplicate
+				&& section.Kind==AreaSectionKind.GroupTitle && rowsPrinted>0) 
+			{
 				return;//Only print the group title for each query object once.
 			}
 			//loop through each row in the table and make sure that the row can fit.  If it can fit, print it.  Otherwise go to next page.
@@ -745,7 +755,7 @@ namespace OpenDental.ReportingComplex
 					}
 				}
 				int greatestObjectHeight=0;
-				int summaryHeight=0;
+				int groupTitleHeight=0;
 				//Now figure out if anything in the header, footer, or title sections can still fit on the page
 				foreach(ReportObject reportObject in queryObj.ReportObjects) {
 					if(reportObject.Size.Height>_heightRemaining) {
@@ -755,11 +765,28 @@ namespace OpenDental.ReportingComplex
 					if(reportObject.SectionName!=section.Name) {
 						continue;
 					}
+					if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummary")) {
+						if(!queryObj.IsLastSplit) {
+							continue;
+						}
+						if(reportObject.Name=="GroupSummaryText") {
+							reportObject.StaticText=GetGroupSummaryValue(reportObject.SummarizedField,reportObject.SummaryGroups,reportObject.Operation).ToString("c");
+							reportObject.Size=new Size((int)g.MeasureString(reportObject.StaticText,reportObject.Font).Width+2,(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Height+2);
+							yPosAdd+=reportObject.OffSetY;
+						}
+					}
+					if(section.Name=="Group Title" && rowsPrinted>0 && reportObject.Name=="Initial Group Title") {
+						continue;
+					}
+					if(section.Name=="Group Footer" && reportObject.SummaryOrientation==SummaryOrientation.South) {
+						ReportObject summaryField=queryObj.GetObjectByName(reportObject.DataField+"Footer");
+						yPos+=summaryField.Size.Height;
+					}
 					if(reportObject.ObjectKind==ReportObjectKind.TextObject) {
 						textObject=reportObject;
 						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
-						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
-							,yPos+textObject.Location.Y
+						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X+textObject.OffSetX
+							,yPos+textObject.Location.Y+textObject.OffSetY
 							,textObject.Size.Width,textObject.Size.Height);
 						if(textObject.IsUnderlined) {
 							g.DrawString(textObject.StaticText,new Font(textObject.Font.FontFamily,textObject.Font.Size,textObject.Font.Style|FontStyle.Underline),Brushes.Black,layoutRect,strFormat);
@@ -770,8 +797,14 @@ namespace OpenDental.ReportingComplex
 						if(greatestObjectHeight<textObject.Size.Height) {
 							greatestObjectHeight=textObject.Size.Height;
 						}
-						summaryHeight+=textObject.Size.Height;
+						groupTitleHeight+=textObject.Size.Height;
 						if(section.Name=="Group Title") {
+							yPos+=textObject.Size.Height;
+						}
+						if(section.Name=="Group Footer" 
+							&& reportObject.SummaryOrientation==SummaryOrientation.North 
+							|| reportObject.SummaryOrientation==SummaryOrientation.South) 
+						{
 							yPos+=textObject.Size.Height;
 						}
 					}
@@ -791,7 +824,7 @@ namespace OpenDental.ReportingComplex
 						if(greatestObjectHeight<boxObject.Size.Height) {
 							greatestObjectHeight=boxObject.Size.Height;
 						}
-						summaryHeight+=boxObject.Size.Height;
+						groupTitleHeight+=boxObject.Size.Height;
 					}
 					else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
 						lineObject=reportObject;
@@ -839,16 +872,17 @@ namespace OpenDental.ReportingComplex
 						if(greatestObjectHeight<lineObject.Size.Height) {
 							greatestObjectHeight=lineObject.Size.Height;
 						}
-						summaryHeight+=lineObject.Size.Height;
+						groupTitleHeight+=lineObject.Size.Height;
 					}
 					else if(reportObject.ObjectKind==ReportObjectKind.FieldObject) {
 						fieldObject=reportObject;
+						RectangleF layoutRect;
 						strFormat=ReportObject.GetStringFormatAlignment(fieldObject.TextAlign);
-						RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeights[i]);
-						if(MyReport.HasGridLines()) {
-							g.DrawRectangle(new Pen(Brushes.LightGray),Rectangle.Round(layoutRect));
-						}
 						if(fieldObject.FieldKind==FieldDefKind.DataTableField) {
+							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeights[i]);
+							if(MyReport.HasGridLines()) {
+								g.DrawRectangle(new Pen(Brushes.LightGray),Rectangle.Round(layoutRect));
+							}
 							rawText=queryObj.ReportTable.Rows
 								[i][queryObj.DataFields.IndexOf(fieldObject.DataField)].ToString();
 							displayText=rawText;
@@ -861,6 +895,7 @@ namespace OpenDental.ReportingComplex
 							}
 						}
 						else {
+							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,fieldObject.Size.Height);
 							displayText=fieldObject.GetSummaryValue(queryObj.ReportTable,queryObj.DataFields.IndexOf(fieldObject.SummarizedField)).ToString(fieldObject.FormatString);
 						}
 						g.DrawString(displayText,fieldObject.Font
@@ -875,7 +910,7 @@ namespace OpenDental.ReportingComplex
 					break;
 				}
 				else if(section.Kind==AreaSectionKind.GroupTitle) {
-					section.Height+=summaryHeight;
+					section.Height+=groupTitleHeight;
 					_heightRemaining-=section.Height;
 					break;
 				}
@@ -895,6 +930,30 @@ namespace OpenDental.ReportingComplex
 				rowsPrinted=0;
 				queryObj.IsPrinted=true;
 			}
+		}
+
+		private double GetGroupSummaryValue(string columnName,List<int> summaryGroups,SummaryOperation operation) {
+			double retVal=0;
+			for(int i=0;i<MyReport.ReportObjects.Count;i++) {
+				if(MyReport.ReportObjects[i].ObjectKind!=ReportObjectKind.QueryObject) {
+					continue;
+				}
+				QueryObject queryObj=(QueryObject)MyReport.ReportObjects[i];
+				if(!summaryGroups.Contains(queryObj.QueryGroup)) {
+					continue;
+				}
+				for(int j=0;j<queryObj.ReportTable.Rows.Count;j++) {
+					if(operation==SummaryOperation.Sum) {
+						//This could be enhanced in the future to only sum up the cells that match the column name within the current query group.
+						//Right now, if multiple query groups share the same column name that is being summed, the total will include both sets.
+						retVal+=PIn.Double(queryObj.ReportTable.Rows[j][queryObj.ReportTable.Columns.IndexOf(columnName)].ToString());
+					}
+					else if(operation==SummaryOperation.Count) {
+						retVal++;
+					}
+				}
+			}
+			return retVal;
 		}
 
 		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i,QueryObject queryObj) {

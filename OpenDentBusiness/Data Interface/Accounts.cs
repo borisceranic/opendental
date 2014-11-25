@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Windows.Forms;
 
 namespace OpenDentBusiness{
-	
+
 	public class Accounts {
 		private static Account[] listLong;
 		private static Account[] listShort;
@@ -51,11 +51,11 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
-		private static void FillCache(DataTable table){
+		private static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
 			listLong=Crud.AccountCrud.TableToList(table).ToArray();
 			List<Account> list=new List<Account>();
-			for(int i=0;i<listLong.Length;i++){
+			for(int i=0;i<listLong.Length;i++) {
 				if(!listLong[i].Inactive) {
 					list.Add(listLong[i].Clone());
 				}
@@ -82,13 +82,13 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Loops through listLong to find a description for the specified account.  0 returns an empty string.</summary>
-		public static string GetDescript(long accountNum){
+		public static string GetDescript(long accountNum) {
 			//No need to check RemotingRole; no call to db.
 			if(accountNum==0) {
 				return "";
 			}
-			for(int i=0;i<ListLong.Length;i++){
-				if(ListLong[i].AccountNum==accountNum){
+			for(int i=0;i<ListLong.Length;i++) {
+				if(ListLong[i].AccountNum==accountNum) {
 					return ListLong[i].Description;
 				}
 			}
@@ -98,7 +98,7 @@ namespace OpenDentBusiness{
 		///<summary>Loops through listLong to find an account.  Will return null if accountNum is 0.</summary>
 		public static Account GetAccount(long accountNum) {
 			//No need to check RemotingRole; no call to db.
-			if(accountNum==0){
+			if(accountNum==0) {
 				return null;
 			}
 			for(int i=0;i<ListLong.Length;i++) {
@@ -117,16 +117,16 @@ namespace OpenDentBusiness{
 			}
 			//check to see if account has any journal entries
 			string command="SELECT COUNT(*) FROM journalentry WHERE AccountNum="+POut.Long(acct.AccountNum);
-			if(Db.GetCount(command)!="0"){
+			if(Db.GetCount(command)!="0") {
 				throw new ApplicationException(Lans.g("FormAccountEdit",
 					"Not allowed to delete an account with existing journal entries."));
 			}
 			//Check various preference entries
 			command="SELECT ValueString FROM preference WHERE PrefName='AccountingDepositAccounts'";
 			string result=Db.GetCount(command);
-			string[] strArray=result.Split(new char[] {','});
-			for(int i=0;i<strArray.Length;i++){
-				if(strArray[i]==acct.AccountNum.ToString()){
+			string[] strArray=result.Split(new char[] { ',' });
+			for(int i=0;i<strArray.Length;i++) {
+				if(strArray[i]==acct.AccountNum.ToString()) {
 					throw new ApplicationException(Lans.g("FormAccountEdit","Account is in use in the setup section."));
 				}
 			}
@@ -141,10 +141,10 @@ namespace OpenDentBusiness{
 				throw new ApplicationException(Lans.g("FormAccountEdit","Account is in use in the setup section."));
 			}
 			//check AccountingAutoPay entries
-			for(int i=0;i<AccountingAutoPays.Listt.Count;i++){
+			for(int i=0;i<AccountingAutoPays.Listt.Count;i++) {
 				strArray=AccountingAutoPays.Listt[i].PickList.Split(new char[] { ',' });
-				for(int s=0;s<strArray.Length;s++){
-					if(strArray[s]==acct.AccountNum.ToString()){
+				for(int s=0;s<strArray.Length;s++) {
+					if(strArray[s]==acct.AccountNum.ToString()) {
 						throw new ApplicationException(Lans.g("FormAccountEdit","Account is in use in the setup section."));
 					}
 				}
@@ -154,9 +154,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used to test the sign on debits and credits for the five different account types</summary>
-		public static bool DebitIsPos(AccountType type){
+		public static bool DebitIsPos(AccountType type) {
 			//No need to check RemotingRole; no call to db.
-			switch(type){
+			switch(type) {
 				case AccountType.Asset:
 				case AccountType.Expense:
 					return true;
@@ -179,14 +179,14 @@ namespace OpenDentBusiness{
 			DataTable table=Db.GetTable(command);
 			double debit=0;
 			double credit=0;
-			if(table.Rows.Count>0){
+			if(table.Rows.Count>0) {
 				debit=PIn.Double(table.Rows[0][0].ToString());
 				credit=PIn.Double(table.Rows[0][1].ToString());
 			}
-			if(DebitIsPos(acctType)){
+			if(DebitIsPos(acctType)) {
 				return debit-credit;
 			}
-			else{
+			else {
 				return credit-debit;
 			}
 			/*}
@@ -198,7 +198,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Checks the loaded prefs to see if user has setup deposit linking.  Returns true if so.</summary>
-		public static bool DepositsLinked(){
+		public static bool DepositsLinked() {
 			//No need to check RemotingRole; no call to db.
 			if(PrefC.GetInt(PrefName.AccountingSoftware)==(int)AccountingSoftware.QuickBooks) {
 				if(PrefC.GetString(PrefName.QuickBooksDepositAccounts)=="") {
@@ -223,7 +223,7 @@ namespace OpenDentBusiness{
 		///<summary>Checks the loaded prefs and accountingAutoPays to see if user has setup auto pay linking.  Returns true if so.</summary>
 		public static bool PaymentsLinked() {
 			//No need to check RemotingRole; no call to db.
-			if(AccountingAutoPays.Listt.Count==0){
+			if(AccountingAutoPays.Listt.Count==0) {
 				return false;
 			}
 			if(PrefC.GetLong(PrefName.AccountingCashIncomeAccount)==0) {
@@ -234,7 +234,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static long[] GetDepositAccounts(){
+		public static long[] GetDepositAccounts() {
 			//No need to check RemotingRole; no call to db.
 			string depStr=PrefC.GetString(PrefName.AccountingDepositAccounts);
 			string[] depStrArray=depStr.Split(new char[] { ',' });
@@ -281,7 +281,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
-		public static DataTable GetFullList(DateTime asOfDate, bool showInactive){
+		public static DataTable GetFullList(DateTime asOfDate,bool showInactive) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),asOfDate,showInactive);
 			}
@@ -303,7 +303,7 @@ namespace OpenDentBusiness{
 				+"FROM account "
 				+"LEFT JOIN journalentry ON journalentry.AccountNum=account.AccountNum AND "
 				+"DateDisplayed <= "+POut.Date(asOfDate)+" WHERE AcctType<=2 ";
-			if(!showInactive){
+			if(!showInactive) {
 				command+="AND Inactive=0 ";
 			}
 			command+="GROUP BY account.AccountNum, account.AcctType, account.Description, account.BankNumber,"
@@ -312,7 +312,7 @@ namespace OpenDentBusiness{
 			AccountType aType;
 			decimal debit=0;
 			decimal credit=0;
-			for(int i=0;i<rawTable.Rows.Count;i++){
+			for(int i=0;i<rawTable.Rows.Count;i++) {
 				row=table.NewRow();
 				aType=(AccountType)PIn.Long(rawTable.Rows[i]["AcctType"].ToString());
 				row["type"]=Lans.g("enumAccountType",aType.ToString());
@@ -326,10 +326,10 @@ namespace OpenDentBusiness{
 					row["balance"]=(credit-debit).ToString("N");
 				}
 				row["BankNumber"]=rawTable.Rows[i]["BankNumber"].ToString();
-				if(rawTable.Rows[i]["Inactive"].ToString()=="0"){
+				if(rawTable.Rows[i]["Inactive"].ToString()=="0") {
 					row["inactive"]="";
 				}
-				else{
+				else {
 					row["inactive"]="X";
 				}
 				row["color"]=rawTable.Rows[i]["AccountColor"].ToString();//it will be an unsigned int at this point.
@@ -346,7 +346,7 @@ namespace OpenDentBusiness{
 				+"GROUP BY AcctType ORDER BY AcctType";//income first, but could return zero rows.
 			rawTable=Db.GetTable(command);
 			decimal balance=0;
-			for(int i=0;i<rawTable.Rows.Count;i++){
+			for(int i=0;i<rawTable.Rows.Count;i++) {
 				aType=(AccountType)PIn.Long(rawTable.Rows[i]["AcctType"].ToString());
 				debit=PIn.Decimal(rawTable.Rows[i]["SumDebit"].ToString());
 				credit=PIn.Decimal(rawTable.Rows[i]["SumCredit"].ToString());
@@ -405,6 +405,18 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
+		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
+		public static DataTable GetEquityTable(DateTime asOfDate) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),asOfDate);
+			}
+			string queryEquity="SELECT Description, SUM(CreditAmt-DebitAmt) SumTotal, AcctType "
+        +"FROM account, journalentry "
+        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(asOfDate)+" AND AcctType=2 "
+        +"GROUP BY account.AccountNum "
+        +"ORDER BY Description, DateDisplayed ";
+			return Db.GetTable(queryEquity);
+		}
 	}
 
 	

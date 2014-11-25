@@ -18,7 +18,6 @@ namespace OpenDental.ReportingComplex {
 		private ParameterFieldCollection _parameterFields=new ParameterFieldCollection();
 		private bool _isLandscape;
 		private bool _hasGridLines;
-		private bool _hasReportSummary;
 		private string _reportName;
 		private string _description;
 		private string _authorID;
@@ -69,16 +68,6 @@ namespace OpenDental.ReportingComplex {
 			}
 			set{
 				_isLandscape=value;
-			}
-		}
-
-		///<summary></summary>
-		public bool HasReportSummary {
-			get {
-				return _hasReportSummary;
-			}
-			set {
-				_hasReportSummary=value;
 			}
 		}
 		///<summary>The name to display in the menu.</summary>
@@ -207,38 +196,38 @@ namespace OpenDental.ReportingComplex {
 			_sections["Report Header"].Height+=(int)size.Height+5;
 		}
 
-		public QueryObject AddQuery(string query,string title,string tableFromColumn,SplitByKind splitByKind) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind);
+		public QueryObject AddQuery(string query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,string tableFromColumn,SplitByKind splitByKind,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,enumNames,null);
+		public QueryObject AddQuery(string query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
+			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string tableFromColumn,SplitByKind splitByKind) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind);
+		public QueryObject AddQuery(DataTable query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string tableFromColumn,SplitByKind splitByKind,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,enumNames,null);
+		public QueryObject AddQuery(DataTable query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
+			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,string tableFromColumn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,null,dictDefNames);
+		public QueryObject AddQuery(string query,string title,string tableFromColumn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
+			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,queryGroup,isCentered,null,dictDefNames);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string tableFromColumn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,null,dictDefNames);
+		public QueryObject AddQuery(DataTable query,string title,string tableFromColumn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
+			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,queryGroup,isCentered,null,dictDefNames);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
@@ -251,14 +240,6 @@ namespace OpenDental.ReportingComplex {
 		/// <summary></summary>
 		public void AddBox(string name,string sectionName,Color color,float lineThickness,int offSetX,int offSetY) {
 			_reportObjects.Add(new ReportObject(name,sectionName,color,lineThickness,offSetX,offSetY));
-		}
-
-		public void AddReportSummaryField(Color color,string staticText,string dataFieldName,SummaryOperation operation,int offSetX,int offSetY) {
-			_hasReportSummary=true;
-			_reportObjects.Add(new ReportObject("ReportSummaryLabel","Report Footer",new Point(0,0),new Size((int)(_grfx.MeasureString(staticText,new Font("Tahoma",9)).Width/_grfx.DpiX*100+2)
-				,(int)(_grfx.MeasureString(staticText,new Font("Tahoma",9)).Height/_grfx.DpiY*100+2)),staticText,new Font("Tahoma",9),ContentAlignment.MiddleLeft,offSetX,offSetY));
-			_sections["Report Footer"].Height+=(int)((_grfx.MeasureString(staticText,new Font("Tahoma",9))).Height/_grfx.DpiY*100+2)+offSetY;
-			_reportObjects.Add(new ReportObject("ReportSummaryText","Report Footer",color,dataFieldName,operation,offSetX,offSetY));
 		}
 
 		public ReportObject GetObjectByName(string name){
@@ -362,10 +343,11 @@ namespace OpenDental.ReportingComplex {
 						continue;
 					}
 					//Check if the query needs to be split up into sub queries.  E.g. one payment report query split up via payment type.
-					if(!String.IsNullOrWhiteSpace(query.ColumnNameToSplitOn)) {
+					if(!String.IsNullOrWhiteSpace(query.ColumnNameToSplitOn)) { 
 						//The query needs to be split up into sub queries every time the ColumnNameToSplitOn cell changes.  
 						//Therefore, we need to create a separate QueryObject for every time the cell value changes.
 						string lastCellValue="";
+						query.IsLastSplit=false;
 						QueryObject newQuery=null;
 						for(int j=0;j<query.ReportTable.Rows.Count;j++) {
 							if(query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString()!=lastCellValue) {
@@ -397,6 +379,9 @@ namespace OpenDental.ReportingComplex {
 											break;
 										case SplitByKind.Date:
 											newQuery.GetGroupTitle().StaticText=PIn.Date(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()).ToShortDateString();
+											break;
+										case SplitByKind.Value:
+											newQuery.GetGroupTitle().StaticText=newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString();
 											break;
 									}
 									newQuery.SubmitQuery();
@@ -444,8 +429,12 @@ namespace OpenDental.ReportingComplex {
 							case SplitByKind.Date:
 								newQuery.GetGroupTitle().StaticText=PIn.Date(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()).ToShortDateString();
 								break;
+							case SplitByKind.Value:
+								newQuery.GetGroupTitle().StaticText=newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString();
+								break;
 						}
 						newQuery.SubmitQuery();
+						newQuery.IsLastSplit=true;
 						newReportObjects.Add(newQuery);
 					}
 					else {
@@ -457,13 +446,6 @@ namespace OpenDental.ReportingComplex {
 				}
 			}
 			_reportObjects=newReportObjects;
-			if(_hasReportSummary) {
-				for(int i=0;i<_reportObjects.Count;i++) {
-					if(_reportObjects[i].SectionName=="Report Footer" && _reportObjects[i].FieldKind==FieldDefKind.SummaryField) {
-						_reportObjects[i].StaticText=GetReportSummaryValue(_reportObjects[i].SummarizedField,_reportObjects[i].Operation).ToString("c");
-					}
-				}
-			}
 			return true;
 		}
 
@@ -479,26 +461,6 @@ namespace OpenDental.ReportingComplex {
 			return _hasGridLines;
 		}
 
-		private double GetReportSummaryValue(string columnName,SummaryOperation operation) {
-			double retVal=0;
-			for(int i=0;i<_reportObjects.Count;i++) {
-				if(_reportObjects[i].ObjectKind!=ReportObjectKind.QueryObject) {
-					continue;
-				}
-				QueryObject queryObj=(QueryObject)_reportObjects[i];
-				for(int j=0;j<queryObj.ReportTable.Rows.Count;j++) {
-					if(operation==SummaryOperation.Sum) {
-						//This could be enhanced in the future to only sum up the cells that match the column name within the current query group.
-						//Right now, if multiple query groups share the same column name that is being summed, the total will include both sets.
-						retVal+=PIn.Double(queryObj.ReportTable.Rows[j][queryObj.ReportTable.Columns.IndexOf(columnName)].ToString());
-					}
-					else if(operation==SummaryOperation.Count) {
-						retVal++;
-					}
-				}
-			}
-			return retVal;
-		}
 
 		
 

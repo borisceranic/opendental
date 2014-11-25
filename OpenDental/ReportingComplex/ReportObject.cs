@@ -3,6 +3,7 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.ReportingComplex {
 	///<summary>There is one ReportObject for each element of an ODReport that gets printed on the page.  There are many different kinds of reportObjects.</summary>
@@ -33,6 +34,8 @@ namespace OpenDental.ReportingComplex {
 		private bool _isUnderlined;
 		private string _summarizedField;
 		private string _dataField;
+		private SummaryOrientation _summaryOrientation;
+		private List<int> _summaryGroups;
 		
 
 #region Properties
@@ -271,6 +274,24 @@ namespace OpenDental.ReportingComplex {
 				_dataField=value;
 			}
 		}
+		///<summary>The location of the summary label around the summary field</summary>
+		public SummaryOrientation SummaryOrientation {
+			get {
+				return _summaryOrientation;
+			}
+			set {
+				_summaryOrientation=value;
+			}
+		}
+		///<summary>The numeric value of the QueryGroup this summary is including.</summary>
+		public List<int> SummaryGroups {
+			get {
+				return _summaryGroups;
+			}
+			set {
+				_summaryGroups=value;
+			}
+		}
 #endregion
 
 		///<summary>Default constructor.</summary>
@@ -368,13 +389,13 @@ namespace OpenDental.ReportingComplex {
 			_objectKind=ReportObjectKind.FieldObject;
 		}
 
-		///<summary>Overload for ReportSummary ReportObject</summary>
-		public ReportObject(string name,string sectionName,Color color,string summarizedField,SummaryOperation operation,int offSetX,int offSetY) {
+		///<summary>Overload for GroupSummary ReportObject</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedField,SummaryOperation operation,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
-			_location=new Point(0,0);
-			_size=new Size(0,0);
-			_font=new Font(FontFamily.GenericSansSerif,9);
+			_location=location;
+			_size=size;
+			_font=new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold);
 			_fieldKind=FieldDefKind.SummaryField;
 			_valueType=FieldValueType.Number;
 			_operation=operation;
@@ -481,6 +502,14 @@ namespace OpenDental.ReportingComplex {
 			reportObj._isUnderlined=this._isUnderlined;
 			reportObj._summarizedField=this._summarizedField;
 			reportObj._dataField=this._dataField;
+			reportObj._summaryOrientation=this._summaryOrientation;
+			List<int> summaryGroupsNew=new List<int>();
+			if(this._summaryGroups!=null) {
+				for(int i=0;i<this._summaryGroups.Count;i++) {
+					summaryGroupsNew.Add(this._summaryGroups[i]);
+				}
+			}
+			reportObj._summaryGroups=summaryGroupsNew;
 			return reportObj;
 		}
 
@@ -589,7 +618,23 @@ namespace OpenDental.ReportingComplex {
 		///<summary>2</summary>
 		Enum,
 		///<summary>3</summary>
-		Definition
+		Definition,
+		///<summary>4</summary>
+		Value
+	}
+
+	///<summary>This determines which side of the summaryfield the label will be drawn on.</summary>
+	public enum SummaryOrientation {
+		///<summary>0</summary>
+		None,
+		///<summary>1</summary>
+		North,
+		///<summary>2</summary>
+		South,
+		///<summary>3</summary>
+		East,
+		///<summary>4</summary>
+		West
 	}
 
 	

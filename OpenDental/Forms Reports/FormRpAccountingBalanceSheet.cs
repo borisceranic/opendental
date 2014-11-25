@@ -5,6 +5,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -13,6 +14,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.MonthCalendar date1;
 		private System.Windows.Forms.Label labelTO;
+		private UI.Button butTest;
 		private System.ComponentModel.Container components = null;
 		//private FormQuery FormQuery2;
 
@@ -44,58 +46,75 @@ namespace OpenDental{
 			this.labelTO = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.butTest = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// date1
 			// 
-			this.date1.Location = new System.Drawing.Point(31,36);
+			this.date1.Location = new System.Drawing.Point(31, 36);
 			this.date1.MaxSelectionCount = 1;
 			this.date1.Name = "date1";
 			this.date1.TabIndex = 1;
 			// 
 			// labelTO
 			// 
-			this.labelTO.Location = new System.Drawing.Point(28,9);
+			this.labelTO.Location = new System.Drawing.Point(28, 9);
 			this.labelTO.Name = "labelTO";
-			this.labelTO.Size = new System.Drawing.Size(72,23);
+			this.labelTO.Size = new System.Drawing.Size(72, 23);
 			this.labelTO.TabIndex = 22;
 			this.labelTO.Text = "As of";
 			this.labelTO.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(297,219);
+			this.butCancel.Location = new System.Drawing.Point(297, 219);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(297,184);
+			this.butOK.Location = new System.Drawing.Point(297, 184);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// butTest
+			// 
+			this.butTest.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butTest.Autosize = true;
+			this.butTest.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butTest.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butTest.CornerRadius = 4F;
+			this.butTest.Location = new System.Drawing.Point(297, 152);
+			this.butTest.Name = "butTest";
+			this.butTest.Size = new System.Drawing.Size(75, 26);
+			this.butTest.TabIndex = 24;
+			this.butTest.Text = "Test Report";
+			this.butTest.Click += new System.EventHandler(this.butTest_Click);
+			// 
 			// FormRpAccountingBalanceSheet
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(412,258);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(412, 258);
+			this.Controls.Add(this.butTest);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.date1);
@@ -120,6 +139,51 @@ namespace OpenDental{
 			else{//default to last year
 				date1.SelectionStart=new DateTime(DateTime.Today.Year-1,12,31);
 			}
+		}
+
+		private void butTest_Click(object sender,EventArgs e) {
+			string queryAssets="SELECT Description, SUM(DebitAmt-CreditAmt) SumTotal "
+        +"FROM account, journalentry "
+        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(date1.SelectionStart)+" AND AcctType=0 "
+        +"GROUP BY account.AccountNum "
+        +"ORDER BY Description, DateDisplayed";
+			string queryLiabilities="SELECT Description, SUM(CreditAmt-DebitAmt) SumTotal "
+        +"FROM account, journalentry "
+        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(date1.SelectionStart)+" AND AcctType=1 "
+        +"GROUP BY account.AccountNum "
+        +"ORDER BY Description, DateDisplayed";
+			DataTable queryEquity=Accounts.GetEquityTable(date1.SelectionStart);
+			queryEquity.LoadDataRow(new object[] { "Retained Earnings (Auto)",ODR.GetData.RetainedEarningsAuto(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			queryEquity.LoadDataRow(new object[] { "NetIncomeThisYear",ODR.GetData.NetIncomeThisYear(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			//create the report
+			ReportComplex report=new ReportComplex("Balance Sheet","",true,true,false);
+			report.ReportName="Balance Sheet";
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
+			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString());
+			//setup query
+			QueryObject query;
+			query=report.AddQuery(queryAssets,"Assets","",SplitByKind.None,1,true);
+			// add columns to report
+			query.AddColumn("Description",300,FieldValueType.String);
+			query.AddColumn("Patient",150,FieldValueType.Number);
+			query=report.AddQuery(queryLiabilities,"Liabilities","",SplitByKind.None,1,true);
+			// add columns to report
+			query.AddColumn("Description",300,FieldValueType.String);
+			query.AddColumn("Patient",150,FieldValueType.Number);
+			query=report.AddQuery(queryEquity,"Equity","",SplitByKind.None,2,true);
+			// add columns to report
+			query.AddColumn("Description",300,FieldValueType.String);
+			query.AddColumn("Patient",150,FieldValueType.Number);
+			report.AddPageNum();
+			// execute query
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			// display report
+			FormReportComplex FormR=new FormReportComplex(report);
+			//FormR.MyReport=report;
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {

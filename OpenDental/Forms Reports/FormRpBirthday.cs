@@ -526,7 +526,7 @@ namespace OpenDental
 			ReportComplex report=new ReportComplex(Lan.g(this,"Birthdays"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
 			report.ReportName=Lan.g(this,"Birthdays");
 			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat));
-			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"","",SplitByKind.None);
+			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"","",SplitByKind.None,1,true);
 			query.AddColumn("LName",90,FieldValueType.String);
 			query.AddColumn("FName",90,FieldValueType.String);
 			query.AddColumn("Preferred",90,FieldValueType.String);

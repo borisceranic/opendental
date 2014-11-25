@@ -1432,7 +1432,7 @@ namespace OpenDental{
 				row["balance"]=table.Rows[i]["balance"].ToString();
 				tbl.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None);
+			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
 			query.AddColumn("ChargeDate",80,FieldValueType.Date);
 			//move the first column more to the middle
 			query.GetColumnHeader("ChargeDate").Location=new Point(150,0);
