@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class FormEmailInbox:Form {
@@ -89,20 +91,23 @@ namespace OpenDental {
 				int colReceivedDatePixCount=140;
 				int colStatusPixCount=120;
 				int colFromPixCount=200;
+				int colSigPixCount=24;
 				int colSubjectPixCount=200;
 				int colPatientPixCount=140;
-				int colVariablePixCount=gridEmailMessages.Width-22-colReceivedDatePixCount-colStatusPixCount-colFromPixCount-colSubjectPixCount-colPatientPixCount;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"ReceivedDate"),colReceivedDatePixCount,HorizontalAlignment.Center));
+				int colVariablePixCount=gridEmailMessages.Width-22-colReceivedDatePixCount-colStatusPixCount-colFromPixCount-colSigPixCount-colSubjectPixCount-colPatientPixCount;
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"ReceivedDate"),colReceivedDatePixCount,HorizontalAlignment.Center));//0
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sent/Received"),colStatusPixCount,HorizontalAlignment.Center));
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sent/Received"),colStatusPixCount,HorizontalAlignment.Center));//1
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Subject"),colSubjectPixCount,HorizontalAlignment.Left));
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Subject"),colSubjectPixCount,HorizontalAlignment.Left));//2
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"From"),colFromPixCount,HorizontalAlignment.Left));
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"From"),colFromPixCount,HorizontalAlignment.Left));//3
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Patient"),colPatientPixCount,HorizontalAlignment.Left));
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sig"),colSigPixCount,HorizontalAlignment.Center));//4
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Preview"),colVariablePixCount,HorizontalAlignment.Left));
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Patient"),colPatientPixCount,HorizontalAlignment.Left));//5
+				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Preview"),colVariablePixCount,HorizontalAlignment.Left));//6
 				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			}
 			gridEmailMessages.Rows.Clear();
@@ -117,6 +122,20 @@ namespace OpenDental {
 				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].SentOrReceived.ToString()));//Status
 				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].Subject));//Subject
 				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].FromAddress));//From
+				string sigTrust="";//Blank for no signature, N for untrusted signature, Y for trusted signature.
+				for(int j=0;j<ListEmailMessages[i].Attachments.Count;j++) {
+					if(ListEmailMessages[i].Attachments[j].DisplayedFileName.ToLower()!="smime.p7s") {
+						continue;//Not a digital signature.
+					}
+					sigTrust="N";
+					//A more accurate way to test for trust would be to read the subject name from the certificate, then check the trust for the subject name instead of the from address.
+					//We use the more accurate way inside FormEmailDigitalSignature.  However, we cannot use the accurate way inside the inbox because it would cause the inbox to load very slowly.
+					if(EmailMessages.IsDirectAddressTrusted(ListEmailMessages[i].FromAddress)) {
+						sigTrust="Y";
+					}
+					break;
+				}
+				row.Cells.Add(new UI.ODGridCell(sigTrust));//Sig
 				long patNumRegardingPatient=ListEmailMessages[i].PatNum;
 				//Webmail messages should list the patient as the PatNumSubj, which means "the patient whom this message is regarding".
 				if(ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.WebMailReceived || ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.WebMailRecdRead) {
@@ -134,6 +153,33 @@ namespace OpenDental {
 				gridEmailMessages.Rows.Add(row);
 			}
 			gridEmailMessages.EndUpdate();
+		}
+
+		private void gridEmailMessages_CellClick(object sender,UI.ODGridClickEventArgs e) {
+			if(e.Col!=4) {
+				//Not the Sig column.
+				return;
+			}
+			EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[e.Row].Tag;
+			for(int i=0;i<emailMessage.Attachments.Count;i++) {
+				if(emailMessage.Attachments[i].DisplayedFileName.ToLower()!="smime.p7s") {
+					continue;
+				}
+				string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailMessage.Attachments[i].ActualFileName);
+				X509Certificate2 certSig=EmailMessages.GetEmailSignatureFromSmimeP7sFile(smimeP7sFilePath);
+				FormEmailDigitalSignature form=new FormEmailDigitalSignature(certSig);
+				if(form.ShowDialog()==DialogResult.OK) {
+					//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
+					EmailMessages.RefreshCertStoreExternal(AddressInbox);
+					string sigTrust="N";
+					if(EmailMessages.IsDirectAddressTrusted(emailMessage.FromAddress)) {
+						sigTrust="Y";
+					}
+					gridEmailMessages.Rows[e.Row].Cells[e.Col].Text=sigTrust;
+					gridEmailMessages.Invalidate();
+				}
+				break;
+			}
 		}
 
 		private void gridEmailMessages_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {

@@ -26,7 +26,6 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEmailDigitalSignature));
 			this.butTrust = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textCertificateAuthority = new System.Windows.Forms.TextBox();
 			this.textValidFrom = new System.Windows.Forms.TextBox();
@@ -51,7 +50,7 @@ namespace OpenDental{
 			this.butTrust.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butTrust.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butTrust.CornerRadius = 4F;
-			this.butTrust.Location = new System.Drawing.Point(132, 322);
+			this.butTrust.Location = new System.Drawing.Point(132, 308);
 			this.butTrust.Name = "butTrust";
 			this.butTrust.Size = new System.Drawing.Size(75, 24);
 			this.butTrust.TabIndex = 3;
@@ -66,25 +65,16 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(403, 322);
+			this.butCancel.Location = new System.Drawing.Point(403, 308);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(129, 9);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(303, 20);
-			this.label1.TabIndex = 4;
-			this.label1.Text = "This email message has been digitally signed\r\n";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(5, 65);
+			this.label2.Location = new System.Drawing.Point(5, 130);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(126, 20);
 			this.label2.TabIndex = 5;
@@ -93,7 +83,7 @@ namespace OpenDental{
 			// 
 			// textCertificateAuthority
 			// 
-			this.textCertificateAuthority.Location = new System.Drawing.Point(132, 65);
+			this.textCertificateAuthority.Location = new System.Drawing.Point(132, 130);
 			this.textCertificateAuthority.Multiline = true;
 			this.textCertificateAuthority.Name = "textCertificateAuthority";
 			this.textCertificateAuthority.ReadOnly = true;
@@ -103,7 +93,7 @@ namespace OpenDental{
 			// 
 			// textValidFrom
 			// 
-			this.textValidFrom.Location = new System.Drawing.Point(132, 131);
+			this.textValidFrom.Location = new System.Drawing.Point(132, 196);
 			this.textValidFrom.Name = "textValidFrom";
 			this.textValidFrom.ReadOnly = true;
 			this.textValidFrom.Size = new System.Drawing.Size(332, 20);
@@ -111,7 +101,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(2, 131);
+			this.label3.Location = new System.Drawing.Point(2, 196);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(129, 20);
 			this.label3.TabIndex = 7;
@@ -120,7 +110,7 @@ namespace OpenDental{
 			// 
 			// textSignedBy
 			// 
-			this.textSignedBy.Location = new System.Drawing.Point(132, 39);
+			this.textSignedBy.Location = new System.Drawing.Point(132, 104);
 			this.textSignedBy.Name = "textSignedBy";
 			this.textSignedBy.ReadOnly = true;
 			this.textSignedBy.Size = new System.Drawing.Size(332, 20);
@@ -128,7 +118,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(5, 39);
+			this.label5.Location = new System.Drawing.Point(5, 104);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(126, 20);
 			this.label5.TabIndex = 11;
@@ -137,7 +127,7 @@ namespace OpenDental{
 			// 
 			// textThumbprint
 			// 
-			this.textThumbprint.Location = new System.Drawing.Point(132, 157);
+			this.textThumbprint.Location = new System.Drawing.Point(132, 222);
 			this.textThumbprint.Name = "textThumbprint";
 			this.textThumbprint.ReadOnly = true;
 			this.textThumbprint.Size = new System.Drawing.Size(332, 20);
@@ -145,7 +135,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(2, 157);
+			this.label6.Location = new System.Drawing.Point(2, 222);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(129, 20);
 			this.label6.TabIndex = 13;
@@ -154,7 +144,7 @@ namespace OpenDental{
 			// 
 			// textVersion
 			// 
-			this.textVersion.Location = new System.Drawing.Point(132, 180);
+			this.textVersion.Location = new System.Drawing.Point(132, 245);
 			this.textVersion.Name = "textVersion";
 			this.textVersion.ReadOnly = true;
 			this.textVersion.Size = new System.Drawing.Size(332, 20);
@@ -162,7 +152,7 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(2, 180);
+			this.label7.Location = new System.Drawing.Point(2, 245);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(129, 20);
 			this.label7.TabIndex = 15;
@@ -171,7 +161,7 @@ namespace OpenDental{
 			// 
 			// textTrustStatus
 			// 
-			this.textTrustStatus.Location = new System.Drawing.Point(132, 206);
+			this.textTrustStatus.Location = new System.Drawing.Point(132, 12);
 			this.textTrustStatus.Name = "textTrustStatus";
 			this.textTrustStatus.ReadOnly = true;
 			this.textTrustStatus.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -180,7 +170,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(5, 206);
+			this.label4.Location = new System.Drawing.Point(5, 12);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(126, 20);
 			this.label4.TabIndex = 17;
@@ -189,7 +179,7 @@ namespace OpenDental{
 			// 
 			// textTrustExplanation
 			// 
-			this.textTrustExplanation.Location = new System.Drawing.Point(132, 232);
+			this.textTrustExplanation.Location = new System.Drawing.Point(132, 38);
 			this.textTrustExplanation.Multiline = true;
 			this.textTrustExplanation.Name = "textTrustExplanation";
 			this.textTrustExplanation.ReadOnly = true;
@@ -199,7 +189,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(5, 232);
+			this.label8.Location = new System.Drawing.Point(5, 38);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(126, 20);
 			this.label8.TabIndex = 19;
@@ -209,7 +199,7 @@ namespace OpenDental{
 			// FormEmailDigitalSignature
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(497, 358);
+			this.ClientSize = new System.Drawing.Size(497, 344);
 			this.Controls.Add(this.textTrustExplanation);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.textTrustStatus);
@@ -224,7 +214,6 @@ namespace OpenDental{
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textCertificateAuthority);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butTrust);
 			this.Controls.Add(this.butCancel);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -243,7 +232,6 @@ namespace OpenDental{
 
 		private OpenDental.UI.Button butTrust;
 		private OpenDental.UI.Button butCancel;
-		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textCertificateAuthority;
 		private System.Windows.Forms.TextBox textValidFrom;

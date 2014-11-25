@@ -146,6 +146,7 @@ namespace OpenDental{
 			this.gridEmailMessages.Title = "Email Messages";
 			this.gridEmailMessages.TranslationName = "TableApptProcs";
 			this.gridEmailMessages.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmailMessages_CellDoubleClick);
+			this.gridEmailMessages.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmailMessages_CellClick);
 			// 
 			// butClose
 			// 
