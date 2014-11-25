@@ -459,14 +459,14 @@ namespace OpenDentBusiness{
 				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
 				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum AND claim.PlanNum=inssub.PlanNum "
 				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+">="+POut.Date(dateServiceStart)+" AND "+DbHelper.DateColumn("DateService")+"<="+POut.Date(dateServiceEnd);
-			DataTable dtClaims=Db.GetTable(command);
-			if(dtClaims.Rows.Count==0) {
+			DataTable tableClaims=Db.GetTable(command);
+			if(tableClaims.Rows.Count==0) {
 				return null;//No matches found for the specific claim fee and date of service.  Aboloutely no suitable matches.
 			}
 			//Look for a single exact match by claim identifier.  This step is first, so that the user can override claim association to the 835 or 277 by changing the claim identifier if desired.
 			List<int> listIndiciesForIdentifier=new List<int>();
-			for(int i=0;i<dtClaims.Rows.Count;i++) {
-				string claimId=PIn.String(dtClaims.Rows[i]["ClaimIdentifier"].ToString());
+			for(int i=0;i<tableClaims.Rows.Count;i++) {
+				string claimId=PIn.String(tableClaims.Rows[i]["ClaimIdentifier"].ToString());
 				if(claimId==claimIdentifier) {
 					listIndiciesForIdentifier.Add(i);
 				}
@@ -476,8 +476,8 @@ namespace OpenDentBusiness{
 				//characters. Therefore, if the claim identifier is longer than 20 characters, then it was truncated when sent out, so we have to look for claims beginning with the 
 				//claim identifier given if there is not an exact match.  We also send shorter identifiers for some clearinghouses.  For example, the maximum claim identifier length
 				//for Denti-Cal is 17 characters.
-				for(int i=0;i<dtClaims.Rows.Count;i++) {
-					string claimId=PIn.String(dtClaims.Rows[i]["ClaimIdentifier"].ToString());
+				for(int i=0;i<tableClaims.Rows.Count;i++) {
+					string claimId=PIn.String(tableClaims.Rows[i]["ClaimIdentifier"].ToString());
 					if(claimId.StartsWith(claimIdentifier)) {
 						listIndiciesForIdentifier.Add(i);
 					}
@@ -488,54 +488,80 @@ namespace OpenDentBusiness{
 			}
 			else if(listIndiciesForIdentifier.Count==1) {
 				//A single match based on claim identifier, claim date of service, and claim fee.
-				long claimNum=PIn.Long(dtClaims.Rows[listIndiciesForIdentifier[0]]["ClaimNum"].ToString());
+				long claimNum=PIn.Long(tableClaims.Rows[listIndiciesForIdentifier[0]]["ClaimNum"].ToString());
 				return Claims.GetClaim(claimNum);
 			}
 			else if(listIndiciesForIdentifier.Count>1) {//Edge case.
 				//Multiple matches for the specified claim identifier AND date service AND fee.  The claim must have been split (rare because the split claims must have the same fee).
 				//Continue to more advanced matching below, although it probably will not help.  We could enhance this specific scenario by picking a claim based on the procedures attached, but that is not a guarantee either.
 			}
-			//Locate claims from the short list which match the patient name and subscriber ID.
-			List<int> listIndiciesForPatient=new List<int>();
-			patFname=patFname.ToLower();
-			patLname=patLname.ToLower();
-			for(int i=0;i<dtClaims.Rows.Count;i++) {
-				string lname=PIn.String(dtClaims.Rows[i]["LName"].ToString()).ToLower();
-				string fname=PIn.String(dtClaims.Rows[i]["FName"].ToString()).ToLower();
-				string subId=PIn.String(dtClaims.Rows[i]["SubscriberID"].ToString());
-				if(lname!=patLname) {
-					continue;
+			//Locate claims exactly matching patient last name.
+			List<DataRow> listMatches=new List<DataRow>();
+			patLname=patLname.Trim().ToLower();
+			for(int i=0;i<tableClaims.Rows.Count;i++) {
+				string lastNameInDb=PIn.String(tableClaims.Rows[i]["LName"].ToString()).Trim().ToLower();
+				if(lastNameInDb==patLname) {
+					listMatches.Add(tableClaims.Rows[i]);
 				}
-				if(fname!=patFname) {
-					continue;
+			}
+			//Locate claims matching exact first name or partial first name, with a preference for exact match.
+			List<DataRow> listExactFirst=new List<DataRow>();
+			List<DataRow> listPartFirst=new List<DataRow>();
+			patFname=patFname.Trim().ToLower();
+			for(int i=0;i<listMatches.Count;i++) {
+				string firstNameInDb=PIn.String(listMatches[i]["FName"].ToString()).Trim().ToLower();
+				if(firstNameInDb==patFname) {
+					listExactFirst.Add(listMatches[i]);
 				}
-				//subId is the ID currently on the insurance plan, and subscriberId is the ID from the ERA 835.
-				if(subId==subscriberId) {
-					//Exact subscriber ID match is preferred.
+				else if(firstNameInDb.Length>=2 && patFname.StartsWith(firstNameInDb)) {
+					//Unfortunately, in the real world, we have observed carriers returning the patients first name followed by a space followed by the patient middle name all within the first name field.
+					//This issue is probably due to human error when the carrier's staff typed the patient name into their system.  All we can do is try to cope with this situation.
+					listPartFirst.Add(listMatches[i]);
 				}
-				else if(subId.Length>=3 && (subscriberId==subId.Substring(0,subId.Length-1) || subscriberId==subId.Substring(0,subId.Length-2))) {
+			}
+			if(listExactFirst.Count>0) {
+				listMatches=listExactFirst;//One or more exact matches found.  Ignore any partial matches.
+			}
+			else {
+				listMatches=listPartFirst;//Use partial matches only if no exact matches were found.
+			}
+			//Locate claims matching exact subscriber ID or partial subscriber ID, with a preference for exact match.
+			List<DataRow> listExactId=new List<DataRow>();
+			List<DataRow> listPartId=new List<DataRow>();
+			subscriberId=subscriberId.Trim();
+			for(int i=0;i<listMatches.Count;i++) {
+				string subIdInDb=PIn.String(listMatches[i]["SubscriberID"].ToString()).Trim();
+				if(subIdInDb==subscriberId) {
+					listExactId.Add(listMatches[i]);
+				}
+				else if(subIdInDb.Length>=3 && (subscriberId==subIdInDb.Substring(0,subIdInDb.Length-1) || subscriberId==subIdInDb.Substring(0,subIdInDb.Length-2))) {
 					//Partial subscriber ID matches are somewhat common.
 					//Insurance companies sometimes create a base subscriber ID for all family members, then append a one or two digit number to make IDs unique for each family member.
 					//We have seen at least one real world example where the ERA contained the base subscriber ID instead of the patient specific ID.
 					//We also check that the subscriber ID in OD is at least 3 characters long, because we must allow for the 2 optional ending characters and we require an extra leading character to avoid matching blank IDs.
+					listPartId.Add(listMatches[i]);
 				}
-				else if(subscriberId.Length>=3 && (subId==subscriberId.Substring(0,subscriberId.Length-1) || subId==subscriberId.Substring(0,subscriberId.Length-2))) {
+				else if(subscriberId.Length>=3 && (subIdInDb==subscriberId.Substring(0,subscriberId.Length-1) || subIdInDb==subscriberId.Substring(0,subscriberId.Length-2))) {
 					//Partial match in the other direction.  Comparable to the scenario above.
+					listPartId.Add(listMatches[i]);
 				}
-				else {
-					continue;
-				}
-				listIndiciesForPatient.Add(i);
 			}
-			if(listIndiciesForPatient.Count==0) {
+			if(listExactId.Count>0) {
+				listMatches=listExactId;//One or more exact matches found.  Ignore any partial matches.
+			}
+			else {
+				listMatches=listPartId;//Use partial matches only if no exact matches were found.
+			}
+			//We have finished locating the matches.  Now decide what to do based on the number of matches found.
+			if(listMatches.Count==0) {
 				return null;//No suitable matches.
 			}
-			else if(listIndiciesForPatient.Count==1) {
+			else if(listMatches.Count==1) {
 				//A single match based on patient first name, patient last name, subscriber ID, claim date of service, and claim fee.
-				long claimNum=PIn.Long(dtClaims.Rows[listIndiciesForPatient[0]]["ClaimNum"].ToString());
+				long claimNum=PIn.Long(listMatches[0]["ClaimNum"].ToString());
 				return Claims.GetClaim(claimNum);
 			}
-			else if(listIndiciesForPatient.Count>1) {//Edge case.
+			else if(listMatches.Count>1) {//Edge case.
 				//Multiple matches (rare).  We might be able to pick the correct claim based on the attached procedures, but we can worry about this situation later if it happens more than we expect.
 			}
 			return null;
