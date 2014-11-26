@@ -419,8 +419,8 @@ namespace OpenDentBusiness{
 				+"FROM patient,appointment,patient guar "
 				+"WHERE patient.PatNum=appointment.PatNum "
 				+"AND patient.Guarantor=guar.PatNum "
-				+"AND AptDateTime > "+POut.Date(dateFrom)+" "
-				+"AND AptDateTime <= "+POut.Date(dateTo)+" "
+				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
 				+"AND AptStatus IN(1,4) ";//scheduled,ASAP
 			if(provNum>0){
 				command+="AND ((appointment.ProvNum="+POut.Long(provNum)+" AND appointment.IsHygiene=0) "//only include doc if it's not a hyg appt
