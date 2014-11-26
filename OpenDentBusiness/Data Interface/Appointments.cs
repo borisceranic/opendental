@@ -421,8 +421,8 @@ namespace OpenDentBusiness{
 				+"FROM patient,appointment,patient guar "
 				+"WHERE patient.PatNum=appointment.PatNum "
 				+"AND patient.Guarantor=guar.PatNum "
-				+"AND AptDateTime > "+POut.Date(dateFrom)+" "
-				+"AND AptDateTime < "+POut.Date(dateTo.AddDays(1))+" "
+				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
 				+"AND (AptStatus=1 "//scheduled
 				+"OR AptStatus=4) ";//ASAP
 			if(provNum>0){
