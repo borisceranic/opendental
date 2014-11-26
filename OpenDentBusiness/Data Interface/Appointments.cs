@@ -421,8 +421,9 @@ namespace OpenDentBusiness{
 				+"FROM patient,appointment,patient guar "
 				+"WHERE patient.PatNum=appointment.PatNum "
 				+"AND patient.Guarantor=guar.PatNum "
-				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
-				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
+				+"AND AptDateTime > "+POut.Date(dateFrom)+" "
+				//Example: AptDateTime="2014-11-26 13:00".  Filter is 11-26, giving "2014-11-27 00:00" to compare against.  This captures all times.
+				+"AND AptDateTime < "+POut.Date(dateTo.AddDays(1))+" "
 				+"AND (AptStatus=1 "//scheduled
 				+"OR AptStatus=4) ";//ASAP
 			if(provNum>0){
