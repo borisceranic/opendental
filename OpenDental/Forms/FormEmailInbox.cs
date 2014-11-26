@@ -112,34 +112,35 @@ namespace OpenDental {
 			}
 			gridEmailMessages.Rows.Clear();
 			for(int i=0;i<ListEmailMessages.Count;i++) {
+				EmailMessage emailMessage=ListEmailMessages[i];
 				UI.ODGridRow row=new UI.ODGridRow();
-				row.Tag=ListEmailMessages[i];//Used to locate the correct email message if the user decides to sort the grid.
-				if(ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.Received || ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.WebMailReceived
-					|| ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.ReceivedEncrypted || ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
+				row.Tag=emailMessage;//Used to locate the correct email message if the user decides to sort the grid.
+				if(emailMessage.SentOrReceived==EmailSentOrReceived.Received || emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived
+					|| emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted || emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
 					row.Bold=true;//unread
 				}
-				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].MsgDateTime.ToString()));//ReceivedDate
-				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].SentOrReceived.ToString()));//Status
-				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].Subject));//Subject
-				row.Cells.Add(new UI.ODGridCell(ListEmailMessages[i].FromAddress));//From
+				row.Cells.Add(new UI.ODGridCell(emailMessage.MsgDateTime.ToString()));//ReceivedDate
+				row.Cells.Add(new UI.ODGridCell(emailMessage.SentOrReceived.ToString()));//Status
+				row.Cells.Add(new UI.ODGridCell(emailMessage.Subject));//Subject
+				row.Cells.Add(new UI.ODGridCell(emailMessage.FromAddress));//From
 				string sigTrust="";//Blank for no signature, N for untrusted signature, Y for trusted signature.
-				for(int j=0;j<ListEmailMessages[i].Attachments.Count;j++) {
-					if(ListEmailMessages[i].Attachments[j].DisplayedFileName.ToLower()!="smime.p7s") {
+				for(int j=0;j<emailMessage.Attachments.Count;j++) {
+					if(emailMessage.Attachments[j].DisplayedFileName.ToLower()!="smime.p7s") {
 						continue;//Not a digital signature.
 					}
 					sigTrust="N";
 					//A more accurate way to test for trust would be to read the subject name from the certificate, then check the trust for the subject name instead of the from address.
 					//We use the more accurate way inside FormEmailDigitalSignature.  However, we cannot use the accurate way inside the inbox because it would cause the inbox to load very slowly.
-					if(EmailMessages.IsDirectAddressTrusted(ListEmailMessages[i].FromAddress)) {
+					if(EmailMessages.IsAddressTrusted(emailMessage.FromAddress)) {
 						sigTrust="Y";
 					}
 					break;
 				}
 				row.Cells.Add(new UI.ODGridCell(sigTrust));//Sig
-				long patNumRegardingPatient=ListEmailMessages[i].PatNum;
+				long patNumRegardingPatient=emailMessage.PatNum;
 				//Webmail messages should list the patient as the PatNumSubj, which means "the patient whom this message is regarding".
-				if(ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.WebMailReceived || ListEmailMessages[i].SentOrReceived==EmailSentOrReceived.WebMailRecdRead) {
-					patNumRegardingPatient=ListEmailMessages[i].PatNumSubj;
+				if(emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived || emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead) {
+					patNumRegardingPatient=emailMessage.PatNumSubj;
 				}
 				if(patNumRegardingPatient==0) {
 					row.Cells.Add(new UI.ODGridCell(""));//Patient
@@ -148,7 +149,7 @@ namespace OpenDental {
 					Patient pat=Patients.GetPat(patNumRegardingPatient);
 					row.Cells.Add(new UI.ODGridCell(pat.GetNameLF()));//Patient
 				}
-				string preview=ListEmailMessages[i].BodyText.Replace("\r\n"," ").Replace('\n',' ');//Replace newlines with spaces, in order to compress the preview.
+				string preview=emailMessage.BodyText.Replace("\r\n"," ").Replace('\n',' ');//Replace newlines with spaces, in order to compress the preview.
 				row.Cells.Add(new UI.ODGridCell(preview));//Preview
 				gridEmailMessages.Rows.Add(row);
 			}
@@ -172,7 +173,7 @@ namespace OpenDental {
 					//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
 					EmailMessages.RefreshCertStoreExternal(AddressInbox);
 					string sigTrust="N";
-					if(EmailMessages.IsDirectAddressTrusted(emailMessage.FromAddress)) {
+					if(EmailMessages.IsAddressTrusted(emailMessage.FromAddress)) {
 						sigTrust="Y";
 					}
 					gridEmailMessages.Rows[e.Row].Cells[e.Col].Text=sigTrust;

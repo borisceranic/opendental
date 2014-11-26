@@ -26,7 +26,7 @@ namespace OpenDental {
 			textValidFrom.Text=_certSig.NotBefore.ToShortDateString()+" to "+_certSig.NotAfter.ToShortDateString();
 			textThumbprint.Text=_certSig.Thumbprint;
 			textVersion.Text=_certSig.Version.ToString();
-			_isTrusted=EmailMessages.IsDirectAddressTrusted(signedByAddress);
+			_isTrusted=EmailMessages.IsAddressTrusted(signedByAddress);
 			if(_isTrusted) {
 				butTrust.Visible=false;
 				textTrustStatus.Text=Lan.g(this,"Trusted");

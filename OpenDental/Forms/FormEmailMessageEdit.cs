@@ -1041,14 +1041,14 @@ namespace OpenDental{
 		}
 
 		private void butDecrypt_Click(object sender,EventArgs e) {
-			if(!EmailMessages.IsDirectAddressTrusted(MessageCur.FromAddress)) {//Not trusted yet.
+			if(!EmailMessages.IsAddressTrusted(MessageCur.FromAddress)) {//Not trusted yet.
 				string strTrustMessage=Lan.g(this,"The sender address must be added to your trusted addresses before you can decrypt the email")
 					+". "+Lan.g(this,"Add")+" "+MessageCur.FromAddress+" "+Lan.g(this,"to trusted addresses")+"?";
 				if(MessageBox.Show(strTrustMessage,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
 					Cursor=Cursors.WaitCursor;
 					EmailMessages.TryAddTrustDirect(MessageCur.FromAddress);
 					Cursor=Cursors.Default;
-					if(!EmailMessages.IsDirectAddressTrusted(MessageCur.FromAddress)) {
+					if(!EmailMessages.IsAddressTrusted(MessageCur.FromAddress)) {
 						MsgBox.Show(this,"Failed to trust sender because a valid certificate could not be located.");
 						return;
 					}
@@ -1153,9 +1153,9 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			if(!EmailMessages.IsDirectAddressTrusted(textToAddress.Text)) {//Not trusted yet.
+			if(!EmailMessages.IsAddressTrusted(textToAddress.Text)) {//Not trusted yet.
 				EmailMessages.TryAddTrustDirect(textToAddress.Text);
-				if(!EmailMessages.IsDirectAddressTrusted(textToAddress.Text)) {
+				if(!EmailMessages.IsAddressTrusted(textToAddress.Text)) {
 					Cursor=Cursors.Default;
 					MsgBox.Show(this,"Failed to trust recipient because a valid certificate could not be located.");
 					return;

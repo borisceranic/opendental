@@ -740,7 +740,7 @@ namespace OpenDentBusiness{
 			return directAgent;
 		}
 
-		public static bool IsDirectAddressTrusted(string strAddressTest) {
+		public static bool IsAddressTrusted(string strAddressTest) {
 			if(strAddressTest.Trim()=="") {
 				return false;
 			}
@@ -758,7 +758,7 @@ namespace OpenDentBusiness{
 				return false;
 			}
 			//No need to check RemotingRole; no call to db.
-			if(IsDirectAddressTrusted(strAddressTest)) {
+			if(IsAddressTrusted(strAddressTest)) {
 				return true;//Already trusted.
 			}
 			try {
@@ -980,7 +980,7 @@ namespace OpenDentBusiness{
 			EmailMessage emailMessage=null;
 			if(isEncrypted) {
 				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false);//Exclude attachments until we decrypt.
-				emailMessage.RawEmailIn=strRawEmail;//This raw email is encrypted.
+				emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
 				emailMessage.EmailMessageNum=emailMessageNum;
 				emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedEncrypted;
 				//The entire contents of the email are saved in the emailMessage.BodyText field, so that if decryption fails, the email will still be saved to the db for decryption later if possible.
@@ -989,15 +989,29 @@ namespace OpenDentBusiness{
 				try {
 					Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(inMsg.Message.ToValue.Trim());
 					//throw new ApplicationException("test decryption failure");
-					inMsg=directAgent.ProcessIncoming(inMsg);//Decrypts, valudates trust, etc.
+					inMsg=directAgent.ProcessIncoming(inMsg);//Decrypts and valudates trust.  Also removes the signature from the decrypted attachments and moves them into inMsg.Signatures.
 					emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);//If the message was wrapped, then the To, From, Subject and Date can change after decyption. We also need to create the attachments for the decrypted message.
-					emailMessage.RawEmailIn=inMsg.SerializeMessage();//Now that we have decrypted, we must get the raw email contents differently (cannot use strRawEmail). 
+					//emailMessage.RawEmailIn=inMsg.SerializeMessage();//Now that we have decrypted, we can use this to get the human readable contents of the email, but it will exclude the digital signature.
 					emailMessage.EmailMessageNum=emailMessageNum;
 					emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedDirect;
 					emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
+					if(inMsg.HasSenderSignatures) {
+						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
+							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							emailMessage.Attachments.Add(emailAttach);
+						}
+					}
 				}
 				catch(Exception ex) {
 					//SentOrReceived will be ReceivedEncrypted, indicating to the calling code that decryption failed.
+					//The decryption step may have failed due to an untrusted sender, in which case the decrypting actually took place and the signature was extracted.
+					//We add the signature to the email message so it will show up next to the email message in the inbox and make it easier for the user to add trust for the sender.
+					if(inMsg.HasSenderSignatures) {
+						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
+							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							emailMessage.Attachments.Add(emailAttach);
+						}
+					}
 					if(emailMessageNum==0) {
 						EmailMessages.Insert(emailMessage);
 						return emailMessage;//If the message was just downloaded, then this function was called from the inbox, simply return the inserted email without an exception (it can be decypted later manually by the user).

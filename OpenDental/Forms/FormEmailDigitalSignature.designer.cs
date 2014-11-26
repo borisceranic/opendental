@@ -50,7 +50,7 @@ namespace OpenDental{
 			this.butTrust.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butTrust.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butTrust.CornerRadius = 4F;
-			this.butTrust.Location = new System.Drawing.Point(132, 308);
+			this.butTrust.Location = new System.Drawing.Point(106, 316);
 			this.butTrust.Name = "butTrust";
 			this.butTrust.Size = new System.Drawing.Size(75, 24);
 			this.butTrust.TabIndex = 3;
@@ -65,7 +65,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(403, 308);
+			this.butCancel.Location = new System.Drawing.Point(403, 316);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -74,16 +74,16 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(5, 130);
+			this.label2.Location = new System.Drawing.Point(5, 141);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(126, 20);
+			this.label2.Size = new System.Drawing.Size(100, 20);
 			this.label2.TabIndex = 5;
-			this.label2.Text = "Certificate Authority:";
+			this.label2.Text = "Authority:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textCertificateAuthority
 			// 
-			this.textCertificateAuthority.Location = new System.Drawing.Point(132, 130);
+			this.textCertificateAuthority.Location = new System.Drawing.Point(106, 141);
 			this.textCertificateAuthority.Multiline = true;
 			this.textCertificateAuthority.Name = "textCertificateAuthority";
 			this.textCertificateAuthority.ReadOnly = true;
@@ -93,7 +93,7 @@ namespace OpenDental{
 			// 
 			// textValidFrom
 			// 
-			this.textValidFrom.Location = new System.Drawing.Point(132, 196);
+			this.textValidFrom.Location = new System.Drawing.Point(106, 207);
 			this.textValidFrom.Name = "textValidFrom";
 			this.textValidFrom.ReadOnly = true;
 			this.textValidFrom.Size = new System.Drawing.Size(332, 20);
@@ -101,16 +101,16 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(2, 196);
+			this.label3.Location = new System.Drawing.Point(5, 207);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(129, 20);
+			this.label3.Size = new System.Drawing.Size(100, 20);
 			this.label3.TabIndex = 7;
 			this.label3.Text = "Valid From:";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSignedBy
 			// 
-			this.textSignedBy.Location = new System.Drawing.Point(132, 104);
+			this.textSignedBy.Location = new System.Drawing.Point(106, 115);
 			this.textSignedBy.Name = "textSignedBy";
 			this.textSignedBy.ReadOnly = true;
 			this.textSignedBy.Size = new System.Drawing.Size(332, 20);
@@ -118,16 +118,16 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(5, 104);
+			this.label5.Location = new System.Drawing.Point(5, 115);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(126, 20);
+			this.label5.Size = new System.Drawing.Size(100, 20);
 			this.label5.TabIndex = 11;
 			this.label5.Text = "Signed By:";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textThumbprint
 			// 
-			this.textThumbprint.Location = new System.Drawing.Point(132, 222);
+			this.textThumbprint.Location = new System.Drawing.Point(106, 233);
 			this.textThumbprint.Name = "textThumbprint";
 			this.textThumbprint.ReadOnly = true;
 			this.textThumbprint.Size = new System.Drawing.Size(332, 20);
@@ -135,16 +135,16 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(2, 222);
+			this.label6.Location = new System.Drawing.Point(5, 233);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(129, 20);
+			this.label6.Size = new System.Drawing.Size(100, 20);
 			this.label6.TabIndex = 13;
 			this.label6.Text = "Thumbprint:";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textVersion
 			// 
-			this.textVersion.Location = new System.Drawing.Point(132, 245);
+			this.textVersion.Location = new System.Drawing.Point(106, 256);
 			this.textVersion.Name = "textVersion";
 			this.textVersion.ReadOnly = true;
 			this.textVersion.Size = new System.Drawing.Size(332, 20);
@@ -152,16 +152,16 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(2, 245);
+			this.label7.Location = new System.Drawing.Point(5, 256);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(129, 20);
+			this.label7.Size = new System.Drawing.Size(100, 20);
 			this.label7.TabIndex = 15;
-			this.label7.Text = "Certificate Version:";
+			this.label7.Text = "Version:";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textTrustStatus
 			// 
-			this.textTrustStatus.Location = new System.Drawing.Point(132, 12);
+			this.textTrustStatus.Location = new System.Drawing.Point(106, 23);
 			this.textTrustStatus.Name = "textTrustStatus";
 			this.textTrustStatus.ReadOnly = true;
 			this.textTrustStatus.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -170,16 +170,16 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(5, 12);
+			this.label4.Location = new System.Drawing.Point(5, 23);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(126, 20);
+			this.label4.Size = new System.Drawing.Size(100, 20);
 			this.label4.TabIndex = 17;
 			this.label4.Text = "Trust Status:";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textTrustExplanation
 			// 
-			this.textTrustExplanation.Location = new System.Drawing.Point(132, 38);
+			this.textTrustExplanation.Location = new System.Drawing.Point(106, 49);
 			this.textTrustExplanation.Multiline = true;
 			this.textTrustExplanation.Name = "textTrustExplanation";
 			this.textTrustExplanation.ReadOnly = true;
@@ -189,17 +189,17 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(5, 38);
+			this.label8.Location = new System.Drawing.Point(5, 49);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(126, 20);
+			this.label8.Size = new System.Drawing.Size(100, 20);
 			this.label8.TabIndex = 19;
-			this.label8.Text = "Trust Explanation:";
+			this.label8.Text = "Trust Details:";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormEmailDigitalSignature
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(497, 344);
+			this.ClientSize = new System.Drawing.Size(497, 352);
 			this.Controls.Add(this.textTrustExplanation);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.textTrustStatus);
