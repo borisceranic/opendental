@@ -6608,7 +6608,7 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE cpt ADD VersionIDs varchar2(255)";
 					Db.NonQ(command);
 				}
-				//Add UserQueryAdmin permission to everyone------------------------------------------------------
+				//Add UserQueryAdmin permission to everyone-------------------------------------------------------
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=19";//Anyone who currently has UserQuery access will initially have UserQueryAdmin access.
 					DataTable table=Db.GetTable(command);
