@@ -305,6 +305,23 @@ namespace OpenDentBusiness{
 			sig.TaskNum=0;
 			Insert(sig);
 		}
+
+		///<summary>Acknowledge one signal from the manage module grid</summary>
+		public static void AckSignal(long signalNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),signalNum);
+				return;
+			}
+			string command="UPDATE signalod SET AckTime = ";
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				command+=POut.DateT(MiscData.GetNowDateTime());
+			}
+			else {//Assume MySQL
+				command+="NOW()";
+			}
+			command+=" WHERE SignalNum="+POut.Long(signalNum)+" ";
+			Db.NonQ(command);
+		}
 	}
 
 	

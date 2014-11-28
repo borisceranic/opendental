@@ -1418,8 +1418,7 @@ namespace OpenDental{
 				if(sig.AckTime.Year>1880){
 					continue;//totally ignore if trying to ack a previously acked signal
 				}
-				sig.AckTime=DateTime.Now+TimeDelta;
-				Signalods.Update(sig);
+				Signalods.AckSignal(sig.SignalNum);
 				//change the grid temporarily until the next timer event.  This makes it feel more responsive.
 				if(checkIncludeAck.Checked){
 					gridMessages.Rows[gridMessages.SelectedIndices[i]].Cells[3].Text=sig.AckTime.ToShortTimeString();					
