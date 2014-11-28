@@ -576,6 +576,13 @@ namespace OpenDental{
 			if(!IsSafeSql()) {
 				return;
 			}
+			bool isCommand=IsCommandSql(textQuery.Text);
+			if(isCommand && !Security.IsAuthorized(Permissions.UserQueryAdmin)) {
+				return;
+			}
+			if(isCommand) {
+				SecurityLogs.MakeLogEntry(Permissions.UserQueryAdmin,0,"Command query run.");
+			}
 			report=new ReportSimpleGrid();
 			report.Query=textQuery.Text;
 			SubmitQuery();
@@ -1534,6 +1541,129 @@ namespace OpenDental{
 
 		private void FormQuery_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
 			//SecurityLogs.MakeLogEntry("User Query","");
+		}
+
+		///<summary>Returns true if the given SQL script in strSql contains any commands (INSERT, UPDATE, DELETE, etc.)</summary>
+		private bool IsCommandSql(string strSql) {
+			string trimmedSql=strSql.Trim();//If a line is completely a comment it may have only a trailing \n to make a subquery on. We need to keep it there.
+			string[] arraySqlExpressions=trimmedSql.ToUpper().Split(';');
+			for(int i=0;i<arraySqlExpressions.Length;i++) {
+				//Clean out any leading comments before we do anything else
+				while(arraySqlExpressions[i].Trim().StartsWith("#") || arraySqlExpressions[i].Trim().StartsWith("--") || arraySqlExpressions[i].Trim().StartsWith("/*")) {
+					if(arraySqlExpressions[i].Trim().StartsWith("/*")) {
+						arraySqlExpressions[i]=arraySqlExpressions[i].Remove(0,arraySqlExpressions[i].IndexOf("*/")+3).Trim();
+					}
+					else {//Comment starting with # or starting with --
+						int endIndex=arraySqlExpressions[i].IndexOf("\n");
+						if(endIndex!=-1) {//This is so it doesn't break if the last line of a command is a comment
+							arraySqlExpressions[i]=arraySqlExpressions[i].Remove(0,arraySqlExpressions[i].IndexOf("\n")).Trim();
+						}
+						else {
+							arraySqlExpressions[i]=arraySqlExpressions[i].Remove(0,arraySqlExpressions[i].Length).Trim();
+						}
+					}
+				}
+				if(String.IsNullOrWhiteSpace(arraySqlExpressions[i])){
+					continue;//Ignore empty SQL statements.
+				}
+				if(arraySqlExpressions[i].Trim().StartsWith("SELECT")){//We don't care about select queries
+					continue;
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("SET")) {
+					//We need to allow SET statements because we use them to set variables in our query examples.
+					continue;
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("UPDATE")) {//These next we allow if they are on temp tables
+					if(HasNonTempTable("UPDATE",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("ALTER")) {
+					if(HasNonTempTable("TABLE",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("CREATE")) {//CREATE INDEX or CREATE TABLE or CREATE TEMPORARY TABLE
+					int a=arraySqlExpressions[i].Trim().IndexOf("INDEX");
+					int b=arraySqlExpressions[i].Trim().IndexOf("TABLE");
+					string keyword="";
+					if(a==-1 && b==-1) {
+						//Invalid command.  Ignore.
+					}
+					else if(a!=-1 && b==-1) {
+						keyword="INDEX";
+					}
+					else if(a==-1 && b!=-1) {
+						keyword="TABLE";
+					}
+					else if(a!=-1 && b!=-1) {
+						keyword=arraySqlExpressions[i].Trim().Substring(Math.Min(a,b),5);//Get the keyword that is closest to the front of the string.
+					}					
+					if(keyword!="" && HasNonTempTable(keyword,arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("DROP")) { //DROP [TEMPORARY] TABLE [IF EXISTS]
+					int a=arraySqlExpressions[i].Trim().IndexOf("TABLE");
+					//We require exactly one space between these two keywords, because there are all sorts of technically valid ways to write the IF EXISTS which would create a lot of work for us.
+					//Examples "DROP TABLE x IF    EXISTS ...", "DROP TABLE x IF /*comment IF EXISTS*/  EXISTS ...", "DROP TABLE ifexists IF EXISTS /*IF EXISTS*/"
+					int b=arraySqlExpressions[i].Trim().IndexOf("IF EXISTS");
+					string keyword="";
+					if(a==-1 && b==-1) {
+						//Invalid command.  Ignore.
+					}
+					else if(b==-1) {
+						keyword="TABLE";//Must have TABLE if it's not invalid
+					}
+					else {
+						keyword="IF EXISTS";//It has the IF EXISTS statement
+					}
+					if(keyword!="" && HasNonTempTable(keyword,arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("RENAME")) {
+					if(HasNonTempTable("TABLE",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("TRUNCATE")) {
+					if(HasNonTempTable("TABLE",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("DELETE")) {
+					if(HasNonTempTable("DELETE",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else if(arraySqlExpressions[i].Trim().StartsWith("INSERT")) {
+					if(HasNonTempTable("INTO",arraySqlExpressions[i])) {
+						return true;
+					}
+				}
+				else {//All the rest of the commands that we won't allow, even with temp tables, also includes if there are any additional comments embedded.
+					return true;
+				}
+			}
+			return false;
+		}
+
+		///<summary>The keywords must be listed in the order they are required to appear within the query.</summary>
+		private static bool HasNonTempTable(string keyword,string command) {
+			int keywordEndIndex=command.IndexOf(keyword)+keyword.Length;
+			command=command.Remove(0,keywordEndIndex).Trim();//Everything left will be the table/s or nested queries.
+			//Match one or more table names with optional alias for each table name, separated by commas.
+			//A word in this contenxt is any string of non-space characters which also does not include ',' or '(' or ')'.
+			Match m=Regex.Match(command,@"^([^\s,\(\)]+(\s+[^\s,\(\)]+)?(\s*,\s*[^\s,\(\)]+(\s+[^\s,\(\)]+)?)*)");
+			string[] arrayTableNames=m.Result("$1").Split(',');
+			for(int i=0;i<arrayTableNames.Length;i++) {//Adding matched strings to list
+				string tableName=arrayTableNames[i].Trim().Split(' ')[0];
+				if(!tableName.StartsWith("TEMP") && !tableName.StartsWith("TMP")) {//A table name that doesn't start with temp nor tmp (non temp table).
+					return true;
+				}
+			}			
+			return false;
 		}
 
 		

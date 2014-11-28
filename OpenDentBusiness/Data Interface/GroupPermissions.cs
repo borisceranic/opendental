@@ -203,7 +203,8 @@ namespace OpenDentBusiness{
 				//case Permissions.TaskEdit:
 				//case Permissions.EmailSend:
 				//case Permissions.WebmailSend:
-				return false;//Does not have audit Trail.
+				//case Permissions.UserQueryAdmin:
+				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
 		}
@@ -358,6 +359,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Email Send");
 				case Permissions.WebmailSend:
 					return Lans.g("enumPermissions","Webmail Send");
+				case Permissions.UserQueryAdmin:
+					return Lans.g("enumPermissions","Command Query");
 			}
 			return "";//should never happen
 		}

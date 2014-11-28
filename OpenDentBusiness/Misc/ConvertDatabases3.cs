@@ -6608,6 +6608,29 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE cpt ADD VersionIDs varchar2(255)";
 					Db.NonQ(command);
 				}
+				//Add UserQueryAdmin permission to everyone------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=19";//Anyone who currently has UserQuery access will initially have UserQueryAdmin access.
+					DataTable table=Db.GetTable(command);
+					long groupNum;
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							 +"VALUES("+POut.Long(groupNum)+",87)";  //87: UserQueryAdmin
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=19";//Anyone who currently has UserQuery access will initially have UserQueryAdmin access.
+					DataTable table=Db.GetTable(command);
+					long groupNum;
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							 +"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",87)";  //87: UserQueryAdmin
+						Db.NonQ(command);
+					}
+				}
 				//Update every current cpt code to verion 2014.  Importing of 2015 codes was not implemented until this OD version or later.
 				//oracle compatible
 				command="UPDATE cpt SET VersionIDs='2014'";
