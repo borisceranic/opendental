@@ -657,7 +657,7 @@ namespace OpenDentBusiness{
 				+"WHERE recall.PatNum="+POut.Long(patNum);
 			Db.NonQ(command);
 			//Get table of future appointments dates with recall type for this patient, where a procedure is attached that is a recall trigger procedure
-			command=@"SELECT recalltrigger.RecallTypeNum,MIN("+DbHelper.DateColumn("appointment.AptDateTime")+@") AS AptDateTime
+			command=@"SELECT recalltrigger.RecallTypeNum,MIN("+DbHelper.DtimeToDate("appointment.AptDateTime")+@") AS AptDateTime
 				FROM appointment,procedurelog,recalltrigger,recall
 				WHERE appointment.AptNum=procedurelog.AptNum 
 				AND appointment.PatNum="+POut.Long(patNum)+@" 

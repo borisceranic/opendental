@@ -458,7 +458,7 @@ namespace OpenDentBusiness{
 				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
 				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
 				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum AND claim.PlanNum=inssub.PlanNum "
-				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+">="+POut.Date(dateServiceStart)+" AND "+DbHelper.DateColumn("DateService")+"<="+POut.Date(dateServiceEnd);
+				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DtimeToDate("DateService")+">="+POut.Date(dateServiceStart)+" AND "+DbHelper.DtimeToDate("DateService")+"<="+POut.Date(dateServiceEnd);
 			DataTable tableClaims=Db.GetTable(command);
 			if(tableClaims.Rows.Count==0) {
 				return null;//No matches found for the specific claim fee and date of service.  Aboloutely no suitable matches.

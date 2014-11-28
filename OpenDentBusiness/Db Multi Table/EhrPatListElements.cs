@@ -51,7 +51,7 @@ namespace OpenDentBusiness {
 							//DT is stored as a string in ehrlabresult.ObservationValueDateTime as YYYY[MM[DD]]
 							case HL70125.DT:
 								select+=",ehrlabresult"+i+".ObservationValueDateTime ";//+DbHelper.DateFormatColumn("RPAD(ehrlabresult"+i+".ObservationValueDateTime,8,'01')","%m/%d/%Y");
-								where+="AND "+DbHelper.DateColumn("RPAD(ehrlabresult"+i+".ObservationValueDateTime,8,'01')")
+								where+="AND "+DbHelper.DtimeToDate("RPAD(ehrlabresult"+i+".ObservationValueDateTime,8,'01')")
 									+GetOperandText(elementList[i].Operand)+"'"+POut.String(elementList[i].LabValue)+"' "
 									+"AND ehrlabresult"+i+".ValueType='DT' ";
 								break;

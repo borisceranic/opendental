@@ -632,8 +632,8 @@ namespace OpenDentBusiness{
 				LEFT JOIN (SELECT timeadjust.EmployeeNum,SEC_TO_TIME(SUM(TIME_TO_SEC(timeadjust.RegHours))) AS AdjReg,
 					SEC_TO_TIME(SUM(TIME_TO_SEC(timeadjust.OTimeHours))) AdjOTime 
 					FROM timeadjust 
-					WHERE "+DbHelper.DateColumn("TimeEntry")+" >= "+POut.Date(startDate)+@" 
-					AND "+DbHelper.DateColumn("TimeEntry")+" <= "+POut.Date(stopDate)+@"
+					WHERE "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(startDate)+@" 
+					AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(stopDate)+@"
 					GROUP BY timeadjust.EmployeeNum) temptimeadjust ON clockevent.EmployeeNum=temptimeadjust.EmployeeNum
 				LEFT JOIN (SELECT ceb.EmployeeNum,SEC_TO_TIME(IFNULL(SUM(UNIX_TIMESTAMP(ceb.TimeDisplayed2)),0)-IFNULL(SUM(UNIX_TIMESTAMP(ceb.TimeDisplayed1)),0)) AS BreakTime
 					FROM clockevent ceb

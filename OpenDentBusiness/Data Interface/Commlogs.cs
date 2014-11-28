@@ -84,7 +84,7 @@ namespace OpenDentBusiness{
 			}
 			if(recallType!=0){
 				command="SELECT COUNT(*) FROM commlog WHERE ";
-				command+=DbHelper.DateColumn("CommDateTime")+" = "+datesql;
+				command+=DbHelper.DtimeToDate("CommDateTime")+" = "+datesql;
 				command+=" AND PatNum="+POut.Long(patNum)+" AND CommType="+POut.Long(recallType)
 					+" AND Mode_="+POut.Long((int)_mode)
 					+" AND SentOrReceived=1";
@@ -140,7 +140,7 @@ namespace OpenDentBusiness{
 				return Meth.GetInt(MethodBase.GetCurrentMethod(),date);
 			}
 			string command="SELECT COUNT(*) FROM commlog "
-				+"WHERE "+DbHelper.DateColumn("CommDateTime")+" = "+POut.Date(date)+" "
+				+"WHERE "+DbHelper.DtimeToDate("CommDateTime")+" = "+POut.Date(date)+" "
 				+"AND (SELECT ItemValue FROM definition WHERE definition.DefNum=commlog.CommType) ='"+CommItemTypeAuto.RECALL.ToString()+"'";
 			return PIn.Int(Db.GetScalar(command));
 		}
@@ -151,7 +151,7 @@ namespace OpenDentBusiness{
 				return;
 			}
 			string command="DELETE FROM commlog "
-				+"WHERE "+DbHelper.DateColumn("CommDateTime")+" = "+POut.Date(date)+" "
+				+"WHERE "+DbHelper.DtimeToDate("CommDateTime")+" = "+POut.Date(date)+" "
 				+"AND (SELECT ItemValue FROM definition WHERE definition.DefNum=commlog.CommType) ='"+CommItemTypeAuto.RECALL.ToString()+"'";
 			Db.NonQ(command);
 		}

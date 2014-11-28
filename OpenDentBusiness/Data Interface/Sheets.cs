@@ -103,7 +103,7 @@ namespace OpenDentBusiness{
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
 			string command="SELECT * FROM sheet WHERE PatNum="+POut.Long(patNum)
-				+" AND "+DbHelper.DateColumn("DateTimeSheet")+" = "+datesql;
+				+" AND "+DbHelper.DtimeToDate("DateTimeSheet")+" = "+datesql;
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
@@ -337,7 +337,7 @@ namespace OpenDentBusiness{
 			if(examDescript!=""){
 				command+="AND Description LIKE '%"+POut.String(examDescript)+"%' ";//case insensitive text matches
 			}
-			command+="AND "+DbHelper.DateColumn("DateTimeSheet")+">="+POut.Date(startDate)+" AND "+DbHelper.DateColumn("DateTimeSheet")+"<="+POut.Date(endDate)+" "
+			command+="AND "+DbHelper.DtimeToDate("DateTimeSheet")+">="+POut.Date(startDate)+" AND "+DbHelper.DtimeToDate("DateTimeSheet")+"<="+POut.Date(endDate)+" "
 				+"ORDER BY DateTimeSheet";
 			return Crud.SheetCrud.SelectMany(command);
 		}

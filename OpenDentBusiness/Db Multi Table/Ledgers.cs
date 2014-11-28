@@ -270,7 +270,7 @@ namespace OpenDentBusiness{
 					//Calculate the total charges for each patient during this time period and 
 					//place the results into memory table 'chargesOver90'.
 					"(SELECT t.PatNum,SUM(t.TranAmount) TotalCharges FROM "+tempOdAgingTransTableName+" t "+
-						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DateColumn(ninetyDaysAgo)+" GROUP BY t.PatNum) chargesOver90 "+
+						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DtimeToDate(ninetyDaysAgo)+" GROUP BY t.PatNum) chargesOver90 "+
 					//Update the tempaging table with the caculated charges for the time period.
 					"SET a.ChargesOver90=chargesOver90.TotalCharges "+
 					"WHERE a.PatNum=chargesOver90.PatNum;";
@@ -279,8 +279,8 @@ namespace OpenDentBusiness{
 					//Calculate the total charges for each patient during this time period and 
 					//place the results into memory table 'charges_61_90'.
 					"(SELECT t.PatNum,SUM(t.TranAmount) TotalCharges FROM "+tempOdAgingTransTableName+" t "+
-						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DateColumn(sixtyDaysAgo)+" AND "+
-						"t.TranDate>="+DbHelper.DateColumn(ninetyDaysAgo)+" GROUP BY t.PatNum) charges_61_90 "+
+						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DtimeToDate(sixtyDaysAgo)+" AND "+
+						"t.TranDate>="+DbHelper.DtimeToDate(ninetyDaysAgo)+" GROUP BY t.PatNum) charges_61_90 "+
 					//Update the tempaging table with the caculated charges for the time period.
 					"SET a.Charges_61_90=charges_61_90.TotalCharges "+
 					"WHERE a.PatNum=charges_61_90.PatNum;";
@@ -289,8 +289,8 @@ namespace OpenDentBusiness{
 					//Calculate the total charges for each patient during this time period and 
 					//place the results into memory table 'charges_31_60'.
 					"(SELECT t.PatNum,SUM(t.TranAmount) TotalCharges FROM "+tempOdAgingTransTableName+" t "+
-						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DateColumn(thirtyDaysAgo)+" AND "+
-						"t.TranDate>="+DbHelper.DateColumn(sixtyDaysAgo)+" GROUP BY t.PatNum) charges_31_60 "+
+						"WHERE t.TranAmount>0 AND t.TranDate<"+DbHelper.DtimeToDate(thirtyDaysAgo)+" AND "+
+						"t.TranDate>="+DbHelper.DtimeToDate(sixtyDaysAgo)+" GROUP BY t.PatNum) charges_31_60 "+
 					//Update the tempaging table with the caculated charges for the time period.
 					"SET a.Charges_31_60=charges_31_60.TotalCharges "+
 					"WHERE a.PatNum=charges_31_60.PatNum;";
@@ -299,8 +299,8 @@ namespace OpenDentBusiness{
 					//Calculate the total charges for each patient during this time period and 
 					//place the results into memory table 'charges_0_30'.
 					"(SELECT t.PatNum,SUM(t.TranAmount) TotalCharges FROM "+tempOdAgingTransTableName+" t "+
-						"WHERE t.TranAmount>0 AND t.TranDate<="+DbHelper.DateColumn(asOfDate)+" AND "+
-						"t.TranDate>="+DbHelper.DateColumn(thirtyDaysAgo)+" GROUP BY t.PatNum) charges_0_30 "+
+						"WHERE t.TranAmount>0 AND t.TranDate<="+DbHelper.DtimeToDate(asOfDate)+" AND "+
+						"t.TranDate>="+DbHelper.DtimeToDate(thirtyDaysAgo)+" GROUP BY t.PatNum) charges_0_30 "+
 					//Update the tempaging table with the caculated charges for the time period.
 					"SET a.Charges_0_30=charges_0_30.TotalCharges "+
 					"WHERE a.PatNum=charges_0_30.PatNum;";
@@ -308,7 +308,7 @@ namespace OpenDentBusiness{
 				command+="UPDATE "+tempAgingTableName+" a,"+
 					//Calculate the total credits for each patient and store the results in memory table 'credits'.
 					"(SELECT t.PatNum,-SUM(t.TranAmount) TotalCredits FROM "+tempOdAgingTransTableName+" t "+
-						"WHERE t.TranAmount<0 AND t.TranDate<="+DbHelper.DateColumn(asOfDate)+" GROUP BY t.PatNum) credits "+
+						"WHERE t.TranAmount<0 AND t.TranDate<="+DbHelper.DtimeToDate(asOfDate)+" GROUP BY t.PatNum) credits "+
 					//Update the total credit for each patient into the tempaging table.
 					"SET a.TotalCredits=credits.TotalCredits "+
 					"WHERE a.PatNum=credits.PatNum;";
@@ -319,8 +319,8 @@ namespace OpenDentBusiness{
 					"(SELECT cp.PatNum,SUM(cp.InsPayEst+cp.WriteOff) InsEst "+
 							"FROM claimproc cp "+
 							"WHERE cp.PatNum<>0 "+
-							(historic?(" AND ((cp.Status=0 AND cp.ProcDate<="+DbHelper.DateColumn(asOfDate)+") OR "+
-								"(cp.Status=1 AND cp.DateCP>"+DbHelper.DateColumn(asOfDate)+")) AND cp.ProcDate<="+DbHelper.DateColumn(asOfDate)+" "):" AND cp.Status=0 ")+
+							(historic?(" AND ((cp.Status=0 AND cp.ProcDate<="+DbHelper.DtimeToDate(asOfDate)+") OR "+
+								"(cp.Status=1 AND cp.DateCP>"+DbHelper.DtimeToDate(asOfDate)+")) AND cp.ProcDate<="+DbHelper.DtimeToDate(asOfDate)+" "):" AND cp.Status=0 ")+
 								(guarantor==0?"":(" AND cp.PatNum IN "+familyPatNums+" "))+
 							"GROUP BY cp.PatNum) t "+//not received claims.
 					//Update the tempaging table with the insurance estimates for each patient.
@@ -333,7 +333,7 @@ namespace OpenDentBusiness{
 				command+="UPDATE "+tempAgingTableName+" a,"+
 					"(SELECT ppc.Guarantor,IFNULL(SUM(ppc.Principal+ppc.Interest),0) PayPlanCharges "+
 					"FROM payplancharge ppc "+
-					"WHERE ppc.ChargeDate<="+DbHelper.DateColumn(billInAdvanceDate)+" "+//bill in adv. date accounts for historic vs current because of how it is set above.
+					"WHERE ppc.ChargeDate<="+DbHelper.DtimeToDate(billInAdvanceDate)+" "+//bill in adv. date accounts for historic vs current because of how it is set above.
 					"GROUP BY ppc.Guarantor) c "+
 				"SET a.PayPlanDue=c.PayPlanCharges "+
 					"WHERE c.Guarantor=a.PatNum;";
@@ -345,7 +345,7 @@ namespace OpenDentBusiness{
 					"(SELECT ps.PatNum,SUM(ps.SplitAmt) PayPlanPayments "+
 					"FROM paysplit ps "+
 					"WHERE ps.PayPlanNum<>0 "+//only payments attached to payment plans.
-					(historic?(" AND ps.DatePay<="+DbHelper.DateColumn(asOfDate)+" "):"")+
+					(historic?(" AND ps.DatePay<="+DbHelper.DtimeToDate(asOfDate)+" "):"")+
 					"GROUP BY ps.PatNum) p "+
 				"SET a.PayPlanDue=a.PayPlanDue-p.PayPlanPayments "+
 					"WHERE p.PatNum=a.PatNum;";
@@ -354,7 +354,7 @@ namespace OpenDentBusiness{
 					"FROM claimproc cp "+
 					"WHERE cp.PayPlanNum!=0 "+//only ins payments attached to payment plans
 					"AND cp.status IN (1,4,5) "+//received, supplemental, or CapClaim
-					(historic?(" AND cp.DateCP<="+DbHelper.DateColumn(asOfDate)+" "):"")+
+					(historic?(" AND cp.DateCP<="+DbHelper.DtimeToDate(asOfDate)+" "):"")+
 					"GROUP BY cp.PatNum) p "+
 					"SET a.PayPlanDue=a.PayPlanDue-p.PayPlanInsPayments "+
 					"WHERE p.PatNum=a.PatNum;";
@@ -364,7 +364,7 @@ namespace OpenDentBusiness{
 				//Calculate the total balance for each patient and
 				//place the results into memory table 'totals'.
 				"(SELECT t.PatNum,SUM(t.TranAmount) BalTotal FROM "+tempOdAgingTransTableName+" t "+
-					"WHERE t.TranAmount<>0 "+(historic?(" AND t.TranDate<="+DbHelper.DateColumn(asOfDate)):"")+" GROUP BY t.PatNum) totals "+
+					"WHERE t.TranAmount<>0 "+(historic?(" AND t.TranDate<="+DbHelper.DtimeToDate(asOfDate)):"")+" GROUP BY t.PatNum) totals "+
 				//Update the tempaging table with the caculated charges for the time period.
 				"SET a.BalTotal=totals.BalTotal "+
 				"WHERE a.PatNum=totals.PatNum;";

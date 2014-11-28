@@ -648,7 +648,7 @@ namespace OpenDental{
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			//Procedures------------------------------------------------------------------------------
 			report.Query="(SELECT "
-				+DbHelper.DateColumn("procedurelog.ProcDate")+" procdate,"
+				+DbHelper.DtimeToDate("procedurelog.ProcDate")+" procdate,"
 				+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) namelf,"
 				+"procedurecode.Descript,"
 				+"provider.Abbr,"
@@ -678,8 +678,8 @@ namespace OpenDental{
 				+"AND provider.ProvNum=procedurelog.ProvNum "
 				+whereProv
 				+whereClin
-				+"AND "+DbHelper.DateColumn("procedurelog.ProcDate")+" >= " +POut.Date(dateFrom)+" "
-				+"AND "+DbHelper.DateColumn("procedurelog.ProcDate")+" <= " +POut.Date(dateTo)+" "
+				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= " +POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= " +POut.Date(dateTo)+" "
 				+"GROUP BY procedurelog.ProcNum "
 				+") UNION ALL (";
 			//Adjustments-----------------------------------------------------------------------------
@@ -1138,18 +1138,18 @@ Group By procdate Order by procdate desc
 			}
 			//==Travis (04/11/2014): In the case that you have two capitation plans for a single patient the query below will cause a duplicate row, incorectly increasing your production.
 			//	We now state in the manual that having two capitation plans is not advised and will cause reporting to be off.
-			report.Query="SELECT "+DbHelper.DateColumn("procedurelog.ProcDate")+" ProcDate, "
+			report.Query="SELECT "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" ProcDate, "
 				+"SUM(procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)) "
 				+"-IFNULL(SUM(claimproc.WriteOff),0) "
 				+"FROM procedurelog "
 				+"LEFT JOIN claimproc ON procedurelog.procnum=claimproc.procnum AND claimproc.status='7' "//only CapComplete writeoffs are subtracted here.
-				+"WHERE "+DbHelper.DateColumn("procedurelog.ProcDate")+" >= "+POut.Date(dateFrom)+" "
-				+"AND "+DbHelper.DateColumn("procedurelog.ProcDate")+" <= "+POut.Date(dateTo)+" "
+				+"WHERE "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= "+POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= "+POut.Date(dateTo)+" "
 				+"AND procedurelog.ProcStatus = '2' "//complete
 				+whereProv
 				+whereClin
-				+"GROUP BY "+DbHelper.DateColumn("procedurelog.ProcDate")+" "
-				+"ORDER BY "+DbHelper.DateColumn("procedurelog.ProcDate");
+				+"GROUP BY "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" "
+				+"ORDER BY "+DbHelper.DtimeToDate("procedurelog.ProcDate");
 			TableCharge=report.GetTempTable();
 //NEXT is TableInsWriteoff--------------------------------------------------------------------------
 /*
@@ -1254,7 +1254,7 @@ GROUP BY SchedDate
 				whereClin+=") ";
 			}
 			//The reason ProcFee*(UnitQty+BaseUnits) is not used here is due to the inability to predict the UnitQty of something you have yet to do.
-			report.Query= "SELECT "+DbHelper.DateColumn("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) "
+			report.Query= "SELECT "+DbHelper.DtimeToDate("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) "
 				+"FROM (SELECT appointment.AptDateTime,IFNULL(procedurelog.ProcFee,0) Fee,";
 			if(PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO)) {
 				report.Query+="SUM(IFNULL(CASE WHEN WriteOffEstOverride != -1 THEN WriteOffEstOverride ELSE WriteOffEst END,0)) WriteoffEstimate ";
@@ -1268,8 +1268,8 @@ GROUP BY SchedDate
 				+"LEFT JOIN claimproc ON procedurelog.ProcNum = claimproc.ProcNum AND Status=6 AND (WriteOffEst != -1 OR WriteOffEstOverride != -1) "
 				+"WHERE (appointment.AptStatus = 1 OR "//stat=scheduled
         +"appointment.AptStatus = 4) "//or stat=ASAP
-				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
-				+"AND "+DbHelper.DateColumn("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
+				+"AND "+DbHelper.DtimeToDate("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DtimeToDate("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
 				+whereProv
 				+whereClin
 				+" GROUP BY procedurelog.ProcNum) t "//without this, there can be duplicate proc rows due to the claimproc join with dual insurance.

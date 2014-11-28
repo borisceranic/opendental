@@ -1344,10 +1344,10 @@ namespace OpenDentBusiness{
 			string command="SELECT DateTimeArrived,DateTimeSeated,LName,FName,Preferred,"+DbHelper.Now()+" dateTimeNow "
 				+"FROM appointment "
 				+"JOIN patient ON appointment.PatNum=patient.PatNum "
-				+"WHERE "+DbHelper.DateColumn("AptDateTime")+" = "+POut.Date(DateTime.Now)+" "
+				+"WHERE "+DbHelper.DtimeToDate("AptDateTime")+" = "+POut.Date(DateTime.Now)+" "
 				+"AND DateTimeArrived > "+POut.Date(DateTime.Now)+" "//midnight earlier today
 				+"AND DateTimeArrived < "+DbHelper.Now()+" "
-				+"AND "+DbHelper.DateColumn("DateTimeArrived")+"="+DbHelper.DateColumn("AptDateTime")+" ";//prevents people from getting "stuck" in waiting room.
+				+"AND "+DbHelper.DtimeToDate("DateTimeArrived")+"="+DbHelper.DtimeToDate("AptDateTime")+" ";//prevents people from getting "stuck" in waiting room.
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				command+="AND TO_NUMBER(TO_CHAR(DateTimeSeated,'SSSSS')) = 0 ";
 			}
@@ -1613,7 +1613,7 @@ namespace OpenDentBusiness{
 				DateTime aptDate=PIn.DateT(aptDateTime);
 				command+=" OR (AptNum=0 "//unattached
 					+"AND ProcStatus=2 "//complete
-					+"AND "+DbHelper.DateColumn("ProcDate")+"="+POut.Date(aptDate)+")";//same date
+					+"AND "+DbHelper.DtimeToDate("ProcDate")+"="+POut.Date(aptDate)+")";//same date
 			}
 			command+=") "
 				+"AND ProcStatus<>6 "//Not deleted.
@@ -1969,7 +1969,7 @@ namespace OpenDentBusiness{
 			Dictionary<long,DateTime> retVal=new Dictionary<long,DateTime>();
 			string command="SELECT PatNum,MAX(AptDateTime) DateLastAppt "
 					+"FROM appointment "
-					+"WHERE "+DbHelper.DateColumn("AptDateTime")+"<="+DbHelper.Curdate()+" "
+					+"WHERE "+DbHelper.DtimeToDate("AptDateTime")+"<="+DbHelper.Curdate()+" "
 					+"GROUP BY PatNum";
 			DataTable tableLastVisit=Db.GetTable(command);
 			for(int i=0;i<tableLastVisit.Rows.Count;i++) {
@@ -1986,7 +1986,7 @@ namespace OpenDentBusiness{
 			string command="SELECT * "
 					+"FROM appointment "
 					+"WHERE AptStatus IN (1,2,4) "//Scheduled, Complete, ASAP
-					+"AND "+DbHelper.DateColumn("AptDateTime")+">="+POut.Date(dateFrom)+" AND "+DbHelper.DateColumn("AptDateTime")+"<="+POut.Date(dateTo);
+					+"AND "+DbHelper.DtimeToDate("AptDateTime")+">="+POut.Date(dateFrom)+" AND "+DbHelper.DtimeToDate("AptDateTime")+"<="+POut.Date(dateTo);
 			List<Appointment> listApts=Crud.AppointmentCrud.SelectMany(command);
 			for(int i=0;i<listApts.Count;i++) {
 				if(retVal.ContainsKey(listApts[i].PatNum)) {

@@ -1689,7 +1689,7 @@ FROM insplan";
 				command+=@"AND patplan.Ordinal=1 AND insplan.MonthRenew="+POut.Int(monthStart)+" ";
 			}
 			if(!patsWithAppts) {
-				command+=@"AND patient.PatNum NOT IN (SELECT PatNum FROM appointment WHERE AptStatus IN (1,4) AND "+DbHelper.DateColumn("AptDateTime")+">"+DbHelper.Curdate()+") ";//Scheduled and ASAP appointments.
+				command+=@"AND patient.PatNum NOT IN (SELECT PatNum FROM appointment WHERE AptStatus IN (1,4) AND "+DbHelper.DtimeToDate("AptDateTime")+">"+DbHelper.Curdate()+") ";//Scheduled and ASAP appointments.
 			}
 			if(aboveAmount>0) {
 				command+=@"AND (tempannualmax"+rndStr+@".AnnualMax IS NULL OR tempannualmax"+rndStr+@".AnnualMax-IFNULL(tempused"+rndStr+@".AmtUsed,0)>"+POut.Double(aboveAmount)+") ";

@@ -16,8 +16,8 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT * FROM timeadjust WHERE "
 				+"EmployeeNum = "+POut.Long(empNum)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" >= "+POut.Date(fromDate)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" <= "+POut.Date(toDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(fromDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(toDate)+" "
 				+"ORDER BY TimeEntry";
 			return Crud.TimeAdjustCrud.SelectMany(command);
 		}
@@ -31,8 +31,8 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT * FROM timeadjust WHERE "
 				+"EmployeeNum = "+POut.Long(empNum)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" >= "+POut.Date(fromDate)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" <= "+POut.Date(toDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(fromDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(toDate)+" "
 				+"ORDER BY TimeEntry";
 			retVal=Crud.TimeAdjustCrud.SelectMany(command);
 			//Validate---------------------------------------------------------------------------------------------------------------
@@ -50,8 +50,8 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT * FROM timeadjust WHERE "
 				+"EmployeeNum = "+POut.Long(empNum)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" >= "+POut.Date(fromDate)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" <= "+POut.Date(toDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(fromDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(toDate)+" "
 				+"ORDER BY TimeEntry";
 			//listTimeAdjusts=Crud.TimeAdjustCrud.SelectMany(command);
 			return Crud.TimeAdjustCrud.SelectMany(command);
@@ -106,8 +106,8 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT * FROM timeadjust WHERE "
 				+"EmployeeNum = "+POut.Long(employeeNum)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" >= "+POut.Date(startDate)+" "
-				+"AND "+DbHelper.DateColumn("TimeEntry")+" < "+POut.Date(stopDate.AddDays(1))+" "//add one day to go the end of the specified date.
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(startDate)+" "
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" < "+POut.Date(stopDate.AddDays(1))+" "//add one day to go the end of the specified date.
 				+"AND IsAuto=1";
 			//listTimeAdjusts=Crud.TimeAdjustCrud.SelectMany(command);
 			return Crud.TimeAdjustCrud.SelectMany(command);

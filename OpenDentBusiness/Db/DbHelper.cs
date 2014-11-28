@@ -141,7 +141,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>TO_DATE() for datetime columns where we only want the date.</summary>
-		public static string DateColumn(string colName) {
+		public static string DtimeToDate(string colName) {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				return "TO_DATE("+colName+")";
 			}

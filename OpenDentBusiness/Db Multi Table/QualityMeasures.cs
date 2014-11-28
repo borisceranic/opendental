@@ -3233,7 +3233,7 @@ namespace OpenDentBusiness {
 				+"FROM ehrmeasureevent "
 				+"LEFT JOIN snomed ON snomed.SnomedCode=ehrmeasureevent.CodeValueResult AND ehrmeasureevent.CodeSystemResult='SNOMEDCT' "
 				+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.TobaccoUseAssessed)+" " 
-				+"AND "+DbHelper.DateColumn("DateTEvent")+">="+POut.Date(dateEnd)+"-INTERVAL 24 MONTH ";
+				+"AND "+DbHelper.DtimeToDate("DateTEvent")+">="+POut.Date(dateEnd)+"-INTERVAL 24 MONTH ";
 			if(listPatNums!=null && listPatNums.Count>0) {
 				command+="AND ehrmeasureevent.PatNum IN("+string.Join(",",listPatNums)+") ";
 			}

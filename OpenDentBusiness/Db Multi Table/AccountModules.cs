@@ -653,7 +653,7 @@ namespace OpenDentBusiness {
 				+"AND paysplit.ProcNum<>0 "//Prevents long load time in a patient with thousands of entries.
 				+"AND paysplit.PatNum IN ("+familyPatNums+")"
 				+") patPay_,"
-				+"ProcCode,"+DbHelper.DateColumn("procedurelog.ProcDate")+" procDate_,ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,"
+				+"ProcCode,"+DbHelper.DtimeToDate("procedurelog.ProcDate")+" procDate_,ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,"
 				+"procedurelog.ProvNum,procedurelog.Surf,ToothNum,ToothRange,UnitQty,"
 				+"SUM(cp1.WriteOff) writeOff_, "
 				+"(SELECT MIN(ClaimNum) FROM claimproc cp3,insplan WHERE procedurelog.ProcNum=cp3.ProcNum "
@@ -668,7 +668,7 @@ namespace OpenDentBusiness {
 				+familyPatNums;
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				command+=") GROUP BY procedurelog.ClinicNum,procedurelog.BaseUnits,procedurelog.BillingNote,procedurecode.CodeNum,Descript,LaymanTerm,procedurelog.MedicalCode,procedurelog.PatNum,ProcCode,"
-					+DbHelper.DateColumn("procedurelog.ProcDate")+",ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,procedurelog.ProvNum,procedurelog.Surf,ToothNum,"
+					+DbHelper.DtimeToDate("procedurelog.ProcDate")+",ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,procedurelog.ProvNum,procedurelog.Surf,ToothNum,"
 					+"ToothRange,UnitQty ";
 			}
 			else{//mysql. Including Descript in the GROUP BY causes mysql to lock up sometimes.  Unsure why.
@@ -679,7 +679,7 @@ namespace OpenDentBusiness {
 				//different query here.  Include all column names.
 				command="SELECT '' AS adj_,procedurelog.BaseUnits,procedurelog.BillingNote,procedurelog.ClinicNum,procedurecode.CodeNum,procedurecode.Descript,"
 					+"'' AS insPayAmt_,'' AS insPayEst_,procedurecode.LaymanTerm,procedurelog.MedicalCode,'' AS noBillIns_,procedurelog.PatNum,"
-					+"'' AS patPay_,procedurecode.ProcCode,"+DbHelper.DateColumn("procedurelog.ProcDate")+" procDate_,procedurelog.ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,"
+					+"'' AS patPay_,procedurecode.ProcCode,"+DbHelper.DtimeToDate("procedurelog.ProcDate")+" procDate_,procedurelog.ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,"
 					+"procedurelog.ProvNum,procedurelog.Surf,procedurelog.ToothNum,procedurelog.ToothRange,procedurelog.UnitQty,"
 					+"'' AS writeOff_,'' AS unsent_,'' AS writeOffCap_ "
 					+"FROM procedurelog "

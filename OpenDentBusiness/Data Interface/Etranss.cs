@@ -26,11 +26,11 @@ namespace OpenDentBusiness{
 				//if(DataConnection.DBtype==DatabaseType.Oracle){
 				//	command+="TO_";
 				//}
-				+DbHelper.DateColumn("DateTimeTrans")+" >= "+POut.Date(dateFrom)+" AND "
+				+DbHelper.DtimeToDate("DateTimeTrans")+" >= "+POut.Date(dateFrom)+" AND "
 				//if(DataConnection.DBtype==DatabaseType.Oracle){
 				//	command+="TO_";
 				//}
-				+DbHelper.DateColumn("DateTimeTrans")+" <= "+POut.Date(dateTo)+" "
+				+DbHelper.DtimeToDate("DateTimeTrans")+" <= "+POut.Date(dateTo)+" "
 				+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_997)+" "
 				+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_999)+" "
 				+"AND Etype!="+POut.Long((int)EtransType.BenefitInquiry270)+" "

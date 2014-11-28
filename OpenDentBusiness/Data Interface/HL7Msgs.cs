@@ -34,7 +34,7 @@ namespace OpenDentBusiness{
 			}
 			//join with the patient table so we can display patient name instead of PatNum
 			string command=@"SELECT HL7MsgNum,HL7Status,'' AS MsgText,AptNum,DateTStamp,PatNum,Note	"
-				+"FROM hl7msg	WHERE "+DbHelper.DateColumn("hl7msg.DateTStamp")+" BETWEEN "+POut.Date(startDate)+" AND "+POut.Date(endDate)+" ";
+				+"FROM hl7msg	WHERE "+DbHelper.DtimeToDate("hl7msg.DateTStamp")+" BETWEEN "+POut.Date(startDate)+" AND "+POut.Date(endDate)+" ";
 			if(patNum>0) {
 				command+="AND hl7msg.PatNum="+POut.Long(patNum)+" ";
 			}

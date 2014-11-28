@@ -829,8 +829,8 @@ namespace OpenDentBusiness{
 							+") Procs "
 							+"LEFT JOIN ehrmeasureevent ON ehrmeasureevent.PatNum=Procs.PatNum "
 								+"AND EventType="+POut.Int((int)EhrMeasureEventType.ClinicalSummaryProvidedToPt)+" "
-								+"AND "+DbHelper.DateColumn("ehrmeasureevent.DateTEvent")+" >= Procs.visitDate "
-								+"AND "+DbHelper.DateColumn("ehrmeasureevent.DateTEvent")+" <= Procs.deadlineDate "
+								+"AND "+DbHelper.DtimeToDate("ehrmeasureevent.DateTEvent")+" >= Procs.visitDate "
+								+"AND "+DbHelper.DtimeToDate("ehrmeasureevent.DateTEvent")+" <= Procs.deadlineDate "
 							+"GROUP BY Procs.PatNum,Procs.visitDate;";
 					tableRaw=Db.GetTable(command);
 					break;
@@ -1559,16 +1559,16 @@ namespace OpenDentBusiness{
 						+"GROUP BY patient.PatNum) A ";
 					//left join allergies with DateTStamp within reporting period
 					command+="LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM allergy "
-						+"WHERE "+DbHelper.DateColumn("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"WHERE "+DbHelper.DtimeToDate("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"GROUP BY PatNum) allergies ON allergies.PatNum=A.PatNum ";
 					//left join problems with DateTStamp within reporting period
 					command+="LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM disease "
-						+"WHERE "+DbHelper.DateColumn("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"WHERE "+DbHelper.DtimeToDate("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"GROUP BY PatNum) problems ON problems.PatNum=A.PatNum ";
 					//left join medications with DateStart or DateTStamp within reporting period
 					command+="LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM medicationpat "
 						+"WHERE DateStart BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
-						+"OR "+DbHelper.DateColumn("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"OR "+DbHelper.DtimeToDate("DateTStamp")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"GROUP BY PatNum) meds ON meds.PatNum=A.PatNum";
 					return retval+=PIn.Int(Db.GetScalar(command));
 				#endregion
