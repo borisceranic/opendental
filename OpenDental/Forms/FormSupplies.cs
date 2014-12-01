@@ -364,20 +364,6 @@ namespace OpenDental {
 		}
 		
 		private void textFind_TextChanged(object sender,EventArgs e) {
-			//TODO: standardize this validation. i.e. use validation provider?
-			if(!Regex.IsMatch(textFind.Text,@"^[0-9a-zA-Z]*$")) {
-				textFind.BackColor=Color.LightPink;
-				return;
-			}
-			textFind.BackColor=SystemColors.Window;
-			//if(textFind.Text!="" || IsSelectMode) {
-			//	butUp.Enabled=false;
-			//	butDown.Enabled=false;
-			//}
-			//else {
-			//	butUp.Enabled=true;
-			//	butDown.Enabled=true;
-			//}
 			SelectedGridItems.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
 				SelectedGridItems.Add(ListSupply[index].SupplyNum);
