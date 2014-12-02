@@ -303,27 +303,36 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			MessageHL7 msgHl7=new MessageHL7(MessageTypeHL7.SRR);
+			Provider provPri=Providers.GetProv(apt.ProvNum);
 			//go through each segment in the def
 			for(int i=0;i<hl7DefMessage.hl7DefSegments.Count;i++) {
-				SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
-				seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
-				for(int j=0;j<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;j++) {
-					string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].FieldName;
-					if(fieldName=="") {//If fixed text instead of field name just add text to segment
-						seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].FixedText);
-					}
-					else {
-						string fieldValue="";
-						if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.MSA) {
-							fieldValue=FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent);
+				List<Provider> listProvs=new List<Provider>();
+				listProvs.Add(provPri);
+				if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.AIP && apt.ProvHyg>0) {
+					listProvs.Add(Providers.GetProv(apt.ProvHyg));
+				}
+				for(int j=0;j<listProvs.Count;j++) {//AIP will be repeated if there is a dentist and a hygienist on the appt
+					Provider prov=listProvs[j];
+					SegmentHL7 seg=new SegmentHL7(hl7DefMessage.hl7DefSegments[i].SegmentName);
+					seg.SetField(0,hl7DefMessage.hl7DefSegments[i].SegmentName.ToString());
+					for(int k=0;k<hl7DefMessage.hl7DefSegments[i].hl7DefFields.Count;k++) {
+						string fieldName=hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FieldName;
+						if(fieldName=="") {//If fixed text instead of field name just add text to segment
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].FixedText);
 						}
 						else {
-							fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,apt,j+1,eventType,seg.Name);
+							string fieldValue="";
+							if(hl7DefMessage.hl7DefSegments[i].SegmentName==SegmentNameHL7.MSA) {
+								fieldValue=FieldConstructor.GenerateFieldACK(hl7Def,fieldName,controlId,isAck,ackEvent);
+							}
+							else {
+								fieldValue=FieldConstructor.GenerateFieldSRR(hl7Def,fieldName,pat,prov,apt,j+1,eventType,seg.Name);
+							}
+							seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[k].OrdinalPos,fieldValue);
 						}
-						seg.SetField(hl7DefMessage.hl7DefSegments[i].hl7DefFields[j].OrdinalPos,fieldValue);
 					}
+					msgHl7.Segments.Add(seg);
 				}
-				msgHl7.Segments.Add(seg);
 			}
 			return msgHl7;
 		}

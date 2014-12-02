@@ -24,8 +24,8 @@ namespace OpenDentBusiness.HL7 {
 		}
 		
 		///<summary>Sends null values in for objects not required.  GenerateField will return an empty string if a field requires an object and that object is null.</summary>
-		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Appointment apt,int sequenceNum,EventTypeHL7 eventType,SegmentNameHL7 segName) {
-			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,null,null,null,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SRR_S01,segName);
+		public static string GenerateFieldSRR(HL7Def def,string fieldName,Patient pat,Provider prov,Appointment apt,int sequenceNum,EventTypeHL7 eventType,SegmentNameHL7 segName) {
+			return GenerateField(def,fieldName,MessageTypeHL7.SRR,pat,prov,null,null,apt,sequenceNum,eventType,null,null,MessageStructureHL7.SRR_S01,segName);
 		}
 
 		///<summary>apt, guar, proc, prov, pdfDescription, pdfDataString, patplanCur, inssubCur, insplanCur, carrierCur, and patSub can be null and will return an empty string if a field requires that object</summary>
@@ -88,6 +88,12 @@ namespace OpenDentBusiness.HL7 {
 					}
 					//apt.AptStatus==ApptStatus.Scheduled or apt.AptStatus==ApptStatus.ASAP or other status that triggers an SCH segment
 					return "Booked";
+				case "apt.confirmStatus":
+					if(apt==null) {
+						return "";
+					}
+					//Example: |^Appointment Confirmed|
+					return gConcat(def.ComponentSeparator,"",DefC.GetName(DefCat.ApptConfirmed,apt.Confirmed));//this will return an empty string if apt.Confirmed is 0 or invalid
 				case "apt.endAptDateTime":
 					if(apt==null) {
 						return "";
@@ -396,25 +402,6 @@ namespace OpenDentBusiness.HL7 {
 						return pdfDataString;
 					}
 				#region Procedure
-				case "proc.location":
-					//Point of Care^Room^^Facility^^Person Location Type
-					//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
-					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
-						return "";
-					}
-					string procClinicDescript=Clinics.GetDesc(proc.ClinicNum);//could be blank if proc.ClinicNum is invalid
-					if(procClinicDescript=="") {
-						procClinicDescript=Clinics.GetDesc(pat.ClinicNum);//could be blank if pat.ClinicNum is invalid
-					}
-					string procOpName="";
-					if(apt!=null) {
-						Operatory procOp=Operatories.GetOperatory(apt.Op);
-						if(procOp!=null) {
-							procOpName=procOp.OpName;
-						}
-					}
-					practiceName=PrefC.GetString(PrefName.PracticeTitle);
-					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",def.SubcomponentSeparator+practiceName,"","C");
 				case "proc.DiagnosticCode":
 					if(proc==null) {
 						return "";
@@ -441,14 +428,33 @@ namespace OpenDentBusiness.HL7 {
 							retval+=listDiagCodes[i];
 							continue;
 						}
-						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd9Cur.Description,"I9C","","","","31","","");
+						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd9Cur.Description,"I9C","","","","31");
 					}
 					return retval;
+				case "proc.location":
+					//Point of Care^Room^^Facility^^Person Location Type
+					//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
+					if(proc==null || (proc.ClinicNum==0 && pat.ClinicNum==0)) {//if proc is null and both pat.ClinicNum and proc.ClinicNum are 0, return empty string
+						return "";
+					}
+					string procClinicDescript=Clinics.GetDesc(proc.ClinicNum);//could be blank if proc.ClinicNum is invalid
+					if(procClinicDescript=="") {
+						procClinicDescript=Clinics.GetDesc(pat.ClinicNum);//could be blank if pat.ClinicNum is invalid
+					}
+					string procOpName="";
+					if(apt!=null) {
+						Operatory procOp=Operatories.GetOperatory(apt.Op);
+						if(procOp!=null) {
+							procOpName=procOp.OpName;
+						}
+					}
+					practiceName=PrefC.GetString(PrefName.PracticeTitle);
+					return gConcat(def.ComponentSeparator,procClinicDescript,procOpName,"",def.SubcomponentSeparator+practiceName,"","C");
 				case "proc.procDateTime":
 					if(proc==null) {
 						return "";
 					}
-					return gDTM(proc.ProcDate,14);
+					return gDTM(proc.ProcDate,8);
 				case "proc.ProcFee":
 					if(proc==null) {
 						return "";
@@ -463,7 +469,12 @@ namespace OpenDentBusiness.HL7 {
 					if(proc==null) {
 						return "";
 					}
-					return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
+					if(_isEcwDef) {
+						return gTreatArea(def.ComponentSeparator,proc,def.IsQuadAsToothNum);
+					}
+					else {
+						return gTreatArea(def.SubcomponentSeparator,proc,def.IsQuadAsToothNum);
+					}
 				case "proccode.ProcCode":
 					if(proc==null) {
 						return "";
@@ -484,12 +495,21 @@ namespace OpenDentBusiness.HL7 {
 						return gConcat(def.ComponentSeparator,prov.EcwID,prov.LName,prov.FName,prov.MI);
 					}
 					//Will return all provider IDs in the oidexternals table linked to this provider as repetitions
-					//Example: 2.16.840.1.113883.3.4337.1486.6566.3.1^Abbott^Sarah^L~OtherSoftware.Root.Provider.ProvID^Abbott^Sarah^L
+					//For an AIG, the provider name is one component in the form LName, FName MI and the fourth component is the provider abbreviation
+					//For a PV1 or AIP, the provider name is separated into three components like LName^FName^MI and the sixth component is the provider abbreviation
+					//AIG Example: |2.16.840.1.113883.3.4337.1486.6566.3.1^Abbott, Sarah L, DMD^^DrAbbott~OtherSoftware.Root.Provider.ProvID^Abbott, Sarah L, DMD^^DrAbbott|
+					//PV1 or AIP Example: 2.16.840.1.113883.3.4337.1486.6566.3.1^Abbott^Sarah^L^DMD^DrAbbott~OtherSoftware.Root.Provider.ProvID^Abbott^Sarah^L^DMD^DrAbbott
 					List<OIDExternal> listProvOidExt=OIDExternals.GetByInternalIDAndType(prov.ProvNum,IdentifierType.Provider);
-					retval=gConcat(def.ComponentSeparator,OIDInternals.GetForType(IdentifierType.Provider).IDRoot+"."+prov.ProvNum,prov.LName,prov.FName,prov.MI);
+					string provName="";
+					if(segName==SegmentNameHL7.AIG) {
+						provName=prov.LName+", "+prov.FName+" "+prov.MI+", "+prov.Suffix;
+					}
+					else {
+						provName=gConcat(def.ComponentSeparator,prov.LName,prov.FName,prov.MI,prov.Suffix);
+					}
+					retval=gConcat(def.ComponentSeparator,OIDInternals.GetForType(IdentifierType.Provider).IDRoot+"."+prov.ProvNum,provName,prov.Abbr);
 					for(int i=0;i<listProvOidExt.Count;i++) {
-						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listProvOidExt[i].rootExternal+"."+listProvOidExt[i].IDExternal,
-							prov.LName,prov.FName,prov.MI,prov.Suffix,prov.Abbr);
+						retval+=def.RepetitionSeparator+gConcat(def.ComponentSeparator,listProvOidExt[i].rootExternal+"."+listProvOidExt[i].IDExternal,provName,prov.Abbr);
 					}
 					return retval;
 				case "prov.provType":
@@ -700,29 +720,30 @@ namespace OpenDentBusiness.HL7 {
 					//DEP-HandicapDep (GRD-Guardian), DEP-Dependent, OTH-SignifOther (OTH-Other), OTH-InjuredPlantiff
 					//We store relationship to subscriber and they want subscriber's relationship to patient, therefore
 					//Relat.Child will return "PAR" for Parent, Relat.Employee will return "EMR" for Employer, and Relat.HandicapDep and Relat.Dependent will return "GRD" for Guardian
+					//Example: |PAR^Parent|
 					if(patplanCur==null) {
 						return "";
 					}
 					if(patplanCur.Relationship==Relat.Self) {
-						return "SEL";
+						return gConcat(def.ComponentSeparator,"SEL","Self");
 					}
 					if(patplanCur.Relationship==Relat.Spouse) {
-						return "SPO";
+						return gConcat(def.ComponentSeparator,"SPO","Spouse");
 					}
 					if(patplanCur.Relationship==Relat.LifePartner) {
-						return "DOM";//Life Partner
+						return gConcat(def.ComponentSeparator,"DOM","Life Partner");
 					}
 					if(patplanCur.Relationship==Relat.Child) {
-						return "PAR";//Parent
+						return gConcat(def.ComponentSeparator,"PAR","Parent");
 					}
 					if(patplanCur.Relationship==Relat.Employee) {
-						return "EMR";//Employer
+						return gConcat(def.ComponentSeparator,"EMR","Employer");
 					}
 					if(patplanCur.Relationship==Relat.Dependent || patplanCur.Relationship==Relat.HandicapDep) {
-						return "GRD";//Guardian
+						return gConcat(def.ComponentSeparator,"GRD","Guardian");
 					}
 					//if Relat.SignifOther or Relat.InjuredPlaintiff or any others
-					return "OTH";
+					return gConcat(def.ComponentSeparator,"OTH","Other");
 				#endregion PatPlan
 				case "sequenceNum":
 					return sequenceNum.ToString();
@@ -740,7 +761,7 @@ namespace OpenDentBusiness.HL7 {
 				case "messageControlId":
 					return controlId;
 				case "messageType":
-					return gConcat(def.ComponentSeparator,"ACK",ackEvent);
+					return gConcat(def.ComponentSeparator,MessageTypeHL7.ACK.ToString(),ackEvent,MessageTypeHL7.ACK.ToString());
 				case "separators^~\\&":
 					return gSep(def);
 				default:
@@ -875,6 +896,7 @@ namespace OpenDentBusiness.HL7 {
 			return retval;
 		}
 
+		///<summary>The value for the parameter componentSep is def.ComponentSeparator (default ^) for eCW bridges.  But for all other bridges it will be def.SubcomponentSeparator (default &)., we will place the "procedure code modifier" all in the first component, the "Identifier" component.  The second component is "Text" so it doesn't really make sense to put the tooth or range of teeth in the "Identifier" component and the surface/quad/sextant/arch in the "Text" component.  Now the whole tooth/surf/range/quad/sextant/arch modifier will be in the "Identifier" component with 0, 1, or 2 subcomponents.  Examples for eCW: |4^MODL|, |^UL|, |1,2,3|, |^3|.  Examples for everyone else: |4&MODL|, |&UL|, |1,2,3|, |&3|</summary>
 		private static string gTreatArea(string componentSep,Procedure proc,bool isQuadAsToothNum) {
 			string retVal="";
 			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);

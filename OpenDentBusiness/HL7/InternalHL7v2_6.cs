@@ -158,6 +158,8 @@ namespace OpenDentBusiness.HL7 {
 						//This field is repeatable and will be handled the same as the patientIdList in the PID segment, so it may contain multiple CX data type identifiers that point to a patient.
 						seg.AddField(2,"guarIdList");
 						//GT1.3, Guarantor Name
+						//This will contain the last, first, and middle names as well as the title
+						//Example:  LName^FName^MiddleI^^Title
 						seg.AddField(3,"guar.nameLFM");
 						//GT1.5, Guarantor Address
 						//GT1.5.20, comment, is used to populate patient.AddrNote with '\.br\' signaling a line break.
@@ -258,6 +260,8 @@ namespace OpenDentBusiness.HL7 {
 						//or if no patient can be found using that value.
 						seg.AddField(4,"pat.ChartNumber");
 						//PID.5, Patient Name
+						//This will contain the last, first, and middle names as well as the title
+						//Example:  LName^FName^MiddleI^^Title
 						seg.AddField(5,"pat.nameLFM");
 						//PID.7, Date/Time of Birth
 						seg.AddField(7,"pat.birthdateTime");
@@ -403,6 +407,8 @@ namespace OpenDentBusiness.HL7 {
 						//or if no patient can be found using that value.
 						seg.AddField(4,"pat.ChartNumber");
 						//PID.5, Patient Name
+						//This will contain the last, first, and middle names as well as the title
+						//Example:  LName^FName^MiddleI^^Title
 						seg.AddField(5,"pat.nameLFM");
 						//PID.7, Date/Time of Birth
 						seg.AddField(7,"pat.birthdateTime");
@@ -552,10 +558,12 @@ namespace OpenDentBusiness.HL7 {
 						//The recommeded value for this field in the table is ^2.16.840.1.113883.3.4337.1486.CustomerPatNum^HL7.
 						//If the oidinternal row with IDType=Root does not have an IDRoot assigned, we will revert to sending 'OD'
 						seg.AddField(2,"sendingApp");
+						//MSH.3, Sending Facility, not used
 						//MSH.4, Receiving Application
 						//This field will have to be a fixed text field and would have to be modified in a custom definition
 						//if they want the outbound messages to have a specific receiving application identifier
 						seg.AddField(4,"0361",DataTypeHL7.HD,"","NamespaceID^UniversalID^UniversalIDType");
+						//MSH.5, Receiving Facility, not used
 						//MSH.6, Message Date and Time (YYYYMMDDHHMMSS)
 						seg.AddField(6,"dateTime.Now");
 						//MSH.8, Message Type, MSG data type
@@ -570,12 +578,12 @@ namespace OpenDentBusiness.HL7 {
 						//MSH.11, Version ID, VID data type, Version ID^Internationalization Code^International Version ID
 						//All components are optional, we will only send Version ID, which is currently 2.6
 						seg.AddField(11,"0104",DataTypeHL7.VID,"","2.6");
-						//MSH.16, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
+						//MSH.15, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
 						//This is for enhanced acknowledgment mode, which we do not currently support, but we will send our mode just in case
 						//With field MSH.15, Accept Ack Type, not present it will default to NE
-						//Field MSH.16 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
+						//Field MSH.15 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
 						//But MSH.15 not present or null means we do not require a separate accept ACK message, just the accept and validate response meaning the message was accepted and processed
-						seg.AddField(16,"0155",DataTypeHL7.ID,"","AL");
+						seg.AddField(15,"0155",DataTypeHL7.ID,"","AL");
 					#endregion MSH - Message Header
 					#region MSA - Message Acknowledgment
 					seg=new HL7DefSegment();
@@ -610,10 +618,12 @@ namespace OpenDentBusiness.HL7 {
 						//The recommeded value for this field in the table is ^2.16.840.1.113883.3.4337.1486.CustomerPatNum^HL7.
 						//If the oidinternal row with IDType=Root does not have an IDRoot assigned, we will revert to sending 'OD'
 						seg.AddField(2,"sendingApp");
+						//MSH.3, Sending Facility, not used
 						//MSH.4, Receiving Application
 						//This field will have to be a fixed text field and would have to be modified in a custom definition
 						//if they want the outbound messages to have a specific receiving application identifier
 						seg.AddField(4,"0361",DataTypeHL7.HD,"","NamespaceID^UniversalID^UniversalIDType");
+						//MSH.5, Receiving Facility, not used
 						//MSH.6, Message Date and Time (YYYYMMDDHHMMSS)
 						seg.AddField(6,"dateTime.Now");
 						//MSH.8, Message Type, MSG data type
@@ -628,12 +638,12 @@ namespace OpenDentBusiness.HL7 {
 						//MSH.11, Version ID, VID data type, Version ID^Internationalization Code^International Version ID
 						//All components are optional, we will only send Version ID, which is currently 2.6
 						seg.AddField(11,"0104",DataTypeHL7.VID,"","2.6");
-						//MSH.16, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
+						//MSH.15, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
 						//This is for enhanced acknowledgment mode, which we do not currently support, but we will send our mode just in case
 						//With field MSH.15, Accept Ack Type, not present it will default to NE
-						//Field MSH.16 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
+						//Field MSH.15 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
 						//But MSH.15 not present or null means we do not require a separate accept ACK message, just the accept and validate response meaning the message was accepted and processed
-						seg.AddField(16,"0155",DataTypeHL7.ID,"","AL");
+						seg.AddField(15,"0155",DataTypeHL7.ID,"","AL");
 					#endregion MSH - Message Header
 					#region EVN - Event Type
 					seg=new HL7DefSegment();
@@ -822,10 +832,12 @@ namespace OpenDentBusiness.HL7 {
 						//The recommeded value for this field in the table is ^2.16.840.1.113883.3.4337.1486.CustomerPatNum^HL7.
 						//If the oidinternal row with IDType=Root does not have an IDRoot assigned, we will revert to sending 'OD'
 						seg.AddField(2,"sendingApp");
+						//MSH.3, Sending Facility, not used
 						//MSH.4, Receiving Application
 						//This field will have to be a fixed text field and would have to be modified in a custom definition
 						//if they want the outbound messages to have a specific receiving application identifier
 						seg.AddField(4,"0361",DataTypeHL7.HD,"","NamespaceID^UniversalID^UniversalIDType");
+						//MSH.5, Receiving Facility, not used
 						//MSH.6, Message Date and Time (YYYYMMDDHHMMSS)
 						seg.AddField(6,"dateTime.Now");
 						//MSH.8, Message Type, MSG data type
@@ -840,12 +852,12 @@ namespace OpenDentBusiness.HL7 {
 						//MSH.11, Version ID, VID data type, Version ID^Internationalization Code^International Version ID
 						//All components are optional, we will only send Version ID, which is currently 2.6
 						seg.AddField(11,"0104",DataTypeHL7.VID,"","2.6");
-						//MSH.16, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
+						//MSH.15, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
 						//This is for enhanced acknowledgment mode, which we do not currently support, but we will send our mode just in case
 						//With field MSH.15, Accept Ack Type, not present it will default to NE
-						//Field MSH.16 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
+						//Field MSH.15 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
 						//But MSH.15 not present or null means we do not require a separate accept ACK message, just the accept and validate response meaning the message was accepted and processed
-						seg.AddField(16,"0155",DataTypeHL7.ID,"","AL");
+						seg.AddField(15,"0155",DataTypeHL7.ID,"","AL");
 					#endregion MSH - Message Header
 					#region EVN - Event Type
 					seg=new HL7DefSegment();
@@ -928,7 +940,7 @@ namespace OpenDentBusiness.HL7 {
 						//PV1.3, Assigned Patient Location, PL - Person Location Data Type: Point of Care^Room^^Facility^^Person Location Type
 						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
 						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
-						seg.AddField(3,"pat.location");
+						seg.AddField(3,"apt.location");
 						//PV1.7, Attending/Primary Care Doctor, ProviderId^LastName^FirstName^MI
 						seg.AddField(7,"0010",DataTypeHL7.XCN,"prov.provIdNameLFM","");
 						//PV1.11, Temporary Location, PL - Person Location data type: PointOfCare^^^^^Person Location Type
@@ -981,6 +993,8 @@ namespace OpenDentBusiness.HL7 {
 						//FT1.19, Diagnosis Code, CWE data type, repeatable if they have more than 1 code on the proc (currently 4 allowed)
 						//Example: |520.2^Abnormal tooth size/form^I9C^^^^31^^~521.81^Cracked tooth^I9C^^^^31^^|
 						seg.AddField(19,"proc.DiagnosticCode");
+						//FT1.20, Performed by Code
+						seg.AddField(20,"prov.provIdNameLFM");
 						//FT1.21, Ordering Provider
 						seg.AddField(21,"prov.provIdNameLFM");
 						//FT1.22, Unit Cost (procedure fee)
@@ -1036,6 +1050,8 @@ namespace OpenDentBusiness.HL7 {
 						//DEP-HandicapDep (GRD-Guardian), DEP-Dependent, OTH-SignifOther (OTH-Other), OTH-InjuredPlantiff
 						//We store relationship to subscriber and they want subscriber's relationship to patient, therefore
 						//Relat.Child will return "PAR" for Parent, Relat.Employee will return "EMR" for Employer, and Relat.HandicapDep and Relat.Dependent will return "GRD" for Guardian
+						//We will use the first two components, Identifier^Text
+						//Example: |PAR^Parent|
 						seg.AddField(17,"patplan.subRelationToPat");
 						//IN1.18, Insured's Date of Birth, DTM data type
 						seg.AddField(18,"inssub.subBirthdate");
@@ -1080,10 +1096,12 @@ namespace OpenDentBusiness.HL7 {
 						//The recommeded value for this field in the table is ^2.16.840.1.113883.3.4337.1486.CustomerPatNum^HL7.
 						//If the oidinternal row with IDType=Root does not have an IDRoot assigned, we will revert to sending 'OD'
 						seg.AddField(2,"sendingApp");
+						//MSH.3, Sending Facility, not used
 						//MSH.4, Receiving Application
 						//This field will have to be a fixed text field and would have to be modified in a custom definition
 						//if they want the outbound messages to have a specific receiving application identifier
 						seg.AddField(4,"0361",DataTypeHL7.HD,"","NamespaceID^UniversalID^UniversalIDType");
+						//MSH.5, Receiving Facility, not used
 						//MSH.6, Message Date and Time (YYYYMMDDHHMMSS)
 						seg.AddField(6,"dateTime.Now");
 						//MSH.8, Message Type, MSG data type
@@ -1098,12 +1116,12 @@ namespace OpenDentBusiness.HL7 {
 						//MSH.11, Version ID, VID data type, Version ID^Internationalization Code^International Version ID
 						//All components are optional, we will only send Version ID, which is currently 2.6
 						seg.AddField(11,"0104",DataTypeHL7.VID,"","2.6");
-						//MSH.16, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
+						//MSH.15, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
 						//This is for enhanced acknowledgment mode, which we do not currently support, but we will send our mode just in case
 						//With field MSH.15, Accept Ack Type, not present it will default to NE
-						//Field MSH.16 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
+						//Field MSH.15 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
 						//But MSH.15 not present or null means we do not require a separate accept ACK message, just the accept and validate response meaning the message was accepted and processed
-						seg.AddField(16,"0155",DataTypeHL7.ID,"","AL");
+						seg.AddField(15,"0155",DataTypeHL7.ID,"","AL");
 					#endregion MSH - Message Header
 					#region SCH - Schedule Activity Information
 					seg=new HL7DefSegment();
@@ -1269,6 +1287,11 @@ namespace OpenDentBusiness.HL7 {
 						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
 						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
+						//AIL.12, Filler Status Code, CWE data type
+						//We will use this to send the confirmation status of the appointment
+						//We will use the second component (text) and send the ItemName (confirm Name) from the definition table that is set for this appointment
+						//Example: |^Appointment Confirmed|
+						seg.AddField(12,"apt.confirmStatus");
 					#endregion AIL - Appointment Information - Location Resource
 					#region AIP - Appointment Information - Personnel Resource
 					//We will use the AIP segment to identify the dentist and hygienist on the appointment
@@ -1292,6 +1315,11 @@ namespace OpenDentBusiness.HL7 {
 						//AIP.4, Resource Type, CWE data type
 						//We will send 'd' for dentist (apt.ProvNum) and 'h' for hygienist (apt.ProvHyg)
 						seg.AddField(4,"prov.provType");
+						//AIP.12, Filler Status Code, CWE data type
+						//We will use this to send the confirmation status of the appointment
+						//We will use the second component (text) and send the ItemName (confirm Name) from the definition table that is set for this appointment
+						//Example: |^Appointment Confirmed|
+						seg.AddField(12,"apt.confirmStatus");
 					#endregion AIP - Appointment Information - Personnel Resource
 				#endregion SIU - Schedule Information Unsolicited
 				#region SRR - Schedule Request Response
@@ -1309,10 +1337,12 @@ namespace OpenDentBusiness.HL7 {
 						//The recommeded value for this field in the table is ^2.16.840.1.113883.3.4337.1486.CustomerPatNum^HL7.
 						//If the oidinternal row with IDType=Root does not have an IDRoot assigned, we will revert to sending 'OD'
 						seg.AddField(2,"sendingApp");
+						//MSH.3, Sending Facility, not used
 						//MSH.4, Receiving Application
 						//This field will have to be a fixed text field and would have to be modified in a custom definition
 						//if they want the outbound messages to have a specific receiving application identifier
 						seg.AddField(4,"0361",DataTypeHL7.HD,"","NamespaceID^UniversalID^UniversalIDType");
+						//MSH.5, Receiving Facility, not used
 						//MSH.6, Message Date and Time (YYYYMMDDHHMMSS)
 						seg.AddField(6,"dateTime.Now");
 						//MSH.8, Message Type, MSG data type
@@ -1327,12 +1357,12 @@ namespace OpenDentBusiness.HL7 {
 						//MSH.11, Version ID, VID data type, Version ID^Internationalization Code^International Version ID
 						//All components are optional, we will only send Version ID, which is currently 2.6
 						seg.AddField(11,"0104",DataTypeHL7.VID,"","2.6");
-						//MSH.16, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
+						//MSH.15, Application Ack Type (AL=Always, NE=Never, ER=Error/reject conditions only, SU=Successful completion only)
 						//This is for enhanced acknowledgment mode, which we do not currently support, but we will send our mode just in case
 						//With field MSH.15, Accept Ack Type, not present it will default to NE
-						//Field MSH.16 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
+						//Field MSH.15 set to AL means we will require an ack for every message that is sent, meaning it was processed successfully by the receiving application
 						//But MSH.15 not present or null means we do not require a separate accept ACK message, just the accept and validate response meaning the message was accepted and processed
-						seg.AddField(16,"0155",DataTypeHL7.ID,"","AL");
+						seg.AddField(15,"0155",DataTypeHL7.ID,"","AL");
 					#endregion MSH - Message Header
 					#region MSA - Message Acknowledgment
 					seg=new HL7DefSegment();
@@ -1378,10 +1408,13 @@ namespace OpenDentBusiness.HL7 {
 					seg=new HL7DefSegment();
 					msg.AddSegment(seg,2,true,true,SegmentNameHL7.NTE);
 						//Fields-------------------------------------------------------------------------------------------------------------
+						//NTE.1, Set ID, SI data type
+						//We will only ever send one NTE segment in outbound messages, so this will always be 1
+						seg.AddFieldFixed(1,DataTypeHL7.SI,"1");
 						//NTE.3, Comment, FT data type (formatted text)
-						//We will append this comment to appointment.Note if the Note for this appointment does not already contain the exact text received
-						//This is formatted text, so we will allow new lines.
-						//As in the address note field (see PID.11) we will accept '\.br\' (where the '\' is the defined escape char, \ by default) to signal a new line.
+						//We will send the appointment.Note value in this field for outbound messages
+						//This is formatted text, so new line characters in the appointment.Note will be replaced with
+						//the designated new line character sequence '\.br\' (where the '\' is the defined escape char, \ by default)
 						seg.AddField(3,"apt.Note");
 					#endregion NTE - Notes and Comments
 					#region PID - Patient Identification
@@ -1498,6 +1531,11 @@ namespace OpenDentBusiness.HL7 {
 						//Facility is a HD data type, so Namespace&ID&IDType.  We will just use &PracticeTitle with no namespace or IDType.
 						//Example: ClinicDescript^OpName^^&PracticeTitle^^C  (C for clinic)
 						seg.AddField(3,"apt.location");
+						//AIL.12, Filler Status Code, CWE data type
+						//We will use this to send the confirmation status of the appointment
+						//We will use the second component (text) and send the ItemName (confirm Name) from the definition table that is set for this appointment
+						//Example: |^Appointment Confirmed|
+						seg.AddField(12,"apt.confirmStatus");
 					#endregion AIL - Appointment Information - Location Resource
 					#region AIP - Appointment Information - Personnel Resource
 					//We will use the AIP segment to identify the dentist and hygienist on the appointment
@@ -1521,6 +1559,11 @@ namespace OpenDentBusiness.HL7 {
 						//AIP.4, Resource Type, CWE data type
 						//We will send 'd' for dentist (apt.ProvNum) and 'h' for hygienist (apt.ProvHyg)
 						seg.AddField(4,"prov.provType");
+						//AIP.12, Filler Status Code, CWE data type
+						//We will use this to send the confirmation status of the appointment
+						//We will use the second component (text) and send the ItemName (confirm Name) from the definition table that is set for this appointment
+						//Example: |^Appointment Confirmed|
+						seg.AddField(12,"apt.confirmStatus");
 					#endregion AIP - Appointment Information - Personnel Resource
 				#endregion SRR - Schedule Request Response
 			#endregion Outbound Messages
