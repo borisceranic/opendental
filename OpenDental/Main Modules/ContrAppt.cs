@@ -2866,7 +2866,15 @@ namespace OpenDental {
 			ContrApptSingle.ClickedAptNum=HitTestAppt(e.Location);
 			SheetClickedonOp=ApptDrawing.VisOps[ApptDrawing.XPosToOpIdx(e.X)].OperatoryNum;
 			SheetClickedonDay=ApptDrawing.XPosToDay(e.X);
-			if(!ApptDrawing.IsWeeklyView) {
+			//if Sunday is selected, we want to go to forward to the Sunday after the first day of the week (always Monday) not the Sunday before
+			//used to determine if a blockout from a list of blockouts is on the day selected
+			//this value will be added to the first day of the week, always Monday, to get the day selected
+			//Example: if user clicks on Wednesday, (int)Wednesday=3, (int)Monday=1, SheetClickedonDay=3-1=2, Monday.AddDays(SheetClickedonDay)=Wednesday
+			//Example: if user clicks on Sunday, (int)Sunday=0, SheetClickedonDay=6, Monday.AddDays(SheetClickedonDay)=the Sunday following the start of the week Monday
+			if(AppointmentL.DateSelected.DayOfWeek==DayOfWeek.Sunday) {
+				SheetClickedonDay=6;
+			}
+			else {
 				SheetClickedonDay=((int)AppointmentL.DateSelected.DayOfWeek)-1;
 			}
 			Graphics grfx=ContrApptSheet2.CreateGraphics();
