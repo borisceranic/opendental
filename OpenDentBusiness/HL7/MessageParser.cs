@@ -555,7 +555,7 @@ namespace OpenDentBusiness.HL7 {
 					ProcessPV1(pat,apt,segDef,seg);
 					return;
 				case SegmentNameHL7.SCH:
-					ProcessSCH(pat,apt,segDef,seg);
+					ProcessSCH(pat,apt,segDef,seg,msg);
 					return;
 				default:
 					return;
@@ -1112,6 +1112,7 @@ namespace OpenDentBusiness.HL7 {
 						guar.LName=seg.GetFieldComponent(itemOrder,0);
 						guar.FName=seg.GetFieldComponent(itemOrder,1);
 						guar.MiddleI=seg.GetFieldComponent(itemOrder,2);
+						guar.Title=seg.GetFieldComponent(itemOrder,4);
 						continue;
 					//case "guar.PatNum": Maybe do nothing??
 					case "guar.SSN":
@@ -1239,11 +1240,16 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 				}
 			}
-			if(apt.Note.Contains(strAptNote)) {//if the existing note contains the exact text of the note in the NTE segment, don't append it again
+			//if the existing note contains the exact text of the note in the NTE segment, don't append it again
+			//replace the \r's and then \n's with a blank string before comparing to eliminate inconsistencies in new line characters
+			if(apt.Note.Replace("\r\n","\n").Replace("\r","\n").Contains(strAptNote.Replace("\r\n","\n").Replace("\r","\n"))) {
 				return;
 			}
 			Appointment aptOld=apt.Clone();
-			apt.Note+="\r\n"+strAptNote;
+			if(apt.Note.Length>0) {//if the existing note already contains some text, add a new line before appending the note from the NTE segment
+				apt.Note+="\r\n";
+			}
+			apt.Note+=strAptNote;
 			Appointments.Update(apt,aptOld);
 			_aptProcessed=apt;
 			if(_isVerboseLogging) {
@@ -2026,9 +2032,13 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		///<summary>Returns AptNum of the incoming appointment.  apt was found using the apt.AptNum field of the SCH segment, but can be null if it's a new appointment.  Used for eCW and other interfaces where OD is not the filler application.  When OD is not the filler application, we allow appointments to be created by the interfaced software and communicated to OD with an SIU message.</summary>
-		public static long ProcessSCH(Patient pat,Appointment apt,HL7DefSegment segDef,SegmentHL7 seg) {
+		public static long ProcessSCH(Patient pat,Appointment apt,HL7DefSegment segDef,SegmentHL7 seg,MessageHL7 msg) {
 			if(pat.FName=="" || pat.LName=="") {
 				throw new Exception("Appointment not processed due to missing patient first or last name. PatNum:"+pat.PatNum.ToString());
+			}
+			char escapeChar='\\';
+			if(msg.Delimiters.Length>2) {//it is possible they did not send all 4 of the delimiter chars, in which case we will use the default \
+				escapeChar=msg.Delimiters[2];
 			}
 			string strAptNote="";
 			double aptLength=0;
@@ -2056,7 +2066,7 @@ namespace OpenDentBusiness.HL7 {
 						aptStop=FieldParser.DateTimeParse(seg.GetFieldComponent(itemOrder,4));
 						continue;
 					case "apt.Note":
-						strAptNote=seg.GetFieldComponent(itemOrder);
+						strAptNote=FieldParser.StringNewLineParse(seg.GetFieldComponent(itemOrder),escapeChar);
 						continue;
 					default:
 						continue;
@@ -2076,7 +2086,14 @@ namespace OpenDentBusiness.HL7 {
 			if(apt.PatNum!=pat.PatNum) {//we can't process this message because wrong patnum.
 				throw new Exception("Appointment does not match patient "+pat.GetNameFLnoPref()+", apt.PatNum: "+apt.PatNum.ToString()+", pat.PatNum: "+pat.PatNum.ToString());
 			}
-			apt.Note=strAptNote;
+			//if the existing note contains the exact text of the note in the SCH segment, don't append it again
+			//replace the \r's and then \n's with a blank string before comparing to eliminate inconsistencies in new line characters
+			if(!apt.Note.Replace("\r","").Replace("\n","").Contains(strAptNote.Replace("\r","").Replace("\n",""))) {
+				if(apt.Note.Length>0) {//if the existing note already contains some text, add a new line before appending the note from the SCH segment
+					apt.Note+="\r\n";
+				}
+				apt.Note+=strAptNote;
+			}
 			string pattern;
 			//If aptStop is MinValue we know that stop time was not sent or was not in the correct format so try to use the duration field.
 			if(aptStop==DateTime.MinValue && aptLength!=0) {//Stop time is optional.  If not included we will use the duration field to calculate pattern.

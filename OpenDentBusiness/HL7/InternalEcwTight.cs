@@ -134,8 +134,8 @@ namespace OpenDentBusiness.HL7 {
 			//SCH segment------------------------------------------------------------------
 			seg=new HL7DefSegment();
 			msg.AddSegment(seg,1,SegmentNameHL7.SCH);
-			//SCH.1, Placer Appointment ID.  In the old eCW interface, we were pulling from SCH.2, which was always the same as SCH.1.
-			seg.AddField(1,"apt.AptNum");
+			//SCH.2, Filler Appointment ID.  In the old eCW interface, we were pulling from SCH.2, which was always the same as SCH.1.
+			seg.AddField(2,"apt.AptNum");
 			//SCH.7, Appointment Reason
 			seg.AddField(7,"apt.Note");
 			//SCH.11, Appointment Timing Quantity
