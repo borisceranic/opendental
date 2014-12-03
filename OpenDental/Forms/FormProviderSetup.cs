@@ -729,8 +729,11 @@ namespace OpenDental{
 				if(gridMain.SelectedIndices.Length>0) {//place new provider after the first selected index. No changes are made to DB until after provider is actually inserted.
 					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString())).ItemOrder;//now two with this itemorder
 				}
-				else {
+				else if(gridMain.Rows.Count>0) {
 					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.Rows.Count-1]["ProvNum"].ToString())).ItemOrder;
+				}
+				else {
+					FormPE.ProvCur.ItemOrder=0;
 				}
 			}
 			if(!radioStudents.Checked) {
