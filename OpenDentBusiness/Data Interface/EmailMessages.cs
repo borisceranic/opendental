@@ -203,13 +203,14 @@ namespace OpenDentBusiness{
 			return strErrors;
 		}
 
-		///<summary>Refreshes our cached copy of the public key certificate store from the Windows certificate store.</summary>
+		///<summary>Refreshes our cached copy of the public key certificate store and the anchor certificate store from the Windows certificate store.</summary>
 		public static void RefreshCertStoreExternal(EmailAddress emailAddressLocal) {
 			string strSenderAddress=emailAddressLocal.EmailUsername.Trim();//Cannot be emailAddressFrom.SenderAddress, or else will not find the right encryption certificate.
 			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(strSenderAddress);
 			string strSenderDomain=strSenderAddress.Substring(strSenderAddress.IndexOf("@")+1);//For example, if strSenderAddress is ehr@opendental.com, then this will be opendental.com
 			//Refresh the directAgent class using the updated list of public certs while leaving everything else alone. This must be done, or else the certificate will not be found when encrypting the outgoing email.
-			directAgent=new Health.Direct.Agent.DirectAgent(strSenderDomain,directAgent.PrivateCertResolver,Health.Direct.Common.Certificates.SystemX509Store.OpenExternal().CreateResolver(),directAgent.TrustAnchors);
+			directAgent=new Health.Direct.Agent.DirectAgent(strSenderDomain,directAgent.PrivateCertResolver,Health.Direct.Common.Certificates.SystemX509Store.OpenExternal().CreateResolver(),
+				new Health.Direct.Common.Certificates.TrustAnchorResolver(Health.Direct.Common.Certificates.SystemX509Store.OpenAnchor()));
 			directAgent.EncryptMessages=true;
 			HashDirectAgents[strSenderDomain]=directAgent;
 		}
@@ -1233,19 +1234,12 @@ namespace OpenDentBusiness{
 			if(hasAttachments && emailMessage.Attachments!=null && emailMessage.Attachments.Count>0) {
 				string strAttachPath=GetEmailAttachPath();
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
-					string strAttachFileName=emailMessage.Attachments[i].DisplayedFileName;
 					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
-					string strAttachText=File.ReadAllText(strAttachFile);
-					Health.Direct.Common.Mime.MimeEntity mimeEntityAttach=new Health.Direct.Common.Mime.MimeEntity(Convert.ToBase64String(Encoding.UTF8.GetBytes(strAttachText)));
-					mimeEntityAttach.ContentDisposition="attachment;";
-					mimeEntityAttach.ContentTransferEncoding="base64;";
-					if(Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()==".xml" || Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()==".xsl") {
-						mimeEntityAttach.ContentType="text/xml;";
-					}
-					else {
-						mimeEntityAttach.ContentType="text/plain;";
-					}
-					mimeEntityAttach.ContentType+=" name="+strAttachFileName+";";
+					//We always attach with base64 encoding, so that we do not have to worry about violating the RFC822 email format with binary characters or invalid newlines.
+					Health.Direct.Common.Mime.MimeEntity mimeEntityAttach=new Health.Direct.Common.Mime.MimeEntity(Convert.ToBase64String(File.ReadAllBytes(strAttachFile)));
+					mimeEntityAttach.ContentTransferEncoding="base64";
+					mimeEntityAttach.ContentDisposition="attachment; filename=\""+emailMessage.Attachments[i].DisplayedFileName+"\"";
+					mimeEntityAttach.ContentType=Mime.GetMimeTypeForEmail(strAttachFile)+"; name=\""+emailMessage.Attachments[i].DisplayedFileName+"\"";
 					listMimeParts.Add(mimeEntityAttach);
 				}
 			}

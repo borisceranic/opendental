@@ -172,12 +172,7 @@ namespace OpenDental {
 				if(form.ShowDialog()==DialogResult.OK) {
 					//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
 					EmailMessages.RefreshCertStoreExternal(AddressInbox);
-					string sigTrust="N";
-					if(EmailMessages.IsAddressTrusted(emailMessage.FromAddress)) {
-						sigTrust="Y";
-					}
-					gridEmailMessages.Rows[e.Row].Cells[e.Col].Text=sigTrust;
-					gridEmailMessages.Invalidate();
+					GetMessages();//Refresh the entire inbox, because there may be multiple email messages from the same address that the user just added trust for.  The Sig column may need to be updated on multiple rows.
 				}
 				break;
 			}

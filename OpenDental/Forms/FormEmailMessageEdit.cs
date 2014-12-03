@@ -68,6 +68,8 @@ namespace OpenDental{
 		///<summary>The signing certificate attached to this email message, or null if not present.</summary>
 		private X509Certificate2 _certSig;
 		private bool _isComposing;
+		///<summary>TODO: Replace this flag with a new flag on the email address object.</summary>
+		private bool _isSigningEnabled=true;
 
 		///<summary></summary>
 		public FormEmailMessageEdit(EmailMessage messageCur){
@@ -317,6 +319,7 @@ namespace OpenDental{
 			this.textSignedBy.ReadOnly = true;
 			this.textSignedBy.Size = new System.Drawing.Size(325, 20);
 			this.textSignedBy.TabIndex = 39;
+			this.textSignedBy.Visible = false;
 			// 
 			// labelSignedBy
 			// 
@@ -326,6 +329,7 @@ namespace OpenDental{
 			this.labelSignedBy.TabIndex = 40;
 			this.labelSignedBy.Text = "Signed By:";
 			this.labelSignedBy.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSignedBy.Visible = false;
 			// 
 			// butSig
 			// 
@@ -658,7 +662,9 @@ namespace OpenDental{
 		private void RefreshAll() {
 			if(MessageCur.SentOrReceived==EmailSentOrReceived.Neither) {//Composing a message
 				_isComposing=true;
-				SetSig(EmailMessages.GetCertFromPrivateStore(MessageCur.FromAddress));
+				if(_isSigningEnabled) {
+					SetSig(EmailMessages.GetCertFromPrivateStore(MessageCur.FromAddress));
+				}
 			}
 			else {//sent or received (not composing)
 				_isComposing=false;
@@ -824,14 +830,14 @@ namespace OpenDental{
 		}
 
 		private void textFromAddress_KeyUp(object sender,KeyEventArgs e) {
-			if(!_isComposing) {
+			if(!_isComposing || !_isSigningEnabled) {
 				return;
 			}
 			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
 		}
 
 		private void textFromAddress_Leave(object sender,EventArgs e) {
-			if(!_isComposing) {
+			if(!_isComposing || !_isSigningEnabled) {
 				return;
 			}
 			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
@@ -1205,7 +1211,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			SaveMsg();
 			try{
-				if(_certSig==null) {
+				if(_certSig==null && !_isSigningEnabled) {
 					EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
 				}
 				else {
