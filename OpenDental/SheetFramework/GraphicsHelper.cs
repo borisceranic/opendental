@@ -48,7 +48,7 @@ namespace OpenDental {
 				layoutRectangle=new RectangleF(
 					bounds.X,
 					(float)(bounds.Y+topPad+pixelsPerLine*lineIdx),
-					bounds.Width+50,//any amount of extra padding here will not cause malfunction
+					bounds.Width+100,//any amount of extra padding here will not cause malfunction
 					layoutH);
 				g.DrawString(str.Substring(ix,chars),font,brush,layoutRectangle);
 				lineIdx+=1;
@@ -100,7 +100,7 @@ namespace OpenDental {
 					(float)xbounds.X,
 					//(float)(xbounds.Y+(float)topPad/scaleToPix+(pixelsPerLine/scaleToPix)*lineIdx),
 					(float)(xbounds.Y+adjustTextDown+(pixelsPerLine/scaleToPix)*lineIdx),
-					(float)xbounds.Width+50,//any amount of extra padding here will not cause malfunction
+					(float)xbounds.Width+100,//any amount of extra padding here will not cause malfunction
 					0);//layoutH);
 				xg.DrawString(str.Substring(ix,chars),xfont,xbrush,(double)layoutRectangle.Left,(double)layoutRectangle.Top);
 				lineIdx+=1;
