@@ -1018,8 +1018,7 @@ namespace OpenDentBusiness{
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
 					string strAttachFileName=emailMessage.Attachments[i].DisplayedFileName;
 					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
-					string strAttachText=File.ReadAllText(strAttachFile);
-					Health.Direct.Common.Mime.MimeEntity mimeEntityAttach=new Health.Direct.Common.Mime.MimeEntity(Convert.ToBase64String(Encoding.UTF8.GetBytes(strAttachText)));
+					Health.Direct.Common.Mime.MimeEntity mimeEntityAttach=new Health.Direct.Common.Mime.MimeEntity(Convert.ToBase64String(File.ReadAllBytes(strAttachFile)));
 					mimeEntityAttach.ContentDisposition="attachment;";
 					mimeEntityAttach.ContentTransferEncoding="base64;";
 					if(Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()==".xml" || Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()==".xsl") {
