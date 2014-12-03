@@ -450,10 +450,10 @@ namespace OpenDental.ReportingComplex
 				if(reportObject.SectionName!=section.Name){
 					continue;
 				}
-				if(reportObject.ObjectKind==ReportObjectKind.TextObject){
+				if(reportObject.ReportObjectKind==ReportObjectKind.TextObject){
 					textObject=reportObject;
 					Font newFont=textObject.Font;
-					strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+					strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 					if(section.Name=="Report Footer") {
 						if(textObject.Name=="ReportSummaryText") {
 							xPos+=MyReport.ReportObjects["ReportSummaryLabel"].Size.Width;
@@ -466,7 +466,7 @@ namespace OpenDental.ReportingComplex
 							SizeF size=g.MeasureString(textObject.StaticText,newFont);
 							textObject.Size=new Size((int)size.Width+1,(int)size.Height+1);
 						}
-						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+						strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X+textObject.OffSetX
 							,yPos+textObject.Location.Y+textObject.OffSetY
 							,textObject.Size.Width,textObject.Size.Height);
@@ -479,7 +479,7 @@ namespace OpenDental.ReportingComplex
 						}
 					}
 					else {
-						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+						strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
 							,yPos+textObject.Location.Y
 							,textObject.Size.Width,textObject.Size.Height);
@@ -491,31 +491,31 @@ namespace OpenDental.ReportingComplex
 						}
 					}
 				}
-				else if(reportObject.ObjectKind==ReportObjectKind.FieldObject){
+				else if(reportObject.ReportObjectKind==ReportObjectKind.FieldObject){
 					fieldObject=reportObject;
-					strFormat=ReportObject.GetStringFormatAlignment(fieldObject.TextAlign);
+					strFormat=ReportObject.GetStringFormatAlignment(fieldObject.ContentAlignment);
 					RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X
 						,yPos+fieldObject.Location.Y
 						,fieldObject.Size.Width,fieldObject.Size.Height);
 					displayText="";
-					if(fieldObject.FieldKind==FieldDefKind.SummaryField) {
+					if(fieldObject.FieldDefKind==FieldDefKind.SummaryField) {
 						//displayText=fieldObject.GetSummaryValue
 						//	(MyReport.ReportTables,MyReport.DataFields.IndexOf
 						//	(fieldObject.SummarizedField))
 						//	.ToString(fieldObject.FormatString);
 					}
-					else if(fieldObject.FieldKind==FieldDefKind.SpecialField){
-						if(fieldObject.SpecialType==SpecialFieldType.PageNofM){//not functional yet
+					else if(fieldObject.FieldDefKind==FieldDefKind.SpecialField){
+						if(fieldObject.SpecialFieldType==SpecialFieldType.PageNofM){//not functional yet
 							//displayText=Lan.g(this,"Page")+" "+(pagesPrinted+1).ToString()
 							//	+Lan.g(
 						}
-						else if(fieldObject.SpecialType==SpecialFieldType.PageNumber){
+						else if(fieldObject.SpecialFieldType==SpecialFieldType.PageNumber){
 							displayText=Lan.g(this,"Page")+" "+(pagesPrinted+1).ToString();
 						}
 					}
 					g.DrawString(displayText,fieldObject.Font,Brushes.Black,layoutRect,strFormat);
 				}
-				else if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+				else if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
 					boxObject=reportObject;
 					int x1=xPos+boxObject.OffSetX;
 					int x2=xPos-boxObject.OffSetX;
@@ -527,9 +527,9 @@ namespace OpenDental.ReportingComplex
 					}
 					x2+=maxHorizontalLength;
 					y2+=MyReport.GetSectionHeight(boxObject.SectionName);
-					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 				}
-				else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+				else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
 					lineObject=reportObject;
 					int length;
 					int x=lineObject.OffSetX;
@@ -539,7 +539,7 @@ namespace OpenDental.ReportingComplex
 						maxHorizontalLength=850;
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
-						length=maxHorizontalLength*lineObject.LinePercent/100;
+						length=maxHorizontalLength*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.Bottom) {
 							y+=MyReport.GetSectionHeight(lineObject.SectionName);
 						}
@@ -553,10 +553,10 @@ namespace OpenDental.ReportingComplex
 							continue;
 						}
 						x+=(maxHorizontalLength/2)-(length/2);
-						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.Left) {
 							//Do Nothing Here
 						}
@@ -570,7 +570,7 @@ namespace OpenDental.ReportingComplex
 							continue;
 						}
 						y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
-						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 					}
 				}
 			}
@@ -591,7 +591,7 @@ namespace OpenDental.ReportingComplex
 					continue;
 				}
 
-				if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+				if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
 					boxObject=reportObject;
 					int x1=xPos+boxObject.OffSetX;
 					int x2=xPos-boxObject.OffSetX;
@@ -603,9 +603,9 @@ namespace OpenDental.ReportingComplex
 					}
 					x2+=maxHorizontalLength-xPos;
 					y2+=_heightRemaining*MyReport.GetSectionHeight(boxObject.SectionName);
-					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 				}
-				else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+				else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
 					lineObject=reportObject;
 					int length;
 					int x=lineObject.OffSetX;
@@ -615,7 +615,7 @@ namespace OpenDental.ReportingComplex
 						maxHorizontalLength=850;
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
-						length=maxHorizontalLength*lineObject.LinePercent/100;
+						length=maxHorizontalLength*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.Bottom) {
 							y+=MyReport.GetSectionHeight(lineObject.SectionName);
 						}
@@ -629,10 +629,10 @@ namespace OpenDental.ReportingComplex
 							continue;
 						}
 						x+=(maxHorizontalLength/2)-(length/2);
-						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.Left) {
 							//Do Nothing Here
 						}
@@ -646,7 +646,7 @@ namespace OpenDental.ReportingComplex
 							continue;
 						}
 						y=y+(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
-						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 					}
 					else {
 						//Do nothing since it has already been done for each row.
@@ -659,10 +659,10 @@ namespace OpenDental.ReportingComplex
 					//skip any reportObjects that are not in this section
 					continue;
 				}
-				if(reportObject.ObjectKind==ReportObjectKind.TextObject) {
+				if(reportObject.ReportObjectKind==ReportObjectKind.TextObject) {
 					//not typical to print textobject in details section, but allowed
 					textObject=reportObject;
-					strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+					strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 					RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X
 						,yPos+textObject.Location.Y
 						,textObject.Size.Width,textObject.Size.Height);
@@ -672,7 +672,7 @@ namespace OpenDental.ReportingComplex
 						g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
 					}
 				}
-				else if(reportObject.ObjectKind==ReportObjectKind.QueryObject) {
+				else if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
 					queryObject=(QueryObject)reportObject;
 					if(queryObject.IsPrinted==true) {
 						continue;
@@ -732,7 +732,7 @@ namespace OpenDental.ReportingComplex
 			//loop through each row in the table and make sure that the row can fit.  If it can fit, print it.  Otherwise go to next page.
 			for(int i=rowsPrinted;i<queryObj.ReportTable.Rows.Count;i++) {
 				//Figure out the current row height
-				if(section.Name=="Detail" && queryObj.RowHeights[i]>_heightRemaining) {
+				if(section.Name=="Detail" && queryObj.RowHeightValues[i]>_heightRemaining) {
 					_heightRemaining=0;
 					return;
 				}
@@ -749,7 +749,7 @@ namespace OpenDental.ReportingComplex
 						}
 					}
 					//This is a new table and we want to know if we can print the first row
-					if(titleHeight+headerHeight+queryObj.RowHeights[0]>_heightRemaining) {
+					if(titleHeight+headerHeight+queryObj.RowHeightValues[0]>_heightRemaining) {
 						_heightRemaining=0;
 						return;
 					}
@@ -770,7 +770,7 @@ namespace OpenDental.ReportingComplex
 							continue;
 						}
 						if(reportObject.Name=="GroupSummaryText") {
-							reportObject.StaticText=GetGroupSummaryValue(reportObject.SummarizedField,reportObject.SummaryGroups,reportObject.Operation).ToString("c");
+							reportObject.StaticText=GetGroupSummaryValue(reportObject.SummarizedField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString("c");
 							reportObject.Size=new Size((int)g.MeasureString(reportObject.StaticText,reportObject.Font).Width+2,(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Height+2);
 							yPosAdd+=reportObject.OffSetY;
 						}
@@ -782,9 +782,9 @@ namespace OpenDental.ReportingComplex
 						ReportObject summaryField=queryObj.GetObjectByName(reportObject.DataField+"Footer");
 						yPos+=summaryField.Size.Height;
 					}
-					if(reportObject.ObjectKind==ReportObjectKind.TextObject) {
+					if(reportObject.ReportObjectKind==ReportObjectKind.TextObject) {
 						textObject=reportObject;
-						strFormat=ReportObject.GetStringFormatAlignment(textObject.TextAlign);
+						strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X+textObject.OffSetX
 							,yPos+textObject.Location.Y+textObject.OffSetY
 							,textObject.Size.Width,textObject.Size.Height);
@@ -808,7 +808,7 @@ namespace OpenDental.ReportingComplex
 							yPos+=textObject.Size.Height;
 						}
 					}
-					else if(reportObject.ObjectKind==ReportObjectKind.BoxObject) {
+					else if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
 						boxObject=reportObject;
 						int x1=xPos+boxObject.OffSetX;
 						int x2=xPos-boxObject.OffSetX;
@@ -820,13 +820,13 @@ namespace OpenDental.ReportingComplex
 						}
 						x2+=maxHorizontalLength;
 						y2+=queryObj.GetSectionHeight(boxObject.SectionName);
-						g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.LineThickness),x1,y1,x2-x1,y2-y1);
+						g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 						if(greatestObjectHeight<boxObject.Size.Height) {
 							greatestObjectHeight=boxObject.Size.Height;
 						}
 						groupTitleHeight+=boxObject.Size.Height;
 					}
-					else if(reportObject.ObjectKind==ReportObjectKind.LineObject) {
+					else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
 						lineObject=reportObject;
 						int length;
 						int x=lineObject.OffSetX;
@@ -836,7 +836,7 @@ namespace OpenDental.ReportingComplex
 							maxHorizontalLength=850;
 						}
 						if(lineObject.LineOrientation==LineOrientation.Horizontal) {
-							length=maxHorizontalLength*lineObject.LinePercent/100;
+							length=maxHorizontalLength*lineObject.IntLinePercent/100;
 							if(lineObject.LinePosition==LinePosition.Bottom) {
 								y+=queryObj.GetSectionHeight(lineObject.SectionName);
 							}
@@ -850,10 +850,10 @@ namespace OpenDental.ReportingComplex
 								continue;
 							}
 							x+=(maxHorizontalLength/2)-(length/2);
-							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x+length,y);
+							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 						}
 						else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-							length=queryObj.GetSectionHeight(lineObject.SectionName)*lineObject.LinePercent/100;
+							length=queryObj.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
 							if(lineObject.LinePosition==LinePosition.Left) {
 								//Do Nothing Here
 							}
@@ -867,24 +867,24 @@ namespace OpenDental.ReportingComplex
 								continue;
 							}
 							y+=(queryObj.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
-							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.LineThickness),x,y,x,y+length);
+							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 						}
 						if(greatestObjectHeight<lineObject.Size.Height) {
 							greatestObjectHeight=lineObject.Size.Height;
 						}
 						groupTitleHeight+=lineObject.Size.Height;
 					}
-					else if(reportObject.ObjectKind==ReportObjectKind.FieldObject) {
+					else if(reportObject.ReportObjectKind==ReportObjectKind.FieldObject) {
 						fieldObject=reportObject;
 						RectangleF layoutRect;
-						strFormat=ReportObject.GetStringFormatAlignment(fieldObject.TextAlign);
-						if(fieldObject.FieldKind==FieldDefKind.DataTableField) {
-							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeights[i]);
+						strFormat=ReportObject.GetStringFormatAlignment(fieldObject.ContentAlignment);
+						if(fieldObject.FieldDefKind==FieldDefKind.DataTableField) {
+							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeightValues[i]);
 							if(MyReport.HasGridLines()) {
 								g.DrawRectangle(new Pen(Brushes.LightGray),Rectangle.Round(layoutRect));
 							}
 							rawText=queryObj.ReportTable.Rows
-								[i][queryObj.DataFields.IndexOf(fieldObject.DataField)].ToString();
+								[i][queryObj.ArrDataFields.IndexOf(fieldObject.DataField)].ToString();
 							displayText=rawText;
 							List<string> listString=GetDisplayString(displayText,prevDisplayText,fieldObject,i,queryObj);
 							displayText=listString[0];
@@ -896,7 +896,7 @@ namespace OpenDental.ReportingComplex
 						}
 						else {
 							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,fieldObject.Size.Height);
-							displayText=fieldObject.GetSummaryValue(queryObj.ReportTable,queryObj.DataFields.IndexOf(fieldObject.SummarizedField)).ToString(fieldObject.FormatString);
+							displayText=fieldObject.GetSummaryValue(queryObj.ReportTable,queryObj.ArrDataFields.IndexOf(fieldObject.SummarizedField)).ToString(fieldObject.StringFormat);
 						}
 						g.DrawString(displayText,fieldObject.Font
 						,new SolidBrush(fieldObject.ForeColor),new RectangleF(layoutRect.X+1,layoutRect.Y+1,layoutRect.Width-1,layoutRect.Height-1),strFormat);
@@ -904,6 +904,7 @@ namespace OpenDental.ReportingComplex
 					}
 				}
 				if(section.Kind==AreaSectionKind.GroupFooter) {
+					yPosAdd+=20;//Added to give a buffer between split tables.
 					section.Height+=yPosAdd;
 					_heightRemaining-=section.Height;
 					yPos+=yPosAdd;
@@ -935,18 +936,23 @@ namespace OpenDental.ReportingComplex
 		private double GetGroupSummaryValue(string columnName,List<int> summaryGroups,SummaryOperation operation) {
 			double retVal=0;
 			for(int i=0;i<MyReport.ReportObjects.Count;i++) {
-				if(MyReport.ReportObjects[i].ObjectKind!=ReportObjectKind.QueryObject) {
+				if(MyReport.ReportObjects[i].ReportObjectKind!=ReportObjectKind.QueryObject) {
 					continue;
 				}
 				QueryObject queryObj=(QueryObject)MyReport.ReportObjects[i];
-				if(!summaryGroups.Contains(queryObj.QueryGroup)) {
+				if(!summaryGroups.Contains(queryObj.QueryGroupValue)) {
 					continue;
 				}
 				for(int j=0;j<queryObj.ReportTable.Rows.Count;j++) {
 					if(operation==SummaryOperation.Sum) {
 						//This could be enhanced in the future to only sum up the cells that match the column name within the current query group.
 						//Right now, if multiple query groups share the same column name that is being summed, the total will include both sets.
-						retVal+=PIn.Double(queryObj.ReportTable.Rows[j][queryObj.ReportTable.Columns.IndexOf(columnName)].ToString());
+						if(queryObj.IsNegativeSummary) {
+							retVal-=PIn.Double(queryObj.ReportTable.Rows[j][queryObj.ReportTable.Columns.IndexOf(columnName)].ToString());
+						}
+						else {
+							retVal+=PIn.Double(queryObj.ReportTable.Rows[j][queryObj.ReportTable.Columns.IndexOf(columnName)].ToString());
+						}
 					}
 					else if(operation==SummaryOperation.Count) {
 						retVal++;
@@ -959,37 +965,37 @@ namespace OpenDental.ReportingComplex
 		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i,QueryObject queryObj) {
 			string displayText="";
 			List<string> retVals=new List<string>();
-			if(reportObject.ValueType==FieldValueType.Age) {
+			if(reportObject.FieldValueType==FieldValueType.Age) {
 				displayText=Patients.AgeToString(Patients.DateToAge(PIn.Date(rawText)));//(fieldObject.FormatString);
 			}
-			else if(reportObject.ValueType==FieldValueType.Boolean) {
-				displayText=PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString();//(fieldObject.FormatString);
+			else if(reportObject.FieldValueType==FieldValueType.Boolean) {
+				displayText=PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();//(fieldObject.FormatString);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Bool(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
+					prevDisplayText=PIn.Bool(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
 				}
 			}
-			else if(reportObject.ValueType==FieldValueType.Date) {
-				displayText=PIn.DateT(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+			else if(reportObject.FieldValueType==FieldValueType.Date) {
+				displayText=PIn.DateT(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.DateT(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+					prevDisplayText=PIn.DateT(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
-			else if(reportObject.ValueType==FieldValueType.Integer) {
-				displayText=PIn.Long(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+			else if(reportObject.FieldValueType==FieldValueType.Integer) {
+				displayText=PIn.Long(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Long(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+					prevDisplayText=PIn.Long(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
-			else if(reportObject.ValueType==FieldValueType.Number) {
-				displayText=PIn.Double(queryObj.ReportTable.Rows[i][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+			else if(reportObject.FieldValueType==FieldValueType.Number) {
+				displayText=PIn.Double(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Double(queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.FormatString);
+					prevDisplayText=PIn.Double(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
-			else if(reportObject.ValueType==FieldValueType.String) {
+			else if(reportObject.FieldValueType==FieldValueType.String) {
 				displayText=rawText;
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=queryObj.ReportTable.Rows[i-1][queryObj.DataFields.IndexOf(reportObject.DataField)].ToString();
+					prevDisplayText=queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString();
 				}
 			}
 			retVals.Add(displayText);

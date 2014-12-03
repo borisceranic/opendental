@@ -131,9 +131,14 @@ namespace OpenDental
 			//	MsgBox.Show(this,"To date cannot be before From date.");
 			//	return;
 			//}
-			ReportComplex report=new ReportComplex(Lan.g(this,"Payment Plans"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName=Lan.g(this,"PaymentPlans");
-			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString());
+			report.AddTitle("Title",Lan.g(this,"Payment Plans"),fontTitle);
+			report.AddSubTitle("PracticeTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString(),fontSubTitle);
 			DataTable table=new DataTable();
 			table.Columns.Add("guarantor");
 			table.Columns.Add("ins");
@@ -202,26 +207,26 @@ namespace OpenDental
 				row["dueTen"]=(dueTen-paid).ToString("f");
 				table.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(table,"","",SplitByKind.None,1,true);
-			query.AddColumn("Guarantor",160,FieldValueType.String);
-			query.AddColumn("Ins",40,FieldValueType.String);
-			query.GetColumnHeader("Ins").TextAlign=ContentAlignment.MiddleCenter;
-			query.GetColumnDetail("Ins").TextAlign=ContentAlignment.MiddleCenter;
-			query.AddColumn("Princ",100,FieldValueType.String);
-			query.GetColumnHeader("Princ").TextAlign=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("Princ").TextAlign=ContentAlignment.MiddleRight;
-			query.AddColumn("Paid",100,FieldValueType.String);
-			query.GetColumnHeader("Paid").TextAlign=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("Paid").TextAlign=ContentAlignment.MiddleRight;
-			query.AddColumn("Due Now",100,FieldValueType.String);
-			query.GetColumnHeader("Due Now").TextAlign=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("Due Now").TextAlign=ContentAlignment.MiddleRight;
+			QueryObject query=report.AddQuery(table,"",font,"",SplitByKind.None,1,true);
+			query.AddColumn("Guarantor",160,FieldValueType.String,font);
+			query.AddColumn("Ins",40,FieldValueType.String,font);
+			query.GetColumnHeader("Ins").ContentAlignment=ContentAlignment.MiddleCenter;
+			query.GetColumnDetail("Ins").ContentAlignment=ContentAlignment.MiddleCenter;
+			query.AddColumn("Princ",100,FieldValueType.String,font);
+			query.GetColumnHeader("Princ").ContentAlignment=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Princ").ContentAlignment=ContentAlignment.MiddleRight;
+			query.AddColumn("Paid",100,FieldValueType.String,font);
+			query.GetColumnHeader("Paid").ContentAlignment=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Paid").ContentAlignment=ContentAlignment.MiddleRight;
+			query.AddColumn("Due Now",100,FieldValueType.String,font);
+			query.GetColumnHeader("Due Now").ContentAlignment=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Due Now").ContentAlignment=ContentAlignment.MiddleRight;
 			query.AddColumn("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days",100,FieldValueType.String);
+				+" Days",100,FieldValueType.String,font);
 			query.GetColumnHeader("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days").TextAlign=ContentAlignment.MiddleRight;
+				+" Days").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days").TextAlign=ContentAlignment.MiddleRight;
+				+" Days").ContentAlignment=ContentAlignment.MiddleRight;
 			if(!report.SubmitQueries()) {
 				return;
 			}

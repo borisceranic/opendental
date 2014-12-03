@@ -405,12 +405,79 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
+		///<summary>Gets the full GeneralLedger list.</summary>
+		public static DataTable GetGeneralLedger(DateTime dateStart,DateTime dateEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+			}
+			string queryString=@"SELECT DATE("+POut.Date(new DateTime(dateStart.Year-1,12,31))+@") DateDisplayed,
+				'' Memo,
+				'' Splits,
+				'' CheckNumber,
+				startingbals.SumTotal DebitAmt,
+				0 CreditAmt,
+				'' Balance,
+				startingbals.Description,
+				startingbals.AcctType,
+				startingbals.AccountNum
+				FROM (
+					SELECT account.AccountNum,
+					account.Description,
+					account.AcctType,
+					ROUND(SUM(journalentry.DebitAmt-journalentry.CreditAmt),2) SumTotal
+					FROM account
+					INNER JOIN journalentry ON journalentry.AccountNum=account.AccountNum
+					AND journalentry.DateDisplayed < "+POut.Date(dateStart)+@" 
+					AND account.AcctType IN (0,1,2)/*assets,liablities,equity*/
+					GROUP BY account.AccountNum
+				) startingbals
+
+				UNION ALL
+	
+				SELECT journalentry.DateDisplayed,
+				journalentry.Memo,
+				journalentry.Splits,
+				journalentry.CheckNumber,
+				journalentry.DebitAmt, 
+				journalentry.CreditAmt,
+				'' Balance,
+				account.Description,
+				account.AcctType,
+				account.AccountNum 
+				FROM account
+				LEFT JOIN journalentry ON account.AccountNum=journalentry.AccountNum 
+					AND journalentry.DateDisplayed >= "+POut.Date(dateStart)+@" 
+					AND journalentry.DateDisplayed <= "+POut.Date(dateEnd)+@" 
+				WHERE account.AcctType IN(0,1,2)
+				
+				UNION ALL 
+				
+				SELECT journalentry.DateDisplayed, 
+				journalentry.Memo, 
+				journalentry.Splits, 
+				journalentry.CheckNumber,
+				journalentry.DebitAmt, 
+				journalentry.CreditAmt, 
+				'' Balance,
+				account.Description, 
+				account.AcctType,
+				account.AccountNum 
+				FROM account 
+				LEFT JOIN journalentry ON account.AccountNum=journalentry.AccountNum 
+					AND journalentry.DateDisplayed >= "+POut.Date(dateStart)+@"  
+					AND journalentry.DateDisplayed <= "+POut.Date(dateEnd)+@"  
+				WHERE account.AcctType IN(3,4)
+				
+				ORDER BY AcctType, Description, DateDisplayed;";
+			return Db.GetTable(queryString);
+		}
+
 		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
 		public static DataTable GetEquityTable(DateTime asOfDate) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),asOfDate);
 			}
-			string queryEquity="SELECT Description, SUM(CreditAmt-DebitAmt) SumTotal, AcctType "
+			string queryEquity="SELECT Description, SUM(ROUND(CreditAmt,3)-ROUND(DebitAmt,3)) SumTotal, AcctType "
         +"FROM account, journalentry "
         +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(asOfDate)+" AND AcctType=2 "
         +"GROUP BY account.AccountNum "

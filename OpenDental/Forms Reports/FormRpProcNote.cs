@@ -123,7 +123,12 @@ namespace OpenDental{
 		}
 
 		private void ExecuteReport(){
-			ReportComplex report=new ReportComplex(Lan.g(this,"Incomplete Procedure Notes"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
+			report.AddTitle("Title",Lan.g(this,"Incomplete Procedure Notes"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			QueryObject query=report.AddQuery(@"(SELECT procedurelog.ProcDate,
 				CONCAT(CONCAT(patient.LName,', '),patient.FName),
 				procedurecode.ProcCode,procedurecode.Descript,
@@ -152,13 +157,13 @@ namespace OpenDental{
 				FROM procnote n2
 				WHERE n1.ProcNum = n2.ProcNum)
 				AND procedurecode.ProcCode='~GRP~')
-				ORDER BY ProcDate","","",SplitByKind.None,1,true);
-			query.AddColumn("Date",80,FieldValueType.Date);
-			query.AddColumn("Patient",120,FieldValueType.String);
-			query.AddColumn("Code",50,FieldValueType.String);
-			query.AddColumn("Description",120,FieldValueType.String);
-			query.AddColumn("Tth",30,FieldValueType.String);
-			query.AddColumn("Surf",40,FieldValueType.String);
+				ORDER BY ProcDate","",font,"",SplitByKind.None,1,true);
+			query.AddColumn("Date",80,FieldValueType.Date,font);
+			query.AddColumn("Patient",120,FieldValueType.String,font);
+			query.AddColumn("Code",50,FieldValueType.String,font);
+			query.AddColumn("Description",120,FieldValueType.String,font);
+			query.AddColumn("Tth",30,FieldValueType.String,font);
+			query.AddColumn("Surf",40,FieldValueType.String,font);
 			if(!report.SubmitQueries()) {
 				DialogResult=DialogResult.Cancel;
 				return;

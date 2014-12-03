@@ -523,22 +523,28 @@ namespace OpenDental
 				MsgBox.Show(this,"To date cannot be before From date.");
 				return;
 			}
-			ReportComplex report=new ReportComplex(Lan.g(this,"Birthdays"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
+
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName=Lan.g(this,"Birthdays");
-			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat));
-			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"","",SplitByKind.None,1,true);
-			query.AddColumn("LName",90,FieldValueType.String);
-			query.AddColumn("FName",90,FieldValueType.String);
-			query.AddColumn("Preferred",90,FieldValueType.String);
-			query.AddColumn("Address",90,FieldValueType.String);
-			query.AddColumn("Address2",90,FieldValueType.String);
-			query.AddColumn("City",75,FieldValueType.String);
-			query.AddColumn("State",60,FieldValueType.String);
-			query.AddColumn("Zip",75,FieldValueType.String);
-			query.AddColumn("Birthdate",75,FieldValueType.Date);
-			query.GetColumnDetail("Birthdate").FormatString="d";
-			query.AddColumn("Age",45,FieldValueType.Integer);
-			report.AddPageNum();
+			report.AddTitle("Title",Lan.g(this,"Birthdays"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat),fontSubTitle);
+			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"",font,"",SplitByKind.None,1,true);
+			query.AddColumn("LName",90,FieldValueType.String,font);
+			query.AddColumn("FName",90,FieldValueType.String,font);
+			query.AddColumn("Preferred",90,FieldValueType.String,font);
+			query.AddColumn("Address",90,FieldValueType.String,font);
+			query.AddColumn("Address2",90,FieldValueType.String,font);
+			query.AddColumn("City",75,FieldValueType.String,font);
+			query.AddColumn("State",60,FieldValueType.String,font);
+			query.AddColumn("Zip",75,FieldValueType.String,font);
+			query.AddColumn("Birthdate",75,FieldValueType.Date,font);
+			query.GetColumnDetail("Birthdate").StringFormat="d";
+			query.AddColumn("Age",45,FieldValueType.Integer,font);
+			report.AddPageNum(font);
 			if(!report.SubmitQueries()) {
 				return;
 			}

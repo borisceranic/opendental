@@ -141,22 +141,27 @@ namespace OpenDental {
 		private void butMissing_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
-			ReportComplex report=new ReportComplex("XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),"No Matching Transaction Found in Open Dental",true,true,false);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="Missing";
-			report.GetTitle().IsUnderlined=true;
+			report.AddTitle("Title","XCharge Transactions From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),fontTitle);
+			report.GetTitle("Title").IsUnderlined=true;
+			report.AddSubTitle("SubTitle","No Matching Transaction Found in Open Dental",fontSubTitle);
 			QueryObject query;
 			DataTable dt=XChargeTransactions.GetMissingTable(programNum,date1.SelectionStart,date2.SelectionStart);
-			query=report.AddQuery(dt,"Missing Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
-			query.AddColumn("Transaction Date/Time",170,FieldValueType.String);
-			query.AddColumn("Transaction Type",120,FieldValueType.String);
-			query.AddColumn("Clerk ID",80,FieldValueType.String);
-			query.AddColumn("Item#",50,FieldValueType.String);
-			query.AddColumn("Pat",50,FieldValueType.String);
-			query.AddColumn("Credit Card Num",140,FieldValueType.String);
-			query.AddColumn("Exp",50,FieldValueType.String);
-			query.AddColumn("Result",50,FieldValueType.String);
-			query.AddColumn("Amount",60,FieldValueType.Number);
-			query.GetColumnHeader("Amount").TextAlign=ContentAlignment.MiddleRight;
+			query=report.AddQuery(dt,"Missing Payments",font,"",SplitByKind.None,1,true);//Valid entries to count have result code 0
+			query.AddColumn("Transaction Date/Time",170,FieldValueType.String,font);
+			query.AddColumn("Transaction Type",120,FieldValueType.String,font);
+			query.AddColumn("Clerk ID",80,FieldValueType.String,font);
+			query.AddColumn("Item#",50,FieldValueType.String,font);
+			query.AddColumn("Pat",50,FieldValueType.String,font);
+			query.AddColumn("Credit Card Num",140,FieldValueType.String,font);
+			query.AddColumn("Exp",50,FieldValueType.String,font);
+			query.AddColumn("Result",50,FieldValueType.String,font);
+			query.AddColumn("Amount",60,FieldValueType.Number,font);
+			query.GetColumnHeader("Amount").ContentAlignment=ContentAlignment.MiddleRight;
 			if(!report.SubmitQueries()) {
 				return;
 			}
@@ -169,9 +174,14 @@ namespace OpenDental {
 		private void butExtra_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
-			ReportComplex report=new ReportComplex("Payments From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),"No Matching X-Charge Transactions for these Payments",true,true,false);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="Extra Payments";
-			report.GetTitle().IsUnderlined=true;
+			report.AddTitle("Title","Payments From "+date1.SelectionStart.ToShortDateString()+" To "+date2.SelectionStart.ToShortDateString(),fontTitle);
+			report.GetTitle("Title").IsUnderlined=true;
+			report.AddSubTitle("SubTitle","No Matching X-Charge Transactions for these Payments",fontSubTitle);
 			QueryObject query;
 			query=report.AddQuery("SELECT payment.PatNum, LName, FName, payment.DateEntry,payment.PayDate, payment.PayNote,payment.PayAmt "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
@@ -181,16 +191,16 @@ namespace OpenDental {
 				+"ON X.PatNum=payment.PatNum AND DATE(X.TransactionDateTime)=payment.DateEntry AND X.Amount=payment.PayAmt "
 				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"AND X.TransactionDateTime IS NULL "
-				+"ORDER BY PayDate ASC, patient.LName","Extra Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
-			query.AddColumn("Pat",50,FieldValueType.String);
-			query.AddColumn("LName",100,FieldValueType.String);
-			query.AddColumn("FName",100,FieldValueType.String);
-			query.AddColumn("DateEntry",100,FieldValueType.Date);
-			query.AddColumn("PayDate",100,FieldValueType.Date);
-			query.AddColumn("PayNote",150,FieldValueType.String);
-			query.AddColumn("PayAmt",70,FieldValueType.Number);
-			query.GetColumnHeader("PayAmt").TextAlign=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("PayAmt").TextAlign=ContentAlignment.MiddleRight;
+				+"ORDER BY PayDate ASC, patient.LName","Extra Payments",font,"",SplitByKind.None,1,true);//Valid entries to count have result code 0
+			query.AddColumn("Pat",50,FieldValueType.String,font);
+			query.AddColumn("LName",100,FieldValueType.String,font);
+			query.AddColumn("FName",100,FieldValueType.String,font);
+			query.AddColumn("DateEntry",100,FieldValueType.Date,font);
+			query.AddColumn("PayDate",100,FieldValueType.Date,font);
+			query.AddColumn("PayNote",150,FieldValueType.String,font);
+			query.AddColumn("PayAmt",70,FieldValueType.Number,font);
+			query.GetColumnHeader("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;
 			if(!report.SubmitQueries()) {
 				return;
 			}

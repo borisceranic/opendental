@@ -110,20 +110,11 @@ namespace OpenDental.ReportingComplex {
 		#endregion
 
 		///<summary>This can add a title, subtitle, grid lines, and page nums to the report using defaults.  If the parameters are blank or false the object will not be added.</summary>
-		public ReportComplex(string title,string subTitle,bool hasGridLines,bool hasPageNums,bool isLandscape) {
+		public ReportComplex(bool hasGridLines,bool isLandscape) {
 			_grfx=Graphics.FromImage(new Bitmap(1,1));
 			_isLandscape=isLandscape;
-			if(!String.IsNullOrWhiteSpace(title)) {
-				AddTitle(title);
-			}
-			if(!String.IsNullOrWhiteSpace(subTitle)) {
-				AddSubTitle("Default",subTitle);
-			}
 			if(hasGridLines) {
 				AddGridLines();
-			}
-			if(hasPageNums) {
-				AddPageNum();
 			}
 			if(_sections["Report Header"]==null) {
 				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
@@ -140,8 +131,7 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>Adds a ReportObject large, centered, and bold, to the top of the Report Header Section.  Should only be done once, and done before any subTitles.</summary>
-		private void AddTitle(string title){
-			Font font=new Font("Tahoma",17,FontStyle.Bold);
+		public void AddTitle(string name,string title,Font font){
 			Size size=new Size((int)(_grfx.MeasureString(title,font).Width/_grfx.DpiX*100+2)
 				,(int)(_grfx.MeasureString(title,font).Height/_grfx.DpiY*100+2));
 			int xPos;
@@ -158,16 +148,15 @@ namespace OpenDental.ReportingComplex {
 				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
 			}
 			_reportObjects.Add(
-				new ReportObject("Title","Report Header",new Point(xPos,0),size,title,font,ContentAlignment.MiddleCenter));
-			//this it the only place a white buffer is added to a header.
+				new ReportObject(name,"Report Header",new Point(xPos,0),size,title,font,ContentAlignment.MiddleCenter));
+			//this is the only place a white buffer is added to a header.
 			_sections["Report Header"].Height=(int)size.Height+20;
 			//grfx.Dispose();
 			//FormR.Dispose();
 		}
 
 		///<summary>Adds a ReportObject, centered and bold, at the bottom of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
-		public void AddSubTitle(string name,string subTitle){
-			Font font=new Font("Tahoma",10,FontStyle.Bold);
+		public void AddSubTitle(string name,string subTitle,Font font){
 			Size size=new Size((int)(_grfx.MeasureString(subTitle,font).Width/_grfx.DpiX*100+2)
 				,(int)(_grfx.MeasureString(subTitle,font).Height/_grfx.DpiY*100+2));
 			int xPos;
@@ -177,7 +166,7 @@ namespace OpenDental.ReportingComplex {
 			}
 			else {
 				xPos=850/2;
-			xPos-=30;
+				xPos-=30;
 			}
 			xPos-=(int)(size.Width/2);
 			if(_sections["Report Header"]==null){
@@ -196,38 +185,38 @@ namespace OpenDental.ReportingComplex {
 			_sections["Report Header"].Height+=(int)size.Height+5;
 		}
 
-		public QueryObject AddQuery(string query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered);
+		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
+		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered);
+		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string columnToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,columnToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
+		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,string tableFromColumn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,queryGroup,isCentered,null,dictDefNames);
+		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,string tableFromColumn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,tableFromColumn,splitByKind,queryGroup,isCentered,null,dictDefNames);
+		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
+			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
@@ -252,10 +241,10 @@ namespace OpenDental.ReportingComplex {
 			return null;
 		}
 
-		public ReportObject GetTitle() {
+		public ReportObject GetTitle(string name) {
 			//ReportObject ro=null;
 			for(int i=_reportObjects.Count-1;i>=0;i--) {//search from the end backwards
-				if(_reportObjects[i].Name=="Title") {
+				if(_reportObjects[i].Name==name) {
 					return ReportObjects[i];
 				}
 			}
@@ -275,9 +264,8 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		/// <summary>Put a pagenumber object on lower left of page footer section. Object is named PageNum.</summary>
-		public void AddPageNum(){
+		public void AddPageNum(Font font){
 			//add page number
-			Font font=new Font("Tahoma",9);
 			Size size=new Size(150,(int)(_grfx.MeasureString("anytext",font).Height/_grfx.DpiY*100+2));
 			if(_sections["Page Footer"]==null){
 				_sections.Add(new Section(AreaSectionKind.PageFooter,0));	
@@ -331,7 +319,7 @@ namespace OpenDental.ReportingComplex {
 			ReportObjectCollection newReportObjects=new ReportObjectCollection();
 			_sections.Add(new Section(AreaSectionKind.Query,0));
 			for(int i=0;i<_reportObjects.Count;i++) {
-				if(_reportObjects[i].ObjectKind==ReportObjectKind.QueryObject) {
+				if(_reportObjects[i].ReportObjectKind==ReportObjectKind.QueryObject) {
 					QueryObject query=(QueryObject)_reportObjects[i];
 					if(!query.SubmitQuery()) {
 						if(query.ReportTable.Rows.Count==0) {
@@ -353,23 +341,23 @@ namespace OpenDental.ReportingComplex {
 							if(query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString()!=lastCellValue) {
 								//Must happen the first time through
 								if(newQuery!=null) {
-									switch(newQuery.SplitKind) {
+									switch(newQuery.SplitByKind) {
 										case SplitByKind.None:
 											return false;
 										case SplitByKind.Enum:
-											if(newQuery.EnumNames==null) {
+											if(newQuery.ListEnumNames==null) {
 												return false;
 											}
-											displayText=newQuery.EnumNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+											displayText=newQuery.ListEnumNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 											newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 											newQuery.GetGroupTitle().StaticText=displayText;
 											break;
 										case SplitByKind.Definition:
-											if(newQuery.DefNames==null) {
+											if(newQuery.DictDefNames==null) {
 												return false;
 											}
-											if(newQuery.DefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
-												displayText=newQuery.DefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+											if(newQuery.DictDefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
+												displayText=newQuery.DictDefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 												newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 												newQuery.GetGroupTitle().StaticText=displayText;
 											}
@@ -378,10 +366,14 @@ namespace OpenDental.ReportingComplex {
 											}
 											break;
 										case SplitByKind.Date:
-											newQuery.GetGroupTitle().StaticText=PIn.Date(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()).ToShortDateString();
+											displayText=PIn.Date(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()).ToShortDateString();
+											newQuery.GetGroupTitle().StaticText=displayText;
+											newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 											break;
 										case SplitByKind.Value:
-											newQuery.GetGroupTitle().StaticText=newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString();
+											displayText=newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString();
+											newQuery.GetGroupTitle().StaticText=displayText;
+											newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 											break;
 									}
 									newQuery.SubmitQuery();
@@ -402,23 +394,23 @@ namespace OpenDental.ReportingComplex {
 							}
 							lastCellValue=query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString();
 						}
-						switch(newQuery.SplitKind) {
+						switch(newQuery.SplitByKind) {
 							case SplitByKind.None:
 								return false;
 							case SplitByKind.Enum:
-								if(newQuery.EnumNames==null) {
+								if(newQuery.ListEnumNames==null) {
 									return false;
 								}
-								displayText=newQuery.EnumNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+								displayText=newQuery.ListEnumNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 								newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 								newQuery.GetGroupTitle().StaticText=displayText;
 								break;
 							case SplitByKind.Definition:
-								if(newQuery.DefNames==null) {
+								if(newQuery.DictDefNames==null) {
 									return false;
 								}
-								if(newQuery.DefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
-									displayText=newQuery.DefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+								if(newQuery.DictDefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
+									displayText=newQuery.DictDefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 									newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 									newQuery.GetGroupTitle().StaticText=displayText;
 								}

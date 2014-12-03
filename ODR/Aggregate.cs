@@ -24,20 +24,25 @@ namespace ODR{
 			if(debitAmt==null || creditAmt==null){
 				return 0.ToString("N");
 			}
-			//Cannot read debitAmt and creditAmt as decimals because it makes the general ledger detail report fail.  Simply cast as decimals when doing mathematical operations.
-			double debit=(double)debitAmt;//PIn.PDouble(debitAmt);
-			double credit=(double)creditAmt;//PIn.PDouble(creditAmt);
-			if(groupByVal==null || groupBy.ToString()!=groupByVal) {//if new or changed group
-				runningSum=0;
+			try {
+				//Cannot read debitAmt and creditAmt as decimals because it makes the general ledger detail report fail.  Simply cast as decimals when doing mathematical operations.
+				double debit=(double)debitAmt;//PIn.PDouble(debitAmt);
+				double credit=(double)creditAmt;//PIn.PDouble(creditAmt)
+				if(groupByVal==null || groupBy.ToString()!=groupByVal) {//if new or changed group
+					runningSum=0;
+				}
+				groupByVal=groupBy.ToString();
+				if(TestValue.AccountDebitIsPos(acctType.ToString())) {
+					runningSum+=(decimal)debit-(decimal)credit;
+				}
+				else {
+					runningSum+=(decimal)credit-(decimal)debit;
+				}
+				return runningSum.ToString("N");
 			}
-			groupByVal=groupBy.ToString();
-			if(TestValue.AccountDebitIsPos(acctType.ToString())){
-				runningSum+=(decimal)debit-(decimal)credit;
+			catch {
+				return 0.ToString("N");
 			}
-			else{
-				runningSum+=(decimal)credit-(decimal)debit;
-			}
-			return runningSum.ToString("N");
 		}
 
 	}

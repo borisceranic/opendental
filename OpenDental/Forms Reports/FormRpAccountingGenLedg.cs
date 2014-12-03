@@ -157,65 +157,35 @@ namespace OpenDental{
 		}
 
 		private void butTest_Click(object sender,EventArgs e) {
-			string queryString="DROP TABLE IF EXISTS tempstartingbals; "
-				+"CREATE TABLE tempstartingbals "
-				+"SELECT Description,AcctType,ROUND(SUM(DebitAmt-CreditAmt),2) SumTotal,account.AccountNum "
-        +"FROM account, journalentry "
-        +"WHERE account.AccountNum=journalentry.AccountNum "
-        +"AND DateDisplayed &lt; '2007-01-01' "
-        +"AND (AcctType=0 OR AcctType=1 OR AcctType=2)/*assetes,liablities,equity*/ "
-        +"GROUP BY account.AccountNum; "
-        +"SELECT DATE('2006-12-31') DateDisplayed,SumTotal  DebitAmt,0 CreditAmt,'' Memo,'' Splits,'' CheckNumber,Description,AcctType,AccountNum "
-        +"FROM tempstartingbals "
-        +"UNION ALL "
-        +"SELECT DateDisplayed, Memo, DebitAmt, CreditAmt, Splits, CheckNumber, account.Description, AcctType, account.AccountNum  "
-        +"FROM account "
-        +"LEFT JOIN journalentry ON account.AccountNum=journalentry.AccountNum "
-        +"AND DateDisplayed &gt;= '2007-01-01' "
-        +"AND DateDisplayed &lt;= '2007-12-31' "
-        +"WHERE account.AcctType= 0 OR account.AcctType=1 OR account.AcctType=2 "
-        +"UNION ALL "
-        +"SELECT DateDisplayed, Memo, DebitAmt, CreditAmt, Splits, CheckNumber, account.Description, AcctType, account.AccountNum "
-        +"FROM account "
-        +"LEFT JOIN journalentry ON account.AccountNum=journalentry.AccountNum "
-        +"AND DateDisplayed &gt;= '2007-01-01' "
-        +"AND DateDisplayed &lt;= '2007-12-31' "
-        +"WHERE account.AcctType= 3 OR account.AcctType=4 "
-        +"ORDER BY AcctType, Description, DateDisplayed; "
-        +"DROP TABLE IF EXISTS tempstartingbals;";
+			DataTable data=Accounts.GetGeneralLedger(date1.SelectionStart,date2.SelectionStart);
+			for(int i=0;i<data.Rows.Count;i++) {
+				data.Rows[i]["Balance"]=ODR.Aggregate.RunningSumForAccounts(data.Rows[i]["AccountNum"],data.Rows[i]["DebitAmt"],data.Rows[i]["CreditAmt"],data.Rows[i]["AcctType"]);
+			}
+			Font font=new Font("Tahoma",7);
+			Font fontTitle=new Font("Tahoma",9);
+			Font fontSubTitle=new Font("Tahoma",8);
 			//create the report
-			ReportComplex report=new ReportComplex("General Ledger","",true,true,false);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="General Ledger";
-			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
-			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
+			report.AddTitle("Title","Detail of General Ledger",fontTitle);
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString(),fontSubTitle);
+			report.Sections["Report Header"].Height-=20;
 			//setup query
 			QueryObject query;
-			query=report.AddQuery(queryString,"","Description",SplitByKind.Value,1,true);
+			query=report.AddQuery(data,"Accounts",font,"Description",SplitByKind.Value,1,true);
+			query.GetGroupTitle().Font=new Font("Tahoma",8);
 			// add columns to report
-			query.AddColumn("Date",75,FieldValueType.Date);
-			query.GetColumnDetail("Date").SuppressIfDuplicate = true;
-			query.GetColumnDetail("Date").FormatString="d";
-			query.AddColumn("Patient",175,FieldValueType.String);
-			query.AddColumn("Age",45,FieldValueType.Age);
-			query.AddColumn("Time",65,FieldValueType.Date);
-			query.GetColumnDetail("Time").FormatString="t";
-			query.GetColumnDetail("Time").TextAlign = ContentAlignment.MiddleRight;
-			query.GetColumnHeader("Time").TextAlign = ContentAlignment.MiddleRight;
-			query.AddColumn("Length",60,FieldValueType.Integer);
-			query.GetColumnHeader("Length").Location=new Point(
-				query.GetColumnHeader("Length").Location.X,
-				query.GetColumnHeader("Length").Location.Y);
-			query.GetColumnHeader("Length").TextAlign = ContentAlignment.MiddleCenter;
-			query.GetColumnDetail("Length").TextAlign = ContentAlignment.MiddleCenter;
-			query.GetColumnDetail("Length").Location=new Point(
-				query.GetColumnDetail("Length").Location.X,
-				query.GetColumnDetail("Length").Location.Y);
-			query.AddColumn("Description",170,FieldValueType.String);
-			query.AddColumn("Home Ph.",120,FieldValueType.String);
-			query.AddColumn("Work Ph.",120,FieldValueType.String);
-			query.AddColumn("Cell Ph.",120,FieldValueType.String);
-			query.ReportObjects.Add(new ReportObject("Buffer","Group Footer",new Point(0,0),new Size(1,50),"",new Font("Tahoma",9),ContentAlignment.MiddleCenter));
-			report.AddPageNum();
+			query.AddColumn("Date",75,FieldValueType.Date,font);
+			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
+			query.GetColumnDetail("Date").StringFormat="d";
+			query.AddColumn("Memo",175,FieldValueType.String,font);
+			query.AddColumn("Splits",175,FieldValueType.String,font);
+			query.AddColumn("Check",45,FieldValueType.String,font);
+			query.AddColumn("Debit",70,FieldValueType.String,font);
+			query.AddColumn("Credit",70,FieldValueType.String,font);
+			query.AddColumn("Balance",70,FieldValueType.String,font);
+			report.AddPageNum(font);
 			report.AddGridLines();
 			// execute query
 			if(!report.SubmitQueries()) {

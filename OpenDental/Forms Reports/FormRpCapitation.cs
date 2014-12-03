@@ -207,8 +207,13 @@ namespace OpenDental{
 				MsgBox.Show(this,"Carrier can not be blank. Please input a value for carrier.");
 				return;
 			}
-			ReportComplex report=new ReportComplex("Capitation Utilization",PrefC.GetString(PrefName.PracticeTitle),true,true,true);
-			report.AddSubTitle("Date",textDateStart.Text+" - "+textDateEnd.Text);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,true);
+			report.AddTitle("Title",Lan.g(this,"Capitation Utilization"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date",textDateStart.Text+" - "+textDateEnd.Text,fontSubTitle);
 			QueryObject query=report.AddQuery(@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
 				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
 				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
@@ -229,22 +234,22 @@ namespace OpenDental{
 				+"AND procedurelog.ProcDate >= "+POut.Date(dateStart)+" "
 				+"AND procedurelog.ProcDate <= "+POut.Date(dateEnd)+" "
 				+"AND insplan.PlanType = 'c' "
-				+"AND procedurelog.ProcStatus = 2","","",SplitByKind.None,1,true);
-			query.AddColumn("Carrier",150,FieldValueType.String);
+				+"AND procedurelog.ProcStatus = 2","",font,"",SplitByKind.None,1,true);
+			query.AddColumn("Carrier",150,FieldValueType.String,font);
 			query.GetColumnDetail("Carrier").SuppressIfDuplicate=true;
-			query.AddColumn("Subscriber",120,FieldValueType.String);
+			query.AddColumn("Subscriber",120,FieldValueType.String,font);
 			query.GetColumnDetail("Subscriber").SuppressIfDuplicate=true;
-			query.AddColumn("Subsc SSN",70,FieldValueType.String);
+			query.AddColumn("Subsc SSN",70,FieldValueType.String,font);
 			query.GetColumnDetail("Subsc SSN").SuppressIfDuplicate=true;
-			query.AddColumn("Patient",120,FieldValueType.String);
-			query.AddColumn("Pat DOB",80,FieldValueType.Date);
-			query.AddColumn("Code",50,FieldValueType.String);
-			query.AddColumn("Proc Description",120,FieldValueType.String);
-			query.AddColumn("Tth",30,FieldValueType.String);
-			query.AddColumn("Surf",40,FieldValueType.String);
-			query.AddColumn("Date",80,FieldValueType.Date);
-			query.AddColumn("UCR Fee",70,FieldValueType.Number);
-			query.AddColumn("Co-Pay",70,FieldValueType.Number);
+			query.AddColumn("Patient",120,FieldValueType.String,font);
+			query.AddColumn("Pat DOB",80,FieldValueType.Date,font);
+			query.AddColumn("Code",50,FieldValueType.String,font);
+			query.AddColumn("Proc Description",120,FieldValueType.String,font);
+			query.AddColumn("Tth",30,FieldValueType.String,font);
+			query.AddColumn("Surf",40,FieldValueType.String,font);
+			query.AddColumn("Date",80,FieldValueType.Date,font);
+			query.AddColumn("UCR Fee",70,FieldValueType.Number,font);
+			query.AddColumn("Co-Pay",70,FieldValueType.Number,font);
 			if(!report.SubmitQueries()) {
 				//DialogResult=DialogResult.Cancel;
 				return;

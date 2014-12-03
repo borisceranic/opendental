@@ -314,44 +314,48 @@ namespace OpenDental
 			}
 			whereProv += ")) ";
 			//create the report
-			ReportComplex report=new ReportComplex("Appointments","",true,true,true);
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,true);
 			report.ReportName="Appointments";
-			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
-			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
+			report.AddTitle("Title",Lan.g(this,"Appointments"),fontTitle);
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString(),fontSubTitle);
 			//setup query
 			QueryObject query;
 			query=report.AddQuery(@"SELECT appointment.AptDateTime,trim(CONCAT(CONCAT(CONCAT(CONCAT(concat(patient.LName,', '),"
 			  +"case when length(patient.Preferred) > 0 then CONCAT(CONCAT('(',patient.Preferred),') ') else '' end),patient.fname), ' '),"
-				+"patient.middlei)) AS PatName,patient.Birthdate,appointment.AptDateTime,length(appointment.Pattern)*5,appointment.ProcDescript,patient.HmPhone, patient.WkPhone, patient.WirelessPhone,appointment.AptStatus"
+				+"patient.middlei)) AS PatName,patient.Birthdate,appointment.AptDateTime,length(appointment.Pattern)*5,appointment.ProcDescript,patient.HmPhone, patient.WkPhone, patient.WirelessPhone"
 				+" FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
 				+POut.Date(dateTo.AddDays(1)) + " AND " + "AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " + "AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
 				whereProv + " " +
-				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","","AptStatus",SplitByKind.Enum,1,true,new List<string>(Enum.GetNames(typeof(ApptStatus))));
+				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","",font,"",SplitByKind.None,1,true);
 			// add columns to report
-			query.AddColumn("Date", 75, FieldValueType.Date);
+			query.AddColumn("Date",75,FieldValueType.Date,font);
 			query.GetColumnDetail("Date").SuppressIfDuplicate = true;
-			query.GetColumnDetail("Date").FormatString="d";
-			query.AddColumn("Patient",175,FieldValueType.String);
-			query.AddColumn("Age",45,FieldValueType.Age);
-			query.AddColumn("Time",65,FieldValueType.Date);
-			query.GetColumnDetail("Time").FormatString="t";
-			query.GetColumnDetail("Time").TextAlign = ContentAlignment.MiddleRight;
-			query.GetColumnHeader("Time").TextAlign = ContentAlignment.MiddleRight;
-			query.AddColumn("Length",60,FieldValueType.Integer);
+			query.GetColumnDetail("Date").StringFormat="d";
+			query.AddColumn("Patient",175,FieldValueType.String,font);
+			query.AddColumn("Age",45,FieldValueType.Age,font);
+			query.AddColumn("Time",65,FieldValueType.Date,font);
+			query.GetColumnDetail("Time").StringFormat="t";
+			query.GetColumnDetail("Time").ContentAlignment = ContentAlignment.MiddleRight;
+			query.GetColumnHeader("Time").ContentAlignment = ContentAlignment.MiddleRight;
+			query.AddColumn("Length",60,FieldValueType.Integer,font);
 			query.GetColumnHeader("Length").Location=new Point(
 				query.GetColumnHeader("Length").Location.X,
 				query.GetColumnHeader("Length").Location.Y);
-			query.GetColumnHeader("Length").TextAlign = ContentAlignment.MiddleCenter;
-			query.GetColumnDetail("Length").TextAlign = ContentAlignment.MiddleCenter;
+			query.GetColumnHeader("Length").ContentAlignment = ContentAlignment.MiddleCenter;
+			query.GetColumnDetail("Length").ContentAlignment = ContentAlignment.MiddleCenter;
 			query.GetColumnDetail("Length").Location=new Point(
 				query.GetColumnDetail("Length").Location.X,
 				query.GetColumnDetail("Length").Location.Y);
-			query.AddColumn("Description",170,FieldValueType.String);
-			query.AddColumn("Home Ph.",120,FieldValueType.String);
-			query.AddColumn("Work Ph.",120,FieldValueType.String);
-			query.AddColumn("Cell Ph.",120,FieldValueType.String);
+			query.AddColumn("Description",170,FieldValueType.String,font);
+			query.AddColumn("Home Ph.",120,FieldValueType.String,font);
+			query.AddColumn("Work Ph.",120,FieldValueType.String,font);
+			query.AddColumn("Cell Ph.",120,FieldValueType.String,font);
 			query.ReportObjects.Add(new ReportObject("Buffer","Group Footer",new Point(0,0),new Size(1,50),"",new Font("Tahoma",9),ContentAlignment.MiddleCenter));
-			report.AddPageNum();
+			report.AddPageNum(font);
 			report.AddGridLines();
 			// execute query
 			if(!report.SubmitQueries()){

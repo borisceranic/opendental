@@ -12,33 +12,32 @@ namespace OpenDental.ReportingComplex {
 		private Point _location;
 		private Size _size;
 		private string _name;
-		private ReportObjectKind _objectKind;
+		private ReportObjectKind _reportObjectKind;
 		private Font _font;
-		private ContentAlignment _textAlign;
+		private ContentAlignment _contentAlignment;
 		private Color _foreColor;
 		private string _staticText;
-		private string _formatString;
+		private string _stringFormat;
 		private bool _suppressIfDuplicate;
-		private string _endSectionName;
-		private Point _locationLowerRight;
-		private float _lineThickness;
-		private FieldDefKind _fieldKind;
-		private FieldValueType _valueType;
-		private SpecialFieldType _specialType;
-		private SummaryOperation _operation;
+		private float _floatLineThickness;
+		private FieldDefKind _fieldDefKind;
+		private FieldValueType _fieldValueType;
+		private SpecialFieldType _specialFieldType;
+		private SummaryOperation _summaryOperation;
 		private LineOrientation _lineOrientation;
 		private LinePosition _linePosition;
-		private int _linePercent;
+		private int _intLinePercent;
 		private int _offSetX;
 		private int _offSetY;
 		private bool _isUnderlined;
-		private string _summarizedField;
-		private string _dataField;
+		private string _summarizedFieldName;
+		private string _dataFieldName;
 		private SummaryOrientation _summaryOrientation;
-		private List<int> _summaryGroups;
+		private List<int> _summaryGroupValues;
 		
 
 #region Properties
+
 		///<summary>The name of the section to which this object is attached.  For lines and boxes that span multiple sections, this is the section in which the upper part of the object resides.</summary>
 		public string SectionName{
 			get{
@@ -48,6 +47,7 @@ namespace OpenDental.ReportingComplex {
 				_sectionName=value;
 			}
 		}
+
 		///<summary>Location within the section. Frequently, y=0</summary>
 		public Point Location{
 			get{
@@ -57,7 +57,8 @@ namespace OpenDental.ReportingComplex {
 				_location=value;
 			}
 		}
-		///<summary></summary>
+
+		///<summary>Typically not set since this is set by a helper function when important properties for size change.</summary>
 		public Size Size{
 			get{
 				return _size;
@@ -66,6 +67,7 @@ namespace OpenDental.ReportingComplex {
 				_size=value;
 			}
 		}
+
 		///<summary>The unique name of the ReportObject.</summary>
 		public string Name{
 			get{
@@ -75,33 +77,38 @@ namespace OpenDental.ReportingComplex {
 				_name=value;
 			}
 		}
+
 		///<summary>For instance, FieldObject, or TextObject.</summary>
-		public ReportObjectKind ObjectKind{
+		public ReportObjectKind ReportObjectKind{
 			get{
-				return _objectKind;
+				return _reportObjectKind;
 			}
 			set{
-				_objectKind=value;
+				_reportObjectKind=value;
 			}
 		}
-		///<summary></summary>
+
+		///<summary>Setting this will also set the size.</summary>
 		public Font Font{
 			get{
 				return _font;
 			}
 			set{
 				_font=value;
+				_size=CalculateNewSize(_staticText,_font);
 			}
 		}
+
 		///<summary>Horizontal alignment of the text.</summary>
-		public ContentAlignment TextAlign{
+		public ContentAlignment ContentAlignment{
 			get{
-				return _textAlign;
+				return _contentAlignment;
 			}
 			set{
-				_textAlign=value;
+				_contentAlignment=value;
 			}
 		}
+
 		///<summary>Can be used for text color or for line color.</summary>
 		public Color ForeColor{
 			get{
@@ -111,25 +118,29 @@ namespace OpenDental.ReportingComplex {
 				_foreColor=value;
 			}
 		}
-		///<summary>The text to display for a TextObject.  Will later include XML formatting markup.</summary>
+
+		///<summary>The text to display for a TextObject. Setting this will also set the size.</summary>
 		public string StaticText{
 			get{
 				return _staticText;
 			}
 			set{
 				_staticText=value;
+				_size=CalculateNewSize(_staticText,_font);
 			}
 		}
+
 		///<summary>For a FieldObject, a C# format string that specifies how to print dates, times, numbers, and currency based on the country or on a custom format.</summary>
 		///<remarks>There are a LOT of options for this string.  Look in C# help under Standard Numeric Format Strings, Custom Numeric Format Strings, Standard DateTime Format Strings, Custom DateTime Format Strings, and Enumeration Format Strings.  Once users are allowed to edit reports, we will assemble a help page with all of the common options. The best options are "n" for number, and "d" for date.</remarks>
-		public string FormatString{
+		public string StringFormat{
 			get{
-				return _formatString;
+				return _stringFormat;
 			}
 			set{
-				_formatString=value;
+				_stringFormat=value;
 			}
 		}
+
 		///<summary>Suppresses this field if the field for the previous record was the same.  Only used with data fields.  E.g. So that a query ordered by a date column doesn't print the same date over and over.</summary>
 		public bool SuppressIfDuplicate{
 			get{
@@ -139,33 +150,17 @@ namespace OpenDental.ReportingComplex {
 				_suppressIfDuplicate=value;
 			}
 		}
-		///<summary>For graphics, the name of the Section to which the lower part of the object extends.  This will normally be the same as the sectionName unless the object spans multiple sections.  The object will then be drawn across all sections in between.</summary>
-		public string EndSectionName{
-			get{
-				return _endSectionName;
-			}
-			set{
-				_endSectionName=value;
-			}
-		}
-		///<summary>The position of the lower right corner of the box or line in the coordinates of the endSection.</summary>
-		public Point LocationLowerRight{
-			get{
-				return _locationLowerRight;
-			}
-			set{
-				_locationLowerRight=value;
-			}
-		}
+
 		///<summary></summary>
-		public float LineThickness{
+		public float FloatLineThickness{
 			get{
-				return _lineThickness;
+				return _floatLineThickness;
 			}
 			set{
-				_lineThickness=value;
+				_floatLineThickness=value;
 			}
 		}
+
 		///<summary>Used to determine whether the line is vertical or horizontal.</summary>
 		public LineOrientation LineOrientation {
 			get {
@@ -175,6 +170,7 @@ namespace OpenDental.ReportingComplex {
 				_lineOrientation=value;
 			}
 		}
+
 		///<summary>Used to determine intial starting position of the line.</summary>
 		public LinePosition LinePosition {
 			get {
@@ -184,16 +180,18 @@ namespace OpenDental.ReportingComplex {
 				_linePosition=value;
 			}
 		}
+
 		///<summary>Used to determine what percentage of the section the line will draw on.</summary>
-		public int LinePercent {
+		public int IntLinePercent {
 			get {
-				return _linePercent;
+				return _intLinePercent;
 			}
 			set {
-				_linePercent=value;
+				_intLinePercent=value;
 			}
 		}
-		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
+
+		///<summary>Used to offset lines, boxes, and text by a specific number of pixels.</summary>
 		public int OffSetX {
 			get {
 				return _offSetX;
@@ -202,7 +200,8 @@ namespace OpenDental.ReportingComplex {
 				_offSetX=value;
 			}
 		}
-		///<summary>Used to offset lines and boxes by a specific number of pixels.</summary>
+
+		///<summary>Used to offset lines, boxes, and text by a specific number of pixels.</summary>
 		public int OffSetY {
 			get {
 				return _offSetY;
@@ -211,6 +210,7 @@ namespace OpenDental.ReportingComplex {
 				_offSetY=value;
 			}
 		}
+
 		///<summary>Used to underline text objects and titles.</summary>
 		public bool IsUnderlined {
 			get {
@@ -220,60 +220,67 @@ namespace OpenDental.ReportingComplex {
 				_isUnderlined=value;
 			}
 		}
+
 		///<summary>The kind of field, like FormulaField, SummaryField, or DataTableField.</summary>
-		public FieldDefKind FieldKind{
+		public FieldDefKind FieldDefKind{
 			get{
-				return _fieldKind;
+				return _fieldDefKind;
 			}
 			set{
-				_fieldKind=value;
+				_fieldDefKind=value;
 			}
 		}
+
 		///<summary>The value type of field, like string or datetime.</summary>
-		public FieldValueType ValueType{
+		public FieldValueType FieldValueType{
 			get{
-				return _valueType;
+				return _fieldValueType;
 			}
 			set{
-				_valueType=value;
+				_fieldValueType=value;
 			}
 		}
+
 		///<summary>For FieldKind=FieldDefKind.SpecialField, this is the type.  eg. pagenumber</summary>
-		public SpecialFieldType SpecialType{
+		public SpecialFieldType SpecialFieldType{
 			get{
-				return _specialType;
+				return _specialFieldType;
 			}
 			set{
-				_specialType=value;
+				_specialFieldType=value;
 			}
 		}
+
 		///<summary>For FieldKind=FieldDefKind.SummaryField, the summary operation type.</summary>
-		public SummaryOperation Operation{
+		public SummaryOperation SummaryOperation{
 			get{
-				return _operation;
+				return _summaryOperation;
 			}
 			set{
-				_operation=value;
+				_summaryOperation=value;
 			}
 		}
+
 		///<summary>For FieldKind=FieldDefKind.SummaryField, the name of the dataField that is being summarized.  This might later be changed to refer to a ReportObject name instead (or maybe not).</summary>
 		public string SummarizedField{
 			get{
-				return _summarizedField;
+				return _summarizedFieldName;
 			}
 			set{
-				_summarizedField=value;
+				_summarizedFieldName=value;
 			}
 		}
+
 		///<summary>For objectKind=ReportObjectKind.FieldObject, the name of the dataField column.</summary>
 		public string DataField{
 			get{
-				return _dataField;
+				return _dataFieldName;
 			}
 			set{
-				_dataField=value;
+				_dataFieldName=value;
 			}
 		}
+
 		///<summary>The location of the summary label around the summary field</summary>
 		public SummaryOrientation SummaryOrientation {
 			get {
@@ -283,15 +290,17 @@ namespace OpenDental.ReportingComplex {
 				_summaryOrientation=value;
 			}
 		}
-		///<summary>The numeric value of the QueryGroup this summary is including.</summary>
+
+		///<summary>The numeric value of the QueryGroup. Used when summarizing groups of queries.</summary>
 		public List<int> SummaryGroups {
 			get {
-				return _summaryGroups;
+				return _summaryGroupValues;
 			}
 			set {
-				_summaryGroups=value;
+				_summaryGroupValues=value;
 			}
 		}
+
 #endregion
 
 		///<summary>Default constructor.</summary>
@@ -299,32 +308,32 @@ namespace OpenDental.ReportingComplex {
 
 		}
 
-		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign,int offSetX,int offSetY){
+		///<summary>Overload for TextObject with offsets.</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment,int offSetX,int offSetY){
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
 			_staticText=staticText;
 			_font=font;
-			_textAlign=textAlign;
+			_contentAlignment=contentAlignment;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
 			_foreColor=Color.Black;
-			_objectKind=ReportObjectKind.TextObject;
+			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
 		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment textAlign) {
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
 			_staticText=staticText;
 			_font=font;
-			_textAlign=textAlign;
+			_contentAlignment=contentAlignment;
 			_foreColor=Color.Black;
-			_objectKind=ReportObjectKind.TextObject;
+			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
 		///<summary>Overload for BoxObject.</summary>
@@ -332,10 +341,10 @@ namespace OpenDental.ReportingComplex {
 			_name=name;
 			_sectionName=sectionName;
 			_foreColor=color;
-			_lineThickness=lineThickness;
+			_floatLineThickness=lineThickness;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
-			_objectKind=ReportObjectKind.BoxObject;
+			_reportObjectKind=ReportObjectKind.BoxObject;
 		}
 
 		///<summary>Overload for LineObject.</summary>
@@ -343,89 +352,87 @@ namespace OpenDental.ReportingComplex {
 			_name=name;
 			_sectionName=sectionName;
 			_foreColor=color;
-			_lineThickness=lineThickness;
+			_floatLineThickness=lineThickness;
 			_lineOrientation=lineOrientation;
 			_linePosition=linePosition;
-			_linePercent=linePercent;
+			_intLinePercent=linePercent;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
-			_objectKind=ReportObjectKind.LineObject;
+			_reportObjectKind=ReportObjectKind.LineObject;
 		}
 
 		///<summary>Overload for DataTableField ReportObject</summary>
 		public ReportObject(string name,string sectionName,Point location,Size size
-			,string thisDataField,FieldValueType thisValueType
-			,Font thisFont,ContentAlignment thisTextAlign,string thisFormatString) {
+			,string dataFieldName,FieldValueType fieldValueType
+			,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
-			_font=thisFont;
-			_textAlign=thisTextAlign;
-			_formatString=thisFormatString;
-			_fieldKind=FieldDefKind.DataTableField;
-			_dataField=thisDataField;
-			_valueType=thisValueType;
+			_font=font;
+			_contentAlignment=contentAlignment;
+			_stringFormat=stringFormat;
+			_fieldDefKind=FieldDefKind.DataTableField;
+			_dataFieldName=dataFieldName;
+			_fieldValueType=fieldValueType;
 			//defaults:
 			_foreColor=Color.Black;
-			_objectKind=ReportObjectKind.FieldObject;
+			_reportObjectKind=ReportObjectKind.FieldObject;
 		}
 
 		///<summary>Overload for SummaryField ReportObject</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,SummaryOperation operation,string summarizedField,Font font,ContentAlignment textAlign,string formatString) {
+		public ReportObject(string name,string sectionName,Point location,Size size,SummaryOperation summaryOperation,string summarizedFieldName,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
 			_font=font;
-			_textAlign=textAlign;
-			_formatString=formatString;
-			_fieldKind=FieldDefKind.SummaryField;
-			_valueType=FieldValueType.Number;
-			_operation=operation;
-			_summarizedField=summarizedField;
+			_contentAlignment=contentAlignment;
+			_stringFormat=stringFormat;
+			_fieldDefKind=FieldDefKind.SummaryField;
+			_fieldValueType=FieldValueType.Number;
+			_summaryOperation=summaryOperation;
+			_summarizedFieldName=summarizedFieldName;
 			//defaults:
 			_foreColor=Color.Black;
-			_objectKind=ReportObjectKind.FieldObject;
+			_reportObjectKind=ReportObjectKind.FieldObject;
 		}
 
 		///<summary>Overload for GroupSummary ReportObject</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedField,SummaryOperation operation,int offSetX,int offSetY) {
-			_name=name;
-			_sectionName=sectionName;
-			_location=location;
-			_size=size;
-			_font=new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold);
-			_fieldKind=FieldDefKind.SummaryField;
-			_valueType=FieldValueType.Number;
-			_operation=operation;
-			_summarizedField=summarizedField;
-			_offSetX=offSetX;
-			_offSetY=offSetY;
-			//defaults:
-			_textAlign=ContentAlignment.MiddleLeft;
-			_foreColor=color;
-			_objectKind=ReportObjectKind.TextObject;
-		}
-
-		///<summary>Overload for SpecialField ReportObject</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,FieldValueType valueType,SpecialFieldType specialType,Font font,ContentAlignment textAlign,string formatString) {
+		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedFieldName,Font font,SummaryOperation summaryOperation,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
 			_font=font;
-			_textAlign=textAlign;
-			_formatString=formatString;
-			_fieldKind=FieldDefKind.SpecialField;
-			_valueType=valueType;
-			_specialType=specialType;
+			_fieldDefKind=FieldDefKind.SummaryField;
+			_fieldValueType=FieldValueType.Number;
+			_summaryOperation=summaryOperation;
+			_summarizedFieldName=summarizedFieldName;
+			_offSetX=offSetX;
+			_offSetY=offSetY;
 			//defaults:
-			_foreColor=Color.Black;
-			_objectKind=ReportObjectKind.FieldObject;
+			_contentAlignment=ContentAlignment.MiddleLeft;
+			_foreColor=color;
+			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
-
+		///<summary>Overload for SpecialField ReportObject</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,FieldValueType fieldValueType,SpecialFieldType specialType,Font font,ContentAlignment contentAlignment,string stringFormat) {
+			_name=name;
+			_sectionName=sectionName;
+			_location=location;
+			_size=size;
+			_font=font;
+			_contentAlignment=contentAlignment;
+			_stringFormat=stringFormat;
+			_fieldDefKind=FieldDefKind.SpecialField;
+			_fieldValueType=fieldValueType;
+			_specialFieldType=specialType;
+			//defaults:
+			_foreColor=Color.Black;
+			_reportObjectKind=ReportObjectKind.FieldObject;
+		}
 
 		///<summary>Converts contentAlignment into a combination of StringAlignments used to format strings.  This method is mostly called for drawing text on reportObjects.</summary>
 		public static StringFormat GetStringFormatAlignment(ContentAlignment contentAlignment){
@@ -474,59 +481,74 @@ namespace OpenDental.ReportingComplex {
 			return stringFormat;
 		}
 
+		///<summary>Used to copy a report object when creating new QueryObjects.</summary>
 		public ReportObject DeepCopyReportObject() {
 			ReportObject reportObj=new ReportObject();
 			reportObj._sectionName=this._sectionName;
 			reportObj._location=new Point(this._location.X,this._location.Y);
 			reportObj._size=new Size(this._size.Width,this._size.Height);
 			reportObj._name=this._name;
-			reportObj._objectKind=this._objectKind;
+			reportObj._reportObjectKind=this._reportObjectKind;
 			reportObj._font=(Font)this._font.Clone();
-			reportObj._textAlign=this._textAlign;
+			reportObj._contentAlignment=this._contentAlignment;
 			reportObj._foreColor=this._foreColor;
 			reportObj._staticText=this._staticText;
-			reportObj._formatString=this._formatString;
+			reportObj._stringFormat=this._stringFormat;
 			reportObj._suppressIfDuplicate=this._suppressIfDuplicate;
-			reportObj._endSectionName=this._endSectionName;
-			reportObj._locationLowerRight=new Point(this._locationLowerRight.X,this._locationLowerRight.Y);
-			reportObj._lineThickness=this._lineThickness;
-			reportObj._fieldKind=this._fieldKind;
-			reportObj._valueType=this._valueType;
-			reportObj._specialType=this._specialType;
-			reportObj._operation=this._operation;
+			reportObj._floatLineThickness=this._floatLineThickness;
+			reportObj._fieldDefKind=this._fieldDefKind;
+			reportObj._fieldValueType=this._fieldValueType;
+			reportObj._specialFieldType=this._specialFieldType;
+			reportObj._summaryOperation=this._summaryOperation;
 			reportObj._lineOrientation=this._lineOrientation;
 			reportObj._linePosition=this._linePosition;
-			reportObj._linePercent=this._linePercent;
+			reportObj._intLinePercent=this._intLinePercent;
 			reportObj._offSetX=this._offSetX;
 			reportObj._offSetY=this._offSetY;
 			reportObj._isUnderlined=this._isUnderlined;
-			reportObj._summarizedField=this._summarizedField;
-			reportObj._dataField=this._dataField;
+			reportObj._summarizedFieldName=this._summarizedFieldName;
+			reportObj._dataFieldName=this._dataFieldName;
 			reportObj._summaryOrientation=this._summaryOrientation;
 			List<int> summaryGroupsNew=new List<int>();
-			if(this._summaryGroups!=null) {
-				for(int i=0;i<this._summaryGroups.Count;i++) {
-					summaryGroupsNew.Add(this._summaryGroups[i]);
+			if(this._summaryGroupValues!=null) {
+				for(int i=0;i<this._summaryGroupValues.Count;i++) {
+					summaryGroupsNew.Add(this._summaryGroupValues[i]);
 				}
 			}
-			reportObj._summaryGroups=summaryGroupsNew;
+			reportObj._summaryGroupValues=summaryGroupsNew;
 			return reportObj;
 		}
 
 		///<summary>Once a dataTable has been set, this method can be run to get the summary value of this field.  It will still need to be formatted.  It loops through all records to get this value.</summary>
 		public double GetSummaryValue(DataTable dataTable,int col){
 			double retVal=0;
-			for(int i=0;i<dataTable.Rows.Count;i++){
-				if(Operation==SummaryOperation.Sum){
+			for(int i=0;i<dataTable.Rows.Count;i++) {
+				if(SummaryOperation==SummaryOperation.Sum) {
 					retVal+=PIn.Double(dataTable.Rows[i][col].ToString());
 				}
-				else if(Operation==SummaryOperation.Count){
+				else if(SummaryOperation==SummaryOperation.Count) {
 					retVal++;
 				}
 			}
 			return retVal;
 		}
 
+		///<summary>Used to automatically calculate the new size when something important changes. Also recalculates location for report headers.</summary>
+		private Size CalculateNewSize(string text,Font font) {
+			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
+			Size size;
+			if(_sectionName=="Group Header" || _sectionName=="Group Footer" || _sectionName=="Detail") {
+				size=new Size(_size.Width,(int)(grfx.MeasureString(text,font).Height/grfx.DpiY*100+2));
+			}
+			else {
+				size=new Size((int)(grfx.MeasureString(text,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(text,font).Height/grfx.DpiY*100+2));
+			}
+			if(_sectionName=="Report Header") {
+				_location.X+=(_size.Width/2);
+				_location.X-=(size.Width/2);
+			}
+			return size;
+		}
 
 	}
 

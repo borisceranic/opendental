@@ -1367,13 +1367,18 @@ namespace OpenDental{
 			if(!SaveData()){
 				return;
 			}
-			ReportComplex report=new ReportComplex(Lan.g(this,"Payment Plan Terms"),PrefC.GetString(PrefName.PracticeTitle),false,false,false);
-			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString());
+			Font font=new Font("Tahoma",9);
+			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(false,false);
+			report.AddTitle("Title",Lan.g(this,"Payment Plan Terms"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString(),fontSubTitle);
 			string sectName="Report Header";
 			Section section=report.Sections["Report Header"];
 			//int sectIndex=report.Sections.GetIndexOfKind(AreaSectionKind.ReportHeader);
 			Size size=new Size(300,20);//big enough for any text
-			Font font=new Font("Tahoma",9);
 			ContentAlignment alignL=ContentAlignment.MiddleLeft;
 			ContentAlignment alignR=ContentAlignment.MiddleRight;
 			int yPos=140;
@@ -1432,18 +1437,15 @@ namespace OpenDental{
 				row["balance"]=table.Rows[i]["balance"].ToString();
 				tbl.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
-			query.AddColumn("ChargeDate",80,FieldValueType.Date);
-			//move the first column more to the middle
-			query.GetColumnHeader("ChargeDate").Location=new Point(150,0);
+			QueryObject query=report.AddQuery(tbl,"",font,"",SplitByKind.None,1,true);
+			query.AddColumn("ChargeDate",80,FieldValueType.Date,font);
 			query.GetColumnHeader("ChargeDate").StaticText="Date";
-			query.GetColumnDetail("ChargeDate").Location=new Point(150,0);
-			query.AddColumn("Description",150,FieldValueType.String);
-			query.AddColumn("Charges",70,FieldValueType.Number);
-			query.AddColumn("Credits",70,FieldValueType.Number);
-			query.AddColumn("Balance",70,FieldValueType.String);
-			query.GetColumnHeader("Balance").TextAlign=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("Balance").TextAlign=ContentAlignment.MiddleRight;
+			query.AddColumn("Description",150,FieldValueType.String,font);
+			query.AddColumn("Charges",70,FieldValueType.Number,font);
+			query.AddColumn("Credits",70,FieldValueType.Number,font);
+			query.AddColumn("Balance",70,FieldValueType.String,font);
+			query.GetColumnHeader("Balance").ContentAlignment=ContentAlignment.MiddleRight;
+			query.GetColumnDetail("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			report.ReportObjects.Add(new ReportObject
 			("Signature","Report Footer",new Point(x1,70),size,"Signature of Guarantor:",font,alignL));
 			if(!report.SubmitQueries()) {

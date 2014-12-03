@@ -272,11 +272,17 @@ namespace OpenDental{
 		}
 
 		private void ExecuteIndividual(){
-			ReportComplex report=new ReportComplex(Lan.g(this,"PPO Writeoffs"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
-			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
-			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"));
+			Font font=new Font("Tahoma",9);
+			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
+			report.AddTitle("Title",Lan.g(this,"PPO Writeoffs"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString(),fontSubTitle);
+			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"),fontSubTitle);
 			if(textCarrier.Text!="") {
-				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text,fontSubTitle);
 			}
 			string queryText="SET @DateFrom="+POut.Date(date1.SelectionStart)+", @DateTo="+POut.Date(date2.SelectionStart)
 				+", @CarrierName='%"+POut.String(textCarrier.Text)+"%';";
@@ -324,15 +330,15 @@ namespace OpenDental{
 					GROUP BY claimproc.ClaimNum 
 					ORDER BY claimproc.ProcDate";
 			}
-			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None,1,true);
-			query.AddColumn("Date",80,FieldValueType.Date);
-			query.AddColumn("Patient",120,FieldValueType.String);
-			query.AddColumn("Carrier",150,FieldValueType.String);
-			query.AddColumn("Provider",60,FieldValueType.String);
-			query.AddColumn("Stand Fee",80,FieldValueType.Number);
-			query.AddColumn("PPO Fee",80,FieldValueType.Number);
-			query.AddColumn("Writeoff",80,FieldValueType.Number);
-			query.AddSummaryLabel("Stand Fee","Totals:",SummaryOrientation.West,false);
+			QueryObject query=report.AddQuery(queryText,"",font,"",SplitByKind.None,1,true);
+			query.AddColumn("Date",80,FieldValueType.Date,font);
+			query.AddColumn("Patient",120,FieldValueType.String,font);
+			query.AddColumn("Carrier",150,FieldValueType.String,font);
+			query.AddColumn("Provider",60,FieldValueType.String,font);
+			query.AddColumn("Stand Fee",80,FieldValueType.Number,font);
+			query.AddColumn("PPO Fee",80,FieldValueType.Number,font);
+			query.AddColumn("Writeoff",80,FieldValueType.Number,font);
+			query.AddSummaryLabel("Stand Fee","Totals:",SummaryOrientation.West,false,fontBold);
 			if(!report.SubmitQueries()) {
 				DialogResult=DialogResult.Cancel;
 				return;
@@ -343,14 +349,19 @@ namespace OpenDental{
 		}
 
 		private void ExecuteGroup() {
-			ReportComplex report=new ReportComplex(Lan.g(this,"PPO Writeoffs"),PrefC.GetString(PrefName.PracticeTitle),true,true,false);
-			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
-			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"));
+			Font font=new Font("Tahoma",9);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
+			report.AddTitle("Title",Lan.g(this,"PPO Writeoffs"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Date SubTitle",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString(),fontSubTitle);
+			report.AddSubTitle("Claims",Lan.g(this,"Individual Claims"),fontSubTitle);
 			if(textCarrier.Text!="") {
-				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text,fontSubTitle);
 			}
 			if(textCarrier.Text!="") {
-				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text);
+				report.AddSubTitle("Carrier",Lan.g(this,"Carrier like: ")+textCarrier.Text,fontSubTitle);
 			}
 			string queryText="";
 			if(radioWriteoffPay.Checked) {
@@ -391,11 +402,11 @@ namespace OpenDental{
 					GROUP BY carrier.CarrierNum 
 					ORDER BY carrier.CarrierName";
 			}
-			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None,1,true);
-			query.AddColumn("Carrier",180,FieldValueType.String);
-			query.AddColumn("Stand Fee",80,FieldValueType.Number);
-			query.AddColumn("PPO Fee",80,FieldValueType.Number);
-			query.AddColumn("Writeoff",80,FieldValueType.Number);
+			QueryObject query=report.AddQuery(queryText,"",font,"",SplitByKind.None,1,true);
+			query.AddColumn("Carrier",180,FieldValueType.String,font);
+			query.AddColumn("Stand Fee",80,FieldValueType.Number,font);
+			query.AddColumn("PPO Fee",80,FieldValueType.Number,font);
+			query.AddColumn("Writeoff",80,FieldValueType.Number,font);
 			if(!report.SubmitQueries()) {
 				DialogResult=DialogResult.Cancel;
 				return;
