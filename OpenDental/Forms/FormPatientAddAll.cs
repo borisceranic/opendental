@@ -11,7 +11,11 @@ namespace OpenDental {
 		public string LName;
 		public string FName;
 		public long SelectedPatNum;
-		private string mostRecentLName;
+		private string _lnameOld1;
+		private string _fnameOld2="";
+		private string _fnameOld3="";
+		private string _fnameOld4="";
+		private string _fnameOld5="";
 		private List<Referral> similarReferrals;
 		private string referralOriginal;
 		private System.Windows.Forms.ListBox listReferral;
@@ -165,7 +169,8 @@ namespace OpenDental {
 				textLName1.Text=textLName1.Text.ToUpper();
 				textLName1.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
+			_lnameOld1=textLName1.Text;
 		}
 
 		private void textLName2_TextChanged(object sender,EventArgs e) {
@@ -201,7 +206,7 @@ namespace OpenDental {
 				textFName1.Text=textFName1.Text.ToUpper();
 				textFName1.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
 		}
 
 		private void textFName2_TextChanged(object sender,EventArgs e) {
@@ -209,7 +214,8 @@ namespace OpenDental {
 				textFName2.Text=textFName2.Text.ToUpper();
 				textFName2.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
+			_fnameOld2=textFName2.Text;
 		}
 
 		private void textFName3_TextChanged(object sender,EventArgs e) {
@@ -217,7 +223,8 @@ namespace OpenDental {
 				textFName3.Text=textFName3.Text.ToUpper();
 				textFName3.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
+			_fnameOld3=textFName3.Text;
 		}
 
 		private void textFName4_TextChanged(object sender,EventArgs e) {
@@ -225,7 +232,8 @@ namespace OpenDental {
 				textFName4.Text=textFName4.Text.ToUpper();
 				textFName4.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
+			_fnameOld4=textFName4.Text;
 		}
 
 		private void textFName5_TextChanged(object sender,EventArgs e) {
@@ -233,44 +241,36 @@ namespace OpenDental {
 				textFName5.Text=textFName5.Text.ToUpper();
 				textFName5.SelectionStart=1;
 			}
-			SetLNames();
+			SetLnames();
+			_fnameOld5=textFName5.Text;
 		}
 
-		private void SetLNames(){
-			if(textLName2.Text=="" || textLName2.Text==mostRecentLName){
-				if(textFName2.Text==""){
-					textLName2.Text="";
-				}
-				else{
-					textLName2.Text=textLName1.Text;
-				}
-			}
-			if(textLName3.Text=="" || textLName3.Text==mostRecentLName){
-				if(textFName3.Text==""){
-					textLName3.Text="";
-				}
-				else{
-					textLName3.Text=textLName1.Text;
-				}
-			}
-			if(textLName4.Text=="" || textLName4.Text==mostRecentLName){
-				if(textFName4.Text==""){
-					textLName4.Text="";
-				}
-				else{
-					textLName4.Text=textLName1.Text;
-				}
-			}
-			if(textLName5.Text=="" || textLName5.Text==mostRecentLName){
-				if(textFName5.Text==""){
-					textLName5.Text="";
-				}
-				else{
-					textLName5.Text=textLName1.Text;
-				}
-			}
-			mostRecentLName=textLName1.Text;
+		private void SetLnames() {
+			SetLname(textLName2,textFName2,_fnameOld2);
+			SetLname(textLName3,textFName3,_fnameOld3);
+			SetLname(textLName4,textFName4,_fnameOld4);
+			SetLname(textLName5,textFName5,_fnameOld5);
 			ResetSubscriberLists();
+		}
+
+		private void SetLname(TextBox textLname,TextBox textFname,string fnameOld) {
+			if(textLname.Text=="" && textFname.Text=="") {
+				textLname.Text="";
+			}
+			else if(textLname.Text=="" && textFname.Text!="") {
+				textLname.Text=textLName1.Text;
+			}
+			else if(textLname.Text==_lnameOld1 && textFname.Text=="") {
+				if(fnameOld!="" && textFname.Text=="") {
+					textLname.Text="";
+				}
+				else {
+					textLname.Text=textLName1.Text;
+				}
+			}
+			else if(textLname.Text==_lnameOld1 && textFname.Text!="") {
+				textLname.Text=textLName1.Text;
+			}
 		}
 		#endregion Names
 
