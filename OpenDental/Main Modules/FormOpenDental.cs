@@ -5925,6 +5925,10 @@ namespace OpenDental{
 				if(openForm.Name=="FormTerminal") {
 					return;
 				}
+				//If anything is in progress we should halt the autologoff. After the window finishes, this will get hit after a maximum of 15 seconds and perform the auto-logoff.
+				if(openForm.Name=="FormProgress") {
+					return;
+				}
 			}
 			//Warning.  When debugging this, the ActiveForm will be impossible to determine by setting breakpoints.
 			//string activeFormText=Form.ActiveForm.Text;
