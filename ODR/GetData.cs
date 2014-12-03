@@ -16,7 +16,7 @@ namespace ODR{
 		}
 
 		///<Summary>asOfDate is typically 12/31/...  </Summary>
-		public static float NetIncomeThisYear(object asOfDateObj) {
+		public static double NetIncomeThisYear(object asOfDateObj) {
 			DateTime asOfDate;
 			if(asOfDateObj.GetType()==typeof(string)){
 				asOfDate=PIn.Date(asOfDateObj.ToString());
@@ -36,13 +36,13 @@ namespace ODR{
 			+" GROUP BY AcctType";
 			DataConnection dcon=new DataConnection();
 			DataTable table=dcon.GetTable(command);
-			float retVal=0;
+			double retVal=0;
 			for(int i=0;i<table.Rows.Count;i++){
 				if(table.Rows[i][2].ToString()=="3"//income
 					|| table.Rows[i][2].ToString()=="4")//expense
 				{
-					retVal+=PIn.Float(table.Rows[i][0].ToString());//add credit
-					retVal-=PIn.Float(table.Rows[i][1].ToString());//subtract debit
+					retVal+=PIn.Double(table.Rows[i][0].ToString());//add credit
+					retVal-=PIn.Double(table.Rows[i][1].ToString());//subtract debit
 					//if it's an expense, we are subtracting (income-expense), but the signs cancel.
 				}
 			}
@@ -50,7 +50,7 @@ namespace ODR{
 		}
 
 		///<Summary>Gets sum of all income-expenses for all previous years. asOfDate could be any date</Summary>
-		public static float RetainedEarningsAuto(object asOfDateObj) {
+		public static double RetainedEarningsAuto(object asOfDateObj) {
 			DateTime asOfDate;
 			if(asOfDateObj.GetType()==typeof(string)) {
 				asOfDate=PIn.Date(asOfDateObj.ToString());
@@ -69,13 +69,13 @@ namespace ODR{
 			+" GROUP BY AcctType";
 			DataConnection dcon=new DataConnection();
 			DataTable table=dcon.GetTable(command);
-			float retVal=0;
+			double retVal=0;
 			for(int i=0;i<table.Rows.Count;i++) {
 				if(table.Rows[i][2].ToString()=="3"//income
 					|| table.Rows[i][2].ToString()=="4")//expense
 				{
-					retVal+=PIn.Float(table.Rows[i][0].ToString());//add credit
-					retVal-=PIn.Float(table.Rows[i][1].ToString());//subtract debit
+					retVal+=PIn.Double(table.Rows[i][0].ToString());//add credit
+					retVal-=PIn.Double(table.Rows[i][1].ToString());//subtract debit
 					//if it's an expense, we are subtracting (income-expense), but the signs cancel.
 				}
 			}
