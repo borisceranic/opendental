@@ -9265,6 +9265,9 @@ namespace OpenDental{
 				//extremely long name
 				text=PatCur.GetNameFirst()[0]+". "+PatCur.LName;//example: J. Sparks
 			}
+			string[] headerText={ text };
+			Plugins.HookAddCode(this,"ContrChart.pd2_PrintPage_middle",PatCur,e,g,headerText);
+			text=headerText[0];
 			g.DrawString(text,subHeadingFont,Brushes.Black,400-g.MeasureString(text,subHeadingFont).Width/2,yPos);
 			text="Page "+(pagesPrinted+1);
 			g.DrawString(text,subHeadingFont,Brushes.Black,800-g.MeasureString(text,subHeadingFont).Width,yPos);
