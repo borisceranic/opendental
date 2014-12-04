@@ -580,7 +580,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(875, 575);
 			this.Name = "FormEmailMessageEdit";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit E-mail Message";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormEmailMessageEdit_Closing);
