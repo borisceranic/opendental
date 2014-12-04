@@ -25,7 +25,7 @@ namespace OpenDental {
 			for(int i=0;i<splits.Count;i++) {
 				Claim claim=Claims.GetClaim(splits[i].ClaimNum);
 				ClaimPayment cp=new ClaimPayment();
-				cp.CheckDate=claim.DateService;
+				cp.CheckDate=claim.DateReceived;
 				cp.CheckAmt=splits[i].InsPayAmt;
 				cp.ClinicNum=claim.ClinicNum;
 				cp.CarrierName=splits[i].Carrier;
@@ -33,7 +33,7 @@ namespace OpenDental {
 				ClaimPayments.Insert(cp);
 				List<ClaimProc> claimP=ClaimProcs.RefreshForClaim(splits[i].ClaimNum);
 				for(int j=0;j<claimP.Count;j++) {
-					claimP[j].DateCP=claim.DateService;
+					claimP[j].DateCP=claim.DateReceived;
 					claimP[j].ClaimPaymentNum=cp.ClaimPaymentNum;
 					ClaimProcs.Update(claimP[j]);
 				}
