@@ -309,12 +309,17 @@ namespace OpenDental{
 		}
 
 		private void butCopyWeek_Click(object sender,EventArgs e) {
+			//Always start week on Monday
+			if(DateSelected.DayOfWeek==DayOfWeek.Sunday) {//if selecting Sunday, go back to the previous Monday.
+				DateCopyStart=DateSelected.AddDays(-6);
+			}
+			else {//Any other day. eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
+				DateCopyStart=DateSelected.AddDays(1-(int)DateSelected.DayOfWeek);//eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
+			}
 			if(checkWeekend.Checked){
-				DateCopyStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek);//eg Wed-3=Sun.
 				DateCopyEnd=DateCopyStart.AddDays(6);
 			}
 			else{
-				DateCopyStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek+1);//eg Wed-3+1=Mon.
 				DateCopyEnd=DateCopyStart.AddDays(4);
 			}
 			//FillClipboard();
@@ -330,15 +335,16 @@ namespace OpenDental{
 			DateTime dateSelectedStart;
 			DateTime dateSelectedEnd;
 			bool isWeek=DateCopyStart!=DateCopyEnd;
-			if(isWeek){
-				if(checkWeekend.Checked) {
-					dateSelectedStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek);
-					dateSelectedEnd=dateSelectedStart.AddDays(6);
+			if(isWeek) {
+				//Always start week on Monday
+				if(DateSelected.DayOfWeek==DayOfWeek.Sunday) {//if selecting Sunday, go back to the previous Monday.
+					dateSelectedStart=DateSelected.AddDays(-6);
 				}
-				else{
-					dateSelectedStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek+1);
-					dateSelectedEnd=dateSelectedStart.AddDays(4);
+				else {//Any other day. eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
+					dateSelectedStart=DateSelected.AddDays(1-(int)DateSelected.DayOfWeek);//eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
 				}
+				//DateCopyEnd is greater than DateCopyStart and is either 4 days greater or 6 days greater, so clear/paste the same number of days
+				dateSelectedEnd=dateSelectedStart.AddDays((DateCopyEnd-DateCopyStart).Days);
 			}
 			else {
 				dateSelectedStart=DateSelected;
@@ -393,14 +399,15 @@ namespace OpenDental{
 			DateTime dateSelectedEnd;
 			bool isWeek=DateCopyStart!=DateCopyEnd;
 			if(isWeek) {
-				if(checkWeekend.Checked) {
-					dateSelectedStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek);
-					dateSelectedEnd=dateSelectedStart.AddDays(6);
+				//Always start week on Monday
+				if(DateSelected.DayOfWeek==DayOfWeek.Sunday) {//if selecting Sunday, go back to the previous Monday.
+					dateSelectedStart=DateSelected.AddDays(-6);
 				}
-				else {
-					dateSelectedStart=DateSelected.AddDays(-(int)DateSelected.DayOfWeek+1);
-					dateSelectedEnd=dateSelectedStart.AddDays(4);
+				else {//Any other day. eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
+					dateSelectedStart=DateSelected.AddDays(1-(int)DateSelected.DayOfWeek);//eg Wed.AddDays(1-3)=Wed.AddDays(-2)=Monday
 				}
+				//DateCopyEnd is greater than DateCopyStart and is either 4 days greater or 6 days greater, so clear/paste the same number of days
+				dateSelectedEnd=dateSelectedStart.AddDays((DateCopyEnd-DateCopyStart).Days);
 			}
 			else {
 				dateSelectedStart=DateSelected;
@@ -425,6 +432,7 @@ namespace OpenDental{
 						Schedules.ClearBlockouts(dateSelectedStart.AddDays(r*7),dateSelectedEnd.AddDays(r*7),opNums);
 					}
 					else {
+						//dateSelectedStart will equal dateSelectedEnd if repeating a single day
 						Schedules.ClearBlockouts(dateSelectedStart.AddDays(dayDelta),dateSelectedEnd.AddDays(dayDelta),opNums);
 					}
 				}
@@ -439,6 +447,7 @@ namespace OpenDental{
 					}
 					Schedules.Insert(sched,true);
 				}
+				//dayDelta is only used for repeating single days, not for repeating weeks, so we don't need to determine whether or not they copied weekends, we can rely on checkWeekend.Checked
 				if(!checkWeekend.Checked && dateSelectedStart.AddDays(dayDelta).DayOfWeek==DayOfWeek.Friday) {
 					dayDelta+=3;
 				}
