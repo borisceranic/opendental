@@ -133,6 +133,18 @@ namespace OpenDentBusiness{
 			}
 			command="UPDATE appointment SET Assistant=0 WHERE Assistant="+POut.Long(employeeNum);
 			Db.NonQ(command);
+			command="SELECT ScheduleNum FROM schedule WHERE EmployeeNum="+POut.Long(employeeNum);
+			DataTable table=Db.GetTable(command);
+			List<string> listScheduleNums=new List<string>();//Used for deleting scheduleops below
+			for(int i=0;i<table.Rows.Count;i++) {
+				//Add entry to deletedobjects table if it is a provider schedule type
+				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i]["ScheduleNum"].ToString()));
+				listScheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
+			}
+			command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
+			Db.NonQ(command);
+			//command="DELETE FROM scheduleop WHERE ScheduleNum IN(SELECT ScheduleNum FROM schedule WHERE EmployeeNum="+POut.Long(employeeNum)+")";
+			//Db.NonQ(command);
 			command="DELETE FROM schedule WHERE EmployeeNum="+POut.Long(employeeNum);
 			Db.NonQ(command);
 			command= "DELETE FROM employee WHERE EmployeeNum ="+POut.Long(employeeNum);

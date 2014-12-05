@@ -591,20 +591,22 @@ namespace OpenDentBusiness{
 			}
 			//make deleted entries for synch purposes:
 			string command="SELECT ScheduleNum FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
-				+"AND SchedType="+POut.Long((int)ScheduleType.Provider);
+				+"AND SchedType IN(0,1,3)";//Practice, Provider, Employee//SchedType="+POut.Long((int)ScheduleType.Provider);
 			DataTable table=Db.GetTable(command);
-			List<string> scheduleNums=new List<string>();  //Used for deleting scheduleops below
+			List<string> listScheduleNums=new List<string>();  //Used for deleting scheduleops below
 			for(int i=0;i<table.Rows.Count;i++){
+				//Add entry to deletedobjects table if it is a provider schedule type
 				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i]["ScheduleNum"].ToString()));
-				scheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
+				//regardless of the type, practice, provider or employee, add to the list to delete scheduleop entries below
+				listScheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
 			}
 			//Then, bulk delete.
 			command="DELETE FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
-				+"AND (SchedType=0 OR SchedType=1 OR SchedType=3)";
+				+"AND SchedType IN(0,1,3)";//Practice, Provider, Employee
 			Db.NonQ(command);
-			if(scheduleNums.Count>0) {
+			if(listScheduleNums.Count>0) {
 				//Delete scheduleops for the deleted schedules.
-				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",scheduleNums))+")";
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
 				Db.NonQ(command);
 			}
 			for(int i=0;i<SchedList.Count;i++){
@@ -619,36 +621,12 @@ namespace OpenDentBusiness{
 				return;
 			}
 			if(provNums.Count==0 && empNums.Count==0 && !includePractice) {
-				return;
+				return;//This guarantees that the orClause below will not be empty when included in the command.
 			}
 			string command;
-			string orClause="";
-			List<string> scheduleNums=new List<string>();  //Used for deleting scheduleops below
+			string orClause="";//this is guaranteed to be non empty by the time the command is assembled.
+			List<string> listScheduleNums=new List<string>();//Used for deleting scheduleops below
 			//make deleted entries for synch purposes:
-			if(provNums.Count>0){
-				for(int i=0;i<provNums.Count;i++) {
-					if(orClause!="") {
-						orClause+="OR ";
-					}
-					orClause+="schedule.ProvNum="+POut.Long(provNums[i])+" ";
-				}
-				command="SELECT ScheduleNum FROM schedule "
-					+"WHERE SchedDate >= "+POut.Date(dateStart)+" "
-					+"AND SchedDate <= "+POut.Date(dateEnd)+" "
-					+"AND SchedType="+POut.Long((int)ScheduleType.Provider)
-					+" AND ("+orClause+")";
-				DataTable table=Db.GetTable(command);
-				for(int i=0;i<table.Rows.Count;i++){
-					DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i][0].ToString()));
-					scheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
-				}
-			}
-			//Then, the usual deletion for everything
-			command="DELETE FROM schedule "
-				+"WHERE SchedDate >= "+POut.Date(dateStart)+" "
-				+"AND SchedDate <= "+POut.Date(dateEnd)+" "
-				+"AND (";
-			orClause="";//this is guaranteed to be non empty by the time the command is assembled.
 			if(includePractice) {
 				orClause="SchedType=0 ";
 			}
@@ -664,11 +642,24 @@ namespace OpenDentBusiness{
 				}
 				orClause+="schedule.EmployeeNum="+POut.Long(empNums[i])+" ";
 			}
-			command+=orClause+")";
+			command="SELECT ScheduleNum FROM schedule "
+				+"WHERE SchedDate >= "+POut.Date(dateStart)+" "
+				+"AND SchedDate <= "+POut.Date(dateEnd)+" "
+				+"AND ("+orClause+")";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++){
+				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i][0].ToString()));
+				listScheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
+			}
+			//Then, the usual deletion for everything
+			command="DELETE FROM schedule "
+				+"WHERE SchedDate >= "+POut.Date(dateStart)+" "
+				+"AND SchedDate <= "+POut.Date(dateEnd)+" "
+				+"AND ("+orClause+")";
 			Db.NonQ(command);
-			if(scheduleNums.Count>0) {
+			if(listScheduleNums.Count>0) {
 				//Delete scheduleops for the deleted schedules.
-				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",scheduleNums))+")";
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
 				Db.NonQ(command);
 			}
 		}
