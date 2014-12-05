@@ -75,7 +75,6 @@ namespace OpenDental{
 			this.tabRecallScheduler = new System.Windows.Forms.TabPage();
 			this.butRecallSchedEnable = new OpenDental.UI.Button();
 			this.labelRecallSchedEnable = new System.Windows.Forms.Label();
-			this.labelRecallSchedSetup = new System.Windows.Forms.Label();
 			this.butRecallSchedSetup = new OpenDental.UI.Button();
 			this.labelRecallSchedDesc = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
@@ -632,7 +631,6 @@ namespace OpenDental{
 			this.tabRecallScheduler.BackColor = System.Drawing.SystemColors.Control;
 			this.tabRecallScheduler.Controls.Add(this.butRecallSchedEnable);
 			this.tabRecallScheduler.Controls.Add(this.labelRecallSchedEnable);
-			this.tabRecallScheduler.Controls.Add(this.labelRecallSchedSetup);
 			this.tabRecallScheduler.Controls.Add(this.butRecallSchedSetup);
 			this.tabRecallScheduler.Controls.Add(this.labelRecallSchedDesc);
 			this.tabRecallScheduler.Location = new System.Drawing.Point(4, 22);
@@ -663,15 +661,6 @@ namespace OpenDental{
 			this.labelRecallSchedEnable.TabIndex = 245;
 			this.labelRecallSchedEnable.Text = "labelRecallSchedEnable";
 			// 
-			// labelRecallSchedSetup
-			// 
-			this.labelRecallSchedSetup.Location = new System.Drawing.Point(120, 162);
-			this.labelRecallSchedSetup.Name = "labelRecallSchedSetup";
-			this.labelRecallSchedSetup.Size = new System.Drawing.Size(466, 24);
-			this.labelRecallSchedSetup.TabIndex = 244;
-			this.labelRecallSchedSetup.Text = "TODO: Should we have a quick button to launch recall setup window?";
-			this.labelRecallSchedSetup.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// butRecallSchedSetup
 			// 
 			this.butRecallSchedSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -681,9 +670,10 @@ namespace OpenDental{
 			this.butRecallSchedSetup.CornerRadius = 4F;
 			this.butRecallSchedSetup.Location = new System.Drawing.Point(41, 162);
 			this.butRecallSchedSetup.Name = "butRecallSchedSetup";
-			this.butRecallSchedSetup.Size = new System.Drawing.Size(73, 24);
+			this.butRecallSchedSetup.Size = new System.Drawing.Size(103, 24);
 			this.butRecallSchedSetup.TabIndex = 243;
 			this.butRecallSchedSetup.Text = "Recall Setup";
+			this.butRecallSchedSetup.Click += new System.EventHandler(this.butRecallSchedSetup_Click);
 			// 
 			// labelRecallSchedDesc
 			// 
@@ -848,7 +838,6 @@ namespace OpenDental{
 		private UI.Button butSync;
 		private System.Windows.Forms.TabPage tabRecallScheduler;
 		private System.Windows.Forms.Label labelRecallSchedDesc;
-		private System.Windows.Forms.Label labelRecallSchedSetup;
 		private UI.Button butRecallSchedSetup;
 		private System.Windows.Forms.Label labelRecallSchedEnable;
 		private UI.Button butRecallSchedEnable;

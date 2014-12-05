@@ -75,7 +75,7 @@ namespace OpenDental {
 			labelRecallSchedEnable.Text="";
 			if(PrefC.GetBool(PrefName.RecallSchedulerService)) {
 				butRecallSchedEnable.Enabled=false;
-				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service already enabled.");
+				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service is currently enabled.");
 			}
 			#endregion
 			SetControlEnabledState();
@@ -772,6 +772,9 @@ namespace OpenDental {
 
 		#region recall scheduler
 		private void butRecallSchedEnable_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
 			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
 			Cursor.Current=Cursors.WaitCursor;
 			#region Web Service Settings
@@ -801,13 +804,14 @@ namespace OpenDental {
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
-			if(Recalls.IsRecallSchedulerResponseValid(result, out error, out errorCode)) {
+			if(Recalls.IsRecallSchedulerResponseValid(result,out error,out errorCode)) {
 				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
 				butRecallSchedEnable.Enabled=false;
 				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service has been enabled.");
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
 				if(Prefs.UpdateBool(PrefName.RecallSchedulerService,true)) {
 					_changed=true;
+					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The recall scheduler service was enabled.");
 				}
 				return;
 			}
@@ -816,10 +820,10 @@ namespace OpenDental {
 			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
 				//We want to launch our recall scheduler page if the user is not signed up:
 				try {
-					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+					Process.Start(Recalls.GetRecallSchedulerURL());
 				}
 				catch(Exception) {
-					//Do nothing.
+					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
 				}
 				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
 				labelRecallSchedEnable.Text=error;
@@ -829,10 +833,19 @@ namespace OpenDental {
 				labelRecallSchedEnable.Text=error;
 				return;
 			}
-			//For every other error message returned, we'll simply show it to the user in a pop up.
-			labelRecallSchedEnable.Text="";
+			//For every other error message returned, we'll simply show a generic error in the label and display the detailed error in a pop up.
+			labelRecallSchedEnable.Text=Lan.g(this,"There was a problem enabling the recall scheduler.  Please give us a call or try again.");
 			MessageBox.Show(error);
 			#endregion
+		}
+
+		private void butRecallSchedSetup_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormRecallSetup FormRS=new FormRecallSetup();
+			FormRS.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall");
 		}
 		#endregion
 

@@ -9,7 +9,14 @@ using System.Xml;
 namespace OpenDentBusiness{
 	
 	///<summary></summary>
-	public class Recalls{
+	public class Recalls {
+		private const string RECALL_SCHEDULER_URL="http://www.patientviewer.com/RecallSchedulerPromo.html";
+
+		///<summary>http://www.patientviewer.com/RecallSchedulerPromo.html</summary>
+		public static string GetRecallSchedulerURL() {
+			//No need to check RemotingRole; no call to db.
+			return RECALL_SCHEDULER_URL;
+		}
 
 		///<summary>Gets all recalls for the supplied patients, usually a family or single pat.  Result might have a length of zero.  Each recall will also have the DateScheduled filled by pulling that info from other tables.</summary>
 		public static List<Recall> GetList(List<long> patNums) {

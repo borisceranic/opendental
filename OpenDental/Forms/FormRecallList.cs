@@ -1066,7 +1066,7 @@ namespace OpenDental{
 				//Office has yet to enable the recall scheduler service.
 				//Send them to a promotional web site so that they can learn about how great it is.
 				try {
-					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+					Process.Start(Recalls.GetRecallSchedulerURL());
 				}
 				catch(Exception) {
 					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
@@ -1125,10 +1125,10 @@ namespace OpenDental{
 			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
 				//We want to launch our recall scheduler page if the user is not signed up:
 				try {
-					Process.Start("http://www.opendental.com/");//TODO: replace with URL to recall scheduler service.
+					Process.Start(Recalls.GetRecallSchedulerURL());
 				}
 				catch(Exception) {
-					//Do nothing.
+					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
 				}
 			}
 			//For every error message returned, we'll simply show it to the user in a pop up.
