@@ -336,7 +336,7 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT claim.ClaimNum,carrier.NoSendElect"
 				+",CONCAT(CONCAT(CONCAT(concat(patient.LName,', '),patient.FName),' '),patient.MiddleI)"
-				+",claim.ClaimStatus,carrier.CarrierName,patient.PatNum,carrier.ElectID,MedType,claim.DateService,claim.ClinicNum "
+				+",claim.ClaimStatus,carrier.CarrierName,patient.PatNum,carrier.ElectID,MedType,claim.DateService,claim.ClinicNum,claim.CustomTracking "
 				+"FROM claim "
 				+"Left join insplan on claim.PlanNum = insplan.PlanNum "
 				+"Left join carrier on insplan.CarrierNum = carrier.CarrierNum "
@@ -370,6 +370,7 @@ namespace OpenDentBusiness{
 				listQueue[i].MedType=medType;
 				listQueue[i].DateService     = PIn.Date  (table.Rows[i]["DateService"].ToString());
 				listQueue[i].ClinicNum		 = PIn.Long	 (table.Rows[i]["ClinicNum"].ToString());
+				listQueue[i].CustomTracking		= PIn.Long (table.Rows[i]["CustomTracking"].ToString());
 			}
 			return listQueue;
 		}
@@ -627,6 +628,10 @@ namespace OpenDentBusiness{
 		public string Warnings;
 		///<summary></summary>
 		public DateTime DateService;
+		///<summary>False by default.  For speed purposes, claims should only be validated once, which is just before they are sent.</summary>
+		public bool IsValid;
+		/// <summary>Used to save what tracking is used for filtering.</summary>
+		public long CustomTracking;
 
 		public ClaimSendQueueItem Copy(){
 			return (ClaimSendQueueItem)MemberwiseClone();

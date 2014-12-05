@@ -137,6 +137,8 @@ namespace OpenDental.Eclaims
 					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,clearhouse.ClearinghouseNum,etype,batchNum);
 					etrans.EtransMessageTextNum=etransMsgText.EtransMessageTextNum;
 					Etranss.Update(etrans);
+					//Now we need to update our cache of claims to reflect the change that took place in the database above in Etranss.SetClaimSentOrPrinted()
+					queueItems[j].ClaimStatus="S";
 				}
 			}
 		}

@@ -26,7 +26,10 @@ namespace OpenDental{
 		///<summary>final list of eclaims(as Claim.ClaimNum) to send</summary>
 		public static ArrayList eClaimList;
 		private ODGrid gridMain;
-		private ClaimSendQueueItem[] listQueue;
+		///<summary>The list of all claims regardless of any filters.  Filled on load.  Make sure to update this list with any updates (e.g. after validating claims)</summary>
+		private ClaimSendQueueItem[] _arrayQueueAll;
+		///<summary>A sub list of claims that show in the main grid.  This is a filtered list of _listQueueAll and will get refilled every time FillGrid is called.</summary>
+		private ClaimSendQueueItem[] _arrayQueueFiltered;
 		///<summary></summary>
 		public long GotoPatNum;
 		private ODGrid gridHistory;
@@ -179,6 +182,7 @@ namespace OpenDental{
 			// 
 			// panelHistory
 			// 
+			this.panelHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelHistory.Controls.Add(this.calendarFrom);
 			this.panelHistory.Controls.Add(this.label1);
 			this.panelHistory.Controls.Add(this.calendarTo);
@@ -196,8 +200,7 @@ namespace OpenDental{
 			// 
 			// gridHistory
 			// 
-			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridHistory.HScrollVisible = false;
 			this.gridHistory.Location = new System.Drawing.Point(4, 31);
 			this.gridHistory.Name = "gridHistory";
@@ -293,7 +296,9 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
-			this.gridMain.HScrollVisible = true;
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(4, 49);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
@@ -354,6 +359,7 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Send Claims";
 			this.Load += new System.EventHandler(this.FormClaimsSend_Load);
+			this.Resize += new System.EventHandler(this.FormClaimsSend_Resize);
 			this.panelHistory.ResumeLayout(false);
 			this.panelHistory.PerformLayout();
 			this.panel1.ResumeLayout(false);
@@ -399,6 +405,10 @@ namespace OpenDental{
 				FormClaimReports FormC=new FormClaimReports();
 				FormC.AutomaticMode=true;
 				FormC.ShowDialog();
+			}
+			_arrayQueueAll=Claims.GetQueueList(0,0,0);//Get all claims with no filters applied
+			for(int i=0;i<_arrayQueueAll.Length;i++) {
+				_arrayQueueAll[i].MissingData=Lan.g(this,"(validated when sending)");
 			}
 			FillGrid();
 			textDateFrom.Text=DateTime.Today.AddDays(-7).ToShortDateString();
@@ -458,14 +468,18 @@ namespace OpenDental{
 			ToolBarHistory.Invalidate();
 		}
 
+		private void FormClaimsSend_Resize(object sender,EventArgs e) {
+			AdjustPanelSplit();
+		}
+
 		private void GotoAccount_Clicked(object sender, System.EventArgs e){
 			//accessed by right clicking
 			if(gridMain.SelectedIndices.Length!=1) {
 				MsgBox.Show(this,"Please select exactly one item first.");
 				return;
 			}
-			GotoPatNum=listQueue[gridMain.SelectedIndices[0]].PatNum;
-			GotoClaimNum=listQueue[gridMain.SelectedIndices[0]].ClaimNum;
+			GotoPatNum=_arrayQueueFiltered[gridMain.SelectedIndices[0]].PatNum;
+			GotoClaimNum=_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -474,34 +488,21 @@ namespace OpenDental{
 			SendEclaimsToClearinghouse(Clearinghouses.Listt[menuitem.Index].ClearinghouseNum);
 		}
 
-		private void FillGrid(){
-			long clinicNum=0;
-			long customTracking=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0) {
-				clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			}
-			if(comboCustomTracking.SelectedIndex!=0) {
-				customTracking=DefC.Long[(int)DefCat.ClaimCustomTracking][comboCustomTracking.SelectedIndex-1].DefNum;
-			}
-			listQueue=Claims.GetQueueList(0,clinicNum,customTracking);
-			//The next 13 lines delete any claims that exist without any claim procs.  The db maint does the same thing.
-			//We will eventually prevent it, both when deleting a claimproc from inside a claim and from inside a procedure.
-			List<ClaimSendQueueItem> listQueueShort=new List<ClaimSendQueueItem>();
-			for(int i=0;i<listQueue.Length;i++) {
-				List<ClaimProc> claimProcList=ClaimProcs.RefreshForClaim(listQueue[i].ClaimNum);
-				List<ClaimProc> claimProcs=ClaimProcs.GetForSendClaim(claimProcList,listQueue[i].ClaimNum);
-				if(claimProcs.Count==0) {
-					Claim claimWithNoProcs=Claims.GetClaim(listQueue[i].ClaimNum);
-					Claims.Delete(claimWithNoProcs);
-				}
-				else {
-					listQueueShort.Add(listQueue[i]);
+		private void FillGrid() {
+			FillGrid(false);
+		}
+
+		private void FillGrid(bool rememberSelection){
+			int oldScrollValue=0;
+			List<long> listOldSelectedClaimNums=new List<long>();
+			if(rememberSelection) {
+				oldScrollValue=gridMain.ScrollValue;
+				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+					listOldSelectedClaimNums.Add(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum);
 				}
 			}
-			listQueue=listQueueShort.ToArray();
-			for(int i=0;i<listQueue.Length;i++) {
-				Eclaims.Eclaims.GetMissingData(listQueue[i]);
-			}
+			//Get filtered list from list all
+			_arrayQueueFiltered=GetListQueueFiltered();//We update the class wide variable because it is used in double clicking and other events.
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableQueue","Date Service"),80);//new column
@@ -518,17 +519,17 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableQueue","Warnings"),120);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableQueue","Missing Info"),300);//was 400
+			col=new ODGridColumn(Lan.g("TableQueue","Missing Info"),300);//7. This is position critical.  If this changes, the code below must be updated as well.
 			gridMain.Columns.Add(col);			 
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<listQueue.Length;i++){
+			for(int i=0;i<_arrayQueueFiltered.Length;i++){
 				row=new ODGridRow();
-				row.Cells.Add(listQueue[i].DateService.ToShortDateString());
-				row.Cells.Add(listQueue[i].PatName);
-				row.Cells.Add(listQueue[i].Carrier);
-				row.Cells.Add(Clinics.GetDesc(listQueue[i].ClinicNum));
-				switch(listQueue[i].MedType){
+				row.Cells.Add(_arrayQueueFiltered[i].DateService.ToShortDateString());
+				row.Cells.Add(_arrayQueueFiltered[i].PatName);
+				row.Cells.Add(_arrayQueueFiltered[i].Carrier);
+				row.Cells.Add(Clinics.GetDesc(_arrayQueueFiltered[i].ClinicNum));
+				switch(_arrayQueueFiltered[i].MedType){
 					case EnumClaimMedType.Dental:
 						row.Cells.Add("Dent");
 						break;
@@ -539,27 +540,59 @@ namespace OpenDental{
 						row.Cells.Add("Inst");
 						break;
 				}
-				if(listQueue[i].NoSendElect){
+				if(_arrayQueueFiltered[i].NoSendElect){
 					row.Cells.Add("Paper");
 					row.Cells.Add("");
 					row.Cells.Add("");
 				}
 				else{
-					row.Cells.Add(ClearinghouseL.GetDescript(listQueue[i].ClearinghouseNum));
-					row.Cells.Add(listQueue[i].Warnings);
-					row.Cells.Add(listQueue[i].MissingData);
+					row.Cells.Add(ClearinghouseL.GetDescript(_arrayQueueFiltered[i].ClearinghouseNum));
+					row.Cells.Add(_arrayQueueFiltered[i].Warnings);
+					row.Cells.Add(_arrayQueueFiltered[i].MissingData);
 				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			gridMain.ScrollValue=oldScrollValue;
+			for(int i=0;i<_arrayQueueFiltered.Length;i++) {
+				for(int j=0;j<listOldSelectedClaimNums.Count;j++) {
+					if(_arrayQueueFiltered[i].ClaimNum==listOldSelectedClaimNums[j]) {
+						gridMain.SetSelected(i,true);
+					}
+				}
+			}
+		}
+
+		///<summary>Returns a list of claim send queue items based on the filters.</summary>
+		private ClaimSendQueueItem[] GetListQueueFiltered() {
+			long clinicNum=0;
+			long customTracking=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0) {
+				clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+			}
+			if(comboCustomTracking.SelectedIndex!=0) {
+				customTracking=DefC.Long[(int)DefCat.ClaimCustomTracking][comboCustomTracking.SelectedIndex-1].DefNum;
+			}
+			List<ClaimSendQueueItem> listClaimSend=new List<ClaimSendQueueItem>();
+			listClaimSend.AddRange(_arrayQueueAll);
+			//Remove any non-matches
+			if(clinicNum>0) {
+				//Creating a subset of listClaimSend with all entries c such that c.ClinicNum==clinicNum
+				listClaimSend=listClaimSend.FindAll(c => c.ClinicNum==clinicNum);
+			}
+			if(customTracking>0) {
+				//Creating a subset of listClaimSend with all entries c such that c.CustomTracking==customTracking
+				listClaimSend=listClaimSend.FindAll(c => c.CustomTracking==customTracking);
+			}
+			return listClaimSend.ToArray();
 		}
 
 		private void gridMain_CellDoubleClick(object sender, ODGridClickEventArgs e){
 			int selected=e.Row;
 			FormClaimPrint FormCP;
 			FormCP=new FormClaimPrint();
-			FormCP.PatNumCur=listQueue[e.Row].PatNum;
-			FormCP.ClaimNumCur=listQueue[e.Row].ClaimNum;
+			FormCP.PatNumCur=_arrayQueueFiltered[e.Row].PatNum;
+			FormCP.ClaimNumCur=_arrayQueueFiltered[e.Row].ClaimNum;
 			FormCP.PrintImmediately=false;
 			FormCP.ShowDialog();				
 			FillGrid();	
@@ -613,8 +646,8 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select only one claim."));
 				return;
 			}
-			FormCP.PatNumCur=listQueue[gridMain.GetSelectedIndex()].PatNum;
-			FormCP.ClaimNumCur=listQueue[gridMain.GetSelectedIndex()].ClaimNum;
+			FormCP.PatNumCur=_arrayQueueFiltered[gridMain.GetSelectedIndex()].PatNum;
+			FormCP.ClaimNumCur=_arrayQueueFiltered[gridMain.GetSelectedIndex()].ClaimNum;
 			FormCP.PrintImmediately=false;
 			FormCP.ShowDialog();				
 			FillGrid();
@@ -634,9 +667,9 @@ namespace OpenDental{
 		private void toolBarButPrint_Click(){
 			FormClaimPrint FormCP=new FormClaimPrint();
 			if(gridMain.SelectedIndices.Length==0){
-				for(int i=0;i<listQueue.Length;i++){
-					if((listQueue[i].ClaimStatus=="W" || listQueue[i].ClaimStatus=="P")
-						&& listQueue[i].NoSendElect)
+				for(int i=0;i<_arrayQueueFiltered.Length;i++){
+					if((_arrayQueueFiltered[i].ClaimStatus=="W" || _arrayQueueFiltered[i].ClaimStatus=="P")
+						&& _arrayQueueFiltered[i].NoSendElect)
 					{
 						gridMain.SetSelected(i,true);		
 					}	
@@ -651,13 +684,13 @@ namespace OpenDental{
 			}
 			pd.PrinterSettings.Copies=1; //Used to be sent in the FormCP.PrintImmediate function call below.  Moved up here to keep same logic.
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				FormCP.PatNumCur=listQueue[gridMain.SelectedIndices[i]].PatNum;
-				FormCP.ClaimNumCur=listQueue[gridMain.SelectedIndices[i]].ClaimNum;
+				FormCP.PatNumCur=_arrayQueueFiltered[gridMain.SelectedIndices[i]].PatNum;
+				FormCP.ClaimNumCur=_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum;
 				FormCP.ClaimFormCur=null;//so that it will pull from the individual claim or plan.
 				if(!FormCP.PrintImmediate(pd.PrinterSettings)) {
 					return;
 				}
-				Etranss.SetClaimSentOrPrinted(listQueue[gridMain.SelectedIndices[i]].ClaimNum,listQueue[gridMain.SelectedIndices[i]].PatNum,0,EtransType.ClaimPrinted,0);
+				Etranss.SetClaimSentOrPrinted(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum,_arrayQueueFiltered[gridMain.SelectedIndices[i]].PatNum,0,EtransType.ClaimPrinted,0);
 			}
 			FillGrid();
 			FillHistory();
@@ -677,7 +710,7 @@ namespace OpenDental{
 			InsPlan plan;
 			List<long> carrierNums=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				claim=Claims.GetClaim(listQueue[gridMain.SelectedIndices[i]].ClaimNum);
+				claim=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum);
 				plan=InsPlans.GetPlan(claim.PlanNum,new List <InsPlan> ());
 				carrierNums.Add(plan.CarrierNum);
 			}
@@ -714,24 +747,24 @@ namespace OpenDental{
 				#endif
 			}
 			if(gridMain.SelectedIndices.Length==0){//if none are selected
-				for(int i=0;i<listQueue.Length;i++){//loop through all rows
-					if(!listQueue[i].NoSendElect && listQueue[i].MissingData==""){
+				for(int i=0;i<_arrayQueueFiltered.Length;i++) {//loop through all rows
+					if(!_arrayQueueFiltered[i].NoSendElect) {
 						if(clearinghouseNum==0) {//they did not use the dropdown list for specific clearinghouse
 							//If clearinghouse is zero because they just pushed the button instead of using the dropdown list,
 							//then don't check the clearinghouse of each claim.  Just select them if they are electronic.
 							gridMain.SetSelected(i,true);
 						}
-						else{//if they used the dropdown list,
+						else {//if they used the dropdown list,
 							//then first, try to only select items in the list that match the clearinghouse.
-							if(listQueue[i].ClearinghouseNum==clearinghouseNum) {
+							if(_arrayQueueFiltered[i].ClearinghouseNum==clearinghouseNum) {
 								gridMain.SetSelected(i,true);
 							}
 						}
-					}	
+					}
 				}
 				//If they used the dropdown list, and there still aren't any in the list that match the selected clearinghouse
 				//then ask user if they want to send all of the electronic ones through this clearinghouse.
-				if(clearinghouseNum !=0 && gridMain.SelectedIndices.Length==0) {
+				if(clearinghouseNum!=0 && gridMain.SelectedIndices.Length==0) {
 					if(comboClinic.SelectedIndex==0) {
 						MsgBox.Show(this,"Please filter by clinic first.");
 						return;
@@ -739,27 +772,29 @@ namespace OpenDental{
 					if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Send all e-claims through selected clearinghouse?")) {
 						return;
 					}
-					for(int i=0;i<listQueue.Length;i++) {
-						if(!listQueue[i].NoSendElect && listQueue[i].MissingData=="") {//no Missing Info
+					for(int i=0;i<_arrayQueueFiltered.Length;i++) {
+						if(!_arrayQueueFiltered[i].NoSendElect) {//no Missing Info
 							gridMain.SetSelected(i,true);//this will include other clearinghouses
 						}
 					}
 				}
-				if(gridMain.SelectedIndices.Length==0){
+				if(gridMain.SelectedIndices.Length==0){//No claims in filtered list
 					MsgBox.Show(this,"No claims to send.");
 					return;
 				}
 				if(clearinghouseNum!=0){//if they used the dropdown list to specify clearinghouse
 					int[] selectedindices=(int[])gridMain.SelectedIndices.Clone();
 					for(int i=0;i<selectedindices.Length;i++) {
-						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(listQueue[selectedindices[i]].ClearinghouseNum);
+						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
 						if(clearDefault.Eformat!=clearRow.Eformat) {
 							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearhouse.");
 							return;
 						}
-						gridMain.Rows[selectedindices[i]].Cells[5].Text=clearDefault.Description;//show the changed clearinghouse
+						if(!_arrayQueueFiltered[selectedindices[i]].NoSendElect) {//Only change the text to the clearing house name for electronic claims.
+							gridMain.Rows[selectedindices[i]].Cells[5].Text=clearDefault.Description;
+						}
 					}
-					gridMain.Invalidate();
+					FillGrid(true);
 				}
 				if(!MsgBox.Show(this,true,"Send all selected e-claims?")){
 					FillGrid();//this changes back any clearinghouse descriptions that we changed manually.
@@ -770,35 +805,55 @@ namespace OpenDental{
 				if(clearinghouseNum!=0) {//if they used the dropdown list to specify clearinghouse
 					int[] selectedindices=(int[])gridMain.SelectedIndices.Clone();
 					for(int i=0;i<selectedindices.Length;i++) {
-						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(listQueue[selectedindices[i]].ClearinghouseNum);
+						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
 						if(clearDefault.Eformat!=clearRow.Eformat) {
 							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearhouse.");
 							return;
 						}
-						gridMain.Rows[selectedindices[i]].Cells[5].Text=clearDefault.Description;//show the changed clearinghouse
+						if(!_arrayQueueFiltered[selectedindices[i]].NoSendElect) {//Only change the text to the clearing house name for electronic claims.
+							gridMain.Rows[selectedindices[i]].Cells[5].Text=clearDefault.Description;//show the changed clearinghouse
+						}
 					}
-					gridMain.Invalidate();
 				}
 			}
+			//Now that all of the desired rows have been selected, we need to validate any rows that have not already been validated.
+			bool gridChanged=false;
+			Cursor.Current=Cursors.WaitCursor;
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(_arrayQueueFiltered[gridMain.SelectedIndices[i]].NoSendElect || _arrayQueueFiltered[gridMain.SelectedIndices[i]].IsValid) {
+					continue;//A printed claim or has already been validated.
+				}
+				//Validate the eclaim.
+				Eclaims.Eclaims.GetMissingData(_arrayQueueFiltered[gridMain.SelectedIndices[i]]);
+				gridMain.Rows[gridMain.SelectedIndices[i]].Cells[7].Text=_arrayQueueFiltered[gridMain.SelectedIndices[i]].MissingData;
+				if(_arrayQueueFiltered[gridMain.SelectedIndices[i]].MissingData=="") {
+					_arrayQueueFiltered[gridMain.SelectedIndices[i]].IsValid=true;
+				}
+				gridChanged=true;
+			}
+			if(gridChanged) {
+				FillGrid(true);//Used here to display changes immediately
+			}
+			Cursor.Current=Cursors.Default;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics is in use
-				long clinicNum0=Claims.GetClaim(listQueue[gridMain.SelectedIndices[0]].ClaimNum).ClinicNum;
+				long clinicNum0=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).ClinicNum;
 				for(int i=1;i<gridMain.SelectedIndices.Length;i++){
-					long clinicNum=Claims.GetClaim(listQueue[gridMain.SelectedIndices[i]].ClaimNum).ClinicNum;
+					long clinicNum=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum).ClinicNum;
 					if(clinicNum0!=clinicNum){
 						MsgBox.Show(this,"All claims must be for the same clinic.  You can use the combobox at the top to filter.");
 						return;
 					}
 				}
 			}
-			long clearinghouseNum0=listQueue[gridMain.SelectedIndices[0]].ClearinghouseNum;
-			EnumClaimMedType medType0=Claims.GetClaim(listQueue[gridMain.SelectedIndices[0]].ClaimNum).MedType;
+			long clearinghouseNum0=_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClearinghouseNum;
+			EnumClaimMedType medType0=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {//we start with 0 so that we can check medtype match on the first claim
-				long clearinghouseNumI=listQueue[gridMain.SelectedIndices[i]].ClearinghouseNum;
+				long clearinghouseNumI=_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClearinghouseNum;
 				if(clearinghouseNum0!=clearinghouseNumI) {
 					MsgBox.Show(this,"All claims must be for the same clearinghouse.");
 					return;
 				}
-				EnumClaimMedType medTypeI=Claims.GetClaim(listQueue[gridMain.SelectedIndices[i]].ClaimNum).MedType;
+				EnumClaimMedType medTypeI=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum).MedType;
 				if(medType0!=medTypeI) {
 					MsgBox.Show(this,"All claims must have the same MedType.");
 					return;
@@ -818,11 +873,11 @@ namespace OpenDental{
 				}
 			}
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				if(listQueue[gridMain.SelectedIndices[i]].MissingData!=""){
+				if(!_arrayQueueFiltered[gridMain.SelectedIndices[i]].IsValid && !_arrayQueueFiltered[gridMain.SelectedIndices[i]].NoSendElect){
 					MsgBox.Show(this,"Not allowed to send e-claims with missing information.");
 					return;
 				}
-				if(listQueue[gridMain.SelectedIndices[i]].NoSendElect) {
+				if(_arrayQueueFiltered[gridMain.SelectedIndices[i]].NoSendElect) {
 					MsgBox.Show(this,"Not allowed to send paper claims electronically.");
 					return;
 				}
@@ -830,19 +885,29 @@ namespace OpenDental{
 			List<ClaimSendQueueItem> queueItems=new List<ClaimSendQueueItem>();//a list of queue items to send
 			ClaimSendQueueItem queueitem;
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				queueitem=listQueue[gridMain.SelectedIndices[i]].Copy();
+				queueitem=_arrayQueueFiltered[gridMain.SelectedIndices[i]].Copy();
 				if(clearinghouseNum!=0) {
 					queueitem.ClearinghouseNum=clearinghouseNum;
 				}
 				queueItems.Add(queueitem);
 			}
 			Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItems[0].ClearinghouseNum);
-			EnumClaimMedType medType=Claims.GetClaim(listQueue[gridMain.SelectedIndices[0]].ClaimNum).MedType;
+			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
 			Cursor=Cursors.WaitCursor;
 			Eclaims.Eclaims.SendBatch(queueItems,clearhouse,medType);
 			Cursor=Cursors.Default;
+			//Loop through _listQueueAll and remove all items that were sent.
+			List<ClaimSendQueueItem> listTempQueueItem=new List<ClaimSendQueueItem>(_arrayQueueAll);
+			for(int i=0;i<queueItems.Count;i++) {
+				if(queueItems[i].ClaimStatus=="S") {
+					//Find the claim in the unfiltered list that was just sent and remove it.
+					//(Find the index of listTempQueueItem c where c.ClaimNum is the same as the ClaimNum of the item just sent.)
+					listTempQueueItem.RemoveAt(listTempQueueItem.FindIndex(c => c.ClaimNum==queueItems[i].ClaimNum));
+				}
+			}
+			_arrayQueueAll=listTempQueueItem.ToArray();
 			//statuses changed to S in SendBatches
 			FillGrid();
 			FillHistory();
@@ -999,6 +1064,8 @@ namespace OpenDental{
 			gridMain.Height=panelSplitter.Top-gridMain.Top;
 			panelHistory.Top=panelSplitter.Bottom;
 			panelHistory.Height=this.ClientSize.Height-panelHistory.Top-1;
+			gridHistory.Height=panelHistory.Height-(ToolBarHistory.Location.Y+ToolBarHistory.Height+panelSplitter.Height);//Needs to be done because anchors were removed
+			gridHistory.Location=new Point(gridHistory.Location.X,ToolBarHistory.Location.Y+ToolBarHistory.Height+5);
 		}
 
 		private void panelSplitter_MouseUp(object sender,System.Windows.Forms.MouseEventArgs e) {
