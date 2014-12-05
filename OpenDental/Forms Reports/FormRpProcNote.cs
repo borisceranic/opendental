@@ -157,7 +157,7 @@ namespace OpenDental{
 				FROM procnote n2
 				WHERE n1.ProcNum = n2.ProcNum)
 				AND procedurecode.ProcCode='~GRP~')
-				ORDER BY ProcDate","",font,"",SplitByKind.None,1,true);
+				ORDER BY ProcDate","","",SplitByKind.None,1,true);
 			query.AddColumn("Date",80,FieldValueType.Date,font);
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Code",50,FieldValueType.String,font);

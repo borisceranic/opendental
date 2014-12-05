@@ -155,7 +155,7 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>Creates a QueryObject from the given query string. If a column is specified for splitting, then this will create</summary>
-		public QueryObject(string stringQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames) {
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_stringQuery=stringQuery;
@@ -179,7 +179,7 @@ namespace OpenDental.ReportingComplex {
 			grfx.Dispose();
 		}
 
-		public QueryObject(DataTable tableQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames) {
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_reportTable=tableQuery;
@@ -203,14 +203,34 @@ namespace OpenDental.ReportingComplex {
 			grfx.Dispose();
 		}
 
-		public QueryObject(string stringQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
-			: this(stringQuery,title,font,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null) {
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,Font font)
+			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,font) {
 			
 		}
 
-		public QueryObject(DataTable tableQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
-			: this(tableQuery,title,font,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null) {
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,Font font)
+			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,font) {
 			
+		}
+
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
+			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,new Font("Tahoma",9)) {
+
+		}
+
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
+			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,new Font("Tahoma",9)) {
+
+		}
+
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue)
+			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,true,null,null,new Font("Tahoma",9)) {
+
+		}
+
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue)
+			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,true,null,null,new Font("Tahoma",9)) {
+
 		}
 
 		///<summary>Adds all the objects necessary for a typical column, including the textObject for column header and the fieldObject for the data.  If the column is type Double, then the alignment is set right and a total field is added. Also, default formatstrings are set for dates and doubles.  Does not add lines or shading.</summary>

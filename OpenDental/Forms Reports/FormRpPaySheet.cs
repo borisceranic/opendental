@@ -582,7 +582,7 @@ WHERE 1 "
 			int[] summaryGroups1= { 1 };
 			int[] summaryGroups2= { 2 };
 			int[] summaryGroups3= { 1,2 };
-			QueryObject query=report.AddQuery(tableIns,"Insurance Payments",fontSubTitle,"PayType",SplitByKind.Definition,1,true,dictInsDefNames);
+			QueryObject query=report.AddQuery(tableIns,"Insurance Payments","PayType",SplitByKind.Definition,1,true,dictInsDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").StringFormat="d";
@@ -593,7 +593,7 @@ WHERE 1 "
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",90,FieldValueType.Number,font);
 			query.AddGroupSummaryField("Total Insurance Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,0,50);
-			query=report.AddQuery(tablePat,"Patient Payments",fontSubTitle,"PayType",SplitByKind.Definition,2,true,dictPatDefNames);
+			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,2,true,dictPatDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").StringFormat="d";

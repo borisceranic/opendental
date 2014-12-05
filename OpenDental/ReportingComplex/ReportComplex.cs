@@ -185,38 +185,38 @@ namespace OpenDental.ReportingComplex {
 			_sections["Report Header"].Height+=(int)size.Height+5;
 		}
 
-		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
+		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
+		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Font font) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null,font);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null);
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Font font) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null,font);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(string query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames);
+		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames,Font font) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames,font);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
-		public QueryObject AddQuery(DataTable query,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames) {
-			QueryObject queryObj=new QueryObject(query,title,font,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames);
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames,Font font) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames,font);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
@@ -263,6 +263,9 @@ namespace OpenDental.ReportingComplex {
 			return null;
 		}
 
+		public void AddPageNum() {
+			AddPageNum(new Font("Tahoma",9));
+		}
 		/// <summary>Put a pagenumber object on lower left of page footer section. Object is named PageNum.</summary>
 		public void AddPageNum(Font font){
 			//add page number

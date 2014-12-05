@@ -330,7 +330,7 @@ namespace OpenDental{
 					GROUP BY claimproc.ClaimNum 
 					ORDER BY claimproc.ProcDate";
 			}
-			QueryObject query=report.AddQuery(queryText,"",font,"",SplitByKind.None,1,true);
+			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None,1,true);
 			query.AddColumn("Date",80,FieldValueType.Date,font);
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Carrier",150,FieldValueType.String,font);
@@ -402,7 +402,7 @@ namespace OpenDental{
 					GROUP BY carrier.CarrierNum 
 					ORDER BY carrier.CarrierName";
 			}
-			QueryObject query=report.AddQuery(queryText,"",font,"",SplitByKind.None,1,true);
+			QueryObject query=report.AddQuery(queryText,"","",SplitByKind.None,1,true);
 			query.AddColumn("Carrier",180,FieldValueType.String,font);
 			query.AddColumn("Stand Fee",80,FieldValueType.Number,font);
 			query.AddColumn("PPO Fee",80,FieldValueType.Number,font);

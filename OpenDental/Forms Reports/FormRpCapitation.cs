@@ -234,7 +234,7 @@ namespace OpenDental{
 				+"AND procedurelog.ProcDate >= "+POut.Date(dateStart)+" "
 				+"AND procedurelog.ProcDate <= "+POut.Date(dateEnd)+" "
 				+"AND insplan.PlanType = 'c' "
-				+"AND procedurelog.ProcStatus = 2","",font,"",SplitByKind.None,1,true);
+				+"AND procedurelog.ProcStatus = 2","","",SplitByKind.None,1,true);
 			query.AddColumn("Carrier",150,FieldValueType.String,font);
 			query.GetColumnDetail("Carrier").SuppressIfDuplicate=true;
 			query.AddColumn("Subscriber",120,FieldValueType.String,font);

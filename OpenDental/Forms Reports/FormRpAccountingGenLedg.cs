@@ -173,7 +173,7 @@ namespace OpenDental{
 			report.Sections["Report Header"].Height-=20;
 			//setup query
 			QueryObject query;
-			query=report.AddQuery(data,"Accounts",font,"Description",SplitByKind.Value,1,true);
+			query=report.AddQuery(data,"Accounts","Description",SplitByKind.Value,1,true);
 			query.GetGroupTitle().Font=new Font("Tahoma",8);
 			// add columns to report
 			query.AddColumn("Date",75,FieldValueType.Date,font);

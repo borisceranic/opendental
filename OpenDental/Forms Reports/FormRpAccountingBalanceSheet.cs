@@ -170,19 +170,19 @@ namespace OpenDental{
 			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString(),fontSubTitle);
 			//setup query
 			QueryObject query;
-			query=report.AddQuery(queryAssets,"Assets",font,"",SplitByKind.None,1,true);
+			query=report.AddQuery(queryAssets,"Assets","",SplitByKind.None,1,true);
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Assets",SummaryOrientation.West,false,fontBold);
-			query=report.AddQuery(queryLiabilities,"Liabilities",font,"",SplitByKind.None,1,true);
+			query=report.AddQuery(queryLiabilities,"Liabilities","",SplitByKind.None,1,true);
 			query.IsNegativeSummary=true;
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Liabilities",SummaryOrientation.West,false,fontBold);
 			query.AddGroupSummaryField("Net Assets:",Color.Black,"Amount","SumTotal",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,70,50);
-			query=report.AddQuery(queryEquity,"Equity",font,"",SplitByKind.None,2,true);
+			query=report.AddQuery(queryEquity,"Equity","",SplitByKind.None,2,true);
 			query.AddLine("EquityLine","Group Header",Color.Black,2,LineOrientation.Horizontal,LinePosition.Top,90,0,-30);
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);

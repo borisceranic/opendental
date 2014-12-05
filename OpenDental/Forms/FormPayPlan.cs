@@ -1437,7 +1437,7 @@ namespace OpenDental{
 				row["balance"]=table.Rows[i]["balance"].ToString();
 				tbl.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(tbl,"",font,"",SplitByKind.None,1,true);
+			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
 			query.AddColumn("ChargeDate",80,FieldValueType.Date,font);
 			query.GetColumnHeader("ChargeDate").StaticText="Date";
 			query.AddColumn("Description",150,FieldValueType.String,font);

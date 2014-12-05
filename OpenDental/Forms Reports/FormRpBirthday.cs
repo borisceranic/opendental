@@ -532,7 +532,7 @@ namespace OpenDental
 			report.AddTitle("Title",Lan.g(this,"Birthdays"),fontTitle);
 			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			report.AddSubTitle("Date",dateFrom.ToString(cultureDateFormat)+" - "+dateTo.ToString(cultureDateFormat),fontSubTitle);
-			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"",font,"",SplitByKind.None,1,true);
+			QueryObject query=report.AddQuery(Patients.GetBirthdayList(dateFrom,dateTo),"","",SplitByKind.None,1,true);
 			query.AddColumn("LName",90,FieldValueType.String,font);
 			query.AddColumn("FName",90,FieldValueType.String,font);
 			query.AddColumn("Preferred",90,FieldValueType.String,font);

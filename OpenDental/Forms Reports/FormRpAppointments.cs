@@ -330,7 +330,7 @@ namespace OpenDental
 				+" FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
 				+POut.Date(dateTo.AddDays(1)) + " AND " + "AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " + "AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
 				whereProv + " " +
-				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","",font,"",SplitByKind.None,1,true);
+				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","","",SplitByKind.None,1,true);
 			// add columns to report
 			query.AddColumn("Date",75,FieldValueType.Date,font);
 			query.GetColumnDetail("Date").SuppressIfDuplicate = true;

@@ -151,7 +151,7 @@ namespace OpenDental {
 			report.AddSubTitle("SubTitle","No Matching Transaction Found in Open Dental",fontSubTitle);
 			QueryObject query;
 			DataTable dt=XChargeTransactions.GetMissingTable(programNum,date1.SelectionStart,date2.SelectionStart);
-			query=report.AddQuery(dt,"Missing Payments",font,"",SplitByKind.None,1,true);//Valid entries to count have result code 0
+			query=report.AddQuery(dt,"Missing Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
 			query.AddColumn("Transaction Date/Time",170,FieldValueType.String,font);
 			query.AddColumn("Transaction Type",120,FieldValueType.String,font);
 			query.AddColumn("Clerk ID",80,FieldValueType.String,font);
@@ -191,7 +191,7 @@ namespace OpenDental {
 				+"ON X.PatNum=payment.PatNum AND DATE(X.TransactionDateTime)=payment.DateEntry AND X.Amount=payment.PayAmt "
 				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"AND X.TransactionDateTime IS NULL "
-				+"ORDER BY PayDate ASC, patient.LName","Extra Payments",font,"",SplitByKind.None,1,true);//Valid entries to count have result code 0
+				+"ORDER BY PayDate ASC, patient.LName","Extra Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
 			query.AddColumn("Pat",50,FieldValueType.String,font);
 			query.AddColumn("LName",100,FieldValueType.String,font);
 			query.AddColumn("FName",100,FieldValueType.String,font);
