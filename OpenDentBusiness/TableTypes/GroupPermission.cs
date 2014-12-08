@@ -202,7 +202,9 @@ namespace OpenDentBusiness{
 		///<summary>86- Allows user to send webmail</summary>
 		WebmailSend,
 		///<summary>87- Allows user to run command queries. Command queries are any non-SELECT queries for any non-temporary table.</summar>
-		UserQueryAdmin
+		UserQueryAdmin,
+		///<summary>88- Security permission for assignment of benefits.</summary>
+		InsPlanChangeAssign
 
 	}
 

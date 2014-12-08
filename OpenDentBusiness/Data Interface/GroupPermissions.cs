@@ -204,6 +204,7 @@ namespace OpenDentBusiness{
 				//case Permissions.EmailSend:
 				//case Permissions.WebmailSend:
 				//case Permissions.UserQueryAdmin:
+				//case Permissions.InsPlanChangeAssign:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -287,6 +288,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Insurance Payment Create");
 				case Permissions.InsPayEdit:
 					return Lans.g("enumPermissions","Insurance Payment Edit");
+				case Permissions.InsPlanChangeAssign:
+					return Lans.g("enumPermissions","Insurance Plan Change Assignment of Benefits");
 				case Permissions.InsPlanChangeSubsc:
 					return Lans.g("enumPermissions","Insurance Plan Change Subscriber");
 				case Permissions.ManageModule:

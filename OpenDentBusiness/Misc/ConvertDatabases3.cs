@@ -6636,8 +6636,32 @@ namespace OpenDentBusiness {
 				command="UPDATE cpt SET VersionIDs='2014'";
 				Db.NonQ(command);
 				//END CPT column VersionIDs
-				command="DELETE FROM grouppermission WHERE usergroupNum NOT IN (SELECT usergroupnum FROM usergroup);";//remove any orphaned grouppermissions; Oracle compatable
+				command="DELETE FROM grouppermission WHERE usergroupNum NOT IN (SELECT usergroupnum FROM usergroup)";//remove any orphaned grouppermissions; Oracle compatable
 				Db.NonQ(command);
+				//Add InsPlanChangeAssign permission to everyone------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				DataTable tableGroupPerm=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					long groupNum;
+					for(int i=0;i<tableGroupPerm.Rows.Count;i++) {
+						groupNum=PIn.Long(tableGroupPerm.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							 +"VALUES("+POut.Long(groupNum)+",88)";  //88: InsPlanChangeAssign
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					long groupNum;
+					for(int i=0;i<tableGroupPerm.Rows.Count;i++) {
+						groupNum=PIn.Long(tableGroupPerm.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							 +"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",88)";  //88: InsPlanChangeAssign
+						Db.NonQ(command);
+					}
+				}
+
+
+
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

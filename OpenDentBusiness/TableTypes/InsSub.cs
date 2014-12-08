@@ -31,7 +31,7 @@ namespace OpenDentBusiness{
 		public string SubscNote;
 
 
-		///<summary>Returns a copy of this InsPlan.</summary>
+		///<summary>Returns a copy of this InsSub.</summary>
 		public InsSub Copy(){
 			return (InsSub)this.MemberwiseClone();
 		}
