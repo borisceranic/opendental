@@ -380,7 +380,73 @@ namespace OpenDental{
 				FormRefAttachEdit FormRAE=new FormRefAttachEdit();
 				FormRAE.RefAttachCur=refattach;
 				FormRAE.ShowDialog();
+				//In order to help offices meet EHR Summary of Care measure 1 of Core Measure 15 of 17, we are going to send a summary of care to the patient portal behind the scenes.
+				//We can send the summary of care to the patient instead of to the Dr. because of the following point in the Additional Information section of the Core Measure:
+				//"The EP can send an electronic or paper copy of the summary care record directly to the next provider or can provide it to the patient to deliver to the next provider, if the patient can reasonably expected to do so and meet Measure 1."
+				//We will only send the summary of care if the ref attach is a TO referral and is a transition of care.
+				if(FormRAE.DialogResult==DialogResult.OK 
+					&& !refattach.IsFrom 
+					&& refattach.IsTransitionOfCare) 
+				{
+					try {
+						//TODO: make this more like FormEhrClinicalSummary.butSendToPortal_Click so that the email gets treated like a web mail.
+						Patient PatCur=Patients.GetPat(PatNum);
+						if(!Security.IsAuthorized(Permissions.EmailSend,true)) {
+							throw new Exception();//Do nothing, fails silently.
+						}
+						string strCcdValidationErrors=EhrCCD.ValidateSettings();
+						if(strCcdValidationErrors!="") {
+							throw new Exception();
+						}
+						strCcdValidationErrors=EhrCCD.ValidatePatient(PatCur);
+						if(strCcdValidationErrors!="") {
+							throw new Exception();
+						}
+						Provider prov=null;
+						if(Security.CurUser.ProvNum!=0) {
+							prov=Providers.GetProv(Security.CurUser.ProvNum);
+						}
+						else {
+							prov=Providers.GetProv(PatCur.PriProv);
+						}
+						EmailMessage msgWebMail=new EmailMessage();//New mail object				
+						msgWebMail.FromAddress=prov.GetFormalName();//Adding from address
+						msgWebMail.ToAddress=PatCur.GetNameFL();//Adding to address
+						msgWebMail.PatNum=PatCur.PatNum;//Adding patient number
+						msgWebMail.SentOrReceived=EmailSentOrReceived.WebMailSent;//Setting to sent
+						msgWebMail.ProvNumWebMail=prov.ProvNum;//Adding provider number
+						msgWebMail.Subject="Summary of Care Snapshot for Referral.";//Subject is Summary of Care
+						msgWebMail.BodyText="Summary of Care for "+prov.GetFormalName()+".\r\nTo view the clinical summary:\r\n1) Download all attachments to the same folder.  Do not rename the files.\r\n2) Open the ccd.xml file in an internet browser.";//Body is Summary of Care
+						msgWebMail.MsgDateTime=DateTime.Now;//Message time is now
+						msgWebMail.PatNumSubj=PatCur.PatNum;//Subject of the message is current patient
+						string ccd="";
+						Cursor=Cursors.WaitCursor;
+						ccd=EhrCCD.GenerateSummaryOfCare(Patients.GetPat(PatNum));//Create summary of care, can throw exceptions but they're caught below
+						EmailMessages.CreateAttachmentFromText(msgWebMail,ccd,"ccd.xml");//Create summary of care attachment, can throw exceptions but caught below
+						EmailMessages.CreateAttachmentFromText(msgWebMail,FormEHR.GetEhrResource("CCD"),"ccd.xsl");//Create xsl attachment, can throw exceptions
+						EmailMessages.Insert(msgWebMail);//Insert mail into DB for patient portal
+						EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
+						newMeasureEvent.DateTEvent=DateTime.Now;
+						newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDr;
+						newMeasureEvent.PatNum=PatCur.PatNum;
+						newMeasureEvent.FKey=FormRAE.RefAttachCur.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+						EhrMeasureEvents.Insert(newMeasureEvent);
+						newMeasureEvent=new EhrMeasureEvent();
+						newMeasureEvent.DateTEvent=DateTime.Now;
+						newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
+						newMeasureEvent.PatNum=PatCur.PatNum;
+						newMeasureEvent.FKey=FormRAE.RefAttachCur.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+						EhrMeasureEvents.Insert(newMeasureEvent);
+					}
+					catch {
+						//The user might not have had the send email permission, or something could have gone wrong.
+						//We are just trying to be helpful so it doesn't really matter if something failed above. 
+						//They can simply go to the EHR dashboard and send the summary of care manually like they always have.
+						MsgBox.Show(this,Lan.g(this,"There was a problem automatically sending a summary of care.  Please go to the EHR dashboard to send a summary of care to meet the summary of care core measure."));
+					}
+				}
 			}
+			Cursor=Cursors.Default;
 			FillGrid();
 			for(int i=0;i<RefAttachList.Count;i++) {
 				if(RefAttachList[i].ReferralNum==refattach.ReferralNum) {
