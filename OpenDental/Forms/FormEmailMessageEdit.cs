@@ -1195,7 +1195,7 @@ namespace OpenDental{
 			if(textFromAddress.Text==""
 				|| textToAddress.Text=="")
 			{
-				MessageBox.Show("Addresses not allowed to be blank.");
+				MsgBox.Show(this,"Addresses not allowed to be blank.");
 				return;
 			}
 			if(EhrCCD.HasCcdEmailAttachment(MessageCur)) {
