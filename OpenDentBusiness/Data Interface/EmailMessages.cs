@@ -207,7 +207,7 @@ namespace OpenDentBusiness{
 		public static void RefreshCertStoreExternal(EmailAddress emailAddressLocal) {
 			string strSenderAddress=emailAddressLocal.EmailUsername.Trim();//Cannot be emailAddressFrom.SenderAddress, or else will not find the right encryption certificate.
 			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(strSenderAddress);
-			string strSenderDomain=strSenderAddress.Substring(strSenderAddress.IndexOf("@")+1);//For example, if strSenderAddress is ehr@opendental.com, then this will be opendental.com
+			string strSenderDomain=GetDomainForAddress(strSenderAddress);
 			//Refresh the directAgent class using the updated list of public certs while leaving everything else alone. This must be done, or else the certificate will not be found when encrypting the outgoing email.
 			directAgent=new Health.Direct.Agent.DirectAgent(strSenderDomain,directAgent.PrivateCertResolver,Health.Direct.Common.Certificates.SystemX509Store.OpenExternal().CreateResolver(),
 				new Health.Direct.Common.Certificates.TrustAnchorResolver(Health.Direct.Common.Certificates.SystemX509Store.OpenAnchor()));
@@ -714,7 +714,7 @@ namespace OpenDentBusiness{
 
 		private static Health.Direct.Agent.DirectAgent GetDirectAgentForEmailAddress(string strEmailAddress) {
 			//No need to check RemotingRole; no call to db.
-			string domain=strEmailAddress.Substring(strEmailAddress.IndexOf("@")+1);//For example, if ToAddress is ehr@opendental.com, then this will be opendental.com
+			string domain=GetDomainForAddress(strEmailAddress);
 			Health.Direct.Agent.DirectAgent directAgent=(Health.Direct.Agent.DirectAgent)HashDirectAgents[domain];
 			if(directAgent==null) {
 				try {
@@ -747,7 +747,7 @@ namespace OpenDentBusiness{
 			}
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
-			if(GetValidCertForAddressFromStore(storeAnchors,strAddressTest,false)==null) {//Look for domain level and address level trust certificates (anchors).
+			if(GetValidCertForAddressFromStore(storeAnchors,strAddressTest,true)==null) {//Look for domain level and address level trust certificates (anchors).
 				return false;//None found.
 			}
 			return true;
@@ -771,7 +771,7 @@ namespace OpenDentBusiness{
 				return false;//Possibly a network failure.
 			}
 			Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
-			X509Certificate2 cert=GetValidCertForAddressFromStore(storePublicCerts,strAddressTest,false);
+			X509Certificate2 cert=GetValidCertForAddressFromStore(storePublicCerts,strAddressTest,true);//Look for domain level and address level trust certificates.
 			if(cert==null) {
 				return false;//Should never happen, but just in case.
 			}
@@ -800,15 +800,7 @@ namespace OpenDentBusiness{
 		///IMPORTANT: Be careful what you do with the private certificate.  It must never be shared with another party.</summary>
 		public static X509Certificate2 GetCertFromPrivateStore(string emailAddress) {
 			Health.Direct.Common.Certificates.SystemX509Store storeCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenPrivate();//Open for reading.  Corresponds to NHINDPrivate/Certificates.
-			X509Certificate2Collection collectionCerts=storeCerts.GetAllCertificates();
-			string emailAddressSimple=GetFromAddressSimple(emailAddress).ToLower();
-			foreach(X509Certificate2 cert in collectionCerts) {
-				string subjectName=GetSubjectEmailNameFromSignature(cert).ToLower();
-				if(subjectName==emailAddressSimple) {
-					return cert;
-				}
-			}
-			return null;
+			return GetValidCertForAddressFromStore(storeCerts,emailAddress,true);//Look for domain level and address level trust certificates.
 		}
 
 		///<summary>Returns the subject name intended for email security from the given signed certificate.
@@ -825,67 +817,78 @@ namespace OpenDentBusiness{
 			return "";
 		}
 
-		///<summary>Throws exceptions.  The subjectEmailAddress must correspond to the subject name contained inside the signature file.</summary>
-		public static void TryAddTrustForSignature(X509Certificate2 signedCert,string subjectEmailAddress) {
-			if(subjectEmailAddress.ToLower()!=GetSubjectEmailNameFromSignature(signedCert).ToLower()) {
-				throw new Exception(Lans.g("EmailMessages","The subject email address does not match the email address built into the signature."));
-			}
+		///<summary>Throws exceptions.</summary>
+		public static void TryAddTrustForSignature(X509Certificate2 signedCert) {
 			try {
 				Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
 				storePublicCerts.Add(signedCert);//Write the pubic encryption certificate to the Windows certificate store.
+			}
+			catch(Exception ex) {
+				throw new Exception(Lans.g("EmailMessages","Failed to save signature to encryption certificate store")+". "+ex.Message);
+			}
+			try {
 				Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
 				storeAnchors.Add(signedCert);//Adds to NHINDAnchors/Certificates within the windows certificate store manager (mmc).
 			}
 			catch(Exception ex) {
-				throw new Exception(Lans.g("EmailMessages","Failed to save subject signature to public certificate store")+". "+ex.Message);
+				throw new Exception(Lans.g("EmailMessages","Failed to save signature to trust certificate store")+". "+ex.Message);
 			}
 		}
 
 		///<summary>Sometimes an email From address will contain the person's name along with their email adress.  This function strips out the person's name if present.</summary>
-		public static string GetFromAddressSimple(string formAddress) {
-			if(formAddress.Contains("<")) {
-				int startIndex=formAddress.IndexOf("<")+1;
-				int endIndex=formAddress.IndexOf(">")-1;
-				return formAddress.Substring(startIndex,endIndex-startIndex+1);
+		public static string GetAddressSimple(string emailAddress) {
+			if(emailAddress.Contains("<")) {
+				int startIndex=emailAddress.IndexOf("<")+1;
+				int endIndex=emailAddress.IndexOf(">")-1;
+				return emailAddress.Substring(startIndex,endIndex-startIndex+1);
 			}
-			return formAddress;
+			return emailAddress;
 		}
 
-		///<summary>Set isAddressSpecific if you need to allow/prefer domain certificates over email address specific certificates.</summary>
-		private static X509Certificate2 GetValidCertForAddressFromStore(Health.Direct.Common.Certificates.SystemX509Store store,string strAddressTest,bool isAddressSpecific) {
+		///<summary>The specified emailAddress must be a properly formatted email address or properly formatted domain name.</summary>
+		private static string GetDomainForAddress(string emailAddress) {
+			emailAddress=GetAddressSimple(emailAddress);
+			if(emailAddress.Contains("@")) {
+				return emailAddress.Substring(emailAddress.IndexOf("@")+1);//For example, if ToAddress is ehr@opendental.com, then this will be opendental.com
+			}
+			return emailAddress;
+		}
+
+		///<summary>The strAddressTest can be either a full email address or a domain name.
+		///Set isDomainIncluded to true if you would like to include domain level certificates in addition to the certificates which match the exact test address.  Exact address matches will be preferred over domain matches.
+		///Otherwise, if isDomainIncluded is false, then only certificates which exactly match the test address will be included.</summary>
+		private static X509Certificate2 GetValidCertForAddressFromStore(Health.Direct.Common.Certificates.SystemX509Store store,string strAddressTest,bool isDomainIncluded) {
 			//No need to check RemotingRole; no call to db.
 			X509Certificate2Collection collectionCerts=null;
-			MailAddress mailAddressQuery=new MailAddress(strAddressTest);
 			Health.Direct.Common.Certificates.ICertificateResolver certResolverLocalCache=store.CreateResolver();
 			if(certResolverLocalCache==null) {
 				return null;
 			}
-			collectionCerts=certResolverLocalCache.GetCertificates(mailAddressQuery);
-			if(collectionCerts==null) {
+			strAddressTest=GetAddressSimple(strAddressTest);
+			if(strAddressTest.Contains("@")) {//The specified address is one particular email address as opposed to a domain name.
+				collectionCerts=certResolverLocalCache.GetCertificatesForDomain(strAddressTest);//Gets the certificates for the specified address, but does not get the certificates for the domain associated with the address.
+				if(collectionCerts!=null) {
+					for(int i=0;i<collectionCerts.Count;i++) {
+						if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
+							continue;//If the certificate is not yet valid or is expired, then ignore.
+						}
+						return collectionCerts[i];
+					}
+				}
+			}
+			if(!isDomainIncluded) {
 				return null;
 			}
-			List<X509Certificate2> listDomainCerts=new List<X509Certificate2>();
-			List<X509Certificate2> listAddressCerts=new List<X509Certificate2>();
-			for(int i=0;i<collectionCerts.Count;i++) {
-				if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
-					//If the certificate is not yet valid or is expired, then ignore.
-					continue;
-				}
-				string strCertSubjectName=collectionCerts[i].Subject.Trim().ToLower();
-				if(strCertSubjectName.Contains("e="+strAddressTest.ToLower())) {//Address specific
-					listAddressCerts.Add(collectionCerts[i]);
-				}
-				else {
-					listDomainCerts.Add(collectionCerts[i]);
+			string domain=GetDomainForAddress(strAddressTest);
+			collectionCerts=certResolverLocalCache.GetCertificatesForDomain(domain);
+			if(collectionCerts!=null) {
+				for(int i=0;i<collectionCerts.Count;i++) {
+					if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
+						continue;//If the certificate is not yet valid or is expired, then ignore.
+					}
+					return collectionCerts[i];
 				}
 			}
-			if(!isAddressSpecific && listDomainCerts.Count>0) {//Domain certificates allowed/preferred and there is one.
-				return listDomainCerts[0];
-			}
-			if(listAddressCerts.Count>0) {
-				return listAddressCerts[0];
-			}
-			//A certificate was found in the local store, but it was a domain level certificate and was not for the specific address provided.
 			return null;
 		}
 
@@ -897,7 +900,7 @@ namespace OpenDentBusiness{
 		private static int FindPublicCertForAddress(string strAddressTest) {
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Common.Certificates.SystemX509Store storePublicCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit();//Open for read and write.  Corresponds to NHINDExternal/Certificates.
-			if(GetValidCertForAddressFromStore(storePublicCerts,strAddressTest,true)!=null) {//Address specific (excludes domain level certificates).
+			if(GetValidCertForAddressFromStore(storePublicCerts,strAddressTest,false)!=null) {//Address specific (excludes domain level certificates).
 				return -1;//The certificate was found in the local certificate store within Windows and is already loaded into memory for the specific recipient address given.  No need to query the Internet.
 			}
 			//Cert not found locally.  Attempt to discover the certificate for the exact recipient address provided (below) before using a domain level certificate.

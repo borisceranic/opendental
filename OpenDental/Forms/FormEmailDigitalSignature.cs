@@ -42,7 +42,7 @@ namespace OpenDental {
 
 		private void butTrust_Click(object sender,EventArgs e) {
 			try {
-				EmailMessages.TryAddTrustForSignature(_certSig,textSignedBy.Text);
+				EmailMessages.TryAddTrustForSignature(_certSig);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
