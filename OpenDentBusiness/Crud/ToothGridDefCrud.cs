@@ -50,11 +50,11 @@ namespace OpenDentBusiness.Crud{
 				toothGridDef.SheetFieldDefNum= PIn.Long  (table.Rows[i]["SheetFieldDefNum"].ToString());
 				toothGridDef.NameInternal    = PIn.String(table.Rows[i]["NameInternal"].ToString());
 				toothGridDef.NameShowing     = PIn.String(table.Rows[i]["NameShowing"].ToString());
-				toothGridDef.CellType        = (ToothGridCellType)PIn.Int(table.Rows[i]["CellType"].ToString());
+				toothGridDef.CellType        = (OpenDentBusiness.ToothGridCellType)PIn.Int(table.Rows[i]["CellType"].ToString());
 				toothGridDef.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				toothGridDef.ColumnWidth     = PIn.Int   (table.Rows[i]["ColumnWidth"].ToString());
 				toothGridDef.CodeNum         = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
-				toothGridDef.ProcStatus      = (ProcStat)PIn.Int(table.Rows[i]["ProcStatus"].ToString());
+				toothGridDef.ProcStatus      = (OpenDentBusiness.ProcStat)PIn.Int(table.Rows[i]["ProcStatus"].ToString());
 				retVal.Add(toothGridDef);
 			}
 			return retVal;

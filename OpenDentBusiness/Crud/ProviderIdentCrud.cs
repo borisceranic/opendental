@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				providerIdent.ProviderIdentNum= PIn.Long  (table.Rows[i]["ProviderIdentNum"].ToString());
 				providerIdent.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				providerIdent.PayorID         = PIn.String(table.Rows[i]["PayorID"].ToString());
-				providerIdent.SuppIDType      = (ProviderSupplementalID)PIn.Int(table.Rows[i]["SuppIDType"].ToString());
+				providerIdent.SuppIDType      = (OpenDentBusiness.ProviderSupplementalID)PIn.Int(table.Rows[i]["SuppIDType"].ToString());
 				providerIdent.IDNumber        = PIn.String(table.Rows[i]["IDNumber"].ToString());
 				retVal.Add(providerIdent);
 			}

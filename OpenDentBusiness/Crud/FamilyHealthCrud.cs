@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				familyHealth=new FamilyHealth();
 				familyHealth.FamilyHealthNum= PIn.Long  (table.Rows[i]["FamilyHealthNum"].ToString());
 				familyHealth.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				familyHealth.Relationship   = (FamilyRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
+				familyHealth.Relationship   = (OpenDentBusiness.FamilyRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
 				familyHealth.DiseaseDefNum  = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
 				familyHealth.PersonName     = PIn.String(table.Rows[i]["PersonName"].ToString());
 				retVal.Add(familyHealth);

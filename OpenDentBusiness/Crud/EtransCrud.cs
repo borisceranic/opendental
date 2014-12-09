@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				etrans.EtransNum           = PIn.Long  (table.Rows[i]["EtransNum"].ToString());
 				etrans.DateTimeTrans       = PIn.DateT (table.Rows[i]["DateTimeTrans"].ToString());
 				etrans.ClearingHouseNum    = PIn.Long  (table.Rows[i]["ClearingHouseNum"].ToString());
-				etrans.Etype               = (EtransType)PIn.Int(table.Rows[i]["Etype"].ToString());
+				etrans.Etype               = (OpenDentBusiness.EtransType)PIn.Int(table.Rows[i]["Etype"].ToString());
 				etrans.ClaimNum            = PIn.Long  (table.Rows[i]["ClaimNum"].ToString());
 				etrans.OfficeSequenceNumber= PIn.Int   (table.Rows[i]["OfficeSequenceNumber"].ToString());
 				etrans.CarrierTransCounter = PIn.Int   (table.Rows[i]["CarrierTransCounter"].ToString());

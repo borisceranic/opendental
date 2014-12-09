@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				dunning.DunMessage  = PIn.String(table.Rows[i]["DunMessage"].ToString());
 				dunning.BillingType = PIn.Long  (table.Rows[i]["BillingType"].ToString());
 				dunning.AgeAccount  = PIn.Byte  (table.Rows[i]["AgeAccount"].ToString());
-				dunning.InsIsPending= (YN)PIn.Int(table.Rows[i]["InsIsPending"].ToString());
+				dunning.InsIsPending= (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["InsIsPending"].ToString());
 				dunning.MessageBold = PIn.String(table.Rows[i]["MessageBold"].ToString());
 				dunning.EmailSubject= PIn.String(table.Rows[i]["EmailSubject"].ToString());
 				dunning.EmailBody   = PIn.String(table.Rows[i]["EmailBody"].ToString());

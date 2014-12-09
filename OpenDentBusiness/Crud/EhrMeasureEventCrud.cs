@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				ehrMeasureEvent=new EhrMeasureEvent();
 				ehrMeasureEvent.EhrMeasureEventNum= PIn.Long  (table.Rows[i]["EhrMeasureEventNum"].ToString());
 				ehrMeasureEvent.DateTEvent        = PIn.DateT (table.Rows[i]["DateTEvent"].ToString());
-				ehrMeasureEvent.EventType         = (EhrMeasureEventType)PIn.Int(table.Rows[i]["EventType"].ToString());
+				ehrMeasureEvent.EventType         = (OpenDentBusiness.EhrMeasureEventType)PIn.Int(table.Rows[i]["EventType"].ToString());
 				ehrMeasureEvent.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				ehrMeasureEvent.MoreInfo          = PIn.String(table.Rows[i]["MoreInfo"].ToString());
 				ehrMeasureEvent.CodeValueEvent    = PIn.String(table.Rows[i]["CodeValueEvent"].ToString());

@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				document.DocCategory   = PIn.Long  (table.Rows[i]["DocCategory"].ToString());
 				document.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				document.FileName      = PIn.String(table.Rows[i]["FileName"].ToString());
-				document.ImgType       = (ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
+				document.ImgType       = (OpenDentBusiness.ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
 				document.IsFlipped     = PIn.Bool  (table.Rows[i]["IsFlipped"].ToString());
 				document.DegreesRotated= PIn.Int   (table.Rows[i]["DegreesRotated"].ToString());
 				document.ToothNumbers  = PIn.String(table.Rows[i]["ToothNumbers"].ToString());

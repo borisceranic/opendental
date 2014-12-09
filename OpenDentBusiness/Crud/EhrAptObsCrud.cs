@@ -48,8 +48,8 @@ namespace OpenDentBusiness.Crud{
 				ehrAptObs=new EhrAptObs();
 				ehrAptObs.EhrAptObsNum   = PIn.Long  (table.Rows[i]["EhrAptObsNum"].ToString());
 				ehrAptObs.AptNum         = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				ehrAptObs.IdentifyingCode= (EhrAptObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
-				ehrAptObs.ValType        = (EhrAptObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
+				ehrAptObs.IdentifyingCode= (OpenDentBusiness.EhrAptObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
+				ehrAptObs.ValType        = (OpenDentBusiness.EhrAptObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
 				ehrAptObs.ValReported    = PIn.String(table.Rows[i]["ValReported"].ToString());
 				ehrAptObs.UcumCode       = PIn.String(table.Rows[i]["UcumCode"].ToString());
 				ehrAptObs.ValCodeSystem  = PIn.String(table.Rows[i]["ValCodeSystem"].ToString());

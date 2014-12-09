@@ -51,7 +51,7 @@ namespace OpenDentBusiness.Crud{
 				covCat.DefaultPercent= PIn.Int   (table.Rows[i]["DefaultPercent"].ToString());
 				covCat.CovOrder      = PIn.Byte  (table.Rows[i]["CovOrder"].ToString());
 				covCat.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				covCat.EbenefitCat   = (EbenefitCategory)PIn.Int(table.Rows[i]["EbenefitCat"].ToString());
+				covCat.EbenefitCat   = (OpenDentBusiness.EbenefitCategory)PIn.Int(table.Rows[i]["EbenefitCat"].ToString());
 				retVal.Add(covCat);
 			}
 			return retVal;

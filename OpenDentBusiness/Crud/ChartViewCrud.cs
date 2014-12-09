@@ -49,13 +49,13 @@ namespace OpenDentBusiness.Crud{
 				chartView.ChartViewNum     = PIn.Long  (table.Rows[i]["ChartViewNum"].ToString());
 				chartView.Description      = PIn.String(table.Rows[i]["Description"].ToString());
 				chartView.ItemOrder        = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				chartView.ProcStatuses     = (ChartViewProcStat)PIn.Int(table.Rows[i]["ProcStatuses"].ToString());
-				chartView.ObjectTypes      = (ChartViewObjs)PIn.Int(table.Rows[i]["ObjectTypes"].ToString());
+				chartView.ProcStatuses     = (OpenDentBusiness.ChartViewProcStat)PIn.Int(table.Rows[i]["ProcStatuses"].ToString());
+				chartView.ObjectTypes      = (OpenDentBusiness.ChartViewObjs)PIn.Int(table.Rows[i]["ObjectTypes"].ToString());
 				chartView.ShowProcNotes    = PIn.Bool  (table.Rows[i]["ShowProcNotes"].ToString());
 				chartView.IsAudit          = PIn.Bool  (table.Rows[i]["IsAudit"].ToString());
 				chartView.SelectedTeethOnly= PIn.Bool  (table.Rows[i]["SelectedTeethOnly"].ToString());
-				chartView.OrionStatusFlags = (OrionStatus)PIn.Int(table.Rows[i]["OrionStatusFlags"].ToString());
-				chartView.DatesShowing     = (ChartViewDates)PIn.Int(table.Rows[i]["DatesShowing"].ToString());
+				chartView.OrionStatusFlags = (OpenDentBusiness.OrionStatus)PIn.Int(table.Rows[i]["OrionStatusFlags"].ToString());
+				chartView.DatesShowing     = (OpenDentBusiness.ChartViewDates)PIn.Int(table.Rows[i]["DatesShowing"].ToString());
 				retVal.Add(chartView);
 			}
 			return retVal;

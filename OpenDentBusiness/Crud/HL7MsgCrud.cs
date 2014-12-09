@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				hL7Msg=new HL7Msg();
 				hL7Msg.HL7MsgNum = PIn.Long  (table.Rows[i]["HL7MsgNum"].ToString());
-				hL7Msg.HL7Status = (HL7MessageStatus)PIn.Int(table.Rows[i]["HL7Status"].ToString());
+				hL7Msg.HL7Status = (OpenDentBusiness.HL7MessageStatus)PIn.Int(table.Rows[i]["HL7Status"].ToString());
 				hL7Msg.MsgText   = PIn.String(table.Rows[i]["MsgText"].ToString());
 				hL7Msg.AptNum    = PIn.Long  (table.Rows[i]["AptNum"].ToString());
 				hL7Msg.DateTStamp= PIn.DateT (table.Rows[i]["DateTStamp"].ToString());

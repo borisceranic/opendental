@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				ehrMeasure=new EhrMeasure();
 				ehrMeasure.EhrMeasureNum= PIn.Long  (table.Rows[i]["EhrMeasureNum"].ToString());
-				ehrMeasure.MeasureType  = (EhrMeasureType)PIn.Int(table.Rows[i]["MeasureType"].ToString());
+				ehrMeasure.MeasureType  = (OpenDentBusiness.EhrMeasureType)PIn.Int(table.Rows[i]["MeasureType"].ToString());
 				ehrMeasure.Numerator    = PIn.Int   (table.Rows[i]["Numerator"].ToString());
 				ehrMeasure.Denominator  = PIn.Int   (table.Rows[i]["Denominator"].ToString());
 				retVal.Add(ehrMeasure);

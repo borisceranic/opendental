@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				sheetField=new SheetField();
 				sheetField.SheetFieldNum   = PIn.Long  (table.Rows[i]["SheetFieldNum"].ToString());
 				sheetField.SheetNum        = PIn.Long  (table.Rows[i]["SheetNum"].ToString());
-				sheetField.FieldType       = (SheetFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
+				sheetField.FieldType       = (OpenDentBusiness.SheetFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
 				sheetField.FieldName       = PIn.String(table.Rows[i]["FieldName"].ToString());
 				sheetField.FieldValue      = PIn.String(table.Rows[i]["FieldValue"].ToString());
 				sheetField.FontSize        = PIn.Float (table.Rows[i]["FontSize"].ToString());
@@ -58,12 +58,16 @@ namespace OpenDentBusiness.Crud{
 				sheetField.YPos            = PIn.Int   (table.Rows[i]["YPos"].ToString());
 				sheetField.Width           = PIn.Int   (table.Rows[i]["Width"].ToString());
 				sheetField.Height          = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheetField.GrowthBehavior  = (GrowthBehaviorEnum)PIn.Int(table.Rows[i]["GrowthBehavior"].ToString());
+				sheetField.GrowthBehavior  = (OpenDentBusiness.GrowthBehaviorEnum)PIn.Int(table.Rows[i]["GrowthBehavior"].ToString());
 				sheetField.RadioButtonValue= PIn.String(table.Rows[i]["RadioButtonValue"].ToString());
 				sheetField.RadioButtonGroup= PIn.String(table.Rows[i]["RadioButtonGroup"].ToString());
 				sheetField.IsRequired      = PIn.Bool  (table.Rows[i]["IsRequired"].ToString());
 				sheetField.TabOrder        = PIn.Int   (table.Rows[i]["TabOrder"].ToString());
 				sheetField.ReportableName  = PIn.String(table.Rows[i]["ReportableName"].ToString());
+				sheetField.FKey            = PIn.Long  (table.Rows[i]["FKey"].ToString());
+				sheetField.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(table.Rows[i]["TextAlign"].ToString());
+				sheetField.IsPaymentOption = PIn.Bool  (table.Rows[i]["IsPaymentOption"].ToString());
+				sheetField.ItemColor       = Color.FromArgb(PIn.Int(table.Rows[i]["ItemColor"].ToString()));
 				retVal.Add(sheetField);
 			}
 			return retVal;
@@ -104,7 +108,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetFieldNum,";
 			}
-			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName) VALUES(";
+			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,FKey,TextAlign,IsPaymentOption,ItemColor) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheetField.SheetFieldNum)+",";
 			}
@@ -125,7 +129,11 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheetField.RadioButtonGroup)+"',"
 				+    POut.Bool  (sheetField.IsRequired)+","
 				+    POut.Int   (sheetField.TabOrder)+","
-				+"'"+POut.String(sheetField.ReportableName)+"')";
+				+"'"+POut.String(sheetField.ReportableName)+"',"
+				+    POut.Long  (sheetField.FKey)+","
+				+    POut.Int   ((int)sheetField.TextAlign)+","
+				+    POut.Bool  (sheetField.IsPaymentOption)+","
+				+    POut.Int   (sheetField.ItemColor.ToArgb())+")";
 			if(sheetField.FieldValue==null) {
 				sheetField.FieldValue="";
 			}
@@ -158,7 +166,11 @@ namespace OpenDentBusiness.Crud{
 				+"RadioButtonGroup= '"+POut.String(sheetField.RadioButtonGroup)+"', "
 				+"IsRequired      =  "+POut.Bool  (sheetField.IsRequired)+", "
 				+"TabOrder        =  "+POut.Int   (sheetField.TabOrder)+", "
-				+"ReportableName  = '"+POut.String(sheetField.ReportableName)+"' "
+				+"ReportableName  = '"+POut.String(sheetField.ReportableName)+"', "
+				+"FKey            =  "+POut.Long  (sheetField.FKey)+", "
+				+"TextAlign       =  "+POut.Int   ((int)sheetField.TextAlign)+", "
+				+"IsPaymentOption =  "+POut.Bool  (sheetField.IsPaymentOption)+", "
+				+"ItemColor       =  "+POut.Int   (sheetField.ItemColor.ToArgb())+" "
 				+"WHERE SheetFieldNum = "+POut.Long(sheetField.SheetFieldNum);
 			if(sheetField.FieldValue==null) {
 				sheetField.FieldValue="";
@@ -237,6 +249,22 @@ namespace OpenDentBusiness.Crud{
 			if(sheetField.ReportableName != oldSheetField.ReportableName) {
 				if(command!=""){ command+=",";}
 				command+="ReportableName = '"+POut.String(sheetField.ReportableName)+"'";
+			}
+			if(sheetField.FKey != oldSheetField.FKey) {
+				if(command!=""){ command+=",";}
+				command+="FKey = "+POut.Long(sheetField.FKey)+"";
+			}
+			if(sheetField.TextAlign != oldSheetField.TextAlign) {
+				if(command!=""){ command+=",";}
+				command+="TextAlign = "+POut.Int   ((int)sheetField.TextAlign)+"";
+			}
+			if(sheetField.IsPaymentOption != oldSheetField.IsPaymentOption) {
+				if(command!=""){ command+=",";}
+				command+="IsPaymentOption = "+POut.Bool(sheetField.IsPaymentOption)+"";
+			}
+			if(sheetField.ItemColor != oldSheetField.ItemColor) {
+				if(command!=""){ command+=",";}
+				command+="ItemColor = "+POut.Int(sheetField.ItemColor.ToArgb())+"";
 			}
 			if(command==""){
 				return false;

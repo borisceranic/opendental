@@ -53,8 +53,8 @@ namespace OpenDentBusiness.Crud{
 				apptView.OnlyScheduledProvs = PIn.Bool  (table.Rows[i]["OnlyScheduledProvs"].ToString());
 				apptView.OnlySchedBeforeTime= PIn.Time(table.Rows[i]["OnlySchedBeforeTime"].ToString());
 				apptView.OnlySchedAfterTime = PIn.Time(table.Rows[i]["OnlySchedAfterTime"].ToString());
-				apptView.StackBehavUR       = (ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavUR"].ToString());
-				apptView.StackBehavLR       = (ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavLR"].ToString());
+				apptView.StackBehavUR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavUR"].ToString());
+				apptView.StackBehavLR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavLR"].ToString());
 				apptView.ClinicNum          = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				retVal.Add(apptView);
 			}

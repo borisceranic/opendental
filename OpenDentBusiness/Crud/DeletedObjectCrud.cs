@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				deletedObject=new DeletedObject();
 				deletedObject.DeletedObjectNum= PIn.Long  (table.Rows[i]["DeletedObjectNum"].ToString());
 				deletedObject.ObjectNum       = PIn.Long  (table.Rows[i]["ObjectNum"].ToString());
-				deletedObject.ObjectType      = (DeletedObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
+				deletedObject.ObjectType      = (OpenDentBusiness.DeletedObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
 				deletedObject.DateTStamp      = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
 				retVal.Add(deletedObject);
 			}

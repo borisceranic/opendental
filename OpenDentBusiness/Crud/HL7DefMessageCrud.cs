@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7DefMessage.EventType     =(EventTypeHL7)0;
 				}
-				hL7DefMessage.InOrOut         = (InOutHL7)PIn.Int(table.Rows[i]["InOrOut"].ToString());
+				hL7DefMessage.InOrOut         = (OpenDentBusiness.InOutHL7)PIn.Int(table.Rows[i]["InOrOut"].ToString());
 				hL7DefMessage.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				hL7DefMessage.Note            = PIn.String(table.Rows[i]["Note"].ToString());
 				string messageStructure=table.Rows[i]["MessageStructure"].ToString();

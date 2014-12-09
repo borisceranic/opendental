@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				toothInitial.ToothInitialNum= PIn.Long  (table.Rows[i]["ToothInitialNum"].ToString());
 				toothInitial.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				toothInitial.ToothNum       = PIn.String(table.Rows[i]["ToothNum"].ToString());
-				toothInitial.InitialType    = (ToothInitialType)PIn.Int(table.Rows[i]["InitialType"].ToString());
+				toothInitial.InitialType    = (OpenDentBusiness.ToothInitialType)PIn.Int(table.Rows[i]["InitialType"].ToString());
 				toothInitial.Movement       = PIn.Float (table.Rows[i]["Movement"].ToString());
 				toothInitial.DrawingSegment = PIn.String(table.Rows[i]["DrawingSegment"].ToString());
 				toothInitial.ColorDraw      = Color.FromArgb(PIn.Int(table.Rows[i]["ColorDraw"].ToString()));

@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				sheet=new Sheet();
 				sheet.SheetNum      = PIn.Long  (table.Rows[i]["SheetNum"].ToString());
-				sheet.SheetType     = (SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
+				sheet.SheetType     = (OpenDentBusiness.SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
 				sheet.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				sheet.DateTimeSheet = PIn.DateT (table.Rows[i]["DateTimeSheet"].ToString());
 				sheet.FontSize      = PIn.Float (table.Rows[i]["FontSize"].ToString());

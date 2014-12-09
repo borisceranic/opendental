@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				perioMeasure=new PerioMeasure();
 				perioMeasure.PerioMeasureNum= PIn.Long  (table.Rows[i]["PerioMeasureNum"].ToString());
 				perioMeasure.PerioExamNum   = PIn.Long  (table.Rows[i]["PerioExamNum"].ToString());
-				perioMeasure.SequenceType   = (PerioSequenceType)PIn.Int(table.Rows[i]["SequenceType"].ToString());
+				perioMeasure.SequenceType   = (OpenDentBusiness.PerioSequenceType)PIn.Int(table.Rows[i]["SequenceType"].ToString());
 				perioMeasure.IntTooth       = PIn.Int   (table.Rows[i]["IntTooth"].ToString());
 				perioMeasure.ToothValue     = PIn.Int   (table.Rows[i]["ToothValue"].ToString());
 				perioMeasure.MBvalue        = PIn.Int   (table.Rows[i]["MBvalue"].ToString());

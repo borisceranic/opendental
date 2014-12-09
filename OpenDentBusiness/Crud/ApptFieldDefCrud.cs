@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				apptFieldDef=new ApptFieldDef();
 				apptFieldDef.ApptFieldDefNum= PIn.Long  (table.Rows[i]["ApptFieldDefNum"].ToString());
 				apptFieldDef.FieldName      = PIn.String(table.Rows[i]["FieldName"].ToString());
-				apptFieldDef.FieldType      = (ApptFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
+				apptFieldDef.FieldType      = (OpenDentBusiness.ApptFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
 				apptFieldDef.PickList       = PIn.String(table.Rows[i]["PickList"].ToString());
 				retVal.Add(apptFieldDef);
 			}

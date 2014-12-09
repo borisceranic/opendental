@@ -61,7 +61,7 @@ namespace OpenDentBusiness.Crud{
 				ehrTrigger.VitalLoincList   = PIn.String(table.Rows[i]["VitalLoincList"].ToString());
 				ehrTrigger.Instructions     = PIn.String(table.Rows[i]["Instructions"].ToString());
 				ehrTrigger.Bibliography     = PIn.String(table.Rows[i]["Bibliography"].ToString());
-				ehrTrigger.Cardinality      = (MatchCardinality)PIn.Int(table.Rows[i]["Cardinality"].ToString());
+				ehrTrigger.Cardinality      = (OpenDentBusiness.MatchCardinality)PIn.Int(table.Rows[i]["Cardinality"].ToString());
 				retVal.Add(ehrTrigger);
 			}
 			return retVal;

@@ -53,7 +53,7 @@ namespace OpenDentBusiness.Crud{
 				apptViewItem.ElementDesc     = PIn.String(table.Rows[i]["ElementDesc"].ToString());
 				apptViewItem.ElementOrder    = PIn.Byte  (table.Rows[i]["ElementOrder"].ToString());
 				apptViewItem.ElementColor    = Color.FromArgb(PIn.Int(table.Rows[i]["ElementColor"].ToString()));
-				apptViewItem.ElementAlignment= (ApptViewAlignment)PIn.Int(table.Rows[i]["ElementAlignment"].ToString());
+				apptViewItem.ElementAlignment= (OpenDentBusiness.ApptViewAlignment)PIn.Int(table.Rows[i]["ElementAlignment"].ToString());
 				apptViewItem.ApptFieldDefNum = PIn.Long  (table.Rows[i]["ApptFieldDefNum"].ToString());
 				apptViewItem.PatFieldDefNum  = PIn.Long  (table.Rows[i]["PatFieldDefNum"].ToString());
 				retVal.Add(apptViewItem);

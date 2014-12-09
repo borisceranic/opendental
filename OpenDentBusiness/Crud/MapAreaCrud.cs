@@ -53,7 +53,7 @@ namespace OpenDentBusiness.Crud{
 				mapArea.Width      = PIn.Double(table.Rows[i]["Width"].ToString());
 				mapArea.Height     = PIn.Double(table.Rows[i]["Height"].ToString());
 				mapArea.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				mapArea.ItemType   = (MapItemType)PIn.Int(table.Rows[i]["ItemType"].ToString());
+				mapArea.ItemType   = (OpenDentBusiness.MapItemType)PIn.Int(table.Rows[i]["ItemType"].ToString());
 				retVal.Add(mapArea);
 			}
 			return retVal;

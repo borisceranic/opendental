@@ -51,8 +51,8 @@ namespace OpenDentBusiness.Crud{
 				commlog.CommDateTime  = PIn.DateT (table.Rows[i]["CommDateTime"].ToString());
 				commlog.CommType      = PIn.Long  (table.Rows[i]["CommType"].ToString());
 				commlog.Note          = PIn.String(table.Rows[i]["Note"].ToString());
-				commlog.Mode_         = (CommItemMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
-				commlog.SentOrReceived= (CommSentOrReceived)PIn.Int(table.Rows[i]["SentOrReceived"].ToString());
+				commlog.Mode_         = (OpenDentBusiness.CommItemMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
+				commlog.SentOrReceived= (OpenDentBusiness.CommSentOrReceived)PIn.Int(table.Rows[i]["SentOrReceived"].ToString());
 				commlog.UserNum       = PIn.Long  (table.Rows[i]["UserNum"].ToString());
 				commlog.Signature     = PIn.String(table.Rows[i]["Signature"].ToString());
 				commlog.SigIsTopaz    = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());

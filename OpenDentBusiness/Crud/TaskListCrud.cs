@@ -51,9 +51,9 @@ namespace OpenDentBusiness.Crud{
 				taskList.Parent       = PIn.Long  (table.Rows[i]["Parent"].ToString());
 				taskList.DateTL       = PIn.Date  (table.Rows[i]["DateTL"].ToString());
 				taskList.IsRepeating  = PIn.Bool  (table.Rows[i]["IsRepeating"].ToString());
-				taskList.DateType     = (TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
+				taskList.DateType     = (OpenDentBusiness.TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
 				taskList.FromNum      = PIn.Long  (table.Rows[i]["FromNum"].ToString());
-				taskList.ObjectType   = (TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
+				taskList.ObjectType   = (OpenDentBusiness.TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
 				taskList.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				retVal.Add(taskList);
 			}

@@ -57,16 +57,16 @@ namespace OpenDentBusiness.Crud{
 				vaccinePat.Note                  = PIn.String(table.Rows[i]["Note"].ToString());
 				vaccinePat.FilledCity            = PIn.String(table.Rows[i]["FilledCity"].ToString());
 				vaccinePat.FilledST              = PIn.String(table.Rows[i]["FilledST"].ToString());
-				vaccinePat.CompletionStatus      = (VaccineCompletionStatus)PIn.Int(table.Rows[i]["CompletionStatus"].ToString());
-				vaccinePat.AdministrationNoteCode= (VaccineAdministrationNote)PIn.Int(table.Rows[i]["AdministrationNoteCode"].ToString());
+				vaccinePat.CompletionStatus      = (OpenDentBusiness.VaccineCompletionStatus)PIn.Int(table.Rows[i]["CompletionStatus"].ToString());
+				vaccinePat.AdministrationNoteCode= (OpenDentBusiness.VaccineAdministrationNote)PIn.Int(table.Rows[i]["AdministrationNoteCode"].ToString());
 				vaccinePat.UserNum               = PIn.Long  (table.Rows[i]["UserNum"].ToString());
 				vaccinePat.ProvNumOrdering       = PIn.Long  (table.Rows[i]["ProvNumOrdering"].ToString());
 				vaccinePat.ProvNumAdminister     = PIn.Long  (table.Rows[i]["ProvNumAdminister"].ToString());
 				vaccinePat.DateExpire            = PIn.Date  (table.Rows[i]["DateExpire"].ToString());
-				vaccinePat.RefusalReason         = (VaccineRefusalReason)PIn.Int(table.Rows[i]["RefusalReason"].ToString());
-				vaccinePat.ActionCode            = (VaccineAction)PIn.Int(table.Rows[i]["ActionCode"].ToString());
-				vaccinePat.AdministrationRoute   = (VaccineAdministrationRoute)PIn.Int(table.Rows[i]["AdministrationRoute"].ToString());
-				vaccinePat.AdministrationSite    = (VaccineAdministrationSite)PIn.Int(table.Rows[i]["AdministrationSite"].ToString());
+				vaccinePat.RefusalReason         = (OpenDentBusiness.VaccineRefusalReason)PIn.Int(table.Rows[i]["RefusalReason"].ToString());
+				vaccinePat.ActionCode            = (OpenDentBusiness.VaccineAction)PIn.Int(table.Rows[i]["ActionCode"].ToString());
+				vaccinePat.AdministrationRoute   = (OpenDentBusiness.VaccineAdministrationRoute)PIn.Int(table.Rows[i]["AdministrationRoute"].ToString());
+				vaccinePat.AdministrationSite    = (OpenDentBusiness.VaccineAdministrationSite)PIn.Int(table.Rows[i]["AdministrationSite"].ToString());
 				retVal.Add(vaccinePat);
 			}
 			return retVal;

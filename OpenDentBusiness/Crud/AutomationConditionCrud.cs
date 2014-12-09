@@ -48,8 +48,8 @@ namespace OpenDentBusiness.Crud{
 				automationCondition=new AutomationCondition();
 				automationCondition.AutomationConditionNum= PIn.Long  (table.Rows[i]["AutomationConditionNum"].ToString());
 				automationCondition.AutomationNum         = PIn.Long  (table.Rows[i]["AutomationNum"].ToString());
-				automationCondition.CompareField          = (AutoCondField)PIn.Int(table.Rows[i]["CompareField"].ToString());
-				automationCondition.Comparison            = (AutoCondComparison)PIn.Int(table.Rows[i]["Comparison"].ToString());
+				automationCondition.CompareField          = (OpenDentBusiness.AutoCondField)PIn.Int(table.Rows[i]["CompareField"].ToString());
+				automationCondition.Comparison            = (OpenDentBusiness.AutoCondComparison)PIn.Int(table.Rows[i]["Comparison"].ToString());
 				automationCondition.CompareString         = PIn.String(table.Rows[i]["CompareString"].ToString());
 				retVal.Add(automationCondition);
 			}

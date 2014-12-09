@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				hL7Def=new HL7Def();
 				hL7Def.HL7DefNum            = PIn.Long  (table.Rows[i]["HL7DefNum"].ToString());
 				hL7Def.Description          = PIn.String(table.Rows[i]["Description"].ToString());
-				hL7Def.ModeTx               = (ModeTxHL7)PIn.Int(table.Rows[i]["ModeTx"].ToString());
+				hL7Def.ModeTx               = (OpenDentBusiness.ModeTxHL7)PIn.Int(table.Rows[i]["ModeTx"].ToString());
 				hL7Def.IncomingFolder       = PIn.String(table.Rows[i]["IncomingFolder"].ToString());
 				hL7Def.OutgoingFolder       = PIn.String(table.Rows[i]["OutgoingFolder"].ToString());
 				hL7Def.IncomingPort         = PIn.String(table.Rows[i]["IncomingPort"].ToString());
@@ -74,7 +74,7 @@ namespace OpenDentBusiness.Crud{
 				hL7Def.Note                 = PIn.String(table.Rows[i]["Note"].ToString());
 				hL7Def.HL7Server            = PIn.String(table.Rows[i]["HL7Server"].ToString());
 				hL7Def.HL7ServiceName       = PIn.String(table.Rows[i]["HL7ServiceName"].ToString());
-				hL7Def.ShowDemographics     = (HL7ShowDemographics)PIn.Int(table.Rows[i]["ShowDemographics"].ToString());
+				hL7Def.ShowDemographics     = (OpenDentBusiness.HL7ShowDemographics)PIn.Int(table.Rows[i]["ShowDemographics"].ToString());
 				hL7Def.ShowAppts            = PIn.Bool  (table.Rows[i]["ShowAppts"].ToString());
 				hL7Def.ShowAccount          = PIn.Bool  (table.Rows[i]["ShowAccount"].ToString());
 				hL7Def.IsQuadAsToothNum     = PIn.Bool  (table.Rows[i]["IsQuadAsToothNum"].ToString());

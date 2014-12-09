@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				ehrPatient.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				ehrPatient.MotherMaidenFname= PIn.String(table.Rows[i]["MotherMaidenFname"].ToString());
 				ehrPatient.MotherMaidenLname= PIn.String(table.Rows[i]["MotherMaidenLname"].ToString());
-				ehrPatient.VacShareOk       = (YN)PIn.Int(table.Rows[i]["VacShareOk"].ToString());
+				ehrPatient.VacShareOk       = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["VacShareOk"].ToString());
 				retVal.Add(ehrPatient);
 			}
 			return retVal;

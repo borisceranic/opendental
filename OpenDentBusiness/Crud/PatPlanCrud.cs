@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				patPlan.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				patPlan.Ordinal     = PIn.Byte  (table.Rows[i]["Ordinal"].ToString());
 				patPlan.IsPending   = PIn.Bool  (table.Rows[i]["IsPending"].ToString());
-				patPlan.Relationship= (Relat)PIn.Int(table.Rows[i]["Relationship"].ToString());
+				patPlan.Relationship= (OpenDentBusiness.Relat)PIn.Int(table.Rows[i]["Relationship"].ToString());
 				patPlan.PatID       = PIn.String(table.Rows[i]["PatID"].ToString());
 				patPlan.InsSubNum   = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
 				retVal.Add(patPlan);

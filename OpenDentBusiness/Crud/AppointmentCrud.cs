@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				appointment=new Appointment();
 				appointment.AptNum               = PIn.Long  (table.Rows[i]["AptNum"].ToString());
 				appointment.PatNum               = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				appointment.AptStatus            = (ApptStatus)PIn.Int(table.Rows[i]["AptStatus"].ToString());
+				appointment.AptStatus            = (OpenDentBusiness.ApptStatus)PIn.Int(table.Rows[i]["AptStatus"].ToString());
 				appointment.Pattern              = PIn.String(table.Rows[i]["Pattern"].ToString());
 				appointment.Confirmed            = PIn.Long  (table.Rows[i]["Confirmed"].ToString());
 				appointment.TimeLocked           = PIn.Bool  (table.Rows[i]["TimeLocked"].ToString());

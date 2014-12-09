@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				refAttach.ItemOrder         = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				refAttach.RefDate           = PIn.Date  (table.Rows[i]["RefDate"].ToString());
 				refAttach.IsFrom            = PIn.Bool  (table.Rows[i]["IsFrom"].ToString());
-				refAttach.RefToStatus       = (ReferralToStatus)PIn.Int(table.Rows[i]["RefToStatus"].ToString());
+				refAttach.RefToStatus       = (OpenDentBusiness.ReferralToStatus)PIn.Int(table.Rows[i]["RefToStatus"].ToString());
 				refAttach.Note              = PIn.String(table.Rows[i]["Note"].ToString());
 				refAttach.IsTransitionOfCare= PIn.Bool  (table.Rows[i]["IsTransitionOfCare"].ToString());
 				refAttach.ProcNum           = PIn.Long  (table.Rows[i]["ProcNum"].ToString());

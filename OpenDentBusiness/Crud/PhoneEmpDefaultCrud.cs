@@ -49,10 +49,10 @@ namespace OpenDentBusiness.Crud{
 				phoneEmpDefault.EmployeeNum     = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
 				phoneEmpDefault.IsGraphed       = PIn.Bool  (table.Rows[i]["IsGraphed"].ToString());
 				phoneEmpDefault.HasColor        = PIn.Bool  (table.Rows[i]["HasColor"].ToString());
-				phoneEmpDefault.RingGroups      = (AsteriskRingGroups)PIn.Int(table.Rows[i]["RingGroups"].ToString());
+				phoneEmpDefault.RingGroups      = (OpenDentBusiness.AsteriskRingGroups)PIn.Int(table.Rows[i]["RingGroups"].ToString());
 				phoneEmpDefault.EmpName         = PIn.String(table.Rows[i]["EmpName"].ToString());
 				phoneEmpDefault.PhoneExt        = PIn.Int   (table.Rows[i]["PhoneExt"].ToString());
-				phoneEmpDefault.StatusOverride  = (PhoneEmpStatusOverride)PIn.Int(table.Rows[i]["StatusOverride"].ToString());
+				phoneEmpDefault.StatusOverride  = (OpenDentBusiness.PhoneEmpStatusOverride)PIn.Int(table.Rows[i]["StatusOverride"].ToString());
 				phoneEmpDefault.Notes           = PIn.String(table.Rows[i]["Notes"].ToString());
 				phoneEmpDefault.ComputerName    = PIn.String(table.Rows[i]["ComputerName"].ToString());
 				phoneEmpDefault.IsPrivateScreen = PIn.Bool  (table.Rows[i]["IsPrivateScreen"].ToString());

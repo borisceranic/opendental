@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.AbbrDesc          = PIn.String(table.Rows[i]["AbbrDesc"].ToString());
 				procedureCode.ProcTime          = PIn.String(table.Rows[i]["ProcTime"].ToString());
 				procedureCode.ProcCat           = PIn.Long  (table.Rows[i]["ProcCat"].ToString());
-				procedureCode.TreatArea         = (TreatmentArea)PIn.Int(table.Rows[i]["TreatArea"].ToString());
+				procedureCode.TreatArea         = (OpenDentBusiness.TreatmentArea)PIn.Int(table.Rows[i]["TreatArea"].ToString());
 				procedureCode.NoBillIns         = PIn.Bool  (table.Rows[i]["NoBillIns"].ToString());
 				procedureCode.IsProsth          = PIn.Bool  (table.Rows[i]["IsProsth"].ToString());
 				procedureCode.DefaultNote       = PIn.String(table.Rows[i]["DefaultNote"].ToString());
@@ -61,14 +61,14 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.AlternateCode1    = PIn.String(table.Rows[i]["AlternateCode1"].ToString());
 				procedureCode.MedicalCode       = PIn.String(table.Rows[i]["MedicalCode"].ToString());
 				procedureCode.IsTaxed           = PIn.Bool  (table.Rows[i]["IsTaxed"].ToString());
-				procedureCode.PaintType         = (ToothPaintingType)PIn.Int(table.Rows[i]["PaintType"].ToString());
+				procedureCode.PaintType         = (OpenDentBusiness.ToothPaintingType)PIn.Int(table.Rows[i]["PaintType"].ToString());
 				procedureCode.GraphicColor      = Color.FromArgb(PIn.Int(table.Rows[i]["GraphicColor"].ToString()));
 				procedureCode.LaymanTerm        = PIn.String(table.Rows[i]["LaymanTerm"].ToString());
 				procedureCode.IsCanadianLab     = PIn.Bool  (table.Rows[i]["IsCanadianLab"].ToString());
 				procedureCode.PreExisting       = PIn.Bool  (table.Rows[i]["PreExisting"].ToString());
 				procedureCode.BaseUnits         = PIn.Int   (table.Rows[i]["BaseUnits"].ToString());
 				procedureCode.SubstitutionCode  = PIn.String(table.Rows[i]["SubstitutionCode"].ToString());
-				procedureCode.SubstOnlyIf       = (SubstitutionCondition)PIn.Int(table.Rows[i]["SubstOnlyIf"].ToString());
+				procedureCode.SubstOnlyIf       = (OpenDentBusiness.SubstitutionCondition)PIn.Int(table.Rows[i]["SubstOnlyIf"].ToString());
 				procedureCode.DateTStamp        = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
 				procedureCode.IsMultiVisit      = PIn.Bool  (table.Rows[i]["IsMultiVisit"].ToString());
 				procedureCode.DrugNDC           = PIn.String(table.Rows[i]["DrugNDC"].ToString());

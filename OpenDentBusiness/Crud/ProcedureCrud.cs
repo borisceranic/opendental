@@ -56,11 +56,11 @@ namespace OpenDentBusiness.Crud{
 				procedure.ToothNum          = PIn.String(table.Rows[i]["ToothNum"].ToString());
 				procedure.ToothRange        = PIn.String(table.Rows[i]["ToothRange"].ToString());
 				procedure.Priority          = PIn.Long  (table.Rows[i]["Priority"].ToString());
-				procedure.ProcStatus        = (ProcStat)PIn.Int(table.Rows[i]["ProcStatus"].ToString());
+				procedure.ProcStatus        = (OpenDentBusiness.ProcStat)PIn.Int(table.Rows[i]["ProcStatus"].ToString());
 				procedure.ProvNum           = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				procedure.Dx                = PIn.Long  (table.Rows[i]["Dx"].ToString());
 				procedure.PlannedAptNum     = PIn.Long  (table.Rows[i]["PlannedAptNum"].ToString());
-				procedure.PlaceService      = (PlaceOfService)PIn.Int(table.Rows[i]["PlaceService"].ToString());
+				procedure.PlaceService      = (OpenDentBusiness.PlaceOfService)PIn.Int(table.Rows[i]["PlaceService"].ToString());
 				procedure.Prosthesis        = PIn.String(table.Rows[i]["Prosthesis"].ToString());
 				procedure.DateOriginalProsth= PIn.Date  (table.Rows[i]["DateOriginalProsth"].ToString());
 				procedure.ClaimNote         = PIn.String(table.Rows[i]["ClaimNote"].ToString());
@@ -90,9 +90,9 @@ namespace OpenDentBusiness.Crud{
 				procedure.ProcTimeEnd       = PIn.Time(table.Rows[i]["ProcTimeEnd"].ToString());
 				procedure.DateTStamp        = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
 				procedure.Prognosis         = PIn.Long  (table.Rows[i]["Prognosis"].ToString());
-				procedure.DrugUnit          = (EnumProcDrugUnit)PIn.Int(table.Rows[i]["DrugUnit"].ToString());
+				procedure.DrugUnit          = (OpenDentBusiness.EnumProcDrugUnit)PIn.Int(table.Rows[i]["DrugUnit"].ToString());
 				procedure.DrugQty           = PIn.Float (table.Rows[i]["DrugQty"].ToString());
-				procedure.UnitQtyType       = (ProcUnitQtyType)PIn.Int(table.Rows[i]["UnitQtyType"].ToString());
+				procedure.UnitQtyType       = (OpenDentBusiness.ProcUnitQtyType)PIn.Int(table.Rows[i]["UnitQtyType"].ToString());
 				procedure.StatementNum      = PIn.Long  (table.Rows[i]["StatementNum"].ToString());
 				procedure.IsLocked          = PIn.Bool  (table.Rows[i]["IsLocked"].ToString());
 				procedure.BillingNote       = PIn.String(table.Rows[i]["BillingNote"].ToString());

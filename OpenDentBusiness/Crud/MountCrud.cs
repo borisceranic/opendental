@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				mount.DateCreated= PIn.Date  (table.Rows[i]["DateCreated"].ToString());
 				mount.Description= PIn.String(table.Rows[i]["Description"].ToString());
 				mount.Note       = PIn.String(table.Rows[i]["Note"].ToString());
-				mount.ImgType    = (ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
+				mount.ImgType    = (OpenDentBusiness.ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
 				mount.Width      = PIn.Int   (table.Rows[i]["Width"].ToString());
 				mount.Height     = PIn.Int   (table.Rows[i]["Height"].ToString());
 				retVal.Add(mount);

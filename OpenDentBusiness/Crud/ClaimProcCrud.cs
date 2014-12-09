@@ -54,7 +54,7 @@ namespace OpenDentBusiness.Crud{
 				claimProc.FeeBilled           = PIn.Double(table.Rows[i]["FeeBilled"].ToString());
 				claimProc.InsPayEst           = PIn.Double(table.Rows[i]["InsPayEst"].ToString());
 				claimProc.DedApplied          = PIn.Double(table.Rows[i]["DedApplied"].ToString());
-				claimProc.Status              = (ClaimProcStatus)PIn.Int(table.Rows[i]["Status"].ToString());
+				claimProc.Status              = (OpenDentBusiness.ClaimProcStatus)PIn.Int(table.Rows[i]["Status"].ToString());
 				claimProc.InsPayAmt           = PIn.Double(table.Rows[i]["InsPayAmt"].ToString());
 				claimProc.Remarks             = PIn.String(table.Rows[i]["Remarks"].ToString());
 				claimProc.ClaimPaymentNum     = PIn.Long  (table.Rows[i]["ClaimPaymentNum"].ToString());

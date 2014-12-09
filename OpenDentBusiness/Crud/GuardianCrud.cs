@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				guardian.GuardianNum   = PIn.Long  (table.Rows[i]["GuardianNum"].ToString());
 				guardian.PatNumChild   = PIn.Long  (table.Rows[i]["PatNumChild"].ToString());
 				guardian.PatNumGuardian= PIn.Long  (table.Rows[i]["PatNumGuardian"].ToString());
-				guardian.Relationship  = (GuardianRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
+				guardian.Relationship  = (OpenDentBusiness.GuardianRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
 				guardian.IsGuardian    = PIn.Bool  (table.Rows[i]["IsGuardian"].ToString());
 				retVal.Add(guardian);
 			}

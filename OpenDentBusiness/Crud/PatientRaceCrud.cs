@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				patientRace=new PatientRace();
 				patientRace.PatientRaceNum= PIn.Long  (table.Rows[i]["PatientRaceNum"].ToString());
 				patientRace.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				patientRace.Race          = (PatRace)PIn.Int(table.Rows[i]["Race"].ToString());
+				patientRace.Race          = (OpenDentBusiness.PatRace)PIn.Int(table.Rows[i]["Race"].ToString());
 				patientRace.CdcrecCode    = PIn.String(table.Rows[i]["CdcrecCode"].ToString());
 				retVal.Add(patientRace);
 			}

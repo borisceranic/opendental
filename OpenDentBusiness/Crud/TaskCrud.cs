@@ -51,11 +51,11 @@ namespace OpenDentBusiness.Crud{
 				task.DateTask        = PIn.Date  (table.Rows[i]["DateTask"].ToString());
 				task.KeyNum          = PIn.Long  (table.Rows[i]["KeyNum"].ToString());
 				task.Descript        = PIn.String(table.Rows[i]["Descript"].ToString());
-				task.TaskStatus      = (TaskStatusEnum)PIn.Int(table.Rows[i]["TaskStatus"].ToString());
+				task.TaskStatus      = (OpenDentBusiness.TaskStatusEnum)PIn.Int(table.Rows[i]["TaskStatus"].ToString());
 				task.IsRepeating     = PIn.Bool  (table.Rows[i]["IsRepeating"].ToString());
-				task.DateType        = (TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
+				task.DateType        = (OpenDentBusiness.TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
 				task.FromNum         = PIn.Long  (table.Rows[i]["FromNum"].ToString());
-				task.ObjectType      = (TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
+				task.ObjectType      = (OpenDentBusiness.TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
 				task.DateTimeEntry   = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				task.UserNum         = PIn.Long  (table.Rows[i]["UserNum"].ToString());
 				task.DateTimeFinished= PIn.DateT (table.Rows[i]["DateTimeFinished"].ToString());

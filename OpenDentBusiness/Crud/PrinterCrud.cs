@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				printer=new Printer();
 				printer.PrinterNum   = PIn.Long  (table.Rows[i]["PrinterNum"].ToString());
 				printer.ComputerNum  = PIn.Long  (table.Rows[i]["ComputerNum"].ToString());
-				printer.PrintSit     = (PrintSituation)PIn.Int(table.Rows[i]["PrintSit"].ToString());
+				printer.PrintSit     = (OpenDentBusiness.PrintSituation)PIn.Int(table.Rows[i]["PrintSit"].ToString());
 				printer.PrinterName  = PIn.String(table.Rows[i]["PrinterName"].ToString());
 				printer.DisplayPrompt= PIn.Bool  (table.Rows[i]["DisplayPrompt"].ToString());
 				retVal.Add(printer);

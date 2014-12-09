@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				medicalOrder=new MedicalOrder();
 				medicalOrder.MedicalOrderNum= PIn.Long  (table.Rows[i]["MedicalOrderNum"].ToString());
-				medicalOrder.MedOrderType   = (MedicalOrderType)PIn.Int(table.Rows[i]["MedOrderType"].ToString());
+				medicalOrder.MedOrderType   = (OpenDentBusiness.MedicalOrderType)PIn.Int(table.Rows[i]["MedOrderType"].ToString());
 				medicalOrder.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				medicalOrder.DateTimeOrder  = PIn.DateT (table.Rows[i]["DateTimeOrder"].ToString());
 				medicalOrder.Description    = PIn.String(table.Rows[i]["Description"].ToString());

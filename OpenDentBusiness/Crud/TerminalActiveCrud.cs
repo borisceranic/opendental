@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				terminalActive=new TerminalActive();
 				terminalActive.TerminalActiveNum= PIn.Long  (table.Rows[i]["TerminalActiveNum"].ToString());
 				terminalActive.ComputerName     = PIn.String(table.Rows[i]["ComputerName"].ToString());
-				terminalActive.TerminalStatus   = (TerminalStatusEnum)PIn.Int(table.Rows[i]["TerminalStatus"].ToString());
+				terminalActive.TerminalStatus   = (OpenDentBusiness.TerminalStatusEnum)PIn.Int(table.Rows[i]["TerminalStatus"].ToString());
 				terminalActive.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				retVal.Add(terminalActive);
 			}

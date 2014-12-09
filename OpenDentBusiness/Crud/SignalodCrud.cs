@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				signalod.FromUser   = PIn.String(table.Rows[i]["FromUser"].ToString());
 				signalod.ITypes     = PIn.String(table.Rows[i]["ITypes"].ToString());
 				signalod.DateViewing= PIn.Date  (table.Rows[i]["DateViewing"].ToString());
-				signalod.SigType    = (SignalType)PIn.Int(table.Rows[i]["SigType"].ToString());
+				signalod.SigType    = (OpenDentBusiness.SignalType)PIn.Int(table.Rows[i]["SigType"].ToString());
 				signalod.SigText    = PIn.String(table.Rows[i]["SigText"].ToString());
 				signalod.SigDateTime= PIn.DateT (table.Rows[i]["SigDateTime"].ToString());
 				signalod.ToUser     = PIn.String(table.Rows[i]["ToUser"].ToString());

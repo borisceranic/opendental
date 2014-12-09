@@ -53,7 +53,7 @@ namespace OpenDentBusiness.Crud{
 				statement.DateRangeTo  = PIn.Date  (table.Rows[i]["DateRangeTo"].ToString());
 				statement.Note         = PIn.String(table.Rows[i]["Note"].ToString());
 				statement.NoteBold     = PIn.String(table.Rows[i]["NoteBold"].ToString());
-				statement.Mode_        = (StatementMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
+				statement.Mode_        = (OpenDentBusiness.StatementMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
 				statement.HidePayment  = PIn.Bool  (table.Rows[i]["HidePayment"].ToString());
 				statement.SinglePatient= PIn.Bool  (table.Rows[i]["SinglePatient"].ToString());
 				statement.Intermingled = PIn.Bool  (table.Rows[i]["Intermingled"].ToString());

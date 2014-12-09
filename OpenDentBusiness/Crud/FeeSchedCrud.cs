@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				feeSched=new FeeSched();
 				feeSched.FeeSchedNum = PIn.Long  (table.Rows[i]["FeeSchedNum"].ToString());
 				feeSched.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				feeSched.FeeSchedType= (FeeScheduleType)PIn.Int(table.Rows[i]["FeeSchedType"].ToString());
+				feeSched.FeeSchedType= (OpenDentBusiness.FeeScheduleType)PIn.Int(table.Rows[i]["FeeSchedType"].ToString());
 				feeSched.ItemOrder   = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				feeSched.IsHidden    = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
 				retVal.Add(feeSched);

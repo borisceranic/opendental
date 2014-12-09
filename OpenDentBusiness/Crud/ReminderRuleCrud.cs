@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				reminderRule=new ReminderRule();
 				reminderRule.ReminderRuleNum  = PIn.Long  (table.Rows[i]["ReminderRuleNum"].ToString());
-				reminderRule.ReminderCriterion= (EhrCriterion)PIn.Int(table.Rows[i]["ReminderCriterion"].ToString());
+				reminderRule.ReminderCriterion= (OpenDentBusiness.EhrCriterion)PIn.Int(table.Rows[i]["ReminderCriterion"].ToString());
 				reminderRule.CriterionFK      = PIn.Long  (table.Rows[i]["CriterionFK"].ToString());
 				reminderRule.CriterionValue   = PIn.String(table.Rows[i]["CriterionValue"].ToString());
 				reminderRule.Message          = PIn.String(table.Rows[i]["Message"].ToString());

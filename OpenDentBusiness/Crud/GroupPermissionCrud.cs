@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				groupPermission.NewerDate   = PIn.Date  (table.Rows[i]["NewerDate"].ToString());
 				groupPermission.NewerDays   = PIn.Int   (table.Rows[i]["NewerDays"].ToString());
 				groupPermission.UserGroupNum= PIn.Long  (table.Rows[i]["UserGroupNum"].ToString());
-				groupPermission.PermType    = (Permissions)PIn.Int(table.Rows[i]["PermType"].ToString());
+				groupPermission.PermType    = (OpenDentBusiness.Permissions)PIn.Int(table.Rows[i]["PermType"].ToString());
 				retVal.Add(groupPermission);
 			}
 			return retVal;

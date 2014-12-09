@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 				insPlan.CanadianDiagnosticCode = PIn.String(table.Rows[i]["CanadianDiagnosticCode"].ToString());
 				insPlan.CanadianInstitutionCode= PIn.String(table.Rows[i]["CanadianInstitutionCode"].ToString());
 				insPlan.RxBIN                  = PIn.String(table.Rows[i]["RxBIN"].ToString());
-				insPlan.CobRule                = (EnumCobRule)PIn.Int(table.Rows[i]["CobRule"].ToString());
+				insPlan.CobRule                = (OpenDentBusiness.EnumCobRule)PIn.Int(table.Rows[i]["CobRule"].ToString());
 				insPlan.SopCode                = PIn.String(table.Rows[i]["SopCode"].ToString());
 				retVal.Add(insPlan);
 			}

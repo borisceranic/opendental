@@ -47,7 +47,7 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				def=new Def();
 				def.DefNum   = PIn.Long  (table.Rows[i]["DefNum"].ToString());
-				def.Category = (DefCat)PIn.Int(table.Rows[i]["Category"].ToString());
+				def.Category = (OpenDentBusiness.DefCat)PIn.Int(table.Rows[i]["Category"].ToString());
 				def.ItemOrder= PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				def.ItemName = PIn.String(table.Rows[i]["ItemName"].ToString());
 				def.ItemValue= PIn.String(table.Rows[i]["ItemValue"].ToString());

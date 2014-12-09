@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				clearinghouse.Description     = PIn.String(table.Rows[i]["Description"].ToString());
 				clearinghouse.ExportPath      = PIn.String(table.Rows[i]["ExportPath"].ToString());
 				clearinghouse.Payors          = PIn.String(table.Rows[i]["Payors"].ToString());
-				clearinghouse.Eformat         = (ElectronicClaimFormat)PIn.Int(table.Rows[i]["Eformat"].ToString());
+				clearinghouse.Eformat         = (OpenDentBusiness.ElectronicClaimFormat)PIn.Int(table.Rows[i]["Eformat"].ToString());
 				clearinghouse.ISA05           = PIn.String(table.Rows[i]["ISA05"].ToString());
 				clearinghouse.SenderTIN       = PIn.String(table.Rows[i]["SenderTIN"].ToString());
 				clearinghouse.ISA07           = PIn.String(table.Rows[i]["ISA07"].ToString());
@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 				clearinghouse.ISA15           = PIn.String(table.Rows[i]["ISA15"].ToString());
 				clearinghouse.Password        = PIn.String(table.Rows[i]["Password"].ToString());
 				clearinghouse.ResponsePath    = PIn.String(table.Rows[i]["ResponsePath"].ToString());
-				clearinghouse.CommBridge      = (EclaimsCommBridge)PIn.Int(table.Rows[i]["CommBridge"].ToString());
+				clearinghouse.CommBridge      = (OpenDentBusiness.EclaimsCommBridge)PIn.Int(table.Rows[i]["CommBridge"].ToString());
 				clearinghouse.ClientProgram   = PIn.String(table.Rows[i]["ClientProgram"].ToString());
 				clearinghouse.LastBatchNumber = PIn.Int   (table.Rows[i]["LastBatchNumber"].ToString());
 				clearinghouse.ModemPort       = PIn.Byte  (table.Rows[i]["ModemPort"].ToString());

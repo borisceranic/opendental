@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				toolButItem=new ToolButItem();
 				toolButItem.ToolButItemNum= PIn.Long  (table.Rows[i]["ToolButItemNum"].ToString());
 				toolButItem.ProgramNum    = PIn.Long  (table.Rows[i]["ProgramNum"].ToString());
-				toolButItem.ToolBar       = (ToolBarsAvail)PIn.Int(table.Rows[i]["ToolBar"].ToString());
+				toolButItem.ToolBar       = (OpenDentBusiness.ToolBarsAvail)PIn.Int(table.Rows[i]["ToolBar"].ToString());
 				toolButItem.ButtonText    = PIn.String(table.Rows[i]["ButtonText"].ToString());
 				retVal.Add(toolButItem);
 			}

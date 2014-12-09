@@ -54,7 +54,7 @@ namespace OpenDentBusiness.Crud{
 				provider.MI                  = PIn.String(table.Rows[i]["MI"].ToString());
 				provider.Suffix              = PIn.String(table.Rows[i]["Suffix"].ToString());
 				provider.FeeSched            = PIn.Long  (table.Rows[i]["FeeSched"].ToString());
-				provider.Specialty           = (DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				provider.Specialty           = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
 				provider.SSN                 = PIn.String(table.Rows[i]["SSN"].ToString());
 				provider.StateLicense        = PIn.String(table.Rows[i]["StateLicense"].ToString());
 				provider.DEANum              = PIn.String(table.Rows[i]["DEANum"].ToString());

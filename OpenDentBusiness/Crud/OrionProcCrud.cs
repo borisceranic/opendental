@@ -48,11 +48,11 @@ namespace OpenDentBusiness.Crud{
 				orionProc=new OrionProc();
 				orionProc.OrionProcNum   = PIn.Long  (table.Rows[i]["OrionProcNum"].ToString());
 				orionProc.ProcNum        = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				orionProc.DPC            = (OrionDPC)PIn.Int(table.Rows[i]["DPC"].ToString());
-				orionProc.DPCpost        = (OrionDPC)PIn.Int(table.Rows[i]["DPCpost"].ToString());
+				orionProc.DPC            = (OpenDentBusiness.OrionDPC)PIn.Int(table.Rows[i]["DPC"].ToString());
+				orionProc.DPCpost        = (OpenDentBusiness.OrionDPC)PIn.Int(table.Rows[i]["DPCpost"].ToString());
 				orionProc.DateScheduleBy = PIn.Date  (table.Rows[i]["DateScheduleBy"].ToString());
 				orionProc.DateStopClock  = PIn.Date  (table.Rows[i]["DateStopClock"].ToString());
-				orionProc.Status2        = (OrionStatus)PIn.Int(table.Rows[i]["Status2"].ToString());
+				orionProc.Status2        = (OpenDentBusiness.OrionStatus)PIn.Int(table.Rows[i]["Status2"].ToString());
 				orionProc.IsOnCall       = PIn.Bool  (table.Rows[i]["IsOnCall"].ToString());
 				orionProc.IsEffectiveComm= PIn.Bool  (table.Rows[i]["IsEffectiveComm"].ToString());
 				orionProc.IsRepair       = PIn.Bool  (table.Rows[i]["IsRepair"].ToString());

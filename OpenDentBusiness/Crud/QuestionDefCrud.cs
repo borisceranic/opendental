@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				questionDef.QuestionDefNum= PIn.Long  (table.Rows[i]["QuestionDefNum"].ToString());
 				questionDef.Description   = PIn.String(table.Rows[i]["Description"].ToString());
 				questionDef.ItemOrder     = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				questionDef.QuestType     = (QuestionType)PIn.Int(table.Rows[i]["QuestType"].ToString());
+				questionDef.QuestType     = (OpenDentBusiness.QuestionType)PIn.Int(table.Rows[i]["QuestType"].ToString());
 				retVal.Add(questionDef);
 			}
 			return retVal;

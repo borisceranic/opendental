@@ -48,9 +48,9 @@ namespace OpenDentBusiness.Crud{
 				ehrAmendment=new EhrAmendment();
 				ehrAmendment.EhrAmendmentNum= PIn.Long  (table.Rows[i]["EhrAmendmentNum"].ToString());
 				ehrAmendment.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrAmendment.IsAccepted     = (YN)PIn.Int(table.Rows[i]["IsAccepted"].ToString());
+				ehrAmendment.IsAccepted     = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["IsAccepted"].ToString());
 				ehrAmendment.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				ehrAmendment.Source         = (AmendmentSource)PIn.Int(table.Rows[i]["Source"].ToString());
+				ehrAmendment.Source         = (OpenDentBusiness.AmendmentSource)PIn.Int(table.Rows[i]["Source"].ToString());
 				ehrAmendment.SourceName     = PIn.String(table.Rows[i]["SourceName"].ToString());
 				ehrAmendment.FileName       = PIn.String(table.Rows[i]["FileName"].ToString());
 				ehrAmendment.RawBase64      = PIn.String(table.Rows[i]["RawBase64"].ToString());

@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				computerPref.ComputerPrefNum        = PIn.Long  (table.Rows[i]["ComputerPrefNum"].ToString());
 				computerPref.ComputerName           = PIn.String(table.Rows[i]["ComputerName"].ToString());
 				computerPref.GraphicsUseHardware    = PIn.Bool  (table.Rows[i]["GraphicsUseHardware"].ToString());
-				computerPref.GraphicsSimple         = (DrawingMode)PIn.Int(table.Rows[i]["GraphicsSimple"].ToString());
+				computerPref.GraphicsSimple         = (OpenDentBusiness.DrawingMode)PIn.Int(table.Rows[i]["GraphicsSimple"].ToString());
 				computerPref.SensorType             = PIn.String(table.Rows[i]["SensorType"].ToString());
 				computerPref.SensorBinned           = PIn.Bool  (table.Rows[i]["SensorBinned"].ToString());
 				computerPref.SensorPort             = PIn.Int   (table.Rows[i]["SensorPort"].ToString());

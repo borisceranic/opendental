@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 				rxPat.PharmacyNum = PIn.Long  (table.Rows[i]["PharmacyNum"].ToString());
 				rxPat.IsControlled= PIn.Bool  (table.Rows[i]["IsControlled"].ToString());
 				rxPat.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				rxPat.SendStatus  = (RxSendStatus)PIn.Int(table.Rows[i]["SendStatus"].ToString());
+				rxPat.SendStatus  = (OpenDentBusiness.RxSendStatus)PIn.Int(table.Rows[i]["SendStatus"].ToString());
 				rxPat.RxCui       = PIn.Long  (table.Rows[i]["RxCui"].ToString());
 				rxPat.DosageCode  = PIn.String(table.Rows[i]["DosageCode"].ToString());
 				rxPat.NewCropGuid = PIn.String(table.Rows[i]["NewCropGuid"].ToString());

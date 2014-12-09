@@ -61,7 +61,7 @@ namespace OpenDentBusiness.Crud{
 				carrier.CanadianNetworkNum      = PIn.Long  (table.Rows[i]["CanadianNetworkNum"].ToString());
 				carrier.IsHidden                = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
 				carrier.CanadianEncryptionMethod= PIn.Byte  (table.Rows[i]["CanadianEncryptionMethod"].ToString());
-				carrier.CanadianSupportedTypes  = (CanSupTransTypes)PIn.Int(table.Rows[i]["CanadianSupportedTypes"].ToString());
+				carrier.CanadianSupportedTypes  = (OpenDentBusiness.CanSupTransTypes)PIn.Int(table.Rows[i]["CanadianSupportedTypes"].ToString());
 				retVal.Add(carrier);
 			}
 			return retVal;

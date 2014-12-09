@@ -51,11 +51,11 @@ namespace OpenDentBusiness.Crud{
 				disease.DiseaseDefNum    = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
 				disease.PatNote          = PIn.String(table.Rows[i]["PatNote"].ToString());
 				disease.DateTStamp       = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				disease.ProbStatus       = (ProblemStatus)PIn.Int(table.Rows[i]["ProbStatus"].ToString());
+				disease.ProbStatus       = (OpenDentBusiness.ProblemStatus)PIn.Int(table.Rows[i]["ProbStatus"].ToString());
 				disease.DateStart        = PIn.Date  (table.Rows[i]["DateStart"].ToString());
 				disease.DateStop         = PIn.Date  (table.Rows[i]["DateStop"].ToString());
 				disease.SnomedProblemType= PIn.String(table.Rows[i]["SnomedProblemType"].ToString());
-				disease.FunctionStatus   = (FunctionalStatus)PIn.Int(table.Rows[i]["FunctionStatus"].ToString());
+				disease.FunctionStatus   = (OpenDentBusiness.FunctionalStatus)PIn.Int(table.Rows[i]["FunctionStatus"].ToString());
 				retVal.Add(disease);
 			}
 			return retVal;

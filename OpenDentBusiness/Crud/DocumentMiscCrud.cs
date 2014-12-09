@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				documentMisc.DocMiscNum = PIn.Long  (table.Rows[i]["DocMiscNum"].ToString());
 				documentMisc.DateCreated= PIn.Date  (table.Rows[i]["DateCreated"].ToString());
 				documentMisc.FileName   = PIn.String(table.Rows[i]["FileName"].ToString());
-				documentMisc.DocMiscType= (DocumentMiscType)PIn.Int(table.Rows[i]["DocMiscType"].ToString());
+				documentMisc.DocMiscType= (OpenDentBusiness.DocumentMiscType)PIn.Int(table.Rows[i]["DocMiscType"].ToString());
 				documentMisc.RawBase64  = PIn.String(table.Rows[i]["RawBase64"].ToString());
 				retVal.Add(documentMisc);
 			}

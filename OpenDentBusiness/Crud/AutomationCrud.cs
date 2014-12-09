@@ -48,9 +48,9 @@ namespace OpenDentBusiness.Crud{
 				automation=new Automation();
 				automation.AutomationNum = PIn.Long  (table.Rows[i]["AutomationNum"].ToString());
 				automation.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				automation.Autotrigger   = (AutomationTrigger)PIn.Int(table.Rows[i]["Autotrigger"].ToString());
+				automation.Autotrigger   = (OpenDentBusiness.AutomationTrigger)PIn.Int(table.Rows[i]["Autotrigger"].ToString());
 				automation.ProcCodes     = PIn.String(table.Rows[i]["ProcCodes"].ToString());
-				automation.AutoAction    = (AutomationAction)PIn.Int(table.Rows[i]["AutoAction"].ToString());
+				automation.AutoAction    = (OpenDentBusiness.AutomationAction)PIn.Int(table.Rows[i]["AutoAction"].ToString());
 				automation.SheetDefNum   = PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
 				automation.CommType      = PIn.Long  (table.Rows[i]["CommType"].ToString());
 				automation.MessageContent= PIn.String(table.Rows[i]["MessageContent"].ToString());

@@ -55,7 +55,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.Zip                = PIn.String(table.Rows[i]["Zip"].ToString());
 				clinic.Phone              = PIn.String(table.Rows[i]["Phone"].ToString());
 				clinic.BankNumber         = PIn.String(table.Rows[i]["BankNumber"].ToString());
-				clinic.DefaultPlaceService= (PlaceOfService)PIn.Int(table.Rows[i]["DefaultPlaceService"].ToString());
+				clinic.DefaultPlaceService= (OpenDentBusiness.PlaceOfService)PIn.Int(table.Rows[i]["DefaultPlaceService"].ToString());
 				clinic.InsBillingProv     = PIn.Long  (table.Rows[i]["InsBillingProv"].ToString());
 				clinic.Fax                = PIn.String(table.Rows[i]["Fax"].ToString());
 				clinic.EmailAddressNum    = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());

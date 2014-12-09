@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				autoCodeCond=new AutoCodeCond();
 				autoCodeCond.AutoCodeCondNum= PIn.Long  (table.Rows[i]["AutoCodeCondNum"].ToString());
 				autoCodeCond.AutoCodeItemNum= PIn.Long  (table.Rows[i]["AutoCodeItemNum"].ToString());
-				autoCodeCond.Cond           = (AutoCondition)PIn.Int(table.Rows[i]["Cond"].ToString());
+				autoCodeCond.Cond           = (OpenDentBusiness.AutoCondition)PIn.Int(table.Rows[i]["Cond"].ToString());
 				retVal.Add(autoCodeCond);
 			}
 			return retVal;

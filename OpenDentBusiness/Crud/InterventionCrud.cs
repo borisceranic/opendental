@@ -53,7 +53,7 @@ namespace OpenDentBusiness.Crud{
 				intervention.CodeSystem     = PIn.String(table.Rows[i]["CodeSystem"].ToString());
 				intervention.Note           = PIn.String(table.Rows[i]["Note"].ToString());
 				intervention.DateEntry      = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				intervention.CodeSet        = (InterventionCodeSet)PIn.Int(table.Rows[i]["CodeSet"].ToString());
+				intervention.CodeSet        = (OpenDentBusiness.InterventionCodeSet)PIn.Int(table.Rows[i]["CodeSet"].ToString());
 				retVal.Add(intervention);
 			}
 			return retVal;

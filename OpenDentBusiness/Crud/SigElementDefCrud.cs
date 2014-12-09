@@ -49,7 +49,7 @@ namespace OpenDentBusiness.Crud{
 				sigElementDef.SigElementDefNum= PIn.Long  (table.Rows[i]["SigElementDefNum"].ToString());
 				sigElementDef.LightRow        = PIn.Byte  (table.Rows[i]["LightRow"].ToString());
 				sigElementDef.LightColor      = Color.FromArgb(PIn.Int(table.Rows[i]["LightColor"].ToString()));
-				sigElementDef.SigElementType  = (SignalElementType)PIn.Int(table.Rows[i]["SigElementType"].ToString());
+				sigElementDef.SigElementType  = (OpenDentBusiness.SignalElementType)PIn.Int(table.Rows[i]["SigElementType"].ToString());
 				sigElementDef.SigText         = PIn.String(table.Rows[i]["SigText"].ToString());
 				sigElementDef.Sound           = PIn.String(table.Rows[i]["Sound"].ToString());
 				sigElementDef.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());

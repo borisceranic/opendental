@@ -48,10 +48,10 @@ namespace OpenDentBusiness.Crud{
 				vaccineObs=new VaccineObs();
 				vaccineObs.VaccineObsNum     = PIn.Long  (table.Rows[i]["VaccineObsNum"].ToString());
 				vaccineObs.VaccinePatNum     = PIn.Long  (table.Rows[i]["VaccinePatNum"].ToString());
-				vaccineObs.ValType           = (VaccineObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
-				vaccineObs.IdentifyingCode   = (VaccineObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
+				vaccineObs.ValType           = (OpenDentBusiness.VaccineObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
+				vaccineObs.IdentifyingCode   = (OpenDentBusiness.VaccineObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
 				vaccineObs.ValReported       = PIn.String(table.Rows[i]["ValReported"].ToString());
-				vaccineObs.ValCodeSystem     = (VaccineObsValCodeSystem)PIn.Int(table.Rows[i]["ValCodeSystem"].ToString());
+				vaccineObs.ValCodeSystem     = (OpenDentBusiness.VaccineObsValCodeSystem)PIn.Int(table.Rows[i]["ValCodeSystem"].ToString());
 				vaccineObs.VaccineObsNumGroup= PIn.Long  (table.Rows[i]["VaccineObsNumGroup"].ToString());
 				vaccineObs.UcumCode          = PIn.String(table.Rows[i]["UcumCode"].ToString());
 				vaccineObs.DateObs           = PIn.Date  (table.Rows[i]["DateObs"].ToString());

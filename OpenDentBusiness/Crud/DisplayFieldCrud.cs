@@ -51,7 +51,7 @@ namespace OpenDentBusiness.Crud{
 				displayField.ItemOrder      = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				displayField.Description    = PIn.String(table.Rows[i]["Description"].ToString());
 				displayField.ColumnWidth    = PIn.Int   (table.Rows[i]["ColumnWidth"].ToString());
-				displayField.Category       = (DisplayFieldCategory)PIn.Int(table.Rows[i]["Category"].ToString());
+				displayField.Category       = (OpenDentBusiness.DisplayFieldCategory)PIn.Int(table.Rows[i]["Category"].ToString());
 				displayField.ChartViewNum   = PIn.Long  (table.Rows[i]["ChartViewNum"].ToString());
 				retVal.Add(displayField);
 			}

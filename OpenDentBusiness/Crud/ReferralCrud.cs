@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				referral.MName          = PIn.String(table.Rows[i]["MName"].ToString());
 				referral.SSN            = PIn.String(table.Rows[i]["SSN"].ToString());
 				referral.UsingTIN       = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
-				referral.Specialty      = (DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				referral.Specialty      = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
 				referral.ST             = PIn.String(table.Rows[i]["ST"].ToString());
 				referral.Telephone      = PIn.String(table.Rows[i]["Telephone"].ToString());
 				referral.Address        = PIn.String(table.Rows[i]["Address"].ToString());

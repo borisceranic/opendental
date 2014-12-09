@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				account=new Account();
 				account.AccountNum  = PIn.Long  (table.Rows[i]["AccountNum"].ToString());
 				account.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				account.AcctType    = (AccountType)PIn.Int(table.Rows[i]["AcctType"].ToString());
+				account.AcctType    = (OpenDentBusiness.AccountType)PIn.Int(table.Rows[i]["AcctType"].ToString());
 				account.BankNumber  = PIn.String(table.Rows[i]["BankNumber"].ToString());
 				account.Inactive    = PIn.Bool  (table.Rows[i]["Inactive"].ToString());
 				account.AccountColor= Color.FromArgb(PIn.Int(table.Rows[i]["AccountColor"].ToString()));
