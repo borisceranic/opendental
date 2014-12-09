@@ -20,6 +20,7 @@ namespace OpenDental.ReportingComplex {
 		private string _columnNameToSplitOn;
 		private string _stringQuery;
 		private DataTable _reportTable;
+		private DataTable _exportTable;
 		private List<int> _rowHeightValues;
 		private List<string> _listEnumNames;
 		private Dictionary<long,string> _dictDefNames;
@@ -65,6 +66,15 @@ namespace OpenDental.ReportingComplex {
 			}
 			set {
 				_reportTable=value;
+			}
+		}
+
+		public DataTable ExportTable {
+			get {
+				return _exportTable;
+			}
+			set {
+				_exportTable=value;
 			}
 		}
 
@@ -176,6 +186,7 @@ namespace OpenDental.ReportingComplex {
 			_queryWidth=0;
 			_suppressHeaders=true;
 			_isLastSplit=true;
+			_exportTable=new DataTable();
 			grfx.Dispose();
 		}
 
@@ -200,6 +211,7 @@ namespace OpenDental.ReportingComplex {
 			_queryWidth=0;
 			_suppressHeaders=true;
 			_isLastSplit=true;
+			_exportTable=new DataTable();
 			grfx.Dispose();
 		}
 
@@ -283,6 +295,7 @@ namespace OpenDental.ReportingComplex {
 					,SummaryOperation.Sum,dataField
 					,fontFooter,textAlign,formatString));
 			}
+			_exportTable.Columns.Add(dataField);
 			grfx.Dispose();
 			return;
 		}
@@ -464,6 +477,14 @@ namespace OpenDental.ReportingComplex {
 				}
 				_rowHeightValues.Add(rowHeight);
 			}
+			DataRow row;
+			for(int i=0;i<_reportTable.Rows.Count;i++) {
+				row=_exportTable.NewRow();
+				for(int j=0;j<_exportTable.Columns.Count;j++) {
+					row[j]=_reportTable.Rows[i][j];
+				}
+				_exportTable.Rows.Add(row);
+			}
 			g.Dispose();
 			return true;
 		}
@@ -581,6 +602,11 @@ namespace OpenDental.ReportingComplex {
 			//We only care about column headers at this point.  There is no easy way to copy an entire DataTable.
 			for(int i=0;i<this.ReportTable.Columns.Count;i++) {
 				queryObj._reportTable.Columns.Add(new DataColumn(this.ReportTable.Columns[i].ColumnName));
+			}
+			queryObj._exportTable=new DataTable();
+			//We only care about column headers at this point.  There is no easy way to copy an entire DataTable.
+			for(int i=0;i<this._exportTable.Columns.Count;i++) {
+				queryObj._exportTable.Columns.Add(new DataColumn(this._exportTable.Columns[i].ColumnName));
 			}
 			List<string> enumNamesNew=new List<string>();
 			if(this._listEnumNames!=null) {

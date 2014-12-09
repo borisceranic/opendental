@@ -293,6 +293,14 @@ namespace OpenDental.ReportingComplex
 			if(pd2.DefaultPageSettings.PrintableArea.Height==0) {
 				pd2.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
 			}
+			foreach(ReportObject reportObject in MyReport.ReportObjects) {
+				if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
+					QueryObject queryObject=(QueryObject)reportObject;
+					if(queryObject.IsPrinted==true) {
+						queryObject.IsPrinted=false;
+					}
+				}
+			}
 		}
 
 		private void ToolBarMain_ButtonClick(object sender, OpenDental.UI.ODToolBarButtonClickEventArgs e) {
@@ -1042,61 +1050,83 @@ namespace OpenDental.ReportingComplex
 		}
 
 		private void OnExport_Click(){
-			//SaveFileDialog saveFileDialog2=new SaveFileDialog();
-			//saveFileDialog2.AddExtension=true;
-			////saveFileDialog2.Title=Lan.g(this,"Select Folder to Save File To");
-			//saveFileDialog2.FileName=MyReport.ReportName+".txt";
-			//if(!Directory.Exists(PrefC.GetString(PrefName.ExportPath))){
-			//	try{
-			//		Directory.CreateDirectory(PrefC.GetString(PrefName.ExportPath));
-			//		saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
-			//	}
-			//	catch{
-			//		//initialDirectory will be blank
-			//	}
-			//}
-			//else{
-			//	saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
-			//}
-			////saveFileDialog2.DefaultExt="txt";
-			//saveFileDialog2.Filter="Text files(*.txt)|*.txt|Excel Files(*.xls)|*.xls|All files(*.*)|*.*";
-			//saveFileDialog2.FilterIndex=0;
-			//if(saveFileDialog2.ShowDialog()!=DialogResult.OK){
-			//	return;
-			//}
-			//try{
-			//	using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false)){
-			//		String line="";  
-			//		for(int i=0;i<MyReport.ReportTables.Columns.Count;i++){
-			//			line+=MyReport.ReportTables.Columns[i].Caption;
-			//			if(i<MyReport.ReportTables.Columns.Count-1){
-			//				line+="\t";
-			//			}
-			//		}
-			//		sw.WriteLine(line);
-			//		string cell;
-			//		for(int i=0;i<MyReport.ReportTables.Rows.Count;i++){
-			//			line="";
-			//			for(int j=0;j<MyReport.ReportTables.Columns.Count;j++){
-			//				cell=MyReport.ReportTables.Rows[i][j].ToString();
-			//				cell=cell.Replace("\r","");
-			//				cell=cell.Replace("\n","");
-			//				cell=cell.Replace("\t","");
-			//				cell=cell.Replace("\"","");
-			//				line+=cell;
-			//				if(j<MyReport.ReportTables.Columns.Count-1){
-			//					line+="\t";
-			//				}
-			//			}
-			//			sw.WriteLine(line);
-			//		}
-			//	}//using
-			//}
-			//catch{
-			//	MessageBox.Show(Lan.g(this,"File in use by another program.  Close and try again."));
-			//	return;
-			//}
-			//MessageBox.Show(Lan.g(this,"File created successfully"));
+			SaveFileDialog saveFileDialog2=new SaveFileDialog();
+			saveFileDialog2.AddExtension=true;
+			//saveFileDialog2.Title=Lan.g(this,"Select Folder to Save File To");
+			saveFileDialog2.FileName=MyReport.ReportName+".txt";
+			if(!Directory.Exists(PrefC.GetString(PrefName.ExportPath))) {
+				try {
+					Directory.CreateDirectory(PrefC.GetString(PrefName.ExportPath));
+					saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
+				}
+				catch {
+					//initialDirectory will be blank
+				}
+			}
+			else {
+				saveFileDialog2.InitialDirectory=PrefC.GetString(PrefName.ExportPath);
+			}
+			//saveFileDialog2.DefaultExt="txt";
+			saveFileDialog2.Filter="Text files(*.txt)|*.txt|Excel Files(*.xls)|*.xls|All files(*.*)|*.*";
+			saveFileDialog2.FilterIndex=0;
+			if(saveFileDialog2.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			try {
+				using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false)) {
+					String line="";
+					foreach(ReportObject reportObject in MyReport.ReportObjects) {
+						if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
+							QueryObject query=(QueryObject)reportObject;
+							line=query.GetGroupTitle().StaticText;
+							sw.WriteLine(line);
+							line="";
+							for(int i=0;i<query.ExportTable.Columns.Count;i++) {
+								line+=query.ExportTable.Columns[i].Caption;
+								if(i<query.ExportTable.Columns.Count-1) {
+									line+="\t";
+								}
+							}
+							sw.WriteLine(line);
+							string cell;
+							for(int i=0;i<query.ExportTable.Rows.Count;i++) {
+								line="";
+								for(int j=0;j<query.ExportTable.Columns.Count;j++) {
+									cell=query.ExportTable.Rows[i][j].ToString();
+									cell=cell.Replace("\r","");
+									cell=cell.Replace("\n","");
+									cell=cell.Replace("\t","");
+									cell=cell.Replace("\"","");
+									line+=cell;
+									if(j<query.ExportTable.Columns.Count-1) {
+										line+="\t";
+									}
+								}
+								sw.WriteLine(line);
+							}
+							int columnValue=-1;
+							line="";
+							foreach(ReportObject reportObjQuery in query.ReportObjects) {
+								if(reportObjQuery.SectionName=="Group Footer" && reportObjQuery.Name.Contains("Footer")) {
+									if(columnValue==-1) {
+										columnValue=query.ArrDataFields.IndexOf(reportObjQuery.SummarizedField);
+										for(int i=0;i<columnValue;i++) {
+											line+=" \t";
+										}
+									}
+									line+=reportObjQuery.GetSummaryValue(query.ExportTable,query.ArrDataFields.IndexOf(reportObjQuery.SummarizedField)).ToString(reportObjQuery.StringFormat)+"\t";
+								}
+							}
+							sw.WriteLine(line);
+						}
+					}
+				}//using
+			}
+			catch {
+				MessageBox.Show(Lan.g(this,"File in use by another program.  Close and try again."));
+				return;
+			}
+			MessageBox.Show(Lan.g(this,"File created successfully"));
 		}
 
 		private void OnClose_Click() {
