@@ -244,10 +244,10 @@ namespace OpenDental {
 				newMeasureEvent.DateTEvent=DateTime.Now;
 				newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDr;
 				newMeasureEvent.PatNum=PatCur.PatNum;
-				long fkey=EhrMeasureEvents.Insert(newMeasureEvent);
+				newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+				EhrMeasureEvents.Insert(newMeasureEvent);
 				newMeasureEvent=new EhrMeasureEvent();
 				newMeasureEvent.DateTEvent=DateTime.Now;
-				newMeasureEvent.FKey=fkey;
 				newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
 				newMeasureEvent.PatNum=PatCur.PatNum;
 				newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
