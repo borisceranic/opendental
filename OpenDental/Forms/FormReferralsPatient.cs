@@ -415,8 +415,8 @@ namespace OpenDental{
 						msgWebMail.PatNum=PatCur.PatNum;//Adding patient number
 						msgWebMail.SentOrReceived=EmailSentOrReceived.WebMailSent;//Setting to sent
 						msgWebMail.ProvNumWebMail=prov.ProvNum;//Adding provider number
-						msgWebMail.Subject="Summary of Care Snapshot for Referral.";//Subject is Summary of Care
-						msgWebMail.BodyText="Summary of Care for "+prov.GetFormalName()+".\r\nTo view the clinical summary:\r\n1) Download all attachments to the same folder.  Do not rename the files.\r\n2) Open the ccd.xml file in an internet browser.";//Body is Summary of Care
+						msgWebMail.Subject="Referral Generated for "+FormRS.SelectedReferral.Title+" "+FormRS.SelectedReferral.FName+" "+FormRS.SelectedReferral.LName;//Subject is Summary of Care
+						msgWebMail.BodyText="To view the Summary of Care:\r\n1) Download all attachments to the same folder.  Do not rename the files.\r\n2) Open the ccd.xml file in an internet browser.";//Body is Summary of Care
 						msgWebMail.MsgDateTime=DateTime.Now;//Message time is now
 						msgWebMail.PatNumSubj=PatCur.PatNum;//Subject of the message is current patient
 						string ccd="";
