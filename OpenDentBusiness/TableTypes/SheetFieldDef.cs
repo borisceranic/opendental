@@ -51,6 +51,33 @@ namespace OpenDentBusiness{
 		public int TabOrder;
 		///<summary>Allows reporting on misc fields.</summary>
 		public string ReportableName;
+		///<summary>Foreign key to other tables. Used for sheetGridDef.SheetGridDefNum.</summary>
+		public long FKey;
+		///<summary>Text Alignment for text fields.</summary>
+		public System.Windows.Forms.HorizontalAlignment TextAlign;
+		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
+		public bool IsPaymentOption;
+		///<summary>Text color, line color, rectangle color.</summary>
+		public Color ItemColor;
+		///<summary>See GridDef property below.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		private SheetGridDef _gridDef;
+
+		///<summary>Used to store the gridDef in memory for use in the edit sheet window and elsewhere. This allows the field to be used without having to be saved to DB.</summary>
+		public SheetGridDef GridDef {
+			get {
+				if(_gridDef==null) {
+					_gridDef=SheetGridDefs.GetOne(FKey);
+				}
+				if(_gridDef==null) {
+					_gridDef=new SheetGridDef();
+				}
+				return _gridDef;
+			}
+			set {
+				_gridDef=value;
+			}
+		}
 
 		public SheetFieldDef(){//required for use as a generic.
 			RadioButtonGroup="";
@@ -159,8 +186,20 @@ namespace OpenDentBusiness{
 		}
 
 		public static SheetFieldDef NewSpecial(int xPos,int yPos,int width,int height) {
-			return new SheetFieldDef(SheetFieldType.Special,"","",0,"",false,
+			return new SheetFieldDef(SheetFieldType.Special,"","",0,"Calibri",false,
 				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+		}
+
+		public static SheetFieldDef NewGrid(int xPos,int yPos,int width,int height, SheetGridType type) {
+			SheetFieldDef retVal=new SheetFieldDef(SheetFieldType.Grid,"","",8.5f,"",false,
+				xPos,yPos,width,height,GrowthBehaviorEnum.DownGlobal,"");
+			retVal.GridDef.GridType=type;
+			switch(type) {
+				case SheetGridType.StatementMain:
+					retVal.GridDef.Columns=SheetGridDefs.GetColumnsAvailable(type);//starts with all columns by default.
+					break;
+			}
+			return retVal;
 		}
 
 		///<Summary>Should only be called after FieldValue has been set, due to GrowthBehavior.</Summary>

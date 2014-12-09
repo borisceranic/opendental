@@ -40,7 +40,7 @@ namespace OpenDentBusiness{
 		public int YPos;
 		///<summary>The field will be constrained horizontally to this size.  Not allowed to be zero.</summary>
 		public int Width;
-		///<summary>The field will be constrained vertically to this size.  Not allowed to be 0.  It's not allowed to be zero so that it will be visible on the designer.</summary>
+		///<summary>The field will be constrained vertically to this size.  Not allowed to be stored as 0.  It's not allowed to be zero so that it will be visible on the designer. Set to 0 in memory by SheetUtil.CalculateHeights if image is innacessible for printing.</summary>
 		public int Height;
 		///<summary>Enum:GrowthBehaviorEnum</summary>
 		public GrowthBehaviorEnum GrowthBehavior;
@@ -54,6 +54,16 @@ namespace OpenDentBusiness{
 		public int TabOrder;
 		///<summary>Allows reporting on misc fields.</summary>
 		public string ReportableName;
+		///<summary>Foreign key to other tables. Used for sheetGrid.SheetGridNum</summary>
+		public long FKey;
+		///<summary>Text Alignment for text fields.</summary>
+		public System.Windows.Forms.HorizontalAlignment TextAlign;
+		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
+		public bool IsPaymentOption;
+		///<summary>Text color, line color, rectangle color.</summary>
+		public Color ItemColor;
+
+
 				
 		public SheetField Copy(){
 			return (SheetField)this.MemberwiseClone();
