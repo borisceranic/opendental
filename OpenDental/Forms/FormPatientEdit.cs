@@ -214,6 +214,10 @@ namespace OpenDental{
 			Controls.Add(listSites);
 			listSites.BringToFront();
 			Lan.F(this);
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				labelST.Text="ST, Country";
+				textCountry.Visible=true;
+			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelSSN.Text="SIN";
 				labelZip.Text="Postal Code";
@@ -503,7 +507,7 @@ namespace OpenDental{
 			this.labelST.Name = "labelST";
 			this.labelST.Size = new System.Drawing.Size(188, 14);
 			this.labelST.TabIndex = 0;
-			this.labelST.Text = "ST, Country";
+			this.labelST.Text = "ST";
 			this.labelST.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// labelZip
@@ -1068,6 +1072,7 @@ namespace OpenDental{
 			this.textCountry.Name = "textCountry";
 			this.textCountry.Size = new System.Drawing.Size(192, 20);
 			this.textCountry.TabIndex = 7;
+			this.textCountry.Visible = false;
 			this.textCountry.TextChanged += new System.EventHandler(this.textState_TextChanged);
 			// 
 			// groupNotes
@@ -2260,10 +2265,6 @@ namespace OpenDental{
 				if(HL7Defs.GetOneDeepEnabled().ShowDemographics==HL7ShowDemographics.Show) {//If show, then not edit so disable OK button
 					butOK.Enabled=false;
 				}
-			}
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				labelST.Text="ST";
-				textCountry.Visible=false;
 			}
 		}
 
