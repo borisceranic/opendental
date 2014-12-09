@@ -261,7 +261,7 @@ using System.Drawing;"+rn);
 				}
 				//no special treatment for specialType clob
 				else if(fieldsInDb[f].FieldType.IsEnum) {
-					strb.Append("("+fieldsInDb[f].FieldType.Name+")PIn.Int(");
+					strb.Append("("+fieldsInDb[f].FieldType.ToString()+")PIn.Int(");//.ToString() instead of .Name to get fully qualified name
 				}
 				else switch(fieldsInDb[f].FieldType.Name) {
 					default:
