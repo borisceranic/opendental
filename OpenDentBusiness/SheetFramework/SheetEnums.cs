@@ -34,7 +34,9 @@ namespace OpenDentBusiness {
 		///<Summary>13-Requires SheetParameter for PatNum.</Summary>
 		ExamSheet,
 		///<summary>14-Requires SheetParameter for PatNum.</summary>
-		DepositSlip
+		DepositSlip,
+		///<summary>15-Requires SheetParameter for PatNum.</summary>
+		Statement
 		/*StatementHeader,
 		TxPlanHeader,
 		Postcard*/
@@ -74,7 +76,8 @@ namespace OpenDentBusiness {
 		///<Summary>10-An image specific to one patient.</Summary>
 		PatImage,
 		///<Summary>11-Special: Currently only used for Toothgrid</Summary>
-		Special
+		Special,
+		Grid
 		//<summary></summary>
 		//RadioButton
 		
