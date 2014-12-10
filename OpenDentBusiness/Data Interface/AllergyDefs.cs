@@ -32,7 +32,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<AllergyDef>(MethodBase.GetCurrentMethod(),allergyDescription);
 			}
-			string command="SELECT * FROM allergyDef WHERE Description='"+POut.String(allergyDescription)+"'";
+			string command="SELECT * FROM allergydef WHERE Description='"+POut.String(allergyDescription)+"'";
 			List<AllergyDef> retVal=Crud.AllergyDefCrud.SelectMany(command);
 			if(retVal.Count>0) {
 				return retVal[0];
@@ -203,7 +203,7 @@ namespace OpenDentBusiness{
 			if(codeValue=="") {
 				return null;
 			}
-			string command="SELECT * FROM allergyDef WHERE SnomedAllergyTo="+POut.String(codeValue);
+			string command="SELECT * FROM allergydef WHERE SnomedAllergyTo="+POut.String(codeValue);
 			return Crud.AllergyDefCrud.SelectOne(command);
 		}
 
@@ -215,7 +215,7 @@ namespace OpenDentBusiness{
 			if(medicationNum==0) {
 				return null;
 			}
-			string command="SELECT * FROM allergyDef WHERE MedicationNum="+POut.Long(medicationNum);
+			string command="SELECT * FROM allergydef WHERE MedicationNum="+POut.Long(medicationNum);
 			return Crud.AllergyDefCrud.SelectOne(command);
 		}
 
