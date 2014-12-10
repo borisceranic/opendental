@@ -31,6 +31,7 @@ namespace OpenDental {
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
 			textHeight.Text=SheetFieldDefCur.Height.ToString();
+			checkPmtOpt.Checked=SheetFieldDefCur.IsPaymentOption;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -51,6 +52,7 @@ namespace OpenDental {
 			SheetFieldDefCur.YPos=PIn.Int(textYPos.Text);
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
+			SheetFieldDefCur.IsPaymentOption=checkPmtOpt.Checked;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;
 		}

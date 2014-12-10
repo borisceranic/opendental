@@ -102,6 +102,7 @@ namespace OpenDental {
 		private void FillImage(){
 			textFullPath.Text=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),comboFieldName.Text);
 			if(File.Exists(textFullPath.Text)){
+				GC.Collect();
 				try {
 					pictureBox.Image=Image.FromFile(textFullPath.Text);
 				}
@@ -220,6 +221,7 @@ namespace OpenDental {
 				return;
 			}
 			if(comboFieldName.Text!="Patient Info.gif") {
+				GC.Collect();
 				try {//catch valid files that are not valid images.
 					Image.FromFile(textFullPath.Text);
 				}

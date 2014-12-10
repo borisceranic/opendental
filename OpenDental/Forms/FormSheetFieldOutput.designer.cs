@@ -28,6 +28,8 @@ namespace OpenDental{
 			this.listFields = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.comboTextAlign = new System.Windows.Forms.ComboBox();
+			this.label10 = new System.Windows.Forms.Label();
 			this.checkFontIsBold = new System.Windows.Forms.CheckBox();
 			this.textFontSize = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -46,6 +48,9 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
+			this.checkPmtOpt = new System.Windows.Forms.CheckBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.butColor = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -77,6 +82,10 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.label11);
+			this.groupBox1.Controls.Add(this.butColor);
+			this.groupBox1.Controls.Add(this.comboTextAlign);
+			this.groupBox1.Controls.Add(this.label10);
 			this.groupBox1.Controls.Add(this.checkFontIsBold);
 			this.groupBox1.Controls.Add(this.textFontSize);
 			this.groupBox1.Controls.Add(this.label4);
@@ -84,10 +93,28 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Location = new System.Drawing.Point(188, 60);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(283, 95);
+			this.groupBox1.Size = new System.Drawing.Size(283, 148);
 			this.groupBox1.TabIndex = 88;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Font";
+			// 
+			// comboTextAlign
+			// 
+			this.comboTextAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboTextAlign.FormattingEnabled = true;
+			this.comboTextAlign.Location = new System.Drawing.Point(80, 117);
+			this.comboTextAlign.Name = "comboTextAlign";
+			this.comboTextAlign.Size = new System.Drawing.Size(197, 21);
+			this.comboTextAlign.TabIndex = 111;
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(3, 118);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(78, 16);
+			this.label10.TabIndex = 110;
+			this.label10.Text = "Align";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkFontIsBold
 			// 
@@ -135,7 +162,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(197, 201);
+			this.label5.Location = new System.Drawing.Point(197, 243);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 90;
@@ -144,7 +171,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(197, 227);
+			this.label6.Location = new System.Drawing.Point(197, 269);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 92;
@@ -153,7 +180,7 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(197, 253);
+			this.label7.Location = new System.Drawing.Point(197, 295);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -162,7 +189,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(197, 279);
+			this.label8.Location = new System.Drawing.Point(197, 321);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -173,14 +200,14 @@ namespace OpenDental{
 			// 
 			this.comboGrowthBehavior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboGrowthBehavior.FormattingEnabled = true;
-			this.comboGrowthBehavior.Location = new System.Drawing.Point(268, 172);
+			this.comboGrowthBehavior.Location = new System.Drawing.Point(268, 214);
 			this.comboGrowthBehavior.Name = "comboGrowthBehavior";
 			this.comboGrowthBehavior.Size = new System.Drawing.Size(197, 21);
 			this.comboGrowthBehavior.TabIndex = 99;
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(161, 173);
+			this.label9.Location = new System.Drawing.Point(161, 215);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(107, 16);
 			this.label9.TabIndex = 98;
@@ -189,7 +216,7 @@ namespace OpenDental{
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(268, 278);
+			this.textHeight.Location = new System.Drawing.Point(268, 320);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = -100;
 			this.textHeight.Name = "textHeight";
@@ -198,7 +225,7 @@ namespace OpenDental{
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(268, 252);
+			this.textWidth.Location = new System.Drawing.Point(268, 294);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = -100;
 			this.textWidth.Name = "textWidth";
@@ -207,7 +234,7 @@ namespace OpenDental{
 			// 
 			// textYPos
 			// 
-			this.textYPos.Location = new System.Drawing.Point(268, 226);
+			this.textYPos.Location = new System.Drawing.Point(268, 268);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
@@ -216,7 +243,7 @@ namespace OpenDental{
 			// 
 			// textXPos
 			// 
-			this.textXPos.Location = new System.Drawing.Point(268, 200);
+			this.textXPos.Location = new System.Drawing.Point(268, 242);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
@@ -270,10 +297,41 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
+			// checkPmtOpt
+			// 
+			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPmtOpt.Location = new System.Drawing.Point(164, 346);
+			this.checkPmtOpt.Name = "checkPmtOpt";
+			this.checkPmtOpt.Size = new System.Drawing.Size(119, 20);
+			this.checkPmtOpt.TabIndex = 236;
+			this.checkPmtOpt.Text = "Is Payment Option";
+			this.checkPmtOpt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label11
+			// 
+			this.label11.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.label11.Location = new System.Drawing.Point(7, 93);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(71, 16);
+			this.label11.TabIndex = 242;
+			this.label11.Text = "Color";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butColor
+			// 
+			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+			this.butColor.Location = new System.Drawing.Point(80, 91);
+			this.butColor.Name = "butColor";
+			this.butColor.Size = new System.Drawing.Size(30, 20);
+			this.butColor.TabIndex = 241;
+			this.butColor.Click += new System.EventHandler(this.butColor_Click);
+			// 
 			// FormSheetFieldOutput
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(507, 412);
+			this.Controls.Add(this.checkPmtOpt);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.comboGrowthBehavior);
 			this.Controls.Add(this.label9);
@@ -327,5 +385,10 @@ namespace OpenDental{
 		private System.Windows.Forms.ComboBox comboGrowthBehavior;
 		private System.Windows.Forms.Label label9;
 		private OpenDental.UI.Button butDelete;
+		private System.Windows.Forms.ComboBox comboTextAlign;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.CheckBox checkPmtOpt;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.Button butColor;
 	}
 }

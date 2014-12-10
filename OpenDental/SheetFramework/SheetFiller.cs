@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Text;
 using OpenDentBusiness;
 using System.Text.RegularExpressions;
+using System.Data;
 
 namespace OpenDental{
 	public class SheetFiller {
@@ -85,6 +86,11 @@ namespace OpenDental{
 				case SheetTypeEnum.DepositSlip:
 					deposit=Deposits.GetOne((long)GetParamByName(sheet,"DepositNum").ParamValue);
 					FillFieldsForDepositSlip(sheet,deposit);
+					break;
+				case SheetTypeEnum.Statement:
+					pat=Patients.GetPat(sheet.PatNum);
+					//deposit=Deposits.GetOne((long)GetParamByName(sheet,"DepositNum").ParamValue);
+					FillFieldsForStatement(sheet);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -1939,6 +1945,504 @@ namespace OpenDental{
 				}
 			}
 		}
+
+		private static void FillFieldsForStatement(Sheet sheet) {
+			Patient pat=Patients.GetPat(sheet.PatNum);
+			Patient PatGuar=Patients.GetPat(pat.Guarantor);
+			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
+			SheetArgs a=sheet.GArgs;
+			DataSet dataSet=AccountModules.GetAccount(a.PatNum,a.FromDate,a.ToDate,a.Intermingled,a.SinglePatient,a.StatementNum,a.ShowProcBreakdown,a.ShowPayNotes,a.IsInvoice,a.ShowAdjNotes,true);
+			DataTable tableAppt=dataSet.Tables["appts"];
+			if(tableAppt==null){
+				tableAppt=new DataTable();	
+			}
+			foreach(SheetField field in sheet.SheetFields) {
+				switch(field.FieldName) {
+					case "Account Number":
+						#region Account Number
+						field.FieldValue=Lan.g("Statements","Account Number")+" ";
+						if(PrefC.GetBool(PrefName.StatementAccountsUseChartNumber)) {
+							field.FieldValue+=PatGuar.ChartNumber;
+						}
+						else {
+							field.FieldValue+=PatGuar.PatNum;
+						}
+						#endregion
+						break;
+					case "Future Appointments":
+						#region Future Appointments
+						if(!Stmt.IsReceipt && !Stmt.IsInvoice) {
+							if(tableAppt.Rows.Count>0) {
+								field.FieldValue=Lan.g("Statements","Scheduled Appointments:");
+							}
+							for(int i=0;i<tableAppt.Rows.Count;i++) {
+								field.FieldValue+="\r\n"+tableAppt.Rows[i]["descript"].ToString();
+							}
+						}
+						#endregion
+						break;
+					case "Bold Note":
+						field.FieldValue=sheet.GArgs.BoldNote;
+						if(field.FieldValue==null) {
+							field.FieldValue="";
+						}
+						break;
+					case "Note":
+						field.FieldValue=sheet.GArgs.NormNote;
+						if(field.FieldValue==null) {
+							field.FieldValue="";
+						}
+						break;
+					case "Total.label":
+						field.FieldValue=totInsBalLabsHelper(sheet)[0];
+						break;
+					case "InsEst.label":
+						field.FieldValue=totInsBalLabsHelper(sheet)[1];
+						break;
+					case "Balance.label":
+						field.FieldValue=totInsBalLabsHelper(sheet)[2];
+						break;
+					case "Total.value":
+						field.FieldValue=totInsBalValsHelper(sheet)[0];
+						break;
+					case "InsEst.value":
+						field.FieldValue=totInsBalValsHelper(sheet)[1];
+						break;
+					case "Balance.value":
+						field.FieldValue=totInsBalValsHelper(sheet)[2];
+						break;
+					case "AmountDue.value":
+						try {
+							field.FieldValue=SheetGridDefs.GetDataTableForGridType(SheetGridType.StatementEnclosed,a).Rows[0][0].ToString();
+						}
+						catch {
+							field.FieldValue=0.ToString("c");
+						}
+						break;
+					case "PayPlanAmtDue.value":
+						DataTable tableMisc=AccountModules.GetStatementDataSet(Statements.CreateObject(sheet.GArgs.StatementNum)).Tables["misc"];
+						if(tableMisc==null){
+							tableMisc=new DataTable();	
+						}
+						Double payPlanDue=0;
+						for(int m=0;m<tableMisc.Rows.Count;m++) {
+							if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue") {
+								payPlanDue=PIn.Double(tableMisc.Rows[m]["value"].ToString());
+							}
+						}
+						field.FieldValue=payPlanDue.ToString("c");
+						break;
+					case "Sta/Rec/Inv":
+						#region Sta/Rec/Inv
+						if(sheet.GArgs.IsInvoice) {
+							if(CultureInfo.CurrentCulture.Name=="en-NZ" || CultureInfo.CurrentCulture.Name=="en-AU") {//New Zealand and Australia
+								field.FieldValue=Lan.g("Statments","TAX INVOICE");
+							}
+							else {
+								field.FieldValue=Lan.g("Statments","INVOICE")+" #"+Stmt.StatementNum.ToString();
+							}
+						}
+						else if(sheet.GArgs.IsReceipt) {
+							field.FieldValue=Lan.g("Statments","RECEIPT");
+							if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+								field.FieldValue+=" #"+Stmt.StatementNum.ToString();
+							}
+						}
+						else {
+							field.FieldValue=Lan.g("Statments","STATEMENT");
+						}
+						#endregion
+						break;
+					case "ReturnAddress":
+						#region ReturnAddress
+						if(!PrefC.GetBool(PrefName.StatementShowReturnAddress)) {
+							field.FieldValue="";
+							break;
+						}
+						#region Practice Address
+						if(!PrefC.GetBool(PrefName.EasyNoClinics) && Clinics.List.Length>0 //if using clinics
+						&& Clinics.GetClinic(PatGuar.ClinicNum)!=null)//and this patient assigned to a clinic
+							{
+							Clinic clinic=Clinics.GetClinic(PatGuar.ClinicNum);
+							field.FieldValue=clinic.Description+"\r\n";
+							if(CultureInfo.CurrentCulture.Name=="en-AU") {//Australia
+								Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+								field.FieldValue+="ABN: "+defaultProv.NationalProvID+"\r\n";
+							}
+							if(CultureInfo.CurrentCulture.Name=="en-NZ") {//New Zealand
+								Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+								field.FieldValue+="GST: "+defaultProv.SSN+"\r\n";
+							}
+							field.FieldValue+=clinic.Address+"\r\n";
+							if(clinic.Address2!="") {
+								field.FieldValue+=clinic.Address2+"\r\n";
+							}
+							if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+								field.FieldValue+=clinic.Zip+" "+clinic.City+"\r\n";
+							}
+							else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+								field.FieldValue+=clinic.City+" "+clinic.Zip+"\r\n";
+							}
+							else {
+								field.FieldValue+=clinic.City+", "+clinic.State+" "+clinic.Zip+"\r\n";
+							}
+							if(clinic.Phone.Length==10) {
+								field.FieldValue+="("+clinic.Phone.Substring(0,3)+")"+clinic.Phone.Substring(3,3)+"-"+clinic.Phone.Substring(6)+"\r\n";
+							}
+							else {
+								field.FieldValue+=clinic.Phone+"\r\n";
+							}
+						}
+						else {//no clinics
+							field.FieldValue=PrefC.GetString(PrefName.PracticeTitle)+"\r\n";
+							if(CultureInfo.CurrentCulture.Name=="en-AU") {//Australia
+								Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+								field.FieldValue+="ABN: "+defaultProv.NationalProvID+"\r\n";
+							}
+							if(CultureInfo.CurrentCulture.Name=="en-NZ") {//New Zealand
+								Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
+								field.FieldValue+="GST: "+defaultProv.SSN+"\r\n";
+							}
+							field.FieldValue+=PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
+							if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
+								field.FieldValue+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
+							}
+							if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+								field.FieldValue+=PrefC.GetString(PrefName.PracticeZip)+" "+PrefC.GetString(PrefName.PracticeCity)+"\r\n";
+							}
+							else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+								field.FieldValue+=PrefC.GetString(PrefName.PracticeCity)+" "+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
+							}
+							else {
+								field.FieldValue+=PrefC.GetString(PrefName.PracticeCity)+", "+PrefC.GetString(PrefName.PracticeST)+" "+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
+							}
+							if(PrefC.GetString(PrefName.PracticePhone).Length==10) {
+								field.FieldValue+="("+PrefC.GetString(PrefName.PracticePhone).Substring(0,3)+")"+PrefC.GetString(PrefName.PracticePhone).Substring(3,3)+"-"+PrefC.GetString(PrefName.PracticePhone).Substring(6)+"\r\n";
+							}
+							else {
+								field.FieldValue+=PrefC.GetString(PrefName.PracticePhone)+"\r\n";
+							}
+						}
+						#endregion
+						#endregion
+						break;
+					case "BillingAddress":
+						#region BillingAddress
+						if(Stmt.SinglePatient){
+							field.FieldValue=pat.GetNameFLnoPref()+"\r\n";
+						}
+						else{
+							field.FieldValue=PatGuar.GetNameFLFormal()+"\r\n";
+						}
+						field.FieldValue+=PatGuar.Address+"\r\n";
+						if(PatGuar.Address2!="") {
+							field.FieldValue+=PatGuar.Address2+"\r\n";
+						}
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+							field.FieldValue+=PatGuar.Zip+" "+PatGuar.City;//no line break
+						}
+						else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+							field.FieldValue+=PatGuar.City+" "+PatGuar.Zip;//no line break
+						}
+						else {
+							field.FieldValue+=PatGuar.City+", "+PatGuar.State+" "+PatGuar.Zip;//no line break
+						}
+						if(PatGuar.Country!="") {
+							field.FieldValue+="\r\n"+PatGuar.Country;
+						}
+						#endregion
+						break;
+					case "PracticeTitle":
+						field.FieldValue=PrefC.GetString(PrefName.PracticeTitle);
+						break;
+					case "Statement.IsCopy":
+						field.FieldValue=(Stmt.IsInvoiceCopy?Lan.g("Statements","COPY"):"");
+						break;
+					case "Statement.IsTaxReceipt":
+						//if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) { field.FieldValue=""; break; }
+						field.FieldValue=(Stmt.IsReceipt?Lan.g("Statements","KEEP THIS RECEIPT FOR INCOME TAX PURPOSES"):"");
+						break;
+					case "PracticeAddress":
+						field.FieldValue=PrefC.GetString(PrefName.PracticeAddress);
+						if(PrefC.GetString(PrefName.PracticeAddress2) != "") {
+							field.FieldValue+="\r\n"+PrefC.GetString(PrefName.PracticeAddress2);
+						}
+						break;
+					case "practiceCityStateZip":
+						field.FieldValue=PrefC.GetString(PrefName.PracticeCity)+", "
+							+PrefC.GetString(PrefName.PracticeST)+"  "
+							+PrefC.GetString(PrefName.PracticeZip);
+						break;
+					case "patient.nameFL":
+						field.FieldValue=pat.GetNameFLFormal();
+						break;
+					#region SwissBanking (Not yet supported)
+				//	case "SwissBanking":
+				//		//Originally only for switzerland. Modified code from FormRpStatement.cs
+				//		if(!CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+				//			field.FieldValue="";
+				//			break;
+				//		}
+				//		//&& pagesPrinted==0)//only on the first page
+				//		//{
+				//		//float yred=744;//768;//660 for testing
+				//		//Red line (just temp)
+				//		//g.DrawLine(Pens.Red,0,yred,826,yred);
+				//		MigraDoc.DocumentObjectModel.Font swfont=MigraDocHelper.CreateFont(10);
+				//		//new Font(FontFamily.GenericSansSerif,10);
+				//		//Bank Address---------------------------------------------------------
+				//		HeaderFooter footer=section.Footers.Primary;
+				//		footer.Format.Borders.Color=Colors.Black;
+				//		//footer.AddParagraph(PrefC.GetString(PrefName.BankAddress"));
+				//		frame=footer.AddTextFrame();
+				//		frame.RelativeVertical=RelativeVertical.Line;
+				//		frame.RelativeHorizontal=RelativeHorizontal.Page;
+				//		frame.MarginLeft=Unit.Zero;
+				//		frame.MarginTop=Unit.Zero;
+				//		frame.Top=TopPosition.Parse("0 in");
+				//		frame.Left=LeftPosition.Parse("0 in");
+				//		frame.Width=Unit.FromInch(8.3);
+				//		frame.Height=300;
+				//		//RectangleF=new RectangleF(0,0,
+				//		MigraDocHelper.DrawString(frame,PrefC.GetString(PrefName.BankAddress),swfont,30,30);
+				//		MigraDocHelper.DrawString(frame,PrefC.GetString(PrefName.BankAddress),swfont,246,30);
+				//		//Office Name and Address----------------------------------------------
+				//		text=PrefC.GetString(PrefName.PracticeTitle)+"\r\n"
+				//+PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
+				//		if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
+				//			text+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
+				//		}
+				//		text+=PrefC.GetString(PrefName.PracticeZip)+" "+PrefC.GetString(PrefName.PracticeCity);
+				//		MigraDocHelper.DrawString(frame,text,swfont,30,89);
+				//		MigraDocHelper.DrawString(frame,text,swfont,246,89);
+				//		//Bank account number--------------------------------------------------
+				//		string origBankNum=PrefC.GetString(PrefName.PracticeBankNumber);//must be exactly 9 digits. 2+6+1.
+				//		//the 6 digit portion might have 2 leading 0's which would not go into the dashed bank num.
+				//		string dashedBankNum="?";
+				//		//examples: 01-200027-2
+				//		//          01-4587-1  (from 010045871)
+				//		if(origBankNum.Length==9) {
+				//			dashedBankNum=origBankNum.Substring(0,2)+"-"
+				//	+origBankNum.Substring(2,6).TrimStart(new char[] { '0' })+"-"
+				//	+origBankNum.Substring(8,1);
+				//		}
+				//		swfont=MigraDocHelper.CreateFont(9,true);
+				//		//new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold);
+				//		MigraDocHelper.DrawString(frame,dashedBankNum,swfont,95,169);
+				//		MigraDocHelper.DrawString(frame,dashedBankNum,swfont,340,169);
+				//		//Amount------------------------------------------------------------
+				//		double amountdue=PatGuar.BalTotal-PatGuar.InsEst;
+				//		text=amountdue.ToString("F2");
+				//		text=text.Substring(0,text.Length-3);
+				//		swfont=MigraDocHelper.CreateFont(10);
+				//		MigraDocHelper.DrawString(frame,text,swfont,new RectangleF(50,205,100,25),ParagraphAlignment.Right);
+				//		MigraDocHelper.DrawString(frame,text,swfont,new RectangleF(290,205,100,25),ParagraphAlignment.Right);
+				//		text=amountdue.ToString("F2");//eg 92.00
+				//		text=text.Substring(text.Length-2,2);//eg 00
+				//		MigraDocHelper.DrawString(frame,text,swfont,185,205);
+				//		MigraDocHelper.DrawString(frame,text,swfont,425,205);
+				//		//Patient Address-----------------------------------------------------
+				//		string patAddress=PatGuar.FName+" "+PatGuar.LName+"\r\n"
+				//+PatGuar.Address+"\r\n";
+				//		if(PatGuar.Address2!="") {
+				//			patAddress+=PatGuar.Address2+"\r\n";
+				//		}
+				//		patAddress+=PatGuar.Zip+" "+PatGuar.City;
+				//		patAddress+=((PatGuar.Country=="")?"":"\r\n"+PatGuar.Country);
+				//		MigraDocHelper.DrawString(frame,text,swfont,495,218);//middle left
+				//		MigraDocHelper.DrawString(frame,text,swfont,30,263);//Lower left
+				//		//Compute Reference#------------------------------------------------------
+				//		//Reference# has exactly 27 digits
+				//		//First 6 numbers are what we are calling the BankRouting number.
+				//		//Next 20 numbers represent the invoice #.
+				//		//27th number is the checksum
+				//		string referenceNum=PrefC.GetString(PrefName.BankRouting);//6 digits
+				//		if(referenceNum.Length!=6) {
+				//			referenceNum="000000";
+				//		}
+				//		referenceNum+=PatGuar.PatNum.ToString().PadLeft(12,'0')
+				////"000000000000"//12 0's
+				//+DateTime.Today.ToString("yyyyMMdd");//+8=20
+				//		//for testing:
+				//		//referenceNum+="09090271100000067534";
+				//		//"00000000000000037112";
+				//		referenceNum+=Modulo10(referenceNum).ToString();
+				//		//at this point, the referenceNum will always be exactly 27 digits long.
+				//		string spacedRefNum=referenceNum.Substring(0,2)+" "+referenceNum.Substring(2,5)+" "+referenceNum.Substring(7,5)
+				//+" "+referenceNum.Substring(12,5)+" "+referenceNum.Substring(17,5)+" "+referenceNum.Substring(22,5);
+				//		//text=spacedRefNum.Substring(0,15)+"\r\n"+spacedRefNum.Substring(16)+"\r\n";
+				//		//reference# at lower left above address.  Small
+				//		swfont=MigraDocHelper.CreateFont(7);
+				//		MigraDocHelper.DrawString(frame,spacedRefNum,swfont,30,243);
+				//		//Reference# at upper right---------------------------------------------------------------
+				//		swfont=MigraDocHelper.CreateFont(10);
+				//		MigraDocHelper.DrawString(frame,spacedRefNum,swfont,490,140);
+				//		//Big long number at the lower right--------------------------------------------------
+				//		/*The very long number on the bottom has this format:
+				//		>13 numbers > 27 numbers + 9 numbers >
+				//		>Example: 0100000254306>904483000000000000000371126+ 010045871>
+				//		>
+				//		>The first group of 13 numbers would begin with either 01 or only have 
+				//		>042 without any other following numbers.  01 would be used if there is 
+				//		>a specific amount, and 042 would be used if there is not a specific 
+				//		>amount billed. So in the example, the billed amount is 254.30.  It has 
+				//		>01 followed by leading zeros to fill in the balance of the digits 
+				//		>required.  The last digit is a checksum done by the program.  If the 
+				//		>amount would be 1,254.30 then the example should read 0100001254306.
+				//		>
+				//		>There is a > separator, then the reference number made up previously.
+				//		>
+				//		>Then a + separator, followed by the bank account number.  Previously, 
+				//		>the number printed without the zeros, but in this case it has the zeros 
+				//		>and not the dashes.*/
+				//		swfont=new MigraDoc.DocumentObjectModel.Font("OCR-B 10 BT",12);
+				//		text="01"+amountdue.ToString("F2").Replace(".","").PadLeft(10,'0');
+				//		text+=Modulo10(text).ToString()+">"
+				//+referenceNum+"+ "+origBankNum+">";
+				//		MigraDocHelper.DrawString(frame,text,swfont,255,345);
+				//		break;
+					#endregion
+					case "patient.address":
+						field.FieldValue=pat.Address;
+						if(pat.Address2!="") {
+							field.FieldValue+="\r\n"+pat.Address2;
+						}
+						break;
+					case "patient.cityStateZip":
+						field.FieldValue=pat.City+", "+pat.State+" "+pat.Zip;
+						break;
+					case "Statement.DateSent":
+						field.FieldValue=Stmt.DateSent.ToShortDateString();
+						break;
+					case "patient.salutation":
+						field.FieldValue="Dear "+pat.GetSalutation()+":";
+						break;
+					case "patient.priProvNameFL":
+						field.FieldValue=Providers.GetFormalName(pat.PriProv);
+						break;
+					case "ProviderLegendAUS":
+						#region ProviderLegendAUS
+						//if(CultureInfo.CurrentCulture.Name!="en-AU") {//English (Australia)
+						//	field.FieldValue="";
+						//	break;
+						//}
+						Providers.RefreshCache();
+						field.FieldValue="PROVIDERS:"+"\r\n";
+						for(int i=0;i<ProviderC.ListShort.Count;i++) {//All non-hidden providers are added to the legend.
+							Provider prov=ProviderC.ListShort[i];
+							string suffix="";
+							if(prov.Suffix.Trim()!=""){
+								suffix=", "+prov.Suffix.Trim();
+							}
+							field.FieldValue+=prov.Abbr+" - "+prov.FName+" "+prov.LName+suffix+" - "+prov.MedicaidID+"\r\n";
+						}
+						#endregion
+						break;
+				}
+			}
+		}
+
+		///<summary>Returns three label strings: Total, Insurance, Balance. These labels change based on various settings.</summary>
+		private static string[] totInsBalLabsHelper(Sheet sheet) {
+			string sLine1="";//Total
+			string sLine2="";//InsExt
+			string sLine3="";//Balance
+			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
+			if(Stmt.IsInvoice) {
+				sLine1=Lan.g("Statements","Procedures:");
+				sLine2=Lan.g("Statements","Adjustments:");
+				sLine3=Lan.g("Statements","Total:");
+			}
+			else if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+				sLine1=Lan.g("Statements","Balance:");
+				//sLine2=Lan.g("Statements","Ins Pending:");
+				//sLine3=Lan.g("Statements","After Ins:");
+			}
+			else {//this is more common
+				if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
+					sLine1=Lan.g("Statements","Balance:");
+					sLine2=Lan.g("Statements","-Ins Estimate:");
+					sLine3=Lan.g("Statements","=Owed Now:");
+				}
+				else {
+					sLine1=Lan.g("Statements","Total:");
+					sLine2=Lan.g("Statements","-Ins Estimate:");
+					sLine3=Lan.g("Statements","=Balance:");
+				}
+			}
+			return new string[] { sLine1,sLine2,sLine3 };
+		}
+
+		///<summary>Returns three value strings: Total, Insurance, Balance. These values change based on various settings.</summary>
+		private static string[] totInsBalValsHelper(Sheet sheet) {
+			string sLine1="";//Total
+			string sLine2="";//InsExt
+			string sLine3="";//Balance
+			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
+			DataTable tableAcct;
+			SheetArgs a = sheet.GArgs;//shorthand, does nothing.
+			DataSet dataSet=AccountModules.GetAccount(a.PatNum,a.FromDate,a.ToDate,a.Intermingled,a.SinglePatient,a.StatementNum,a.ShowProcBreakdown,a.ShowPayNotes,a.IsInvoice,a.ShowAdjNotes,true);
+			DataTable tableMisc=dataSet.Tables["misc"];
+			if(tableMisc==null) {
+				tableMisc=new DataTable();
+			}
+			Patient pat=Patients.GetPat(Stmt.PatNum);
+			Patient PatGuar=Patients.GetPat(pat.Guarantor);
+			if(Stmt.IsInvoice) {
+				double adjAmt=0;
+				double procAmt=0;
+				string tableName;
+				for(int i=0;i<dataSet.Tables.Count;i++) {
+					tableAcct=dataSet.Tables[i];
+					tableName=tableAcct.TableName;
+					if(!tableName.StartsWith("account")) {
+						continue;
+					}
+					for(int p=0;p<tableAcct.Rows.Count;p++) {
+						if(tableAcct.Rows[p]["AdjNum"].ToString()!="0") {
+							adjAmt-=PIn.Double(tableAcct.Rows[p]["creditsDouble"].ToString());
+							adjAmt+=PIn.Double(tableAcct.Rows[p]["chargesDouble"].ToString());
+						}
+						else {//must be a procedure
+							procAmt+=PIn.Double(tableAcct.Rows[p]["chargesDouble"].ToString());
+						}
+					}
+				}
+				sLine1+=procAmt.ToString("c");
+				sLine2+=adjAmt.ToString("c");
+				sLine3+=(procAmt+adjAmt).ToString("c");
+			}
+			else if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+				if(Stmt.SinglePatient) {
+					sLine1+=pat.EstBalance.ToString("c");
+				}
+				else {
+					//Show the current family's balance without subtracting insurance estimates.
+					sLine1+=PatGuar.EstBalance.ToString("c");
+				}
+			}
+			else {//more common
+				if(Stmt.SinglePatient) {
+					double patInsEst=0;
+					for(int m=0;m<tableMisc.Rows.Count;m++) {
+						if(tableMisc.Rows[m]["descript"].ToString()=="patInsEst") {
+							patInsEst=PIn.Double(tableMisc.Rows[m]["value"].ToString());
+						}
+					}
+					double patBal=pat.EstBalance-patInsEst;
+					sLine1+=pat.EstBalance.ToString("c");
+					sLine2+=patInsEst.ToString("c");
+					sLine3+=patBal.ToString("c");
+				}
+				else {
+					sLine1+=PatGuar.BalTotal.ToString("c");
+					sLine2+=PatGuar.InsEst.ToString("c");
+					sLine3+=(PatGuar.BalTotal - PatGuar.InsEst).ToString("c");
+				}
+			}
+			return new string[] { sLine1,sLine2,sLine3 };
+		}
+
 
 	}
 }

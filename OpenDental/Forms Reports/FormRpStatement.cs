@@ -394,7 +394,7 @@ namespace OpenDental{
 			Patient PatGuar=fam.ListPats[0];//.Clone();
 			//Patient pat=fam.GetPatient(Stmt.PatNum);
 			DataTable tableMisc=dataSet.Tables["misc"];
-			//HEADING------------------------------------------------------------------------------
+			//HEADING-----------------------------------------------------------------------------------------------------------
 			#region Heading
 			Paragraph par=section.AddParagraph();
 			ParagraphFormat parformat=new ParagraphFormat();
@@ -435,7 +435,7 @@ namespace OpenDental{
 			par.AddFormattedText(text,font);
 			TextFrame frame;
 			#endregion Heading
-			//"COPY" for foreign countries' TAX INVOICES----------------------------------------------
+			//"COPY" for foreign countries' TAX INVOICES------------------------------------------------------------------------
 			#region Tax Invoice Copy
 			if(Stmt.IsInvoiceCopy && CultureInfo.CurrentCulture.Name!="en-US") {//We don't show this for US.
 				font=MigraDocHelper.CreateFont(28,true,System.Drawing.Color.Red);
@@ -452,7 +452,7 @@ namespace OpenDental{
 				par.AddText("COPY");
 			}
 			#endregion Tax Invoice Copy
-			//Practice Address----------------------------------------------------------------------
+			//Practice Address--------------------------------------------------------------------------------------------------
 			#region Practice Address
 			if(PrefC.GetBool(PrefName.StatementShowReturnAddress)) {
 				font=MigraDocHelper.CreateFont(10);
@@ -545,7 +545,7 @@ namespace OpenDental{
 				}
 			}
 			#endregion
-			//AMOUNT ENCLOSED------------------------------------------------------------------------------------------------------
+			//AMOUNT ENCLOSED---------------------------------------------------------------------------------------------------
 			#region Amount Enclosed
 			Table table;
 			Column col;
@@ -616,7 +616,7 @@ namespace OpenDental{
 				par.AddFormattedText(text,font);
 			}
 			#endregion
-			//Credit Card Info--------------------------------------------------------------------------------------------------------
+			//Credit Card Info--------------------------------------------------------------------------------------------------
 			#region Credit Card Info
 			if(!Stmt.HidePayment) {
 				if(PrefC.GetBool(PrefName.StatementShowCreditCard)) {
@@ -667,7 +667,7 @@ namespace OpenDental{
 				}
 			}
 			#endregion
-			//Patient's Billing Address---------------------------------------------------------------------------------------------
+			//Patient's Billing Address-----------------------------------------------------------------------------------------
 			#region Patient Billing Address
 			font=MigraDocHelper.CreateFont(11);
 			frame=MigraDocHelper.CreateContainer(section,62.5f+12.5f,225+1,300,200);
@@ -699,7 +699,9 @@ namespace OpenDental{
 				par.AddLineBreak();
 				par.AddText(PatGuar.Country);
 			}
-			//perforated line------------------------------------------------------------------------------------------------------
+			#endregion
+			//perforated line---------------------------------------------------------------------------------------------------
+			#region Perforated line
 			//yPos=350;//3.62 inches from top, 1/3 page down
 			frame=MigraDocHelper.CreateContainer(section,0,350,850,30);
 			if(!Stmt.HidePayment) {
@@ -738,7 +740,7 @@ namespace OpenDental{
 				par.AddLineBreak();
 			}
 			#endregion
-			//Aging-----------------------------------------------------------------------------------
+			//Aging-------------------------------------------------------------------------------------------------------------
 			#region Aging
 			MigraDocHelper.InsertSpacer(section,275);
 			frame=MigraDocHelper.CreateContainer(section,55,390+legendOffset,250,29);
@@ -839,7 +841,7 @@ namespace OpenDental{
 				gridAging.Dispose();
 			*/
 			#endregion
-			//Floating Balance, Ins info-------------------------------------------------------------------
+			//Floating Balance, Ins info----------------------------------------------------------------------------------------
 			#region FloatingBalance
 			frame=MigraDocHelper.CreateContainer(section,460,380+legendOffset,250,200);
 			//table=MigraDocHelper.DrawTable(frame,0,0,90);
@@ -977,7 +979,7 @@ namespace OpenDental{
 			}
 			MigraDocHelper.InsertSpacer(section, 80);
 			#endregion FloatingBalance
-			//Bold note-------------------------------------------------------------------------------
+			//Bold note---------------------------------------------------------------------------------------------------------
 			#region Bold note
 			if(Stmt.NoteBold!=""){
 				MigraDocHelper.InsertSpacer(section,7);
@@ -988,7 +990,7 @@ namespace OpenDental{
 				MigraDocHelper.InsertSpacer(section,8);
 			}
 			#endregion Bold note
-			//Payment plan grid definition---------------------------------------------------------------------------------
+			//Payment plan grid definition--------------------------------------------------------------------------------------
 			#region PayPlan grid definition
 			ODGridColumn gcol;
 			ODGridRow grow;
@@ -1009,7 +1011,7 @@ namespace OpenDental{
 			gridPP.Width=gridPP.WidthAllColumns+20;
 			gridPP.EndUpdate();
 			#endregion PayPlan grid definition
-			//Payment plan grid.  There will be only one, if any-----------------------------------------------------------------
+			//Payment plan grid.  There will be only one, if any----------------------------------------------------------------
 			#region PayPlan grid
 			DataTable tablePP=dataSet.Tables["payplan"];
 			ODGridCell gcell;
@@ -1057,7 +1059,7 @@ namespace OpenDental{
 				MigraDocHelper.InsertSpacer(section,10);
 			}
 			#endregion PayPlan grid
-			//Body Table definition--------------------------------------------------------------------------------------------------------
+			//Body Table definition---------------------------------------------------------------------------------------------
 			#region Body Table definition
 			ODGrid gridPat = new ODGrid();
 			this.Controls.Add(gridPat);
@@ -1089,7 +1091,8 @@ namespace OpenDental{
 			gridPat.Width=gridPat.WidthAllColumns+20;
 			gridPat.EndUpdate();
 			#endregion Body Table definition
-			//Loop through each table.  Could be one intermingled, or one for each patient-----------------------------------------
+			//Loop through each table.  Could be one intermingled, or one for each patient--------------------------------------
+			#region Main Grid(s)
 			DataTable tableAccount;
 			string tablename;
 			long patnum;
@@ -1202,7 +1205,8 @@ namespace OpenDental{
 				}
 			}
 			gridPat.Dispose();
-			//Future appointments---------------------------------------------------------------------------------------------
+			#endregion
+			//Future appointments-----------------------------------------------------------------------------------------------
 			#region Future appointments
 			if(!Stmt.IsReceipt && !Stmt.IsInvoice) {
 				font=MigraDocHelper.CreateFont(9);
@@ -1221,7 +1225,8 @@ namespace OpenDental{
 				}
 			}
 			#endregion Future appointments
-			//Region specific static notes------------------------------------------------------------------------------------
+			//Region specific static notes--------------------------------------------------------------------------------------
+			#region Region specific static notes i.e. "KEEP THIS RECEIPT FOR INCOME TAX PURPOSES" for Canada
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(Stmt.IsReceipt) {
 					font=MigraDocHelper.CreateFont(9);
@@ -1231,7 +1236,9 @@ namespace OpenDental{
 					MigraDocHelper.InsertSpacer(section,10);
 				}
 			}
-			//Note------------------------------------------------------------------------------------------------------------
+			#endregion
+			//Note--------------------------------------------------------------------------------------------------------------
+			#region Note and Note BOLD
 			font=MigraDocHelper.CreateFont(9);
 			par=section.AddParagraph();
 			par.Format.Font=font;
@@ -1244,6 +1251,8 @@ namespace OpenDental{
 				par.Format.Font=font;
 				par.AddText(Stmt.NoteBold);
 			}
+			#endregion
+			//Swiss Banking-----------------------------------------------------------------------------------------------------
 			#region SwissBanking
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")){//CH is for switzerland. eg de-CH
 				//&& pagesPrinted==0)//only on the first page

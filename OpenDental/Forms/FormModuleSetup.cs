@@ -115,6 +115,7 @@ namespace OpenDental{
 		private CheckBox checkChartNonPatientWarn;
 		private CheckBox checkTreatPlanItemized;
 		private CheckBox checkFamPhiAccess;
+		private CheckBox checkStatmentsUseSheets;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -200,6 +201,7 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
 			this.checkInsDefaultAssignmentOfBenefits = new System.Windows.Forms.CheckBox();
 			this.checkTextMsgOkStatusTreatAsNo = new System.Windows.Forms.CheckBox();
 			this.label15 = new System.Windows.Forms.Label();
@@ -251,7 +253,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
+			this.checkStatmentsUseSheets = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -851,6 +853,17 @@ namespace OpenDental{
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
 			// 
+			// checkFamPhiAccess
+			// 
+			this.checkFamPhiAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkFamPhiAccess.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkFamPhiAccess.Location = new System.Drawing.Point(27, 167);
+			this.checkFamPhiAccess.Name = "checkFamPhiAccess";
+			this.checkFamPhiAccess.Size = new System.Drawing.Size(413, 17);
+			this.checkFamPhiAccess.TabIndex = 206;
+			this.checkFamPhiAccess.Text = "Allow Guarantor access to family health information in patient portal";
+			this.checkFamPhiAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkInsDefaultAssignmentOfBenefits
 			// 
 			this.checkInsDefaultAssignmentOfBenefits.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -898,6 +911,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.checkStatmentsUseSheets);
 			this.tabAccount.Controls.Add(this.checkStoreCCTokens);
 			this.tabAccount.Controls.Add(this.checkAccountShowPaymentNums);
 			this.tabAccount.Controls.Add(this.checkClaimMedTypeIsInstWhenInsPlanIsMedical);
@@ -1462,16 +1476,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkFamPhiAccess
+			// checkStatmentsUseSheets
 			// 
-			this.checkFamPhiAccess.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkFamPhiAccess.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkFamPhiAccess.Location = new System.Drawing.Point(27, 167);
-			this.checkFamPhiAccess.Name = "checkFamPhiAccess";
-			this.checkFamPhiAccess.Size = new System.Drawing.Size(413, 17);
-			this.checkFamPhiAccess.TabIndex = 206;
-			this.checkFamPhiAccess.Text = "Allow Guarantor access to family health information in patient portal";
-			this.checkFamPhiAccess.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkStatmentsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkStatmentsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkStatmentsUseSheets.Location = new System.Drawing.Point(44, 266);
+			this.checkStatmentsUseSheets.Name = "checkStatmentsUseSheets";
+			this.checkStatmentsUseSheets.Size = new System.Drawing.Size(396, 17);
+			this.checkStatmentsUseSheets.TabIndex = 204;
+			this.checkStatmentsUseSheets.Text = "Statments use Sheets";
+			this.checkStatmentsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1613,6 +1627,7 @@ namespace OpenDental{
 			checkClaimsValidateACN.Checked=PrefC.GetBool(PrefName.ClaimsValidateACN);
 			checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked=PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical);
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
+			checkStatmentsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -1879,6 +1894,7 @@ namespace OpenDental{
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
+				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatmentsUseSheets.Checked)
 				)
 			{
 				_changed=true;

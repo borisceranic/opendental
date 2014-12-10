@@ -26,6 +26,7 @@ namespace OpenDental {
 		public bool TerminalListenShut;
 		///<summary>Only used here to draw the dashed margin lines.</summary>
 		private Margins _printMargin=new Margins(0,0,40,60);
+		public bool IsStatment;//Used for statments, do not save a sheet version of the statment.
 
 		public FormSheetFillEdit(Sheet sheet){
 			InitializeComponent();
@@ -73,8 +74,24 @@ namespace OpenDental {
 				panelMain.Width=SheetCur.Width;
 				panelMain.Height=SheetCur.Height;
 			}
+			if(IsStatment) {
+				labelDateTime.Visible=false;
+				textDateTime.Visible=false;
+				labelDescription.Visible=false;
+				textDescription.Visible=false;
+				labelNote.Visible=false;
+				textNote.Visible=false;
+				labelShowInTerminal.Visible=false;
+				textShowInTerminal.Visible=false;
+				butPrint.Visible=false;
+				butPDF.Visible=false;
+				butDelete.Visible=false;
+				butOK.Visible=false;
+				checkErase.Visible=false;
+				butCancel.Text="Close";
+			}
 			//Some controls may be on subsequent pages if the SheetFieldDef is multipage.
-			panelMain.Height=SheetCur.HeightLastField+20;//+20 for Hscrollbar
+			panelMain.Height=Math.Max(SheetCur.HeightPage,SheetCur.HeightLastField+20);//+20 for Hscrollbar
 			textDateTime.Text=SheetCur.DateTimeSheet.ToShortDateString()+" "+SheetCur.DateTimeSheet.ToShortTimeString();
 			textDescription.Text=SheetCur.Description;
 			textNote.Text=SheetCur.InternalNote;
@@ -110,10 +127,23 @@ namespace OpenDental {
 
 		///<summary>Runs as the final step of loading the form, and also immediately after fields are moved down due to growth.</summary>
 		private void LayoutFields() {
+			List<SheetField> fieldsSorted=new List<SheetField>();
+			fieldsSorted.AddRange(SheetCur.SheetFields);//Creates a sortable list that will not change sort order of the original list.
+			fieldsSorted.Sort(SheetFields.SortDrawingOrderLayers);
 			panelMain.Controls.Clear();
 			RichTextBox textbox;//has to be richtextbox due to MS bug that doesn't show cursor.
 			FontStyle style;
 			SheetCheckBox checkbox;
+			//remove fields that shouldn't be drawn
+			#region Remove Hidden Fields
+			if(SheetCur.SheetType== SheetTypeEnum.Statement && !SheetCur.GArgs.ShowPaymentOptions) {
+				for(int i=SheetCur.SheetFields.Count-1;i>=0;i--) {//go backwards to remove elements
+					if(SheetCur.SheetFields[i].IsPaymentOption){
+						SheetCur.SheetFields.RemoveAt(i);
+					}
+				}
+			}
+			#endregion
 			//first, draw images---------------------------------------------------------------------------------------
 			//might change this to only happen once when first loading form:
 			if(pictDraw!=null) {
@@ -134,7 +164,14 @@ namespace OpenDental {
 				pictDraw.Width=SheetCur.Width;
 				pictDraw.Height=SheetCur.Height;
 			}
-			pictDraw.Height=SheetCur.HeightLastField;
+			if(Sheets.CalculatePageCount(SheetCur,_printMargin)==1){
+				pictDraw.Height=SheetCur.HeightPage;//+10 for HScrollBar
+			}
+			else {
+				int pageCount=0;
+				pictDraw.Height=SheetPrinting.bottomCurPage(SheetCur.HeightLastField,SheetCur,out pageCount);
+			}
+			//imgDraw.Dispose();//dispose of old image before setting it to a new image.
 			imgDraw=new Bitmap(pictDraw.Width,pictDraw.Height);
 			pictDraw.Location=new Point(0,0);
 			pictDraw.Image=(Image)imgDraw.Clone();
@@ -174,7 +211,12 @@ namespace OpenDental {
 				textbox.Location=new Point(field.XPos,field.YPos);
 				textbox.Width=field.Width;
 				textbox.ScrollBars=RichTextBoxScrollBars.None;
-				textbox.Text=field.FieldValue;
+				if(field.ItemColor!=Color.FromArgb(0)){
+					textbox.ForeColor=field.ItemColor;
+				}
+				//textbox.Text=field.FieldValue;
+				textbox.SelectionAlignment=field.TextAlign;
+				textbox.SelectedText=field.FieldValue;
 				style=FontStyle.Regular;
 				if(field.FontIsBold) {
 					style=FontStyle.Bold;
@@ -489,17 +531,25 @@ namespace OpenDental {
 					}
 				}
 				if(SheetCur.SheetFields[f].FieldType==SheetFieldType.Line){
-					g.DrawLine(pen2,SheetCur.SheetFields[f].XPos-pictDraw.Left,
+					g.DrawLine((SheetCur.SheetFields[f].ItemColor==Color.FromArgb(0)?pen2:new Pen(SheetCur.SheetFields[f].ItemColor,1))
+						,SheetCur.SheetFields[f].XPos-pictDraw.Left,
 						SheetCur.SheetFields[f].YPos-pictDraw.Top,
 						SheetCur.SheetFields[f].XPos+SheetCur.SheetFields[f].Width-pictDraw.Left,
 						SheetCur.SheetFields[f].YPos+SheetCur.SheetFields[f].Height-pictDraw.Top);
 				}
 				if(SheetCur.SheetFields[f].FieldType==SheetFieldType.Rectangle){
-					g.DrawRectangle(pen2,SheetCur.SheetFields[f].XPos-pictDraw.Left,
+					g.DrawRectangle((SheetCur.SheetFields[f].ItemColor==Color.FromArgb(0)?pen2:new Pen(SheetCur.SheetFields[f].ItemColor,1)),
+						SheetCur.SheetFields[f].XPos-pictDraw.Left,
 						SheetCur.SheetFields[f].YPos-pictDraw.Top,
 						SheetCur.SheetFields[f].Width,
 						SheetCur.SheetFields[f].Height);
 				}
+			}
+			for(int f=0;f<SheetCur.SheetFields.Count;f++) {
+				if(SheetCur.SheetFields[f].FieldType!=SheetFieldType.Grid){
+					continue;
+				}
+				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null);
 			}
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
@@ -507,11 +557,13 @@ namespace OpenDental {
 			Pen pDashMargin=new Pen(Color.Green);
 			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
 			int pageCount=Sheets.CalculatePageCount(SheetCur,_printMargin);
+			int margins=(_printMargin.Top+_printMargin.Bottom);
 			for(int i=1;i<pageCount;i++) {
-				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
-				g.DrawLine(pDashPage,0,i*SheetCur.HeightPage,SheetCur.WidthPage,i*SheetCur.HeightPage);
-				g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage+_printMargin.Top,SheetCur.WidthPage,i*SheetCur.HeightPage+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage-_printMargin.Bottom,SheetCur.WidthPage,i*SheetCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*(SheetCur.HeightPage-margins)+_printMargin.Top,SheetCur.WidthPage,i*(SheetCur.HeightPage-margins)+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetCur.HeightPage+_printMargin.Top,SheetCur.WidthPage,i*SheetCur.HeightPage+_printMargin.Top);
 			}//End Draw Page Break
+			pictDraw.Image.Dispose();
 			pictDraw.Image=img;
 			g.Dispose();
 		}
@@ -530,10 +582,14 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			if(!TryToSaveData()){
+			if(!IsStatment && !TryToSaveData()){
 				return;
 			}
-			SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
+			if(!IsStatment) {
+				SheetArgs gArgs=SheetCur.GArgs;
+				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
+				SheetCur.GArgs=gArgs;
+			}
 			//whether this is a new sheet, or one pulled from the database,
 			//it will have the extra parameter we are looking for.
 			//A new sheet will also have a PatNum parameter which we will ignore.
@@ -664,10 +720,14 @@ namespace OpenDental {
 		}
 
 		private void butPDF_Click(object sender,EventArgs e) {
-			if(!TryToSaveData()){
+			if(!IsStatment && !TryToSaveData()){
 				return;
 			}
-			SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
+			if(!IsStatment) {
+				SheetArgs gArgs=SheetCur.GArgs;
+				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
+				SheetCur.GArgs=gArgs;
+			}
 			string filePathAndName=Path.ChangeExtension(Path.GetTempFileName(),".pdf");
 			//Graphics g=this.CreateGraphics();
 			SheetPrinting.CreatePdf(SheetCur,filePathAndName);
@@ -904,6 +964,18 @@ namespace OpenDental {
 				}
 			}
 			return true;
+		}
+
+		private void FormSheetFillEdit_FormClosing(object sender,FormClosingEventArgs e) {
+			if(imgDraw!=null) {
+				imgDraw.Dispose();
+				imgDraw=null;
+			}
+			if(pictDraw!=null) {
+				pictDraw.Dispose();
+				pictDraw=null;
+			}
+			GC.Collect();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {

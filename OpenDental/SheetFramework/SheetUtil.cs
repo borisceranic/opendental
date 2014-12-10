@@ -6,6 +6,8 @@ using System.IO;
 using System.Text;
 using OpenDentBusiness;
 using CodeBase;
+using System.Data;
+using OpenDental.UI;
 
 namespace OpenDental{
 	public class SheetUtil {
@@ -40,6 +42,45 @@ namespace OpenDental{
 			Font font;
 			FontStyle fontstyle;
 			foreach(SheetField field in sheet.SheetFields) {
+				if(sheet.SheetType==SheetTypeEnum.Statement && field.IsPaymentOption && !sheet.GArgs.ShowPaymentOptions) {
+					continue;//skip payment option fields on statments if neccesary
+				}
+				if(field.FieldType==SheetFieldType.Image 
+					||field.FieldType==SheetFieldType.PatImage) {
+					#region Get the path for the image
+					string filePathAndName="";
+					switch(field.FieldType) {
+						case SheetFieldType.Image:
+							filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+							break;
+						case SheetFieldType.PatImage:
+							if(field.FieldValue=="") {
+								//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
+								filePathAndName="";
+								break;
+							}
+							Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
+							List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
+							if(paths.Count < 1) {//No path was found so we cannot draw the image.
+								continue;
+							}
+							filePathAndName=paths[0];
+							break;
+						default:
+							//not an image field
+							continue;
+					}
+					#endregion
+					#region Load the image into bmpOriginal
+					if(field.FieldName=="Patient Info.gif"
+					||File.Exists(filePathAndName)) {
+						continue;
+					}
+					else {//img doesn't exist or we do not have access to it.
+						field.Height=0;//Set height to zero so that it will not cause extra pages to print.
+					}
+					#endregion
+				}
 				if(field.GrowthBehavior==GrowthBehaviorEnum.None){
 					continue;
 				}
@@ -49,8 +90,21 @@ namespace OpenDental{
 				}
 				font=new Font(field.FontName,field.FontSize,fontstyle);
 				//calcH=(int)g.MeasureString(field.FieldValue,font).Height;//this was too short
-				calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
-				if(calcH<=field.Height){
+				if(field.FieldType!=SheetFieldType.Grid) {
+					calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
+				}
+				else {//handle grid height calculation seperately.
+					calcH=CalculateGridHeightHelper(field,sheet,g);
+				}
+				if(field.FieldType==SheetFieldType.Grid) {
+					SheetGridDef grid=SheetGridDefs.GetOne(field.FKey);
+					if(calcH<=field.Height 
+						&& grid.GridType!=SheetGridType.StatementPayPlan) //0 height payment plan should shrink/not be drawn. All fields below should be moved up.
+					{
+						continue;
+					}
+				}
+				else if(calcH<=field.Height ){
 					continue;
 				}
 				int amountOfGrowth=calcH-field.Height;
@@ -59,11 +113,100 @@ namespace OpenDental{
 					MoveAllDownWhichIntersect(sheet,field,amountOfGrowth);
 				}
 				else if(field.GrowthBehavior==GrowthBehaviorEnum.DownGlobal){
+					//All sheet grids should have DownGlobal growth.
 					MoveAllDownBelowThis(sheet,field,amountOfGrowth);
 				}
 			}
-			//g.Dispose();
 			//return sheetCopy;
+		}
+
+		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.</summary>
+		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g) {
+			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements. That way if OD Grid is ever drawn Differently, it should affect this behavior as well.
+			odGrid.Width=field.Width;
+			odGrid.HideScrollBars=true;
+			int _pageCount=0;
+			int yPosGrid=field.YPos;
+			//Add Title and Header header height at begining of the grid
+			if(yPosGrid+odGrid.TitleHeight+odGrid.HeaderHeight>sheet.HeightPage-60) {
+				//grid is placed near bottom of page, increase yPosGrid to the value of the start of the next page.
+				yPosGrid+=(sheet.HeightPage-60)-(yPosGrid%sheet.HeightPage);
+				//Example: grid at bottom of second page, each page is 1100px, bottom margin is 60px.
+				//2130+=(1100-60)-(2130%1100)
+				//2130+=(1040)-(1030)
+				//2130+=10
+				//The content of the third page starts at 2140, which is exactly what the math worked out to.
+			}
+			SheetGridDef fGrid=SheetGridDefs.GetOne(field.FKey);
+//#warning fix this: should not just set to all defulat columns.
+//			fGrid.Columns=SheetGridDefs.GetColumnsAvailable(fGrid.GridType);//SheetGridColDefs
+			odGrid.Title=fGrid.Title;
+			//SheetGridDefs.GridArgs gArgs=new SheetGridDefs.GridArgs { patnum=sheet.PatNum,StartDate=DateTime.Parse("2014-11-01"),StopDate=DateTime.Parse("2014-11-30") };
+			DataTable Table=SheetGridDefs.GetDataTableForGridType(fGrid.GridType,sheet.GArgs);
+			#region  Fill Grid
+			odGrid.BeginUpdate();
+			odGrid.Columns.Clear();
+			ODGridColumn col;
+			for(int i=0;i<fGrid.Columns.Count;i++){
+				col=new ODGridColumn(fGrid.Columns[i].DisplayName,fGrid.Columns[i].Width);
+				odGrid.Columns.Add(col);
+			}
+			ODGridRow row;
+			for(int i=0;i<Table.Rows.Count;i++){
+				row=new ODGridRow();
+				for(int c=0;c<fGrid.Columns.Count;c++){//Selectively fill columns from the dataTable into the odGrid.
+					row.Cells.Add(Table.Rows[i][fGrid.Columns[c].ColName].ToString());
+				}
+				odGrid.Rows.Add(row);
+			}
+			odGrid.EndUpdate();//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
+			#endregion
+			bool drawTitle=SheetGridDefs.gridHasDefaultTitle(fGrid.GridType);
+			bool drawHeader=true;
+			bool drawFooter=false;
+			if(fGrid.GridType==SheetGridType.StatementMain && !sheet.GArgs.Intermingled) {
+				drawTitle=true;
+			}
+			int pageBreak=SheetPrinting.bottomCurPage(yPosGrid,sheet,out _pageCount);
+			//odGrid.DrawTitleAndHeaders(g,field.XPos,yPosGrid);
+			//yPosGrid+=odGrid.TitleHeight+odGrid.HeaderHeight;
+			//Add each row height, add blank space for the end of each page and headers on the next page.
+			for(int i=0;i<odGrid.RowHeights.Length;i++) {
+				#region Split patient accounts on Statment grids.
+				if(fGrid.GridType==SheetGridType.StatementMain
+					&& !sheet.GArgs.Intermingled
+					&& i>0 
+					&& Table.Rows[i]["patient"].ToString()!=Table.Rows[i-1]["patient"].ToString()) 
+				{//
+					yPosGrid+=20;//space out grids.
+					drawTitle=true;
+					drawHeader=true;
+				}
+				#endregion
+				#region Page break logic
+				if(fGrid.GridType==SheetGridType.StatementPayPlan && i==odGrid.RowHeights.Length-1) {
+					drawFooter=true;
+				}
+				if(yPosGrid+odGrid.RowHeights[i]+(drawTitle?odGrid.TitleHeight:0)+(drawHeader?odGrid.HeaderHeight:0)+(drawFooter?odGrid.TitleHeight:0)>pageBreak) {
+					yPosGrid=pageBreak+1;
+					pageBreak=SheetPrinting.bottomCurPage(yPosGrid,sheet,out _pageCount);
+					drawHeader=true;
+				}
+				#endregion
+				if(drawTitle) {
+					yPosGrid+=odGrid.TitleHeight;
+					drawTitle=false;
+				}
+				if(drawHeader) {
+					yPosGrid+=odGrid.HeaderHeight;
+					drawHeader=false;
+				}
+				yPosGrid+=odGrid.RowHeights[i];
+				if(drawFooter) {
+					yPosGrid+=odGrid.TitleHeight+2;
+				}
+			}
+			return yPosGrid-field.YPos;
 		}
 
 		public static void MoveAllDownBelowThis(Sheet sheet,SheetField field,int amountOfGrowth){
@@ -169,6 +312,10 @@ namespace OpenDental{
 				field.IsRequired=sheetFieldDefList[i].IsRequired;
 				field.TabOrder=sheetFieldDefList[i].TabOrder;
 				field.ReportableName=sheetFieldDefList[i].ReportableName;
+				field.FKey=sheetFieldDefList[i].FKey;
+				field.TextAlign=sheetFieldDefList[i].TextAlign;
+				field.IsPaymentOption=sheetFieldDefList[i].IsPaymentOption;
+				field.ItemColor=sheetFieldDefList[i].ItemColor;
 				retVal.Add(field);
 			}
 			return retVal;

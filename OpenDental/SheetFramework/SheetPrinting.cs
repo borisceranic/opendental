@@ -10,6 +10,7 @@ using OpenDentBusiness;
 using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using System.Data;
 
 namespace OpenDental {
 	public class SheetPrinting {
@@ -19,12 +20,16 @@ namespace OpenDental {
 		private static int _pagesPrinted;
 		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
 		private static int _yPosPrint;
+		///<summary>Should either be 0 or = _printMargin.Top, depending on whcih page we are printing.</summary>
+		private static int _yPosAdj;
 		///<summary>Print margin of the default printer. only used in page break calulations, and only top and bottom are used.</summary>
 		private static Margins _printMargin=new Margins(0,0,40,60);
 		///<summary>If not a batch, then there will just be one sheet in the list.</summary>
 		private static List<Sheet> _sheetList;
 		///<summary>Used to force old single page behavior. Used for labels.</summary>
-		private static bool _forceSinglePage;
+		//private static bool _forceSinglePage;
+		private static bool _printCalibration=false;//debug only
+		private static bool _isPrinting=false;
 
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch){
@@ -32,6 +37,7 @@ namespace OpenDental {
 			//could validate field names here later.
 			_sheetList=sheetBatch;
 			_sheetsPrinted=0;
+			_pagesPrinted=0;
 			_yPosPrint=0;
 			PrintDocument pd=new PrintDocument();
 			pd.OriginAtMargins=true;
@@ -56,16 +62,16 @@ namespace OpenDental {
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
-					SetForceSinglePage(s);
+					//SetForceSinglePage(s);
 					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)));
-					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+					pageCount+=Sheets.CalculatePageCount(s,_printMargin);//(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
 				}
 				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
 				printPreview.ShowDialog();
 			#else
 				try {
 					foreach(Sheet s in _sheetList) {
-						s.SheetFields.Sort(OpenDentBusiness.SheetFields.SortDrawingOrder);
+						s.SheetFields.Sort(OpenDentBusiness.SheetFields.SortDrawingOrderLayers);
 					}
 					if(!PrinterL.SetPrinter(pd,sit,0,"Batch of "+sheetBatch[0].Description+" printed")) {
 						return;
@@ -103,12 +109,13 @@ namespace OpenDental {
 		public static void Print(Sheet sheet,int copies,bool isRxControlled){
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
+			_isPrinting=true;
 			_sheetList=new List<Sheet>();
 			for(int i=0;i<copies;i++){
 				_sheetList.Add(sheet.Copy());
 			}
 			_sheetsPrinted=0;
-			_yPosPrint=0;
+			_yPosPrint=0;// _printMargin.Top;
 			PrintDocument pd=new PrintDocument();
 			pd.OriginAtMargins=true;
 			pd.PrintPage+=new PrintPageEventHandler(pd_PrintPage);
@@ -125,7 +132,9 @@ namespace OpenDental {
 					pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height);
 				}
 			}
-			SetForceSinglePage(sheet);
+			pd.DefaultPageSettings.Margins=new Margins(0,0,0,0);
+			pd.OriginAtMargins=true;
+			//SetForceSinglePage(sheet);
 			PrintSituation sit=PrintSituation.Default;
 			pd.DefaultPageSettings.Landscape=sheet.IsLandscape;
 			switch(sheet.SheetType){
@@ -149,12 +158,14 @@ namespace OpenDental {
 			}
 			//later: add a check here for print preview.
 			#if DEBUG
-				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
+				//pd.DefaultPageSettings.Margins=new Margins(0,0,40,60);
+				//pd.OriginAtMargins=true;
+				//pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height-(100));
 				FormPrintPreview printPreview;
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
-					SetForceSinglePage(s);
-					pageCount+=(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+					//SetForceSinglePage(s);
+					pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
 				}
 				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 				printPreview.ShowDialog();
@@ -178,380 +189,824 @@ namespace OpenDental {
 					//MessageBox.Show(Lan.g("Sheet","Printer not available"));
 				}
 			#endif
+			_isPrinting=false;
 		}
 
-		private static void SetForceSinglePage(Sheet sheet) {
-			if(!sheet.IsMultiPage) {
-				_forceSinglePage=true;
-				return;
-			}
-			switch(sheet.SheetType) {
-				case SheetTypeEnum.DepositSlip:
-				case SheetTypeEnum.LabelAppointment:
-				case SheetTypeEnum.LabelPatient:
-				case SheetTypeEnum.LabelCarrier:
-				case SheetTypeEnum.LabelReferral:
-				case SheetTypeEnum.Rx:
-					_forceSinglePage=true;
-					break;
-				//case SheetTypeEnum.Consent:
-				//case SheetTypeEnum.ExamSheet:
-				//case SheetTypeEnum.MedicalHistory:
-				//case SheetTypeEnum.PatientForm:
-				//case SheetTypeEnum.PatientLetter:
-				//case SheetTypeEnum.ReferralLetter:
-				//case SheetTypeEnum.ReferralSlip:
-				//case SheetTypeEnum.RoutingSlip:
-				//case SheetTypeEnum.LabSlip:
-				default:
-					_forceSinglePage=false;
-					break;
-			}
-		}
-
+		///<summary>This gets called for every page to be printed when sending to a printer.  Will stop printing when e.HasMorePages==false.  See also CreatePdfPage.</summary>
 		private static void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Graphics g=e.Graphics;
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
+			Sheets.SetPageMargin(sheet,_printMargin);
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);//should always be sorted.
-			SetForceSinglePage(sheet);
-			Font font;
-			FontStyle fontstyle;
-			//first, draw images------------------------------------------------------------------------------------
-			DrawImages(sheet,g);
-			//then, drawings--------------------------------------------------------------------------------------------
-			Pen pen=new Pen(Brushes.Black,2f);
-			string[] pointStr;
-			List<Point> points;
-			Point point;
-			string[] xy;
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
+			//Begin drawing.
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) { 
+					continue; 
 				}
-				if(field.FieldType!=SheetFieldType.Drawing) {
-					continue;
+				if(sheet.SheetType==SheetTypeEnum.Statement && field.IsPaymentOption && !sheet.GArgs.ShowPaymentOptions) {
+					continue;//skip payment option fields on statments if neccesary
 				}
-				pointStr=field.FieldValue.Split(';');
-				points=new List<Point>();
-				for(int p=0;p<pointStr.Length;p++) {
-					xy=pointStr[p].Split(',');
-					if(xy.Length==2) {
-						point=new Point(PIn.Int(xy[0]),PIn.Int(xy[1]));
-						points.Add(point);
-					}
-				}
-				for(int i=1;i<points.Count;i++) {
-					g.DrawLine(pen,points[i-1].X,points[i-1].Y-_yPosPrint,points[i].X,points[i].Y-_yPosPrint);
-				}
-			}
-			//then, rectangles and lines----------------------------------------------------------------------------------
-			Pen pen2=new Pen(Brushes.Black,1f);
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType==SheetFieldType.Rectangle) {
-					g.DrawRectangle(pen2,field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
-				}
-				if(field.FieldType==SheetFieldType.Line) {
-					g.DrawLine(pen2,field.XPos,field.YPos-_yPosPrint,
-						field.XPos+field.Width,
-						field.YPos-_yPosPrint+field.Height);
-				}
-			}
-			//then, draw text-----------------------------------------------------------------------------------------------
-			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
-			Graphics gfx=Graphics.FromImage(doubleBuffer);
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.InputField
-				&& field.FieldType!=SheetFieldType.OutputText
-				&& field.FieldType!=SheetFieldType.StaticText) {
-					continue;
-				}
-				fontstyle=FontStyle.Regular;
-				if(field.FontIsBold) {
-					fontstyle=FontStyle.Bold;
-				}
-				font=new Font(field.FontName,field.FontSize,fontstyle);
-				Plugins.HookAddCode(null,"SheetPrinting.pd_PrintPage_drawFieldLoop",field);
-				Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
-				GraphicsHelper.DrawString(g,gfx,field.FieldValue,font,Brushes.Black,bounds);
-				//g.DrawString(field.FieldValue,font,Brushes.Black,field.BoundsF);
-			}
-			gfx.Dispose();
-			//then, checkboxes----------------------------------------------------------------------------------
-			Pen pen3=new Pen(Brushes.Black,1.6f);
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.CheckBox) {
-					continue;
-				}
-				if(field.FieldValue=="X") {
-					g.DrawLine(pen3,field.XPos,field.YPos-_yPosPrint,field.XPos+field.Width,field.YPos-_yPosPrint+field.Height);
-					g.DrawLine(pen3,field.XPos+field.Width,field.YPos-_yPosPrint,field.XPos,field.YPos-_yPosPrint+field.Height);
-				}
-			}
-			//then signature boxes----------------------------------------------------------------------
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.SigBox) {
-					continue;
-				}
-				SignatureBoxWrapper wrapper=new SignatureBoxWrapper();
-				wrapper.Width=field.Width;
-				wrapper.Height=field.Height;
-				if(field.FieldValue.Length>0) {//a signature is present
-					bool sigIsTopaz=false;
-					if(field.FieldValue[0]=='1') {
-						sigIsTopaz=true;
-					}
-					string signature="";
-					if(field.FieldValue.Length>1) {
-						signature=field.FieldValue.Substring(1);
-					}
-					string keyData=Sheets.GetSignatureKey(sheet);
-					wrapper.FillSignature(sigIsTopaz,keyData,signature);
-				}
-				Bitmap sigBitmap=wrapper.GetSigImage();
-				g.DrawImage(sigBitmap,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
-			}
-			if(!_forceSinglePage) {
-				//Set the _yPosPrint for the next page
-				foreach(SheetField field in sheet.SheetFields) {
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
-						_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
+				switch(field.FieldType) {
+					case SheetFieldType.Image:
+					case SheetFieldType.PatImage:
+						drawFieldImage(field,g,null);
 						break;
-					}
+					case SheetFieldType.Drawing:
+						drawFieldDrawing(field,g,null);
+						break;
+					case SheetFieldType.Rectangle:
+						drawFieldRectangle(field,g,null);
+						break;
+					case SheetFieldType.Line:
+						drawFieldLine(field,g,null);
+						break;
+					case SheetFieldType.Grid:
+						drawFieldGrid(field,sheet,g,null);
+						break;
+					case SheetFieldType.InputField:
+					case SheetFieldType.OutputText:
+					case SheetFieldType.StaticText:
+						drawFieldText(field,sheet,g,null);
+						break;
+					case SheetFieldType.CheckBox:
+						drawFieldCheckBox(field,g,null);
+						break;
+					case SheetFieldType.SigBox:
+						drawFieldSigBox(field,sheet,g,null);
+						break;
+					default:
+						//Parameter or possibly new field type.
+						break;
 				}
-				_pagesPrinted++;
-			}
+				GC.Collect();
+			}//end foreach SheetField
+			drawHeader(sheet,g,null);
+			drawFooter(sheet,g,null);
+			#if DEBUG
+				if(_printCalibration) {
+					drawCalibration(sheet,g,e,null,null);
+				}
+			#endif
 			g.Dispose();
-			if(!_forceSinglePage && _pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
+			g=null;
+			GC.Collect();
+			#region Set variables for next page to be printed
+			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
+			_pagesPrinted++;
+			if(_pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
+				_yPosPrint=0;// _printMargin.Top;
+				_yPosAdj=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
-				//heightsCalculated=false;
 				if(_sheetsPrinted<_sheetList.Count){
 					e.HasMorePages=true;
 				}
 				else{
 					e.HasMorePages=false;
 					_sheetsPrinted=0;
-				}	
+				}
+			}
+			#endregion
+		}
+
+		private static bool fieldOnCurPageHelper(SheetField field,Sheet sheet,Margins _printMargin,int _yPosPrint) {
+			//Even though _printMargins and _yPosPrint are available in this context they are passed in so for future compatibility with webforms.
+			if(field.YPos>(_yPosPrint+sheet.HeightPage)){
+				return false;//field is entirely on one of the next pages.
+			}
+			if(field.Bounds.Bottom<_yPosPrint && _pagesPrinted>0) {
+				return false;//field is entirely on one of the previous pages. Unless we are on the first page, then it is in the top margin.
+			}
+			return true;//field is all or partially on current page.
+		}
+
+		#region Drawing Helpers. One for almost every field type. =====================================================================================
+		///<summary>Public accessor to the draw image function</summary>
+		public static void drawImageHelper(SheetField field,Graphics g) {
+			drawFieldImage(field,g,null);
+		}
+
+		public static void drawFieldImage(SheetField field,Graphics g, XGraphics gx) {
+			Bitmap bmpOriginal=null;
+			Bitmap bmpDraw=null;
+			string filePathAndName="";
+			#region Get the path for the image
+			switch(field.FieldType) {
+				case SheetFieldType.Image:
+					filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+					break;
+				case SheetFieldType.PatImage:
+					if(field.FieldValue=="") {
+						//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
+						filePathAndName="";
+						break;
+					}
+					Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
+					List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
+					if(paths.Count < 1) {//No path was found so we cannot draw the image.
+						return;
+					}
+					filePathAndName=paths[0];
+					break;
+				default:
+					//not an image field
+					return;
+			}
+			#endregion
+			#region Load the image into bmpOriginal
+			if(field.FieldName=="Patient Info.gif") {
+				bmpOriginal=OpenDentBusiness.Properties.Resources.Patient_Info;
+			}
+			else if(File.Exists(filePathAndName)) {
+				bmpOriginal=new Bitmap(filePathAndName);
+			}
+			else {
+				return;
+			}
+			#endregion
+			#region Calculate the image ratio and location, set values for imgDrawWidth and imgDrawHeight
+			//inscribe image in field while maintaining aspect ratio.
+			float imgRatio=(float)bmpOriginal.Width/(float)bmpOriginal.Height;
+			float fieldRatio=(float)field.Width/(float)field.Height;
+			float imgDrawHeight=field.Height;//drawn size of image
+			float imgDrawWidth=field.Width;//drawn size of image
+			int adjustY=0;//added to YPos
+			int adjustX=0;//added to XPos
+			//For patient images, we need to make sure the images will fit and can maintain aspect ratio.
+			if(field.FieldType==SheetFieldType.PatImage && imgRatio>fieldRatio) {//image is too wide
+				//X pos and width of field remain unchanged
+				//Y pos and height must change
+				imgDrawHeight=(float)bmpOriginal.Height*((float)field.Width/(float)bmpOriginal.Width);//img.Height*(width based scale) This also handles images that are too small.
+				adjustY=(int)((field.Height-imgDrawHeight)/2f);//adjustY= half of the unused vertical field space
+			}
+			else if(field.FieldType==SheetFieldType.PatImage && imgRatio<fieldRatio) {//image is too tall
+				//X pos and width must change
+				//Y pos and height remain unchanged
+				imgDrawWidth=(float)bmpOriginal.Width*((float)field.Height/(float)bmpOriginal.Height);//img.Height*(width based scale) This also handles images that are too small.
+				adjustX=(int)((field.Width-imgDrawWidth)/2f);//adjustY= half of the unused horizontal field space
+			}
+			else {//image ratio == field ratio
+				//do nothing
+			}
+			#endregion
+			#region Resize drawable image. Do not draw original image, if it is too large it can crash GDI+
+			GC.Collect();
+			Size sz=new Size(Convert.ToInt32(imgDrawWidth),Convert.ToInt32(imgDrawHeight));
+			bmpDraw=new Bitmap(bmpOriginal,sz);
+			#endregion
+			if(gx==null) {
+				g.DrawImage(bmpDraw,field.XPos+adjustX,field.YPos+adjustY-_yPosPrint,imgDrawWidth,imgDrawHeight);
+			}
+			else {
+				XImage xI=XImage.FromGdiPlusImage((Bitmap)bmpDraw.Clone());
+				gx.DrawImage(xI,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
+				xI.Dispose();
+				xI=null;
+			}
+			if(bmpDraw!=null) {
+				bmpDraw.Dispose();
+				bmpDraw=null;
+			}
+			if(bmpOriginal!=null) {
+				bmpOriginal.Dispose();
+				bmpOriginal=null;
+			}
+			GC.Collect();
+		}
+
+		public static void drawFieldDrawing(SheetField field,Graphics g,XGraphics gx) {
+			if(gx==null) {
+				Pen pen=new Pen(Brushes.Black,2f);
+				List<Point> points=new List<Point>();
+				string[] pairs=field.FieldValue.Split(new string[] { ";" },StringSplitOptions.RemoveEmptyEntries);
+				foreach(string p in pairs) {
+					points.Add(new Point(PIn.Int(p.Split(',')[0]),PIn.Int(p.Split(',')[1])));
+				}
+				for(int i=1;i<points.Count;i++) {
+					g.DrawLine(pen,points[i-1].X,points[i-1].Y-_yPosPrint,points[i].X,points[i].Y-_yPosPrint);
+				}
+				pen.Dispose();
+				pen=null;
+			}
+			else {
+				XPen pen=new XPen(XColors.Black,p(2));
+				List<Point> points=new List<Point>();
+				string[] pairs=field.FieldValue.Split(new string[] { ";" },StringSplitOptions.RemoveEmptyEntries);
+				foreach(string p2 in pairs) {
+					points.Add(new Point(PIn.Int(p2.Split(',')[0]),PIn.Int(p2.Split(',')[1])));
+				}
+				for(int i=1;i<points.Count;i++) {
+					gx.DrawLine(pen,p(points[i-1].X),p(points[i-1].Y-_yPosPrint),p(points[i].X),p(points[i].Y-_yPosPrint));
+				}
+				pen=null;
+			}
+			GC.Collect();
+		}
+
+		public static void drawFieldRectangle(SheetField field,Graphics g,XGraphics gx) {
+			if(gx==null) {
+				g.DrawRectangle(Pens.Black,field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
+			}
+			else {
+				gx.DrawRectangle(XPens.Black,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
 			}
 		}
 
+		public static void drawFieldLine(SheetField field,Graphics g,XGraphics gx) {
+			if(gx==null) {
+				g.DrawLine((field.ItemColor==Color.FromArgb(0)?Pens.Black:new Pen(field.ItemColor,1)),
+					field.XPos,field.YPos-_yPosPrint,
+					field.XPos+field.Width,
+					field.YPos-_yPosPrint+field.Height);
+			}
+			else {
+				gx.DrawLine((field.ItemColor==Color.FromArgb(0)?XPens.Black:new XPen(field.ItemColor,1)),
+					p(field.XPos),p(field.YPos-_yPosPrint),
+					p(field.XPos+field.Width),
+					p(field.YPos-_yPosPrint+field.Height));
+			}
+			GC.Collect();		
+		}
+
+		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
+			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements. That way if OD Grid is ever drawn Differently, it should affect this behavior as well.
+			int yPosGrid=field.YPos-_yPosPrint;//yPosGrid is used to determine wherehow far down the grid we are printing.
+			bool yPosPgBreakAdjReq=(bool)(yPosGrid<0);//cast as bool so that it is visually appearant
+			SheetGridDef fGrid=SheetGridDefs.GetOne(field.FKey);
+			odGrid.Title=fGrid.Title;
+			odGrid.Width=0;
+			foreach(SheetGridColDef Col in fGrid.Columns){
+				odGrid.Width+=Col.Width;
+			}
+			odGrid.Height=field.Height;
+			odGrid.HideScrollBars=true;
+			DataTable Table=SheetGridDefs.GetDataTableForGridType(SheetGridDefs.GetOne(field.FKey).GridType,sheet.GArgs);
+			#region  Fill Grid
+			odGrid.BeginUpdate();
+			odGrid.Columns.Clear();
+			ODGridColumn col;
+			for(int i=0;i<fGrid.Columns.Count;i++) {
+				col=new ODGridColumn(fGrid.Columns[i].DisplayName,fGrid.Columns[i].Width);
+				switch(fGrid.Columns[i].TextAlign){
+					case StringAlignment.Near:
+						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Left;
+						break;
+					case StringAlignment.Center:
+						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Center;
+						break;
+					case StringAlignment.Far:
+						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Right;
+						break;
+				}
+				odGrid.Columns.Add(col);
+			}
+			ODGridRow row;
+			for(int i=0;i<Table.Rows.Count;i++) {
+				row=new ODGridRow();
+				for(int c=0;c<fGrid.Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
+					row.Cells.Add(Table.Rows[i][fGrid.Columns[c].ColName].ToString());
+				}
+				odGrid.Rows.Add(row);
+			}
+			odGrid.EndUpdate();//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
+			#endregion
+			bool drawTitle=SheetGridDefs.gridHasDefaultTitle(fGrid.GridType);
+			bool drawHeader=true;
+			bool drawFooter=false;
+			int pageCount=0;
+			int pageBreak=bottomCurPage(yPosGrid,sheet,out pageCount);
+			if(fGrid.GridType==SheetGridType.StatementMain && !sheet.GArgs.Intermingled) {
+				drawTitle=true;
+			}
+			//odGrid.DrawTitleAndHeaders(g,field.XPos,yPosGrid);
+			//yPosGrid+=odGrid.TitleHeight+odGrid.HeaderHeight;
+			//Add each row height, add blank space for the end of each page and headers on the next page.
+			for(int i=0;i<odGrid.RowHeights.Length;i++) {
+				#region Split patient accounts on Statement grids.
+				if(fGrid.GridType==SheetGridType.StatementMain
+					&& !sheet.GArgs.Intermingled
+					&& i>0 
+					&& Table.Rows[i]["patient"].ToString()!=Table.Rows[i-1]["patient"].ToString()) 
+				{//
+					if(gx==null) {
+						odGrid.DrawRow(i-1,g,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true,true);//redraw previous row as a bottom row
+					}
+					else {
+						odGrid.DrawRowX(i-1,gx,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true,true);//redraw previous row as a bottom row
+					}					
+					yPosGrid+=20;//space out grids.
+					drawTitle=true;
+					drawHeader=true;
+				}
+				#endregion
+				#region Page break logic
+				if(fGrid.GridType==SheetGridType.StatementPayPlan && i==odGrid.RowHeights.Length-1) {
+					drawFooter=true;
+				}
+				if(yPosGrid //start position of row
+					+odGrid.RowHeights[i] //+row height
+					+(drawTitle?odGrid.TitleHeight:0) //+title height if needed
+					+(drawHeader?odGrid.HeaderHeight:0) //+header height if needed
+					+(drawFooter?odGrid.TitleHeight:0) //+footer height if needed.
+					>pageBreak)
+				{
+					//if(i>0) {
+					//	if(gx==null) {
+					//		odGrid.DrawRow(i-1,g,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true);//redraw previous row as a bottom row
+					//	}
+					//	else {
+					//		odGrid.DrawRowX(i-1,gx,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true);//redraw previous row as a bottom row
+					//	}			
+					//}
+					yPosGrid=pageBreak+1;
+					pageBreak=bottomCurPage(yPosGrid,sheet,out pageCount);
+					drawHeader=true;
+				}
+				if(_isPrinting && yPosGrid>=0 && yPosPgBreakAdjReq) {//Only true if we are actually printing to the printer or PDF.
+					//_yPosPrint+=pageCount*(_printMargin.Bottom+_printMargin.Top);
+#warning page break logic is still broken when printing. rows are either duplicated or skipped at the end of each page.
+					yPosGrid=0;
+					yPosGrid+=pageCount*(_printMargin.Bottom+_printMargin.Top)+_printMargin.Top+1;
+					yPosPgBreakAdjReq=false;
+					drawHeader=true;
+				}
+				#endregion
+				#region Draw Title
+				if(drawTitle) {
+					switch(fGrid.GridType) {//Draw titles differently for different grids.
+						case SheetGridType.StatementMain:
+							Patient pat=Patients.GetPat(PIn.Long(Table.Rows[i]["PatNum"].ToString()));
+							string patName="";
+							if(pat!=null) {//should always be true
+								patName=pat.GetNameFLnoPref();
+							}
+							if(gx==null) {
+								g.FillRectangle(Brushes.White,field.XPos-10,yPosGrid,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
+							}
+							else {
+								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(yPosGrid-1),p(odGrid.Width),p(odGrid.TitleHeight));
+								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos-10),p(yPosGrid-1),p(300),p(100)),XStringAlignment.Near);
+									//gx.DrawString(patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
+								}
+							}
+							break;
+						case SheetGridType.StatementPayPlan:
+							SizeF sSize=new SizeF();
+							using(Graphics f= Graphics.FromImage(new Bitmap(100,100))){//using graphics f because g is null when gx is not.
+								sSize=f.MeasureString("Payment Plans",new Font("Arial",10,FontStyle.Bold));
+							}
+							if(gx==null) {
+								g.FillRectangle(Brushes.White,field.XPos,yPosGrid,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Payment Plans",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
+							}
+							else {
+								gx.DrawRectangle(Brushes.White,field.XPos,yPosGrid-1,odGrid.Width,odGrid.TitleHeight);
+								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(yPosGrid-1),p(300),p(100)),XStringAlignment.Center);
+									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
+								}
+							}
+							break;
+						default:
+							if(gx==null) {
+								odGrid.DrawTitle(g,field.XPos,yPosGrid);
+							}
+							else {
+								odGrid.DrawTitleX(gx,field.XPos,yPosGrid);
+							}
+							break;
+					}
+					yPosGrid+=odGrid.TitleHeight;
+					drawTitle=false;
+				}
+				#endregion
+				#region Draw Header
+				if(drawHeader) {
+					if(gx==null) {
+						odGrid.DrawHeader(g,field.XPos,yPosGrid,true);
+					}
+					else {
+						odGrid.DrawHeaderX(gx,field.XPos,yPosGrid,true);
+					}
+					yPosGrid+=odGrid.HeaderHeight;
+					drawHeader=false;
+				}
+				#endregion
+				#region Draw Row
+				if(gx==null) {
+					odGrid.DrawRow(i,g,odGrid.Font,field.XPos,yPosGrid,i==odGrid.Rows.Count-1,true);
+				}
+				else {
+					odGrid.DrawRowX(i,gx,odGrid.Font,field.XPos,yPosGrid,i==odGrid.Rows.Count-1,true);
+				}
+				yPosGrid+=odGrid.RowHeights[i];
+				#endregion
+				#region Draw Footer (rare)
+				if(drawFooter) {
+					yPosGrid+=2;
+					switch(fGrid.GridType) {
+						case SheetGridType.StatementPayPlan:
+							SheetArgs a=sheet.GArgs;
+							DataTable tableMisc=AccountModules.GetStatementDataSet(Statements.CreateObject(sheet.GArgs.StatementNum)).Tables["misc"];
+							if(tableMisc==null){
+								tableMisc=new DataTable();	
+							}
+							Double payPlanDue=0;
+							for(int m=0;m<tableMisc.Rows.Count;m++) {
+								if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue") {
+									payPlanDue=PIn.Double(tableMisc.Rows[m]["value"].ToString());
+								}
+							}
+							if(gx==null) {
+								RectangleF rf=new RectangleF(sheet.Width-60-field.Width,yPosGrid,field.Width,odGrid.TitleHeight);
+								g.FillRectangle(Brushes.White,rf);
+								StringFormat sf=new StringFormat();
+								sf.Alignment=StringAlignment.Far;
+								g.DrawString("Payment Plan Amount Due: "+payPlanDue.ToString("c"),new Font("Arial",9,FontStyle.Bold),new SolidBrush(Color.Black),rf,sf);
+							}
+							else {
+								gx.DrawRectangle(Brushes.White,p(sheet.Width-field.Width-60),p(yPosGrid),p(field.Width),p(odGrid.TitleHeight));
+								using(Font _font=new Font("Arial",9,FontStyle.Bold)) {
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plan Amount Due: "+payPlanDue.ToString("c"),new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(sheet.Width-60),p(yPosGrid),p(field.Width),p(odGrid.TitleHeight)),XStringAlignment.Far);
+								}
+							}
+							break;
+					}
+				}
+				#endregion
+			}
+		}
+
+		//public static void drawFieldGridTitleHelper(SheetGridDef gridDef,DataTable Table,int i, ) {
+
+		//}
+
+		//public static void drawFieldGridHeaderHelper() {
+
+		//}
+
+		//public static void drawFieldGridRowHelper() {
+		//
+		//}
+
+		///<summary>Calculates the bottom of the current page assuming a 40px and 60px top and bottom margin respectively.</summary>
+		public static int bottomCurPage(int yPos,Sheet sheet, out int pageCount) {
+			int retVal=sheet.HeightPage-60;//First page bottom is not changed by top margin. Example: 1100px page height, 60px bottom, 1040px is first page bottom
+			pageCount=0;
+			while(retVal<yPos){
+				pageCount++;
+				retVal+=(sheet.HeightPage-100);//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2140px
+			}
+			return retVal;
+		}
+
+		public static void drawFieldText(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
+			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
+			Graphics gfx=Graphics.FromImage(doubleBuffer);
+			Plugins.HookAddCode(null,"SheetPrinting.pd_PrintPage_drawFieldLoop",field);
+			//TODO: this should probably be optimized, but it seems to work for now and we have not had any complaints about speed.
+			if(gx==null){
+			FontStyle fontstyle=(field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
+			Font font=new Font(field.FontName,field.FontSize,fontstyle);
+			Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,Math.Min(field.Height,_yPosPrint+sheet.HeightPage-_printMargin.Bottom-field.YPos));
+			StringAlignment sa= StringAlignment.Near;
+			switch(field.TextAlign) {
+				case System.Windows.Forms.HorizontalAlignment.Left:
+					sa=StringAlignment.Near;
+					break;
+				case System.Windows.Forms.HorizontalAlignment.Center:
+					sa=StringAlignment.Center;
+					break;
+				case System.Windows.Forms.HorizontalAlignment.Right:
+					sa=StringAlignment.Far;
+					break;
+			}
+			GraphicsHelper.DrawString(g,gfx,field.FieldValue,font,(field.ItemColor==Color.FromArgb(0)?Brushes.Black:new SolidBrush(field.ItemColor)),bounds,sa);
+			font.Dispose();
+			font=null;
+			}
+			else{
+				XFontStyle xfontstyle=(field.FontIsBold?XFontStyle.Bold:XFontStyle.Regular);
+				XFont xfont=new XFont(field.FontName,field.FontSize,xfontstyle);
+				XStringAlignment xsa= XStringAlignment.Near;
+				switch(field.TextAlign) {
+					case System.Windows.Forms.HorizontalAlignment.Left:
+						xsa=XStringAlignment.Near;
+						break;
+					case System.Windows.Forms.HorizontalAlignment.Center:
+						xsa=XStringAlignment.Center;
+						field.XPos+=field.Width/2;
+						break;
+					case System.Windows.Forms.HorizontalAlignment.Right:
+						xsa=XStringAlignment.Far;
+						field.XPos+=field.Width;
+						break;
+				}
+				XRect xrect=new XRect(p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
+				GraphicsHelper.DrawStringX(gx,gfx,1d/p(1),field.FieldValue,xfont,(field.ItemColor==Color.FromArgb(0)?XBrushes.Black:new XSolidBrush(field.ItemColor)),xrect,xsa);
+				//xfont.Dispose();
+				xfont=null;
+			}
+			doubleBuffer.Dispose();
+			doubleBuffer=null;
+			gfx.Dispose();
+			gfx=null;
+			GC.Collect();
+		}
+
+		public static void drawFieldCheckBox(SheetField field,Graphics g,XGraphics gx) {
+			if(field.FieldValue!="X") {
+				return;
+			}
+			if(gx==null) {
+				Pen pen3=new Pen(Brushes.Black,1.6f);
+				g.DrawLine(pen3,field.XPos,field.YPos-_yPosPrint,field.XPos+field.Width,field.YPos-_yPosPrint+field.Height);
+				g.DrawLine(pen3,field.XPos+field.Width,field.YPos-_yPosPrint,field.XPos,field.YPos-_yPosPrint+field.Height);
+				pen3.Dispose();
+				pen3=null;
+			}
+			else {
+				XPen pen3=new XPen(XColors.Black,p(1.6f));
+				gx.DrawLine(pen3,p(field.XPos),p(field.YPos-_yPosPrint),p(field.XPos+field.Width),p(field.YPos-_yPosPrint+field.Height));
+				gx.DrawLine(pen3,p(field.XPos+field.Width),p(field.YPos-_yPosPrint),p(field.XPos),p(field.YPos-_yPosPrint+field.Height));
+				pen3=null;
+			}
+			GC.Collect();
+		}
+
+		public static void drawFieldSigBox(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
+			SignatureBoxWrapper wrapper=new SignatureBoxWrapper();
+			wrapper.Width=field.Width;
+			wrapper.Height=field.Height;
+			if(field.FieldValue.Length>0) {//a signature is present
+				bool sigIsTopaz=false;
+				if(field.FieldValue[0]=='1') {
+					sigIsTopaz=true;
+				}
+				string signature="";
+				if(field.FieldValue.Length>1) {
+					signature=field.FieldValue.Substring(1);
+				}
+				string keyData=Sheets.GetSignatureKey(sheet);
+				wrapper.FillSignature(sigIsTopaz,keyData,signature);
+			}
+			if(g!=null) {
+				Bitmap sigBitmap=wrapper.GetSigImage();
+				g.DrawImage(sigBitmap,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
+				sigBitmap.Dispose();
+				sigBitmap=null;
+			}
+			else {
+				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
+				gx.DrawImage(sigBitmap,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
+				sigBitmap.Dispose();
+				sigBitmap=null;
+			}
+		}
+
+		private static void drawHeader(Sheet sheet,Graphics g,XGraphics gx) {
+			if(_pagesPrinted==0) {
+				return;//Never draw header on first page
+			}
+			//white-out the header.
+			if(gx==null) {
+				g.FillRectangle(Brushes.White,0,0,sheet.WidthPage,_printMargin.Top);
+			}
+			else {
+				gx.DrawRectangle(XPens.White,Brushes.White,p(0),p(0),p(sheet.WidthPage),p(_printMargin.Top));
+			}
+		}
+
+		private static void drawFooter(Sheet sheet,Graphics g,XGraphics gx) {
+			if(Sheets.CalculatePageCount(sheet,_printMargin)==1) {
+				return;//Never draw footers on single page sheets.
+			}
+			//whiteout footer.
+			if(gx==null) {
+				g.FillRectangle(Brushes.White,0,sheet.HeightPage-_printMargin.Bottom,sheet.WidthPage,sheet.HeightPage);
+			}
+			else {
+				gx.DrawRectangle(XPens.White,Brushes.White,p(0),p(sheet.HeightPage-_printMargin.Bottom),p(sheet.WidthPage),p(sheet.HeightPage));
+			}
+		}
+
+		private static void drawCalibration(Sheet sheet,Graphics g,PrintPageEventArgs e,XGraphics gx, PdfPage page) {
+			Font font=new Font("Calibri",10f,FontStyle.Regular);
+			XFont xfont=new XFont("Calibri",p(10f),XFontStyle.Regular);
+			int sLineSize=15;
+			int mLineSize=45;
+			int lLineSize=90;
+			for(int pass=0;pass<3;pass++) {
+				int xO=0;//xOrigin
+				int yO=0;//yOrigin
+				switch(pass) {
+					case 0: xO=yO=0; break;
+					case 1: xO=sheet.WidthPage/2; yO=sheet.HeightPage/2; break;
+					case 2: xO=sheet.WidthPage; yO=sheet.HeightPage; break;
+				}
+				for(int i=-100;i<2000;i++) {
+					if(i%100==0 && pass==0) {
+						//label Axis
+						if(g!=null) {
+							if(i==0) {
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(4,4));//label 0
+							}//don't draw the zero twice
+							else {
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(xO+75,i+2));//label Y-axis
+								g.DrawString(i.ToString(),font,Brushes.Black,new PointF(i+2,yO+75));//label X-axis
+							}
+						}
+						else {
+							if(i==0) {
+
+							}//don't draw the zero twice
+							else {
+								gx.DrawString(i.ToString(),xfont,XBrushes.Black,p(xO+75),p(i+2));//label Y-axis
+								gx.DrawString(i.ToString(),xfont,XBrushes.Black,p(i+2),p(yO+75));//label X-axis
+							}
+						}
+					}
+					if(i%100==0) {
+						//draw large lines and label txt
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-lLineSize+xO,i),new Point(+lLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-lLineSize+yO),new Point(i,+lLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-lLineSize+xO),p(i),p(+lLineSize+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-lLineSize+yO),p(i),p(+lLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%50==0) {
+						//draw 50px lines
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-mLineSize+xO,i),new Point(+mLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-mLineSize+yO),new Point(i,+mLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-mLineSize+xO),p(i),p(+mLineSize+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-mLineSize+yO),p(i),p(+mLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%10==0) {
+						//draw small lines
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-sLineSize+xO,i),new Point(+sLineSize+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-sLineSize+yO),new Point(i,+sLineSize+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,new Point(-sLineSize+xO,i),new Point(+sLineSize+xO,i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-sLineSize+yO),p(i),p(+sLineSize+yO));//Allong X-axis
+						}
+					}
+					else if(i%2==0) {
+						//draw dots
+						if(g!=null) {
+							g.DrawLine(Pens.Black,new Point(-1+xO,i),new Point(+1+xO,i));//Allong Y-axis
+							g.DrawLine(Pens.Black,new Point(i,-1+yO),new Point(i,+1+yO));//Allong X-axis
+						}
+						else {
+							gx.DrawLine(XPens.Black,p(-1+xO),p(i),p(+1+xO),p(i));//Allong Y-axis
+							gx.DrawLine(XPens.Black,p(i),p(-1+yO),p(i),p(+1+yO));//Allong X-axis
+						}
+					}
+				}//end i -100=>2000
+			}//end pass
+			//infoBlock
+			PrinterSettings settings = new PrinterSettings();
+			if(g!=null) {
+				g.FillRectangle(Brushes.White,110,110,480,100);
+				g.DrawRectangle(Pens.Black,110,110,480,100);
+				g.DrawString("Sheet Height = "+sheet.HeightPage.ToString(),font,Brushes.Black,112,112);
+				g.DrawString("Sheet Width = "+sheet.WidthPage.ToString(),font,Brushes.Black,112,124);//12px per line
+				g.DrawString("DefaultPrinter = "+settings.PrinterName,font,Brushes.Black,112,136);
+				g.DrawString("HardMarginX = "+e.PageSettings.HardMarginX,font,Brushes.Black,112,148);
+				g.DrawString("HardMarginY = "+e.PageSettings.HardMarginY,font,Brushes.Black,112,160);
+			}
+			else {
+				gx.DrawRectangle(XPens.Black,Brushes.White,p(110),p(110),p(480),p(100));
+				gx.DrawRectangle(XPens.Black,p(110),p(110),p(480),p(100));
+				gx.DrawString("Sheet Height = "+sheet.HeightPage.ToString(),xfont,XBrushes.Black,p(112),p(112));
+				gx.DrawString("Sheet Width = "+sheet.WidthPage.ToString(),xfont,XBrushes.Black,p(112),p(124));//12px per line
+				gx.DrawString("DefaultPrinter = "+settings.PrinterName,xfont,XBrushes.Black,p(112),p(136));
+				gx.DrawString("HardMarginX = "+settings.DefaultPageSettings.HardMarginX,xfont,XBrushes.Black,p(112),p(148));
+				gx.DrawString("HardMarginY = "+settings.DefaultPageSettings.HardMarginY,xfont,XBrushes.Black,p(112),p(160));
+				gx.DrawString("PDF TrimMargins ^v<> = "+page.TrimMargins.Top+","+page.TrimMargins.Bottom+","+page.TrimMargins.Left+","+page.TrimMargins.Right,xfont,XBrushes.Black,p(112),p(172));
+			}
+			font.Dispose();
+			font=null;
+			xfont=null;
+			GC.Collect();
+		}
+
+		#endregion
+
 		public static void CreatePdf(Sheet sheet,string fullFileName) {
+			_isPrinting=true;
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
-			SetForceSinglePage(sheet);
-			int pageCount=(_forceSinglePage?1:Sheets.CalculatePageCount(sheet,_printMargin));
+			//SetForceSinglePage(sheet);
+			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			for(int i=0;i<pageCount;i++) {
+				_pagesPrinted=i;
 				PdfPage page=document.AddPage();
 				CreatePdfPage(sheet,page);
 			}
 			document.Save(fullFileName);
+			_isPrinting=false;
 		}
 
+		///<summary>Called for every page that is generated for a PDF docuemnt. Pages and yPos must be tracked outside of this function. See also pd_PrintPage.</summary>
 		public static void CreatePdfPage(Sheet sheet,PdfPage page) {
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);//should always be sorted.
 			page.Width=p(sheet.Width);//XUnit.FromInch((double)sheet.Width/100);  //new XUnit((double)sheet.Width/100,XGraphicsUnit.Inch);
 			page.Height=p(sheet.Height);//new XUnit((double)sheet.Height/100,XGraphicsUnit.Inch);
 			if(sheet.IsLandscape){
 				page.Orientation=PageOrientation.Landscape;
 			}
-			XGraphics g=XGraphics.FromPdfPage(page);
-			g.SmoothingMode=XSmoothingMode.HighQuality;
-			//g.PageUnit=XGraphicsUnit. //wish they had pixel
-			//XTextFormatter tf = new XTextFormatter(g);//needed for text wrap
-			//tf.Alignment=XParagraphAlignment.Left;
-			//pd.DefaultPageSettings.Landscape=
-			//already done?:SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
-			XFont xfont;
-			XFontStyle xfontstyle;
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
-			//first, draw images--------------------------------------------------------------------------------------
-			DrawImagesToPdf(sheet,g);
-			//then, drawings--------------------------------------------------------------------------------------------
-			XPen pen=new XPen(XColors.Black,p(2));
-			string[] pointStr;
-			List<Point> points;
-			Point point;
-			string[] xy;
+			Sheets.SetPageMargin(sheet,_printMargin);
+			XGraphics gx=XGraphics.FromPdfPage(page);
+			gx.SmoothingMode=XSmoothingMode.HighQuality;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
+				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) { 
+					continue; 
 				}
-				if(field.FieldType!=SheetFieldType.Drawing){
-					continue;
+				switch(field.FieldType) {
+					case SheetFieldType.Image:
+					case SheetFieldType.PatImage:
+						drawFieldImage(field,null,gx);
+						break;
+					case SheetFieldType.Drawing:
+						drawFieldDrawing(field,null,gx);
+						break;
+					case SheetFieldType.Rectangle:
+						drawFieldRectangle(field,null,gx);
+						break;
+					case SheetFieldType.Line:
+						drawFieldLine(field,null,gx);
+						break;
+					case SheetFieldType.Grid:
+						drawFieldGrid(field,sheet,null,gx);
+						break;
+					case SheetFieldType.InputField:
+					case SheetFieldType.OutputText:
+					case SheetFieldType.StaticText:
+						drawFieldText(field,sheet,null,gx);
+						break;
+					case SheetFieldType.CheckBox:
+						drawFieldCheckBox(field,null,gx);
+						break;
+					case SheetFieldType.SigBox:
+						drawFieldSigBox(field,sheet,null,gx);
+						break;
+					default:
+						//Parameter or possibly new field type.
+						break;
 				}
-				pointStr=field.FieldValue.Split(';');
-				points=new List<Point>();
-				for(int j=0;j<pointStr.Length;j++){
-					xy=pointStr[j].Split(',');
-					if(xy.Length==2){
-						point=new Point(PIn.Int(xy[0]),PIn.Int(xy[1]));
-						points.Add(point);
-					}
-				}
-				for(int i=1;i<points.Count;i++){
-					g.DrawLine(pen,p(points[i-1].X),p(points[i-1].Y-_yPosPrint),p(points[i].X),p(points[i].Y-_yPosPrint));
-				}
+				GC.Collect();
+			}//end foreach SheetField
+			drawHeader(sheet,null,gx);
+			drawFooter(sheet,null,gx);
+			gx.Dispose();
+			gx=null;
+			GC.Collect();
+			#region Set variables for next page to be printed
+			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
+			_pagesPrinted++;
+			if(_pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
+				//e.HasMorePages=true;
 			}
-			//then, rectangles and lines----------------------------------------------------------------------------------
-			XPen pen2=new XPen(XColors.Black,p(1));
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType==SheetFieldType.Rectangle){
-					g.DrawRectangle(pen2,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
-				}
-				if(field.FieldType==SheetFieldType.Line){
-					g.DrawLine(pen2,p(field.XPos),p(field.YPos-_yPosPrint),
-						p(field.XPos+field.Width),
-						p(field.YPos-_yPosPrint+field.Height));
-				}
+			else {//we are printing the last page of the current sheet.
+				_yPosPrint=_printMargin.Top;
+				_yPosAdj=0;
+				_pagesPrinted=0;
+				_sheetsPrinted++;
+				//if(_sheetsPrinted<_sheetList.Count) {
+				//	//e.HasMorePages=true;
+				//}
+				//else {
+				//	//e.HasMorePages=false;
+				//	_sheetsPrinted=0;
+				//}
 			}
-			//then, draw text--------------------------------------------------------------------------------------------
-			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);
-			Graphics gfx=Graphics.FromImage(doubleBuffer);
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.InputField
-					&& field.FieldType!=SheetFieldType.OutputText
-					&& field.FieldType!=SheetFieldType.StaticText)
-				{
-					continue;
-				}
-				xfontstyle=XFontStyle.Regular;
-				if(field.FontIsBold){
-					xfontstyle=XFontStyle.Bold;
-				}
-				xfont=new XFont(field.FontName,field.FontSize,xfontstyle);
-				//xfont=new XFont(field.FontName,field.FontSize,xfontstyle);
-				//Rectangle rect=new Rectangle((int)p(field.XPos),(int)p(field.YPos),(int)p(field.Width),(int)p(field.Height));
-				XRect xrect=new XRect(p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
-				//XStringFormat format=new XStringFormat();
-				//tf.DrawString(field.FieldValue,font,XBrushes.Black,xrect,XStringFormats.TopLeft);
-				GraphicsHelper.DrawStringX(g,gfx,1d/p(1),field.FieldValue,xfont,XBrushes.Black,xrect);
-			}
-			gfx.Dispose();
-			//then, checkboxes----------------------------------------------------------------------------------
-			XPen pen3=new XPen(XColors.Black,p(1.6f));
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.CheckBox){
-					continue;
-				}
-				if(field.FieldValue=="X"){
-					g.DrawLine(pen3,p(field.XPos),p(field.YPos-_yPosPrint),p(field.XPos+field.Width),p(field.YPos-_yPosPrint+field.Height));
-					g.DrawLine(pen3,p(field.XPos+field.Width),p(field.YPos-_yPosPrint),p(field.XPos),p(field.YPos-_yPosPrint+field.Height));
-				}
-			}
-			//then signature boxes----------------------------------------------------------------------
-			foreach(SheetField field in sheet.SheetFields) {
-				if(!_forceSinglePage) {
-					if(field.YPos<_yPosPrint) {
-						continue; //skip if on previous page
-					}
-					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom) {
-						break; //Skip if on next page
-					}
-				}
-				if(field.FieldType!=SheetFieldType.SigBox){
-					continue;
-				}
-				SignatureBoxWrapper wrapper=new SignatureBoxWrapper();
-				wrapper.Width=field.Width;
-				wrapper.Height=field.Height;
-				if(field.FieldValue.Length>0){//a signature is present
-					bool sigIsTopaz=false;
-					if(field.FieldValue[0]=='1'){
-						sigIsTopaz=true;
-					}
-					string signature="";
-					if(field.FieldValue.Length>1){
-						signature=field.FieldValue.Substring(1);
-					}
-					string keyData=Sheets.GetSignatureKey(sheet);
-					wrapper.FillSignature(sigIsTopaz,keyData,signature);
-				}
-				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
-				g.DrawImage(sigBitmap,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
-			}
-			if(_forceSinglePage) {
-				return;
-			}
-			//Set the _yPosPrint for the next page
-			foreach(SheetField field in sheet.SheetFields) {
-				if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
-					&& field.YPos!=_yPosPrint+_printMargin.Top) {
-					//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
-					_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
-					break;
-				}
-			}
+
+
+			//foreach(SheetField field in sheet.SheetFields) {
+			//	if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
+			//		&& field.YPos!=_yPosPrint+_printMargin.Top) {
+			//		//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
+			//		_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
+			//		break;
+			//	}
+			//}
+			#endregion
 		}
 
 		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing and rendering the sheet fill edit window.</summary>
@@ -559,19 +1014,14 @@ namespace OpenDental {
 			DrawImages(sheet,graphic,null,drawAll);
 		}
 
-		///<summary>Draws all images from the sheet onto the xgraphic passed in.  Used when exporting to pdfs.</summary>
-		public static void DrawImagesToPdf(Sheet sheet,XGraphics xgraphic) {
-			DrawImages(sheet,null,xgraphic);
-		}
-
 		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing, exporting to pdfs, or rendering the sheet fill edit window.  graphic should be null for pdfs and xgraphic should be null for printing and rendering the sheet fill edit window.</summary>
 		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic,bool drawAll=false) {
 			Bitmap bmpOriginal=null;
-			if(drawAll || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
+			if(drawAll){// || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
 				_yPosPrint=0;
 			}
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!drawAll && !_forceSinglePage) {
+				if(!drawAll ){//&& !_forceSinglePage) {
 					if(field.YPos<_yPosPrint) {
 						continue; //skip if on previous page
 					}
@@ -615,7 +1065,7 @@ namespace OpenDental {
 					continue;
 				}
 				#endregion
-				#region Calculate the image ratio and location
+				#region Calculate the image ratio and location, set values for imgDrawWidth and imgDrawHeight
 				//inscribe image in field while maintaining aspect ratio.
 				float imgRatio=(float)bmpOriginal.Width/(float)bmpOriginal.Height;
 				float fieldRatio=(float)field.Width/(float)field.Height;
@@ -642,21 +1092,17 @@ namespace OpenDental {
 				#endregion
 				#region Draw the image
 				if(xGraphic!=null) {//Drawing an image to a pdf.
-					Bitmap bmpResampled=(Bitmap)bmpOriginal.Clone();
-					if(bmpOriginal.HorizontalResolution!=96 || bmpOriginal.VerticalResolution!=96) {//to avoid slowdown for other pdfs
-						//The scaling on the XGraphics.DrawImage() function causes unreadable output unless the image is in 96 DPI native format.
-						//We use GDI here first to convert the image to the correct size and DPI, then pass the second image to XGraphics.DrawImage().
-						bmpResampled.Dispose();
-						bmpResampled=null;
-						bmpResampled=new Bitmap((Bitmap)bmpOriginal.Clone());//resample the resolution.
+					XImage xI=XImage.FromGdiPlusImage((Bitmap)bmpOriginal.Clone());
+					xGraphic.DrawImage(xI,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
+					if(xI!=null) {//should always happen
+						xI.Dispose();
+						xI=null;
 					}
-					xGraphic.DrawImage(bmpResampled,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
-					bmpResampled.Dispose();
-					bmpResampled=null;
 				}
 				else if(graphic!=null) {//Drawing an image to a printer or the sheet fill edit window.
 					graphic.DrawImage(bmpOriginal,field.XPos+adjustX,field.YPos+adjustY-_yPosPrint,imgDrawWidth,imgDrawHeight);
 				}
+				GC.Collect();
 				#endregion
 			}
 			if(bmpOriginal!=null) {
@@ -664,12 +1110,7 @@ namespace OpenDental {
 				bmpOriginal=null;
 			}
 		}
-
-		/*//<summary>Converts pixels used by us to points used by PdfSharp.</summary>
-		private double P(double pixels){
-			return (double)pixels/100;
-		}*/
-
+		
 		///<summary>Converts pixels used by us to points used by PdfSharp.</summary>
 		private static double p(int pixels){
 			XUnit xunit=XUnit.FromInch((double)pixels/100d);//100 ppi
@@ -682,6 +1123,6 @@ namespace OpenDental {
 			XUnit xunit=XUnit.FromInch((double)pixels/100d);//100 ppi
 			return xunit.Point;
 		}
-
+		
 	}
 }

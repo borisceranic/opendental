@@ -288,6 +288,7 @@ namespace OpenDental{
 			this.Name = "FormSheetFillEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Fill Sheet";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSheetFillEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormSheetFillEdit_Load);
 			this.panel1.ResumeLayout(false);
 			this.ResumeLayout(false);

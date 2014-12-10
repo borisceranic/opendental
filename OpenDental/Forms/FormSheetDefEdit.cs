@@ -9,10 +9,13 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+#warning remove linq.
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
+using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormSheetDefEdit:Form {
@@ -85,18 +88,22 @@ namespace OpenDental {
 		}
 
 		private void FormSheetDefEdit_Load(object sender,EventArgs e) {
+			fillFkeyObjects();
 			if(IsInternal){
 				butDelete.Visible=false;
 				butOK.Visible=false;
 				butCancel.Text=Lan.g(this,"Close");
 				groupAddNew.Visible=false;
 				groupPage.Visible=false;
-				butAlignLeft.Visible=false;
-				butAlignTop.Visible=false;
+				groupAlignH.Visible=false;
+				//butAlignLeft.Visible=false;
+				groupAlignV.Visible=false;
+				//butAlignTop.Visible=false;
 				linkLabelTips.Visible=false;
 				butCopy.Visible=false;
 				butPaste.Visible=false;
 				butTabOrder.Visible=false;
+				butPmtOption.Visible=false;
 			}
 			else{
 				labelInternal.Visible=false;
@@ -104,6 +111,12 @@ namespace OpenDental {
 				//butAlignTop.Visible=true;
 				//butCopy.Visible=true;
 				//butPaste.Visible=true;
+			}
+			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement) {
+				butPmtOption.Visible=false;
+			}
+			if(Sheets.SheetTypeIsSinglePage(SheetDefCur.SheetType)) {
+				groupPage.Visible=false;
 			}
 			if(SheetDefCur.SheetType==SheetTypeEnum.DepositSlip
 				|| SheetDefCur.SheetType==SheetTypeEnum.LabelCarrier) 
@@ -125,6 +138,23 @@ namespace OpenDental {
 			panelMain.Refresh();
 			panelMain.Focus();
 			//textDescription.Focus();
+		}
+
+		private void fillFkeyObjects() {
+			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
+				if(SheetDefCur.SheetFieldDefs[i].FKey==0) {
+					continue;
+				}
+				switch(SheetDefCur.SheetFieldDefs[i].FieldType) {
+					case SheetFieldType.Grid:
+						SheetDefCur.SheetFieldDefs[i].GridDef=SheetGridDefs.GetOne(SheetDefCur.SheetFieldDefs[i].FKey);
+						//SheetDefCur.SheetFieldDefs[i].GridDef.Columns=SheetGridColDefs.
+						break;
+					default:
+						//nothing to do here
+						break;
+				}
+			}
 		}
 
 		private void FillFieldList(){
@@ -175,6 +205,14 @@ namespace OpenDental {
 						break;
 					case SheetFieldType.InputField:
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": "+SheetDefCur.SheetFieldDefs[i].FieldName);
+						break;
+					case SheetFieldType.Grid:
+						if(SheetDefCur.SheetFieldDefs[i].GridDef!=null) {//pull from memory, might not be in the DB yet.
+							listFields.Items.Add(Lan.g(this,"Grid:")+SheetGridDefs.GetName(SheetDefCur.SheetFieldDefs[i].GridDef));
+						}
+						else {
+							listFields.Items.Add(Lan.g(this,"Grid:")+SheetGridDefs.GetName(SheetGridDefs.GetOne(SheetDefCur.SheetFieldDefs[i].FKey)));
+						}
 						break;
 					default:
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldName);
@@ -286,193 +324,286 @@ namespace OpenDental {
 					case SheetFieldType.Special:
 						DrawSpecialHelper(g,i);
 						continue;
-				}
-				DrawSelectionRectangle(g,i);
-				DrawStringHelper(g,i);
-				DrawTabModeHelper(g,i);
+					case SheetFieldType.Grid:
+						DrawGridHelper(g,i);
+						continue;
+					case SheetFieldType.InputField:
+					case SheetFieldType.StaticText:
+					case SheetFieldType.OutputText:
+					default:
+						DrawStringHelper(g,i);
+						DrawTabModeHelper(g,i);
+						//throw new ApplicationException("Unsupported sheet field type : "+SheetDefCur.SheetFieldDefs[i].FieldType.ToString());
+						continue;
+				}//end switch
 			}
+			DrawSelectionRectangle(g);
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
 			pDashPage.DashPattern=new float[] { 4.0F,3.0F,2.0F,3.0F };
 			Pen pDashMargin=new Pen(Color.Green);
 			pDashMargin.DashPattern=new float[] { 1.0F,5.0F };
+			int margins=(_printMargin.Top+_printMargin.Bottom);
 			for(int i=1;i<SheetDefCur.PageCount;i++) {
-				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage-_printMargin.Bottom,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage-_printMargin.Bottom);
-				g.DrawLine(pDashPage,0,i*SheetDefCur.HeightPage,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage);
-				g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage+_printMargin.Top,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage-_printMargin.Bottom,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage-_printMargin.Bottom);
+				g.DrawLine(pDashPage,0,i*(SheetDefCur.HeightPage-margins)+_printMargin.Top,SheetDefCur.WidthPage,i*(SheetDefCur.HeightPage-margins)+_printMargin.Top);
+				//g.DrawLine(pDashMargin,0,i*SheetDefCur.HeightPage+_printMargin.Top,SheetDefCur.WidthPage,i*SheetDefCur.HeightPage+_printMargin.Top);
 			}
 			//End Draw Page Break
 		}
 
-		#region DrawFields Helpers
-		private void SetGraphicsHelper(Graphics g) {
-			g.SmoothingMode=SmoothingMode.HighQuality;
-			g.CompositingQuality=CompositingQuality.HighQuality;//This has to be here or the line thicknesses are wrong.
-			_argsDF=new DrawFieldArgs();//reset _argsDF
-		}
-
-		private void DrawImagesHelper(Graphics g,int i) {
-			string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),SheetDefCur.SheetFieldDefs[i].FieldName);
-			Image img=null;
-			if(SheetDefCur.SheetFieldDefs[i].FieldName=="Patient Info.gif") {
-				img=OpenDentBusiness.Properties.Resources.Patient_Info;
-			}
-			else if(File.Exists(filePathAndName)) {
-				img=Image.FromFile(filePathAndName);
-			}
-			else {
-				return;
-			}
-			g.DrawImage(img,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-		}
-
-		private void DrawPatImageHelper(Graphics g,int i) {
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRed;
-				_argsDF.brush=_argsDF.brushRed;
-			}
-			else {
-				_argsDF.pen=_argsDF.penBlack;
-				_argsDF.brush=_argsDF.brushBlue;
-			}
-			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawString("PatImage: "+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName))
-				,Font/*NOT _argsDF.font*/,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos+1,SheetDefCur.SheetFieldDefs[i].YPos+1);
-		}
-
-		private void DrawLineHelper(Graphics g,int i) {
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRed;
-			}
-			else {
-				_argsDF.pen=_argsDF.penBlack;
-			}
-			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width,
-				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height);
-		}
-
-		private void DrawRectangleHelper(Graphics g,int i) {
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRed;
-			}
-			else {
-				_argsDF.pen=_argsDF.penBlack;
-			}
-			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-		}
-
-		private void DrawCheckBoxHelper(Graphics g,int i) {
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRedThick;
-			}
-			else {
-				_argsDF.pen=_argsDF.penBlueThick;
-			}
-			//g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-			//	SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,
-				SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
-				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
-			g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
-				SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].XPos,
-				SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
-			if(IsTabMode) {
-				Rectangle tabRect = new Rectangle(
-					SheetDefCur.SheetFieldDefs[i].XPos-1,//X
-					SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
-					(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
-					12);//height
-				if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
-					g.FillRectangle(Brushes.White,tabRect);
-					g.DrawRectangle(Pens.Blue,tabRect);
-					g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
-					//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
+		#region DrawFields Helpers (In Alphabetical Order)
+			private void SetGraphicsHelper(Graphics g) {
+				g.SmoothingMode=SmoothingMode.HighQuality;
+				g.CompositingQuality=CompositingQuality.HighQuality;//This has to be here or the line thicknesses are wrong.
+				if(_argsDF!=null) {
+					_argsDF.Dispose();
 				}
-				else {//Blue border, blue box, white letters
-					g.FillRectangle(_argsDF.brushBlue,tabRect);
-					g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
-					//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
+				_argsDF=new DrawFieldArgs();//reset _argsDF
+			}
+
+			private void DrawCheckBoxHelper(Graphics g,int i) {
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRedThick;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlueThick;
+				}
+				//g.DrawRectangle(pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				//	SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,
+					SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
+					SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
+				g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width-1,
+					SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].XPos,
+					SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height-1);
+				if(IsTabMode) {
+					Rectangle tabRect = new Rectangle(
+						SheetDefCur.SheetFieldDefs[i].XPos-1,//X
+						SheetDefCur.SheetFieldDefs[i].YPos-1,//Y
+						(int)g.MeasureString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont).Width+1,//Width
+						12);//height
+					if(ListSheetFieldDefsTabOrder.Contains(SheetDefCur.SheetFieldDefs[i])) {//blue border, white box, blue letters
+						g.FillRectangle(Brushes.White,tabRect);
+						g.DrawRectangle(Pens.Blue,tabRect);
+						g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.Blue,tabRect.X,tabRect.Y-1);
+						//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.Blue,tabRect);
+					}
+					else {//Blue border, blue box, white letters
+						g.FillRectangle(_argsDF.brushBlue,tabRect);
+						g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
+						//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
+					}
 				}
 			}
-		}
 
-		private void DrawSigBoxHelper(Graphics g,int i) {
-			//font=new Font(Font,
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRed;
-				_argsDF.brush=_argsDF.brushRed;
+			private void DrawGridHelper(Graphics g,int i) {
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+					_argsDF.brush=_argsDF.brushRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlack;
+					_argsDF.brush=_argsDF.brushBlue;
+				}
+				SheetGridDef fGrid=SheetDefCur.SheetFieldDefs[i].GridDef;
+#warning fix columns below.
+				//fGrid.Columns=SheetGridDefs.GetColumnsAvailable(fGrid.GridType);
+				ODGrid odGrid=new ODGrid();
+				odGrid.Title=fGrid.Title;
+				odGrid.Width=0;
+				for(int c=0;c<fGrid.Columns.Count;c++){
+					odGrid.Width+=fGrid.Columns[c].Width;
+				}
+				odGrid.HideScrollBars=true;
+				#region  Fill Grid
+				odGrid.BeginUpdate();
+				odGrid.Columns.Clear();
+				ODGridColumn col;
+				for(int c=0;c<fGrid.Columns.Count;c++) {
+					col=new ODGridColumn(fGrid.Columns[c].DisplayName,fGrid.Columns[c].Width);
+					odGrid.Columns.Add(col);
+				}
+				ODGridRow row=new ODGridRow();//Add dummy row
+				for(int c=0;c<fGrid.Columns.Count;c++) {
+					row.Cells.Add(" ");
+				}
+				odGrid.Rows.Add(row);
+				odGrid.EndUpdate();//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
+				#endregion
+				int yPosGrid=SheetDefCur.SheetFieldDefs[i].YPos;
+				if(SheetGridDefs.gridHasDefaultTitle(fGrid.GridType)) {
+					switch(fGrid.GridType) {//Draw titles differently for different grids.
+						case SheetGridType.StatementPayPlan:
+							SizeF sSize=g.MeasureString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold));
+							g.FillRectangle(Brushes.White,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,odGrid.Width,odGrid.TitleHeight);
+							g.DrawString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold),new SolidBrush(Color.Black),SheetDefCur.SheetFieldDefs[i].XPos+(SheetDefCur.SheetFieldDefs[i].Width-sSize.Width)/2,yPosGrid);
+							break;
+						default:
+							odGrid.DrawTitle(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
+							break;
+					}
+					yPosGrid+=odGrid.TitleHeight;
+				}
+				odGrid.DrawHeader(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
+				yPosGrid+=odGrid.HeaderHeight;
+				odGrid.DrawRow(0,g,odGrid.Font,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,false,true);
+				yPosGrid+=odGrid.RowHeights[0]+2;
+				#region drawFooter
+				if(fGrid.GridType==SheetGridType.StatementPayPlan) {
+					RectangleF rf=new RectangleF(SheetDefCur.Width-SheetDefCur.SheetFieldDefs[i].Width-60,yPosGrid,SheetDefCur.SheetFieldDefs[i].Width,odGrid.TitleHeight);
+					g.FillRectangle(Brushes.White,rf);
+					StringFormat sf=new StringFormat();
+					sf.Alignment=StringAlignment.Far;
+					g.DrawString("Payment Plan Amount Due: "+"0.00",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold),new SolidBrush(Color.Black),rf,sf);
+				}
+				#endregion
+				if(listFields.SelectedIndices.Contains(i)) {
+					g.DrawRectangle(_argsDF.penRedThick,
+						SheetDefCur.SheetFieldDefs[i].XPos,
+						SheetDefCur.SheetFieldDefs[i].YPos,
+						SheetDefCur.SheetFieldDefs[i].Width,
+						SheetDefCur.SheetFieldDefs[i].Height);
+				}
+				//g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+				//	SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				//g.DrawString("Grid:"+SheetGridDefs.GetName(SheetDefCur.SheetFieldDefs[i].GridDef),Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
 			}
-			else {
-				_argsDF.pen=_argsDF.penBlue;
-				_argsDF.brush=_argsDF.brushBlue;
-			}
-			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawString("(signature box)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
-		}
 
-		private void DrawSpecialHelper(Graphics g,int i) {
-			//TODO:
-			if(listFields.SelectedIndices.Contains(i)) {
-				_argsDF.pen=_argsDF.penRed;
-				_argsDF.brush=_argsDF.brushRed;
+			private void DrawImagesHelper(Graphics g,int i) {
+				string filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),SheetDefCur.SheetFieldDefs[i].FieldName);
+				Image img=null;
+				if(SheetDefCur.SheetFieldDefs[i].FieldName=="Patient Info.gif") {
+					img=OpenDentBusiness.Properties.Resources.Patient_Info;
+				}
+				else if(File.Exists(filePathAndName)) {
+					img=Image.FromFile(filePathAndName);
+				}
+				else {
+					return;
+				}
+				g.DrawImage(img,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				#if DEBUG
+					g.DrawRectangle(new Pen(Brushes.IndianRed),SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+						SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				#endif
+				if(img!=null) {
+					img.Dispose();
+				}
 			}
-			else {
-				_argsDF.pen=_argsDF.penBlue;
-				_argsDF.brush=_argsDF.brushBlue;
-			}
-			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
-				SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawString("(Special:Tooth Grid)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
-		}
 
-		private void DrawSelectionRectangle(Graphics g,int i) {
-			if(ClickedOnBlankSpace) {
-				g.DrawRectangle(_argsDF.penSelection,
-					//The math functions are used below to account for users clicking and dragging up, down, left, or right.
-					Math.Min(MouseOriginalPos.X,MouseCurrentPos.X),//X
-					Math.Min(MouseOriginalPos.Y,MouseCurrentPos.Y),//Y
-					Math.Abs(MouseCurrentPos.X-MouseOriginalPos.X),//Width
-					Math.Abs(MouseCurrentPos.Y-MouseOriginalPos.Y));//Height
+			private void DrawLineHelper(Graphics g,int i) {
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlack;
+				}
+				g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width,
+					SheetDefCur.SheetFieldDefs[i].YPos+SheetDefCur.SheetFieldDefs[i].Height);
 			}
-		}
 
-		private void DrawStringHelper(Graphics g,int i) {
-			_argsDF.fontstyle=FontStyle.Regular;
-			if(SheetDefCur.SheetFieldDefs[i].FontIsBold) {
-				_argsDF.fontstyle=FontStyle.Bold;
+			private void DrawPatImageHelper(Graphics g,int i) {
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+					_argsDF.brush=_argsDF.brushRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlack;
+					_argsDF.brush=_argsDF.brushBlue;
+				}
+				g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				g.DrawString("PatImage: "+DefC.GetName(DefCat.ImageCats,PIn.Long(SheetDefCur.SheetFieldDefs[i].FieldName))
+					,Font/*NOT _argsDF.font*/,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos+1,SheetDefCur.SheetFieldDefs[i].YPos+1);
 			}
-			_argsDF.font=new Font(SheetDefCur.SheetFieldDefs[i].FontName,SheetDefCur.SheetFieldDefs[i].FontSize,_argsDF.fontstyle);
-			if(listFields.SelectedIndices.Contains(i)) {
-				g.DrawRectangle(_argsDF.penRed,SheetDefCur.SheetFieldDefs[i].Bounds);
-				_argsDF.brush=_argsDF.brushRed;
-			}
-			else {
-				g.DrawRectangle(_argsDF.penBlue,SheetDefCur.SheetFieldDefs[i].Bounds);
-				_argsDF.brush=_argsDF.brushBlue;
-			}
-			string str;
-			if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.StaticText) {
-				str=SheetDefCur.SheetFieldDefs[i].FieldValue;
-				//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldValue,font,
-				//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
-			}
-			else {
-				str=SheetDefCur.SheetFieldDefs[i].FieldName;
-				//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldName,font,
-				//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
-			}
-			//g.DrawString(str,font,brush,SheetDefCur.SheetFieldDefs[i].Bounds);//This was drawing differently than in RichTextBox, so problems with large text.
-			DrawRTFstring(i,str,_argsDF.font,_argsDF.brush,g);
-		}
 
-		private void DrawTabModeHelper(Graphics g,int i) {
+			private void DrawRectangleHelper(Graphics g,int i) {
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlack;
+				}
+				g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			}
+
+			private void DrawSelectionRectangle(Graphics g) {
+				if(ClickedOnBlankSpace) {
+					g.DrawRectangle(_argsDF.penSelection,
+						//The math functions are used below to account for users clicking and dragging up, down, left, or right.
+						Math.Min(MouseOriginalPos.X,MouseCurrentPos.X),//X
+						Math.Min(MouseOriginalPos.Y,MouseCurrentPos.Y),//Y
+						Math.Abs(MouseCurrentPos.X-MouseOriginalPos.X),//Width
+						Math.Abs(MouseCurrentPos.Y-MouseOriginalPos.Y));//Height
+				}
+			}
+
+			private void DrawSigBoxHelper(Graphics g,int i) {
+				//font=new Font(Font,
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+					_argsDF.brush=_argsDF.brushRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlue;
+					_argsDF.brush=_argsDF.brushBlue;
+				}
+				g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				g.DrawString("(signature box)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+			}
+
+			private void DrawSpecialHelper(Graphics g,int i) {
+				//TODO:
+				if(listFields.SelectedIndices.Contains(i)) {
+					_argsDF.pen=_argsDF.penRed;
+					_argsDF.brush=_argsDF.brushRed;
+				}
+				else {
+					_argsDF.pen=_argsDF.penBlue;
+					_argsDF.brush=_argsDF.brushBlue;
+				}
+				g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
+					SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+				g.DrawString("(Special:Tooth Grid)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+			}
+
+			private void DrawStringHelper(Graphics g,int i) {
+				_argsDF.fontstyle=FontStyle.Regular;
+				if(SheetDefCur.SheetFieldDefs[i].FontIsBold) {
+					_argsDF.fontstyle=FontStyle.Bold;
+				}
+				_argsDF.font=new Font(SheetDefCur.SheetFieldDefs[i].FontName,SheetDefCur.SheetFieldDefs[i].FontSize,_argsDF.fontstyle);
+				if(listFields.SelectedIndices.Contains(i)) {
+					g.DrawRectangle(_argsDF.penRed,SheetDefCur.SheetFieldDefs[i].Bounds);
+					_argsDF.brush=_argsDF.brushRed;
+				}
+				else {
+					g.DrawRectangle(_argsDF.penBlue,SheetDefCur.SheetFieldDefs[i].Bounds);
+					_argsDF.brush=_argsDF.brushBlue;
+				}
+				string str;
+				if(SheetDefCur.SheetFieldDefs[i].FieldType==SheetFieldType.StaticText) {
+					str=SheetDefCur.SheetFieldDefs[i].FieldValue;
+					//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldValue,font,
+					//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
+				}
+				else {
+					str=SheetDefCur.SheetFieldDefs[i].FieldName;
+					//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldName,font,
+					//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
+				}
+				//g.DrawString(str,font,brush,SheetDefCur.SheetFieldDefs[i].Bounds);//This was drawing differently than in RichTextBox, so problems with large text.
+				DrawRTFstring(i,str,_argsDF.font,_argsDF.brush,g);
+			}
+
+			private void DrawTabModeHelper(Graphics g,int i) {
 			if(!IsTabMode || SheetDefCur.SheetFieldDefs[i].FieldType!=SheetFieldType.InputField) {
 				return;
 			}
@@ -569,7 +700,7 @@ namespace OpenDental {
 				panelMain.Width=SheetDefCur.Width;
 				panelMain.Height=SheetDefCur.Height;
 			}
-			panelMain.Height=SheetDefCur.HeightTotal;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			FillFieldList();
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
@@ -763,6 +894,30 @@ namespace OpenDental {
 			panelMain.Refresh();
 		}
 
+		private void butAddGrid_Click(object sender,EventArgs e) {
+			//if(this.IsInternal) {//why would we ever "add" to an internal sheet?
+			//	return;
+			//}
+			FormSheetFieldGridType FormT=new FormSheetFieldGridType();
+			FormT.ShowDialog();
+			if(FormT.DialogResult!=DialogResult.OK){
+				return;
+			}
+			FormSheetFieldGrid FormS=new FormSheetFieldGrid();
+			FormS.SheetDefCur=SheetDefCur;
+			FormS.SheetFieldDefCur=SheetFieldDef.NewGrid(0,0,100,100,FormT.SelectedSheetGridType);//is resized from dialog window.
+			//if(this.IsInternal) {//why would we ever "add" to an internal sheet?
+			//	FormS.IsReadOnly=true;
+			//}
+			FormS.ShowDialog();
+			if(FormS.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			SheetDefCur.SheetFieldDefs.Add(FormS.SheetFieldDefCur);
+			FillFieldList();
+			panelMain.Refresh();
+		}
+
 		private void listFields_Click(object sender,EventArgs e) {
 			//if(listFields.SelectedIndices.Count==0){
 			//	return;
@@ -942,6 +1097,22 @@ namespace OpenDental {
 					}
 					if(FormSFS.SheetFieldDefCur==null) {
 						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
+					}
+					break;
+				case SheetFieldType.Grid:
+					FormSheetFieldGrid FormSFG=new FormSheetFieldGrid();
+					FormSFG.SheetDefCur=SheetDefCur;
+					FormSFG.SheetFieldDefCur=field;
+					if(this.IsInternal) {
+						FormSFG.IsReadOnly=true;
+					}
+					FormSFG.ShowDialog();
+					if(FormSFG.DialogResult!=DialogResult.OK) {
+						return;
+					}
+					if(FormSFG.SheetFieldDefCur==null) {
+						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
+						return;
 					}
 					break;
 			}
@@ -1450,6 +1621,80 @@ namespace OpenDental {
 			MessageBox.Show(Lan.g(this,tips));
 		}
 
+		private void butAlignLeft_Click(object sender,EventArgs e) {
+			if(listFields.SelectedIndices.Count<2) {
+				return;
+			}
+			float minX=SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[0]].BoundsF.Left;
+			for(int i=0;i<listFields.SelectedIndices.Count;i++) {
+				if(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].BoundsF.Left<minX) {//current element is higher up than the current 'highest' element.
+					minX=SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].BoundsF.Left;
+				}
+				for(int j=0;j<listFields.SelectedIndices.Count;j++) {
+					if(i==j) {//Don't compare element to itself.
+						continue;
+					}
+					if(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].Bounds.Y//compare the int bounds not the boundsF for practical use
+						==SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[j]].Bounds.Y) //compare the int bounds not the boundsF for practical use
+					{
+						MsgBox.Show(this,"Cannot align controls. Two or more selected controls will overlap.");
+						return;
+					}
+				}
+			}
+			for(int i=0;i<listFields.SelectedIndices.Count;i++) {//Actually move the controls now
+				SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].XPos=(int)minX;
+			}
+			panelMain.Refresh();
+		}
+
+		private void butAlignCenterH_Click(object sender,EventArgs e) {
+			if(listFields.SelectedIndices.Count<2) {
+				return;
+			}
+			List<SheetFieldDef> listSelectedFields=new List<SheetFieldDef>();
+			for(int i=0;i<listFields.SelectedIndices.Count;i++) {
+				listSelectedFields.Add(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]]);
+			}
+			List<int> yPositions=new List<int>();
+			float maxX=int.MinValue;
+			float minX=int.MaxValue;
+			foreach(SheetFieldDef field in listSelectedFields) {
+				if(yPositions.Contains(field.YPos)) {
+					MsgBox.Show(this,"Cannot align controls. Two or more selected controls will overlap.");
+					return;
+				}
+				yPositions.Add(field.YPos);
+				if(maxX<field.Bounds.Right) {
+					maxX=field.Bounds.Right;
+				}
+				if(minX>field.Bounds.Left) {
+					minX=field.Bounds.Left;
+				}
+			}
+			int avgX=(int)(minX+maxX)/2;
+#warning remove lamda statement below.
+			listSelectedFields.ForEach(field => field.XPos=avgX-field.Width/2);
+			panelMain.Refresh();
+		}
+
+		private void butAlignRight_Click(object sender,EventArgs e) {
+			if(listFields.SelectedIndices.Count<2) {
+				return;
+			}
+			List<SheetFieldDef> listSelectedFields=new List<SheetFieldDef>();
+			for(int i=0;i<listFields.SelectedIndices.Count;i++){
+				listSelectedFields.Add(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]]);
+			}
+			if(listSelectedFields.Exists(f1 => listSelectedFields.FindAll(f2 => f1.YPos==f2.YPos).Count>1)) {
+				MsgBox.Show(this,"Cannot align controls. Two or more selected controls will overlap.");
+				return;
+			}
+			int maxX=listSelectedFields.Max(d => d.Bounds.Right);
+			listSelectedFields.ForEach(field => field.XPos=maxX-field.Width);
+			panelMain.Refresh();
+		}
+
 		/// <summary>When clicked it will set all selected elements' Y coordinates to the smallest Y coordinate in the group, unless two controls have the same X coordinate.</summary>
 		private void butAlignTop_Click(object sender,EventArgs e) {
 			if(listFields.SelectedIndices.Count<2) {
@@ -1478,33 +1723,6 @@ namespace OpenDental {
 			panelMain.Refresh();
 		}
 
-		private void butAlignLeft_Click(object sender,EventArgs e) {
-			if(listFields.SelectedIndices.Count<2) {
-				return;
-			}
-			float minX=SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[0]].BoundsF.Left;
-			for(int i=0;i<listFields.SelectedIndices.Count;i++) {
-				if(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].BoundsF.Left<minX) {//current element is higher up than the current 'highest' element.
-					minX=SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].BoundsF.Left;
-				}
-				for(int j=0;j<listFields.SelectedIndices.Count;j++) {
-					if(i==j) {//Don't compare element to itself.
-						continue;
-					}
-					if(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].Bounds.Y//compare the int bounds not the boundsF for practical use
-						==SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[j]].Bounds.Y) //compare the int bounds not the boundsF for practical use
-					{
-						MsgBox.Show(this,"Cannot align controls. Two or more selected controls will overlap.");
-						return;
-					}
-				}
-			}
-			for(int i=0;i<listFields.SelectedIndices.Count;i++) {//Actually move the controls now
-				SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].XPos=(int)minX;
-			}
-			panelMain.Refresh();
-		}
-
 		private void butPaste_Click(object sender,EventArgs e) {
 			PasteControlsFromMemory(new Point(0,0));
 		}
@@ -1522,8 +1740,11 @@ namespace OpenDental {
 				groupAddNew.Enabled=false;
 				butCopy.Enabled=false;
 				butPaste.Enabled=false;
-				butAlignLeft.Enabled=false;
-				butAlignTop.Enabled=false;
+				groupAlignH.Enabled=false;
+				groupAlignV.Enabled=false;
+				butPmtOption.Enabled=false;
+				//butAlignLeft.Enabled=false;
+				//butAlignTop.Enabled=false;
 				butEdit.Enabled=false;
 				ListSheetFieldDefsTabOrder=new List<SheetFieldDef>();//clear or create the list of tab orders.
 			}
@@ -1534,8 +1755,11 @@ namespace OpenDental {
 				groupAddNew.Enabled=true;
 				butCopy.Enabled=true;
 				butPaste.Enabled=true;
-				butAlignLeft.Enabled=true;
-				butAlignTop.Enabled=true;
+				groupAlignH.Enabled=true;
+				groupAlignV.Enabled=true;
+				butPmtOption.Enabled=true;
+				//butAlignLeft.Enabled=true;
+				//butAlignTop.Enabled=true;
 				butEdit.Enabled=true;
 			}
 			panelMain.Refresh();
@@ -1547,28 +1771,28 @@ namespace OpenDental {
 				return;
 			}
 			SheetDefCur.PageCount++;
-			SheetDefCur.IsMultiPage=true;
-			panelMain.Height=SheetDefCur.HeightTotal;
+			//SheetDefCur.IsMultiPage=true;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
 		}
 
 		private void butPageRemove_Click(object sender,EventArgs e) {
 			if(SheetDefCur.PageCount<2) {
-				SheetDefCur.IsMultiPage=false;
+				//SheetDefCur.IsMultiPage=false;
 				//Minimum PageCount 1
 				return;
 			}
 			SheetDefCur.PageCount--;
 			if(SheetDefCur.PageCount==1) {
-				SheetDefCur.IsMultiPage=false;
+				//SheetDefCur.IsMultiPage=false;
 			}
 			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) {//Find all fields that have a YPos greater than the bottom of the page.
 				MsgBox.Show(this,"Cannot remove pages that contain sheet fields.");
 				SheetDefCur.PageCount++;
 				return;
 			}
-			panelMain.Height=SheetDefCur.HeightTotal;
+			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
 			RefreshDoubleBuffer();
 			panelMain.Refresh();
 		}
@@ -1591,29 +1815,41 @@ namespace OpenDental {
 		
 	}
 
-	public class DrawFieldArgs {
-			public Pen penBlue;
-			public Pen penRed;
-			public Pen penBlueThick;
-			public Pen penRedThick;
-			public Pen penBlack;
-			public Pen penSelection;
-			public Pen pen;
-			public Brush brush;
-			public SolidBrush brushBlue;
-			public SolidBrush brushRed;
-			public Font font;
-			public FontStyle fontstyle;
+	public class DrawFieldArgs :IDisposable {
+		public Pen penBlue;
+		public Pen penRed;
+		public Pen penBlueThick;
+		public Pen penRedThick;
+		public Pen penBlack;
+		public Pen penSelection;
+		public Pen pen;
+		public Brush brush;
+		public SolidBrush brushBlue;
+		public SolidBrush brushRed;
+		public Font font;
+		public FontStyle fontstyle;
 
-			public DrawFieldArgs() {
-				penBlue=new Pen(Color.Blue);
-				penRed=new Pen(Color.Red);
-				penBlueThick=new Pen(Color.Blue,1.6f);
-				penRedThick=new Pen(Color.Red,1.6f);
-				penBlack=new Pen(Color.Black);
-				penSelection=new Pen(Color.Black);
-				brushBlue=new SolidBrush(Color.Blue);
-				brushRed=new SolidBrush(Color.Red);
-			}
+		public DrawFieldArgs() {
+			penBlue=new Pen(Color.Blue);
+			penRed=new Pen(Color.Red);
+			penBlueThick=new Pen(Color.Blue,1.6f);
+			penRedThick=new Pen(Color.Red,1.6f);
+			penBlack=new Pen(Color.Black);
+			penSelection=new Pen(Color.Black);
+			brushBlue=new SolidBrush(Color.Blue);
+			brushRed=new SolidBrush(Color.Red);
+		}
+
+		public void Dispose() {
+			penBlue.Dispose();
+			penRed.Dispose();
+			penBlueThick.Dispose();
+			penRedThick.Dispose();
+			penBlack.Dispose();
+			penSelection.Dispose();
+			brushBlue.Dispose();
+			brushRed.Dispose();
+		}
+
 	}
 }

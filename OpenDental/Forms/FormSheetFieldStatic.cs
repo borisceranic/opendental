@@ -44,10 +44,18 @@ namespace OpenDental {
 					comboGrowthBehavior.SelectedIndex=i;
 				}
 			}
+			for(int i=0;i<Enum.GetNames(typeof(System.Windows.Forms.HorizontalAlignment)).Length;i++) {
+				comboTextAlign.Items.Add(Enum.GetNames(typeof(System.Windows.Forms.HorizontalAlignment))[i]);
+				if((int)SheetFieldDefCur.TextAlign==i) {
+					comboTextAlign.SelectedIndex=i;
+				}
+			}
 			textXPos.Text=SheetFieldDefCur.XPos.ToString();
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
 			textHeight.Text=SheetFieldDefCur.Height.ToString();
+			checkPmtOpt.Checked=SheetFieldDefCur.IsPaymentOption;
+			butColor.BackColor=SheetFieldDefCur.ItemColor;
 			FillFields();
 		}
 
@@ -237,6 +245,13 @@ namespace OpenDental {
 			textFieldValue.Focus();
 		}
 
+		private void butColor_Click(object sender,EventArgs e) {
+			ColorDialog colorDialog1=new ColorDialog();
+			colorDialog1.Color=butColor.BackColor;
+			colorDialog1.ShowDialog();
+			butColor.BackColor=colorDialog1.Color;
+		}
+
 		private void butDelete_Click(object sender,EventArgs e) {
 			SheetFieldDefCur=null;
 			DialogResult=DialogResult.OK;
@@ -281,6 +296,9 @@ namespace OpenDental {
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
 			SheetFieldDefCur.GrowthBehavior=(GrowthBehaviorEnum)comboGrowthBehavior.SelectedIndex;
+			SheetFieldDefCur.TextAlign=(System.Windows.Forms.HorizontalAlignment)comboTextAlign.SelectedIndex;
+			SheetFieldDefCur.IsPaymentOption=checkPmtOpt.Checked;
+			SheetFieldDefCur.ItemColor=butColor.BackColor;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;
 		}

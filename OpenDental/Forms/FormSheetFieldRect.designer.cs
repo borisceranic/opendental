@@ -35,11 +35,12 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
+			this.checkPmtOpt = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(35, 24);
+			this.label5.Location = new System.Drawing.Point(62, 24);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 90;
@@ -48,7 +49,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(35, 50);
+			this.label6.Location = new System.Drawing.Point(62, 50);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 92;
@@ -57,7 +58,7 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(35, 76);
+			this.label7.Location = new System.Drawing.Point(62, 76);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -66,7 +67,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(35, 102);
+			this.label8.Location = new System.Drawing.Point(62, 102);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -75,7 +76,7 @@ namespace OpenDental{
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(106, 101);
+			this.textHeight.Location = new System.Drawing.Point(133, 101);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = 1;
 			this.textHeight.Name = "textHeight";
@@ -84,7 +85,7 @@ namespace OpenDental{
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(106, 75);
+			this.textWidth.Location = new System.Drawing.Point(133, 75);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = 1;
 			this.textWidth.Name = "textWidth";
@@ -93,7 +94,7 @@ namespace OpenDental{
 			// 
 			// textYPos
 			// 
-			this.textYPos.Location = new System.Drawing.Point(106, 49);
+			this.textYPos.Location = new System.Drawing.Point(133, 49);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
@@ -102,7 +103,7 @@ namespace OpenDental{
 			// 
 			// textXPos
 			// 
-			this.textXPos.Location = new System.Drawing.Point(106, 23);
+			this.textXPos.Location = new System.Drawing.Point(133, 23);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
@@ -156,10 +157,22 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
+			// checkPmtOpt
+			// 
+			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPmtOpt.Location = new System.Drawing.Point(17, 127);
+			this.checkPmtOpt.Name = "checkPmtOpt";
+			this.checkPmtOpt.Size = new System.Drawing.Size(130, 20);
+			this.checkPmtOpt.TabIndex = 236;
+			this.checkPmtOpt.Text = "Is Payment Option";
+			this.checkPmtOpt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormSheetFieldRect
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(394, 200);
+			this.Controls.Add(this.checkPmtOpt);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textHeight);
 			this.Controls.Add(this.label8);
@@ -194,5 +207,6 @@ namespace OpenDental{
 		private ValidNum textHeight;
 		private System.Windows.Forms.Label label8;
 		private OpenDental.UI.Button butDelete;
+		private System.Windows.Forms.CheckBox checkPmtOpt;
 	}
 }

@@ -25,6 +25,8 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSheetFieldStatic));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.comboTextAlign = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
 			this.checkFontIsBold = new System.Windows.Forms.CheckBox();
 			this.textFontSize = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -48,11 +50,18 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.labelTextW = new System.Windows.Forms.Label();
 			this.butExamSheet = new OpenDental.UI.Button();
+			this.checkPmtOpt = new System.Windows.Forms.CheckBox();
+			this.label10 = new System.Windows.Forms.Label();
+			this.butColor = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.label10);
+			this.groupBox1.Controls.Add(this.butColor);
+			this.groupBox1.Controls.Add(this.comboTextAlign);
+			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Controls.Add(this.checkFontIsBold);
 			this.groupBox1.Controls.Add(this.textFontSize);
 			this.groupBox1.Controls.Add(this.label4);
@@ -60,10 +69,28 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Location = new System.Drawing.Point(18, 361);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(287, 95);
+			this.groupBox1.Size = new System.Drawing.Size(287, 141);
 			this.groupBox1.TabIndex = 88;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Font";
+			// 
+			// comboTextAlign
+			// 
+			this.comboTextAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboTextAlign.FormattingEnabled = true;
+			this.comboTextAlign.Location = new System.Drawing.Point(83, 114);
+			this.comboTextAlign.Name = "comboTextAlign";
+			this.comboTextAlign.Size = new System.Drawing.Size(197, 21);
+			this.comboTextAlign.TabIndex = 107;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(6, 115);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(78, 16);
+			this.label2.TabIndex = 106;
+			this.label2.Text = "Align";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkFontIsBold
 			// 
@@ -111,7 +138,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(31, 502);
+			this.label5.Location = new System.Drawing.Point(31, 537);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 90;
@@ -120,7 +147,7 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(31, 528);
+			this.label6.Location = new System.Drawing.Point(31, 563);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 92;
@@ -129,7 +156,7 @@ namespace OpenDental{
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(31, 554);
+			this.label7.Location = new System.Drawing.Point(31, 589);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -138,7 +165,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(31, 580);
+			this.label8.Location = new System.Drawing.Point(31, 615);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -149,14 +176,14 @@ namespace OpenDental{
 			// 
 			this.comboGrowthBehavior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboGrowthBehavior.FormattingEnabled = true;
-			this.comboGrowthBehavior.Location = new System.Drawing.Point(101, 473);
+			this.comboGrowthBehavior.Location = new System.Drawing.Point(101, 508);
 			this.comboGrowthBehavior.Name = "comboGrowthBehavior";
 			this.comboGrowthBehavior.Size = new System.Drawing.Size(197, 21);
 			this.comboGrowthBehavior.TabIndex = 99;
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(-5, 474);
+			this.label9.Location = new System.Drawing.Point(-5, 509);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(107, 16);
 			this.label9.TabIndex = 98;
@@ -217,7 +244,7 @@ namespace OpenDental{
 			// 
 			// textHeight
 			// 
-			this.textHeight.Location = new System.Drawing.Point(101, 579);
+			this.textHeight.Location = new System.Drawing.Point(101, 614);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = -100;
 			this.textHeight.Name = "textHeight";
@@ -226,7 +253,7 @@ namespace OpenDental{
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(101, 553);
+			this.textWidth.Location = new System.Drawing.Point(101, 588);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = -100;
 			this.textWidth.Name = "textWidth";
@@ -235,7 +262,7 @@ namespace OpenDental{
 			// 
 			// textYPos
 			// 
-			this.textYPos.Location = new System.Drawing.Point(101, 527);
+			this.textYPos.Location = new System.Drawing.Point(101, 562);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
@@ -244,7 +271,7 @@ namespace OpenDental{
 			// 
 			// textXPos
 			// 
-			this.textXPos.Location = new System.Drawing.Point(101, 501);
+			this.textXPos.Location = new System.Drawing.Point(101, 536);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
@@ -283,7 +310,7 @@ namespace OpenDental{
 			// 
 			// labelTextW
 			// 
-			this.labelTextW.Location = new System.Drawing.Point(176, 555);
+			this.labelTextW.Location = new System.Drawing.Point(176, 590);
 			this.labelTextW.Name = "labelTextW";
 			this.labelTextW.Size = new System.Drawing.Size(109, 16);
 			this.labelTextW.TabIndex = 104;
@@ -305,10 +332,41 @@ namespace OpenDental{
 			this.butExamSheet.Text = "Exam Sheet Field";
 			this.butExamSheet.Click += new System.EventHandler(this.butExamSheet_Click);
 			// 
+			// checkPmtOpt
+			// 
+			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPmtOpt.Location = new System.Drawing.Point(7, 639);
+			this.checkPmtOpt.Name = "checkPmtOpt";
+			this.checkPmtOpt.Size = new System.Drawing.Size(109, 20);
+			this.checkPmtOpt.TabIndex = 236;
+			this.checkPmtOpt.Text = "Is Payment Option";
+			this.checkPmtOpt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label10
+			// 
+			this.label10.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.label10.Location = new System.Drawing.Point(10, 90);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(71, 16);
+			this.label10.TabIndex = 240;
+			this.label10.Text = "Color";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butColor
+			// 
+			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+			this.butColor.Location = new System.Drawing.Point(83, 88);
+			this.butColor.Name = "butColor";
+			this.butColor.Size = new System.Drawing.Size(30, 20);
+			this.butColor.TabIndex = 239;
+			this.butColor.Click += new System.EventHandler(this.butColor_Click);
+			// 
 			// FormSheetFieldStatic
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(884, 691);
+			this.Controls.Add(this.checkPmtOpt);
 			this.Controls.Add(this.butExamSheet);
 			this.Controls.Add(this.labelTextW);
 			this.Controls.Add(this.label1);
@@ -366,5 +424,10 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label labelTextW;
 		private UI.Button butExamSheet;
+		private System.Windows.Forms.ComboBox comboTextAlign;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.CheckBox checkPmtOpt;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Button butColor;
 	}
 }

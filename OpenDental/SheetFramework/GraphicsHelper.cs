@@ -25,7 +25,7 @@ namespace OpenDental {
 		}
 
 		///<summary>Since Graphics doesn't have a line height property.  The second graphics object is used for measurement purposes.</summary>
-		public static void DrawString(Graphics g,Graphics gfx,string str,Font font,Brush brush,Rectangle bounds) {
+		public static void DrawString(Graphics g,Graphics gfx,string str,Font font,Brush brush,Rectangle bounds,StringAlignment sa) {
 			SizeF fit=new SizeF(bounds.Width-rightPad,font.Height);
 			StringFormat format=StringFormat.GenericTypographic;
 			float pixelsPerLine=LineSpacingForFont(font.Name) * (float)font.Height;
@@ -45,18 +45,34 @@ namespace OpenDental {
 				else {
 					layoutH=font.Height+2;
 				}
+				int adjX=0;
+				int adjW=100;//any amount of extra padding here will not cause malfunction
+				switch(sa) {
+					case StringAlignment.Near:
+						adjX=0;
+						break;
+					case StringAlignment.Far:
+						adjX=-adjW;
+						break;
+					case StringAlignment.Center:
+						adjX=-adjW/2;
+						break;
+				}
 				layoutRectangle=new RectangleF(
-					bounds.X,
+					bounds.X+adjX,//must add same number of pixels 
 					(float)(bounds.Y+topPad+pixelsPerLine*lineIdx),
-					bounds.Width+100,//any amount of extra padding here will not cause malfunction
+					bounds.Width+adjW,
 					layoutH);
-				g.DrawString(str.Substring(ix,chars),font,brush,layoutRectangle);
+				using(StringFormat sf=StringFormat.GenericDefault) {
+					sf.Alignment=sa;
+					g.DrawString(str.Substring(ix,chars),font,brush,layoutRectangle,sf);
+				}
 				lineIdx+=1;
 			}
 		}
 
 		///<summary>The pdfSharp version of drawstring.  g is used for measurement.  scaleToPix scales xObjects to pixels.</summary>
-		public static void DrawStringX(XGraphics xg,Graphics g,double scaleToPix,string str,XFont xfont,XBrush xbrush,XRect xbounds) {
+		public static void DrawStringX(XGraphics xg,Graphics g,double scaleToPix,string str,XFont xfont,XBrush xbrush,XRect xbounds, XStringAlignment sa) {
 			//There are two coordinate systems here: pixels (used by us) and points (used by PdfSharp).
 			//MeasureString and ALL related measurement functions must use pixels.
 			//DrawString is the ONLY function that uses points.
@@ -100,9 +116,13 @@ namespace OpenDental {
 					(float)xbounds.X,
 					//(float)(xbounds.Y+(float)topPad/scaleToPix+(pixelsPerLine/scaleToPix)*lineIdx),
 					(float)(xbounds.Y+adjustTextDown+(pixelsPerLine/scaleToPix)*lineIdx),
-					(float)xbounds.Width+100,//any amount of extra padding here will not cause malfunction
+					(float)xbounds.Width+50,//any amount of extra padding here will not cause malfunction
 					0);//layoutH);
-				xg.DrawString(str.Substring(ix,chars),xfont,xbrush,(double)layoutRectangle.Left,(double)layoutRectangle.Top);
+				XStringFormat sf=XStringFormats.Default;
+				sf.Alignment=sa;
+				//sf.LineAlignment= XLineAlignment.Near;
+				//xg.DrawString(str.Substring(ix,chars),xfont,xbrush,layoutRectangle,sf);
+				xg.DrawString(str.Substring(ix,chars),xfont,xbrush,(double)layoutRectangle.Left,(double)layoutRectangle.Top,sf);
 				lineIdx+=1;
 			}
 		}

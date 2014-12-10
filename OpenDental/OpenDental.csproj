@@ -72,7 +72,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;USA</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -396,6 +396,24 @@
     </Compile>
     <Compile Include="Forms\FormEmailDigitalSignature.designer.cs">
       <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormSheetGridColDefEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSheetGridColDefEdit.designer.cs">
+      <DependentUpon>FormSheetGridColDefEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormSheetFieldGridType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSheetFieldGridType.designer.cs">
+      <DependentUpon>FormSheetFieldGridType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormSheetFieldGrid.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSheetFieldGrid.designer.cs">
+      <DependentUpon>FormSheetFieldGrid.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormWikiListHistory.cs">
       <SubType>Form</SubType>
@@ -3570,6 +3588,15 @@
     <EmbeddedResource Include="Forms\FormEmailDigitalSignature.resx">
       <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSheetGridColDefEdit.resx">
+      <DependentUpon>FormSheetGridColDefEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSheetFieldGridType.resx">
+      <DependentUpon>FormSheetFieldGridType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSheetFieldGrid.resx">
+      <DependentUpon>FormSheetFieldGrid.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormWikiListHistory.resx">
       <DependentUpon>FormWikiListHistory.cs</DependentUpon>
     </EmbeddedResource>
@@ -5865,7 +5892,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <BaseApplicationManifest Include="Properties\app.manifest" />
-    <None Include="ClassDiagram2.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

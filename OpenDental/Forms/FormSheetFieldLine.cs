@@ -31,6 +31,15 @@ namespace OpenDental {
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
 			textHeight.Text=SheetFieldDefCur.Height.ToString();
+			checkPmtOpt.Checked=SheetFieldDefCur.IsPaymentOption;
+			butColor.BackColor=SheetFieldDefCur.ItemColor;
+		}
+
+		private void butColor_Click(object sender,EventArgs e) {
+			ColorDialog colorDialog1=new ColorDialog();
+			colorDialog1.Color=butColor.BackColor;
+			colorDialog1.ShowDialog();
+			butColor.BackColor=colorDialog1.Color;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -51,6 +60,8 @@ namespace OpenDental {
 			SheetFieldDefCur.YPos=PIn.Int(textYPos.Text);
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
+			SheetFieldDefCur.IsPaymentOption=checkPmtOpt.Checked;
+			SheetFieldDefCur.ItemColor=butColor.BackColor;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;
 		}

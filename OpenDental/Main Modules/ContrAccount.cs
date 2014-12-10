@@ -3689,7 +3689,7 @@ namespace OpenDental {
 				if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()!="0") {//the selected item is a proc
 					Procedure proc=Procedures.GetOneProc(PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()),false);
 					if(proc.PatNum!=PatCur.PatNum) {
-						MsgBox.Show(this,"You can only select procedures or adjustments for a single patient on an invoice.");
+						MsgBox.Show(this,"You can only select procedures or adjustments for the currently patient on an invoice.");
 						gridAccount.SetSelected(false);
 						return;
 					}
@@ -3800,6 +3800,15 @@ namespace OpenDental {
 
 		/// <summary>Saves the statement.  Attaches a pdf to it by creating a doc object.  Prints it or emails it.  </summary>
 		private void PrintStatement(Statement stmt) {
+			if(PrefC.GetBool(PrefName.StatementsUseSheets)) {
+				PrintStatmentSheets(stmt);
+			}
+			else {
+				PrintStatementClassic(stmt);
+			}
+		}
+
+		private void PrintStatementClassic(Statement stmt) {
 			Cursor=Cursors.WaitCursor;
 			Statements.Insert(stmt);
 			FormRpStatement FormST=new FormRpStatement();
@@ -3840,7 +3849,7 @@ namespace OpenDental {
 						patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
 						List<Document> listdocs=new List<Document>();
 						listdocs.Add(Documents.GetByNum(stmt.DocNum));
-						try {  
+						try {
 							ImageStore.DeleteDocuments(listdocs,patFolder);
 						}
 						catch {  //Image could not be deleted, in use.
@@ -3853,19 +3862,89 @@ namespace OpenDental {
 				}
 			}
 			else {//not email
-				#if DEBUG
-					//don't bother to check valid path because it's just debug.
-					string imgPath=ImageStore.GetFilePath(Documents.GetByNum(stmt.DocNum),guarFolder);
-					DateTime now=DateTime.Now;
-					while(DateTime.Now<now.AddSeconds(5) && !File.Exists(imgPath)) {//wait up to 5 seconds.
-						Application.DoEvents();
-					}
-					Process.Start(imgPath);
-				#else
+#if DEBUG
+				//don't bother to check valid path because it's just debug.
+				string imgPath=ImageStore.GetFilePath(Documents.GetByNum(stmt.DocNum),guarFolder);
+				DateTime now=DateTime.Now;
+				while(DateTime.Now<now.AddSeconds(5) && !File.Exists(imgPath)) {//wait up to 5 seconds.
+					Application.DoEvents();
+				}
+				Process.Start(imgPath);
+#else
 					FormST.PrintStatement(stmt,false,dataSet,FamCur,PatCur);
-				#endif
+#endif
 			}
 			Cursor=Cursors.Default;
+
+		}
+
+		private void PrintStatmentSheets(Statement stmt) {
+			Cursor=Cursors.WaitCursor;
+//#error find the correct statement sheet.
+//#error insert statement sheets to DB
+//#error finish this function
+			Statements.Insert(stmt);
+			FormRpStatement FormST=new FormRpStatement();
+			DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
+			FormST.CreateStatementPdf(stmt,PatCur,FamCur,dataSet);
+			//if(ImageStore.UpdatePatient == null){
+			//	ImageStore.UpdatePatient = new FileStore.UpdatePatientDelegate(Patients.Update);
+			//}
+			Patient guar=Patients.GetPat(stmt.PatNum);
+			string guarFolder=ImageStore.GetPatientFolder(guar,ImageStore.GetPreferredAtoZpath());
+			//OpenDental.Imaging.ImageStoreBase imageStore = OpenDental.Imaging.ImageStore.GetImageStore(guar);
+			if(stmt.Mode_==StatementMode.Email) {
+				string attachPath=EmailMessages.GetEmailAttachPath();
+				Random rnd=new Random();
+				string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
+				string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
+				File.Copy(ImageStore.GetFilePath(Documents.GetByNum(stmt.DocNum),guarFolder),filePathAndName);
+				//Process.Start(filePathAndName);
+				EmailMessage message=Statements.GetEmailMessageForStatement(stmt,guar);
+				EmailAttach attach=new EmailAttach();
+				attach.DisplayedFileName="Statement.pdf";
+				attach.ActualFileName=fileName;
+				message.Attachments.Add(attach);
+				FormEmailMessageEdit FormE=new FormEmailMessageEdit(message);
+				FormE.IsNew=true;
+				FormE.ShowDialog();
+				//If user clicked delete or cancel, delete pdf and statement
+				if(FormE.DialogResult==DialogResult.Cancel) {
+					Patient pat;
+					string patFolder;
+					if(stmt.DocNum!=0) {
+						//delete the pdf
+						pat=Patients.GetPat(stmt.PatNum);
+						patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+						List<Document> listdocs=new List<Document>();
+						listdocs.Add(Documents.GetByNum(stmt.DocNum));
+						try {
+							ImageStore.DeleteDocuments(listdocs,patFolder);
+						}
+						catch {  //Image could not be deleted, in use.
+							//This should never get hit because the file was created by this user within this method.  
+							//If the doc cannot be deleted, then we will not stop them, they will have to manually delete it from the images module.
+						}
+					}
+					//delete statement
+					Statements.Delete(stmt);
+				}
+			}
+			else {//not email
+#if DEBUG
+				//don't bother to check valid path because it's just debug.
+				string imgPath=ImageStore.GetFilePath(Documents.GetByNum(stmt.DocNum),guarFolder);
+				DateTime now=DateTime.Now;
+				while(DateTime.Now<now.AddSeconds(5) && !File.Exists(imgPath)) {//wait up to 5 seconds.
+					Application.DoEvents();
+				}
+				Process.Start(imgPath);
+#else
+					FormST.PrintStatement(stmt,false,dataSet,FamCur,PatCur);
+#endif
+			}
+			Cursor=Cursors.Default;
+
 		}
 
 		private void textUrgFinNote_TextChanged(object sender, System.EventArgs e) {
