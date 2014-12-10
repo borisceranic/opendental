@@ -10,6 +10,7 @@ using System.Text;
 namespace OpenDentBusiness {
 	public class AccountModules {
 		//These static variables are only used on either client or server.  Should work fine as written.
+		///<summary>Class level static variable. Several function in the AccountModules class modify the retVal variable.</summary>
 		private static DataSet retVal;
 		private static Family fam;
 		private static Patient pat;
@@ -513,6 +514,13 @@ namespace OpenDentBusiness {
 			table.Columns.Add("ToothNum");
 			table.Columns.Add("ToothRange");
 			table.Columns.Add("tth");
+		}
+		
+		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
+		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool returnTable) {
+			retVal=new DataSet();
+			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes);
+			return retVal;
 		}
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
@@ -1962,6 +1970,10 @@ namespace OpenDentBusiness {
 	class AccountLineComparer : IComparer<DataRow>	{
 		///<summary></summary>
 		public int Compare (DataRow x,DataRow y){
+			if(x["PatNum"].ToString()!=y["PatNum"].ToString()
+				&&(x["PatNum"].ToString()!="0" && y["PatNum"].ToString()!="0")) {
+				return x["PatNum"].ToString().CompareTo(y["PatNum"].ToString());
+			}
 			//if dates are different, then sort by date
 			if(((DateTime)x["DateTime"]).Date!=((DateTime)y["DateTime"]).Date){
 				return (((DateTime)x["DateTime"]).Date).CompareTo(((DateTime)y["DateTime"]).Date);
