@@ -38,17 +38,13 @@ namespace OpenDentBusiness{
 			return sheetdef;
 		}
 
-		///<summary>Includes all attached fields.  It simply deletes all the old fields and inserts new ones.</summary>
+		///<summary>Includes all attached fields.  Intelligently inserts, updates, or deletes old fields.</summary>
 		public static long InsertOrUpdate(SheetDef sheetDef){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				sheetDef.SheetDefNum=Meth.GetLong(MethodBase.GetCurrentMethod(),sheetDef);
 				return sheetDef.SheetDefNum;
 			}
 			string command;
-			if(!sheetDef.IsNew){
-				command="DELETE FROM sheetfielddef WHERE SheetDefNum="+POut.Long(sheetDef.SheetDefNum);
-				Db.NonQ(command);
-			}
 			if(sheetDef.IsNew){
 				sheetDef.SheetDefNum=Crud.SheetDefCrud.Insert(sheetDef);
 			}
@@ -56,9 +52,20 @@ namespace OpenDentBusiness{
 				Crud.SheetDefCrud.Update(sheetDef);
 			}
 			foreach(SheetFieldDef field in sheetDef.SheetFieldDefs){
-				field.IsNew=true;
 				field.SheetDefNum=sheetDef.SheetDefNum;
-				SheetFieldDefs.Insert(field);
+			}
+			SheetFieldDefs.InsUpDel(sheetDef.SheetFieldDefs,sheetDef.SheetDefNum);
+			foreach(SheetFieldDef field in sheetDef.SheetFieldDefs) {
+				if(field.FieldType!= SheetFieldType.Grid) {
+					continue;
+				}
+				if(field.GridDef.SheetGridDefNum==0) {
+					field.FKey=SheetGridDefs.Insert(field.GridDef);
+					SheetFieldDefs.Update(field);//field was inserted above, here we have set the FKey.
+				}
+				else {
+					SheetGridDefs.Update(field.GridDef);
+				}
 			}
 			return sheetDef.SheetDefNum;
 		}

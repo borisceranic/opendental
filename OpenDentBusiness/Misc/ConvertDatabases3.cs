@@ -6659,6 +6659,139 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS sheetgridcoldef";
+					Db.NonQ(command);
+					command=@"CREATE TABLE sheetgridcoldef (
+						SheetGridColDefNum bigint NOT NULL auto_increment PRIMARY KEY,
+						SheetGridDefNum bigint NOT NULL,
+						ColName varchar(255) NOT NULL,
+						DisplayName varchar(255) NOT NULL,
+						Width int NOT NULL,
+						ItemOrder int NOT NULL,
+						textAlign tinyint NOT NULL,
+						INDEX(SheetGridDefNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE sheetgridcoldef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE sheetgridcoldef (
+						SheetGridColDefNum number(20) NOT NULL,
+						SheetGridDefNum number(20) NOT NULL,
+						ColName varchar2(255),
+						DisplayName varchar2(255),
+						Width number(11) NOT NULL,
+						ItemOrder number(11) NOT NULL,
+						textAlign number(3) NOT NULL,
+						CONSTRAINT sheetgridcoldef_SheetGridColDe PRIMARY KEY (SheetGridColDefNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX sheetgridcoldef_SheetGridDefNu ON sheetgridcoldef (SheetGridDefNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS sheetgriddef";
+					Db.NonQ(command);
+					command=@"CREATE TABLE sheetgriddef (
+						SheetGridDefNum bigint NOT NULL auto_increment PRIMARY KEY,
+						GridType varchar(255) NOT NULL,
+						Descritpion varchar(255) NOT NULL,
+						Title varchar(255) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE sheetgriddef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE sheetgriddef (
+						SheetGridDefNum number(20) NOT NULL,
+						GridType varchar2(255),
+						Descritpion varchar2(255),
+						Title varchar2(255),
+						CONSTRAINT sheetgriddef_SheetGridDefNum PRIMARY KEY (SheetGridDefNum)
+						)";
+					Db.NonQ(command);
+				} if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD TextAlign tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD TextAlign number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET TextAlign = 0 WHERE TextAlign IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY TextAlign NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD TextAlign tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD TextAlign number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET TextAlign = 0 WHERE TextAlign IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY TextAlign NOT NULL";
+					Db.NonQ(command);
+				} 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD IsPaymentOption tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD IsPaymentOption number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET IsPaymentOption = 0 WHERE IsPaymentOption IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY IsPaymentOption NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD IsPaymentOption tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD IsPaymentOption number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET IsPaymentOption = 0 WHERE IsPaymentOption IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY IsPaymentOption NOT NULL";
+					Db.NonQ(command);
+				} if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD ItemColor int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD ItemColor number(11)";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET ItemColor = 0 WHERE ItemColor IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY ItemColor NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD ItemColor int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD ItemColor number(11)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET ItemColor = 0 WHERE ItemColor IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY ItemColor NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('StatementsUseSheets',FALSE)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'StatementsUseSheets',FALSE)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -6704,3 +6837,13 @@ namespace OpenDentBusiness {
 
 
 
+
+				
+				
+
+
+				
+
+
+
+				

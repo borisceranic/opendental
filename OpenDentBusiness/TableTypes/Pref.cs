@@ -450,6 +450,7 @@ namespace OpenDentBusiness {
 		StatementShowProcBreakdown,
 		StatementShowReturnAddress,
 		StatementSummaryShowInsInfo,
+		StatementsUseSheets,
 		StoreCCnumbers,
 		StoreCCtokens,
 		SubscriberAllowChangeAlways,

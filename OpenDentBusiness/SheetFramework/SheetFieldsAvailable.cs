@@ -49,6 +49,8 @@ namespace OpenDentBusiness{
 					return GetExamSheet(outInCheck);
 				case SheetTypeEnum.DepositSlip:
 					return GetDepositSlip(outInCheck);
+				case SheetTypeEnum.Statement:
+					return GetStatement(outInCheck);
 			}
 			return new List<SheetFieldDef>();
 		}
@@ -486,6 +488,45 @@ namespace OpenDentBusiness{
 			else if(outInCheck==OutInCheck.In){				
 			}
 			else if(outInCheck==OutInCheck.Check){
+			}
+			return list;
+		}
+
+		private static List<SheetFieldDef> GetStatement(OutInCheck outInCheck) {
+			List<SheetFieldDef> list=new List<SheetFieldDef>();
+			if(outInCheck==OutInCheck.Out) {
+				list.Add(NewOutput("Account Number"));
+				list.Add(NewOutput("Bold Note"));
+				list.Add(NewOutput("Future Appointments"));
+				list.Add(NewOutput("Note"));
+				list.Add(NewOutput("Total.label"));
+				list.Add(NewOutput("Total.value"));
+				list.Add(NewOutput("InsEst.label"));
+				list.Add(NewOutput("InsEst.value"));
+				list.Add(NewOutput("Balance.label"));
+				list.Add(NewOutput("Balance.value"));
+				list.Add(NewOutput("AmountDue.value"));
+				list.Add(NewOutput("PayPlanAmtDue.value"));
+				list.Add(NewOutput("Sta/Rec/Inv"));
+				list.Add(NewOutput("ReturnAddress"));
+				list.Add(NewOutput("BillingAddress"));
+				list.Add(NewOutput("PracticeTitle"));
+				list.Add(NewOutput("PracticeAddress"));
+				list.Add(NewOutput("practiceCityStateZip"));
+				list.Add(NewOutput("patient.nameFL"));
+				list.Add(NewOutput("patient.address"));
+				list.Add(NewOutput("patient.cityStateZip"));
+				list.Add(NewOutput("Statement.DateSent"));
+				list.Add(NewOutput("Statement.IsCopy"));
+				list.Add(NewOutput("Statement.IsTaxReceipt"));
+				//list.Add(NewOutput("SwissBanking"));//Not yet Supported.
+				list.Add(NewOutput("patient.salutation"));
+				list.Add(NewOutput("patient.priProvNameFL"));
+				list.Add(NewOutput("ProviderLegend"));
+			}
+			else if(outInCheck==OutInCheck.In) {
+			}
+			else if(outInCheck==OutInCheck.Check) {
 			}
 			return list;
 		}

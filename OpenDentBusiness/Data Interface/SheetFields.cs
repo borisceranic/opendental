@@ -99,19 +99,41 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		public static int SortDrawingOrder(SheetField f1,SheetField f2) {
-			if(f1.Bounds.Top<f2.Bounds.Top
-				&& f1.Bounds.Bottom>f2.Bounds.Bottom) {//f1 starts before and ends after f2 meaning it should be ordered before f2
-					return -1;
+		///<summary>Sorts fields in the order that they shoudl be drawn on top of eachother. First Images, then Drawings, Lines, Rectangles, Text, Check Boxes, and SigBoxes. In that order.</summary>
+		public static int SortDrawingOrderLayers(SheetField f1,SheetField f2) {
+			if(f1.FieldType!=f2.FieldType) {
+				return FieldTypeSortOrder(f1.FieldType).CompareTo(FieldTypeSortOrder(f2.FieldType));
 			}
-			else if(f2.Bounds.Top<f1.Bounds.Top
-				&& f2.Bounds.Bottom>f1.Bounds.Bottom) {
+			return f1.YPos.CompareTo(f2.YPos);
+			//return f1.SheetFieldNum.CompareTo(f2.SheetFieldNum);
+		}
+
+		///<summary>Re-orders the SheetFieldType enum to a drawing order. Images should be drawn first, then drawings, then lines, then rectangles, etc...</summary>
+		private static int FieldTypeSortOrder(SheetFieldType t) {
+			switch(t) {
+				case SheetFieldType.Image:
+				case SheetFieldType.PatImage:
+					return 0;
+				case SheetFieldType.Drawing:
 					return 1;
+				case SheetFieldType.Line:
+				case SheetFieldType.Rectangle:
+					return 2;
+				case SheetFieldType.Grid:
+					return 3;
+				case SheetFieldType.OutputText:
+				case SheetFieldType.InputField:
+				case SheetFieldType.StaticText:
+					return 4;
+				case SheetFieldType.CheckBox:
+					return 5;
+				case SheetFieldType.SigBox:
+					return 6;
+				case SheetFieldType.Special:
+				case SheetFieldType.Parameter:
+				default:
+					return int.MaxValue;
 			}
-			if(f1.Bounds.Bottom!=f2.Bounds.Bottom) {
-				return f1.Bounds.Bottom.CompareTo(f2.Bounds.Bottom);
-			}
-			return f1.XPos.CompareTo(f2.XPos);
 		}
 
 		///<summary>Sorts the sheet fields by SheetFieldNum.  This is used when creating a signature key and is absolutely critical that it not change.</summary>

@@ -102,11 +102,8 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),sheetGridColDefNum);
 				return;
 			}
-			string command= "DELETE FROM sheetgridcoldef WHERE SheetGridColDefNum = "+POut.Long(sheetGridColDefNum);
-			Db.NonQ(command);
+			Crud.SheetGridColDefCrud.Delete(sheetGridColDefNum);
 		}
-
-
 
 		///<summary></summary>
 		public static List<SheetGridColDef> GetForGridDef(long gridDefNum) {
@@ -134,7 +131,6 @@ namespace OpenDentBusiness{
 			if(x.SheetGridColDefNum!=y.SheetGridColDefNum) {
 				return x.SheetGridColDefNum.CompareTo(y.SheetGridColDefNum);
 			}
-			//
 			return x.GetHashCode().CompareTo(y.GetHashCode());
 		}
 
