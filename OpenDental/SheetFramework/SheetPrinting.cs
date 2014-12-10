@@ -214,7 +214,7 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);//should always be sorted.
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);//should always be sorted.
 			SetForceSinglePage(sheet);
 			Font font;
 			FontStyle fontstyle;
@@ -405,7 +405,7 @@ namespace OpenDental {
 			//already done?:SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
 			XFont xfont;
 			XFontStyle xfontstyle;
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrder);
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			//first, draw images--------------------------------------------------------------------------------------
 			DrawImagesToPdf(sheet,g);
 			//then, drawings--------------------------------------------------------------------------------------------
