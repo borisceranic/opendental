@@ -399,9 +399,9 @@ namespace OpenDentBusiness{
 
 
 		///<summary>Used in FormConfirmList.  The assumption is made that showRecall and showNonRecall will not both be false.</summary>
-		public static DataTable GetConfirmList(DateTime dateFrom,DateTime dateTo,long provNum,long clinicNum,bool showRecall,bool showNonRecall) {
+		public static DataTable GetConfirmList(DateTime dateFrom,DateTime dateTo,long provNum,long clinicNum,bool showRecall,bool showNonRecall,bool showHygPresched) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,provNum,clinicNum,showRecall,showNonRecall);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,provNum,clinicNum,showRecall,showNonRecall,showHygPresched);
 			}
 			DataTable table=new DataTable();
 			DataRow row;
@@ -414,6 +414,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("ClinicNum");//patient.ClinicNum
 			table.Columns.Add("confirmed");
 			table.Columns.Add("contactMethod");
+			table.Columns.Add("dateSched");
 			table.Columns.Add("email");//could be patient or guarantor email.
 			table.Columns.Add("Guarantor");
 			table.Columns.Add("medNotes");
@@ -430,11 +431,12 @@ namespace OpenDentBusiness{
 			string command="SELECT patient.PatNum,patient.LName,patient.FName,patient.Preferred,patient.LName,patient.Guarantor,"
 				+"AptDateTime,patient.Birthdate,patient.ClinicNum,patient.HmPhone,patient.TxtMsgOk,patient.WkPhone,"
 				+"patient.WirelessPhone,ProcDescript,Confirmed,Note,patient.AddrNote,AptNum,patient.MedUrgNote,"
-				+"patient.PreferConfirmMethod,guar.Email guarEmail,patient.Email,patient.Premed,DateTimeAskedToArrive "
-				+"FROM patient,appointment,patient guar "
-				+"WHERE patient.PatNum=appointment.PatNum "
-				+"AND patient.Guarantor=guar.PatNum "
-				+"AND AptDateTime > "+POut.Date(dateFrom)+" "
+				+"patient.PreferConfirmMethod,guar.Email guarEmail,patient.Email,patient.Premed,DateTimeAskedToArrive,LogDateTime "
+				+"FROM patient "
+				+"INNER JOIN appointment ON appointment.PatNum=patient.PatNum "
+				+"INNER JOIN patient guar ON guar.PatNum=patient.Guarantor "
+				+"LEFT JOIN securitylog ON securitylog.PatNum=appointment.PatNum AND securitylog.PermType=25 AND securitylog.FKey=appointment.AptNum "
+				+"WHERE AptDateTime > "+POut.Date(dateFrom)+" "
 				//Example: AptDateTime="2014-11-26 13:00".  Filter is 11-26, giving "2014-11-27 00:00" to compare against.  This captures all times.
 				+"AND AptDateTime < "+POut.Date(dateTo.AddDays(1))+" "
 				+"AND AptStatus IN(1,4) ";//scheduled,ASAP
@@ -447,7 +449,7 @@ namespace OpenDentBusiness{
 			if(clinicNum>0) {
 				command+="AND appointment.ClinicNum="+POut.Long(clinicNum)+" ";
 			}
-			if(showRecall && !showNonRecall) {
+			if(showRecall && !showNonRecall && !showHygPresched) {//Show recall only (the All option was not selected)
 				command+="AND appointment.AptNum IN ("
 					+"SELECT procedurelog.AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
@@ -457,7 +459,7 @@ namespace OpenDentBusiness{
 					+"FROM procedurelog "
 					+"WHERE procedurelog.ProcStatus=2) ";//and the patient has had a procedure completed in the office (i.e. not the patient's first appt)
 			}
-			else if(!showRecall && showNonRecall) {
+			else if(!showRecall && showNonRecall && !showHygPresched) {//Show non-recall only (the All option was not selected)
 				command+="AND (appointment.AptNum NOT IN ("
 					+"SELECT AptNum FROM procedurelog "
 					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
@@ -466,6 +468,10 @@ namespace OpenDentBusiness{
 					+"SELECT DISTINCT procedurelog.PatNum "
 					+"FROM procedurelog "
 					+"WHERE procedurelog.ProcStatus=2)) ";//or if the patient has never had a completed procedure (new patient appts)
+			}
+			else if(!showRecall && !showNonRecall && showHygPresched) {//Show hygiene prescheduled only (the All option was not selected)
+				//Example: LogDateTime="2014-11-26 13:00".  Filter is 11-26, giving "2014-11-27 00:00" to compare against.  This captures all times for 11-26.
+				command+="AND (securitylog.PatNum IS NULL OR securitylog.LogDateTime < "+POut.Date(dateFrom.AddDays(1).AddMonths(-2))+") ";
 			}
 			command+="ORDER BY AptDateTime";
 			DataTable rawtable=Db.GetTable(command);
@@ -505,6 +511,10 @@ namespace OpenDentBusiness{
 				}
 				if(contmeth==ContactMethod.DoNotCall || contmeth==ContactMethod.SeeNotes) {
 					row["contactMethod"]=Lans.g("enumContactMethod",contmeth.ToString());
+				}
+				row["dateSched"]="Unknown";
+				if(rawtable.Rows[i]["LogDateTime"].ToString().Length>0) {
+					row["dateSched"]=rawtable.Rows[i]["LogDateTime"].ToString();
 				}
 				if(rawtable.Rows[i]["Email"].ToString()=="" && rawtable.Rows[i]["guarEmail"].ToString()!="") {
 					row["email"]=rawtable.Rows[i]["guarEmail"].ToString();

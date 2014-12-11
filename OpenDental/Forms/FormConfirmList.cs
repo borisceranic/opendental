@@ -161,7 +161,8 @@ namespace OpenDental{
 			this.comboShowRecall.Items.AddRange(new object[] {
             "All",
             "Recall Only",
-            "Exclude Recall"});
+            "Exclude Recall",
+						"Hygiene Prescheduled"});
 			this.comboShowRecall.Location = new System.Drawing.Point(29, 38);
 			this.comboShowRecall.Name = "comboShowRecall";
 			this.comboShowRecall.Size = new System.Drawing.Size(121, 21);
@@ -461,17 +462,23 @@ namespace OpenDental{
 			}
 			bool showRecalls=false;
 			bool showNonRecalls=false;
+			bool showHygienePrescheduled=false;
 			if(comboShowRecall.SelectedIndex==0 || comboShowRecall.SelectedIndex==1) {//All or Recall Only
 				showRecalls=true;
 			}
 			if(comboShowRecall.SelectedIndex==0 || comboShowRecall.SelectedIndex==2) {//All or Exclude Recalls
 				showNonRecalls=true;
 			}
-			Table=Appointments.GetConfirmList(dateFrom,dateTo,provNum,clinicNum,showRecalls,showNonRecalls);
+			if(comboShowRecall.SelectedIndex==0 || comboShowRecall.SelectedIndex==3) {//All or Hygiene Prescheduled
+				showHygienePrescheduled=true;
+			}
+			Table=Appointments.GetConfirmList(dateFrom,dateTo,provNum,clinicNum,showRecalls,showNonRecalls,showHygienePrescheduled);
 			int scrollVal=grid.ScrollValue;
 			grid.BeginUpdate();
 			grid.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableConfirmList","Date Time"),70);
+			grid.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableConfirmList","DateSched"),80);
 			grid.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Patient"),80);
 			grid.Columns.Add(col);
@@ -487,7 +494,7 @@ namespace OpenDental{
 			grid.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Medical"),80);
 			grid.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableConfirmList","Appt Note"),204);
+			col=new ODGridColumn(Lan.g("TableConfirmList","Appt Note"),124);
 			grid.Columns.Add(col);
 			grid.Rows.Clear();
 			ODGridRow row;
@@ -496,6 +503,7 @@ namespace OpenDental{
 				row=new ODGridRow();
 				//aptDateTime=PIn.PDateT(table.Rows[i][4].ToString());
 				row.Cells.Add(Table.Rows[i]["aptDateTime"].ToString());
+				row.Cells.Add(Table.Rows[i]["dateSched"].ToString());
 				//aptDateTime.ToShortDateString()+"\r\n"+aptDateTime.ToShortTimeString());
 				row.Cells.Add(Table.Rows[i]["patientName"].ToString());
 				row.Cells.Add(Table.Rows[i]["age"].ToString());
