@@ -36,7 +36,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butPostcards;
 		private OpenDental.ValidDate textDateFrom;
 		private OpenDental.ValidDate textDateTo;
-		private OpenDental.UI.ODGrid grid;
+		private OpenDental.UI.ODGrid gridMain;
 		///<summary>When this form closes, this will be the patNum of the last patient viewed.  The calling form should then make use of this to refresh to that patient.  If 0, then calling form should not refresh.</summary>
 		public long SelectedPatNum;
 		///<summary>This list of appointments displayed</summary>
@@ -94,7 +94,7 @@ namespace OpenDental{
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.comboStatus = new System.Windows.Forms.ComboBox();
 			this.butPostcards = new OpenDental.UI.Button();
-			this.grid = new OpenDental.UI.ODGrid();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butEmail = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
@@ -309,18 +309,18 @@ namespace OpenDental{
 			// 
 			// grid
 			// 
-			this.grid.HScrollVisible = false;
-			this.grid.Location = new System.Drawing.Point(4, 69);
-			this.grid.Name = "grid";
-			this.grid.ScrollValue = 0;
-			this.grid.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.grid.Size = new System.Drawing.Size(963, 585);
-			this.grid.TabIndex = 0;
-			this.grid.Title = "Confirmation List";
-			this.grid.TranslationName = "TableConfirmList";
-			this.grid.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellDoubleClick);
-			this.grid.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellClick);
-			this.grid.Click += new System.EventHandler(this.grid_Click);
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(4, 69);
+			this.gridMain.Name = "grid";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.Size = new System.Drawing.Size(963, 585);
+			this.gridMain.TabIndex = 0;
+			this.gridMain.Title = "Confirmation List";
+			this.gridMain.TranslationName = "TableConfirmList";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellClick);
+			this.gridMain.Click += new System.EventHandler(this.grid_Click);
 			// 
 			// butPrint
 			// 
@@ -382,7 +382,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butEmail);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.butPostcards);
-			this.Controls.Add(this.grid);
+			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.butLabels);
 			this.Controls.Add(this.butReport);
@@ -473,30 +473,30 @@ namespace OpenDental{
 				showHygienePrescheduled=true;
 			}
 			Table=Appointments.GetConfirmList(dateFrom,dateTo,provNum,clinicNum,showRecalls,showNonRecalls,showHygienePrescheduled);
-			int scrollVal=grid.ScrollValue;
-			grid.BeginUpdate();
-			grid.Columns.Clear();
+			int scrollVal=gridMain.ScrollValue;
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableConfirmList","Date Time"),70);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","DateSched"),80);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Patient"),80);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Age"),30);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Contact"),150);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Addr/Ph Note"),100);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Status"),80);//confirmed
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Procs"),110);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Medical"),80);
-			grid.Columns.Add(col);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableConfirmList","Appt Note"),124);
-			grid.Columns.Add(col);
-			grid.Rows.Clear();
+			gridMain.Columns.Add(col);
+			gridMain.Rows.Clear();
 			ODGridRow row;
 			ODGridCell cell;
 			for(int i=0;i<Table.Rows.Count;i++){
@@ -515,10 +515,10 @@ namespace OpenDental{
 				cell.ColorText=Color.Red;
 				row.Cells.Add(cell);
 				row.Cells.Add(Table.Rows[i]["Note"].ToString());
-				grid.Rows.Add(row);
+				gridMain.Rows.Add(row);
 			}
-			grid.EndUpdate();
-			grid.ScrollValue=scrollVal;
+			gridMain.EndUpdate();
+			gridMain.ScrollValue=scrollVal;
 		}
 
 		private void grid_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
@@ -529,28 +529,28 @@ namespace OpenDental{
 		}
 
 		private void SetFamilyColors(){
-			if(grid.SelectedIndices.Length!=1){
-				for(int i=0;i<grid.Rows.Count;i++){
-					grid.Rows[i].ColorText=Color.Black;
+			if(gridMain.SelectedIndices.Length!=1){
+				for(int i=0;i<gridMain.Rows.Count;i++){
+					gridMain.Rows[i].ColorText=Color.Black;
 				}
-				grid.Invalidate();
+				gridMain.Invalidate();
 				return;
 			}
-			long guar=PIn.Long(Table.Rows[grid.SelectedIndices[0]]["Guarantor"].ToString());
+			long guar=PIn.Long(Table.Rows[gridMain.SelectedIndices[0]]["Guarantor"].ToString());
 			int famCount=0;
-			for(int i=0;i<grid.Rows.Count;i++){
+			for(int i=0;i<gridMain.Rows.Count;i++){
 				if(PIn.Long(Table.Rows[i]["Guarantor"].ToString())==guar){
 					famCount++;
-					grid.Rows[i].ColorText=Color.Red;
+					gridMain.Rows[i].ColorText=Color.Red;
 				}
 				else{
-					grid.Rows[i].ColorText=Color.Black;
+					gridMain.Rows[i].ColorText=Color.Black;
 				}
 			}
 			if(famCount==1){//only the highlighted patient is red at this point
-				grid.Rows[grid.SelectedIndices[0]].ColorText=Color.Black;
+				gridMain.Rows[gridMain.SelectedIndices[0]].ColorText=Color.Black;
 			}
-			grid.Invalidate();
+			gridMain.Invalidate();
 		}
 
 		private void grid_Click(object sender,EventArgs e) {
@@ -576,7 +576,7 @@ namespace OpenDental{
 			}
 			for(int i=0;i<Table.Rows.Count;i++){
 				if(PIn.Long(Table.Rows[i]["AptNum"].ToString())==selectedApt){
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
 			}
 			SetFamilyColors();
@@ -584,17 +584,17 @@ namespace OpenDental{
 		}
 
 		private void comboStatus_SelectionChangeCommitted(object sender, System.EventArgs e) {
-			if(grid.SelectedIndices.Length==0){
+			if(gridMain.SelectedIndices.Length==0){
 				return;//because user could never initiate this action.
 			}
 			Appointment apt;
 			Cursor=Cursors.WaitCursor;
-			long[] selectedApts=new long[grid.SelectedIndices.Length];
-			for(int i=0;i<grid.SelectedIndices.Length;i++){
-				selectedApts[i]=PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString());
+			long[] selectedApts=new long[gridMain.SelectedIndices.Length];
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
+				selectedApts[i]=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString());
 			}
-			for(int i=0;i<grid.SelectedIndices.Length;i++){
-				apt=Appointments.GetOneApt(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()));
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
+				apt=Appointments.GetOneApt(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
 				Appointment aptOld=apt.Clone();
 				int selectedI=comboStatus.SelectedIndex;
 				apt.Confirmed=DefC.Short[(int)DefCat.ApptConfirmed][selectedI].DefNum;
@@ -612,7 +612,7 @@ namespace OpenDental{
 			for(int i=0;i<Table.Rows.Count;i++){
 				for(int j=0;j<selectedApts.Length;j++){
 					if(PIn.Long(Table.Rows[i]["AptNum"].ToString())==selectedApts[j]){
-						grid.SetSelected(i,true);
+						gridMain.SetSelected(i,true);
 					}
 				}
 			}
@@ -634,16 +634,16 @@ namespace OpenDental{
         return;
       }
 			long[] aptNums;
-      if(grid.SelectedIndices.Length==0){
+      if(gridMain.SelectedIndices.Length==0){
 				aptNums=new long[Table.Rows.Count];
         for(int i=0;i<aptNums.Length;i++){
           aptNums[i]=PIn.Long(Table.Rows[i]["AptNum"].ToString());
         }
       }
       else{
-				aptNums=new long[grid.SelectedIndices.Length];
+				aptNums=new long[gridMain.SelectedIndices.Length];
         for(int i=0;i<aptNums.Length;i++){
-          aptNums[i]=PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString());
+          aptNums[i]=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString());
         }
       }
       FormRpConfirm FormC=new FormRpConfirm(aptNums);
@@ -655,14 +655,14 @@ namespace OpenDental{
         MessageBox.Show(Lan.g(this,"There are no appointments in the list.  Must have at least one to print."));    
         return;
       }
-			if(grid.SelectedIndices.Length==0){
+			if(gridMain.SelectedIndices.Length==0){
 				for(int i=0;i<Table.Rows.Count;i++){
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
 			}
 			List<long> aptNums=new List<long>();
-			for(int i=0;i<grid.SelectedIndices.Length;i++) {
-        aptNums.Add(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()));
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+        aptNums.Add(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
       }
 			AddrTable=Appointments.GetAddrTable(aptNums);
 			pagesPrinted=0;
@@ -682,19 +682,19 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"There are no appointments in the list.  Must have at least one to print."));
 				return;
 			}
-			if(grid.SelectedIndices.Length==0) {
+			if(gridMain.SelectedIndices.Length==0) {
 				ContactMethod cmeth;
 				for(int i=0;i<Table.Rows.Count;i++) {
 					cmeth=(ContactMethod)PIn.Long(Table.Rows[i]["PreferConfirmMethod"].ToString());
 					if(cmeth!=ContactMethod.Mail && cmeth!=ContactMethod.None) {
 						continue;
 					}
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
 			}
 			List<long> aptNums=new List<long>();
-			for(int i=0;i<grid.SelectedIndices.Length;i++) {
-				aptNums.Add(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()));
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				aptNums.Add(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
 			}
 			if(aptNums.Count==0) {
 				MsgBox.Show(this,"No postcards necessary because contact method is not set to Mail for anyone in the list.");
@@ -884,7 +884,7 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.EmailSend)){
 				return;
 			}
-			if(grid.Rows.Count==0) {
+			if(gridMain.Rows.Count==0) {
 				MsgBox.Show(this,"There are no Patients in the table.  Must have at least one.");
 				return;
 			}
@@ -896,7 +896,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"You need to set a status first for confirmation e-mails in the Recall Setup window.");
 				return;
 			}
-			if(grid.SelectedIndices.Length==0) {
+			if(gridMain.SelectedIndices.Length==0) {
 				ContactMethod cmeth;
 				for(int i=0;i<Table.Rows.Count;i++) {
 					cmeth=(ContactMethod)PIn.Int(Table.Rows[i]["PreferConfirmMethod"].ToString());
@@ -909,22 +909,22 @@ namespace OpenDental{
 					if(Table.Rows[i]["email"].ToString()=="") {
 						continue;
 					}
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
-				if(grid.SelectedIndices.Length==0) {
+				if(gridMain.SelectedIndices.Length==0) {
 					MsgBox.Show(this,"Confirmations have been sent to all patients of email type who also have an email address entered.");
 					return;
 				}
 			}
 			else {//deselect the ones that do not have email addresses specified
 				int skipped=0;
-				for(int i=grid.SelectedIndices.Length-1;i>=0;i--) {
-					if(Table.Rows[grid.SelectedIndices[i]]["email"].ToString()=="") {
+				for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {
+					if(Table.Rows[gridMain.SelectedIndices[i]]["email"].ToString()=="") {
 						skipped++;
-						grid.SetSelected(grid.SelectedIndices[i],false);
+						gridMain.SetSelected(gridMain.SelectedIndices[i],false);
 					}
 				}
-				if(grid.SelectedIndices.Length==0) {
+				if(gridMain.SelectedIndices.Length==0) {
 					MsgBox.Show(this,"None of the selected patients had email addresses entered.");
 					return;
 				}
@@ -942,19 +942,19 @@ namespace OpenDental{
 			List<long> listPatNumsFailed=new List<long>();
 			EmailAddress emailAddress;
 			string errors="";
-			for(int i=0;i<grid.SelectedIndices.Length;i++){
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				message=new EmailMessage();
-				message.PatNum=PIn.Long(Table.Rows[grid.SelectedIndices[i]]["PatNum"].ToString());
-				message.ToAddress=Table.Rows[grid.SelectedIndices[i]]["email"].ToString();//Could be guarantor email.
-				emailAddress=EmailAddresses.GetByClinic(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["ClinicNum"].ToString()));
+				message.PatNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				message.ToAddress=Table.Rows[gridMain.SelectedIndices[i]]["email"].ToString();//Could be guarantor email.
+				emailAddress=EmailAddresses.GetByClinic(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString()));
 				message.FromAddress=emailAddress.SenderAddress;				
 				message.Subject=PrefC.GetString(PrefName.ConfirmEmailSubject);
 				listPatNumsSelected.Add(message.PatNum);
 				str=PrefC.GetString(PrefName.ConfirmEmailMessage);
-				str=str.Replace("[NameF]",Table.Rows[grid.SelectedIndices[i]]["nameF"].ToString());
-				str=str.Replace("[NameFL]",Table.Rows[grid.SelectedIndices[i]]["nameFL"].ToString());
-				str=str.Replace("[date]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
-				str=str.Replace("[time]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
+				str=str.Replace("[NameF]",Table.Rows[gridMain.SelectedIndices[i]]["nameF"].ToString());
+				str=str.Replace("[NameFL]",Table.Rows[gridMain.SelectedIndices[i]]["nameFL"].ToString());
+				str=str.Replace("[date]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
+				str=str.Replace("[time]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
 				message.BodyText=str;
 				try {
 					EmailMessages.SendEmailUnsecure(message,emailAddress);
@@ -969,10 +969,10 @@ namespace OpenDental{
 				message.MsgDateTime=DateTime.Now;
 				message.SentOrReceived=EmailSentOrReceived.Sent;
 				EmailMessages.Insert(message);
-				Appointments.SetConfirmed(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusEmailed));
+				Appointments.SetConfirmed(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusEmailed));
 			}
 			Cursor=Cursors.Default;
-			if(listPatNumsFailed.Count==grid.SelectedIndices.Length){ //all failed
+			if(listPatNumsFailed.Count==gridMain.SelectedIndices.Length){ //all failed
 				//no need to refresh
 				if(DialogResult.Yes != MessageBox.Show(Lan.g(this,"All emails failed. Possibly due to invalid email addresses, a loss of connectivity, or a firewall blocking communication.  Would you like to see additional details?"),"",MessageBoxButtons.YesNo)){
 					return;
@@ -987,7 +987,7 @@ namespace OpenDental{
 				for(int i=0;i<Table.Rows.Count;i++) { //table.Rows.Count=grid.Rows.Count
 					long patNum=PIn.Long(Table.Rows[i]["PatNum"].ToString());
 					if(listPatNumsFailed.Contains(patNum)) {
-						grid.SetSelected(i,true);
+						gridMain.SetSelected(i,true);
 					}
 				}
 				if(DialogResult.Yes != MessageBox.Show(Lan.g(this,"Some emails failed to send.  All failed email confirmations have been selected in the confirmation list.  Would you like to see additional details?"),"",MessageBoxButtons.YesNo)) {
@@ -1005,7 +1005,7 @@ namespace OpenDental{
 			for(int i=0;i<Table.Rows.Count;i++) {
 				long patNum=PIn.Long(Table.Rows[i]["PatNum"].ToString());
 				if(listPatNumsSelected.Contains(patNum)) {
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
 			}
 		}
@@ -1014,7 +1014,7 @@ namespace OpenDental{
 			long patNum;
 			string wirelessPhone;
 			YN txtMsgOk;
-			if(grid.Rows.Count==0) {
+			if(gridMain.Rows.Count==0) {
 				MsgBox.Show(this,"There are no Patients in the table.  Must have at least one.");
 				return;
 			}
@@ -1022,7 +1022,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"You need to set a status first for confirmation text messages in the Recall Setup window.");
 				return;
 			}
-			if(grid.SelectedIndices.Length==0) {//None selected. Select all of type text that are not yet confirmed by text message.
+			if(gridMain.SelectedIndices.Length==0) {//None selected. Select all of type text that are not yet confirmed by text message.
 				ContactMethod cmeth;
 				for(int i=0;i<Table.Rows.Count;i++) {
 					cmeth=(ContactMethod)PIn.Int(Table.Rows[i]["PreferConfirmMethod"].ToString());
@@ -1035,35 +1035,35 @@ namespace OpenDental{
 					if(!Table.Rows[i]["contactMethod"].ToString().StartsWith("Text:")) {//Check contact method
 						continue;
 					}
-					grid.SetSelected(i,true);
+					gridMain.SetSelected(i,true);
 				}
-				if(grid.SelectedIndices.Length==0) {
+				if(gridMain.SelectedIndices.Length==0) {
 					MsgBox.Show(this,"All patients of text message type have been sent confirmations.");
 					return;
 				}
 			}
 			//deselect the ones that do not have text messages specified or are not OK to send texts to or have already been texted
 			int skipped=0;
-			for(int i=grid.SelectedIndices.Length-1;i>=0;i--) {
-				wirelessPhone=Table.Rows[grid.SelectedIndices[i]]["WirelessPhone"].ToString();
+			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {
+				wirelessPhone=Table.Rows[gridMain.SelectedIndices[i]]["WirelessPhone"].ToString();
 				if(wirelessPhone=="") {//Check for wireless number
 					skipped++;
-					grid.SetSelected(grid.SelectedIndices[i],false);
+					gridMain.SetSelected(gridMain.SelectedIndices[i],false);
 					continue;
 				}
-				txtMsgOk=(YN)PIn.Int(Table.Rows[grid.SelectedIndices[i]]["TxtMsgOk"].ToString());
+				txtMsgOk=(YN)PIn.Int(Table.Rows[gridMain.SelectedIndices[i]]["TxtMsgOk"].ToString());
 				if(txtMsgOk==YN.Unknown	&& PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)) {//Check if OK to text
 					skipped++;
-					grid.SetSelected(grid.SelectedIndices[i],false);
+					gridMain.SetSelected(gridMain.SelectedIndices[i],false);
 					continue;
 				}
 				if(txtMsgOk==YN.No){//Check if OK to text
 					skipped++;
-					grid.SetSelected(grid.SelectedIndices[i],false);
+					gridMain.SetSelected(gridMain.SelectedIndices[i],false);
 					continue;
 				}
 			}
-			if(grid.SelectedIndices.Length==0) {
+			if(gridMain.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"None of the selected patients have wireless phone numbers and are OK to text.");
 				return;
 			}
@@ -1077,17 +1077,17 @@ namespace OpenDental{
 			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();
 			string message="";
 			//Appointment apt;
-			for(int i=0;i<grid.SelectedIndices.Length;i++){
-				patNum=PIn.Long(Table.Rows[grid.SelectedIndices[i]]["PatNum"].ToString());
-				wirelessPhone=PIn.String(Table.Rows[grid.SelectedIndices[i]]["WirelessPhone"].ToString());
-				txtMsgOk=((YN)PIn.Int(Table.Rows[grid.SelectedIndices[i]]["TxtMsgOk"].ToString()));
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
+				patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				wirelessPhone=PIn.String(Table.Rows[gridMain.SelectedIndices[i]]["WirelessPhone"].ToString());
+				txtMsgOk=((YN)PIn.Int(Table.Rows[gridMain.SelectedIndices[i]]["TxtMsgOk"].ToString()));
 				message=PrefC.GetString(PrefName.ConfirmTextMessage);
-				message=message.Replace("[NameF]",Table.Rows[grid.SelectedIndices[i]]["nameF"].ToString());
-				message=message.Replace("[NameFL]",Table.Rows[grid.SelectedIndices[i]]["nameFL"].ToString());
-				message=message.Replace("[date]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
-				message=message.Replace("[time]",((DateTime)Table.Rows[grid.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
+				message=message.Replace("[NameF]",Table.Rows[gridMain.SelectedIndices[i]]["nameF"].ToString());
+				message=message.Replace("[NameFL]",Table.Rows[gridMain.SelectedIndices[i]]["nameFL"].ToString());
+				message=message.Replace("[date]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
+				message=message.Replace("[time]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
 				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk)) {
-					Appointments.SetConfirmed(PIn.Long(Table.Rows[grid.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
+					Appointments.SetConfirmed(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
 				}
 			}
 			FillMain();
@@ -1158,7 +1158,7 @@ namespace OpenDental{
 				headingPrintH=yPos;
 			}
 			#endregion
-			yPos=grid.PrintPage(g,pagesPrinted,bounds,headingPrintH);
+			yPos=gridMain.PrintPage(g,pagesPrinted,bounds,headingPrintH);
 			pagesPrinted++;
 			if(yPos==-1) {
 				e.HasMorePages=true;
