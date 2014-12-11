@@ -3217,6 +3217,17 @@ namespace OpenDental{
 		private void FormApptEdit_FormClosing(object sender,FormClosingEventArgs e) {
 			//Do not use pat.PatNum here.  Use AptCur.PatNum instead.  Pat will be null in the case that the user does not have the appt create permission.
 			if(DialogResult!=DialogResult.OK) {
+				if(AptCur.AptStatus==ApptStatus.Complete) {
+					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
+						if(DS.Tables["Procedure"].Rows[i]["status"].ToString()!="TP"
+							|| DS.Tables["Procedure"].Rows[i]["attached"].ToString()!="1") {
+							continue;
+						}
+						MsgBox.Show(this,"Detach treatment planned procedures or click OK in the appointment edit window to set them complete.");
+						e.Cancel=true;
+						return;
+					}
+				}
 				if(IsNew) {
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,
 						"Create cancel for date/time: "+AptCur.AptDateTime.ToString(),
