@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.14.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.24.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -6100,6 +6100,23 @@ namespace OpenDentBusiness {
 					"WHERE IsCDA<>0 AND ElectID='610047'";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '14.3.14.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_3_24();
+		}
+
+		///<summary></summary>
+		private static void To14_3_24() {
+			if(FromVersion<new Version("14.3.24.0")) {
+				string command="";
+				//Bug fix for missing surfaces on quickbuttons. This should only affect quick buttons if they have not been edited by users. Oracle compatible.
+				command=@"UPDATE procbuttonquick SET Surf='DL' WHERE ProcButtonQuickNum=13 AND Description='DL' AND CodeValue='D2331' AND Surf=''";
+				Db.NonQ(command);
+				command=@"UPDATE procbuttonquick SET Surf='MDL' WHERE ProcButtonQuickNum=13 AND Description='MDL' AND CodeValue='D2332' AND Surf=''";
+				Db.NonQ(command);
+				command=@"UPDATE procbuttonquick SET Surf='ML' WHERE ProcButtonQuickNum=13 AND Description='ML' AND CodeValue='D2331' AND Surf=''";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.3.24.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_4_0();
