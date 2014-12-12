@@ -14,21 +14,25 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			get{
 				if(listt==null){
-					Refresh();
+					RefreshCache();
 				}
 				return listt;
 			}
 		}
-	
+
 		///<summary></summary>
-		public static void Refresh(){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod());
-				return;
-			}
+		public static DataTable RefreshCache() {
+			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
 			string command="SELECT * FROM canadiannetwork ORDER BY Descript";
-			DataTable table=Db.GetTable(command);
-			listt=Crud.CanadianNetworkCrud.SelectMany(command);
+			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
+			table.TableName="Carrier";
+			FillCache(table);
+			return table;
+		}
+
+		public static void FillCache(DataTable table) {
+			//No need to check RemotingRole; no call to db.
+			listt=Crud.CanadianNetworkCrud.TableToList(table);
 		}
 
 		///<summary></summary>
@@ -58,7 +62,7 @@ namespace OpenDentBusiness{
 		public static CanadianNetwork GetNetwork(long networkNum) {
 			//No need to check RemotingRole; no call to db.
 			if(listt==null) {
-				Refresh();
+				RefreshCache();
 			}
 			for(int i=0;i<listt.Count;i++){
 				if(listt[i].CanadianNetworkNum==networkNum){
