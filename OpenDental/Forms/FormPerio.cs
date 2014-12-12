@@ -1247,7 +1247,7 @@ namespace OpenDental{
 			//textInputBox has already gained focus before this so the selected index remains unchanged.
 			if(e.Button==MouseButtons.Left) {
 				try {
-					listExams.SelectedIndex=e.Y/listExams.ItemHeight;
+					listExams.SelectedIndex=e.Y/listExams.ItemHeight+listExams.TopIndex;
 				}
 				catch {
 					return;//User might have clicked on some white space thus not selecting a valid item.
