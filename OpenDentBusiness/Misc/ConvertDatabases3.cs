@@ -6111,6 +6111,23 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_3_24();
+		}
+
+		///<summary></summary>
+		private static void To14_3_24() {
+			if(FromVersion<new Version("14.3.24.0")) {
+				string command="";
+				//Bug fix for missing surfaces on quickbuttons. This should only affect quick buttons if they have not been edited by users.
+				command=@"UPDATE procbuttonquick SET Surf='DL' WHERE ProcButtonQuickNum=13 AND Description='DL'AND CodeValue='D2331' AND Surf=''";
+				Db.NonQ(command);
+				command=@"UPDATE procbuttonquick SET Surf='MDL' WHERE ProcButtonQuickNum=13 AND Description='MDL'AND CodeValue='D2332' AND Surf=''";
+				Db.NonQ(command);
+				command=@"UPDATE procbuttonquick SET Surf='ML' WHERE ProcButtonQuickNum=13 AND Description='ML'AND CodeValue='D2331' AND Surf=''";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.3.24.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_4_0();
 		}
 
@@ -6660,60 +6677,6 @@ namespace OpenDentBusiness {
 					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="DROP TABLE IF EXISTS sheetgridcoldef";
-					Db.NonQ(command);
-					command=@"CREATE TABLE sheetgridcoldef (
-						SheetGridColDefNum bigint NOT NULL auto_increment PRIMARY KEY,
-						SheetGridDefNum bigint NOT NULL,
-						ColName varchar(255) NOT NULL,
-						DisplayName varchar(255) NOT NULL,
-						Width int NOT NULL,
-						ItemOrder int NOT NULL,
-						textAlign tinyint NOT NULL,
-						INDEX(SheetGridDefNum)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE sheetgridcoldef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE sheetgridcoldef (
-						SheetGridColDefNum number(20) NOT NULL,
-						SheetGridDefNum number(20) NOT NULL,
-						ColName varchar2(255),
-						DisplayName varchar2(255),
-						Width number(11) NOT NULL,
-						ItemOrder number(11) NOT NULL,
-						textAlign number(3) NOT NULL,
-						CONSTRAINT sheetgridcoldef_SheetGridColDe PRIMARY KEY (SheetGridColDefNum)
-						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX sheetgridcoldef_SheetGridDefNu ON sheetgridcoldef (SheetGridDefNum)";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="DROP TABLE IF EXISTS sheetgriddef";
-					Db.NonQ(command);
-					command=@"CREATE TABLE sheetgriddef (
-						SheetGridDefNum bigint NOT NULL auto_increment PRIMARY KEY,
-						GridType varchar(255) NOT NULL,
-						Descritpion varchar(255) NOT NULL,
-						Title varchar(255) NOT NULL
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE sheetgriddef'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE sheetgriddef (
-						SheetGridDefNum number(20) NOT NULL,
-						GridType varchar2(255),
-						Descritpion varchar2(255),
-						Title varchar2(255),
-						CONSTRAINT sheetgriddef_SheetGridDefNum PRIMARY KEY (SheetGridDefNum)
-						)";
-					Db.NonQ(command);
-				} if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE sheetfield ADD TextAlign tinyint NOT NULL";
 					Db.NonQ(command);
 				}
@@ -6750,17 +6713,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE sheetfield ADD IsPaymentOption tinyint NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE sheetfield ADD IsPaymentOption number(3)";
-					Db.NonQ(command);
-					command="UPDATE sheetfield SET IsPaymentOption = 0 WHERE IsPaymentOption IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE sheetfield MODIFY IsPaymentOption NOT NULL";
-					Db.NonQ(command);
-				} if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE sheetfield ADD ItemColor int NOT NULL";
 					Db.NonQ(command);
 				}
