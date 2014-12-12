@@ -1992,6 +1992,7 @@ namespace OpenDental
 				MessageBox.Show(ex.Message);
 				return;
 			}
+			ClaimProcCur.DoDelete=true;
 			DialogResult=DialogResult.OK;
 		}
 
