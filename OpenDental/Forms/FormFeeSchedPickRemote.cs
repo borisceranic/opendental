@@ -108,6 +108,7 @@ namespace OpenDental {
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_AN.txt");//Ontario Dental Association 2015 fee schedule for Anaesthesiologists.
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_EN.txt");//Ontario Dental Association 2015 fee schedule for Endodontists.
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_GP.txt");//Ontario Dental Association 2015 fee schedule for General Practitioners.
+			ListFeeSchedFilesOntario.Add("ON_ODA_2015_LTC.txt");//Ontario Dental Association 2015 fee schedule for Dental Treatment Services for Patients in Long-Term Care Homes.
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_OS.txt");//Ontario Dental Association 2015 fee schedule for Oral & Maxillofacial Surgeons.
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_PA.txt");//Ontario Dental Association 2015 fee schedule for Paediatric Dentists.
 			ListFeeSchedFilesOntario.Add("ON_ODA_2015_PE.txt");//Ontario Dental Association 2015 fee schedule for Periodontists.
