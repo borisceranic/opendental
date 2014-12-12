@@ -652,6 +652,9 @@ namespace OpenDental {
 			if(FormCP.DialogResult!=DialogResult.OK){
 				return;
 			}
+			if(claimProc.DoDelete) {
+				ListClaimProcsForClaim.RemoveAt(e.Row);
+			}
 			FillGridProcedures();
 			FillTotals();
 		}
