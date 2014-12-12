@@ -3917,6 +3917,7 @@ namespace OpenDental {
 							SetInvalid();
 							return;//It's ok to skip the rest of the method here. The appointment is now on the pinboard and must be rescheduled
 						}
+						apt=Appointments.GetOneApt(apt.AptNum);  //Need to get appt from DB so we have the time pattern
 						if(apt!=null && DoesOverlap(apt)) {
 							Appointment aptOld=apt.Clone();
 							MsgBox.Show(this,"Appointment is too long and would overlap another appointment.  Automatically shortened to fit.");
