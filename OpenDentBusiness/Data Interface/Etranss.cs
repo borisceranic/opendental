@@ -11,8 +11,8 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Etranss {
 
-		///<summary>Gets data for the history grid in the SendClaims window.</summary>
-		public static DataTable RefreshHistory(DateTime dateFrom,DateTime dateTo) {
+		///<summary>Gets data for the history grid in the SendClaims window.  The listEtransType must contain as least one item.</summary>
+		public static DataTable RefreshHistory(DateTime dateFrom,DateTime dateTo,List<EtransType> listEtransType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
 			}
@@ -31,22 +31,27 @@ namespace OpenDentBusiness{
 				//	command+="TO_";
 				//}
 				+DbHelper.DtimeToDate("DateTimeTrans")+" <= "+POut.Date(dateTo)+" "
-				+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_997)+" "
-				+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_999)+" "
-				+"AND Etype!="+POut.Long((int)EtransType.BenefitInquiry270)+" "
-				+"AND Etype!="+POut.Long((int)EtransType.BenefitResponse271)+" "
-				+"AND Etype!="+POut.Long((int)EtransType.AckError)+" "
-				//We exclude canadian transaction response types, since the responses can be accessed from the request transaction inside of the claim history portion of FormSendClaims.
-				+"AND Etype!="+POut.Long((int)EtransType.ClaimAck_CA)+" "//Could be attached to a claim, cob claim or ROT.
-				+"AND Etype!="+POut.Long((int)EtransType.ClaimEOB_CA)+" "//Could be attached to a claim, cob claim or ROT.
-				+"AND Etype!="+POut.Long((int)EtransType.EligResponse_CA)+" "//Will always be attached to an Eligibility request.
-				+"AND Etype!="+POut.Long((int)EtransType.EmailResponse_CA)+" "//Will always be attached to a Request for Outstanding Transactions (ROT).
-				+"AND Etype!="+POut.Long((int)EtransType.OutstandingAck_CA)+" "//Will always be attached to an ROT.
-				+"AND Etype!="+POut.Long((int)EtransType.PaymentResponse_CA)+" "//Will always be attached to a Request for Payment Reconciliation (RPR).
-				+"AND Etype!="+POut.Long((int)EtransType.PredetermAck_CA)+" "//Could be attached to a Predetermination request or an ROT.
-				+"AND Etype!="+POut.Long((int)EtransType.PredetermEOB_CA)+" "//Could be attached to a Predetermination request or an ROT.
-				+"AND Etype!="+POut.Long((int)EtransType.ReverseResponse_CA)+" "//Will always be attached to a Reversal request.
-				+"AND Etype!="+POut.Long((int)EtransType.SummaryResponse_CA)+" "//Will always be attached to a Request for Summary Reconciliation (RSR).
+				+"AND Etype IN ("+POut.Long((int)listEtransType[0]);
+				for(int i=1;i<listEtransType.Count;i++){//String.Join doesn't work because there's no way to cast the enums to ints in the function, db uses longs.
+					command+=", "+POut.Long((int)listEtransType[i]);
+				}				
+				command+=") "
+				//+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_997)+" "
+				//+"AND Etype!="+POut.Long((int)EtransType.Acknowledge_999)+" "
+				//+"AND Etype!="+POut.Long((int)EtransType.BenefitInquiry270)+" "
+				//+"AND Etype!="+POut.Long((int)EtransType.BenefitResponse271)+" "
+				//+"AND Etype!="+POut.Long((int)EtransType.AckError)+" "
+				////We exclude canadian transaction response types, since the responses can be accessed from the request transaction inside of the claim history portion of FormSendClaims.
+				//+"AND Etype!="+POut.Long((int)EtransType.ClaimAck_CA)+" "//Could be attached to a claim, cob claim or ROT.
+				//+"AND Etype!="+POut.Long((int)EtransType.ClaimEOB_CA)+" "//Could be attached to a claim, cob claim or ROT.
+				//+"AND Etype!="+POut.Long((int)EtransType.EligResponse_CA)+" "//Will always be attached to an Eligibility request.
+				//+"AND Etype!="+POut.Long((int)EtransType.EmailResponse_CA)+" "//Will always be attached to a Request for Outstanding Transactions (ROT).
+				//+"AND Etype!="+POut.Long((int)EtransType.OutstandingAck_CA)+" "//Will always be attached to an ROT.
+				//+"AND Etype!="+POut.Long((int)EtransType.PaymentResponse_CA)+" "//Will always be attached to a Request for Payment Reconciliation (RPR).
+				//+"AND Etype!="+POut.Long((int)EtransType.PredetermAck_CA)+" "//Could be attached to a Predetermination request or an ROT.
+				//+"AND Etype!="+POut.Long((int)EtransType.PredetermEOB_CA)+" "//Could be attached to a Predetermination request or an ROT.
+				//+"AND Etype!="+POut.Long((int)EtransType.ReverseResponse_CA)+" "//Will always be attached to a Reversal request.
+				//+"AND Etype!="+POut.Long((int)EtransType.SummaryResponse_CA)+" "//Will always be attached to a Request for Summary Reconciliation (RSR).
 				//For Canada, when the undo button is used from Manage | Send Claims, the ClaimNum is set to 0 instead of deleting the etrans entry.
 				//For transaction types related to claims where the claimnum=0, we do not want them to show in the history section of Manage | Send Claims because they have been undone.
 				+"AND (ClaimNum<>0 OR Etype NOT IN ("+POut.Long((int)EtransType.Claim_CA)+","+POut.Long((int)EtransType.ClaimCOB_CA)+","+POut.Long((int)EtransType.Predeterm_CA)+","+POut.Long((int)EtransType.ClaimReversal_CA)+")) "
