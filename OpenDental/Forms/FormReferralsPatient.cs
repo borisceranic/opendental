@@ -421,9 +421,9 @@ namespace OpenDental{
 						if(FormRS.SelectedReferral.Address.Trim()!="") {
 							msgWebMail.BodyText+="Address: "+FormRS.SelectedReferral.Address.Trim()+"\r\n";
 							if(FormRS.SelectedReferral.Address2.Trim()!="") {
-								msgWebMail.BodyText+="\t\t"+FormRS.SelectedReferral.Address2.Trim()+"\r\n";
+								msgWebMail.BodyText+="\t"+FormRS.SelectedReferral.Address2.Trim()+"\r\n";
 							}
-							msgWebMail.BodyText+="\t\t"+FormRS.SelectedReferral.City+" "+FormRS.SelectedReferral.ST+" "+FormRS.SelectedReferral.Zip+"\r\n";
+							msgWebMail.BodyText+="\t"+FormRS.SelectedReferral.City+" "+FormRS.SelectedReferral.ST+" "+FormRS.SelectedReferral.Zip+"\r\n";
 						}
 						if(FormRS.SelectedReferral.Telephone!="") {
 							msgWebMail.BodyText+="Phone: ("+FormRS.SelectedReferral.Telephone.Substring(0,3)+")"+FormRS.SelectedReferral.Telephone.Substring(3,3)+"-"+FormRS.SelectedReferral.Telephone.Substring(6)+"\r\n";
