@@ -214,7 +214,7 @@ namespace OpenDental{
 			Controls.Add(listSites);
 			listSites.BringToFront();
 			Lan.F(this);
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				labelST.Text="ST, Country";
 				textCountry.Visible=true;
 			}
