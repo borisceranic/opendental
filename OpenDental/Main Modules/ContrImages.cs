@@ -1318,34 +1318,39 @@ namespace OpenDental {
 				return;
 			}
 			try {
-				PrintDocument pd=new PrintDocument();
-				pd.PrintPage+=new PrintPageEventHandler(printDocument_PrintPage);
-				PrintDialog dlg=new PrintDialog();
-				dlg.AllowCurrentPage=false;
-				dlg.AllowPrintToFile=true;
-				dlg.AllowSelection=false;
-				dlg.AllowSomePages=false;
-				dlg.Document=pd;
-				dlg.PrintToFile=false;
-				dlg.ShowHelp=true;
-				dlg.ShowNetwork=true;
-				dlg.UseEXDialog=true; //needed because PrintDialog was not showing on 64 bit Vista systems
-				if(dlg.ShowDialog()==DialogResult.OK) {
-					if(pd.DefaultPageSettings.PrintableArea.Width==0||
+				if(Path.GetExtension(DocSelected.FileName).ToLower()==".pdf") {
+					axAcroPDF1.printWithDialog();
+				}
+				else {
+					PrintDocument pd=new PrintDocument();
+					pd.PrintPage+=new PrintPageEventHandler(printDocument_PrintPage);
+					PrintDialog dlg=new PrintDialog();
+					dlg.AllowCurrentPage=false;
+					dlg.AllowPrintToFile=true;
+					dlg.AllowSelection=false;
+					dlg.AllowSomePages=false;
+					dlg.Document=pd;
+					dlg.PrintToFile=false;
+					dlg.ShowHelp=true;
+					dlg.ShowNetwork=true;
+					dlg.UseEXDialog=true; //needed because PrintDialog was not showing on 64 bit Vista systems
+					if(dlg.ShowDialog()==DialogResult.OK) {
+						if(pd.DefaultPageSettings.PrintableArea.Width==0||
 							pd.DefaultPageSettings.PrintableArea.Height==0) {
-						pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
-					}
-					pd.OriginAtMargins=true;
-					pd.DefaultPageSettings.Margins=new Margins(50,50,50,50);//Half-inch all around
-					pd.Print();
-					if(((ImageNodeId)treeDocuments.SelectedNode.Tag).NodeType==ImageNodeType.Eob) { //This happens when printing an EOB from the Batch Ins Claim
-						SecurityLogs.MakeLogEntry(Permissions.Printing,0,"EOB printed");
-					}
-					else if(DocSelected.Description=="") {
-						SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.FileName+" printed");
-					}
-					else {
-						SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.Description+" printed");
+							pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
+						}
+						pd.OriginAtMargins=true;
+						pd.DefaultPageSettings.Margins=new Margins(50,50,50,50);//Half-inch all around
+						pd.Print();
+						if(((ImageNodeId)treeDocuments.SelectedNode.Tag).NodeType==ImageNodeType.Eob) { //This happens when printing an EOB from the Batch Ins Claim
+							SecurityLogs.MakeLogEntry(Permissions.Printing,0,"EOB printed");
+						}
+						else if(DocSelected.Description=="") {
+							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.FileName+" printed");
+						}
+						else {
+							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.Description+" printed");
+						}
 					}
 				}
 			}
