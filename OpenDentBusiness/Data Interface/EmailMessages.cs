@@ -1333,8 +1333,8 @@ namespace OpenDentBusiness{
 			return attachPath;
 		}
 
-		///<summary>Can throw an exception if there is a permission issue saving the file.</summary>
-		public static void CreateAttachmentFromText(EmailMessage emailMessage,string strAttachText,string strDisplayFileName) {
+		///<summary>Automatically creates an email attachment and adds it to the list of attachments to the emailMessage passed in.  It will also return the newly created email attachment so programmers can have access to the actual file name.  Can throw an exception if there is a permission issue saving the file.</summary>
+		public static EmailAttach CreateAttachmentFromText(EmailMessage emailMessage,string strAttachText,string strDisplayFileName) {
 			//No need to check RemotingRole; no call to db.
 			Random rnd=new Random();
 			EmailAttach emailAttach;
@@ -1345,6 +1345,7 @@ namespace OpenDentBusiness{
 			string strAttachFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailAttach.ActualFileName);
 			File.WriteAllText(strAttachFilePath,strAttachText);
 			emailMessage.Attachments.Add(emailAttach);
+			return emailAttach;
 		}
 
 		#endregion Helpers

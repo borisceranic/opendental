@@ -384,16 +384,10 @@ namespace OpenDental{
 				//We can send the summary of care to the patient instead of to the Dr. because of the following point in the Additional Information section of the Core Measure:
 				//"The EP can send an electronic or paper copy of the summary care record directly to the next provider or can provide it to the patient to deliver to the next provider, if the patient can reasonably expected to do so and meet Measure 1."
 				//We will only send the summary of care if the ref attach is a TO referral and is a transition of care.
-				if(FormRAE.DialogResult==DialogResult.OK 
-					&& !refattach.IsFrom 
-					&& refattach.IsTransitionOfCare) 
-				{
+				if(FormRAE.DialogResult==DialogResult.OK && !refattach.IsFrom && refattach.IsTransitionOfCare) {
 					try {
-						//TODO: make this more like FormEhrClinicalSummary.butSendToPortal_Click so that the email gets treated like a web mail.
+						//This is like FormEhrClinicalSummary.butSendToPortal_Click such that the email gets treated like a web mail.
 						Patient PatCur=Patients.GetPat(PatNum);
-						if(!Security.IsAuthorized(Permissions.EmailSend,true)) {
-							throw new Exception();//Do nothing, fails silently.
-						}
 						string strCcdValidationErrors=EhrCCD.ValidateSettings();
 						if(strCcdValidationErrors!="") {
 							throw new Exception();
@@ -415,8 +409,30 @@ namespace OpenDental{
 						msgWebMail.PatNum=PatCur.PatNum;//Adding patient number
 						msgWebMail.SentOrReceived=EmailSentOrReceived.WebMailSent;//Setting to sent
 						msgWebMail.ProvNumWebMail=prov.ProvNum;//Adding provider number
-						msgWebMail.Subject="Referral Generated for "+FormRS.SelectedReferral.Title+" "+FormRS.SelectedReferral.FName+" "+FormRS.SelectedReferral.LName;//Subject is Summary of Care
-						msgWebMail.BodyText="To view the Summary of Care:\r\n1) Download all attachments to the same folder.  Do not rename the files.\r\n2) Open the ccd.xml file in an internet browser.";//Body is Summary of Care
+						msgWebMail.Subject="Referral To "+FormRS.SelectedReferral.GetNameFL();
+						msgWebMail.BodyText=
+							"You have been referred to another provider.  Your summary of care is attached.\r\n"
+							+"You may give a copy of this summary of care to the referred provider if desired.\r\n"
+							+"The contact information for the doctor you are being referred to is as follows:\r\n"
+							+"\r\n";
+						//Here we provide the same information that would go out on a Referral Slip.
+						//When the user prints a Referral Slip, the doctor referred to information is included and contains the doctor's name, address, and phone.
+						msgWebMail.BodyText+="Name: "+FormRS.SelectedReferral.GetNameFL()+"\r\n";
+						if(FormRS.SelectedReferral.Address.Trim()!="") {
+							msgWebMail.BodyText+="Address: "+FormRS.SelectedReferral.Address.Trim()+"\r\n";
+							if(FormRS.SelectedReferral.Address2.Trim()!="") {
+								msgWebMail.BodyText+="\t\t"+FormRS.SelectedReferral.Address2.Trim()+"\r\n";
+							}
+							msgWebMail.BodyText+="\t\t"+FormRS.SelectedReferral.City+" "+FormRS.SelectedReferral.ST+" "+FormRS.SelectedReferral.Zip+"\r\n";
+						}
+						if(FormRS.SelectedReferral.Telephone!="") {
+							msgWebMail.BodyText+="Phone: ("+FormRS.SelectedReferral.Telephone.Substring(0,3)+")"+FormRS.SelectedReferral.Telephone.Substring(3,3)+"-"+FormRS.SelectedReferral.Telephone.Substring(6)+"\r\n";
+						}
+						msgWebMail.BodyText+=
+							"\r\n"
+							+"To view the Summary of Care for the referral to this provider:\r\n"
+							+"1) Download all attachments to the same folder.  Do not rename the files.\r\n"
+							+"2) Open the ccd.xml file in an internet browser.";
 						msgWebMail.MsgDateTime=DateTime.Now;//Message time is now
 						msgWebMail.PatNumSubj=PatCur.PatNum;//Subject of the message is current patient
 						string ccd="";
@@ -439,9 +455,8 @@ namespace OpenDental{
 						EhrMeasureEvents.Insert(newMeasureEvent);
 					}
 					catch {
-						//The user might not have had the send email permission, or something could have gone wrong.
 						//We are just trying to be helpful so it doesn't really matter if something failed above. 
-						//They can simply go to the EHR dashboard and send the summary of care manually like they always have.
+						//They can simply go to the EHR dashboard and send the summary of care manually like they always have.  They will get detailed validation errors there.
 						MsgBox.Show(this,Lan.g(this,"There was a problem automatically sending a summary of care.  Please go to the EHR dashboard to send a summary of care to meet the summary of care core measure."));
 					}
 				}
