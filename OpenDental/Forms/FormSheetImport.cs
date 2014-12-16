@@ -1093,26 +1093,27 @@ namespace OpenDental {
 					Rows.Add(row);
 				}
 				#endregion ins2
-				//Separator-------------------------------------------
-				Rows.Add(CreateSeparator("Misc"));
-				//misc----------------------------------------------------
-				List<string> miscVals=GetMiscValues();
-				for(int i=0;i<miscVals.Count;i++) {
-					fieldVal=miscVals[i];
-					row=new SheetImportRow();
-					row.FieldName="misc";
-					row.FieldDisplay="misc"+(i+1).ToString();
-					row.OldValDisplay="";
-					row.OldValObj="";
-					row.NewValDisplay=fieldVal;
-					row.NewValObj="";
-					row.ImpValDisplay="";
-					row.ImpValObj="";
-					row.ObjType=typeof(string);
-					row.DoImport=false;
-					row.IsFlagged=true;
-					Rows.Add(row);
-				}
+				//jsalmon - It was deemed a bug by Nathan and Jordan 12/16/2014 to be showing Misc fields in the sheet import tool.
+				////Separator-------------------------------------------
+				//Rows.Add(CreateSeparator("Misc"));
+				////misc----------------------------------------------------
+				//List<string> miscVals=GetMiscValues();
+				//for(int i=0;i<miscVals.Count;i++) {
+				//	fieldVal=miscVals[i];
+				//	row=new SheetImportRow();
+				//	row.FieldName="misc";
+				//	row.FieldDisplay="misc"+(i+1).ToString();
+				//	row.OldValDisplay="";
+				//	row.OldValObj="";
+				//	row.NewValDisplay=fieldVal;
+				//	row.NewValObj="";
+				//	row.ImpValDisplay="";
+				//	row.ImpValObj="";
+				//	row.ObjType=typeof(string);
+				//	row.DoImport=false;
+				//	row.IsFlagged=true;
+				//	Rows.Add(row);
+				//}
 			}
 			#endregion
 			#region Medical History
