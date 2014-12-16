@@ -208,7 +208,7 @@ namespace OpenDental {
 				checkbox.Width=field.Width;
 				checkbox.Height=field.Height;
 				checkbox.Tag=field;
-				checkbox.Click+=new EventHandler(text_TextChanged);
+				checkbox.MouseUp+=new MouseEventHandler(checkbox_MouseUp);
 				checkbox.TabStop=(field.TabOrder==0?false:true);
 				checkbox.TabIndex=field.TabOrder;
 				panelMain.Controls.Add(checkbox);
@@ -257,8 +257,16 @@ namespace OpenDental {
 			DialogResult=DialogResult.Cancel;
 		}
 
-		///<summary>Triggered when any field value changes.  This immediately invalidates signatures.  It also causes fields to grow as needed and deselects other radiobuttons in a group.</summary>
+		private void checkbox_MouseUp(object sender,MouseEventArgs e) {
+			FieldValueChanged(sender);
+		}
+
 		private void text_TextChanged(object sender,EventArgs e) {
+			FieldValueChanged(sender);
+		}
+
+		///<summary>Triggered when any field value changes.  This immediately invalidates signatures.  It also causes fields to grow as needed and deselects other radiobuttons in a group.</summary>
+		private void FieldValueChanged(object sender) {
 			foreach(Control control in panelMain.Controls){
 				if(control.GetType()!=typeof(OpenDental.UI.SignatureBoxWrapper)){
 					continue;
