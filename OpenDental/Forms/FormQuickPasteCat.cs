@@ -65,72 +65,72 @@ namespace OpenDental{
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(497,405);
+			this.butCancel.Location = new System.Drawing.Point(497, 418);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(497,364);
+			this.butOK.Location = new System.Drawing.Point(497, 377);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(125,28);
+			this.textDescription.Location = new System.Drawing.Point(125, 28);
 			this.textDescription.Name = "textDescription";
-			this.textDescription.Size = new System.Drawing.Size(357,20);
+			this.textDescription.Size = new System.Drawing.Size(357, 20);
 			this.textDescription.TabIndex = 2;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(7,30);
+			this.label1.Location = new System.Drawing.Point(7, 30);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(117,15);
+			this.label1.Size = new System.Drawing.Size(117, 15);
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Description";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// listType
 			// 
-			this.listType.Location = new System.Drawing.Point(126,61);
+			this.listType.Location = new System.Drawing.Point(126, 61);
 			this.listType.Name = "listType";
 			this.listType.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listType.Size = new System.Drawing.Size(120,368);
+			this.listType.Size = new System.Drawing.Size(120, 381);
 			this.listType.TabIndex = 4;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(7,63);
+			this.label2.Location = new System.Drawing.Point(7, 63);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(117,15);
+			this.label2.Size = new System.Drawing.Size(117, 15);
 			this.label2.TabIndex = 5;
 			this.label2.Text = "Default for Types";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// FormQuickPasteCat
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(588,445);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(588, 458);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.listType);
 			this.Controls.Add(this.label1);
