@@ -134,10 +134,10 @@ namespace OpenDental.Bridges {
 		}
 
 		///<summary>Creates a deposit within QuickBooks.</summary>
-		public static void CreateDeposit(string depositAcct,string incomeAcct,double amount,string memo) {
+		public static void CreateDeposit(DateTime txnDate,string depositAcct,string incomeAcct,double amount,string memo) {
 			try {
 				OpenConnection(9,0,PrefC.GetString(PrefName.QuickBooksCompanyFile));
-				BuildDepositAddRq(depositAcct,incomeAcct,amount,memo);
+				BuildDepositAddRq(txnDate,depositAcct,incomeAcct,amount,memo);
 				DoRequests();
 				CloseConnection();
 				ValidateDepositAddRs();
@@ -154,12 +154,14 @@ namespace OpenDental.Bridges {
 		}
 
 		///<summary>Creates a deposit within QuickBooks.  A QB connection must be open before calling this method. Requires connection with version 9.0</summary>
-		private static void BuildDepositAddRq(string depositAcct,string incomeAcct,double amount,string memo) {
+		private static void BuildDepositAddRq(DateTime txnDate,string depositAcct,string incomeAcct,double amount,string memo) {
 			if(!ConnectionOpen) {
 				return;
 			}
 			//Build the deposit add request and append it to the request message.
 			IDepositAdd DepositAddRq=RequestMsgSet.AppendDepositAddRq();
+			//Set field value for TxnDate
+			DepositAddRq.TxnDate.SetValue(txnDate);
 			//Set field value for FullName.
 			DepositAddRq.DepositToAccountRef.FullName.SetValue(depositAcct);
 			//Set field value for Memo

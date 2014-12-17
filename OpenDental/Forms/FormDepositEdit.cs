@@ -802,15 +802,25 @@ namespace OpenDental{
 		}
 
 		private void butSendQB_Click(object sender,EventArgs e) {
-			CreateDepositQB(DepositAccountsQB[comboDepositAccount.SelectedIndex],IncomeAccountsQB[comboIncomeAccountQB.SelectedIndex],DepositCur.Amount,textMemo.Text,false);
+			DateTime date=PIn.Date(textDate.Text);//We use security on the date showing.
+			if(!Security.IsAuthorized(Permissions.DepositSlips,date)) {
+				return;
+			}
+			DepositCur.DateDeposit=date;
+			CreateDepositQB(false);
 		}
 
 		///<summary>Returns true if a deposit was created OR if the user clicked continue anyway on pop up.</summary>
-		private bool CreateDepositQB(string depositAccount,string incomeAccount,double amount,string memo,bool allowContinue) {
+		private bool CreateDepositQB(bool allowContinue) {
 			try {
 				Cursor.Current=Cursors.WaitCursor;
-				QuickBooks.CreateDeposit(DepositAccountsQB[comboDepositAccount.SelectedIndex]
-					,IncomeAccountsQB[comboIncomeAccountQB.SelectedIndex],DepositCur.Amount,memo);
+				QuickBooks.CreateDeposit(DepositCur.DateDeposit
+					,DepositAccountsQB[comboDepositAccount.SelectedIndex]
+					,IncomeAccountsQB[comboIncomeAccountQB.SelectedIndex]
+					,DepositCur.Amount
+					,textMemo.Text);
+				SecurityLogs.MakeLogEntry(Permissions.DepositSlips,0,Lan.g(this,"Deposit slip sent to QuickBooks.")+"\r\n"
+					+Lan.g(this,"Deposit date")+": "+DepositCur.DateDeposit.ToShortDateString()+" "+Lan.g(this,"for")+" "+DepositCur.Amount.ToString("c"));
 				Cursor.Current=Cursors.Default;
 				MsgBox.Show(this,"Deposit successfully sent to QuickBooks.");
 				butSendQB.Enabled=false;//Don't let user send same deposit more than once.  
@@ -818,12 +828,16 @@ namespace OpenDental{
 			catch(Exception ex) {
 				Cursor.Current=Cursors.Default;
 				if(allowContinue) {
-					if(MessageBox.Show(ex.Message+"\r\n\r\nA deposit has not been created in QuickBooks, continue anyway?","QuickBooks Deposit Create Failed",MessageBoxButtons.YesNo)!=DialogResult.Yes) {
+					if(MessageBox.Show(ex.Message+"\r\n\r\n"
+						+Lan.g(this,"A deposit has not been created in QuickBooks, continue anyway?")
+						,Lan.g(this,"QuickBooks Deposit Create Failed")
+						,MessageBoxButtons.YesNo)!=DialogResult.Yes)
+					{
 						return false;
 					}
 				}
 				else {
-					MessageBox.Show(ex.Message,"QuickBooks Deposit Create Failed");
+					MessageBox.Show(ex.Message,Lan.g(this,"QuickBooks Deposit Create Failed"));
 					return false;
 				}
 			}
@@ -878,16 +892,9 @@ namespace OpenDental{
 			}
 			//Prevent backdating----------------------------------------------------------------------------------------
 			DateTime date=PIn.Date(textDate.Text);
-			if(IsNew) {
-				if(!Security.IsAuthorized(Permissions.DepositSlips,date)) {
-					return false;
-				}
-			}
-			else {
-				//We enforce security here based on date displayed, not date entered
-				if(!Security.IsAuthorized(Permissions.DepositSlips,date)) {
-					return false;
-				}
+			//We enforce security here based on date displayed, not date entered
+			if(!Security.IsAuthorized(Permissions.DepositSlips,date)) {
+				return false;
 			}
 			DepositCur.DateDeposit=PIn.Date(textDate.Text);
 			//amount already handled.
@@ -907,10 +914,7 @@ namespace OpenDental{
 				//Deposits.Insert(DepositCur);
 				if(Accounts.DepositsLinked() && DepositCur.Amount>0) {
 					if(IsQuickBooks) {//Create a deposit in QuickBooks.						
-						if(!CreateDepositQB(DepositAccountsQB[comboDepositAccount.SelectedIndex]
-							,IncomeAccountsQB[comboIncomeAccountQB.SelectedIndex]
-							,DepositCur.Amount,textMemo.Text,true)) 
-						{
+						if(!CreateDepositQB(true)) {
 							return false;
 						}
 						Deposits.Insert(DepositCur);
