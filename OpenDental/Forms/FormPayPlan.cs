@@ -1147,6 +1147,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Payment cannot be 0.");
 				return;
 			}
+			if(textTerm.Text!="" && textPeriodPayment.Text!="") {
+				MsgBox.Show(this,"Please choose either Number of Payments or Payment Amt.");
+				return;
+			}
 			if(textPeriodPayment.Text=="" && PIn.Long(textTerm.Text)<1){
 				MsgBox.Show(this,"Term cannot be less than 1.");
 				return;
