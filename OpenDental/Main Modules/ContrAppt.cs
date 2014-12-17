@@ -3634,9 +3634,13 @@ namespace OpenDental {
 							}
 							continue;
 						case "Note":
-							if(row["Note"].ToString()!="") {
-								h=g.MeasureString(row["Note"].ToString(),font,infoBubble.Width-(int)x).Height;
-								g.DrawString(row["Note"].ToString(),font,Brushes.Blue,new RectangleF(x,y,infoBubble.Width-(int)x,h));
+							string noteStr=row["Note"].ToString();
+							if(noteStr.Trim()!="" && noteStr.Length>200) {
+								noteStr=noteStr.Substring(0,200)+"...";
+							}
+							if(noteStr.Trim()!="") {
+								h=g.MeasureString(noteStr,font,infoBubble.Width-(int)x).Height;
+								g.DrawString(noteStr,font,Brushes.Blue,new RectangleF(x,y,infoBubble.Width-(int)x,h));
 								y+=h;
 							}
 							continue;
