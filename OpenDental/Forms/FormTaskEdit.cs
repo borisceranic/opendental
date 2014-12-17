@@ -1131,6 +1131,15 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a description.");
 				return false;
 			}
+			//Techs want to be notified of any changes made to completed tasks.
+			//Check if the notes, descript, or task list changed on a task marked Done.
+			if((notesChanged || textDescript.Text!=TaskCur.Descript || TaskCur.TaskListNum!=TaskOld.TaskListNum) 
+				&& TaskOld.TaskStatus==TaskStatusEnum.Done) 
+			{
+				//Forcing the status to viewed will put the task in other user's "New for" task list but not the user that made the change.
+				TaskCur.TaskStatus=TaskStatusEnum.Viewed;
+				checkDone.Checked=false;
+			}
 			if(checkDone.Checked) {
 				TaskCur.TaskStatus=TaskStatusEnum.Done;//global even if new status is tracked by user
 				TaskUnreads.DeleteForTask(TaskCur.TaskNum);//clear out taskunreads. We have too many tasks to read the done ones.
@@ -1356,6 +1365,12 @@ namespace OpenDental {
 			}
 			if(IsNew) {
 				Tasks.Delete(TaskCur.TaskNum);
+			}
+			//If a note was added to a Done task and the user hits cancel, the task status is set to Viewed because the note is still there and the task didn't move lists.
+			if(notesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
+				TaskCur.TaskStatus=TaskStatusEnum.Viewed;
+				Tasks.Update(TaskCur,TaskOld);//if task has already been altered, then this is where it will fail.
+				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
 		}
 	}
