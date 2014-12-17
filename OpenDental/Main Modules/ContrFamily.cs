@@ -1366,6 +1366,8 @@ namespace OpenDental{
 					patClone.FName=patNonClone.FName.ToUpper();
 					patClone.MiddleI=patNonClone.MiddleI.ToUpper();
 					patClone.Birthdate=patNonClone.Birthdate;
+					//We intentionally don't synch the patient's provider since the clone feature is so the clone can be assigned to a different provider for tracking production.
+					patClone.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
 					long patClonePatNum=Patients.Insert(patClone,false);
 					patClone=Patients.GetPat(patClonePatNum);//this is so the fields not set will be refreshed to their non-null default value, i.e. '' instead of null
 					strDataUpdated+=Lan.g(this,"The following patient was created")+": "
