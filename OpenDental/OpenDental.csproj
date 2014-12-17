@@ -246,6 +246,7 @@
     <Compile Include="Bridges\DemandForce.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Bridges\Office.cs" />
     <Compile Include="Bridges\HandyDentist.cs" />
     <Compile Include="Bridges\Irys.cs" />
     <Compile Include="Bridges\PandaPerio.cs" />

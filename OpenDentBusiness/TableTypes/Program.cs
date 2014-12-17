@@ -51,6 +51,7 @@ namespace OpenDentBusiness{
 		Dexis,
 		Digora,
 		Divvy,
+		Office,
 		Dolphin,
 		DrCeph,
 		Dxis,

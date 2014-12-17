@@ -117,6 +117,10 @@ namespace OpenDental{
 				Digora.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.Office.ToString()) {
+				Office.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Dolphin.ToString()) {
 				Dolphin.SendData(prog,pat);
 				return;
