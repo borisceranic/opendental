@@ -3183,9 +3183,14 @@ namespace OpenDental {
 				(TempApptSingle.Location.Y-ContrApptSheet2.Location.Y-panelSheet.Location.Y);
 			int tMin=ApptDrawing.ConvertToMin
 				(TempApptSingle.Location.Y-ContrApptSheet2.Location.Y-panelSheet.Location.Y);
+			long opNum=ApptDrawing.VisOps[ApptDrawing.ConvertToOp(TempApptSingle.Location.X-ContrApptSheet2.Location.X)].OperatoryNum;
 			bool timeWasMoved=tHr!=apt.AptDateTime.Hour
 				|| tMin!=apt.AptDateTime.Minute;
-			if(timeWasMoved) {//no question for notes
+			bool isOpChanged=true;
+			if(opNum==apt.Op) {
+				isOpChanged=false;
+			}
+			if(timeWasMoved || isOpChanged) {//no question for notes
 				if(apt.AptStatus == ApptStatus.PtNote | apt.AptStatus == ApptStatus.PtNoteCompleted) {
 					if(!Security.IsAuthorized(Permissions.AppointmentMove)) {
 						mouseIsDown = false;
@@ -3367,7 +3372,7 @@ namespace OpenDental {
 				apt.AptStatus = (ApptStatus)parameters2[2];
 				goto PluginApptDoNotUnbreakApptSameDay;
 			}
-			if(apt.AptStatus==ApptStatus.Broken && timeWasMoved) {
+			if(apt.AptStatus==ApptStatus.Broken && (timeWasMoved || isOpChanged)) {
 				apt.AptStatus=ApptStatus.Scheduled;
 			}
 			PluginApptDoNotUnbreakApptSameDay: { }
