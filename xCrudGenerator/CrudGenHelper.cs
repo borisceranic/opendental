@@ -123,6 +123,24 @@ namespace xCrudGenerator {
 			return false;
 		}
 
+		///<summary></summary>
+		public static bool IsSynchable(Type typeClass) {
+			object[] attributes = typeClass.GetCustomAttributes(typeof(CrudTableAttribute),true);
+			if(attributes.Length==0) {
+				return false;
+			}
+			for(int i=0;i<attributes.Length;i++) {
+				if(attributes[i].GetType()!=typeof(CrudTableAttribute)) {
+					continue;
+				}
+				if(((CrudTableAttribute)attributes[i]).IsSynchable) {
+					return true;
+				}
+			}
+			//couldn't find any.
+			return false;
+		}
+
 		///<summary>For Mobile, this only excludes PK2; result includes PK1, the CustomerNum.  Always excludes fields that are not in the database, like patient.Age.</summary>
 		public static List<FieldInfo> GetFieldsExceptPriKey(FieldInfo[] fields,FieldInfo priKey) {
 			List<FieldInfo> retVal=new List<FieldInfo>();

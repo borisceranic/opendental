@@ -78,85 +78,16 @@ namespace OpenDentBusiness{
 			Crud.SheetFieldDefCrud.Delete(sheetFieldDefNum);
 		}
 
+		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.  listDB can be null.</summary>
 		public static void Synch(List<SheetFieldDef> listNew,long sheetDefNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service
 				return;
 			}
-			Synch(listNew,sheetDefNum,null);
+			List<SheetFieldDef> listDB=SheetFieldDefs.GetForSheetDef(sheetDefNum);
+			Crud.SheetFieldDefCrud.Synch(listNew,listDB);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list. Should always pass in sheetDefNum, listDB should never be null.</summary>
-		public static void Synch(List<SheetFieldDef> listNew,long sheetDefNum, List<SheetFieldDef> listDB=null) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service
-				return;
-			}
-			if(listDB==null) {
-				//fill list with Num
-			}
-			/*Crud.*/Synch(listNew,listDB);
-		}
-
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Synch(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
-			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
-			List<SheetFieldDef> listIns=    new List<SheetFieldDef>();
-			List<SheetFieldDef> listUpdNew =new List<SheetFieldDef>();
-			List<SheetFieldDef> listUpdDB  =new List<SheetFieldDef>();
-			List<SheetFieldDef> listDel    =new List<SheetFieldDef>();
-			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
-			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
-			int idxNew=0;
-			int idxDB=0;
-			SheetFieldDef fieldNew;
-			SheetFieldDef fieldDB;
-			while(idxNew<listNew.Count || idxDB<listDB.Count) {
-				fieldNew=null;
-				if(idxNew<listNew.Count) {
-					fieldNew=listNew[idxNew];
-				}
-				fieldDB=null;
-				if(idxDB<listDB.Count) {
-					fieldDB=listDB[idxDB];
-				}
-				//begin compare
-				if(fieldNew!=null && fieldDB==null) {
-					listIns.Add(fieldNew);
-					idxNew++;
-					continue;
-				}
-				else if(fieldNew==null && fieldDB!=null) {
-					listDel.Add(fieldDB);
-					idxDB++;
-					continue;
-				}
-				else if(fieldNew.SheetFieldDefNum<fieldDB.SheetFieldDefNum) {//newPK less than dbPK
-					listIns.Add(fieldNew);
-					idxNew++;
-					continue;
-				}
-				else if(fieldNew.SheetFieldDefNum>fieldDB.SheetFieldDefNum) {//dbPK less than newPK
-					listDel.Add(fieldDB);
-					idxDB++;
-					continue;
-				}
-				listUpdNew.Add(fieldNew);
-				listUpdDB.Add(fieldDB);
-				idxNew++;
-				idxDB++;
-			}
-			//Commit changes to DB
-			for(int i=0;i<listIns.Count;i++) {
-				Crud.SheetFieldDefCrud.Insert(listIns[i]);
-			}
-			for(int i=0;i<listUpdNew.Count;i++) {
-				Crud.SheetFieldDefCrud.Update(listUpdNew[i],listUpdDB[i]);
-			}
-			for(int i=0;i<listDel.Count;i++) {
-				Crud.SheetFieldDefCrud.Delete(listDel[i].SheetFieldDefNum);
-			}
-		}
 
 		///<summary>Sorts fields in the order that they shoudl be drawn on top of eachother. First Images, then Drawings, Lines, Rectangles, Text, Check Boxes, and SigBoxes. In that order.</summary>
 		public static int SortDrawingOrderLayers(SheetFieldDef f1,SheetFieldDef f2) {

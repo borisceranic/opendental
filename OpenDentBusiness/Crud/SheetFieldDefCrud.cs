@@ -279,5 +279,65 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Synch(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<SheetFieldDef> listIns=    new List<SheetFieldDef>();
+			List<SheetFieldDef> listUpdNew =new List<SheetFieldDef>();
+			List<SheetFieldDef> listUpdDB  =new List<SheetFieldDef>();
+			List<SheetFieldDef> listDel    =new List<SheetFieldDef>();
+			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
+			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
+			int idxNew=0;
+			int idxDB=0;
+			SheetFieldDef fieldNew;
+			SheetFieldDef fieldDB;
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.SheetFieldDefNum<fieldDB.SheetFieldDefNum) {//newPK less than dbPK
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.SheetFieldDefNum>fieldDB.SheetFieldDefNum) {//dbPK less than newPK
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				Update(listUpdNew[i],listUpdDB[i]);
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].SheetFieldDefNum);
+			}
+		}
+
 	}
 }

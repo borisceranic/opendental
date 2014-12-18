@@ -790,6 +790,70 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t2+"}");
 			}
 			#endregion Delete
+			#region Synch
+			//Synch-----------------------------------------------------------------------------------------
+			if(CrudGenHelper.IsSynchable(typeClass)) {
+				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>");
+				strb.Append(rn+t2+"public static void Synch(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
+				strb.Append(rn+t3+"//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.");
+				strb.Append(rn+t3+"List<"+typeClass.Name+"> listIns=    new List<"+typeClass.Name+">();");
+				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdNew =new List<"+typeClass.Name+">();");
+				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdDB  =new List<"+typeClass.Name+">();");
+				strb.Append(rn+t3+"List<"+typeClass.Name+"> listDel    =new List<"+typeClass.Name+">();");
+				strb.Append(rn+t3+"listNew.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK.");
+				strb.Append(rn+t3+"listDB.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK.");
+				strb.Append(rn+t3+"int idxNew=0;");
+				strb.Append(rn+t3+"int idxDB=0;");
+				strb.Append(rn+t3+""+typeClass.Name+" fieldNew;");
+				strb.Append(rn+t3+""+typeClass.Name+" fieldDB;");
+				strb.Append(rn+t3+"while(idxNew<listNew.Count || idxDB<listDB.Count) {");
+				strb.Append(rn+t4+"fieldNew=null;");
+				strb.Append(rn+t4+"if(idxNew<listNew.Count) {");
+				strb.Append(rn+t5+"fieldNew=listNew[idxNew];");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"fieldDB=null;");
+				strb.Append(rn+t4+"if(idxDB<listDB.Count) {");
+				strb.Append(rn+t5+"fieldDB=listDB[idxDB];");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"//begin compare");
+				strb.Append(rn+t4+"if(fieldNew!=null && fieldDB==null) {");
+				strb.Append(rn+t5+"listIns.Add(fieldNew);");
+				strb.Append(rn+t5+"idxNew++;");
+				strb.Append(rn+t5+"continue;");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"else if(fieldNew==null && fieldDB!=null) {");
+				strb.Append(rn+t5+"listDel.Add(fieldDB);");
+				strb.Append(rn+t5+"idxDB++;");
+				strb.Append(rn+t5+"continue;");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+"<fieldDB."+priKey.Name+") {//newPK less than dbPK");
+				strb.Append(rn+t5+"listIns.Add(fieldNew);");
+				strb.Append(rn+t5+"idxNew++;");
+				strb.Append(rn+t5+"continue;");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+">fieldDB."+priKey.Name+") {//dbPK less than newPK");
+				strb.Append(rn+t5+"listDel.Add(fieldDB);");
+				strb.Append(rn+t5+"idxDB++;");
+				strb.Append(rn+t5+"continue;");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"listUpdNew.Add(fieldNew);");
+				strb.Append(rn+t4+"listUpdDB.Add(fieldDB);");
+				strb.Append(rn+t4+"idxNew++;");
+				strb.Append(rn+t4+"idxDB++;");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"//Commit changes to DB");
+				strb.Append(rn+t3+"for(int i=0;i<listIns.Count;i++) {");
+				strb.Append(rn+t4+"Insert(listIns[i]);");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"for(int i=0;i<listUpdNew.Count;i++) {");
+				strb.Append(rn+t4+"Update(listUpdNew[i],listUpdDB[i]);");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"for(int i=0;i<listDel.Count;i++) {");
+				strb.Append(rn+t4+"Delete(listDel[i]."+priKey.Name+");");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t2+"}");
+			}
+			#endregion
 			#region ConvertToM
 			if(isMobile) {
 				//ConvertToM------------------------------------------------------------------------------------------

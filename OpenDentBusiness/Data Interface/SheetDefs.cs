@@ -54,7 +54,7 @@ namespace OpenDentBusiness{
 			foreach(SheetFieldDef field in sheetDef.SheetFieldDefs){
 				field.SheetDefNum=sheetDef.SheetDefNum;
 			}
-			SheetFieldDefs.Synch(sheetDef.SheetFieldDefs,SheetFieldDefs.GetForSheetDef(sheetDef.SheetDefNum));
+			SheetFieldDefs.Synch(sheetDef.SheetFieldDefs,sheetDef.SheetDefNum);
 			return sheetDef.SheetDefNum;
 		}
 
