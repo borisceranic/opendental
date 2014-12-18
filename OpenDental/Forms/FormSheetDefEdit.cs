@@ -88,7 +88,6 @@ namespace OpenDental {
 		}
 
 		private void FormSheetDefEdit_Load(object sender,EventArgs e) {
-			fillFkeyObjects();
 			if(IsInternal){
 				butDelete.Visible=false;
 				butOK.Visible=false;
@@ -96,24 +95,17 @@ namespace OpenDental {
 				groupAddNew.Visible=false;
 				groupPage.Visible=false;
 				groupAlignH.Visible=false;
-				//butAlignLeft.Visible=false;
 				groupAlignV.Visible=false;
-				//butAlignTop.Visible=false;
 				linkLabelTips.Visible=false;
 				butCopy.Visible=false;
 				butPaste.Visible=false;
 				butTabOrder.Visible=false;
-				butPmtOption.Visible=false;
 			}
 			else{
 				labelInternal.Visible=false;
-				//butAlignLeft.Visible=true;
-				//butAlignTop.Visible=true;
-				//butCopy.Visible=true;
-				//butPaste.Visible=true;
 			}
 			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement) {
-				butPmtOption.Visible=false;
+				butAddGrid.Visible=false;
 			}
 			if(Sheets.SheetTypeIsSinglePage(SheetDefCur.SheetType)) {
 				groupPage.Visible=false;
@@ -138,23 +130,6 @@ namespace OpenDental {
 			panelMain.Refresh();
 			panelMain.Focus();
 			//textDescription.Focus();
-		}
-
-		private void fillFkeyObjects() {
-			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
-				if(SheetDefCur.SheetFieldDefs[i].FKey==0) {
-					continue;
-				}
-				switch(SheetDefCur.SheetFieldDefs[i].FieldType) {
-					case SheetFieldType.Grid:
-						SheetDefCur.SheetFieldDefs[i].GridDef=SheetGridDefs.GetOne(SheetDefCur.SheetFieldDefs[i].FKey);
-						//SheetDefCur.SheetFieldDefs[i].GridDef.Columns=SheetGridColDefs.
-						break;
-					default:
-						//nothing to do here
-						break;
-				}
-			}
 		}
 
 		private void FillFieldList(){
@@ -207,12 +182,7 @@ namespace OpenDental {
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": "+SheetDefCur.SheetFieldDefs[i].FieldName);
 						break;
 					case SheetFieldType.Grid:
-						if(SheetDefCur.SheetFieldDefs[i].GridDef!=null) {//pull from memory, might not be in the DB yet.
-							listFields.Items.Add(Lan.g(this,"Grid:")+SheetGridDefs.GetName(SheetDefCur.SheetFieldDefs[i].GridDef));
-						}
-						else {
-							listFields.Items.Add(Lan.g(this,"Grid:")+SheetGridDefs.GetName(SheetGridDefs.GetOne(SheetDefCur.SheetFieldDefs[i].FKey)));
-						}
+						listFields.Items.Add("Grid:"+SheetDefCur.SheetFieldDefs[i].FieldName);
 						break;
 					default:
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldName);
@@ -294,6 +264,7 @@ namespace OpenDental {
 
 		///<summary>If drawImages is true then only image fields will be drawn. Otherwise, all fields but images will be drawn.</summary>
 		private void DrawFields(Graphics g,bool onlyDrawImages){
+			//SheetDefCur.SheetFieldDefs.Sort(SheetFieldDefs.SortDrawingOrderLayers);// for field selection bug
 			SetGraphicsHelper(g);
 			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
 				if(onlyDrawImages){
@@ -408,51 +379,42 @@ namespace OpenDental {
 					_argsDF.pen=_argsDF.penBlack;
 					_argsDF.brush=_argsDF.brushBlue;
 				}
-				SheetGridDef fGrid=SheetDefCur.SheetFieldDefs[i].GridDef;
-#warning fix columns below.
+				List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(SheetDefCur.SheetFieldDefs[i].FieldName);
 				//fGrid.Columns=SheetGridDefs.GetColumnsAvailable(fGrid.GridType);
 				ODGrid odGrid=new ODGrid();
-				odGrid.Title=fGrid.Title;
 				odGrid.Width=0;
-				for(int c=0;c<fGrid.Columns.Count;c++){
-					odGrid.Width+=fGrid.Columns[c].Width;
+				for(int c=0;c<Columns.Count;c++){
+					odGrid.Width+=Columns[c].ColumnWidth;
 				}
 				odGrid.HideScrollBars=true;
 				#region  Fill Grid
 				odGrid.BeginUpdate();
 				odGrid.Columns.Clear();
 				ODGridColumn col;
-				for(int c=0;c<fGrid.Columns.Count;c++) {
-					col=new ODGridColumn(fGrid.Columns[c].DisplayName,fGrid.Columns[c].Width);
+				for(int c=0;c<Columns.Count;c++) {
+					col=new ODGridColumn(Columns[c].Description,Columns[c].ColumnWidth);
 					odGrid.Columns.Add(col);
 				}
 				ODGridRow row=new ODGridRow();//Add dummy row
-				for(int c=0;c<fGrid.Columns.Count;c++) {
-					row.Cells.Add(" ");
+				for(int c=0;c<Columns.Count;c++) {
+					row.Cells.Add(" ");//add dummy row.
 				}
 				odGrid.Rows.Add(row);
 				odGrid.EndUpdate();//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
 				#endregion
 				int yPosGrid=SheetDefCur.SheetFieldDefs[i].YPos;
-				if(SheetGridDefs.gridHasDefaultTitle(fGrid.GridType)) {
-					switch(fGrid.GridType) {//Draw titles differently for different grids.
-						case SheetGridType.StatementPayPlan:
-							SizeF sSize=g.MeasureString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold));
-							g.FillRectangle(Brushes.White,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,odGrid.Width,odGrid.TitleHeight);
-							g.DrawString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold),new SolidBrush(Color.Black),SheetDefCur.SheetFieldDefs[i].XPos+(SheetDefCur.SheetFieldDefs[i].Width-sSize.Width)/2,yPosGrid);
-							break;
-						default:
-							odGrid.DrawTitle(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
-							break;
-					}
+				if(SheetDefCur.SheetFieldDefs[i].FieldName=="StatementPayPlan") {
+					SizeF sSize=g.MeasureString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold));
+					g.FillRectangle(Brushes.White,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,odGrid.Width,odGrid.TitleHeight);
+					g.DrawString("Payment Plans",new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold),new SolidBrush(Color.Black),SheetDefCur.SheetFieldDefs[i].XPos+(SheetDefCur.SheetFieldDefs[i].Width-sSize.Width)/2,yPosGrid);
 					yPosGrid+=odGrid.TitleHeight;
 				}
-				odGrid.DrawHeader(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
+				odGrid.PrintHeader(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
 				yPosGrid+=odGrid.HeaderHeight;
-				odGrid.DrawRow(0,g,odGrid.Font,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,false,true);
+				odGrid.PrintRow(0,g,odGrid.Font,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,false,true);//a single dummy row.
 				yPosGrid+=odGrid.RowHeights[0]+2;
 				#region drawFooter
-				if(fGrid.GridType==SheetGridType.StatementPayPlan) {
+				if(SheetDefCur.SheetFieldDefs[i].FieldName=="StatementPayPlan") {
 					RectangleF rf=new RectangleF(SheetDefCur.Width-SheetDefCur.SheetFieldDefs[i].Width-60,yPosGrid,SheetDefCur.SheetFieldDefs[i].Width,odGrid.TitleHeight);
 					g.FillRectangle(Brushes.White,rf);
 					StringFormat sf=new StringFormat();
@@ -895,20 +857,15 @@ namespace OpenDental {
 		}
 
 		private void butAddGrid_Click(object sender,EventArgs e) {
-			//if(this.IsInternal) {//why would we ever "add" to an internal sheet?
-			//	return;
-			//}
 			FormSheetFieldGridType FormT=new FormSheetFieldGridType();
+			FormT.SheetDefCur=SheetDefCur;
 			FormT.ShowDialog();
-			if(FormT.DialogResult!=DialogResult.OK){
+			if(FormT.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			FormSheetFieldGrid FormS=new FormSheetFieldGrid();
 			FormS.SheetDefCur=SheetDefCur;
-			FormS.SheetFieldDefCur=SheetFieldDef.NewGrid(0,0,100,100,FormT.SelectedSheetGridType);//is resized from dialog window.
-			//if(this.IsInternal) {//why would we ever "add" to an internal sheet?
-			//	FormS.IsReadOnly=true;
-			//}
+			FormS.SheetFieldDefCur=SheetFieldDef.NewGrid(FormT.SelectedSheetGridType,0,0,100,100);//is resized from dialog window.
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
@@ -1126,10 +1083,20 @@ namespace OpenDental {
 				RenumberTabOrderHelper();
 				return;
 			}
+			//listFields.ClearSelected();
 			FillFieldList();
 			if(refreshBuffer) {//Only when image was edited.
 				RefreshDoubleBuffer();
 			}
+			//for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
+			//	if(SheetDefCur.SheetFieldDefs[i].FieldType==field.FieldType
+			//		&& SheetDefCur.SheetFieldDefs[i].FieldType==field.FieldType
+			//		&& SheetDefCur.SheetFieldDefs[i].FieldType==field.FieldType
+			//}
+			//idx=SheetDefCur.SheetFieldDefs.IndexOf(field);
+			//if(idx>0) {//only true if field was not deleted.
+			//	listFields.SetSelected(idx,true);
+			//}
 			if(listFields.Items.Count-1>=idx){
 				listFields.SelectedIndex=idx;//reselect the item.
 			}
@@ -1742,7 +1709,6 @@ namespace OpenDental {
 				butPaste.Enabled=false;
 				groupAlignH.Enabled=false;
 				groupAlignV.Enabled=false;
-				butPmtOption.Enabled=false;
 				//butAlignLeft.Enabled=false;
 				//butAlignTop.Enabled=false;
 				butEdit.Enabled=false;
@@ -1757,7 +1723,6 @@ namespace OpenDental {
 				butPaste.Enabled=true;
 				groupAlignH.Enabled=true;
 				groupAlignV.Enabled=true;
-				butPmtOption.Enabled=true;
 				//butAlignLeft.Enabled=true;
 				//butAlignTop.Enabled=true;
 				butEdit.Enabled=true;

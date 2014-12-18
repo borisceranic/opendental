@@ -57,13 +57,8 @@ namespace OpenDentBusiness{
 		public bool IsWebForm;
 		///<summary>Forces old single page behavior, ignoring page breaks.</summary>
 		public bool IsMultiPage;
-		///<summary>Contains data used to determine which content should be loaded into grids and how to draw it.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
-		public SheetArgs GArgs;
 		
 		public Sheet Copy(){
-			Sheet retVal=(Sheet)this.MemberwiseClone();
-			retVal.GArgs=this.GArgs.Copy();
 			return (Sheet)this.MemberwiseClone();
 		}	
 

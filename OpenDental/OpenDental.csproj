@@ -398,12 +398,6 @@
     <Compile Include="Forms\FormEmailDigitalSignature.designer.cs">
       <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormSheetGridColDefEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormSheetGridColDefEdit.designer.cs">
-      <DependentUpon>FormSheetGridColDefEdit.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormSheetFieldGridType.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3588,9 +3582,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEmailDigitalSignature.resx">
       <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormSheetGridColDefEdit.resx">
-      <DependentUpon>FormSheetGridColDefEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormSheetFieldGridType.resx">
       <DependentUpon>FormSheetFieldGridType.cs</DependentUpon>

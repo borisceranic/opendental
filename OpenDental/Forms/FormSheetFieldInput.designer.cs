@@ -27,8 +27,6 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.listFields = new System.Windows.Forms.ListBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.comboTextAlign = new System.Windows.Forms.ComboBox();
-			this.label1 = new System.Windows.Forms.Label();
 			this.checkFontIsBold = new System.Windows.Forms.CheckBox();
 			this.textFontSize = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -77,8 +75,6 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox1.Controls.Add(this.comboTextAlign);
-			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.checkFontIsBold);
 			this.groupBox1.Controls.Add(this.textFontSize);
 			this.groupBox1.Controls.Add(this.label4);
@@ -86,28 +82,10 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Location = new System.Drawing.Point(182, 42);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(283, 120);
+			this.groupBox1.Size = new System.Drawing.Size(283, 96);
 			this.groupBox1.TabIndex = 88;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Font";
-			// 
-			// comboTextAlign
-			// 
-			this.comboTextAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboTextAlign.FormattingEnabled = true;
-			this.comboTextAlign.Location = new System.Drawing.Point(86, 92);
-			this.comboTextAlign.Name = "comboTextAlign";
-			this.comboTextAlign.Size = new System.Drawing.Size(191, 21);
-			this.comboTextAlign.TabIndex = 109;
-			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(9, 93);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(78, 16);
-			this.label1.TabIndex = 108;
-			this.label1.Text = "Align";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkFontIsBold
 			// 
@@ -156,7 +134,7 @@ namespace OpenDental{
 			// label5
 			// 
 			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label5.Location = new System.Drawing.Point(197, 197);
+			this.label5.Location = new System.Drawing.Point(197, 173);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 16);
 			this.label5.TabIndex = 90;
@@ -166,7 +144,7 @@ namespace OpenDental{
 			// label6
 			// 
 			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label6.Location = new System.Drawing.Point(197, 223);
+			this.label6.Location = new System.Drawing.Point(197, 199);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(71, 16);
 			this.label6.TabIndex = 92;
@@ -176,7 +154,7 @@ namespace OpenDental{
 			// label7
 			// 
 			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label7.Location = new System.Drawing.Point(197, 249);
+			this.label7.Location = new System.Drawing.Point(197, 225);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(71, 16);
 			this.label7.TabIndex = 94;
@@ -186,7 +164,7 @@ namespace OpenDental{
 			// label8
 			// 
 			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label8.Location = new System.Drawing.Point(197, 275);
+			this.label8.Location = new System.Drawing.Point(197, 251);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(71, 16);
 			this.label8.TabIndex = 96;
@@ -198,7 +176,7 @@ namespace OpenDental{
 			this.comboGrowthBehavior.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboGrowthBehavior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboGrowthBehavior.FormattingEnabled = true;
-			this.comboGrowthBehavior.Location = new System.Drawing.Point(268, 168);
+			this.comboGrowthBehavior.Location = new System.Drawing.Point(268, 144);
 			this.comboGrowthBehavior.Name = "comboGrowthBehavior";
 			this.comboGrowthBehavior.Size = new System.Drawing.Size(197, 21);
 			this.comboGrowthBehavior.TabIndex = 99;
@@ -206,7 +184,7 @@ namespace OpenDental{
 			// label9
 			// 
 			this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label9.Location = new System.Drawing.Point(161, 169);
+			this.label9.Location = new System.Drawing.Point(161, 145);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(107, 16);
 			this.label9.TabIndex = 98;
@@ -217,7 +195,7 @@ namespace OpenDental{
 			// 
 			this.checkRequired.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkRequired.AutoSize = true;
-			this.checkRequired.Location = new System.Drawing.Point(214, 300);
+			this.checkRequired.Location = new System.Drawing.Point(214, 276);
 			this.checkRequired.Name = "checkRequired";
 			this.checkRequired.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkRequired.Size = new System.Drawing.Size(69, 17);
@@ -228,7 +206,7 @@ namespace OpenDental{
 			// labelTabOrder
 			// 
 			this.labelTabOrder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelTabOrder.Location = new System.Drawing.Point(197, 324);
+			this.labelTabOrder.Location = new System.Drawing.Point(197, 300);
 			this.labelTabOrder.Name = "labelTabOrder";
 			this.labelTabOrder.Size = new System.Drawing.Size(71, 16);
 			this.labelTabOrder.TabIndex = 102;
@@ -238,7 +216,7 @@ namespace OpenDental{
 			// textTabOrder
 			// 
 			this.textTabOrder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textTabOrder.Location = new System.Drawing.Point(268, 323);
+			this.textTabOrder.Location = new System.Drawing.Point(268, 299);
 			this.textTabOrder.MaxVal = 2000;
 			this.textTabOrder.MinVal = -100;
 			this.textTabOrder.Name = "textTabOrder";
@@ -265,7 +243,7 @@ namespace OpenDental{
 			// textHeight
 			// 
 			this.textHeight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textHeight.Location = new System.Drawing.Point(268, 274);
+			this.textHeight.Location = new System.Drawing.Point(268, 250);
 			this.textHeight.MaxVal = 2000;
 			this.textHeight.MinVal = 1;
 			this.textHeight.Name = "textHeight";
@@ -275,7 +253,7 @@ namespace OpenDental{
 			// textWidth
 			// 
 			this.textWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textWidth.Location = new System.Drawing.Point(268, 248);
+			this.textWidth.Location = new System.Drawing.Point(268, 224);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = 1;
 			this.textWidth.Name = "textWidth";
@@ -285,7 +263,7 @@ namespace OpenDental{
 			// textYPos
 			// 
 			this.textYPos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textYPos.Location = new System.Drawing.Point(268, 222);
+			this.textYPos.Location = new System.Drawing.Point(268, 198);
 			this.textYPos.MaxVal = 2000;
 			this.textYPos.MinVal = -100;
 			this.textYPos.Name = "textYPos";
@@ -295,7 +273,7 @@ namespace OpenDental{
 			// textXPos
 			// 
 			this.textXPos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textXPos.Location = new System.Drawing.Point(268, 196);
+			this.textXPos.Location = new System.Drawing.Point(268, 172);
 			this.textXPos.MaxVal = 2000;
 			this.textXPos.MinVal = -100;
 			this.textXPos.Name = "textXPos";
@@ -413,7 +391,5 @@ namespace OpenDental{
 		private ValidNum textTabOrder;
 		private System.Windows.Forms.TextBox textReportableName;
 		private System.Windows.Forms.Label labelReportableName;
-		private System.Windows.Forms.ComboBox comboTextAlign;
-		private System.Windows.Forms.Label label1;
 	}
 }

@@ -11,6 +11,7 @@ using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System.Data;
+using System.Windows.Forms;
 
 namespace OpenDental {
 	public class SheetPrinting {
@@ -30,9 +31,10 @@ namespace OpenDental {
 		//private static bool _forceSinglePage;
 		private static bool _printCalibration=false;//debug only
 		private static bool _isPrinting=false;
+		private static Statement _stmt;
 
 		///<summary>Surround with try/catch.</summary>
-		public static void PrintBatch(List<Sheet> sheetBatch){
+		public static void PrintBatch(List<Sheet> sheetBatch,Statement stmt=null){
 			//currently no validation for parameters in a batch because of the way it was created.
 			//could validate field names here later.
 			_sheetList=sheetBatch;
@@ -63,7 +65,7 @@ namespace OpenDental {
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
 					//SetForceSinglePage(s);
-					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)));
+					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);
 					pageCount+=Sheets.CalculatePageCount(s,_printMargin);//(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
 				}
 				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
@@ -90,25 +92,16 @@ namespace OpenDental {
 			Print(sheet,1,isControlled);
 		}
 
-		///<Summary>Surround with try/catch.</Summary>
-		public static void Print(Sheet sheet){
-			Print(sheet,1,false);
-		}
-
-		///<Summary>Surround with try/catch.</Summary>
-		public static void Print(Sheet sheet,int copies){
-			Print(sheet,copies,false);
-		}
-
 		public static void SetZero() {
 			_sheetsPrinted=0;
 			_yPosPrint=0;
 		}
 
 		///<Summary></Summary>
-		public static void Print(Sheet sheet,int copies,bool isRxControlled){
+		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null){
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
+			_stmt=stmt;
 			_isPrinting=true;
 			_sheetList=new List<Sheet>();
 			for(int i=0;i<copies;i++){
@@ -198,15 +191,12 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			Sheets.SetPageMargin(sheet,_printMargin);
-			SheetUtil.CalculateHeights(sheet,g);//this is here because of easy access to g.
+			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);//this is here because of easy access to g.
 			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			//Begin drawing.
 			foreach(SheetField field in sheet.SheetFields) {
 				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) { 
 					continue; 
-				}
-				if(sheet.SheetType==SheetTypeEnum.Statement && field.IsPaymentOption && !sheet.GArgs.ShowPaymentOptions) {
-					continue;//skip payment option fields on statments if neccesary
 				}
 				switch(field.FieldType) {
 					case SheetFieldType.Image:
@@ -223,7 +213,7 @@ namespace OpenDental {
 						drawFieldLine(field,g,null);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,g,null);
+						drawFieldGrid(field,sheet,g,null,_stmt);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:
@@ -433,34 +423,47 @@ namespace OpenDental {
 			GC.Collect();		
 		}
 
-		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
-			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements. That way if OD Grid is ever drawn Differently, it should affect this behavior as well.
-			int yPosGrid=field.YPos-_yPosPrint;//yPosGrid is used to determine wherehow far down the grid we are printing.
-			bool yPosPgBreakAdjReq=(bool)(yPosGrid<0);//cast as bool so that it is visually appearant
-			SheetGridDef fGrid=SheetGridDefs.GetOne(field.FKey);
-			odGrid.Title=fGrid.Title;
+		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx, Statement stmt) {
+			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
+			int _yAdjCurRow=0;//used to adjust for Titles, Headers, Rows, and footers (all considered part of the same row).
 			odGrid.Width=0;
-			foreach(SheetGridColDef Col in fGrid.Columns){
-				odGrid.Width+=Col.Width;
+			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
+			foreach(DisplayField Col in Columns) {
+				odGrid.Width+=Col.ColumnWidth;
 			}
 			odGrid.Height=field.Height;
 			odGrid.HideScrollBars=true;
-			DataTable Table=SheetGridDefs.GetDataTableForGridType(SheetGridDefs.GetOne(field.FKey).GridType,sheet.GArgs);
-			#region  Fill Grid
+			odGrid.YPosField=field.YPos;
+			odGrid.Title=field.FieldName+(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
+			odGrid.TopMargin=40;
+			odGrid.BottomMargin=60;
+			odGrid.PageHeight=sheet.HeightPage;
+			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt);
+			#region  Fill Grid, Set Text Alignment
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
 			ODGridColumn col;
-			for(int i=0;i<fGrid.Columns.Count;i++) {
-				col=new ODGridColumn(fGrid.Columns[i].DisplayName,fGrid.Columns[i].Width);
-				switch(fGrid.Columns[i].TextAlign){
-					case StringAlignment.Near:
-						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Left;
+			for(int i=0;i<Columns.Count;i++) {
+				col=new ODGridColumn(Columns[i].Description,Columns[i].ColumnWidth);
+				switch(field.FieldName+"."+Columns[i].InternalName) {//Unusual switch statement to differentiate similar column names in different grids.
+					case "StatementMain.charges":
+					case "StatementMain.credits":
+					case "StatementMain.balance":
+					case "StatementPayPlan.charges":
+					case "StatementPayPlan.credits":
+					case "StatementPayPlan.balance":
+						col.TextAlign=HorizontalAlignment.Right;
 						break;
-					case StringAlignment.Center:
-						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Center;
+					case "StatementAging.Age00to30":
+					case "StatementAging.Age31to60":
+					case "StatementAging.Age61to90":
+					case "StatementAging.Age90plus":
+					case "StatementEnclosed.AmountDue":
+					case "StatementEnclosed.DateDue":
+						col.TextAlign=HorizontalAlignment.Center;
 						break;
-					case StringAlignment.Far:
-						col.TextAlign= System.Windows.Forms.HorizontalAlignment.Right;
+					default:
+						col.TextAlign=HorizontalAlignment.Left;
 						break;
 				}
 				odGrid.Columns.Add(col);
@@ -468,155 +471,103 @@ namespace OpenDental {
 			ODGridRow row;
 			for(int i=0;i<Table.Rows.Count;i++) {
 				row=new ODGridRow();
-				for(int c=0;c<fGrid.Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
-					row.Cells.Add(Table.Rows[i][fGrid.Columns[c].ColName].ToString());
+				for(int c=0;c<Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
+					row.Cells.Add(Table.Rows[i][Columns[c].InternalName].ToString());
 				}
 				odGrid.Rows.Add(row);
 			}
-			odGrid.EndUpdate();//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
+			odGrid.EndUpdate(true);//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
 			#endregion
-			bool drawTitle=SheetGridDefs.gridHasDefaultTitle(fGrid.GridType);
-			bool drawHeader=true;
-			bool drawFooter=false;
-			int pageCount=0;
-			int pageBreak=bottomCurPage(yPosGrid,sheet,out pageCount);
-			if(fGrid.GridType==SheetGridType.StatementMain && !sheet.GArgs.Intermingled) {
-				drawTitle=true;
-			}
-			//odGrid.DrawTitleAndHeaders(g,field.XPos,yPosGrid);
-			//yPosGrid+=odGrid.TitleHeight+odGrid.HeaderHeight;
-			//Add each row height, add blank space for the end of each page and headers on the next page.
 			for(int i=0;i<odGrid.RowHeights.Length;i++) {
-				#region Split patient accounts on Statement grids.
-				if(fGrid.GridType==SheetGridType.StatementMain
-					&& !sheet.GArgs.Intermingled
-					&& i>0 
-					&& Table.Rows[i]["patient"].ToString()!=Table.Rows[i-1]["patient"].ToString()) 
-				{//
-					if(gx==null) {
-						odGrid.DrawRow(i-1,g,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true,true);//redraw previous row as a bottom row
-					}
-					else {
-						odGrid.DrawRowX(i-1,gx,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true,true);//redraw previous row as a bottom row
-					}					
-					yPosGrid+=20;//space out grids.
-					drawTitle=true;
-					drawHeader=true;
-				}
-				#endregion
-				#region Page break logic
-				if(fGrid.GridType==SheetGridType.StatementPayPlan && i==odGrid.RowHeights.Length-1) {
-					drawFooter=true;
-				}
-				if(yPosGrid //start position of row
-					+odGrid.RowHeights[i] //+row height
-					+(drawTitle?odGrid.TitleHeight:0) //+title height if needed
-					+(drawHeader?odGrid.HeaderHeight:0) //+header height if needed
-					+(drawFooter?odGrid.TitleHeight:0) //+footer height if needed.
-					>pageBreak)
+				if(_isPrinting
+					&& (odGrid.PrintRows[i].YPos-_printMargin.Top<_yPosPrint //rows at the end of previous page
+						|| odGrid.PrintRows[i].YPos-sheet.HeightPage+_printMargin.Bottom>_yPosPrint)) 
 				{
-					//if(i>0) {
-					//	if(gx==null) {
-					//		odGrid.DrawRow(i-1,g,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true);//redraw previous row as a bottom row
-					//	}
-					//	else {
-					//		odGrid.DrawRowX(i-1,gx,odGrid.Font,field.XPos,yPosGrid-odGrid.RowHeights[i-1],true);//redraw previous row as a bottom row
-					//	}			
-					//}
-					yPosGrid=pageBreak+1;
-					pageBreak=bottomCurPage(yPosGrid,sheet,out pageCount);
-					drawHeader=true;
+					continue;//continue because we do not want to draw rows from other pages.
 				}
-				if(_isPrinting && yPosGrid>=0 && yPosPgBreakAdjReq) {//Only true if we are actually printing to the printer or PDF.
-					//_yPosPrint+=pageCount*(_printMargin.Bottom+_printMargin.Top);
-#warning page break logic is still broken when printing. rows are either duplicated or skipped at the end of each page.
-					yPosGrid=0;
-					yPosGrid+=pageCount*(_printMargin.Bottom+_printMargin.Top)+_printMargin.Top+1;
-					yPosPgBreakAdjReq=false;
-					drawHeader=true;
-				}
-				#endregion
+				_yAdjCurRow=0;
+				//if(odGrid.PrintRows[i].YPos<_yPosPrint
+				//	|| odGrid.PrintRows[i].YPos-_yPosPrint>sheet.HeightPage) {
+				//	continue;//skip rows on previous page and rows on next page.
+				//}
 				#region Draw Title
-				if(drawTitle) {
-					switch(fGrid.GridType) {//Draw titles differently for different grids.
-						case SheetGridType.StatementMain:
+				if(odGrid.PrintRows[i].IsTitleRow) {
+					switch(field.FieldName) {//Draw titles differently for different grids.
+						case "StatementMain":
 							Patient pat=Patients.GetPat(PIn.Long(Table.Rows[i]["PatNum"].ToString()));
 							string patName="";
 							if(pat!=null) {//should always be true
 								patName=pat.GetNameFLnoPref();
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos-10,yPosGrid,odGrid.Width,odGrid.TitleHeight);
-								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
+								g.FillRectangle(Brushes.White,field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(yPosGrid-1),p(odGrid.Width),p(odGrid.TitleHeight));
+								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight));
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos-10),p(yPosGrid-1),p(300),p(100)),XStringAlignment.Near);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Near);
 									//gx.DrawString(patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
 								}
 							}
 							break;
-						case SheetGridType.StatementPayPlan:
+						case "StatementPayPlan":
 							SizeF sSize=new SizeF();
-							using(Graphics f= Graphics.FromImage(new Bitmap(100,100))){//using graphics f because g is null when gx is not.
+							using(Graphics f= Graphics.FromImage(new Bitmap(100,100))) {//using graphics f because g is null when gx is not.
 								sSize=f.MeasureString("Payment Plans",new Font("Arial",10,FontStyle.Bold));
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos,yPosGrid,odGrid.Width,odGrid.TitleHeight);
-								g.DrawString("Payment Plans",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
+								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Payment Plans",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,field.XPos,yPosGrid-1,odGrid.Width,odGrid.TitleHeight);
+								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(yPosGrid-1),p(300),p(100)),XStringAlignment.Center);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
 							break;
 						default:
 							if(gx==null) {
-								odGrid.DrawTitle(g,field.XPos,yPosGrid);
+								odGrid.PrintTitle(g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint);
 							}
 							else {
-								odGrid.DrawTitleX(gx,field.XPos,yPosGrid);
+								odGrid.PrintTitleX(gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint);
 							}
 							break;
 					}
-					yPosGrid+=odGrid.TitleHeight;
-					drawTitle=false;
+					_yAdjCurRow+=odGrid.TitleHeight;
 				}
 				#endregion
 				#region Draw Header
-				if(drawHeader) {
+				if(odGrid.PrintRows[i].IsHeaderRow) {
 					if(gx==null) {
-						odGrid.DrawHeader(g,field.XPos,yPosGrid,true);
+						odGrid.PrintHeader(g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow);
 					}
 					else {
-						odGrid.DrawHeaderX(gx,field.XPos,yPosGrid,true);
+						odGrid.PrintHeaderX(gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow);
 					}
-					yPosGrid+=odGrid.HeaderHeight;
-					drawHeader=false;
+					_yAdjCurRow+=odGrid.HeaderHeight;
 				}
 				#endregion
 				#region Draw Row
 				if(gx==null) {
-					odGrid.DrawRow(i,g,odGrid.Font,field.XPos,yPosGrid,i==odGrid.Rows.Count-1,true);
+					odGrid.PrintRow(i,g,odGrid.Font,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
 				}
 				else {
-					odGrid.DrawRowX(i,gx,odGrid.Font,field.XPos,yPosGrid,i==odGrid.Rows.Count-1,true);
+					odGrid.PrintRowX(i,gx,odGrid.Font,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
 				}
-				yPosGrid+=odGrid.RowHeights[i];
+				_yAdjCurRow+=odGrid.RowHeights[i];
 				#endregion
 				#region Draw Footer (rare)
-				if(drawFooter) {
-					yPosGrid+=2;
-					switch(fGrid.GridType) {
-						case SheetGridType.StatementPayPlan:
-							SheetArgs a=sheet.GArgs;
-							DataTable tableMisc=AccountModules.GetStatementDataSet(Statements.CreateObject(sheet.GArgs.StatementNum)).Tables["misc"];
-							if(tableMisc==null){
-								tableMisc=new DataTable();	
+				if(odGrid.PrintRows[i].IsFooterRow) {
+					_yAdjCurRow+=2;
+					switch(field.FieldName) {
+						case "StatementPayPlan":
+							DataTable tableMisc=AccountModules.GetStatementDataSet(stmt).Tables["misc"];
+							if(tableMisc==null) {
+								tableMisc=new DataTable();
 							}
 							Double payPlanDue=0;
 							for(int m=0;m<tableMisc.Rows.Count;m++) {
@@ -625,16 +576,16 @@ namespace OpenDental {
 								}
 							}
 							if(gx==null) {
-								RectangleF rf=new RectangleF(sheet.Width-60-field.Width,yPosGrid,field.Width,odGrid.TitleHeight);
+								RectangleF rf=new RectangleF(sheet.Width-60-field.Width,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,field.Width,odGrid.TitleHeight);
 								g.FillRectangle(Brushes.White,rf);
 								StringFormat sf=new StringFormat();
 								sf.Alignment=StringAlignment.Far;
 								g.DrawString("Payment Plan Amount Due: "+payPlanDue.ToString("c"),new Font("Arial",9,FontStyle.Bold),new SolidBrush(Color.Black),rf,sf);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,p(sheet.Width-field.Width-60),p(yPosGrid),p(field.Width),p(odGrid.TitleHeight));
+								gx.DrawRectangle(Brushes.White,p(sheet.Width-field.Width-60),p(odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight));
 								using(Font _font=new Font("Arial",9,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plan Amount Due: "+payPlanDue.ToString("c"),new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(sheet.Width-60),p(yPosGrid),p(field.Width),p(odGrid.TitleHeight)),XStringAlignment.Far);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plan Amount Due: "+payPlanDue.ToString("c"),new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(sheet.Width-60),p(odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight)),XStringAlignment.Far);
 								}
 							}
 							break;
@@ -643,18 +594,6 @@ namespace OpenDental {
 				#endregion
 			}
 		}
-
-		//public static void drawFieldGridTitleHelper(SheetGridDef gridDef,DataTable Table,int i, ) {
-
-		//}
-
-		//public static void drawFieldGridHeaderHelper() {
-
-		//}
-
-		//public static void drawFieldGridRowHelper() {
-		//
-		//}
 
 		///<summary>Calculates the bottom of the current page assuming a 40px and 60px top and bottom margin respectively.</summary>
 		public static int bottomCurPage(int yPos,Sheet sheet, out int pageCount) {
@@ -671,26 +610,25 @@ namespace OpenDental {
 			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
 			Graphics gfx=Graphics.FromImage(doubleBuffer);
 			Plugins.HookAddCode(null,"SheetPrinting.pd_PrintPage_drawFieldLoop",field);
-			//TODO: this should probably be optimized, but it seems to work for now and we have not had any complaints about speed.
 			if(gx==null){
-			FontStyle fontstyle=(field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
-			Font font=new Font(field.FontName,field.FontSize,fontstyle);
-			Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,Math.Min(field.Height,_yPosPrint+sheet.HeightPage-_printMargin.Bottom-field.YPos));
-			StringAlignment sa= StringAlignment.Near;
-			switch(field.TextAlign) {
-				case System.Windows.Forms.HorizontalAlignment.Left:
-					sa=StringAlignment.Near;
-					break;
-				case System.Windows.Forms.HorizontalAlignment.Center:
-					sa=StringAlignment.Center;
-					break;
-				case System.Windows.Forms.HorizontalAlignment.Right:
-					sa=StringAlignment.Far;
-					break;
-			}
-			GraphicsHelper.DrawString(g,gfx,field.FieldValue,font,(field.ItemColor==Color.FromArgb(0)?Brushes.Black:new SolidBrush(field.ItemColor)),bounds,sa);
-			font.Dispose();
-			font=null;
+				FontStyle fontstyle=(field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
+				Font font=new Font(field.FontName,field.FontSize,fontstyle);
+				Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,Math.Min(field.Height,_yPosPrint+sheet.HeightPage-_printMargin.Bottom-field.YPos));
+				StringAlignment sa= StringAlignment.Near;
+				switch(field.TextAlign) {
+					case System.Windows.Forms.HorizontalAlignment.Left:
+						sa=StringAlignment.Near;
+						break;
+					case System.Windows.Forms.HorizontalAlignment.Center:
+						sa=StringAlignment.Center;
+						break;
+					case System.Windows.Forms.HorizontalAlignment.Right:
+						sa=StringAlignment.Far;
+						break;
+				}
+				GraphicsHelper.DrawString(g,gfx,field.FieldValue,font,(field.ItemColor==Color.FromArgb(0)?Brushes.Black:new SolidBrush(field.ItemColor)),bounds,sa);
+				font.Dispose();
+				font=null;
 			}
 			else{
 				XFontStyle xfontstyle=(field.FontIsBold?XFontStyle.Bold:XFontStyle.Regular);
@@ -908,7 +846,8 @@ namespace OpenDental {
 
 		#endregion
 
-		public static void CreatePdf(Sheet sheet,string fullFileName) {
+		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt) {
+			_stmt=stmt;
 			_isPrinting=true;
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
@@ -953,7 +892,7 @@ namespace OpenDental {
 						drawFieldLine(field,null,gx);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,null,gx);
+						drawFieldGrid(field,sheet,null,gx,_stmt);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:

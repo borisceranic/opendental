@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
 
 namespace OpenDentBusiness{
 	///<summary>One field on a sheetDef.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class SheetFieldDef:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -51,33 +53,12 @@ namespace OpenDentBusiness{
 		public int TabOrder;
 		///<summary>Allows reporting on misc fields.</summary>
 		public string ReportableName;
-		///<summary>Foreign key to other tables. Used for sheetGridDef.SheetGridDefNum.</summary>
-		public long FKey;
 		///<summary>Text Alignment for text fields.</summary>
-		public System.Windows.Forms.HorizontalAlignment TextAlign;
+		public HorizontalAlignment TextAlign;
 		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
 		public bool IsPaymentOption;
 		///<summary>Text color, line color, rectangle color.</summary>
 		public Color ItemColor;
-		///<summary>See GridDef property below.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
-		private SheetGridDef _gridDef;
-
-		///<summary>Used to store the gridDef in memory for use in the edit sheet window and elsewhere. This allows the field to be used without having to be saved to DB.</summary>
-		public SheetGridDef GridDef {
-			get {
-				if(_gridDef==null) {
-					_gridDef=SheetGridDefs.GetOne(FKey);
-				}
-				if(_gridDef==null) {
-					_gridDef=new SheetGridDef();
-				}
-				return _gridDef;
-			}
-			set {
-				_gridDef=value;
-			}
-		}
 
 		public SheetFieldDef(){//required for use as a generic.
 			RadioButtonGroup="";
@@ -87,7 +68,7 @@ namespace OpenDentBusiness{
 		public SheetFieldDef(SheetFieldType fieldType,string fieldName,string fieldValue,
 			float fontSize,string fontName,bool fontIsBold,
 			int xPos,int yPos,int width,int height,
-			GrowthBehaviorEnum growthBehavior,string radioButtonValue) 
+			GrowthBehaviorEnum growthBehavior,string radioButtonValue,bool isPaymentOption=false,KnownColor itemColor=KnownColor.Black,HorizontalAlignment textAlign=HorizontalAlignment.Left) 
 		{
 			FieldType=fieldType;
 			FieldName=fieldName;
@@ -101,6 +82,9 @@ namespace OpenDentBusiness{
 			Height=height;
 			GrowthBehavior=growthBehavior;
 			RadioButtonValue=radioButtonValue;
+			IsPaymentOption=isPaymentOption;
+			ItemColor=Color.FromKnownColor(itemColor);
+			TextAlign=textAlign;
 		}
 
 		public SheetFieldDef Copy(){
@@ -120,32 +104,41 @@ namespace OpenDentBusiness{
 			return new Font(FontName,FontSize,style);
 		}
 
-		public static SheetFieldDef NewOutput(string fieldName,float fontSize,string fontName,bool fontIsBold,
-			int xPos,int yPos,int width,int height)
-		{
-			return new SheetFieldDef(SheetFieldType.OutputText,fieldName,"",fontSize,fontName,fontIsBold,
-				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
-		}
+		//public static SheetFieldDef NewOutput(string fieldName,float fontSize,string fontName,bool fontIsBold,
+		//	int xPos,int yPos,int width,int height)
+		//{
+		//	return new SheetFieldDef(SheetFieldType.OutputText,fieldName,"",fontSize,fontName,fontIsBold,
+		//		xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+		//}
 
 		public static SheetFieldDef NewOutput(string fieldName,float fontSize,string fontName,bool fontIsBold,
-			int xPos,int yPos,int width,int height,GrowthBehaviorEnum growthBehavior)
+			int xPos,int yPos,int width,int height,GrowthBehaviorEnum growthBehavior=GrowthBehaviorEnum.None,KnownColor itemColor=KnownColor.Black)
 		{
 			return new SheetFieldDef(SheetFieldType.OutputText,fieldName,"",fontSize,fontName,fontIsBold,
-				xPos,yPos,width,height,growthBehavior,"");
+				xPos,yPos,width,height,growthBehavior,"",false,itemColor);
 		}
 
-		public static SheetFieldDef NewStaticText(string fieldValue,float fontSize,string fontName,bool fontIsBold,
-			int xPos,int yPos,int width,int height)
+		public static SheetFieldDef NewOutput(string fieldName,float fontSize,string fontName,bool fontIsBold,
+			int xPos,int yPos,int width,int height,HorizontalAlignment textAlign, KnownColor itemColor=KnownColor.Black,
+			GrowthBehaviorEnum growthBehavior=GrowthBehaviorEnum.None)
 		{
-			return new SheetFieldDef(SheetFieldType.StaticText,"",fieldValue,fontSize,fontName,fontIsBold,
-				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+			return new SheetFieldDef(SheetFieldType.OutputText,fieldName,"",fontSize,fontName,fontIsBold,
+				xPos,yPos,width,height,growthBehavior,"",false,itemColor,textAlign);
 		}
 
+		//public static SheetFieldDef NewStaticText(string fieldValue,float fontSize,string fontName,bool fontIsBold,
+		//	int xPos,int yPos,int width,int height) {
+		//	return new SheetFieldDef(SheetFieldType.StaticText,"",fieldValue,fontSize,fontName,fontIsBold,
+		//		xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+		//}
+
+		///<summary>Use named parameters if you only need to use some of the optional parameters.</summary>
 		public static SheetFieldDef NewStaticText(string fieldValue,float fontSize,string fontName,bool fontIsBold,
-			int xPos,int yPos,int width,int height,GrowthBehaviorEnum growthBehavior)
+			int xPos,int yPos,int width,int height,GrowthBehaviorEnum growthBehavior=GrowthBehaviorEnum.None,bool isPaymentOption=false,KnownColor itemColor=KnownColor.Black,
+			HorizontalAlignment textAlign=HorizontalAlignment.Left) 
 		{
 			return new SheetFieldDef(SheetFieldType.StaticText,"",fieldValue,fontSize,fontName,fontIsBold,
-				xPos,yPos,width,height,growthBehavior,"");
+				xPos,yPos,width,height,GrowthBehaviorEnum.None,"",isPaymentOption,itemColor,textAlign);
 		}
 
 		public static SheetFieldDef NewInput(string fieldName,float fontSize,string fontName,bool fontIsBold,
@@ -160,9 +153,9 @@ namespace OpenDentBusiness{
 				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
 		}
 
-		public static SheetFieldDef NewLine(int xPos,int yPos,int width,int height) {
+		public static SheetFieldDef NewLine(int xPos,int yPos,int width,int height,bool isPaymentOption=false,KnownColor itemColor=KnownColor.Black) {
 			return new SheetFieldDef(SheetFieldType.Line,"","",0,"",false,
-				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+				xPos,yPos,width,height,GrowthBehaviorEnum.None,"",isPaymentOption,itemColor);
 		}
 
 		public static SheetFieldDef NewRect(int xPos,int yPos,int width,int height) {
@@ -190,15 +183,9 @@ namespace OpenDentBusiness{
 				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
 		}
 
-		public static SheetFieldDef NewGrid(int xPos,int yPos,int width,int height, SheetGridType type) {
-			SheetFieldDef retVal=new SheetFieldDef(SheetFieldType.Grid,"","",8.5f,"",false,
+		public static SheetFieldDef NewGrid(string fieldName,int xPos,int yPos,int width,int height) {
+			SheetFieldDef retVal=new SheetFieldDef(SheetFieldType.Grid,fieldName,"",8.5f,"",false,
 				xPos,yPos,width,height,GrowthBehaviorEnum.DownGlobal,"");
-			retVal.GridDef.GridType=type;
-			switch(type) {
-				case SheetGridType.StatementMain:
-					retVal.GridDef.Columns=SheetGridDefs.GetColumnsAvailable(type);//starts with all columns by default.
-					break;
-			}
 			return retVal;
 		}
 

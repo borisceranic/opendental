@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace OpenDentBusiness{
 	///<summary>One field on a sheet.</summary>
@@ -54,12 +55,8 @@ namespace OpenDentBusiness{
 		public int TabOrder;
 		///<summary>Allows reporting on misc fields.</summary>
 		public string ReportableName;
-		///<summary>Foreign key to other tables. Used for sheetGrid.SheetGridNum</summary>
-		public long FKey;
 		///<summary>Text Alignment for text fields.</summary>
-		public System.Windows.Forms.HorizontalAlignment TextAlign;
-		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
-		public bool IsPaymentOption;
+		public HorizontalAlignment TextAlign;
 		///<summary>Text color, line color, rectangle color.</summary>
 		public Color ItemColor;
 

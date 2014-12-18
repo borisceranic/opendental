@@ -24,6 +24,9 @@ namespace OpenDental {
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
+			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement) {
+				checkPmtOpt.Visible=false;
+			}
 			if(SheetDefCur.SheetType==SheetTypeEnum.PatientLetter) {
 				butExamSheet.Visible=true;
 			}

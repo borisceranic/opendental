@@ -15,8 +15,8 @@ namespace OpenDentBusiness {
 			set { isNew = value; }
 		}
 
-	
 		
+
 
 	}
 }

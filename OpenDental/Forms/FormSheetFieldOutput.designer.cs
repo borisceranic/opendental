@@ -28,6 +28,8 @@ namespace OpenDental{
 			this.listFields = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.butColor = new System.Windows.Forms.Button();
 			this.comboTextAlign = new System.Windows.Forms.ComboBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.checkFontIsBold = new System.Windows.Forms.CheckBox();
@@ -48,9 +50,6 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
-			this.checkPmtOpt = new System.Windows.Forms.CheckBox();
-			this.label11 = new System.Windows.Forms.Label();
-			this.butColor = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -97,6 +96,25 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 88;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Font";
+			// 
+			// label11
+			// 
+			this.label11.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.label11.Location = new System.Drawing.Point(7, 93);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(71, 16);
+			this.label11.TabIndex = 242;
+			this.label11.Text = "Color";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butColor
+			// 
+			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+			this.butColor.Location = new System.Drawing.Point(80, 91);
+			this.butColor.Name = "butColor";
+			this.butColor.Size = new System.Drawing.Size(30, 20);
+			this.butColor.TabIndex = 241;
+			this.butColor.Click += new System.EventHandler(this.butColor_Click);
 			// 
 			// comboTextAlign
 			// 
@@ -297,41 +315,10 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
-			// checkPmtOpt
-			// 
-			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPmtOpt.Location = new System.Drawing.Point(164, 346);
-			this.checkPmtOpt.Name = "checkPmtOpt";
-			this.checkPmtOpt.Size = new System.Drawing.Size(119, 20);
-			this.checkPmtOpt.TabIndex = 236;
-			this.checkPmtOpt.Text = "Is Payment Option";
-			this.checkPmtOpt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// label11
-			// 
-			this.label11.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label11.Location = new System.Drawing.Point(7, 93);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(71, 16);
-			this.label11.TabIndex = 242;
-			this.label11.Text = "Color";
-			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// butColor
-			// 
-			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Location = new System.Drawing.Point(80, 91);
-			this.butColor.Name = "butColor";
-			this.butColor.Size = new System.Drawing.Size(30, 20);
-			this.butColor.TabIndex = 241;
-			this.butColor.Click += new System.EventHandler(this.butColor_Click);
-			// 
 			// FormSheetFieldOutput
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(507, 412);
-			this.Controls.Add(this.checkPmtOpt);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.comboGrowthBehavior);
 			this.Controls.Add(this.label9);
@@ -387,7 +374,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butDelete;
 		private System.Windows.Forms.ComboBox comboTextAlign;
 		private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.CheckBox checkPmtOpt;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Button butColor;
 	}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
 
 namespace OpenDentBusiness{
 	public class SheetsInternal {
@@ -58,6 +59,8 @@ namespace OpenDentBusiness{
 					return ExamSheet();
 				case SheetInternalType.DepositSlip:
 					return DepositSlip();
+				case SheetInternalType.Statement:
+					return StmtSheet();
 				default:
 					throw new ApplicationException("Invalid SheetInternalType.");
 			}
@@ -1540,6 +1543,52 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			y+=4;
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("deposit.BankAccountInfo",8f,sheet.FontName,true,50,y,700,0,GrowthBehaviorEnum.DownGlobal));
 			y+=1;//The actual y-value of the proceeding elements will be changed depending on the size of the deposit.BankAccountInfo, since we are using DownGlobal growth.
+			return sheet;
+		}
+
+		private static SheetDef StmtSheet() {
+			SheetDef sheet=new SheetDef(SheetTypeEnum.Statement);
+			sheet.Description="Statment";
+			sheet.FontName="Arial";
+			sheet.FontSize=9f;
+			sheet.Width=850;
+			sheet.Height=1100;
+			//From top to bottom
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statementReceiptInvoice",15f,"Arial",true,325,60,200,22,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("returnAddress",10f,"Arial",false,40,70,250,80));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.DateSent",9f,"Arial",false,325,83,200,13,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("accountNumber",9f,"Arial",false,325,97,200,13,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementEnclosed",445,120,321,31));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("CREDIT CARD TYPE",8f,"Arial",false,445,185,125,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(566,201,200,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("#",8f,"Arial",false,445,210,12,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(458,226,308,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("3 DIGIT CSV",8f,"Arial",false,445,235,75,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("billingAddress",10f,"Arial",false,85,240,250,60));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(521,251,245,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("EXPIRES",8f,"Arial",false,445,260,59,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(505,276,261,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("AMOUNT APPROVED",8f,"Arial",false,445,285,127,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(573,301,193,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("NAME",8f,"Arial",false,445,310,42,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(488,326,278,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("SIGNATURE",8f,"Arial",false,445,335,80,14,isPaymentOption:true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(521,351,245,0,true));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(0,359,850,0,isPaymentOption:true,itemColor:KnownColor.LightGray));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("PLEASE DETACH AND RETURN THE UPPER PORTION WITH YOUR PAYMENT",6f,"Arial",false,225,360,400,10,isPaymentOption:true,itemColor:KnownColor.LightGray));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("totalLabel",9f,"Arial",false,554,385,150,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("totalValue",9f,"Arial",false,705,385,80,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementAging",60,395,400,31));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("insEstLabel",9f,"Arial",false,554,400,150,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("insEstValue",9f,"Arial",false,705,400,80,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("balanceLabel",9f,"Arial",true,554,415,150,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("balanceValue",9f,"Arial",true,705,415,80,14,HorizontalAlignment.Right));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,449,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementPayPlan",170,465,510,49));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementMain",65,535,720,31));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("futureAppointments",9f,"Arial",false,50,572,725,14));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.Note",9f,"Arial",false,50,587,725,14));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,602,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
 			return sheet;
 		}
 

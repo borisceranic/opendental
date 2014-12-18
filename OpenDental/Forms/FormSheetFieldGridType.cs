@@ -8,7 +8,9 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormSheetFieldGridType:Form {
-		public SheetGridType SelectedSheetGridType;
+		public SheetDef SheetDefCur;
+		public string SelectedSheetGridType;
+		private List<string> listGridTypes;
 
 		public FormSheetFieldGridType() {
 			InitializeComponent();
@@ -16,20 +18,24 @@ namespace OpenDental {
 		}
 
 		private void FormSheetFieldGrid_Load(object sender,EventArgs e) {
+			listGridTypes=SheetUtil.GetGridsAvailable(SheetDefCur.SheetType);
+			if(listGridTypes.Count==0) {
+				DialogResult=DialogResult.Cancel;//should never happen, but in case we launched the grid window without any valid grid types for this sheet type.
+			}
 			fillComboGridTypes();
 		}
 
 		///<summary>Calling function should almost always call fillColumnNames() after this because the selected gridType may have just been changed.</summary>
 		private void fillComboGridTypes() {
 			comboGridType.Items.Clear();
-			for(int i=0;i<Enum.GetValues(typeof(SheetGridType)).Length;i++) {
-				comboGridType.Items.Add(SheetGridDefs.TypeToDisplay((SheetGridType)i));
+			for(int i=0;i<listGridTypes.Count;i++) {
+				comboGridType.Items.Add(listGridTypes[i]);
 			}
 			comboGridType.SelectedIndex=0;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			SelectedSheetGridType=(SheetGridType)comboGridType.SelectedIndex;
+			SelectedSheetGridType=listGridTypes[comboGridType.SelectedIndex];
 			DialogResult=DialogResult.OK;
 		}
 

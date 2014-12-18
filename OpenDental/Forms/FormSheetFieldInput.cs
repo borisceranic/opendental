@@ -58,12 +58,6 @@ namespace OpenDental {
 					comboGrowthBehavior.SelectedIndex=i;
 				}
 			}
-			for(int i=0;i<Enum.GetNames(typeof(System.Windows.Forms.HorizontalAlignment)).Length;i++) {
-				comboTextAlign.Items.Add(Enum.GetNames(typeof(System.Windows.Forms.HorizontalAlignment))[i]);
-				if((int)SheetFieldDefCur.TextAlign==i) {
-					comboTextAlign.SelectedIndex=i;
-				}
-			}
 			textXPos.Text=SheetFieldDefCur.XPos.ToString();
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
@@ -151,7 +145,6 @@ namespace OpenDental {
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
 			SheetFieldDefCur.GrowthBehavior=(GrowthBehaviorEnum)comboGrowthBehavior.SelectedIndex;
-			SheetFieldDefCur.TextAlign=(System.Windows.Forms.HorizontalAlignment)comboTextAlign.SelectedIndex;
 			SheetFieldDefCur.IsRequired=checkRequired.Checked;
 			SheetFieldDefCur.TabOrder=PIn.Int(textTabOrder.Text);
 			//don't save to database here.

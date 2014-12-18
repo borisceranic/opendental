@@ -10,7 +10,7 @@ using System.Data;
 namespace OpenDental{
 	public class SheetFiller {
 		///<summary>Gets the data from the database and fills the fields. Input should only be new sheets.</summary>
-		public static void FillFields(Sheet sheet){
+		public static void FillFields(Sheet sheet,Statement stmt=null){
 			foreach(SheetParameter param in sheet.Parameters){
 				if(param.IsRequired && param.ParamValue==null){
 					throw new ApplicationException(Lan.g("Sheet","Parameter not specified for sheet: ")+param.ParamName);
@@ -90,7 +90,7 @@ namespace OpenDental{
 				case SheetTypeEnum.Statement:
 					pat=Patients.GetPat(sheet.PatNum);
 					//deposit=Deposits.GetOne((long)GetParamByName(sheet,"DepositNum").ParamValue);
-					FillFieldsForStatement(sheet);
+					FillFieldsForStatement(sheet,stmt);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -1946,19 +1946,18 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForStatement(Sheet sheet) {
+		private static void FillFieldsForStatement(Sheet sheet,Statement Stmt) {
 			Patient pat=Patients.GetPat(sheet.PatNum);
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
-			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
-			SheetArgs a=sheet.GArgs;
-			DataSet dataSet=AccountModules.GetAccount(a.PatNum,a.FromDate,a.ToDate,a.Intermingled,a.SinglePatient,a.StatementNum,a.ShowProcBreakdown,a.ShowPayNotes,a.IsInvoice,a.ShowAdjNotes,true);
+			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,
+				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			DataTable tableAppt=dataSet.Tables["appts"];
 			if(tableAppt==null){
 				tableAppt=new DataTable();	
 			}
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
-					case "Account Number":
+					case "accountNumber":
 						#region Account Number
 						field.FieldValue=Lan.g("Statements","Account Number")+" ";
 						if(PrefC.GetBool(PrefName.StatementAccountsUseChartNumber)) {
@@ -1969,7 +1968,7 @@ namespace OpenDental{
 						}
 						#endregion
 						break;
-					case "Future Appointments":
+					case "futureAppointments":
 						#region Future Appointments
 						if(!Stmt.IsReceipt && !Stmt.IsInvoice) {
 							if(tableAppt.Rows.Count>0) {
@@ -1981,46 +1980,46 @@ namespace OpenDental{
 						}
 						#endregion
 						break;
-					case "Bold Note":
-						field.FieldValue=sheet.GArgs.BoldNote;
+					case "statement.NoteBold":
+						field.FieldValue=Stmt.NoteBold;
 						if(field.FieldValue==null) {
 							field.FieldValue="";
 						}
 						break;
-					case "Note":
-						field.FieldValue=sheet.GArgs.NormNote;
+					case "statement.Note":
+						field.FieldValue=Stmt.Note;
 						if(field.FieldValue==null) {
 							field.FieldValue="";
 						}
 						break;
-					case "Total.label":
-						field.FieldValue=totInsBalLabsHelper(sheet)[0];
+					case "totalLabel":
+						field.FieldValue=totInsBalLabsHelper(sheet,Stmt)[0];
 						break;
-					case "InsEst.label":
-						field.FieldValue=totInsBalLabsHelper(sheet)[1];
+					case "insEstLabel":
+						field.FieldValue=totInsBalLabsHelper(sheet,Stmt)[1];
 						break;
-					case "Balance.label":
-						field.FieldValue=totInsBalLabsHelper(sheet)[2];
+					case "balanceLabel":
+						field.FieldValue=totInsBalLabsHelper(sheet,Stmt)[2];
 						break;
-					case "Total.value":
-						field.FieldValue=totInsBalValsHelper(sheet)[0];
+					case "totalValue":
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[0];
 						break;
-					case "InsEst.value":
-						field.FieldValue=totInsBalValsHelper(sheet)[1];
+					case "insEstValue":
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[1];
 						break;
-					case "Balance.value":
-						field.FieldValue=totInsBalValsHelper(sheet)[2];
+					case "balanceValue":
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[2];
 						break;
-					case "AmountDue.value":
+					case "amountDueValue":
 						try {
-							field.FieldValue=SheetGridDefs.GetDataTableForGridType(SheetGridType.StatementEnclosed,a).Rows[0][0].ToString();
+							field.FieldValue=PIn.Double(SheetUtil.GetDataTableForGridType("StatementEnclosed",Stmt).Rows[0][0].ToString()).ToString("C");
 						}
 						catch {
-							field.FieldValue=0.ToString("c");
+							field.FieldValue=0.ToString("C");
 						}
 						break;
-					case "PayPlanAmtDue.value":
-						DataTable tableMisc=AccountModules.GetStatementDataSet(Statements.CreateObject(sheet.GArgs.StatementNum)).Tables["misc"];
+					case "payPlanAmtDueValue":
+						DataTable tableMisc=AccountModules.GetStatementDataSet(Stmt).Tables["misc"];
 						if(tableMisc==null){
 							tableMisc=new DataTable();	
 						}
@@ -2032,9 +2031,9 @@ namespace OpenDental{
 						}
 						field.FieldValue=payPlanDue.ToString("c");
 						break;
-					case "Sta/Rec/Inv":
+					case "statementReceiptInvoice":
 						#region Sta/Rec/Inv
-						if(sheet.GArgs.IsInvoice) {
+						if(Stmt.IsInvoice) {
 							if(CultureInfo.CurrentCulture.Name=="en-NZ" || CultureInfo.CurrentCulture.Name=="en-AU") {//New Zealand and Australia
 								field.FieldValue=Lan.g("Statments","TAX INVOICE");
 							}
@@ -2042,7 +2041,7 @@ namespace OpenDental{
 								field.FieldValue=Lan.g("Statments","INVOICE")+" #"+Stmt.StatementNum.ToString();
 							}
 						}
-						else if(sheet.GArgs.IsReceipt) {
+						else if(Stmt.IsReceipt) {
 							field.FieldValue=Lan.g("Statments","RECEIPT");
 							if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
 								field.FieldValue+=" #"+Stmt.StatementNum.ToString();
@@ -2053,7 +2052,7 @@ namespace OpenDental{
 						}
 						#endregion
 						break;
-					case "ReturnAddress":
+					case "returnAddress":
 						#region ReturnAddress
 						if(!PrefC.GetBool(PrefName.StatementShowReturnAddress)) {
 							field.FieldValue="";
@@ -2126,7 +2125,7 @@ namespace OpenDental{
 						#endregion
 						#endregion
 						break;
-					case "BillingAddress":
+					case "billingAddress":
 						#region BillingAddress
 						if(Stmt.SinglePatient){
 							field.FieldValue=pat.GetNameFLnoPref()+"\r\n";
@@ -2152,17 +2151,17 @@ namespace OpenDental{
 						}
 						#endregion
 						break;
-					case "PracticeTitle":
+					case "practiceTitle":
 						field.FieldValue=PrefC.GetString(PrefName.PracticeTitle);
 						break;
-					case "Statement.IsCopy":
+					case "statementIsCopy":
 						field.FieldValue=(Stmt.IsInvoiceCopy?Lan.g("Statements","COPY"):"");
 						break;
-					case "Statement.IsTaxReceipt":
+					case "statementIsTaxReceipt":
 						//if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) { field.FieldValue=""; break; }
 						field.FieldValue=(Stmt.IsReceipt?Lan.g("Statements","KEEP THIS RECEIPT FOR INCOME TAX PURPOSES"):"");
 						break;
-					case "PracticeAddress":
+					case "practiceAddress":
 						field.FieldValue=PrefC.GetString(PrefName.PracticeAddress);
 						if(PrefC.GetString(PrefName.PracticeAddress2) != "") {
 							field.FieldValue+="\r\n"+PrefC.GetString(PrefName.PracticeAddress2);
@@ -2173,145 +2172,7 @@ namespace OpenDental{
 							+PrefC.GetString(PrefName.PracticeST)+"  "
 							+PrefC.GetString(PrefName.PracticeZip);
 						break;
-					case "patient.nameFL":
-						field.FieldValue=pat.GetNameFLFormal();
-						break;
-					#region SwissBanking (Not yet supported)
-				//	case "SwissBanking":
-				//		//Originally only for switzerland. Modified code from FormRpStatement.cs
-				//		if(!CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
-				//			field.FieldValue="";
-				//			break;
-				//		}
-				//		//&& pagesPrinted==0)//only on the first page
-				//		//{
-				//		//float yred=744;//768;//660 for testing
-				//		//Red line (just temp)
-				//		//g.DrawLine(Pens.Red,0,yred,826,yred);
-				//		MigraDoc.DocumentObjectModel.Font swfont=MigraDocHelper.CreateFont(10);
-				//		//new Font(FontFamily.GenericSansSerif,10);
-				//		//Bank Address---------------------------------------------------------
-				//		HeaderFooter footer=section.Footers.Primary;
-				//		footer.Format.Borders.Color=Colors.Black;
-				//		//footer.AddParagraph(PrefC.GetString(PrefName.BankAddress"));
-				//		frame=footer.AddTextFrame();
-				//		frame.RelativeVertical=RelativeVertical.Line;
-				//		frame.RelativeHorizontal=RelativeHorizontal.Page;
-				//		frame.MarginLeft=Unit.Zero;
-				//		frame.MarginTop=Unit.Zero;
-				//		frame.Top=TopPosition.Parse("0 in");
-				//		frame.Left=LeftPosition.Parse("0 in");
-				//		frame.Width=Unit.FromInch(8.3);
-				//		frame.Height=300;
-				//		//RectangleF=new RectangleF(0,0,
-				//		MigraDocHelper.DrawString(frame,PrefC.GetString(PrefName.BankAddress),swfont,30,30);
-				//		MigraDocHelper.DrawString(frame,PrefC.GetString(PrefName.BankAddress),swfont,246,30);
-				//		//Office Name and Address----------------------------------------------
-				//		text=PrefC.GetString(PrefName.PracticeTitle)+"\r\n"
-				//+PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
-				//		if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
-				//			text+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
-				//		}
-				//		text+=PrefC.GetString(PrefName.PracticeZip)+" "+PrefC.GetString(PrefName.PracticeCity);
-				//		MigraDocHelper.DrawString(frame,text,swfont,30,89);
-				//		MigraDocHelper.DrawString(frame,text,swfont,246,89);
-				//		//Bank account number--------------------------------------------------
-				//		string origBankNum=PrefC.GetString(PrefName.PracticeBankNumber);//must be exactly 9 digits. 2+6+1.
-				//		//the 6 digit portion might have 2 leading 0's which would not go into the dashed bank num.
-				//		string dashedBankNum="?";
-				//		//examples: 01-200027-2
-				//		//          01-4587-1  (from 010045871)
-				//		if(origBankNum.Length==9) {
-				//			dashedBankNum=origBankNum.Substring(0,2)+"-"
-				//	+origBankNum.Substring(2,6).TrimStart(new char[] { '0' })+"-"
-				//	+origBankNum.Substring(8,1);
-				//		}
-				//		swfont=MigraDocHelper.CreateFont(9,true);
-				//		//new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold);
-				//		MigraDocHelper.DrawString(frame,dashedBankNum,swfont,95,169);
-				//		MigraDocHelper.DrawString(frame,dashedBankNum,swfont,340,169);
-				//		//Amount------------------------------------------------------------
-				//		double amountdue=PatGuar.BalTotal-PatGuar.InsEst;
-				//		text=amountdue.ToString("F2");
-				//		text=text.Substring(0,text.Length-3);
-				//		swfont=MigraDocHelper.CreateFont(10);
-				//		MigraDocHelper.DrawString(frame,text,swfont,new RectangleF(50,205,100,25),ParagraphAlignment.Right);
-				//		MigraDocHelper.DrawString(frame,text,swfont,new RectangleF(290,205,100,25),ParagraphAlignment.Right);
-				//		text=amountdue.ToString("F2");//eg 92.00
-				//		text=text.Substring(text.Length-2,2);//eg 00
-				//		MigraDocHelper.DrawString(frame,text,swfont,185,205);
-				//		MigraDocHelper.DrawString(frame,text,swfont,425,205);
-				//		//Patient Address-----------------------------------------------------
-				//		string patAddress=PatGuar.FName+" "+PatGuar.LName+"\r\n"
-				//+PatGuar.Address+"\r\n";
-				//		if(PatGuar.Address2!="") {
-				//			patAddress+=PatGuar.Address2+"\r\n";
-				//		}
-				//		patAddress+=PatGuar.Zip+" "+PatGuar.City;
-				//		patAddress+=((PatGuar.Country=="")?"":"\r\n"+PatGuar.Country);
-				//		MigraDocHelper.DrawString(frame,text,swfont,495,218);//middle left
-				//		MigraDocHelper.DrawString(frame,text,swfont,30,263);//Lower left
-				//		//Compute Reference#------------------------------------------------------
-				//		//Reference# has exactly 27 digits
-				//		//First 6 numbers are what we are calling the BankRouting number.
-				//		//Next 20 numbers represent the invoice #.
-				//		//27th number is the checksum
-				//		string referenceNum=PrefC.GetString(PrefName.BankRouting);//6 digits
-				//		if(referenceNum.Length!=6) {
-				//			referenceNum="000000";
-				//		}
-				//		referenceNum+=PatGuar.PatNum.ToString().PadLeft(12,'0')
-				////"000000000000"//12 0's
-				//+DateTime.Today.ToString("yyyyMMdd");//+8=20
-				//		//for testing:
-				//		//referenceNum+="09090271100000067534";
-				//		//"00000000000000037112";
-				//		referenceNum+=Modulo10(referenceNum).ToString();
-				//		//at this point, the referenceNum will always be exactly 27 digits long.
-				//		string spacedRefNum=referenceNum.Substring(0,2)+" "+referenceNum.Substring(2,5)+" "+referenceNum.Substring(7,5)
-				//+" "+referenceNum.Substring(12,5)+" "+referenceNum.Substring(17,5)+" "+referenceNum.Substring(22,5);
-				//		//text=spacedRefNum.Substring(0,15)+"\r\n"+spacedRefNum.Substring(16)+"\r\n";
-				//		//reference# at lower left above address.  Small
-				//		swfont=MigraDocHelper.CreateFont(7);
-				//		MigraDocHelper.DrawString(frame,spacedRefNum,swfont,30,243);
-				//		//Reference# at upper right---------------------------------------------------------------
-				//		swfont=MigraDocHelper.CreateFont(10);
-				//		MigraDocHelper.DrawString(frame,spacedRefNum,swfont,490,140);
-				//		//Big long number at the lower right--------------------------------------------------
-				//		/*The very long number on the bottom has this format:
-				//		>13 numbers > 27 numbers + 9 numbers >
-				//		>Example: 0100000254306>904483000000000000000371126+ 010045871>
-				//		>
-				//		>The first group of 13 numbers would begin with either 01 or only have 
-				//		>042 without any other following numbers.  01 would be used if there is 
-				//		>a specific amount, and 042 would be used if there is not a specific 
-				//		>amount billed. So in the example, the billed amount is 254.30.  It has 
-				//		>01 followed by leading zeros to fill in the balance of the digits 
-				//		>required.  The last digit is a checksum done by the program.  If the 
-				//		>amount would be 1,254.30 then the example should read 0100001254306.
-				//		>
-				//		>There is a > separator, then the reference number made up previously.
-				//		>
-				//		>Then a + separator, followed by the bank account number.  Previously, 
-				//		>the number printed without the zeros, but in this case it has the zeros 
-				//		>and not the dashes.*/
-				//		swfont=new MigraDoc.DocumentObjectModel.Font("OCR-B 10 BT",12);
-				//		text="01"+amountdue.ToString("F2").Replace(".","").PadLeft(10,'0');
-				//		text+=Modulo10(text).ToString()+">"
-				//+referenceNum+"+ "+origBankNum+">";
-				//		MigraDocHelper.DrawString(frame,text,swfont,255,345);
-				//		break;
-					#endregion
-					case "patient.address":
-						field.FieldValue=pat.Address;
-						if(pat.Address2!="") {
-							field.FieldValue+="\r\n"+pat.Address2;
-						}
-						break;
-					case "patient.cityStateZip":
-						field.FieldValue=pat.City+", "+pat.State+" "+pat.Zip;
-						break;
-					case "Statement.DateSent":
+					case "statement.DateSent":
 						field.FieldValue=Stmt.DateSent.ToShortDateString();
 						break;
 					case "patient.salutation":
@@ -2322,10 +2183,10 @@ namespace OpenDental{
 						break;
 					case "ProviderLegendAUS":
 						#region ProviderLegendAUS
-						//if(CultureInfo.CurrentCulture.Name!="en-AU") {//English (Australia)
-						//	field.FieldValue="";
-						//	break;
-						//}
+						if(CultureInfo.CurrentCulture.Name!="en-AU") {//English (Australia)
+							field.FieldValue="";
+							break;
+						}
 						Providers.RefreshCache();
 						field.FieldValue="PROVIDERS:"+"\r\n";
 						for(int i=0;i<ProviderC.ListShort.Count;i++) {//All non-hidden providers are added to the legend.
@@ -2343,11 +2204,10 @@ namespace OpenDental{
 		}
 
 		///<summary>Returns three label strings: Total, Insurance, Balance. These labels change based on various settings.</summary>
-		private static string[] totInsBalLabsHelper(Sheet sheet) {
+		private static string[] totInsBalLabsHelper(Sheet sheet,Statement Stmt) {
 			string sLine1="";//Total
 			string sLine2="";//InsExt
 			string sLine3="";//Balance
-			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
 			if(Stmt.IsInvoice) {
 				sLine1=Lan.g("Statements","Procedures:");
 				sLine2=Lan.g("Statements","Adjustments:");
@@ -2374,14 +2234,12 @@ namespace OpenDental{
 		}
 
 		///<summary>Returns three value strings: Total, Insurance, Balance. These values change based on various settings.</summary>
-		private static string[] totInsBalValsHelper(Sheet sheet) {
+		private static string[] totInsBalValsHelper(Sheet sheet,Statement Stmt) {
 			string sLine1="";//Total
 			string sLine2="";//InsExt
 			string sLine3="";//Balance
-			Statement Stmt=Statements.CreateObject(sheet.GArgs.StatementNum);
-			DataTable tableAcct;
-			SheetArgs a = sheet.GArgs;//shorthand, does nothing.
-			DataSet dataSet=AccountModules.GetAccount(a.PatNum,a.FromDate,a.ToDate,a.Intermingled,a.SinglePatient,a.StatementNum,a.ShowProcBreakdown,a.ShowPayNotes,a.IsInvoice,a.ShowAdjNotes,true);
+			DataTable tableAcct; 
+			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			DataTable tableMisc=dataSet.Tables["misc"];
 			if(tableMisc==null) {
 				tableMisc=new DataTable();

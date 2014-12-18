@@ -35,7 +35,6 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
-			this.checkPmtOpt = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label5
@@ -157,22 +156,10 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
-			// checkPmtOpt
-			// 
-			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPmtOpt.Location = new System.Drawing.Point(17, 127);
-			this.checkPmtOpt.Name = "checkPmtOpt";
-			this.checkPmtOpt.Size = new System.Drawing.Size(130, 20);
-			this.checkPmtOpt.TabIndex = 236;
-			this.checkPmtOpt.Text = "Is Payment Option";
-			this.checkPmtOpt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormSheetFieldRect
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(394, 200);
-			this.Controls.Add(this.checkPmtOpt);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textHeight);
 			this.Controls.Add(this.label8);
@@ -207,6 +194,5 @@ namespace OpenDental{
 		private ValidNum textHeight;
 		private System.Windows.Forms.Label label8;
 		private OpenDental.UI.Button butDelete;
-		private System.Windows.Forms.CheckBox checkPmtOpt;
 	}
 }

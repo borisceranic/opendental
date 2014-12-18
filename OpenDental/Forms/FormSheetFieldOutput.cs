@@ -57,7 +57,6 @@ namespace OpenDental {
 					comboTextAlign.SelectedIndex=i;
 				}
 			}
-			checkPmtOpt.Checked=SheetFieldDefCur.IsPaymentOption;
 			textXPos.Text=SheetFieldDefCur.XPos.ToString();
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
@@ -125,7 +124,6 @@ namespace OpenDental {
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
 			SheetFieldDefCur.GrowthBehavior=(GrowthBehaviorEnum)comboGrowthBehavior.SelectedIndex;
 			SheetFieldDefCur.TextAlign=(System.Windows.Forms.HorizontalAlignment)comboTextAlign.SelectedIndex;
-			SheetFieldDefCur.IsPaymentOption=checkPmtOpt.Checked;
 			SheetFieldDefCur.ItemColor=butColor.BackColor;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;

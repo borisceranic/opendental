@@ -37,6 +37,7 @@ namespace OpenDentBusiness {
 		DepositSlip,
 		///<summary>15-Requires SheetParameter for PatNum.</summary>
 		Statement
+#warning Remove Statement type if not releasing in 14.4
 		/*StatementHeader,
 		TxPlanHeader,
 		Postcard*/
@@ -77,6 +78,7 @@ namespace OpenDentBusiness {
 		PatImage,
 		///<Summary>11-Special: Currently only used for Toothgrid</Summary>
 		Special,
+		///<summary>12-Grid: Placable grids similar to ODGrids. Used primarily in statments.</summary>
 		Grid
 		//<summary></summary>
 		//RadioButton
@@ -110,7 +112,8 @@ namespace OpenDentBusiness {
 		MedicalHistUpdate,
 		LabSlip,
 		ExamSheet,
-		DepositSlip
+		DepositSlip,
+		Statement
 	}
 
 	public enum OutInCheck{

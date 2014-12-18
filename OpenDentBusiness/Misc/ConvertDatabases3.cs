@@ -6135,46 +6135,6 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("14.4.0.0")) {
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE sheetfield ADD FKey bigint NOT NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE sheetfield ADD INDEX (FKey)";
-					Db.NonQ(command);
-					command="UPDATE sheetfield SET FKey=FieldValue WHERE FieldType=10";
-					Db.NonQ(command);
-					//TODO:
-					//command="UPDATE sheetfield SET FieldValue='' WHERE FieldType=10";
-					//Db.NonQ(command);
-					//Plus elsewhere in code as well.
-				}
-				else {//oracle
-					command="ALTER TABLE sheetfield ADD FKey number(20)";
-					Db.NonQ(command);
-					command="UPDATE sheetfield SET FKey = 0 WHERE FKey IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE sheetfield MODIFY FKey NOT NULL";
-					Db.NonQ(command);
-					command=@"CREATE INDEX sheetfield_FKey ON sheetfield (FKey)";
-					Db.NonQ(command);
-					command="UPDATE sheetfield SET FKey=TO_NUMBER(FieldValue) WHERE FieldType=10";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE sheetfielddef ADD FKey bigint NOT NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE sheetfielddef ADD INDEX (FKey)";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE sheetfielddef ADD FKey number(20)";
-					Db.NonQ(command);
-					command="UPDATE sheetfielddef SET FKey = 0 WHERE FKey IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE sheetfielddef MODIFY FKey NOT NULL";
-					Db.NonQ(command);
-					command=@"CREATE INDEX sheetfielddef_FKey ON sheetfielddef (FKey)";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS dispsupply";
 					Db.NonQ(command);
 					command=@"CREATE TABLE dispsupply (
@@ -6712,26 +6672,27 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE sheetfielddef MODIFY IsPaymentOption NOT NULL";
 					Db.NonQ(command);
 				}
+				string cBlack=POut.Int(System.Drawing.Color.Black.ToArgb());
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE sheetfield ADD ItemColor int NOT NULL";
+					command="ALTER TABLE sheetfield ADD ItemColor int NOT NULL DEFAULT "+cBlack;
 					Db.NonQ(command);
 				}
 				else {//oracle
 					command="ALTER TABLE sheetfield ADD ItemColor number(11)";
 					Db.NonQ(command);
-					command="UPDATE sheetfield SET ItemColor = 0 WHERE ItemColor IS NULL";
+					command="UPDATE sheetfield SET ItemColor = "+cBlack+" WHERE ItemColor IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE sheetfield MODIFY ItemColor NOT NULL";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE sheetfielddef ADD ItemColor int NOT NULL";
+					command="ALTER TABLE sheetfielddef ADD ItemColor int NOT NULL DEFAULT "+cBlack;
 					Db.NonQ(command);
 				}
 				else {//oracle
 					command="ALTER TABLE sheetfielddef ADD ItemColor number(11)";
 					Db.NonQ(command);
-					command="UPDATE sheetfielddef SET ItemColor = 0 WHERE ItemColor IS NULL";
+					command="UPDATE sheetfielddef SET ItemColor = "+cBlack+" WHERE ItemColor IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE sheetfielddef MODIFY ItemColor NOT NULL";
 					Db.NonQ(command);

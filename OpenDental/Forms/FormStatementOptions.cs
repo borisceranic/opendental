@@ -58,10 +58,6 @@ namespace OpenDental{
 		private CheckBox checkIsInvoice;
 		private TextBox textInvoiceNum;
 		private Label label5;
-		private UI.Button butPreviewNew;
-		private GroupBox groupCustom;
-		private UI.Button button1;
-		private UI.Button button2;
 		///<summary>js This is superfluous and should be removed some day.</summary>
 		private int electIndex;
 
@@ -137,14 +133,9 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.checkIsInvoiceCopy = new System.Windows.Forms.CheckBox();
 			this.checkIsInvoice = new System.Windows.Forms.CheckBox();
-			this.butPreviewNew = new OpenDental.UI.Button();
-			this.groupCustom = new System.Windows.Forms.GroupBox();
-			this.button1 = new OpenDental.UI.Button();
-			this.button2 = new OpenDental.UI.Button();
 			this.groupFuchs.SuspendLayout();
 			this.groupDateRange.SuspendLayout();
 			this.groupInvoice.SuspendLayout();
-			this.groupCustom.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -604,64 +595,6 @@ namespace OpenDental{
 			this.checkIsInvoice.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsInvoice.Click += new System.EventHandler(this.checkIsInvoice_Click);
 			// 
-			// butPreviewNew
-			// 
-			this.butPreviewNew.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPreviewNew.Autosize = true;
-			this.butPreviewNew.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPreviewNew.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPreviewNew.CornerRadius = 4F;
-			this.butPreviewNew.Image = global::OpenDental.Properties.Resources.printPreview20;
-			this.butPreviewNew.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPreviewNew.Location = new System.Drawing.Point(6, 76);
-			this.butPreviewNew.Name = "butPreviewNew";
-			this.butPreviewNew.Size = new System.Drawing.Size(79, 24);
-			this.butPreviewNew.TabIndex = 248;
-			this.butPreviewNew.Text = "View";
-			this.butPreviewNew.Click += new System.EventHandler(this.butSheet_Click);
-			// 
-			// groupCustom
-			// 
-			this.groupCustom.Controls.Add(this.button1);
-			this.groupCustom.Controls.Add(this.button2);
-			this.groupCustom.Controls.Add(this.butPreviewNew);
-			this.groupCustom.Location = new System.Drawing.Point(573, 399);
-			this.groupCustom.Name = "groupCustom";
-			this.groupCustom.Size = new System.Drawing.Size(124, 118);
-			this.groupCustom.TabIndex = 22;
-			this.groupCustom.TabStop = false;
-			this.groupCustom.Text = "Custom Statements";
-			// 
-			// button1
-			// 
-			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.button1.Autosize = true;
-			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.button1.CornerRadius = 4F;
-			this.button1.Image = global::OpenDental.Properties.Resources.butPrint;
-			this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.button1.Location = new System.Drawing.Point(6, 16);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(79, 24);
-			this.button1.TabIndex = 244;
-			this.button1.Text = "Print";
-			// 
-			// button2
-			// 
-			this.button2.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.button2.Autosize = true;
-			this.button2.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.button2.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.button2.CornerRadius = 4F;
-			this.button2.Image = global::OpenDental.Properties.Resources.email1;
-			this.button2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.button2.Location = new System.Drawing.Point(6, 46);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(79, 24);
-			this.button2.TabIndex = 245;
-			this.button2.Text = "E-mail";
-			// 
 			// FormStatementOptions
 			// 
 			this.AcceptButton = this.butOK;
@@ -670,7 +603,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.butEmail);
 			this.Controls.Add(this.butPreview);
-			this.Controls.Add(this.groupCustom);
 			this.Controls.Add(this.groupInvoice);
 			this.Controls.Add(this.checkIsReceipt);
 			this.Controls.Add(this.textDate);
@@ -703,7 +635,6 @@ namespace OpenDental{
 			this.groupDateRange.PerformLayout();
 			this.groupInvoice.ResumeLayout(false);
 			this.groupInvoice.PerformLayout();
-			this.groupCustom.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -906,7 +837,6 @@ namespace OpenDental{
 				butEmail.Enabled=false;
 				butPrint.Enabled=false;
 				butPreview.Enabled=false;
-				butPreviewNew.Enabled=false;
 			} 
 			Plugins.HookAddCode(this,"FormStatementOptions_Load_end");
 		}
@@ -1069,28 +999,12 @@ namespace OpenDental{
 					Cursor=Cursors.Default;
 					return;
 				}
-				SheetDef sheetDef=SheetDefs.GetSheetDef(SheetDefs.GetCustomForType(SheetTypeEnum.Statement)[0].SheetDefNum);
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum);
-				sheet.GArgs=new SheetArgs();
-				sheet.GArgs.SetForStatement(
-					StmtCur.PatNum,
-					StmtCur.DateRangeFrom,
-					StmtCur.DateRangeTo,
-					StmtCur.Intermingled,
-					StmtCur.SinglePatient,
-					StmtCur.StatementNum,
-					StmtCur.IsInvoice,
-					StmtCur.IsReceipt,
-					PrefC.GetBool(PrefName.StatementShowProcBreakdown),
-					PrefC.GetBool(PrefName.StatementShowNotes),
-					PrefC.GetBool(PrefName.StatementShowAdjNotes),
-					textNoteBold.Text,
-					textNote.Text,
-					!checkHidePayment.Checked);
-				SheetFiller.FillFields(sheet);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)));
+				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
+				SheetFiller.FillFields(sheet,StmtCur);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),StmtCur.PatNum.ToString()+".pdf");
-				SheetPrinting.CreatePdf(sheet,tempPath);
+				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
@@ -1197,28 +1111,12 @@ namespace OpenDental{
 				if(!SaveToDb()) {
 					return;
 				}
-				SheetDef sheetDef=SheetDefs.GetSheetDef(SheetDefs.GetCustomForType(SheetTypeEnum.Statement)[0].SheetDefNum);
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum);
-				sheet.GArgs=new SheetArgs();
-				sheet.GArgs.SetForStatement(
-					StmtCur.PatNum,
-					StmtCur.DateRangeFrom,
-					StmtCur.DateRangeTo,
-					StmtCur.Intermingled,
-					StmtCur.SinglePatient,
-					StmtCur.StatementNum,
-					StmtCur.IsInvoice,
-					StmtCur.IsReceipt,
-					PrefC.GetBool(PrefName.StatementShowProcBreakdown),
-					PrefC.GetBool(PrefName.StatementShowNotes),
-					PrefC.GetBool(PrefName.StatementShowAdjNotes),
-					textNoteBold.Text,
-					textNote.Text,
-					!checkHidePayment.Checked);
-				SheetFiller.FillFields(sheet);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)));
+				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
+				SheetFiller.FillFields(sheet,StmtCur);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),StmtCur.PatNum.ToString()+".pdf");
-				SheetPrinting.CreatePdf(sheet,tempPath);
+				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
@@ -1351,28 +1249,13 @@ namespace OpenDental{
 			if(!SaveToDb()) {
 				return;
 			}
-			SheetDef sheetDef=SheetDefs.GetSheetDef(SheetDefs.GetCustomForType(SheetTypeEnum.Statement)[0].SheetDefNum);
-			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum);
-			sheet.GArgs=new SheetArgs();
-			sheet.GArgs.SetForStatement(
-				StmtCur.PatNum,
-				StmtCur.DateRangeFrom,
-				StmtCur.DateRangeTo,
-				StmtCur.Intermingled,
-				StmtCur.SinglePatient,
-				StmtCur.StatementNum,
-				StmtCur.IsInvoice,
-				StmtCur.IsReceipt,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),
-				PrefC.GetBool(PrefName.StatementShowNotes),
-				PrefC.GetBool(PrefName.StatementShowAdjNotes),
-				textNoteBold.Text,
-				textNote.Text,
-				!checkHidePayment.Checked);
-			SheetFiller.FillFields(sheet);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)));
+			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
+			SheetFiller.FillFields(sheet,StmtCur);
+			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur,true,40,60);
 			//print directly to PDF here, and save it.
 			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+			FormSFE.Stmt=StmtCur;
 			FormSFE.IsStatment=true;
 			FormSFE.ShowDialog();
 		}
@@ -1645,36 +1528,6 @@ namespace OpenDental{
 			if(StmtCur.IsInvoice) {
 				checkIsInvoice.Checked=true;//don't let them uncheck it.
 			}
-		}
-
-		private void butSheet_Click(object sender,EventArgs e) {
-			if(!SaveToDb()){
-				return;
-			}
-			SheetDef sheetDef=SheetDefs.GetSheetDef(SheetDefs.GetCustomForType(SheetTypeEnum.Statement)[0].SheetDefNum);
-			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum);
-			sheet.GArgs=new SheetArgs();
-			sheet.GArgs.SetForStatement(
-				StmtCur.PatNum,
-				StmtCur.DateRangeFrom,
-				StmtCur.DateRangeTo,
-				StmtCur.Intermingled,
-				StmtCur.SinglePatient,
-				StmtCur.StatementNum,
-				StmtCur.IsInvoice,
-				StmtCur.IsReceipt,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),
-				PrefC.GetBool(PrefName.StatementShowNotes),
-				PrefC.GetBool(PrefName.StatementShowAdjNotes),
-				textNoteBold.Text,
-				textNote.Text,
-				!checkHidePayment.Checked);
-			SheetFiller.FillFields(sheet);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)));
-			//print directly to PDF here, and save it.
-			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
-			FormSFE.IsStatment=true;
-			FormSFE.ShowDialog();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {

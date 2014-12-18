@@ -67,7 +67,6 @@ namespace OpenDental{
 			this.butAlignRight = new OpenDental.UI.Button();
 			this.butAlignCenterH = new OpenDental.UI.Button();
 			this.groupAlignV = new System.Windows.Forms.GroupBox();
-			this.butPmtOption = new OpenDental.UI.Button();
 			this.panel1.SuspendLayout();
 			this.groupAddNew.SuspendLayout();
 			this.groupPage.SuspendLayout();
@@ -600,26 +599,10 @@ namespace OpenDental{
 			this.groupAlignV.TabStop = false;
 			this.groupAlignV.Text = "Vertical Align";
 			// 
-			// butPmtOption
-			// 
-			this.butPmtOption.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPmtOption.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butPmtOption.Autosize = true;
-			this.butPmtOption.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPmtOption.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPmtOption.CornerRadius = 4F;
-			this.butPmtOption.Location = new System.Drawing.Point(679, 716);
-			this.butPmtOption.Name = "butPmtOption";
-			this.butPmtOption.Size = new System.Drawing.Size(70, 24);
-			this.butPmtOption.TabIndex = 98;
-			this.butPmtOption.TabStop = false;
-			this.butPmtOption.Text = "Pmt Option";
-			// 
 			// FormSheetDefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(828, 794);
-			this.Controls.Add(this.butPmtOption);
 			this.Controls.Add(this.groupAlignV);
 			this.Controls.Add(this.groupAlignH);
 			this.Controls.Add(this.groupPage);
@@ -692,6 +675,5 @@ namespace OpenDental{
 		private UI.Button butAlignRight;
 		private UI.Button butAlignCenterH;
 		private System.Windows.Forms.GroupBox groupAlignV;
-		private UI.Button butPmtOption;
 	}
 }

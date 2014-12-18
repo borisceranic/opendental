@@ -64,7 +64,6 @@ namespace OpenDentBusiness.Crud{
 				sheetFieldDef.IsRequired      = PIn.Bool  (table.Rows[i]["IsRequired"].ToString());
 				sheetFieldDef.TabOrder        = PIn.Int   (table.Rows[i]["TabOrder"].ToString());
 				sheetFieldDef.ReportableName  = PIn.String(table.Rows[i]["ReportableName"].ToString());
-				sheetFieldDef.FKey            = PIn.Long  (table.Rows[i]["FKey"].ToString());
 				sheetFieldDef.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(table.Rows[i]["TextAlign"].ToString());
 				sheetFieldDef.IsPaymentOption = PIn.Bool  (table.Rows[i]["IsPaymentOption"].ToString());
 				sheetFieldDef.ItemColor       = Color.FromArgb(PIn.Int(table.Rows[i]["ItemColor"].ToString()));
@@ -108,7 +107,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetFieldDefNum,";
 			}
-			command+="SheetDefNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,FKey,TextAlign,IsPaymentOption,ItemColor) VALUES(";
+			command+="SheetDefNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,IsPaymentOption,ItemColor) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheetFieldDef.SheetFieldDefNum)+",";
 			}
@@ -130,7 +129,6 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (sheetFieldDef.IsRequired)+","
 				+    POut.Int   (sheetFieldDef.TabOrder)+","
 				+"'"+POut.String(sheetFieldDef.ReportableName)+"',"
-				+    POut.Long  (sheetFieldDef.FKey)+","
 				+    POut.Int   ((int)sheetFieldDef.TextAlign)+","
 				+    POut.Bool  (sheetFieldDef.IsPaymentOption)+","
 				+    POut.Int   (sheetFieldDef.ItemColor.ToArgb())+")";
@@ -167,7 +165,6 @@ namespace OpenDentBusiness.Crud{
 				+"IsRequired      =  "+POut.Bool  (sheetFieldDef.IsRequired)+", "
 				+"TabOrder        =  "+POut.Int   (sheetFieldDef.TabOrder)+", "
 				+"ReportableName  = '"+POut.String(sheetFieldDef.ReportableName)+"', "
-				+"FKey            =  "+POut.Long  (sheetFieldDef.FKey)+", "
 				+"TextAlign       =  "+POut.Int   ((int)sheetFieldDef.TextAlign)+", "
 				+"IsPaymentOption =  "+POut.Bool  (sheetFieldDef.IsPaymentOption)+", "
 				+"ItemColor       =  "+POut.Int   (sheetFieldDef.ItemColor.ToArgb())+" "
@@ -249,10 +246,6 @@ namespace OpenDentBusiness.Crud{
 			if(sheetFieldDef.ReportableName != oldSheetFieldDef.ReportableName) {
 				if(command!=""){ command+=",";}
 				command+="ReportableName = '"+POut.String(sheetFieldDef.ReportableName)+"'";
-			}
-			if(sheetFieldDef.FKey != oldSheetFieldDef.FKey) {
-				if(command!=""){ command+=",";}
-				command+="FKey = "+POut.Long(sheetFieldDef.FKey)+"";
 			}
 			if(sheetFieldDef.TextAlign != oldSheetFieldDef.TextAlign) {
 				if(command!=""){ command+=",";}

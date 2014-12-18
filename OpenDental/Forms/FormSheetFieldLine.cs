@@ -27,6 +27,9 @@ namespace OpenDental {
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
+			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement) {
+				checkPmtOpt.Visible=false;
+			}
 			textXPos.Text=SheetFieldDefCur.XPos.ToString();
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();

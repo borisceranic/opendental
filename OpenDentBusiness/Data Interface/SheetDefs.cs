@@ -54,19 +54,7 @@ namespace OpenDentBusiness{
 			foreach(SheetFieldDef field in sheetDef.SheetFieldDefs){
 				field.SheetDefNum=sheetDef.SheetDefNum;
 			}
-			SheetFieldDefs.InsUpDel(sheetDef.SheetFieldDefs,sheetDef.SheetDefNum);
-			foreach(SheetFieldDef field in sheetDef.SheetFieldDefs) {
-				if(field.FieldType!= SheetFieldType.Grid) {
-					continue;
-				}
-				if(field.GridDef.SheetGridDefNum==0) {
-					field.FKey=SheetGridDefs.Insert(field.GridDef);
-					SheetFieldDefs.Update(field);//field was inserted above, here we have set the FKey.
-				}
-				else {
-					SheetGridDefs.Update(field.GridDef);
-				}
-			}
+			SheetFieldDefs.Synch(sheetDef.SheetFieldDefs,SheetFieldDefs.GetForSheetDef(sheetDef.SheetDefNum));
 			return sheetDef.SheetDefNum;
 		}
 

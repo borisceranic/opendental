@@ -27,6 +27,7 @@ namespace OpenDental {
 		///<summary>Only used here to draw the dashed margin lines.</summary>
 		private Margins _printMargin=new Margins(0,0,40,60);
 		public bool IsStatment;//Used for statments, do not save a sheet version of the statment.
+		public Statement Stmt;
 
 		public FormSheetFillEdit(Sheet sheet){
 			InitializeComponent();
@@ -83,8 +84,10 @@ namespace OpenDental {
 				textNote.Visible=false;
 				labelShowInTerminal.Visible=false;
 				textShowInTerminal.Visible=false;
+#if !DEBUG
 				butPrint.Visible=false;
 				butPDF.Visible=false;
+#endif
 				butDelete.Visible=false;
 				butOK.Visible=false;
 				checkErase.Visible=false;
@@ -134,16 +137,6 @@ namespace OpenDental {
 			RichTextBox textbox;//has to be richtextbox due to MS bug that doesn't show cursor.
 			FontStyle style;
 			SheetCheckBox checkbox;
-			//remove fields that shouldn't be drawn
-			#region Remove Hidden Fields
-			if(SheetCur.SheetType== SheetTypeEnum.Statement && !SheetCur.GArgs.ShowPaymentOptions) {
-				for(int i=SheetCur.SheetFields.Count-1;i>=0;i--) {//go backwards to remove elements
-					if(SheetCur.SheetFields[i].IsPaymentOption){
-						SheetCur.SheetFields.RemoveAt(i);
-					}
-				}
-			}
-			#endregion
 			//first, draw images---------------------------------------------------------------------------------------
 			//might change this to only happen once when first loading form:
 			if(pictDraw!=null) {
@@ -557,7 +550,7 @@ namespace OpenDental {
 				if(SheetCur.SheetFields[f].FieldType!=SheetFieldType.Grid){
 					continue;
 				}
-				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null);
+				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,Stmt);
 			}
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
@@ -590,13 +583,11 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			if(!IsStatment && !TryToSaveData()){
+			if(!IsStatment && !TryToSaveData()){//short circuit with !IsStatment
 				return;
 			}
 			if(!IsStatment) {
-				SheetArgs gArgs=SheetCur.GArgs;
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
-				SheetCur.GArgs=gArgs;
 			}
 			//whether this is a new sheet, or one pulled from the database,
 			//it will have the extra parameter we are looking for.
@@ -656,7 +647,7 @@ namespace OpenDental {
 				return;
 			}
 			if(FormS.PaperCopies>0){
-				SheetPrinting.Print(SheetCur,FormS.PaperCopies,RxIsControlled);
+				SheetPrinting.Print(SheetCur,FormS.PaperCopies,RxIsControlled,Stmt);
 			}
 			EmailMessage message;
 			Random rnd=new Random();
@@ -679,7 +670,7 @@ namespace OpenDental {
 				}
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
-				SheetPrinting.CreatePdf(SheetCur,filePathAndName);
+				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
 				//Process.Start(filePathAndName);
 				message=new EmailMessage();
 				message.PatNum=SheetCur.PatNum;
@@ -706,7 +697,7 @@ namespace OpenDental {
 				//email referral
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
-				SheetPrinting.CreatePdf(SheetCur,filePathAndName);
+				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
 				//Process.Start(filePathAndName);
 				message=new EmailMessage();
 				message.PatNum=SheetCur.PatNum;
@@ -732,13 +723,11 @@ namespace OpenDental {
 				return;
 			}
 			if(!IsStatment) {
-				SheetArgs gArgs=SheetCur.GArgs;
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
-				SheetCur.GArgs=gArgs;
 			}
 			string filePathAndName=Path.ChangeExtension(Path.GetTempFileName(),".pdf");
 			//Graphics g=this.CreateGraphics();
-			SheetPrinting.CreatePdf(SheetCur,filePathAndName);
+			SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
 			//g.Dispose();
 			Process.Start(filePathAndName);
 			SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,SheetCur.Description+" from "+SheetCur.DateTimeSheet.ToShortDateString()+" pdf was created");

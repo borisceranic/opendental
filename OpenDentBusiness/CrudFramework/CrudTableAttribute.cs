@@ -10,6 +10,7 @@ namespace OpenDentBusiness {
 			this.isDeleteForbidden=false;
 			this.isMissingInGeneral=false;
 			this.isMobile=false;
+			this.isSynchable=false;
 		}
 
 		private string tableName;
@@ -38,6 +39,13 @@ namespace OpenDentBusiness {
 		public bool IsMobile {
 			get { return isMobile; }
 			set { isMobile=value; }
+		}
+
+		private bool isSynchable;
+		///<summary>Set to true for tables that are used on server for mobile services.  These are 'lite' versions of the main tables, and end with m.  A composite primary key will be expected.  The Crud generator will generate these crud files in a different place than the other crud files.  It will also generate the dataInterface 'ms' class to a different location.  It also won't validate that the table exists in the test database.</summary>
+		public bool IsSynchable {
+			get { return isSynchable; }
+			set { isSynchable=value; }
 		}
 
 	}

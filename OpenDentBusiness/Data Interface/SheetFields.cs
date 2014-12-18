@@ -109,7 +109,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Re-orders the SheetFieldType enum to a drawing order. Images should be drawn first, then drawings, then lines, then rectangles, etc...</summary>
-		private static int FieldTypeSortOrder(SheetFieldType t) {
+		internal static int FieldTypeSortOrder(SheetFieldType t) {
 			switch(t) {
 				case SheetFieldType.Image:
 				case SheetFieldType.PatImage:

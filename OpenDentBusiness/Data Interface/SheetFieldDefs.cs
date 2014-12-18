@@ -78,138 +78,94 @@ namespace OpenDentBusiness{
 			Crud.SheetFieldDefCrud.Delete(sheetFieldDefNum);
 		}
 
-		///<summary>Inerts, updates, or deletes fields in DB to match the list of supplied sheet fields.</summary>
-		public static void InsUpDel(List<SheetFieldDef> listNew,long sheetFieldDefNum) {
-			List<SheetFieldDef> listDB=GetForSheetDef(sheetFieldDefNum);
-			List<SheetFieldDef> listIns=new List<SheetFieldDef>();
-			List<SheetFieldDef> listUpd=new List<SheetFieldDef>();
-			List<SheetFieldDef> listDel=new List<SheetFieldDef>();
-			listNew.Sort(SortInsUpDel);
-			listDB.Sort(SortInsUpDel);
+		public static void Synch(List<SheetFieldDef> listNew,long sheetDefNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service
+				return;
+			}
+			Synch(listNew,sheetDefNum,null);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list. Should always pass in sheetDefNum, listDB should never be null.</summary>
+		public static void Synch(List<SheetFieldDef> listNew,long sheetDefNum, List<SheetFieldDef> listDB=null) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service
+				return;
+			}
+			if(listDB==null) {
+				//fill list with Num
+			}
+			/*Crud.*/Synch(listNew,listDB);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Synch(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<SheetFieldDef> listIns=    new List<SheetFieldDef>();
+			List<SheetFieldDef> listUpdNew =new List<SheetFieldDef>();
+			List<SheetFieldDef> listUpdDB  =new List<SheetFieldDef>();
+			List<SheetFieldDef> listDel    =new List<SheetFieldDef>();
+			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
+			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
 			int idxNew=0;
 			int idxDB=0;
-			SheetFieldDef fieldNew;//=new SheetFieldDef();
-			SheetFieldDef fieldDB;//=new SheetFieldDef();
-			if(idxNew<listNew.Count) {
-				fieldNew=listNew[idxNew];
-			}
-			else {
+			SheetFieldDef fieldNew;
+			SheetFieldDef fieldDB;
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
 				fieldNew=null;
-			}
-			if(idxDB<listDB.Count) {
-				fieldDB=listDB[idxDB];
-			}
-			else {
-				fieldDB=null;
-			}
-			while(fieldNew!=null || fieldDB!=null) {
 				if(idxNew<listNew.Count) {
 					fieldNew=listNew[idxNew];
 				}
-				else {
-					fieldNew=null;
-				}
+				fieldDB=null;
 				if(idxDB<listDB.Count) {
 					fieldDB=listDB[idxDB];
 				}
-				else {
-					fieldDB=null;
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
 				}
-				switch(GetAction(fieldNew,fieldDB)) {
-					case InsUpDelNone.Insert:
-						listIns.Add(fieldNew);
-						idxNew++;
-						break;
-					case InsUpDelNone.Update:
-						listUpd.Add(fieldNew);
-						idxNew++;
-						idxDB++;
-						break;
-					case InsUpDelNone.Delete:
-						listDel.Add(fieldDB);
-						idxDB++;
-						break;
-					case InsUpDelNone.None:
-						idxNew++;
-						idxDB++;
-						break;
+				else if(fieldNew==null && fieldDB!=null) {
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
 				}
+				else if(fieldNew.SheetFieldDefNum<fieldDB.SheetFieldDefNum) {//newPK less than dbPK
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.SheetFieldDefNum>fieldDB.SheetFieldDefNum) {//dbPK less than newPK
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
 			}
-			//Insert
+			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
-				SheetFieldDefs.Insert(listIns[i]);
+				Crud.SheetFieldDefCrud.Insert(listIns[i]);
 			}
-			//Update
-			for(int i=0;i<listUpd.Count;i++) {
-				SheetFieldDefs.Update(listUpd[i]);
+			for(int i=0;i<listUpdNew.Count;i++) {
+				Crud.SheetFieldDefCrud.Update(listUpdNew[i],listUpdDB[i]);
 			}
-			//Delete
 			for(int i=0;i<listDel.Count;i++) {
-				SheetFieldDefs.Delete(listDel[i].SheetFieldDefNum);
+				Crud.SheetFieldDefCrud.Delete(listDel[i].SheetFieldDefNum);
 			}
 		}
 
-		///<summary>Accepts nulls. Insert always applies to NewItem, Delete always applies to DBItem. Update and None are self explanatory.</summary>
-		public static InsUpDelNone GetAction(SheetFieldDef NewItem,SheetFieldDef DBItem) {
-			if(NewItem==null && DBItem==null) {
-				return InsUpDelNone.None;
+		///<summary>Sorts fields in the order that they shoudl be drawn on top of eachother. First Images, then Drawings, Lines, Rectangles, Text, Check Boxes, and SigBoxes. In that order.</summary>
+		public static int SortDrawingOrderLayers(SheetFieldDef f1,SheetFieldDef f2) {
+			if(f1.FieldType!=f2.FieldType) {
+				return SheetFields.FieldTypeSortOrder(f1.FieldType).CompareTo(SheetFields.FieldTypeSortOrder(f2.FieldType));
 			}
-			if(NewItem!=null && DBItem==null) {
-				return InsUpDelNone.Insert;
-			}
-			if(NewItem==null && DBItem!=null) {
-				return InsUpDelNone.Delete;
-			}
-			if(SortInsUpDel(NewItem,DBItem)<0){
-				return InsUpDelNone.Insert;
-			}
-			else if(SortInsUpDel(NewItem,DBItem)>0){
-				return InsUpDelNone.Delete;
-			}
-			else if(NewItem.FieldType       != DBItem.FieldType           
-				|| NewItem.FieldName         != DBItem.FieldName           
-				|| NewItem.FieldValue        != DBItem.FieldValue          
-				|| NewItem.FontSize          != DBItem.FontSize            
-				|| NewItem.FontName          != DBItem.FontName            
-				|| NewItem.FontIsBold        != DBItem.FontIsBold          
-				|| NewItem.XPos              != DBItem.XPos                
-				|| NewItem.YPos              != DBItem.YPos                
-				|| NewItem.Width             != DBItem.Width               
-				|| NewItem.Height            != DBItem.Height              
-				|| NewItem.GrowthBehavior    != DBItem.GrowthBehavior      
-				|| NewItem.RadioButtonValue  != DBItem.RadioButtonValue    
-				|| NewItem.RadioButtonGroup  != DBItem.RadioButtonGroup    
-				|| NewItem.IsRequired        != DBItem.IsRequired          
-				|| NewItem.TabOrder          != DBItem.TabOrder            
-				|| NewItem.ReportableName    != DBItem.ReportableName      
-				|| NewItem.FKey              != DBItem.FKey                
-				|| NewItem.TextAlign         != DBItem.TextAlign           
-				|| NewItem.IsPaymentOption   != DBItem.IsPaymentOption     
-				|| NewItem.ItemColor         != DBItem.ItemColor
-				|| NewItem.FieldType        == SheetFieldType.Grid) 
-			{
-				return InsUpDelNone.Update;
-			}
-			return InsUpDelNone.None;
+			return f1.YPos.CompareTo(f2.YPos);
+			//return f1.SheetFieldNum.CompareTo(f2.SheetFieldNum);
 		}
-
-		public static int SortInsUpDel(SheetFieldDef NewItem,SheetFieldDef DBItem) {
-			if(NewItem.SheetFieldDefNum != DBItem.SheetFieldDefNum && NewItem.SheetFieldDefNum!=0)	return NewItem.SheetFieldDefNum.CompareTo(DBItem.SheetFieldDefNum);
-			if(NewItem.YPos             != DBItem.YPos) return NewItem.YPos.CompareTo(DBItem.YPos);
-			if(NewItem.XPos             != DBItem.XPos) return NewItem.XPos.CompareTo(DBItem.XPos);
-			if(NewItem.Width            != DBItem.Width) return NewItem.Width.CompareTo(DBItem.Width);
-			if(NewItem.Height           != DBItem.Height) return NewItem.Height.CompareTo(DBItem.Height); 
-			return 0;
-		}
-
-
-
-	}
-
-	public enum InsUpDelNone {
-		Insert,
-		Update,
-		Delete,
-		None
+		
 	}
 }

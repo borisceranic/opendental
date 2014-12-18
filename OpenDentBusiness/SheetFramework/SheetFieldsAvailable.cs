@@ -495,34 +495,37 @@ namespace OpenDentBusiness{
 		private static List<SheetFieldDef> GetStatement(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
 			if(outInCheck==OutInCheck.Out) {
-				list.Add(NewOutput("Account Number"));
-				list.Add(NewOutput("Bold Note"));
-				list.Add(NewOutput("Future Appointments"));
-				list.Add(NewOutput("Note"));
-				list.Add(NewOutput("Total.label"));
-				list.Add(NewOutput("Total.value"));
-				list.Add(NewOutput("InsEst.label"));
-				list.Add(NewOutput("InsEst.value"));
-				list.Add(NewOutput("Balance.label"));
-				list.Add(NewOutput("Balance.value"));
-				list.Add(NewOutput("AmountDue.value"));
-				list.Add(NewOutput("PayPlanAmtDue.value"));
-				list.Add(NewOutput("Sta/Rec/Inv"));
-				list.Add(NewOutput("ReturnAddress"));
-				list.Add(NewOutput("BillingAddress"));
-				list.Add(NewOutput("PracticeTitle"));
-				list.Add(NewOutput("PracticeAddress"));
-				list.Add(NewOutput("practiceCityStateZip"));
-				list.Add(NewOutput("patient.nameFL"));
-				list.Add(NewOutput("patient.address"));
-				list.Add(NewOutput("patient.cityStateZip"));
-				list.Add(NewOutput("Statement.DateSent"));
-				list.Add(NewOutput("Statement.IsCopy"));
-				list.Add(NewOutput("Statement.IsTaxReceipt"));
+				//Output field names:
+				//Each sheet typically has a main datatable type.  
+				//For OutputText types, FieldName is usually the string representation of the database column for the main table.  
+				//For other tables, it can be of the form table.Column.  
+				//There may also be extra fields available that are not strictly pulled from the database.  
+				//  -Extra fields will start with lowercase to indicate that they are not pure database fields.
+				list.Add(NewOutput("accountNumber"));
+				list.Add(NewOutput("statement.NoteBold"));
+				list.Add(NewOutput("statement.Note"));
+				list.Add(NewOutput("futureAppointments"));
+				list.Add(NewOutput("totalLabel"));
+				list.Add(NewOutput("totalValue"));
+				list.Add(NewOutput("insEstLabel"));
+				list.Add(NewOutput("insEstValue"));
+				list.Add(NewOutput("balanceLabel"));
+				list.Add(NewOutput("balanceValue"));
+				list.Add(NewOutput("amountDueValue"));
+				list.Add(NewOutput("payPlanAmtDueValue"));
+				list.Add(NewOutput("statementReceiptInvoice"));
+				list.Add(NewOutput("returnAddress"));
+				list.Add(NewOutput("billingAddress"));
+				//list.Add(NewOutput("practiceTitle"));
+				//list.Add(NewOutput("practiceAddress"));
+				//list.Add(NewOutput("practiceCityStateZip"));
+				list.Add(NewOutput("statement.DateSent"));
+				list.Add(NewOutput("statementIsCopy"));
+				list.Add(NewOutput("statementIsTaxReceipt"));
 				//list.Add(NewOutput("SwissBanking"));//Not yet Supported.
-				list.Add(NewOutput("patient.salutation"));
-				list.Add(NewOutput("patient.priProvNameFL"));
-				list.Add(NewOutput("ProviderLegend"));
+				//list.Add(NewOutput("patient.salutation"));
+				//list.Add(NewOutput("patient.priProvNameFL"));
+				list.Add(NewOutput("providerLegend"));
 			}
 			else if(outInCheck==OutInCheck.In) {
 			}

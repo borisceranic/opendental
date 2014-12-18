@@ -55,7 +55,7 @@ namespace OpenDental.UI {
 		private int[] _rowHeights;
 		///<summary>This array has one element for each row.  For each row, it keeps track of the vertical height of only the note portion of the row in pixels.  Usually 0, unless you want notes showing.</summary>
 		private int[] NoteHeights;
-		///<summary>This array has one element for each row.  For each row, it keeps track of the vertical location at which to start drawing this row in pixels.  This makes it much easier to paint rows.</summary>
+		///<summary>(NOT used for sheet grids, use PrintRows.)  This array has one element for each row.  For each row, it keeps track of the vertical location at which to start drawing this row in pixels.  This makes it much easier to paint rows.</summary>
 		private int[] RowLocs;
 		private bool hScrollVisible;
 		///<summary>Set at the very beginning of OnPaint.  Uses the ColWidth of each column to set up this array with one element for each column.  Contains the columns Pos for that column.</summary>
@@ -101,6 +101,17 @@ namespace OpenDental.UI {
 		private static bool _useBlueTheme;
 		private StringFormat _format;
 		public bool HideScrollBars=false;//used when printing grids to sheets
+		///<summary>Currently only used for printing on sheets.</summary>
+		public List<ODPrintRow> PrintRows;
+		///<summary>Used when calculating printed row positions.  Set to 0 when using in FormSheetFillEdit.</summary>
+		public int TopMargin;
+		///<summary>Used when calculating printed row positions.  Set to 0 when using in FormSheetFillEdit.</summary>
+		public int BottomMargin;
+		public int PageHeight;
+		///<summary>(Printing Only) The position on the page that this grid will print. If this is halfway down the second page, 1100px tall, this value should be 1650, not 550.</summary>
+		public int YPosField;
+		///<summary>Height of field when printing.  Set using CalculateHeights() from EndUpdate()</summary>
+		private int _printHeight;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -197,7 +208,12 @@ namespace OpenDental.UI {
 			}
 		}
 
-
+		///<summary>Height of field when printing.  Set using CalculateHeights() from EndUpdate()</summary>
+		public int PrintHeight {
+			get {
+				return _printHeight;
+			}
+		}
 
 		///<summary>Gets the collection of ODGridColumns assigned to the ODGrid control.</summary>
 		//[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -517,105 +533,166 @@ namespace OpenDental.UI {
 		}
 
 		///<summary>Called from PrintPage() and EndUpdate().  After adding rows to the grid, this calculates the height of each row because some rows may have text wrap and will take up more than one row.  Also, rows with notes, must be made much larger, because notes start on the second line.  If column images are used, rows will be enlarged to make space for the images.</summary>
-		private void ComputeRows(Graphics g) {
+		private void ComputeRows(Graphics g,bool IsForPrinting=false) {
 			//Travis - 06/04/2013: Sometimes ComputeRows() will incorrectly measure the number of rows when the font of the cell will display in bold.  This can cause text that would be on a new line to not display.
 			//This is because all textual measurements use cellFont which is never bold.  A possible solution would be to add another font that is bold to the current using statement.  
 			//Then before any text is measured, check if the cell is bold in order to pass the appropriate font.
-			//using(Graphics g=this.CreateGraphics()) {
-				using(Font cellFont=new Font(FontFamily.GenericSansSerif,cellFontSize)) {
-					_rowHeights=new int[rows.Count];
-					NoteHeights=new int[rows.Count];
-					//multiPageNoteHeights=new List<List<int>>();
-					//multiPageNoteSection=new List<List<string>>();
-					//for(int i=0;i<rows.Count;i++) {
-						//List<int> intList=new List<int>();
-						//multiPageNoteHeights.Add(intList);
-						//List<string> stringList=new List<string>();
-						//multiPageNoteSection.Add(stringList);
-					//}
-					RowLocs=new int[rows.Count];
-					GridH=0;
-					int cellH;
-					int noteW=0;
-					if(NoteSpanStop>0 && NoteSpanStart<columns.Count) {
-						for(int i=NoteSpanStart;i<=NoteSpanStop;i++) {
-							noteW+=columns[i].ColWidth;
-						}
-					}
-					int imageH=0;
-					HasEditableColumn=false;
-					for(int i=0;i<columns.Count;i++) {
-						if(columns[i].IsEditable){
-							HasEditableColumn=true;
-						}
-						if(columns[i].ImageList!=null) {
-							if(columns[i].ImageList.ImageSize.Height>imageH) {
-								imageH=columns[i].ImageList.ImageSize.Height+1;
-							}
-						}
-					}
-					for(int i=0;i<rows.Count;i++) {
-						_rowHeights[i]=0;
-						if(wrapText) {
-							//find the tallest col
-							for(int j=0;j<rows[i].Cells.Count;j++) {
-								if(HasEditableColumn) {
-									//doesn't seem to calculate right when it ends in a "\r\n". It doesn't make room for the new line. Make it, by adding another one for calculations.
-									cellH=(int)((1.03)*(float)(g.MeasureString(rows[i].Cells[j].Text+"\r\n",cellFont,columns[j].ColWidth,_format).Height))+4;//because textbox will be bigger
-									if(cellH < EDITABLE_ROW_HEIGHT) {
-										cellH=EDITABLE_ROW_HEIGHT;//only used for single line text
-									}
-								}
-								else {
-									cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height+1;
-								}
-								//if(rows[i].Height==0) {//not set
-								//  cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
-								//}
-								//else {
-								//  cellH=rows[i].Height;
-								//}
-								if(cellH>_rowHeights[i]) {
-									_rowHeights[i]=cellH;
-								}
-							}
-							//Cameron 10/23/2013: Rows used to look like thick lines when the row height was 1.  When the height is less than 4, the row is not visible enough to select or edit.
-							//We will use the height of the string "Any" to determine a better row height so the user can see that it is an empty row.
-							//If, for whatever reason, their font really does return a row height less than 4, the following code will return that value anyway thus this change should be harmless.
-							if(_rowHeights[i]<4) {
-								_rowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
-							}
-						}
-						else {//text not wrapping
-							if(HasEditableColumn) {
-								_rowHeights[i]=EDITABLE_ROW_HEIGHT;
-							}
-							else {
-								_rowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
-							}
-							//if(rows[i].Height==0) {//not set
-							//	RowHeights[i]=(int)g.MeasureString("Any",cellFont,100).Height+1;
-							//}
-							//else {
-							//	RowHeights[i]=rows[i].Height;
-							//}
-						}
-						if(imageH>_rowHeights[i]) {
-							_rowHeights[i]=imageH;
-						}
-						if(noteW>0 && rows[i].Note!="") {
-							NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFont,noteW,_format).Height;
-						}
-						if(i==0) {
-							RowLocs[i]=0;
-						}
-						else {
-							RowLocs[i]=RowLocs[i-1]+_rowHeights[i-1]+NoteHeights[i-1];
-						}
-						GridH+=_rowHeights[i]+NoteHeights[i];
+			using(Font cellFont=new Font(FontFamily.GenericSansSerif,cellFontSize)) {
+				_rowHeights=new int[rows.Count];
+				NoteHeights=new int[rows.Count];
+				//multiPageNoteHeights=new List<List<int>>();
+				//multiPageNoteSection=new List<List<string>>();
+				//for(int i=0;i<rows.Count;i++) {
+					//List<int> intList=new List<int>();
+					//multiPageNoteHeights.Add(intList);
+					//List<string> stringList=new List<string>();
+					//multiPageNoteSection.Add(stringList);
+				//}
+				RowLocs=new int[rows.Count];
+				GridH=0;
+				int cellH;
+				int noteW=0;
+				if(NoteSpanStop>0 && NoteSpanStart<columns.Count) {
+					for(int i=NoteSpanStart;i<=NoteSpanStop;i++) {
+						noteW+=columns[i].ColWidth;
 					}
 				}
-			//}
+				int imageH=0;
+				HasEditableColumn=false;
+				for(int i=0;i<columns.Count;i++) {
+					if(columns[i].IsEditable){
+						HasEditableColumn=true;
+					}
+					if(columns[i].ImageList!=null) {
+						if(columns[i].ImageList.ImageSize.Height>imageH) {
+							imageH=columns[i].ImageList.ImageSize.Height+1;
+						}
+					}
+				}
+				for(int i=0;i<rows.Count;i++) {
+					_rowHeights[i]=0;
+					if(wrapText) {
+						//find the tallest col
+						for(int j=0;j<rows[i].Cells.Count;j++) {
+							if(HasEditableColumn) {
+								//doesn't seem to calculate right when it ends in a "\r\n". It doesn't make room for the new line. Make it, by adding another one for calculations.
+								cellH=(int)((1.03)*(float)(g.MeasureString(rows[i].Cells[j].Text+"\r\n",cellFont,columns[j].ColWidth,_format).Height))+4;//because textbox will be bigger
+								if(cellH < EDITABLE_ROW_HEIGHT) {
+									cellH=EDITABLE_ROW_HEIGHT;//only used for single line text
+								}
+							}
+							else {
+								cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height+1;
+							}
+							//if(rows[i].Height==0) {//not set
+							//  cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
+							//}
+							//else {
+							//  cellH=rows[i].Height;
+							//}
+							if(cellH>_rowHeights[i]) {
+								_rowHeights[i]=cellH;
+							}
+						}
+						//Cameron 10/23/2013: Rows used to look like thick lines when the row height was 1.  When the height is less than 4, the row is not visible enough to select or edit.
+						//We will use the height of the string "Any" to determine a better row height so the user can see that it is an empty row.
+						//If, for whatever reason, their font really does return a row height less than 4, the following code will return that value anyway thus this change should be harmless.
+						if(_rowHeights[i]<4) {
+							_rowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
+						}
+					}
+					else {//text not wrapping
+						if(HasEditableColumn) {
+							_rowHeights[i]=EDITABLE_ROW_HEIGHT;
+						}
+						else {
+							_rowHeights[i]=(int)g.MeasureString("Any",cellFont,100,_format).Height+1;
+						}
+						//if(rows[i].Height==0) {//not set
+						//	RowHeights[i]=(int)g.MeasureString("Any",cellFont,100).Height+1;
+						//}
+						//else {
+						//	RowHeights[i]=rows[i].Height;
+						//}
+					}
+					if(imageH>_rowHeights[i]) {
+						_rowHeights[i]=imageH;
+					}
+					if(noteW>0 && rows[i].Note!="") {
+						NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFont,noteW,_format).Height;
+					}
+					if(i==0) {
+						RowLocs[i]=0;
+					}
+					else {
+						RowLocs[i]=RowLocs[i-1]+_rowHeights[i-1]+NoteHeights[i-1];
+					}
+					GridH+=_rowHeights[i]+NoteHeights[i];
+				}
+			}
+			if(IsForPrinting) {
+				ComputePrintRows();
+			}
+		}
+
+		///<summary>Fills PrintRows with row information.</summary>
+		private void ComputePrintRows() {
+			PrintRows=new List<ODPrintRow>();
+			bool drawTitle=false;
+			bool drawHeader=true;
+			bool drawFooter=false;
+			int yPosCur=YPosField;
+			int bottomCurPage=PageHeight-BottomMargin;
+			while(yPosCur>bottomCurPage) {//advance pages until we are using correct y values. Example: grid starts on page three, yPosCur would be something like 2500
+				bottomCurPage+=PageHeight-(TopMargin+BottomMargin);
+			}
+			for(int i=0;i<RowHeights.Length;i++) {
+				#region Split patient accounts on Statement grids.
+				if(title.StartsWith("StatementMain.NotIntermingled") 
+					&& i==0) 
+				{
+					drawTitle=true;
+				}
+				else if(title.StartsWith("StatementMain.NotIntermingled")
+					&& i>0 
+					&& rows[i].Cells[1].Text!=rows[i-1].Cells[1].Text) //index 1 should be patient. May need to be enhanced later if grid customization is enabled.
+				{
+					yPosCur+=20;//space out grids.
+					PrintRows[i-1].IsBottomRow=true;
+					drawTitle=true;
+					drawHeader=true;
+				}
+				#endregion
+				#region Page break logic
+				if(title.StartsWith("StatementPayPlan") && i==RowHeights.Length-1) {
+					drawFooter=true;
+				}
+				if(yPosCur //start position of row
+					+RowHeights[i] //+row height
+					+(drawTitle?TitleHeight:0) //+title height if needed
+					+(drawHeader?HeaderHeight:0) //+header height if needed
+					+(drawFooter?TitleHeight:0) //+footer height if needed.
+					>=bottomCurPage) 
+				{
+					if(i>0) {
+						PrintRows[i-1].IsBottomRow=true;//this row causes a page break. Previous row should be a bottom row.
+					}
+					yPosCur=bottomCurPage+1;
+					bottomCurPage+=PageHeight-(TopMargin+BottomMargin);
+					drawHeader=true;
+				}
+				#endregion
+				PrintRows.Add(new ODPrintRow(yPosCur,drawTitle,drawHeader,false,drawFooter));
+				yPosCur+=(drawTitle?TitleHeight:0);
+				yPosCur+=(drawHeader?HeaderHeight:0);
+				yPosCur+=RowHeights[i];
+				yPosCur+=(drawFooter?TitleHeight:0);
+				drawTitle=drawHeader=drawFooter=false;//reset all flags for next row.
+				if(i==RowHeights.Length-1){//set print height equal to the bottom of the last row.
+					PrintRows[i].IsBottomRow=true;
+					_printHeight=yPosCur-YPosField;
+				}
+			}
 		}
 
 		///<summary>Returns row. -1 if no valid row.  Supply the y position in pixels.</summary>
@@ -708,13 +785,13 @@ namespace OpenDental.UI {
 			}
 			try {
 				for(int i=0;i<rows.Count;i++) {
-					if(-vScroll.Value+RowLocs[i]+_rowHeights[i]+NoteHeights[i]<0) {
+					if(-vScroll.Value+RowLocs[i]+RowHeights[i]+NoteHeights[i]<0) {
 						continue;//lower edge of row above top of grid area
 					}
 					if(-vScroll.Value+1+titleHeight+headerHeight+RowLocs[i]>Height) {
 						return;//row below lower edge of control
 					}
-					DrawRow(i,g,cellFont,0,RowLocs[i]+titleHeight+headerHeight);
+					DrawRow(i,g,cellFont);
 				}
 			}
 			finally {
@@ -725,7 +802,357 @@ namespace OpenDental.UI {
 		}
 
 		///<summary>Draws background, lines, image, and text for a single row.</summary>
-		public void DrawRow(int rowI,Graphics g,Font cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+		private void DrawRow(int rowI,Graphics g,Font cellFont) {
+			RectangleF textRect;
+			Pen gridPen=new Pen(this.cGridLine);
+			Pen lowerPen=new Pen(this.cGridLine);
+			if(rowI==rows.Count-1) {//last row
+				lowerPen=new Pen(Color.FromArgb(120,120,120));
+			}
+			else {
+				if(rows[rowI].ColorLborder!=Color.Empty) {
+					lowerPen=new Pen(rows[rowI].ColorLborder);
+				}
+			}
+			SolidBrush textBrush;
+			//selected row color
+			if(selectedIndices.Contains(rowI)) {
+				g.FillRectangle(new SolidBrush(selectedRowColor),
+					1,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+					GridW,
+					RowHeights[rowI]+NoteHeights[rowI]-1);
+			}
+			//colored row background
+			else if(rows[rowI].ColorBackG!=Color.White) {
+				g.FillRectangle(new SolidBrush(rows[rowI].ColorBackG),
+					1,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+					GridW,
+					RowHeights[rowI]+NoteHeights[rowI]-1);
+			}
+			//normal row color
+			else {//need to draw over the gray background
+				g.FillRectangle(new SolidBrush(rows[rowI].ColorBackG),
+					1,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+					GridW,//this is a really simple width value that always works well
+					RowHeights[rowI]+NoteHeights[rowI]-1);
+			}
+			if(selectionMode==GridSelectionMode.OneCell && selectedCell.X!=-1 && selectedCell.Y!=-1
+			&& selectedCell.Y==rowI) {
+				g.FillRectangle(new SolidBrush(selectedRowColor),
+					-hScroll.Value+1+ColPos[selectedCell.X],
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+					columns[selectedCell.X].ColWidth,
+					RowHeights[rowI]+NoteHeights[rowI]-1);
+			}
+			//lines for note section
+			if(NoteHeights[rowI]>0) {
+				//left vertical gridline
+				if(NoteSpanStart!=0) {
+					g.DrawLine(gridPen,
+						-hScroll.Value+1+ColPos[NoteSpanStart],
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI],
+						-hScroll.Value+1+ColPos[NoteSpanStart],
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+NoteHeights[rowI]);
+				}
+				//Horizontal line which divides the main part of the row from the notes section of the row
+				g.DrawLine(gridPen,
+					-hScroll.Value+1+ColPos[0]+1,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI],
+					-hScroll.Value+1+ColPos[columns.Count-1]+columns[columns.Count-1].ColWidth,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]);
+
+			}
+			for(int i=0;i<columns.Count;i++) {
+				//right vertical gridline
+				if(rowI==0) {
+					g.DrawLine(gridPen,
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI],
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]);
+				}
+				else {
+					g.DrawLine(gridPen,
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]);
+				}
+				//lower horizontal gridline
+				if(i==0) {
+					g.DrawLine(lowerPen,
+						-hScroll.Value+1+ColPos[i],
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+NoteHeights[rowI],
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+NoteHeights[rowI]);
+				}
+				else {
+					g.DrawLine(lowerPen,
+						-hScroll.Value+1+ColPos[i]+1,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+NoteHeights[rowI],
+						-hScroll.Value+1+ColPos[i]+columns[i].ColWidth,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+NoteHeights[rowI]);
+				}
+				//text
+				if(rows[rowI].Cells.Count-1<i) {
+					continue;
+				}
+				switch(columns[i].TextAlign) {
+					case HorizontalAlignment.Left:
+						_format.Alignment=StringAlignment.Near;
+						break;
+					case HorizontalAlignment.Center:
+						_format.Alignment=StringAlignment.Center;
+						break;
+					case HorizontalAlignment.Right:
+						_format.Alignment=StringAlignment.Far;
+						break;
+				}
+				int vertical=-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1;
+				int horizontal=-hScroll.Value+1+ColPos[i]+1;
+				int cellW=columns[i].ColWidth;
+				int cellH=RowHeights[rowI];
+				if(HasEditableColumn) {//These cells are taller
+					vertical+=2;//so this is to push text down to center it in the cell
+					cellH-=3;//to keep it from spilling into the next cell
+				}
+				if(columns[i].TextAlign==HorizontalAlignment.Right) {
+					if(HasEditableColumn) {
+						horizontal-=4;
+						cellW+=2;
+					}
+					else {
+						horizontal-=2;
+						cellW+=2;
+					}
+				}
+				textRect=new RectangleF(horizontal,vertical,cellW,cellH);
+				if(rows[rowI].Cells[i].ColorText==Color.Empty) {
+					textBrush=new SolidBrush(rows[rowI].ColorText);
+				}
+				else {
+					textBrush=new SolidBrush(rows[rowI].Cells[i].ColorText);
+				}
+				if(rows[rowI].Cells[i].Bold==YN.Yes) {
+					cellFont=new Font(cellFont,FontStyle.Bold);
+				}
+				else if(rows[rowI].Cells[i].Bold==YN.No) {
+					cellFont=new Font(cellFont,FontStyle.Regular);
+				}
+				else {//unknown.  Use row bold
+					if(rows[rowI].Bold) {
+						cellFont=new Font(cellFont,FontStyle.Bold);
+					}
+					else {
+						cellFont=new Font(cellFont,FontStyle.Regular);
+					}
+				}
+				if(columns[i].ImageList==null) {
+					g.DrawString(rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,_format);
+				}
+				else {
+					int imageIndex=-1;
+					if(rows[rowI].Cells[i].Text!="") {
+						imageIndex=PIn.Int(rows[rowI].Cells[i].Text);
+					}
+					if(imageIndex!=-1) {
+						Image img=columns[i].ImageList.Images[imageIndex];
+						g.DrawImage(img,horizontal,vertical-1);
+					}
+				}
+			}
+			//note text
+			if(NoteHeights[rowI]>0 && NoteSpanStop>0 && NoteSpanStart<columns.Count) {
+				int noteW=0;
+				for(int i=NoteSpanStart;i<=NoteSpanStop;i++) {
+					noteW+=columns[i].ColWidth;
+				}
+				if(rows[rowI].Bold) {
+					cellFont=new Font(cellFont,FontStyle.Bold);
+				}
+				else {
+					cellFont=new Font(cellFont,FontStyle.Regular);
+				}
+				textBrush=new SolidBrush(rows[rowI].ColorText);
+				textRect=new RectangleF(
+					-hScroll.Value+1+ColPos[NoteSpanStart]+1,
+					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+RowHeights[rowI]+1,
+					ColPos[NoteSpanStop]+columns[NoteSpanStop].ColWidth-ColPos[NoteSpanStart],
+					NoteHeights[rowI]);
+				_format.Alignment=StringAlignment.Near;
+				g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,_format);
+			}
+		}
+
+		private void DrawTitleAndHeaders(Graphics g) {
+			//Title----------------------------------------------------------------------------------------------------
+			Color cTitleTop=Color.White;
+			Color cTitleBottom=Color.FromArgb(213,213,223);
+			Color cTitleText=Color.Black;
+			if(_useBlueTheme) {
+				cTitleTop=Color.FromArgb(156,175,230);//191,205,245);//139,160,224);//114,136,201);//106,132,210);//109,129,191);//104,136,232);
+				cTitleBottom=Color.FromArgb(60,90,150);//35,55,115);//49,63,105);//(20,47,126);
+				cTitleText=Color.White;
+			}
+			LinearGradientBrush brushTitleBackground=new LinearGradientBrush(new Rectangle(0,0,Width,titleHeight),cTitleTop,cTitleBottom,LinearGradientMode.Vertical);
+			SolidBrush brushTitleText=new SolidBrush(cTitleText);
+			g.FillRectangle(brushTitleBackground,0,0,Width,titleHeight);
+			Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
+			g.DrawString(title,titleFont,brushTitleText,Width/2-g.MeasureString(title,titleFont).Width/2,2);
+			if(brushTitleBackground!=null) {
+				brushTitleBackground.Dispose();
+				brushTitleBackground=null;
+			}
+			if(brushTitleText!=null) {
+				brushTitleText.Dispose();
+				brushTitleText=null;
+			}
+			if(titleFont!=null) {
+				titleFont.Dispose();
+				titleFont=null;
+			}
+			//Column Headers-----------------------------------------------------------------------------------------
+			Color cTitleBackG=Color.FromArgb(210,210,210);
+			if(_useBlueTheme) {
+				cTitleBackG=Color.FromArgb(223,234,245);//208,225,242);//166,185,204);
+			}
+			g.FillRectangle(new SolidBrush(cTitleBackG),0,titleHeight,Width,headerHeight);//background
+			g.DrawLine(new Pen(Color.FromArgb(102,102,122)),0,titleHeight,Width,titleHeight);//line between title and headers
+			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold)) {
+				for(int i=0;i<columns.Count;i++) {
+					if(i!=0) {
+						//vertical lines separating column headers
+						g.DrawLine(new Pen(Color.FromArgb(120,120,120)),-hScroll.Value+1+ColPos[i],titleHeight+3,
+							-hScroll.Value+1+ColPos[i],titleHeight+headerHeight-2);
+						g.DrawLine(new Pen(Color.White),-hScroll.Value+1+ColPos[i]+1,titleHeight+3,
+							-hScroll.Value+1+ColPos[i]+1,titleHeight+headerHeight-2);
+					}
+					g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
+						-hScroll.Value+ColPos[i]+columns[i].ColWidth/2-g.MeasureString(columns[i].Heading,headerFont).Width/2,
+						titleHeight+2);
+					if(sortedByColumnIdx==i) {
+						PointF p=new PointF(-hScroll.Value+1+ColPos[i]+6,titleHeight+(float)headerHeight/2f);
+						if(sortedIsAscending) {//pointing up
+							g.FillPolygon(Brushes.White,new PointF[] {
+								new PointF(p.X-4.9f,p.Y+2f),//LLstub
+								new PointF(p.X-4.9f,p.Y+2.5f),//LLbase
+								new PointF(p.X+4.9f,p.Y+2.5f),//LRbase
+								new PointF(p.X+4.9f,p.Y+2f),//LRstub
+								new PointF(p.X,p.Y-2.8f)});//Top
+							g.FillPolygon(Brushes.Black,new PointF[] {
+								new PointF(p.X-4,p.Y+2),//LL
+								new PointF(p.X+4,p.Y+2),//LR
+								new PointF(p.X,p.Y-2)});//Top
+						}
+						else {//pointing down
+							g.FillPolygon(Brushes.White,new PointF[] {//shaped like home plate
+								new PointF(p.X-4.9f,p.Y-2f),//ULstub
+								new PointF(p.X-4.9f,p.Y-2.7f),//ULtop
+								new PointF(p.X+4.9f,p.Y-2.7f),//URtop
+								new PointF(p.X+4.9f,p.Y-2f),//URstub
+								new PointF(p.X,p.Y+2.8f)});//Bottom
+							g.FillPolygon(Brushes.Black,new PointF[] {
+								new PointF(p.X-4,p.Y-2),//UL
+								new PointF(p.X+4,p.Y-2),//UR
+								new PointF(p.X,p.Y+2)});//Bottom
+						}
+					}
+				}
+			}
+			//line below headers
+			g.DrawLine(new Pen(Color.FromArgb(120,120,120)),0,titleHeight+headerHeight,Width,titleHeight+headerHeight);
+		}
+
+		///<summary>Draws outline around entire control.</summary>
+		private void DrawOutline(Graphics g) {
+			if(hScroll.Visible) {//for the little square at the lower right between the two scrollbars
+				g.FillRectangle(new SolidBrush(Color.FromKnownColor(KnownColor.Control)),Width-vScroll.Width-1,
+					Height-hScroll.Height-1,vScroll.Width,hScroll.Height);
+			}
+			Color cOutline=Color.FromArgb(119,119,146);
+			if(_useBlueTheme) {
+				cOutline=Color.FromArgb(47,70,117);
+			}
+			using(Pen pen=new Pen(cOutline)) {
+				g.DrawRectangle(pen,0,0,Width-1,Height-1);
+			}
+		}
+		#endregion
+
+		#region Clicking
+		///<summary></summary>
+		protected void OnCellDoubleClick(int col,int row) {
+			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
+			if(CellDoubleClick!=null) {
+				CellDoubleClick(this,gArgs);
+			}
+		}
+
+		///<summary></summary>
+		protected override void OnDoubleClick(EventArgs e) {
+			base.OnDoubleClick(e);
+			if(MouseDownRow==-1) {
+				return;//double click was in the title or header section
+			}
+			if(MouseDownCol==-1) {
+				return;//click was to the right of the columns
+			}
+			OnCellDoubleClick(MouseDownCol,MouseDownRow);
+		}
+
+		///<summary></summary>
+		protected void OnCellClick(int col,int row,MouseButtons button) {
+			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,button);
+			if(CellClick!=null) {
+				CellClick(this,gArgs);
+			}
+		}
+
+		///<summary></summary>
+		protected override void OnClick(EventArgs e) {
+			base.OnClick(e);
+			if(MouseDownRow==-1) {
+				return;//click was in the title or header section
+			}
+			if(MouseDownCol==-1) {
+				return;//click was to the right of the columns
+			}
+			OnCellClick(MouseDownCol,MouseDownRow,lastButtonPressed);
+		}
+		#endregion Clicking
+
+		#region BeginEndUpdate
+		///<summary>Call this before adding any rows.  You would typically call Rows.Clear after this.</summary>
+		public void BeginUpdate() {
+			IsUpdating=true;
+		}
+
+		///<summary>Must be called after adding rows.  This computes the columns, computes the rows, lays out the scrollbars, clears SelectedIndices, and invalidates.  Does not zero out scrollVal.  Sometimes, it seems like scrollVal needs to be reset somehow because it's an inappropriate number, and when you first grab the scrollbar, it jumps.  No time to investigate.</summary>
+		public void EndUpdate(bool isForPrinting=false) {
+			ComputeColumns();
+			using(Graphics g=this.CreateGraphics()) {
+				ComputeRows(g,isForPrinting);
+			}
+			LayoutScrollBars();
+			//ScrollValue=0;
+			selectedIndices=new ArrayList();
+			selectedCell=new Point(-1,-1);
+			if(editBox!=null) {
+				editBox.Dispose();
+			}
+			sortedByColumnIdx=-1;
+			IsUpdating=false;
+			Invalidate();
+		}
+		#endregion BeginEndUpdate
+
+		#region Printing
+
+		///<summary></summary>
+		public void PrintRow(int rowI,Graphics g,Font cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
 			Color cOutline=Color.FromArgb(119,119,146);
 			if(_useBlueTheme) {
 				cOutline=Color.FromArgb(47,70,117);
@@ -846,8 +1273,8 @@ namespace OpenDental.UI {
 				int cellW=columns[i].ColWidth;
 				int cellH=_rowHeights[rowI];
 				if(HasEditableColumn) {//These cells are taller
-						vertical+=2;//so this is to push text down to center it in the cell
-						cellH-=3;//to keep it from spilling into the next cell
+					vertical+=2;//so this is to push text down to center it in the cell
+					cellH-=3;//to keep it from spilling into the next cell
 				}
 				if(columns[i].TextAlign==HorizontalAlignment.Right) {
 					if(HasEditableColumn) {
@@ -928,8 +1355,8 @@ namespace OpenDental.UI {
 
 		}
 
-		///<summary>Draws background, lines, image, and text for a single row.</summary>
-		public void DrawRowX(int rowI,XGraphics g,Font _cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+		///<summary></summary>
+		public void PrintRowX(int rowI,XGraphics g,Font _cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
 			Color cOutline=Color.FromArgb(119,119,146);
 			if(_useBlueTheme) {
 				cOutline=Color.FromArgb(47,70,117);
@@ -1135,7 +1562,7 @@ namespace OpenDental.UI {
 			}
 		}
 
-		public void DrawTitle(Graphics g,int x,int y) {
+		public void PrintTitle(Graphics g,int x,int y) {
 			Color cTitleTop=Color.White;
 			Color cTitleBottom=Color.FromArgb(213,213,223);
 			Color cTitleText=Color.Black;
@@ -1177,7 +1604,7 @@ namespace OpenDental.UI {
 			}
 		}
 
-		public void DrawTitleX(XGraphics g,int x,int y) {
+		public void PrintTitleX(XGraphics g,int x,int y) {
 			Color cTitleTop=Color.White;
 			Color cTitleBottom=Color.FromArgb(213,213,223);
 			Color cTitleText=Color.Black;
@@ -1211,55 +1638,22 @@ namespace OpenDental.UI {
 				brushTitleBackground.Dispose();
 				brushTitleBackground=null;
 			}
-			//if(brushTitleText!=null) {
-			//	brushTitleText.Dispose();
-			//	brushTitleText=null;
-			//}
-			//if(titleFont!=null) {
-			//	titleFont.Dispose();
-			//	titleFont=null;
-			//}
 		}
 
-		public void DrawHeader(Graphics g,int x,int y,bool isSheetGrid=false) {
-			Color cOutline=Color.FromArgb(119,119,146);
-			if(_useBlueTheme) {
-				cOutline=Color.FromArgb(47,70,117);
-			}
-			if(isSheetGrid) {
-				cOutline=Color.Black;
-			}
+		public void PrintHeader(Graphics g,int x,int y) {
+			Color cOutline=cOutline=Color.Black;
 			Color cTitleTop=Color.White;
 			Color cTitleBottom=Color.FromArgb(213,213,223);
 			Color cTitleText=Color.Black;
-			if(_useBlueTheme) {
-				cTitleTop=Color.FromArgb(156,175,230);//191,205,245);//139,160,224);//114,136,201);//106,132,210);//109,129,191);//104,136,232);
-				cTitleBottom=Color.FromArgb(60,90,150);//35,55,115);//49,63,105);//(20,47,126);
-				cTitleText=Color.White;
-			}
-			Color cTitleBackG=Color.FromArgb(210,210,210);
-			if(_useBlueTheme) {
-				cTitleBackG=Color.FromArgb(223,234,245);//208,225,242);//166,185,204);
-			}
+			Color cTitleBackG=Color.LightGray;
 			g.FillRectangle(new SolidBrush(cTitleBackG),x,y,Width,headerHeight);//background
 			g.DrawLine(new Pen(Color.FromArgb(102,102,122)),x,y,x+Width,y);//line between title and headers
-			Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
-			if(isSheetGrid) {
-				headerFont=new Font("Arial",8.5f,FontStyle.Bold);
-			}
+			Font headerFont=new Font("Arial",8.5f,FontStyle.Bold);
 			for(int i=0;i<columns.Count;i++) {
 				if(i!=0) {
 					//vertical lines separating column headers
-					if(isSheetGrid) {
-						g.DrawLine(new Pen(cOutline),x+(-hScroll.Value+ColPos[i]),y,
-							x+(-hScroll.Value+ColPos[i]),y+headerHeight);
-					}
-					else{
-						g.DrawLine(new Pen(Color.FromArgb(120,120,120)),x+(-hScroll.Value+ColPos[i]),y+3,
-							x+(-hScroll.Value+ColPos[i]),y+(headerHeight-2));
-						g.DrawLine(new Pen(Color.White),x+(-hScroll.Value+ColPos[i]+1),y+3,
-							x+(-hScroll.Value+ColPos[i]+1),y+(headerHeight-2));
-					}
+					g.DrawLine(new Pen(cOutline),x+(-hScroll.Value+ColPos[i]),y,
+						x+(-hScroll.Value+ColPos[i]),y+headerHeight);
 				}
 				g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
 					(float)x+(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2-g.MeasureString(columns[i].Heading,headerFont).Width/2),
@@ -1295,218 +1689,37 @@ namespace OpenDental.UI {
 			headerFont.Dispose();
 			//Outline the Title
 			using(Pen pen=new Pen(cOutline)) {
-				if(isSheetGrid) {
-					g.DrawRectangle(pen,x,y,Width,HeaderHeight);
-				}
-				else {
-					//Draw line from UL to LL to LR to UR. bottom three sides of a rectangle.
-					g.DrawLines(pen,new Point[] { 
-					new Point(x,y),
-					new Point(x,y+HeaderHeight),
-					new Point(x+Width,y+HeaderHeight),
-					new Point(x+Width,y)});
-				}
+				g.DrawRectangle(pen,x,y,Width,HeaderHeight);
 			}
-			if(isSheetGrid) {
 				g.DrawLine(new Pen(cOutline),x,y+headerHeight,x+Width,y+headerHeight);
-			}
-			else {
-				g.DrawLine(new Pen(Color.FromArgb(120,120,120)),x,y+headerHeight,x+Width,y+headerHeight);
-			}
 		}
 
-		public void DrawHeaderX(XGraphics g,int x,int y,bool isSheetGrid=false) {
-			Color cOutline=Color.FromArgb(119,119,146);
-			if(_useBlueTheme && !isSheetGrid) {
-				cOutline=Color.FromArgb(47,70,117);
-			}
-			if(isSheetGrid) {
-				cOutline=Color.Black;
-			}
+		public void PrintHeaderX(XGraphics g,int x,int y) {
+			Color cOutline=cOutline=Color.Black;
 			Color cTitleTop=Color.White;
 			Color cTitleBottom=Color.FromArgb(213,213,223);
 			Color cTitleText=Color.Black;
-			if(_useBlueTheme) {
-				cTitleTop=Color.FromArgb(156,175,230);//191,205,245);//139,160,224);//114,136,201);//106,132,210);//109,129,191);//104,136,232);
-				cTitleBottom=Color.FromArgb(60,90,150);//35,55,115);//49,63,105);//(20,47,126);
-				cTitleText=Color.White;
-			}
-			Color cTitleBackG=Color.FromArgb(210,210,210);
-			if(_useBlueTheme) {
-				cTitleBackG=Color.FromArgb(223,234,245);//208,225,242);//166,185,204);
-			}
+			Color cTitleBackG=Color.LightGray;
 			g.DrawRectangle(new XSolidBrush(cTitleBackG),p(x),p(y),p(Width),p(headerHeight));//background
 			g.DrawLine(new XPen(Color.FromArgb(102,102,122)),p(x),p(y),p(x+Width),p(y));//line between title and headers
-			Font _headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);//not needed anymore, leftover from g version (as opposed to gx version.)
-			if(isSheetGrid) {
-				_headerFont=new Font("Arial",8.5f,FontStyle.Bold);
-			}
+			Font _headerFont=new Font("Arial",8.5f,FontStyle.Bold);
 			XFont headerFont=new XFont(_headerFont.FontFamily.Name.ToString(),_headerFont.Size,XFontStyle.Bold);
 			for(int i=0;i<columns.Count;i++) {
 				if(i!=0) {
-					if(isSheetGrid) {
-						g.DrawLine(new XPen(cOutline),p(x+(-hScroll.Value+ColPos[i])),p(y),
-							p(x+(-hScroll.Value+ColPos[i])),p(y+headerHeight));
-					}
-					else {
-						//vertical lines separating column headers
-						g.DrawLine(new XPen(Color.FromArgb(120,120,120)),p(x+(-hScroll.Value+ColPos[i])),p(y+3),
-							p(x+(-hScroll.Value+ColPos[i])),p(y+(headerHeight-2)));
-						g.DrawLine(new XPen(Color.White),p(x+(-hScroll.Value+ColPos[i]+1)),p(y+3),
-							p(x+(-hScroll.Value+ColPos[i]+1)),p(y+(headerHeight-2)));
-					}
+					g.DrawLine(new XPen(cOutline),p(x+(-hScroll.Value+ColPos[i])),p(y),
+						p(x+(-hScroll.Value+ColPos[i])),p(y+headerHeight));
 				}
 				float xFloat=(float)x+(float)(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2);//for some reason visual studio would not allow this statment within the DrawString Below.
-				//g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
-				//	p(xFloat),
-				//	p((float)y+2f));
 				DrawStringX(g,columns[i].Heading,headerFont,XBrushes.Black,new XRect(p(xFloat),p(y-3),100,100),XStringAlignment.Center);
-				//if(sortedByColumnIdx==i) {
-				//	PointF p=new PointF(x+(-hScroll.Value+1+ColPos[i]+6),y+(float)headerHeight/2f);
-				//	if(sortedIsAscending) {//pointing up
-				//		g.FillPolygon(Brushes.White,new PointF[] {
-				//			new PointF(p.X-4.9f,p.Y+2f),//LLstub
-				//			new PointF(p.X-4.9f,p.Y+2.5f),//LLbase
-				//			new PointF(p.X+4.9f,p.Y+2.5f),//LRbase
-				//			new PointF(p.X+4.9f,p.Y+2f),//LRstub
-				//			new PointF(p.X,p.Y-2.8f)});//Top
-				//		g.FillPolygon(Brushes.Black,new PointF[] {
-				//			new PointF(p.X-4,p.Y+2),//LL
-				//			new PointF(p.X+4,p.Y+2),//LR
-				//			new PointF(p.X,p.Y-2)});//Top
-				//	}
-				//	else {//pointing down
-				//		g.FillPolygon(Brushes.White,new PointF[] {//shaped like home plate
-				//			new PointF(p.X-4.9f,p.Y-2f),//ULstub
-				//			new PointF(p.X-4.9f,p.Y-2.7f),//ULtop
-				//			new PointF(p.X+4.9f,p.Y-2.7f),//URtop
-				//			new PointF(p.X+4.9f,p.Y-2f),//URstub
-				//			new PointF(p.X,p.Y+2.8f)});//Bottom
-				//		g.FillPolygon(Brushes.Black,new PointF[] {
-				//			new PointF(p.X-4,p.Y-2),//UL
-				//			new PointF(p.X+4,p.Y-2),//UR
-				//			new PointF(p.X,p.Y+2)});//Bottom
-				//	}
-				//}
 			}//end for columns.Count
 			//Outline the Title
 			XPen pen=new XPen(cOutline);
-			if(isSheetGrid) {
-				g.DrawRectangle(pen,p(x),p(y),p(Width),p(HeaderHeight));
-			}
-			else {
-				//Draw line from UL to LL to LR to UR. bottom three sides of a rectangle.
-				g.DrawLines(pen,new XPoint[] { 
-				new XPoint(p(x),p(y)),
-				new XPoint(p(x),p(y+titleHeight-3)),
-				new XPoint(p(x+Width),p(y+titleHeight-3)),
-				new XPoint(p(x+Width),p(y))});
-			}
-			if(isSheetGrid) {
-				g.DrawLine(new XPen(cOutline),p(x),p(y+headerHeight),p(x+Width),p(y+headerHeight));
-			}
-			else {
-				g.DrawLine(new XPen(Color.FromArgb(120,120,120)),p(x),p(y+headerHeight),p(x+Width),p(y+headerHeight));
-			}
+			g.DrawRectangle(pen,p(x),p(y),p(Width),p(HeaderHeight));
+			g.DrawLine(new XPen(cOutline),p(x),p(y+headerHeight),p(x+Width),p(y+headerHeight));
 		}
-
-		public void DrawTitleAndHeaders(Graphics g, int x=0, int y=0) {
-			DrawTitle(g,x,y);
-			DrawHeader(g,x,y+titleHeight);
-		}
-
-		///<summary>Draws outline around entire control.</summary>
-		private void DrawOutline(Graphics g) {
-			if(hScroll.Visible) {//for the little square at the lower right between the two scrollbars
-				g.FillRectangle(new SolidBrush(Color.FromKnownColor(KnownColor.Control)),Width-vScroll.Width-1,
-					Height-hScroll.Height-1,vScroll.Width,hScroll.Height);
-			}
-			Color cOutline=Color.FromArgb(119,119,146);
-			if(_useBlueTheme){
-				cOutline=Color.FromArgb(47,70,117);
-			}
-			using(Pen pen=new Pen(cOutline)) {
-				g.DrawRectangle(pen,0,0,Width-1,Height-1);
-			}
-		}
-		#endregion
-
-		#region Clicking
-		///<summary></summary>
-		protected void OnCellDoubleClick(int col,int row) {
-			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
-			if(CellDoubleClick!=null) {
-				CellDoubleClick(this,gArgs);
-			}
-		}
-
-		///<summary></summary>
-		protected override void OnDoubleClick(EventArgs e) {
-			base.OnDoubleClick(e);
-			if(MouseDownRow==-1) {
-				return;//double click was in the title or header section
-			}
-			if(MouseDownCol==-1) {
-				return;//click was to the right of the columns
-			}
-			OnCellDoubleClick(MouseDownCol,MouseDownRow);
-		}
-
-		///<summary></summary>
-		protected void OnCellClick(int col,int row,MouseButtons button) {
-			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,button);
-			if(CellClick!=null) {
-				CellClick(this,gArgs);
-			}
-		}
-
-		///<summary></summary>
-		protected override void OnClick(EventArgs e) {
-			base.OnClick(e);
-			if(MouseDownRow==-1) {
-				return;//click was in the title or header section
-			}
-			if(MouseDownCol==-1) {
-				return;//click was to the right of the columns
-			}
-			OnCellClick(MouseDownCol,MouseDownRow,lastButtonPressed);
-		}
-		#endregion Clicking
-
-		#region BeginEndUpdate
-		///<summary>Call this before adding any rows.  You would typically call Rows.Clear after this.</summary>
-		public void BeginUpdate() {
-			IsUpdating=true;
-		}
-
-		///<summary>Must be called after adding rows.  This computes the columns, computes the rows, lays out the scrollbars, clears SelectedIndices, and invalidates.  Does not zero out scrollVal.  Sometimes, it seems like scrollVal needs to be reset somehow because it's an inappropriate number, and when you first grab the scrollbar, it jumps.  No time to investigate.</summary>
-		public void EndUpdate() {
-			ComputeColumns();
-			using(Graphics g=this.CreateGraphics()) {
-				ComputeRows(g);
-			}
-			LayoutScrollBars();
-			//ScrollValue=0;
-			selectedIndices=new ArrayList();
-			selectedCell=new Point(-1,-1);
-			if(editBox!=null) {
-				editBox.Dispose();
-			}
-			sortedByColumnIdx=-1;
-			IsUpdating=false;
-			Invalidate();
-		}
-		#endregion BeginEndUpdate
-
-		#region Printing
 
 		///<summary>(Not used for sheet printing) If there are more pages to print, it returns -1.  If this is the last page, it returns the yPos of where the printing stopped.  Graphics will be paper, pageNumber resets some class level variables at page 0, bounds are used to contain the grid drawing, and marginTopFirstPage leaves room so as to not overwrite the title and subtitle.</summary>
-		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage) {
-			return PrintPage(g,pageNumber,bounds,marginTopFirstPage,false);
-		}
-
-		///<summary>(Not used for sheet printing) Same as PrintPage, but added bool to signature for HasHeaderEveryPage. </summary>
-		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage,bool HasHeaderSpaceOnEveryPage) {
+		public int PrintPage(Graphics g,int pageNumber,Rectangle bounds,int marginTopFirstPage,bool HasHeaderSpaceOnEveryPage=false) {
 			//Printers ignore TextRenderingHint.AntiAlias.  
 			//And they ignore SmoothingMode.HighQuality.
 			//They seem to do font themselves instead of letting us have control.
@@ -2750,6 +2963,27 @@ namespace OpenDental.UI {
 
 
 
+	}
+
+	public class ODPrintRow {
+		///<summary>YPos relative to top of entire grid.  When printing this includes adjustments for page breaks.  If row has title/header the title/header should be drawn at this position.</summary>
+		public int YPos;
+		///<summary>Usually only true for some grids, and only for the first row.</summary>
+		public bool IsTitleRow;
+		///<summary>Usually true if row is at the top of a new page, or when changing patients in a statement grid.</summary>
+		public bool IsHeaderRow;
+		///<summary>True for rows that require a bold bottom line, at end of entire grid, at page breaks, or at a separation in the grid.</summary>
+		public bool IsBottomRow;
+		///<summary>Rarely true, usually only for last row in particular grids.</summary>
+		public bool IsFooterRow;
+
+		public ODPrintRow(int yPos,bool isTitleRow,bool isHeaderRow,bool isBottomRow,bool isFooterRow) {
+			YPos=yPos;
+			IsTitleRow=isTitleRow;
+			IsHeaderRow=isHeaderRow;
+			IsBottomRow=isBottomRow;
+			IsFooterRow=isFooterRow;
+		}
 	}
 
 

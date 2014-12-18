@@ -49,7 +49,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(364, 128);
+			this.butOK.Location = new System.Drawing.Point(364, 141);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -64,7 +64,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(364, 158);
+			this.butCancel.Location = new System.Drawing.Point(364, 171);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -81,7 +81,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(15, 158);
+			this.butDelete.Location = new System.Drawing.Point(15, 171);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(77, 24);
 			this.butDelete.TabIndex = 100;
@@ -178,7 +178,7 @@ namespace OpenDental{
 			// 
 			this.checkPmtOpt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPmtOpt.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPmtOpt.Location = new System.Drawing.Point(12, 116);
+			this.checkPmtOpt.Location = new System.Drawing.Point(12, 138);
 			this.checkPmtOpt.Name = "checkPmtOpt";
 			this.checkPmtOpt.Size = new System.Drawing.Size(130, 20);
 			this.checkPmtOpt.TabIndex = 236;
@@ -188,7 +188,7 @@ namespace OpenDental{
 			// butColor
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Location = new System.Drawing.Point(129, 139);
+			this.butColor.Location = new System.Drawing.Point(129, 116);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(30, 20);
 			this.butColor.TabIndex = 237;
@@ -197,7 +197,7 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label2.Location = new System.Drawing.Point(52, 139);
+			this.label2.Location = new System.Drawing.Point(52, 116);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(71, 16);
 			this.label2.TabIndex = 238;
@@ -207,7 +207,7 @@ namespace OpenDental{
 			// FormSheetFieldLine
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(451, 194);
+			this.ClientSize = new System.Drawing.Size(451, 207);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.butColor);
 			this.Controls.Add(this.checkPmtOpt);

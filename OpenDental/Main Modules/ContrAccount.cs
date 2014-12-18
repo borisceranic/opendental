@@ -3589,6 +3589,10 @@ namespace OpenDental {
 		}
 
 		private void menuItemStatementEmail_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EmailSend)) {
+				Cursor=Cursors.Default;
+				return;
+			}
 			Statement stmt=new Statement();
 			stmt.PatNum=PatCur.Guarantor;
 			stmt.DateSent=DateTimeOD.Today;
@@ -3880,13 +3884,45 @@ namespace OpenDental {
 
 		private void PrintStatmentSheets(Statement stmt) {
 			Cursor=Cursors.WaitCursor;
-//#error find the correct statement sheet.
-//#error insert statement sheets to DB
-//#error finish this function
 			Statements.Insert(stmt);
-			FormRpStatement FormST=new FormRpStatement();
-			DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
-			FormST.CreateStatementPdf(stmt,PatCur,FamCur,dataSet);
+			if(PrefC.GetBool(PrefName.StatementsUseSheets)) {
+				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+				SheetFiller.FillFields(sheet,stmt);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),stmt.PatNum.ToString()+".pdf");
+				SheetPrinting.CreatePdf(sheet,tempPath,stmt);
+				long category=0;
+				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
+						category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
+						break;
+					}
+				}
+				if(category==0) {
+					category=DefC.Short[(int)DefCat.ImageCats][0].DefNum;//put it in the first category.
+				}
+				//create doc--------------------------------------------------------------------------------------
+				OpenDentBusiness.Document docc=null;
+				try {
+					docc=ImageStore.Import(tempPath,category,Patients.GetPat(stmt.PatNum));
+				}
+				catch {
+					MsgBox.Show(this,"Error saving document.");
+					//this.Cursor=Cursors.Default;
+					return;
+				}
+				docc.ImgType=ImageType.Document;
+				docc.DateCreated=stmt.DateSent;
+				Documents.Update(docc);
+				stmt.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
+				Statements.AttachDoc(stmt.StatementNum,docc.DocNum);
+			}
+			else {
+				FormRpStatement FormST=new FormRpStatement();
+				DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
+				FormST.CreateStatementPdf(stmt,PatCur,FamCur,dataSet);
+			}
 			//if(ImageStore.UpdatePatient == null){
 			//	ImageStore.UpdatePatient = new FileStore.UpdatePatientDelegate(Patients.Update);
 			//}
@@ -3894,6 +3930,10 @@ namespace OpenDental {
 			string guarFolder=ImageStore.GetPatientFolder(guar,ImageStore.GetPreferredAtoZpath());
 			//OpenDental.Imaging.ImageStoreBase imageStore = OpenDental.Imaging.ImageStore.GetImageStore(guar);
 			if(stmt.Mode_==StatementMode.Email) {
+				if(!Security.IsAuthorized(Permissions.EmailSend)) {
+					Cursor=Cursors.Default;
+					return;
+				}
 				string attachPath=EmailMessages.GetEmailAttachPath();
 				Random rnd=new Random();
 				string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
