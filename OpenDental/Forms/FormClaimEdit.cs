@@ -5395,9 +5395,22 @@ namespace OpenDental{
 				try {
 					Eclaims.Canadian.SendClaim(listQueue[0],true);//Ignore the etransNum result. Physically print the form.
 				}
+				catch(ApplicationException ex) {
+					//Custom error messages are thrown as ApplicationExceptions in SendClaim().
+					//There are probably no other scenarios where an ApplicationException thrown.  If there are, then the user will still get the message, but not the details.  Not a big deal.
+					Cursor=Cursors.Default;
+					//The message is translated before thrown, so we do not need to translate here.
+					//We show the message in a copy/paste window so that our techs and users can quickly copy the message and search for a solution.
+					MsgBoxCopyPaste form=new MsgBoxCopyPaste(ex.Message);
+					form.ShowDialog();
+					return;
+				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
-					MessageBox.Show(ex.ToString());
+					//The message is translated before thrown, so we do not need to translate here.
+					//We show the message in a copy/paste window so that our techs and users can quickly copy the message and search for a solution.
+					MsgBoxCopyPaste form=new MsgBoxCopyPaste(ex.ToString());
+					form.ShowDialog();
 					return;
 				}
 			}
