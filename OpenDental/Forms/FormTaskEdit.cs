@@ -990,7 +990,7 @@ namespace OpenDental {
 							comboTaskPriorities.SelectedIndex=i;//Change selection to the triage blue
 						}
 					}
-					textDescript.Text+=" @@";
+					//textDescript.Text+=" @@";//Taken care of when selectedIndex is changed on the line above
 				}
 				_numNotes=NoteList.Count;
 			}
@@ -1121,9 +1121,10 @@ namespace OpenDental {
 			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
 				return;
 			}
+			int textDescriptCursorPosition=textDescript.SelectionStart;
 			//Handles the blue color.  If it is currently blue, we're changing it to white.
-			if(textDescript.Text.Contains("@@") || _pritoryDefNumSelected==_triageBlueNum) {
-				textDescript.Text=textDescript.Text.Replace("@@","");
+			if(_pritoryDefNumSelected==_triageBlueNum) {//Also goes here if it's red, and blue button is clicked while @@'s are present (aka. CUSTOMER @@)
+				textDescript.Text=textDescript.Text.Replace("@@","");//Replace any @@'s if present
 				_pritoryDefNumSelected=_triageWhiteNum;//White
 				for(int i=0;i<_listTaskPriorities.Count;i++) {
 					if(_listTaskPriorities[i].DefNum==_triageWhiteNum) {
@@ -1132,7 +1133,9 @@ namespace OpenDental {
 				}
 			}
 			else if(color==butBlue.Name) {//Blue button was pressed, we change the task to be blue
-				textDescript.Text+=" @@";
+				if(!textDescript.Text.Contains("@@")) {
+					textDescript.Text+=" @@";
+				}
 			}
 			//Handles the red color. If it is currently red, we're changing it to white
 			if(textDescript.Text.Contains("CUSTOMER")
@@ -1155,6 +1158,9 @@ namespace OpenDental {
 						}
 					}
 				}
+				if(textDescriptCursorPosition > -1) {
+					textDescript.SelectionStart=textDescriptCursorPosition;
+				}
 			}
 			else if(color==butRed.Name) {//Red button was pressed, we change the task to red.
 				textDescript.Text+=" !!";
@@ -1174,38 +1180,53 @@ namespace OpenDental {
 			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
 				return;
 			}
+			if(IsNew && textDescript.Text.Trim()=="") {
+				return;
+			}
+			int textDescriptCursorPosition=textDescript.SelectionStart;
 			string descriptText=textDescript.Text;
 			if(_pritoryDefNumSelected==_triageRedNum) {//User manually changed to red.
 				descriptText=descriptText.Replace(" @@","");//Strip out any @@'s
-				if(!descriptText.Contains("!!")) {
+				if(!descriptText.Contains("!!")
+						&&!descriptText.Contains("CUSTOMER")
+						&&!descriptText.Contains("DOWN")
+						&&!descriptText.Contains("URGENT")
+						&&!descriptText.Contains("CONFERENCE")) 
+				{
 					descriptText+=" !!";//Add !!'s
 				}
 			}
-			else if(_pritoryDefNumSelected==_triageBlueNum) {//User manually changed to blue.
-				descriptText=descriptText.Replace(" !!","");//Change out any triageRed text
+			else if(_pritoryDefNumSelected==_triageBlueNum) {//Index changed to blue
+				descriptText=descriptText.Replace("!!","");//Change out any triageRed text
 				descriptText=descriptText.Replace("CUSTOMER","customer");
 				descriptText=descriptText.Replace("DOWN","down");
 				descriptText=descriptText.Replace("URGENT","urgent");
 				descriptText=descriptText.Replace("CONFERENCE","conference");
 				if(!descriptText.Contains("@@")) {
-					descriptText+=" @@";//Add blue text
+					descriptText+=" @@";//Add blue text, gets fired when opening up new task in triage list so automatically appends @@'s
 				}
 			}
 			else { //Remove all triggers from the text box that would force the priority to change to red or blue.  This allows other colors, like white, or brown, etc.
-				descriptText=descriptText.Replace(" !!","");//Change out any triageRed and triageBlue text
-				descriptText=descriptText.Replace(" @@","");
+				descriptText=descriptText.Replace("!!","");//Change out any triageRed and triageBlue text
+				descriptText=descriptText.Replace("@@","");
 				descriptText=descriptText.Replace("CUSTOMER","customer");
 				descriptText=descriptText.Replace("DOWN","down");
 				descriptText=descriptText.Replace("URGENT","urgent");
 				descriptText=descriptText.Replace("CONFERENCE","conference");
 			}
 			textDescript.Text=descriptText;
+			if(textDescriptCursorPosition > -1) {
+				textDescript.SelectionStart=textDescriptCursorPosition;
+			}
 		}
 
 		///<summary>Looks at the text in the description, and correctly sets comboTaskPriorities based on what color it should be.</summary>
 		private void UpdateTaskPriorityForTriageBasedOnDescript() {
 			//We could potentially make this user customizeable!
 			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If triage task list and HQ
+				return;
+			}
+			if(textDescript.Text.Trim()=="") {
 				return;
 			}
 			int indexToSelect=-1;
