@@ -37,6 +37,8 @@ namespace OpenDental {
 			if(!UpdateCodeSystemThread.IsRunning) { //All done, exit.
 				if(_hasDownloaded) {
 					DataValid.SetInvalid(InvalidType.EhrCodes);//Update in-memory list of codes for all other workstations
+					DataValid.SetInvalid(InvalidType.Diseases);//The purpose of this line is to refresh the ICD9 cache, because the ICD9s do not have an invalid type yet.
+					DataValid.SetInvalid(InvalidType.Sops);
 				}
 				return;
 			}
