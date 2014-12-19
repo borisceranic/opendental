@@ -5,34 +5,69 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public class ProviderC {
-		private static List<Provider> listLong;
-		private static List<Provider> list;
+		private static List<Provider> _listLong;
+		private static List<Provider> _listShort;
+		private static object _lock=new object();
 
 		///<summary>Rarely used. Includes all providers, even if hidden.</summary>
 		public static List<Provider> ListLong {
 			get {
-				if(listLong==null) {
-					Providers.RefreshCache();
-				}
-				return listLong;
+				return GetListLong();
 			}
 			set {
-				listLong=value;
+				lock(_lock) {
+					_listLong=value;
+				}
 			}
 		}
 
 		///<summary>This is the list used most often. It does not include hidden providers.</summary>
 		public static List<Provider> ListShort {
 			get {
-				if(list==null) {
+				if(_listShort==null) {
 					Providers.RefreshCache();
 				}
-				return list;
+				return _listShort;
 			}
 			set {
-				list=value;
+				lock(_lock) {
+					_listShort=value;
+				}
 			}
 		}
 
+		public static List<Provider> GetListLong() {
+			bool hasNullList=false;
+			lock(_lock) {
+				hasNullList=_listLong==null;
+			}
+			if(hasNullList) {
+				Providers.RefreshCache();
+			}
+			List<Provider> list=new List<Provider>();
+			lock(_lock) {
+				if(_listLong!=null) {
+					list.AddRange(_listLong);
+				}
+			}
+			return list;
+		}
+
+		public static List<Provider> GetListShort() {
+			bool hasNullList=false;
+			lock(_lock) {
+				hasNullList=_listShort==null;
+			}
+			if(hasNullList) {
+				Providers.RefreshCache();
+			}
+			List<Provider> list=new List<Provider>();
+			lock(_lock) {
+				if(_listShort!=null) {
+					list.AddRange(_listShort);
+				}
+			}
+			return list;
+		}
 	}
 }
