@@ -880,6 +880,9 @@ namespace OpenDentBusiness{
 				return null;
 			}
 			string domain=GetDomainForAddress(strAddressTest);
+			if(domain=="") {
+				return null;
+			}
 			collectionCerts=certResolverLocalCache.GetCertificatesForDomain(domain);
 			if(collectionCerts!=null) {
 				for(int i=0;i<collectionCerts.Count;i++) {
