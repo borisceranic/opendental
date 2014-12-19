@@ -51,7 +51,7 @@ namespace OpenDentBusiness {
 		ReminderSent,
 		///<summary>6</summary>
 		MedicationReconcile,
-		///<summary>7</summary>
+		///<summary>7 - When Summary of Care is provided in one of the following ways: Printed, exported, or sent to the patient portal (for referrals To doctors).</summary>
 		SummaryOfCareProvidedToDr,
 		///<summary>8</summary>
 		TobaccoUseAssessed,
@@ -65,7 +65,7 @@ namespace OpenDentBusiness {
 		CPOE_LabOrdered,
 		///<summary>13</summary>
 		CPOE_RadOrdered,
-		///<summary>14</summary>
+		///<summary>14 - When a Summary of Care is provided to a doctor electronically in one of the following ways: Exported (we assume they send another way), or a Direct message is sent with Summary of Care attached.</summary>
 		SummaryOfCareProvidedToDrElectronic,
 		///<summary>15</summary>
 		SecureMessageFromPat

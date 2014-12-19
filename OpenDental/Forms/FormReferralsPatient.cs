@@ -447,12 +447,6 @@ namespace OpenDental{
 						newMeasureEvent.PatNum=PatCur.PatNum;
 						newMeasureEvent.FKey=FormRAE.RefAttachCur.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
 						EhrMeasureEvents.Insert(newMeasureEvent);
-						newMeasureEvent=new EhrMeasureEvent();
-						newMeasureEvent.DateTEvent=DateTime.Now;
-						newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
-						newMeasureEvent.PatNum=PatCur.PatNum;
-						newMeasureEvent.FKey=FormRAE.RefAttachCur.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
-						EhrMeasureEvents.Insert(newMeasureEvent);
 					}
 					catch {
 						//We are just trying to be helpful so it doesn't really matter if something failed above. 
