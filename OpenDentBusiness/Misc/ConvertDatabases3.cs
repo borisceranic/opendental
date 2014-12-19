@@ -6781,6 +6781,36 @@ namespace OpenDentBusiness {
 						+"'Office')";
 					Db.NonQ(command);
 				}//end Office bridge
+				//Inserting PriorityDefNum into task table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE task ADD PriorityDefNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE task ADD INDEX (PriorityDefNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE task ADD PriorityDefNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE task SET PriorityDefNum = 0 WHERE PriorityDefNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE task MODIFY PriorityDefNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX task_PriorityDefNum ON task (PriorityDefNum)";
+					Db.NonQ(command);
+				}
+				//Inserting new category for task PriorityDefNum defcat in definition table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue,ItemColor) "
+						+"VALUES(33,0,'Normal','D',-1)";//Inserting definition with category 33 (TaskPriorities) with default of white (-1)
+				}
+				else {
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue,ItemColor) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),33,0,'Normal','D',-1)";//33 (TaskPriorities) with default of white (-1)
+				}
+				long defNum=Db.NonQ(command,true);
+				//Updating all tasks with white priority level
+				command="UPDATE task SET PriorityDefNum="+POut.Long(defNum);
+				Db.NonQ(command,true);
 
 
 

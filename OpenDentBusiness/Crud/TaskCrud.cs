@@ -59,6 +59,7 @@ namespace OpenDentBusiness.Crud{
 				task.DateTimeEntry   = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				task.UserNum         = PIn.Long  (table.Rows[i]["UserNum"].ToString());
 				task.DateTimeFinished= PIn.DateT (table.Rows[i]["DateTimeFinished"].ToString());
+				task.PriorityDefNum  = PIn.Long  (table.Rows[i]["PriorityDefNum"].ToString());
 				retVal.Add(task);
 			}
 			return retVal;
@@ -99,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="TaskNum,";
 			}
-			command+="TaskListNum,DateTask,KeyNum,Descript,TaskStatus,IsRepeating,DateType,FromNum,ObjectType,DateTimeEntry,UserNum,DateTimeFinished) VALUES(";
+			command+="TaskListNum,DateTask,KeyNum,Descript,TaskStatus,IsRepeating,DateType,FromNum,ObjectType,DateTimeEntry,UserNum,DateTimeFinished,PriorityDefNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(task.TaskNum)+",";
 			}
@@ -115,7 +116,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)task.ObjectType)+","
 				+    POut.DateT (task.DateTimeEntry)+","
 				+    POut.Long  (task.UserNum)+","
-				+    POut.DateT (task.DateTimeFinished)+")";
+				+    POut.DateT (task.DateTimeFinished)+","
+				+    POut.Long  (task.PriorityDefNum)+")";
 			if(task.Descript==null) {
 				task.Descript="";
 			}
@@ -143,7 +145,8 @@ namespace OpenDentBusiness.Crud{
 				+"ObjectType      =  "+POut.Int   ((int)task.ObjectType)+", "
 				+"DateTimeEntry   =  "+POut.DateT (task.DateTimeEntry)+", "
 				+"UserNum         =  "+POut.Long  (task.UserNum)+", "
-				+"DateTimeFinished=  "+POut.DateT (task.DateTimeFinished)+" "
+				+"DateTimeFinished=  "+POut.DateT (task.DateTimeFinished)+", "
+				+"PriorityDefNum  =  "+POut.Long  (task.PriorityDefNum)+" "
 				+"WHERE TaskNum = "+POut.Long(task.TaskNum);
 			if(task.Descript==null) {
 				task.Descript="";
@@ -202,6 +205,10 @@ namespace OpenDentBusiness.Crud{
 			if(task.DateTimeFinished != oldTask.DateTimeFinished) {
 				if(command!=""){ command+=",";}
 				command+="DateTimeFinished = "+POut.DateT(task.DateTimeFinished)+"";
+			}
+			if(task.PriorityDefNum != oldTask.PriorityDefNum) {
+				if(command!=""){ command+=",";}
+				command+="PriorityDefNum = "+POut.Long(task.PriorityDefNum)+"";
 			}
 			if(command==""){
 				return false;

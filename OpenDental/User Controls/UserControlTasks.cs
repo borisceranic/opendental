@@ -499,19 +499,7 @@ namespace OpenDental {
 					row.Cells.Add(TasksList[i].ParentDesc);
 				}
 				row.Cells.Add(dateStr+objDesc+TasksList[i].Descript+notes);
-				if(TasksList[i].TaskListNum==_TriageListNum) {
-					if(!hasNotes || TasksList[i].Descript.Contains("@@")) {
-						row.ColorBackG=Color.LightBlue;
-					}
-					if(TasksList[i].Descript.Contains("CUSTOMER")
-						|| TasksList[i].Descript.Contains("DOWN")
-						|| TasksList[i].Descript.Contains("URGENT")
-						|| TasksList[i].Descript.Contains("CONFERENCE")
-						|| TasksList[i].Descript.Contains("!!")) 
-					{
-						row.ColorBackG=Color.Salmon;
-					}
-				}
+				row.ColorBackG=DefC.GetColor(DefCat.TaskPriorities,TasksList[i].PriorityDefNum);//No need to do any text detection for triage priorities, we'll just use the task priority colors.
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();

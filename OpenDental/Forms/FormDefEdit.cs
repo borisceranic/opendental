@@ -40,12 +40,15 @@ namespace OpenDental{
 		public static bool CanHide;
 		private OpenDental.UI.Button butDelete;
 		public static bool CanDelete;
+		///<summary>The list of definitions that is showing in FormDefinitions.  This list will typically be out of synch with the cache.  Gets set in the constructor.</summary>
+		private Def[] _defsList;
 		
-		///<summary></summary>
-		public FormDefEdit(Def defCur){
+		///<summary>defCur should be the currently selected def from FormDefinitions.  defList is going to be the in-memory list of definitions currently displaying to the user.  defList typically is out of synch with the cache which is why we need to pass it in.</summary>
+		public FormDefEdit(Def defCur,Def[] defsList){
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
 			DefCur=defCur.Copy();
+			_defsList=defsList;
 		}
 
 		///<summary></summary>
@@ -256,6 +259,21 @@ namespace OpenDental{
 			//MessageBox.Show(Preferences.Cur.ItemColor.ToString());
 		}
 
+		///<summary>Check to make sure that DefCur is not the last showing def in the list of defs that was passed in.  Only helpful for definitions that require at least one def be present.</summary>
+		private bool IsDefCurLastShowing() {
+			int countShowing=0;
+			for(int i=0;i<_defsList.Length;i++) {
+				if(_defsList[i].DefNum==DefCur.DefNum) {
+					continue;
+				}
+				if(_defsList[i].IsHidden) {
+					continue;
+				}
+				countShowing++;
+			}
+			return countShowing==0;
+		}
+
 		private void butColor_Click(object sender, System.EventArgs e) {
 			colorDialog1.Color=butColor.BackColor;
 			colorDialog1.ShowDialog();
@@ -322,6 +340,14 @@ namespace OpenDental{
 						return;
 					}
 					break;
+				case DefCat.TaskPriorities:
+					if(checkHidden.Checked) {
+						if(IsDefCurLastShowing()) {
+							MsgBox.Show(this,"You cannot hide the last priority.");
+							return;
+						}
+					}
+					break;
 				case DefCat.CommLogTypes:
 					if(textValue.Text!="" && textValue.Text!="MISC" && textValue.Text!="APPT" 
 						&& textValue.Text!="FIN" && textValue.Text!="RECALL") 
@@ -372,10 +398,7 @@ namespace OpenDental{
 					break;
 				case DefCat.ProcCodeCats:
 					if(checkHidden.Checked) {
-						Defs.RefreshCache();
-						Def[] enabledDefs=DefC.Short[(int)DefCat.ProcCodeCats];
-						//if no enabled defs or this is the only enabled def, don't allow disabling
-						if(enabledDefs.Length==0 || (enabledDefs.Length==1 && enabledDefs[0].DefNum==DefCur.DefNum)) {
+						if(IsDefCurLastShowing()) {
 							MsgBox.Show(this,"At least one procedure code category must be enabled.");
 							return;
 						}

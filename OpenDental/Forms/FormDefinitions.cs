@@ -221,10 +221,11 @@ namespace OpenDental{
             "Prognosis",
             "Recall/Unsch Status",
             "Supply Categories",
+            "Task Priorities",
             "Treat\' Plan Priorities"});
 			this.listCategory.Location = new System.Drawing.Point(22, 36);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(147, 329);
+			this.listCategory.Size = new System.Drawing.Size(147, 342);
 			this.listCategory.TabIndex = 0;
 			this.listCategory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listCategory_MouseDown);
 			// 
@@ -299,7 +300,8 @@ namespace OpenDental{
 			lookupCat[21]=DefCat.Prognosis;
 			lookupCat[22]=DefCat.RecallUnschedStatus;
 			lookupCat[23]=DefCat.SupplyCats;
-			lookupCat[24]=DefCat.TxPriorities;			
+			lookupCat[24]=DefCat.TaskPriorities;
+			lookupCat[25]=DefCat.TxPriorities;			
 			for(int i=0;i<listCategory.Items.Count;i++){
 				listCategory.Items[i]=Lan.g(this,(string)listCategory.Items[i]);
 				if((int)lookupCat[i]==SelectedCat){
@@ -460,7 +462,15 @@ namespace OpenDental{
 					FormDefEdit.CanHide=false;
 					FormDefEdit.HelpText=Lan.g(this,"The categories for inventory supplies.");
 					break;
-				case 24://"Treat' Plan Priorities":
+				case 24://Task Priorities
+					FormDefEdit.CanDelete=false;
+					FormDefEdit.CanHide=true;
+					FormDefEdit.ValueText=Lan.g(this,"D = Default");
+					FormDefEdit.EnableColor=true;
+					FormDefEdit.EnableValue=true;
+					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection within the task edit window.  Task lists are sorted using the order of these priorities.  They can have any description and color.  At least one priority should be Default (D).  If more than one priority is flagged as the default, the last default in the list will be used.  If no default is set, the last priority will be used.  Changes affect all tasks where the definition is used.");
+					break;
+				case 25://"Treat' Plan Priorities":
 					//SelectedCat=20;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection in the Treatment Plan module.  They can be simple numbers or descriptive abbreviations 7 letters or less.  Changes affect all procedures where the definition is used.");
@@ -599,7 +609,7 @@ namespace OpenDental{
 				FormDEI.ShowDialog();
 			}
 			else {
-				FormDefEdit FormDefEdit2 = new FormDefEdit(DefsList[e.Row]);
+				FormDefEdit FormDefEdit2 = new FormDefEdit(DefsList[e.Row],DefsList);
 				FormDefEdit2.IsNew=false;
 				FormDefEdit2.ShowDialog();
 				//Preferences2.GetCatList(listCategory.SelectedIndex);
@@ -626,7 +636,7 @@ namespace OpenDental{
 				}
 			}
 			else {
-				FormDefEdit FormDE=new FormDefEdit(DefCur);
+				FormDefEdit FormDE=new FormDefEdit(DefCur,DefsList);
 				FormDE.IsNew=true;
 				FormDE.ShowDialog();
 				if(FormDE.DialogResult!=DialogResult.OK) {
@@ -647,6 +657,25 @@ namespace OpenDental{
 			//Warn the user if they are about to hide a billing type currently in use.
 			if(DefsList[DefsSelected].Category==DefCat.BillingTypes && Patients.IsBillingTypeInUse(DefsList[DefsSelected].DefNum)) {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: Billing type is currently in use by patients.")) {
+					return;
+				}
+			}
+			//Stop users from hiding the last definition in categories that must have at least one def in them.
+			if(DefsList[DefsSelected].Category==DefCat.TaskPriorities
+				|| DefsList[DefsSelected].Category==DefCat.ProcCodeCats) 
+			{
+				int countShowing=0;
+				for(int i=0;i<DefsList.Length;i++) {
+					if(DefsList[i].DefNum==DefsList[DefsSelected].DefNum) {
+						continue;
+					}
+					if(DefsList[i].IsHidden) {
+						continue;
+					}
+					countShowing++;
+				}
+				if(countShowing==0) {
+					MsgBox.Show(this,"You cannot hide the last definition in this category.");
 					return;
 				}
 			}

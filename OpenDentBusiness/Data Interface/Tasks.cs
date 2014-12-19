@@ -187,17 +187,13 @@ namespace OpenDentBusiness{
 				//otherwise, restrict by current user
 				command+="AND taskunread.UserNum="+POut.Long(currentUserNum)+") IsUnread, ";
 			}
-			command+="patient.LName,patient.FName,patient.Preferred ";
-			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
-				command+=",COALESCE(MAX(tasknote.DateTimeNote),task.DateTimeEntry) AS 'LastUpdated',"
-					+"CASE WHEN tasknote.TaskNoteNum IS NULL THEN 0 ELSE 1 END AS 'HasNotes' ";
-			}
-			command+="FROM task "
-				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" ";
-			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
-				command+="LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum ";
-			}
-			command+="WHERE TaskListNum="+POut.Long(listNum);
+			command+="patient.LName,patient.FName,patient.Preferred, "
+							+"COALESCE(MAX(tasknote.DateTimeNote),task.DateTimeEntry) AS 'LastUpdated',"
+							+"CASE WHEN tasknote.TaskNoteNum IS NULL THEN 0 ELSE 1 END AS 'HasNotes' "
+							+"FROM task "
+							+"LEFT JOIN patient ON task.KeyNum=patient.PatNum AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" "
+							+"LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum "
+							+"WHERE TaskListNum="+POut.Long(listNum);
 			if(showDone) {
 				command+=" AND (TaskStatus !="+POut.Long((int)TaskStatusEnum.Done)
 					+" OR DateTimeFinished > "+POut.Date(startDate)+")";//of if done, then restrict date
@@ -205,28 +201,22 @@ namespace OpenDentBusiness{
 			else {
 				command+=" AND TaskStatus !="+POut.Long((int)TaskStatusEnum.Done);
 			}
-			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
-				command+=" GROUP BY task.TaskNum";//Sorting happens below
-			}
-			command+=" ORDER BY DateTimeEntry";
+			command+=" GROUP BY task.TaskNum "//Sorting happens below
+							+" ORDER BY DateTimeEntry";
 			DataTable table=Db.GetTable(command);
 			List<Task> taskList=new List<Task>();
-			if(listNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Note: Only used for HQ, Oracle does not matter.
-				List<DataRow> listRows=new List<DataRow>();
-				for(int i=0;i<table.Rows.Count;i++) {
-					listRows.Add(table.Rows[i]);
-				}
-				listRows.Sort(TaskComparer);//We can only sort a list because the sort function requires input data.
-				DataTable tableSorted=table.Clone();//Easy way to copy the columns.
-				tableSorted.Rows.Clear();
-				for(int i=0;i<listRows.Count;i++) {
-					tableSorted.Rows.Add(listRows[i].ItemArray);
-				}
-				taskList=TableToList(tableSorted);
+			//Note: Only used for HQ, Oracle does not matter.
+			List<DataRow> listRows=new List<DataRow>();
+			for(int i=0;i<table.Rows.Count;i++) {
+				listRows.Add(table.Rows[i]);
 			}
-			else {//Not special triage sorting
-				taskList=TableToList(table);
+			listRows.Sort(TaskComparer);
+			DataTable tableSorted=table.Clone();//Easy way to copy the columns.
+			tableSorted.Rows.Clear();
+			for(int i=0;i<listRows.Count;i++) {
+				tableSorted.Rows.Add(listRows[i].ItemArray);
 			}
+			taskList=TableToList(tableSorted);
 			return taskList;
 		}
 
@@ -362,15 +352,63 @@ namespace OpenDentBusiness{
 				if(task.UserNum!=oldTask.UserNum) {
 					TaskEditCreateLog(Lans.g("Tasks","Changed user from")+" "+Userods.GetName(oldTask.UserNum),task);//+" To "+Userods.GetName(task.UserNum)),task);
 				}
-				if(task.KeyNum!=oldTask.KeyNum) {
-					long newPat=(task.ObjectType==TaskObjectType.Patient?task.KeyNum:Appointments.GetOneApt(task.KeyNum).PatNum);
-					long oldPat=(oldTask.ObjectType==TaskObjectType.Patient?oldTask.KeyNum:Appointments.GetOneApt(oldTask.KeyNum).PatNum);
-					if(newPat!=oldPat){
-						TaskEditCreateLog(Lans.g("tasks","Attached patient changed from")+" "+oldPat.ToString(),task);//+" to "+newPat.ToString()),task);					
+				if(task.KeyNum!=oldTask.KeyNum) {//We know at this point that SOMETHING with the task association changed.
+					Patient patOld=null;
+					Patient patNew=null;
+					string log="";
+					#region Old Task Object Type
+					if(oldTask.KeyNum > 0) {//Old task had a patient/appointment
+						if(oldTask.ObjectType==TaskObjectType.Patient) {//It was a patient
+							patOld=Patients.GetLim(oldTask.KeyNum);
+							log+=Lans.g("Tasks","Task object type changed from patient")+" "+patOld.GetNameFL()+" ";
+						}
+						else {//It was an appointment
+							log+=Lans.g("Tasks","Task object type changed from appointment for")+" ";
+							Appointment aptOld=Appointments.GetOneApt(oldTask.KeyNum);
+							patOld=Patients.GetLim(aptOld.PatNum);
+							if(aptOld==null) {
+								log+=Lans.g("Tasks","(appointment deleted)")+" ";
+							}
+							else {
+								log+=Lans.g("Tasks",patOld.GetNameLF()
+									+"  "+aptOld.AptDateTime.ToString()
+									+"  "+aptOld.ProcDescript+" ");
+							}
+						}
 					}
+					else {//Old task had "None"
+						log+=Lans.g("Tasks","Task object type changed from none")+" ";
+					}
+					#endregion
+					#region New Task Object Type
+					if(task.KeyNum > 0) {//New task has a patient/appointment
+						if(task.ObjectType==TaskObjectType.Patient) {//It was a patient
+							patNew=Patients.GetLim(task.KeyNum);
+							log+=Lans.g("Tasks","to object type patient")+" "+patNew.GetNameFL();
+						}
+						else {//It was an appointment
+							log+=Lans.g("Tasks","to object type appointment for")+" ";
+							Appointment aptNew=Appointments.GetOneApt(task.KeyNum);
+							patNew=Patients.GetLim(aptNew.PatNum);
+							if(aptNew==null) {
+								log+=Lans.g("Tasks","(appointment deleted)");
+							}
+							else {
+								log+=Lans.g("Tasks",patNew.GetNameLF()
+									+"  "+aptNew.AptDateTime.ToString()
+									+"  "+aptNew.ProcDescript);
+							}
+						}
+					}
+					else {
+						log+=Lans.g("Tasks","to object type none.");
+					}
+					#endregion
+					//Make a log depending on what happened with the object type association.
+					TaskEditCreateLog(log,task);
 				}
 				if(task.TaskListNum!=oldTask.TaskListNum) {
-					TaskEditCreateLog(Lans.g("tasks","Task moved from "+TaskLists.GetOne(oldTask.TaskListNum).Descript),task);
+					TaskEditCreateLog(Lans.g("Tasks","Task moved from "+TaskLists.GetOne(oldTask.TaskListNum).Descript),task);
 				}
 			}
 			Crud.TaskCrud.Update(task);
@@ -518,45 +556,35 @@ namespace OpenDentBusiness{
 		}
 
 		public static int TaskComparer(DataRow x,DataRow y) {
-			int xTaskColor=FindTaskColor(x["Descript"].ToString(),PIn.Bool(x["HasNotes"].ToString()));
-			int yTaskColor=FindTaskColor(y["Descript"].ToString(),PIn.Bool(y["HasNotes"].ToString()));
-			//All tasks that are currently blue NEED to use the task date time and not the most recent task note time.
-			//We do this here because it is too complicated to update the query to consider the color of tasks.
-			if(xTaskColor==1) {//blue
-				x["LastUpdated"]=x["DateTimeEntry"];
-			}
-			if(yTaskColor==1) {//blue
-				y["LastUpdated"]=y["DateTimeEntry"];
-			}
-			//Now compare the times of tasks that share the same color.
-			if(xTaskColor==yTaskColor) {//Case 1: Tasks have same colors, sort by date.
-				return CompareTimes(x,y);
-			}
-			else {//Case 2: Tasks have different colors, sort by priority.
-				if(xTaskColor>yTaskColor) {
+			//sort by priority, then time
+			long xTaskPriorityDefNum=PIn.Long(x["PriorityDefNum"].ToString());
+			long yTaskPriorityDefNum=PIn.Long(y["PriorityDefNum"].ToString());
+			if(xTaskPriorityDefNum > 0 && yTaskPriorityDefNum > 0) {//They're both good
+				//If there is a valid priority set, we want to sort by the priorities first.
+				int xTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,xTaskPriorityDefNum).ItemOrder;
+				int yTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,yTaskPriorityDefNum).ItemOrder;
+				if(xTaskPriorityItemOrder<yTaskPriorityItemOrder) {//0 ItemOrder is higher priority than 1 ItemOrder
 					return -1;
 				}
-				else {
+				else if(xTaskPriorityItemOrder>yTaskPriorityItemOrder) {
 					return 1;
 				}
+				else {//Both the same priority, look at the times. (Should we just look at Task times now instead of note times?)
+					return CompareTimes(x,y);
+				}
 			}
-		}
-
-		///<summary>Figures out what the current color of the task passed is and returns an int based on color priority.  0 = white, 1 = blue, 2 = red</summary>
-		public static int FindTaskColor(string taskDescript,bool hasTaskNotes) {
-			int taskColor=0;//Default white
-			if(taskDescript.Contains("CUSTOMER")
-				|| taskDescript.Contains("DOWN")
-				|| taskDescript.Contains("URGENT")
-				|| taskDescript.Contains("CONFERENCE")
-				|| taskDescript.Contains("!!")) 
-			{
-				taskColor=2;//red
+			else if(xTaskPriorityDefNum > 0 && yTaskPriorityDefNum < 1) {//x is good, y is not good.
+				return -1;
 			}
-			else if(!hasTaskNotes || taskDescript.Contains("@@")) {
-				taskColor=1;//blue
+			else if(yTaskPriorityDefNum > 0 && xTaskPriorityDefNum < 1) {//x is not good, y is good.
+				return 1;
 			}
-			return taskColor;
+			//There should never be a task without a priority.  If there is, we need to sort the non-priority tasks among themselves and move them all to the bottom.
+			else if(xTaskPriorityDefNum==0 && yTaskPriorityDefNum==0) {//Neither are good.
+				return CompareTimes(x,y);
+			}
+			//If all else failes, sort by time.
+			return CompareTimes(x,y);//This should never happen.
 		}
 
 		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>

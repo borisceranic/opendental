@@ -47,6 +47,8 @@ namespace OpenDentBusiness{
 		///<Summary>Not a database column.  Attached patient's name (NameLF) if there is an attached patient.</Summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public string PatientName;
+		///<summary>FK to definition.DefNum.  The priority for this task which is used when filling task lists.  The placement of the task in the list is dependent on the item order of the definitions.</summary>
+		public long PriorityDefNum;
 
 		///<summary></summary>
 		public Task() {
@@ -72,7 +74,8 @@ namespace OpenDentBusiness{
 				&& ObjectType==((Task)obj).ObjectType
 				&& DateTimeEntry==((Task)obj).DateTimeEntry
 				&& UserNum==((Task)obj).UserNum
-				&& DateTimeFinished==((Task)obj).DateTimeFinished)
+				&& DateTimeFinished==((Task)obj).DateTimeFinished
+				&& PriorityDefNum==((Task)obj).PriorityDefNum)
 			{
 				return true;
 			}

@@ -44,7 +44,7 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Gets a list of defs for one category.</summary>
+		///<summary>Gets a list of non-hidden defs for one category.</summary>
 		public static Def[] GetList(DefCat defCat) {
 			return Short[(int)defCat];
 		}

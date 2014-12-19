@@ -126,7 +126,9 @@ namespace OpenDentBusiness {
 		///<summary>31- Custom Tracking, statuses such as 'review', 'hold', 'riskmanage', etc.</summary>
 		ClaimCustomTracking,
 		///<summary>32- PayType for claims such as 'Check', 'EFT', etc.</summary>
-		InsurancePaymentType
+		InsurancePaymentType,
+		///<summary>33- Categories of priorities for tasks.</summary>
+		TaskPriorities
 	}
 
 	
