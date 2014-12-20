@@ -176,7 +176,9 @@ namespace OpenDentBusiness{
 						catch { }
 						try { ehrLabCur.UsiCodeSystemNameAlt	=																			fields[4].Split('^')[5]; }
 						catch { }
-						try { ehrLabCur.UsiTextOriginal				=																			fields[4].Split('^')[6]; }
+						//OBR-4.6 - Coding System Version ID
+						//OBR-4.7 - Alternate Coding System Version ID
+						try { ehrLabCur.UsiTextOriginal				=																			fields[4].Split('^')[8]; }
 						catch { }
 						//Observation Date Time
 						ehrLabCur.ObservationDateTimeStart		=fields[7];
@@ -205,7 +207,9 @@ namespace OpenDentBusiness{
 							catch { }
 							try { ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt			=tempClinInfo.Split('^')[5]; }
 							catch { }
-							try { ehrLabClinicalInfo.ClinicalInfoTextOriginal						=tempClinInfo.Split('^')[6]; }
+							//OBR-13.6 - Coding System Version ID
+							//OBR-13.7 - Alternate Coding System Version ID
+							try { ehrLabClinicalInfo.ClinicalInfoTextOriginal						=tempClinInfo.Split('^')[8]; }
 							catch { }
 							ehrLabCur.ListRelevantClinicalInformations.Add(ehrLabClinicalInfo);
 						}
@@ -227,7 +231,9 @@ namespace OpenDentBusiness{
 						catch { }
 						try { ehrLabCur.ParentObservationCodeSystemNameAlt		=fields[26].Split('^')[0].Split('&')[5]; }
 						catch { }
-						try { ehrLabCur.ParentObservationTextOriginal					=fields[26].Split('^')[0].Split('&')[6]; }
+						//OBR-26.0.6 - Coding System Version ID
+						//OBR-26.0.7 - Alternate Coding System Version ID
+						try { ehrLabCur.ParentObservationTextOriginal					=fields[26].Split('^')[0].Split('&')[8]; }
 						catch { }
 						try { ehrLabCur.ParentObservationSubID								=fields[26].Split('^')[1]; }
 						catch { }
@@ -338,8 +344,10 @@ namespace OpenDentBusiness{
 						catch { }
 						try { labResult.ObservationIdentifierCodeSystemNameAlt	=fields[3].Split('^')[5]; }
 						catch { }
-						if(fields[3].Split('^').Length>6) {
-							labResult.ObservationIdentifierTextOriginal							=fields[3].Split('^')[6];
+						//OBX-3.6 - Coding System Version ID
+						//OBX-3.7 - Alternate Coding System Version ID
+						if(fields[3].Split('^').Length>8) {
+							labResult.ObservationIdentifierTextOriginal							=fields[3].Split('^')[8];
 						}
 						labResult.ObservationIdentifierSub=fields[4];
 						//Observation Value
@@ -357,8 +365,10 @@ namespace OpenDentBusiness{
 								catch { }
 								try { labResult.ObservationValueCodedElementCodeSystemNameAlt			=fields[5].Split('^')[5]; }
 								catch { }
+								//OBX-5.6 - Coding System Version ID
+								//OBX-5.7 - Alternate Coding System Version ID
 								if(labResult.ValueType==HL70125.CWE) {
-									labResult.ObservationValueCodedElementTextOriginal=fields[5].Split('^')[6];
+									labResult.ObservationValueCodedElementTextOriginal=fields[5].Split('^')[8];
 								}
 								break;
 							case HL70125.DT:
@@ -399,7 +409,9 @@ namespace OpenDentBusiness{
 							catch { }
 							try { labResult.UnitsCodeSystemNameAlt	=fields[6].Split('^')[5]; }
 							catch { }
-							try { labResult.UnitsTextOriginal				=fields[6].Split('^')[6]; }
+							//OBX-6.6 - Coding System Version ID
+							//OBX-6.7 - Alternate Coding System Version ID
+							try { labResult.UnitsTextOriginal				=fields[6].Split('^')[8]; }
 							catch { }
 						}
 
@@ -482,7 +494,9 @@ namespace OpenDentBusiness{
 						catch { }
 						try { ehrLabSpecimen.SpecimenTypeCodeSystemNameAlt	= fields[4].Split('^')[5]; }
 						catch { }
-						try { ehrLabSpecimen.SpecimenTypeTextOriginal				= fields[4].Split('^')[6]; }
+						//SPM-4.6 - Coding System Version ID
+						//SPM-4.7 - Alternate Coding System Version ID
+						try { ehrLabSpecimen.SpecimenTypeTextOriginal				= fields[4].Split('^')[8]; }
 						catch { }
 						//TODO:? check to see if either triplet contained a valid code.
 						//Collection Date Time
@@ -513,7 +527,9 @@ namespace OpenDentBusiness{
 							catch { }
 							try { ehrLabRR.SpecimenRejectReasonCodeSystemNameAlt	=fields[21].Split('~')[i].Split('^')[5]; }
 							catch { }
-							try { ehrLabRR.SpecimenRejectReasonTextOriginal				=fields[21].Split('~')[i].Split('^')[6]; }
+							//SPM-21.6 - Coding System Version ID
+							//SPM-21.7 - Alternate Coding System Version ID
+							try { ehrLabRR.SpecimenRejectReasonTextOriginal				=fields[21].Split('~')[i].Split('^')[8]; }
 							catch { }
 							//TODO:? check to see if either triplet contained a valid code.
 							ehrLabSpecimen.ListEhrLabSpecimenRejectReason.Add(ehrLabRR);
@@ -535,7 +551,9 @@ namespace OpenDentBusiness{
 							catch { }
 							try { ehrLabSC.SpecimenConditionCodeSystemNameAlt		=fields[24].Split('~')[i].Split('^')[5]; }
 							catch { }
-							try { ehrLabSC.SpecimenConditionTextOriginal				=fields[24].Split('~')[i].Split('^')[6]; }
+							//SPM-24.6 - Coding System Version ID
+							//SPM-24.7 - Alternate Coding System Version ID
+							try { ehrLabSC.SpecimenConditionTextOriginal				=fields[24].Split('~')[i].Split('^')[8]; }
 							catch { }
 							ehrLabSpecimen.ListEhrLabSpecimenCondition.Add(ehrLabSC);
 						}
