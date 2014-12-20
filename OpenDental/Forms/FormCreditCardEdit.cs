@@ -199,7 +199,13 @@ namespace OpenDental {
 					ProgramProperty prop=(ProgramProperty)ProgramProperties.GetForProgram(prog.ProgramNum)[0];
 					ProcessStartInfo info=new ProcessStartInfo(path);
 					string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
-					File.Delete(resultfile);//delete the old result file.
+					try {
+						File.Delete(resultfile);//delete the old result file.
+					}
+					catch {
+						MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions.");
+						return;
+					}
 					if(CreditCardOld.CCNumberMasked!=CreditCardCur.CCNumberMasked) {//They changed card number which we have to delete archived token which will create a new one next time card is charged.
 						info.Arguments+="/TRANSACTIONTYPE:ARCHIVEVAULTDELETE ";
 						info.Arguments+="/XCACCOUNTID:"+CreditCardCur.XChargeToken+" ";
@@ -234,22 +240,28 @@ namespace OpenDental {
 					Cursor=Cursors.Default;
 					string resulttext="";
 					string line="";
-					using(TextReader reader=new StreamReader(resultfile)) {
-						line=reader.ReadLine();
-						while(line!=null) {
-							if(resulttext!="") {
-								resulttext+="\r\n";
-							}
-							resulttext+=line;
-							if(line.StartsWith("RESULT=")) {
-								if(line!="RESULT=SUCCESS") {
-									CreditCardCur=CreditCards.GetOne(CreditCardCur.CreditCardNum);
-									FillData();
-									return;
-								}
-							}
+					try {
+						using(TextReader reader=new StreamReader(resultfile)) {
 							line=reader.ReadLine();
+							while(line!=null) {
+								if(resulttext!="") {
+									resulttext+="\r\n";
+								}
+								resulttext+=line;
+								if(line.StartsWith("RESULT=")) {
+									if(line!="RESULT=SUCCESS") {
+										CreditCardCur=CreditCards.GetOne(CreditCardCur.CreditCardNum);
+										FillData();
+										return;
+									}
+								}
+								line=reader.ReadLine();
+							}
 						}
+					}
+					catch {
+						MsgBox.Show(this,"There was a problem creating or editing this card with X-Charge.  Please try again.");
+						return;
 					}
 				}//End of special token logic
 				#endregion

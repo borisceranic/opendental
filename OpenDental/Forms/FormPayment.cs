@@ -1280,7 +1280,13 @@ namespace OpenDental {
 			Patient pat=Patients.GetPat(PaymentCur.PatNum);
 			PatientNote patnote=PatientNotes.Refresh(pat.PatNum,pat.Guarantor);
 			string resultfile=Path.Combine(Path.GetDirectoryName(xPath),"XResult.txt");
-			File.Delete(resultfile);//delete the old result file.
+			try {
+				File.Delete(resultfile);//delete the old result file.
+			}
+			catch {
+				MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions.");
+				return;
+			}
 			info.Arguments="";
 			double amt=PIn.Double(textAmount.Text);
 			if(amt<0) {//X-Charge always wants a positive number, even for returns.
@@ -1385,90 +1391,98 @@ namespace OpenDental {
 			string xChargeToken="";
 			string accountMasked="";
 			string expiration="";
-			using(TextReader reader=new StreamReader(resultfile)) {
-				line=reader.ReadLine();
-				/*Example of successful transaction:
-					RESULT=SUCCESS
-					TYPE=Purchase
-					APPROVALCODE=000064
-					ACCOUNT=XXXXXXXXXXXX6781
-					ACCOUNTTYPE=VISA*
-					AMOUNT=1.77
-					AVSRESULT=Y
-					CVRESULT=M
-				*/
-				while(line!=null) {
-					if(resulttext!="") {
-						resulttext+="\r\n";
-					}
-					resulttext+=line;
-					if(line.StartsWith("RESULT=")) {
-						if(line!="RESULT=SUCCESS") {
-							//Charge was a failure and there might be a description as to why it failed. Continue to loop through line.
-							while(line!=null) {
-								line=reader.ReadLine();
-								resulttext+="\r\n"+line;
-							}
-							needToken=false;//Don't update CCard due to failure
-							newCard=false;//Don't insert CCard due to failure
-							break;
-						}
-						if(tranType==1) {
-							xReturn=true;
-						}
-						if(tranType==6) {
-							xAdjust=true;
-						}
-						if(tranType==7) {
-							xVoid=true;
-						}
-					}
-					if(line.StartsWith("APPROVEDAMOUNT=")) {
-						approvedAmt=PIn.Double(line.Substring(15));
-						if(approvedAmt != amt) {
-							showApprovedAmtNotice=true;
-						}
-					}
-					if(line.StartsWith("XCACCOUNTID=")) {
-						xChargeToken=PIn.String(line.Substring(12));
-					}
-					if(line.StartsWith("ACCOUNT=")) {
-						accountMasked=PIn.String(line.Substring(8));
-					}
-					if(line.StartsWith("EXPIRATION=")) {
-						expiration=PIn.String(line.Substring(11));
-					}
-					if(line.StartsWith("ADDITIONALFUNDSREQUIRED=")) {
-						additionalFunds=PIn.Double(line.Substring(24));
-					}
+			try {
+				using(TextReader reader=new StreamReader(resultfile)) {
 					line=reader.ReadLine();
-				}
-				if(needToken && xChargeToken!="") {
-					//Only way this code can be hit is if they have set up a credit card and it does not have a token.
-					//So we'll use the created token from result file and assign it to the coresponding account.
-					//Also will delete the credit card number and replace it with secure masked number.
-					CCard.XChargeToken=xChargeToken;
-					CCard.CCNumberMasked=accountMasked;
-					CCard.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
-					CreditCards.Update(CCard);
-				}
-				if(newCard) {
-					if(xChargeToken=="") {//Shouldn't happen again but leaving just in case.
-						MsgBox.Show(this,"X-Charge didn't return a token so credit card information couldn't be saved.");
+					/*Example of successful transaction:
+						RESULT=SUCCESS
+						TYPE=Purchase
+						APPROVALCODE=000064
+						ACCOUNT=XXXXXXXXXXXX6781
+						ACCOUNTTYPE=VISA*
+						AMOUNT=1.77
+						AVSRESULT=Y
+						CVRESULT=M
+					*/
+					while(line!=null) {
+						if(resulttext!="") {
+							resulttext+="\r\n";
+						}
+						resulttext+=line;
+						if(line.StartsWith("RESULT=")) {
+							if(line!="RESULT=SUCCESS") {
+								//Charge was a failure and there might be a description as to why it failed. Continue to loop through line.
+								while(line!=null) {
+									line=reader.ReadLine();
+									resulttext+="\r\n"+line;
+								}
+								needToken=false;//Don't update CCard due to failure
+								newCard=false;//Don't insert CCard due to failure
+								break;
+							}
+							if(tranType==1) {
+								xReturn=true;
+							}
+							if(tranType==6) {
+								xAdjust=true;
+							}
+							if(tranType==7) {
+								xVoid=true;
+							}
+						}
+						if(line.StartsWith("APPROVEDAMOUNT=")) {
+							approvedAmt=PIn.Double(line.Substring(15));
+							if(approvedAmt != amt) {
+								showApprovedAmtNotice=true;
+							}
+						}
+						if(line.StartsWith("XCACCOUNTID=")) {
+							xChargeToken=PIn.String(line.Substring(12));
+						}
+						if(line.StartsWith("ACCOUNT=")) {
+							accountMasked=PIn.String(line.Substring(8));
+						}
+						if(line.StartsWith("EXPIRATION=")) {
+							expiration=PIn.String(line.Substring(11));
+						}
+						if(line.StartsWith("ADDITIONALFUNDSREQUIRED=")) {
+							additionalFunds=PIn.Double(line.Substring(24));
+						}
+						line=reader.ReadLine();
 					}
-					else {
-						if(FormXT.SaveToken) {
-							CCard=new CreditCard();
-							List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
-							CCard.ItemOrder=itemOrderCount.Count;
-							CCard.PatNum=PatCur.PatNum;
-							CCard.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
-							CCard.XChargeToken=xChargeToken;
-							CCard.CCNumberMasked=accountMasked;
-							CreditCards.Insert(CCard);
+					if(needToken && xChargeToken!="") {
+						//Only way this code can be hit is if they have set up a credit card and it does not have a token.
+						//So we'll use the created token from result file and assign it to the coresponding account.
+						//Also will delete the credit card number and replace it with secure masked number.
+						CCard.XChargeToken=xChargeToken;
+						CCard.CCNumberMasked=accountMasked;
+						CCard.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
+						CreditCards.Update(CCard);
+					}
+					if(newCard) {
+						if(xChargeToken=="") {//Shouldn't happen again but leaving just in case.
+							MsgBox.Show(this,"X-Charge didn't return a token so credit card information couldn't be saved.");
+						}
+						else {
+							if(FormXT.SaveToken) {
+								CCard=new CreditCard();
+								List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
+								CCard.ItemOrder=itemOrderCount.Count;
+								CCard.PatNum=PatCur.PatNum;
+								CCard.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
+								CCard.XChargeToken=xChargeToken;
+								CCard.CCNumberMasked=accountMasked;
+								CreditCards.Insert(CCard);
+							}
 						}
 					}
 				}
+			}
+			catch {
+				MessageBox.Show(Lan.g(this,"There was a problem charging the card.  Please run the credit card report from inside X-Charge to verify that the card was not actually charged.")
+					+"\r\n"+Lan.g(this,"If the card was charged, you need to make sure that the payment amount matches.")
+					+"\r\n"+Lan.g(this,"If the card was not charged, please try again."));
+				return;
 			}
 			if(showApprovedAmtNotice && !xVoid && !xAdjust && !xReturn) {
 				MessageBox.Show(Lan.g(this,"The amount you typed in: ")+amt.ToString("C")

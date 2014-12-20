@@ -76,7 +76,13 @@ namespace OpenDental {
 					string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
 					ProcessStartInfo info=new ProcessStartInfo(path);
 					string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
-					File.Delete(resultfile);//delete the old result file.
+					try {
+						File.Delete(resultfile);//delete the old result file.
+					}
+					catch {
+						MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions.");
+						return;
+					}
 					info.Arguments="";
 					info.Arguments+="/TRANSACTIONTYPE:ArchiveVaultAdd /LOCKTRANTYPE ";
 					info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
@@ -106,42 +112,48 @@ namespace OpenDental {
 					string accountMasked="";
 					string exp="";;
 					bool insertCard=false;
-					using(TextReader reader=new StreamReader(resultfile)) {
-						line=reader.ReadLine();
-						while(line!=null) {
-							if(resulttext!="") {
-								resulttext+="\r\n";
-							}
-							resulttext+=line;
-							if(line.StartsWith("RESULT=")) {
-								if(line!="RESULT=SUCCESS") {
-									break;
-								}
-								insertCard=true;
-							}
-							if(line.StartsWith("XCACCOUNTID=")) {
-								xChargeToken=PIn.String(line.Substring(12));
-							}
-							if(line.StartsWith("ACCOUNT=")) {
-								accountMasked=PIn.String(line.Substring(8));
-							}
-							if(line.StartsWith("EXPIRATION=")) {
-								exp=PIn.String(line.Substring(11));
-							}
+					try {
+						using(TextReader reader=new StreamReader(resultfile)) {
 							line=reader.ReadLine();
+							while(line!=null) {
+								if(resulttext!="") {
+									resulttext+="\r\n";
+								}
+								resulttext+=line;
+								if(line.StartsWith("RESULT=")) {
+									if(line!="RESULT=SUCCESS") {
+										break;
+									}
+									insertCard=true;
+								}
+								if(line.StartsWith("XCACCOUNTID=")) {
+									xChargeToken=PIn.String(line.Substring(12));
+								}
+								if(line.StartsWith("ACCOUNT=")) {
+									accountMasked=PIn.String(line.Substring(8));
+								}
+								if(line.StartsWith("EXPIRATION=")) {
+									exp=PIn.String(line.Substring(11));
+								}
+								line=reader.ReadLine();
+							}
+							if(insertCard && xChargeToken!="") {//Might not be necessary but we've had successful charges with no tokens returned before.
+								CreditCard creditCardCur=new CreditCard();
+								List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
+								creditCardCur.PatNum=PatCur.PatNum;
+								creditCardCur.ItemOrder=itemOrderCount.Count;
+								creditCardCur.CCNumberMasked=accountMasked;
+								creditCardCur.XChargeToken=xChargeToken;
+								creditCardCur.CCExpiration=new DateTime(Convert.ToInt32("20"+PIn.String(exp.Substring(2,2))),Convert.ToInt32(PIn.String(exp.Substring(0,2))),1);
+								CreditCards.Insert(creditCardCur);
+							}
 						}
-						if(insertCard && xChargeToken!="") {//Might not be necessary but we've had successful charges with no tokens returned before.
-							CreditCard creditCardCur=new CreditCard();
-							List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
-							creditCardCur.PatNum=PatCur.PatNum;
-							creditCardCur.ItemOrder=itemOrderCount.Count;
-							creditCardCur.CCNumberMasked=accountMasked;
-							creditCardCur.XChargeToken=xChargeToken;
-							creditCardCur.CCExpiration=new DateTime(Convert.ToInt32("20"+PIn.String(exp.Substring(2,2))),Convert.ToInt32(PIn.String(exp.Substring(0,2))),1);
-							CreditCards.Insert(creditCardCur);
-						}
+						RefreshCardList();
 					}
-					RefreshCardList();
+					catch {
+						MsgBox.Show(this,Lan.g(this,"There was a problem adding the credit card.  Please try again."));
+						return;
+					}
 					return;
 				}
 				else {

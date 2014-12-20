@@ -270,7 +270,14 @@ namespace OpenDental {
 				ProcessStartInfo info=new ProcessStartInfo(xPath);
 				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
 				string resultfile=Path.Combine(Path.GetDirectoryName(xPath),"XResult.txt");
-				File.Delete(resultfile);//delete the old result file.
+				try {
+					File.Delete(resultfile);//delete the old result file.
+				}
+				catch {
+					//Probably did not have permissions to delete the file.  Don't do anything, because a message will show telling them that the cards left in the grid failed.
+					//They will then go try and run the cards in the Account module and will then get a detailed message telling them what is wrong.
+					continue;
+				}
 				info.Arguments="";
 				double amt=PIn.Double(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
 				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
@@ -325,27 +332,32 @@ namespace OpenDental {
 				string line="";
 				string resultText="";
 				recurringResultFile+="PatNum: "+patNum+" Name: "+table.Rows[i]["PatName"].ToString()+"\r\n";
-				using(TextReader reader=new StreamReader(resultfile)) {
-					line=reader.ReadLine();
-					while(line!=null) {
-						if(resultText!="") {
-							resultText+="\r\n";
-						}
-						resultText+=line;
-						if(line.StartsWith("RESULT=")) {
-							if(line=="RESULT=SUCCESS") {
-								success++;
-								labelCharged.Text=Lan.g(this,"Charged=")+success;
-								insertPayment=true;
-							}
-							else {
-								failed++;
-								labelFailed.Text=Lan.g(this,"Failed=")+failed;
-							}
-						}
+				try {
+					using(TextReader reader=new StreamReader(resultfile)) {
 						line=reader.ReadLine();
+						while(line!=null) {
+							if(resultText!="") {
+								resultText+="\r\n";
+							}
+							resultText+=line;
+							if(line.StartsWith("RESULT=")) {
+								if(line=="RESULT=SUCCESS") {
+									success++;
+									labelCharged.Text=Lan.g(this,"Charged=")+success;
+									insertPayment=true;
+								}
+								else {
+									failed++;
+									labelFailed.Text=Lan.g(this,"Failed=")+failed;
+								}
+							}
+							line=reader.ReadLine();
+						}
+						recurringResultFile+=resultText+"\r\n\r\n";
 					}
-					recurringResultFile+=resultText+"\r\n\r\n";
+				}
+				catch {
+					continue;//Cards will still be in the list if something went wrong.
 				}
 				#endregion
 				if(insertPayment) {

@@ -87,7 +87,13 @@ namespace OpenDental {
 				ProgramProperty prop=(ProgramProperty)ProgramProperties.GetForProgram(prog.ProgramNum)[0];
 				ProcessStartInfo info=new ProcessStartInfo(path);
 				string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
-				File.Delete(resultfile);//delete the old result file.
+				try {
+					File.Delete(resultfile);//delete the old result file.
+				}
+				catch {
+					MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions.");
+					break;
+				}
 				info.Arguments+="/TRANSACTIONTYPE:ARCHIVEVAULTQUERY ";
 				info.Arguments+="/XCACCOUNTID:"+CardList[i].XChargeToken+" ";
 				info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
@@ -108,32 +114,38 @@ namespace OpenDental {
 				string line="";
 				string account="";
 				string exp="";
-				using(TextReader reader=new StreamReader(resultfile)) {
-					line=reader.ReadLine();
-					while(line!=null) {
-						if(resulttext!="") {
-							resulttext+="\r\n";
-						}
-						resulttext+=line;
-						if(line.StartsWith("ACCOUNT=")) {
-							account=line.Substring(8);
-						}
-						else if(line.StartsWith("EXPIRATION=")) {
-							exp=line.Substring(11);
-						}
+				try {
+					using(TextReader reader=new StreamReader(resultfile)) {
 						line=reader.ReadLine();
+						while(line!=null) {
+							if(resulttext!="") {
+								resulttext+="\r\n";
+							}
+							resulttext+=line;
+							if(line.StartsWith("ACCOUNT=")) {
+								account=line.Substring(8);
+							}
+							else if(line.StartsWith("EXPIRATION=")) {
+								exp=line.Substring(11);
+							}
+							line=reader.ReadLine();
+						}
+						if(CardList[i].CCNumberMasked.Length>4 && account.Length>4
+							&& CardList[i].CCNumberMasked.Substring(CardList[i].CCNumberMasked.Length-4)==account.Substring(account.Length-4)
+							&& CardList[i].CCExpiration.ToString("MMyy")==exp) 
+						{
+							//The credit card on file matches the one in X-Charge, so remove from the list.
+							CardList.Remove(CardList[i]);
+							verified++;
+						}
+						else {
+							invalid++;
+						}
 					}
-					if(CardList[i].CCNumberMasked.Length>4 && account.Length>4
-						&& CardList[i].CCNumberMasked.Substring(CardList[i].CCNumberMasked.Length-4)==account.Substring(account.Length-4)
-						&& CardList[i].CCExpiration.ToString("MMyy")==exp) 
-					{
-						//The credit card on file matches the one in X-Charge, so remove from the list.
-						CardList.Remove(CardList[i]);
-						verified++;
-					}
-					else {
-						invalid++;
-					}
+				}
+				catch {
+					MsgBox.Show(this,"Something went wrong validating X-Charge tokens.  Please try again.");
+					break;
 				}
 				textVerified.Text=verified.ToString();
 				textInvalid.Text=invalid.ToString();
