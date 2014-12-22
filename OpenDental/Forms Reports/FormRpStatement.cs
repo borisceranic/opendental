@@ -1383,6 +1383,9 @@ namespace OpenDental{
 				int[] intTable={0,9,4,6,8,2,7,1,3,5};
 				int intTransfer=0;
 				for(int intIndex=0;intIndex<strNumber.Length;intIndex++){
+					if(!Char.IsDigit(strNumber[intIndex])) {
+						continue;
+					}
 					int digit=Convert.ToInt32(strNumber.Substring(intIndex,1));
 					int modulus=(intTransfer+digit) % 10;
 					intTransfer=intTable[modulus];
