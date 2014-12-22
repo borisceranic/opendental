@@ -8930,16 +8930,31 @@ namespace OpenDental{
 				ModuleSelected(PatCur.PatNum);
 				return;
 			}
+			//One task
+			if(gridProg.SelectedIndices.Length==1
+				&& ((DataRow)gridProg.Rows[gridProg.SelectedIndices[0]].Tag)["TaskNum"].ToString()!="0")
+			{
+				if(MsgBox.Show(this,MsgBoxButtons.OKCancel,"The selected task will be marked Done and will affect all users.")) {
+					long taskNum=PIn.Long(((DataRow)gridProg.Rows[gridProg.SelectedIndices[0]].Tag)["TaskNum"].ToString());
+					Task taskCur=Tasks.GetOne(taskNum);
+					Task taskOld=taskCur.Copy();
+					taskCur.TaskStatus=TaskStatusEnum.Done;//global even if new status is tracked by user
+					TaskUnreads.DeleteForTask(taskCur.TaskNum);//clear out taskunreads. We have too many tasks to read the done ones.
+					Tasks.Update(taskCur,taskOld);
+					ModuleSelected(PatCur.PatNum);
+					return;
+				}
+			}
 			//Multiple procedures------------------------------------------------------------------------------------------------------
 			if(!PrefC.GetBool(PrefName.AllowSettingProcsComplete)){
-				MsgBox.Show(this,"Only single appointments may be set complete.  If you want to be able to set procedures complete, you must turn on that option in Setup | Chart | Chart Preferences.");
+				MsgBox.Show(this,"Only single appointments and tasks may be set complete.  If you want to be able to set procedures complete, you must turn on that option in Setup | Chart | Chart Preferences.");
 				return;
 			}
 			//check to make sure we don't have non-procedures
 			for(int i=0;i<gridProg.SelectedIndices.Length;i++) {
 				row=(DataRow)gridProg.Rows[gridProg.SelectedIndices[i]].Tag;
 				if(row["ProcNum"].ToString()=="0" || row["ProcCode"].ToString()=="~GRP~") {
-					MsgBox.Show(this,"Only procedures or single appointments may be set complete.");
+					MsgBox.Show(this,"Only procedures, single appointments, or tasks may be set complete.");
 					return;
 				}
 			}
