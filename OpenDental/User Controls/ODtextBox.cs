@@ -338,23 +338,28 @@ namespace OpenDental {
 					Clipboard.SetDataObject(SelectedText);
 					break;
 				case 14://paste
-					if(!Clipboard.ContainsText()) {
-						MsgBox.Show(this,"There is no text on the clipboard.");
-						break;
+					try {
+						if(!Clipboard.ContainsText()) {
+							MsgBox.Show(this,"There is no text on the clipboard.");
+							break;
+						}
+						int caret=SelectionStart;
+						IDataObject iData=Clipboard.GetDataObject();
+						if(SelectionLength>0) {
+							Text=Text.Remove(SelectionStart,SelectionLength);
+							SelectionLength=0;
+						}
+						string strPaste=(string)iData.GetData(DataFormats.Text);
+						Text=Text.Insert(caret,strPaste);
+						//MaxLength is not enforced by the RichTextBox.  It allows us to set the Text value to a longer length, so we have to handle it manually.
+						if(Text.Length>MaxLength) {
+							Text=Text.Substring(0,MaxLength);
+						}
+						SelectionStart=caret+strPaste.Length;
 					}
-					int caret=SelectionStart;
-					IDataObject iData=Clipboard.GetDataObject();
-					if(SelectionLength>0) {
-						Text=Text.Remove(SelectionStart,SelectionLength);
-						SelectionLength=0;
+					catch(Exception ex) {
+						MessageBox.Show(Lan.g(this,"Failed to paste text from clipboard")+": "+ex.Message);
 					}
-					string strPaste=(string)iData.GetData(DataFormats.Text);
-					Text=Text.Insert(caret,strPaste);
-					//MaxLength is not enforced by the RichTextBox.  It allows us to set the Text value to a longer length, so we have to handle it manually.
-					if(Text.Length>MaxLength) {
-						Text=Text.Substring(0,MaxLength);
-					}
-					SelectionStart=caret+strPaste.Length;
 					break;
 			}
 		}
