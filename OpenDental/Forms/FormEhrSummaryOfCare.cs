@@ -157,19 +157,21 @@ namespace OpenDental {
 		}
 
 		private void butExport_Click(object sender,EventArgs e) {
-			FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				MessageBox.Show("Summary of Care not exported.");
-				return;
-			}
+			//Generate the CCD first so that any validation errors are apparent and up front.
+			//It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
 			string ccd="";
 			try {
 				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
+				return;
+			}
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=PatCur.PatNum;
+			FormRP.IsSelectionMode=true;
+			if(FormRP.ShowDialog()==DialogResult.Cancel) {
+				MessageBox.Show("Summary of Care not exported.");
 				return;
 			}
 			FolderBrowserDialog dlg=new FolderBrowserDialog();
@@ -206,19 +208,21 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.EmailSend)) {
 				return;
 			}
-			FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				MessageBox.Show("Summary of Care not exported.");
-				return;
-			}
+			//Generate the CCD first so that any validation errors are apparent and up front.
+			//It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
 			string ccd="";
 			try {
 				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
+				return;
+			}
+			FormReferralsPatient FormRP=new FormReferralsPatient();
+			FormRP.PatNum=PatCur.PatNum;
+			FormRP.IsSelectionMode=true;
+			if(FormRP.ShowDialog()==DialogResult.Cancel) {
+				MessageBox.Show("Summary of Care not exported.");
 				return;
 			}
 			Cursor=Cursors.WaitCursor;

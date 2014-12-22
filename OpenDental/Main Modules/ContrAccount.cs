@@ -3980,7 +3980,7 @@ namespace OpenDental {
 				}
 				Process.Start(imgPath);
 #else
-					FormST.PrintStatement(stmt,false,dataSet,FamCur,PatCur);
+					//FormST.PrintStatement(stmt,false,dataSet,FamCur,PatCur);
 #endif
 			}
 			Cursor=Cursors.Default;
