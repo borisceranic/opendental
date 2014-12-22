@@ -891,8 +891,8 @@ namespace OpenDentBusiness{
 			}
 			command+=") ORDER BY Relationship";
 			DataTable rawGuardians=dcon.GetTable(command);
-			string refFrom="";
-			string refTo="";
+			Dictionary<long,string> dictRefFromPatNums=new Dictionary<long,string>();//Only contains FROM referrals
+			Dictionary<long,string> dictRefToPatNums=new Dictionary<long,string>();//Only contains TO referrals
 			List<long> listPatNums=new List<long>();
 			List<long> listRefNums=new List<long>();
 			for(int i=0;i<raw.Rows.Count;i++) {
@@ -915,14 +915,18 @@ namespace OpenDentBusiness{
 					}
 				}
 				if(listRefAttaches[j].IsFrom) {
-					refFrom+="Referred From: "+nameLF+"\r\n";
+					if(!dictRefFromPatNums.ContainsKey(listRefAttaches[j].PatNum)) {//New entry
+						dictRefFromPatNums.Add(listRefAttaches[j].PatNum,Lans.g("Appointments","Referred From")+":");
+					}
+					dictRefFromPatNums[listRefAttaches[j].PatNum]+=("\r\n"+nameLF);//Concatenate all refFrom nameLF's to the refFrom dict
 				}
 				else {
-					refTo+="Referred To: "+nameLF+"\r\n";
+					if(!dictRefToPatNums.ContainsKey(listRefAttaches[j].PatNum)) {
+						dictRefToPatNums.Add(listRefAttaches[j].PatNum,Lans.g("Appointments","Referred To")+":");//New entry
+					}
+					dictRefToPatNums[listRefAttaches[j].PatNum]+=("\r\n"+nameLF);//Concatenate all refTo nameLF's to the refTo dict
 				}
 			}
-			refFrom.TrimEnd('\r','\n');
-			refTo.TrimEnd('\r','\n');
 			DateTime aptDate;
 			TimeSpan span;
 			int hours;
@@ -1178,8 +1182,13 @@ namespace OpenDentBusiness{
 				}
 				row["ProvNum"]=raw.Rows[i]["apptProvNum"].ToString();
 				row["ProvHyg"]=raw.Rows[i]["apptProvHyg"].ToString();
-				row["referralFrom"]=refFrom;
-				row["referralTo"]=refTo;
+				long apptPatNum=PIn.Long(raw.Rows[i]["apptPatNum"].ToString());
+				if(dictRefFromPatNums.ContainsKey(apptPatNum)) {//Add this patient's "from" referrals
+					row["referralFrom"]=dictRefFromPatNums[apptPatNum];
+				}
+				if(dictRefToPatNums.ContainsKey(apptPatNum)) {//Add this patient's "to" referrals
+					row["referralTo"]=dictRefToPatNums[apptPatNum];
+				}
 				row["timeAskedToArrive"]="";
 				timeAskedToArrive=PIn.DateT(raw.Rows[i]["apptDateTimeAskedToArrive"].ToString());
 				if(timeAskedToArrive.Year>1880) {
