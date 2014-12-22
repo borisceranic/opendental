@@ -6811,6 +6811,15 @@ namespace OpenDentBusiness {
 				//Updating all tasks with white priority level
 				command="UPDATE task SET PriorityDefNum="+POut.Long(defNum);
 				Db.NonQ(command,true);
+				//Add ManualUserNameEntry to preference with a default value of '0' (so that it is disabled by default)
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ManualUserNameEntry','0')";
+					Db.NonQ(command);
+				}
+				else{
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference), 'ManualUserNameEntry','0')";
+					Db.NonQ(command);
+				}
 
 
 
