@@ -166,7 +166,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormLogOn_Load(object sender, System.EventArgs e) {
-			if(PrefC.GetBool(PrefName.ManualUserNameEntry)) {
+			if(PrefC.GetBool(PrefName.UserNameManualEntry)) {
 				listUser.Visible=false;
 				textUser.Visible=true;
 				textUser.Select();//Give focus to the user name text box.
@@ -205,7 +205,7 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,System.EventArgs e) {
 			Userod selectedUser=null;
-			if(PrefC.GetBool(PrefName.ManualUserNameEntry)) {
+			if(PrefC.GetBool(PrefName.UserNameManualEntry)) {
 				for(int i=0;i<listUser.Items.Count;i++) {
 					//Check the user name typed in using ToLower and Trim because Open Dental is case insensitive and does not allow white-space in regards to user names.
 					if(textUser.Text.Trim().ToLower()==listUser.Items[i].ToString().Trim().ToLower()) {

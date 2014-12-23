@@ -40,7 +40,7 @@ namespace OpenDental{
 		private TextBox textLogOffAfterMinutes;
 		private Label label3;
 		private Label label4;
-		private CheckBox checkManualUserNameEntry;
+		private CheckBox checkUserNameManualEntry;
 		//private DataTable table;
 		private List<Userod> ListUser;
 
@@ -97,7 +97,7 @@ namespace OpenDental{
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.checkManualUserNameEntry = new System.Windows.Forms.CheckBox();
+			this.checkUserNameManualEntry = new System.Windows.Forms.CheckBox();
 			this.butChange = new OpenDental.UI.Button();
 			this.butSetAll = new OpenDental.UI.Button();
 			this.butAddUser = new OpenDental.UI.Button();
@@ -305,17 +305,17 @@ namespace OpenDental{
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
-			// checkManualUserNameEntry
+			// checkUserNameManualEntry
 			// 
-			this.checkManualUserNameEntry.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.checkManualUserNameEntry.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkManualUserNameEntry.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkManualUserNameEntry.Location = new System.Drawing.Point(238, 624);
-			this.checkManualUserNameEntry.Name = "checkManualUserNameEntry";
-			this.checkManualUserNameEntry.Size = new System.Drawing.Size(224, 16);
-			this.checkManualUserNameEntry.TabIndex = 103;
-			this.checkManualUserNameEntry.Text = "Manually enter log on credentials";
-			this.checkManualUserNameEntry.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkUserNameManualEntry.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkUserNameManualEntry.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkUserNameManualEntry.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkUserNameManualEntry.Location = new System.Drawing.Point(238, 624);
+			this.checkUserNameManualEntry.Name = "checkUserNameManualEntry";
+			this.checkUserNameManualEntry.Size = new System.Drawing.Size(224, 16);
+			this.checkUserNameManualEntry.TabIndex = 103;
+			this.checkUserNameManualEntry.Text = "Manually enter log on credentials";
+			this.checkUserNameManualEntry.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butChange
 			// 
@@ -396,7 +396,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(894, 700);
-			this.Controls.Add(this.checkManualUserNameEntry);
+			this.Controls.Add(this.checkUserNameManualEntry);
 			this.Controls.Add(this.textLogOffAfterMinutes);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
@@ -456,7 +456,7 @@ namespace OpenDental{
 			checkCannotEditOwn.Checked=PrefC.GetBool(PrefName.TimecardUsersDontEditOwnCard);
 			checkCannotEditOwn.Enabled=checkTimecardSecurityEnabled.Checked;
 			checkLogOffWindows.Checked=PrefC.GetBool(PrefName.SecurityLogOffWithWindows);
-			checkManualUserNameEntry.Checked=PrefC.GetBool(PrefName.ManualUserNameEntry);
+			checkUserNameManualEntry.Checked=PrefC.GetBool(PrefName.UserNameManualEntry);
 			if(PrefC.GetInt(PrefName.SecurityLockDays)>0) {
 				textDaysLock.Text=PrefC.GetInt(PrefName.SecurityLockDays).ToString();
 			}
@@ -1032,7 +1032,7 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.TimecardSecurityEnabled,checkTimecardSecurityEnabled.Checked) 
 				| Prefs.UpdateBool(PrefName.TimecardUsersDontEditOwnCard,checkCannotEditOwn.Checked) 
 				| Prefs.UpdateBool(PrefName.SecurityLogOffWithWindows,checkLogOffWindows.Checked)
-				| Prefs.UpdateBool(PrefName.ManualUserNameEntry,checkManualUserNameEntry.Checked)
+				| Prefs.UpdateBool(PrefName.UserNameManualEntry,checkUserNameManualEntry.Checked)
 				| Prefs.UpdateInt(PrefName.SecurityLogOffAfterMinutes,PIn.Int(textLogOffAfterMinutes.Text))
 				)
 			{

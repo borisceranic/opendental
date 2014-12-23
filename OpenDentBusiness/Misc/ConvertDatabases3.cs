@@ -6811,13 +6811,13 @@ namespace OpenDentBusiness {
 				//Updating all tasks with white priority level
 				command="UPDATE task SET PriorityDefNum="+POut.Long(defNum);
 				Db.NonQ(command,true);
-				//Add ManualUserNameEntry to preference with a default value of '0' (so that it is disabled by default)
+				//Add UserNameManualEntry to preference with a default value of '0' (so that it is disabled by default)
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('ManualUserNameEntry','0')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('UserNameManualEntry','0')";
 					Db.NonQ(command);
 				}
 				else{
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference), 'ManualUserNameEntry','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference), 'UserNameManualEntry','0')";
 					Db.NonQ(command);
 				}
 
@@ -6874,3 +6874,92 @@ namespace OpenDentBusiness {
 
 
 				
+
+				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE cpt ADD VersionIDs varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE cpt ADD VersionIDs varchar2(255)";
+					Db.NonQ(command);
+				}
+				*/
+
+				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD TextAlign tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD TextAlign number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET TextAlign = 0 WHERE TextAlign IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY TextAlign NOT NULL";
+					Db.NonQ(command);
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD ItemColor int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD ItemColor number(11)";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET ItemColor = 0 WHERE ItemColor IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY ItemColor NOT NULL";
+					Db.NonQ(command);
+				}
+				*/
+
+				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD TextAlign tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD TextAlign number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET TextAlign = 0 WHERE TextAlign IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY TextAlign NOT NULL";
+					Db.NonQ(command);
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD IsPaymentOption tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD IsPaymentOption number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET IsPaymentOption = 0 WHERE IsPaymentOption IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY IsPaymentOption NOT NULL";
+					Db.NonQ(command);
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfielddef ADD ItemColor int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheetfielddef ADD ItemColor number(11)";
+					Db.NonQ(command);
+					command="UPDATE sheetfielddef SET ItemColor = 0 WHERE ItemColor IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfielddef MODIFY ItemColor NOT NULL";
+					Db.NonQ(command);
+				}
+				*/
+
+				/*				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE task ADD PriorityDefNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE task ADD INDEX (PriorityDefNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE task ADD PriorityDefNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE task SET PriorityDefNum = 0 WHERE PriorityDefNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE task MODIFY PriorityDefNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX task_PriorityDefNum ON task (PriorityDefNum)";
+					Db.NonQ(command);
+				}
+				*/

@@ -250,8 +250,6 @@ namespace OpenDentBusiness {
 		LanguagesUsedByPatients,
 		LetterMergePath,
 		MainWindowTitle,
-		///<summary>Boolean.  0 by default.  When enabled, users must enter their user name manually at the log on window.</summary>
-		ManualUserNameEntry,
 		///<summary>0=Meaningful Use Stage 1, 1=Meaningful Use Stage 2.  Global, affects all providers.  Changes the MU grid that is seen for individual patients and for summary reports.</summary>
 		MeaningfulUseTwo,
 		///<summary>New procs will use the fee amount tied to the medical code instead of the ADA code.</summary>
@@ -501,6 +499,8 @@ namespace OpenDentBusiness {
 		UseBillingAddressOnClaims,
 		///<summary>Enum:ToothNumberingNomenclature 0=Universal(American), 1=FDI, 2=Haderup, 3=Palmer</summary>
 		UseInternationalToothNumbers,
+		///<summary>Boolean.  0 by default.  When enabled, users must enter their user name manually at the log on window.</summary>
+		UserNameManualEntry,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>
 		WebHostSynchServerURL,
 		WebServiceServerName,
