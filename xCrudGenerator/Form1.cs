@@ -790,22 +790,24 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t2+"}");
 			}
 			#endregion Delete
-			#region Synch
+			#region Sync
 			//Synch-----------------------------------------------------------------------------------------
 			if(CrudGenHelper.IsSynchable(typeClass)) {
 				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>");
-				strb.Append(rn+t2+"public static void Synch(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
+				strb.Append(rn+t2+"public static void Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
 				strb.Append(rn+t3+"//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listIns=    new List<"+typeClass.Name+">();");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdNew =new List<"+typeClass.Name+">();");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdDB  =new List<"+typeClass.Name+">();");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listDel    =new List<"+typeClass.Name+">();");
-				strb.Append(rn+t3+"listNew.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK.");
-				strb.Append(rn+t3+"listDB.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK.");
+				strb.Append(rn+t3+"listNew.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.");
+				strb.Append(rn+t3+"listDB.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.");
 				strb.Append(rn+t3+"int idxNew=0;");
 				strb.Append(rn+t3+"int idxDB=0;");
 				strb.Append(rn+t3+""+typeClass.Name+" fieldNew;");
 				strb.Append(rn+t3+""+typeClass.Name+" fieldDB;");
+				strb.Append(rn+t3+"//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element. The next element is determined by Primary Key.");
+				strb.Append(rn+t3+"//If the New list contains the next item it will be inserted. If the DB contains the next item, it will be deleted. If both lists contain the next item, the item will be updated.");
 				strb.Append(rn+t3+"while(idxNew<listNew.Count || idxDB<listDB.Count) {");
 				strb.Append(rn+t4+"fieldNew=null;");
 				strb.Append(rn+t4+"if(idxNew<listNew.Count) {");
@@ -816,26 +818,27 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t5+"fieldDB=listDB[idxDB];");
 				strb.Append(rn+t4+"}");
 				strb.Append(rn+t4+"//begin compare");
-				strb.Append(rn+t4+"if(fieldNew!=null && fieldDB==null) {");
+				strb.Append(rn+t4+"if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.");
 				strb.Append(rn+t5+"listIns.Add(fieldNew);");
 				strb.Append(rn+t5+"idxNew++;");
 				strb.Append(rn+t5+"continue;");
 				strb.Append(rn+t4+"}");
-				strb.Append(rn+t4+"else if(fieldNew==null && fieldDB!=null) {");
+				strb.Append(rn+t4+"else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.");
 				strb.Append(rn+t5+"listDel.Add(fieldDB);");
 				strb.Append(rn+t5+"idxDB++;");
 				strb.Append(rn+t5+"continue;");
 				strb.Append(rn+t4+"}");
-				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+"<fieldDB."+priKey.Name+") {//newPK less than dbPK");
+				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+"<fieldDB."+priKey.Name+") {//newPK less than dbPK, newItem is 'next'");
 				strb.Append(rn+t5+"listIns.Add(fieldNew);");
 				strb.Append(rn+t5+"idxNew++;");
 				strb.Append(rn+t5+"continue;");
 				strb.Append(rn+t4+"}");
-				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+">fieldDB."+priKey.Name+") {//dbPK less than newPK");
+				strb.Append(rn+t4+"else if(fieldNew."+priKey.Name+">fieldDB."+priKey.Name+") {//dbPK less than newPK, dbItem is 'next'");
 				strb.Append(rn+t5+"listDel.Add(fieldDB);");
 				strb.Append(rn+t5+"idxDB++;");
 				strb.Append(rn+t5+"continue;");
 				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"//Both lists contain the 'next' item, update required");
 				strb.Append(rn+t4+"listUpdNew.Add(fieldNew);");
 				strb.Append(rn+t4+"listUpdDB.Add(fieldDB);");
 				strb.Append(rn+t4+"idxNew++;");

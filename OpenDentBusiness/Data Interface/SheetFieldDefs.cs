@@ -78,14 +78,14 @@ namespace OpenDentBusiness{
 			Crud.SheetFieldDefCrud.Delete(sheetFieldDefNum);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.  listDB can be null.</summary>
-		public static void Synch(List<SheetFieldDef> listNew,long sheetDefNum) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.</summary>
+		public static void Sync(List<SheetFieldDef> listNew,long sheetDefNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service
 				return;
 			}
 			List<SheetFieldDef> listDB=SheetFieldDefs.GetForSheetDef(sheetDefNum);
-			Crud.SheetFieldDefCrud.Synch(listNew,listDB);
+			Crud.SheetFieldDefCrud.Sync(listNew,listDB);
 		}
 
 

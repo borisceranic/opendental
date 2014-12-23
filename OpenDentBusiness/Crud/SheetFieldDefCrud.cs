@@ -280,18 +280,20 @@ namespace OpenDentBusiness.Crud{
 		}
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Synch(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
+		public static void Sync(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<SheetFieldDef> listIns=    new List<SheetFieldDef>();
 			List<SheetFieldDef> listUpdNew =new List<SheetFieldDef>();
 			List<SheetFieldDef> listUpdDB  =new List<SheetFieldDef>();
 			List<SheetFieldDef> listDel    =new List<SheetFieldDef>();
-			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
-			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK.
+			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.
+			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.
 			int idxNew=0;
 			int idxDB=0;
 			SheetFieldDef fieldNew;
 			SheetFieldDef fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element. The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted. If the DB contains the next item, it will be deleted. If both lists contain the next item, the item will be updated.
 			while(idxNew<listNew.Count || idxDB<listDB.Count) {
 				fieldNew=null;
 				if(idxNew<listNew.Count) {
@@ -302,26 +304,27 @@ namespace OpenDentBusiness.Crud{
 					fieldDB=listDB[idxDB];
 				}
 				//begin compare
-				if(fieldNew!=null && fieldDB==null) {
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
 					listIns.Add(fieldNew);
 					idxNew++;
 					continue;
 				}
-				else if(fieldNew==null && fieldDB!=null) {
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
 					listDel.Add(fieldDB);
 					idxDB++;
 					continue;
 				}
-				else if(fieldNew.SheetFieldDefNum<fieldDB.SheetFieldDefNum) {//newPK less than dbPK
+				else if(fieldNew.SheetFieldDefNum<fieldDB.SheetFieldDefNum) {//newPK less than dbPK, newItem is 'next'
 					listIns.Add(fieldNew);
 					idxNew++;
 					continue;
 				}
-				else if(fieldNew.SheetFieldDefNum>fieldDB.SheetFieldDefNum) {//dbPK less than newPK
+				else if(fieldNew.SheetFieldDefNum>fieldDB.SheetFieldDefNum) {//dbPK less than newPK, dbItem is 'next'
 					listDel.Add(fieldDB);
 					idxDB++;
 					continue;
 				}
+				//Both lists contain the 'next' item, update required
 				listUpdNew.Add(fieldNew);
 				listUpdDB.Add(fieldDB);
 				idxNew++;
