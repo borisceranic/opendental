@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness{
 	///<summary>One field on a sheetDef.</summary>
@@ -58,7 +59,19 @@ namespace OpenDentBusiness{
 		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
 		public bool IsPaymentOption;
 		///<summary>Text color, line color, rectangle color.</summary>
+		[XmlIgnore]
 		public Color ItemColor;
+
+		///<summary>Used only for serialization purposes</summary>
+		[XmlElement("ColorOverride",typeof(int))]
+		public int ItemColorXml {
+			get {
+				return ItemColor.ToArgb();
+			}
+			set {
+				ItemColor=Color.FromArgb(value);
+			}
+		}
 
 		public SheetFieldDef(){//required for use as a generic.
 			RadioButtonGroup="";

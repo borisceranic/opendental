@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness{
 	///<summary>One field on a sheet.</summary>
@@ -58,9 +59,19 @@ namespace OpenDentBusiness{
 		///<summary>Text Alignment for text fields.</summary>
 		public HorizontalAlignment TextAlign;
 		///<summary>Text color, line color, rectangle color.</summary>
+		[XmlIgnore]
 		public Color ItemColor;
 
-
+		///<summary>Used only for serialization purposes</summary>
+		[XmlElement("ColorOverride",typeof(int))]
+		public int ItemColorXml {
+			get {
+				return ItemColor.ToArgb();
+			}
+			set {
+				ItemColor=Color.FromArgb(value);
+			}
+		}
 				
 		public SheetField Copy(){
 			return (SheetField)this.MemberwiseClone();
