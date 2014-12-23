@@ -6820,6 +6820,54 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference), 'UserNameManualEntry','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplan ADD PaySchedule tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplan ADD PaySchedule number(3)";
+					Db.NonQ(command);
+					command="UPDATE payplan SET PaySchedule = 0 WHERE PaySchedule IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplan MODIFY PaySchedule NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplan ADD NumberOfPayments int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplan ADD NumberOfPayments number(11)";
+					Db.NonQ(command);
+					command="UPDATE payplan SET NumberOfPayments = 0 WHERE NumberOfPayments IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplan MODIFY NumberOfPayments NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplan ADD PayAmt double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplan ADD PayAmt number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE payplan SET PayAmt = 0 WHERE PayAmt IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplan MODIFY PayAmt NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplan ADD DownPayment double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplan ADD DownPayment number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE payplan SET DownPayment = 0 WHERE DownPayment IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplan MODIFY DownPayment NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

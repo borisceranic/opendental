@@ -46,15 +46,19 @@ namespace OpenDentBusiness.Crud{
 			PayPlan payPlan;
 			for(int i=0;i<table.Rows.Count;i++) {
 				payPlan=new PayPlan();
-				payPlan.PayPlanNum  = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
-				payPlan.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				payPlan.Guarantor   = PIn.Long  (table.Rows[i]["Guarantor"].ToString());
-				payPlan.PayPlanDate = PIn.Date  (table.Rows[i]["PayPlanDate"].ToString());
-				payPlan.APR         = PIn.Double(table.Rows[i]["APR"].ToString());
-				payPlan.Note        = PIn.String(table.Rows[i]["Note"].ToString());
-				payPlan.PlanNum     = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
-				payPlan.CompletedAmt= PIn.Double(table.Rows[i]["CompletedAmt"].ToString());
-				payPlan.InsSubNum   = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
+				payPlan.PayPlanNum      = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
+				payPlan.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
+				payPlan.Guarantor       = PIn.Long  (table.Rows[i]["Guarantor"].ToString());
+				payPlan.PayPlanDate     = PIn.Date  (table.Rows[i]["PayPlanDate"].ToString());
+				payPlan.APR             = PIn.Double(table.Rows[i]["APR"].ToString());
+				payPlan.Note            = PIn.String(table.Rows[i]["Note"].ToString());
+				payPlan.PlanNum         = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
+				payPlan.CompletedAmt    = PIn.Double(table.Rows[i]["CompletedAmt"].ToString());
+				payPlan.InsSubNum       = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
+				payPlan.PaySchedule     = (OpenDentBusiness.PayPlan+PaymentSchedule)PIn.Int(table.Rows[i]["PaySchedule"].ToString());
+				payPlan.NumberOfPayments= PIn.Int   (table.Rows[i]["NumberOfPayments"].ToString());
+				payPlan.PayAmt          = PIn.Double(table.Rows[i]["PayAmt"].ToString());
+				payPlan.DownPayment     = PIn.Double(table.Rows[i]["DownPayment"].ToString());
 				retVal.Add(payPlan);
 			}
 			return retVal;
@@ -95,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PayPlanNum,";
 			}
-			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum) VALUES(";
+			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(payPlan.PayPlanNum)+",";
 			}
@@ -107,7 +111,11 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(payPlan.Note)+"',"
 				+    POut.Long  (payPlan.PlanNum)+","
 				+"'"+POut.Double(payPlan.CompletedAmt)+"',"
-				+    POut.Long  (payPlan.InsSubNum)+")";
+				+    POut.Long  (payPlan.InsSubNum)+","
+				+    POut.Int   ((int)payPlan.PaySchedule)+","
+				+    POut.Int   (payPlan.NumberOfPayments)+","
+				+"'"+POut.Double(payPlan.PayAmt)+"',"
+				+"'"+POut.Double(payPlan.DownPayment)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -120,14 +128,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one PayPlan in the database.</summary>
 		public static void Update(PayPlan payPlan){
 			string command="UPDATE payplan SET "
-				+"PatNum      =  "+POut.Long  (payPlan.PatNum)+", "
-				+"Guarantor   =  "+POut.Long  (payPlan.Guarantor)+", "
-				+"PayPlanDate =  "+POut.Date  (payPlan.PayPlanDate)+", "
-				+"APR         = '"+POut.Double(payPlan.APR)+"', "
-				+"Note        = '"+POut.String(payPlan.Note)+"', "
-				+"PlanNum     =  "+POut.Long  (payPlan.PlanNum)+", "
-				+"CompletedAmt= '"+POut.Double(payPlan.CompletedAmt)+"', "
-				+"InsSubNum   =  "+POut.Long  (payPlan.InsSubNum)+" "
+				+"PatNum          =  "+POut.Long  (payPlan.PatNum)+", "
+				+"Guarantor       =  "+POut.Long  (payPlan.Guarantor)+", "
+				+"PayPlanDate     =  "+POut.Date  (payPlan.PayPlanDate)+", "
+				+"APR             = '"+POut.Double(payPlan.APR)+"', "
+				+"Note            = '"+POut.String(payPlan.Note)+"', "
+				+"PlanNum         =  "+POut.Long  (payPlan.PlanNum)+", "
+				+"CompletedAmt    = '"+POut.Double(payPlan.CompletedAmt)+"', "
+				+"InsSubNum       =  "+POut.Long  (payPlan.InsSubNum)+", "
+				+"PaySchedule     =  "+POut.Int   ((int)payPlan.PaySchedule)+", "
+				+"NumberOfPayments=  "+POut.Int   (payPlan.NumberOfPayments)+", "
+				+"PayAmt          = '"+POut.Double(payPlan.PayAmt)+"', "
+				+"DownPayment     = '"+POut.Double(payPlan.DownPayment)+"' "
 				+"WHERE PayPlanNum = "+POut.Long(payPlan.PayPlanNum);
 			Db.NonQ(command);
 		}
@@ -166,6 +178,22 @@ namespace OpenDentBusiness.Crud{
 			if(payPlan.InsSubNum != oldPayPlan.InsSubNum) {
 				if(command!=""){ command+=",";}
 				command+="InsSubNum = "+POut.Long(payPlan.InsSubNum)+"";
+			}
+			if(payPlan.PaySchedule != oldPayPlan.PaySchedule) {
+				if(command!=""){ command+=",";}
+				command+="PaySchedule = "+POut.Int   ((int)payPlan.PaySchedule)+"";
+			}
+			if(payPlan.NumberOfPayments != oldPayPlan.NumberOfPayments) {
+				if(command!=""){ command+=",";}
+				command+="NumberOfPayments = "+POut.Int(payPlan.NumberOfPayments)+"";
+			}
+			if(payPlan.PayAmt != oldPayPlan.PayAmt) {
+				if(command!=""){ command+=",";}
+				command+="PayAmt = '"+POut.Double(payPlan.PayAmt)+"'";
+			}
+			if(payPlan.DownPayment != oldPayPlan.DownPayment) {
+				if(command!=""){ command+=",";}
+				command+="DownPayment = '"+POut.Double(payPlan.DownPayment)+"'";
 			}
 			if(command==""){
 				return false;
