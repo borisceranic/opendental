@@ -305,7 +305,7 @@ namespace OpenDentBusiness{
 			//The UI layer won't know about the addition.
 			//So we need to refresh if we can't initially find the prov.
 			RefreshCache();
-			List<Provider> listProvs=ProviderC.GetListLong();
+			listProvs=ProviderC.GetListLong();
 			for(int i=0;i<listProvs.Count;i++) {
 				if(listProvs[i].EcwID==eID) {
 					return listProvs[i].Copy();
