@@ -155,8 +155,9 @@ namespace OpenDentBusiness{
 					retVal=pat.FeeSched;
 				}
 				else {//Patient did not have a fee sched, check the provider.
-					if(pat.PriProv!=0 && ProviderC.ListLong.Count>0) {
-						retVal=ProviderC.ListLong[Providers.GetIndexLong(pat.PriProv)].FeeSched;//Guaranteed to work because ProviderC.ListLong has at least one provider in the list.
+					List<Provider> listProvs=ProviderC.GetListLong();
+					if(pat.PriProv!=0 && listProvs.Count>0) {
+						retVal=listProvs[Providers.GetIndexLong(pat.PriProv,listProvs)].FeeSched;//Guaranteed to work because ProviderC.ListLong has at least one provider in the list.
 					}
 				}
 			}
@@ -172,7 +173,8 @@ namespace OpenDentBusiness{
 			if(patFeeSched!=0){
 				return patFeeSched;
 			}
-			return ProviderC.ListLong[Providers.GetIndexLong(patPriProvNum)].FeeSched;
+			List<Provider> listProvs=ProviderC.GetListLong();
+			return listProvs[Providers.GetIndexLong(patPriProvNum,listProvs)].FeeSched;
 		}
 
 		///<summary>Gets the fee schedule from the primary MEDICAL insurance plan, the first insurance plan, the patient, or the provider in that order.</summary>
@@ -195,25 +197,27 @@ namespace OpenDentBusiness{
 					return GetFeeSched(pat,planList,patPlans,subList);  //Use dental insurance fee schedule
 				}
 				subCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlans,planOrdinal),subList);
-				InsPlan PlanCur = InsPlans.GetPlan(subCur.PlanNum, planList);
-				if (PlanCur == null){
-					retVal = 0;
+				InsPlan PlanCur=InsPlans.GetPlan(subCur.PlanNum, planList);
+				if (PlanCur==null){
+					retVal=0;
 				} 
 				else {
-					retVal = PlanCur.FeeSched;
+					retVal=PlanCur.FeeSched;
 				}
 			}
-			if (retVal == 0){
-				if (pat.FeeSched != 0){
-					retVal = pat.FeeSched;
+			if (retVal==0){
+				if (pat.FeeSched!=0){
+					retVal=pat.FeeSched;
 				} 
 				else {
-					if (pat.PriProv == 0){
-						retVal = ProviderC.ListShort[0].FeeSched;
+					if (pat.PriProv==0){
+						List<Provider> listProvs=ProviderC.GetListShort();
+						retVal=listProvs[0].FeeSched;
 					} 
 					else {
 						//MessageBox.Show(Providers.GetIndex(Patients.Cur.PriProv).ToString());   
-						retVal = ProviderC.ListLong[Providers.GetIndexLong(pat.PriProv)].FeeSched;
+						List<Provider> listProvs=ProviderC.GetListLong();
+						retVal=listProvs[Providers.GetIndexLong(pat.PriProv,listProvs)].FeeSched;
 					}
 				}
 			}

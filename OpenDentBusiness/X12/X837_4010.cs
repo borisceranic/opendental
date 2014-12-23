@@ -100,6 +100,7 @@ namespace OpenDentBusiness {
 			List<Procedure> procList;
 			List<ToothInitial> initialList;
 			List<PatPlan> patPlans;
+			List<Provider> listProvs=ProviderC.GetListLong();
 			Procedure proc;
 			ProcedureCode procCode;
 			Provider provTreat;//might be different for each proc
@@ -190,7 +191,7 @@ namespace OpenDentBusiness {
 						+"*"//HL02: No parent. Not used
 						+"20*"//HL03: Heirarchical level code. 20=Information source
 						+"1~");//HL04: Heirarchical child code. 1=child HL present
-					billProv=ProviderC.ListLong[Providers.GetIndexLong(claimItems[i].ProvBill1)];
+					billProv=listProvs[Providers.GetIndexLong(claimItems[i].ProvBill1,listProvs)];
 					if(isMedical) {
 						//2000A PRV: Provider Specialty Information
 						seg++;
@@ -883,7 +884,7 @@ namespace OpenDentBusiness {
 				//2310A Referring provider. We don't use.
 				//2310B Rendering provider. Only required if different from the billing provider
 				//But required by WebClaim, so we will always include it
-				provTreat=ProviderC.ListLong[Providers.GetIndexLong(claim.ProvTreat)];
+				provTreat=listProvs[Providers.GetIndexLong(claim.ProvTreat,listProvs)];
 				//if(claim.ProvTreat!=claim.ProvBill){
 				//2310B NM1: name
 				seg++;
@@ -1240,7 +1241,7 @@ namespace OpenDentBusiness {
 					//2420A NM1: Rendering provider name. Only if different from the claim.
 					if(claim.ProvTreat!=proc.ProvNum
 						&& PrefC.GetBool(PrefName.EclaimsSeparateTreatProv)) {
-						provTreat=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvNum)];
+						provTreat=listProvs[Providers.GetIndexLong(proc.ProvNum,listProvs)];
 						seg++;
 						sw.Write("NM1*82*"//82=rendering prov
 							+"1*"//NM102: 1=person
@@ -1666,8 +1667,9 @@ namespace OpenDentBusiness {
 				strb.Append("Clearinghouse GS03");
 			}
 			List<X12TransactionItem> claimItems=Claims.GetX12TransactionInfo(((ClaimSendQueueItem)queueItem).ClaimNum);//just to get prov. Needs work.
-			Provider billProv=ProviderC.ListLong[Providers.GetIndexLong(claimItems[0].ProvBill1)];
-			Provider treatProv=ProviderC.ListLong[Providers.GetIndexLong(claim.ProvTreat)];
+			List<Provider> listProvs=ProviderC.GetListLong();
+			Provider billProv=listProvs[Providers.GetIndexLong(claimItems[0].ProvBill1,listProvs)];
+			Provider treatProv=listProvs[Providers.GetIndexLong(claim.ProvTreat,listProvs)];
 			InsPlan insPlan=InsPlans.GetPlan(claim.PlanNum,null);
 			InsSub sub=InsSubs.GetSub(claim.InsSubNum,null);
 			//if(insPlan.IsMedical) {
@@ -1975,7 +1977,7 @@ namespace OpenDentBusiness {
 					}
 				}
 				if(claim.ProvTreat!=proc.ProvNum && PrefC.GetBool(PrefName.EclaimsSeparateTreatProv)) {
-					treatProv=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvNum)];
+					treatProv=listProvs[Providers.GetIndexLong(proc.ProvNum,listProvs)];
 					if(treatProv.LName=="") {
 						if(strb.Length!=0) {
 							strb.Append(",");

@@ -2476,8 +2476,9 @@ namespace OpenDentBusiness
 				strb.Append("Clearinghouse GS03");
 			}
 			List<X12TransactionItem> claimItems=Claims.GetX12TransactionInfo(((ClaimSendQueueItem)queueItem).ClaimNum);//just to get prov. Needs work.
-			Provider billProv=ProviderC.ListLong[Providers.GetIndexLong(claimItems[0].ProvBill1)];
-			Provider treatProv=ProviderC.ListLong[Providers.GetIndexLong(claim.ProvTreat)];
+			List<Provider> listProvs=ProviderC.GetListLong();
+			Provider billProv=listProvs[Providers.GetIndexLong(claimItems[0].ProvBill1,listProvs)];
+			Provider treatProv=listProvs[Providers.GetIndexLong(claim.ProvTreat,listProvs)];
 			Referral referral=Referrals.GetReferral(claim.ReferringProv);
 			InsPlan insPlan=InsPlans.GetPlan(claim.PlanNum,null);
 			InsSub sub=InsSubs.GetSub(claim.InsSubNum,null);
@@ -2943,7 +2944,7 @@ namespace OpenDentBusiness
 				//Providers
 				Provider provTreatProc=treatProv;
 				if(claim.ProvTreat!=proc.ProvNum && PrefC.GetBool(PrefName.EclaimsSeparateTreatProv)) {
-					provTreatProc=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvNum)];
+					provTreatProc=listProvs[Providers.GetIndexLong(proc.ProvNum,listProvs)];
 					if(provTreatProc.LName=="") {
 						Comma(strb);
 						strb.Append("Treat Prov LName for proc "+procCode.ProcCode);
@@ -2972,10 +2973,10 @@ namespace OpenDentBusiness
 				if(claim.MedType==EnumClaimMedType.Medical) {
 					Provider provOrderProc=provTreatProc;
 					if(claim.ProvOrderOverride!=0) {
-						provOrderProc=ProviderC.ListLong[Providers.GetIndexLong(claim.ProvOrderOverride)];
+						provOrderProc=listProvs[Providers.GetIndexLong(claim.ProvOrderOverride,listProvs)];
 					}
 					if(proc.ProvOrderOverride!=0) {
-						provOrderProc=ProviderC.ListLong[Providers.GetIndexLong(proc.ProvOrderOverride)];
+						provOrderProc=listProvs[Providers.GetIndexLong(proc.ProvOrderOverride,listProvs)];
 					}
 					//Do not validate ordering provider override name or NPI if already validated elsewhere.
 					if(provOrderProc.ProvNum!=proc.ProvNum && provOrderProc.ProvNum!=claim.ProvTreat && provOrderProc.ProvNum!=claim.ProvBill) {
