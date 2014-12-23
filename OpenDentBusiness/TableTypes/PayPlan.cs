@@ -25,7 +25,7 @@ namespace OpenDentBusiness{
 		public double CompletedAmt;
 		///<summary>FK to inssub.InsSubNum.  Will be 0 if standard payment plan.  But if this is being used to track expected insurance payments, then this will be the foreign key to inssub.InsSubNum, and Guarantor will be 0.</summary>
 		public long InsSubNum;
-		///<summary>How often payments are scheduled to be made.</summary>
+		///<summary>Enum:PaymentSchedule How often payments are scheduled to be made.</summary>
 		public PaymentSchedule PaySchedule;
 		///<summary>The number of payments that will be made to complete the payment plan.</summary>
 		public int NumberOfPayments;
@@ -39,19 +39,19 @@ namespace OpenDentBusiness{
 			return (PayPlan)this.MemberwiseClone();
 		}
 
-		public enum PaymentSchedule {
-			///<summary>0 - Pay 1 time every month.</summary>
-			Monthly,
-			///<summary>1 - Pay 1 time every month on a certain day of the week.</summary>
-			MonthlyDayOfWeek,
-			///<summary>2 - Pay every week per month.</summary>
-			Weekly,
-			///<summary>3 - Pay every other week per times per month.</summary>
-			BiWeekly,
-			///<summary>4 - Pay 4 times per year.</summary>
-			Quarterly
-		}
+	}
 
+	public enum PaymentSchedule {
+		///<summary>0 - Pay 1 time every month.</summary>
+		Monthly,
+		///<summary>1 - Pay 1 time every month on a certain day of the week.</summary>
+		MonthlyDayOfWeek,
+		///<summary>2 - Pay every week per month.</summary>
+		Weekly,
+		///<summary>3 - Pay every other week per times per month.</summary>
+		BiWeekly,
+		///<summary>4 - Pay 4 times per year.</summary>
+		Quarterly
 	}
 
 	

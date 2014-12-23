@@ -55,7 +55,7 @@ namespace OpenDentBusiness.Crud{
 				payPlan.PlanNum         = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
 				payPlan.CompletedAmt    = PIn.Double(table.Rows[i]["CompletedAmt"].ToString());
 				payPlan.InsSubNum       = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
-				payPlan.PaySchedule     = (OpenDentBusiness.PayPlan+PaymentSchedule)PIn.Int(table.Rows[i]["PaySchedule"].ToString());
+				payPlan.PaySchedule     = (OpenDentBusiness.PaymentSchedule)PIn.Int(table.Rows[i]["PaySchedule"].ToString());
 				payPlan.NumberOfPayments= PIn.Int   (table.Rows[i]["NumberOfPayments"].ToString());
 				payPlan.PayAmt          = PIn.Double(table.Rows[i]["PayAmt"].ToString());
 				payPlan.DownPayment     = PIn.Double(table.Rows[i]["DownPayment"].ToString());
