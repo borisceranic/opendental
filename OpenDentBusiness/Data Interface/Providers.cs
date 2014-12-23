@@ -209,8 +209,9 @@ namespace OpenDentBusiness{
 		}
 		
 		///<summary>Abbr - LName, FName (hidden).  For dental schools -- ProvNum - LName, FName (hidden).</summary>
-		public static string GetLongDesc(long provNum,List<Provider> listProvs) {
+		public static string GetLongDesc(long provNum) {
 			//No need to check RemotingRole; no call to db.
+			List<Provider> listProvs=ProviderC.GetListLong();
 			for(int i=0;i<listProvs.Count;i++) {
 				if(listProvs[i].ProvNum==provNum) {
 					return listProvs[i].GetLongDesc();
