@@ -392,6 +392,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEmailCertRegister.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEmailCertRegister.designer.cs">
+      <DependentUpon>FormEmailCertRegister.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEmailDigitalSignature.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3579,6 +3585,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEmailCertRegister.resx">
+      <DependentUpon>FormEmailCertRegister.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEmailDigitalSignature.resx">
       <DependentUpon>FormEmailDigitalSignature.cs</DependentUpon>

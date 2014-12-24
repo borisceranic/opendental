@@ -37,6 +37,7 @@ namespace OpenDental{
 		private Label label11;
 		private Label label9;
 		private Label label12;
+		private UI.Button butRegisterCertificate;
 		public bool IsNew;
 
 		///<summary></summary>
@@ -86,6 +87,7 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
 			this.groupOutgoing = new System.Windows.Forms.GroupBox();
+			this.label9 = new System.Windows.Forms.Label();
 			this.groupIncoming = new System.Windows.Forms.GroupBox();
 			this.textSMTPserverIncoming = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
@@ -93,8 +95,8 @@ namespace OpenDental{
 			this.textPortIncoming = new System.Windows.Forms.TextBox();
 			this.textBox5 = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
-			this.label9 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
+			this.butRegisterCertificate = new OpenDental.UI.Button();
 			this.groupOutgoing.SuspendLayout();
 			this.groupIncoming.SuspendLayout();
 			this.SuspendLayout();
@@ -261,7 +263,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(43, 384);
+			this.butDelete.Location = new System.Drawing.Point(12, 384);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 6;
@@ -285,6 +287,15 @@ namespace OpenDental{
 			this.groupOutgoing.TabIndex = 26;
 			this.groupOutgoing.TabStop = false;
 			this.groupOutgoing.Text = "Outgoing Email Settings";
+			// 
+			// label9
+			// 
+			this.label9.Location = new System.Drawing.Point(404, 142);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(159, 20);
+			this.label9.TabIndex = 24;
+			this.label9.Text = "(not used in encrypted email)";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// groupIncoming
 			// 
@@ -353,15 +364,6 @@ namespace OpenDental{
 			this.label11.Text = "Incoming Port";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label9
-			// 
-			this.label9.Location = new System.Drawing.Point(404, 142);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(159, 20);
-			this.label9.TabIndex = 24;
-			this.label9.Text = "(not used in encrypted email)";
-			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// label12
 			// 
 			this.label12.Location = new System.Drawing.Point(416, 6);
@@ -371,12 +373,28 @@ namespace OpenDental{
 			this.label12.Text = "(full email address)";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// butRegisterCertificate
+			// 
+			this.butRegisterCertificate.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRegisterCertificate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRegisterCertificate.Autosize = true;
+			this.butRegisterCertificate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRegisterCertificate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRegisterCertificate.CornerRadius = 4F;
+			this.butRegisterCertificate.Location = new System.Drawing.Point(197, 384);
+			this.butRegisterCertificate.Name = "butRegisterCertificate";
+			this.butRegisterCertificate.Size = new System.Drawing.Size(106, 24);
+			this.butRegisterCertificate.TabIndex = 29;
+			this.butRegisterCertificate.Text = "Register Certificate";
+			this.butRegisterCertificate.Click += new System.EventHandler(this.butRegisterCertificate_Click);
+			// 
 			// FormEmailAddressEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(600, 424);
+			this.Controls.Add(this.butRegisterCertificate);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.groupIncoming);
 			this.Controls.Add(this.groupOutgoing);
@@ -448,6 +466,11 @@ namespace OpenDental{
 			}
 			EmailAddresses.Delete(EmailAddressCur.EmailAddressNum);
 			DialogResult=DialogResult.OK;//OK triggers a refresh for the grid.
+		}
+
+		private void butRegisterCertificate_Click(object sender,EventArgs e) {
+			FormEmailCertRegister form=new FormEmailCertRegister(textUsername.Text);
+			form.ShowDialog();
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
