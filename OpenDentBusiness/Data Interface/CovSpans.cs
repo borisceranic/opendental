@@ -82,11 +82,13 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static long GetCat(string myCode){
 			//No need to check RemotingRole; no call to db.
+			CovSpan[] arrayCovSpans=CovSpanC.GetList();
 			long retVal=0;
-			for(int i=0;i<CovSpanC.List.Length;i++){
-				if(String.Compare(myCode,CovSpanC.List[i].FromCode)>=0
-					&& String.Compare(myCode,CovSpanC.List[i].ToCode)<=0){
-					retVal=CovSpanC.List[i].CovCatNum;
+			for(int i=0;i<arrayCovSpans.Length;i++){
+				if(String.Compare(myCode,arrayCovSpans[i].FromCode)>=0
+					&& String.Compare(myCode,arrayCovSpans[i].ToCode)<=0)
+				{
+					retVal=arrayCovSpans[i].CovCatNum;
 				}
 			}
 			return retVal;
@@ -96,9 +98,10 @@ namespace OpenDentBusiness{
 		public static CovSpan[] GetForCat(long catNum){
 			//No need to check RemotingRole; no call to db.
 			ArrayList AL=new ArrayList();
-			for(int i=0;i<CovSpanC.List.Length;i++){
-				if(CovSpanC.List[i].CovCatNum==catNum){
-					AL.Add(CovSpanC.List[i].Copy());
+			CovSpan[] arrayCovSpans=CovSpanC.GetList();
+			for(int i=0;i<arrayCovSpans.Length;i++){
+				if(arrayCovSpans[i].CovCatNum==catNum){
+					AL.Add(arrayCovSpans[i].Copy());
 				}
 			}
 			CovSpan[] retVal=new CovSpan[AL.Count];

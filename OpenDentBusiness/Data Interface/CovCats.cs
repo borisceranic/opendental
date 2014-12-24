@@ -20,13 +20,15 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			CovCatC.Listt=Crud.CovCatCrud.TableToList(table);
-			CovCatC.ListShort=new List<CovCat>();
-			for(int i=0;i<CovCatC.Listt.Count;i++) {
-				if(!CovCatC.Listt[i].IsHidden) {
-					CovCatC.ListShort.Add(CovCatC.Listt[i]);
+			List<CovCat> listCovCats=Crud.CovCatCrud.TableToList(table);
+			List<CovCat> listCovCatShort=new List<CovCat>();
+			for(int i=0;i<listCovCats.Count;i++) {
+				if(!listCovCats[i].IsHidden) {
+					listCovCatShort.Add(listCovCats[i]);
 				}
 			}
+			CovCatC.ListShort=listCovCatShort;
+			CovCatC.Listt=listCovCats;
 		}
 
 		///<summary></summary>
@@ -47,28 +49,28 @@ namespace OpenDentBusiness {
 			return Crud.CovCatCrud.Insert(covcat);
 		}
 
-		///<summary></summary>
+		///<summary>Does not update the cache.  The cache must be manually refreshed after using this method beccause it only updates the database.</summary>
 		public static void MoveUp(CovCat covcat) {
 			//No need to check RemotingRole; no call to db.
-			RefreshCache();
+			List<CovCat> listCovCats=CovCatC.GetListt();
 			int oldOrder=CovCatC.GetOrderLong(covcat.CovCatNum);
 			if(oldOrder==0 || oldOrder==-1) {
 				return;
 			}
-			SetOrder(CovCatC.Listt[oldOrder],(byte)(oldOrder-1));
-			SetOrder(CovCatC.Listt[oldOrder-1],(byte)oldOrder);
+			SetOrder(listCovCats[oldOrder],(byte)(oldOrder-1));
+			SetOrder(listCovCats[oldOrder-1],(byte)oldOrder);
 		}
 
-		///<summary></summary>
+		///<summary>Does not update the cache.  The cache must be manually refreshed after using this method beccause it only updates the database.</summary>
 		public static void MoveDown(CovCat covcat) {
 			//No need to check RemotingRole; no call to db.
-			RefreshCache();
+			List<CovCat> listCovCats=CovCatC.GetListt();
 			int oldOrder=CovCatC.GetOrderLong(covcat.CovCatNum);
-			if(oldOrder==CovCatC.Listt.Count-1 || oldOrder==-1) {
+			if(oldOrder==listCovCats.Count-1 || oldOrder==-1) {
 				return;
 			}
-			SetOrder(CovCatC.Listt[oldOrder],(byte)(oldOrder+1));
-			SetOrder(CovCatC.Listt[oldOrder+1],(byte)oldOrder);
+			SetOrder(listCovCats[oldOrder],(byte)(oldOrder+1));
+			SetOrder(listCovCats[oldOrder+1],(byte)oldOrder);
 		}
 
 		///<summary></summary>
@@ -81,9 +83,10 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static CovCat GetCovCat(long covCatNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<CovCatC.Listt.Count;i++) {
-				if(covCatNum==CovCatC.Listt[i].CovCatNum) {
-					return CovCatC.Listt[i].Copy();
+			List<CovCat> listCovCats=CovCatC.GetListt();
+			for(int i=0;i<listCovCats.Count;i++) {
+				if(covCatNum==listCovCats[i].CovCatNum) {
+					return listCovCats[i].Copy();
 				}
 			}
 			return null;//won't happen	
@@ -92,10 +95,11 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static double GetDefaultPercent(long myCovCatNum) {
 			//No need to check RemotingRole; no call to db.
+			List<CovCat> listCovCats=CovCatC.GetListt();
 			double retVal=0;
-			for(int i=0;i<CovCatC.Listt.Count;i++){
-				if(myCovCatNum==CovCatC.Listt[i].CovCatNum){
-					retVal=(double)CovCatC.Listt[i].DefaultPercent;
+			for(int i=0;i<listCovCats.Count;i++){
+				if(myCovCatNum==listCovCats[i].CovCatNum){
+					retVal=(double)listCovCats[i].DefaultPercent;
 				}
 			}
 			return retVal;	
@@ -104,10 +108,11 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static string GetDesc(long covCatNum) {
 			//No need to check RemotingRole; no call to db.
+			List<CovCat> listCovCats=CovCatC.GetListt();
 			string retStr="";
-			for(int i=0;i<CovCatC.Listt.Count;i++){
-				if(covCatNum==CovCatC.Listt[i].CovCatNum){
-					retStr=CovCatC.Listt[i].Description;
+			for(int i=0;i<listCovCats.Count;i++){
+				if(covCatNum==listCovCats[i].CovCatNum){
+					retStr=listCovCats[i].Description;
 				}
 			}
 			return retStr;	
@@ -117,10 +122,11 @@ namespace OpenDentBusiness {
 		public static long GetCovCatNum(int orderShort){
 			//No need to check RemotingRole; no call to db.
 			//need to check this again:
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
 			long retVal=0;
-			for(int i=0;i<CovCatC.ListShort.Count;i++){
-				if(orderShort==CovCatC.ListShort[i].CovOrder){
-					retVal=CovCatC.ListShort[i].CovCatNum;
+			for(int i=0;i<listCovCatsShort.Count;i++){
+				if(orderShort==listCovCatsShort[i].CovOrder){
+					retVal=listCovCatsShort[i].CovCatNum;
 				}
 			}
 			return retVal;	
@@ -129,9 +135,10 @@ namespace OpenDentBusiness {
 		///<summary>Returns -1 if not in ListShort.</summary>
 		public static int GetOrderShort(long CovCatNum) {
 			//No need to check RemotingRole; no call to db.
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
 			int retVal=-1;
-			for(int i=0;i<CovCatC.ListShort.Count;i++){
-				if(CovCatNum==CovCatC.ListShort[i].CovCatNum){
+			for(int i=0;i<listCovCatsShort.Count;i++){
+				if(CovCatNum==listCovCatsShort[i].CovCatNum){
 					retVal=i;
 				}
 			}
@@ -141,9 +148,10 @@ namespace OpenDentBusiness {
 		///<summary>Gets a matching benefit category from the short list.  Returns null if not found, which should be tested for.</summary>
 		public static CovCat GetForEbenCat(EbenefitCategory eben){
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<CovCatC.ListShort.Count;i++) {
-				if(eben==CovCatC.ListShort[i].EbenefitCat) {
-					return CovCatC.ListShort[i];
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
+			for(int i=0;i<listCovCatsShort.Count;i++) {
+				if(eben==listCovCatsShort[i].EbenefitCat) {
+					return listCovCatsShort[i];
 				}
 			}
 			return null;
@@ -152,9 +160,10 @@ namespace OpenDentBusiness {
 		///<summary>If none assigned, it will return None.</summary>
 		public static EbenefitCategory GetEbenCat(long covCatNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<CovCatC.ListShort.Count;i++) {
-				if(covCatNum==CovCatC.ListShort[i].CovCatNum) {
-					return CovCatC.ListShort[i].EbenefitCat;
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
+			for(int i=0;i<listCovCatsShort.Count;i++) {
+				if(covCatNum==listCovCatsShort[i].CovCatNum) {
+					return listCovCatsShort[i].EbenefitCat;
 				}
 			}
 			return EbenefitCategory.None;
@@ -162,9 +171,10 @@ namespace OpenDentBusiness {
 
 		public static int CountForEbenCat(EbenefitCategory eben) {
 			//No need to check RemotingRole; no call to db.
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
 			int retVal=0;
-			for(int i=0;i<CovCatC.ListShort.Count;i++) {
-				if(CovCatC.ListShort[i].EbenefitCat == eben) {
+			for(int i=0;i<listCovCatsShort.Count;i++) {
+				if(listCovCatsShort[i].EbenefitCat == eben) {
 					retVal++;
 				}
 			}
@@ -190,19 +200,21 @@ namespace OpenDentBusiness {
 			SetOrder(GetForEbenCat(EbenefitCategory.Adjunctive),13);
 			//now set the remaining categories to come after the ebens.
 			byte idx=14;
-			for(int i=0;i<CovCatC.ListShort.Count;i++) {
-				if(CovCatC.ListShort[i].EbenefitCat !=EbenefitCategory.None) {
+			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
+			for(int i=0;i<listCovCatsShort.Count;i++) {
+				if(listCovCatsShort[i].EbenefitCat !=EbenefitCategory.None) {
 					continue;
 				}
-				SetOrder(CovCatC.ListShort[i],idx);
+				SetOrder(listCovCatsShort[i],idx);
 				idx++;
 			}
 			//finally, the hidden categories
-			for(int i=0;i<CovCatC.Listt.Count;i++) {
-				if(!CovCatC.Listt[i].IsHidden) {
+			List<CovCat> listCovCats=CovCatC.GetListt();
+			for(int i=0;i<listCovCats.Count;i++) {
+				if(!listCovCats[i].IsHidden) {
 					continue;
 				}
-				SetOrder(CovCatC.Listt[i],idx);
+				SetOrder(listCovCats[i],idx);
 				idx++;
 			}
 		}

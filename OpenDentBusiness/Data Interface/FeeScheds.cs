@@ -21,13 +21,15 @@ namespace OpenDentBusiness{
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
 			//FeeSchedC.ListLong=new List<FeeSched>();
-			FeeSchedC.ListShort=new List<FeeSched>();
-			FeeSchedC.ListLong=Crud.FeeSchedCrud.TableToList(table);
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++) {
-				if(!FeeSchedC.ListLong[i].IsHidden) {
-					FeeSchedC.ListShort.Add(FeeSchedC.ListLong[i]);
+			List<FeeSched> listFeeScheds=Crud.FeeSchedCrud.TableToList(table);
+			List<FeeSched> listFeeSchedsShort=new List<FeeSched>();
+			for(int i=0;i<listFeeScheds.Count;i++) {
+				if(!listFeeScheds[i].IsHidden) {
+					listFeeSchedsShort.Add(listFeeScheds[i]);
 				}
 			}
+			FeeSchedC.ListShort=listFeeSchedsShort;
+			FeeSchedC.ListLong=listFeeScheds;
 		}
 
 		///<summary></summary>
@@ -53,9 +55,10 @@ namespace OpenDentBusiness{
 			if(feeSchedNum==0){
 				return "";
 			}
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++){
-				if(FeeSchedC.ListLong[i].FeeSchedNum==feeSchedNum){
-					return FeeSchedC.ListLong[i].Description;
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			for(int i=0;i<listFeeScheds.Count;i++){
+				if(listFeeScheds[i].FeeSchedNum==feeSchedNum){
+					return listFeeScheds[i].Description;
 				}
 			}
 			return "";
@@ -63,9 +66,10 @@ namespace OpenDentBusiness{
 
 		public static bool GetIsHidden(long feeSchedNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++){
-				if(FeeSchedC.ListLong[i].FeeSchedNum==feeSchedNum){
-					return FeeSchedC.ListLong[i].IsHidden;
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			for(int i=0;i<listFeeScheds.Count;i++){
+				if(listFeeScheds[i].FeeSchedNum==feeSchedNum){
+					return listFeeScheds[i].IsHidden;
 				}
 			}
 			return true;
@@ -74,9 +78,10 @@ namespace OpenDentBusiness{
 		///<summary>Will return null if exact name not found.</summary>
 		public static FeeSched GetByExactName(string description){
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++){
-				if(FeeSchedC.ListLong[i].Description==description){
-					return FeeSchedC.ListLong[i].Copy();
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			for(int i=0;i<listFeeScheds.Count;i++){
+				if(listFeeScheds[i].Description==description){
+					return listFeeScheds[i].Copy();
 				}
 			}
 			return null;
@@ -85,12 +90,13 @@ namespace OpenDentBusiness{
 		///<summary>Will return null if exact name not found.</summary>
 		public static FeeSched GetByExactName(string description,FeeScheduleType feeSchedType){
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++){
-				if(FeeSchedC.ListLong[i].FeeSchedType!=feeSchedType){
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			for(int i=0;i<listFeeScheds.Count;i++){
+				if(listFeeScheds[i].FeeSchedType!=feeSchedType){
 					continue;
 				}
-				if(FeeSchedC.ListLong[i].Description==description){
-					return FeeSchedC.ListLong[i].Copy();
+				if(listFeeScheds[i].Description==description){
+					return listFeeScheds[i].Copy();
 				}
 			}
 			return null;
@@ -100,12 +106,13 @@ namespace OpenDentBusiness{
 		public static List<FeeSched> GetListForType(FeeScheduleType feeSchedType,bool includeHidden) {
 			//No need to check RemotingRole; no call to db.
 			List<FeeSched> retVal=new List<FeeSched>();
-			for(int i=0;i<FeeSchedC.ListLong.Count;i++) {
-				if(!includeHidden && FeeSchedC.ListLong[i].IsHidden){
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			for(int i=0;i<listFeeScheds.Count;i++) {
+				if(!includeHidden && listFeeScheds[i].IsHidden){
 					continue;
 				}
-				if(FeeSchedC.ListLong[i].FeeSchedType==feeSchedType){
-					retVal.Add(FeeSchedC.ListLong[i].Copy());
+				if(listFeeScheds[i].FeeSchedType==feeSchedType){
+					retVal.Add(listFeeScheds[i].Copy());
 				}
 			}
 			return retVal;

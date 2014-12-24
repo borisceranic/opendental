@@ -26,15 +26,15 @@ namespace OpenDentBusiness{
 
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			ProviderC.ListLong=Crud.ProviderCrud.TableToList(table);
-			List<Provider> listShort=new List<Provider>();
-			List<Provider> listLong=ProviderC.GetListLong();
-			for(int i=0;i<listLong.Count;i++){
-				if(!listLong[i].IsHidden){
-					listShort.Add(listLong[i]);	
+			List<Provider> listProvidersShort=new List<Provider>();
+			List<Provider> listProvidersLong=Crud.ProviderCrud.TableToList(table);
+			for(int i=0;i<listProvidersLong.Count;i++){
+				if(!listProvidersLong[i].IsHidden){
+					listProvidersShort.Add(listProvidersLong[i]);	
 				}
 			}
-			ProviderC.ListShort=listShort;
+			ProviderC.ListShort=listProvidersShort;
+			ProviderC.ListLong=listProvidersLong;
 		}
 
 		///<summary></summary>

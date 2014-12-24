@@ -4018,7 +4018,8 @@ namespace OpenDentBusiness {
 				}
 			}
 			else {
-				command=@"UPDATE provider SET FeeSched="+POut.Long(FeeSchedC.ListShort[0].FeeSchedNum)+" "
+				List<FeeSched> listFeeSchedsShort=FeeSchedC.GetListShort();
+				command=@"UPDATE provider SET FeeSched="+POut.Long(listFeeSchedsShort[0].FeeSchedNum)+" "
 					+"WHERE FeeSched NOT IN (SELECT FeeSchedNum FROM feesched)";
 				long numberFixed=Db.NonQ(command);
 				if(numberFixed>0 || verbose) {

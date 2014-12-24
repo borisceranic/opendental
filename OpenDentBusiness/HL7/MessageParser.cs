@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Globalization;
 using System.Text;
 using System.Diagnostics;
@@ -1576,6 +1577,7 @@ namespace OpenDentBusiness.HL7 {
 			string strOidExtRoot="";
 			ProcedureCode procCode=null;
 			DateTime dateProc=DateTime.MinValue;
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
 			for(int i=0;i<segDef.hl7DefFields.Count;i++) {
 				int itemOrder=segDef.hl7DefFields[i].OrdinalPos;
 				switch(segDef.hl7DefFields[i].FieldName) {
@@ -1590,12 +1592,12 @@ namespace OpenDentBusiness.HL7 {
 							return;
 						}
 						string strProcCode=seg.GetFieldComponent(itemOrder,0);
-						if(!ProcedureCodeC.HList.ContainsKey(strProcCode)) {//code does not exist in proc code list, write entry in event log an return
+						if(!hashProcedureCodes.ContainsKey(strProcCode)) {//code does not exist in proc code list, write entry in event log an return
 							EventLog.WriteEntry("OpenDentHL7","A procedure was not added for patient "+pat.GetNameFLnoPref()
 								+".  The code supplied in the PR1 segment does not exist in the database.  The code provided was "+strProcCode+".",EventLogEntryType.Information);
 							return;
 						}
-						procCode=(ProcedureCode)ProcedureCodeC.HList[strProcCode];
+						procCode=(ProcedureCode)hashProcedureCodes[strProcCode];
 						continue;
 					case "proc.procDateTime":
 						dateProc=FieldParser.DateTimeParse(seg.GetFieldComponent(itemOrder));

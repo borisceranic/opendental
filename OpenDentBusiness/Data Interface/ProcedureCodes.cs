@@ -24,14 +24,16 @@ namespace OpenDentBusiness{
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
 			ProcedureCodeC.Listt=Crud.ProcedureCodeCrud.TableToList(table);
-			ProcedureCodeC.HList=new Hashtable();
-			for(int i=0;i<ProcedureCodeC.Listt.Count;i++) {
+			Hashtable hashProcCodes=new Hashtable();
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
+			for(int i=0;i<listProcedureCodes.Count;i++) {
 				try {
-					ProcedureCodeC.HList.Add(ProcedureCodeC.Listt[i].ProcCode,ProcedureCodeC.Listt[i].Copy());
+					hashProcCodes.Add(listProcedureCodes[i].ProcCode,listProcedureCodes[i].Copy());
 				}
 				catch {
 				}
 			}
+			ProcedureCodeC.HList=hashProcCodes;
 		}
 
 		public static List<ProcedureCode> GetChangedSince(DateTime changedSince) {
@@ -77,8 +79,9 @@ namespace OpenDentBusiness{
 				//MessageBox.Show(Lans.g("ProcCodes","Error. Invalid procedure code."));
 				return new ProcedureCode();
 			}
-			if(ProcedureCodeC.HList.Contains(myCode)) {
-				return (ProcedureCode)ProcedureCodeC.HList[myCode];
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
+			if(hashProcedureCodes.Contains(myCode)) {
+				return (ProcedureCode)hashProcedureCodes[myCode];
 			}
 			else{
 				return new ProcedureCode();
@@ -92,9 +95,10 @@ namespace OpenDentBusiness{
 				//MessageBox.Show(Lans.g("ProcCodes","Error. Invalid procedure code."));
 				return new ProcedureCode();
 			}
-			for(int i=0;i<ProcedureCodeC.Listt.Count;i++) {
-				if(ProcedureCodeC.Listt[i].CodeNum==codeNum) {
-					return ProcedureCodeC.Listt[i];
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
+			for(int i=0;i<listProcedureCodes.Count;i++) {
+				if(listProcedureCodes[i].CodeNum==codeNum) {
+					return listProcedureCodes[i];
 				}
 			}
 			return new ProcedureCode();
@@ -119,8 +123,9 @@ namespace OpenDentBusiness{
 			if(myCode==null || myCode=="") {
 				return 0;
 			}
-			if(ProcedureCodeC.HList.Contains(myCode)) {
-				return ((ProcedureCode)ProcedureCodeC.HList[myCode]).CodeNum;
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
+			if(hashProcedureCodes.Contains(myCode)) {
+				return ((ProcedureCode)hashProcedureCodes[myCode]).CodeNum;
 			}
 			return 0;
 			//else {
@@ -134,19 +139,20 @@ namespace OpenDentBusiness{
 			if(procCode==null || procCode=="") {
 				return 0;
 			}
-			if(!ProcedureCodeC.HList.Contains(procCode)) {
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
+			if(!hashProcedureCodes.Contains(procCode)) {
 				return 0;
 			}
-			ProcedureCode proc=(ProcedureCode)ProcedureCodeC.HList[procCode];
-			if(proc.SubstitutionCode!="" && ProcedureCodeC.HList.Contains(proc.SubstitutionCode)) {
+			ProcedureCode proc=(ProcedureCode)hashProcedureCodes[procCode];
+			if(proc.SubstitutionCode!="" && hashProcedureCodes.Contains(proc.SubstitutionCode)) {
 				if(proc.SubstOnlyIf==SubstitutionCondition.Always){
-					return ((ProcedureCode)ProcedureCodeC.HList[proc.SubstitutionCode]).CodeNum;
+					return ((ProcedureCode)hashProcedureCodes[proc.SubstitutionCode]).CodeNum;
 				}
 				if(proc.SubstOnlyIf==SubstitutionCondition.Molar && Tooth.IsMolar(toothNum)){
-					return ((ProcedureCode)ProcedureCodeC.HList[proc.SubstitutionCode]).CodeNum;
+					return ((ProcedureCode)hashProcedureCodes[proc.SubstitutionCode]).CodeNum;
 				}
 				if(proc.SubstOnlyIf==SubstitutionCondition.SecondMolar && Tooth.IsSecondMolar(toothNum)) {
-					return ((ProcedureCode)ProcedureCodeC.HList[proc.SubstitutionCode]).CodeNum;
+					return ((ProcedureCode)hashProcedureCodes[proc.SubstitutionCode]).CodeNum;
 				}
 			}
 			return proc.CodeNum;
@@ -158,9 +164,10 @@ namespace OpenDentBusiness{
 				return "";
 				//throw new ApplicationException("CodeNum cannot be zero.");
 			}
-			for(int i=0;i<ProcedureCodeC.Listt.Count;i++) {
-				if(ProcedureCodeC.Listt[i].CodeNum==codeNum) {
-					return ProcedureCodeC.Listt[i].ProcCode;
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
+			for(int i=0;i<listProcedureCodes.Count;i++) {
+				if(listProcedureCodes[i].CodeNum==codeNum) {
+					return listProcedureCodes[i].ProcCode;
 				}
 			}
 			throw new ApplicationException("Missing codenum");
@@ -172,7 +179,8 @@ namespace OpenDentBusiness{
 			if(myCode==null || myCode=="") {
 				return false;
 			}
-			if(ProcedureCodeC.HList.Contains(myCode)) {
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
+			if(hashProcedureCodes.Contains(myCode)) {
 				return true;
 			}
 			else {
@@ -184,10 +192,11 @@ namespace OpenDentBusiness{
 		public static ProcedureCode[] GetProcList(){
 			//No need to check RemotingRole; no call to db.
 			List<ProcedureCode> retVal=new List<ProcedureCode>();
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
 			for(int j=0;j<DefC.Short[(int)DefCat.ProcCodeCats].Length;j++){
-				for(int k=0;k<ProcedureCodeC.Listt.Count;k++) {
-					if(DefC.Short[(int)DefCat.ProcCodeCats][j].DefNum==ProcedureCodeC.Listt[k].ProcCat) {
-						retVal.Add(ProcedureCodeC.Listt[k].Copy());
+				for(int k=0;k<listProcedureCodes.Count;k++) {
+					if(DefC.Short[(int)DefCat.ProcCodeCats][j].DefNum==listProcedureCodes[k].ProcCat) {
+						retVal.Add(listProcedureCodes[k].Copy());
 					}
 				}
 			}
@@ -236,12 +245,13 @@ namespace OpenDentBusiness{
 		///<summary>Returns the LaymanTerm for the supplied codeNum, or the description if none present.</summary>
 		public static string GetLaymanTerm(long codeNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProcedureCodeC.Listt.Count;i++) {
-				if(ProcedureCodeC.Listt[i].CodeNum==codeNum) {
-					if(ProcedureCodeC.Listt[i].LaymanTerm !="") {
-						return ProcedureCodeC.Listt[i].LaymanTerm;
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
+			for(int i=0;i<listProcedureCodes.Count;i++) {
+				if(listProcedureCodes[i].CodeNum==codeNum) {
+					if(listProcedureCodes[i].LaymanTerm !="") {
+						return listProcedureCodes[i].LaymanTerm;
 					}
-					return ProcedureCodeC.Listt[i].Descript;
+					return listProcedureCodes[i].Descript;
 				}
 			}
 			return "";

@@ -10,19 +10,37 @@ namespace OpenDentBusiness{
 		#region CachePattern
 
 		///<summary>A list of all ProcApptColors.</summary>
-		private static List<ProcApptColor> listt;
+		private static List<ProcApptColor> _listt;
+		private static object _lock=new object();
 
 		///<summary>A list of all ProcApptColors.</summary>
-		public static List<ProcApptColor> Listt{
+		public static List<ProcApptColor> Listt {
 			get {
-				if(listt==null) {
-					RefreshCache();
-				}
-				return listt;
+				return GetListLong();
 			}
 			set {
-				listt=value;
+				lock(_lock) {
+					_listt=value;
+				}
 			}
+		}
+
+		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		public static List<ProcApptColor> GetListLong() {
+			bool hasNullList=false;
+			lock(_lock) {
+				hasNullList=_listt==null;
+			}
+			if(hasNullList) {
+				ProcApptColors.RefreshCache();
+			}
+			List<ProcApptColor> listProcApptColors=new List<ProcApptColor>();
+			lock(_lock){
+				if(_listt!=null) {
+					listProcApptColors.AddRange(_listt);
+				}
+			}
+			return listProcApptColors;
 		}
 
 		///<summary></summary>
@@ -38,7 +56,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.ProcApptColorCrud.TableToList(table);
+			_listt=Crud.ProcApptColorCrud.TableToList(table);
 		}
 		#endregion
 
@@ -92,20 +110,21 @@ namespace OpenDentBusiness{
 		public static ProcApptColor GetMatch(string procCode) {
 			string code1="";
 			string code2="";
-			for(int i=0;i<Listt.Count;i++) {//using public property to trigger refresh if needed.
-				if(Listt[i].CodeRange.Contains("-")) {
-					string[] codeSplit=Listt[i].CodeRange.Split('-');
+			List<ProcApptColor> listProcApptColors=ProcApptColors.GetListLong();
+			for(int i=0;i<listProcApptColors.Count;i++) {//using public property to trigger refresh if needed.
+				if(listProcApptColors[i].CodeRange.Contains("-")) {
+					string[] codeSplit=listProcApptColors[i].CodeRange.Split('-');
 					code1=codeSplit[0].Trim();
 					code2=codeSplit[1].Trim();
 				}
 				else{
-					code1=Listt[i].CodeRange.Trim();
-					code2=Listt[i].CodeRange.Trim();
+					code1=listProcApptColors[i].CodeRange.Trim();
+					code2=listProcApptColors[i].CodeRange.Trim();
 				}
 				if(procCode.CompareTo(code1)<0 || procCode.CompareTo(code2)>0) {
 					continue;
 				}
-				return listt[i];
+				return listProcApptColors[i];
 			}
 			return null;
 		}

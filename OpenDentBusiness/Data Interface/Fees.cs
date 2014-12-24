@@ -7,19 +7,37 @@ using System.Reflection;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Fees {
-		private static List<Fee> listt;
+		private static List<Fee> _listt;
+		private static object _lock=new object();
 
 		///<summary>A list of all Fees.</summary>
 		public static List<Fee> Listt{
 			get {
-				if(listt==null) {
-					RefreshCache();
-				}
-				return listt;
+				return GetListt();
 			}
 			set {
-				listt=value;
+				lock(_lock) {
+					_listt=value;
+				}
 			}
+		}
+
+		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		public static List<Fee> GetListt() {
+			bool hasNullList=false;
+			lock(_lock) {
+				hasNullList=_listt==null;
+			}
+			if(hasNullList) {
+				Fees.RefreshCache();
+			}
+			List<Fee> listFees=new List<Fee>();
+			lock(_lock) {
+				if(_listt!=null) {
+					listFees.AddRange(_listt);
+				}
+			}
+			return listFees;
 		}
 
 		public static DataTable RefreshCache() {
@@ -34,7 +52,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.FeeCrud.TableToList(table);
+			Listt=Crud.FeeCrud.TableToList(table);
 			/*
 			Dict=new Dictionary<FeeKey,Fee>();
 			FeeKey key;
@@ -94,9 +112,10 @@ namespace OpenDentBusiness{
 			if(feeSchedNum==0){
 				return null;
 			}
-			for(int i=0;i<Listt.Count;i++) {
-				if(Listt[i].CodeNum==codeNum && Listt[i].FeeSched==feeSchedNum) {
-					return Listt[i];
+			List<Fee> listFees=GetListt();
+			for(int i=0;i<listFees.Count;i++) {
+				if(listFees[i].CodeNum==codeNum && listFees[i].FeeSched==feeSchedNum) {
+					return listFees[i];
 				}
 			}
 			return null;
@@ -114,9 +133,10 @@ namespace OpenDentBusiness{
 			if(FeeScheds.GetIsHidden(feeSchedNum)){
 				return -1;//you cannot obtain fees for hidden fee schedules
 			}
-			for(int i=0;i<Listt.Count;i++) {
-				if(Listt[i].CodeNum==codeNum && Listt[i].FeeSched==feeSchedNum) {
-					return Listt[i].Amount;
+			List<Fee> listFees=GetListt();
+			for(int i=0;i<listFees.Count;i++) {
+				if(listFees[i].CodeNum==codeNum && listFees[i].FeeSched==feeSchedNum) {
+					return listFees[i].Amount;
 				}
 			}
 			return -1;//code not found
@@ -237,15 +257,16 @@ namespace OpenDentBusiness{
 		///<summary>Copies any fee objects over to the new fee schedule.  Usually run ClearFeeSched first.  Be careful exactly which int's you supply.</summary>
 		public static void CopyFees(long fromFeeSched,long toFeeSched) {
 			//No need to check RemotingRole; no call to db.
-			if(Listt==null) {
+			List<Fee> listFees=GetListt();
+			if(listFees==null) {
 				RefreshCache();
 			}
 			Fee fee;
-			for(int i=0;i<Listt.Count;i++){
-				if(Listt[i].FeeSched!=fromFeeSched){
+			for(int i=0;i<listFees.Count;i++){
+				if(listFees[i].FeeSched!=fromFeeSched){
 					continue;
 				}
-				fee=Listt[i].Copy();
+				fee=listFees[i].Copy();
 				fee.FeeSched=toFeeSched;
 				Fees.Insert(fee);
 			}
@@ -254,19 +275,20 @@ namespace OpenDentBusiness{
 		///<summary>Increases the fee schedule by percent.  Round should be the number of decimal places, either 0,1,or 2.</summary>
 		public static void Increase(long feeSched,int percent,int round) {
 			//No need to check RemotingRole; no call to db.
-			if(Listt==null) {
+			List<Fee> listFees=GetListt();
+			if(listFees==null) {
 				RefreshCache();
 			}
 			Fee fee;
 			double newVal;
-			for(int i=0;i<Listt.Count;i++){
-				if(Listt[i].FeeSched!=feeSched){
+			for(int i=0;i<listFees.Count;i++){
+				if(listFees[i].FeeSched!=feeSched){
 					continue;
 				}
-				if(Listt[i].Amount==0){
+				if(listFees[i].Amount==0){
 					continue;
 				}
-				fee=Listt[i].Copy();
+				fee=listFees[i].Copy();
 				newVal=(double)fee.Amount*(1+(double)percent/100);
 				if(round>0) {
 					fee.Amount=Math.Round(newVal,round);

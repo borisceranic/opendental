@@ -773,7 +773,8 @@ namespace OpenDentBusiness {
 			//loop through all the carrier names
 			string carrierName;
 			FeeSched sched;
-			int itemOrder=FeeSchedC.ListLong.Count;
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			int itemOrder=listFeeScheds.Count;
 			DataTable tableCarrierNums;
 			long retVal=0;
 			for(int i=0;i<table.Rows.Count;i++){

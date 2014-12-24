@@ -22,30 +22,31 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<RecallType> list=Crud.RecallTypeCrud.TableToList(table);
 			//reorder rows for better usability
-			RecallTypeC.Listt=new List<RecallType>();
+			List<RecallType> listRecallTypes=new List<RecallType>();
 			for(int i=0;i<list.Count;i++){
 				if(list[i].RecallTypeNum==PrefC.GetLong(PrefName.RecallTypeSpecialProphy)){
-					RecallTypeC.Listt.Add(list[i]);
+					listRecallTypes.Add(list[i]);
 					break;
 				}
 			}
 			for(int i=0;i<list.Count;i++){
 				if(list[i].RecallTypeNum==PrefC.GetLong(PrefName.RecallTypeSpecialChildProphy)){
-					RecallTypeC.Listt.Add(list[i]);
+					listRecallTypes.Add(list[i]);
 					break;
 				}
 			}
 			for(int i=0;i<list.Count;i++){
 				if(list[i].RecallTypeNum==PrefC.GetLong(PrefName.RecallTypeSpecialPerio)){
-					RecallTypeC.Listt.Add(list[i]);
+					listRecallTypes.Add(list[i]);
 					break;
 				}
 			}
 			for(int i=0;i<list.Count;i++){//now add the rest
-				if(!RecallTypeC.Listt.Contains(list[i])){
-					RecallTypeC.Listt.Add(list[i]);
+				if(!listRecallTypes.Contains(list[i])){
+					listRecallTypes.Add(list[i]);
 				}
 			}
+			RecallTypeC.Listt=listRecallTypes;
 		}
 
 		///<summary></summary>
@@ -68,12 +69,13 @@ namespace OpenDentBusiness{
 
 		public static string GetDescription(long recallTypeNum) {
 			//No need to check RemotingRole; no call to db.
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
 			if(recallTypeNum==0){
 				return "";
 			}
-			for(int i=0;i<RecallTypeC.Listt.Count;i++){
-				if(RecallTypeC.Listt[i].RecallTypeNum==recallTypeNum){
-					return RecallTypeC.Listt[i].Description;
+			for(int i=0;i<listRecallTypes.Count;i++){
+				if(listRecallTypes[i].RecallTypeNum==recallTypeNum){
+					return listRecallTypes[i].Description;
 				}
 			}
 			return "";
@@ -81,12 +83,13 @@ namespace OpenDentBusiness{
 
 		public static Interval GetInterval(long recallTypeNum) {
 			//No need to check RemotingRole; no call to db.
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
 			if(recallTypeNum==0){
 				return new Interval(0,0,0,0);
 			}
-			for(int i=0;i<RecallTypeC.Listt.Count;i++){
-				if(RecallTypeC.Listt[i].RecallTypeNum==recallTypeNum){
-					return RecallTypeC.Listt[i].DefaultInterval;
+			for(int i=0;i<listRecallTypes.Count;i++){
+				if(listRecallTypes[i].RecallTypeNum==recallTypeNum){
+					return listRecallTypes[i].DefaultInterval;
 				}
 			}
 			return new Interval(0,0,0,0);
@@ -96,15 +99,16 @@ namespace OpenDentBusiness{
 		public static List<string> GetProcs(long recallTypeNum) {
 			//No need to check RemotingRole; no call to db.
 			List<string> retVal=new List<string>();
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
 			if(recallTypeNum==0){
 				return retVal;
 			}
-			for(int i=0;i<RecallTypeC.Listt.Count;i++){
-				if(RecallTypeC.Listt[i].RecallTypeNum==recallTypeNum){
-					if(RecallTypeC.Listt[i].Procedures==""){
+			for(int i=0;i<listRecallTypes.Count;i++){
+				if(listRecallTypes[i].RecallTypeNum==recallTypeNum){
+					if(listRecallTypes[i].Procedures==""){
 						return retVal;
 					}
-					string[] strArray=RecallTypeC.Listt[i].Procedures.Split(',');
+					string[] strArray=listRecallTypes[i].Procedures.Split(',');
 					retVal.AddRange(strArray);
 					return retVal;
 				}
@@ -129,12 +133,13 @@ namespace OpenDentBusiness{
 
 		public static string GetTimePattern(long recallTypeNum) {
 			//No need to check RemotingRole; no call to db.
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
 			if(recallTypeNum==0){
 				return "";
 			}
-			for(int i=0;i<RecallTypeC.Listt.Count;i++){
-				if(RecallTypeC.Listt[i].RecallTypeNum==recallTypeNum){
-					return RecallTypeC.Listt[i].TimePattern;
+			for(int i=0;i<listRecallTypes.Count;i++){
+				if(listRecallTypes[i].RecallTypeNum==recallTypeNum){
+					return listRecallTypes[i].TimePattern;
 				}
 			}
 			return "";
@@ -173,10 +178,11 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<RecallType> retVal=new List<RecallType>();
 			List<RecallTrigger> triggers;
-			for(int i=0;i<RecallTypeC.Listt.Count;i++){
-				triggers=RecallTriggers.GetForType(RecallTypeC.Listt[i].RecallTypeNum);
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
+			for(int i=0;i<listRecallTypes.Count;i++){
+				triggers=RecallTriggers.GetForType(listRecallTypes[i].RecallTypeNum);
 				if(triggers.Count>0){
-					retVal.Add(RecallTypeC.Listt[i].Copy());
+					retVal.Add(listRecallTypes[i].Copy());
 				}
 			}
 			return retVal;

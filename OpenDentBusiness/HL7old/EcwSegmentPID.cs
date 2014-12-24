@@ -224,11 +224,12 @@ namespace OpenDentBusiness.HL7 {
 			bool isNewProv=false;
 			bool provChanged=false;
 			if(prov==null) {
+				List<FeeSched> listFeeSchedsShort=FeeSchedC.GetListShort();
 				isNewProv=true;
 				prov=new Provider();
 				prov.Abbr=eID;//They can manually change this later.
 				prov.EcwID=eID;
-				prov.FeeSched=FeeSchedC.ListShort[0].FeeSchedNum;
+				prov.FeeSched=listFeeSchedsShort[0].FeeSchedNum;
 			}
 			if(prov.LName!=field.GetComponentVal(1)) {
 				provChanged=true;
