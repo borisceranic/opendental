@@ -22,10 +22,7 @@ namespace OpenDentBusiness {
 
 		public static List<Provider> ListShort {
 			get {
-				if(_listShort==null) {
-					Providers.RefreshCache();
-				}
-				return _listShort;
+				return GetListShort();
 			}
 			set {
 				lock(_lock) {
