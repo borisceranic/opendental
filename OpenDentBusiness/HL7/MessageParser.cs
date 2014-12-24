@@ -1242,6 +1242,9 @@ namespace OpenDentBusiness.HL7 {
 			}
 			//if the existing note contains the exact text of the note in the NTE segment, don't append it again
 			//replace the \r's and then \n's with a blank string before comparing to eliminate inconsistencies in new line characters
+			if(apt.Note==null) {//just in case a new appointment gets here and has not been inserted yet, should never happen
+				apt.Note="";
+			}
 			if(apt.Note.Replace("\r\n","\n").Replace("\r","\n").Contains(strAptNote.Replace("\r\n","\n").Replace("\r","\n"))) {
 				return;
 			}
@@ -2079,6 +2082,7 @@ namespace OpenDentBusiness.HL7 {
 				apt.AptNum=aptNum;
 				apt.PatNum=pat.PatNum;
 				apt.AptStatus=ApptStatus.Scheduled;
+				apt.Note="";
 			}
 			else {
 				aptOld=apt.Clone();
