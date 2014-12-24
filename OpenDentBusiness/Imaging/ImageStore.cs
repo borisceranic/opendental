@@ -51,6 +51,9 @@ namespace OpenDentBusiness {
 		///<summary>Will create folder if needed.  Will validate that folder exists.  It will alter the pat.ImageFolder if needed, but still make sure to pass in a very new Patient because we do not want an invalid patFolder.</summary>
 		public static string GetPatientFolder(Patient pat,string AtoZpath) {
 			string retVal="";
+			if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				return retVal;
+			}
 			if(pat.ImageFolder=="") {//creates new folder for patient if none present
 				string name=pat.LName+pat.FName;
 				string folder="";
@@ -92,7 +95,11 @@ namespace OpenDentBusiness {
 
 		///<summary>Will create folder if needed.  Will validate that folder exists.</summary>
 		public static string GetEobFolder() {
-			string retVal=ODFileUtils.CombinePaths(GetPreferredAtoZpath(),"EOBs");
+			string retVal="";
+			if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				return retVal;
+			}
+			retVal=ODFileUtils.CombinePaths(GetPreferredAtoZpath(),"EOBs");
 			if(!Directory.Exists(retVal)) {
 				Directory.CreateDirectory(retVal);
 			}
@@ -101,7 +108,11 @@ namespace OpenDentBusiness {
 
 		///<summary>Will create folder if needed.  Will validate that folder exists.</summary>
 		public static string GetAmdFolder() {
-			string retVal=ODFileUtils.CombinePaths(GetPreferredAtoZpath(),"Amendments");
+			string retVal="";
+			if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				return retVal;
+			}
+			retVal=ODFileUtils.CombinePaths(GetPreferredAtoZpath(),"Amendments");
 			if(!Directory.Exists(retVal)) {
 				Directory.CreateDirectory(retVal);
 			}
@@ -110,6 +121,10 @@ namespace OpenDentBusiness {
 
 		///<summary>When the Image module is opened, this loads newly added files.</summary>
 		public static void AddMissingFilesToDatabase(Patient pat) {
+			//There is no such thing as adding files from any directory when not using AtoZ
+			if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				return;
+			}
 			string patFolder=GetPatientFolder(pat,GetPreferredAtoZpath());
 			DirectoryInfo di = new DirectoryInfo(patFolder);
 			FileInfo[] fiList = di.GetFiles();
