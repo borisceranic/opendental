@@ -7,10 +7,14 @@ namespace OpenDentBusiness {
 	public class ProviderC {
 		private static List<Provider> _listLong;
 		private static List<Provider> _listShort;
+		///<summary>Thread safe lock object.  Any time you access _listShort or _listLong you MUST wrap the code block with lock(_lock).  Failing to lock will result in a potential for unsafe access by multiple threads at the same time.</summary>
 		private static object _lock=new object();
 
+		///<summary>Rarely used. Includes all providers, even if hidden.</summary>
 		public static List<Provider> ListLong {
 			get {
+				//TODO: Add the following comment to the summary if we decide to not use GetListLong() here:
+				//Use GetListLong() instead of this getter when needing access to this list from the OpenDentBusiness project.
 				return GetListLong();
 			}
 			set {
@@ -20,8 +24,11 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>This is the list used most often. It does not include hidden providers.</summary>
 		public static List<Provider> ListShort {
 			get {
+				//TODO: Add the following comment to the summary if we decide to not use GetListShort() here:
+				//Use GetListShort() instead of this getter when needing access to this list from the OpenDentBusiness project.
 				return GetListShort();
 			}
 			set {
@@ -31,40 +38,42 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Thread-safe. Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>Rarely used. Includes all providers, even if hidden.</summary>
 		public static List<Provider> GetListLong() {
-			//If this is first-time access then the cache will be null. Check for null do the initial RefreshCache when necessary.
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listLong==null;
+				if(_listLong==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
-				Providers.RefreshCache();
+			//If this is first-time access then the cache will be null.  Only do the initial RefreshCache when necessary.
+			if(isListNull) {
+				//RefreshCache should never be locked because it contains database I/O.
+				Providers.RefreshCache();//Eventually calls ListLong's setter which is thread safe.
 			}
 			List<Provider> listProvs=new List<Provider>();
 			lock(_lock) {
-				if(_listLong!=null) {
-					listProvs.AddRange(_listLong);
-				}
+				listProvs.AddRange(_listLong);
 			}
 			return listProvs;
 		}
 
-		///<summary>Thread-safe. Returns a copy of the currently cached short list of objects.</summary>
+		///<summary>This is the list used most often. It does not include hidden providers.</summary>
 		public static List<Provider> GetListShort() {
-			//If this is first-time access then the cache will be null. Check for null do the initial RefreshCache when necessary.
 			bool hasNullList=false;
 			lock(_lock) {
-				hasNullList=_listShort==null;
+				if(_listShort==null) {
+					hasNullList=true;
+				}
 			}
+			//If this is first-time access then the cache will be null.  Only do the initial RefreshCache when necessary.
 			if(hasNullList) {
-				Providers.RefreshCache();
+				//RefreshCache should never be locked because it contains database I/O.
+				Providers.RefreshCache();//Eventually calls ListShort's setter which is thread safe.
 			}
 			List<Provider> listProvs=new List<Provider>();
 			lock(_lock) {
-				if(_listShort!=null) {
-					listProvs.AddRange(_listShort);
-				}
+				listProvs.AddRange(_listShort);
 			}
 			return listProvs;
 		}

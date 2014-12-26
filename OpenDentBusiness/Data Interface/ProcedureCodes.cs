@@ -30,7 +30,7 @@ namespace OpenDentBusiness{
 				try {
 					hashProcCodes.Add(listProcedureCodes[i].ProcCode,listProcedureCodes[i].Copy());
 				}
-				catch {
+				catch {//in case of duplicate in db
 				}
 			}
 			ProcedureCodeC.HList=hashProcCodes;

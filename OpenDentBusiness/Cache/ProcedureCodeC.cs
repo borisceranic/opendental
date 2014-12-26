@@ -67,7 +67,7 @@ namespace OpenDentBusiness {
 						try {//Reconstruct the hash table from listProcedureCodes because I don't know how to deep copy a hash table.
 							hashProcedureCodes.Add(listProcedureCodes[i].ProcCode,listProcedureCodes[i].Copy());
 						}
-						catch {
+						catch {//in case of duplicate in db
 						}
 					}
 				}
