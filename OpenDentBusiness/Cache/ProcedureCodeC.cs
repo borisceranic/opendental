@@ -34,38 +34,38 @@ namespace OpenDentBusiness {
 
 		///<summary></summary>
 		public static List<ProcedureCode> GetListLong() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
 				if(_list==null) {
-					hasNullList=true;
+					isListNull=true;
 				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				ProcedureCodes.RefreshCache();
 			}
-			List<ProcedureCode> listProcedureCodes=new List<ProcedureCode>();
+			List<ProcedureCode> listProcCodes=new List<ProcedureCode>();
 			lock(_lock) {
-				listProcedureCodes.AddRange(_list);
+				listProcCodes.AddRange(_list);
 			}
-			return listProcedureCodes;
+			return listProcCodes;
 		}
 
 		///<summary>key:ProcCode, value:ProcedureCode</summary>
 		public static Hashtable GetHList() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
 				if(_hList==null) {
-					hasNullList=true;
+					isListNull=true;
 				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				ProcedureCodes.RefreshCache();
 			}
-			Hashtable hashProcedureCodes;
+			Hashtable hashProcCodes;
 			lock(_lock) {
-				hashProcedureCodes=new Hashtable(_hList);
+				hashProcCodes=new Hashtable(_hList);
 			}
-			return hashProcedureCodes;
+			return hashProcCodes;
 		}
 
 		
