@@ -36,7 +36,7 @@ namespace OpenDentBusiness {
 		public static List<ProcedureCode> GetListLong() {
 			bool hasNullList=false;
 			lock(_lock) {
-				if(_hList==null) {
+				if(_list==null) {
 					hasNullList=true;
 				}
 			}
