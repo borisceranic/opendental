@@ -209,6 +209,7 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.Security) || isAll){
 				ds.Tables.Add(Userods.RefreshCache());
 				ds.Tables.Add(UserGroups.RefreshCache());
+				ds.Tables.Add(GroupPermissions.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.Sheets) || isAll){
 				ds.Tables.Add(SheetDefs.RefreshCache());
