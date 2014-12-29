@@ -282,18 +282,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
 		public static void Sync(List<SheetFieldDef> listNew,List<SheetFieldDef> listDB) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
-			List<SheetFieldDef> listIns=    new List<SheetFieldDef>();
+			List<SheetFieldDef> listIns    =new List<SheetFieldDef>();
 			List<SheetFieldDef> listUpdNew =new List<SheetFieldDef>();
 			List<SheetFieldDef> listUpdDB  =new List<SheetFieldDef>();
 			List<SheetFieldDef> listDel    =new List<SheetFieldDef>();
-			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.
-			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, just sorts by compairing PK. Lambda expressions are not allowed, this is the one and only exception.
+			listNew.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((SheetFieldDef x,SheetFieldDef y) => { return x.SheetFieldDefNum.CompareTo(y.SheetFieldDefNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
 			int idxNew=0;
 			int idxDB=0;
 			SheetFieldDef fieldNew;
 			SheetFieldDef fieldDB;
-			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element. The next element is determined by Primary Key.
-			//If the New list contains the next item it will be inserted. If the DB contains the next item, it will be deleted. If both lists contain the next item, the item will be updated.
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
 			while(idxNew<listNew.Count || idxDB<listDB.Count) {
 				fieldNew=null;
 				if(idxNew<listNew.Count) {
