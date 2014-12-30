@@ -80,16 +80,6 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary></summary>
-		public static void TruncateAll() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod());
-				return;
-			}
-			string command="TRUNCATE TABLE cdcrec";//Oracle compatible
-			DataCore.NonQ(command);
-		}
-
 		public static string GetByPatRace(PatRace patRace) {
 			string retval="";
 			switch(patRace) {
