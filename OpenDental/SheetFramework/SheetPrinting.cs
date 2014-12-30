@@ -634,7 +634,7 @@ namespace OpenDental {
 				_yPosPrint=0;
 			}
 			foreach(SheetField field in sheet.SheetFields) {
-				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+				if(!drawAll && !fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
 					continue;
 				}
 				#region Get the path for the image
