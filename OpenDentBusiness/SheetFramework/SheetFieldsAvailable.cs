@@ -495,12 +495,6 @@ namespace OpenDentBusiness{
 		private static List<SheetFieldDef> GetStatement(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
 			if(outInCheck==OutInCheck.Out) {
-				//Output field names:
-				//Each sheet typically has a main datatable type.  
-				//For OutputText types, FieldName is usually the string representation of the database column for the main table.  
-				//For other tables, it can be of the form table.Column.  
-				//There may also be extra fields available that are not strictly pulled from the database.  
-				//  -Extra fields will start with lowercase to indicate that they are not pure database fields.
 				list.Add(NewOutput("accountNumber"));
 				list.Add(NewOutput("statement.NoteBold"));
 				list.Add(NewOutput("statement.Note"));
@@ -516,15 +510,9 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("statementReceiptInvoice"));
 				list.Add(NewOutput("returnAddress"));
 				list.Add(NewOutput("billingAddress"));
-				//list.Add(NewOutput("practiceTitle"));
-				//list.Add(NewOutput("practiceAddress"));
-				//list.Add(NewOutput("practiceCityStateZip"));
 				list.Add(NewOutput("statement.DateSent"));
 				list.Add(NewOutput("statementIsCopy"));
 				list.Add(NewOutput("statementIsTaxReceipt"));
-				//list.Add(NewOutput("SwissBanking"));//Not yet Supported.
-				//list.Add(NewOutput("patient.salutation"));
-				//list.Add(NewOutput("patient.priProvNameFL"));
 				list.Add(NewOutput("providerLegend"));
 			}
 			else if(outInCheck==OutInCheck.In) {
