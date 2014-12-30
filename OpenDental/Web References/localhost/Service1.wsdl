@@ -40,15 +40,33 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="PracticeTitleReset">
+      <s:element name="RequestEmailVerificationCode">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="PracticeTitleResetResponse">
-        <s:complexType />
+      <s:element name="RequestEmailVerificationCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestEmailVerificationCodeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PostEmailCertificate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PostEmailCertificateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PostEmailCertificateResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
       </s:element>
       <s:element name="IsForeignRegKey">
         <s:complexType>
@@ -176,6 +194,16 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="PracticeTitleReset">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PracticeTitleResetResponse">
+        <s:complexType />
+      </s:element>
       <s:element name="ValidateWebLander">
         <s:complexType>
           <s:sequence>
@@ -280,11 +308,17 @@
   <wsdl:message name="RequestCustomerIDSoapOut">
     <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
   </wsdl:message>
-  <wsdl:message name="PracticeTitleResetSoapIn">
-    <wsdl:part name="parameters" element="tns:PracticeTitleReset" />
+  <wsdl:message name="RequestEmailVerificationCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestEmailVerificationCode" />
   </wsdl:message>
-  <wsdl:message name="PracticeTitleResetSoapOut">
-    <wsdl:part name="parameters" element="tns:PracticeTitleResetResponse" />
+  <wsdl:message name="RequestEmailVerificationCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestEmailVerificationCodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="PostEmailCertificateSoapIn">
+    <wsdl:part name="parameters" element="tns:PostEmailCertificate" />
+  </wsdl:message>
+  <wsdl:message name="PostEmailCertificateSoapOut">
+    <wsdl:part name="parameters" element="tns:PostEmailCertificateResponse" />
   </wsdl:message>
   <wsdl:message name="IsForeignRegKeySoapIn">
     <wsdl:part name="parameters" element="tns:IsForeignRegKey" />
@@ -340,6 +374,12 @@
   <wsdl:message name="RequestFeeSchedSoapOut">
     <wsdl:part name="parameters" element="tns:RequestFeeSchedResponse" />
   </wsdl:message>
+  <wsdl:message name="PracticeTitleResetSoapIn">
+    <wsdl:part name="parameters" element="tns:PracticeTitleReset" />
+  </wsdl:message>
+  <wsdl:message name="PracticeTitleResetSoapOut">
+    <wsdl:part name="parameters" element="tns:PracticeTitleResetResponse" />
+  </wsdl:message>
   <wsdl:message name="ValidateWebLanderSoapIn">
     <wsdl:part name="parameters" element="tns:ValidateWebLander" />
   </wsdl:message>
@@ -389,9 +429,13 @@
       <wsdl:input message="tns:RequestCustomerIDSoapIn" />
       <wsdl:output message="tns:RequestCustomerIDSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <wsdl:input message="tns:PracticeTitleResetSoapIn" />
-      <wsdl:output message="tns:PracticeTitleResetSoapOut" />
+    <wsdl:operation name="RequestEmailVerificationCode">
+      <wsdl:input message="tns:RequestEmailVerificationCodeSoapIn" />
+      <wsdl:output message="tns:RequestEmailVerificationCodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PostEmailCertificate">
+      <wsdl:input message="tns:PostEmailCertificateSoapIn" />
+      <wsdl:output message="tns:PostEmailCertificateSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="IsForeignRegKey">
       <wsdl:input message="tns:IsForeignRegKeySoapIn" />
@@ -428,6 +472,10 @@
     <wsdl:operation name="RequestFeeSched">
       <wsdl:input message="tns:RequestFeeSchedSoapIn" />
       <wsdl:output message="tns:RequestFeeSchedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <wsdl:input message="tns:PracticeTitleResetSoapIn" />
+      <wsdl:output message="tns:PracticeTitleResetSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="ValidateWebLander">
       <wsdl:input message="tns:ValidateWebLanderSoapIn" />
@@ -483,8 +531,17 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <soap:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
+    <wsdl:operation name="RequestEmailVerificationCode">
+      <soap:operation soapAction="http://open-dent.com/RequestEmailVerificationCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostEmailCertificate">
+      <soap:operation soapAction="http://open-dent.com/PostEmailCertificate" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -566,6 +623,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestFeeSched">
       <soap:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <soap:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -657,8 +723,17 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="PracticeTitleReset">
-      <soap12:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
+    <wsdl:operation name="RequestEmailVerificationCode">
+      <soap12:operation soapAction="http://open-dent.com/RequestEmailVerificationCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostEmailCertificate">
+      <soap12:operation soapAction="http://open-dent.com/PostEmailCertificate" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -740,6 +815,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestFeeSched">
       <soap12:operation soapAction="http://open-dent.com/RequestFeeSched" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PracticeTitleReset">
+      <soap12:operation soapAction="http://open-dent.com/PracticeTitleReset" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

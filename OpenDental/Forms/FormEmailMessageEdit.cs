@@ -1210,7 +1210,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			SaveMsg();
 			try{
-				if(_certSig==null && !_isSigningEnabled) {
+				if(_certSig==null || !_isSigningEnabled) {
 					EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
 				}
 				else {

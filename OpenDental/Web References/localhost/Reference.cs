@@ -35,7 +35,9 @@ namespace OpenDental.localhost {
         
         private System.Threading.SendOrPostCallback RequestCustomerIDOperationCompleted;
         
-        private System.Threading.SendOrPostCallback PracticeTitleResetOperationCompleted;
+        private System.Threading.SendOrPostCallback RequestEmailVerificationCodeOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback PostEmailCertificateOperationCompleted;
         
         private System.Threading.SendOrPostCallback IsForeignRegKeyOperationCompleted;
         
@@ -54,6 +56,8 @@ namespace OpenDental.localhost {
         private System.Threading.SendOrPostCallback FeatureRequestDiscussGetListOperationCompleted;
         
         private System.Threading.SendOrPostCallback RequestFeeSchedOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback PracticeTitleResetOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidateWebLanderOperationCompleted;
         
@@ -115,7 +119,10 @@ namespace OpenDental.localhost {
         public event RequestCustomerIDCompletedEventHandler RequestCustomerIDCompleted;
         
         /// <remarks/>
-        public event PracticeTitleResetCompletedEventHandler PracticeTitleResetCompleted;
+        public event RequestEmailVerificationCodeCompletedEventHandler RequestEmailVerificationCodeCompleted;
+        
+        /// <remarks/>
+        public event PostEmailCertificateCompletedEventHandler PostEmailCertificateCompleted;
         
         /// <remarks/>
         public event IsForeignRegKeyCompletedEventHandler IsForeignRegKeyCompleted;
@@ -143,6 +150,9 @@ namespace OpenDental.localhost {
         
         /// <remarks/>
         public event RequestFeeSchedCompletedEventHandler RequestFeeSchedCompleted;
+        
+        /// <remarks/>
+        public event PracticeTitleResetCompletedEventHandler PracticeTitleResetCompleted;
         
         /// <remarks/>
         public event ValidateWebLanderCompletedEventHandler ValidateWebLanderCompleted;
@@ -248,30 +258,60 @@ namespace OpenDental.localhost {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/PracticeTitleReset", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void PracticeTitleReset(string officeData) {
-            this.Invoke("PracticeTitleReset", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/RequestEmailVerificationCode", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string RequestEmailVerificationCode(string officeData) {
+            object[] results = this.Invoke("RequestEmailVerificationCode", new object[] {
                         officeData});
+            return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void PracticeTitleResetAsync(string officeData) {
-            this.PracticeTitleResetAsync(officeData, null);
+        public void RequestEmailVerificationCodeAsync(string officeData) {
+            this.RequestEmailVerificationCodeAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void PracticeTitleResetAsync(string officeData, object userState) {
-            if ((this.PracticeTitleResetOperationCompleted == null)) {
-                this.PracticeTitleResetOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPracticeTitleResetOperationCompleted);
+        public void RequestEmailVerificationCodeAsync(string officeData, object userState) {
+            if ((this.RequestEmailVerificationCodeOperationCompleted == null)) {
+                this.RequestEmailVerificationCodeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRequestEmailVerificationCodeOperationCompleted);
             }
-            this.InvokeAsync("PracticeTitleReset", new object[] {
-                        officeData}, this.PracticeTitleResetOperationCompleted, userState);
+            this.InvokeAsync("RequestEmailVerificationCode", new object[] {
+                        officeData}, this.RequestEmailVerificationCodeOperationCompleted, userState);
         }
         
-        private void OnPracticeTitleResetOperationCompleted(object arg) {
-            if ((this.PracticeTitleResetCompleted != null)) {
+        private void OnRequestEmailVerificationCodeOperationCompleted(object arg) {
+            if ((this.RequestEmailVerificationCodeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.PracticeTitleResetCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.RequestEmailVerificationCodeCompleted(this, new RequestEmailVerificationCodeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/PostEmailCertificate", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string PostEmailCertificate(string officeData) {
+            object[] results = this.Invoke("PostEmailCertificate", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void PostEmailCertificateAsync(string officeData) {
+            this.PostEmailCertificateAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void PostEmailCertificateAsync(string officeData, object userState) {
+            if ((this.PostEmailCertificateOperationCompleted == null)) {
+                this.PostEmailCertificateOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPostEmailCertificateOperationCompleted);
+            }
+            this.InvokeAsync("PostEmailCertificate", new object[] {
+                        officeData}, this.PostEmailCertificateOperationCompleted, userState);
+        }
+        
+        private void OnPostEmailCertificateOperationCompleted(object arg) {
+            if ((this.PostEmailCertificateCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PostEmailCertificateCompleted(this, new PostEmailCertificateCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -533,6 +573,34 @@ namespace OpenDental.localhost {
             if ((this.RequestFeeSchedCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.RequestFeeSchedCompleted(this, new RequestFeeSchedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/PracticeTitleReset", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void PracticeTitleReset(string officeData) {
+            this.Invoke("PracticeTitleReset", new object[] {
+                        officeData});
+        }
+        
+        /// <remarks/>
+        public void PracticeTitleResetAsync(string officeData) {
+            this.PracticeTitleResetAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void PracticeTitleResetAsync(string officeData, object userState) {
+            if ((this.PracticeTitleResetOperationCompleted == null)) {
+                this.PracticeTitleResetOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPracticeTitleResetOperationCompleted);
+            }
+            this.InvokeAsync("PracticeTitleReset", new object[] {
+                        officeData}, this.PracticeTitleResetOperationCompleted, userState);
+        }
+        
+        private void OnPracticeTitleResetOperationCompleted(object arg) {
+            if ((this.PracticeTitleResetCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PracticeTitleResetCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -809,7 +877,55 @@ namespace OpenDental.localhost {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void PracticeTitleResetCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    public delegate void RequestEmailVerificationCodeCompletedEventHandler(object sender, RequestEmailVerificationCodeCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RequestEmailVerificationCodeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RequestEmailVerificationCodeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void PostEmailCertificateCompletedEventHandler(object sender, PostEmailCertificateCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class PostEmailCertificateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal PostEmailCertificateCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
@@ -1044,6 +1160,10 @@ namespace OpenDental.localhost {
             }
         }
     }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
+    public delegate void PracticeTitleResetCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
