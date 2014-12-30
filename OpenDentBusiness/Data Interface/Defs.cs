@@ -21,14 +21,16 @@ namespace OpenDentBusiness {
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
 			List<Def> list=Crud.DefCrud.TableToList(table);
-			DefC.Long=new Def[Enum.GetValues(typeof(DefCat)).Length][];
+			Def[][] arrayLong=new Def[Enum.GetValues(typeof(DefCat)).Length][];
 			for(int j=0;j<Enum.GetValues(typeof(DefCat)).Length;j++) {
-				DefC.Long[j]=GetForCategory(j,true,list);
+				arrayLong[j]=GetForCategory(j,true,list);
 			}
-			DefC.Short=new Def[Enum.GetValues(typeof(DefCat)).Length][];
+			Def[][] arrayShort=new Def[Enum.GetValues(typeof(DefCat)).Length][];
 			for(int j=0;j<Enum.GetValues(typeof(DefCat)).Length;j++) {
-				DefC.Short[j]=GetForCategory(j,false,list);
+				arrayShort[j]=GetForCategory(j,false,list);
 			}
+			DefC.Long=arrayLong;
+			DefC.Short=arrayShort;
 		}
 
 		///<summary>Used by the refresh method above.</summary>

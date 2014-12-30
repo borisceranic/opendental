@@ -6,41 +6,91 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public class DefC {
-		private static Def[][] shortt;
-		private static Def[][] longg;
+		private static Def[][] _short;
+		private static Def[][] _long;
+		private static object _lock=new object();
 
 		///<summary>Stores all defs in a 2D array.</summary>
 		public static Def[][] Long {
 			get {
-				if(longg==null) {
-					Defs.RefreshCache();
-				}
-				return longg;
+				return GetArrayLong();
 			}
 			set {
-				longg=value;
+				lock(_lock) {
+					_long=value;
+				}
 			}
 		}
 
 		///<summary>Stores all defs in a 2D array except the hidden ones.  The first dimension is the category, in int format.  The second dimension is the index of the definition in this category.  This is dependent on how it was refreshed, and not on what is in the database.  If you need to reference a specific def, then the DefNum is more effective.</summary>
 		public static Def[][] Short {
 			get {
-				if(shortt==null) {
-					Defs.RefreshCache();
-				}
-				return shortt;
+				return GetArrayShort();
 			}
 			set {
-				shortt=value;
+				lock(_lock) {
+					_short=value;
+				}
 			}
+		}
+
+		///<summary>Stores all defs in a 2D array.</summary>
+		public static Def[][] GetArrayLong() {
+			bool isArrayNull=false;
+			lock(_lock) {
+				if(_long==null) {
+					isArrayNull=true;
+				}
+			}
+			if(isArrayNull) {
+				Defs.RefreshCache();
+			}
+			Def[][] arrayDefs=new Def[Enum.GetValues(typeof(DefCat)).Length][];
+			lock(_lock) {
+				for(int i=0;i<arrayDefs.Length;i++) {
+					Def[] arrayDefCopy=new Def[_long[i].Length];
+					for(int j=0;j<_long[i].Length;j++) {
+						arrayDefCopy[j]=_long[i][j].Copy();
+					}
+					arrayDefs[i]=arrayDefCopy;
+				}
+			}
+			return arrayDefs;
+		}
+
+		///<summary>Stores all defs in a 2D array except the hidden ones.  The first dimension is the category, in int format.  The second dimension is the index of the definition in this category.  This is dependent on how it was refreshed, and not on what is in the database.  If you need to reference a specific def, then the DefNum is more effective.</summary>
+		public static Def[][] GetArrayShort() {
+			bool isArrayNull=false;
+			lock(_lock) {
+				if(_short==null) {
+					isArrayNull=true;
+				}
+			}
+			if(isArrayNull) {
+				Defs.RefreshCache();
+			}
+			Def[][] arrayDefs=new Def[Enum.GetValues(typeof(DefCat)).Length][];
+			lock(_lock) {
+				for(int i=0;i<arrayDefs.Length;i++) {
+					Def[] arrayDefCopy=new Def[_short[i].Length];
+					for(int j=0;j<_short[i].Length;j++) {
+						arrayDefCopy[j]=_short[i][j].Copy();
+					}
+					arrayDefs[i]=arrayDefCopy;
+				}
+			}
+			return arrayDefs;
 		}
 
 		public static bool DefShortIsNull {
 			get {
-				if(shortt==null) {
-					return true;
+				bool isArrayNull=false;
+				lock(_lock) {
+					if(_short==null) {
+						isArrayNull=true;
+					}
 				}
-				return false;
+				return isArrayNull;
 			}
 		}
 
