@@ -52,7 +52,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(416, 255);
+			this.butOK.Location = new System.Drawing.Point(416, 265);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -67,7 +67,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(497, 255);
+			this.butCancel.Location = new System.Drawing.Point(497, 265);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -81,7 +81,7 @@ namespace OpenDental{
 			this.groupStep1.Controls.Add(this.butSendCode);
 			this.groupStep1.Controls.Add(this.labelEmailAddress);
 			this.groupStep1.Controls.Add(this.textEmailAddress);
-			this.groupStep1.Location = new System.Drawing.Point(18, 57);
+			this.groupStep1.Location = new System.Drawing.Point(18, 64);
 			this.groupStep1.Name = "groupStep1";
 			this.groupStep1.Size = new System.Drawing.Size(557, 44);
 			this.groupStep1.TabIndex = 4;
@@ -127,7 +127,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupStep2.Controls.Add(this.labelVerificationCode);
 			this.groupStep2.Controls.Add(this.textVerificationCode);
-			this.groupStep2.Location = new System.Drawing.Point(18, 107);
+			this.groupStep2.Location = new System.Drawing.Point(18, 124);
 			this.groupStep2.Name = "groupStep2";
 			this.groupStep2.Size = new System.Drawing.Size(557, 44);
 			this.groupStep2.TabIndex = 5;
@@ -140,12 +140,9 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.label2.Location = new System.Drawing.Point(15, 9);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(557, 33);
+			this.label2.Size = new System.Drawing.Size(557, 45);
 			this.label2.TabIndex = 7;
-			this.label2.Text = "Use this window to register an e-mail certificate for receiving EHR Direct messag" +
-    "es.\r\nRegistering also makes it easier for other Open Dental customers to send yo" +
-    "u Standard Encrypted E-mail.";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.label2.Text = resources.GetString("label2.Text");
 			// 
 			// labelVerificationCode
 			// 
@@ -170,7 +167,7 @@ namespace OpenDental{
 			this.groupStep3.Controls.Add(this.butBrowse);
 			this.groupStep3.Controls.Add(this.labelCertFilePath);
 			this.groupStep3.Controls.Add(this.textCertFilePath);
-			this.groupStep3.Location = new System.Drawing.Point(18, 157);
+			this.groupStep3.Location = new System.Drawing.Point(18, 184);
 			this.groupStep3.Name = "groupStep3";
 			this.groupStep3.Size = new System.Drawing.Size(557, 44);
 			this.groupStep3.TabIndex = 8;
@@ -218,7 +215,7 @@ namespace OpenDental{
 			// FormEmailCertRegister
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(584, 291);
+			this.ClientSize = new System.Drawing.Size(584, 301);
 			this.Controls.Add(this.groupStep3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.groupStep2);

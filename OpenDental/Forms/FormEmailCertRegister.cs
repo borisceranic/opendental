@@ -20,6 +20,10 @@ namespace OpenDental {
 		}
 
 		private void butSendCode_Click(object sender,EventArgs e) {
+			if(textEmailAddress.Text.Trim()=="") {
+				MsgBox.Show(this,"Email Address is blank.");
+				return;
+			}
 			Cursor=Cursors.WaitCursor;
 			XmlWriterSettings settings=new XmlWriterSettings();
 			settings.Indent=true;
@@ -61,6 +65,7 @@ namespace OpenDental {
 				return;
 			}
 			Cursor=Cursors.Default;
+			textVerificationCode.Text="";//Clear the old verification code if there was one.
 			MessageBox.Show(Lan.g(this,"Done.")+"  "+Lan.g(this,"The verification code has been sent to")+" "+textEmailAddress.Text);
 		}
 

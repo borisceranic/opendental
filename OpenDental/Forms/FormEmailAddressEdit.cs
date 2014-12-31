@@ -383,9 +383,9 @@ namespace OpenDental{
 			this.butRegisterCertificate.CornerRadius = 4F;
 			this.butRegisterCertificate.Location = new System.Drawing.Point(197, 384);
 			this.butRegisterCertificate.Name = "butRegisterCertificate";
-			this.butRegisterCertificate.Size = new System.Drawing.Size(106, 24);
+			this.butRegisterCertificate.Size = new System.Drawing.Size(122, 24);
 			this.butRegisterCertificate.TabIndex = 29;
-			this.butRegisterCertificate.Text = "Register Certificate";
+			this.butRegisterCertificate.Text = "Certificate";
 			this.butRegisterCertificate.Click += new System.EventHandler(this.butRegisterCertificate_Click);
 			// 
 			// FormEmailAddressEdit
