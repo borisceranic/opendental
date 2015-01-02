@@ -20,20 +20,22 @@ namespace OpenDentBusiness {
 			}
 		}
 		
-		///<summary>thread-safe.  Returns a copy of the currently cached list of objects.</summary>
+		///<summary></summary>
 		public static CovSpan[] GetList() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_list==null;
+				if(_list==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				CovSpans.RefreshCache();
 			}
-			CovSpan[] arrayCovSpans=null;
+			CovSpan[] arrayCovSpans;
 			lock(_lock) {
-				if(_list!=null) {
-					arrayCovSpans=new CovSpan[_list.Length];
-					_list.CopyTo(arrayCovSpans,0);
+				arrayCovSpans=new CovSpan[_list.Length];
+				for(int i=0;i<_list.Length;i++) {
+					arrayCovSpans[i]=_list[i].Copy();
 				}
 			}
 			return arrayCovSpans;

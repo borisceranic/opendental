@@ -22,19 +22,21 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>A list of all Fees.</summary>
 		public static List<Fee> GetListt() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listt==null;
+				if(_listt==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				Fees.RefreshCache();
 			}
 			List<Fee> listFees=new List<Fee>();
 			lock(_lock) {
-				if(_listt!=null) {
-					listFees.AddRange(_listt);
+				for(int i=0;i<_listt.Count;i++) {
+					listFees.Add(_listt[i].Copy());
 				}
 			}
 			return listFees;

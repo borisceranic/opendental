@@ -33,37 +33,41 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>A list of all feescheds.</summary>
 		public static List<FeeSched> GetListLong() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listLong==null;
+				if(_listLong==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				FeeScheds.RefreshCache();
 			}
 			List<FeeSched> listFeeScheds=new List<FeeSched>();
 			lock(_lock) {
-				if(_listLong!=null) {
-					listFeeScheds.AddRange(_listLong);
+				for(int i=0;i<_listLong.Count;i++) {
+					listFeeScheds.Add(_listLong[i].Copy());
 				}
 			}
 			return listFeeScheds;
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>A list of feescheds that are not hidden.</summary>
 		public static List<FeeSched> GetListShort() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listShort==null;
+				if(_listShort==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				FeeScheds.RefreshCache();
 			}
 			List<FeeSched> listFeeScheds=new List<FeeSched>();
 			lock(_lock) {
-				if(_listShort!=null) {
-					listFeeScheds.AddRange(_listShort);
+				for(int i=0;i<_listShort.Count;i++) {
+					listFeeScheds.Add(_listShort[i].Copy());
 				}
 			}
 			return listFeeScheds;

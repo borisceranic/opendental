@@ -45,7 +45,9 @@ namespace OpenDentBusiness {
 			}
 			List<ProcedureCode> listProcCodes=new List<ProcedureCode>();
 			lock(_lock) {
-				listProcCodes.AddRange(_list);
+				for(int i=0;i<_list.Count;i++) {
+					listProcCodes.Add(_list[i].Copy());
+				}
 			}
 			return listProcCodes;
 		}
@@ -63,7 +65,7 @@ namespace OpenDentBusiness {
 			}
 			Hashtable hashProcCodes;
 			lock(_lock) {
-				hashProcCodes=new Hashtable(_hList);
+				hashProcCodes=new Hashtable(_hList);//TODO: after pattern approved by Jordan, update to give a deep copy using a foreach loop.
 			}
 			return hashProcCodes;
 		}

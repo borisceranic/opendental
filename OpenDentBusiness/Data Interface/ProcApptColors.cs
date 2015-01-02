@@ -25,19 +25,21 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>A list of all ProcApptColors.</summary>
 		public static List<ProcApptColor> GetListLong() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listt==null;
+				if(_listt==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				ProcApptColors.RefreshCache();
 			}
 			List<ProcApptColor> listProcApptColors=new List<ProcApptColor>();
-			lock(_lock){
-				if(_listt!=null) {
-					listProcApptColors.AddRange(_listt);
+			lock(_lock) {
+				for(int i=0;i<_listt.Count;i++) {
+					listProcApptColors.Add(_listt[i].Copy());
 				}
 			}
 			return listProcApptColors;

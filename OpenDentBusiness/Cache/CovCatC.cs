@@ -33,37 +33,41 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached long list of objects.</summary>
+		///<summary>All CovCats</summary>
 		public static List<CovCat> GetListt() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listt==null;
+				if(_listt==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				CovCats.RefreshCache();
 			}
 			List<CovCat> listCovCats=new List<CovCat>();
 			lock(_lock) {
-				if(_listt!=null) {
-					listCovCats.AddRange(_listt);
+				for(int i=0;i<_listt.Count;i++) {
+					listCovCats.Add(_listt[i].Copy());
 				}
 			}
 			return listCovCats;
 		}
 
-		///<summary>Thread-safe.  Returns a copy of the currently cached short list of objects.</summary>
+		///<summary>Only CovCats that are not hidden.</summary>
 		public static List<CovCat> GetListShort() {
-			bool hasNullList=false;
+			bool isListNull=false;
 			lock(_lock) {
-				hasNullList=_listShort==null;
+				if(_listShort==null) {
+					isListNull=true;
+				}
 			}
-			if(hasNullList) {
+			if(isListNull) {
 				CovCats.RefreshCache();
 			}
 			List<CovCat> listCovCats=new List<CovCat>();
 			lock(_lock) {
-				if(_listShort!=null) {
-					listCovCats.AddRange(_listShort);
+				for(int i=0;i<_listShort.Count;i++) {
+					listCovCats.Add(_listShort[i].Copy());
 				}
 			}
 			return listCovCats;
