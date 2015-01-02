@@ -28,8 +28,7 @@ namespace OpenDental {
 			table=Patients.GetPtDataTable(false,textLName.Text,textFName.Text,"",
 				"",false,"","",
 				"","","",0,
-				false,false,
-				Security.CurUser.ClinicNum,DateTime.MinValue,0,"","","");
+				false,false,DateTime.MinValue,0,"","","","");
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;

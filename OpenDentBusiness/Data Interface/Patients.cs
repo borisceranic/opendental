@@ -222,11 +222,11 @@ namespace OpenDentBusiness{
  		///<summary>Only used for the Select Patient dialog.  Pass in a billing type of 0 for all billing types.</summary>
 		public static DataTable GetPtDataTable(bool limit,string lname,string fname,string phone,
 			string address,bool hideInactive,string city,string state,string ssn,string patnum,string chartnumber,
-			long billingtype,bool guarOnly,bool showArchived,long clinicNum,DateTime birthdate,
-			long siteNum,string subscriberId,string email,string country)
+			long billingtype,bool guarOnly,bool showArchived,DateTime birthdate,
+			long siteNum,string subscriberId,string email,string country,string clinicNums)
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,clinicNum,birthdate,siteNum,subscriberId,email,country);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,clinicNums);
 			}
 			string billingsnippet=" ";
 			if(billingtype!=0){
@@ -376,8 +376,14 @@ namespace OpenDentBusiness{
 			if(guarOnly){
 				command+="AND patient.PatNum = Guarantor ";
 			}
-			if(clinicNum!=0){
-				command+="AND ClinicNum="+POut.Long(clinicNum)+" ";
+			if(clinicNums!="") {
+				command+="AND patient.Guarantor IN ( "
+				+"SELECT DISTINCT Guarantor FROM patient "
+				+"LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "
+					+"AND (procedurelog.ProcStatus=1 OR procedurelog.ProcStatus=2) "
+					+"AND procedurelog.ClinicNum IN ("+POut.String(clinicNums)+") "
+				+"WHERE patient.PatStatus !=4 "
+				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN ("+POut.String(clinicNums)+"))) ";
 			}
 			if(siteNum>0) {
 				command+="AND SiteNum="+POut.Long(siteNum)+" ";
@@ -2510,6 +2516,35 @@ FROM insplan";
 				return Lans.g("FormPatientPortal","Password must contain a number.");
 			}
 			return "";
+		}
+
+		///<summary>Returns a distinct list of PatNums for guarantors that have any family member with passed in clinics, or have had work done at passed in clinics.</summary>
+		public static string GetClinicGuarantors(string clinicNums) {
+			string clinicGuarantors="";
+			//Get guarantor of patients with clinic from comma delimited list
+			string command="SELECT DISTINCT Guarantor FROM patient WHERE ClinicNum IN ("+clinicNums+")";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				if(i>0 || clinicGuarantors!="") {
+					clinicGuarantors+=",";
+				}
+				clinicGuarantors+=PIn.String(table.Rows[i]["Guarantor"].ToString());
+			}
+			//Get guarantor of patients who have had work done at clinic in comma delimited list
+			command="SELECT DISTINCT Guarantor "
+				+"FROM procedurelog "
+				+"INNER JOIN patient ON patient.PatNum=procedurelog.PatNum "
+					+"AND patient.PatStatus !=4 "
+				+"WHERE procedurelog.ProcStatus IN (1,2) "
+				+"AND procedurelog.ClinicNum IN ("+clinicNums+")";
+			table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				if(i>0 || clinicGuarantors!="") {
+					clinicGuarantors+=",";
+				}
+				clinicGuarantors+=PIn.String(table.Rows[i]["Guarantor"].ToString());
+			}
+			return clinicGuarantors;
 		}
 	}
 

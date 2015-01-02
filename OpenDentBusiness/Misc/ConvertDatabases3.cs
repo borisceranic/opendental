@@ -6868,6 +6868,20 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE payplan MODIFY DownPayment NOT NULL";
 					Db.NonQ(command);
 				}
+				//Add triple column index to procedurelog table for clinic filter enhancement, specifically patient selection.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("procedurelog","PatNum,ProcStatus,ClinicNum")) {
+							command="ALTER TABLE procedurelog ADD INDEX indexPNPSCN (PatNum,ProcStatus,ClinicNum)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX procedurelog_PNPSCN ON procedurelog (PatNum,ProcStatus,ClinicNum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 
 
 

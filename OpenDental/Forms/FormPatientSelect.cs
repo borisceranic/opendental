@@ -77,7 +77,10 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private List<DisplayField> fields;
+		///<summary>Program level clinic currently being viewed.  Set outside this form when launched.  Sets selected index of comboClinic.</summary>
 		public long ClinicNum;
+		///<summary>List of all the clinics this userod has access to.  When comboClinic.SelectedIndex=0 it refers to all clinics in this list.  Otherwise their selected clinic will always be _listClinics[comboClinic.SelectedIndex-1].</summary>
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormPatientSelect(){
@@ -783,10 +786,10 @@ namespace OpenDental{
 				//if the current user is restricted to a clinic (or in the future many clinics), All will refer to only those clinics the user has access to. May only be one clinic.
 				comboClinic.Items.Add(Lan.g(this,"All"));
 				comboClinic.SelectedIndex=0;
-				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);//could be only one if the user is restricted
-				for(int i=0;i<listClinics.Count;i++) {
-					comboClinic.Items.Add(listClinics[i].Description);
-					if(ClinicNum==listClinics[i].ClinicNum) {
+				_listClinics=Clinics.GetForUserod(Security.CurUser);//could be only one if the user is restricted
+				for(int i=0;i<_listClinics.Count;i++) {
+					comboClinic.Items.Add(_listClinics[i].Description);
+					if(ClinicNum==_listClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
@@ -1105,15 +1108,25 @@ namespace OpenDental{
 				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
 			}
 			DateTime birthdate=PIn.Date(textBirthdate.Text);//this will frequently be minval.
-			long clinicNum=0;//all clinics
-			if(Security.CurUser.ClinicNum!=0 && Security.CurUser.ClinicIsRestricted){
-				clinicNum=Security.CurUser.ClinicNum;
+			string clinicNums="";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)){
+				if(comboClinic.SelectedIndex==0) {
+					for(int i=0;i<_listClinics.Count;i++) {
+						if(i>0){
+							clinicNums+=",";
+						}
+						clinicNums+=_listClinics[i].ClinicNum;
+					}
+				}
+				else {
+					clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
+				}
 			}
 			PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
 				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
-				checkGuarantors.Checked,checkShowArchived.Checked,//checkShowProspectiveOnly.Checked,
-				clinicNum,birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text);
+				checkGuarantors.Checked,checkShowArchived.Checked,
+				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,clinicNums);
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;
