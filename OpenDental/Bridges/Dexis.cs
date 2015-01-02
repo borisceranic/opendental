@@ -32,7 +32,11 @@ namespace OpenDental.Bridges{
 					} else {
 						id=pat.ChartNumber;
 					}
-					using(StreamWriter sw=new StreamWriter(infoFile,false)) {
+					Encoding enc=Encoding.UTF8;
+					if(ProgramCur.ProgName==ProgramName.XDR.ToString()) {//XDR only, not Dexis.
+						enc=Encoding.GetEncoding(1252);//This encoding was specifically requested by the XDR development team.
+					}
+					using(StreamWriter sw=new StreamWriter(infoFile,false,enc)) {
 						sw.WriteLine(pat.LName+", "+pat.FName
 							+"  "+pat.Birthdate.ToShortDateString()
 							+"  ("+id+")");
