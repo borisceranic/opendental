@@ -5,10 +5,11 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public class ProviderC {
+		//The threading comments in this class are not generally going to be present in the other similar classes.
 		private static List<Provider> _listLong;
 		private static List<Provider> _listShort;
-		///<summary>Thread safe lock object.  Any time you access _listShort or _listLong you MUST wrap the code block with lock(_lock).  Failing to lock will result in a potential for unsafe access by multiple threads at the same time.</summary>
-		private static object _lock=new object();
+		///<summary>Thread safe lock object.  Any time you access _listShort or _listLong you MUST wrap the code block with lock(_lockObj).  Failing to lock will result in a potential for unsafe access by multiple threads at the same time.</summary>
+		private static object _lockObj=new object();
 
 		///<summary>Rarely used. Includes all providers, even if hidden.</summary>
 		public static List<Provider> ListLong {
@@ -16,7 +17,7 @@ namespace OpenDentBusiness {
 				return GetListLong();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listLong=value;
 				}
 			}
@@ -28,7 +29,7 @@ namespace OpenDentBusiness {
 				return GetListShort();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listShort=value;
 				}
 			}
@@ -37,7 +38,7 @@ namespace OpenDentBusiness {
 		///<summary>Rarely used. Includes all providers, even if hidden.</summary>
 		public static List<Provider> GetListLong() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listLong==null) {
 					isListNull=true;
 				}
@@ -48,7 +49,7 @@ namespace OpenDentBusiness {
 				Providers.RefreshCache();//Eventually calls ListLong's setter which is thread safe.
 			}
 			List<Provider> listProvs=new List<Provider>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listLong.Count;i++) {
 					listProvs.Add(_listLong[i].Copy());
 				}
@@ -59,7 +60,7 @@ namespace OpenDentBusiness {
 		///<summary>This is the list used most often. It does not include hidden providers.</summary>
 		public static List<Provider> GetListShort() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listShort==null) {
 					isListNull=true;
 				}
@@ -70,7 +71,7 @@ namespace OpenDentBusiness {
 				Providers.RefreshCache();//Eventually calls ListShort's setter which is thread safe.
 			}
 			List<Provider> listProvs=new List<Provider>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listShort.Count;i++) {
 					listProvs.Add(_listShort[i].Copy());
 				}

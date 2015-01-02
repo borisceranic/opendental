@@ -7,14 +7,14 @@ namespace OpenDentBusiness {
 	public class CovSpanC {
 		///<summary></summary>
 		private static CovSpan[] _list;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		public static CovSpan[] List {
 			get {
 				return GetList();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_list=value;
 				}
 			}
@@ -23,7 +23,7 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static CovSpan[] GetList() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_list==null) {
 					isListNull=true;
 				}
@@ -32,7 +32,7 @@ namespace OpenDentBusiness {
 				CovSpans.RefreshCache();
 			}
 			CovSpan[] arrayCovSpans;
-			lock(_lock) {
+			lock(_lockObj) {
 				arrayCovSpans=new CovSpan[_list.Length];
 				for(int i=0;i<_list.Length;i++) {
 					arrayCovSpans[i]=_list[i].Copy();

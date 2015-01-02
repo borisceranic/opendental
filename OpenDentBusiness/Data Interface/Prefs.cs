@@ -20,7 +20,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			PrefC.Dict=new Dictionary<string,Pref>();
+			Dictionary<string,Pref> dictPrefs=new Dictionary<string,Pref>();
 			Pref pref;
 			//PrefName enumpn;
 			//Can't use Crud.PrefCrud.TableToList(table) because it will fail the first time someone runs 7.6 before conversion.
@@ -32,8 +32,9 @@ namespace OpenDentBusiness{
 				pref.PrefName=PIn.String(table.Rows[i]["PrefName"].ToString());
 				pref.ValueString=PIn.String(table.Rows[i]["ValueString"].ToString());
 				//no need to load up the comments.  Especially since this will fail when user first runs version 5.8.
-				PrefC.Dict.Add(pref.PrefName,pref);
+				dictPrefs.Add(pref.PrefName,pref);
 			}
+			PrefC.Dict=dictPrefs;
 		}
 
 		///<summary></summary>
@@ -62,7 +63,8 @@ namespace OpenDentBusiness{
 		///<summary>Updates a pref of type long.  Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateLong(PrefName prefName,long newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName.ToString())) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(PrefC.GetLong(prefName)==newValue) {
@@ -88,7 +90,8 @@ namespace OpenDentBusiness{
 		///<summary>Updates a pref of type double.  Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateDouble(PrefName prefName,double newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName.ToString())) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(PrefC.GetDouble(prefName)==newValue) {
@@ -116,7 +119,8 @@ namespace OpenDentBusiness{
 		///<summary>Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateBool(PrefName prefName,bool newValue,bool isForced) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName.ToString())) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(!isForced && PrefC.GetBool(prefName)==newValue) {
@@ -142,7 +146,8 @@ namespace OpenDentBusiness{
 		///<summary>Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateString(PrefName prefName,string newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName.ToString())) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(PrefC.GetString(prefName)==newValue) {
@@ -168,7 +173,8 @@ namespace OpenDentBusiness{
 		///<summary>Used for prefs that are non-standard.  Especially by outside programmers. Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateRaw(string prefName,string newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName)) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName)) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(PrefC.GetRaw(prefName)==newValue) {
@@ -194,7 +200,8 @@ namespace OpenDentBusiness{
 		///<summary>Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateDateT(PrefName prefName,DateTime newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
-			if(!PrefC.Dict.ContainsKey(prefName.ToString())) {
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
 			if(PrefC.GetDateT(prefName)==newValue) {
@@ -261,7 +268,8 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets a Pref object when the PrefName is provided</summary>
 		public static Pref GetPref(String PrefName) {
-			Pref pref=PrefC.Dict[PrefName];
+			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
+			Pref pref=dictPrefs[PrefName];
 			return pref;
 		}
 

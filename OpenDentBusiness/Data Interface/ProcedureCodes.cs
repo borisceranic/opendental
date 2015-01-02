@@ -193,9 +193,10 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<ProcedureCode> retVal=new List<ProcedureCode>();
 			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
-			for(int j=0;j<DefC.Short[(int)DefCat.ProcCodeCats].Length;j++){
+			Def[][] arrayDefs=DefC.GetArrayShort();
+			for(int j=0;j<arrayDefs[(int)DefCat.ProcCodeCats].Length;j++) {
 				for(int k=0;k<listProcedureCodes.Count;k++) {
-					if(DefC.Short[(int)DefCat.ProcCodeCats][j].DefNum==listProcedureCodes[k].ProcCat) {
+					if(arrayDefs[(int)DefCat.ProcCodeCats][j].DefNum==listProcedureCodes[k].ProcCat) {
 						retVal.Add(listProcedureCodes[k].Copy());
 					}
 				}
@@ -293,10 +294,11 @@ namespace OpenDentBusiness{
 				}
 			}
 			if(catNum==0) {
+				Def[][] arrayDefs=DefC.GetArrayLong();
 				def=new Def();
 				def.Category=DefCat.ProcCodeCats;
 				def.ItemName="Obsolete";
-				def.ItemOrder=DefC.Long[(int)DefCat.ProcCodeCats].Length;
+				def.ItemOrder=arrayDefs[(int)DefCat.ProcCodeCats].Length;
 				def.IsHidden=true;
 				Defs.Insert(def);
 				Defs.RefreshCache();

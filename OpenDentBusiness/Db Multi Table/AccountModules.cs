@@ -177,6 +177,7 @@ namespace OpenDentBusiness {
 			DataTable rawPay=dcon.GetTable(command);
 			decimal payamt;
 			decimal amt;
+			Def[][] arrayDefs=DefC.GetArrayLong();
 			for(int i=0;i<rawPay.Rows.Count;i++){
 				row=table.NewRow();
 				row["AdjNum"]="0";
@@ -186,11 +187,11 @@ namespace OpenDentBusiness {
 				row["charges"]="";
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
 				if(payPlanPlanNum!=0) {//ins payments
 					row["ClaimNum"]=rawPay.Rows[i]["ClaimNum"].ToString();
 					row["ClaimPaymentNum"]=rawPay.Rows[i]["ClaimPaymentNum"].ToString();
-					row["colorText"]=DefC.Long[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
+					row["colorText"]=arrayDefs[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
 				}
 				if(payPlanPlanNum==0) {
 					amt=PIn.Decimal(rawPay.Rows[i]["SplitAmt"].ToString());
@@ -580,6 +581,7 @@ namespace OpenDentBusiness {
 			DataTable rawClaimPay=dcon.GetTable(command);
 			DateTime procdate;
 			decimal writeoff;
+			Def[][] arrayDefs=DefC.GetArrayLong();
 			for(int i=0;i<rawClaimPay.Rows.Count;i++){
 				if(isInvoice) {//this could possibly be optimized later by not running the query in the first place.
 					break;
@@ -594,7 +596,7 @@ namespace OpenDentBusiness {
 				row["ClaimPaymentNum"]="1";//this is now just a boolean flag indicating that it is a payment.
 				//this is because it will frequently not be attached to an actual claim payment.
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaimPay.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
 				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
 				writeoff=PIn.Decimal(rawClaimPay.Rows[i]["WriteOff_"].ToString());
 				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" && amt+writeoff==0) {//payplan payments are tracked in the payplan, so nothing to display.
@@ -723,7 +725,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawProc.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][0].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][0].ItemColor.ToArgb().ToString();
 				row["creditsDouble"]=0;
 				row["credits"]="";
 				dateT=PIn.DateT(rawProc.Rows[i]["procDate_"].ToString());
@@ -888,7 +890,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawAdj.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][1].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][1].ItemColor.ToArgb().ToString();
 				dateT=PIn.DateT(rawAdj.Rows[i]["AdjDate"].ToString());
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
@@ -954,7 +956,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawPay.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][3].ItemColor.ToArgb().ToString();
 				amt=PIn.Decimal(rawPay.Rows[i]["splitAmt_"].ToString());
 				row["creditsDouble"]=amt;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
@@ -1064,7 +1066,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]=rawClaim.Rows[i]["ClaimNum"].ToString();
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaim.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][4].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][4].ItemColor.ToArgb().ToString();
 					//might be changed lower down based on claim status
 				row["creditsDouble"]=0;
 				row["credits"]="";
@@ -1099,7 +1101,7 @@ namespace OpenDentBusiness {
 					else{
 						row["description"]+=daterec.ToShortDateString();
 					}
-					row["colorText"] = DefC.Long[(int)DefCat.AccountColors][8].ItemColor.ToArgb().ToString();
+					row["colorText"] = arrayDefs[(int)DefCat.AccountColors][8].ItemColor.ToArgb().ToString();
 				} 
 				else if(claimStatus=="U"){
 					row["description"]+="\r\n"+Lans.g("ContrAccount","Unsent");
@@ -1225,7 +1227,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]="";
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][5].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][5].ItemColor.ToArgb().ToString();
 				row["creditsDouble"]=0;
 				row["credits"]="";
 				dateT=PIn.DateT(rawState.Rows[i]["DateSent"].ToString());
@@ -1326,7 +1328,7 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]="";
-				row["colorText"]=DefC.Long[(int)DefCat.AccountColors][6].ItemColor.ToArgb().ToString();
+				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][6].ItemColor.ToArgb().ToString();
 				//amt=PIn.PDouble(rawPayPlan.Rows[i]["principal_"].ToString());
 				amt=PIn.Decimal(rawPayPlan.Rows[i]["CompletedAmt"].ToString());
 				row["creditsDouble"]=amt;

@@ -1588,6 +1588,8 @@ namespace OpenDentBusiness{
 			table.Columns.Add("treatmentPlan");
 			table.Columns.Add("carrierName");
 			List<DataRow> rows=new List<DataRow>();
+			Def[][] arrayDefs=DefC.GetArrayShort();
+			List<Provider> listProvs=ProviderC.GetListShort();
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
 			string command=@"
@@ -1708,7 +1710,6 @@ FROM insplan";
 				else {
 					command+=" OR patient.PriProv=";
 				}
-				List<Provider> listProvs=ProviderC.GetListShort();
 				command+=POut.Long(listProvs[(int)providerFilter[i]-1].ProvNum);
 				if(i==providerFilter.Count-1) {
 					command+=") ";
@@ -1721,7 +1722,7 @@ FROM insplan";
 				else {
 					command+=" OR patient.BillingType=";
 				}
-				command+=POut.Long(DefC.Short[(int)DefCat.BillingTypes][(int)billingFilter[i]-1].DefNum);
+				command+=POut.Long(arrayDefs[(int)DefCat.BillingTypes][(int)billingFilter[i]-1].DefNum);
 				if(i==billingFilter.Count-1) {
 					command+=") ";
 				}

@@ -21,6 +21,7 @@ namespace OpenDentBusiness.UI {
 			Pen penO;//provider outline color
 			Color backColor;
 			Color provColor;
+			Def[][] arrayDefs=DefC.GetArrayLong();
 			if(dataRoww["ProvNum"].ToString()!="0" && dataRoww["IsHygiene"].ToString()=="0") {//dentist
 				provColor=Providers.GetColor(PIn.Long(dataRoww["ProvNum"].ToString()));
 				penO=new Pen(Providers.GetOutlineColor(PIn.Long(dataRoww["ProvNum"].ToString())));
@@ -34,13 +35,13 @@ namespace OpenDentBusiness.UI {
 				penO=new Pen(Color.Black);
 			}
 			if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete) {
-				backColor=DefC.Long[(int)DefCat.AppointmentColors][2].ItemColor;
+				backColor=arrayDefs[(int)DefCat.AppointmentColors][2].ItemColor;
 			}
 			else if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.PtNote) {
-				backColor=DefC.Long[(int)DefCat.AppointmentColors][5].ItemColor;
+				backColor=arrayDefs[(int)DefCat.AppointmentColors][5].ItemColor;
 			}
 			else if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.PtNoteCompleted) {
-				backColor=DefC.Long[(int)DefCat.AppointmentColors][6].ItemColor;
+				backColor=arrayDefs[(int)DefCat.AppointmentColors][6].ItemColor;
 			}
 			else if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
 				backColor=Color.FromArgb(PIn.Int(dataRoww["ColorOverride"].ToString()));

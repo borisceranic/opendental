@@ -99,8 +99,9 @@ namespace OpenDentBusiness{
 		public static List<LetterMerge> GetListForCat(int catIndex){
 			//No need to check RemotingRole; no call to db.
 			List<LetterMerge> retVal=new List<LetterMerge>();
+			Def[][] arrayDefs=DefC.GetArrayShort();
 			for(int i=0;i<Listt.Length;i++){
-				if(Listt[i].Category==DefC.Short[(int)DefCat.LetterMergeCats][catIndex].DefNum){
+				if(Listt[i].Category==arrayDefs[(int)DefCat.LetterMergeCats][catIndex].DefNum) {
 					retVal.Add(Listt[i]);
 				}
 			}

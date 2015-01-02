@@ -7,14 +7,14 @@ namespace OpenDentBusiness {
 	public class ProcedureCodeC {	
 		private static List<ProcedureCode> _list;
 		private static Hashtable _hList;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		public static List<ProcedureCode> Listt {
 			get {
 				return GetListLong();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_list=value;
 				}
 			}
@@ -26,7 +26,7 @@ namespace OpenDentBusiness {
 				return GetHList();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_hList=value;
 				}
 			}
@@ -35,7 +35,7 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static List<ProcedureCode> GetListLong() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_list==null) {
 					isListNull=true;
 				}
@@ -44,7 +44,7 @@ namespace OpenDentBusiness {
 				ProcedureCodes.RefreshCache();
 			}
 			List<ProcedureCode> listProcCodes=new List<ProcedureCode>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_list.Count;i++) {
 					listProcCodes.Add(_list[i].Copy());
 				}
@@ -55,7 +55,7 @@ namespace OpenDentBusiness {
 		///<summary>key:ProcCode, value:ProcedureCode</summary>
 		public static Hashtable GetHList() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_hList==null) {
 					isListNull=true;
 				}
@@ -63,9 +63,12 @@ namespace OpenDentBusiness {
 			if(isListNull) {
 				ProcedureCodes.RefreshCache();
 			}
-			Hashtable hashProcCodes;
-			lock(_lock) {
-				hashProcCodes=new Hashtable(_hList);//TODO: after pattern approved by Jordan, update to give a deep copy using a foreach loop.
+			Hashtable hashProcCodes=new Hashtable();
+			lock(_lockObj) {
+				//Jordan approved foreach loop for speed purposes.  Looping through a hashtable of 38,000 items using a for loop took ~22,840ms whereas a foreach loop takes ~10ms.
+				foreach(DictionaryEntry entry in _hList) {
+					hashProcCodes.Add(entry.Key,((ProcedureCode)entry.Value).Copy());
+				}
 			}
 			return hashProcCodes;
 		}

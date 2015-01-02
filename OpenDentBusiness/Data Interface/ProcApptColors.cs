@@ -11,7 +11,7 @@ namespace OpenDentBusiness{
 
 		///<summary>A list of all ProcApptColors.</summary>
 		private static List<ProcApptColor> _listt;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		///<summary>A list of all ProcApptColors.</summary>
 		public static List<ProcApptColor> Listt {
@@ -19,7 +19,7 @@ namespace OpenDentBusiness{
 				return GetListLong();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listt=value;
 				}
 			}
@@ -28,7 +28,7 @@ namespace OpenDentBusiness{
 		///<summary>A list of all ProcApptColors.</summary>
 		public static List<ProcApptColor> GetListLong() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listt==null) {
 					isListNull=true;
 				}
@@ -37,7 +37,7 @@ namespace OpenDentBusiness{
 				ProcApptColors.RefreshCache();
 			}
 			List<ProcApptColor> listProcApptColors=new List<ProcApptColor>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listt.Count;i++) {
 					listProcApptColors.Add(_listt[i].Copy());
 				}

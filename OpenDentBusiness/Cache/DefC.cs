@@ -8,7 +8,7 @@ namespace OpenDentBusiness {
 	public class DefC {
 		private static Def[][] _short;
 		private static Def[][] _long;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		///<summary>Stores all defs in a 2D array.</summary>
 		public static Def[][] Long {
@@ -16,7 +16,7 @@ namespace OpenDentBusiness {
 				return GetArrayLong();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_long=value;
 				}
 			}
@@ -28,7 +28,7 @@ namespace OpenDentBusiness {
 				return GetArrayShort();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_short=value;
 				}
 			}
@@ -37,7 +37,7 @@ namespace OpenDentBusiness {
 		///<summary>Stores all defs in a 2D array.</summary>
 		public static Def[][] GetArrayLong() {
 			bool isArrayNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_long==null) {
 					isArrayNull=true;
 				}
@@ -46,7 +46,7 @@ namespace OpenDentBusiness {
 				Defs.RefreshCache();
 			}
 			Def[][] arrayDefs=new Def[Enum.GetValues(typeof(DefCat)).Length][];
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<arrayDefs.Length;i++) {
 					Def[] arrayDefCopy=new Def[_long[i].Length];
 					for(int j=0;j<_long[i].Length;j++) {
@@ -61,7 +61,7 @@ namespace OpenDentBusiness {
 		///<summary>Stores all defs in a 2D array except the hidden ones.  The first dimension is the category, in int format.  The second dimension is the index of the definition in this category.  This is dependent on how it was refreshed, and not on what is in the database.  If you need to reference a specific def, then the DefNum is more effective.</summary>
 		public static Def[][] GetArrayShort() {
 			bool isArrayNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_short==null) {
 					isArrayNull=true;
 				}
@@ -70,7 +70,7 @@ namespace OpenDentBusiness {
 				Defs.RefreshCache();
 			}
 			Def[][] arrayDefs=new Def[Enum.GetValues(typeof(DefCat)).Length][];
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<arrayDefs.Length;i++) {
 					Def[] arrayDefCopy=new Def[_short[i].Length];
 					for(int j=0;j<_short[i].Length;j++) {
@@ -85,7 +85,7 @@ namespace OpenDentBusiness {
 		public static bool DefShortIsNull {
 			get {
 				bool isArrayNull=false;
-				lock(_lock) {
+				lock(_lockObj) {
 					if(_short==null) {
 						isArrayNull=true;
 					}
@@ -96,14 +96,16 @@ namespace OpenDentBusiness {
 
 		///<summary>Gets a list of non-hidden defs for one category.</summary>
 		public static Def[] GetList(DefCat defCat) {
-			return Short[(int)defCat];
+			Def[][] arrayDefs=GetArrayShort();
+			return arrayDefs[(int)defCat];
 		}
 
 		///<summary>Get one def from Long.  Returns null if not found.  Only used for very limited situations.  Other Get functions tend to be much more useful since they don't return null.  There is also BIG potential for silent bugs if you use this.ItemOrder instead of GetOrder().</summary>
 		public static Def GetDef(DefCat myCat,long myDefNum) {
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].DefNum==myDefNum) {
-					return DefC.Long[(int)myCat][i].Copy();
+			Def[][] arrayDefs=GetArrayLong();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
+					return arrayDefs[(int)myCat][i].Copy();
 				}
 			}
 			return null;
@@ -114,9 +116,10 @@ namespace OpenDentBusiness {
 			if(myDefNum==0){
 				return "";
 			}
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].DefNum==myDefNum) {
-					return DefC.Long[(int)myCat][i].ItemName;
+			Def[][] arrayDefs=GetArrayLong();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
+					return arrayDefs[(int)myCat][i].ItemName;
 				}
 			}
 			return "";
@@ -124,12 +127,13 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns 0 if it can't find the named def.  If the name is blank, then it returns the first def in the category.</summary>
 		public static long GetByExactName(DefCat myCat,string itemName) {
+			Def[][] arrayDefs=GetArrayLong();
 			if(itemName=="") {
-				return DefC.Long[(int)myCat][0].DefNum;//return the first one in the list
+				return arrayDefs[(int)myCat][0].DefNum;//return the first one in the list
 			}
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].ItemName==itemName) {
-					return DefC.Long[(int)myCat][i].DefNum;
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].ItemName==itemName) {
+					return arrayDefs[(int)myCat][i].DefNum;
 				}
 			}
 			return 0;
@@ -137,15 +141,16 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns the named def.  If it can't find the name, then it returns the first def in the category.</summary>
 		public static long GetByExactNameNeverZero(DefCat myCat,string itemName) {
+			Def[][] arrayDefs=GetArrayLong();
 			if(itemName=="") {
-				return DefC.Long[(int)myCat][0].DefNum;//return the first one in the list
+				return arrayDefs[(int)myCat][0].DefNum;//return the first one in the list
 			}
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].ItemName==itemName) {
-					return DefC.Long[(int)myCat][i].DefNum;
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].ItemName==itemName) {
+					return arrayDefs[(int)myCat][i].DefNum;
 				}
 			}
-			if(DefC.Long[(int)myCat].Length==0) {
+			if(arrayDefs[(int)myCat].Length==0) {
 				Def def=new Def();
 				def.Category=myCat;
 				def.ItemOrder=0;
@@ -153,14 +158,16 @@ namespace OpenDentBusiness {
 				Defs.Insert(def);
 				Defs.RefreshCache();
 			}
-			return DefC.Long[(int)myCat][0].DefNum;//return the first one in the list
+			Def[][] arrayDefsUpdated=GetArrayLong();//The cache could have changed by this point.  Grab it again just in case.
+			return arrayDefsUpdated[(int)myCat][0].DefNum;//return the first one in the list
 		}
 
 		///<summary>Gets the order of the def within Short or -1 if not found.</summary>
 		public static int GetOrder(DefCat myCat,long myDefNum) {
 			//gets the index in the list of unhidden (the Short list).
-			for(int i=0;i<DefC.Short[(int)myCat].GetLength(0);i++) {
-				if(DefC.Short[(int)myCat][i].DefNum==myDefNum) {
+			Def[][] arrayDefs=GetArrayShort();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
 					return i;
 				}
 			}
@@ -170,9 +177,10 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static string GetValue(DefCat myCat,long myDefNum) {
 			string retStr="";
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].DefNum==myDefNum) {
-					retStr=DefC.Long[(int)myCat][i].ItemValue;
+			Def[][] arrayDefs=GetArrayLong();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
+					retStr=arrayDefs[(int)myCat][i].ItemValue;
 				}
 			}
 			return retStr;
@@ -181,9 +189,10 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static Color GetColor(DefCat myCat,long myDefNum) {
 			Color retCol=Color.White;
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].DefNum==myDefNum) {
-					retCol=DefC.Long[(int)myCat][i].ItemColor;
+			Def[][] arrayDefs=GetArrayLong();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
+					retCol=arrayDefs[(int)myCat][i].ItemColor;
 				}
 			}
 			return retCol;
@@ -191,9 +200,10 @@ namespace OpenDentBusiness {
 
 		///<summary></summary>
 		public static bool GetHidden(DefCat myCat,long myDefNum) {
-			for(int i=0;i<DefC.Long[(int)myCat].GetLength(0);i++) {
-				if(DefC.Long[(int)myCat][i].DefNum==myDefNum) {
-					return DefC.Long[(int)myCat][i].IsHidden;
+			Def[][] arrayDefs=GetArrayLong();
+			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
+				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
+					return arrayDefs[(int)myCat][i].IsHidden;
 				}
 			}
 			return false;
@@ -215,9 +225,10 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static List<Def> GetPositiveAdjTypes() {
 			List<Def> retVal=new List<Def>();
-			for(int i=0;i<DefC.Short[(int)DefCat.AdjTypes].Length;i++) {
-				if(DefC.Short[(int)DefCat.AdjTypes][i].ItemValue=="+") {
-					retVal.Add(DefC.Short[(int)DefCat.AdjTypes][i]);
+			Def[][] arrayDefs=GetArrayShort();
+			for(int i=0;i<arrayDefs[(int)DefCat.AdjTypes].Length;i++) {
+				if(arrayDefs[(int)DefCat.AdjTypes][i].ItemValue=="+") {
+					retVal.Add(arrayDefs[(int)DefCat.AdjTypes][i]);
 				}
 			}
 			return retVal;
@@ -226,9 +237,10 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static List<Def> GetNegativeAdjTypes() {
 			List<Def> retVal=new List<Def>();
-			for(int i=0;i<DefC.Short[(int)DefCat.AdjTypes].Length;i++) {
-				if(DefC.Short[(int)DefCat.AdjTypes][i].ItemValue=="-") {
-					retVal.Add(DefC.Short[(int)DefCat.AdjTypes][i]);
+			Def[][] arrayDefs=GetArrayShort();
+			for(int i=0;i<arrayDefs[(int)DefCat.AdjTypes].Length;i++) {
+				if(arrayDefs[(int)DefCat.AdjTypes][i].ItemValue=="-") {
+					retVal.Add(arrayDefs[(int)DefCat.AdjTypes][i]);
 				}
 			}
 			return retVal;

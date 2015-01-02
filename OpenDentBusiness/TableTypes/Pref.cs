@@ -17,6 +17,11 @@ namespace OpenDentBusiness {
 		public string ValueString;
 		///<summary>Documentation on usage and values of each pref.  Mostly deprecated now in favor of using XML comments in the code.</summary>
 		public string Comments;
+
+		///<summary>Returns a copy of the pref.</summary>
+		public Pref Copy() {
+			return (Pref)this.MemberwiseClone();
+		}
 	}
 
 	///<summary>Because this enum is stored in the database as strings rather than as numbers, we can do the order alphabetically.  This enum must exactly match the prefs in the database.  Deprecated preferences will start with "Deprecated" in the summary section.</summary>

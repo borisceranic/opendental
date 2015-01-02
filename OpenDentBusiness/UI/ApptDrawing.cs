@@ -76,10 +76,11 @@ namespace OpenDentBusiness.UI {
 			Brush openBrush;
 			Brush closedBrush;
 			Brush holidayBrush;
+			Def[][] arrayDefs=DefC.GetArrayLong();
 			try {
-				openBrush=new SolidBrush(DefC.Long[(int)DefCat.AppointmentColors][0].ItemColor);
-				closedBrush=new SolidBrush(DefC.Long[(int)DefCat.AppointmentColors][1].ItemColor);
-				holidayBrush=new SolidBrush(DefC.Long[(int)DefCat.AppointmentColors][3].ItemColor);
+				openBrush=new SolidBrush(arrayDefs[(int)DefCat.AppointmentColors][0].ItemColor);
+				closedBrush=new SolidBrush(arrayDefs[(int)DefCat.AppointmentColors][1].ItemColor);
+				holidayBrush=new SolidBrush(arrayDefs[(int)DefCat.AppointmentColors][3].ItemColor);
 			}
 			catch {//this is just for design-time
 				openBrush=new SolidBrush(Color.White);
@@ -225,6 +226,7 @@ namespace OpenDentBusiness.UI {
 			Font blockFont=new Font("Arial",fontSize);
 			string blockText;
 			RectangleF rect;
+			Def[][] arrayDefs=DefC.GetArrayShort();
 			for(int i=0;i<schedForType.Length;i++) {
 				blockBrush=new SolidBrush(DefC.GetColor(DefCat.BlockoutTypes,schedForType[i].BlockoutType));
 				penOutline = new Pen(DefC.GetColor(DefCat.BlockoutTypes,schedForType[i].BlockoutType),2);
@@ -287,7 +289,7 @@ namespace OpenDentBusiness.UI {
 					else {
 						g.DrawRectangle(penOutline,rect.X+1,rect.Y+2,rect.Width-2,rect.Height-3);
 					}
-					g.DrawString(blockText,blockFont,new SolidBrush(DefC.Short[(int)DefCat.AppointmentColors][4].ItemColor),rect);
+					g.DrawString(blockText,blockFont,new SolidBrush(arrayDefs[(int)DefCat.AppointmentColors][4].ItemColor),rect);
 				}
 				blockBrush.Dispose();
 				penOutline.Dispose();
@@ -308,8 +310,9 @@ namespace OpenDentBusiness.UI {
 		///<summary>The background provider schedules for the provider bars on the left.</summary>
 		public static void DrawProvScheds(Graphics g,DateTime startTime,DateTime stopTime) {
 			Brush openBrush;
+			Def[][] arrayDefs=DefC.GetArrayLong();
 			try {
-				openBrush=new SolidBrush(DefC.Long[(int)DefCat.AppointmentColors][0].ItemColor);
+				openBrush=new SolidBrush(arrayDefs[(int)DefCat.AppointmentColors][0].ItemColor);
 			}
 			catch {//this is just for design-time
 				openBrush=new SolidBrush(Color.White);

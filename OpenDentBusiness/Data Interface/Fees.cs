@@ -8,7 +8,7 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Fees {
 		private static List<Fee> _listt;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		///<summary>A list of all Fees.</summary>
 		public static List<Fee> Listt{
@@ -16,7 +16,7 @@ namespace OpenDentBusiness{
 				return GetListt();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listt=value;
 				}
 			}
@@ -25,7 +25,7 @@ namespace OpenDentBusiness{
 		///<summary>A list of all Fees.</summary>
 		public static List<Fee> GetListt() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listt==null) {
 					isListNull=true;
 				}
@@ -34,7 +34,7 @@ namespace OpenDentBusiness{
 				Fees.RefreshCache();
 			}
 			List<Fee> listFees=new List<Fee>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listt.Count;i++) {
 					listFees.Add(_listt[i].Copy());
 				}

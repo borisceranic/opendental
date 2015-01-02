@@ -1858,9 +1858,10 @@ namespace OpenDentBusiness {
 					log+=Lans.g("FormDatabaseMaintenance","Images with no category found: ")+table.Rows.Count+"\r\n";
 				}
 			}
-			else{
+			else {
+				Def[][] arrayDefs=DefC.GetArrayShort();
 				for(int i=0;i<table.Rows.Count;i++) {
-					command="UPDATE document SET DocCategory="+POut.Long(DefC.Short[(int)DefCat.ImageCats][0].DefNum)
+					command="UPDATE document SET DocCategory="+POut.Long(arrayDefs[(int)DefCat.ImageCats][0].DefNum)
 				    +" WHERE DocNum="+table.Rows[i][0].ToString();
 					Db.NonQ(command);
 				}
@@ -3198,10 +3199,11 @@ namespace OpenDentBusiness {
 				command="SELECT *,SUM(SplitAmt) SplitAmt_ FROM paysplit WHERE NOT EXISTS(SELECT * FROM payment WHERE paysplit.PayNum=payment.PayNum) GROUP BY PayNum";
 				DataTable table=Db.GetTable(command);
 				if(table.Rows.Count>0 || verbose) {
+					Def[][] arrayDefs=DefC.GetArrayShort();
 					for(int i=0;i<table.Rows.Count;i++) {
 						///<summary>There's only one place in the program where this is called from.  Date is today, so no need to validate the date.</summary>
 						Payment payment=new Payment();
-						payment.PayType=DefC.Short[(int)DefCat.PaymentTypes][0].DefNum;
+						payment.PayType=arrayDefs[(int)DefCat.PaymentTypes][0].DefNum;
 						payment.DateEntry=PIn.Date(table.Rows[i]["DateEntry"].ToString());
 						payment.PatNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
 						payment.PayDate=PIn.Date(table.Rows[i]["DatePay"].ToString());
@@ -3473,11 +3475,12 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
+			Def[][] arrayDefs=DefC.GetArrayShort();
 			if(isCheck) {
 				command="SELECT COUNT(*) FROM procedurecode WHERE procedurecode.ProcCat=0";
 				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					if(DefC.Short[(int)DefCat.ProcCodeCats].Length==0) {
+					if(arrayDefs[(int)DefCat.ProcCodeCats].Length==0) {
 						log+=Lans.g("FormDatabaseMaintenance","Procedure codes with no categories found but cannot be fixed because there are no visible proc code categories.")+"\r\n";
 						return log;
 					}
@@ -3485,11 +3488,11 @@ namespace OpenDentBusiness {
 				}
 			}
 			else {//fix
-				if(DefC.Short[(int)DefCat.ProcCodeCats].Length==0) {
+				if(arrayDefs[(int)DefCat.ProcCodeCats].Length==0) {
 					log+=Lans.g("FormDatabaseMaintenance","Procedure codes with no categories cannot be fixed because there are no visible proc code categories.")+"\r\n";
 					return log;
 				}
-				command="UPDATE procedurecode SET procedurecode.ProcCat="+POut.Long(DefC.Short[(int)DefCat.ProcCodeCats][0].DefNum)+" WHERE procedurecode.ProcCat=0";
+				command="UPDATE procedurecode SET procedurecode.ProcCat="+POut.Long(arrayDefs[(int)DefCat.ProcCodeCats][0].DefNum)+" WHERE procedurecode.ProcCat=0";
 				long numberfixed=Db.NonQ(command);
 				if(numberfixed>0) {
 					Signalods.SetInvalid(InvalidType.ProcCodes);

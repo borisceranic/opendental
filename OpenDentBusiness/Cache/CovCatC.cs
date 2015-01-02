@@ -7,7 +7,7 @@ namespace OpenDentBusiness {
 	public class CovCatC {
 		private static List<CovCat> _listt;
 		private static List<CovCat> _listShort;
-		private static object _lock=new object();
+		private static object _lockObj=new object();
 
 		///<summary>All CovCats</summary>
 		public static List<CovCat> Listt {
@@ -15,7 +15,7 @@ namespace OpenDentBusiness {
 				return GetListt();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listt=value;
 				}
 			}
@@ -27,7 +27,7 @@ namespace OpenDentBusiness {
 				return GetListShort();
 			}
 			set {
-				lock(_lock) {
+				lock(_lockObj) {
 					_listShort=value;
 				}
 			}
@@ -36,7 +36,7 @@ namespace OpenDentBusiness {
 		///<summary>All CovCats</summary>
 		public static List<CovCat> GetListt() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listt==null) {
 					isListNull=true;
 				}
@@ -45,7 +45,7 @@ namespace OpenDentBusiness {
 				CovCats.RefreshCache();
 			}
 			List<CovCat> listCovCats=new List<CovCat>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listt.Count;i++) {
 					listCovCats.Add(_listt[i].Copy());
 				}
@@ -56,7 +56,7 @@ namespace OpenDentBusiness {
 		///<summary>Only CovCats that are not hidden.</summary>
 		public static List<CovCat> GetListShort() {
 			bool isListNull=false;
-			lock(_lock) {
+			lock(_lockObj) {
 				if(_listShort==null) {
 					isListNull=true;
 				}
@@ -65,7 +65,7 @@ namespace OpenDentBusiness {
 				CovCats.RefreshCache();
 			}
 			List<CovCat> listCovCats=new List<CovCat>();
-			lock(_lock) {
+			lock(_lockObj) {
 				for(int i=0;i<_listShort.Count;i++) {
 					listCovCats.Add(_listShort[i].Copy());
 				}
