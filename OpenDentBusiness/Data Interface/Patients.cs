@@ -380,9 +380,9 @@ namespace OpenDentBusiness{
 				command+="AND patient.Guarantor IN ( "
 				+"SELECT DISTINCT Guarantor FROM patient "
 				+"LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "
-					+"AND (procedurelog.ProcStatus=1 OR procedurelog.ProcStatus=2) "
+					+"AND (procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" OR procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+") "
 					+"AND procedurelog.ClinicNum IN ("+POut.String(clinicNums)+") "
-				+"WHERE patient.PatStatus !=4 "
+				+"WHERE patient.PatStatus !="+POut.Int((int)PatientStatus.Deleted)+" "
 				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN ("+POut.String(clinicNums)+"))) ";
 			}
 			if(siteNum>0) {
