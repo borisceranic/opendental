@@ -1345,6 +1345,8 @@ namespace OpenDental {
 		public void LayoutScrollOpProv() {//ModuleSelectedOld(int patNum){
 			//the scrollbar logic cannot be moved to someplace where it will be activated while working in apptbook
 			//RefreshVisops();//forces reset after changing databases
+			int oldHeight=ContrApptSheet2.Height;
+			int oldVScrollVal=vScrollBar1.Value;
 			if(DefC.Short!=null) {
 				ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
 				ApptDrawing.ApptSheetWidth=panelSheet.Width-vScrollBar1.Width;
@@ -1363,13 +1365,17 @@ namespace OpenDental {
 			vScrollBar1.SmallChange=6*ApptDrawing.LineH;//6 rows
 			if(vScrollBar1.Value==0) {//ApptViewC.List seems to already be not null by this point.
 				int rowsPerHr=60/ApptDrawing.MinPerIncr*ApptDrawing.RowsPerIncr;
-				//use the row setting from the first view.
-				if(ApptViewC.List.Length>0) {
-					rowsPerHr=60/ApptDrawing.MinPerIncr*ApptViewC.List[0].RowsPerIncr;
+				//use the row setting from the selected view.
+				if(ApptViewC.List.Length>0 && comboView.SelectedIndex>0) {
+					rowsPerHr=60/ApptDrawing.MinPerIncr*ApptViewC.List[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
 				}
 				if(8*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
 					vScrollBar1.Value=8*rowsPerHr*ApptDrawing.LineH;//8am
 				}
+			}
+			else if(ContrApptSheet2.Height!=oldHeight && oldHeight > 0) {//Try not to move the scroll bar around when changing between views that have different row increment values.
+				//the max prevents setting scroll value to a negative, the min prevents setting scroll value beyond maximum scroll allowed
+				vScrollBar1.Value=Math.Min(oldVScrollVal*ContrApptSheet2.Height/oldHeight,Math.Max(vScrollBar1.Maximum-vScrollBar1.LargeChange,0));
 			}
 			if(vScrollBar1.Value>vScrollBar1.Maximum-vScrollBar1.LargeChange) {
 				if(vScrollBar1.Maximum-vScrollBar1.LargeChange>=0) {//but don't allow setting negative number
