@@ -383,7 +383,7 @@ namespace OpenDentBusiness{
 					+"AND (procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" OR procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+") "
 					+"AND procedurelog.ClinicNum IN ("+POut.String(clinicNums)+") "
 				+"WHERE patient.PatStatus !="+POut.Int((int)PatientStatus.Deleted)+" "
-				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN ("+POut.String(clinicNums)+"))) ";
+				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN (0,"+POut.String(clinicNums)+"))) "; //Includes patients that are not assigned to any clinic.  May need to restrict selection of these patients in the future.
 			}
 			if(siteNum>0) {
 				command+="AND SiteNum="+POut.Long(siteNum)+" ";
