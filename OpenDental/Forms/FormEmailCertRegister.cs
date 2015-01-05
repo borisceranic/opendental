@@ -53,7 +53,7 @@ namespace OpenDental {
 			}
 			catch(Exception ex) {
 				Cursor=Cursors.Default;
-				MessageBox.Show("Error: "+ex.Message);
+				MessageBox.Show(Lan.g(this,"Error.")+"  "+ex.Message);
 				return;
 			}
 			XmlDocument doc=new XmlDocument();
@@ -85,8 +85,8 @@ namespace OpenDental {
 				return;
 			}
 			string ext=Path.GetExtension(textCertFilePath.Text).ToLower();
-			if(ext!=".pfx" && ext!=".der" && ext!=".cer") {
-				MsgBox.Show(this,"Certificate file path extension must be .pfx or .der or .cer.");
+			if(ext!=".der" && ext!=".cer") {
+				MsgBox.Show(this,"Certificate file path extension must be .der or .cer.");
 				return;
 			}
 			byte[] arrayCertificateBytes=null;
@@ -112,7 +112,7 @@ namespace OpenDental {
 				return;
 			}
 			if(cert.HasPrivateKey) {
-				MessageBox.Show(Lan.g(this,"The specified certificate contains a private key.")+"  "+Lan.g(this,"For your security, please export your public key and upload that instead."));
+				MsgBox.Show(this,"The specified certificate contains a private key.  For your security, please export your public key and upload that instead.");
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
@@ -121,7 +121,7 @@ namespace OpenDental {
 			settings.IndentChars=("    ");
 			StringBuilder strbuild=new StringBuilder();
 			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
-				writer.WriteStartElement("RequestEmailVeritificationCode");
+				writer.WriteStartElement("PostEmailCertificate");
 				writer.WriteElementString("RegistrationKey",PrefC.GetString(PrefName.RegistrationKey));
 				writer.WriteElementString("EmailAddress",textEmailAddress.Text);
 				writer.WriteElementString("VerificationCode",textVerificationCode.Text);

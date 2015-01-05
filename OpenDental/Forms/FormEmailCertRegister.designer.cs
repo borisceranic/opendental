@@ -226,7 +226,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormEmailCertRegister";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "E-mail Certificate Registration";
+			this.Text = "Email Certificate Registration";
 			this.groupStep1.ResumeLayout(false);
 			this.groupStep1.PerformLayout();
 			this.groupStep2.ResumeLayout(false);

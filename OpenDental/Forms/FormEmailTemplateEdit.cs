@@ -138,7 +138,7 @@ namespace OpenDental{
 			this.Name = "FormEmailTemplateEdit";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Edit E-mail Template";
+			this.Text = "Edit Email Template";
 			this.Load += new System.EventHandler(this.FormEmailTemplateEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();

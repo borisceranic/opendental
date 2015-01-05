@@ -413,7 +413,7 @@ namespace OpenDental{
 			this.Name = "FormEmailAddressEdit";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Edit E-mail Address";
+			this.Text = "Edit Email Address";
 			this.Load += new System.EventHandler(this.FormEmailAddress_Load);
 			this.groupOutgoing.ResumeLayout(false);
 			this.groupOutgoing.PerformLayout();
