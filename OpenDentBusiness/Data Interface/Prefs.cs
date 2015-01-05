@@ -83,7 +83,9 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=newValue.ToString();
-			PrefC.Dict[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
+			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			dictPrefsUpdated[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
@@ -139,7 +141,9 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=POut.Bool(newValue);
-			PrefC.Dict[prefName.ToString()]=pref;
+			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			dictPrefsUpdated[prefName.ToString()]=pref;
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
@@ -166,7 +170,9 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=newValue;
-			PrefC.Dict[prefName.ToString()]=pref;
+			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			dictPrefsUpdated[prefName.ToString()]=pref;
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
@@ -193,7 +199,9 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName;
 			pref.ValueString=newValue;
-			PrefC.Dict[prefName]=pref;
+			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			dictPrefsUpdated[prefName.ToString()]=pref;
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
@@ -220,7 +228,9 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=POut.DateT(newValue,false);
-			PrefC.Dict[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
+			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			dictPrefsUpdated[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
