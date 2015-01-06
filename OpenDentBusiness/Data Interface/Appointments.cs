@@ -1960,6 +1960,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a dictionary containing the last completed appointment date of each patient.</summary>
 		public static Dictionary<long,DateTime> GetDateLastVisit() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,DateTime>>(MethodBase.GetCurrentMethod());
+			}
 			Dictionary<long,DateTime> retVal=new Dictionary<long,DateTime>();
 			string command="SELECT PatNum,MAX(AptDateTime) DateLastAppt "
 					+"FROM appointment "
@@ -1976,6 +1979,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a dictionary containing all information of every scheduled, completed, and ASAP appointment made from all non-deleted patients.  Usually used for bridges.</summary>
 		public static Dictionary<long,List<Appointment>> GetAptsForPats(DateTime dateFrom,DateTime dateTo) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,List<Appointment>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
+			}
 			Dictionary<long,List<Appointment>> retVal=new Dictionary<long,List<Appointment>>();
 			string command="SELECT * "
 					+"FROM appointment "
@@ -1995,6 +2001,9 @@ namespace OpenDentBusiness{
 
 		/// <summary>Get a dictionary of all procedure codes for all scheduled, ASAP, and completed appointments</summary>
 		public static Dictionary<long,List<long>> GetCodeNumsAllApts() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,List<long>>>(MethodBase.GetCurrentMethod());
+			}
 			Dictionary<long,List<long>> retVal=new Dictionary<long,List<long>>();
 			string command="SELECT appointment.AptNum,procedurelog.CodeNum "
 				+"FROM appointment "
