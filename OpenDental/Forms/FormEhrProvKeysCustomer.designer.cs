@@ -59,7 +59,6 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -148,7 +147,6 @@ namespace OpenDental{
 			// butAddQuarterly
 			// 
 			this.butAddQuarterly.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddQuarterly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAddQuarterly.Autosize = true;
 			this.butAddQuarterly.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddQuarterly.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
