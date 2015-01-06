@@ -2060,13 +2060,14 @@ namespace OpenDentBusiness{
 			if(RecallTypes.IsSpecialRecallType(recallCur.RecallTypeNum)
 				&& patCur.Birthdate.AddYears(PrefC.GetInt(PrefName.RecallAgeAdult)) > ((recallCur.DateDue>DateTime.Today)?recallCur.DateDue:DateTime.Today)) //For example, if pt's 12th birthday falls after recall date.
 			{
-				for(int i=0;i<RecallTypeC.Listt.Count;i++) {//TODO: UPDATE CACHE PATTERN HERE-------------------------------------
-					if(RecallTypeC.Listt[i].RecallTypeNum==RecallTypes.ChildProphyType) {
-						List<string> childprocs=RecallTypes.GetProcs(RecallTypeC.Listt[i].RecallTypeNum);
+				List<RecallType> listRecallTypes=RecallTypeC.GetListt();
+				for(int i=0;i<listRecallTypes.Count;i++) {
+					if(listRecallTypes[i].RecallTypeNum==RecallTypes.ChildProphyType) {
+						List<string> childprocs=RecallTypes.GetProcs(listRecallTypes[i].RecallTypeNum);
 						if(childprocs.Count>0) {
 							listProcStrs=childprocs;//overrides adult procs.
 						}
-						string childpattern=RecallTypes.GetTimePattern(RecallTypeC.Listt[i].RecallTypeNum);
+						string childpattern=RecallTypes.GetTimePattern(listRecallTypes[i].RecallTypeNum);
 						if(childpattern!="") {
 							recallPattern=childpattern;//overrides adult pattern.
 						}
