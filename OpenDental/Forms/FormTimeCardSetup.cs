@@ -311,7 +311,7 @@ namespace OpenDental{
 			else{
 				payPeriodCur.DateStart=PayPeriods.List[PayPeriods.List.Length-1].DateStop.AddDays(1);
 			}
-			payPeriodCur.DateStop=payPeriodCur.DateStart.AddDays(14);
+			payPeriodCur.DateStop=payPeriodCur.DateStart.AddDays(13);//payPeriodCur.DateStop is inclusive, this is effectively a 14 day default pay period. This only affects default date of newly created pay periods.
 			payPeriodCur.DatePaycheck=payPeriodCur.DateStop.AddDays(4);
 			FormPayPeriodEdit FormP=new FormPayPeriodEdit(payPeriodCur);
 			FormP.IsNew=true;

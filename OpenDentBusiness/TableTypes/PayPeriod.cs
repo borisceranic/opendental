@@ -11,7 +11,7 @@ namespace OpenDentBusiness{
 		public long PayPeriodNum;
 		///<summary>The first day of the payperiod</summary>
 		public DateTime DateStart;
-		///<summary>The last day of the payperiod.</summary>
+		///<summary>The last day of the payperiod.  Inclusive, ignoring time of day.</summary>
 		public DateTime DateStop;
 		///<summary>The date that paychecks will be dated.  A few days after the dateStop.  Optional.</summary>
 		public DateTime DatePaycheck;
