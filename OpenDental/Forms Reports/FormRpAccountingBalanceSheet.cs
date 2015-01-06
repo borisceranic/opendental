@@ -176,7 +176,7 @@ namespace OpenDental{
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Liabilities",SummaryOrientation.West,false,fontBold);
-			query.AddGroupSummaryField("Net Assets:",Color.Black,"Amount","SumTotal",SummaryOperation.Sum,fontBold,0,50);
+			query.AddGroupSummaryField("Net Assets:",Color.Black,"Amount","SumTotal",SummaryOperation.Sum,fontBold,0,10);
 			query=report.AddQuery(tableEquity,"Equity","",SplitByKind.None,2,true);
 			query.AddLine("EquityLine","Group Header",Color.Black,2,LineOrientation.Horizontal,LinePosition.Top,90,0,-30);
 			// add columns to report
