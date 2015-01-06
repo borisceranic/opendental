@@ -1053,7 +1053,7 @@ namespace OpenDental
 			}
 			if(checkPayPlan.Checked && checkPatOtherFam.Checked){
 				MessageBox.Show(Lan.g(this,"You cannot split outside of the family for a payment plan.")+"  "
-					+Lan.g(this,"Either uncheck the Attach to Payment Plan checkbox, or split to a family member instead."));
+					+Lan.g(this,"Either uncheck the Attached to Payment Plan checkbox, or split to a family member instead."));
 				return;
 			}
 			PaySplitCur.DatePay=PIn.Date(textDatePay.Text);//gets overwritten anyway
