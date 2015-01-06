@@ -38,7 +38,7 @@ namespace OpenDental{
 			// label1
 			// 
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label1.Location = new System.Drawing.Point(69, 596);
+			this.label1.Location = new System.Drawing.Point(69, 464);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(240, 37);
 			this.label1.TabIndex = 195;
@@ -49,7 +49,7 @@ namespace OpenDental{
 			// textCharge
 			// 
 			this.textCharge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textCharge.Location = new System.Drawing.Point(311, 603);
+			this.textCharge.Location = new System.Drawing.Point(311, 471);
 			this.textCharge.Name = "textCharge";
 			this.textCharge.ReadOnly = true;
 			this.textCharge.Size = new System.Drawing.Size(62, 20);
@@ -59,7 +59,6 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -81,7 +80,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(895, 602);
+			this.butClose.Location = new System.Drawing.Point(1010, 470);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -97,7 +96,7 @@ namespace OpenDental{
 			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSave.CornerRadius = 4F;
 			this.butSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butSave.Location = new System.Drawing.Point(405, 600);
+			this.butSave.Location = new System.Drawing.Point(405, 468);
 			this.butSave.Name = "butSave";
 			this.butSave.Size = new System.Drawing.Size(94, 24);
 			this.butSave.TabIndex = 197;
@@ -107,7 +106,7 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label2.Location = new System.Drawing.Point(505, 590);
+			this.label2.Location = new System.Drawing.Point(505, 458);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(125, 49);
 			this.label2.TabIndex = 198;
@@ -123,7 +122,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(9, 48);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(553, 539);
+			this.gridMain.Size = new System.Drawing.Size(553, 407);
 			this.gridMain.TabIndex = 193;
 			this.gridMain.Title = "Provider Keys";
 			this.gridMain.TranslationName = "";
@@ -139,7 +138,7 @@ namespace OpenDental{
 			this.gridQ.Location = new System.Drawing.Point(568, 48);
 			this.gridQ.Name = "gridQ";
 			this.gridQ.ScrollValue = 0;
-			this.gridQ.Size = new System.Drawing.Size(407, 539);
+			this.gridQ.Size = new System.Drawing.Size(522, 407);
 			this.gridQ.TabIndex = 199;
 			this.gridQ.Title = "Quarterly Keys";
 			this.gridQ.TranslationName = "";
@@ -148,7 +147,6 @@ namespace OpenDental{
 			// butAddQuarterly
 			// 
 			this.butAddQuarterly.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddQuarterly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAddQuarterly.Autosize = true;
 			this.butAddQuarterly.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddQuarterly.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -165,7 +163,7 @@ namespace OpenDental{
 			// FormEhrProvKeysCustomer
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(982, 638);
+			this.ClientSize = new System.Drawing.Size(1097, 506);
 			this.Controls.Add(this.butAddQuarterly);
 			this.Controls.Add(this.gridQ);
 			this.Controls.Add(this.label2);
