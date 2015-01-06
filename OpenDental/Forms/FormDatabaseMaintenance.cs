@@ -128,7 +128,7 @@ namespace OpenDental {
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(874, 697);
+			this.butClose.Location = new System.Drawing.Point(874, 660);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 0;
@@ -156,7 +156,7 @@ namespace OpenDental {
 			this.butCheck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCheck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCheck.CornerRadius = 4F;
-			this.butCheck.Location = new System.Drawing.Point(670, 697);
+			this.butCheck.Location = new System.Drawing.Point(670, 660);
 			this.butCheck.Name = "butCheck";
 			this.butCheck.Size = new System.Drawing.Size(75, 26);
 			this.butCheck.TabIndex = 5;
@@ -182,7 +182,7 @@ namespace OpenDental {
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrint;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(532, 697);
+			this.butPrint.Location = new System.Drawing.Point(532, 660);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(87, 26);
 			this.butPrint.TabIndex = 18;
@@ -197,7 +197,7 @@ namespace OpenDental {
 			this.butFix.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butFix.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butFix.CornerRadius = 4F;
-			this.butFix.Location = new System.Drawing.Point(750, 697);
+			this.butFix.Location = new System.Drawing.Point(750, 660);
 			this.butFix.Name = "butFix";
 			this.butFix.Size = new System.Drawing.Size(75, 26);
 			this.butFix.TabIndex = 20;
@@ -223,7 +223,7 @@ namespace OpenDental {
 			this.groupBox1.Controls.Add(this.butApptProcs);
 			this.groupBox1.Controls.Add(this.butOptimize);
 			this.groupBox1.Controls.Add(this.butInsPayFix);
-			this.groupBox1.Location = new System.Drawing.Point(27, 502);
+			this.groupBox1.Location = new System.Drawing.Point(27, 465);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(470, 230);
 			this.groupBox1.TabIndex = 31;
@@ -425,7 +425,7 @@ namespace OpenDental {
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(922, 419);
+			this.gridMain.Size = new System.Drawing.Size(922, 382);
 			this.gridMain.TabIndex = 96;
 			this.gridMain.Title = "Database Checks";
 			this.gridMain.TranslationName = "TableClaimPaySplits";
@@ -434,7 +434,7 @@ namespace OpenDental {
 			// butNone
 			// 
 			this.butNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butNone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butNone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butNone.Autosize = true;
 			this.butNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -448,6 +448,7 @@ namespace OpenDental {
 			// 
 			// textBox2
 			// 
+			this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBox2.BackColor = System.Drawing.SystemColors.Control;
 			this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.textBox2.Location = new System.Drawing.Point(503, 502);
@@ -464,7 +465,7 @@ namespace OpenDental {
 			this.AcceptButton = this.butCheck;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
-			this.ClientSize = new System.Drawing.Size(982, 733);
+			this.ClientSize = new System.Drawing.Size(982, 696);
 			this.Controls.Add(this.textBox2);
 			this.Controls.Add(this.butNone);
 			this.Controls.Add(this.gridMain);
@@ -478,7 +479,7 @@ namespace OpenDental {
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(966, 434);
+			this.MinimumSize = new System.Drawing.Size(966, 458);
 			this.Name = "FormDatabaseMaintenance";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
