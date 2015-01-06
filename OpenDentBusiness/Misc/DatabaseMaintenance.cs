@@ -2565,7 +2565,7 @@ namespace OpenDentBusiness {
 			}
 			if(isCheck) {
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Messaging buttons found with invalid button orders: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Messaging buttons found with invalid button orders")+": "+numFound+"\r\n";
 				}
 			}
 			else {//fix
@@ -2581,7 +2581,30 @@ namespace OpenDentBusiness {
 					table=Db.GetTable(queryStr);
 				} while(table.Rows.Count > 0);
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Messaging buttons with invalid button orders fixed: ")+numFound.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Messaging buttons with invalid button orders fixed")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string OrthoChartFieldsWithoutValues(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			string queryStr="SELECT COUNT(*) FROM orthochart WHERE FieldValue=''";
+			int numFound=PIn.Int(Db.GetCount(queryStr));
+			if(isCheck) {
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Ortho chart fields without values found")+": "+numFound+"\r\n";
+				}
+			}
+			else {//fix
+				command="DELETE FROM orthochart WHERE FieldValue=''";
+				Db.NonQ(command);
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Ortho chart fields without values fixed")+": "+numFound.ToString()+"\r\n";
 				}
 			}
 			return log;

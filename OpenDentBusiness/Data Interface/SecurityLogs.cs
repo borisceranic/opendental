@@ -63,7 +63,7 @@ namespace OpenDentBusiness{
 			return Refresh(patNum,permTypes,new List<long>(){ fKey });
 		}
 
-		///<summary>Used when viewing various audit trails of specific types.  This overload will return security logs for multiple objects (or fKeys).  Typically you will only need a specific type audit log for one type.  However, for things like ortho charts, each row (FK) in the database represents just one part of a larger ortho chart "object".  Thus, to get the full experience of a specific type audit trail window, we need to get security logs for multiple objects (FKs) that comprise the larger object (what the user sees).  Only implemented with ortho chart so far.</summary>
+		///<summary>Used when viewing various audit trails of specific types.  This overload will return security logs for multiple objects (or fKeys).  Typically you will only need a specific type audit log for one type.  However, for things like ortho charts, each row (FK) in the database represents just one part of a larger ortho chart "object".  Thus, to get the full experience of a specific type audit trail window, we need to get security logs for multiple objects (FKs) that comprise the larger object (what the user sees).  Only implemented with ortho chart so far.  FKeys can be null.</summary>
 		public static SecurityLog[] Refresh(long patNum,List<Permissions> permTypes,List<long> fKeys) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<SecurityLog[]>(MethodBase.GetCurrentMethod(),patNum,permTypes,fKeys);
@@ -77,7 +77,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM securitylog "
 				+"WHERE ("+types+") ";
-			if(fKeys.Count > 0) {
+			if(fKeys!=null && fKeys.Count > 0) {
 				command+="AND FKey IN ("+String.Join(",",fKeys)+") ";
 			}
 			if(patNum!=0) {//appointments

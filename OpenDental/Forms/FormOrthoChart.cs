@@ -365,23 +365,29 @@ namespace OpenDental {
 		}
 
 		private void butAudit_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedCell.X==-1) {
-				MsgBox.Show(this,"Please select an ortho chart field or date first.");
-				return;
-			}
-			//We cannot show audit trails for deleted ortho charts because we delete entries in the ortho chart table.
-			//So we have to look and see if the ortho chart entry is in the db still and then use that PK to show the unique audit trail.
-			List<long> orthoChartNums=GetOrthoChartNumsForRow(gridMain.SelectedCell.Y);
-			List<Permissions> perms=new List<Permissions>();
-			perms.Add(Permissions.OrthoChartEdit);
-			FormAuditOneType FormA=new FormAuditOneType(_patCur.PatNum,perms,Lan.g(this,"Audit Trail for Ortho Chart"),0);
-			SecurityLog[] orthoChartLogs=SecurityLogs.Refresh(_patCur.PatNum,new List<Permissions> { Permissions.OrthoChartEdit },orthoChartNums);
+			FormAuditOrtho FormAO=new FormAuditOrtho();
+			SecurityLog[] orthoChartLogs=SecurityLogs.Refresh(_patCur.PatNum,new List<Permissions> { Permissions.OrthoChartEdit },null);
 			SecurityLog[] patientFieldLogs=SecurityLogs.Refresh(new DateTime(1,1,1),DateTime.Today,Permissions.PatientFieldEdit,_patCur.PatNum,0);
-			List<SecurityLog> listLogs=new List<SecurityLog>();
-			listLogs.AddRange(orthoChartLogs);//Show the ortho chart logs first.  There might be a lot of patient field logs.
-			listLogs.AddRange(patientFieldLogs);
-			FormA.LogList=listLogs.ToArray();
-			FormA.ShowDialog();
+			SortedDictionary<DateTime,List<SecurityLog>> dictDatesOfServiceLogEntries=new SortedDictionary<DateTime,List<SecurityLog>>();
+			//Add all dates from grid first, some may not have audit trail entries, but should be selectable from FormAO
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				DateTime dtCur=((DateTime)table.Rows[i]["Date"]).Date;
+				if(dictDatesOfServiceLogEntries.ContainsKey(dtCur)) {
+					continue;
+				}
+				dictDatesOfServiceLogEntries.Add(dtCur,new List<SecurityLog>());
+			}
+			//Add Ortho Audit Trail Entries
+			for(int i=0;i<orthoChartLogs.Length;i++) {
+				DateTime dtCur=OrthoCharts.GetOrthoDateFromLog(orthoChartLogs[i]);
+				if(!dictDatesOfServiceLogEntries.ContainsKey(dtCur)) {
+					dictDatesOfServiceLogEntries.Add(dtCur,new List<SecurityLog>());
+				}
+				dictDatesOfServiceLogEntries[dtCur].Add(orthoChartLogs[i]);//add entry to existing list.
+			}
+			FormAO.DictDateOrthoLogs=dictDatesOfServiceLogEntries;
+			FormAO.PatientFieldLogs.AddRange(patientFieldLogs);
+			FormAO.ShowDialog();
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -407,9 +413,11 @@ namespace OpenDental {
 				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
 					table.Rows[i][j+1]=gridMain.Rows[i].Cells[j+1].Text;
 				}
-			} 
-			List<OrthoChart> _listOrthoCharts=OrthoCharts.GetAllForPatient(_patCur.PatNum);
-			List<OrthoChart> listOrthoChartsFromTable=new List<OrthoChart>();
+			}
+			//Modified Sync pattern.  We cannot use the standard Sync pattern here because we have to perform logging when updating or deleting.
+			#region Modified Sync Pattern
+			List<OrthoChart> listDB=OrthoCharts.GetAllForPatient(_patCur.PatNum);
+			List<OrthoChart> listNew=new List<OrthoChart>();
 			for(int r=0;r<table.Rows.Count;r++) {
 				for(int c=1;c<table.Columns.Count;c++) {//skip col 0
 					OrthoChart tempChart = new OrthoChart();
@@ -417,37 +425,106 @@ namespace OpenDental {
 					tempChart.FieldName=_listOrthDisplayFields[c-1].Description;
 					tempChart.FieldValue=table.Rows[r][c].ToString();
 					tempChart.PatNum=_patCur.PatNum;
-					listOrthoChartsFromTable.Add(tempChart);
+					listNew.Add(tempChart);
 				}
 			}
-			//Check table list vs DB list for inserts and updates.
-			for(int i=0;i<listOrthoChartsFromTable.Count;i++) {
-				//Update the Record if it already exists or Insert if it's new.
-				for(int j=0;j<=_listOrthoCharts.Count;j++) {
-					//Insert if you've made it through the whole list.
-					if(j==_listOrthoCharts.Count) {
-						OrthoCharts.Insert(listOrthoChartsFromTable[i]);
-						break;
-					}
-					//Update if type and date match
-					if(_listOrthoCharts[j].DateService==listOrthoChartsFromTable[i].DateService 
-							&& _listOrthoCharts[j].FieldName==listOrthoChartsFromTable[i].FieldName) 
-					{
-						listOrthoChartsFromTable[i].OrthoChartNum=_listOrthoCharts[j].OrthoChartNum;
-						//Make a security log if the user has changed anything.
-						if(listOrthoChartsFromTable[i].FieldValue!=_listOrthoCharts[j].FieldValue) {
-							SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,_patCur.PatNum
-								,Lan.g(this,"Ortho chart field edited.  Field date")+": "+_listOrthoCharts[j].DateService.ToShortDateString()+"  "
-									+Lan.g(this,"Field name")+": "+_listOrthoCharts[j].FieldName+"\r\n"
-									+Lan.g(this,"Old value")+": \""+_listOrthoCharts[j].FieldValue+"\"  "
-									+Lan.g(this,"New value")+": \""+listOrthoChartsFromTable[i].FieldValue+"\""
-								,_listOrthoCharts[j].OrthoChartNum);
-						}
-						OrthoCharts.Update(listOrthoChartsFromTable[i]);
-						break;
-					}
+			//Inserts, updates, or deletes database rows to match supplied list.
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<OrthoChart> listIns    =new List<OrthoChart>();
+			List<OrthoChart> listUpdNew =new List<OrthoChart>();
+			List<OrthoChart> listUpdDB  =new List<OrthoChart>();
+			List<OrthoChart> listDel    =new List<OrthoChart>();
+			List<string> listColNames=new List<string>();
+			//Remove fields from the DB list that are not currently set to display.
+			for(int i=0;i<_listOrthDisplayFields.Count;i++){
+				listColNames.Add(_listOrthDisplayFields[i].Description);
+			}
+			for(int i=listDB.Count-1;i>=0;i--){
+				if(!listColNames.Contains(listDB[i].FieldName)){
+					listDB.RemoveAt(i);
 				}
 			}
+			listNew.Sort(OrthoCharts.SortDateField);
+			listDB.Sort(OrthoCharts.SortDateField);
+			int idxNew=0;
+			int idxDB=0;
+			OrthoChart fieldNew;
+			OrthoChart fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.DateService<fieldDB.DateService) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.DateService>fieldDB.DateService) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.FieldName.CompareTo(fieldDB.FieldName)<0) {//New Fieldname Comes First
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.FieldName.CompareTo(fieldDB.FieldName)>0) {//DB Fieldname Comes First
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				if(listIns[i].FieldValue=="") {//do not insert new blank values. This happens when fields from today are not used.
+					continue;
+				}
+				OrthoCharts.Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,_patCur.PatNum
+					//DateService is parsed from this field in the audit trail function
+					,Lan.g(this,"Ortho chart field edited.  Field date")+": "+listUpdNew[i].DateService.ToShortDateString()+"  "
+									+Lan.g(this,"Field name")+": "+listUpdNew[i].FieldName+"\r\n"
+									+Lan.g(this,"Old value")+": \""+listUpdDB[i].FieldValue+"\"  "
+									+Lan.g(this,"New value")+": \""+listUpdNew[i].FieldValue+"\" "
+									+listUpdDB[i].DateService.ToString("yyyyMMdd")//This date stamp must be the last 8 characters for new OrthoEdit audit trail entries.
+					);
+				if(listUpdNew[i].FieldValue!="") {//Actually update rows that have a new value.
+					OrthoCharts.Update(listUpdNew[i],listUpdDB[i]);
+				}
+				else {//instead of updating to a blank value, we delete the row from the DB.
+					listDel.Add(listUpdDB[i]);
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {//All logging should have been performed above in the "Update block"
+				OrthoCharts.Delete(listDel[i].OrthoChartNum);
+			}
+			#endregion
 		}
 
 		
