@@ -1986,6 +1986,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a dictionary containing the last completed appointment date of each patient.</summary>
 		public static Dictionary<long,DateTime> GetDateLastVisit() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,DateTime>>(MethodBase.GetCurrentMethod());
+			}
 			Dictionary<long,DateTime> retVal=new Dictionary<long,DateTime>();
 			string command="SELECT PatNum,MAX(AptDateTime) DateLastAppt "
 					+"FROM appointment "
@@ -2002,10 +2005,13 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a dictionary containing all information of every scheduled, completed, and ASAP appointment made from all non-deleted patients.  Usually used for bridges.</summary>
 		public static Dictionary<long,List<Appointment>> GetAptsForPats(DateTime dateFrom,DateTime dateTo) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,List<Appointment>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
+			}
 			Dictionary<long,List<Appointment>> retVal=new Dictionary<long,List<Appointment>>();
 			string command="SELECT * "
 					+"FROM appointment "
-					+"WHERE AptStatus IN (1,2,4) "//Scheduled, Complete, ASAP
+					+"WHERE AptStatus IN ("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.Complete)+","+POut.Int((int)ApptStatus.ASAP)+") "
 					+"AND "+DbHelper.DtimeToDate("AptDateTime")+">="+POut.Date(dateFrom)+" AND "+DbHelper.DtimeToDate("AptDateTime")+"<="+POut.Date(dateTo);
 			List<Appointment> listApts=Crud.AppointmentCrud.SelectMany(command);
 			for(int i=0;i<listApts.Count;i++) {
@@ -2021,14 +2027,17 @@ namespace OpenDentBusiness{
 
 		/// <summary>Get a dictionary of all procedure codes for all scheduled, ASAP, and completed appointments</summary>
 		public static Dictionary<long,List<long>> GetCodeNumsAllApts() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<long,List<long>>>(MethodBase.GetCurrentMethod());
+			}
 			Dictionary<long,List<long>> retVal=new Dictionary<long,List<long>>();
 			string command="SELECT appointment.AptNum,procedurelog.CodeNum "
 				+"FROM appointment "
 				+"LEFT JOIN procedurelog ON procedurelog.AptNum=appointment.AptNum";
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
-				long aptNum=PIn.Long(table.Rows[i][0].ToString());
-				long codeNum=PIn.Long(table.Rows[i][1].ToString());
+				long aptNum=PIn.Long(table.Rows[i]["AptNum"].ToString());
+				long codeNum=PIn.Long(table.Rows[i]["CodeNum"].ToString());
 				if(retVal.ContainsKey(aptNum)) {
 					retVal[aptNum].Add(codeNum);//Add the current CodeNum to the list of CodeNums for the appointment.
 				}
