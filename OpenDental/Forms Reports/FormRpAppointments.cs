@@ -354,7 +354,6 @@ namespace OpenDental
 			query.AddColumn("Home Ph.",120,FieldValueType.String,font);
 			query.AddColumn("Work Ph.",120,FieldValueType.String,font);
 			query.AddColumn("Cell Ph.",120,FieldValueType.String,font);
-			query.ReportObjects.Add(new ReportObject("Buffer","Group Footer",new Point(0,0),new Size(1,50),"",new Font("Tahoma",9),ContentAlignment.MiddleCenter));
 			report.AddPageNum(font);
 			report.AddGridLines();
 			// execute query

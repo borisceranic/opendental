@@ -592,18 +592,18 @@ WHERE 1 "
 			query.AddColumn("Clinic",120,FieldValueType.String,font);
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",90,FieldValueType.Number,font);
-			query.AddGroupSummaryField("Total Insurance Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,0,50);
+			query.AddGroupSummaryField("Total Insurance Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,0,10);
 			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,2,true,dictPatDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").StringFormat="d";
-			query.AddColumn("Patient Name",300,FieldValueType.String,font);
+			query.AddColumn("Patient Name",270,FieldValueType.String,font);
 			query.AddColumn("Provider",90,FieldValueType.String,font);
 			query.AddColumn("Clinic",120,FieldValueType.String,font);
 			query.AddColumn("Check#",75,FieldValueType.String,font);
-			query.AddColumn("Amount",90,FieldValueType.Number,font);
-			query.AddGroupSummaryField("Total Patient Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),fontBold,-20,30);
-			query.AddGroupSummaryField("Total All Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups3),fontBold,-20,70);
+			query.AddColumn("Amount",120,FieldValueType.Number,font);
+			query.AddGroupSummaryField("Total Patient Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),fontBold,0,10);
+			query.AddGroupSummaryField("Total All Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups3),fontBold,0,10);
 			report.AddPageNum(font);
 			report.AddGridLines();
 			if(!report.SubmitQueries()) {

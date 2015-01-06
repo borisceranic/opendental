@@ -182,6 +182,19 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Pulls from cache.  Can contain a null clinic if not found.</summary>
+		public static List<Clinic> GetClinics(List<long> listClinicNums) {
+			//No need to check RemotingRole; no call to db.
+			List<Clinic> listClinics=new List<Clinic>();
+			for(int i=0;i<listClinicNums.Count;i++) {
+				if(listClinicNums[i]==0) {
+					continue;
+				}
+				listClinics.Add(GetClinic(listClinicNums[i]));
+			}
+			return listClinics;
+		}
+
 		///<summary>Returns an empty string for invalid clinicNums.</summary>
 		public static string GetDesc(long clinicNum) {
 			//No need to check RemotingRole; no call to db.

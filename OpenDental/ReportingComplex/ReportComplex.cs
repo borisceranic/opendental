@@ -130,6 +130,8 @@ namespace OpenDental.ReportingComplex {
 			}
 		}
 
+
+
 		///<summary>Adds a ReportObject large, centered, and bold, to the top of the Report Header Section.  Should only be done once, and done before any subTitles.</summary>
 		public void AddTitle(string name,string title,Font font){
 			Size size=new Size((int)(_grfx.MeasureString(title,font).Width/_grfx.DpiX*100+2)
@@ -153,6 +155,10 @@ namespace OpenDental.ReportingComplex {
 			_sections["Report Header"].Height=(int)size.Height+20;
 			//grfx.Dispose();
 			//FormR.Dispose();
+		}
+
+		public void AddTitle(string name,string title) {
+			AddTitle(name,title,new Font("Tahoma",17,FontStyle.Bold));
 		}
 
 		///<summary>Adds a ReportObject, centered and bold, at the bottom of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
@@ -183,6 +189,10 @@ namespace OpenDental.ReportingComplex {
 			_reportObjects.Add(
 				new ReportObject(name,"Report Header",new Point(xPos,yPos+5),size,subTitle,font,ContentAlignment.MiddleCenter));
 			_sections["Report Header"].Height+=(int)size.Height+5;
+		}
+
+		public void AddSubTitle(string name,string subTitle) {
+			AddSubTitle(name,subTitle,new Font("Tahoma",10,FontStyle.Bold));
 		}
 
 		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {

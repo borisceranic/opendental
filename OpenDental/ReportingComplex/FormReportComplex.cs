@@ -777,10 +777,17 @@ namespace OpenDental.ReportingComplex
 						if(!queryObj.IsLastSplit) {
 							continue;
 						}
-						if(reportObject.Name=="GroupSummaryText") {
-							reportObject.StaticText=GetGroupSummaryValue(reportObject.SummarizedField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString("c");
-							reportObject.Size=new Size((int)g.MeasureString(reportObject.StaticText,reportObject.Font).Width+2,(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Height+2);
-							yPosAdd+=reportObject.OffSetY;
+						if(reportObject.Name.Contains("GroupSummaryLabel")) {
+							yPos+=reportObject.OffSetY;
+						}
+						if(reportObject.Name.Contains("GroupSummaryText")) {
+							reportObject.StaticText=GetGroupSummaryValue(reportObject.DataField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString("c");
+							int width=(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Width+2;
+							int height=(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Height+2;
+							if(width<queryObj.GetObjectByName(reportObject.SummarizedField+"Header").Size.Width) {
+								width=queryObj.GetObjectByName(reportObject.SummarizedField+"Header").Size.Width;
+							}
+							reportObject.Size=new Size(width,height);
 						}
 					}
 					if(section.Name=="Group Title" && rowsPrinted>0 && reportObject.Name=="Initial Group Title") {
@@ -810,9 +817,10 @@ namespace OpenDental.ReportingComplex
 							yPos+=textObject.Size.Height;
 						}
 						if(section.Name=="Group Footer" 
-							&& reportObject.SummaryOrientation==SummaryOrientation.North 
-							|| reportObject.SummaryOrientation==SummaryOrientation.South) 
+							&& ((reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)
+								|| (reportObject.Name.Contains("GroupSummaryText")))) 
 						{
+							yPosAdd+=textObject.Size.Height;
 							yPos+=textObject.Size.Height;
 						}
 					}

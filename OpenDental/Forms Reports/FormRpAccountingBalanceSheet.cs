@@ -45,9 +45,9 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpAccountingBalanceSheet));
 			this.date1 = new System.Windows.Forms.MonthCalendar();
 			this.labelTO = new System.Windows.Forms.Label();
+			this.butTest = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.butTest = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// date1
@@ -65,6 +65,22 @@ namespace OpenDental{
 			this.labelTO.TabIndex = 22;
 			this.labelTO.Text = "As of";
 			this.labelTO.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// butTest
+			// 
+			this.butTest.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butTest.Autosize = true;
+			this.butTest.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butTest.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butTest.CornerRadius = 4F;
+			this.butTest.Location = new System.Drawing.Point(297, 152);
+			this.butTest.Name = "butTest";
+			this.butTest.Size = new System.Drawing.Size(75, 26);
+			this.butTest.TabIndex = 24;
+			this.butTest.Text = "Test Report";
+			this.butTest.Visible = false;
+			this.butTest.Click += new System.EventHandler(this.butTest_Click);
 			// 
 			// butCancel
 			// 
@@ -96,21 +112,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// butTest
-			// 
-			this.butTest.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butTest.Autosize = true;
-			this.butTest.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTest.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTest.CornerRadius = 4F;
-			this.butTest.Location = new System.Drawing.Point(297, 152);
-			this.butTest.Name = "butTest";
-			this.butTest.Size = new System.Drawing.Size(75, 26);
-			this.butTest.TabIndex = 24;
-			this.butTest.Text = "Test Report";
-			this.butTest.Click += new System.EventHandler(this.butTest_Click);
-			// 
 			// FormRpAccountingBalanceSheet
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -134,6 +135,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRpAccountingBalanceSheet_Load(object sender, System.EventArgs e) {
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				butTest.Visible=true;
+			}
 			if(DateTime.Today.Month>6){//default to this year
 				date1.SelectionStart=new DateTime(DateTime.Today.Year,12,31);
 			}
@@ -143,25 +147,16 @@ namespace OpenDental{
 		}
 
 		private void butTest_Click(object sender,EventArgs e) {
-			string queryAssets="SELECT Description, SUM(ROUND(DebitAmt,3)-ROUND(CreditAmt,3)) SumTotal "
-        +"FROM account, journalentry "
-        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(date1.SelectionStart)+" AND AcctType=0 "
-        +"GROUP BY account.AccountNum "
-        +"ORDER BY Description, DateDisplayed";
-			string queryLiabilities="SELECT Description, SUM(ROUND(CreditAmt,3)-ROUND(DebitAmt,3)) SumTotal "
-        +"FROM account, journalentry "
-        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(date1.SelectionStart)+" AND AcctType=1 "
-        +"GROUP BY account.AccountNum "
-        +"ORDER BY Description, DateDisplayed";
-			int[] summaryGroups1= { 1 };
-			int[] summaryGroups2= { 2 };
 			Font font=new Font("Tahoma",9);
 			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
-			DataTable queryEquity=Accounts.GetEquityTable(date1.SelectionStart);
-			queryEquity.LoadDataRow(new object[] { "Retained Earnings (Auto)",ODR.GetData.RetainedEarningsAuto(date1.SelectionStart) },LoadOption.OverwriteChanges);
-			queryEquity.LoadDataRow(new object[] { "NetIncomeThisYear",ODR.GetData.NetIncomeThisYear(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			DataTable tableAssets=Accounts.GetAssetTable(date1.SelectionStart);
+			DataTable tableLiabilities=Accounts.GetLiabilityTable(date1.SelectionStart);
+			DataTable tableEquity=Accounts.GetEquityTable(date1.SelectionStart);
+			//Add two new rows to the equity data table to show Retained Earnings (Auto) and NetIncomeThisYear
+			tableEquity.LoadDataRow(new object[] { "Retained Earnings (Auto)",ODR.GetData.RetainedEarningsAuto(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			tableEquity.LoadDataRow(new object[] { "NetIncomeThisYear",ODR.GetData.NetIncomeThisYear(date1.SelectionStart) },LoadOption.OverwriteChanges);
 			//create the report
 			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="Balance Sheet";
@@ -170,25 +165,24 @@ namespace OpenDental{
 			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString(),fontSubTitle);
 			//setup query
 			QueryObject query;
-			query=report.AddQuery(queryAssets,"Assets","",SplitByKind.None,1,true);
+			query=report.AddQuery(tableAssets,"Assets","",SplitByKind.None,1,true);
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Assets",SummaryOrientation.West,false,fontBold);
-			query=report.AddQuery(queryLiabilities,"Liabilities","",SplitByKind.None,1,true);
+			query=report.AddQuery(tableLiabilities,"Liabilities","",SplitByKind.None,1,true);
 			query.IsNegativeSummary=true;
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Liabilities",SummaryOrientation.West,false,fontBold);
-			query.AddGroupSummaryField("Net Assets:",Color.Black,"Amount","SumTotal",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,70,50);
-			query=report.AddQuery(queryEquity,"Equity","",SplitByKind.None,2,true);
+			query.AddGroupSummaryField("Net Assets:",Color.Black,"Amount","SumTotal",SummaryOperation.Sum,fontBold,0,50);
+			query=report.AddQuery(tableEquity,"Equity","",SplitByKind.None,2,true);
 			query.AddLine("EquityLine","Group Header",Color.Black,2,LineOrientation.Horizontal,LinePosition.Top,90,0,-30);
 			// add columns to report
 			query.AddColumn("Description",300,FieldValueType.String,font);
 			query.AddColumn("Amount",150,FieldValueType.Number,font);
 			query.AddSummaryLabel("Amount","Total Equity",SummaryOrientation.West,false,fontBold);
-			//query.AddGroupSummaryField(Color.Black,"Total Patient Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),-20,30);
 			report.AddPageNum(font);
 			// execute query
 			if(!report.SubmitQueries()) {

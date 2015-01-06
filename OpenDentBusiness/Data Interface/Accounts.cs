@@ -473,16 +473,40 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
+		public static DataTable GetAssetTable(DateTime asOfDate) {
+			//No need to check RemotingRole; no call to db.
+			return GetAccountTotalByType(asOfDate,AccountType.Asset);
+		}
+
+		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
+		public static DataTable GetLiabilityTable(DateTime asOfDate) {
+			//No need to check RemotingRole; no call to db.
+			return GetAccountTotalByType(asOfDate,AccountType.Liability);
+		}
+
+		///<summary>Gets the full list to display in the Chart of Accounts, including balances.</summary>
 		public static DataTable GetEquityTable(DateTime asOfDate) {
+			//No need to check RemotingRole; no call to db.
+			return GetAccountTotalByType(asOfDate,AccountType.Equity);
+		}
+
+		private static DataTable GetAccountTotalByType(DateTime asOfDate,AccountType acctType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),asOfDate);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),asOfDate,acctType);
 			}
-			string queryEquity="SELECT Description, SUM(ROUND(CreditAmt,3)-ROUND(DebitAmt,3)) SumTotal, AcctType "
+			string sumTotalStr="";
+			if(acctType==AccountType.Asset) {
+				sumTotalStr="SUM(ROUND(DebitAmt,3)-ROUND(CreditAmt,3))";
+			}
+			else {//Liability or equity
+				sumTotalStr="SUM(ROUND(CreditAmt,3)-ROUND(DebitAmt,3))";
+			}
+			string command="SELECT Description, "+sumTotalStr+" SumTotal, AcctType "
         +"FROM account, journalentry "
-        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(asOfDate)+" AND AcctType=2 "
+        +"WHERE account.AccountNum=journalentry.AccountNum AND DateDisplayed <= "+POut.Date(asOfDate)+" AND AcctType="+POut.Int((int)acctType)+" "
         +"GROUP BY account.AccountNum "
         +"ORDER BY Description, DateDisplayed ";
-			return Db.GetTable(queryEquity);
+			return Db.GetTable(command);
 		}
 	}
 

@@ -403,11 +403,11 @@ namespace OpenDental.ReportingComplex {
 			Point location=GetObjectByName(columnName+"Header").Location;
 			Size labelSize=new Size((int)(grfx.MeasureString(staticText,font).Width/grfx.DpiX*100+2)
 				,(int)(grfx.MeasureString(staticText,font).Height/grfx.DpiY*100+2));
-			int i=_reportObjects.Add(new ReportObject("GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleLeft,offSetX,offSetY));
+			int i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleLeft,offSetX,offSetY));
 			_reportObjects[i].DataField=dataFieldName;
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			_sections["Group Footer"].Height+=(int)((grfx.MeasureString(staticText,font)).Height/grfx.DpiY*100+2)+offSetY;
-			i=_reportObjects.Add(new ReportObject("GroupSummaryText","Group Footer",location,new Size(0,0),color,dataFieldName,font,summaryOperation,offSetX,offSetY));
+			i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryText","Group Footer",location,new Size(0,0),color,columnName,dataFieldName,font,summaryOperation,offSetX,offSetY));
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			grfx.Dispose();
 		}
@@ -417,21 +417,34 @@ namespace OpenDental.ReportingComplex {
 			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,queryGroupValues,font,0,0);
 		}
 
-		///<summary>Default Font is Tahoma 10pt Bold.</summary>
+		///<summary>Default Font is Tahoma 8pt Bold.</summary>
 		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,int offSetX,int offSetY) {
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,queryGroupValues,new Font("Tahoma",10,FontStyle.Bold),offSetX,offSetY);
+			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,queryGroupValues,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
 		}
 
-		///<summary>Default Font is Tahoma 10pt Bold. Summary group is set to 1.</summary>
+		///<summary>Defaults: Font Tahoma 8pt Bold, summary group 1.</summary>
 		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation) {
-			int[] summaryGroups= { 1 };
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,new List<int>(summaryGroups),new Font("Tahoma",10,FontStyle.Bold),0,0);
+			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),0,0);
 		}
 
-		///<summary>Default Font is Tahoma 10pt Bold. Summary group is set to 1., Color is set to Black.</summary>
+		///<summary>Default Font is Tahoma 8pt Bold.  Summary group is set to 1.  Color is Black.</summary>
 		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation) {
-			int[] summaryGroups= { 1 };
-			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>(summaryGroups),new Font("Tahoma",10,FontStyle.Bold),0,0);
+			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),0,0);
+		}
+
+		///<summary>Default Font is Tahoma 8pt Bold. Summary group is set to 1., Color is set to Black.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
+		}
+
+		///<summary>Summary group is set to 1., Color is set to Black.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },font,offSetX,offSetY);
+		}
+
+		///<summary>Summary group is set to 1.</summary>
+		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },font,offSetX,offSetY);
 		}
 
 		///<summary>Submits the Query to the database and fills ReportTable with the results.  Returns false if the query fails.</summary>

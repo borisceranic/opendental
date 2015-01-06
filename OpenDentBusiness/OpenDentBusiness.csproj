@@ -877,6 +877,7 @@
     <Compile Include="Plugins\PluginBase.cs" />
     <Compile Include="Plugins\PluginContainer.cs" />
     <Compile Include="Plugins\Plugins.cs" />
+    <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\WikiListHist.cs" />
@@ -1035,7 +1036,6 @@
     </Compile>
     <Compile Include="Remoting\RemotingClient.cs" />
     <Compile Include="Reports\Reports.cs" />
-    <Compile Include="Reports\RpAdjSheet.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SheetFramework\SheetEnums.cs">
       <SubType>Code</SubType>

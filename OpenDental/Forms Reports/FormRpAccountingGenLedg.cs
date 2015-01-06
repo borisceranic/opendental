@@ -117,6 +117,7 @@ namespace OpenDental{
 			this.butTest.Size = new System.Drawing.Size(75, 26);
 			this.butTest.TabIndex = 23;
 			this.butTest.Text = "Test Report";
+			this.butTest.Visible = false;
 			this.butTest.Click += new System.EventHandler(this.butTest_Click);
 			// 
 			// FormRpAccountingGenLedg
@@ -143,8 +144,8 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRpAccountingGenLedg_Load(object sender, System.EventArgs e) {
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				butTest.Visible=false;
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				butTest.Visible=true;
 			}
 			if(DateTime.Today.Month>6){//default to this year
 				date1.SelectionStart=new DateTime(DateTime.Today.Year,1,1);

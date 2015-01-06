@@ -399,11 +399,12 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>Overload for GroupSummary ReportObject</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedFieldName,Font font,SummaryOperation summaryOperation,int offSetX,int offSetY) {
+		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedFieldName,string datafield,Font font,SummaryOperation summaryOperation,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
 			_size=size;
+			_dataFieldName=datafield;
 			_font=font;
 			_fieldDefKind=FieldDefKind.SummaryField;
 			_fieldValueType=FieldValueType.Number;
@@ -411,9 +412,9 @@ namespace OpenDental.ReportingComplex {
 			_summarizedFieldName=summarizedFieldName;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
-			//defaults:
-			_contentAlignment=ContentAlignment.MiddleLeft;
 			_foreColor=color;
+			//defaults:
+			_contentAlignment=ContentAlignment.MiddleRight;
 			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
