@@ -2039,5 +2039,183 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Fills an appointment passed in with all appropriate procedures for the recall passed in.  It's up to the calling class to then place the appointment on the pinboard or schedule.  The appointment will be inserted into the database in this method so it's important to delete it if the appointment doesn't get scheduled.  Returns the list of procedures that were created for the appointment so that they can be displayed to Orion users.</summary>
+		public static List<Procedure> FillAppointmentForRecall(Appointment aptCur,Recall recallCur,List<Recall> listRecalls,Patient patCur,List<string> listProcStrs,List<InsPlan> listPlans,List<InsSub> listSubs) {
+			//No need to check RemotingRole; no call to db.
+			aptCur.PatNum=patCur.PatNum;
+			aptCur.AptStatus=ApptStatus.UnschedList;//In all places where this is used, the unsched status with no aptDateTime will cause the appt to be deleted when the pinboard is cleared.
+			if(patCur.PriProv==0) {
+				aptCur.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+			}
+			else {
+				aptCur.ProvNum=patCur.PriProv;
+			}
+			aptCur.ProvHyg=patCur.SecProv;
+			if(aptCur.ProvHyg!=0) {
+				aptCur.IsHygiene=true;
+			}
+			aptCur.ClinicNum=patCur.ClinicNum;
+			//whether perio or prophy:
+			string recallPattern=RecallTypes.GetTimePattern(recallCur.RecallTypeNum);
+			if(RecallTypes.IsSpecialRecallType(recallCur.RecallTypeNum)
+				&& patCur.Birthdate.AddYears(PrefC.GetInt(PrefName.RecallAgeAdult)) > ((recallCur.DateDue>DateTime.Today)?recallCur.DateDue:DateTime.Today)) //For example, if pt's 12th birthday falls after recall date.
+			{
+				for(int i=0;i<RecallTypeC.Listt.Count;i++) {//TODO: UPDATE CACHE PATTERN HERE-------------------------------------
+					if(RecallTypeC.Listt[i].RecallTypeNum==RecallTypes.ChildProphyType) {
+						List<string> childprocs=RecallTypes.GetProcs(RecallTypeC.Listt[i].RecallTypeNum);
+						if(childprocs.Count>0) {
+							listProcStrs=childprocs;//overrides adult procs.
+						}
+						string childpattern=RecallTypes.GetTimePattern(RecallTypeC.Listt[i].RecallTypeNum);
+						if(childpattern!="") {
+							recallPattern=childpattern;//overrides adult pattern.
+						}
+					}
+				}
+			}
+			//convert time pattern to 5 minute increment
+			StringBuilder savePattern=new StringBuilder();
+			for(int i=0;i<recallPattern.Length;i++) {
+				savePattern.Append(recallPattern.Substring(i,1));
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==10) {
+					savePattern.Append(recallPattern.Substring(i,1));
+				}
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
+					savePattern.Append(recallPattern.Substring(i,1));
+					savePattern.Append(recallPattern.Substring(i,1));
+				}
+			}
+			if(savePattern.ToString()=="") {
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
+					savePattern.Append("///XXX///");
+				}
+				else {
+					savePattern.Append("//XX//");
+				}
+			}
+			aptCur.Pattern=savePattern.ToString();
+			//Add films------------------------------------------------------------------------------------------------------
+			if(RecallTypes.IsSpecialRecallType(recallCur.RecallTypeNum)) {//if this is a prophy or perio
+				for(int i=0;i<listRecalls.Count;i++) {
+					if(recallCur.RecallNum==listRecalls[i].RecallNum) {
+						continue;//already handled.
+					}
+					if(listRecalls[i].IsDisabled) {
+						continue;
+					}
+					if(listRecalls[i].DateDue.Year<1880) {
+						continue;
+					}
+					if(listRecalls[i].DateDue>recallCur.DateDue//if film due date is after prophy due date
+						&& listRecalls[i].DateDue>DateTime.Today)//and not overdue
+					{
+						continue;
+					}
+					//incomplete: exclude manual recall types
+					listProcStrs.AddRange(RecallTypes.GetProcs(listRecalls[i].RecallTypeNum));
+				}
+			}
+			aptCur.ProcDescript="";
+			aptCur.ProcsColored="";
+			for(int i=0;i<listProcStrs.Count;i++) {
+				string procDescOne="";
+				if(i>0) {
+					aptCur.ProcDescript+=", ";
+				}
+				procDescOne+=ProcedureCodes.GetProcCode(listProcStrs[i]).AbbrDesc;
+				aptCur.ProcDescript+=procDescOne;
+				//Color and previous date are determined by ProcApptColor object
+				ProcApptColor pac=ProcApptColors.GetMatch(listProcStrs[i]);
+				System.Drawing.Color pColor=System.Drawing.Color.Black;
+				string prevDateString="";
+				if(pac!=null) {
+					pColor=pac.ColorText;
+					if(pac.ShowPreviousDate) {
+						prevDateString=Procedures.GetRecentProcDateString(aptCur.PatNum,aptCur.AptDateTime,pac.CodeRange);
+						if(prevDateString!="") {
+							prevDateString=" ("+prevDateString+")";
+						}
+					}
+				}
+				aptCur.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
+			}
+			aptCur.TimeLocked=PrefC.GetBool(PrefName.AppointmentTimeIsLocked);
+			Appointments.Insert(aptCur);
+			Procedure procCur;
+			List<PatPlan> listPatPlans=PatPlans.Refresh(patCur.PatNum);
+			List<Benefit> listBenifits=Benefits.Refresh(listPatPlans,listSubs);
+			InsPlan priplan=null;
+			InsSub prisub=null;
+			if(listPatPlans.Count>0) {
+				prisub=InsSubs.GetSub(listPatPlans[0].InsSubNum,listSubs);
+				priplan=InsPlans.GetPlan(prisub.PlanNum,listPlans);
+			}
+			double insfee;
+			double standardfee;
+			List<Procedure> listProcs=new List<Procedure>();
+			for(int i=0;i<listProcStrs.Count;i++) {
+				procCur=new Procedure();//this will be an insert
+				//procnum
+				procCur.PatNum=patCur.PatNum;
+				procCur.AptNum=aptCur.AptNum;
+				procCur.CodeNum=ProcedureCodes.GetCodeNum(listProcStrs[i]);
+				procCur.ProcDate=DateTime.Now;
+				procCur.DateTP=DateTime.Now;
+				//Check if it's a medical procedure.
+				bool isMed = false;
+				procCur.MedicalCode=ProcedureCodes.GetProcCode(procCur.CodeNum).MedicalCode;
+				if(procCur.MedicalCode != null && procCur.MedicalCode != "") {
+					isMed = true;
+				}
+				//Get fee schedule for medical or dental.
+				long feeSch;
+				if(isMed) {
+					feeSch=Fees.GetMedFeeSched(patCur,listPlans,listPatPlans,listSubs);
+				}
+				else {
+					feeSch=Fees.GetFeeSched(patCur,listPlans,listPatPlans,listSubs);
+				}
+				//Get the fee amount for medical or dental.
+				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
+					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(procCur.MedicalCode).CodeNum,feeSch);
+				}
+				else {
+					insfee=Fees.GetAmount0(procCur.CodeNum,feeSch);
+				}
+				if(priplan!=null && priplan.PlanType=="p") {//PPO
+					standardfee=Fees.GetAmount0(procCur.CodeNum,Providers.GetProv(Patients.GetProvNum(patCur)).FeeSched);
+					if(standardfee>insfee) {
+						procCur.ProcFee=standardfee;
+					}
+					else {
+						procCur.ProcFee=insfee;
+					}
+				}
+				else {
+					procCur.ProcFee=insfee;
+				}
+				//surf
+				//toothnum
+				//Procedures.Cur.ToothRange="";
+				//ProcCur.NoBillIns=ProcedureCodes.GetProcCode(ProcCur.CodeNum).NoBillIns;
+				//priority
+				procCur.ProcStatus=ProcStat.TP;
+				procCur.Note="";
+				//Procedures.Cur.PriEstim=
+				//Procedures.Cur.SecEstim=
+				//claimnum
+				procCur.ProvNum=patCur.PriProv;
+				//Procedures.Cur.Dx=
+				procCur.ClinicNum=patCur.ClinicNum;
+				//nextaptnum
+				procCur.BaseUnits = ProcedureCodes.GetProcCode(procCur.CodeNum).BaseUnits;
+				procCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+				Procedures.Insert(procCur);//no recall synch required
+				Procedures.ComputeEstimates(procCur,patCur.PatNum,new List<ClaimProc>(),false,listPlans,listPatPlans,listBenifits,patCur.Age,listSubs);
+				listProcs.Add(procCur);
+			}
+			return listProcs;
+		}
+
 	}
 }
