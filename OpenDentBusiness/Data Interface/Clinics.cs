@@ -8,19 +8,39 @@ namespace OpenDentBusiness{
 	///<summary>There is no cache for clinics.  We assume they will almost never change.</summary>
 	public class Clinics {
 		///<summary>Clinics cannot be hidden or deleted, so there is only one list.</summary>
-		private static Clinic[] list;
+		private static Clinic[] _list;
+		private static object _lockObj=new object();
 
 		public static Clinic[] List{
 			//No need to check RemotingRole; no call to db.
 			get {
-				if(list==null) {
-					RefreshCache();
-				}
-				return list;
+				return GetList();
 			}
 			set {
-				list=value;
+				lock(_lockObj) {
+					_list=value;
+				}
 			}
+		}
+
+		public static Clinic[] GetList() {
+			bool isListNull=false;
+			lock(_lockObj) {
+				if(_list==null) {
+					isListNull=true;
+				}
+			}
+			if(isListNull) {
+				RefreshCache();
+			}
+			Clinic[] arrayClinics;
+			lock(_lockObj) {
+				arrayClinics=new Clinic[_list.Length];
+				for(int i=0;i<_list.Length;i++) {
+					arrayClinics[i]=_list[i].Copy();
+				}
+			}
+			return arrayClinics;
 		}
 
 		///<summary>Refresh all clinics.  Not actually part of official cache.</summary>
@@ -36,7 +56,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			list=Crud.ClinicCrud.TableToList(table).ToArray();
+			List=Crud.ClinicCrud.TableToList(table).ToArray();
 		}
 
 		///<summary></summary>
@@ -174,9 +194,10 @@ namespace OpenDentBusiness{
 		///<summary>Returns null if clinic not found.  Pulls from cache.</summary>
 		public static Clinic GetClinic(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++){
-				if(List[i].ClinicNum==clinicNum){
-					return List[i].Copy();
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++){
+				if(arrayClinics[i].ClinicNum==clinicNum){
+					return arrayClinics[i].Copy();
 				}
 			}
 			return null;
@@ -198,9 +219,10 @@ namespace OpenDentBusiness{
 		///<summary>Returns an empty string for invalid clinicNums.</summary>
 		public static string GetDesc(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++){
-				if(List[i].ClinicNum==clinicNum){
-					return List[i].Description;
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++){
+				if(arrayClinics[i].ClinicNum==clinicNum){
+					return arrayClinics[i].Description;
 				}
 			}
 			return "";
@@ -209,9 +231,10 @@ namespace OpenDentBusiness{
 		///<summary>Returns practice default for invalid clinicNums.</summary>
 		public static PlaceOfService GetPlaceService(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++){
-				if(List[i].ClinicNum==clinicNum){
-					return List[i].DefaultPlaceService;
+			Clinic[] arrayClinics=GetList(); 
+			for(int i=0;i<arrayClinics.Length;i++){
+				if(arrayClinics[i].ClinicNum==clinicNum){
+					return arrayClinics[i].DefaultPlaceService;
 				}
 			}
 			return (PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
@@ -221,8 +244,9 @@ namespace OpenDentBusiness{
 		///<summary>Clinics cannot be hidden, so if clinicNum=0, this will return -1.</summary>
 		public static int GetIndex(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++) {
-				if(List[i].ClinicNum==clinicNum) {
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].ClinicNum==clinicNum) {
 					return i;
 				}
 			}
@@ -232,9 +256,10 @@ namespace OpenDentBusiness{
 		///<summary>Used by HL7 when parsing incoming messages.  Returns the ClinicNum of the clinic with Description matching exactly (not case sensitive) the description provided.  Returns 0 if no clinic is found with this exact description.  There may be more than one clinic with the same description, but this will return the first one in the list.</summary>
 		public static long GetByDesc(string description) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++) {
-				if(List[i].Description.ToLower()==description.ToLower()) {
-					return List[i].ClinicNum;
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].Description.ToLower()==description.ToLower()) {
+					return arrayClinics[i].ClinicNum;
 				}
 			}
 			return 0;
@@ -248,8 +273,9 @@ namespace OpenDentBusiness{
 				listClinics.Add(GetClinic(curUser.ClinicNum));
 				return listClinics;
 			}
-			for(int i=0;i<List.Length;i++) {
-				listClinics.Add(List[i].Copy());
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				listClinics.Add(arrayClinics[i].Copy());
 			}
 			return listClinics;
 		}

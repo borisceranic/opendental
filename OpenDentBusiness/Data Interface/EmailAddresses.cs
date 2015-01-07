@@ -7,19 +7,39 @@ namespace OpenDentBusiness{
 	public class EmailAddresses{
 		#region CachePattern
 		///<summary>A list of all EmailAddresses.</summary>
-		private static List<EmailAddress> listt;
+		private static List<EmailAddress> _listt;
+		private static object _lockObj=new object();
 
 		///<summary>A list of all EmailAddresses.</summary>
 		public static List<EmailAddress> Listt{
 			get {
-				if(listt==null) {
-					RefreshCache();
-				}
-				return listt;
+				return GetListt();
 			}
 			set {
-				listt=value;
+				lock(_lockObj) {
+					_listt=value;
+				}
 			}
+		}
+		
+		///<summary>A list of all EmailAddresses.</summary>
+		public static List<EmailAddress> GetListt() {
+			bool isListNull=false;
+			lock(_lockObj) {
+				if(_listt==null) {
+					isListNull=true;
+				}
+			}
+			if(isListNull) {
+				RefreshCache();
+			}
+			List<EmailAddress> listEmailAddresses=new List<EmailAddress>();
+			lock(_lockObj) {
+				for(int i=0;i<_listt.Count;i++) {
+					listEmailAddresses.Add(_listt[i].Clone());
+				}
+			}
+			return listEmailAddresses;
 		}
 
 		///<summary></summary>
@@ -35,7 +55,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.EmailAddressCrud.TableToList(table);
+			Listt=Crud.EmailAddressCrud.TableToList(table);
 		}
 		#endregion
 
@@ -53,8 +73,9 @@ namespace OpenDentBusiness{
 				}
 			}
 			if(emailAddress==null) {
-				if(listt.Count>0) {//user didn't set a default
-					emailAddress=listt[0];
+				List<EmailAddress> listEmailAddresses=GetListt();
+				if(listEmailAddresses.Count>0) {//user didn't set a default
+					emailAddress=listEmailAddresses[0];
 				}
 				else {
 					emailAddress=new EmailAddress();//To avoid null checks.
@@ -71,9 +92,10 @@ namespace OpenDentBusiness{
 		///<summary>Gets one EmailAddress from the cached listt.  Might be null.</summary>
 		public static EmailAddress GetOne(long emailAddressNum){
 			//No need to check RemoteRole; Calls GetTableRemotelyIfNeeded().
-			for(int i=0;i<Listt.Count;i++) {
-				if(Listt[i].EmailAddressNum==emailAddressNum) {
-					return Listt[i];
+			List<EmailAddress> listEmailAddresses=GetListt();
+			for(int i=0;i<listEmailAddresses.Count;i++) {
+				if(listEmailAddresses[i].EmailAddressNum==emailAddressNum) {
+					return listEmailAddresses[i];
 				}
 			}
 			return null;
@@ -81,8 +103,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Checks to make sure at least one email address has a valid (not blank) SMTP server.</summary>
 		public static bool ExistsValidEmail() {
-			for(int i=0;i<Listt.Count;i++) {
-				if(Listt[i].SMTPserver!="") {
+			List<EmailAddress> listEmailAddresses=GetListt();
+			for(int i=0;i<listEmailAddresses.Count;i++) {
+				if(listEmailAddresses[i].SMTPserver!="") {
 					return true;
 				}
 			}

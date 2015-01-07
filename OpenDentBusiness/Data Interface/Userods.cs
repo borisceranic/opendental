@@ -29,18 +29,28 @@ namespace OpenDentBusiness {
 
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			UserodC.Listt=Crud.UserodCrud.TableToList(table);
-		}			
+			List<Userod> listUserodsLong=Crud.UserodCrud.TableToList(table);
+			List<Userod> listUserodsShort=new List<Userod>();
+			for(int i=0;i<listUserodsLong.Count;i++) {//This logic used to be in UserodC, but didn't really follow our new pattern.
+				if(listUserodsLong[i].IsHidden) {
+					continue;
+				}
+				listUserodsShort.Add(listUserodsLong[i]);
+			}
+			UserodC.Listt=listUserodsLong;
+			UserodC.ShortList=listUserodsShort;
+		}
 
 		///<summary></summary>
 		public static Userod GetUser(long userNum) {
 			//No need to check RemotingRole; no call to db.
-			if(UserodC.Listt==null){
+			List<Userod> listUserods=UserodC.GetListt();
+			if(listUserods==null){
 				RefreshCache();
 			}
-			for(int i=0;i<UserodC.Listt.Count;i++) {
-				if(UserodC.Listt[i].UserNum==userNum){
-					return UserodC.Listt[i];
+			for(int i=0;i<listUserods.Count;i++) {
+				if(listUserods[i].UserNum==userNum){
+					return listUserods[i];
 				}
 			}
 			return null;
@@ -49,21 +59,22 @@ namespace OpenDentBusiness {
 		///<summary>Returns null if not found.  isEcwTight is not case sensitive.</summary>
 		public static Userod GetUserByName(string userName,bool isEcwTight) {
 			//No need to check RemotingRole; no call to db.
-			if(UserodC.Listt==null) {
+			List<Userod> listUserods=UserodC.GetListt();
+			if(listUserods==null) {
 				RefreshCache();
 			}
-			for(int i=0;i<UserodC.Listt.Count;i++) {
-				if(UserodC.Listt[i].IsHidden){
+			for(int i=0;i<listUserods.Count;i++) {
+				if(listUserods[i].IsHidden){
 					continue;
 				}
 				if(isEcwTight) {
-					if(UserodC.Listt[i].UserName.ToLower()==userName.ToLower()) {
-						return UserodC.Listt[i];
+					if(listUserods[i].UserName.ToLower()==userName.ToLower()) {
+						return listUserods[i];
 					}
 				}
 				else {
-					if(UserodC.Listt[i].UserName==userName) {//exact
-						return UserodC.Listt[i];
+					if(listUserods[i].UserName==userName) {//exact
+						return listUserods[i];
 					}
 				}
 			}
@@ -73,12 +84,13 @@ namespace OpenDentBusiness {
 		///<summary>Returns null if not found.</summary>
 		public static Userod GetUserByEmployeeNum(long employeeNum) {
 			//No need to check RemotingRole; no call to db.
-			if(UserodC.Listt==null) {
+			List<Userod> listUserods=UserodC.GetListt();
+			if(listUserods==null) {
 				RefreshCache();
 			}
-			for(int i=0;i<UserodC.Listt.Count;i++) {
-				if(UserodC.Listt[i].EmployeeNum==employeeNum) {
-					return UserodC.Listt[i];
+			for(int i=0;i<listUserods.Count;i++) {
+				if(listUserods[i].EmployeeNum==employeeNum) {
+					return listUserods[i];
 				}
 			}
 			return null;
@@ -130,9 +142,10 @@ namespace OpenDentBusiness {
 				throw new ApplicationException("Invalid username or password.");
 			}
 			Userod userod=null;
-			for(int i=0;i<UserodC.Listt.Count;i++){
-				if(UserodC.Listt[i].UserName==cred.Username){
-					userod=UserodC.Listt[i];
+			List<Userod> listUserods=UserodC.GetListt();
+			for(int i=0;i<listUserods.Count;i++){
+				if(listUserods[i].UserName==cred.Username){
+					userod=listUserods[i];
 					break;
 				}
 			}
@@ -501,9 +514,10 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			//ArrayList al=new ArrayList();
 			List<Userod> retVal=new List<Userod>();
-			for(int i=0;i<UserodC.Listt.Count;i++){
-				if(UserodC.Listt[i].UserGroupNum==userGroupNum){
-					retVal.Add(UserodC.Listt[i]);
+			List<Userod> listUserods=UserodC.GetListt();
+			for(int i=0;i<listUserods.Count;i++){
+				if(listUserods[i].UserGroupNum==userGroupNum){
+					retVal.Add(listUserods[i]);
 				}
 			}
 			//User[] retVal=new User[al.Count];
@@ -519,9 +533,10 @@ namespace OpenDentBusiness {
 				if(GroupPermissionC.List[i].PermType!=Permissions.SecurityAdmin) {
 					continue;
 				}
-				for(int j=0;j<UserodC.Listt.Count;j++) {
-					if(UserodC.Listt[j].UserGroupNum==GroupPermissionC.List[i].UserGroupNum) {
-						return UserodC.Listt[j];
+				List<Userod> listUserods=UserodC.GetListt();
+				for(int j=0;j<listUserods.Count;j++) {
+					if(listUserods[j].UserGroupNum==GroupPermissionC.List[i].UserGroupNum) {
+						return listUserods[j];
 					}
 				}
 			}
@@ -531,9 +546,10 @@ namespace OpenDentBusiness {
 		/// <summary>Will return 0 if no inbox found for user.</summary>
 		public static long GetInbox(long userNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<UserodC.Listt.Count;i++) {
-				if(UserodC.Listt[i].UserNum==userNum){
-					return UserodC.Listt[i].TaskListInBox;
+			List<Userod> listUserods=UserodC.GetListt();
+			for(int i=0;i<listUserods.Count;i++) {
+				if(listUserods[i].UserNum==userNum){
+					return listUserods[i].TaskListInBox;
 				}
 			}
 			return 0;
@@ -543,9 +559,10 @@ namespace OpenDentBusiness {
 		public static List<Userod> GetNotHidden(){
 			//No need to check RemotingRole; no call to db.
 			List<Userod> retVal=new List<Userod>();
-			for(int i=0;i<UserodC.Listt.Count;i++){
-				if(!UserodC.Listt[i].IsHidden){
-					retVal.Add(UserodC.Listt[i].Copy());
+			List<Userod> listUserods=UserodC.GetListt();
+			for(int i=0;i<listUserods.Count;i++){
+				if(!listUserods[i].IsHidden){
+					retVal.Add(listUserods[i].Copy());
 				}
 			}
 			//retVal.Sort(//in a hurry, so skipping
@@ -555,9 +572,10 @@ namespace OpenDentBusiness {
 		//Return 3, which is non-admin provider type
 		public static long GetAnesthProvType(long anesthProvType) {
 			//No need to check RemotingRole; no call to db.
-			for(int i = 0;i < UserodC.Listt.Count;i++) {
-				if(UserodC.Listt[i].AnesthProvType == anesthProvType) {
-					return UserodC.Listt[i].AnesthProvType;
+			List<Userod> listUserods=UserodC.GetListt();
+			for(int i = 0;i < listUserods.Count;i++) {
+				if(listUserods[i].AnesthProvType == anesthProvType) {
+					return listUserods[i].AnesthProvType;
 				}
 			}
 			return 3;
