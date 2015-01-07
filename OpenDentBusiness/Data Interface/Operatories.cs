@@ -21,13 +21,15 @@ namespace OpenDentBusiness{
 
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			OperatoryC.Listt=Crud.OperatoryCrud.TableToList(table);
-			OperatoryC.ListShort=new List<Operatory>();
-			for(int i=0;i<OperatoryC.Listt.Count;i++) {
-				if(!OperatoryC.Listt[i].IsHidden) {
-					OperatoryC.ListShort.Add(OperatoryC.Listt[i]);
+			List<Operatory> listOpsShort=new List<Operatory>();
+			List<Operatory> listOpsLong=Crud.OperatoryCrud.TableToList(table);
+			for(int i=0;i<listOpsLong.Count;i++) {
+				if(!listOpsLong[i].IsHidden) {
+					listOpsShort.Add(listOpsLong[i]);
 				}
 			}
+			OperatoryC.Listt=listOpsLong;
+			OperatoryC.ListShort=listOpsShort;
 		}
 		#endregion
 
@@ -63,9 +65,10 @@ namespace OpenDentBusiness{
 
 		public static string GetAbbrev(long operatoryNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<OperatoryC.Listt.Count;i++){
-				if(OperatoryC.Listt[i].OperatoryNum==operatoryNum){
-					return OperatoryC.Listt[i].Abbrev;
+			List<Operatory> listOpsLong=OperatoryC.GetListt();
+			for(int i=0;i<listOpsLong.Count;i++) {
+				if(listOpsLong[i].OperatoryNum==operatoryNum) {
+					return listOpsLong[i].Abbrev;
 				}
 			}
 			return "";
@@ -74,8 +77,9 @@ namespace OpenDentBusiness{
 		///<summary>Gets the order of the op within ListShort or -1 if not found.</summary>
 		public static int GetOrder(long opNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
-				if(OperatoryC.ListShort[i].OperatoryNum==opNum) {
+			List<Operatory> listOpsShort=OperatoryC.GetListShort();
+			for(int i=0;i<listOpsShort.Count;i++) {
+				if(listOpsShort[i].OperatoryNum==opNum) {
 					return i;
 				}
 			}
@@ -85,9 +89,10 @@ namespace OpenDentBusiness{
 		///<summary>Gets operatory from the cache.</summary>
 		public static Operatory GetOperatory(long operatoryNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<OperatoryC.Listt.Count;i++) {
-				if(OperatoryC.Listt[i].OperatoryNum==operatoryNum) {
-					return OperatoryC.Listt[i].Copy();
+			List<Operatory> listOpsLong=OperatoryC.GetListt();
+			for(int i=0;i<listOpsLong.Count;i++) {
+				if(listOpsLong[i].OperatoryNum==operatoryNum) {
+					return listOpsLong[i].Copy();
 				}
 			}
 			return null;
