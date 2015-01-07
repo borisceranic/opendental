@@ -61,6 +61,7 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			Userod user;
 			//First Selected Ortho Chart Logs
 			foreach(int iDate in gridHist.SelectedIndices) {
 				DateTime dateRow=(DateTime)gridHist.Rows[iDate].Tag;
@@ -70,7 +71,13 @@ namespace OpenDental {
 				for(int i=0;i<DictDateOrthoLogs[dateRow].Count;i++) {
 					row=new ODGridRow();
 					row.Cells.Add(DictDateOrthoLogs[dateRow][i].LogDateTime.ToShortDateString()+" "+DictDateOrthoLogs[dateRow][i].LogDateTime.ToShortTimeString());
-					row.Cells.Add(Userods.GetUser(DictDateOrthoLogs[dateRow][i].UserNum).UserName);
+					user=Userods.GetUser(DictDateOrthoLogs[dateRow][i].UserNum);
+					if(user==null) {//Will be null for audit trails made by outside entities that do not require users to be logged in.  E.g. recall scheduler.
+						row.Cells.Add("unknown");
+					}
+					else {
+						row.Cells.Add(user.UserName);
+					}
 					row.Cells.Add(DictDateOrthoLogs[dateRow][i].PermType.ToString());
 					row.Cells.Add(DictDateOrthoLogs[dateRow][i].LogText);
 					gridMain.Rows.Add(row);

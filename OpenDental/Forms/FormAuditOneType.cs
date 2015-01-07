@@ -122,10 +122,17 @@ namespace OpenDental{
 			grid.Columns.Add(col);
 			grid.Rows.Clear();
 			ODGridRow row;
+			Userod user;
 			for(int i=0;i<LogList.Length;i++){
 				row=new ODGridRow();
 				row.Cells.Add(LogList[i].LogDateTime.ToShortDateString()+" "+LogList[i].LogDateTime.ToShortTimeString());
-				row.Cells.Add(Userods.GetUser(LogList[i].UserNum).UserName);
+				user=Userods.GetUser(LogList[i].UserNum);
+				if(user==null) {//Will be null for audit trails made by outside entities that do not require users to be logged in.  E.g. recall scheduler.
+					row.Cells.Add("unknown");
+				}
+				else {
+					row.Cells.Add(user.UserName);
+				}
 				row.Cells.Add(LogList[i].PermType.ToString());
 				row.Cells.Add(LogList[i].LogText);
 				grid.Rows.Add(row);
