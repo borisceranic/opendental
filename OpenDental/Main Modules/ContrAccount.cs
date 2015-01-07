@@ -3461,7 +3461,7 @@ namespace OpenDental {
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="001";
-			repeat.ChargeAmt=149;
+			repeat.ChargeAmt=159;
 			repeat.DateStart=DateTimeOD.Today;
 			repeat.DateStop=DateTimeOD.Today.AddMonths(11);
 			repeat.IsEnabled=true;
@@ -3497,7 +3497,7 @@ namespace OpenDental {
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="027";
-			repeat.ChargeAmt=10;
+			repeat.ChargeAmt=15;
 			repeat.DateStart=DateTimeOD.Today;
 			repeat.IsEnabled=true;
 			RepeatCharges.Insert(repeat);
