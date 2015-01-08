@@ -917,6 +917,15 @@ namespace OpenDental{
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
+			//check if file is available to print if it was already created.  Does not affect first time printing.
+			if(StmtCur.DocNum!=0 && checkIsSent.Checked) {
+				Patient pat=Patients.GetPat(StmtCur.PatNum);
+				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				if(!File.Exists(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder))) {
+					MsgBox.Show(this,"File not found: " + Documents.GetByNum(StmtCur.DocNum).FileName);
+					return;
+				}
+			}
 			if(PrefC.GetBool(PrefName.StatementsUseSheets)) {
 				butPrintSheets();
 			}
@@ -1246,18 +1255,33 @@ namespace OpenDental{
 		}
 
 		private void butPreviewSheets() {
-			if(!SaveToDb()) {
-				return;
+			if(StmtCur.DocNum!=0 && checkIsSent.Checked) {//initiallySent && checkIsSent.Checked){
+				//launch existing archive pdf
+				Cursor=Cursors.WaitCursor;
+				Patient pat=Patients.GetPat(StmtCur.PatNum);
+				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				if(!File.Exists(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder))) {
+					Cursor=Cursors.Default;
+					MsgBox.Show(this,"File not found: " + Documents.GetByNum(StmtCur.DocNum).FileName);
+					return;
+				}
+				Process.Start(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder));
+				Cursor=Cursors.Default;
 			}
-			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
-			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-			SheetFiller.FillFields(sheet,StmtCur);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur,true,40,60);
-			//print directly to PDF here, and save it.
-			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
-			FormSFE.Stmt=StmtCur;
-			FormSFE.IsStatment=true;
-			FormSFE.ShowDialog();
+			else {//was not initially sent, or else user has unchecked the sent box
+				if(!SaveToDb()) {
+					return;
+				}
+				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
+				SheetFiller.FillFields(sheet,StmtCur);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur,true,40,60);
+				//print directly to PDF here, and save it.
+				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+				FormSFE.Stmt=StmtCur;
+				FormSFE.IsStatment=true;
+				FormSFE.ShowDialog();
+			}
 		}
 
 		private void textDate_KeyPress(object sender,KeyPressEventArgs e) {
