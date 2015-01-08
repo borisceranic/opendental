@@ -458,6 +458,14 @@ namespace OpenDentBusiness {
 				//		continue;
 				//	}
 				//}
+				else if(histList[i].Status==ClaimProcStatus.Adjustment) {
+					//We always want to apply the deductible for any adjustment to insurance benefits.
+					//This code must be directly above the following "else if(benInd.CovCatNum!=0) {" because adjustments do not have procedure codes to compare.
+					//Therefore, the following else if block will not find a match and will continue looping through histList instead of correctly applying deductible.
+					if(benInd.CovCatNum!=0 || CovCats.GetEbenCat(benInd.CovCatNum)!=EbenefitCategory.General) {
+						continue;
+					}
+				}
 				else if(benInd.CovCatNum!=0) {//specific category
 					spansForCat=CovSpans.GetForCat(benInd.CovCatNum);
 					bool isMatch=false;
