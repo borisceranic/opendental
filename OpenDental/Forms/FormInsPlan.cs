@@ -1769,7 +1769,9 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			PlanNumOriginal=PlanCur.PlanNum;
 			PlanCurOriginal=PlanCur.Copy();
-			_subOld=_subCur.Copy();
+			if(_subCur!=null) {
+				_subOld=_subCur.Copy();
+			}
 			long patPlanNum=0;
 			if(PatPlanCur!=null) {
 				patPlanNum=PatPlanCur.PatPlanNum;
