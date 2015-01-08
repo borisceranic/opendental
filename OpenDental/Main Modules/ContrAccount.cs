@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using CodeBase;
+using System.Threading;
 
 namespace OpenDental {
 
@@ -3885,44 +3886,37 @@ namespace OpenDental {
 		private void PrintStatmentSheets(Statement stmt) {
 			Cursor=Cursors.WaitCursor;
 			Statements.Insert(stmt);
-			if(PrefC.GetBool(PrefName.StatementsUseSheets)) {
-				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
-				SheetFiller.FillFields(sheet,stmt);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
-				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),stmt.PatNum.ToString()+".pdf");
-				SheetPrinting.CreatePdf(sheet,tempPath,stmt);
-				long category=0;
-				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
-					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
-						category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
-						break;
-					}
+			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+			Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+			SheetFiller.FillFields(sheet,stmt);
+			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+			string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),stmt.PatNum.ToString()+".pdf");
+			SheetPrinting.CreatePdf(sheet,tempPath,stmt);
+			long category=0;
+			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+				if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
+					category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
+					break;
 				}
-				if(category==0) {
-					category=DefC.Short[(int)DefCat.ImageCats][0].DefNum;//put it in the first category.
-				}
-				//create doc--------------------------------------------------------------------------------------
-				OpenDentBusiness.Document docc=null;
-				try {
-					docc=ImageStore.Import(tempPath,category,Patients.GetPat(stmt.PatNum));
-				}
-				catch {
-					MsgBox.Show(this,"Error saving document.");
-					//this.Cursor=Cursors.Default;
-					return;
-				}
-				docc.ImgType=ImageType.Document;
-				docc.DateCreated=stmt.DateSent;
-				Documents.Update(docc);
-				stmt.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
-				Statements.AttachDoc(stmt.StatementNum,docc.DocNum);
 			}
-			else {
-				FormRpStatement FormST=new FormRpStatement();
-				DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
-				FormST.CreateStatementPdf(stmt,PatCur,FamCur,dataSet);
+			if(category==0) {
+				category=DefC.Short[(int)DefCat.ImageCats][0].DefNum;//put it in the first category.
 			}
+			//create doc--------------------------------------------------------------------------------------
+			OpenDentBusiness.Document docc=null;
+			try {
+				docc=ImageStore.Import(tempPath,category,Patients.GetPat(stmt.PatNum));
+			}
+			catch {
+				MsgBox.Show(this,"Error saving document.");
+				//this.Cursor=Cursors.Default;
+				return;
+			}
+			docc.ImgType=ImageType.Document;
+			docc.DateCreated=stmt.DateSent;
+			Documents.Update(docc);
+			stmt.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
+			Statements.AttachDoc(stmt.StatementNum,docc.DocNum);
 			//if(ImageStore.UpdatePatient == null){
 			//	ImageStore.UpdatePatient = new FileStore.UpdatePatientDelegate(Patients.Update);
 			//}
@@ -3980,7 +3974,35 @@ namespace OpenDental {
 				}
 				Process.Start(imgPath);
 #else
-					FormST.PrintStatement(stmt,false,dataSet,FamCur,PatCur);
+				//Thread thread=new Thread(new ParameterizedThreadStart(SheetPrinting.PrintStatment));
+				//thread.Start(new List<object> { sheetDef,stmt,tempPath });
+				try {
+					ProcessStartInfo info=new ProcessStartInfo();
+					info.Verb="print";
+					info.FileName=tempPath;
+					info.CreateNoWindow=true;
+					info.WindowStyle=ProcessWindowStyle.Hidden;
+					Process p=new Process();
+					p.StartInfo=info;
+					p.Start();
+					p.WaitForInputIdle();
+					//Wait for process to be idle for at least 1 second.
+					long ticks = -1;
+					while(ticks != p.TotalProcessorTime.Ticks) {
+						ticks = p.TotalProcessorTime.Ticks;
+						Thread.Sleep(1000);
+					}
+					if(p.CloseMainWindow()==false) {
+						p.Kill();
+					}
+				}
+				catch(Exception ex) {
+					//Must reset sheet, PDF printing modifies field positions.
+					sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+					SheetFiller.FillFields(sheet,stmt);
+					SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+					SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
+				}
 #endif
 			}
 			Cursor=Cursors.Default;
