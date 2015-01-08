@@ -337,6 +337,7 @@ namespace OpenDentBusiness {
 		///<summary>In FormProcCodes, this is the default for the ShowHidden checkbox.</summary>
 		ProcCodeListShowHidden,
 		ProcLockingIsAllowed,
+		///<summary>Frequency at which signals are processed. Also used by HQ to determine triage label refresh frequency.</summary>		
 		ProcessSigsIntervalInSecs,
 		ProcGroupNoteDoesAggregate,
 		ProgramVersion,
