@@ -1269,7 +1269,7 @@ namespace OpenDental{
 				Cursor=Cursors.Default;
 			}
 			else {//was not initially sent, or else user has unchecked the sent box
-				if(!SaveToDb()) {
+				if(!SaveToDb()) { 
 					return;
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
