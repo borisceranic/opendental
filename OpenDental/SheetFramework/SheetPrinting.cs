@@ -12,6 +12,7 @@ using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System.Data;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace OpenDental {
 	public class SheetPrinting {
@@ -21,8 +22,6 @@ namespace OpenDental {
 		private static int _pagesPrinted;
 		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
 		private static int _yPosPrint;
-		///<summary>Should either be 0 or = _printMargin.Top, depending on whcih page we are printing.</summary>
-		private static int _yPosAdj;
 		///<summary>Print margin of the default printer. only used in page break calulations, and only top and bottom are used.</summary>
 		private static Margins _printMargin=new Margins(0,0,40,60);
 		///<summary>If not a batch, then there will just be one sheet in the list.</summary>
@@ -32,6 +31,36 @@ namespace OpenDental {
 		private static bool _printCalibration=false;//debug only
 		private static bool _isPrinting=false;
 		private static Statement _stmt;
+
+
+		public static void PrintStatment(object parameters) {
+			List<object> listParams=(List<object>)parameters;
+			SheetDef sheetDef=(SheetDef)listParams[0];
+			Statement stmt=(Statement)listParams[1];
+			string filePath=(string)listParams[2];
+			try {
+				ProcessStartInfo info=new ProcessStartInfo();
+				info.Verb="print";
+				info.FileName=filePath;
+				info.CreateNoWindow=true;
+				info.WindowStyle=ProcessWindowStyle.Hidden;
+				Process p=new Process();
+				p.StartInfo=info;
+				p.Start();
+				p.WaitForInputIdle();
+				System.Threading.Thread.Sleep(3000);
+				if(p.CloseMainWindow()==false) {
+					p.Kill();
+				}
+			}
+			catch(Exception ex) {
+				//Must rest sheet, as PDF printing modifies fields.
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+				SheetFiller.FillFields(sheet,stmt);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+				SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
+			}
+		}
 
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch,Statement stmt=null){
@@ -250,7 +279,6 @@ namespace OpenDental {
 			}
 			else {//we are printing the last page of the current sheet.
 				_yPosPrint=0;// _printMargin.Top;
-				_yPosAdj=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
 				if(_sheetsPrinted<_sheetList.Count){
@@ -924,7 +952,6 @@ namespace OpenDental {
 			}
 			else {//we are printing the last page of the current sheet.
 				_yPosPrint=_printMargin.Top;
-				_yPosAdj=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
 				//if(_sheetsPrinted<_sheetList.Count) {
