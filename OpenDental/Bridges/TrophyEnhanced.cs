@@ -67,7 +67,10 @@ namespace OpenDental.Bridges{
 			//	return;
 			//}
 			string comline="-P"+patFolder
-				+" -N"+Tidy(pat.LName)+","+Tidy(pat.FName);
+				//We are adding a space between the last and first name of the patient because CareStream
+				//was being given the information as a last name instead of a first and last name.
+				//Quotes are not necessary around these command line parameters.
+				+" -N"+Tidy(pat.LName)+", "+Tidy(pat.FName);
 			//MessageBox.Show(comline);
 			try{
 				Process.Start(path,comline);
