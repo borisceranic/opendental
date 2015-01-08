@@ -1237,7 +1237,7 @@ namespace OpenDentBusiness {
 					row["description"]+=Lans.g("ContrAccount","Statement");
 				}
 				else {//Must be invoice
-					row["description"]+=Lans.g("ContrAccount","Invoice");
+					row["description"]+=Lans.g("ContrAccount","Invoice")+" #"+rawState.Rows[i]["StatementNum"].ToString();
 				}
 				_mode=(StatementMode)PIn.Long(rawState.Rows[i]["Mode_"].ToString());
 				row["description"]+="-"+Lans.g("enumStatementMode",_mode.ToString());
