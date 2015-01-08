@@ -47,6 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormCentralProdInc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralProdInc.Designer.cs">
+      <DependentUpon>FormCentralProdInc.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCentralPasswordCheck.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -79,6 +85,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormCentralProdInc.resx">
+      <DependentUpon>FormCentralProdInc.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormCentralPasswordCheck.resx">
       <DependentUpon>FormCentralPasswordCheck.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -123,6 +132,10 @@
     <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
       <Project>{18F7BC78-4B99-48D3-A1F1-0D13A63E3CF9}</Project>
       <Name>xCodeBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenDental\OpenDental.csproj">
+      <Project>{8136317d-c936-49b6-9e31-d90f02d2f207}</Project>
+      <Name>OpenDental</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenDentBusiness\OpenDentBusiness.csproj">
       <Project>{3D0FC76E-803C-4DE2-BDB1-47D63A4E2357}</Project>

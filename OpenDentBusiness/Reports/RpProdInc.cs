@@ -46,7 +46,6 @@ namespace OpenDentBusiness {
 			DateTime[] dates=new DateTime[dateTo.Month-dateFrom.Month+1];
 			//Get a list of clinics so that we have access to their descriptions for the report.
 			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
-			//Todo loop through listClinicNums and create a one to one list of that clinics description.
 			for(int it=0;it<listClinicNums.Count;it++) {
 				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop
 					dates[i]=dateFrom.AddMonths(i);//only the month and year are important

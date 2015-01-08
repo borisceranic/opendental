@@ -12,6 +12,7 @@ using System.Xml.XPath;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDental;
 
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
@@ -94,6 +95,7 @@ namespace CentralManager {
 			try {
 				dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
 				RemotingClient.RemotingRole=RemotingRole.ClientDirect;
+				Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
 				return true;
 			}
 			catch(Exception ex){
@@ -121,6 +123,22 @@ namespace CentralManager {
 			FillGrid();
 		}
 
+		private void butProdInc_Click(object sender,EventArgs e) {
+			List<CentralConnection> listSelectedConn=new List<CentralConnection>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedConn.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);//The tag of this grid is the CentralConnection object
+			}
+			if(listSelectedConn.Count==0) {
+				MsgBox.Show(this,"Please select at least one connection to run this report against.");
+				return;
+			}
+			FormCentralProdInc FormCPI=new FormCentralProdInc();
+			FormCPI.ConnList=listSelectedConn;
+			FormCPI.EncryptionKey=EncryptionKey;
+			FormCPI.ShowDialog();
+			GetConfigAndConnect();//Set the connection settings back to the central manager db.
+		}
+
 		private void FillGrid() {
 			ConnList=CentralConnections.Refresh(textSearch.Text);
 			gridMain.BeginUpdate();
@@ -144,6 +162,7 @@ namespace CentralManager {
 					row.Cells.Add(ConnList[i].ServerName+", "+ConnList[i].DatabaseName);
 				}
 				row.Cells.Add(ConnList[i].Note);
+				row.Tag=ConnList[i];
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
