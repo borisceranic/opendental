@@ -215,7 +215,6 @@ namespace OpenDental{
 		private MenuItem menuItem3;
 		private MenuItem menuApptFieldDefs;
 		private MenuItem menuItemWebForms;
-		private System.Windows.Forms.Timer timerPhoneWebCam;
 		private FormTerminalManager formTerminalManager;
 		private FormPhoneTiles formPhoneTiles;
 		private FormMapHQ formMapHQ;
@@ -246,6 +245,7 @@ namespace OpenDental{
 		private Label labelMsg;
 		///<summary>This thread fills labelMsg</summary>
 		private Thread ThreadVM;
+		private Thread ThreadHqMetrics;
 		private MenuItem menuItemWiki;
 		private MenuItem menuItemProcLockTool;
 		private MenuItem menuItemHL7;
@@ -309,6 +309,8 @@ namespace OpenDental{
 		///Replicaiton is NOT broken when this flag is true, because the user can re-enable replicaiton using the START SLAVE SQL without any ill effects.
 		///This flag is used to display a warning to the user, but will not ever block the user from using OD.</summary>
 		private bool _isReplicationSlaveStopped=false;
+		///<summary>HQ only. Keep track of last time triage task labels were filled. Too taxing on the server to perform every 1.6 seconds with the rest of the HQ thread metrics. Triage labels will be refreshed on ProcessSigsIntervalInSecs interval.</summary>
+		DateTime _hqMetricsLastRefreshed=DateTime.MinValue;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -574,7 +576,6 @@ namespace OpenDental{
 			this.menuLetter = new System.Windows.Forms.ContextMenu();
 			this.timerDisabledKey = new System.Windows.Forms.Timer(this.components);
 			this.timerHeartBeat = new System.Windows.Forms.Timer(this.components);
-			this.timerPhoneWebCam = new System.Windows.Forms.Timer(this.components);
 			this.timerWebHostSynch = new System.Windows.Forms.Timer(this.components);
 			this.timerLogoff = new System.Windows.Forms.Timer(this.components);
 			this.timerReplicationMonitor = new System.Windows.Forms.Timer(this.components);
@@ -1664,11 +1665,6 @@ namespace OpenDental{
 			this.timerHeartBeat.Interval = 180000;
 			this.timerHeartBeat.Tick += new System.EventHandler(this.timerHeartBeat_Tick);
 			// 
-			// timerPhoneWebCam
-			// 
-			this.timerPhoneWebCam.Interval = 1600;
-			this.timerPhoneWebCam.Tick += new System.EventHandler(this.timerPhoneWebCam_Tick);
-			// 
 			// timerWebHostSynch
 			// 
 			this.timerWebHostSynch.Enabled = true;
@@ -2146,7 +2142,8 @@ namespace OpenDental{
 				#endif
 				ThreadVM=new Thread(new ThreadStart(this.ThreadVM_SetLabelMsg));
 				ThreadVM.Start();//It's done this way because the file activity tends to lock the UI on slow connections.
-				FillTriageLabels();
+				ThreadHqMetrics=new Thread(new ThreadStart(PhoneWebCamTickWorkerThread));
+				ThreadHqMetrics.Start();						
 			}
 			#if !TRIALONLY
 				if(PrefC.GetDate(PrefName.BackupReminderLastDateRun).AddMonths(1)<DateTime.Today) {
@@ -3220,7 +3217,6 @@ namespace OpenDental{
 					panelSplitter.Width=width;
 					panelSplitter.Visible=true;
 					if(PrefC.GetBool(PrefName.DockPhonePanelShow)){
-						timerPhoneWebCam.Enabled=true;//the only place this happens
 						//phoneSmall.Visible=true;
 						//phoneSmall.Location=new Point(position.X,panelSplitter.Bottom+butBigPhones.Height);
 						phoneSmall.Location=new Point(0,comboTriageCoordinator.Bottom);
@@ -3423,8 +3419,11 @@ namespace OpenDental{
 			Signalods.Insert(sig);
 		}
 
-		private void FillTriageLabels() {
-			DataTable phoneMetrics=Phones.GetTriageMetrics();
+		/// <summary>HQ Only. FillTriageLabelsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
+		private delegate void FillTriageLabelsArgs(DataTable phoneMetrics);
+
+		/// <summary>HQ Only. Digest results of FillTriageLabels and update form controls accordingly.</summary>
+		private void FillTriageLabelsResults(DataTable phoneMetrics) {
 			int countTasksWithoutNotes=PIn.Int(phoneMetrics.Rows[0]["CountTasksWithoutNotes"].ToString());
 			int countTasksWithNotes=PIn.Int(phoneMetrics.Rows[0]["CountTasksWithNotes"].ToString());
 			int countUrgentTasks=PIn.Int(phoneMetrics.Rows[0]["CountUrgentTasks"].ToString());
@@ -3448,13 +3447,19 @@ namespace OpenDental{
 			labelTriage.Text="T:"+countStr;
 			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
 			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
-				formMapHQ.SetTriageNormal(countTasksWithNotes,countTasksWithoutNotes,triageBehind);				
+				formMapHQ.SetTriageNormal(countTasksWithNotes,countTasksWithoutNotes,triageBehind);
 				TimeSpan urgentTriageBehind=new TimeSpan(0);
 				if(timeOfOldestUrgentTaskNote.Year>1880) {
 					urgentTriageBehind=DateTime.Now-timeOfOldestUrgentTaskNote;
 				}
 				formMapHQ.SetTriageUrgent(countUrgentTasks,urgentTriageBehind);
 			}
+		}
+
+		///<summary>HQ Only. This function is called from a thread. DO NOT access any form controls directly. Everything must be invoked back to the main thread.</summary>
+		private void FillTriageLabels() {
+			DataTable phoneMetrics=Phones.GetTriageMetrics();
+			this.Invoke(new FillTriageLabelsArgs(FillTriageLabelsResults),phoneMetrics);
 		}
 
 		private void GotoModule_ModuleSelected(ModuleEventArgs e){
@@ -3647,10 +3652,7 @@ namespace OpenDental{
 				return;
 			}
 			try {
-				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs
-				if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-					FillTriageLabels();
-				}
+				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs				
 				if(sigList.Count==0) {
 					return;
 				}
@@ -5756,40 +5758,49 @@ namespace OpenDental{
 			}
 		}
 
-		private void timerPhoneWebCam_Tick(object sender,EventArgs e) {
-			//every 1.6s.  Performance was not very good when it was synchronous.
-			//This won't even happen unless PrefName.DockPhonePanelShow==true
-			Thread workerThread=new Thread(new ThreadStart(PhoneWebCamTickWorkerThread));
-			workerThread.Start();
-		}
-
 		private void PhoneWebCamTickWorkerThread() {
-			try {
-				List<Phone> phoneList=Phones.GetPhoneList();
-				List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
-				//HQ Only - 'Office Down' TaskListNum = 2576.
-				List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
-				string ipaddressStr="";
-				IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
-				foreach(IPAddress ipaddress in iphostentry.AddressList) {
-					if(ipaddress.ToString().Contains("10.10.2")) {
-						ipaddressStr=ipaddress.ToString();
-						break;
+			while(true) { //Run this thread for the entirety of the application instance. Close event will eventually throw ThreadAbortException which will kill this thread.
+				try {
+					//Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
+					if((formMapHQ!=null && !formMapHQ.IsDisposed) || 
+							//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
+							DateTime.Now.Subtract(_hqMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) {
+						FillTriageLabels();
+						//Reset the interval timer.
+						_hqMetricsLastRefreshed=DateTime.Now;
 					}
+					List<Phone> phoneList=Phones.GetPhoneList();
+					List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
+					//HQ Only - 'Office Down' TaskListNum = 2576.
+					List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
+					string ipaddressStr="";
+					IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
+					foreach(IPAddress ipaddress in iphostentry.AddressList) {
+						if(ipaddress.ToString().Contains("10.10.2")) {
+							ipaddressStr=ipaddress.ToString();
+							break;
+						}
+					}
+					//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
+					int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
+					//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
+					//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
+					//(EG... incoming call, outgoing call, hangup, etc).
+					Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
+					bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
+					//send the results back to the UI layer for action.
+					if(!this.IsDisposed) {
+						Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
+					}
+					//Only run this thread every 1.6 seconds.
+					Thread.Sleep((int)TimeSpan.FromSeconds(1.6).TotalMilliseconds);
 				}
-				//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
-				int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
-				//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
-				//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
-				//(EG... incoming call, outgoing call, hangup, etc).
-				Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
-				bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
-				//send the results back to the UI layer for action.
-				if(!this.IsDisposed) {
-					Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
+				catch(ThreadAbortException) {//OnClosing will abort the thread.
+					return;//Exits the loop.
+				}
+				catch { //Any exception which is caught will be swallowed. We will try again next time.
 				}
 			}
-			catch { }//prevents crash on closing if FormOpenDental has already been disposed or if MySQL connection has been lost
 		}
 
 		private void TryNonPatientPopup() {
@@ -6203,6 +6214,11 @@ namespace OpenDental{
 				ThreadVM.Abort();
 				ThreadVM.Join();
 				ThreadVM=null;
+			}
+			if(ThreadHqMetrics!=null) {
+				ThreadHqMetrics.Abort();
+				ThreadHqMetrics.Join();
+				ThreadHqMetrics=null;
 			}
 			if(_isEmailThreadRunning) {
 				_isEmailThreadRunning=false;
