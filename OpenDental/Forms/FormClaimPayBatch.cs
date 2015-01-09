@@ -344,6 +344,8 @@ namespace OpenDental{
 			// textAmount
 			// 
 			this.textAmount.Location = new System.Drawing.Point(110, 82);
+			this.textAmount.MaxVal = 100000000D;
+			this.textAmount.MinVal = -100000000D;
 			this.textAmount.Name = "textAmount";
 			this.textAmount.ReadOnly = true;
 			this.textAmount.Size = new System.Drawing.Size(68, 20);
@@ -493,6 +495,8 @@ namespace OpenDental{
 			// textTotal
 			// 
 			this.textTotal.Location = new System.Drawing.Point(792, 359);
+			this.textTotal.MaxVal = 100000000D;
+			this.textTotal.MinVal = -100000000D;
 			this.textTotal.Name = "textTotal";
 			this.textTotal.ReadOnly = true;
 			this.textTotal.Size = new System.Drawing.Size(81, 20);
@@ -527,7 +531,7 @@ namespace OpenDental{
 			this.butView.Name = "butView";
 			this.butView.Size = new System.Drawing.Size(72, 24);
 			this.butView.TabIndex = 109;
-			this.butView.Text = "View";
+			this.butView.Text = "View EOB";
 			this.butView.Click += new System.EventHandler(this.butView_Click);
 			// 
 			// butOK
@@ -685,9 +689,11 @@ namespace OpenDental{
 			}
 			if(EobAttaches.Exists(ClaimPaymentCur.ClaimPaymentNum)) {
 				textEobIsScanned.Text=Lan.g(this,"Yes");
+				butView.Text="View EOB";
 			}
 			else {
 				textEobIsScanned.Text=Lan.g(this,"No");
+				butView.Text="Scan EOB";
 			}
 		}
 
@@ -1004,9 +1010,11 @@ namespace OpenDental{
 			formI.ShowDialog();
 			if(EobAttaches.Exists(ClaimPaymentCur.ClaimPaymentNum)) {
 				textEobIsScanned.Text=Lan.g(this,"Yes");
+				butView.Text="View EOB";
 			}
 			else {
 				textEobIsScanned.Text=Lan.g(this,"No");
+				butView.Text="Scan EOB";
 			}
 			FillClaimPayment();//For customer 5769, who was getting ocassional Chinese chars in the Amount boxes.
 			FillGrids();//ditto

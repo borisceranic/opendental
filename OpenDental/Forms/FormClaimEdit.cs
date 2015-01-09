@@ -3210,7 +3210,7 @@ namespace OpenDental{
 			this.butPayTotal.Name = "butPayTotal";
 			this.butPayTotal.Size = new System.Drawing.Size(99, 24);
 			this.butPayTotal.TabIndex = 100;
-			this.butPayTotal.Text = "&Total";
+			this.butPayTotal.Text = "As &Total";
 			this.butPayTotal.Click += new System.EventHandler(this.butPayTotal_Click);
 			// 
 			// butPayProc
@@ -3330,9 +3330,10 @@ namespace OpenDental{
 			// 
 			this.labelBatch.Location = new System.Drawing.Point(574, 421);
 			this.labelBatch.Name = "labelBatch";
-			this.labelBatch.Size = new System.Drawing.Size(158, 53);
+			this.labelBatch.Size = new System.Drawing.Size(168, 53);
 			this.labelBatch.TabIndex = 151;
-			this.labelBatch.Text = "Don\'t create a new ins. payment until payments for all claims have been entered.";
+			this.labelBatch.Text = "After all insurance payments on your EOB have been entered, click \"Finalize Payme" +
+    "nt\" to finish this batch for daily reporting.";
 			// 
 			// label89
 			// 
@@ -3375,9 +3376,9 @@ namespace OpenDental{
 			this.butBatch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butBatch.Location = new System.Drawing.Point(577, 389);
 			this.butBatch.Name = "butBatch";
-			this.butBatch.Size = new System.Drawing.Size(138, 24);
+			this.butBatch.Size = new System.Drawing.Size(145, 24);
 			this.butBatch.TabIndex = 150;
-			this.butBatch.Text = "Create Ins. Payment";
+			this.butBatch.Text = "Finalize Payment";
 			this.butBatch.Click += new System.EventHandler(this.butBatch_Click);
 			// 
 			// textLabFees
