@@ -1214,6 +1214,46 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		///<summary>Deletes claimprocs that are attached to group notes.</summary>
+		public static string ClaimProcEstimateAttachedToGroupNote(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			//It is impossible to attach a group note to a claim, because group notes always have status EC, but status C is required to attach to a claim, or status TP for a preauth.
+			//Since the group note cannot be attached to a claim, it also cannot be attached to a claim payment.
+			//Claimproc estimates attached to group notes cannot be viewed anywhere in the UI.
+			command="SELECT claimproc.ClaimProcNum "
+				+"FROM claimproc "
+				+"INNER JOIN procedurelog ON claimproc.ProcNum=procedurelog.ProcNum "
+				+"INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum AND procedurecode.ProcCode='~GRP~' "
+				+"WHERE claimproc.Status="+POut.Int((int)ClaimProcStatus.Estimate)+" AND claimproc.ClaimNum=0 AND claimproc.ClaimPaymentNum=0";//Ensures that the claimproc has no relevant information attached to it.
+			table=Db.GetTable(command);
+			string log="";
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Estimates attached to group notes")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			else {
+				if(table.Rows.Count>0) {
+					command="DELETE FROM claimproc WHERE claimproc.ClaimProcNum IN (";
+					for(int i=0;i<table.Rows.Count;i++) {
+						if(i>0){
+							command+=",";
+						}
+						command+=PIn.Long(table.Rows[i]["ClaimProcNum"].ToString());
+					}
+					command+=")";
+					Db.NonQ(command);
+				}
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Estimates attached to group notes deleted")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ClaimProcDateNotMatchCapComplete(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
