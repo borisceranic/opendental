@@ -384,14 +384,6 @@ namespace OpenDentBusiness {
 		RecallPostcardMessage2,
 		RecallPostcardMessage3,
 		RecallPostcardsPerSheet,
-		RecallSchedulerMessage,
-		RecallSchedulerMessage2,
-		RecallSchedulerMessage3,
-		///<summary>Boolean. 0 by default. True when recall scheduler service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
-		RecallSchedulerService,
-		RecallSchedulerSubject,
-		RecallSchedulerSubject2,
-		RecallSchedulerSubject3,
 		RecallShowIfDaysFirstReminder,
 		RecallShowIfDaysSecondReminder,
 		RecallStatusEmailed,
@@ -509,6 +501,14 @@ namespace OpenDentBusiness {
 		UserNameManualEntry,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>
 		WebHostSynchServerURL,
+		WebSchedulerMessage,
+		WebSchedulerMessage2,
+		WebSchedulerMessage3,
+		///<summary>Boolean. 0 by default. True when web scheduler service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
+		WebSchedulerService,
+		WebSchedulerSubject,
+		WebSchedulerSubject2,
+		WebSchedulerSubject3,
 		WebServiceServerName,
 		WordProcessorPath,
 		XRayExposureLevel

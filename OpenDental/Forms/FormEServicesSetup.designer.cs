@@ -72,11 +72,11 @@ namespace OpenDental{
 			this.label19 = new System.Windows.Forms.Label();
 			this.butFullSync = new OpenDental.UI.Button();
 			this.butSync = new OpenDental.UI.Button();
-			this.tabRecallScheduler = new System.Windows.Forms.TabPage();
+			this.tabWebScheduler = new System.Windows.Forms.TabPage();
 			this.butRecallSchedEnable = new OpenDental.UI.Button();
 			this.labelRecallSchedEnable = new System.Windows.Forms.Label();
 			this.butRecallSchedSetup = new OpenDental.UI.Button();
-			this.labelRecallSchedDesc = new System.Windows.Forms.Label();
+			this.labelWebSchedDesc = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.butSaveListenerPort = new OpenDental.UI.Button();
@@ -90,7 +90,7 @@ namespace OpenDental{
 			this.groupBox2.SuspendLayout();
 			this.tabMobileOld.SuspendLayout();
 			this.groupPreferences.SuspendLayout();
-			this.tabRecallScheduler.SuspendLayout();
+			this.tabWebScheduler.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -261,7 +261,7 @@ namespace OpenDental{
 			this.tabControl.Controls.Add(this.tabPatientPortal);
 			this.tabControl.Controls.Add(this.tabMobileNew);
 			this.tabControl.Controls.Add(this.tabMobileOld);
-			this.tabControl.Controls.Add(this.tabRecallScheduler);
+			this.tabControl.Controls.Add(this.tabWebScheduler);
 			this.tabControl.Location = new System.Drawing.Point(12, 40);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
@@ -626,18 +626,18 @@ namespace OpenDental{
 			this.butSync.Text = "Synch";
 			this.butSync.Click += new System.EventHandler(this.butSync_Click);
 			// 
-			// tabRecallScheduler
+			// tabWebScheduler
 			// 
-			this.tabRecallScheduler.BackColor = System.Drawing.SystemColors.Control;
-			this.tabRecallScheduler.Controls.Add(this.butRecallSchedEnable);
-			this.tabRecallScheduler.Controls.Add(this.labelRecallSchedEnable);
-			this.tabRecallScheduler.Controls.Add(this.butRecallSchedSetup);
-			this.tabRecallScheduler.Controls.Add(this.labelRecallSchedDesc);
-			this.tabRecallScheduler.Location = new System.Drawing.Point(4, 22);
-			this.tabRecallScheduler.Name = "tabRecallScheduler";
-			this.tabRecallScheduler.Size = new System.Drawing.Size(944, 588);
-			this.tabRecallScheduler.TabIndex = 3;
-			this.tabRecallScheduler.Text = "Recall Scheduler";
+			this.tabWebScheduler.BackColor = System.Drawing.SystemColors.Control;
+			this.tabWebScheduler.Controls.Add(this.butRecallSchedEnable);
+			this.tabWebScheduler.Controls.Add(this.labelRecallSchedEnable);
+			this.tabWebScheduler.Controls.Add(this.butRecallSchedSetup);
+			this.tabWebScheduler.Controls.Add(this.labelWebSchedDesc);
+			this.tabWebScheduler.Location = new System.Drawing.Point(4, 22);
+			this.tabWebScheduler.Name = "tabWebScheduler";
+			this.tabWebScheduler.Size = new System.Drawing.Size(944, 588);
+			this.tabWebScheduler.TabIndex = 3;
+			this.tabWebScheduler.Text = "Web Scheduler";
 			// 
 			// butRecallSchedEnable
 			// 
@@ -675,13 +675,13 @@ namespace OpenDental{
 			this.butRecallSchedSetup.Text = "Recall Setup";
 			this.butRecallSchedSetup.Click += new System.EventHandler(this.butRecallSchedSetup_Click);
 			// 
-			// labelRecallSchedDesc
+			// labelWebSchedDesc
 			// 
-			this.labelRecallSchedDesc.Location = new System.Drawing.Point(38, 12);
-			this.labelRecallSchedDesc.Name = "labelRecallSchedDesc";
-			this.labelRecallSchedDesc.Size = new System.Drawing.Size(869, 49);
-			this.labelRecallSchedDesc.TabIndex = 52;
-			this.labelRecallSchedDesc.Text = "TODO: This is where a great and fantastic description of the recall scheduler ser" +
+			this.labelWebSchedDesc.Location = new System.Drawing.Point(38, 12);
+			this.labelWebSchedDesc.Name = "labelRecallSchedDesc";
+			this.labelWebSchedDesc.Size = new System.Drawing.Size(869, 49);
+			this.labelWebSchedDesc.TabIndex = 52;
+			this.labelWebSchedDesc.Text = "TODO: This is where a great and fantastic description of the web scheduler ser" +
     "vice will go.";
 			// 
 			// label11
@@ -775,7 +775,7 @@ namespace OpenDental{
 			this.tabMobileOld.ResumeLayout(false);
 			this.groupPreferences.ResumeLayout(false);
 			this.groupPreferences.PerformLayout();
-			this.tabRecallScheduler.ResumeLayout(false);
+			this.tabWebScheduler.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -836,8 +836,8 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label19;
 		private UI.Button butFullSync;
 		private UI.Button butSync;
-		private System.Windows.Forms.TabPage tabRecallScheduler;
-		private System.Windows.Forms.Label labelRecallSchedDesc;
+		private System.Windows.Forms.TabPage tabWebScheduler;
+		private System.Windows.Forms.Label labelWebSchedDesc;
 		private UI.Button butRecallSchedSetup;
 		private System.Windows.Forms.Label labelRecallSchedEnable;
 		private UI.Button butRecallSchedEnable;

@@ -76,7 +76,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butGotoFamily;
 		private OpenDental.UI.Button butUndo;
 		private UI.Button butECards;
-		private Panel panelRecallScheduler;
+		private Panel panelWebScheduler;
 		private MenuItem menuItemSeeAccount;
 		//<summary>Only used if PinClicked=true</summary>
 		//public List<long> AptNumsSelected;
@@ -146,7 +146,7 @@ namespace OpenDental{
 			this.butGotoFamily = new OpenDental.UI.Button();
 			this.butUndo = new OpenDental.UI.Button();
 			this.butECards = new OpenDental.UI.Button();
-			this.panelRecallScheduler = new System.Windows.Forms.Panel();
+			this.panelWebScheduler = new System.Windows.Forms.Panel();
 			this.groupBox1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
@@ -637,23 +637,23 @@ namespace OpenDental{
 			this.butECards.Visible = false;
 			this.butECards.Click += new System.EventHandler(this.butECards_Click);
 			// 
-			// panelRecallScheduler
+			// panelWebScheduler
 			// 
-			this.panelRecallScheduler.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.panelRecallScheduler.BackgroundImage = global::OpenDental.Properties.Resources.webSched_PV_Button;
-			this.panelRecallScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.panelRecallScheduler.Location = new System.Drawing.Point(762, 663);
-			this.panelRecallScheduler.Name = "panelRecallScheduler";
-			this.panelRecallScheduler.Size = new System.Drawing.Size(120, 24);
-			this.panelRecallScheduler.TabIndex = 119;
-			this.panelRecallScheduler.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelRecallScheduler_MouseClick);
+			this.panelWebScheduler.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.panelWebScheduler.BackgroundImage = global::OpenDental.Properties.Resources.webSched_PV_Button;
+			this.panelWebScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.panelWebScheduler.Location = new System.Drawing.Point(762, 663);
+			this.panelWebScheduler.Name = "panelWebScheduler";
+			this.panelWebScheduler.Size = new System.Drawing.Size(120, 24);
+			this.panelWebScheduler.TabIndex = 119;
+			this.panelWebScheduler.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelWebScheduler_MouseClick);
 			// 
 			// FormRecallList
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(975, 691);
-			this.Controls.Add(this.panelRecallScheduler);
+			this.Controls.Add(this.panelWebScheduler);
 			this.Controls.Add(this.butUndo);
 			this.Controls.Add(this.butGotoFamily);
 			this.Controls.Add(this.butCommlog);
@@ -1061,21 +1061,21 @@ namespace OpenDental{
 			FillMain(excludePatNums);
 		}
 
-		private void panelRecallScheduler_MouseClick(object sender,MouseEventArgs e) {
-			if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
-				//Office has yet to enable the recall scheduler service.
+		private void panelWebScheduler_MouseClick(object sender,MouseEventArgs e) {
+			if(!PrefC.GetBool(PrefName.WebSchedulerService)) {
+				//Office has yet to enable the web scheduler service.
 				//Send them to a promotional web site so that they can learn about how great it is.
 				try {
-					Process.Start(Recalls.GetRecallSchedulerURL());
+					Process.Start(Recalls.GetWebSchedulerURL());
 				}
 				catch(Exception) {
 					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
 				}
 				//Now take them to the eService Setup window so that they can click the Enable button if they are signed up.
-				FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.RecallScheduler);
+				FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.WebScheduler);
 				FormESS.ShowDialog();
-				//User could have enabled the recall scheduler right here, only return if they still do not have the feature enabled.
-				if(!PrefC.GetBool(PrefName.RecallSchedulerService)) {
+				//User could have enabled the web scheduler right here, only return if they still do not have the feature enabled.
+				if(!PrefC.GetBool(PrefName.WebSchedulerService)) {
 					return;//No need to waste the time calling our web service.
 				}
 			}
@@ -1106,7 +1106,7 @@ namespace OpenDental{
 			#endregion
 			string result="";
 			try {
-				result=updateService.ValidateRecallScheduler(strbuild.ToString());
+				result=updateService.ValidateWebScheduler(strbuild.ToString());
 			}
 			catch { 
 				//Do nothing.  Leaving result empty will display correct error messages later on.
@@ -1114,18 +1114,18 @@ namespace OpenDental{
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
-			if(Recalls.IsRecallSchedulerResponseValid(result,out error,out errorCode)) {
-				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
+			if(Recalls.IsWebSchedulerResponseValid(result,out error,out errorCode)) {
+				//Everything went good, the office is active on support and has an active web scheduler repeating charge.
 				//Send recall notifications to the selected patients.
-				SendRecallSchedulerNotifications();
+				SendWebSchedulerNotifications();
 				return;
 			}
 			#region Error Handling
 			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
-			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
-				//We want to launch our recall scheduler page if the user is not signed up:
+			if(errorCode==110) {//Customer not registered for WebScheduler monthly service
+				//We want to launch our web scheduler page if the user is not signed up:
 				try {
-					Process.Start(Recalls.GetRecallSchedulerURL());
+					Process.Start(Recalls.GetWebSchedulerURL());
 				}
 				catch(Exception) {
 					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
@@ -1137,7 +1137,7 @@ namespace OpenDental{
 		}
 
 		///<summary>Sends a payload to the web service to get obfuscated URLs for the selected patients.  Once the obfuscated URLs are returned it emails each patient their recall reminder.</summary>
-		private void SendRecallSchedulerNotifications() {
+		private void SendWebSchedulerNotifications() {
 			#region Recall List Validation
 			if(gridMain.Rows.Count < 1){
         MessageBox.Show(Lan.g(this,"There are no Patients in the Recall table.  Must have at least one."));    
@@ -1187,12 +1187,12 @@ namespace OpenDental{
 				}
 			}
 			#endregion
-			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Send recall scheduler emails to all of the selected patients?")) {
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Send web scheduler emails to all of the selected patients?")) {
 				return;
 			}
 			Cursor.Current=Cursors.WaitCursor;
 			string response="";
-			Dictionary<long,string> dictRecallSchedulerParameters=new Dictionary<long,string>();
+			Dictionary<long,string> dictWebSchedulerParameters=new Dictionary<long,string>();
 			List<long> recallNums=new List<long>();
 			//Loop through all selected patients and grab their corresponding RecallNum.
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
@@ -1227,7 +1227,7 @@ namespace OpenDental{
 				writer.WriteEndElement();
 			}
 			try {
-				response=updateService.GetRecallSchedulerURLs(strbuild.ToString());
+				response=updateService.GetWebSchedulerURLs(strbuild.ToString());
 			}
 			catch {
 				//Do nothing.  Leaving result empty will display correct error messages later on.
@@ -1241,7 +1241,7 @@ namespace OpenDental{
 			try {
 				doc.LoadXml(response);
 				nodeError=doc.SelectSingleNode("//Error");
-				nodeResponse=doc.SelectSingleNode("//GetRecallSchedulerURLsResponse");
+				nodeResponse=doc.SelectSingleNode("//GetWebSchedulerURLsResponse");
 			}
 			catch {
 				//Invalid web service response passed in.  Node will be null and will return false correctly.
@@ -1249,7 +1249,7 @@ namespace OpenDental{
 			#region Error Handling
 			if(nodeError!=null || nodeResponse==null) {
 				string error=Lans.g(this,"There was an error with the web request.  Please try again or give us a call.");
-				//Either something went wrong or someone tried to get cute and use our recall scheduler service when they weren't supposed to.
+				//Either something went wrong or someone tried to get cute and use our web scheduler service when they weren't supposed to.
 				if(nodeError!=null) {
 					error+="\r\n"+Lan.g(this,"Error Details")+":\r\n" +nodeError.InnerText;
 				}
@@ -1259,7 +1259,7 @@ namespace OpenDental{
 			}
 			#endregion
 			//At this point we know we got a valid response from our web service.
-			dictRecallSchedulerParameters.Clear();
+			dictWebSchedulerParameters.Clear();
 			nodeURLs=doc.GetElementsByTagName("URL");
 			if(nodeURLs!=null) {
 				//Loop through all the URL nodes that were returned.
@@ -1270,13 +1270,13 @@ namespace OpenDental{
 					if(attributeRecallNum!=null) {
 						recallNum=PIn.Long(attributeRecallNum.Value);
 					}
-					dictRecallSchedulerParameters.Add(recallNum,nodeURLs[i].InnerText);
+					dictWebSchedulerParameters.Add(recallNum,nodeURLs[i].InnerText);
 				}
 			}
 			#endregion
 			//Now that the web service response has been validated, parsed, and our dictionary filled, we now can loop through the selected patients and send off the emails.
 			RecallListSort sortBy=(RecallListSort)comboSort.SelectedIndex;
-			addrTable=Recalls.GetAddrTableForRecallScheduler(recallNums,checkGroupFamilies.Checked,sortBy);
+			addrTable=Recalls.GetAddrTableForWebScheduler(recallNums,checkGroupFamilies.Checked,sortBy);
 			EmailMessage emailMessage;
 			EmailAddress emailAddress;
 			for(int i=0;i<addrTable.Rows.Count;i++) {
@@ -1289,28 +1289,28 @@ namespace OpenDental{
 				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
 				emailMessage.FromAddress=emailAddress.SenderAddress;
 				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
-					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject);
-					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage);
+					emailSubject=PrefC.GetString(PrefName.WebSchedulerSubject);
+					emailBody=PrefC.GetString(PrefName.WebSchedulerMessage);
 				}
 				else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
-					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject2);
-					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage2);
+					emailSubject=PrefC.GetString(PrefName.WebSchedulerSubject2);
+					emailBody=PrefC.GetString(PrefName.WebSchedulerMessage2);
 				}
 				else {
-					emailSubject=PrefC.GetString(PrefName.RecallSchedulerSubject3);
-					emailBody=PrefC.GetString(PrefName.RecallSchedulerMessage3);
+					emailSubject=PrefC.GetString(PrefName.WebSchedulerSubject3);
+					emailBody=PrefC.GetString(PrefName.WebSchedulerMessage3);
 				}
 				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
 				emailBody=emailBody.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
 				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
 				string URL="";
 				try {
-					dictRecallSchedulerParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
+					dictWebSchedulerParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
 				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
 					string error=ex.Message+"\r\n";
-					MessageBox.Show(error+Lan.g(this,"Problem getting recall scheduler URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
+					MessageBox.Show(error+Lan.g(this,"Problem getting web scheduler URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString());
 					break;
 				}
 				emailBody=emailBody.Replace("[URL]",URL);
@@ -1352,7 +1352,7 @@ namespace OpenDental{
 				#region Insert Commlog
 				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
 					PrefC.GetLong(PrefName.RecallStatusEmailed));
-				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));//TODO: ask Nathan if he wants a recall scheduler status?
+				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));//TODO: ask Nathan if he wants a web scheduler status?
 				#endregion
 			}
 			FillMain(null);

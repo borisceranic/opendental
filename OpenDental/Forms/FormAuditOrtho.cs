@@ -72,7 +72,7 @@ namespace OpenDental {
 					row=new ODGridRow();
 					row.Cells.Add(DictDateOrthoLogs[dateRow][i].LogDateTime.ToShortDateString()+" "+DictDateOrthoLogs[dateRow][i].LogDateTime.ToShortTimeString());
 					user=Userods.GetUser(DictDateOrthoLogs[dateRow][i].UserNum);
-					if(user==null) {//Will be null for audit trails made by outside entities that do not require users to be logged in.  E.g. recall scheduler.
+					if(user==null) {//Will be null for audit trails made by outside entities that do not require users to be logged in.  E.g. web scheduler.
 						row.Cells.Add("unknown");
 					}
 					else {

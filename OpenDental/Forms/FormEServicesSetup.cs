@@ -42,8 +42,8 @@ namespace OpenDental {
 				case EService.MobileNew:
 					tabControl.SelectTab(tabMobileNew);
 					break;
-				case EService.RecallScheduler:
-					tabControl.SelectTab(tabRecallScheduler);
+				case EService.WebScheduler:
+					tabControl.SelectTab(tabWebScheduler);
 					break;
 				case EService.PatientPortal:
 				default:
@@ -71,11 +71,11 @@ namespace OpenDental {
 			//Web server is not contacted when loading this form.  That would be too slow.
 			//CreateAppointments(5);
 			#endregion
-			#region recall scheduler
+			#region web scheduler
 			labelRecallSchedEnable.Text="";
-			if(PrefC.GetBool(PrefName.RecallSchedulerService)) {
+			if(PrefC.GetBool(PrefName.WebSchedulerService)) {
 				butRecallSchedEnable.Enabled=false;
-				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service is currently enabled.");
+				labelRecallSchedEnable.Text=Lan.g(this,"Web scheduler service is currently enabled.");
 			}
 			#endregion
 			SetControlEnabledState();
@@ -770,7 +770,7 @@ namespace OpenDental {
 
 		#endregion
 
-		#region recall scheduler
+		#region web scheduler
 		private void butRecallSchedEnable_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
@@ -800,27 +800,27 @@ namespace OpenDental {
 				writer.WriteEndElement();
 			}
 			#endregion
-			string result=updateService.ValidateRecallScheduler(strbuild.ToString());
+			string result=updateService.ValidateWebScheduler(strbuild.ToString());
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
-			if(Recalls.IsRecallSchedulerResponseValid(result,out error,out errorCode)) {
-				//Everything went good, the office is active on support and has an active recall scheduler repeating charge.
+			if(Recalls.IsWebSchedulerResponseValid(result,out error,out errorCode)) {
+				//Everything went good, the office is active on support and has an active web scheduler repeating charge.
 				butRecallSchedEnable.Enabled=false;
-				labelRecallSchedEnable.Text=Lan.g(this,"Recall scheduler service has been enabled.");
+				labelRecallSchedEnable.Text=Lan.g(this,"Web scheduler service has been enabled.");
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
-				if(Prefs.UpdateBool(PrefName.RecallSchedulerService,true)) {
+				if(Prefs.UpdateBool(PrefName.WebSchedulerService,true)) {
 					_changed=true;
-					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The recall scheduler service was enabled.");
+					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The web scheduler service was enabled.");
 				}
 				return;
 			}
 			#region Error Handling
 			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
-			if(errorCode==110) {//Customer not registered for RecallScheduler monthly service
-				//We want to launch our recall scheduler page if the user is not signed up:
+			if(errorCode==110) {//Customer not registered for WebSched monthly service
+				//We want to launch our web scheduler page if the user is not signed up:
 				try {
-					Process.Start(Recalls.GetRecallSchedulerURL());
+					Process.Start(Recalls.GetWebSchedulerURL());
 				}
 				catch(Exception) {
 					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
@@ -834,7 +834,7 @@ namespace OpenDental {
 				return;
 			}
 			//For every other error message returned, we'll simply show a generic error in the label and display the detailed error in a pop up.
-			labelRecallSchedEnable.Text=Lan.g(this,"There was a problem enabling the recall scheduler.  Please give us a call or try again.");
+			labelRecallSchedEnable.Text=Lan.g(this,"There was a problem enabling the web scheduler.  Please give us a call or try again.");
 			MessageBox.Show(error);
 			#endregion
 		}
@@ -901,7 +901,7 @@ namespace OpenDental {
 			PatientPortal,
 			MobileOld,
 			MobileNew,
-			RecallScheduler
+			WebScheduler
 		}
 	}
 }

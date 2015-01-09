@@ -10,12 +10,12 @@ namespace OpenDentBusiness{
 	
 	///<summary></summary>
 	public class Recalls {
-		private const string RECALL_SCHEDULER_URL="http://www.patientviewer.com/RecallSchedulerPromo.html";
+		private const string WEB_SCHEDULER_URL="http://www.patientviewer.com/WebSchedulerPromo.html";
 
-		///<summary>http://www.patientviewer.com/RecallSchedulerPromo.html</summary>
-		public static string GetRecallSchedulerURL() {
+		///<summary>http://www.patientviewer.com/WebSchedulerPromo.html</summary>
+		public static string GetWebSchedulerURL() {
 			//No need to check RemotingRole; no call to db.
-			return RECALL_SCHEDULER_URL;
+			return WEB_SCHEDULER_URL;
 		}
 
 		///<summary>Gets all recalls for the supplied patients, usually a family or single pat.  Result might have a length of zero.  Each recall will also have the DateScheduled filled by pulling that info from other tables.</summary>
@@ -943,7 +943,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static DataTable GetAddrTableForRecallScheduler(List<long> recallNums,bool groupByFamily,RecallListSort sortBy) {
+		public static DataTable GetAddrTableForWebScheduler(List<long> recallNums,bool groupByFamily,RecallListSort sortBy) {
 			//No need to check RemotingRole; no call to db.
 			DataTable rawTable=GetAddrTableRaw(recallNums);
 			List<DataRow> rawRows=new List<DataRow>();
@@ -1122,25 +1122,25 @@ namespace OpenDentBusiness{
 			return recallList;
 		}
 
-		///<summary>Validates the results of our ValidateRecallScheduler web service call.  Returns true if they are valid, false if the office is not allowed to use the recall scheduler or if there was an error with the web service.  Error will be empty and ErrorCode will be 0 for valid responses and filled with error text if office is not valid or if something went wrong with the web service call.</summary>
-		///<param name="response">This should be the result string that was received from WebServiceCustomerUpdates.ValidateRecallScheduler()</param>
-		///<param name="error">Empty unless the customer is not valid for the recall scheduler service or there was an error with the web service response.</param>
-		///<param name="errorCode">0=no errors. 110=No recall scheduler repeating charge. 120=Invalid web service response. 190=All other errors.</param>
-		///<returns>True if user is an active customer and they have an active RecallScheduler repeating charge.</returns>
-		public static bool IsRecallSchedulerResponseValid(string response, out string error, out int errorCode) {
+		///<summary>Validates the results of our ValidateWebScheduler web service call.  Returns true if they are valid, false if the office is not allowed to use the web scheduler or if there was an error with the web service.  Error will be empty and ErrorCode will be 0 for valid responses and filled with error text if office is not valid or if something went wrong with the web service call.</summary>
+		///<param name="response">This should be the result string that was received from WebServiceCustomerUpdates.ValidateWebScheduler()</param>
+		///<param name="error">Empty unless the customer is not valid for the web scheduler service or there was an error with the web service response.</param>
+		///<param name="errorCode">0=no errors. 110=No web scheduler repeating charge. 120=Invalid web service response. 190=All other errors.</param>
+		///<returns>True if user is an active customer and they have an active WebScheduler repeating charge.</returns>
+		public static bool IsWebSchedulerResponseValid(string response, out string error, out int errorCode) {
 			error="";
 			errorCode=0;
 			XmlDocument doc=new XmlDocument();
 			XmlNode node=null;
 			try {
 				doc.LoadXml(response);
-				node=doc.SelectSingleNode("//ValidateRecallSchedulerResponse");
+				node=doc.SelectSingleNode("//ValidateWebSchedulerResponse");
 			}
 			catch {
 				//Invalid web service response passed in.  Node will be null and will return false correctly.
 			}
 			if(node==null) {
-				//There should always be a ValidateRecallSchedulerResponse node.  If there isn't, something went wrong.
+				//There should always be a ValidateWebSchedulerResponse node.  If there isn't, something went wrong.
 				error=Lans.g("Recalls","Invalid web service response.  Please try again or give us a call.");
 				errorCode=120;
 				return false;
@@ -1158,10 +1158,10 @@ namespace OpenDentBusiness{
 				errorCode=120;
 				return false;
 			}
-			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for RecallScheduler monthly service", etc.
-			if(nodeErrorCode.InnerText=="110") {//Customer not registered for RecallScheduler monthly service
+			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for WebScheduler monthly service", etc.
+			if(nodeErrorCode.InnerText=="110") {//Customer not registered for WebScheduler monthly service
 				error=Lans.g("Recalls","Please give us a call or visit our web page to see more information about signing up for this service.")
-					+"\r\n"+"http://www.opendental.com/";//TODO: replace with URL to recall scheduler service.
+					+"\r\n"+Recalls.GetWebSchedulerURL();
 				errorCode=110;
 				return false;
 			}
