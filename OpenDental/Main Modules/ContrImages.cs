@@ -1943,7 +1943,7 @@ namespace OpenDental {
 				Document doc=null;
 				for(int i=0;i<fileNames.Length;i++) {
 					try {
-						doc=ImageStore.Import(fileNames[i],GetCurrentCategory(),PatCur);
+						doc=ImageStore.Import(fileNames[i],GetCurrentCategory(),PatCur);//Makes log
 					}
 					catch(Exception ex) {
 						MessageBox.Show(Lan.g(this,"Unable to copy file, May be in use: ")+ex.Message+": "+openFileDialog.FileName);
@@ -2132,7 +2132,7 @@ namespace OpenDental {
 					DeleteSelection(false,true);
 				}
 				try {
-					doc=ImageStore.ImportImageToMount(bitmapPaste,0,MountItemsForSelected[IdxSelectedInMount].MountItemNum,GetCurrentCategory(),PatCur);
+					doc=ImageStore.ImportImageToMount(bitmapPaste,0,MountItemsForSelected[IdxSelectedInMount].MountItemNum,GetCurrentCategory(),PatCur);//Makes log entry				
 					doc.WindowingMax=255;
 					doc.WindowingMin=0;
 					Documents.Update(doc);
@@ -2147,7 +2147,7 @@ namespace OpenDental {
 			}
 			else {//Paste the image as its own unique document.
 				try {
-					doc=ImageStore.Import(bitmapPaste,GetCurrentCategory(),ImageType.Photo,PatCur);
+					doc=ImageStore.Import(bitmapPaste,GetCurrentCategory(),ImageType.Photo,PatCur);//Makes log entry
 				}
 				catch {
 					MessageBox.Show(Lan.g(this,"Error saving document."));
@@ -2403,12 +2403,27 @@ namespace OpenDental {
 			}
 			if(NodeIdentifierDown.NodeType==ImageNodeType.Mount) {
 				Mount mount=Mounts.GetByNum(NodeIdentifierDown.PriKey);
+				string mountSourceCat=DefC.GetDef(DefCat.ImageCats,mount.DocCategory).ItemName;
+				string mountDestCat=DefC.GetDef(DefCat.ImageCats,nodeOverCategoryDefNum).ItemName;
 				mount.DocCategory=nodeOverCategoryDefNum;
+				SecurityLogs.MakeLogEntry(Permissions.ImageEdit,mount.PatNum,Lan.g(this,"Mount moved from")+" "+mountSourceCat+" "+Lan.g(this,"to")+" "+mountDestCat,mount.MountNum);
 				Mounts.Update(mount);
 			}
 			else if(NodeIdentifierDown.NodeType==ImageNodeType.Doc) {
 				Document doc=Documents.GetByNum(NodeIdentifierDown.PriKey);
+				string docSourceCat=DefC.GetDef(DefCat.ImageCats,doc.DocCategory).ItemName;
+				string docDestCat=DefC.GetDef(DefCat.ImageCats,nodeOverCategoryDefNum).ItemName;
 				doc.DocCategory=nodeOverCategoryDefNum;
+				string logText=Lan.g(this,"Document moved")+": "+doc.FileName;
+				if(doc.Description!="") {
+					string docDescript=doc.Description;
+					if(docDescript.Length>50) {
+						docDescript=docDescript.Substring(0,50);
+					}
+					logText+=" "+Lan.g(this,"with description")+" "+docDescript;
+				}
+				logText+=" "+Lan.g(this,"from category")+" "+docSourceCat+" "+Lan.g(this,"to category")+" "+docDestCat;
+				SecurityLogs.MakeLogEntry(Permissions.ImageEdit,doc.PatNum,logText,doc.DocNum);
 				Documents.Update(doc);
 			}
 			FillDocList(true);

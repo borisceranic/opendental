@@ -201,10 +201,12 @@ namespace OpenDentBusiness{
 		EmailSend,
 		///<summary>86- Allows user to send webmail</summary>
 		WebmailSend,
-		///<summary>87- Allows user to run command queries. Command queries are any non-SELECT queries for any non-temporary table.</summar>
+		///<summary>87- Allows user to run command queries. Command queries are any non-SELECT queries for any non-temporary table.</summary>
 		UserQueryAdmin,
 		///<summary>88- Security permission for assignment of benefits.</summary>
-		InsPlanChangeAssign
+		InsPlanChangeAssign,
+		///<summary>89- Audit trail for images and documents in the image module.  There is no user interface in the security window for this permission because it is only used for tracking.</summary>
+		ImageEdit
 
 	}
 

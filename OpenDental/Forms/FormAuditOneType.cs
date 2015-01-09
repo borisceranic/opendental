@@ -101,6 +101,9 @@ namespace OpenDental{
 			else if(PermTypes.Contains(Permissions.OrthoChartEdit)) {
 				labelDisclaimer.Text=Lan.g(this,"Changes made to the ortho chart for this date before the update to 14.3 were not tracked in the audit trail.");
 			}
+			else if(PermTypes.Contains(Permissions.ImageEdit) || PermTypes.Contains(Permissions.ImageDelete)) {
+				labelDisclaimer.Text=Lan.g(this,"Changes made to this document before the update to 15.1 will not be reflected below.");
+			}
 			FillGrid();
 		}
 

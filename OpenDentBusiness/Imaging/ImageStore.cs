@@ -132,7 +132,7 @@ namespace OpenDentBusiness {
 			for(int i = 0;i < fiList.Length;i++) {
 				fileList.Add(fiList[i].FullName);
 			}
-			int countAdded = Documents.InsertMissing(pat,fileList);
+			int countAdded = Documents.InsertMissing(pat,fileList);//Automatically detects and inserts files that are in the patient's folder that aren't present in the database. Logs entries.
 			//should notify user
 			//if(countAdded > 0) {
 			//	Debug.WriteLine(countAdded.ToString() + " documents found and added to the first category.");
@@ -332,7 +332,7 @@ namespace OpenDentBusiness {
 			Documents.Insert(doc,pat);//this assigns a filename and saves to db
 			doc=Documents.GetByNum(doc.DocNum);
 			try {
-				SaveDocument(doc,pathImportFrom,patFolder);
+				SaveDocument(doc,pathImportFrom,patFolder);//Makes log entry
 				if(!PrefC.AtoZfolderUsed) {
 					Documents.Update(doc);//Because SaveDocument() modified doc.RawBase64
 				}
@@ -383,7 +383,7 @@ namespace OpenDentBusiness {
 			myEncoderParameters.Param[0] = myEncoderParameter;
 			//AutoCrop()?
 			try {
-				SaveDocument(doc,image,myImageCodecInfo,myEncoderParameters,patFolder);
+				SaveDocument(doc,image,myImageCodecInfo,myEncoderParameters,patFolder);//Makes log entry
 				if(!PrefC.AtoZfolderUsed) {
 					Documents.Update(doc);//because SaveDocument stuck the image in doc.RawBase64.
 					//no thumbnail yet
@@ -412,7 +412,7 @@ namespace OpenDentBusiness {
 			Documents.Insert(doc,pat);//this assigns a filename and saves to db
 			doc=Documents.GetByNum(doc.DocNum);
 			try {
-				SaveDocument(doc,pathSourceFile,patFolder);
+				SaveDocument(doc,pathSourceFile,patFolder);//Makes log entry
 			}
 			catch {
 				Documents.Delete(doc);
@@ -438,7 +438,7 @@ namespace OpenDentBusiness {
 			Documents.Insert(doc,pat);//creates filename and saves to db
 			doc=Documents.GetByNum(doc.DocNum);
 			try {
-				SaveDocument(doc,image,ImageFormat.Bmp,patFolder);
+				SaveDocument(doc,image,ImageFormat.Bmp,patFolder);//Makes log entry
 			}
 			catch {
 				Documents.Delete(doc);
@@ -478,6 +478,7 @@ namespace OpenDentBusiness {
 					EobAttaches.Update(eob);//because SaveEobAttach stuck the image in EobAttach.RawBase64.
 					//no thumbnail
 				}
+				//No security log for creation of EOB's because they don't show up in the images module.
 			}
 			catch {
 				EobAttaches.Delete(eob.EobAttachNum);
@@ -505,6 +506,7 @@ namespace OpenDentBusiness {
 			eob=EobAttaches.GetOne(eob.EobAttachNum);
 			try {
 				SaveEobAttach(eob,pathImportFrom,eobFolder);
+				//No security log for creation of EOB's because they don't show up in the images module.
 				if(PrefC.AtoZfolderUsed) {
 					EobAttaches.Update(eob);
 				}
@@ -541,6 +543,7 @@ namespace OpenDentBusiness {
 			myEncoderParameters.Param[0] = myEncoderParameter;
 			try {
 				SaveAmdAttach(amd,image,myImageCodecInfo,myEncoderParameters,amdFolder);
+				//No security log for creation of AMD Attaches because they don't show up in the images module
 			}
 			catch {
 				//EhrAmendments.Delete(amd.EhrAmendmentNum);
@@ -568,6 +571,7 @@ namespace OpenDentBusiness {
 			//amd=EhrAmendments.GetOne(amd.EhrAmendmentNum);
 			try {
 				SaveAmdAttach(amd,pathImportFrom,amdFolder);
+				//No security log for creation of AMD Attaches because they don't show up in the images module
 			}
 			catch {
 				//EhrAmendments.Delete(amd.EhrAmendmentNum);
@@ -645,6 +649,7 @@ namespace OpenDentBusiness {
 					doc.RawBase64=Convert.ToBase64String(rawData);
 				}
 			}
+			LogDocument(Lans.g("ContrImages","Document Created")+": ",Permissions.ImageEdit,doc);
 		}
 
 		///<summary>If usingAtoZfoler, then patFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the doc.RawBase64 which must then be updated to db.</summary>
@@ -659,9 +664,10 @@ namespace OpenDentBusiness {
 			else {//if saving to AtoZ folder
 				image.Save(ODFileUtils.CombinePaths(patFolder,doc.FileName),codec,encoderParameters);
 			}
+			LogDocument(Lans.g("ContrImages","Document Created")+": ",Permissions.ImageEdit,doc);
 		}
 
-		///<summary>If usingAtoZfoler, then patFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the eob.RawBase64 which must then be updated to db.</summary>
+		///<summary>If using AtoZfolder, then patFolder must be fully qualified and valid.  If not using AtoZfolder, this fills the eob.RawBase64 which must then be updated to db.</summary>
 		public static void SaveDocument(Document doc,string pathSourceFile,string patFolder) {
 			if(PrefC.AtoZfolderUsed) {
 				File.Copy(pathSourceFile,ODFileUtils.CombinePaths(patFolder,doc.FileName));
@@ -670,9 +676,10 @@ namespace OpenDentBusiness {
 				byte[] rawData=File.ReadAllBytes(pathSourceFile);
 				doc.RawBase64=Convert.ToBase64String(rawData);
 			}
+			LogDocument(Lans.g("ContrImages","Document Created")+": ",Permissions.ImageEdit,doc);
 		}
 
-		///<summary>If usingAtoZfoler, then patFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the eob.RawBase64 which must then be updated to db.</summary>
+		///<summary>If using AtoZfolder, then patFolder must be fully qualified and valid.  If not using AtoZfolder, this fills the eob.RawBase64 which must then be updated to db.</summary>
 		public static void SaveEobAttach(EobAttach eob,Bitmap image,ImageCodecInfo codec,EncoderParameters encoderParameters,string eobFolder) {
 			if(PrefC.AtoZfolderUsed) {
 				image.Save(ODFileUtils.CombinePaths(eobFolder,eob.FileName),codec,encoderParameters);
@@ -684,9 +691,10 @@ namespace OpenDentBusiness {
 					eob.RawBase64=Convert.ToBase64String(rawData);
 				}
 			}
+			//No security log for creation of EOB because they don't show up in the images module.
 		}
 
-		///<summary>If usingAtoZfolder, then patFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the eob.RawBase64 which must then be updated to db.</summary>
+		///<summary>If using AtoZfolder, then patFolder must be fully qualified and valid.  If not using AtoZfolder, this fills the eob.RawBase64 which must then be updated to db.</summary>
 		public static void SaveAmdAttach(EhrAmendment amd,Bitmap image,ImageCodecInfo codec,EncoderParameters encoderParameters,string amdFolder) {
 			if(PrefC.AtoZfolderUsed) {
 				image.Save(ODFileUtils.CombinePaths(amdFolder,amd.FileName),codec,encoderParameters);
@@ -699,9 +707,10 @@ namespace OpenDentBusiness {
 					EhrAmendments.Update(amd);
 				}
 			}
+			//No security log for creation of AMD Attaches because they don't show up in the images module
 		}
 
-		///<summary>If usingAtoZfolder, then eobFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the eob.RawBase64 which must then be updated to db.</summary>
+		///<summary>If using AtoZfolder, then patFolder must be fully qualified and valid.  If not using AtoZfolder, this fills the eob.RawBase64 which must then be updated to db.</summary>
 		public static void SaveEobAttach(EobAttach eob,string pathSourceFile,string eobFolder) {
 			if(PrefC.AtoZfolderUsed) {
 				File.Copy(pathSourceFile,ODFileUtils.CombinePaths(eobFolder,eob.FileName));
@@ -710,9 +719,10 @@ namespace OpenDentBusiness {
 				byte[] rawData=File.ReadAllBytes(pathSourceFile);
 				eob.RawBase64=Convert.ToBase64String(rawData);
 			}
+			//No security log for creation of EOB because they don't show up in the images module
 		}
 
-		///<summary>If usingAtoZfoler, then eobFolder must be fully qualified and valid.  If not usingAtoZ folder, this fills the eob.RawBase64 which must then be updated to db.</summary>
+		///<summary>If using AtoZfolder, then patFolder must be fully qualified and valid.  If not using AtoZfolder, this fills the eob.RawBase64 which must then be updated to db.</summary>
 		public static void SaveAmdAttach(EhrAmendment amd,string pathSourceFile,string amdFolder) {
 			if(PrefC.AtoZfolderUsed) {
 				File.Copy(pathSourceFile,ODFileUtils.CombinePaths(amdFolder,amd.FileName));
@@ -722,6 +732,7 @@ namespace OpenDentBusiness {
 				amd.RawBase64=Convert.ToBase64String(rawData);
 				EhrAmendments.Update(amd);
 			}
+			//No security log for creation of AMD Attaches because they don't show up in the images module
 		}
 
 		///<summary>For each of the documents in the list, deletes row from db and image from AtoZ folder if needed.  Throws exception if the file cannot be deleted.  Surround in try/catch.</summary>
@@ -746,6 +757,7 @@ namespace OpenDentBusiness {
 						string filePath = ODFileUtils.CombinePaths(patFolder,documents[i].FileName);
 						if(File.Exists(filePath)) {
 							File.Delete(filePath);
+							LogDocument(Lans.g("ContrImages","Document Deleted")+": ",Permissions.ImageDelete,documents[i]);
 						}
 					}
 					catch {
@@ -765,6 +777,7 @@ namespace OpenDentBusiness {
 				if(File.Exists(filePath)) {
 					try {
 						File.Delete(filePath);
+						//No security log for deletion of EOB's because they don't show up in the images module.
 					}
 					catch { }//file seems to be frequently locked.
 				}
@@ -781,6 +794,7 @@ namespace OpenDentBusiness {
 				if(File.Exists(filePath)) {
 					try {
 						File.Delete(filePath);
+						//No security log for deletion of AMD Attaches because they don't show up in the images module.
 					}
 					catch {
 						MessageBox.Show("Delete was unsuccessful. The file may be in use.");
@@ -803,6 +817,7 @@ namespace OpenDentBusiness {
 				if(File.Exists(filePath)) {
 					try {
 						File.Delete(filePath);
+						//No security log for deletion of AMD Attaches because they don't show up in the images module.
 					}
 					catch {
 						//MessageBox.Show("Delete was unsuccessful. The file may be in use.");
@@ -873,5 +888,21 @@ namespace OpenDentBusiness {
 			return (ext == ".jpg" || ext == ".jpeg" || ext == ".tga" || ext == ".bmp" || ext == ".tif" ||
 				ext == ".tiff" || ext == ".gif" || ext == ".emf" || ext == ".exif" || ext == ".ico" || ext == ".png" || ext == ".wmf" || ext == ".tig");
 		}
+
+		///<summary>Makes log entry for documents.  Supply beginning text, permission, and document.</summary>
+		public static void LogDocument(string logMsgStart,Permissions perm,Document doc) {
+			string logMsg=logMsgStart+doc.FileName;
+			if(doc.Description!="") {
+				string descriptDoc=doc.Description;
+				if(descriptDoc.Length>50) {
+					descriptDoc=descriptDoc.Substring(0,50);
+				}
+				logMsg+=" "+Lans.g("ContrImages","with description")+" "+descriptDoc;
+			}
+			Def docCat=DefC.GetDef(DefCat.ImageCats,doc.DocCategory);
+			logMsg+=" "+Lans.g("ContrImages","with category")+" "+docCat.ItemName;
+			SecurityLogs.MakeLogEntry(perm,doc.PatNum,logMsg,doc.DocNum);
+		}
+
 	}
 }

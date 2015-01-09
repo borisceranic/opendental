@@ -106,6 +106,14 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
+		public static bool Update(Document doc,Document docOld){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),doc,docOld);
+			}
+			return Crud.DocumentCrud.Update(doc,docOld);
+		}
+
+		///<summary></summary>
 		public static void Delete(Document doc){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),doc);
@@ -304,7 +312,7 @@ namespace OpenDentBusiness {
 				for(int i=0;i<table.Rows.Count && !inList;i++){
 					inList=(table.Rows[i]["FileName"].ToString()==fileName);
 				}
-				if(!inList){
+				if(!inList){//OD found new images in the patient's folder that aren't part of the DB.
 					Document doc=new Document();
 					doc.DateCreated=File.GetLastWriteTime(fileList[j]);
 					doc.Description=fileName;
@@ -313,6 +321,8 @@ namespace OpenDentBusiness {
 					doc.PatNum=patient.PatNum;
 					Insert(doc,patient);
 					countAdded++;
+					string docCat=DefC.GetDef(DefCat.ImageCats,doc.DocCategory).ItemName;
+					SecurityLogs.MakeLogEntry(Permissions.ImageEdit,patient.PatNum,Lans.g("ContrImages","Document Created: A file")+", "+doc.FileName+", "+Lans.g("ContrImages","placed into the patient's AtoZ images folder from outside of the program was detected and a record automatically inserted into the first image category")+", "+docCat,doc.DocNum);
 				}
 			}
 			return countAdded;

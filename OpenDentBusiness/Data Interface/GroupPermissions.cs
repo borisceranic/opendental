@@ -205,6 +205,7 @@ namespace OpenDentBusiness{
 				//case Permissions.WebmailSend:
 				//case Permissions.UserQueryAdmin:
 				//case Permissions.InsPlanChangeAssign:
+				//case Permissions.ImageEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -274,6 +275,8 @@ namespace OpenDentBusiness{
 				//	return Lans.g("enumPermissions","EHR Access Info Button");
 				//case Permissions.EhrShowCDS:
 				//	return Lans.g("enumPermissions","EHR Show Clinical Decision Support");
+				case Permissions.EmailSend:
+					return Lans.g("enumPermissions","Email Send");
 				case Permissions.EquipmentDelete:
 					return Lans.g("enumPermissions","Equipment Delete");
 				case Permissions.EquipmentSetup:
@@ -282,6 +285,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Family Module");
 				case Permissions.ImageDelete:
 					return Lans.g("enumPermissions","Image Delete");
+				case Permissions.ImageEdit:
+					return Lans.g("enumPermissions","Image Edit");
 				case Permissions.ImagesModule:
 					return Lans.g("enumPermissions","Images Module");
 				case Permissions.InsPayCreate:
@@ -326,6 +331,10 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Referral, Delete from Patient");
 				case Permissions.ReferralAdd:
 					return Lans.g("enumPermissions","Referral Add");
+				case Permissions.ReportDashboard:
+					return Lans.g("enumPermissions","Reports - Dashboard");
+				case Permissions.ReportProdInc:
+					return Lans.g("enumPermissions","Reports - Production and Income, Aging");
 				case Permissions.RxCreate:
 					return Lans.g("enumPermissions","Rx Create");
 				case Permissions.RxEdit:
@@ -338,6 +347,10 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Setup - Covers a wide variety of setup functions");
 				case Permissions.SheetEdit:
 					return Lans.g("enumPermissions","Sheet Edit");
+				case Permissions.TaskEdit:
+					return Lans.g("enumPermissions","Task Edit");
+				case Permissions.TaskNoteEdit:
+					return Lans.g("enumPermissions","Task Note Edit");
 				case Permissions.TimecardDeleteEntry:
 					return Lans.g("enumPermissions","Timecard Delete Entry");
 				case Permissions.TimecardsEditAll:
@@ -348,22 +361,12 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Edit Treatment Plan");
 				case Permissions.UserQuery:
 					return Lans.g("enumPermissions","User Query");
-				case Permissions.ReportProdInc:
-					return Lans.g("enumPermissions","Reports - Production and Income, Aging");
-				case Permissions.ReportDashboard:
-					return Lans.g("enumPermissions","Reports - Dashboard");
-				case Permissions.TaskNoteEdit:
-					return Lans.g("enumPermissions","Task Note Edit");
-				case Permissions.WikiListSetup:
-					return Lans.g("enumPermissions","Wiki List Setup");
-				case Permissions.TaskEdit:
-					return Lans.g("enumPermissions","Task Edit");
-				case Permissions.EmailSend:
-					return Lans.g("enumPermissions","Email Send");
-				case Permissions.WebmailSend:
-					return Lans.g("enumPermissions","Webmail Send");
 				case Permissions.UserQueryAdmin:
 					return Lans.g("enumPermissions","Command Query");
+				case Permissions.WebmailSend:
+					return Lans.g("enumPermissions","Webmail Send");
+				case Permissions.WikiListSetup:
+					return Lans.g("enumPermissions","Wiki List Setup");
 			}
 			return "";//should never happen
 		}
