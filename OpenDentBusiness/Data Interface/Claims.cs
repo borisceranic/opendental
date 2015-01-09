@@ -456,8 +456,7 @@ namespace OpenDentBusiness{
 			string command="SELECT claim.ClaimNum,claim.ClaimIdentifier,claim.ClaimStatus,patient.LName,patient.FName,inssub.SubscriberID "
 				+"FROM claim "
 				+"INNER JOIN patient ON patient.PatNum=claim.PatNum "
-				+"INNER JOIN patplan ON patplan.PatNum=claim.PatNum "
-				+"INNER JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum AND claim.PlanNum=inssub.PlanNum "
+				+"INNER JOIN inssub ON inssub.InsSubNum=claim.InsSubNum AND claim.PlanNum=inssub.PlanNum "
 				+"WHERE ROUND(ClaimFee,2)="+POut.Double(claimFee)+" AND "+DbHelper.DateColumn("DateService")+">="+POut.Date(dateServiceStart)+" AND "+DbHelper.DateColumn("DateService")+"<="+POut.Date(dateServiceEnd);
 			DataTable tableClaims=Db.GetTable(command);
 			if(tableClaims.Rows.Count==0) {
