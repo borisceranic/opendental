@@ -1906,5 +1906,75 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary>Validates that insurance plan deductible adjustments only count towards the None or General deductibles.</summary>
+		public static string TestThirtyFive(int specificTest) {
+			if(specificTest != 0 && specificTest !=35) {
+				return "";
+			}
+			string suffix="35";
+			string retVal="";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateAnnualMax(plan.PlanNum,1000);
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.Diagnostic,100);
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.RoutinePreventive,100);
+			BenefitT.CreateDeductible(plan.PlanNum,EbenefitCategory.RoutinePreventive,50);
+			//There are two "general" deductibles here because the Category General and the BenCat of 0 are not the same and need to be tested seperately.
+			BenefitT.CreateDeductible(plan.PlanNum,EbenefitCategory.General,50);
+			BenefitT.CreateDeductibleGeneral(plan.PlanNum,BenefitCoverageLevel.Individual,50);
+			PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			//proc1 - PerExam
+			Procedure proc1=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.TP,"",200);
+			//proc2 - Sealant
+			Procedure proc2=ProcedureT.CreateProcedure(pat,"D1351",ProcStat.TP,"5",200);
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			//Add insurance adjustment of $150 deductible.  This allows us to check that proc2's deductible amount didn't get removed.
+			ClaimProcT.AddInsUsedAdjustment(pat.PatNum,plan.PlanNum,0,sub.InsSubNum,150);
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			Procedure[] ProcListTP=Procedures.GetListTP(ProcList);//sorted by priority, then toothnum
+			for(int i=0;i<ProcListTP.Length;i++) {
+				Procedures.ComputeEstimates(ProcListTP[i],pat.PatNum,ref claimProcs,false,planList,patPlans,benefitList,
+					histList,loopList,false,pat.Age,subList);
+				//then, add this information to loopList so that the next procedure is aware of it.
+				loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs,ProcListTP[i].ProcNum,ProcListTP[i].CodeNum));
+			}
+			//Save changes in the list to the database, just like the TP module does when loaded.
+			ClaimProcs.Synch(ref claimProcs,claimProcListOld);
+			claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			//Validate the estimates within the Edit Claim Proc window are correct when opened from inside of the TP module by passing in same histlist and loop list that the TP module would.
+			histList=ClaimProcs.GetHistList(pat.PatNum,benefitList,patPlans,planList,DateTime.Today,subList);//The history list is fetched when the TP module is loaded and is passed in the same for all claimprocs.
+			loopList=new List<ClaimProcHist>();//Always empty for the first claimproc.
+			ClaimProc claimProc1=ClaimProcs.GetEstimate(claimProcs,proc1.ProcNum,plan.PlanNum,subNum);
+			FormClaimProc formCP1=new FormClaimProc(claimProc1,proc1,fam,pat,planList,histList,ref loopList,patPlans,false,subList);
+			formCP1.Initialize();
+			string dedEst1=formCP1.GetTextValue("textDedEst");
+			if(dedEst1!="0.00") {
+				throw new Exception("Deductible estimates in Treatment Plan Procedure Grid and Claim Proc Edit Window are $"+dedEst1+" but should be $0.00 for proc1 from TP module. \r\n");
+			}
+			ClaimProc claimProc2=ClaimProcs.GetEstimate(claimProcs,proc2.ProcNum,plan.PlanNum,subNum);
+			histList=ClaimProcs.GetHistList(pat.PatNum,benefitList,patPlans,planList,DateTime.Today,subList);//The history list is fetched when the TP module is loaded and is passed in the same for all claimprocs.
+			loopList=new List<ClaimProcHist>();
+			loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs,proc1.ProcNum,proc1.CodeNum));
+			FormClaimProc formCP2=new FormClaimProc(claimProc2,proc2,fam,pat,planList,histList,ref loopList,patPlans,false,subList);
+			formCP2.Initialize();
+			string dedEst2=formCP2.GetTextValue("textDedEst");
+			if(dedEst2!="50.00") {
+				throw new Exception("Deductible estimates in Treatment Plan Procedure Grid and Claim Proc Edit Window are $"+dedEst2+" but should be $50.00 for proc2 from TP module. \r\n");
+			}
+			retVal+="35: Passed.  Insurance adjustments only apply to None and General deductibles.\r\n";
+			return retVal;
+		}
+
 	}
 }
