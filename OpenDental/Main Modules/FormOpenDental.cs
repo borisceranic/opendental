@@ -3766,13 +3766,22 @@ namespace OpenDental{
 
 		///<summary>Gives users 15 seconds to finish what they were doing before the program shuts down.</summary>
 		private void KillThread() {
-			//Application.DoEvents();
-			DateTime now=DateTime.Now;
-			while(DateTime.Now < now.AddSeconds(15)) {
-				Application.DoEvents();
-			}
-			//Thread.Sleep(30000);//30 sec
-			Application.Exit();
+			Thread.Sleep(15000);//15 seconds
+			//We have to call ProcessKillCommand with an Invoke, so that the Application.Exit()
+			//will run from the main thread and bypass all FormClosing events except 
+			//FormOpenDental.FormClosing. We need to bypass the closing events so that the closing
+			//events do not have the opportunity to prevent the program from closing.
+			Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
+		}
+
+		///<summary></summary>
+		protected delegate void ProcessKillCommandDelegate();
+
+		///<summary></summary>
+		public void ProcessKillCommand() {
+			//It is crucial that every form be forcefully closed so that they do not stay connected to a database that has been updated to a more recent version.
+			CloseOpenForms(true);
+			Application.Exit();//This will call FormOpenDental's closing event which will clean up all threads that are currently running.
 		}
 
 		private void PlaySounds(Object objSignalList){
@@ -6000,22 +6009,27 @@ namespace OpenDental{
 			dateTimeLastActivity=DateTime.Now;
 		}
 
-		private void LogOffNow() {
-			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
+		///<summary>Closes all open forms except FormOpenDental.  Set isForceClose to true if you want to ignore all potential closing events.  E.g. FormWikiEdit will ask users on closing if they are sure they want to discard unsaved work.  Returns false if there is an open form that requests attention, thus needs to stop the closing of the forms.</summary>
+		private bool CloseOpenForms(bool isForceClose) {
 			for(int f=Application.OpenForms.Count-1;f>=0;f--) {//Loop backwards so we don't get an array out of bounds error
 				if(Application.OpenForms[f]==this) {// main form
 					continue;
 				}
-				if(Plugins.HookMethod(this,"FormOpenDental.LogOffNow_loopingforms",Application.OpenForms[f])) {
-					continue;//if some criteria are met in the hook, don't close a certain form
+				//If force closing, we HAVE to forcefully close everything related to Open Dental, regardless of plugins.  Otherwise, give plugins a chance to stop the log off event.
+				if(!isForceClose) {
+					//This hook was moved into this method so that the form closing loop could be shared.
+					//It is correctly named and was not updated to say "FormOpenDental.CloseOpenForms" on purpose for backwards compatibility.
+					if(Plugins.HookMethod(this,"FormOpenDental.LogOffNow_loopingforms",Application.OpenForms[f])) {
+						continue;//if some criteria are met in the hook, don't close a certain form
+					}
 				}
 				Form openForm=Application.OpenForms[f];//Copy so we have a reference to it after we close it.
 				openForm.Hide();
 				//Currently there is no way to tell if LogOffNow got called from a user initiating the log off, or if this is the auto log off feature.
 				//Therefore, when the auto log off feature is enabled, we will forcefully close all forms because some forms might have pop ups within FormClosing prevent the form from closing.
 				//That introduces the possibility of sensitive information staying visible in the background while the program waits for user input.
-				if(PrefC.GetLong(PrefName.SecurityLogOffAfterMinutes)>0) {//If the auto-log off feature is enabled, force close all forms.
-					openForm.Dispose();
+				if(isForceClose) {
+					openForm.Dispose();//Strictly disposing of a form will not perform the closing events.
 				}
 				else {
 					//Gracefully close each window.  If a window requesting attention causes the form to stay open.  Stop the log off event because the user chose to.
@@ -6023,9 +6037,18 @@ namespace OpenDental{
 					if(openForm.IsDisposed==false) {//If the form was not closed.  
 						//E.g. The wiki edit window will ask users if they want to lose their work or continue working.  This will get hit if they chose to continue working.
 						openForm.Show();//Show that form again
-						return;//Stop logging off
+						return false;//This form needs to stay open and stop all other forms from being closed.
 					}
 				}
+			}
+			return true;//All open forms have been closed at this point.
+		}
+
+		private void LogOffNow() {
+			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
+			bool isForceClose=PrefC.GetLong(PrefName.SecurityLogOffAfterMinutes)>0;
+			if(!CloseOpenForms(isForceClose)) {
+				return;//A form is still open.  Do not continue to log the user off.
 			}
 			LastModule=myOutlookBar.SelectedIndex;
 			myOutlookBar.SelectedIndex=-1;
