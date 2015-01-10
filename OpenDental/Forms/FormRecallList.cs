@@ -1069,19 +1069,22 @@ namespace OpenDental{
 					Process.Start(Recalls.GetWebSchedulerURL());
 				}
 				catch(Exception) {
-					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
+					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply do nothing.
 				}
-				//Now take them to the eService Setup window so that they can click the Enable button if they are signed up.
+				//Automatically open the eService Setup window so that they can easily click the Enable button if they call us to sign up or are already signed up and just need to enable it.
 				FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.WebScheduler);
 				FormESS.ShowDialog();
-				//User could have enabled the web scheduler right here, only return if they still do not have the feature enabled.
 				if(!PrefC.GetBool(PrefName.WebSchedulerService)) {
-					return;//No need to waste the time calling our web service.
+					//User might not have enabled the web scheduler.
+					//No need to waste the time calling our web service if they didn't enable it.
+					return;
 				}
 			}
-			//Send off a web request to  WebServiceCustomersUpdates to verify that the office is valid and is paying for the eService.  
+			//Either the web scheduler service was enabled or they just enabled it.
+			//Send off a web request to  WebServiceCustomersUpdates to verify that the office is still valid and is currently paying for the eService.  
 			Cursor.Current=Cursors.WaitCursor;
-			#region Web Service Settings
+			StringBuilder strbuild=new StringBuilder();
+			#region Web Service Call
 #if DEBUG
 			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
 #else
@@ -1097,7 +1100,6 @@ namespace OpenDental{
 			XmlWriterSettings settings = new XmlWriterSettings();
 			settings.Indent = true;
 			settings.IndentChars = ("    ");
-			StringBuilder strbuild=new StringBuilder();
 			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
 				writer.WriteStartElement("RegistrationKey");
 				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
@@ -1128,10 +1130,10 @@ namespace OpenDental{
 					Process.Start(Recalls.GetWebSchedulerURL());
 				}
 				catch(Exception) {
-					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
+					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply do nothing.
 				}
 			}
-			//For every error message returned, we'll simply show it to the user in a pop up.
+			//For every error message returned, we'll show it to the user in a pop up.
 			MessageBox.Show(error);
 			#endregion
 		}

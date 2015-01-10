@@ -72,10 +72,10 @@ namespace OpenDental {
 			//CreateAppointments(5);
 			#endregion
 			#region web scheduler
-			labelRecallSchedEnable.Text="";
+			labelWebSchedEnable.Text="";
 			if(PrefC.GetBool(PrefName.WebSchedulerService)) {
-				butRecallSchedEnable.Enabled=false;
-				labelRecallSchedEnable.Text=Lan.g(this,"Web scheduler service is currently enabled.");
+				butWebSchedEnable.Enabled=false;
+				labelWebSchedEnable.Text=Lan.g(this,"Web scheduler service is currently enabled.");
 			}
 			#endregion
 			SetControlEnabledState();
@@ -771,7 +771,7 @@ namespace OpenDental {
 		#endregion
 
 		#region web scheduler
-		private void butRecallSchedEnable_Click(object sender,EventArgs e) {
+		private void butWebSchedEnable_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
 			}
@@ -805,9 +805,9 @@ namespace OpenDental {
 			string error="";
 			int errorCode=0;
 			if(Recalls.IsWebSchedulerResponseValid(result,out error,out errorCode)) {
-				//Everything went good, the office is active on support and has an active web scheduler repeating charge.
-				butRecallSchedEnable.Enabled=false;
-				labelRecallSchedEnable.Text=Lan.g(this,"Web scheduler service has been enabled.");
+				//Everything went good, the office is actively on support and has an active WebSched repeating charge.
+				butWebSchedEnable.Enabled=false;
+				labelWebSchedEnable.Text=Lan.g(this,"Web scheduler service has been enabled.");
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
 				if(Prefs.UpdateBool(PrefName.WebSchedulerService,true)) {
 					_changed=true;
@@ -816,7 +816,7 @@ namespace OpenDental {
 				return;
 			}
 			#region Error Handling
-			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the web scheduler service.
 			if(errorCode==110) {//Customer not registered for WebSched monthly service
 				//We want to launch our web scheduler page if the user is not signed up:
 				try {
@@ -826,26 +826,44 @@ namespace OpenDental {
 					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
 				}
 				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
-				labelRecallSchedEnable.Text=error;
+				labelWebSchedEnable.Text=error;
 				return;
 			}
 			else if(errorCode==120) {
-				labelRecallSchedEnable.Text=error;
+				labelWebSchedEnable.Text=error;
 				return;
 			}
 			//For every other error message returned, we'll simply show a generic error in the label and display the detailed error in a pop up.
-			labelRecallSchedEnable.Text=Lan.g(this,"There was a problem enabling the web scheduler.  Please give us a call or try again.");
+			labelWebSchedEnable.Text=Lan.g(this,"There was a problem enabling the web scheduler.  Please give us a call or try again.");
 			MessageBox.Show(error);
 			#endregion
 		}
 
-		private void butRecallSchedSetup_Click(object sender,EventArgs e) {
+		private void butWebSchedSetup_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
 			}
 			FormRecallSetup FormRS=new FormRecallSetup();
 			FormRS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall");
+		}
+
+		private void butRecallTypes_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormRecallTypes FormRT=new FormRecallTypes();
+			FormRT.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Types");
+		}
+
+		private void butOperatories_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormOperatories FormO=new FormOperatories();
+			FormO.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Operatories");
 		}
 		#endregion
 

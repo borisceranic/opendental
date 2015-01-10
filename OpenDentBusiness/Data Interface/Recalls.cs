@@ -1149,7 +1149,7 @@ namespace OpenDentBusiness{
 				return true;
 			}
 			#region Error Handling
-			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable 
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the web scheduler.
 			XmlNode nodeError=doc.SelectSingleNode("//Error");
 			XmlNode nodeErrorCode=doc.SelectSingleNode("//ErrorCode");
 			if(nodeError==null || nodeErrorCode==null) {
@@ -1158,8 +1158,8 @@ namespace OpenDentBusiness{
 				errorCode=120;
 				return false;
 			}
-			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for WebScheduler monthly service", etc.
-			if(nodeErrorCode.InnerText=="110") {//Customer not registered for WebScheduler monthly service
+			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for WebSched monthly service", etc.
+			if(nodeErrorCode.InnerText=="110") {//Customer not registered for WebSched monthly service
 				error=Lans.g("Recalls","Please give us a call or visit our web page to see more information about signing up for this service.")
 					+"\r\n"+Recalls.GetWebSchedulerURL();
 				errorCode=110;

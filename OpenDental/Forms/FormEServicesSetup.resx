@@ -140,6 +140,11 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
+  <data name="labelWebSchedDesc.Text" xml:space="preserve">
+    <value>The Web Scheduler is an easy way for your patients to schedule their recall appointments.  Use the new Patient Viewer Web Sched button in the Recall List window in order to send emails to patients with a link that they can click on to quickly schedule their recall appointment directly into your schedule.  This service requires that you have our OpenDentalCustListener installed.  
+
+For more information, see our online manual.</value>
+  </data>
   <data name="label12.Text" xml:space="preserve">
     <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
