@@ -58,7 +58,9 @@ namespace OpenDentBusiness{
 		///<summary>4</summary>
 		InPerson,
 		///<summary>5</summary>
-		Text
+		Text,
+		///<summary>6</summary>
+		WebSched
 	}
 
 	///<summary>0=neither, 1=sent, 2=received.</summary>

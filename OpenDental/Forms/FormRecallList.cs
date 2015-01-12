@@ -1328,15 +1328,7 @@ namespace OpenDental{
 				emailMessage.Subject=emailSubject;
 				emailMessage.BodyText=emailBody;
 				try {
-					//TODO: uncomment once done testing.
-					//EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
-					//TODO remove section after testing complete.
-					string test="From: "+emailMessage.FromAddress+"\r\n"
-						+"To: "+emailMessage.ToAddress+"\r\n"
-						+"Subject: "+emailMessage.Subject+"\r\n"
-						+"Body: "+emailMessage.BodyText;
-					MsgBoxCopyPaste MsgBoxCP=new MsgBoxCopyPaste(test);
-					MsgBoxCP.Show();
+					EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
 				}
 				catch(Exception ex) {
 					Cursor=Cursors.Default;
@@ -1352,9 +1344,9 @@ namespace OpenDental{
 				EmailMessages.Insert(emailMessage);
 				#endregion
 				#region Insert Commlog
-				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
+				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.WebSched,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
 					PrefC.GetLong(PrefName.RecallStatusEmailed));
-				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));//TODO: ask Nathan if he wants a web scheduler status?
+				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));
 				#endregion
 			}
 			FillMain(null);
