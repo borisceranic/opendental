@@ -775,6 +775,8 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
 			}
+			labelWebSchedEnable.Text="";
+			Application.DoEvents();
 			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
 			Cursor.Current=Cursors.WaitCursor;
 			#region Web Service Settings
@@ -800,14 +802,20 @@ namespace OpenDental {
 				writer.WriteEndElement();
 			}
 			#endregion
-			string result=updateService.ValidateWebScheduler(strbuild.ToString());
+			string result="";
+			try {
+				result=updateService.ValidateWebScheduler(strbuild.ToString());
+			}
+			catch {
+				//Our service might be down or the client might not be connected to the internet or the transmission got cut off somehow.
+			}
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
 			if(Recalls.IsWebSchedulerResponseValid(result,out error,out errorCode)) {
 				//Everything went good, the office is actively on support and has an active WebSched repeating charge.
 				butWebSchedEnable.Enabled=false;
-				labelWebSchedEnable.Text=Lan.g(this,"Web scheduler service has been enabled.");
+				labelWebSchedEnable.Text=Lan.g(this,"The web scheduler service has been enabled.");
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
 				if(Prefs.UpdateBool(PrefName.WebSchedulerService,true)) {
 					_changed=true;
