@@ -665,7 +665,7 @@ namespace OpenDental{
 			// 
 			// label22
 			// 
-			this.label22.Location = new System.Drawing.Point(120, 179);
+			this.label22.Location = new System.Drawing.Point(120, 173);
 			this.label22.Name = "label22";
 			this.label22.Size = new System.Drawing.Size(632, 18);
 			this.label22.TabIndex = 251;
@@ -679,7 +679,7 @@ namespace OpenDental{
 			this.butOperatories.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOperatories.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOperatories.CornerRadius = 4F;
-			this.butOperatories.Location = new System.Drawing.Point(9, 173);
+			this.butOperatories.Location = new System.Drawing.Point(9, 167);
 			this.butOperatories.Name = "butOperatories";
 			this.butOperatories.Size = new System.Drawing.Size(103, 24);
 			this.butOperatories.TabIndex = 250;
@@ -711,7 +711,7 @@ namespace OpenDental{
 			// 
 			// label20
 			// 
-			this.label20.Location = new System.Drawing.Point(120, 69);
+			this.label20.Location = new System.Drawing.Point(120, 73);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(632, 18);
 			this.label20.TabIndex = 247;
@@ -725,7 +725,8 @@ namespace OpenDental{
 			this.labelRecallMessage.Size = new System.Drawing.Size(746, 30);
 			this.labelRecallMessage.TabIndex = 246;
 			this.labelRecallMessage.Text = "The web scheduler uses settings from several different places in the program.\r\nHe" +
-    "re are some shortcuts to get to those places to fine tune your web scheduler.";
+    "re are some shortcuts to get to those places that allow fine tuning of your web " +
+    "scheduler.";
 			// 
 			// butRecallSchedSetup
 			// 
@@ -734,7 +735,7 @@ namespace OpenDental{
 			this.butRecallSchedSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRecallSchedSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRecallSchedSetup.CornerRadius = 4F;
-			this.butRecallSchedSetup.Location = new System.Drawing.Point(9, 63);
+			this.butRecallSchedSetup.Location = new System.Drawing.Point(9, 67);
 			this.butRecallSchedSetup.Name = "butRecallSchedSetup";
 			this.butRecallSchedSetup.Size = new System.Drawing.Size(103, 24);
 			this.butRecallSchedSetup.TabIndex = 243;
@@ -748,7 +749,7 @@ namespace OpenDental{
 			this.butWebSchedEnable.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butWebSchedEnable.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butWebSchedEnable.CornerRadius = 4F;
-			this.butWebSchedEnable.Location = new System.Drawing.Point(102, 105);
+			this.butWebSchedEnable.Location = new System.Drawing.Point(102, 116);
 			this.butWebSchedEnable.Name = "butWebSchedEnable";
 			this.butWebSchedEnable.Size = new System.Drawing.Size(102, 24);
 			this.butWebSchedEnable.TabIndex = 246;
@@ -757,9 +758,9 @@ namespace OpenDental{
 			// 
 			// labelWebSchedEnable
 			// 
-			this.labelWebSchedEnable.Location = new System.Drawing.Point(93, 132);
+			this.labelWebSchedEnable.Location = new System.Drawing.Point(93, 143);
 			this.labelWebSchedEnable.Name = "labelWebSchedEnable";
-			this.labelWebSchedEnable.Size = new System.Drawing.Size(758, 52);
+			this.labelWebSchedEnable.Size = new System.Drawing.Size(758, 41);
 			this.labelWebSchedEnable.TabIndex = 245;
 			this.labelWebSchedEnable.Text = "labelWebSchedEnable";
 			// 
@@ -767,7 +768,7 @@ namespace OpenDental{
 			// 
 			this.labelWebSchedDesc.Location = new System.Drawing.Point(93, 12);
 			this.labelWebSchedDesc.Name = "labelWebSchedDesc";
-			this.labelWebSchedDesc.Size = new System.Drawing.Size(758, 90);
+			this.labelWebSchedDesc.Size = new System.Drawing.Size(758, 101);
 			this.labelWebSchedDesc.TabIndex = 52;
 			this.labelWebSchedDesc.Text = resources.GetString("labelWebSchedDesc.Text");
 			// 
