@@ -305,6 +305,9 @@ namespace OpenDental{
 		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
 		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
+		private ContextMenu menuClinic;
+		///<summary>This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
+		private long _clinicNum=0;
 		///<summary>Will be set to true if the STOP SLAVE SQL was run on the replication server for which the local replication monitor is watching.
 		///Replicaiton is NOT broken when this flag is true, because the user can re-enable replicaiton using the START SLAVE SQL without any ill effects.
 		///This flag is used to display a warning to the user, but will not ever block the user from using OD.</summary>
@@ -589,6 +592,7 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
+			this.menuClinic = new System.Windows.Forms.ContextMenu();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -1800,6 +1804,10 @@ namespace OpenDental{
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
 			// 
+			// menuClinic
+			// 
+			this.menuClinic.Popup += new System.EventHandler(this.menuClinic_Popup);
+			// 
 			// FormOpenDental
 			// 
 			this.ClientSize = new System.Drawing.Size(982, 550);
@@ -2195,6 +2203,18 @@ namespace OpenDental{
 			//		}
 			//	#endif
 			//}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(Security.CurUser!=null) {
+					_clinicNum=Security.CurUser.ClinicNum;
+				}
+				if(_clinicNum==0) {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+				}
+				else {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(_clinicNum);
+				}
+			}
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),_clinicNum);
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
 			timerReplicationMonitor.Enabled=true;
@@ -2636,6 +2656,12 @@ namespace OpenDental{
 				ToolBarMain.Buttons.Add(button);
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Popups"),-1,Lan.g(this,"Edit popups for this patient"),"Popups"));
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				button=new ODToolBarButton(Lan.g(this,"Clinic"),-1,Lan.g(this,"Select the Current Clinic"),"Clinic");
+				button.Style=ODToolBarButtonStyle.DropDownButton;
+				button.DropDownMenu=menuClinic;
+				ToolBarMain.Buttons.Add(button);
+			}
 			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.AllModules);
 			for(int i=0;i<toolButItems.Count;i++) {
 			  //ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
@@ -2688,6 +2714,9 @@ namespace OpenDental{
 					case "Popups":
 						OnPopups_Click();
 						break;
+					case "Clinic":
+						OnClinic_Click();
+						break;
 				}
 			}
 			else if(e.Button.Tag.GetType()==typeof(long)) {
@@ -2697,6 +2726,7 @@ namespace OpenDental{
 
 		private void OnPatient_Click() {
 			FormPatientSelect formPS=new FormPatientSelect();
+			formPS.ClinicNum=_clinicNum;
 			formPS.ShowDialog();
 			if(formPS.DialogResult==DialogResult.OK) {
 				CurPatNum=formPS.SelectedPatNum;
@@ -2783,7 +2813,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Popups"].Enabled=true;
 			}
 			ToolBarMain.Invalidate();
-			Text=PatientL.GetMainTitle(pat);
+			Text=PatientL.GetMainTitle(pat,_clinicNum);
 			if(PopupEventList==null){
 				PopupEventList=new List<PopupEvent>();
 			}
@@ -3188,6 +3218,51 @@ namespace OpenDental{
 			}
 		}
 
+		private void OnClinic_Click() {
+			MsgBox.Show(this,"Please use the dropdown list.");
+		}
+
+		private void menuClinic_Popup(object sender,EventArgs e) {
+			//Clinic dropdown will be disabled if the current user is restricted to a single clinic
+			menuClinic.MenuItems.Clear();
+			MenuItem menuItem;
+			List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
+			if(!Security.CurUser.ClinicIsRestricted) {
+				menuItem=new MenuItem(Lan.g(this,"Unassigned"),menuClinic_Click);
+				menuItem.Tag=new Clinic();//selecting Unassigned will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
+				if(_clinicNum==0) {
+					menuItem.Checked=true;
+				}
+				menuClinic.MenuItems.Add(menuItem);
+				menuClinic.MenuItems.Add("-");
+			}
+			for(int i=0;i<listClinics.Count;i++) {
+				menuItem=new MenuItem(listClinics[i].Description,menuClinic_Click);
+				menuItem.Tag=listClinics[i];
+				if(_clinicNum==listClinics[i].ClinicNum) {
+					menuItem.Checked=true;
+				}
+				menuClinic.MenuItems.Add(menuItem);
+			}
+		}
+
+		///<summary>This is used to set the private class wide variable _clinicNum, sets the clinic button.ToolTipText, and refreshes the current module.</summary>
+		private void menuClinic_Click(object sender,System.EventArgs e) {
+			if(((MenuItem)sender).Tag==null) {
+				return;
+			}
+			Clinic clinicCur=(Clinic)((MenuItem)sender).Tag;
+			_clinicNum=clinicCur.ClinicNum;
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),_clinicNum);
+			if(_clinicNum==0) {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+			}
+			else {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(_clinicNum);
+			}
+			RefreshCurrentModule();
+		}
+		
 		private void FormOpenDental_Resize(object sender,EventArgs e) {
 			LayoutControls();
 			if(Plugins.PluginsAreLoaded) {
@@ -4956,6 +5031,15 @@ namespace OpenDental{
 			FormSecurity FormS=new FormSecurity(); 
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
+			_clinicNum=Security.CurUser.ClinicNum;
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),_clinicNum);
+			if(_clinicNum==0) {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+			}
+			else {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(_clinicNum);
+			}
+			RefreshCurrentModule();
 		}
 
 		private void menuItemSheets_Click(object sender,EventArgs e) {
@@ -5012,6 +5096,20 @@ namespace OpenDental{
 			FormClinics FormC=new FormClinics();
 			FormC.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Clinics");
+			//this menu item is only visible if the clinics show feature is enabled (!EasyNoClinics)
+			if(Clinics.GetDesc(_clinicNum)=="") {//will be empty string if _clinicNum is not valid, in case they deleted the clinic
+				_clinicNum=Security.CurUser.ClinicNum;
+			}
+			//reset the main title bar in case the user changes the clinic description for the selected clinic
+			Patient pat=Patients.GetPat(CurPatNum);
+			Text=PatientL.GetMainTitle(pat,_clinicNum);
+			//reset the tip text in case the user changes the clinic description
+			if(_clinicNum==0) {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+			}
+			else {
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(_clinicNum);
+			}
 		}
 		
 		private void menuItemContacts_Click(object sender, System.EventArgs e) {
@@ -5709,13 +5807,8 @@ namespace OpenDental{
 				myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 				myOutlookBar.Invalidate();
 				SetModuleSelected();
-				if(CurPatNum==0) {
-					Text=PatientL.GetMainTitle(null);
-				}
-				else {
-					Patient pat=Patients.GetPat(CurPatNum);
-					Text=PatientL.GetMainTitle(pat);
-				}
+				Patient pat=Patients.GetPat(CurPatNum);//pat could be null
+				Text=PatientL.GetMainTitle(pat,_clinicNum);//handles pat==null by not displaying pat name in title bar
 				if(userControlTasks1.Visible) {
 					userControlTasks1.InitializeOnStartup();
 				}
@@ -6069,7 +6162,8 @@ namespace OpenDental{
 			}
 			Userod oldUser=Security.CurUser;
 			Security.CurUser=null;
-			Text=PatientL.GetMainTitle(null);
+			_clinicNum=0;
+			Text=PatientL.GetMainTitle(null,_clinicNum);
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Security.CurUser=oldUser;//so that the queries in FormLogOn() will work for the web service, since the web service requires a valid user to run queries.
 			}
@@ -6079,16 +6173,18 @@ namespace OpenDental{
 				Application.Exit();
 				return;
 			}
+			//If a different user logs on and they have clinics enabled, then clear the patient drop down history
+			//since the current user may not have permission to access patients from the same clinic(s) as the old user
+			if(oldUser.UserNum!=Security.CurUser.UserNum && !PrefC.GetBool(PrefName.EasyNoClinics)) {
+				CurPatNum=0;
+				PatientL.RemoveAllFromMenu(menuPatient);
+			}
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
 			SetModuleSelected();
-			if(CurPatNum==0) {
-				Text=PatientL.GetMainTitle(null);
-			}
-			else {
-				Patient pat=Patients.GetPat(CurPatNum);
-				Text=PatientL.GetMainTitle(pat);
-			}
+			_clinicNum=Security.CurUser.ClinicNum;
+			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
+			Text=PatientL.GetMainTitle(pat,_clinicNum);//handles pat==null by not displaying pat name in title bar
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
@@ -6201,13 +6297,8 @@ namespace OpenDental{
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
 			SetModuleSelected();
-			if(CurPatNum==0) {
-				Text=PatientL.GetMainTitle(null);
-			}
-			else {
-				Patient pat=Patients.GetPat(CurPatNum);
-				Text=PatientL.GetMainTitle(pat);
-			}
+			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
+			Text=PatientL.GetMainTitle(pat,_clinicNum);//handles pat==null by not displaying pat name in title bar
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}

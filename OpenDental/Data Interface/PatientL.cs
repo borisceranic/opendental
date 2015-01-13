@@ -24,6 +24,13 @@ namespace OpenDental{
 			buttonLastFiveNames.Remove(nameLF);
 		}
 
+		///<summary>Removes all patients from the dropdown menu and from the history.  Only used when a user logs off and a different user logs on.  Important for enterprise customers with clinic restrictions for users.</summary>
+		public static void RemoveAllFromMenu(ContextMenu menu) {
+			menu.MenuItems.Clear();
+			buttonLastFivePatNums.Clear();
+			buttonLastFiveNames.Clear();
+		}
+
 		///<summary>The current patient will already be on the button.  This adds the family members when user clicks dropdown arrow. Can handle null values for pat and fam.  Need to supply the menu to fill as well as the EventHandler to set for each item (all the same).</summary>
 		public static void AddFamilyToMenu(ContextMenu menu,EventHandler onClick,long patNum,Family fam) {
 			//No need to check RemotingRole; no call to db.
@@ -86,12 +93,15 @@ namespace OpenDental{
 			return fam.ListPats[index-buttonLastFivePatNums.Count-2].PatNum;
 		}
 
-		///<summary>Accepts null.</summary>
-		public static string GetMainTitle(Patient pat) {
+		///<summary>Accepts null for pat and 0 for clinicNum.</summary>
+		public static string GetMainTitle(Patient pat,long clinicNum) {
 			string retVal=PrefC.GetString(PrefName.MainWindowTitle);
 			object[] parameters = { retVal };
 			Plugins.HookAddCode(null,"PatientL.GetMainTitle_beginning",parameters);
-			retVal = (string)parameters[0];  
+			retVal = (string)parameters[0];
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && clinicNum>0) {
+				retVal+=" - "+Clinics.GetDesc(clinicNum);
+			}
 			if(Security.CurUser!=null){
 				retVal+=" {"+Security.CurUser.UserName+"}";
 			}
