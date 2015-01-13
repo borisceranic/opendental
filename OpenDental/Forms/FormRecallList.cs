@@ -1149,13 +1149,11 @@ namespace OpenDental{
 				MsgBox.Show(this,"You need to enter an SMTP server name in e-mail setup before you can send e-mail.");
 				return;
 			}
-			if(PrefC.GetLong(PrefName.RecallStatusEmailed)==0){//TODO: Ask Nathan if we want to have a separate status; RecallStatusWebSched?
-				MsgBox.Show(this,"You need to set a status first in the Recall Setup window.");
+			if(PrefC.GetLong(PrefName.RecallStatusEmailed)==0){
+				MsgBox.Show(this,"You need to set an email status first in the Recall Setup window.");
 				return;
 			}
 			if(gridMain.SelectedIndices.Length==0) {
-				//TODO: Ask Nathan if we want to make sure the preferred contact method is email?
-				//TODO: Are we going to simply loop through the list and select all patients with an email address entered?
 				ContactMethod cmeth;
 				for(int i=0;i<table.Rows.Count;i++) {
 					cmeth=(ContactMethod)PIn.Long(table.Rows[i]["PreferRecallMethod"].ToString());
