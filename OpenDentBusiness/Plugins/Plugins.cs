@@ -126,6 +126,10 @@ namespace OpenDentBusiness {
 			if(PluginList==null && RemotingClient.RemotingRole==RemotingRole.ServerWeb) {//on middle tier server.
 				LoadAllPlugins(null);
 			}
+			//Plugins are not currently supported with the GWT web service.
+			if(PluginList==null) {
+				return;//Fail silently if plugins could not be loaded.
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				//if there are multiple plugins, we run them all
 				PluginList[i].Plugin.HookAddCode(sender,hookName,parameters);
