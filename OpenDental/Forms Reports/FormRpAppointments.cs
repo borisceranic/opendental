@@ -225,7 +225,7 @@ namespace OpenDental
 			this.checkShowWebSched.Name = "checkShowWebSched";
 			this.checkShowWebSched.Size = new System.Drawing.Size(248, 18);
 			this.checkShowWebSched.TabIndex = 46;
-			this.checkShowWebSched.Text = "Only show web scheduler appointments.";
+			this.checkShowWebSched.Text = "Only show Web Sched appointments.";
 			// 
 			// FormRpAppointments
 			// 
@@ -326,7 +326,7 @@ namespace OpenDental
 			whereProv += ")) ";
 			string innerJoinWebSched="";
 			if(checkShowWebSched.Checked) {
-				//Filter the results with an inner join on the securitylog table so that only appointments created by the web scheduler are shown in the results.
+				//Filter the results with an inner join on the securitylog table so that only appointments created by the Web Sched are shown in the results.
 				innerJoinWebSched=" INNER JOIN securitylog ON appointment.AptNum=securitylog.FKey"
 					+" AND securitylog.LogSource="+POut.Int((int)LogSources.WebSched)
 					+" AND securitylog.PermType="+POut.Int((int)Permissions.AppointmentCreate)+" ";

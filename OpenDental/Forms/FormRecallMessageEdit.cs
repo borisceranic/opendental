@@ -25,7 +25,7 @@ namespace OpenDental {
 				|| _prefName==PrefName.RecallEmailSubject
 				|| _prefName==PrefName.RecallEmailSubject2
 				|| _prefName==PrefName.RecallEmailSubject3
-				|| _prefName==PrefName.WebSchedulerSubject) 
+				|| _prefName==PrefName.WebSchedSubject) 
 			{
 				if(textMain.Text.Length>200) {
 					MsgBox.Show(this,"Email subjects cannot be longer than 200 characters.");

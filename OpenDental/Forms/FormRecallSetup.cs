@@ -715,16 +715,16 @@ namespace OpenDental{
 			row.Cells.Add("1");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Subject line.  Available variables")+": [NameF]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerSubject));
-			row.Tag="WebSchedulerSubject";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedSubject));
+			row.Tag="WebSchedSubject";
 			gridMain.Rows.Add(row);
 			//
 			row=new ODGridRow();
 			row.Cells.Add("1");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerMessage));
-			row.Tag="WebSchedulerMessage";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedMessage));
+			row.Tag="WebSchedMessage";
 			gridMain.Rows.Add(row);
 			#endregion
 			#region 2nd Reminder
@@ -774,16 +774,16 @@ namespace OpenDental{
 			row.Cells.Add("2");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Subject line.  Available variables")+": [NameF]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerSubject2));
-			row.Tag="WebSchedulerSubject2";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedSubject2));
+			row.Tag="WebSchedSubject2";
 			gridMain.Rows.Add(row);
 			//
 			row=new ODGridRow();
 			row.Cells.Add("2");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerMessage2));
-			row.Tag="WebSchedulerMessage2";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedMessage2));
+			row.Tag="WebSchedMessage2";
 			gridMain.Rows.Add(row);
 			#endregion
 			#region 3rd Reminder
@@ -833,16 +833,16 @@ namespace OpenDental{
 			row.Cells.Add("3");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Subject line.  Available variables")+": [NameF]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerSubject3));
-			row.Tag="WebSchedulerSubject3";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedSubject3));
+			row.Tag="WebSchedSubject3";
 			gridMain.Rows.Add(row);
 			//
 			row=new ODGridRow();
 			row.Cells.Add("3");
 			row.Cells.Add(Lan.g(this,"WebSched"));
 			row.Cells.Add(Lan.g(this,"Available variables")+": [NameF], [DueDate], [OfficePhone], [URL]");
-			row.Cells.Add(PrefC.GetString(PrefName.WebSchedulerMessage3));
-			row.Tag="WebSchedulerMessage3";
+			row.Cells.Add(PrefC.GetString(PrefName.WebSchedMessage3));
+			row.Tag="WebSchedMessage3";
 			gridMain.Rows.Add(row);
 			#endregion
 			#region Confirmation

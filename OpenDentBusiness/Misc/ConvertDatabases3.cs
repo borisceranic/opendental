@@ -6409,64 +6409,64 @@ namespace OpenDentBusiness {
 				string pw=PIn.String(Db.GetScalar(command));
 				command="UPDATE programproperty SET PropertyValue='"+Encrypt(pw)+"' WHERE ProgramNum="+POut.Long(ProgramNum)+" AND PropertyDesc='Password'";//Oracle doesn't have any rescrictions with this query.
 				Db.NonQ(command);
-				//Web scheduler preferences-----------
+				//Web Sched preferences-----------
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerService','0')";//Service will be off by default
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedService','0')";//Service will be off by default
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerService','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedService','0')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerSubject','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedSubject','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerSubject','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedSubject','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerMessage','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedMessage','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerMessage','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedMessage','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerSubject2','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedSubject2','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerSubject2','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedSubject2','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerMessage2','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedMessage2','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerMessage2','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedMessage2','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerSubject3','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedSubject3','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerSubject3','Dental Care Reminder for [NameF]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedSubject3','Dental Care Reminder for [NameF]')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedulerMessage3','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedMessage3','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedulerMessage3','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedMessage3','You or your family member is due for a regular dental check-up on [DueDate].  Please visit our online scheduler link below or call our office today at [OfficePhone] in order to schedule your appointment.\r\n[URL]')";
 					Db.NonQ(command);
 				}
-				//End web scheduler preferences------
+				//End Web Sched preferences------
 				try {
 					if(DataConnection.DBtype==DatabaseType.MySql) {
 						//This index was added to the primary key of the table in To6_1_1() when the table was created.

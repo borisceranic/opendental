@@ -65,9 +65,9 @@ namespace OpenDental.customerUpdates {
         
         private System.Threading.SendOrPostCallback ValidatePatientPortalOfficeOperationCompleted;
         
-        private System.Threading.SendOrPostCallback ValidateWebSchedulerOperationCompleted;
+        private System.Threading.SendOrPostCallback ValidateWebSchedOperationCompleted;
         
-        private System.Threading.SendOrPostCallback GetWebSchedulerURLsOperationCompleted;
+        private System.Threading.SendOrPostCallback GetWebSchedURLsOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidateResellerCredentialsOperationCompleted;
         
@@ -164,10 +164,10 @@ namespace OpenDental.customerUpdates {
         public event ValidatePatientPortalOfficeCompletedEventHandler ValidatePatientPortalOfficeCompleted;
         
         /// <remarks/>
-        public event ValidateWebSchedulerCompletedEventHandler ValidateWebSchedulerCompleted;
+        public event ValidateWebSchedCompletedEventHandler ValidateWebSchedCompleted;
         
         /// <remarks/>
-        public event GetWebSchedulerURLsCompletedEventHandler GetWebSchedulerURLsCompleted;
+        public event GetWebSchedURLsCompletedEventHandler GetWebSchedURLsCompleted;
         
         /// <remarks/>
         public event ValidateResellerCredentialsCompletedEventHandler ValidateResellerCredentialsCompleted;
@@ -692,60 +692,60 @@ namespace OpenDental.customerUpdates {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateWebScheduler", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string ValidateWebScheduler(string officeData) {
-            object[] results = this.Invoke("ValidateWebScheduler", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/ValidateWebSched", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ValidateWebSched(string officeData) {
+            object[] results = this.Invoke("ValidateWebSched", new object[] {
                         officeData});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void ValidateWebSchedulerAsync(string officeData) {
-            this.ValidateWebSchedulerAsync(officeData, null);
+        public void ValidateWebSchedAsync(string officeData) {
+            this.ValidateWebSchedAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void ValidateWebSchedulerAsync(string officeData, object userState) {
-            if ((this.ValidateWebSchedulerOperationCompleted == null)) {
-                this.ValidateWebSchedulerOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateWebSchedulerOperationCompleted);
+        public void ValidateWebSchedAsync(string officeData, object userState) {
+            if ((this.ValidateWebSchedOperationCompleted == null)) {
+                this.ValidateWebSchedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateWebSchedOperationCompleted);
             }
-            this.InvokeAsync("ValidateWebScheduler", new object[] {
-                        officeData}, this.ValidateWebSchedulerOperationCompleted, userState);
+            this.InvokeAsync("ValidateWebSched", new object[] {
+                        officeData}, this.ValidateWebSchedOperationCompleted, userState);
         }
         
-        private void OnValidateWebSchedulerOperationCompleted(object arg) {
-            if ((this.ValidateWebSchedulerCompleted != null)) {
+        private void OnValidateWebSchedOperationCompleted(object arg) {
+            if ((this.ValidateWebSchedCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.ValidateWebSchedulerCompleted(this, new ValidateWebSchedulerCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.ValidateWebSchedCompleted(this, new ValidateWebSchedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/GetWebSchedulerURLs", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetWebSchedulerURLs(string officeData) {
-            object[] results = this.Invoke("GetWebSchedulerURLs", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://open-dent.com/GetWebSchedURLs", RequestNamespace="http://open-dent.com/", ResponseNamespace="http://open-dent.com/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetWebSchedURLs(string officeData) {
+            object[] results = this.Invoke("GetWebSchedURLs", new object[] {
                         officeData});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void GetWebSchedulerURLsAsync(string officeData) {
-            this.GetWebSchedulerURLsAsync(officeData, null);
+        public void GetWebSchedURLsAsync(string officeData) {
+            this.GetWebSchedURLsAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void GetWebSchedulerURLsAsync(string officeData, object userState) {
-            if ((this.GetWebSchedulerURLsOperationCompleted == null)) {
-                this.GetWebSchedulerURLsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetWebSchedulerURLsOperationCompleted);
+        public void GetWebSchedURLsAsync(string officeData, object userState) {
+            if ((this.GetWebSchedURLsOperationCompleted == null)) {
+                this.GetWebSchedURLsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetWebSchedURLsOperationCompleted);
             }
-            this.InvokeAsync("GetWebSchedulerURLs", new object[] {
-                        officeData}, this.GetWebSchedulerURLsOperationCompleted, userState);
+            this.InvokeAsync("GetWebSchedURLs", new object[] {
+                        officeData}, this.GetWebSchedURLsOperationCompleted, userState);
         }
         
-        private void OnGetWebSchedulerURLsOperationCompleted(object arg) {
-            if ((this.GetWebSchedulerURLsCompleted != null)) {
+        private void OnGetWebSchedURLsOperationCompleted(object arg) {
+            if ((this.GetWebSchedURLsCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetWebSchedulerURLsCompleted(this, new GetWebSchedulerURLsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.GetWebSchedURLsCompleted(this, new GetWebSchedURLsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -1245,17 +1245,17 @@ namespace OpenDental.customerUpdates {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.33440")]
-    public delegate void ValidateWebSchedulerCompletedEventHandler(object sender, ValidateWebSchedulerCompletedEventArgs e);
+    public delegate void ValidateWebSchedCompletedEventHandler(object sender, ValidateWebSchedCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ValidateWebSchedulerCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class ValidateWebSchedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal ValidateWebSchedulerCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal ValidateWebSchedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -1271,17 +1271,17 @@ namespace OpenDental.customerUpdates {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.33440")]
-    public delegate void GetWebSchedulerURLsCompletedEventHandler(object sender, GetWebSchedulerURLsCompletedEventArgs e);
+    public delegate void GetWebSchedURLsCompletedEventHandler(object sender, GetWebSchedURLsCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetWebSchedulerURLsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class GetWebSchedURLsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal GetWebSchedulerURLsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal GetWebSchedURLsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

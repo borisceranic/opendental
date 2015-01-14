@@ -42,8 +42,8 @@ namespace OpenDental {
 				case EService.MobileNew:
 					tabControl.SelectTab(tabMobileNew);
 					break;
-				case EService.WebScheduler:
-					tabControl.SelectTab(tabWebScheduler);
+				case EService.WebSched:
+					tabControl.SelectTab(tabWebSched);
 					break;
 				case EService.PatientPortal:
 				default:
@@ -71,11 +71,11 @@ namespace OpenDental {
 			//Web server is not contacted when loading this form.  That would be too slow.
 			//CreateAppointments(5);
 			#endregion
-			#region web scheduler
+			#region Web Sched
 			labelWebSchedEnable.Text="";
-			if(PrefC.GetBool(PrefName.WebSchedulerService)) {
+			if(PrefC.GetBool(PrefName.WebSchedService)) {
 				butWebSchedEnable.Enabled=false;
-				labelWebSchedEnable.Text=Lan.g(this,"Web scheduler service is currently enabled.");
+				labelWebSchedEnable.Text=Lan.g(this,"Web Sched service is currently enabled.");
 			}
 			#endregion
 			SetControlEnabledState();
@@ -770,7 +770,7 @@ namespace OpenDental {
 
 		#endregion
 
-		#region web scheduler
+		#region web sched
 		private void butWebSchedEnable_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
@@ -804,7 +804,7 @@ namespace OpenDental {
 			#endregion
 			string result="";
 			try {
-				result=updateService.ValidateWebScheduler(strbuild.ToString());
+				result=updateService.ValidateWebSched(strbuild.ToString());
 			}
 			catch {
 				//Our service might be down or the client might not be connected to the internet or the transmission got cut off somehow.
@@ -812,26 +812,26 @@ namespace OpenDental {
 			Cursor.Current=Cursors.Default;
 			string error="";
 			int errorCode=0;
-			if(Recalls.IsWebSchedulerResponseValid(result,out error,out errorCode)) {
+			if(Recalls.IsWebSchedResponseValid(result,out error,out errorCode)) {
 				//Everything went good, the office is actively on support and has an active WebSched repeating charge.
 				butWebSchedEnable.Enabled=false;
-				labelWebSchedEnable.Text=Lan.g(this,"The web scheduler service has been enabled.");
+				labelWebSchedEnable.Text=Lan.g(this,"The Web Sched service has been enabled.");
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
-				if(Prefs.UpdateBool(PrefName.WebSchedulerService,true)) {
+				if(Prefs.UpdateBool(PrefName.WebSchedService,true)) {
 					_changed=true;
-					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The web scheduler service was enabled.");
+					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The Web Sched service was enabled.");
 				}
 				return;
 			}
 			#region Error Handling
-			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the web scheduler service.
+			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the Web Sched service.
 			if(errorCode==110) {//Customer not registered for WebSched monthly service
-				//We want to launch our web scheduler page if the user is not signed up:
+				//We want to launch our Web Sched page if the user is not signed up:
 				try {
-					Process.Start(Recalls.GetWebSchedulerURL());
+					Process.Start(Recalls.GetWebSchedPromoURL());
 				}
 				catch(Exception) {
-					//The promotional web site can't be shown, most likely due to the computer not having a default broswer.  Simply don't do anything.
+					//The promotional web site can't be shown, most likely due to the computer not having a default browser.  Simply don't do anything.
 				}
 				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
 				labelWebSchedEnable.Text=error;
@@ -842,9 +842,19 @@ namespace OpenDental {
 				return;
 			}
 			//For every other error message returned, we'll simply show a generic error in the label and display the detailed error in a pop up.
-			labelWebSchedEnable.Text=Lan.g(this,"There was a problem enabling the web scheduler.  Please give us a call or try again.");
+			labelWebSchedEnable.Text=Lan.g(this,"There was a problem enabling the Web Sched.  Please give us a call or try again.");
 			MessageBox.Show(error);
 			#endregion
+		}
+
+		private void butSignUp_Click(object sender,EventArgs e) {
+			try {
+				Process.Start(Recalls.GetWebSchedPromoURL());
+			}
+			catch(Exception) {
+				//The promotional web site can't be shown, most likely due to the computer not having a default browser.
+				MessageBox.Show(Lan.g(this,"Sign up page could not load.  Please visit the following web site")+":\r\n"+Recalls.GetWebSchedPromoURL());
+			}
 		}
 
 		private void butWebSchedSetup_Click(object sender,EventArgs e) {
@@ -927,7 +937,7 @@ namespace OpenDental {
 			PatientPortal,
 			MobileOld,
 			MobileNew,
-			WebScheduler
+			WebSched
 		}
 	}
 }

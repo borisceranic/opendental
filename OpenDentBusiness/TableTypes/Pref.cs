@@ -501,14 +501,14 @@ namespace OpenDentBusiness {
 		UserNameManualEntry,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>
 		WebHostSynchServerURL,
-		WebSchedulerMessage,
-		WebSchedulerMessage2,
-		WebSchedulerMessage3,
-		///<summary>Boolean. 0 by default. True when web scheduler service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
-		WebSchedulerService,
-		WebSchedulerSubject,
-		WebSchedulerSubject2,
-		WebSchedulerSubject3,
+		WebSchedMessage,
+		WebSchedMessage2,
+		WebSchedMessage3,
+		///<summary>Boolean. 0 by default. True when Web Sched service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
+		WebSchedService,
+		WebSchedSubject,
+		WebSchedSubject2,
+		WebSchedSubject3,
 		WebServiceServerName,
 		WordProcessorPath,
 		XRayExposureLevel

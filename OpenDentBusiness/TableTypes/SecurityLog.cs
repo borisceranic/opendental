@@ -40,7 +40,7 @@ namespace OpenDentBusiness{
 	public enum LogSources {
 		///<summary>0 - Open Dental and unknown entities.</summary>
 		None,
-		///<summary>1 - GWT web scheduler application.</summary>
+		///<summary>1 - GWT Web Sched application.</summary>
 		WebSched
 	}
 
