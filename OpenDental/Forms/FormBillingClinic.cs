@@ -11,6 +11,7 @@ namespace OpenDental {
 	public partial class FormBillingClinic:Form {
 		///<summary>0 - all clinics.</summary>
 		public long ClinicNum;
+		private List<Clinic> _listClinics;
 
 		public FormBillingClinic() {
 			InitializeComponent();
@@ -19,10 +20,14 @@ namespace OpenDental {
 
 		private void FormBillingClinic_Load(object sender,EventArgs e) {
 			listClinic.Items.Add("All");
-			for(int i=0;i<Clinics.List.Length;i++) {
-				listClinic.Items.Add(Clinics.List[i].Description);
-			}
 			listClinic.SelectedIndex=0;
+			_listClinics=Clinics.GetForUserod(Security.CurUser);
+			for(int i=0;i<_listClinics.Count;i++) {
+				listClinic.Items.Add(_listClinics[i].Description);
+				if(_listClinics[i].ClinicNum==ClinicNum) {
+					listClinic.SelectedIndex=i+1;
+				}
+			}
 		}
 
 		private void listClinic_DoubleClick(object sender,EventArgs e) {
@@ -31,7 +36,7 @@ namespace OpenDental {
 			}
 			ClinicNum=0;
 			if(listClinic.SelectedIndex>0) {
-				ClinicNum=Clinics.List[listClinic.SelectedIndex-1].ClinicNum;
+				ClinicNum=_listClinics[listClinic.SelectedIndex-1].ClinicNum;
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -39,7 +44,7 @@ namespace OpenDental {
 		private void butOK_Click(object sender,EventArgs e) {
 			ClinicNum=0;
 			if(listClinic.SelectedIndex>0) {
-				ClinicNum=Clinics.List[listClinic.SelectedIndex-1].ClinicNum;
+				ClinicNum=_listClinics[listClinic.SelectedIndex-1].ClinicNum;
 			}
 			DialogResult=DialogResult.OK;
 		}

@@ -107,9 +107,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>For orderBy, use 0 for BillingType and 1 for PatientName.</summary>
-		public static DataTable GetBilling(bool isSent,int orderBy,DateTime dateFrom,DateTime dateTo,long clinicNum){
+		public static DataTable GetBilling(bool isSent,int orderBy,DateTime dateFrom,DateTime dateTo,List<long> clinicNums){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),isSent,orderBy,dateFrom,dateTo,clinicNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),isSent,orderBy,dateFrom,dateTo,clinicNums);
 			}
 			DataTable table=new DataTable();
 			DataRow row;
@@ -147,8 +147,8 @@ namespace OpenDentBusiness{
 			//if(dateFrom.Year>1800){
 			command+="AND statement.DateSent<"+POut.Date(dateTo.AddDays(1))+" ";//less than midnight tonight
 			//}
-			if(clinicNum>0) {
-				command+="AND patient.ClinicNum="+clinicNum+" ";
+			if(clinicNums.Count>0) {
+				command+="AND patient.ClinicNum IN ("+string.Join(",",clinicNums)+") ";
 			}
 			command+="GROUP BY BalTotal,BillingType,FName,InsEst,statement.IsSent,"
 				+"LName,MiddleI,statement.Mode_,PayPlanDue,Preferred,"

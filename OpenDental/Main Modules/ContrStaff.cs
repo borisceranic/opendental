@@ -819,6 +819,7 @@ namespace OpenDental{
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
 					//Have user choose which clinic they want to see billing for.
 					FormBillingClinic FormBC=new FormBillingClinic();
+					FormBC.ClinicNum=FormOpenDental.ClinicNum;
 					FormBC.ShowDialog();
 					if(FormBC.DialogResult==DialogResult.OK) {
 						if(Statements.UnsentClinicStatementsExist(FormBC.ClinicNum)) {//Check if clinic has unsent bills.
@@ -827,6 +828,9 @@ namespace OpenDental{
 						else {//No unsent bills for clinic.  Show billing options to generate a billing list.
 							ShowBillingOptions(FormBC.ClinicNum);
 						}
+					}
+					else {//User clicked the X on FormBillingClinic
+						return;//Do not create a security log when billing wasn't actually shown.
 					}
 				}
 				else {//Not using clinics and has unsent bills.  Simply show billing window.
@@ -849,9 +853,11 @@ namespace OpenDental{
 				//It does not hurt to always close this window before loading a new instance, because the unsent bills are saved in the database and the entire purpose of FormBilling is the Go To feature.
 				//Any statements that were showing in the old billing list window that we are about to close could potentially be stale and are now invalid and should not be sent.
 				//Another good reason to close the window is when using clinics.  It was possible to show a different clinic billing list than the one chosen.
-				if(FormB.ClinicNum!=clinicNum) {//For most users clinic nums will always be 0.
-					//The old billing list was showing a different clinic.  No need to show the warning message in this scenario.
-					hadListShowing=false;
+				for(int i=0;i<FormB.ListClinics.Count;i++) {
+					if(FormB.ListClinics[i].ClinicNum!=clinicNum) {//For most users clinic nums will always be 0.
+						//The old billing list was showing a different clinic.  No need to show the warning message in this scenario.
+						hadListShowing=false;
+					}
 				}
 				FormB.Close();
 			}

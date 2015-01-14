@@ -61,8 +61,9 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private bool ignoreRefreshOnce;
-		///<summary>ClinicNum should be set before this window by FormBillingOptions.</summary>
 		public long ClinicNum;
+		///<summary>Do not pass a list of clinics in.  This list gets filled on load based on the user logged in.  ListClinics is used in other forms so it is public.</summary>
+		public List<Clinic> ListClinics;
 
 		protected void OnGoToChanged(long patNum) {
 			if(GoToChanged!=null) {
@@ -495,9 +496,10 @@ namespace OpenDental{
 				comboClinic.Visible=true;
 				comboClinic.Items.Add("All");
 				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==ClinicNum) {
+				ListClinics=Clinics.GetForUserod(Security.CurUser);
+				for(int i=0;i<ListClinics.Count;i++) {
+					comboClinic.Items.Add(ListClinics[i].Description);
+					if(ClinicNum==ListClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
@@ -520,7 +522,7 @@ namespace OpenDental{
 		}
 
 		///<summary>We will always try to preserve the selected bills as well as the scroll postition.</summary>
-		private void FillGrid(){
+		private void FillGrid() {
 			if(textDateStart.errorProvider1.GetError(textDateStart)!=""
 				|| textDateEnd.errorProvider1.GetError(textDateEnd)!="")
 			{
@@ -541,11 +543,16 @@ namespace OpenDental{
 			if(textDateEnd.Text!=""){
 				dateTo=PIn.Date(textDateEnd.Text);
 			}
-			ClinicNum=0;
+			List<long> clinicNums=new List<long>();
 			if(comboClinic.SelectedIndex>0) {
-				ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+				clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
 			}
-			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,ClinicNum);
+			else {
+				for(int i=0;i<ListClinics.Count;i++) {
+					clinicNums.Add(ListClinics[i].ClinicNum);
+				}
+			}
+			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,clinicNums);
 			gridBill.BeginUpdate();
 			gridBill.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableBilling","Name"),180);

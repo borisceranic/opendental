@@ -54,6 +54,8 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Dunning[] dunningList;
 		public long ClinicNum;
+		///<summary>Do not pass a list of clinics in.  This list gets filled on load based on the user logged in.  ListClinics is used in other forms so it is public.</summary>
+		public List<Clinic> ListClinics;
 
 		///<summary></summary>
 		public FormBillingOptions(){
@@ -672,9 +674,10 @@ namespace OpenDental{
 				comboClinic.Visible=true;
 				comboClinic.Items.Add("All");
 				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==ClinicNum) {
+				ListClinics=Clinics.GetForUserod(Security.CurUser);
+				for(int i=0;i<ListClinics.Count;i++) {
+					comboClinic.Items.Add(ListClinics[i].Description);
+					if(ClinicNum==ListClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
@@ -890,15 +893,20 @@ namespace OpenDental{
 				}
 				billingNums.Add(DefC.Short[(int)DefCat.BillingTypes][listBillType.SelectedIndices[i]-1].DefNum);
 			}
-			ClinicNum=0;
+			List<long> clinicNums=new List<long>();
 			if(comboClinic.SelectedIndex>0) {
-				ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+				clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
+			}
+			else {
+				for(int i=0;i<ListClinics.Count;i++) {
+					clinicNums.Add(ListClinics[i].ClinicNum);
+				}
 			}
 			Cursor=Cursors.WaitCursor;
 			List<PatAging> agingList=Patients.GetAgingList(getAge,lastStatement,billingNums,checkBadAddress.Checked,
 				checkExcludeNegative.Checked,PIn.Double(textExcludeLessThan.Text),
 				checkExcludeInactive.Checked,checkIncludeChanged.Checked,checkExcludeInsPending.Checked,
-				checkExcludeIfProcs.Checked,checkIgnoreInPerson.Checked,ClinicNum);
+				checkExcludeIfProcs.Checked,checkIgnoreInPerson.Checked,clinicNums);
 			DateTime dateRangeFrom=DateTime.MinValue;
 			DateTime dateRangeTo=DateTimeOD.Today;//Needed for payplan accuracy.//new DateTime(2200,1,1);
 			if(textDateStart.Text!=""){
