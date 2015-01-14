@@ -28,6 +28,7 @@ namespace OpenDental
 		private System.Windows.Forms.GroupBox groupBox1;
 		private OpenDental.UI.Button butTomorrow;
 		private OpenDental.UI.Button butToday;
+		private CheckBox checkShowWebSched;
 
 		/// <summary>
 		/// Required designer variable.
@@ -79,96 +80,97 @@ namespace OpenDental
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.butToday = new OpenDental.UI.Button();
 			this.butTomorrow = new OpenDental.UI.Button();
+			this.checkShowWebSched = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butAll
 			// 
-			this.butAll.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAll.Autosize = true;
 			this.butAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAll.CornerRadius = 4F;
-			this.butAll.Location = new System.Drawing.Point(28,243);
+			this.butAll.Location = new System.Drawing.Point(28, 243);
 			this.butAll.Name = "butAll";
-			this.butAll.Size = new System.Drawing.Size(75,26);
+			this.butAll.Size = new System.Drawing.Size(75, 26);
 			this.butAll.TabIndex = 34;
 			this.butAll.Text = "&All";
 			this.butAll.Click += new System.EventHandler(this.butAll_Click);
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(27,41);
+			this.listProv.Location = new System.Drawing.Point(27, 41);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(120,186);
+			this.listProv.Size = new System.Drawing.Size(120, 186);
 			this.listProv.TabIndex = 33;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(27,18);
+			this.label1.Location = new System.Drawing.Point(27, 18);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(104,16);
+			this.label1.Size = new System.Drawing.Size(104, 16);
 			this.label1.TabIndex = 32;
 			this.label1.Text = "Providers";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(92,51);
+			this.textDateTo.Location = new System.Drawing.Point(92, 51);
 			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(100,20);
+			this.textDateTo.Size = new System.Drawing.Size(100, 20);
 			this.textDateTo.TabIndex = 44;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(4,52);
+			this.label3.Location = new System.Drawing.Point(4, 52);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(82,18);
+			this.label3.Size = new System.Drawing.Size(82, 18);
 			this.label3.TabIndex = 39;
 			this.label3.Text = "To";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(6,26);
+			this.label2.Location = new System.Drawing.Point(6, 26);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(82,18);
+			this.label2.Size = new System.Drawing.Size(82, 18);
 			this.label2.TabIndex = 37;
 			this.label2.Text = "From";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(92,24);
+			this.textDateFrom.Location = new System.Drawing.Point(92, 24);
 			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(100,20);
+			this.textDateFrom.Size = new System.Drawing.Size(100, 20);
 			this.textDateFrom.TabIndex = 43;
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(502,336);
+			this.butCancel.Location = new System.Drawing.Point(502, 336);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 44;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(502,296);
+			this.butOK.Location = new System.Drawing.Point(502, 296);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 43;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
@@ -181,47 +183,57 @@ namespace OpenDental
 			this.groupBox1.Controls.Add(this.textDateTo);
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Controls.Add(this.label2);
-			this.groupBox1.Location = new System.Drawing.Point(200,35);
+			this.groupBox1.Location = new System.Drawing.Point(200, 35);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(380,158);
+			this.groupBox1.Size = new System.Drawing.Size(380, 158);
 			this.groupBox1.TabIndex = 45;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Date Range";
 			// 
 			// butToday
 			// 
-			this.butToday.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butToday.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butToday.Autosize = true;
 			this.butToday.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butToday.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butToday.CornerRadius = 4F;
-			this.butToday.Location = new System.Drawing.Point(250,23);
+			this.butToday.Location = new System.Drawing.Point(250, 23);
 			this.butToday.Name = "butToday";
-			this.butToday.Size = new System.Drawing.Size(96,23);
+			this.butToday.Size = new System.Drawing.Size(96, 23);
 			this.butToday.TabIndex = 46;
 			this.butToday.Text = "Today";
 			this.butToday.Click += new System.EventHandler(this.butToday_Click);
 			// 
 			// butTomorrow
 			// 
-			this.butTomorrow.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butTomorrow.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butTomorrow.Autosize = true;
 			this.butTomorrow.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butTomorrow.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butTomorrow.CornerRadius = 4F;
-			this.butTomorrow.Location = new System.Drawing.Point(250,50);
+			this.butTomorrow.Location = new System.Drawing.Point(250, 50);
 			this.butTomorrow.Name = "butTomorrow";
-			this.butTomorrow.Size = new System.Drawing.Size(96,23);
+			this.butTomorrow.Size = new System.Drawing.Size(96, 23);
 			this.butTomorrow.TabIndex = 45;
 			this.butTomorrow.Text = "Tomorrow";
 			this.butTomorrow.Click += new System.EventHandler(this.butTomorrow_Click);
 			// 
+			// checkShowWebSched
+			// 
+			this.checkShowWebSched.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowWebSched.Location = new System.Drawing.Point(292, 209);
+			this.checkShowWebSched.Name = "checkShowWebSched";
+			this.checkShowWebSched.Size = new System.Drawing.Size(248, 18);
+			this.checkShowWebSched.TabIndex = 46;
+			this.checkShowWebSched.Text = "Only show web scheduler appointments.";
+			// 
 			// FormRpAppointments
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(645,383);
+			this.ClientSize = new System.Drawing.Size(645, 383);
+			this.Controls.Add(this.checkShowWebSched);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
@@ -294,7 +306,6 @@ namespace OpenDental
 				MessageBox.Show(Lan.g(this,"You must select at least one provider."));
 				return;
 			}
-
 			string whereProv;//used as the provider portion of the where clauses.
 			//each whereProv needs to be set up separately for each query
 			whereProv="(appointment.ProvNum IN (";
@@ -313,6 +324,13 @@ namespace OpenDental
 				whereProv+="'"+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+"'";
 			}
 			whereProv += ")) ";
+			string innerJoinWebSched="";
+			if(checkShowWebSched.Checked) {
+				//Filter the results with an inner join on the securitylog table so that only appointments created by the web scheduler are shown in the results.
+				innerJoinWebSched=" INNER JOIN securitylog ON appointment.AptNum=securitylog.FKey"
+					+" AND securitylog.LogSource="+POut.Int((int)LogSources.WebSched)
+					+" AND securitylog.PermType="+POut.Int((int)Permissions.AppointmentCreate)+" ";
+			}
 			//create the report
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
@@ -325,12 +343,17 @@ namespace OpenDental
 			//setup query
 			QueryObject query;
 			query=report.AddQuery(@"SELECT appointment.AptDateTime,trim(CONCAT(CONCAT(CONCAT(CONCAT(concat(patient.LName,', '),"
-			  +"case when length(patient.Preferred) > 0 then CONCAT(CONCAT('(',patient.Preferred),') ') else '' end),patient.fname), ' '),"
-				+"patient.middlei)) AS PatName,patient.Birthdate,appointment.AptDateTime,length(appointment.Pattern)*5,appointment.ProcDescript,patient.HmPhone, patient.WkPhone, patient.WirelessPhone"
-				+" FROM appointment INNER JOIN patient ON appointment.PatNum = patient.PatNum WHERE appointment.AptDateTime between " + POut.Date(dateFrom) + " AND "
-				+POut.Date(dateTo.AddDays(1)) + " AND " + "AptStatus != '" + (int)ApptStatus.UnschedList + "' AND " + "AptStatus != '" + (int)ApptStatus.Planned + "' AND " +
-				whereProv + " " +
-				"ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","","",SplitByKind.None,1,true);
+			  +"CASE WHEN length(patient.Preferred) > 0 then CONCAT(CONCAT('(',patient.Preferred),') ') ELSE '' END),patient.FName), ' '),"
+				+"patient.MiddleI)) AS PatName,patient.Birthdate,appointment.AptDateTime,LENGTH(appointment.Pattern)*5,appointment.ProcDescript,patient.HmPhone, patient.WkPhone, patient.WirelessPhone"
+				+" FROM appointment"
+				+" INNER JOIN patient ON appointment.PatNum = patient.PatNum"
+				+innerJoinWebSched
+				+" WHERE appointment.AptDateTime BETWEEN "+POut.Date(dateFrom)
+				+" AND "+POut.Date(dateTo.AddDays(1))
+				+" AND AptStatus != '"+(int)ApptStatus.UnschedList+"'"
+				+" AND AptStatus != '"+(int)ApptStatus.Planned+"'"
+				+" AND "+whereProv
+				+" ORDER BY appointment.AptStatus,appointment.AptDateTime, 2","","",SplitByKind.None,1,true);
 			// add columns to report
 			query.AddColumn("Date",75,FieldValueType.Date,font);
 			query.GetColumnDetail("Date").SuppressIfDuplicate = true;

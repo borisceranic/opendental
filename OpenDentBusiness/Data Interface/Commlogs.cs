@@ -72,8 +72,14 @@ namespace OpenDentBusiness{
 
 		///<summary>Used when printing or emailing recall to make a commlog entry without any display.</summary>
 		public static void InsertForRecall(long patNum,CommItemMode _mode,int numberOfReminders,long defNumNewStatus) {
+			//No need to check RemotingRole; no call to db.
+			InsertForRecall(patNum,_mode,numberOfReminders,defNumNewStatus,false);//Recall commlog not associated to the web scheduler app.
+		}
+
+		///<summary>Used when printing or emailing recall to make a commlog entry without any display.  Only set isWebSched to true if this is a commlog associated to the GWT web scheduler app.</summary>
+		public static void InsertForRecall(long patNum,CommItemMode _mode,int numberOfReminders,long defNumNewStatus,bool isWebSched) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,_mode,numberOfReminders,defNumNewStatus);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,_mode,numberOfReminders,defNumNewStatus,isWebSched);
 				return;
 			}
 			long recallType=Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL);
@@ -118,6 +124,7 @@ namespace OpenDentBusiness{
 				com.Note+="  "+DefC.GetName(DefCat.RecallUnschedStatus,defNumNewStatus);
 			}
 			com.UserNum=Security.CurUser.UserNum;
+			com.IsWebSched=isWebSched;
 			Insert(com);
 		}
 

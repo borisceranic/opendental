@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				securityLog.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				securityLog.CompName      = PIn.String(table.Rows[i]["CompName"].ToString());
 				securityLog.FKey          = PIn.Long  (table.Rows[i]["FKey"].ToString());
+				securityLog.LogSource     = (OpenDentBusiness.LogSources)PIn.Int(table.Rows[i]["LogSource"].ToString());
 				retVal.Add(securityLog);
 			}
 			return retVal;
@@ -94,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SecurityLogNum,";
 			}
-			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey) VALUES(";
+			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(securityLog.SecurityLogNum)+",";
 			}
@@ -105,7 +106,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(securityLog.LogText)+"',"
 				+    POut.Long  (securityLog.PatNum)+","
 				+"'"+POut.String(securityLog.CompName)+"',"
-				+    POut.Long  (securityLog.FKey)+")";
+				+    POut.Long  (securityLog.FKey)+","
+				+    POut.Int   ((int)securityLog.LogSource)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -124,7 +126,8 @@ namespace OpenDentBusiness.Crud{
 				+"LogText       = '"+POut.String(securityLog.LogText)+"', "
 				+"PatNum        =  "+POut.Long  (securityLog.PatNum)+", "
 				+"CompName      = '"+POut.String(securityLog.CompName)+"', "
-				+"FKey          =  "+POut.Long  (securityLog.FKey)+" "
+				+"FKey          =  "+POut.Long  (securityLog.FKey)+", "
+				+"LogSource     =  "+POut.Int   ((int)securityLog.LogSource)+" "
 				+"WHERE SecurityLogNum = "+POut.Long(securityLog.SecurityLogNum);
 			Db.NonQ(command);
 		}
@@ -156,6 +159,10 @@ namespace OpenDentBusiness.Crud{
 			if(securityLog.FKey != oldSecurityLog.FKey) {
 				if(command!=""){ command+=",";}
 				command+="FKey = "+POut.Long(securityLog.FKey)+"";
+			}
+			if(securityLog.LogSource != oldSecurityLog.LogSource) {
+				if(command!=""){ command+=",";}
+				command+="LogSource = "+POut.Int   ((int)securityLog.LogSource)+"";
 			}
 			if(command==""){
 				return false;

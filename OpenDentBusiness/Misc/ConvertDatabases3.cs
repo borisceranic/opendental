@@ -6914,6 +6914,20 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE commlog MODIFY IsWebSched NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE securitylog ADD LogSource tinyint NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE securitylog SET LogSource = 0";//Set all securitylogs to none
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE securitylog ADD LogSource number(3)";
+					Db.NonQ(command);
+					command="UPDATE securitylog SET LogSource = 0 WHERE LogSource IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE securitylog MODIFY LogSource NOT NULL";
+					Db.NonQ(command);
+				}
 				
 
 

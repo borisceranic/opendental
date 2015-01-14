@@ -24,6 +24,8 @@ namespace OpenDentBusiness{
 		public string CompName;
 		///<summary>A foreign key to a table associated with the PermType.  0 indicates not in use.  This is typically used for objects that have specific audit trails so that users can see all audit entries related to a particular object.  For the patient portal, it is used to indicate logs created on behalf of other patients.  It's uses include:  AptNum with PermType AppointmentCreate, AppointmentEdit, or AppointmentMove tracks all appointment logs for a particular appointment.  CodeNum with PermType ProcFeeEdit currently only tracks fee changes.  PatNum with PermType PatientPortal represents an entry that a patient made on behalf of another patient.  The PatNum column will represent the patient who is taking the action.  PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
 		public long FKey;
+		///<summary>Enum:LogSources None, WebSched.</summary>
+		public LogSources LogSource;
 
 		///<summary>PatNum-NameLF</summary>
 		[CrudColumn(IsNotDbColumn=true)]
@@ -32,6 +34,14 @@ namespace OpenDentBusiness{
 		[CrudColumn(IsNotDbColumn=true)]
 		public string LogHash;
 
+	}
+
+	///<summary>Known entities that create security logs.</summary>
+	public enum LogSources {
+		///<summary>0 - Open Dental and unknown entities.</summary>
+		None,
+		///<summary>1 - GWT web scheduler application.</summary>
+		WebSched
 	}
 
 	
