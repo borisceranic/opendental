@@ -38,6 +38,24 @@ namespace OpenDentBusiness {
 			return Convert.ToBase64String(retval);
 		}
 
+		///<summary>Helper method to determine if an index already exists.  Returns true if colNames matches the concatenation of all COLUMN_NAME(s) for the column(s) referenced by an index on the corresponding tableName.  If the index references multiple columns, colNames must have the column names in the exact order in which the index was created separated by commas, without spaces.  Example: the claimproc table has the multi-column index on columns ClaimPaymentNum, Status, and InsPayAmt.  To see if that index already exists, the parameters would be tableName="claimproc" and colNames="ClaimPaymentNum,Status,InsPayAmt".  Not case sensitive.  This will always return false for Oracle.</summary>
+		public static bool IndexExists(string tableName,string colNames) {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {//Oracle will not allow the same column to be indexed more than once
+				return false;
+			}
+			string command="SELECT COUNT(*) FROM ("
+				+"SELECT GROUP_CONCAT(LOWER(COLUMN_NAME) ORDER BY SEQ_IN_INDEX) ColNames "
+				+"FROM INFORMATION_SCHEMA.STATISTICS "
+				+"WHERE TABLE_SCHEMA=SCHEMA() "
+				+"AND LOWER(TABLE_NAME)='"+POut.String(tableName.ToLower())+"' "
+				+"GROUP BY INDEX_NAME) cols "
+				+"WHERE cols.ColNames='"+POut.String(colNames.ToLower())+"'";
+			if(Db.GetCount(command)=="0") {
+				return false;
+			}
+			return true;
+		}
+
 		#endregion Helper Functions
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
@@ -6882,30 +6900,27 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE commlog ADD IsWebSched tinyint NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE commlog SET IsWebSched = 0";//Set all commlogs to not be web sched
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE commlog ADD IsWebSched number(3)";
+					Db.NonQ(command);
+					command="UPDATE commlog SET IsWebSched = 0 WHERE IsWebSched IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE commlog MODIFY IsWebSched NOT NULL";
+					Db.NonQ(command);
+				}
+				
 
 
 
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-		}
-
-		///<summary>Helper method to determine if an index already exists.  Returns true if colNames matches the concatenation of all COLUMN_NAME(s) for the column(s) referenced by an index on the corresponding tableName.  If the index references multiple columns, colNames must have the column names in the exact order in which the index was created separated by commas, without spaces.  Example: the claimproc table has the multi-column index on columns ClaimPaymentNum, Status, and InsPayAmt.  To see if that index already exists, the parameters would be tableName="claimproc" and colNames="ClaimPaymentNum,Status,InsPayAmt".  Not case sensitive.  This will always return false for Oracle.</summary>
-		public static bool IndexExists(string tableName,string colNames) {
-			if(DataConnection.DBtype==DatabaseType.Oracle) {//Oracle will not allow the same column to be indexed more than once
-				return false;
-			}
-			string command="SELECT COUNT(*) FROM ("
-				+"SELECT GROUP_CONCAT(LOWER(COLUMN_NAME) ORDER BY SEQ_IN_INDEX) ColNames "
-				+"FROM INFORMATION_SCHEMA.STATISTICS "
-				+"WHERE TABLE_SCHEMA=SCHEMA() "
-				+"AND LOWER(TABLE_NAME)='"+POut.String(tableName.ToLower())+"' "
-				+"GROUP BY INDEX_NAME) cols "
-				+"WHERE cols.ColNames='"+POut.String(colNames.ToLower())+"'";
-			if(Db.GetCount(command)=="0") {
-				return false;
-			}
-			return true;
 		}
 		
 

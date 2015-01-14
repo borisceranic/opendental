@@ -37,6 +37,8 @@ namespace OpenDentBusiness{
 		///<summary>Date and time when commlog ended.  Mainly for internal use.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeEnd;
+		///<summary>True if commlog was created on behalf of the web scheduler.  Mainly used for reporting metrics.</summary>
+		public bool IsWebSched;
 
 		///<summary></summary>
 		public Commlog Copy(){

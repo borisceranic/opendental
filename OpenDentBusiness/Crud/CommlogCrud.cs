@@ -58,6 +58,7 @@ namespace OpenDentBusiness.Crud{
 				commlog.SigIsTopaz    = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
 				commlog.DateTStamp    = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
 				commlog.DateTimeEnd   = PIn.DateT (table.Rows[i]["DateTimeEnd"].ToString());
+				commlog.IsWebSched    = PIn.Bool  (table.Rows[i]["IsWebSched"].ToString());
 				retVal.Add(commlog);
 			}
 			return retVal;
@@ -98,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CommlogNum,";
 			}
-			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd) VALUES(";
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,IsWebSched) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(commlog.CommlogNum)+",";
 			}
@@ -113,7 +114,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(commlog.Signature)+"',"
 				+    POut.Bool  (commlog.SigIsTopaz)+","
 				//DateTStamp can only be set by MySQL
-				+    POut.DateT (commlog.DateTimeEnd)+")";
+				+    POut.DateT (commlog.DateTimeEnd)+","
+				+    POut.Bool  (commlog.IsWebSched)+")";
 			if(commlog.Note==null) {
 				commlog.Note="";
 			}
@@ -140,7 +142,8 @@ namespace OpenDentBusiness.Crud{
 				+"Signature     = '"+POut.String(commlog.Signature)+"', "
 				+"SigIsTopaz    =  "+POut.Bool  (commlog.SigIsTopaz)+", "
 				//DateTStamp can only be set by MySQL
-				+"DateTimeEnd   =  "+POut.DateT (commlog.DateTimeEnd)+" "
+				+"DateTimeEnd   =  "+POut.DateT (commlog.DateTimeEnd)+", "
+				+"IsWebSched    =  "+POut.Bool  (commlog.IsWebSched)+" "
 				+"WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
 			if(commlog.Note==null) {
 				commlog.Note="";
@@ -192,6 +195,10 @@ namespace OpenDentBusiness.Crud{
 			if(commlog.DateTimeEnd != oldCommlog.DateTimeEnd) {
 				if(command!=""){ command+=",";}
 				command+="DateTimeEnd = "+POut.DateT(commlog.DateTimeEnd)+"";
+			}
+			if(commlog.IsWebSched != oldCommlog.IsWebSched) {
+				if(command!=""){ command+=",";}
+				command+="IsWebSched = "+POut.Bool(commlog.IsWebSched)+"";
 			}
 			if(command==""){
 				return false;
