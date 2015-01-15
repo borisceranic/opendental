@@ -535,6 +535,11 @@ namespace OpenDental{
 					return;
 				}
 			}
+			if(textDateStop.Text.Trim()!="" && PIn.Date(textDateStart.Text)>PIn.Date(textDateStop.Text)) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"The start date is after the stop date.  Continue?")) {
+					return;
+				}
+			}
 			RepeatCur.ProcCode=textCode.Text;
 			RepeatCur.ChargeAmt=PIn.Double(textChargeAmt.Text);
 			RepeatCur.DateStart=PIn.Date(textDateStart.Text);

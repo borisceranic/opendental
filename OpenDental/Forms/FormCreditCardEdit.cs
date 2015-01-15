@@ -93,6 +93,11 @@ namespace OpenDental {
 				MsgBox.Show(this,"Expiration format invalid.");
 				return false;
 			}
+			if(textDateStop.Text.Trim()!="" && PIn.Date(textDateStart.Text)>PIn.Date(textDateStop.Text)) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"The recurring charge start date is after the stop date.  Continue?")) {
+					return false;
+				}
+			}
 			if(IsXCharge) {//Only validate recurring setup if using X-Charge.
 				if(textDateStart.errorProvider1.GetError(textDateStart)!=""
 				|| textDateStop.errorProvider1.GetError(textDateStop)!=""
