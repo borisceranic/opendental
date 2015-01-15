@@ -1318,7 +1318,23 @@ namespace OpenDental {
 				return;
 			}
 			try {
-				if(Path.GetExtension(DocSelected.FileName).ToLower()==".pdf") {
+				string fileName=null;
+				string description=null;
+				ImageNodeId nodeId=(ImageNodeId)treeDocuments.SelectedNode.Tag;
+				if(nodeId.NodeType==ImageNodeType.Eob) {
+					fileName=EobAttaches.GetOne(nodeId.PriKey).FileName;
+					description="";
+				}
+				else if(nodeId.NodeType==ImageNodeType.Amd) {
+					EhrAmendment ehrAmendment=EhrAmendments.GetOne(nodeId.PriKey);
+					fileName=ehrAmendment.FileName;
+					description=ehrAmendment.Description;
+				}
+				else {
+					fileName=DocSelected.FileName;
+					description=DocSelected.Description;
+				}
+				if(Path.GetExtension(fileName).ToLower()==".pdf") {//Selected document is PDF, we handle differently than documents that aren't pdf.
 					axAcroPDF1.printWithDialog();
 				}
 				else {
@@ -1345,11 +1361,11 @@ namespace OpenDental {
 						if(((ImageNodeId)treeDocuments.SelectedNode.Tag).NodeType==ImageNodeType.Eob) { //This happens when printing an EOB from the Batch Ins Claim
 							SecurityLogs.MakeLogEntry(Permissions.Printing,0,"EOB printed");
 						}
-						else if(DocSelected.Description=="") {
-							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.FileName+" printed");
+						else if(description=="") {
+							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+fileName+" printed");
 						}
 						else {
-							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+DocSelected.Description+" printed");
+							SecurityLogs.MakeLogEntry(Permissions.Printing,PatCur.PatNum,"Patient image "+description+" printed");
 						}
 					}
 				}
