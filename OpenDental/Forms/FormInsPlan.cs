@@ -144,7 +144,7 @@ namespace OpenDental{
 		//<summary>Set to true if called from the list of insurance plans.  In this case, the planNum will be 0.  There will be no subscriber.  Benefits will be 'typical' rather than from one specific plan.  Upon saving, all similar plans will be set to be exactly the same as PlanCur.</summary>
 		//public bool IsForAll;//Instead, just pass in a null subscriber.
 		///<summary>Set to true from FormInsPlansMerge.  In this case, the insplan is read only, because it's much more complicated to allow user to change.</summary>
-		public bool IsReadOnly;
+		//public bool IsReadOnly;
 		private List<FeeSched> FeeSchedsStandard;
 		private List<FeeSched> FeeSchedsCopay;
 		private GroupBox groupPlan;
