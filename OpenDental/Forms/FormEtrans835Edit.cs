@@ -313,9 +313,10 @@ namespace OpenDental {
 				}
 			}
 			//For each NotReceived/unpaid procedure on the claim where the procedure information can be successfully located on the EOB, enter the payment information.
+			List<List<Hx835_Proc>> listProcsForClaimProcs=claimPaid.GetPaymentsForClaimProcs(listClaimProcsToEdit);
 			for(int i=0;i<listClaimProcsToEdit.Count;i++) {
 				ClaimProc claimProc=listClaimProcsToEdit[i];
-				List<Hx835_Proc> listProcsForProcNum=claimPaid.GetPaymentsForClaimProc(claimProc);
+				List<Hx835_Proc> listProcsForProcNum=listProcsForClaimProcs[i];
 				//If listProcsForProcNum.Count==0, then procedure payment details were not not found for this one specific procedure.
 				//This can happen with procedures from older 837s, when we did not send out the procedure identifiers, in which case ProcNum would be 0.
 				//Since we cannot place detail on the service line, we will leave the amounts for the procedure on the total payment line.
@@ -445,6 +446,7 @@ namespace OpenDental {
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 		
 	}
