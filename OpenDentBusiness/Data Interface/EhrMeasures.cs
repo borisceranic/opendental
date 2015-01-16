@@ -2130,6 +2130,9 @@ namespace OpenDentBusiness{
 							mu.Details="Smoking status entered";
 							mu.Met=MuMet.True;
 						}
+						if(pat.Age<13) {//The smoking measure does not apply to patients under the age of 13.
+							mu.Met=MuMet.NA;
+						}
 						mu.Action="Edit smoking status";
 						break;
 					#endregion
@@ -4208,6 +4211,9 @@ namespace OpenDentBusiness{
 						else {
 							mu.Details="Smoking status entered";
 							mu.Met=MuMet.True;
+						}
+						if(pat.Age<13) {//The smoking measure does not apply to patients under the age of 13.
+							mu.Met=MuMet.NA;
 						}
 						mu.Action="Edit smoking status";
 						break;
