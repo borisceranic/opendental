@@ -2996,33 +2996,53 @@ namespace OpenDentBusiness {
 			return Claims.GetClaim(ClaimNum);
 		}
 
-		///<summary>There could be multiple matches if the procedure was split or bundled/unbundled.</summary>
-		public List<Hx835_Proc> GetPaymentsForClaimProc(ClaimProc claimProc) {
-			List<Hx835_Proc> listProcPayments=new List<Hx835_Proc>();
-			//First locate by unique identifier.  There will be no match for older procedures because we did not always send the procedure identifiers.
+		///<summary>There could be multiple matches for a claimproc if the procedure was split or unbundled.
+		///For each claimproc in listClaimProcs, a list of Hx835_Procs will be returned.
+		///If there are no matches for a claimProc, then the list corresponding to that claimProc will be an empty list (not null).</summary>
+		public List<List<Hx835_Proc>> GetPaymentsForClaimProcs(List<ClaimProc> listClaimProcs) {
+			List<List<Hx835_Proc>> retVal=new List<List<Hx835_Proc>>();
+			//All of the x835 procedures begin unassigned to any claimproc.  When an x835 procedure is assigned to a claimproc, it is removed from unassigned list.
+			List<Hx835_Proc> listProcsUnassigned=new List<Hx835_Proc>();
 			for(int i=0;i<ListProcs.Count;i++) {
-				if(ListProcs[i].ProcNum==claimProc.ProcNum) {
-					listProcPayments.Add(ListProcs[i]);
+				listProcsUnassigned.Add(ListProcs[i]);
+			}
+			//First locate matches by unique identifier.  There may be no match for older procedures, because we did not always send the procedure identifiers in the 837s.
+			//This loop also ensures that every item of retVal contains an initialized list, although some lists may be empty.
+			for(int i=0;i<listClaimProcs.Count;i++) {
+				ClaimProc claimProc=listClaimProcs[i];
+				List<Hx835_Proc> listProcMatches=new List<Hx835_Proc>();
+				for(int j=listProcsUnassigned.Count-1;j>=0;j--) {//We go backward, so we can remove the current item without modifying j.
+					if(listProcsUnassigned[j].ProcNum!=claimProc.ProcNum) {
+						continue;
+					}
+					listProcMatches.Add(listProcsUnassigned[j]);
+					//Remove the current item.  This will cause [j] to contain an item we have seen already, thus j-- at the top of the loop will get us to the next item.
+					listProcsUnassigned.RemoveAt(j);
+				}
+				retVal.Add(listProcMatches);
+			}
+			//For those claimprocs for which no match was found using the unique ID, 
+			//try to locate by procedure code and procedure fee.
+			//Unfortunately, this would not match split procedures which have no specified ProcNum.
+			for(int i=0;i<retVal.Count;i++) {
+				if(retVal[i].Count>0) {
+					continue;//Already matched this claimProc by ProcNum.
+				}
+				ClaimProc claimProc=listClaimProcs[i];
+				for(int j=0;j<listProcsUnassigned.Count;j++) {
+					Hx835_Proc procPaid=listProcsUnassigned[j];
+					if(procPaid.ProcFee!=(decimal)claimProc.FeeBilled) {
+						continue;
+					}
+					if(procPaid.ProcCodeBilled!=claimProc.CodeSent) {
+						continue;
+					}
+					retVal[i].Add(procPaid);
+					listProcsUnassigned.RemoveAt(j);
+					break;//Only one unassigned procedure may be asssigned to a claimproc by fee and code.
 				}
 			}
-			if(listProcPayments.Count>0) {
-				return listProcPayments;
-			}
-			//No match was found using the unique ID.  Now try to locate by procedure code and procedure fee.
-			for(int i=0;i<ListProcs.Count;i++) {
-				Hx835_Proc procPaid=ListProcs[i];
-				if(procPaid.ProcFee!=(decimal)claimProc.FeeBilled) {
-					continue;
-				}
-				if(procPaid.ProcCodeBilled!=claimProc.CodeSent) {
-					continue;
-				}
-				listProcPayments.Add(procPaid);
-			}
-			if(listProcPayments.Count>1) {
-				listProcPayments.Clear();//If multiple procedures were matched by code and amount, then we are not certain where to place the payments.
-			}
-			return listProcPayments;
+			return retVal;
 		}
 
 		///<summary>Concats all adjustment descriptions from ListClaimAdjustments into a single string, separated by newlines.</summary>
@@ -3564,5 +3584,45 @@ namespace OpenDentBusiness {
 //GE*1*1~
 //IEA*1*000000001~
 #endregion Example 8
+
+#region Example 9
+//Example 9 (Modified version of example 4, with a different patient, and more procedures of the same code and fee to test procedure matching):
+//ISA*00*          *00*          *ZZ*810624427      *ZZ*113504607      *140217*1450*^*00501*000000001*0*P*:~
+//GS*HP*810624427*113504607*20140217*1450*1*X*005010X224A2~
+//ST*835*0001~
+//BPR*I*40.00*C*CHK************20150116~
+//TRN*1*0012524879*1559123456~
+//REF*EV*030240928~
+//DTM*405*20150116~
+//N1*PR*YOUR TAX DOLLARS AT WORK~
+//N3*481A00 DEER RUN ROAD~
+//N4*WEST PALM BCH*FL*11114~
+//N1*PE*ACME MEDICAL CENTER*FI*599944521~
+//N3*PO BOX 863382~
+//N4*ORLANDO*FL*55115~
+//REF*PQ*10488~
+//LX*1~
+//CLP*0001000054*1*40.00*40.00**12*50580155533~
+//NM1*QC*1*NORRIS*CHUCK****MI*8652413659~
+//NM1*82*1*NORRIS*CHUCK****MI*8652413659~
+//DTM*232*20150116~
+//SVC*HC:12345*10.00*10.00**1~
+//DTM*472*20150116~
+//SVC*HC:12345*10.00*10.00**1~
+//DTM*472*20150116~
+//REF*6R*p9~
+//SVC*HC:12345*10.00*6.00**1*HC:56789~
+//DTM*472*20150116~
+//REF*6R*p10~
+//SVC*HC:12345*10.00*4.00**1*HC:98765~
+//DTM*472*20150116~
+//REF*6R*p10~
+//SVC*HC:12345*10.00*10.00**1~
+//DTM*472*20150116~
+//REF*6R*p5~
+//SE*38*0001~
+//GE*1*1~
+//IEA*1*000000001~
+#endregion Example 9
 
 #endregion Examples
