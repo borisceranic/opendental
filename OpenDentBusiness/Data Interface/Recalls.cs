@@ -10,12 +10,12 @@ namespace OpenDentBusiness{
 	
 	///<summary></summary>
 	public class Recalls {
-		private const string WEB_SCHED_PROMO_URL="http://www.patientviewer.com/WebSchedulerPromo.html";
+		private const string WEB_SCHED_SIGN_UP_URL="http://www.patientviewer.com/WebSchedSignUp.html";
 
-		///<summary>http://www.patientviewer.com/WebSchedulerPromo.html</summary>
+		///<summary>http://www.patientviewer.com/WebSchedSignUp.html</summary>
 		public static string GetWebSchedPromoURL() {
 			//No need to check RemotingRole; no call to db.
-			return WEB_SCHED_PROMO_URL;
+			return WEB_SCHED_SIGN_UP_URL;
 		}
 
 		///<summary>Gets all recalls for the supplied patients, usually a family or single pat.  Result might have a length of zero.  Each recall will also have the DateScheduled filled by pulling that info from other tables.</summary>
