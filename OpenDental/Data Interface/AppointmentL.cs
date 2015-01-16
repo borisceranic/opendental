@@ -577,7 +577,7 @@ namespace OpenDental{
 					continue;
 				}
 				aptDateTime=PIn.DateT(dayTable.Rows[i]["AptDateTime"].ToString());
-				if(ApptDrawing.IsWeeklyView && aptDateTime.Date==apt.AptDateTime.Date){
+				if(ApptDrawing.IsWeeklyView && aptDateTime.Date!=apt.AptDateTime.Date){//These appointments are on different days.
 					continue;
 				}
 				//calculate starting row
