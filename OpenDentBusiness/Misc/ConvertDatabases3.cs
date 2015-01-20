@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.24.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.30.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -6117,6 +6117,29 @@ namespace OpenDentBusiness {
 				command=@"UPDATE procbuttonquick SET Surf='ML' WHERE ProcButtonQuickNum=13 AND Description='ML' AND CodeValue='D2331' AND Surf=''";
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '14.3.24.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To14_3_30();
+		}
+
+		///<summary></summary>
+		private static void To14_3_30() {
+			if(FromVersion<new Version("14.3.30.0")) {
+				string command="";
+				//Inline DBM to remove old signals.  This query is run regularly as of version 15.1.  This is here to tide user over until they update to version 15.1.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != '0001-01-01' AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < CURRENT_TIMESTAMP -2";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != TO_DATE('0001-01-01','YYYY-MM-DD') AND SigDateTime < CURRENT_TIMESTAMP -2";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To14_4_0();
