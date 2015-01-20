@@ -201,7 +201,7 @@ namespace OpenDental {
 			this.butFix.Name = "butFix";
 			this.butFix.Size = new System.Drawing.Size(75, 26);
 			this.butFix.TabIndex = 20;
-			this.butFix.Text = "Fix";
+			this.butFix.Text = "&Fix";
 			this.butFix.Click += new System.EventHandler(this.butFix_Click);
 			// 
 			// groupBox1

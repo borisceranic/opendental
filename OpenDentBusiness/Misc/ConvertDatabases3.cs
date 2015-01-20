@@ -6146,6 +6146,29 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.24.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_3_30();
+		}
+
+		///<summary></summary>
+		private static void To14_3_30() {
+			if(FromVersion<new Version("14.3.30.0")) {
+				string command="";
+				//Inline DBM to remove old signals.  This query is run regularly as of version 15.1.  This is here to tide user over until they update to version 15.1.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != '0001-01-01' AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < CURRENT_TIMESTAMP -2";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != TO_DATE('0001-01-01','YYYY-MM-DD') AND SigDateTime < CURRENT_TIMESTAMP -2";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To14_4_0();
 		}
 
@@ -6932,6 +6955,14 @@ namespace OpenDentBusiness {
 
 
 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SignalLastClearedDate','0001-01-01')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SignalLastClearedDate',TO_DATE('0001-01-01','YYYY-MM-DD'))";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

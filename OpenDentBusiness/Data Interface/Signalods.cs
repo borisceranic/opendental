@@ -322,6 +322,39 @@ namespace OpenDentBusiness{
 			command+=" WHERE SignalNum="+POut.Long(signalNum)+" ";
 			Db.NonQ(command);
 		}
+
+		///<summary>Must be called after Preference cache has been filled.  Deletes all signals older than 2 days if this has not been run within the last week.  Will fail silently if anything goes wrong.</summary>
+		public static void ClearOldSignals() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			try {
+				if(PrefC.GetDict().ContainsKey(PrefName.SignalLastClearedDate.ToString())
+					&& PrefC.GetDateT(PrefName.SignalLastClearedDate)>MiscData.GetNowDateTime().AddDays(-7)) //Has already been run in the past week. This is all server based time.
+				{
+					return;//Do not run this process again.
+				}
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {//easier to read that using the DbHelper Functions and it also matches the ConvertDB3 script
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != '0001-01-01' AND SigDateTime < DATE_ADD(NOW(),INTERVAL -2 DAY)";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="DELETE FROM signalod WHERE SigType = 1 AND SigDateTime < CURRENT_TIMESTAMP -2";//Itypes only older than 2 days
+					Db.NonQ(command);
+					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != TO_DATE('0001-01-01','YYYY-MM-DD') AND SigDateTime < CURRENT_TIMESTAMP -2";//Only unacknowledged buttons older than 2 days
+					Db.NonQ(command);
+				}
+				SigElements.DeleteOrphaned();
+				Prefs.UpdateDateT(PrefName.SignalLastClearedDate,MiscData.GetNowDateTime());//Set Last cleared to now.
+			}
+			catch(Exception ex) {
+				//fail silently
+			}
+		}
 	}
 
 	

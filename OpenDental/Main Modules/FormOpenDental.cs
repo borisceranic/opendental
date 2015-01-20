@@ -1962,10 +1962,12 @@ namespace OpenDental{
 			if(Programs.UsingEcwTightOrFullMode()) {
 				Splash.Dispose();//We don't show splash screen when bridging to eCW.
 			}
+			RefreshLocalData(InvalidType.Prefs);//should only refresh preferences so that SignalLastClearedDate preference can be used in ClearOldSignals()
+			Signalods.ClearOldSignals();
 			//We no longer do this shotgun approach because it can slow the loading time.
 			//RefreshLocalData(InvalidType.AllLocal);
 			List<InvalidType> invalidTypes=new List<InvalidType>();
-			invalidTypes.Add(InvalidType.Prefs);
+			//invalidTypes.Add(InvalidType.Prefs);//Preferences were refreshed above.  The only preference which might be stale is SignalLastClearedDate, but it is not used anywhere after calling ClearOldSignals() above.
 			invalidTypes.Add(InvalidType.Defs);
 			invalidTypes.Add(InvalidType.Providers);//obviously heavily used
 			invalidTypes.Add(InvalidType.Programs);//already done above, but needs to be done explicitly to trigger the PostCleanup 
@@ -3719,7 +3721,7 @@ namespace OpenDental{
 				//we can skip painting on the icon
 			}
 		}
-	
+
 		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.</summary>
 		public void ProcessSignals(){
 			if(Security.CurUser==null) {

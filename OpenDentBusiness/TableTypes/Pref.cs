@@ -435,6 +435,8 @@ namespace OpenDentBusiness {
 		ShowIDinTitleBar,
 		ShowProgressNotesInsteadofCommLog,
 		ShowUrgFinNoteInProgressNotes,
+		///<summary>Only used on startup.  The date in which stale signalods were removed.</summary>
+		SignalLastClearedDate,
 		/// <summary>Name of this Software.  Defaults to 'Open Dental Software'.</summary>
 		SoftwareName,
 		SolidBlockouts,

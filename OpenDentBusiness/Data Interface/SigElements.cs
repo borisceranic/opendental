@@ -50,6 +50,16 @@ namespace OpenDentBusiness{
 			return Crud.SigElementCrud.Insert(se);
 		}
 
+		///<summary>Should not be called regularly, usually only after batch deleting old signals.</summary>
+		public static void DeleteOrphaned() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			string command= "DELETE from SigElement WHERE SignalNum NOT IN (SELECT SignalNum FROM signalod)";
+			Db.NonQ(command);
+		}
+
 		//<summary>There's no such thing as deleting a SigElement</summary>
 		/*public void Delete(){
 			string command= "DELETE from SigElement WHERE SigElementNum = '"
@@ -72,9 +82,9 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		
 
-	
+
+
 	}
 
 	
