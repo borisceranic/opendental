@@ -317,10 +317,12 @@ namespace OpenDental{
 				listClinic.Items.Clear();
 				listClinic.Items.Add(Lan.g(this,"all"));
 				listClinic.SelectedIndex=0;
+				checkClinicIsRestricted.Enabled=false;
 				for(int i=0;i<Clinics.List.Length;i++) {
 					listClinic.Items.Add(Clinics.List[i].Description);
 					if(UserCur.ClinicNum==Clinics.List[i].ClinicNum) {
 						listClinic.SelectedIndex=i+1;
+						checkClinicIsRestricted.Enabled=true;
 					}
 				}
 				checkClinicIsRestricted.Checked=UserCur.ClinicIsRestricted;
