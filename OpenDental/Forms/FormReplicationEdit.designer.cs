@@ -45,6 +45,8 @@ namespace OpenDental{
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.butThisComputer = new OpenDental.UI.Button();
+			this.label11 = new System.Windows.Forms.Label();
+			this.checkReportServer = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -62,7 +64,7 @@ namespace OpenDental{
 			this.textDescript.Location = new System.Drawing.Point(238, 22);
 			this.textDescript.Name = "textDescript";
 			this.textDescript.Size = new System.Drawing.Size(318, 20);
-			this.textDescript.TabIndex = 61;
+			this.textDescript.TabIndex = 0;
 			this.textDescript.WordWrap = false;
 			// 
 			// label2
@@ -106,7 +108,7 @@ namespace OpenDental{
 			this.textRangeStart.Location = new System.Drawing.Point(238, 107);
 			this.textRangeStart.Name = "textRangeStart";
 			this.textRangeStart.Size = new System.Drawing.Size(175, 20);
-			this.textRangeStart.TabIndex = 68;
+			this.textRangeStart.TabIndex = 3;
 			this.textRangeStart.WordWrap = false;
 			// 
 			// textRangeEnd
@@ -114,7 +116,7 @@ namespace OpenDental{
 			this.textRangeEnd.Location = new System.Drawing.Point(238, 137);
 			this.textRangeEnd.Name = "textRangeEnd";
 			this.textRangeEnd.Size = new System.Drawing.Size(175, 20);
-			this.textRangeEnd.TabIndex = 69;
+			this.textRangeEnd.TabIndex = 4;
 			this.textRangeEnd.WordWrap = false;
 			// 
 			// textAtoZpath
@@ -122,7 +124,7 @@ namespace OpenDental{
 			this.textAtoZpath.Location = new System.Drawing.Point(238, 168);
 			this.textAtoZpath.Name = "textAtoZpath";
 			this.textAtoZpath.Size = new System.Drawing.Size(388, 20);
-			this.textAtoZpath.TabIndex = 72;
+			this.textAtoZpath.TabIndex = 5;
 			this.textAtoZpath.WordWrap = false;
 			// 
 			// label6
@@ -140,7 +142,7 @@ namespace OpenDental{
 			this.checkUpdateBlocked.Location = new System.Drawing.Point(16, 200);
 			this.checkUpdateBlocked.Name = "checkUpdateBlocked";
 			this.checkUpdateBlocked.Size = new System.Drawing.Size(236, 18);
-			this.checkUpdateBlocked.TabIndex = 99;
+			this.checkUpdateBlocked.TabIndex = 6;
 			this.checkUpdateBlocked.Text = "Update Blocked";
 			this.checkUpdateBlocked.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkUpdateBlocked.UseVisualStyleBackColor = true;
@@ -174,10 +176,10 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(24, 333);
+			this.butDelete.Location = new System.Drawing.Point(24, 372);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(86, 24);
-			this.butDelete.TabIndex = 70;
+			this.butDelete.TabIndex = 12;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -188,7 +190,7 @@ namespace OpenDental{
 			this.textServerId.MinVal = 0;
 			this.textServerId.Name = "textServerId";
 			this.textServerId.Size = new System.Drawing.Size(100, 20);
-			this.textServerId.TabIndex = 64;
+			this.textServerId.TabIndex = 1;
 			// 
 			// butOK
 			// 
@@ -198,10 +200,10 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(488, 333);
+			this.butOK.Location = new System.Drawing.Point(488, 372);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 10;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -213,24 +215,24 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(579, 333);
+			this.butCancel.Location = new System.Drawing.Point(579, 372);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 11;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// textSlaveMonitor
 			// 
-			this.textSlaveMonitor.Location = new System.Drawing.Point(238, 251);
+			this.textSlaveMonitor.Location = new System.Drawing.Point(238, 297);
 			this.textSlaveMonitor.Name = "textSlaveMonitor";
 			this.textSlaveMonitor.Size = new System.Drawing.Size(306, 20);
-			this.textSlaveMonitor.TabIndex = 103;
+			this.textSlaveMonitor.TabIndex = 8;
 			this.textSlaveMonitor.WordWrap = false;
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(10, 251);
+			this.label9.Location = new System.Drawing.Point(10, 297);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(226, 18);
 			this.label9.TabIndex = 102;
@@ -239,7 +241,7 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(238, 274);
+			this.label10.Location = new System.Drawing.Point(238, 320);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(306, 41);
 			this.label10.TabIndex = 100;
@@ -249,22 +251,44 @@ namespace OpenDental{
 			// butThisComputer
 			// 
 			this.butThisComputer.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butThisComputer.Autosize = true;
 			this.butThisComputer.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butThisComputer.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butThisComputer.CornerRadius = 4F;
-			this.butThisComputer.Location = new System.Drawing.Point(550, 251);
+			this.butThisComputer.Location = new System.Drawing.Point(550, 297);
 			this.butThisComputer.Name = "butThisComputer";
 			this.butThisComputer.Size = new System.Drawing.Size(87, 24);
-			this.butThisComputer.TabIndex = 3;
+			this.butThisComputer.TabIndex = 9;
 			this.butThisComputer.Text = "This Computer";
 			this.butThisComputer.Click += new System.EventHandler(this.butThisComputer_Click);
+			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(258, 248);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(368, 46);
+			this.label11.TabIndex = 104;
+			this.label11.Text = "User queries with CREATE TABLE or DROP TABLE syntax can only be run when connecte" +
+    "d to this server.  Allowing such queries to run on non-report servers can cause " +
+    "replication to crash.";
+			// 
+			// checkReportServer
+			// 
+			this.checkReportServer.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkReportServer.Location = new System.Drawing.Point(16, 248);
+			this.checkReportServer.Name = "checkReportServer";
+			this.checkReportServer.Size = new System.Drawing.Size(236, 18);
+			this.checkReportServer.TabIndex = 7;
+			this.checkReportServer.Text = "Report Server";
+			this.checkReportServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkReportServer.UseVisualStyleBackColor = true;
 			// 
 			// FormReplicationEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(678, 372);
+			this.ClientSize = new System.Drawing.Size(678, 411);
+			this.Controls.Add(this.checkReportServer);
+			this.Controls.Add(this.label11);
 			this.Controls.Add(this.textSlaveMonitor);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.label8);
@@ -287,6 +311,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(694, 450);
 			this.Name = "FormReplicationEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Replication Server";
@@ -319,5 +344,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label10;
 		private UI.Button butThisComputer;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.CheckBox checkReportServer;
 	}
 }

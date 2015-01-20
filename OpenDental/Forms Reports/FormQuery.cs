@@ -1107,12 +1107,12 @@ namespace OpenDental{
 				return true;
 			}
 			//At this point we know that replication is enabled and the command is potentially unsafe.
-			if(PrefC.GetString(PrefName.ReplicationUserQueryServer)=="") {  //if no allowed ReplicationUserQueryServer set in replication setup
+			if(PrefC.GetLong(PrefName.ReplicationUserQueryServer)==0) {//if no allowed ReplicationUserQueryServer set in replication setup
 				MsgBox.Show(this,"This query contains unsafe syntax that can crash replication.  There is currently no computer set that is allowed to run these types of queries.  This can be set in the replication setup window.");
 				return false;
 			}
-			else if(Environment.MachineName.ToLower()!=PrefC.GetString(PrefName.ReplicationUserQueryServer).ToLower()) { //if not running query from the ReplicationUserQueryServer set in replication setup 
-				MessageBox.Show(this,Lan.g(this,"This query contains unsafe syntax that can crash replication")+".  "+Lan.g(this,"The only computer allowed to run these queries is")+" "+PrefName.ReplicationUserQueryServer+".  "+Lan.g(this,"This can be changed in the replication setup window"+"."));
+			else if(!ReplicationServers.IsConnectedReportServer()) {//if not running query from the ReplicationUserQueryServer set in replication setup 
+				MsgBox.Show(this,"This query contains unsafe syntax that can crash replication.  Only computers connected to the report server are allowed to run these queries.  The current report server can be found in the replication setup window.");
 				return false;
 			}
 			return true;

@@ -29,6 +29,9 @@ namespace OpenDental {
 			textAtoZpath.Text=RepServ.AtoZpath;
 			checkUpdateBlocked.Checked=RepServ.UpdateBlocked;
 			textSlaveMonitor.Text=RepServ.SlaveMonitor;
+			if(RepServ.ReplicationServerNum==PrefC.GetLong(PrefName.ReplicationUserQueryServer)) {
+				checkReportServer.Checked=true;
+			}
 		}
 
 		private void butThisComputer_Click(object sender,EventArgs e) {
@@ -42,6 +45,11 @@ namespace OpenDental {
 			}
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete?")) {
 				return;
+			}
+			if(RepServ.ReplicationServerNum==PrefC.GetLong(PrefName.ReplicationUserQueryServer)) {//Current report server.
+				if(Prefs.UpdateLong(PrefName.ReplicationUserQueryServer,0)) {
+					DataValid.SetInvalid(InvalidType.Prefs);
+				}
 			}
 			ReplicationServers.DeleteObject(RepServ.ReplicationServerNum);
 			DialogResult=DialogResult.OK;
@@ -96,6 +104,17 @@ namespace OpenDental {
 			}
 			else {
 				ReplicationServers.Update(RepServ);
+			}
+			//Update the ReplicationUserQueryServer preference as needed.
+			if(checkReportServer.Checked) {
+				if(Prefs.UpdateLong(PrefName.ReplicationUserQueryServer,RepServ.ReplicationServerNum)) {
+					DataValid.SetInvalid(InvalidType.Prefs);
+				}
+			}
+			else if(RepServ.ReplicationServerNum==PrefC.GetLong(PrefName.ReplicationUserQueryServer)) {//If this replication server was the original report server, set the current server to 0.
+				if(Prefs.UpdateLong(PrefName.ReplicationUserQueryServer,0)) {
+					DataValid.SetInvalid(InvalidType.Prefs);
+				}
 			}
 			DialogResult=DialogResult.OK;
 		}

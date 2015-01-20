@@ -77,6 +77,7 @@ namespace OpenDentBusiness{
 			Crud.ReplicationServerCrud.Delete(replicationServerNum);
 		}
 
+		///<summary>Gets the MySQL server_id variable for the current connection.</summary>
 		public static int GetServer_id() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetInt(MethodBase.GetCurrentMethod());
@@ -183,6 +184,19 @@ namespace OpenDentBusiness{
 			catch {
 				return false;
 			}
+		}
+
+		///<summary>Checks if the current database connected to is the replication report server.  Allows users to run dangerous custom queries that could potentially break replication.  We will allow these queries to be run on exactly one replication server (the report server), because our custom queries contain CREATE TABLE statements for static temporary table names which can cause replication failure if multiple users run the same query at the same time.</summary>
+		public static bool IsConnectedReportServer() {
+			//No need to check RemotingRole; no call to db.
+			if(PrefC.GetLong(PrefName.ReplicationUserQueryServer)==0) {//Report server not set up.
+				return false;
+			}
+			ReplicationServer repServer=GetForLocalComputer();
+			if(repServer==null || repServer.ReplicationServerNum!=PrefC.GetLong(PrefName.ReplicationUserQueryServer)) {
+				return false;
+			}
+			return true;
 		}
 
 		///<summary>Get the status of the replication server.</summary>
