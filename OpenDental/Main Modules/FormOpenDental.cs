@@ -6181,8 +6181,8 @@ namespace OpenDental{
 			}
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
-			SetModuleSelected();
 			ClinicNum=Security.CurUser.ClinicNum;
+			SetModuleSelected();
 			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
 			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
 			if(userControlTasks1.Visible) {
