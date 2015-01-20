@@ -141,8 +141,10 @@ namespace OpenDentBusiness{
 				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i]["ScheduleNum"].ToString()));
 				listScheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
 			}
-			command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
-			Db.NonQ(command);
+			if(listScheduleNums.Count>0) {
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
+				Db.NonQ(command);
+			}
 			//command="DELETE FROM scheduleop WHERE ScheduleNum IN(SELECT ScheduleNum FROM schedule WHERE EmployeeNum="+POut.Long(employeeNum)+")";
 			//Db.NonQ(command);
 			command="DELETE FROM schedule WHERE EmployeeNum="+POut.Long(employeeNum);
