@@ -70,6 +70,17 @@ namespace OpenDental {
 						if(files[i].ToLower().StartsWith("procedurecodes")) {
 							continue;//Skip any files which contain procedure codes, because we only want to display fee files.
 						}
+						if(files[i].ToUpper().StartsWith("QC_ACDQ_")) {
+							try {
+								long year=PIn.Long(files[i].Substring(8,4));
+								if(year<DateTime.Now.Year) {//Current year and next year will show up.
+									continue;//Quebec fee schedules for previous years must be unavailable to the user.
+								}
+							}
+							catch {
+								continue;//Improperty formatted file name.
+							}
+						}
 						ListFeeSchedFilesAll.Add(files[i]);
 					}
 				}
