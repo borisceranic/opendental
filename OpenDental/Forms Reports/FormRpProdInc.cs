@@ -1264,7 +1264,7 @@ GROUP BY SchedDate
 			}
 			report.Query+=
 				"FROM appointment "
-				+"LEFT JOIN procedurelog ON appointment.AptNum = procedurelog.AptNum "
+				+"LEFT JOIN procedurelog ON appointment.AptNum = procedurelog.AptNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" "
 				+"LEFT JOIN claimproc ON procedurelog.ProcNum = claimproc.ProcNum AND Status=6 AND (WriteOffEst != -1 OR WriteOffEstOverride != -1) "
 				+"WHERE (appointment.AptStatus = 1 OR "//stat=scheduled
         +"appointment.AptStatus = 4) "//or stat=ASAP
