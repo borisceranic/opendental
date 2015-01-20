@@ -29,7 +29,6 @@ namespace OpenDental {
 				groupBoxReplicationFailure.Visible=true;
 				textReplicaitonFailureAtServer_id.Text=PrefC.GetInt(PrefName.ReplicationFailureAtServer_id).ToString();
 			}
-			textUserQueryServer.Text=PrefC.GetString(PrefName.ReplicationUserQueryServer);
 			FillGrid();
 		}
 
@@ -47,9 +46,11 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormReplicationSetup","AtoZ Path"),160);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("FormReplicationSetup","UpdateBlocked"),100);
+			col=new ODGridColumn(Lan.g("FormReplicationSetup","UpdateBlocked"),100,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("FormReplicationSetup","SlaveMonitor"),100);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("FormReplicationSetup","IsReport"),100,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -62,11 +63,11 @@ namespace OpenDental {
 				row.Cells.Add(ReplicationServers.Listt[i].AtoZpath);
 				row.Cells.Add(ReplicationServers.Listt[i].UpdateBlocked ? "X" : "");
 				row.Cells.Add(ReplicationServers.Listt[i].SlaveMonitor.ToString());
+				row.Cells.Add(ReplicationServers.Listt[i].ReplicationServerNum==PrefC.GetLong(PrefName.ReplicationUserQueryServer) ? "X" : "");
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
-
 
 		private void checkRandomPrimaryKeys_Click(object sender,System.EventArgs e) {
 			if(checkRandomPrimaryKeys.Checked) {
@@ -228,9 +229,6 @@ namespace OpenDental {
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
-			if(Prefs.UpdateString(PrefName.ReplicationUserQueryServer,textUserQueryServer.Text)) {
-				DataValid.SetInvalid(InvalidType.Prefs);
-			}
 			Close();
 		}
 

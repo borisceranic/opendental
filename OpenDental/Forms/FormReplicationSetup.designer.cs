@@ -43,9 +43,6 @@ namespace OpenDental{
 			this.butClearReplicationFailureAtServer_id = new OpenDental.UI.Button();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textReplicaitonFailureAtServer_id = new System.Windows.Forms.TextBox();
-			this.label7 = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
-			this.textUserQueryServer = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBoxReplicationFailure.SuspendLayout();
 			this.SuspendLayout();
@@ -219,7 +216,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(798, 630);
+			this.butClose.Location = new System.Drawing.Point(798, 598);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -274,40 +271,10 @@ namespace OpenDental{
 			this.textReplicaitonFailureAtServer_id.Size = new System.Drawing.Size(75, 20);
 			this.textReplicaitonFailureAtServer_id.TabIndex = 67;
 			// 
-			// label7
-			// 
-			this.label7.Location = new System.Drawing.Point(318, 626);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(458, 39);
-			this.label7.TabIndex = 68;
-			this.label7.Text = "This is the only computer that is allowed to run user queries with CREATE TABLE o" +
-    "r DROP TABLE syntax.  Only this computer is allowed to run these queries otherwi" +
-    "se replication can crash.";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// label8
-			// 
-			this.label8.Location = new System.Drawing.Point(14, 633);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(153, 18);
-			this.label8.TabIndex = 69;
-			this.label8.Text = "User Query Server Name";
-			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textUserQueryServer
-			// 
-			this.textUserQueryServer.Location = new System.Drawing.Point(173, 633);
-			this.textUserQueryServer.Name = "textUserQueryServer";
-			this.textUserQueryServer.Size = new System.Drawing.Size(139, 20);
-			this.textUserQueryServer.TabIndex = 70;
-			// 
 			// FormReplicationSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(885, 668);
-			this.Controls.Add(this.textUserQueryServer);
-			this.Controls.Add(this.label8);
-			this.Controls.Add(this.label7);
+			this.ClientSize = new System.Drawing.Size(885, 636);
 			this.Controls.Add(this.groupBoxReplicationFailure);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label2);
@@ -329,7 +296,6 @@ namespace OpenDental{
 			this.groupBoxReplicationFailure.ResumeLayout(false);
 			this.groupBoxReplicationFailure.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
@@ -354,8 +320,5 @@ namespace OpenDental{
 		private UI.Button butClearReplicationFailureAtServer_id;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textReplicaitonFailureAtServer_id;
-		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.TextBox textUserQueryServer;
 	}
 }

@@ -6139,6 +6139,12 @@ namespace OpenDentBusiness {
 					command="DELETE FROM signalod WHERE SigType = 0 AND AckTime != TO_DATE('0001-01-01','YYYY-MM-DD') AND SigDateTime < CURRENT_TIMESTAMP -2";//Only unacknowledged buttons older than 2 days
 					Db.NonQ(command);
 				}
+				//The ReplicationUserQueryServer preference used to store the "case insensitive computer name" of one singular computer.
+				//When using replication, that one computer was designated as the ONLY computer that could run dangerous user queries.
+				//Nathan qualified this as a bug because it was not good enough for one of our large customers.  We instead need to have the preference store the Repliction Server PK.
+				//This way, ANY computer connected to the "report server" can run dangerous user queries.
+				command="UPDATE preference SET ValueString = '0' WHERE PrefName = 'ReplicationUserQueryServer'";
+				Db.NonQ(command);//Simply clear out the old computer name because there is no way we can guess which specific database is the "report server" based on a computer name.
 				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
