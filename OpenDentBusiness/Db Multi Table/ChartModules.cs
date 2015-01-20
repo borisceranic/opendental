@@ -1173,10 +1173,15 @@ namespace OpenDentBusiness {
 				+"LEFT JOIN appointment ON appointment.NextAptNum=plannedappt.AptNum "
 				//+"LEFT JOIN procedurelog ON procedurelog.PlannedAptNum=plannedappt.AptNum "//grab all attached completed procs
 				//+"AND procedurelog.ProcStatus=2 "
-				+"WHERE plannedappt.PatNum="+POut.Long(patNum)+" "
-				+"GROUP BY plannedappt.AptNum,ItemOrder,PlannedApptNum,appointment.AptDateTime,"
-				+"appointment.Pattern,appointment.AptStatus,appointment.AptNum "
-				+"ORDER BY ItemOrder";
+				+"WHERE plannedappt.PatNum="+POut.Long(patNum)+" ";
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="GROUP BY plannedappt.AptNum ";
+			}
+			else {
+				command+="GROUP BY plannedappt.AptNum,ItemOrder,PlannedApptNum,appointment.AptDateTime,"
+				+"appointment.Pattern,appointment.AptStatus,appointment.AptNum ";
+			}
+			command+="ORDER BY ItemOrder";
 			//plannedappt.AptNum does refer to the planned appt, but the other fields in the result are for the linked scheduled appt.
 			DataTable rawPlannedAppts=dcon.GetTable(command);
 			DataRow aptRow;
