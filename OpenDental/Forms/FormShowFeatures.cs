@@ -200,6 +200,7 @@ namespace OpenDental{
 			this.checkNoClinics.TabIndex = 8;
 			this.checkNoClinics.Text = "Clinics (multiple office locations)";
 			this.checkNoClinics.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkNoClinics.Click += new System.EventHandler(this.checkNoClinics_Click);
 			// 
 			// checkDentalSchools
 			// 
@@ -385,6 +386,10 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools) && checkDentalSchools.Checked) {
 				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
 			}
+		}
+
+		private void checkNoClinics_Click(object sender,EventArgs e) {
+			MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
 		}
 
 		private void checkEhr_Click(object sender,EventArgs e) {
