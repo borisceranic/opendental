@@ -77,8 +77,6 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private List<DisplayField> fields;
-		///<summary>Program level clinic currently being viewed.  Set outside this form when launched.  Sets selected index of comboClinic.</summary>
-		public long ClinicNum;
 		///<summary>List of all the clinics this userod has access to.  When comboClinic.SelectedIndex=0 it refers to all clinics in this list.  Otherwise their selected clinic will always be _listClinics[comboClinic.SelectedIndex-1].</summary>
 		private List<Clinic> _listClinics;
 
@@ -789,7 +787,7 @@ namespace OpenDental{
 				_listClinics=Clinics.GetForUserod(Security.CurUser);//could be only one if the user is restricted
 				for(int i=0;i<_listClinics.Count;i++) {
 					comboClinic.Items.Add(_listClinics[i].Description);
-					if(ClinicNum==_listClinics[i].ClinicNum) {
+					if(FormOpenDental.ClinicNum==_listClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}

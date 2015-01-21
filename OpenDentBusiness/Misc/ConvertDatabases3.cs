@@ -6957,10 +6957,6 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE securitylog MODIFY LogSource NOT NULL";
 					Db.NonQ(command);
 				}
-				
-
-
-
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('SignalLastClearedDate','0001-01-01')";
 					Db.NonQ(command);
@@ -6968,6 +6964,78 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SignalLastClearedDate',TO_DATE('0001-01-01','YYYY-MM-DD'))";
 					Db.NonQ(command);
+				}
+				 if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE apptview CHANGE ClinicNum OnlyScheduledClinic bigint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE apptview RENAME COLUMN ClinicNum TO OnlyScheduledClinic";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE apptview ADD AssignedClinic bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE apptview ADD INDEX (AssignedClinic)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE apptview ADD AssignedClinic number(20)";
+					Db.NonQ(command);
+					command="UPDATE apptview SET AssignedClinic = 0 WHERE AssignedClinic IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE apptview MODIFY AssignedClinic NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX apptview_AssignedClinic ON apptview (AssignedClinic)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//All existing apptviews will have the AssignedClinic set to 0 and will therefore exist in the list of apptviews not assigned to a clinic.
+					//For all apptviews with operatories assigned, where all operatories in the view are assigned to one clinic, the view will be duplicated and assigned to that clinic.
+					//If the view contains an operatory that is not assigned to a clinic, or if there are operatories in the view from more than one clinic,
+					//the view cannot be assigned to a clinic and will only be in the unassigned list.
+					command="SELECT apptview.ApptViewNum,MAX(operatory.ClinicNum) AS ClinicNum FROM apptview "
+						+"INNER JOIN apptviewitem ON apptview.ApptViewNum=apptviewitem.ApptViewNum AND apptviewitem.OpNum>0 "
+						+"INNER JOIN operatory ON operatory.OperatoryNum=apptviewitem.OpNum "
+						+"GROUP BY apptview.ApptViewNum "
+						+"HAVING COUNT(DISTINCT operatory.ClinicNum)=1 AND MAX(operatory.ClinicNum)>0";
+					DataTable tableApptViewNumOpNum=Db.GetTable(command);
+					for(int i=0;i<tableApptViewNumOpNum.Rows.Count;i++) {
+						long apptViewNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ApptViewNum"].ToString());
+						long clinicNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ClinicNum"].ToString());
+						command="INSERT INTO apptview (Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
+							+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,AssignedClinic) "
+							+"(SELECT Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,"
+							+"StackBehavUR,StackBehavLR,OnlyScheduledClinic,"+POut.Long(clinicNum)+" "
+							+"FROM apptview WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
+						long viewnum=Db.NonQ(command,true);
+						command="INSERT INTO apptviewitem (ApptViewNum,OpNum,ProvNum,ElementDesc,"
+							+"ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum) "
+							+"(SELECT "+POut.Long(viewnum)+",OpNum,ProvNum,"
+							+"ElementDesc,ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum "
+							+"FROM apptviewitem WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
+						Db.NonQ(command);
+					}
+					//set the item orders for each clinic's assigned views.
+					command="SELECT * FROM apptview ORDER BY AssignedClinic,ItemOrder";
+					DataTable table=Db.GetTable(command);
+					long clinicNumPrev=0;
+					int itemOrderCur=0;
+					for(int i=0;i<table.Rows.Count;i++) {
+						long clinicNumCur=PIn.Long(table.Rows[i]["AssignedClinic"].ToString());
+						long apptViewNumCur=PIn.Long(table.Rows[i]["ApptViewNum"].ToString());
+						if(i==0 || clinicNumCur!=clinicNumPrev) {
+							itemOrderCur=0;
+							clinicNumPrev=clinicNumCur;
+						}
+						else if(clinicNumCur==clinicNumPrev) {
+							itemOrderCur++;
+						}
+						command="UPDATE apptview SET ItemOrder="+POut.Int(itemOrderCur)+" WHERE ApptViewNum="+POut.Long(apptViewNumCur);
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
 				}
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

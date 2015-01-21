@@ -28,8 +28,15 @@ namespace OpenDentBusiness{
 		public ApptViewStackBehavior StackBehavUR;
 		///<summary>Enum:ApptViewStackBehavior </summary>
 		public ApptViewStackBehavior StackBehavLR;
-		///<summary>FK to clinic.ClinicNum.  0=All clinics.  If OnlyScheduledProvs is set to true, then only provider schedules with matching clinic will be included.</summary>
-		public long ClinicNum;
+		///<summary>FK to clinic.ClinicNum.  0=All clinics.  If OnlyScheduledProvs is set to true, then only provider schedules for operatories with matching clinic will be included.</summary>
+		public long OnlyScheduledClinic;
+		///<summary>FK to clinic.ClinicNum.  0-All.  This view will only be available to users with permission to access the views for this clinic and only when this clinic is selected in the main toolbar.  Unassigned views will only display for users that are not restricted to a clinic(s) and therefore have permission to view data for all clinics.</summary>
+		public long AssignedClinic;
+
+		///<summary>Returns a copy of this ApptView.</summary>
+		public ApptView Copy() {
+			return (ApptView)this.MemberwiseClone();
+		}
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("OnlySchedBeforeTime",typeof(long))]

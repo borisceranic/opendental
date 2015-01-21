@@ -65,10 +65,18 @@ namespace OpenDental{
 		private Label label1;
 		private ODGrid gridApptFieldDefs;
 		private ODGrid gridPatFieldDefs;
-		private Label labelClinic;
-		private ComboBox comboClinic;
+		private Label labelOpClinic;
+		private ComboBox comboOpClinic;
+		private ComboBox comboAssignedClinic;
+		private Label labelAssignedClinic;
 		///<summary>Set this value before opening the form.</summary>
 		public ApptView ApptViewCur;
+		///<summary>Set this value with the clinic selected in FormApptViews.</summary>
+		public long AssignedClinicNum;
+		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time as comboAssignedClinic and is used to set apptview.AssignedClinic when saving.</summary>
+		private List<long> _listUserClinicNums;
+		///<summary>This is a list of all operatories available to add to this view based on AssignedClinicNum and the clinic the ops are assigned to.  If the clinics show feature is turned off (EasyNoClinics=true) or if the view is not assigned to a clinic, all unhidden ops will be available.  If an op is not assigned to a clinic, it will only be available to add to views also not assigned to a clinic.  If the view is assigned to a clinic, ops assigned to the same clinic will be available to add to the view.</summary>
+		private List<long> _listOpNums;
 		//<summary>Tracks MouseIsDown on listOps.</summary>
 		//private bool MouseIsDown;
 
@@ -124,7 +132,8 @@ namespace OpenDental{
 			this.checkOnlyScheduledProvs = new System.Windows.Forms.CheckBox();
 			this.textBeforeTime = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.labelClinic = new System.Windows.Forms.Label();
+			this.labelOpClinic = new System.Windows.Forms.Label();
+			this.comboOpClinic = new System.Windows.Forms.ComboBox();
 			this.labelAfterTime = new System.Windows.Forms.Label();
 			this.textAfterTime = new System.Windows.Forms.TextBox();
 			this.labelBeforeTime = new System.Windows.Forms.Label();
@@ -140,7 +149,8 @@ namespace OpenDental{
 			this.gridAvailable = new OpenDental.UI.ODGrid();
 			this.gridApptFieldDefs = new OpenDental.UI.ODGrid();
 			this.gridPatFieldDefs = new OpenDental.UI.ODGrid();
-			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.comboAssignedClinic = new System.Windows.Forms.ComboBox();
+			this.labelAssignedClinic = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
@@ -195,52 +205,52 @@ namespace OpenDental{
 			// 
 			// labelOps
 			// 
-			this.labelOps.Location = new System.Drawing.Point(32, 149);
+			this.labelOps.Location = new System.Drawing.Point(32, 106);
 			this.labelOps.Name = "labelOps";
-			this.labelOps.Size = new System.Drawing.Size(184, 35);
+			this.labelOps.Size = new System.Drawing.Size(246, 18);
 			this.labelOps.TabIndex = 39;
 			this.labelOps.Text = "View Operatories";
 			this.labelOps.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listOps
 			// 
-			this.listOps.Location = new System.Drawing.Point(32, 186);
+			this.listOps.Location = new System.Drawing.Point(32, 126);
 			this.listOps.Name = "listOps";
 			this.listOps.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listOps.Size = new System.Drawing.Size(120, 186);
+			this.listOps.Size = new System.Drawing.Size(120, 225);
 			this.listOps.TabIndex = 40;
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(32, 401);
+			this.listProv.Location = new System.Drawing.Point(32, 384);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(120, 212);
+			this.listProv.Size = new System.Drawing.Size(120, 225);
 			this.listProv.TabIndex = 42;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(32, 376);
+			this.label2.Location = new System.Drawing.Point(32, 364);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(128, 23);
+			this.label2.Size = new System.Drawing.Size(128, 18);
 			this.label2.TabIndex = 41;
 			this.label2.Text = "View Provider Bars";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(110, 10);
+			this.label3.Location = new System.Drawing.Point(5, 11);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(187, 18);
+			this.label3.Size = new System.Drawing.Size(217, 17);
 			this.label3.TabIndex = 43;
 			this.label3.Text = "Description";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(298, 11);
+			this.textDescription.Location = new System.Drawing.Point(222, 11);
 			this.textDescription.Name = "textDescription";
-			this.textDescription.Size = new System.Drawing.Size(250, 20);
+			this.textDescription.Size = new System.Drawing.Size(160, 20);
 			this.textDescription.TabIndex = 44;
 			// 
 			// butDown
@@ -252,7 +262,7 @@ namespace OpenDental{
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(297, 475);
+			this.butDown.Location = new System.Drawing.Point(297, 511);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(71, 24);
 			this.butDown.TabIndex = 50;
@@ -268,7 +278,7 @@ namespace OpenDental{
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(219, 475);
+			this.butUp.Location = new System.Drawing.Point(219, 511);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(71, 24);
 			this.butUp.TabIndex = 51;
@@ -283,7 +293,7 @@ namespace OpenDental{
 			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLeft.CornerRadius = 4F;
 			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
-			this.butLeft.Location = new System.Drawing.Point(404, 312);
+			this.butLeft.Location = new System.Drawing.Point(389, 312);
 			this.butLeft.Name = "butLeft";
 			this.butLeft.Size = new System.Drawing.Size(35, 26);
 			this.butLeft.TabIndex = 52;
@@ -297,7 +307,7 @@ namespace OpenDental{
 			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRight.CornerRadius = 4F;
 			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
-			this.butRight.Location = new System.Drawing.Point(404, 278);
+			this.butRight.Location = new System.Drawing.Point(389, 278);
 			this.butRight.Name = "butRight";
 			this.butRight.Size = new System.Drawing.Size(35, 26);
 			this.butRight.TabIndex = 53;
@@ -305,16 +315,16 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(51, 31);
+			this.label6.Location = new System.Drawing.Point(5, 33);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(246, 18);
+			this.label6.Size = new System.Drawing.Size(217, 17);
 			this.label6.TabIndex = 54;
 			this.label6.Text = "Rows Per Time Increment (usually 1)";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// textRowsPerIncr
 			// 
-			this.textRowsPerIncr.Location = new System.Drawing.Point(298, 33);
+			this.textRowsPerIncr.Location = new System.Drawing.Point(222, 33);
 			this.textRowsPerIncr.Name = "textRowsPerIncr";
 			this.textRowsPerIncr.Size = new System.Drawing.Size(56, 20);
 			this.textRowsPerIncr.TabIndex = 55;
@@ -322,10 +332,11 @@ namespace OpenDental{
 			// 
 			// checkOnlyScheduledProvs
 			// 
+			this.checkOnlyScheduledProvs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkOnlyScheduledProvs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(6, 11);
+			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(-15, 15);
 			this.checkOnlyScheduledProvs.Name = "checkOnlyScheduledProvs";
-			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(282, 18);
+			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(295, 17);
 			this.checkOnlyScheduledProvs.TabIndex = 56;
 			this.checkOnlyScheduledProvs.Text = "Only show operatories for scheduled providers";
 			this.checkOnlyScheduledProvs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -334,37 +345,52 @@ namespace OpenDental{
 			// 
 			// textBeforeTime
 			// 
-			this.textBeforeTime.Location = new System.Drawing.Point(263, 30);
+			this.textBeforeTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBeforeTime.Location = new System.Drawing.Point(265, 33);
 			this.textBeforeTime.Name = "textBeforeTime";
 			this.textBeforeTime.Size = new System.Drawing.Size(56, 20);
 			this.textBeforeTime.TabIndex = 57;
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.labelClinic);
+			this.groupBox1.Controls.Add(this.labelOpClinic);
+			this.groupBox1.Controls.Add(this.comboOpClinic);
 			this.groupBox1.Controls.Add(this.labelAfterTime);
 			this.groupBox1.Controls.Add(this.textAfterTime);
 			this.groupBox1.Controls.Add(this.labelBeforeTime);
-			this.groupBox1.Controls.Add(this.checkOnlyScheduledProvs);
 			this.groupBox1.Controls.Add(this.textBeforeTime);
-			this.groupBox1.Location = new System.Drawing.Point(35, 49);
+			this.groupBox1.Controls.Add(this.checkOnlyScheduledProvs);
+			this.groupBox1.Location = new System.Drawing.Point(430, 1);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(398, 101);
+			this.groupBox1.Size = new System.Drawing.Size(397, 104);
 			this.groupBox1.TabIndex = 58;
 			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Display Filter";
 			// 
-			// labelClinic
+			// labelOpClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(77, 74);
-			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(187, 17);
-			this.labelClinic.TabIndex = 61;
-			this.labelClinic.Text = "Clinic";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.labelOpClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelOpClinic.Location = new System.Drawing.Point(78, 77);
+			this.labelOpClinic.Name = "labelOpClinic";
+			this.labelOpClinic.Size = new System.Drawing.Size(187, 17);
+			this.labelOpClinic.TabIndex = 61;
+			this.labelOpClinic.Text = "Only operatories for clinic";
+			this.labelOpClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
+			// comboOpClinic
+			// 
+			this.comboOpClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboOpClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboOpClinic.Location = new System.Drawing.Point(265, 77);
+			this.comboOpClinic.MaxDropDownItems = 30;
+			this.comboOpClinic.Name = "comboOpClinic";
+			this.comboOpClinic.Size = new System.Drawing.Size(129, 21);
+			this.comboOpClinic.TabIndex = 131;
 			// 
 			// labelAfterTime
 			// 
-			this.labelAfterTime.Location = new System.Drawing.Point(77, 52);
+			this.labelAfterTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelAfterTime.Location = new System.Drawing.Point(78, 55);
 			this.labelAfterTime.Name = "labelAfterTime";
 			this.labelAfterTime.Size = new System.Drawing.Size(187, 17);
 			this.labelAfterTime.TabIndex = 60;
@@ -373,14 +399,16 @@ namespace OpenDental{
 			// 
 			// textAfterTime
 			// 
-			this.textAfterTime.Location = new System.Drawing.Point(263, 52);
+			this.textAfterTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textAfterTime.Location = new System.Drawing.Point(265, 55);
 			this.textAfterTime.Name = "textAfterTime";
 			this.textAfterTime.Size = new System.Drawing.Size(56, 20);
 			this.textAfterTime.TabIndex = 59;
 			// 
 			// labelBeforeTime
 			// 
-			this.labelBeforeTime.Location = new System.Drawing.Point(77, 30);
+			this.labelBeforeTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelBeforeTime.Location = new System.Drawing.Point(78, 33);
 			this.labelBeforeTime.Name = "labelBeforeTime";
 			this.labelBeforeTime.Size = new System.Drawing.Size(187, 17);
 			this.labelBeforeTime.TabIndex = 58;
@@ -399,9 +427,9 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.butUp);
 			this.groupBox2.Controls.Add(this.label8);
 			this.groupBox2.Controls.Add(this.butDown);
-			this.groupBox2.Location = new System.Drawing.Point(449, 144);
+			this.groupBox2.Location = new System.Drawing.Point(430, 108);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(378, 507);
+			this.groupBox2.Size = new System.Drawing.Size(397, 543);
 			this.groupBox2.TabIndex = 59;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Rows Displayed (double click to edit or to move to another corner)";
@@ -426,14 +454,14 @@ namespace OpenDental{
 			// listStackUR
 			// 
 			this.listStackUR.FormattingEnabled = true;
-			this.listStackUR.Location = new System.Drawing.Point(192, 177);
+			this.listStackUR.Location = new System.Drawing.Point(192, 213);
 			this.listStackUR.Name = "listStackUR";
 			this.listStackUR.Size = new System.Drawing.Size(175, 30);
 			this.listStackUR.TabIndex = 64;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(190, 158);
+			this.label1.Location = new System.Drawing.Point(190, 194);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(175, 17);
 			this.label1.TabIndex = 63;
@@ -446,7 +474,7 @@ namespace OpenDental{
 			this.gridLR.Location = new System.Drawing.Point(192, 349);
 			this.gridLR.Name = "gridLR";
 			this.gridLR.ScrollValue = 0;
-			this.gridLR.Size = new System.Drawing.Size(175, 120);
+			this.gridLR.Size = new System.Drawing.Size(175, 156);
 			this.gridLR.TabIndex = 62;
 			this.gridLR.Title = "Lower Right Corner";
 			this.gridLR.TranslationName = null;
@@ -459,7 +487,7 @@ namespace OpenDental{
 			this.gridUR.Location = new System.Drawing.Point(192, 18);
 			this.gridUR.Name = "gridUR";
 			this.gridUR.ScrollValue = 0;
-			this.gridUR.Size = new System.Drawing.Size(175, 138);
+			this.gridUR.Size = new System.Drawing.Size(175, 174);
 			this.gridUR.TabIndex = 61;
 			this.gridUR.Title = "Upper Right Corner";
 			this.gridUR.TranslationName = null;
@@ -472,7 +500,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(11, 18);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(175, 451);
+			this.gridMain.Size = new System.Drawing.Size(175, 487);
 			this.gridMain.TabIndex = 60;
 			this.gridMain.Title = "Main List";
 			this.gridMain.TranslationName = null;
@@ -481,7 +509,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(11, 478);
+			this.label8.Location = new System.Drawing.Point(11, 514);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(209, 17);
 			this.label8.TabIndex = 59;
@@ -491,7 +519,7 @@ namespace OpenDental{
 			// gridAvailable
 			// 
 			this.gridAvailable.HScrollVisible = false;
-			this.gridAvailable.Location = new System.Drawing.Point(222, 162);
+			this.gridAvailable.Location = new System.Drawing.Point(207, 126);
 			this.gridAvailable.Name = "gridAvailable";
 			this.gridAvailable.ScrollValue = 0;
 			this.gridAvailable.Size = new System.Drawing.Size(175, 269);
@@ -503,10 +531,10 @@ namespace OpenDental{
 			// gridApptFieldDefs
 			// 
 			this.gridApptFieldDefs.HScrollVisible = false;
-			this.gridApptFieldDefs.Location = new System.Drawing.Point(222, 434);
+			this.gridApptFieldDefs.Location = new System.Drawing.Point(207, 398);
 			this.gridApptFieldDefs.Name = "gridApptFieldDefs";
 			this.gridApptFieldDefs.ScrollValue = 0;
-			this.gridApptFieldDefs.Size = new System.Drawing.Size(175, 88);
+			this.gridApptFieldDefs.Size = new System.Drawing.Size(175, 106);
 			this.gridApptFieldDefs.TabIndex = 62;
 			this.gridApptFieldDefs.Title = "Appt Field Defs";
 			this.gridApptFieldDefs.TranslationName = null;
@@ -515,23 +543,33 @@ namespace OpenDental{
 			// gridPatFieldDefs
 			// 
 			this.gridPatFieldDefs.HScrollVisible = false;
-			this.gridPatFieldDefs.Location = new System.Drawing.Point(222, 525);
+			this.gridPatFieldDefs.Location = new System.Drawing.Point(207, 507);
 			this.gridPatFieldDefs.Name = "gridPatFieldDefs";
 			this.gridPatFieldDefs.ScrollValue = 0;
-			this.gridPatFieldDefs.Size = new System.Drawing.Size(175, 88);
+			this.gridPatFieldDefs.Size = new System.Drawing.Size(175, 106);
 			this.gridPatFieldDefs.TabIndex = 63;
 			this.gridPatFieldDefs.Title = "Patient Field Defs";
 			this.gridPatFieldDefs.TranslationName = null;
 			this.gridPatFieldDefs.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPatFieldDefs_CellClick);
 			// 
-			// comboClinic
+			// comboAssignedClinic
 			// 
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(298, 123);
-			this.comboClinic.MaxDropDownItems = 30;
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(129, 21);
-			this.comboClinic.TabIndex = 131;
+			this.comboAssignedClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboAssignedClinic.Location = new System.Drawing.Point(222, 55);
+			this.comboAssignedClinic.MaxDropDownItems = 30;
+			this.comboAssignedClinic.Name = "comboAssignedClinic";
+			this.comboAssignedClinic.Size = new System.Drawing.Size(160, 21);
+			this.comboAssignedClinic.TabIndex = 133;
+			this.comboAssignedClinic.SelectionChangeCommitted += new System.EventHandler(this.comboAssignedClinic_SelectionChangeCommitted);
+			// 
+			// labelAssignedClinic
+			// 
+			this.labelAssignedClinic.Location = new System.Drawing.Point(5, 55);
+			this.labelAssignedClinic.Name = "labelAssignedClinic";
+			this.labelAssignedClinic.Size = new System.Drawing.Size(217, 17);
+			this.labelAssignedClinic.TabIndex = 132;
+			this.labelAssignedClinic.Text = "Assigned Clinic";
+			this.labelAssignedClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// FormApptViewEdit
 			// 
@@ -539,13 +577,14 @@ namespace OpenDental{
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(852, 696);
-			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.comboAssignedClinic);
+			this.Controls.Add(this.labelAssignedClinic);
 			this.Controls.Add(this.gridPatFieldDefs);
 			this.Controls.Add(this.gridApptFieldDefs);
 			this.Controls.Add(this.gridAvailable);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.textRowsPerIncr);
-			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.butRight);
 			this.Controls.Add(this.butLeft);
@@ -591,21 +630,52 @@ namespace OpenDental{
 			if(ApptViewCur.OnlySchedAfterTime > new TimeSpan(0,0,0)) {
 				textAfterTime.Text=(DateTime.Today+ApptViewCur.OnlySchedAfterTime).ToShortTimeString();
 			}
-			Clinics.RefreshCache();
-			comboClinic.Items.Add("All");
-			comboClinic.SelectedIndex=0;
-			for(int i=0;i<Clinics.List.Length;i++){
-				comboClinic.Items.Add(Clinics.List[i].Description);
-				if(Clinics.List[i].ClinicNum==ApptViewCur.ClinicNum) {
-					comboClinic.SelectedIndex=i+1;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				Clinics.RefreshCache();
+				comboOpClinic.Items.Clear();
+				comboOpClinic.Items.Add("All");
+				comboOpClinic.SelectedIndex=0;
+				for(int i=0;i<Clinics.List.Length;i++){
+					comboOpClinic.Items.Add(Clinics.List[i].Description);
+					if(Clinics.List[i].ClinicNum==ApptViewCur.OnlyScheduledClinic) {
+						comboOpClinic.SelectedIndex=i+1;
+					}
 				}
+				_listUserClinicNums=new List<long>();
+				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					comboAssignedClinic.Items.Add("All");
+					_listUserClinicNums.Add(0);//this way both lists have the same number of items in it and if 'All' is selected the view AssignedClinicNum will be set to 0
+					comboAssignedClinic.SelectedIndex=0;
+				}
+				for(int i=0;i<listClinics.Count;i++) {
+					comboAssignedClinic.Items.Add(listClinics[i].Description);
+					_listUserClinicNums.Add(listClinics[i].ClinicNum);
+					if(AssignedClinicNum==listClinics[i].ClinicNum) {
+						comboAssignedClinic.SelectedIndex=Security.CurUser.ClinicIsRestricted?i:i+1;//increment the SelectedIndex to account for 'none' in the list at position 0.
+					}
+				}
+			}
+			else {//clinics show feature disabled (EasyNoClinics=true)
+				comboOpClinic.Visible=false;
+				labelOpClinic.Visible=false;
+				comboAssignedClinic.Visible=false;
+				labelAssignedClinic.Visible=false;
+				_listUserClinicNums=new List<long>() { 0 };//if clinics are disabled, apptview.AssignedClinic will be set to 0
 			}
 			SetOpLabel();
 			ApptViewItemL.GetForCurView(ApptViewCur,true,null);//passing in true triggers it to give us the proper list of ops.
+			_listOpNums=new List<long>();
 			for(int i=0;i<OperatoryC.ListShort.Count;i++){
-				listOps.Items.Add(OperatoryC.ListShort[i].OpName);
-				if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)){
-					listOps.SetSelected(i,true);
+				if(PrefC.GetBool(PrefName.EasyNoClinics) //add op to list of ops available for the view if the clinics show feature is turned off
+					|| AssignedClinicNum==0 //or this view is not assigned to a clinic
+					|| OperatoryC.ListShort[i].ClinicNum==AssignedClinicNum) //or the operatory is assigned to same clinic as this view
+				{
+					listOps.Items.Add(OperatoryC.ListShort[i].OpName);
+					_listOpNums.Add(OperatoryC.ListShort[i].OperatoryNum);
+					if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)) {
+						listOps.SetSelected(listOps.Items.Count-1,true);
+					}
 				}
 			}
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
@@ -852,19 +922,21 @@ namespace OpenDental{
 				labelOps.Text=Lan.g(this,"View Operatories (week view only)");
 				labelBeforeTime.Visible=true;
 				labelAfterTime.Visible=true;
-				labelClinic.Visible=true;
 				textBeforeTime.Visible=true;
 				textAfterTime.Visible=true;
-				comboClinic.Visible=true;
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					comboOpClinic.Visible=true;
+					labelOpClinic.Visible=true;
+				}
 			}
 			else {
 				labelOps.Text=Lan.g(this,"View Operatories");
 				labelBeforeTime.Visible=false;
 				labelAfterTime.Visible=false;
-				labelClinic.Visible=false;
+				labelOpClinic.Visible=false;
 				textBeforeTime.Visible=false;
 				textAfterTime.Visible=false;
-				comboClinic.Visible=false;
+				comboOpClinic.Visible=false;
 			}
 		}
 
@@ -1136,6 +1208,25 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary>This will remove operatories from the list of ops available to assign to this view and fill the list with ops assigned to the same clinic or unassigned.  If the current view has operatories selected that are assigned to a different view, a message box will warn the user that continuing will remove the operatories from the view.</summary>
+		private void comboAssignedClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(AssignedClinicNum==_listUserClinicNums[comboAssignedClinic.SelectedIndex]) {
+				return;
+			}
+			AssignedClinicNum=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
+			listOps.ClearSelected();
+			listOps.Items.Clear();
+			_listOpNums=new List<long>();
+			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
+				if(AssignedClinicNum==0 //add op to list of ops available for the view if the user chose to not assign this view to a clinic
+					|| OperatoryC.ListShort[i].ClinicNum==AssignedClinicNum) //or the operatory is assigned to same clinic as this view
+				{
+					listOps.Items.Add(OperatoryC.ListShort[i].OpName);
+					_listOpNums.Add(OperatoryC.ListShort[i].OperatoryNum);
+				}
+			}
+		}
+
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			//this does mess up the item orders a little, but missing numbers don't actually hurt anything.
 			if(MessageBox.Show(Lan.g(this,"Delete this category?"),"",MessageBoxButtons.OKCancel)
@@ -1186,11 +1277,11 @@ namespace OpenDental{
 			}
 			ApptViewItems.DeleteAllForView(ApptViewCur);//start with a clean slate
 			ApptViewItem item;
-			for(int i=0;i<OperatoryC.ListShort.Count;i++){
+			for(int i=0;i<_listOpNums.Count;i++){
 				if(listOps.SelectedIndices.Contains(i)){
 					item=new ApptViewItem();
 					item.ApptViewNum=ApptViewCur.ApptViewNum;
-					item.OpNum=OperatoryC.ListShort[i].OperatoryNum;
+					item.OpNum=_listOpNums[i];
 					ApptViewItems.Insert(item);
 				}
 			}
@@ -1228,10 +1319,14 @@ namespace OpenDental{
 			ApptViewCur.OnlyScheduledProvs=checkOnlyScheduledProvs.Checked;
 			ApptViewCur.OnlySchedBeforeTime=timeBefore.TimeOfDay;
 			ApptViewCur.OnlySchedAfterTime=timeAfter.TimeOfDay;
-			ApptViewCur.ClinicNum=0;//Default clinics to "All"
-			if(checkOnlyScheduledProvs.Checked && comboClinic.SelectedIndex>0) {
-				ApptViewCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+			ApptViewCur.OnlyScheduledClinic=0;//Default is all clinics
+			if(checkOnlyScheduledProvs.Checked && comboOpClinic.SelectedIndex>0) {
+				ApptViewCur.OnlyScheduledClinic=Clinics.List[comboOpClinic.SelectedIndex-1].ClinicNum;
 			}
+			//_listUserClinicNums will contain only a 0 if the clinics show feature is disabled
+			//if the user is not restricted to a clinic, the list will contain 0 in the first position since comboAssignedClinic will contain 'none'
+			//restricted users (Security.CurUser.ClinicsIsRestricted=true && Security.CurUser.ClinicNum>0) won't have access to the unassigned views (AssignedClinic=0)
+			ApptViewCur.AssignedClinic=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
 			ApptViews.Update(ApptViewCur);//same whether isnew or not
 			DialogResult=DialogResult.OK;
 		}

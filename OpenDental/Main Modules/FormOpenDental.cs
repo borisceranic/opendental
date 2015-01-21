@@ -2210,7 +2210,7 @@ namespace OpenDental{
 					ClinicNum=Security.CurUser.ClinicNum;
 				}
 				if(ClinicNum==0) {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
 				}
 				else {
 					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
@@ -2728,7 +2728,6 @@ namespace OpenDental{
 
 		private void OnPatient_Click() {
 			FormPatientSelect formPS=new FormPatientSelect();
-			formPS.ClinicNum=ClinicNum;
 			formPS.ShowDialog();
 			if(formPS.DialogResult==DialogResult.OK) {
 				CurPatNum=formPS.SelectedPatNum;
@@ -3230,8 +3229,8 @@ namespace OpenDental{
 			MenuItem menuItem;
 			List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 			if(!Security.CurUser.ClinicIsRestricted) {
-				menuItem=new MenuItem(Lan.g(this,"Unassigned"),menuClinic_Click);
-				menuItem.Tag=new Clinic();//selecting Unassigned will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
+				menuItem=new MenuItem(Lan.g(this,"All"),menuClinic_Click);
+				menuItem.Tag=new Clinic();//selecting All will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
 				if(ClinicNum==0) {
 					menuItem.Checked=true;
 				}
@@ -3257,7 +3256,7 @@ namespace OpenDental{
 			ClinicNum=clinicCur.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
 			}
 			else {
 				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
@@ -5037,7 +5036,7 @@ namespace OpenDental{
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				if(ClinicNum==0) {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: Unassigned");
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
 				}
 				else {
 					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
@@ -5101,7 +5100,7 @@ namespace OpenDental{
 			FormC.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Clinics");
 			//this menu item is only visible if the clinics show feature is enabled (!EasyNoClinics)
-			if(Clinics.GetDesc(ClinicNum)=="") {//will be empty string if _clinicNum is not valid, in case they deleted the clinic
+			if(Clinics.GetDesc(ClinicNum)=="") {//will be empty string if ClinicNum is not valid, in case they deleted the clinic
 				ClinicNum=Security.CurUser.ClinicNum;
 			}
 			//reset the main title bar in case the user changes the clinic description for the selected clinic
@@ -5109,7 +5108,7 @@ namespace OpenDental{
 			Text=PatientL.GetMainTitle(pat,ClinicNum);
 			//reset the tip text in case the user changes the clinic description
 			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
 			}
 			else {
 				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
