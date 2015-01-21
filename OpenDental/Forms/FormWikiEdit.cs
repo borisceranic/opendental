@@ -116,7 +116,9 @@ namespace OpenDental {
 		}
 
 		private void textContent_TextChanged(object sender,EventArgs e) {
-			RefreshHtml();
+			//Prevent browser from updating too frequently.
+			timerWikiBrowserRefresh.Stop();
+			timerWikiBrowserRefresh.Start();
 		}
 
 		private void textContent_KeyPress(object sender,KeyPressEventArgs e) {
@@ -217,6 +219,12 @@ namespace OpenDental {
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Bold"),12,"","Bold"));
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Italic"),13,"","Italic"));
 			toolBar2.Buttons.Add(new ODToolBarButton(Lan.g(this,"Color"),14,"","Color"));
+		}
+
+		private void timerWikiBrowserRefresh_Tick(object sender,EventArgs e) {
+			//This timer was set by textContent_TextChanged in order to prevent refreshing too frequently.
+			timerWikiBrowserRefresh.Stop();
+			RefreshHtml();
 		}
 
 		private void ToolBarMain_ButtonClick(object sender,OpenDental.UI.ODToolBarButtonClickEventArgs e) {
