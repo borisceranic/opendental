@@ -37,6 +37,7 @@ namespace OpenDental{
 			this.textContent = new OpenDental.TextBoxWiki();
 			this.webBrowserWiki = new System.Windows.Forms.WebBrowser();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.timerWikiBrowserRefresh = new System.Windows.Forms.Timer(this.components);
 			this.contextMenuMain.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -168,6 +169,11 @@ namespace OpenDental{
 			this.ToolBarMain.TabIndex = 3;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
+			// timerWikiBrowserRefresh
+			// 
+			this.timerWikiBrowserRefresh.Interval = 500;
+			this.timerWikiBrowserRefresh.Tick += new System.EventHandler(this.timerWikiBrowserRefresh_Tick);
+			// 
 			// FormWikiEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -205,6 +211,7 @@ namespace OpenDental{
 		private System.Windows.Forms.ToolStripMenuItem menuItemUndo;
 		private System.Windows.Forms.TextBox textNumbers;
 		private UI.ODToolBar toolBar2;
+		private System.Windows.Forms.Timer timerWikiBrowserRefresh;
 
 	}
 }
