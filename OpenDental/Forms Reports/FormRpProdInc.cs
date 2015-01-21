@@ -49,6 +49,7 @@ namespace OpenDental{
 		private CheckBox checkAllClin;
 		///<summary>If set externally, then this sets the date on startup.</summary>
 		public DateTime DateEnd;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormRpProdInc(){
@@ -107,19 +108,19 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(35,128);
+			this.label1.Location = new System.Drawing.Point(35, 128);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(104,16);
+			this.label1.Size = new System.Drawing.Size(104, 16);
 			this.label1.TabIndex = 29;
 			this.label1.Text = "Providers";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(37,165);
+			this.listProv.Location = new System.Drawing.Point(37, 165);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(154,186);
+			this.listProv.Size = new System.Drawing.Size(154, 186);
 			this.listProv.TabIndex = 30;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
 			// 
@@ -127,9 +128,9 @@ namespace OpenDental{
 			// 
 			this.radioMonthly.Checked = true;
 			this.radioMonthly.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioMonthly.Location = new System.Drawing.Point(14,40);
+			this.radioMonthly.Location = new System.Drawing.Point(14, 40);
 			this.radioMonthly.Name = "radioMonthly";
-			this.radioMonthly.Size = new System.Drawing.Size(104,17);
+			this.radioMonthly.Size = new System.Drawing.Size(104, 17);
 			this.radioMonthly.TabIndex = 33;
 			this.radioMonthly.TabStop = true;
 			this.radioMonthly.Text = "Monthly";
@@ -138,9 +139,9 @@ namespace OpenDental{
 			// radioDaily
 			// 
 			this.radioDaily.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioDaily.Location = new System.Drawing.Point(14,21);
+			this.radioDaily.Location = new System.Drawing.Point(14, 21);
 			this.radioDaily.Name = "radioDaily";
-			this.radioDaily.Size = new System.Drawing.Size(104,17);
+			this.radioDaily.Size = new System.Drawing.Size(104, 17);
 			this.radioDaily.TabIndex = 34;
 			this.radioDaily.Text = "Daily";
 			this.radioDaily.Click += new System.EventHandler(this.radioDaily_Click);
@@ -151,9 +152,9 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.radioDaily);
 			this.groupBox1.Controls.Add(this.radioMonthly);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(37,13);
+			this.groupBox1.Location = new System.Drawing.Point(37, 13);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(123,84);
+			this.groupBox1.Size = new System.Drawing.Size(123, 84);
 			this.groupBox1.TabIndex = 35;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Report Type";
@@ -161,46 +162,46 @@ namespace OpenDental{
 			// radioAnnual
 			// 
 			this.radioAnnual.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioAnnual.Location = new System.Drawing.Point(14,59);
+			this.radioAnnual.Location = new System.Drawing.Point(14, 59);
 			this.radioAnnual.Name = "radioAnnual";
-			this.radioAnnual.Size = new System.Drawing.Size(104,17);
+			this.radioAnnual.Size = new System.Drawing.Size(104, 17);
 			this.radioAnnual.TabIndex = 35;
 			this.radioAnnual.Text = "Annual";
 			this.radioAnnual.Click += new System.EventHandler(this.radioAnnual_Click);
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(9,79);
+			this.label2.Location = new System.Drawing.Point(9, 79);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(82,18);
+			this.label2.Size = new System.Drawing.Size(82, 18);
 			this.label2.TabIndex = 37;
 			this.label2.Text = "From";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(7,105);
+			this.label3.Location = new System.Drawing.Point(7, 105);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(82,18);
+			this.label3.Size = new System.Drawing.Size(82, 18);
 			this.label3.TabIndex = 39;
 			this.label3.Text = "To";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(356,66);
+			this.label4.Location = new System.Drawing.Point(356, 66);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(127,20);
+			this.label4.Size = new System.Drawing.Size(127, 20);
 			this.label4.TabIndex = 41;
 			this.label4.Text = "Today\'s Date";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textToday
 			// 
-			this.textToday.Location = new System.Drawing.Point(485,64);
+			this.textToday.Location = new System.Drawing.Point(485, 64);
 			this.textToday.Name = "textToday";
 			this.textToday.ReadOnly = true;
-			this.textToday.Size = new System.Drawing.Size(100,20);
+			this.textToday.Size = new System.Drawing.Size(100, 20);
 			this.textToday.TabIndex = 42;
 			// 
 			// groupBox2
@@ -213,83 +214,83 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.label3);
 			this.groupBox2.Controls.Add(this.butLeft);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(390,90);
+			this.groupBox2.Location = new System.Drawing.Point(390, 90);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(281,144);
+			this.groupBox2.Size = new System.Drawing.Size(281, 144);
 			this.groupBox2.TabIndex = 43;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Date Range";
 			// 
 			// butRight
 			// 
-			this.butRight.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butRight.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butRight.Autosize = true;
 			this.butRight.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRight.CornerRadius = 4F;
 			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
-			this.butRight.Location = new System.Drawing.Point(205,30);
+			this.butRight.Location = new System.Drawing.Point(205, 30);
 			this.butRight.Name = "butRight";
-			this.butRight.Size = new System.Drawing.Size(45,26);
+			this.butRight.Size = new System.Drawing.Size(45, 26);
 			this.butRight.TabIndex = 46;
 			this.butRight.Click += new System.EventHandler(this.butRight_Click);
 			// 
 			// butThis
 			// 
-			this.butThis.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butThis.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butThis.Autosize = true;
 			this.butThis.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butThis.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butThis.CornerRadius = 4F;
-			this.butThis.Location = new System.Drawing.Point(95,30);
+			this.butThis.Location = new System.Drawing.Point(95, 30);
 			this.butThis.Name = "butThis";
-			this.butThis.Size = new System.Drawing.Size(101,26);
+			this.butThis.Size = new System.Drawing.Size(101, 26);
 			this.butThis.TabIndex = 45;
 			this.butThis.Text = "This";
 			this.butThis.Click += new System.EventHandler(this.butThis_Click);
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(95,77);
+			this.textDateFrom.Location = new System.Drawing.Point(95, 77);
 			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(100,20);
+			this.textDateFrom.Size = new System.Drawing.Size(100, 20);
 			this.textDateFrom.TabIndex = 43;
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(95,104);
+			this.textDateTo.Location = new System.Drawing.Point(95, 104);
 			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(100,20);
+			this.textDateTo.Size = new System.Drawing.Size(100, 20);
 			this.textDateTo.TabIndex = 44;
 			// 
 			// butLeft
 			// 
-			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butLeft.Autosize = true;
 			this.butLeft.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLeft.CornerRadius = 4F;
 			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
-			this.butLeft.Location = new System.Drawing.Point(41,30);
+			this.butLeft.Location = new System.Drawing.Point(41, 30);
 			this.butLeft.Name = "butLeft";
-			this.butLeft.Size = new System.Drawing.Size(45,26);
+			this.butLeft.Size = new System.Drawing.Size(45, 26);
 			this.butLeft.TabIndex = 44;
 			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
 			// listClin
 			// 
-			this.listClin.Location = new System.Drawing.Point(215,165);
+			this.listClin.Location = new System.Drawing.Point(215, 165);
 			this.listClin.Name = "listClin";
 			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listClin.Size = new System.Drawing.Size(154,186);
+			this.listClin.Size = new System.Drawing.Size(154, 186);
 			this.listClin.TabIndex = 45;
 			this.listClin.Click += new System.EventHandler(this.listClin_Click);
 			// 
 			// labelClin
 			// 
-			this.labelClin.Location = new System.Drawing.Point(212,128);
+			this.labelClin.Location = new System.Drawing.Point(212, 128);
 			this.labelClin.Name = "labelClin";
-			this.labelClin.Size = new System.Drawing.Size(104,16);
+			this.labelClin.Size = new System.Drawing.Size(104, 16);
 			this.labelClin.TabIndex = 44;
 			this.labelClin.Text = "Clinics";
 			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -299,27 +300,27 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.label5);
 			this.groupBox3.Controls.Add(this.radioWriteoffProc);
 			this.groupBox3.Controls.Add(this.radioWriteoffPay);
-			this.groupBox3.Location = new System.Drawing.Point(390,256);
+			this.groupBox3.Location = new System.Drawing.Point(390, 256);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(281,95);
+			this.groupBox3.Size = new System.Drawing.Size(281, 95);
 			this.groupBox3.TabIndex = 46;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Show Insurance Writeoffs";
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(6,71);
+			this.label5.Location = new System.Drawing.Point(6, 71);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(269,17);
+			this.label5.Size = new System.Drawing.Size(269, 17);
 			this.label5.TabIndex = 2;
 			this.label5.Text = "(this is discussed in the PPO section of the manual)";
 			// 
 			// radioWriteoffProc
 			// 
 			this.radioWriteoffProc.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-			this.radioWriteoffProc.Location = new System.Drawing.Point(9,41);
+			this.radioWriteoffProc.Location = new System.Drawing.Point(9, 41);
 			this.radioWriteoffProc.Name = "radioWriteoffProc";
-			this.radioWriteoffProc.Size = new System.Drawing.Size(244,23);
+			this.radioWriteoffProc.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffProc.TabIndex = 1;
 			this.radioWriteoffProc.Text = "Using procedure date.";
 			this.radioWriteoffProc.TextAlign = System.Drawing.ContentAlignment.TopLeft;
@@ -329,9 +330,9 @@ namespace OpenDental{
 			// 
 			this.radioWriteoffPay.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.radioWriteoffPay.Checked = true;
-			this.radioWriteoffPay.Location = new System.Drawing.Point(9,20);
+			this.radioWriteoffPay.Location = new System.Drawing.Point(9, 20);
 			this.radioWriteoffPay.Name = "radioWriteoffPay";
-			this.radioWriteoffPay.Size = new System.Drawing.Size(244,23);
+			this.radioWriteoffPay.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffPay.TabIndex = 0;
 			this.radioWriteoffPay.TabStop = true;
 			this.radioWriteoffPay.Text = "Using insurance payment date.";
@@ -343,59 +344,57 @@ namespace OpenDental{
 			this.checkAllProv.Checked = true;
 			this.checkAllProv.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllProv.Location = new System.Drawing.Point(38,146);
+			this.checkAllProv.Location = new System.Drawing.Point(38, 146);
 			this.checkAllProv.Name = "checkAllProv";
-			this.checkAllProv.Size = new System.Drawing.Size(95,16);
+			this.checkAllProv.Size = new System.Drawing.Size(95, 16);
 			this.checkAllProv.TabIndex = 47;
 			this.checkAllProv.Text = "All";
 			this.checkAllProv.Click += new System.EventHandler(this.checkAllProv_Click);
 			// 
 			// checkAllClin
 			// 
-			this.checkAllClin.Checked = true;
-			this.checkAllClin.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllClin.Location = new System.Drawing.Point(215,146);
+			this.checkAllClin.Location = new System.Drawing.Point(215, 146);
 			this.checkAllClin.Name = "checkAllClin";
-			this.checkAllClin.Size = new System.Drawing.Size(95,16);
+			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
 			this.checkAllClin.TabIndex = 48;
 			this.checkAllClin.Text = "All";
 			this.checkAllClin.Click += new System.EventHandler(this.checkAllClin_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(710,365);
+			this.butCancel.Location = new System.Drawing.Point(710, 365);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(710,330);
+			this.butOK.Location = new System.Drawing.Point(710, 330);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// FormRpProdInc
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(818,417);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(818, 417);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.checkAllProv);
 			this.Controls.Add(this.groupBox3);
@@ -437,9 +436,17 @@ namespace OpenDental{
 				checkAllClin.Visible=false;
 			}
 			else{
-				listClin.Items.Add(Lan.g(this,"Unassigned"));
-				for(int i=0;i<Clinics.List.Length;i++) {
-					listClin.Items.Add(Clinics.List[i].Description);
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					listClin.Items.Add(Lan.g(this,"Unassigned"));
+					listClin.SetSelected(0,true);
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=listClin.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						listClin.SelectedIndices.Clear();
+						listClin.SetSelected(curIndex,true);
+					}
 				}
 			}
 			switch(DailyMonthlyAnnual){
@@ -489,6 +496,11 @@ namespace OpenDental{
 
 		private void checkAllClin_Click(object sender,EventArgs e) {
 			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			else {
 				listClin.SelectedIndices.Clear();
 			}
 		}
@@ -630,19 +642,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			string whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND procedurelog.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="procedurelog.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="procedurelog.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -699,19 +714,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND adjustment.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="adjustment.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="adjustment.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -753,19 +771,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND claimproc.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="claimproc.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -840,19 +861,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND paysplit.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="paysplit.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="paysplit.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -900,19 +924,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND claimproc.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="claimproc.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1026,11 +1053,14 @@ namespace OpenDental{
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.SelectedIndices[i]==0) {
+						if(listClin.Items[i].ToString()=="Unassigned") {
 							clinNames+=Lan.g(this,"Unassigned");
 						}
+						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						}
 						else {
-							clinNames+=Clinics.List[listClin.SelectedIndices[i]-1].Description;
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
 						}
 					}
 					report.SubTitle.Add(clinNames);
@@ -1121,19 +1151,22 @@ Group By procdate Order by procdate desc
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND procedurelog.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="procedurelog.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="procedurelog.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1175,19 +1208,22 @@ GROUP BY DateCP Order by DateCP
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND claimproc.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="claimproc.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1238,19 +1274,22 @@ GROUP BY SchedDate
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND procedurelog.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="procedurelog.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="procedurelog.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1306,19 +1345,22 @@ group by claimpayment.checkdate order by procdate
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND paysplit.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="paysplit.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="paysplit.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1355,19 +1397,22 @@ group by claimpayment.checkdate order by procdate
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND claimproc.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="claimproc.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="claimproc.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1408,19 +1453,22 @@ ORDER BY adjdate DESC
 				whereProv+=") ";
 			}
 			whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND adjustment.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="adjustment.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="adjustment.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -1550,11 +1598,14 @@ ORDER BY adjdate DESC
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.SelectedIndices[i]==0) {
+						if(listClin.Items[i].ToString()=="Unassigned") {
 							clinNames+=Lan.g(this,"Unassigned");
 						}
+						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						}
 						else {
-							clinNames+=Clinics.List[listClin.SelectedIndices[i]-1].Description;
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
 						}
 					}
 					report.SubTitle.Add(clinNames);
@@ -1624,12 +1675,18 @@ ORDER BY adjdate DESC
 				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
 			}
 			List<long> listClinicNums=new List<long>();
-			for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-				if(listClin.SelectedIndices[i]==0) {
-					listClinicNums.Add(0);//Unassigned
-					continue;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						listClinicNums.Add(0);
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					}
+					else {
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+					}
 				}
-				listClinicNums.Add(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum);
 			}
 			DataSet ds=RpProdInc.GetAnnualDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
@@ -1665,11 +1722,14 @@ ORDER BY adjdate DESC
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.SelectedIndices[i]==0) {
+						if(listClin.Items[i].ToString()=="Unassigned") {
 							clinNames+=Lan.g(this,"Unassigned");
 						}
+						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						}
 						else {
-							clinNames+=Clinics.List[listClin.SelectedIndices[i]-1].Description;
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
 						}
 					}
 					report.AddSubTitle("Clinics",clinNames);

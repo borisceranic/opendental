@@ -5,6 +5,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -24,6 +25,7 @@ namespace OpenDental{
 		private ListBox listClin;
 		private Label labelClin;
 		private FormQuery FormQuery2;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormRpAdjSheet(){
@@ -64,100 +66,100 @@ namespace OpenDental{
 			// 
 			// butTypeAll
 			// 
-			butTypeAll.AdjustImageLocation = new System.Drawing.Point(0,0);
+			butTypeAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			butTypeAll.Autosize = true;
 			butTypeAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			butTypeAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			butTypeAll.CornerRadius = 4F;
-			butTypeAll.Location = new System.Drawing.Point(32,366);
+			butTypeAll.Location = new System.Drawing.Point(32, 366);
 			butTypeAll.Name = "butTypeAll";
-			butTypeAll.Size = new System.Drawing.Size(75,26);
+			butTypeAll.Size = new System.Drawing.Size(75, 26);
 			butTypeAll.TabIndex = 40;
 			butTypeAll.Text = "&All";
 			butTypeAll.Click += new System.EventHandler(this.butTypeAll_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(634,390);
+			this.butCancel.Location = new System.Drawing.Point(634, 390);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(634,358);
+			this.butOK.Location = new System.Drawing.Point(634, 358);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// date2
 			// 
-			this.date2.Location = new System.Drawing.Point(288,37);
+			this.date2.Location = new System.Drawing.Point(288, 37);
 			this.date2.Name = "date2";
 			this.date2.TabIndex = 2;
 			// 
 			// date1
 			// 
-			this.date1.Location = new System.Drawing.Point(32,37);
+			this.date1.Location = new System.Drawing.Point(32, 37);
 			this.date1.Name = "date1";
 			this.date1.TabIndex = 1;
 			// 
 			// labelTO
 			// 
-			this.labelTO.Location = new System.Drawing.Point(222,37);
+			this.labelTO.Location = new System.Drawing.Point(222, 37);
 			this.labelTO.Name = "labelTO";
-			this.labelTO.Size = new System.Drawing.Size(51,23);
+			this.labelTO.Size = new System.Drawing.Size(51, 23);
 			this.labelTO.TabIndex = 28;
 			this.labelTO.Text = "TO";
 			this.labelTO.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(533,51);
+			this.listProv.Location = new System.Drawing.Point(533, 51);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(181,147);
+			this.listProv.Size = new System.Drawing.Size(181, 147);
 			this.listProv.TabIndex = 36;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(530,18);
+			this.label1.Location = new System.Drawing.Point(530, 18);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(104,16);
+			this.label1.Size = new System.Drawing.Size(104, 16);
 			this.label1.TabIndex = 35;
 			this.label1.Text = "Providers";
 			// 
 			// listType
 			// 
-			this.listType.Location = new System.Drawing.Point(32,263);
+			this.listType.Location = new System.Drawing.Point(32, 263);
 			this.listType.Name = "listType";
 			this.listType.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listType.Size = new System.Drawing.Size(120,95);
+			this.listType.Size = new System.Drawing.Size(120, 95);
 			this.listType.TabIndex = 39;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(32,244);
+			this.label2.Location = new System.Drawing.Point(32, 244);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(120,16);
+			this.label2.Size = new System.Drawing.Size(120, 16);
 			this.label2.TabIndex = 38;
 			this.label2.Text = "Adjustment Types";
 			// 
@@ -166,47 +168,45 @@ namespace OpenDental{
 			this.checkAllProv.Checked = true;
 			this.checkAllProv.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllProv.Location = new System.Drawing.Point(533,34);
+			this.checkAllProv.Location = new System.Drawing.Point(533, 34);
 			this.checkAllProv.Name = "checkAllProv";
-			this.checkAllProv.Size = new System.Drawing.Size(95,16);
+			this.checkAllProv.Size = new System.Drawing.Size(95, 16);
 			this.checkAllProv.TabIndex = 48;
 			this.checkAllProv.Text = "All";
 			this.checkAllProv.Click += new System.EventHandler(this.checkAllProv_Click);
 			// 
 			// checkAllClin
 			// 
-			this.checkAllClin.Checked = true;
-			this.checkAllClin.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllClin.Location = new System.Drawing.Point(311,225);
+			this.checkAllClin.Location = new System.Drawing.Point(311, 225);
 			this.checkAllClin.Name = "checkAllClin";
-			this.checkAllClin.Size = new System.Drawing.Size(95,16);
+			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
 			this.checkAllClin.TabIndex = 51;
 			this.checkAllClin.Text = "All";
 			this.checkAllClin.Click += new System.EventHandler(this.checkAllClin_Click);
 			// 
 			// listClin
 			// 
-			this.listClin.Location = new System.Drawing.Point(311,244);
+			this.listClin.Location = new System.Drawing.Point(311, 244);
 			this.listClin.Name = "listClin";
 			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listClin.Size = new System.Drawing.Size(154,147);
+			this.listClin.Size = new System.Drawing.Size(154, 147);
 			this.listClin.TabIndex = 50;
 			this.listClin.Click += new System.EventHandler(this.listClin_Click);
 			// 
 			// labelClin
 			// 
-			this.labelClin.Location = new System.Drawing.Point(308,207);
+			this.labelClin.Location = new System.Drawing.Point(308, 207);
 			this.labelClin.Name = "labelClin";
-			this.labelClin.Size = new System.Drawing.Size(104,16);
+			this.labelClin.Size = new System.Drawing.Size(104, 16);
 			this.labelClin.TabIndex = 49;
 			this.labelClin.Text = "Clinics";
 			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// FormRpAdjSheet
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(743,442);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(743, 442);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.listClin);
 			this.Controls.Add(this.labelClin);
@@ -246,9 +246,17 @@ namespace OpenDental{
 				checkAllClin.Visible=false;
 			}
 			else {
-				listClin.Items.Add(Lan.g(this,"Unassigned"));
-				for(int i=0;i<Clinics.List.Length;i++) {
-					listClin.Items.Add(Clinics.List[i].Description);
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					listClin.Items.Add(Lan.g(this,"Unassigned"));
+					listClin.SetSelected(0,true);
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=listClin.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						listClin.SelectedIndices.Clear();
+						listClin.SetSelected(curIndex,true);
+					}
 				}
 			}
 			for(int i=0;i<DefC.Short[(int)DefCat.AdjTypes].Length;i++) {
@@ -271,6 +279,11 @@ namespace OpenDental{
 
 		private void checkAllClin_Click(object sender,EventArgs e) {
 			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			else {
 				listClin.SelectedIndices.Clear();
 			}
 		}
@@ -326,19 +339,22 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			string whereClin="";
-			if(!checkAllClin.Checked) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(i==0) {
-						whereClin+=" AND (";
+						whereClin+=" AND adjustment.ClinicNum IN(";
 					}
 					else {
-						whereClin+="OR ";
+						whereClin+=",";
 					}
-					if(listClin.SelectedIndices[i]==0) {
-						whereClin+="adjustment.ClinicNum = 0 ";
+					if(listClin.Items[i].ToString()=="Unassigned") {
+						whereClin+="0";
+					}
+					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 					}
 					else {
-						whereClin+="adjustment.ClinicNum = "+POut.Long(Clinics.List[listClin.SelectedIndices[i]-1].ClinicNum)+" ";
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
 					}
 				}
 				whereClin+=") ";
@@ -425,11 +441,14 @@ namespace OpenDental{
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.SelectedIndices[i]==0) {
+						if(listClin.Items[i].ToString()=="Unassigned") {
 							clinNames+=Lan.g(this,"Unassigned");
 						}
+						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						}
 						else {
-							clinNames+=Clinics.List[listClin.SelectedIndices[i]-1].Description;
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
 						}
 					}
 					report.SubTitle.Add(clinNames);

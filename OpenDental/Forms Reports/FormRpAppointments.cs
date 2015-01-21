@@ -238,8 +238,6 @@ namespace OpenDental
 			// 
 			// checkAllClinics
 			// 
-			this.checkAllClinics.Checked = true;
-			this.checkAllClinics.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllClinics.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkAllClinics.Location = new System.Drawing.Point(138, 38);
 			this.checkAllClinics.Name = "checkAllClinics";
@@ -301,9 +299,16 @@ namespace OpenDental
 			else {//Clinics enabled.
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
 				listClinics.Items.Clear();
-				listClinics.Items.Add(Lan.g(this,"Unassigned"));
+				if(!Security.CurUser.ClinicIsRestricted) {
+					listClinics.Items.Add(Lan.g(this,"Unassigned"));
+					listClinics.SetSelected(0,true);
+				}
 				for(int i=0;i<_listClinics.Count;i++) {
-					listClinics.Items.Add(_listClinics[i].Description);
+					int curIndex=listClinics.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						listClinics.SelectedIndices.Clear();
+						listClinics.SetSelected(curIndex,true);
+					}
 				}
 			}
 			SetTomorrow();
@@ -356,6 +361,11 @@ namespace OpenDental
 
 		private void checkAllClinics_Click(object sender,EventArgs e) {
 			if(checkAllClinics.Checked) {
+				for(int i=0;i<listClinics.Items.Count;i++) {
+					listClinics.SetSelected(i,true);
+				}
+			}
+			else {
 				listClinics.SelectedIndices.Clear();
 			}
 		}
@@ -407,19 +417,25 @@ namespace OpenDental
 				whereProv += ")) ";
 			}
 			string whereClinics="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && !checkAllClinics.Checked) {//Not no clinics.
-				whereClinics=" AND (appointment.ClinicNum IN (";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics.
 				for(int i=0;i<listClinics.SelectedIndices.Count;i++) {
-					if(i>0) {
+					if(i==0) {
+						whereClinics+=" AND appointment.ClinicNum IN(";
+					}
+					else {
 						whereClinics+=",";
 					}
-					if(listClinics.SelectedIndices[i]==0) {
-						whereClinics+="0";//Unassigned
-						continue;
+					if(listClinics.Items[i].ToString()=="Unassigned") {
+						whereClinics+="0";
 					}
-					whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]-1].ClinicNum);
+					else if(listClinics.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
+						whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					}
+					else {
+						whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+					}
 				}
-				whereClinics+=")) ";
+				whereClinics+=") ";
 			}
 			string innerJoinWebSched="";
 			if(checkShowWebSched.Checked) {
