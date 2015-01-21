@@ -5035,11 +5035,13 @@ namespace OpenDental{
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
 			ClinicNum=Security.CurUser.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
-			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": Unassigned";
-			}
-			else {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(ClinicNum==0) {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: Unassigned");
+				}
+				else {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
+				}
 			}
 			RefreshCurrentModule();
 		}
