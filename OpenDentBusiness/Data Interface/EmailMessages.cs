@@ -799,7 +799,13 @@ namespace OpenDentBusiness{
 		///Used for creating a signing signature in email encryption, which requires the private key (the public key alone is not enough, we tried it and an exception is thrown by Dot NET).
 		///IMPORTANT: Be careful what you do with the private certificate.  It must never be shared with another party.</summary>
 		public static X509Certificate2 GetCertFromPrivateStore(string emailAddress) {
-			Health.Direct.Common.Certificates.SystemX509Store storeCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenPrivate();//Open for reading.  Corresponds to NHINDPrivate/Certificates.
+			Health.Direct.Common.Certificates.SystemX509Store storeCerts=null;
+			try {
+				storeCerts=Health.Direct.Common.Certificates.SystemX509Store.OpenPrivate();//Open for reading.  Corresponds to NHINDPrivate/Certificates.
+			}
+			catch {
+ 				return null;//This only happens when the private certificate store has not been created yet.  In which case, there are no signatures for the specified emailAddress.
+			}
 			return GetValidCertForAddressFromStore(storeCerts,emailAddress,true);//Look for domain level and address level trust certificates.
 		}
 
