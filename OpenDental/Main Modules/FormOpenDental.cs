@@ -2130,6 +2130,17 @@ namespace OpenDental{
 			}
 			myOutlookBar.Invalidate();
 			LayoutToolBar();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//If block must be run before SetModuleSelected() so correct clinic filtration occurs.
+				if(Security.CurUser!=null) {
+					ClinicNum=Security.CurUser.ClinicNum;
+				}
+				if(ClinicNum==0) {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
+				}
+				else {
+					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
+				}
+			}
 			SetModuleSelected();
 			Cursor=Cursors.Default;
 			if(myOutlookBar.SelectedIndex==-1){
@@ -2205,17 +2216,6 @@ namespace OpenDental{
 			//		}
 			//	#endif
 			//}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(Security.CurUser!=null) {
-					ClinicNum=Security.CurUser.ClinicNum;
-				}
-				if(ClinicNum==0) {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
-				}
-				else {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
-				}
-			}
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
@@ -3256,7 +3256,7 @@ namespace OpenDental{
 			ClinicNum=clinicCur.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
 			}
 			else {
 				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
@@ -5108,7 +5108,7 @@ namespace OpenDental{
 			Text=PatientL.GetMainTitle(pat,ClinicNum);
 			//reset the tip text in case the user changes the clinic description
 			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": All";
+				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
 			}
 			else {
 				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
