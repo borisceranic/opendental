@@ -69,6 +69,24 @@ namespace OpenDentBusiness{
 			return Crud.EmployeeCrud.SelectMany(command);
 		}
 
+		///<summary>Gets all the employees for a specific clinicNum, according to their associated user. Sorts by LastName.</summary>
+		public static List<Employee> GetForTimeCardByClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Employee> listEmployee=new List<Employee>();
+			for(int i=0;i<Employees.ListShort.Length;i++) {
+				for(int j=0;j<UserodC.ShortList.Count;j++) {
+					if(UserodC.ShortList[j].ClinicNum==clinicNum 
+						&& UserodC.ShortList[j].EmployeeNum==Employees.ListShort[i].EmployeeNum) 
+					{
+						listEmployee.Add(Employees.ListShort[i]);
+						break;
+					}
+				}
+			}
+			listEmployee.Sort(Employees.SortByLastName);
+			return listEmployee;
+		}
+
 		/*public static Employee[] GetListByExtension(){
 			if(ListShort==null){
 				return new Employee[0];

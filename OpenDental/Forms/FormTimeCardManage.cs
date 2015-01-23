@@ -26,9 +26,11 @@ namespace OpenDental {
 		private string rate2Time2;
 		private int PagesPrinted;
 		private bool HeadingPrinted;
+		private List<Employee> _listEmployees;
 
-		public FormTimeCardManage() {
+		public FormTimeCardManage(List<Employee> listEmployees) {
 			InitializeComponent();
+			_listEmployees=listEmployees;
 			Lan.F(this);
 		}
 
@@ -46,7 +48,7 @@ namespace OpenDental {
 		}
 
 		private void FillMain() {
-			MainTable=ClockEvents.GetTimeCardManage(DateStart,DateStop);//,false);
+			MainTable=ClockEvents.GetTimeCardManage(DateStart,DateStop,FormOpenDental.ClinicNum);//,false);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Employee"),140);
@@ -135,7 +137,7 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
-			FormTimeCard FormTC=new FormTimeCard();
+			FormTimeCard FormTC=new FormTimeCard(_listEmployees);
 			FormTC.IsByLastName=true;
 			FormTC.EmployeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[e.Row]["EmployeeNum"].ToString()));
 			FormTC.SelectedPayPeriod=SelectedPayPeriod;

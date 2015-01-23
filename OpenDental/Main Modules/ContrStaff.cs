@@ -75,6 +75,7 @@ namespace OpenDental{
 		///<summary>This is public so that FormOpenDental can access it.</summary>
 		public FormTasks FormT;
 		public FormAccounting FormA;
+		private List<Employee> _listEmployees=new List<Employee>();
 
 		///<summary></summary>
 		public ContrStaff(){
@@ -1005,10 +1006,11 @@ namespace OpenDental{
 			gridEmp.Columns.Add(col);
 			gridEmp.Rows.Clear();
 			UI.ODGridRow row;
-			for(int i=0;i<Employees.ListShort.Length;i++){
+			_listEmployees=Employees.GetForTimeCardByClinic(FormOpenDental.ClinicNum);
+			for(int i=0;i<_listEmployees.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
-				row.Cells.Add(Employees.GetNameFL(Employees.ListShort[i]));
-				row.Cells.Add(Employees.ListShort[i].ClockStatus);
+				row.Cells.Add(Employees.GetNameFL(_listEmployees[i]));
+				row.Cells.Add(_listEmployees[i].ClockStatus);
 				gridEmp.Rows.Add(row);
 			}
 			gridEmp.EndUpdate();
@@ -1016,8 +1018,8 @@ namespace OpenDental{
 			for(int i=0;i<Enum.GetNames(typeof(TimeClockStatus)).Length;i++){
 				listStatus.Items.Add(Lan.g("enumTimeClockStatus",Enum.GetNames(typeof(TimeClockStatus))[i]));
 			}
-			for(int i=0;i<Employees.ListShort.Length;i++){
-				if(Employees.ListShort[i].EmployeeNum==Security.CurUser.EmployeeNum){
+			for(int i=0;i<_listEmployees.Count;i++) {
+				if(_listEmployees[i].EmployeeNum==Security.CurUser.EmployeeNum) {
 					SelectEmpI(i);
 					return;
 				}
@@ -1037,7 +1039,7 @@ namespace OpenDental{
 				return;
 			}
 			gridEmp.SetSelected(index,true);
-			EmployeeCur=Employees.ListShort[index];
+			EmployeeCur=_listEmployees[index];
 			ClockEvent clockEvent=ClockEvents.GetLastEvent(EmployeeCur.EmployeeNum);
 			if(clockEvent==null) {//new employee.  They need to clock in.
 				butClockIn.Enabled=true;
@@ -1077,7 +1079,7 @@ namespace OpenDental{
 
 		private void gridEmp_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			if(PrefC.GetBool(PrefName.TimecardSecurityEnabled)){
-				if(Security.CurUser.EmployeeNum!=Employees.ListShort[e.Row].EmployeeNum){
+				if(Security.CurUser.EmployeeNum!=_listEmployees[e.Row].EmployeeNum) {
 					if(!Security.IsAuthorized(Permissions.TimecardsEditAll)){
 						SelectEmpI(-1);
 						return;
@@ -1149,7 +1151,7 @@ namespace OpenDental{
 		}
 
 		private void butManage_Click(object sender,EventArgs e) {
-			FormTimeCardManage FormTCM=new FormTimeCardManage();
+			FormTimeCardManage FormTCM=new FormTimeCardManage(_listEmployees);
 			FormTCM.ShowDialog();
 		}
 
@@ -1161,8 +1163,8 @@ namespace OpenDental{
 			if(!butTimeCard.Enabled) {
 				return;
 			}
-			FormTimeCard FormTC=new FormTimeCard();
-			FormTC.EmployeeCur=Employees.ListShort[e.Row];
+			FormTimeCard FormTC=new FormTimeCard(_listEmployees);
+			FormTC.EmployeeCur=_listEmployees[e.Row];
 			FormTC.ShowDialog();
 			ModuleSelected(PatCurNum);
 		}
@@ -1172,7 +1174,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"The adminstrator needs to setup pay periods first.");
 				return;
 			}
-			FormTimeCard FormTC=new FormTimeCard();
+			FormTimeCard FormTC=new FormTimeCard(_listEmployees);
 			FormTC.EmployeeCur=EmployeeCur;
 			FormTC.ShowDialog();
 			ModuleSelected(PatCurNum);
@@ -1183,7 +1185,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"The adminstrator needs to setup pay periods first.");
 				return;
 			}
-			FormTimeCard FormTC=new FormTimeCard();
+			FormTimeCard FormTC=new FormTimeCard(_listEmployees);
 			FormTC.EmployeeCur=EmployeeCur;
 			FormTC.IsBreaks=true;
 			FormTC.ShowDialog();

@@ -11,6 +11,7 @@ namespace OpenDental {
 	public partial class FormTimeCardRuleEdit:Form {
 
 		public TimeCardRule timeCardRule;
+		private List<Employee> _listEmployees;
 
 		public FormTimeCardRuleEdit() {
 			InitializeComponent();
@@ -18,11 +19,17 @@ namespace OpenDental {
 		}
 
 		private void FormTimeCardRuleEdit_Load(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				_listEmployees=Employees.GetForTimeCard();
+			}
+			else {
+				_listEmployees=Employees.GetForTimeCardByClinic(FormOpenDental.ClinicNum);
+			}
 			listEmp.Items.Add(Lan.g(this,"All Employees"));
 			listEmp.SelectedIndex=0;
-			for(int i=0;i<Employees.ListShort.Length;i++){
-				listEmp.Items.Add(Employees.ListShort[i].FName+" "+Employees.ListShort[i].LName);
-				if(Employees.ListShort[i].EmployeeNum==timeCardRule.EmployeeNum){
+			for(int i=0;i<_listEmployees.Count;i++) {
+				listEmp.Items.Add(_listEmployees[i].FName+" "+_listEmployees[i].LName);
+				if(_listEmployees[i].EmployeeNum==timeCardRule.EmployeeNum) {
 					listEmp.SelectedIndex=i+1;
 				}
 			}
@@ -133,11 +140,11 @@ namespace OpenDental {
 				return;
 			}
 			//save-------------------------------------------------
-			if(listEmp.SelectedIndex==0) {
+			if(listEmp.SelectedIndex==0) {//TODO: Ask Cameron if it is ok to make time card rules that affect all clinics.
 				timeCardRule.EmployeeNum=0;//All employees.
 			}
 			else {
-				timeCardRule.EmployeeNum=Employees.ListShort[listEmp.SelectedIndex-1].EmployeeNum;
+				timeCardRule.EmployeeNum=_listEmployees[listEmp.SelectedIndex-1].EmployeeNum;
 			}
 			timeCardRule.OverHoursPerDay=overHoursPerDay;
 			timeCardRule.AfterTimeOfDay=afterTimeOfDay;

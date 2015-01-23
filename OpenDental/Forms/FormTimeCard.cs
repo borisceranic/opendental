@@ -70,13 +70,14 @@ namespace OpenDental{
 		private TimeSpan storedWeekSpan;
 
 		///<summary></summary>
-		public FormTimeCard()
+		public FormTimeCard(List<Employee> listEmployees)
 		{
 			//
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
 			Lan.F(this);
+			_listEmp=listEmployees;
 		}
 
 		/// <summary>
@@ -541,17 +542,13 @@ namespace OpenDental{
 
 		private void FormTimeCard_Load(object sender, System.EventArgs e){
 			Initialize(DateTimeOD.Today);
-			FillEmployeeList();
+			SortEmployeeList();
 			if(Security.IsAuthorized(Permissions.TimecardsEditAll,true)) {
 				groupEmployee.Visible=true;
 			}
 		}
 
-		public void FillEmployeeList() {
-			_listEmp=new List<Employee>();//clear items and initialize
-			for(int i=0;i<Employees.ListShort.Length;i++) {
-				_listEmp.Add(Employees.ListShort[i]);
-			}
+		public void SortEmployeeList() {
 			if(IsByLastName) {
 				_listEmp.Sort(Employees.SortByLastName);
 			}
