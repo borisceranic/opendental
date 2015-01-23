@@ -4569,6 +4569,29 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
+		/// <summary>userod is restricted to ClinicNum 0 - All.  Restricted to All clinics doesn't make sense.  This will set the ClinicIsRestricted bool to false if ClinicNum=0.</summary>
+		public static string UserodInvalidRestrictedClinic(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM userod WHERE ClinicNum=0 AND ClinicIsRestricted=1";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Users found restricted to an invalid clinic")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {//Fix
+				command="UPDATE userod SET ClinicIsRestricted=0 WHERE ClinicNum=0 AND ClinicIsRestricted=1";
+				long numberFixed=Db.NonQ(command);
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Users fixed with restriction to an invalid clinic")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
 
 
 
