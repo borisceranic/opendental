@@ -643,21 +643,21 @@ namespace OpenDental{
 			}
 			string whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND procedurelog.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND procedurelog.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -715,21 +715,21 @@ namespace OpenDental{
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND adjustment.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND adjustment.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -772,21 +772,21 @@ namespace OpenDental{
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND claimproc.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND claimproc.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -862,21 +862,21 @@ namespace OpenDental{
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND paysplit.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND paysplit.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -925,21 +925,21 @@ namespace OpenDental{
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND claimproc.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND claimproc.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1053,14 +1053,16 @@ namespace OpenDental{
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.Items[i].ToString()=="Unassigned") {
-							clinNames+=Lan.g(this,"Unassigned");
-						}
-						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						if(Security.CurUser.ClinicIsRestricted) {
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
 						}
 						else {
-							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
+							if(listClin.SelectedIndices[i]==0) {
+								clinNames+=Lan.g(this,"Unassigned");
+							}
+							else {
+								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
 						}
 					}
 					report.SubTitle.Add(clinNames);
@@ -1152,21 +1154,21 @@ Group By procdate Order by procdate desc
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND procedurelog.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND procedurelog.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1209,21 +1211,21 @@ GROUP BY DateCP Order by DateCP
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND claimproc.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND claimproc.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1275,21 +1277,21 @@ GROUP BY SchedDate
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND procedurelog.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND procedurelog.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1346,21 +1348,21 @@ group by claimpayment.checkdate order by procdate
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND paysplit.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND paysplit.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1398,21 +1400,21 @@ group by claimpayment.checkdate order by procdate
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND claimproc.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND claimproc.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1454,21 +1456,21 @@ ORDER BY adjdate DESC
 			}
 			whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClin+=" AND adjustment.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClin+=" AND adjustment.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClin+=",";
 					}
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						whereClin+="0";
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClin+=") ";
@@ -1598,14 +1600,16 @@ ORDER BY adjdate DESC
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.Items[i].ToString()=="Unassigned") {
-							clinNames+=Lan.g(this,"Unassigned");
-						}
-						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						if(Security.CurUser.ClinicIsRestricted) {
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
 						}
 						else {
-							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
+							if(listClin.SelectedIndices[i]==0) {
+								clinNames+=Lan.g(this,"Unassigned");
+							}
+							else {
+								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
 						}
 					}
 					report.SubTitle.Add(clinNames);
@@ -1677,14 +1681,16 @@ ORDER BY adjdate DESC
 			List<long> listClinicNums=new List<long>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(listClin.Items[i].ToString()=="Unassigned") {
-						listClinicNums.Add(0);
-					}
-					else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClin.SelectedIndices[i]==0) {
+							listClinicNums.Add(0);
+						}
+						else {
+							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 			}
@@ -1722,14 +1728,16 @@ ORDER BY adjdate DESC
 						if(i>0) {
 							clinNames+=", ";
 						}
-						if(listClin.Items[i].ToString()=="Unassigned") {
-							clinNames+=Lan.g(this,"Unassigned");
-						}
-						else if(listClin.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-							clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+						if(Security.CurUser.ClinicIsRestricted) {
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
 						}
 						else {
-							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;//else we know that the list is a 1:1 to _listClinics
+							if(listClin.SelectedIndices[i]==0) {
+								clinNames+=Lan.g(this,"Unassigned");
+							}
+							else {
+								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
 						}
 					}
 					report.AddSubTitle("Clinics",clinNames);

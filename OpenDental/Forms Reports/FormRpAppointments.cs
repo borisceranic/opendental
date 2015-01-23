@@ -417,22 +417,22 @@ namespace OpenDental
 				whereProv += ")) ";
 			}
 			string whereClinics="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics.
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				whereClinics+=" AND appointment.ClinicNum IN(";
 				for(int i=0;i<listClinics.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereClinics+=" AND appointment.ClinicNum IN(";
-					}
-					else {
+					if(i>0) {
 						whereClinics+=",";
 					}
-					if(listClinics.Items[i].ToString()=="Unassigned") {
-						whereClinics+="0";
-					}
-					else if(listClinics.Items[0].ToString()=="Unassigned") {//If the first item in the list is unassigned
-						whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
-						whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]].ClinicNum);//else we know that the list is a 1:1 to _listClinics
+						if(listClinics.SelectedIndices[i]==0) {
+							whereClinics+="0";
+						}
+						else {
+							whereClinics+=POut.Long(_listClinics[listClinics.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
 					}
 				}
 				whereClinics+=") ";
