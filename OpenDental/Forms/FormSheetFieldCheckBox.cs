@@ -130,24 +130,29 @@ namespace OpenDental {
 			listMedical.Visible=false;
 			radioYes.Visible=false;
 			radioNo.Visible=false;
+			labelYesNo.Visible=false;
 			if(listFields.SelectedIndex==-1) {
 				return;
 			}
 			if(isMedHistSheet) {
 				labelRequired.Visible=true;
 				checkRequired.Visible=true;
-				radioYes.Visible=true;
-				radioNo.Visible=true;
 				switch(AvailFields[listFields.SelectedIndex].FieldName) {
 					case "allergy":
 						labelMedical.Visible=true;
 						listMedical.Visible=true;
+						radioYes.Visible=true;
+						radioNo.Visible=true;
+						labelYesNo.Visible=true;
 						labelMedical.Text="Allergies";
 						FillListMedical(MedicalListType.allergy);
 						break;
 					case "problem":
 						labelMedical.Visible=true;
 						listMedical.Visible=true;
+						radioYes.Visible=true;
+						radioNo.Visible=true;
+						labelYesNo.Visible=true;
 						labelMedical.Text="Problems";
 						FillListMedical(MedicalListType.problem);
 						break;
@@ -163,9 +168,6 @@ namespace OpenDental {
 				checkRequired.Visible=true;
 			}
 			else {
-				labelMiscInstructions.Visible=false;
-				labelReportableName.Visible=false;
-				textReportableName.Visible=false;
 				textReportableName.Text="";
 				radioButtonValues=SheetFieldsAvailable.GetRadio(AvailFields[listFields.SelectedIndex].FieldName);
 				if(radioButtonValues.Count==0) {

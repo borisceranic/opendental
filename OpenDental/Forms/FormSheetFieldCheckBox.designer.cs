@@ -43,6 +43,11 @@ namespace OpenDental{
 			this.labelMedical = new System.Windows.Forms.Label();
 			this.radioYes = new System.Windows.Forms.RadioButton();
 			this.radioNo = new System.Windows.Forms.RadioButton();
+			this.labelRequired = new System.Windows.Forms.Label();
+			this.textReportableName = new System.Windows.Forms.TextBox();
+			this.labelReportableName = new System.Windows.Forms.Label();
+			this.labelMiscInstructions = new System.Windows.Forms.Label();
+			this.labelYesNo = new System.Windows.Forms.Label();
 			this.textTabOrder = new OpenDental.ValidNum();
 			this.butDelete = new OpenDental.UI.Button();
 			this.textHeight = new OpenDental.ValidNum();
@@ -51,10 +56,6 @@ namespace OpenDental{
 			this.textXPos = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.labelRequired = new System.Windows.Forms.Label();
-			this.textReportableName = new System.Windows.Forms.TextBox();
-			this.labelReportableName = new System.Windows.Forms.Label();
-			this.labelMiscInstructions = new System.Windows.Forms.Label();
 			this.groupRadioMisc.SuspendLayout();
 			this.groupRadio.SuspendLayout();
 			this.SuspendLayout();
@@ -73,7 +74,7 @@ namespace OpenDental{
 			this.listFields.FormattingEnabled = true;
 			this.listFields.Location = new System.Drawing.Point(15, 37);
 			this.listFields.Name = "listFields";
-			this.listFields.Size = new System.Drawing.Size(142, 472);
+			this.listFields.Size = new System.Drawing.Size(142, 511);
 			this.listFields.TabIndex = 85;
 			this.listFields.SelectedIndexChanged += new System.EventHandler(this.listFields_SelectedIndexChanged);
 			this.listFields.DoubleClick += new System.EventHandler(this.listFields_DoubleClick);
@@ -146,14 +147,13 @@ namespace OpenDental{
 			// checkRequired
 			// 
 			this.checkRequired.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkRequired.Location = new System.Drawing.Point(373, 184);
+			this.checkRequired.Location = new System.Drawing.Point(359, 195);
 			this.checkRequired.Name = "checkRequired";
 			this.checkRequired.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkRequired.Size = new System.Drawing.Size(97, 17);
 			this.checkRequired.TabIndex = 107;
 			this.checkRequired.Text = "Required";
 			this.checkRequired.UseVisualStyleBackColor = true;
-			this.checkRequired.Visible = false;
 			// 
 			// groupRadioMisc
 			// 
@@ -192,7 +192,7 @@ namespace OpenDental{
 			this.groupRadio.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupRadio.Controls.Add(this.listRadio);
 			this.groupRadio.Controls.Add(this.label1);
-			this.groupRadio.Location = new System.Drawing.Point(362, 243);
+			this.groupRadio.Location = new System.Drawing.Point(362, 313);
 			this.groupRadio.Name = "groupRadio";
 			this.groupRadio.Size = new System.Drawing.Size(297, 183);
 			this.groupRadio.TabIndex = 101;
@@ -203,7 +203,7 @@ namespace OpenDental{
 			// labelTabOrder
 			// 
 			this.labelTabOrder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelTabOrder.Location = new System.Drawing.Point(385, 491);
+			this.labelTabOrder.Location = new System.Drawing.Point(385, 561);
 			this.labelTabOrder.Name = "labelTabOrder";
 			this.labelTabOrder.Size = new System.Drawing.Size(71, 16);
 			this.labelTabOrder.TabIndex = 108;
@@ -215,7 +215,7 @@ namespace OpenDental{
 			this.listMedical.FormattingEnabled = true;
 			this.listMedical.Location = new System.Drawing.Point(186, 37);
 			this.listMedical.Name = "listMedical";
-			this.listMedical.Size = new System.Drawing.Size(142, 472);
+			this.listMedical.Size = new System.Drawing.Size(142, 511);
 			this.listMedical.TabIndex = 110;
 			this.listMedical.Visible = false;
 			this.listMedical.DoubleClick += new System.EventHandler(this.listMedical_DoubleClick);
@@ -234,7 +234,7 @@ namespace OpenDental{
 			// 
 			this.radioYes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.radioYes.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioYes.Location = new System.Drawing.Point(409, 203);
+			this.radioYes.Location = new System.Drawing.Point(395, 252);
 			this.radioYes.Name = "radioYes";
 			this.radioYes.Size = new System.Drawing.Size(61, 17);
 			this.radioYes.TabIndex = 114;
@@ -249,7 +249,7 @@ namespace OpenDental{
 			// 
 			this.radioNo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.radioNo.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radioNo.Location = new System.Drawing.Point(409, 221);
+			this.radioNo.Location = new System.Drawing.Point(395, 270);
 			this.radioNo.Name = "radioNo";
 			this.radioNo.Size = new System.Drawing.Size(61, 17);
 			this.radioNo.TabIndex = 115;
@@ -260,10 +260,56 @@ namespace OpenDental{
 			this.radioNo.Visible = false;
 			this.radioNo.Click += new System.EventHandler(this.radioNo_Click);
 			// 
+			// labelRequired
+			// 
+			this.labelRequired.Location = new System.Drawing.Point(465, 185);
+			this.labelRequired.Name = "labelRequired";
+			this.labelRequired.Size = new System.Drawing.Size(188, 40);
+			this.labelRequired.TabIndex = 116;
+			this.labelRequired.Text = "Radion buttons in a radio button group must all be marked required or all be mark" +
+    "ed not required.";
+			// 
+			// textReportableName
+			// 
+			this.textReportableName.Location = new System.Drawing.Point(456, 536);
+			this.textReportableName.Name = "textReportableName";
+			this.textReportableName.Size = new System.Drawing.Size(197, 20);
+			this.textReportableName.TabIndex = 107;
+			// 
+			// labelReportableName
+			// 
+			this.labelReportableName.Location = new System.Drawing.Point(315, 537);
+			this.labelReportableName.Name = "labelReportableName";
+			this.labelReportableName.Size = new System.Drawing.Size(141, 16);
+			this.labelReportableName.TabIndex = 108;
+			this.labelReportableName.Text = "Reportable Name";
+			this.labelReportableName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelMiscInstructions
+			// 
+			this.labelMiscInstructions.Location = new System.Drawing.Point(370, 499);
+			this.labelMiscInstructions.Name = "labelMiscInstructions";
+			this.labelMiscInstructions.Size = new System.Drawing.Size(289, 32);
+			this.labelMiscInstructions.TabIndex = 117;
+			this.labelMiscInstructions.Text = "To make misc radio buttons reportable, set a different Reportable Name for each b" +
+    "utton in the group.";
+			this.labelMiscInstructions.Visible = false;
+			// 
+			// labelYesNo
+			// 
+			this.labelYesNo.Location = new System.Drawing.Point(462, 235);
+			this.labelYesNo.Name = "labelYesNo";
+			this.labelYesNo.Size = new System.Drawing.Size(197, 68);
+			this.labelYesNo.TabIndex = 118;
+			this.labelYesNo.Text = "First create a checkbox with the \"Yes\" value, then create a second checkbox for t" +
+    "he same category with the \"No\" value.  The two checkboxes will act as a radio bu" +
+    "tton group.";
+			this.labelYesNo.Visible = false;
+			// 
 			// textTabOrder
 			// 
 			this.textTabOrder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textTabOrder.Location = new System.Drawing.Point(456, 490);
+			this.textTabOrder.Location = new System.Drawing.Point(456, 560);
 			this.textTabOrder.MaxVal = 2000;
 			this.textTabOrder.MinVal = -100;
 			this.textTabOrder.Name = "textTabOrder";
@@ -280,7 +326,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(16, 530);
+			this.butDelete.Location = new System.Drawing.Point(16, 590);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(77, 24);
 			this.butDelete.TabIndex = 100;
@@ -335,7 +381,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(503, 530);
+			this.butOK.Location = new System.Drawing.Point(503, 590);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -350,51 +396,18 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(584, 530);
+			this.butCancel.Location = new System.Drawing.Point(584, 590);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// labelRequired
-			// 
-			this.labelRequired.Location = new System.Drawing.Point(480, 184);
-			this.labelRequired.Name = "labelRequired";
-			this.labelRequired.Size = new System.Drawing.Size(177, 56);
-			this.labelRequired.TabIndex = 116;
-			this.labelRequired.Text = "Radio buttons in a radio button group must all be marked required or all be marke" +
-    "d not required.";
-			// 
-			// textReportableName
-			// 
-			this.textReportableName.Location = new System.Drawing.Point(456, 466);
-			this.textReportableName.Name = "textReportableName";
-			this.textReportableName.Size = new System.Drawing.Size(197, 20);
-			this.textReportableName.TabIndex = 107;
-			// 
-			// labelReportableName
-			// 
-			this.labelReportableName.Location = new System.Drawing.Point(315, 467);
-			this.labelReportableName.Name = "labelReportableName";
-			this.labelReportableName.Size = new System.Drawing.Size(141, 16);
-			this.labelReportableName.TabIndex = 108;
-			this.labelReportableName.Text = "Reportable Name";
-			this.labelReportableName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelMiscInstructions
-			// 
-			this.labelMiscInstructions.Location = new System.Drawing.Point(370, 429);
-			this.labelMiscInstructions.Name = "labelMiscInstructions";
-			this.labelMiscInstructions.Size = new System.Drawing.Size(289, 32);
-			this.labelMiscInstructions.TabIndex = 117;
-			this.labelMiscInstructions.Text = "To make misc radio buttons reportable, set a different Reportable Name for each b" +
-    "utton in the group.";
-			// 
 			// FormSheetFieldCheckBox
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(675, 568);
+			this.ClientSize = new System.Drawing.Size(675, 628);
+			this.Controls.Add(this.labelYesNo);
 			this.Controls.Add(this.listMedical);
 			this.Controls.Add(this.labelMiscInstructions);
 			this.Controls.Add(this.textReportableName);
@@ -467,5 +480,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textReportableName;
 		private System.Windows.Forms.Label labelReportableName;
 		private System.Windows.Forms.Label labelMiscInstructions;
+		private System.Windows.Forms.Label labelYesNo;
 	}
 }
