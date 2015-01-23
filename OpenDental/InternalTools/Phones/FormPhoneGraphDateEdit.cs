@@ -120,7 +120,7 @@ namespace OpenDental {
 		
 		private void butEditSchedule_Click(object sender,EventArgs e) {
 			//allow user to edit this day's schedule
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(DateEdit);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(DateEdit,ProviderC.GetListShort(),Employees.GetListShort());
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;

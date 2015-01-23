@@ -290,6 +290,42 @@ namespace OpenDentBusiness{
 			return retval;
 		}
 
+		///<summary>Gets all providers associated to users that have a clinic set to the clinic passed in.  Passing in 0 will get a list of providers not assigned to any clinic or to any users.</summary>
+		public static List<Provider> GetProvsByClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> listProvsWithClinics=new List<Provider>();
+			List<Userod> listUsersShort=UserodC.GetListShort();
+			for(int i=0;i<listUsersShort.Count;i++) {
+				Provider prov=Providers.GetProv(listUsersShort[i].ProvNum);
+				if(prov==null) {
+					continue;
+				}
+				if(clinicNum > 0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
+					continue;
+				}
+				if(listUsersShort[i].ClinicNum > 0) {//User is associated to a clinic, add the provider to the list of provs with clinics.
+					listProvsWithClinics.Add(prov);
+				}
+			}
+			if(clinicNum==0) {//Return the list of providers without clinics.
+				//We need to find all providers not associated to a clinic (via userod) and also include all providers not even associated to a user.
+				//Since listProvsWithClinics is comprised of all providers associated to a clinic, simply loop through the provider cache and remove providers present in listProvsWithClinics.
+				List<Provider> listProvsUnassigned=ProviderC.GetListShort();
+				for(int i=listProvsUnassigned.Count-1;i>=0;i--) {
+					for(int j=0;j<listProvsWithClinics.Count;j++) {
+						if(listProvsWithClinics[j].ProvNum==listProvsUnassigned[i].ProvNum) {
+							listProvsUnassigned.RemoveAt(i);
+							break;
+						}
+					}
+				}
+				return listProvsUnassigned;
+			}
+			else {
+				return listProvsWithClinics;
+			}
+		}
+
 		///<summary>Gets a provider from the List.  If EcwID is not found, then it returns null.</summary>
 		public static Provider GetProvByEcwID(string eID) {
 			//No need to check RemotingRole; no call to db.

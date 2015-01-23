@@ -24,6 +24,11 @@ namespace OpenDentBusiness{
 		///<summary>Used to store the payroll identification number used to generate payroll reports. ADP uses six digit number between 000051 and 999999.</summary>
 		public string PayrollID;
 
+		///<summary></summary>
+		public Employee Copy() {
+			return (Employee)this.MemberwiseClone();
+		}
+
 		//public string Abbrev;//Not in use
 		//public bool IsAdmin;//Not in use
 		//public string TimePeriodType;//Not in use

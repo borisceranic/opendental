@@ -60,6 +60,15 @@ namespace OpenDentBusiness{
 			listShort=tempList.ToArray();
 		}
 
+		///<summary>Does not include hidden employees</summary>
+		public static List<Employee> GetListShort() {
+			List<Employee> listEmpsShort=new List<Employee>();
+			for(int i=0;i<ListShort.Length;i++) {
+				listEmpsShort.Add(ListShort[i].Copy());
+			}
+			return listEmpsShort;
+		}
+
 		///<summary>Instead of using the cache, which sorts by FName, LName.</summary>
 		public static List<Employee> GetForTimeCard() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -239,6 +248,44 @@ namespace OpenDentBusiness{
 				}
 			}
 			return null;
+		}
+
+		///<summary>Gets all employees associated to users that have a clinic set to the clinic passed in.  Passing in 0 will get a list of employees not assigned to any clinic or to any users.</summary>
+		public static List<Employee> GetEmpsForClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Employee> listEmpsWithClinics=new List<Employee>();
+			List<Userod> listUsersShort=UserodC.GetListShort();
+			List<long> listEmpNums=new List<long>();
+			for(int i=0;i<listUsersShort.Count;i++) {
+				Employee emp=Employees.GetEmp(listUsersShort[i].EmployeeNum);
+				if(emp==null) {
+					continue;
+				}
+				if(clinicNum==0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
+					continue;
+				}
+				if(listUsersShort[i].ClinicNum==0 && !listEmpNums.Contains(emp.EmployeeNum)) {//User is associated to a clinic, add the employee to the list of emps with clinics.
+					listEmpsWithClinics.Add(emp);
+					listEmpNums.Add(emp.EmployeeNum);
+				}
+			}
+			if(clinicNum==0) {//Return the list of employees without clinics.
+				//We need to find all employees not associated to a clinic (via userod) and also include all employees not even associated to a user.
+				//Since listEmpsWithClinics is comprised of all employees associated to a clinic, simply loop through the employee cache and remove employees present in listEmpsWithClinics.
+				List<Employee> listEmpsUnassigned=Employees.GetListShort();
+				for(int i=listEmpsUnassigned.Count-1;i>=0;i--) {
+					for(int j=0;j<listEmpsWithClinics.Count;j++) {
+						if(listEmpsWithClinics[j].EmployeeNum==listEmpsUnassigned[i].EmployeeNum) {
+							listEmpsUnassigned.RemoveAt(i);
+							break;
+						}
+					}
+				}
+				return listEmpsUnassigned;
+			}
+			else {
+				return listEmpsWithClinics;
+			}
 		}
 
 		/// <summary> Returns -1 if employeeNum is not found.  0 if not hidden and 1 if hidden </summary>		

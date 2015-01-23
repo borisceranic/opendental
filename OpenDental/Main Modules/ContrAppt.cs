@@ -1335,7 +1335,7 @@ namespace OpenDental {
 				//there cannot be a selected appointment if no patient is loaded.
 				ContrApptSingle.SelectedAptNum=-1;//fixes a minor bug.
 			}
-			DS=Appointments.RefreshPeriod(startDate,endDate);
+			DS=Appointments.RefreshPeriod(startDate,endDate,FormOpenDental.ClinicNum);
 			LastTimeDataRetrieved=DateTime.Now;
 			SchedListPeriod=Schedules.ConvertTableToList(DS.Tables["Schedule"]);
 			ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);
@@ -2135,7 +2135,15 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
 			}
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected);
+			List<Provider> listProvs=ProviderC.GetListShort();
+			List<Employee> listEmps=Employees.GetListShort();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				//For phase one we are only filtering employees, not providers.  Show all providers for now.
+				//listProvs=Providers.GetProvsByClinic(FormOpenDental.ClinicNum);
+				listEmps=Employees.GetEmpsForClinic(FormOpenDental.ClinicNum);
+			}
+			//Get the providers and employees for the currently selected clinic.
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,listProvs,listEmps);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh

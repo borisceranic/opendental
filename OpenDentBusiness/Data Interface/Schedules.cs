@@ -91,6 +91,25 @@ namespace OpenDentBusiness{
 			return RefreshAndFill(command);
 		}
 
+		///<summary>Gets a list of Schedule items for one date filtered by providers and employees.  Also includes all schedules with SchedType of practice for the day.</summary>
+		public static List<Schedule> RefreshDayEditForPracticeProvsEmps(DateTime dateSched,List<long> listProvNums,List<long> listEmpNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),dateSched,listProvNums,listEmpNums);
+			}
+			string command="SELECT schedule.* "
+				+"FROM schedule "
+				+"WHERE SchedDate="+POut.Date(dateSched)+" "
+				+"AND (SchedType="+POut.Int((int)ScheduleType.Practice)+" ";
+			if(listProvNums.Count > 0) {
+				command+="OR (SchedType="+POut.Int((int)ScheduleType.Provider)+" AND schedule.ProvNum IN ("+String.Join(",",listProvNums)+")) ";
+			}
+			if(listEmpNums.Count > 0) {
+				command+="OR (SchedType="+POut.Int((int)ScheduleType.Employee)+" AND schedule.EmployeeNum IN ("+String.Join(",",listEmpNums)+")) ";
+			}
+			command+=") ";
+			return RefreshAndFill(command);
+		}
+
 		///<summary></summary>
 		public static List<Schedule> GetTwoYearPeriod(DateTime startDate) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -176,7 +195,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Set validate to true to throw an exception if start and stop times need to be validated.  If validate is set to false, then the calling code is responsible for the validation.</summary>
+		///<summary>Set validate to true to throw an exception if start and stop times need to be validated.  If validate is set to false, then the calling code is responsible for the validation.  Also inserts necessary scheduleop enteries.</summary>
 		public static long Insert(Schedule sched,bool validate){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				sched.ScheduleNum=Meth.GetLong(MethodBase.GetCurrentMethod(),sched,validate);
@@ -578,39 +597,38 @@ namespace OpenDentBusiness{
 			return retVal.Date;
 		}
 
-		///<summary>Surround with try/catch.  Deletes all existing practice, provider, and employee schedules for a day and then saves the provided list.</summary>
-		public static void SetForDay(List<Schedule> SchedList,DateTime schedDate){
+		///<summary>Surround with try/catch.  Deletes all existing practice schedules for the provided date.  Deletes all provider and employee schedules for the day for the ones passed in.  After deleting all of those schedule entries, this method will loop through the provided list of schedules and insert them into the database.</summary>
+		public static void SetForDay(List<Schedule> listScheds,DateTime dateSched,List<long> listProvNums,List<long> listEmpNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),SchedList,schedDate);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listScheds,dateSched,listProvNums,listEmpNums);
 				return;
 			}
-			for(int i=0;i<SchedList.Count;i++){
-				if(SchedList[i].StartTime > SchedList[i].StopTime) {
+			for(int i=0;i<listScheds.Count;i++) {
+				if(listScheds[i].StartTime > listScheds[i].StopTime) {
 					throw new Exception(Lans.g("Schedule","Stop time must be later than start time."));
 				}
 			}
 			//make deleted entries for synch purposes:
-			string command="SELECT ScheduleNum FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
-				+"AND SchedType IN(0,1,3)";//Practice, Provider, Employee//SchedType="+POut.Long((int)ScheduleType.Provider);
-			DataTable table=Db.GetTable(command);
-			List<string> listScheduleNums=new List<string>();  //Used for deleting scheduleops below
-			for(int i=0;i<table.Rows.Count;i++){
+			List<Schedule> listSchedsDb=RefreshDayEditForPracticeProvsEmps(dateSched,listProvNums,listEmpNums);
+			List<long> listScheduleNums=new List<long>();  //Used for deleting scheduleops below
+			for(int i=0;i<listSchedsDb.Count;i++) {
 				//Add entry to deletedobjects table if it is a provider schedule type
-				DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,PIn.Long(table.Rows[i]["ScheduleNum"].ToString()));
+				if(listSchedsDb[i].SchedType==ScheduleType.Provider) {
+					DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,listSchedsDb[i].ScheduleNum);
+				}
 				//regardless of the type, practice, provider or employee, add to the list to delete scheduleop entries below
-				listScheduleNums.Add(table.Rows[i]["ScheduleNum"].ToString());
+				listScheduleNums.Add(listSchedsDb[i].ScheduleNum);
 			}
-			//Then, bulk delete.
-			command="DELETE FROM schedule WHERE SchedDate= "+POut.Date(schedDate)+" "
-				+"AND SchedType IN(0,1,3)";//Practice, Provider, Employee
-			Db.NonQ(command);
 			if(listScheduleNums.Count>0) {
+				//Then, bulk delete.
+				string command="DELETE FROM schedule WHERE ScheduleNum IN("+String.Join(",",listScheduleNums)+")";
+				Db.NonQ(command);
 				//Delete scheduleops for the deleted schedules.
-				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+POut.String(String.Join(",",listScheduleNums))+")";
+				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+String.Join(",",listScheduleNums)+")";
 				Db.NonQ(command);
 			}
-			for(int i=0;i<SchedList.Count;i++){
-				Insert(SchedList[i],false);
+			for(int i=0;i<listScheds.Count;i++) {
+				Insert(listScheds[i],false);
 			}
 		}
 

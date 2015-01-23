@@ -655,13 +655,18 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static DataSet RefreshPeriod(DateTime dateStart,DateTime dateEnd) {
+			return RefreshPeriod(dateStart,dateEnd,0);
+		}
+
+		///<summary>Set clinicNum to 0 to return 'all' clinics.  Otherwise, filters the data set on the clinic num passed in.  Currently only filters GetPeriodEmployeeSchedTable()</summary>
+		public static DataSet RefreshPeriod(DateTime dateStart,DateTime dateEnd,long clinicNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateStart,dateEnd,clinicNum);
 			} 
 			DataSet retVal=new DataSet();
 			DataTable tableAppt=GetPeriodApptsTable(dateStart,dateEnd,0,false);
-			retVal.Tables.Add(tableAppt);//parameters[0],parameters[1],"0","0"));
-			retVal.Tables.Add(GetPeriodEmployeeSchedTable(dateStart,dateEnd));
+			retVal.Tables.Add(tableAppt);
+			retVal.Tables.Add(GetPeriodEmployeeSchedTable(dateStart,dateEnd,clinicNum));
 			retVal.Tables.Add(GetPeriodWaitingRoomTable());
 			retVal.Tables.Add(GetPeriodSchedule(dateStart,dateEnd));
 			retVal.Tables.Add(GetApptFields(tableAppt));
@@ -1305,11 +1310,14 @@ namespace OpenDentBusiness{
 		}
 
 		public static DataTable GetPeriodEmployeeSchedTable(DateTime dateStart,DateTime dateEnd) {
+			return GetPeriodEmployeeSchedTable(dateStart,dateEnd,0);
+		}
+
+		///<summary>Set clinicNum to 0 to return 'unassigned' clinics.  Otherwise, filters the data set on the clinic num passed in.</summary>
+		public static DataTable GetPeriodEmployeeSchedTable(DateTime dateStart,DateTime dateEnd,long clinicNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,clinicNum);
 			}
-			//DateTime dateStart=PIn.PDate(strDateStart);
-			//DateTime dateEnd=PIn.PDate(strDateEnd);
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("EmpSched");
 			DataRow row;
@@ -1320,12 +1328,31 @@ namespace OpenDentBusiness{
 			if(dateStart!=dateEnd) {
 				return table;
 			}
+			string clinicJoin="";
+			string clinicWhere="";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				clinicJoin="LEFT JOIN userod ON employee.EmployeeNum=userod.EmployeeNum ";
+				if(clinicNum==0) {
+					clinicWhere="AND (userod.ClinicNum IS NULL OR userod.ClinicNum=0) ";
+				}
+				else {
+					clinicWhere="AND userod.ClinicNum="+POut.Long(clinicNum)+" ";
+				}
+			}
 			string command="SELECT StartTime,StopTime,FName,employee.EmployeeNum,Note "
-				+"FROM employee,schedule "
-				+"WHERE schedule.EmployeeNum=employee.EmployeeNum "
-				+"AND SchedType=3 "//employee
+				+"FROM employee "
+				+"INNER JOIN schedule ON schedule.EmployeeNum=employee.EmployeeNum "
+				+clinicJoin
+				+"WHERE SchedType="+POut.Int((int)ScheduleType.Employee)+" "
 				+"AND SchedDate = "+POut.Date(dateStart)+" "
-				+"ORDER BY FName";
+				+clinicWhere;
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				command+="GROUP BY employee.EmployeeNum ";
+			}
+			else {
+				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note ";
+			}
+			command+="ORDER BY FName";
 			DataTable raw=dcon.GetTable(command);
 			DateTime startTime;
 			DateTime stopTime;

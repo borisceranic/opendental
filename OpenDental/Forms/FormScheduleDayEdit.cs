@@ -12,12 +12,9 @@ namespace OpenDental{
 	public class FormScheduleDayEdit:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butAddTime;
 		private OpenDental.UI.Button butCloseOffice;
-		//private ArrayList ALdefaults;
 		private OpenDental.UI.Button butCancel;
 		private System.ComponentModel.Container components = null;
-		//private Schedule[] SchedListDay;
-		private DateTime SchedCurDate;
-		//private ScheduleType SchedType;
+		private DateTime _dateSched;
 		private OpenDental.UI.ODGrid gridMain;
 		private Label labelDate;
 		private GroupBox groupBox3;
@@ -35,15 +32,20 @@ namespace OpenDental{
 		private TabPage tabPage1;
 		private TabPage tabPage2;
 		private GraphScheduleDay graphScheduleDay;
-		//private int ProvNum;
-		private List<Schedule> SchedList;
+		private List<Schedule> _listScheds;
+		private List<Provider> _listProvs;
+		private List<Employee> _listEmps;
+		///<summary>The provider nums of _listProvs.  Helper, which is set once on load.</summary>
+		private List<long> _listProvNums;
+		///<summary>The employee nums of _listEmps.  Helper, which is set once on load.</summary>
+		private List<long> _listEmpNums;
 
 		///<summary></summary>
-		public FormScheduleDayEdit(DateTime schedCurDate){
+		public FormScheduleDayEdit(DateTime dateSched,List<Provider> listProvs,List<Employee> listEmps) {
 			InitializeComponent();
-			SchedCurDate=schedCurDate;
-			//SchedType=schedType;
-			//ProvNum=provNum;
+			_dateSched=dateSched;
+			_listProvs=listProvs;
+			_listEmps=listEmps;
 			Lan.F(this);
 		}
 
@@ -383,18 +385,24 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScheduleDay_Load(object sender, System.EventArgs e) {
-			labelDate.Text=SchedCurDate.ToString("dddd")+" "+SchedCurDate.ToShortDateString();
-			SchedList=Schedules.RefreshDayEdit(SchedCurDate);//only does this on startup
-			//listProv
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				listProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				//listProv.SetSelected(i,true);
+			labelDate.Text=_dateSched.ToString("dddd")+" "+_dateSched.ToShortDateString();
+			_listProvNums=new List<long>();
+			_listEmpNums=new List<long>();
+			for(int i=0;i<_listProvs.Count;i++) {
+				_listProvNums.Add(_listProvs[i].ProvNum);
 			}
-			for(int i=0;i<Employees.ListShort.Length;i++) {
-				listEmp.Items.Add(Employees.ListShort[i].FName);
-				//listEmp.SetSelected(i,true);
+			for(int i=0;i<_listEmps.Count;i++) {
+				_listEmpNums.Add(_listEmps[i].EmployeeNum);
+			}
+			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvNums,_listEmpNums);//only does this on startup
+			for(int i=0;i<_listProvs.Count;i++) {
+				listProv.Items.Add(_listProvs[i].Abbr);
+			}
+			for(int i=0;i<_listEmps.Count;i++) {
+				listEmp.Items.Add(_listEmps[i].FName);
 			}
       FillGrid();
+			//Use the actual provider cache (not the passed in provider list) to populate this combo box because it is a global preference, so it should look at "global" level providers (currently all).
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
 				comboProv.Items.Add(ProviderC.ListShort[i].Abbr);
 				if(ProviderC.ListShort[i].ProvNum==PrefC.GetLong(PrefName.ScheduleProvUnassigned)) {
@@ -403,10 +411,10 @@ namespace OpenDental{
 			}
 		}
 
-    private void FillGrid(){
+		private void FillGrid() {
 			//do not refresh from db
-			SchedList.Sort(CompareSchedule);
-			graphScheduleDay.SetSchedules(SchedList);
+			_listScheds.Sort(CompareSchedule);
+			graphScheduleDay.SetSchedules(_listScheds);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableSchedDay","Provider"),100);
@@ -427,38 +435,38 @@ namespace OpenDental{
 			string opdesc;
 			//string opstr;
 			//string[] oparray;
-			for(int i=0;i<SchedList.Count;i++){
+			for(int i=0;i<_listScheds.Count;i++) {
 				row=new ODGridRow();
 				//Prov
-				if(SchedList[i].ProvNum!=0){
-					row.Cells.Add(Providers.GetAbbr(SchedList[i].ProvNum));
+				if(_listScheds[i].ProvNum!=0) {
+					row.Cells.Add(Providers.GetAbbr(_listScheds[i].ProvNum));
 				}
-				else{
+				else {
 					row.Cells.Add("");
 				}
 				//Employee
-				if(SchedList[i].EmployeeNum==0) {
+				if(_listScheds[i].EmployeeNum==0) {
 					row.Cells.Add("");
 				}
-				else{
-					row.Cells.Add(Employees.GetEmp(SchedList[i].EmployeeNum).FName);
+				else {
+					row.Cells.Add(Employees.GetEmp(_listScheds[i].EmployeeNum).FName);
 				}
 				//times
-				if(SchedList[i].StartTime==TimeSpan.Zero 
-					&& SchedList[i].StopTime==TimeSpan.Zero)
-					//SchedList[i].SchedType==ScheduleType.Practice){
+				if(_listScheds[i].StartTime==TimeSpan.Zero 
+					&& _listScheds[i].StopTime==TimeSpan.Zero)
+				//SchedList[i].SchedType==ScheduleType.Practice){
 				{
 					row.Cells.Add("");
 					row.Cells.Add("");
 				}
-				else{
-					row.Cells.Add(SchedList[i].StartTime.ToShortTimeString());
-					row.Cells.Add(SchedList[i].StopTime.ToShortTimeString());
+				else {
+					row.Cells.Add(_listScheds[i].StartTime.ToShortTimeString());
+					row.Cells.Add(_listScheds[i].StopTime.ToShortTimeString());
 				}
 				//ops
 				opdesc="";
-				for(int o=0;o<SchedList[i].Ops.Count;o++) {
-					Operatory op=Operatories.GetOperatory(SchedList[i].Ops[o]);
+				for(int o=0;o<_listScheds[i].Ops.Count;o++) {
+					Operatory op=Operatories.GetOperatory(_listScheds[i].Ops[o]);
 					if(op.IsHidden) {//Skip hidden operatories because it just confuses users.
 						continue;
 					}
@@ -470,15 +478,15 @@ namespace OpenDental{
 				row.Cells.Add(opdesc);
 				//note
 				note="";
-				if(SchedList[i].Status==SchedStatus.Holiday) {
+				if(_listScheds[i].Status==SchedStatus.Holiday) {
 					note+=Lan.g(this,"Holiday: ");
 				}
-				note+=SchedList[i].Note;
+				note+=_listScheds[i].Note;
 				row.Cells.Add(note);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-    }
+		}
 
 		private int CompareSchedule(Schedule x,Schedule y){
 			if(x==y){
@@ -506,16 +514,16 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Schedule schedCur=SchedList[e.Row];//remember the clicked row
+			Schedule schedCur=_listScheds[e.Row];//remember the clicked row
 			FormScheduleEdit FormS=new FormScheduleEdit();
-			FormS.SchedCur=SchedList[e.Row];
+			FormS.SchedCur=_listScheds[e.Row];
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			FillGrid();
-			for(int i=0;i<SchedList.Count;i++){
-				if(SchedList[i]==schedCur){
+			for(int i=0;i<_listScheds.Count;i++){
+				if(_listScheds[i]==schedCur){
 					gridMain.SetSelected(i,true);
 				}
 			}
@@ -528,14 +536,14 @@ namespace OpenDental{
 		//}
 
 		private void butAddTime_Click(object sender, System.EventArgs e) {
-			Schedule SchedCur=new Schedule();
-			SchedCur.SchedDate=SchedCurDate;
-			SchedCur.Status=SchedStatus.Open;
-			SchedCur.StartTime=new TimeSpan(8,0,0);//8am
-			SchedCur.StopTime=new TimeSpan(17,0,0);//5pm
+			Schedule schedCur=new Schedule();
+			schedCur.SchedDate=_dateSched;
+			schedCur.Status=SchedStatus.Open;
+			schedCur.StartTime=new TimeSpan(8,0,0);//8am
+			schedCur.StopTime=new TimeSpan(17,0,0);//5pm
 			//schedtype, provNum, and empnum will be set down below
 			FormScheduleEdit FormS=new FormScheduleEdit();
-			FormS.SchedCur=SchedCur;
+			FormS.SchedCur=schedCur;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;
@@ -543,28 +551,28 @@ namespace OpenDental{
 			Schedule schedTemp;
 			for(int i=0;i<listProv.SelectedIndices.Count;i++){
 				schedTemp=new Schedule();
-				schedTemp=SchedCur.Copy();
+				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Provider;
-				schedTemp.ProvNum=ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum;
-				SchedList.Add(schedTemp);
+				schedTemp.ProvNum=_listProvs[listProv.SelectedIndices[i]].ProvNum;
+				_listScheds.Add(schedTemp);
 			}
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
 				schedTemp=new Schedule();
-				schedTemp=SchedCur.Copy();
+				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Employee;
-				schedTemp.EmployeeNum=Employees.ListShort[listEmp.SelectedIndices[i]].EmployeeNum;
-				SchedList.Add(schedTemp);
+				schedTemp.EmployeeNum=_listEmps[listEmp.SelectedIndices[i]].EmployeeNum;
+				_listScheds.Add(schedTemp);
 			}
 			FillGrid();
 		}
 
 		private void butProvNote_Click(object sender,EventArgs e) {
-			Schedule SchedCur=new Schedule();
-			SchedCur.SchedDate=SchedCurDate;
-			SchedCur.Status=SchedStatus.Open;
+			Schedule schedCur=new Schedule();
+			schedCur.SchedDate=_dateSched;
+			schedCur.Status=SchedStatus.Open;
 			//schedtype, provNum, and empnum will be set down below
 			FormScheduleEdit FormS=new FormScheduleEdit();
-			FormS.SchedCur=SchedCur;
+			FormS.SchedCur=schedCur;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
@@ -572,24 +580,24 @@ namespace OpenDental{
 			Schedule schedTemp;
 			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
 				schedTemp=new Schedule();
-				schedTemp=SchedCur.Copy();
+				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Provider;
-				schedTemp.ProvNum=ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum;
-				SchedList.Add(schedTemp);
+				schedTemp.ProvNum=_listProvs[listProv.SelectedIndices[i]].ProvNum;
+				_listScheds.Add(schedTemp);
 			}
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
 				schedTemp=new Schedule();
-				schedTemp=SchedCur.Copy();
+				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Employee;
-				schedTemp.EmployeeNum=Employees.ListShort[listEmp.SelectedIndices[i]].EmployeeNum;
-				SchedList.Add(schedTemp);
+				schedTemp.EmployeeNum=_listEmps[listEmp.SelectedIndices[i]].EmployeeNum;
+				_listScheds.Add(schedTemp);
 			}
 			FillGrid();
 		}
 
 		private void butNote_Click(object sender,EventArgs e) {
 			Schedule SchedCur=new Schedule();
-			SchedCur.SchedDate=SchedCurDate;
+			SchedCur.SchedDate=_dateSched;
 			SchedCur.Status=SchedStatus.Open;
 			SchedCur.SchedType=ScheduleType.Practice;
 			FormScheduleEdit FormS=new FormScheduleEdit();
@@ -598,21 +606,21 @@ namespace OpenDental{
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			SchedList.Add(SchedCur);
+			_listScheds.Add(SchedCur);
 			FillGrid();
 		}
 
 		private void butHoliday_Click(object sender,System.EventArgs e) {
-			for(int i=0;i<SchedList.Count;i++){
-				if(SchedList[i].SchedType==ScheduleType.Practice
-					&& SchedList[i].Status==SchedStatus.Holiday)
+			for(int i=0;i<_listScheds.Count;i++){
+				if(_listScheds[i].SchedType==ScheduleType.Practice
+					&& _listScheds[i].Status==SchedStatus.Holiday)
 				{
 					MsgBox.Show(this,"Day is already a Holiday.");
 					return;
 				}
 			}
 		  Schedule SchedCur=new Schedule();
-      SchedCur.SchedDate=SchedCurDate;
+      SchedCur.SchedDate=_dateSched;
       SchedCur.Status=SchedStatus.Holiday;
 			SchedCur.SchedType=ScheduleType.Practice;
 		  FormScheduleEdit FormS=new FormScheduleEdit();
@@ -621,7 +629,7 @@ namespace OpenDental{
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			SchedList.Add(SchedCur);
+			_listScheds.Add(SchedCur);
       FillGrid();
 		}
 
@@ -632,27 +640,27 @@ namespace OpenDental{
 					gridMain.SetSelected(false);//So that they don't accidentally hit Delete again and it wipe out the entire day without warning.
 					return;
 				}
-				SchedList.Clear();
+				_listScheds.Clear();
 				FillGrid();
 				return;
 			}
 			//loop backwards:
-			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--){
-				SchedList.RemoveAt(gridMain.SelectedIndices[i]);
+			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {
+				_listScheds.RemoveAt(gridMain.SelectedIndices[i]);
 			}
 			FillGrid();
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			try {
-				Schedules.SetForDay(SchedList,SchedCurDate);
+				Schedules.SetForDay(_listScheds,_dateSched,_listProvNums,_listEmpNums);
 			}
 			catch(Exception ex) {
 				MsgBox.Show(this,ex.Message);
 				return;
 			}
 			if(comboProv.SelectedIndex!=-1
-				&& Prefs.UpdateLong(PrefName.ScheduleProvUnassigned,ProviderC.ListShort[comboProv.SelectedIndex].ProvNum))
+				&& Prefs.UpdateLong(PrefName.ScheduleProvUnassigned,ProviderC.ListShort[comboProv.SelectedIndex].ProvNum))//Must use provider cache here, not _listProvs.
 			{
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
