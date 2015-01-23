@@ -459,6 +459,8 @@ namespace OpenDentBusiness {
 		TasksCheckOnStartup,
 		TasksNewTrackedByUser,
 		TasksShowOpenTickets,
+		///<summary>Keeps track of date of one-time cleanup of temp files.  Prevents continued annoying cleanups after the first month.</summary>
+		TempFolderDateFirstCleaned,
 		TerminalClosePassword,
 		TextMsgOkStatusTreatAsNo,
 		TimeCardADPExportIncludesName,

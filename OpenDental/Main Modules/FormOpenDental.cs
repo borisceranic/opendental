@@ -1945,7 +1945,7 @@ namespace OpenDental{
 				if(CommandLineArgs.Length==0) {
 					Splash.Show();
 				}
-				if(!PrefsStartup()){//looks for the AtoZ folder here, but would like to eventually move that down to after login
+				if(!PrefsStartup()){//looks for the AtoZ folder here, but would like to eventually move that down to after login.  In Release, refreshes the Pref cache if conversion successful.
 					Cursor=Cursors.Default;
 					Splash.Dispose();
 					Application.Exit();
@@ -2265,7 +2265,7 @@ namespace OpenDental{
 			}
 			//if RemotingRole.ClientWeb, version will have already been checked at login, so no danger here.
 			//ClientWeb version can be older than this version, but that will be caught in a moment.
-			if(!PrefL.ConvertDB()){
+			if(!PrefL.ConvertDB()){//refreshes Prefs if converted successfully.
 				return false;
 			}
 			PrefL.MySqlVersion55Remind();
@@ -2296,6 +2296,11 @@ namespace OpenDental{
 					return false;
 				}
 				Cache.Refresh(InvalidType.Prefs);
+			}
+			//This must be done at startup in case the user does not perform any action to save something to temp file.
+			//This will cause slowdown, but only for the first week.
+			if(DateTime.Today<PrefC.GetDate(PrefName.TempFolderDateFirstCleaned).AddDays(7)) {
+				PrefL.GetTempFolderPath();//We don't care about the return value.  Just trying to trigger the one-time cleanup and create the temp/opendental directory.
 			}
 			Lans.RefreshCache();//automatically skips if current culture is en-US
 			LanguageForeigns.Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);//automatically skips if current culture is en-US
@@ -6365,6 +6370,28 @@ namespace OpenDental{
 			//    Application.OpenForms[f].Close();
 			//  }
 			//}
+			string tempPath=PrefL.GetTempFolderPath();
+			string[] arrayFileNames=Directory.GetFiles(tempPath,"*.*",SearchOption.AllDirectories);//All files in the current directory plus all files in all subdirectories.
+			for(int i=0;i<arrayFileNames.Length;i++) {
+				try {
+					File.Delete(arrayFileNames[i]);
+				}
+				catch {
+					//Do nothing because the file could have been in use or there were not sufficient permissions.
+					//This file will most likely get deleted next time a temp file is created.
+				}
+			}			
+			List <string> listDirectories=new List<string>(Directory.GetDirectories(tempPath,"*",SearchOption.AllDirectories));//All subdirectories.
+			listDirectories.Sort();//We need to sort so that we know for certain which directories are parent directories of other directories.
+			for(int i=listDirectories.Count-1;i>=0;i--) {//Easier than recursion.  Since the list is ordered ascending, then going backwards means we delete subdirectories before their parent directories.
+				try {
+					Directory.Delete(listDirectories[i]);
+				}
+				catch {
+					//Do nothing because the folder could have been in use or there were not sufficient permissions.
+					//This folder will most likely get deleted next time Open Dental closes.
+				}
+			}
 		}
 
 		private void FormOpenDental_FormClosed(object sender,FormClosedEventArgs e) {

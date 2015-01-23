@@ -426,5 +426,45 @@ namespace OpenDental {
 			return true;
 		}
 
+		///<summary>Returns the path to the temporary opendental directory, temp/opendental.  Also performs one-time cleanup, if necessary.  In FormOpenDental_FormClosing, the contents of temp/opendental get cleaned up.</summary>
+		public static string GetTempFolderPath() {
+			//Will clean up entire temp folder for a month after the enhancement of temp file cleanups as long as the temp\opendental folder doesn't already exist.
+			string tempPathOD=ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental");
+			if(Directory.Exists(tempPathOD)) {
+				//Cleanup has already run for the old temp folder.  Do nothing.
+				return tempPathOD;
+			}
+			Directory.CreateDirectory(tempPathOD);
+			if(DateTime.Today>PrefC.GetDate(PrefName.TempFolderDateFirstCleaned).AddMonths(1)) {
+				return tempPathOD;
+			}
+			//This might be used if this is the first time running this version on the computer that did the db update.
+			//This might also be used if this is a computer that was turned off for a few weeks around the time of update conversion.
+			//We need some sort of time limit just in case it's annoying and keeps happening.
+			//So this will have a small risk of missing a computer, but the benefit of limiting outweighs the risk.
+			//Empty entire temp folder.  Blank folders will be left behind because they do not matter.
+			string[] arrayFileNames=Directory.GetFiles(Path.GetTempPath());
+			for(int i=0;i<arrayFileNames.Length;i++) {
+				try {
+					if(arrayFileNames[i].Substring(arrayFileNames[i].LastIndexOf('.'))==".exe" || arrayFileNames[i].Substring(arrayFileNames[i].LastIndexOf('.'))==".cs") {
+						//Do nothing.  We don't care about .exe or .cs files and don't want to interrupt other programs' files.
+					}
+					else {
+						File.Delete(arrayFileNames[i]);
+					}
+				}
+				catch {
+					//Do nothing because the file could have been in use or there were not sufficient permissions.
+					//This file will most likely get deleted next time a temp file is created.
+				}
+			}
+			return tempPathOD;
+		}
+
+		///<summary>Creates a new randomly named file in the given directory path with the given extension and returns the full path to the new file.</summary>
+		public static string GetRandomTempFile(string ext) {
+			return ODFileUtils.CreateRandomFile(GetTempFolderPath(),ext);
+		}
+
 	}
 }

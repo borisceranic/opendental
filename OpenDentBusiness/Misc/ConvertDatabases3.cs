@@ -7037,6 +7037,14 @@ namespace OpenDentBusiness {
 				}
 				else {//oracle
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TempFolderDateFirstCleaned',CURDATE())";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TempFolderDateFirstCleaned',SYSDATE)";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
