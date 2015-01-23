@@ -3234,8 +3234,8 @@ namespace OpenDental{
 			MenuItem menuItem;
 			List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 			if(!Security.CurUser.ClinicIsRestricted) {
-				menuItem=new MenuItem(Lan.g(this,"All"),menuClinic_Click);
-				menuItem.Tag=new Clinic();//selecting All will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
+				menuItem=new MenuItem(Lan.g(this,"Headquarters"),menuClinic_Click);
+				menuItem.Tag=new Clinic();//selecting Headquarters will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
 				if(ClinicNum==0) {
 					menuItem.Checked=true;
 				}
