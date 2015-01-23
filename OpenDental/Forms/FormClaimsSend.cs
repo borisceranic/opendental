@@ -64,6 +64,7 @@ namespace OpenDental{
 		private ContextMenu contextMenuEclaims;
 		private List<EtransType> _listCurEtransTypes;
 		//private ContextMenu contextMenuHist;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormClaimsSend(){
@@ -412,10 +413,16 @@ namespace OpenDental{
 				labelClinic.Visible=false;
 			}
 			else {
-				comboClinic.Items.Add(Lan.g(this,"all"));
-				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					comboClinic.Items.Add(Lan.g(this,"Unassigned"));
+					comboClinic.SelectedIndex=0;
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=comboClinic.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						comboClinic.SelectedIndex=curIndex;
+					}
 				}
 			}
 			comboCustomTracking.Items.Add(Lan.g(this,"all"));
@@ -625,8 +632,13 @@ namespace OpenDental{
 		private ClaimSendQueueItem[] GetListQueueFiltered() {
 			long clinicNum=0;
 			long customTracking=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0) {
-				clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex!=0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
+				}
+				else if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
 			}
 			if(comboCustomTracking.SelectedIndex!=0) {
 				customTracking=DefC.Long[(int)DefCat.ClaimCustomTracking][comboCustomTracking.SelectedIndex-1].DefNum;
@@ -634,10 +646,8 @@ namespace OpenDental{
 			List<ClaimSendQueueItem> listClaimSend=new List<ClaimSendQueueItem>();
 			listClaimSend.AddRange(_arrayQueueAll);
 			//Remove any non-matches
-			if(clinicNum>0) {
-				//Creating a subset of listClaimSend with all entries c such that c.ClinicNum==clinicNum
-				listClaimSend=listClaimSend.FindAll(c => c.ClinicNum==clinicNum);
-			}
+			//Creating a subset of listClaimSend with all entries c such that c.ClinicNum==clinicNum
+			listClaimSend=listClaimSend.FindAll(c => c.ClinicNum==clinicNum);
 			if(customTracking>0) {
 				//Creating a subset of listClaimSend with all entries c such that c.CustomTracking==customTracking
 				listClaimSend=listClaimSend.FindAll(c => c.CustomTracking==customTracking);
