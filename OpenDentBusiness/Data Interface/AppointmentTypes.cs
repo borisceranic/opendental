@@ -44,6 +44,31 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			listt=Crud.AppointmentTypeCrud.TableToList(table);
 		}
+
+		///<summary>Returns a deep copy of Listt.</summary>
+		public static List<AppointmentType> GetListt() {
+			List<AppointmentType> listApptTypes=new List<AppointmentType>();
+			for(int i=0;i<AppointmentTypes.Listt.Count;i++) {//Gets a deep copy of the cache.
+				listApptTypes.Add(AppointmentTypes.Listt[i].Clone());
+			}
+			return listApptTypes;
+		}
+
+		#endregion
+
+		#region Sync Pattern
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<AppointmentType> listNew) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);//never pass DB list through the web service
+				return;
+			}
+			string command="SELECT * FROM appointmenttype ORDER BY ItemOrder";
+			List<AppointmentType> listApptTypes=Crud.AppointmentTypeCrud.SelectMany(command);
+			Crud.AppointmentTypeCrud.Sync(listNew,listApptTypes);
+		}
+
 		#endregion
 
 		///<summary>Gets one AppointmentType from the cache.</summary>

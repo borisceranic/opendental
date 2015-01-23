@@ -7,6 +7,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>Appointment type is used to override appointment color.  Might control other properties on appointments in the future.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class AppointmentType:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -15,7 +16,7 @@ namespace OpenDentBusiness{
 		public string AppointmentTypeName;
 		///<summary></summary>
 		public Color AppointmentTypeColor;
-		///<summary></summary>
+		///<summary>0 based</summary>
 		public int ItemOrder;
 		///<summary></summary>
 		public bool IsHidden;

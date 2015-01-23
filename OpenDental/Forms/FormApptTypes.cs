@@ -10,6 +10,7 @@ using OpenDental.UI;
 namespace OpenDental {
 	public partial class FormApptTypes:Form {
 		private List<AppointmentType> _listApptTypes;
+		private bool _isChanged=false;
 
 		public FormApptTypes() {
 			InitializeComponent();
@@ -18,6 +19,7 @@ namespace OpenDental {
 		}
 
 		private void FormApptTypes_Load(object sender,EventArgs e) {
+			_listApptTypes=AppointmentTypes.GetListt();
 			FillMain();
 		}
 
@@ -28,11 +30,10 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableApptTypes","Color"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptTypes","Hidden"),0);
+			col=new ODGridColumn(Lan.g("TableApptTypes","Hidden"),0,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			_listApptTypes=AppointmentTypes.Listt;
 			_listApptTypes.Sort(AppointmentTypes.SortItemOrder);
 			for(int i=0;i<_listApptTypes.Count;i++) {
 				row=new ODGridRow();
@@ -48,6 +49,42 @@ namespace OpenDental {
 			gridMain.EndUpdate();
 		}
 
+		private void butUp_Click(object sender,EventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select an item in the grid first.");
+				return;
+			}
+			if(gridMain.GetSelectedIndex()==0) {
+				//Do nothing, the item is at the top of the list.
+				return;
+			}
+			int index=gridMain.GetSelectedIndex();
+			_isChanged=true;
+			_listApptTypes[index-1].ItemOrder+=1;
+			_listApptTypes[index].ItemOrder-=1;
+			FillMain();
+			index-=1;
+			gridMain.SetSelected(index,true);
+		}
+
+		private void butDown_Click(object sender,EventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select an item in the grid first.");
+				return;
+			}
+			if(gridMain.GetSelectedIndex()==_listApptTypes.Count-1) {
+				//Do nothing, the item is at the bottom of the list.
+				return;
+			}
+			int index=gridMain.GetSelectedIndex();
+			_isChanged=true;
+			_listApptTypes[index+1].ItemOrder-=1;
+			_listApptTypes[index].ItemOrder+=1;
+			FillMain();
+			index+=1;
+			gridMain.SetSelected(index,true);
+		}
+
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormApptTypeEdit FormATE=new FormApptTypeEdit();
 			FormATE.AppointmentTypeCur=_listApptTypes[e.Row];
@@ -55,21 +92,37 @@ namespace OpenDental {
 			if(FormATE.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			if(FormATE.AppointmentTypeCur==null) {
+				_listApptTypes.RemoveAt(e.Row);
+			}
+			else {
+				_listApptTypes[e.Row]=FormATE.AppointmentTypeCur;
+			}
+			_isChanged=true;
 			FillMain();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
 			FormApptTypeEdit FormATE=new FormApptTypeEdit();
 			FormATE.AppointmentTypeCur=new AppointmentType();
-			FormATE.IsNew=true;
+			FormATE.AppointmentTypeCur.ItemOrder=_listApptTypes.Count-1;
 			FormATE.ShowDialog();
 			if(FormATE.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			_listApptTypes.Add(FormATE.AppointmentTypeCur);
+			_isChanged=true;
 			FillMain();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
+			if(_isChanged) {
+				for(int i=0;i<_listApptTypes.Count;i++) {
+					_listApptTypes[i].ItemOrder=i;
+				}
+				AppointmentTypes.Sync(_listApptTypes);
+				DataValid.SetInvalid(InvalidType.AppointmentTypes);
+			}
 			DialogResult=DialogResult.OK;
 		}
 

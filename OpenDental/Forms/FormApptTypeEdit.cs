@@ -9,8 +9,6 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormApptTypeEdit:Form {
 		public AppointmentType AppointmentTypeCur;
-		private AppointmentType _appointmentTypeOriginal;
-		public bool IsNew;
 
 		public FormApptTypeEdit() {
 			InitializeComponent();
@@ -18,7 +16,6 @@ namespace OpenDental {
 		}
 
 		private void FormApptTypeEdit_Load(object sender,EventArgs e) {
-			_appointmentTypeOriginal=AppointmentTypeCur.Clone();
 			textName.Text=AppointmentTypeCur.AppointmentTypeName;
 			butColor.BackColor=AppointmentTypeCur.AppointmentTypeColor;
 			checkIsHidden.Checked=AppointmentTypeCur.IsHidden;
@@ -36,19 +33,12 @@ namespace OpenDental {
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(IsNew) {
+			if(AppointmentTypeCur.IsNew) {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
 			else {
-				try {
-					AppointmentTypes.Delete(AppointmentTypeCur.AppointmentTypeNum);
-				}
-				catch(Exception ex) {
-					MessageBox.Show(ex.Message);
-					return;
-				}
-				DataValid.SetInvalid(InvalidType.AppointmentTypes);
+				AppointmentTypeCur=null;
 				DialogResult=DialogResult.OK;
 			}
 		}
@@ -57,13 +47,6 @@ namespace OpenDental {
 			AppointmentTypeCur.AppointmentTypeName=textName.Text;
 			AppointmentTypeCur.AppointmentTypeColor=butColor.BackColor;
 			AppointmentTypeCur.IsHidden=checkIsHidden.Checked;
-			if(IsNew) {
-				AppointmentTypes.Insert(AppointmentTypeCur);
-			}
-			else {
-				AppointmentTypes.Update(AppointmentTypeCur);
-			}
-			DataValid.SetInvalid(InvalidType.AppointmentTypes);
 			DialogResult=DialogResult.OK;
 		}
 
