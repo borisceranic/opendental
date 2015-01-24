@@ -302,6 +302,16 @@ namespace OpenDental{
 				//this.Cursor=Cursors.Default;
 				return;
 			}
+			finally {
+				//Clean up the temp file because is no reason to leave files in the temp directory.
+				try {
+					File.Delete(tempPath);
+				}
+				catch {
+					//Do nothing because the file could have been in use or there were not sufficient permissions.
+					//This file will most likely get deleted next time a statement is created.
+				}
+			}
 			docc.ImgType=ImageType.Document;
 			if(Stmt.IsInvoice) {
 				docc.Description=Lan.g(this,"Invoice");

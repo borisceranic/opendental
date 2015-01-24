@@ -143,6 +143,14 @@ namespace OpenDentBusiness {
 		public static string GetHashString(Document doc,string patFolder) {
 			//the key data is the bytes of the file, concatenated with the bytes of the note.
 			byte[] textbytes;
+			if(!PrefC.AtoZfolderUsed){
+				patFolder=ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental");
+				byte[] rawData=Convert.FromBase64String(doc.RawBase64);
+				using(FileStream file=new FileStream(ODFileUtils.CombinePaths(patFolder,doc.FileName),FileMode.Create,FileAccess.Write)) {
+					file.Write(rawData,0,rawData.Length);
+					file.Close();
+				}
+			}
 			if(doc.Note == null) {
 				textbytes = Encoding.UTF8.GetBytes("");
 			}
@@ -150,6 +158,12 @@ namespace OpenDentBusiness {
 				textbytes = Encoding.UTF8.GetBytes(doc.Note);
 			}
 			byte[] filebytes = GetBytes(doc,patFolder);
+			if(!PrefC.AtoZfolderUsed) {
+				try {
+					File.Delete(ODFileUtils.CombinePaths(patFolder,doc.FileName));
+				}
+				catch { }//Should never happen since the file was just created and the permissions were there moments ago when the file was created.
+			}
 			int fileLength = filebytes.Length;
 			byte[] buffer = new byte[textbytes.Length + filebytes.Length];
 			Array.Copy(filebytes,0,buffer,0,fileLength);
@@ -593,12 +607,10 @@ namespace OpenDentBusiness {
 			}
 			else {//image is in database
 				byte[] rawData=Convert.FromBase64String(doc.RawBase64);
-				Image image=null;
-				using(MemoryStream stream=new MemoryStream()) {
-					stream.Read(rawData,0,rawData.Length);
-					image=Image.FromStream(stream);
+				using(FileStream file=new FileStream(saveToPath,FileMode.Create,FileAccess.Write)) {
+					file.Write(rawData,0,rawData.Length);
+					file.Close();
 				}
-				image.Save(saveToPath);
 			}
 		}
 

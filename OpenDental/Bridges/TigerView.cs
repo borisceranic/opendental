@@ -225,6 +225,10 @@ namespace OpenDental.Bridges {
 		}
 
 		private static void ProcessFile(string fullPath) {
+			if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				MsgBox.Show("TigerView","TigerView is not currently supported when storing images in the database.");
+				return;
+			}
 			string filename=Path.GetFileName(fullPath);
 			//Get the patNum/chartNum from filename.  Example: tmb123.20091119.XXXXXX.tig where X is identifier
 			string[] splitFileName=filename.Split(new char[] { '.' });

@@ -894,7 +894,7 @@ namespace OpenDental {
 				ImagesCur=ImageStore.OpenImagesEob(eob);
 				if(ImagesCur[0]==null) {
 					if(ImageHelper.HasImageExtension(eob.FileName)) {
-						MessageBox.Show(Lan.g(this,"File not found: ") + eob.FileName);
+						MessageBox.Show(Lan.g(this,"File not found")+": " + eob.FileName);
 					}
 					else if(Path.GetExtension(eob.FileName).ToLower()==".pdf") {//Adobe acrobat file.
 						try {
@@ -904,13 +904,23 @@ namespace OpenDental {
 							axAcroPDF1.Size=pictureBoxMain.Size;
 							axAcroPDF1.Location=pictureBoxMain.Location;
 							axAcroPDF1.OnError+=new EventHandler(pdfFileError);
-							string pdfFilePath=ODFileUtils.CombinePaths(ImageStore.GetEobFolder(),eob.FileName);
+							string pdfFilePath="";
+							if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+								pdfFilePath=ODFileUtils.CombinePaths(ImageStore.GetEobFolder(),eob.FileName);
+							}
+							else {
+								pdfFilePath=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),DocSelected.DocNum+PatCur.PatNum+".pdf");
+								File.WriteAllBytes(pdfFilePath,Convert.FromBase64String(DocSelected.RawBase64));
+							}
 							if(!File.Exists(pdfFilePath)) {
-								MessageBox.Show(Lan.g(this,"File not found: ") + eob.FileName);
+								MessageBox.Show(Lan.g(this,"File not found")+": " + eob.FileName);
 							}
 							else {
 								axAcroPDF1.LoadFile(pdfFilePath);//The return status of this function doesn't seem to be helpful.
 								pictureBoxMain.Visible=false;
+								if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+									File.Delete(pdfFilePath);
+								}
 							}
 						}
 						catch(Exception ex) {
@@ -933,7 +943,7 @@ namespace OpenDental {
 				bool isExportable=pictureBoxMain.Visible;
 				if(ImagesCur[0]==null) {
 					if(ImageHelper.HasImageExtension(DocSelected.FileName)) {
-						MessageBox.Show(Lan.g(this,"File not found: ") + DocSelected.FileName);
+						MessageBox.Show(Lan.g(this,"File not found")+": " + DocSelected.FileName);
 					}
 					else if(Path.GetExtension(DocSelected.FileName).ToLower()==".pdf") {//Adobe acrobat file.
 						try {
@@ -943,14 +953,24 @@ namespace OpenDental {
 							axAcroPDF1.Size=pictureBoxMain.Size;
 							axAcroPDF1.Location=pictureBoxMain.Location;
 							axAcroPDF1.OnError+=new EventHandler(pdfFileError);
-							string pdfFilePath=ODFileUtils.CombinePaths(PatFolder,DocSelected.FileName);
+							string pdfFilePath="";
+							if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+								pdfFilePath=ODFileUtils.CombinePaths(PatFolder,DocSelected.FileName);
+							}
+							else {
+								pdfFilePath=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),DocSelected.DocNum+PatCur.PatNum+".pdf");
+								File.WriteAllBytes(pdfFilePath,Convert.FromBase64String(DocSelected.RawBase64));
+							}
 							if(!File.Exists(pdfFilePath)) {
-								MessageBox.Show(Lan.g(this,"File not found: ") + DocSelected.FileName);
+								MessageBox.Show(Lan.g(this,"File not found")+": " + DocSelected.FileName);
 							}
 							else {
 								axAcroPDF1.LoadFile(pdfFilePath);//The return status of this function doesn't seem to be helpful.
 								pictureBoxMain.Visible=false;
 								isExportable=true;
+								if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+									File.Delete(pdfFilePath);
+								}
 							}
 						}
 						catch {
@@ -980,7 +1000,7 @@ namespace OpenDental {
 				ImagesCur=ImageStore.OpenImagesAmd(amd);
 				if(ImagesCur[0]==null) {
 					if(ImageHelper.HasImageExtension(amd.FileName)) {
-						MessageBox.Show(Lan.g(this,"File not found: ") + amd.FileName);
+						MessageBox.Show(Lan.g(this,"File not found")+": " + amd.FileName);
 					}
 					else if(Path.GetExtension(amd.FileName).ToLower()==".pdf") {//Adobe acrobat file.
 						try {
@@ -990,13 +1010,23 @@ namespace OpenDental {
 							axAcroPDF1.Size=pictureBoxMain.Size;
 							axAcroPDF1.Location=pictureBoxMain.Location;
 							axAcroPDF1.OnError+=new EventHandler(pdfFileError);
-							string pdfFilePath=ODFileUtils.CombinePaths(ImageStore.GetAmdFolder(),amd.FileName);
+							string pdfFilePath="";
+							if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+								pdfFilePath=ODFileUtils.CombinePaths(ImageStore.GetAmdFolder(),amd.FileName);
+							}
+							else {
+								pdfFilePath=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),DocSelected.DocNum+PatCur.PatNum+".pdf");
+								File.WriteAllBytes(pdfFilePath,Convert.FromBase64String(DocSelected.RawBase64));
+							}
 							if(!File.Exists(pdfFilePath)) {
-								MessageBox.Show(Lan.g(this,"File not found: ") + amd.FileName);
+								MessageBox.Show(Lan.g(this,"File not found")+": " + amd.FileName);
 							}
 							else {
 								axAcroPDF1.LoadFile(pdfFilePath);//The return status of this function doesn't seem to be helpful.
 								pictureBoxMain.Visible=false;
+								if(!PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+									File.Delete(pdfFilePath);
+								}
 							}
 						}
 						catch {
@@ -2016,7 +2046,7 @@ namespace OpenDental {
 					ImageStore.Export(fileName,doc,PatCur);
 				}
 				catch(Exception ex) {
-					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use: ") + ex.Message + ": " + fileName);
+					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use")+": " + ex.Message + ": " + fileName);
 					return;
 				}
 			}
@@ -2036,7 +2066,7 @@ namespace OpenDental {
 					ImageStore.ExportEobAttach(fileName,eob);
 				}
 				catch(Exception ex) {
-					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use: ") + ex.Message + ": " + fileName);
+					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use")+": " + ex.Message + ": " + fileName);
 					return;
 				}
 			}
@@ -2056,7 +2086,7 @@ namespace OpenDental {
 					ImageStore.ExportAmdAttach(fileName,amd);
 				}
 				catch(Exception ex) {
-					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use: ") + ex.Message + ": " + fileName);
+					MessageBox.Show(Lan.g(this,"Unable to export file, May be in use")+": " + ex.Message + ": " + fileName);
 					return;
 				}
 			}
@@ -2690,6 +2720,9 @@ namespace OpenDental {
 			ImageNodeId nodeId=(ImageNodeId)clickedNode.Tag;
 			if(nodeId.NodeType==ImageNodeType.None) {
 				return;
+			}
+			if(!PrefC.AtoZfolderUsed) {
+				return;//Documents must be stored in the A to Z Folder to open them outside of Open Dental.  Users can use the export button for now.
 			}
 			if(nodeId.NodeType==ImageNodeType.Mount) {
 				FormMountEdit fme=new FormMountEdit(MountSelected);
