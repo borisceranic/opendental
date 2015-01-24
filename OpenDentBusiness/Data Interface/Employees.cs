@@ -137,6 +137,8 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command= "DELETE FROM employee WHERE EmployeeNum ="+POut.Long(employeeNum);
 			Db.NonQ(command);
+			command="DELETE FROM timecardrule WHERE EmployeeNum="+POut.Long(employeeNum);
+			Db.NonQ(command);
 		}
 
 		/*
