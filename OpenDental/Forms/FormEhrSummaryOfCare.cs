@@ -149,10 +149,20 @@ namespace OpenDental {
 				XmlProcessingInstruction pi=(XmlProcessingInstruction)node;
 				pi.Value="type=\"text/xsl\" href=\""+xslFileName+"\"";
 			}
-			File.WriteAllText(Path.Combine(Path.GetTempPath(),xmlFileName),doc.InnerXml.ToString());
-			File.WriteAllText(Path.Combine(Path.GetTempPath(),xslFileName),xslContents);
-			FormEhrSummaryCcdEdit formESCD=new FormEhrSummaryCcdEdit(Path.Combine(Path.GetTempPath(),xmlFileName),patCur);
+			File.WriteAllText(Path.Combine(PrefL.GetTempFolderPath(),xmlFileName),doc.InnerXml.ToString());
+			File.WriteAllText(Path.Combine(PrefL.GetTempFolderPath(),xslFileName),xslContents);
+			FormEhrSummaryCcdEdit formESCD=new FormEhrSummaryCcdEdit(ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),xmlFileName),patCur);
 			formESCD.ShowDialog();
+			string[] arrayFileNames={"ccd.xml","ccd.xsl","ccr.xml","ccr.xsl"};
+			for(int i=0;i<arrayFileNames.Length;i++) {
+				try {
+					File.Delete(ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),arrayFileNames[i]));
+				}
+				catch {
+					//Do nothing because the file could have been in use or there were not sufficient permissions.
+					//This file will most likely get deleted next time a file is created.
+				}
+			}
 			return formESCD.DidPrint;
 		}
 
