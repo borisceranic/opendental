@@ -305,13 +305,13 @@ namespace OpenDental{
 		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
 		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
-		private ContextMenu menuClinic;
 		///<summary>This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
 		public static long ClinicNum=0;
 		///<summary>Will be set to true if the STOP SLAVE SQL was run on the replication server for which the local replication monitor is watching.
 		///Replicaiton is NOT broken when this flag is true, because the user can re-enable replicaiton using the START SLAVE SQL without any ill effects.
 		///This flag is used to display a warning to the user, but will not ever block the user from using OD.</summary>
 		private bool _isReplicationSlaveStopped=false;
+		private MenuItem menuClinics;
 		///<summary>HQ only. Keep track of last time triage task labels were filled. Too taxing on the server to perform every 1.6 seconds with the rest of the HQ thread metrics. Triage labels will be refreshed on ProcessSigsIntervalInSecs interval.</summary>
 		DateTime _hqMetricsLastRefreshed=DateTime.MinValue;
 
@@ -559,6 +559,7 @@ namespace OpenDental{
 			this.menuItemReqStudents = new System.Windows.Forms.MenuItem();
 			this.menuItemWebForms = new System.Windows.Forms.MenuItem();
 			this.menuItemWiki = new System.Windows.Forms.MenuItem();
+			this.menuClinics = new System.Windows.Forms.MenuItem();
 			this.menuItemHelp = new System.Windows.Forms.MenuItem();
 			this.menuItemRemote = new System.Windows.Forms.MenuItem();
 			this.menuItemHelpWindows = new System.Windows.Forms.MenuItem();
@@ -592,7 +593,6 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
-			this.menuClinic = new System.Windows.Forms.ContextMenu();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -611,6 +611,7 @@ namespace OpenDental{
             this.menuItemReports,
             this.menuItemCustomReports,
             this.menuItemTools,
+            this.menuClinics,
             this.menuItemHelp});
 			// 
 			// menuItemLogOff
@@ -1535,9 +1536,14 @@ namespace OpenDental{
 			this.menuItemWiki.Text = "Wiki";
 			this.menuItemWiki.Click += new System.EventHandler(this.menuItemWiki_Click);
 			// 
+			// menuClinics
+			// 
+			this.menuClinics.Index = 7;
+			this.menuClinics.Text = "&Clinics";
+			// 
 			// menuItemHelp
 			// 
-			this.menuItemHelp.Index = 7;
+			this.menuItemHelp.Index = 8;
 			this.menuItemHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemRemote,
             this.menuItemHelpWindows,
@@ -1803,10 +1809,6 @@ namespace OpenDental{
 			this.lightSignalGrid1.TabIndex = 20;
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
-			// 
-			// menuClinic
-			// 
-			this.menuClinic.Popup += new System.EventHandler(this.menuClinic_Popup);
 			// 
 			// FormOpenDental
 			// 
@@ -2216,6 +2218,12 @@ namespace OpenDental{
 			//		}
 			//	#endif
 			//}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(Security.CurUser!=null) {
+					ClinicNum=Security.CurUser.ClinicNum;
+					RefreshMenuClinics();
+				}
+			}
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
@@ -2345,9 +2353,11 @@ namespace OpenDental{
 				}
 				if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 					menuItemClinics.Visible=false;
+					menuClinics.Visible=false;
 				}
 				else {
 					menuItemClinics.Visible=true;
+					menuClinics.Visible=true;
 				}
 				if(PrefC.GetBool(PrefName.EasyHideClinical)) {
 					myOutlookBar.Buttons[4].Caption=Lan.g(this,"Procs");
@@ -2663,12 +2673,6 @@ namespace OpenDental{
 				ToolBarMain.Buttons.Add(button);
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Popups"),-1,Lan.g(this,"Edit popups for this patient"),"Popups"));
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				button=new ODToolBarButton(Lan.g(this,"Clinic"),-1,Lan.g(this,"Select the Current Clinic"),"Clinic");
-				button.Style=ODToolBarButtonStyle.DropDownButton;
-				button.DropDownMenu=menuClinic;
-				ToolBarMain.Buttons.Add(button);
-			}
 			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.AllModules);
 			for(int i=0;i<toolButItems.Count;i++) {
 			  //ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
@@ -2720,9 +2724,6 @@ namespace OpenDental{
 						break;
 					case "Popups":
 						OnPopups_Click();
-						break;
-					case "Clinic":
-						OnClinic_Click();
 						break;
 				}
 			}
@@ -3224,49 +3225,39 @@ namespace OpenDental{
 			}
 		}
 
-		private void OnClinic_Click() {
-			MsgBox.Show(this,"Please use the dropdown list.");
-		}
-
-		private void menuClinic_Popup(object sender,EventArgs e) {
-			//Clinic dropdown will be disabled if the current user is restricted to a single clinic
-			menuClinic.MenuItems.Clear();
+		private void RefreshMenuClinics() {
+			menuClinics.MenuItems.Clear();
 			MenuItem menuItem;
-			List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 			if(!Security.CurUser.ClinicIsRestricted) {
 				menuItem=new MenuItem(Lan.g(this,"Headquarters"),menuClinic_Click);
-				menuItem.Tag=new Clinic();//selecting Headquarters will set the _clinicNum variable to 0 and will allow the user to display unassigned appt views
+				menuItem.Tag=new Clinic();//Having a ClinicNum of 0 will make OD act like 'Headquarters'.  This allows the user to see unassigned appt views, all operatories, etc.
 				if(ClinicNum==0) {
 					menuItem.Checked=true;
 				}
-				menuClinic.MenuItems.Add(menuItem);
-				menuClinic.MenuItems.Add("-");
+				menuClinics.MenuItems.Add(menuItem);
+				menuClinics.MenuItems.Add("-");//Separator
 			}
+			List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 			for(int i=0;i<listClinics.Count;i++) {
 				menuItem=new MenuItem(listClinics[i].Description,menuClinic_Click);
 				menuItem.Tag=listClinics[i];
 				if(ClinicNum==listClinics[i].ClinicNum) {
 					menuItem.Checked=true;
 				}
-				menuClinic.MenuItems.Add(menuItem);
+				menuClinics.MenuItems.Add(menuItem);
 			}
 		}
 
 		///<summary>This is used to set the private class wide variable _clinicNum, sets the clinic button.ToolTipText, and refreshes the current module.</summary>
 		private void menuClinic_Click(object sender,System.EventArgs e) {
-			if(((MenuItem)sender).Tag==null) {
+			if(sender.GetType()!=typeof(MenuItem) && ((MenuItem)sender).Tag!=null) {
 				return;
 			}
 			Clinic clinicCur=(Clinic)((MenuItem)sender).Tag;
 			ClinicNum=clinicCur.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
-			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
-			}
-			else {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
-			}
 			RefreshCurrentModule();
+			RefreshMenuClinics();
 		}
 		
 		private void FormOpenDental_Resize(object sender,EventArgs e) {
@@ -6189,7 +6180,10 @@ namespace OpenDental{
 			}
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
-			ClinicNum=Security.CurUser.ClinicNum;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				ClinicNum=Security.CurUser.ClinicNum;
+				RefreshMenuClinics();
+			}
 			SetModuleSelected();
 			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
 			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
