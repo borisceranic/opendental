@@ -153,6 +153,16 @@ namespace OpenDental {
 			File.WriteAllText(Path.Combine(Path.GetTempPath(),xslFileName),xslContents);
 			FormEhrSummaryCcdEdit formESCD=new FormEhrSummaryCcdEdit(Path.Combine(Path.GetTempPath(),xmlFileName),patCur);
 			formESCD.ShowDialog();
+			string[] arrayFileNames= { "ccd.xml","ccd.xsl","ccr.xml","ccr.xsl" };
+			for(int i=0;i<arrayFileNames.Length;i++) {
+				try {
+					File.Delete(ODFileUtils.CombinePaths(Path.GetTempPath(),arrayFileNames[i]));
+				}
+				catch {
+					//Do nothing because the file could have been in use or there were not sufficient permissions.
+					//This file will most likely get deleted next time a file is created.
+				}
+			}
 			return formESCD.DidPrint;
 		}
 
