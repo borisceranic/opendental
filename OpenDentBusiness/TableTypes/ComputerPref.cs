@@ -42,8 +42,6 @@ namespace OpenDentBusiness {
 		///no format is currently set and the best theoretical foramt will be chosen at program startup. If this value is set to
 		///'opengl' then this computer is using OpenGL and a DirectX format will not be picked.</summary>
 		public string DirectXFormat;
-		///<summary>The index of the most recent appt view for this computer.  Uses it when opening.</summary>
-		public byte RecentApptView;
 		///<summary>Show the select scanner dialog when scanning documents.</summary>
 		public bool ScanDocSelectSource;
 		///<summary>Show the scanner options dialog when scanning documents.</summary>
@@ -56,6 +54,10 @@ namespace OpenDentBusiness {
 		public int ScanDocResolution;
 		///<summary>0-100. Quality of jpeg after compression when scanning documents.  100 indicates full quality.  Opposite of compression.</summary>
 		public byte ScanDocQuality;
+		///<summary>FK to clinic.ClinicNum.  The most recent clinic for this computer.  Determines which clinic is used when loading Open Dental.</summary>
+		public long ClinicNum;
+		///<summary>FK to apptview.ApptViewNum.  The most recent appt view num for this computer.  Used when opening with the Appts module in conjunction with ClinicNum if this ApptViewNum is associated to the ClinicNum.</summary>
+		public long ApptViewNum;
 
 
 		public ComputerPref Copy(){

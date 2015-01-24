@@ -6990,40 +6990,100 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD ClinicNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref ADD INDEX (ClinicNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET ClinicNum = 0 WHERE ClinicNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY ClinicNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX computerpref_ClinicNum ON computerpref (ClinicNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD ApptViewNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref ADD INDEX (ApptViewNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD ApptViewNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET ApptViewNum = 0 WHERE ApptViewNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY ApptViewNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX computerpref_ApptViewNum ON computerpref (ApptViewNum)";
+					Db.NonQ(command);
+				}
+				//convert RecentApptView (index in list of views for the recent view) to ApptViewNum (FK to the actual view)
+				command="SELECT * FROM computerpref";
+				DataTable tableCompPrefs=Db.GetTable(command);
+				command="SELECT * FROM apptview ORDER BY ItemOrder";
+				DataTable tableApptViews=Db.GetTable(command);
+				for(int i=0;i<tableCompPrefs.Rows.Count;i++) {
+					try {
+						long compPrefNum=PIn.Long(tableCompPrefs.Rows[i]["ComputerPrefNum"].ToString());
+						int apptViewIndex=PIn.Int(tableCompPrefs.Rows[i]["RecentApptView"].ToString());
+						long apptViewNum=PIn.Long(tableApptViews.Rows[apptViewIndex]["ApptViewNum"].ToString());
+						command="UPDATE computerpref SET ApptViewNum="+POut.Long(apptViewNum)+" WHERE ComputerPrefNum="+POut.Long(compPrefNum);
+						Db.NonQ(command);
+					}
+					catch {
+						//Don't fail the upgrade for failing to set a default appt view for this computer.
+						//The worst that could happen is first user to log into this computer will see a default "none" view.
+						//Keep trying to set defaults for subsequent computers.
+					}
+				}
+				//after converting data in RecentApptView to ApptViewNum, drop the RecentApptView column
+				command="ALTER TABLE computerpref DROP COLUMN RecentApptView";
+				Db.NonQ(command);
+				#region Duplicate view for clinic if all ops in view are assigned to one clinic
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//All existing apptviews will have the AssignedClinic set to 0 and will therefore exist in the list of apptviews not assigned to a clinic.
 					//For all apptviews with operatories assigned, where all operatories in the view are assigned to one clinic, the view will be duplicated and assigned to that clinic.
 					//If the view contains an operatory that is not assigned to a clinic, or if there are operatories in the view from more than one clinic,
 					//the view cannot be assigned to a clinic and will only be in the unassigned list.
 					command="SELECT apptview.ApptViewNum,MAX(operatory.ClinicNum) AS ClinicNum FROM apptview "
-						+"INNER JOIN apptviewitem ON apptview.ApptViewNum=apptviewitem.ApptViewNum AND apptviewitem.OpNum>0 "
-						+"INNER JOIN operatory ON operatory.OperatoryNum=apptviewitem.OpNum "
-						+"GROUP BY apptview.ApptViewNum "
-						+"HAVING COUNT(DISTINCT operatory.ClinicNum)=1 AND MAX(operatory.ClinicNum)>0";
+					+"INNER JOIN apptviewitem ON apptview.ApptViewNum=apptviewitem.ApptViewNum AND apptviewitem.OpNum>0 "
+					+"INNER JOIN operatory ON operatory.OperatoryNum=apptviewitem.OpNum "
+					+"GROUP BY apptview.ApptViewNum "
+					+"HAVING COUNT(DISTINCT operatory.ClinicNum)=1 AND MAX(operatory.ClinicNum)>0";
 					DataTable tableApptViewNumOpNum=Db.GetTable(command);
 					for(int i=0;i<tableApptViewNumOpNum.Rows.Count;i++) {
 						long apptViewNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ApptViewNum"].ToString());
 						long clinicNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ClinicNum"].ToString());
-						command="INSERT INTO apptview (Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
-							+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,AssignedClinic) "
-							+"(SELECT Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,"
-							+"StackBehavUR,StackBehavLR,OnlyScheduledClinic,"+POut.Long(clinicNum)+" "
-							+"FROM apptview WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
+						command="INSERT INTO apptview (ApptViewNum,Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
+						+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,AssignedClinic) "
+						+"(SELECT (SELECT MAX(ApptViewNum)+1 FROM apptview),Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
+						+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,"+POut.Long(clinicNum)+" "
+						+"FROM apptview WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
 						long viewnum=Db.NonQ(command,true);
-						command="INSERT INTO apptviewitem (ApptViewNum,OpNum,ProvNum,ElementDesc,"
-							+"ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum) "
-							+"(SELECT "+POut.Long(viewnum)+",OpNum,ProvNum,"
-							+"ElementDesc,ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum "
-							+"FROM apptviewitem WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
-						Db.NonQ(command);
+						command="SELECT ApptViewItemNum FROM apptviewitem WHERE ApptViewNum="+POut.Long(apptViewNum);
+						DataTable tableApptViewItemNums=Db.GetTable(command);
+						for(int j=0;j<tableApptViewItemNums.Rows.Count;j++) {
+							long viewItemNum=PIn.Long(tableApptViewItemNums.Rows[j]["ApptViewItemNum"].ToString());
+							command="INSERT INTO apptviewitem (ApptViewItemNum,ApptViewNum,OpNum,ProvNum,ElementDesc,"
+						+"ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum) "
+						+"(SELECT (SELECT MAX(ApptViewItemNum)+1 FROM apptviewitem),"+POut.Long(viewnum)+",OpNum,ProvNum,"
+						+"ElementDesc,ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum "
+						+"FROM apptviewitem WHERE ApptViewItemNum="+POut.Long(viewItemNum)+")";
+							Db.NonQ(command);
+						}
 					}
 					//set the item orders for each clinic's assigned views.
 					command="SELECT * FROM apptview ORDER BY AssignedClinic,ItemOrder";
-					DataTable table=Db.GetTable(command);
+					DataTable tableViews=Db.GetTable(command);
 					long clinicNumPrev=0;
 					int itemOrderCur=0;
-					for(int i=0;i<table.Rows.Count;i++) {
-						long clinicNumCur=PIn.Long(table.Rows[i]["AssignedClinic"].ToString());
-						long apptViewNumCur=PIn.Long(table.Rows[i]["ApptViewNum"].ToString());
+					for(int i=0;i<tableViews.Rows.Count;i++) {
+						long clinicNumCur=PIn.Long(tableViews.Rows[i]["AssignedClinic"].ToString());
+						long apptViewNumCur=PIn.Long(tableViews.Rows[i]["ApptViewNum"].ToString());
 						if(i==0 || clinicNumCur!=clinicNumPrev) {
 							itemOrderCur=0;
 							clinicNumPrev=clinicNumCur;
@@ -7036,7 +7096,9 @@ namespace OpenDentBusiness {
 					}
 				}
 				else {//oracle
+					//we won't try to duplicate the views for oracle, the user will have to create the views for each clinic manually
 				}
+				#endregion
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('TempFolderDateFirstCleaned',CURDATE())";
 					Db.NonQ(command);
@@ -7045,6 +7107,10 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TempFolderDateFirstCleaned',SYSDATE)";
 					Db.NonQ(command);
 				}
+
+
+
+
 				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
