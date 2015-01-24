@@ -41,7 +41,7 @@ namespace OpenDental {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
 			}
 			else {
-				folderUpdate=ODFileUtils.CombinePaths(Path.GetTempPath(),"UpdateFiles");
+				folderUpdate=ODFileUtils.CombinePaths(GetTempFolderPath(),"UpdateFiles");
 			}
 			if(Directory.Exists(folderUpdate)) {
 				try {
@@ -180,7 +180,7 @@ namespace OpenDental {
 					folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
 				}
 				else {//images in db
-					folderUpdate=ODFileUtils.CombinePaths(Path.GetTempPath(),"UpdateFiles");
+					folderUpdate=ODFileUtils.CombinePaths(GetTempFolderPath(),"UpdateFiles");
 					if(Directory.Exists(folderUpdate)) {
 						Directory.Delete(folderUpdate,true);
 					}
@@ -227,7 +227,7 @@ namespace OpenDental {
 					Application.Exit();
 					return false;
 				}
-				string tempDir=Path.GetTempPath();
+				string tempDir=GetTempFolderPath();
 				//copy UpdateFileCopier.exe to the temp directory
 				File.Copy(ODFileUtils.CombinePaths(folderUpdate,"UpdateFileCopier.exe"),//source
 					ODFileUtils.CombinePaths(tempDir,"UpdateFileCopier.exe"),//dest
@@ -274,7 +274,7 @@ namespace OpenDental {
 				return;//app will exit
 			}
 			string tempFile=ODFileUtils.CombinePaths(dlg.SelectedPath,patchName);
-				//ODFileUtils.CombinePaths(Path.GetTempPath(),patchName);
+			//ODFileUtils.CombinePaths(GetTempFolderPath(),patchName);
 			FormUpdate.DownloadInstallPatchFromURI(updateUri+updateCode+"/"+patchName,//Source URI
 				tempFile,true,false,null);//Local destination file.
 			File.Delete(tempFile);//Cleanup install file.
@@ -413,7 +413,7 @@ namespace OpenDental {
 					if(FormUpdate.ShouldDownloadUpdate(updateUri,updateCode,out updateInfoMajor,out updateInfoMinor)) {
 						if(MessageBox.Show(updateInfoMajor+Lan.g("Prefs","Perform program update now?"),"",
 							MessageBoxButtons.YesNo)==DialogResult.Yes) {
-							string tempFile=ODFileUtils.CombinePaths(Path.GetTempPath(),patchName);//Resort to a more common temp file name.
+							string tempFile=ODFileUtils.CombinePaths(GetTempFolderPath(),patchName);//Resort to a more common temp file name.
 							FormUpdate.DownloadInstallPatchFromURI(updateUri+updateCode+"/"+patchName,//Source URI
 								tempFile,true,true,null);//Local destination file.
 							File.Delete(tempFile);//Cleanup install file.

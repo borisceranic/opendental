@@ -3658,7 +3658,7 @@ namespace OpenDental{
 			byte[] xmlResponseBytes=Convert.FromBase64String(response.XmlResponse);
 			string xmlResponse=Encoding.UTF8.GetString(xmlResponseBytes);
 #if DEBUG//For capturing the xmlReponse with the newlines properly showing.
-			string tempFile=ODFileUtils.CreateRandomFile(Path.GetTempPath(),".txt");
+			string tempFile=PrefL.GetRandomTempFile(".txt");
 			File.WriteAllText(tempFile,xmlResponse);
 #endif
 			XmlDocument xml=new XmlDocument();

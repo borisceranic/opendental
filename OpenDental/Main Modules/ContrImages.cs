@@ -1800,7 +1800,7 @@ namespace OpenDental {
 					}
 				}
 			}
-			string tempFile=Path.GetTempFileName().Replace(".tmp",".pdf");
+			string tempFile=PrefL.GetRandomTempFile(".pdf");
 			try {
 				xImageDeviceManager.Obfuscator.ActivateEZTwain();
 			}

@@ -932,7 +932,7 @@ namespace OpenDental{
 			}
 			//now print-------------------------------------------------------------------------------------
 			if(pd!=null){
-				string tempFileOutputDocument=Path.GetTempFileName()+".pdf";
+				string tempFileOutputDocument=PrefL.GetRandomTempFile(".pdf");
 				outputDocument.Save(tempFileOutputDocument);
 				try{
 					Process.Start(tempFileOutputDocument);

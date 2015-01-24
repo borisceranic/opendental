@@ -694,7 +694,7 @@ namespace OpenDental{
 					FormSF=new FormSheetFillEdit(sheet);
 					SheetPrinting.CreatePdfPage(sheet,page);
 				}
-				filePathAndName=Path.ChangeExtension(Path.GetTempFileName(),".pdf");
+				filePathAndName=PrefL.GetRandomTempFile(".pdf");
 				document.Save(filePathAndName);
 				Process.Start(filePathAndName);
 				DialogResult=DialogResult.OK;

@@ -154,7 +154,7 @@ namespace OpenDental {
 								if(ze.FileName.ToLower().EndsWith(".txt.txt")) {
 									meduFileExtention=".txt.txt";  //The file we're looking for is .txt.txt, used to build file name for import later.
 								}
-								ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
+								ze.Extract(PrefL.GetTempFolderPath(),ExtractExistingFileAction.OverwriteSilently);
 								foundFile=true;
 							}
 						}
@@ -164,7 +164,7 @@ namespace OpenDental {
 						}
 						//Add a new thread. We will run these all in parallel once we have them all queued.
 						//MEDU.txt.txt is not a typo. That is litterally how the resource file is realeased to the public!
-						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(Path.GetTempPath(),"MEDU"+meduFileExtention),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe),versionID);
+						UpdateCodeSystemThread.Add(ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),"MEDU"+meduFileExtention),_listCodeSystems[gridMain.SelectedIndices[i]],new UpdateCodeSystemThread.UpdateCodeSystemArgs(UpdateCodeSystemThread_UpdateSafe),versionID);
 						//We got this far so the local file was retreived successfully. No initial status to report.
 						_mapCodeSystemStatus[codeSystem.CodeSystemName]="";
 						#endregion
@@ -762,7 +762,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 
 			///<summary>Returns temp file name used to download file.  Can throw exception.</summary>
 			private string DownloadFileHelper(string codeSystemURL) {
-				string zipFileDestination=Path.GetTempFileName();
+				string zipFileDestination=PrefL.GetRandomTempFile(".tmp");
 				//Cleanup existing.
 				File.Delete(zipFileDestination);
 				try {
@@ -773,8 +773,8 @@ If the master term dictionary or software program containing the UCUM table, UCU
 					using(MemoryStream ms=new MemoryStream())
 					using(ZipFile unzipped=ZipFile.Read(zipFileDestination)) {
 						ZipEntry ze=unzipped[0];
-						ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
-						return Path.GetTempPath()+unzipped[0].FileName;
+						ze.Extract(PrefL.GetTempFolderPath(),ExtractExistingFileAction.OverwriteSilently);
+						return ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),unzipped[0].FileName);
 					}
 				}
 				finally{

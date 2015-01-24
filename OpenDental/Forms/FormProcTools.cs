@@ -263,7 +263,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			_codeList=new List<ProcedureCode>();
 			string url=@"http://www.opendental.com/feescanada/procedurecodes.txt";
-			string tempFile=Path.GetTempFileName();
+			string tempFile=PrefL.GetRandomTempFile(".tmp");
 			WebClient myWebClient=new WebClient();
 			try {
 				myWebClient.DownloadFile(url,tempFile);

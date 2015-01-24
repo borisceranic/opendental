@@ -126,7 +126,7 @@ namespace OpenDental {
 
 		///<summary></summary>
 		public static void DrawBitmap(TextFrame frameContainer,System.Drawing.Bitmap bitmap,float xPos,float yPos) {
-			string imageFileName=Path.GetTempFileName();
+			string imageFileName=PrefL.GetRandomTempFile(".tmp");
 			bitmap.SetResolution(100,100);//prevents framework from scaling it.
 			bitmap.Save(imageFileName);
 			TextFrame frame=new TextFrame();

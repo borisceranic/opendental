@@ -845,7 +845,7 @@ namespace OpenDental{
 				feeData=Encoding.UTF8.GetString(feeDataBytes);
 			}
 			else {
-				string tempFile=Path.GetTempFileName();
+				string tempFile=PrefL.GetRandomTempFile(".tmp");
 				WebClient myWebClient=new WebClient();
 				try {
 					myWebClient.DownloadFile(formPick.FileChosenUrl,tempFile);

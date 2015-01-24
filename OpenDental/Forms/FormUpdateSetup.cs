@@ -445,7 +445,7 @@ namespace OpenDental{
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
 			}
 			else{//db
-				folderUpdate=ODFileUtils.CombinePaths(Path.GetTempPath(),"UpdateFiles");
+				folderUpdate=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),"UpdateFiles");
 				if(Directory.Exists(folderUpdate)) {
 					Directory.Delete(folderUpdate,true);
 				}

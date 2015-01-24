@@ -976,7 +976,7 @@ namespace OpenDental{
 				//There is also a high probability that the attachment no longer exists if
 				//the A to Z folders are disabled, since the file will have originally been
 				//placed in the temporary directory.
-				string tempFile=ODFileUtils.CombinePaths(Path.GetTempPath(),_listEmailAttachDisplayed[listAttachments.SelectedIndex].DisplayedFileName);
+				string tempFile=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),_listEmailAttachDisplayed[listAttachments.SelectedIndex].DisplayedFileName);
 				File.Copy(strFilePathAttach,tempFile,true);
 				Process.Start(tempFile);
 			}

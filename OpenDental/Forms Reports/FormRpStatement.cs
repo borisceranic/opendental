@@ -262,7 +262,7 @@ namespace OpenDental{
 			//Patient pat=Patients.GetPat(stmt.PatNum);
 			//imageStore = ImageStore.GetImageStore(pat2);
 			//Save to a temp pdf--------------------------------------------------------------------------
-			string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),pat2.PatNum.ToString()+".pdf");
+			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),pat2.PatNum.ToString()+".pdf");
 			PrintDocument pd=new PrintDocument();
 			pd.DefaultPageSettings.Margins=new Margins(40,40,40,60);
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH

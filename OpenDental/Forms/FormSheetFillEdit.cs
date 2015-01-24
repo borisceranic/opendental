@@ -725,7 +725,7 @@ namespace OpenDental {
 			if(!IsStatment) {
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
 			}
-			string filePathAndName=Path.ChangeExtension(Path.GetTempFileName(),".pdf");
+			string filePathAndName=PrefL.GetRandomTempFile(".pdf");
 			//Graphics g=this.CreateGraphics();
 			SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
 			//g.Dispose();

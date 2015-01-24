@@ -46,7 +46,7 @@ namespace OpenDental {
 		private void ComposeNewRx() {
 			string clickThroughXml="";// ErxXml.BuildClickThroughXml(prov,emp,pat);
 #if DEBUG //To make capturing the XML easier.
-			string tempFile=Path.GetTempFileName()+".txt";
+			string tempFile=PrefL.GetRandomTempFile(".txt");
 			File.WriteAllText(tempFile,clickThroughXml);
 			File.Delete(tempFile);//Put a break point here to capture XML.
 #endif

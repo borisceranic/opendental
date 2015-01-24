@@ -82,7 +82,7 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			string fileName=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),"results.txt");
+			string fileName=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),"results.txt");
 			File.WriteAllText(fileName,textResults.Text);
 			Process.Start(fileName);
 			MsgBox.Show(this,"Please print from the text editor.");

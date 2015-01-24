@@ -1012,7 +1012,7 @@ namespace OpenDental{
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
 				SheetFiller.FillFields(sheet,StmtCur);
 				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
-				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),StmtCur.PatNum.ToString()+".pdf");
+				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
 				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
@@ -1133,7 +1133,7 @@ namespace OpenDental{
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
 				SheetFiller.FillFields(sheet,StmtCur);
 				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
-				string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),StmtCur.PatNum.ToString()+".pdf");
+				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
 				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {

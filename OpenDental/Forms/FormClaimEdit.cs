@@ -5258,7 +5258,7 @@ namespace OpenDental{
 			string attachPath=EmailMessages.GetEmailAttachPath();
 			try {
 				string tempFile
-					=ODFileUtils.CombinePaths(Path.GetTempPath(),ClaimCur.Attachments[listAttachments.SelectedIndex].DisplayedFileName);
+					=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),ClaimCur.Attachments[listAttachments.SelectedIndex].DisplayedFileName);
 				File.Copy(
 					ODFileUtils.CombinePaths(attachPath,ClaimCur.Attachments[listAttachments.SelectedIndex].ActualFileName),
 					tempFile,

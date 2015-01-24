@@ -927,7 +927,7 @@ namespace OpenDental{
 			string destDir=ImageStore.GetPreferredAtoZpath();
 			string destPath2=null;
 			if(destDir==null) {//Not using A to Z folders?
-				destDir=Path.GetTempPath();
+				destDir=PrefL.GetTempFolderPath();
 				//destDir2=null;//already null
 			}
 			else {//using A to Z folders.
@@ -957,7 +957,7 @@ namespace OpenDental{
 			string destDir=ImageStore.GetPreferredAtoZpath();
 			string destPath2=null;
 			if(destDir==null) {//Not using A to Z folders?
-				destDir=Path.GetTempPath();
+				destDir=PrefL.GetTempFolderPath();
 			}
 			else {
 				destPath2=ODFileUtils.CombinePaths(destDir,"SetupFiles");
@@ -989,7 +989,7 @@ namespace OpenDental{
 			string destDir=ImageStore.GetPreferredAtoZpath();
 			string destPath2=null;
 			if(destDir==null) {//Not using A to Z folders?
-				destDir=Path.GetTempPath();
+				destDir=PrefL.GetTempFolderPath();
 			}
 			else {
 				destPath2=ODFileUtils.CombinePaths(destDir,"SetupFiles");
@@ -1103,7 +1103,7 @@ namespace OpenDental{
 			string patchName="Setup.exe";
 			string destDir=ImageStore.GetPreferredAtoZpath();
 			if(destDir==null){//Not using A to Z folders?
-				destDir=Path.GetTempPath();
+				destDir=PrefL.GetTempFolderPath();
 			}
 			DownloadInstallPatchFromURI(textWebsitePath.Text+textUpdateCode.Text+"/"+patchName,//Source URI
 				ODFileUtils.CombinePaths(destDir,patchName),true,false,null);//Local destination file.

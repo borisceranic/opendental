@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Xml;
 using OpenDentBusiness;
 using System.Collections.Generic;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class FormEhrSetup:Form {
@@ -140,7 +141,7 @@ namespace OpenDental {
 		}
 
 		private static string downloadFileHelper(string codeSystemURL,string codeSystemName) {
-			string zipFileDestination=Path.GetTempFileName();//@"c:\users\ryan\desktop\"+codeSystemName+".txt";
+			string zipFileDestination=PrefL.GetRandomTempFile(".tmp");//@"c:\users\ryan\desktop\"+codeSystemName+".tmp";
 			File.Delete(zipFileDestination);
 			WebRequest wr=WebRequest.Create(codeSystemURL);
 			WebResponse webResp=null;
@@ -156,8 +157,8 @@ namespace OpenDental {
 			MemoryStream ms=new MemoryStream();
 			using(ZipFile unzipped=ZipFile.Read(zipFileDestination)) {
 				ZipEntry ze=unzipped[0];
-				ze.Extract(Path.GetTempPath(),ExtractExistingFileAction.OverwriteSilently);
-				return Path.GetTempPath()+unzipped[0].FileName;
+				ze.Extract(PrefL.GetTempFolderPath(),ExtractExistingFileAction.OverwriteSilently);
+				return ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),unzipped[0].FileName);
 			}
 		}
 

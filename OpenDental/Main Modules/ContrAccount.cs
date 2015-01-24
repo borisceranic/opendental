@@ -3890,8 +3890,8 @@ namespace OpenDental {
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
 			SheetFiller.FillFields(sheet,stmt);
 			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
-			string tempPath=CodeBase.ODFileUtils.CombinePaths(Path.GetTempPath(),stmt.PatNum.ToString()+".pdf");
-			SheetPrinting.CreatePdf(sheet,tempPath,stmt);
+			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),stmt.PatNum.ToString()+".pdf");
+			SheetPrinting.CreatePdf(sheet,tempPath,stmt);//We don't delete this from temp folder
 			long category=0;
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 				if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
