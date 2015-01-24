@@ -1034,6 +1034,15 @@ namespace OpenDental{
 					//this.Cursor=Cursors.Default;
 					return;
 				}
+				finally {
+					//Delete the temp file since we don't need it anymore.
+					try {
+						File.Delete(tempPath);
+					}
+					catch {
+						//Do nothing.  This file will likely get cleaned up later.
+					}
+				}
 				docc.ImgType=ImageType.Document;
 				if(StmtCur.IsInvoice) {
 					docc.Description=Lan.g(this,"Invoice");
@@ -1218,6 +1227,7 @@ namespace OpenDental{
 				Cursor=Cursors.WaitCursor;
 				Patient pat=Patients.GetPat(StmtCur.PatNum);
 				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				//Currently unable to load Statements stored in database even though they get saved into the database.
 				if(!File.Exists(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder))) {
 					Cursor=Cursors.Default;
 					MsgBox.Show(this,"File not found: " + Documents.GetByNum(StmtCur.DocNum).FileName);
