@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 				computerPref.ScanDocGrayscale       = PIn.Bool  (table.Rows[i]["ScanDocGrayscale"].ToString());
 				computerPref.ScanDocResolution      = PIn.Int   (table.Rows[i]["ScanDocResolution"].ToString());
 				computerPref.ScanDocQuality         = PIn.Byte  (table.Rows[i]["ScanDocQuality"].ToString());
-				computerPref.ClinicNum        = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				computerPref.ApptViewNum      = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
+				computerPref.ClinicNum              = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				computerPref.ApptViewNum            = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
 				retVal.Add(computerPref);
 			}
 			return retVal;
@@ -171,8 +171,8 @@ namespace OpenDentBusiness.Crud{
 				+"ScanDocGrayscale       =  "+POut.Bool  (computerPref.ScanDocGrayscale)+", "
 				+"ScanDocResolution      =  "+POut.Int   (computerPref.ScanDocResolution)+", "
 				+"ScanDocQuality         =  "+POut.Byte  (computerPref.ScanDocQuality)+", "
-				+"ClinicNum        =  "+POut.Long  (computerPref.ClinicNum)+", "
-				+"ApptViewNum      =  "+POut.Long  (computerPref.ApptViewNum)+" "
+				+"ClinicNum              =  "+POut.Long  (computerPref.ClinicNum)+", "
+				+"ApptViewNum            =  "+POut.Long  (computerPref.ApptViewNum)+" "
 				+"WHERE ComputerPrefNum = "+POut.Long(computerPref.ComputerPrefNum);
 			Db.NonQ(command);
 		}
