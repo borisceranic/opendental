@@ -24,7 +24,7 @@ namespace OpenDentBusiness{
 		public DateTime SigDateTime;
 		///<summary>Text version of 'user' this message was sent to, which can actually be any description of a group or individual.</summary>
 		public string ToUser;
-		///<summary>If this signal has been acknowledged, then this will contain the date and time.  This is how lights get turned off also.</summary>
+		///<summary>If this signal has been acknowledged, then this will contain the server date and time.  This is how lights get turned off also.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime AckTime;
 		///<summary>FK to task.TaskNum.  If IType=Tasks, then this is the taskNum that was added.</summary>

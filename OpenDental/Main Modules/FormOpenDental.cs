@@ -143,7 +143,7 @@ namespace OpenDental{
 		private MenuItem menuItemMessaging;
 		private OpenDental.UI.LightSignalGrid lightSignalGrid1;
 		private MenuItem menuItemMessagingButs;
-		///<summary>This is not the actual date/time last refreshed.  It is really the date/time of the last item in the database retrieved on previous refreshes.  That way, the local workstation time is irrelevant.</summary>
+		///<summary>This is not the actual date/time last refreshed.  It is really the server based date/time of the last item in the database retrieved on previous refreshes.  That way, the local workstation time is irrelevant.</summary>
 		public static DateTime signalLastRefreshed;
 		private FormSplash Splash;
 		private Bitmap bitmapIcon;
@@ -3836,7 +3836,7 @@ namespace OpenDental{
 				Plugins.HookAddCode(this,"FormOpenDental.ProcessSignals_end",sigList);
 			}
 			catch {
-				signalLastRefreshed=DateTime.Now;
+				signalLastRefreshed=MiscData.GetNowDateTime();
 			}
 		}
 
