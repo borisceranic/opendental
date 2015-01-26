@@ -263,10 +263,10 @@ namespace OpenDentBusiness{
 				if(emp==null) {
 					continue;
 				}
-				if(clinicNum==0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
+				if(clinicNum!=0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
 					continue;
 				}
-				if(listUsersShort[i].ClinicNum==0 && !listEmpNums.Contains(emp.EmployeeNum)) {//User is associated to a clinic, add the employee to the list of emps with clinics.
+				if(listUsersShort[i].ClinicNum!=0 && !listEmpNums.Contains(emp.EmployeeNum)) {//User is associated to a clinic, add the employee to the list of emps with clinics.
 					listEmpsWithClinics.Add(emp);
 					listEmpNums.Add(emp.EmployeeNum);
 				}

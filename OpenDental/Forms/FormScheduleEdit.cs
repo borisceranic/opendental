@@ -20,9 +20,10 @@ namespace OpenDental{
 		private ComboBox comboStart;
 		private ListBox listOps;
 		private Label labelOps;
-		//<summary></summary>
-		//public bool IsNew;
 		public Schedule SchedCur;
+		///<summary>Filters the list of operatories available to the clinic passed in.  Set to 0 to show all operatories.</summary>
+		public long ClinicNum;
+		private List<Operatory> _listOps;
 
 		///<summary></summary>
 		public FormScheduleEdit(){
@@ -189,13 +190,13 @@ namespace OpenDental{
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Schedule";
-			this.Load += new System.EventHandler(this.FormScheduleDayEdit_Load);
+			this.Load += new System.EventHandler(this.FormScheduleEdit_Load);
 			this.ResumeLayout(false);
 
 		}
 		#endregion
 
-		private void FormScheduleDayEdit_Load(object sender, System.EventArgs e) {
+		private void FormScheduleEdit_Load(object sender, System.EventArgs e) {
 			DateTime time;
 			for(int i=0;i<24;i++) {
 				time=DateTime.Today+TimeSpan.FromHours(7)+TimeSpan.FromMinutes(30*i);
@@ -205,10 +206,18 @@ namespace OpenDental{
 			comboStart.Text=SchedCur.StartTime.ToShortTimeString();
       comboStop.Text=SchedCur.StopTime.ToShortTimeString();
 			listOps.Items.Add(Lan.g(this,"not specified"));
-			for(int i=0;i<OperatoryC.ListShort.Count;i++){
-				listOps.Items.Add(OperatoryC.ListShort[i].OpName);
-				if(SchedCur.Ops.Contains(OperatoryC.ListShort[i].OperatoryNum)){
-					listOps.SetSelected(i+1,true);
+			List<Operatory> listOpsShort=OperatoryC.GetListShort();
+			_listOps=new List<Operatory>();
+			for(int i=0;i<listOpsShort.Count;i++) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && ClinicNum!=0) {//Using clinics and a clinic filter was passed in.
+					if(listOpsShort[i].ClinicNum!=ClinicNum) {
+						continue;
+					}
+				}
+				listOps.Items.Add(listOpsShort[i].OpName);
+				_listOps.Add(listOpsShort[i]);
+				if(SchedCur.Ops.Contains(listOpsShort[i].OperatoryNum)) {
+					listOps.SetSelected(listOps.Items.Count-1,true);//Select the item that was just added.
 				}
 			}
 			if(listOps.SelectedIndices.Count==0){
@@ -258,7 +267,7 @@ namespace OpenDental{
 			SchedCur.Ops=new List<long>();
 			if(!listOps.SelectedIndices.Contains(0)){
 				for(int i=0;i<listOps.SelectedIndices.Count;i++){
-					SchedCur.Ops.Add(OperatoryC.ListShort[listOps.SelectedIndices[i]-1].OperatoryNum);
+					SchedCur.Ops.Add(_listOps[listOps.SelectedIndices[i]-1].OperatoryNum);
 				}
 			}
 			DialogResult=DialogResult.OK;		  

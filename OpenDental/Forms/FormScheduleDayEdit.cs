@@ -33,17 +33,30 @@ namespace OpenDental{
 		private TabPage tabPage2;
 		private GraphScheduleDay graphScheduleDay;
 		private List<Schedule> _listScheds;
+		private long _clinicNum;
 		private List<Provider> _listProvs;
 		private List<Employee> _listEmps;
 		///<summary>The provider nums of _listProvs.  Helper, which is set once on load.</summary>
 		private List<long> _listProvNums;
 		///<summary>The employee nums of _listEmps.  Helper, which is set once on load.</summary>
 		private List<long> _listEmpNums;
-
+		
 		///<summary></summary>
-		public FormScheduleDayEdit(DateTime dateSched,List<Provider> listProvs,List<Employee> listEmps) {
+		public FormScheduleDayEdit(DateTime dateSched) : this(dateSched,0) {
+		}
+
+		///<summary>When clinics are enabled, this will filter the employee list box by the clinic passed in.  Pass 0 to show 'Unassigned' employees.</summary>
+		public FormScheduleDayEdit(DateTime dateSched,long clinicNum) {
 			InitializeComponent();
 			_dateSched=dateSched;
+			_clinicNum=clinicNum;
+			List<Provider> listProvs=ProviderC.GetListShort();
+			List<Employee> listEmps=Employees.GetListShort();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				//For phase one we are only filtering employees, not providers.  Show all providers for now.
+				//listProvs=Providers.GetProvsByClinic(_clinicNum);
+				listEmps=Employees.GetEmpsForClinic(_clinicNum);
+			}
 			_listProvs=listProvs;
 			_listEmps=listEmps;
 			Lan.F(this);
@@ -517,6 +530,7 @@ namespace OpenDental{
 			Schedule schedCur=_listScheds[e.Row];//remember the clicked row
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=_listScheds[e.Row];
+			FormS.ClinicNum=_clinicNum;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
@@ -544,6 +558,7 @@ namespace OpenDental{
 			//schedtype, provNum, and empnum will be set down below
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=schedCur;
+			FormS.ClinicNum=_clinicNum;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;
@@ -573,6 +588,7 @@ namespace OpenDental{
 			//schedtype, provNum, and empnum will be set down below
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=schedCur;
+			FormS.ClinicNum=_clinicNum;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
@@ -602,6 +618,7 @@ namespace OpenDental{
 			SchedCur.SchedType=ScheduleType.Practice;
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=SchedCur;
+			FormS.ClinicNum=_clinicNum;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
@@ -625,6 +642,7 @@ namespace OpenDental{
 			SchedCur.SchedType=ScheduleType.Practice;
 		  FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=SchedCur;
+			FormS.ClinicNum=_clinicNum;
       FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;

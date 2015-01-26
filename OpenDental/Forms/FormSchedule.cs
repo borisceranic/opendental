@@ -669,7 +669,14 @@ namespace OpenDental{
 				return;
 			}
 			//MessageBox.Show(selectedDate.ToShortDateString());
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,_listProvs,_listEmps);
+			long clinicNum=0; 
+			if(Security.CurUser.ClinicIsRestricted) {
+				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			else if(comboClinic.SelectedIndex > 0) {
+				clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Unassigned is the first option.
+			}
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum);
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;

@@ -2186,15 +2186,8 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
 			}
-			List<Provider> listProvs=ProviderC.GetListShort();
-			List<Employee> listEmps=Employees.GetListShort();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				//For phase one we are only filtering employees, not providers.  Show all providers for now.
-				//listProvs=Providers.GetProvsByClinic(FormOpenDental.ClinicNum);
-				listEmps=Employees.GetEmpsForClinic(FormOpenDental.ClinicNum);
-			}
 			//Get the providers and employees for the currently selected clinic.
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,listProvs,listEmps);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,FormOpenDental.ClinicNum);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh
@@ -5261,7 +5254,7 @@ namespace OpenDental {
 				MessageBox.Show("Blockout not found.");
 				return;//should never happen
 			}
-			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur);
+			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,FormOpenDental.ClinicNum);
 			FormSB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout edit.");
 			RefreshPeriod();
@@ -5326,7 +5319,7 @@ namespace OpenDental {
 				SchedCur.SchedDate=WeekStartDate.AddDays(SheetClickedonDay);
 			}
 			SchedCur.SchedType=ScheduleType.Blockout;
-			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur);
+			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,FormOpenDental.ClinicNum);
 			FormSB.IsNew=true;
 			FormSB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout add.");

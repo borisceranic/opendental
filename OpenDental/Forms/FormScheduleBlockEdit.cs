@@ -25,12 +25,15 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelType;
 		private ComboBox comboStart;
 		private ComboBox comboStop;
-		private Schedule SchedCur;
+		private Schedule _schedCur;
+		private long _clinicNum;
+		private List<Operatory> _listOps;
 
-		///<summary></summary>
-		public FormScheduleBlockEdit(Schedule schedCur){
+		///<summary>Setting clinicNum to 0 will show all operatories, otherwise only operatories for the clinic passed in will show.</summary>
+		public FormScheduleBlockEdit(Schedule schedCur,long clinicNum) {
 			InitializeComponent();
-			SchedCur=schedCur;
+			_schedCur=schedCur;
+			_clinicNum=clinicNum;
 			Lan.F(this);
 		}
 
@@ -232,17 +235,17 @@ namespace OpenDental{
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Blockout";
-			this.Load += new System.EventHandler(this.FormScheduleDayEdit_Load);
+			this.Load += new System.EventHandler(this.FormScheduleBlockEdit_Load);
 			this.ResumeLayout(false);
 
 		}
 		#endregion
 
-		private void FormScheduleDayEdit_Load(object sender, System.EventArgs e) {
+		private void FormScheduleBlockEdit_Load(object sender,System.EventArgs e) {
 			listType.Items.Clear();
 			for(int i=0;i<DefC.Short[(int)DefCat.BlockoutTypes].Length;i++){
 				listType.Items.Add(DefC.Short[(int)DefCat.BlockoutTypes][i].ItemName);
-				if(SchedCur.BlockoutType==DefC.Short[(int)DefCat.BlockoutTypes][i].DefNum){
+				if(_schedCur.BlockoutType==DefC.Short[(int)DefCat.BlockoutTypes][i].DefNum){
 					listType.SelectedIndex=i;
 				}
 			}
@@ -255,12 +258,19 @@ namespace OpenDental{
 				listType.SelectedIndex=0;
 			}
 			listOp.Items.Clear();
-			//listOp.Items.Add(Lan.g(this,"All Ops"));
-			//listOp.SelectedIndex=0;
-			for(int i=0;i<OperatoryC.ListShort.Count ;i++){
-				listOp.Items.Add(OperatoryC.ListShort[i].Abbrev);
-				if(SchedCur.Ops.Contains(OperatoryC.ListShort[i].OperatoryNum)){
-					listOp.SetSelected(i,true);
+			//Filter clinics by the clinic passed in.
+			List<Operatory> listOpsShort=OperatoryC.GetListShort();
+			_listOps=new List<Operatory>();
+			for(int i=0;i<listOpsShort.Count;i++) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && _clinicNum!=0) {//Using clinics and a clinic filter was passed in.
+					if(listOpsShort[i].ClinicNum!=_clinicNum) {
+						continue;
+					}
+				}
+				listOp.Items.Add(listOpsShort[i].OpName);
+				_listOps.Add(listOpsShort[i]);
+				if(_schedCur.Ops.Contains(listOpsShort[i].OperatoryNum)) {
+					listOp.SetSelected(listOp.Items.Count-1,true);//Select the item that was just added.
 				}
 			}
 			DateTime time;
@@ -269,10 +279,10 @@ namespace OpenDental{
 				comboStart.Items.Add(time.ToShortTimeString());
 				comboStop.Items.Add(time.ToShortTimeString());
 			}
-      comboStart.Text=SchedCur.StartTime.ToShortTimeString();
-			comboStop.Text=SchedCur.StopTime.ToShortTimeString();
-			textNote.Text=SchedCur.Note;
-			comboStart.Select(); 
+			comboStart.Text=_schedCur.StartTime.ToShortTimeString();
+			comboStop.Text=_schedCur.StopTime.ToShortTimeString();
+			textNote.Text=_schedCur.Note;
+			comboStart.Select();
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -283,7 +293,7 @@ namespace OpenDental{
         DialogResult=DialogResult.Cancel; 
       }
       else{ 
-        Schedules.Delete(SchedCur);	
+        Schedules.Delete(_schedCur);	
       }
       DialogResult=DialogResult.Cancel;
 		}
@@ -294,29 +304,29 @@ namespace OpenDental{
 				return;
 			}
 		  try{
-				SchedCur.StartTime=DateTime.Parse(comboStart.Text).TimeOfDay;
-				SchedCur.StopTime=DateTime.Parse(comboStop.Text).TimeOfDay;
+				_schedCur.StartTime=DateTime.Parse(comboStart.Text).TimeOfDay;
+				_schedCur.StopTime=DateTime.Parse(comboStop.Text).TimeOfDay;
 			}
 			catch{
 				MsgBox.Show(this,"Incorrect time format");
 				return;
 			}
-      SchedCur.Note=textNote.Text;
-			SchedCur.BlockoutType=DefC.Short[(int)DefCat.BlockoutTypes][listType.SelectedIndex].DefNum;
-			SchedCur.Ops=new List<long>();
+      _schedCur.Note=textNote.Text;
+			_schedCur.BlockoutType=DefC.Short[(int)DefCat.BlockoutTypes][listType.SelectedIndex].DefNum;
+			_schedCur.Ops=new List<long>();
 			for(int i=0;i<listOp.SelectedIndices.Count;i++){
-				SchedCur.Ops.Add(OperatoryC.ListShort[listOp.SelectedIndices[i]].OperatoryNum);
+				_schedCur.Ops.Add(_listOps[listOp.SelectedIndices[i]].OperatoryNum);
 			}
-			if(Schedules.Overlaps(SchedCur)) {
+			if(Schedules.Overlaps(_schedCur)) {
 				MsgBox.Show(this,"Blockouts not allowed to overlap.");
 				return;
 			}
 			try{
 				if(IsNew) {
-					Schedules.Insert(SchedCur,true);
+					Schedules.Insert(_schedCur,true);
 				}
 				else {
-					Schedules.Update(SchedCur);
+					Schedules.Update(_schedCur);
 				}
 			}
 			catch(Exception ex){
