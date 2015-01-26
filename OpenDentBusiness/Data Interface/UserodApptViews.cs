@@ -1,17 +1,57 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	///<summary></summary>
-	public class UserodApptViews{
+	public class UserodApptViews {
 
-		///<summary>Gets all recent userodapptviews for the user passed in.  Multiple userodapptviews can be returned when using clinics.</summary>
-		public static List<UserodApptView> GetForUser(long userNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<UserodApptView>>(MethodBase.GetCurrentMethod(),userNum);
+		///<summary>Gets the most recent ApptViewNum from the db for the user and clinic passed in.  clinicNum can be 0.  Returns 0 if no match found.</summary>
+		public static long GetApptViewNumForUserAndClinic(long userNum,long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			UserodApptView userodApptView=GetOneForUserClinicAndApptView(userNum,clinicNum,0);
+			if(userodApptView!=null) {
+				return userodApptView.ApptViewNum;
 			}
-			string command="SELECT * FROM userodapptview WHERE UserNum = "+POut.Long(userNum);
-			return Crud.UserodApptViewCrud.SelectMany(command);
+			return 0;
+		}
+
+		///<summary>Gets the most recent UserodApptView from the db for the user, clinic, and apptview passed in.  clinicNum and apptViewNum can be 0.  If apptViewNum is 0, no ApptViewNum filter will be applied.  Returns null if no match found.</summary>
+		public static UserodApptView GetOneForUserClinicAndApptView(long userNum,long clinicNum,long apptViewNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<UserodApptView>(MethodBase.GetCurrentMethod(),userNum,clinicNum,apptViewNum);
+			}
+			UserodApptView userodApptView=new UserodApptView();
+			string command="SELECT * FROM userodapptview "
+				+"WHERE UserNum = "+POut.Long(userNum)+" "
+				+"AND ClinicNum = "+POut.Long(clinicNum)+" ";//If clinicNum of 0 passed in, we MUST filter by 0 because that is a valid entry in the db.
+			if(apptViewNum!=0) {//There should never be a row in the database with an ApptViewNum of 0.  If 0 passed in, simply don't filter.
+				command+="AND ApptViewNum = "+POut.Long(apptViewNum)+" ";
+			}
+			command+="LIMIT 1";
+			return Crud.UserodApptViewCrud.SelectOne(command);
+		}
+
+		public static void InsertOrUpdate(long userNum,long clinicNum,long apptViewNum) {
+			//No need to check RemotingRole; no call to db.
+			UserodApptView userodApptView=new UserodApptView();
+			userodApptView.UserNum=userNum;
+			userodApptView.ClinicNum=clinicNum;
+			userodApptView.ApptViewNum=apptViewNum;
+			InsertOrUpdate(userodApptView);
+		}
+
+		public static void InsertOrUpdate(UserodApptView userodApptView) {
+			//No need to check RemotingRole; no call to db.
+			//Check if there is already a row in the database for this user, clinic, and apptview.
+			UserodApptView userodApptViewDb=GetOneForUserClinicAndApptView(userodApptView.UserNum,userodApptView.ClinicNum,userodApptView.ApptViewNum);
+			if(userodApptViewDb==null) {
+				Insert(userodApptView);
+			}
+			else {
+				userodApptView.UserodApptViewNum=userodApptViewDb.UserodApptViewNum;//userodApptView.UserodApptViewNum will be 0 if InsertOrUpdate(long,long,long) was used.
+				Update(userodApptView);
+			}
 		}
 
 		///<summary></summary>
@@ -81,6 +121,15 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<UserodApptView>(MethodBase.GetCurrentMethod(),userodApptViewNum);
 			}
 			return Crud.UserodApptViewCrud.SelectOne(userodApptViewNum);
+		}
+
+		///<summary>Gets all recent userodapptviews for the user passed in.  Multiple userodapptviews can be returned when using clinics.</summary>
+		public static List<UserodApptView> GetForUser(long userNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<UserodApptView>>(MethodBase.GetCurrentMethod(),userNum);
+			}
+			string command="SELECT * FROM userodapptview WHERE UserNum = "+POut.Long(userNum);
+			return Crud.UserodApptViewCrud.SelectMany(command);
 		}
 
 		///<summary></summary>
