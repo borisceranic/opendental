@@ -38,7 +38,12 @@ namespace OpenDental{
 				//MessageBox.Show("apptcategorynum:"+ApptCategories.Cur.ApptCategoryNum.ToString());
 				//make visible ops exactly the same as the short ops list (all except hidden)
 				for(int i=0;i<OperatoryC.ListShort.Count;i++){
-					ApptDrawing.VisOps.Add(OperatoryC.ListShort[i]);
+					if(PrefC.GetBool(PrefName.EasyNoClinics) //if clinics disabled
+						|| FormOpenDental.ClinicNum==0 //or if program level ClinicNum set to Headquarters
+						|| OperatoryC.ListShort[i].ClinicNum==FormOpenDental.ClinicNum) //or if the op is assigned to the program level ClinicNum
+					{
+						ApptDrawing.VisOps.Add(OperatoryC.ListShort[i]);
+					}
 				}
 				//make visible provs exactly the same as the prov list (all except hidden)
 				for(int i=0;i<ProviderC.ListShort.Count;i++){

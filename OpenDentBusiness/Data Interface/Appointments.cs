@@ -667,6 +667,7 @@ namespace OpenDentBusiness{
 			DataTable tableAppt=GetPeriodApptsTable(dateStart,dateEnd,0,false);
 			retVal.Tables.Add(tableAppt);
 			retVal.Tables.Add(GetPeriodEmployeeSchedTable(dateStart,dateEnd,clinicNum));
+			//retVal.Tables.Add(GetPeriodWaitingRoomTable(clinicNum));
 			retVal.Tables.Add(GetPeriodWaitingRoomTable());
 			retVal.Tables.Add(GetPeriodSchedule(dateStart,dateEnd));
 			retVal.Tables.Add(GetApptFields(tableAppt));
@@ -1388,7 +1389,8 @@ namespace OpenDentBusiness{
 			//columns that start with lowercase are altered for display rather than being raw data.
 			table.Columns.Add("patName");
 			table.Columns.Add("waitTime");
-			string command="SELECT DateTimeArrived,DateTimeSeated,LName,FName,Preferred,"+DbHelper.Now()+" dateTimeNow "
+			table.Columns.Add("OpNum");
+			string command="SELECT DateTimeArrived,DateTimeSeated,LName,FName,Preferred,"+DbHelper.Now()+" dateTimeNow,Op "
 				+"FROM appointment "
 				+"JOIN patient ON appointment.PatNum=patient.PatNum "
 				+"WHERE "+DbHelper.DtimeToDate("AptDateTime")+" = "+POut.Date(DateTime.Now)+" "
@@ -1429,6 +1431,7 @@ namespace OpenDentBusiness{
 					//minutes-=60*waitTime.Hours;
 				//}
 				//row["waitTime"]+=waitTime.Minutes.ToString()+"m";
+				row["OpNum"]=raw.Rows[i]["Op"].ToString();
 				table.Rows.Add(row);
 			}
 			return table;

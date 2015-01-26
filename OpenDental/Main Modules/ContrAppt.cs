@@ -173,6 +173,8 @@ namespace OpenDental {
 		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
 		//This list will contain the same number of items as comboView minus 1 for 'none'.
 		private List<ApptView> _listApptViews;
+		///<summary>List of operatories in the currently selected view, disregarding the Only show ops for scheduled provs check box.  Also will not include hidden ops.  Used to fill the waiting room based on the currently selected ApptView.</summary>
+		private List<Operatory> _listOpsInView;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -1347,6 +1349,20 @@ namespace OpenDental {
 				viewCur=_listApptViews[comboView.SelectedIndex-1];
 			}
 			ApptViewItemL.GetForCurView(viewCur,ApptDrawing.IsWeeklyView,SchedListPeriod);
+			_listOpsInView=new List<Operatory>();
+			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
+				if(viewCur==null) {//if the 'none' view is selected
+					if(PrefC.GetBool(PrefName.EasyNoClinics) //if clinics is disabled
+						|| FormOpenDental.ClinicNum==0 //or the clinic 'Headquarters' is selected
+						|| OperatoryC.ListShort[i].ClinicNum==FormOpenDental.ClinicNum) // or the op is assigned to the selected clinic
+					{
+						_listOpsInView.Add(OperatoryC.ListShort[i].Copy()); //add the op to the list of ops visible
+					}
+				}
+				else if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)) {//or if the op is in the selected view
+					_listOpsInView.Add(OperatoryC.ListShort[i].Copy()); //add the op to the list of ops visible
+				}
+			}
 		}
 
 		/// <summary>Called from both ModuleSelected and from RefreshPeriod.  Do not call it from any event like Layout.  This also clears listConfirmed.</summary>
@@ -1695,7 +1711,12 @@ namespace OpenDental {
 
 		///<summary></summary>
 		private void comboView_SelectionChangeCommitted(object sender,EventArgs e) {
-			SetView(comboView.SelectedIndex,true);
+			if(comboView.SelectedIndex==0) {
+				SetView(0,false);
+			}
+			else {
+				SetView(_listApptViews[comboView.SelectedIndex-1].ApptViewNum,true);
+			}
 		}
 
 		///<summary>Activated anytime a Patient menu item is clicked.</summary>
@@ -1898,9 +1919,6 @@ namespace OpenDental {
 		/// <summary>Sets the index of comboView for the specified ApptViewNum.  Then, does a ModuleSelected().  If saveToDb, then it will remember the ApptViewNum and currently selected ClinicNum for this workstation.</summary>
 		private void SetView(long apptViewNum,bool saveToDb) {
 			comboView.SelectedIndex=0;
-			if(apptViewNum<1) {
-				return;
-			}
 			for(int i=0;i<_listApptViews.Count;i++) {
 				if(apptViewNum==_listApptViews[i].ApptViewNum) {
 					comboView.SelectedIndex=i+1;//+1 for 'none'
@@ -2164,6 +2182,18 @@ namespace OpenDental {
 			DateTime waitTime;
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					bool isInView=false;
+					for(int j=0;j<_listOpsInView.Count;j++) {
+						if(_listOpsInView[j].OperatoryNum==PIn.Long(table.Rows[i]["OpNum"].ToString())) {
+							isInView=true;
+							break;
+						}
+					}
+					if(!isInView) {
+						continue;
+					}
+				}
 				row=new ODGridRow();
 				row.Cells.Add(table.Rows[i]["patName"].ToString());
 				waitTime=DateTime.Parse(table.Rows[i]["waitTime"].ToString());//we ignore date
@@ -2185,6 +2215,13 @@ namespace OpenDental {
 			}
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
+			}
+			List<Provider> listProvs=ProviderC.GetListShort();
+			List<Employee> listEmps=Employees.GetListShort();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				//For phase one we are only filtering employees, not providers.  Show all providers for now.
+				//listProvs=Providers.GetProvsByClinic(FormOpenDental.ClinicNum);
+				listEmps=Employees.GetEmpsForClinic(FormOpenDental.ClinicNum);
 			}
 			//Get the providers and employees for the currently selected clinic.
 			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,FormOpenDental.ClinicNum);
