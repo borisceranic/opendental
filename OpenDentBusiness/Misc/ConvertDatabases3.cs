@@ -7107,6 +7107,38 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TempFolderDateFirstCleaned',SYSDATE)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS userodapptview";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userodapptview (
+						UserodApptViewNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNum bigint NOT NULL,
+						ClinicNum bigint NOT NULL,
+						ApptViewNum bigint NOT NULL,
+						INDEX(UserNum),
+						INDEX(ClinicNum),
+						INDEX(ApptViewNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE userodapptview'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userodapptview (
+						UserodApptViewNum number(20) NOT NULL,
+						UserNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						ApptViewNum number(20) NOT NULL,
+						CONSTRAINT userodapptview_UserodApptViewN PRIMARY KEY (UserodApptViewNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userodapptview_UserNum ON userodapptview (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userodapptview_ClinicNum ON userodapptview (ClinicNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userodapptview_ApptViewNum ON userodapptview (ApptViewNum)";
+					Db.NonQ(command);
+				}
 
 
 
