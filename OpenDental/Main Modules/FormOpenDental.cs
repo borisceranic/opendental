@@ -2136,12 +2136,6 @@ namespace OpenDental{
 				if(Security.CurUser!=null) {
 					ClinicNum=Security.CurUser.ClinicNum;
 				}
-				if(ClinicNum==0) {
-					//ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
-				}
-				else {
-					//ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
-				}
 			}
 			SetModuleSelected();
 			Cursor=Cursors.Default;
@@ -3249,7 +3243,7 @@ namespace OpenDental{
 			RefreshLocalData(InvalidType.Views);
 		}
 
-		///<summary>This is used to set the private class wide variable _clinicNum, sets the clinic button.ToolTipText, and refreshes the current module.</summary>
+		///<summary>This is used to set the private class wide variable _clinicNum and refreshes the current module.</summary>
 		private void menuClinic_Click(object sender,System.EventArgs e) {
 			if(sender.GetType()!=typeof(MenuItem) && ((MenuItem)sender).Tag!=null) {
 				return;
@@ -5031,14 +5025,6 @@ namespace OpenDental{
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
 			ClinicNum=Security.CurUser.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(ClinicNum==0) {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
-				}
-				else {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
-				}
-			}
 			RefreshCurrentModule();
 		}
 
@@ -5104,12 +5090,6 @@ namespace OpenDental{
 			Patient pat=Patients.GetPat(CurPatNum);
 			Text=PatientL.GetMainTitle(pat,ClinicNum);
 			//reset the tip text in case the user changes the clinic description
-			if(ClinicNum==0) {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
-			}
-			else {
-				ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
-			}
 		}
 		
 		private void menuItemContacts_Click(object sender, System.EventArgs e) {
