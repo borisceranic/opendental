@@ -100,7 +100,10 @@ namespace OpenDental{
 			Plugins.HookAddCode(null,"PatientL.GetMainTitle_beginning",parameters);
 			retVal = (string)parameters[0];
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && clinicNum>0) {
-				retVal+=" - "+Clinics.GetDesc(clinicNum);
+				if(retVal!="") {
+					retVal+=" - Clinic: ";
+				}
+				retVal+=Clinics.GetDesc(clinicNum);
 			}
 			if(Security.CurUser!=null){
 				retVal+=" {"+Security.CurUser.UserName+"}";

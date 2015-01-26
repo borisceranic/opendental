@@ -170,6 +170,9 @@ namespace OpenDental {
 		private Panel panelMakeButtons;
 		private int pageColumn;
 		private List<DisplayField> _aptBubbleDefs;
+		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
+		//This list will contain the same number of items as comboView minus 1 for 'none'.
+		private List<ApptView> _listApptViews;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -191,6 +194,7 @@ namespace OpenDental {
 			infoBubble.Controls.Add(PicturePat);
 			this.Controls.Add(infoBubble);
 			ContrApptSheet2.MouseWheel+=new MouseEventHandler(ContrApptSheet2_MouseWheel);
+			_listApptViews=new List<ApptView>();
 		}
 
 		///<summary></summary>
@@ -1338,7 +1342,11 @@ namespace OpenDental {
 			DS=Appointments.RefreshPeriod(startDate,endDate,FormOpenDental.ClinicNum);
 			LastTimeDataRetrieved=DateTime.Now;
 			SchedListPeriod=Schedules.ConvertTableToList(DS.Tables["Schedule"]);
-			ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);
+			ApptView viewCur=null;
+			if(comboView.SelectedIndex>0) {
+				viewCur=_listApptViews[comboView.SelectedIndex-1];
+			}
+			ApptViewItemL.GetForCurView(viewCur,ApptDrawing.IsWeeklyView,SchedListPeriod);
 		}
 
 		/// <summary>Called from both ModuleSelected and from RefreshPeriod.  Do not call it from any event like Layout.  This also clears listConfirmed.</summary>
@@ -1348,7 +1356,11 @@ namespace OpenDental {
 			int oldHeight=ContrApptSheet2.Height;
 			int oldVScrollVal=vScrollBar1.Value;
 			if(DefC.Short!=null) {
-				ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
+				ApptView viewCur=null;
+				if(comboView.SelectedIndex>0) {
+					viewCur=_listApptViews[comboView.SelectedIndex-1];
+				}
+				ApptViewItemL.GetForCurView(viewCur,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
 				ApptDrawing.ApptSheetWidth=panelSheet.Width-vScrollBar1.Width;
 				ApptDrawing.ComputeColWidth(0);
 				ContrApptSheet2.Height=ApptDrawing.LineH*24*ApptDrawing.RowsPerHr;
@@ -1732,7 +1744,11 @@ namespace OpenDental {
 				tabControl.Height=panelSheet.Height-tabControl.Top+21;
 			}
 			if(!DefC.DefShortIsNull) {
-				ApptViewItemL.GetForCurView(comboView.SelectedIndex-1,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
+				ApptView viewCur=null;
+				if(comboView.SelectedIndex>0) {
+					viewCur=_listApptViews[comboView.SelectedIndex-1];
+				}
+				ApptViewItemL.GetForCurView(viewCur,ApptDrawing.IsWeeklyView,SchedListPeriod);//refreshes visops,etc
 				ApptDrawing.ApptSheetWidth=panelSheet.Width-vScrollBar1.Width;
 				ApptDrawing.ComputeColWidth(0);
 			}
@@ -1754,8 +1770,33 @@ namespace OpenDental {
 			AppointmentL.DateSelected=DateTime.Now;
 			ContrApptSingle.SelectedAptNum=-1;
 			//RefreshPeriod();//Don't think this is needed.
-			FillViews();//This does a SetView which will be overridden in the next line.
-			SetView((int)ComputerPrefs.LocalComputer.RecentApptView,false);
+			FillViews();//This does a SetView which will be overridden below.
+			//If there is a row in userodapptview for this workstation and the selected clinic, set the view using userodapptview.ApptViewNum
+			//If there isn't a row in userodapptview or if the clinics feature is not enabled,
+			//use computerpref.ClinicNum and ApptViewNum and set the view to the recent view if the currently selected clinic is the recent clinic for this computer
+			//If the user does not have permission to access the ClinicNum and therefore doesn't have access to the ApptViewNum,
+			//select the 'none' view for the selected clinic
+			//ApptView apptViewCur=UserodApptViews.GetViewFromUserAndClinic(Security.CurUser,FormOpenDental.ClinicNum);
+			ApptView apptViewCur=null;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);
+			}
+			else if(FormOpenDental.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum //use the computerpref recent apptview if the local computer's recent clinic is the selected clinic
+				&& (!Security.CurUser.ClinicIsRestricted //and either the current user is not restricted to a clinic and therefore has permission to access the selected clinic
+				|| Security.CurUser.ClinicNum==FormOpenDental.ClinicNum)) //or the current user is restricted to the selected clinic and has access
+			{
+				apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);
+			}
+			if(apptViewCur==null) {
+				SetView(0,false);
+			}
+			else {
+				SetView(apptViewCur.ApptViewNum,false);
+			}
+			//Only set the view using the computer pref for recently selected view if clinics are not enabled or if the recently selected clinic is the currently selected clinic.
+			//if(PrefC.GetBool(PrefName.EasyNoClinics) || ComputerPrefs.LocalComputer.ClinicNum==FormOpenDental.ClinicNum) {
+			//	SetView((int)ComputerPrefs.LocalComputer.RecentApptView,false);
+			//}
 			menuWeeklyApt.MenuItems.Clear();
 			menuWeeklyApt.MenuItems.Add(Lan.g(this,"Copy to Pinboard"),new EventHandler(menuWeekly_Click));
 			menuApt.MenuItems.Clear();
@@ -1844,38 +1885,34 @@ namespace OpenDental {
 
 		}
 
-		///<summary>The key press from the main form is passed down to this module.</summary>
+		///<summary>The key press from the main form is passed down to this module.  This is guaranteed to be between the keys of F1 and F12.</summary>
 		public void FunctionKeyPress(Keys keys) {
-			switch(keys) {
-				case Keys.F1: SetView(1,true); break;
-				case Keys.F2: SetView(2,true); break;
-				case Keys.F3: SetView(3,true); break;
-				case Keys.F4: SetView(4,true); break;
-				case Keys.F5: SetView(5,true); break;
-				case Keys.F6: SetView(6,true); break;
-				case Keys.F7: SetView(7,true); break;
-				case Keys.F8: SetView(8,true); break;
-				case Keys.F9: SetView(9,true); break;
-				case Keys.F10: SetView(10,true); break;
-				case Keys.F11: SetView(11,true); break;
-				case Keys.F12: SetView(12,true); break;
-			}
-		}
-
-		/// <summary>Sets the view to the specified index, checking for validity in the process.  Then, does a ModuleSelected().  If saveToDb, then it will remember the index for this workstation.</summary>
-		private void SetView(int viewIndex,bool saveToDb) {
-			if(viewIndex > ApptViewC.List.Length) {
+			string keyName=Enum.GetName(typeof(Keys),keys);//keyName will be F1, F2, ... F12
+			int fKeyVal=int.Parse(keyName.TrimStart('F'));//strip off the F and convert to an int
+			if(_listApptViews.Count<fKeyVal) {
 				return;
 			}
-			comboView.SelectedIndex=viewIndex;
-			if(comboView.SelectedIndex==-1) {
-				comboView.SelectedIndex=0;
+			SetView(_listApptViews[fKeyVal-1].ApptViewNum,true);
+		}
+
+		/// <summary>Sets the index of comboView for the specified ApptViewNum.  Then, does a ModuleSelected().  If saveToDb, then it will remember the ApptViewNum and currently selected ClinicNum for this workstation.</summary>
+		private void SetView(long apptViewNum,bool saveToDb) {
+			comboView.SelectedIndex=0;
+			if(apptViewNum<1) {
+				return;
+			}
+			for(int i=0;i<_listApptViews.Count;i++) {
+				if(apptViewNum==_listApptViews[i].ApptViewNum) {
+					comboView.SelectedIndex=i+1;//+1 for 'none'
+					break;
+				}
 			}
 			if(!InitializedOnStartup) {
 				return;//prevent ModuleSelected().
 			}
 			if(saveToDb) {
-				ComputerPrefs.LocalComputer.RecentApptView=(byte)viewIndex;
+				ComputerPrefs.LocalComputer.ApptViewNum=apptViewNum;
+				ComputerPrefs.LocalComputer.ClinicNum=FormOpenDental.ClinicNum;
 				ComputerPrefs.Update(ComputerPrefs.LocalComputer);
 			}
 			if(PatCur==null) {
@@ -1886,20 +1923,34 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Fills the comboView with the current list of views and then tries to reselect the previous selection.  Also called from FormOpenDental.RefreshLocalData().</summary>
+		///<summary>Fills comboView with the current list of views and then tries to reselect the previous selection.  Also called from FormOpenDental.RefreshLocalData().</summary>
 		public void FillViews() {
-			int selected=comboView.SelectedIndex;
+			ApptView apptViewCur=null;
+			if(comboView.SelectedIndex>0 && comboView.SelectedIndex-1<_listApptViews.Count) {
+				apptViewCur=_listApptViews[comboView.SelectedIndex-1];
+			}
 			comboView.Items.Clear();
+			_listApptViews.Clear();
 			comboView.Items.Add(Lan.g(this,"none"));
 			string f="";
+			bool clinicsEnabled=!PrefC.GetBool(PrefName.EasyNoClinics);
 			for(int i=0;i<ApptViewC.List.Length;i++) {
-				if(i<=12)
-					f="F"+(i+1).ToString()+"-";
+				if(clinicsEnabled && FormOpenDental.ClinicNum!=ApptViewC.List[i].AssignedClinic) {
+					continue;
+				}
+				_listApptViews.Add(ApptViewC.List[i].Copy());
+				if(_listApptViews.Count<=12)
+					f="F"+_listApptViews.Count.ToString()+"-";
 				else
 					f="";
 				comboView.Items.Add(f+ApptViewC.List[i].Description);
 			}
-			SetView(selected,false);//this also triggers ModuleSelected()
+			if(apptViewCur!=null) {
+				SetView(apptViewCur.ApptViewNum,false);//this also triggers ModuleSelected()
+			}
+			else {
+				SetView(0,false);//this also triggers ModuleSelected()
+			}
 		}
 
 		///<summary>Sets appointment data invalid on all other computers, causing them to refresh.  Does NOT refresh the data for this computer which must be done separately.</summary>

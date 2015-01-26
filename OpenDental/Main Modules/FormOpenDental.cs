@@ -2137,10 +2137,10 @@ namespace OpenDental{
 					ClinicNum=Security.CurUser.ClinicNum;
 				}
 				if(ClinicNum==0) {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
+					//ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic: All");
 				}
 				else {
-					ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
+					//ToolBarMain.Buttons["Clinic"].ToolTipText=Lan.g(this,"Clinic")+": "+Clinics.GetDesc(ClinicNum);
 				}
 			}
 			SetModuleSelected();
@@ -3246,6 +3246,7 @@ namespace OpenDental{
 				}
 				menuClinics.MenuItems.Add(menuItem);
 			}
+			RefreshLocalData(InvalidType.Views);
 		}
 
 		///<summary>This is used to set the private class wide variable _clinicNum, sets the clinic button.ToolTipText, and refreshes the current module.</summary>

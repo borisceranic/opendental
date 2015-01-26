@@ -51,6 +51,20 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Gets an ApptView from the cache.  If apptviewnum is not valid, then it returns null.</summary>
+		public static ApptView GetApptView(long apptViewNum) {
+			//No need to check RemotingRole; no call to db.
+			if(apptViewNum==0) {
+				return null;
+			}
+			for(int i=0;i<ApptViewC.List.Length;i++) {
+				if(ApptViewC.List[i].ApptViewNum==apptViewNum) {
+					return ApptViewC.List[i].Copy();
+				}
+			}
+			return null;
+		}
+
 	
 
 	

@@ -15,14 +15,15 @@ namespace OpenDental{
 		public static List<ApptViewItem> ApptRows;
 		public static ApptView ApptViewCur;
 
-		public static void GetForCurView(int indexInList,bool isWeekly,List<Schedule> dailySched) {
-			if(indexInList<0){//might be -1 or -2
-				GetForCurView(null,isWeekly,dailySched);
-			}
-			else{
-				GetForCurView(ApptViewC.List[indexInList],isWeekly,dailySched);
-			}
-		}
+		//Deprecated function, we no longer store the index of the veiw in the computer pref table
+		//public static void GetForCurView(int indexInList,bool isWeekly,List<Schedule> dailySched) {
+		//	if(indexInList<0){//might be -1 or -2
+		//		GetForCurView(null,isWeekly,dailySched);
+		//	}
+		//	else{
+		//		GetForCurView(ApptViewC.List[indexInList],isWeekly,dailySched);
+		//	}
+		//}
 
 		///<summary>Gets (list)ForCurView, ApptDrawing.VisOps, ApptDrawing.VisProvs, and ApptRows.  Also sets TwoRows. Works even if supply -1 to indicate no apptview is selected.  Pass in null for the dailySched if this is a weekly view or if in FormApptViewEdit.</summary>
 		public static void GetForCurView(ApptView av,bool isWeekly,List<Schedule> dailySched){
