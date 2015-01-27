@@ -39,6 +39,7 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private Dictionary<long,string> patientNames;
+		private List<Clinic> _listUserClinics;
 
 		///<summary></summary>
 		public FormTrackNext(){
@@ -273,10 +274,19 @@ namespace OpenDental{
 				labelClinic.Visible=false;
 			}
 			else {
-				comboClinic.Items.Add(Lan.g(this,"All"));
-				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					comboClinic.Items.Add(Lan.g(this,"All"));
+					comboClinic.SelectedIndex=0;
+				}
+				_listUserClinics=Clinics.GetForUserod(Security.CurUser);
+				for(int i=0;i<_listUserClinics.Count;i++) {
+					comboClinic.Items.Add(_listUserClinics[i].Description);
+					if(_listUserClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						comboClinic.SelectedIndex=i;
+						if(!Security.CurUser.ClinicIsRestricted) {
+							comboClinic.SelectedIndex++;//add 1 for "All"
+						}
+					}
 				}
 			}
 			FillGrid();
@@ -305,8 +315,12 @@ namespace OpenDental{
 				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
 			}
 			long clinicNum=0;
-			if(comboClinic.SelectedIndex > 0) {
-				clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+			//if clinics are not enabled, comboClinic.SelectedIndex will be -1, so clinicNum will be 0 and list will not be filtered by clinic
+			if(Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex>-1) {
+				clinicNum=_listUserClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			else if(comboClinic.SelectedIndex > 0) {//if user is not restricted, clinicNum will be 0 and the query will get all clinic data
+				clinicNum=_listUserClinics[comboClinic.SelectedIndex-1].ClinicNum;//if user is not restricted, comboClinic will contain "All" so minus 1
 			}
 			AptList=Appointments.RefreshPlannedTracker(order,provNum,siteNum,clinicNum);
 			gridMain.BeginUpdate();
