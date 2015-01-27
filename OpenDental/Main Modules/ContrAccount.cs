@@ -170,6 +170,7 @@ namespace OpenDental {
 		private MenuItem menuItemInvoice;
 		private ODGrid gridPatInfo;
 		private bool InitializedOnStartup;
+		private MenuItem menuItemRepeatWebSched;
 		private List<DisplayField> _patInfoDisplayFields;
 		#endregion UserVariables
 
@@ -314,6 +315,7 @@ namespace OpenDental {
 			this.gridComm = new OpenDental.UI.ODGrid();
 			this.gridPatInfo = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.menuItemRepeatWebSched = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -444,7 +446,8 @@ namespace OpenDental {
             this.menuItemRepeatStand,
             this.menuItemRepeatEmail,
             this.menuItemRepeatMobile,
-            this.menuItemRepeatCanada});
+            this.menuItemRepeatCanada,
+            this.menuItemRepeatWebSched});
 			// 
 			// menuItemRepeatStand
 			// 
@@ -1602,6 +1605,12 @@ namespace OpenDental {
 			this.ToolBarMain.Size = new System.Drawing.Size(939, 25);
 			this.ToolBarMain.TabIndex = 47;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
+			// 
+			// menuItemRepeatWebSched
+			// 
+			this.menuItemRepeatWebSched.Index = 4;
+			this.menuItemRepeatWebSched.Text = "WebSched Monthly";
+			this.menuItemRepeatWebSched.Click += new System.EventHandler(this.menuItemRepeatWebSched_Click);
 			// 
 			// ContrAccount
 			// 
@@ -3526,6 +3535,20 @@ namespace OpenDental {
 			repeat.ProcCode="001";
 			repeat.ChargeAmt=99;
 			repeat.DateStart=DateTimeOD.Today.AddYears(1);
+			repeat.IsEnabled=true;
+			RepeatCharges.Insert(repeat);
+			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void menuItemRepeatWebSched_Click(object sender,EventArgs e) {
+			if(!ProcedureCodeC.HList.ContainsKey("037")) {
+				return;
+			}
+			RepeatCharge repeat=new RepeatCharge();
+			repeat.PatNum=PatCur.PatNum;
+			repeat.ProcCode="037";
+			repeat.ChargeAmt=75;
+			repeat.DateStart=DateTimeOD.Today;
 			repeat.IsEnabled=true;
 			RepeatCharges.Insert(repeat);
 			ModuleSelected(PatCur.PatNum);
