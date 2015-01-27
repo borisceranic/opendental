@@ -62,9 +62,9 @@ namespace OpenDental {
 			if(phoneList==null) {
 				return;
 			}
-			int rows=7;
-			int columns=8;
-			float boxWidth=21.4f;
+			float rows=7;
+			float columns=9;
+			float boxWidth=((float)this.Width)/columns; //21.4f;
 			float boxHeight=17f;
 			float hTot=boxHeight*rows;
 			float x=0f;
