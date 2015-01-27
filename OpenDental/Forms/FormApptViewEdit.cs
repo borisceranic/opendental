@@ -334,9 +334,9 @@ namespace OpenDental{
 			// 
 			this.checkOnlyScheduledProvs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkOnlyScheduledProvs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(-15, 15);
+			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(6, 15);
 			this.checkOnlyScheduledProvs.Name = "checkOnlyScheduledProvs";
-			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(295, 17);
+			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(274, 17);
 			this.checkOnlyScheduledProvs.TabIndex = 56;
 			this.checkOnlyScheduledProvs.Text = "Only show operatories for scheduled providers";
 			this.checkOnlyScheduledProvs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -630,12 +630,19 @@ namespace OpenDental{
 			if(ApptViewCur.OnlySchedAfterTime > new TimeSpan(0,0,0)) {
 				textAfterTime.Text=(DateTime.Today+ApptViewCur.OnlySchedAfterTime).ToShortTimeString();
 			}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				comboOpClinic.Visible=false;
+				labelOpClinic.Visible=false;
+				comboAssignedClinic.Visible=false;
+				labelAssignedClinic.Visible=false;
+				_listUserClinicNums=new List<long>() { 0 };//if clinics are disabled, apptview.AssignedClinic will be set to 0
+			}
+			else {//Using clinics
 				Clinics.RefreshCache();
 				comboOpClinic.Items.Clear();
-				comboOpClinic.Items.Add("All");
+				comboOpClinic.Items.Add(Lan.g(this,"All"));
 				comboOpClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++){
+				for(int i=0;i<Clinics.List.Length;i++) {
 					comboOpClinic.Items.Add(Clinics.List[i].Description);
 					if(Clinics.List[i].ClinicNum==ApptViewCur.OnlyScheduledClinic) {
 						comboOpClinic.SelectedIndex=i+1;
@@ -643,8 +650,9 @@ namespace OpenDental{
 				}
 				_listUserClinicNums=new List<long>();
 				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
+				comboAssignedClinic.Items.Clear();
 				if(!Security.CurUser.ClinicIsRestricted) {
-					comboAssignedClinic.Items.Add("All");
+					comboAssignedClinic.Items.Add(Lan.g(this,"All"));
 					_listUserClinicNums.Add(0);//this way both lists have the same number of items in it and if 'All' is selected the view AssignedClinicNum will be set to 0
 					comboAssignedClinic.SelectedIndex=0;
 				}
@@ -652,32 +660,18 @@ namespace OpenDental{
 					comboAssignedClinic.Items.Add(listClinics[i].Description);
 					_listUserClinicNums.Add(listClinics[i].ClinicNum);
 					if(AssignedClinicNum==listClinics[i].ClinicNum) {
-						comboAssignedClinic.SelectedIndex=Security.CurUser.ClinicIsRestricted?i:i+1;//increment the SelectedIndex to account for 'none' in the list at position 0.
+						if(Security.CurUser.ClinicIsRestricted) {
+							comboAssignedClinic.SelectedIndex=i;
+						}
+						else {
+							comboAssignedClinic.SelectedIndex=i+1;//increment the SelectedIndex to account for 'All' in the list at position 0.
+						}
 					}
 				}
-			}
-			else {//clinics show feature disabled (EasyNoClinics=true)
-				comboOpClinic.Visible=false;
-				labelOpClinic.Visible=false;
-				comboAssignedClinic.Visible=false;
-				labelAssignedClinic.Visible=false;
-				_listUserClinicNums=new List<long>() { 0 };//if clinics are disabled, apptview.AssignedClinic will be set to 0
 			}
 			SetOpLabel();
 			ApptViewItemL.GetForCurView(ApptViewCur,true,null);//passing in true triggers it to give us the proper list of ops.
-			_listOpNums=new List<long>();
-			for(int i=0;i<OperatoryC.ListShort.Count;i++){
-				if(PrefC.GetBool(PrefName.EasyNoClinics) //add op to list of ops available for the view if the clinics show feature is turned off
-					|| AssignedClinicNum==0 //or this view is not assigned to a clinic
-					|| OperatoryC.ListShort[i].ClinicNum==AssignedClinicNum) //or the operatory is assigned to same clinic as this view
-				{
-					listOps.Items.Add(OperatoryC.ListShort[i].OpName);
-					_listOpNums.Add(OperatoryC.ListShort[i].OperatoryNum);
-					if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)) {
-						listOps.SetSelected(listOps.Items.Count-1,true);
-					}
-				}
-			}
+			FillOperatories();
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
 				listProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
 				if(ApptViewItemL.ProvIsInView(ProviderC.ListShort[i].ProvNum)){
@@ -881,6 +875,25 @@ namespace OpenDental{
 				}
 			}
 			gridPatFieldDefs.EndUpdate();
+		}
+
+		///<summary>Fills the list box of operatories available for the view.  Considers clinics.</summary>
+		private void FillOperatories() {
+			listOps.ClearSelected();
+			listOps.Items.Clear();
+			_listOpNums=new List<long>();
+			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
+				if(PrefC.GetBool(PrefName.EasyNoClinics) //add op to list of ops available for the view if the clinics show feature is turned off
+					|| AssignedClinicNum==0 //or this view is not assigned to a clinic
+					|| OperatoryC.ListShort[i].ClinicNum==AssignedClinicNum) //or the operatory is assigned to same clinic as this view
+				{
+					listOps.Items.Add(OperatoryC.ListShort[i].OpName);
+					_listOpNums.Add(OperatoryC.ListShort[i].OperatoryNum);
+					if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)) {
+						listOps.SetSelected(listOps.Items.Count-1,true);
+					}
+				}
+			}
 		}
 
 		///<summary>Called from FillElements. Used to determine whether a given element is already displayed. If not, then it is displayed in the available rows on the left.</summary>
@@ -1208,23 +1221,13 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>This will remove operatories from the list of ops available to assign to this view and fill the list with ops assigned to the same clinic or unassigned.  If the current view has operatories selected that are assigned to a different view, a message box will warn the user that continuing will remove the operatories from the view.</summary>
+		///<summary>This will remove operatories from the list of ops available to assign to this view and fill the list with ops assigned to the same clinic or unassigned.  If the current view has operatories selected that are assigned to a different view.</summary>
 		private void comboAssignedClinic_SelectionChangeCommitted(object sender,EventArgs e) {
 			if(AssignedClinicNum==_listUserClinicNums[comboAssignedClinic.SelectedIndex]) {
 				return;
 			}
 			AssignedClinicNum=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
-			listOps.ClearSelected();
-			listOps.Items.Clear();
-			_listOpNums=new List<long>();
-			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
-				if(AssignedClinicNum==0 //add op to list of ops available for the view if the user chose to not assign this view to a clinic
-					|| OperatoryC.ListShort[i].ClinicNum==AssignedClinicNum) //or the operatory is assigned to same clinic as this view
-				{
-					listOps.Items.Add(OperatoryC.ListShort[i].OpName);
-					_listOpNums.Add(OperatoryC.ListShort[i].OperatoryNum);
-				}
-			}
+			FillOperatories();
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -1324,7 +1327,7 @@ namespace OpenDental{
 				ApptViewCur.OnlyScheduledClinic=Clinics.List[comboOpClinic.SelectedIndex-1].ClinicNum;
 			}
 			//_listUserClinicNums will contain only a 0 if the clinics show feature is disabled
-			//if the user is not restricted to a clinic, the list will contain 0 in the first position since comboAssignedClinic will contain 'none'
+			//if the user is not restricted to a clinic, the list will contain 0 in the first position since comboAssignedClinic will contain 'All'
 			//restricted users (Security.CurUser.ClinicsIsRestricted=true && Security.CurUser.ClinicNum>0) won't have access to the unassigned views (AssignedClinic=0)
 			ApptViewCur.AssignedClinic=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
 			ApptViews.Update(ApptViewCur);//same whether isnew or not

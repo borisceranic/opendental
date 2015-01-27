@@ -1712,7 +1712,7 @@ namespace OpenDental {
 		///<summary></summary>
 		private void comboView_SelectionChangeCommitted(object sender,EventArgs e) {
 			if(comboView.SelectedIndex==0) {
-				SetView(0,false);
+				SetView(0,true);
 			}
 			else {
 				SetView(_listApptViews[comboView.SelectedIndex-1].ApptViewNum,true);
@@ -1922,9 +1922,8 @@ namespace OpenDental {
 			_listApptViews.Clear();
 			comboView.Items.Add(Lan.g(this,"none"));
 			string f="";
-			bool clinicsEnabled=!PrefC.GetBool(PrefName.EasyNoClinics);
 			for(int i=0;i<ApptViewC.List.Length;i++) {
-				if(clinicsEnabled && FormOpenDental.ClinicNum!=ApptViewC.List[i].AssignedClinic) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=ApptViewC.List[i].AssignedClinic) {
 					continue;
 				}
 				_listApptViews.Add(ApptViewC.List[i].Copy());
@@ -1936,19 +1935,14 @@ namespace OpenDental {
 			}
 			//load the recently used apptview from the db, either the userodapptview table if an entry exists or the computerpref table if an entry for this computer exists
 			ApptView apptViewCur=null;
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {//no clinics
-				apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);//if not using clinics, maintain the old behavior of storing 1 view per computer, could be null
+			UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,FormOpenDental.ClinicNum);
+			if(userodApptViewCur!=null) {
+				apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum);
 			}
-			else {//clinics enabled
-				UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,FormOpenDental.ClinicNum);
-				if(userodApptViewCur!=null) {
-					apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum);
-				}
-				if(apptViewCur==null //if no entry in the userodapptview table
-					&& FormOpenDental.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) //and if the program level ClinicNum is the stored recent ClinicNum for this computer 
-				{
-					apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);//use the computerpref for this computer and user
-				}
+			if(apptViewCur==null //if no entry in the userodapptview table
+				&& FormOpenDental.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) //and if the program level ClinicNum is the stored recent ClinicNum for this computer 
+			{
+				apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);//use the computerpref for this computer and user
 			}
 			if(apptViewCur!=null) {
 				SetView(apptViewCur.ApptViewNum,false);//this also triggers ModuleSelected()
