@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.4.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -6175,11 +6175,11 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To14_4_0();
+			To15_1_1();
 		}
 
-		private static void To14_4_0() {
-			if(FromVersion<new Version("14.4.0.0")) {
+		private static void To15_1_1() {
+			if(FromVersion<new Version("15.1.1.0")) {
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS dispsupply";
@@ -7139,11 +7139,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX userodapptview_ApptViewNum ON userodapptview (ApptViewNum)";
 					Db.NonQ(command);
 				}
-
-
-
-
-				command="UPDATE preference SET ValueString = '14.4.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '15.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 		}
