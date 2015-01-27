@@ -5023,8 +5023,11 @@ namespace OpenDental{
 			FormSecurity FormS=new FormSecurity(); 
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
-			ClinicNum=Security.CurUser.ClinicNum;
-			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				ClinicNum=Security.CurUser.ClinicNum;
+				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+				RefreshMenuClinics();
+			}
 			RefreshCurrentModule();
 		}
 
@@ -5085,7 +5088,9 @@ namespace OpenDental{
 			//this menu item is only visible if the clinics show feature is enabled (!EasyNoClinics)
 			if(Clinics.GetDesc(ClinicNum)=="") {//will be empty string if ClinicNum is not valid, in case they deleted the clinic
 				ClinicNum=Security.CurUser.ClinicNum;
+				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			}
+			RefreshMenuClinics();
 			//reset the main title bar in case the user changes the clinic description for the selected clinic
 			Patient pat=Patients.GetPat(CurPatNum);
 			Text=PatientL.GetMainTitle(pat,ClinicNum);

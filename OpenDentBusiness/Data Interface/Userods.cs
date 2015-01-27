@@ -85,15 +85,25 @@ namespace OpenDentBusiness {
 		public static Userod GetUserByEmployeeNum(long employeeNum) {
 			//No need to check RemotingRole; no call to db.
 			List<Userod> listUserods=UserodC.GetListt();
-			if(listUserods==null) {
-				RefreshCache();
-			}
 			for(int i=0;i<listUserods.Count;i++) {
 				if(listUserods[i].EmployeeNum==employeeNum) {
 					return listUserods[i];
 				}
 			}
 			return null;
+		}
+
+		///<summary>Returns all users that are associated to the employee passed in.  Returns empty list if no matches found.</summary>
+		public static List<Userod> GetUsersByEmployeeNum(long employeeNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Userod> listUserodsLong=UserodC.GetListt();
+			List<Userod> listUserods=new List<Userod>();
+			for(int i=0;i<listUserodsLong.Count;i++) {
+				if(listUserodsLong[i].EmployeeNum==employeeNum) {
+					listUserods.Add(listUserodsLong[i]);
+				}
+			}
+			return listUserods;
 		}
 
 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.</summary>

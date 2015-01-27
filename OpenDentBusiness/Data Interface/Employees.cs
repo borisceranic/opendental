@@ -78,24 +78,6 @@ namespace OpenDentBusiness{
 			return Crud.EmployeeCrud.SelectMany(command);
 		}
 
-		///<summary>Gets all the employees for a specific clinicNum, according to their associated user. Sorts by LastName.</summary>
-		public static List<Employee> GetForTimeCardByClinic(long clinicNum) {
-			//No need to check RemotingRole; no call to db.
-			List<Employee> listEmployee=new List<Employee>();
-			for(int i=0;i<Employees.ListShort.Length;i++) {
-				for(int j=0;j<UserodC.ShortList.Count;j++) {
-					if(UserodC.ShortList[j].ClinicNum==clinicNum 
-						&& UserodC.ShortList[j].EmployeeNum==Employees.ListShort[i].EmployeeNum) 
-					{
-						listEmployee.Add(Employees.ListShort[i]);
-						break;
-					}
-				}
-			}
-			listEmployee.Sort(Employees.SortByLastName);
-			return listEmployee;
-		}
-
 		/*public static Employee[] GetListByExtension(){
 			if(ListShort==null){
 				return new Employee[0];
@@ -252,45 +234,64 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
-		///<summary>Gets all employees associated to users that have a clinic set to the clinic passed in.  Passing in 0 will get a list of employees not assigned to any clinic or to any users.</summary>
+		///<summary>Gets all employees associated to users that have a clinic set to the clinic passed in.  Passing in 0 will get a list of employees not assigned to any clinic.  Gets employees from the cache which is sorted by FName, LastName.</summary>
 		public static List<Employee> GetEmpsForClinic(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			List<Employee> listEmpsWithClinics=new List<Employee>();
-			List<Userod> listUsersShort=UserodC.GetListShort();
-			List<long> listEmpNums=new List<long>();
-			for(int i=0;i<listUsersShort.Count;i++) {
-				Employee emp=Employees.GetEmp(listUsersShort[i].EmployeeNum);
-				if(emp==null) {
-					continue;
-				}
-				if(clinicNum!=0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
-					continue;
-				}
-				if(listUsersShort[i].ClinicNum!=0 && !listEmpNums.Contains(emp.EmployeeNum)) {//User is associated to a clinic, add the employee to the list of emps with clinics.
-					listEmpsWithClinics.Add(emp);
-					listEmpNums.Add(emp.EmployeeNum);
-				}
-			}
-			if(clinicNum==0) {//Return the list of employees without clinics.
-				//We need to find all employees not associated to a clinic (via userod) and also include all employees not even associated to a user.
-				//Since listEmpsWithClinics is comprised of all employees associated to a clinic, simply loop through the employee cache and remove employees present in listEmpsWithClinics.
-				List<Employee> listEmpsUnassigned=Employees.GetListShort();
-				for(int i=listEmpsUnassigned.Count-1;i>=0;i--) {
-					for(int j=0;j<listEmpsWithClinics.Count;j++) {
-						if(listEmpsWithClinics[j].EmployeeNum==listEmpsUnassigned[i].EmployeeNum) {
-							listEmpsUnassigned.RemoveAt(i);
-							break;
-						}
-					}
-				}
-				return listEmpsUnassigned;
-			}
-			else {
-				return listEmpsWithClinics;
-			}
+			return GetEmpsForClinic(clinicNum,false);
 		}
 
-		/// <summary> Returns -1 if employeeNum is not found.  0 if not hidden and 1 if hidden </summary>		
+		///<summary>Gets all the employees for a specific clinicNum, according to their associated user.  Pass in a clinicNum of 0 to get the list of unassigned or "all" employees (depending on isAll flag).  In addition to setting clinicNum to 0, set isAll true to get a list of all employees or false to get a list of employees that are not associated to any clinics.  Always gets the list of employees from the cache which is sorted by FName, LastName.</summary>
+		public static List<Employee> GetEmpsForClinic(long clinicNum,bool isAll) {
+			//No need to check RemotingRole; no call to db.
+			if(clinicNum==0 && isAll) {//Simply return all employees.
+				return Employees.GetListShort();
+			}
+			List<Employee> listEmpsShort=Employees.GetListShort();
+			List<Employee> listEmpsWithClinic=new List<Employee>();
+			List<long> listEmpNumsWithClinic=new List<long>();
+			List<Employee> listEmpsUnassigned=new List<Employee>();
+			List<long> listEmpNumsUnassigned=new List<long>();
+			for(int i=0;i<listEmpsShort.Count;i++) {
+				List<Userod> listUsers=Userods.GetUsersByEmployeeNum(listEmpsShort[i].EmployeeNum);
+				if(listUsers.Count==0) {
+					if(listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
+						continue;//Employee already added to the results.
+					}
+					listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
+					listEmpsUnassigned.Add(listEmpsShort[i]);
+					continue;
+				}
+				//At this point we know there is at least one Userod associated to this employee.
+				for(int j=0;j<listUsers.Count;j++) {
+					//Check if the user is associated to a clinic
+					if(listUsers[j].ClinicNum==0) {//Unassigned
+						if(listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
+							continue;//Employee already added to the results.
+						}
+						listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
+						listEmpsUnassigned.Add(listEmpsShort[i]);
+						continue;
+					}
+					//User is associated to a clinic.  Make sure it matches the clinicNum passed in before adding them to the list of results.
+					if(listUsers[j].ClinicNum==clinicNum) {
+						if(listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
+							continue;//Employee already added to the results.
+						}
+						listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
+						listEmpsWithClinic.Add(listEmpsShort[i]);
+					}
+				}
+			}
+			//Returning the 'All' employee list was handled above.  We now only care about two scenarios.
+			//1 - Returning a list of 'unassigned' employees.  This is used for the 'Headquarters' clinic filter.
+			//2 - Returning a list of employees associated to the specific clinic passed in.
+			if(clinicNum==0 && !isAll) {
+				return listEmpsUnassigned;
+			}
+			return listEmpsWithClinic;
+		}
+
+		/// <summary> Returns -1 if employeeNum is not found.  0 if not hidden and 1 if hidden.</summary>		
 		public static int IsHidden(long employeeNum) {
 			//No need to check RemotingRole; no call to db.
 			int rValue = -1;
@@ -345,6 +346,12 @@ namespace OpenDentBusiness{
 					case SortBy.firstName:
 						ret=x.FName.CompareTo(y.FName); 
 						break;
+					case SortBy.LFName:
+						ret=x.LName.CompareTo(y.LName);
+						if(ret==0) {
+							ret=x.FName.CompareTo(y.FName);
+						}
+						break;
 					case SortBy.lastName:
 					default:
 						ret=x.LName.CompareTo(y.LName); 
@@ -364,8 +371,10 @@ namespace OpenDentBusiness{
 				empNum,
 				///<summary>2 - By FName.</summary>
 				firstName,
-				///<summary>2 - By LName.</summary>
-				lastName
+				///<summary>3 - By LName.</summary>
+				lastName,
+				///<summary>4 - By LName, then FName.</summary>
+				LFName
 			};
 		}
 	}

@@ -27,6 +27,7 @@ namespace OpenDental {
 		private int PagesPrinted;
 		private bool HeadingPrinted;
 		private List<Employee> _listEmployees;
+		private List<Clinic> _listClinics;
 
 		public FormTimeCardManage(List<Employee> listEmployees) {
 			InitializeComponent();
@@ -41,6 +42,25 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
+			}
+			else {//clinics
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				comboClinic.Items.Clear();
+				if(!Security.CurUser.ClinicIsRestricted) {
+					comboClinic.Items.Add(Lan.g(this,"All"));
+					comboClinic.Items.Add(Lan.g(this,"Headquarters"));
+					comboClinic.SelectedIndex=1;
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=comboClinic.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						comboClinic.SelectedIndex=curIndex;
+					}
+				}
+			}
 			FillPayPeriod();
 			FillMain();
 			//butCompute.Visible=false;			//only until unit tests are complete. exceed
@@ -48,7 +68,25 @@ namespace OpenDental {
 		}
 
 		private void FillMain() {
-			MainTable=ClockEvents.GetTimeCardManage(DateStart,DateStop,FormOpenDental.ClinicNum);//,false);
+			long clinicNum=0;
+			bool isAll=false;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else {//All and Headquarters are the first two available options.
+					if(comboClinic.SelectedIndex==0) {//All is selected.
+						isAll=true;
+					}
+					else if(comboClinic.SelectedIndex==1) {
+						//Do nothing since the defaults are this selection
+					}
+					else {//A specific clinic was selected.
+						clinicNum=_listClinics[comboClinic.SelectedIndex-2].ClinicNum;//Subtract 2, because All and Headquarters are added to the list.
+					}
+				}
+			}
+			MainTable=ClockEvents.GetTimeCardManage(DateStart,DateStop,clinicNum,isAll);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Employee"),140);
@@ -836,6 +874,10 @@ namespace OpenDental {
 				e.HasMorePages=false;
 			}
 			g.Dispose();
+		}
+
+		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillMain();
 		}
 
 		///<summary>Exports MainTable (a data table) not the actual OD Grid. This allows for EmployeeNum and ADPNum without having to perform any lookups.</summary>

@@ -363,11 +363,10 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Returns clockevent information for all non-hidden employees.  Used only in the time card manage window.</summary>
-		/// <param name="IsPrintReport">Only applicable to ODHQ. If true, will add ADP pay numer and note. The query takes about 9 seconds if this is set top true vs. about 2 seconds if set to false.</param>
-		public static DataTable GetTimeCardManage(DateTime startDate,DateTime stopDate,long clinicNum) {
+		///<summary>Returns clockevent information for all non-hidden employees.  Used only in the time card manage window.  Set isAll to true to return all employee time cards (used for clinics).</summary>
+		public static DataTable GetTimeCardManage(DateTime startDate,DateTime stopDate,long clinicNum,bool isAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),startDate,stopDate,clinicNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),startDate,stopDate,clinicNum,isAll);
 			}
 			//Construct empty table------------------------------------------------------------------------------------------------------------------------
 			DataTable retVal=new DataTable("TimeCardManage");
@@ -394,7 +393,8 @@ namespace OpenDentBusiness{
 				listEmployees=Employees.GetForTimeCard();
 			}
 			else {
-				listEmployees=Employees.GetForTimeCardByClinic(clinicNum);
+				listEmployees=Employees.GetEmpsForClinic(clinicNum,isAll);
+				listEmployees.Sort(new Employees.EmployeeComparer(Employees.EmployeeComparer.SortBy.LFName));
 			}
 			for(int e=0;e<listEmployees.Count;e++) {
 				string employeeErrors="";

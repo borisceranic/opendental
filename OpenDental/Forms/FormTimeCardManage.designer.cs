@@ -47,6 +47,8 @@ namespace OpenDental{
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.butExportGrid = new OpenDental.UI.Button();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -65,7 +67,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Location = new System.Drawing.Point(12, 9);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(659, 51);
+			this.groupBox1.Size = new System.Drawing.Size(587, 51);
 			this.groupBox1.TabIndex = 15;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Pay Period";
@@ -159,7 +161,7 @@ namespace OpenDental{
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(931, 562);
+			this.gridMain.Size = new System.Drawing.Size(950, 562);
 			this.gridMain.TabIndex = 16;
 			this.gridMain.Title = "Employee Time Cards";
 			this.gridMain.TranslationName = "TableTimeCard";
@@ -222,7 +224,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(868, 652);
+			this.butClose.Location = new System.Drawing.Point(887, 652);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -270,7 +272,7 @@ namespace OpenDental{
 			this.butClearAuto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClearAuto.CornerRadius = 4F;
 			this.butClearAuto.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butClearAuto.Location = new System.Drawing.Point(677, 36);
+			this.butClearAuto.Location = new System.Drawing.Point(845, 36);
 			this.butClearAuto.Name = "butClearAuto";
 			this.butClearAuto.Size = new System.Drawing.Size(117, 24);
 			this.butClearAuto.TabIndex = 122;
@@ -285,7 +287,7 @@ namespace OpenDental{
 			this.butClearManual.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClearManual.CornerRadius = 4F;
 			this.butClearManual.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butClearManual.Location = new System.Drawing.Point(677, 9);
+			this.butClearManual.Location = new System.Drawing.Point(845, 9);
 			this.butClearManual.Name = "butClearManual";
 			this.butClearManual.Size = new System.Drawing.Size(117, 24);
 			this.butClearManual.TabIndex = 123;
@@ -362,10 +364,31 @@ namespace OpenDental{
 			this.butExportGrid.Text = "Export Grid";
 			this.butExportGrid.Click += new System.EventHandler(this.butExportGrid_Click);
 			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(641, 37);
+			this.comboClinic.MaxDropDownItems = 30;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(162, 21);
+			this.comboClinic.TabIndex = 128;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(642, 21);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(58, 13);
+			this.labelClinic.TabIndex = 127;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormTimeCardManage
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(955, 692);
+			this.ClientSize = new System.Drawing.Size(974, 692);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.groupBox4);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
@@ -377,7 +400,7 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormTimeCardManage";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Time Card Manage";
+			this.Text = " ";
 			this.Load += new System.EventHandler(this.FormTimeCardManage_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
@@ -413,5 +436,7 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.GroupBox groupBox4;
 		private UI.Button butExportGrid;
+		private System.Windows.Forms.ComboBox comboClinic;
+		private System.Windows.Forms.Label labelClinic;
 	}
 }
