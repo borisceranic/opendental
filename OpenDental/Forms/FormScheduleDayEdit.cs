@@ -45,7 +45,7 @@ namespace OpenDental{
 		public FormScheduleDayEdit(DateTime dateSched) : this(dateSched,0) {
 		}
 
-		///<summary>When clinics are enabled, this will filter the employee list box by the clinic passed in.  Pass 0 to show 'Unassigned' employees.</summary>
+		///<summary>When clinics are enabled, this will filter the employee list box by the clinic passed in.  Pass 0 to only show employees not assigned to a clinic.</summary>
 		public FormScheduleDayEdit(DateTime dateSched,long clinicNum) {
 			InitializeComponent();
 			_dateSched=dateSched;

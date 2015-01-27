@@ -482,7 +482,7 @@ namespace OpenDental{
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
 				comboClinic.Items.Clear();
 				if(!Security.CurUser.ClinicIsRestricted) {
-					comboClinic.Items.Add(Lan.g(this,"Unassigned"));
+					comboClinic.Items.Add(Lan.g(this,"Headquarters"));
 					comboClinic.SelectedIndex=0;
 				}
 				for(int i=0;i<_listClinics.Count;i++) {
@@ -528,14 +528,14 @@ namespace OpenDental{
 				//}
 				//Fill the employee list box.
 				_listEmps=new List<Employee>();
-				if(comboClinic.SelectedIndex==0 && !Security.CurUser.ClinicIsRestricted) {//Unassigned is selected.
-					_listEmps=Employees.GetEmpsForClinic(0);//Get employees unassigned.
+				if(comboClinic.SelectedIndex==0 && !Security.CurUser.ClinicIsRestricted) {//Headquarters is selected.
+					_listEmps=Employees.GetEmpsForClinic(0);//Only get employees that are not assigned to a clinic.
 				}
 				else if(Security.CurUser.ClinicIsRestricted) {
 					_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
 				}
 				else {
-					_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex-1].ClinicNum);//Subtract 1, because Unassigned is the first option.
+					_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex-1].ClinicNum);//Subtract 1, because Headquarters is the first option.
 				}
 				for(int i=0;i<_listEmps.Count;i++) {
 					listEmp.Items.Add(_listEmps[i].FName);
@@ -674,7 +674,7 @@ namespace OpenDental{
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
 			else if(comboClinic.SelectedIndex > 0) {
-				clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Unassigned is the first option.
+				clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
 			}
 			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum);
 			FormS.ShowDialog();
