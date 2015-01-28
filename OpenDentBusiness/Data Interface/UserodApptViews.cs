@@ -17,9 +17,6 @@ namespace OpenDentBusiness {
 
 		public static void InsertOrUpdate(long userNum,long clinicNum,long apptViewNum) {
 			//No need to check RemotingRole; no call to db.
-			if(apptViewNum<1) {
-				return;//do not record the 'none' view for the user
-			}
 			UserodApptView userodApptView=new UserodApptView();
 			userodApptView.UserNum=userNum;
 			userodApptView.ClinicNum=clinicNum;
