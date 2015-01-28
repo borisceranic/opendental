@@ -82,16 +82,14 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>When closing the payplan window, this sets all the charges to the appropriate provider and clinic.  This is the only way to set those fields.</summary>
-		public static void SetProvAndClinic(long payPlanNum,long provNum,long clinicNum) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in payPlanNum.</summary>
+		public static void Sync(List<PayPlanCharge> listPayPlanCharges,long payPlanNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),payPlanNum,provNum,clinicNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPayPlanCharges,payPlanNum);
 				return;
 			}
-			string command="UPDATE payplancharge SET ProvNum="+POut.Long(provNum)+", "
-				+"ClinicNum="+POut.Long(clinicNum)+" "
-				+"WHERE PayPlanNum="+POut.Long(payPlanNum);
-			Db.NonQ(command);
+			List<PayPlanCharge> listDB=PayPlanCharges.GetForPayPlan(payPlanNum);
+			Crud.PayPlanChargeCrud.Sync(listPayPlanCharges,listDB);
 		}
 	
 	}

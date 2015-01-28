@@ -182,6 +182,23 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Gets all ClaimProc bundles for the given PayPlanNum. Bundles claimprocs by Date and then by ClaimPaymentNum.</summary>
+		public static DataTable GetBundlesForPayPlan(long payPlanNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
+			}
+			//MAX functions added to preserve behavior in Oracle.  We may use ProcDate instead of DateCP in the future.
+			string command="SELECT claimproc.ClaimNum,MAX(claimpayment.CheckNum) CheckNum,claimproc.DateCP,MAX(CheckAmt) CheckAmt,claimproc.ClaimPaymentNum,MAX(claimpayment.PayType) PayType, "
+				+"SUM(claimproc.InsPayAmt) InsPayAmt "
+				+"FROM claimproc "
+				+"LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum=claimpayment.ClaimPaymentNum "
+				+"WHERE PayPlanNum="+POut.Long(payPlanNum)+" "
+				+"AND claimproc.Status IN ("+POut.Long((long)ClaimProcStatus.Received)+","+POut.Long((long)ClaimProcStatus.Supplemental)+","+POut.Long((long)ClaimProcStatus.CapClaim)+") "
+				+"GROUP BY claimproc.ClaimNum,claimproc.DateCP,claimproc.ClaimPaymentNum "
+				+"ORDER BY claimproc.DateCP";
+			return Db.GetTable(command);
+		}
+
 		///<summary>When sending or printing a claim, this converts the supplied list into a list of ClaimProcs that need to be sent.</summary>
 		public static List<ClaimProc> GetForSendClaim(List<ClaimProc> claimProcList,long claimNum) {
 			//No need to check RemotingRole; no call to db.

@@ -173,6 +173,23 @@ namespace OpenDentBusiness{
 			return retList;
 		}
 
+		///<summary>For a given PayPlan, returns a table of PaySplits with additional payment information, plus the same paysplits in listPaySplits.
+		///Set listPaySplits to an empty list before calling.</summary>
+		public static DataTable GetForPayPlan(long payPlanNum,List<PaySplit> listPaySplits) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
+			}
+			string command="SELECT paysplit.*,payment.CheckNum,payment.PayAmt,payment.PayType "
+					+"FROM paysplit "
+					+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
+					+"WHERE paysplit.PayPlanNum="+POut.Long(payPlanNum)+" "
+					+"ORDER BY ProcDate";
+			DataTable tableSplits=Db.GetTable(command);
+			listPaySplits.Clear();
+			listPaySplits.AddRange(Crud.PaySplitCrud.TableToList(tableSplits));
+			return tableSplits;
+		}
+
 		///<summary>Used once in ContrAccount.  Usually returns 0 unless there is a payplan for this payment and patient.</summary>
 		public static long GetPayPlanNum(long payNum,long patNum,PaySplit[] List) {
 			//No need to check RemotingRole; no call to db.

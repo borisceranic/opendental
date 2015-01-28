@@ -21,7 +21,8 @@ namespace OpenDental{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butDelete;
 		private OpenDental.ODtextBox textNote;
-		private PayPlanCharge PayPlanChargeCur;
+		///<summary>If the user deletes the PayPlanChargeCur, then it will be null when the form is closed.</summary>
+		public PayPlanCharge PayPlanChargeCur;
 		private OpenDental.ValidDouble textPrincipal;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
@@ -35,7 +36,7 @@ namespace OpenDental{
 		///<summary></summary>
 		public FormPayPlanChargeEdit(PayPlanCharge payPlanCharge){
 			InitializeComponent();
-			PayPlanChargeCur=payPlanCharge.Copy();
+			PayPlanChargeCur=payPlanCharge;
 			Lan.F(this);
 		}
 
@@ -303,12 +304,6 @@ namespace OpenDental{
 			PayPlanChargeCur.Interest=PIn.Double(textInterest.Text);
 			PayPlanChargeCur.Note=textNote.Text;
 			//not allowed to change provnum or clinicNum here.
-			if(IsNew){
-				PayPlanCharges.Insert(PayPlanChargeCur);
-			}
-			else{
-				PayPlanCharges.Update(PayPlanChargeCur);
-			}
 			DialogResult=DialogResult.OK;
 		}
 
@@ -317,8 +312,8 @@ namespace OpenDental{
 				DialogResult=DialogResult.Cancel;
 			}
 			else{
-				PayPlanCharges.Delete(PayPlanChargeCur);
 				DialogResult=DialogResult.OK;
+				PayPlanChargeCur=null;//Setting this null so we know to get rid of it when the form closes.
 			}
 		}
 

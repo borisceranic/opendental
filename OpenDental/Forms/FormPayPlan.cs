@@ -82,7 +82,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label14;
 		//private List<PayPlanCharge> ChargeList;
 		private double AmtPaid;
-		private DataTable table;
 		private double TotPrinc;
 		private double TotInt;
 		private Label label1;
@@ -99,6 +98,9 @@ namespace OpenDental{
 		private List<InsSub> SubList;
 		///<summary>This form is reused as long as this parent form remains open.</summary>
 		private FormPaymentPlanOptions FormPayPlanOpts;
+		///<summary>Cached list of PayPlanCharges.</summary>
+		private List<PayPlanCharge> _listPayPlanCharges;
+		private Def[] _arrayAccountColors;//Putting this here so we do one DB call for colors instead of many.  They'll never change.
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
 		public FormPayPlan(Patient patCur,PayPlan payPlanCur){
@@ -896,6 +898,10 @@ namespace OpenDental{
 				//If there  is a larger gap than 1 month before the first payment, interest will be under calculated.
 				//For now, our temporary solution is to prefill the date of first payment box starting with next months date which is the most accurate for calculating interest.
 				textDateFirstPay.Text=DateTime.Now.AddMonths(1).ToShortDateString();
+				_listPayPlanCharges=new List<PayPlanCharge>();
+			}
+			else {
+				_listPayPlanCharges=PayPlanCharges.GetForPayPlan(PayPlanCur.PayPlanNum);
 			}
 			textAPR.Text=PayPlanCur.APR.ToString();
 			AmtPaid=PayPlans.GetAmtPaid(PayPlanCur.PayPlanNum);
@@ -915,15 +921,16 @@ namespace OpenDental{
 				butGoToGuar.Visible=false;
 				butChangeGuar.Visible=false;
 			}
+			_arrayAccountColors=DefC.GetList(DefCat.AccountColors);
 			FillCharges();
 		}
 
 		/// <summary>Called 5 times.  This also fills prov and clinic based on the first charge if not new.</summary>
 		private void FillCharges(){
-			table=AccountModules.GetPayPlanAmort(PayPlanCur.PayPlanNum).Tables["payplanamort"];
 			gridCharges.BeginUpdate();
 			gridCharges.Columns.Clear();
 			ODGridColumn col;
+			//If this column is changed from a date column then the comparer method (ComparePayPlanRows) needs to be updated.
 			col=new ODGridColumn(Lan.g("PayPlanAmortization","Date"),65,HorizontalAlignment.Right);
 			gridCharges.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("PayPlanAmortization","Description"),220);
@@ -936,65 +943,156 @@ namespace OpenDental{
 			gridCharges.Columns.Add(col);
 			col=new ODGridColumn("",147);//filler
 			gridCharges.Columns.Add(col);
-			gridCharges.Rows.Clear();
-			UI.ODGridRow row;
-			for(int i=0;i<table.Rows.Count;i++){
-				row=new ODGridRow();
-				row.Cells.Add(table.Rows[i]["date"].ToString());
-				row.Cells.Add(table.Rows[i]["description"].ToString());
-				row.Cells.Add(table.Rows[i]["charges"].ToString());
-				row.Cells.Add(table.Rows[i]["credits"].ToString());
-				row.Cells.Add(table.Rows[i]["balance"].ToString());
-				row.Cells.Add("");
-				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
-				if(i<table.Rows.Count-1//not the last row
-					&& ((DateTime)table.Rows[i]["DateTime"]).Date<=DateTime.Today
-					&& ((DateTime)table.Rows[i+1]["DateTime"]).Date>DateTime.Today)
-				{
-					row.ColorLborder=Color.Black;
-					row.Cells[4].Bold=YN.Yes;
+			gridCharges.Rows.Clear();					
+			List<ODGridRow> listPayPlanRows=new List<ODGridRow>();
+			int payPlanChargeOrdinal=1;
+			for(int i=0;i<_listPayPlanCharges.Count;i++){//Payplan Charges
+				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],payPlanChargeOrdinal));
+				if(!listPayPlanRows[i].Cells[1].Text.Contains("Downpayment")) {
+					payPlanChargeOrdinal++;
 				}
-				gridCharges.Rows.Add(row);
 			}
-			//The code below is not very efficient, but it doesn't matter
-			//List<PayPlanCharge> ChargeListAll=PayPlanCharges.Refresh(PayPlanCur.Guarantor);
-			List<PayPlanCharge> ChargeList=PayPlanCharges.GetForPayPlan(PayPlanCur.PayPlanNum);
+			if(PayPlanCur.PlanNum==0) {//Normal payplan
+				List<PaySplit> listPaySplits=new List<PaySplit>();
+				DataTable bundledPayments=PaySplits.GetForPayPlan(PayPlanCur.PayPlanNum,listPaySplits);
+				for(int i=0;i<listPaySplits.Count;i++) {
+					listPayPlanRows.Add(CreateRowForPaySplit(bundledPayments.Rows[i],listPaySplits[i]));
+				}
+			}
+			else {//Insurance payplan
+				DataTable bundledClaimProcs=ClaimProcs.GetBundlesForPayPlan(PayPlanCur.PayPlanNum);
+				for(int i=0;i<bundledClaimProcs.Rows.Count;i++) {
+					listPayPlanRows.Add(CreateRowForClaimProcs(bundledClaimProcs.Rows[i]));
+				}
+			}
+			listPayPlanRows.Sort(ComparePayPlanRows);
+			for(int i=0;i<listPayPlanRows.Count;i++) {
+				gridCharges.Rows.Add(listPayPlanRows[i]);
+			}
 			TotPrinc=0;
 			TotInt=0;
-			for(int i=0;i<ChargeList.Count;i++){
-				TotPrinc+=ChargeList[i].Principal;
-				TotInt+=ChargeList[i].Interest;
+			for(int i=0;i<_listPayPlanCharges.Count;i++){
+				TotPrinc+=_listPayPlanCharges[i].Principal;
+				TotInt+=_listPayPlanCharges[i].Interest;
 			}
 			TotPrincInt=TotPrinc+TotInt;
-			if(ChargeList.Count==0){
+			if(_listPayPlanCharges.Count==0) {
 				//don't damage what's already present in textAmount.Text
 			}
 			else{
 				textAmount.Text=TotPrinc.ToString("f");
 			}
 			textTotalCost.Text=TotPrincInt.ToString("f");
-			if(ChargeList.Count>0){
-				textDateFirstPay.Text=ChargeList[0].ChargeDate.ToShortDateString();
+			if(_listPayPlanCharges.Count>0){
+				textDateFirstPay.Text=_listPayPlanCharges[0].ChargeDate.ToShortDateString();
 			}
 			else{
 				//don't damage what's already in textDateFirstPay.Text
 			}
 			gridCharges.EndUpdate();
-			textAccumulatedDue.Text=PayPlans.GetAccumDue(PayPlanCur.PayPlanNum,ChargeList).ToString("f");
-			textPrincPaid.Text=PayPlans.GetPrincPaid(AmtPaid,PayPlanCur.PayPlanNum,ChargeList).ToString("f");
-			if(!IsNew && ChargeList.Count>0) {
+			double balanceAmt=0;
+			for(int i=0;i<gridCharges.Rows.Count;i++){//Filling row cells with balance information and coloring them green.
+				if(gridCharges.Rows[i].Cells[2].Text!="") {//Charge
+					balanceAmt+=Convert.ToDouble(gridCharges.Rows[i].Cells[2].Text);
+				}
+				else if(gridCharges.Rows[i].Cells[3].Text!="") {//Credit
+					balanceAmt-=Convert.ToDouble(gridCharges.Rows[i].Cells[3].Text);
+				}
+				gridCharges.Rows[i].Cells[4].Text=balanceAmt.ToString("n");
+				if(i<gridCharges.Rows.Count-1//Not the last row
+					&& DateTime.Parse(gridCharges.Rows[i].Cells[0].Text)<=DateTime.Today 
+					&& DateTime.Parse(gridCharges.Rows[i+1].Cells[0].Text)>DateTime.Today)//Coloration of where we are currently in grid based on date.
+				{
+					gridCharges.Rows[i].ColorLborder=Color.Black;
+					gridCharges.Rows[i].Cells[4].Bold=YN.Yes;
+				}
+			}
+			textAccumulatedDue.Text=PayPlans.GetAccumDue(PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
+			textPrincPaid.Text=PayPlans.GetPrincPaid(AmtPaid,PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
+			if(!IsNew && _listPayPlanCharges.Count>0) {
 				if(comboProv.SelectedIndex==-1) {//This avoids resetting the combo every time FillCharges is run.
-					comboProv.SelectedIndex=Providers.GetIndex(ChargeList[0].ProvNum);//could still be -1
+					comboProv.SelectedIndex=Providers.GetIndex(_listPayPlanCharges[0].ProvNum);//could still be -1
 				}
 				if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex==-1) {
-					if(ChargeList[0].ClinicNum==0){
+					if(_listPayPlanCharges[0].ClinicNum==0){
 						comboClinic.SelectedIndex=0;
 					}
 					else{
-						comboClinic.SelectedIndex=Clinics.GetIndex(ChargeList[0].ClinicNum)+1;
+						comboClinic.SelectedIndex=Clinics.GetIndex(_listPayPlanCharges[0].ClinicNum)+1;
 					}
 				}
 			}
+		}
+
+		private ODGridRow CreateRowForPayPlanCharge(PayPlanCharge payPlanCharge,int payPlanChargeOrdinal) {
+			string descript="#"+payPlanChargeOrdinal+" ";
+			if(payPlanCharge.Interest!=0) {
+				descript+="Interest: "+payPlanCharge.Interest.ToString("n");
+			}
+			if(payPlanCharge.Note!="") {
+				if(descript!="") {
+					descript+="  ";
+				}
+				descript+=payPlanCharge.Note;
+			}
+			ODGridRow row=new ODGridRow();//Charge row
+			row.Cells.Add(payPlanCharge.ChargeDate.ToShortDateString());//Date
+			row.Cells.Add(descript);//Descript
+			row.Cells.Add((payPlanCharge.Principal+payPlanCharge.Interest).ToString("n"));//Charge
+			row.Cells.Add("");//No credits, this is a charge
+			row.Cells.Add("");//Balance (filled later)
+			row.Cells.Add("");//Empty filler column
+			row.Tag=payPlanCharge;
+			return row;
+		}
+
+		private ODGridRow CreateRowForPaySplit(DataRow rowBundlePayment,PaySplit paySplit) {
+			string descript=DefC.GetName(DefCat.PaymentTypes,PIn.Long(rowBundlePayment["PayType"].ToString()));
+			if(rowBundlePayment["CheckNum"].ToString()!="") {
+				descript+=" #"+rowBundlePayment["CheckNum"].ToString();
+			}
+			descript+=" "+paySplit.SplitAmt.ToString("c");//Not sure if we really want to convert from string to double then back to string.. maybe a better way to format this?
+			if(Convert.ToDouble(rowBundlePayment["PayAmt"].ToString())!=paySplit.SplitAmt) { 
+				descript+=Lans.g(this,"(split)");
+			}
+			ODGridRow row=new ODGridRow();
+			row.Cells.Add(paySplit.ProcDate.ToShortDateString());//Date
+			row.Cells.Add(descript);//Descript
+			row.Cells.Add("");//No charge, this is a credit
+			row.Cells.Add(paySplit.SplitAmt.ToString("n"));//Credit
+			row.Cells.Add("");//Balance (filled later)
+			row.Cells.Add("");//Empty filler column
+			row.Tag=paySplit;
+			row.ColorText=_arrayAccountColors[3].ItemColor;//Setup | Definitions | Account Colors | Payment;
+			return row;
+		}
+
+		private ODGridRow CreateRowForClaimProcs(DataRow rowBundleClaimProc) {//Either a claimpayment or a bundle of claimprocs with no claimpayment that were on the same date.
+			string descript=DefC.GetName(DefCat.InsurancePaymentType,PIn.Long(rowBundleClaimProc["PayType"].ToString()));
+			if(rowBundleClaimProc["CheckNum"].ToString()!=""){
+				descript+=" #"+rowBundleClaimProc["CheckNum"];
+			}
+			if(PIn.Long(rowBundleClaimProc["ClaimPaymentNum"].ToString())==0) {
+				descript+="No Finalized Payment";
+			}
+			else {
+				double checkAmt=PIn.Double(rowBundleClaimProc["CheckAmt"].ToString());
+				descript+=" "+checkAmt.ToString("c");
+				double insPayAmt=PIn.Double(rowBundleClaimProc["InsPayAmt"].ToString());
+				if(checkAmt!=insPayAmt){
+					descript+=" "+Lans.g(this,"(split)");
+				}
+			}
+			ODGridRow row=new ODGridRow();
+			row.Cells.Add(PIn.DateT(rowBundleClaimProc["DateCP"].ToString()).ToShortDateString());//Date
+			row.Cells.Add(descript);//Descript
+			row.Cells.Add("");//No charge, this is a credit
+			row.Cells.Add(PIn.Double(rowBundleClaimProc["InsPayAmt"].ToString()).ToString("n"));//Credit
+			row.Cells.Add("");//Balance (filled later)
+			row.Cells.Add("");//Empty filler column
+			row.Tag=rowBundleClaimProc;
+			row.ColorText=_arrayAccountColors[7].ItemColor;//Setup | Definitions | Account Colors | Insurance Payment
+			return row;
 		}
 
 		private void butGoToPat_Click(object sender, System.EventArgs e) {
@@ -1018,7 +1116,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Not allowed to change the guarantor because payments are attached.");
 				return;
 			}
-			if(table.Rows.Count>0){
+			if(gridCharges.Rows.Count>0){
 				MsgBox.Show(this,"Not allowed to change the guarantor without first clearing the amortization schedule.");
 				return;
 			}
@@ -1038,7 +1136,7 @@ namespace OpenDental{
 				checkIns.Checked=!checkIns.Checked;
 				return;
 			}
-			if(table.Rows.Count>0){
+			if(gridCharges.Rows.Count>0){
 				MsgBox.Show(this,"Not allowed without first clearing the amortization schedule.");
 				checkIns.Checked=!checkIns.Checked;
 				return;
@@ -1159,11 +1257,11 @@ namespace OpenDental{
 				MsgBox.Show(this,"Down paymnent must be less than or equal to total amount.");
 				return;
 			}
-			if(table.Rows.Count>0){
+			if(gridCharges.Rows.Count>0){
 				if(!MsgBox.Show(this,true,"Replace existing amortization schedule?")){
 					return;
 				}
-				PayPlanCharges.DeleteAllInPlan(PayPlanCur.PayPlanNum);
+				_listPayPlanCharges.Clear();
 			}
 			PayPlanCharge ppCharge;
 			//down payment
@@ -1173,13 +1271,13 @@ namespace OpenDental{
 				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
 				ppCharge.Guarantor=PayPlanCur.Guarantor;
 				ppCharge.PatNum=PayPlanCur.PatNum;
-				ppCharge.ChargeDate=DateTimeOD.Today;
+				ppCharge.ChargeDate=PIn.DateT(textDateFirstPay.Text);
 				ppCharge.Interest=0;
 				ppCharge.Principal=downpayment;
 				ppCharge.Note=Lan.g(this,"Downpayment");
 				ppCharge.ProvNum=PatCur.PriProv;//will be changed at the end.
 				ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed at the end.
-				PayPlanCharges.Insert(ppCharge);
+				_listPayPlanCharges.Add(ppCharge);
 			}
 			double principal=PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text);//Always >= 0 due to validation.
 			double APR=PIn.Double(textAPR.Text);
@@ -1275,7 +1373,7 @@ namespace OpenDental{
 				}
 				principalDecrementing-=(decimal)ppCharge.Principal;
 				//If somehow principalDecrementing was slightly negative right here due to rounding errors, then at worst the last charge amount would wrong by a few pennies and the loop would immediately exit.
-				PayPlanCharges.Insert(ppCharge);
+				_listPayPlanCharges.Add(ppCharge);
 				countCharges++;
 			}
 			FillCharges();
@@ -1304,38 +1402,34 @@ namespace OpenDental{
 		}
 
 		private void gridCharges_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			if(table.Rows[e.Row]["PayPlanChargeNum"].ToString()!="0"){
-				PayPlanCharge charge=PayPlanCharges.GetOne(PIn.Long(table.Rows[e.Row]["PayPlanChargeNum"].ToString()));
-				FormPayPlanChargeEdit FormP=new FormPayPlanChargeEdit(charge);
+			if(gridCharges.Rows[e.Row].Tag.GetType()==typeof(PayPlanCharge)){
+				PayPlanCharge payPlanCharge=(PayPlanCharge)gridCharges.Rows[e.Row].Tag;
+				FormPayPlanChargeEdit FormP=new FormPayPlanChargeEdit(payPlanCharge);//This automatically takes care of our in-memory list because the Tag is referencing our list of objects.
 				FormP.ShowDialog();
 				if(FormP.DialogResult==DialogResult.Cancel){
 					return;
 				}
-			}
-			else if(table.Rows[e.Row]["PayNum"].ToString()!="0"){
-				Payment pay=Payments.GetPayment(PIn.Long(table.Rows[e.Row]["PayNum"].ToString()));
-				/*if(pay.PayType==0){//provider income transfer. I don't think this is possible, but you never know.
-					FormProviderIncTrans FormPIT=new FormProviderIncTrans();
-					FormPIT.PatNum=PatCur.PatNum;
-					FormPIT.PaymentCur=pay;
-					FormPIT.IsNew=false;
-					FormPIT.ShowDialog();
-					if(FormPIT.DialogResult==DialogResult.Cancel){
-						return;
-					}
+				if(FormP.PayPlanChargeCur==null) {//The user deleted the payplancharge.
+					_listPayPlanCharges.Remove(payPlanCharge);//We know the payPlanCharge object is inside _listPayPlanCharges.
+					gridCharges.BeginUpdate();
+					gridCharges.Rows.RemoveAt(e.Row);
+					gridCharges.EndUpdate();
+					return;
 				}
-				else{*/
-				FormPayment FormPayment2=new FormPayment(PatCur,FamCur,pay);
+			}
+			else if(gridCharges.Rows[e.Row].Tag.GetType()==typeof(PaySplit)){
+				PaySplit paySplit=(PaySplit)gridCharges.Rows[e.Row].Tag;
+				FormPayment FormPayment2=new FormPayment(PatCur,FamCur,Payments.GetPayment(paySplit.PayNum));//FormPayment may inserts and/or update the paysplits. 
 				FormPayment2.IsNew=false;
 				FormPayment2.ShowDialog();
 				if(FormPayment2.DialogResult==DialogResult.Cancel){
 					return;
 				}
-				//}
 			}
-			else if(table.Rows[e.Row]["ClaimNum"].ToString()!="0") {
-				Claim claimCur=Claims.GetClaim(PIn.Long(table.Rows[e.Row]["ClaimNum"].ToString()));
-				FormClaimEdit FormCE=new FormClaimEdit(claimCur,PatCur,FamCur);
+			else if(gridCharges.Rows[e.Row].Tag.GetType()==typeof(DataRow)){//Claim payment or bundle.
+				DataRow bundledClaimProc=(DataRow)gridCharges.Rows[e.Row].Tag;
+				Claim claimCur=Claims.GetClaim(PIn.Long(bundledClaimProc["claimproc.ClaimNum"].ToString()));
+				FormClaimEdit FormCE=new FormClaimEdit(claimCur,PatCur,FamCur);//FormClaimEdit inserts and/or updates the claim and/or claimprocs, which could potentially change the bundle.
 				FormCE.IsNew=false;
 				FormCE.ShowDialog();
 				//Cancel from FormClaimEdit does not cancel payment edits, fill grid every time
@@ -1356,6 +1450,7 @@ namespace OpenDental{
 			if(FormP.DialogResult==DialogResult.Cancel){
 				return;
 			}
+			_listPayPlanCharges.Add(ppCharge);
 			FillCharges();
 		}
 
@@ -1363,7 +1458,7 @@ namespace OpenDental{
 			if(!MsgBox.Show(this,true,"Clear all charges from amortization schedule?")){
 				return;
 			}
-			PayPlanCharges.DeleteAllInPlan(PayPlanCur.PayPlanNum);
+			_listPayPlanCharges.Clear();
 			FillCharges();
 		}
 
@@ -1432,13 +1527,13 @@ namespace OpenDental{
 			tbl.Columns.Add("credits");
 			tbl.Columns.Add("balance");
 			DataRow row;
-			for(int i=0;i<table.Rows.Count;i++) {
+			for(int i=0;i<gridCharges.Rows.Count;i++) {
 				row=tbl.NewRow();
-				row["date"]=table.Rows[i]["date"].ToString();
-				row["description"]=table.Rows[i]["description"].ToString();
-				row["charges"]=table.Rows[i]["charges"].ToString();
-				row["credits"]=table.Rows[i]["credits"].ToString();
-				row["balance"]=table.Rows[i]["balance"].ToString();
+				row["date"]=gridCharges.Rows[i].Cells[0].Text;
+				row["description"]=gridCharges.Rows[i].Cells[1].Text;
+				row["charges"]=gridCharges.Rows[i].Cells[2].Text;
+				row["credits"]=gridCharges.Rows[i].Cells[3].Text;
+				row["balance"]=gridCharges.Rows[i].Cells[4].Text;
 				tbl.Rows.Add(row);
 			}
 			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
@@ -1475,7 +1570,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
-			if(table.Rows.Count==0) {
+			if(gridCharges.Rows.Count==0) {
 				MsgBox.Show(this,"An amortization schedule must be created first.");
 				return false;
 			}
@@ -1510,7 +1605,11 @@ namespace OpenDental{
 					clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
 				}
 			}
-			PayPlanCharges.SetProvAndClinic(PayPlanCur.PayPlanNum,provNum,clinicNum);
+			for(int i=0;i<_listPayPlanCharges.Count;i++) {
+				_listPayPlanCharges[i].ClinicNum=clinicNum;
+				_listPayPlanCharges[i].ProvNum=provNum;
+			}
+			PayPlanCharges.Sync(_listPayPlanCharges,PayPlanCur.PayPlanNum);
 			return true;
 		}
 
@@ -1543,6 +1642,37 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		///<summary>Sorts by the first column, as a date column, in ascending order.</summary>
+		private int ComparePayPlanRows(ODGridRow x,ODGridRow y) {
+			DateTime dateTimeX=DateTime.Parse(x.Cells[0].Text);
+			DateTime dateTimeY=DateTime.Parse(y.Cells[0].Text);
+			if(dateTimeX<dateTimeY) {
+				return -1;
+			}
+			else if(dateTimeX>dateTimeY) {
+				return 1;
+			}
+			else {//dateTimeX==dateTimeY
+				if(x.Cells[1].Text.Contains("Downpayment")) {
+					return -1;
+				}
+				//Show charges before credits on the same date.
+				if(x.Tag.GetType()==typeof(PayPlanCharge)) {//x is charge (Type.Equals doesn't seem to work in sorters for some reason)
+					if(y.Tag.GetType()==typeof(PaySplit) || y.Tag.GetType()==typeof(DataRow)) {//y is credit, x goes first
+						return -1;
+					}
+					//x and y are both charges (Not likely, they shouldn't have same dates)
+				}
+				else {//x is credit
+					if(y.Tag.GetType()==typeof(PayPlanCharge)) {//y is charge
+						return 1;
+					}
+					//x and y are both credits
+				}
+				return 0;
+			}
 		}
 
 		private void FormPayPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
