@@ -1324,10 +1324,13 @@ namespace OpenDental{
 			if(checkOnlyScheduledProvs.Checked && comboOpClinic.SelectedIndex>0) {
 				ApptViewCur.OnlyScheduledClinic=Clinics.List[comboOpClinic.SelectedIndex-1].ClinicNum;
 			}
-			//_listUserClinicNums will contain only a 0 if the clinics show feature is disabled
-			//if the user is not restricted to a clinic, the list will contain 0 in the first position since comboAssignedClinic will contain 'All'
-			//restricted users (Security.CurUser.ClinicsIsRestricted=true && Security.CurUser.ClinicNum>0) won't have access to the unassigned views (AssignedClinic=0)
-			ApptViewCur.AssignedClinic=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
+			ApptViewCur.AssignedClinic=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				//_listUserClinicNums will contain only a 0 if the clinics show feature is disabled
+				//if the user is not restricted to a clinic, the list will contain 0 in the first position since comboAssignedClinic will contain 'All'
+				//restricted users (Security.CurUser.ClinicsIsRestricted=true && Security.CurUser.ClinicNum>0) won't have access to the unassigned views (AssignedClinic=0)
+				ApptViewCur.AssignedClinic=_listUserClinicNums[comboAssignedClinic.SelectedIndex];
+			}
 			ApptViews.Update(ApptViewCur);//same whether isnew or not
 			DialogResult=DialogResult.OK;
 		}
