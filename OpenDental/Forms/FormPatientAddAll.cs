@@ -1650,7 +1650,7 @@ namespace OpenDental {
 				}
 				sub1=new InsSub();
 				sub1.PlanNum=selectedPlan1.PlanNum;
-				sub1.AssignBen=true;
+				sub1.AssignBen=PrefC.GetBool(PrefName.InsDefaultAssignBen);
 				sub1.ReleaseInfo=true;
 				sub1.DateEffective=DateTime.MinValue;
 				sub1.DateTerm=DateTime.MinValue;
@@ -1729,7 +1729,7 @@ namespace OpenDental {
 				}
 				sub2=new InsSub();
 				sub2.PlanNum=selectedPlan2.PlanNum;
-				sub2.AssignBen=true;
+				sub2.AssignBen=PrefC.GetBool(PrefName.InsDefaultAssignBen);
 				sub2.ReleaseInfo=true;
 				sub2.DateEffective=DateTime.MinValue;
 				sub2.DateTerm=DateTime.MinValue;
