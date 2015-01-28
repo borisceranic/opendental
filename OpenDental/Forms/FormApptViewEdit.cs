@@ -39,7 +39,6 @@ namespace OpenDental{
 		private List<long> displayedAvailableApptFieldDefs;
 		///<summary>The actual PatFieldDefNums of all available elements because no language translation is needed.</summary>
 		private List<long> displayedAvailablePatFieldDefs;
-		private System.Windows.Forms.ColorDialog colorDialog1;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textRowsPerIncr;
 		///<summary>A local list of ApptViewItems which are displayed in all three lists on the right.  Not updated to db until the form is closed.</summary>
@@ -126,7 +125,6 @@ namespace OpenDental{
 			this.butUp = new OpenDental.UI.Button();
 			this.butLeft = new OpenDental.UI.Button();
 			this.butRight = new OpenDental.UI.Button();
-			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textRowsPerIncr = new System.Windows.Forms.TextBox();
 			this.checkOnlyScheduledProvs = new System.Windows.Forms.CheckBox();
@@ -370,7 +368,7 @@ namespace OpenDental{
 			// labelOpClinic
 			// 
 			this.labelOpClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelOpClinic.Location = new System.Drawing.Point(78, 77);
+			this.labelOpClinic.Location = new System.Drawing.Point(77, 77);
 			this.labelOpClinic.Name = "labelOpClinic";
 			this.labelOpClinic.Size = new System.Drawing.Size(187, 17);
 			this.labelOpClinic.TabIndex = 61;
@@ -390,7 +388,7 @@ namespace OpenDental{
 			// labelAfterTime
 			// 
 			this.labelAfterTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelAfterTime.Location = new System.Drawing.Point(78, 55);
+			this.labelAfterTime.Location = new System.Drawing.Point(77, 55);
 			this.labelAfterTime.Name = "labelAfterTime";
 			this.labelAfterTime.Size = new System.Drawing.Size(187, 17);
 			this.labelAfterTime.TabIndex = 60;
@@ -408,7 +406,7 @@ namespace OpenDental{
 			// labelBeforeTime
 			// 
 			this.labelBeforeTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelBeforeTime.Location = new System.Drawing.Point(78, 33);
+			this.labelBeforeTime.Location = new System.Drawing.Point(77, 33);
 			this.labelBeforeTime.Name = "labelBeforeTime";
 			this.labelBeforeTime.Size = new System.Drawing.Size(187, 17);
 			this.labelBeforeTime.TabIndex = 58;
