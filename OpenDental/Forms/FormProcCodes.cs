@@ -1056,6 +1056,7 @@ namespace OpenDental{
 					Fees.Listt[Fees.Listt.IndexOf(fee)].Amount=dNew;
 				}
 			}
+			changed=true;//Cause a cache refresh signal to be sent on closing.
 			SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(fee.CodeNum)
 				+", "+Lan.g(this,"Fee: ")+""+fee.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(fee.FeeSched)
 				+". "+Lan.g(this,"Manual edit in grid from Procedure Codes list."),fee.CodeNum);
