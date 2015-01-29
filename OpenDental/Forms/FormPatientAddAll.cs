@@ -1337,7 +1337,7 @@ namespace OpenDental {
 			guar.Country=textCountry.Text;
 			guar.Zip=textZip.Text;
 			guar.AddrNote=textAddrNotes.Text;
-			guar.ClinicNum=Security.CurUser.ClinicNum;
+			guar.ClinicNum=FormOpenDental.ClinicNum;
 			Patients.Insert(guar,false);
 			CustReference custRef=new CustReference();
 			custRef.PatNum=guar.PatNum;
@@ -1403,7 +1403,7 @@ namespace OpenDental {
 				pat2.Country=textCountry.Text;
 				pat2.Zip=textZip.Text;
 				pat2.AddrNote=textAddrNotes.Text;
-				pat2.ClinicNum=Security.CurUser.ClinicNum;
+				pat2.ClinicNum=FormOpenDental.ClinicNum;;
 				pat2.Guarantor=guar.Guarantor;
 				Patients.Insert(pat2,false);
 				custRef=new CustReference();
@@ -1448,7 +1448,7 @@ namespace OpenDental {
 				pat3.Country=textCountry.Text;
 				pat3.Zip=textZip.Text;
 				pat3.AddrNote=textAddrNotes.Text;
-				pat3.ClinicNum=Security.CurUser.ClinicNum;
+				pat3.ClinicNum=FormOpenDental.ClinicNum;
 				pat3.Guarantor=guar.Guarantor;
 				Patients.Insert(pat3,false);
 				custRef=new CustReference();
@@ -1493,7 +1493,7 @@ namespace OpenDental {
 				pat4.Country=textCountry.Text;
 				pat4.Zip=textZip.Text;
 				pat4.AddrNote=textAddrNotes.Text;
-				pat4.ClinicNum=Security.CurUser.ClinicNum;
+				pat4.ClinicNum=FormOpenDental.ClinicNum;
 				pat4.Guarantor=guar.Guarantor;
 				Patients.Insert(pat4,false);
 				custRef=new CustReference();
@@ -1538,7 +1538,7 @@ namespace OpenDental {
 				pat5.Country=textCountry.Text;
 				pat5.Zip=textZip.Text;
 				pat5.AddrNote=textAddrNotes.Text;
-				pat5.ClinicNum=Security.CurUser.ClinicNum;
+				pat5.ClinicNum=FormOpenDental.ClinicNum;
 				pat5.Guarantor=guar.Guarantor;
 				Patients.Insert(pat5,false);
 				custRef=new CustReference();
