@@ -753,8 +753,6 @@ namespace OpenDental{
 			}
 			//Rate 2 Time -----------------------------
 			textRate2Auto.Text=ClockEvents.Format(ClockEventCur.Rate2Auto);
-			//notes ------------------------------------------------------------------------------------
-			textNote.Text=ClockEventCur.Note;
 		}
 
 /////<summary>Does not alter the overrides, but only the auto calc boxes.  Triggered by many things on this form.  It's better to have it be triggered too frequently than to miss something.</summary>
