@@ -696,7 +696,7 @@ namespace OpenDental{
 			//Regular Time -----------------------------
 			if(clockedTime>TimeSpan.Zero) {
 				TimeSpan regularTime=clockedTime
-					+(ClockEventCur.AdjustIsOverridden								?ClockEventCur.Adjust		:ClockEventCur.AdjustAuto)
+					+(ClockEventCur.AdjustIsOverridden                ?ClockEventCur.Adjust   :ClockEventCur.AdjustAuto)
 					-(ClockEventCur.OTimeHours==TimeSpan.FromHours(-1)?ClockEventCur.OTimeAuto:ClockEventCur.OTimeHours);
 				textRegTime.Text=ClockEvents.Format(regularTime);
 			}
@@ -715,7 +715,6 @@ namespace OpenDental{
 			else {
 				textRate2Hours.Text=ClockEvents.Format(ClockEventCur.Rate2Hours);
 			}
-			
 			//notes ------------------------------------------------------------------------------------
 			textNote.Text=ClockEventCur.Note;
 		}
@@ -740,7 +739,7 @@ namespace OpenDental{
 			//Regular Time -----------------------------
 			if(clockedTime>TimeSpan.Zero) {
 				TimeSpan regularTime=clockedTime
-					+(ClockEventCur.AdjustIsOverridden								?ClockEventCur.Adjust		:ClockEventCur.AdjustAuto)
+					+(ClockEventCur.AdjustIsOverridden                ?ClockEventCur.Adjust   :ClockEventCur.AdjustAuto)
 					-(ClockEventCur.OTimeHours==TimeSpan.FromHours(-1)?ClockEventCur.OTimeAuto:ClockEventCur.OTimeHours);
 				textRegTime.Text=ClockEvents.Format(regularTime);
 			}
@@ -753,83 +752,8 @@ namespace OpenDental{
 			}
 			//Rate 2 Time -----------------------------
 			textRate2Auto.Text=ClockEvents.Format(ClockEventCur.Rate2Auto);
-			//notes ------------------------------------------------------------------------------------
-			textNote.Text=ClockEventCur.Note;
 		}
 
-/////<summary>Does not alter the overrides, but only the auto calc boxes.  Triggered by many things on this form.  It's better to have it be triggered too frequently than to miss something.</summary>
-		//private void FillTimeSpans() {
-		//	if(ClockEventCur.ClockStatus==TimeClockStatus.Break){//TimeSpans not showing
-		//		return;
-		//	}
-		//	if(textTimeEntered2.Text=="" || textTimeDisplayed2.Text=="") {
-		//		textClockedTime.Text="";
-		//		textRegTime.Text="";
-		//		return;
-		//	}
-		//	try{
-		//		DateTime.Parse(textTimeDisplayed1.Text);//because this must always be valid
-		//		DateTime.Parse(textTimeDisplayed2.Text);//this must also be filled in order to calculate timespans
-		//	}
-		//	catch{//an invalid date/time.
-		//		//textTotalHours.Text="";
-		//		//textRegTime.Text="";
-		//		return;
-		//	}
-		//	DateTime dt1=DateTime.Parse(textTimeDisplayed1.Text);
-		//	DateTime dt2=DateTime.Parse(textTimeDisplayed2.Text);
-		//	if(dt1 > dt2){
-		//		return;
-		//	}
-		//	TimeSpan clockedTime=dt2-dt1;
-		//	textClockedTime.Text=ClockEvents.Format(clockedTime);
-		//	TimeSpan overtime=ClockEventCur.OTimeAuto;
-		//	if(textOTimeHours.Text!="") {
-		//		try {
-		//			if(textOTimeHours.Text.Contains(":")) {
-		//				overtime=TimeSpan.Parse(textOTimeHours.Text);
-		//			}
-		//			else {
-		//				overtime=TimeSpan.FromHours(Double.Parse(textOTimeHours.Text));
-		//			}
-		//		}
-		//		catch {
-		//			return;
-		//		}
-		//	}
-		//	TimeSpan adjust=ClockEventCur.AdjustAuto;
-		//	if(textAdjust.Text!="") {
-		//		try {
-		//			if(textAdjust.Text.Contains(":")) {
-		//				adjust=TimeSpan.Parse(textAdjust.Text);
-		//			}
-		//			else {
-		//				adjust=TimeSpan.FromHours(Double.Parse(textAdjust.Text));
-		//			}
-		//		}
-		//		catch {
-		//			return;
-		//		}
-		//	}
-		//	TimeSpan regTime=clockedTime-overtime+adjust;//adjust is typically a negative value
-		//	if(regTime<TimeSpan.Zero) {
-		//		textRegTime.Text="";
-		//		return;
-		//	}
-		//	textRegTime.Text=ClockEvents.Format(regTime);
-		//	//if(ClockEventCur.AmountBonusAuto==-1) {
-		//	//  textAmountBonusAuto.Text="";
-		//	//}
-		//	//else {
-		//	//  textAmountBonusAuto.Text=ClockEventCur.AmountBonusAuto.ToString("f");
-		//	//}
-		//	//if(ClockEventCur.AmountBonus==-1) {
-		//	//  textAmountBonus.Text="";
-		//	//}
-		//	//else {
-		//	//  textAmountBonus.Text=ClockEventCur.AmountBonus.ToString("f");
-		//	//}
-		//}
 		private void textTimeDisplayed2_TextChanged(object sender,EventArgs e) {
 			try {
 				ClockEventCur.TimeDisplayed2=DateTime.Parse(textTimeDisplayed2.Text);
@@ -1109,61 +1033,5 @@ namespace OpenDental{
 			DialogResult=DialogResult.Cancel;
 		}
 
-		
-
-		
-
-		
-
-		
-
-		
-	
-
-		
-
-		
-
-	
-
-
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
