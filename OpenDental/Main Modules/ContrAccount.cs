@@ -2901,7 +2901,7 @@ namespace OpenDental {
 					return;
 				}
 			}
-			bool allAreProcedures=true;
+			bool allAreProcedures=true;//In Canada, this will also be true if the user selected labs.
 			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
 				if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()=="0"){
 					allAreProcedures=false;
@@ -2911,8 +2911,11 @@ namespace OpenDental {
 				MsgBox.Show(this,"You can only select procedures.");
 				return;
 			}
-			//At this point, all selected items are procedures.
+			//At this point, all selected items are procedures.  In Canada, the selections may also include labs.
 			InsCanadaValidateProcs(procsForPat,table);
+			if(gridAccount.SelectedIndices.Length<1){
+				return;
+			}
 			string claimType="P";
 			if(PatPlanList.Count==1 && PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0) {//if there's exactly one medical plan
 				claimType="Med";
