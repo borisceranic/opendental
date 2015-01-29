@@ -1043,19 +1043,35 @@ namespace OpenDental{
 				fee.CodeNum=codeNum;
 				fee.Amount=dNew;
 				Fees.Insert(fee);
-				Fees.Listt.Add(fee);
+				List<Fee> listFees=Fees.GetListt();
+				listFees.Add(fee);
+				Fees.Listt=listFees;
 			}
 			else {//if fee existed
 				if(strNew=="") {//delete old fee
 					Fees.Delete(fee);
-					Fees.Listt.Remove(fee);
+					List<Fee> listFees=Fees.GetListt();
+					for(int i=0;i<listFees.Count;i++) {
+						if(listFees[i].FeeNum==fee.FeeNum) {
+							listFees.RemoveAt(i);
+							break;
+						}
+					}
+					Fees.Listt=listFees;
 				}
 				else {//change fee
-					fee.Amount=dNew;
-					Fees.Update(fee);
-					Fees.Listt[Fees.Listt.IndexOf(fee)].Amount=dNew;
+					List<Fee> listFees=Fees.GetListt();
+					for(int i=0;i<listFees.Count;i++) {
+						if(listFees[i].FeeNum==fee.FeeNum) {
+							listFees[i].Amount=dNew;
+							Fees.Update(listFees[i]);
+							Fees.Listt=listFees;
+							break;
+						}
+					}
 				}
 			}
+			changed=true;//Cause a cache refresh signal to be sent on closing.
 			SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(fee.CodeNum)
 				+", "+Lan.g(this,"Fee: ")+""+fee.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(fee.FeeSched)
 				+". "+Lan.g(this,"Manual edit in grid from Procedure Codes list."),fee.CodeNum);
