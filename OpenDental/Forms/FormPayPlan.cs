@@ -68,7 +68,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkIns;
 		private System.Windows.Forms.Label labelGuarantor;
 		private System.Windows.Forms.Label labelInsPlan;
-		///<summary>Only used for new payment plan.  Pass in the starting amount.</summary>
+		///<summary>Only used for new payment plan.  Pass in the starting amount.  Usually the patient account balance.</summary>
 		public double TotalAmt;
 		///<summary>Family for the patient of this payplan.  Used to display insurance info.</summary>
 		private Family FamCur;
@@ -904,7 +904,7 @@ namespace OpenDental{
 				_listPayPlanCharges=PayPlanCharges.GetForPayPlan(PayPlanCur.PayPlanNum);
 			}
 			textAPR.Text=PayPlanCur.APR.ToString();
-			AmtPaid=PayPlans.GetAmtPaid(PayPlanCur.PayPlanNum);
+			AmtPaid=PayPlans.GetAmtPaid(PayPlanCur.PayPlanNum);//Only counts amount paid for Patient Payment Plans and not Insurance Payment Plans.  Could be changed in the future
 			textAmtPaid.Text=AmtPaid.ToString("f");
 			textCompletedAmt.Text=PayPlanCur.CompletedAmt.ToString("f");
 			textNote.Text=PayPlanCur.Note;
@@ -945,12 +945,8 @@ namespace OpenDental{
 			gridCharges.Columns.Add(col);
 			gridCharges.Rows.Clear();					
 			List<ODGridRow> listPayPlanRows=new List<ODGridRow>();
-			int payPlanChargeOrdinal=1;
 			for(int i=0;i<_listPayPlanCharges.Count;i++){//Payplan Charges
-				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],payPlanChargeOrdinal));
-				if(!listPayPlanRows[i].Cells[1].Text.Contains("Downpayment")) {
-					payPlanChargeOrdinal++;
-				}
+				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],i+1));
 			}
 			if(PayPlanCur.PlanNum==0) {//Normal payplan
 				List<PaySplit> listPaySplits=new List<PaySplit>();
@@ -991,7 +987,7 @@ namespace OpenDental{
 			}
 			gridCharges.EndUpdate();
 			double balanceAmt=0;
-			for(int i=0;i<gridCharges.Rows.Count;i++){//Filling row cells with balance information and coloring them green.
+			for(int i=0;i<gridCharges.Rows.Count;i++){//Filling row cells with balance information.
 				if(gridCharges.Rows[i].Cells[2].Text!="") {//Charge
 					balanceAmt+=Convert.ToDouble(gridCharges.Rows[i].Cells[2].Text);
 				}
@@ -1025,15 +1021,12 @@ namespace OpenDental{
 		}
 
 		private ODGridRow CreateRowForPayPlanCharge(PayPlanCharge payPlanCharge,int payPlanChargeOrdinal) {
-			string descript="#"+payPlanChargeOrdinal+" ";
+			string descript="#"+payPlanChargeOrdinal;
 			if(payPlanCharge.Interest!=0) {
-				descript+="Interest: "+payPlanCharge.Interest.ToString("n");
+				descript+=" Interest: "+payPlanCharge.Interest.ToString("n");
 			}
 			if(payPlanCharge.Note!="") {
-				if(descript!="") {
-					descript+="  ";
-				}
-				descript+=payPlanCharge.Note;
+				descript+=" "+payPlanCharge.Note;
 			}
 			ODGridRow row=new ODGridRow();//Charge row
 			row.Cells.Add(payPlanCharge.ChargeDate.ToShortDateString());//Date
@@ -1271,7 +1264,7 @@ namespace OpenDental{
 				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
 				ppCharge.Guarantor=PayPlanCur.Guarantor;
 				ppCharge.PatNum=PayPlanCur.PatNum;
-				ppCharge.ChargeDate=PIn.DateT(textDateFirstPay.Text);
+				ppCharge.ChargeDate=DateTimeOD.Today;
 				ppCharge.Interest=0;
 				ppCharge.Principal=downpayment;
 				ppCharge.Note=Lan.g(this,"Downpayment");
@@ -1459,7 +1452,9 @@ namespace OpenDental{
 				return;
 			}
 			_listPayPlanCharges.Clear();
-			FillCharges();
+			gridCharges.BeginUpdate();
+			gridCharges.Rows.Clear();
+			gridCharges.EndUpdate();
 		}
 
 		private void butPrint_Click(object sender, System.EventArgs e) {
@@ -1654,25 +1649,21 @@ namespace OpenDental{
 			else if(dateTimeX>dateTimeY) {
 				return 1;
 			}
-			else {//dateTimeX==dateTimeY
-				if(x.Cells[1].Text.Contains("Downpayment")) {
+			//dateTimeX==dateTimeY
+			//Show charges before credits on the same date.
+			if(x.Tag.GetType()==typeof(PayPlanCharge)) {//x is charge (Type.Equals doesn't seem to work in sorters for some reason)
+				if(y.Tag.GetType()==typeof(PaySplit) || y.Tag.GetType()==typeof(DataRow)) {//y is credit, x goes first
 					return -1;
 				}
-				//Show charges before credits on the same date.
-				if(x.Tag.GetType()==typeof(PayPlanCharge)) {//x is charge (Type.Equals doesn't seem to work in sorters for some reason)
-					if(y.Tag.GetType()==typeof(PaySplit) || y.Tag.GetType()==typeof(DataRow)) {//y is credit, x goes first
-						return -1;
-					}
-					//x and y are both charges (Not likely, they shouldn't have same dates)
-				}
-				else {//x is credit
-					if(y.Tag.GetType()==typeof(PayPlanCharge)) {//y is charge
-						return 1;
-					}
-					//x and y are both credits
-				}
-				return 0;
+				//x and y are both charges (Not likely, they shouldn't have same dates)
 			}
+			else {//x is credit
+				if(y.Tag.GetType()==typeof(PayPlanCharge)) {//y is charge
+					return 1;
+				}
+				//x and y are both credits
+			}
+			return x.Cells[1].Text.CompareTo(y.Cells[1].Text);//Sort by description.  This orders the payment plan charges which are on the same date by their charge number.  Might order payments by check number as well.
 		}
 
 		private void FormPayPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

@@ -183,7 +183,7 @@ namespace OpenDentBusiness{
 					+"FROM paysplit "
 					+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
 					+"WHERE paysplit.PayPlanNum="+POut.Long(payPlanNum)+" "
-					+"ORDER BY ProcDate";
+					+"ORDER BY ProcDate"; 
 			DataTable tableSplits=Db.GetTable(command);
 			listPaySplits.Clear();
 			listPaySplits.AddRange(Crud.PaySplitCrud.TableToList(tableSplits));

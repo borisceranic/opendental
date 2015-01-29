@@ -313,7 +313,7 @@ namespace OpenDental{
 			}
 			else{
 				DialogResult=DialogResult.OK;
-				PayPlanChargeCur=null;//Setting this null so we know to get rid of it when the form closes.
+				PayPlanChargeCur=null;//Setting this null so we know to get rid of it when the form closes. 
 			}
 		}
 
