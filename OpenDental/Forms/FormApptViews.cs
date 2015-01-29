@@ -314,7 +314,7 @@ namespace OpenDental{
 			_listApptViews=new List<ApptView>();
 			string F;
 			for(int i=0;i<ApptViewC.List.Length;i++){
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && _clinicNum!=ApptViewC.List[i].AssignedClinic) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && _clinicNum!=ApptViewC.List[i].ClinicNum) {
 					continue;//only add views assigned to the clinic selected
 				}
 				if(listViews.Items.Count<12)
@@ -353,7 +353,7 @@ namespace OpenDental{
 			FormApptViewEdit FormAVE=new FormApptViewEdit();
 			FormAVE.ApptViewCur=ApptViewCur;
 			FormAVE.IsNew=true;
-			FormAVE.AssignedClinicNum=_clinicNum;
+			FormAVE.ClinicNum=_clinicNum;
 			FormAVE.ShowDialog();
 			if(FormAVE.DialogResult!=DialogResult.OK){
 				return;
@@ -371,7 +371,7 @@ namespace OpenDental{
 			ApptView ApptViewCur=_listApptViews[listViews.SelectedIndex];
 			FormApptViewEdit FormAVE=new FormApptViewEdit();
 			FormAVE.ApptViewCur=ApptViewCur;
-			FormAVE.AssignedClinicNum=_clinicNum;
+			FormAVE.ClinicNum=_clinicNum;
 			FormAVE.ShowDialog();
 			if(FormAVE.DialogResult!=DialogResult.OK){
 				return;

@@ -6965,30 +6965,6 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SignalLastClearedDate',TO_DATE('0001-01-01','YYYY-MM-DD'))";
 					Db.NonQ(command);
 				}
-				 if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE apptview CHANGE ClinicNum OnlyScheduledClinic bigint NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE apptview RENAME COLUMN ClinicNum TO OnlyScheduledClinic";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE apptview ADD AssignedClinic bigint NOT NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE apptview ADD INDEX (AssignedClinic)";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE apptview ADD AssignedClinic number(20)";
-					Db.NonQ(command);
-					command="UPDATE apptview SET AssignedClinic = 0 WHERE AssignedClinic IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE apptview MODIFY AssignedClinic NOT NULL";
-					Db.NonQ(command);
-					command=@"CREATE INDEX apptview_AssignedClinic ON apptview (AssignedClinic)";
-					Db.NonQ(command);
-				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref ADD ClinicNum bigint NOT NULL";
 					Db.NonQ(command);
@@ -7043,47 +7019,54 @@ namespace OpenDentBusiness {
 				//after converting data in RecentApptView to ApptViewNum, drop the RecentApptView column
 				command="ALTER TABLE computerpref DROP COLUMN RecentApptView";
 				Db.NonQ(command);
-				#region Duplicate view for clinic if all ops in view are assigned to one clinic
+				#region Duplicate Views for Clinics
+				//Any apptviews with a ClinicNum set will need to have an apptviewitem for each clinic associated to that clinic.
+				//For any views that contained an operatory and were "assigned to a clinic", they will no longer have access to that operatory.  This is expected behavior with our new clinic filtering.
+				//Once all clinic apptviews are moved out of the 'Headquarters' view, we'll need to go back through the 'Headquarters' apptview list and fix the ItemOrders.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					//All existing apptviews will have the AssignedClinic set to 0 and will therefore exist in the list of apptviews not assigned to a clinic.
-					//For all apptviews with operatories assigned, where all operatories in the view are assigned to one clinic, the view will be duplicated and assigned to that clinic.
-					//If the view contains an operatory that is not assigned to a clinic, or if there are operatories in the view from more than one clinic,
-					//the view cannot be assigned to a clinic and will only be in the unassigned list.
-					command="SELECT apptview.ApptViewNum,MAX(operatory.ClinicNum) AS ClinicNum FROM apptview "
-					+"INNER JOIN apptviewitem ON apptview.ApptViewNum=apptviewitem.ApptViewNum AND apptviewitem.OpNum>0 "
-					+"INNER JOIN operatory ON operatory.OperatoryNum=apptviewitem.OpNum "
-					+"GROUP BY apptview.ApptViewNum "
-					+"HAVING COUNT(DISTINCT operatory.ClinicNum)=1 AND MAX(operatory.ClinicNum)>0";
-					DataTable tableApptViewNumOpNum=Db.GetTable(command);
-					for(int i=0;i<tableApptViewNumOpNum.Rows.Count;i++) {
-						long apptViewNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ApptViewNum"].ToString());
-						long clinicNum=PIn.Long(tableApptViewNumOpNum.Rows[i]["ClinicNum"].ToString());
-						command="INSERT INTO apptview (ApptViewNum,Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
-						+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,AssignedClinic) "
-						+"(SELECT (SELECT MAX(ApptViewNum)+1 FROM apptview),Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,"
-						+"OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,OnlyScheduledClinic,"+POut.Long(clinicNum)+" "
-						+"FROM apptview WHERE ApptViewNum="+POut.Long(apptViewNum)+")";
-						long viewnum=Db.NonQ(command,true);
-						command="SELECT ApptViewItemNum FROM apptviewitem WHERE ApptViewNum="+POut.Long(apptViewNum);
-						DataTable tableApptViewItemNums=Db.GetTable(command);
-						for(int j=0;j<tableApptViewItemNums.Rows.Count;j++) {
-							long viewItemNum=PIn.Long(tableApptViewItemNums.Rows[j]["ApptViewItemNum"].ToString());
-							command="INSERT INTO apptviewitem (ApptViewItemNum,ApptViewNum,OpNum,ProvNum,ElementDesc,"
-						+"ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum) "
-						+"(SELECT (SELECT MAX(ApptViewItemNum)+1 FROM apptviewitem),"+POut.Long(viewnum)+",OpNum,ProvNum,"
-						+"ElementDesc,ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum "
-						+"FROM apptviewitem WHERE ApptViewItemNum="+POut.Long(viewItemNum)+")";
-							Db.NonQ(command);
+					//Start by grabbing all apptviews with a clinic set.
+					command="SELECT apptview.ApptViewNum,apptview.ClinicNum FROM apptview WHERE apptview.ClinicNum > 0";
+					DataTable tableApptViewClinics=Db.GetTable(command);
+					Dictionary<long,DataTable> dictOpsForClinics=new Dictionary<long,DataTable>();//Key = ClinicNum, Value= DataTable of OperatoryNums for the specified clinic.
+					for(int i=0;i<tableApptViewClinics.Rows.Count;i++) {
+						DataTable tableClinicOpNums=null;
+						long clinicNum=PIn.Long(tableApptViewClinics.Rows[i]["ClinicNum"].ToString());
+						//Now that we have a list of apptviews that will be moved into their own sub lists, we need to clear out any current operatories and replace them with ALL ops for that clinic.
+						//Check to see if we've already gone to the database to retrieve all operatories for the clinic for this apptview
+						if(dictOpsForClinics.ContainsKey(clinicNum)) {
+							tableClinicOpNums=dictOpsForClinics[clinicNum];
 						}
+						else {
+							command="SELECT OperatoryNum FROM operatory WHERE operatory.ClinicNum="+tableApptViewClinics.Rows[i]["ClinicNum"].ToString();
+							tableClinicOpNums=Db.GetTable(command);
+							dictOpsForClinics.Add(clinicNum,tableClinicOpNums);
+						}
+						if(tableClinicOpNums.Rows.Count==0) {
+							//There is no such thing as an apptview with no operatory selected.  If there are no ops for this particular clinic, we must remove the clinic filter so that they can manually set it later.
+							command="UPDATE apptview SET apptview.ClinicNum=0 WHERE apptview.ApptViewNum="+tableApptViewClinics.Rows[i]["ApptViewNum"].ToString();
+							Db.NonQ(command);
+							continue;
+						}
+						//Remove all current apptviewitems that are for 'ops'.  We have to remove them all because they might be for ops that are not associated to the apptview's clinic.
+						command="DELETE FROM apptviewitem "
+							+"WHERE apptviewitem.ApptViewNum="+tableApptViewClinics.Rows[i]["ApptViewNum"].ToString()+" "
+							+"AND apptviewitem.OpNum > 0";
+						Db.NonQ(command);
+						//Add an 'op' apptviewitem for every single operatory that is associated to the apptview's clinic.
+						command="";
+						for(int j=0;j<tableClinicOpNums.Rows.Count;j++) {
+							command+="INSERT INTO apptviewitem (ApptViewNum,OpNum) VALUES ("+tableApptViewClinics.Rows[i]["ApptViewNum"].ToString()+","+tableClinicOpNums.Rows[j]["OperatoryNum"].ToString()+");\r\n";
+						}
+						Db.NonQ(command);//Bulk inserts are not Oracle compatible with this current syntax.
 					}
-					//set the item orders for each clinic's assigned views.
-					command="SELECT * FROM apptview ORDER BY AssignedClinic,ItemOrder";
-					DataTable tableViews=Db.GetTable(command);
+					//Update item orders for all apptviews split up into sub groups by clinic.
+					command="SELECT ApptViewNum,ClinicNum FROM apptview ORDER BY ClinicNum,ItemOrder";
+					DataTable tableClinicViewsOrdered=Db.GetTable(command);
 					long clinicNumPrev=0;
 					int itemOrderCur=0;
-					for(int i=0;i<tableViews.Rows.Count;i++) {
-						long clinicNumCur=PIn.Long(tableViews.Rows[i]["AssignedClinic"].ToString());
-						long apptViewNumCur=PIn.Long(tableViews.Rows[i]["ApptViewNum"].ToString());
+					for(int i=0;i<tableClinicViewsOrdered.Rows.Count;i++) {
+						long clinicNumCur=PIn.Long(tableClinicViewsOrdered.Rows[i]["ClinicNum"].ToString());
+						long apptViewNumCur=PIn.Long(tableClinicViewsOrdered.Rows[i]["ApptViewNum"].ToString());
 						if(i==0 || clinicNumCur!=clinicNumPrev) {
 							itemOrderCur=0;
 							clinicNumPrev=clinicNumCur;

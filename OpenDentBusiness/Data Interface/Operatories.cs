@@ -97,6 +97,19 @@ namespace OpenDentBusiness{
 			}
 			return null;
 		}
+
+		///<summary>Get all non-hidden operatories for the clinic passed in.</summary>
+		public static List<Operatory> GetForClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Operatory> listRetVal=new List<Operatory>();
+			List<Operatory> listOpsShort=OperatoryC.GetListShort();
+			for(int i=0;i<listOpsShort.Count;i++) {
+				if(listOpsShort[i].ClinicNum==clinicNum) {
+					listRetVal.Add(listOpsShort[i].Copy());
+				}
+			}
+			return listRetVal;
+		}
 		
 	
 	}
