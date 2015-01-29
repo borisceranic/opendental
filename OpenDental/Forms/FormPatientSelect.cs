@@ -1246,7 +1246,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				PatCur.Gender=PatientGender.Unknown;
 			}
-			PatCur.ClinicNum=Security.CurUser.ClinicNum;
+			PatCur.ClinicNum=FormOpenDental.ClinicNum;
 			Patients.Insert(PatCur,false);
 			CustReference custRef=new CustReference();
 			custRef.PatNum=PatCur.PatNum;
