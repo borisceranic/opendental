@@ -127,7 +127,7 @@ namespace OpenDental{
 						//Add all the ops for this 'sched' to the list of visible ops
 						for(int p=0;p<listSchedOps.Count;p++) {
 							//Filter the ops if the clinic option was set for the appt view.
-							if(ApptViewCur.OnlyScheduledClinic>0 && ApptViewCur.OnlyScheduledClinic!=Operatories.GetOperatory(listSchedOps[p]).ClinicNum) {
+							if(ApptViewCur.ClinicNum>0 && ApptViewCur.ClinicNum!=Operatories.GetOperatory(listSchedOps[p]).ClinicNum) {
 								continue;
 							}
 							if(listSchedOps[p]==OperatoryC.ListShort[i].OperatoryNum) {
@@ -143,7 +143,7 @@ namespace OpenDental{
 						//If the provider is not scheduled to any op(s), add their default op(s).
 						if(OperatoryC.ListShort[i].ProvDentist==dailySched[s].ProvNum && listSchedOps.Count==0) {//only if the sched does not specify any ops
 							//Only add the op if the clinic option was not set in the appt view or if the op is assigned to that clinic.
-							if(ApptViewCur.OnlyScheduledClinic==0 || ApptViewCur.OnlyScheduledClinic==OperatoryC.ListShort[i].ClinicNum) {
+							if(ApptViewCur.ClinicNum==0 || ApptViewCur.ClinicNum==OperatoryC.ListShort[i].ClinicNum) {
 								indexOp=Operatories.GetOrder(OperatoryC.ListShort[i].OperatoryNum);
 								if(indexOp!=-1 && !ApptDrawing.VisOps.Contains(OperatoryC.ListShort[i])) {
 									ApptDrawing.VisOps.Add(OperatoryC.ListShort[i]);

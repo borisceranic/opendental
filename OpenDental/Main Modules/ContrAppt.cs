@@ -173,8 +173,6 @@ namespace OpenDental {
 		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
 		//This list will contain the same number of items as comboView minus 1 for 'none'.
 		private List<ApptView> _listApptViews;
-		///<summary>List of operatories in the currently selected view, disregarding the Only show ops for scheduled provs check box.  Also will not include hidden ops.  Used to fill the waiting room based on the currently selected ApptView.</summary>
-		private List<Operatory> _listOpsInView;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -1349,20 +1347,6 @@ namespace OpenDental {
 				viewCur=_listApptViews[comboView.SelectedIndex-1];
 			}
 			ApptViewItemL.GetForCurView(viewCur,ApptDrawing.IsWeeklyView,SchedListPeriod);
-			_listOpsInView=new List<Operatory>();
-			for(int i=0;i<OperatoryC.ListShort.Count;i++) {
-				if(viewCur==null) {//if the 'none' view is selected
-					if(PrefC.GetBool(PrefName.EasyNoClinics) //if clinics is disabled
-						|| FormOpenDental.ClinicNum==0 //or the clinic 'Headquarters' is selected
-						|| OperatoryC.ListShort[i].ClinicNum==FormOpenDental.ClinicNum) // or the op is assigned to the selected clinic
-					{
-						_listOpsInView.Add(OperatoryC.ListShort[i].Copy()); //add the op to the list of ops visible
-					}
-				}
-				else if(ApptViewItemL.OpIsInView(OperatoryC.ListShort[i].OperatoryNum)) {//or if the op is in the selected view
-					_listOpsInView.Add(OperatoryC.ListShort[i].Copy()); //add the op to the list of ops visible
-				}
-			}
 		}
 
 		/// <summary>Called from both ModuleSelected and from RefreshPeriod.  Do not call it from any event like Layout.  This also clears listConfirmed.</summary>
@@ -1923,7 +1907,9 @@ namespace OpenDental {
 			comboView.Items.Add(Lan.g(this,"none"));
 			string f="";
 			for(int i=0;i<ApptViewC.List.Length;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=ApptViewC.List[i].AssignedClinic) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=ApptViewC.List[i].ClinicNum) {
+					//This is intentional, we do NOT want 'Headquarters' to have access to clinic specific apptviews.  
+					//Likewise, we do not want clinic specific views to be accessible from specific clinic filters.
 					continue;
 				}
 				_listApptViews.Add(ApptViewC.List[i].Copy());
@@ -2153,6 +2139,10 @@ namespace OpenDental {
 			}
 			TimeSpan delta=DateTime.Now-LastTimeDataRetrieved;
 			DataTable table=DS.Tables["WaitingRoom"];
+			List<Operatory> listOpsForClinic=new List<Operatory>();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				listOpsForClinic=Operatories.GetForClinic(FormOpenDental.ClinicNum);
+			}
 			gridWaiting.BeginUpdate();
 			gridWaiting.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableApptWaiting","Patient"),130);
@@ -2163,10 +2153,11 @@ namespace OpenDental {
 			DateTime waitTime;
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				//We only want to filter the waiting room by the clinic's operatories when clinics are enabled and they are not using 'Headquarters' mode.
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=0) {
 					bool isInView=false;
-					for(int j=0;j<_listOpsInView.Count;j++) {
-						if(_listOpsInView[j].OperatoryNum==PIn.Long(table.Rows[i]["OpNum"].ToString())) {
+					for(int j=0;j<listOpsForClinic.Count;j++) {
+						if(listOpsForClinic[j].OperatoryNum==PIn.Long(table.Rows[i]["OpNum"].ToString())) {
 							isInView=true;
 							break;
 						}
