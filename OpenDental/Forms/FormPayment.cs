@@ -1814,6 +1814,7 @@ namespace OpenDental {
 				}
 				if(listPayType.SelectedIndex==-1) {
 					MsgBox.Show(this,"A payment type must be selected.");
+					return;
 				}
 			}
 			if(IsNew) {
