@@ -7005,12 +7005,17 @@ namespace OpenDentBusiness {
 				for(int i=0;i<tableCompPrefs.Rows.Count;i++) {
 					try {
 						long compPrefNum=PIn.Long(tableCompPrefs.Rows[i]["ComputerPrefNum"].ToString());
+						//The computer preference 'RecentApptView' column is stored as a byte that represents the selected index of the apptview within the appt view combo box.  It is 1 based.
 						int apptViewIndex=PIn.Int(tableCompPrefs.Rows[i]["RecentApptView"].ToString());
-						long apptViewNum=PIn.Long(tableApptViews.Rows[apptViewIndex]["ApptViewNum"].ToString());
+						long apptViewNum=0;//Default to 'none' view.
+						if(apptViewIndex > 0 && apptViewIndex<=tableApptViews.Rows.Count) {
+							apptViewIndex--;//Subtract 1 from apptViewIndex because RecentApptView is 1 based and we need to treat it 0 based.  If it is already zero, let it go through.
+							apptViewNum=PIn.Long(tableApptViews.Rows[apptViewIndex]["ApptViewNum"].ToString());//Get the apptview based on the index of the old RecentApptView computer preference.
+						}
 						command="UPDATE computerpref SET ApptViewNum="+POut.Long(apptViewNum)+" WHERE ComputerPrefNum="+POut.Long(compPrefNum);
 						Db.NonQ(command);
 					}
-					catch {
+					catch(Exception) {
 						//Don't fail the upgrade for failing to set a default appt view for this computer.
 						//The worst that could happen is first user to log into this computer will see a default "none" view.
 						//Keep trying to set defaults for subsequent computers.
