@@ -899,7 +899,7 @@ namespace OpenDental {
 				comboTaskPriorities.SelectedIndex=comboTaskPriorities.Items.Count-1;
 				_pritoryDefNumSelected=_listTaskPriorities[_listTaskPriorities.Count-1].DefNum;
 			}
-			if(IsNew && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Set to triage blue if HQ, triage list, and is new.
+			if(TaskListCur!=null && IsNew && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Set to triage blue if HQ, triage list, and is new.
 				for(int i=0;i<_listTaskPriorities.Count;i++) {
 					if(_listTaskPriorities[i].DefNum==_triageBlueNum) {//Finding the option that is triageBlue to select it in the combobox (Combobox mirrors _listTaskPriorityDefs)
 						comboTaskPriorities.SelectedIndex=i;
@@ -970,7 +970,7 @@ namespace OpenDental {
 			ODGridRow row;
 			NoteList=TaskNotes.GetForTask(TaskCur.TaskNum);
 			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+			if(TaskListCur!=null && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				if(_numNotes==-1) {//Only fill _numNotes here the first time FillGrid is called.  This is used for coloring triage tasks.
 					_numNotes=NoteList.Count;
 				}
@@ -1118,7 +1118,7 @@ namespace OpenDental {
 		///<summary>Handles changing a triage task from red or blue depending on which color button was pushed.</summary>
 		private void UpdateDescriptForColor(string color) {
 			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
+			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
 				return;
 			}
 			int textDescriptCursorPosition=textDescript.SelectionStart;
@@ -1177,7 +1177,7 @@ namespace OpenDental {
 			_pritoryDefNumSelected=_listTaskPriorities[comboTaskPriorities.SelectedIndex].DefNum;
 			butColor.BackColor=DefC.GetColor(DefCat.TaskPriorities,_pritoryDefNumSelected);//Change the color swatch so people know the priority's color
 			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
+			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
 				return;
 			}
 			if(IsNew && textDescript.Text.Trim()=="") {
@@ -1223,7 +1223,7 @@ namespace OpenDental {
 		///<summary>Looks at the text in the description, and correctly sets comboTaskPriorities based on what color it should be.</summary>
 		private void UpdateTaskPriorityForTriageBasedOnDescript() {
 			//We could potentially make this user customizeable!
-			if(TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If triage task list and HQ
+			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If triage task list and HQ
 				return;
 			}
 			if(textDescript.Text.Trim()=="") {
