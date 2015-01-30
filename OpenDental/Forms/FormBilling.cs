@@ -544,12 +544,14 @@ namespace OpenDental{
 				dateTo=PIn.Date(textDateEnd.Text);
 			}
 			List<long> clinicNums=new List<long>();
-			if(comboClinic.SelectedIndex>0) {
-				clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
-			}
-			else {
-				for(int i=0;i<ListClinics.Count;i++) {
-					clinicNums.Add(ListClinics[i].ClinicNum);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				if(comboClinic.SelectedIndex>0) {
+					clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
+				}
+				else {
+					for(int i=0;i<ListClinics.Count;i++) {
+						clinicNums.Add(ListClinics[i].ClinicNum);
+					}
 				}
 			}
 			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,clinicNums);
