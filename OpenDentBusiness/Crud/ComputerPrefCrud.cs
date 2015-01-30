@@ -70,6 +70,7 @@ namespace OpenDentBusiness.Crud{
 				computerPref.ScanDocQuality         = PIn.Byte  (table.Rows[i]["ScanDocQuality"].ToString());
 				computerPref.ClinicNum              = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				computerPref.ApptViewNum            = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
+				computerPref.RecentApptView         = PIn.Byte  (table.Rows[i]["RecentApptView"].ToString());
 				retVal.Add(computerPref);
 			}
 			return retVal;
@@ -110,7 +111,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ComputerPrefNum,";
 			}
-			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum) VALUES(";
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(computerPref.ComputerPrefNum)+",";
 			}
@@ -137,7 +138,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (computerPref.ScanDocResolution)+","
 				+    POut.Byte  (computerPref.ScanDocQuality)+","
 				+    POut.Long  (computerPref.ClinicNum)+","
-				+    POut.Long  (computerPref.ApptViewNum)+")";
+				+    POut.Long  (computerPref.ApptViewNum)+","
+				+    POut.Byte  (computerPref.RecentApptView)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +174,8 @@ namespace OpenDentBusiness.Crud{
 				+"ScanDocResolution      =  "+POut.Int   (computerPref.ScanDocResolution)+", "
 				+"ScanDocQuality         =  "+POut.Byte  (computerPref.ScanDocQuality)+", "
 				+"ClinicNum              =  "+POut.Long  (computerPref.ClinicNum)+", "
-				+"ApptViewNum            =  "+POut.Long  (computerPref.ApptViewNum)+" "
+				+"ApptViewNum            =  "+POut.Long  (computerPref.ApptViewNum)+", "
+				+"RecentApptView         =  "+POut.Byte  (computerPref.RecentApptView)+" "
 				+"WHERE ComputerPrefNum = "+POut.Long(computerPref.ComputerPrefNum);
 			Db.NonQ(command);
 		}
@@ -271,6 +274,10 @@ namespace OpenDentBusiness.Crud{
 			if(computerPref.ApptViewNum != oldComputerPref.ApptViewNum) {
 				if(command!=""){ command+=",";}
 				command+="ApptViewNum = "+POut.Long(computerPref.ApptViewNum)+"";
+			}
+			if(computerPref.RecentApptView != oldComputerPref.RecentApptView) {
+				if(command!=""){ command+=",";}
+				command+="RecentApptView = "+POut.Byte(computerPref.RecentApptView)+"";
 			}
 			if(command==""){
 				return false;

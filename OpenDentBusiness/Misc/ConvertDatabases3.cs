@@ -7130,6 +7130,30 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_1_3();
+		}
+
+		///<summary></summary>
+		private static void To15_1_3() {
+			if(FromVersion<new Version("15.1.3.0")) {
+				string command="";
+				//We dropped RecentApptView in 15.1.1 but should not have because it is a column that is used by older versions prior to calling the 'update file copier' code which will cause UEs to occur.
+				//Bringing the column back with deprecation comments for the database documentation in our manual.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD RecentApptView tinyint unsigned NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD RecentApptView number(3)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET RecentApptView = 0 WHERE RecentApptView IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY RecentApptView NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.1.3.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_2_0();
 		}
 

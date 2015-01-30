@@ -58,6 +58,8 @@ namespace OpenDentBusiness {
 		public long ClinicNum;
 		///<summary>FK to apptview.ApptViewNum.  The most recent appt view num for this computer.  Used when opening with the Appts module in conjunction with ClinicNum if this ApptViewNum is associated to the ClinicNum.</summary>
 		public long ApptViewNum;
+		///<summary>Deprecated.  The index of the most recent appt view for this computer.  Uses it when opening.  This column cannot be dropped due to older versions using it upon opening (prior to calling the update file copier code) so they will throw a UE if this column is ever dropped.</summary>
+		public byte RecentApptView;
 
 
 		public ComputerPref Copy(){
