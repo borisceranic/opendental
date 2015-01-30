@@ -44,6 +44,8 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//MSH.8, Message Type
 						seg.AddField(8,"messageType");
+						//MSH.9, Message Control ID
+						seg.AddField(9,"messageControlId");
 					#endregion MSH - Message Header
 					#region MSA - Message Acknowledgment
 					seg=new HL7DefSegment();

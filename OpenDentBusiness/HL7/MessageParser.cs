@@ -133,7 +133,17 @@ namespace OpenDentBusiness.HL7 {
 					FieldHL7 fieldPatIds=msg.Segments[pidOrder].GetField(patIdListOrdinal);
 					//Example: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^MR|
 					//field component values will be the first repetition, repeats will be in field.ListRepeatFields
-					if(fieldPatIds.GetComponentVal(4).ToLower()=="pi") {//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
+					//field 4 is an HD data type, which is composed of 3 subcomponents separated by the "&".
+					//subcomponent 1 is the universal ID for the assigning authority
+					//subcomponent 2 is the universal ID type for the assigning authority
+					char subcompSeparator='&';
+					if(msg.Delimiters.Length>3) {
+						subcompSeparator=msg.Delimiters[3];
+					}
+					string[] arrayPatIdSubComps=fieldPatIds.GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None);
+					if(arrayPatIdSubComps.Length>1//there must be at least 2 sub-components in the assigning authority component so we can identify whose ID this is
+						&& fieldPatIds.GetComponentVal(4).ToLower()=="pi")//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
+					{
 						int checkDigit=-1;
 						try {
 							checkDigit=PIn.Int(fieldPatIds.GetComponentVal(1));
@@ -143,20 +153,15 @@ namespace OpenDentBusiness.HL7 {
 						}
 						//if using the M10 or M11 check digit algorithm and it passes the respective test, or not using either algorithm, then use the ID
 						if((fieldPatIds.GetComponentVal(2).ToLower()=="m10"
-							&& (checkDigit==-1 || M10CheckDigit(fieldPatIds.GetComponentVal(0))!=checkDigit))//using M10 scheme and either invalid check digit or doesn't match calc
+								&& checkDigit!=-1
+								&& M10CheckDigit(fieldPatIds.GetComponentVal(0))==checkDigit)//using M10 scheme and the check digit is valid and matches calc
 							|| (fieldPatIds.GetComponentVal(2).ToLower()=="m11"
-							&& (checkDigit==-1 || M11CheckDigit(fieldPatIds.GetComponentVal(0))!=checkDigit))//using M11 scheme and either invalid check digit or doesn't match calc
+								&& checkDigit!=-1
+								&& M11CheckDigit(fieldPatIds.GetComponentVal(0))==checkDigit)//using M11 scheme and the check digit is valid and matches calc
 							|| (fieldPatIds.GetComponentVal(2).ToLower()!="m10"
-							&& fieldPatIds.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
+								&& fieldPatIds.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
 						{
-							//field 4 is an HD data type, which is composed of 3 subcomponents separated by the "&".
-							//subcomponent 1 is the universal ID for the assigning authority
-							//subcomponent 2 is the universal ID type for the assigning authority
-							char subcompSeparator='&';
-							if(msg.Delimiters.Length>3) {
-								subcompSeparator=msg.Delimiters[3];
-							}
-							if(fieldPatIds.GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1].ToLower()==patOIDRoot.ToLower()) {
+							if(arrayPatIdSubComps[1].ToLower()==patOIDRoot.ToLower()) {
 								try {
 									patNumFromIds=PIn.Long(fieldPatIds.GetComponentVal(0));
 								}
@@ -168,7 +173,7 @@ namespace OpenDentBusiness.HL7 {
 								OIDExternal oidCur=new OIDExternal();
 								oidCur.IDType=IdentifierType.Patient;
 								oidCur.IDExternal=fieldPatIds.GetComponentVal(0);
-								oidCur.rootExternal=fieldPatIds.GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1];
+								oidCur.rootExternal=arrayPatIdSubComps[1];
 								listOids.Add(oidCur);
 							}
 						}
@@ -178,6 +183,10 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					}
 					for(int r=0;r<fieldPatIds.ListRepeatFields.Count;r++) {
+						arrayPatIdSubComps=fieldPatIds.ListRepeatFields[r].GetComponentVal(3).ToLower().Split(new char[] { subcompSeparator },StringSplitOptions.None);
+						if(arrayPatIdSubComps.Length<2) {//there must be at least 2 sub-components in the assigning authority component so we can identify whose ID this is
+							continue;
+						}
 						if(fieldPatIds.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")
 						{
 							continue;
@@ -200,11 +209,7 @@ namespace OpenDentBusiness.HL7 {
 							continue;
 						}
 						//if not using the M10 or M11 check digit scheme or if the check digit is good, trust the ID in component 0 to be valid and attempt to use
-						char subcompSeparator='&';
-						if(msg.Delimiters.Length>3) {
-							subcompSeparator=msg.Delimiters[3];
-						}
-						if(fieldPatIds.ListRepeatFields[r].GetComponentVal(3).ToLower().Split(new char[] { subcompSeparator },StringSplitOptions.None)[1]==patOIDRoot.ToLower()) {
+						if(arrayPatIdSubComps[1]==patOIDRoot.ToLower()) {
 							if(patNumFromIds==0) {
 								try {
 									patNumFromIds=PIn.Long(fieldPatIds.ListRepeatFields[r].GetComponentVal(0));
@@ -218,7 +223,7 @@ namespace OpenDentBusiness.HL7 {
 							OIDExternal oidCur=new OIDExternal();
 							oidCur.IDType=IdentifierType.Patient;
 							oidCur.IDExternal=fieldPatIds.ListRepeatFields[r].GetComponentVal(0);
-							oidCur.rootExternal=fieldPatIds.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompSeparator },StringSplitOptions.None)[1];
+							oidCur.rootExternal=arrayPatIdSubComps[1];
 							listOids.Add(oidCur);
 						}
 					}
@@ -879,7 +884,10 @@ namespace OpenDentBusiness.HL7 {
 				FieldHL7 fieldGuarIds=seg.GetField(guarIdsOrdinal);
 				//Example field: |1234^3^M11^&2.16.840.1.113883.3.4337.1486.6566.2&HL7^PI~7684^8^M11^&Other.Software.OID&OIDType^PI|
 				//field component values will be the first repetition, repeats will be in field.ListRepeatFields
-				if(fieldGuarIds.GetComponentVal(4).ToLower()=="pi") {//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
+				string[] arrayGuarIdSubComps=fieldGuarIds.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None);
+				if(arrayGuarIdSubComps.Length>1 //must be at least two subcomponents in the assigning authority component so we can identify whose ID this is
+					&& fieldGuarIds.GetComponentVal(4).ToLower()=="pi") //PI=patient internal identifier; a number that is unique to a patient within an assigning authority
+				{
 					int intCheckDigit=-1;
 					try {
 						intCheckDigit=PIn.Int(fieldGuarIds.GetComponentVal(1));
@@ -887,15 +895,18 @@ namespace OpenDentBusiness.HL7 {
 					catch(Exception ex) {
 						//checkDigit will remain -1
 					}
-					//if using the M10 or M11 check digit algorithm and it passes the respective test, or not using either algorithm, then use the ID
+					//if using the M10 or M11 check digit algorithm and it passes the respective test, or not using either algorithm
+					//and only if there's at least 2 components in field 3 for the assigning authority so we can identify whose ID we are dealing with, then use the ID
 					if((fieldGuarIds.GetComponentVal(2).ToLower()=="m10"
-						&& (intCheckDigit==-1 || M10CheckDigit(fieldGuarIds.GetComponentVal(0))!=intCheckDigit))//using M10 scheme and either invalid check digit or it doesn't match calc
+							&& intCheckDigit!=-1
+							&& M10CheckDigit(fieldGuarIds.GetComponentVal(0))==intCheckDigit)//using M10 scheme and the check digit is valid and matches calc
 						|| (fieldGuarIds.GetComponentVal(2).ToLower()=="m11"
-						&& (intCheckDigit==-1 || M11CheckDigit(fieldGuarIds.GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either invalid check digit or it doesn't match calc
+							&& intCheckDigit!=-1
+							&& M11CheckDigit(fieldGuarIds.GetComponentVal(0))==intCheckDigit)//using M11 scheme and the check digit is valid and matches calc
 						|| (fieldGuarIds.GetComponentVal(2).ToLower()!="m10"
-						&& fieldGuarIds.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
+							&& fieldGuarIds.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
 					{
-						if(fieldGuarIds.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1].ToLower()==patOidRoot.ToLower()) {
+						if(arrayGuarIdSubComps[1].ToLower()==patOidRoot.ToLower()) {
 							try {
 								guarPatNumFromIds=PIn.Long(fieldGuarIds.GetComponentVal(0));
 							}
@@ -907,12 +918,16 @@ namespace OpenDentBusiness.HL7 {
 							OIDExternal oidCur=new OIDExternal();
 							oidCur.IDType=IdentifierType.Patient;
 							oidCur.IDExternal=fieldGuarIds.GetComponentVal(0);
-							oidCur.rootExternal=fieldGuarIds.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1];
+							oidCur.rootExternal=arrayGuarIdSubComps[1];
 							listOids.Add(oidCur);
 						}
 					}
 				}
 				for(int r=0;r<fieldGuarIds.ListRepeatFields.Count;r++) {
+					arrayGuarIdSubComps=fieldGuarIds.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None);
+					if(arrayGuarIdSubComps.Length<2) {//must be at least two sub-components to the assigning authority component so we can identify whose ID this is
+						continue;
+					}
 					if(fieldGuarIds.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")
 					{
 						continue;
@@ -935,7 +950,7 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					}
 					//if not using the M10 or M11 check digit scheme or if the check digit is good, trust the ID in component 0 to be valid and attempt to use
-					if(fieldGuarIds.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1].ToLower()==patOidRoot.ToLower()) {
+					if(arrayGuarIdSubComps[1].ToLower()==patOidRoot.ToLower()) {
 						try {
 							guarPatNumFromIds=PIn.Long(fieldGuarIds.ListRepeatFields[r].GetComponentVal(0));
 						}
@@ -947,7 +962,7 @@ namespace OpenDentBusiness.HL7 {
 						OIDExternal oidCur=new OIDExternal();
 						oidCur.IDType=IdentifierType.Patient;
 						oidCur.IDExternal=fieldGuarIds.ListRepeatFields[r].GetComponentVal(0);
-						oidCur.rootExternal=fieldGuarIds.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1];
+						oidCur.rootExternal=arrayGuarIdSubComps[1];
 						listOids.Add(oidCur);
 					}
 				}
@@ -1488,7 +1503,9 @@ namespace OpenDentBusiness.HL7 {
 						}
 						string strPatIdCur="";
 						string strPatIdRootCur="";
-						if(fieldCur.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1].ToLower()!=strPatOIDRoot.ToLower()//not our PatNum
+						string[] arrayPatIdSubComps=fieldCur.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None);
+						if(arrayPatIdSubComps.Length>1 //so the next line doesn't throw an exception
+							&& arrayPatIdSubComps[1].ToLower()!=strPatOIDRoot.ToLower()//not our PatNum
 							&& fieldCur.GetComponentVal(4).ToLower()=="pi")//PI=patient internal identifier; a number that is unique to a patient within an assigning authority
 						{
 							int intCheckDigit=-1;
@@ -1500,15 +1517,17 @@ namespace OpenDentBusiness.HL7 {
 							}
 							//if using the M10 or M11 check digit algorithm and it passes the respective test, or not using either algorithm, then use the ID
 							if((fieldCur.GetComponentVal(2).ToLower()=="m10"
-								&& (intCheckDigit==-1 || M10CheckDigit(fieldCur.GetComponentVal(0))!=intCheckDigit))//using M10 scheme and either invalid check digit or doesn't match calc
+									&& intCheckDigit!=-1
+									&& M10CheckDigit(fieldCur.GetComponentVal(0))==intCheckDigit)//using M10 scheme and the check digit is valid and matches calc
 								|| (fieldCur.GetComponentVal(2).ToLower()=="m11"
-								&& (intCheckDigit==-1 || M11CheckDigit(fieldCur.GetComponentVal(0))!=intCheckDigit))//using M11 scheme and either invalid check digit or doesn't match calc
+									&& intCheckDigit!=-1
+									&& M11CheckDigit(fieldCur.GetComponentVal(0))==intCheckDigit)//using M11 scheme and the check digit is valid and matches calc
 								|| (fieldCur.GetComponentVal(2).ToLower()!="m10"
-								&& fieldCur.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
+									&& fieldCur.GetComponentVal(2).ToLower()!="m11"))//not using either check digit scheme
 							{
 								//Either passed the check digit test or not using the M10 or M11 check digit scheme, so trust the ID to be valid
 								strPatIdCur=fieldCur.GetComponentVal(0);
-								strPatIdRootCur=fieldCur.GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1];
+								strPatIdRootCur=arrayPatIdSubComps[1];
 							}
 						}
 						OIDExternal oidExtCur=new OIDExternal();
@@ -1522,8 +1541,12 @@ namespace OpenDentBusiness.HL7 {
 							verboseMsg+="\r\nExternal patient ID: "+oidExtCur.IDExternal+", External root: "+oidExtCur.rootExternal;
 						}
 						for(int r=0;r<fieldCur.ListRepeatFields.Count;r++) {
-							if(fieldCur.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1].ToLower()==strPatOIDRoot.ToLower()
-								|| fieldCur.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")
+							arrayPatIdSubComps=fieldCur.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None);
+							if(arrayPatIdSubComps.Length<2) {//there must be at least 2 sub-components in the assigning authority component so we can identify whose ID this is
+								continue;
+							}
+							if(arrayPatIdSubComps[1].ToLower()==strPatOIDRoot.ToLower() //if this is the OD patient OID root
+								|| fieldCur.ListRepeatFields[r].GetComponentVal(4).ToLower()!="pi")//or not a patient identifier, then skip this repetition
 							{
 								continue;
 							}
@@ -1546,7 +1569,7 @@ namespace OpenDentBusiness.HL7 {
 							}
 							//if not using the M10 or M11 check digit scheme or if the check digit is good, trust the ID in component 0 to be valid and store as IDExternal
 							strPatIdCur=fieldCur.ListRepeatFields[r].GetComponentVal(0);
-							strPatIdRootCur=fieldCur.ListRepeatFields[r].GetComponentVal(3).Split(new char[] { subcompChar },StringSplitOptions.None)[1];
+							strPatIdRootCur=arrayPatIdSubComps[1];
 							if(strPatIdCur!="" && strPatIdRootCur!="" && OIDExternals.GetByRootAndExtension(strPatIdRootCur,strPatIdCur)==null) {
 								oidExtCur=new OIDExternal();
 								oidExtCur.IDType=IdentifierType.Patient;
@@ -1700,7 +1723,7 @@ namespace OpenDentBusiness.HL7 {
 					break;
 				case TreatmentArea.ToothRange:
 					//break up the list of tooth numbers supplied and validate and convert them into universal tooth numbers for inserting into the db
-					string[] listToothNums=strToothNum.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries);
+					string[] listToothNums=strToothNum.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
 					for(int i=0;i<listToothNums.Length;i++) {
 						if(!Tooth.IsValidEntry(listToothNums[i])) {
 							EventLog.WriteEntry("OpenDentHL7","A procedure was not added for patient "+pat.GetNameFLnoPref()+".  The treatment area for the code "
