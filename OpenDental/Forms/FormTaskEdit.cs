@@ -794,6 +794,51 @@ namespace OpenDental {
 					}
 				}
 			}
+			_listTaskPriorities=new List<Def>();
+			_listTaskPriorities.AddRange(DefC.GetList(DefCat.TaskPriorities));//Fill list with non-hidden priorities.  We do this because we need a list instead of an array.
+			//There must be at least one priority in Setup | Definitions.  Do not let them load the task edit window without at least one priority.
+			if(_listTaskPriorities.Count < 1) {
+				MsgBox.Show(this,"There are no task priorities in Setup | Definitions.  There must be at least one in order to use the task system.");
+				DialogResult=DialogResult.Cancel;
+				Close();
+			}
+			bool hasDefault=false;
+			_pritoryDefNumSelected=TaskCur.PriorityDefNum;
+			comboTaskPriorities.Items.Clear();
+			for(int i=0;i<_listTaskPriorities.Count;i++) {//Add non-hidden defs first
+				comboTaskPriorities.Items.Add(_listTaskPriorities[i].ItemName);
+				if(!IsNew && _pritoryDefNumSelected==_listTaskPriorities[i].DefNum) {//Task is not new, we should select the priority it is listed with in the DB.
+					comboTaskPriorities.SelectedIndex=i;//Sets combo text too
+				}
+				if((IsNew || _pritoryDefNumSelected==0) && _listTaskPriorities[i].ItemValue=="D") {//Task is new or does not have a priority.
+					//Select the default value in the combo box and assign it to the task.
+					comboTaskPriorities.SelectedIndex=i;
+					_pritoryDefNumSelected=_listTaskPriorities[i].DefNum;
+					hasDefault=true;
+				}
+			}
+			if((IsNew || _pritoryDefNumSelected==0) && !hasDefault) {//If no default has been set in the definitions, select the last item in the list.
+				comboTaskPriorities.SelectedIndex=comboTaskPriorities.Items.Count-1;
+				_pritoryDefNumSelected=_listTaskPriorities[_listTaskPriorities.Count-1].DefNum;
+			}
+			if(TaskListCur!=null && IsNew && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Set to triage blue if HQ, triage list, and is new.
+				for(int i=0;i<_listTaskPriorities.Count;i++) {
+					if(_listTaskPriorities[i].DefNum==_triageBlueNum) {//Finding the option that is triageBlue to select it in the combobox (Combobox mirrors _listTaskPriorityDefs)
+						comboTaskPriorities.SelectedIndex=i;
+						break;
+					}
+				}
+				_pritoryDefNumSelected=_triageBlueNum;
+			}
+			if(comboTaskPriorities.SelectedIndex==-1) {//Priority for task wasn't found in the non-hidden priorities list (and isn't triageBlue), so it must be a hidden priority.
+				Def[] arrayTaskDefsLong=DefC.Long[(int)DefCat.TaskPriorities];//Get all priorities
+				for(int i=0;i<arrayTaskDefsLong.Length;i++) {
+					if(arrayTaskDefsLong[i].DefNum==_pritoryDefNumSelected) {//We find the hidden priority and set the text of the combo box.
+						comboTaskPriorities.Text=(arrayTaskDefsLong[i].ItemName+" (Hidden)");
+						butColor.BackColor=arrayTaskDefsLong[i].ItemColor;
+					}
+				}
+			}
 			textUser.Text=Userods.GetName(TaskCur.UserNum);//might be blank.
 			if(TaskListCur!=null) {
 				textTaskList.Text=TaskListCur.Descript;
@@ -879,43 +924,6 @@ namespace OpenDental {
 				MsgBox.Show(this,"There are no task priorities in Setup | Definitions.  There must be at least one in order to use the task system.");
 				DialogResult=DialogResult.Cancel;
 				Close();
-			}
-			bool hasDefault=false;
-			_pritoryDefNumSelected=TaskCur.PriorityDefNum;
-			comboTaskPriorities.Items.Clear();
-			for(int i=0;i<_listTaskPriorities.Count;i++) {//Add non-hidden defs first
-				comboTaskPriorities.Items.Add(_listTaskPriorities[i].ItemName);
-				if(!IsNew && _pritoryDefNumSelected==_listTaskPriorities[i].DefNum){//Task is not new, we should select the priority it is listed with in the DB.
-					comboTaskPriorities.SelectedIndex=i;//Sets combo text too
-				}
-				if((IsNew || _pritoryDefNumSelected==0) && _listTaskPriorities[i].ItemValue=="D") {//Task is new or does not have a priority.
-					//Select the default value in the combo box and assign it to the task.
-					comboTaskPriorities.SelectedIndex=i;
-					_pritoryDefNumSelected=_listTaskPriorities[i].DefNum;
-					hasDefault=true;
-				}
-			}
-			if((IsNew || _pritoryDefNumSelected==0) && !hasDefault) {//If no default has been set in the definitions, select the last item in the list.
-				comboTaskPriorities.SelectedIndex=comboTaskPriorities.Items.Count-1;
-				_pritoryDefNumSelected=_listTaskPriorities[_listTaskPriorities.Count-1].DefNum;
-			}
-			if(TaskListCur!=null && IsNew && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {//Set to triage blue if HQ, triage list, and is new.
-				for(int i=0;i<_listTaskPriorities.Count;i++) {
-					if(_listTaskPriorities[i].DefNum==_triageBlueNum) {//Finding the option that is triageBlue to select it in the combobox (Combobox mirrors _listTaskPriorityDefs)
-						comboTaskPriorities.SelectedIndex=i;
-						break;
-					}
-				}
-				_pritoryDefNumSelected=_triageBlueNum;
-			}
-			if(comboTaskPriorities.SelectedIndex==-1) {//Priority for task wasn't found in the non-hidden priorities list (and isn't triageBlue), so it must be a hidden priority.
-				Def[] arrayTaskDefsLong=DefC.Long[(int)DefCat.TaskPriorities];//Get all priorities
-				for(int i=0;i<arrayTaskDefsLong.Length;i++) {
-					if(arrayTaskDefsLong[i].DefNum==_pritoryDefNumSelected) {//We find the hidden priority and set the text of the combo box.
-						comboTaskPriorities.Text=(arrayTaskDefsLong[i].ItemName+" (Hidden)");
-						butColor.BackColor=arrayTaskDefsLong[i].ItemColor;
-					}
-				}
 			}
 			FillObject();
 			FillGrid();//Need this in order to pick ReplyToUserNum next.
