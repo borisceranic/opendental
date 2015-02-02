@@ -893,20 +893,22 @@ namespace OpenDental{
 				}
 				billingNums.Add(DefC.Short[(int)DefCat.BillingTypes][listBillType.SelectedIndices[i]-1].DefNum);
 			}
-			List<long> clinicNums=new List<long>();
-			if(comboClinic.SelectedIndex>0) {
-				clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
-			}
-			else {
-				for(int i=0;i<ListClinics.Count;i++) {
-					clinicNums.Add(ListClinics[i].ClinicNum);
+			List<long> listClinicNums=new List<long>();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+				if(comboClinic.SelectedIndex>0) {
+					listClinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
+				}
+				else {
+					for(int i=0;i<ListClinics.Count;i++) {
+						listClinicNums.Add(ListClinics[i].ClinicNum);
+					}
 				}
 			}
 			Cursor=Cursors.WaitCursor;
 			List<PatAging> agingList=Patients.GetAgingList(getAge,lastStatement,billingNums,checkBadAddress.Checked,
 				checkExcludeNegative.Checked,PIn.Double(textExcludeLessThan.Text),
 				checkExcludeInactive.Checked,checkIncludeChanged.Checked,checkExcludeInsPending.Checked,
-				checkExcludeIfProcs.Checked,checkIgnoreInPerson.Checked,clinicNums);
+				checkExcludeIfProcs.Checked,checkIgnoreInPerson.Checked,listClinicNums);
 			DateTime dateRangeFrom=DateTime.MinValue;
 			DateTime dateRangeTo=DateTimeOD.Today;//Needed for payplan accuracy.//new DateTime(2200,1,1);
 			if(textDateStart.Text!=""){
