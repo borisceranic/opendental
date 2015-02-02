@@ -978,7 +978,7 @@ namespace OpenDental {
 			ODGridRow row;
 			NoteList=TaskNotes.GetForTask(TaskCur.TaskNum);
 			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur!=null && TaskListCur.TaskListNum==1697 && PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				if(_numNotes==-1) {//Only fill _numNotes here the first time FillGrid is called.  This is used for coloring triage tasks.
 					_numNotes=NoteList.Count;
 				}
@@ -1125,8 +1125,8 @@ namespace OpenDental {
 
 		///<summary>Handles changing a triage task from red or blue depending on which color button was pushed.</summary>
 		private void UpdateDescriptForColor(string color) {
-			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
+			//Only do weird logic when editing a task if HQ
+			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				return;
 			}
 			int textDescriptCursorPosition=textDescript.SelectionStart;
@@ -1184,8 +1184,8 @@ namespace OpenDental {
 		private void UpdateTaskPriorityForTriageBasedOnCombo() {
 			_pritoryDefNumSelected=_listTaskPriorities[comboTaskPriorities.SelectedIndex].DefNum;
 			butColor.BackColor=DefC.GetColor(DefCat.TaskPriorities,_pritoryDefNumSelected);//Change the color swatch so people know the priority's color
-			//Only do weird logic when editing a task associated with the triage task list.
-			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If HQ only
+			//Only do weird logic when editing a task if HQ
+			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				return;
 			}
 			if(IsNew && textDescript.Text.Trim()=="") {
@@ -1231,7 +1231,8 @@ namespace OpenDental {
 		///<summary>Looks at the text in the description, and correctly sets comboTaskPriorities based on what color it should be.</summary>
 		private void UpdateTaskPriorityForTriageBasedOnDescript() {
 			//We could potentially make this user customizeable!
-			if(TaskListCur==null || TaskListCur.TaskListNum!=1697 || !PrefC.GetBool(PrefName.DockPhonePanelShow)) {// If triage task list and HQ
+			//Only do weird logic when editing a task if HQ
+			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				return;
 			}
 			if(textDescript.Text.Trim()=="") {
