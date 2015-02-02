@@ -407,8 +407,11 @@ namespace OpenDentBusiness{
 					//Make a log depending on what happened with the object type association.
 					TaskEditCreateLog(log,task);
 				}
-				if(task.TaskListNum!=oldTask.TaskListNum) {
-					TaskEditCreateLog(Lans.g("Tasks","Task moved from "+TaskLists.GetOne(oldTask.TaskListNum).Descript),task);
+				if(task.TaskListNum!=oldTask.TaskListNum && oldTask.TaskListNum==0) {
+					TaskEditCreateLog(Lans.g("Tasks","Task moved from Main"),task);
+				}
+				else if(task.TaskListNum!=oldTask.TaskListNum) {
+					TaskEditCreateLog(Lans.g("Tasks","Task moved from")+" "+TaskLists.GetOne(oldTask.TaskListNum).Descript,task);
 				}
 			}
 			Crud.TaskCrud.Update(task);
