@@ -1340,7 +1340,7 @@ namespace OpenDentBusiness{
 					clinicWhere="AND userod.ClinicNum="+POut.Long(clinicNum)+" ";
 				}
 			}
-			string command="SELECT StartTime,StopTime,FName,employee.EmployeeNum,Note "
+			string command="SELECT StartTime,StopTime,FName,employee.EmployeeNum,Note,schedule.ScheduleNum "
 				+"FROM employee "
 				+"INNER JOIN schedule ON schedule.EmployeeNum=employee.EmployeeNum "
 				+clinicJoin
@@ -1348,12 +1348,12 @@ namespace OpenDentBusiness{
 				+"AND SchedDate = "+POut.Date(dateStart)+" "
 				+clinicWhere;
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY employee.EmployeeNum ";
+				command+="GROUP BY schedule.ScheduleNum ";
 			}
 			else {
-				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note ";
+				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum ";
 			}
-			command+="ORDER BY FName";
+			command+="ORDER BY FName,StartTime";
 			DataTable raw=dcon.GetTable(command);
 			DateTime startTime;
 			DateTime stopTime;
