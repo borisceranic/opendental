@@ -3491,35 +3491,35 @@ namespace OpenDental{
 
 		/// <summary>HQ Only. Digest results of FillTriageLabels and update form controls accordingly.</summary>
 		private void FillTriageLabelsResults(DataTable phoneMetrics) {
-			int countTasksWithoutNotes=PIn.Int(phoneMetrics.Rows[0]["CountTasksWithoutNotes"].ToString());
-			int countTasksWithNotes=PIn.Int(phoneMetrics.Rows[0]["CountTasksWithNotes"].ToString());
-			int countUrgentTasks=PIn.Int(phoneMetrics.Rows[0]["CountUrgentTasks"].ToString());
-			DateTime timeOfOldestTaskWithoutNotes=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestTaskWithoutNotes"].ToString());
-			DateTime timeOfOldestUrgentTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestUrgentTaskNote"].ToString());
+			int countBlueTasks=PIn.Int(phoneMetrics.Rows[0]["CountBlueTasks"].ToString());
+			int countWhiteTasks=PIn.Int(phoneMetrics.Rows[0]["CountWhiteTasks"].ToString());
+			int countRedTasks=PIn.Int(phoneMetrics.Rows[0]["CountRedTasks"].ToString());
+			DateTime timeOfOldestBlueTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestBlueTaskNote"].ToString());
+			DateTime timeOfOldestRedTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestRedTaskNote"].ToString());
 			TimeSpan triageBehind=new TimeSpan(0);
-			if(timeOfOldestTaskWithoutNotes.Year>1880) {
-				triageBehind=DateTime.Now-timeOfOldestTaskWithoutNotes;
+			if(timeOfOldestBlueTaskNote.Year>1880) {
+				triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
 			}
 			string countStr="0";
-			if(countTasksWithoutNotes>0) {//Triage show red so users notice more.
-				countStr=countTasksWithoutNotes.ToString();
+			if(countBlueTasks>0) {//Triage show red so users notice more.
+				countStr=countBlueTasks.ToString();
 				labelTriage.ForeColor=Color.Firebrick;
 			}
 			else {
-				if(countTasksWithNotes>0) {
-					countStr="("+countTasksWithNotes.ToString()+")";
+				if(countWhiteTasks>0) {
+					countStr="("+countWhiteTasks.ToString()+")";
 				}
 				labelTriage.ForeColor=Color.Black;
 			}
 			labelTriage.Text="T:"+countStr;
 			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
 			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
-				formMapHQ.SetTriageNormal(countTasksWithNotes,countTasksWithoutNotes,triageBehind);
+				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind);
 				TimeSpan urgentTriageBehind=new TimeSpan(0);
-				if(timeOfOldestUrgentTaskNote.Year>1880) {
-					urgentTriageBehind=DateTime.Now-timeOfOldestUrgentTaskNote;
+				if(timeOfOldestRedTaskNote.Year>1880) {
+					urgentTriageBehind=DateTime.Now-timeOfOldestRedTaskNote;
 				}
-				formMapHQ.SetTriageUrgent(countUrgentTasks,urgentTriageBehind);
+				formMapHQ.SetTriageUrgent(countRedTasks,urgentTriageBehind);
 			}
 		}
 
