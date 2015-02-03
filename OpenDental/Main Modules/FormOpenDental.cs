@@ -4094,6 +4094,12 @@ namespace OpenDental{
 		}
 
 		private void ThreadEmailInbox_Receive() {
+			try {
+				EmailMessages.CreateCertificateStoresIfNeeded();
+			}
+			catch {
+				//Probably a permission issue creating the stores.  Nothing we can do except explain in the manual.
+			}
 			//The EmailInboxCheckInterval preference defines the number of minutes between automatic inbox receiving.
 			//Do not perform the first email inbox receive within the first EmailInboxCheckInterval minutes of program startup (thread startup).
 			_isEmailThreadRunning=true;
