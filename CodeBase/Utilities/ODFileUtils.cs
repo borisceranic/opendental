@@ -8,6 +8,10 @@ using System.Windows.Forms;
 namespace CodeBase {
 	public class ODFileUtils {
 
+		///<summary>This is a class scope variable in order to ensure that the random value is only seeded once for each time OD is launched.
+		///Otherwise, if instantiated more often, then the same random numbers are generated over and over again.</summary>
+		private static Random _rand=new Random();
+
 		///<summary>Removes a trailing path separator from the given string if one exists.</summary>
 		public static string RemoveTrailingSeparators(string path){
 			while(path!=null && path.Length>0 && (path[path.Length-1]=='\\' || path[path.Length-1]=='/')) {
@@ -58,11 +62,10 @@ namespace CodeBase {
 			bool fileCreated=false;
 			string filePath="";
 			const string randChrs="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-			Random rand=new Random();
 			do{
 				string fileName="";
 				for(int i=0;i<6;i++){
-					fileName+=randChrs[rand.Next(0,randChrs.Length-1)];
+					fileName+=randChrs[_rand.Next(0,randChrs.Length-1)];
 				}
 				fileName+=DateTime.Now.ToString("yyyyMMddhhmmss");
 				filePath=CombinePaths(dir,fileName+ext);
