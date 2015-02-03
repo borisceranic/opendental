@@ -592,9 +592,19 @@ namespace OpenDentBusiness{
 
 		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>
 		public static int CompareTimes(DataRow x,DataRow y) {
-			DateTime xMaxDateTime=PIn.DateT(x["LastUpdated"].ToString());
-			DateTime yMaxDateTime=PIn.DateT(y["LastUpdated"].ToString());
-			return xMaxDateTime.CompareTo(yMaxDateTime);
+			if(PIn.Long(x["TaskListNum"].ToString())==1697//Triage Task List Num for HQ
+				&& PIn.Long(y["TaskListNum"].ToString())==1697
+				&& PrefC.GetBool(PrefName.DockPhonePanelShow)) 
+			{
+				DateTime xMaxDateTime=PIn.DateT(x["LastUpdated"].ToString());
+				DateTime yMaxDateTime=PIn.DateT(y["LastUpdated"].ToString());
+				return xMaxDateTime.CompareTo(yMaxDateTime);
+			}
+			else {
+				DateTime xMaxDateTime=PIn.DateT(x["DateTimeEntry"].ToString());
+				DateTime yMaxDateTime=PIn.DateT(y["DateTimeEntry"].ToString());
+				return xMaxDateTime.CompareTo(yMaxDateTime);
+			}
 		}
 
 
