@@ -1557,6 +1557,14 @@ namespace OpenDental {
 				MsgBox.Show(this,"One or more task note edit windows are open and must be closed.");
 				return;
 			}
+			if(!SaveCur()) {//If user clicked OK without changing anything, then this will have no effect.
+				return;
+			}
+			if(!notesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
+				DialogResult=DialogResult.OK;
+				Close();
+				return;
+			}
 			if(IsNew) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
@@ -1565,14 +1573,6 @@ namespace OpenDental {
 			}
 			else {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
-			}
-			if(!SaveCur()) {//If user clicked OK without changing anything, then this will have no effect.
-				return;
-			}
-			if(!notesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
-				DialogResult=DialogResult.OK;
-				Close();
-				return;
 			}
 			DialogResult=DialogResult.OK;
 			Close();
