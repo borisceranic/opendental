@@ -712,6 +712,15 @@ namespace OpenDentBusiness{
 
 		#region Helpers
 
+		///<summary>Throws an exception if there is a permission issue.  Creates all of the necessary certificate stores for email encryption (Direct and Standard) if they do not already exist.
+		///There is no way for the user to create these stores manually through Microsoft Management Console (mmc.exe) and they are needed to import certificates.</summary>
+		public static void CreateCertificateStoresIfNeeded() {
+			Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit().Dispose();//Create the NHINDAnchor certificate store if it does not already exist on the local machine.
+			Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit().Dispose();//Create the NHINDExternal certificate store if it does not already exist on the local machine.
+			Health.Direct.Common.Certificates.SystemX509Store.OpenPrivateEdit().Dispose();//Create the NHINDPrivate certificate store if it does not already exist on the local machine.
+		}
+
+		///<summary>Throws exceptions if there are permission issues.  Creates the 3 necessary certificate stores if they do not already exist.</summary>
 		private static Health.Direct.Agent.DirectAgent GetDirectAgentForEmailAddress(string strEmailAddress) {
 			//No need to check RemotingRole; no call to db.
 			string domain=GetDomainForAddress(strEmailAddress);
@@ -722,9 +731,7 @@ namespace OpenDentBusiness{
 				}
 				catch(Exception ex) {
 					if(ex.Message.Contains("cannot find the file specified")) {//A typical exception when the 3 required certificate stores needed for Direct have not been created on one particular client machine.
-						Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit().Dispose();//Create the NHINDAnchor certificate store if it does not already exist on the local machine.
-						Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit().Dispose();//Create the NHINDExternal certificate store if it does not already exist on the local machine.
-						Health.Direct.Common.Certificates.SystemX509Store.OpenPrivateEdit().Dispose();//Create the NHINDPrivate certificate store if it does not already exist on the local machine.
+						CreateCertificateStoresIfNeeded();
 						directAgent=new Health.Direct.Agent.DirectAgent(domain);//Try again.
 					}
 					else {
