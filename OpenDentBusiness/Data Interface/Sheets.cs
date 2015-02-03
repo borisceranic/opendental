@@ -424,7 +424,7 @@ namespace OpenDentBusiness{
 
 		///<summary>This gives the number of pages required to print all fields without cutting any of them in half. This must be calculated ahead of time when creating multi page pdfs.</summary>
 		public static int CalculatePageCount(Sheet sheet,System.Drawing.Printing.Margins m) {
-			if(sheet.HeightLastField<sheet.HeightPage) {
+			if(sheet.HeightLastField<=sheet.HeightPage) { //HeightLastField takes the bottom bounds (sum of lengths of Y. Ex. Y=0 to Y=1099, bounds=1100). HeightPage is the value of Width/Length depending on Landscape/Portrait.
 				return 1;//if all of the fields are less than one page, even if some of the fields fall within the margin of the first page.
 			}
 			if(SheetTypeIsSinglePage(sheet.SheetType)) {
