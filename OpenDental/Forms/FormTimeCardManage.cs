@@ -633,8 +633,14 @@ namespace OpenDental {
 			yPos+=18;
 			while(yPos < e.PageBounds.Height-75-50-32-16 && linesPrinted < timeCardGrid.Rows.Count) {
 				for(int i=0;i<colPos.Length-1;i++) {
-					e.Graphics.DrawString(timeCardGrid.Rows[linesPrinted].Cells[i].Text,font,brush
-						,new RectangleF(colPos[i]+2,yPos,colPos[i+1]-colPos[i]-5,font.GetHeight(e.Graphics)));
+					if(timeCardGrid.Rows[linesPrinted].Cells[i].ColorText==Color.Empty || timeCardGrid.Rows[linesPrinted].Cells[i].ColorText==Color.Black) {
+						e.Graphics.DrawString(timeCardGrid.Rows[linesPrinted].Cells[i].Text,font,brush
+							,new RectangleF(colPos[i]+2,yPos,colPos[i+1]-colPos[i]-5,font.GetHeight(e.Graphics)));
+					}
+					else {
+						e.Graphics.DrawString(timeCardGrid.Rows[linesPrinted].Cells[i].Text,font,Brushes.Red
+							,new RectangleF(colPos[i]+2,yPos,colPos[i+1]-colPos[i]-5,font.GetHeight(e.Graphics)));
+					}
 				}
 				//Column lines		
 				for(int i=0;i<colPos.Length;i++) {
