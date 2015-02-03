@@ -640,39 +640,34 @@ namespace OpenDentBusiness {
 					WHERE  
 						TaskListNum=1697   -- Triage task list.
 						AND TaskStatus<>2   -- Not done (new or viewed).
-						AND TaskNum NOT IN (SELECT tn.TaskNum FROM tasknote tn WHERE tn.TaskNum = task.TaskNum)  -- no notes yet
-					) AS CountTasksWithoutNotes 
+						AND PriorityDefNum=502  -- triage blue
+					) AS CountBlueTasks
 				-- count triage tasks with notes
 				,(SELECT COUNT(TaskNum)  
 					FROM task 
 					WHERE  
 						TaskListNum=1697  -- Triage task list.
 						AND TaskStatus<>2  -- Not done (new or viewed).
-						AND TaskNum IN (SELECT tn.TaskNum FROM tasknote tn WHERE tn.TaskNum = task.TaskNum)  -- no notes yet
-					) AS CountTasksWithNotes 
+						AND PriorityDefNum=503  -- triage white
+					) AS CountWhiteTasks 
 				-- count urgent triage tasks (does not matter if it has notes or not)
 				,(SELECT COUNT(TaskNum)  
 					FROM task 
 					WHERE  
 						TaskListNum=1697  -- Triage task list.
 						AND TaskStatus<>2  -- Not done (new or viewed).
-						AND  
-						(  -- COLLATE utf8_bin means case-sesitive search
-							Descript COLLATE utf8_bin LIKE '%CUSTOMER%' 
-							OR Descript COLLATE utf8_bin LIKE '%DOWN%' 
-							OR Descript COLLATE utf8_bin LIKE '%URGENT%' 
-							OR Descript COLLATE utf8_bin LIKE '%CONFERENCE%' 
-							OR Descript COLLATE utf8_bin LIKE '%!!%' 
-						) 
-					) AS CountUrgentTasks	 
-				-- time of oldest triage task which does not already have notes 
-				,(SELECT IFNULL(MIN(DateTimeEntry),'0001-01-01') 
-					FROM task 
-					WHERE TaskListNum=1697  -- Triage task list.
-						AND TaskStatus<>2  -- Not done (new or viewed).
-						AND TaskNum NOT IN (SELECT tn.TaskNum FROM tasknote tn)  -- no notes yet 
-					LIMIT 1 
-					) AS TimeOfOldestTaskWithoutNotes 
+						AND PriorityDefNum=501 -- triage red
+					) AS CountRedTasks	 
+				-- time of oldest triage task
+				,(SELECT MIN(DateTimeMax) 
+					FROM
+						(SELECT GREATEST(IFNULL(task.DateTimeEntry,'0001-01-01'), IFNULL((SELECT MAX(DateTimeNote) FROM tasknote WHERE tasknote.tasknum=task.tasknum),'0001-01-01')) AS DateTimeMax
+						FROM task
+						WHERE TaskListNum=1697 /*Triage task list*/
+							AND TaskStatus<>2 /*Not done (new or viewed)*/
+							AND PriorityDefNum=502 -- Triage blue
+						) temp
+					) AS TimeOfOldestBlueTaskNote
 				-- time of oldest urgent task or the oldest tasknote if one exists
 				,(SELECT MIN(DateTimeMax) 
 					FROM
@@ -680,15 +675,9 @@ namespace OpenDentBusiness {
 						FROM task
 						WHERE TaskListNum=1697 /*Triage task list*/
 							AND TaskStatus<>2 /*Not done (new or viewed)*/
-							AND  
-							( Descript LIKE BINARY '%CUSTOMER%'
-							OR Descript LIKE BINARY '%DOWN%'
-							OR Descript LIKE BINARY '%URGENT%'
-							OR Descript LIKE BINARY '%CONFERENCE%'
-							OR Descript LIKE BINARY '%!!%'
-							)
+							AND PriorityDefNum=501 -- triage red
 						) temp
-					) AS TimeOfOldestUrgentTaskNote;";
+					) AS TimeOfOldestRedTaskNote;";
 			return Db.GetTable(command);
 		}
 
