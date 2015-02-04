@@ -1548,7 +1548,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 
 		private static SheetDef StmtSheet() {
 			SheetDef sheet=new SheetDef(SheetTypeEnum.Statement);
-			sheet.Description="Statment";
+			sheet.Description="Statement";
 			sheet.FontName="Arial";
 			sheet.FontSize=9f;
 			sheet.Width=850;
