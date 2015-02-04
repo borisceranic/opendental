@@ -75,8 +75,19 @@ namespace OpenDentBusiness{
 			}
 			return List.Length-1;//if we can't find a match, just return the last index
 		}
-		
 
+		///<summary></summary>
+		public static bool HasPayPeriodForDate(DateTime date) {
+			//No need to check RemotingRole; no call to db.
+			for(int i=0;i<List.Length;i++) {
+				if(date.Date >= List[i].DateStart.Date 
+					&& date.Date <= List[i].DateStop.Date) 
+				{
+					return true;
+				}
+			}
+			return false;//if we can't find a match, return false;
+		}
 
 
 

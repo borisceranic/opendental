@@ -1114,6 +1114,9 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				Phones.SetPhoneStatus(ClockStatusEnum.Available,Phones.GetExtensionForEmp(EmployeeCur.EmployeeNum),EmployeeCur.EmployeeNum);
 			}
+			if(!PayPeriods.HasPayPeriodForDate(DateTime.Today)) {
+				MsgBox.Show(this,"No dates exist for this pay period.  Time clock events will not display until pay periods have been created for this date range");
+			}
 		}
 
 		private void butClockOut_Click(object sender,System.EventArgs e) {
