@@ -1925,8 +1925,13 @@ namespace OpenDental {
 			//load the recently used apptview from the db, either the userodapptview table if an entry exists or the computerpref table if an entry for this computer exists
 			ApptView apptViewCur=null;
 			UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,FormOpenDental.ClinicNum);
-			if(InitializedOnStartup && userodApptViewCur!=null) {
-				apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum);
+			if(userodApptViewCur!=null) { //if there is an entry in the userodapptview table for this user
+				if(InitializedOnStartup //if either ContrAppt has already been initialized
+					|| (Security.CurUser.ClinicIsRestricted //or the current user is restricted
+					&& FormOpenDental.ClinicNum!=ComputerPrefs.LocalComputer.ClinicNum)) //and FormOpenDental.ClinicNum (set to the current user's clinic) is not the computerpref clinic
+				{
+					apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum); //then load the view for the user in the userodapptview table
+				}
 			}
 			if(apptViewCur==null //if no entry in the userodapptview table
 				&& FormOpenDental.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) //and if the program level ClinicNum is the stored recent ClinicNum for this computer 
