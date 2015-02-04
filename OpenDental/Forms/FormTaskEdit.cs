@@ -1610,7 +1610,12 @@ namespace OpenDental {
 			//If a note was added to a Done task and the user hits cancel, the task status is set to Viewed because the note is still there and the task didn't move lists.
 			if(notesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
 				TaskCur.TaskStatus=TaskStatusEnum.Viewed;
-				Tasks.Update(TaskCur,TaskOld);//if task has already been altered, then this is where it will fail.
+				try {
+					Tasks.Update(TaskCur,TaskOld);//if task has already been altered, then this is where it will fail.
+				}
+				catch {
+					return;
+				}
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
 		}
