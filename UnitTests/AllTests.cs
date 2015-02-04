@@ -1976,5 +1976,91 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary>Similar to tests 1 and 2.</summary>
+		public static string TestThirtySix(int specificTest) {
+			if(specificTest != 0 && specificTest != 36) {
+				return "";
+			}
+			string suffix="36";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			long feeSchedNum1=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix);
+			long feeSchedNum2=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix+"b");
+			//Standard Fee (we only insert this value to test that it is not used in the calculations).
+			Fees.RefreshCache();
+			long codeNum=ProcedureCodes.GetCodeNum("D4341");
+			Fee fee=Fees.GetFee(codeNum,53);
+			if(fee==null) {
+				fee=new Fee();
+				fee.CodeNum=codeNum;
+				fee.FeeSched=53;
+				fee.Amount=1200;
+				Fees.Insert(fee);
+			}
+			else {
+				fee.Amount=1200;
+				Fees.Update(fee);
+			}
+			//PPO fees
+			fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum1;
+			fee.Amount=206;
+			Fees.Insert(fee);
+			fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum2;
+			fee.Amount=117;
+			Fees.Insert(fee);
+			Fees.RefreshCache();
+			//Carrier
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			long planNum1=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum1,EnumCobRule.Standard).PlanNum;
+			long planNum2=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum2,EnumCobRule.Standard).PlanNum;
+			InsSub sub1=InsSubT.CreateInsSub(pat.PatNum,planNum1);
+			long subNum1=sub1.InsSubNum;
+			InsSub sub2=InsSubT.CreateInsSub(pat.PatNum,planNum2);
+			long subNum2=sub2.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum1,EbenefitCategory.Periodontics,50);
+			BenefitT.CreateCategoryPercent(planNum2,EbenefitCategory.Periodontics,80);
+			PatPlanT.CreatePatPlan(1,patNum,subNum1);
+			PatPlanT.CreatePatPlan(2,patNum,subNum2);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D4341",ProcStat.TP,"",206);//Scaling in undefined/any quadrant.
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(patNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//Validate
+			string retVal="";
+			ClaimProc claimProc;
+			if(specificTest==0 || specificTest==36) {
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				//I don't think allowed can be easily tested on the fly, and it's not that important.
+				if(claimProc.InsEstTotal!=103) {
+					throw new Exception("Primary total estimate should be 103. \r\n");
+				}
+				if(claimProc.WriteOffEst!=0) {
+					throw new Exception("Primary writeoff estimate should be 0. \r\n");
+				}
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum2,subNum2);
+				if(claimProc.InsEstTotal!=93.6) {
+					throw new Exception("Secondary total estimate should be 93.60. \r\n");
+				}
+				if(claimProc.WriteOffEst!=0) {
+					throw new Exception("Secondary writeoff estimate should be 0. \r\n");
+				}
+				retVal+="36: Passed.  Claim proc estimates for dual PPO ins when primary writeoff is zero.\r\n";
+			}
+			return retVal;
+		}
+
 	}
 }

@@ -826,7 +826,7 @@ namespace OpenDentBusiness{
 				if(remainingWriteOff<0) {
 					remainingWriteOff=0;
 				}
-				if(writeOffOtherIns>0) {//no secondary writeoff estimates allowed
+				if(paidOtherInsTot>0 || writeOffOtherIns>0) {//No secondary writeoff estimates allowed.  Only primary may have writeoffs.  If no other insurance payments/estimates/writeoffs, then the current writeoff is calculated as primary.
 					cp.WriteOffEst=0;//The reasoning for this is covered in the manual under Unit Test #1 and COB.
 				}
 				//We can't go over either number.  We must use the smaller of the two.  If one of them is zero, then the writeoff is zero.
