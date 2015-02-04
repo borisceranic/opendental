@@ -2132,11 +2132,26 @@ namespace OpenDental{
 			}
 			myOutlookBar.Invalidate();
 			LayoutToolBar();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//If block must be run before SetModuleSelected() so correct clinic filtration occurs.
-				if(Security.CurUser!=null) {
-					ClinicNum=Security.CurUser.ClinicNum;
-					RefreshMenuClinics();
+			//If clinics are enabled, we will set the public ClinicNum variable
+			//If the user is restricted to a clinic(s), and the computerpref clinic is not one of the user's restricted clinics, the user's clinic will be selected
+			//If the user is not restricted, or if the user is restricted but has access to the computerpref clinic, the computerpref clinic will be selected
+			//The ClinicNum will determine which view is loaded, either from the computerpref table or from the userodapptview table
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && Security.CurUser!=null) {//If block must be run before SetModuleSelected() so correct clinic filtration occurs.
+				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
+				bool isCompClinicAllowed=false;
+				for(int i=0;i<listClinics.Count;i++) {
+					if(listClinics[i].ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) {
+						isCompClinicAllowed=true;
+						break;
+					}
 				}
+				if(Security.CurUser.ClinicIsRestricted && !isCompClinicAllowed) {//user is restricted and does not have access to the computerpref clinic
+					ClinicNum=Security.CurUser.ClinicNum;
+				}
+				else {//the user is either not restricted to a clinic(s) or the user is restricted but has access to the computerpref clinic
+					ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
+				}
+				RefreshMenuClinics();
 			}
 			SetModuleSelected();
 			Cursor=Cursors.Default;
