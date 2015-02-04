@@ -460,9 +460,6 @@ namespace OpenDental.ReportingComplex {
 					return false;
 				}
 			}
-			if(_reportTable.Rows.Count==0) {//This should never throw an exception due to reportTable being null unless the programmer messed up when creating their report.
-				return false;
-			}
 			_rowHeightValues=new List<int>();
 			Graphics g=Graphics.FromImage(new Bitmap(1,1));
 			for(int i=0;i<_reportTable.Rows.Count;i++) {
