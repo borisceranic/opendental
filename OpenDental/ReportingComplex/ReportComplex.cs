@@ -327,6 +327,7 @@ namespace OpenDental.ReportingComplex {
 
 		///<summary>Submits the queries to the database and makes query objects for each query with the results.  Returns false if one of the queries failed.</summary>
 		public bool SubmitQueries(){
+			bool hasRows=false;
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			string displayText;
 			ReportObjectCollection newReportObjects=new ReportObjectCollection();
@@ -335,14 +336,12 @@ namespace OpenDental.ReportingComplex {
 				if(_reportObjects[i].ReportObjectKind==ReportObjectKind.QueryObject) {
 					QueryObject query=(QueryObject)_reportObjects[i];
 					if(!query.SubmitQuery()) {
-						if(query.ReportTable.Rows.Count==0) {
-							MsgBox.Show(this,"The report has no results to show.");
-						}
 						return false;
 					}
 					if(query.ReportTable.Rows.Count==0) {
 						continue;
 					}
+					hasRows=true;
 					//Check if the query needs to be split up into sub queries.  E.g. one payment report query split up via payment type.
 					if(!String.IsNullOrWhiteSpace(query.ColumnNameToSplitOn)) { 
 						//The query needs to be split up into sub queries every time the ColumnNameToSplitOn cell changes.  
@@ -449,6 +448,10 @@ namespace OpenDental.ReportingComplex {
 				else {
 					newReportObjects.Add(_reportObjects[i]);
 				}
+			}
+			if(!hasRows) {
+				MsgBox.Show(this,"The report has no results to show.");
+				return false;
 			}
 			_reportObjects=newReportObjects;
 			return true;
