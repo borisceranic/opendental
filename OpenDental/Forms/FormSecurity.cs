@@ -676,10 +676,12 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableSecurity","Provider"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSecurity","Clinic"),80);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSecurity","ClinicRestricted"),100,HorizontalAlignment.Center);
-			gridMain.Columns.Add(col);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				col=new ODGridColumn(Lan.g("TableSecurity","Clinic"),80);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableSecurity","ClinicRestricted"),100,HorizontalAlignment.Center);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableSecurity","Strong"),80,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
@@ -728,8 +730,10 @@ namespace OpenDental{
 				row.Cells.Add(UserGroups.GetGroup(ListUser[i].UserGroupNum).Description);
 				row.Cells.Add(Employees.GetNameFL(ListUser[i].EmployeeNum));
 				row.Cells.Add(Providers.GetLongDesc(ListUser[i].ProvNum));
-				row.Cells.Add(Clinics.GetDesc(ListUser[i].ClinicNum));
-				row.Cells.Add(ListUser[i].ClinicIsRestricted?"X":"");
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					row.Cells.Add(Clinics.GetDesc(ListUser[i].ClinicNum));
+					row.Cells.Add(ListUser[i].ClinicIsRestricted?"X":"");
+				}
 				row.Cells.Add(ListUser[i].PasswordIsStrong?"X":"");
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 					Provider prov=Providers.GetProv(ListUser[i].ProvNum);
