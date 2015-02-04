@@ -187,7 +187,7 @@ namespace OpenDental {
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
 				+"LEFT JOIN (SELECT TransactionDateTime,ClerkID,BatchNum,ItemNum,PatNum,CCType,CreditCardNum,Expiration,Result,Amount FROM xchargetransaction "
 					+"WHERE (DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
-						+"AND ResultCode=0 "+@") AS X "
+						+"AND (ResultCode=0 OR ResultCode=10) AS X "
 				+"ON X.PatNum=payment.PatNum AND DATE(X.TransactionDateTime)=payment.DateEntry AND X.Amount=payment.PayAmt "
 				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"AND X.TransactionDateTime IS NULL "
