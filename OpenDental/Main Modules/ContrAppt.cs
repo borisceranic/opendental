@@ -1886,6 +1886,9 @@ namespace OpenDental {
 			if(!InitializedOnStartup) {
 				return;//prevent ModuleSelected().
 			}
+			if(InitializedOnStartup && !Visible) {
+				return;
+			}
 			if(saveToDb) {
 				ComputerPrefs.LocalComputer.ApptViewNum=apptViewNum;
 				ComputerPrefs.LocalComputer.ClinicNum=FormOpenDental.ClinicNum;
@@ -1922,7 +1925,7 @@ namespace OpenDental {
 			//load the recently used apptview from the db, either the userodapptview table if an entry exists or the computerpref table if an entry for this computer exists
 			ApptView apptViewCur=null;
 			UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,FormOpenDental.ClinicNum);
-			if(userodApptViewCur!=null) {
+			if(InitializedOnStartup && userodApptViewCur!=null) {
 				apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum);
 			}
 			if(apptViewCur==null //if no entry in the userodapptview table

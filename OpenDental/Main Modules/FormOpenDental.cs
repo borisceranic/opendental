@@ -2135,6 +2135,7 @@ namespace OpenDental{
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//If block must be run before SetModuleSelected() so correct clinic filtration occurs.
 				if(Security.CurUser!=null) {
 					ClinicNum=Security.CurUser.ClinicNum;
+					RefreshMenuClinics();
 				}
 			}
 			SetModuleSelected();
@@ -2212,12 +2213,6 @@ namespace OpenDental{
 			//		}
 			//	#endif
 			//}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(Security.CurUser!=null) {
-					ClinicNum=Security.CurUser.ClinicNum;
-					RefreshMenuClinics();
-				}
-			}
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
@@ -3240,7 +3235,10 @@ namespace OpenDental{
 				}
 				menuClinics.MenuItems.Add(menuItem);
 			}
-			RefreshLocalData(InvalidType.Views);
+			RefreshLocalData(InvalidType.Views);//fills apptviews, sets the view, and then calls ContrAppt.ModuleSelected
+			if(!ContrAppt2.Visible) {
+				RefreshCurrentModule();//calls ModuleSelected of the current module, don't do this if ContrAppt2 is visible since it was just done above
+			}
 		}
 
 		///<summary>This is used to set the private class wide variable _clinicNum and refreshes the current module.</summary>
@@ -3251,7 +3249,6 @@ namespace OpenDental{
 			Clinic clinicCur=(Clinic)((MenuItem)sender).Tag;
 			ClinicNum=clinicCur.ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
-			RefreshCurrentModule();
 			RefreshMenuClinics();
 		}
 		
