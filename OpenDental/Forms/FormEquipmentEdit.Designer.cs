@@ -120,7 +120,7 @@ namespace OpenDental{
 			this.textLocation.Location = new System.Drawing.Point(135, 243);
 			this.textLocation.Name = "textLocation";
 			this.textLocation.Size = new System.Drawing.Size(401, 20);
-			this.textLocation.TabIndex = 6;
+			this.textLocation.TabIndex = 7;
 			// 
 			// label7
 			// 
@@ -154,32 +154,36 @@ namespace OpenDental{
 			this.textMarketValue.BackColor = System.Drawing.SystemColors.Window;
 			this.textMarketValue.ForeColor = System.Drawing.SystemColors.WindowText;
 			this.textMarketValue.Location = new System.Drawing.Point(135, 215);
+			this.textMarketValue.MaxVal = 100000000D;
+			this.textMarketValue.MinVal = -100000000D;
 			this.textMarketValue.Name = "textMarketValue";
 			this.textMarketValue.Size = new System.Drawing.Size(100, 20);
-			this.textMarketValue.TabIndex = 24;
+			this.textMarketValue.TabIndex = 6;
 			// 
 			// textDateSold
 			// 
 			this.textDateSold.Location = new System.Drawing.Point(135, 159);
 			this.textDateSold.Name = "textDateSold";
 			this.textDateSold.Size = new System.Drawing.Size(100, 20);
-			this.textDateSold.TabIndex = 23;
+			this.textDateSold.TabIndex = 4;
 			// 
 			// textDatePurchased
 			// 
 			this.textDatePurchased.Location = new System.Drawing.Point(135, 131);
 			this.textDatePurchased.Name = "textDatePurchased";
 			this.textDatePurchased.Size = new System.Drawing.Size(100, 20);
-			this.textDatePurchased.TabIndex = 22;
+			this.textDatePurchased.TabIndex = 3;
 			// 
 			// textPurchaseCost
 			// 
 			this.textPurchaseCost.BackColor = System.Drawing.SystemColors.Window;
 			this.textPurchaseCost.ForeColor = System.Drawing.SystemColors.WindowText;
 			this.textPurchaseCost.Location = new System.Drawing.Point(135, 187);
+			this.textPurchaseCost.MaxVal = 100000000D;
+			this.textPurchaseCost.MinVal = -100000000D;
 			this.textPurchaseCost.Name = "textPurchaseCost";
 			this.textPurchaseCost.Size = new System.Drawing.Size(100, 20);
-			this.textPurchaseCost.TabIndex = 21;
+			this.textPurchaseCost.TabIndex = 5;
 			// 
 			// butDelete
 			// 
@@ -194,7 +198,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(27, 306);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(81, 24);
-			this.butDelete.TabIndex = 6;
+			this.butDelete.TabIndex = 10;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -209,7 +213,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(402, 306);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 7;
+			this.butOK.TabIndex = 8;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -224,7 +228,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(491, 306);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 9;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
