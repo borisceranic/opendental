@@ -88,7 +88,7 @@ namespace OpenDental{
 			}
 			//if this appt view has the option to show only scheduled providers and this is daily view.
 			//Remember that there is no intelligence in weekly view for this option, and it behaves just like it always did.
-			if(ApptViewCur!=null && ApptViewCur.OnlyScheduledProvs && !isWeekly) {
+			if(ApptViewCur!=null && dailySched!=null && ApptViewCur.OnlyScheduledProvs && !isWeekly) {
 				//intelligently decide what ops to show.  It's based on the schedule for the day.
 				//VisOps will be totally empty right now because it looped out of the above section of code.
 				List<long> listSchedOps;
