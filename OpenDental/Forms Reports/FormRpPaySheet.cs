@@ -436,17 +436,21 @@ namespace OpenDental{
 			string queryIns=
 				@"SELECT CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+",CHAR(25)) DateCP,carrier.CarrierName,MAX("
 +DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") lfname,
-provider.Abbr,
-clinic.Description clinicDesc,
-claimpayment.CheckNum,FORMAT(SUM(claimproc.InsPayAmt),2) amt,claimproc.ClaimNum,claimpayment.PayType 
-FROM claimproc
-LEFT JOIN insplan ON claimproc.PlanNum = insplan.PlanNum 
-LEFT JOIN patient ON claimproc.PatNum = patient.PatNum
-LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum
-LEFT JOIN provider ON provider.ProvNum=claimproc.ProvNum
-LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum = claimpayment.ClaimPaymentNum
-LEFT JOIN clinic ON clinic.ClinicNum=claimproc.ClinicNum
-WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
+provider.Abbr, ";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryIns+="clinic.Description clinicDesc, ";
+			}
+			queryIns+=@"claimpayment.CheckNum,FORMAT(SUM(claimproc.InsPayAmt),2) amt,claimproc.ClaimNum,claimpayment.PayType 
+				FROM claimproc
+				LEFT JOIN insplan ON claimproc.PlanNum = insplan.PlanNum 
+				LEFT JOIN patient ON claimproc.PatNum = patient.PatNum
+				LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum
+				LEFT JOIN provider ON provider.ProvNum=claimproc.ProvNum
+				LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum = claimpayment.ClaimPaymentNum ";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryIns+="LEFT JOIN clinic ON clinic.ClinicNum=claimproc.ClinicNum ";
+			}
+			queryIns+="WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
 				+whereProv
 				+whereClin
 				+"AND claimpayment.CheckDate >= "+POut.Date(date1.SelectionStart)+" "
@@ -461,10 +465,12 @@ WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
 				}
 				queryIns+=") ";
 			}
-			queryIns+=@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),
-claimproc.ClaimPaymentNum,provider.ProvNum,
-claimproc.ClinicNum,carrier.CarrierName,provider.Abbr,
-clinic.Description,claimpayment.CheckNum";
+			queryIns+=@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),"
+				+"claimproc.ClaimPaymentNum,provider.ProvNum,";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryIns+="claimproc.ClinicNum,clinic.Description,";
+			}
+			queryIns+="carrier.CarrierName,provider.Abbr,claimpayment.CheckNum";
 			if(radioPatient.Checked) {
 				queryIns+=",patient.PatNum";
 			}
@@ -509,17 +515,21 @@ clinic.Description,claimpayment.CheckNum";
 			}
 			string queryPat=
 				@"SELECT CONVERT("+DbHelper.DateFormatColumn("payment.PayDate","%c/%d/%Y")+",CHAR(25)) AS DatePay,MAX("
-+DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") AS lfname,provider.Abbr,
-clinic.Description clinicDesc,
-payment.CheckNum,
-FORMAT(SUM(paysplit.SplitAmt),2) amt, payment.PayNum,ItemName,payment.PayType 
-FROM payment
-LEFT JOIN paysplit ON payment.PayNum=paysplit.PayNum
-LEFT JOIN patient ON payment.PatNum=patient.PatNum
-LEFT JOIN provider ON paysplit.ProvNum=provider.ProvNum
-LEFT JOIN definition ON payment.PayType=definition.DefNum 
-LEFT JOIN clinic ON payment.ClinicNum=clinic.ClinicNum
-WHERE 1 "
++DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") AS lfname,provider.Abbr, ";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryPat+="clinic.Description clinicDesc, ";
+			}
+			queryPat+=@"payment.CheckNum,
+				FORMAT(SUM(paysplit.SplitAmt),2) amt, payment.PayNum,ItemName,payment.PayType 
+				FROM payment
+				LEFT JOIN paysplit ON payment.PayNum=paysplit.PayNum
+				LEFT JOIN patient ON payment.PatNum=patient.PatNum
+				LEFT JOIN provider ON paysplit.ProvNum=provider.ProvNum
+				LEFT JOIN definition ON payment.PayType=definition.DefNum ";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryPat+="LEFT JOIN clinic ON clinic.ClinicNum=payment.ClinicNum ";
+			}
+			queryPat+="WHERE 1 "
 				+whereProv
 				+whereClin
 				+"AND paysplit.DatePay >= "+POut.Date(date1.SelectionStart)+" "
@@ -534,9 +544,11 @@ WHERE 1 "
 				}
 				queryPat+=") ";
 			}
-			queryPat+=@"GROUP BY "
-				+"payment.PayNum,payment.PayDate,provider.ProvNum,payment.ClinicNum"
-				+",provider.Abbr,clinic.Description,payment.CheckNum,definition.ItemName";
+			queryPat+=@"GROUP BY payment.PayNum,payment.PayDate,provider.ProvNum,";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				queryPat+="payment.ClinicNum,clinic.Description,";
+			}
+			queryPat+="provider.Abbr,payment.CheckNum,definition.ItemName";
 			if(radioPatient.Checked) {
 				queryPat+=",patient.PatNum";
 			}
@@ -621,7 +633,9 @@ WHERE 1 "
 			query.GetColumnDetail("Date").StringFormat="d";
 			query.AddColumn("Patient Name",270,FieldValueType.String,font);
 			query.AddColumn("Provider",90,FieldValueType.String,font);
-			query.AddColumn("Clinic",120,FieldValueType.String,font);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				query.AddColumn("Clinic",120,FieldValueType.String,font);
+			}
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",120,FieldValueType.Number,font);
 			query.AddGroupSummaryField("Total Patient Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),fontBold,0,10);
