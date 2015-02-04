@@ -548,7 +548,8 @@ namespace OpenDental{
 				if(comboClinic.SelectedIndex>0) {
 					clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
 				}
-				else {
+				else {//User has selected 'All', so add 0 and any clinics that the user has access to.
+					clinicNums.Add(0);
 					for(int i=0;i<ListClinics.Count;i++) {
 						clinicNums.Add(ListClinics[i].ClinicNum);
 					}
