@@ -426,9 +426,9 @@ namespace OpenDentBusiness{
 			string breakErrors="";
 			string ruleErrors="";
 			//Fill lists and catch validation error messages------------------------------------------------------------------------------------------------------------
-			try{ listClockEvent			=ClockEvents	.GetValidList(employee.EmployeeNum,dateStart,dateStop,false); } catch(Exception ex){clockErrors			+=ex.Message;}
-			try{ listClockEventBreak=ClockEvents	.GetValidList(employee.EmployeeNum,dateStart,dateStop,true);	} catch(Exception ex){breakErrors			+=ex.Message;}
-			try{ listTimeCardRule		=TimeCardRules.GetValidList(employee);																			} catch(Exception ex){ruleErrors			+=ex.Message;}
+			try{ listClockEvent     =ClockEvents  .GetValidList(employee.EmployeeNum,dateStart,dateStop,false); } catch(Exception ex){clockErrors			+=ex.Message;}
+			try{ listClockEventBreak=ClockEvents  .GetValidList(employee.EmployeeNum,dateStart,dateStop,true);	} catch(Exception ex){breakErrors			+=ex.Message;}
+			try{ listTimeCardRule   =TimeCardRules.GetValidList(employee);										} catch(Exception ex){ruleErrors			+=ex.Message;}
 			//Validation between two or more lists above----------------------------------------------------------------------------------------------------------------
 			for(int b=0;b<listClockEventBreak.Count;b++) {
 				bool isValidBreak=false;
@@ -461,7 +461,7 @@ namespace OpenDentBusiness{
 			//Begin calculations=========================================================================================================================================
 			TimeSpan tsHoursWorkedTotal			=new TimeSpan()				;
 			TimeSpan tsOvertimeHoursRule		=new TimeSpan(24,0,0)	;//Example 10:00 for overtime rule after 10 hours per day.
-			TimeSpan tsDifferentialAMRule		=new TimeSpan()				;//Example 06:00 for differential rule before 6am.
+			TimeSpan tsDifferentialAMRule		=new TimeSpan()			;//Example 06:00 for differential rule before 6am.
 			TimeSpan tsDifferentialPMRule		=new TimeSpan(24,0,0)	;//Example 17:00 for differential rule after  5pm.
 			//Fill over hours rule from list-------------------------------------------------------------------------------------
 			for(int i=0;i<listTimeCardRule.Count;i++){//loop through rules for this one employee, including any that apply to all emps.
@@ -575,6 +575,7 @@ namespace OpenDentBusiness{
 				if(tsHoursWorkedTotal>tsOvertimeHoursRule) {//if OverHoursPerDay then make AutoOTAdjustments.
 					listClockEvent[i].OTimeAuto	+=tsHoursWorkedTotal-tsOvertimeHoursRule;//++OTimeAuto
 					//listClockEvent[i].AdjustAuto-=tsHoursWorkedTotal-tsOvertimeHoursRule;//--AdjustAuto
+					tsHoursWorkedTotal=tsOvertimeHoursRule;//subsequent clock events should be counted as overtime.
 				}
 				if(i==listClockEvent.Count-1 || listClockEvent[i].TimeDisplayed1.Date!=listClockEvent[i+1].TimeDisplayed1.Date) {
 					//Either the last clock event in the list or last clock event for the day.
