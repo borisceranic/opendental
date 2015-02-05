@@ -575,6 +575,7 @@ namespace OpenDentBusiness{
 				if(tsHoursWorkedTotal>tsOvertimeHoursRule) {//if OverHoursPerDay then make AutoOTAdjustments.
 					listClockEvent[i].OTimeAuto	+=tsHoursWorkedTotal-tsOvertimeHoursRule;//++OTimeAuto
 					//listClockEvent[i].AdjustAuto-=tsHoursWorkedTotal-tsOvertimeHoursRule;//--AdjustAuto
+					tsHoursWorkedTotal=tsOvertimeHoursRule;//subsequent clock events should be counted as overtime.
 				}
 				if(i==listClockEvent.Count-1 || listClockEvent[i].TimeDisplayed1.Date!=listClockEvent[i+1].TimeDisplayed1.Date) {
 					//Either the last clock event in the list or last clock event for the day.
