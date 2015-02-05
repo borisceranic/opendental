@@ -95,6 +95,8 @@ namespace OpenDental {
 		private const long _triageBlueNum=502;
 		///<summary>FK to the definition.DefNum at HQ for the triage priority color for white.</summary>
 		private const long _triageWhiteNum=503;
+		///<summary>FK to tasklist.TaskListNum. </summary>
+		private const long _triageTaskListNum=1697;
 
 		///<summary>Task gets inserted ahead of time, then frequently altered before passing in here.  The taskOld that is passed in should be the task as it is in the database.  When saving, taskOld will be compared with db to make sure no changes.</summary>
 		public FormTaskEdit(Task taskCur,Task taskOld) {
@@ -1428,6 +1430,28 @@ namespace OpenDental {
 			//Cur.KeyNum already handled
 			UpdateTaskPriorityForTriageBasedOnDescript();//This will correct the task priority in the case that a user created / edited a task in their task list and then sent it to the triage task list.
 			TaskCur.PriorityDefNum=_pritoryDefNumSelected;
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)){//HQ
+				if(TaskCur.TaskListNum==_triageTaskListNum) {//Sending to triage
+					if(TaskCur.PriorityDefNum!=_triageRedNum && TaskCur.PriorityDefNum!=_triageBlueNum) {
+						TaskCur.PriorityDefNum=_triageWhiteNum;//Sending to triage with any priority other than red/blue, set it to triageWhite
+					}
+				}
+				else {//Not sending to triage, mark it as the default no matter what (If we add more definitions, this may be a problem. For example sending from one user to another.)
+					for(int i=0;i<_listTaskPriorities.Count;i++){
+						if(_listTaskPriorities[i].ItemValue!="D"){
+							continue;//Not default.
+						}
+						//Change out any triageRed and triageBlue text to prevent the priority from not changing.
+						TaskCur.Descript=TaskCur.Descript.Replace("!!","");//Remove triage red text.
+						TaskCur.Descript=TaskCur.Descript.Replace("CUSTOMER","customer");//Remove triage red text.
+						TaskCur.Descript=TaskCur.Descript.Replace("DOWN","down");//Remove triage red text.
+						TaskCur.Descript=TaskCur.Descript.Replace("URGENT","urgent");//Remove triage red text.
+						TaskCur.Descript=TaskCur.Descript.Replace("CONFERENCE","conference");//Remove triage red text.
+						TaskCur.Descript=TaskCur.Descript.Replace("@@","");//Remove triage blue text.
+						TaskCur.PriorityDefNum=_listTaskPriorities[i].DefNum;//Change the defnum
+					}
+				}
+			}
 			try {
 				if(IsNew) {
 					TaskCur.IsNew=true;
