@@ -33,7 +33,7 @@ namespace OpenDental {
 		private static Statement _stmt;
 
 
-		public static void PrintStatment(object parameters) {
+		public static void PrintStatement(object parameters) {
 			List<object> listParams=(List<object>)parameters;
 			SheetDef sheetDef=(SheetDef)listParams[0];
 			Statement stmt=(Statement)listParams[1];
@@ -180,18 +180,18 @@ namespace OpenDental {
 			}
 			//later: add a check here for print preview.
 			#if DEBUG
-				//pd.DefaultPageSettings.Margins=new Margins(0,0,40,60);
-				//pd.OriginAtMargins=true;
-				//pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height-(100));
-				FormPrintPreview printPreview;
-				int pageCount=0;
-				foreach(Sheet s in _sheetList) {
-					//SetForceSinglePage(s);
-					pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
-				}
-				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
-				printPreview.ShowDialog();
-			#else
+			//	//pd.DefaultPageSettings.Margins=new Margins(0,0,40,60);
+			//	//pd.OriginAtMargins=true;
+			//	//pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height-(100));
+			//	FormPrintPreview printPreview;
+			//	int pageCount=0;
+			//	foreach(Sheet s in _sheetList) {
+			//		//SetForceSinglePage(s);
+			//		pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+			//	}
+			//	printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
+			//	printPreview.ShowDialog();
+			//#else
 				try {
 					if(sheet.PatNum!=null){
 						if(!PrinterL.SetPrinter(pd,sit,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {

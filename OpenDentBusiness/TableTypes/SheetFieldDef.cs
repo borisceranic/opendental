@@ -56,7 +56,7 @@ namespace OpenDentBusiness{
 		public string ReportableName;
 		///<summary>Text Alignment for text fields.</summary>
 		public HorizontalAlignment TextAlign;
-		///<summary>Used to determine if the field should be hidden when printing statments.</summary>
+		///<summary>Used to determine if the field should be hidden when printing statements.</summary>
 		public bool IsPaymentOption;
 		///<summary>Text color, line color, rectangle color.</summary>
 		[XmlIgnore]

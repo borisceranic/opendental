@@ -1059,6 +1059,8 @@ namespace OpenDental{
 				Documents.Update(docc);
 				StmtCur.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
 				Statements.AttachDoc(StmtCur.StatementNum,docc.DocNum);
+
+#error print the actual statement
 				if(StmtCur.IsInvoice && checkIsInvoiceCopy.Visible) {//for foreign countries
 					StmtCur.IsInvoiceCopy=true;
 					Statements.Update(StmtCur);
@@ -1289,7 +1291,7 @@ namespace OpenDental{
 				//print directly to PDF here, and save it.
 				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 				FormSFE.Stmt=StmtCur;
-				FormSFE.IsStatment=true;
+				FormSFE.IsStatement=true;
 				FormSFE.ShowDialog();
 			}
 		}

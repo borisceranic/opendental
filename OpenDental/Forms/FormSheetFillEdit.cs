@@ -26,7 +26,7 @@ namespace OpenDental {
 		public bool TerminalListenShut;
 		///<summary>Only used here to draw the dashed margin lines.</summary>
 		private Margins _printMargin=new Margins(0,0,40,60);
-		public bool IsStatment;//Used for statments, do not save a sheet version of the statment.
+		public bool IsStatement;//Used for statements, do not save a sheet version of the statement.
 		public Statement Stmt;
 
 		public FormSheetFillEdit(Sheet sheet){
@@ -75,7 +75,7 @@ namespace OpenDental {
 				panelMain.Width=SheetCur.Width;
 				panelMain.Height=SheetCur.Height;
 			}
-			if(IsStatment) {
+			if(IsStatement) {
 				labelDateTime.Visible=false;
 				textDateTime.Visible=false;
 				labelDescription.Visible=false;
@@ -583,10 +583,10 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			if(!IsStatment && !TryToSaveData()){//short circuit with !IsStatment
+			if(!IsStatement && !TryToSaveData()){//short circuit with !IsStatement
 				return;
 			}
-			if(!IsStatment) {
+			if(!IsStatement) {
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
 			}
 			//whether this is a new sheet, or one pulled from the database,
@@ -719,10 +719,10 @@ namespace OpenDental {
 		}
 
 		private void butPDF_Click(object sender,EventArgs e) {
-			if(!IsStatment && !TryToSaveData()){
+			if(!IsStatement && !TryToSaveData()){
 				return;
 			}
-			if(!IsStatment) {
+			if(!IsStatement) {
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
 			}
 			string filePathAndName=PrefL.GetRandomTempFile(".pdf");

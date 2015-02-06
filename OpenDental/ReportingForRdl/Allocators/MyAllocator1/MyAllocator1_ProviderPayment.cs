@@ -144,7 +144,7 @@ namespace OpenDental.Reporting.Allocators {
 		}
 		/// <summary>
 		/// Generates a string in form of '(#,#,#,#,#,#, ##.##, 0)' just so things match up.
-		/// Designed to be used with a statment such as INSERT INTO `account` VALUES (1,'Checking Account',0,'',0,-1),(2,'Ca ....
+		/// Designed to be used with a statement such as INSERT INTO `account` VALUES (1,'Checking Account',0,'',0,-1),(2,'Ca ....
 		/// </summary>
 		public static string ValueString(int iAllocType,uint uiGuarantor,int iProvNum,
 										 int iTableSource,ulong ulSourceNum,
