@@ -94,7 +94,6 @@ namespace OpenDental{
 		private CheckBox checkInsDefaultAssignmentOfBenefits;
 		private GroupBox groupBox1;
 		private CheckBox checkIntermingleDefault;
-		private CheckBox checkStatementSummaryShowInsInfo;
 		private CheckBox checkStatementShowReturnAddress;
 		private CheckBox checkStatementShowProcBreakdown;
 		private CheckBox checkShowCC;
@@ -207,6 +206,7 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.checkStatmentsUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkStoreCCTokens = new System.Windows.Forms.CheckBox();
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
@@ -238,7 +238,6 @@ namespace OpenDental{
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.checkStatementShowAdjNotes = new System.Windows.Forms.CheckBox();
 			this.checkIntermingleDefault = new System.Windows.Forms.CheckBox();
-			this.checkStatementSummaryShowInsInfo = new System.Windows.Forms.CheckBox();
 			this.checkStatementShowReturnAddress = new System.Windows.Forms.CheckBox();
 			this.checkStatementShowProcBreakdown = new System.Windows.Forms.CheckBox();
 			this.checkShowCC = new System.Windows.Forms.CheckBox();
@@ -253,7 +252,6 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkStatmentsUseSheets = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -935,6 +933,17 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
+			// checkStatmentsUseSheets
+			// 
+			this.checkStatmentsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkStatmentsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkStatmentsUseSheets.Location = new System.Drawing.Point(44, 266);
+			this.checkStatmentsUseSheets.Name = "checkStatmentsUseSheets";
+			this.checkStatmentsUseSheets.Size = new System.Drawing.Size(396, 17);
+			this.checkStatmentsUseSheets.TabIndex = 204;
+			this.checkStatmentsUseSheets.Text = "Statments use Sheets";
+			this.checkStatmentsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkStoreCCTokens
 			// 
 			this.checkStoreCCTokens.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1270,7 +1279,6 @@ namespace OpenDental{
 			// 
 			this.groupBox1.Controls.Add(this.checkStatementShowAdjNotes);
 			this.groupBox1.Controls.Add(this.checkIntermingleDefault);
-			this.groupBox1.Controls.Add(this.checkStatementSummaryShowInsInfo);
 			this.groupBox1.Controls.Add(this.checkStatementShowReturnAddress);
 			this.groupBox1.Controls.Add(this.checkStatementShowProcBreakdown);
 			this.groupBox1.Controls.Add(this.checkShowCC);
@@ -1283,7 +1291,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.textPayPlansBillInAdvanceDays);
 			this.groupBox1.Location = new System.Drawing.Point(38, 76);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(413, 240);
+			this.groupBox1.Size = new System.Drawing.Size(413, 216);
 			this.groupBox1.TabIndex = 197;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Billing and Statements";
@@ -1303,23 +1311,12 @@ namespace OpenDental{
 			// 
 			this.checkIntermingleDefault.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIntermingleDefault.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIntermingleDefault.Location = new System.Drawing.Point(25, 207);
+			this.checkIntermingleDefault.Location = new System.Drawing.Point(25, 189);
 			this.checkIntermingleDefault.Name = "checkIntermingleDefault";
 			this.checkIntermingleDefault.Size = new System.Drawing.Size(377, 16);
 			this.checkIntermingleDefault.TabIndex = 214;
 			this.checkIntermingleDefault.Text = "Default to all types of statements printing in intermingled mode";
 			this.checkIntermingleDefault.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// checkStatementSummaryShowInsInfo
-			// 
-			this.checkStatementSummaryShowInsInfo.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkStatementSummaryShowInsInfo.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkStatementSummaryShowInsInfo.Location = new System.Drawing.Point(34, 189);
-			this.checkStatementSummaryShowInsInfo.Name = "checkStatementSummaryShowInsInfo";
-			this.checkStatementSummaryShowInsInfo.Size = new System.Drawing.Size(368, 17);
-			this.checkStatementSummaryShowInsInfo.TabIndex = 213;
-			this.checkStatementSummaryShowInsInfo.Text = "Show insurance pending and related balance info on statement summary";
-			this.checkStatementSummaryShowInsInfo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkStatementShowReturnAddress
 			// 
@@ -1475,17 +1472,6 @@ namespace OpenDental{
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// checkStatmentsUseSheets
-			// 
-			this.checkStatmentsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkStatmentsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkStatmentsUseSheets.Location = new System.Drawing.Point(44, 266);
-			this.checkStatmentsUseSheets.Name = "checkStatmentsUseSheets";
-			this.checkStatmentsUseSheets.Size = new System.Drawing.Size(396, 17);
-			this.checkStatmentsUseSheets.TabIndex = 204;
-			this.checkStatmentsUseSheets.Text = "Statments use Sheets";
-			this.checkStatmentsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1687,7 +1673,6 @@ namespace OpenDental{
 				textStatementsCalcDueDate.Text=PrefC.GetLong(PrefName.StatementsCalcDueDate).ToString();
 			}
 			textPayPlansBillInAdvanceDays.Text=PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString();
-			checkStatementSummaryShowInsInfo.Checked=PrefC.GetBool(PrefName.StatementSummaryShowInsInfo);
 			checkIntermingleDefault.Checked=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
 			#endregion
 		}
@@ -1866,7 +1851,6 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ShowAccountFamilyCommEntries,checkShowFamilyCommByDefault.Checked)
 				| Prefs.UpdateBool(PrefName.InsDefaultPPOpercent,checkPPOpercentage.Checked)
 				| Prefs.UpdateBool(PrefName.ClaimFormTreatDentSaysSigOnFile,checkClaimFormTreatDentSaysSigOnFile.Checked)
-				| Prefs.UpdateBool(PrefName.StatementSummaryShowInsInfo, checkStatementSummaryShowInsInfo.Checked)
 				| Prefs.UpdateBool(PrefName.ApptModuleRefreshesEveryMinute, checkApptRefreshEveryMinute.Checked)
 				| Prefs.UpdateBool(PrefName.ChartQuickAddHideAmalgam, checkChartQuickAddHideAmalgam.Checked)
 				| Prefs.UpdateBool(PrefName.AllowedFeeSchedsAutomate,checkAllowedFeeSchedsAutomate.Checked)
