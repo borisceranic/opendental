@@ -3829,7 +3829,7 @@ namespace OpenDental {
 		/// <summary>Saves the statement.  Attaches a pdf to it by creating a doc object.  Prints it or emails it.  </summary>
 		private void PrintStatement(Statement stmt) {
 			if(PrefC.GetBool(PrefName.StatementsUseSheets)) {
-				PrintStatmentSheets(stmt);
+				PrintStatementSheets(stmt);
 			}
 			else {
 				PrintStatementClassic(stmt);
@@ -3906,7 +3906,7 @@ namespace OpenDental {
 
 		}
 
-		private void PrintStatmentSheets(Statement stmt) {
+		private void PrintStatementSheets(Statement stmt) {
 			Cursor=Cursors.WaitCursor;
 			Statements.Insert(stmt);
 			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
@@ -3997,7 +3997,7 @@ namespace OpenDental {
 				}
 				Process.Start(imgPath);
 #else
-				//Thread thread=new Thread(new ParameterizedThreadStart(SheetPrinting.PrintStatment));
+				//Thread thread=new Thread(new ParameterizedThreadStart(SheetPrinting.PrintStatement));
 				//thread.Start(new List<object> { sheetDef,stmt,tempPath });
 				try {
 					ProcessStartInfo info=new ProcessStartInfo();

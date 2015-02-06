@@ -3622,7 +3622,7 @@ namespace OpenDental{
 			if(table.Rows.Count != 0) {
 				infoReceiverFirstName = PIn.String(table.Rows[0][0].ToString());
 				infoReceiverLastName = PIn.String(table.Rows[0][1].ToString());
-				// Case statment for TaxoCode
+				// Case statement for TaxoCode
 				switch(PIn.Long(table.Rows[0][2].ToString())) {
 					case 1:
 						TaxoCode = "124Q00000X";

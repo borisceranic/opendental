@@ -1289,7 +1289,7 @@ namespace OpenDental{
 				//print directly to PDF here, and save it.
 				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 				FormSFE.Stmt=StmtCur;
-				FormSFE.IsStatment=true;
+				FormSFE.IsStatement=true;
 				FormSFE.ShowDialog();
 			}
 		}

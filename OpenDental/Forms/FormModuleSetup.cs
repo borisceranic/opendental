@@ -114,7 +114,7 @@ namespace OpenDental{
 		private CheckBox checkChartNonPatientWarn;
 		private CheckBox checkTreatPlanItemized;
 		private CheckBox checkFamPhiAccess;
-		private CheckBox checkStatmentsUseSheets;
+		private CheckBox checkStatementsUseSheets;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -206,7 +206,7 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
-			this.checkStatmentsUseSheets = new System.Windows.Forms.CheckBox();
+			this.checkStatementsUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkStoreCCTokens = new System.Windows.Forms.CheckBox();
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
@@ -909,7 +909,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
-			this.tabAccount.Controls.Add(this.checkStatmentsUseSheets);
+			this.tabAccount.Controls.Add(this.checkStatementsUseSheets);
 			this.tabAccount.Controls.Add(this.checkStoreCCTokens);
 			this.tabAccount.Controls.Add(this.checkAccountShowPaymentNums);
 			this.tabAccount.Controls.Add(this.checkClaimMedTypeIsInstWhenInsPlanIsMedical);
@@ -933,16 +933,16 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
-			// checkStatmentsUseSheets
+			// checkStatementsUseSheets
 			// 
-			this.checkStatmentsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkStatmentsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkStatmentsUseSheets.Location = new System.Drawing.Point(44, 266);
-			this.checkStatmentsUseSheets.Name = "checkStatmentsUseSheets";
-			this.checkStatmentsUseSheets.Size = new System.Drawing.Size(396, 17);
-			this.checkStatmentsUseSheets.TabIndex = 204;
-			this.checkStatmentsUseSheets.Text = "Statments use Sheets";
-			this.checkStatmentsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkStatementsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkStatementsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkStatementsUseSheets.Location = new System.Drawing.Point(44, 266);
+			this.checkStatementsUseSheets.Name = "checkStatementsUseSheets";
+			this.checkStatementsUseSheets.Size = new System.Drawing.Size(396, 17);
+			this.checkStatementsUseSheets.TabIndex = 204;
+			this.checkStatementsUseSheets.Text = "Statements use Sheets";
+			this.checkStatementsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkStoreCCTokens
 			// 
@@ -1613,7 +1613,7 @@ namespace OpenDental{
 			checkClaimsValidateACN.Checked=PrefC.GetBool(PrefName.ClaimsValidateACN);
 			checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked=PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical);
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
-			checkStatmentsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
+			checkStatementsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -1878,7 +1878,7 @@ namespace OpenDental{
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
-				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatmentsUseSheets.Checked)
+				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
 				)
 			{
 				_changed=true;

@@ -33,7 +33,7 @@ namespace OpenDental {
 		private static Statement _stmt;
 
 
-		public static void PrintStatment(object parameters) {
+		public static void PrintStatement(object parameters) {
 			List<object> listParams=(List<object>)parameters;
 			SheetDef sheetDef=(SheetDef)listParams[0];
 			Statement stmt=(Statement)listParams[1];

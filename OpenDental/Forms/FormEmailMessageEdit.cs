@@ -1011,7 +1011,7 @@ namespace OpenDental{
 
 		private void buttonFuchsMailDSF_Click(object sender,EventArgs e) {
 			textSubject.Text="Statement to DSF";
-			textBodyText.Text="For accounting, sent statment to skimom@springfielddental.net"+textBodyText.Text;
+			textBodyText.Text="For accounting, sent statement to skimom@springfielddental.net"+textBodyText.Text;
 			textToAddress.Text="skimom@springfielddental.net";
 			messageChanged=false;
 		}
@@ -1019,7 +1019,7 @@ namespace OpenDental{
 		private void buttonFuchsMailDMF_Click(object sender,EventArgs e) {
 			textToAddress.Text="smilecouple@yahoo.com";
 			textSubject.Text="Statement to DMF";
-			textBodyText.Text="For accounting, sent statment to smilecouple@yahoo.com"+textBodyText.Text;
+			textBodyText.Text="For accounting, sent statement to smilecouple@yahoo.com"+textBodyText.Text;
 			messageChanged=false;
 		}
 

@@ -78,7 +78,7 @@ namespace OpenDentBusiness {
 		PatImage,
 		///<Summary>11-Special: Currently only used for Toothgrid</Summary>
 		Special,
-		///<summary>12-Grid: Placable grids similar to ODGrids. Used primarily in statments.</summary>
+		///<summary>12-Grid: Placable grids similar to ODGrids. Used primarily in statements.</summary>
 		Grid
 		//<summary></summary>
 		//RadioButton

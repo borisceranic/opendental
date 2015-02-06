@@ -531,7 +531,7 @@ If the master term dictionary or software program containing the UCUM table, UCU
 			private const int CHUNK_SIZE=10;
 			///<summary>Static lis of threads. All managed internally. Must always be locked by _lock when accessed!!!</summary>
 			private static List<UpdateCodeSystemThread> _threads=new List<UpdateCodeSystemThread>();
-			///<summary>All access of _threads member MUST BE enclosed with lock statment in order to prevent thread-lock and race conditions.</summary>
+			///<summary>All access of _threads member MUST BE enclosed with lock statement in order to prevent thread-lock and race conditions.</summary>
 			private static object _lock=new object();
 			///<summary>The code system being updated.</summary>
 			private CodeSystem _codeSystem;			

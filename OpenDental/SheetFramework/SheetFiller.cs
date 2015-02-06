@@ -2035,20 +2035,20 @@ namespace OpenDental{
 						#region Sta/Rec/Inv
 						if(Stmt.IsInvoice) {
 							if(CultureInfo.CurrentCulture.Name=="en-NZ" || CultureInfo.CurrentCulture.Name=="en-AU") {//New Zealand and Australia
-								field.FieldValue=Lan.g("Statments","TAX INVOICE");
+								field.FieldValue=Lan.g("Statements","TAX INVOICE");
 							}
 							else {
-								field.FieldValue=Lan.g("Statments","INVOICE")+" #"+Stmt.StatementNum.ToString();
+								field.FieldValue=Lan.g("Statements","INVOICE")+" #"+Stmt.StatementNum.ToString();
 							}
 						}
 						else if(Stmt.IsReceipt) {
-							field.FieldValue=Lan.g("Statments","RECEIPT");
+							field.FieldValue=Lan.g("Statements","RECEIPT");
 							if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
 								field.FieldValue+=" #"+Stmt.StatementNum.ToString();
 							}
 						}
 						else {
-							field.FieldValue=Lan.g("Statments","STATEMENT");
+							field.FieldValue=Lan.g("Statements","STATEMENT");
 						}
 						#endregion
 						break;

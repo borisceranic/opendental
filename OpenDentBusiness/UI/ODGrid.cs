@@ -1709,7 +1709,7 @@ namespace OpenDental.UI {
 					g.DrawLine(new XPen(cOutline),p(x+(-hScroll.Value+ColPos[i])),p(y),
 						p(x+(-hScroll.Value+ColPos[i])),p(y+headerHeight));
 				}
-				float xFloat=(float)x+(float)(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2);//for some reason visual studio would not allow this statment within the DrawString Below.
+				float xFloat=(float)x+(float)(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2);//for some reason visual studio would not allow this statement within the DrawString Below.
 				DrawStringX(g,columns[i].Heading,headerFont,XBrushes.Black,new XRect(p(xFloat),p(y-3),100,100),XStringAlignment.Center);
 			}//end for columns.Count
 			//Outline the Title
