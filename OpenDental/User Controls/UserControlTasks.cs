@@ -234,7 +234,9 @@ namespace OpenDental {
 		}
 
 		private void textStartDate_TextChanged(object sender,EventArgs e) {
-			FillGrid();
+			//Prevent FillGrid() from updating too frequently.
+			timerDoneTaskListRefresh.Stop();
+			timerDoneTaskListRefresh.Start();
 		}
 
 		private void FillGrid(){
@@ -249,6 +251,7 @@ namespace OpenDental {
 			if(TreeHistory==null){
 				return;
 			}
+			Cursor=Cursors.WaitCursor;
 			if(TreeHistory.Count>0) {//not on main trunk
 				parent=TreeHistory[TreeHistory.Count-1].TaskListNum;
 				date=DateTime.MinValue;
@@ -507,6 +510,7 @@ namespace OpenDental {
 			if(tabContr.SelectedTab==tabOpenTickets) {
 				SetOpenTicketTab(gridMain.Rows.Count);
 			}
+			Cursor=Cursors.Default;
 		}
 
 		private void checkShowFinished_Click(object sender,EventArgs e) {
@@ -1380,6 +1384,12 @@ namespace OpenDental {
 			}
 			FillTree();
 			//FillMain();
+			FillGrid();
+		}
+
+		private void timerDoneTaskListRefresh_Tick(object sender,EventArgs e) {
+			//This timer was set by textStartDate_TextChanged in order to prevent refreshing too frequently.
+			timerDoneTaskListRefresh.Stop();
 			FillGrid();
 		}
 

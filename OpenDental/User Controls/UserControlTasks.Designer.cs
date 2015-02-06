@@ -55,8 +55,9 @@ namespace OpenDental {
 			this.menuItemGoto = new System.Windows.Forms.MenuItem();
 			this.checkShowFinished = new System.Windows.Forms.CheckBox();
 			this.labelStartDate = new System.Windows.Forms.Label();
-			this.textStartDate = new OpenDental.ValidDate();
+			this.timerDoneTaskListRefresh = new System.Windows.Forms.Timer(this.components);
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.textStartDate = new OpenDental.ValidDate();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.tabContr.SuspendLayout();
 			this.SuspendLayout();
@@ -314,15 +315,10 @@ namespace OpenDental {
 			this.labelStartDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.labelStartDate.Visible = false;
 			// 
-			// textStartDate
+			// timerDoneTaskListRefresh
 			// 
-			this.textStartDate.Location = new System.Drawing.Point(238, 310);
-			this.textStartDate.Name = "textStartDate";
-			this.textStartDate.Size = new System.Drawing.Size(87, 20);
-			this.textStartDate.TabIndex = 11;
-			this.textStartDate.Visible = false;
-			this.textStartDate.TextChanged += new System.EventHandler(this.textStartDate_TextChanged);
-			this.textStartDate.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textStartDate_KeyPress);
+			this.timerDoneTaskListRefresh.Interval = 2000;
+			this.timerDoneTaskListRefresh.Tick += new System.EventHandler(this.timerDoneTaskListRefresh_Tick);
 			// 
 			// gridMain
 			// 
@@ -339,6 +335,16 @@ namespace OpenDental {
 			this.gridMain.TranslationName = "TableTasks";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridMain_MouseDown);
+			// 
+			// textStartDate
+			// 
+			this.textStartDate.Location = new System.Drawing.Point(238, 310);
+			this.textStartDate.Name = "textStartDate";
+			this.textStartDate.Size = new System.Drawing.Size(87, 20);
+			this.textStartDate.TabIndex = 11;
+			this.textStartDate.Visible = false;
+			this.textStartDate.TextChanged += new System.EventHandler(this.textStartDate_TextChanged);
+			this.textStartDate.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textStartDate_KeyPress);
 			// 
 			// ToolBarMain
 			// 
@@ -406,5 +412,6 @@ namespace OpenDental {
 		private System.Windows.Forms.MenuItem menuItemDone;
 		private System.Windows.Forms.MenuItem menuItem4;
 		private System.Windows.Forms.MenuItem menuItemSendToMe;
+		private System.Windows.Forms.Timer timerDoneTaskListRefresh;
 	}
 }
