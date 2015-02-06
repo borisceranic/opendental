@@ -449,6 +449,7 @@ namespace OpenDentBusiness {
 		StatementShowAdjNotes,
 		StatementShowProcBreakdown,
 		StatementShowReturnAddress,
+		///<summary>Deprecated.  Not used anywhere.</summary>
 		StatementSummaryShowInsInfo,
 		StatementsUseSheets,
 		StoreCCnumbers,
