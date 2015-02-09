@@ -275,7 +275,12 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(gridMain.GetSelectedIndex()==-1){
-				MsgBox.Show(this,"Please select Rx first or click Blank");
+				if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+					MsgBox.Show(this,"Please select Rx first.");
+				}
+				else {
+					MsgBox.Show(this,"Please select Rx first or click Blank");
+				}
 				return;
 			}
 			RxSelected();
