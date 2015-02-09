@@ -602,7 +602,9 @@ provider.Abbr, ";
 			report.ReportName=Lan.g(this,"Daily Payments");
 			report.AddTitle("Title",Lan.g(this,"Daily Payments"),fontTitle);
 			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
-			report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
+			}
 			Dictionary<long,string> dictInsDefNames=new Dictionary<long,string>();
 			Dictionary<long,string> dictPatDefNames=new Dictionary<long,string>();
 			List<Def> insDefs=new List<Def>(DefC.GetList(DefCat.InsurancePaymentType));
@@ -616,6 +618,7 @@ provider.Abbr, ";
 			int[] summaryGroups1= { 1 };
 			int[] summaryGroups2= { 2 };
 			int[] summaryGroups3= { 1,2 };
+			//Insurance Payments Query-------------------------------------
 			QueryObject query=report.AddQuery(tableIns,"Insurance Payments","PayType",SplitByKind.Definition,1,true,dictInsDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
@@ -623,10 +626,13 @@ provider.Abbr, ";
 			query.AddColumn("Carrier",150,FieldValueType.String,font);
 			query.AddColumn("Patient Name",150,FieldValueType.String,font);
 			query.AddColumn("Provider",90,FieldValueType.String,font);
-			query.AddColumn("Clinic",120,FieldValueType.String,font);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				query.AddColumn("Clinic",120,FieldValueType.String,font);
+			}
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",90,FieldValueType.Number,font);
 			query.AddGroupSummaryField("Total Insurance Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,0,10);
+			//Patient Payments Query---------------------------------------
 			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,2,true,dictPatDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
