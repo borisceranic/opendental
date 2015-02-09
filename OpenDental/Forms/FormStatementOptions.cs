@@ -1060,7 +1060,7 @@ namespace OpenDental{
 				StmtCur.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
 				Statements.AttachDoc(StmtCur.StatementNum,docc.DocNum);
 
-#error print the actual statement
+//#error print the actual statement
 				if(StmtCur.IsInvoice && checkIsInvoiceCopy.Visible) {//for foreign countries
 					StmtCur.IsInvoiceCopy=true;
 					Statements.Update(StmtCur);
