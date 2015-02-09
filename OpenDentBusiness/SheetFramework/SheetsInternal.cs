@@ -1555,7 +1555,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.Height=1100;
 			//From top to bottom
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statementReceiptInvoice",15f,"Arial",true,325,60,200,22,HorizontalAlignment.Center));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("returnAddress",10f,"Arial",false,40,70,250,80));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("returnAddress",10f,"Arial",false,40,70,250,80,GrowthBehaviorEnum.DownLocal));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.DateSent",9f,"Arial",false,325,83,200,13,HorizontalAlignment.Center));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("accountNumber",9f,"Arial",false,325,97,200,13,HorizontalAlignment.Center));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementEnclosed",445,120,321,31));
@@ -1587,7 +1587,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementPayPlan",170,465,510,49));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementMain",65,535,720,31));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("futureAppointments",9f,"Arial",false,50,572,725,14));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.Note",9f,"Arial",false,50,587,725,14));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.Note",9f,"Arial",false,50,587,725,14,GrowthBehaviorEnum.DownGlobal));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,602,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
 			return sheet;
 		}
