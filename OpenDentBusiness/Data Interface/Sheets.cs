@@ -448,7 +448,11 @@ namespace OpenDentBusiness{
 
 		public static void SetPageMargin(Sheet sheet,System.Drawing.Printing.Margins m) {
 			if(SheetTypeIsSinglePage(sheet.SheetType)) {
-				m=new System.Drawing.Printing.Margins(0,0,0,0);
+				m.Left=0;
+				m.Right=0;
+				m.Top=0;
+				m.Bottom=0;
+				//m=new System.Drawing.Printing.Margins(0,0,0,0); //does not work, creates new reference.
 				return;
 			}
 		}
