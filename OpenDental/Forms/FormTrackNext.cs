@@ -12,15 +12,7 @@ namespace OpenDental{
 	/// <summary>The Next appoinment tracking tool.</summary>
 	public class FormTrackNext : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butClose;
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
-		///<summary>Passes the pinclicked result down from the appointment to the parent form.</summary>
-		public bool PinClicked;
 		private List<Appointment> AptList;
-		///<summary>When this form closes, this will be the patNum of the last patient viewed.  The calling form should then make use of this to refresh to that patient.  If 0, then calling form should not refresh.</summary>
-		public long SelectedPatNum;
 		private OpenDental.UI.ODGrid gridMain;
 		private ComboBox comboProv;
 		private Label label4;
@@ -28,8 +20,6 @@ namespace OpenDental{
 		private ComboBox comboOrder;
 		private Label label1;
 		private OpenDental.UI.Button butPrint;
-		///<summary>Only used if PinClicked=true</summary>
-		public long AptSelected;
 		private int pagesPrinted;
 		private bool headingPrinted;
 		private PrintDocument pd;
@@ -40,8 +30,11 @@ namespace OpenDental{
 		private Label labelClinic;
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
+		private IContainer components;
+		private ContextMenuStrip menuRightClick;
+		public PatientSelectedEventHandler PatientGoTo;
 
-		///<summary></summary>
+		///<summary>PatientGoTo must be set before calling Show() or ShowDialog().</summary>
 		public FormTrackNext(){
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
@@ -69,6 +62,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTrackNext));
 			this.butClose = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -82,6 +76,7 @@ namespace OpenDental{
 			this.labelSite = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this.menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -111,6 +106,7 @@ namespace OpenDental{
 			this.gridMain.Title = "Planned Appointments";
 			this.gridMain.TranslationName = "FormTrackNext";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grid_MouseUp);
 			// 
 			// comboProv
 			// 
@@ -216,6 +212,11 @@ namespace OpenDental{
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// menuRightClick
+			// 
+			this.menuRightClick.Name = "menuRightClick";
+			this.menuRightClick.Size = new System.Drawing.Size(61, 4);
+			// 
 			// FormTrackNext
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -233,14 +234,12 @@ namespace OpenDental{
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimizeBox = false;
 			this.Name = "FormTrackNext";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Track Planned Appointments";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormTrackNext_FormClosing);
 			this.Load += new System.EventHandler(this.FormTrackNext_Load);
 			this.ResumeLayout(false);
 
@@ -248,6 +247,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormTrackNext_Load(object sender, System.EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			patientNames=Patients.GetAllPatientNames();
 			comboOrder.Items.Add(Lan.g(this,"Status"));
 			comboOrder.Items.Add(Lan.g(this,"Alphabetical"));
@@ -290,6 +290,21 @@ namespace OpenDental{
 				}
 			}
 			FillGrid();
+			menuRightClick.Items.Clear();
+			menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+			menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+			Cursor=Cursors.Default;
+		}
+
+		private void menuRight_click(object sender,System.EventArgs e) {
+			switch(menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
+				case 0:
+					SeeChart_Click();
+					break;
+				case 1:
+					SendPinboard_Click();
+					break;
+			}
 		}
 
 		private void FillGrid(){
@@ -364,20 +379,53 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void grid_MouseUp(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right) {
+				if(gridMain.SelectedIndices.Length>0) {
+					menuRightClick.Show(gridMain,new Point(e.X,e.Y));
+				}
+			}
+		}
+
+		private void SeeChart_Click() {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			//Only one can be selected at a time in this grid, but just in case we change it in the future it will select the last one in the list to be consistent with other patient selections.
+			Patient pat=Patients.GetPat(AptList[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]].PatNum);
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
+			GotoModule.GotoChart(pat.PatNum);
+		}
+
+		private void SendPinboard_Click() {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			List<long> listAppts=new List<long>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listAppts.Add(AptList[gridMain.SelectedIndices[i]].AptNum);//Will only be one unless multiselect is enabled in the future
+			}
+			GotoModule.PinToAppt(listAppts,0);//This will send all appointments in _listAptSelected to the pinboard, and will select the patient attached to the last appointment in _listAptSelected.
+		}
+
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			SelectedPatNum=AptList[e.Row].PatNum;
 			int currentSelection=gridMain.GetSelectedIndex();
 			int currentScroll=gridMain.ScrollValue;
+			Patient pat=Patients.GetPat(AptList[e.Row].PatNum);//Only one can be selected at a time in this grid.
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
 			FormApptEdit FormAE=new FormApptEdit(AptList[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();
-			if(FormAE.DialogResult!=DialogResult.OK)
+			if(FormAE.DialogResult!=DialogResult.OK) {
 				return;
+			}
 			if(FormAE.PinClicked) {
-				PinClicked=true;
-				AptSelected=AptList[e.Row].AptNum;
+				SendPinboard_Click();
 				DialogResult=DialogResult.OK;
-				return;
 			}
 			else {
 				FillGrid();
@@ -452,20 +500,6 @@ namespace OpenDental{
 		private void butClose_Click(object sender, System.EventArgs e) {
 			Close();
 		}
-
-		private void FormTrackNext_FormClosing(object sender,FormClosingEventArgs e) {
-			//Patients.HList=null;
-			if(gridMain.GetSelectedIndex()!=-1) {
-				SelectedPatNum=AptList[gridMain.GetSelectedIndex()].PatNum;
-			}
-		}
-
-		
-		
-
-		
-		
-
 
 	}
 }

@@ -173,6 +173,7 @@ namespace OpenDental {
 		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
 		//This list will contain the same number of items as comboView minus 1 for 'none'.
 		private List<ApptView> _listApptViews;
+		private FormTrackNext FormTN;
 		private FormUnsched FormUnsched2;
 
 		///<summary></summary>
@@ -4259,18 +4260,15 @@ namespace OpenDental {
 		}
 
 		private void OnTrack_Click() {
-			Cursor=Cursors.WaitCursor;
-			FormTrackNext FormTN=new FormTrackNext();
-			FormTN.ShowDialog();
-			if(FormTN.PinClicked) {
-				SendToPinBoard(FormTN.AptSelected);
+			if(FormTN==null || FormTN.IsDisposed) {
+				FormTN=new FormTrackNext();
+				FormTN.PatientGoTo=PatientSelected;
 			}
-			if(FormTN.SelectedPatNum!=0) {
-				RefreshModuleDataPatient(FormTN.SelectedPatNum);
-				OnPatientSelected(PatCur);
-				//RefreshModulePatient(FormTN.SelectedPatNum);
+			FormTN.Show();
+			if(FormTN.WindowState==FormWindowState.Minimized) {
+				FormTN.WindowState=FormWindowState.Normal;
 			}
-			Cursor=Cursors.Default;
+			FormTN.BringToFront();
 		}
 
 		private void OnLists_Click() {
