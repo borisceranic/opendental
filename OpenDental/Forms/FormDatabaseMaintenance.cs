@@ -569,7 +569,7 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			string result="";
 			try {
-				DatabaseMaintenance.BackupRepairAndOptimize();
+				result=DatabaseMaintenance.BackupRepairAndOptimize();
 			}
 			catch(Exception ex) {
 				result=DateTime.Now.ToString()+"\r\n";

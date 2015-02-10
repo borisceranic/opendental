@@ -65,9 +65,11 @@ namespace OpenDentBusiness {
 		///<summary>If using MySQL, tries to make a backup of the database and then optimizes and repairs each table.  Returns true if a backup was made.
 		///We have to backup the database before running the repair commands because it has a tendency to delete data it cannot understand which is problematic.
 		///Currently called whenever MySQL is upgraded and when users click Optimize in database maintenance.</summary>
-		public static void BackupRepairAndOptimize() {
+		public static string BackupRepairAndOptimize(bool isLogged=false) {
+			StringBuilder retVal=new StringBuilder();
+			DataTable tableLog=null;
 			if(DataConnection.DBtype!=DatabaseType.MySql) {
-				return;
+				return "";
 			}
 			#if !DEBUG
 			MiscData.MakeABackup();
@@ -80,12 +82,29 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<tableNames.Length;i++) {
 				command="OPTIMIZE TABLE `"+tableNames[i]+"`";
-				Db.NonQ(command);
+				if(!isLogged) {
+					Db.NonQ(command);
+				}
+				else {
+					tableLog=Db.GetTable(command);
+					for(int r=0;r<tableLog.Rows.Count;r++) {//usually only 1 row, unless something abnormal is found.
+						retVal.AppendLine(tableLog.Rows[r][0].ToString().PadRight(50,' ')+"| "+tableLog.Rows[r][1].ToString()+" | "+tableLog.Rows[r][2].ToString()+" | "+tableLog.Rows[r][3].ToString());
+					}
+				}
 			}
 			for(int i=0;i<tableNames.Length;i++) {
 				command="REPAIR TABLE `"+tableNames[i]+"`";
-				Db.NonQ(command);
+				if(!isLogged) {
+					Db.NonQ(command);
+				}
+				else {
+					tableLog=Db.GetTable(command);
+					for(int r=0;r<tableLog.Rows.Count;r++) {//usually only 1 row, unless something abnormal is found.
+						retVal.AppendLine(tableLog.Rows[r][0].ToString().PadRight(50,' ')+"| "+tableLog.Rows[r][1].ToString()+" | "+tableLog.Rows[r][2].ToString()+" | "+tableLog.Rows[r][3].ToString());
+					}
+				}
 			}
+			return retVal.ToString();
 		}
 
 		[DbmMethod]
