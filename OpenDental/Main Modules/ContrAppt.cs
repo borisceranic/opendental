@@ -173,6 +173,7 @@ namespace OpenDental {
 		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
 		//This list will contain the same number of items as comboView minus 1 for 'none'.
 		private List<ApptView> _listApptViews;
+		private FormUnsched FormUnsched2;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -4194,18 +4195,16 @@ namespace OpenDental {
 		}*/
 
 		private void OnUnschedList_Click() {
-			Cursor=Cursors.WaitCursor;
-			FormUnsched FormUnsched2=new FormUnsched();
-			FormUnsched2.ShowDialog();
-			if(FormUnsched2.PinClicked) {
-				SendToPinBoard(FormUnsched2.AptSelected);
+			//Reselect existing window if available, if not create a new instance
+			if(FormUnsched2==null || FormUnsched2.IsDisposed) {
+				FormUnsched2=new FormUnsched();
+				FormUnsched2.PatientGoTo=PatientSelected;
 			}
-			if(FormUnsched2.SelectedPatNum!=0) {
-				RefreshModuleDataPatient(FormUnsched2.SelectedPatNum);
-				OnPatientSelected(PatCur);
-				//RefreshModulePatient(FormUnsched2.SelectedPatNum);
+			FormUnsched2.Show();
+			if(FormUnsched2.WindowState==FormWindowState.Minimized) {//only applicable if re-using an existing instance
+				FormUnsched2.WindowState=FormWindowState.Normal;
 			}
-			Cursor=Cursors.Default;
+			FormUnsched2.BringToFront();
 		}
 
 		private void OnASAPList_Click() {
@@ -4728,7 +4727,7 @@ namespace OpenDental {
 					cardPrintFamily=false;
 					PrintApptCard();
 					break;
-				case 10://RIGHT HERE DUMMY
+				case 10:
 					cardPrintFamily=true;
 					PrintApptCard();
 					break;

@@ -14,8 +14,6 @@ namespace OpenDental{
 		private IContainer components;
 		private OpenDental.UI.Button butClose;
 		///<summary></summary>
-		public bool PinClicked=false;		
-		///<summary></summary>
 		public static string procsForCur;
 		private OpenDental.UI.ODGrid grid;
 		private OpenDental.UI.Button butPrint;
@@ -24,8 +22,6 @@ namespace OpenDental{
 		private bool headingPrinted;
 		private int headingPrintH;
 		private int pagesPrinted;
-		///<summary>Only used if PinClicked=true</summary>
-		public long AptSelected;
 		private ComboBox comboOrder;
 		private Label label1;
 		private ComboBox comboProv;
@@ -33,16 +29,16 @@ namespace OpenDental{
 		private OpenDental.UI.Button butRefresh;
 		private ComboBox comboSite;
 		private Label labelSite;
-		///<summary>When this form closes, this will be the patNum of the last patient viewed.  The calling form should then make use of this to refresh to that patient.  If 0, then calling form should not refresh.</summary>
-		public long SelectedPatNum;
 		private CheckBox checkBrokenAppts;
-		private ContextMenuStrip menuDelete;
+		private ContextMenuStrip _menuRightClick;
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
+		private List<long> _listAptSelected;
+		public PatientSelectedEventHandler PatientGoTo;
 
-		///<summary></summary>
+		///<summary>PatientGoTo must be set before calling Show() or ShowDialog().</summary>
 		public FormUnsched(){
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
@@ -78,7 +74,7 @@ namespace OpenDental{
 			this.comboSite = new System.Windows.Forms.ComboBox();
 			this.labelSite = new System.Windows.Forms.Label();
 			this.checkBrokenAppts = new System.Windows.Forms.CheckBox();
-			this.menuDelete = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this._menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.SuspendLayout();
@@ -211,10 +207,10 @@ namespace OpenDental{
 			this.checkBrokenAppts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkBrokenAppts.UseVisualStyleBackColor = true;
 			// 
-			// menuDelete
+			// _menuRightClick
 			// 
-			this.menuDelete.Name = "menuDelete";
-			this.menuDelete.Size = new System.Drawing.Size(61, 4);
+			this._menuRightClick.Name = "menuRightClick";
+			this._menuRightClick.Size = new System.Drawing.Size(61, 4);
 			// 
 			// comboClinic
 			// 
@@ -252,15 +248,12 @@ namespace OpenDental{
 			this.Controls.Add(this.grid);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.butClose);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimizeBox = false;
 			this.Name = "FormUnsched";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Unscheduled List";
-			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormUnsched_Closing);
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormUnsched_FormClosing);
 			this.Load += new System.EventHandler(this.FormUnsched_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -269,6 +262,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormUnsched_Load(object sender, System.EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			patientNames=Patients.GetAllPatientNames();
 			comboOrder.Items.Add(Lan.g(this,"Status"));
 			comboOrder.Items.Add(Lan.g(this,"Alphabetical"));
@@ -310,14 +304,24 @@ namespace OpenDental{
 					}
 				}
 			}
+			_listAptSelected=new List<long>();
 			FillGrid();
-			menuDelete.Items.Clear();
-			menuDelete.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuDelete_click));
+			_menuRightClick.Items.Clear();
+			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
+			Cursor=Cursors.Default;
 		}
 
-		private void menuDelete_click(object sender,System.EventArgs e) {
-			switch(menuDelete.Items.IndexOf((ToolStripMenuItem)sender)) {
+		private void menuRight_click(object sender,System.EventArgs e) {
+			switch(_menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
 				case 0:
+					SeeChart_Click();
+					break;
+				case 1:
+					SendPinboard_Click();
+					break;
+				case 2:
 					Delete_Click();
 					break;
 			}
@@ -330,9 +334,33 @@ namespace OpenDental{
 		private void grid_MouseUp(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right) {
 				if(grid.SelectedIndices.Length>0) {
-					menuDelete.Show(grid,new Point(e.X,e.Y));
+					_menuRightClick.Show(grid,new Point(e.X,e.Y));
 				}
 			}
+		}
+
+		///<summary>If multiple patients are selected in UnchedList, will select the last patient to remain consistent with sending to pinboard behavior.</summary>
+		private void SeeChart_Click() {
+			if(grid.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			Patient pat=Patients.GetPat(ListUn[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
+			GotoModule.GotoChart(pat.PatNum);
+		}
+
+		private void SendPinboard_Click() {
+			if(grid.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			_listAptSelected.Clear();
+			for(int i=0;i<grid.SelectedIndices.Length;i++) {
+				_listAptSelected.Add(ListUn[grid.SelectedIndices[i]].AptNum);
+			}
+			GotoModule.PinToAppt(_listAptSelected,0);//This will send all appointments in _listAptSelected to the pinboard, and will select the patient attached to the last appointment in _listAptSelected.
 		}
 
 		private void Delete_Click() {
@@ -416,15 +444,17 @@ namespace OpenDental{
 		private void grid_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			int currentSelection=e.Row;//tbApts.SelectedRow;
 			int currentScroll=grid.ScrollValue;//tbApts.ScrollValue;
-			SelectedPatNum=ListUn[e.Row].PatNum;
+			Patient pat=Patients.GetPat(ListUn[e.Row].PatNum);//If multiple selected, just take the one that was clicked on.
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
 			FormApptEdit FormAE=new FormApptEdit(ListUn[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();
-			if(FormAE.DialogResult!=DialogResult.OK)
+			if(FormAE.DialogResult!=DialogResult.OK) {
 				return;
+			}
 			if(FormAE.PinClicked) {
-				PinClicked=true;
-				AptSelected=ListUn[e.Row].AptNum;
+				SendPinboard_Click();//Whatever they double clicked on will still be selected, just fire the event.
 				DialogResult=DialogResult.OK;
 			}
 			else {
@@ -500,26 +530,6 @@ namespace OpenDental{
 		private void butClose_Click(object sender, System.EventArgs e) {
 			Close();
 		}
-
-		private void FormUnsched_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			//Patients.HList=null;
-		}
-
-		private void FormUnsched_FormClosing(object sender,FormClosingEventArgs e) {
-			if(grid.SelectedIndices.Length==1) {
-				SelectedPatNum=ListUn[grid.SelectedIndices[0]].PatNum;
-			}
-		}
-
-		
-
-		
-
-		
-
-		
-
-		
 
 	}
 }
