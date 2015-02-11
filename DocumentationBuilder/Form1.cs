@@ -217,6 +217,7 @@ namespace DocumentationBuilder {
 				case "accountingautopay": return "AccountingAutoPay";
 				case "allergydef": return "AllergyDef";
 				case "appointmentrule": return "AppointmentRule";
+				case "appointmenttype": return "AppointmentType";
 				case "apptfield": return "ApptField";
 				case "apptfielddef": return "ApptFieldDef";
 				case "apptview": return "ApptView";
@@ -254,6 +255,7 @@ namespace DocumentationBuilder {
 				case "dictcustom": return "DictCustom";
 				case "diseasedef": return "DiseaseDef";
 				case "displayfield": return "DisplayField";
+				case "dispsupply": return "DispSupply";
 				case "docattach": return "DocAttach";
 				case "documentmisc": return "DocumentMisc";
 				case "drugmanufacturer": return "DrugManufacturer";
@@ -286,12 +288,17 @@ namespace DocumentationBuilder {
 				case "emailmessageuid": return "EmailMessageUid";
 				case "emailtemplate": return "EmailTemplate";
 				case "eobattach": return "EobAttach";
-				case "etransmessagetext": return "EtransMessageText";
 				case "erxlog": return "ErxLog";
+				case "etransmessagetext": return "EtransMessageText";
+				case "evaluationcriterion": return "EvaluationCriterion";
+				case "evaluationcriteriondef": return "EvaluationCriterionDef";
+				case "evaluationdef": return "EvaluationDef";
 				case "familyhealth": return "FamilyHealth";
 				case "feesched": return "FeeSched";
 				case "formpat": return "FormPat";
 				case "formularymed": return "FormularyMed";
+				case "gradingscale": return "GradingScale";
+				case "gradingscaleitem": return "GradingScaleItem";
 				case "graphicassembly": return "GraphicAssembly Not Used";
 				case "graphicelement": return "graphicelement Not Used";
 				case "graphicpoint": return "graphicpoint Not Used";
@@ -345,6 +352,7 @@ namespace DocumentationBuilder {
 				case "procapptcolor": return "ProcApptColor";
 				case "procbutton": return "ProcButton";
 				case "procbuttonitem": return "ProcButtonItem";
+				case "procbuttonquick": return "ProcButtonQuick";
 				case "proccodenote": return "ProcCodeNote";
 				case "procedurecode": return "ProcedureCode";
 				case "procedurelog": return "Procedure";
@@ -403,11 +411,13 @@ namespace DocumentationBuilder {
 				case "toothinitial": return "ToothInitial";
 				case "treatplan": return "TreatPlan";
 				case "usergroup": return "UserGroup";
+				case "userodapptview": return "UserodApptView";
 				case "userquery": return "UserQuery";
 				case "vaccinedef": return "VaccineDef";
 				case "vaccineobs": return "VaccineObs";
 				case "vaccinepat": return "VaccinePat";
 				case "wikilistheaderwidth": return "WikiListHeaderWidth";
+				case "wikilisthist": return "WikiListHist";
 				case "wikipage": return "WikiPage";
 				case "wikipagehist": return "WikiPageHist";
 				case "xchargetransaction": return "XChargeTransaction";
