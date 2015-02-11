@@ -534,10 +534,8 @@ namespace OpenDental.UI {
 
 		///<summary>Called from PrintPage() and EndUpdate().  After adding rows to the grid, this calculates the height of each row because some rows may have text wrap and will take up more than one row.  Also, rows with notes, must be made much larger, because notes start on the second line.  If column images are used, rows will be enlarged to make space for the images.</summary>
 		private void ComputeRows(Graphics g,bool IsForPrinting=false) {
-			//Travis - 06/04/2013: Sometimes ComputeRows() will incorrectly measure the number of rows when the font of the cell will display in bold.  This can cause text that would be on a new line to not display.
-			//This is because all textual measurements use cellFont which is never bold.  A possible solution would be to add another font that is bold to the current using statement.  
-			//Then before any text is measured, check if the cell is bold in order to pass the appropriate font.
-			using(Font cellFont=new Font(FontFamily.GenericSansSerif,cellFontSize)) {
+			Font cellFontBold=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Bold);
+			using(Font cellFontNormal=new Font(FontFamily.GenericSansSerif,cellFontSize)) {
 				_rowHeights=new int[rows.Count];
 				NoteHeights=new int[rows.Count];
 				//multiPageNoteHeights=new List<List<int>>();
@@ -571,6 +569,19 @@ namespace OpenDental.UI {
 				}
 				for(int i=0;i<rows.Count;i++) {
 					_rowHeights[i]=0;
+					Font cellFont=cellFontNormal;
+					if(rows[i].Bold==true) {
+						cellFont=cellFontBold;
+					}
+					else {
+						//Determine if any cells in this row are bold.  If at least one cell is bold, then we need to calculate the row height using bold font.
+						for(int j=0;j<rows[i].Cells.Count;j++) {
+							if(rows[i].Cells[j].Bold==YN.Yes) {
+								cellFont=cellFontBold;
+								break;
+							}
+						}
+					}
 					if(wrapText) {
 						//find the tallest col
 						for(int j=0;j<rows[i].Cells.Count;j++) {
@@ -619,7 +630,7 @@ namespace OpenDental.UI {
 						_rowHeights[i]=imageH;
 					}
 					if(noteW>0 && rows[i].Note!="") {
-						NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFont,noteW,_format).Height;
+						NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFontNormal,noteW,_format).Height;//Notes cannot be bold.  Always normal font.
 					}
 					if(i==0) {
 						RowLocs[i]=0;
@@ -629,7 +640,8 @@ namespace OpenDental.UI {
 					}
 					GridH+=_rowHeights[i]+NoteHeights[i];
 				}
-			}
+			}//end using
+			cellFontBold.Dispose();
 			if(IsForPrinting) {
 				ComputePrintRows();
 			}
