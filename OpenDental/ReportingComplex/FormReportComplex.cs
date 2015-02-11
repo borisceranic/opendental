@@ -762,16 +762,34 @@ namespace OpenDental.ReportingComplex
 						return;
 					}
 				}
+				//Find the Group Footer height to see if printing the last row should happen on another page.
+				if(section.Name=="Detail" && rowsPrinted==queryObj.ReportTable.Rows.Count-1) {
+					int groupFooterHeight=0;
+					foreach(ReportObject reportObject in queryObj.ReportObjects) {
+						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryText")) {
+							groupFooterHeight+=reportObject.Size.Height+reportObject.OffSetY;
+						}
+						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel") 
+							&& (reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)) {
+							groupFooterHeight+=reportObject.Size.Height;
+						}
+					}
+					//See if we can print the Group Footer and the Last row
+					if(groupFooterHeight+queryObj.RowHeightValues[queryObj.ReportTable.Rows.Count-1]>_heightRemaining) {
+						_heightRemaining=0;
+						return;
+					}
+				}
 				int greatestObjectHeight=0;
 				int groupTitleHeight=0;
 				//Now figure out if anything in the header, footer, or title sections can still fit on the page
 				foreach(ReportObject reportObject in queryObj.ReportObjects) {
+					if(reportObject.SectionName!=section.Name) {
+						continue;
+					}
 					if(reportObject.Size.Height>_heightRemaining) {
 						_heightRemaining=0;
 						return;
-					}
-					if(reportObject.SectionName!=section.Name) {
-						continue;
 					}
 					if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummary")) {
 						if(!queryObj.IsLastSplit) {
