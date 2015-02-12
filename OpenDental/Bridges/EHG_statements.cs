@@ -299,7 +299,7 @@ namespace OpenDental.Bridges {
 			return str;
 		}
 
-		///<summary>Surround with try catch.  The "data" is the previously constructed xml.</summary>
+		///<summary>Surround with try catch.  The "data" is the previously constructed xml.  If the internet connection is lost or unavailable, then the exception thrown will be a 404 error similar to the following: "The remote server returned an error: (404) Not Found"</summary>
 		public static void Send(string data) {
 			//Validate the structure of the XML before sending.
 			StringReader sr=new StringReader(data);
@@ -442,6 +442,15 @@ namespace OpenDental.Bridges {
 			//Debug.WriteLine(postData);
 			//MessageBox.Show(postData);
 			webReq=(HttpWebRequest)WebRequest.Create(serverName);
+			//Timeout documentation: https://msdn.microsoft.com/en-us/library/system.net.httpwebrequest.timeout(v=vs.110).aspx.
+			//Timeout: "Gets or sets the time-out value in milliseconds for the GetResponse and GetRequestStream methods."
+			//Timeout default is 100 seconds, which should be sufficient in waiting for a reply from dentalxchange, since the reply is small.
+			//ReadWriteTimeout documentation: https://msdn.microsoft.com/en-us/library/system.net.httpwebrequest.readwritetimeout%28v=vs.110%29.aspx
+			//ReadWriteTimeout: "Gets or sets a time-out in milliseconds when writing to or reading from a stream."
+			//ReadWriteTimeout default is 300 seconds (5 minutes).
+			//Our message box that tells the user to wait up to 10 minutes for bills to send, therefore we need at least a 10 minute ReadWriteTimeout.
+			//The user sees progress in the UI when sending.  We can increase timeouts as much as we want without making the program look like it crashed.
+			webReq.ReadWriteTimeout=600000;//10 minutes = 10*60 seconds = 600 seconds = 600*1000 milliseconds = 600,000 milliseconds.
 			webReq.KeepAlive=false;
 			webReq.Method="POST";
 			webReq.ContentType="multipart/form-data; boundary="+boundary;
