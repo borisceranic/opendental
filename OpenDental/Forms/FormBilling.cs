@@ -961,7 +961,14 @@ namespace OpenDental{
 						}
 					}
 					catch(Exception ex) {
-						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(ex.Message);
+						string errorMsg=ex.Message;
+						if(ex.Message.Contains("(404) Not Found")) {
+							//The full error is "The remote server returned an error: (404) Not Found."  We convert the message into a more user friendly message.
+							errorMsg=Lan.g(this,"The connection to the server could not be established or was lost, or the upload timed out.  "
+								+"Ensure your internet connection is working and that your firewall is not blocking this application.  "
+								+"If the upload timed out after 10 minutes, try sending 25 statements or less in each batch to reduce upload time.");
+						}
+						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
 						msgbox.ShowDialog();
 						//MessageBox.Show();
 						sentelect=0;
