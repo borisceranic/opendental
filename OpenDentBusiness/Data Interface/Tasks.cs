@@ -562,44 +562,54 @@ namespace OpenDentBusiness{
 			//sort by priority, then time
 			long xTaskPriorityDefNum=PIn.Long(x["PriorityDefNum"].ToString());
 			long yTaskPriorityDefNum=PIn.Long(y["PriorityDefNum"].ToString());
-			if(xTaskPriorityDefNum > 0 && yTaskPriorityDefNum > 0) {//They're both good
-				//If there is a valid priority set, we want to sort by the priorities first.
-				int xTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,xTaskPriorityDefNum).ItemOrder;
-				int yTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,yTaskPriorityDefNum).ItemOrder;
-				if(xTaskPriorityItemOrder<yTaskPriorityItemOrder) {//0 ItemOrder is higher priority than 1 ItemOrder
-					return -1;
-				}
-				else if(xTaskPriorityItemOrder>yTaskPriorityItemOrder) {
-					return 1;
-				}
-				else {//Both the same priority, look at the times. (Should we just look at Task times now instead of note times?)
-					return CompareTimes(x,y);
+			long defaultTaskPriorityDefNum=0;
+			List<Def> listTaskPriorities=new List<Def>();
+			listTaskPriorities.AddRange(DefC.GetList(DefCat.TaskPriorities));
+			for(int i=0;i<listTaskPriorities.Count;i++){
+				if(listTaskPriorities[i].ItemValue.ToUpper()=="D") {
+					defaultTaskPriorityDefNum=listTaskPriorities[i].DefNum;
+					break;
 				}
 			}
-			else if(xTaskPriorityDefNum > 0 && yTaskPriorityDefNum < 1) {//x is good, y is not good.
-				return -1;
+			//0 will always be considered like the default task priority.
+			if(xTaskPriorityDefNum==0) {
+				xTaskPriorityDefNum=defaultTaskPriorityDefNum;
 			}
-			else if(yTaskPriorityDefNum > 0 && xTaskPriorityDefNum < 1) {//x is not good, y is good.
+			if(yTaskPriorityDefNum==0) {
+				yTaskPriorityDefNum=defaultTaskPriorityDefNum;
+			}
+			//IsUnread is 0 if the task has been read by that user (IsUnread is essentially a count of if it's unread).
+			if(PIn.Long(x["IsUnread"].ToString())!=0 && PIn.Long(y["IsUnread"].ToString())==0) {//x is unread, y is read, move x down.
 				return 1;
 			}
-			//There should never be a task without a priority.  If there is, we need to sort the non-priority tasks among themselves and move them all to the bottom.
-			else if(xTaskPriorityDefNum==0 && yTaskPriorityDefNum==0) {//Neither are good.
+			if(PIn.Long(x["IsUnread"].ToString())==0 && PIn.Long(y["IsUnread"].ToString())!=0) {//x is read, y is unread, move x up.
+				return -1;
+			}
+			//X and Y have same read/unread status at this point
+			int xTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,xTaskPriorityDefNum).ItemOrder;
+			int yTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,yTaskPriorityDefNum).ItemOrder;
+			if(xTaskPriorityItemOrder<yTaskPriorityItemOrder) {//0 ItemOrder is higher priority than 1 ItemOrder
+				return -1;//x is higher priority
+			}
+			else if(xTaskPriorityItemOrder>yTaskPriorityItemOrder) {
+				return 1;//y is higher priority
+			}
+			else {//Both have same read/unread status and same priority
 				return CompareTimes(x,y);
 			}
-			//If all else failes, sort by time.
-			return CompareTimes(x,y);//This should never happen.
 		}
 
 		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>
 		public static int CompareTimes(DataRow x,DataRow y) {
 			if(PIn.Long(x["TaskListNum"].ToString())==1697//Triage Task List Num for HQ
-				&& PIn.Long(y["TaskListNum"].ToString())==1697
-				&& PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				&& PrefC.GetBool(PrefName.DockPhonePanelShow)
+				&& PIn.Long(x["PriorityDefNum"].ToString())==501)//Red tasks in triage only, sort by lastUpdated
+			{
 				DateTime xMaxDateTime=PIn.DateT(x["LastUpdated"].ToString());
 				DateTime yMaxDateTime=PIn.DateT(y["LastUpdated"].ToString());
 				return xMaxDateTime.CompareTo(yMaxDateTime);
 			}
-			else {
+			else {//Sort everything else based on task creation date
 				DateTime xMaxDateTime=PIn.DateT(x["DateTimeEntry"].ToString());
 				DateTime yMaxDateTime=PIn.DateT(y["DateTimeEntry"].ToString());
 				return xMaxDateTime.CompareTo(yMaxDateTime);
