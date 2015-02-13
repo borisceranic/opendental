@@ -381,20 +381,20 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary>Gets the production for one appointment by looping through the procsMultApts which was filled previously from GetProcsMultApts.</summary>
-		public static double GetProductionOneApt(long myAptNum,Procedure[] procsMultApts,bool isPlanned) {
-			//No need to check RemotingRole; no call to db.
-			double retVal=0;
-			for(int i=0;i<procsMultApts.Length;i++) {
-				if(isPlanned && procsMultApts[i].PlannedAptNum==myAptNum) {
-					retVal+=procsMultApts[i].ProcFee;
-				}
-				if(!isPlanned && procsMultApts[i].AptNum==myAptNum) {
-					retVal+=procsMultApts[i].ProcFee;
-				}
-			}
-			return retVal;
-		}
+		/////<summary>Gets the production for one appointment by looping through the procsMultApts which was filled previously from GetProcsMultApts.</summary>
+		//public static double GetProductionOneApt(long myAptNum,Procedure[] procsMultApts,bool isPlanned) {
+		//	//No need to check RemotingRole; no call to db.
+		//	double retVal=0;
+		//	for(int i=0;i<procsMultApts.Length;i++) {
+		//		if(isPlanned && procsMultApts[i].PlannedAptNum==myAptNum) {
+		//			retVal+=procsMultApts[i].ProcFee*(procsMultApts[i].BaseUnits+procsMultApts[i].UnitQty);
+		//		}
+		//		if(!isPlanned && procsMultApts[i].AptNum==myAptNum) {
+		//			retVal+=procsMultApts[i].ProcFee*(procsMultApts[i].BaseUnits+procsMultApts[i].UnitQty);
+		//		}
+		//	}
+		//	return retVal;
+		//}
 
 		///<summary>Used in FormClaimEdit,FormClaimPrint,FormClaimPayTotal,ContrAccount etc to get description of procedure. Procedure list needs to include the procedure we are looking for.  If procNum could be 0 (e.g. total payment claimprocs) or if the list does not contain the procNum, this will return a new Procedure with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
 		public static Procedure GetProcFromList(List<Procedure> list,long procNum) {
@@ -1275,8 +1275,9 @@ namespace OpenDentBusiness {
 					}
 					//Alter primary WO if needed.
 					if(priClaimProcIdx!=-1){
-						if(sumPay+claimProcs[priClaimProcIdx].WriteOffEst > proc.ProcFee){
-							double writeOffEst=proc.ProcFee-sumPay;
+						double procFee=proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty);
+						if(sumPay+claimProcs[priClaimProcIdx].WriteOffEst > procFee) {
+							double writeOffEst=procFee-sumPay;
 							if(writeOffEst<0) {
 								writeOffEst=0;
 							}
@@ -1332,14 +1333,14 @@ namespace OpenDentBusiness {
 					if(ordinal!=4) {//only process on the fourth round
 						continue;
 					}
-					ClaimProcs.ComputeBaseEst(claimProcs[i],proc.ProcFee,proc.ToothNum,proc.CodeNum,PlanCur,0,
+					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,0,
 						benefitList,histList,loopList,patPlans,0,0,patientAge,0);
 				}
 				else if(patplan.Ordinal==1){
 					if(ordinal!=1) {
 						continue;
 					}
-					ClaimProcs.ComputeBaseEst(claimProcs[i],proc.ProcFee,proc.ToothNum,proc.CodeNum,PlanCur,patplan.PatPlanNum,
+					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
 					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
 					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
@@ -1349,7 +1350,7 @@ namespace OpenDentBusiness {
 					if(ordinal!=2) {
 						continue;
 					}
-					ClaimProcs.ComputeBaseEst(claimProcs[i],proc.ProcFee,proc.ToothNum,proc.CodeNum,PlanCur,patplan.PatPlanNum,
+					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
 					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
 					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
@@ -1359,7 +1360,7 @@ namespace OpenDentBusiness {
 					if(ordinal!=3) {
 						continue;
 					}
-					ClaimProcs.ComputeBaseEst(claimProcs[i],proc.ProcFee,proc.ToothNum,proc.CodeNum,PlanCur,patplan.PatPlanNum,
+					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
 					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
 					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
@@ -1369,7 +1370,7 @@ namespace OpenDentBusiness {
 					if(ordinal!=4) {
 						continue;
 					}
-					ClaimProcs.ComputeBaseEst(claimProcs[i],proc.ProcFee,proc.ToothNum,proc.CodeNum,PlanCur,patplan.PatPlanNum,
+					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
 				}
 				//This was a longstanding bug. I hope there are not other consequences for commenting it out.

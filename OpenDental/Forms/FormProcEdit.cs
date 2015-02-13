@@ -3783,7 +3783,7 @@ namespace OpenDental{
 			if(patPlanNum > 0){
 				double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(cp,PatPlanList);
 				double writeOffOtherIns=ClaimProcs.GetWriteOffOtherIns(cp,PatPlanList);
-				ClaimProcs.ComputeBaseEst(cp,ProcCur.ProcFee,ProcCur.ToothNum,ProcCur.CodeNum,plan,patPlanNum,benList,
+				ClaimProcs.ComputeBaseEst(cp,ProcCur,plan,patPlanNum,benList,
 					HistList,LoopList,PatPlanList,paidOtherInsTotal,paidOtherInsTotal,PatCur.Age,writeOffOtherIns);	
 			}
 			FormClaimProc FormC=new FormClaimProc(cp,ProcCur,FamCur,PatCur,PlanList,HistList,ref LoopList,PatPlanList,true,SubList);

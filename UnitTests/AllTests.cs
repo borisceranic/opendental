@@ -2062,5 +2062,195 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary></summary>
+		public static string TestThirtySeven(int specificTest) {
+			if(specificTest != 0 && specificTest != 37) {
+				return "";
+			}
+			string suffix="37";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			long feeSchedNum1=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix);
+			//Standard Fee (we only insert this value to test that it is not used in the calculations).
+			Fees.RefreshCache();
+			long codeNum=ProcedureCodes.GetCodeNum("D0270");//1BW
+			//PPO fee
+			Fee fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum1;
+			fee.Amount=40;
+			Fees.Insert(fee);
+			Fees.RefreshCache();
+			//Copay fee schedule
+			long feeSchedNumCopay=FeeSchedT.CreateFeeSched(FeeScheduleType.CoPay,suffix);
+			fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNumCopay;
+			fee.Amount=5;
+			Fees.Insert(fee);
+			Fees.RefreshCache();
+			//Carrier
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			long planNum1=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum1,EnumCobRule.Basic).PlanNum;
+			BenefitT.CreateDeductibleGeneral(planNum1,BenefitCoverageLevel.Individual,10);
+			InsSub sub1=InsSubT.CreateInsSub(pat.PatNum,planNum1);
+			long subNum1=sub1.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum1,EbenefitCategory.DiagnosticXRay,80);
+			PatPlanT.CreatePatPlan(1,patNum,subNum1);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D0270",ProcStat.C,"",50);//1BW
+			Procedure procOld=proc.Copy();
+			proc.UnitQty=3;
+			Procedures.Update(proc,procOld);//1BW x 3
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			InsPlan insPlan1=InsPlans.GetPlan(planNum1,planList);
+			insPlan1.CopayFeeSched=feeSchedNumCopay;
+			InsPlans.Update(insPlan1);
+			List<PatPlan> patPlans=PatPlans.Refresh(patNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//Validate
+			string retVal="";
+			ClaimProc claimProc;
+			if(specificTest==0 || specificTest==37) {
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				if(claimProc.InsEstTotal!=76) {
+					throw new Exception("Primary total estimate should be 76.\r\n");
+				}
+				if(claimProc.WriteOffEst!=30) {
+					throw new Exception("Primary writeoff estimate should be 30.\r\n");
+				}
+				retVal+="37: Passed.  PPO insurance estimates for procedures with multiple units.\r\n";
+			}
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestThirtyEight(int specificTest) {
+			if(specificTest != 0 && specificTest != 38) {
+				return "";
+			}
+			string suffix="38";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			//Carrier
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			long planNum1=InsPlanT.CreateInsPlan(carrier.CarrierNum).PlanNum;
+			InsSub sub1=InsSubT.CreateInsSub(pat.PatNum,planNum1);
+			long subNum1=sub1.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum1,EbenefitCategory.DiagnosticXRay,80);
+			PatPlanT.CreatePatPlan(1,patNum,subNum1);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D0270",ProcStat.C,"",50);//1BW
+			Procedure procOld=proc.Copy();
+			proc.UnitQty=2;
+			Procedures.Update(proc,procOld);//1BW x 2
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(patNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//Validate
+			string retVal="";
+			ClaimProc claimProc;
+			if(specificTest==0 || specificTest==38) {
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				if(claimProc.InsEstTotal!=80) {
+					throw new Exception("Primary total estimate should be 80.\r\n");
+				}
+				retVal+="38: Passed.  Category percentage insurance estimates for procedures with multiple units.\r\n";
+			}
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestThirtyNine(int specificTest) {
+			if(specificTest != 0 && specificTest != 39) {
+				return "";
+			}
+			string suffix="39";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			long feeSchedNum1=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix);
+			long feeSchedNum2=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix+"b");
+			//Standard Fee (we only insert this value to test that it is not used in the calculations).
+			Fees.RefreshCache();
+			long codeNum=ProcedureCodes.GetCodeNum("D0270");
+			//PPO fees
+			Fee fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum1;
+			fee.Amount=40;
+			Fees.Insert(fee);
+			fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum2;
+			fee.Amount=30;
+			Fees.Insert(fee);
+			Fees.RefreshCache();
+			//Carrier
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			long planNum1=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum1,EnumCobRule.Basic).PlanNum;
+			long planNum2=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum2,EnumCobRule.Basic).PlanNum;
+			InsSub sub1=InsSubT.CreateInsSub(pat.PatNum,planNum1);
+			long subNum1=sub1.InsSubNum;
+			InsSub sub2=InsSubT.CreateInsSub(pat.PatNum,planNum2);
+			long subNum2=sub2.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum1,EbenefitCategory.DiagnosticXRay,80);
+			BenefitT.CreateCategoryPercent(planNum2,EbenefitCategory.DiagnosticXRay,80);
+			PatPlanT.CreatePatPlan(1,patNum,subNum1);
+			PatPlanT.CreatePatPlan(2,patNum,subNum2);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D0270",ProcStat.TP,"",50);//Scaling in undefined/any quadrant.
+			Procedure procOld=proc.Copy();
+			proc.UnitQty=4;
+			Procedures.Update(proc,procOld);//1BW x 4
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(patNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//Validate
+			string retVal="";
+			ClaimProc claimProc;
+			if(specificTest==0 || specificTest==39) {
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				if(claimProc.InsEstTotal!=128) {
+					throw new Exception("Primary total estimate should be 128. \r\n");
+				}
+				if(claimProc.WriteOffEst!=40) {
+					throw new Exception("Primary writeoff estimate should be 40. \r\n");
+				}
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum2,subNum2);
+				if(claimProc.InsEstTotal!=0) {
+					throw new Exception("Secondary total estimate should be 0. \r\n");
+				}
+				if(claimProc.WriteOffEst!=0) {
+					throw new Exception("Secondary writeoff estimate should be 0. \r\n");
+				}
+				retVal+="39: Passed.  Claim proc writeoff estimates for procedures with multiple units.\r\n";
+			}
+			return retVal;
+		}
+
 	}
 }

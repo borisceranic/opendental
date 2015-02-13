@@ -550,8 +550,11 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Calculates the Base estimate, InsEstTotal, and all the other insurance numbers for a single claimproc.  This is is not done on the fly.  Use Procedure.GetEst to later retrieve the estimate. This function replaces all of the upper estimating logic that was within FormClaimProc.  BaseEst=((fee or allowedOverride)-Copay) x (percentage or percentOverride).  The calling class must have already created the claimProc, and this function simply updates the BaseEst field of that claimproc. pst.Tot not used.  For Estimate and CapEstimate, all the estimate fields will be recalculated except the overrides.  histList and loopList can be null.  If so, then deductible and annual max will not be recalculated.  histList and loopList may only make sense in TP module and claimEdit.  loopList contains all claimprocs in the current list (TP or claim) that come before this procedure.  PaidOtherInsTot should only contain sum of InsEstTotal/Override, or paid, depending on the status.  PaidOtherInsBase also includes actual payments.</summary>
-		public static void ComputeBaseEst(ClaimProc cp,double procFee,string toothNum,long codeNum,InsPlan plan,long patPlanNum,List<Benefit> benList,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,List<PatPlan> patPlanList,double paidOtherInsTot,double paidOtherInsBase,int patientAge,double writeOffOtherIns) {
+		public static void ComputeBaseEst(ClaimProc cp,Procedure proc,InsPlan plan,long patPlanNum,List<Benefit> benList,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,List<PatPlan> patPlanList,double paidOtherInsTot,double paidOtherInsBase,int patientAge,double writeOffOtherIns) {
 			//No need to check RemotingRole; no call to db.
+			double procFee=proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty);
+			string toothNum=proc.ToothNum;
+			long codeNum=proc.CodeNum;
 			if(cp.Status==ClaimProcStatus.CapClaim
 				|| cp.Status==ClaimProcStatus.CapComplete
 				|| cp.Status==ClaimProcStatus.Preauth
@@ -614,6 +617,7 @@ namespace OpenDentBusiness{
 				double carrierAllowed=InsPlans.GetAllowed(ProcedureCodes.GetProcCode(codeNum).ProcCode,plan.FeeSched,plan.AllowedFeeSched,
 					plan.CodeSubstNone,plan.PlanType,toothNum,cp.ProvNum);
 				if(carrierAllowed != -1) {
+					carrierAllowed=carrierAllowed*Math.Max(1,proc.BaseUnits+proc.UnitQty);
 					if(carrierAllowed > procFee) {
 						allowed=procFee;
 						cp.BaseEst=procFee;
@@ -628,6 +632,9 @@ namespace OpenDentBusiness{
 			}
 			//Copay----------------------------------------------------------------------------------------------
 			cp.CopayAmt=InsPlans.GetCopay(codeNum,plan.FeeSched,plan.CopayFeeSched,plan.CodeSubstNone,toothNum);
+			if(cp.CopayAmt!=-1) {
+				cp.CopayAmt=cp.CopayAmt*Math.Max(1,proc.BaseUnits+proc.UnitQty);
+			}
 			if(cp.CopayAmt > allowed) {//if the copay is greater than the allowed fee calculated above
 				cp.CopayAmt=allowed;//reduce the copay
 			}
@@ -811,6 +818,7 @@ namespace OpenDentBusiness{
 					true,"p","",cp.ProvNum);
 				double allowedNoSubst=procFee;
 				if(carrierAllowedNoSubst != -1) {
+					carrierAllowedNoSubst=carrierAllowedNoSubst*Math.Max(1,proc.BaseUnits+proc.UnitQty);
 					if(carrierAllowedNoSubst > procFee) {
 						allowedNoSubst=procFee;
 					}

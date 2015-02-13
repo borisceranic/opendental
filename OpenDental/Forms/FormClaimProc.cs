@@ -1604,10 +1604,10 @@ namespace OpenDental
 					textCarrierAllowed.Text="";
 				}
 				else if(CarrierAllowedAmount > proc.ProcFee) {//if the Dr's UCR is lower than the Carrier's PPO allowed.
-					textCarrierAllowed.Text=proc.ProcFee.ToString("f");
+					textCarrierAllowed.Text=(proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty)).ToString("f");
 				}
 				else {
-					textCarrierAllowed.Text=CarrierAllowedAmount.ToString("f");
+					textCarrierAllowed.Text=(CarrierAllowedAmount*Math.Max(1,proc.BaseUnits+proc.UnitQty)).ToString("f");
 				}
 			}
 			else{
@@ -1733,7 +1733,7 @@ namespace OpenDental
 				ClaimProcCur.WriteOffEstOverride=PIn.Double(textWriteOffEstOverride.Text);
 			}
 			if(IsProc) {
-				ClaimProcs.ComputeBaseEst(ClaimProcCur,proc.ProcFee,proc.ToothNum,proc.CodeNum,Plan,PatPlanNum,BenefitList,
+				ClaimProcs.ComputeBaseEst(ClaimProcCur,proc,Plan,PatPlanNum,BenefitList,
 					HistList,LoopList,PatPlanList,PaidOtherInsTotal,PaidOtherInsBaseEst,PatCur.Age,WriteOffOtherIns);
 				//Paid other ins is not accurate
 			}
