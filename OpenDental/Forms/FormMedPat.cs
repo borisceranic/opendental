@@ -495,6 +495,10 @@ namespace OpenDental{
 			if(MedicationPatCur.DateStop.Year>1880) {
 				textDateStop.Text=MedicationPatCur.DateStop.ToShortDateString();
 			}
+			if(IsNew) {
+				butEdit.Visible=false;
+				labelEdit.Visible=false;
+			}
 		}
 
 		private void butTodayStart_Click(object sender,EventArgs e) {
