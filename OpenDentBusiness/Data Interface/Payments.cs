@@ -58,7 +58,10 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT * FROM payment "
 				+"WHERE DepositNum = "+POut.Long(depositNum)+" "
-				+"ORDER BY PayDate";
+				//Order by the date on the payment, and then the incremental order of the creation of each payment (doesn't affect random primary keys).
+				//It was an internal complaint that checks on the same date show up in a 'random' order.
+				//The real fix for this issue would be to add a time column and order by it by that instead of the PK.
+				+"ORDER BY PayDate,PayNum";//Not usual pattern to order by PK
 			return Crud.PaymentCrud.SelectMany(command);
 		}
 
@@ -86,7 +89,10 @@ namespace OpenDentBusiness{
 					command+=")";
 				}
 			}
-			command+=" ORDER BY PayDate";
+			//Order by the date on the payment, and then the incremental order of the creation of each payment (doesn't affect random primary keys).
+			//It was an internal complaint that checks on the same date show up in a 'random' order.
+			//The real fix for this issue would be to add a time column and order by it by that instead of the PK.
+			command+=" ORDER BY PayDate,PayNum";//Not usual pattern to order by PK
 			object[] parameters={command,payTypes};
 			Plugins.HookAddCode(null, "Payments.GetForDeposit_beforequeryrun", parameters);
 			command=(string)parameters[0];
