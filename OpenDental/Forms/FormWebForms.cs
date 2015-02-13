@@ -437,33 +437,43 @@ namespace OpenDental {
 			}
 		}
 
-		/// <summary>
-		/// </summary>
+		///<summary>This is not a generic sheet comparer.  It is actually a web form sheet field comparer.  Returns false if any sheet fields that the web form cares about are not equal.</summary>
 		private bool CompareSheets(Sheet sheetFromDb,Sheet newSheet) {
-			bool isEqual=true;
 			//the 2 sheets are sorted before comparison because in some cases SheetFields[i] refers to a different field in sheetFromDb than in newSheet
 			Sheet sortedSheetFromDb=new Sheet();
 			Sheet sortedNewSheet=new Sheet();
 			sortedSheetFromDb.SheetFields=sheetFromDb.SheetFields.OrderBy(sf => sf.SheetFieldNum).ToList();
 			sortedNewSheet.SheetFields=newSheet.SheetFields.OrderBy(sf => sf.SheetFieldNum).ToList();
 			for(int i=0;i<sortedSheetFromDb.SheetFields.Count;i++) {
-				// read each parameter of the SheetField like Fontsize,FieldValue, FontIsBold, XPos, YPos etc.
-				foreach(FieldInfo fieldinfo in sortedSheetFromDb.SheetFields[i].GetType().GetFields()) {
-					string dbSheetFieldValue="";
-					string newSheetFieldValue="";
-					//.ToString() works for Int64, Int32, Enum, DateTime(bithdate), Boolean, Double
-					if(fieldinfo.GetValue(sortedSheetFromDb.SheetFields[i])!=null) {
-						dbSheetFieldValue=fieldinfo.GetValue(sortedSheetFromDb.SheetFields[i]).ToString();
-					}
-					if(fieldinfo.GetValue(newSheet.SheetFields[i])!=null) {
-						newSheetFieldValue=fieldinfo.GetValue(sortedNewSheet.SheetFields[i]).ToString();
-					}
-					if(dbSheetFieldValue!=newSheetFieldValue) {
-						isEqual=false;
-					}
+				//Explicitly compare the sheet field values that can be imported via web forms.
+				//This makes it so that any future columns added to the sheetfield table will not affect this comparer.
+				//When new columns are added, we can now decide on a per column basis if the column matters for comparisons.
+				//We will always add new columns below and simply comment them out if we do not want to use them for comparison, this way we know that the column was considered.
+				if(sortedSheetFromDb.SheetFields[i].SheetNum!=sortedNewSheet.SheetFields[i].SheetNum
+					|| sortedSheetFromDb.SheetFields[i].FieldType!=sortedNewSheet.SheetFields[i].FieldType
+					|| sortedSheetFromDb.SheetFields[i].FieldName!=sortedNewSheet.SheetFields[i].FieldName
+					|| sortedSheetFromDb.SheetFields[i].FieldValue!=sortedNewSheet.SheetFields[i].FieldValue
+					|| sortedSheetFromDb.SheetFields[i].FontSize!=sortedNewSheet.SheetFields[i].FontSize
+					|| sortedSheetFromDb.SheetFields[i].FontName!=sortedNewSheet.SheetFields[i].FontName
+					|| sortedSheetFromDb.SheetFields[i].FontIsBold!=sortedNewSheet.SheetFields[i].FontIsBold
+					|| sortedSheetFromDb.SheetFields[i].XPos!=sortedNewSheet.SheetFields[i].XPos
+					|| sortedSheetFromDb.SheetFields[i].YPos!=sortedNewSheet.SheetFields[i].YPos
+					|| sortedSheetFromDb.SheetFields[i].Width!=sortedNewSheet.SheetFields[i].Width
+					|| sortedSheetFromDb.SheetFields[i].Height!=sortedNewSheet.SheetFields[i].Height
+					|| sortedSheetFromDb.SheetFields[i].GrowthBehavior!=sortedNewSheet.SheetFields[i].GrowthBehavior
+					|| sortedSheetFromDb.SheetFields[i].RadioButtonValue!=sortedNewSheet.SheetFields[i].RadioButtonValue
+					|| sortedSheetFromDb.SheetFields[i].RadioButtonGroup!=sortedNewSheet.SheetFields[i].RadioButtonGroup
+					|| sortedSheetFromDb.SheetFields[i].IsRequired!=sortedNewSheet.SheetFields[i].IsRequired
+					|| sortedSheetFromDb.SheetFields[i].TabOrder!=sortedNewSheet.SheetFields[i].TabOrder
+					|| sortedSheetFromDb.SheetFields[i].ReportableName!=sortedNewSheet.SheetFields[i].ReportableName
+					//|| sortedSheetFromDb.SheetFields[i].TextAlign!=sortedNewSheet.SheetFields[i].TextAlign
+					//|| sortedSheetFromDb.SheetFields[i].ItemColor!=sortedNewSheet.SheetFields[i].ItemColor
+					) 
+				{
+					return false;//No need to keep looping, we know the sheets are not equal at this point.
 				}
 			}
-			return isEqual;
+			return true;//All web form sheet fields are equal.
 		}
 
 		private void butRetrieve_Click(object sender,System.EventArgs e) {
