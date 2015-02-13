@@ -120,6 +120,8 @@ namespace OpenDentBusiness{
 		///<summary>Returns medications that contain the passed in string.  Blank for all.</summary>
 		public static List<Medication> GetList(string str) {
 			//No need to check RemotingRole; no call to db.
+			//This is not the correct way... The real answer is to implement invalid types for Medications.
+			Refresh();
 			List<Medication> retVal=new List<Medication>();
 			Medication[] arrayMeds=GetListt();
 			for(int i=0;i<arrayMeds.Length;i++) {
@@ -369,6 +371,19 @@ namespace OpenDentBusiness{
 			return Crud.MedicationCrud.SelectOne(command);
 		}
 
+		public static bool AreMedicationsEqual(Medication medication,Medication medicationOld) {
+			//No need to check RemotingRole; no call to db.
+			if((medicationOld==null || medication==null)
+				|| medicationOld.MedicationNum!=medication.MedicationNum
+				|| medicationOld.MedName!=medication.MedName
+				|| medicationOld.GenericNum!=medication.GenericNum
+				|| medicationOld.Notes!=medication.Notes
+				|| medicationOld.RxCui!=medication.RxCui) 
+			{
+				return false;
+			}
+			return true;
+		}
 
 	}
 
