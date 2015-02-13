@@ -10,6 +10,7 @@ using OpenDental.ReportingComplex;
 using OpenDental.UI;
 using OpenDentBusiness;
 using CodeBase;
+using System.Collections.Generic;
 
 namespace OpenDental
 {
@@ -20,6 +21,20 @@ namespace OpenDental
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private CheckBox checkHideCompletePlans;
+		private CheckBox checkAllProv;
+		private ListBox listProv;
+		private Label label1;
+		private GroupBox groupBox1;
+		private RadioButton radioBoth;
+		private RadioButton radioPatient;
+		private RadioButton radioInsurance;
+		private MonthCalendar dateEnd;
+		private MonthCalendar dateStart;
+		private CheckBox checkShowFamilyBalance;
+		private CheckBox checkAllClin;
+		private ListBox listClin;
+		private Label labelClin;
+		private List<Clinic> _listClinics;
 		//private int pagesPrinted;
 		private ErrorProvider errorProvider1=new ErrorProvider();
 		//private DataTable BirthdayTable;
@@ -48,6 +63,20 @@ namespace OpenDental
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.checkHideCompletePlans = new System.Windows.Forms.CheckBox();
+			this.checkAllProv = new System.Windows.Forms.CheckBox();
+			this.listProv = new System.Windows.Forms.ListBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.radioBoth = new System.Windows.Forms.RadioButton();
+			this.radioPatient = new System.Windows.Forms.RadioButton();
+			this.radioInsurance = new System.Windows.Forms.RadioButton();
+			this.dateEnd = new System.Windows.Forms.MonthCalendar();
+			this.dateStart = new System.Windows.Forms.MonthCalendar();
+			this.checkShowFamilyBalance = new System.Windows.Forms.CheckBox();
+			this.checkAllClin = new System.Windows.Forms.CheckBox();
+			this.listClin = new System.Windows.Forms.ListBox();
+			this.labelClin = new System.Windows.Forms.Label();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -59,11 +88,12 @@ namespace OpenDental
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(546, 216);
+			this.butCancel.Location = new System.Drawing.Point(500, 445);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 44;
 			this.butCancel.Text = "&Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
@@ -73,64 +103,283 @@ namespace OpenDental
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(546, 176);
+			this.butOK.Location = new System.Drawing.Point(419, 445);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 43;
-			this.butOK.Text = "Report";
-			this.butOK.Click += new System.EventHandler(this.butReport_Click);
+			this.butOK.Text = "&OK";
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// checkHideCompletePlans
 			// 
-			this.checkHideCompletePlans.AutoSize = true;
-			this.checkHideCompletePlans.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHideCompletePlans.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHideCompletePlans.Location = new System.Drawing.Point(167, 216);
+			this.checkHideCompletePlans.Location = new System.Drawing.Point(31, 276);
 			this.checkHideCompletePlans.Name = "checkHideCompletePlans";
-			this.checkHideCompletePlans.Size = new System.Drawing.Size(180, 18);
+			this.checkHideCompletePlans.Size = new System.Drawing.Size(216, 18);
 			this.checkHideCompletePlans.TabIndex = 45;
 			this.checkHideCompletePlans.Text = "Hide Completed Payment Plans";
-			this.checkHideCompletePlans.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHideCompletePlans.UseVisualStyleBackColor = true;
+			// 
+			// checkAllProv
+			// 
+			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkAllProv.Location = new System.Drawing.Point(252, 201);
+			this.checkAllProv.Name = "checkAllProv";
+			this.checkAllProv.Size = new System.Drawing.Size(95, 16);
+			this.checkAllProv.TabIndex = 48;
+			this.checkAllProv.Text = "All";
+			this.checkAllProv.Click += new System.EventHandler(this.checkAllProv_Click);
+			// 
+			// listProv
+			// 
+			this.listProv.Location = new System.Drawing.Point(251, 221);
+			this.listProv.Name = "listProv";
+			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listProv.Size = new System.Drawing.Size(163, 199);
+			this.listProv.TabIndex = 47;
+			this.listProv.Click += new System.EventHandler(this.listProv_Click);
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(249, 182);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(104, 16);
+			this.label1.TabIndex = 46;
+			this.label1.Text = "Providers";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.radioBoth);
+			this.groupBox1.Controls.Add(this.radioPatient);
+			this.groupBox1.Controls.Add(this.radioInsurance);
+			this.groupBox1.Location = new System.Drawing.Point(23, 183);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(173, 87);
+			this.groupBox1.TabIndex = 49;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Payment Plan Types";
+			// 
+			// radioBoth
+			// 
+			this.radioBoth.Checked = true;
+			this.radioBoth.Location = new System.Drawing.Point(8, 58);
+			this.radioBoth.Name = "radioBoth";
+			this.radioBoth.Size = new System.Drawing.Size(159, 18);
+			this.radioBoth.TabIndex = 2;
+			this.radioBoth.TabStop = true;
+			this.radioBoth.Text = "Both";
+			this.radioBoth.UseVisualStyleBackColor = true;
+			// 
+			// radioPatient
+			// 
+			this.radioPatient.Location = new System.Drawing.Point(8, 38);
+			this.radioPatient.Name = "radioPatient";
+			this.radioPatient.Size = new System.Drawing.Size(159, 18);
+			this.radioPatient.TabIndex = 1;
+			this.radioPatient.Text = "Patient";
+			this.radioPatient.UseVisualStyleBackColor = true;
+			// 
+			// radioInsurance
+			// 
+			this.radioInsurance.Location = new System.Drawing.Point(8, 19);
+			this.radioInsurance.Name = "radioInsurance";
+			this.radioInsurance.Size = new System.Drawing.Size(159, 18);
+			this.radioInsurance.TabIndex = 0;
+			this.radioInsurance.Text = "Insurance";
+			this.radioInsurance.UseVisualStyleBackColor = true;
+			// 
+			// date2
+			// 
+			this.dateEnd.Location = new System.Drawing.Point(305, 18);
+			this.dateEnd.Name = "date2";
+			this.dateEnd.TabIndex = 51;
+			// 
+			// date1
+			// 
+			this.dateStart.Location = new System.Drawing.Point(48, 18);
+			this.dateStart.Name = "date1";
+			this.dateStart.TabIndex = 50;
+			// 
+			// checkShowFamilyBalance
+			// 
+			this.checkShowFamilyBalance.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowFamilyBalance.Location = new System.Drawing.Point(31, 297);
+			this.checkShowFamilyBalance.Name = "checkShowFamilyBalance";
+			this.checkShowFamilyBalance.Size = new System.Drawing.Size(216, 18);
+			this.checkShowFamilyBalance.TabIndex = 52;
+			this.checkShowFamilyBalance.Text = "Show Family Balance";
+			this.checkShowFamilyBalance.UseVisualStyleBackColor = true;
+			// 
+			// checkAllClin
+			// 
+			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkAllClin.Location = new System.Drawing.Point(420, 202);
+			this.checkAllClin.Name = "checkAllClin";
+			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
+			this.checkAllClin.TabIndex = 57;
+			this.checkAllClin.Text = "All";
+			this.checkAllClin.Click += new System.EventHandler(this.checkAllClin_Click);
+			// 
+			// listClin
+			// 
+			this.listClin.Location = new System.Drawing.Point(420, 221);
+			this.listClin.Name = "listClin";
+			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listClin.Size = new System.Drawing.Size(154, 199);
+			this.listClin.TabIndex = 56;
+			this.listClin.Click += new System.EventHandler(this.listClin_Click);
+			// 
+			// labelClin
+			// 
+			this.labelClin.Location = new System.Drawing.Point(417, 184);
+			this.labelClin.Name = "labelClin";
+			this.labelClin.Size = new System.Drawing.Size(104, 16);
+			this.labelClin.TabIndex = 55;
+			this.labelClin.Text = "Clinics";
+			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// FormRpPayPlans
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(660, 264);
+			this.ClientSize = new System.Drawing.Size(586, 481);
+			this.Controls.Add(this.checkAllClin);
+			this.Controls.Add(this.listClin);
+			this.Controls.Add(this.labelClin);
+			this.Controls.Add(this.checkShowFamilyBalance);
+			this.Controls.Add(this.dateEnd);
+			this.Controls.Add(this.dateStart);
+			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.checkAllProv);
+			this.Controls.Add(this.listProv);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkHideCompletePlans);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(602, 519);
 			this.Name = "FormRpPayPlans";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment Plans Report";
 			this.Load += new System.EventHandler(this.FormRpPayPlans_Load);
+			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 		#endregion
 
 		private void FormRpPayPlans_Load(object sender, System.EventArgs e){
+			dateStart.SelectionStart=DateTime.Today;
+			dateEnd.SelectionStart=DateTime.Today;
 			checkHideCompletePlans.Checked=true;
+			List<Provider> listShort=ProviderC.GetListShort();
+			for(int i=0;i<listShort.Count;i++) {
+				listProv.Items.Add(listShort[i].GetLongDesc());
+				listProv.SelectedIndices.Add(i);
+			}
+			checkAllProv.Checked=true;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				listClin.Visible=false;
+				labelClin.Visible=false;
+				checkAllClin.Visible=false;
+			}
+			else {
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					listClin.Items.Add(Lan.g(this,"Unassigned"));
+					listClin.SetSelected(0,true);
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=listClin.Items.Add(_listClinics[i].Description);
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						listClin.SelectedIndices.Clear();
+						listClin.SetSelected(curIndex,true);
+					}
+				}
+			}
 		}
 
-		private void butReport_Click(object sender, System.EventArgs e){
-			//if(errorProvider1.GetError(textDateFrom) != ""
-			//	|| errorProvider1.GetError(textDateTo) != "") 
-			//{
-			//	MsgBox.Show(this,"Please fix data entry errors first.");
-			//	return;
-			//}
-			//DateTime dateFrom=PIn.PDate(textDateFrom.Text);
-			//DateTime dateTo=PIn.PDate(textDateTo.Text);
-			//if(dateTo < dateFrom) 
-			//{
-			//	MsgBox.Show(this,"To date cannot be before From date.");
-			//	return;
-			//}
+		private void checkAllProv_Click(object sender,EventArgs e) {
+			if(checkAllProv.Checked) {
+				for(int i=0;i<listProv.Items.Count;i++) {
+					listProv.SetSelected(i,true);
+				}
+			}
+			else {
+				listProv.SelectedIndices.Clear();
+			}
+		}
+
+		private void listProv_Click(object sender,EventArgs e) {
+			if(listProv.SelectedIndices.Count>0) {
+				checkAllProv.Checked=false;
+			}
+		}
+
+		private void checkAllClin_Click(object sender,EventArgs e) {
+			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			else {
+				listClin.SelectedIndices.Clear();
+			}
+		}
+
+		private void listClin_Click(object sender,EventArgs e) {
+			if(listClin.SelectedIndices.Count>0) {
+				checkAllClin.Checked=false;
+			}
+		}
+
+		private void butOK_Click(object sender, System.EventArgs e){
+			if(listProv.SelectedIndices.Count==0) {
+				MsgBox.Show(this,"Please select at least one provider.");
+				return;
+			}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				if(listClin.SelectedIndices.Count==0) {
+					MsgBox.Show(this,"Please select at least one clinic.");
+					return;
+				}
+			}
+			if(dateStart.SelectionStart>dateEnd.SelectionStart) {
+				MsgBox.Show(this,"Start date cannot be greater than the end date.");
+				return;
+			}
+			string whereProv="";
+			whereProv+=" AND payplancharge.ProvNum IN(";
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				if(i>0) {
+					whereProv+=",";
+				}
+				whereProv+=POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+			}
+			whereProv+=") ";
+			string whereClin="";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				whereClin+=" AND payplancharge.ClinicNum IN(";
+				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+					if(i>0) {
+						whereClin+=",";
+					}
+					if(Security.CurUser.ClinicIsRestricted) {
+						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+					}
+					else {
+						if(listClin.SelectedIndices[i]==0) {
+							whereClin+="0";
+						}
+						else {
+							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
+					}
+				}
+				whereClin+=") ";
+			}
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
@@ -138,44 +387,67 @@ namespace OpenDental
 			report.ReportName=Lan.g(this,"PaymentPlans");
 			report.AddTitle("Title",Lan.g(this,"Payment Plans"),fontTitle);
 			report.AddSubTitle("PracticeTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
-			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString(),fontSubTitle);
+			report.AddSubTitle("Date SubTitle",dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString(),fontSubTitle);
 			DataTable table=new DataTable();
+			table.Columns.Add("provider");
 			table.Columns.Add("guarantor");
 			table.Columns.Add("ins");
 			table.Columns.Add("princ");
 			table.Columns.Add("paid");
 			table.Columns.Add("due");
-			table.Columns.Add("dueTen");
+			table.Columns.Add("balance");
+			table.Columns.Add("clinicname");
 			DataRow row;
-			string datesql="CURDATE()";
+			string datesql="CURDATE()";//This is used to find out how much people owe currently and has nothing to do with the selected range
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
 			//Oracle TODO:  Either put entire query without GROUP BY in SUBSELECT and then GROUP BY outside, or rewrite query to use joins instead of subselects.
 			string command="SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum, "
 				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-					+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', "
-				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-					+"AND ChargeDate <= "+DbHelper.DateAddDay(datesql,POut.Long(PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays)))+@"),0) '_dueTen', "
-				+"COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum AND paysplit.PayPlanNum!=0),0) '_paid', "
-				+"COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum AND claimproc.Status IN(1,4,5) AND claimproc.PayPlanNum!=0),0) '_insPaid', "
-				+"COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal' "
-				+"FROM payplan "
+					+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', ";
+				command+="COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum AND paysplit.PayPlanNum!=0),0) '_paid', ";
+				command+="COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum "
+					+"AND claimproc.Status IN("
+					+POut.Int((int)ClaimProcStatus.Received)+","
+					+POut.Int((int)ClaimProcStatus.Supplemental)+","
+					+POut.Int((int)ClaimProcStatus.CapClaim)
+					+") AND claimproc.PayPlanNum!=0),0) '_insPaid', ";
+				command+="COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal', "
+				+"patient.PatNum PatNum, "
+				+"payplancharge.ProvNum ProvNum";
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					command+=", payplancharge.ClinicNum ClinicNum";
+				}
+				command+=" FROM payplan "
 				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
-				//WHERE SUBSTRING(Birthdate,6,5) >= '"+dateFrom.ToString("MM-dd")+"' "
-				//+"AND SUBSTRING(Birthdate,6,5) <= '"+dateTo.ToString("MM-dd")+"' "
-				+"GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
+				+"LEFT JOIN payplancharge ON payplan.PayPlanNum=payplancharge.PayPlanNum "
+				+"WHERE payplan.PayPlanDate >= "+POut.Date(dateStart.SelectionStart)+" "
+				+"AND payplan.PayPlanDate <= "+POut.Date(dateEnd.SelectionStart)+" "
+				+whereProv
+				+whereClin;
+				if(radioInsurance.Checked) {
+					command+="AND payplan.PlanNum!=0 ";
+				}
+				else if(radioPatient.Checked) {
+					command+="AND payplan.PlanNum=0 ";
+				}
+				command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
 			if(checkHideCompletePlans.Checked) {
 				command+="HAVING _paid+_insPaid < _principal ";
 			}
-			command+="ORDER BY LName,FName";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				command+="ORDER BY ClinicNum,LName,FName";
+			}
+			else {
+				command+="ORDER BY LName,FName";
+			}
 			DataTable raw=Reports.GetTable(command);
 			//DateTime payplanDate;
 			Patient pat;
 			double princ;
 			double paid;
 			double accumDue;
-			double dueTen;
 			for(int i=0;i<raw.Rows.Count;i++) {
 				princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
 				if(raw.Rows[i]["PlanNum"].ToString()=="0") {//pat payplan
@@ -185,7 +457,6 @@ namespace OpenDental
 					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
 				}
 				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
-				dueTen=PIn.Double(raw.Rows[i]["_dueTen"].ToString());
 				row=table.NewRow();
 				//payplanDate=PIn.PDate(raw.Rows[i]["PayPlanDate"].ToString());
 				//row["date"]=raw.Rows[i]["PayPlanDate"].ToString();//payplanDate.ToShortDateString();
@@ -194,6 +465,7 @@ namespace OpenDental
 				pat.FName=raw.Rows[i]["FName"].ToString();
 				pat.MiddleI=raw.Rows[i]["MiddleI"].ToString();
 				pat.Preferred=raw.Rows[i]["Preferred"].ToString();
+				row["provider"]=Providers.GetLName(PIn.Long(raw.Rows[i]["ProvNum"].ToString()));
 				row["guarantor"]=pat.GetNameLF();
 				if(raw.Rows[i]["PlanNum"].ToString()=="0") {
 					row["ins"]="";
@@ -204,35 +476,54 @@ namespace OpenDental
 				row["princ"]=princ.ToString("f");
 				row["paid"]=paid.ToString("f");
 				row["due"]=(accumDue-paid).ToString("f");
-				row["dueTen"]=(dueTen-paid).ToString("f");
+				if(checkShowFamilyBalance.Checked) {
+					Family famCur=Patients.GetFamily(PIn.Long(raw.Rows[i]["PatNum"].ToString()));
+					Decimal total=(decimal)famCur.ListPats[0].BalTotal;
+					row["balance"]=(total - (decimal)famCur.ListPats[0].InsEst).ToString("F");
+				}
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+					string clinicDesc=Clinics.GetDesc(PIn.Long(raw.Rows[i]["ClinicNum"].ToString()));
+					row["clinicname"]=(clinicDesc=="")?Lan.g(this,"Unassigned"):clinicDesc;
+				}
 				table.Rows.Add(row);
 			}
-			QueryObject query=report.AddQuery(table,"","",SplitByKind.None,1,true);
+			QueryObject query;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				query=report.AddQuery(table,"","clinicname",SplitByKind.Value,1,true);
+			}
+			else {
+				query=report.AddQuery(table,"","",SplitByKind.None,1,true);
+			}
+			query.AddColumn("Provider",160,FieldValueType.String,font);
 			query.AddColumn("Guarantor",160,FieldValueType.String,font);
 			query.AddColumn("Ins",40,FieldValueType.String,font);
 			query.GetColumnHeader("Ins").ContentAlignment=ContentAlignment.MiddleCenter;
 			query.GetColumnDetail("Ins").ContentAlignment=ContentAlignment.MiddleCenter;
-			query.AddColumn("Princ",100,FieldValueType.String,font);
+			query.AddColumn("Princ",100,FieldValueType.Number,font);
 			query.GetColumnHeader("Princ").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Princ").ContentAlignment=ContentAlignment.MiddleRight;
-			query.AddColumn("Paid",100,FieldValueType.String,font);
+			query.AddColumn("Paid",100,FieldValueType.Number,font);
 			query.GetColumnHeader("Paid").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Paid").ContentAlignment=ContentAlignment.MiddleRight;
-			query.AddColumn("Due Now",100,FieldValueType.String,font);
+			query.AddColumn("Due Now",100,FieldValueType.Number,font);
 			query.GetColumnHeader("Due Now").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Due Now").ContentAlignment=ContentAlignment.MiddleRight;
-			query.AddColumn("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days",100,FieldValueType.String,font);
-			query.GetColumnHeader("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days").ContentAlignment=ContentAlignment.MiddleRight;
-			query.GetColumnDetail("Due in "+PrefC.GetLong(PrefName.PayPlansBillInAdvanceDays).ToString()
-				+" Days").ContentAlignment=ContentAlignment.MiddleRight;
+			if(checkShowFamilyBalance.Checked) {
+				query.AddColumn("Fam Balance",100,FieldValueType.String,font);
+				query.GetColumnHeader("Fam Balance").ContentAlignment=ContentAlignment.MiddleRight;
+				query.GetColumnDetail("Fam Balance").ContentAlignment=ContentAlignment.MiddleRight;
+				query.GetColumnDetail("Fam Balance").SuppressIfDuplicate=true;
+			}
 			if(!report.SubmitQueries()) {
 				return;
 			}
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
+		}
+
+		private void butCancel_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.Cancel;
 		}
 
 		
