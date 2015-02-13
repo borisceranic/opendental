@@ -801,9 +801,9 @@ namespace OpenDental{
 			// label13
 			// 
 			this.label13.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label13.Location = new System.Drawing.Point(-11, 212);
+			this.label13.Location = new System.Drawing.Point(6, 212);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(247, 15);
+			this.label13.Size = new System.Drawing.Size(230, 15);
 			this.label13.TabIndex = 200;
 			this.label13.Text = "Search Behavior";
 			this.label13.TextAlign = System.Drawing.ContentAlignment.TopRight;
