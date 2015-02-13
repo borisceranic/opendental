@@ -7,13 +7,13 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Deposits {
 
-		///<summary>Gets all Deposits, ordered by date.  </summary>
+		///<summary>Gets all Deposits, ordered by DateDeposit, DepositNum.  </summary>
 		public static Deposit[] Refresh() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Deposit[]>(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT * FROM deposit "
-				+"ORDER BY DateDeposit";
+				+"ORDER BY DateDeposit,DepositNum";
 			return Crud.DepositCrud.SelectMany(command).ToArray();
 		}
 
@@ -24,7 +24,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM deposit "
 				+"WHERE NOT EXISTS(SELECT * FROM transaction WHERE deposit.DepositNum=transaction.DepositNum) "
-				+"ORDER BY DateDeposit";
+				+"ORDER BY DateDeposit,DepositNum";
 			return Crud.DepositCrud.SelectMany(command).ToArray();
 		}
 
