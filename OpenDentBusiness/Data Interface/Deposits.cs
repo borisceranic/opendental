@@ -13,7 +13,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<Deposit[]>(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT * FROM deposit "
-				+"ORDER BY DateDeposit,DepositNum";
+				+"ORDER BY DateDeposit";
 			return Crud.DepositCrud.SelectMany(command).ToArray();
 		}
 
@@ -24,7 +24,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM deposit "
 				+"WHERE NOT EXISTS(SELECT * FROM transaction WHERE deposit.DepositNum=transaction.DepositNum) "
-				+"ORDER BY DateDeposit,DepositNum";
+				+"ORDER BY DateDeposit";
 			return Crud.DepositCrud.SelectMany(command).ToArray();
 		}
 

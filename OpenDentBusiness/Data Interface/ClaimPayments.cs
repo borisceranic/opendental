@@ -95,7 +95,10 @@ namespace OpenDentBusiness{
 				}
 			}
 			command+=" AND IsPartial=0"//Don't let users attach partial insurance payments to deposits.
-				+" ORDER BY CheckDate";
+				//Order by the date on the check, and then the incremental order of the creation of each payment (doesn't affect random primary keys).
+				//It was an internal complaint that checks on the same date show up in a 'random' order.
+				//The real fix for this issue would be to add a time column and order by it by that instead of the PK.
+				+" ORDER BY CheckDate,ClaimPaymentNum";//Not usual pattern to order by PK
 			return Crud.ClaimPaymentCrud.SelectMany(command).ToArray();
 		}
 
@@ -109,7 +112,10 @@ namespace OpenDentBusiness{
 				+"INNER JOIN definition ON claimpayment.PayType=definition.DefNum "
 				+"WHERE DepositNum = "+POut.Long(depositNum)
 				+" AND definition.ItemValue=''"//Check if payment type should show in the deposit slip.  'N'=not show, empty string means should show.
-				+" ORDER BY CheckDate";
+				//Order by the date on the check, and then the incremental order of the creation of each payment (doesn't affect random primary keys).
+				//It was an internal complaint that checks on the same date show up in a 'random' order.
+				//The real fix for this issue would be to add a time column and order by it by that instead of the PK.
+				+" ORDER BY CheckDate,ClaimPaymentNum";//Not usual pattern to order by PK
 			return Crud.ClaimPaymentCrud.SelectMany(command).ToArray();
 		}
 
