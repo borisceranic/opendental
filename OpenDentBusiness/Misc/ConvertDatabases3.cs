@@ -4079,11 +4079,11 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) "
-									+"VALUES (32"+",'"+POut.String("EFT")+"','0','N')";
+									+"VALUES (32"+",'"+POut.String("EFT")+"','1','N')";
 				}
 				else {//oracle
 					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
-									+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),32,'"+POut.String("EFT")+"','0','N')";
+									+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),32,'"+POut.String("EFT")+"','1','N')";
 				}
 				Db.NonQ(command,true);
 				//Insert VistaDent Bridge
