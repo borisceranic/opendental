@@ -757,7 +757,7 @@ namespace OpenDentBusiness.UI {
 			if(endHour==0) {
 				endHour=24;
 			}
-			if(aptHourBegin>=endHour || aptHourEnd<beginHour) {
+			if(aptHourBegin>=endHour || aptHourEnd<=beginHour) {
 				return false;
 			}
 			return true;
