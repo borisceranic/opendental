@@ -233,6 +233,12 @@ namespace OpenDentBusiness {
 			DataTable tableProduction=Db.GetTable(command);
 			tableProduction.TableName="tableProduction";
 			//Adjustments----------------------------------------------------------------------------
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereProv=" AND adjustment.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND adjustment.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
 			command="SELECT "
 				+"adjustment.AdjDate,"
 				+"adjustment.ClinicNum,"
@@ -246,6 +252,12 @@ namespace OpenDentBusiness {
 			DataTable tableAdj=Db.GetTable(command);
 			tableAdj.TableName="tableAdj";
 			//TableInsWriteoff--------------------------------------------------------------------------
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereProv=" AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
 			if(writeOffPay) {
 				command="SELECT "
 					+"claimproc.DateCP ClaimDate," 
@@ -274,6 +286,12 @@ namespace OpenDentBusiness {
 			DataTable tableInsWriteoff=Db.GetTable(command);
 			tableInsWriteoff.TableName="tableInsWriteoff";
 			//PtIncome--------------------------------------------------------------------------------
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereProv=" AND paysplit.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND paysplit.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
 			command="SELECT "
 				+"paysplit.DatePay,"
 				+"paysplit.ClinicNum,"
@@ -288,6 +306,12 @@ namespace OpenDentBusiness {
 			DataTable tablePay=Db.GetTable(command);
 			tablePay.TableName="tablePay";
 			//InsIncome---------------------------------------------------------------------------------
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereProv=" AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
 			command="SELECT claimpayment.CheckDate,claimproc.ClinicNum,SUM(claimproc.InsPayamt) Ins "
 				+"FROM claimpayment,claimproc WHERE "
 				+"claimproc.ClaimPaymentNum = claimpayment.ClaimPaymentNum "
