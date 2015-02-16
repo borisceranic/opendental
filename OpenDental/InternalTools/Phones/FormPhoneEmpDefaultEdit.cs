@@ -30,7 +30,7 @@ namespace OpenDental{
 		private CheckBox checkHasColor;
 		private TextBox textEmpName;
 		private Label label6;
-		private TextBox textNotes;
+		private OpenDental.ODtextBox textNotes;
 		private Label label3;
 		private TextBox textComputerName;
 		private Label label4;
@@ -96,7 +96,7 @@ namespace OpenDental{
 			this.checkHasColor = new System.Windows.Forms.CheckBox();
 			this.textEmpName = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.textNotes = new System.Windows.Forms.TextBox();
+			this.textNotes = new OpenDental.ODtextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.textComputerName = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
