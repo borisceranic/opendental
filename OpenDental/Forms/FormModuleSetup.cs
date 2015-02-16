@@ -115,6 +115,7 @@ namespace OpenDental{
 		private CheckBox checkTreatPlanItemized;
 		private CheckBox checkFamPhiAccess;
 		private CheckBox checkStatementsUseSheets;
+		private CheckBox checkWaitingRoomFilterByView;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -252,6 +253,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkWaitingRoomFilterByView = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -774,6 +776,7 @@ namespace OpenDental{
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.checkWaitingRoomFilterByView);
 			this.tabAppts.Controls.Add(this.label13);
 			this.tabAppts.Controls.Add(this.comboSearchBehavior);
 			this.tabAppts.Controls.Add(this.checkAppointmentTimeIsLocked);
@@ -1473,6 +1476,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkWaitingRoomFilterByView
+			// 
+			this.checkWaitingRoomFilterByView.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkWaitingRoomFilterByView.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkWaitingRoomFilterByView.Location = new System.Drawing.Point(34, 253);
+			this.checkWaitingRoomFilterByView.Name = "checkWaitingRoomFilterByView";
+			this.checkWaitingRoomFilterByView.Size = new System.Drawing.Size(406, 17);
+			this.checkWaitingRoomFilterByView.TabIndex = 201;
+			this.checkWaitingRoomFilterByView.Text = "Filter the waiting room based on the selected appointment view.";
+			this.checkWaitingRoomFilterByView.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1583,6 +1597,7 @@ namespace OpenDental{
 			}
 			comboSearchBehavior.SelectedIndex=PrefC.GetInt(PrefName.AppointmentSearchBehavior);
 			checkAppointmentTimeIsLocked.Checked=PrefC.GetBool(PrefName.AppointmentTimeIsLocked);
+			checkWaitingRoomFilterByView.Checked=PrefC.GetBool(PrefName.WaitingRoomFilterByView);
 			#endregion
 			#region Family Module
 			//Family module-----------------------------------------------------------------------
@@ -1879,6 +1894,7 @@ namespace OpenDental{
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
+				| Prefs.UpdateBool(PrefName.WaitingRoomFilterByView,checkWaitingRoomFilterByView.Checked)
 				)
 			{
 				_changed=true;

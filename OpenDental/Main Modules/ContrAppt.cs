@@ -2150,8 +2150,19 @@ namespace OpenDental {
 			TimeSpan delta=DateTime.Now-LastTimeDataRetrieved;
 			DataTable table=DS.Tables["WaitingRoom"];
 			List<Operatory> listOpsForClinic=new List<Operatory>();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				listOpsForClinic=Operatories.GetForClinic(FormOpenDental.ClinicNum);
+			List<Operatory> listOpsForApptView=new List<Operatory>();
+			if(PrefC.GetBool(PrefName.WaitingRoomFilterByView)) {
+				//In order to filter the waiting room by appointment view, we need to always grab the operatories visible for TODAY.
+				//This way, regardless of what day the customer is looking at, the waiting room will only change when they change appointment views.
+				List<Schedule> listSchedulesForToday=Schedules.ConvertTableToList(Appointments.GetPeriodSchedule(DateTime.Now,DateTime.Now));
+				ApptView viewCur=null;
+				if(comboView.SelectedIndex>0) {
+					viewCur=_listApptViews[comboView.SelectedIndex-1];
+				}
+				listOpsForApptView=ApptViewItemL.GetOpsForApptView(viewCur,ApptDrawing.IsWeeklyView,listSchedulesForToday);
+			}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				listOpsForClinic=Operatories.GetOpsForClinic(FormOpenDental.ClinicNum);
 			}
 			gridWaiting.BeginUpdate();
 			gridWaiting.Columns.Clear();
@@ -2163,6 +2174,19 @@ namespace OpenDental {
 			DateTime waitTime;
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
+				//Always filter the waiting room by appointment view first, regardless of using clinics or not.
+				if(PrefC.GetBool(PrefName.WaitingRoomFilterByView)) {
+					bool isInView=false;
+					for(int j=0;j<listOpsForApptView.Count;j++) {
+						if(listOpsForApptView[j].OperatoryNum==PIn.Long(table.Rows[i]["OpNum"].ToString())) {
+							isInView=true;
+							break;
+						}
+					}
+					if(!isInView) {
+						continue;
+					}
+				}
 				//We only want to filter the waiting room by the clinic's operatories when clinics are enabled and they are not using 'Headquarters' mode.
 				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=0) {
 					bool isInView=false;

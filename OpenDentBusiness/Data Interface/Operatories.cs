@@ -99,7 +99,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Get all non-hidden operatories for the clinic passed in.</summary>
-		public static List<Operatory> GetForClinic(long clinicNum) {
+		public static List<Operatory> GetOpsForClinic(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
 			List<Operatory> listRetVal=new List<Operatory>();
 			List<Operatory> listOpsShort=OperatoryC.GetListShort();
