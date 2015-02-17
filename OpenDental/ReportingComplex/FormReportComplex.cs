@@ -799,7 +799,12 @@ namespace OpenDental.ReportingComplex
 							yPos+=reportObject.OffSetY;
 						}
 						if(reportObject.Name.Contains("GroupSummaryText")) {
-							reportObject.StaticText=GetGroupSummaryValue(reportObject.DataField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString("c");
+							if(reportObject.SummaryOperation==SummaryOperation.Sum) {
+								reportObject.StaticText=GetGroupSummaryValue(reportObject.DataField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString("c");
+							}
+							else if(reportObject.SummaryOperation==SummaryOperation.Count) {
+								reportObject.StaticText=GetGroupSummaryValue(reportObject.DataField,reportObject.SummaryGroups,reportObject.SummaryOperation).ToString();
+							}
 							int width=(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Width+2;
 							int height=(int)g.MeasureString(reportObject.StaticText,reportObject.Font).Height+2;
 							if(width<queryObj.GetObjectByName(reportObject.SummarizedField+"Header").Size.Width) {
@@ -1003,7 +1008,12 @@ namespace OpenDental.ReportingComplex
 				displayText=Patients.AgeToString(Patients.DateToAge(PIn.Date(rawText)));//(fieldObject.FormatString);
 			}
 			else if(reportObject.FieldValueType==FieldValueType.Boolean) {
-				displayText=PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();//(fieldObject.FormatString);
+				if(PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString())) {
+					displayText="X";
+				}
+				else {
+					displayText="";
+				}
 				if(i>0 && reportObject.SuppressIfDuplicate) {
 					prevDisplayText=PIn.Bool(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
 				}
