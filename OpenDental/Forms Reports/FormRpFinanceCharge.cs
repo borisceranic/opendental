@@ -10,9 +10,12 @@ namespace OpenDental{
 	public class FormRpFinanceCharge : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
-		private OpenDental.ValidDate textDate;
-		private System.Windows.Forms.Label label1;
 		private System.ComponentModel.Container components = null;
+		private GroupBox groupBox2;
+		private Label label2;
+		private ValidDate textDateFrom;
+		private ValidDate textDateTo;
+		private Label label3;
 		private FormQuery FormQuery2;
 
 		///<summary></summary>
@@ -38,112 +41,146 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpFinanceCharge));
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.textDate = new OpenDental.ValidDate();
-			this.label1 = new System.Windows.Forms.Label();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.textDateFrom = new OpenDental.ValidDate();
+			this.textDateTo = new OpenDental.ValidDate();
+			this.label3 = new System.Windows.Forms.Label();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(336,176);
+			this.butCancel.Location = new System.Drawing.Point(349, 192);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
-			this.butCancel.TabIndex = 19;
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
+			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(336,142);
+			this.butOK.Location = new System.Drawing.Point(268, 192);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
-			this.butOK.TabIndex = 18;
+			this.butOK.Size = new System.Drawing.Size(75, 26);
+			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// textDate
+			// groupBox2
 			// 
-			this.textDate.Location = new System.Drawing.Point(154,62);
-			this.textDate.Name = "textDate";
-			this.textDate.ReadOnly = true;
-			this.textDate.Size = new System.Drawing.Size(116,20);
-			this.textDate.TabIndex = 16;
+			this.groupBox2.Controls.Add(this.label2);
+			this.groupBox2.Controls.Add(this.textDateFrom);
+			this.groupBox2.Controls.Add(this.textDateTo);
+			this.groupBox2.Controls.Add(this.label3);
+			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.groupBox2.Location = new System.Drawing.Point(92, 30);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(252, 125);
+			this.groupBox2.TabIndex = 1;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Date Range";
 			// 
-			// label1
+			// label2
 			// 
-			this.label1.Location = new System.Drawing.Point(12,66);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(136,14);
-			this.label1.TabIndex = 17;
-			this.label1.Text = "Date of Charges";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label2.Location = new System.Drawing.Point(2, 43);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(82, 18);
+			this.label2.TabIndex = 37;
+			this.label2.Text = "From";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textDateFrom
+			// 
+			this.textDateFrom.Location = new System.Drawing.Point(90, 40);
+			this.textDateFrom.Name = "textDateFrom";
+			this.textDateFrom.Size = new System.Drawing.Size(100, 20);
+			this.textDateFrom.TabIndex = 1;
+			// 
+			// textDateTo
+			// 
+			this.textDateTo.Location = new System.Drawing.Point(90, 67);
+			this.textDateTo.Name = "textDateTo";
+			this.textDateTo.Size = new System.Drawing.Size(100, 20);
+			this.textDateTo.TabIndex = 2;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(2, 70);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(82, 18);
+			this.label3.TabIndex = 39;
+			this.label3.Text = "To";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// FormRpFinanceCharge
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(436,230);
+			this.ClientSize = new System.Drawing.Size(436, 230);
+			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
-			this.Controls.Add(this.textDate);
-			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(452, 268);
 			this.Name = "FormRpFinanceCharge";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Finance Charge Report";
 			this.Load += new System.EventHandler(this.FormRpFinanceCharge_Load);
+			this.groupBox2.ResumeLayout(false);
+			this.groupBox2.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 		#endregion
 
 		private void FormRpFinanceCharge_Load(object sender, System.EventArgs e) {
-			textDate.Text=PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
-			/*if(DateTime.Today.Day > 15){
-				if(DateTime.Today.Month!=12){
-					textDate.Text=(new DateTime(DateTime.Today.Year,DateTime.Today.Month+1,1)).ToShortDateString();		
-				}
-				else{ 
-					textDate.Text=(new DateTime(DateTime.Today.Year+1,1,1)).ToShortDateString();	
-				}
-			}
-			else{
-				textDate.Text=(new DateTime(DateTime.Today.Year,DateTime.Today.Month,1)).ToShortDateString();
-			}	*/	
+			textDateFrom.Text=PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
+			textDateTo.Text=PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			//if(textDate.errorProvider1.GetError(textDate)!=""){
-			//	MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
-			//	return;
-			//}
+			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
+				|| textDateTo.errorProvider1.GetError(textDateTo)!="") 
+			{
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			DateTime dateFrom=PIn.Date(textDateFrom.Text);
+			DateTime dateTo=PIn.Date(textDateTo.Text);
+			if(dateTo<dateFrom) {
+				MsgBox.Show(this,"To date cannot be before From date.");
+				return;
+			}
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=
-				"SELECT "+DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+",adjamt "
+				"SELECT "+DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+",AdjAmt "
 				+"FROM patient,adjustment "
-				+"WHERE patient.patnum=adjustment.patnum "
-				+"AND adjustment.adjdate = "+POut.Date(PrefC.GetDate(PrefName.FinanceChargeLastRun))
-				+"AND adjustment.adjtype = '"+POut.Long(PrefC.GetLong(PrefName.FinanceChargeAdjustmentType))+"'";
+				+"WHERE patient.PatNum=adjustment.PatNum "
+				+"AND adjustment.AdjDate BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" "
+				+"AND adjustment.AdjType = '"+POut.Long(PrefC.GetLong(PrefName.FinanceChargeAdjustmentType))+"'";
 			FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();		
-			report.Title="FINANCE CHARGE REPORT";
+			report.Title=Lans.g(this,"FINANCE CHARGE REPORT");
 			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			report.SubTitle.Add("Date of Charges: "+PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString());
+			report.SubTitle.Add(textDateFrom.Text+" - "+textDateTo.Text);
 			report.SetColumn(this,0,"Patient Name",180);
 			report.SetColumn(this,1,"Amount",100,HorizontalAlignment.Right);
 
