@@ -704,6 +704,24 @@ namespace OpenDental{
 			if(changed){
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.Fees);
 			}
+			changed=false;
+			//Correct the item orders of all definition categories.
+			Def[][] arrayAllDefs=DefC.GetArrayLong();//Don't use DefsList because it will only be an array of defs for the selected category.
+			int itemOrderCur=0;
+			for(int i=0;i<arrayAllDefs.Length;i++) {
+				itemOrderCur=0;
+				for(int j=0;j<arrayAllDefs[i].Length;j++) {
+					if(arrayAllDefs[i][j].ItemOrder!=itemOrderCur) {
+						arrayAllDefs[i][j].ItemOrder=itemOrderCur;
+						Defs.Update(arrayAllDefs[i][j]);
+						changed=true;
+					}
+					itemOrderCur++;
+				}
+			}
+			if(changed) {//This will only get fired if the item order was corrected
+				DataValid.SetInvalid(InvalidType.Defs,InvalidType.Fees);
+			}
 			DefsIsSelected=false;
 			//if(user!=null){
 				//SecurityLogs.MakeLogEntry("Definitions","Altered Definitions",user);
