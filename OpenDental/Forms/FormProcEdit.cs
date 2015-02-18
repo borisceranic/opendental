@@ -2885,6 +2885,7 @@ namespace OpenDental{
 			}
 			else{
 				if(ProcCur.ProcStatus==ProcStat.C){
+					textDiscount.Enabled=false;
 					if(ProcCur.IsLocked) {//Whether locking is currently allowed, this proc may have been locked previously.
 						butOK.Enabled=false;//use this state to cascade permission to any form opened from here
 						butDelete.Enabled=false;
@@ -3829,12 +3830,24 @@ namespace OpenDental{
 			Adjustment[] AdjustmentList=Adjustments.Refresh(ProcCur.PatNum);
 			AdjustmentsForProc=Adjustments.GetForProc(ProcCur.ProcNum,AdjustmentList);
 			tbAdj.ResetRows(AdjustmentsForProc.Count);
+			double discountAmt=0;//Total discount amount from all adjustments of default type.
 			for(int i=0;i<AdjustmentsForProc.Count;i++){
-				tbAdj.Cell[0,i]=((Adjustment)AdjustmentsForProc[i]).AdjDate.ToShortDateString();
-				tbAdj.Cell[1,i]=((Adjustment)AdjustmentsForProc[i]).AdjAmt.ToString("F");
+				Adjustment adjustment=(Adjustment)AdjustmentsForProc[i];
+				tbAdj.Cell[0,i]=adjustment.AdjDate.ToShortDateString();
+				tbAdj.Cell[1,i]=adjustment.AdjAmt.ToString("F");
 				tbAdj.FontBold[1,i]=true;
-				tbAdj.Cell[2,i]=DefC.GetName(DefCat.AdjTypes,((Adjustment)AdjustmentsForProc[i]).AdjType);
-				tbAdj.Cell[3,i]=((Adjustment)AdjustmentsForProc[i]).AdjNote;
+				tbAdj.Cell[2,i]=DefC.GetName(DefCat.AdjTypes,adjustment.AdjType);
+				tbAdj.Cell[3,i]=adjustment.AdjNote;
+				if(adjustment.AdjType==PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)) {
+					discountAmt-=adjustment.AdjAmt;//Discounts are stored as negatives, we want a positive discount value.
+				}
+			}
+			//Because we keep the discount field in sync with the discount adjustment when the procedure has a status of TP,
+			//we considered it a bug that the opposite didn't happen once the procedure was set complete.
+			if(ProcCur.ProcStatus==ProcStat.C) {
+				//Updating the discount text box will cause the procedure to get updated if the user clicks OK.
+				//This is fine because the Discount column is not designed for accuracy (after being set complete) and is loosely kept updated.
+				textDiscount.Text=discountAmt.ToString("F");//Calculated based on all adjustments of type if complete
 			}
 			tbAdj.SetGridColor(Color.LightGray);
 			tbAdj.LayoutTables();

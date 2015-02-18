@@ -122,7 +122,7 @@ namespace OpenDentBusiness {
 		public string DiagnosticCode3;
 		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
 		public string DiagnosticCode4;
-		///<summary>Stores the dollar amount of the discount, not full price.  E.g.  for a 10% discount, Fee = $160 Discount = $16.</summary>
+		///<summary>Stores the dollar amount of the discount, not full price.  E.g.  for a 10% discount, Fee = $160 Discount = $16.  This column is used by treatment planned procedures to create an adjustment when set complete.  It should not be used as an accurate monetary discount value for completed procedures.</summary>
 		public double Discount;
 		///<summary>Some procedures require a SNOMED code which indicates that site on the body at which this procedure was performed.</summary>
 		public string SnomedBodySite;
