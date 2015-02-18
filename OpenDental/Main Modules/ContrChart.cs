@@ -4699,6 +4699,14 @@ namespace OpenDental{
 						//Not even available to most users.
 						RegistrationKey[] keys=RegistrationKeys.GetForPatient(PatCur.PatNum);
 						for(int i=0;i<keys.Length;i++) {
+							//For non-guarantors with reseller keys, we do not want to show other family member reseller keys (there will be a lot of them).
+							if(PatCur.PatNum!=PatCur.Guarantor
+								&& keys[i].IsResellerCustomer 
+								&& keys[i].PatNum!=PatCur.PatNum) 
+							{
+								//The current patient selected is not the guarantor and this is a reseller key for another family member.  Do not show it in this patient's chart module.
+								continue;
+							}
 							row=new ODGridRow();
 							row.Cells.Add(Lan.g("TableChartPtInfo","Registration Key"));
 							string str=keys[i].RegKey.Substring(0,4)+"-"+keys[i].RegKey.Substring(4,4)+"-"
