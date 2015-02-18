@@ -707,16 +707,13 @@ namespace OpenDental{
 			changed=false;
 			//Correct the item orders of all definition categories.
 			Def[][] arrayAllDefs=DefC.GetArrayLong();//Don't use DefsList because it will only be an array of defs for the selected category.
-			int itemOrderCur=0;
 			for(int i=0;i<arrayAllDefs.Length;i++) {
-				itemOrderCur=0;
 				for(int j=0;j<arrayAllDefs[i].Length;j++) {
-					if(arrayAllDefs[i][j].ItemOrder!=itemOrderCur) {
-						arrayAllDefs[i][j].ItemOrder=itemOrderCur;
+					if(arrayAllDefs[i][j].ItemOrder!=j) {
+						arrayAllDefs[i][j].ItemOrder=j;
 						Defs.Update(arrayAllDefs[i][j]);
 						changed=true;
 					}
-					itemOrderCur++;
 				}
 			}
 			if(changed) {//This will only get fired if the item order was corrected
