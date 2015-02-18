@@ -3450,7 +3450,7 @@ namespace OpenDental{
 		
 		///<summary>This is called when any local data becomes outdated.  It's purpose is to tell the other computers to update certain local data.</summary>
 		private void DataValid_BecameInvalid(OpenDental.ValidEventArgs e){
-			if(e.OnlyLocal){//This is deprecated and doesn't seem to be used at all anymore.
+			if(e.OnlyLocal){//Currently used after doing a restore from FormBackup so that the local cache is forcefully updated.
 				if(!PrefsStartup()){//??
 					return;
 				}
