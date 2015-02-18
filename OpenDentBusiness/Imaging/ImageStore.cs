@@ -23,7 +23,12 @@ namespace OpenDentBusiness {
 				return null;
 			}
 			if(LocalAtoZpath==null) {//on startup
-				LocalAtoZpath=ComputerPrefs.LocalComputer.AtoZpath;
+				try {
+					LocalAtoZpath=ComputerPrefs.LocalComputer.AtoZpath;
+				}
+				catch {//fails when loading plugins after switching to version 15.1 because of schema change.
+					LocalAtoZpath="";
+				}
 			}
 			string replicationAtoZ=ReplicationServers.GetAtoZpath();
 			if(replicationAtoZ!="") {
