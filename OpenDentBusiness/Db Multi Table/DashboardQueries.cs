@@ -7,27 +7,58 @@ using System.Reflection;
 
 namespace OpenDentBusiness {
 	public class DashboardQueries {
+		///<summary>Set this boolean to true if you want to have message boxes pop up after each method is run when in debug mode.  Used to time long computations before loading the dashboard.</summary>
+		private static bool _showElapsedTimesForDebug=false;
+		private static string _elapsedTimeProdInc="";
+		private static string _elapsedTimeProvList="";
+		private static string _elapsedTimeProdProvs="";
+		private static string _elapsedTimeAR="";
+		private static string _elapsedTimeNewPatients="";
+
 		public static DataTable GetProvList(DateTime dt) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dt);
 			}
+#if DEBUG
+			_elapsedTimeProvList="";
+			System.Diagnostics.Stopwatch stopWatch=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch stopWatchTotal=new System.Diagnostics.Stopwatch();
+			_elapsedTimeProvList="Elapsed time for GetProvList:\r\n";
+			stopWatch.Restart();
+			stopWatchTotal.Restart();
+#endif
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
 			string command;
 			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="DROP TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				ProvNum bigint NOT NULL PRIMARY KEY,
 				production decimal NOT NULL,
 				income decimal NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="CREATE TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//providers
 			command=@"INSERT INTO tempdash"+rndStr+@" (ProvNum)
 				SELECT ProvNum
 				FROM provider WHERE IsHidden=0
 				ORDER BY ItemOrder";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="providers: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//production--------------------------------------------------------------------
 			//procs
 			command=@"UPDATE tempdash"+rndStr+@" 
@@ -36,6 +67,11 @@ namespace OpenDentBusiness {
 				AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+@"
 				AND ProcDate="+POut.Date(dt)+")";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="production - procs: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//capcomplete writeoffs were skipped
 			//adjustments
 			command=@"UPDATE tempdash"+rndStr+@" 
@@ -43,6 +79,11 @@ namespace OpenDentBusiness {
 				WHERE adjustment.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND AdjDate="+POut.Date(dt)+")";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="production - adjustments: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//insurance writeoffs
 			if(PrefC.GetBool(PrefName.ReportsPPOwriteoffDefaultToProcDate)) {//use procdate
 				command=@"UPDATE tempdash"+rndStr+@" 
@@ -59,6 +100,11 @@ namespace OpenDentBusiness {
 					AND (claimproc.Status=1 OR claimproc.Status=4) )";//received or supplemental 
 			}
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="production - writeoffs: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//income------------------------------------------------------------------------
 			//patient income
 			command=@"UPDATE tempdash"+rndStr+@" 
@@ -66,17 +112,41 @@ namespace OpenDentBusiness {
 				WHERE paysplit.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND DatePay="+POut.Date(dt)+")";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="income - patient: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//ins income
 			command=@"UPDATE tempdash"+rndStr+@" 
 				SET income=income+(SELECT IFNULL(SUM(InsPayAmt),0) FROM claimproc 
 				WHERE claimproc.ProvNum=tempdash"+rndStr+@".ProvNum
 				AND DateCP="+POut.Date(dt)+")";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="income - insurance: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//final queries
 			command="SELECT * FROM tempdash"+rndStr+@"";
 			DataTable table=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProvList+="SELECT * : "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			stopWatchTotal.Stop();
+			_elapsedTimeProvList+="DROP TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			_elapsedTimeProvList+="Total: "+stopWatchTotal.Elapsed.ToString();
+			if(_showElapsedTimesForDebug) {
+				System.Windows.Forms.MessageBox.Show(_elapsedTimeProvList);
+			}
+#endif
 			return table;
 		}
 
@@ -104,8 +174,21 @@ namespace OpenDentBusiness {
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
 			string command;
+#if DEBUG
+			_elapsedTimeProdProvs="";
+			System.Diagnostics.Stopwatch stopWatch=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch stopWatchTotal=new System.Diagnostics.Stopwatch();
+			_elapsedTimeProdProvs="Elapsed time for GetProdProvs:\r\n";
+			stopWatch.Restart();
+			stopWatchTotal.Restart();
+#endif
 			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdProvs+="DROP TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//this table will contain approx 12x3xProv rows if there was production for each prov in each month.
 			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				DatePeriod date NOT NULL,
@@ -113,6 +196,11 @@ namespace OpenDentBusiness {
 				production decimal NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdProvs+="CREATE TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//procs. Inserts approx 12xProv rows
 			command=@"INSERT INTO tempdash"+rndStr+@"
 				SELECT procedurelog.ProcDate,procedurelog.ProvNum,
@@ -125,6 +213,11 @@ namespace OpenDentBusiness {
 				AND procedurelog.ProcDate <= "+POut.Date(dateTo)+@"
 				GROUP BY procedurelog.ProvNum,MONTH(procedurelog.ProcDate)";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdProvs+="INSERT INTO: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			
 			//todo 2 more tables
 
@@ -134,12 +227,31 @@ namespace OpenDentBusiness {
 				FROM tempdash"+rndStr+@" 
 				GROUP BY ProvNum,MONTH(DatePeriod)";//this fails with date issue
 			DataTable tableProd=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdProvs+="tableProd: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdProvs+="DROP TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			Db.NonQ(command);
 			command=@"SELECT ProvNum
 				FROM provider WHERE IsHidden=0
 				ORDER BY ItemOrder";
 			DataTable tableProv=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			stopWatchTotal.Stop();
+			_elapsedTimeProdProvs+="SELECT ProvNum FROM provider: "+stopWatch.Elapsed.ToString()+"\r\n";
+			_elapsedTimeProdProvs+="Total: "+stopWatchTotal.Elapsed.ToString();
+			if(_showElapsedTimesForDebug) {
+				System.Windows.Forms.MessageBox.Show(_elapsedTimeProdProvs);
+			}
+#endif
 			List<List<int>> retVal=new List<List<int>>();
 			for(int p=0;p<tableProv.Rows.Count;p++){//loop through each provider
 				long provNum=PIn.Long(tableProv.Rows[p]["ProvNum"].ToString());
@@ -175,6 +287,14 @@ namespace OpenDentBusiness {
 			List<int> listInt;
 			listInt=new List<int>();
 			bool agingWasRun=false;
+#if DEBUG
+			_elapsedTimeAR="";
+			System.Diagnostics.Stopwatch stopWatch=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch stopWatchTotal=new System.Diagnostics.Stopwatch();
+			_elapsedTimeAR="Elapsed time for GetAR:\r\n";
+			stopWatch.Restart();
+			stopWatchTotal.Restart();
+#endif
 			for(int i=0;i<12;i++) {
 				DateTime dateLastOfMonth=dateFrom.AddMonths(i+1).AddDays(-1);
 				DashboardAR dash=null;
@@ -189,10 +309,18 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				agingWasRun=true;
+#if DEBUG
+				stopWatch.Restart();
+#endif
 				//run historical aging on all patients based on the date entered.
 				Ledgers.ComputeAging(0,dateLastOfMonth,true);
 				command=@"SELECT SUM(Bal_0_30+Bal_31_60+Bal_61_90+BalOver90),SUM(InsEst) FROM patient";
 				DataTable table=Db.GetTable(command);
+#if DEBUG
+				stopWatch.Stop();
+				_elapsedTimeAR+="Ledgers.ComputeAging() #"+i+" : "+stopWatch.Elapsed.ToString()+"\r\n";
+				stopWatch.Restart();
+#endif
 				dash=new DashboardAR();
 				dash.DateCalc=dateLastOfMonth;
 				dash.BalTotal=PIn.Double(table.Rows[0][0].ToString());
@@ -201,8 +329,24 @@ namespace OpenDentBusiness {
 				listInt.Add((int)dash.BalTotal);//and also use it now.
 			}
 			if(agingWasRun) {
+#if DEBUG
+				stopWatch.Restart();
+#endif
 				Ledgers.RunAging();//set aging back to normal
+#if DEBUG
+				stopWatch.Stop();
+				_elapsedTimeAR+="set aging back to normal: "+stopWatch.Elapsed.ToString()+"\r\n";
+				stopWatch.Restart();
+#endif
 			}
+#if DEBUG
+			stopWatch.Stop();
+			stopWatchTotal.Stop();
+			_elapsedTimeAR+="Total: "+stopWatchTotal.Elapsed.ToString();
+			if(_showElapsedTimesForDebug) {
+				System.Windows.Forms.MessageBox.Show(_elapsedTimeAR);
+			}
+#endif
 			List<List<int>> retVal=new List<List<int>>();
 			retVal.Add(listInt);
 			return retVal;
@@ -212,6 +356,14 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<List<int>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
 			}
+#if DEBUG
+			_elapsedTimeProdInc="";
+			System.Diagnostics.Stopwatch stopWatch=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch stopWatchTotal=new System.Diagnostics.Stopwatch();
+			_elapsedTimeProdInc="Elapsed time for GetProdInc:\r\n";
+			stopWatch.Restart();
+			stopWatchTotal.Restart();
+#endif
 			string command;
 			command=@"SELECT procedurelog.ProcDate,
 				SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0)
@@ -223,6 +375,11 @@ namespace OpenDentBusiness {
 				AND procedurelog.ProcDate <= "+POut.Date(dateTo)+@"
 				GROUP BY MONTH(procedurelog.ProcDate)";
 			DataTable tableProduction=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdInc+="tableProduction: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command=@"SELECT AdjDate,
 				SUM(AdjAmt)
 				FROM adjustment
@@ -230,6 +387,11 @@ namespace OpenDentBusiness {
 				AND AdjDate <= "+POut.Date(dateTo)+@"
 				GROUP BY MONTH(AdjDate)";
 			DataTable tableAdj=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdInc+="tableAdj: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			if(PrefC.GetBool(PrefName.ReportsPPOwriteoffDefaultToProcDate)) {//use procdate
 				command="SELECT "
 					+"claimproc.ProcDate," 
@@ -251,6 +413,11 @@ namespace OpenDentBusiness {
 					+"GROUP BY MONTH(claimproc.DateCP)";
 			}
 			DataTable tableWriteoff=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdInc+="tableWriteoff: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command="SELECT "
 				+"paysplit.DatePay,"
 				+"SUM(paysplit.SplitAmt) "
@@ -260,6 +427,11 @@ namespace OpenDentBusiness {
 				+"AND paysplit.DatePay <= "+POut.Date(dateTo)+" "
 				+"GROUP BY MONTH(paysplit.DatePay)";
 			DataTable tablePay=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeProdInc+="tablePay: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command="SELECT claimpayment.CheckDate,SUM(claimproc.InsPayamt) "
 				+"FROM claimpayment,claimproc WHERE "
 				+"claimproc.ClaimPaymentNum = claimpayment.ClaimPaymentNum "
@@ -267,6 +439,15 @@ namespace OpenDentBusiness {
 				+"AND claimpayment.CheckDate <= " + POut.Date(dateTo)+" "
 				+" GROUP BY claimpayment.CheckDate ORDER BY checkdate";
 			DataTable tableIns=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			stopWatchTotal.Stop();
+			_elapsedTimeProdInc+="tableIns: "+stopWatch.Elapsed.ToString()+"\r\n";
+			_elapsedTimeProdInc+="Total: "+stopWatchTotal.Elapsed.ToString();
+			if(_showElapsedTimesForDebug) {
+				System.Windows.Forms.MessageBox.Show(_elapsedTimeProdInc);
+			}
+#endif
 			//production--------------------------------------------------------------------
 			List<int> listInt;
 			listInt=new List<int>();
@@ -332,14 +513,32 @@ namespace OpenDentBusiness {
 			}
 			Random rnd=new Random();
 			string rndStr=rnd.Next(1000000).ToString();
+#if DEBUG
+			_elapsedTimeNewPatients="";
+			System.Diagnostics.Stopwatch stopWatch=new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch stopWatchTotal=new System.Diagnostics.Stopwatch();
+			_elapsedTimeNewPatients="Elapsed time for GetNewPatients:\r\n";
+			stopWatch.Restart();
+			stopWatchTotal.Restart();
+#endif
 			string command;
 			command="DROP TABLE IF EXISTS tempdash"+rndStr+@";";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeNewPatients+="DROP TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command=@"CREATE TABLE tempdash"+rndStr+@" (
 				PatNum bigint NOT NULL PRIMARY KEY,
 				dateFirstProc datetime NOT NULL
 				) DEFAULT CHARSET=utf8";
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeNewPatients+="CREATE TABLE: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			//table full of individual patients and their dateFirstProcs.
 			command=@"INSERT INTO tempdash"+rndStr+@" 
 				SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
@@ -347,10 +546,24 @@ namespace OpenDentBusiness {
 				HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
 				+"AND dateFirstProc <= "+POut.Date(dateTo);
 			Db.NonQ(command);
+#if DEBUG
+			stopWatch.Stop();
+			_elapsedTimeNewPatients+="INSERT INTO: "+stopWatch.Elapsed.ToString()+"\r\n";
+			stopWatch.Restart();
+#endif
 			command="SELECT dateFirstProc,COUNT(*) "
 				+"FROM tempdash"+rndStr+@" "
 				+"GROUP BY MONTH(dateFirstProc)";
 			DataTable tableCounts=Db.GetTable(command);
+#if DEBUG
+			stopWatch.Stop();
+			stopWatchTotal.Stop();
+			_elapsedTimeNewPatients+="SELECT dateFirstProc,COUNT(*): "+stopWatch.Elapsed.ToString()+"\r\n";
+			_elapsedTimeNewPatients+="Total: "+stopWatchTotal.Elapsed.ToString();
+			if(_showElapsedTimesForDebug) {
+				System.Windows.Forms.MessageBox.Show(_elapsedTimeNewPatients);
+			}
+#endif
 			List<int> listInt=new List<int>();
 			for(int i=0;i<12;i++) {
 				int ptcount=0;
