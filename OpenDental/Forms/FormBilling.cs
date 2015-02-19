@@ -491,6 +491,8 @@ namespace OpenDental{
 			comboOrder.Items.Add(Lan.g(this,"BillingType"));
 			comboOrder.Items.Add(Lan.g(this,"PatientName"));
 			comboOrder.SelectedIndex=0;
+			//ListClinics can be called even when Clinics is not turned on, therefore it needs to be set to something to avoid a null reference.
+			ListClinics=new List<Clinic>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
 				labelClinic.Visible=true;
 				comboClinic.Visible=true;
