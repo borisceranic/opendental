@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.1.12.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.3.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -7152,28 +7152,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '15.1.3.0' WHERE PrefName = 'DataBaseVersion'";
-				Db.NonQ(command);
-			}
-			To15_1_12();
-		}
-
-		///<summary></summary>
-		private static void To15_1_12() {
-			if(FromVersion<new Version("15.1.12.0")) {
-				string command="";
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE apptview ADD MaxNoteLen int NOT NULL";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="ALTER TABLE apptview ADD MaxNoteLen number(11)";
-					Db.NonQ(command);
-					command="UPDATE apptview SET MaxNoteLen = 0 WHERE MaxNoteLen IS NULL";
-					Db.NonQ(command);
-					command="ALTER TABLE apptview MODIFY MaxNoteLen NOT NULL";
-					Db.NonQ(command);
-				}
-				command="UPDATE preference SET ValueString = '15.1.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_2_1();

@@ -3715,12 +3715,8 @@ namespace OpenDental {
 							continue;
 						case "Note":
 							string noteStr=row["Note"].ToString();
-							int _maxNoteLen=0;
-							if(comboView.SelectedIndex>0) {
-								_maxNoteLen=_listApptViews[comboView.SelectedIndex-1].MaxNoteLen;//SelectedIndex-1 to account for "none" view
-							}
-							if(noteStr.Trim()!="" && _maxNoteLen>0 && noteStr.Length>_maxNoteLen) {
-								noteStr=noteStr.Substring(0,_maxNoteLen)+"...";
+							if(noteStr.Trim()!="" && noteStr.Length>200) {
+								noteStr=noteStr.Substring(0,200)+"...";
 							}
 							if(noteStr.Trim()!="") {
 								h=g.MeasureString(noteStr,font,infoBubble.Width-(int)x).Height;
