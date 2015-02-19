@@ -33,10 +33,11 @@ namespace OpenDentalWpf {
 		}
 
 		public void FillData() {
+			Cursor=Cursors.Wait;
 			textDate.Text=DateShowing.ToString("ddd")+" "+DateShowing.ToShortDateString();
 			table=DashboardQueries.GetProvList(DateShowing);
 			FillScreen();
-			
+			Cursor=Cursors.Arrow;
 		}
 
 		public List<int> SelectedIndices{
