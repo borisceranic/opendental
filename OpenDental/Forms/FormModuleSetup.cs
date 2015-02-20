@@ -115,6 +115,8 @@ namespace OpenDental{
 		private CheckBox checkTreatPlanItemized;
 		private CheckBox checkFamPhiAccess;
 		private CheckBox checkStatementsUseSheets;
+		private TextBox textApptBubNoteLength;
+		private Label label21;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -252,6 +254,8 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.textApptBubNoteLength = new System.Windows.Forms.TextBox();
+			this.label21 = new System.Windows.Forms.Label();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -774,6 +778,8 @@ namespace OpenDental{
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.textApptBubNoteLength);
+			this.tabAppts.Controls.Add(this.label21);
 			this.tabAppts.Controls.Add(this.label13);
 			this.tabAppts.Controls.Add(this.comboSearchBehavior);
 			this.tabAppts.Controls.Add(this.checkAppointmentTimeIsLocked);
@@ -815,14 +821,14 @@ namespace OpenDental{
 			this.comboSearchBehavior.Location = new System.Drawing.Point(238, 209);
 			this.comboSearchBehavior.MaxDropDownItems = 30;
 			this.comboSearchBehavior.Name = "comboSearchBehavior";
-			this.comboSearchBehavior.Size = new System.Drawing.Size(201, 21);
+			this.comboSearchBehavior.Size = new System.Drawing.Size(203, 21);
 			this.comboSearchBehavior.TabIndex = 199;
 			// 
 			// checkAppointmentTimeIsLocked
 			// 
 			this.checkAppointmentTimeIsLocked.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkAppointmentTimeIsLocked.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAppointmentTimeIsLocked.Location = new System.Drawing.Point(34, 236);
+			this.checkAppointmentTimeIsLocked.Location = new System.Drawing.Point(34, 234);
 			this.checkAppointmentTimeIsLocked.Name = "checkAppointmentTimeIsLocked";
 			this.checkAppointmentTimeIsLocked.Size = new System.Drawing.Size(406, 17);
 			this.checkAppointmentTimeIsLocked.TabIndex = 198;
@@ -1473,6 +1479,23 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// textApptBubNoteLength
+			// 
+			this.textApptBubNoteLength.Location = new System.Drawing.Point(357, 253);
+			this.textApptBubNoteLength.Name = "textApptBubNoteLength";
+			this.textApptBubNoteLength.Size = new System.Drawing.Size(83, 20);
+			this.textApptBubNoteLength.TabIndex = 213;
+			// 
+			// label21
+			// 
+			this.label21.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label21.Location = new System.Drawing.Point(105, 256);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(246, 16);
+			this.label21.TabIndex = 212;
+			this.label21.Text = "Appointment bubble max note length (0 for no limit)";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1491,6 +1514,7 @@ namespace OpenDental{
 			this.Load += new System.EventHandler(this.FormModuleSetup_Load);
 			this.tabControl1.ResumeLayout(false);
 			this.tabAppts.ResumeLayout(false);
+			this.tabAppts.PerformLayout();
 			this.tabFamily.ResumeLayout(false);
 			this.tabAccount.ResumeLayout(false);
 			this.tabAccount.PerformLayout();
@@ -1583,6 +1607,7 @@ namespace OpenDental{
 			}
 			comboSearchBehavior.SelectedIndex=PrefC.GetInt(PrefName.AppointmentSearchBehavior);
 			checkAppointmentTimeIsLocked.Checked=PrefC.GetBool(PrefName.AppointmentTimeIsLocked);
+			textApptBubNoteLength.Text=PrefC.GetInt(PrefName.AppointmentBubblesNoteLength).ToString();
 			#endregion
 			#region Family Module
 			//Family module-----------------------------------------------------------------------
@@ -1818,6 +1843,15 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
+			int noteLength=0;//Placeholder
+			if(!int.TryParse(textApptBubNoteLength.Text,out noteLength)) {
+				MsgBox.Show(this,"Max appointment note length is invalid. Please enter a valid number to continue.");
+				return;
+			}
+			if(noteLength<0) {
+				MsgBox.Show(this,"Max appointment note length cannot be a negative number.");
+				return;
+			}
 			if( Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)
 				| Prefs.UpdateBool(PrefName.TreatPlanShowGraphics,checkTreatPlanShowGraphics.Checked)
 				| Prefs.UpdateBool(PrefName.TreatPlanShowCompleted,checkTreatPlanShowCompleted.Checked)
@@ -1879,6 +1913,7 @@ namespace OpenDental{
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,negAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
+				| Prefs.UpdateInt(PrefName.AppointmentBubblesNoteLength,noteLength)
 				)
 			{
 				_changed=true;
