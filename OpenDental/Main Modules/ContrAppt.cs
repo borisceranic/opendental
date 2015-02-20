@@ -3741,10 +3741,11 @@ namespace OpenDental {
 							continue;
 						case "Note":
 							string noteStr=row["Note"].ToString();
-							if(noteStr.Trim()!="" && noteStr.Length>200) {
-								noteStr=noteStr.Substring(0,200)+"...";
+							int maxNoteLength=PrefC.GetInt(PrefName.AppointmentBubblesNoteLength);
+							if(noteStr.Trim()!="" && maxNoteLength>0 && noteStr.Length>maxNoteLength) {//Trim text
+								noteStr=noteStr.Substring(0,maxNoteLength)+"...";
 							}
-							if(noteStr.Trim()!="") {
+							if(noteStr.Trim()!="") { //draw text
 								h=g.MeasureString(noteStr,font,infoBubble.Width-(int)x).Height;
 								g.DrawString(noteStr,font,Brushes.Blue,new RectangleF(x,y,infoBubble.Width-(int)x,h));
 								y+=h;
