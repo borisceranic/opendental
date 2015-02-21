@@ -83,7 +83,7 @@ namespace OpenDentBusiness {
 		public HL70203 OrderingProviderIdentifierTypeCode;
 		#endregion
 
-		#endregion OCR
+		#endregion ORC
 		#region OBR fields
 		///<summary>Enumerates the OBR segments within a single message starting with 1.  OBR.1</summary>
 		public long SetIdOBR;
@@ -334,7 +334,7 @@ namespace OpenDentBusiness {
 
 namespace EhrLaboratories {
 
-	///<summary>Specimine Action Code. Constrained to AGLO. OID:2.16.840.1.113883.12.119  HL70369 code:HL70119.  Source HL7 2.5.1 Labratory Reporting Interface documentation.</summary>
+	///<summary>Specimen Action Code. Constrained to AGLO. OID:2.16.840.1.113883.12.119  HL70369 code:HL70119.  Source HL7 2.5.1 Labratory Reporting Interface documentation.</summary>
 	public enum HL70065 {
 		///<summary>0 - Add ordered tests to the existing specimen.</summary>
 		A,

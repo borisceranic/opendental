@@ -112,7 +112,7 @@ namespace OpenDentBusiness {
 		public string referenceRange;
 		///<summary>Comma Delimited list of Abnormal Flags using HL70078 enum values.  OBX.8.*</summary>
 		public string AbnormalFlags;
-		///<summary>[0..*] This is not a data column but is stored in a seperate table named EhrLabResult. OBX.*</summary>
+		///<summary>[0..*] This is not a data column but is stored in a seperate table named EhrLabNote. OBX.*</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		private List<EhrLabNote> _listEhrLabResultNotes;
 		///<summary>Coded status of result.  OBX.11</summary>
@@ -287,7 +287,7 @@ namespace EhrLaboratories {
 		H,
 		///<summary>3 - Above upper panic limits</summary>
 		HH,
-		///<summary>4 - Below absolute low-off instrument scale.  Actual value is "&gt;" but symbol cannot be used as an enum value.</summary>
+		///<summary>4 - Below absolute low-off instrument scale.  Actual value is "&lt;" but symbol cannot be used as an enum value.</summary>
 		_lt,
 		///<summary>5 - Below low normal</summary>
 		L,

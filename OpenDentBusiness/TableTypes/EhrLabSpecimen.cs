@@ -13,21 +13,21 @@ namespace OpenDentBusiness {
 		public long EhrLabNum;
 		///<summary>Enumerates the SPM segments within a single message starting with 1.  SPM.1</summary>
 		public long SetIdSPM;
-		///<summary>SPM.1</summary>
+		///<summary>SPM.2</summary>
 		public string SpecimenTypeID;
-		///<summary>Description of SpecimenTypeId.  SPM.2</summary>
+		///<summary>Description of SpecimenTypeId.  SPM.3</summary>
 		public string SpecimenTypeText;
-		///<summary>CodeSystem that SpecimenTypeId came from.  SPM.3</summary>
+		///<summary>CodeSystem that SpecimenTypeId came from.  SPM.4</summary>
 		//[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public string SpecimenTypeCodeSystemName;
-		///<summary>SPM.4</summary>
+		///<summary>SPM.5</summary>
 		public string SpecimenTypeIDAlt;
-		///<summary>Description of SpecimenTypeIdAlt.  SPM.5</summary>
+		///<summary>Description of SpecimenTypeIdAlt.  SPM.6</summary>
 		public string SpecimenTypeTextAlt;
-		///<summary>CodeSystem that SpecimenTypeId came from.  SPM.6</summary>
+		///<summary>CodeSystem that SpecimenTypeId came from.  SPM.7</summary>
 		//[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public string SpecimenTypeCodeSystemNameAlt;
-		///<summary>Optional text that describes the original text used to encode the values above.  SPM.7</summary>
+		///<summary>Optional text that describes the original text used to encode the values above.  SPM.8</summary>
 		public string SpecimenTypeTextOriginal;
 		///<summary>Stored as string in the format YYYYMMDD[HH[MM[SS]]] where bracketed values are optional.  When time is not known will be valued "0000".  SPM.17.1.1</summary>
 		public string CollectionDateTimeStart;
