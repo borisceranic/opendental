@@ -1369,7 +1369,7 @@ namespace OpenDental{
 				if(fields[i].InternalName=="Discount" && !checkShowDiscount.Checked){
 					continue;
 				}
-				if(fields[i].InternalName=="Pat" && !checkShowIns.Checked){
+				if(fields[i].InternalName=="Pat" && !checkShowIns.Checked && !checkShowDiscount.Checked){
 					continue;
 				}
 				if(fields[i].InternalName=="Fee" 
@@ -1461,7 +1461,7 @@ namespace OpenDental{
 							}
 							break;
 						case "Pat":
-							if(checkShowIns.Checked) {
+							if(checkShowIns.Checked || checkShowDiscount.Checked) {
 								row.Cells.Add(RowsMain[i].Pat.ToString("F"));
 							}
 							break;
