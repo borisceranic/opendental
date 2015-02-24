@@ -6175,6 +6175,25 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_3_35();
+		}
+
+		///<summary></summary>
+		private static void To14_3_35() {
+			if(FromVersion<new Version("14.3.35.0")) {
+				string command="";
+				//AppointmentBubblesNoteLength also inserted into version 15.1.13
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentBubblesNoteLength','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentBubblesNoteLength','0')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.3.35.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_1_1();
 		}
 
@@ -7161,13 +7180,23 @@ namespace OpenDentBusiness {
 		private static void To15_1_13() {
 			if(FromVersion<new Version("15.1.13.0")) {
 				string command="";
+				//AppointmentBubblesNoteLength also inserted into version 14.3.35
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentBubblesNoteLength','0')";
-					Db.NonQ(command);
+					command="SELECT COUNT(*) FROM preference WHERE PrefName='AppointmentBubblesNoteLength' LIMIT 1";
 				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentBubblesNoteLength','0')";
-					Db.NonQ(command);
+				else {//oracle doesn't have LIMIT
+					command="SELECT COUNT(*) FROM (SELECT ValueString FROM preference WHERE PrefName='AppointmentBubblesNoteLength') WHERE RowNum<=1";
+				}
+				long hasAppointmentBubblesNoteLength=PIn.Long(Db.GetCount(command));
+				if(hasAppointmentBubblesNoteLength==0) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentBubblesNoteLength','0')";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentBubblesNoteLength','0')";
+						Db.NonQ(command);
+					}
 				}
 				command="UPDATE preference SET ValueString = '15.1.13.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
