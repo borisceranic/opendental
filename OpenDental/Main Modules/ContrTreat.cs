@@ -2972,11 +2972,11 @@ namespace OpenDental{
 
 		///<summary>Similar method in Account</summary>
 		private bool CheckClearinghouseDefaults() {
-			if(PrefC.GetInt(PrefName.ClearinghouseDefaultDent)==0) {
+			if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==0) {
 				MsgBox.Show(this,"No default dental clearinghouse defined.");
 				return false;
 			}
-			if(PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance) && PrefC.GetInt(PrefName.ClearinghouseDefaultMed)==0) {
+			if(PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance) && PrefC.GetLong(PrefName.ClearinghouseDefaultMed)==0) {
 				MsgBox.Show(this,"No default medical clearinghouse defined.");
 				return false;
 			}
