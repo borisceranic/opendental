@@ -44,6 +44,13 @@ namespace OpenDental {
 					return false;
 				}
 			}
+			else {
+				int age;
+				//Make sure that the user typed in an integer and not a word.
+				if(!int.TryParse(textCompareString.Text,out age)) {
+					return false;
+				}
+			}
 			return true;
 		}
 

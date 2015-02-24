@@ -268,15 +268,19 @@ namespace OpenDental {
 		private static bool AgeComparison(AutomationCondition autoCond,long patNum) {
 			Patient pat=Patients.GetPat(patNum);
 			int age=pat.Age;
+			int ageTrigger=0;
+			if(!int.TryParse(autoCond.CompareString,out ageTrigger)){
+				return false;//This is only possible due to an old bug that was fixed.
+			}
 			switch(autoCond.Comparison) {
 				case AutoCondComparison.Equals:
-					return (age==PIn.Int(autoCond.CompareString));
+					return (age==ageTrigger);
 				case AutoCondComparison.Contains:
 					return (age.ToString().Contains(autoCond.CompareString));
 				case AutoCondComparison.GreaterThan:
-					return (age>PIn.Int(autoCond.CompareString));
+					return (age>ageTrigger);
 				case AutoCondComparison.LessThan:
-					return (age<PIn.Int(autoCond.CompareString));
+					return (age<ageTrigger);
 				default:
 					return false;
 			}
