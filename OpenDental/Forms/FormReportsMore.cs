@@ -101,7 +101,7 @@ namespace OpenDental {
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(312, 273);
+			this.label1.Location = new System.Drawing.Point(312, 289);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(118, 18);
 			this.label1.TabIndex = 2;
@@ -156,7 +156,7 @@ namespace OpenDental {
 			// labelArizonaPrimaryCare
 			// 
 			this.labelArizonaPrimaryCare.AutoSize = true;
-			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(312, 333);
+			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(312, 349);
 			this.labelArizonaPrimaryCare.Name = "labelArizonaPrimaryCare";
 			this.labelArizonaPrimaryCare.Size = new System.Drawing.Size(104, 13);
 			this.labelArizonaPrimaryCare.TabIndex = 20;
@@ -168,7 +168,7 @@ namespace OpenDental {
 			this.listArizonaPrimaryCare.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listArizonaPrimaryCare.FormattingEnabled = true;
 			this.listArizonaPrimaryCare.ItemHeight = 15;
-			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(315, 351);
+			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(315, 367);
 			this.listArizonaPrimaryCare.Name = "listArizonaPrimaryCare";
 			this.listArizonaPrimaryCare.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listArizonaPrimaryCare.Size = new System.Drawing.Size(204, 34);
@@ -248,7 +248,7 @@ namespace OpenDental {
 			this.listPublicHealth.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listPublicHealth.FormattingEnabled = true;
 			this.listPublicHealth.ItemHeight = 15;
-			this.listPublicHealth.Location = new System.Drawing.Point(315, 294);
+			this.listPublicHealth.Location = new System.Drawing.Point(315, 310);
 			this.listPublicHealth.Name = "listPublicHealth";
 			this.listPublicHealth.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listPublicHealth.Size = new System.Drawing.Size(204, 34);
@@ -263,7 +263,7 @@ namespace OpenDental {
 			this.listLists.Location = new System.Drawing.Point(315, 87);
 			this.listLists.Name = "listLists";
 			this.listLists.SelectionMode = System.Windows.Forms.SelectionMode.None;
-			this.listLists.Size = new System.Drawing.Size(204, 184);
+			this.listLists.Size = new System.Drawing.Size(204, 199);
 			this.listLists.TabIndex = 9;
 			this.listLists.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listLists_MouseDown);
 			// 
@@ -321,7 +321,7 @@ namespace OpenDental {
 			// setupToolStripMenuItem
 			// 
 			this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-			this.setupToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+			this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
 			this.setupToolStripMenuItem.Text = "Setup";
 			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
 			// 
@@ -451,6 +451,7 @@ namespace OpenDental {
 			listLists.Items.AddRange(new string[] {
 				Lan.g(this,"Appointments"),
 				Lan.g(this,"Birthdays"),
+				Lan.g(this,"Broken Appointments"),
 				Lan.g(this,"Insurance Plans"),
 				Lan.g(this,"New Patients"),
 				Lan.g(this,"Patients - Raw"),
@@ -711,17 +712,22 @@ namespace OpenDental {
 					FormB.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Birthdays");
 					break;
-				case 2://Insurance Plans
+				case 2://Broken Appointments
+					FormRpBrokenAppointments FormBroken=new FormRpBrokenAppointments();
+					FormBroken.ShowDialog();
+					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Broken Appointments");
+					break;
+				case 3://Insurance Plans
 					FormRpInsCo FormInsCo=new FormRpInsCo();
 					FormInsCo.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Insurance Plans");
 					break;
-				case 3://New Patients
+				case 4://New Patients
 					FormRpNewPatients FormNewPats=new FormRpNewPatients();
 					FormNewPats.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"New Patients");
 					break;
-				case 4://Patients - Raw
+				case 5://Patients - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -729,7 +735,7 @@ namespace OpenDental {
 					FormPatients.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patients - Raw");
 					break;
-				case 5://Patient Notes
+				case 6://Patient Notes
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -737,17 +743,17 @@ namespace OpenDental {
 					FormPN.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patient Notes");
 					break;
-				case 6://Prescriptions
+				case 7://Prescriptions
 					FormRpPrescriptions FormPrescript=new FormRpPrescriptions();
 					FormPrescript.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Rx");
 					break;
-				case 7://Procedure Codes
+				case 8://Procedure Codes
 					FormRpProcCodes FormProcCodes=new FormRpProcCodes();
 					FormProcCodes.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Procedure Codes");
 					break;
-				case 8://Referrals - Raw
+				case 9://Referrals - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -755,18 +761,18 @@ namespace OpenDental {
 					FormReferral.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referrals - Raw");
 					break;
-				case 9://Referral Analysis
+				case 10://Referral Analysis
 					FormRpReferralAnalysis FormRA=new FormRpReferralAnalysis();
 					FormRA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referral Analysis");
 					break;
-				case 10://Referred Proc Tracking
+				case 11://Referred Proc Tracking
 					FormReferralProcTrack FormRP=new FormReferralProcTrack();
 					FormRP.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"ReferredProcTracking");
 					Close();
 					break;
-				case 11://Treatment Finder
+				case 12://Treatment Finder
 					RpModalSelection=ReportModalSelection.TreatmentFinder;
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Treatment Finder");
 					Close();

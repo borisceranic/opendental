@@ -7187,6 +7187,24 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WaitingRoomFilterByView','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('BrokenApptCommLogWithProcedure','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptCommLogWithProcedure','0')";
+					Db.NonQ(command);
+				}
+				command="SELECT CodeNum FROM procedurecode WHERE ProcCode='D9986'";//oracle compatible
+				long codeNum=PIn.Long(Db.GetScalar(command));
+				if(codeNum!=0) {
+					command="SELECT ValueString FROM preference WHERE PrefName='BrokenAppointmentAdjustmentType'";//oracle compatible
+					long brokenAdjType=PIn.Long(Db.GetScalar(command));
+					command="DELETE FROM adjustment WHERE AdjType="+brokenAdjType+" AND AdjAmt=0";//oracle compatible
+					Db.NonQ(command);
+					command="UPDATE procedurecode SET NoBillIns=1 WHERE CodeNum="+codeNum;//oracle compatible
+					Db.NonQ(command);
+				}
 
 
 

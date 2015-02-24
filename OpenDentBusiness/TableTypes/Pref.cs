@@ -115,8 +115,12 @@ namespace OpenDentBusiness {
 		/// <summary>0=no,1=EHG,2=POS(xml file),3=ClaimX(xml file)</summary>
 		BillingUseElectronic,
 		BirthdayPostcardMsg,
+		///<summary>FK to definition.DefNum.  The adjustment type that will be used on the adjustment that is automatically created when an appointment is broken.</summary>
 		BrokenAppointmentAdjustmentType,
+		///<summary>Boolean.  0 by default.  When true, makes an appointment, otherwise makes an adjustment.</summary>
 		BrokenApptCommLogNotAdjustment,
+		///<summary>Boolean.  0 by default.  When true, makes a commlog in addition to an ADA D9986 procedure.</summary>
+		BrokenApptCommLogWithProcedure,
 		///<summary>For Ontario Dental Association fee schedules.</summary>
 		CanadaODAMemberNumber,
 		///<summary>For Ontario Dental Association fee schedules.</summary>
