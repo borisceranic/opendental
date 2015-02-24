@@ -3640,8 +3640,9 @@ namespace OpenDental {
 							continue;
 						case "Note":
 							string noteStr=row["Note"].ToString();
-							if(noteStr.Trim()!="" && noteStr.Length>200) {
-								noteStr=noteStr.Substring(0,200)+"...";
+							int maxNoteLength=PrefC.GetInt(PrefName.AppointmentBubblesNoteLength);
+							if(noteStr.Trim()!="" && maxNoteLength>0 && noteStr.Length>maxNoteLength) {
+								noteStr=noteStr.Substring(0,maxNoteLength)+"...";
 							}
 							if(noteStr.Trim()!="") {
 								h=g.MeasureString(noteStr,font,infoBubble.Width-(int)x).Height;

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("14.3.30.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("14.3.35.0");//This value must be changed when a new conversion is to be triggered.
 
 		///<summary>Oracle compatible: 07/11/2013</summary>
 		private static void To13_2_1() {
@@ -6148,7 +6148,26 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.30.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To14_4_0();
+			To14_3_35();
+		}
+
+		///<summary></summary>
+		private static void To14_3_35() {
+			if(FromVersion<new Version("14.3.35.0")) {
+				string command="";
+				//AppointmentBubblesNoteLength also inserted into version 15.1.13
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentBubblesNoteLength','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentBubblesNoteLength','0')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '14.3.35.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			//To15_1_1();
 		}
 		
 
