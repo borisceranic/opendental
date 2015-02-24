@@ -518,14 +518,14 @@ namespace OpenDentBusiness {
 		}
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool returnTable) {
+		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatmentPrinting,bool returnTable) {
 			retVal=new DataSet();
-			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes);
+			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatmentPrinting);
 			return retVal;
 		}
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		private static void GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes) {
+		private static void GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting=false) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes);
 				return;
@@ -1383,7 +1383,12 @@ namespace OpenDentBusiness {
 			}
 			#endregion Installment Plans
 			//Sorting-----------------------------------------------------------------------------------------
-			rows.Sort(new AccountLineComparer());
+			if(isForStatementPrinting && !intermingled) {
+				rows.Sort(AccountModules.SortRowsForStatmentPrinting);
+			}
+			else {
+				rows.Sort(new AccountLineComparer());
+			}
 			//Canadian lab procedures need to come immediately after their corresponding proc---------------------------------
 			for(int i=0;i<labRows.Count;i++) {
 				for(int r=0;r<rows.Count;r++) {
@@ -1963,28 +1968,48 @@ namespace OpenDentBusiness {
 			retVal.Tables.Add(table);
 		}
 
+		///<summary>Used to resort data rows used for printing main account grid on statements.</summary>
+		public static int SortRowsForStatmentPrinting(DataRow x,DataRow y) {
+			if(x["PatNum"].ToString()!=y["PatNum"].ToString()
+			&&(x["PatNum"].ToString()!="0" && y["PatNum"].ToString()!="0")) {
+				return x["PatNum"].ToString().CompareTo(y["PatNum"].ToString());
+			}
+			//if dates are different, then sort by date
+			if(((DateTime)x["DateTime"]).Date!=((DateTime)y["DateTime"]).Date) {
+				return (((DateTime)x["DateTime"]).Date).CompareTo(((DateTime)y["DateTime"]).Date);
+			}
+			//Sort by Type (right now just sorts procedures first...)
+			if(x["ProcNum"].ToString()!="0" && y["ProcNum"].ToString()=="0") {
+				return -1;
+			}
+			if(x["ProcNum"].ToString()=="0" && y["ProcNum"].ToString()!="0") {
+				return 1;
+			}
+			//Sort procedures by status, priority, tooth region/num, proc code
+			if(x["ProcNum"].ToString()!="0" && y["ProcNum"].ToString()!="0") {//if both are procedures
+				return ProcedureLogic.CompareProcedures(x,y);
+			}
+			return 0;
+		}
+
 
 
 
 	}
 
 	///<summary>The supplied DataRows must include the following columns: ProcNum,DateTime,(Priority not needed),ToothRange,ToothNum,ProcCode. This sorts all objects in Account module based on their types, dates, toothrange, toothnum, and proccode.  Times are always ignored if present.</summary>
-	class AccountLineComparer : IComparer<DataRow>	{
+	class AccountLineComparer:IComparer<DataRow> {
 		///<summary></summary>
-		public int Compare (DataRow x,DataRow y){
-			if(x["PatNum"].ToString()!=y["PatNum"].ToString()
-				&&(x["PatNum"].ToString()!="0" && y["PatNum"].ToString()!="0")) {
-				return x["PatNum"].ToString().CompareTo(y["PatNum"].ToString());
-			}
+		public int Compare(DataRow x,DataRow y) {
 			//if dates are different, then sort by date
-			if(((DateTime)x["DateTime"]).Date!=((DateTime)y["DateTime"]).Date){
+			if(((DateTime)x["DateTime"]).Date!=((DateTime)y["DateTime"]).Date) {
 				return (((DateTime)x["DateTime"]).Date).CompareTo(((DateTime)y["DateTime"]).Date);
 			}
 			//Sort by Type (right now just sorts procedures first...)
-			if(x["ProcNum"].ToString()!="0" && y["ProcNum"].ToString()=="0"){
+			if(x["ProcNum"].ToString()!="0" && y["ProcNum"].ToString()=="0") {
 				return -1;
 			}
-			if(x["ProcNum"].ToString()=="0" && y["ProcNum"].ToString()!="0"){
+			if(x["ProcNum"].ToString()=="0" && y["ProcNum"].ToString()!="0") {
 				return 1;
 			}
 			//Sort procedures by status, priority, tooth region/num, proc code
