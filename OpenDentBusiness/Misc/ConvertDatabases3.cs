@@ -6027,6 +6027,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE sheetdef MODIFY IsMultiPage NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD INDEX (FieldType)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command=@"CREATE INDEX sheetfield_FieldType ON sheetfield (FieldType)";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '14.3.3.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
@@ -7199,6 +7207,19 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("sheetfield","FieldType")) {
+							command="ALTER TABLE sheetfield ADD INDEX (FieldType)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX sheetfield_FieldType ON sheetfield (FieldType)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 				command="UPDATE preference SET ValueString = '15.1.13.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
