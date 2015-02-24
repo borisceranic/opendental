@@ -1950,7 +1950,7 @@ namespace OpenDental{
 			Patient pat=Patients.GetPat(sheet.PatNum);
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
 			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
 			DataTable tableAppt=dataSet.Tables["appts"];
 			if(tableAppt==null){
 				tableAppt=new DataTable();	
@@ -2239,7 +2239,7 @@ namespace OpenDental{
 			string sLine2="";//InsExt
 			string sLine3="";//Balance
 			DataTable tableAcct; 
-			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
 			DataTable tableMisc=dataSet.Tables["misc"];
 			if(tableMisc==null) {
 				tableMisc=new DataTable();
