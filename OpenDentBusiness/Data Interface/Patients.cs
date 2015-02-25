@@ -515,183 +515,83 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),guarNum,excludePayNum,groupByProv);
 			}
-			Random rnd=new Random();
-			string rndStr=rnd.Next(1000000).ToString();
-			string tableName="tempfambal"+rndStr;
-			string command="";
+			//This method no longer uses a temporary table due to the problems it was causing replication users.
+			//The in-memory table name was left as "tempfambal" for nostalgic purposes because veteran engineers know exactly where to look when "tempfambal" is mentioned.
+			//This query will be using UNION ALLs so that duplicate-row removal does not occur. 
+			string command=@"
+					SELECT tempfambal.PatNum,tempfambal.ProvNum,
+						tempfambal.ClinicNum,SUM(tempfambal.AmtBal) StartBal,
+						SUM(tempfambal.AmtBal-tempfambal.InsEst) AfterIns,patient.FName,patient.Preferred,0 EndBal,
+						CASE WHEN patient.Guarantor!=patient.PatNum THEN 1 ELSE 0 END IsNotGuar,patient.Birthdate
+					FROM(
+						/*Completed procedures*/
+						(SELECT patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum,SUM(procedurelog.ProcFee) AmtBal,0 InsEst
+						FROM procedurelog,patient
+						WHERE patient.PatNum=procedurelog.PatNum
+						AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+@"
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum)
+					UNION ALL			
+						/*Received insurance payments*/
+						(SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,-SUM(claimproc.InsPayAmt)-SUM(claimproc.Writeoff) AmtBal,0 InsEst
+						FROM claimproc,patient
+						WHERE patient.PatNum=claimproc.PatNum
+						AND (claimproc.Status="+POut.Int((int)ClaimProcStatus.Received)+@" 
+							OR claimproc.Status="+POut.Int((int)ClaimProcStatus.Supplemental)+@" 
+							OR claimproc.Status="+POut.Int((int)ClaimProcStatus.CapClaim)+@" 
+							OR claimproc.Status="+POut.Int((int)ClaimProcStatus.CapComplete)+@")
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum)
+					UNION ALL
+						/*Insurance estimates*/
+						(SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,0 AmtBal,SUM(claimproc.InsPayEst)+SUM(claimproc.Writeoff) InsEst
+						FROM claimproc,patient
+						WHERE patient.PatNum=claimproc.PatNum
+						AND claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived)+@"
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum)
+					UNION ALL
+						/*Adjustments*/
+						(SELECT patient.PatNum,adjustment.ProvNum,adjustment.ClinicNum,SUM(adjustment.AdjAmt) AmtBal,0 InsEst
+						FROM adjustment,patient
+						WHERE patient.PatNum=adjustment.PatNum
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY patient.PatNum,adjustment.ProvNum,adjustment.ClinicNum)
+					UNION ALL
+						/*Patient payments*/
+						(SELECT patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum,-SUM(SplitAmt) AmtBal,0 InsEst
+						FROM paysplit,patient
+						WHERE patient.PatNum=paysplit.PatNum
+						AND paysplit.PayNum!="+POut.Long(excludePayNum)+@"
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						AND paysplit.PayPlanNum=0
+						GROUP BY patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum)
+					UNION ALL
+						/*payplan princ reduction*/
+						(SELECT patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum,-SUM(payplancharge.Principal) AmtBal,0 InsEst
+						FROM payplancharge,patient
+						WHERE patient.PatNum=payplancharge.PatNum
+						AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum)
+					) tempfambal,patient
+					WHERE tempfambal.PatNum=patient.PatNum 
+					GROUP BY tempfambal.PatNum,tempfambal.ProvNum,";
+			if(!groupByProv) {
+				command+=@"tempfambal.ClinicNum,";
+			}
+			command+=@"patient.FName,patient.Preferred";
+			//Probably an unnecessary MySQL / Oracle split but I didn't want to affect the old GROUP BY functionality for MySQL just be Oracle is lame.
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				#region MySQL tempfambal
-				command+=@"DROP TABLE IF EXISTS "+tableName+@";
-					CREATE TABLE "+tableName+@"( 
-						FamBalNum int NOT NULL auto_increment,
-						PatNum bigint NOT NULL DEFAULT 0,
-						ProvNum bigint NOT NULL DEFAULT 0,
-						ClinicNum bigint NOT NULL DEFAULT 0,
-						AmtBal double NOT NULL DEFAULT 0,
-						InsEst double NOT NULL DEFAULT 0,
-						PRIMARY KEY (FamBalNum));
-				
-					/*Completed procedures*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum,SUM(ProcFee)
-					FROM procedurelog,patient
-					WHERE patient.PatNum=procedurelog.PatNum
-					AND ProcStatus=2
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-			
-					/*Received insurance payments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,-SUM(InsPayAmt)-SUM(Writeoff)
-					FROM claimproc,patient
-					WHERE patient.PatNum=claimproc.PatNum
-					AND (Status=1 OR Status=4 OR Status=5 OR Status=7)/*received,supplemental,capclaim. (7-capcomplete writeoff)*/
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-
-					/*Insurance estimates*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,InsEst)
-					SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,SUM(InsPayEst)+SUM(Writeoff)
-					FROM claimproc,patient
-					WHERE patient.PatNum=claimproc.PatNum
-					AND Status=0 /*NotReceived*/
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-
-					/*Adjustments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,adjustment.ProvNum,adjustment.ClinicNum,SUM(AdjAmt)
-					FROM adjustment,patient
-					WHERE patient.PatNum=adjustment.PatNum
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-
-					/*Patient payments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum,-SUM(SplitAmt)
-					FROM paysplit,patient
-					WHERE patient.PatNum=paysplit.PatNum
-					AND paysplit.PayNum!="+POut.Long(excludePayNum)+@"
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					AND paysplit.PayPlanNum=0
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-
-					/*payplan princ reduction*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum,-SUM(Principal)
-					FROM payplancharge,patient
-					WHERE patient.PatNum=payplancharge.PatNum
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,ProvNum,ClinicNum;
-
-					SELECT "+tableName+@".PatNum,"+tableName+@".ProvNum,
-						"+tableName+@".ClinicNum,"+tableName+@".ClinicNum,SUM(AmtBal) StartBal,
-						SUM(AmtBal-"+tableName+@".InsEst) AfterIns,FName,Preferred,'0' EndBal,
-						CASE WHEN Guarantor!=patient.PatNum THEN 1 ELSE 0 END AS IsNotGuar
-					FROM "+tableName+@",patient
-					WHERE "+tableName+@".PatNum=patient.PatNum
-					GROUP BY PatNum,ProvNum,";
-				if(!groupByProv) {
-					command+=@"ClinicNum,";
-				}
-				command+=@"FName,Preferred
+				command+=@"
 					HAVING ((StartBal>0.005 OR StartBal<-0.005) OR (AfterIns>0.005 OR AfterIns<-0.005))
-					ORDER BY IsNotGuar,Birthdate,ProvNum,FName,Preferred;
-
-					DROP TABLE IF EXISTS "+tableName+@"";
-				#endregion
-				return Db.GetTable(command);
-			}
-			else {//Oracle
-				#region Oracle tempfambal
-				command=DbHelper.DropTableIfExist(tableName);//Drop tempfambal just in case it already exists.
-				Db.NonQ(command);//Oracle has serious issues with running multiple statements at the same time.
-				#region CREATE tempfambal
-				command=@"CREATE TABLE "+tableName+@"(
-					PatNum number(20) DEFAULT 0,
-					ProvNum number(20) DEFAULT 0,
-					ClinicNum number(20) DEFAULT 0,
-					AmtBal number(38,8) DEFAULT 0,
-					InsEst number(38,8) DEFAULT 0);";
-				Db.NonQ(command);
-				#endregion
-				#region INSERT INTO tempfambal
-				//The inserts are both MySQL and Oracle compatible:
-				command=@"/*Completed procedures*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum,SUM(ProcFee)
-					FROM procedurelog,patient
-					WHERE patient.PatNum=procedurelog.PatNum
-					AND ProcStatus=2
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum";
-				Db.NonQ(command);
-				command=@"/*Received insurance payments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,-SUM(InsPayAmt)-SUM(Writeoff)
-					FROM claimproc,patient
-					WHERE patient.PatNum=claimproc.PatNum
-					AND (Status=1 OR Status=4 OR Status=5 OR Status=7)/*received,supplemental,capclaim. (7-capcomplete writeoff)*/
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum";
-				Db.NonQ(command);
-				command=@"/*Insurance estimates*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,InsEst)
-					SELECT patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum,SUM(InsPayEst)+SUM(Writeoff)
-					FROM claimproc,patient
-					WHERE patient.PatNum=claimproc.PatNum
-					AND Status=0 /*NotReceived*/
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,claimproc.ProvNum,claimproc.ClinicNum";
-				Db.NonQ(command);
-				command=@"/*Adjustments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,adjustment.ProvNum,adjustment.ClinicNum,SUM(AdjAmt)
-					FROM adjustment,patient
-					WHERE patient.PatNum=adjustment.PatNum
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,adjustment.ProvNum,adjustment.ClinicNum";
-				Db.NonQ(command);
-				command=@"/*Patient payments*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum,-SUM(SplitAmt)
-					FROM paysplit,patient
-					WHERE patient.PatNum=paysplit.PatNum
-					AND paysplit.PayNum!="+POut.Long(excludePayNum)+@"
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					AND paysplit.PayPlanNum=0
-					GROUP BY patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum";
-				Db.NonQ(command);
-				command=@"/*payplan princ reduction*/
-					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
-					SELECT patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum,-SUM(Principal)
-					FROM payplancharge,patient
-					WHERE patient.PatNum=payplancharge.PatNum
-					AND patient.Guarantor="+POut.Long(guarNum)+@"
-					GROUP BY patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum";
-				Db.NonQ(command);
-				#endregion
-				#region SELECT FROM tempfambal
-				command=@"SELECT "+tableName+@".PatNum,"+tableName+@".ProvNum,
-						"+tableName+@".ClinicNum,"+tableName+@".ClinicNum,SUM(AmtBal) StartBal,
-						SUM(AmtBal-"+tableName+@".InsEst) AfterIns,FName,Preferred,'0' EndBal,
-						CASE WHEN Guarantor!=patient.PatNum THEN 1 ELSE 0 END AS IsNotGuar
-					FROM "+tableName+@",patient
-					WHERE "+tableName+@".PatNum=patient.PatNum
-					GROUP BY "+tableName+@".PatNum,"+tableName+@".ProvNum,";
-				if(!groupByProv) {
-					command+=tableName+@".ClinicNum,";
-				}
-				command+=@"FName,Preferred,CASE WHEN Guarantor!=patient.PatNum THEN 1 ELSE 0 END,Birthdate
-					HAVING ((SUM(AmtBal)>0.005 OR (SUM(AmtBal)<-0.005)) OR (SUM(AmtBal-"+tableName+@".InsEst)>0.005 OR SUM(AmtBal-"+tableName+@".InsEst)<-0.005))
 					ORDER BY IsNotGuar,Birthdate,ProvNum,FName,Preferred";
-				#endregion
-				DataTable result=Db.GetTable(command);
-				command=DbHelper.DropTableIfExist(tableName);//Drop tempfambal now that we're done with it.
-				Db.NonQ(command);
-				#endregion
-				return result;
 			}
+			else {//Oracle.
+				command+=@",(CASE WHEN Guarantor!=patient.PatNum THEN 1 ELSE 0 END),Birthdate
+					HAVING ((SUM(AmtBal)>0.005 OR SUM(AmtBal)<-0.005) OR (SUM(AmtBal-tempfambal.InsEst)>0.005 OR SUM(AmtBal-tempfambal.InsEst)<-0.005))
+					ORDER BY IsNotGuar,patient.Birthdate,tempfambal.ProvNum,patient.FName,patient.Preferred";
+			}
+			return Db.GetTable(command);
 		}
 
 		///<summary></summary>
