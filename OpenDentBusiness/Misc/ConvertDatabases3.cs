@@ -6572,11 +6572,11 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('ProblemListIsAlpabetical',FALSE)";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ProblemListIsAlpabetical','0')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProblemListIsAlpabetical',FALSE)";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProblemListIsAlpabetical','0')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -6772,11 +6772,11 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('StatementsUseSheets',FALSE)";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('StatementsUseSheets','0')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'StatementsUseSheets',FALSE)";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'StatementsUseSheets','0')";
 					Db.NonQ(command);
 				}
 				//Insert Office bridge-----------------------------------------------------------------
@@ -6833,14 +6833,14 @@ namespace OpenDentBusiness {
 						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
 						+"'0')";
 					Db.NonQ(command);
-					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Document folder', "
 						+"'"+POut.String(@"C:\OpenDentImages\")+"')";
 					Db.NonQ(command);
-					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
@@ -6878,7 +6878,7 @@ namespace OpenDentBusiness {
 						+"VALUES(33,0,'Normal','D',-1)";//Inserting definition with category 33 (TaskPriorities) with default of white (-1)
 				}
 				else {
-					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue,ItemColor) "
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue,ItemColor) "
 						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),33,0,'Normal','D',-1)";//33 (TaskPriorities) with default of white (-1)
 				}
 				long defNum=Db.NonQ(command,true);
@@ -7184,7 +7184,7 @@ namespace OpenDentBusiness {
 			To15_1_13();
 		}
 
-		///<summary></summary>
+		///<summary>Oracle compatible: 02/25/2015</summary>
 		private static void To15_1_13() {
 			if(FromVersion<new Version("15.1.13.0")) {
 				string command="";
