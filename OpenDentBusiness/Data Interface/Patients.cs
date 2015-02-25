@@ -522,14 +522,12 @@ namespace OpenDentBusiness{
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				#region MySQL tempfambal
 				command+=@"DROP TABLE IF EXISTS "+tableName+@";
-					CREATE TABLE "+tableName+@"( 
-						FamBalNum int NOT NULL auto_increment,
+					CREATE TABLE "+tableName+@"(
 						PatNum bigint NOT NULL DEFAULT 0,
 						ProvNum bigint NOT NULL DEFAULT 0,
 						ClinicNum bigint NOT NULL DEFAULT 0,
 						AmtBal double NOT NULL DEFAULT 0,
-						InsEst double NOT NULL DEFAULT 0,
-						PRIMARY KEY (FamBalNum));
+						InsEst double NOT NULL DEFAULT 0);
 				
 					/*Completed procedures*/
 					INSERT INTO "+tableName+@" (PatNum,ProvNum,ClinicNum,AmtBal)
