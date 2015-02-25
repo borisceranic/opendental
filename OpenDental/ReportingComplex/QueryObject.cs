@@ -454,7 +454,7 @@ namespace OpenDental.ReportingComplex {
 			}
 			else {
 				try {
-					_reportTable=Reports.GetTable(_stringQuery);
+					_reportTable=ReportsComplex.GetTable(_stringQuery);
 				}
 				catch(Exception) {
 					return false;

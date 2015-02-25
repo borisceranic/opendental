@@ -879,6 +879,9 @@
     <Compile Include="Plugins\PluginBase.cs" />
     <Compile Include="Plugins\PluginContainer.cs" />
     <Compile Include="Plugins\Plugins.cs" />
+    <Compile Include="Reports\RpPayPlan.cs" />
+    <Compile Include="Reports\ReportsComplex.cs" />
+    <Compile Include="Reports\RpPaySheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
     <Compile Include="TableTypes\AppointmentType.cs" />

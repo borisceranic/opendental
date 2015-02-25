@@ -399,165 +399,54 @@ namespace OpenDental{
 				MsgBox.Show(this,"At least one type must be selected.");
 				return;
 			}
-			string whereProv="";
-			if(!checkAllProv.Checked) {
-				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereProv+=" AND (";
-					}
-					else {
-						whereProv+="OR ";
-					}
-					whereProv+="claimproc.ProvNum = "+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+" ";
-				}
-				whereProv+=") ";
+			List<long> listProvNums=new List<long>();
+			List<long> listClinicNums=new List<long>();
+			List<long> listInsTypes=new List<long>();
+			List<long> listPatTypes=new List<long>();
+			List<Provider> listProvs=ProviderC.GetListShort();
+			List<Def> listInsDefs=new List<Def>(DefC.GetList(DefCat.InsurancePaymentType));
+			List<Def> listPatDefs=new List<Def>(DefC.GetList(DefCat.PaymentTypes));
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				listProvNums.Add(listProvs[listProv.SelectedIndices[i]].ProvNum);
 			}
-			string whereClin="";
+			if(checkAllProv.Checked) {
+				for(int i=0;i<listProvs.Count;i++) {
+					listProvNums.Add(listProvs[i].ProvNum);
+				}
+			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				whereClin+=" AND claimproc.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i>0) {
-						whereClin+=",";
-					}
 					if(Security.CurUser.ClinicIsRestricted) {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							whereClin+="0";
+							listClinicNums.Add(0);
 						}
 						else {
-							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 						}
 					}
 				}
-				whereClin+=") ";
 			}
-			string queryIns=
-				@"SELECT CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+",CHAR(25)) DateCP,carrier.CarrierName,MAX("
-+DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") lfname,
-provider.Abbr, ";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryIns+="clinic.Description clinicDesc, ";
+			for(int i=0;i<listInsuranceTypes.SelectedIndices.Count;i++) {
+				listInsTypes.Add(listInsDefs[listInsuranceTypes.SelectedIndices[i]].DefNum);
 			}
-			queryIns+=@"claimpayment.CheckNum,FORMAT(SUM(claimproc.InsPayAmt),2) amt,claimproc.ClaimNum,claimpayment.PayType 
-				FROM claimproc
-				LEFT JOIN insplan ON claimproc.PlanNum = insplan.PlanNum 
-				LEFT JOIN patient ON claimproc.PatNum = patient.PatNum
-				LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum
-				LEFT JOIN provider ON provider.ProvNum=claimproc.ProvNum
-				LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum = claimpayment.ClaimPaymentNum ";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryIns+="LEFT JOIN clinic ON clinic.ClinicNum=claimproc.ClinicNum ";
-			}
-			queryIns+="WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
-				+whereProv
-				+whereClin
-				+"AND claimpayment.CheckDate >= "+POut.Date(date1.SelectionStart)+" "
-				+"AND claimpayment.CheckDate <= "+POut.Date(date2.SelectionStart)+" ";
-			if(!checkInsuranceTypes.Checked && listInsuranceTypes.SelectedIndices.Count>0) {
-				queryIns+="AND claimpayment.PayType IN (";
-				for(int i=0;i<listInsuranceTypes.SelectedIndices.Count;i++) {
-					if(i>0) {
-						queryIns+=",";
-					}
-					queryIns+=POut.Long(DefC.Short[(int)DefCat.InsurancePaymentType][listInsuranceTypes.SelectedIndices[i]].DefNum);
+			if(checkInsuranceTypes.Checked) {
+				for(int i=0;i<listInsDefs.Count;i++) {
+					listInsTypes.Add(listInsDefs[i].DefNum);
 				}
-				queryIns+=") ";
 			}
-			queryIns+=@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),"
-				+"claimproc.ClaimPaymentNum,provider.ProvNum,";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryIns+="claimproc.ClinicNum,clinic.Description,";
+			for(int i=0;i<listPatientTypes.SelectedIndices.Count;i++) {
+				listPatTypes.Add(listPatDefs[listPatientTypes.SelectedIndices[i]].DefNum);
 			}
-			queryIns+="carrier.CarrierName,provider.Abbr,claimpayment.CheckNum";
-			if(radioPatient.Checked) {
-				queryIns+=",patient.PatNum";
-			}
-			queryIns+=" ORDER BY claimpayment.PayType,claimproc.DateCP,lfname";
-			if(!checkInsuranceTypes.Checked && listInsuranceTypes.SelectedIndices.Count==0) {
-				queryIns=DbHelper.LimitOrderBy(queryIns,0);
-			}
-			//patient payments-----------------------------------------------------------------------------------------
-			whereProv="";
-			if(!checkAllProv.Checked) {
-				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereProv+=" AND (";
-					}
-					else {
-						whereProv+="OR ";
-					}
-					whereProv+="paysplit.ProvNum = "+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+" ";
+			if(checkPatientTypes.Checked) {
+				for(int i=0;i<listPatDefs.Count;i++) {
+					listPatTypes.Add(listPatDefs[i].DefNum);
 				}
-				whereProv+=") ";
 			}
-			whereClin="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				whereClin+=" AND payment.ClinicNum IN(";
-				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i>0) {
-						whereClin+=",";
-					}
-					if(Security.CurUser.ClinicIsRestricted) {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
-					}
-					else {
-						if(listClin.SelectedIndices[i]==0) {
-							whereClin+="0";
-						}
-						else {
-							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
-						}
-					}
-				}
-				whereClin+=") ";
-			}
-			string queryPat=
-				@"SELECT CONVERT("+DbHelper.DateFormatColumn("payment.PayDate","%c/%d/%Y")+",CHAR(25)) AS DatePay,MAX("
-+DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") AS lfname,provider.Abbr, ";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryPat+="clinic.Description clinicDesc, ";
-			}
-			queryPat+=@"payment.CheckNum,
-				FORMAT(SUM(paysplit.SplitAmt),2) amt, payment.PayNum,ItemName,payment.PayType 
-				FROM payment
-				LEFT JOIN paysplit ON payment.PayNum=paysplit.PayNum
-				LEFT JOIN patient ON payment.PatNum=patient.PatNum
-				LEFT JOIN provider ON paysplit.ProvNum=provider.ProvNum
-				LEFT JOIN definition ON payment.PayType=definition.DefNum ";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryPat+="LEFT JOIN clinic ON clinic.ClinicNum=payment.ClinicNum ";
-			}
-			queryPat+="WHERE 1 "
-				+whereProv
-				+whereClin
-				+"AND paysplit.DatePay >= "+POut.Date(date1.SelectionStart)+" "
-				+"AND paysplit.DatePay <= "+POut.Date(date2.SelectionStart)+" ";
-			if(!checkPatientTypes.Checked && listPatientTypes.SelectedIndices.Count>0) {
-				queryPat+="AND (";
-				for(int i=0;i<listPatientTypes.SelectedIndices.Count;i++) {
-					if(i>0) {
-						queryPat+="OR ";
-					}
-					queryPat+="payment.PayType = "+POut.Long(DefC.Short[(int)DefCat.PaymentTypes][listPatientTypes.SelectedIndices[i]].DefNum)+" ";
-				}
-				queryPat+=") ";
-			}
-			queryPat+=@"GROUP BY payment.PayNum,payment.PayDate,provider.ProvNum,";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryPat+="payment.ClinicNum,clinic.Description,";
-			}
-			queryPat+="provider.Abbr,payment.CheckNum,definition.ItemName";
-			if(radioPatient.Checked) {
-				queryPat+=",patient.PatNum";
-			}
-			queryPat+=" ORDER BY payment.PayType,paysplit.DatePay,lfname";
-			if(!checkPatientTypes.Checked && listPatientTypes.SelectedIndices.Count==0) {
-				queryPat=DbHelper.LimitOrderBy(queryPat,0);
-			}
-			DataTable tableIns=Reports.GetTable(queryIns);
-			DataTable tablePat=Reports.GetTable(queryPat);
+			DataTable tableIns=RpPaySheet.GetInsTable(date1.SelectionStart,date2.SelectionStart,listProvNums,listClinicNums,listInsTypes,checkAllProv.Checked,checkAllClin.Checked,checkInsuranceTypes.Checked,radioPatient.Checked);
+			DataTable tablePat=RpPaySheet.GetPatTable(date1.SelectionStart,date2.SelectionStart,listProvNums,listClinicNums,listPatTypes,checkAllProv.Checked,checkAllClin.Checked,checkPatientTypes.Checked,radioPatient.Checked);
 			string subtitleProvs="";
 			string subtitleClinics="";
 			if(checkAllProv.Checked) {

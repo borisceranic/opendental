@@ -7,7 +7,7 @@ using System.Text;
 namespace OpenDentBusiness {
 	public class RpProdInc {
 
-		///<summary></summary>
+		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
 		public static DataSet GetAnnualDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
 			DataSet dataSet=GetProdIncAnnualDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
@@ -202,7 +202,7 @@ namespace OpenDentBusiness {
 			return ds;
 		}
 
-		///<summary>Returns a dataset that contains 5 tables used to generate the annual report.</summary>
+		///<summary>Returns a dataset that contains 5 tables used to generate the annual report. If not using clinics then supply an empty list of clinicNums.</summary>
 		public static DataSet GetProdIncAnnualDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
