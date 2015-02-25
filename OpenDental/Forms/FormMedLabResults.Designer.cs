@@ -104,7 +104,7 @@
 			this.Name = "FormMedLabResults";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Medical Lab Results";
-			this.Load += new System.EventHandler(this.FormEhrLabOrders_Load);
+			this.Load += new System.EventHandler(this.FormMedLabResults_Load);
 			this.ResumeLayout(false);
 
 		}
