@@ -1202,7 +1202,7 @@ namespace OpenDental{
 				}
 				Providers.RemoveProvFromFutureSchedule(ProvCur.ProvNum);
 			}
-			if(ProvCur.IsInstructor || ProvCur.SchoolClassNum!=0) {//Is an Instructor or a Student
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools) && (ProvCur.IsInstructor || ProvCur.SchoolClassNum!=0)) {//Is an Instructor or a Student
 				if(textUserName.Text=="") {
 					MsgBox.Show(this,"User Name is not allowed to be blank.");
 					return;
