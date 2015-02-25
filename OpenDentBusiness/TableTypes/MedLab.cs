@@ -1,14 +1,19 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>LabCorp lab observation order.  These fields are required for the LabCorp result report, used to link the order to the result(s),
+	///<summary>The EHRLab table is structured to tightly with the HL7 standard and should have names that more reflect how the user will
+	///consume the data and for that reason for actual implementation we are using these medlab tables.
+	///Medical lab observation order.  This table is currently only used for LabCorp, but may be utilized by other third party lab
+	///services in the future.  These are the fields required for the LabCorp result report, used to link the order to the result(s),
 	///specimen(s), place(s) of service, or for linking parent and child results.
-	///Contains data from the PID, ORC, OBR, and applicable NTE segments</summary>
+	///This table contains data from the PID, ORC, OBR, and applicable NTE segments
+	///
+	/// </summary>
 	[Serializable]
-	public class LabCorpLab:TableBase {
+	public class MedLab:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long LabCorpLabNum;
+		public long MedLabNum;
 		#region PID Fields
 		///<summary>FK to patient.PatNum.  PID.2 - External Patient ID. LabCorp report field "Client Alt. Pat ID".</summary>
 		public long PatNum;
@@ -51,7 +56,7 @@ namespace OpenDentBusiness {
 		///value from the first OBR record in the message.  The message limits this field to 64 characters, the rest is truncated.</summary>
 		public string ClinicalInfo;
 		///<summary>OBR.14 - Date/Time of Specimen Receipt in Lab.  LabCorp report field "Date Entered".  yyyyMMddHHmm format in the message, no seconds.
-		///Date and time the order was entered in the LabCorp Lab System.</summary>
+		///Date and time the order was entered in the Lab System.</summary>
 		public DateTime DateTimeEntered;
 		///<summary>ORC.12.1 and OBR.16.1 - Ordering Provider ID Number.  LabCorp report field "NPI".  ORC.12.* and OBR.16.* are repeatable, the eighth
 		///component identifies the source of the ID in the first component.  Component 8 possible values: "U"-UPIN,
@@ -68,11 +73,11 @@ namespace OpenDentBusiness {
 		///<summary>OBR.18 - Alternate Unique Foreign Accession / Specimen ID.  LabCorp report field "Control Number".</summary>
 		public string SpecimenIDAlt;
 		///<summary>OBR.22 - Date/Time Observations Reported.  LabCorp report field "Date &amp; Time Reported".  yyyyMMddHHmm format in the message, no secs.
-		///Date and time the results were released from the LabCorp Lab System.</summary>
+		///Date and time the results were released from the Lab System.</summary>
 		public DateTime DateTimeReported;
 		///<summary>OBR.25 - Order Result Status.  LabCorp possible values: "F" - Final, "P" - Preliminary, "X" - Cancelled, "C" - Corrected.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
-		public ResultStatusOrder ResultStatus;
+		public ResultStatus ResultStatus;
 		///<summary>OBR.26.1 - Link to Parent Result or Organism Link to Susceptibility.
 		///A reflex result will have the parent's OBX.3.1 value here for linking.</summary>
 		public string ParentObsID;
@@ -85,10 +90,15 @@ namespace OpenDentBusiness {
 		///NTE segments can be used for longer comments.  All NTE segments at the OBR level will be concatenated and stored in this one field.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string NoteLab;
+		///<summary>This is the filename of the original archived message that was processed to create this medlab object as well as associated
+		///medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a sub-folder called
+		///LabCorpHL7Msgs. If the option to store images directly in the database is chosen, this will be an empty field and there will not be the
+		///option to display the original HL7 message.</summary>
+		public string FileName;
 
 		///<summary></summary>
-		public LabCorpLab Copy() {
-			return (LabCorpLab)MemberwiseClone();
+		public MedLab Copy() {
+			return (MedLab)MemberwiseClone();
 		}
 
 	}
@@ -104,14 +114,16 @@ namespace OpenDentBusiness {
 	}
 
 	///<summary>Order Result Status.  Identification of status of results at the ordered item level.</summary>
-	public enum ResultStatusOrder {
-		///<summary>0 - Corrected.  Applies when Discrete Microbiology test are ordered.</summary>
+	public enum ResultStatus {
+		///<summary>0 - Corrected Result.</summary>
 		C,
-		///<summary>1 - Final.</summary>
+		///<summary>1 - Final.  Result complete and verified.</summary>
 		F,
-		///<summary>2 - Preliminary.</summary>
+		///<summary>2 - Incomplete.  For Discrete Microbiology Testing.</summary>
+		I,
+		///<summary>3 - Preliminary.  Final not yet obtained.</summary>
 		P,
-		///<summary>3 - Canceled.</summary>
+		///<summary>4 - Canceled.  Procedure cannot be done.  Result canceled due to Non-Performance.</summary>
 		X
 	}
 

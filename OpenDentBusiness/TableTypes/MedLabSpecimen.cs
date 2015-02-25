@@ -1,15 +1,17 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>LabCorp lab specimen.  Contains data from the SPM segment.  Each LabCorpLab object can have 0 to many specimen segments.
+	///<summary>The EHRLabSpecimen table is structured to tightly with the HL7 standard and should have names that more reflect how the user will
+	///consume the data and for that reason for actual implementation we are using these medlab tables.
+	///Medical lab specimen.  Contains data from the SPM segment.  Each MedLab object can have 0 to many specimen segments.
 	///Each segment will be its own row in this table.</summary>
 	[Serializable]
-	public class LabCorpSpecimen:TableBase {
+	public class MedLabSpecimen:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long LabCorpSpecimenNum;
-		///<summary>FK to labcorplab.LabCorpLabNum.  Each LabCorpLab object can have 0 to many specimens pointing to it.</summary>
-		public long LabCorpLabNum;
+		public long MedLabSpecimenNum;
+		///<summary>FK to medlab.MedLabNum.  Each MedLab object can have 0 to many specimens pointing to it.</summary>
+		public long MedLabNum;
 		///<summary>SPM.2 - Specimen ID.  Unique identifier for the specimen as referenced by the Placer application, the Filler application, or both.
 		///The value sent in this field should be the identification value sent on the specimen container.</summary>
 		public string SpecimenID;
@@ -21,8 +23,8 @@ namespace OpenDentBusiness {
 		public DateTime DateTimeCollected;
 
 		///<summary></summary>
-		public LabCorpSpecimen Copy() {
-			return (LabCorpSpecimen)MemberwiseClone();
+		public MedLabSpecimen Copy() {
+			return (MedLabSpecimen)MemberwiseClone();
 		}
 
 	}

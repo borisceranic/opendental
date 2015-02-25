@@ -1,15 +1,18 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>LabCorp lab result.  These fields are required for the LabCorp result report, used to link the result to an order,
+	///<summary>The EHRLabResult table is structured to tightly with the HL7 standard and should have names that more reflect how the user will
+	///consume the data and for that reason for actual implementation we are using these medlab tables.
+	///Medical lab result.  This table is currently only used for LabCorp, but may be utilized by other third party lab
+	///services in the future.  These fields are required for the LabCorp result report, used to link the result to an order,
 	///or for linking a parent and child result.  Contains data from the OBX, ZEF, and applicable NTE segments.</summary>
 	[Serializable]
-	public class LabCorpResult:TableBase {
+	public class MedLabResult:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long LabCorpResultNum;
-		///<summary>FK to labcorplab.LabCorpLabNum.  Each LabCorpLab object can have one to many results pointing to it.</summary>
-		public long LabCorpLabNum;
+		public long MedLabResultNum;
+		///<summary>FK to medlab.medLabNum.  Each MedLab object can have one to many results pointing to it.</summary>
+		public long MedLabNum;
 		#region OBX Fields
 		///<summary>OBX.3.1 - Observation Identifier.  Reflex results will have the ObsID of the parent in OBR.26 for linking.</summary>
 		public string ObsID;
@@ -26,9 +29,9 @@ namespace OpenDentBusiness {
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public AbnormalFlag AbnormalFlag;
 		///<summary>OBX.11 - Observation Result Status.</summary>
-		public ResultStatusObs ResultStatus;
+		public ResultStatus ResultStatus;
 		///<summary>OBX.14 - Date/Time of Observation.  yyyyMMddHHmm format in the message, no seconds.
-		///Date and time tech entered result into the LabCorp System.</summary>
+		///Date and time tech entered result into the Lab System.</summary>
 		public DateTime DateTimeObs;
 		///<summary>OBX.15 - Producer ID (Producer’s Reference).  LabCorp report field "LAB".  ID of LabCorp Facility responsible for performing the
 		///testing.  The Lab Name is supplied in the ZPS segment.</summary>
@@ -45,13 +48,13 @@ namespace OpenDentBusiness {
 		public string Note;
 
 		///<summary></summary>
-		public LabCorpResult Copy() {
-			return (LabCorpResult)MemberwiseClone();
+		public MedLabResult Copy() {
+			return (MedLabResult)MemberwiseClone();
 		}
 
 	}
 
-	///<summary>LabCorp Abnormal Flags.</summary>
+	///<summary>MedLab Abnormal Flags.</summary>
 	public enum AbnormalFlag {
 		///<summary>0 - None.  Blank or null value indicates normal result, so no abnormal flag.</summary>
 		None,
@@ -83,17 +86,4 @@ namespace OpenDentBusiness {
 		S
 	}
 
-	///<summary>Observation Result Status.</summary>
-	public enum ResultStatusObs {
-		///<summary>0 - Corrected Result.</summary>
-		C,
-		///<summary>1 - Result complete and verified.</summary>
-		F,
-		///<summary>2 - Incomplete.  For Discrete Microbiology Testing.</summary>
-		I,
-		///<summary>3 - Preliminary result.  Final not yet obtained.</summary>
-		P,
-		///<summary>4 - Procedure cannot be done.  Result canceled due to Non-Performance.</summary>
-		X
-	}
 }

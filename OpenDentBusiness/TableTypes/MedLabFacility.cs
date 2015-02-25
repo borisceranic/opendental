@@ -1,16 +1,16 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>LabCorp facility that performed the test procedure(s).  Contains data from the ZPS segment.  Each LabCorpLab object can have one to
+	///<summary>Medical lab facility that performed the test procedure(s).  Contains data from the ZPS segment.  Each MedLab object can have one to
 	///many places of service, each in a repetition of the ZPS segment.  Each repetition will be its own row in this table.</summary>
 	[Serializable]
-	public class LabCorpFacility:TableBase {
+	public class MedLabFacility:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long LabCorpFacilityNum;
+		public long MedLabFacilityNum;
 		///<summary>ZPS.2 - Facility Mnemonic.  Footnote ID or, depending on lab code settings, an intelligent lab code.</summary>
 		public string FacilityCode;
-		///<summary>ZPS.3 - Facility Name.  LabCorp location name that performed the testing.</summary>
+		///<summary>ZPS.3 - Facility Name.  Medical lab location name that performed the testing.</summary>
 		public string FacilityName;
 		///<summary>ZPS.4.1 - Facility Address.</summary>
 		public string Address;
@@ -30,8 +30,8 @@ namespace OpenDentBusiness {
 		public string DirectorFName;
 
 		///<summary></summary>
-		public LabCorpFacility Copy() {
-			return (LabCorpFacility)MemberwiseClone();
+		public MedLabFacility Copy() {
+			return (MedLabFacility)MemberwiseClone();
 		}
 
 	}
