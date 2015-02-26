@@ -103,6 +103,13 @@ namespace ServiceManager {
 					return;
 				}
 			}
+			if(_serviceFile.Name=="OpenDentalCustListener.exe") {
+				FormWebConfigSettings FormWCS=new FormWebConfigSettings(_serviceFile);
+				FormWCS.ShowDialog();
+				if(FormWCS.DialogResult!=DialogResult.OK) {
+					return;
+				}
+			}
 			Process process=new Process();
 			process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
 			process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
