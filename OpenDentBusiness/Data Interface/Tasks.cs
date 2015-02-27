@@ -7,6 +7,11 @@ using System.Reflection;
 namespace OpenDentBusiness{
 	///<summary>Not part of cache refresh.</summary>
 	public class Tasks {
+		private const long _triageTaskListNum=1697;
+		private const long _redTaskDefNum=501;
+		private static bool _isHQ;
+		private static long _defaultTaskPriorityDefNum;
+
 		///<summary>Only used from UI.</summary>
 		public static ArrayList LastOpenList;
 		///<summary>Only used from UI.  The index of the last open tab.</summary>
@@ -210,6 +215,17 @@ namespace OpenDentBusiness{
 			for(int i=0;i<table.Rows.Count;i++) {
 				listRows.Add(table.Rows[i]);
 			}
+			#region Set Sort Variables. This greatly increases sort speed.
+			_isHQ=PrefC.GetBool(PrefName.DockPhonePanelShow);//increases speed of the sort function performed below.
+			List<Def> listTaskPriorities=new List<Def>();
+			listTaskPriorities.AddRange(DefC.GetList(DefCat.TaskPriorities));
+			for(int i=0;i<listTaskPriorities.Count;i++) {
+				if(listTaskPriorities[i].ItemValue.ToUpper()=="D") {
+					_defaultTaskPriorityDefNum=listTaskPriorities[i].DefNum;
+					break;
+				}
+			}
+			#endregion
 			listRows.Sort(TaskComparer);
 			DataTable tableSorted=table.Clone();//Easy way to copy the columns.
 			tableSorted.Rows.Clear();
@@ -558,52 +574,36 @@ namespace OpenDentBusiness{
 			SecurityLogs.MakeLogEntry(Permissions.TaskEdit,patNum,logText,task.TaskNum);
 		}
 
+		///<summary>Sorted in Ascending order: Unread/Read, </summary>
 		public static int TaskComparer(DataRow x,DataRow y) {
-			//sort by priority, then time
-			long xTaskPriorityDefNum=PIn.Long(x["PriorityDefNum"].ToString());
-			long yTaskPriorityDefNum=PIn.Long(y["PriorityDefNum"].ToString());
-			long defaultTaskPriorityDefNum=0;
-			List<Def> listTaskPriorities=new List<Def>();
-			listTaskPriorities.AddRange(DefC.GetList(DefCat.TaskPriorities));
-			for(int i=0;i<listTaskPriorities.Count;i++){
-				if(listTaskPriorities[i].ItemValue.ToUpper()=="D") {
-					defaultTaskPriorityDefNum=listTaskPriorities[i].DefNum;
-					break;
+			//1)Sort by IsUnread status
+			if(x["IsUnread"].ToString()!=y["IsUnread"].ToString()) {
+				//Note: we are returning the negative of x.CompareTo(y)
+				return -(PIn.Long(x["IsUnread"].ToString()).CompareTo(PIn.Long(y["IsUnread"].ToString())));//sort unread to top.
+			}
+			//2)Sort by Task Priority
+			if(x["PriorityDefNum"].ToString()!=y["PriorityDefNum"].ToString()) {//we only care about task priority if they are different
+				long xTaskPriorityDefNum=PIn.Long(x["PriorityDefNum"].ToString());
+				long yTaskPriorityDefNum=PIn.Long(y["PriorityDefNum"].ToString());
+				//0 will always be considered like the default task priority.
+				if(xTaskPriorityDefNum==0) {
+					xTaskPriorityDefNum=_defaultTaskPriorityDefNum;
 				}
+				if(yTaskPriorityDefNum==0) {
+					yTaskPriorityDefNum=_defaultTaskPriorityDefNum;
+				}
+				//x.ItemOrder.CompareTo(y.ItemOrder)
+				return DefC.GetDef(DefCat.TaskPriorities,xTaskPriorityDefNum).ItemOrder.CompareTo(DefC.GetDef(DefCat.TaskPriorities,yTaskPriorityDefNum).ItemOrder);
 			}
-			//0 will always be considered like the default task priority.
-			if(xTaskPriorityDefNum==0) {
-				xTaskPriorityDefNum=defaultTaskPriorityDefNum;
-			}
-			if(yTaskPriorityDefNum==0) {
-				yTaskPriorityDefNum=defaultTaskPriorityDefNum;
-			}
-			//IsUnread is 0 if the task has been read by that user (IsUnread is essentially a count of if it's unread).
-			if(PIn.Long(x["IsUnread"].ToString())!=0 && PIn.Long(y["IsUnread"].ToString())==0) {//x is unread, y is read, move x down.
-				return 1;
-			}
-			if(PIn.Long(x["IsUnread"].ToString())==0 && PIn.Long(y["IsUnread"].ToString())!=0) {//x is read, y is unread, move x up.
-				return -1;
-			}
-			//X and Y have same read/unread status at this point
-			int xTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,xTaskPriorityDefNum).ItemOrder;
-			int yTaskPriorityItemOrder=DefC.GetDef(DefCat.TaskPriorities,yTaskPriorityDefNum).ItemOrder;
-			if(xTaskPriorityItemOrder<yTaskPriorityItemOrder) {//0 ItemOrder is higher priority than 1 ItemOrder
-				return -1;//x is higher priority
-			}
-			else if(xTaskPriorityItemOrder>yTaskPriorityItemOrder) {
-				return 1;//y is higher priority
-			}
-			else {//Both have same read/unread status and same priority
-				return CompareTimes(x,y);
-			}
+			//3)Sort by Date Time
+			return CompareTimes(x,y);
 		}
 
 		///<summary>Compares the most recent times of the task or task notes associated to the tasks passed in.  Most recently updated tasks will be farther down in the list.</summary>
 		public static int CompareTimes(DataRow x,DataRow y) {
-			if(PIn.Long(x["TaskListNum"].ToString())==1697//Triage Task List Num for HQ
-				&& PrefC.GetBool(PrefName.DockPhonePanelShow)
-				&& PIn.Long(x["PriorityDefNum"].ToString())==501)//Red tasks in triage only, sort by lastUpdated
+			if(_isHQ
+				&& PIn.Long(x["TaskListNum"].ToString())==_triageTaskListNum
+				&& PIn.Long(x["PriorityDefNum"].ToString())==_redTaskDefNum)//Red tasks in triage only, sort by lastUpdated
 			{
 				DateTime xMaxDateTime=PIn.DateT(x["LastUpdated"].ToString());
 				DateTime yMaxDateTime=PIn.DateT(y["LastUpdated"].ToString());
