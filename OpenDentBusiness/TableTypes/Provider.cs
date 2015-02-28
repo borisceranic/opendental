@@ -157,6 +157,16 @@ namespace OpenDentBusiness{
 			return retval;
 		}
 
+
+		///<Summary>For use in areas of the program where we have only have room for the simple abbr.  Such as pick boxes in the claim edit window.  This will give Abbr (hidden).</Summary>
+		public string GetAbbr() {
+			string retval=Abbr;
+			if(IsHidden) {
+				retval+=" "+Lans.g("Providers","(hidden)");
+			}
+			return retval;
+		}
+
 		///<summary>FName MI. LName, Suffix</summary>
 		public string GetFormalName() {
 			string retVal=FName+" "+MI;
