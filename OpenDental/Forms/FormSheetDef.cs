@@ -47,7 +47,6 @@ namespace OpenDental {
 			textWidth.Text=SheetDefCur.Width.ToString();
 			textHeight.Text=SheetDefCur.Height.ToString();
 			checkIsLandscape.Checked=SheetDefCur.IsLandscape;
-			checkIsMultiPage.Checked = SheetDefCur.IsMultiPage;
 		}
 
 		///<summary>Sets the minimum valid value (used for validation only) of the appropriate Height or Width field based on the bottom of the lowest field. 
@@ -163,7 +162,6 @@ namespace OpenDental {
 			SheetDefCur.Width=PIn.Int(textWidth.Text);
 			SheetDefCur.Height=PIn.Int(textHeight.Text);
 			SheetDefCur.IsLandscape=checkIsLandscape.Checked;
-			SheetDefCur.IsMultiPage=checkIsMultiPage.Checked;
 			//don't save to database here.
 			DialogResult=DialogResult.OK;
 		}

@@ -86,6 +86,7 @@ namespace OpenDental{
 			this.butDelete.Size = new System.Drawing.Size(77, 24);
 			this.butDelete.TabIndex = 115;
 			this.butDelete.Text = "Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// comboGrowthBehavior
 			// 
