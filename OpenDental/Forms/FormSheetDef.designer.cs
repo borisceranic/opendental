@@ -40,7 +40,6 @@ namespace OpenDental{
 			this.textWidth = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.checkIsMultiPage = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -210,23 +209,10 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// checkIsMultiPage
-			// 
-			this.checkIsMultiPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.checkIsMultiPage.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsMultiPage.Location = new System.Drawing.Point(42, 413);
-			this.checkIsMultiPage.Name = "checkIsMultiPage";
-			this.checkIsMultiPage.Size = new System.Drawing.Size(126, 20);
-			this.checkIsMultiPage.TabIndex = 101;
-			this.checkIsMultiPage.Text = "Multi Page";
-			this.checkIsMultiPage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsMultiPage.UseVisualStyleBackColor = true;
-			// 
 			// FormSheetDef
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(496, 455);
-			this.Controls.Add(this.checkIsMultiPage);
 			this.Controls.Add(this.checkIsLandscape);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.label1);
@@ -269,6 +255,5 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textDescription;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.CheckBox checkIsLandscape;
-        private System.Windows.Forms.CheckBox checkIsMultiPage;
 	}
 }
