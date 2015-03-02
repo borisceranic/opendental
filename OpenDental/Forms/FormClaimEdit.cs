@@ -5523,6 +5523,40 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void comboProvBill_SelectionChangeCommitted(object sender,EventArgs e) {
+			_provNumBillSelected=ProviderC.ListShort[comboProvBill.SelectedIndex].ProvNum;
+		}
+
+		private void butPickProvBill_Click(object sender,EventArgs e) {
+			FormProviderPick formP=new FormProviderPick();
+			if(comboProvBill.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
+				formP.SelectedProvNum=_provNumBillSelected;
+			}
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboProvBill.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
+			_provNumBillSelected=formP.SelectedProvNum;
+		}
+
+		private void comboProvTreat_SelectionChangeCommitted(object sender,EventArgs e) {
+			_provNumTreatSelected=ProviderC.ListShort[comboProvTreat.SelectedIndex].ProvNum;
+		}
+
+		private void butPickProvTreat_Click(object sender,EventArgs e) {
+			FormProviderPick formP=new FormProviderPick();
+			if(comboProvTreat.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
+				formP.SelectedProvNum=_provNumTreatSelected;
+			}
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboProvTreat.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
+			_provNumTreatSelected=formP.SelectedProvNum;
+		}
+
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			if(IsNew){
 				DialogResult=DialogResult.Cancel;//jump straight to Closing, where the claimprocs will be changed
@@ -5679,40 +5713,6 @@ namespace OpenDental{
 				ShowProviderTransferWindow();
 			}
 			DialogResult=DialogResult.OK;
-		}
-
-		private void comboProvBill_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumBillSelected=ProviderC.ListShort[comboProvBill.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvBill_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvBill.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumBillSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvBill.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumBillSelected=formP.SelectedProvNum;
-		}
-
-		private void comboProvTreat_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumTreatSelected=ProviderC.ListShort[comboProvTreat.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvTreat_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvTreat.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumTreatSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvTreat.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumTreatSelected=formP.SelectedProvNum;
 		}
 		
 		/// <summary>Also handles Canadian warnings.</summary>
