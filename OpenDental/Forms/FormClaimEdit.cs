@@ -341,7 +341,11 @@ namespace OpenDental{
 		private GroupBox groupUb04;
 		///<summary>If this claim edit window is accessed from the batch ins window, then set this to true to hide the batch button in this window and prevent loop.</summary>
 		public bool IsFromBatchWindow;
+		private UI.Button butPickProvBill;
+		private UI.Button butPickProvTreat;
 		private long _provNumOrderingSelected;
+		private long _provNumBillSelected;
+		private long _provNumTreatSelected;
 
 		///<summary></summary>
 		public FormClaimEdit(Claim claimCur, Patient patCur,Family famCur){
@@ -658,6 +662,8 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.butPickProvBill = new OpenDental.UI.Button();
+			this.butPickProvTreat = new OpenDental.UI.Button();
 			this.groupProsth.SuspendLayout();
 			this.groupOrtho.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -931,19 +937,21 @@ namespace OpenDental{
 			// 
 			// comboProvBill
 			// 
-			this.comboProvBill.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvBill.Location = new System.Drawing.Point(351, 74);
+			this.comboProvBill.MaxDropDownItems = 30;
 			this.comboProvBill.Name = "comboProvBill";
-			this.comboProvBill.Size = new System.Drawing.Size(100, 21);
+			this.comboProvBill.Size = new System.Drawing.Size(150, 21);
 			this.comboProvBill.TabIndex = 97;
+			this.comboProvBill.SelectionChangeCommitted += new System.EventHandler(this.comboProvBill_SelectionChangeCommitted);
 			// 
 			// comboProvTreat
 			// 
-			this.comboProvTreat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvTreat.Location = new System.Drawing.Point(351, 95);
+			this.comboProvTreat.MaxDropDownItems = 30;
 			this.comboProvTreat.Name = "comboProvTreat";
-			this.comboProvTreat.Size = new System.Drawing.Size(100, 21);
+			this.comboProvTreat.Size = new System.Drawing.Size(150, 21);
 			this.comboProvTreat.TabIndex = 99;
+			this.comboProvTreat.SelectionChangeCommitted += new System.EventHandler(this.comboProvTreat_SelectionChangeCommitted);
 			// 
 			// label2
 			// 
@@ -3633,12 +3641,42 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// butPickProvBill
+			// 
+			this.butPickProvBill.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickProvBill.Autosize = false;
+			this.butPickProvBill.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickProvBill.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickProvBill.CornerRadius = 2F;
+			this.butPickProvBill.Location = new System.Drawing.Point(503, 74);
+			this.butPickProvBill.Name = "butPickProvBill";
+			this.butPickProvBill.Size = new System.Drawing.Size(18, 21);
+			this.butPickProvBill.TabIndex = 261;
+			this.butPickProvBill.Text = "...";
+			this.butPickProvBill.Click += new System.EventHandler(this.butPickProvBill_Click);
+			// 
+			// butPickProvTreat
+			// 
+			this.butPickProvTreat.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickProvTreat.Autosize = false;
+			this.butPickProvTreat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickProvTreat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickProvTreat.CornerRadius = 2F;
+			this.butPickProvTreat.Location = new System.Drawing.Point(503, 95);
+			this.butPickProvTreat.Name = "butPickProvTreat";
+			this.butPickProvTreat.Size = new System.Drawing.Size(18, 21);
+			this.butPickProvTreat.TabIndex = 262;
+			this.butPickProvTreat.Text = "...";
+			this.butPickProvTreat.Click += new System.EventHandler(this.butPickProvTreat_Click);
+			// 
 			// FormClaimEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.AutoScroll = true;
 			this.ClientSize = new System.Drawing.Size(984, 913);
 			this.ControlBox = false;
+			this.Controls.Add(this.butPickProvTreat);
+			this.Controls.Add(this.butPickProvBill);
 			this.Controls.Add(this.butResend);
 			this.Controls.Add(this.textDateResent);
 			this.Controls.Add(this.label89);
@@ -3908,6 +3946,38 @@ namespace OpenDental{
 					comboProvNumOrdering.SelectedIndex=i;//Sets combo text too.
 				}
 			}
+			//ComboProvBill
+			_provNumBillSelected=ClaimCur.ProvBill;
+			comboProvBill.Items.Clear();
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
+				comboProvBill.Items.Add(ProviderC.ListShort[i].Abbr);//Only visible provs added to combobox.
+				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvBill) {
+					comboProvBill.SelectedIndex=i;//Sets combo text too.
+				}
+			}
+			if(_provNumBillSelected==0) {//Is new (exclude this block of code if provider selection is optional)
+				comboProvBill.SelectedIndex=0;
+				_provNumBillSelected=ProviderC.ListShort[0].ProvNum;
+			}
+			if(comboProvBill.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
+				comboProvBill.Text=Providers.GetProv(_provNumBillSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
+			}
+			//ComboProvTreat
+			_provNumTreatSelected=ClaimCur.ProvTreat;
+			comboProvTreat.Items.Clear();
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
+				comboProvTreat.Items.Add(ProviderC.ListShort[i].Abbr);//Only visible provs added to combobox.
+				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvTreat) {
+					comboProvTreat.SelectedIndex=i;//Sets combo text too.
+				}
+			}
+			if(_provNumTreatSelected==0) {//Is new (exclude this block of code if provider selection is optional)
+				comboProvTreat.SelectedIndex=0;
+				_provNumTreatSelected=ProviderC.ListShort[0].ProvNum;
+			}
+			if(comboProvTreat.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
+				comboProvTreat.Text=Providers.GetProv(_provNumTreatSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
+			}
 			FillForm();
 			FillCanadian();
 		}
@@ -4006,25 +4076,6 @@ namespace OpenDental{
 						comboCustomTracking.SelectedIndex=i+1;
 					}
 				}
-			}
-			comboProvBill.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvBill.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvBill) {
-					comboProvBill.SelectedIndex=i;
-				}
-			}
-			if(comboProvBill.Items.Count>0 && comboProvBill.SelectedIndex==-1)
-				comboProvBill.SelectedIndex=0;
-			comboProvTreat.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvTreat.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvTreat) {
-					comboProvTreat.SelectedIndex=i;
-				}
-			}
-			if(comboProvTreat.Items.Count>0 && comboProvTreat.SelectedIndex==-1) {
-				comboProvTreat.SelectedIndex=0;
 			}
 			textPriorAuth.Text=ClaimCur.PriorAuthorizationNumber;
 			textPredeterm.Text=ClaimCur.PreAuthString;
@@ -5472,6 +5523,40 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void comboProvBill_SelectionChangeCommitted(object sender,EventArgs e) {
+			_provNumBillSelected=ProviderC.ListShort[comboProvBill.SelectedIndex].ProvNum;
+		}
+
+		private void butPickProvBill_Click(object sender,EventArgs e) {
+			FormProviderPick formP=new FormProviderPick();
+			if(comboProvBill.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
+				formP.SelectedProvNum=_provNumBillSelected;
+			}
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboProvBill.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
+			_provNumBillSelected=formP.SelectedProvNum;
+		}
+
+		private void comboProvTreat_SelectionChangeCommitted(object sender,EventArgs e) {
+			_provNumTreatSelected=ProviderC.ListShort[comboProvTreat.SelectedIndex].ProvNum;
+		}
+
+		private void butPickProvTreat_Click(object sender,EventArgs e) {
+			FormProviderPick formP=new FormProviderPick();
+			if(comboProvTreat.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
+				formP.SelectedProvNum=_provNumTreatSelected;
+			}
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboProvTreat.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
+			_provNumTreatSelected=formP.SelectedProvNum;
+		}
+
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			if(IsNew){
 				DialogResult=DialogResult.Cancel;//jump straight to Closing, where the claimprocs will be changed
@@ -5923,9 +6008,7 @@ namespace OpenDental{
 			//patRelats will always be selected
 			ClaimCur.PatRelat=(Relat)comboPatRelat.SelectedIndex;
 			ClaimCur.PatRelat2=(Relat)comboPatRelat2.SelectedIndex;
-			if(comboProvTreat.SelectedIndex!=-1){
-				ClaimCur.ProvTreat=ProviderC.ListShort[comboProvTreat.SelectedIndex].ProvNum;
-			}
+			ClaimCur.ProvTreat=_provNumTreatSelected;
 			ClaimCur.PriorAuthorizationNumber=textPriorAuth.Text;
 			ClaimCur.PreAuthString=textPredeterm.Text;
 			//isprosthesis handled earlier
@@ -5933,9 +6016,7 @@ namespace OpenDental{
 			ClaimCur.ReasonUnderPaid=textReasonUnder.Text;
 			ClaimCur.ClaimNote=textNote.Text;
 			//ispreauth
-			if(comboProvBill.SelectedIndex!=-1){
-				ClaimCur.ProvBill=ProviderC.ListShort[comboProvBill.SelectedIndex].ProvNum;
-			}
+			ClaimCur.ProvBill=_provNumBillSelected;
 			ClaimCur.IsOrtho=checkIsOrtho.Checked;
 			ClaimCur.OrthoRemainM=PIn.Byte(textOrthoRemainM.Text);
 			ClaimCur.OrthoDate=PIn.Date(textOrthoDate.Text);
