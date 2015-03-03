@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.1.13.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.14.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -7220,6 +7220,60 @@ namespace OpenDentBusiness {
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 				command="UPDATE preference SET ValueString = '15.1.13.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_1_14();
+		}
+
+		///<summary>Oracle compatible: 03/02/2015</summary>
+		private static void To15_1_14() {
+			if(FromVersion<new Version("15.1.14.0")) {
+				string command="";
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE adjustment ADD INDEX indexProvNum (ProvNum)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX adjustment_ProvNum ON adjustment (ProvNum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE claimproc ADD INDEX indexPNPD (ProvNum,ProcDate)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX claimproc_PNPD ON claimproc (ProvNum,ProcDate)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE claimproc ADD INDEX indexPNDCP (ProvNum,DateCP)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX claimproc_PNDCP ON claimproc (ProvNum,DateCP)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE procedurelog ADD INDEX indexPNPD (ProvNum,ProcDate)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX procedurelog_PNPD ON procedurelog (ProvNum,ProcDate)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
+				command="UPDATE preference SET ValueString = '15.1.14.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_2_0();

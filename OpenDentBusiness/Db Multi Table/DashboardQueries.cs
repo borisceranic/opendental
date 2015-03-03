@@ -117,7 +117,7 @@ namespace OpenDentBusiness {
 			command=@"INSERT INTO tempdash"+rndStr+@"
 				SELECT procedurelog.ProcDate,procedurelog.ProvNum,
 				SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0)
-				FROM procedurelog
+				FROM procedurelog USE INDEX(indexPNPD)
 				LEFT JOIN claimproc ON procedurelog.ProcNum=claimproc.ProcNum
 				AND claimproc.Status='7' /*only CapComplete writeoffs are subtracted here*/
 				WHERE procedurelog.ProcStatus = '2'
@@ -148,9 +148,9 @@ namespace OpenDentBusiness {
 					decimal prod=0;
 					DateTime datePeriod=dateFrom.AddMonths(i);//only the month and year are important
 					for(int j=0;j<tableProd.Rows.Count;j++)  {
-						if(datePeriod.Year==PIn.Date(tableProd.Rows[j]["DatePeriod"].ToString()).Year
+						if(provNum==PIn.Long(tableProd.Rows[j]["ProvNum"].ToString())
 							&& datePeriod.Month==PIn.Date(tableProd.Rows[j]["DatePeriod"].ToString()).Month
-							&& provNum==PIn.Long(tableProd.Rows[j]["ProvNum"].ToString()))
+							&& datePeriod.Year==PIn.Date(tableProd.Rows[j]["DatePeriod"].ToString()).Year)
 						{
 		 					prod=PIn.Decimal(tableProd.Rows[j]["prod"].ToString());
 							break;
@@ -342,7 +342,8 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 			//table full of individual patients and their dateFirstProcs.
 			command=@"INSERT INTO tempdash"+rndStr+@" 
-				SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
+				SELECT PatNum, MIN(ProcDate) dateFirstProc 
+				FROM procedurelog USE INDEX(indexPatNum)
 				WHERE ProcStatus=2 GROUP BY PatNum
 				HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
 				+"AND dateFirstProc <= "+POut.Date(dateTo);

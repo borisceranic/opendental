@@ -152,6 +152,33 @@ namespace OpenDentalServer {
 					int intResult=(int)methodInfo.Invoke(null,paramObjs);
 					return intResult.ToString();
 				}
+				else if(type == typeof(DtoGetDouble)) {
+					DtoGetDouble dtoGetDouble=(DtoGetDouble)dto;
+					Userods.CheckCredentials(dtoGetDouble.Credentials);//will throw exception if fails.
+					string[] fullNameComponents=GetComponentsFromDtoMeth(dtoGetDouble.MethodName);
+					string assemblyName=fullNameComponents[0];//OpenDentBusiness or else a plugin name
+					string className=fullNameComponents[1];
+					string methodName=fullNameComponents[2];
+					Type classType=null;
+					Assembly ass=Plugins.GetAssembly(assemblyName);
+					if(ass==null) {
+						classType=Type.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className+","+assemblyName);
+					}
+					else {//plugin was found
+						classType=ass.GetType(assemblyName//actually, the namespace which we require to be same as assembly by convention
+							+"."+className);
+					}
+					DtoObject[] parameters=dtoGetDouble.Params;
+					Type[] paramTypes=DtoObject.GenerateTypes(parameters,assemblyName);
+					MethodInfo methodInfo=classType.GetMethod(methodName,paramTypes);
+					if(methodInfo==null) {
+						throw new ApplicationException("Method not found with "+parameters.Length.ToString()+" parameters: "+dtoGetDouble.MethodName);
+					}
+					object[] paramObjs=DtoObject.GenerateObjects(parameters);
+					double doubleResult=(double)methodInfo.Invoke(null,paramObjs);
+					return doubleResult.ToString();
+				}
 				else if(type == typeof(DtoGetVoid)) {
 					DtoGetVoid dtoGetVoid=(DtoGetVoid)dto;
 					Userods.CheckCredentials(dtoGetVoid.Credentials);//will throw exception if fails.
