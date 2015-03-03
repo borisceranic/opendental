@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	public class FormUserGroupPicker:System.Windows.Forms.Form {
@@ -17,6 +18,7 @@ namespace OpenDental{
 		/// Required designer variable.
 		/// </summary>
 		private System.ComponentModel.Container components = null;
+		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
 		public FormUserGroupPicker()
@@ -122,12 +124,14 @@ namespace OpenDental{
 		private void FillList(){
 			UserGroups.RefreshCache();
 			listGroups.Items.Clear();
+			_listUserGroups=new List<UserGroup>();
 			for(int i=0;i<UserGroups.List.Length;i++) {
 				if(!IsAdminMode
 					&& GroupPermissions.HasPermission(UserGroups.List[i].UserGroupNum,Permissions.SecurityAdmin)) 
 				{
 					continue;
 				}
+				_listUserGroups.Add(UserGroups.List[i]);
 				listGroups.Items.Add(UserGroups.List[i].Description);
 			}
 		}
@@ -136,7 +140,7 @@ namespace OpenDental{
 			if(listGroups.SelectedIndex==-1) {
 				return;
 			}
-			UserGroup=UserGroups.List[listGroups.SelectedIndex];
+			UserGroup=_listUserGroups[listGroups.SelectedIndex];
 			DialogResult=DialogResult.OK;
 		}
 
@@ -145,7 +149,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Select a group.");
 				return;
 			}
-			UserGroup=UserGroups.List[listGroups.SelectedIndex];
+			UserGroup=_listUserGroups[listGroups.SelectedIndex];
 			DialogResult=DialogResult.OK;
 		}
 
