@@ -7310,6 +7310,242 @@ namespace OpenDentBusiness {
 					command="UPDATE procedurecode SET NoBillIns=1 WHERE CodeNum="+codeNum;//oracle compatible
 					Db.NonQ(command);
 				}
+				#region medlab tables for LabCorp HL7 interface
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS medlab";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlab (
+						MedLabNum bigint NOT NULL auto_increment PRIMARY KEY,
+						PatNum bigint NOT NULL,
+						ProvNum bigint NOT NULL,
+						PatIDLab varchar(255) NOT NULL,
+						PatIDAlt varchar(255) NOT NULL,
+						PatAge varchar(255) NOT NULL,
+						PatAccountNum varchar(255) NOT NULL,
+						PatFasting tinyint NOT NULL,
+						SpecimenID varchar(255) NOT NULL,
+						ObsTestID varchar(255) NOT NULL,
+						ObsTestDescript varchar(255) NOT NULL,
+						DateTimeCollected datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						TotalVolume varchar(255) NOT NULL,
+						ActionCode varchar(255) NOT NULL,
+						ClinicalInfo varchar(255) NOT NULL,
+						DateTimeEntered datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						OrderingProvNPI varchar(255) NOT NULL,
+						OrderingProvLocalID varchar(255) NOT NULL,
+						OrderingProvLName varchar(255) NOT NULL,
+						OrderingProvFName varchar(255) NOT NULL,
+						SpecimenIDAlt varchar(255) NOT NULL,
+						DateTimeReported datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						ResultStatus varchar(255) NOT NULL,
+						ParentObsID varchar(255) NOT NULL,
+						ParentObsTestID varchar(255) NOT NULL,
+						NotePat text NOT NULL,
+						NoteLab text NOT NULL,
+						FileName varchar(255) NOT NULL,
+						OriginalPIDSegment text NOT NULL,
+						INDEX(PatNum),
+						INDEX(ProvNum),
+						INDEX(ObsTestID),
+						INDEX(ParentObsID),
+						INDEX(ParentObsTestID)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlab'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlab (
+						MedLabNum number(20) NOT NULL,
+						PatNum number(20) NOT NULL,
+						ProvNum number(20) NOT NULL,
+						PatIDLab varchar2(255),
+						PatIDAlt varchar2(255),
+						PatAge varchar2(255),
+						PatAccountNum varchar2(255),
+						PatFasting number(3) NOT NULL,
+						SpecimenID varchar2(255),
+						ObsTestID varchar2(255),
+						ObsTestDescript varchar2(255),
+						DateTimeCollected date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						TotalVolume varchar2(255),
+						ActionCode varchar2(255),
+						ClinicalInfo varchar2(255),
+						DateTimeEntered date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						OrderingProvNPI varchar2(255),
+						OrderingProvLocalID varchar2(255),
+						OrderingProvLName varchar2(255),
+						OrderingProvFName varchar2(255),
+						SpecimenIDAlt varchar2(255),
+						DateTimeReported date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						ResultStatus varchar2(255),
+						ParentObsID varchar2(255),
+						ParentObsTestID varchar2(255),
+						NotePat clob,
+						NoteLab clob,
+						FileName varchar2(255),
+						OriginalPIDSegment varchar2(4000),
+						CONSTRAINT medlab_MedLabNum PRIMARY KEY (MedLabNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlab_PatNum ON medlab (PatNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlab_ProvNum ON medlab (ProvNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlab_ObsTestID ON medlab (ObsTestID)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlab_ParentObsID ON medlab (ParentObsID)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlab_ParentObsTestID ON medlab (ParentObsTestID)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS medlabresult";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabresult (
+						MedLabResultNum bigint NOT NULL auto_increment PRIMARY KEY,
+						MedLabNum bigint NOT NULL,
+						ObsID varchar(255) NOT NULL,
+						ObsText varchar(255) NOT NULL,
+						ObsLoinc varchar(255) NOT NULL,
+						ObsLoincText varchar(255) NOT NULL,
+						ObsValue varchar(255) NOT NULL,
+						ObsUnits varchar(255) NOT NULL,
+						ReferenceRange varchar(255) NOT NULL,
+						AbnormalFlag varchar(255) NOT NULL,
+						ResultStatus varchar(255) NOT NULL,
+						DateTimeObs datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						FacilityID varchar(255) NOT NULL,
+						DocNum bigint NOT NULL,
+						Note text NOT NULL,
+						INDEX(MedLabNum),
+						INDEX(ObsID),
+						INDEX(DocNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabresult'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabresult (
+						MedLabResultNum number(20) NOT NULL,
+						MedLabNum number(20) NOT NULL,
+						ObsID varchar2(255),
+						ObsText varchar2(255),
+						ObsLoinc varchar2(255),
+						ObsLoincText varchar2(255),
+						ObsValue varchar2(255),
+						ObsUnits varchar2(255),
+						ReferenceRange varchar2(255),
+						AbnormalFlag varchar2(255),
+						ResultStatus varchar2(255),
+						DateTimeObs date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						FacilityID varchar2(255),
+						DocNum number(20) NOT NULL,
+						Note clob,
+						CONSTRAINT medlabresult_MedLabResultNum PRIMARY KEY (MedLabResultNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabresult_MedLabNum ON medlabresult (MedLabNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabresult_ObsID ON medlabresult (ObsID)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabresult_DocNum ON medlabresult (DocNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS medlabspecimen";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabspecimen (
+						MedLabSpecimenNum bigint NOT NULL auto_increment PRIMARY KEY,
+						MedLabNum bigint NOT NULL,
+						SpecimenID varchar(255) NOT NULL,
+						SpecimenDescript varchar(255) NOT NULL,
+						DateTimeCollected datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						INDEX(MedLabNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabspecimen'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabspecimen (
+						MedLabSpecimenNum number(20) NOT NULL,
+						MedLabNum number(20) NOT NULL,
+						SpecimenID varchar2(255),
+						SpecimenDescript varchar2(255),
+						DateTimeCollected date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CONSTRAINT medlabspecimen_MedLabSpecimenN PRIMARY KEY (MedLabSpecimenNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabspecimen_MedLabNum ON medlabspecimen (MedLabNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS medlabfacility";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabfacility (
+						MedLabFacilityNum bigint NOT NULL auto_increment PRIMARY KEY,
+						FacilityCode varchar(255) NOT NULL,
+						FacilityName varchar(255) NOT NULL,
+						Address varchar(255) NOT NULL,
+						City varchar(255) NOT NULL,
+						State varchar(255) NOT NULL,
+						Zip varchar(255) NOT NULL,
+						Phone varchar(255) NOT NULL,
+						DirectorTitle varchar(255) NOT NULL,
+						DirectorLName varchar(255) NOT NULL,
+						DirectorFName varchar(255) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabfacility'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabfacility (
+						MedLabFacilityNum number(20) NOT NULL,
+						FacilityCode varchar2(255),
+						FacilityName varchar2(255),
+						Address varchar2(255),
+						City varchar2(255),
+						State varchar2(255),
+						Zip varchar2(255),
+						Phone varchar2(255),
+						DirectorTitle varchar2(255),
+						DirectorLName varchar2(255),
+						DirectorFName varchar2(255),
+						CONSTRAINT medlabfacility_MedLabFacilityN PRIMARY KEY (MedLabFacilityNum)
+						)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS medlabattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabattach (
+						MedLabAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						MedLabNum bigint NOT NULL,
+						MedLabFacilityNum bigint NOT NULL,
+						INDEX(MedLabNum),
+						INDEX(MedLabFacilityNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE medlabattach (
+						MedLabAttachNum number(20) NOT NULL,
+						MedLabNum number(20) NOT NULL,
+						MedLabFacilityNum number(20) NOT NULL,
+						CONSTRAINT medlabattach_MedLabAttachNum PRIMARY KEY (MedLabAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabattach_MedLabNum ON medlabattach (MedLabNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabattach_MedLabFacilityNum ON medlabattach (MedLabFacilityNum)";
+					Db.NonQ(command);
+				}
+				#endregion medlab tables for LabCorp HL7 interface
 
 
 

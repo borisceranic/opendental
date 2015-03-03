@@ -52,7 +52,8 @@ namespace OpenDentBusiness{
 			return Crud.HL7DefCrud.SelectOne(command);
 		}
 
-		/// <summary>Gets from cache.  This will return null if no HL7defs are enabled.  Since only one can be enabled, this will return only the enabled one. No need to check RemotingRole, cache is filled by calling GetTableRemotelyIfNeeded.</summary>
+		/// <summary>Gets from cache.  This will return null if no HL7defs are enabled.  Since only one can be enabled, this will return only one.
+		///No need to check RemotingRole, cache is filled by calling GetTableRemotelyIfNeeded.</summary>
 		public static HL7Def GetOneDeepEnabled() {
 			HL7Def retval=null;
 			for(int i=0;i<Listt.Count;i++) {

@@ -1,5 +1,5 @@
 namespace OpenDental{
-	partial class FormMedLabResultEdit {
+	partial class FormMedLabEdit {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMedLabResultEdit));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMedLabEdit));
 			this.butOk = new System.Windows.Forms.Button();
 			this.butCancel = new System.Windows.Forms.Button();
 			this.textPatPhone = new System.Windows.Forms.TextBox();
@@ -101,11 +101,14 @@ namespace OpenDental{
 			this.groupOrderingPhys = new System.Windows.Forms.GroupBox();
 			this.butShowHL7 = new System.Windows.Forms.Button();
 			this.labelShowHL7 = new System.Windows.Forms.Label();
-			this.odGridFacilities = new OpenDental.UI.ODGrid();
-			this.odGridResults = new OpenDental.UI.ODGrid();
+			this.gridFacilities = new OpenDental.UI.ODGrid();
+			this.gridResults = new OpenDental.UI.ODGrid();
 			this.odtextGenComments = new OpenDental.ODtextBox();
 			this.odtextTestsOrd = new OpenDental.ODtextBox();
 			this.odtextAddlInfo = new OpenDental.ODtextBox();
+			this.butPrint = new System.Windows.Forms.Button();
+			this.labelPrint = new System.Windows.Forms.Label();
+			this.butProvSelect = new System.Windows.Forms.Button();
 			this.groupPatAddressPh.SuspendLayout();
 			this.groupAcctAddr.SuspendLayout();
 			this.groupPat.SuspendLayout();
@@ -480,7 +483,7 @@ namespace OpenDental{
 			this.textPhysicianName.Location = new System.Drawing.Point(129, 17);
 			this.textPhysicianName.MaxLength = 100;
 			this.textPhysicianName.Name = "textPhysicianName";
-			this.textPhysicianName.Size = new System.Drawing.Size(298, 20);
+			this.textPhysicianName.Size = new System.Drawing.Size(266, 20);
 			this.textPhysicianName.TabIndex = 307;
 			// 
 			// labelPhysicianName
@@ -803,6 +806,7 @@ namespace OpenDental{
 			// 
 			// groupOrderingPhys
 			// 
+			this.groupOrderingPhys.Controls.Add(this.butProvSelect);
 			this.groupOrderingPhys.Controls.Add(this.textPhysicianName);
 			this.groupOrderingPhys.Controls.Add(this.labelPhysicianName);
 			this.groupOrderingPhys.Controls.Add(this.textPhysicianNPI);
@@ -819,7 +823,7 @@ namespace OpenDental{
 			// butShowHL7
 			// 
 			this.butShowHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butShowHL7.Location = new System.Drawing.Point(354, 604);
+			this.butShowHL7.Location = new System.Drawing.Point(462, 604);
 			this.butShowHL7.Name = "butShowHL7";
 			this.butShowHL7.Size = new System.Drawing.Size(75, 24);
 			this.butShowHL7.TabIndex = 328;
@@ -830,38 +834,38 @@ namespace OpenDental{
 			// labelShowHL7
 			// 
 			this.labelShowHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelShowHL7.Location = new System.Drawing.Point(430, 608);
+			this.labelShowHL7.Location = new System.Drawing.Point(538, 608);
 			this.labelShowHL7.Name = "labelShowHL7";
-			this.labelShowHL7.Size = new System.Drawing.Size(250, 16);
+			this.labelShowHL7.Size = new System.Drawing.Size(228, 16);
 			this.labelShowHL7.TabIndex = 329;
 			this.labelShowHL7.Text = "Show the original inbound HL7 message.";
 			// 
-			// odGridFacilities
+			// gridFacilities
 			// 
-			this.odGridFacilities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.gridFacilities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.odGridFacilities.HScrollVisible = false;
-			this.odGridFacilities.Location = new System.Drawing.Point(12, 512);
-			this.odGridFacilities.Name = "odGridFacilities";
-			this.odGridFacilities.ScrollValue = 0;
-			this.odGridFacilities.Size = new System.Drawing.Size(950, 85);
-			this.odGridFacilities.TabIndex = 324;
-			this.odGridFacilities.Title = "Lab Facilities";
-			this.odGridFacilities.TranslationName = null;
+			this.gridFacilities.HScrollVisible = false;
+			this.gridFacilities.Location = new System.Drawing.Point(12, 512);
+			this.gridFacilities.Name = "gridFacilities";
+			this.gridFacilities.ScrollValue = 0;
+			this.gridFacilities.Size = new System.Drawing.Size(950, 85);
+			this.gridFacilities.TabIndex = 324;
+			this.gridFacilities.Title = "Lab Facilities";
+			this.gridFacilities.TranslationName = null;
 			// 
-			// odGridResults
+			// gridResults
 			// 
-			this.odGridResults.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridResults.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.odGridResults.HScrollVisible = false;
-			this.odGridResults.Location = new System.Drawing.Point(12, 392);
-			this.odGridResults.Name = "odGridResults";
-			this.odGridResults.ScrollValue = 0;
-			this.odGridResults.Size = new System.Drawing.Size(950, 115);
-			this.odGridResults.TabIndex = 315;
-			this.odGridResults.Title = "Lab Results";
-			this.odGridResults.TranslationName = null;
+			this.gridResults.HScrollVisible = false;
+			this.gridResults.Location = new System.Drawing.Point(12, 392);
+			this.gridResults.Name = "gridResults";
+			this.gridResults.ScrollValue = 0;
+			this.gridResults.Size = new System.Drawing.Size(950, 115);
+			this.gridResults.TabIndex = 315;
+			this.gridResults.Title = "Test Results";
+			this.gridResults.TranslationName = null;
 			// 
 			// odtextGenComments
 			// 
@@ -899,23 +903,55 @@ namespace OpenDental{
 			this.odtextAddlInfo.TabIndex = 0;
 			this.odtextAddlInfo.Text = "";
 			// 
-			// FormMedLabResultEdit
+			// butPrint
+			// 
+			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butPrint.Location = new System.Drawing.Point(254, 604);
+			this.butPrint.Name = "butPrint";
+			this.butPrint.Size = new System.Drawing.Size(75, 24);
+			this.butPrint.TabIndex = 330;
+			this.butPrint.Text = "Print";
+			this.butPrint.UseVisualStyleBackColor = true;
+			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
+			// 
+			// labelPrint
+			// 
+			this.labelPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelPrint.Location = new System.Drawing.Point(330, 608);
+			this.labelPrint.Name = "labelPrint";
+			this.labelPrint.Size = new System.Drawing.Size(126, 16);
+			this.labelPrint.TabIndex = 331;
+			this.labelPrint.Text = "Print results report.";
+			// 
+			// butProvSelect
+			// 
+			this.butProvSelect.Location = new System.Drawing.Point(400, 14);
+			this.butProvSelect.Name = "butProvSelect";
+			this.butProvSelect.Size = new System.Drawing.Size(27, 24);
+			this.butProvSelect.TabIndex = 301;
+			this.butProvSelect.Text = "...";
+			this.butProvSelect.UseVisualStyleBackColor = true;
+			this.butProvSelect.Click += new System.EventHandler(this.butProvSelect_Click);
+			// 
+			// FormMedLabEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 640);
+			this.Controls.Add(this.labelPrint);
+			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.labelShowHL7);
 			this.Controls.Add(this.butShowHL7);
 			this.Controls.Add(this.groupOrderingPhys);
 			this.Controls.Add(this.groupPat);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.odGridFacilities);
+			this.Controls.Add(this.gridFacilities);
 			this.Controls.Add(this.labelGenComments);
 			this.Controls.Add(this.odtextGenComments);
 			this.Controls.Add(this.textClientAltPatID);
 			this.Controls.Add(this.labelClientAltPatID);
 			this.Controls.Add(this.textClientAcc);
 			this.Controls.Add(this.labelClientAcc);
-			this.Controls.Add(this.odGridResults);
+			this.Controls.Add(this.gridResults);
 			this.Controls.Add(this.labelTestsOrd);
 			this.Controls.Add(this.odtextTestsOrd);
 			this.Controls.Add(this.groupAcctAddr);
@@ -942,10 +978,10 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(990, 678);
-			this.Name = "FormMedLabResultEdit";
+			this.Name = "FormMedLabEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Medical Lab Result Report Edit";
-			this.Load += new System.EventHandler(this.FormMedLabResultEdit_Load);
+			this.Text = "Medical Lab Edit";
+			this.Load += new System.EventHandler(this.FormMedLabEdit_Load);
 			this.groupPatAddressPh.ResumeLayout(false);
 			this.groupPatAddressPh.PerformLayout();
 			this.groupAcctAddr.ResumeLayout(false);
@@ -999,7 +1035,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPhysicianNPI;
 		private System.Windows.Forms.Label labelTestsOrd;
 		private ODtextBox odtextTestsOrd;
-		private UI.ODGrid odGridResults;
+		private UI.ODGrid gridResults;
 		private System.Windows.Forms.TextBox textClientAltPatID;
 		private System.Windows.Forms.Label labelClientAltPatID;
 		private System.Windows.Forms.TextBox textClientAcc;
@@ -1016,7 +1052,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textAcctState;
 		private System.Windows.Forms.TextBox textAcctCity;
 		private System.Windows.Forms.Label labelAcctCityStZip;
-		private UI.ODGrid odGridFacilities;
+		private UI.ODGrid gridFacilities;
 		private System.Windows.Forms.Button butDelete;
 		private System.Windows.Forms.GroupBox groupPat;
 		private System.Windows.Forms.TextBox textFasting;
@@ -1043,6 +1079,9 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupOrderingPhys;
 		private System.Windows.Forms.Button butShowHL7;
 		private System.Windows.Forms.Label labelShowHL7;
+		private System.Windows.Forms.Button butPrint;
+		private System.Windows.Forms.Label labelPrint;
+		private System.Windows.Forms.Button butProvSelect;
 
 	}
 }

@@ -1,5 +1,5 @@
 ﻿namespace OpenDental {
-	partial class FormMedLabResults {
+	partial class FormMedLabs {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMedLabResults));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMedLabs));
 			this.butRetrieve = new System.Windows.Forms.Button();
 			this.butClose = new System.Windows.Forms.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -64,7 +64,7 @@
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.Size = new System.Drawing.Size(730, 245);
 			this.gridMain.TabIndex = 5;
-			this.gridMain.Title = "Laboratory Results";
+			this.gridMain.Title = "Labs";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
@@ -89,7 +89,7 @@
 			this.labelMove.Text = "Move a lab result to a different patient by first selecting the result from the l" +
     "ist above, and then selecting the correct patient.";
 			// 
-			// FormMedLabResults
+			// FormMedLabs
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -101,10 +101,10 @@
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(855, 339);
-			this.Name = "FormMedLabResults";
+			this.Name = "FormMedLabs";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Medical Lab Results";
-			this.Load += new System.EventHandler(this.FormMedLabResults_Load);
+			this.Text = "Medical Labs";
+			this.Load += new System.EventHandler(this.FormMedLabs_Load);
 			this.ResumeLayout(false);
 
 		}

@@ -17,6 +17,8 @@ namespace OpenDentBusiness {
 		#region PID Fields
 		///<summary>FK to patient.PatNum.  PID.2 - External Patient ID. LabCorp report field "Client Alt. Pat ID".</summary>
 		public long PatNum;
+		///<summary>FK to provider.ProvNum.  Can be 0. Attempt to match ordering prov external IDs to internal provnum.</summary>
+		public long ProvNum;
 		///<summary>PID.3 - Lab Assigned Patient Id.  LabCorp report field "Specimen Number".  LabCorp assigned, alpha numeric specimen number.</summary>
 		public string PatIDLab;
 		///<summary>PID.4 - Alternate Patient ID.  LabCorp report field "Patient ID".  Alternate patient ID.</summary>
@@ -41,6 +43,7 @@ namespace OpenDentBusiness {
 		public string ObsTestDescript;
 		///<summary>OBR.7 - Observation/Specimen Collection Date/Time.  LabCorp report field "Date &amp; Time Collected".
 		///yyyyMMddHHmm format in the message, no seconds.  May be blank.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeCollected;
 		///<summary>OBR.9 - Collection/Urine Volume (Quantity/Field Value).  LabCorp report field "Total Volume".
 		///The LabCorp document says this field is "Numeric Characters", but the HL7 documentation data type as CQ, which is a number with units
@@ -57,6 +60,7 @@ namespace OpenDentBusiness {
 		public string ClinicalInfo;
 		///<summary>OBR.14 - Date/Time of Specimen Receipt in Lab.  LabCorp report field "Date Entered".  yyyyMMddHHmm format in the message, no seconds.
 		///Date and time the order was entered in the Lab System.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeEntered;
 		///<summary>ORC.12.1 and OBR.16.1 - Ordering Provider ID Number.  LabCorp report field "NPI".  ORC.12.* and OBR.16.* are repeatable, the eighth
 		///component identifies the source of the ID in the first component.  Component 8 possible values: "U"-UPIN,
@@ -74,13 +78,16 @@ namespace OpenDentBusiness {
 		public string SpecimenIDAlt;
 		///<summary>OBR.22 - Date/Time Observations Reported.  LabCorp report field "Date &amp; Time Reported".  yyyyMMddHHmm format in the message, no secs.
 		///Date and time the results were released from the Lab System.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeReported;
 		///<summary>OBR.25 - Order Result Status.  LabCorp possible values: "F" - Final, "P" - Preliminary, "X" - Cancelled, "C" - Corrected.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public ResultStatus ResultStatus;
 		///<summary>OBR.26.1 - Link to Parent Result or Organism Link to Susceptibility.
-		///A reflex result will have the parent's OBX.3.1 value here for linking.</summary>
+		///A reflex test will have the parent's OBX.3.1 value here for linking.</summary>
 		public string ParentObsID;
+		///<summary>OBR.29 - Link to Parent Order.  A reflex test will have the value from OBR.4.1 of the original order in this field for linking.</summary>
+		public string ParentObsTestID;
 		#endregion OBR Fields
 		///<summary>NTE.3 - Comment Text, PID Level.  The NTE segment is repeatable and the Comment Text component is limited to 78 characters.  Multiple
 		///NTE segments can be used for longer comments.  All NTE segments at the PID level will be concatenated and stored in this one field.</summary>
@@ -90,11 +97,14 @@ namespace OpenDentBusiness {
 		///NTE segments can be used for longer comments.  All NTE segments at the OBR level will be concatenated and stored in this one field.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string NoteLab;
-		///<summary>This is the filename of the original archived message that was processed to create this medlab object as well as associated
-		///medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a sub-folder called
-		///LabCorpHL7Msgs. If the option to store images directly in the database is chosen, this will be an empty field and there will not be the
-		///option to display the original HL7 message.</summary>
+		///<summary>Not unique. More than one MedLab object can point to the same FileName, so deleting the MedLab object does not necessarily mean
+		///the file can also be deleted.  This is the filename of the original archived message that was processed to create this medlab object as
+		///well as associated medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a
+		///sub-folder called LabCorpHL7Msgs. If the option to store images directly in the database is chosen, this will be an empty field and there
+		///will not be the option to display the original HL7 message.</summary>
 		public string FileName;
+		///<summary>The PID Segment from the HL7 message used to generate this MedLab object.</summary>
+		public string OriginalPIDSegment;
 
 		///<summary></summary>
 		public MedLab Copy() {

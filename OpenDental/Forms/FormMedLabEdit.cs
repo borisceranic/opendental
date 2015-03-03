@@ -5,19 +5,27 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMedLabResultEdit:Form {
+	public partial class FormMedLabEdit:Form {
 		public MedLab MedLabCur;
 
-		public FormMedLabResultEdit() {
+		public FormMedLabEdit() {
 			InitializeComponent();
 			Lan.F(this);
 		}
 
-		private void FormMedLabResultEdit_Load(object sender,EventArgs e) {
+		private void FormMedLabEdit_Load(object sender,EventArgs e) {
 			//FillGrid();
 		}
 
 		private void butPatSelect_Click(object sender,EventArgs e) {
+
+		}
+
+		private void butProvSelect_Click(object sender,EventArgs e) {
+
+		}
+
+		private void butPrint_Click(object sender,EventArgs e) {
 
 		}
 

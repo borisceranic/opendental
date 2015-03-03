@@ -299,6 +299,11 @@
     <Compile Include="Crud\MedicalOrderCrud.cs" />
     <Compile Include="Crud\MedicationCrud.cs" />
     <Compile Include="Crud\MedicationPatCrud.cs" />
+    <Compile Include="Crud\MedLabAttachCrud.cs" />
+    <Compile Include="Crud\MedLabCrud.cs" />
+    <Compile Include="Crud\MedLabFacilityCrud.cs" />
+    <Compile Include="Crud\MedLabResultCrud.cs" />
+    <Compile Include="Crud\MedLabSpecimenCrud.cs" />
     <Compile Include="Crud\MountCrud.cs" />
     <Compile Include="Crud\MountDefCrud.cs" />
     <Compile Include="Crud\MountItemCrud.cs" />
@@ -475,6 +480,11 @@
     <Compile Include="Data Interface\Interventions.cs" />
     <Compile Include="Data Interface\Loincs.cs" />
     <Compile Include="Data Interface\MapAreas.cs" />
+    <Compile Include="Data Interface\MedLabAttaches.cs" />
+    <Compile Include="Data Interface\MedLabFacilities.cs" />
+    <Compile Include="Data Interface\MedLabResults.cs" />
+    <Compile Include="Data Interface\MedLabs.cs" />
+    <Compile Include="Data Interface\MedLabSpecimens.cs" />
     <Compile Include="Data Interface\OIDExternals.cs" />
     <Compile Include="Data Interface\OIDInternals.cs" />
     <Compile Include="Data Interface\PatientRaces.cs" />

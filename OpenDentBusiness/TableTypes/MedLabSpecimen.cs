@@ -20,6 +20,7 @@ namespace OpenDentBusiness {
 		///<summary>SPM.17 - Specimen Collection Date/Time.  yyyyMMddHHmm format in the message, no seconds.  The date and time when the specimen was
 		///acquired from the source.  This is a DR - Date/Time Range data type, so it may have more than one component if a specimen was collected over
 		///a period of time.  The first component is the start date/time so we will make sure to only store SPM.17.1 in this field.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeCollected;
 
 		///<summary></summary>

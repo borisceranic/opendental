@@ -26,7 +26,7 @@ namespace OpenDental {
 		}
 
 		private void butReceive_Click(object sender,EventArgs e) {
-			/*string sample=@"MSH|^~\&|KAM|DGI|Y|OU|20100920093000||ORU^R01^ORU_R01|20100920093000|P|2.3.1
+			/*string sample=@"MSH|^~\&|KAM|DGI|Y|OU|20100920093000||ORU^R01^ORU_R01|20100920093000|P|2.5.1
 PID||405979410 |405979410^^^&2.16.840.1.113883.19.3.2.1&ISO^MR||Lewis^Frank ||19500101|M||2106-3^White^HL70005|622 Chestnut^^Springfield^Tennessee^37026^^M||^^^^^615^3826396|||||405979410 ||||N^Not Hispanic or Latino^HL70189
 OBR|1|OrderNum-1001|FillOrder-1001|24331-1^Lipid Panel^LN||20100920083000|20100920083000|20100920083000|||||Hemolyzed ||LNA&Arterial Catheter&Hl70070| ProviderIDNum-100^Crow^Tom^Black^III^Dr.||||Aloha Laboratories 575 Luau Street Honolulu Hawaii 96813 ||||CH|F|
 OBX|1|NM|14647-2^Total cholesterol^LN |134465|162|mg/dl |<200| N|||F|||20100920083000 

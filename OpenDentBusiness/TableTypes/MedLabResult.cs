@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>The EHRLabResult table is structured to tightly with the HL7 standard and should have names that more reflect how the user will
-	///consume the data and for that reason for actual implementation we are using these medlab tables.
-	///Medical lab result.  This table is currently only used for LabCorp, but may be utilized by other third party lab
+	///<summary>Medical lab result.  The EHRLabResult table is structured too tightly with the HL7 standard and should have names that more reflect how 
+	///the user will consume the data and for that reason for actual implementation we are using these medlab tables.
+	///This table is currently only used for LabCorp, but may be utilized by other third party lab
 	///services in the future.  These fields are required for the LabCorp result report, used to link the result to an order,
 	///or for linking a parent and child result.  Contains data from the OBX, ZEF, and applicable NTE segments.</summary>
 	[Serializable]
@@ -11,27 +11,45 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long MedLabResultNum;
-		///<summary>FK to medlab.medLabNum.  Each MedLab object can have one to many results pointing to it.</summary>
+		///<summary>FK to medlab.medLabNum.  Each MedLab object can have one or more results pointing to it.</summary>
 		public long MedLabNum;
 		#region OBX Fields
 		///<summary>OBX.3.1 - Observation Identifier.  Reflex results will have the ObsID of the parent in OBR.26 for linking.</summary>
 		public string ObsID;
 		///<summary>OBX.3.2 - Observation Text.  LabCorp report field "TESTS".  LabCorp test name.</summary>
 		public string ObsText;
-		///<summary>OBX.5.1 - Observation Value.  LabCorp report field "RESULT".  Can be null if coded entries, prelims, canceled, or >21 chars and being
-		///returned as an attached NTE.  "TNP" will be reported for Test Not Performed.</summary>
+		///<summary>OBX.3.4 - Alternate Identifier (LOINC).  This is the LOINC code for the test performed.
+		///When displaying the results, LabCorp requires OBR.4.2, the text name of the test to be displayed, not the LOINC code.
+		///But we will store it so we can link to the LOINC code table for reporting purposes.</summary>
+		public string ObsLoinc;
+		///<summary>OBX.3.5 - Alternate Observation Text (LOINC Description).  The LOINC code description for the test performed.
+		///We will display OBR.4.2 per LabCorp requirements, but we will store this description for reporting purposes.</summary>
+		public string ObsLoincText;
+		///<summary>OBX.5.1 - Observation Value.  LabCorp report field "RESULT".
+		///Can be null if coded entries, prelims, canceled, or >21 chars and being returned as an attached NTE.
+		///"TNP" will be reported for Test Not Performed.  For value >21 chars in length: OBX.2 will be 'TX' for text,
+		///OBX.5 will be NULL (empty field), and the value will be in attached NTEs.
+		///Examples: Value less than 21 chars:
+		///OBX|1|ST|001180^Potassium, Serum^L||K+ is >6.5 mEq/L.||3.5-5.5|A||N|F|19830527||200605040929|01|
+		///Value >21 chars:
+		///OBX|6|TX|001180^Potassium, Serum^L||||3.5-5.5|||N|C|19830527||200511071406|01|
+		///NTE|1|L|Red cells observed in serum. Glucose may be falsely decreased.
+		///NTE|2|L|Potassium may be falsely increased.</summary>
 		public string ObsValue;
 		///<summary>OBX.6.1 - Identifier.  LabCorp report field "UNITS".  Units of measure, if too large it will be in the NTE segment.</summary>
 		public string ObsUnits;
 		///<summary>OBX.7 - Reference Ranges.  LabCorp report field "REFERENCE INTERVAL".  Only if applicable.</summary>
 		public string ReferenceRange;
-		///<summary>OBX.8 - Abnormal Flags.  LabCorp report field "FLAG".  Blank or null is normal.</summary>
+		///<summary>OBX.8 - Abnormal Flags.  LabCorp report field "FLAG".  Blank or null is normal.  When this is displayed on the LabCorp report
+		///it must be the human readable display name, so for example _gt (>) is displayed as "Panic High" and _lt (&lt;) is "Panic Low".</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public AbnormalFlag AbnormalFlag;
 		///<summary>OBX.11 - Observation Result Status.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public ResultStatus ResultStatus;
 		///<summary>OBX.14 - Date/Time of Observation.  yyyyMMddHHmm format in the message, no seconds.
 		///Date and time tech entered result into the Lab System.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeObs;
 		///<summary>OBX.15 - Producer ID (Producer’s Reference).  LabCorp report field "LAB".  ID of LabCorp Facility responsible for performing the
 		///testing.  The Lab Name is supplied in the ZPS segment.</summary>
@@ -58,7 +76,7 @@ namespace OpenDentBusiness {
 	public enum AbnormalFlag {
 		///<summary>0 - None.  Blank or null value indicates normal result, so no abnormal flag.</summary>
 		None,
-		///<summary>1 - Panic High.  Actual value is "&gt;" but symbol cannot be used as an enum value.</summary>
+		///<summary>1 - Panic High.  Actual value is ">" but symbol cannot be used as an enum value.</summary>
 		_gt,
 		///<summary>2 - Panic Low.  Actual value is "&lt;" but symbol cannot be used as an enum value.</summary>
 		_lt,

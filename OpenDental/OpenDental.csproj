@@ -398,17 +398,17 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormMedLabResults.cs">
+    <Compile Include="Forms\FormMedLabs.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormMedLabResults.Designer.cs">
-      <DependentUpon>FormMedLabResults.cs</DependentUpon>
+    <Compile Include="Forms\FormMedLabs.Designer.cs">
+      <DependentUpon>FormMedLabs.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormMedLabResultEdit.cs">
+    <Compile Include="Forms\FormMedLabEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormMedLabResultEdit.designer.cs">
-      <DependentUpon>FormMedLabResultEdit.cs</DependentUpon>
+    <Compile Include="Forms\FormMedLabEdit.designer.cs">
+      <DependentUpon>FormMedLabEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormAuditOrtho.cs">
       <SubType>Form</SubType>
@@ -3613,11 +3613,11 @@
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormMedLabResults.resx">
-      <DependentUpon>FormMedLabResults.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormMedLabs.resx">
+      <DependentUpon>FormMedLabs.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormMedLabResultEdit.resx">
-      <DependentUpon>FormMedLabResultEdit.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormMedLabEdit.resx">
+      <DependentUpon>FormMedLabEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormAuditOrtho.resx">
       <DependentUpon>FormAuditOrtho.cs</DependentUpon>

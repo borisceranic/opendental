@@ -5,15 +5,15 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormMedLabResults:Form {
+	public partial class FormMedLabs:Form {
 		public List<MedLab> ListMedLabs;
 		public Patient PatCur;
 
-		public FormMedLabResults() {
+		public FormMedLabs() {
 			InitializeComponent();
 		}
 
-		private void FormMedLabResults_Load(object sender,EventArgs e) {
+		private void FormMedLabs_Load(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -54,10 +54,10 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormMedLabResultEdit FormRE=new FormMedLabResultEdit();
-			FormRE.MedLabCur=ListMedLabs[e.Row];
-			FormRE.ShowDialog();
-			if(FormRE.DialogResult!=DialogResult.OK) {
+			FormMedLabEdit FormLE=new FormMedLabEdit();
+			FormLE.MedLabCur=ListMedLabs[e.Row];
+			FormLE.ShowDialog();
+			if(FormLE.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			FillGrid();
