@@ -87,6 +87,18 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
+		public static double ProcessGetDouble(DtoGetDouble dto) {
+			string result=SendAndReceive(dto);//this might throw an exception if server unavailable
+			try {
+				return PIn.Double(result);
+			}
+			catch {
+				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
+				throw new Exception(exception.Message);
+			}
+		}
+
+		///<summary></summary>
 		public static void ProcessGetVoid(DtoGetVoid dto) {
 			string result=SendAndReceive(dto);//this might throw an exception if server unavailable
 			if(result!="0"){

@@ -39,9 +39,20 @@ namespace OpenDentalWpf {
 			listColorsAR.Add(Colors.Firebrick);
 			List<DashboardAR> listDashAR=DashboardARs.Refresh(contrDashAR.DateStart);
 			if(listDashAR.Count==0) {
+				//Make a guess as to how long the user might have to wait.
+				double agingInMilliseconds=Ledgers.GetAgingComputationTime();
+				//Aging will be run a total of 13 times.
+				agingInMilliseconds=agingInMilliseconds*13;
+				TimeSpan timeSpan=TimeSpan.FromMilliseconds(agingInMilliseconds);
+				string timeEstimate="";
+				if(timeSpan.Minutes>0) {
+					timeEstimate+=timeSpan.Minutes+" "+Lans.g(this,"minutes and")+" ";
+				}
+				timeEstimate+=timeSpan.Seconds+" "+Lans.g(this,"seconds");
 				MessageBoxResult result=MessageBox.Show(Lans.g(this,
-					"A one-time routine needs to be run that will take a few moments."),"",MessageBoxButton.OKCancel);
-				if(result!=MessageBoxResult.OK){
+					"A one-time routine needs to be run that will take about")+"\r\n"
+					+timeEstimate+".  "+Lans.g(this,"Continue?"),"",MessageBoxButton.OKCancel);
+				if(result!=MessageBoxResult.OK) {
 					Close();
 					return;
 				}

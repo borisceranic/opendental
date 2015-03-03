@@ -83,6 +83,11 @@ namespace OpenDentBusiness {
 
 	}
 
+	///<summary>Gets a double.</summary>
+	public class DtoGetDouble:DataTransferObject {
+
+	}
+
 	///<summary>Used when the return type is void.  It will still return 0 to ack.</summary>
 	public class DtoGetVoid:DataTransferObject {
 		

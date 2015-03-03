@@ -135,6 +135,34 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
+		public static double GetDouble(MethodBase methodBase,params object[] parameters) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ClientWeb) {
+				throw new ApplicationException("Meth.GetDouble may only be used when RemotingRole is ClientWeb.");
+			}
+#if DEBUG
+			//Verify that it returns a double
+			MethodInfo methodInfo=null;
+			try {
+				methodInfo=methodBase.ReflectedType.GetMethod(methodBase.Name);
+			}
+			catch(AmbiguousMatchException) {
+				//Ambiguous match exceptions do not matter for the middle tier and are just annoying when they get thrown here.  Ignore them.
+			}
+			if(methodInfo!=null && methodInfo.ReturnType != typeof(double)) {
+				throw new ApplicationException("Meth.GetDouble calling class must return double.");
+			}
+#endif
+			DtoGetDouble dto=new DtoGetDouble();
+			dto.MethodName=methodBase.DeclaringType.Assembly.GetName().Name+"."
+				+methodBase.DeclaringType.Name+"."+methodBase.Name;
+			dto.Params=DtoObject.ConstructArray(parameters,GetParamTypes(methodBase));
+			dto.Credentials=new Credentials();
+			dto.Credentials.Username=Security.CurUser.UserName;
+			dto.Credentials.Password=Security.PasswordTyped;//.CurUser.Password;
+			return RemotingClient.ProcessGetDouble(dto);
+		}
+
+		///<summary></summary>
 		public static void GetVoid(MethodBase methodBase,params object[] parameters) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ClientWeb) {
 				throw new ApplicationException("Meth.GetVoid may only be used when RemotingRole is ClientWeb.");

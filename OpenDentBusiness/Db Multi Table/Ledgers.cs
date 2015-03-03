@@ -10,7 +10,27 @@ using OpenDentBusiness;
 namespace OpenDentBusiness{
 
 	///<summary>This does not correspond to any table in the database.  It works with a variety of tables to calculate aging.</summary>
-	public class Ledgers{
+	public class Ledgers {
+
+		///<summary>Returns a rough guess on how long RunAging() will take in milliseconds based on the amount of data within certain tables that are used to compute aging.</summary>
+		public static double GetAgingComputationTime() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDouble(MethodBase.GetCurrentMethod());
+			}
+			//Factor of 0.0042680625638876 was discovered by timing aging on a large database.  It proved to be very accurate when tested on other databases.
+			//A large database with 6091757 rows in the following tables took on average 26 seconds (26000 ms) to run aging.  26000(ms) / 6091757(rows) = 0.0042680625638876
+			string command=@"SELECT ((SELECT COUNT(*) FROM patient)
+				+ (SELECT COUNT(*) FROM procedurelog)
+				+ (SELECT COUNT(*) FROM paysplit)
+				+ (SELECT COUNT(*) FROM adjustment)
+				+ (SELECT COUNT(*) FROM claimproc)
+				+ (SELECT COUNT(*) FROM payplan)
+				+ (SELECT COUNT(*) FROM payplancharge)) * 0.0042680625638876 AgingInMilliseconds";
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				command+=" FROM dual";//Oracle requires a FROM clause be present.
+			}
+			return PIn.Double(Db.GetScalar(command));
+		}
 
 		///<summary>This runs aging for all patients.  If using monthly aging, it always just runs the aging as of the last date again.  If using daily aging, it runs it as of today.  This logic used to be in FormAging, but is now centralized.</summary>
 		public static void RunAging() {
