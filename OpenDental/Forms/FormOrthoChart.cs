@@ -506,20 +506,24 @@ namespace OpenDental {
 				OrthoCharts.Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {
-				SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,_patCur.PatNum
-					//DateService is parsed from this field in the audit trail function
-					,Lan.g(this,"Ortho chart field edited.  Field date")+": "+listUpdNew[i].DateService.ToShortDateString()+"  "
-									+Lan.g(this,"Field name")+": "+listUpdNew[i].FieldName+"\r\n"
-									+Lan.g(this,"Old value")+": \""+listUpdDB[i].FieldValue+"\"  "
-									+Lan.g(this,"New value")+": \""+listUpdNew[i].FieldValue+"\" "
-									+listUpdDB[i].DateService.ToString("yyyyMMdd")//This date stamp must be the last 8 characters for new OrthoEdit audit trail entries.
-					);
+				if(listUpdDB[i].FieldValue==listUpdNew[i].FieldValue) {
+					continue;//values equal. do not update/create log entry.
+				}
 				if(listUpdNew[i].FieldValue!="") {//Actually update rows that have a new value.
 					OrthoCharts.Update(listUpdNew[i],listUpdDB[i]);
 				}
 				else {//instead of updating to a blank value, we delete the row from the DB.
 					listDel.Add(listUpdDB[i]);
 				}
+				#region security log entry
+				SecurityLogs.MakeLogEntry(Permissions.OrthoChartEdit,_patCur.PatNum
+					//DateService is parsed from this field in the audit trail function
+					,Lan.g(this,"Ortho chart field edited.  Field date")+": "+listUpdNew[i].DateService.ToShortDateString()+"  "
+					+Lan.g(this,"Field name")+": "+listUpdNew[i].FieldName+"\r\n"
+					+Lan.g(this,"Old value")+": \""+listUpdDB[i].FieldValue+"\"  "
+					+Lan.g(this,"New value")+": \""+listUpdNew[i].FieldValue+"\" "
+					+listUpdDB[i].DateService.ToString("yyyyMMdd"));//This date stamp must be the last 8 characters for new OrthoEdit audit trail entries.
+				#endregion
 			}
 			for(int i=0;i<listDel.Count;i++) {//All logging should have been performed above in the "Update block"
 				OrthoCharts.Delete(listDel[i].OrthoChartNum);
