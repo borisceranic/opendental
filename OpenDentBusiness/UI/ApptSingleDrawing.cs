@@ -766,7 +766,12 @@ namespace OpenDentBusiness.UI {
 			if(endHour==0) {
 				endHour=24;
 			}
-			if(aptHourBegin>=endHour || aptHourEnd<=beginHour) {
+			//If the appointment begins on or after the stopping hour (because we don't support minutes currently) then this appointment is not visible.
+			//However, we need to check the time portion of the appointment ending time in correlation to the begin hour 
+			//because the appointment could end within the same hour that the printing begin hour is set to.
+			//E.g. an appointment from 8 AM to 8:40 AM needs to show as visible when printing a schedule from 8 AM to 5 PM.
+			TimeSpan timePrintBegin=new TimeSpan(beginHour,0,0);
+			if(aptHourBegin>=endHour || aptTimeEnd<=timePrintBegin) {
 				return false;
 			}
 			return true;
