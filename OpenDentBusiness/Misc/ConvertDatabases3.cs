@@ -7273,6 +7273,17 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE tasklist ADD INDEX indexParent (Parent)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX tasklist_Parent ON tasklist (Parent)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
 				command="UPDATE preference SET ValueString = '15.1.14.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
