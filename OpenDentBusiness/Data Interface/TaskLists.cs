@@ -14,27 +14,31 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<TaskList>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT tasklist.*,"
-				+"(SELECT COUNT(*) FROM taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
-				+"AND task.TaskNum=taskancestor.TaskNum ";
+			string command=@"SELECT tasklist.*,COALESCE(unreadtasks.Count,0) 'NewTaskCount',t2.Descript 'ParentDesc1',t3.Descript 'ParentDesc2'
+					FROM tasklist
+					LEFT JOIN tasksubscription ON tasksubscription.TaskListNum=tasklist.TaskListNum
+					LEFT JOIN tasklist t2 ON t2.TaskListNum=tasklist.Parent 
+					LEFT JOIN tasklist t3 ON t3.TaskListNum=t2.Parent 
+					LEFT JOIN (
+						SELECT taskancestor.TaskListNum, COUNT(*) 'Count'
+						FROM taskancestor,task
+						WHERE task.TaskNum=taskancestor.TaskNum";
 			if(PrefC.GetBool(PrefName.TasksNewTrackedByUser)) {
-				command+="AND EXISTS(SELECT * FROM taskunread WHERE taskunread.TaskNum=task.TaskNum "
-					+"AND taskunread.UserNum="+POut.Long(userNum)+") "
-					+"AND task.TaskStatus !=2 ";//not done
+				command+=@"
+						AND EXISTS(SELECT * FROM taskunread 
+							WHERE taskunread.TaskNum=task.TaskNum 
+							AND taskunread.UserNum="+POut.Long(userNum)+@") 
+						AND task.TaskStatus!="+POut.Int((int)TaskStatusEnum.Done);
 			}
 			else {
-				command+="AND task.TaskStatus=0 ";
+				command+=@"
+						AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
 			}
-			command+="),"
-				+"t2.Descript,t3.Descript FROM tasksubscription "
-				+"LEFT JOIN tasklist ON tasklist.TaskListNum=tasksubscription.TaskListNum "
-				+"LEFT JOIN tasklist t2 ON t2.TaskListNum=tasklist.Parent "
-				+"LEFT JOIN tasklist t3 ON t3.TaskListNum=t2.Parent "
-				//+"LEFT JOIN taskancestor ON taskancestor.TaskList=tasklist.TaskList "
-				//+"LEFT JOIN task ON task.TaskNum=taskancestor.TaskNum AND task.TaskStatus=0 "
-				+"WHERE tasksubscription.UserNum="+POut.Long(userNum)
-				+" AND tasksubscription.TaskListNum!=0 "
-				+"ORDER BY tasklist.DateTimeEntry";
+			command+=@"
+						GROUP BY taskancestor.TaskListNum) unreadtasks ON unreadtasks.TaskListNum = tasklist.TaskListNum 
+					WHERE tasksubscription.UserNum="+POut.Long(userNum)+@"
+					AND tasksubscription.TaskListNum!=0 
+					ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -43,10 +47,12 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<TaskList>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT tasklist.*,"+DbHelper.IfNull("A.Num",0)+" "
-				+"FROM tasklist "
-				+"LEFT JOIN (SELECT tasklist.TaskListNum,COUNT(*) Num FROM tasklist,taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
-				+"AND task.TaskNum=taskancestor.TaskNum ";
+			string command=@"SELECT tasklist.*,COALESCE(unreadtasks.Count,0) 'NewTaskCount' 
+				FROM tasklist 
+				LEFT JOIN (SELECT tasklist.TaskListNum,COUNT(*) Count 
+					FROM tasklist,taskancestor,task 
+					WHERE taskancestor.TaskListNum=tasklist.TaskListNum 
+					AND task.TaskNum=taskancestor.TaskNum ";
 			if(PrefC.GetBool(PrefName.TasksNewTrackedByUser)) {
 				command+="AND EXISTS(SELECT * FROM taskunread WHERE taskunread.TaskNum=task.TaskNum ";
 				//if a list is someone's inbox, 
@@ -55,16 +61,16 @@ namespace OpenDentBusiness{
 				command+="THEN (taskunread.UserNum=(SELECT UserNum FROM userod WHERE userod.TaskListInBox=tasklist.TaskListNum LIMIT 1)) ";
 				//otherwise, restrict by current user
 				command+="ELSE taskunread.UserNum="+POut.Long(userNum)+" END)) "
-					+"AND task.TaskStatus !=2 ";//not done
+					+"AND task.TaskStatus!="+POut.Int((int)TaskStatusEnum.Done)+" ";//not done
 			}
 			else {
 				command+="AND task.TaskStatus=0 ";
 			}
-			command+="GROUP BY tasklist.TaskListNum) A ON A.TaskListNum=tasklist.TaskListNum "
+			command+="GROUP BY tasklist.TaskListNum) unreadtasks ON unreadtasks.TaskListNum=tasklist.TaskListNum "
 				+"WHERE Parent=0 "
 				+"AND DateTL < "+POut.Date(new DateTime(1880,01,01))+" "
 				+"AND IsRepeating=0 "
-				+"ORDER BY Descript";//DateTimeEntry";
+				+"ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -75,14 +81,14 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT tasklist.*,"
 				+"(SELECT COUNT(*) FROM taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
-				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus=0) "
+				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New)+") "
 				//I don't think the repeating trunk would ever track by user, so no special treatment here.
 				//Acutual behavior in both cases needs to be tested.
 				+"FROM tasklist "
 				+"WHERE Parent=0 "
 				+"AND DateTL < "+POut.Date(new DateTime(1880,01,01))+" "
 				+"AND IsRepeating=1 "
-				+"ORDER BY DateTimeEntry";
+				+"ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -102,18 +108,18 @@ namespace OpenDentBusiness{
 					//then restrict by that user
 					command+="AND taskunread.UserNum="+POut.Long(userNumInbox)+") ";
 				}
-				else{
+				else {
 					//otherwise, restrict by current user
 					command+="AND taskunread.UserNum="+POut.Long(userNum)+") ";
 				}
 			}
 			else {
-				command+="AND task.TaskStatus=0";
+				command+="AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
 			}
 			command+=") "
 				+"FROM tasklist "
-				+"WHERE Parent="+POut.Long(parent)
-				+" ORDER BY DateTimeEntry";
+				+"WHERE Parent="+POut.Long(parent)+" "
+				+"ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -125,12 +131,12 @@ namespace OpenDentBusiness{
 			string command=
 				"SELECT tasklist.*,"
 				+"(SELECT COUNT(*) FROM taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
-				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus=0) "
+				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New)+") 'NewTaskCount' "
 				//See the note in RefreshRepeatingTrunk.  Behavior needs to be tested.
 				+"FROM tasklist "
 				+"WHERE IsRepeating=1 "
 				+"AND DateType="+POut.Long((int)dateType)+" "
-				+"ORDER BY DateTimeEntry";
+				+"ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -161,14 +167,14 @@ namespace OpenDentBusiness{
 			//	command+="AND EXISTS(SELECT * FROM taskunread WHERE taskunread.TaskNum=task.TaskNum)";
 			//}
 			//else {
-				command+="AND task.TaskStatus=0";
+				command+="AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
 			//}
-			command+=") "
+				command+=") 'NewTaskCount' "
 				+"FROM tasklist "
 				+"WHERE DateTL >= "+POut.Date(dateFrom)
 				+" AND DateTL <= "+POut.Date(dateTo)
 				+" AND DateType="+POut.Long((int)dateType)
-				+" ORDER BY DateTimeEntry";
+				+" ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
 			return TableToList(Db.GetTable(command));
 		}
 
@@ -191,21 +197,34 @@ namespace OpenDentBusiness{
 			string command="SELECT * FROM tasklist WHERE DateType=0 ";
 		}*/
 
+		///<summary>The table passed in can contain additional columns: "NewTaskCount", "ParentDesc1", "ParentDesc2".  These additional columns are used when getting a list of task lists for trunks.</summary>
 		private static List<TaskList> TableToList(DataTable table){
 			//No need to check RemotingRole; no call to db.
 			List<TaskList> retVal=Crud.TaskListCrud.TableToList(table);
-			TaskList tasklist;
 			string desc;
+			//Check if the table passed in contains any of the special columns used to fill task lists for trunks.  If not, simply return.
+			if(!table.Columns.Contains("NewTaskCount")) {
+				return retVal;
+			}
+			//The following ParentDesc columns are optional.
+			bool hasParentDesc=false;
+			if(table.Columns.Contains("ParentDesc1")
+				&& table.Columns.Contains("ParentDesc2")) 
+			{
+				hasParentDesc=true;
+			}
+			//There were special non db columns passed in that need to be set.
+			//Loop through the entire list of task lists and set their corresponding non db columns to the values of the table passed in.
 			for(int i=0;i<retVal.Count;i++) {
-				if(table.Columns.Count>9){
-					retVal[i].NewTaskCount=PIn.Int(table.Rows[i][9].ToString());
-				}
-				if(table.Columns.Count>10){
-					desc=PIn.String(table.Rows[i][10].ToString());
-					if(desc!=""){
+				//We know at this point that the table passed in contains a NewTaskCount column.
+				retVal[i].NewTaskCount=PIn.Int(table.Rows[i]["NewTaskCount"].ToString());
+				if(hasParentDesc) {//Check for optional parent descriptions.
+					//Create visual heirarchy of tasklists
+					desc=PIn.String(table.Rows[i]["ParentDesc1"].ToString());
+					if(desc!="") {
 						retVal[i].ParentDesc=desc+"/";
 					}
-					desc=PIn.String(table.Rows[i][11].ToString());
+					desc=PIn.String(table.Rows[i]["ParentDesc2"].ToString());
 					if(desc!="") {
 						retVal[i].ParentDesc=desc+"/"+retVal[i].ParentDesc;
 					}
