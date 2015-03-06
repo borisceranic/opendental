@@ -7311,13 +7311,41 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptCommLogWithProcedure','0')";
 					Db.NonQ(command);
 				}
-				command="SELECT CodeNum FROM procedurecode WHERE ProcCode='D9986'";//oracle compatible
+				command="SELECT CodeNum FROM procedurecode WHERE ProcCode='D9986'";//Broken appointment procedure for CDT 2015.  Oracle compatible.
 				long codeNum=PIn.Long(Db.GetScalar(command));
-				if(codeNum!=0) {
-					command="SELECT ValueString FROM preference WHERE PrefName='BrokenAppointmentAdjustmentType'";//oracle compatible
-					long brokenAdjType=PIn.Long(Db.GetScalar(command));
-					command="DELETE FROM adjustment WHERE AdjType="+brokenAdjType+" AND AdjAmt=0";//oracle compatible
-					Db.NonQ(command);
+				if(codeNum!=0) {//If foreign, the customer will probably not have D9986.  This is for USA only.
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						//Make a 'broken appointment' procedure for every adjustment in the database.
+						command="SELECT ValueString FROM preference WHERE PrefName='BrokenAppointmentAdjustmentType'";
+						long brokenAdjType=PIn.Long(Db.GetScalar(command));
+						command="SELECT * FROM adjustment WHERE AdjType="+brokenAdjType;
+						DataTable tableBrokenAdjustments=Db.GetTable(command);
+						for(int i=0;i<tableBrokenAdjustments.Rows.Count;i++) {
+							DateTime dateAdj=PIn.Date(tableBrokenAdjustments.Rows[i]["AdjDate"].ToString());
+							command="INSERT INTO procedurelog ("
+								+"PatNum,DateTP,ProcDate,DateEntryC,ProcFee,ProcStatus,ProvNum,ClinicNum,CodeNum,UnitQty,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode) VALUES("
+								+tableBrokenAdjustments.Rows[i]["PatNum"].ToString()+","
+								+POut.Date(dateAdj,true)+","//DateTP
+								+POut.Date(dateAdj,true)+","//ProcDate
+								+POut.Date(dateAdj,true)+","//DateEntryC
+								+"0,"//ProcFee
+								+"2,"//ProcStatus complete
+								+tableBrokenAdjustments.Rows[i]["ProvNum"].ToString()+","
+								+tableBrokenAdjustments.Rows[i]["ClinicNum"].ToString()+","
+								+codeNum.ToString()+","//Code D9986
+								+"1,"//UnitQty
+								+"'','','','','')";//CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode
+							Db.NonQ(command);
+						}
+						//Remove all adjustments that do not have an amount.
+						//Leaving adjustments with amounts is intended because the procedures we created will have a 0 fee which will not affect reports.
+						command="DELETE FROM adjustment WHERE AdjType="+brokenAdjType+" AND AdjAmt=0";
+						Db.NonQ(command);
+					}
+					else {//Oracle
+						//Not going to worry about Oracle automation for inserting procedures.
+						//We would have to spell out every single column that does not allow null values and no one uses Oracle. -jsalmon
+					}
 					command="UPDATE procedurecode SET NoBillIns=1 WHERE CodeNum="+codeNum;//oracle compatible
 					Db.NonQ(command);
 				}
