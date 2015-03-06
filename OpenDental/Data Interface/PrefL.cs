@@ -32,10 +32,6 @@ namespace OpenDental {
 		}
 
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent) {
-			if(MessageBox.Show("Would you like to copy files to the server?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
-				Application.Exit();
-				return false;//If user clicks cancel, then exit program
-			}
 			string folderUpdate="";
 			if(PrefC.AtoZfolderUsed) {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
