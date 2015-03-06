@@ -921,7 +921,15 @@ namespace OpenDental{
 						field.FieldValue=Providers.GetLongDesc(pat.PriProv);
 						break;
 					case "text":
-						field.FieldValue=GetParamByName(sheet,"text").ParamValue.ToString();
+						//If the user sets a Label Text as their patient label, then the "text" param will be null.
+						//We will handle this case by manually setting the field value to name and address here.
+						SheetParameter paramCur=GetParamByName(sheet,"text");
+						if(paramCur==null) {
+							field.FieldValue=pat.FName+" "+pat.LName+"\r\n"+pat.Address+"\r\n"+pat.City+", "+pat.State+" "+pat.Zip+"\r\n";
+						}
+						else {
+							field.FieldValue=paramCur.ParamValue.ToString();
+						}
 						break;
 				}
 			}
