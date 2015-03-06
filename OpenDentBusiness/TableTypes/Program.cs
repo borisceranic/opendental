@@ -91,6 +91,7 @@ namespace OpenDentBusiness{
 		Sirona,
 		Sopro,
 		TigerView,
+		Triana,
 		Trojan,
 		Trophy,
 		TrophyEnhanced,
