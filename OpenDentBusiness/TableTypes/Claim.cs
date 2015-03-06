@@ -64,7 +64,7 @@ namespace OpenDentBusiness{
 		public YN EmployRelated;
 		///<summary>True if is ortho.</summary>
 		public bool IsOrtho;
-		///<summary>Remaining months of ortho. Valid values are 1-36.</summary>
+		///<summary>Remaining months of ortho.  Valid values are 1-36, although we allow greater than or equal to 0.</summary>
 		public byte OrthoRemainM;
 		///<summary>Date ortho appliance placed.</summary>
 		public DateTime OrthoDate;
@@ -153,6 +153,8 @@ namespace OpenDentBusiness{
 		public string OrigRefNum;
 		///<summary>FK to provider.ProvNum.  Ordering provider override.  Medical eclaims only.  Defaults to zero.  If set to zero, then the ProvTreat will go out on the eclaim instead.</summary>
 		public long ProvOrderOverride;
+		///<summary>Total estimated months of ortho.  Valid values are 1-36, although we allow greater than or equal to 0.</summary>
+		public byte OrthoTotalM;
 
 		///<summary>Not a data column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

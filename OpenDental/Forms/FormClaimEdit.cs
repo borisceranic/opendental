@@ -345,6 +345,8 @@ namespace OpenDental{
 		private UI.Button butPickProvTreat;
 		private long _provNumOrderingSelected;
 		private long _provNumBillSelected;
+		private ValidNum textOrthoTotalM;
+		private Label label96;
 		private long _provNumTreatSelected;
 
 		///<summary></summary>
@@ -664,6 +666,8 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butPickProvBill = new OpenDental.UI.Button();
 			this.butPickProvTreat = new OpenDental.UI.Button();
+			this.textOrthoTotalM = new OpenDental.ValidNum();
+			this.label96 = new System.Windows.Forms.Label();
 			this.groupProsth.SuspendLayout();
 			this.groupOrtho.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -877,6 +881,8 @@ namespace OpenDental{
 			// groupOrtho
 			// 
 			this.groupOrtho.BackColor = System.Drawing.SystemColors.Window;
+			this.groupOrtho.Controls.Add(this.textOrthoTotalM);
+			this.groupOrtho.Controls.Add(this.label96);
 			this.groupOrtho.Controls.Add(this.textOrthoDate);
 			this.groupOrtho.Controls.Add(this.labelOrthoDate);
 			this.groupOrtho.Controls.Add(this.textOrthoRemainM);
@@ -908,7 +914,7 @@ namespace OpenDental{
 			// 
 			// textOrthoRemainM
 			// 
-			this.textOrthoRemainM.Location = new System.Drawing.Point(115, 60);
+			this.textOrthoRemainM.Location = new System.Drawing.Point(115, 80);
 			this.textOrthoRemainM.MaxVal = 255;
 			this.textOrthoRemainM.MinVal = 0;
 			this.textOrthoRemainM.Name = "textOrthoRemainM";
@@ -928,7 +934,7 @@ namespace OpenDental{
 			// 
 			// labelOrthoRemainM
 			// 
-			this.labelOrthoRemainM.Location = new System.Drawing.Point(2, 61);
+			this.labelOrthoRemainM.Location = new System.Drawing.Point(2, 81);
 			this.labelOrthoRemainM.Name = "labelOrthoRemainM";
 			this.labelOrthoRemainM.Size = new System.Drawing.Size(112, 18);
 			this.labelOrthoRemainM.TabIndex = 102;
@@ -3669,6 +3675,24 @@ namespace OpenDental{
 			this.butPickProvTreat.Text = "...";
 			this.butPickProvTreat.Click += new System.EventHandler(this.butPickProvTreat_Click);
 			// 
+			// textOrthoTotalM
+			// 
+			this.textOrthoTotalM.Location = new System.Drawing.Point(115, 58);
+			this.textOrthoTotalM.MaxVal = 255;
+			this.textOrthoTotalM.MinVal = 0;
+			this.textOrthoTotalM.Name = "textOrthoTotalM";
+			this.textOrthoTotalM.Size = new System.Drawing.Size(39, 20);
+			this.textOrthoTotalM.TabIndex = 105;
+			// 
+			// label96
+			// 
+			this.label96.Location = new System.Drawing.Point(2, 59);
+			this.label96.Name = "label96";
+			this.label96.Size = new System.Drawing.Size(112, 18);
+			this.label96.TabIndex = 106;
+			this.label96.Text = "Months Total";
+			this.label96.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormClaimEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -4112,6 +4136,7 @@ namespace OpenDental{
 			textReasonUnder.Text=ClaimCur.ReasonUnderPaid;
 			textNote.Text=ClaimCur.ClaimNote;
 			checkIsOrtho.Checked=ClaimCur.IsOrtho;
+			textOrthoTotalM.Text=ClaimCur.OrthoTotalM.ToString();
 			textOrthoRemainM.Text=ClaimCur.OrthoRemainM.ToString();
 			if(ClaimCur.OrthoDate.Year < 1860){
 				textOrthoDate.Text="";
@@ -6018,6 +6043,7 @@ namespace OpenDental{
 			//ispreauth
 			ClaimCur.ProvBill=_provNumBillSelected;
 			ClaimCur.IsOrtho=checkIsOrtho.Checked;
+			ClaimCur.OrthoTotalM=PIn.Byte(textOrthoTotalM.Text);
 			ClaimCur.OrthoRemainM=PIn.Byte(textOrthoRemainM.Text);
 			ClaimCur.OrthoDate=PIn.Date(textOrthoDate.Text);
 			ClaimCur.RefNumString=textRefNum.Text;

@@ -752,7 +752,7 @@ namespace OpenDentBusiness
 					//2300 DN1: Orthodontic Total Months of Treatment.
 					if(claim.IsOrtho) {
 						sw.Write("DN1"+s
-							+s//DN101 1/15 Quantity: Total months of orthodontic treatment. Not used because no field yet in OD.
+							+((claim.OrthoTotalM>0)?claim.OrthoTotalM.ToString():"")+s//DN101 1/15 Quantity: Orthodontic Treatment Months Count.  Estimated number of treatment months.
 							+claim.OrthoRemainM.ToString());//DN102 1/15 Quantity: Number of treatment months remaining.
 						EndSegment(sw);//DN103 is not used and DN104 is situational but we do not use it.
 					}
@@ -2842,6 +2842,10 @@ namespace OpenDentBusiness
 			if(Procedures.GetUniqueDiagnosticCodes(procList,true).Count>12) {
 				Comma(strb);
 				strb.Append("Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
+			}
+			if(claim.MedType==EnumClaimMedType.Dental && claim.IsOrtho && claim.OrthoTotalM>0 && claim.OrthoTotalM<claim.OrthoRemainM) {
+				Comma(strb);
+				strb.Append("Ortho months total must be greater than or equal to ortho months remaining.");
 			}
 			Procedure proc;
 			ProcedureCode procCode;

@@ -7648,6 +7648,18 @@ namespace OpenDentBusiness {
 				    +"'Triana')";
 					Db.NonQ(command);
 				}//end Triana bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claim ADD OrthoTotalM tinyint unsigned NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claim ADD OrthoTotalM number(3)";
+					Db.NonQ(command);
+					command="UPDATE claim SET OrthoTotalM = 0 WHERE OrthoTotalM IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim MODIFY OrthoTotalM NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -7660,7 +7672,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
 
 
 
