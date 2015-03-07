@@ -50,9 +50,11 @@ namespace OpenDentBusiness{
 
 		public static List<FieldNameAndType> GetFullList() {
 			List<FieldNameAndType> retVal=new List<FieldNameAndType>();
+			retVal.Add(new FieldNameAndType("accountNum",DataTypeHL7.CX));//used by LabCorp to send the accountNum and fasting flag in position 7
 			retVal.Add(new FieldNameAndType("ackCode",DataTypeHL7.ID,"0008"));
 			retVal.Add(new FieldNameAndType("allergenRxNorm",DataTypeHL7.CWE));//Example: RxNormCode^^RXNORM^^^^^^
 			retVal.Add(new FieldNameAndType("allergenType",DataTypeHL7.CWE,"0127"));//DA - Drug Allergy, FA - Food Allergy, MA - Miscellaneous Allergy
+			retVal.Add(new FieldNameAndType("altPatId",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("apt.AptDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("apt.AptNum",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("apt.aptStatus",DataTypeHL7.CWE,"0278"));
@@ -66,12 +68,24 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("apt.operatory",DataTypeHL7.CWE));//Schedule ID
 			retVal.Add(new FieldNameAndType("apt.type",DataTypeHL7.CWE,"0277"));//Normal or Complete
 			retVal.Add(new FieldNameAndType("apt.userOD",DataTypeHL7.CWE));//Filler contact person and entered by person
+			retVal.Add(new FieldNameAndType("base64File",DataTypeHL7.ST));//base64 representation of an embedded file
 			retVal.Add(new FieldNameAndType("carrier.addressCityStateZip",DataTypeHL7.XAD));
 			retVal.Add(new FieldNameAndType("carrier.CarrierName",DataTypeHL7.XON));
 			retVal.Add(new FieldNameAndType("carrier.ElectID",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("carrier.Phone",DataTypeHL7.XTN));
+			retVal.Add(new FieldNameAndType("clinicalInfo",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("dateTime.Now",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("dateTimeCollected",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("dateTimeEntered",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("dateTimeObs",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("dateTimeReported",DataTypeHL7.DTM));
+			retVal.Add(new FieldNameAndType("dateTimeSpecimen",DataTypeHL7.DR));
 			retVal.Add(new FieldNameAndType("eventType",DataTypeHL7.ID,"0003"));
+			retVal.Add(new FieldNameAndType("facilityId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("facilityName",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("facilityAddress",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("facilityPhone",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("facilityDirector",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("guar.addressCityStateZip",DataTypeHL7.XAD));
 			retVal.Add(new FieldNameAndType("guar.birthdateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("guar.ChartNumber",DataTypeHL7.CX));
@@ -97,9 +111,21 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("inssub.subBirthdate",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("inssub.SubscriberID",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("inssub.subscriberName",DataTypeHL7.XPN));
+			retVal.Add(new FieldNameAndType("labNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlab.NoteLab column
+			retVal.Add(new FieldNameAndType("labPatId",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("medicationRxNorm",DataTypeHL7.CWE));//code^descript^codeSystem, Example: RxNorm Code^^RXNORM, descript is ignored
 			retVal.Add(new FieldNameAndType("messageControlId",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("messageType",DataTypeHL7.MSG));
+			retVal.Add(new FieldNameAndType("obsAbnormalFlag",DataTypeHL7.ID,"0078"));
+			retVal.Add(new FieldNameAndType("obsId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlabresult.Note column
+			retVal.Add(new FieldNameAndType("obsRefRange",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("obsTestId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsUnits",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsValue",DataTypeHL7.Varied));
+			retVal.Add(new FieldNameAndType("orderingProv",DataTypeHL7.XCN));
+			retVal.Add(new FieldNameAndType("parentObsId",DataTypeHL7.PRL));
+			retVal.Add(new FieldNameAndType("parentObsTestId",DataTypeHL7.EIP));
 			retVal.Add(new FieldNameAndType("pat.addressCityStateZip",DataTypeHL7.XAD));
 			retVal.Add(new FieldNameAndType("pat.birthdateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("pat.ChartNumber",DataTypeHL7.CX));
@@ -116,6 +142,8 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("pat.SSN",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("pat.WkPhone",DataTypeHL7.XTN));
 			retVal.Add(new FieldNameAndType("pat.Urgency",DataTypeHL7.IS,"0018"));//0 - Unknown, 1 - NoProblems, 2 - NeedsCare, 3 - Urgent
+			retVal.Add(new FieldNameAndType("patBirthdateAge",DataTypeHL7.DTM));//atually not a DTM data type since LabCorp uses bday^years^months^days
+			retVal.Add(new FieldNameAndType("patNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlab.NotePat column
 			retVal.Add(new FieldNameAndType("patientIds",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("patplan.Ordinal",DataTypeHL7.ST));//1,2,3...
 			retVal.Add(new FieldNameAndType("patplan.policyNum",DataTypeHL7.ST));
@@ -138,10 +166,17 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("prov.provIdNameLFM",DataTypeHL7.XCN));//Provider id table is user defined table and different number depending on what segment it is pulled from.  Example: FT1 Performed By Code table is 0084, PV1 Attending Doctor is table 0010
 			retVal.Add(new FieldNameAndType("prov.provIdName",DataTypeHL7.XCN));
 			retVal.Add(new FieldNameAndType("prov.provType",DataTypeHL7.CWE,"0182"));//accepted values: 'd' or 'D' for dentist, 'h' or 'H' for hygienist
+			retVal.Add(new FieldNameAndType("resultStatus",DataTypeHL7.ID,"0123"));
 			retVal.Add(new FieldNameAndType("segmentAction",DataTypeHL7.ID,"0206"));//A-Add/Insert, D-Delete, U-Update, X-No Change
 			retVal.Add(new FieldNameAndType("sendingApp",DataTypeHL7.HD,"0361"));//the Open Dental HL7 root assigned to the office and stored in the oidinternal table with the IDType of Root
+			retVal.Add(new FieldNameAndType("sendingFacility",DataTypeHL7.HD,"0362"));
 			retVal.Add(new FieldNameAndType("separators^~\\&",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("sequenceNum",DataTypeHL7.SI));
+			retVal.Add(new FieldNameAndType("specimenAction",DataTypeHL7.ID,"0065"));
+			retVal.Add(new FieldNameAndType("specimenDescript",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("specimenId",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("specimenIdAlt",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("totalVolume",DataTypeHL7.CQ));
 			return retVal;
 		}
 
@@ -168,6 +203,8 @@ namespace OpenDentBusiness{
 
 	///<summary>Data types are listed in HL7 docs section 2.15.  The items in this enumeration can be freely rearranged without damaging the database.  But can't change spelling or remove existing item.</summary>
 	public enum DataTypeHL7 {
+		///<summary>Coded element.  Has been replaced in v2.6 with CNE and CWE, retained for backward compatibility only.</summary>
+		CE,
 		///<summary>Coded with no exceptions.  Examples: ProcCode (Dxxxx) or TreatmentArea like tooth^surface</summary>
 		CNE,
 		///<summary>Composite price.  Example: 125.00</summary>
@@ -178,27 +215,33 @@ namespace OpenDentBusiness{
 		CWE,
 		///<summary>Extended composite ID with check digit.  Example: patient.PatNum or patient.ChartNumber or appointment.AptNum.</summary>
 		CX,
+		///<summary>Date/Time Range.  DateTimeStart&DateTimeEnd.</summary>
+		DR,
 		///<summary>Date.  yyyyMMdd.  4,6,or 8</summary>
 		DT,
 		///<summary>Date/Time.  yyyyMMddHHmmss etc.  Allowed 4,6,8,10,12,14.  Possibly more, but unlikely.</summary>
 		DTM,
 		///<summary>Entity identifier.  Example: appointment.AptNum</summary>
 		EI,
-		/// <summary>Formatted text data.  We support new lines identified by '\.br\' (where '\' is the defined escape char, \ is the default)</summary>
+		///<summary>Entity identifier pair.</summary>
+		EIP,
+		///<summary>Formatted text data.  We support new lines identified by '\.br\' (where '\' is the defined escape char, \ is the default)</summary>
 		FT,
-		/// <summary>Hierarchic designator.  Application identifier.  Example: "OD" for OpenDental.</summary>
+		///<summary>Hierarchic designator.  Application identifier.  Example: "OD" for OpenDental.</summary>
 		HD,
-		/// <summary>Coded value for HL7 defined tables.  Must include TableId.  Example: 0003 is eCW's event type table id.</summary>
+		///<summary>Coded value for HL7 defined tables.  Must include TableId.  Example: 0003 is eCW's event type table id.</summary>
 		ID,
 		///<summary>Coded value for user-defined tables.  Example: Administrative Sex, F=Female, M=Male,U=Unknown.</summary>
 		IS,
-		/// <summary>Message type.  Example: composed of messageType^eventType like DFT^P03</summary>
+		///<summary>Message type.  Example: composed of messageType^eventType like DFT^P03</summary>
 		MSG,
-		/// <summary>Numeric.  Example: transaction quantity of 1.0</summary>
+		///<summary>Numeric.  Example: transaction quantity of 1.0</summary>
 		NM,
-		/// <summary>Person Location.  ^^^^^Person Location Type^^^Location Description.  Example: ^^^^^S^^^West Salem Elementary.  S=site (or grade school) description.</summary>
+		///<summary>Person Location.  ^^^^^Person Location Type^^^Location Description.  Example: ^^^^^S^^^West Salem Elementary.  S=site (or grade school) description.</summary>
 		PL,
-		/// <summary>Processing type.  Examples: P-Production, T-Test.</summary>
+		///<summary>Parent Result Link.</summary>
+		PRL,
+		///<summary>Processing type.  Examples: P-Production, T-Test.</summary>
 		PT,
 		///<summary>Sequence ID.  Example: for repeating segments number that begins with 1.</summary>
 		SI,
@@ -206,7 +249,10 @@ namespace OpenDentBusiness{
 		ST,
 		///<summary>Timing quantity.  Example: for eCW appointment ^^duration^startTime^endTime like ^^1200^20120101112000^20120101114000 for 20 minute (1200 second) appointment starting at 11:20 on 01/01/2012</summary>
 		TQ,
-		/// <summary>Version identifier.  Example: 2.3</summary>
+		///<summary>Used if the data type for a field can vary based on other factors.  For example, when the field is a test observation value,
+		///the data type depends on the type of test and how the results of the test are reported.</summary>
+		Varied,
+		///<summary>Version identifier.  Example: 2.3</summary>
 		VID,
 		///<summary>Extended address.  Example: Addr1^Addr2^City^State^Zip like 120 Main St.^Suite 3^Salem^OR^97302</summary>
 		XAD,

@@ -47,6 +47,8 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				medLab=new MedLab();
 				medLab.MedLabNum          = PIn.Long  (table.Rows[i]["MedLabNum"].ToString());
+				medLab.SendingApp         = PIn.String(table.Rows[i]["SendingApp"].ToString());
+				medLab.SendingFacility    = PIn.String(table.Rows[i]["SendingFacility"].ToString());
 				medLab.PatNum             = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				medLab.ProvNum            = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				medLab.PatIDLab           = PIn.String(table.Rows[i]["PatIDLab"].ToString());
@@ -57,6 +59,8 @@ namespace OpenDentBusiness.Crud{
 				medLab.SpecimenID         = PIn.String(table.Rows[i]["SpecimenID"].ToString());
 				medLab.ObsTestID          = PIn.String(table.Rows[i]["ObsTestID"].ToString());
 				medLab.ObsTestDescript    = PIn.String(table.Rows[i]["ObsTestDescript"].ToString());
+				medLab.ObsTestLoinc       = PIn.String(table.Rows[i]["ObsTestLoinc"].ToString());
+				medLab.ObsTestLoincText   = PIn.String(table.Rows[i]["ObsTestLoincText"].ToString());
 				medLab.DateTimeCollected  = PIn.DateT (table.Rows[i]["DateTimeCollected"].ToString());
 				medLab.TotalVolume        = PIn.String(table.Rows[i]["TotalVolume"].ToString());
 				string actionCode=table.Rows[i]["ActionCode"].ToString();
@@ -133,12 +137,14 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MedLabNum,";
 			}
-			command+="PatNum,ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,ObsTestID,ObsTestDescript,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
+			command+="SendingApp,SendingFacility,PatNum,ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(medLab.MedLabNum)+",";
 			}
 			command+=
-				     POut.Long  (medLab.PatNum)+","
+				 "'"+POut.String(medLab.SendingApp)+"',"
+				+"'"+POut.String(medLab.SendingFacility)+"',"
+				+    POut.Long  (medLab.PatNum)+","
 				+    POut.Long  (medLab.ProvNum)+","
 				+"'"+POut.String(medLab.PatIDLab)+"',"
 				+"'"+POut.String(medLab.PatIDAlt)+"',"
@@ -148,6 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLab.SpecimenID)+"',"
 				+"'"+POut.String(medLab.ObsTestID)+"',"
 				+"'"+POut.String(medLab.ObsTestDescript)+"',"
+				+"'"+POut.String(medLab.ObsTestLoinc)+"',"
+				+"'"+POut.String(medLab.ObsTestLoincText)+"',"
 				+    POut.DateT (medLab.DateTimeCollected)+","
 				+"'"+POut.String(medLab.TotalVolume)+"',"
 				+"'"+POut.String(medLab.ActionCode.ToString())+"',"
@@ -186,6 +194,8 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLab in the database.</summary>
 		public static void Update(MedLab medLab){
 			string command="UPDATE medlab SET "
+				+"SendingApp         = '"+POut.String(medLab.SendingApp)+"', "
+				+"SendingFacility    = '"+POut.String(medLab.SendingFacility)+"', "
 				+"PatNum             =  "+POut.Long  (medLab.PatNum)+", "
 				+"ProvNum            =  "+POut.Long  (medLab.ProvNum)+", "
 				+"PatIDLab           = '"+POut.String(medLab.PatIDLab)+"', "
@@ -196,6 +206,8 @@ namespace OpenDentBusiness.Crud{
 				+"SpecimenID         = '"+POut.String(medLab.SpecimenID)+"', "
 				+"ObsTestID          = '"+POut.String(medLab.ObsTestID)+"', "
 				+"ObsTestDescript    = '"+POut.String(medLab.ObsTestDescript)+"', "
+				+"ObsTestLoinc       = '"+POut.String(medLab.ObsTestLoinc)+"', "
+				+"ObsTestLoincText   = '"+POut.String(medLab.ObsTestLoincText)+"', "
 				+"DateTimeCollected  =  "+POut.DateT (medLab.DateTimeCollected)+", "
 				+"TotalVolume        = '"+POut.String(medLab.TotalVolume)+"', "
 				+"ActionCode         = '"+POut.String(medLab.ActionCode.ToString())+"', "
@@ -229,6 +241,14 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLab in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(MedLab medLab,MedLab oldMedLab){
 			string command="";
+			if(medLab.SendingApp != oldMedLab.SendingApp) {
+				if(command!=""){ command+=",";}
+				command+="SendingApp = '"+POut.String(medLab.SendingApp)+"'";
+			}
+			if(medLab.SendingFacility != oldMedLab.SendingFacility) {
+				if(command!=""){ command+=",";}
+				command+="SendingFacility = '"+POut.String(medLab.SendingFacility)+"'";
+			}
 			if(medLab.PatNum != oldMedLab.PatNum) {
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(medLab.PatNum)+"";
@@ -268,6 +288,14 @@ namespace OpenDentBusiness.Crud{
 			if(medLab.ObsTestDescript != oldMedLab.ObsTestDescript) {
 				if(command!=""){ command+=",";}
 				command+="ObsTestDescript = '"+POut.String(medLab.ObsTestDescript)+"'";
+			}
+			if(medLab.ObsTestLoinc != oldMedLab.ObsTestLoinc) {
+				if(command!=""){ command+=",";}
+				command+="ObsTestLoinc = '"+POut.String(medLab.ObsTestLoinc)+"'";
+			}
+			if(medLab.ObsTestLoincText != oldMedLab.ObsTestLoincText) {
+				if(command!=""){ command+=",";}
+				command+="ObsTestLoincText = '"+POut.String(medLab.ObsTestLoincText)+"'";
 			}
 			if(medLab.DateTimeCollected != oldMedLab.DateTimeCollected) {
 				if(command!=""){ command+=",";}

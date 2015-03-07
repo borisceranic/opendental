@@ -7355,6 +7355,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE medlab (
 						MedLabNum bigint NOT NULL auto_increment PRIMARY KEY,
+						SendingApp varchar(255) NOT NULL,
+						SendingFacility varchar(255) NOT NULL,
 						PatNum bigint NOT NULL,
 						ProvNum bigint NOT NULL,
 						PatIDLab varchar(255) NOT NULL,
@@ -7365,6 +7367,8 @@ namespace OpenDentBusiness {
 						SpecimenID varchar(255) NOT NULL,
 						ObsTestID varchar(255) NOT NULL,
 						ObsTestDescript varchar(255) NOT NULL,
+						ObsTestLoinc varchar(255) NOT NULL,
+						ObsTestLoincText varchar(255) NOT NULL,
 						DateTimeCollected datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						TotalVolume varchar(255) NOT NULL,
 						ActionCode varchar(255) NOT NULL,
@@ -7384,10 +7388,7 @@ namespace OpenDentBusiness {
 						FileName varchar(255) NOT NULL,
 						OriginalPIDSegment text NOT NULL,
 						INDEX(PatNum),
-						INDEX(ProvNum),
-						INDEX(ObsTestID),
-						INDEX(ParentObsID),
-						INDEX(ParentObsTestID)
+						INDEX(ProvNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
 				}
@@ -7396,6 +7397,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE medlab (
 						MedLabNum number(20) NOT NULL,
+						SendingApp varchar2(255),
+						SendingFacility varchar2(255),
 						PatNum number(20) NOT NULL,
 						ProvNum number(20) NOT NULL,
 						PatIDLab varchar2(255),
@@ -7406,6 +7409,8 @@ namespace OpenDentBusiness {
 						SpecimenID varchar2(255),
 						ObsTestID varchar2(255),
 						ObsTestDescript varchar2(255),
+						ObsTestLoinc varchar2(255),
+						ObsTestLoincText varchar2(255),
 						DateTimeCollected date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						TotalVolume varchar2(255),
 						ActionCode varchar2(255),
@@ -7431,12 +7436,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX medlab_ProvNum ON medlab (ProvNum)";
 					Db.NonQ(command);
-					command=@"CREATE INDEX medlab_ObsTestID ON medlab (ObsTestID)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX medlab_ParentObsID ON medlab (ParentObsID)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX medlab_ParentObsTestID ON medlab (ParentObsTestID)";
-					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS medlabresult";
@@ -7458,7 +7457,6 @@ namespace OpenDentBusiness {
 						DocNum bigint NOT NULL,
 						Note text NOT NULL,
 						INDEX(MedLabNum),
-						INDEX(ObsID),
 						INDEX(DocNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
@@ -7486,8 +7484,6 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 					command=@"CREATE INDEX medlabresult_MedLabNum ON medlabresult (MedLabNum)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX medlabresult_ObsID ON medlabresult (ObsID)";
 					Db.NonQ(command);
 					command=@"CREATE INDEX medlabresult_DocNum ON medlabresult (DocNum)";
 					Db.NonQ(command);

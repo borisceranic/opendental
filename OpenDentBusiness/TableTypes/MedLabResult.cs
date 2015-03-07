@@ -18,12 +18,12 @@ namespace OpenDentBusiness {
 		public string ObsID;
 		///<summary>OBX.3.2 - Observation Text.  LabCorp report field "TESTS".  LabCorp test name.</summary>
 		public string ObsText;
-		///<summary>OBX.3.4 - Alternate Identifier (LOINC).  This is the LOINC code for the test performed.
-		///When displaying the results, LabCorp requires OBR.4.2, the text name of the test to be displayed, not the LOINC code.
+		///<summary>OBX.3.4 - Alternate Identifier (LOINC).  This is the LOINC code for the observation.
+		///When displaying the results, LabCorp requires OBX.3.2, the text name of the test to be displayed, not the LOINC code.
 		///But we will store it so we can link to the LOINC code table for reporting purposes.</summary>
 		public string ObsLoinc;
-		///<summary>OBX.3.5 - Alternate Observation Text (LOINC Description).  The LOINC code description for the test performed.
-		///We will display OBR.4.2 per LabCorp requirements, but we will store this description for reporting purposes.</summary>
+		///<summary>OBX.3.5 - Alternate Observation Text (LOINC Description).  The LOINC code description for the observation.
+		///We will display OBX.3.2 per LabCorp requirements, but we will store this description for reporting purposes.</summary>
 		public string ObsLoincText;
 		///<summary>OBX.5.1 - Observation Value.  LabCorp report field "RESULT".
 		///Can be null if coded entries, prelims, canceled, or >21 chars and being returned as an attached NTE.

@@ -117,10 +117,16 @@ namespace OpenDentBusiness {
 		RXR,
 		///<summary>Scheduling Activity Information</summary>
 		SCH,
+		///<summary>Specimen</summary>
+		SPM,
 		///<summary>Timing/Quantity</summary>
 		TQ1,
 		///<summary>This can happen for unsupported segments.</summary>
 		Unknown,
+		///<summary>Encapsulated Data Format</summary>
+		ZEF,
+		///<summary>Place of Service</summary>
+		ZPS,
 		///<summary>We use for PDF Data</summary>
 		ZX1,
 	}

@@ -129,7 +129,10 @@ namespace OpenDentBusiness{
 		///<para>We will still put ChartNumber in PID.2 (used to be referred to as 'external ID' by HL7 doc) for outgoing msgs and look for our PatNum in PID.2 for incoming msgs.</para>
 		///<para>We will now also check PID.3 for a repitition that contains our PatNum as part of the CX data type.</para>
 		///<para>Account and Appointments module are visible and users can change and add patients.</para></summary>
-		HL7v2_6
+		HL7v2_6,
+		///<summary>This is currently used for LabCorp and is based on HL7 version 2.3 specifications.
+		///<para>This interface has been built to the LabCorp standards and may not match the HL7 version 2.3 specs exactly.</para></summary>
+		MedLabv2_3
 	}
 
 	

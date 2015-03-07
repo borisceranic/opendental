@@ -14,6 +14,16 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long MedLabNum;
+		#region MSH Fields
+		///<summary>MSH-2 - Sending Application.  Used to identify the LabCorp Lab System sending the results.
+		///Possible values for LabCorp (as of their v10.7 specs): '1100' - LabCorp Lab System, 'DIANON' - DIANON Systems,
+		///'ADL' - Acupath Diagnostic Laboratories, 'EGL' - Esoterix Genetic Laboratories.
+		///For backward compatibility only: 'CMBP', 'LITHOLINK', 'USLABS'</summary>
+		public string SendingApp;
+		///<summary>MSH-3 - Sending Facility.  Identifies the LabCorp laboratory responsible for the client.
+		///It could be a LabCorp assigned 'Responsible Lab Code' representing the responsible laboratory or it could be a CLIA number.</summary>
+		public string SendingFacility;
+		#endregion MSH Fields
 		#region PID Fields
 		///<summary>FK to patient.PatNum.  PID.2 - External Patient ID. LabCorp report field "Client Alt. Pat ID".</summary>
 		public long PatNum;
@@ -41,6 +51,13 @@ namespace OpenDentBusiness {
 		public string ObsTestID;
 		///<summary>OBR.4.2 - Observation Battery Text.  LabCorp report field "Tests Ordered".</summary>
 		public string ObsTestDescript;
+		///<summary>OBR.4.4 - Alternate Battery Identifier (LOINC).  This is the LOINC code for the test performed.
+		///When displaying the results, LabCorp requires OBR.4.2, the text name of the test to be displayed, not the LOINC code.
+		///But we will store it so we can link to the LOINC code table for reporting purposes.</summary>
+		public string ObsTestLoinc;
+		///<summary>OBR.4.5 - Alternate Observation Battery Text (LOINC Description).  The LOINC code description for the test performed.
+		///We will display OBR.4.2 per LabCorp requirements, but we will store this description for reporting purposes.</summary>
+		public string ObsTestLoincText;
 		///<summary>OBR.7 - Observation/Specimen Collection Date/Time.  LabCorp report field "Date &amp; Time Collected".
 		///yyyyMMddHHmm format in the message, no seconds.  May be blank.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]

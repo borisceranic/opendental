@@ -165,6 +165,10 @@ namespace OpenDentBusiness {
 		///<summary>Used for DFT/ACK event type P03.
 		///<para>All outbound DFT's are this structure.</para></summary>
 		DFT_P03,
+		///<summary>Used for ORU/ACK event type R01.
+		///<para>All inbound ORU - Unsolicited transmission of an observation message will use this structure.</para>
+		///<para>This is used for all inbound LabCorp messages.</para></summary>
+		ORU_R01,
 		///<summary>Used for PPR/ACK event types PC1, PC2, and PC3.
 		///<para>We currently only support PC1 (add problem) and PC2 (update problem), both use this structure.</para></summary>
 		PPR_PC1,

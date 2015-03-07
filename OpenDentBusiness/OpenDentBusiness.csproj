@@ -602,6 +602,7 @@
     <Compile Include="HL7old\EhrADT_A01.cs" />
     <Compile Include="HL7old\EhrORU.cs" />
     <Compile Include="HL7old\EhrVXU.cs" />
+    <Compile Include="HL7\MedLabv2_3.cs" />
     <Compile Include="HL7\InternalHL7v2_6.cs" />
     <Compile Include="HL7\InternalCentricity.cs" />
     <Compile Include="HL7\FieldConstructor.cs" />
