@@ -164,6 +164,8 @@
               <s:element minOccurs="1" maxOccurs="1" name="IsRequired" type="s:byte" />
               <s:element minOccurs="1" maxOccurs="1" name="TabOrder" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="ReportableName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TextAlign" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="ItemColor" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="webforms_sheetReference" type="tns:EntityReferenceOfwebforms_sheet" />
             </s:sequence>
           </s:extension>
@@ -317,6 +319,8 @@
               <s:element minOccurs="1" maxOccurs="1" name="Width" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="Height" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="IsLandscape" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="PageCount" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsMultiPage" type="s:boolean" />
               <s:element minOccurs="0" maxOccurs="1" name="SheetFieldDefs" type="tns:ArrayOfSheetFieldDef" />
             </s:sequence>
           </s:extension>
@@ -350,6 +354,9 @@
               <s:element minOccurs="0" maxOccurs="1" name="ImageData" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="TabOrder" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="ReportableName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TextAlign" type="tns:HorizontalAlignment" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsPaymentOption" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="ColorOverride" type="s:int" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -368,6 +375,7 @@
           <s:enumeration value="SigBox" />
           <s:enumeration value="PatImage" />
           <s:enumeration value="Special" />
+          <s:enumeration value="Grid" />
         </s:restriction>
       </s:simpleType>
       <s:simpleType name="GrowthBehaviorEnum">
@@ -375,6 +383,13 @@
           <s:enumeration value="None" />
           <s:enumeration value="DownLocal" />
           <s:enumeration value="DownGlobal" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="HorizontalAlignment">
+        <s:restriction base="s:string">
+          <s:enumeration value="Left" />
+          <s:enumeration value="Right" />
+          <s:enumeration value="Center" />
         </s:restriction>
       </s:simpleType>
       <s:simpleType name="SheetTypeEnum">
@@ -394,6 +409,7 @@
           <s:enumeration value="LabSlip" />
           <s:enumeration value="ExamSheet" />
           <s:enumeration value="DepositSlip" />
+          <s:enumeration value="Statement" />
         </s:restriction>
       </s:simpleType>
       <s:complexType name="ArrayOfSheetFieldDef">

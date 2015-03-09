@@ -1070,7 +1070,9 @@ namespace WebForms
         /// <param name="radioButtonGroup">Initial value of the RadioButtonGroup property.</param>
         /// <param name="isRequired">Initial value of the IsRequired property.</param>
         /// <param name="tabOrder">Initial value of the TabOrder property.</param>
-        public static webforms_sheetfield Createwebforms_sheetfield(global::System.Int64 sheetFieldID, global::System.Int64 sheetID, global::System.Int32 fieldType, global::System.String fieldValue, global::System.Single fontSize, global::System.SByte fontIsBold, global::System.Int32 xPos, global::System.Int32 yPos, global::System.Int32 width, global::System.Int32 height, global::System.Int32 growthBehavior, global::System.String radioButtonValue, global::System.String radioButtonGroup, global::System.SByte isRequired, global::System.Int32 tabOrder)
+        /// <param name="textAlign">Initial value of the TextAlign property.</param>
+        /// <param name="itemColor">Initial value of the ItemColor property.</param>
+        public static webforms_sheetfield Createwebforms_sheetfield(global::System.Int64 sheetFieldID, global::System.Int64 sheetID, global::System.Int32 fieldType, global::System.String fieldValue, global::System.Single fontSize, global::System.SByte fontIsBold, global::System.Int32 xPos, global::System.Int32 yPos, global::System.Int32 width, global::System.Int32 height, global::System.Int32 growthBehavior, global::System.String radioButtonValue, global::System.String radioButtonGroup, global::System.SByte isRequired, global::System.Int32 tabOrder, global::System.Int32 textAlign, global::System.Int32 itemColor)
         {
             webforms_sheetfield webforms_sheetfield = new webforms_sheetfield();
             webforms_sheetfield.SheetFieldID = sheetFieldID;
@@ -1088,6 +1090,8 @@ namespace WebForms
             webforms_sheetfield.RadioButtonGroup = radioButtonGroup;
             webforms_sheetfield.IsRequired = isRequired;
             webforms_sheetfield.TabOrder = tabOrder;
+            webforms_sheetfield.TextAlign = textAlign;
+            webforms_sheetfield.ItemColor = itemColor;
             return webforms_sheetfield;
         }
 
@@ -1529,6 +1533,54 @@ namespace WebForms
         private global::System.String _ReportableName;
         partial void OnReportableNameChanging(global::System.String value);
         partial void OnReportableNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 TextAlign
+        {
+            get
+            {
+                return _TextAlign;
+            }
+            set
+            {
+                OnTextAlignChanging(value);
+                ReportPropertyChanging("TextAlign");
+                _TextAlign = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("TextAlign");
+                OnTextAlignChanged();
+            }
+        }
+        private global::System.Int32 _TextAlign;
+        partial void OnTextAlignChanging(global::System.Int32 value);
+        partial void OnTextAlignChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 ItemColor
+        {
+            get
+            {
+                return _ItemColor;
+            }
+            set
+            {
+                OnItemColorChanging(value);
+                ReportPropertyChanging("ItemColor");
+                _ItemColor = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ItemColor");
+                OnItemColorChanged();
+            }
+        }
+        private global::System.Int32 _ItemColor;
+        partial void OnItemColorChanging(global::System.Int32 value);
+        partial void OnItemColorChanged();
 
         #endregion
 
@@ -1608,7 +1660,9 @@ namespace WebForms
         /// <param name="isRequired">Initial value of the IsRequired property.</param>
         /// <param name="imageData">Initial value of the ImageData property.</param>
         /// <param name="tabOrder">Initial value of the TabOrder property.</param>
-        public static webforms_sheetfielddef Createwebforms_sheetfielddef(global::System.Int64 webSheetFieldDefID, global::System.Int64 webSheetDefID, global::System.Int32 fieldType, global::System.String fieldName, global::System.String fieldValue, global::System.Single fontSize, global::System.String fontName, global::System.SByte fontIsBold, global::System.Int32 xPos, global::System.Int32 yPos, global::System.Int32 width, global::System.Int32 height, global::System.Int32 growthBehavior, global::System.String radioButtonValue, global::System.String radioButtonGroup, global::System.SByte isRequired, global::System.String imageData, global::System.Int32 tabOrder)
+        /// <param name="textAlign">Initial value of the TextAlign property.</param>
+        /// <param name="itemColor">Initial value of the ItemColor property.</param>
+        public static webforms_sheetfielddef Createwebforms_sheetfielddef(global::System.Int64 webSheetFieldDefID, global::System.Int64 webSheetDefID, global::System.Int32 fieldType, global::System.String fieldName, global::System.String fieldValue, global::System.Single fontSize, global::System.String fontName, global::System.SByte fontIsBold, global::System.Int32 xPos, global::System.Int32 yPos, global::System.Int32 width, global::System.Int32 height, global::System.Int32 growthBehavior, global::System.String radioButtonValue, global::System.String radioButtonGroup, global::System.SByte isRequired, global::System.String imageData, global::System.Int32 tabOrder, global::System.Int32 textAlign, global::System.Int32 itemColor)
         {
             webforms_sheetfielddef webforms_sheetfielddef = new webforms_sheetfielddef();
             webforms_sheetfielddef.WebSheetFieldDefID = webSheetFieldDefID;
@@ -1629,6 +1683,8 @@ namespace WebForms
             webforms_sheetfielddef.IsRequired = isRequired;
             webforms_sheetfielddef.ImageData = imageData;
             webforms_sheetfielddef.TabOrder = tabOrder;
+            webforms_sheetfielddef.TextAlign = textAlign;
+            webforms_sheetfielddef.ItemColor = itemColor;
             return webforms_sheetfielddef;
         }
 
@@ -2094,6 +2150,54 @@ namespace WebForms
         private global::System.String _ReportableName;
         partial void OnReportableNameChanging(global::System.String value);
         partial void OnReportableNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 TextAlign
+        {
+            get
+            {
+                return _TextAlign;
+            }
+            set
+            {
+                OnTextAlignChanging(value);
+                ReportPropertyChanging("TextAlign");
+                _TextAlign = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("TextAlign");
+                OnTextAlignChanged();
+            }
+        }
+        private global::System.Int32 _TextAlign;
+        partial void OnTextAlignChanging(global::System.Int32 value);
+        partial void OnTextAlignChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 ItemColor
+        {
+            get
+            {
+                return _ItemColor;
+            }
+            set
+            {
+                OnItemColorChanging(value);
+                ReportPropertyChanging("ItemColor");
+                _ItemColor = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("ItemColor");
+                OnItemColorChanged();
+            }
+        }
+        private global::System.Int32 _ItemColor;
+        partial void OnItemColorChanging(global::System.Int32 value);
+        partial void OnItemColorChanged();
 
         #endregion
 

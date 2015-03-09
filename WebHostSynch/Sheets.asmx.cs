@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Threading;
 using OpenDentBusiness;
 using WebForms;
+using System.Drawing;
 
 namespace WebHostSynch {
 	/// <summary>
@@ -328,6 +329,10 @@ namespace WebHostSynch {
 								else {
 									propertyinfo.SetValue(SheetFieldDefObj,(sbyte)0,null);
 								}
+							}
+							//Check if the current field is of type Color.  We check fieldinfo instead of propertyinfo because propertyinfo should be of type int (if done correctly).
+							else if(fieldinfo.FieldType==typeof(Color)) {
+								propertyinfo.SetValue(SheetFieldDefObj,((Color)fieldinfo.GetValue(sheetDef.SheetFieldDefs[i])).ToArgb(),null);//Color fields are stored as ints.
 							}
 							else {
 								if(fieldinfo.GetValue(sheetDef.SheetFieldDefs[i])==null) {
