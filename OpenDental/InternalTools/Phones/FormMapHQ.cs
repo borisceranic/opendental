@@ -232,20 +232,21 @@ namespace OpenDental {
 			}
 		}
 		
-		public void SetTriageNormal(int callsWithNotes,int callsWithNoNotes,TimeSpan timeBehind) {
+		///<summary>Sets the time for current triage tasks and colors it according to how far behind we are.</summary>
+		public void SetTriageNormal(int callsWithNotes,int callsWithNoNotes,TimeSpan timeBehind,int triageRed) {
 			if(timeBehind==TimeSpan.Zero) { //format the string special for this case
 				this.labelTriageTimeSpan.Text="0";
 			}
 			else {
 				this.labelTriageTimeSpan.Text=((int)timeBehind.TotalMinutes).ToString();			
 			}
-			if(callsWithNoNotes>0) { //we have calls which don't have notes so display that number
-				this.labelTriageCalls.Text=callsWithNoNotes.ToString();
+			if(callsWithNoNotes>0 || triageRed>0) { //we have calls which don't have notes or a red triage task so display that number
+				this.labelTriageCalls.Text=(callsWithNoNotes+triageRed).ToString();
 			}
-			else { //we don't have any calls with no notes so display count of total tasks
+			else { //we don't have any calls with no notes nor any red triage tasks so display count of total tasks
 				this.labelTriageCalls.Text="("+callsWithNotes.ToString()+")";
 			}
-			if(callsWithNoNotes>10) { //we are behind
+			if(callsWithNoNotes+triageRed>10) { //we are behind
 				labelTriageCalls.SetAlertColors();
 			}
 			else { //we are ok
