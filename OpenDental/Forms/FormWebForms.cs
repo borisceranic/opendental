@@ -322,6 +322,8 @@ namespace OpenDental {
 						sheetfield.RadioButtonValue=sAnds.web_sheetfieldlist[i].RadioButtonValue;
 						sheetfield.GrowthBehavior=(GrowthBehaviorEnum)sAnds.web_sheetfieldlist[i].GrowthBehavior;
 						sheetfield.FieldValue=sAnds.web_sheetfieldlist[i].FieldValue;
+						sheetfield.TextAlign=(HorizontalAlignment)sAnds.web_sheetfieldlist[i].TextAlign;
+						sheetfield.ItemColor=Color.FromArgb(sAnds.web_sheetfieldlist[i].ItemColor);
 						newSheet.SheetFields.Add(sheetfield);
 					}// end of j loop
 					Sheets.SaveNewSheet(newSheet);
@@ -466,8 +468,8 @@ namespace OpenDental {
 					|| sortedSheetFromDb.SheetFields[i].IsRequired!=sortedNewSheet.SheetFields[i].IsRequired
 					|| sortedSheetFromDb.SheetFields[i].TabOrder!=sortedNewSheet.SheetFields[i].TabOrder
 					|| sortedSheetFromDb.SheetFields[i].ReportableName!=sortedNewSheet.SheetFields[i].ReportableName
-					//|| sortedSheetFromDb.SheetFields[i].TextAlign!=sortedNewSheet.SheetFields[i].TextAlign
-					//|| sortedSheetFromDb.SheetFields[i].ItemColor!=sortedNewSheet.SheetFields[i].ItemColor
+					|| sortedSheetFromDb.SheetFields[i].TextAlign!=sortedNewSheet.SheetFields[i].TextAlign
+					|| sortedSheetFromDb.SheetFields[i].ItemColor!=sortedNewSheet.SheetFields[i].ItemColor
 					) 
 				{
 					return false;//No need to keep looping, we know the sheets are not equal at this point.
