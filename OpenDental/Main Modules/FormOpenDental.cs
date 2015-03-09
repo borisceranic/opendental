@@ -3509,12 +3509,23 @@ namespace OpenDental{
 			DateTime timeOfOldestBlueTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestBlueTaskNote"].ToString());
 			DateTime timeOfOldestRedTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestRedTaskNote"].ToString());
 			TimeSpan triageBehind=new TimeSpan(0);
-			if(timeOfOldestBlueTaskNote.Year>1880) {
+			if(timeOfOldestBlueTaskNote.Year>1880 && timeOfOldestRedTaskNote.Year>1880) {
+				if(timeOfOldestBlueTaskNote<timeOfOldestRedTaskNote){
+					triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
+				}
+				else {//triageBehind based off of older RedTask
+					triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
+				}
+			}
+			else if(timeOfOldestBlueTaskNote.Year>1880) {
 				triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
 			}
+			else if(timeOfOldestRedTaskNote.Year>1880) {
+				triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
+			}
 			string countStr="0";
-			if(countBlueTasks>0) {//Triage show red so users notice more.
-				countStr=countBlueTasks.ToString();
+			if(countBlueTasks>0 || countRedTasks>0) {//Triage show red so users notice more.
+				countStr=(countBlueTasks+countRedTasks).ToString();
 				labelTriage.ForeColor=Color.Firebrick;
 			}
 			else {
@@ -3526,7 +3537,7 @@ namespace OpenDental{
 			labelTriage.Text="T:"+countStr;
 			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
 			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
-				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind);
+				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind,countRedTasks);
 				TimeSpan urgentTriageBehind=new TimeSpan(0);
 				if(timeOfOldestRedTaskNote.Year>1880) {
 					urgentTriageBehind=DateTime.Now-timeOfOldestRedTaskNote;
