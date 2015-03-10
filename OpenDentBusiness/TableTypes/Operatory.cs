@@ -4,6 +4,7 @@ using System.Collections;
 namespace OpenDentBusiness{
 	///<summary>Each row is a single operatory or column in the appts module.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class Operatory:TableBase{
 		///<summary>Primary key</summary>
 		[CrudColumn(IsPriKey=true)]
