@@ -577,10 +577,10 @@ namespace OpenDental {
 						whereProv = "Report Includes:  ";
 						for(int i = 0;i < listProv.SelectedIndices.Count;i++) {
 							if(nameCount < 3) {
-								whereProv += " "+ProviderC.ListShort[listProv.SelectedIndices[i] - 1].GetFormalName()+" /";
+								whereProv+=" "+ProviderC.ListShort[listProv.SelectedIndices[i]-1].GetAbbr()+"-"+ProviderC.ListShort[listProv.SelectedIndices[i]-1].GetFormalName()+" /";
 							}
 							else {
-								whereProvx += " "+ProviderC.ListShort[listProv.SelectedIndices[i] - 1].GetFormalName()+" /";
+								whereProvx+=" "+ProviderC.ListShort[listProv.SelectedIndices[i]-1].GetAbbr()+"-"+ProviderC.ListShort[listProv.SelectedIndices[i]-1].GetFormalName()+" /";
 							}
 							nameCount += 1;
 						}
