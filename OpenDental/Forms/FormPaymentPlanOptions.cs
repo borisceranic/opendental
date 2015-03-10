@@ -9,9 +9,25 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormPaymentPlanOptions:Form {
-		public FormPaymentPlanOptions() {
+
+		public FormPaymentPlanOptions(PaymentSchedule paySchedule) {
 			InitializeComponent();
 			Lan.F(this);
+			if(paySchedule==PaymentSchedule.Weekly) {
+				radioWeekly.Checked=true;
+			}
+			else if(paySchedule==PaymentSchedule.BiWeekly) {
+				radioEveryOtherWeek.Checked=true;
+			}
+			else if(paySchedule==PaymentSchedule.MonthlyDayOfWeek) {
+				radioOrdinalWeekday.Checked=true;
+			}
+			else if(paySchedule==PaymentSchedule.Monthly) {
+				radioMonthly.Checked=true;
+			}
+			else {//quarterly
+				radioQuarterly.Checked=true;
+			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

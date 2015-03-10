@@ -113,7 +113,7 @@ namespace OpenDental{
 			FamCur=Patients.GetFamily(PatCur.PatNum);
 			SubList=InsSubs.RefreshForFam(FamCur);
 			InsPlanList=InsPlans.RefreshForSubList(SubList);
-			FormPayPlanOpts=new FormPaymentPlanOptions();
+			FormPayPlanOpts=new FormPaymentPlanOptions(PayPlanCur.PaySchedule);
 			Lan.F(this);
 		}
 
@@ -865,6 +865,13 @@ namespace OpenDental{
 		private void FormPayPlan_Load(object sender, System.EventArgs e) {
 			textPatient.Text=Patients.GetLim(PayPlanCur.PatNum).GetNameLF();
 			textGuarantor.Text=Patients.GetLim(PayPlanCur.Guarantor).GetNameLF();
+			if(PayPlanCur.NumberOfPayments!=0) {
+				textTerm.Text=PayPlanCur.NumberOfPayments.ToString();
+			}
+			else {
+				textPeriodPayment.Text=PayPlanCur.PayAmt.ToString("f");
+			}
+			textDownPayment.Text=PayPlanCur.DownPayment.ToString("f");
 			for(int i=0;i<ProviderC.ListShort.Count;i++) {
 				comboProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
 				if(IsNew && ProviderC.ListShort[i].ProvNum==PatCur.PriProv) {//new payment plans default to pri prov
@@ -1273,7 +1280,9 @@ namespace OpenDental{
 				_listPayPlanCharges.Add(ppCharge);
 			}
 			double principal=PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text);//Always >= 0 due to validation.
+			PayPlanCur.DownPayment=PIn.Double(textDownPayment.Text);
 			double APR=PIn.Double(textAPR.Text);
+			PayPlanCur.APR=APR;
 			double periodRate;
 			decimal periodPayment;
 			if(APR==0){
@@ -1282,18 +1291,23 @@ namespace OpenDental{
 			else{
 				if(FormPayPlanOpts.radioWeekly.Checked){
 					periodRate=APR/100/52;
+					PayPlanCur.PaySchedule=PaymentSchedule.Weekly;
 				}
 				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked){
 					periodRate=APR/100/26;
+					PayPlanCur.PaySchedule=PaymentSchedule.BiWeekly;
 				}
 				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked){
 					periodRate=APR/100/12;
+					PayPlanCur.PaySchedule=PaymentSchedule.MonthlyDayOfWeek;
 				}
 				else if(FormPayPlanOpts.radioMonthly.Checked){
 					periodRate=APR/100/12;
+					PayPlanCur.PaySchedule=PaymentSchedule.Monthly;
 				}
 				else{//quarterly
 					periodRate=APR/100/4;
+					PayPlanCur.PaySchedule=PaymentSchedule.Quarterly;
 				}
 			}
 			int roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
@@ -1309,9 +1323,11 @@ namespace OpenDental{
 				}
 				//Round up to the nearest penny (or international equivalent).  This causes the principal on the last payment to be less than or equal to the other principal amounts.
 				periodPayment=(decimal)(Math.Ceiling(periodExactAmt*Math.Pow(10,roundDec))/Math.Pow(10,roundDec));
+				PayPlanCur.NumberOfPayments=term;
 			}
 			else{//Use period payment supplied
 				periodPayment=PIn.Decimal(textPeriodPayment.Text);
+				PayPlanCur.PayAmt=(double)periodPayment;
 			}
 			decimal principalDecrementing=(decimal)principal;//The principal which will be decreased to zero in the loop.  Always starts >= 0, due to validation.
 			DateTime firstDate=PIn.Date(textDateFirstPay.Text);
@@ -1585,7 +1601,12 @@ namespace OpenDental{
 			//PatNum not editable.
 			//Guarantor set already
 			PayPlanCur.PayPlanDate=PIn.Date(textDate.Text);
-			PayPlanCur.APR=PIn.Double(textAPR.Text);
+			//The following variables were handled when the amortization schedule was created.
+			//PayPlanCur.APR
+			//PayPlanCur.PaySchedule
+			//PayPlanCur.NumberOfPayments
+			//PayPlanCur.PayAmt
+			//PayPlanCur.DownPayment
 			PayPlanCur.Note=textNote.Text;
 			PayPlanCur.CompletedAmt=PIn.Double(textCompletedAmt.Text);
 			//PlanNum set already
