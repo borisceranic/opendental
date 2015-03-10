@@ -1028,6 +1028,9 @@ namespace OpenDental {
 
 		private void OnNoteEditComplete_CellDoubleClick(object sender) {
 			notesChanged=true;
+			if(TaskOld.TaskStatus==TaskStatusEnum.Done) {//If task was marked Done when opened, we uncheck the Done checkbox so people can see the changes.
+				checkDone.Checked=false;
+			}
 			FillGrid();
 		}
 
@@ -1048,6 +1051,9 @@ namespace OpenDental {
 
 		private void OnNoteEditComplete_Add(object sender) {
 			notesChanged=true;
+			if(TaskOld.TaskStatus==TaskStatusEnum.Done) {//If task was marked Done when opened, we uncheck the Done checkbox so people can see the changes.
+				checkDone.Checked=false;
+			}
 			FillGrid();
 			if(MightNeedSetRead) {//'new' box is checked
 				checkNew.Checked=false;
@@ -1329,6 +1335,9 @@ namespace OpenDental {
 				MightNeedSetRead=false;//so that the automation won't happen again
 			}
 			UpdateTaskPriorityForTriageBasedOnDescript();
+			if(TaskOld.TaskStatus==TaskStatusEnum.Done && textDescript.Text!=TaskOld.Descript) {
+				checkDone.Checked=false;
+			}
 		}
 
 		private void butCopy_Click(object sender,EventArgs e) {
@@ -1373,10 +1382,8 @@ namespace OpenDental {
 				return false;
 			}
 			//Techs want to be notified of any changes made to completed tasks.
-			//Check if the notes, descript, or task list changed on a task marked Done.
-			if((notesChanged || textDescript.Text!=TaskCur.Descript || TaskCur.TaskListNum!=TaskOld.TaskListNum) 
-				&& TaskOld.TaskStatus==TaskStatusEnum.Done) 
-			{
+			//Check if the task list changed on a task marked Done.
+			if(TaskCur.TaskListNum!=TaskOld.TaskListNum	&& TaskOld.TaskStatus==TaskStatusEnum.Done) {
 				//Forcing the status to viewed will put the task in other user's "New for" task list but not the user that made the change.
 				TaskCur.TaskStatus=TaskStatusEnum.Viewed;
 				checkDone.Checked=false;
@@ -1611,12 +1618,15 @@ namespace OpenDental {
 			}
 			//If a note was added to a Done task and the user hits cancel, the task status is set to Viewed because the note is still there and the task didn't move lists.
 			if(notesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
+				if(checkDone.Checked) {//Will only happen when the Done checkbox has been manually re-checked by the user.
+					return;
+				}
 				TaskCur.TaskStatus=TaskStatusEnum.Viewed;
 				try {
 					Tasks.Update(TaskCur,TaskOld);//if task has already been altered, then this is where it will fail.
 				}
 				catch {
-					return;
+					return;//Silently leave because the user could be trying to cancel out of a task that had been edited by another user.
 				}
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
