@@ -23,7 +23,8 @@ namespace OpenDental{
 		/// </summary>
 		private System.ComponentModel.Container components = null;
 		private TextBox textUser;
-		private List<Userod> shortList;
+		private CheckBox checkShowCEMTUsers;
+		private List<Userod> _listUsers;
 
 		///<summary></summary>
 		public FormLogOn()
@@ -66,6 +67,7 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.textPassword = new System.Windows.Forms.TextBox();
 			this.textUser = new System.Windows.Forms.TextBox();
+			this.checkShowCEMTUsers = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -140,11 +142,23 @@ namespace OpenDental{
 			this.textUser.TabIndex = 8;
 			this.textUser.Visible = false;
 			// 
+			// checkShowCEMTUsers
+			// 
+			this.checkShowCEMTUsers.Location = new System.Drawing.Point(191, 68);
+			this.checkShowCEMTUsers.Name = "checkShowCEMTUsers";
+			this.checkShowCEMTUsers.Size = new System.Drawing.Size(213, 24);
+			this.checkShowCEMTUsers.TabIndex = 9;
+			this.checkShowCEMTUsers.Text = "Show CEMT users";
+			this.checkShowCEMTUsers.UseVisualStyleBackColor = true;
+			this.checkShowCEMTUsers.Visible = false;
+			this.checkShowCEMTUsers.CheckedChanged += new System.EventHandler(this.checkShowCEMTUsers_CheckedChanged);
+			// 
 			// FormLogOn
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(464, 378);
+			this.Controls.Add(this.checkShowCEMTUsers);
 			this.Controls.Add(this.textUser);
 			this.Controls.Add(this.textPassword);
 			this.Controls.Add(this.butOK);
@@ -171,6 +185,12 @@ namespace OpenDental{
 				textUser.Visible=true;
 				textUser.Select();//Give focus to the user name text box.
 			}
+			else {//Show a list of users.
+				//Only show the show CEMT user check box if not manually typing user names and there are CEMT users present in the db.
+				if(Userods.GetUsersForCEMT().Count>0) {
+					checkShowCEMTUsers.Visible=true;
+				}
+			}
 			FillListBox();
 		}
 
@@ -190,10 +210,19 @@ namespace OpenDental{
 			GroupPermissions.RefreshCache();
 			listUser.BeginUpdate();
 			listUser.Items.Clear();
-			shortList=UserodC.ShortList;
-			for(int i=0;i<shortList.Count;i++){
-				listUser.Items.Add(shortList[i]);
-				if(Security.CurUser!=null && shortList[i].UserNum==Security.CurUser.UserNum){
+			if(PrefC.GetBool(PrefName.UserNameManualEntry)) {
+				//Because _listUsers is used to verify the user name typed in, we need to include both non-hidden and CEMT users for offices that type in their credentials instead of picking.
+				_listUsers=Userods.GetUsers(true);
+			}
+			else if(checkShowCEMTUsers.Checked) {//Only show list of CEMT users.
+				_listUsers=Userods.GetUsersForCEMT();
+			}
+			else {//This will be the most common way to fill the user list.  Only includes non-hidden, non-CEMT users.
+				_listUsers=Userods.GetUsers();
+			}
+			for(int i=0;i<_listUsers.Count;i++){
+				listUser.Items.Add(_listUsers[i]);
+				if(Security.CurUser!=null && _listUsers[i].UserNum==Security.CurUser.UserNum){
 					listUser.SelectedIndex=i;
 				}
 			}
@@ -201,6 +230,10 @@ namespace OpenDental{
 				listUser.SelectedIndex=0;
 			}
 			listUser.EndUpdate();
+		}
+
+		private void checkShowCEMTUsers_CheckedChanged(object sender,EventArgs e) {
+			FillListBox();
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {

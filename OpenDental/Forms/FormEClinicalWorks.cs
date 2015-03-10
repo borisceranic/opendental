@@ -62,6 +62,7 @@ namespace OpenDental{
 		private Label label12;
 		private CheckBox checkHideButChartRx;
 		private Label labelHL7FolderIn;
+		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
 		public FormEClinicalWorks() {
@@ -645,9 +646,10 @@ namespace OpenDental{
 			}
 			textODServer.Text=MiscData.GetODServer();
 			comboDefaultUserGroup.Items.Clear();
-			for(int i=0;i<UserGroups.List.Length;i++) {
-				comboDefaultUserGroup.Items.Add(UserGroups.List[i].Description);
-				if(GetProp("DefaultUserGroup")==UserGroups.List[i].UserGroupNum.ToString()) {
+			_listUserGroups=UserGroups.GetList();
+			for(int i=0;i<_listUserGroups.Count;i++) {
+				comboDefaultUserGroup.Items.Add(_listUserGroups[i].Description);
+				if(GetProp("DefaultUserGroup")==_listUserGroups[i].UserGroupNum.ToString()) {
 					comboDefaultUserGroup.SelectedIndex=i;
 				}
 			}
@@ -827,7 +829,7 @@ namespace OpenDental{
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eCWServer",textECWServer.Text);
 				Prefs.UpdateString(PrefName.HL7FolderIn,textHL7FolderIn.Text);
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"DefaultUserGroup",
-					UserGroups.List[comboDefaultUserGroup.SelectedIndex].UserGroupNum.ToString());
+					_listUserGroups[comboDefaultUserGroup.SelectedIndex].UserGroupNum.ToString());
 				if(checkShowImages.Checked) {
 					ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ShowImagesModule","1");
 				}

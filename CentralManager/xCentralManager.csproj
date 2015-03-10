@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.2.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Required dlls\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,6 +51,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Db\CentralConnectionHelper.cs" />
+    <Compile Include="Db\CentralGroupPermissions.cs" />
+    <Compile Include="Db\CentralUserGroups.cs" />
+    <Compile Include="Db\CentralUserods.cs" />
+    <Compile Include="FormCentralGroupPermEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralGroupPermEdit.Designer.cs">
+      <DependentUpon>FormCentralGroupPermEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCentralProdInc.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,8 +97,47 @@
     <Compile Include="FormCentralManager.Designer.cs">
       <DependentUpon>FormCentralManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCentralUserEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralUserEdit.Designer.cs">
+      <DependentUpon>FormCentralUserEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralUserGroupEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralUserGroupEdit.Designer.cs">
+      <DependentUpon>FormCentralUserGroupEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralUserGroups.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralUserGroups.Designer.cs">
+      <DependentUpon>FormCentralUserGroups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralUserPasswordEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralUserPasswordEdit.Designer.cs">
+      <DependentUpon>FormCentralUserPasswordEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralChooseDatabase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralChooseDatabase.Designer.cs">
+      <DependentUpon>FormCentralChooseDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralSecurity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralSecurity.Designer.cs">
+      <DependentUpon>FormCentralSecurity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormCentralGroupPermEdit.resx">
+      <DependentUpon>FormCentralGroupPermEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormCentralProdInc.resx">
       <DependentUpon>FormCentralProdInc.cs</DependentUpon>
     </EmbeddedResource>
@@ -106,6 +159,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralManager.resx">
       <DependentUpon>FormCentralManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralChooseDatabase.resx">
+      <DependentUpon>FormCentralChooseDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralUserEdit.resx">
+      <DependentUpon>FormCentralUserEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralUserGroupEdit.resx">
+      <DependentUpon>FormCentralUserGroupEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralUserGroups.resx">
+      <DependentUpon>FormCentralUserGroups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralUserPasswordEdit.resx">
+      <DependentUpon>FormCentralUserPasswordEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralSecurity.resx">
+      <DependentUpon>FormCentralSecurity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -132,6 +203,10 @@
     <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
       <Project>{18F7BC78-4B99-48D3-A1F1-0D13A63E3CF9}</Project>
       <Name>xCodeBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ODR\xODR.csproj">
+      <Project>{84688345-BB6A-4F2F-8672-A82B52FD433B}</Project>
+      <Name>xODR</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenDental\OpenDental.csproj">
       <Project>{8136317d-c936-49b6-9e31-d90f02d2f207}</Project>

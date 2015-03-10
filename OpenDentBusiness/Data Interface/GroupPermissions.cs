@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Windows.Forms;
@@ -37,6 +38,16 @@ namespace OpenDentBusiness{
 				}
 			}
 			Crud.GroupPermissionCrud.Update(gp);
+		}
+
+		///<summary>Deletes GroupPermissions based on primary key.  Do not call this method unless you have checked specific dependencies first.  E.g. after deleting this permission, there will still be a security admin user.  This method is only called from the CEMT sync.  RemovePermission should probably be used instead.</summary>
+		public static void Delete(GroupPermission gp) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),gp);
+				return;
+			}
+			string command="DELETE FROM grouppermission WHERE GroupPermNum = "+POut.Long(gp.GroupPermNum);
+			Db.NonQ(command);
 		}
 
 		///<summary></summary>
@@ -96,6 +107,18 @@ namespace OpenDentBusiness{
 				}
 			}
 			return null;
+		}
+
+		///<summary>Gets a list of GroupPermissions for the supplied UserGroupNum.</summary>
+		public static List<GroupPermission> GetPerms(long userGroupNum) {
+			//No need to check RemotingRole; no call to db.
+			List<GroupPermission> listGroupPerms=new List<GroupPermission>();
+			for(int i=0;i<GroupPermissionC.List.Length;i++) {
+				if(GroupPermissionC.List[i].UserGroupNum==userGroupNum) {
+					listGroupPerms.Add(GroupPermissionC.List[i].Copy());
+				}
+			}
+			return listGroupPerms;
 		}
 
 		///<summary>Used in Security.IsAuthorized</summary>

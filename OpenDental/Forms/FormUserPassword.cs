@@ -25,7 +25,7 @@ namespace OpenDental{
 		private Label labelCurrent;
 		private CheckBox checkShow;
 		///<summary></summary>
-		public string hashedResult;
+		public string HashedResult;
 		public bool IsInSecurityWindow;
 
 		///<summary>Set true if creating rather than changing a password.</summary>
@@ -229,10 +229,10 @@ namespace OpenDental{
 				}
 			}
 			if(textPassword.Text==""){
-				hashedResult="";
+				HashedResult="";
 			}
 			else{
-				hashedResult=Userods.EncryptPassword(textPassword.Text);
+				HashedResult=Userods.EncryptPassword(textPassword.Text);
 			}
 			//MessageBox.Show(hashedResult);
 			DialogResult=DialogResult.OK;

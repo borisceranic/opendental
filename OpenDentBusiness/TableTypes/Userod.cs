@@ -35,6 +35,8 @@ namespace OpenDentBusiness{
 		public bool ClinicIsRestricted;
 		///<summary>If set to true, the BlockInbox button will start out pressed for this user.</summary>
 		public bool InboxHidePopups;
+		///<summary>FK to userod.UserNum.  The user num within the Central Manager database.  Only editable via CEMT.  Can change when CEMT syncs.</summary>
+		public long UserNumCEMT;
 
 		public Userod(){
 

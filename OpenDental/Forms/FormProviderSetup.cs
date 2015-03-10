@@ -48,6 +48,7 @@ namespace OpenDental{
 		private UI.Button butMoveSec;
 		///<summary>Set when prov picker button is used.  textMoveTo shows this prov in human readable format.</summary>
 		private long _provNumMoveTo=-1;
+		private List<UserGroup> _listUserGroups;
 
 		///<summary>Not used for selection.  Use FormProviderPick or FormProviderMultiPick for that.</summary>
 		public FormProviderSetup(){
@@ -537,8 +538,9 @@ namespace OpenDental{
 			//There are two permissions which allow access to this window: Providers and AdminDentalStudents.  SecurityAdmin allows some extra functions.
 			Cache.Refresh(InvalidType.Providers);
 			if(Security.IsAuthorized(Permissions.SecurityAdmin,true)){
-				for(int i=0;i<UserGroups.List.Length;i++){
-					comboUserGroup.Items.Add(UserGroups.List[i].Description);
+				_listUserGroups=UserGroups.GetList();
+				for(int i=0;i<_listUserGroups.Count;i++){
+					comboUserGroup.Items.Add(_listUserGroups[i].Description);
 				}
 			}
 			else{
@@ -1007,7 +1009,7 @@ namespace OpenDental{
 			}
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				Userod user=new Userod();
-				user.UserGroupNum=UserGroups.List[comboUserGroup.SelectedIndex].UserGroupNum;
+				user.UserGroupNum=_listUserGroups[comboUserGroup.SelectedIndex].UserGroupNum;
 				user.ProvNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ProvNum"].ToString());
 				user.UserName=GetUniqueUserName(table.Rows[gridMain.SelectedIndices[i]]["LName"].ToString(),
 					table.Rows[gridMain.SelectedIndices[i]]["FName"].ToString());

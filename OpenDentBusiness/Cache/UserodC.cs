@@ -53,7 +53,7 @@ namespace OpenDentBusiness {
 			return listUserods;
 		}
 		
-		///<summary>A list of users.  Does not include hidden users.</summary>
+		///<summary>A list of users.  Does not include hidden users or CEMT users.</summary>
 		public static List<Userod> GetListShort() {
 			bool isListNull=false;
 			lock(_lockObj) {

@@ -41,6 +41,7 @@ namespace OpenDental{
 		private Label label3;
 		private Label label4;
 		private CheckBox checkUserNameManualEntry;
+		private Label labelGlobalDateLockDisabled;
 		//private DataTable table;
 		private List<Userod> ListUser;
 
@@ -98,6 +99,7 @@ namespace OpenDental{
 			this.label4 = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.checkUserNameManualEntry = new System.Windows.Forms.CheckBox();
+			this.labelGlobalDateLockDisabled = new System.Windows.Forms.Label();
 			this.butChange = new OpenDental.UI.Button();
 			this.butSetAll = new OpenDental.UI.Button();
 			this.butAddUser = new OpenDental.UI.Button();
@@ -317,6 +319,17 @@ namespace OpenDental{
 			this.checkUserNameManualEntry.Text = "Manually enter log on credentials";
 			this.checkUserNameManualEntry.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// labelGlobalDateLockDisabled
+			// 
+			this.labelGlobalDateLockDisabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelGlobalDateLockDisabled.Location = new System.Drawing.Point(375, 652);
+			this.labelGlobalDateLockDisabled.Name = "labelGlobalDateLockDisabled";
+			this.labelGlobalDateLockDisabled.Size = new System.Drawing.Size(113, 42);
+			this.labelGlobalDateLockDisabled.TabIndex = 104;
+			this.labelGlobalDateLockDisabled.Text = "(Disabled from Central \r\nManagement Tool) ";
+			this.labelGlobalDateLockDisabled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelGlobalDateLockDisabled.Visible = false;
+			// 
 			// butChange
 			// 
 			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -396,6 +409,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(894, 700);
+			this.Controls.Add(this.labelGlobalDateLockDisabled);
 			this.Controls.Add(this.checkUserNameManualEntry);
 			this.Controls.Add(this.textLogOffAfterMinutes);
 			this.Controls.Add(this.label4);
@@ -462,6 +476,10 @@ namespace OpenDental{
 			}
 			if(PrefC.GetDate(PrefName.SecurityLockDate).Year>1880){
 				textDateLock.Text=PrefC.GetDate(PrefName.SecurityLockDate).ToShortDateString();
+			}
+			if(PrefC.GetBool(PrefName.CentralManagerSecurityLock)) {
+				butChange.Enabled=false;
+				labelGlobalDateLockDisabled.Visible=true;
 			}
 		}
 

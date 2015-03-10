@@ -4520,7 +4520,7 @@ namespace OpenDental{
 			if(FormU.DialogResult==DialogResult.Cancel) {
 				return;
 			}
-			Security.CurUser.Password=FormU.hashedResult;
+			Security.CurUser.Password=FormU.HashedResult;
 			if(PrefC.GetBool(PrefName.PasswordsMustBeStrong)) {
 				Security.CurUser.PasswordIsStrong=true;
 			}

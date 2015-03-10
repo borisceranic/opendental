@@ -32,7 +32,7 @@ namespace OpenDentBusiness {
 			List<Userod> listUserodsLong=Crud.UserodCrud.TableToList(table);
 			List<Userod> listUserodsShort=new List<Userod>();
 			for(int i=0;i<listUserodsLong.Count;i++) {//This logic used to be in UserodC, but didn't really follow our new pattern.
-				if(listUserodsLong[i].IsHidden) {
+				if(listUserodsLong[i].IsHidden || listUserodsLong[i].UserNumCEMT!=0) {
 					continue;
 				}
 				listUserodsShort.Add(listUserodsLong[i]);
@@ -54,6 +54,40 @@ namespace OpenDentBusiness {
 				}
 			}
 			return null;
+		}
+
+		///<summary>Returns a list of all non-hidden users.  Does not include CEMT users.</summary>
+		public static List<Userod> GetUsers() {
+			return GetUsers(false);
+		}
+
+		///<summary>Returns a list of all non-hidden users.  Set includeCEMT to true if you want CEMT users included.</summary>
+		public static List<Userod> GetUsers(bool includeCEMT) {
+			List<Userod> retVal=new List<Userod>();
+			List<Userod> listUsersLong=UserodC.GetListt();
+			for(int i=0;i<listUsersLong.Count;i++) {
+				if(listUsersLong[i].IsHidden) {
+					continue;
+				}
+				if(!includeCEMT && listUsersLong[i].UserNumCEMT!=0) {
+					continue;
+				}
+				retVal.Add(listUsersLong[i]);
+			}
+			return retVal;
+		}
+
+		///<summary>Returns a list of all non-hidden CEMT users.</summary>
+		public static List<Userod> GetUsersForCEMT() {
+			List<Userod> retVal=new List<Userod>();
+			List<Userod> listUsers=UserodC.GetListt();
+			for(int i=0;i<listUsers.Count;i++) {
+				if(listUsers[i].UserNumCEMT==0) {
+					continue;
+				}
+				retVal.Add(listUsers[i]);
+			}
+			return retVal;
 		}
 
 		///<summary>Returns null if not found.  isEcwTight is not case sensitive.</summary>
@@ -359,18 +393,18 @@ namespace OpenDentBusiness {
 				command+="ORDER BY UserName";
 				return Crud.UserodCrud.SelectMany(command);
 			}
-			command="SELECT * FROM userod ";
+			command="SELECT * FROM userod WHERE UserNumCEMT=0  ";
 			if(usertype=="emp"){
-				command+="WHERE EmployeeNum!=0 ";
+				command+="AND EmployeeNum!=0 ";
 			}
 			else if(usertype=="prov") {//and all schoolclassnums
-				command+="WHERE ProvNum!=0 ";
+				command+="AND ProvNum!=0 ";
 			}
 			else if(usertype=="all") {
 				//command+="";
 			}
 			else if(usertype=="other") {
-				command+="WHERE ProvNum=0 AND EmployeeNum=0 ";
+				command+="AND ProvNum=0 AND EmployeeNum=0 ";
 			}
 			command+="ORDER BY UserName";
 			return Crud.UserodCrud.SelectMany(command);
@@ -424,6 +458,31 @@ namespace OpenDentBusiness {
 			Crud.UserodCrud.Update(userod);
 		}
 
+		///<summary>Update for CEMT only.  Used when updating Remote databases with information from the CEMT.  Because of potentially different primary keys we have to update based on UserNumCEMT.</summary>
+		public static void UpdateCEMT(Userod userod) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),userod);
+				return;
+			}
+			//Validate(false,userod,false);//Can't use this validate. it's for normal updating only.
+			string command="UPDATE userod SET "
+				+"UserName          = '"+POut.String(userod.UserName)+"', "
+				+"Password          = '"+POut.String(userod.Password)+"', "
+				+"UserGroupNum      =  "+POut.Long(userod.UserGroupNum)+", "//need to find primary key of remote user group
+				+"EmployeeNum       =  "+POut.Long  (userod.EmployeeNum)+", "
+				+"ClinicNum         =  "+POut.Long  (userod.ClinicNum)+", "
+				+"ProvNum           =  "+POut.Long  (userod.ProvNum)+", "
+				+"IsHidden          =  "+POut.Bool  (userod.IsHidden)+", "
+				+"TaskListInBox     =  "+POut.Long  (userod.TaskListInBox)+", "
+				+"AnesthProvType    =  "+POut.Int   (userod.AnesthProvType)+", "
+				+"DefaultHidePopups =  "+POut.Bool  (userod.DefaultHidePopups)+", "
+				+"PasswordIsStrong  =  "+POut.Bool  (userod.PasswordIsStrong)+", "
+				+"ClinicIsRestricted=  "+POut.Bool  (userod.ClinicIsRestricted)+", "
+				+"InboxHidePopups   =  "+POut.Bool  (userod.InboxHidePopups)+" "
+				+"WHERE UserNumCEMT = "+POut.Long(userod.UserNumCEMT);
+			Db.NonQ(command);
+		}
+
 		///<summary>Surround with try/catch because it can throw exceptions.  Only used from FormOpenDental.menuItemPassword_Click().  Same as Update(), only the Validate call skips checking duplicate names for hidden users.</summary>
 		public static void UpdatePassword(Userod userod){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -462,7 +521,13 @@ namespace OpenDentBusiness {
 			}
 			//It doesn't matter if the UserName is already in use if the user being updated is going to be hidden.  This check will block them from unhiding duplicate users.
 			if(!user.IsHidden) {//if the user is now not hidden
+				//CEMT users will not be visible from within Open Dental.  Therefore, make a different check so that we can know if the name
+				//the user typed in is a duplicate of a CEMT user.  In doing this, we are able to give a better message.
+				if(!IsUserNameUnique(user.UserName,excludeUserNum,excludeHiddenUsers,true)) {
+					throw new Exception(Lans.g("Userods","UserName already in use by CEMT member."));
+				}
 				if(!IsUserNameUnique(user.UserName,excludeUserNum,excludeHiddenUsers)) {
+					//IsUserNameUnique doesn't care if it's a CEMT user or not.. It just gets a count based on username.
 					throw new Exception(Lans.g("Userods","UserName already in use."));
 				}
 			}
@@ -488,14 +553,19 @@ namespace OpenDentBusiness {
 				+"WHERE PermType='"+POut.Long((int)Permissions.SecurityAdmin)+"' "
 				+"AND UserGroupNum="+POut.Long(user.UserGroupNum);
 			if(Db.GetCount(command)!="0"//if this user is admin
-				&& user.IsHidden)//and hidden
+				&& user.IsHidden //and hidden
+				&& user.UserNumCEMT==0) //and non-CEMT
 			{
 				throw new Exception(Lans.g("Userods","Admins cannot be hidden."));
 			}
 		}
 
-		///<summary>Supply 0 or -1 for the excludeUserNum to not exclude any.</summary>
 		public static bool IsUserNameUnique(string username,long excludeUserNum,bool excludeHiddenUsers) {
+			return IsUserNameUnique(username,excludeUserNum,excludeHiddenUsers,false);
+		}
+
+		///<summary>Supply 0 or -1 for the excludeUserNum to not exclude any.</summary>
+		public static bool IsUserNameUnique(string username,long excludeUserNum,bool excludeHiddenUsers,bool searchCEMTUsers) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),username,excludeUserNum,excludeHiddenUsers);
 			}
@@ -510,7 +580,10 @@ namespace OpenDentBusiness {
 			command+="UserName='"+POut.String(username)+"' "
 				+"AND UserNum !="+POut.Long(excludeUserNum)+" ";
 			if(excludeHiddenUsers) {
-				command+="AND IsHidden=0";//not hidden
+				command+="AND IsHidden=0 ";//not hidden
+			}
+			if(searchCEMTUsers) {
+				command+="AND UserNumCEMT!=0";
 			}
 			DataTable table=Db.GetTable(command);
 			if(table.Rows[0][0].ToString()=="0") {
@@ -568,15 +641,7 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static List<Userod> GetNotHidden(){
 			//No need to check RemotingRole; no call to db.
-			List<Userod> retVal=new List<Userod>();
-			List<Userod> listUserods=UserodC.GetListt();
-			for(int i=0;i<listUserods.Count;i++){
-				if(!listUserods[i].IsHidden){
-					retVal.Add(listUserods[i].Copy());
-				}
-			}
-			//retVal.Sort(//in a hurry, so skipping
-			return retVal;
+			return UserodC.GetListShort();
 		}
 
 		//Return 3, which is non-admin provider type

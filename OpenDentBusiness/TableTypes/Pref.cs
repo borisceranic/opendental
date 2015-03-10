@@ -125,6 +125,8 @@ namespace OpenDentBusiness {
 		CanadaODAMemberNumber,
 		///<summary>For Ontario Dental Association fee schedules.</summary>
 		CanadaODAMemberPass,
+		///<summary>Boolean.  0 by default.  If enabled, only CEMT can edit certain security settings.  Currently only used for global lock date.</summary>
+		CentralManagerSecurityLock,
 		///<summary>This is the hash of the password that is needed to open the Central Manager tool.</summary>
 		CentralManagerPassHash,
 		ChartQuickAddHideAmalgam,

@@ -199,7 +199,7 @@ namespace OpenDentBusiness{
 		Letters,
 		///<summary>18</summary>
 		QuickPaste,
-		///<summary>19- Userod and UserGroup</summary>
+		///<summary>19- Userods, UserGroups, and GroupPermissions</summary>
 		Security,
 		///<summary>20</summary>
 		Programs,

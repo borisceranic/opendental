@@ -60,6 +60,7 @@ namespace OpenDentBusiness.Crud{
 				userod.PasswordIsStrong  = PIn.Bool  (table.Rows[i]["PasswordIsStrong"].ToString());
 				userod.ClinicIsRestricted= PIn.Bool  (table.Rows[i]["ClinicIsRestricted"].ToString());
 				userod.InboxHidePopups   = PIn.Bool  (table.Rows[i]["InboxHidePopups"].ToString());
+				userod.UserNumCEMT       = PIn.Long  (table.Rows[i]["UserNumCEMT"].ToString());
 				retVal.Add(userod);
 			}
 			return retVal;
@@ -100,7 +101,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="UserNum,";
 			}
-			command+="UserName,Password,UserGroupNum,EmployeeNum,ClinicNum,ProvNum,IsHidden,TaskListInBox,AnesthProvType,DefaultHidePopups,PasswordIsStrong,ClinicIsRestricted,InboxHidePopups) VALUES(";
+			command+="UserName,Password,UserGroupNum,EmployeeNum,ClinicNum,ProvNum,IsHidden,TaskListInBox,AnesthProvType,DefaultHidePopups,PasswordIsStrong,ClinicIsRestricted,InboxHidePopups,UserNumCEMT) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(userod.UserNum)+",";
 			}
@@ -117,7 +118,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (userod.DefaultHidePopups)+","
 				+    POut.Bool  (userod.PasswordIsStrong)+","
 				+    POut.Bool  (userod.ClinicIsRestricted)+","
-				+    POut.Bool  (userod.InboxHidePopups)+")";
+				+    POut.Bool  (userod.InboxHidePopups)+","
+				+    POut.Long  (userod.UserNumCEMT)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +144,8 @@ namespace OpenDentBusiness.Crud{
 				+"DefaultHidePopups =  "+POut.Bool  (userod.DefaultHidePopups)+", "
 				+"PasswordIsStrong  =  "+POut.Bool  (userod.PasswordIsStrong)+", "
 				+"ClinicIsRestricted=  "+POut.Bool  (userod.ClinicIsRestricted)+", "
-				+"InboxHidePopups   =  "+POut.Bool  (userod.InboxHidePopups)+" "
+				+"InboxHidePopups   =  "+POut.Bool  (userod.InboxHidePopups)+", "
+				+"UserNumCEMT       =  "+POut.Long  (userod.UserNumCEMT)+" "
 				+"WHERE UserNum = "+POut.Long(userod.UserNum);
 			Db.NonQ(command);
 		}
@@ -201,6 +204,10 @@ namespace OpenDentBusiness.Crud{
 			if(userod.InboxHidePopups != oldUserod.InboxHidePopups) {
 				if(command!=""){ command+=",";}
 				command+="InboxHidePopups = "+POut.Bool(userod.InboxHidePopups)+"";
+			}
+			if(userod.UserNumCEMT != oldUserod.UserNumCEMT) {
+				if(command!=""){ command+=",";}
+				command+="UserNumCEMT = "+POut.Long(userod.UserNumCEMT)+"";
 			}
 			if(command==""){
 				return false;

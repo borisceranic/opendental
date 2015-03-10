@@ -46,8 +46,9 @@ namespace OpenDentBusiness.Crud{
 			UserGroup userGroup;
 			for(int i=0;i<table.Rows.Count;i++) {
 				userGroup=new UserGroup();
-				userGroup.UserGroupNum= PIn.Long  (table.Rows[i]["UserGroupNum"].ToString());
-				userGroup.Description = PIn.String(table.Rows[i]["Description"].ToString());
+				userGroup.UserGroupNum    = PIn.Long  (table.Rows[i]["UserGroupNum"].ToString());
+				userGroup.Description     = PIn.String(table.Rows[i]["Description"].ToString());
+				userGroup.UserGroupNumCEMT= PIn.Long  (table.Rows[i]["UserGroupNumCEMT"].ToString());
 				retVal.Add(userGroup);
 			}
 			return retVal;
@@ -88,12 +89,13 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="UserGroupNum,";
 			}
-			command+="Description) VALUES(";
+			command+="Description,UserGroupNumCEMT) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(userGroup.UserGroupNum)+",";
 			}
 			command+=
-				 "'"+POut.String(userGroup.Description)+"')";
+				 "'"+POut.String(userGroup.Description)+"',"
+				+    POut.Long  (userGroup.UserGroupNumCEMT)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -106,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one UserGroup in the database.</summary>
 		public static void Update(UserGroup userGroup){
 			string command="UPDATE usergroup SET "
-				+"Description = '"+POut.String(userGroup.Description)+"' "
+				+"Description     = '"+POut.String(userGroup.Description)+"', "
+				+"UserGroupNumCEMT=  "+POut.Long  (userGroup.UserGroupNumCEMT)+" "
 				+"WHERE UserGroupNum = "+POut.Long(userGroup.UserGroupNum);
 			Db.NonQ(command);
 		}
@@ -117,6 +120,10 @@ namespace OpenDentBusiness.Crud{
 			if(userGroup.Description != oldUserGroup.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(userGroup.Description)+"'";
+			}
+			if(userGroup.UserGroupNumCEMT != oldUserGroup.UserGroupNumCEMT) {
+				if(command!=""){ command+=",";}
+				command+="UserGroupNumCEMT = "+POut.Long(userGroup.UserGroupNumCEMT)+"";
 			}
 			if(command==""){
 				return false;

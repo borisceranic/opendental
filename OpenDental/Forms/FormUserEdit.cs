@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>
@@ -34,6 +35,7 @@ namespace OpenDental{
 		private CheckBox checkClinicIsRestricted;
 		///<summary></summary>
 		public Userod UserCur;
+		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
 		public FormUserEdit(Userod userCur)
@@ -281,9 +283,10 @@ namespace OpenDental{
 		private void FormUserEdit_Load(object sender, System.EventArgs e) {
 			checkIsHidden.Checked=UserCur.IsHidden;
 			textUserName.Text=UserCur.UserName;
-			for(int i=0;i<UserGroups.List.Length;i++){
-				listUserGroup.Items.Add(UserGroups.List[i].Description);
-				if(UserCur.UserGroupNum==UserGroups.List[i].UserGroupNum){
+			_listUserGroups=UserGroups.GetList();
+			for(int i=0;i<_listUserGroups.Count;i++){
+				listUserGroup.Items.Add(_listUserGroups[i].Description);
+				if(UserCur.UserGroupNum==_listUserGroups[i].UserGroupNum) {
 					listUserGroup.SelectedIndex=i;
 				}
 			}
@@ -354,7 +357,7 @@ namespace OpenDental{
 			if(FormU.DialogResult==DialogResult.Cancel){
 				return;
 			}
-			UserCur.Password=FormU.hashedResult;
+			UserCur.Password=FormU.HashedResult;
 			if(PrefC.GetBool(PrefName.PasswordsMustBeStrong)) {
 				UserCur.PasswordIsStrong=true;
 			}
@@ -365,21 +368,6 @@ namespace OpenDental{
 				butPassword.Text=Lan.g(this,"Change Password");
 			}
 		}
-
-		/*private void butDelete_Click(object sender, System.EventArgs e) {
-			if(IsNew){
-				DialogResult=DialogResult.Cancel;
-				return;
-			}
-			try{
-				UserCur.Delete();
-			}
-			catch(Exception ex){
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			DialogResult=DialogResult.OK;
-		}*/
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textUserName.Text==""){
@@ -392,7 +380,7 @@ namespace OpenDental{
 			}
 			UserCur.IsHidden=checkIsHidden.Checked;
 			UserCur.UserName=textUserName.Text;
-			UserCur.UserGroupNum=UserGroups.List[listUserGroup.SelectedIndex].UserGroupNum;
+			UserCur.UserGroupNum=_listUserGroups[listUserGroup.SelectedIndex].UserGroupNum;
 			if(listEmployee.SelectedIndex==0){
 				UserCur.EmployeeNum=0;
 			}

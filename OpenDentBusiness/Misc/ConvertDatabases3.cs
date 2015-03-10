@@ -7656,6 +7656,38 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE claim MODIFY OrthoTotalM NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('CentralManagerSecurityLock','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'CentralManagerSecurityLock','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE userod ADD UserNumCEMT bigint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE userod ADD UserNumCEMT number(20)";
+					Db.NonQ(command);
+					command="UPDATE userod SET UserNumCEMT = 0 WHERE UserNumCEMT IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE userod MODIFY UserNumCEMT NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE usergroup ADD UserGroupNumCEMT bigint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE usergroup ADD UserGroupNumCEMT number(20)";
+					Db.NonQ(command);
+					command="UPDATE usergroup SET UserGroupNumCEMT = 0 WHERE UserGroupNumCEMT IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE usergroup MODIFY UserGroupNumCEMT NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";

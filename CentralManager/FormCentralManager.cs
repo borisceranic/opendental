@@ -105,15 +105,21 @@ namespace CentralManager {
 			}
 		}
 
-		private void butPassword_Click(object sender,EventArgs e) {
+		private void menuPassword_Click(object sender,EventArgs e) {
 			FormCentralPasswordChange formC=new FormCentralPasswordChange();
 			formC.ShowDialog();
 		}
 
-		private void butConSetup_Click(object sender,EventArgs e) {
+		private void menuConSetup_Click(object sender,EventArgs e) {
 			FormCentralConnectionsSetup formS=new FormCentralConnectionsSetup();
 			formS.ShowDialog();
 			FillGrid();
+		}
+
+		private void menuUserEdit_Click(object sender,EventArgs e) {
+			FormCentralSecurity FormCUS=new FormCentralSecurity();
+			FormCUS.ShowDialog();
+			GetConfigAndConnect();
 		}
 
 		private void textSearch_TextChanged(object sender,EventArgs e) {
@@ -123,7 +129,7 @@ namespace CentralManager {
 			FillGrid();
 		}
 
-		private void butProdInc_Click(object sender,EventArgs e) {
+		private void menuProdInc_Click(object sender,EventArgs e) {
 			List<CentralConnection> listSelectedConn=new List<CentralConnection>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				listSelectedConn.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);//The tag of this grid is the CentralConnection object
@@ -197,19 +203,11 @@ namespace CentralManager {
 				args+="OdPassword=\""+CentralConnections.Decrypt(ConnList[e.Row].OdPassword,EncryptionKey)+"\" ";
 			}
 			#if DEBUG
-				Process.Start("E:\\My Documents\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
+				Process.Start("C:\\Development\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
 			#else
 				Process.Start("OpenDental.exe",args);
 			#endif
 		}
-
-		
-
-
-	
-
-		
-
 		
 	}
 }

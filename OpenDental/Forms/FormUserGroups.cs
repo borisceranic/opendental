@@ -1,9 +1,10 @@
-using System;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.Windows.Forms;
 using OpenDentBusiness;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace OpenDental{
 	/// <summary>
@@ -13,6 +14,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butClose;
 		private ListBox listGroups;
 		private OpenDental.UI.Button butAddGroup;
+		private List<UserGroup> _listUserGroups;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -124,8 +126,9 @@ namespace OpenDental{
 		private void FillList(){
 			UserGroups.RefreshCache();
 			listGroups.Items.Clear();
-			for(int i=0;i<UserGroups.List.Length;i++){
-				listGroups.Items.Add(UserGroups.List[i].Description);
+			_listUserGroups=UserGroups.GetList();
+			for(int i=0;i<_listUserGroups.Count;i++){
+				listGroups.Items.Add(_listUserGroups[i].Description);
 			}
 		}
 
@@ -144,7 +147,7 @@ namespace OpenDental{
 			if(listGroups.SelectedIndex==-1) {
 				return;
 			}
-			UserGroup group=UserGroups.List[listGroups.SelectedIndex];
+			UserGroup group=_listUserGroups[listGroups.SelectedIndex];
 			FormUserGroupEdit FormU=new FormUserGroupEdit(group);
 			FormU.ShowDialog();
 			if(FormU.DialogResult==DialogResult.Cancel) {

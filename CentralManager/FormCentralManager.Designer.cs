@@ -23,75 +23,82 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.butConSetup = new System.Windows.Forms.Button();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.butPassword = new System.Windows.Forms.Button();
+			this.components = new System.ComponentModel.Container();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textSearch = new System.Windows.Forms.TextBox();
-			this.butProdInc = new System.Windows.Forms.Button();
+			this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
+			this.menuItemSetup = new System.Windows.Forms.MenuItem();
+			this.menuItemPassword = new System.Windows.Forms.MenuItem();
+			this.menuItemConnections = new System.Windows.Forms.MenuItem();
+			this.menuItemUsers = new System.Windows.Forms.MenuItem();
+			this.menuItemReports = new System.Windows.Forms.MenuItem();
+			this.menuItemAnnualPI = new System.Windows.Forms.MenuItem();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// butConSetup
-			// 
-			this.butConSetup.Location = new System.Drawing.Point(101, 19);
-			this.butConSetup.Name = "butConSetup";
-			this.butConSetup.Size = new System.Drawing.Size(87, 24);
-			this.butConSetup.TabIndex = 0;
-			this.butConSetup.Text = "Connections";
-			this.butConSetup.UseVisualStyleBackColor = true;
-			this.butConSetup.Click += new System.EventHandler(this.butConSetup_Click);
-			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.butPassword);
-			this.groupBox1.Controls.Add(this.butConSetup);
-			this.groupBox1.Location = new System.Drawing.Point(11, 10);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(204, 51);
-			this.groupBox1.TabIndex = 6;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Setup";
-			// 
-			// butPassword
-			// 
-			this.butPassword.Location = new System.Drawing.Point(15, 19);
-			this.butPassword.Name = "butPassword";
-			this.butPassword.Size = new System.Drawing.Size(78, 24);
-			this.butPassword.TabIndex = 1;
-			this.butPassword.Text = "Password";
-			this.butPassword.UseVisualStyleBackColor = true;
-			this.butPassword.Click += new System.EventHandler(this.butPassword_Click);
 			// 
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(237, 36);
+			this.label2.Location = new System.Drawing.Point(524, 3);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(111, 17);
+			this.label2.Size = new System.Drawing.Size(56, 17);
 			this.label2.TabIndex = 212;
 			this.label2.Text = "Search";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSearch
 			// 
-			this.textSearch.Location = new System.Drawing.Point(351, 33);
+			this.textSearch.Location = new System.Drawing.Point(582, 1);
 			this.textSearch.Name = "textSearch";
 			this.textSearch.Size = new System.Drawing.Size(190, 20);
 			this.textSearch.TabIndex = 211;
 			this.textSearch.TextChanged += new System.EventHandler(this.textSearch_TextChanged);
 			// 
-			// butProdInc
+			// mainMenu
 			// 
-			this.butProdInc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butProdInc.Location = new System.Drawing.Point(684, 31);
-			this.butProdInc.Name = "butProdInc";
-			this.butProdInc.Size = new System.Drawing.Size(87, 24);
-			this.butProdInc.TabIndex = 213;
-			this.butProdInc.Text = "Annual P&&I";
-			this.butProdInc.UseVisualStyleBackColor = true;
-			this.butProdInc.Click += new System.EventHandler(this.butProdInc_Click);
+			this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemSetup,
+            this.menuItemReports});
+			// 
+			// menuItemSetup
+			// 
+			this.menuItemSetup.Index = 0;
+			this.menuItemSetup.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemConnections,
+            this.menuItemPassword,
+            this.menuItemUsers});
+			this.menuItemSetup.Text = "Setup";
+			// 
+			// menuItemPassword
+			// 
+			this.menuItemPassword.Index = 1;
+			this.menuItemPassword.Text = "Password";
+			this.menuItemPassword.Click += new System.EventHandler(this.menuPassword_Click);
+			// 
+			// menuItemConnections
+			// 
+			this.menuItemConnections.Index = 0;
+			this.menuItemConnections.Text = "Connections";
+			this.menuItemConnections.Click += new System.EventHandler(this.menuConSetup_Click);
+			// 
+			// menuItemUsers
+			// 
+			this.menuItemUsers.Index = 2;
+			this.menuItemUsers.Text = "Users";
+			this.menuItemUsers.Click += new System.EventHandler(this.menuUserEdit_Click);
+			// 
+			// menuItemReports
+			// 
+			this.menuItemReports.Index = 1;
+			this.menuItemReports.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemAnnualPI});
+			this.menuItemReports.Text = "Reports";
+			// 
+			// menuItemAnnualPI
+			// 
+			this.menuItemAnnualPI.Index = 0;
+			this.menuItemAnnualPI.Text = "Annual P&&I";
+			this.menuItemAnnualPI.Click += new System.EventHandler(this.menuProdInc_Click);
 			// 
 			// gridMain
 			// 
@@ -99,11 +106,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(11, 72);
+			this.gridMain.Location = new System.Drawing.Point(11, 23);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(760, 612);
+			this.gridMain.Size = new System.Drawing.Size(760, 526);
 			this.gridMain.TabIndex = 5;
 			this.gridMain.Title = "Connections - double click to launch";
 			this.gridMain.TranslationName = "";
@@ -113,18 +120,16 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(784, 696);
-			this.Controls.Add(this.butProdInc);
+			this.ClientSize = new System.Drawing.Size(784, 561);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textSearch);
-			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.gridMain);
+			this.Menu = this.mainMenu;
 			this.MinimumSize = new System.Drawing.Size(657, 267);
 			this.Name = "FormCentralManager";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Central Manager";
 			this.Load += new System.EventHandler(this.FormCentralManager_Load);
-			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -132,13 +137,16 @@
 
 		#endregion
 
-		private System.Windows.Forms.Button butConSetup;
 		private OpenDental.UI.ODGrid gridMain;
-		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.Button butPassword;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textSearch;
-		private System.Windows.Forms.Button butProdInc;
+		private System.Windows.Forms.MainMenu mainMenu;
+		private System.Windows.Forms.MenuItem menuItemSetup;
+		private System.Windows.Forms.MenuItem menuItemReports;
+		private System.Windows.Forms.MenuItem menuItemPassword;
+		private System.Windows.Forms.MenuItem menuItemConnections;
+		private System.Windows.Forms.MenuItem menuItemUsers;
+		private System.Windows.Forms.MenuItem menuItemAnnualPI;
 	}
 }
 
