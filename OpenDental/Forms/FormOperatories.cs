@@ -22,7 +22,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butDown;
 		private OpenDental.UI.Button butUp;
-		private bool changed;
+		private List<Operatory> _listOps;
 
 		///<summary></summary>
 		public FormOperatories()
@@ -177,22 +177,12 @@ namespace OpenDental{
 		#endregion
 
 		private void FormOperatories_Load(object sender, System.EventArgs e) {
+			Cache.Refresh(InvalidType.Operatories);
+			_listOps=OperatoryC.GetListt();//Already ordered by ItemOrder
 			FillGrid();
 		}
 
 		private void FillGrid(){
-			Cache.Refresh(InvalidType.Operatories);
-			bool neededFixing=false;
-			for(int i=0;i<OperatoryC.Listt.Count;i++) {
-				if(OperatoryC.Listt[i].ItemOrder!=i) {
-					OperatoryC.Listt[i].ItemOrder=i;
-					Operatories.Update(OperatoryC.Listt[i]);
-					neededFixing=true;
-				}
-			}
-			if(neededFixing) {
-				DataValid.SetInvalid(InvalidType.Operatories);
-			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableOperatories","Op Name"),150);
@@ -211,20 +201,20 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			UI.ODGridRow row;
-			for(int i=0;i<OperatoryC.Listt.Count;i++){
+			for(int i=0;i<_listOps.Count;i++){
 				row=new OpenDental.UI.ODGridRow();
-				row.Cells.Add(OperatoryC.Listt[i].OpName);
-				row.Cells.Add(OperatoryC.Listt[i].Abbrev);
-				if(OperatoryC.Listt[i].IsHidden){
+				row.Cells.Add(_listOps[i].OpName);
+				row.Cells.Add(_listOps[i].Abbrev);
+				if(_listOps[i].IsHidden){
 					row.Cells.Add("X");
 				}
 				else{
 					row.Cells.Add("");
 				}
-				row.Cells.Add(Clinics.GetDesc(OperatoryC.Listt[i].ClinicNum));
-				row.Cells.Add(Providers.GetAbbr(OperatoryC.Listt[i].ProvDentist));
-				row.Cells.Add(Providers.GetAbbr(OperatoryC.Listt[i].ProvHygienist));
-				if(OperatoryC.Listt[i].IsHygiene){
+				row.Cells.Add(Clinics.GetDesc(_listOps[i].ClinicNum));
+				row.Cells.Add(Providers.GetAbbr(_listOps[i].ProvDentist));
+				row.Cells.Add(Providers.GetAbbr(_listOps[i].ProvHygienist));
+				if(_listOps[i].IsHygiene){
 					row.Cells.Add("X");
 				}
 				else{
@@ -236,10 +226,10 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			FormOperatoryEdit FormE=new FormOperatoryEdit(OperatoryC.Listt[e.Row]);
+			FormOperatoryEdit FormE=new FormOperatoryEdit(_listOps[e.Row]);
+			FormE.ListOps=_listOps;
 			FormE.ShowDialog();
 			FillGrid();
-			changed=true;
 		}
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
@@ -248,23 +238,16 @@ namespace OpenDental{
 				opCur.ItemOrder=gridMain.SelectedIndices[0];
 			}
 			else{
-				opCur.ItemOrder=OperatoryC.Listt.Count;//goes at end of list
+				opCur.ItemOrder=_listOps.Count;//goes at end of list
 			}
 			FormOperatoryEdit FormE=new FormOperatoryEdit(opCur);
+			FormE.ListOps=_listOps;
 			FormE.IsNew=true;
 			FormE.ShowDialog();
 			if(FormE.DialogResult==DialogResult.Cancel){
 				return;
 			}
-			if(gridMain.SelectedIndices.Length>0){
-				//fix the itemOrder of every Operatory following this one
-				for(int i=gridMain.SelectedIndices[0];i<OperatoryC.Listt.Count;i++){
-					OperatoryC.Listt[i].ItemOrder++;
-					Operatories.Update(OperatoryC.Listt[i]);
-				}
-			}
 			FillGrid();
-			changed=true;
 		}
 
 		private void butUp_Click(object sender, System.EventArgs e) {
@@ -277,14 +260,13 @@ namespace OpenDental{
 				return;//already at the top
 			}
 			//move selected item up
-			OperatoryC.Listt[selected].ItemOrder--;
-			Operatories.Update(OperatoryC.Listt[selected]);
+			_listOps[selected].ItemOrder--;
 			//move the one above it down
-			OperatoryC.Listt[selected-1].ItemOrder++;
-			Operatories.Update(OperatoryC.Listt[selected-1]);
+			_listOps[selected-1].ItemOrder++;
+			//Swap positions
+			_listOps.Reverse(selected-1,2);
 			FillGrid();
 			gridMain.SetSelected(selected-1,true);
-			changed=true;
 		}
 
 		private void butDown_Click(object sender, System.EventArgs e) {
@@ -293,18 +275,17 @@ namespace OpenDental{
 				return;
 			}
 			int selected=gridMain.SelectedIndices[0];
-			if(selected==OperatoryC.Listt.Count-1){
+			if(selected==_listOps.Count-1){
 				return;//already at the bottom
 			}
 			//move selected item down
-			OperatoryC.Listt[selected].ItemOrder++;
-			Operatories.Update(OperatoryC.Listt[selected]);
+			_listOps[selected].ItemOrder++;
 			//move the one below it up
-			OperatoryC.Listt[selected+1].ItemOrder--;
-			Operatories.Update(OperatoryC.Listt[selected+1]);
+			_listOps[selected+1].ItemOrder--;
+			//Swap positions
+			_listOps.Reverse(selected,2);
 			FillGrid();
 			gridMain.SetSelected(selected+1,true);
-			changed=true;
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {
@@ -312,9 +293,8 @@ namespace OpenDental{
 		}
 
 		private void FormOperatories_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(changed){
-				DataValid.SetInvalid(InvalidType.Operatories);
-			}
+			Operatories.Sync(_listOps);
+			DataValid.SetInvalid(InvalidType.Operatories);//With sync we don't know if anything changed.
 		}
 
 		

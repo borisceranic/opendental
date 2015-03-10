@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary></summary>
@@ -33,6 +34,7 @@ namespace OpenDental{
 		private CheckBox checkSetProspective;
 		private Label label3;
 		private Operatory OpCur;
+		public List<Operatory> ListOps;
 
 		///<summary></summary>
 		public FormOperatoryEdit(Operatory opCur)
@@ -354,17 +356,11 @@ namespace OpenDental{
 				OpCur.ProvHygienist=ProviderC.ListShort[comboProvHygienist.SelectedIndex-1].ProvNum;
 			OpCur.IsHygiene=checkIsHygiene.Checked;
 			OpCur.SetProspective=checkSetProspective.Checked;
-			try{
-				if(IsNew) {
-					Operatories.Insert(OpCur);
+			if(IsNew) {
+				ListOps.Insert(OpCur.ItemOrder,OpCur);//Insert into list at appropriate spot
+				for(int i=0;i<ListOps.Count;i++) {
+					ListOps[i].ItemOrder=i;//reset/correct item orders
 				}
-				else {
-					Operatories.Update(OpCur);
-				}
-			}
-			catch(ApplicationException ex){
-				MessageBox.Show(ex.Message);
-				return;
 			}
 			DialogResult=DialogResult.OK;
 		}
