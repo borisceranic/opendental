@@ -476,6 +476,26 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Returns the default practice provider</summary>
+		public static Provider GetDefaultProvider() {
+			//No need to check RemotingRole; no call to db.
+			return GetDefaultProvider(0);
+		}
+
+		///<summary>Returns the default provider for the clinic if it exists, else returns the default practice provider.  Pass 0 to get practice default.  Can return null if no clinic or practice default provider found.</summary>
+		public static Provider GetDefaultProvider(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			Clinic clinic=Clinics.GetClinic(clinicNum);
+			Provider provider=null;
+			if(clinic!=null && clinic.DefaultProv!=0) {//the clinic exists
+				provider=Providers.GetProv(clinic.DefaultProv);
+			}
+			if(provider==null) {//If not using clinics or if the specified clinic does not have a valid default provider set.
+				provider=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));//Try to get the practice default.
+			}
+			return provider;
+		}
+
 		public static DataTable GetDefaultPracticeProvider(){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod());

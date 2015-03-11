@@ -7688,6 +7688,22 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE usergroup MODIFY UserGroupNumCEMT NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD DefaultProv bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic ADD INDEX (DefaultProv)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD DefaultProv number(20)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET DefaultProv = 0 WHERE DefaultProv IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY DefaultProv NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX clinic_DefaultProv ON clinic (DefaultProv)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";

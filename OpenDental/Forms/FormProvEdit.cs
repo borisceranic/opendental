@@ -1166,9 +1166,23 @@ namespace OpenDental{
 				MsgBox.Show(this,"SSN/TIN not allowed to have dash.");
 				return;
 			}
-			if(checkIsHidden.Checked && PrefC.GetLong(PrefName.PracticeDefaultProv)==ProvCur.ProvNum) {
-				MsgBox.Show(this,"Not allowed to hide practice default provider.");
-				return;
+			if(checkIsHidden.Checked) {
+				if(PrefC.GetLong(PrefName.PracticeDefaultProv)==ProvCur.ProvNum) {
+					MsgBox.Show(this,"Not allowed to hide practice default provider.");
+					return;
+				}
+				if(PrefC.GetLong(PrefName.InsBillingProv)==ProvCur.ProvNum) {
+					MsgBox.Show(this,"Not allowed to hide the default ins billing provider.");
+					return;
+				}
+				if(Clinics.IsInsBillingProvider(ProvCur.ProvNum)) {
+					MsgBox.Show(this,"Not allowed to hide a clinic ins billing provider.");
+					return;
+				}
+				if(Clinics.IsDefaultClinicProvider(ProvCur.ProvNum)) {
+					MsgBox.Show(this,"Not allowed to hide a clinic default provider.");
+					return;
+				}
 			}
 			for(int i=0;i<ProviderC.ListLong.Count;i++) {
 				if(ProviderC.ListLong[i].ProvNum==ProvCur.ProvNum) {

@@ -33,6 +33,8 @@ namespace OpenDentBusiness{
 		public string Fax;
 		///<summary>FK to EmailAddress.EmailAddressNum.</summary>
 		public long EmailAddressNum;
+		///<summary>FK to provider.ProvNum.  Used in place of the default practice provider when making new patients.</summary>
+		public long DefaultProv;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

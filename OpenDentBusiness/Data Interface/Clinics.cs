@@ -280,6 +280,30 @@ namespace OpenDentBusiness{
 			return listClinics;
 		}
 
+		///<summary>This method returns true if the given provider is set as the default clinic provider for any clinic.</summary>
+		public static bool IsDefaultClinicProvider(long provNum) {
+			//No need to check RemotingRole; no call to db.
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].DefaultProv==provNum) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		///<summary>This method returns true if the given provider is set as the default ins billing provider for any clinic.</summary>
+		public static bool IsInsBillingProvider(long provNum) {
+			//No need to check RemotingRole; no call to db.
+			Clinic[] arrayClinics=GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].InsBillingProv==provNum) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 	}
 	
 

@@ -115,6 +115,8 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.textCountry = new System.Windows.Forms.TextBox();
 			this.labelCountry = new System.Windows.Forms.Label();
 			this.textEmail = new System.Windows.Forms.TextBox();
@@ -153,8 +155,6 @@ namespace OpenDental{
 			this.butSearch = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.contrKeyboard1 = new OpenDental.User_Controls.ContrKeyboard();
-			this.comboClinic = new System.Windows.Forms.ComboBox();
-			this.labelClinic = new System.Windows.Forms.Label();
 			this.groupAddPt.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -299,6 +299,25 @@ namespace OpenDental{
 			this.groupBox2.TabIndex = 0;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Search by:";
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(118, 336);
+			this.comboClinic.MaxDropDownItems = 40;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(138, 21);
+			this.comboClinic.TabIndex = 48;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(11, 340);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(106, 14);
+			this.labelClinic.TabIndex = 47;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textCountry
 			// 
@@ -677,25 +696,6 @@ namespace OpenDental{
 			this.contrKeyboard1.TabIndex = 10;
 			this.contrKeyboard1.KeyClick += new OpenDental.User_Controls.KeyboardClickEventHandler(this.contrKeyboard1_KeyClick);
 			this.contrKeyboard1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.contrKeyboard1_MouseDown);
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(118, 336);
-			this.comboClinic.MaxDropDownItems = 40;
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(138, 21);
-			this.comboClinic.TabIndex = 48;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
-			// 
-			// labelClinic
-			// 
-			this.labelClinic.Location = new System.Drawing.Point(11, 340);
-			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(106, 14);
-			this.labelClinic.TabIndex = 47;
-			this.labelClinic.Text = "Clinic";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormPatientSelect
 			// 
@@ -1242,7 +1242,15 @@ namespace OpenDental{
 			}
 			PatCur.PatStatus=PatientStatus.Patient;
 			PatCur.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-			PatCur.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
+			//Explicitly use the combo clinic instead of FormOpenDental.ClinicNum becuase the combo box should default to that clinic unless manually changed by the user.
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0) {//not no clinics and all isn't selected
+				//Set the patients primary provider to the clinic default provider.
+				PatCur.PriProv=Providers.GetDefaultProvider(_listClinics[comboClinic.SelectedIndex-1].ClinicNum).ProvNum;
+			}
+			else {
+				//Set the patients primary provider to the practice default provider.
+				PatCur.PriProv=Providers.GetDefaultProvider().ProvNum;
+			}
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				PatCur.Gender=PatientGender.Unknown;
 			}
