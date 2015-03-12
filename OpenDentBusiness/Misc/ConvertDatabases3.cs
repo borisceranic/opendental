@@ -7704,7 +7704,56 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX clinic_DefaultProv ON clinic (DefaultProv)";
 					Db.NonQ(command);
 				}
-
+				#region ConnectionGroup tables for Central Enterprise Management Tool
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS connectiongroup";
+					Db.NonQ(command);
+					command=@"CREATE TABLE connectiongroup (
+						ConnectionGroupNum bigint NOT NULL auto_increment PRIMARY KEY,
+						Description varchar(255) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE connectiongroup'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE connectiongroup (
+						ConnectionGroupNum number(20) NOT NULL,
+						Description varchar2(255),
+						CONSTRAINT connectiongroup_ConnectionGrou PRIMARY KEY (ConnectionGroupNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX connectiongroup_ConnGroupNum ON connectiongroup (ConnectionGroupNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS conngroupattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE conngroupattach (
+						ConnGroupAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ConnectionGroupNum bigint NOT NULL,
+						CentralConnectionNum bigint NOT NULL,
+						INDEX(ConnectionGroupNum),
+						INDEX(CentralConnectionNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE conngroupattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE conngroupattach (
+						ConnGroupAttachNum number(20) NOT NULL,
+						ConnectionGroupNum number(20) NOT NULL,
+						CentralConnectionNum number(20) NOT NULL,
+						CONSTRAINT conngroupattach_ConnGroupAttac PRIMARY KEY (ConnGroupAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX conngroupattach_ConnectionAtta ON conngroupattach (ConnGroupAttachNum)";//too long
+					Db.NonQ(command);
+					command=@"CREATE INDEX conngroupattach_CentralConnect ON conngroupattach (CentralConnectionNum)";//too long
+					Db.NonQ(command);
+				}
+				#endregion
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

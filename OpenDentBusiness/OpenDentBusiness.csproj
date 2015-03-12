@@ -175,6 +175,8 @@
     <Compile Include="Crud\AutoNoteControlCrud.cs" />
     <Compile Include="Crud\AutoNoteCrud.cs" />
     <Compile Include="Crud\CDSPermissionCrud.cs" />
+    <Compile Include="Crud\ConnectionGroupCrud.cs" />
+    <Compile Include="Crud\ConnGroupAttachCrud.cs" />
     <Compile Include="Crud\DispSupplyCrud.cs" />
     <Compile Include="Crud\EhrAptObsCrud.cs" />
     <Compile Include="Crud\EhrCarePlanCrud.cs" />
@@ -439,6 +441,8 @@
     <Compile Include="Data Interface\AutomationConditions.cs" />
     <Compile Include="Data Interface\Automations.cs" />
     <Compile Include="Data Interface\CDSPermissions.cs" />
+    <Compile Include="Data Interface\ConnectionGroups.cs" />
+    <Compile Include="Data Interface\ConnGroupAttaches.cs" />
     <Compile Include="Data Interface\DispSupplies.cs" />
     <Compile Include="Data Interface\EhrAptObses.cs" />
     <Compile Include="Data Interface\EhrCarePlans.cs" />
@@ -896,6 +900,8 @@
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
     <Compile Include="TableTypes\AppointmentType.cs" />
+    <Compile Include="TableTypes\ConnectionGroup.cs" />
+    <Compile Include="TableTypes\ConnectionGroupAttach.cs" />
     <Compile Include="TableTypes\MedLabAttach.cs" />
     <Compile Include="TableTypes\MedLabFacility.cs" />
     <Compile Include="TableTypes\MedLabSpecimen.cs" />
