@@ -13,6 +13,7 @@ namespace OpenDentBusiness{
 		private static List<ReplicationServer> listt;
 		///<summary>This value is only retrieved once upon startup.</summary>
 		private static int server_id=-1;
+		///<summary>Must be class level variable so that we do not re-generate the same random numbers every time GetKey() is called.</summary>
 		private static Random _random=new Random();
 
 		/// <summary>The first time this is accessed, the value is obtained using a query.  Will be 0 unless a server id was set in my.ini.</summary>
