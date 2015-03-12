@@ -8,6 +8,7 @@ using OpenDentBusiness;
 using CodeBase;
 using System.Data;
 using OpenDental.UI;
+using System.Globalization;
 
 namespace OpenDental{
 	public class SheetUtil {
@@ -387,6 +388,26 @@ namespace OpenDental{
 					retVal=t.Clone();
 				}
 				foreach(DataRow r in t.Rows) {
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && stmt.IsReceipt) {//Canadian. en-CA or fr-CA
+						if(r["StatementNum"].ToString()!="0") {//Hide statement rows for Canadian receipts.
+							continue;
+						}
+						if(r["ClaimNum"].ToString()!="0") {//Hide claim rows and claim payment rows for Canadian receipts.
+							continue;
+						}
+						if(PIn.Long(r["ProcNum"].ToString())!=0){
+							r["description"]="";//Description: blank in Canada normally because this information is used on taxes and is considered a security concern.
+						}
+						r["ProcCode"]="";//Code: blank in Canada normally because this information is used on taxes and is considered a security concern.
+						r["tth"]="";//Tooth: blank in Canada normally because this information is used on taxes and is considered a security concern.
+					}
+					if(CultureInfo.CurrentCulture.Name=="en-US"	&& stmt.IsReceipt && r["PayNum"].ToString()=="0") {//Hide everything except patient payments
+						continue;
+						//js Some additional features would be nice for receipts, such as hiding the bal column, the aging, and the amount due sections.
+					}
+					if(CultureInfo.CurrentCulture.Name=="en-AU" && r["prov"].ToString().Trim()!="") {//English (Australia)
+						r["description"]=r["prov"].ToString()+" - "+r["description"].ToString();
+					}
 					retVal.ImportRow(r);
 				}
 				if(t.Rows.Count==0) {
