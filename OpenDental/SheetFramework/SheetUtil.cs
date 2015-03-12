@@ -43,8 +43,7 @@ namespace OpenDental{
 			Font font;
 			FontStyle fontstyle;
 			foreach(SheetField field in sheet.SheetFields) {
-				if(field.FieldType==SheetFieldType.Image 
-					||field.FieldType==SheetFieldType.PatImage) {
+				if(field.FieldType==SheetFieldType.Image || field.FieldType==SheetFieldType.PatImage) {
 					#region Get the path for the image
 					string filePathAndName="";
 					switch(field.FieldType) {
@@ -69,17 +68,14 @@ namespace OpenDental{
 							continue;
 					}
 					#endregion
-					#region Load the image into bmpOriginal
-					if(field.FieldName=="Patient Info.gif"
-					||File.Exists(filePathAndName)) {
+					if(field.FieldName=="Patient Info.gif" || File.Exists(filePathAndName)) {
 						continue;
 					}
 					else {//img doesn't exist or we do not have access to it.
 						field.Height=0;//Set height to zero so that it will not cause extra pages to print.
 					}
-					#endregion
 				}
-				if(field.GrowthBehavior==GrowthBehaviorEnum.None){
+				if(field.GrowthBehavior==GrowthBehaviorEnum.None){//Images don't have growth behavior, so images are excluded below this point.
 					continue;
 				}
 				fontstyle=FontStyle.Regular;
