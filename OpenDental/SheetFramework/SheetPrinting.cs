@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Printing;
-using System.IO;
-using CodeBase;
+﻿using CodeBase;
 using OpenDental.UI;
 using OpenDentBusiness;
 using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Windows.Forms;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Drawing.Printing;
+using System.IO;
+using System.Windows.Forms;
 
 namespace OpenDental {
 	public class SheetPrinting {
@@ -218,6 +219,7 @@ namespace OpenDental {
 		private static void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Graphics g=e.Graphics;
 			g.SmoothingMode=SmoothingMode.HighQuality;
+			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			Sheets.SetPageMargin(sheet,_printMargin);
 			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);//this is here because of easy access to g.
@@ -230,7 +232,15 @@ namespace OpenDental {
 				switch(field.FieldType) {
 					case SheetFieldType.Image:
 					case SheetFieldType.PatImage:
-						drawFieldImage(field,g,null);
+						try {
+							drawFieldImage(field,g,null);
+						}
+						catch(OutOfMemoryException ex) {
+							//Cancel the print job because there is a static image on this sheet which is to big for the printer to handle.
+							MessageBox.Show(ex.Message);//Custom message that is already translated.
+							e.Cancel=true;
+							return;
+						}
 						break;
 					case SheetFieldType.Drawing:
 						drawFieldDrawing(field,g,null);
@@ -309,9 +319,9 @@ namespace OpenDental {
 			drawFieldImage(field,g,null);
 		}
 
+		///<summary>Draws the image to the graphics object passed in.  Can throw an OutOfMemoryException when printing that will have a message that should be displayed and the print job should be cancelled.</summary>
 		public static void drawFieldImage(SheetField field,Graphics g, XGraphics gx) {
 			Bitmap bmpOriginal=null;
-			Bitmap bmpDraw=null;
 			string filePathAndName="";
 			#region Get the path for the image
 			switch(field.FieldType) {
@@ -372,23 +382,43 @@ namespace OpenDental {
 				//do nothing
 			}
 			#endregion
-			#region Resize drawable image. Do not draw original image, if it is too large it can crash GDI+
 			GC.Collect();
-			Size sz=new Size(Convert.ToInt32(imgDrawWidth),Convert.ToInt32(imgDrawHeight));
-			bmpDraw=new Bitmap(bmpOriginal,sz);
-			#endregion
+			//We used to scale down bmpOriginal here to avoid memory exceptions.
+			//Doing so was causing significant quality loss when printing or creating pdfs with very large images.
 			if(gx==null) {
-				g.DrawImage(bmpDraw,field.XPos+adjustX,field.YPos+adjustY-_yPosPrint,imgDrawWidth,imgDrawHeight);
+				try {
+					//Always use the original BMP so that very large images can be scaled by the graphics class thus keeping a high quality image by using interpolation.
+					g.DrawImage(bmpOriginal,
+						new Rectangle(field.XPos+adjustX,field.YPos+adjustY-_yPosPrint,(int)imgDrawWidth,(int)imgDrawHeight),
+						new Rectangle(0,0,bmpOriginal.Width,bmpOriginal.Height),
+						GraphicsUnit.Pixel);
+				}
+				catch(OutOfMemoryException) {
+					throw new OutOfMemoryException(Lan.g("Sheets","A static image on this sheet is too high in quality and cannot be printed.")+"\r\n"
+						+Lan.g("Sheets","Try printing to a different printer or lower the quality of the static image")+":\r\n"
+						+filePathAndName);
+				}
 			}
 			else {
-				XImage xI=XImage.FromGdiPlusImage((Bitmap)bmpDraw.Clone());
+				MemoryStream ms=null;
+				//For some reason PdfSharp's XImage cannot handle TIFF images.
+				if(filePathAndName.ToLower().EndsWith(".tif") || filePathAndName.ToLower().EndsWith(".tiff")) {
+					//Trick PdfSharp when we get a TIFF image into thinking it is a different image type.
+					//Saving to BMP format will sometimes increase the file size dramatically.  E.g. an 11MB JPG turned into a 240MB BMP.
+					//Instead of using BMP, we will use JPG which should have little to no quality loss and should be more compressed than BMP.
+					ms=new MemoryStream();
+					bmpOriginal.Save(ms,ImageFormat.Jpeg);
+					bmpOriginal.Dispose();
+					bmpOriginal=new Bitmap(ms);
+				}
+				XImage xI=XImage.FromGdiPlusImage(bmpOriginal);
 				gx.DrawImage(xI,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
 				xI.Dispose();
 				xI=null;
-			}
-			if(bmpDraw!=null) {
-				bmpDraw.Dispose();
-				bmpDraw=null;
+				if(ms!=null) {
+					ms.Dispose();
+					ms=null;
+				}
 			}
 			if(bmpOriginal!=null) {
 				bmpOriginal.Dispose();
