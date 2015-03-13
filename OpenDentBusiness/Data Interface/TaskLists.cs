@@ -81,7 +81,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT tasklist.*,"
 				+"(SELECT COUNT(*) FROM taskancestor,task WHERE taskancestor.TaskListNum=tasklist.TaskListNum "
-				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New)+") "
+				+"AND task.TaskNum=taskancestor.TaskNum AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New)+") NewTaskCount"
 				//I don't think the repeating trunk would ever track by user, so no special treatment here.
 				//Acutual behavior in both cases needs to be tested.
 				+"FROM tasklist "
@@ -116,7 +116,7 @@ namespace OpenDentBusiness{
 			else {
 				command+="AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
 			}
-			command+=") "
+			command+=") 'NewTaskCount' "
 				+"FROM tasklist "
 				+"WHERE Parent="+POut.Long(parent)+" "
 				+"ORDER BY tasklist.Descript,tasklist.DateTimeEntry";
