@@ -28,7 +28,7 @@ namespace OpenDental.Bridges {
 				}
 			}
 			else {
-				string cmdline="PW7";
+				string cmdline="OD14";
 				if(ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Enter 0 to use PatientNum, or 1 to use ChartNum")=="0") {
 					cmdline+=" "+pat.PatNum.ToString();
 				}
@@ -49,7 +49,8 @@ namespace OpenDental.Bridges {
 				else {
 					cmdline+=" NA";
 				}
-				if(pat.SSN.Replace("0","").Trim()!="") {//An SSN which is all zeros will be treated as a blank SSN.  Needed for eCW, since eCW sets SSN to 000-00-0000 if the patient does not have an SSN.
+				//SSNs which are all zeros will be treated as blank.  Needed for eCW, since eCW sets SSN to 000-00-0000 if the patient does not have an SSN.
+				if(pat.SSN.Replace("0","").Trim()!="") {
 					//Otherwise, output raw SSN:
 					cmdline+=" "+pat.SSN;
 				}
@@ -107,15 +108,9 @@ namespace OpenDental.Bridges {
 					else {
 						cmdline+=" NA";
 					}
-					if(referral.Telephone!="") {
-						cmdline+=" "+Tidy(referral.Telephone);
-					}
-					else {
-						cmdline+=" NA";
-					}
 				}
 				else {
-					cmdline+=" NA NA NA NA NA NA NA NA";
+					cmdline+=" NA NA NA NA NA NA NA";
 				}
 
 				try {
