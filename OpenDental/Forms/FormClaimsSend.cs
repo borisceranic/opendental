@@ -647,7 +647,9 @@ namespace OpenDental{
 			listClaimSend.AddRange(_arrayQueueAll);
 			//Remove any non-matches
 			//Creating a subset of listClaimSend with all entries c such that c.ClinicNum==clinicNum
-			listClaimSend=listClaimSend.FindAll(c => c.ClinicNum==clinicNum);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Filter by clinic only when clinics are enabled.
+				listClaimSend=listClaimSend.FindAll(c => c.ClinicNum==clinicNum);
+			}
 			if(customTracking>0) {
 				//Creating a subset of listClaimSend with all entries c such that c.CustomTracking==customTracking
 				listClaimSend=listClaimSend.FindAll(c => c.CustomTracking==customTracking);
