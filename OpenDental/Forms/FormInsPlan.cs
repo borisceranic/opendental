@@ -3462,7 +3462,7 @@ namespace OpenDental{
 				&& clearhouse.CommBridge!=EclaimsCommBridge.EDS)
 				&& clearhouse.Eformat!=ElectronicClaimFormat.Canadian)
 			{
-				MsgBox.Show(this,"So far, eligibility checks only work with ClaimConnect and CDAnet.");
+				MsgBox.Show(this,"So far, eligibility checks only work with ClaimConnect, EDS, and CDAnet.");
 				return;
 			}
 			if(clearhouse.Eformat==ElectronicClaimFormat.Canadian) {
