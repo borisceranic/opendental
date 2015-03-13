@@ -472,7 +472,14 @@ namespace OpenDentBusiness{
 			}
 			else if(!showRecall && !showNonRecall && showHygPresched) {//Show hygiene prescheduled only (the All option was not selected)
 				//Example: LogDateTime="2014-11-26 13:00".  Filter is 11-26, giving "2014-11-27 00:00" to compare against.  This captures all times for 11-26.
-				command+="AND (securitylog.PatNum IS NULL OR securitylog.LogDateTime < "+POut.Date(dateFrom.AddDays(1).AddMonths(-2))+") ";
+				string aptDateSql="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					aptDateSql="DATE(appointment.AptDateTime-INTERVAL 2 MONTH)";
+				}
+				else {
+					aptDateSql="ADD_MONTHS(TO_CHAR(appointment.AptDateTime,'MM/DD/YYYY %HH24:%MI:%SS'),-2)";
+				}
+				command+="AND (securitylog.PatNum IS NULL OR securitylog.LogDateTime < "+aptDateSql+") ";
 			}
 			command+="ORDER BY AptDateTime";
 			DataTable rawtable=Db.GetTable(command);
