@@ -1172,6 +1172,7 @@ namespace OpenDental{
 					butDeleteProc.Enabled=false;
 					butInsPlan1.Enabled=false;
 					butInsPlan2.Enabled=false;
+					butComplete.Enabled=false;
 				}
 			}
 			//The four objects below are needed when adding procs to this appt.
