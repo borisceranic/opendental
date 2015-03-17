@@ -462,7 +462,8 @@ namespace OpenDental {
 					_argsDF.pen=_argsDF.penRed;
 				}
 				else {
-					_argsDF.pen=_argsDF.penBlack;
+					_argsDF.penLine.Color=SheetDefCur.SheetFieldDefs[i].ItemColor;
+					_argsDF.pen=_argsDF.penLine;
 				}
 				g.DrawLine(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,
 					SheetDefCur.SheetFieldDefs[i].XPos+SheetDefCur.SheetFieldDefs[i].Width,
@@ -555,6 +556,12 @@ namespace OpenDental {
 					str=SheetDefCur.SheetFieldDefs[i].FieldValue;
 					//g.DrawString(SheetDefCur.SheetFieldDefs[i].FieldValue,font,
 					//	brush,SheetDefCur.SheetFieldDefs[i].Bounds);
+					//Static text can have a custom color.
+					//Check to see if this text box is selected.  If it is, do not change the color.
+					if(!listFields.SelectedIndices.Contains(i)) {
+						_argsDF.brushText.Color=SheetDefCur.SheetFieldDefs[i].ItemColor;
+						_argsDF.brush=_argsDF.brushText;
+					}
 				}
 				else {
 					str=SheetDefCur.SheetFieldDefs[i].FieldName;
@@ -601,12 +608,13 @@ namespace OpenDental {
 			if(data!=null) {//That field has been calculated
 				//If any of the following factors change, then that could potentially change text positions.
 				if(field.FontName.CompareTo(data[1])==0//Has font name changed since last pass?
-			      && field.FontSize.CompareTo(data[2])==0//Has font size changed since last pass?
-			      && field.FontIsBold.CompareTo(data[3])==0//Has font boldness changed since last pass?
-			      && field.Width.CompareTo(data[4])==0//Has field width changed since last pass?
-			      && field.Height.CompareTo(data[5])==0//Has field height changed since last pass?
-			      && str.CompareTo(data[6])==0)//Has field text changed since last pass?
-			    {
+					&& field.FontSize.CompareTo(data[2])==0//Has font size changed since last pass?
+					&& field.FontIsBold.CompareTo(data[3])==0//Has font boldness changed since last pass?
+					&& field.Width.CompareTo(data[4])==0//Has field width changed since last pass?
+					&& field.Height.CompareTo(data[5])==0//Has field height changed since last pass?
+					&& str.CompareTo(data[6])==0//Has field text changed since last pass?
+					&& field.TextAlign.CompareTo(data[7])==0)//Has field text align changed since last pass?
+				{
 					doCalc=false;//Nothing has changed. Do not recalculate.
 				}
 			}
@@ -616,6 +624,7 @@ namespace OpenDental {
 				textbox.Visible=false;
 				textbox.BorderStyle=BorderStyle.None;
 				textbox.ScrollBars=RichTextBoxScrollBars.None;
+				textbox.SelectionAlignment=field.TextAlign;
 				textbox.Location=new Point(field.XPos,field.YPos);
 				textbox.Width=field.Width;
 				textbox.Height=field.Height;
@@ -633,7 +642,7 @@ namespace OpenDental {
 					positions[j]=textbox.GetPositionFromCharIndex(j);//This line is slow, so we try to minimize calling it by chaching positions each time there are changes.
 				}
 				textbox.Dispose();
-				data=new object[] { positions,field.FontName,field.FontSize,field.FontIsBold,field.Width,field.Height,str };
+				data=new object[] { positions,field.FontName,field.FontSize,field.FontIsBold,field.Width,field.Height,str,field.TextAlign };
 				HashRtfStringCache[index.ToString()]=data;
 			}
 			Point[] charPositions=(Point[])data[0];
@@ -1787,10 +1796,14 @@ namespace OpenDental {
 		public Pen penRedThick;
 		public Pen penBlack;
 		public Pen penSelection;
+		///<summary>Line color can be customized.  Make sure to explicitly set the color of this pen before using it because it might contain a color of a previous line.</summary>
+		public Pen penLine;
 		public Pen pen;
 		public Brush brush;
 		public SolidBrush brushBlue;
 		public SolidBrush brushRed;
+		///<summary>Static text color can be customized.  Make sure to explicitly set the color of this brush before using it because it might contain a color of previous static text.</summary>
+		public SolidBrush brushText;
 		public Font font;
 		public FontStyle fontstyle;
 
@@ -1801,8 +1814,10 @@ namespace OpenDental {
 			penRedThick=new Pen(Color.Red,1.6f);
 			penBlack=new Pen(Color.Black);
 			penSelection=new Pen(Color.Black);
+			penLine=new Pen(Color.Black);
 			brushBlue=new SolidBrush(Color.Blue);
 			brushRed=new SolidBrush(Color.Red);
+			brushText=new SolidBrush(Color.Black);
 		}
 
 		public void Dispose() {
@@ -1812,8 +1827,10 @@ namespace OpenDental {
 			penRedThick.Dispose();
 			penBlack.Dispose();
 			penSelection.Dispose();
+			penLine.Dispose();
 			brushBlue.Dispose();
 			brushRed.Dispose();
+			brushText.Dispose();
 		}
 
 	}
