@@ -7,13 +7,7 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class ConnGroupAttaches{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
 		#region CachePattern
-		//This region can be eliminated if this is not a table type with cached data.
-		//If leaving this region in place, be sure to add RefreshCache and FillCache 
-		//to the Cache.cs file with all the other Cache types.
-
 		///<summary>A list of all ConnGroupAttaches.</summary>
 		private static List<ConnGroupAttach> listt;
 
@@ -33,7 +27,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache(){
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM conngroupattach ORDER BY ItemOrder";//stub query probably needs to be changed
+			string command="SELECT * FROM conngroupattach";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="ConnGroupAttach";
 			FillCache(table);
@@ -46,18 +40,26 @@ namespace OpenDentBusiness{
 			listt=Crud.ConnGroupAttachCrud.TableToList(table);
 		}
 		#endregion
-		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
 		public static List<ConnGroupAttach> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ConnGroupAttach>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM conngroupattach WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM conngroupattach";
 			return Crud.ConnGroupAttachCrud.SelectMany(command);
 		}
+
+		 ///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in ConnectionGroupNum.</summary>
+     public static void Sync(List<ConnGroupAttach> listNew,long connectionGroupNum) {
+				if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+							Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,connectionGroupNum);//never pass DB list through the web service
+							return;
+				}
+				List<ConnGroupAttach> listDB=ConnGroupAttaches.GetForGroup(connectionGroupNum);
+				Crud.ConnGroupAttachCrud.Sync(listNew,listDB);
+     }
+
 
 		///<summary>Gets one ConnGroupAttach from the db.</summary>
 		public static ConnGroupAttach GetOne(long connGroupAttachNum){
@@ -66,6 +68,43 @@ namespace OpenDentBusiness{
 			}
 			return Crud.ConnGroupAttachCrud.SelectOne(connGroupAttachNum);
 		}
+
+		///<summary>Gets all ConnGroupAttaches for a given ConnectionGroupNum.</summary>
+		public static List<ConnGroupAttach> GetForGroup(long connectionGroupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetObject<List<ConnGroupAttach>>(MethodBase.GetCurrentMethod(),connectionGroupNum);
+			}
+			string command="SELECT * FROM conngroupattach WHERE ConnectionGroupNum="+POut.Long(connectionGroupNum);
+			return Crud.ConnGroupAttachCrud.SelectMany(command);
+		}
+
+		///<summary>Gets all ConnGroupAttaches for a given CentralConnectionNum.</summary>
+		public static List<ConnGroupAttach> GetForConnection(long connectionNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetObject<List<ConnGroupAttach>>(MethodBase.GetCurrentMethod(),connectionNum);
+			}
+			string command="SELECT * FROM conngroupattach WHERE CentralConnectionNum="+POut.Long(connectionNum);
+			return Crud.ConnGroupAttachCrud.SelectMany(command);
+		}
+
+		///<summary>Gets count of ConnGroupAttaches for a ConnectionGroup.</summary>
+		public static int GetCountByGroup(long groupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetObject<int>(MethodBase.GetCurrentMethod(),groupNum);
+			}
+			string command="SELECT COUNT(*) FROM conngroupattach WHERE ConnectionGroupNum="+POut.Long(groupNum);
+			return PIn.Int(Db.GetCount(command));
+		}
+
+		///<summary>Gets count of ConnGroupAttaches for a CentralConnection.</summary>
+		public static int GetCountByConnection(long connectionNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetObject<int>(MethodBase.GetCurrentMethod(),connectionNum);
+			}
+			string command="SELECT COUNT(*) FROM conngroupattach WHERE CentralConnectionNum="+POut.Long(connectionNum);
+			return PIn.Int(Db.GetCount(command));
+		}
+
 
 		///<summary></summary>
 		public static long Insert(ConnGroupAttach connGroupAttach){
@@ -94,9 +133,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM conngroupattach WHERE ConnGroupAttachNum = "+POut.Long(connGroupAttachNum);
 			Db.NonQ(command);
 		}
-		*/
-
-
 
 	}
 }

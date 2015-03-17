@@ -55,6 +55,18 @@
     <Compile Include="Db\CentralGroupPermissions.cs" />
     <Compile Include="Db\CentralUserGroups.cs" />
     <Compile Include="Db\CentralUserods.cs" />
+    <Compile Include="FormCentralConnectionGroupEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralConnectionGroupEdit.Designer.cs">
+      <DependentUpon>FormCentralConnectionGroupEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCentralConnectionGroups.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralConnectionGroups.Designer.cs">
+      <DependentUpon>FormCentralConnectionGroups.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCentralGroupPermEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -84,12 +96,6 @@
     </Compile>
     <Compile Include="FormCentralConnectionEdit.designer.cs">
       <DependentUpon>FormCentralConnectionEdit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormCentralConnectionsSetup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormCentralConnectionsSetup.designer.cs">
-      <DependentUpon>FormCentralConnectionsSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="FormCentralManager.cs">
       <SubType>Form</SubType>
@@ -121,11 +127,11 @@
     <Compile Include="FormCentralUserPasswordEdit.Designer.cs">
       <DependentUpon>FormCentralUserPasswordEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormCentralChooseDatabase.cs">
+    <Compile Include="FormCentralConnections.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormCentralChooseDatabase.Designer.cs">
-      <DependentUpon>FormCentralChooseDatabase.cs</DependentUpon>
+    <Compile Include="FormCentralConnections.Designer.cs">
+      <DependentUpon>FormCentralConnections.cs</DependentUpon>
     </Compile>
     <Compile Include="FormCentralSecurity.cs">
       <SubType>Form</SubType>
@@ -135,6 +141,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormCentralConnectionGroupEdit.resx">
+      <DependentUpon>FormCentralConnectionGroupEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralConnectionGroups.resx">
+      <DependentUpon>FormCentralConnectionGroups.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormCentralGroupPermEdit.resx">
       <DependentUpon>FormCentralGroupPermEdit.cs</DependentUpon>
     </EmbeddedResource>
@@ -153,15 +165,11 @@
       <DependentUpon>FormCentralConnectionEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormCentralConnectionsSetup.resx">
-      <DependentUpon>FormCentralConnectionsSetup.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="FormCentralManager.resx">
       <DependentUpon>FormCentralManager.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormCentralChooseDatabase.resx">
-      <DependentUpon>FormCentralChooseDatabase.cs</DependentUpon>
+    <EmbeddedResource Include="FormCentralConnections.resx">
+      <DependentUpon>FormCentralConnections.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralUserEdit.resx">
       <DependentUpon>FormCentralUserEdit.cs</DependentUpon>

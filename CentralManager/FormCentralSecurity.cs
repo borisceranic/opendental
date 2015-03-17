@@ -472,19 +472,23 @@ namespace CentralManager {
 			Prefs.UpdateBool(PrefName.SecurityLockIncludesAdmin,checkAdmin.Checked) ;
 			Prefs.UpdateBool(PrefName.CentralManagerSecurityLock,checkEnable.Checked);
 			List<CentralConnection> listChosenConns=new List<CentralConnection>();
-			FormCentralChooseDatabase FormCCD=new FormCentralChooseDatabase();
-			FormCCD.ShowDialog();
-			if(FormCCD.DialogResult==DialogResult.OK) {
-				listChosenConns=FormCCD.ListCentralConn;
+			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.LabelText.Text=Lans.g("CentralSecuritiy","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
+			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
+			FormCC.ShowDialog();
+			if(FormCC.DialogResult==DialogResult.OK) {
+				listChosenConns=FormCC.ListConns;
 			}
 			else {
 				return;
 			}
+
 			SyncAll(listChosenConns);
 			DialogResult=DialogResult.OK;
 		}
 
-			private void SyncAll(List<CentralConnection> listConns) {
+		private void SyncAll(List<CentralConnection> listConns) {
+			Cursor=Cursors.WaitCursor;
 			//Get CEMT users, groups, and associated permissions
 			List<CentralUserData> listCentralUserData=new List<CentralUserData>();
 			for(int i=0;i<_listCEMTUsers.Count;i++) {
@@ -519,9 +523,10 @@ namespace CentralManager {
 				}
 				Prefs.RefreshCache();
 				if(Prefs.UpdateString(PrefName.SecurityLockDate,POut.Date(PIn.Date(textDate.Text),false))
-				| Prefs.UpdateInt(PrefName.SecurityLockDays,PIn.Int(textDays.Text))
-				| Prefs.UpdateBool(PrefName.SecurityLockIncludesAdmin,checkAdmin.Checked)  
-				| Prefs.UpdateBool(PrefName.CentralManagerSecurityLock,checkEnable.Checked)) {
+					| Prefs.UpdateInt(PrefName.SecurityLockDays,PIn.Int(textDays.Text))
+					| Prefs.UpdateBool(PrefName.SecurityLockIncludesAdmin,checkAdmin.Checked)  
+					| Prefs.UpdateBool(PrefName.CentralManagerSecurityLock,checkEnable.Checked)) 
+				{
 					Signalods.SetInvalid(InvalidType.Prefs);//Causes cache refresh on workstations
 				}
 				//We're connected, cache has been refreshed
@@ -590,6 +595,7 @@ namespace CentralManager {
 			if(nameConflicts!="") {
 				errorText+="Name Conflicts:\r\n"+nameConflicts+"Please rename users and try again.\r\n";
 			}
+			Cursor=Cursors.Default;
 			MsgBoxCopyPaste MsgBoxCopyPaste=new MsgBoxCopyPaste(errorText);
 			MsgBoxCopyPaste.ShowDialog();
 		}

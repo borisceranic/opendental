@@ -17,8 +17,8 @@ using OpenDental;
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
 		public static byte[] EncryptionKey;
-		private List<CentralConnection> ConnList;
-		private bool IsStartingUp;
+		private List<CentralConnection> _listConns;
+		private List<ConnectionGroup> _listConnectionGroups;
 
 		public FormCentralManager() {
 			InitializeComponent();
@@ -27,7 +27,6 @@ namespace CentralManager {
 		}
 
 		private void FormCentralManager_Load(object sender,EventArgs e) {
-			IsStartingUp=true;
 			if(!GetConfigAndConnect()){
 				return;
 			}
@@ -35,22 +34,28 @@ namespace CentralManager {
 			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion));
 			Version currentVersion=Assembly.GetAssembly(typeof(Db)).GetName().Version;
 			if(storedVersion.CompareTo(currentVersion)!=0){
-				MessageBox.Show("Program version: "+currentVersion.ToString()+"\r\n"
-					+"Database version: "+storedVersion.ToString()+"\r\n"
-					+"Versions must match.  Please manually connect to the database through the main program in order to update the version.");
+				MessageBox.Show(Lan.g(this,"Program version")+": "+currentVersion.ToString()+"\r\n"
+					+Lan.g(this,"Database version")+": "+storedVersion.ToString()+"\r\n"
+					+Lan.g(this,"Versions must match.  Please manually connect to the database through the main program in order to update the version."));
 				Application.Exit();
 				return;
 			}
 			if(PrefC.GetString(PrefName.CentralManagerPassHash)!=""){
-				FormCentralPasswordCheck formC=new FormCentralPasswordCheck();
-				formC.ShowDialog();
-				if(formC.DialogResult!=DialogResult.OK){
+				FormCentralPasswordCheck FormCPC=new FormCentralPasswordCheck();
+				FormCPC.ShowDialog();
+				if(FormCPC.DialogResult!=DialogResult.OK){
 					Application.Exit();
 					return;
 				}
 			}
+			_listConnectionGroups=ConnectionGroups.GetListt();
+			comboConnectionGroups.Items.Clear();
+			comboConnectionGroups.Items.Add("All");
+			for(int i=0;i<_listConnectionGroups.Count;i++) {
+				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
+			}
+			comboConnectionGroups.SelectedIndex=0;//Select 'All' on load.
 			FillGrid();
-			IsStartingUp=false;
 		}
 
 		///<summary>Gets the settings from the config file and attempts to connect.</summary>
@@ -105,14 +110,109 @@ namespace CentralManager {
 			}
 		}
 
-		private void menuPassword_Click(object sender,EventArgs e) {
-			FormCentralPasswordChange formC=new FormCentralPasswordChange();
-			formC.ShowDialog();
+		private void FillGrid() {
+			_listConns=CentralConnections.Refresh(textSearch.Text);
+			if(comboConnectionGroups.SelectedIndex>0) {
+				_listConns=ConnectionGroups.FilterConnsByGroup(_listConns,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
+			}
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn("#",40);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Database",320);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Note",300);
+			gridMain.Columns.Add(col);
+			gridMain.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_listConns.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(_listConns[i].ItemOrder.ToString());
+				if(_listConns[i].DatabaseName=="") {//uri
+					row.Cells.Add(_listConns[i].ServiceURI);
+				}
+				else {
+					row.Cells.Add(_listConns[i].ServerName+", "+_listConns[i].DatabaseName);
+				}
+				row.Cells.Add(_listConns[i].Note);
+				row.Tag=_listConns[i];
+				gridMain.Rows.Add(row);
+			}
+			gridMain.EndUpdate();
 		}
 
-		private void menuConSetup_Click(object sender,EventArgs e) {
-			FormCentralConnectionsSetup formS=new FormCentralConnectionsSetup();
-			formS.ShowDialog();
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			string args="";
+			if(_listConns[e.Row].DatabaseName!="") {
+				//ServerName=localhost DatabaseName=opendental MySqlUser=root MySqlPassword=
+				args+="ServerName=\""+_listConns[e.Row].ServerName+"\" "
+					+"DatabaseName=\""+_listConns[e.Row].DatabaseName+"\" "
+					+"MySqlUser=\""+_listConns[e.Row].MySqlUser+"\" ";
+				if(_listConns[e.Row].MySqlPassword!="") {
+					args+="MySqlPassword=\""+CentralConnections.Decrypt(_listConns[e.Row].MySqlPassword,EncryptionKey)+"\" ";
+				}
+			}
+			else if(_listConns[e.Row].ServiceURI!="") {
+				args+="WebServiceURI=\""+_listConns[e.Row].ServiceURI+"\" ";
+				if(_listConns[e.Row].WebServiceIsEcw){
+					args+="WebServiceIsEcw=True ";
+				}
+			}
+			else {
+				MessageBox.Show("Either a database or a Middle Tier URI must be specified in the connection.");
+				return;
+			}
+			//od username and password always allowed
+			if(_listConns[e.Row].OdUser!="") {
+				args+="UserName=\""+_listConns[e.Row].OdUser+"\" ";
+			}
+			if(_listConns[e.Row].OdPassword!="") {
+				args+="OdPassword=\""+CentralConnections.Decrypt(_listConns[e.Row].OdPassword,EncryptionKey)+"\" ";
+			}
+			#if DEBUG
+				Process.Start("C:\\Development\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
+			#else
+				Process.Start("OpenDental.exe",args);
+			#endif
+		}
+
+		private void textSearch_TextChanged(object sender,EventArgs e) {
+			FillGrid();
+		}
+		
+		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		#region Menu Setup
+
+		private void menuConnSetup_Click(object sender,EventArgs e) {
+			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.LabelText.Text=Lans.g("FormCentralConnections","Double click an existing connection to edit or click the 'Add' button to add a new connection.");
+			FormCC.Text=Lans.g("FormCentralConnections","Connection Setup");
+			FormCC.ShowDialog();
+			FillGrid();
+		}
+
+		private void menuGroups_Click(object sender,EventArgs e) {
+			ConnectionGroup connGroupCur=null;
+			if(comboConnectionGroups.SelectedIndex>0) {
+				connGroupCur=_listConnectionGroups[comboConnectionGroups.SelectedIndex-1];
+			}
+			FormCentralConnectionGroups FormCCG=new FormCentralConnectionGroups();
+			FormCCG.ShowDialog();
+			ConnectionGroups.RefreshCache();
+			_listConnectionGroups=ConnectionGroups.GetListt();
+			comboConnectionGroups.Items.Clear();
+			comboConnectionGroups.Items.Add("All");
+			comboConnectionGroups.SelectedIndex=0;//default to "All"
+			for(int i=0;i<_listConnectionGroups.Count;i++) {
+				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
+				if(connGroupCur!=null && connGroupCur.ConnectionGroupNum==_listConnectionGroups[i].ConnectionGroupNum) {
+					comboConnectionGroups.SelectedIndex=i+1;//Reselect the connection group that the user had before.
+				}
+			}
 			FillGrid();
 		}
 
@@ -122,12 +222,14 @@ namespace CentralManager {
 			GetConfigAndConnect();
 		}
 
-		private void textSearch_TextChanged(object sender,EventArgs e) {
-			if(IsStartingUp) {
-				return;
-			}
-			FillGrid();
+		private void menuPassword_Click(object sender,EventArgs e) {
+			FormCentralPasswordChange FormCPC=new FormCentralPasswordChange();
+			FormCPC.ShowDialog();
 		}
+
+		#endregion
+
+		#region Menu Reports
 
 		private void menuProdInc_Click(object sender,EventArgs e) {
 			List<CentralConnection> listSelectedConn=new List<CentralConnection>();
@@ -145,69 +247,7 @@ namespace CentralManager {
 			GetConfigAndConnect();//Set the connection settings back to the central manager db.
 		}
 
-		private void FillGrid() {
-			ConnList=CentralConnections.Refresh(textSearch.Text);
-			gridMain.BeginUpdate();
-			gridMain.Columns.Clear();
-			ODGridColumn col;
-			col=new ODGridColumn("#",40);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Database",320);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Note",300);
-			gridMain.Columns.Add(col);
-			gridMain.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<ConnList.Count;i++) {
-				row=new ODGridRow();
-				row.Cells.Add(ConnList[i].ItemOrder.ToString());
-				if(ConnList[i].DatabaseName=="") {//uri
-					row.Cells.Add(ConnList[i].ServiceURI);
-				}
-				else {
-					row.Cells.Add(ConnList[i].ServerName+", "+ConnList[i].DatabaseName);
-				}
-				row.Cells.Add(ConnList[i].Note);
-				row.Tag=ConnList[i];
-				gridMain.Rows.Add(row);
-			}
-			gridMain.EndUpdate();
-		}
-
-		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			string args="";
-			if(ConnList[e.Row].DatabaseName!="") {
-				//ServerName=localhost DatabaseName=opendental MySqlUser=root MySqlPassword=
-				args+="ServerName=\""+ConnList[e.Row].ServerName+"\" "
-					+"DatabaseName=\""+ConnList[e.Row].DatabaseName+"\" "
-					+"MySqlUser=\""+ConnList[e.Row].MySqlUser+"\" ";
-				if(ConnList[e.Row].MySqlPassword!="") {
-					args+="MySqlPassword=\""+CentralConnections.Decrypt(ConnList[e.Row].MySqlPassword,EncryptionKey)+"\" ";
-				}
-			}
-			else if(ConnList[e.Row].ServiceURI!="") {
-				args+="WebServiceURI=\""+ConnList[e.Row].ServiceURI+"\" ";
-				if(ConnList[e.Row].WebServiceIsEcw){
-					args+="WebServiceIsEcw=True ";
-				}
-			}
-			else {
-				MessageBox.Show("Either a database or a Middle Tier URI must be specified in the connection.");
-				return;
-			}
-			//od username and password always allowed
-			if(ConnList[e.Row].OdUser!="") {
-				args+="UserName=\""+ConnList[e.Row].OdUser+"\" ";
-			}
-			if(ConnList[e.Row].OdPassword!="") {
-				args+="OdPassword=\""+CentralConnections.Decrypt(ConnList[e.Row].OdPassword,EncryptionKey)+"\" ";
-			}
-			#if DEBUG
-				Process.Start("C:\\Development\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
-			#else
-				Process.Start("OpenDental.exe",args);
-			#endif
-		}
+		#endregion
 		
 	}
 }

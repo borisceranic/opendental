@@ -7,12 +7,7 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class ConnectionGroups{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
 		#region CachePattern
-		//This region can be eliminated if this is not a table type with cached data.
-		//If leaving this region in place, be sure to add RefreshCache and FillCache 
-		//to the Cache.cs file with all the other Cache types.
 
 		///<summary>A list of all ConnectionGroups.</summary>
 		private static List<ConnectionGroup> listt;
@@ -30,10 +25,18 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		public static List<ConnectionGroup> GetListt() {
+			List<ConnectionGroup> listConns=new List<ConnectionGroup>();
+			for(int i=0;i<Listt.Count;i++) {
+				listConns.Add(Listt[i].Copy());
+			}
+			return listConns;
+		}
+
 		///<summary></summary>
-		public static DataTable RefreshCache(){
+		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM connectiongroup ORDER BY ItemOrder";//stub query probably needs to be changed
+			string command="SELECT * FROM connectiongroup ORDER BY Description";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="ConnectionGroup";
 			FillCache(table);
@@ -46,25 +49,58 @@ namespace OpenDentBusiness{
 			listt=Crud.ConnectionGroupCrud.TableToList(table);
 		}
 		#endregion
-		*/
-		/*
-		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
 		public static List<ConnectionGroup> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ConnectionGroup>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM connectiongroup WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM connectiongroup ORDER BY Description";
 			return Crud.ConnectionGroupCrud.SelectMany(command);
 		}
 
-		///<summary>Gets one ConnectionGroup from the db.</summary>
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+    public static void Sync(List<ConnectionGroup> listNew) {
+      if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+        Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
+        return;
+      }
+			ConnectionGroups.RefreshCache();
+      List<ConnectionGroup> listDB=ConnectionGroups.Listt;
+      Crud.ConnectionGroupCrud.Sync(listNew,listDB);
+    }
+
+		///<summary>Filters _listConns to only include connections that are associated to the selected connection group.</summary>
+		public static List<CentralConnection> FilterConnsByGroup(List<CentralConnection> listConns,ConnectionGroup connGroup) {
+			List<CentralConnection> retVal=new List<CentralConnection>();
+			//Get all ConnGroupAttaches for selected group.
+			List<ConnGroupAttach> listCentralConnGroupAttaches=ConnGroupAttaches.GetForGroup(connGroup.ConnectionGroupNum);
+			for(int i=0;i<listConns.Count;i++) {//Go through connections and return a subset of only those in listConnAttaches (only those in the selected group).
+				for(int j=0;j<listCentralConnGroupAttaches.Count;j++) {
+					if(listConns[i].CentralConnectionNum==listCentralConnGroupAttaches[j].CentralConnectionNum) {//Connection entry found for selected group, display connection.
+						retVal.Add(listConns[i]);
+						break;
+					}
+				}
+			}
+			return retVal;
+		}
+
+		///<summary>Gets one ConnectionGroup from the db based on the ConnectionGroupNum.</summary>
 		public static ConnectionGroup GetOne(long connectionGroupNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				return Meth.GetObject<ConnectionGroup>(MethodBase.GetCurrentMethod(),connectionGroupNum);
 			}
 			return Crud.ConnectionGroupCrud.SelectOne(connectionGroupNum);
+		}
+
+		///<summary>Gets ConnectionGroups based on description.</summary>
+		public static List<ConnectionGroup> GetByDescription(string description) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<ConnectionGroup>>(MethodBase.GetCurrentMethod(),description);
+			}
+			string command="SELECT * FROM connectiongroup WHERE Description LIKE '%"+POut.String(description)+"%'";
+			return Crud.ConnectionGroupCrud.SelectMany(command);
 		}
 
 		///<summary></summary>
@@ -94,9 +130,5 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM connectiongroup WHERE ConnectionGroupNum = "+POut.Long(connectionGroupNum);
 			Db.NonQ(command);
 		}
-		*/
-
-
-
 	}
 }

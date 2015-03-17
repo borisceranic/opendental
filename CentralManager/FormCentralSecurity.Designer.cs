@@ -93,7 +93,7 @@
 			this.butSyncAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSyncAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSyncAll.CornerRadius = 4F;
-			this.butSyncAll.Location = new System.Drawing.Point(566, 532);
+			this.butSyncAll.Location = new System.Drawing.Point(566, 443);
 			this.butSyncAll.Name = "butSyncAll";
 			this.butSyncAll.Size = new System.Drawing.Size(75, 24);
 			this.butSyncAll.TabIndex = 67;
@@ -187,7 +187,7 @@
 			this.groupBox1.Controls.Add(this.textDays);
 			this.groupBox1.Controls.Add(this.textDate);
 			this.groupBox1.Controls.Add(this.label2);
-			this.groupBox1.Location = new System.Drawing.Point(49, 368);
+			this.groupBox1.Location = new System.Drawing.Point(12, 388);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(488, 228);
 			this.groupBox1.TabIndex = 106;
