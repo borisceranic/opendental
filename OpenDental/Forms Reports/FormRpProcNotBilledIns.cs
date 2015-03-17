@@ -138,18 +138,12 @@ namespace OpenDental{
 				report.Query+=DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI");
 			}
 			report.Query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee "
-				+"FROM patient,procedurecode,procedurelog,claimproc "
+				+"FROM patient,procedurecode,procedurelog,claimproc,insplan "
 				+"WHERE claimproc.procnum=procedurelog.procnum "
 				+"AND patient.PatNum=procedurelog.PatNum "
 				+"AND procedurelog.CodeNum=procedurecode.CodeNum "
-				//We used to explicitly exclude completed procedures with unsent medical estimates from this report.
-				//We think this was because, back in 2010, medical insurance was a new feature.
-				//Also, it did not support intermingling dental and medical insurance for patients.
-				//On 02/12/2015, excluding these procedures was considered an oversight to the medical features added after 2010.
-				//Users had no way to see why patients were being excluded from their billing list(s) when using the 'Exclude if insurance pending' option.
-				//Currently, the 'Exclude if insurance pending' billing option will exclude patients due to pending medical insurance estimates.
-				//If showing unsent medical estimates in this report is to be considered a bug in the future, 
-				//make sure to go enhance the billing options query to exclude medical insurance estimates so that those patients show up in the billing list(s).
+				+"AND claimproc.PlanNum=insplan.PlanNum "
+				+"AND insplan.IsMedical=0 "
 				+"AND claimproc.NoBillIns=0 "
 				+"AND procedurelog.ProcFee>0 "
 				+"AND claimproc.Status=6 "//estimate
