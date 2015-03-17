@@ -14,6 +14,7 @@ namespace OpenDental {
 	public partial class FormHL7DefMessageEdit:System.Windows.Forms.Form {
 		public HL7DefMessage HL7DefMesCur;
 		public bool IsHL7DefInternal;
+		public HL7InternalType InternalType;
 
 		///<summary></summary>
 		public FormHL7DefMessageEdit() {
@@ -41,11 +42,14 @@ namespace OpenDental {
 					radioOut.Checked=true;
 				}
 			}
-			if(IsHL7DefInternal) {
+			if(IsHL7DefInternal || InternalType==HL7InternalType.MedLabv2_3) {
 				butAdd.Enabled=false;
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 				labelDelete.Visible=true;
+				if(InternalType==HL7InternalType.MedLabv2_3) {
+					labelDelete.Text=Lan.g(this,"The messages and segments, and their item orders cannot be modified in a MedLabv2_3 definition.");
+				}
 			}
 		}
 
@@ -84,6 +88,7 @@ namespace OpenDental {
 			FormHL7DefSegmentEdit FormS=new FormHL7DefSegmentEdit();
 			FormS.HL7DefSegCur=HL7DefMesCur.hl7DefSegments[e.Row];
 			FormS.IsHL7DefInternal=IsHL7DefInternal;
+			FormS.InternalType=InternalType;
 			FormS.ShowDialog();
 			FillGrid();
 		}
@@ -112,6 +117,7 @@ namespace OpenDental {
 			FormS.HL7DefSegCur.HL7DefMessageNum=HL7DefMesCur.HL7DefMessageNum;
 			FormS.HL7DefSegCur.IsNew=true;
 			FormS.IsHL7DefInternal=false;
+			FormS.InternalType=InternalType;
 			FormS.ShowDialog();
 			FillGrid();
 		}
@@ -120,6 +126,10 @@ namespace OpenDental {
 			//This button is disabled if IsHL7DefInternal
 			if(radioOut.Checked && textItemOrder.errorProvider1.GetError(textItemOrder)!="") {
 				MsgBox.Show(this,"Please fix data entry error first.");
+				return;
+			}
+			if(HL7DefMesCur.hl7DefSegments[0].SegmentName!=SegmentNameHL7.MSH) {
+				MsgBox.Show(this,"The first segment in any message must be the MSH - Message Header segment.");
 				return;
 			}
 			HL7DefMesCur.MessageType=(MessageTypeHL7)comboMsgType.SelectedIndex+1;//+1 because 0 is NotDefined and is not displayed for user to select

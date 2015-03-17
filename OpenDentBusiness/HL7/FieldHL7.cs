@@ -36,7 +36,7 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		public override string ToString() {
-			return fullText;
+			return FullText;
 		}
 
 		///<summary>Setting the FullText resets all the child components to the values passed in here.</summary>

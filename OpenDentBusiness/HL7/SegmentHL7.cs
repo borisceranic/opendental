@@ -10,7 +10,7 @@ namespace OpenDentBusiness.HL7 {
 		///<summary>The name</summary>
 		public SegmentNameHL7 Name;
 		///<summary>The original full text of the segment.</summary>
-		private string fullText;
+		private string _fullText;
 		private char[] _delimiters;
 
 		///<summary>Only use this constructor when generating a message instead of parsing a message.  Uses the default message delimiters.</summary>
@@ -24,7 +24,7 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		private void InitializeVariables(SegmentNameHL7 name,char[] delimiters) {
-			fullText="";
+			_fullText="";
 			Name=name;
 			_delimiters=delimiters;
 			Fields=new List<FieldHL7>();
@@ -78,18 +78,18 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		public override string ToString() {
-			return fullText;
+			return FullText;
 		}
 
 		///<summary>Setting the FullText resets all the child fields.</summary>
 		public string FullText {
 			get {
-				return fullText;
+				return _fullText;
 			}
 			set {
-				fullText=value;
+				_fullText=value;
 				Fields=new List<FieldHL7>();
-				string[] fields=fullText.Split(new string[] { "|" },StringSplitOptions.None);
+				string[] fields=_fullText.Split(new string[] { "|" },StringSplitOptions.None);
 				FieldHL7 field;
 				for(int i=0;i<fields.Length;i++) {
 					field=new FieldHL7(fields[i],_delimiters);
@@ -112,7 +112,8 @@ namespace OpenDentBusiness.HL7 {
 			return Fields[indexPos].FullText;
 		}
 
-		///<summary>Really just a handy shortcut.  Identical to getting component 0 or to GetFieldFullText if there is only one component.</summary>
+		///<summary>Really just a handy shortcut.  Identical to getting component 0 or to GetFieldFullText if there is only one component.
+		///This will return an empty string if fieldIndex is greater than the number of fields in the segment.</summary>
 		public string GetFieldComponent(int fieldIndex) {
 			return GetFieldComponent(fieldIndex,0);
 		}
@@ -143,12 +144,12 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		private void RefreshFullText() {
-			fullText="";
+			_fullText="";
 			for(int i=0;i<Fields.Count;i++) {
 				if(i>0) {
-					fullText+="|";
+					_fullText+="|";
 				}
-				fullText+=Fields[i].FullText;
+				_fullText+=Fields[i].FullText;
 			}
 		}
 

@@ -52,13 +52,24 @@ namespace OpenDentBusiness{
 			return Crud.HL7DefCrud.SelectOne(command);
 		}
 
-		/// <summary>Gets from cache.  This will return null if no HL7defs are enabled.  Since only one can be enabled, this will return only one.
-		///No need to check RemotingRole, cache is filled by calling GetTableRemotelyIfNeeded.</summary>
+		///<summary>Gets from cache.  Will get all enabled defs that are not InternalType HL7InternalType.MedLabv2_3.
+		///Only one def that is not MedLabv2_3 can be enabled so this is guaranteed to return only one def.</summary>
 		public static HL7Def GetOneDeepEnabled() {
+			return GetOneDeepEnabled(false);
+		}
+
+		///<summary>Gets from cache.  If isMedLabHL7 is true, this will only return the enabled def if it is HL7InternalType.MedLabv2_3.
+		///If false, then only those defs not of that type.  This will return null if no HL7defs are enabled.  Since only one can be enabled,
+		///this will return only one.  No need to check RemotingRole, cache is filled by calling GetTableRemotelyIfNeeded.</summary>
+		public static HL7Def GetOneDeepEnabled(bool isMedLabHL7) {
 			HL7Def retval=null;
 			for(int i=0;i<Listt.Count;i++) {
-				if(Listt[i].IsEnabled) {
+				if(!Listt[i].IsEnabled) {
+					continue;
+				}
+				if(isMedLabHL7==(Listt[i].InternalType==HL7InternalType.MedLabv2_3)) {
 					retval=Listt[i];
+					break;
 				}
 			}
 			if(retval==null) {
@@ -95,6 +106,9 @@ namespace OpenDentBusiness{
 			def=GetInternalFromDb(HL7InternalType.HL7v2_6);
 			def=InternalHL7v2_6.GetDeepInternal(def);
 			listInternal.Add(def);
+			def=GetInternalFromDb(HL7InternalType.MedLabv2_3);
+			def=MedLabv2_3.GetDeepInternal(def);
+			listInternal.Add(def);
 			//Add defs for other companies like Centricity here later.
 			return listInternal;
 		}
@@ -117,27 +131,38 @@ namespace OpenDentBusiness{
 			else if(def.InternalType==HL7InternalType.HL7v2_6) {
 				def=InternalHL7v2_6.GetDeepInternal(def);
 			}
+			else if(def.InternalType==HL7InternalType.MedLabv2_3) {
+				def=MedLabv2_3.GetDeepInternal(def);
+			}
 			//no need to return a def because the original reference won't have been lost.
 		}
 
-		///<summary>Tells us whether there is an existing enable HL7Def.</summary>
-		public static bool IsExistingHL7Enabled(long excludeHL7DefNum) {
+		///<summary>Tells us whether there is an existing enabled HL7Def, excluding the def with excludeHL7DefNum.
+		///If isMedLabHL7 is true, this will only check to see if a def of type HL7InternalType.MedLabv2_3 is enabled.
+		///Otherwise, only defs not of that type will be checked.</summary>
+		public static bool IsExistingHL7Enabled(long excludeHL7DefNum,bool isMedLabHL7) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),excludeHL7DefNum);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),excludeHL7DefNum,isMedLabHL7);
 			}
 			string command="SELECT COUNT(*) FROM hl7def WHERE IsEnabled=1 AND HL7DefNum != "+POut.Long(excludeHL7DefNum);
+			if(isMedLabHL7) {
+				command+=" AND InternalType=='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";
+			}
+			else {
+				command+=" AND InternalType!='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";
+			}
 			if(Db.GetCount(command)=="0") {
 				return false;
 			}
 			return true;
 		}
 
-		///<summary>Tells us whether there is an existing enabled HL7Def.</summary>
+		///<summary>Tells us whether there is an existing enabled HL7Def that is not HL7InternalType.MedLabv2_3.</summary>
 		public static bool IsExistingHL7Enabled() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT COUNT(*) FROM hl7def WHERE IsEnabled=1";
+			string command="SELECT COUNT(*) FROM hl7def WHERE IsEnabled=1 AND InternalType!='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";
 			if(Db.GetCount(command)=="0") {
 				return false;
 			}

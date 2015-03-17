@@ -101,7 +101,7 @@ namespace OpenDentBusiness.HL7 {
 		///<summary>If an optional segment is not present, this will return null.  If a required segment is missing, this will throw an exception.
 		///This should only be used for non-repeatable segments, and only those that would be in a message 0 or 1 time.  If a segment can be in the
 		///message more than one time, like a NTE note segment, then this will return the first one found every time and there could be many others.
-		///Safer to use GetSegments below if the segment can repeat.</summary>
+		///Use GetSegments if the segment can repeat.</summary>
 		public SegmentHL7 GetSegment(SegmentNameHL7 segmentName,bool isRequired) {
 			for(int i=0;i<Segments.Count;i++) {
 				if(Segments[i].Name==segmentName) {

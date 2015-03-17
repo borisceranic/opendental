@@ -205,13 +205,13 @@ namespace OpenDental{
 			grid1.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Description"),100);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Mode Tx"),55);
+			col=new ODGridColumn(Lan.g(this,"Mode"),40);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),110);
+			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),115);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),110);
+			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),115);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Enabled"),10);
+			col=new ODGridColumn(Lan.g(this,"Enabled"),30);
 			grid1.Columns.Add(col);
 			grid1.Rows.Clear();
 			for(int i=0;i<ListInternal.Count;i++) {
@@ -240,13 +240,13 @@ namespace OpenDental{
 			grid2.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Description"),100);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Mode Tx"),55);
+			col=new ODGridColumn(Lan.g(this,"Mode"),40);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),110);
+			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),115);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),110);
+			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),115);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Enabled"),10);
+			col=new ODGridColumn(Lan.g(this,"Enabled"),30);
 			grid2.Columns.Add(col);
 			grid2.Rows.Clear();
 			for(int i=0;i<ListCustom.Count;i++) {

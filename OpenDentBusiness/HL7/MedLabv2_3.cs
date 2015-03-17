@@ -12,7 +12,7 @@ namespace OpenDentBusiness.HL7 {
 			if(def==null) {//wasn't in the database
 				def=new HL7Def();
 				def.IsNew=true;
-				def.Description="MedLab version 2.3";
+				def.Description="MedLab HL7 v2.3";
 				def.ModeTx=ModeTxHL7.File;
 				def.IncomingFolder="";
 				def.OutgoingFolder="";
@@ -76,8 +76,9 @@ namespace OpenDentBusiness.HL7 {
 						//All age components are left padded with 0's, the years is padded to 3 chars, the months and days are padded to 2 chars
 						//Example: 19811213^033^02^19
 						seg.AddField(7,"patBirthdateAge");
-						//PID.18, Patient Account Number.  LabCorp assigned account number.  This field is also used to send the Fasting flag in component 7.
+						//PID.18.1, Patient Account Number.  LabCorp assigned account number.  This field is also used to send the Fasting flag in component 7.
 						//Fasting flag values are 'Y', 'N', or blank
+						//Example: AccountNum^^^BillCode^ABNFlag^SpecimenStatus^FastingFlag
 						seg.AddField(18,"accountNum");
 					#endregion PID - Patient Identification
 					#region NK1 - Next of Kin
@@ -93,6 +94,7 @@ namespace OpenDentBusiness.HL7 {
 						//seg.AddField(4,"nextOfKinAddress");
 						//NK1.5, Next of Kin Phone
 						//seg.AddField(5,"nextOfKinPhone");
+						seg.hl7DefFields=new List<HL7DefField>();
 					#endregion NK1 - Next of Kin
 					#region NTE - Notes and Comments
 					seg=new HL7DefSegment();

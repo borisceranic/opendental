@@ -154,6 +154,7 @@ namespace OpenDental {
 			FormHL7DefMessageEdit FormS=new FormHL7DefMessageEdit();
 			FormS.HL7DefMesCur=(HL7DefMessage)gridMain.Rows[e.Row].Tag;
 			FormS.IsHL7DefInternal=HL7DefCur.IsInternal;
+			FormS.InternalType=HL7DefCur.InternalType;
 			FormS.ShowDialog();
 			FillGrid();
 		}
@@ -215,7 +216,7 @@ namespace OpenDental {
 
 		private void checkEnabled_Click(object sender,EventArgs e) {
 			if(checkEnabled.Checked) {
-				bool isHL7Enabled=HL7Defs.IsExistingHL7Enabled(HL7DefCur.HL7DefNum);
+				bool isHL7Enabled=HL7Defs.IsExistingHL7Enabled(HL7DefCur.HL7DefNum,HL7DefCur.InternalType==HL7InternalType.MedLabv2_3);
 				if(isHL7Enabled) {
 					checkEnabled.Checked=false;
 					MsgBox.Show(this,"Only one HL7 process can be enabled.  Another HL7 definition is enabled.");
@@ -296,6 +297,7 @@ namespace OpenDental {
 			FormS.HL7DefMesCur.HL7DefNum=HL7DefCur.HL7DefNum;
 			FormS.HL7DefMesCur.IsNew=true;
 			FormS.IsHL7DefInternal=false;
+			FormS.InternalType=HL7DefCur.InternalType;
 			FormS.ShowDialog();
 			FillGrid();
 		}

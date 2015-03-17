@@ -66,13 +66,13 @@ namespace OpenDental{
 			this.radioIn.Text = "Incoming";
 			this.radioIn.UseVisualStyleBackColor = true;
 			// 
-			// comboEventType
+			// comboMessageStructure
 			// 
 			this.comboMessageStructure.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.comboMessageStructure.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboMessageStructure.Location = new System.Drawing.Point(164, 42);
 			this.comboMessageStructure.MaxDropDownItems = 100;
-			this.comboMessageStructure.Name = "comboEventType";
+			this.comboMessageStructure.Name = "comboMessageStructure";
 			this.comboMessageStructure.Size = new System.Drawing.Size(138, 21);
 			this.comboMessageStructure.TabIndex = 13;
 			// 
@@ -142,7 +142,7 @@ namespace OpenDental{
 			this.labelDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelDelete.Location = new System.Drawing.Point(108, 492);
 			this.labelDelete.Name = "labelDelete";
-			this.labelDelete.Size = new System.Drawing.Size(266, 28);
+			this.labelDelete.Size = new System.Drawing.Size(311, 28);
 			this.labelDelete.TabIndex = 66;
 			this.labelDelete.Text = "This HL7Def is internal. To edit this HL7Def you must first copy it to the Custom" +
     " list.";
@@ -221,7 +221,7 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(409, 494);
+			this.butAdd.Location = new System.Drawing.Point(425, 494);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(80, 24);
 			this.butAdd.TabIndex = 0;

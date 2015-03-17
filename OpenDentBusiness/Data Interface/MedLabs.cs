@@ -48,6 +48,23 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
+		///<summary></summary>
+		public static long Insert(MedLab medLab){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				medLab.MedLabNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLab);
+				return medLab.MedLabNum;
+			}
+			return Crud.MedLabCrud.Insert(medLab);
+		}
+
+		///<summary></summary>
+		public static void Update(MedLab medLab){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLab);
+				return;
+			}
+			Crud.MedLabCrud.Update(medLab);
+		}
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
@@ -67,24 +84,6 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<MedLab>(MethodBase.GetCurrentMethod(),medLabNum);
 			}
 			return Crud.MedLabCrud.SelectOne(medLabNum);
-		}
-
-		///<summary></summary>
-		public static long Insert(MedLab medLab){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				medLab.MedLabNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLab);
-				return medLab.MedLabNum;
-			}
-			return Crud.MedLabCrud.Insert(medLab);
-		}
-
-		///<summary></summary>
-		public static void Update(MedLab medLab){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLab);
-				return;
-			}
-			Crud.MedLabCrud.Update(medLab);
 		}
 
 		///<summary></summary>

@@ -14,6 +14,7 @@ namespace OpenDental {
 	public partial class FormHL7DefSegmentEdit:System.Windows.Forms.Form {
 		public HL7DefSegment HL7DefSegCur;
 		public bool IsHL7DefInternal;
+		public HL7InternalType InternalType;
 
 		///<summary></summary>
 		public FormHL7DefSegmentEdit() {
@@ -33,11 +34,14 @@ namespace OpenDental {
 				checkIsOptional.Checked=HL7DefSegCur.IsOptional;
 				textNote.Text=HL7DefSegCur.Note;
 			}
-			if(IsHL7DefInternal) {
+			if(IsHL7DefInternal || InternalType==HL7InternalType.MedLabv2_3) {
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 				labelDelete.Visible=true;
 				butAdd.Enabled=false;
+				if(InternalType==HL7InternalType.MedLabv2_3) {
+					labelDelete.Text=Lan.g(this,"The segments and their item orders cannot be modified in a MedLabv2_3 definition.");
+				}
 			}
 		}
 
