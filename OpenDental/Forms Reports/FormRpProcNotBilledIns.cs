@@ -14,6 +14,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.Container components = null;
+		private CheckBox checkMedical;
 		private FormQuery FormQuery2;
 
 		///<summary></summary>
@@ -48,63 +49,75 @@ namespace OpenDental{
 			this.labelTO = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkMedical = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// date2
 			// 
-			this.date2.Location = new System.Drawing.Point(288,112);
+			this.date2.Location = new System.Drawing.Point(288, 112);
 			this.date2.Name = "date2";
 			this.date2.TabIndex = 2;
 			// 
 			// date1
 			// 
-			this.date1.Location = new System.Drawing.Point(32,112);
+			this.date1.Location = new System.Drawing.Point(32, 112);
 			this.date1.Name = "date1";
 			this.date1.TabIndex = 1;
 			// 
 			// labelTO
 			// 
-			this.labelTO.Location = new System.Drawing.Point(213,120);
+			this.labelTO.Location = new System.Drawing.Point(213, 120);
 			this.labelTO.Name = "labelTO";
-			this.labelTO.Size = new System.Drawing.Size(76,23);
+			this.labelTO.Size = new System.Drawing.Size(76, 23);
 			this.labelTO.TabIndex = 10;
 			this.labelTO.Text = "TO";
 			this.labelTO.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(520,328);
+			this.butCancel.Location = new System.Drawing.Point(520, 328);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(520,292);
+			this.butOK.Location = new System.Drawing.Point(520, 292);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 3;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkMedical
+			// 
+			this.checkMedical.Location = new System.Drawing.Point(32, 294);
+			this.checkMedical.Name = "checkMedical";
+			this.checkMedical.Size = new System.Drawing.Size(227, 24);
+			this.checkMedical.TabIndex = 11;
+			this.checkMedical.Text = "Include Medical Procedures";
+			this.checkMedical.UseVisualStyleBackColor = true;
+			this.checkMedical.Visible = false;
+			// 
 			// FormRpProcNotBilledIns
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(616,366);
+			this.ClientSize = new System.Drawing.Size(616, 366);
+			this.Controls.Add(this.checkMedical);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.date2);
@@ -125,6 +138,9 @@ namespace OpenDental{
 		private void FormProcNotAttach_Load(object sender, System.EventArgs e) {
 			date1.SelectionStart=DateTime.Today;
 			date2.SelectionStart=DateTime.Today;
+			if(PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance)) {
+				checkMedical.Visible=true;
+			}
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
@@ -142,19 +158,16 @@ namespace OpenDental{
 				report.Query+=DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI");
 			}
 			report.Query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee "
-				+"FROM patient,procedurecode,procedurelog,claimproc "
+				+"FROM patient,procedurecode,procedurelog,claimproc,insplan "
 				+"WHERE claimproc.procnum=procedurelog.procnum "
 				+"AND patient.PatNum=procedurelog.PatNum "
 				+"AND procedurelog.CodeNum=procedurecode.CodeNum "
-				//We used to explicitly exclude completed procedures with unsent medical estimates from this report.
-				//We think this was because, back in 2010, medical insurance was a new feature.
-				//Also, it did not support intermingling dental and medical insurance for patients.
-				//On 02/12/2015, excluding these procedures was considered an oversight to the medical features added after 2010.
-				//Users had no way to see why patients were being excluded from their billing list(s) when using the 'Exclude if insurance pending' option.
-				//Currently, the 'Exclude if insurance pending' billing option will exclude patients due to pending medical insurance estimates.
-				//If showing unsent medical estimates in this report is to be considered a bug in the future, 
-				//make sure to go enhance the billing options query to exclude medical insurance estimates so that those patients show up in the billing list(s).
-				+"AND claimproc.NoBillIns=0 "
+				+"AND claimproc.PlanNum=insplan.PlanNum ";
+			if(!checkMedical.Checked) {
+				//Users would have no way to see why patients are being excluded from their billing list(s) without this check box when using the 'Exclude if insurance pending' option.
+				report.Query+="AND insplan.IsMedical=0 ";
+			}
+			report.Query+="AND claimproc.NoBillIns=0 "
 				+"AND procedurelog.ProcFee>0 "
 				+"AND claimproc.Status=6 "//estimate
 				+"AND procedurelog.procstatus=2 "
