@@ -7720,10 +7720,8 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE connectiongroup (
 						ConnectionGroupNum number(20) NOT NULL,
 						Description varchar2(255),
-						CONSTRAINT connectiongroup_ConnectionGrou PRIMARY KEY (ConnectionGroupNum)
+						CONSTRAINT connectiongroup_ConnGroupNum PRIMARY KEY (ConnectionGroupNum)
 						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX connectiongroup_ConnGroupNum ON connectiongroup (ConnectionGroupNum)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -7748,9 +7746,7 @@ namespace OpenDentBusiness {
 						CONSTRAINT conngroupattach_ConnGroupAttac PRIMARY KEY (ConnGroupAttachNum)
 						)";
 					Db.NonQ(command);
-					command=@"CREATE INDEX conngroupattach_ConnectionAtta ON conngroupattach (ConnGroupAttachNum)";//too long
-					Db.NonQ(command);
-					command=@"CREATE INDEX conngroupattach_CentralConnect ON conngroupattach (CentralConnectionNum)";//too long
+					command=@"CREATE INDEX conngroupattach_CentralConnect ON conngroupattach (CentralConnectionNum)";
 					Db.NonQ(command);
 				}
 				#endregion
