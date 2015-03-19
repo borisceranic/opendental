@@ -33,6 +33,8 @@
 			this.menuItemOpen = new System.Windows.Forms.MenuItem();
 			this.menuItemRename = new System.Windows.Forms.MenuItem();
 			this.menuItemRemove = new System.Windows.Forms.MenuItem();
+			this.textSentOrReceived = new System.Windows.Forms.TextBox();
+			this.label5 = new System.Windows.Forms.Label();
 			this.gridAttachments = new OpenDental.UI.ODGrid();
 			this.textSubject = new OpenDental.ODtextBox();
 			this.textSignedBy = new OpenDental.ODtextBox();
@@ -46,7 +48,7 @@
 			// 
 			// labelSignedBy
 			// 
-			this.labelSignedBy.Location = new System.Drawing.Point(0, 70);
+			this.labelSignedBy.Location = new System.Drawing.Point(0, 83);
 			this.labelSignedBy.Name = "labelSignedBy";
 			this.labelSignedBy.Size = new System.Drawing.Size(88, 14);
 			this.labelSignedBy.TabIndex = 0;
@@ -55,19 +57,21 @@
 			// 
 			// textMsgDateTime
 			// 
+			this.textMsgDateTime.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textMsgDateTime.BackColor = System.Drawing.SystemColors.Control;
 			this.textMsgDateTime.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.textMsgDateTime.ForeColor = System.Drawing.Color.Red;
-			this.textMsgDateTime.Location = new System.Drawing.Point(89, 8);
+			this.textMsgDateTime.Location = new System.Drawing.Point(89, 21);
 			this.textMsgDateTime.Name = "textMsgDateTime";
-			this.textMsgDateTime.Size = new System.Drawing.Size(253, 13);
+			this.textMsgDateTime.Size = new System.Drawing.Size(559, 13);
 			this.textMsgDateTime.TabIndex = 0;
 			this.textMsgDateTime.TabStop = false;
 			this.textMsgDateTime.Text = "Unsent";
 			// 
 			// labelSent
 			// 
-			this.labelSent.Location = new System.Drawing.Point(0, 7);
+			this.labelSent.Location = new System.Drawing.Point(0, 20);
 			this.labelSent.Name = "labelSent";
 			this.labelSent.Size = new System.Drawing.Size(88, 14);
 			this.labelSent.TabIndex = 0;
@@ -76,7 +80,7 @@
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(0, 28);
+			this.label3.Location = new System.Drawing.Point(0, 41);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(88, 14);
 			this.label3.TabIndex = 0;
@@ -85,7 +89,7 @@
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(0, 49);
+			this.label1.Location = new System.Drawing.Point(0, 62);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(88, 14);
 			this.label1.TabIndex = 0;
@@ -94,7 +98,7 @@
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(0, 89);
+			this.label2.Location = new System.Drawing.Point(0, 102);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(88, 14);
 			this.label2.TabIndex = 0;
@@ -127,14 +131,34 @@
 			this.menuItemRemove.Text = "Remove";
 			this.menuItemRemove.Click += new System.EventHandler(this.menuItemRemove_Click);
 			// 
+			// textSentOrReceived
+			// 
+			this.textSentOrReceived.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textSentOrReceived.BackColor = System.Drawing.SystemColors.Control;
+			this.textSentOrReceived.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textSentOrReceived.Location = new System.Drawing.Point(89, 1);
+			this.textSentOrReceived.Name = "textSentOrReceived";
+			this.textSentOrReceived.Size = new System.Drawing.Size(556, 13);
+			this.textSentOrReceived.TabIndex = 36;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(0, 0);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(88, 14);
+			this.label5.TabIndex = 37;
+			this.label5.Text = "Sent/Received:";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// gridAttachments
 			// 
 			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridAttachments.HScrollVisible = false;
-			this.gridAttachments.Location = new System.Drawing.Point(651, 0);
+			this.gridAttachments.Location = new System.Drawing.Point(651, 1);
 			this.gridAttachments.Name = "gridAttachments";
 			this.gridAttachments.ScrollValue = 0;
-			this.gridAttachments.Size = new System.Drawing.Size(322, 108);
+			this.gridAttachments.Size = new System.Drawing.Size(321, 120);
 			this.gridAttachments.TabIndex = 0;
 			this.gridAttachments.TabStop = false;
 			this.gridAttachments.Title = "Attachments";
@@ -148,7 +172,7 @@
 			this.textSubject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSubject.DetectUrls = false;
-			this.textSubject.Location = new System.Drawing.Point(89, 87);
+			this.textSubject.Location = new System.Drawing.Point(89, 100);
 			this.textSubject.Multiline = false;
 			this.textSubject.Name = "textSubject";
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -164,7 +188,7 @@
 			this.textSignedBy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSignedBy.DetectUrls = false;
-			this.textSignedBy.Location = new System.Drawing.Point(89, 66);
+			this.textSignedBy.Location = new System.Drawing.Point(89, 79);
 			this.textSignedBy.Multiline = false;
 			this.textSignedBy.Name = "textSignedBy";
 			this.textSignedBy.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -183,7 +207,7 @@
 			this.textToAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textToAddress.DetectUrls = false;
-			this.textToAddress.Location = new System.Drawing.Point(89, 45);
+			this.textToAddress.Location = new System.Drawing.Point(89, 58);
 			this.textToAddress.Multiline = false;
 			this.textToAddress.Name = "textToAddress";
 			this.textToAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -200,7 +224,7 @@
 			this.textFromAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textFromAddress.DetectUrls = false;
-			this.textFromAddress.Location = new System.Drawing.Point(89, 24);
+			this.textFromAddress.Location = new System.Drawing.Point(89, 37);
 			this.textFromAddress.Multiline = false;
 			this.textFromAddress.Name = "textFromAddress";
 			this.textFromAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -221,7 +245,7 @@
 			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAttach.CornerRadius = 4F;
-			this.butAttach.Location = new System.Drawing.Point(652, 18);
+			this.butAttach.Location = new System.Drawing.Point(652, 19);
 			this.butAttach.Name = "butAttach";
 			this.butAttach.Size = new System.Drawing.Size(75, 16);
 			this.butAttach.TabIndex = 6;
@@ -236,7 +260,7 @@
 			this.butSig.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSig.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSig.CornerRadius = 4F;
-			this.butSig.Location = new System.Drawing.Point(615, 66);
+			this.butSig.Location = new System.Drawing.Point(615, 79);
 			this.butSig.Name = "butSig";
 			this.butSig.Size = new System.Drawing.Size(33, 20);
 			this.butSig.TabIndex = 3;
@@ -246,7 +270,7 @@
 			// webBrowser
 			// 
 			this.webBrowser.AllowWebBrowserDrop = false;
-			this.webBrowser.Location = new System.Drawing.Point(37, 108);
+			this.webBrowser.Location = new System.Drawing.Point(37, 121);
 			this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
 			this.webBrowser.Name = "webBrowser";
 			this.webBrowser.ScriptErrorsSuppressed = true;
@@ -265,11 +289,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBodyText.DetectUrls = false;
-			this.textBodyText.Location = new System.Drawing.Point(89, 108);
+			this.textBodyText.Location = new System.Drawing.Point(89, 121);
 			this.textBodyText.Name = "textBodyText";
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBodyText.Size = new System.Drawing.Size(884, 297);
+			this.textBodyText.Size = new System.Drawing.Size(884, 284);
 			this.textBodyText.TabIndex = 5;
 			this.textBodyText.Text = "";
 			this.textBodyText.TextChanged += new System.EventHandler(this.textBodyText_TextChanged);
@@ -278,6 +302,8 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.textSentOrReceived);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textSubject);
 			this.Controls.Add(this.textSignedBy);
 			this.Controls.Add(this.textToAddress);
@@ -321,6 +347,8 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.TextBox textSentOrReceived;
+		private System.Windows.Forms.Label label5;
 
 	}
 }

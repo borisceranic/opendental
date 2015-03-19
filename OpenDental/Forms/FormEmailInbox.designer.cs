@@ -204,11 +204,14 @@ namespace OpenDental{
 			this.emailPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.emailPreview.BodyText = "";
 			this.emailPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.emailPreview.Location = new System.Drawing.Point(0, 0);
 			this.emailPreview.Name = "emailPreview";
 			this.emailPreview.Size = new System.Drawing.Size(937, 405);
+			this.emailPreview.Subject = "";
 			this.emailPreview.TabIndex = 1;
+			this.emailPreview.ToAddress = "";
 			// 
 			// splitContainerNoFlicker
 			// 

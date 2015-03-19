@@ -30,11 +30,48 @@ namespace OpenDental.User_Controls {
 			get { return _isMessageChanged; }
 		}
 
-		private EmailAddress GetEmailAddress() {
+		///<summary>Can return null.</summary>
+		public Patient PatCur {
+			get { return _patCur; }
+		}
+
+		public string Subject {
+			get { return textSubject.Text; }
+			set { textSubject.Text=value; }
+		}
+
+		public string BodyText {
+			get { return textBodyText.Text; }
+			set { textBodyText.Text=value; }
+		}
+
+		public string FromAddress {
+			get { return textFromAddress.Text; }
+		}
+
+		public string ToAddress {
+			get { return textToAddress.Text; }
+			set { textToAddress.Text=value; }
+		}
+
+		public EmailAddress GetEmailAddress() {
 			if(_patCur==null) {//can happen if sending deposit slip by email
 				return EmailAddresses.GetByClinic(0);//gets the practice default address
 			}
 			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+		}
+
+		public bool IsSigned {
+			get { return (_isSigningEnabled && _certSig!=null); }
+		}
+
+		public X509Certificate2 Signature {
+			get {
+				if(IsSigned) {
+					return _certSig;
+				}
+				return null;
+			}
 		}
 
 		public EmailPreviewControl() {
@@ -55,20 +92,24 @@ namespace OpenDental.User_Controls {
 				_isComposing=false;
 				textMsgDateTime.Text=MessageCur.MsgDateTime.ToString();
 				textMsgDateTime.ForeColor=Color.Black;
-				butAttach.Enabled=false;
+				butAttach.Visible=false;
 				textFromAddress.ReadOnly=true;
 				textToAddress.ReadOnly=true;
 				textSubject.ReadOnly=true;
-				textSubject.SpellCheckIsEnabled=false;
+				textSubject.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 				textBodyText.ReadOnly=true;
-				textBodyText.SpellCheckIsEnabled=false;
+				textBodyText.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 			}
+			textSentOrReceived.Text=MessageCur.SentOrReceived.ToString();
 			textFromAddress.Text=MessageCur.FromAddress;
 			textToAddress.Text=MessageCur.ToAddress;
 			textSubject.Text=MessageCur.Subject;
 			textBodyText.Text=MessageCur.BodyText;
+			textBodyText.Visible=true;
+			webBrowser.Visible=false;
 			//For all email received types, we disable most of the controls and put the form into a mostly read-only state.
-			//There is no reason a user should ever edit a received message. The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
+			//There is no reason a user should ever edit a received message.
+			//The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
 			if(MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
 				MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
 				MessageCur.SentOrReceived==EmailSentOrReceived.ReadDirect ||
@@ -77,8 +118,6 @@ namespace OpenDental.User_Controls {
 				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
 				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
 			{
-				textBodyText.ReadOnly=true;
-				textBodyText.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 				//If an html body is received, then we display the body using a webbrowser control, so the user sees the message formatted as intended.
 				if(MessageCur.BodyText.ToLower().Contains("<html")) {
 					textBodyText.Visible=false;
@@ -335,13 +374,13 @@ namespace OpenDental.User_Controls {
 		}
 
 		///<summary>Saves the UI input values into the emailMessage.  Allowed to save message with invalid fields, so no validation here.</summary>
-		private void SaveMsg(EmailMessage emailMessage) {
+		public void SaveMsg(EmailMessage emailMessage) {
 			emailMessage.FromAddress=textFromAddress.Text;
 			emailMessage.ToAddress=textToAddress.Text;
 			emailMessage.Subject=textSubject.Text;
 			emailMessage.BodyText=textBodyText.Text;
 			emailMessage.MsgDateTime=DateTime.Now;
-			emailMessage.SentOrReceived=MessageCur.SentOrReceived;
+			emailMessage.SentOrReceived=MessageCur.SentOrReceived;//Status does not ever change.
 		}
 
 	}

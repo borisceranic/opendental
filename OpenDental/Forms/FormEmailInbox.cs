@@ -89,6 +89,13 @@ namespace OpenDental {
 
 		///<summary>Gets new emails and also shows older emails from the database.</summary>
 		private void FillGridEmailMessages() {
+			//Remember current email selections.
+			List<long> listEmailMessageNumsSelected=new List<long>();
+			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
+				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
+				listEmailMessageNumsSelected.Add(emailMessage.EmailMessageNum);
+			}
+			//Refresh the list and grid from the database.
 			ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
 			gridEmailMessages.BeginUpdate();
 			gridEmailMessages.Rows.Clear();
@@ -152,9 +159,20 @@ namespace OpenDental {
 				gridEmailMessages.Rows.Add(row);
 			}
 			gridEmailMessages.EndUpdate();
+			//Selection must occur after EndUpdate().
+			for(int i=0;i<gridEmailMessages.Rows.Count;i++) {
+				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[i].Tag;
+				if(listEmailMessageNumsSelected.Contains(emailMessage.EmailMessageNum)) {
+					gridEmailMessages.SetSelected(i,true);
+				}
+			}
 		}
 
 		private void gridEmailMessages_CellClick(object sender,UI.ODGridClickEventArgs e) {
+			if(gridEmailMessages.SelectedIndices.Length>=2) {
+				splitContainerNoFlicker.Panel2Collapsed=true;//Do not show preview if there are more than one emails selected.
+				return;
+			}
 			EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[e.Row].Tag;
 			if(EmailMessages.IsSecureWebMail(emailMessage.SentOrReceived)) {
 				//We do not yet have a preview for secure web mail messages.
@@ -164,7 +182,6 @@ namespace OpenDental {
 			EmailMessages.UpdateSentOrReceivedRead(emailMessage);
 			emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Refresh from the database to get the full body text.
 			FillGridEmailMessages();//To show the email is read.
-			gridEmailMessages.SetSelected(e.Row,true);
 			splitContainerNoFlicker.Panel2Collapsed=false;
 			emailPreview.Width=splitContainerNoFlicker.Panel2.Width;//For some reason the anchors do not always work inside panel2.
 			emailPreview.Height=splitContainerNoFlicker.Panel2.Height;//For some reason the anchors do not always work inside panel2.
