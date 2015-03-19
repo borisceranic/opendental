@@ -2252,5 +2252,112 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary></summary>
+		public static string TestFourty(int specificTest) {
+			if(specificTest != 0 && specificTest != 40) {
+				return "";
+			}
+			string suffix="40";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			long feeSchedAllowedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.OutNetwork,suffix+"-allowed");
+			long feeSchedNum2=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,suffix+"b");
+			//Standard Fee (we only insert this value to test that it is not used in the calculations).
+			Fees.RefreshCache();
+			long codeNum=ProcedureCodes.GetCodeNum("D0272");
+			Fee fee=Fees.GetFee(codeNum,feeSchedAllowedNum);
+			if(fee==null) {
+				fee=new Fee();
+				fee.CodeNum=codeNum;
+				fee.FeeSched=feeSchedAllowedNum;
+				fee.Amount=152;
+				Fees.Insert(fee);
+			}
+			else {
+				fee.Amount=152;
+				Fees.Update(fee);
+			}
+			//PPO fees
+			fee=new Fee();
+			fee.CodeNum=codeNum;
+			fee.FeeSched=feeSchedNum2;
+			fee.Amount=87.99;
+			Fees.Insert(fee);
+			Fees.RefreshCache();
+			//Carrier
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			//Plan 1 - Category Percentage
+			long planNum1=InsPlanT.CreateInsPlan(carrier.CarrierNum).PlanNum;
+			InsPlan insPlan1=InsPlans.RefreshOne(planNum1);
+			insPlan1.FeeSched=0;
+			insPlan1.AllowedFeeSched=feeSchedAllowedNum;
+			InsPlans.Update(insPlan1);
+			InsSub sub1=InsSubT.CreateInsSub(pat.PatNum,planNum1);
+			long subNum1=sub1.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum1,EbenefitCategory.DiagnosticXRay,80);
+			BenefitT.CreateDeductibleGeneral(planNum1,BenefitCoverageLevel.Individual,50);
+			PatPlanT.CreatePatPlan(1,patNum,subNum1);
+			//Plan 2 - PPO
+			long planNum2=InsPlanT.CreateInsPlanPPO(carrier.CarrierNum,feeSchedNum2,EnumCobRule.Basic).PlanNum;
+			InsSub sub2=InsSubT.CreateInsSub(pat.PatNum,planNum2);
+			long subNum2=sub2.InsSubNum;
+			BenefitT.CreateCategoryPercent(planNum2,EbenefitCategory.DiagnosticXRay,100);
+			PatPlanT.CreatePatPlan(2,patNum,subNum2);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D0272",ProcStat.TP,"",236);
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(patNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//Validate
+			string retVal="";
+			ClaimProc claimProc;
+			if(specificTest==0 || specificTest==40) {
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				//Test insurance numbers without calculating secondary PPO insurance writeoffs
+				if(claimProc.InsEstTotal!=81.6) {
+					throw new Exception("Primary total estimate should be 81.60. \r\n");
+				}
+				if(claimProc.WriteOffEst!=-1) {
+					throw new Exception("Primary writeoff estimate should be -1. \r\n");
+				}
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum2,subNum2);
+				if(claimProc.InsEstTotal!=6.39) {
+					throw new Exception("Secondary total estimate should be 6.39. \r\n");
+				}
+				if(claimProc.WriteOffEst!=0) {
+					throw new Exception("Secondary writeoff estimate should be 0. \r\n");
+				}
+				//Now test insurance numbers with calculating secondary PPO insurance writeoffs
+				Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,true);
+				Procedures.ComputeEstimates(proc,patNum,ref claimProcs,false,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+				claimProcs=ClaimProcs.Refresh(patNum);
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum1,subNum1);
+				if(claimProc.InsEstTotal!=81.6) {
+					throw new Exception("Primary total estimate should be 81.60. \r\n");
+				}
+				if(claimProc.WriteOffEst!=-1) {
+					throw new Exception("Primary writeoff estimate should be -1. \r\n");
+				}
+				claimProc=ClaimProcs.GetEstimate(claimProcs,procNum,planNum2,subNum2);
+				if(claimProc.InsEstTotal!=6.39) {
+					throw new Exception("Secondary total estimate should be 6.39. \r\n");
+				}
+				if(claimProc.WriteOffEst!=148.01) {
+					throw new Exception("Secondary writeoff estimate should be 148.01. \r\n");
+				}
+				retVal+="40: Passed.  Dual insurance with secondary PPO insurance writeoffs calculated based on preference.\r\n";
+			}
+			Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,false);
+			return retVal;
+		}
+
 	}
 }

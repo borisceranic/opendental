@@ -143,6 +143,7 @@ namespace UnitTests {
 			else {
 				textResults.Text+=DatabaseTools.ClearDb();
 			}
+			Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,false);
 			try{
 				textResults.Text+=BenefitT.BenefitComputeRenewDate();
 			}
@@ -429,6 +430,13 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				textResults.Text+="39: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourty(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="40: Failed. "+ex.Message;
 			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
