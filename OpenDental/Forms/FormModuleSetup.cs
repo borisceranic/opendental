@@ -117,6 +117,7 @@ namespace OpenDental{
 		private CheckBox checkStatementsUseSheets;
 		private TextBox textApptBubNoteLength;
 		private Label label21;
+		private CheckBox checkInsPPOsecWriteoffs;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -198,6 +199,8 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.textApptBubNoteLength = new System.Windows.Forms.TextBox();
+			this.label21 = new System.Windows.Forms.Label();
 			this.label13 = new System.Windows.Forms.Label();
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
@@ -254,8 +257,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.textApptBubNoteLength = new System.Windows.Forms.TextBox();
-			this.label21 = new System.Windows.Forms.Label();
+			this.checkInsPPOsecWriteoffs = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -804,6 +806,23 @@ namespace OpenDental{
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
+			// textApptBubNoteLength
+			// 
+			this.textApptBubNoteLength.Location = new System.Drawing.Point(357, 253);
+			this.textApptBubNoteLength.Name = "textApptBubNoteLength";
+			this.textApptBubNoteLength.Size = new System.Drawing.Size(83, 20);
+			this.textApptBubNoteLength.TabIndex = 213;
+			// 
+			// label21
+			// 
+			this.label21.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label21.Location = new System.Drawing.Point(105, 256);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(246, 16);
+			this.label21.TabIndex = 212;
+			this.label21.Text = "Appointment bubble max note length (0 for no limit)";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// label13
 			// 
 			this.label13.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -839,6 +858,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkInsPPOsecWriteoffs);
 			this.tabFamily.Controls.Add(this.checkFamPhiAccess);
 			this.tabFamily.Controls.Add(this.checkInsDefaultAssignmentOfBenefits);
 			this.tabFamily.Controls.Add(this.checkTextMsgOkStatusTreatAsNo);
@@ -1479,22 +1499,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// textApptBubNoteLength
+			// checkInsPPOsecWriteoffs
 			// 
-			this.textApptBubNoteLength.Location = new System.Drawing.Point(357, 253);
-			this.textApptBubNoteLength.Name = "textApptBubNoteLength";
-			this.textApptBubNoteLength.Size = new System.Drawing.Size(83, 20);
-			this.textApptBubNoteLength.TabIndex = 213;
-			// 
-			// label21
-			// 
-			this.label21.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label21.Location = new System.Drawing.Point(105, 256);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(246, 16);
-			this.label21.TabIndex = 212;
-			this.label21.Text = "Appointment bubble max note length (0 for no limit)";
-			this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.checkInsPPOsecWriteoffs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkInsPPOsecWriteoffs.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkInsPPOsecWriteoffs.Location = new System.Drawing.Point(58, 184);
+			this.checkInsPPOsecWriteoffs.Name = "checkInsPPOsecWriteoffs";
+			this.checkInsPPOsecWriteoffs.Size = new System.Drawing.Size(382, 18);
+			this.checkInsPPOsecWriteoffs.TabIndex = 216;
+			this.checkInsPPOsecWriteoffs.Text = "Calculate secondary insurance PPO writeoffs (not recommended, see manual)";
+			this.checkInsPPOsecWriteoffs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkInsPPOsecWriteoffs.UseVisualStyleBackColor = true;
 			// 
 			// FormModuleSetup
 			// 
@@ -1617,6 +1632,7 @@ namespace OpenDental{
 			checkCoPayFeeScheduleBlankLikeZero.Checked=PrefC.GetBool(PrefName.CoPay_FeeSchedule_BlankLikeZero);
 			checkInsDefaultShowUCRonClaims.Checked=PrefC.GetBool(PrefName.InsDefaultShowUCRonClaims);
 			checkInsDefaultAssignmentOfBenefits.Checked=PrefC.GetBool(PrefName.InsDefaultAssignBen);
+			checkInsPPOsecWriteoffs.Checked=PrefC.GetBool(PrefName.InsPPOsecWriteoffs);
 			for(int i=0;i<Enum.GetNames(typeof(EnumCobRule)).Length;i++) {
 				comboCobRule.Items.Add(Lan.g("enumEnumCobRule",Enum.GetNames(typeof(EnumCobRule))[i]));
 			}
@@ -1914,6 +1930,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
 				| Prefs.UpdateInt(PrefName.AppointmentBubblesNoteLength,noteLength)
+				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
 				)
 			{
 				_changed=true;

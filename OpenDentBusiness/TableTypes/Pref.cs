@@ -247,6 +247,8 @@ namespace OpenDentBusiness {
 		InsDefaultAssignBen,
 		///<summary>0=unknown, user did not make a selection.  1=Yes, 2=No.</summary>
 		InsPlanConverstion_7_5_17_AutoMergeYN,
+		///<summary>0 by default.  If false, secondary PPO writeoffs will always be zero (normal).  At least one customer wants to see secondary writeoffs.</summary>
+		InsPPOsecWriteoffs,
 		InsurancePlansShared,
 		IntermingleFamilyDefault,
 		LabelPatientDefaultSheetDefNum,

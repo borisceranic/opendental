@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.1.14.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.16.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -6202,6 +6202,24 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '14.3.35.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To14_3_37();
+		}
+
+		///<summary></summary>
+		private static void To14_3_37() {
+			if(FromVersion<new Version("14.3.37.0")) {
+				string command="";
+				//InsPPOsecWriteoffs also inserted into version 15.1
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsPPOsecWriteoffs','0')";
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsPPOsecWriteoffs','0')";
+				}
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '14.3.37.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_1_1();
 		}
 
@@ -7285,6 +7303,27 @@ namespace OpenDentBusiness {
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception if index already exists.
 				command="UPDATE preference SET ValueString = '15.1.14.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_1_16();
+		}
+
+		///<summary>Oracle compatible: 03/18/2015</summary>
+		private static void To15_1_16() {
+			if(FromVersion<new Version("15.1.16.0")) {
+				string command="";
+				command="SELECT * FROM preference WHERE PrefName='InsPPOsecWriteoffs'";
+				DataTable tableCur=Db.GetTable(command);
+				if(tableCur.Rows.Count==0) {//The InsPPOsecWriteoffs pref does not already exist
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO preference(PrefName,ValueString) VALUES('InsPPOsecWriteoffs','0')";
+					}
+					else {//oracle
+						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsPPOsecWriteoffs','0')";
+					}
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.1.16.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_2_0();
