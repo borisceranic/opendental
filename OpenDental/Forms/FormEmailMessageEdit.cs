@@ -1,20 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-//using OpenDental.Reporting;
-//using Indy.Sockets.IndySMTP;
-//using Indy.Sockets.IndyMessage;
-using OpenDentBusiness;
 using CodeBase;
-using System.Collections.Generic;
+using OpenDentBusiness;
 
 namespace OpenDental{
-	/// <summary>
-	/// Summary description for FormBasicTemplate.
-	/// </summary>
 	public class FormEmailMessageEdit : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		/// <summary>Required designer variable.</summary>
@@ -35,7 +29,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butInsert;
 		private System.Windows.Forms.Label labelSent;
 		private UI.Button butRefresh;
-		///<summary></summary>
 		public bool IsNew;
 		private bool templatesChanged;
 		private System.Windows.Forms.Panel panelTemplates;
@@ -50,7 +43,6 @@ namespace OpenDental{
 		private MenuItem menuItemRemove;
 		private OpenDental.UI.Button buttonFuchsMailDSF;
 		private OpenDental.UI.Button buttonFuchsMailDMF;
-		//private int PatNum;
 		private EmailMessage MessageCur;
 		private Label labelDecrypt;
 		private UI.Button butDecrypt;

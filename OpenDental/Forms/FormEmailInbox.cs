@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
@@ -17,10 +18,14 @@ namespace OpenDental {
 		}
 
 		private void FormEmailInbox_Load(object sender,EventArgs e) {
-			labelInboxComputerName.Text="Computer Name Where New Email Is Fetched: "+PrefC.GetString(PrefName.EmailInboxComputerName);
+			labelInboxComputerName.Text="Computer Name Where New Email Is Retrieved: "+PrefC.GetString(PrefName.EmailInboxComputerName);
 			labelThisComputer.Text+=Dns.GetHostName();
 			Application.DoEvents();//Show the form contents before loading email into the grid.
 			GetMessages();//If no new messages, then the user will know based on what shows in the grid.
+		}
+
+		private void FormEmailInbox_Resize(object sender,EventArgs e) {
+			FillGridEmailMessages();//To resize the columnns in the grid as needed.
 		}
 
 		private void menuItemSetup_Click(object sender,EventArgs e) {
@@ -85,32 +90,27 @@ namespace OpenDental {
 		///<summary>Gets new emails and also shows older emails from the database.</summary>
 		private void FillGridEmailMessages() {
 			ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
-			if(gridEmailMessages.Columns.Count==0) {//Columns do not change.  We only need to set them once.
-				gridEmailMessages.BeginUpdate();
-				gridEmailMessages.Columns.Clear();
-				int colReceivedDatePixCount=140;
-				int colStatusPixCount=120;
-				int colFromPixCount=200;
-				int colSigPixCount=24;
-				int colSubjectPixCount=200;
-				int colPatientPixCount=140;
-				int colVariablePixCount=gridEmailMessages.Width-22-colReceivedDatePixCount-colStatusPixCount-colFromPixCount-colSigPixCount-colSubjectPixCount-colPatientPixCount;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"ReceivedDate"),colReceivedDatePixCount,HorizontalAlignment.Center));//0
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sent/Received"),colStatusPixCount,HorizontalAlignment.Center));//1
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Subject"),colSubjectPixCount,HorizontalAlignment.Left));//2
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"From"),colFromPixCount,HorizontalAlignment.Left));//3
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sig"),colSigPixCount,HorizontalAlignment.Center));//4
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Patient"),colPatientPixCount,HorizontalAlignment.Left));//5
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Preview"),colVariablePixCount,HorizontalAlignment.Left));//6
-				gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-			}
+			gridEmailMessages.BeginUpdate();
 			gridEmailMessages.Rows.Clear();
+			gridEmailMessages.Columns.Clear();
+			int colReceivedDatePixCount=140;
+			int colMessageTypePixCount=120;
+			int colFromPixCount=200;
+			int colSigPixCount=24;
+			int colPatientPixCount=140;
+			int variableWidth=gridEmailMessages.Width-10-colFromPixCount-colReceivedDatePixCount-colMessageTypePixCount-colSigPixCount-colPatientPixCount;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"From"),colFromPixCount,HorizontalAlignment.Left));//0
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Subject"),variableWidth,HorizontalAlignment.Left));//1
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Date Received"),colReceivedDatePixCount,HorizontalAlignment.Center));//2
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"MessageType"),colMessageTypePixCount,HorizontalAlignment.Center));//3
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sig"),colSigPixCount,HorizontalAlignment.Center));//4
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Patient"),colPatientPixCount,HorizontalAlignment.Left));//5
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;			
 			for(int i=0;i<ListEmailMessages.Count;i++) {
 				EmailMessage emailMessage=ListEmailMessages[i];
 				UI.ODGridRow row=new UI.ODGridRow();
@@ -119,10 +119,10 @@ namespace OpenDental {
 					|| emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted || emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
 					row.Bold=true;//unread
 				}
-				row.Cells.Add(new UI.ODGridCell(emailMessage.MsgDateTime.ToString()));//ReceivedDate
-				row.Cells.Add(new UI.ODGridCell(emailMessage.SentOrReceived.ToString()));//Status
-				row.Cells.Add(new UI.ODGridCell(emailMessage.Subject));//Subject
-				row.Cells.Add(new UI.ODGridCell(emailMessage.FromAddress));//From
+				row.Cells.Add(new UI.ODGridCell(emailMessage.FromAddress));//0 From
+				row.Cells.Add(new UI.ODGridCell(emailMessage.Subject));//1 Subject
+				row.Cells.Add(new UI.ODGridCell(emailMessage.MsgDateTime.ToString()));//2 ReceivedDate
+				row.Cells.Add(new UI.ODGridCell(EmailMessages.GetEmailSentOrReceivedDescript(emailMessage.SentOrReceived)));//3 MessageType
 				string sigTrust="";//Blank for no signature, N for untrusted signature, Y for trusted signature.
 				for(int j=0;j<emailMessage.Attachments.Count;j++) {
 					if(emailMessage.Attachments[j].DisplayedFileName.ToLower()!="smime.p7s") {
@@ -136,32 +136,43 @@ namespace OpenDental {
 					}
 					break;
 				}
-				row.Cells.Add(new UI.ODGridCell(sigTrust));//Sig
+				row.Cells.Add(new UI.ODGridCell(sigTrust));//4 Sig
 				long patNumRegardingPatient=emailMessage.PatNum;
 				//Webmail messages should list the patient as the PatNumSubj, which means "the patient whom this message is regarding".
 				if(emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived || emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead) {
 					patNumRegardingPatient=emailMessage.PatNumSubj;
 				}
 				if(patNumRegardingPatient==0) {
-					row.Cells.Add(new UI.ODGridCell(""));//Patient
+					row.Cells.Add(new UI.ODGridCell(""));//5 Patient
 				}
 				else {
 					Patient pat=Patients.GetPat(patNumRegardingPatient);
-					row.Cells.Add(new UI.ODGridCell(pat.GetNameLF()));//Patient
+					row.Cells.Add(new UI.ODGridCell(pat.GetNameLF()));//5 Patient
 				}
-				string preview=emailMessage.BodyText.Replace("\r\n"," ").Replace('\n',' ');//Replace newlines with spaces, in order to compress the preview.
-				row.Cells.Add(new UI.ODGridCell(preview));//Preview
 				gridEmailMessages.Rows.Add(row);
 			}
 			gridEmailMessages.EndUpdate();
 		}
 
 		private void gridEmailMessages_CellClick(object sender,UI.ODGridClickEventArgs e) {
-			if(e.Col!=4) {
-				//Not the Sig column.
+			EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[e.Row].Tag;
+			if(EmailMessages.IsSecureWebMail(emailMessage.SentOrReceived)) {
+				//We do not yet have a preview for secure web mail messages.
+				splitContainerNoFlicker.Panel2Collapsed=true;
 				return;
 			}
-			EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[e.Row].Tag;
+			EmailMessages.UpdateSentOrReceivedRead(emailMessage);
+			emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Refresh from the database to get the full body text.
+			FillGridEmailMessages();//To show the email is read.
+			gridEmailMessages.SetSelected(e.Row,true);
+			splitContainerNoFlicker.Panel2Collapsed=false;
+			emailPreview.Width=splitContainerNoFlicker.Panel2.Width;//For some reason the anchors do not always work inside panel2.
+			emailPreview.Height=splitContainerNoFlicker.Panel2.Height;//For some reason the anchors do not always work inside panel2.
+			emailPreview.LoadEmailMessage(emailMessage);
+			//Handle Sig column clicks.
+			if(e.Col!=4) {
+				return;//Not the Sig column.
+			}
 			for(int i=0;i<emailMessage.Attachments.Count;i++) {
 				if(emailMessage.Attachments[i].DisplayedFileName.ToLower()!="smime.p7s") {
 					continue;
@@ -172,7 +183,9 @@ namespace OpenDental {
 				if(form.ShowDialog()==DialogResult.OK) {
 					//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
 					EmailMessages.RefreshCertStoreExternal(AddressInbox);
-					GetMessages();//Refresh the entire inbox, because there may be multiple email messages from the same address that the user just added trust for.  The Sig column may need to be updated on multiple rows.
+					//Refresh the entire inbox, because there may be multiple email messages from the same address that the user just added trust for.
+					//The Sig column may need to be updated on multiple rows.
+					GetMessages();
 				}
 				break;
 			}

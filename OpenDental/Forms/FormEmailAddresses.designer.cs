@@ -31,9 +31,9 @@ namespace OpenDental{
 			this.textInboxCheckInterval = new System.Windows.Forms.TextBox();
 			this.groupEmailPrefs = new System.Windows.Forms.GroupBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butSetDefault = new OpenDental.UI.Button();
 			this.butWebMailNotify = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butThisComputer = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
@@ -48,7 +48,7 @@ namespace OpenDental{
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxComputerName.TabIndex = 6;
-			this.labelInboxComputerName.Text = "Computer Name To Fetch New Email From";
+			this.labelInboxComputerName.Text = "Computer Name To Retrieve New Email From";
 			this.labelInboxComputerName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// labelInboxCheckInterval
@@ -58,7 +58,7 @@ namespace OpenDental{
 			this.labelInboxCheckInterval.Name = "labelInboxCheckInterval";
 			this.labelInboxCheckInterval.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxCheckInterval.TabIndex = 7;
-			this.labelInboxCheckInterval.Text = "Inbox Check Interval";
+			this.labelInboxCheckInterval.Text = "Inbox Retrieve Interval";
 			this.labelInboxCheckInterval.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// labelInboxCheckUnits
@@ -112,21 +112,6 @@ namespace OpenDental{
     "red.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(18, 12);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(391, 440);
-			this.gridMain.TabIndex = 4;
-			this.gridMain.Title = "Email Addresses";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
 			// butSetDefault
 			// 
 			this.butSetDefault.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -157,6 +142,21 @@ namespace OpenDental{
 			this.butWebMailNotify.Text = "WebMail Notify";
 			this.butWebMailNotify.UseVisualStyleBackColor = true;
 			this.butWebMailNotify.Click += new System.EventHandler(this.butWebMailNotify_Click);
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(18, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(391, 440);
+			this.gridMain.TabIndex = 4;
+			this.gridMain.Title = "Email Addresses";
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// butThisComputer
 			// 

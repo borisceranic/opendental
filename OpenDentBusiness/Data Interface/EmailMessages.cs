@@ -1364,6 +1364,41 @@ namespace OpenDentBusiness{
 			return emailAttach;
 		}
 
+		public static string GetEmailSentOrReceivedDescript(EmailSentOrReceived sentOrReceived) {
+			if(IsRegularEmail(sentOrReceived)) {
+				return Lans.g("EmailMessages","Regular Email");
+			}
+			if(IsEncryptedEmail(sentOrReceived)) {
+				return Lans.g("EmailMessages","Encrypted Email");
+			}
+			if(IsSecureWebMail(sentOrReceived)) {
+				return Lans.g("EmailMessages","Secure Web Mail");
+			}
+			if(IsUnsent(sentOrReceived)) {
+				return Lans.g("EmailMessages","Unsent");
+			}			
+			return "";
+		}
+
+		public static bool IsRegularEmail(EmailSentOrReceived sentOrReceived) {
+			return (sentOrReceived==EmailSentOrReceived.Read || sentOrReceived==EmailSentOrReceived.Received || sentOrReceived==EmailSentOrReceived.Sent);
+		}
+
+		public static bool IsEncryptedEmail(EmailSentOrReceived sentOrReceived) {
+			return (sentOrReceived==EmailSentOrReceived.ReadDirect || sentOrReceived==EmailSentOrReceived.ReceivedDirect || 
+				sentOrReceived==EmailSentOrReceived.SentDirect || sentOrReceived==EmailSentOrReceived.ReceivedEncrypted || 
+				sentOrReceived==EmailSentOrReceived.AckDirectNotSent || sentOrReceived==EmailSentOrReceived.AckDirectProcessed);
+		}
+
+		public static bool IsSecureWebMail(EmailSentOrReceived sentOrReceived) {
+			return (sentOrReceived==EmailSentOrReceived.WebMailRecdRead || sentOrReceived==EmailSentOrReceived.WebMailReceived ||
+				sentOrReceived==EmailSentOrReceived.WebMailSent);
+		}
+
+		public static bool IsUnsent(EmailSentOrReceived sentOrReceived) {
+			return (sentOrReceived==EmailSentOrReceived.Neither);
+		}
+
 		#endregion Helpers
 
 		#region Testing

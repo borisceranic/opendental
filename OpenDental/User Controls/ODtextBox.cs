@@ -393,7 +393,14 @@ namespace OpenDental {
 
 		///<summary>When the contents of the text box is resized, e.g. when word wrap creates a new line, clear red wavy lines so they don't shift down.</summary>
 		private void ODtextBox_ContentsResized(object sender,ContentsResizedEventArgs e) {
-			if(DesignMode || !this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+			try {
+				if(DesignMode || !this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+					return;
+				}
+			}
+			catch {
+				//This can only happen if designing and DesignMode is false for some reason.  Has happened when this control is two levels deep.
+				//The exception happens in PrefC.GetBool() because there is no database connection in design time.
 				return;
 			}
 			Point textEndPointCur=this.GetPositionFromCharIndex(Text.Length-1);
