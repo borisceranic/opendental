@@ -809,7 +809,11 @@ namespace OpenDentBusiness{
 				if(remainingWriteOff<0) {
 					remainingWriteOff=0;
 				}
-				if(paidOtherInsTot>0 || writeOffOtherIns>0) {//No secondary writeoff estimates allowed.  Only primary may have writeoffs.  If no other insurance payments/estimates/writeoffs, then the current writeoff is calculated as primary.
+				if((!PrefC.GetBool(PrefName.InsPPOsecWriteoffs) && paidOtherInsTot>0) || writeOffOtherIns>0) {
+					//This pref solves a conflict between two customers.  One customer paid for a past feature request.
+					//They need this new preference because they have a non-PPO as primary and a pseudo-PPO (Medicaid flagged as PPO) as secondary.
+					//When the pref is true, then secondary writeoffs are only included if other insurance has no writeoffs already.  This is how we used to calculate secondary writeoffs for everyone.
+					//When the pref is false (default), then no secondary writeoff estimates allowed.  Only primary may have writeoffs.  If no other insurance payments/estimates/writeoffs, then the current writeoff is calculated as primary.
 					cp.WriteOffEst=0;//The reasoning for this is covered in the manual under Unit Test #1 and COB.
 				}
 				//We can't go over either number.  We must use the smaller of the two.  If one of them is zero, then the writeoff is zero.
