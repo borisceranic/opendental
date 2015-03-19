@@ -175,6 +175,27 @@ namespace OpenDental.Eclaims
 				}				
 				return;
 			}
+			#region Data Sanity Checking (for Replication)
+			//Example: We had one replication customer who was able to delete an insurance plan for which was attached to a claim.
+			//Imagine two replication servers, server A and server B.  An insplan is created which is not associated to any claims.
+			//Both databases have a copy of the insplan.  The internet connection is lost.  On server A, a user deletes the insurance
+			//plan (which is allowed because no claims are attached).  On server B, a user creates a claim with the insurance plan.
+			//When the internet connection returns, the delete insplan statement is run on server B, which then creates a claim with
+			//an invalid InsPlanNum on server B.  Without the checking below, the send claims window would crash for this one scenario.
+			Claim claim=Claims.GetClaim(queueItem.ClaimNum);//This should always exist, because we just did a select to get the queue item.
+			InsPlan insPlan=InsPlans.RefreshOne(claim.PlanNum);
+			if(insPlan==null) {//Check for missing PlanNums
+				queueItem.MissingData=Lans.g("Eclaims","Claim insurance plan record missing.  Please recreate claim.");
+				return;
+			}
+			if(claim.InsSubNum2!=0) {
+				InsPlan insPlan2=InsPlans.RefreshOne(claim.PlanNum2);
+				if(insPlan2==null) {//Check for missing PlanNums
+					queueItem.MissingData=Lans.g("Eclaims","Claim other insurance plan record missing.  Please recreate claim.");
+					return;//This will let the office send other claims that passed validation without throwing an exception.
+				}
+			}
+			#endregion Data Sanity Checking (for Replication)
 			if(clearhouse.Eformat==ElectronicClaimFormat.x837D_4010){
 				X837_4010.Validate(queueItem);//,out warnings);
 				//return;
