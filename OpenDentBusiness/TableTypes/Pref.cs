@@ -273,6 +273,7 @@ namespace OpenDentBusiness {
 		MobileUserName,
 		//MobileSyncLastFileNumber,
 		//MobileSyncPath,
+		///<summary>The major and minor version of the current MySQL connection.  Gets updated on startup when a new version is detected.</summary>
 		MySqlVersion,
 		///<summary>There is no UI for user to change this.  Format, if OD customer, is PatNum-(RandomString)(CheckSum).  Example: 1234-W6c43.  Format for resellers is up to them.</summary>
 		NewCropAccountId,

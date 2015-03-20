@@ -257,8 +257,8 @@ namespace OpenDental {
 			}
 			bool hasBackup=false;
 			string thisVersion=MiscData.GetMySqlVersion();
-			float floatVersion=PIn.Float(thisVersion.Substring(0,3));
-			if(floatVersion < 5.0f) {
+			Version versionMySQL=new Version(thisVersion);
+			if(versionMySQL < new Version(5,0)) {
 				//We will force users to upgrade to 5.0, but not yet to 5.5
 				MessageBox.Show(Lan.g("Prefs","Your version of MySQL won't work with this program")+": "+thisVersion
 					+".  "+Lan.g("Prefs","You should upgrade to MySQL 5.0 using the installer on our website."));
@@ -268,22 +268,31 @@ namespace OpenDental {
 			if(!PrefC.ContainsKey("MySqlVersion")) {//db has not yet been updated to store this pref
 				//We're going to skip this.  We will recommend that people first upgrade OD, then MySQL, so this won't be an issue.
 			}
-			else if(Prefs.UpdateString(PrefName.MySqlVersion,floatVersion.ToString("f1"))) {
-				if(!MsgBox.Show("Prefs",MsgBoxButtons.OKCancel,"Tables will now be backed up, optimized, and repaired.  This will take a minute or two.  Continue?")) {
-					Application.Exit();
-					return false;
+			else {//Using a version that stores the MySQL version as a preference.
+				//There was an old bug where the MySQLVersion preference could be stored as 5,5 instead of 5.5 due to converting the version into a float.
+				//Replace any commas with periods before checking if the preference is going to change.
+				//This is simply an attempt to avoid making unnecessary backups for users with a corrupt version (e.g. 5,5).
+				if(PrefC.GetString(PrefName.MySqlVersion).Contains(",")) {
+					Prefs.UpdateString(PrefName.MySqlVersion,PrefC.GetString(PrefName.MySqlVersion).Replace(",","."));
 				}
-				try {
-					DatabaseMaintenance.BackupRepairAndOptimize();
-					hasBackup=true;
-				}
-				catch(Exception e) {
-					if(e.Message!="") {
-						MessageBox.Show(e.Message);
+				//Now check to see if the MySQL version has been updated.  If it has, make an automatic backup, repair, and optimize all tables.
+				if(Prefs.UpdateString(PrefName.MySqlVersion,(thisVersion))) {
+					if(!MsgBox.Show("Prefs",MsgBoxButtons.OKCancel,"Tables will now be backed up, optimized, and repaired.  This will take a minute or two.  Continue?")) {
+						Application.Exit();
+						return false;
 					}
-					MsgBox.Show("Prefs","Backup failed. Your database has not been altered.");
-					Application.Exit();
-					return false;//but this should never happen
+					try {
+						DatabaseMaintenance.BackupRepairAndOptimize();
+						hasBackup=true;
+					}
+					catch(Exception e) {
+						if(e.Message!="") {
+							MessageBox.Show(e.Message);
+						}
+						MsgBox.Show("Prefs","Backup failed. Your database has not been altered.");
+						Application.Exit();
+						return false;//but this should never happen
+					}
 				}
 			}
 			if(PrefC.ContainsKey("DatabaseConvertedForMySql41")) {
@@ -320,13 +329,8 @@ namespace OpenDental {
 				return;
 			}
 			string thisVersion=MiscData.GetMySqlVersion();
-			float floatVersion=PIn.Float(thisVersion.Substring(0,3));
-			//doing it this way will be needed later to handle two digit version numbers.  
-			//We may then combine them into a single float, remembering to left pad single digit minor versions.
-			//int majVer=int.Parse(thisVersion.Split(',','.')[0]);
-			//int minVer=int.Parse(thisVersion.Split(',','.')[1]);
-			//if((majVer<5 || (majVer=5 && minVer<5))	&& !Programs.IsEnabled(ProgramName.eClinicalWorks)){//Do not show msg if MySQL version is 5.5 or greater or eCW is enabled
-			if(floatVersion < 5.5f	&& !Programs.IsEnabled(ProgramName.eClinicalWorks)){//Do not show msg if MySQL version is 5.5 or greater or eCW is enabled
+			Version versionMySQL=new Version(thisVersion);
+			if(versionMySQL < new Version(5,5) && !Programs.IsEnabled(ProgramName.eClinicalWorks)) {//Do not show msg if MySQL version is 5.5 or greater or eCW is enabled
 				MsgBox.Show("Prefs","You should upgrade to MySQL 5.5 using the installer posted on our website.  It's not urgent, but until you upgrade, you are likely to get a few errors each day which will require restarting the MySQL service.");
 			}
 		}
