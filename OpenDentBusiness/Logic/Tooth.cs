@@ -864,13 +864,13 @@ namespace OpenDentBusiness{
 			}
 			//O-------------------------------------------
 			if(toothNum=="" || IsPosterior(toothNum)) {
-				if(al.Contains("O")) {
+				if(al.Contains("O") || al.Contains("I")) {//Under some circumstances pressing O/I only applies O surface
 					surfTidy+="O";
 				}
 			}
 			//I---------------------------------
 			if(toothNum=="" || IsAnterior(toothNum)) {
-				if(al.Contains("I")) {
+				if(al.Contains("I") || al.Contains("O")) {//Under some circumstances pressing O/I only applies I surface
 					surfTidy+="I";
 				}
 			}
@@ -880,7 +880,7 @@ namespace OpenDentBusiness{
 			}
 			//B------------------------------------------------
 			if(toothNum=="" || IsPosterior(toothNum)) {
-				if(al.Contains("B")) {
+				if(al.Contains("B") || al.Contains("F")) {//Under some circumstances pressing B/F only applies F surface
 					surfTidy+="B";
 				}
 			}
@@ -894,7 +894,7 @@ namespace OpenDentBusiness{
 			}
 			else {
 				if(toothNum=="" || IsAnterior(toothNum)) {
-					if(al.Contains("F")) {
+					if(al.Contains("F") || al.Contains("B")) {//Under some circumstances pressing B/F only applies B surface
 						surfTidy+="F";
 					}
 				}
