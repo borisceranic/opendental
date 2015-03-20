@@ -6214,12 +6214,15 @@ namespace OpenDental{
 				textSurf.AppendText("M");
 			}
 			if(butOI.BackColor==Color.White){
-				if(ToothGraphic.IsAnterior(toothChart.SelectedTeeth[0])){
-					textSurf.AppendText("I");
+				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
+					if(ToothGraphic.IsAnterior(toothChart.SelectedTeeth[i]) && !textSurf.Text.Contains("I")) {
+						textSurf.AppendText("I");
+					}
+					else if(!textSurf.Text.Contains("O")) {
+						textSurf.AppendText("O");
+					}
 				}
-				else{	
-					textSurf.AppendText("O");
-				}
+				textSurf.Text=textSurf.Text.Replace("IO","OI");//For consistant user experience, always O before I
 			}
 			if(butD.BackColor==Color.White){
 				textSurf.AppendText("D");
@@ -6232,17 +6235,25 @@ namespace OpenDental{
 					textSurf.AppendText("V");
 				}
 			}
-			if(butBF.BackColor==Color.White){
-				if(ToothGraphic.IsAnterior(toothChart.SelectedTeeth[0])) {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-						textSurf.AppendText("V");//vestibular
+			if(butBF.BackColor==Color.White) {
+				for(int i=0;i<toothChart.SelectedTeeth.Count;i++) {
+					if(ToothGraphic.IsAnterior(toothChart.SelectedTeeth[i])) {
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && !textSurf.Text.Contains("V")) {//Canadian. en-CA or fr-CA
+							textSurf.AppendText("V");//vestibular
+						}
+						else if(!CultureInfo.CurrentCulture.Name.EndsWith("CA") && !textSurf.Text.Contains("F")){
+							textSurf.AppendText("F");
+						}
 					}
-					else {
-						textSurf.AppendText("F");
+					else if(!textSurf.Text.Contains("B")){
+						textSurf.AppendText("B");
 					}
 				}
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+					textSurf.Text=textSurf.Text.Replace("VB","BV");//For consistant user experience, always B before V
+				}
 				else {
-					textSurf.AppendText("B");
+					textSurf.Text=textSurf.Text.Replace("FB","BF");//For consistant user experience, always B before F
 				}
 			}
 			if(butL.BackColor==Color.White){
