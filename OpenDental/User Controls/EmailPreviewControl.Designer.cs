@@ -155,10 +155,10 @@
 			// 
 			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridAttachments.HScrollVisible = false;
-			this.gridAttachments.Location = new System.Drawing.Point(651, 1);
+			this.gridAttachments.Location = new System.Drawing.Point(649, 22);
 			this.gridAttachments.Name = "gridAttachments";
 			this.gridAttachments.ScrollValue = 0;
-			this.gridAttachments.Size = new System.Drawing.Size(321, 120);
+			this.gridAttachments.Size = new System.Drawing.Size(323, 98);
 			this.gridAttachments.TabIndex = 0;
 			this.gridAttachments.TabStop = false;
 			this.gridAttachments.Title = "Attachments";
@@ -245,9 +245,9 @@
 			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAttach.CornerRadius = 4F;
-			this.butAttach.Location = new System.Drawing.Point(652, 19);
+			this.butAttach.Location = new System.Drawing.Point(649, 1);
 			this.butAttach.Name = "butAttach";
-			this.butAttach.Size = new System.Drawing.Size(75, 16);
+			this.butAttach.Size = new System.Drawing.Size(75, 20);
 			this.butAttach.TabIndex = 6;
 			this.butAttach.Text = "Attach...";
 			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
@@ -260,7 +260,7 @@
 			this.butSig.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSig.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSig.CornerRadius = 4F;
-			this.butSig.Location = new System.Drawing.Point(615, 79);
+			this.butSig.Location = new System.Drawing.Point(614, 79);
 			this.butSig.Name = "butSig";
 			this.butSig.Size = new System.Drawing.Size(33, 20);
 			this.butSig.TabIndex = 3;

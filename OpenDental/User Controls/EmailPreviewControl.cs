@@ -11,60 +11,25 @@ using OpenDentBusiness;
 namespace OpenDental.User_Controls {
 	public partial class EmailPreviewControl:UserControl {
 
-		private bool _isLoading=false;
-		private EmailMessage MessageCur=null;
-		private bool _isComposing=false;
 		///<summary>TODO: Replace this flag with a new flag on the email address object.</summary>
 		private bool _isSigningEnabled=true;
+		private bool _hasMessageChanged=false;
+		private bool _isLoading=false;
+		private bool _isComposing=false;
+		private EmailMessage _emailMessage=null;		
 		private X509Certificate2 _certSig=null;
 		private List<EmailAttach> _listEmailAttachDisplayed=null;
 		///<summary>Used when sending to get Clinic.</summary>
 		private Patient _patCur=null;
-		private bool _isMessageChanged=false;
 
-		public bool IsComposing {
-			get { return _isComposing; }
-		}
-
-		public bool IsMessageChanged {
-			get { return _isMessageChanged; }
-		}
-
-		///<summary>Can return null.</summary>
-		public Patient PatCur {
-			get { return _patCur; }
-		}
-
-		public string Subject {
-			get { return textSubject.Text; }
-			set { textSubject.Text=value; }
-		}
-
-		public string BodyText {
-			get { return textBodyText.Text; }
-			set { textBodyText.Text=value; }
-		}
-
-		public string FromAddress {
-			get { return textFromAddress.Text; }
-		}
-
-		public string ToAddress {
-			get { return textToAddress.Text; }
-			set { textToAddress.Text=value; }
-		}
-
-		public EmailAddress GetEmailAddress() {
-			if(_patCur==null) {//can happen if sending deposit slip by email
-				return EmailAddresses.GetByClinic(0);//gets the practice default address
-			}
-			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
-		}
-
-		public bool IsSigned {
-			get { return (_isSigningEnabled && _certSig!=null); }
-		}
-
+		public bool HasMessageChanged { get { return _hasMessageChanged; } }
+		public bool IsComposing { get { return _isComposing; } }
+		public string Subject { get { return textSubject.Text; } set { textSubject.Text=value; } }
+		public string BodyText { get { return textBodyText.Text; } set { textBodyText.Text=value; } }
+		public string FromAddress { get { return textFromAddress.Text; } }
+		public string ToAddress { get { return textToAddress.Text; } set { textToAddress.Text=value; } }
+		public bool IsSigned { get { return (_isSigningEnabled && _certSig!=null); } }
+		
 		public X509Certificate2 Signature {
 			get {
 				if(IsSigned) {
@@ -74,25 +39,32 @@ namespace OpenDental.User_Controls {
 			}
 		}
 
+		public EmailAddress GetEmailAddress() {
+			if(_patCur==null) {//can happen if sending deposit slip by email
+				return EmailAddresses.GetByClinic(0);//gets the practice default address
+			}
+			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+		}				
+
 		public EmailPreviewControl() {
 			InitializeComponent();
 			gridAttachments.ContextMenu=contextMenuAttachments;
 		}
 
 		public void LoadEmailMessage(EmailMessage emailMessage) {
-			MessageCur=emailMessage;
-			_patCur=Patients.GetPat(MessageCur.PatNum);//we could just as easily pass this in.
-			if(MessageCur.SentOrReceived==EmailSentOrReceived.Neither) {//Composing a message
+			_emailMessage=emailMessage;
+			_patCur=Patients.GetPat(_emailMessage.PatNum);//we could just as easily pass this in.
+			if(_emailMessage.SentOrReceived==EmailSentOrReceived.Neither) {//Composing a message
 				_isComposing=true;
 				if(_isSigningEnabled) {
-					SetSig(EmailMessages.GetCertFromPrivateStore(MessageCur.FromAddress));
+					SetSig(EmailMessages.GetCertFromPrivateStore(_emailMessage.FromAddress));
 				}
 			}
 			else {//sent or received (not composing)
 				_isComposing=false;
-				textMsgDateTime.Text=MessageCur.MsgDateTime.ToString();
+				textMsgDateTime.Text=_emailMessage.MsgDateTime.ToString();
 				textMsgDateTime.ForeColor=Color.Black;
-				butAttach.Visible=false;
+				butAttach.Enabled=false;
 				textFromAddress.ReadOnly=true;
 				textToAddress.ReadOnly=true;
 				textSubject.ReadOnly=true;
@@ -100,29 +72,29 @@ namespace OpenDental.User_Controls {
 				textBodyText.ReadOnly=true;
 				textBodyText.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 			}
-			textSentOrReceived.Text=MessageCur.SentOrReceived.ToString();
-			textFromAddress.Text=MessageCur.FromAddress;
-			textToAddress.Text=MessageCur.ToAddress;
-			textSubject.Text=MessageCur.Subject;
-			textBodyText.Text=MessageCur.BodyText;
+			textSentOrReceived.Text=_emailMessage.SentOrReceived.ToString();
+			textFromAddress.Text=_emailMessage.FromAddress;
+			textToAddress.Text=_emailMessage.ToAddress;
+			textSubject.Text=_emailMessage.Subject;
+			textBodyText.Text=_emailMessage.BodyText;
 			textBodyText.Visible=true;
 			webBrowser.Visible=false;
 			//For all email received types, we disable most of the controls and put the form into a mostly read-only state.
 			//There is no reason a user should ever edit a received message.
 			//The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
-			if(MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.ReadDirect ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.Received ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.Read ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
+			if(_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.ReadDirect ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.Received ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.Read ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
 			{
 				//If an html body is received, then we display the body using a webbrowser control, so the user sees the message formatted as intended.
-				if(MessageCur.BodyText.ToLower().Contains("<html")) {
+				if(_emailMessage.BodyText.ToLower().Contains("<html")) {
 					textBodyText.Visible=false;
 					_isLoading=true;
-					webBrowser.DocumentText=MessageCur.BodyText;
+					webBrowser.DocumentText=_emailMessage.BodyText;
 					webBrowser.Location=textBodyText.Location;
 					webBrowser.Size=textBodyText.Size;
 					webBrowser.Anchor=textBodyText.Anchor;
@@ -131,32 +103,6 @@ namespace OpenDental.User_Controls {
 			}
 			FillAttachments();
 			textBodyText.Select();
-		}
-
-		private void webBrowser_Navigating(object sender,WebBrowserNavigatingEventArgs e) {
-			if(_isLoading) {
-				return;
-			}
-			e.Cancel=true;//Cancel browser navigation (for links clicked within the email message).
-			Process.Start(e.Url.ToString());//Instead launch the URL into a new default browser window.
-		}
-
-		private void webBrowser_Navigated(object sender,WebBrowserNavigatedEventArgs e) {
-			_isLoading=false;
-		}
-
-		private void SetSig(X509Certificate2 certSig) {
-			_certSig=certSig;
-			labelSignedBy.Visible=false;
-			textSignedBy.Visible=false;
-			textSignedBy.Text="";
-			butSig.Visible=false;
-			if(certSig!=null) {
-				labelSignedBy.Visible=true;
-				textSignedBy.Visible=true;
-				textSignedBy.Text=EmailMessages.GetSubjectEmailNameFromSignature(certSig);
-				butSig.Visible=true;
-			}
 		}
 
 		#region Attachments
@@ -170,10 +116,10 @@ namespace OpenDental.User_Controls {
 			gridAttachments.Rows.Clear();
 			gridAttachments.Columns.Clear();
 			gridAttachments.Columns.Add(new OpenDental.UI.ODGridColumn("",0));//No name column, since there is only one column.
-			for(int i=0;i<MessageCur.Attachments.Count;i++) {
-				if(MessageCur.Attachments[i].DisplayedFileName.ToLower()=="smime.p7s") {
+			for(int i=0;i<_emailMessage.Attachments.Count;i++) {
+				if(_emailMessage.Attachments[i].DisplayedFileName.ToLower()=="smime.p7s") {
 					if(!_isComposing) {
-						string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),MessageCur.Attachments[i].ActualFileName);
+						string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_emailMessage.Attachments[i].ActualFileName);
 						SetSig(EmailMessages.GetEmailSignatureFromSmimeP7sFile(smimeP7sFilePath));
 					}
 					//Do not display email signatures in the attachment list, because "smime.p7s" has no meaning to a user
@@ -181,9 +127,9 @@ namespace OpenDental.User_Controls {
 					continue;
 				}
 				OpenDental.UI.ODGridRow row=new UI.ODGridRow();
-				row.Cells.Add(MessageCur.Attachments[i].DisplayedFileName);
+				row.Cells.Add(_emailMessage.Attachments[i].DisplayedFileName);
 				gridAttachments.Rows.Add(row);
-				_listEmailAttachDisplayed.Add(MessageCur.Attachments[i]);
+				_listEmailAttachDisplayed.Add(_emailMessage.Attachments[i]);
 			}
 			gridAttachments.EndUpdate();
 			if(gridAttachments.Rows.Count>0) {
@@ -222,9 +168,9 @@ namespace OpenDental.User_Controls {
 
 		private void menuItemRemove_Click(object sender,EventArgs e) {
 			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
-			for(int i=0;i<MessageCur.Attachments.Count;i++) {
-				if(MessageCur.Attachments[i].EmailAttachNum==emailAttach.EmailAttachNum) {
-					MessageCur.Attachments.RemoveAt(i);
+			for(int i=0;i<_emailMessage.Attachments.Count;i++) {
+				if(_emailMessage.Attachments[i].EmailAttachNum==emailAttach.EmailAttachNum) {
+					_emailMessage.Attachments.RemoveAt(i);
 					break;
 				}
 			}
@@ -253,7 +199,7 @@ namespace OpenDental.User_Controls {
 					string strTextXml=File.ReadAllText(strFilePathAttach);
 					if(EhrCCD.IsCCD(strTextXml)) {
 						Patient patEmail=null;//Will be null for most email messages.
-						if(MessageCur.SentOrReceived==EmailSentOrReceived.ReadDirect || MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
+						if(_emailMessage.SentOrReceived==EmailSentOrReceived.ReadDirect || _emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
 							patEmail=_patCur;//Only allow reconcile if received via Direct.
 						}
 						string strAlterateFilPathXslCCD="";
@@ -322,7 +268,7 @@ namespace OpenDental.User_Controls {
 					attach=new EmailAttach();
 					attach.DisplayedFileName=Path.GetFileName(dlg.FileNames[i]);
 					attach.ActualFileName=newName;
-					MessageCur.Attachments.Add(attach);
+					_emailMessage.Attachments.Add(attach);
 				}
 			}
 			catch(Exception ex) {
@@ -347,6 +293,8 @@ namespace OpenDental.User_Controls {
 
 		#endregion Attachments
 
+		#region Signature
+
 		private void textFromAddress_KeyUp(object sender,KeyEventArgs e) {
 			if(!_isComposing || !_isSigningEnabled) {
 				return;
@@ -367,11 +315,49 @@ namespace OpenDental.User_Controls {
 				//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
 				EmailMessages.RefreshCertStoreExternal(GetEmailAddress());
 			}
-		}		
-		
-		private void textBodyText_TextChanged(object sender,EventArgs e) {
-			_isMessageChanged=true;
 		}
+
+		private void SetSig(X509Certificate2 certSig) {
+			_certSig=certSig;
+			labelSignedBy.Visible=false;
+			textSignedBy.Visible=false;
+			textSignedBy.Text="";
+			butSig.Visible=false;
+			if(certSig!=null) {
+				labelSignedBy.Visible=true;
+				textSignedBy.Visible=true;
+				textSignedBy.Text=EmailMessages.GetSubjectEmailNameFromSignature(certSig);
+				butSig.Visible=true;
+			}
+		}
+
+		#endregion Signature
+
+		#region Body
+
+		public void LoadTemplate(string subject,string bodyText) {
+			Subject=subject;
+			BodyText=bodyText;
+			_hasMessageChanged=false;
+		}
+
+		private void textBodyText_TextChanged(object sender,EventArgs e) {
+			_hasMessageChanged=true;
+		}
+
+		private void webBrowser_Navigating(object sender,WebBrowserNavigatingEventArgs e) {
+			if(_isLoading) {
+				return;
+			}
+			e.Cancel=true;//Cancel browser navigation (for links clicked within the email message).
+			Process.Start(e.Url.ToString());//Instead launch the URL into a new default browser window.
+		}
+
+		private void webBrowser_Navigated(object sender,WebBrowserNavigatedEventArgs e) {
+			_isLoading=false;
+		}
+
+		#endregion Body
 
 		///<summary>Saves the UI input values into the emailMessage.  Allowed to save message with invalid fields, so no validation here.</summary>
 		public void SaveMsg(EmailMessage emailMessage) {
@@ -380,7 +366,7 @@ namespace OpenDental.User_Controls {
 			emailMessage.Subject=textSubject.Text;
 			emailMessage.BodyText=textBodyText.Text;
 			emailMessage.MsgDateTime=DateTime.Now;
-			emailMessage.SentOrReceived=MessageCur.SentOrReceived;//Status does not ever change.
+			emailMessage.SentOrReceived=_emailMessage.SentOrReceived;//Status does not ever change.
 		}
 
 	}

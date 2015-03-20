@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
@@ -16,19 +13,18 @@ namespace OpenDental{
 		private OpenDental.UI.Button butSend;
 		private OpenDental.UI.Button butDeleteTemplate;
 		private OpenDental.UI.Button butAddTemplate;
-		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Label labelTemplate;
 		private System.Windows.Forms.ListBox listTemplates;
 		private OpenDental.UI.Button butInsertTemplate;
 		private UI.Button butRefresh;
 		public bool IsNew;
-		private bool templatesChanged;
+		private bool _hasTemplatesChanged;
 		private System.Windows.Forms.Panel panelTemplates;
-		private bool messageChanged;
 		private OpenDental.UI.Button butSave;
 		private OpenDental.UI.Button butDelete;
 		private OpenDental.UI.Button buttonFuchsMailDSF;
 		private OpenDental.UI.Button buttonFuchsMailDMF;
-		private EmailMessage MessageCur;
+		private EmailMessage _emailMessage;
 		private Label labelDecrypt;
 		private UI.Button butDecrypt;
 		private UI.Button butDirectMessage;
@@ -36,10 +32,10 @@ namespace OpenDental{
 		private User_Controls.EmailPreviewControl emailPreview;
 
 		///<summary></summary>
-		public FormEmailMessageEdit(EmailMessage messageCur){
+		public FormEmailMessageEdit(EmailMessage emailMessage){
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
-			MessageCur=messageCur.Copy();
+			_emailMessage=emailMessage.Copy();
 		}
 
 		/// <summary>
@@ -65,7 +61,7 @@ namespace OpenDental{
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEmailMessageEdit));
-			this.label4 = new System.Windows.Forms.Label();
+			this.labelTemplate = new System.Windows.Forms.Label();
 			this.listTemplates = new System.Windows.Forms.ListBox();
 			this.panelTemplates = new System.Windows.Forms.Panel();
 			this.butInsertTemplate = new OpenDental.UI.Button();
@@ -86,14 +82,14 @@ namespace OpenDental{
 			this.panelTemplates.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label4
+			// labelTemplate
 			// 
-			this.label4.Location = new System.Drawing.Point(8, 7);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(124, 14);
-			this.label4.TabIndex = 18;
-			this.label4.Text = "E-mail Template";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelTemplate.Location = new System.Drawing.Point(8, 7);
+			this.labelTemplate.Name = "labelTemplate";
+			this.labelTemplate.Size = new System.Drawing.Size(166, 14);
+			this.labelTemplate.TabIndex = 18;
+			this.labelTemplate.Text = "E-mail Template";
+			this.labelTemplate.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listTemplates
 			// 
@@ -109,7 +105,7 @@ namespace OpenDental{
 			this.panelTemplates.Controls.Add(this.butInsertTemplate);
 			this.panelTemplates.Controls.Add(this.butDeleteTemplate);
 			this.panelTemplates.Controls.Add(this.butAddTemplate);
-			this.panelTemplates.Controls.Add(this.label4);
+			this.panelTemplates.Controls.Add(this.labelTemplate);
 			this.panelTemplates.Controls.Add(this.listTemplates);
 			this.panelTemplates.Location = new System.Drawing.Point(8, 9);
 			this.panelTemplates.Name = "panelTemplates";
@@ -337,10 +333,13 @@ namespace OpenDental{
 			this.emailPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.emailPreview.Location = new System.Drawing.Point(189, 9);
+			this.emailPreview.BodyText = "";
+			this.emailPreview.Location = new System.Drawing.Point(189, 1);
 			this.emailPreview.Name = "emailPreview";
-			this.emailPreview.Size = new System.Drawing.Size(771, 644);
+			this.emailPreview.Size = new System.Drawing.Size(771, 652);
+			this.emailPreview.Subject = "";
 			this.emailPreview.TabIndex = 38;
+			this.emailPreview.ToAddress = "";
 			// 
 			// FormEmailMessageEdit
 			// 
@@ -389,7 +388,7 @@ namespace OpenDental{
 		}
 
 		private void RefreshAll() {
-			emailPreview.LoadEmailMessage(MessageCur);
+			emailPreview.LoadEmailMessage(_emailMessage);
 			if(!emailPreview.IsComposing) {
 				panelTemplates.Visible=false;
 				butDirectMessage.Enabled=false;//not allowed to send again.
@@ -407,34 +406,34 @@ namespace OpenDental{
 			butRefresh.Visible=false;
 			//For all email received types, we disable most of the controls and put the form into a mostly read-only state.
 			//There is no reason a user should ever edit a received message. The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
-			if(MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.ReadDirect ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.Received ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.Read ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
-				MessageCur.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
+			if(_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.ReadDirect ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.Received ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.Read ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
+				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
 			{
 				butRefresh.Visible=true;
 				butRawMessage.Visible=true;
 			}
 			labelDecrypt.Visible=false;
 			butDecrypt.Visible=false;
-			if(MessageCur.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted) {
+			if(_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted) {
 				labelDecrypt.Visible=true;
 				butDecrypt.Visible=true;
 				butRefresh.Visible=false;
 			}
 		}
 
-		private void FillTemplates(){
+		#region Templates
+
+		private void FillTemplates() {
 			listTemplates.Items.Clear();
-			for(int i=0;i<EmailTemplates.List.Length;i++){
+			for(int i=0;i<EmailTemplates.List.Length;i++) {
 				listTemplates.Items.Add(EmailTemplates.List[i].Subject);
 			}
 		}
-
-		#region Templates
 
 		private void listTemplates_DoubleClick(object sender, System.EventArgs e) {
 			if(listTemplates.SelectedIndex==-1){
@@ -450,7 +449,7 @@ namespace OpenDental{
 				return;
 			}
 			EmailTemplates.RefreshCache();
-			templatesChanged=true;
+			_hasTemplatesChanged=true;
 			FillTemplates();
 		}
 
@@ -463,7 +462,7 @@ namespace OpenDental{
 				return;
 			}
 			EmailTemplates.RefreshCache();
-			templatesChanged=true;
+			_hasTemplatesChanged=true;
 			FillTemplates();
 		}
 
@@ -478,7 +477,7 @@ namespace OpenDental{
 			}
 			EmailTemplates.Delete(EmailTemplates.List[listTemplates.SelectedIndex]);
 			EmailTemplates.RefreshCache();
-			templatesChanged=true;
+			_hasTemplatesChanged=true;
 			FillTemplates();
 		}
 
@@ -487,62 +486,38 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select an item first."));
 				return;
 			}
-			if(messageChanged){
+			if(emailPreview.HasMessageChanged){
 				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?"),"",MessageBoxButtons.OKCancel)
 					!=DialogResult.OK){
 					return;
 				}
 			}
-			emailPreview.Subject=EmailTemplates.List[listTemplates.SelectedIndex].Subject;
-			emailPreview.BodyText=EmailTemplates.List[listTemplates.SelectedIndex].BodyText;
-			messageChanged=false;
+			emailPreview.LoadTemplate(EmailTemplates.List[listTemplates.SelectedIndex].Subject,EmailTemplates.List[listTemplates.SelectedIndex].BodyText);
 		}
 
 		///<summary>Hard coded template.</summary>
 		private void buttonFuchsMailDSF_Click(object sender,EventArgs e) {
-			emailPreview.Subject="Statement to DSF";
-			emailPreview.BodyText="For accounting, sent statement to skimom@springfielddental.net"+emailPreview.BodyText;
 			emailPreview.ToAddress="skimom@springfielddental.net";
-			messageChanged=false;
+			emailPreview.LoadTemplate("Statement to DSF","For accounting, sent statement to skimom@springfielddental.net"+emailPreview.BodyText);
 		}
 
 		///<summary>Hard coded template.</summary>
 		private void buttonFuchsMailDMF_Click(object sender,EventArgs e) {
 			emailPreview.ToAddress="smilecouple@yahoo.com";
-			emailPreview.Subject="Statement to DMF";
-			emailPreview.BodyText="For accounting, sent statement to smilecouple@yahoo.com"+emailPreview.BodyText;
-			messageChanged=false;
+			emailPreview.LoadTemplate("Statement to DMF","For accounting, sent statement to smilecouple@yahoo.com"+emailPreview.BodyText);
 		}
 
 		#endregion Templates
 
-		private void butDelete_Click(object sender,EventArgs e) {
-			if(IsNew){
-				DialogResult=DialogResult.Cancel;
-				//It will be deleted in the FormClosing() Event.
-			}
-			else{
-				if(MsgBox.Show(this,true,"Delete this email?")){
-					EmailMessages.Delete(MessageCur);
-					DialogResult=DialogResult.OK;
-				}
-			}
-		}
-
-		private void butRawMessage_Click(object sender,EventArgs e) {
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(MessageCur.RawEmailIn);
-			msgbox.ShowDialog();
-		}
-
 		private void butDecrypt_Click(object sender,EventArgs e) {
-			if(!EmailMessages.IsAddressTrusted(MessageCur.FromAddress)) {//Not trusted yet.
+			if(!EmailMessages.IsAddressTrusted(_emailMessage.FromAddress)) {//Not trusted yet.
 				string strTrustMessage=Lan.g(this,"The sender address must be added to your trusted addresses before you can decrypt the email")
-					+". "+Lan.g(this,"Add")+" "+MessageCur.FromAddress+" "+Lan.g(this,"to trusted addresses")+"?";
+					+". "+Lan.g(this,"Add")+" "+_emailMessage.FromAddress+" "+Lan.g(this,"to trusted addresses")+"?";
 				if(MessageBox.Show(strTrustMessage,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
 					Cursor=Cursors.WaitCursor;
-					EmailMessages.TryAddTrustDirect(MessageCur.FromAddress);
+					EmailMessages.TryAddTrustDirect(_emailMessage.FromAddress);
 					Cursor=Cursors.Default;
-					if(!EmailMessages.IsAddressTrusted(MessageCur.FromAddress)) {
+					if(!EmailMessages.IsAddressTrusted(_emailMessage.FromAddress)) {
 						MsgBox.Show(this,"Failed to trust sender because a valid certificate could not be located.");
 						return;
 					}
@@ -555,9 +530,9 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=emailPreview.GetEmailAddress();
 			try {
-				MessageCur=EmailMessages.ProcessRawEmailMessage(MessageCur.BodyText,MessageCur.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
+				_emailMessage=EmailMessages.ProcessRawEmailMessage(_emailMessage.BodyText,_emailMessage.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
 				//The Direct message was decrypted.
-				EmailMessages.UpdateSentOrReceivedRead(MessageCur);//Mark read, because we are already viewing the message within the current window.					
+				EmailMessages.UpdateSentOrReceivedRead(_emailMessage);//Mark read, because we are already viewing the message within the current window.					
 				RefreshAll();
 			}
 			catch(Exception ex) {
@@ -568,6 +543,24 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(IsNew){
+				DialogResult=DialogResult.Cancel;
+				//It will be deleted in the FormClosing() Event.
+			}
+			else{
+				if(MsgBox.Show(this,true,"Delete this email?")){
+					EmailMessages.Delete(_emailMessage);
+					DialogResult=DialogResult.OK;
+				}
+			}
+		}
+
+		private void butRawMessage_Click(object sender,EventArgs e) {
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(_emailMessage.RawEmailIn);
+			msgbox.ShowDialog();
+		}		
+
 		private void butSave_Click(object sender,EventArgs e) {
 			//this will not be available if already sent.
 			SaveMsg();
@@ -576,23 +569,23 @@ namespace OpenDental{
 
 		private void SaveMsg(){
 			//allowed to save message with invalid fields, so no validation here.  Only validate when sending.
-			emailPreview.SaveMsg(MessageCur);
+			emailPreview.SaveMsg(_emailMessage);
 			if(IsNew) {
-				EmailMessages.Insert(MessageCur);
+				EmailMessages.Insert(_emailMessage);
 				IsNew=false;//As soon as the message is saved to the database, it is no longer new because it has a primary key.  Prevents new email from being duplicated if saved multiple times.
 			}
 			else {
-				EmailMessages.Update(MessageCur);
+				EmailMessages.Update(_emailMessage);
 			}
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
-			List<EmailAttach> listEmailAttachOld=MessageCur.Attachments;
+			List<EmailAttach> listEmailAttachOld=_emailMessage.Attachments;
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=emailPreview.GetEmailAddress();
 			try {
-				MessageCur=EmailMessages.ProcessRawEmailMessage(MessageCur.RawEmailIn,MessageCur.EmailMessageNum,emailAddress,false);
-				EmailMessages.UpdateSentOrReceivedRead(MessageCur);//Mark read, because we are already viewing the message within the current window.
+				_emailMessage=EmailMessages.ProcessRawEmailMessage(_emailMessage.RawEmailIn,_emailMessage.EmailMessageNum,emailAddress,false);
+				EmailMessages.UpdateSentOrReceivedRead(_emailMessage);//Mark read, because we are already viewing the message within the current window.
 				RefreshAll();
 			}
 			catch(Exception ex) {
@@ -644,15 +637,15 @@ namespace OpenDental{
 			}
 			SaveMsg();
 			try {
-				string strErrors=EmailMessages.SendEmailDirect(MessageCur,emailAddressFrom);
+				string strErrors=EmailMessages.SendEmailDirect(_emailMessage,emailAddressFrom);
 				if(strErrors!="") {
 					Cursor=Cursors.Default;
 					MessageBox.Show(strErrors);
 					return;
 				}
 				else {
-					MessageCur.SentOrReceived=EmailSentOrReceived.SentDirect;
-					EmailMessages.Update(MessageCur);
+					_emailMessage.SentOrReceived=EmailSentOrReceived.SentDirect;
+					EmailMessages.Update(_emailMessage);
 					MsgBox.Show(this,"Sent");
 				}
 			}
@@ -672,7 +665,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Addresses not allowed to be blank.");
 				return;
 			}
-			if(EhrCCD.HasCcdEmailAttachment(MessageCur)) {
+			if(EhrCCD.HasCcdEmailAttachment(_emailMessage)) {
 				MsgBox.Show(this,"The email has a summary of care attachment which may contain sensitive patient data.  Use the Direct Message button instead.");
 				return;
 			}
@@ -685,13 +678,13 @@ namespace OpenDental{
 			SaveMsg();
 			try{
 				if(emailPreview.IsSigned) {
-					EmailMessages.SendEmailUnsecureWithSig(MessageCur,emailAddress,emailPreview.Signature);
+					EmailMessages.SendEmailUnsecureWithSig(_emailMessage,emailAddress,emailPreview.Signature);
 				}
 				else {
-					EmailMessages.SendEmailUnsecure(MessageCur,emailAddress);
+					EmailMessages.SendEmailUnsecure(_emailMessage,emailAddress);
 				}
-				MessageCur.SentOrReceived=EmailSentOrReceived.Sent;
-				EmailMessages.Update(MessageCur);
+				_emailMessage.SentOrReceived=EmailSentOrReceived.Sent;
+				EmailMessages.Update(_emailMessage);
 				MsgBox.Show(this,"Sent");
 			}
 			catch(Exception ex){
@@ -709,7 +702,7 @@ namespace OpenDental{
 		}
 
 		private void FormEmailMessageEdit_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(templatesChanged){
+			if(_hasTemplatesChanged){
 				DataValid.SetInvalid(InvalidType.Email);
 			}
 		}
@@ -719,49 +712,9 @@ namespace OpenDental{
 				return;
 			}
 			if(IsNew){
-				EmailMessages.Delete(MessageCur);
+				EmailMessages.Delete(_emailMessage);
 			}
 		}
-		
-
-		
-
-		
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
 
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

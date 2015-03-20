@@ -29,7 +29,9 @@ namespace OpenDental{
 			this.menuItemSetup = new System.Windows.Forms.MenuItem();
 			this.labelInboxComputerName = new System.Windows.Forms.Label();
 			this.labelThisComputer = new System.Windows.Forms.Label();
+			this.splitContainerNoFlicker = new OpenDental.SplitContainerNoFlicker();
 			this.gridEmailMessages = new OpenDental.UI.ODGrid();
+			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butChangePat = new OpenDental.UI.Button();
 			this.butMarkUnread = new OpenDental.UI.Button();
@@ -37,8 +39,6 @@ namespace OpenDental{
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.odToolBarButton1 = new OpenDental.UI.ODToolBarButton();
-			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
-			this.splitContainerNoFlicker = new OpenDental.SplitContainerNoFlicker();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainerNoFlicker)).BeginInit();
 			this.splitContainerNoFlicker.Panel1.SuspendLayout();
 			this.splitContainerNoFlicker.Panel2.SuspendLayout();
@@ -59,7 +59,7 @@ namespace OpenDental{
 			// labelInboxComputerName
 			// 
 			this.labelInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxComputerName.Location = new System.Drawing.Point(279, 650);
+			this.labelInboxComputerName.Location = new System.Drawing.Point(279, 661);
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(417, 16);
 			this.labelInboxComputerName.TabIndex = 144;
@@ -69,12 +69,36 @@ namespace OpenDental{
 			// labelThisComputer
 			// 
 			this.labelThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelThisComputer.Location = new System.Drawing.Point(404, 666);
+			this.labelThisComputer.Location = new System.Drawing.Point(404, 677);
 			this.labelThisComputer.Name = "labelThisComputer";
 			this.labelThisComputer.Size = new System.Drawing.Size(292, 16);
 			this.labelThisComputer.TabIndex = 145;
 			this.labelThisComputer.Text = "This Computer Name: ";
 			this.labelThisComputer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// splitContainerNoFlicker
+			// 
+			this.splitContainerNoFlicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.splitContainerNoFlicker.Location = new System.Drawing.Point(12, 26);
+			this.splitContainerNoFlicker.Name = "splitContainerNoFlicker";
+			this.splitContainerNoFlicker.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			// 
+			// splitContainerNoFlicker.Panel1
+			// 
+			this.splitContainerNoFlicker.Panel1.Controls.Add(this.gridEmailMessages);
+			this.splitContainerNoFlicker.Panel1MinSize = 200;
+			// 
+			// splitContainerNoFlicker.Panel2
+			// 
+			this.splitContainerNoFlicker.Panel2.Controls.Add(this.emailPreview);
+			this.splitContainerNoFlicker.Panel2Collapsed = true;
+			this.splitContainerNoFlicker.Panel2MinSize = 200;
+			this.splitContainerNoFlicker.Size = new System.Drawing.Size(950, 634);
+			this.splitContainerNoFlicker.SplitterDistance = 200;
+			this.splitContainerNoFlicker.TabIndex = 0;
+			this.splitContainerNoFlicker.TabStop = false;
 			// 
 			// gridEmailMessages
 			// 
@@ -87,12 +111,26 @@ namespace OpenDental{
 			this.gridEmailMessages.Name = "gridEmailMessages";
 			this.gridEmailMessages.ScrollValue = 0;
 			this.gridEmailMessages.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridEmailMessages.Size = new System.Drawing.Size(937, 620);
+			this.gridEmailMessages.Size = new System.Drawing.Size(950, 634);
 			this.gridEmailMessages.TabIndex = 140;
 			this.gridEmailMessages.Title = "Email Messages";
 			this.gridEmailMessages.TranslationName = "TableApptProcs";
 			this.gridEmailMessages.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmailMessages_CellDoubleClick);
 			this.gridEmailMessages.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmailMessages_CellClick);
+			// 
+			// emailPreview
+			// 
+			this.emailPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.emailPreview.BodyText = "";
+			this.emailPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.emailPreview.Location = new System.Drawing.Point(0, 0);
+			this.emailPreview.Name = "emailPreview";
+			this.emailPreview.Size = new System.Drawing.Size(937, 405);
+			this.emailPreview.Subject = "";
+			this.emailPreview.TabIndex = 1;
+			this.emailPreview.ToAddress = "";
 			// 
 			// butDelete
 			// 
@@ -104,7 +142,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 653);
+			this.butDelete.Location = new System.Drawing.Point(12, 666);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(83, 24);
 			this.butDelete.TabIndex = 147;
@@ -119,7 +157,7 @@ namespace OpenDental{
 			this.butChangePat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChangePat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butChangePat.CornerRadius = 4F;
-			this.butChangePat.Location = new System.Drawing.Point(631, 3);
+			this.butChangePat.Location = new System.Drawing.Point(656, 1);
 			this.butChangePat.Name = "butChangePat";
 			this.butChangePat.Size = new System.Drawing.Size(75, 24);
 			this.butChangePat.TabIndex = 146;
@@ -134,7 +172,7 @@ namespace OpenDental{
 			this.butMarkUnread.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMarkUnread.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMarkUnread.CornerRadius = 4F;
-			this.butMarkUnread.Location = new System.Drawing.Point(712, 3);
+			this.butMarkUnread.Location = new System.Drawing.Point(733, 1);
 			this.butMarkUnread.Name = "butMarkUnread";
 			this.butMarkUnread.Size = new System.Drawing.Size(75, 24);
 			this.butMarkUnread.TabIndex = 143;
@@ -149,7 +187,7 @@ namespace OpenDental{
 			this.butMarkRead.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMarkRead.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMarkRead.CornerRadius = 4F;
-			this.butMarkRead.Location = new System.Drawing.Point(793, 3);
+			this.butMarkRead.Location = new System.Drawing.Point(810, 1);
 			this.butMarkRead.Name = "butMarkRead";
 			this.butMarkRead.Size = new System.Drawing.Size(75, 24);
 			this.butMarkRead.TabIndex = 142;
@@ -164,7 +202,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(874, 3);
+			this.butRefresh.Location = new System.Drawing.Point(887, 1);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 141;
@@ -179,7 +217,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(874, 653);
+			this.butClose.Location = new System.Drawing.Point(887, 666);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -198,44 +236,6 @@ namespace OpenDental{
 			this.odToolBarButton1.Tag = "";
 			this.odToolBarButton1.Text = "";
 			this.odToolBarButton1.ToolTipText = "";
-			// 
-			// emailPreview
-			// 
-			this.emailPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.emailPreview.BodyText = "";
-			this.emailPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.emailPreview.Location = new System.Drawing.Point(0, 0);
-			this.emailPreview.Name = "emailPreview";
-			this.emailPreview.Size = new System.Drawing.Size(937, 405);
-			this.emailPreview.Subject = "";
-			this.emailPreview.TabIndex = 1;
-			this.emailPreview.ToAddress = "";
-			// 
-			// splitContainerNoFlicker
-			// 
-			this.splitContainerNoFlicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.splitContainerNoFlicker.Location = new System.Drawing.Point(12, 30);
-			this.splitContainerNoFlicker.Name = "splitContainerNoFlicker";
-			this.splitContainerNoFlicker.Orientation = System.Windows.Forms.Orientation.Horizontal;
-			// 
-			// splitContainerNoFlicker.Panel1
-			// 
-			this.splitContainerNoFlicker.Panel1.Controls.Add(this.gridEmailMessages);
-			this.splitContainerNoFlicker.Panel1MinSize = 200;
-			// 
-			// splitContainerNoFlicker.Panel2
-			// 
-			this.splitContainerNoFlicker.Panel2.Controls.Add(this.emailPreview);
-			this.splitContainerNoFlicker.Panel2Collapsed = true;
-			this.splitContainerNoFlicker.Panel2MinSize = 200;
-			this.splitContainerNoFlicker.Size = new System.Drawing.Size(937, 620);
-			this.splitContainerNoFlicker.SplitterDistance = 200;
-			this.splitContainerNoFlicker.TabIndex = 0;
-			this.splitContainerNoFlicker.TabStop = false;
 			// 
 			// FormEmailInbox
 			// 
