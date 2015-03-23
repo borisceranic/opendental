@@ -31,7 +31,7 @@ namespace OpenDental{
 			FromVersion=new Version(fromVersion);
 			ToVersion=new Version(toVersion);//Application.ProductVersion);
 			if(FromVersion>=new Version("3.4.0") && PrefC.GetBool(PrefName.CorruptedDatabase)){
-				MsgBox.Show(this,"Your database is corrupted because a conversion failed.  Please contact us.  This database is unusable and you will need to restore from a backup.");
+				MsgBox.Show(this,"Your database is corrupted because an update failed.  Please contact us.  This database is unusable and you will need to restore from a backup.");
 				return false;//shuts program down.
 			}
 			if(FromVersion==ToVersion) {

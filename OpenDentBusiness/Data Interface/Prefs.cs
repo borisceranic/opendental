@@ -283,6 +283,21 @@ namespace OpenDentBusiness{
 			return pref;
 		}
 
+		///<summary>This method is unique in that it does not use the cache.  This special preference needs to be validated before the cache is loaded to avoid confusion.  We have seen several cases of corrupt databases which also have duplicate preferences.  In these situations, we want to tell the user that the database is corrupt instead of reporting the duplicate preference, because restoring from the most recent backup almost always fixes both of these issues simultaneously.</summary>
+		public static bool IsDatabaseCorrupt() {
+			string command="SELECT ValueString FROM preference WHERE PrefName='"+POut.String(PrefName.CorruptedDatabase.ToString())+"'";
+			try {
+				if(Db.GetScalar(command)!="0") {
+					return true;
+				}
+			}
+			catch {
+				//The preference was added in version 3.4.  If converting from a very old database, the preference might not be available.
+				//If the current database is after version 3.4 and the preference is missing/corrupt, then an error will occur later in the loading sequence.
+			}
+			return false;
+		}
+
 	}
 
 	
