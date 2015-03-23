@@ -2252,12 +2252,13 @@ namespace OpenDental{
 
 		///<summary>Returns false if it can't complete a conversion, find datapath, or validate registration key.</summary>
 		private bool PrefsStartup(){
-			//We do not normally check prefereneces in this manner.  Normally we use PrefC.  See detailed comments in the function summary.
-			if(Prefs.IsDatabaseCorrupt()) {
-				MsgBox.Show(this,"Your database is corrupted because an update failed.  Please contact us.  This database is unusable and you will need to restore from a backup.");
+			try {
+				Cache.Refresh(InvalidType.Prefs);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
 				return false;//shuts program down.
 			}
-			Cache.Refresh(InvalidType.Prefs);
 			if(!PrefL.CheckMySqlVersion()){
 				return false;
 			}
