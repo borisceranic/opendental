@@ -24,6 +24,7 @@ namespace OpenDentBusiness{
 			Pref pref;
 			//PrefName enumpn;
 			//Can't use Crud.PrefCrud.TableToList(table) because it will fail the first time someone runs 7.6 before conversion.
+			List<string> listDuplicatePrefs=new List<string>();
 			for(int i=0;i<table.Rows.Count;i++) {
 				pref=new Pref();
 				if(table.Columns.Contains("PrefNum")) {
@@ -32,7 +33,21 @@ namespace OpenDentBusiness{
 				pref.PrefName=PIn.String(table.Rows[i]["PrefName"].ToString());
 				pref.ValueString=PIn.String(table.Rows[i]["ValueString"].ToString());
 				//no need to load up the comments.  Especially since this will fail when user first runs version 5.8.
-				dictPrefs.Add(pref.PrefName,pref);
+				if(dictPrefs.ContainsKey(pref.PrefName)) {
+					listDuplicatePrefs.Add(pref.PrefName);//The current preference is a duplicate preference.
+				}
+				else {
+					dictPrefs.Add(pref.PrefName,pref);
+				}
+			}
+			if(listDuplicatePrefs.Count>0 &&																				//Duplicate preferences found, and
+				dictPrefs.ContainsKey(PrefName.CorruptedDatabase.ToString()) &&				//CorruptedDatabase preference exists (only v3.4+), and
+				dictPrefs[PrefName.CorruptedDatabase.ToString()].ValueString!="0")		//The CorruptedDatabase flag is set.
+			{
+				throw new ApplicationException(Lans.g("Prefs","Your database is corrupted because an update failed.  Please contact us.  This database is unusable and you will need to restore from a backup."));
+			}
+			else if(listDuplicatePrefs.Count>0) {//Duplicate preferences, but the CorruptedDatabase flag is not set.
+				throw new ApplicationException(Lans.g("Prefs","Duplicate preferences found in database")+": "+String.Join(",",listDuplicatePrefs));
 			}
 			PrefC.Dict=dictPrefs;
 		}
@@ -281,21 +296,6 @@ namespace OpenDentBusiness{
 			Dictionary<string,Pref> dictPrefs=PrefC.GetDict();
 			Pref pref=dictPrefs[PrefName];
 			return pref;
-		}
-
-		///<summary>This method is unique in that it does not use the cache.  This special preference needs to be validated before the cache is loaded to avoid confusion.  We have seen several cases of corrupt databases which also have duplicate preferences.  In these situations, we want to tell the user that the database is corrupt instead of reporting the duplicate preference, because restoring from the most recent backup almost always fixes both of these issues simultaneously.</summary>
-		public static bool IsDatabaseCorrupt() {
-			string command="SELECT ValueString FROM preference WHERE PrefName='"+POut.String(PrefName.CorruptedDatabase.ToString())+"'";
-			try {
-				if(Db.GetScalar(command)!="0") {
-					return true;
-				}
-			}
-			catch {
-				//The preference was added in version 3.4.  If converting from a very old database, the preference might not be available.
-				//If the current database is after version 3.4 and the preference is missing/corrupt, then an error will occur later in the loading sequence.
-			}
-			return false;
 		}
 
 	}
