@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.1.16.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.17.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -7324,6 +7324,79 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '15.1.16.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_1_17();
+		}
+
+		///<summary>Oracle compatible: 03/24/2015</summary>
+		private static void To15_1_17() {
+			if(FromVersion<new Version("15.1.17.0")) {
+				string command="";
+				//Insert Triana bridge-----------------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'Triana', "
+				    +"'Triana from genorayamerica.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"Triana.exe")+"', "
+				    +"'', "//leave blank if none
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Import.ini path', "
+				    +"'"+POut.String(@"C:\Program Files\Triana\Import.ini")+"')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'Triana')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'Triana', "
+				    +"'Triana from genorayamerica.com', "
+				    +"'0', "
+				    +"'"+POut.String(@"Triana.exe")+"', "
+				    +"'', "//leave blank if none
+				    +"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+				    +"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'Import.ini path', "
+				    +"'"+POut.String(@"C:\Program Files\Triana\Import.ini")+"')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+				    +"VALUES ("
+				    +"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+				    +"'"+POut.Long(programNum)+"', "
+				    +"'2', "//ToolBarsAvail.ChartModule
+				    +"'Triana')";
+					Db.NonQ(command);
+				}//end Triana bridge
+				command="UPDATE preference SET ValueString = '15.1.17.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_2_0();

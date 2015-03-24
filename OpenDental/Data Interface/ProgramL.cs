@@ -233,6 +233,10 @@ namespace OpenDental{
 				TigerView.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.Triana.ToString()) {
+				Triana.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Trophy.ToString()) {
 				Trophy.SendData(prog,pat);
 				return;
