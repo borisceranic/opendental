@@ -84,6 +84,8 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butBrowseOut = new OpenDental.UI.Button();
 			this.butBrowseIn = new OpenDental.UI.Button();
+			this.labelLabImageCat = new System.Windows.Forms.Label();
+			this.comboLabResultImageCat = new System.Windows.Forms.ComboBox();
 			this.groupShowDemographics.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -685,10 +687,30 @@ namespace OpenDental{
 			this.butBrowseIn.Text = "&Browse";
 			this.butBrowseIn.Click += new System.EventHandler(this.butBrowseIn_Click);
 			// 
+			// labelLabImageCat
+			// 
+			this.labelLabImageCat.Location = new System.Drawing.Point(12, 274);
+			this.labelLabImageCat.Name = "labelLabImageCat";
+			this.labelLabImageCat.Size = new System.Drawing.Size(142, 18);
+			this.labelLabImageCat.TabIndex = 82;
+			this.labelLabImageCat.Text = "Lab Result Image Category";
+			this.labelLabImageCat.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboLabResultImageCat
+			// 
+			this.comboLabResultImageCat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboLabResultImageCat.Location = new System.Drawing.Point(155, 274);
+			this.comboLabResultImageCat.MaxDropDownItems = 100;
+			this.comboLabResultImageCat.Name = "comboLabResultImageCat";
+			this.comboLabResultImageCat.Size = new System.Drawing.Size(138, 21);
+			this.comboLabResultImageCat.TabIndex = 85;
+			// 
 			// FormHL7DefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.comboLabResultImageCat);
+			this.Controls.Add(this.labelLabImageCat);
 			this.Controls.Add(this.label17);
 			this.Controls.Add(this.checkShowAccount);
 			this.Controls.Add(this.checkShowAppts);
@@ -819,5 +841,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkShowAppts;
 		private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.CheckBox checkQuadAsToothNum;
+		private System.Windows.Forms.Label labelLabImageCat;
+		private System.Windows.Forms.ComboBox comboLabResultImageCat;
 	}
 }

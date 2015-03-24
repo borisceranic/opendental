@@ -146,7 +146,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT COUNT(*) FROM hl7def WHERE IsEnabled=1 AND HL7DefNum != "+POut.Long(excludeHL7DefNum);
 			if(isMedLabHL7) {
-				command+=" AND InternalType=='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";
+				command+=" AND InternalType='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";
 			}
 			else {
 				command+=" AND InternalType!='"+POut.String(HL7InternalType.MedLabv2_3.ToString())+"'";

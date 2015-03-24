@@ -7789,6 +7789,22 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				#endregion
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD LabResultImageCat bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE hl7def ADD INDEX (LabResultImageCat)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD LabResultImageCat number(20)";
+					Db.NonQ(command);
+					command="UPDATE hl7def SET LabResultImageCat = 0 WHERE LabResultImageCat IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE hl7def MODIFY LabResultImageCat NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX hl7def_LabResultImageCat ON hl7def (LabResultImageCat)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

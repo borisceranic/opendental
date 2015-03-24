@@ -77,6 +77,18 @@ namespace OpenDental {
 				butDelete.Enabled=false;
 				labelDelete.Visible=true;
 			}
+			if(HL7DefCur.InternalType==HL7InternalType.MedLabv2_3) {
+				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+					comboLabResultImageCat.Items.Add(DefC.Short[(int)DefCat.ImageCats][i].ItemName);
+					if(DefC.Short[(int)DefCat.ImageCats][i].DefNum==HL7DefCur.LabResultImageCat) {
+						comboLabResultImageCat.SelectedIndex=i;
+					}
+				}
+			}
+			else {
+				comboLabResultImageCat.Visible=false;
+				labelLabImageCat.Visible=false;
+			}
 		}
 
 		private void FillGrid() {
@@ -435,6 +447,9 @@ namespace OpenDental {
 				HL7DefCur.OutgoingIpPort=textOutPort.Text;
 				HL7DefCur.IncomingFolder="";
 				HL7DefCur.OutgoingFolder="";
+			}
+			if(comboLabResultImageCat.SelectedIndex>=0) {
+				HL7DefCur.LabResultImageCat=DefC.Short[(int)DefCat.ImageCats][comboLabResultImageCat.SelectedIndex].DefNum;
 			}
 			//save
 			if(checkEnabled.Checked) {

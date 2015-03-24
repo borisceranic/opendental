@@ -58,6 +58,8 @@ namespace OpenDentBusiness{
 		public bool ShowAccount;
 		///<summary>Send the quadrant in the tooth number component instead of the surface component of the FT1.26 field of the outgoing DFT messages.  Only for eCW.</summary>
 		public bool IsQuadAsToothNum;
+		///<summary>FK to definition.DefNum.  Image category used by MedLab HL7 interfaces when storing PDFs received via inbound HL7 messages.</summary>
+		public long LabResultImageCat;
 
 
 		///<Summary>List of messages associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>
