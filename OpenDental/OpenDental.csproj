@@ -330,6 +330,7 @@
     <Compile Include="Bridges\Trophy.cs" />
     <Compile Include="Bridges\TrophyEnhanced.cs" />
     <Compile Include="Bridges\VixWin.cs" />
+    <Compile Include="Bridges\VixWinNumbered.cs" />
     <Compile Include="Bridges\VixWinOld.cs" />
     <Compile Include="Bridges\XVWeb.cs" />
     <Compile Include="Bridges\ZImage.cs" />
