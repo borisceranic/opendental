@@ -40,6 +40,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RequestCustomerIDStrict">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RequestCustomerIDStrictResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestCustomerIDStrictResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestEmailVerificationCode">
         <s:complexType>
           <s:sequence>
@@ -308,6 +322,12 @@
   <wsdl:message name="RequestCustomerIDSoapOut">
     <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
   </wsdl:message>
+  <wsdl:message name="RequestCustomerIDStrictSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestCustomerIDStrict" />
+  </wsdl:message>
+  <wsdl:message name="RequestCustomerIDStrictSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestCustomerIDStrictResponse" />
+  </wsdl:message>
   <wsdl:message name="RequestEmailVerificationCodeSoapIn">
     <wsdl:part name="parameters" element="tns:RequestEmailVerificationCode" />
   </wsdl:message>
@@ -429,6 +449,10 @@
       <wsdl:input message="tns:RequestCustomerIDSoapIn" />
       <wsdl:output message="tns:RequestCustomerIDSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <wsdl:input message="tns:RequestCustomerIDStrictSoapIn" />
+      <wsdl:output message="tns:RequestCustomerIDStrictSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="RequestEmailVerificationCode">
       <wsdl:input message="tns:RequestEmailVerificationCodeSoapIn" />
       <wsdl:output message="tns:RequestEmailVerificationCodeSoapOut" />
@@ -524,6 +548,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestCustomerID">
       <soap:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <soap:operation soapAction="http://open-dent.com/RequestCustomerIDStrict" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -716,6 +749,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestCustomerID">
       <soap12:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <soap12:operation soapAction="http://open-dent.com/RequestCustomerIDStrict" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
