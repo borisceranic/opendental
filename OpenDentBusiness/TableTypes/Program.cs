@@ -103,6 +103,7 @@ namespace OpenDentBusiness{
 		VixWin,
 		VixWinBase36,
 		VixWinBase41,
+		VixWinNumbered,
 		VixWinOld,
 		Xcharge,
 		XDR,
