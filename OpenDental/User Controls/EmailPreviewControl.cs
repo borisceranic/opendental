@@ -21,6 +21,8 @@ namespace OpenDental.User_Controls {
 		private List<EmailAttach> _listEmailAttachDisplayed=null;
 		///<summary>Used when sending to get Clinic.</summary>
 		private Patient _patCur=null;
+		///<summary>If the message is an html email with images, then this list contains the raw image mime parts.  The user must give permission before converting these to images, for security purposes.  Gmail also does this with images, for example.</summary>
+		private List<Health.Direct.Common.Mime.MimeEntity> _listImageParts=null;
 
 		public bool HasMessageChanged { get { return _hasMessageChanged; } }
 		public bool IsComposing { get { return _isComposing; } }
@@ -52,6 +54,7 @@ namespace OpenDental.User_Controls {
 		}
 
 		public void LoadEmailMessage(EmailMessage emailMessage) {
+			Cursor=Cursors.WaitCursor;
 			_emailMessage=emailMessage;
 			_patCur=Patients.GetPat(_emailMessage.PatNum);//we could just as easily pass this in.
 			if(_emailMessage.SentOrReceived==EmailSentOrReceived.Neither) {//Composing a message
@@ -61,6 +64,9 @@ namespace OpenDental.User_Controls {
 				}
 			}
 			else {//sent or received (not composing)
+				//For all email received or sent types, we disable most of the controls and put the window into a mostly read-only state.
+				//There is no reason a user should ever edit a received message.
+				//The user can copy the content and send a new email if needed (to mimic forwarding until we add the forwarding feature).
 				_isComposing=false;
 				textMsgDateTime.Text=_emailMessage.MsgDateTime.ToString();
 				textMsgDateTime.ForeColor=Color.Black;
@@ -76,33 +82,38 @@ namespace OpenDental.User_Controls {
 			textFromAddress.Text=_emailMessage.FromAddress;
 			textToAddress.Text=_emailMessage.ToAddress;
 			textSubject.Text=_emailMessage.Subject;
-			textBodyText.Text=_emailMessage.BodyText;
 			textBodyText.Visible=true;
 			webBrowser.Visible=false;
-			//For all email received types, we disable most of the controls and put the form into a mostly read-only state.
-			//There is no reason a user should ever edit a received message.
-			//The user can copy the content and send a new email if needed (perhaps we will have forward capabilities in the future).
-			if(_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.ReadDirect ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.Received ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.Read ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived ||
-				_emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead)
-			{
-				//If an html body is received, then we display the body using a webbrowser control, so the user sees the message formatted as intended.
-				if(_emailMessage.BodyText.ToLower().Contains("<html")) {
+			List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,"text/html","text/plain","image/");
+			List<Health.Direct.Common.Mime.MimeEntity> listHtmlParts=listMimeParts[0];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
+			List<Health.Direct.Common.Mime.MimeEntity> listTextParts=listMimeParts[1];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
+			_listImageParts=listMimeParts[2];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
+			if(EmailMessages.IsReceived(_emailMessage.SentOrReceived)) {
+				if(listHtmlParts.Count>0) {//Html body found.
 					textBodyText.Visible=false;
 					_isLoading=true;
-					webBrowser.DocumentText=_emailMessage.BodyText;
+					webBrowser.DocumentText=listHtmlParts[0].Body.Text;
 					webBrowser.Location=textBodyText.Location;
 					webBrowser.Size=textBodyText.Size;
 					webBrowser.Anchor=textBodyText.Anchor;
 					webBrowser.Visible=true;
+					if(_listImageParts.Count>0) {
+						butShowImages.Visible=true;
+					}
 				}
+				else if(listTextParts.Count>0) {//No html body found, however one specific mime part is for viewing in text only.					
+					textBodyText.Text=listTextParts[0].Body.Text;
+				}
+				else {//No html body found and no text body found.  Last resort.  Show all mime parts which are not attachments (ugly).
+					textBodyText.Text=_emailMessage.BodyText;//This version of the body text includes all non-attachment mime parts.
+				}
+			}
+			else {//Sent or Unsent/Saved.
+				textBodyText.Text=_emailMessage.BodyText;//Show the body text exactly as typed by the user.
 			}
 			FillAttachments();
 			textBodyText.Select();
+			Cursor=Cursors.Default;
 		}
 
 		#region Attachments
@@ -339,6 +350,24 @@ namespace OpenDental.User_Controls {
 			Subject=subject;
 			BodyText=bodyText;
 			_hasMessageChanged=false;
+		}
+
+		private void butShowImages_Click(object sender,EventArgs e) {
+			try {
+				//We need a folder in order to place the images beside the html file in order for the relative image paths to work correctly.
+				string htmlFolderPath=ODFileUtils.CreateRandomFolder(PrefL.GetTempFolderPath());//Throws exceptions.
+				string filePathHtml=ODFileUtils.CreateRandomFile(htmlFolderPath,".html");
+				File.WriteAllText(filePathHtml,webBrowser.DocumentText);
+				for(int i=0;i<_listImageParts.Count;i++) {
+					EmailMessages.SaveMimeImageToFile(_listImageParts[i],htmlFolderPath);
+				}
+				_isLoading=true;
+				webBrowser.Navigate(filePathHtml);
+				butShowImages.Visible=false;
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.ToString());
+			}
 		}
 
 		private void textBodyText_TextChanged(object sender,EventArgs e) {

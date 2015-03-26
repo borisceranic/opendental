@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
@@ -708,6 +709,249 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Parses a raw email into a usable object.</summary>
+		private static Health.Direct.Agent.IncomingMessage RawEmailToIncomingMessage(string strRawEmailIn) {
+			//No need to check RemotingRole; no call to db.
+			Health.Direct.Agent.IncomingMessage inMsg=null;
+			try {
+				inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmailIn);//Used to parse all email (encrypted or not).
+			}
+			catch(Exception ex) {
+				if(ex.Message=="Error=MissingHeaderValue") {
+					//The "Welcome to Email" message from GoDaddy has a blank CC field which causes the IncomingMessage() constructor to throw an exception.
+					//The TO header can be blank because it is not required, since the user could put all destination addresses in either CC or BCC alone.  We tested this.
+					strRawEmailIn=Regex.Replace(strRawEmailIn,@"TO:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the TO header if it is any number of spaces or tabs followed by exactly one newline.
+					strRawEmailIn=Regex.Replace(strRawEmailIn,@"CC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the CC header if it is any number of spaces or tabs followed by exactly one newline.
+					strRawEmailIn=Regex.Replace(strRawEmailIn,@"BCC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Probably overkill, but does not hurt.
+					inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmailIn);
+				}
+				else {
+					throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+				}
+			}
+			return inMsg;
+		}
+
+		private static bool IsReceivedMessageEncrypted(Health.Direct.Agent.IncomingMessage inMsg) {
+			//No need to check RemotingRole; no call to db.
+			if(inMsg.Message.ContentType.ToLower().Contains("application/pkcs7-mime")) {
+				return true;//The email MIME/body is encrypted (known as S/MIME). Treated as an Encrypted/Direct message.
+			}
+			return false;
+		}
+
+		///<summary>Throws various exceptions if decryption fails.  Decryption will fail if the sender is not yet trusted by the recipient.  Decrypts and valudates trust.  If decrypted successfully, removes the sender signature from the decrypted attachments and moves them into inMsg.Signatures.</summary>
+		private static Health.Direct.Agent.IncomingMessage DecryptIncomingMessage(Health.Direct.Agent.IncomingMessage inMsg) {
+			//No need to check RemotingRole; no call to db.
+			Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(inMsg.Message.ToValue.Trim());
+			//throw new ApplicationException("test decryption failure");
+			return directAgent.ProcessIncoming(inMsg);//Decrypts and valudates trust.  Also removes the signature from the decrypted attachments and moves them into inMsg.Signatures.
+		}
+
+		///<summary>Converts any raw email message (encrypted or not) into an EmailMessage object, and saves any email attachments to the emailattach table in the db.
+		///The emailMessageNum will be used to set EmailMessage.EmailMessageNum.  If emailMessageNum is 0, then the EmailMessage will be inserted into the db, otherwise the EmailMessage will be updated in the db.
+		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.
+		///If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.
+		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
+		public static EmailMessage ProcessRawEmailMessage(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
+			//No need to check RemotingRole; no call to db.
+			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail);
+			bool isEncrypted=IsReceivedMessageEncrypted(inMsg);
+			EmailMessage emailMessage=null;
+			if(isEncrypted) {
+				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false);//Exclude attachments until we decrypt.
+				emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
+				emailMessage.EmailMessageNum=emailMessageNum;
+				emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedEncrypted;
+				emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
+				//The entire contents of the email are saved in the emailMessage.BodyText field, so that if decryption fails, the email will still be saved to the db for decryption later if possible.
+				emailMessage.BodyText=strRawEmail;
+				try {
+					inMsg=DecryptIncomingMessage(inMsg);
+					emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);//If the message was wrapped, then the To, From, Subject and Date can change after decyption. We also need to create the attachments for the decrypted message.
+					emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
+					emailMessage.EmailMessageNum=emailMessageNum;
+					emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedDirect;
+					emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
+					if(inMsg.HasSenderSignatures) {
+						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
+							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							emailMessage.Attachments.Add(emailAttach);
+						}
+					}
+				}
+				catch(Exception ex) {
+					//SentOrReceived will be ReceivedEncrypted, indicating to the calling code that decryption failed.
+					//The decryption step may have failed due to an untrusted sender, in which case the decrypting actually took place and the signature was extracted.
+					//We add the signature to the email message so it will show up next to the email message in the inbox and make it easier for the user to add trust for the sender.
+					if(inMsg.HasSenderSignatures) {
+						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
+							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							emailMessage.Attachments.Add(emailAttach);
+						}
+					}
+					if(emailMessageNum==0) {
+						EmailMessages.Insert(emailMessage);
+						return emailMessage;//If the message was just downloaded, then this function was called from the inbox, simply return the inserted email without an exception (it can be decypted later manually by the user).
+					}
+					//Do not update if emailMessageNum<>0, because nothing changed (was encrypted and still is).
+					throw ex;//Throw an exception if trying to decrypt an email that was already in the database, so the user can see the error message in the UI.
+				}
+			}
+			else {//Unencrypted
+				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);
+				emailMessage.RawEmailIn=strRawEmail;
+				emailMessage.EmailMessageNum=emailMessageNum;
+				emailMessage.SentOrReceived=EmailSentOrReceived.Received;
+				emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
+			}
+			EhrSummaryCcd ehrSummaryCcd=null;
+			if(isEncrypted) {
+				for(int i=0;i<emailMessage.Attachments.Count;i++) {
+					if(Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()!=".xml") {
+						continue;
+					}
+					string strAttachPath=GetEmailAttachPath();
+					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
+					string strAttachText=File.ReadAllText(strAttachFile);
+					if(EhrCCD.IsCCD(strAttachText)) {
+						if(emailMessage.PatNum==0) {
+							try {
+								XmlDocument xmlDocCcd=new XmlDocument();
+								xmlDocCcd.LoadXml(strAttachText);
+								emailMessage.PatNum=EhrCCD.GetCCDpat(xmlDocCcd);// A match is not guaranteed, which is why we have a button to allow the user to change the patient.
+							}
+							catch {
+								//Invalid XML.  Cannot match patient.
+							}
+						}
+						ehrSummaryCcd=new EhrSummaryCcd();
+						ehrSummaryCcd.ContentSummary=strAttachText;
+						ehrSummaryCcd.DateSummary=DateTime.Today;
+						ehrSummaryCcd.EmailAttachNum=i;//Temporary value, so we can locate the FK down below.
+						ehrSummaryCcd.PatNum=emailMessage.PatNum;
+						break;//We can only handle one CCD message per email, because we only have one patnum field per email record and the ehrsummaryccd record requires a patnum.
+					}
+				}
+			}
+			if(emailMessageNum==0) {
+				EmailMessages.Insert(emailMessage);//Also inserts all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
+			}
+			else {
+				EmailMessages.Update(emailMessage);//Also deletes all previous attachments, then recreates all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
+			}
+			if(ehrSummaryCcd!=null) {
+				ehrSummaryCcd.EmailAttachNum=emailMessage.Attachments[(int)ehrSummaryCcd.EmailAttachNum].EmailAttachNum;
+				EhrSummaryCcds.Insert(ehrSummaryCcd);
+			}
+			if(isEncrypted && isAck) {
+				//Send a Message Disposition Notification (MDN) message to the sender, as required by the Direct messaging specifications.
+				//The MDN will be attached to the same patient as the incoming message.
+				SendAckDirect(inMsg,emailAddressReceiver,emailMessage.PatNum);
+			}
+			return emailMessage;
+		}
+
+		///<summary>Email bodies can have multiple parts.  Usually, for HTML email, there will be one HTML mime part plus one mime part for each image (in base64) which is part of the email message.  HTML messages usually also have one mime part for the text version of the email message, in case the email client does not have html capabilities.  This function extracts the text for all mime body parts which fully or partially match the specified mime content types.  For example, you could specify a mime content of "image/" to find images of all types, or you could specify a mime content type of "image/jpeg" to find only jpeg images.  Always returns one valid list for each specified mime content types, where the individual lists are always present but may be zero length.</summary>
+		public static List<List<Health.Direct.Common.Mime.MimeEntity>> GetMimePartsForMimeTypes(string strRawEmailIn,params string[] arrayMimeContentTypes) {
+			//No need to check RemotingRole; no call to db.
+			Health.Direct.Agent.IncomingMessage inMsg=null;
+			try {
+				inMsg=RawEmailToIncomingMessage(strRawEmailIn);
+				if(IsReceivedMessageEncrypted(inMsg)) {
+					inMsg=DecryptIncomingMessage(inMsg);
+				}
+			}
+			catch {
+				return new List<List<Health.Direct.Common.Mime.MimeEntity>>();//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
+			}
+			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
+			List<List<Health.Direct.Common.Mime.MimeEntity>> retVal=new List<List<Health.Direct.Common.Mime.MimeEntity>>();
+			for(int i=0;i<arrayMimeContentTypes.Length;i++) {
+				string mimeContentType=arrayMimeContentTypes[i];
+				List<Health.Direct.Common.Mime.MimeEntity> listMimeParts=new List<Health.Direct.Common.Mime.MimeEntity>();
+				for(int j=0;j<listMimeLeafNodes.Count;j++) {
+					if(listMimeLeafNodes[j].ContentType.Contains(mimeContentType)) {
+						listMimeParts.Add(listMimeLeafNodes[j]);
+					}
+				}
+				retVal.Add(listMimeParts);
+			}			
+			return retVal;
+		}
+
+		///<summary>Generates the image and returns the path to where the file was saved.  Returns null if the image could not be created.</summary>
+		public static string SaveMimeImageToFile(Health.Direct.Common.Mime.MimeEntity mimeEntityForImage,string directoryPath) {
+			//No need to check RemotingRole; no call to db.
+			if(!mimeEntityForImage.ContentTransferEncoding.Contains("base64")) {
+				return null;
+			}
+			try {
+				byte[] bytesForImage=Convert.FromBase64String(mimeEntityForImage.Body.Text);
+				MemoryStream ms=new MemoryStream(bytesForImage);
+				Bitmap bitmap=new Bitmap(ms);
+				int nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("name=");
+				if(nameIndexStart>=0) {
+					nameIndexStart+=5;
+				}
+				else {
+					nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("filename=");
+					if(nameIndexStart>=0) {
+						nameIndexStart+=9;
+					}
+				}
+				if(nameIndexStart<0) {
+					return null;
+				}
+				int nameIndexEnd=mimeEntityForImage.ContentType.IndexOf(';',nameIndexStart+1);
+				string fileName="";
+				if(nameIndexEnd>=0) {
+					fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart,nameIndexEnd-nameIndexStart+1);
+				}
+				else {
+					fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart);
+				}
+				fileName=fileName.Replace("\"","");
+				string fileExt=Path.GetExtension(fileName);
+				string filePath=ODFileUtils.CombinePaths(directoryPath,fileName);
+				System.Drawing.Imaging.ImageFormat imageFormat=System.Drawing.Imaging.ImageFormat.Jpeg;
+				if(fileExt.ToLower()==".bmp") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Bmp;
+				}
+				else if(fileExt.ToLower()==".emf") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Emf;
+				}
+				else if(fileExt.ToLower()==".exif") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Exif;
+				}
+				else if(fileExt.ToLower()==".gif") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Gif;
+				}
+				else if(fileExt.ToLower()==".ico") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Icon;
+				}
+				else if(fileExt.ToLower()==".jpg" || fileExt.ToLower()==".jpeg") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Jpeg;
+				}
+				else if(fileExt.ToLower()==".png") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Png;
+				}
+				else if(fileExt.ToLower()==".tif" || fileExt.ToLower()==".tiff") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Tiff;
+				}
+				else if(fileExt.ToLower()==".wmf") {
+					imageFormat=System.Drawing.Imaging.ImageFormat.Wmf;
+				}
+				bitmap.Save(filePath,imageFormat);
+				bitmap.Dispose();
+				ms.Dispose();
+				return filePath;
+			}
+			catch {
+			}
+			return null;
+		}
+
 		#endregion Receiving
 
 		#region Helpers
@@ -715,6 +959,7 @@ namespace OpenDentBusiness{
 		///<summary>Throws an exception if there is a permission issue.  Creates all of the necessary certificate stores for email encryption (Direct and Standard) if they do not already exist.
 		///There is no way for the user to create these stores manually through Microsoft Management Console (mmc.exe) and they are needed to import certificates.</summary>
 		public static void CreateCertificateStoresIfNeeded() {
+			//No need to check RemotingRole; no call to db.
 			Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit().Dispose();//Create the NHINDAnchor certificate store if it does not already exist on the local machine.
 			Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit().Dispose();//Create the NHINDExternal certificate store if it does not already exist on the local machine.
 			Health.Direct.Common.Certificates.SystemX509Store.OpenPrivateEdit().Dispose();//Create the NHINDPrivate certificate store if it does not already exist on the local machine.
@@ -969,129 +1214,38 @@ namespace OpenDentBusiness{
 			return listCertsDiscoveredActive.Count;
 		}
 
-		///<summary>Converts any raw email message (encrypted or not) into an EmailMessage object, and saves any email attachments to the emailattach table in the db.
-		///The emailMessageNum will be used to set EmailMessage.EmailMessageNum.  If emailMessageNum is 0, then the EmailMessage will be inserted into the db, otherwise the EmailMessage will be updated in the db.
-		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.
-		///If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.
-		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
-		public static EmailMessage ProcessRawEmailMessage(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
+		///<summary>Gets all mime parts in the message which do not have child mime parts.  Returns null on error.</summary>
+		private static List<Health.Direct.Common.Mime.MimeEntity> GetMimeLeafNodes(Health.Direct.Common.Mail.Message message) {
 			//No need to check RemotingRole; no call to db.
-			Health.Direct.Agent.IncomingMessage inMsg=null;
+			//Think of the mime structure as a tree.
+			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=new List<Health.Direct.Common.Mime.MimeEntity>();
+			Health.Direct.Common.Mime.MimeEntity mimeEntity=null;
 			try {
-				inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmail);//Used to parse all email (encrypted or not).
+				mimeEntity=message.ExtractMimeEntity();
 			}
-			catch(Exception ex) {
-				if(ex.Message=="Error=MissingHeaderValue") {
-					//The "Welcome to Email" message from GoDaddy has a blank CC field which causes the IncomingMessage() constructor to throw an exception.
-					//The TO header can be blank because it is not required, since the user could put all destination addresses in either CC or BCC alone.  We tested this.
-					strRawEmail=Regex.Replace(strRawEmail,@"TO:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the TO header if it is any number of spaces or tabs followed by exactly one newline.
-					strRawEmail=Regex.Replace(strRawEmail,@"CC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the CC header if it is any number of spaces or tabs followed by exactly one newline.
-					strRawEmail=Regex.Replace(strRawEmail,@"BCC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Probably overkill, but does not hurt.
-					inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmail);
-				}
-				else {
-					throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
-				}
+			catch {
+				return null;			
 			}
-			bool isEncrypted=false;
-			if(inMsg.Message.ContentType.ToLower().Contains("application/pkcs7-mime")) {//The email MIME/body is encrypted (known as S/MIME). Treated as a Direct message.
-				isEncrypted=true;
-			}
-			EmailMessage emailMessage=null;
-			if(isEncrypted) {
-				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false);//Exclude attachments until we decrypt.
-				emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
-				emailMessage.EmailMessageNum=emailMessageNum;
-				emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedEncrypted;
-				//The entire contents of the email are saved in the emailMessage.BodyText field, so that if decryption fails, the email will still be saved to the db for decryption later if possible.
-				emailMessage.BodyText=strRawEmail;
-				emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
-				try {
-					Health.Direct.Agent.DirectAgent directAgent=GetDirectAgentForEmailAddress(inMsg.Message.ToValue.Trim());
-					//throw new ApplicationException("test decryption failure");
-					inMsg=directAgent.ProcessIncoming(inMsg);//Decrypts and valudates trust.  Also removes the signature from the decrypted attachments and moves them into inMsg.Signatures.
-					emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);//If the message was wrapped, then the To, From, Subject and Date can change after decyption. We also need to create the attachments for the decrypted message.
-					//emailMessage.RawEmailIn=inMsg.SerializeMessage();//Now that we have decrypted, we can use this to get the human readable contents of the email, but it will exclude the digital signature.
-					emailMessage.EmailMessageNum=emailMessageNum;
-					emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedDirect;
-					emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
-					if(inMsg.HasSenderSignatures) {
-						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
-							emailMessage.Attachments.Add(emailAttach);
+			//If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
+			if(message.IsMultiPart) {
+				List<Health.Direct.Common.Mime.MimeEntity> listMimeMultiPart=new List<Health.Direct.Common.Mime.MimeEntity>();
+				listMimeMultiPart.Add(mimeEntity);
+				while(listMimeMultiPart.Count>0) {
+					foreach(Health.Direct.Common.Mime.MimeEntity mimePart in listMimeMultiPart[0].GetParts()) {
+						if(mimePart.IsMultiPart) {
+							listMimeMultiPart.Add(mimePart);
+						}
+						else {
+							listMimePartLeafNodes.Add(mimePart);
 						}
 					}
-				}
-				catch(Exception ex) {
-					//SentOrReceived will be ReceivedEncrypted, indicating to the calling code that decryption failed.
-					//The decryption step may have failed due to an untrusted sender, in which case the decrypting actually took place and the signature was extracted.
-					//We add the signature to the email message so it will show up next to the email message in the inbox and make it easier for the user to add trust for the sender.
-					if(inMsg.HasSenderSignatures) {
-						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
-							emailMessage.Attachments.Add(emailAttach);
-						}
-					}
-					if(emailMessageNum==0) {
-						EmailMessages.Insert(emailMessage);
-						return emailMessage;//If the message was just downloaded, then this function was called from the inbox, simply return the inserted email without an exception (it can be decypted later manually by the user).
-					}
-					//Do not update if emailMessageNum<>0, because nothing changed (was encrypted and still is).
-					throw ex;//Throw an exception if trying to decrypt an email that was already in the database, so the user can see the error message in the UI.
+					listMimeMultiPart.RemoveAt(0);
 				}
 			}
-			else {//Unencrypted
-				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);
-				emailMessage.RawEmailIn=strRawEmail;
-				emailMessage.EmailMessageNum=emailMessageNum;
-				emailMessage.SentOrReceived=EmailSentOrReceived.Received;
-				emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
+			else {//Single body part.
+				listMimePartLeafNodes.Add(mimeEntity);
 			}
-			EhrSummaryCcd ehrSummaryCcd=null;
-			if(isEncrypted) {
-				for(int i=0;i<emailMessage.Attachments.Count;i++) {
-					if(Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()!=".xml") {
-						continue;
-					}
-					string strAttachPath=GetEmailAttachPath();
-					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
-					string strAttachText=File.ReadAllText(strAttachFile);
-					if(EhrCCD.IsCCD(strAttachText)) {
-						if(emailMessage.PatNum==0) {
-							try {
-								XmlDocument xmlDocCcd=new XmlDocument();
-								xmlDocCcd.LoadXml(strAttachText);
-								emailMessage.PatNum=EhrCCD.GetCCDpat(xmlDocCcd);// A match is not guaranteed, which is why we have a button to allow the user to change the patient.
-							}
-							catch {
-								//Invalid XML.  Cannot match patient.
-							}
-						}
-						ehrSummaryCcd=new EhrSummaryCcd();
-						ehrSummaryCcd.ContentSummary=strAttachText;
-						ehrSummaryCcd.DateSummary=DateTime.Today;
-						ehrSummaryCcd.EmailAttachNum=i;//Temporary value, so we can locate the FK down below.
-						ehrSummaryCcd.PatNum=emailMessage.PatNum;
-						break;//We can only handle one CCD message per email, because we only have one patnum field per email record and the ehrsummaryccd record requires a patnum.
-					}
-				}
-			}
-			if(emailMessageNum==0) {
-				EmailMessages.Insert(emailMessage);//Also inserts all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
-			}
-			else {
-				EmailMessages.Update(emailMessage);//Also deletes all previous attachments, then recreates all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
-			}
-			if(ehrSummaryCcd!=null) {
-				ehrSummaryCcd.EmailAttachNum=emailMessage.Attachments[(int)ehrSummaryCcd.EmailAttachNum].EmailAttachNum;
-				EhrSummaryCcds.Insert(ehrSummaryCcd);
-			}
-			if(isEncrypted && isAck) {
-				//Send a Message Disposition Notification (MDN) message to the sender, as required by the Direct messaging specifications.
-				//The MDN will be attached to the same patient as the incoming message.
-				SendAckDirect(inMsg,emailAddressReceiver,emailMessage.PatNum);
-			}
-			return emailMessage;
+			return listMimePartLeafNodes;
 		}
 
 		///<summary>Converts the Health.Direct.Common.Mail.Message into an OD EmailMessage.  The Direct library is used for both encrypted and unencrypted email.  Set hasAttachments to false to exclude attachments.</summary>
@@ -1135,33 +1289,10 @@ namespace OpenDentBusiness{
 			}
 			//Think of the mime structure as a tree.
 			//We want to treat one part and multi-part emails the same way below, so we make our own list of leaf node mime parts (mime parts which have no children, also know as single part).
-			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=new List<Health.Direct.Common.Mime.MimeEntity>();
-			Health.Direct.Common.Mime.MimeEntity mimeEntity=null;
-			try {
-				mimeEntity=message.ExtractMimeEntity();
-			}
-			catch {
+			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=GetMimeLeafNodes(message);
+			if(listMimePartLeafNodes==null) {
 				emailMessage.BodyText=ProcessMimeTextPart(message.Body.Text);
 				return emailMessage;
-			}
-			//If GetParts() is called when IsMultiPart is false, then an exception will be thrown by the Direct library.
-			if(message.IsMultiPart) {
-				List<Health.Direct.Common.Mime.MimeEntity> listMimeMultiPart=new List<Health.Direct.Common.Mime.MimeEntity>();
-				listMimeMultiPart.Add(mimeEntity);
-				while(listMimeMultiPart.Count>0) {
-					foreach(Health.Direct.Common.Mime.MimeEntity mimePart in listMimeMultiPart[0].GetParts()) {
-						if(mimePart.IsMultiPart) {
-							listMimeMultiPart.Add(mimePart);
-						}
-						else {
-							listMimePartLeafNodes.Add(mimePart);
-						}
-					}
-					listMimeMultiPart.RemoveAt(0);
-				}
-			}
-			else {//Single body part.
-				listMimePartLeafNodes.Add(mimeEntity);
 			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeBodyTextParts=new List<Health.Direct.Common.Mime.MimeEntity>();
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeAttachParts=new List<Health.Direct.Common.Mime.MimeEntity>();
@@ -1365,6 +1496,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static string GetEmailSentOrReceivedDescript(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
 			if(IsRegularEmail(sentOrReceived)) {
 				return Lans.g("EmailMessages","Regular Email");
 			}
@@ -1381,22 +1513,34 @@ namespace OpenDentBusiness{
 		}
 
 		public static bool IsRegularEmail(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
 			return (sentOrReceived==EmailSentOrReceived.Read || sentOrReceived==EmailSentOrReceived.Received || sentOrReceived==EmailSentOrReceived.Sent);
 		}
 
 		public static bool IsEncryptedEmail(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
 			return (sentOrReceived==EmailSentOrReceived.ReadDirect || sentOrReceived==EmailSentOrReceived.ReceivedDirect || 
 				sentOrReceived==EmailSentOrReceived.SentDirect || sentOrReceived==EmailSentOrReceived.ReceivedEncrypted || 
 				sentOrReceived==EmailSentOrReceived.AckDirectNotSent || sentOrReceived==EmailSentOrReceived.AckDirectProcessed);
 		}
 
 		public static bool IsSecureWebMail(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
 			return (sentOrReceived==EmailSentOrReceived.WebMailRecdRead || sentOrReceived==EmailSentOrReceived.WebMailReceived ||
 				sentOrReceived==EmailSentOrReceived.WebMailSent);
 		}
 
 		public static bool IsUnsent(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
 			return (sentOrReceived==EmailSentOrReceived.Neither);
+		}
+
+		public static bool IsReceived(EmailSentOrReceived sentOrReceived) {
+			//No need to check RemotingRole; no call to db.
+			return (sentOrReceived==EmailSentOrReceived.ReceivedEncrypted || sentOrReceived==EmailSentOrReceived.ReceivedDirect ||
+				sentOrReceived==EmailSentOrReceived.ReadDirect || sentOrReceived==EmailSentOrReceived.Received ||
+				sentOrReceived==EmailSentOrReceived.Read || sentOrReceived==EmailSentOrReceived.WebMailReceived ||
+				sentOrReceived==EmailSentOrReceived.WebMailRecdRead);
 		}
 
 		#endregion Helpers

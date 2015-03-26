@@ -81,5 +81,25 @@ namespace CodeBase {
 			return filePath;
 		}
 
+		///<summary>Throws exceptions when there are permission issues.  Creates a new randomly named subdirectory inside the given directory path and returns the full path to the new subfolder.</summary>
+		public static string CreateRandomFolder(string dir) {
+			bool isFolderCreated=false;
+			string folderPath="";
+			const string randChrs="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			do {
+				string subDirName="";
+				for(int i=0;i<6;i++) {
+					subDirName+=randChrs[_rand.Next(0,randChrs.Length-1)];
+				}
+				subDirName+=DateTime.Now.ToString("yyyyMMddhhmmss");
+				folderPath=CombinePaths(dir,subDirName);
+				if(!Directory.Exists(folderPath)) {
+					Directory.CreateDirectory(folderPath);
+					isFolderCreated=true;
+				}
+			} while(!isFolderCreated);
+			return folderPath;
+		}
+
 	}
 }

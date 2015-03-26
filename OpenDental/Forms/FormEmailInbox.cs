@@ -59,7 +59,7 @@ namespace OpenDental {
 			}
 			Cursor=Cursors.WaitCursor;
 			int emailMessagesTotalCount=0;
-			Text="Email Inbox for "+AddressInbox.EmailUsername+" - Fetching new email...";
+			Text="Email Inbox for "+AddressInbox.EmailUsername+" - Receiving new email...";
 			try {
 				bool hasMoreEmail=true;
 				while(hasMoreEmail) {
@@ -179,6 +179,7 @@ namespace OpenDental {
 				splitContainerNoFlicker.Panel2Collapsed=true;
 				return;
 			}
+			Cursor=Cursors.WaitCursor;
 			EmailMessages.UpdateSentOrReceivedRead(emailMessage);
 			emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Refresh from the database to get the full body text.
 			FillGridEmailMessages();//To show the email is read.
@@ -186,6 +187,7 @@ namespace OpenDental {
 			emailPreview.Width=splitContainerNoFlicker.Panel2.Width;//For some reason the anchors do not always work inside panel2.
 			emailPreview.Height=splitContainerNoFlicker.Panel2.Height;//For some reason the anchors do not always work inside panel2.
 			emailPreview.LoadEmailMessage(emailMessage);
+			Cursor=Cursors.Default;
 			//Handle Sig column clicks.
 			if(e.Col!=4) {
 				return;//Not the Sig column.

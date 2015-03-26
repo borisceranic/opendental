@@ -244,7 +244,7 @@ namespace OpenDental{
 			this.buttonFuchsMailDMF.CornerRadius = 4F;
 			this.buttonFuchsMailDMF.Location = new System.Drawing.Point(197, 177);
 			this.buttonFuchsMailDMF.Name = "buttonFuchsMailDMF";
-			this.buttonFuchsMailDMF.Size = new System.Drawing.Size(75, 22);
+			this.buttonFuchsMailDMF.Size = new System.Drawing.Size(78, 22);
 			this.buttonFuchsMailDMF.TabIndex = 30;
 			this.buttonFuchsMailDMF.Text = "To DMF";
 			this.buttonFuchsMailDMF.Visible = false;
@@ -259,7 +259,7 @@ namespace OpenDental{
 			this.buttonFuchsMailDSF.CornerRadius = 4F;
 			this.buttonFuchsMailDSF.Location = new System.Drawing.Point(197, 149);
 			this.buttonFuchsMailDSF.Name = "buttonFuchsMailDSF";
-			this.buttonFuchsMailDSF.Size = new System.Drawing.Size(75, 22);
+			this.buttonFuchsMailDSF.Size = new System.Drawing.Size(78, 22);
 			this.buttonFuchsMailDSF.TabIndex = 29;
 			this.buttonFuchsMailDSF.Text = "To DSF";
 			this.buttonFuchsMailDSF.Visible = false;
@@ -651,7 +651,8 @@ namespace OpenDental{
 			}
 			catch(Exception ex) {
 				Cursor=Cursors.Default;
-				MessageBox.Show(ex.Message);
+				MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(ex.Message);
+				msgBox.ShowDialog();
 				return;
 			}
 			Cursor=Cursors.Default;
@@ -689,7 +690,8 @@ namespace OpenDental{
 			}
 			catch(Exception ex){
 				Cursor=Cursors.Default;
-				MessageBox.Show(ex.Message);
+				MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(ex.Message);
+				msgBox.ShowDialog();
 				return;
 			}
 			Cursor=Cursors.Default;

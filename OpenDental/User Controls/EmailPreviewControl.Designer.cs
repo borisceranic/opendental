@@ -44,6 +44,7 @@
 			this.butSig = new OpenDental.UI.Button();
 			this.webBrowser = new System.Windows.Forms.WebBrowser();
 			this.textBodyText = new OpenDental.ODtextBox();
+			this.butShowImages = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// labelSignedBy
@@ -64,7 +65,7 @@
 			this.textMsgDateTime.ForeColor = System.Drawing.Color.Red;
 			this.textMsgDateTime.Location = new System.Drawing.Point(89, 21);
 			this.textMsgDateTime.Name = "textMsgDateTime";
-			this.textMsgDateTime.Size = new System.Drawing.Size(559, 13);
+			this.textMsgDateTime.Size = new System.Drawing.Size(555, 13);
 			this.textMsgDateTime.TabIndex = 0;
 			this.textMsgDateTime.TabStop = false;
 			this.textMsgDateTime.Text = "Unsent";
@@ -139,15 +140,16 @@
 			this.textSentOrReceived.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.textSentOrReceived.Location = new System.Drawing.Point(89, 1);
 			this.textSentOrReceived.Name = "textSentOrReceived";
-			this.textSentOrReceived.Size = new System.Drawing.Size(556, 13);
-			this.textSentOrReceived.TabIndex = 36;
+			this.textSentOrReceived.Size = new System.Drawing.Size(555, 13);
+			this.textSentOrReceived.TabIndex = 0;
+			this.textSentOrReceived.TabStop = false;
 			// 
 			// label5
 			// 
 			this.label5.Location = new System.Drawing.Point(0, 0);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(88, 14);
-			this.label5.TabIndex = 37;
+			this.label5.TabIndex = 0;
 			this.label5.Text = "Sent/Received:";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -178,7 +180,7 @@
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textSubject.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
 			this.textSubject.Size = new System.Drawing.Size(559, 20);
-			this.textSubject.TabIndex = 3;
+			this.textSubject.TabIndex = 4;
 			this.textSubject.Text = "";
 			this.textSubject.WordWrap = false;
 			// 
@@ -270,11 +272,11 @@
 			// webBrowser
 			// 
 			this.webBrowser.AllowWebBrowserDrop = false;
-			this.webBrowser.Location = new System.Drawing.Point(37, 121);
+			this.webBrowser.Location = new System.Drawing.Point(950, 0);
 			this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
 			this.webBrowser.Name = "webBrowser";
 			this.webBrowser.ScriptErrorsSuppressed = true;
-			this.webBrowser.Size = new System.Drawing.Size(46, 25);
+			this.webBrowser.Size = new System.Drawing.Size(20, 20);
 			this.webBrowser.TabIndex = 0;
 			this.webBrowser.TabStop = false;
 			this.webBrowser.Visible = false;
@@ -298,10 +300,26 @@
 			this.textBodyText.Text = "";
 			this.textBodyText.TextChanged += new System.EventHandler(this.textBodyText_TextChanged);
 			// 
+			// butShowImages
+			// 
+			this.butShowImages.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowImages.Autosize = true;
+			this.butShowImages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowImages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowImages.CornerRadius = 4F;
+			this.butShowImages.Location = new System.Drawing.Point(8, 121);
+			this.butShowImages.Name = "butShowImages";
+			this.butShowImages.Size = new System.Drawing.Size(78, 22);
+			this.butShowImages.TabIndex = 7;
+			this.butShowImages.Text = "Show Images";
+			this.butShowImages.Visible = false;
+			this.butShowImages.Click += new System.EventHandler(this.butShowImages_Click);
+			// 
 			// EmailPreviewControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.butShowImages);
 			this.Controls.Add(this.textSentOrReceived);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textSubject);
@@ -349,6 +367,7 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textSentOrReceived;
 		private System.Windows.Forms.Label label5;
+		private UI.Button butShowImages;
 
 	}
 }
