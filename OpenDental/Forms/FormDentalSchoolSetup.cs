@@ -34,7 +34,8 @@ namespace OpenDental {
 			if(FormUGP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			DialogResult diag=MessageBox.Show(Lan.g(this,"Would you also like to update all existing students to this user group?"),"",MessageBoxButtons.YesNoCancel);
+			DialogResult diag=MessageBox.Show(Lan.g(this,"Update all existing students to this user group?")+"\r\n"
+				+Lan.g(this,"Choose No to just save the new default user group for students."),"",MessageBoxButtons.YesNoCancel);
 			if(diag==DialogResult.Cancel) {
 				return;
 			}
@@ -45,9 +46,14 @@ namespace OpenDental {
 				catch {
 					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
 					return;
-				}			
+				}
 				Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
 				textStudents.Text=FormUGP.UserGroup.Description;
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+			if(diag==DialogResult.No) {
+				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
+				textInstructors.Text=FormUGP.UserGroup.Description;
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 		}
@@ -62,7 +68,8 @@ namespace OpenDental {
 			if(FormUGP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			DialogResult diag=MessageBox.Show(Lan.g(this,"Would you also like to update all existing instructors to this user group?"),"",MessageBoxButtons.YesNoCancel);
+			DialogResult diag=MessageBox.Show(Lan.g(this,"Update all existing students to this user group?")+"\r\n"
+				+Lan.g(this,"Choose No to just save the new default user group for students."),"",MessageBoxButtons.YesNoCancel);
 			if(diag==DialogResult.Cancel) {
 				return;
 			}
@@ -74,6 +81,11 @@ namespace OpenDental {
 					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
 					return;
 				}
+				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
+				textInstructors.Text=FormUGP.UserGroup.Description;
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+			if(diag==DialogResult.No) {
 				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
 				textInstructors.Text=FormUGP.UserGroup.Description;
 				DataValid.SetInvalid(InvalidType.Prefs);
