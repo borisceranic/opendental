@@ -6375,6 +6375,7 @@ namespace OpenDental{
 				_threadTimeSynch.Join();
 				_threadTimeSynch=null;
 			}
+			ODThread.QuitSyncAllOdThreads();
 			if(Security.CurUser!=null) {
 				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			}

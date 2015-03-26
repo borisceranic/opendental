@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
 using OpenDental;
+using CodeBase;
 
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
@@ -248,6 +249,10 @@ namespace CentralManager {
 		}
 
 		#endregion
+
+		private void FormCentralManager_FormClosing(object sender,FormClosingEventArgs e) {
+			ODThread.QuitSyncAllOdThreads();
+		}
 		
 	}
 }
