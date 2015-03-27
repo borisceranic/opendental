@@ -92,7 +92,7 @@ namespace OpenDental.User_Controls {
 				if(listHtmlParts.Count>0) {//Html body found.
 					textBodyText.Visible=false;
 					_isLoading=true;
-					webBrowser.DocumentText=listHtmlParts[0].Body.Text;
+					webBrowser.DocumentText=EmailMessages.ProcessMimeTextPart(listHtmlParts[0].Body.Text);
 					webBrowser.Location=textBodyText.Location;
 					webBrowser.Size=textBodyText.Size;
 					webBrowser.Anchor=textBodyText.Anchor;
@@ -102,7 +102,7 @@ namespace OpenDental.User_Controls {
 					}
 				}
 				else if(listTextParts.Count>0) {//No html body found, however one specific mime part is for viewing in text only.					
-					textBodyText.Text=listTextParts[0].Body.Text;
+					textBodyText.Text=EmailMessages.ProcessMimeTextPart(listTextParts[0].Body.Text);
 				}
 				else {//No html body found and no text body found.  Last resort.  Show all mime parts which are not attachments (ugly).
 					textBodyText.Text=_emailMessage.BodyText;//This version of the body text includes all non-attachment mime parts.
@@ -357,10 +357,14 @@ namespace OpenDental.User_Controls {
 				//We need a folder in order to place the images beside the html file in order for the relative image paths to work correctly.
 				string htmlFolderPath=ODFileUtils.CreateRandomFolder(PrefL.GetTempFolderPath());//Throws exceptions.
 				string filePathHtml=ODFileUtils.CreateRandomFile(htmlFolderPath,".html");
-				File.WriteAllText(filePathHtml,webBrowser.DocumentText);
+				string html=webBrowser.DocumentText;
 				for(int i=0;i<_listImageParts.Count;i++) {
+					string contentId=EmailMessages.GetMimeImageContentId(_listImageParts[i]);
+					string fileName=EmailMessages.GetMimeImageFileName(_listImageParts[i]);
+					html=html.Replace("cid:"+contentId,fileName);
 					EmailMessages.SaveMimeImageToFile(_listImageParts[i],htmlFolderPath);
 				}
+				File.WriteAllText(filePathHtml,html);
 				_isLoading=true;
 				webBrowser.Navigate(filePathHtml);
 				butShowImages.Visible=false;

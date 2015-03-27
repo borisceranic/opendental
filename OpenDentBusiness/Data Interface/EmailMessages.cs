@@ -863,7 +863,8 @@ namespace OpenDentBusiness{
 				}
 			}
 			catch {
-				return new List<List<Health.Direct.Common.Mime.MimeEntity>>();//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
+				//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
+				return new List<List<Health.Direct.Common.Mime.MimeEntity>>();
 			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			List<List<Health.Direct.Common.Mime.MimeEntity>> retVal=new List<List<Health.Direct.Common.Mime.MimeEntity>>();
@@ -880,7 +881,40 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>Generates the image and returns the path to where the file was saved.  Returns null if the image could not be created.</summary>
+		public static string GetMimeImageFileName(Health.Direct.Common.Mime.MimeEntity mimeEntityForImage) {
+			int nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("name=");
+			if(nameIndexStart>=0) {
+				nameIndexStart+=5;
+			}
+			else {
+				nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("filename=");
+				if(nameIndexStart>=0) {
+					nameIndexStart+=9;
+				}
+			}
+			if(nameIndexStart<0) {
+				return null;
+			}
+			int nameIndexEnd=mimeEntityForImage.ContentType.IndexOf(';',nameIndexStart+1);
+			string fileName="";
+			if(nameIndexEnd>=0) {
+				fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart,nameIndexEnd-nameIndexStart+1);
+			}
+			else {
+				fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart);
+			}
+			return fileName.Replace("\"","");
+		}
+
+		public static string GetMimeImageContentId(Health.Direct.Common.Mime.MimeEntity mimeEntityForImage) {
+			if(!mimeEntityForImage.Headers.Contains("Content-ID")) {
+				return "";
+			}
+			return mimeEntityForImage.Headers["Content-ID"].Value.Replace("<","").Replace(">","");
+		}
+
+		///<summary>Generates the image and returns the path to where the file was saved.  Returns null if the image could not be created.
+		///Used to save images for received html messages.</summary>
 		public static string SaveMimeImageToFile(Health.Direct.Common.Mime.MimeEntity mimeEntityForImage,string directoryPath) {
 			//No need to check RemotingRole; no call to db.
 			if(!mimeEntityForImage.ContentTransferEncoding.Contains("base64")) {
@@ -890,28 +924,7 @@ namespace OpenDentBusiness{
 				byte[] bytesForImage=Convert.FromBase64String(mimeEntityForImage.Body.Text);
 				MemoryStream ms=new MemoryStream(bytesForImage);
 				Bitmap bitmap=new Bitmap(ms);
-				int nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("name=");
-				if(nameIndexStart>=0) {
-					nameIndexStart+=5;
-				}
-				else {
-					nameIndexStart=mimeEntityForImage.ContentType.ToLower().IndexOf("filename=");
-					if(nameIndexStart>=0) {
-						nameIndexStart+=9;
-					}
-				}
-				if(nameIndexStart<0) {
-					return null;
-				}
-				int nameIndexEnd=mimeEntityForImage.ContentType.IndexOf(';',nameIndexStart+1);
-				string fileName="";
-				if(nameIndexEnd>=0) {
-					fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart,nameIndexEnd-nameIndexStart+1);
-				}
-				else {
-					fileName=mimeEntityForImage.ContentType.Substring(nameIndexStart);
-				}
-				fileName=fileName.Replace("\"","");
+				string fileName=GetMimeImageFileName(mimeEntityForImage);
 				string fileExt=Path.GetExtension(fileName);
 				string filePath=ODFileUtils.CombinePaths(directoryPath,fileName);
 				System.Drawing.Imaging.ImageFormat imageFormat=System.Drawing.Imaging.ImageFormat.Jpeg;
@@ -1424,42 +1437,54 @@ namespace OpenDentBusiness{
 			return emailAttach;
 		}
 
-		private static string ProcessMimeTextPart(string strBody) {
+		public static string ProcessMimeTextPart(string strBodyText) {
 			//No need to check RemotingRole; no call to db.
-			//For unencrypted emails from GoDaddy, the body text is html, but each line is wrapped at 75 characters and an extra '=' is appended.
-			//Our algorithm to handle the extra equal signs is more generic, in case GoDaddy every changes their wrap character count, or in case other email providers manimulate the email body in a similar manner.
-			bool isWrappedEmail=true;
-			string[] arrayMimeBodyLines=strBody.Split(new string[] { "\r\n","\r","\n" },StringSplitOptions.None);
-			int lastTextLineIndex=arrayMimeBodyLines.Length-1;//GoDaddy emails also have trailing blank lines after the body text, which we need to ignore when determining if the email is wrapped or not.
-			while(arrayMimeBodyLines[lastTextLineIndex].Length==0 && lastTextLineIndex>0) {
-				lastTextLineIndex--;
-			}
-			for(int i=0;i<lastTextLineIndex;i++) {//Ignore the last line in this consideration, because it is almost always a shorter line than the wrapped lines.
-				if(arrayMimeBodyLines[i].Length<50) {//Why would any email provider wrap an email to less than 50 characters?
-					isWrappedEmail=false;
-					break;
+			//Official documentation regarding text wrapping.  http://www.ietf.org/rfc/rfc2646.txt
+			//Both text and html bodies appear to be commonly wrapped at 75 characters with an extra '=' character added to the end of wrapped lines.
+			//We have seen email wrapped at 75 characters from a number of sources, including GoDaddy and Comodo.
+			//However, lines may be wrapped at any number of characters, so we cannot rely on the length of the line.
+			//Instead we rely on the presence of a "soft line break" (a special character SP followed by CRLF).
+			//I hard line break is a CRLF which is not preceded by the SP character.
+			//The SP character can be any character, and from what we have seen, is usually the '=' character.
+			string sp="=";//Soft line break indicator character.
+			string[] arrayMimeBodyLines=strBodyText.Split(new string[] { "\r\n","\r","\n" },StringSplitOptions.None);
+			StringBuilder sbBodyText=new StringBuilder();
+			for(int i=0;i<arrayMimeBodyLines.Length;i++) {
+				if(arrayMimeBodyLines[i].EndsWith(sp)) {//Soft line break.  The line ends with SP CRLF
+					//The current line is wrapped.  Remove the trailing soft line break indicator character and also remove the new line.
+					//The CRLF was already removed when splitting, so we only need to remove the soft line break indicator at the end.
+					sbBodyText.Append(arrayMimeBodyLines[i].Substring(0,arrayMimeBodyLines[i].Length-1));
 				}
-				if(i>0 && arrayMimeBodyLines[i].Length!=arrayMimeBodyLines[i-1].Length) {//Wrapped email messages have lines of the same length (excluding the last line)
-					isWrappedEmail=false;
-					break;
-				}
-				if(!arrayMimeBodyLines[i].EndsWith("=")) {
-					isWrappedEmail=false;
-					break;
-				}
-			}
-			string retVal=strBody;
-			if(isWrappedEmail) {
-				StringBuilder sbBodyText=new StringBuilder();
-				for(int i=0;i<lastTextLineIndex;i++) {
-					sbBodyText.Append(arrayMimeBodyLines[i].Substring(0,arrayMimeBodyLines[i].Length-1));//The whole line, excluding the last character.
-				}
-				for(int i=lastTextLineIndex;i<arrayMimeBodyLines.Length;i++) {//Copy the the last text line and all trailing blank lines as is.
+				else {//Hard line break.
+					//The current line is not wrapped.  Do not modify this line.  Also ensure that the CRLF is placed back into the output.
 					sbBodyText.Append(arrayMimeBodyLines[i]);
+					if(i<arrayMimeBodyLines.Length) {
+						sbBodyText.AppendLine();
+					}
 				}
-				retVal=sbBodyText.ToString();
 			}
-			return retVal;
+			//Soft line breaks have now been removed from the message.
+			//In the remaining message, the same special character is used to precede encoded characters.
+			//For example, "=3D" needs to be converted to an '=' character, because 3D in hexadecimal is the '=' character.
+			//Another example, "=20" would be converted to a ' ' character.
+			string strBodyTextUnwrapped=sbBodyText.ToString();
+			string[] arrayBodyEncoded=strBodyTextUnwrapped.Split(new string[] { sp },StringSplitOptions.None);
+			StringBuilder retVal=new StringBuilder();
+			if(arrayBodyEncoded.Length>0) {
+				retVal.Append(arrayBodyEncoded[0]);
+				for(int i=1;i<arrayBodyEncoded.Length;i++) {
+					if(Regex.IsMatch(arrayBodyEncoded[i],"^[0-9A-F]{2}.*")) {//Starts with a 2 digit hexadecimal number.
+						string hexStr=arrayBodyEncoded[i].Substring(0,2);
+						char c=(char)Convert.ToInt32(hexStr,16);
+						retVal.Append(c);
+						retVal.Append(arrayBodyEncoded[i].Substring(2));
+					}
+					else {
+						retVal.Append(arrayBodyEncoded[i]);
+					}
+				}
+			}
+			return retVal.ToString();
 		}
 
 		public static string GetEmailAttachPath() {
