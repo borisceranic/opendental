@@ -179,10 +179,11 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
 			}
-			string command="SELECT paysplit.*,payment.CheckNum,payment.PayAmt,payment.PayType "
+			string command="SELECT paysplit.*,payment.CheckNum,SUM(payment.PayAmt) AS 'PayAmt',payment.PayType "
 					+"FROM paysplit "
 					+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
 					+"WHERE paysplit.PayPlanNum="+POut.Long(payPlanNum)+" "
+					+"GROUP BY paysplit.ProcDate,paysplit.PayNum,paysplit.ProvNum "
 					+"ORDER BY ProcDate"; 
 			DataTable tableSplits=Db.GetTable(command);
 			listPaySplits.Clear();

@@ -938,19 +938,23 @@ namespace OpenDental{
 			gridCharges.Columns.Clear();
 			ODGridColumn col;
 			//If this column is changed from a date column then the comparer method (ComparePayPlanRows) needs to be updated.
-			col=new ODGridColumn(Lan.g("PayPlanAmortization","Date"),65,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Date"),65,HorizontalAlignment.Right);//0
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("PayPlanAmortization","Description"),220);
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Provider"),50);//1
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("PayPlanAmortization","Charges"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Description"),150);//2
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("PayPlanAmortization","Credits"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Principal"),60,HorizontalAlignment.Right);//3
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("PayPlanAmortization","Balance"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Interest"),60,HorizontalAlignment.Right);//4
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn("",147);//filler
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Payment"),60,HorizontalAlignment.Right);//5
 			gridCharges.Columns.Add(col);
-			gridCharges.Rows.Clear();					
+			col=new ODGridColumn(Lan.g("PayPlanAmortization","Balance"),60,HorizontalAlignment.Right);//6
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn("",107);//7 filler
+			gridCharges.Columns.Add(col);
+			gridCharges.Rows.Clear();
 			List<ODGridRow> listPayPlanRows=new List<ODGridRow>();
 			for(int i=0;i<_listPayPlanCharges.Count;i++){//Payplan Charges
 				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],i+1));
@@ -971,6 +975,29 @@ namespace OpenDental{
 			listPayPlanRows.Sort(ComparePayPlanRows);
 			for(int i=0;i<listPayPlanRows.Count;i++) {
 				gridCharges.Rows.Add(listPayPlanRows[i]);
+				bool isTotalsRow=false;
+				if(i<listPayPlanRows.Count-1//Not the last row.
+					&& DateTime.Parse(listPayPlanRows[i].Cells[0].Text)<=DateTime.Today 
+					&& DateTime.Parse(listPayPlanRows[i+1].Cells[0].Text)>DateTime.Today)
+				{
+					isTotalsRow=true;
+				}
+				if(i==listPayPlanRows.Count-1 && DateTime.Parse(listPayPlanRows[i].Cells[0].Text)<=DateTime.Today) {//Last row.
+					isTotalsRow=true;
+				}
+				if(isTotalsRow) {
+					ODGridRow row=new ODGridRow();//Charge row
+					row.Tag=null;//This is how we will reference the totals row in a few other places.
+					row.Cells.Add(DateTime.Today.ToShortDateString());//Date
+					row.Cells.Add("");
+					row.Cells.Add("Current Totals:");//Descript
+					row.Cells.Add("");//Principal
+					row.Cells.Add("");//Interest
+					row.Cells.Add("");//Payment
+					row.Cells.Add("");//Balance (filled later)
+					row.Cells.Add("");//Empty filler column
+					gridCharges.Rows.Add(row);
+				}
 			}
 			TotPrinc=0;
 			TotInt=0;
@@ -994,20 +1021,30 @@ namespace OpenDental{
 			}
 			gridCharges.EndUpdate();
 			double balanceAmt=0;
+			TotPrinc=0;
+			TotInt=0;
+			double TotPay=0;
 			for(int i=0;i<gridCharges.Rows.Count;i++){//Filling row cells with balance information.
-				if(gridCharges.Rows[i].Cells[2].Text!="") {//Charge
-					balanceAmt+=Convert.ToDouble(gridCharges.Rows[i].Cells[2].Text);
+				if(gridCharges.Rows[i].Cells[3].Text!="") {//Principal
+					TotPrinc+=PIn.Double(gridCharges.Rows[i].Cells[3].Text);
+					balanceAmt+=PIn.Double(gridCharges.Rows[i].Cells[3].Text);
 				}
-				else if(gridCharges.Rows[i].Cells[3].Text!="") {//Credit
-					balanceAmt-=Convert.ToDouble(gridCharges.Rows[i].Cells[3].Text);
+				if(gridCharges.Rows[i].Cells[4].Text!="") {//Interest
+					TotInt+=PIn.Double(gridCharges.Rows[i].Cells[4].Text);
+					balanceAmt+=PIn.Double(gridCharges.Rows[i].Cells[4].Text);
 				}
-				gridCharges.Rows[i].Cells[4].Text=balanceAmt.ToString("n");
-				if(i<gridCharges.Rows.Count-1//Not the last row
-					&& DateTime.Parse(gridCharges.Rows[i].Cells[0].Text)<=DateTime.Today 
-					&& DateTime.Parse(gridCharges.Rows[i+1].Cells[0].Text)>DateTime.Today)//Coloration of where we are currently in grid based on date.
-				{
+				else if(gridCharges.Rows[i].Cells[5].Text!="") {//Payment
+					TotPay+=PIn.Double(gridCharges.Rows[i].Cells[5].Text);
+					balanceAmt-=PIn.Double(gridCharges.Rows[i].Cells[5].Text);
+				}
+				gridCharges.Rows[i].Cells[6].Text=balanceAmt.ToString("n");
+				if(gridCharges.Rows[i].Tag==null) {//Placeholder row for current totals
+					gridCharges.Rows[i].Cells[5].Text=TotPay.ToString("n");
+					gridCharges.Rows[i].Cells[4].Text=TotInt.ToString("n");
+					gridCharges.Rows[i].Cells[3].Text=TotPrinc.ToString("n");
 					gridCharges.Rows[i].ColorLborder=Color.Black;
-					gridCharges.Rows[i].Cells[4].Bold=YN.Yes;
+					gridCharges.Rows[i].Cells[6].Bold=YN.Yes;
+					//gridCharges.Rows[i].ColorBackG=Color.Orange;
 				}
 			}
 			textAccumulatedDue.Text=PayPlans.GetAccumDue(PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
@@ -1029,19 +1066,18 @@ namespace OpenDental{
 
 		private ODGridRow CreateRowForPayPlanCharge(PayPlanCharge payPlanCharge,int payPlanChargeOrdinal) {
 			string descript="#"+payPlanChargeOrdinal;
-			if(payPlanCharge.Interest!=0) {
-				descript+=" Interest: "+payPlanCharge.Interest.ToString("n");
-			}
 			if(payPlanCharge.Note!="") {
 				descript+=" "+payPlanCharge.Note;
 			}
 			ODGridRow row=new ODGridRow();//Charge row
-			row.Cells.Add(payPlanCharge.ChargeDate.ToShortDateString());//Date
-			row.Cells.Add(descript);//Descript
-			row.Cells.Add((payPlanCharge.Principal+payPlanCharge.Interest).ToString("n"));//Charge
-			row.Cells.Add("");//No credits, this is a charge
-			row.Cells.Add("");//Balance (filled later)
-			row.Cells.Add("");//Empty filler column
+			row.Cells.Add(payPlanCharge.ChargeDate.ToShortDateString());//0 Date
+			row.Cells.Add(Providers.GetAbbr(payPlanCharge.ProvNum));//1 Prov Abbr
+			row.Cells.Add(descript);//2 Descript
+			row.Cells.Add((payPlanCharge.Principal).ToString("n"));//3 Principal
+			row.Cells.Add(payPlanCharge.Interest.ToString("n"));//4 Interest
+			row.Cells.Add("");//5 Payment
+			row.Cells.Add("");//6 Balance (filled later)
+			row.Cells.Add("");//7 Empty filler column
 			row.Tag=payPlanCharge;
 			return row;
 		}
@@ -1056,12 +1092,14 @@ namespace OpenDental{
 				descript+=Lans.g(this,"(split)");
 			}
 			ODGridRow row=new ODGridRow();
-			row.Cells.Add(paySplit.ProcDate.ToShortDateString());//Date
-			row.Cells.Add(descript);//Descript
-			row.Cells.Add("");//No charge, this is a credit
-			row.Cells.Add(paySplit.SplitAmt.ToString("n"));//Credit
-			row.Cells.Add("");//Balance (filled later)
-			row.Cells.Add("");//Empty filler column
+			row.Cells.Add(paySplit.ProcDate.ToShortDateString());//0 Date
+			row.Cells.Add(Providers.GetAbbr(Convert.ToInt32(rowBundlePayment["ProvNum"])));//1 Prov Abbr
+			row.Cells.Add(descript);//2 Descript
+			row.Cells.Add("");//3 Principal
+			row.Cells.Add("");//4 Interest
+			row.Cells.Add(paySplit.SplitAmt.ToString("n"));//5 Payment
+			row.Cells.Add("");//6 Balance (filled later)
+			row.Cells.Add("");//7 Empty filler column
 			row.Tag=paySplit;
 			row.ColorText=_arrayAccountColors[3].ItemColor;//Setup | Definitions | Account Colors | Payment;
 			return row;
@@ -1084,12 +1122,14 @@ namespace OpenDental{
 				}
 			}
 			ODGridRow row=new ODGridRow();
-			row.Cells.Add(PIn.DateT(rowBundleClaimProc["DateCP"].ToString()).ToShortDateString());//Date
-			row.Cells.Add(descript);//Descript
-			row.Cells.Add("");//No charge, this is a credit
-			row.Cells.Add(PIn.Double(rowBundleClaimProc["InsPayAmt"].ToString()).ToString("n"));//Credit
-			row.Cells.Add("");//Balance (filled later)
-			row.Cells.Add("");//Empty filler column
+			row.Cells.Add(PIn.DateT(rowBundleClaimProc["DateCP"].ToString()).ToShortDateString());//0 Date
+			row.Cells.Add(Providers.GetLName(Convert.ToInt32(rowBundleClaimProc["ProvNum"])));//1 Prov Abbr
+			row.Cells.Add(descript);//2 Descript
+			row.Cells.Add("");//3 Principal
+			row.Cells.Add("");//4 Interest
+			row.Cells.Add(PIn.Double(rowBundleClaimProc["InsPayAmt"].ToString()).ToString("n"));//5 Payment
+			row.Cells.Add("");//6 Balance (filled later)
+			row.Cells.Add("");//7 Empty filler column
 			row.Tag=rowBundleClaimProc;
 			row.ColorText=_arrayAccountColors[7].ItemColor;//Setup | Definitions | Account Colors | Insurance Payment
 			return row;
@@ -1332,7 +1372,7 @@ namespace OpenDental{
 			decimal principalDecrementing=(decimal)principal;//The principal which will be decreased to zero in the loop.  Always starts >= 0, due to validation.
 			DateTime firstDate=PIn.Date(textDateFirstPay.Text);
 			int countCharges=0;
-			while(principalDecrementing>0 && countCharges<100){//the 100 limit prevents infinite loop
+			while(principalDecrementing>0 && countCharges<2000){//the 2000 limit prevents infinite loop
 				ppCharge=new PayPlanCharge();
 				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
 				ppCharge.Guarantor=PayPlanCur.Guarantor;
@@ -1411,6 +1451,9 @@ namespace OpenDental{
 		}
 
 		private void gridCharges_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
+			if(gridCharges.Rows[e.Row].Tag==null) {//Prevent double clicking on the "Current Totals" row
+				return;
+			}
 			if(gridCharges.Rows[e.Row].Tag.GetType()==typeof(PayPlanCharge)){
 				PayPlanCharge payPlanCharge=(PayPlanCharge)gridCharges.Rows[e.Row].Tag;
 				FormPayPlanChargeEdit FormP=new FormPayPlanChargeEdit(payPlanCharge);//This automatically takes care of our in-memory list because the Tag is referencing our list of objects.
@@ -1533,27 +1576,33 @@ namespace OpenDental{
 			section.Height=yPos+30;
 			DataTable tbl=new DataTable();
 			tbl.Columns.Add("date");
+			tbl.Columns.Add("prov");
 			tbl.Columns.Add("description");
-			tbl.Columns.Add("charges");
-			tbl.Columns.Add("credits");
+			tbl.Columns.Add("principal");
+			tbl.Columns.Add("interest");
+			tbl.Columns.Add("payment");
 			tbl.Columns.Add("balance");
 			DataRow row;
 			for(int i=0;i<gridCharges.Rows.Count;i++) {
 				row=tbl.NewRow();
 				row["date"]=gridCharges.Rows[i].Cells[0].Text;
-				row["description"]=gridCharges.Rows[i].Cells[1].Text;
-				row["charges"]=gridCharges.Rows[i].Cells[2].Text;
-				row["credits"]=gridCharges.Rows[i].Cells[3].Text;
-				row["balance"]=gridCharges.Rows[i].Cells[4].Text;
+				row["prov"]=gridCharges.Rows[i].Cells[1].Text;
+				row["description"]=gridCharges.Rows[i].Cells[2].Text;
+				row["principal"]=gridCharges.Rows[i].Cells[3].Text;
+				row["interest"]=gridCharges.Rows[i].Cells[4].Text;
+				row["payment"]=gridCharges.Rows[i].Cells[5].Text;
+				row["balance"]=gridCharges.Rows[i].Cells[6].Text;
 				tbl.Rows.Add(row);
 			}
 			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
 			query.AddColumn("ChargeDate",80,FieldValueType.Date,font);
 			query.GetColumnHeader("ChargeDate").StaticText="Date";
-			query.AddColumn("Description",150,FieldValueType.String,font);
-			query.AddColumn("Charges",70,FieldValueType.Number,font);
-			query.AddColumn("Credits",70,FieldValueType.Number,font);
-			query.AddColumn("Balance",70,FieldValueType.String,font);
+			query.AddColumn("Provider",50,FieldValueType.String,font);
+			query.AddColumn("Description",100,FieldValueType.String,font);
+			query.AddColumn("Principal",50,FieldValueType.Number,font);
+			query.AddColumn("Interest",50,FieldValueType.Number,font);
+			query.AddColumn("Payment",50,FieldValueType.Number,font);
+			query.AddColumn("Balance",60,FieldValueType.String,font);
 			query.GetColumnHeader("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			report.ReportObjects.Add(new ReportObject
@@ -1671,7 +1720,7 @@ namespace OpenDental{
 				return 1;
 			}
 			//dateTimeX==dateTimeY
-			//Show charges before credits on the same date.
+			//Show charges before Payment on the same date.
 			if(x.Tag.GetType()==typeof(PayPlanCharge)) {//x is charge (Type.Equals doesn't seem to work in sorters for some reason)
 				if(y.Tag.GetType()==typeof(PaySplit) || y.Tag.GetType()==typeof(DataRow)) {//y is credit, x goes first
 					return -1;
@@ -1682,9 +1731,9 @@ namespace OpenDental{
 				if(y.Tag.GetType()==typeof(PayPlanCharge)) {//y is charge
 					return 1;
 				}
-				//x and y are both credits
+				//x and y are both Payments
 			}
-			return x.Cells[1].Text.CompareTo(y.Cells[1].Text);//Sort by description.  This orders the payment plan charges which are on the same date by their charge number.  Might order payments by check number as well.
+			return x.Cells[2].Text.CompareTo(y.Cells[2].Text);//Sort by description.  This orders the payment plan charges which are on the same date by their charge number.  Might order payments by check number as well.
 		}
 
 		private void FormPayPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
