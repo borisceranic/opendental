@@ -2914,7 +2914,11 @@ namespace OpenDental {
 			//At this point, all selected items are procedures.
 			InsCanadaValidateProcs(procsForPat,table);
 			string claimType="P";
-			if(PatPlanList.Count==1 && PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0) {//if there's exactly one medical plan
+			//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
+			if(PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0
+				&& PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,InsPlanList,SubList)==0
+				&& PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)==0) 
+			{
 				claimType="Med";
 			}
 			Claim ClaimCur=CreateClaim(claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
