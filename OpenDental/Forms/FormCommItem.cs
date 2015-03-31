@@ -449,7 +449,10 @@ namespace OpenDental{
 			keyData+=CommlogCur.Mode_.ToString();
 			keyData+=CommlogCur.SentOrReceived.ToString();
 			if(CommlogCur.Note!=null){
-				keyData+=CommlogCur.Note.ToString();
+				//We need to replace \r\n with \n because Commlog.Note is a TextIsClobNote and when inserting it into the db we will POut.StringNote it,
+				//which changes all \n to \r\n before inserting.  
+				//Since the signature is made with the initial \n, we need to change the note back or it will be invalid and show a blank signature.
+				keyData+=CommlogCur.Note.ToString().Replace("\r\n","\n");
 			}
 			return keyData;
 		}
