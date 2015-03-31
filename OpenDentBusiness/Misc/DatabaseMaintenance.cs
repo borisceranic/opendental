@@ -4472,6 +4472,31 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string TaskUnreadsWithoutTasksAttached(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM taskunread "
+					+"WHERE taskunread.TaskNum NOT IN(SELECT TaskNum FROM task)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Unread task notifications for deleted tasks")+": "+numFound+"\r\n";
+				}
+			}
+			else {
+				command="DELETE FROM taskunread "
+					+"WHERE taskunread.TaskNum NOT IN(SELECT TaskNum FROM task)";
+				long numberFixed=Db.NonQ(command);
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Unread task notifications for deleted tasks removed")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string TimeCardRuleEmployeeNumInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);

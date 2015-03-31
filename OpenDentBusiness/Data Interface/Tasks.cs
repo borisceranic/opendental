@@ -488,11 +488,13 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),taskNum);
 				return;
 			}
-			string command= "DELETE from task WHERE TaskNum = "+POut.Long(taskNum);
+			string command= "DELETE FROM task WHERE TaskNum = "+POut.Long(taskNum);
  			Db.NonQ(command);
-			command="DELETE from taskancestor WHERE TaskNum = "+POut.Long(taskNum);
+			command="DELETE FROM taskancestor WHERE TaskNum = "+POut.Long(taskNum);
 			Db.NonQ(command);
-			command="DELETE from tasknote WHERE TaskNum = "+POut.Long(taskNum);
+			command="DELETE FROM tasknote WHERE TaskNum = "+POut.Long(taskNum);
+			Db.NonQ(command);
+			command="DELETE FROM taskunread WHERE TaskNum = "+POut.Long(taskNum);
 			Db.NonQ(command);
 		}
 
