@@ -1466,7 +1466,7 @@ namespace OpenDental {
 				}
 			}
 			Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task from tasklist")+" "+TaskLists.GetOne(TaskCur.TaskListNum).Descript,TaskCur);
-			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all three tables
+			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all four tables
 			DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			DialogResult=DialogResult.OK;
 			Close();
