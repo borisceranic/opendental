@@ -15,6 +15,8 @@ namespace CodeBase {
 		public int TimeIntervalMS=0;
 		///<summary>Pointer to the function from the calling code which will perform the majority of this thread's work.</summary>
 		private WorkerDelegate _worker=null;
+		///<summary>Pointer to the function from the calling code which will be alerted when the run function has thrown an unhandled exception.</summary>
+		private ExceptionDelegate _exceptionHandler=null;
 		///<summary>Custom data which can be set before launching the thread and then safely accessed within the WorkerDelegate.  Helps prevent the need to lock objects due to multi-threading, most of the time.</summary>
 		public object Tag=null;
 		///<summary>Custom data which can be used within the WorkerDelegate.  Helps prevent the need to lock objects due to multi-threading, most of the time.</summary>
@@ -55,6 +57,14 @@ namespace CodeBase {
 			Parameters=parameters;
 		}
 
+		///<summary>Start all threads for a given group. If thread has already been started then take no action on that thread.</summary>
+		public static void StartThreadsByGroupName(string groupName) {
+			List<ODThread> listOdThreadsForGroup=GetThreadsByGroupName(groupName);
+			for(int i=0;i<listOdThreadsForGroup.Count;i++) {
+				listOdThreadsForGroup[i].Start();
+			}			
+		}
+
 		///<summary>Starts the thread and returns immediately.  If the thread is already started or has already finished, then this function will have no effect.</summary>
 		public void Start() {
 			if(_thread.IsAlive) {
@@ -74,7 +84,17 @@ namespace CodeBase {
 		///<summary>Main thread loop that executes the WorkerDelegate and sleeps for the designated timeIntervalMS (in milliseconds) if one was set.</summary>
 		private void Run() {
 			while(!_hasQuit) {
-				_worker(this);
+				try {
+					_worker(this);				
+				}
+				catch(Exception e) { //An exception was unhandled by the worker delegate. Alert the caller if they have subscribed to this event.
+					if(_exceptionHandler!=null) {
+						_exceptionHandler(e);
+					}
+					else { //Caller has not subscribed to this event so stop program execution and alert end user that something unforeseen has failed.
+						throw e;
+					}
+				}
 				if(TimeIntervalMS>0) {
 					_waitEvent.WaitOne(TimeIntervalMS);//WaitOne is used instead of Sleep so that threads can be 'woken up' in the middle of waiting in order to process pertinent information.
 				}
@@ -150,8 +170,15 @@ namespace CodeBase {
 			return listOdThreadsForGroup;
 		}
 
+		///<summary>Add an exception handler to be alerted of unhandled exceptions in the work delegate.</summary>
+		public void AddExceptionHandler(ExceptionDelegate exceptionHandler) {
+			_exceptionHandler+=exceptionHandler;
+		}
+
 		///<summary>Pointer delegate to the method that does the work for this thread.  The worker method has to take an ODThread as a parameter so that it has access to Tag and other variables when needed.</summary>
 		public delegate void WorkerDelegate(ODThread odThread);
 
+		///<summary>Pointer delegate to the method that gets called when the worker delegate throws an unhandled exception.</summary>
+		public delegate void ExceptionDelegate(Exception e);
 	}
 }
