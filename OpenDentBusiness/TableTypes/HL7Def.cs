@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Xml.Serialization;
 
 namespace OpenDentBusiness{
@@ -60,6 +58,13 @@ namespace OpenDentBusiness{
 		public bool IsQuadAsToothNum;
 		///<summary>FK to definition.DefNum.  Image category used by MedLab HL7 interfaces when storing PDFs received via inbound HL7 messages.</summary>
 		public long LabResultImageCat;
+		///<summary>The username for logging into the Sftp server.</summary>
+		public string SftpUsername;
+		///<summary>The password used with the SftpUsername to log into the Sftp server.  This won't be displayed to the user but will be stored as plain text in the db.</summary>
+		public string SftpPassword;
+		///<summary>The socket used to connect to the Sftp server for retrieving inbound HL7 messages.  Currently only used by MedLabv2_3 interfaces.
+		///This will be the address:port of the Sftp server to connect to for retrieving lab results.  Example: server.address.com:20020.</summary>
+		public string SftpInSocket;
 
 
 		///<Summary>List of messages associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>
@@ -94,7 +99,9 @@ namespace OpenDentBusiness{
 		///<summary>0</summary>
 		File,
 		///<summary>1</summary>
-		TcpIp
+		TcpIp,
+		///<summary>2.  Used for MedLab HL7 transmission, currently only LabCorp.</summary>
+		Sftp
 	}
 
 	public enum HL7ShowDemographics {

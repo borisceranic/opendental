@@ -7465,6 +7465,7 @@ namespace OpenDentBusiness {
 			}
 			To15_2_0();
 		}
+
 		///<summary></summary>
 		private static void To15_2_0() {
 			if(FromVersion<new Version("15.2.0.0")) {
@@ -7695,7 +7696,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE medlabfacility (
 						MedLabFacilityNum bigint NOT NULL auto_increment PRIMARY KEY,
-						FacilityCode varchar(255) NOT NULL,
 						FacilityName varchar(255) NOT NULL,
 						Address varchar(255) NOT NULL,
 						City varchar(255) NOT NULL,
@@ -7713,7 +7713,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE medlabfacility (
 						MedLabFacilityNum number(20) NOT NULL,
-						FacilityCode varchar2(255),
 						FacilityName varchar2(255),
 						Address varchar2(255),
 						City varchar2(255),
@@ -7728,30 +7727,35 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="DROP TABLE IF EXISTS medlabattach";
+					command="DROP TABLE IF EXISTS medlabfacattach";
 					Db.NonQ(command);
-					command=@"CREATE TABLE medlabattach (
-						MedLabAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+					command=@"CREATE TABLE medlabfacattach (
+						MedLabFacAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
 						MedLabNum bigint NOT NULL,
+						MedLabResultNum bigint NOT NULL,
 						MedLabFacilityNum bigint NOT NULL,
 						INDEX(MedLabNum),
+						INDEX(MedLabResultNum),
 						INDEX(MedLabFacilityNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE medlabfacattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
-					command=@"CREATE TABLE medlabattach (
-						MedLabAttachNum number(20) NOT NULL,
+					command=@"CREATE TABLE medlabfacattach (
+						MedLabFacAttachNum number(20) NOT NULL,
 						MedLabNum number(20) NOT NULL,
+						MedLabResultNum number(20) NOT NULL,
 						MedLabFacilityNum number(20) NOT NULL,
-						CONSTRAINT medlabattach_MedLabAttachNum PRIMARY KEY (MedLabAttachNum)
+						CONSTRAINT medlabfacattach_MedLabFacAttac PRIMARY KEY (MedLabFacAttachNum)
 						)";
 					Db.NonQ(command);
-					command=@"CREATE INDEX medlabattach_MedLabNum ON medlabattach (MedLabNum)";
+					command=@"CREATE INDEX medlabfacattach_MedLabNum ON medlabfacattach (MedLabNum)";
 					Db.NonQ(command);
-					command=@"CREATE INDEX medlabattach_MedLabFacilityNum ON medlabattach (MedLabFacilityNum)";
+					command=@"CREATE INDEX medlabfacattach_MedLabResultNu ON medlabfacattach (MedLabResultNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX medlabfacattach_MedLabFacility ON medlabfacattach (MedLabFacilityNum)";
 					Db.NonQ(command);
 				}
 				#endregion medlab tables for LabCorp HL7 interface
@@ -7875,6 +7879,30 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE hl7def MODIFY LabResultImageCat NOT NULL";
 					Db.NonQ(command);
 					command=@"CREATE INDEX hl7def_LabResultImageCat ON hl7def (LabResultImageCat)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD SftpUsername varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD SftpUsername varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD SftpPassword varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD SftpPassword varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD SftpInSocket varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD SftpInSocket varchar2(255)";
 					Db.NonQ(command);
 				}
 

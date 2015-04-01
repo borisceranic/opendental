@@ -8,8 +8,6 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long MedLabFacilityNum;
-		///<summary>ZPS.2 - Facility Mnemonic.  Footnote ID or, depending on lab code settings, an intelligent lab code.</summary>
-		public string FacilityCode;
 		///<summary>ZPS.3 - Facility Name.  Medical lab location name that performed the testing.</summary>
 		public string FacilityName;
 		///<summary>ZPS.4.1 - Facility Address.</summary>

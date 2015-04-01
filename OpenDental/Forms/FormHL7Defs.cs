@@ -1,15 +1,7 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Reflection;
 using OpenDentBusiness;
-using OpenDentBusiness.HL7;
 using OpenDental.UI;
 
 namespace OpenDental{
@@ -76,10 +68,10 @@ namespace OpenDental{
 			this.grid1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.grid1.HScrollVisible = false;
-			this.grid1.Location = new System.Drawing.Point(12,38);
+			this.grid1.Location = new System.Drawing.Point(12, 38);
 			this.grid1.Name = "grid1";
 			this.grid1.ScrollValue = 0;
-			this.grid1.Size = new System.Drawing.Size(445,559);
+			this.grid1.Size = new System.Drawing.Size(470, 559);
 			this.grid1.TabIndex = 14;
 			this.grid1.Title = "Internal";
 			this.grid1.TranslationName = null;
@@ -91,10 +83,10 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.grid2.HScrollVisible = false;
-			this.grid2.Location = new System.Drawing.Point(465,38);
+			this.grid2.Location = new System.Drawing.Point(491, 38);
 			this.grid2.Name = "grid2";
 			this.grid2.ScrollValue = 0;
-			this.grid2.Size = new System.Drawing.Size(445,559);
+			this.grid2.Size = new System.Drawing.Size(470, 559);
 			this.grid2.TabIndex = 12;
 			this.grid2.Title = "Custom";
 			this.grid2.TranslationName = null;
@@ -102,7 +94,7 @@ namespace OpenDental{
 			// 
 			// butDuplicate
 			// 
-			this.butDuplicate.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butDuplicate.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butDuplicate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDuplicate.Autosize = true;
 			this.butDuplicate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -110,16 +102,16 @@ namespace OpenDental{
 			this.butDuplicate.CornerRadius = 4F;
 			this.butDuplicate.Image = global::OpenDental.Properties.Resources.Add;
 			this.butDuplicate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDuplicate.Location = new System.Drawing.Point(737,607);
+			this.butDuplicate.Location = new System.Drawing.Point(737, 607);
 			this.butDuplicate.Name = "butDuplicate";
-			this.butDuplicate.Size = new System.Drawing.Size(89,24);
+			this.butDuplicate.Size = new System.Drawing.Size(89, 24);
 			this.butDuplicate.TabIndex = 20;
 			this.butDuplicate.Text = "Duplicate";
 			this.butDuplicate.Click += new System.EventHandler(this.butDuplicate_Click);
 			// 
 			// butCopy
 			// 
-			this.butCopy.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCopy.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butCopy.Autosize = true;
 			this.butCopy.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -127,47 +119,47 @@ namespace OpenDental{
 			this.butCopy.CornerRadius = 4F;
 			this.butCopy.Image = global::OpenDental.Properties.Resources.Right;
 			this.butCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCopy.Location = new System.Drawing.Point(333,607);
+			this.butCopy.Location = new System.Drawing.Point(333, 607);
 			this.butCopy.Name = "butCopy";
-			this.butCopy.Size = new System.Drawing.Size(75,24);
+			this.butCopy.Size = new System.Drawing.Size(75, 24);
 			this.butCopy.TabIndex = 15;
 			this.butCopy.Text = "Copy";
 			this.butCopy.Click += new System.EventHandler(this.butCopy_Click);
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(836,607);
+			this.butClose.Location = new System.Drawing.Point(887, 607);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,24);
+			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
 			// butHistory
 			// 
-			this.butHistory.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butHistory.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butHistory.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.butHistory.Autosize = true;
 			this.butHistory.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butHistory.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butHistory.CornerRadius = 4F;
-			this.butHistory.Location = new System.Drawing.Point(12,8);
+			this.butHistory.Location = new System.Drawing.Point(38, 8);
 			this.butHistory.Name = "butHistory";
-			this.butHistory.Size = new System.Drawing.Size(75,24);
+			this.butHistory.Size = new System.Drawing.Size(75, 24);
 			this.butHistory.TabIndex = 21;
 			this.butHistory.Text = "History";
 			this.butHistory.Click += new System.EventHandler(this.butHistory_Click);
 			// 
 			// FormHL7Defs
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(923,641);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(974, 641);
 			this.Controls.Add(this.butHistory);
 			this.Controls.Add(this.butDuplicate);
 			this.Controls.Add(this.butCopy);
@@ -207,11 +199,11 @@ namespace OpenDental{
 			grid1.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Mode"),40);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),115);
+			col=new ODGridColumn(Lan.g(this,"In Folder / Socket"),130);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),115);
+			col=new ODGridColumn(Lan.g(this,"Out Folder / Socket"),130);
 			grid1.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Enabled"),30);
+			col=new ODGridColumn(Lan.g(this,"Enabled"),35);
 			grid1.Columns.Add(col);
 			grid1.Rows.Clear();
 			for(int i=0;i<ListInternal.Count;i++) {
@@ -222,9 +214,13 @@ namespace OpenDental{
 					row.Cells.Add(ListInternal[i].IncomingFolder);
 					row.Cells.Add(ListInternal[i].OutgoingFolder);
 				}
-				else {//TcpIp mode
-					row.Cells.Add(ListInternal[i].IncomingPort);
+				else if(ListInternal[i].ModeTx==ModeTxHL7.TcpIp) {
+					row.Cells.Add(ListInternal[i].HL7Server+":"+ListInternal[i].IncomingPort);
 					row.Cells.Add(ListInternal[i].OutgoingIpPort);
+				}
+				else {//Sftp
+					row.Cells.Add(ListInternal[i].SftpInSocket);
+					row.Cells.Add("N/A");
 				}
 				row.Cells.Add(ListInternal[i].IsEnabled?"X":"");
 				grid1.Rows.Add(row);
@@ -242,11 +238,11 @@ namespace OpenDental{
 			grid2.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Mode"),40);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"In Folder / Port"),115);
+			col=new ODGridColumn(Lan.g(this,"In Folder / Socket"),130);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Out Folder / Port"),115);
+			col=new ODGridColumn(Lan.g(this,"Out Folder / Socket"),130);
 			grid2.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Enabled"),30);
+			col=new ODGridColumn(Lan.g(this,"Enabled"),35);
 			grid2.Columns.Add(col);
 			grid2.Rows.Clear();
 			for(int i=0;i<ListCustom.Count;i++) {
@@ -257,9 +253,13 @@ namespace OpenDental{
 					row.Cells.Add(ListCustom[i].IncomingFolder);
 					row.Cells.Add(ListCustom[i].OutgoingFolder);
 				}
-				else {//TcpIp mode
-					row.Cells.Add(ListCustom[i].IncomingPort);
+				else if(ListCustom[i].ModeTx==ModeTxHL7.TcpIp) {
+					row.Cells.Add(ListCustom[i].HL7Server+":"+ListCustom[i].IncomingPort);
 					row.Cells.Add(ListCustom[i].OutgoingIpPort);
+				}
+				else {//Sftp
+					row.Cells.Add(ListCustom[i].SftpInSocket);
+					row.Cells.Add("N/A");
 				}
 				row.Cells.Add(ListCustom[i].IsEnabled?"X":"");
 				grid2.Rows.Add(row);

@@ -14,6 +14,8 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long MedLabNum;
+		///<summary>FK to provider.ProvNum.  Can be 0. Attempt to match ordering prov external IDs to internal provnum.</summary>
+		public long ProvNum;
 		#region MSH Fields
 		///<summary>MSH-2 - Sending Application.  Used to identify the LabCorp Lab System sending the results.
 		///Possible values for LabCorp (as of their v10.7 specs): '1100' - LabCorp Lab System, 'DIANON' - DIANON Systems,
@@ -27,8 +29,6 @@ namespace OpenDentBusiness {
 		#region PID Fields
 		///<summary>FK to patient.PatNum.  PID.2 - External Patient ID. LabCorp report field "Client Alt. Pat ID".</summary>
 		public long PatNum;
-		///<summary>FK to provider.ProvNum.  Can be 0. Attempt to match ordering prov external IDs to internal provnum.</summary>
-		public long ProvNum;
 		///<summary>PID.3 - Lab Assigned Patient Id.  LabCorp report field "Specimen Number".  LabCorp assigned, alpha numeric specimen number.</summary>
 		public string PatIDLab;
 		///<summary>PID.4 - Alternate Patient ID.  LabCorp report field "Patient ID".  Alternate patient ID.</summary>
@@ -43,7 +43,7 @@ namespace OpenDentBusiness {
 		///A blank component will be stored as 0 - Unknown, the result report fasting field will be blank.</summary>
 		public YN PatFasting;
 		#endregion PID Fields
-		#region OBR Fields
+		#region OBR/ORC Fields
 		///<summary>ORC.2.1 and OBR.2.1 - Unique Foreign Accession or Specimen ID.  LabCorp report field "Client Accession (ACC)".
 		///ID sent on the specimen container.</summary>
 		public string SpecimenID;
@@ -105,7 +105,7 @@ namespace OpenDentBusiness {
 		public string ParentObsID;
 		///<summary>OBR.29 - Link to Parent Order.  A reflex test will have the value from OBR.4.1 of the original order in this field for linking.</summary>
 		public string ParentObsTestID;
-		#endregion OBR Fields
+		#endregion OBR/ORC Fields
 		///<summary>NTE.3 - Comment Text, PID Level.  The NTE segment is repeatable and the Comment Text component is limited to 78 characters.  Multiple
 		///NTE segments can be used for longer comments.  All NTE segments at the PID level will be concatenated and stored in this one field.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
@@ -114,11 +114,12 @@ namespace OpenDentBusiness {
 		///NTE segments can be used for longer comments.  All NTE segments at the OBR level will be concatenated and stored in this one field.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string NoteLab;
-		///<summary>Not unique. More than one MedLab object can point to the same FileName, so deleting the MedLab object does not necessarily mean
-		///the file can also be deleted.  This is the filename of the original archived message that was processed to create this medlab object as
-		///well as associated medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a
-		///sub-folder called LabCorpHL7Msgs. If the option to store images directly in the database is chosen, this will be an empty field and there
-		///will not be the option to display the original HL7 message.</summary>
+		///<summary>Not unique. More than one MedLab object can point to the same FileName, so deleting the MedLab object does not necessarily mean the
+		///file can also be deleted.  This is the filename of the original archived message that was processed to create this medlab object as well as
+		///associated medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a sub-folder
+		///called MedLabHL7.  If a message is processed correctly it will be moved into the sub-folder MedLabHL7/Processed.  Any message that remains in
+		///the MedLabHL7 folder and aren't moved into the Processed folder failed at some point during processing.  If the option to store images directly
+		///in the database is chosen, this will be an empty field and there will not be the option to display the original HL7 message.</summary>
 		public string FileName;
 		///<summary>The PID Segment from the HL7 message used to generate this MedLab object.</summary>
 		public string OriginalPIDSegment;

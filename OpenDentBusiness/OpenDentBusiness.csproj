@@ -301,7 +301,7 @@
     <Compile Include="Crud\MedicalOrderCrud.cs" />
     <Compile Include="Crud\MedicationCrud.cs" />
     <Compile Include="Crud\MedicationPatCrud.cs" />
-    <Compile Include="Crud\MedLabAttachCrud.cs" />
+    <Compile Include="Crud\MedLabFacAttachCrud.cs" />
     <Compile Include="Crud\MedLabCrud.cs" />
     <Compile Include="Crud\MedLabFacilityCrud.cs" />
     <Compile Include="Crud\MedLabResultCrud.cs" />
@@ -484,7 +484,7 @@
     <Compile Include="Data Interface\Interventions.cs" />
     <Compile Include="Data Interface\Loincs.cs" />
     <Compile Include="Data Interface\MapAreas.cs" />
-    <Compile Include="Data Interface\MedLabAttaches.cs" />
+    <Compile Include="Data Interface\MedLabFacAttaches.cs" />
     <Compile Include="Data Interface\MedLabFacilities.cs" />
     <Compile Include="Data Interface\MedLabResults.cs" />
     <Compile Include="Data Interface\MedLabs.cs" />
@@ -606,6 +606,7 @@
     <Compile Include="HL7old\EhrADT_A01.cs" />
     <Compile Include="HL7old\EhrORU.cs" />
     <Compile Include="HL7old\EhrVXU.cs" />
+    <Compile Include="HL7\FieldParserMedLab.cs" />
     <Compile Include="HL7\MessageParserMedLab.cs" />
     <Compile Include="HL7\MedLabv2_3.cs" />
     <Compile Include="HL7\InternalHL7v2_6.cs" />
@@ -903,7 +904,7 @@
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
-    <Compile Include="TableTypes\MedLabAttach.cs" />
+    <Compile Include="TableTypes\MedLabFacAttach.cs" />
     <Compile Include="TableTypes\MedLabFacility.cs" />
     <Compile Include="TableTypes\MedLabSpecimen.cs" />
     <Compile Include="TableTypes\MedLabResult.cs" />

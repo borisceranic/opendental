@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class MedLabAttaches{
+	public class MedLabFacAttaches{
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*
 		#region CachePattern
@@ -47,6 +43,16 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
+
+		///<summary></summary>
+		public static long Insert(MedLabFacAttach medLabAttach) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				medLabAttach.MedLabFacAttachNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabAttach);
+				return medLabAttach.MedLabFacAttachNum;
+			}
+			return Crud.MedLabFacAttachCrud.Insert(medLabAttach);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
@@ -65,15 +71,6 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<MedLabAttach>(MethodBase.GetCurrentMethod(),medLabAttachNum);
 			}
 			return Crud.MedLabAttachCrud.SelectOne(medLabAttachNum);
-		}
-
-		///<summary></summary>
-		public static long Insert(MedLabAttach medLabAttach){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				medLabAttach.MedLabAttachNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabAttach);
-				return medLabAttach.MedLabAttachNum;
-			}
-			return Crud.MedLabAttachCrud.Insert(medLabAttach);
 		}
 
 		///<summary></summary>

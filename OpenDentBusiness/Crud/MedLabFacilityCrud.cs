@@ -47,7 +47,6 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				medLabFacility=new MedLabFacility();
 				medLabFacility.MedLabFacilityNum= PIn.Long  (table.Rows[i]["MedLabFacilityNum"].ToString());
-				medLabFacility.FacilityCode     = PIn.String(table.Rows[i]["FacilityCode"].ToString());
 				medLabFacility.FacilityName     = PIn.String(table.Rows[i]["FacilityName"].ToString());
 				medLabFacility.Address          = PIn.String(table.Rows[i]["Address"].ToString());
 				medLabFacility.City             = PIn.String(table.Rows[i]["City"].ToString());
@@ -97,13 +96,12 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MedLabFacilityNum,";
 			}
-			command+="FacilityCode,FacilityName,Address,City,State,Zip,Phone,DirectorTitle,DirectorLName,DirectorFName) VALUES(";
+			command+="FacilityName,Address,City,State,Zip,Phone,DirectorTitle,DirectorLName,DirectorFName) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(medLabFacility.MedLabFacilityNum)+",";
 			}
 			command+=
-				 "'"+POut.String(medLabFacility.FacilityCode)+"',"
-				+"'"+POut.String(medLabFacility.FacilityName)+"',"
+				 "'"+POut.String(medLabFacility.FacilityName)+"',"
 				+"'"+POut.String(medLabFacility.Address)+"',"
 				+"'"+POut.String(medLabFacility.City)+"',"
 				+"'"+POut.String(medLabFacility.State)+"',"
@@ -124,7 +122,6 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLabFacility in the database.</summary>
 		public static void Update(MedLabFacility medLabFacility){
 			string command="UPDATE medlabfacility SET "
-				+"FacilityCode     = '"+POut.String(medLabFacility.FacilityCode)+"', "
 				+"FacilityName     = '"+POut.String(medLabFacility.FacilityName)+"', "
 				+"Address          = '"+POut.String(medLabFacility.Address)+"', "
 				+"City             = '"+POut.String(medLabFacility.City)+"', "
@@ -141,10 +138,6 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLabFacility in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(MedLabFacility medLabFacility,MedLabFacility oldMedLabFacility){
 			string command="";
-			if(medLabFacility.FacilityCode != oldMedLabFacility.FacilityCode) {
-				if(command!=""){ command+=",";}
-				command+="FacilityCode = '"+POut.String(medLabFacility.FacilityCode)+"'";
-			}
 			if(medLabFacility.FacilityName != oldMedLabFacility.FacilityName) {
 				if(command!=""){ command+=",";}
 				command+="FacilityName = '"+POut.String(medLabFacility.FacilityName)+"'";

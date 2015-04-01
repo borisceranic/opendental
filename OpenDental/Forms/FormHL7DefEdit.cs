@@ -1,10 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
@@ -25,21 +20,11 @@ namespace OpenDental {
 
 		private void FormHL7DefEdit_Load(object sender,EventArgs e) {
 			FillGrid();
-			for(int i=0;i<Enum.GetNames(typeof(ModeTxHL7)).Length;i++) {
-				comboModeTx.Items.Add(Lan.g("enumModeTxHL7",Enum.GetName(typeof(ModeTxHL7),i).ToString()));
-				if((int)HL7DefCur.ModeTx==i){
-					comboModeTx.SelectedIndex=i;
-				}
-			}
 			textDescription.Text=HL7DefCur.Description;
 			checkInternal.Checked=HL7DefCur.IsInternal;
 			checkEnabled.Checked=HL7DefCur.IsEnabled;
 			textInternalType.Text=HL7DefCur.InternalType.ToString();
 			textInternalTypeVersion.Text=HL7DefCur.InternalTypeVersion;
-			textInPort.Text=HL7DefCur.IncomingPort;
-			textInPath.Text=HL7DefCur.IncomingFolder;
-			textOutPort.Text=HL7DefCur.OutgoingIpPort;
-			textOutPath.Text=HL7DefCur.OutgoingFolder;
 			textFieldSep.Text=HL7DefCur.FieldSeparator;
 			textRepSep.Text=HL7DefCur.RepetitionSeparator;
 			textCompSep.Text=HL7DefCur.ComponentSeparator;
@@ -52,43 +37,155 @@ namespace OpenDental {
 			checkShowAccount.Checked=HL7DefCur.ShowAccount;
 			checkShowAppts.Checked=HL7DefCur.ShowAppts;
 			checkQuadAsToothNum.Checked=HL7DefCur.IsQuadAsToothNum;
-			if(HL7DefCur.IsInternal) {
-				if(!HL7DefCur.IsEnabled) {
-					textDescription.ReadOnly=true;
-					textInPath.ReadOnly=true;
-					textOutPath.ReadOnly=true;
-					textInPort.ReadOnly=true;
-					textOutPort.ReadOnly=true;
-					butBrowseIn.Enabled=false;
-					butBrowseOut.Enabled=false;
-					textFieldSep.ReadOnly=true;
-					textRepSep.ReadOnly=true;
-					textCompSep.ReadOnly=true;
-					textSubcompSep.ReadOnly=true;
-					textEscChar.ReadOnly=true;
-					textHL7Server.ReadOnly=true;
-					textHL7ServiceName.ReadOnly=true;
-					groupShowDemographics.Enabled=false;
-					checkShowAppts.Enabled=false;
-					checkShowAccount.Enabled=false;
-					checkQuadAsToothNum.Enabled=false;
+			textSftpUsername.Text=HL7DefCur.SftpUsername;
+			textSftpPassword.Text=HL7DefCur.SftpPassword;
+			for(int i=0;i<Enum.GetNames(typeof(ModeTxHL7)).Length;i++) {
+				comboModeTx.Items.Add(Lan.g("enumModeTxHL7",Enum.GetName(typeof(ModeTxHL7),i).ToString()));
+				if((int)HL7DefCur.ModeTx==i){
+					comboModeTx.SelectedIndex=i;
 				}
-				butAdd.Enabled=false;
-				butDelete.Enabled=false;
-				labelDelete.Visible=true;
 			}
 			if(HL7DefCur.InternalType==HL7InternalType.MedLabv2_3) {
+				comboModeTx.SelectedIndex=(int)ModeTxHL7.Sftp;//just in case, for MedLabv2_3 types this should always be Sftp and isn't editable for now
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
-					comboLabResultImageCat.Items.Add(DefC.Short[(int)DefCat.ImageCats][i].ItemName);
+					comboLabImageCat.Items.Add(DefC.Short[(int)DefCat.ImageCats][i].ItemName);
 					if(DefC.Short[(int)DefCat.ImageCats][i].DefNum==HL7DefCur.LabResultImageCat) {
-						comboLabResultImageCat.SelectedIndex=i;
+						comboLabImageCat.SelectedIndex=i;
 					}
 				}
 			}
-			else {
-				comboLabResultImageCat.Visible=false;
-				labelLabImageCat.Visible=false;
+			//no need to call SetControls since the comboModeTx_SelectedIndexChanged and/or checkEnabled_CheckedChanged triggered it already
+		}
+
+		///<summary>Sets control visibility and label/textbox text based on ModeTx and internal type.  Also sets control read only property based on enabled status.</summary>
+		private void SetControls() {
+			#region Enabled/Disabled Affected Controls
+			butBrowseIn.Enabled=false;
+			butBrowseOut.Enabled=false;
+			checkQuadAsToothNum.Enabled=false;
+			checkShowAccount.Enabled=false;
+			checkShowAppts.Enabled=false;
+			comboLabImageCat.Enabled=false;
+			//comboModeTx.Enabled=false;//also part of the internal type controls, must be type other than MedLabv2_3 and enabled for comboModeTx to be enabled
+			groupDelimeters.Enabled=false;
+			groupShowDemographics.Enabled=false;
+			textDescription.ReadOnly=false;
+			textHL7Server.ReadOnly=false;
+			textHL7ServiceName.ReadOnly=false;
+			textInPathOrAddrPort.ReadOnly=false;
+			textOutPathOrAddrPort.ReadOnly=false;
+			textSftpPassword.ReadOnly=false;
+			textSftpUsername.ReadOnly=false;
+			#endregion Enabled/Disabled Affected Controls
+			#region Internal Type Affected Controls
+			butAdd.Enabled=false;
+			checkQuadAsToothNum.Visible=false;
+			checkShowAccount.Visible=false;
+			checkShowAppts.Visible=false;
+			comboModeTx.Enabled=false;
+			groupShowDemographics.Visible=false;
+			#endregion Internal Type Affected Controls
+			#region IsInternal Affected Controls
+			//butAdd.Enabled=false;//also part of internal type controls, must be type other than MedLabv2_3 and not internal for butAdd to be visible
+			butDelete.Enabled=false;
+			labelDelete.Visible=false;
+			#endregion IsInternal Affected Controls
+			#region Tx Mode Affected Controls
+			butBrowseIn.Visible=false;
+			butBrowseOut.Visible=false;
+			comboLabImageCat.Visible=false;
+			labelInAddrPortEx.Visible=false;
+			labelLabImageCat.Visible=false;
+			labelOutAddrPortEx.Visible=false;
+			labelOutPathOrAddrPort.Visible=false;
+			labelSftpPassword.Visible=false;
+			labelSftpUsername.Visible=false;
+			textOutPathOrAddrPort.Visible=false;
+			textSftpPassword.Visible=false;
+			textSftpUsername.Visible=false;
+			#endregion Tx Mode Affected Controls
+			#region Set Enabled/Disabled Controls
+			if(checkEnabled.Checked) {
+				butBrowseIn.Enabled=true;
+				butBrowseOut.Enabled=true;
+				checkQuadAsToothNum.Enabled=true;
+				checkShowAccount.Enabled=true;
+				checkShowAppts.Enabled=true;
+				comboLabImageCat.Enabled=true;
+				groupShowDemographics.Enabled=true;
+				groupDelimeters.Enabled=true;
 			}
+			else {
+				textDescription.ReadOnly=true;
+				textHL7Server.ReadOnly=true;
+				textHL7ServiceName.ReadOnly=true;
+				textInPathOrAddrPort.ReadOnly=true;
+				textOutPathOrAddrPort.ReadOnly=true;
+				textSftpPassword.ReadOnly=true;
+				textSftpUsername.ReadOnly=true;
+			}
+			#endregion Set Enabled/Disabled Controls
+			#region Set Internal Type Controls
+			if(HL7DefCur.InternalType!=HL7InternalType.MedLabv2_3) {
+				if(!HL7DefCur.IsInternal) {
+					butAdd.Enabled=true;
+				}
+				if(checkEnabled.Checked) {
+					comboModeTx.Enabled=true;
+				}
+				checkQuadAsToothNum.Visible=true;
+				checkShowAccount.Visible=true;
+				checkShowAppts.Visible=true;
+				groupShowDemographics.Visible=true;
+			}
+			#endregion Set Internal Type Controls
+			#region Set IsInternal Controls
+			if(HL7DefCur.IsInternal) {
+				labelDelete.Visible=true;
+			}
+			else {
+				butDelete.Enabled=true;
+			}
+			#endregion Set IsInternal Controls
+			#region Set Tx Mode Controls
+			switch(comboModeTx.SelectedIndex) {
+				case (int)ModeTxHL7.File:
+					butBrowseIn.Visible=true;
+					butBrowseOut.Visible=true;
+					labelInPathOrAddrPort.Text="Inbound Folder";
+					labelOutPathOrAddrPort.Text="Outbound Folder";
+					labelOutPathOrAddrPort.Visible=true;
+					textInPathOrAddrPort.Text=HL7DefCur.IncomingFolder;
+					textOutPathOrAddrPort.Text=HL7DefCur.OutgoingFolder;
+					textOutPathOrAddrPort.Visible=true;
+					break;
+				case (int)ModeTxHL7.TcpIp:
+					labelInAddrPortEx.Text="Ex: 5845";
+					labelInAddrPortEx.Visible=true;
+					labelInPathOrAddrPort.Text="Inbound Port";
+					labelOutAddrPortEx.Visible=true;
+					labelOutPathOrAddrPort.Text="Outbound IP:Port";
+					labelOutPathOrAddrPort.Visible=true;
+					textInPathOrAddrPort.Text=HL7DefCur.IncomingPort;
+					textOutPathOrAddrPort.Text=HL7DefCur.OutgoingIpPort;
+					textOutPathOrAddrPort.Visible=true;
+					break;
+				case (int)ModeTxHL7.Sftp:
+					comboLabImageCat.Visible=true;
+					labelInAddrPortEx.Text="Ex: server.address.com:12345";
+					labelInAddrPortEx.Visible=true;
+					labelInPathOrAddrPort.Text="Sftp Server Address:Port";
+					labelLabImageCat.Visible=true;
+					labelSftpPassword.Visible=true;
+					labelSftpUsername.Visible=true;
+					textInPathOrAddrPort.Text=HL7DefCur.SftpInSocket;
+					textSftpPassword.Visible=true;
+					textSftpUsername.Visible=true;
+					break;
+				default:
+					break;
+			}
+			#endregion Set Tx Mode Controls
 		}
 
 		private void FillGrid() {
@@ -148,17 +245,17 @@ namespace OpenDental {
 
 		private void butBrowseIn_Click(object sender,EventArgs e) {
 			FolderBrowserDialog dlg=new FolderBrowserDialog();
-			dlg.SelectedPath=textInPath.Text;
+			dlg.SelectedPath=textInPathOrAddrPort.Text;
 			if(dlg.ShowDialog()==DialogResult.OK) {
-				textInPath.Text=dlg.SelectedPath;
+				textInPathOrAddrPort.Text=dlg.SelectedPath;
 			}
 		}
 
 		private void butBrowseOut_Click(object sender,EventArgs e) {
 			FolderBrowserDialog dlg=new FolderBrowserDialog();
-			dlg.SelectedPath=textOutPath.Text;
+			dlg.SelectedPath=textOutPathOrAddrPort.Text;
 			if(dlg.ShowDialog()==DialogResult.OK) {
-				textOutPath.Text=dlg.SelectedPath;
+				textOutPathOrAddrPort.Text=dlg.SelectedPath;
 			}
 		}
 
@@ -184,46 +281,7 @@ namespace OpenDental {
 		}
 
 		private void checkEnabled_CheckedChanged(object sender,EventArgs e) {
-			if(checkEnabled.Checked) {
-				butBrowseIn.Enabled=true;
-				butBrowseOut.Enabled=true;
-				textInPath.ReadOnly=false;
-				textInPort.ReadOnly=false;
-				textOutPath.ReadOnly=false;
-				textOutPort.ReadOnly=false;
-				textDescription.ReadOnly=false;
-				textFieldSep.ReadOnly=false;
-				textRepSep.ReadOnly=false;
-				textCompSep.ReadOnly=false;
-				textSubcompSep.ReadOnly=false;
-				textEscChar.ReadOnly=false;
-				textHL7Server.ReadOnly=false;
-				textHL7ServiceName.ReadOnly=false;
-				groupShowDemographics.Enabled=true;
-				checkShowAppts.Enabled=true;
-				checkShowAccount.Enabled=true;
-				checkQuadAsToothNum.Enabled=true;
-			}
-			else {
-				butBrowseIn.Enabled=false;
-				butBrowseOut.Enabled=false;
-				textInPath.ReadOnly=true;
-				textInPort.ReadOnly=true;
-				textOutPath.ReadOnly=true;
-				textOutPort.ReadOnly=true;
-				textDescription.ReadOnly=true;
-				textFieldSep.ReadOnly=true;
-				textRepSep.ReadOnly=true;
-				textCompSep.ReadOnly=true;
-				textSubcompSep.ReadOnly=true;
-				textEscChar.ReadOnly=true;
-				textHL7Server.ReadOnly=true;
-				textHL7ServiceName.ReadOnly=true;
-				groupShowDemographics.Enabled=false;
-				checkShowAppts.Enabled=false;
-				checkShowAccount.Enabled=false;
-				checkQuadAsToothNum.Enabled=false;
-			}
+			SetControls();
 		}
 
 		private void checkEnabled_Click(object sender,EventArgs e) {
@@ -244,43 +302,7 @@ namespace OpenDental {
 		}
 
 		private void comboModeTx_SelectedIndexChanged(object sender,System.EventArgs e) {
-			if(comboModeTx.SelectedIndex==0) {
-				textInPort.Visible=false;
-				textOutPort.Visible=false;
-				labelInPort.Visible=false;
-				labelInPortEx.Visible=false;
-				labelOutPort.Visible=false;
-				labelOutPortEx.Visible=false;
-				textInPath.Visible=true;
-				textOutPath.Visible=true;
-				labelInPath.Visible=true;
-				butBrowseIn.Visible=true;
-				labelOutPath.Visible=true;
-				butBrowseOut.Visible=true;
-				textInPort.TabStop=false;
-				textOutPort.TabStop=false;
-				butBrowseIn.TabStop=true;
-				butBrowseOut.TabStop=true;
-			}
-			else if(comboModeTx.SelectedIndex==1) {
-				comboModeTx.SelectedIndex=1;
-				textInPort.Visible=true;
-				textOutPort.Visible=true;
-				labelInPort.Visible=true;
-				labelInPortEx.Visible=true;
-				labelOutPort.Visible=true;
-				labelOutPortEx.Visible=true;
-				textInPath.Visible=false;
-				textOutPath.Visible=false;
-				labelInPath.Visible=false;
-				butBrowseIn.Visible=false;
-				labelOutPath.Visible=false;
-				butBrowseOut.Visible=false;
-				textInPort.TabStop=true;
-				textOutPort.TabStop=true;
-				butBrowseIn.TabStop=false;
-				butBrowseOut.TabStop=false;
-			}
+			SetControls();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -328,85 +350,123 @@ namespace OpenDental {
 			}
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
-			//validation
-			if(checkEnabled.Checked) {
-				if(textHL7Server.Text=="") {
-					MsgBox.Show(this,"HL7 Server may not be blank.");
-					return;
-				}
-				if(textHL7ServiceName.Text=="") {
-					MsgBox.Show(this,"HL7 Service Name may not be blank.");
-					return;
-				}
-				if(comboModeTx.SelectedIndex==(int)ModeTxHL7.File) {
-					if(textInPath.Text=="") {
-						MsgBox.Show(this,"The path for Incoming Folder is empty.");
-						return;
+		///<summary>If all of the entered data is valid, or if the def is not enabled, returns true.  Otherwise false.</summary>
+		private bool ValidateData() {
+			if(!checkEnabled.Checked) {
+				return true;
+			}
+			if(textHL7Server.Text=="") {
+				MsgBox.Show(this,"HL7 Server may not be blank.");
+				return false;
+			}
+			if(textHL7ServiceName.Text=="") {
+				MsgBox.Show(this,"HL7 Service Name may not be blank.");
+				return false;
+			}
+			switch(comboModeTx.SelectedIndex) {
+				case (int)ModeTxHL7.File:
+					if(textInPathOrAddrPort.Text=="") {
+						MsgBox.Show(this,"The path for Inbound Folder is empty.");
+						return false;
 					}
-					if(textOutPath.Text=="") {
-						MsgBox.Show(this,"The path for Outgoing Folder is empty.");
-						return;
+					if(textOutPathOrAddrPort.Text=="") {
+						MsgBox.Show(this,"The path for Outbound Folder is empty.");
+						return false;
 					}
 					//paths are checked when service starts, not when closing form, since paths are local paths but only exist on the ODHL7 server
-				}
-				else {//TcpIp mode
-					if(textInPort.Text=="") {
-						MsgBox.Show(this,"The Incoming Port is empty.");
-						return;
+					break;
+				case (int)ModeTxHL7.TcpIp:
+					if(textInPathOrAddrPort.Text=="") {
+						MsgBox.Show(this,"The Inbound Port is empty.");
+						return false;
 					}
-					if(textOutPort.Text=="") {
-						MsgBox.Show(this,"The Outgoing IP:Port is empty.");
-						return;
+					if(textOutPathOrAddrPort.Text=="") {
+						MsgBox.Show(this,"The Outbound IP:Port is empty.");
+						return false;
 					}
-					string[] strIpPort=textOutPort.Text.Split(':');
+					string[] strIpPort=textOutPathOrAddrPort.Text.Split(':');
 					if(strIpPort.Length!=2) {//there isn't a ':' in the IpPort field
-						MsgBox.Show(this,"The Outgoing IP:Port field requires an IP address, followed by a colon, followed by a port number.");
-						return;
+						MsgBox.Show(this,"The Outbound IP:Port field requires an IP address, followed by a colon, followed by a port number.");
+						return false;
 					}
 					try {
 						System.Net.IPAddress.Parse(strIpPort[0]);
 					}
 					catch {
-						MsgBox.Show(this,"The Outgoing IP address is invalid.");
-						return;
+						MsgBox.Show(this,"The Outbound IP address is invalid.");
+						return false;
 					}
 					try {
 						int.Parse(strIpPort[1]);
 					}
 					catch {
-						MsgBox.Show(this,"The Outgoing port must be a valid integer.");
-						return;
+						MsgBox.Show(this,"The Outbound Port must be a valid integer.");
+						return false;
 					}
 					try {
-						int.Parse(textInPort.Text.ToString());
+						int.Parse(textInPathOrAddrPort.Text.ToString());
 					}
 					catch {
-						MsgBox.Show(this,"The Incoming port must be a valid integer.");
-						return;
+						MsgBox.Show(this,"The Inbound Port must be a valid integer.");
+						return false;
 					}
-				}
+					break;
+				case (int)ModeTxHL7.Sftp:
+					if(textInPathOrAddrPort.Text=="") {
+						MsgBox.Show(this,"The Sftp Server Address:Port field is empty.");
+						return false;
+					}
+					if(textSftpUsername.Text=="") {
+						MsgBox.Show(this,"The Sftp Username field is empty.");
+						return false;
+					}
+					if(textSftpPassword.Text=="") {
+						MsgBox.Show(this,"The Sftp Password field is empty.");
+						return false;
+					}
+					//NOTE: May not always require a port, so this test may not be necessary
+					string[] strAddressPort=textInPathOrAddrPort.Text.Split(':');
+					if(strAddressPort.Length>=2) {
+						try {
+							int.Parse(strAddressPort[1]);
+						}
+						catch(Exception ex) {
+							MsgBox.Show(this,"The Sftp Server Port must be a valid integer.");
+							return false;
+						}
+					}
+					break;
+				default:
+					break;
 			}
 			if(textFieldSep.Text.Length!=1) {
 				MsgBox.Show(this,"The field separator must be a single character.");
-				return;
+				return false;
 			}
 			if(textRepSep.Text.Length!=1) {
 				MsgBox.Show(this,"The repetition separator must be a single character.");
-				return;
+				return false;
 			}
 			if(textCompSep.Text.Length!=1) {
 				MsgBox.Show(this,"The component separator must be a single character.");
-				return;
+				return false;
 			}
 			if(textSubcompSep.Text.Length!=1) {
 				MsgBox.Show(this,"The subcomponent separator must be a single character.");
-				return;
+				return false;
 			}
 			if(textEscChar.Text.Length!=1) {
 				MsgBox.Show(this,"The escape character must be a single character.");
+				return false;
+			}
+			return true;
+		}
+
+		private void butOK_Click(object sender,EventArgs e) {
+			if(!ValidateData()) {
 				return;
 			}
+			#region Set Values
 			HL7DefCur.HL7Server=textHL7Server.Text;
 			HL7DefCur.HL7ServiceName=textHL7ServiceName.Text;
 			HL7DefCur.IsInternal=checkInternal.Checked;
@@ -436,22 +496,32 @@ namespace OpenDental {
 			HL7DefCur.ShowAccount=checkShowAccount.Checked;
 			HL7DefCur.ShowAppts=checkShowAppts.Checked;
 			HL7DefCur.IsQuadAsToothNum=checkQuadAsToothNum.Checked;
+			//clear all fields in order to save the relevant data in the proper fields and clear out data that may not be relevant for the Tx mode
+			HL7DefCur.IncomingFolder="";
+			HL7DefCur.OutgoingFolder="";
+			HL7DefCur.IncomingPort="";
+			HL7DefCur.OutgoingIpPort="";
+			HL7DefCur.SftpInSocket="";
+			HL7DefCur.SftpUsername="";
+			HL7DefCur.SftpPassword="";
 			if(comboModeTx.SelectedIndex==(int)ModeTxHL7.File) {
-				HL7DefCur.IncomingFolder=textInPath.Text;
-				HL7DefCur.OutgoingFolder=textOutPath.Text;
-				HL7DefCur.IncomingPort="";
-				HL7DefCur.OutgoingIpPort="";
+				HL7DefCur.IncomingFolder=textInPathOrAddrPort.Text;
+				HL7DefCur.OutgoingFolder=textOutPathOrAddrPort.Text;
 			}
-			else {//TcpIp mode
-				HL7DefCur.IncomingPort=textInPort.Text;
-				HL7DefCur.OutgoingIpPort=textOutPort.Text;
-				HL7DefCur.IncomingFolder="";
-				HL7DefCur.OutgoingFolder="";
+			else if(comboModeTx.SelectedIndex==(int)ModeTxHL7.TcpIp) {
+				HL7DefCur.IncomingPort=textInPathOrAddrPort.Text;
+				HL7DefCur.OutgoingIpPort=textOutPathOrAddrPort.Text;
 			}
-			if(comboLabResultImageCat.SelectedIndex>=0) {
-				HL7DefCur.LabResultImageCat=DefC.Short[(int)DefCat.ImageCats][comboLabResultImageCat.SelectedIndex].DefNum;
+			else if(comboModeTx.SelectedIndex==(int)ModeTxHL7.Sftp) {
+				HL7DefCur.SftpInSocket=textInPathOrAddrPort.Text;
+				HL7DefCur.SftpUsername=textSftpUsername.Text.Trim();
+				HL7DefCur.SftpPassword=textSftpPassword.Text.Trim();
 			}
-			//save
+			if(comboLabImageCat.SelectedIndex>=0) {
+				HL7DefCur.LabResultImageCat=DefC.Short[(int)DefCat.ImageCats][comboLabImageCat.SelectedIndex].DefNum;
+			}
+			#endregion Set Values
+			#region Save
 			if(checkEnabled.Checked) {
 				HL7DefCur.IsEnabled=true;
 				if(checkInternal.Checked){
@@ -489,6 +559,7 @@ namespace OpenDental {
 					HL7Defs.Update(HL7DefCur);
 				}
 			}
+			#endregion Save
 			DialogResult=DialogResult.OK;
 		}
 

@@ -47,10 +47,10 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				medLab=new MedLab();
 				medLab.MedLabNum          = PIn.Long  (table.Rows[i]["MedLabNum"].ToString());
+				medLab.ProvNum            = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				medLab.SendingApp         = PIn.String(table.Rows[i]["SendingApp"].ToString());
 				medLab.SendingFacility    = PIn.String(table.Rows[i]["SendingFacility"].ToString());
 				medLab.PatNum             = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				medLab.ProvNum            = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				medLab.PatIDLab           = PIn.String(table.Rows[i]["PatIDLab"].ToString());
 				medLab.PatIDAlt           = PIn.String(table.Rows[i]["PatIDAlt"].ToString());
 				medLab.PatAge             = PIn.String(table.Rows[i]["PatAge"].ToString());
@@ -137,15 +137,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MedLabNum,";
 			}
-			command+="SendingApp,SendingFacility,PatNum,ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
+			command+="ProvNum,SendingApp,SendingFacility,PatNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(medLab.MedLabNum)+",";
 			}
 			command+=
-				 "'"+POut.String(medLab.SendingApp)+"',"
+				     POut.Long  (medLab.ProvNum)+","
+				+"'"+POut.String(medLab.SendingApp)+"',"
 				+"'"+POut.String(medLab.SendingFacility)+"',"
 				+    POut.Long  (medLab.PatNum)+","
-				+    POut.Long  (medLab.ProvNum)+","
 				+"'"+POut.String(medLab.PatIDLab)+"',"
 				+"'"+POut.String(medLab.PatIDAlt)+"',"
 				+"'"+POut.String(medLab.PatAge)+"',"
@@ -194,10 +194,10 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLab in the database.</summary>
 		public static void Update(MedLab medLab){
 			string command="UPDATE medlab SET "
+				+"ProvNum            =  "+POut.Long  (medLab.ProvNum)+", "
 				+"SendingApp         = '"+POut.String(medLab.SendingApp)+"', "
 				+"SendingFacility    = '"+POut.String(medLab.SendingFacility)+"', "
 				+"PatNum             =  "+POut.Long  (medLab.PatNum)+", "
-				+"ProvNum            =  "+POut.Long  (medLab.ProvNum)+", "
 				+"PatIDLab           = '"+POut.String(medLab.PatIDLab)+"', "
 				+"PatIDAlt           = '"+POut.String(medLab.PatIDAlt)+"', "
 				+"PatAge             = '"+POut.String(medLab.PatAge)+"', "
@@ -241,6 +241,10 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MedLab in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(MedLab medLab,MedLab oldMedLab){
 			string command="";
+			if(medLab.ProvNum != oldMedLab.ProvNum) {
+				if(command!=""){ command+=",";}
+				command+="ProvNum = "+POut.Long(medLab.ProvNum)+"";
+			}
 			if(medLab.SendingApp != oldMedLab.SendingApp) {
 				if(command!=""){ command+=",";}
 				command+="SendingApp = '"+POut.String(medLab.SendingApp)+"'";
@@ -252,10 +256,6 @@ namespace OpenDentBusiness.Crud{
 			if(medLab.PatNum != oldMedLab.PatNum) {
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(medLab.PatNum)+"";
-			}
-			if(medLab.ProvNum != oldMedLab.ProvNum) {
-				if(command!=""){ command+=",";}
-				command+="ProvNum = "+POut.Long(medLab.ProvNum)+"";
 			}
 			if(medLab.PatIDLab != oldMedLab.PatIDLab) {
 				if(command!=""){ command+=",";}
