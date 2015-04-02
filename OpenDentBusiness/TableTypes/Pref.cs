@@ -236,6 +236,8 @@ namespace OpenDentBusiness {
 		FuchsListSelectionColor,
 		FuchsOptionsOn,
 		GenericEClaimsForm,
+		///<summary>Has no UI.  Used to validate help support.  See the OpenDentalHelp project for more information on HelpKey.</summary>
+		HelpKey,
 		HL7FolderOut,
 		HL7FolderIn,
 		///<summary>Used by HQ. Projected onto wall displayed on top of FormMapHQ</summary>

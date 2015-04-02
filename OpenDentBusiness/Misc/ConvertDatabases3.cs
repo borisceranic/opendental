@@ -7905,6 +7905,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE hl7def ADD SftpInSocket varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('HelpKey','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'HelpKey','')";
+					Db.NonQ(command);
+				}
+
+
+
+
 
 				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
