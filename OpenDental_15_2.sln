@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xCrudGenerator", "xCrudGene
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2773A017-BC40-4046-A10D-3C22B2B33736}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDentalHelp", "..\..\Shared Projects Subversion\OpenDentalHelp\head\OpenDentalHelp\OpenDentalHelp.csproj", "{98B2999C-8A9F-4795-B452-7F6231ED56B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -494,6 +496,21 @@ Global
 		{76227E95-B261-4B6A-A97C-3764E7EDDF97}.Release|Mixed Platforms.Build.0 = Release|x86
 		{76227E95-B261-4B6A-A97C-3764E7EDDF97}.Release|x86.ActiveCfg = Release|x86
 		{76227E95-B261-4B6A-A97C-3764E7EDDF97}.Release|x86.Build.0 = Release|x86
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.LinuxRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.LinuxRelease|Any CPU.Build.0 = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.LinuxRelease|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.LinuxRelease|Mixed Platforms.Build.0 = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.LinuxRelease|x86.ActiveCfg = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
