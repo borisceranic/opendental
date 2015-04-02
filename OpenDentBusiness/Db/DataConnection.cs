@@ -27,9 +27,7 @@ namespace OpenDentBusiness {
 	}
 
 	///<summary></summary>
-	public class DataConnection {//
-		///<summary>The value here is now reliable for public use.  FormChooseDatabase.DBtype, which used to be used for the client is now gone.</summary>
-		public static DatabaseType DBtype;
+	public class DataConnection {
 		///<summary>This data adapter is used for all queries to the database.</summary>
 		private MySqlDataAdapter da;
 		///<summary>Data adapter when 'isOracle' is set to true.</summary>
@@ -48,20 +46,167 @@ namespace OpenDentBusiness {
 		public OracleCommand cmdOr;
 		///<summary>After inserting a row, this variable will contain the primary key for the newly inserted row.  This can frequently save an additional query to the database.</summary>
 		public long InsertID;
-		private static string Database;
-		private static string ServerName;
-		private static string MysqlUser;
-		private static string MysqlPass;
+		private static string _database;
+		private static string _serverName;
+		private static string _mysqlUser;
+		private static string _mysqlPass;
 		//User with lower privileges:
-		private static string MysqlUserLow;
-		private static string MysqlPassLow;
+		private static string _mysqlUserLow;
+		private static string _mysqlPassLow;
 		///<summary>If this is used, then none of the fields above will be set.</summary>
-		private static string ConnectionString="";
+		private static string _connectionString="";
+		///<summary>The value here is now reliable for public use.  FormChooseDatabase.DBtype, which used to be used for the client is now gone.</summary>
+		private static DatabaseType _dBtype;
+		//ThreadStatic Variables are thread specific and are thread safe thus do not require locking.
+		[ThreadStatic]
+		private static string _databaseT;
+		[ThreadStatic]
+		private static string _serverNameT;
+		[ThreadStatic]
+		private static string _mysqlUserT;
+		[ThreadStatic]
+		private static string _mysqlPassT;
+		[ThreadStatic]
+		private static string _mysqlUserLowT;
+		[ThreadStatic]
+		private static string _mysqlPassLowT;
+		[ThreadStatic]
+		///<summary>If this is used, then none of the fields above will be set.</summary>
+		private static string _connectionStringT="";
+		[ThreadStatic]
+		private static DatabaseType _dBtypeT;
 #if DEBUG
 		///<summary>milliseconds.</summary>
 		private static int delayForTesting=0;
 		private static bool logDebugQueries=false;
 #endif
+
+		#region Properties
+
+		///<summary>Only call from the main thread.  The value here is now reliable for public use.  FormChooseDatabase.DBtype, which used to be used for the client is now gone.</summary>
+		public static DatabaseType DBtype {
+			get {
+				return _dBtypeT;
+			}
+			set {
+				_dBtype=value;
+				_dBtypeT=value;
+			}
+		}
+
+		//=====================================================================================================================================================
+		// The following properties MUST first check if the thread static variables are null or empty which will cause the non thread safe static variables
+		// to be returned.  This is because the main thread of Open Dental is written in a way that SetDb is only called once (on startup) and then
+		// the static connection settings are used afterwards for subsequent connections / database calls.
+		// Individual threads that need to access different databases (CEMT) need to call SetDbT before making db calls.
+		//=====================================================================================================================================================
+		
+		private static string Database {
+			get {
+				if(String.IsNullOrEmpty(_databaseT)) {
+					return _database;
+				}
+				else {
+					return _databaseT;
+				}
+			}
+			set {
+				_database=value;
+				_databaseT=value;
+			}
+		}
+
+		private static string ServerName {
+			get {
+				if(String.IsNullOrEmpty(_serverNameT)) {
+					return _serverName;
+				}
+				else {
+					return _serverNameT;
+				}
+			}
+			set {
+				_serverName=value;
+				_serverNameT=value;
+			}
+		}
+
+		private static string MysqlUser {
+			get {
+				if(String.IsNullOrEmpty(_mysqlUserT)) {
+					return _mysqlUser;
+				}
+				else {
+					return _mysqlUserT;
+				}
+			}
+			set {
+				_mysqlUser=value;
+				_mysqlUserT=value;
+			}
+		}
+
+		private static string MysqlPass {
+			get {
+				if(String.IsNullOrEmpty(_mysqlPassT)) {
+					return _mysqlPass;
+				}
+				else {
+					return _mysqlPassT;
+				}
+			}
+			set {
+				_mysqlPass=value;
+				_mysqlPassT=value;
+			}
+		}
+
+		private static string MysqlUserLow {
+			get {
+				if(String.IsNullOrEmpty(_mysqlUserLowT)) {
+					return _mysqlUserLow;
+				}
+				else {
+					return _mysqlUserLowT;
+				}
+			}
+			set {
+				_mysqlUserLow=value;
+				_mysqlUserLowT=value;
+			}
+		}
+
+		private static string MysqlPassLow {
+			get {
+				if(String.IsNullOrEmpty(_mysqlPassLowT)) {
+					return _mysqlPassLow;
+				}
+				else {
+					return _mysqlPassLowT;
+				}
+			}
+			set {
+				_mysqlPassLow=value;
+				_mysqlPassLowT=value;
+			}
+		}
+
+		private static string ConnectionString {
+			get {
+				if(String.IsNullOrEmpty(_connectionStringT)) {
+					return _connectionString;
+				}
+				else {
+					return _connectionStringT;
+				}
+			}
+			set {
+				_connectionString=value;
+				_connectionStringT=value;
+			}
+		}
+
+		#endregion
 
 		//For queries that do not use this flag, all queries are split into single commands. For those SQL commands which
 		//are a single command but contain multiple semi-colons, then this string should be set to false before the 
@@ -279,6 +424,36 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public void SetDb(string connectStr,string connectStrLow,DatabaseType dbtype) {
 			SetDb(connectStr,connectStrLow,dbtype,false);
+		}
+
+		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  Should be called before connecting to a database from a thread outside of the main thread.</summary>
+		public void SetDbT(string server,string db,string user,string password,string userLow,string passLow,DatabaseType dbtype) {
+			_dBtypeT=dbtype;
+			string connectStr=BuildSimpleConnectionString(server,db,user,password);
+			string connectStrLow="";
+			if(userLow!="") {
+				connectStrLow=BuildSimpleConnectionString(server,db,userLow,passLow);
+			}
+			TestConnection(connectStr,connectStrLow,dbtype,false);
+			//connection strings must be valid, so OK to set permanently
+			_databaseT=db;
+			_serverNameT=server;//yes, it includes the port
+			_mysqlUserT=user;
+			_mysqlPassT=password;
+			_mysqlUserLowT=userLow;
+			_mysqlPassLowT=passLow;
+		}
+
+		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  Should be called before connecting to a database from a thread outside of the main thread.</summary>
+		public void SetDbT(string connectStr,string connectStrLow,DatabaseType dbtype,bool skipValidation) {
+			TestConnection(connectStr,connectStrLow,dbtype,skipValidation);
+			//connection string must be valid, so OK to set permanently
+			_connectionStringT=connectStr;
+		}
+
+		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  Should be called before connecting to a database from a thread outside of the main thread.</summary>
+		public void SetDbT(string connectStr,string connectStrLow,DatabaseType dbtype) {
+			SetDbT(connectStr,connectStrLow,dbtype,false);
 		}
 
 		private void TestConnection(string connectStr,string connectStrLow,DatabaseType dbtype,bool skipValidation) {
