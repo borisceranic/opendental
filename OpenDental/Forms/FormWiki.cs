@@ -40,7 +40,12 @@ namespace OpenDental {
 			LayoutToolBar();
 			historyNav=new List<string>();
 			historyNavBack=0;//This is the pointer that keeps track of our position in historyNav.  0 means this is the newest page in history, a positive number is the number of pages before the newest page.
+			if(Plugins.HookMethod(this,"FormWiki.FormWiki_Load_beforeHomePageLoad")) {
+				goto HookSkipHomePageLoad;
+			}
 			LoadWikiPage("Home");
+			HookSkipHomePageLoad: { }
+			Plugins.HookAddCode(this,"FormWiki.FormWiki_Load_end");
 		}
 
 		/// <summary>Because FormWikiEdit is no longer modal, this is necessary to be able to tell FormWiki to refresh when saving an edited page.</summary>

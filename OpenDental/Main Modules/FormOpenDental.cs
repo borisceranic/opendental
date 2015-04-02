@@ -5543,6 +5543,9 @@ namespace OpenDental{
 		}
 
 		private void menuItemWiki_Click(object sender,EventArgs e) {
+			if(Plugins.HookMethod(this,"FormOpenDental.menuItemWiki_Click")) {
+				return;
+			}
 			if(FormMyWiki==null || FormMyWiki.IsDisposed) {
 				FormMyWiki=new FormWiki();
 			}
