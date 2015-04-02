@@ -2420,7 +2420,20 @@ namespace OpenDental {
 			if(e.Button!=MouseButtons.Left) {
 				return;//Dragging can only happen with the left mouse button.
 			}
-			TimeSpan timeSpanDrag=(TimeSpan)(DateTime.Now-TimeMouseMoved);
+			if(TimeMouseMoved.Year==1) {//No valid mouse movements occurred after the mouse down event and before the mouse up event.
+				//If the user moused down, then immediately moused up or moved slightly then moused up on the original source node before moving elsewhere.
+				return;//Do not move the document.
+				//This fixed a bug where users were able to accidentally move images while they were loading.  The user would mouse down, then mouse up
+				//(to select the image), then start moving the mouse to do something else and the image would unexpectedly move to another image category.
+				//NOTE: For some reason, if the user tries to move an image while it is loading, then the move action will be ignored, because the 
+				//mouse events fire out of order (mouse down, then mouse up, then mouse move).  However, this seems like a minor issue, because
+				//users typically intuitively know that certain commands are ignored while loading is in progress.  If this situation occurs to a user,
+				//they will probably know that they need to try again.  The second time they try to move the image it will move, because once the image
+				//is loaded, clicking on the image will not cause it to reload.  Also, the move will work the first time if the mouse up event happens
+				//after loading is completed.  Therefore, this minor issue can only happen on very slow computers or very large images.
+				//To fix the minor issue in the future, we might consider somehow forcing the mouse events to fire in order, even when images are loading.
+			}
+			//TimeSpan timeSpanDrag=(TimeSpan)(DateTime.Now-TimeMouseMoved);
 			//if(timeSpanDrag.Milliseconds < 200) { //js 3/31/2012. Was 250
 			//	return;//Too short of a drag and drop.  Probably human error
 			//}
