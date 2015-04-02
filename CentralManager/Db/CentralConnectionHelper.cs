@@ -45,13 +45,13 @@ namespace CentralManager {
 				MessageBox.Show("Either a database or a Middle Tier URI must be specified in the connection.");
 				return false;
 			}
-			DataConnection.DBtype=DatabaseType.MySql;
-			OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
 			try {
 				if(RemotingClient.ServerURI!="") {
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
 				}
 				else {
+					DataConnection.DBtype=DatabaseType.MySql;
+					OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
 					dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
 					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
 				}
