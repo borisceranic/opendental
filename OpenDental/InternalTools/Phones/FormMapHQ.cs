@@ -81,7 +81,7 @@ namespace OpenDental {
 					}
 					//we got this far so we found a corresponding cubicle for this phone entry
 					room.EmployeeNum=phone.EmployeeNum;
-					room.EmployeeName=phone.EmployeeName;					
+					room.EmployeeName=phone.EmployeeName;
 					if(phone.DateTimeStart.Date==DateTime.Today) {
 						TimeSpan span=DateTime.Now-phone.DateTimeStart+_timeDelta;
 						DateTime timeOfDay=DateTime.Today+span;
@@ -90,7 +90,7 @@ namespace OpenDental {
 					else {
 						room.Elapsed="";
 					}
-					string status=phone.ClockStatus.ToString();
+					string status=ConvertClockStatusToString(phone.ClockStatus);
 					//Check if the user is logged in.
 					if(phone.ClockStatus==ClockStatusEnum.None
 						|| phone.ClockStatus==ClockStatusEnum.Home) {
@@ -130,6 +130,36 @@ namespace OpenDental {
 			}
 			catch {
 				//something failed unexpectedly
+			}
+		}
+
+		private static string ConvertClockStatusToString(ClockStatusEnum status) {
+			switch(status) {
+				case ClockStatusEnum.Lunch:
+					return "Lunch";
+				case ClockStatusEnum.Break:
+					return "Break";
+				case ClockStatusEnum.Available:
+					return "Avail";
+				case ClockStatusEnum.WrapUp:
+					return "WrapU";
+				case ClockStatusEnum.Training:
+					return "Train";
+				case ClockStatusEnum.TeamAssist:
+					return "TmAst";
+				case ClockStatusEnum.OfflineAssist:
+					return "OffAst";
+				case ClockStatusEnum.Backup:
+					return "BackU";
+				case ClockStatusEnum.Unavailable:
+					return "UnAv";
+				case ClockStatusEnum.NeedsHelp:
+					return "Help";
+				case ClockStatusEnum.Off:
+				case ClockStatusEnum.None:
+				case ClockStatusEnum.Home:
+				default:
+					return status.ToString();
 			}
 		}
 

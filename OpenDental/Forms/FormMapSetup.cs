@@ -260,6 +260,7 @@ namespace OpenDental {
 			FormEP.MapItem.Height=6;
 			FormEP.MapItem.ItemType=MapItemType.Room;
 			FormEP.MapItem.Extension=employee.PhoneExt;
+			FormEP.MapItem.Description="";
 			if(FormEP.ShowDialog(this)!=DialogResult.OK) {
 				return;
 			}
