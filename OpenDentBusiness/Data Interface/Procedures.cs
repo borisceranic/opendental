@@ -1565,20 +1565,31 @@ namespace OpenDentBusiness {
 			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
 			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
 			List <Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
-			for(int i=0;i<labFeesForProc.Count;i++) {
-				Procedure labFeeNew=labFeesForProc[i];
-				Procedure labFeeOld=labFeeNew.Copy();
-				labFeeNew.AptNum=proc.AptNum;
-				labFeeNew.CanadianTypeCodes=proc.CanadianTypeCodes;
-				labFeeNew.ClinicNum=proc.ClinicNum;
-				labFeeNew.DateEntryC=proc.DateEntryC;
-				labFeeNew.PlaceService=proc.PlaceService;
-				labFeeNew.ProcDate=proc.ProcDate;
-				labFeeNew.ProcStatus=ProcStat.C;
-				labFeeNew.ProvNum=proc.ProvNum;
-				labFeeNew.SiteNum=proc.SiteNum;
-				labFeeNew.UserNum=proc.UserNum;
-				Procedures.Update(labFeeNew,labFeeOld);
+			if(proc.ProcNumLab==0) {//Regular procedure, not a lab.
+				for(int i=0;i<labFeesForProc.Count;i++) {
+					Procedure labFeeNew=labFeesForProc[i];
+					Procedure labFeeOld=labFeeNew.Copy();
+					labFeeNew.AptNum=proc.AptNum;
+					labFeeNew.CanadianTypeCodes=proc.CanadianTypeCodes;
+					labFeeNew.ClinicNum=proc.ClinicNum;
+					labFeeNew.DateEntryC=proc.DateEntryC;
+					labFeeNew.PlaceService=proc.PlaceService;
+					labFeeNew.ProcDate=proc.ProcDate;
+					labFeeNew.ProcStatus=ProcStat.C;
+					labFeeNew.ProvNum=proc.ProvNum;
+					labFeeNew.SiteNum=proc.SiteNum;
+					labFeeNew.UserNum=proc.UserNum;
+					Procedures.Update(labFeeNew,labFeeOld);
+				}
+			}
+			else {//Lab fee.  Set complete, set the parent procedure as well as any other lab fees complete.
+				command="SELECT * FROM procedurelog WHERE ProcNum="+proc.ProcNumLab+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
+				Procedure procParent=Crud.ProcedureCrud.SelectOne(command);
+				SetCanadianLabFeesCompleteForProc(procParent);
+				Procedure parentProcNew=procParent;
+				Procedure parentProcOld=procParent.Copy();
+				parentProcNew.ProcStatus=ProcStat.C;
+				Procedures.Update(parentProcNew,parentProcOld);
 			}
 		}
 
@@ -1590,11 +1601,22 @@ namespace OpenDentBusiness {
 			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
 			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
 			List<Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
-			for(int i=0;i<labFeesForProc.Count;i++) {
-				Procedure labFeeNew=labFeesForProc[i];
-				Procedure labFeeOld=labFeeNew.Copy();
-				labFeeNew.ProcStatus=proc.ProcStatus;
-				Procedures.Update(labFeeNew,labFeeOld);
+			if(proc.ProcNumLab==0) {//Regular procedure, not a lab.
+				for(int i=0;i<labFeesForProc.Count;i++) {
+					Procedure labFeeNew=labFeesForProc[i];
+					Procedure labFeeOld=labFeeNew.Copy();
+					labFeeNew.ProcStatus=proc.ProcStatus;
+					Procedures.Update(labFeeNew,labFeeOld);
+				}
+			}
+			else {//Lab fee.  If lab is set back to any status other than complete, set the parent procedure as well as any other lab fees back to that status.
+				command="SELECT * FROM procedurelog WHERE ProcNum="+proc.ProcNumLab+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
+				Procedure procParent=Crud.ProcedureCrud.SelectOne(command);
+				Procedure parentProcNew=procParent;
+				Procedure parentProcOld=procParent.Copy();
+				parentProcNew.ProcStatus=proc.ProcStatus;
+				SetCanadianLabFeesStatusForProc(parentProcNew);
+				Procedures.Update(parentProcNew,parentProcOld);
 			}
 		}
 

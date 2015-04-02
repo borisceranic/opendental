@@ -4000,7 +4000,7 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod(HasBreakDown=true)]
-		public static string ProcedurelogTpAttachedToCompleteLabFeesCanada(bool verbose,bool isCheck) {
+		public static string ProcedurelogNotComplAttachedToComplLabCanada(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
@@ -4013,7 +4013,7 @@ namespace OpenDentBusiness {
 				+"INNER JOIN procedurecode pc ON pc.CodeNum=proc.CodeNum "
 				+"INNER JOIN procedurelog lab ON proc.ProcNum=lab.ProcNumLab AND lab.ProcStatus="+POut.Long((int)ProcStat.C)+" "
 				+"INNER JOIN procedurecode pclab ON pclab.CodeNum=lab.CodeNum "
-				+"WHERE proc.ProcStatus="+POut.Long((int)ProcStat.TP);
+				+"WHERE proc.ProcStatus!="+POut.Long((int)ProcStat.C);
 			table=Db.GetTable(command);
 			if(table.Rows.Count==0 && !verbose) {
 				return log;
@@ -4027,7 +4027,7 @@ namespace OpenDentBusiness {
 				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
 				for(int i=0;i<table.Rows.Count;i++) {
 					log+=Lans.g("FormDatabaseMaintenance","Completed lab fee")+" "+table.Rows[i]["ProcCodeLab"].ToString()+" "
-							+Lans.g("FormDatabaseMaintenance","is attached to TP procedure")+" "+table.Rows[i]["ProcCode"].ToString()+" "
+							+Lans.g("FormDatabaseMaintenance","is attached to non-complete procedure")+" "+table.Rows[i]["ProcCode"].ToString()+" "
 							+Lans.g("FormDatabaseMaintenance","on date")+" "+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()+". "
 							+Lans.g("FormDatabaseMaintenance","PatNum: ")+table.Rows[i]["PatNum"].ToString()+"\r\n";
 				}
