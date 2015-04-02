@@ -55,7 +55,7 @@ namespace OpenDental {
 			}
 		}
 
-		private int _borderThickness=6;
+		private int _borderThickness=4;
 		[Category("Appearance")]
 		[Description("Thickness of the border drawn around the control")]
 		public int BorderThickness {
@@ -265,34 +265,46 @@ namespace OpenDental {
 					FitText(this.Text,Font,brushText,new RectangleF(rcOuter.Left,rcOuter.Top+2,rcOuter.Width,rcOuter.Height),stringFormat,e.Graphics);
 					return;
 				}
-				//4 rows of data
-				int rowsLowestCommonDenominator=9;
+				//3 rows of data
+				int rowsLowestCommonDenominator=6;
 				float typicalRowHeight=rcOuter.Height/(float)rowsLowestCommonDenominator;
 				//row 1 - employee name
-				FitText(EmployeeName,FontHeader,brushText,new RectangleF(rcOuter.X,rcOuter.Y,rcOuter.Width,typicalRowHeight*3),stringFormat,e.Graphics);
-				float yPosBottom=typicalRowHeight*3; //row 1 is 3/9 tall
-				//row 2 (left) - employee extension
-				FitText(Extension,Font,brushText,new RectangleF(rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width/2,typicalRowHeight*2),stringFormat,e.Graphics);
-				//row 2 (right) - phone icon
+				float rowHeight=typicalRowHeight*2; //row 1 is 2/6 tall
+				FitText(EmployeeName,FontHeader,brushText,new RectangleF(rcOuter.X,rcOuter.Y,rcOuter.Width,rowHeight),stringFormat,e.Graphics);
+				float yPosBottom=rowHeight;
+				//e.Graphics.DrawRectangle(Pens.LimeGreen,rcOuter.X,rcOuter.Y,rcOuter.Width,rowHeight);
+				//row 2 - elapsed time
+				rowHeight=typicalRowHeight*2; //row 2 is 2/6 tall
+				FitText(Elapsed,Font,brushText,new RectangleF(rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width,rowHeight),stringFormat,e.Graphics);
+				//e.Graphics.DrawRectangle(Pens.Red,rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width,rowHeight);
+				yPosBottom+=rowHeight;
+				//row 3 (left) - employee status
+				rowHeight=typicalRowHeight*2; //row 3 is 2/6 tall
+				//left-most 3/4 of row 3 is the status text
+				FitText(Status,Font,brushText,new RectangleF(rcOuter.X-2,rcOuter.Y+yPosBottom+1,((rcOuter.Width/4)*3)+4,rowHeight),stringFormat,e.Graphics);
+				//row 3 (right) - phone icon				
 				if(PhoneImage!=null) {
-					using(Bitmap bitmap=new Bitmap(PhoneImage)) {//center the image on the right-hand side of row 2
-						RectangleF rectImage=new RectangleF(rcOuter.X+(rcOuter.Width/2),rcOuter.Y+yPosBottom,rcOuter.Width/2,typicalRowHeight*2);
+					using(Bitmap bitmap=new Bitmap(PhoneImage)) {//right-most 1/4 of row 3 is the phone icon
+						RectangleF rectImage=new RectangleF((rcOuter.X+(rcOuter.Width/4)*3)-BorderThickness,rcOuter.Y+yPosBottom,PhoneImage.Width,rowHeight);
+						//Scale the image.
 						if(bitmap.Height<rectImage.Height) {
-							rectImage.Y-=(bitmap.Height-rectImage.Height)/2;
+							rectImage.Y+=(rectImage.Height-bitmap.Height)/2;
+							rectImage.Height=bitmap.Height;
 						}
 						if(bitmap.Width<rectImage.Width) {
-							rectImage.X-=(bitmap.Width-rectImage.Width)/2;
+							rectImage.X-=(rectImage.Width-bitmap.Width)/2;
+							rectImage.Width=bitmap.Width;
 						}
-						e.Graphics.DrawImageUnscaled(PhoneImage,Rectangle.Round(rectImage));
+						e.Graphics.DrawImage(
+							PhoneImage,
+							rectImage,
+							new RectangleF(0,0,bitmap.Width,bitmap.Height),
+							GraphicsUnit.Pixel);
+						//e.Graphics.DrawRectangle(Pens.Orange,rectImage.X,rectImage.Y,rectImage.Width,rectImage.Height);
 					}
 				}
-				yPosBottom+=typicalRowHeight*2; //row 2 is 2/9 tall				
-				//row 3 - elapsed time
-				FitText(Elapsed,Font,brushText,new RectangleF(rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width,typicalRowHeight*2),stringFormat,e.Graphics);
-				yPosBottom+=typicalRowHeight*2; //row 3 is 2/9 tall				
-				//row 4 - employee status
-				FitText(Status,Font,brushText,new RectangleF(rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width,typicalRowHeight*2),stringFormat,e.Graphics);
-				yPosBottom+=typicalRowHeight*2; //row 4 is 2/9 tall				
+				//e.Graphics.DrawRectangle(Pens.Blue,rcOuter.X,rcOuter.Y+yPosBottom,rcOuter.Width,rowHeight);
+				yPosBottom+=rowHeight;
 			}
 			catch { }
 			finally {
