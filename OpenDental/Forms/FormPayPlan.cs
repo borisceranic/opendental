@@ -100,6 +100,11 @@ namespace OpenDental{
 		private FormPaymentPlanOptions FormPayPlanOpts;
 		///<summary>Cached list of PayPlanCharges.</summary>
 		private List<PayPlanCharge> _listPayPlanCharges;
+		private ValidDouble textBalance;
+		private TextBox textInterest;
+		private ValidDouble textPayment;
+		private ValidDouble textPrincipal;
+		private Label labelTotals;
 		private Def[] _arrayAccountColors;//Putting this here so we do one DB call for colors instead of many.  They'll never change.
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
@@ -173,7 +178,12 @@ namespace OpenDental{
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.textInterest = new System.Windows.Forms.TextBox();
+			this.labelTotals = new System.Windows.Forms.Label();
 			this.gridCharges = new OpenDental.UI.ODGrid();
+			this.textBalance = new OpenDental.ValidDouble();
+			this.textPayment = new OpenDental.ValidDouble();
+			this.textPrincipal = new OpenDental.ValidDouble();
 			this.butPickProv = new OpenDental.UI.Button();
 			this.textCompletedAmt = new OpenDental.ValidDouble();
 			this.butAdd = new OpenDental.UI.Button();
@@ -510,6 +520,25 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Same for all charges";
 			// 
+			// textInterest
+			// 
+			this.textInterest.Location = new System.Drawing.Point(761, 528);
+			this.textInterest.Name = "textInterest";
+			this.textInterest.ReadOnly = true;
+			this.textInterest.Size = new System.Drawing.Size(60, 20);
+			this.textInterest.TabIndex = 141;
+			this.textInterest.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// labelTotals
+			// 
+			this.labelTotals.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTotals.Location = new System.Drawing.Point(435, 531);
+			this.labelTotals.Name = "labelTotals";
+			this.labelTotals.Size = new System.Drawing.Size(266, 15);
+			this.labelTotals.TabIndex = 142;
+			this.labelTotals.Text = "Current Totals";
+			this.labelTotals.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// gridCharges
 			// 
 			this.gridCharges.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -519,11 +548,44 @@ namespace OpenDental{
 			this.gridCharges.Location = new System.Drawing.Point(435, 9);
 			this.gridCharges.Name = "gridCharges";
 			this.gridCharges.ScrollValue = 0;
-			this.gridCharges.Size = new System.Drawing.Size(536, 596);
+			this.gridCharges.Size = new System.Drawing.Size(536, 515);
 			this.gridCharges.TabIndex = 41;
 			this.gridCharges.Title = "Amortization Schedule";
 			this.gridCharges.TranslationName = "PayPlanAmortization";
 			this.gridCharges.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridCharges_CellDoubleClick);
+			// 
+			// textBalance
+			// 
+			this.textBalance.Location = new System.Drawing.Point(881, 528);
+			this.textBalance.MaxVal = 100000000D;
+			this.textBalance.MinVal = -100000000D;
+			this.textBalance.Name = "textBalance";
+			this.textBalance.ReadOnly = true;
+			this.textBalance.Size = new System.Drawing.Size(60, 20);
+			this.textBalance.TabIndex = 144;
+			this.textBalance.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textPayment
+			// 
+			this.textPayment.Location = new System.Drawing.Point(821, 528);
+			this.textPayment.MaxVal = 100000000D;
+			this.textPayment.MinVal = -100000000D;
+			this.textPayment.Name = "textPayment";
+			this.textPayment.ReadOnly = true;
+			this.textPayment.Size = new System.Drawing.Size(60, 20);
+			this.textPayment.TabIndex = 140;
+			this.textPayment.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textPrincipal
+			// 
+			this.textPrincipal.Location = new System.Drawing.Point(701, 528);
+			this.textPrincipal.MaxVal = 100000000D;
+			this.textPrincipal.MinVal = -100000000D;
+			this.textPrincipal.Name = "textPrincipal";
+			this.textPrincipal.ReadOnly = true;
+			this.textPrincipal.Size = new System.Drawing.Size(60, 20);
+			this.textPrincipal.TabIndex = 139;
+			this.textPrincipal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// butPickProv
 			// 
@@ -807,6 +869,11 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 698);
+			this.Controls.Add(this.textBalance);
+			this.Controls.Add(this.textInterest);
+			this.Controls.Add(this.textPayment);
+			this.Controls.Add(this.textPrincipal);
+			this.Controls.Add(this.labelTotals);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label1);
@@ -975,29 +1042,6 @@ namespace OpenDental{
 			listPayPlanRows.Sort(ComparePayPlanRows);
 			for(int i=0;i<listPayPlanRows.Count;i++) {
 				gridCharges.Rows.Add(listPayPlanRows[i]);
-				bool isTotalsRow=false;
-				if(i<listPayPlanRows.Count-1//Not the last row.
-					&& DateTime.Parse(listPayPlanRows[i].Cells[0].Text)<=DateTime.Today 
-					&& DateTime.Parse(listPayPlanRows[i+1].Cells[0].Text)>DateTime.Today)
-				{
-					isTotalsRow=true;
-				}
-				if(i==listPayPlanRows.Count-1 && DateTime.Parse(listPayPlanRows[i].Cells[0].Text)<=DateTime.Today) {//Last row.
-					isTotalsRow=true;
-				}
-				if(isTotalsRow) {
-					ODGridRow row=new ODGridRow();//Charge row
-					row.Tag=null;//This is how we will reference the totals row in a few other places.
-					row.Cells.Add(DateTime.Today.ToShortDateString());//Date
-					row.Cells.Add("");
-					row.Cells.Add("Current Totals:");//Descript
-					row.Cells.Add("");//Principal
-					row.Cells.Add("");//Interest
-					row.Cells.Add("");//Payment
-					row.Cells.Add("");//Balance (filled later)
-					row.Cells.Add("");//Empty filler column
-					gridCharges.Rows.Add(row);
-				}
 			}
 			TotPrinc=0;
 			TotInt=0;
@@ -1024,6 +1068,7 @@ namespace OpenDental{
 			TotPrinc=0;
 			TotInt=0;
 			double TotPay=0;
+			int totalsRowIndex=0;
 			for(int i=0;i<gridCharges.Rows.Count;i++){//Filling row cells with balance information.
 				if(gridCharges.Rows[i].Cells[3].Text!="") {//Principal
 					TotPrinc+=PIn.Double(gridCharges.Rows[i].Cells[3].Text);
@@ -1037,16 +1082,17 @@ namespace OpenDental{
 					TotPay+=PIn.Double(gridCharges.Rows[i].Cells[5].Text);
 					balanceAmt-=PIn.Double(gridCharges.Rows[i].Cells[5].Text);
 				}
-				gridCharges.Rows[i].Cells[6].Text=balanceAmt.ToString("n");
-				if(gridCharges.Rows[i].Tag==null) {//Placeholder row for current totals
-					gridCharges.Rows[i].Cells[5].Text=TotPay.ToString("n");
-					gridCharges.Rows[i].Cells[4].Text=TotInt.ToString("n");
-					gridCharges.Rows[i].Cells[3].Text=TotPrinc.ToString("n");
-					gridCharges.Rows[i].ColorLborder=Color.Black;
-					gridCharges.Rows[i].Cells[6].Bold=YN.Yes;
-					//gridCharges.Rows[i].ColorBackG=Color.Orange;
+				gridCharges.Rows[i].Cells[6].Text=balanceAmt.ToString("f");
+				if(DateTime.Parse(listPayPlanRows[i].Cells[0].Text)<=DateTime.Today) {
+					textPrincipal.Text=TotPrinc.ToString("f");
+					textInterest.Text=TotInt.ToString("f");
+					textPayment.Text=TotPay.ToString("f");
+					textBalance.Text=balanceAmt.ToString("f");
+					totalsRowIndex=i;
 				}
 			}
+			gridCharges.Rows[totalsRowIndex].ColorLborder=Color.Black;
+			gridCharges.Rows[totalsRowIndex].Cells[6].Bold=YN.Yes;
 			textAccumulatedDue.Text=PayPlans.GetAccumDue(PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
 			textPrincPaid.Text=PayPlans.GetPrincPaid(AmtPaid,PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
 			if(!IsNew && _listPayPlanCharges.Count>0) {
