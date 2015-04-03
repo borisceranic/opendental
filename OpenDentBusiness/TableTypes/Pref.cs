@@ -152,6 +152,7 @@ namespace OpenDentBusiness {
 		///<summary>The message that goes out to patients when doing a batch confirmation.</summary>
 		ConfirmTextMessage,
 		CoPay_FeeSchedule_BlankLikeZero,
+		///<summary>Boolean.  Typically set to true when an update is in progress and will be set to false when finished.  Otherwise true means that the database is in a corrupt state.</summary>
 		CorruptedDatabase,
 		///<summary>This is the default encounter code used for automatically generating encounters when specific actions are performed in Open Dental.  The code is displayed/set in FormEhrSettings.  We will set it and give the user a list of 9 suggested codes to use such that the encounters generated will cause the pateint to be considered part of the initial patient population in the 9 clinical quality measures tracked by OD.  CQMDefaultEncounterCodeSystem will identify the code system this code is from and the code value will be a FK to that code system.</summary>
 		CQMDefaultEncounterCodeValue,

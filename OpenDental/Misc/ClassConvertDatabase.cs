@@ -157,6 +157,27 @@ namespace OpenDental{
 				MsgBox.Show(this,"Backup failed. Your database has not been altered.");
 				return false;
 			}
+			//We've been getting an increasing number of phone calls with databases that have duplicate preferences which is impossible
+			//unless a user has gotten this far and another computer in the office is in the middle of an update as well.
+			//The issue is most likely due to the blocking messageboxes above which wait indefinitely for user input right before upgrading the database.
+			//This means that the cache for this computer could be stale and we need to manually refresh our cache to double check 
+			//that the database isn't flagged as corrupt, an update isn't in progress, or that the database version hasn't changed (someone successfully updated already).
+			Prefs.RefreshCache();
+			//Now check the preferences that should stop this computer from executing an update.
+			if(PrefC.GetBool(PrefName.CorruptedDatabase) || PrefC.GetString(PrefName.UpdateInProgressOnComputerName)!=Environment.MachineName) {
+				//At this point, the pref "corrupted database" being true means that a computer is in the middle of running the upgrade script.
+				//There will be another corrupted database check on start up which will take care of the scenario where this is truly a corrupted database.
+				//Also, we need to make sure that the update in progress preference is set to this computer because we JUST set it to that value before entering this method.
+				//If it has changed, we absolutely know without a doubt that another computer is trying to update at the same time.
+				MsgBox.Show(this,"An update is already in progress from another computer.");
+				return false;
+			}
+			//Double check that the database version has not changed.  This check is here just in case another computer has successfully updated the database already.
+			Version versionDatabase=new Version(PrefC.GetString(PrefName.DataBaseVersion));
+			if(FromVersion!=versionDatabase) {
+				MsgBox.Show(this,"The database has already been updated from another computer.");
+				return false;
+			}
 			try{
 #endif
 			if(FromVersion < new Version("7.5.17")) {//Insurance Plan schema conversion
