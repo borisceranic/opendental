@@ -4,9 +4,14 @@ using System.Text;
 using System.IO;
 using System.CodeDom;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace CodeBase {
 	public class ODFileUtils {
+
+		[DllImport("kernel32.dll",SetLastError=true,CharSet=CharSet.Auto)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GetDiskFreeSpaceEx(string lpDirectoryName,out ulong lpFreebytesAvailable,out ulong lpTotalNumberOfBytes,out ulong lpTotalNumberOfFreeBytes);
 
 		///<summary>This is a class scope variable in order to ensure that the random value is only seeded once for each time OD is launched.
 		///Otherwise, if instantiated more often, then the same random numbers are generated over and over again.</summary>
@@ -46,6 +51,23 @@ namespace CodeBase {
 				finalPath=finalPath+path;
 			}
 			return finalPath;
+		}
+
+		///<summary>This function takes a valid folder path.  Accepts UNC paths as well.  freeBytesAvail will contain the free space in bytes of the drive containing the folder.
+		///It returns false if the function fails.</summary>
+		public static bool GetDiskFreeSpace(string folder,out ulong freeBytesAvail) {
+			freeBytesAvail=0;
+			if(!folder.EndsWith("\\")) {
+				folder+="\\";
+			}
+			ulong totBytes=0;
+			ulong totFreeBytes=0;
+			if(GetDiskFreeSpaceEx(folder,out freeBytesAvail,out totBytes,out totFreeBytes)) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 		///<summary>Returns the directory in which the program executable rests. To get the full path for the program executable, use Applicaiton.ExecutablePath.</summary>

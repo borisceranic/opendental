@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
+using System.Runtime.InteropServices;
 
 namespace OpenDental{
 	/// <summary>
@@ -558,7 +559,18 @@ namespace OpenDental{
 				Lan.g(this,"Preparing to copy database"),//this happens very fast and probably won't be noticed.
 				100,"" });//max of 100 keeps dlg from closing
 			string dbName=MiscData.GetCurrentDatabase();
+			ulong driveFreeSpace=0;
 			double dbSize=GetFileSizes(textBackupFromPath.Text+dbName)/1024;
+			//Attempt to get the free disk space on the drive or share of the destination folder.
+			//If the free space cannot be determined the backup will be attempted anyway (old behavior).
+			if(ODFileUtils.GetDiskFreeSpace(textBackupToPath.Text,out driveFreeSpace)) {
+				if((ulong)dbSize*1024*1024>=driveFreeSpace) {//dbSize is in megabytes, cast to ulong to compare. It will never be negative so this is safe.
+					Invoke(new ErrorMessageDelegate(SetErrorMessage),new object[] { Lan.g(this,"Not enough free disk space available on the destination drive to backup the database.") });
+					//We now want to automatically close FormProgress.  This is done by clearing out the variables.
+					Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,"",0,"" });
+					return;
+				}
+			}
 			try{
 				string dbtopath=ODFileUtils.CombinePaths(textBackupToPath.Text,dbName);
 				if(Directory.Exists(dbtopath)){// D:\opendental
@@ -615,7 +627,16 @@ namespace OpenDental{
 					Lan.g(this,"Calculating size of files in A to Z folder."),
 					100,"" });//max of 100 keeps dlg from closing
 					int atozSize=GetFileSizes(ODFileUtils.CombinePaths(atozFull,""),
-						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }))/1024;
+						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }))/1024; 
+					driveFreeSpace=0;
+					//Attempt to get the free disk space on the drive or share of the destination folder.
+					//If the free space cannot be determined the backup will be attempted anyway (old behavior).
+					if(ODFileUtils.GetDiskFreeSpace(textBackupToPath.Text,out driveFreeSpace)) {
+						if((ulong)(atozSize*1024*1024)>=driveFreeSpace) {//atozSize is in megabytes, cast to ulong in order to compare.  It will never be negative so it's safe.
+							//Not enough free space to perform the backup.
+							throw new ApplicationException(Lan.g(this,"Backing up A to Z images folder failed.  Not enough free disk space available on the destination drive."));
+						}
+					}
 					if(!Directory.Exists(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir))) {// D:\OpenDentalData
 						Directory.CreateDirectory(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir));// D:\OpenDentalData
 					}
@@ -624,6 +645,9 @@ namespace OpenDental{
 						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }),// D:\OpenDentalData\
 						atozSize);
 				}
+			}
+			catch(ApplicationException ex) {
+				Invoke(new ErrorMessageDelegate(SetErrorMessage),new object[] { ex.Message }); 
 			}
 			catch {
 				Invoke(new ErrorMessageDelegate(SetErrorMessage),new object[] { Lan.g(this,"Backing up A to Z images folder failed.  User might not have enough permissions or a file might be in use.") });
