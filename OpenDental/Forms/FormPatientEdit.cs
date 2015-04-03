@@ -176,6 +176,7 @@ namespace OpenDental{
 		private UI.Button butPickSecondary;
 		private UI.Button butPickPrimary;
 		private EhrPatient _ehrPatientCur;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormPatientEdit(Patient patCur,Family famCur){
@@ -2082,13 +2083,19 @@ namespace OpenDental{
 				}
 				comboBillType.SelectedIndex=0;
 			}
+			_listClinics=Clinics.GetForUserod(Security.CurUser);
 			comboClinic.Items.Clear();
-			comboClinic.Items.Add(Lan.g(this,"none"));
+			comboClinic.Items.Add(Lan.g(this,"Unassigned"));
 			comboClinic.SelectedIndex=0;
-			for(int i=0;i<Clinics.List.Length;i++){
-				comboClinic.Items.Add(Clinics.List[i].Description);
-				if(Clinics.List[i].ClinicNum==PatCur.ClinicNum){
-					comboClinic.SelectedIndex=i+1;
+			for(int i=0;i<_listClinics.Count;i++) {
+				comboClinic.Items.Add(_listClinics[i].Description);
+				if(_listClinics[i].ClinicNum==PatCur.ClinicNum) {
+					if(Security.CurUser.ClinicIsRestricted) {
+						comboClinic.SelectedIndex=i;
+					}
+					else {
+						comboClinic.SelectedIndex=i+1;
+					}
 				}
 			}
 			switch(PatCur.StudentStatus){
@@ -3245,11 +3252,11 @@ namespace OpenDental{
 			if(comboBillType.SelectedIndex!=-1){
 				PatCur.BillingType=DefC.Short[(int)DefCat.BillingTypes][comboBillType.SelectedIndex].DefNum;
 			}
-			if(comboClinic.SelectedIndex==0){
+			if(comboClinic.SelectedIndex==0) {
 				PatCur.ClinicNum=0;
 			}
-			else{
-				PatCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
+			else {
+				PatCur.ClinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
 			}
 			List<PatRace> listPatRaces=new List<PatRace>();
 			for(int i=0;i<comboBoxMultiRace.SelectedIndices.Count;i++) {
