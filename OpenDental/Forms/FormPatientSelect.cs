@@ -1180,6 +1180,9 @@ namespace OpenDental{
 						case "Pri Prov":
 							row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
 							break;
+						case "Clinic":
+							row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
+							break;
 						case "Birthdate":
 							row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
 							break;

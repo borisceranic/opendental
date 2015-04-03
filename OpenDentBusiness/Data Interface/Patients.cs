@@ -258,7 +258,7 @@ namespace OpenDentBusiness{
 				regexp+=phonedigits[i];
 			}
 			string command="SELECT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
-				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email,Country ";
+				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email,Country,patient.ClinicNum ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+=",GROUP_CONCAT(DISTINCT phonenumber.PhoneNumberVal) AS OtherPhone ";//this customer might have multiple extra phone numbers that match the param.
 			}
@@ -403,6 +403,7 @@ namespace OpenDentBusiness{
 			DataTable PtDataTable=table.Clone();//does not copy any data
 			PtDataTable.TableName="table";
 			PtDataTable.Columns.Add("age");
+			PtDataTable.Columns.Add("clinic");
 			PtDataTable.Columns.Add("site");
 			for(int i=0;i<PtDataTable.Columns.Count;i++){
 				PtDataTable.Columns[i].DataType=typeof(string);
@@ -443,6 +444,7 @@ namespace OpenDentBusiness{
 				r["site"]=Sites.GetDescription(PIn.Long(table.Rows[i]["SiteNum"].ToString()));
 				r["Email"]=table.Rows[i]["Email"].ToString();
 				r["Country"]=table.Rows[i]["Country"].ToString();
+				r["clinic"]=Clinics.GetDesc(PIn.Long(table.Rows[i]["ClinicNum"].ToString()));
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
 					r["OtherPhone"]=table.Rows[i]["OtherPhone"].ToString();
 				}
