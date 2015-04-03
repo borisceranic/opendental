@@ -669,16 +669,17 @@ namespace OpenDental{
 				listBillType.SelectedIndex=0;
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				labelSaveDefaults.Text="(except the date at the top and clinic at the bottom)";
+				labelSaveDefaults.Text="("+Lan.g(this,"except the date at the top and clinic at the bottom")+")";
 				labelClinic.Visible=true;
 				comboClinic.Visible=true;
-				comboClinic.Items.Add("All");
+				comboClinic.Items.Add(Lan.g(this,"All"));
+				comboClinic.Items.Add(Lan.g(this,"Unassigned"));
 				comboClinic.SelectedIndex=0;
 				ListClinics=Clinics.GetForUserod(Security.CurUser);
 				for(int i=0;i<ListClinics.Count;i++) {
 					comboClinic.Items.Add(ListClinics[i].Description);
 					if(ClinicNum==ListClinics[i].ClinicNum) {
-						comboClinic.SelectedIndex=i+1;
+						comboClinic.SelectedIndex=i+2;
 					}
 				}
 			}
@@ -895,13 +896,16 @@ namespace OpenDental{
 			}
 			List<long> listClinicNums=new List<long>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				if(comboClinic.SelectedIndex>0) {
-					listClinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
+				if(comboClinic.SelectedIndex>1) {
+					listClinicNums.Add(ListClinics[comboClinic.SelectedIndex-2].ClinicNum);
 				}
 				else {
-					for(int i=0;i<ListClinics.Count;i++) {
-						listClinicNums.Add(ListClinics[i].ClinicNum);
+					if(comboClinic.SelectedIndex==0) {//All
+						for(int i=0;i<ListClinics.Count;i++) {
+							listClinicNums.Add(ListClinics[i].ClinicNum);
+						}
 					}
+					listClinicNums.Add(0);//Unassigned will always be used at this point.
 				}
 			}
 			Cursor=Cursors.WaitCursor;
