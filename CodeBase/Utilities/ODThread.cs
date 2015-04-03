@@ -112,7 +112,7 @@ namespace CodeBase {
 		///<summary>Synchronously waits for all threads in the specified group to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for all threads to join.</summary>
 		public static void JoinThreadsByGroupName(int timeoutMS,string groupName) {
 			List<ODThread> listOdThreadsForGroup=GetThreadsByGroupName(groupName);
-			for(int i=0;i<listOdThreadsForGroup.Count;i++) {
+			for(int i=0;i<listOdThreadsForGroup.Count;i++) {				
 				listOdThreadsForGroup[i].Join(timeoutMS);
 			}
 		}
@@ -120,14 +120,18 @@ namespace CodeBase {
 		///<summary>Immediately returns after flagging the thread to quit itself asynchronously.  The thread may execute a bit longer.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
 		public void QuitAsync() {
 			_hasQuit=true;
+			//If thread is in waiting on wait event, wake it can quit gracefully.
+			Wakeup();
 			lock(_lockObj) {
 				_listOdThreads.Remove(this);
-			}
+			}		
 		}
 
 		///<summary>Waits for this thread to quit itself before returning.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
 		public void QuitSync(int timeoutMS) {
 			_hasQuit=true;
+			//If thread is in waiting on wait event, wake it can quit gracefully.
+			Wakeup();
 			try {
 				if(!Join(timeoutMS)) {//Wait for allotted time before throwing ThreadAbortException.
 					_thread.Abort();//Should only get here if Run delegate took longer than the allotted timeout.
@@ -147,9 +151,11 @@ namespace CodeBase {
 		///<summary>Waits for ALL threads in the group to finish doing work before returning.  Each thread will be given the timeoutMS to quit.  Try to keep in mind how many threads are going to be quitting when setting the milliseconds for the timeout.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
 		public static void QuitSyncThreadsByGroupName(int timeoutMS,string groupName) {
 			List<ODThread> listThreadsForGroup=GetThreadsByGroupName(groupName);
-			for(int i=0;i<listThreadsForGroup.Count;i++) {
-				listThreadsForGroup[i].QuitSync(timeoutMS);
+			for(int i=0;i<listThreadsForGroup.Count;i++) { //Quit all threads in parallel so our wait times are not cummulative.
+				listThreadsForGroup[i].QuitAsync();
 			}
+			//Wait for all threads to end or timeout, whichever comes first.
+			JoinThreadsByGroupName(timeoutMS,groupName);
 		}
 
 		///<summary>Should only be called when the main application is closing.  Loops through ALL ODThreads that are still running and synchronously quits them.  The main application thread will wait for all threads to finish doing work.</summary>
