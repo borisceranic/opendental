@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Data;
 using OpenDental.UI;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental{
 ///<summary>All this dialog does is set the patnum and it is up to the calling form to do an immediate refresh, or possibly just change the patnum back to what it was.  So the other patient fields must remain intact during all logic in this form, especially if SelectionModeOnly.</summary>
@@ -1179,6 +1180,9 @@ namespace OpenDental{
 							break;
 						case "Pri Prov":
 							row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
+							break;
+						case "Clinic":
+							row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
 							break;
 						case "Birthdate":
 							row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
