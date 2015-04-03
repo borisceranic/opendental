@@ -18,6 +18,32 @@ namespace OpenDental.UI {
 		[Category("Action"),Description("Event raised when signature is cleared or altered.")]
 		public event EventHandler SignatureChanged=null;
 
+		///<summary>A new Width property with local scope to SignatureBoxWrapper.  Sets the width of this control as well as the width of the topaz signature control.</summary>
+		public new int Width {
+			get {
+				return base.Width;
+			}
+			set {
+				if(sigBoxTopaz!=null) {
+					sigBoxTopaz.Width=value;
+				}
+				base.Width=value;
+			}
+		}
+
+		///<summary>A new Height property with local scope to SignatureBoxWrapper.  Set the height of this control as well as the width of the topaz signature control.</summary>
+		public new int Height {
+			get {
+				return base.Height;
+			}
+			set {
+				if(sigBoxTopaz!=null) {
+					sigBoxTopaz.Height=value;
+				}
+				base.Height=value;
+			}
+		}
+
 		public SignatureBoxWrapper() {
 			InitializeComponent();
 			//allowTopaz=(Environment.OSVersion.Platform!=PlatformID.Unix && !CodeBase.ODEnvironment.Is64BitOperatingSystem());
