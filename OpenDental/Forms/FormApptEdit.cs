@@ -2477,7 +2477,9 @@ namespace OpenDental{
 			string aptPattern=Appointments.ConvertPatternTo5(strBTime.ToString());
 			//Only run appt overlap check if editing an appt not in unscheduled list and in chart module and eCW program link not enabled.
 			if((IsInChartModule || IsInViewPatAppts) && !Programs.UsingEcwTightOrFullMode() && AptCur.AptStatus!=ApptStatus.UnschedList) {
-				Appointments.RefreshPeriod(AptCur.AptDateTime,AptCur.AptDateTime);
+				//==Travis 04/06/2015:  This call was added on 04/23/2014 and backported to 14.1.  It is not storing the return value and does not look to be
+				//		doing anything so it has been commented out.
+				//Appointments.RefreshPeriod(AptCur.AptDateTime,AptCur.AptDateTime);
 				List<Appointment> apptList=Appointments.GetForPeriodList(AptCur.AptDateTime,AptCur.AptDateTime);
 				if(DoesOverlap(aptPattern,apptList)) {
 					MsgBox.Show(this,"Appointment is too long and would overlap another appointment.  Automatically shortened to fit.");
