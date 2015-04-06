@@ -99,7 +99,14 @@ namespace OpenDental {
 			}
 			//Update the Phone tables accordingly.
 			PhoneEmpDefaults.SetAvailable(tile.PhoneCur.Extension,employeeNum);
-			PhoneAsterisks.SetToDefaultRingGroups(tile.PhoneCur.Extension,employeeNum);
+			PhoneEmpDefault pedCur=PhoneEmpDefaults.GetOne(employeeNum);
+			//If the employee was set to triage, do not set them to default ring group, set them to triage (backup) ringroup.
+			if(pedCur!=null && pedCur.IsTriageOperator) {
+				PhoneAsterisks.SetRingGroups(pedCur.PhoneExt,AsteriskRingGroups.Backup);
+			}
+			else {
+				PhoneAsterisks.SetToDefaultRingGroups(tile.PhoneCur.Extension,employeeNum);
+			}
 			Phones.SetPhoneStatus(ClockStatusEnum.Available,tile.PhoneCur.Extension,employeeNum);//green
 		}
 
@@ -317,7 +324,14 @@ namespace OpenDental {
 				return false;
 			}
 			PhoneEmpDefaults.SetAvailable(tile.PhoneCur.Extension,tile.PhoneCur.EmployeeNum);
-			PhoneAsterisks.SetToDefaultRingGroups(tile.PhoneCur.Extension,tile.PhoneCur.EmployeeNum);
+			PhoneEmpDefault pedCur=PhoneEmpDefaults.GetOne(tile.PhoneCur.EmployeeNum);
+			//If the employee was set to triage, do not set them to default ring group, set them to triage (backup) ringroup.
+			if(pedCur!=null && pedCur.IsTriageOperator) {
+				PhoneAsterisks.SetRingGroups(pedCur.PhoneExt,AsteriskRingGroups.Backup);
+			}
+			else {
+				PhoneAsterisks.SetToDefaultRingGroups(tile.PhoneCur.Extension,tile.PhoneCur.EmployeeNum);
+			}
 			Phones.SetPhoneStatus(newClockStatus,tile.PhoneCur.Extension);
 			return true;
 		}
