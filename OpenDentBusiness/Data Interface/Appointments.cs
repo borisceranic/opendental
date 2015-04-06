@@ -1353,6 +1353,7 @@ namespace OpenDentBusiness{
 				+clinicJoin
 				+"WHERE SchedType="+POut.Int((int)ScheduleType.Employee)+" "
 				+"AND SchedDate = "+POut.Date(dateStart)+" "
+				+"AND employee.IsHidden = 0 "
 				+clinicWhere;
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY schedule.ScheduleNum ";
