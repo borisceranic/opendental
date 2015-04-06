@@ -1526,7 +1526,7 @@ namespace OpenDental{
 			}
 			else if(gridCharges.Rows[e.Row].Tag.GetType()==typeof(DataRow)){//Claim payment or bundle.
 				DataRow bundledClaimProc=(DataRow)gridCharges.Rows[e.Row].Tag;
-				Claim claimCur=Claims.GetClaim(PIn.Long(bundledClaimProc["claimproc.ClaimNum"].ToString()));
+				Claim claimCur=Claims.GetClaim(PIn.Long(bundledClaimProc["ClaimNum"].ToString()));
 				FormClaimEdit FormCE=new FormClaimEdit(claimCur,PatCur,FamCur);//FormClaimEdit inserts and/or updates the claim and/or claimprocs, which could potentially change the bundle.
 				FormCE.IsNew=false;
 				FormCE.ShowDialog();

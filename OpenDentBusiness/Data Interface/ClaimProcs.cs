@@ -188,8 +188,8 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
 			}
 			//MAX functions added to preserve behavior in Oracle.  We may use ProcDate instead of DateCP in the future.
-			string command="SELECT claimproc.ClaimNum,MAX(claimpayment.CheckNum) CheckNum,claimproc.DateCP,MAX(claimpayment.CheckAmt) CheckAmt,claimproc.ClaimPaymentNum,MAX(claimpayment.PayType) PayType, claimproc.ProvNum "
-				+"SUM(claimproc.InsPayAmt) InsPayAmt "
+			string command="SELECT claimproc.ClaimNum,MAX(claimpayment.CheckNum) CheckNum,claimproc.DateCP,MAX(claimpayment.CheckAmt) CheckAmt,claimproc.ClaimPaymentNum,MAX(claimpayment.PayType) PayType, claimproc.ProvNum"
+					+",SUM(claimproc.InsPayAmt) InsPayAmt "
 				+"FROM claimproc "
 				+"LEFT JOIN claimpayment ON claimproc.ClaimPaymentNum=claimpayment.ClaimPaymentNum "
 				+"WHERE PayPlanNum="+POut.Long(payPlanNum)+" "
