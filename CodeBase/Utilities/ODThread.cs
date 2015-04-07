@@ -17,6 +17,8 @@ namespace CodeBase {
 		private WorkerDelegate _worker=null;
 		///<summary>Pointer to the function from the calling code which will be alerted when the run function has thrown an unhandled exception.</summary>
 		private ExceptionDelegate _exceptionHandler=null;
+		///<summary>Pointer to the function from the calling code which will be alerted when the run function has completed.</summary>
+		private WorkerDelegate _threadExitHandler=null;		
 		///<summary>Custom data which can be set before launching the thread and then safely accessed within the WorkerDelegate.  Helps prevent the need to lock objects due to multi-threading, most of the time.</summary>
 		public object Tag=null;
 		///<summary>Custom data which can be used within the WorkerDelegate.  Helps prevent the need to lock objects due to multi-threading, most of the time.</summary>
@@ -102,6 +104,9 @@ namespace CodeBase {
 					_hasQuit=true;
 				}
 			}
+			if(_threadExitHandler!=null) {
+				_threadExitHandler(this);
+			}
 		}
 
 		///<summary>Forces the calling thread to synchronously wait for the current thread to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for the thread to join.</summary>
@@ -179,6 +184,11 @@ namespace CodeBase {
 		///<summary>Add an exception handler to be alerted of unhandled exceptions in the work delegate.</summary>
 		public void AddExceptionHandler(ExceptionDelegate exceptionHandler) {
 			_exceptionHandler+=exceptionHandler;
+		}
+
+		///<summary>Add an exception handler to be alerted of unhandled exceptions in the work delegate.</summary>
+		public void AddThreadExitHandler(WorkerDelegate threadExitHandler) {
+			_threadExitHandler+=threadExitHandler;
 		}
 
 		///<summary>Pointer delegate to the method that does the work for this thread.  The worker method has to take an ODThread as a parameter so that it has access to Tag and other variables when needed.</summary>
