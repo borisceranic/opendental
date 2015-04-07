@@ -164,7 +164,9 @@ namespace OpenDental{
 			//that the database isn't flagged as corrupt, an update isn't in progress, or that the database version hasn't changed (someone successfully updated already).
 			Prefs.RefreshCache();
 			//Now check the preferences that should stop this computer from executing an update.
-			if(PrefC.GetBool(PrefName.CorruptedDatabase) || PrefC.GetString(PrefName.UpdateInProgressOnComputerName)!=Environment.MachineName) {
+			if(PrefC.GetBool(PrefName.CorruptedDatabase) 
+				|| (PrefC.GetString(PrefName.UpdateInProgressOnComputerName)!="" && PrefC.GetString(PrefName.UpdateInProgressOnComputerName)!=Environment.MachineName))
+			{
 				//At this point, the pref "corrupted database" being true means that a computer is in the middle of running the upgrade script.
 				//There will be another corrupted database check on start up which will take care of the scenario where this is truly a corrupted database.
 				//Also, we need to make sure that the update in progress preference is set to this computer because we JUST set it to that value before entering this method.
@@ -205,6 +207,14 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.CorruptedDatabase,true);
 			}
 			ConvertDatabases.FromVersion=FromVersion;
+#if !DEBUG
+			//Typically the UpdateInProgressOnComputerName preference will have already been set within FormUpdate.
+			//However, the user could have cancelled out of FormUpdate after successfully downloading the Setup.exe
+			//OR the Setup.exe could have been manually sent to our customer (during troubleshooting with HQ).
+			//For those scenarios, the preference will be empty at this point and we need to let other computers know that an update going to start.
+			//Updating the string (again) here will guarantee that all computers know an update is in fact in progress from this machine.
+			Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,Environment.MachineName);
+#endif
 			ConvertDatabases.To2_8_2();//begins going through the chain of conversion steps
 			Cursor.Current=Cursors.Default;
 			if(FromVersion>=new Version("3.4.0")){
