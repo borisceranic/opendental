@@ -1316,6 +1316,7 @@ namespace OpenDentBusiness {
 			command+="ORDER BY PayPlanDate";
 			DataTable rawPayPlan=dcon.GetTable(command);
 			for(int i=0;i<rawPayPlan.Rows.Count;i++){
+				//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
 				if(isInvoice) {
 					break;
 				}
@@ -1379,6 +1380,7 @@ namespace OpenDentBusiness {
 				GetPayPlans(rawPayPlan,rawPay,rawInstall,rawClaimPay);
 			}
 			else {
+				//Always includes the payment plan breakdown for statements, receipts, and invoices.
 				GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay);
 			}
 			#endregion Installment Plans

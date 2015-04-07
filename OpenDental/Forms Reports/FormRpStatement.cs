@@ -1023,6 +1023,7 @@ namespace OpenDental{
 			#endregion PayPlan grid definition
 			//Payment plan grid.  There will be only one, if any----------------------------------------------------------------
 			#region PayPlan grid
+			//We currently show payment plan breakdowns on all statements, receipts, and invoices.
 			DataTable tablePP=dataSet.Tables["payplan"];
 			ODGridCell gcell;
 			if(tablePP.Rows.Count>0){
