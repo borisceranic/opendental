@@ -16,14 +16,6 @@ namespace OpenDental {
 			string pref=PrefC.GetString(PrefName.DataBaseVersion);
 				//(Pref)PrefC.HList["DataBaseVersion"];
 			//Debug.WriteLine(pref.PrefName+","+pref.ValueString);
-#if !DEBUG
-			//Typically the UpdateInProgressOnComputerName preference will have already been set within FormUpdate.
-			//However, the user could have cancelled out of FormUpdate after successfully downloading the Setup.exe
-			//OR the Setup.exe could have been manually sent to our customer (during troubleshooting with HQ).
-			//For those scenarios, the preference will be empty at this point and we need to let other computers know that an update going to start.
-			//Updating the string (again) here will guarantee that all computers know an update is in fact in progress from this machine.
-			Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,Environment.MachineName);
-#endif
 			if(ClassConvertDatabase2.Convert(pref,toVersion,silent)) {
 				//((Pref)PrefC.HList["DataBaseVersion"]).ValueString)) {
 				return true;
