@@ -740,7 +740,9 @@ namespace OpenDental{
 			gridAttached.Columns.Add(col); 
 			gridAttached.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ClaimsAttached.Count;i++){
+			double total=0;
+			for(int i=0;i<ClaimsAttached.Count;i++) {
+				total+=ClaimsAttached[i].InsPayAmt;
 				row=new ODGridRow();
 				row.Cells.Add(ClaimsAttached[i].PaymentRow.ToString());
 				row.Cells.Add(ClaimsAttached[i].DateClaim.ToShortDateString());
@@ -752,10 +754,6 @@ namespace OpenDental{
 				gridAttached.Rows.Add(row);
 			}
 			gridAttached.EndUpdate();
-			decimal total=0;
-			for(int i=0;i<ClaimsAttached.Count;i++) {
-				total+=(decimal)ClaimsAttached[i].InsPayAmt;
-			}
 			textTotal.Text=total.ToString("F");
 			//gridOutstanding-------------------------------------------------------------------------------------------------
 			int scrollValue=gridOut.ScrollValue;
