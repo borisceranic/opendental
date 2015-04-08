@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.1.17.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.1.20.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -7460,6 +7460,38 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}//end VixWinNumbered bridge
 				command="UPDATE preference SET ValueString = '15.1.17.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_1_20();
+		}
+
+		///<summary></summary>
+		private static void To15_1_20() {
+			if(FromVersion<new Version("15.1.20.0")) {
+				string command="";
+				command="SELECT DefNum FROM definition WHERE Category='27' AND ItemValue='RECALL' ORDER BY ItemOrder";//commlog type for recall
+				DataTable tableRecallTypes=Db.GetTable(command);
+				command="SELECT PatNum,CommDateTime,Note FROM commlog where CommType='"+tableRecallTypes.Rows[0]["DefNum"].ToString()+"'";
+				DataTable tableCommlogs=Db.GetTable(command);
+				command="";
+				for(int i=0;i<tableCommlogs.Rows.Count;i++) {//Make ehrmeasureevent for users who have been sending reminders from FormRecallList
+					DateTime dateTimeComm=PIn.DateT(tableCommlogs.Rows[i]["CommDateTime"].ToString());
+					long patNum=PIn.Long(tableCommlogs.Rows[i]["PatNum"].ToString());
+					string note=PIn.String(tableCommlogs.Rows[i]["Note"].ToString());
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command+="INSERT INTO ehrmeasureevent (DateTEvent,EventType,PatNum,MoreInfo) "
+							+"VALUES( "
+							+POut.DateT(dateTimeComm,true)+","//DateTEvent
+							+"5,"//EventType ReminderSent
+							+POut.Long(patNum)+","//PatNum
+							+"'"+POut.String(note)+"'); ";//MoreInfo
+					}
+					else {
+						//EHR is not Oracle compatable, so we don't worry about Oracle here.
+					}
+				}
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.1.20.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_2_0();
