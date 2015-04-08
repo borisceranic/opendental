@@ -562,7 +562,7 @@ namespace OpenDental {
 			contextTree.MenuItems.Clear();
 			contextTree.MenuItems.Add("Print",new System.EventHandler(menuTree_Click));
 			contextTree.MenuItems.Add("Delete",new System.EventHandler(menuTree_Click));
-			if(ClaimPaymentNum==0) {
+			if(ClaimPaymentNum==0 && EhrAmendmentCur==null) {//not an eob and not an amendment
 				contextTree.MenuItems.Add("Info",new System.EventHandler(menuTree_Click));
 			}
 		}
@@ -697,6 +697,8 @@ namespace OpenDental {
 		///<summary>This overload is for batch claim payment (EOB) images.</summary>
 		public void ModuleSelectedClaimPayment(long claimPaymentNum) {
 			ClaimPaymentNum=claimPaymentNum;
+			//Just in case this control has not been initialized yet.  Does not hurt to call multiple times.  Simply returns if already initilized.
+			InitializeOnStartup();
 			LayoutToolBar();//again
 			sliderBrightnessContrast.Visible=false;
 			//ToolBarPaint.Location=new Point(pictureBoxMain.Left,ToolBarPaint.Top);//happens in ResizeAll().
@@ -719,6 +721,8 @@ namespace OpenDental {
 		///<summary>This overload is for amendment images.  Loads the one image for this amendment.</summary>
 		public void ModuleSelectedAmendment(EhrAmendment amendment) {
 			EhrAmendmentCur=amendment;
+			//Just in case this control has not been initialized yet.  Does not hurt to call multiple times.  Simply returns if already initilized.
+			InitializeOnStartup();
 			LayoutAmendmentToolBar();
 			sliderBrightnessContrast.Visible=false;
 			//ToolBarPaint.Location=new Point(pictureBoxMain.Left,ToolBarPaint.Top);//happens in ResizeAll().
@@ -2126,7 +2130,11 @@ namespace OpenDental {
 				//bitmapCopy.Dispose();
 				//bitmapCopy=null;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.Copy,PatCur.PatNum,"Patient image "+Documents.GetByNum(nodeId.PriKey).FileName+" copied to clipboard");
+			long patNum=0;
+			if(PatCur!=null) {
+				patNum=PatCur.PatNum;
+			}
+			SecurityLogs.MakeLogEntry(Permissions.Copy,patNum,"Patient image "+Documents.GetByNum(nodeId.PriKey).FileName+" copied to clipboard");
 			Cursor=Cursors.Default;
 		}
 
