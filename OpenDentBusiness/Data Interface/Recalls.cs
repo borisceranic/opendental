@@ -966,9 +966,9 @@ namespace OpenDentBusiness{
 					if(rawRows[i]["guarAddress2"].ToString()!="") {
 						row["address"]+="\r\n"+rawRows[i]["guarAddress2"].ToString();
 					}
-					row["City"]=rawRows[i]["City"].ToString();
-					row["State"]=rawRows[i]["State"].ToString();
-					row["Zip"]=rawRows[i]["Zip"].ToString();
+					row["City"]=rawRows[i]["guarCity"].ToString();
+					row["State"]=rawRows[i]["guarState"].ToString();
+					row["Zip"]=rawRows[i]["guarZip"].ToString();
 					row["clinicNum"]=rawRows[i]["guarClinicNum"].ToString();
 					row["dateDue"]=PIn.Date(rawRows[i]["DateDue"].ToString()).ToShortDateString();
 					row["email"]=rawRows[i]["guarEmail"].ToString();
