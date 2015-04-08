@@ -126,6 +126,12 @@ namespace OpenDentBusiness{
 			com.UserNum=Security.CurUser.UserNum;
 			com.IsWebSched=isWebSched;
 			Insert(com);
+			EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
+			newMeasureEvent.DateTEvent=com.CommDateTime;
+			newMeasureEvent.EventType=EhrMeasureEventType.ReminderSent;
+			newMeasureEvent.PatNum=com.PatNum;
+			newMeasureEvent.MoreInfo=com.Note;
+			EhrMeasureEvents.Insert(newMeasureEvent);
 		}
 
 		///<Summary>Returns a defnum.  If no match, then it returns the first one in the list in that category.</Summary>
