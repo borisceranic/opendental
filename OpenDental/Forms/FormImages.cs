@@ -20,7 +20,6 @@ namespace OpenDental {
 		}
 
 		private void FormImages_Load(object sender,EventArgs e) {
-			contrImagesMain.InitializeOnStartup();
 			if(ClaimPaymentNum!=0) {
 				contrImagesMain.ModuleSelectedClaimPayment(ClaimPaymentNum);
 			}
