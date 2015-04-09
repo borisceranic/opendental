@@ -7472,15 +7472,17 @@ namespace OpenDentBusiness {
 				string command="";
 				command="SELECT DefNum FROM definition WHERE Category='27' AND ItemValue='RECALL' ORDER BY ItemOrder";//commlog type for recall
 				DataTable tableRecallTypes=Db.GetTable(command);
-				command="SELECT PatNum,CommDateTime,Note FROM commlog where CommType='"+tableRecallTypes.Rows[0]["DefNum"].ToString()+"'";
-				DataTable tableCommlogs=Db.GetTable(command);
-				command="";
+				DataTable tableCommlogs=new DataTable();//Will have no rows when there are no recall types set up.
+				if(tableRecallTypes.Rows.Count>0) {
+					command="SELECT PatNum,CommDateTime,Note FROM commlog where CommType='"+tableRecallTypes.Rows[0]["DefNum"].ToString()+"'";
+					tableCommlogs=Db.GetTable(command);
+				}
 				for(int i=0;i<tableCommlogs.Rows.Count;i++) {//Make ehrmeasureevent for users who have been sending reminders from FormRecallList
 					DateTime dateTimeComm=PIn.DateT(tableCommlogs.Rows[i]["CommDateTime"].ToString());
 					long patNum=PIn.Long(tableCommlogs.Rows[i]["PatNum"].ToString());
 					string note=PIn.String(tableCommlogs.Rows[i]["Note"].ToString());
 					if(DataConnection.DBtype==DatabaseType.MySql) {
-						command+="INSERT INTO ehrmeasureevent (DateTEvent,EventType,PatNum,MoreInfo) "
+						command="INSERT INTO ehrmeasureevent (DateTEvent,EventType,PatNum,MoreInfo) "
 							+"VALUES( "
 							+POut.DateT(dateTimeComm,true)+","//DateTEvent
 							+"5,"//EventType ReminderSent
@@ -7490,8 +7492,8 @@ namespace OpenDentBusiness {
 					else {
 						//EHR is not Oracle compatable, so we don't worry about Oracle here.
 					}
+					Db.NonQ(command);
 				}
-				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.1.20.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
