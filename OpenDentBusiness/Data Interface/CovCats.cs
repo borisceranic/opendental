@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Reflection;
 
 namespace OpenDentBusiness {
@@ -220,6 +221,15 @@ namespace OpenDentBusiness {
 		}
 
 		public static void SetSpansToDefault() {
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				SetSpansToDefaultCanada();
+			}
+			else {
+				SetSpansToDefaultUsa();
+			}
+		}
+
+		public static void SetSpansToDefaultUsa() {
 			//This can only be run if the validation checks have been run first.
 			//No need to check RemotingRole; no call to db.
 			long covCatNum;
@@ -336,7 +346,44 @@ namespace OpenDentBusiness {
 
 		}
 
+		public static void SetSpansToDefaultCanada() {
+			//This can only be run if the validation checks have been run first.
+			//No need to check RemotingRole; no call to db.
+			RecreateSpansForCategory(EbenefitCategory.General,"00000-99999");
+			RecreateSpansForCategory(EbenefitCategory.Diagnostic,"01000-09999");
+			RecreateSpansForCategory(EbenefitCategory.DiagnosticXRay,"02000-02999");
+			RecreateSpansForCategory(EbenefitCategory.RoutinePreventive,"10000-19999");
+			RecreateSpansForCategory(EbenefitCategory.Restorative,"20000-26999","28000-29999");
+			RecreateSpansForCategory(EbenefitCategory.Crowns,"27000-27999");
+			RecreateSpansForCategory(EbenefitCategory.Endodontics,"30000-39999");
+			RecreateSpansForCategory(EbenefitCategory.Periodontics,"40000-49999");
+			RecreateSpansForCategory(EbenefitCategory.Prosthodontics,"50000-56999","58000-69999");
+			RecreateSpansForCategory(EbenefitCategory.MaxillofacialProsth,"57000-57999");
+			RecreateSpansForCategory(EbenefitCategory.OralSurgery,"70000-79999");
+			RecreateSpansForCategory(EbenefitCategory.Orthodontics,"80000-89999");
+			RecreateSpansForCategory(EbenefitCategory.Adjunctive,"90000-99999");
+			RecreateSpansForCategory(EbenefitCategory.Accident);
+		}
 
+		///<summary>Deletes the current CovSpans for the given eBenefitCategory, then creates new code ranges from the ranges specified in arrayCodeRanges.  The values in arrayCodeRanges can be a single code such as "D0120" or a code range such as "D9000-D9999".</summary>
+		private static void RecreateSpansForCategory(EbenefitCategory eBenefitCategory,params string[] arrayCodeRanges) {
+			long covCatNum=GetForEbenCat(eBenefitCategory).CovCatNum;
+			CovSpans.DeleteForCat(covCatNum);
+			for(int i=0;i<arrayCodeRanges.Length;i++) {
+				string codeRange=arrayCodeRanges[i];
+				CovSpan span=new CovSpan();
+				span.CovCatNum=covCatNum;
+				if(codeRange.Contains("-")) {//Code range
+					span.FromCode=codeRange.Substring(0,codeRange.IndexOf("-"));
+					span.ToCode=codeRange.Substring(span.FromCode.Length+1);
+				}
+				else {//Single code
+					span.FromCode=codeRange;
+					span.ToCode=codeRange;
+				}
+				CovSpans.Insert(span);
+			}
+		}
 
 	}
 
