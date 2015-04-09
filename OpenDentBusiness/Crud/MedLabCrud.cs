@@ -57,7 +57,7 @@ namespace OpenDentBusiness.Crud{
 				medLab.PatAccountNum      = PIn.String(table.Rows[i]["PatAccountNum"].ToString());
 				medLab.PatFasting         = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["PatFasting"].ToString());
 				medLab.SpecimenID         = PIn.String(table.Rows[i]["SpecimenID"].ToString());
-				medLab.SpecimenIDFiller		= PIn.String(table.Rows[i]["SpecimenIDFiller"].ToString());
+				medLab.SpecimenIDFiller   = PIn.String(table.Rows[i]["SpecimenIDFiller"].ToString());
 				medLab.ObsTestID          = PIn.String(table.Rows[i]["ObsTestID"].ToString());
 				medLab.ObsTestDescript    = PIn.String(table.Rows[i]["ObsTestDescript"].ToString());
 				medLab.ObsTestLoinc       = PIn.String(table.Rows[i]["ObsTestLoinc"].ToString());
@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MedLabNum,";
 			}
-			command+="ProvNum,SendingApp,SendingFacility,PatNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,SpecimenIDInternal,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
+			command+="ProvNum,SendingApp,SendingFacility,PatNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,SpecimenIDFiller,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(medLab.MedLabNum)+",";
 			}
@@ -206,7 +206,7 @@ namespace OpenDentBusiness.Crud{
 				+"PatAccountNum      = '"+POut.String(medLab.PatAccountNum)+"', "
 				+"PatFasting         =  "+POut.Int   ((int)medLab.PatFasting)+", "
 				+"SpecimenID         = '"+POut.String(medLab.SpecimenID)+"', "
-				+"SpecimenIDFiller = '"+POut.String(medLab.SpecimenIDFiller)+"', "
+				+"SpecimenIDFiller   = '"+POut.String(medLab.SpecimenIDFiller)+"', "
 				+"ObsTestID          = '"+POut.String(medLab.ObsTestID)+"', "
 				+"ObsTestDescript    = '"+POut.String(medLab.ObsTestDescript)+"', "
 				+"ObsTestLoinc       = '"+POut.String(medLab.ObsTestLoinc)+"', "
