@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -48,6 +45,24 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
+		///<summary>Get all MedLab objects for a specific patient from the database.  Can return an empty list.</summary>
+		public static List<MedLab> GetForPatient(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM medlab WHERE PatNum="+POut.Long(patNum);
+			return Crud.MedLabCrud.SelectMany(command);
+		}
+
+		public static void UpdateFileNames(List<long> medLabNumList,string fileNameNew) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLabNumList,fileNameNew);
+				return;
+			}
+			string command="UPDATE medlab SET FileName='"+POut.String(fileNameNew)+"' WHERE MedLabNum IN("+string.Join(",",medLabNumList)+")";
+			Db.NonQ(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(MedLab medLab){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -68,15 +83,6 @@ namespace OpenDentBusiness{
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
-
-		///<summary></summary>
-		public static List<MedLab> Refresh(long patNum){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM medlab WHERE PatNum = "+POut.Long(patNum);
-			return Crud.MedLabCrud.SelectMany(command);
-		}
 
 		///<summary>Gets one MedLab from the db.</summary>
 		public static MedLab GetOne(long medLabNum){

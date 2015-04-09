@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness.HL7 {
 	///<summary></summary>
@@ -13,11 +11,14 @@ namespace OpenDentBusiness.HL7 {
 				def=new HL7Def();
 				def.IsNew=true;
 				def.Description="MedLab HL7 v2.3";
-				def.ModeTx=ModeTxHL7.File;
+				def.ModeTx=ModeTxHL7.Sftp;
 				def.IncomingFolder="";
 				def.OutgoingFolder="";
 				def.IncomingPort="";
 				def.OutgoingIpPort="";
+				def.SftpInSocket="";
+				def.SftpUsername="";
+				def.SftpPassword="";
 				def.FieldSeparator="|";
 				def.ComponentSeparator="^";
 				def.SubcomponentSeparator="&";
@@ -117,6 +118,11 @@ namespace OpenDentBusiness.HL7 {
 						//ORC.2.2 is the constant value 'LAB'
 						//Example: L2435^LAB
 						seg.AddField(2,"specimenId");
+						//ORC.3, Filler Accession ID.  The LabCorp assigned specimen number.  These are reused on a yearly basis, but used with the client
+						//specific specimen ID in ORC.2, these two numbers should uniquely identify a specimen/order.  ORC.3.2 is the constant value 'LAB'.
+						//This should match OBR.3.
+						//Example: 08599499950^LAB
+						seg.AddField(3,"specimenIdFiller");
 						//ORC.12, Ordering Provider, XCN Data Type
 						//ProvID^ProvLName^ProvFName^ProvMiddleI^^^^SourceTable
 						//This field repeats for every ID available for the provider with the SourceTable component identifying the type of ID in each repetition.
@@ -129,11 +135,16 @@ namespace OpenDentBusiness.HL7 {
 					seg=new HL7DefSegment();
 					msg.AddSegment(seg,5,true,false,SegmentNameHL7.OBR);
 						//Fields-------------------------------------------------------------------------------------------------------------
-						//OBR.3, Unique Foreign Accession or Specimen ID
+						//OBR.2, Unique Foreign Accession or Specimen ID
 						//Must match the value in ORC.2 and is the ID value sent on the specimen container and is unique per patient order, not test order.
-						//OBR.2.2 is the constant value 'LAB'
+						//OBR.2.2 is the constant value 'LAB'.
 						//Example: L2435^LAB
 						seg.AddField(2,"specimenId");
+						//OBR.3, Internal Accession ID.  The LabCorp assigned specimen number.  These are reused on a yearly basis, but used with the client
+						//specific specimen ID in OBR.2, these two numbers should uniquely identify a specimen/order.  OBR.3.2 is the constant value 'LAB'.
+						//This should match ORC.3.
+						//Example: 08599499950^LAB
+						seg.AddField(3,"specimenIdFiller");
 						//OBR.4, Universal Service Identifier, CWE data type
 						//This identifies the observation.  This will be the ID and text description of the test, as well as the LOINC code and description.
 						//Example: 006072^RPR^L^20507-0^Reagin Ab^LN
@@ -163,6 +174,9 @@ namespace OpenDentBusiness.HL7 {
 						//OBR.22, Date/Time Observation Reported.
 						//LabCorp format: yyyyMMddHHmm
 						seg.AddField(22,"dateTimeReported");
+						//OBR.24, Producer's Section ID, used by LabCorp to identify the facility responsible for performing the testing.
+						//This will be the footnote ID of the ZPS segment and will be used to attach a MedLab object to a MedLabFacility object.
+						seg.AddField(24,"facilityId");
 						//OBR.25, Order Result Status.
 						//LabCorp values: 'F' - Final, 'P' - Preliminary, 'X' - Cancelled, 'C' - Corrected
 						seg.AddField(25,"resultStatus");
@@ -189,13 +203,20 @@ namespace OpenDentBusiness.HL7 {
 					seg=new HL7DefSegment();
 					msg.AddSegment(seg,7,true,false,SegmentNameHL7.OBX);
 						//Fields-------------------------------------------------------------------------------------------------------------
+						//OBX.2, Value Type.  This field is not stored explicitly, but it is used to determine the value type of the observation.
+						//If this field is 'TX' for text, the value will be >21 chars and will be sent in the attached NTEs.
+						seg.AddField(2,"obsValueType");
 						//OBX.3, Observation ID.  This field has the same structure as the OBR.4.
 						//ID^Text^CodeSystem^AltID^AltIDText^AltIDCodeSystem, the AltID is the LOINC code so the AltIDCodeSystem will be 'LN'
 						//Example: 006072^RPR^L^20507-0^Reagin Ab^LN
 						seg.AddField(3,"obsId");
-						//OBX.5, Observation Value.
-						//ObsValue^TypeOfData^DataSubtype^Encoding^Data
-						//LabCorp report will display OBX.5.1 as the result
+						//OBX.4, Observation Sub ID.  This field is used to aid in the identification of results with the same observation ID (OBX.3) within a
+						//given OBR.  If OBX.5.3 is 'ORM' (organism) this field will link a result to an organism, whether this is for organism #1, organism #2,
+						//or organism #3.
+						seg.AddField(4,"obsIdSub");
+						//OBX.5, Observation Value.  ObsValue^TypeOfData^DataSubtype^Encoding^Data.  LabCorp report will display OBX.5.1 as the result.
+						//For value >21 chars in length: OBX.2 will be 'TX' for text, OBX.5 will be NULL (empty field), and the value will be in attached NTEs.
+						//"TNP" will be reported for Test Not Performed.
 						seg.AddField(5,"obsValue");
 						//OBX.6, Units.
 						//Identifier^Text^CodeSystem.  Id is units of measure abbreviation, text is full text version of units, coding system is 'L' (local id).
@@ -212,16 +233,18 @@ namespace OpenDentBusiness.HL7 {
 						seg.AddField(14,"dateTimeObs");
 						//OBX.15, Producer's ID.
 						//For LabCorp this is used to report the facility responsible for performing the testing.  This will hold the lab ID that will reference
-						//a ZPS segment with the lab facility name, address, and director details.
+						//a ZPS segment with the lab name, address, and director details.  Used to link a MedLabResult object to a MedLabFacility object.
 						seg.AddField(15,"facilityId");
 					#endregion OBX - Observation/Result
 					#region ZEF - Encapsulated Data Format
 					seg=new HL7DefSegment();
 					msg.AddSegment(seg,8,true,true,SegmentNameHL7.ZEF);
 						//Fields-------------------------------------------------------------------------------------------------------------
-						//ZEF.3, Embedded File.
+						//ZEF.1, Sequence Number, 1 through 9999
+						seg.AddField(1,"sequenceNum");
+						//ZEF.2, Embedded File.
 						//Base64 embedded file, sent in 50k blocks and will be concatenated together to and converted back into
-						seg.AddField(3,"base64File");
+						seg.AddField(2,"base64File");
 					#endregion ZEF - Encapsulated Data Format
 					#region NTE - Notes and Comments
 					seg=new HL7DefSegment();

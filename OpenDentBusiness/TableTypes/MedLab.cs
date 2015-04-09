@@ -47,6 +47,9 @@ namespace OpenDentBusiness {
 		///<summary>ORC.2.1 and OBR.2.1 - Unique Foreign Accession or Specimen ID.  LabCorp report field "Client Accession (ACC)".
 		///ID sent on the specimen container.</summary>
 		public string SpecimenID;
+		///<summary>ORC.3.1 and OBR.3.1 - Internal (to LabCorp for example)/Filler Accession or Specimen ID.
+		///LabCorp assigned specimen number, reused on a yearly basis.</summary>
+		public string SpecimenIDFiller;
 		///<summary>OBR.4.1 - Observation Battery Identifier.  Reflex result will have this value in OBR.29 to link the reflex to the parent.</summary>
 		public string ObsTestID;
 		///<summary>OBR.4.2 - Observation Battery Text.  LabCorp report field "Tests Ordered".</summary>

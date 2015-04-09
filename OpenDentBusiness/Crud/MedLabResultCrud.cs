@@ -52,7 +52,18 @@ namespace OpenDentBusiness.Crud{
 				medLabResult.ObsText        = PIn.String(table.Rows[i]["ObsText"].ToString());
 				medLabResult.ObsLoinc       = PIn.String(table.Rows[i]["ObsLoinc"].ToString());
 				medLabResult.ObsLoincText   = PIn.String(table.Rows[i]["ObsLoincText"].ToString());
+				medLabResult.ObsIDSub       = PIn.String(table.Rows[i]["ObsIDSub"].ToString());
 				medLabResult.ObsValue       = PIn.String(table.Rows[i]["ObsValue"].ToString());
+				string obsSubType=table.Rows[i]["ObsSubType"].ToString();
+				if(obsSubType==""){
+					medLabResult.ObsSubType   =(DataSubtype)0;
+				}
+				else try{
+					medLabResult.ObsSubType   =(DataSubtype)Enum.Parse(typeof(DataSubtype),obsSubType);
+				}
+				catch{
+					medLabResult.ObsSubType   =(DataSubtype)0;
+				}
 				medLabResult.ObsUnits       = PIn.String(table.Rows[i]["ObsUnits"].ToString());
 				medLabResult.ReferenceRange = PIn.String(table.Rows[i]["ReferenceRange"].ToString());
 				string abnormalFlag=table.Rows[i]["AbnormalFlag"].ToString();
@@ -119,7 +130,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MedLabResultNum,";
 			}
-			command+="MedLabNum,ObsID,ObsText,ObsLoinc,ObsLoincText,ObsValue,ObsUnits,ReferenceRange,AbnormalFlag,ResultStatus,DateTimeObs,FacilityID,DocNum,Note) VALUES(";
+			command+="MedLabNum,ObsID,ObsText,ObsLoinc,ObsLoincText,ObsIDSub,ObsValue,ObsSubType,ObsUnits,ReferenceRange,AbnormalFlag,ResultStatus,DateTimeObs,FacilityID,DocNum,Note) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(medLabResult.MedLabResultNum)+",";
 			}
@@ -129,7 +140,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLabResult.ObsText)+"',"
 				+"'"+POut.String(medLabResult.ObsLoinc)+"',"
 				+"'"+POut.String(medLabResult.ObsLoincText)+"',"
+				+"'"+POut.String(medLabResult.ObsIDSub)+"',"
 				+"'"+POut.String(medLabResult.ObsValue)+"',"
+				+"'"+POut.String(medLabResult.ObsSubType.ToString())+"',"
 				+"'"+POut.String(medLabResult.ObsUnits)+"',"
 				+"'"+POut.String(medLabResult.ReferenceRange)+"',"
 				+"'"+POut.String(medLabResult.AbnormalFlag.ToString())+"',"
@@ -159,7 +172,9 @@ namespace OpenDentBusiness.Crud{
 				+"ObsText        = '"+POut.String(medLabResult.ObsText)+"', "
 				+"ObsLoinc       = '"+POut.String(medLabResult.ObsLoinc)+"', "
 				+"ObsLoincText   = '"+POut.String(medLabResult.ObsLoincText)+"', "
+				+"ObsIDSub       = '"+POut.String(medLabResult.ObsIDSub)+"', "
 				+"ObsValue       = '"+POut.String(medLabResult.ObsValue)+"', "
+				+"ObsSubType     = '"+POut.String(medLabResult.ObsSubType.ToString())+"', "
 				+"ObsUnits       = '"+POut.String(medLabResult.ObsUnits)+"', "
 				+"ReferenceRange = '"+POut.String(medLabResult.ReferenceRange)+"', "
 				+"AbnormalFlag   = '"+POut.String(medLabResult.AbnormalFlag.ToString())+"', "
@@ -199,9 +214,17 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ObsLoincText = '"+POut.String(medLabResult.ObsLoincText)+"'";
 			}
+			if(medLabResult.ObsIDSub != oldMedLabResult.ObsIDSub) {
+				if(command!=""){ command+=",";}
+				command+="ObsIDSub = '"+POut.String(medLabResult.ObsIDSub)+"'";
+			}
 			if(medLabResult.ObsValue != oldMedLabResult.ObsValue) {
 				if(command!=""){ command+=",";}
 				command+="ObsValue = '"+POut.String(medLabResult.ObsValue)+"'";
+			}
+			if(medLabResult.ObsSubType != oldMedLabResult.ObsSubType) {
+				if(command!=""){ command+=",";}
+				command+="ObsSubType = '"+POut.String(medLabResult.ObsSubType.ToString())+"'";
 			}
 			if(medLabResult.ObsUnits != oldMedLabResult.ObsUnits) {
 				if(command!=""){ command+=",";}

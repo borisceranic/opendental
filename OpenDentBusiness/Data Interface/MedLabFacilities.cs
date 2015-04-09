@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -47,6 +43,34 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
+
+		///<summary>Checks the database for a MedLabFacility with matching name, address, city, and state and if the facility doesn't exist, it's inserted.
+		///Returns the MedLabFacilityNum for the facility inserted or found.</summary>
+		public static long InsertIfNotInDb(MedLabFacility medLabFacility) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),medLabFacility);
+			}
+			string command="SELECT * FROM medlabfacility WHERE FacilityName='"+POut.String(medLabFacility.FacilityName)+"' "
+				+"AND Address='"+POut.String(medLabFacility.Address)+"' "
+				+"AND City='"+POut.String(medLabFacility.City)+"' "
+				+"AND State='"+POut.String(medLabFacility.State)+"'";
+			MedLabFacility medLabFacilityDb=Crud.MedLabFacilityCrud.SelectOne(command);
+			if(medLabFacilityDb==null) {
+				return Crud.MedLabFacilityCrud.Insert(medLabFacility);
+			}
+			medLabFacility.MedLabFacilityNum=medLabFacilityDb.MedLabFacilityNum;
+			Crud.MedLabFacilityCrud.Update(medLabFacility,medLabFacilityDb);
+			return medLabFacilityDb.MedLabFacilityNum;
+		}
+
+		///<summary>Gets one MedLabFacility from the db.</summary>
+		public static MedLabFacility GetOne(long medLabFacilityNum){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetObject<MedLabFacility>(MethodBase.GetCurrentMethod(),medLabFacilityNum);
+			}
+			return Crud.MedLabFacilityCrud.SelectOne(medLabFacilityNum);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
@@ -58,15 +82,7 @@ namespace OpenDentBusiness{
 			string command="SELECT * FROM medlabfacility WHERE PatNum = "+POut.Long(patNum);
 			return Crud.MedLabFacilityCrud.SelectMany(command);
 		}
-
-		///<summary>Gets one MedLabFacility from the db.</summary>
-		public static MedLabFacility GetOne(long medLabFacilityNum){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<MedLabFacility>(MethodBase.GetCurrentMethod(),medLabFacilityNum);
-			}
-			return Crud.MedLabFacilityCrud.SelectOne(medLabFacilityNum);
-		}
-
+		
 		///<summary></summary>
 		public static long Insert(MedLabFacility medLabFacility){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

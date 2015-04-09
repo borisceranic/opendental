@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -47,6 +43,16 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
+
+		///<summary></summary>
+		public static long Insert(MedLabSpecimen medLabSpecimen) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				medLabSpecimen.MedLabSpecimenNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabSpecimen);
+				return medLabSpecimen.MedLabSpecimenNum;
+			}
+			return Crud.MedLabSpecimenCrud.Insert(medLabSpecimen);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
@@ -65,15 +71,6 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<MedLabSpecimen>(MethodBase.GetCurrentMethod(),medLabSpecimenNum);
 			}
 			return Crud.MedLabSpecimenCrud.SelectOne(medLabSpecimenNum);
-		}
-
-		///<summary></summary>
-		public static long Insert(MedLabSpecimen medLabSpecimen){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				medLabSpecimen.MedLabSpecimenNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabSpecimen);
-				return medLabSpecimen.MedLabSpecimenNum;
-			}
-			return Crud.MedLabSpecimenCrud.Insert(medLabSpecimen);
 		}
 
 		///<summary></summary>

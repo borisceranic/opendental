@@ -25,6 +25,10 @@ namespace OpenDentBusiness {
 		///<summary>OBX.3.5 - Alternate Observation Text (LOINC Description).  The LOINC code description for the observation.
 		///We will display OBX.3.2 per LabCorp requirements, but we will store this description for reporting purposes.</summary>
 		public string ObsLoincText;
+		///<summary>OBX.4 - Observation Sub ID.  Used to aid in the identification of results with the same Observation ID (OBX.3) within a given OBR.
+		///This value is used to tie the results to the same organism.  The value in OBX.5.3 tells whether this OBX is the organism, observation, or
+		///antibiotic and then the value in OBX.4 links them together as to whether this is for organism #1, organism #2, etc.</summary>
+		public string ObsIDSub;
 		///<summary>OBX.5.1 - Observation Value.  LabCorp report field "RESULT".
 		///Can be null if coded entries, prelims, canceled, or >21 chars and being returned as an attached NTE.
 		///"TNP" will be reported for Test Not Performed.  For value >21 chars in length: OBX.2 will be 'TX' for text,
@@ -36,6 +40,11 @@ namespace OpenDentBusiness {
 		///NTE|1|L|Red cells observed in serum. Glucose may be falsely decreased.
 		///NTE|2|L|Potassium may be falsely increased.</summary>
 		public string ObsValue;
+		///<summary>OBX.5.3 - Data Subtype.  Used to identify the coding system. Required if Discrete Microbiology testing is ordered to identify
+		///Microbiology Result Type.  Example of use: If OBX.5.3 is ORM, then the observation sub ID in OBX.4 is used to associate the result with
+		///a specific organism.  OBX.4 might contain 1, 2, or 3 meaning the result is for organism #1, organism #2, or organism #3.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public DataSubtype ObsSubType;
 		///<summary>OBX.6.1 - Identifier.  LabCorp report field "UNITS".  Units of measure, if too large it will be in the NTE segment.</summary>
 		public string ObsUnits;
 		///<summary>OBX.7 - Reference Ranges.  LabCorp report field "REFERENCE INTERVAL".  Only if applicable.</summary>
@@ -102,6 +111,30 @@ namespace OpenDentBusiness {
 		R,
 		///<summary>13 - Susceptible.  For Discrete Microbiology susceptibilities only.</summary>
 		S
+	}
+
+	///<summary>Used to identify the coding system. Required if Discrete Microbiology testing is ordered to identify Microbiology Result Type.
+	///Example of use: If OBX.5.3 is ORM, then the observation sub ID in OBX.4 is used to associate the result with a specific organism.
+	///OBX.4 might contain 1, 2, or 3 meaning the result is for organism #1, organism #2, or organism #3.</summary>
+	public enum DataSubtype {
+		///<summary>This idicates that we are unable to parse the value from the HL7 message into a data subtype.</summary>
+		Unknown,
+		///<summary>Antibody (for Discrete Microbiology only)</summary>
+		ANT,
+		///<summary>Organism identifier (for Discrete Microbiology only)</summary>
+		ORM,
+		///<summary>Presumptive organism identifier (for Discrete Microbiology only)</summary>
+		ORP,
+		///<summary>Observation (for Discrete Microbiology only)</summary>
+		OBS,
+		///<summary>Modifier (for Discrete Microbiology only)</summary>
+		MOD,
+		///<summary>Local Identifier (default when no Microbiology Result Text)</summary>
+		L,
+		///<summary>Embedded PDF result type or separate PDF file</summary>
+		PDF,
+		///<summary>Embedded TIF result type or a separate TIF file</summary>
+		TIF
 	}
 
 }

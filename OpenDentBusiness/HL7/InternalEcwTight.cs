@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness.HL7 {
 	///<summary></summary>
@@ -19,6 +17,9 @@ namespace OpenDentBusiness.HL7 {
 				def.OutgoingFolder="";
 				def.IncomingPort="";
 				def.OutgoingIpPort="";
+				def.SftpInSocket="";
+				def.SftpUsername="";
+				def.SftpPassword="";
 				def.FieldSeparator="|";
 				def.ComponentSeparator="^";
 				def.SubcomponentSeparator="&";

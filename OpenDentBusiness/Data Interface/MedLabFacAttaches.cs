@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -10,11 +11,11 @@ namespace OpenDentBusiness{
 		//If leaving this region in place, be sure to add RefreshCache and FillCache 
 		//to the Cache.cs file with all the other Cache types.
 
-		///<summary>A list of all MedLabAttaches.</summary>
-		private static List<MedLabAttach> listt;
+		///<summary>A list of all MedLabFacAttaches.</summary>
+		private static List<MedLabFacAttach> listt;
 
-		///<summary>A list of all MedLabAttaches.</summary>
-		public static List<MedLabAttach> Listt{
+		///<summary>A list of all MedLabFacAttaches.</summary>
+		public static List<MedLabFacAttach> Listt{
 			get {
 				if(listt==null) {
 					RefreshCache();
@@ -29,9 +30,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache(){
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM medlabattach ORDER BY ItemOrder";//stub query probably needs to be changed
+			string command="SELECT * FROM medlabfacattach ORDER BY ItemOrder";//stub query probably needs to be changed
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
-			table.TableName="MedLabAttach";
+			table.TableName="MedLabFacAttach";
 			FillCache(table);
 			return table;
 		}
@@ -39,56 +40,76 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.MedLabAttachCrud.TableToList(table);
+			listt=Crud.MedLabFacAttachCrud.TableToList(table);
 		}
 		#endregion
 		*/
 
 		///<summary></summary>
-		public static long Insert(MedLabFacAttach medLabAttach) {
+		public static long Insert(MedLabFacAttach medLabFacAttach) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				medLabAttach.MedLabFacAttachNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabAttach);
-				return medLabAttach.MedLabFacAttachNum;
+				medLabFacAttach.MedLabFacAttachNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabFacAttach);
+				return medLabFacAttach.MedLabFacAttachNum;
 			}
-			return Crud.MedLabFacAttachCrud.Insert(medLabAttach);
+			return Crud.MedLabFacAttachCrud.Insert(medLabFacAttach);
+		}
+
+		///<summary>Gets all MedLabFacAttaches from the db for a MedLab or a MedLabResult.  Only one parameter is required,
+		///EITHER a MedLabNum OR a MedLabResultNum.  The other parameter should be 0.  If both parameters are >0, then list
+		///returned will be all MedLabFacAttaches with EITHER the MedLabNum OR the MedLabResultNum provided.</summary>
+		public static List<MedLabFacAttach> GetAllForLabOrResult(long medLabNum,long medLabResultNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLabFacAttach>>(MethodBase.GetCurrentMethod(),medLabNum,medLabResultNum);
+			}
+			string command="SELECT * FROM medlabfacattach WHERE ";
+			if(medLabNum!=0) {
+				command+="MedLabNum="+POut.Long(medLabNum);
+			}
+			if(medLabResultNum!=0) {
+				if(medLabNum!=0) {
+					command+=" OR ";
+				}
+				command+="MedLabResultNum="+POut.Long(medLabResultNum);
+			}
+			return Crud.MedLabFacAttachCrud.SelectMany(command);
 		}
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
-		public static List<MedLabAttach> Refresh(long patNum){
+		public static List<MedLabFacAttach> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<MedLabAttach>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<MedLabFacAttach>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM medlabattach WHERE PatNum = "+POut.Long(patNum);
-			return Crud.MedLabAttachCrud.SelectMany(command);
+			string command="SELECT * FROM medlabfacattach WHERE PatNum = "+POut.Long(patNum);
+			return Crud.MedLabFacAttachCrud.SelectMany(command);
 		}
 
-		///<summary>Gets one MedLabAttach from the db.</summary>
-		public static MedLabAttach GetOne(long medLabAttachNum){
+		///<summary>Gets one MedLabFacAttach from the db.</summary>
+		public static MedLabFacAttach GetOne(long medLabFacAttachNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<MedLabAttach>(MethodBase.GetCurrentMethod(),medLabAttachNum);
+				return Meth.GetObject<MedLabFacAttach>(MethodBase.GetCurrentMethod(),medLabFacAttachNum);
 			}
-			return Crud.MedLabAttachCrud.SelectOne(medLabAttachNum);
+			return Crud.MedLabFacAttachCrud.SelectOne(medLabFacAttachNum);
 		}
 
 		///<summary></summary>
-		public static void Update(MedLabAttach medLabAttach){
+		public static void Update(MedLabFacAttach medLabFacAttach){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLabAttach);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLabFacAttach);
 				return;
 			}
-			Crud.MedLabAttachCrud.Update(medLabAttach);
+			Crud.MedLabFacAttachCrud.Update(medLabFacAttach);
 		}
 
 		///<summary></summary>
-		public static void Delete(long medLabAttachNum) {
+		public static void Delete(long medLabFacAttachNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLabAttachNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),medLabFacAttachNum);
 				return;
 			}
-			string command= "DELETE FROM medlabattach WHERE MedLabAttachNum = "+POut.Long(medLabAttachNum);
+			string command= "DELETE FROM medlabfacattach WHERE MedLabFacAttachNum = "+POut.Long(medLabFacAttachNum);
 			Db.NonQ(command);
 		}
 		*/

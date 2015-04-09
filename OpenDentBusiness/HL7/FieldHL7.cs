@@ -81,12 +81,12 @@ namespace OpenDentBusiness.HL7 {
 			}
 		}
 
-		///<summary></summary>
+		///<summary>If the index supplied is greater than the number of components, this will return an empty string.</summary>
 		public string GetComponentVal(int indexPos) {
 			if(indexPos > Components.Count-1) {
 				return "";
 			}
-			return Components[indexPos].ComponentVal;
+			return Components[indexPos].ComponentVal.Trim();
 		}
 
 		///<summary>This also resets the number of components.  And it sets fullText.</summary>

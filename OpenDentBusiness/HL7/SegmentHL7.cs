@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace OpenDentBusiness.HL7 {
 	///<summary>A 'row' in the message.  Composed of fields</summary>
@@ -12,6 +11,7 @@ namespace OpenDentBusiness.HL7 {
 		///<summary>The original full text of the segment.</summary>
 		private string _fullText;
 		private char[] _delimiters;
+		public int SequenceNumIndex=1;//the index for the field of the sequence num for repeating segs, usually the 2nd field in the seg, but set in the def
 
 		///<summary>Only use this constructor when generating a message instead of parsing a message.  Uses the default message delimiters.</summary>
 		internal SegmentHL7(SegmentNameHL7 name) {
@@ -101,6 +101,22 @@ namespace OpenDentBusiness.HL7 {
 				catch {
 					Name=SegmentNameHL7.Unknown;
 				}
+			}
+		}
+
+		///<summary>Read-only property.  This is the sequence number of this segment within the HL7 message.  Repeatable segments have a sequence number
+		///identifying which repetition the segment is and is used to order the repeating segments.  If the value in the field with index SequenceNumPos
+		///cannot be parsed into an int, or if the segment does not have an index SequenceNumPos field, the SequenceNum returned will be -1.</summary>
+		public int SequenceNum {
+			get {
+				int retval=-1;
+				try {
+					retval=Int32.Parse(Fields[SequenceNumIndex].FullText);
+				}
+				catch(Exception ex) {
+					//do nothing, the sequence num will remain -1
+				}
+				return retval;
 			}
 		}
 

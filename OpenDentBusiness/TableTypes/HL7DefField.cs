@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace OpenDentBusiness{
 	///<summary>Multiple fields per segment.</summary>
@@ -120,9 +118,11 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("obsId",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("obsNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlabresult.Note column
 			retVal.Add(new FieldNameAndType("obsRefRange",DataTypeHL7.ST));
+			retVal.Add(new FieldNameAndType("obsIdSub",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("obsTestId",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("obsUnits",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("obsValue",DataTypeHL7.Varied));
+			retVal.Add(new FieldNameAndType("obsValueType",DataTypeHL7.ID,"0125"));
 			retVal.Add(new FieldNameAndType("orderingProv",DataTypeHL7.XCN));
 			retVal.Add(new FieldNameAndType("parentObsId",DataTypeHL7.PRL));
 			retVal.Add(new FieldNameAndType("parentObsTestId",DataTypeHL7.EIP));
@@ -175,6 +175,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("specimenAction",DataTypeHL7.ID,"0065"));
 			retVal.Add(new FieldNameAndType("specimenDescript",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("specimenId",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("specimenIDFiller",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("specimenIdAlt",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("totalVolume",DataTypeHL7.CQ));
 			return retVal;
