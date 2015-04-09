@@ -62,8 +62,12 @@ namespace OpenDental {
 			if(phoneList==null) {
 				return;
 			}
-			float rows=7;
-			float columns=9;
+			int columns=9;
+			int rows=1;
+			//Dynamically figure out how many rows are needed if there are any phone tiles present.
+			if(phoneList.Count > 0 && columns > 0) {
+				rows=(phoneList.Count + columns - 1) / columns;//Rounds up the result of tile count / columns.
+			}
 			float boxWidth=((float)this.Width)/columns; //21.4f;
 			float boxHeight=17f;
 			float hTot=boxHeight*rows;
@@ -71,6 +75,12 @@ namespace OpenDental {
 			float y=0f;
 			//Create a white "background" rectangle so that any empty squares (no employees) will show as white boxes instead of no color.
 			g.FillRectangle(new SolidBrush(Color.White),x,y,boxWidth*columns,boxHeight*rows);
+			//Dynamically move the phone tile control down.
+			int xTile=0;//Just in case this needs to be dynamic in the future as well.
+			int yTile=(int)(boxHeight*rows) + 5;//The height of the lights plus a little padding.
+			phoneTile.Location=new Point(xTile,yTile);
+			//Dynamically resize the entire UserControlPhoneSmall.
+			this.Size=new System.Drawing.Size(173,yTile+phoneTile.Height);
 			for(int i=0;i<phoneList.Count;i++) {				
 				//Draw the extension number if a person is available at that extension.
 				if(phoneList[i].ClockStatus!=ClockStatusEnum.Home

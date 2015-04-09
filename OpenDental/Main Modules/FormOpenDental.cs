@@ -1693,6 +1693,8 @@ namespace OpenDental{
 			// 
 			// panelPhoneSmall
 			// 
+			this.panelPhoneSmall.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.panelPhoneSmall.Controls.Add(this.labelFieldType);
 			this.panelPhoneSmall.Controls.Add(this.comboTriageCoordinator);
 			this.panelPhoneSmall.Controls.Add(this.labelMsg);
