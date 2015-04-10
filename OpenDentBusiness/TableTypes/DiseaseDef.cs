@@ -6,6 +6,7 @@ namespace OpenDentBusiness{
 
 	/// <summary>A list of diseases that can be assigned to patients.  Cannot be deleted if in use by any patients.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class DiseaseDef:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

@@ -425,6 +425,16 @@ namespace OpenDentBusiness {
 			return false;
 		}
 
+		///<summary>Sync pattern, must sync entire table. Probably only to be used in the master problem list window.</summary>
+		public static void Sync(List<DiseaseDef> listDefs) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listDefs);
+				return;
+			}
+			DiseaseDefs.RefreshCache();
+			Crud.DiseaseDefCrud.Sync(listDefs,new List<DiseaseDef>(DiseaseDefs.ListLong));
+		}
+
 		///<summary>Get all diseasedefs that have a pregnancy code that applies to the three CQM measures with pregnancy as an exclusion condition.</summary>
 		public static List<DiseaseDef> GetAllPregDiseaseDefs() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
