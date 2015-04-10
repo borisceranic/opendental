@@ -4259,16 +4259,30 @@ namespace OpenDental{
 				textCode10.Text=ClaimCondCodeLogCur.Code10.ToString();
 			}
 			if(ListClaimValCodes!=null) {
-				for(int i=0;i<ListClaimValCodes.Count;i++) {
-					ClaimValCodeLog vc = (ClaimValCodeLog)ListClaimValCodes[i];
-					TextBox code = (TextBox)Controls.Find("textVC" + i + "Code",true)[0];
-					code.Text=vc.ValCode.ToString();
-					TextBox amount = (TextBox)Controls.Find("textVC" + i + "Amount",true)[0];
-					amount.Text=vc.ValAmount.ToString();
-				}
+				FillValCode(ListClaimValCodes,0,textVC0Code,textVC0Amount);
+				FillValCode(ListClaimValCodes,1,textVC1Code,textVC1Amount);
+				FillValCode(ListClaimValCodes,2,textVC2Code,textVC2Amount);
+				FillValCode(ListClaimValCodes,3,textVC3Code,textVC3Amount);
+				FillValCode(ListClaimValCodes,4,textVC4Code,textVC4Amount);
+				FillValCode(ListClaimValCodes,5,textVC5Code,textVC5Amount);
+				FillValCode(ListClaimValCodes,6,textVC6Code,textVC6Amount);
+				FillValCode(ListClaimValCodes,7,textVC7Code,textVC7Amount);
+				FillValCode(ListClaimValCodes,8,textVC8Code,textVC8Amount);
+				FillValCode(ListClaimValCodes,9,textVC9Code,textVC9Amount);
+				FillValCode(ListClaimValCodes,10,textVC10Code,textVC10Amount);
+				FillValCode(ListClaimValCodes,11,textVC11Code,textVC11Amount);
 			}
 			FillGrids();
 			FillAttachments();
+		}
+
+		///<summary>If valCodeIdx>listClaimValCodes.Count then nothing will happen, otherwise it will fill the text boxes with appropriate values
+		///from the listClaimValCodes[valCodeIdx].</summary>
+		private static void FillValCode(List<ClaimValCodeLog> listClaimValCodes,int valCodeIdx,TextBox textVCCode,TextBox textVCAmount) {
+			if(listClaimValCodes.Count>valCodeIdx) {
+				textVCCode.Text=listClaimValCodes[valCodeIdx].ValCode;
+				textVCAmount.Text=listClaimValCodes[valCodeIdx].ValAmount.ToString();
+			}
 		}
 
 		private void FillCanadian() {
@@ -6199,34 +6213,19 @@ namespace OpenDental{
 			ClaimCur.PatientStatusCode=textPatientStatus.Text;
 			ClaimCur.ProvOrderOverride=_provNumOrderingSelected;
 			Claims.Update(ClaimCur);
-			if(ListClaimValCodes!=null){
-				for(int i=0;i<ListClaimValCodes.Count;i++){ //update existing Value Code pairs
-					ClaimValCodeLog vc = (ClaimValCodeLog)ListClaimValCodes[i];
-					TextBox code = (TextBox)Controls.Find("textVC" + i + "Code", true)[0];
-					vc.ValCode=code.Text.ToString();
-					TextBox amount = (TextBox)Controls.Find("textVC" + i + "Amount", true)[0];
-					string amt = amount.Text;
-					if(amt=="") {
-						amt = "0";
-					}
-					vc.ValAmount=Double.Parse(amt);
-				}
-				for(int i=(ListClaimValCodes.Count);i<12;i++){ //add new Value Code pairs
-					ClaimValCodeLog vc = new ClaimValCodeLog();
-					TextBox code = (TextBox)Controls.Find("textVC" + i + "Code", true)[0];
-					vc.ValCode=code.Text.ToString();
-					TextBox amount = (TextBox)Controls.Find("textVC" + i + "Amount", true)[0];
-					string amt = amount.Text;
-					if(amt=="") {
-						amt = "0";
-					}
-					vc.ValAmount=Double.Parse(amt);
-					vc.ClaimNum=ClaimCur.ClaimNum;
-					vc.ClaimValCodeLogNum=0;
-					if(vc.ValCode!="" || vc.ValAmount!=0){
-						ListClaimValCodes.Add(vc);
-					}
-				}
+			if(ListClaimValCodes!=null) {
+				GetValCodes(ListClaimValCodes,0,ClaimCur.ClaimNum,textVC0Code,textVC0Amount);
+				GetValCodes(ListClaimValCodes,1,ClaimCur.ClaimNum,textVC1Code,textVC1Amount);
+				GetValCodes(ListClaimValCodes,2,ClaimCur.ClaimNum,textVC2Code,textVC2Amount);
+				GetValCodes(ListClaimValCodes,3,ClaimCur.ClaimNum,textVC3Code,textVC3Amount);
+				GetValCodes(ListClaimValCodes,4,ClaimCur.ClaimNum,textVC4Code,textVC4Amount);
+				GetValCodes(ListClaimValCodes,5,ClaimCur.ClaimNum,textVC5Code,textVC5Amount);
+				GetValCodes(ListClaimValCodes,6,ClaimCur.ClaimNum,textVC6Code,textVC6Amount);
+				GetValCodes(ListClaimValCodes,7,ClaimCur.ClaimNum,textVC7Code,textVC7Amount);
+				GetValCodes(ListClaimValCodes,8,ClaimCur.ClaimNum,textVC8Code,textVC8Amount);
+				GetValCodes(ListClaimValCodes,9,ClaimCur.ClaimNum,textVC9Code,textVC9Amount);
+				GetValCodes(ListClaimValCodes,10,ClaimCur.ClaimNum,textVC10Code,textVC10Amount);
+				GetValCodes(ListClaimValCodes,11,ClaimCur.ClaimNum,textVC11Code,textVC11Amount);
 				ClaimValCodeLogs.UpdateList(ListClaimValCodes);
 			}
 			if(ClaimCondCodeLogCur!=null || textCode0.Text!="" || textCode1.Text!="" || textCode2.Text!="" || textCode3.Text!="" || 
@@ -6270,6 +6269,20 @@ namespace OpenDental{
 				SecurityLogs.MakeLogEntry(Permissions.ClaimSentEdit,ClaimCur.PatNum,
 					PatCur.GetNameLF()+", "
 					+Lan.g(this,"Date of service: ")+ClaimCur.DateService.ToShortDateString());
+			}
+		}
+
+		private void GetValCodes(List<ClaimValCodeLog> listClaimValCodes,int valCodeIdx,long claimNum,TextBox textVCCode,TextBox textVCAmount) {
+			if(valCodeIdx<listClaimValCodes.Count) {//update existing ClaimValCodeLog
+				listClaimValCodes[valCodeIdx].ValCode=textVCCode.Text;
+				listClaimValCodes[valCodeIdx].ValAmount=PIn.Double(textVCAmount.Text);
+			}
+			else if(PIn.Double(textVCAmount.Text)>0 || textVCCode.Text!="") {//add a new ClaimValCodeLog
+				ClaimValCodeLog claimVC=new ClaimValCodeLog();
+				claimVC.ValCode=textVCCode.Text;
+				claimVC.ValAmount=PIn.Double(textVCAmount.Text);
+				claimVC.ClaimNum=claimNum;
+				listClaimValCodes.Add(claimVC);
 			}
 		}
 
