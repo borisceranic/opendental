@@ -493,22 +493,12 @@ namespace OpenDental{
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {
-			if(IsSelectionMode) {//Never update disease defs in selection mode.
-				DialogResult=DialogResult.Cancel;
-			}
-			////Only update the defs that changed their item order.
-			//for(int i=0;i<_listDiseaseDefs.Count;i++) {
-			//	if(_listDiseaseDefs[i].ItemOrder!=i) {
-			//		_listDiseaseDefs[i].ItemOrder=i;
-			//		DiseaseDefs.Update(_listDiseaseDefs[i]);
-			//		IsChanged=true;//Just in case?  This should already be flagged as true by this point.
-			//	}
-			//}
 			DialogResult=DialogResult.Cancel;
 		}
 
 		private void FormDiseaseDefs_FormClosing(object sender,FormClosingEventArgs e) {
 			if(IsChanged) {
+				DiseaseDefs.Sync(_listDiseaseDefs);//Update if anything has changed, even in selection mode.
 				DataValid.SetInvalid(InvalidType.Diseases);
 			}
 		}
