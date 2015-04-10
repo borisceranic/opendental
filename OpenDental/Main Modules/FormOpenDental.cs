@@ -307,6 +307,8 @@ namespace OpenDental{
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
 		///<summary>This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
 		public static long ClinicNum=0;
+		///<summary>This is used to determine how Open Dental closed.  If this is set to anything but 0 then some kind of error occurred and Open Dental was forced to close.  Currently only used when updating Open Dental silently.</summary>
+		public static int ExitCode=0;
 		///<summary>Will be set to true if the STOP SLAVE SQL was run on the replication server for which the local replication monitor is watching.
 		///Replicaiton is NOT broken when this flag is true, because the user can re-enable replicaiton using the START SLAVE SQL without any ill effects.
 		///This flag is used to display a warning to the user, but will not ever block the user from using OD.</summary>
@@ -1839,21 +1841,15 @@ namespace OpenDental{
 
 		#endregion
 
-		private void FormOpenDental_Load(object sender, System.EventArgs e){
+		private void FormOpenDental_Load(object sender,System.EventArgs e) {
 			_isStartingUp=true;//Halts mobile synch during updates.
 			Splash.Dispose();
-			Version versionOd=Assembly.GetAssembly(typeof(FormOpenDental)).GetName().Version;
-			Version versionObBus=Assembly.GetAssembly(typeof(Db)).GetName().Version;
-			if(versionOd!=versionObBus) {
-				MessageBox.Show("Mismatched program file versions. Please run the Open Dental setup file again on this computer.");//No MsgBox or Lan.g() here, because we don't want to access the database if there is a version conflict.
-				Application.Exit();
-				return;
-			}
 			allNeutral();
 			string odUser="";
 			string odPassHash="";
 			string webServiceUri="";
 			YN webServiceIsEcw=YN.Unknown;
+			bool isSilentUpdate=false;
 			string odPassword="";
 			string serverName="";
 			string databaseName="";
@@ -1893,16 +1889,49 @@ namespace OpenDental{
 					if(CommandLineArgs[i].StartsWith("MySqlPassword=") && CommandLineArgs[i].Length>14) {
 						mySqlPassword=CommandLineArgs[i].Substring(14).Trim('"');
 					}
+					if(CommandLineArgs[i].StartsWith("IsSilentUpdate=") && CommandLineArgs[i].Length>15) {
+						if(CommandLineArgs[i].Substring(15).Trim('"').ToLower()=="true") {
+							isSilentUpdate=true;
+						}
+						else {
+							isSilentUpdate=false;
+						}
+					}
 				}
 			}
 			YN noShow=YN.Unknown;
-			if(webServiceUri!=""){//a web service was specified
-				if(odUser!="" && odPassword!=""){//and both a username and password were specified
+			if(webServiceUri!="") {//a web service was specified
+				if(odUser!="" && odPassword!="") {//and both a username and password were specified
 					noShow=YN.Yes;
 				}
 			}
-			else if(databaseName!=""){
+			else if(databaseName!="") {
 				noShow=YN.Yes;
+			}
+			//Users that want to silently update MUST pass in the following command line args.
+			if(isSilentUpdate && (odUser.Trim()==""
+					|| (odPassword.Trim()=="" && odPassHash.Trim()=="")
+					|| serverName.Trim()==""
+					|| databaseName.Trim()==""
+					|| mySqlUser.Trim()==""
+					|| mySqlPassword.Trim()=="")) 
+			{
+				ExitCode=104;//Required command line arguments have not been set for silent updating
+				Application.Exit();
+				return;
+			}
+			Version versionOd=Assembly.GetAssembly(typeof(FormOpenDental)).GetName().Version;
+			Version versionObBus=Assembly.GetAssembly(typeof(Db)).GetName().Version;
+			if(versionOd!=versionObBus) {
+				if(isSilentUpdate) {
+					ExitCode=105;//File versions do not match
+				}
+				else {//Not a silent update.  Show a warning message.
+					//No MsgBox or Lan.g() here, because we don't want to access the database if there is a version conflict.
+					MessageBox.Show("Mismatched program file versions. Please run the Open Dental setup file again on this computer.");
+				}
+				Application.Exit();
+				return;
 			}
 			FormChooseDatabase formChooseDb=new FormChooseDatabase();
 			formChooseDb.OdUser=odUser;
@@ -1920,6 +1949,11 @@ namespace OpenDental{
 			while(true) {//Most users will loop through once.  If user tries to connect to a db with replication failure, they will loop through again.
 				if(formChooseDb.NoShow==YN.Yes) {
 					if(!formChooseDb.TryToConnect()) {
+						if(isSilentUpdate) {
+							ExitCode=106;//Connection to specified database has failed
+							Application.Exit();
+							return;
+						}
 						formChooseDb.ShowDialog();
 						if(formChooseDb.DialogResult==DialogResult.Cancel) {
 							Application.Exit();
@@ -1949,10 +1983,20 @@ namespace OpenDental{
 				if(CommandLineArgs.Length==0) {
 					Splash.Show();
 				}
-				if(!PrefsStartup()){//looks for the AtoZ folder here, but would like to eventually move that down to after login.  In Release, refreshes the Pref cache if conversion successful.
+				if(!PrefsStartup(isSilentUpdate)) {//looks for the AtoZ folder here, but would like to eventually move that down to after login.  In Release, refreshes the Pref cache if conversion successful.
 					Cursor=Cursors.Default;
 					Splash.Dispose();
+					if(ExitCode==0) {
+						//PrefsStartup failed and ExitCode is still 0 which means an unexpected error must have occured.
+						//Set the exit code to 999 which will represent an Unknown Error
+						ExitCode=999;
+					}
 					Application.Exit();
+					return;
+				}
+				if(isSilentUpdate) {
+					//The db was successfully updated so there is nothing else that needs to be done after this point.
+					Application.Exit();//Exits with ExitCode=0
 					return;
 				}
 				if(ReplicationServers.Server_id!=0 && ReplicationServers.Server_id==PrefC.GetInt(PrefName.ReplicationFailureAtServer_id)) {
@@ -2252,16 +2296,25 @@ namespace OpenDental{
 			}
 		}
 
+		private bool PrefsStartup() {
+			return PrefsStartup(false);
+		}
+
 		///<summary>Returns false if it can't complete a conversion, find datapath, or validate registration key.</summary>
-		private bool PrefsStartup(){
+		private bool PrefsStartup(bool isSilentUpdate){
 			try {
 				Cache.Refresh(InvalidType.Prefs);
 			}
 			catch(Exception ex) {
+				if(isSilentUpdate) {
+					ExitCode=100;//Database could not be accessed for cache refresh
+					Application.Exit();
+					return false;
+				}
 				MessageBox.Show(ex.Message);
 				return false;//shuts program down.
 			}
-			if(!PrefL.CheckMySqlVersion()){
+			if(!PrefL.CheckMySqlVersion(isSilentUpdate)){
 				return false;
 			}
 			if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -2269,11 +2322,21 @@ namespace OpenDental{
 					MiscData.SetSqlMode();
 				}
 				catch {
+					if(isSilentUpdate) {
+						ExitCode=111;//Global SQL mode could not be set
+						Application.Exit();
+						return false;
+					}
 					MessageBox.Show("Unable to set global sql mode.  User probably does not have enough permission.");
 					return false;
 				}
 				string updateComputerName=PrefC.GetStringSilent(PrefName.UpdateInProgressOnComputerName);
 				if(updateComputerName != "" && Environment.MachineName != updateComputerName) {
+					if(isSilentUpdate) {
+						ExitCode=120;//Computer trying to access DB during update
+						Application.Exit();
+						return false;
+					}
 					DialogResult result=MessageBox.Show("An update is in progress on "+updateComputerName+".  Not allowed to start up until that update is complete.\r\n\r\nIf you are the person who started the update and you wish to override this message because an update is not in progress, click Retry.\r\n\r\nDo not click Retry unless you started the update.",
 						"",MessageBoxButtons.RetryCancel);
 					if(result==DialogResult.Retry) {
@@ -2285,13 +2348,31 @@ namespace OpenDental{
 			}
 			//if RemotingRole.ClientWeb, version will have already been checked at login, so no danger here.
 			//ClientWeb version can be older than this version, but that will be caught in a moment.
-			if(!PrefL.ConvertDB()){//refreshes Prefs if converted successfully.
-				return false;
+			if(isSilentUpdate) {
+				if(!PrefL.ConvertDB(true,Application.ProductVersion)) {//refreshes Prefs if converted successfully.
+					if(ExitCode==0) {//Unknown error occurred
+						ExitCode=200;//Convert Database has failed during execution (Unknown Error)
+					}
+					Application.Exit();
+					return false;
+				}
 			}
-			PrefL.MySqlVersion55Remind();
+			else {
+				if(!PrefL.ConvertDB()) {//refreshes Prefs if converted successfully.
+					return false;
+				}
+			}
+			if(!isSilentUpdate) {
+				PrefL.MySqlVersion55Remind();
+			}
 			if(PrefC.AtoZfolderUsed) {
 				string prefImagePath=ImageStore.GetPreferredAtoZpath();
 				if(prefImagePath==null || !Directory.Exists(prefImagePath)) {//AtoZ folder not found
+					if(isSilentUpdate) {
+						ExitCode=300;//AtoZ folder not found (Warning)
+						Application.Exit();
+						return false;
+					}
 					Cache.Refresh(InvalidType.Security);
 					FormPath FormP=new FormPath();
 					FormP.IsStartingUp=true;
@@ -2304,11 +2385,15 @@ namespace OpenDental{
 					Cache.Refresh(InvalidType.Prefs);//because listening thread not started yet.
 				}
 			}
-			if(!PrefL.CheckProgramVersion()){
+			if(!PrefL.CheckProgramVersion(isSilentUpdate)){
 				return false;
 			}
 			if(!FormRegistrationKey.ValidateKey(PrefC.GetString(PrefName.RegistrationKey))){
-				//true){
+				if(isSilentUpdate) {
+					ExitCode=311;//Registration Key could not be validated
+					Application.Exit();
+					return false;
+				}
 				FormRegistrationKey FormR=new FormRegistrationKey();
 				FormR.ShowDialog();
 				if(FormR.DialogResult!=DialogResult.OK){
@@ -6337,6 +6422,12 @@ namespace OpenDental{
 		}
 
 		private void FormOpenDental_FormClosing(object sender,FormClosingEventArgs e) {
+			//ExitCode will only be set if trying to silently update.  
+			//If we start using ExitCode for anything other than silently updating, this can be moved towards the bottom of this closing.
+			//If moved to the bottom, all of the clean up code that this closing event does needs to be considered in regards to updating silently from a CEMT computer.
+			if(ExitCode!=0) {
+				Environment.Exit(ExitCode);
+			}
 			try {
 				Programs.ScrubExportedPatientData();//Required for EHR module d.7.
 			}

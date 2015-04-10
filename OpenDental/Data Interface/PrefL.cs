@@ -10,7 +10,7 @@ using Ionic.Zip;
 namespace OpenDental {
 	public class PrefL{
 
-		///<summary>This ONLY runs when first opening the program.  It returns true if either no conversion is necessary, or if conversion was successful.  False for other situations like corrupt db, trying to convert to older version, etc.  Silent mode is ONLY used for internal tools, NEVER with the main program.</summary>
+		///<summary>This ONLY runs when first opening the program.  It returns true if either no conversion is necessary, or if conversion was successful.  False for other situations like corrupt db, trying to convert to older version, etc.  Silent mode is mostly used from internal tools.  It is currently used in the Main Program if the silent command line argument is set.</summary>
 		public static bool ConvertDB(bool silent,string toVersion) {
 			ClassConvertDatabase ClassConvertDatabase2=new ClassConvertDatabase();
 			string pref=PrefC.GetString(PrefName.DataBaseVersion);
@@ -32,6 +32,10 @@ namespace OpenDental {
 		}
 
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent) {
+			return CopyFromHereToUpdateFiles(versionCurrent,false);
+		}
+
+		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent) {
 			string folderUpdate="";
 			if(PrefC.AtoZfolderUsed) {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
@@ -44,6 +48,11 @@ namespace OpenDental {
 					Directory.Delete(folderUpdate,true);
 				}
 				catch {
+					if(isSilent) {
+						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
+						Application.Exit();
+						return false;
+					}
 					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program: ")+folderUpdate);
 					return false;
 				}
@@ -53,6 +62,11 @@ namespace OpenDental {
 					Application.DoEvents();
 				}
 				if(Directory.Exists(folderUpdate)) {
+					if(isSilent) {
+						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
+						Application.Exit();
+						return false;
+					}
 					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program: ")+folderUpdate);
 					return false;
 				}
@@ -98,13 +112,22 @@ namespace OpenDental {
 			return true;
 		}
 
-		///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
+			///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
 		public static bool CheckProgramVersion() {
+			return CheckProgramVersion(false);
+		}
+
+		///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
+		public static bool CheckProgramVersion(bool isSilent) {
 #if DEBUG
 			return true;//Development mode never needs to check versions or copy files to other directories.  Simply return true at this point.
 #endif
-			bool downgrade=false;
 			if(PrefC.GetBool(PrefName.UpdateWindowShowsClassicView)) {
+				if(isSilent) {
+					FormOpenDental.ExitCode=399;//Classic View is not supported with Silent Update
+					Application.Exit();
+					return false;
+				}
 				return CheckProgramVersionClassic();
 			}
 			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion));
@@ -119,6 +142,11 @@ namespace OpenDental {
 				&& PrefC.GetString(PrefName.WebServiceServerName)!="" 
 				&& !ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower()))
 			{
+				if(isSilent) {
+					FormOpenDental.ExitCode=310;//Client version is higher than Server Version and update is not allowed from Client.
+					Application.Exit();
+					return false;
+				}
 				//Offer to downgrade
 				string message=Lan.g("Prefs","Your version is more recent than the server version.");
 				message+="\r\n"+Lan.g("Prefs","Updates are only allowed from the web server")+": "+PrefC.GetString(PrefName.WebServiceServerName);
@@ -127,13 +155,11 @@ namespace OpenDental {
 					Application.Exit();
 					return false;//If user clicks cancel, then exit program
 				}
-				downgrade=true;
 			}
 			//Push update to server if client version > server version and either the WebServiceServerName is blank or the current computer ID is the same as the WebServiceServerName
-				//At this point we know 100% it's going to be an upgrade
-			else	if(storedVersion<currentVersion 
-				&& (PrefC.GetString(PrefName.WebServiceServerName)=="" || ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower())))
-			{
+			//At this point we know 100% it's going to be an upgrade
+			else if(storedVersion<currentVersion 
+				&& (PrefC.GetString(PrefName.WebServiceServerName)=="" || ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower()))) {
 #if TRIALONLY
 				if(PrefC.GetString(PrefName.RegistrationKey)!="") {//Allow databases with no reg key to continue.  Needed by our conversion department.
 					//Trial users should never be able to update a database, not even the ProgramVersion preference.
@@ -160,7 +186,7 @@ namespace OpenDental {
 				//This computer just performed an update, but none of the other computers has updated yet.
 				//So attempt to stash all files that are in the Application directory.
 				//At this point we know that we are going to perform an update.
-				if(!CopyFromHereToUpdateFiles(currentVersion)) {
+				if(!CopyFromHereToUpdateFiles(currentVersion,isSilent)) {
 					Application.Exit();
 					return false;
 				}
@@ -168,7 +194,12 @@ namespace OpenDental {
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
 				Cache.Refresh(InvalidType.Prefs);
 			}
-			if(storedVersion>currentVersion || downgrade) {
+			if(storedVersion>currentVersion) {
+				if(isSilent) {//This should never happen after a silent update.
+					FormOpenDental.ExitCode=312;//Stored version is higher that client version after an update was successful.
+					Application.Exit();
+					return false;
+				}
 				//performs both upgrades and downgrades by recopying update files from ODI folder to local program path.
 				//This is the update sequence for both a direct workstation, and for a ClientWeb workstation.
 				string folderUpdate="";
@@ -276,8 +307,13 @@ namespace OpenDental {
 			File.Delete(tempFile);//Cleanup install file.
 		}
 
-		///<summary>This ONLY runs when first opening the program.  Gets run early in the sequence. Returns false if the program should exit.</summary>
+				///<summary>This ONLY runs when first opening the program.  Gets run early in the sequence. Returns false if the program should exit.</summary>
 		public static bool CheckMySqlVersion() {
+			return CheckMySqlVersion(false);
+		}
+
+		///<summary>This ONLY runs when first opening the program.  Gets run early in the sequence. Returns false if the program should exit.</summary>
+		public static bool CheckMySqlVersion(bool isSilent) {
 			if(DataConnection.DBtype!=DatabaseType.MySql) {
 				return true;
 			}
@@ -285,6 +321,11 @@ namespace OpenDental {
 			string thisVersion=MiscData.GetMySqlVersion();
 			Version versionMySQL=new Version(thisVersion);
 			if(versionMySQL < new Version(5,0)) {
+				if(isSilent) {
+					FormOpenDental.ExitCode=110;//MySQL version lower than 5.0
+					Application.Exit();
+					return false;
+				}
 				//We will force users to upgrade to 5.0, but not yet to 5.5
 				MessageBox.Show(Lan.g("Prefs","Your version of MySQL won't work with this program")+": "+thisVersion
 					+".  "+Lan.g("Prefs","You should upgrade to MySQL 5.0 using the installer on our website."));
@@ -303,15 +344,22 @@ namespace OpenDental {
 				}
 				//Now check to see if the MySQL version has been updated.  If it has, make an automatic backup, repair, and optimize all tables.
 				if(Prefs.UpdateString(PrefName.MySqlVersion,(thisVersion))) {
-					if(!MsgBox.Show("Prefs",MsgBoxButtons.OKCancel,"Tables will now be backed up, optimized, and repaired.  This will take a minute or two.  Continue?")) {
-						Application.Exit();
-						return false;
+					if(!isSilent) {
+						if(!MsgBox.Show("Prefs",MsgBoxButtons.OKCancel,"Tables will now be backed up, optimized, and repaired.  This will take a minute or two.  Continue?")) {
+							Application.Exit();
+							return false;
+						}
 					}
 					try {
 						DatabaseMaintenance.BackupRepairAndOptimize();
 						hasBackup=true;
 					}
 					catch(Exception e) {
+						if(isSilent) {
+							FormOpenDental.ExitCode=101;//Database Backup failed
+							Application.Exit();
+							return false;
+						}
 						if(e.Message!="") {
 							MessageBox.Show(e.Message);
 						}
@@ -324,9 +372,11 @@ namespace OpenDental {
 			if(PrefC.ContainsKey("DatabaseConvertedForMySql41")) {
 				return true;//already converted
 			}
-			if(!MsgBox.Show("Prefs",true,"Your database will now be converted for use with MySQL 4.1.")) {
-				Application.Exit();
-				return false;
+			if(!isSilent) {
+				if(!MsgBox.Show("Prefs",true,"Your database will now be converted for use with MySQL 4.1.")) {
+					Application.Exit();
+					return false;
+				}
 			}
 			//ClassConvertDatabase CCD=new ClassConvertDatabase();
 			try {
@@ -335,6 +385,11 @@ namespace OpenDental {
 				}
 			}
 			catch(Exception e) {
+				if(isSilent) {
+					FormOpenDental.ExitCode=101;//Database Backup failed
+					Application.Exit();
+					return false;
+				}
 				if(e.Message!="") {
 					MessageBox.Show(e.Message);
 				}
@@ -342,9 +397,13 @@ namespace OpenDental {
 				Application.Exit();
 				return false;//but this should never happen
 			}
-			MessageBox.Show("Backup performed");
+			if(!isSilent) {
+				MsgBox.Show("Prefs","Backup performed");
+			}
 			Prefs.ConvertToMySqlVersion41();
-			MessageBox.Show("converted");
+			if(!isSilent) {
+				MsgBox.Show("Prefs","Converted");
+			}
 			//Refresh();
 			return true;
 		}
