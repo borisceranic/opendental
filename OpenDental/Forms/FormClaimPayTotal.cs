@@ -387,7 +387,13 @@ namespace OpenDental
 			Procedure ProcCur;
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
 				row=new ODGridRow();
-				row.Cells.Add(ClaimProcsToEdit[i].ProcDate.ToShortDateString());
+				if(ClaimProcsToEdit[i].ProcNum==0) {//Total payment
+					//We want to always show the "Payment Date" instead of the procedure date for total payments because they are not associated to procedures.
+					row.Cells.Add(ClaimProcsToEdit[i].DateCP.ToShortDateString());
+				}
+				else {
+					row.Cells.Add(ClaimProcsToEdit[i].ProcDate.ToShortDateString());
+				}
 				row.Cells.Add(Providers.GetAbbr(ClaimProcsToEdit[i].ProvNum));
 				if(ClaimProcsToEdit[i].ProcNum==0) {
 					row.Cells.Add("");

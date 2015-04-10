@@ -4393,7 +4393,13 @@ namespace OpenDental{
 				else{
 					row.Cells.Add(ClaimProcsForClaim[i].LineNumber.ToString());
 				}
-				row.Cells.Add(ClaimProcsForClaim[i].ProcDate.ToShortDateString());
+				if(ClaimProcsForClaim[i].ProcNum==0) {//Total payment
+					//We want to always show the "Payment Date" instead of the procedure date for total payments because they are not associated to procedures.
+					row.Cells.Add(ClaimProcsForClaim[i].DateCP.ToShortDateString());
+				}
+				else {
+					row.Cells.Add(ClaimProcsForClaim[i].ProcDate.ToShortDateString());
+				}
 				row.Cells.Add(Providers.GetAbbr(((ClaimProc)ClaimProcsForClaim[i]).ProvNum));
 				if(ClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");//code
