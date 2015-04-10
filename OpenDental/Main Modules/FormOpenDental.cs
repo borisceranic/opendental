@@ -188,7 +188,7 @@ namespace OpenDental{
 		//private UserControlPhonePanel phonePanel;
 		///<summary>Command line args passed in when program starts.</summary>
 		public string[] CommandLineArgs;
-		private Thread ThreadCommandLine;
+		//private Thread ThreadCommandLine;
 		///<summary>Listens for commands coming from other instances of Open Dental on this computer.</summary>
 		private TcpListener TcpListenerCommandLine;
 		///<summary>True if there is already a different instance of OD running.  This prevents attempting to start the listener.</summary>
@@ -2246,12 +2246,12 @@ namespace OpenDental{
 				//}
 			#endif
 			FillPatientButton(null);
-			ThreadCommandLine=new Thread(new ThreadStart(Listen));
-			if(!IsSecondInstance) {//can't use a port that's already in use.
-				//js We can't do this yet.  I tried it already, and it consumes nearly 100% CPU.  Not while testing, but later.
-				//So until we really need to do it, it's easiest no just not start the thread for now.
-				//ThreadCommandLine.Start();
-			}
+			//ThreadCommandLine=new Thread(new ThreadStart(Listen));
+			//if(!IsSecondInstance) {//can't use a port that's already in use.
+			//	//js We can't do this yet.  I tried it already, and it consumes nearly 100% CPU.  Not while testing, but later.
+			//	//So until we really need to do it, it's easiest no just not start the thread for now.
+			//	//ThreadCommandLine.Start();
+			//}
 			//if(CommandLineArgs.Length>0) {
 			ProcessCommandLine(CommandLineArgs);
 			//}
@@ -4268,6 +4268,7 @@ namespace OpenDental{
 		private void timerSignals_Tick(object sender, System.EventArgs e) {
 			//typically every 4 seconds:
 			ProcessSignals();
+			//lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
 		}
 
 		private void timerDisabledKey_Tick(object sender,EventArgs e) {
@@ -5735,29 +5736,29 @@ namespace OpenDental{
 		//}
 
 		///<summary>separate thread</summary>
-		public void Listen() {
-			IPAddress ipAddress = Dns.GetHostAddresses("localhost")[0];
-			TcpListenerCommandLine=new TcpListener(ipAddress,2123);
-			TcpListenerCommandLine.Start();
-			while(true) {
-				if(!TcpListenerCommandLine.Pending()) {
-					//Thread.Sleep(1000);//for 1 second
-					continue;
-				}
-				TcpClient TcpClientRec = TcpListenerCommandLine.AcceptTcpClient();
-				NetworkStream ns = TcpClientRec.GetStream();
-				XmlSerializer serializer=new XmlSerializer(typeof(string[]));
-				string[] args=(string[])serializer.Deserialize(ns);
-				Invoke(new ProcessCommandLineDelegate(ProcessCommandLine),new object[] { args });
-				ns.Close();
-				TcpClientRec.Close();
-			}
-		}
+		//public void Listen() {
+		//	IPAddress ipAddress = Dns.GetHostAddresses("localhost")[0];
+		//	TcpListenerCommandLine=new TcpListener(ipAddress,2123);
+		//	TcpListenerCommandLine.Start();
+		//	while(true) {
+		//		if(!TcpListenerCommandLine.Pending()) {
+		//			//Thread.Sleep(1000);//for 1 second
+		//			continue;
+		//		}
+		//		TcpClient TcpClientRec = TcpListenerCommandLine.AcceptTcpClient();
+		//		NetworkStream ns = TcpClientRec.GetStream();
+		//		XmlSerializer serializer=new XmlSerializer(typeof(string[]));
+		//		string[] args=(string[])serializer.Deserialize(ns);
+		//		Invoke(new ProcessCommandLineDelegate(ProcessCommandLine),new object[] { args });
+		//		ns.Close();
+		//		TcpClientRec.Close();
+		//	}
+		//}
 
 		
 
-		///<summary></summary>
-		protected delegate void ProcessCommandLineDelegate(string[] args);
+		/////<summary></summary>
+		//protected delegate void ProcessCommandLineDelegate(string[] args);
 
 		///<summary></summary>
 		public void ProcessCommandLine(string[] args) {
@@ -6440,10 +6441,10 @@ namespace OpenDental{
 			catch { }
 			FormUAppoint.AbortThread();
 			//ICat.AbortThread
-			//earlier, this wasn't working.  But I haven't tested it since moving it from Closing to FormClosing.
-			if(ThreadCommandLine!=null) {
-				ThreadCommandLine.Abort();
-			}
+			////earlier, this wasn't working.  But I haven't tested it since moving it from Closing to FormClosing.
+			//if(ThreadCommandLine!=null) {
+			//	ThreadCommandLine.Abort();
+			//}
 			if(ThreadVM!=null) {
 				ThreadVM.Abort();
 				ThreadVM.Join();
