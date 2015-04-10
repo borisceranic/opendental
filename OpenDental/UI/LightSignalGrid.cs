@@ -15,9 +15,12 @@ namespace OpenDental.UI {
 		//private bool IsUpdating;
 		//<summary>collection of SignalButtonStates</summary>
 		private SignalButtonState[] sigButStates;
+		///<summary>Used for conference room highlighting.</summary>
+		public List<PhoneConf> ListPhoneConfs;
 		private int buttonH;
 		private bool mouseIsDown;
 		private int hotButton;
+		private static Font _fontBlue;
 		///<summary></summary>
 		[Category("Action"),Description("Occurs when a button is clicked.")]
 		public event ODLightSignalGridClickEventHandler ButtonClick=null;
@@ -26,6 +29,7 @@ namespace OpenDental.UI {
 			InitializeComponent();
 			buttonH=25;
 			hotButton=-1;
+			_fontBlue=new Font(Font.FontFamily,7f,Font.Style);
 		}
 
 		#region Properties
@@ -125,6 +129,20 @@ namespace OpenDental.UI {
 				rect=new RectangleF(-2,i*buttonH,Width+4,buttonH);
 				g.DrawString(sigButStates[i].Text,Font,Brushes.Black,rect,format);
 			}
+			//Highlight conference rooms
+			if(ListPhoneConfs==null) {
+				ListPhoneConfs=new List<PhoneConf>();
+			}
+			for(int i=0;i<ListPhoneConfs.Count;i++) {
+				if(ListPhoneConfs[i].Occupants==0) {
+					continue;//do not draw anything for "empty" conference rooms.
+				}
+				g.DrawRectangle(Pens.Blue,0,ListPhoneConfs[i].ButtonIndex*buttonH,Width-1,buttonH);//blue outline.
+				g.DrawString(ListPhoneConfs[i].Occupants.ToString(),_fontBlue,//White drop shadow for blue counter in upper right corner.
+					Brushes.White,Width-g.MeasureString(ListPhoneConfs[i].Occupants.ToString(),_fontBlue,20).Width,1+ListPhoneConfs[i].ButtonIndex*buttonH);
+				g.DrawString(ListPhoneConfs[i].Occupants.ToString(),_fontBlue,//Blue text for occupant count in upper right hand corner or button.
+					Brushes.Blue,Width-1-g.MeasureString(ListPhoneConfs[i].Occupants.ToString(),_fontBlue,20).Width,ListPhoneConfs[i].ButtonIndex*buttonH);
+			}
 			e.Graphics.DrawImageUnscaled(doubleBuffer,0,0);
 			g.Dispose();
 			base.OnPaint(e);
@@ -155,6 +173,12 @@ namespace OpenDental.UI {
 				sigButStates[i].CurrentColor=Color.White;
 			}
 			LayoutButtons();
+			Invalidate();
+		}
+
+		///<summary>This will reset conference rooms to the specified list, and invalidate for repaint.</summary>
+		public void SetConfs(List<PhoneConf> listPhoneConfs) {
+			ListPhoneConfs=listPhoneConfs;
 			Invalidate();
 		}
 
