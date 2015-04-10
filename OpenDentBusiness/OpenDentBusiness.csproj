@@ -125,6 +125,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Required dlls\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenPop">
       <HintPath>..\Required dlls\OpenPop.dll</HintPath>
     </Reference>
@@ -146,6 +149,7 @@
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -257,6 +261,7 @@
     <Compile Include="Crud\EobAttachCrud.cs" />
     <Compile Include="Crud\EquipmentCrud.cs" />
     <Compile Include="Crud\ErxLogCrud.cs" />
+    <Compile Include="Crud\EServiceSignalCrud.cs" />
     <Compile Include="Crud\EtransCrud.cs" />
     <Compile Include="Crud\EtransMessageTextCrud.cs" />
     <Compile Include="Crud\EvaluationCriterionCrud.cs" />
@@ -330,6 +335,7 @@
     <Compile Include="Crud\PerioExamCrud.cs" />
     <Compile Include="Crud\PerioMeasureCrud.cs" />
     <Compile Include="Crud\PharmacyCrud.cs" />
+    <Compile Include="Crud\PhoneConfCrud.cs" />
     <Compile Include="Crud\PhoneCrud.cs" />
     <Compile Include="Crud\PhoneEmpDefaultCrud.cs" />
     <Compile Include="Crud\PhoneGraphCrud.cs" />
@@ -394,6 +400,9 @@
     <Compile Include="Crud\SigElementDefCrud.cs" />
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
+    <Compile Include="Crud\SmsMOCrud.cs" />
+    <Compile Include="Crud\SmsMTCrud.cs" />
+    <Compile Include="Crud\SmsVlnCrud.cs" />
     <Compile Include="Crud\SnomedCrud.cs" />
     <Compile Include="Crud\SopCrud.cs" />
     <Compile Include="Crud\StatementCrud.cs" />
@@ -472,6 +481,7 @@
     </Compile>
     <Compile Include="Data Interface\EmailMessageUids.cs" />
     <Compile Include="Data Interface\Encounters.cs" />
+    <Compile Include="Data Interface\EServiceSignals.cs" />
     <Compile Include="Data Interface\EvaluationCriterionDefs.cs" />
     <Compile Include="Data Interface\EvaluationCriterions.cs" />
     <Compile Include="Data Interface\EvaluationDefs.cs" />
@@ -493,6 +503,10 @@
     <Compile Include="Data Interface\OIDInternals.cs" />
     <Compile Include="Data Interface\PatientRaces.cs" />
     <Compile Include="Data Interface\PayorTypes.cs" />
+    <Compile Include="Data Interface\SmsMOs.cs" />
+    <Compile Include="Data Interface\SmsMTs.cs" />
+    <Compile Include="Data Interface\SmsVlns.cs" />
+    <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />
     <Compile Include="Data Interface\ResellerServices.cs" />
@@ -625,6 +639,7 @@
     <Compile Include="InternalTools\Phones\PhoneNumbers.cs" />
     <Compile Include="InternalTools\Phones\PhoneOverrides.cs" />
     <Compile Include="InternalTools\Phones\Phones.cs" />
+    <Compile Include="InternalTools\Phones\TableTypes\PhoneConf.cs" />
     <Compile Include="InternalTools\Phones\TableTypes\Phone.cs" />
     <Compile Include="InternalTools\Phones\TableTypes\PhoneEmpDefault.cs" />
     <Compile Include="InternalTools\Phones\TableTypes\PhoneGraph.cs" />
@@ -904,6 +919,10 @@
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
+    <Compile Include="TableTypes\EServiceSignal.cs" />
+    <Compile Include="TableTypes\SmsVln.cs" />
+    <Compile Include="TableTypes\SmsMT.cs" />
+    <Compile Include="TableTypes\SmsMO.cs" />
     <Compile Include="TableTypes\MedLabFacAttach.cs" />
     <Compile Include="TableTypes\MedLabFacility.cs" />
     <Compile Include="TableTypes\MedLabSpecimen.cs" />

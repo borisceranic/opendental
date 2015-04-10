@@ -28,7 +28,7 @@ namespace OpenDentBusiness {
 		///<summary>A single long message will be broken into several smaller 153 utf8 or 70 unicode character messages.</summary>
 		public int MsgParts;
 		///<summary>The amount charged to the customer. Total cost for this message.</summary>
-		public decimal MsgCost;
+		public double MsgCost;
 		///<summary>FK to clinic.ClinicNum.  Only used when associating SMS accounts to clinics.</summary>
 		public long ClinicNum;
 		///<summary>Only used when SMSDeliveryStatus==Failed.</summary>
