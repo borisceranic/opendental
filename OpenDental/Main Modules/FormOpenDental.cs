@@ -48,6 +48,7 @@ using System.Xml.Serialization;
 using SparksToothChart;
 //using OpenDental.SmartCards;
 using OpenDental.UI;
+using System.ServiceProcess;
 #if EHRTEST
 using EHR;
 #endif
@@ -2100,6 +2101,27 @@ namespace OpenDental{
 				ProcedureCodes.ResetADAdescriptions();
 				Prefs.UpdateBool(PrefName.ADAdescriptionsReset,true);
 			}
+			#region Start OpenDent Services
+			//If this is the designated update server, make sure that all "OpenDent..." services are up and running.
+			//This is mainly to increase the odds that critical services required for e-Services are always running.
+			if(PrefC.GetString(PrefName.WebServiceServerName)!="" && ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName))) {
+				List<ServiceController> listServices=ODEnvironment.GetAllOpenDentServices();
+				for(int i=0;i<listServices.Count;i++) {
+					//Only attempt to start services that are of status stopped or stop pending.
+					//If we do not do this, an InvalidOperationException will throw that says "An instance of the service is already running"
+					if(listServices[i].Status!=ServiceControllerStatus.Stopped && listServices[i].Status!=ServiceControllerStatus.StopPending) {
+						continue;
+					}
+					try {
+						listServices[i].Start();//We will not wait for the service to start so that loading OD does not take any longer that usual.
+					}
+					catch {
+						//An InvalidOperationException can get thrown if the service could not be started.  E.g. current user is not running Open Dental as an administrator.
+						//We do not want to halt the startup sequence here.  If we want to notify customers of a downed service, there needs to be an additional monitoring service installed.
+					}
+				}
+			}
+			#endregion
 			Splash.Dispose();
 			//Choose a default DirectX format when no DirectX format has been specified and running in DirectX tooth chart mode.
 			//ComputerPref localComputerPrefs=ComputerPrefs.GetForLocalComputer();

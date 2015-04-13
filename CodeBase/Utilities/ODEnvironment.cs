@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -70,5 +71,19 @@ namespace CodeBase{
 			}
 			return false;
 		}
+
+		///<summary>Gets all services that start with "OpenDent" that are installed on the current computer.</summary>
+		public static List<ServiceController> GetAllOpenDentServices() {
+			List<ServiceController> listServiceControllers=new List<ServiceController>();
+			ServiceController[] arrayAllServiceControllers=ServiceController.GetServices();
+			for(int i=0;i<arrayAllServiceControllers.Length;i++) {
+				if(arrayAllServiceControllers[i].ServiceName.StartsWith("OpenDent")) {
+					listServiceControllers.Add(arrayAllServiceControllers[i]);
+				}
+			}
+			return listServiceControllers;
+		}
+
+
   }
 }

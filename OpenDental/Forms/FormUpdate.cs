@@ -1,18 +1,19 @@
+using CodeBase;
+using OpenDentBusiness;
 using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
-using System.Xml;
 using System.Windows.Forms;
-using OpenDentBusiness;
-using CodeBase;
+using System.Xml;
 
 namespace OpenDental{
 	/// <summary>
@@ -1192,7 +1193,41 @@ namespace OpenDental{
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//unlock workstations, since nothing was actually done.
 				return;
 			}
-			try{
+			#region Stop OpenDent Services
+			//If the update has been initiated from the designated update server then try and stop all "OpenDent..." services.
+			//They will be automatically restarted once Open Dental has successfully upgraded.
+			if(PrefC.GetString(PrefName.WebServiceServerName)!="" && ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName))) {
+				List<ServiceController> listServices=ODEnvironment.GetAllOpenDentServices();
+				StringBuilder strBuilder=new StringBuilder();
+				if(listServices.Count>0) {
+					FormAlertSimple FormAS=new FormAlertSimple(Lan.g("FormUpdate","Stopping services..."));
+					FormAS.Show();
+					Application.DoEvents();//Allows the form to show up on top of FormUpdate right away.
+					//Loop through all Open Dental services and stop them if they have not stopped or are not pending a stop so that their binaries can be updated.
+					for(int i=0;i<listServices.Count;i++) {
+						if(listServices[i].Status==ServiceControllerStatus.Stopped || listServices[i].Status==ServiceControllerStatus.StopPending) {
+							continue;//Already stopped.  Calling Stop again will guarantee an exception is thrown.  Do not try calling Stop on a stopped service.
+						}
+						try {
+							listServices[i].Stop();
+							listServices[i].WaitForStatus(ServiceControllerStatus.Stopped,new TimeSpan(0,0,7));
+						}
+						catch {
+							//An InvalidOperationException will get thrown if the service could not stop.  E.g. the user is not running Open Dental as an administrator.
+							strBuilder.AppendLine(listServices[i].DisplayName);
+						}
+					}
+					FormAS.Close();
+					//Notify the user to go manually stop the services that could not automatically stop.
+					if(strBuilder.ToString()!="") {
+						MsgBoxCopyPaste msgBCP=new MsgBoxCopyPaste(Lan.g("FormUpdate","The following services could not be stopped.  You need to manually stop them before continuing.")
+						+"\r\n"+strBuilder.ToString());
+						msgBCP.ShowDialog();
+					}
+				}
+			}
+			#endregion
+			try {
 				Process.Start(destinationPath);
 				Application.Exit();
 			}
