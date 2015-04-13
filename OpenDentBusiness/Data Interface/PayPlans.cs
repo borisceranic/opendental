@@ -25,6 +25,20 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanCrud.SelectOne(payPlanNum);
 		}
 
+		public static List<PayPlan> GetForPats(Patient[] arrayPats) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),arrayPats);
+			}
+			string[] arrayPatNums= new string[arrayPats.Length];
+			for(int i=0;i<arrayPats.Length;i++) {
+				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
+			}
+			string command="SELECT * FROM payplan"
+				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")";
+			return Crud.PayPlanCrud.SelectMany(command);
+
+		}
+
 		///<summary>Determines if there are any valid plans with that patient as the guarantor.</summary>
 		public static List<PayPlan> GetValidPlansNoIns(long guarNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

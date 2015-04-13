@@ -38,6 +38,27 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Gets all negative or positive adjustments for a patient depending on how isPositive is set.</summary>
+		public static List<Adjustment> GetAdjustForPats(Patient[] arrayPats,bool isPositive) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Adjustment>>(MethodBase.GetCurrentMethod(),arrayPats);
+			}
+			string[] arrayPatNums= new string[arrayPats.Length];
+			for(int i=0;i<arrayPats.Length;i++) {
+				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
+			}
+			string command="SELECT * FROM adjustment"
+				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")";
+			if(isPositive) {
+				command+=" AND AdjAmt>0";
+			}
+			else {
+				command+=" AND AdjAmt<0";
+			} 
+				command+=" ORDER BY DateEntry";
+			return Crud.AdjustmentCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static void Update(Adjustment adj){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -75,6 +96,16 @@ namespace OpenDentBusiness{
 				}
 			}
 			return retVal;
+		}
+
+		///<summary>Sums all adjustments for a proc then returns that sum.</summary>
+		public static double GetTotForProc(long procNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDouble(MethodBase.GetCurrentMethod(),procNum);
+			}
+			string command="SELECT SUM(AdjAmt) FROM adjustment"
+				+" WHERE ProcNum="+POut.Long(procNum);
+			return PIn.Double(Db.GetScalar(command));
 		}
 
 		///<summary>Creates a new discount adjustment for the given procedure.</summary>

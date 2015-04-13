@@ -32,6 +32,22 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanChargeCrud.SelectMany(command);
 		}
 
+		///<summary>Gets all payplan charges for the payplans passed in based on today's date.</summary>
+		public static List<PayPlanCharge> GetDueForPayPlans(List<PayPlan> listPayPlans) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlanCharge>>(MethodBase.GetCurrentMethod(),listPayPlans);
+			}
+			string[] arrayPlanNums= new string[listPayPlans.Count];
+			for(int i=0;i<arrayPlanNums.Length;i++) {
+				arrayPlanNums[i]=listPayPlans[i].PayPlanNum.ToString();
+			}
+			string command= "SELECT * FROM payplancharge "
+				+"WHERE PayPlanNum IN("+String.Join(", ",arrayPlanNums)+")"
+				+"AND ChargeDate <= DATE(NOW()) "
+				+"ORDER BY ChargeDate";
+			return Crud.PayPlanChargeCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static PayPlanCharge GetOne(long payPlanChargeNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

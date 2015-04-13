@@ -68,6 +68,28 @@ namespace OpenDentBusiness{
  			Db.NonQ(command);
 		}
 
+		///<summary>Used from payment window AutoSplit button to delete paysplits when clicking AutoSplit more than once.</summary>
+		public static void DeleteForPayment(long payNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),payNum);
+				return;
+			}
+			string command="DELETE FROM paysplit"
+				+" WHERE PayNum="+POut.Long(payNum);
+			Db.NonQ(command);
+		}
+		
+		///<summary>Used from FormPayment to return the total payments for a procedure without requiring a supplied list.</summary>
+		public static string GetTotForProc(long procNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetString(MethodBase.GetCurrentMethod(),procNum);
+			}
+			string command="SELECT SUM(paysplit.SplitAmt) FROM paysplit "
+				+"WHERE paysplit.ProcNum="+POut.Long(procNum);
+			return Db.GetScalar(command);
+
+		}
+
 		///<summary>Returns all paySplits for the given procNum. Must supply a list of all paysplits for the patient.</summary>
 		public static ArrayList GetForProc(long procNum,PaySplit[] List) {
 			//No need to check RemotingRole; no call to db.
@@ -159,6 +181,21 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Used in Payment window to get all paysplits for a single patient without using a supplied list.</summary>
+		public static List<PaySplit> GetForPats(Patient[] arrayPats) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PaySplit>>(MethodBase.GetCurrentMethod(),arrayPats);
+			}
+			string[] arrayPatNums= new string[arrayPats.Length];
+			for(int i=0;i<arrayPats.Length;i++) {
+				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
+			}
+			string command="SELECT * FROM paysplit"
+				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")"
+				+" ORDER BY DateEntry";//We could use ProcDate here but some paysplits may not be attributed to procs.
+			return Crud.PaySplitCrud.SelectMany(command);
+		}
+
 		///<summary>Used once in ContrAccount to just get the splits for a single patient.  The supplied list also contains splits that are not necessarily for this one patient.</summary>
 		public static PaySplit[] GetForPatient(long patNum,PaySplit[] List) {
 			//No need to check RemotingRole; no call to db.
@@ -201,16 +238,6 @@ namespace OpenDentBusiness{
 			}
 			return 0;
 		}
-
-		/*
-		///<summary>Used in ComputeBalances to compute balance for a single patient. Supply a list of all paysplits for the patient.</summary>
-		public static double ComputeBal(PaySplit[] list){//
-			double retVal=0;
-			for(int i=0;i<list.Length;i++){
-				retVal+=list[i].SplitAmt;
-			}
-			return retVal;
-		}*/
 
 		///<summary>Used in FormPayment to sych database with changes user made to the paySplit list for a payment.  Must supply an old list for comparison.  Only the differences are saved.</summary>
 		public static void UpdateList(List<PaySplit> oldSplitList,List<PaySplit> newSplitList) {

@@ -388,12 +388,9 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<X12TransactionItem>>(MethodBase.GetCurrentMethod(),claimNums);
 			}
-			StringBuilder str=new StringBuilder();
-			for(int i=0;i<claimNums.Count;i++){
-				if(i>0){
-					str.Append(" OR");
-				}
-				str.Append(" claim.ClaimNum="+POut.Long(claimNums[i]));//((ClaimSendQueueItem)queueItems[i]).ClaimNum.ToString());
+			List<X12TransactionItem> retVal=new List<X12TransactionItem>();
+			if(claimNums.Count<1) {
+				return retVal;
 			}
 			string command;
 			command="SELECT carrier.ElectID,claim.ProvBill,inssub.Subscriber,"
@@ -402,10 +399,9 @@ namespace OpenDentBusiness{
 				+"WHERE claim.PlanNum=insplan.PlanNum "
 				+"AND claim.InsSubNum=inssub.InsSubNum "
 				+"AND carrier.CarrierNum=insplan.CarrierNum "
-				+"AND ("+str.ToString()+") "
+				+"AND claim.ClaimNum IN ("+String.Join(",",claimNums)+") "
 				+"ORDER BY carrier.ElectID,claim.ProvBill,inssub.Subscriber,subscNotPatient,claim.PatNum";
 			DataTable table=Db.GetTable(command);
-			List<X12TransactionItem> retVal=new List<X12TransactionItem>();
 			//object[,] myA=new object[5,table.Rows.Count];
 			X12TransactionItem item;
 			for(int i=0;i<table.Rows.Count;i++){

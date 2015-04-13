@@ -645,6 +645,10 @@ namespace OpenDentBusiness {
 			#endregion Claimprocs
 			#region Procedures
 			//Procedures------------------------------------------------------------------------------------------
+			//We believe that Capitation Writeoffs are being counted twice due to the way the query gets and uses each column.
+			//In the future we should evaluate and test if this is correct behavior
+			//This code has been replicated and put into use in Procedures.GetPatPortion.
+			//Any changes here should also be made to that method.
 			command="SELECT "
 				+"(SELECT SUM(AdjAmt) FROM adjustment WHERE procedurelog.ProcNum=adjustment.ProcNum "
 				+"AND adjustment.ProcNum<>0 "//Prevents long load time in a patient with thousands of entries.  Example: customer was using a dummy patient.

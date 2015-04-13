@@ -50,6 +50,23 @@ namespace OpenDentBusiness{
 			return Crud.PaymentCrud.SelectMany(command);
 		}
 
+		///<summary>Gets all payments for a family.</summary>
+		public static List<Payment> GetNonSplitForPats(Patient[] arrayPats) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Payment>>(MethodBase.GetCurrentMethod(),arrayPats);
+			}
+			string[] arrayPatNums= new string[arrayPats.Length];
+			for(int i=0;i<arrayPats.Length;i++) {
+				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
+			}
+			string command="SELECT * FROM payment"
+				+" LEFT JOIN paysplit ON paysplit.PayNum=payment.PayNum"
+				+" WHERE payment.PatNum IN("+String.Join(", ",arrayPatNums)+")"
+				+" AND paysplit.SplitNum IS NULL"//Getting all payments with no splits
+				+" ORDER BY PayDate";
+			return Crud.PaymentCrud.SelectMany(command);
+		}
+
 		///<summary>Gets all payments attached to a single deposit.</summary>
 		public static List<Payment> GetForDeposit(long depositNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

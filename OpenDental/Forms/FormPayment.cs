@@ -96,6 +96,7 @@ namespace OpenDental {
 		private bool payConnectWarn;
 		private List<CreditCard> creditCards;
 		private CheckBox checkBalanceGroupByProv;
+		private UI.Button butSplitManage;
 		///<summary>The local override path or normal path for X-Charge.</summary>
 		private string xPath;
 
@@ -167,6 +168,7 @@ namespace OpenDental {
 			this.checkBalanceGroupByProv = new System.Windows.Forms.CheckBox();
 			this.gridBal = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butSplitManage = new OpenDental.UI.Button();
 			this.butPayConnect = new OpenDental.UI.Button();
 			this.butPay = new OpenDental.UI.Button();
 			this.textDateEntry = new OpenDental.ValidDate();
@@ -533,6 +535,22 @@ namespace OpenDental {
 			this.gridMain.TranslationName = "TablePaySplits";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// butSplitManage
+			// 
+			this.butSplitManage.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSplitManage.Autosize = true;
+			this.butSplitManage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSplitManage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSplitManage.CornerRadius = 4F;
+			this.butSplitManage.Image = global::OpenDental.Properties.Resources.Add;
+			this.butSplitManage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butSplitManage.Location = new System.Drawing.Point(105, 435);
+			this.butSplitManage.Name = "butSplitManage";
+			this.butSplitManage.Size = new System.Drawing.Size(101, 24);
+			this.butSplitManage.TabIndex = 134;
+			this.butSplitManage.Text = "Split Manager";
+			this.butSplitManage.Click += new System.EventHandler(this.butSplitManage_Click);
+			// 
 			// butPayConnect
 			// 
 			this.butPayConnect.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -574,6 +592,8 @@ namespace OpenDental {
 			// 
 			// textNote
 			// 
+			this.textNote.AcceptsTab = true;
+			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(106, 152);
 			this.textNote.MaxLength = 4000;
 			this.textNote.Name = "textNote";
@@ -586,6 +606,8 @@ namespace OpenDental {
 			// textAmount
 			// 
 			this.textAmount.Location = new System.Drawing.Point(106, 90);
+			this.textAmount.MaxVal = 100000000D;
+			this.textAmount.MinVal = -100000000D;
 			this.textAmount.Name = "textAmount";
 			this.textAmount.Size = new System.Drawing.Size(84, 20);
 			this.textAmount.TabIndex = 0;
@@ -666,6 +688,7 @@ namespace OpenDental {
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 562);
 			this.Controls.Add(this.checkBalanceGroupByProv);
+			this.Controls.Add(this.butSplitManage);
 			this.Controls.Add(this.checkRecurring);
 			this.Controls.Add(this.labelCreditCards);
 			this.Controls.Add(this.comboCreditCards);
@@ -913,39 +936,59 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TablePaySplits","Prov"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Clinic"),70);
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),170);
+				gridMain.Columns.Add(col);
+			}
+			else {//Using clinics.
+				col=new ODGridColumn(Lan.g("TablePaySplits","Clinic"),70);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),100);
+				gridMain.Columns.Add(col);
+			}
+			col=new ODGridColumn(Lan.g("TablePaySplits","Type"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),130);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Unearned"),60);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Procedure"),100);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Amount"),50,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Amount"),60,HorizontalAlignment.Right);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Unearned"),50);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Remaining"),60);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			tot=0;
-			Procedure proc;
+			Procedure proc=null;
 			string procDesc;
 			for(int i=0;i<SplitList.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(SplitList[i].ProcDate.ToShortDateString());
 				row.Cells.Add(Providers.GetAbbr(SplitList[i].ProvNum));
-				row.Cells.Add(Clinics.GetDesc(SplitList[i].ClinicNum));
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					row.Cells.Add(Clinics.GetDesc(SplitList[i].ClinicNum));
+				}
 				row.Cells.Add(FamCur.GetNameInFamFL(SplitList[i].PatNum));
 				if(SplitList[i].ProcNum>0) {
 					proc=Procedures.GetOneProc(SplitList[i].ProcNum,false);
 					procDesc=Procedures.GetDescription(proc);
-					row.Cells.Add(procDesc);
+					row.Cells.Add("Proc: "+procDesc);
+				}
+				else if(SplitList[i].PayPlanNum>0) {
+					row.Cells.Add("PayPlanCharge");
 				}
 				else {
-					row.Cells.Add("");
+					row.Cells.Add("Adjustment");
 				}
-				row.Cells.Add(SplitList[i].SplitAmt.ToString("F"));
 				row.Cells.Add(DefC.GetName(DefCat.PaySplitUnearnedType,SplitList[i].UnearnedType));//handles 0 just fine
+				row.Cells.Add(SplitList[i].SplitAmt.ToString("F"));
 				tot+=SplitList[i].SplitAmt;
 				gridMain.Rows.Add(row);
+				if(proc!=null) {
+					double splitAmt=PIn.Double(PaySplits.GetTotForProc(proc.ProcNum));//This breaks if you're doing adjustment instead of procedures
+					double adjustAmt=Adjustments.GetTotForProc(proc.ProcNum);
+					if(splitAmt<proc.ProcFee+adjustAmt) {
+						row.Cells.Add(((proc.ProcFee+adjustAmt)-splitAmt).ToString("F"));
+					}
+				}
 			}
 			gridMain.EndUpdate();
 			textTotal.Text=tot.ToString("F");
@@ -1763,6 +1806,24 @@ namespace OpenDental {
 
 		}
 
+		private void butSplitManage_Click(object sender,EventArgs e) {
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
+			FormPSM.ClinicNum=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				FormPSM.ClinicNum=Clinics.GetByDesc(comboClinic.Items[comboClinic.SelectedIndex].ToString());
+			}
+			Family patFam=Patients.GetFamily(PatCur.PatNum);
+			FormPSM.ArrayPatsForFam=patFam.ListPats;
+			FormPSM.PaymentCur=PaymentCur;
+			FormPSM.PayDate=PIn.DateT(textDate.Text);
+			FormPSM.IsNew=IsNew;
+			FormPSM.ShowDialog();
+			if(FormPSM.DialogResult==DialogResult.OK) {
+				DialogResult=DialogResult.OK;//Close payment form
+			}
+		}
+
 		private void butDeleteAll_Click(object sender,System.EventArgs e) {
 			if(textDeposit.Visible) {//this will get checked again by the middle layer
 				MsgBox.Show(this,"This payment is attached to a deposit.  Not allowed to delete.");
@@ -1910,6 +1971,33 @@ namespace OpenDental {
 			}
 			//PaymentCur.PatNum=PatCur.PatNum;//this is already done before opening this window.
 			//PaymentCur.ClinicNum already handled
+			if(IsNew && SplitList.Count==0) {
+				//The user has no splits and is trying to submit a payment. We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
+				bool isAutoSplit=MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?");
+				if(isAutoSplit) {
+					FormPaySplitManage FormPSM=new FormPaySplitManage();
+					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
+					FormPSM.ClinicNum=0;
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+						FormPSM.ClinicNum=Clinics.GetByDesc(comboClinic.Items[comboClinic.SelectedIndex].ToString());
+					}
+					Family patFam=Patients.GetFamily(PatCur.PatNum);
+					FormPSM.ArrayPatsForFam=patFam.ListPats;
+					FormPSM.PaymentCur=PaymentCur;
+					FormPSM.PayDate=PIn.DateT(textDate.Text);
+					FormPSM.IsNew=IsNew;
+					FormPSM.ShowDialog();
+					if(FormPSM.DialogResult==DialogResult.OK) {
+						DialogResult=DialogResult.OK;
+						return;
+					}
+					else {//If they cancel out of the autosplit we want to treat it like they cancelled out of the payment window.  Alternatively we could give them a single split for the full amount..
+						DialogResult=DialogResult.Cancel;
+						Payments.Delete(PaymentCur);
+						return;
+					}
+				}
+			}
 			if(SplitList.Count==0) {
 				if(Payments.AllocationRequired(PaymentCur.PayAmt,PaymentCur.PatNum)
 					&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {

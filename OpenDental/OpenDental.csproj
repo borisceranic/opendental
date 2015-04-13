@@ -405,6 +405,18 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormAmountEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormAmountEdit.designer.cs">
+      <DependentUpon>FormAmountEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormPaySplitManage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormPaySplitManage.designer.cs">
+      <DependentUpon>FormPaySplitManage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormMedLabs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3625,6 +3637,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormAmountEdit.resx">
+      <DependentUpon>FormAmountEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPaySplitManage.resx">
+      <DependentUpon>FormPaySplitManage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMedLabs.resx">
       <DependentUpon>FormMedLabs.cs</DependentUpon>
