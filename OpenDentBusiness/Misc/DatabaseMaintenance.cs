@@ -1695,6 +1695,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		///<summary>We are only checking mismatched statuses if either claim or claimproc is marked as received.</summary>
 		[DbmMethod(HasBreakDown=true)]
 		public static string ClaimProcStatusNotMatchClaim(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1704,8 +1705,8 @@ namespace OpenDentBusiness {
 			command=@"SELECT claim.PatNum,claim.DateService,claimproc.ProcDate,claimproc.CodeSent,claimproc.FeeBilled
 					FROM claimproc,claim
 					WHERE claimproc.ClaimNum=claim.ClaimNum
-					AND claim.ClaimStatus='R'
-					AND claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived);
+					AND ((claim.ClaimStatus='R' AND claimproc.Status="+POut.Int((int)ClaimProcStatus.NotReceived)+") "
+					+"OR (claim.ClaimStatus!='R' AND claimproc.Status="+POut.Int((int)ClaimProcStatus.Received)+"))";
 			table=Db.GetTable(command);
 			if(table.Rows.Count==0 && !verbose) {
 				return log;
