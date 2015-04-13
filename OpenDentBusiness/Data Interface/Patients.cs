@@ -1197,7 +1197,7 @@ namespace OpenDentBusiness{
 				return Meth.GetString(MethodBase.GetCurrentMethod(),chartNum,excludePatNum);
 			}
 			string command="SELECT LName,FName from patient WHERE "
-				+"ChartNumber = '"+chartNum
+				+"ChartNumber = '"+POut.String(chartNum)
 				+"' AND PatNum != '"+excludePatNum.ToString()+"'";
 			DataTable table=Db.GetTable(command);
 			string retVal="";
