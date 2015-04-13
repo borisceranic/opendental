@@ -360,6 +360,9 @@ namespace OpenDental{
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			if(FormD.DiseaseDefCur==null) {//User deleted the DiseaseDef.
+				_listDiseaseDefs.RemoveAt(gridMain.GetSelectedIndex());
+			}
 			//RefreshList();
 			IsChanged=true;
 			FillGrid();

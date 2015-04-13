@@ -15,7 +15,7 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		///<summary></summary>
 		public bool IsNew;
-		private OpenDental.UI.Button buttonDelete;
+		private OpenDental.UI.Button butDelete;
 		private CheckBox checkIsHidden;
 		private Label label1;
 		private TextBox textICD9;
@@ -66,7 +66,7 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.textName = new System.Windows.Forms.TextBox();
-			this.buttonDelete = new OpenDental.UI.Button();
+			this.butDelete = new OpenDental.UI.Button();
 			this.checkIsHidden = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textICD9 = new System.Windows.Forms.TextBox();
@@ -118,22 +118,22 @@ namespace OpenDental{
 			this.textName.Size = new System.Drawing.Size(308, 20);
 			this.textName.TabIndex = 2;
 			// 
-			// buttonDelete
+			// butDelete
 			// 
-			this.buttonDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.buttonDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonDelete.Autosize = true;
-			this.buttonDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.buttonDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.buttonDelete.CornerRadius = 4F;
-			this.buttonDelete.Image = global::OpenDental.Properties.Resources.deleteX;
-			this.buttonDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.buttonDelete.Location = new System.Drawing.Point(30, 172);
-			this.buttonDelete.Name = "buttonDelete";
-			this.buttonDelete.Size = new System.Drawing.Size(82, 25);
-			this.buttonDelete.TabIndex = 5;
-			this.buttonDelete.Text = "&Delete";
-			this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(30, 172);
+			this.butDelete.Name = "buttonDelete";
+			this.butDelete.Size = new System.Drawing.Size(82, 25);
+			this.butDelete.TabIndex = 5;
+			this.butDelete.Text = "&Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// checkIsHidden
 			// 
@@ -266,7 +266,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkIsHidden);
-			this.Controls.Add(this.buttonDelete);
+			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textSnomed);
 			this.Controls.Add(this.textICD9);
 			this.Controls.Add(this.textName);
@@ -362,7 +362,7 @@ namespace OpenDental{
 			textIcd10.Text=FormI.SelectedIcd10.Icd10Code+"-"+FormI.SelectedIcd10.Description;
 		}
 
-		private void buttonDelete_Click(object sender,EventArgs e) {
+		private void butDelete_Click(object sender,EventArgs e) {
 			if(IsNew){
 				DialogResult=DialogResult.Cancel;
 				return;
@@ -370,6 +370,7 @@ namespace OpenDental{
 			try{
 				DiseaseDefs.Delete(DiseaseDefCur);
 				SecurityLogs.MakeLogEntry(Permissions.ProblemEdit,0,DiseaseDefCur.DiseaseName+" deleted.");
+				DiseaseDefCur=null;//Flags this disease for removal in outside forms.
 				DialogResult=DialogResult.OK;
 			}
 			catch(ApplicationException ex){
