@@ -17,14 +17,13 @@ namespace OpenDental {
 		private DateTime DateStart;
 		private DateTime DateStop;
 		private DataTable MainTable;
-		private int pagesPrinted;
 		private string totalTime;
 		private string overTime;
 		private string rate2Time;
 		private string totalTime2;
 		private string overTime2;
 		private string rate2Time2;
-		private int PagesPrinted;
+		private int _pagesPrinted;
 		private bool HeadingPrinted;
 		private List<Employee> _listEmployees;
 		private List<Clinic> _listClinics;
@@ -446,7 +445,7 @@ namespace OpenDental {
 
 		//Prints one timecard for each employee.
 		private void butPrintAll_Click(object sender,EventArgs e) {
-			pagesPrinted=0;
+			_pagesPrinted=0;
 			PrintDocument pd=new PrintDocument();
 			pd.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
 			FormPrintPreview pView=new FormPrintPreview(PrintSituation.Default,pd,gridMain.Rows.Count,0,"Employee timecards printed");
@@ -460,7 +459,7 @@ namespace OpenDental {
 		private void PrintEveryTimeCard(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			//A preview of every single emp on their own page will show up. User will print from there.
 			Graphics g=e.Graphics;
-			Employee employeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[pagesPrinted]["EmployeeNum"].ToString()));
+			Employee employeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[_pagesPrinted]["EmployeeNum"].ToString()));
 			ODGrid timeCardGrid=GetGridForPrinting(employeeCur);
 			int linesPrinted=0;
 			//Create a timecardgrid for this employee?
@@ -545,9 +544,9 @@ namespace OpenDental {
 			g.DrawString(Lan.g(this,"Overtime")+": "+overTime+" ("+overTime2+")",fontHeader,brush,xPos,yPos);
 			yPos+=16;
 			g.DrawString(Lan.g(this,"Rate 2 Time")+": "+rate2Time+" ("+rate2Time2+")",fontHeader,brush,xPos,yPos);
-			pagesPrinted++;
-			if(gridMain.Rows.Count==pagesPrinted) {
-				pagesPrinted=0;
+			_pagesPrinted++;
+			if(gridMain.Rows.Count==_pagesPrinted) {
+				_pagesPrinted=0;
 				e.HasMorePages=false;
 			}
 			else {
@@ -557,7 +556,7 @@ namespace OpenDental {
 
 		///<summary>Print timecards for selected employees only.</summary>
 		private void butPrintSelected_Click(object sender,EventArgs e) {
-			pagesPrinted=0;
+			_pagesPrinted=0;
 			PrintDocument pd=new PrintDocument();
 			pd.PrintPage += new PrintPageEventHandler(this.pd2_PrintPageSelective);
 			FormPrintPreview pView=new FormPrintPreview(PrintSituation.Default,pd,gridMain.SelectedIndices.Length,0,"Employee timecards printed");
@@ -572,7 +571,7 @@ namespace OpenDental {
 		private void PrintEmployeeTimeCard(object sender, System.Drawing.Printing.PrintPageEventArgs e) {
 			//A preview of every single emp on their own page will show up. User will print from there.
 			Graphics g=e.Graphics;
-			Employee employeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[gridMain.SelectedIndices[pagesPrinted]]["EmployeeNum"].ToString()));
+			Employee employeeCur=Employees.GetEmp(PIn.Long(MainTable.Rows[gridMain.SelectedIndices[_pagesPrinted]]["EmployeeNum"].ToString()));
 			ODGrid timeCardGrid=GetGridForPrinting(employeeCur);
 			int linesPrinted=0;
 			//Create a timecardgrid for this employee?
@@ -657,9 +656,9 @@ namespace OpenDental {
 			g.DrawString(Lan.g(this,"Overtime")+": "+overTime+" ("+overTime2+")",fontHeader,brush,xPos,yPos);
 			yPos+=16;
 			g.DrawString(Lan.g(this,"Rate 2 Time")+": "+rate2Time+" ("+rate2Time2+")",fontHeader,brush,xPos,yPos);
-			pagesPrinted++;
-			if(gridMain.SelectedIndices.Length==pagesPrinted) {
-				pagesPrinted=0;
+			_pagesPrinted++;
+			if(gridMain.SelectedIndices.Length==_pagesPrinted) {
+				_pagesPrinted=0;
 				e.HasMorePages=false;
 			}
 			else {
@@ -827,7 +826,7 @@ namespace OpenDental {
 
 		///<summary>Print exactly what is showing in gridMain. (Including rows that do not fit in the UI.)</summary>
 		private void butPrintGrid_Click(object sender,EventArgs e) {
-			PagesPrinted=0;
+			_pagesPrinted=0;
 			HeadingPrinted=false;
 			PrintDocument pd=new PrintDocument();
 			pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage);
@@ -871,8 +870,8 @@ namespace OpenDental {
 				headingPrintH=y;
 			}
 			#endregion
-			y=gridMain.PrintPage(g,pagesPrinted,bounds,headingPrintH);
-			PagesPrinted++;
+			y=gridMain.PrintPage(g,_pagesPrinted,bounds,headingPrintH);
+			_pagesPrinted++;
 			if(y==-1) {
 				e.HasMorePages=true;
 			}
