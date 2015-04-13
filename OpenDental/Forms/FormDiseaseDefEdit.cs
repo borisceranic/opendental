@@ -370,6 +370,7 @@ namespace OpenDental{
 			try{
 				DiseaseDefs.Delete(DiseaseDefCur);
 				SecurityLogs.MakeLogEntry(Permissions.ProblemEdit,0,DiseaseDefCur.DiseaseName+" deleted.");
+				DiseaseDefCur=null;//Flags this disease for removal in outside forms.
 				DialogResult=DialogResult.OK;
 			}
 			catch(ApplicationException ex){
