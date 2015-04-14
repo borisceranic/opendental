@@ -254,7 +254,7 @@ namespace OpenDental{
 			// 
 			this.comboUnschedStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboUnschedStatus.Location = new System.Drawing.Point(114, 21);
-			this.comboUnschedStatus.MaxDropDownItems = 100;
+			this.comboUnschedStatus.MaxDropDownItems = 30;
 			this.comboUnschedStatus.Name = "comboUnschedStatus";
 			this.comboUnschedStatus.Size = new System.Drawing.Size(126, 21);
 			this.comboUnschedStatus.TabIndex = 83;
@@ -272,7 +272,7 @@ namespace OpenDental{
 			// 
 			this.comboStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboStatus.Location = new System.Drawing.Point(114, 0);
-			this.comboStatus.MaxDropDownItems = 10;
+			this.comboStatus.MaxDropDownItems = 30;
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(126, 21);
 			this.comboStatus.TabIndex = 81;
@@ -318,7 +318,7 @@ namespace OpenDental{
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboClinic.Location = new System.Drawing.Point(114, 83);
-			this.comboClinic.MaxDropDownItems = 100;
+			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(126, 21);
 			this.comboClinic.TabIndex = 136;
@@ -354,7 +354,7 @@ namespace OpenDental{
 			// 
 			this.comboProvNum.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvNum.Location = new System.Drawing.Point(114, 104);
-			this.comboProvNum.MaxDropDownItems = 100;
+			this.comboProvNum.MaxDropDownItems = 30;
 			this.comboProvNum.Name = "comboProvNum";
 			this.comboProvNum.Size = new System.Drawing.Size(107, 21);
 			this.comboProvNum.TabIndex = 131;
