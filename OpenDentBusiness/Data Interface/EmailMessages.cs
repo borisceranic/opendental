@@ -1094,7 +1094,7 @@ namespace OpenDentBusiness{
 			return emailMessage;
 		}
 
-		///<summary>Converts the Health.Direct.Common.Mail.Message into an OD EmailMessage.  The Direct library is used for both encrypted and unencrypted email.  Set hasAttachments to false to exclude attachments.</summary>
+		///<summary>Throws exceptions.  Converts the Health.Direct.Common.Mail.Message into an OD EmailMessage.  The Direct library is used for both encrypted and unencrypted email.  Set hasAttachments to false to exclude attachments.</summary>
 		private static EmailMessage ConvertMessageToEmailMessage(Health.Direct.Common.Mail.Message message,bool hasAttachments) {
 			//No need to check RemotingRole; no call to db.
 			EmailMessage emailMessage=new EmailMessage();
@@ -1196,21 +1196,47 @@ namespace OpenDentBusiness{
 			if(!hasAttachments) {
 				return emailMessage;
 			}
+			//If an encrypted attachment is present (smime.p7m), then ensure the message content type correctly indicates an encrypted message.
 			for(int i=0;i<listMimeAttachParts.Count;i++) {
 				Health.Direct.Common.Mime.MimeEntity mimePartAttach=listMimeAttachParts[i];
-				byte[] arrayData=Encoding.UTF8.GetBytes(mimePartAttach.Body.Text);
-				try {
-					if(mimePartAttach.ContentTransferEncoding.ToLower().Contains("base64")) {
-						arrayData=Convert.FromBase64String(mimePartAttach.Body.Text);
-					}
-				}
-				catch {
-				}
-				EmailAttach emailAttach=CreateAttachInAttachPath(mimePartAttach.ParsedContentType.Name,arrayData);
 				if(mimePartAttach.ParsedContentType.Name.ToLower()=="smime.p7m") {//encrypted attachment
 					message.ContentType="application/pkcs7-mime; name=smime.p7m; boundary="+strTextPartBoundary+";";
+					break;
 				}
-				emailMessage.Attachments.Add(emailAttach);//The attachment EmailMessageNum is set when the emailMessage is inserted/updated below.					
+			}
+			try {
+				for(int i=0;i<listMimeAttachParts.Count;i++) {
+					Health.Direct.Common.Mime.MimeEntity mimePartAttach=listMimeAttachParts[i];
+					byte[] arrayData=null;
+					try {
+						if(mimePartAttach.ContentTransferEncoding.ToLower().Contains("base64")) {
+							arrayData=Convert.FromBase64String(mimePartAttach.Body.Text);
+						}
+					}
+					catch {
+					}
+					if(arrayData==null) {//Plain attachment.
+						arrayData=Encoding.UTF8.GetBytes(mimePartAttach.Body.Text);
+					}
+					EmailAttach emailAttach=CreateAttachInAttachPath(mimePartAttach.ParsedContentType.Name,arrayData);
+					emailMessage.Attachments.Add(emailAttach);//The attachment EmailMessageNum is set when the emailMessage is inserted/updated below.
+				}
+			}
+			catch(Exception ex) {
+				//Failed to extract all attachments from the email message.  Cleanup the attachments which were successfully extracted.
+				for(int i=0;i<emailMessage.Attachments.Count;i++) {
+					string attachFilePath=ODFileUtils.CombinePaths(GetEmailAttachPath(),emailMessage.Attachments[i].ActualFileName);
+					if(!File.Exists(attachFilePath)) {
+						continue;
+					}
+					try {
+						File.Delete(attachFilePath);
+					}
+					catch {
+						//Probably nothing else we can do.  At least continue to the remaining attachments to try deleting them as well.
+					}
+				}
+				throw ex;
 			}
 			return emailMessage;
 		}
@@ -1274,7 +1300,7 @@ namespace OpenDentBusiness{
 			return message;
 		}
 
-		///<summary>Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file, but with EmailMessageNum set to zero so it can be set later.</summary>
+		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file, but with EmailMessageNum set to zero so it can be set later.</summary>
 		private static EmailAttach CreateAttachInAttachPath(string strAttachFileName,byte[] arrayData) {
 			//No need to check RemotingRole; no call to db.
 			string strAttachFileNameAdjusted=strAttachFileName;
@@ -1286,7 +1312,20 @@ namespace OpenDentBusiness{
 			while(File.Exists(strAttachFile)) {
 				strAttachFile=ODFileUtils.CombinePaths(strAttachPath,DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+"_"+strAttachFileNameAdjusted);
 			}
-			File.WriteAllBytes(strAttachFile,arrayData);
+			try {
+				File.WriteAllBytes(strAttachFile,arrayData);
+			}
+			catch(Exception ex) {
+				try {
+					if(File.Exists(strAttachFile)) {
+						File.Delete(strAttachFile);
+					}
+				}
+				catch {
+					//We tried our best to delete the file, and there is nothing else to try.
+				}
+				throw ex;//Show the initial error message, even if the Delete() failed.
+			}
 			EmailAttach emailAttach=new EmailAttach();
 			emailAttach.ActualFileName=Path.GetFileName(strAttachFile);
 			emailAttach.DisplayedFileName=Path.GetFileName(strAttachFileNameAdjusted);//shorter name, excludes date and time stamp info.
