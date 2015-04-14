@@ -199,16 +199,18 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
+		///<summary>This report has never worked for Oracle.</summary>
+		private void butOK_Click(object sender,System.EventArgs e) {
 			FormReportForRdl FormR=new FormReportForRdl();
 			string s=Properties.Resources.ReportAccountingGenLedger;
 			s=s.Replace("1/1/2007 - 12/31/2007",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
 			s=s.Replace("2007-01-01",POut.Date(date1.SelectionStart,false));
 			s=s.Replace("2007-12-31",POut.Date(date2.SelectionStart,false));
 			s=s.Replace("2006-12-31",POut.Date(date1.SelectionStart.AddDays(-1),false));
+			s=s.Replace("@@@ConnectionString@@@",DataConnection.GetCurrentConnectionString());//must use current connection string, not static string from FreeDentalConfig.xml
 			FormR.SourceRdlString=s;
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;		
+			DialogResult=DialogResult.OK;
 		}
 
 		
