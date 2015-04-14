@@ -899,7 +899,7 @@
     <DataSource Name="DS1">
       <ConnectionProperties>
         <DataProvider>MySQL.NET</DataProvider>
-        <ConnectString>=ODR.DataConnection.GetODConnStr()</ConnectString>
+        <ConnectString>@@@ConnectionString@@@</ConnectString>
         <IntegratedSecurity>false</IntegratedSecurity>
       </ConnectionProperties>
     </DataSource>

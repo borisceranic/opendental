@@ -376,6 +376,11 @@ namespace OpenDentBusiness {
 			return BuildSimpleConnectionString(DBtype,pServer,pDatabase,pUserID,pPassword);
 		}
 
+		public static string GetCurrentConnectionString() {
+			DataConnection dcon=new DataConnection();
+			return dcon.con.ConnectionString;
+		}
+
 		//private void PrepOracleConnection(){
 		//if(parameters.Count>0) {//Getting parameters for statement.
 		//	for(int p=0;p<parameters.Count;p++) {
