@@ -555,6 +555,7 @@ namespace OpenDentBusiness{
 						+"AND medicationpat.ProvNum IN("+POut.String(provs)+")	"
 						+"AND medicationpat.PatNote!='' "
 						+"AND medicationpat.DateStart BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"AND medicationpat.MedicationNum=0 "//MedicationNum is 0 when creating an Rx either manually or through NewCrop.  MedicationNum is not 0 when manually added through the medical window.
 						+"LEFT JOIN medication ON medication.MedicationNum=medicationpat.MedicationNum";
 					tableRaw=Db.GetTable(command);
 					break;
@@ -568,14 +569,14 @@ namespace OpenDentBusiness{
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"INNER JOIN medicationpat ON medicationpat.PatNum=patient.PatNum "
-						+"AND medicationpat.MedicationNum!="+POut.Long(PrefC.GetLong(PrefName.MedicationsIndicateNone))+" ";
+						+"AND medicationpat.MedicationNum=0 ";//MedicationNum is 0 when creating an Rx either manually or through NewCrop.  MedicationNum is not 0 when manually added through the medical window.
 					//this next join limits to only patients for whom the provider has previously ordered medications
 					command+="INNER JOIN (SELECT PatNum FROM medicationpat "
 						+"WHERE PatNote!='' AND DateStart > "+POut.Date(new DateTime(1880,1,1))+" "
-						+"AND ProvNum IN("+POut.String(provs)+") GROUP BY PatNum) prevordered ON prevordered.PatNum=patient.PatNum "
+						+"AND ProvNum IN("+POut.String(provs)+") AND MedicationNum=0 GROUP BY PatNum) prevordered ON prevordered.PatNum=patient.PatNum "
 						+"GROUP BY patient.PatNum) allpatsprevordered "
 						+"LEFT JOIN (SELECT medicationpat.PatNum,COUNT(*) AS 'Count' FROM medicationpat "
-						+"WHERE medicationpat.IsCpoe=1 GROUP BY PatNum) CountCpoe ON CountCpoe.PatNum=allpatsprevordered.PatNum";
+						+"WHERE medicationpat.IsCpoe=1 AND medicationpat.MedicationNum=0 GROUP BY PatNum) CountCpoe ON CountCpoe.PatNum=allpatsprevordered.PatNum";
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -2647,6 +2648,7 @@ namespace OpenDentBusiness{
 						+"LEFT JOIN ehrmeasureevent as eme ON medPat.MedicationPatNum=eme.FKey "
 						+"AND eme.EventType="+POut.Int((int)EhrMeasureEventType.CPOE_MedOrdered)+" "
 						+"WHERE medPat.ProvNum IN("+POut.String(provs)+") "
+						+"AND medPat.MedicationNum=0 "//MedicationNum is 0 when creating an Rx either manually or through NewCrop.  MedicationNum is not 0 when manually added through the medical window.
 						+"AND medPat.DateStart BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
 					tableRaw=Db.GetTable(command);
 					break;
