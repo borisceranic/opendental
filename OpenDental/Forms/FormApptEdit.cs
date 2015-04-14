@@ -195,6 +195,8 @@ namespace OpenDental{
 			this.listQuickAdd = new System.Windows.Forms.ListBox();
 			this.labelQuickAdd = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.comboApptType = new System.Windows.Forms.ComboBox();
+			this.label10 = new System.Windows.Forms.Label();
 			this.labelSyndromicObservations = new System.Windows.Forms.Label();
 			this.butSyndromicObservations = new OpenDental.UI.Button();
 			this.label9 = new System.Windows.Forms.Label();
@@ -236,8 +238,6 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
-			this.comboApptType = new System.Windows.Forms.ComboBox();
-			this.label10 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -254,7 +254,7 @@ namespace OpenDental{
 			// 
 			this.comboUnschedStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboUnschedStatus.Location = new System.Drawing.Point(114, 21);
-			this.comboUnschedStatus.MaxDropDownItems = 100;
+			this.comboUnschedStatus.MaxDropDownItems = 30;
 			this.comboUnschedStatus.Name = "comboUnschedStatus";
 			this.comboUnschedStatus.Size = new System.Drawing.Size(126, 21);
 			this.comboUnschedStatus.TabIndex = 83;
@@ -272,7 +272,7 @@ namespace OpenDental{
 			// 
 			this.comboStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboStatus.Location = new System.Drawing.Point(114, 0);
-			this.comboStatus.MaxDropDownItems = 10;
+			this.comboStatus.MaxDropDownItems = 30;
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(126, 21);
 			this.comboStatus.TabIndex = 81;
@@ -318,7 +318,7 @@ namespace OpenDental{
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboClinic.Location = new System.Drawing.Point(114, 83);
-			this.comboClinic.MaxDropDownItems = 100;
+			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(126, 21);
 			this.comboClinic.TabIndex = 136;
@@ -354,7 +354,7 @@ namespace OpenDental{
 			// 
 			this.comboProvNum.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvNum.Location = new System.Drawing.Point(114, 104);
-			this.comboProvNum.MaxDropDownItems = 100;
+			this.comboProvNum.MaxDropDownItems = 30;
 			this.comboProvNum.Name = "comboProvNum";
 			this.comboProvNum.Size = new System.Drawing.Size(107, 21);
 			this.comboProvNum.TabIndex = 131;
@@ -568,6 +568,25 @@ namespace OpenDental{
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(260, 447);
 			this.panel1.TabIndex = 164;
+			// 
+			// comboApptType
+			// 
+			this.comboApptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboApptType.Location = new System.Drawing.Point(114, 246);
+			this.comboApptType.MaxDropDownItems = 30;
+			this.comboApptType.Name = "comboApptType";
+			this.comboApptType.Size = new System.Drawing.Size(126, 21);
+			this.comboApptType.TabIndex = 183;
+			this.comboApptType.SelectionChangeCommitted += new System.EventHandler(this.comboApptType_SelectionChangeCommitted);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(13, 249);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(98, 16);
+			this.label10.TabIndex = 182;
+			this.label10.Text = "Appointment Type";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelSyndromicObservations
 			// 
@@ -1089,25 +1108,6 @@ namespace OpenDental{
 			this.butText.TabIndex = 143;
 			this.butText.Text = "Text";
 			this.butText.Click += new System.EventHandler(this.butText_Click);
-			// 
-			// comboApptType
-			// 
-			this.comboApptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboApptType.Location = new System.Drawing.Point(114, 246);
-			this.comboApptType.MaxDropDownItems = 30;
-			this.comboApptType.Name = "comboApptType";
-			this.comboApptType.Size = new System.Drawing.Size(126, 21);
-			this.comboApptType.TabIndex = 183;
-			this.comboApptType.SelectionChangeCommitted += new System.EventHandler(this.comboApptType_SelectionChangeCommitted);
-			// 
-			// label10
-			// 
-			this.label10.Location = new System.Drawing.Point(13, 249);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(98, 16);
-			this.label10.TabIndex = 182;
-			this.label10.Text = "Appointment Type";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormApptEdit
 			// 
