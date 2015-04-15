@@ -8111,7 +8111,43 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				//========================END ADD SMS TABLES=========================
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ProgramNum FROM program WHERE ProgName='Xcharge' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT ProgramNum FROM (SELECT ProgramNum FROM program WHERE ProgName='Xcharge') WHERE RowNum<=1";
+				}
+				long programNum=PIn.Long(Db.GetScalar(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'XWebID', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'TerminalID', "
+						+"'')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'XWebID', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'TerminalID', "
+						+"'')";
+					Db.NonQ(command);
+				}//end X-Web properties.
 
 
 
