@@ -49,6 +49,8 @@ namespace OpenDental{
 		private List<InsSub> SubList;
 		private List<Patient> SuperFamilyGuarantors;
 		private List<Patient> SuperFamilyMembers;
+		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
+		private long _patNumLast;
 
 		///<summary></summary>
 		public ContrFamily(){
@@ -227,6 +229,7 @@ namespace OpenDental{
 		public void ModuleUnselected(){
 			FamCur=null;
 			PlanList=null;
+			_patNumLast=0;//Clear out the last pat num so that a security log gets entered that the module was "visited" or "refreshed".
 			Plugins.HookAddCode(this,"ContrFamily.ModuleUnselected_end");
 		}
 
@@ -247,6 +250,10 @@ namespace OpenDental{
 			PatFieldList=PatFields.Refresh(patNum);
 			SuperFamilyMembers=Patients.GetBySuperFamily(PatCur.SuperFamily);
 			SuperFamilyGuarantors=Patients.GetSuperFamilyGuarantors(PatCur.SuperFamily);
+			if(_patNumLast!=patNum) {
+				SecurityLogs.MakeLogEntry(Permissions.FamilyModule,patNum,"");
+				_patNumLast=patNum;//Stops module from making too many logs
+			}
 		}
 
 		private void RefreshModuleScreen(){
