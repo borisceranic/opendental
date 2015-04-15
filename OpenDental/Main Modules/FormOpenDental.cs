@@ -3847,35 +3847,30 @@ namespace OpenDental{
 						e.Cancel=true;
 						return;
 					}
-					SecurityLogs.MakeLogEntry(Permissions.FamilyModule,CurPatNum,"");
 					break;
 				case 2:
 					if(!Security.IsAuthorized(Permissions.AccountModule)){
 						e.Cancel=true;
 						return;
 					}
-					SecurityLogs.MakeLogEntry(Permissions.AccountModule,CurPatNum,"");
 					break;
 				case 3:
 					if(!Security.IsAuthorized(Permissions.TPModule)){
 						e.Cancel=true;
 						return;
 					}
-					SecurityLogs.MakeLogEntry(Permissions.TPModule,CurPatNum,"");
 					break;
 				case 4:
 					if(!Security.IsAuthorized(Permissions.ChartModule)){
 						e.Cancel=true;
 						return;
 					}
-					SecurityLogs.MakeLogEntry(Permissions.ChartModule,CurPatNum,"");
 					break;
 				case 5:
 					if(!Security.IsAuthorized(Permissions.ImagesModule)){
 						e.Cancel=true;
 						return;
 					}
-					SecurityLogs.MakeLogEntry(Permissions.ImagesModule,CurPatNum,"");
 					break;
 				case 6:
 					if(!Security.IsAuthorized(Permissions.ManageModule)){

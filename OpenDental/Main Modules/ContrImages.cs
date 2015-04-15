@@ -158,6 +158,8 @@ namespace OpenDental {
 		///<summary></summary>
 		[Category("Action"),Description("Occurs when the close button is clicked in the toolbar.")]
 		public event EventHandler CloseClick=null;
+		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
+		private long _patNumLast;
 		#endregion ManuallyCreatedVariables
 
 		///<summary></summary>
@@ -748,6 +750,7 @@ namespace OpenDental {
 			}
 			//Cancel current image capture.
 			xRayImageController.KillXRayThread();
+			_patNumLast=0;//Clear out the last pat num so that a security log gets entered that the module was "visited" or "refreshed".
 			Plugins.HookAddCode(this,"ContrImages.ModuleUnselected_end");
 		}
 
@@ -761,6 +764,10 @@ namespace OpenDental {
 			FamCur=Patients.GetFamily(patNum);
 			PatCur=FamCur.GetPatient(patNum);
 			PatFolder=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());//This is where the pat folder gets created if it does not yet exist.
+			if(_patNumLast!=patNum) {
+				SecurityLogs.MakeLogEntry(Permissions.ImagesModule,patNum,"");
+				_patNumLast=patNum;
+			}
 			ImageStore.AddMissingFilesToDatabase(PatCur);
 		}
 

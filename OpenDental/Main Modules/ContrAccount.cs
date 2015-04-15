@@ -110,6 +110,8 @@ namespace OpenDental {
 		private Label labelInsRem;
 		private decimal PPBalanceTotal;
 		private PatField[] _patFieldList;
+		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
+		private long _patNumLast;
 
 		#region UserVariables
 		///<summary>This holds nearly all of the data needed for display.  It is retrieved in one call to the database.</summary>
@@ -1833,6 +1835,7 @@ namespace OpenDental {
 			//}
 			FamCur=null;
 			RepeatChargeList=null;
+			_patNumLast=0;//Clear out the last pat num so that a security log gets entered that the module was "visited" or "refreshed".
 			Plugins.HookAddCode(this,"ContrAccount.ModuleUnselected_end");
 		}
 
@@ -1867,6 +1870,10 @@ namespace OpenDental {
 			PatientNoteCur=PatientNotes.Refresh(PatCur.PatNum,PatCur.Guarantor);
 			_patFieldList=PatFields.Refresh(patNum);
 			FillSummary();
+			if(_patNumLast!=patNum) {
+				SecurityLogs.MakeLogEntry(Permissions.AccountModule,patNum,"");
+				_patNumLast=patNum;
+			}
 			Plugins.HookAddCode(this,"ContrAccount.RefreshModuleData_end",FamCur,PatCur,DataSetMain,PPBalanceTotal,isSelectingFamily);
 		}
 

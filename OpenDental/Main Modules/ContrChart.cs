@@ -296,6 +296,8 @@ namespace OpenDental{
 		///<summary>Reset each time a new instance of OD is launched.  If NewCrop data fails to refresh and the last failure message was over an hour ago, then we show a popup reminding the user about the failure.</summary>
 		private DateTime _dateNewCropRefreshFail;
 		private List<ProcButtonQuick> listProcButtonQuicks;
+		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
+		private long _patNumLast;
 	
 		///<summary></summary>
 		public ContrChart(){
@@ -3198,6 +3200,7 @@ namespace OpenDental{
 			PatCur=null;
 			PlanList=null;
 			SubList=null;
+			_patNumLast=0;//Clear out the last pat num so that a security log gets entered that the module was "visited" or "refreshed".
 			Plugins.HookAddCode(this,"ContrChart.ModuleUnselected_end");
 		}
 		
@@ -3229,6 +3232,10 @@ namespace OpenDental{
 			ToothInitialList=ToothInitials.Refresh(patNum);
 //todo: optimize for Full mode:
 			PatFieldList=PatFields.Refresh(patNum);
+			if(_patNumLast!=patNum) {
+				SecurityLogs.MakeLogEntry(Permissions.ChartModule,patNum,"");
+				_patNumLast=patNum;
+			}
 		}		
 
 		private void RefreshModuleScreen(){
