@@ -593,8 +593,6 @@ namespace OpenDentBusiness {
 				row["chargesDouble"]=0;
 				row["charges"]="";
 				row["ClaimNum"]=rawClaimPay.Rows[i]["ClaimNum"].ToString();
-				row["ClaimPaymentNum"]="1";//this is now just a boolean flag indicating that it is a payment.
-				//this is because it will frequently not be attached to an actual claim payment.
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaimPay.Rows[i]["ClinicNum"].ToString()));
 				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
 				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
@@ -608,16 +606,27 @@ namespace OpenDentBusiness {
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
 				procdate=PIn.DateT(rawClaimPay.Rows[i]["ProcDate"].ToString());
-				row["description"]=Lans.g("AccountModule","Insurance Payment for Claim ")+procdate.ToShortDateString();
+				row["description"]=Lans.g("AccountModule","Insurance Payment for Claim")+" "+procdate.ToShortDateString();
 				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0") {
 					row["description"]+="\r\n("+Lans.g("AccountModule","Payments Tracked in Payment Plan")+")";
 				}
 				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" || writeoff!=0) {
-					row["description"]+="\r\n"+Lans.g("AccountModule","Payment:")+" "+amt.ToString("c");
+					row["description"]+="\r\n"+Lans.g("AccountModule","Payment")+": "+amt.ToString("c");
 				}
 				if(writeoff!=0) {
-					row["description"]+="\r\n"+Lans.g("AccountModule","Writeoff:")+" "+writeoff.ToString("c");
-				}				
+					row["description"]+="\r\n"+Lans.g("AccountModule","Writeoff")+": "+writeoff.ToString("c");
+				}
+				if(amt!=0 && rawClaimPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {
+					//Not all claim payments have been finalized and are not yet attached to claim payments (checks).
+					//Indicate to the user that they need to finalize this payment before reports will be accurate.
+					row["description"]+="\r\n"+Lans.g("AccountModule","PAYMENT NEEDS TO BE FINALIZED");
+				}
+				//jsalmon - I do not agree with the next line but am leaving it here so as to not break unknown parts of the program.  Something like this should never be done.
+				//          We either need to create a separate column using a naming convention that leads programmers to think it is a boolean or
+				//          we need to make the column lowercase "claimPaymentNum".  Making the first character lowercase will at least lead OD developers to this line 
+				//          so that they can then learn that this variable is not to be trusted and that it is in fact a boolean...
+				row["ClaimPaymentNum"]="1";//this is now just a boolean flag indicating that it is a payment.
+				//this is because it will frequently not be attached to an actual claim payment.
 				//row["extraDetail"]="";
 				row["patient"]=fam.GetNameInFamFirst(PIn.Long(rawClaimPay.Rows[i]["PatNum"].ToString()));
 				row["PatNum"]=rawClaimPay.Rows[i]["PatNum"].ToString();

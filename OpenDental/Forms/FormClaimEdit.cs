@@ -4459,13 +4459,18 @@ namespace OpenDental{
 				else{
 					row.Cells.Add(ClaimProcsForClaim[i].LineNumber.ToString());
 				}
+				string date=ClaimProcsForClaim[i].ProcDate.ToShortDateString();
 				if(ClaimProcsForClaim[i].ProcNum==0) {//Total payment
 					//We want to always show the "Payment Date" instead of the procedure date for total payments because they are not associated to procedures.
-					row.Cells.Add(ClaimProcsForClaim[i].DateCP.ToShortDateString());
+					date=ClaimProcsForClaim[i].DateCP.ToShortDateString();
 				}
-				else {
-					row.Cells.Add(ClaimProcsForClaim[i].ProcDate.ToShortDateString());
+				//Check if there was insurance payment amount entered but no claim payment (insurance check / not finalized). 
+				if(ClaimProcsForClaim[i].InsPayAmt > 0 && ClaimProcsForClaim[i].ClaimPaymentNum==0) {
+					//Many users will just enter payment via clicking 'By Procedure' or 'Total' which does not "finalize" claim payments.
+					//Instead of showing a "payment date" for insurance payments, we are going to make it visually obvious that the payments have not been finalized yet.
+					date=Lan.g(this,"Not Final");//"Not Finalized" is too long.
 				}
+				row.Cells.Add(date);
 				row.Cells.Add(Providers.GetAbbr(((ClaimProc)ClaimProcsForClaim[i]).ProvNum));
 				if(ClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");//code
