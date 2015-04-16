@@ -130,7 +130,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary></summary>
+		///<summary>Rounds input up to max of 2 decimal places. EG: .0047 will return "0.00"; .0051 will return "0.01".</summary>
 		public static string Double(double myDouble){
 			try{
 				//because decimal is a comma in Europe, this sends it to db with period instead 
