@@ -479,12 +479,8 @@ namespace OpenDental {
 				listArizonaPrimaryCare.Visible=true;
 			}
 			//Notify user if partial batch ins payments exist.
-			List<ClaimPayment> listClaimPay=ClaimPayments.GetForDateRange(DateTime.Now.AddMonths(-1),DateTime.Now,0);
-			for(int i=0;i<listClaimPay.Count;i++) {
-				if(listClaimPay[i].IsPartial) {
-					MsgBox.Show(this,"Reports will not be accurate until partial insurance payments are completed.");
-					break;
-				}
+			if(ClaimPayments.HasPartialPayments()) {
+				MsgBox.Show(this,"At least one insurance payment is not finalized.  Reports will be inaccurate until all payments are finalized.");
 			}
 		}
 

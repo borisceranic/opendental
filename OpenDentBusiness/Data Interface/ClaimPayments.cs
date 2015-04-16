@@ -130,6 +130,36 @@ namespace OpenDentBusiness{
 			return Crud.ClaimPaymentCrud.SelectOne(command);
 		}
 
+		///<summary>Returns true if there is a partial batch insurance payment or if there are any claimprocs with status Received that have InsPayAmts but are not associated to a claim payment.  Used to warn users that reports will be inaccurate until insurance payments are finalized.</summary>
+		public static bool HasPartialPayments() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod());
+			}
+			//Union together two queries that look for incomplete insurance payments.
+			//The first query will look for any partial batch insurance payments.
+			//The second query will look for any claim payments (InsPayAmt > 0) that do not have a claim payment (no check / not finalized).
+			string command=@"
+				SELECT COUNT(*) 
+				FROM ((SELECT claimpayment.ClaimPaymentNum 
+					FROM claimpayment 
+					WHERE claimpayment.IsPartial = 1 
+					AND claimpayment.CheckDate <= "+POut.Date(DateTime.Now)+@" 
+					AND claimpayment.CheckDate >= "+POut.Date(DateTime.Now.AddMonths(-1))+@")
+						UNION ALL
+					(SELECT claimproc.ClaimProcNum 
+					FROM claimproc
+					WHERE claimproc.ClaimPaymentNum = 0
+					AND claimproc.InsPayAmt != 0 
+					AND claimproc.Status IN("+POut.Int((int)ClaimProcStatus.Received)+","+POut.Int((int)ClaimProcStatus.Supplemental)+","+POut.Int((int)ClaimProcStatus.CapClaim)+@") 
+					AND claimproc.DateEntry <= "+POut.Date(DateTime.Now)+@" 
+					AND claimproc.DateEntry >= "+POut.Date(DateTime.Now.AddMonths(-1))+@")
+				) partialpayments";//claimproc.DateEntry is updated when payment is received.
+			if(Db.GetCount(command)!="0") {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary></summary>
 		public static long Insert(ClaimPayment cp) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
