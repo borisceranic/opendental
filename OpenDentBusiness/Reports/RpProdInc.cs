@@ -229,7 +229,8 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND procedurelog.ProcDate >= " +POut.Date(dateFrom)+" "
 				+"AND procedurelog.ProcDate <= " +POut.Date(dateTo)+" "
-				+"GROUP BY MONTH(procedurelog.ProcDate)";
+				+"GROUP BY MONTH(procedurelog.ProcDate),ClinicNum "
+				+"ORDER BY ClinicNum,ProcDate";
 			DataTable tableProduction=Db.GetTable(command);
 			tableProduction.TableName="tableProduction";
 			//Adjustments----------------------------------------------------------------------------
@@ -248,7 +249,8 @@ namespace OpenDentBusiness {
 				+"AND adjustment.AdjDate <= "+POut.Date(dateTo)+" "
 				+whereProv
 				+whereClin
-				+"GROUP BY MONTH(adjustment.AdjDate)";
+				+"GROUP BY MONTH(adjustment.AdjDate),ClinicNum "
+				+"ORDER BY ClinicNum,ProcDate";
 			DataTable tableAdj=Db.GetTable(command);
 			tableAdj.TableName="tableAdj";
 			//TableInsWriteoff--------------------------------------------------------------------------
@@ -269,7 +271,8 @@ namespace OpenDentBusiness {
 					+whereProv
 					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4) "//Received or supplemental
-					+"GROUP BY MONTH(claimproc.DateCP)";
+					+"GROUP BY MONTH(claimproc.DateCP),ClinicNum "
+					+"ORDER BY ClinicNum,DateCP";
 			}
 			else {
 				command="SELECT "
@@ -280,8 +283,10 @@ namespace OpenDentBusiness {
 					+"WHERE claimproc.ProcDate >= "+POut.Date(dateFrom)+" "
 					+"AND claimproc.ProcDate <= "+POut.Date(dateTo)+" "
 					+whereProv
+					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) " //received or supplemental or notreceived
-					+"GROUP BY MONTH(claimproc.ProcDate)";
+					+"GROUP BY MONTH(claimproc.ProcDate),ClinicNum "
+					+"ORDER BY ClinicNum,ProcDate";
 			}
 			DataTable tableInsWriteoff=Db.GetTable(command);
 			tableInsWriteoff.TableName="tableInsWriteoff";
@@ -302,7 +307,8 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND paysplit.DatePay >= "+POut.Date(dateFrom)+" "
 				+"AND paysplit.DatePay <= "+POut.Date(dateTo)+" "
-				+"GROUP BY MONTH(paysplit.DatePay)";
+				+"GROUP BY MONTH(paysplit.DatePay),ClinicNum "
+				+"ORDER BY ClinicNum,DatePay";
 			DataTable tablePay=Db.GetTable(command);
 			tablePay.TableName="tablePay";
 			//InsIncome---------------------------------------------------------------------------------
@@ -319,7 +325,7 @@ namespace OpenDentBusiness {
 				+"AND claimpayment.CheckDate <= " + POut.Date(dateTo)+" "
 				+whereProv
 				+whereClin
-				+" GROUP BY claimpayment.CheckDate ORDER BY checkdate";
+				+" GROUP BY claimpayment.CheckDate,ClinicNum ORDER BY ClinicNum,CheckDate";
 			DataTable tableIns=Db.GetTable(command);
 			tableIns.TableName="tableIns";
 			DataSet dataSet=new DataSet();
