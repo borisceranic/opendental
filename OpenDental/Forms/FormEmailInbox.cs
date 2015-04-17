@@ -196,7 +196,7 @@ namespace OpenDental {
 				if(emailMessage.Attachments[i].DisplayedFileName.ToLower()!="smime.p7s") {
 					continue;
 				}
-				string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailMessage.Attachments[i].ActualFileName);
+				string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailMessage.Attachments[i].ActualFileName);
 				X509Certificate2 certSig=EmailMessages.GetEmailSignatureFromSmimeP7sFile(smimeP7sFilePath);
 				FormEmailDigitalSignature form=new FormEmailDigitalSignature(certSig);
 				if(form.ShowDialog()==DialogResult.OK) {

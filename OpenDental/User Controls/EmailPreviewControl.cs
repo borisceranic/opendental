@@ -84,11 +84,11 @@ namespace OpenDental.User_Controls {
 			textSubject.Text=_emailMessage.Subject;
 			textBodyText.Visible=true;
 			webBrowser.Visible=false;
-			List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,"text/html","text/plain","image/");
-			List<Health.Direct.Common.Mime.MimeEntity> listHtmlParts=listMimeParts[0];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
-			List<Health.Direct.Common.Mime.MimeEntity> listTextParts=listMimeParts[1];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
-			_listImageParts=listMimeParts[2];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 			if(EmailMessages.IsReceived(_emailMessage.SentOrReceived)) {
+				List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,"text/html","text/plain","image/");
+				List<Health.Direct.Common.Mime.MimeEntity> listHtmlParts=listMimeParts[0];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
+				List<Health.Direct.Common.Mime.MimeEntity> listTextParts=listMimeParts[1];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
+				_listImageParts=listMimeParts[2];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 				if(listHtmlParts.Count>0) {//Html body found.
 					textBodyText.Visible=false;
 					_isLoading=true;
@@ -130,7 +130,7 @@ namespace OpenDental.User_Controls {
 			for(int i=0;i<_emailMessage.Attachments.Count;i++) {
 				if(_emailMessage.Attachments[i].DisplayedFileName.ToLower()=="smime.p7s") {
 					if(!_isComposing) {
-						string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_emailMessage.Attachments[i].ActualFileName);
+						string smimeP7sFilePath=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),_emailMessage.Attachments[i].ActualFileName);
 						SetSig(EmailMessages.GetEmailSignatureFromSmimeP7sFile(smimeP7sFilePath));
 					}
 					//Do not display email signatures in the attachment list, because "smime.p7s" has no meaning to a user
@@ -204,7 +204,7 @@ namespace OpenDental.User_Controls {
 
 		private void OpenFile() {
 			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
-			string strFilePathAttach=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailAttach.ActualFileName);
+			string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailAttach.ActualFileName);
 			try {
 				if(EhrCCD.IsCcdEmailAttachment(emailAttach)) {
 					string strTextXml=File.ReadAllText(strFilePathAttach);
@@ -217,7 +217,7 @@ namespace OpenDental.User_Controls {
 						//Try to find a corresponding stylesheet. This will only be used in the event that the default stylesheet cannot be loaded from the EHR dll.
 						for(int i=0;i<_listEmailAttachDisplayed.Count;i++) {
 							if(Path.GetExtension(_listEmailAttachDisplayed[i].ActualFileName).ToLower()==".xsl") {
-								strAlterateFilPathXslCCD=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_listEmailAttachDisplayed[i].ActualFileName);
+								strAlterateFilPathXslCCD=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),_listEmailAttachDisplayed[i].ActualFileName);
 								break;
 							}
 						}
@@ -269,7 +269,7 @@ namespace OpenDental.User_Controls {
 			Random rnd=new Random();
 			string newName;
 			EmailAttach attach;
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			try {
 				for(int i=0;i<dlg.FileNames.Length;i++) {
 					//copy the file

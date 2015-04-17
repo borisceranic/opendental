@@ -529,7 +529,7 @@ namespace OpenDentBusiness{
 					}
 				}
 				//TODO: We need to add some kind of alternatve view or similar replacement for outgoing Direct messages to work with SSL. Write the body to a temporary file and attach with the correct mime type and name?
-				string attachPath=EmailMessages.GetEmailAttachPath();
+				string attachPath=EmailAttaches.GetAttachPath();
 				System.Web.Mail.MailAttachment attach;
 				//foreach (string sSubstr in sAttach.Split(delim)){
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
@@ -560,7 +560,7 @@ namespace OpenDentBusiness{
 				for(int i=0;i<arrayAlternateViews.Length;i++) {//Needed for Direct messages to be interpreted encrypted on the receiver's end.
 					message.AlternateViews.Add(arrayAlternateViews[i]);
 				}
-				string attachPath=EmailMessages.GetEmailAttachPath();
+				string attachPath=EmailAttaches.GetAttachPath();
 				Attachment attach;
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
 					attach=new Attachment(ODFileUtils.CombinePaths(attachPath,emailMessage.Attachments[i].ActualFileName));
@@ -786,7 +786,7 @@ namespace OpenDentBusiness{
 					emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
 					if(inMsg.HasSenderSignatures) {
 						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
 							emailMessage.Attachments.Add(emailAttach);
 						}
 					}
@@ -797,7 +797,7 @@ namespace OpenDentBusiness{
 					//We add the signature to the email message so it will show up next to the email message in the inbox and make it easier for the user to add trust for the sender.
 					if(inMsg.HasSenderSignatures) {
 						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=CreateAttachInAttachPath("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
 							emailMessage.Attachments.Add(emailAttach);
 						}
 					}
@@ -822,7 +822,7 @@ namespace OpenDentBusiness{
 					if(Path.GetExtension(emailMessage.Attachments[i].ActualFileName).ToLower()!=".xml") {
 						continue;
 					}
-					string strAttachPath=GetEmailAttachPath();
+					string strAttachPath=EmailAttaches.GetAttachPath();
 					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
 					string strAttachText=File.ReadAllText(strAttachFile);
 					if(EhrCCD.IsCCD(strAttachText)) {
@@ -875,7 +875,7 @@ namespace OpenDentBusiness{
 			}
 			catch {
 				//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
-				return new List<List<Health.Direct.Common.Mime.MimeEntity>>();
+				return new List<List<Health.Direct.Common.Mime.MimeEntity>>(arrayMimeContentTypes.Length);
 			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			List<List<Health.Direct.Common.Mime.MimeEntity>> retVal=new List<List<Health.Direct.Common.Mime.MimeEntity>>();
@@ -1373,14 +1373,14 @@ namespace OpenDentBusiness{
 					if(arrayData==null) {//Plain attachment.
 						arrayData=Encoding.UTF8.GetBytes(mimePartAttach.Body.Text);
 					}
-					EmailAttach emailAttach=CreateAttachInAttachPath(mimePartAttach.ParsedContentType.Name,arrayData);
+					EmailAttach emailAttach=EmailAttaches.CreateAttach(mimePartAttach.ParsedContentType.Name,arrayData);
 					emailMessage.Attachments.Add(emailAttach);//The attachment EmailMessageNum is set when the emailMessage is inserted/updated below.
 				}
 			}
 			catch(Exception ex) {
 				//Failed to extract all attachments from the email message.  Cleanup the attachments which were successfully extracted.
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
-					string attachFilePath=ODFileUtils.CombinePaths(GetEmailAttachPath(),emailMessage.Attachments[i].ActualFileName);
+					string attachFilePath=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailMessage.Attachments[i].ActualFileName);
 					if(!File.Exists(attachFilePath)) {
 						continue;
 					}
@@ -1432,7 +1432,7 @@ namespace OpenDentBusiness{
 				listMimeParts.Add(mimeEntityBodyText);
 			}
 			if(hasAttachments && emailMessage.Attachments!=null && emailMessage.Attachments.Count>0) {
-				string strAttachPath=GetEmailAttachPath();
+				string strAttachPath=EmailAttaches.GetAttachPath();
 				for(int i=0;i<emailMessage.Attachments.Count;i++) {
 					string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,emailMessage.Attachments[i].ActualFileName);
 					//We always attach with base64 encoding, so that we do not have to worry about violating the RFC822 email format with binary characters or invalid newlines.
@@ -1453,38 +1453,6 @@ namespace OpenDentBusiness{
 				message.SetParts(listMimeParts,"multipart/mixed; boundary="+strBoundry+";");
 			}
 			return message;
-		}
-
-		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file, but with EmailMessageNum set to zero so it can be set later.</summary>
-		private static EmailAttach CreateAttachInAttachPath(string strAttachFileName,byte[] arrayData) {
-			//No need to check RemotingRole; no call to db.
-			string strAttachFileNameAdjusted=strAttachFileName;
-			if(String.IsNullOrEmpty(strAttachFileName)) {
-				strAttachFileNameAdjusted=MiscUtils.CreateRandomAlphaNumericString(8)+".txt";//just in case
-			}
-			string strAttachPath=GetEmailAttachPath();
-			string strAttachFile=ODFileUtils.CombinePaths(strAttachPath,DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+"_"+strAttachFileNameAdjusted);
-			while(File.Exists(strAttachFile)) {
-				strAttachFile=ODFileUtils.CombinePaths(strAttachPath,DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+"_"+strAttachFileNameAdjusted);
-			}
-			try {
-				File.WriteAllBytes(strAttachFile,arrayData);
-			}
-			catch(Exception ex) {
-				try {
-					if(File.Exists(strAttachFile)) {
-						File.Delete(strAttachFile);
-					}
-				}
-				catch {
-					//We tried our best to delete the file, and there is nothing else to try.
-				}
-				throw ex;//Show the initial error message, even if the Delete() failed.
-			}
-			EmailAttach emailAttach=new EmailAttach();
-			emailAttach.ActualFileName=Path.GetFileName(strAttachFile);
-			emailAttach.DisplayedFileName=Path.GetFileName(strAttachFileNameAdjusted);//shorter name, excludes date and time stamp info.
-			return emailAttach;
 		}
 
 		public static string ProcessMimeTextPart(string strBodyText) {
@@ -1535,39 +1503,6 @@ namespace OpenDentBusiness{
 				}
 			}
 			return retVal.ToString();
-		}
-
-		public static string GetEmailAttachPath() {
-			//No need to check RemotingRole; no call to db.
-			string attachPath;
-			if(PrefC.AtoZfolderUsed) {
-				attachPath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"EmailAttachments");
-				if(!Directory.Exists(attachPath)) {
-					Directory.CreateDirectory(attachPath);
-				}
-			}
-			else {
-				//For users who have the A to Z folders disabled, there is no defined image path, so we
-				//have to use a temp path.  This means that the attachments might be available immediately afterward,
-				//but probably not later.
-				attachPath=ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental");//Have to use Path.GetTempPath() here instead of PrefL.GetTempPathFolder() because we can't access PrefL.
-			}
-			return attachPath;
-		}
-
-		///<summary>Automatically creates an email attachment and adds it to the list of attachments to the emailMessage passed in.  It will also return the newly created email attachment so programmers can have access to the actual file name.  Can throw an exception if there is a permission issue saving the file.</summary>
-		public static EmailAttach CreateAttachmentFromText(EmailMessage emailMessage,string strAttachText,string strDisplayFileName) {
-			//No need to check RemotingRole; no call to db.
-			Random rnd=new Random();
-			EmailAttach emailAttach;
-			//create the attachment
-			emailAttach=new EmailAttach();
-			emailAttach.DisplayedFileName=strDisplayFileName;
-			emailAttach.ActualFileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+Path.GetExtension(strDisplayFileName);//To make unique.
-			string strAttachFilePath=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailAttach.ActualFileName);
-			File.WriteAllText(strAttachFilePath,strAttachText);
-			emailMessage.Attachments.Add(emailAttach);
-			return emailAttach;
 		}
 
 		public static string GetEmailSentOrReceivedDescript(EmailSentOrReceived sentOrReceived) {
@@ -1642,11 +1577,11 @@ namespace OpenDentBusiness{
 			emailMessage.Subject=subjectAndBody;
 			emailMessage.BodyText=subjectAndBody;
 			if(attachName1!="") {
-				EmailAttach emailAttach=CreateAttachInAttachPath(attachName1,Encoding.UTF8.GetBytes(attachContents1));
+				EmailAttach emailAttach=EmailAttaches.CreateAttach(attachName1,Encoding.UTF8.GetBytes(attachContents1));
 				emailMessage.Attachments.Add(emailAttach);
 			}
 			if(attachName2!="") {
-				EmailAttach emailAttach=CreateAttachInAttachPath(attachName2,Encoding.UTF8.GetBytes(attachContents2));
+				EmailAttach emailAttach=EmailAttaches.CreateAttach(attachName2,Encoding.UTF8.GetBytes(attachContents2));
 				emailMessage.Attachments.Add(emailAttach);
 			}
 			SendEmailUnsecure(emailMessage,emailAddressFrom);
@@ -1675,7 +1610,7 @@ namespace OpenDentBusiness{
 			if(emailMessage.Attachments==null || emailMessage.Attachments.Count==0) {
 				throw new Exception("No attachments");
 			}
-			string strAttachFile=ODFileUtils.CombinePaths(GetEmailAttachPath(),emailMessage.Attachments[0].ActualFileName);
+			string strAttachFile=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailMessage.Attachments[0].ActualFileName);
 			return File.ReadAllText(strAttachFile);
 		}
 

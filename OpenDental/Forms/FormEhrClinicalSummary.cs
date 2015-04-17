@@ -111,7 +111,7 @@ namespace OpenDental {
 				//TODO: It would be more patient friendly if we instead generated a PDF file containing the Clinical Summary printout, or if we simply displayed the Clinical Summary in the portal.
 				//The CMS definition does not prohibit sending human readable files, and sending a PDF to the portal mimics printing the Clinical Summary and handing to patient.
 				Random rnd=new Random();
-				string attachPath=EmailMessages.GetEmailAttachPath();
+				string attachPath=EmailAttaches.GetAttachPath();
 				List<EmailAttach> listAttachments=new List<EmailAttach>();
 				EmailAttach attachCcd=new EmailAttach();
 				attachCcd.DisplayedFileName="ccd.xml";

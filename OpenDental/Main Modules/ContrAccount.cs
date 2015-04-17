@@ -3867,7 +3867,7 @@ namespace OpenDental {
 					Cursor=Cursors.Default;
 					return;
 				}
-				string attachPath=EmailMessages.GetEmailAttachPath();
+				string attachPath=EmailAttaches.GetAttachPath();
 				Random rnd=new Random();
 				string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
@@ -3965,7 +3965,7 @@ namespace OpenDental {
 					Cursor=Cursors.Default;
 					return;
 				}
-				string attachPath=EmailMessages.GetEmailAttachPath();
+				string attachPath=EmailAttaches.GetAttachPath();
 				Random rnd=new Random();
 				string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);

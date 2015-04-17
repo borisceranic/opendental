@@ -651,7 +651,7 @@ namespace OpenDental {
 			}
 			EmailMessage message;
 			Random rnd=new Random();
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			string fileName;
 			string filePathAndName;
 			EmailAddress emailAddress;

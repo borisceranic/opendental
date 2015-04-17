@@ -1214,7 +1214,7 @@ namespace OpenDental{
 
 		/// <summary>Also displays the dialog for the email.  Must have already created and attached the pdf.  Returns false if it could not create the email.</summary>
 		private bool CreateEmailMessage(){
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			Random rnd=new Random();
 			string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 			string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);

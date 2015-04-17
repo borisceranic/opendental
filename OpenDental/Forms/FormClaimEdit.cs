@@ -5268,7 +5268,7 @@ namespace OpenDental{
 			g.Dispose();
 			Random rnd=new Random();
 			string newName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".jpg";
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			string newPath=ODFileUtils.CombinePaths(attachPath,newName);
 			try {
 				bitmapBig.Save(newPath);
@@ -5292,7 +5292,7 @@ namespace OpenDental{
 			}
 			for(int i=0;i<ClaimCur.Attachments.Count;i++){
 				string curAttachPath=ODFileUtils.CombinePaths(new string[] {
-					EmailMessages.GetEmailAttachPath(),ClaimCur.Attachments[i].ActualFileName});			
+					EmailAttaches.GetAttachPath(),ClaimCur.Attachments[i].ActualFileName});			
 				if(!File.Exists(curAttachPath)){
 					MessageBox.Show("The attachment file "+curAttachPath+" has been moved, deleted or is inaccessible.");
 					return;
@@ -5356,7 +5356,7 @@ namespace OpenDental{
 			//There is also a high probability that the attachment no longer exists if
 			//the A to Z folders are disabled, since the file will have originally been
 			//placed in the temporary directory.
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			try {
 				string tempFile
 					=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),ClaimCur.Attachments[listAttachments.SelectedIndex].DisplayedFileName);

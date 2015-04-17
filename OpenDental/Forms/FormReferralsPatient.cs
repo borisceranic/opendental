@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -438,8 +439,8 @@ namespace OpenDental{
 						string ccd="";
 						Cursor=Cursors.WaitCursor;
 						ccd=EhrCCD.GenerateSummaryOfCare(Patients.GetPat(PatNum));//Create summary of care, can throw exceptions but they're caught below
-						EmailMessages.CreateAttachmentFromText(msgWebMail,ccd,"ccd.xml");//Create summary of care attachment, can throw exceptions but caught below
-						EmailMessages.CreateAttachmentFromText(msgWebMail,FormEHR.GetEhrResource("CCD"),"ccd.xsl");//Create xsl attachment, can throw exceptions
+						msgWebMail.Attachments.Add(EmailAttaches.CreateAttach("ccd.xml",Encoding.UTF8.GetBytes(ccd)));//Create summary of care attachment, can throw exceptions but caught below
+						msgWebMail.Attachments.Add(EmailAttaches.CreateAttach("ccd.xsl",Encoding.UTF8.GetBytes(FormEHR.GetEhrResource("CCD"))));//Create xsl attachment, can throw exceptions
 						EmailMessages.Insert(msgWebMail);//Insert mail into DB for patient portal
 						EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
 						newMeasureEvent.DateTEvent=DateTime.Now;

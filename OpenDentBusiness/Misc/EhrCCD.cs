@@ -3341,7 +3341,7 @@ Vital Signs
 		}
 
 		public static bool IsCcdEmailAttachment(EmailAttach emailAttach) {
-			string strFilePathAttach=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),emailAttach.ActualFileName);
+			string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailAttach.ActualFileName);
 			if(Path.GetExtension(strFilePathAttach).ToLower()!=".xml") {
 				return false;
 			}

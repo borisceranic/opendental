@@ -594,7 +594,7 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.Default;
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			for(int i=0;i<listEmailAttachOld.Count;i++) {//For each old attachment, attempt to delete.  The new attachments were created with different names in ProcessRawEmailMessage().
 				string filePath=ODFileUtils.CombinePaths(attachPath,listEmailAttachOld[i].ActualFileName);
 				try {

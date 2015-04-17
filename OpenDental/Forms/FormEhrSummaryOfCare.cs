@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
@@ -246,8 +247,8 @@ namespace OpenDental {
 			emailMessage.Subject="Summary of Care";
 			emailMessage.BodyText="Summary of Care";
 			try {
-				EmailMessages.CreateAttachmentFromText(emailMessage,ccd,"ccd.xml");
-				EmailMessages.CreateAttachmentFromText(emailMessage,FormEHR.GetEhrResource("CCD"),"ccd.xsl");
+				emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xml",Encoding.UTF8.GetBytes(ccd)));
+				emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xsl",Encoding.UTF8.GetBytes(FormEHR.GetEhrResource("CCD"))));
 			}
 			catch(Exception ex) {
 				Cursor=Cursors.Default;

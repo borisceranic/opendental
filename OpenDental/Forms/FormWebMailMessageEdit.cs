@@ -237,7 +237,7 @@ namespace OpenDental {
 				if(listAttachments.SelectedIndex==-1) {
 					return;
 				}
-				string strFilePathAttach=ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName);
+				string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName);
 				//We have to create a copy of the file because the name is different.
 				//There is also a high probability that the attachment no longer exists if
 				//the A to Z folders are disabled, since the file will have originally been
@@ -260,7 +260,7 @@ namespace OpenDental {
 				if(listAttachments.SelectedIndex==-1) {
 					return;
 				}
-				File.Delete(ODFileUtils.CombinePaths(EmailMessages.GetEmailAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName));
+				File.Delete(ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),_listAttachments[listAttachments.SelectedIndex].ActualFileName));
 				_listAttachments.RemoveAt(listAttachments.SelectedIndex);
 				FillAttachments();
 			}
@@ -319,7 +319,7 @@ namespace OpenDental {
 			Random rnd=new Random();
 			string newName;
 			EmailAttach attach;
-			string attachPath=EmailMessages.GetEmailAttachPath();
+			string attachPath=EmailAttaches.GetAttachPath();
 			try {
 				for(int i=0;i<dlg.FileNames.Length;i++) {
 					//copy the file
