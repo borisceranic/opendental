@@ -86,6 +86,13 @@ namespace OpenDentBusiness {
 		///<summary>Only call from the main thread.  The value here is now reliable for public use.  FormChooseDatabase.DBtype, which used to be used for the client is now gone.</summary>
 		public static DatabaseType DBtype {
 			get {
+				//We need to know if thread variables are being used (SetDbT was called).  Because DBType is an enum we do not have a way to check if _dBtypeT is "null or empty".
+				//Check if _databaseT and _connectionStringT are null or empty which will indicate that we need to return _dBtype (set by the main thread) instead of _dBtypeT (thread specific).
+				if(String.IsNullOrEmpty(_databaseT) && String.IsNullOrEmpty(_connectionStringT)) {
+					//This will often get hit by separate threads that were spawned from the main thread and did not use SetDbT.  E.g. FormOpenDental.ThreadEmailInbox
+					//They need to follow old behavior and use the old static, non-thread safe variables that are assumed to "never change" except on startup.
+					return _dBtype;
+				}
 				return _dBtypeT;
 			}
 			set {
