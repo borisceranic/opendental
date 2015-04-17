@@ -877,13 +877,18 @@ namespace OpenDental
 				//butAttach.Enabled=true;
 				//butDetach.Enabled=false;
 				//ComputeProcTotals();
+				checkPatOtherFam.Enabled=true;
+				textProcDate.Enabled=true;
+				comboProvider.Enabled=true;
+				comboClinic.Enabled=true;
+				butPickProv.Enabled=true;
 				return;
 			}
 			ProcCur=Procedures.GetOneProc(PaySplitCur.ProcNum,false);
 			List<ClaimProc> ClaimProcList=ClaimProcs.Refresh(ProcCur.PatNum);
 			Adjustment[] AdjustmentList=Adjustments.Refresh(ProcCur.PatNum);
 			PaySplit[] PaySplitList=PaySplits.Refresh(ProcCur.PatNum);
-			//textProcDate.Text=ProcCur.ProcDate.ToShortDateString();
+			textProcDate.Text=ProcCur.ProcDate.ToShortDateString();
 			textProcDate2.Text=ProcCur.ProcDate.ToShortDateString();
 			textProcProv.Text=Providers.GetAbbr(ProcCur.ProvNum);
 			textProcTooth.Text=Tooth.ToInternat(ProcCur.ToothNum);
@@ -926,13 +931,31 @@ namespace OpenDental
 			else{
 				textProcPrevPaid.Text=ProcPrevPaid.ToString("F");
 			}
+			textAmount.Text=(ProcFee-(ProcWriteoff+ProcInsPaid+ProcInsEst+ProcAdj+ProcPrevPaid)).ToString("f");
 			ComputeProcTotals();
 			//butAttach.Enabled=false;
 			//butDetach.Enabled=true;
+			checkPatOtherFam.Enabled=false;
+			textProcDate.Enabled=false;
+			comboProvider.Enabled=false;
+			for(int i=0;i<comboProvider.Items.Count;i++) {
+				if(comboProvider.Items[i].ToString()==textProcProv.Text) {
+					comboProvider.SelectedIndex=i;
+					break;
+				}
+			}
+			comboClinic.Enabled=false;
+			for(int i=0;i<comboClinic.Items.Count;i++) {
+				if(comboClinic.Items[i].ToString()==Clinics.GetDesc(ProcCur.ClinicNum)) {
+					comboClinic.SelectedIndex=i;
+					break;
+				}
+			}
+			butPickProv.Enabled=false;
 		}
 
 		///<summary>Does not alter any of the proc amounts except PaidHere and Remaining.</summary>
-		private void ComputeProcTotals(){
+		private void ComputeProcTotals() {
 			ProcPaidHere=0;
 			if(textAmount.errorProvider1.GetError(textAmount)==""){
 				ProcPaidHere=-PIn.Double(textAmount.Text);	
@@ -966,6 +989,7 @@ namespace OpenDental
 			if(FormPS.DialogResult!=DialogResult.OK){
 				return;
 			}
+
 			PaySplitCur.ProcNum=FormPS.SelectedProcNum;
 			FillProcedure();
 			textProcDate.Text=ProcCur.ProcDate.ToShortDateString();

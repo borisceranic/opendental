@@ -1809,19 +1809,18 @@ namespace OpenDental {
 		private void butSplitManage_Click(object sender,EventArgs e) {
 			FormPaySplitManage FormPSM=new FormPaySplitManage();
 			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
-			FormPSM.ClinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
-				FormPSM.ClinicNum=Clinics.GetByDesc(comboClinic.Items[comboClinic.SelectedIndex].ToString());
-			}
 			Family patFam=Patients.GetFamily(PatCur.PatNum);
-			FormPSM.ArrayPatsForFam=patFam.ListPats;
+			FormPSM.FamCur=patFam;
 			FormPSM.PaymentCur=PaymentCur;
 			FormPSM.PayDate=PIn.DateT(textDate.Text);
 			FormPSM.IsNew=IsNew;
+			FormPSM.ListSplitsCur=SplitList;
 			FormPSM.ShowDialog();
 			if(FormPSM.DialogResult==DialogResult.OK) {
-				DialogResult=DialogResult.OK;//Close payment form
+				SplitList=FormPSM.ListSplitsCur;
+				PaymentCur=FormPSM.PaymentCur;
 			}
+			FillMain();//Is this what we want?  It will reflect changes and allow them to delete all splits for an old payment if desired.  More clicks though.
 		}
 
 		private void butDeleteAll_Click(object sender,System.EventArgs e) {
@@ -1972,67 +1971,61 @@ namespace OpenDental {
 			//PaymentCur.PatNum=PatCur.PatNum;//this is already done before opening this window.
 			//PaymentCur.ClinicNum already handled
 			if(IsNew && SplitList.Count==0) {
-				//The user has no splits and is trying to submit a payment. We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
+				//The user has no splits and is trying to submit a payment.
+				//We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
 				bool isAutoSplit=MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?");
 				if(isAutoSplit) {
 					FormPaySplitManage FormPSM=new FormPaySplitManage();
 					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
-					FormPSM.ClinicNum=0;
-					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
-						FormPSM.ClinicNum=Clinics.GetByDesc(comboClinic.Items[comboClinic.SelectedIndex].ToString());
-					}
 					Family patFam=Patients.GetFamily(PatCur.PatNum);
-					FormPSM.ArrayPatsForFam=patFam.ListPats;
+					FormPSM.FamCur=patFam;
 					FormPSM.PaymentCur=PaymentCur;
 					FormPSM.PayDate=PIn.DateT(textDate.Text);
 					FormPSM.IsNew=IsNew;
-					FormPSM.ShowDialog();
-					if(FormPSM.DialogResult==DialogResult.OK) {
-						DialogResult=DialogResult.OK;
-						return;
-					}
-					else {//If they cancel out of the autosplit we want to treat it like they cancelled out of the payment window.  Alternatively we could give them a single split for the full amount..
-						DialogResult=DialogResult.Cancel;
-						Payments.Delete(PaymentCur);
-						return;
+					FormPSM.ListSplitsCur=SplitList;
+					if(FormPSM.ShowDialog()==DialogResult.OK) {
+						SplitList=FormPSM.ListSplitsCur;
+						PaymentCur=FormPSM.PaymentCur;
 					}
 				}
 			}
-			if(SplitList.Count==0) {
-				if(Payments.AllocationRequired(PaymentCur.PayAmt,PaymentCur.PatNum)
-					&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {
-					SplitList=Payments.Allocate(PaymentCur);//PayAmt needs to be set first
-				}
-				else {//Either no allocation required, or user does not want to allocate.  Just add one split.
-					PaySplit split=new PaySplit();
-					split.PatNum=PaymentCur.PatNum;
-					split.ClinicNum=PaymentCur.ClinicNum;
-					split.PayNum=PaymentCur.PayNum;
-					split.ProcDate=PaymentCur.PayDate;
-					split.DatePay=PaymentCur.PayDate;
-					split.ProvNum=Patients.GetProvNum(PatCur);
-					split.SplitAmt=PaymentCur.PayAmt;
-					SplitList.Add(split);
-				}
-			}
-			else {
-				if(SplitList.Count==1//if one split
-					&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
-				{
-					SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match
-				}
-				if(SplitList.Count==1//if one split
-					&& PaymentCur.PayDate != SplitList[0].ProcDate
-					&& SplitList[0].ProcNum==0)//not attached to procedure
-				{
-					if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
-						SplitList[0].ProcDate=PaymentCur.PayDate;
+			else {//Existing payment and/or has splits.
+				if(SplitList.Count==0) {//Existing payment with no splits.
+					if(Payments.AllocationRequired(PaymentCur.PayAmt,PaymentCur.PatNum)
+						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {
+						SplitList=Payments.Allocate(PaymentCur);//PayAmt needs to be set first
+					}
+					else {//Either no allocation required, or user does not want to allocate.  Just add one split.
+						PaySplit split=new PaySplit();
+						split.PatNum=PaymentCur.PatNum;
+						split.ClinicNum=PaymentCur.ClinicNum;
+						split.PayNum=PaymentCur.PayNum;
+						split.ProcDate=PaymentCur.PayDate;
+						split.DatePay=PaymentCur.PayDate;
+						split.ProvNum=Patients.GetProvNum(PatCur);
+						split.SplitAmt=PaymentCur.PayAmt;
+						SplitList.Add(split);
 					}
 				}
-				if(SplitList.Count!=1 && PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
-					MsgBox.Show(this,"Split totals must equal payment amount.");
-					//work on reallocation schemes here later
-					return;
+				else {//A new or existing payment with splits.
+					if(SplitList.Count==1//if one split
+						&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
+					{
+						SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match
+					}
+					if(SplitList.Count==1//if one split
+						&& PaymentCur.PayDate != SplitList[0].ProcDate
+						&& SplitList[0].ProcNum==0)//not attached to procedure
+					{
+						if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
+							SplitList[0].ProcDate=PaymentCur.PayDate;
+						}
+					}
+					if(SplitList.Count!=1 && PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
+						MsgBox.Show(this,"Split totals must equal payment amount.");
+						//work on reallocation schemes here later
+						return;
+					}
 				}
 			}
 			if(SplitList.Count>1) {
@@ -2056,7 +2049,7 @@ namespace OpenDental {
 			//Accounting synch is done here.  All validation was done further up
 			//If user is trying to change the amount or linked account of an entry that was already copied and linked to accounting section
 			if(accountingSynchRequired) {
-				Payments.AlterLinkedEntries(accountingOldAmt,PIn.Double(textAmount.Text),IsNew,
+				Payments.AlterLinkedEntries(accountingOldAmt,PaymentCur.PayAmt,IsNew,
 					PaymentCur.PayNum,accountingNewAcct,PaymentCur.PayDate,FamCur.GetNameInFamFL(PaymentCur.PatNum));
 			}
 			if(IsNew) {
