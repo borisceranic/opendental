@@ -1760,8 +1760,8 @@ ORDER BY adjdate DESC
 			query.AddColumn("Pt Income",120,FieldValueType.Number);
 			query.AddColumn("Ins Income",120,FieldValueType.Number);
 			query.AddColumn("Total Income",120,FieldValueType.Number);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				//For clinics only, we want to add one last table to the end of the report that totals all clinics together.
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1) {
+				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Month",75,FieldValueType.String);
 				query.AddColumn("Production",120,FieldValueType.Number);
