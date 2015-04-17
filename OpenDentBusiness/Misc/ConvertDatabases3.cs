@@ -8128,6 +8128,12 @@ namespace OpenDentBusiness {
 					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
 						+") VALUES("
 						+"'"+POut.Long(programNum)+"', "
+						+"'AuthKey', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
 						+"'TerminalID', "
 						+"'')";
 					Db.NonQ(command);
@@ -8138,6 +8144,13 @@ namespace OpenDentBusiness {
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'XWebID', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'AuthKey', "
 						+"'')";
 					Db.NonQ(command);
 					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"

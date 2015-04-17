@@ -34,10 +34,12 @@ namespace OpenDental{
 		private Label labelUser;
 		private GroupBox groupXWeb;
 		private Label label6;
-		private TextBox textTerminalID;
-		private Label label2;
+		private TextBox textAuthKey;
+		private Label labelAuthKey;
 		private TextBox textXWebID;
-		private Label label4;
+		private Label labelXWebID;
+		private TextBox textTerminalID;
+		private Label labelTerminalID;
 		private string pathOverrideOld;
 
 		///<summary></summary>
@@ -86,11 +88,13 @@ namespace OpenDental{
 			this.textOverride = new System.Windows.Forms.TextBox();
 			this.labelOverride = new System.Windows.Forms.Label();
 			this.groupXWeb = new System.Windows.Forms.GroupBox();
-			this.textTerminalID = new System.Windows.Forms.TextBox();
-			this.label2 = new System.Windows.Forms.Label();
-			this.textXWebID = new System.Windows.Forms.TextBox();
-			this.label4 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
+			this.textAuthKey = new System.Windows.Forms.TextBox();
+			this.labelAuthKey = new System.Windows.Forms.Label();
+			this.textXWebID = new System.Windows.Forms.TextBox();
+			this.labelXWebID = new System.Windows.Forms.Label();
+			this.textTerminalID = new System.Windows.Forms.TextBox();
+			this.labelTerminalID = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.groupXWeb.SuspendLayout();
@@ -204,49 +208,19 @@ namespace OpenDental{
 			// 
 			// groupXWeb
 			// 
-			this.groupXWeb.Controls.Add(this.label6);
 			this.groupXWeb.Controls.Add(this.textTerminalID);
-			this.groupXWeb.Controls.Add(this.label2);
+			this.groupXWeb.Controls.Add(this.labelTerminalID);
+			this.groupXWeb.Controls.Add(this.label6);
+			this.groupXWeb.Controls.Add(this.textAuthKey);
+			this.groupXWeb.Controls.Add(this.labelAuthKey);
 			this.groupXWeb.Controls.Add(this.textXWebID);
-			this.groupXWeb.Controls.Add(this.label4);
+			this.groupXWeb.Controls.Add(this.labelXWebID);
 			this.groupXWeb.Location = new System.Drawing.Point(18, 301);
 			this.groupXWeb.Name = "groupXWeb";
-			this.groupXWeb.Size = new System.Drawing.Size(427, 153);
+			this.groupXWeb.Size = new System.Drawing.Size(427, 193);
 			this.groupXWeb.TabIndex = 60;
 			this.groupXWeb.TabStop = false;
 			this.groupXWeb.Text = "X-Web";
-			// 
-			// textTerminalID
-			// 
-			this.textTerminalID.Location = new System.Drawing.Point(6, 120);
-			this.textTerminalID.Name = "textTerminalID";
-			this.textTerminalID.Size = new System.Drawing.Size(413, 20);
-			this.textTerminalID.TabIndex = 12;
-			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(4, 99);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(413, 18);
-			this.label2.TabIndex = 65;
-			this.label2.Text = "Terminal ID";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// textXWebID
-			// 
-			this.textXWebID.Location = new System.Drawing.Point(5, 76);
-			this.textXWebID.Name = "textXWebID";
-			this.textXWebID.Size = new System.Drawing.Size(413, 20);
-			this.textXWebID.TabIndex = 10;
-			// 
-			// label4
-			// 
-			this.label4.Location = new System.Drawing.Point(4, 55);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(231, 18);
-			this.label4.TabIndex = 63;
-			this.label4.Text = "XWeb ID";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label6
 			// 
@@ -259,6 +233,55 @@ namespace OpenDental{
     "eb.";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// textAuthKey
+			// 
+			this.textAuthKey.Location = new System.Drawing.Point(6, 120);
+			this.textAuthKey.Name = "textAuthKey";
+			this.textAuthKey.Size = new System.Drawing.Size(413, 20);
+			this.textAuthKey.TabIndex = 11;
+			this.textAuthKey.TextChanged += new System.EventHandler(this.textAuthKey_TextChanged);
+			// 
+			// labelAuthKey
+			// 
+			this.labelAuthKey.Location = new System.Drawing.Point(4, 99);
+			this.labelAuthKey.Name = "labelAuthKey";
+			this.labelAuthKey.Size = new System.Drawing.Size(413, 18);
+			this.labelAuthKey.TabIndex = 65;
+			this.labelAuthKey.Text = "Auth Key";
+			this.labelAuthKey.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// textXWebID
+			// 
+			this.textXWebID.Location = new System.Drawing.Point(5, 76);
+			this.textXWebID.Name = "textXWebID";
+			this.textXWebID.Size = new System.Drawing.Size(413, 20);
+			this.textXWebID.TabIndex = 10;
+			// 
+			// labelXWebID
+			// 
+			this.labelXWebID.Location = new System.Drawing.Point(4, 55);
+			this.labelXWebID.Name = "labelXWebID";
+			this.labelXWebID.Size = new System.Drawing.Size(231, 18);
+			this.labelXWebID.TabIndex = 63;
+			this.labelXWebID.Text = "XWeb ID";
+			this.labelXWebID.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// textTerminalID
+			// 
+			this.textTerminalID.Location = new System.Drawing.Point(6, 164);
+			this.textTerminalID.Name = "textTerminalID";
+			this.textTerminalID.Size = new System.Drawing.Size(413, 20);
+			this.textTerminalID.TabIndex = 12;
+			// 
+			// labelTerminalID
+			// 
+			this.labelTerminalID.Location = new System.Drawing.Point(4, 143);
+			this.labelTerminalID.Name = "labelTerminalID";
+			this.labelTerminalID.Size = new System.Drawing.Size(413, 18);
+			this.labelTerminalID.TabIndex = 68;
+			this.labelTerminalID.Text = "Terminal ID";
+			this.labelTerminalID.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// butOK
 			// 
 			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -267,7 +290,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(273, 470);
+			this.butOK.Location = new System.Drawing.Point(273, 506);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 13;
@@ -282,7 +305,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(370, 470);
+			this.butCancel.Location = new System.Drawing.Point(370, 506);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 14;
@@ -292,7 +315,7 @@ namespace OpenDental{
 			// FormXchargeSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(480, 508);
+			this.ClientSize = new System.Drawing.Size(480, 544);
 			this.Controls.Add(this.groupXWeb);
 			this.Controls.Add(this.textOverride);
 			this.Controls.Add(this.labelOverride);
@@ -342,6 +365,12 @@ namespace OpenDental{
 					comboPaymentType.SelectedIndex=i;
 			}
 			textXWebID.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"XWebID");
+			string authKey=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"AuthKey"));
+			if(authKey.Length>0) {
+				//X-Charge does not show the Auth Key within their server set up.  We shall do the same.
+				textAuthKey.UseSystemPasswordChar=true;
+				textAuthKey.Text=authKey;
+			}
 			textTerminalID.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"TerminalID");
 		}
 
@@ -363,6 +392,14 @@ namespace OpenDental{
 			return true;
 		}
 
+		private void textAuthKey_TextChanged(object sender,EventArgs e) {
+			//We want to let users see what they are typing in if they cleared out the AuthKey field completely or are typing in for the first time.
+			//X-Charge does this in their server settings window.  We shall do the same.
+			if(textAuthKey.Text.Trim()=="") {
+				textAuthKey.UseSystemPasswordChar=false;
+			}
+		}
+
 		private void linkLabel1_LinkClicked(object sender,LinkLabelLinkClickedEventArgs e) {
 			Process.Start("http://xchargepayments.com/opendental/");
 		}
@@ -378,7 +415,10 @@ namespace OpenDental{
 					return;
 				}
 			}
-			else if(!File.Exists(textPath.Text)){
+			else if(textPath.Text=="" && textXWebID.Text!="" && textAuthKey.Text!="" && textTerminalID.Text!="") {
+				//If XWeb is enabled and the client application is disabled, then we do not need to check the client application path.
+			}
+			else if(!File.Exists(textPath.Text)) {
 				MsgBox.Show(this,"Path is not valid.");
 				return;
 			}
@@ -386,21 +426,33 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a payment type first.");
 				return;
 			}
-			if(textXWebID.Text.Trim().Length > 0 || textTerminalID.Text.Trim().Length > 0) {
-				//Validate that XWebID and TerminalID are valid lengths.
-				if(textXWebID.Text.Trim().Length!=12) {
+			//Check to see if ANY X-Web settings have been set.
+			if(textXWebID.Text.Trim().Length > 0 
+				|| textAuthKey.Text.Trim().Length > 0
+				|| textTerminalID.Text.Trim().Length > 0) 
+			{
+				//Validate ALL XWebID, AuthKey, and TerminalID.  Each is required for X-Web to work.
+				if(!Regex.IsMatch(textXWebID.Text.Trim(),"^[0-9]{12}$")) {
 					MsgBox.Show(this,"XWeb ID must be 12 digits.");
 					return;
 				}
-				if(textTerminalID.Text.Trim().Length!=8) {
+				if(!Regex.IsMatch(textAuthKey.Text.Trim(),"^[A-Za-z0-9]{32}$")) {
+					MsgBox.Show(this,"Auth Key must be 32 alphanumeric characters.");
+					return;
+				}
+				if(!Regex.IsMatch(textTerminalID.Text.Trim(),"^[0-9]{8}$")) {
 					MsgBox.Show(this,"Terminal ID must be 8 digits.");
 					return;
 				}
+				//We are not going to give the option for users to use their User Name and Password.
+				//The following password strength requirement would need to be enforced if we want to start allowing use of User Names and Passwords in lieu of the Auth Key.
+				/****************************************************************************************************************************
 				//XWebID and TerminalID are valid.  Make sure the password meets the required complexity for XWeb.
 				if(!IsPasswordXWebValid()) {
 					MessageBox.Show(this,Lan.g(this,"Passwords must be between 8 and 15 characters in length, and must contain at least one letter, one number, and one of these special characters")+": $%^&+=");
 					return;
 				}
+				****************************************************************************************************************************/
 			}
 			prog.Enabled=checkEnabled.Checked;
 			prog.Path=textPath.Text;
@@ -414,6 +466,7 @@ namespace OpenDental{
 			ProgramProperties.SetProperty(prog.ProgramNum,"Username",textUser.Text);
 			ProgramProperties.SetProperty(prog.ProgramNum,"Password",CodeBase.MiscUtils.Encrypt(textPassword.Text));
 			ProgramProperties.SetProperty(prog.ProgramNum,"XWebID",textXWebID.Text.Trim());
+			ProgramProperties.SetProperty(prog.ProgramNum,"AuthKey",CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim()));
 			ProgramProperties.SetProperty(prog.ProgramNum,"TerminalID",textTerminalID.Text.Trim());
 			DataValid.SetInvalid(InvalidType.Programs);
 			DialogResult=DialogResult.OK;

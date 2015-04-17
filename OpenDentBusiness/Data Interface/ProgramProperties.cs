@@ -110,6 +110,19 @@ namespace OpenDentBusiness {
 			return GetPropVal(programNum,desc);
 		}
 
+		///<summary>Returns the property with the matching description from the provided list.  Null if the property cannot be found by the description.</summary>
+		public static ProgramProperty GetPropByDesc(string propertyDesc,List<ProgramProperty> listProperties) {
+			//No need to check RemotingRole; no call to db.
+			ProgramProperty property=null;
+			for(int i=0;i<listProperties.Count;i++) {
+				if(listProperties[i].PropertyDesc==propertyDesc) {
+					property=listProperties[i];
+					break;
+				}
+			}
+			return property;
+		}
+
 		///<summary>Used in FormUAppoint to get frequent and current data.</summary>
 		public static string GetValFromDb(long programNum,string desc) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
