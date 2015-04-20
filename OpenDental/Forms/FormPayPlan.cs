@@ -1643,16 +1643,16 @@ namespace OpenDental{
 			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
 			query.AddColumn("ChargeDate",80,FieldValueType.Date,font);
 			query.GetColumnHeader("ChargeDate").StaticText="Date";
-			query.AddColumn("Provider",50,FieldValueType.String,font);
+			query.AddColumn("Provider",80,FieldValueType.String,font);
 			query.AddColumn("Description",100,FieldValueType.String,font);
-			query.AddColumn("Principal",50,FieldValueType.Number,font);
-			query.AddColumn("Interest",50,FieldValueType.Number,font);
-			query.AddColumn("Payment",50,FieldValueType.Number,font);
-			query.AddColumn("Balance",60,FieldValueType.String,font);
+			query.AddColumn("Principal",80,FieldValueType.Number,font);
+			query.AddColumn("Interest",80,FieldValueType.Number,font);
+			query.AddColumn("Payment",80,FieldValueType.Number,font);
+			query.AddColumn("Balance",80,FieldValueType.String,font);
 			query.GetColumnHeader("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Balance").ContentAlignment=ContentAlignment.MiddleRight;
-			report.ReportObjects.Add(new ReportObject
-			("Signature","Report Footer",new Point(x1,70),size,"Signature of Guarantor:",font,alignL));
+			report.ReportObjects.Add(new ReportObject("Note","Report Footer",new Point(x1,20),new Size(500,200),textNote.Text,font,ContentAlignment.TopLeft));
+			report.ReportObjects.Add(new ReportObject("Signature","Report Footer",new Point(x1,220),new Size(500,20),"Signature of Guarantor: ____________________________________________",font,alignL));
 			if(!report.SubmitQueries()) {
 				return;
 			}
