@@ -15,7 +15,6 @@ namespace OpenDental{
 		private System.Windows.Forms.MonthCalendar date2;
 		private System.Windows.Forms.MonthCalendar date1;
 		private System.Windows.Forms.Label labelTO;
-		private UI.Button butTest;
 		private System.ComponentModel.Container components = null;
 		//private FormQuery FormQuery2;
 
@@ -48,7 +47,6 @@ namespace OpenDental{
 			this.labelTO = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.butTest = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// date2
@@ -104,27 +102,10 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// butTest
-			// 
-			this.butTest.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butTest.Autosize = true;
-			this.butTest.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTest.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTest.CornerRadius = 4F;
-			this.butTest.Location = new System.Drawing.Point(534, 222);
-			this.butTest.Name = "butTest";
-			this.butTest.Size = new System.Drawing.Size(75, 26);
-			this.butTest.TabIndex = 23;
-			this.butTest.Text = "Test Report";
-			this.butTest.Visible = false;
-			this.butTest.Click += new System.EventHandler(this.butTest_Click);
-			// 
 			// FormRpAccountingGenLedg
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(649, 330);
-			this.Controls.Add(this.butTest);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.date2);
@@ -144,9 +125,6 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRpAccountingGenLedg_Load(object sender, System.EventArgs e) {
-			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				butTest.Visible=true;
-			}
 			if(DateTime.Today.Month>6){//default to this year
 				date1.SelectionStart=new DateTime(DateTime.Today.Year,1,1);
 				date2.SelectionStart=new DateTime(DateTime.Today.Year,12,31);
@@ -157,7 +135,8 @@ namespace OpenDental{
 			}
 		}
 
-		private void butTest_Click(object sender,EventArgs e) {
+		///<summary>This report has never worked for Oracle.</summary>
+		private void butOK_Click(object sender,System.EventArgs e) {
 			DataTable data=Accounts.GetGeneralLedger(date1.SelectionStart,date2.SelectionStart);
 			for(int i=0;i<data.Rows.Count;i++) {
 				data.Rows[i]["Balance"]=ODR.Aggregate.RunningSumForAccounts(data.Rows[i]["AccountNum"],data.Rows[i]["DebitAmt"],data.Rows[i]["CreditAmt"],data.Rows[i]["AcctType"]);
@@ -195,20 +174,6 @@ namespace OpenDental{
 			// display report
 			FormReportComplex FormR=new FormReportComplex(report);
 			//FormR.MyReport=report;
-			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
-		}
-
-		///<summary>This report has never worked for Oracle.</summary>
-		private void butOK_Click(object sender,System.EventArgs e) {
-			FormReportForRdl FormR=new FormReportForRdl();
-			string s=Properties.Resources.ReportAccountingGenLedger;
-			s=s.Replace("1/1/2007 - 12/31/2007",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString());
-			s=s.Replace("2007-01-01",POut.Date(date1.SelectionStart,false));
-			s=s.Replace("2007-12-31",POut.Date(date2.SelectionStart,false));
-			s=s.Replace("2006-12-31",POut.Date(date1.SelectionStart.AddDays(-1),false));
-			s=s.Replace("@@@ConnectionString@@@",DataConnection.GetCurrentConnectionString());//must use current connection string, not static string from FreeDentalConfig.xml
-			FormR.SourceRdlString=s;
 			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
