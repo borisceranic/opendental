@@ -182,6 +182,21 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Gets all ClaimProcs for this family that aren't directly associated with procedures.</summary>
+		public static List<ClaimProc> GetByTotClaimProcsForPats(Patient[] arrayPats) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<ClaimProc>>(MethodBase.GetCurrentMethod(),arrayPats);
+			}
+			string[] arrayPatNums= new string[arrayPats.Length];
+			for(int i=0;i<arrayPats.Length;i++) {
+				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
+			}
+			string command="SELECT * from claimproc WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")"
+					+" AND ProcNum=0 AND (Status="+(int)ClaimProcStatus.Received+" OR Status="+(int)ClaimProcStatus.Supplemental+")"
+					+" ORDER BY DateCP";
+			return Crud.ClaimProcCrud.SelectMany(command);
+		}
+
 		///<summary>Gets all ClaimProc bundles for the given PayPlanNum. Bundles claimprocs by Date and then by ClaimPaymentNum.</summary>
 		public static DataTable GetBundlesForPayPlan(long payPlanNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
