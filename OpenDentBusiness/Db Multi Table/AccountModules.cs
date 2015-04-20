@@ -202,7 +202,7 @@ namespace OpenDentBusiness {
 				row["creditsDouble"]=amt;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
 				if(payPlanPlanNum==0) {
-					dateT=PIn.DateT(rawPay.Rows[i]["ProcDate"].ToString());
+					dateT=PIn.DateT(rawPay.Rows[i]["DatePay"].ToString());
 				}
 				else {
 					dateT=PIn.DateT(rawPay.Rows[i]["DateCP"].ToString());//this may be changed to ProcDate in the future

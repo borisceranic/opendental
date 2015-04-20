@@ -1138,7 +1138,7 @@ namespace OpenDental{
 				descript+=Lans.g(this,"(split)");
 			}
 			ODGridRow row=new ODGridRow();
-			row.Cells.Add(paySplit.ProcDate.ToShortDateString());//0 Date
+			row.Cells.Add(paySplit.DatePay.ToShortDateString());//0 Date
 			row.Cells.Add(Providers.GetAbbr(Convert.ToInt32(rowBundlePayment["ProvNum"])));//1 Prov Abbr
 			row.Cells.Add(descript);//2 Descript
 			row.Cells.Add("");//3 Principal
