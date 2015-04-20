@@ -688,6 +688,9 @@ namespace OpenDental {
 		}
 
 		private void AddTask_Clicked() {
+			if(Plugins.HookMethod(this,"UserControlTasks.AddTask_Clicked")) {
+				return;
+			}
 			//if(tabContr.SelectedTab==tabUser && TreeHistory.Count==0) {//trunk of user tab
 			//	MsgBox.Show(this,"Not allowed to add a task to the trunk of the user tab.  Add it to a child list instead.");
 			//	return;

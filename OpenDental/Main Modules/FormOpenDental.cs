@@ -2969,6 +2969,9 @@ namespace OpenDental{
 		}
 
 		private void OnCommlog_Click() {
+			if(Plugins.HookMethod(this,"FormOpenDental.OnCommlog_Click",CurPatNum)) {
+				return;
+			}
 			Commlog CommlogCur = new Commlog();
 			CommlogCur.PatNum = CurPatNum;
 			CommlogCur.CommDateTime = DateTime.Now;
@@ -4385,6 +4388,9 @@ namespace OpenDental{
 			Commlog commlog=Commlogs.GetIncompleteEntry(Security.CurUser.UserNum,CurPatNum);
 			PhoneEmpDefault ped=PhoneEmpDefaults.GetByExtAndEmp(phoneSmall.Extension,Security.CurUser.EmployeeNum);
 			if(ped!=null && ped.IsTriageOperator) {
+				if(Plugins.HookMethod(this,"FormOpenDental.phoneSmall_GoToChanged_IsTriage",pat,phoneSmall.Extension)) {
+					return;
+				}
 				Task task=new Task();
 				task.TaskListNum=-1;//don't show it in any list yet.
 				Tasks.Insert(task);
@@ -4399,6 +4405,9 @@ namespace OpenDental{
 				FormTE.Show();
 			}
 			else {//Not a triage operator.
+				if(Plugins.HookMethod(this,"FormOpenDental.phoneSmall_GoToChanged_NotTriage",pat)) {
+					return;
+				}
 				if(commlog==null) {
 					commlog = new Commlog();
 					commlog.PatNum = CurPatNum;
