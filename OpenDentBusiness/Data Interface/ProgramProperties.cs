@@ -21,7 +21,9 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			ProgramPropertyC.Listt=Crud.ProgramPropertyCrud.TableToList(table);
+			List<ProgramProperty> listProgramProperties=Crud.ProgramPropertyCrud.TableToList(table);
+			//This is where code should go if there is ever a short list implemented for program properties.
+			ProgramPropertyC.Listt=listProgramProperties;
 		}
 
 		///<summary></summary>
@@ -46,13 +48,14 @@ namespace OpenDentBusiness {
 		///DO NOT MODIFY the returned properties.  Read only.</summary>
 		public static List<ProgramProperty> GetListForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
-			List<ProgramProperty> listProgProp=new List<ProgramProperty>();
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum==programNum && ProgramPropertyC.Listt[i].PropertyDesc!="") {
-					listProgProp.Add(ProgramPropertyC.Listt[i]);
+			List<ProgramProperty> listProgPropsResult=new List<ProgramProperty>();
+			List<ProgramProperty> listProgPropsCache=ProgramPropertyC.GetListt();
+			for(int i=0;i<listProgPropsCache.Count;i++) {
+				if(listProgPropsCache[i].ProgramNum==programNum && listProgPropsCache[i].PropertyDesc!="") {
+					listProgPropsResult.Add(listProgPropsCache[i]);
 				}
 			}
-			return listProgProp;
+			return listProgPropsResult;
 		}
 
 		///<summary>Returns an ArrayList of programproperties attached to the specified programNum.  Does not include path overrides.
@@ -60,9 +63,10 @@ namespace OpenDentBusiness {
 		public static ArrayList GetForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
 			ArrayList ForProgram=new ArrayList();
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum==programNum && ProgramPropertyC.Listt[i].PropertyDesc!="") {
-					ForProgram.Add(ProgramPropertyC.Listt[i]);
+			List<ProgramProperty> listProgramProperties=ProgramPropertyC.GetListt();
+			for(int i=0;i<listProgramProperties.Count;i++) {
+				if(listProgramProperties[i].ProgramNum==programNum && listProgramProperties[i].PropertyDesc!="") {
+					ForProgram.Add(listProgramProperties[i]);
 				}
 			}
 			return ForProgram;
@@ -92,14 +96,15 @@ namespace OpenDentBusiness {
 
 		public static string GetPropVal(long programNum,string desc) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum!=programNum) {
+			List<ProgramProperty> listProgramProperties=ProgramPropertyC.GetListt();
+			for(int i=0;i<listProgramProperties.Count;i++) {
+				if(listProgramProperties[i].ProgramNum!=programNum) {
 					continue;
 				}
-				if(ProgramPropertyC.Listt[i].PropertyDesc!=desc) {
+				if(listProgramProperties[i].PropertyDesc!=desc) {
 					continue;
 				}
-				return ProgramPropertyC.Listt[i].PropertyValue;
+				return listProgramProperties[i].PropertyValue;
 			}
 			throw new ApplicationException("Property not found: "+desc);
 		}
@@ -140,12 +145,13 @@ namespace OpenDentBusiness {
 		///<summary>Returns the path override for the current computer and the specified programNum.  Returns empty string if no override found.</summary>
 		public static string GetLocalPathOverrideForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum==programNum
-					&& ProgramPropertyC.Listt[i].PropertyDesc==""
-					&& ProgramPropertyC.Listt[i].ComputerName.ToUpper()==Environment.MachineName.ToUpper()) 
+			List<ProgramProperty> listProgramProperties=ProgramPropertyC.GetListt();
+			for(int i=0;i<listProgramProperties.Count;i++) {
+				if(listProgramProperties[i].ProgramNum==programNum
+					&& listProgramProperties[i].PropertyDesc==""
+					&& listProgramProperties[i].ComputerName.ToUpper()==Environment.MachineName.ToUpper()) 
 				{
-					return ProgramPropertyC.Listt[i].PropertyValue;
+					return listProgramProperties[i].PropertyValue;
 				}
 			}
 			return "";
@@ -154,13 +160,14 @@ namespace OpenDentBusiness {
 		///<summary>This will insert or update a local path override property for the specified programNum.</summary>
 		public static void InsertOrUpdateLocalOverridePath(long programNum,string newPath) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramPropertyC.Listt.Count;i++) {
-				if(ProgramPropertyC.Listt[i].ProgramNum==programNum
-					&& ProgramPropertyC.Listt[i].PropertyDesc==""
-					&& ProgramPropertyC.Listt[i].ComputerName.ToUpper()==Environment.MachineName.ToUpper()) 
+			List<ProgramProperty> listProgramProperties=ProgramPropertyC.GetListt();
+			for(int i=0;i<listProgramProperties.Count;i++) {
+				if(listProgramProperties[i].ProgramNum==programNum
+					&& listProgramProperties[i].PropertyDesc==""
+					&& listProgramProperties[i].ComputerName.ToUpper()==Environment.MachineName.ToUpper()) 
 				{
-					ProgramPropertyC.Listt[i].PropertyValue=newPath;
-					ProgramProperties.Update(ProgramPropertyC.Listt[i]);
+					listProgramProperties[i].PropertyValue=newPath;
+					ProgramProperties.Update(listProgramProperties[i]);
 					return;//Will only be one override per computer per program.
 				}
 			}
