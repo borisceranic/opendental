@@ -1811,6 +1811,7 @@ namespace OpenDental {
 			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
 			Family patFam=Patients.GetFamily(PatCur.PatNum);
 			FormPSM.FamCur=patFam;
+			FormPSM.PatCur=PatCur;
 			FormPSM.PaymentCur=PaymentCur;
 			FormPSM.PayDate=PIn.DateT(textDate.Text);
 			FormPSM.IsNew=IsNew;
@@ -1979,6 +1980,7 @@ namespace OpenDental {
 					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
 					Family patFam=Patients.GetFamily(PatCur.PatNum);
 					FormPSM.FamCur=patFam;
+					FormPSM.PatCur=PatCur;
 					FormPSM.PaymentCur=PaymentCur;
 					FormPSM.PayDate=PIn.DateT(textDate.Text);
 					FormPSM.IsNew=IsNew;

@@ -194,18 +194,18 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets the patient portion due of this procedure.  It is many times different than the proc fee.</summary>
-		public static double GetPatPortion(Procedure proc) {
+		public static double GetPatPortion(Procedure proc,List<ClaimProc> listClaimProcs) {
 			//No need to check RemotingRole; no call to db.
 			//The following code is designed to duplicate the Procedures section of the GetAccount method in AccountModules.cs
 			//We believe that Capitation Writeoffs are being counted twice due to the way the query gets and uses each column.
 			//In the future we should evaluate and test if this is correct behavior.
-			List <ClaimProc> listClaimProcs=RefreshForProc(proc.ProcNum);
+			List<ClaimProc> listClaimProcsForProc=ClaimProcs.GetForProc(listClaimProcs,proc.ProcNum);
 			double capWriteoff=0;
 			double insPayAmt=0;
 			double insPayEst=0;
 			double writeOff=0;
-			for(int i=0;i<listClaimProcs.Count;i++) {
-				ClaimProc claimProc=listClaimProcs[i];
+			for(int i=0;i<listClaimProcsForProc.Count;i++) {
+				ClaimProc claimProc=listClaimProcsForProc[i];
 				if(claimProc.Status==ClaimProcStatus.CapComplete) {
 					capWriteoff+=claimProc.WriteOff;
 				}
