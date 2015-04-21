@@ -6677,45 +6677,45 @@ namespace OpenDental{
 				ProcCur.ProcFee=0;
 			}
 			else {
-				InsPlan priplan=null;
-				InsSub prisub=null;
+				InsPlan insPlanPrimary=null;
+				InsSub insSubPrimary=null;
 				if(PatPlanList.Count>0) {
-					prisub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
-					priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
+					insSubPrimary=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
+					insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,PlanList);
 				}
-				//Check if it's a medical procedure.
-				double insfee;
-				bool isMed = false;
+				//Check if it is also a medical procedure.
+				double procFee;
+				bool hasMedCode = false;
 				ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
 				if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
-					isMed = true;
+					hasMedCode = true;
 				}
 				//Get fee schedule for medical or dental.
 				long feeSch;
-				if(isMed) {
+				if(hasMedCode) {
 					feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList);
 				}
 				else {
 					feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList);
 				}
 				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
+				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && hasMedCode) {
+					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
 				}
 				else {
-					insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
+					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
 				}
-				if(priplan!=null && priplan.PlanType=="p" && !isMed) {//PPO
-					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched);
-					if(standardfee>insfee) {
-						ProcCur.ProcFee=standardfee;
+				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !(hasMedCode && insPlanPrimary.IsMedical)) {//PPO
+					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched);
+					if(provFee>procFee) {
+						ProcCur.ProcFee=provFee;
 					}
 					else {
-						ProcCur.ProcFee=insfee;
+						ProcCur.ProcFee=procFee;
 					}
 				}
 				else {
-					ProcCur.ProcFee=insfee;
+					ProcCur.ProcFee=procFee;
 				}
 			}
 			//surf
