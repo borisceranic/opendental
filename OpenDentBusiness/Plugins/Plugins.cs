@@ -31,16 +31,17 @@ namespace OpenDentBusiness {
 			//  js 6/20/14 Don't do this.  We will now support plugins for middle tier.
 			//	return;//no plugins will load.  So from now on, we can assume a direct connection.
 			//}
-			for(int i=0;i<ProgramC.Listt.Count;i++) {
-				if(!ProgramC.Listt[i].Enabled) {
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(!listPrograms[i].Enabled) {
 					continue;
 				}
-				if(ProgramC.Listt[i].PluginDllName=="") {
+				if(listPrograms[i].PluginDllName=="") {
 					continue;
 				}
-				string dllPath=ODFileUtils.CombinePaths(Application.StartupPath,ProgramC.Listt[i].PluginDllName);
+				string dllPath=ODFileUtils.CombinePaths(Application.StartupPath,listPrograms[i].PluginDllName);
 				if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
-					dllPath=ODFileUtils.CombinePaths(System.Web.HttpContext.Current.Server.MapPath(null),ProgramC.Listt[i].PluginDllName);
+					dllPath=ODFileUtils.CombinePaths(System.Web.HttpContext.Current.Server.MapPath(null),listPrograms[i].PluginDllName);
 				}
 				if(dllPath.Contains("[VersionMajMin]")) {
 					Version vers=new Version(Application.ProductVersion);
@@ -54,7 +55,7 @@ namespace OpenDentBusiness {
 						#if !DEBUG
 						if(PrefC.AtoZfolderUsed) {//must be using AtoZ folder
 							string dllPathVersionCentral=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"Plugins",
-								ProgramC.Listt[i].PluginDllName.Replace("[VersionMajMin]",vers.Major.ToString()+"."+vers.Minor.ToString()));
+								listPrograms[i].PluginDllName.Replace("[VersionMajMin]",vers.Major.ToString()+"."+vers.Minor.ToString()));
 							if(File.Exists(dllPathVersionCentral)) {
 								File.Copy(dllPathVersionCentral,dllPath,true);
 							}
@@ -78,13 +79,13 @@ namespace OpenDentBusiness {
 				}
 				catch(Exception ex) {
 					//how to handle this for RemotingRole.ServerWeb?:
-					MessageBox.Show("Error loading Plugin:"+ProgramC.Listt[i].PluginDllName+"\r\n"
+					MessageBox.Show("Error loading Plugin:"+listPrograms[i].PluginDllName+"\r\n"
 						+ex.Message);
 					continue;//don't add it to plugin list.
 				}
 				PluginContainer container=new PluginContainer();
 				container.Plugin=plugin;
-				container.ProgramNum=ProgramC.Listt[i].ProgramNum;
+				container.ProgramNum=listPrograms[i].ProgramNum;
 				container.Assemb=ass;
 				container.Name=assName;
 				PluginList.Add(container);

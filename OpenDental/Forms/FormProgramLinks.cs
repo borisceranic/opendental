@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -140,9 +141,10 @@ namespace OpenDental{
 			Programs.RefreshCache();
 			listProgram.Items.Clear();
 			string itemName="";
-			for(int i=0;i<ProgramC.Listt.Count;i++){
-				itemName=ProgramC.Listt[i].ProgDesc;
-				if(ProgramC.Listt[i].Enabled)
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				itemName=listPrograms[i].ProgDesc;
+				if(listPrograms[i].Enabled)
 					itemName+="(enabled)";
 				listProgram.Items.Add(itemName);
 			}
@@ -161,7 +163,8 @@ namespace OpenDental{
 			if(listProgram.SelectedIndex==-1){
 				return;
 			}
-			Program program=ProgramC.Listt[listProgram.SelectedIndex].Copy();
+			List<Program> listPrograms=ProgramC.GetListt();
+			Program program=listPrograms[listProgram.SelectedIndex].Copy();
 			if(program.ProgName=="UAppoint"){
 				FormUAppoint FormU=new FormUAppoint();
 				FormU.ProgramCur=program;

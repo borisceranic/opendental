@@ -16,9 +16,10 @@ namespace OpenDental{
 		///<summary>Typically used when user clicks a button to a Program link.  This method attempts to identify and execute the program based on the given programNum.</summary>
 		public static void Execute(long programNum,Patient pat) {
 			Program prog=null;
-			for(int i=0;i<ProgramC.Listt.Count;i++){
-				if(ProgramC.Listt[i].ProgramNum==programNum) {
-					prog=ProgramC.Listt[i];
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(listPrograms[i].ProgramNum==programNum) {
+					prog=listPrograms[i];
 				}
 			}
 			if(prog==null) {//no match was found

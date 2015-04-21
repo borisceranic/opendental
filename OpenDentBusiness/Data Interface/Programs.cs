@@ -27,33 +27,15 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			ProgramC.HList=new Hashtable();
-			ProgramC.Listt=Crud.ProgramCrud.TableToList(table);
-			for(int i=0;i<ProgramC.Listt.Count;i++){
-				if(!ProgramC.HList.ContainsKey(ProgramC.Listt[i].ProgName)) {
-					ProgramC.HList.Add(ProgramC.Listt[i].ProgName,ProgramC.Listt[i]);
+			Hashtable hashPrograms=new Hashtable();
+			List<Program> listPrograms=Crud.ProgramCrud.TableToList(table);
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(!hashPrograms.ContainsKey(listPrograms[i].ProgName)) {
+					hashPrograms.Add(listPrograms[i].ProgName,listPrograms[i]);
 				}
 			}
-			//The lines below are replaced by the logic above.
-			/*
-			ProgramC.HList=new Hashtable();
-			Program prog = new Program();
-			ProgramC.Listt=new List<Program>();
-			for (int i=0;i<table.Rows.Count;i++){
-				prog=new Program();
-				prog.ProgramNum =PIn.Long(table.Rows[i][0].ToString());
-				prog.ProgName   =PIn.String(table.Rows[i][1].ToString());
-				prog.ProgDesc   =PIn.String(table.Rows[i][2].ToString());
-				prog.Enabled    =PIn.Bool(table.Rows[i][3].ToString());
-				prog.Path       =PIn.String(table.Rows[i][4].ToString());
-				prog.CommandLine=PIn.String(table.Rows[i][5].ToString());
-				prog.Note       =PIn.String(table.Rows[i][6].ToString());
-				prog.PluginDllName=PIn.String(table.Rows[i][7].ToString());
-				ProgramC.Listt.Add(prog);
-				if(!ProgramC.HList.ContainsKey(prog.ProgName)) {
-					ProgramC.HList.Add(prog.ProgName,prog);
-				}
-			}*/
+			ProgramC.HList=hashPrograms;
+			ProgramC.Listt=listPrograms;
 		}
 
 		///<summary></summary>
@@ -89,10 +71,8 @@ namespace OpenDentBusiness{
 		///<summary>Returns true if a Program link with the given name or number exists and is enabled.</summary>
 		public static bool IsEnabled(ProgramName progName){
 			//No need to check RemotingRole; no call to db.
-			if(ProgramC.HList==null) {
-				Programs.RefreshCache();
-			}
-			if(ProgramC.HList.ContainsKey(progName.ToString()) && ((Program)ProgramC.HList[progName.ToString()]).Enabled) {
+			Hashtable hashPrograms=ProgramC.GetHList();
+			if(hashPrograms.ContainsKey(progName.ToString()) && ((Program)hashPrograms[progName.ToString()]).Enabled) {
 				return true;
 			}
 			return false;
@@ -101,8 +81,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static bool IsEnabled(long programNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramC.Listt.Count;i++) {
-				if(ProgramC.Listt[i].ProgramNum==programNum && ProgramC.Listt[i].Enabled) {
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(listPrograms[i].ProgramNum==programNum && listPrograms[i].Enabled) {
 					return true;
 				}
 			}
@@ -112,9 +93,10 @@ namespace OpenDentBusiness{
 		///<summary>Supply a valid program Name, and this will set Cur to be the corresponding Program object.</summary>
 		public static Program GetCur(ProgramName progName) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramC.Listt.Count;i++) {
-				if(ProgramC.Listt[i].ProgName==progName.ToString()) {
-					return ProgramC.Listt[i];
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(listPrograms[i].ProgName==progName.ToString()) {
+					return listPrograms[i];
 				}
 			}
 			return null;//to signify that the program could not be located. (user deleted it in an older version)
@@ -123,9 +105,10 @@ namespace OpenDentBusiness{
 		///<summary>Supply a valid program Name.  Will return 0 if not found.</summary>
 		public static long GetProgramNum(ProgramName progName) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ProgramC.Listt.Count;i++) {
-				if(ProgramC.Listt[i].ProgName==progName.ToString()) {
-					return ProgramC.Listt[i].ProgramNum;
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(listPrograms[i].ProgName==progName.ToString()) {
+					return listPrograms[i].ProgramNum;
 				}
 			}
 			return 0;
