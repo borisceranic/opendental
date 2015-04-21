@@ -11,6 +11,12 @@ namespace CodeBase {
 		private AutoResetEvent _waitEvent=new AutoResetEvent(false);
 		///<summary>Gets set to true when QuitSync() or QuitAsync() has been called or if this thread has finished and no timed interval was set.</summary>
 		private bool _hasQuit=false;
+		///<summary>Indicates if ODThread has been scheduled to quit. Check this from within a resource intensive thread periodically if you want to exit gracefully during the course of the WorkerDelegate function.</summary>
+		public bool HasQuit {
+			get {
+				return _hasQuit;
+			}
+		}
 		///<summary>The amount of time in milliseconds that this thread will sleep before calling the WorkerDelegate again.  Setting the interval to zero or a negative number will call the WorkerDelegate once and then quit itself.</summary>
 		public int TimeIntervalMS=0;
 		///<summary>Pointer to the function from the calling code which will perform the majority of this thread's work.</summary>
@@ -57,6 +63,10 @@ namespace CodeBase {
 			TimeIntervalMS=timeIntervalMS;
 			_worker+=worker;
 			Parameters=parameters;
+		}
+
+		public override string ToString() {
+			return Name;
 		}
 
 		///<summary>Start all threads for a given group. If thread has already been started then take no action on that thread.</summary>
