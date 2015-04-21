@@ -32,19 +32,18 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanChargeCrud.SelectMany(command);
 		}
 
-		///<summary>Gets all payplan charges for the payplans passed in based on today's date.</summary>
-		public static List<PayPlanCharge> GetDueForPayPlans(List<PayPlan> listPayPlans) {
+		///<summary>Gets all payplan charges for the payplans passed in such that the Guarantor is the specified patient.  Based on today's date.  The patNum is for the current patient.</summary>
+		public static List<PayPlanCharge> GetDueForPayPlans(List<PayPlan> listPayPlans,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PayPlanCharge>>(MethodBase.GetCurrentMethod(),listPayPlans);
+				return Meth.GetObject<List<PayPlanCharge>>(MethodBase.GetCurrentMethod(),listPayPlans,patNum);
 			}
-			string[] arrayPlanNums= new string[listPayPlans.Count];
-			for(int i=0;i<arrayPlanNums.Length;i++) {
-				arrayPlanNums[i]=listPayPlans[i].PayPlanNum.ToString();
+			List<string> listPlanNums=new List<string>();
+			for(int i=0;i<listPayPlans.Count;i++) {
+				listPlanNums.Add(listPayPlans[i].PayPlanNum.ToString());
 			}
 			string command= "SELECT * FROM payplancharge "
-				+"WHERE PayPlanNum IN("+String.Join(", ",arrayPlanNums)+")"
-				+"AND ChargeDate <= DATE(NOW()) "
-				+"ORDER BY ChargeDate";
+				+"WHERE Guarantor="+POut.Long(patNum)+" AND PayPlanNum IN("+String.Join(", ",listPlanNums)+") "
+				+"AND ChargeDate <= DATE(NOW()) ";
 			return Crud.PayPlanChargeCrud.SelectMany(command);
 		}
 

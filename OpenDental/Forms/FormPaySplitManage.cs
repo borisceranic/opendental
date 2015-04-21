@@ -18,6 +18,7 @@ namespace OpenDental {
 		///<summary>The amount entered for the current payment.  May be changed in this window.</summary>
 		public double PaymentAmt;
 		public Family FamCur;
+		public Patient PatCur;
 		public Payment PaymentCur;
 		public DateTime PayDate;
 		public bool IsNew;
@@ -34,9 +35,13 @@ namespace OpenDental {
 			_listAccountCharges=new List<AccountEntry>();
 			_payAvailableCur=PaymentAmt;
 			textPayAmt.Text=PaymentAmt.ToString("f");
+			List<long> listPatNums=new List<long>();
+			for(int i=0;i<FamCur.ListPats.Length;i++) {
+				listPatNums.Add(FamCur.ListPats[i].PatNum);
+			}
 			if(IsNew) {
-				ListSplitsCur=AutoSplitForPayment(FamCur.ListPats,PaymentCur.PayNum,ref _payAvailableCur,PayDate);//New payment, generated autosplits overwrites any manual/pre-existing splits.
-				//For reference later: Assigning to ListSplitsCur instead of _payAvailableCur ensures that for old payments splits aren't over-written, and no duplication takes place if it's a new payment with pre-existing splits since they're wiped out.
+				ListSplitsCur=AutoSplitForPayment(listPatNums,PaymentCur.PayNum,ref _payAvailableCur,PayDate);//New payment, generated autosplits overwrites any manual/pre-existing splits.
+				//For reference later: Assigning to ListSplitsCur instead of _payAvailableCur ensures that for old payments, splits aren't over-written, and no duplication takes place if it's a new payment with pre-existing splits since they're wiped out.
 				textSplitAmt.Text=(PaymentAmt-_payAvailableCur).ToString("f");//Amount Paid Increases as PayAmt decreases.
 			}
 			else {//Not new, or new with at least one pre-existing paysplit.  
@@ -53,7 +58,7 @@ namespace OpenDental {
 				//I originally thought we didn't want to make any new autosplits, but I think now that if they opened an old payment and increased the value of the payment they should get autosplits made.
 				//If they didn't change the payment amount _payAvailableCur will be 0 so no new autosplits will be made anyways.
 				//Problem:  If it's a new payment with existing paysplits the paysplits won't be counted in when autosplits are determined.
-				AutoSplitForPayment(FamCur.ListPats,PaymentCur.PayNum,ref _payAvailableCur,PayDate);//With the splits already made on old payment their charges will be marked correctly.
+				AutoSplitForPayment(listPatNums,PaymentCur.PayNum,ref _payAvailableCur,PayDate);//With the splits already made on old payment their charges will be marked correctly.
 				//For reference later: Assigning to ListSplitsCur instead of _payAvailableCur ensures that for old payments or new payments with existing splits they aren't over-written, and no duplication takes place.
 			}
 			FillChargeGrid();
@@ -180,132 +185,142 @@ namespace OpenDental {
 		///<summary>Creates and paysplits associated to the patient passed in for the payment passed in until the payAmt has been met.  
 		///Returns the list of new paysplits that have been created.  payAmt is passed as a ref so that we can do this same logic for an entire 
 		///family while keeping track of the remaining pay amount.</summary>
-		private List<PaySplit> AutoSplitForPayment(Patient[] arrayPats,long payNum,ref double payAmt,DateTime date) {
+		private List<PaySplit> AutoSplitForPayment(List<long> listPatNums,long payNum,ref double payAmt,DateTime date) {
 			//Get the lists of items we'll be using to calculate with.
 			//double payAmt=_payAvailableCur;
-			List<Procedure> listComplProcs=Procedures.GetCompleteForPats(arrayPats);//Ordered by ProcDdate
+			List<Procedure> listProcs=Procedures.GetCompleteForPats(listPatNums);
 			//listPayments should be empty, there isn't currently a way to make payments without at least one split.
 			//During research however we found there were sometimes payments with no splits, so erred on the side of caution.
-			List<Payment> listPayments=Payments.GetNonSplitForPats(arrayPats);//Ordered by PayDate
-			List<Adjustment> listNegAdjustments=Adjustments.GetAdjustForPats(arrayPats,false);//Ordered by DateEntry
-			List<Adjustment> listPosAdjustments=Adjustments.GetAdjustForPats(arrayPats,true);//Ordered by DateEntry
-			List<PaySplit> listPaySplits=PaySplits.GetForPats(arrayPats);//Ordered by DateEntry, might contain payplan payments.
-			List<ClaimProc> listClaimProcs=ClaimProcs.GetByTotClaimProcsForPats(arrayPats);//Claimprocs paid by total, ordered by DateEntry, might contain ins payplan payments.
-			List<PayPlan> listPayPlans=PayPlans.GetForPats(arrayPats);//Used to figure out how much we need to pay off procs with, also contains insurance payplans.
+			List<Payment> listPayments=Payments.GetNonSplitForPats(listPatNums);
+			List<Adjustment> listNegAdjustments=Adjustments.GetAdjustForPats(listPatNums,false);
+			List<Adjustment> listPosAdjustments=Adjustments.GetAdjustForPats(listPatNums,true);
+			List<PaySplit> listPaySplits=PaySplits.GetForPats(listPatNums);//Might contain payplan payments.
+			List<ClaimProc> listInsPayAsTotal=ClaimProcs.GetByTotForPats(listPatNums);//Claimprocs paid as total, might contain ins payplan payments.
+			List<PayPlan> listPayPlans=PayPlans.GetForPats(listPatNums,PatCur.PatNum);//Used to figure out how much we need to pay off procs with, also contains insurance payplans.
 			double payPlanAmt=0;
 			for(int i=0;i<listPayPlans.Count;i++) {
-				payPlanAmt+=listPayPlans[i].CompletedAmt;
+				if(listPatNums.Contains(listPayPlans[i].PatNum)) {//The payplan is for someone in the current family.  Excludes payment plan guarantors outside of the family.
+					payPlanAmt+=listPayPlans[i].CompletedAmt;
+				}
 			}
 			List<PayPlanCharge> listPayPlanCharges=new List<PayPlanCharge>();
 			if(listPayPlans.Count>0){
-				listPayPlanCharges=PayPlanCharges.GetDueForPayPlans(listPayPlans);//Ordered by ChargeDate, doesn't get charges for the future.
+				listPayPlanCharges=PayPlanCharges.GetDueForPayPlans(listPayPlans,PatCur.PatNum);//Does not get charges for the future.
 			}
-			for(int i=0;i<listComplProcs.Count;i++) {//Getting the actual amount patient is responsible for.
-				//Calculated using writeoffs, inspayest, inspayamt.  Done the same way ContrAcct does it.
-				listComplProcs[i].ProcFee=Procedures.GetPatPortion(listComplProcs[i]);
+			for(int i=0;i<listProcs.Count;i++) {//Getting the actual amount patient is responsible for.
+				//Calculated using writeoffs, inspayest, inspayamt.  Done the same way ContrAcct does it.				
+				listProcs[i].ProcFee=ClaimProcs.GetPatPortion(listProcs[i]);
 			}
 			//Now we have all negative and positive adjustments.
-			//Attribute splits and neg adjustments to their procedures if they have been attached to some.
-			//Attribute splits
+			//In the next two regions, apply credits to their procedures if they have been attached.
+			#region Splits
 			for(int i=0;i<listPaySplits.Count;i++) {
-				for(int j=0;j<listComplProcs.Count;j++) {
-					if(listPaySplits[i].ProcNum==listComplProcs[j].ProcNum) {//This is the proc the split is associated with
-						if(listComplProcs[j].ProcFee-listPaySplits[i].SplitAmt<0) {//The split amount brings it below zero which isn't common
-							listPaySplits[i].SplitAmt-=listComplProcs[j].ProcFee;//They overpaid on the split
-							listComplProcs[j].ProcFee=0;
-						}
-						else {
-							listComplProcs[j].ProcFee-=listPaySplits[i].SplitAmt;
-							listPaySplits[i].SplitAmt=0;
-							break;
-						}
+				for(int j=0;j<listProcs.Count;j++) {
+					if(listPaySplits[i].ProcNum!=listProcs[j].ProcNum) {
+						continue;
+					}
+					//This is the proc the split is associated with.
+					if(listProcs[j].ProcFee<listPaySplits[i].SplitAmt) {
+						listPaySplits[i].SplitAmt-=listProcs[j].ProcFee;//They overpaid on the split
+						listProcs[j].ProcFee=0;
+					}
+					else {//ProcFee>=SplitAmt
+						listProcs[j].ProcFee-=listPaySplits[i].SplitAmt;
+						listPaySplits[i].SplitAmt=0;
+						break;
 					}
 				}
 			}
+			#endregion Splits
+			#region Negative Adjustments
 			//Attribute negative adjustments (Proc Discounts will be accounted for here, they're displayed in the Proc Discount field but there are also adjustments made)
 			for(int i=0;i<listNegAdjustments.Count;i++) {
-				for(int j=0;j<listComplProcs.Count;j++) {
-					if(listNegAdjustments[i].ProcNum==listComplProcs[j].ProcNum) {//This is the proc the adjustment is associated with
-						if(listComplProcs[j].ProcFee+listNegAdjustments[i].AdjAmt<0) {//Discounts are stored as negatives, so we want to add the negative to the fee
-							listNegAdjustments[i].AdjAmt+=listComplProcs[j].ProcFee;//Overdid the negative adjustment
-							listComplProcs[j].ProcFee=0;
-						}
-						else {
-							listComplProcs[j].ProcFee+=listNegAdjustments[i].AdjAmt;
-							listNegAdjustments[i].AdjAmt=0;
-							break;
-						}
+				for(int j=0;j<listProcs.Count;j++) {
+					if(listNegAdjustments[i].ProcNum!=listProcs[j].ProcNum) {
+						continue;
+					}
+					double creditAmt=-listNegAdjustments[i].AdjAmt;//AdjAmt is negative.
+					//This is the proc the adjustment is associated with.
+					if(listProcs[j].ProcFee<creditAmt) {
+						listNegAdjustments[i].AdjAmt+=listProcs[j].ProcFee;//Reduce the credit by the fee.
+						listProcs[j].ProcFee=0;
+					}
+					else {//ProcFee>=creditAmt
+						listProcs[j].ProcFee-=creditAmt;
+						listNegAdjustments[i].AdjAmt=0;
+						break;
 					}
 				}
 			}
+			#endregion Negative Adjustments
+			#region Paysplits
 			//Attribute splits to their payplans.
 			for(int i=0;i<listPaySplits.Count;i++) {
 				for(int j=0;j<listPayPlanCharges.Count;j++) {
-					if(listPaySplits[i].PayPlanNum==listPayPlanCharges[j].PayPlanNum && listPayPlanCharges[j].Principal>0) {
-						if((listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest)-listPaySplits[i].SplitAmt<0) {//Use part of split as it covers more than one payplancharge
-							listPaySplits[i].SplitAmt-=(listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest);
-							listPayPlanCharges[j].Principal=0;
+					if(listPaySplits[i].PayPlanNum!=listPayPlanCharges[j].PayPlanNum || listPayPlanCharges[j].Principal<=0) {
+						continue;
+					}
+					if((listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest)<=listPaySplits[i].SplitAmt) {//Used part of split as it potentially covers more than one payplancharge
+						listPaySplits[i].SplitAmt-=(listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest);
+						listPayPlanCharges[j].Principal=0;
+						listPayPlanCharges[j].Interest=0;
+					}
+					else {//Principal+Interest>SplitAmt.  Use all of split.  Eliminate the charge's interest first, then the principal. 
+						if(listPayPlanCharges[j].Interest<listPaySplits[i].SplitAmt) {//Use part of split on interest.
+							listPaySplits[i].SplitAmt-=listPayPlanCharges[j].Interest;
 							listPayPlanCharges[j].Interest=0;
 						}
-						else {//Use all of split. Eliminate the charge's interest first, then the principal. 
-							if(listPayPlanCharges[j].Interest-listPaySplits[i].SplitAmt<0) {//Use part of split on interest
-								listPaySplits[i].SplitAmt-=listPayPlanCharges[j].Interest;
-								listPayPlanCharges[j].Interest=0;
-							}
-							else {//Use all of split on interest
-								listPayPlanCharges[j].Interest-=listPaySplits[i].SplitAmt;
-								listPaySplits[i].SplitAmt=0;
-								break;//If split is 0, we don't need to continue.
-							}
-							if(listPayPlanCharges[j].Principal-listPaySplits[i].SplitAmt<0) {//Use part of split on principal (Most common scenario)
-								listPaySplits[i].SplitAmt-=listPayPlanCharges[j].Principal;
-								listPayPlanCharges[j].Principal=0;
-							}
-							else {//Use all of split on principal (Only happens if the split exactly pays off the charge)
-								listPayPlanCharges[j].Principal-=listPaySplits[i].SplitAmt;
-								listPaySplits[i].SplitAmt=0;
-							}
-							break;
+						else {//Interest>=SplitAmt.  Use all of split on interest.
+							listPayPlanCharges[j].Interest-=listPaySplits[i].SplitAmt;
+							listPaySplits[i].SplitAmt=0;
+							break;//If split is 0, we don't need to continue.
 						}
+						//(Principal+Interest)>SplitAmt => Principal>SplitAmt-Interest.  Since now SplitAmt=SplitAmt-Interest, really we have Principal>SplitAmt.
+						//Use all of split on principal (Only happens if the split exactly pays off the charge).
+						listPayPlanCharges[j].Principal-=listPaySplits[i].SplitAmt;
+						listPaySplits[i].SplitAmt=0;
+						break;
 					}
 				}
 			}
-			//Attribute ByTotal claimprocs to their potential ins payplans.
-			for(int i=0;i<listClaimProcs.Count;i++) {
+			#endregion Paysplits
+			#region As Total Ins Payments
+			//Attribute "as total" insurance payments to their potential ins payplans.
+			for(int i=0;i<listInsPayAsTotal.Count;i++) {
 				for(int j=0;j<listPayPlanCharges.Count;j++) {
-					if(listClaimProcs[i].PayPlanNum==listPayPlanCharges[j].PayPlanNum && listPayPlanCharges[j].Principal>0) {
-						if((listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest)-listClaimProcs[i].InsPayAmt<0) {//Use part of split as it covers more than one payplancharge
-							listClaimProcs[i].InsPayAmt-=(listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest);
-							listPayPlanCharges[j].Principal=0;
+					if(listInsPayAsTotal[i].PayPlanNum!=listPayPlanCharges[j].PayPlanNum || listPayPlanCharges[j].Principal<=0) {
+						continue;
+					}
+					if((listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest)<=listInsPayAsTotal[i].InsPayAmt) {//Use part of split as it potentially covers more than one payplancharge
+						listInsPayAsTotal[i].InsPayAmt-=(listPayPlanCharges[j].Principal+listPayPlanCharges[j].Interest);
+						listPayPlanCharges[j].Principal=0;
+						listPayPlanCharges[j].Interest=0;
+					}
+					else {//Principal+Interest>InsPayAmt.  Use all of split.  Eliminate the charge's interest first, then the principal. 
+						if(listPayPlanCharges[j].Interest<listInsPayAsTotal[i].InsPayAmt) {//Use part of split on interest
+							listInsPayAsTotal[i].InsPayAmt-=listPayPlanCharges[j].Interest;
 							listPayPlanCharges[j].Interest=0;
 						}
-						else {//Use all of split. Eliminate the charge's interest first, then the principal. 
-							if(listPayPlanCharges[j].Interest-listClaimProcs[i].InsPayAmt<0) {//Use part of split on interest
-								listClaimProcs[i].InsPayAmt-=listPayPlanCharges[j].Interest;
-								listPayPlanCharges[j].Interest=0;
-							}
-							else {//Use all of split on interest
-								listPayPlanCharges[j].Interest-=listClaimProcs[i].InsPayAmt;
-								listClaimProcs[i].InsPayAmt=0;
-								break;//If split is 0, we don't need to continue.
-							}
-							if(listPayPlanCharges[j].Principal-listClaimProcs[i].InsPayAmt<0) {//Use part of split on principal (Most common scenario)
-								listClaimProcs[i].InsPayAmt-=listPayPlanCharges[j].Principal;
-								listPayPlanCharges[j].Principal=0;
-							}
-							else {//Use all of split on principal (Only happens if the split exactly pays off the charge)
-								listPayPlanCharges[j].Principal-=listClaimProcs[i].InsPayAmt;
-								listClaimProcs[i].InsPayAmt=0;
-							}
-							break;
+						else {//Interest>=InsPayAmt.  Use all of split on interest.
+							listPayPlanCharges[j].Interest-=listInsPayAsTotal[i].InsPayAmt;
+							listInsPayAsTotal[i].InsPayAmt=0;
+							break;//If split is 0, we don't need to continue.
 						}
+						//(Principal+Interest)>InsPayAmt => Principal>InsPayAmt-Interest.  Since now InsPayAmt=InsPayAmt-Interest, really we have Principal>InsPayAmt.
+						//Apply the rest that's left over on the principal.
+						listPayPlanCharges[j].Principal-=listInsPayAsTotal[i].InsPayAmt;
+						listInsPayAsTotal[i].InsPayAmt=0;
+						break;
 					}
 				}
 			}
-			//Now we have all splits and neg adjustments attributed to their procedures/payplan (If they were attributed).  We may have a whole host of procs with 0 balance (or possibly negative)
-			//as well as payplan charges that have yet to be paid off (excluding those in the future).
-			//Pay everything off FIFO by date, across object boundaries by making a datatable containing columns date, type, pri key, and owed amount.  Then go through the dataset and pay stuff off.
-			//Then what we have left is everything that has nothing left to pay it off, so make splits for our current payment based on those ordered by date.
+			#endregion As Total Ins Payments
+			//Over the next 3 regions, we will do the following:
+			//Now we have all splits and neg adjustments attributed to their procedures/payplan (If they were attributed).  We may have a whole host of 
+			//procs with 0 balance (or possibly negative) as well as payplan charges that have yet to be paid off (excluding those in the future).  Pay
+			//everything off FIFO by date, across object boundaries by making a list containing AccountEntry objects.  Then, go through the list and apply
+			//payments.  What remains is everything which is unpaid, so make splits for our current payment based on those.  Order by date.
+			#region List of Charges
 			_listAccountCharges=new List<AccountEntry>();
 			for(int i=0;i<listPayPlanCharges.Count;i++) {
 				AccountEntry accountEntry=new AccountEntry();
@@ -331,19 +346,21 @@ namespace OpenDental {
 				accountEntry.PatNum=listPosAdjustments[i].PatNum;
 				_listAccountCharges.Add(accountEntry);
 			}
-			for(int i=0;i<listComplProcs.Count;i++) {
+			for(int i=0;i<listProcs.Count;i++) {
 				AccountEntry accountEntry=new AccountEntry();
-				accountEntry.Date=listComplProcs[i].ProcDate;
-				accountEntry.PriKey=listComplProcs[i].ProcNum;
+				accountEntry.Date=listProcs[i].ProcDate;
+				accountEntry.PriKey=listProcs[i].ProcNum;
 				accountEntry.Type="Proc";
-				accountEntry.AmountCur=listComplProcs[i].ProcFee;
-				accountEntry.AmountOriginal=listComplProcs[i].ProcFee;
-				accountEntry.ProvNum=listComplProcs[i].ProvNum;
-				accountEntry.ClinicNum=listComplProcs[i].ClinicNum;
-				accountEntry.PatNum=listComplProcs[i].PatNum;
+				accountEntry.AmountCur=listProcs[i].ProcFee;
+				accountEntry.AmountOriginal=listProcs[i].ProcFee;
+				accountEntry.ProvNum=listProcs[i].ProvNum;
+				accountEntry.ClinicNum=listProcs[i].ClinicNum;
+				accountEntry.PatNum=listProcs[i].PatNum;
 				_listAccountCharges.Add(accountEntry);
 			}
 			_listAccountCharges.Sort(RowComparer);
+			#endregion List of Charges
+			#region List of Credits
 			//Getting a date-sorted table of all credits that haven't been attributed to anything.
 			List<AccountEntry> listAccountCredits=new List<AccountEntry>();
 			for(int i=0;i<listNegAdjustments.Count;i++) {
@@ -388,110 +405,116 @@ namespace OpenDental {
 					listAccountCredits.Add(accountEntry);
 				}
 			}
-			for(int i=0;i<listClaimProcs.Count;i++) {
-				if(listClaimProcs[i].InsPayAmt>0) {
+			for(int i=0;i<listInsPayAsTotal.Count;i++) {
+				if(listInsPayAsTotal[i].InsPayAmt>0) {
 					AccountEntry accountEntry=new AccountEntry();
-					accountEntry.Date=listClaimProcs[i].DateCP;
-					accountEntry.PriKey=listClaimProcs[i].ClaimProcNum;
+					accountEntry.Date=listInsPayAsTotal[i].DateCP;
+					accountEntry.PriKey=listInsPayAsTotal[i].ClaimProcNum;
 					accountEntry.Type="ClaimProc";
-					accountEntry.AmountCur=listClaimProcs[i].InsPayAmt;
-					accountEntry.AmountOriginal=listClaimProcs[i].InsPayAmt;
-					accountEntry.ProvNum=listClaimProcs[i].ProvNum;
-					accountEntry.ClinicNum=listClaimProcs[i].ClinicNum;
-					accountEntry.PatNum=listClaimProcs[i].PatNum;
+					accountEntry.AmountCur=listInsPayAsTotal[i].InsPayAmt;
+					accountEntry.AmountOriginal=listInsPayAsTotal[i].InsPayAmt;
+					accountEntry.ProvNum=listInsPayAsTotal[i].ProvNum;
+					accountEntry.ClinicNum=listInsPayAsTotal[i].ClinicNum;
+					accountEntry.PatNum=listInsPayAsTotal[i].PatNum;
 					listAccountCredits.Add(accountEntry);
 				}
 			}
 			listAccountCredits.Sort(RowComparer);
-			//Now we have a date-sorted dataset of all the unpaid charges as well as all non-attributed credits.  
+			#endregion List of Credits
+			#region Implicit Linking
+			//Now we have a date-sorted list of all the unpaid charges as well as all non-attributed credits.  
 			//We need to go through each and pay them off in order until all we have left is the most recent unpaid charges.
 			for(int i=0;i<_listAccountCharges.Count;i++) {
+				if(_listAccountCharges[i].AmountCur<=0) {
+					continue;
+				}
 				double owedAmt=_listAccountCharges[i].AmountCur;
-				if(owedAmt>0) {
-					if(payPlanAmt>0 && owedAmt-payPlanAmt<0) {//Use the payplan to pay off stuff before using the credit table
-						payPlanAmt-=owedAmt;//Still more left in the payplan amount, keep using it.
-						_listAccountCharges[i].AmountCur=0;
+				if(payPlanAmt>0 && owedAmt<payPlanAmt && _listAccountCharges[i].Type!="PayPlanCharge") {//Use the payplan to pay the full charge, as long as it's not a payplancharge (Is this what we want? Most of me says yes, especially when we take into account what Providers get credit.)
+					payPlanAmt-=owedAmt;//Still more left in the payplan amount, keep using it.
+					_listAccountCharges[i].AmountCur=0;
+					continue;
+				}
+				else if(payPlanAmt>0 && _listAccountCharges[i].Type!="PayPlanCharge") {//Using up the last of the payPlanAmt, time to use the credits
+					owedAmt-=payPlanAmt;
+					payPlanAmt=0;
+				}
+				for(int j=0;j<listAccountCredits.Count;j++) {
+					if(listAccountCredits[j].AmountCur<=0) {//May have been set to 0 for a previous owed item.
 						continue;
 					}
-					else if(payPlanAmt>0){//Using up the last of the payPlanAmt, time to use the credits
-						owedAmt-=payPlanAmt;
-						payPlanAmt=0;
+					double creditAmt=listAccountCredits[j].AmountCur;
+					if(owedAmt<creditAmt) {//This credit item can pay the owed item in full. Use a partial amount.
+						creditAmt-=owedAmt;
+						listAccountCredits[j].AmountCur=creditAmt;//Change the credit item to reflect the "payment".
+						_listAccountCharges[i].AmountCur=0;
+						break;
 					}
-					for(int j=0;j<listAccountCredits.Count;j++) {
-						double creditAmt=listAccountCredits[j].AmountCur;
-						if(creditAmt>0) {//May have been set to 0 for a previous owed item.
-							if(owedAmt-creditAmt<0) {//This credit item can pay the owed item in full. Use a partial amount.
-								creditAmt-=owedAmt;
-								listAccountCredits[j].AmountCur=creditAmt;//Change the credit item to reflect the "payment".
-								_listAccountCharges[i].AmountCur=0;
-								break;
-							}
-							else {//This credit item cannot pay the owed item in full. Use all of credit, continue on to the next credit item.
-								owedAmt-=creditAmt;
-								creditAmt=0;
-								listAccountCredits[j].AmountCur=0;
-								_listAccountCharges[i].AmountCur=owedAmt;
-							}
-						}
+					else {//This credit item cannot pay the owed item in full. Use all of credit, continue on to the next credit item.
+						owedAmt-=creditAmt;
+						creditAmt=0;
+						listAccountCredits[j].AmountCur=0;
 					}
 				}
+				_listAccountCharges[i].AmountCur=owedAmt;
 			}
-			//At this point we have a table of procs, positive adjustments, and payplancharges that require payment if the Amount>0.   
+			#endregion Implicit Linking
+			#region Auto-split Current Payment
+			//At this point we have a list of procs, positive adjustments, and payplancharges that require payment if the Amount>0.   
 			//Create and associate new paysplits to their respective charge items.
 			List<PaySplit> listAutoSplits=new List<PaySplit>();
 			for(int i=0;i<_listAccountCharges.Count;i++) {
-				double amtPaidForProc=0;
+				if(payAmt<=0 || _listAccountCharges[i].AmountCur<=0) {
+					continue;
+				}
 				double amtOwed=_listAccountCharges[i].AmountCur;
-				if(amtOwed>0 && payAmt>0) {//Still more to pay off on this charge and we have money left in the payment entered.
-					if(amtOwed-payAmt<0) {//Use partial payment
-						payAmt-=amtOwed;
-						amtPaidForProc=amtOwed;
-						_listAccountCharges[i].AmountCur=0;
-					}
-					else {//Use full payment
-						amtPaidForProc=payAmt;
-						amtOwed-=payAmt;
-						payAmt=0;
-						_listAccountCharges[i].AmountCur=amtOwed;
+				double amtPaidForProc=0;
+				if(amtOwed<payAmt) {//Use partial payment
+					payAmt-=amtOwed;
+					amtPaidForProc=amtOwed;
+					_listAccountCharges[i].AmountCur=0;
+				}
+				else {//Use full payment
+					amtPaidForProc=payAmt;
+					amtOwed-=payAmt;
+					payAmt=0;
+					_listAccountCharges[i].AmountCur=amtOwed;
+				}
+				PaySplit split=new PaySplit();
+				split.SplitAmt=amtPaidForProc;
+				split.DatePay=date;
+				if(_listAccountCharges[i].Type=="Proc") {
+					Procedure proc=Procedures.GetOneProc(_listAccountCharges[i].PriKey,false);
+					split.PatNum=proc.PatNum;
+					split.ProcDate=proc.ProcDate;
+					split.ProcNum=proc.ProcNum;
+					split.ProvNum=proc.ProvNum;
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+						split.ClinicNum=proc.ClinicNum;
 					}
 				}
-				if(amtPaidForProc>0) {//Only greater than zero if some of the proc was actually paid by this payment
-					PaySplit split=new PaySplit();
-					split.SplitAmt=amtPaidForProc;
-					split.DatePay=date;
-					if(_listAccountCharges[i].Type=="Proc") {
-						Procedure proc=Procedures.GetOneProc(_listAccountCharges[i].PriKey,false);
-						split.PatNum=proc.PatNum;
-						split.ProcDate=proc.ProcDate;
-						split.ProcNum=proc.ProcNum;
-						split.ProvNum=proc.ProvNum;
-						if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-							split.ClinicNum=proc.ClinicNum;
-						}
+				else if(_listAccountCharges[i].Type=="PayPlanCharge") {
+					PayPlanCharge charge=PayPlanCharges.GetOne(_listAccountCharges[i].PriKey);
+					split.PatNum=charge.PatNum;
+					split.ProcDate=charge.ChargeDate;
+					split.ProvNum=charge.ProvNum;
+					split.PayPlanNum=charge.PayPlanNum;
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+						split.ClinicNum=charge.ClinicNum;
 					}
-					else if(_listAccountCharges[i].Type=="PayPlanCharge") {
-						PayPlanCharge charge=PayPlanCharges.GetOne(_listAccountCharges[i].PriKey);
-						split.PatNum=charge.PatNum;
-						split.ProcDate=charge.ChargeDate;
-						split.ProvNum=charge.ProvNum;
-						split.PayPlanNum=charge.PayPlanNum;
-						if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-							split.ClinicNum=charge.ClinicNum;
-						}
-					}
-					else {
-						Adjustment adjustment=Adjustments.GetOne(_listAccountCharges[i].PriKey);
-						split.PatNum=adjustment.PatNum;
-						split.ProcDate=adjustment.AdjDate;
-						split.ProvNum=adjustment.ProvNum;
-						if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-							split.ClinicNum=adjustment.ClinicNum;
-						}
-					}
-					split.PayNum=payNum;
-					listAutoSplits.Add(split);
 				}
+				else {
+					Adjustment adjustment=Adjustments.GetOne(_listAccountCharges[i].PriKey);
+					split.PatNum=adjustment.PatNum;
+					split.ProcDate=adjustment.AdjDate;
+					split.ProvNum=adjustment.ProvNum;
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+						split.ClinicNum=adjustment.ClinicNum;
+					}
+				}
+				split.PayNum=payNum;
+				listAutoSplits.Add(split);
 			}
+			#endregion Auto-Spit Current Payment
 			return listAutoSplits;
 		}
 

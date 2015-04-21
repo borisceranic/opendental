@@ -25,18 +25,15 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanCrud.SelectOne(payPlanNum);
 		}
 
-		public static List<PayPlan> GetForPats(Patient[] arrayPats) {
+		///<summary>The patNum is the current patient.</summary>
+		public static List<PayPlan> GetForPats(List<long> listPatNums,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),listPatNums,patNum);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * FROM payplan"
-				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")";
+			//We have to check for guarantor separately in case the payment plan belongs to a patient in another family.
+			string command="SELECT * FROM payplan "
+				+"WHERE PatNum IN("+String.Join(", ",listPatNums)+") OR Guarantor="+POut.Long(patNum);
 			return Crud.PayPlanCrud.SelectMany(command);
-
 		}
 
 		///<summary>Determines if there are any valid plans with that patient as the guarantor.</summary>

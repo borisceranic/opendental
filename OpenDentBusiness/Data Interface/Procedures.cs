@@ -36,43 +36,13 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Gets all completed procedures for a family.  Used when making auto splits.</summary>
-		public static List<Procedure> GetCompleteForPats(Patient[] arrayPats) {
+		public static List<Procedure> GetCompleteForPats(List<long> listPatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),listPatNums);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * from procedurelog WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")"
-					+" AND ProcStatus="+(int)ProcStat.C//Completed only
-					+" ORDER BY ProcDate";
+			string command="SELECT * from procedurelog WHERE PatNum IN("+String.Join(", ",listPatNums)+")"
+				+" AND ProcStatus="+(int)ProcStat.C;//Completed only
 			return Crud.ProcedureCrud.SelectMany(command);
-		}
-
-		///<summary>Gets the patient portion due of this procedure.  It is many times different than the proc fee.</summary>
-		public static double GetPatPortion(Procedure proc) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetDouble(MethodBase.GetCurrentMethod(),proc);
-			}
-			//The following code is designed to replicate the Procedures section of the GetAccount method in AccountModules.cs
-			//We believe that Capitation Writeoffs are being counted twice due to the way the query gets and uses each column.
-			//In the future we should evaluate and test if this is correct behavior
-			string command="SELECT SUM(WriteOff) FROM claimproc"
-				+" WHERE ProcNum="+POut.Long(proc.ProcNum)
-				+" AND Status="+(int)ClaimProcStatus.CapComplete;//CapComplete
-			double capitationWriteoff=PIn.Double(Db.GetScalar(command));
-			command="SELECT SUM(InsPayAmt) FROM claimproc"
-				+" WHERE ProcNum="+POut.Long(proc.ProcNum);
-			double insPayAmt=PIn.Double(Db.GetScalar(command));
-			command="SELECT SUM(InsPayEst) FROM claimproc"
-				+" WHERE ProcNum="+POut.Long(proc.ProcNum)
-				+" AND Status="+(int)ClaimProcStatus.NotReceived;//NotReceived
-			double insPayEst=PIn.Double(Db.GetScalar(command));
-			command="SELECT SUM(Writeoff) FROM claimproc"
-				+" WHERE ProcNum="+POut.Long(proc.ProcNum);
-			double writeOff=PIn.Double(Db.GetScalar(command));
-			return proc.ProcFee-capitationWriteoff-insPayAmt-insPayEst-writeOff;
 		}
 
 		///<summary></summary>

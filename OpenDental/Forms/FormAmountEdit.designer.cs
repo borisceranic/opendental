@@ -38,7 +38,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(183, 9);
+			this.butOK.Location = new System.Drawing.Point(89, 57);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -53,7 +53,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(183, 39);
+			this.butCancel.Location = new System.Drawing.Point(170, 57);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -62,24 +62,25 @@ namespace OpenDental{
 			// 
 			// textAmount
 			// 
-			this.textAmount.Location = new System.Drawing.Point(22, 30);
+			this.textAmount.Location = new System.Drawing.Point(161, 21);
 			this.textAmount.Name = "textAmount";
-			this.textAmount.Size = new System.Drawing.Size(155, 20);
+			this.textAmount.Size = new System.Drawing.Size(84, 20);
 			this.textAmount.TabIndex = 0;
 			// 
 			// labelText
 			// 
-			this.labelText.Location = new System.Drawing.Point(13, 6);
+			this.labelText.Location = new System.Drawing.Point(1, 21);
 			this.labelText.Name = "labelText";
-			this.labelText.Size = new System.Drawing.Size(164, 21);
+			this.labelText.Size = new System.Drawing.Size(154, 21);
 			this.labelText.TabIndex = 3;
 			this.labelText.Text = "Amount";
+			this.labelText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormAmountEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(270, 75);
+			this.ClientSize = new System.Drawing.Size(257, 93);
 			this.Controls.Add(this.labelText);
 			this.Controls.Add(this.textAmount);
 			this.Controls.Add(this.butOK);

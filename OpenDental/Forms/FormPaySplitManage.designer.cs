@@ -48,16 +48,16 @@ namespace OpenDental{
 			// label1
 			// 
 			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(432, 13);
+			this.label1.Location = new System.Drawing.Point(559, 36);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(129, 23);
+			this.label1.Size = new System.Drawing.Size(152, 23);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "Amount Remaining";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textAmtAvailable
 			// 
-			this.textAmtAvailable.Location = new System.Drawing.Point(432, 39);
+			this.textAmtAvailable.Location = new System.Drawing.Point(711, 40);
 			this.textAmtAvailable.Name = "textAmtAvailable";
 			this.textAmtAvailable.ReadOnly = true;
 			this.textAmtAvailable.Size = new System.Drawing.Size(129, 20);
@@ -100,16 +100,16 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label2.Location = new System.Drawing.Point(296, 13);
+			this.label2.Location = new System.Drawing.Point(320, 35);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(129, 23);
+			this.label2.Size = new System.Drawing.Size(104, 23);
 			this.label2.TabIndex = 20;
 			this.label2.Text = "Split Amount";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSplitAmt
 			// 
-			this.textSplitAmt.Location = new System.Drawing.Point(296, 39);
+			this.textSplitAmt.Location = new System.Drawing.Point(424, 39);
 			this.textSplitAmt.Name = "textSplitAmt";
 			this.textSplitAmt.ReadOnly = true;
 			this.textSplitAmt.Size = new System.Drawing.Size(129, 20);
@@ -249,16 +249,16 @@ namespace OpenDental{
 			// label5
 			// 
 			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label5.Location = new System.Drawing.Point(61, 13);
+			this.label5.Location = new System.Drawing.Point(4, 36);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(129, 23);
 			this.label5.TabIndex = 23;
 			this.label5.Text = "Payment Amount";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textPayAmt
 			// 
-			this.textPayAmt.Location = new System.Drawing.Point(61, 39);
+			this.textPayAmt.Location = new System.Drawing.Point(134, 39);
 			this.textPayAmt.Name = "textPayAmt";
 			this.textPayAmt.ReadOnly = true;
 			this.textPayAmt.Size = new System.Drawing.Size(129, 20);
@@ -272,7 +272,7 @@ namespace OpenDental{
 			this.butEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butEdit.CornerRadius = 4F;
-			this.butEdit.Location = new System.Drawing.Point(193, 39);
+			this.butEdit.Location = new System.Drawing.Point(269, 38);
 			this.butEdit.Name = "butEdit";
 			this.butEdit.Size = new System.Drawing.Size(45, 20);
 			this.butEdit.TabIndex = 25;

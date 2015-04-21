@@ -9,14 +9,16 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormAmountEdit:Form {
 		public double Amount;
+		private string _text;
 
 		public FormAmountEdit(string text) {
 			InitializeComponent();
-			labelText.Text=text;
 			Lan.F(this);
+			_text=text;
 		}
 
 		private void FormAmountEdit_Load(object sender,EventArgs e) {
+			labelText.Text=_text;
 			textAmount.Text=POut.Double(Amount);
 			textAmount.SelectionStart=0;
 			textAmount.SelectionLength=textAmount.Text.Length;

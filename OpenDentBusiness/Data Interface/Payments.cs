@@ -51,19 +51,14 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all payments for a family.</summary>
-		public static List<Payment> GetNonSplitForPats(Patient[] arrayPats) {
+		public static List<Payment> GetNonSplitForPats(List<long> listPatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Payment>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<Payment>>(MethodBase.GetCurrentMethod(),listPatNums);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * FROM payment"
-				+" LEFT JOIN paysplit ON paysplit.PayNum=payment.PayNum"
-				+" WHERE payment.PatNum IN("+String.Join(", ",arrayPatNums)+")"
-				+" AND paysplit.SplitNum IS NULL"//Getting all payments with no splits
-				+" ORDER BY PayDate";
+			string command="SELECT * FROM payment "
+				+"LEFT JOIN paysplit ON paysplit.PayNum=payment.PayNum "
+				+"WHERE payment.PatNum IN("+String.Join(", ",listPatNums)+") "
+				+"AND paysplit.SplitNum IS NULL";//Getting all payments with no splits
 			return Crud.PaymentCrud.SelectMany(command);
 		}
 

@@ -39,23 +39,18 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all negative or positive adjustments for a patient depending on how isPositive is set.</summary>
-		public static List<Adjustment> GetAdjustForPats(Patient[] arrayPats,bool isPositive) {
+		public static List<Adjustment> GetAdjustForPats(List<long> listPatNums,bool isPositive) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Adjustment>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<Adjustment>>(MethodBase.GetCurrentMethod(),listPatNums,isPositive);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * FROM adjustment"
-				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")";
+			string command="SELECT * FROM adjustment "
+				+"WHERE PatNum IN("+String.Join(", ",listPatNums)+") ";
 			if(isPositive) {
-				command+=" AND AdjAmt>0";
+				command+="AND AdjAmt>0";
 			}
 			else {
-				command+=" AND AdjAmt<0";
-			} 
-				command+=" ORDER BY DateEntry";
+				command+="AND AdjAmt<0";
+			}
 			return Crud.AdjustmentCrud.SelectMany(command);
 		}
 

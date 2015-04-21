@@ -182,17 +182,12 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used in Payment window to get all paysplits for a single patient without using a supplied list.</summary>
-		public static List<PaySplit> GetForPats(Patient[] arrayPats) {
+		public static List<PaySplit> GetForPats(List<long> listPatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PaySplit>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<PaySplit>>(MethodBase.GetCurrentMethod(),listPatNums);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * FROM paysplit"
-				+" WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")"
-				+" ORDER BY DateEntry";//We could use ProcDate here but some paysplits may not be attributed to procs.
+			string command="SELECT * FROM paysplit "
+				+"WHERE PatNum IN("+String.Join(", ",listPatNums)+")";
 			return Crud.PaySplitCrud.SelectMany(command);
 		}
 

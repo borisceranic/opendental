@@ -182,19 +182,40 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Gets all ClaimProcs for this family that aren't directly associated with procedures.</summary>
-		public static List<ClaimProc> GetByTotClaimProcsForPats(Patient[] arrayPats) {
+		///<summary>Gets all as total insurance payments for a family.</summary>
+		public static List<ClaimProc> GetByTotForPats(List<long> listPatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<ClaimProc>>(MethodBase.GetCurrentMethod(),arrayPats);
+				return Meth.GetObject<List<ClaimProc>>(MethodBase.GetCurrentMethod(),listPatNums);
 			}
-			string[] arrayPatNums= new string[arrayPats.Length];
-			for(int i=0;i<arrayPats.Length;i++) {
-				arrayPatNums[i]=arrayPats[i].PatNum.ToString();
-			}
-			string command="SELECT * from claimproc WHERE PatNum IN("+String.Join(", ",arrayPatNums)+")"
-					+" AND ProcNum=0 AND (Status="+(int)ClaimProcStatus.Received+" OR Status="+(int)ClaimProcStatus.Supplemental+")"
-					+" ORDER BY DateCP";
+			string command="SELECT * from claimproc WHERE PatNum IN("+String.Join(", ",listPatNums)+") "
+				+"AND ProcNum=0 AND InsPayAmt!=0 "
+				+"AND Status IN ("+POut.Int((int)ClaimProcStatus.Received)+","+POut.Int((int)ClaimProcStatus.Supplemental)+","+POut.Int((int)ClaimProcStatus.CapClaim)+")";
 			return Crud.ClaimProcCrud.SelectMany(command);
+		}
+
+		///<summary>Gets the patient portion due of this procedure.  It is many times different than the proc fee.</summary>
+		public static double GetPatPortion(Procedure proc) {
+			//No need to check RemotingRole; no call to db.
+			//The following code is designed to duplicate the Procedures section of the GetAccount method in AccountModules.cs
+			//We believe that Capitation Writeoffs are being counted twice due to the way the query gets and uses each column.
+			//In the future we should evaluate and test if this is correct behavior.
+			List <ClaimProc> listClaimProcs=RefreshForProc(proc.ProcNum);
+			double capWriteoff=0;
+			double insPayAmt=0;
+			double insPayEst=0;
+			double writeOff=0;
+			for(int i=0;i<listClaimProcs.Count;i++) {
+				ClaimProc claimProc=listClaimProcs[i];
+				if(claimProc.Status==ClaimProcStatus.CapComplete) {
+					capWriteoff+=claimProc.WriteOff;
+				}
+				if(claimProc.Status==ClaimProcStatus.NotReceived) {
+					insPayEst+=claimProc.InsPayEst;
+				}
+				insPayAmt+=claimProc.InsPayAmt;
+				writeOff+=claimProc.WriteOff;
+			}
+			return proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty)-capWriteoff-insPayAmt-insPayEst-writeOff;
 		}
 
 		///<summary>Gets all ClaimProc bundles for the given PayPlanNum. Bundles claimprocs by Date and then by ClaimPaymentNum.</summary>
