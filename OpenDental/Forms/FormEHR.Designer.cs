@@ -44,6 +44,7 @@
 			this.butCarePlans = new System.Windows.Forms.Button();
 			this.but2011Labs = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butMeasureEvent = new System.Windows.Forms.Button();
 			this.gridMu = new OpenDental.UI.ODGrid();
 			this.groupBox4.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -251,6 +252,16 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "2011 Ed.";
 			// 
+			// butMeasureEvent
+			// 
+			this.butMeasureEvent.Location = new System.Drawing.Point(712, 554);
+			this.butMeasureEvent.Name = "butMeasureEvent";
+			this.butMeasureEvent.Size = new System.Drawing.Size(84, 23);
+			this.butMeasureEvent.TabIndex = 43;
+			this.butMeasureEvent.Text = "Edit Events";
+			this.butMeasureEvent.UseVisualStyleBackColor = true;
+			this.butMeasureEvent.Click += new System.EventHandler(this.butMeasureEvent_Click);
+			// 
 			// gridMu
 			// 
 			this.gridMu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -271,6 +282,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(817, 674);
+			this.Controls.Add(this.butMeasureEvent);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butCarePlans);
 			this.Controls.Add(this.butInterventions);
@@ -323,5 +335,6 @@
 		private System.Windows.Forms.Button butCarePlans;
 		private System.Windows.Forms.Button but2011Labs;
 		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.Button butMeasureEvent;
 	}
 }

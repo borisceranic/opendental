@@ -76,7 +76,8 @@ namespace OpenDentBusiness{
 			date=date.Date; //Remove the time portion of date so we can compare strictly as a date later.
 			if(!GroupPermissions.HasPermission(userGroupNum,perm)){
 				if(!suppressMessage){
-					throw new Exception(Lans.g("Security","Not authorized for")+"\r\n"+GroupPermissions.GetDesc(perm));
+					throw new Exception(Lans.g("Security","Not authorized.")+"\r\n"
+						+Lans.g("Security","A user with the SecurityAdmin permission must grant you access for")+":\r\n"+GroupPermissions.GetDesc(perm));
 				}
 				return false;
 			}

@@ -234,8 +234,7 @@ namespace OpenDental {
 			//gridMain is filled with assessments, interventions, and/or medications
 			if(objCur.GetType().Name=="EhrMeasureEvent") {
 				//if assessment, we will allow them to change the DateTEvent, but not the status or more info box
-				FormEhrMeasureEventEdit FormM=new FormEhrMeasureEventEdit();
-				FormM.MeasCur=(EhrMeasureEvent)objCur;
+				FormEhrMeasureEventEdit FormM=new FormEhrMeasureEventEdit((EhrMeasureEvent)objCur);
 				FormM.ShowDialog();
 			}
 			if(objCur.GetType().Name=="Intervention") {

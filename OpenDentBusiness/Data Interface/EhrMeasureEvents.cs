@@ -7,6 +7,22 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class EhrMeasureEvents{
+
+		///<summary>Gets a list of MeasureEvents.  Primarily used in FormEhrMeasureEvents.  Pass in true to get all EhrMeasureEvents for the date range.  Passing in true will ignore the specified measure event type.</summary>
+		public static List<EhrMeasureEvent> GetAllByTypeFromDB(DateTime dateStart,DateTime dateEnd,EhrMeasureEventType measureEventType,bool isAll) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EhrMeasureEvent>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,measureEventType,isAll);
+			}
+			string command="SELECT * FROM ehrmeasureevent "
+				+"WHERE DateTEvent >= "+POut.DateT(dateStart)+" "
+				+"AND DateTEvent <= "+POut.DateT(dateEnd)+" ";
+			if(!isAll) {
+				command+="AND EventType = "+POut.Int((int)measureEventType)+" ";
+			}
+			command+="ORDER BY EventType,DateTEvent,PatNum";
+			return Crud.EhrMeasureEventCrud.SelectMany(command);
+		}
+
 		///<summary>Ordered by dateT</summary>
 		public static List<EhrMeasureEvent> Refresh(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

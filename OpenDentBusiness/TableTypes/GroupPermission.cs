@@ -206,7 +206,9 @@ namespace OpenDentBusiness{
 		///<summary>88- Security permission for assignment of benefits.</summary>
 		InsPlanChangeAssign,
 		///<summary>89- Audit trail for images and documents in the image module.  There is no user interface in the security window for this permission because it is only used for tracking.</summary>
-		ImageEdit
+		ImageEdit,
+		///<summary>90- Allows editing of all measure events.  Also used to track changes made to events.</summary>
+		EhrMeasureEventEdit
 
 	}
 

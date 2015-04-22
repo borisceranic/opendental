@@ -644,6 +644,8 @@ namespace OpenDental{
 			node=SetNode("EHR");
 				node2=SetNode(Permissions.EhrEmergencyAccess);
 				node.Nodes.Add(node2);
+				node2=SetNode(Permissions.EhrMeasureEventEdit);
+				node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
 			node=SetNode("Dental School");
 				node2=SetNode(Permissions.AdminDentalInstructors);

@@ -104,6 +104,9 @@ namespace OpenDental{
 			else if(PermTypes.Contains(Permissions.ImageEdit) || PermTypes.Contains(Permissions.ImageDelete)) {
 				labelDisclaimer.Text=Lan.g(this,"Changes made to this document before the update to 15.1 will not be reflected below.");
 			}
+			else if(PermTypes.Contains(Permissions.EhrMeasureEventEdit)) {
+				labelDisclaimer.Text=Lan.g(this,"Changes made to this measure event before the update to 15.2 will not be reflected below.");
+			}
 			FillGrid();
 		}
 

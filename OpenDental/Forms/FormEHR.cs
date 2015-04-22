@@ -576,6 +576,14 @@ namespace OpenDental {
 			LaunchOrdersWindow();
 		}
 
+		private void butMeasureEvent_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.EhrMeasureEventEdit)) {
+				return;
+			}
+			FormEhrMeasureEvents FormEME=new FormEhrMeasureEvents();
+			FormEME.ShowDialog();
+		}
+
 		public static bool ProvKeyIsValid(string lName,string fName,int yearValue,string provKey) {
 			try {
 				#if EHRTEST //This pattern allows the code to compile without having the EHR code available.
