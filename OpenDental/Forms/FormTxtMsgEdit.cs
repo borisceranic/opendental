@@ -29,6 +29,9 @@ namespace OpenDental {
 			if(Plugins.HookMethod(this,"FormTxtMsgEdit.SendText_Start",patNum,wirelessPhone,message,txtMsgOk)) {
 				return false;
 			}
+			if(Plugins.HookMethod(this,"FormTxtMsgEdit.SendText_Start2",patNum,wirelessPhone,message,txtMsgOk)) {
+				return true;
+			}
 			if(wirelessPhone=="") {
 				MsgBox.Show(this,"Please enter a phone number.");
 				return false;
