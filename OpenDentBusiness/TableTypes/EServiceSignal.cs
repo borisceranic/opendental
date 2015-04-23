@@ -45,7 +45,7 @@ namespace OpenDentBusiness {
 	}
 
 	///<summary>Used by EServiceSignal.ServiceCode. Each service will have an entry here. Stored as an int for forward compatibility.</summary>
-	public enum eServiceCodes {
+	public enum eServiceCode {
 		Undefined=0,
 		ListenerService=1,
 		SMSService=2

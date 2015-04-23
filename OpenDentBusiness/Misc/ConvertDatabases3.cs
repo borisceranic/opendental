@@ -7953,15 +7953,17 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'HelpKey','')";
 					Db.NonQ(command);
 				}
-				//==========================ADD SMS TABLES===========================
+				#region//==========================ADD SMS TABLES===========================
 				//Add table eservicesignal
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS eservicesignal";
 					Db.NonQ(command);
 					command=@"CREATE TABLE eservicesignal (
 						EServiceSignalNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ServiceCode int NOT NULL,
+						ReasonCategory int NOT NULL,
 						ReasonCode int NOT NULL,
-						SeverityStatus tinyint NOT NULL,
+						Severity tinyint NOT NULL,
 						Description varchar(255) NOT NULL,
 						TimeStamp datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						Tag varchar(255) NOT NULL,
@@ -7973,8 +7975,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE TABLE eservicesignal (
 						EServiceSignalNum number(20) NOT NULL,
+						ServiceCode number(11) NOT NULL,
+						ReasonCategory number(11) NOT NULL,
 						ReasonCode number(11) NOT NULL,
-						SeverityStatus number(3) NOT NULL,
+						Severity number(3) NOT NULL,
 						Description varchar2(255),
 						TimeStamp date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						Tag varchar2(255),
@@ -7983,7 +7987,7 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
-				//add table smsmo
+				//Add SmsMo table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS smsmo";
 					Db.NonQ(command);
@@ -8003,7 +8007,8 @@ namespace OpenDentBusiness {
 						INDEX(CommlogNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				} else {//oracle
+				}
+				else {//oracle
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsmo'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE smsmo (
@@ -8027,7 +8032,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX smsmo_CommlogNum ON smsmo (CommlogNum)";
 					Db.NonQ(command);
 				}
-				//add table smsmt
+				//Add SmsMt table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS smsmt";
 					Db.NonQ(command);
@@ -8045,14 +8050,15 @@ namespace OpenDentBusiness {
 						MsgParts int NOT NULL,
 						MsgCost double NOT NULL,
 						ClinicNum bigint NOT NULL,
-						FailCode varchar(255) NOT NULL,
-						DateTimeSent datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						CustErrorText varchar(255) NOT NULL,
+						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						DateTimeTerminated datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						INDEX(PatNum),
 						INDEX(ClinicNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				} else {//oracle
+				}
+				else {//oracle
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsmt'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE smsmt (
@@ -8069,8 +8075,8 @@ namespace OpenDentBusiness {
 						MsgParts number(11) NOT NULL,
 						MsgCost number(38,8) NOT NULL,
 						ClinicNum number(20) NOT NULL,
-						FailCode varchar2(255),
-						DateTimeSent date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CustErrorText varchar2(255),
+						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						DateTimeTerminated date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						CONSTRAINT smsmt_SmsMTNum PRIMARY KEY (SmsMTNum)
 						)";
@@ -8110,7 +8116,39 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX smsvln_ClinicNum ON smsvln (ClinicNum)";
 					Db.NonQ(command);
 				}
-				//========================END ADD SMS TABLES=========================
+				#endregion//========================END ADD SMS TABLES=========================
+				//SMS contract fields
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SmsContractDate','')";
+					Db.NonQ(command);
+				} else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SmsContractDate','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SmsContractName','')";
+					Db.NonQ(command);
+				} else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SmsContractName','')";
+					Db.NonQ(command);
+				} 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD SmsContractDate date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				} else {//oracle
+					command="ALTER TABLE clinic ADD SmsContractDate date";
+					Db.NonQ(command);
+					command="UPDATE clinic SET SmsContractDate = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SmsContractDate IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY SmsContractDate NOT NULL";
+					Db.NonQ(command);
+				} if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD SmsContractName varchar(255) NOT NULL";
+					Db.NonQ(command);
+				} else {//oracle
+					command="ALTER TABLE clinic ADD SmsContractName varchar2(255)";
+					Db.NonQ(command);
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="SELECT ProgramNum FROM program WHERE ProgName='Xcharge' LIMIT 1";
 				}
@@ -8195,6 +8233,10 @@ namespace OpenDentBusiness {
 
 
 
+
+
+
+				
 
 
 

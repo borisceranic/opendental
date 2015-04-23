@@ -96,7 +96,20 @@ namespace OpenDentBusiness{
 		}
 		*/
 
-
-
+		public static List<SmsVln> GetForClinics(List<Clinic> listClinics) {
+			if(listClinics.Count==0){
+				return new List<SmsVln>();
+			}
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<SmsVln>>(MethodBase.GetCurrentMethod(),listClinics);
+			}
+			//List<long> clinicNums=listClinics.Select(c => c.ClinicNum).ToList();
+			List<long> listClinicNums=new List<long>();
+			for(int i=0;i<listClinics.Count;i++) {
+				listClinicNums.Add(listClinics[i].ClinicNum);
+			}
+			string command= "SELECT * FROM smsvln WHERE ClinicNum IN ("+String.Join(",",listClinicNums)+")";
+			return Crud.SmsVlnCrud.SelectMany(command);
+		}
 	}
 }

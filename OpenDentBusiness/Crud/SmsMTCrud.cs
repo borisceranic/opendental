@@ -59,8 +59,8 @@ namespace OpenDentBusiness.Crud{
 				smsMT.MsgParts          = PIn.Int   (table.Rows[i]["MsgParts"].ToString());
 				smsMT.MsgCost           = PIn.Double(table.Rows[i]["MsgCost"].ToString());
 				smsMT.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				smsMT.FailCode          = PIn.String(table.Rows[i]["FailCode"].ToString());
-				smsMT.DateTimeSent      = PIn.DateT (table.Rows[i]["DateTimeSent"].ToString());
+				smsMT.CustErrorText     = PIn.String(table.Rows[i]["CustErrorText"].ToString());
+				smsMT.DateTimeEntry     = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				smsMT.DateTimeTerminated= PIn.DateT (table.Rows[i]["DateTimeTerminated"].ToString());
 				retVal.Add(smsMT);
 			}
@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsMTNum,";
 			}
-			command+="PatNum,GuidMessage,GuidBatch,VlnNumber,PhonePat,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgCost,ClinicNum,FailCode,DateTimeSent,DateTimeTerminated) VALUES(";
+			command+="PatNum,GuidMessage,GuidBatch,VlnNumber,PhonePat,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgCost,ClinicNum,CustErrorText,DateTimeEntry,DateTimeTerminated) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsMT.SmsMTNum)+",";
 			}
@@ -119,8 +119,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (smsMT.MsgParts)+","
 				+"'"+POut.Double(smsMT.MsgCost)+"',"
 				+    POut.Long  (smsMT.ClinicNum)+","
-				+"'"+POut.String(smsMT.FailCode)+"',"
-				+    POut.DateT (smsMT.DateTimeSent)+","
+				+"'"+POut.String(smsMT.CustErrorText)+"',"
+				+    POut.DateT (smsMT.DateTimeEntry)+","
 				+    POut.DateT (smsMT.DateTimeTerminated)+")";
 			if(smsMT.MsgText==null) {
 				smsMT.MsgText="";
@@ -150,8 +150,8 @@ namespace OpenDentBusiness.Crud{
 				+"MsgParts          =  "+POut.Int   (smsMT.MsgParts)+", "
 				+"MsgCost           = '"+POut.Double(smsMT.MsgCost)+"', "
 				+"ClinicNum         =  "+POut.Long  (smsMT.ClinicNum)+", "
-				+"FailCode          = '"+POut.String(smsMT.FailCode)+"', "
-				+"DateTimeSent      =  "+POut.DateT (smsMT.DateTimeSent)+", "
+				+"CustErrorText     = '"+POut.String(smsMT.CustErrorText)+"', "
+				+"DateTimeEntry     =  "+POut.DateT (smsMT.DateTimeEntry)+", "
 				+"DateTimeTerminated=  "+POut.DateT (smsMT.DateTimeTerminated)+" "
 				+"WHERE SmsMTNum = "+POut.Long(smsMT.SmsMTNum);
 			if(smsMT.MsgText==null) {
@@ -212,13 +212,13 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClinicNum = "+POut.Long(smsMT.ClinicNum)+"";
 			}
-			if(smsMT.FailCode != oldSmsMT.FailCode) {
+			if(smsMT.CustErrorText != oldSmsMT.CustErrorText) {
 				if(command!=""){ command+=",";}
-				command+="FailCode = '"+POut.String(smsMT.FailCode)+"'";
+				command+="CustErrorText = '"+POut.String(smsMT.CustErrorText)+"'";
 			}
-			if(smsMT.DateTimeSent != oldSmsMT.DateTimeSent) {
+			if(smsMT.DateTimeEntry != oldSmsMT.DateTimeEntry) {
 				if(command!=""){ command+=",";}
-				command+="DateTimeSent = "+POut.DateT(smsMT.DateTimeSent)+"";
+				command+="DateTimeEntry = "+POut.DateT(smsMT.DateTimeEntry)+"";
 			}
 			if(smsMT.DateTimeTerminated != oldSmsMT.DateTimeTerminated) {
 				if(command!=""){ command+=",";}

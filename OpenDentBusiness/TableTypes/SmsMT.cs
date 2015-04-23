@@ -32,10 +32,10 @@ namespace OpenDentBusiness {
 		///<summary>FK to clinic.ClinicNum.  Only used when associating SMS accounts to clinics.</summary>
 		public long ClinicNum;
 		///<summary>Only used when SMSDeliveryStatus==Failed.</summary>
-		public string FailCode;
+		public string CustErrorText;
 		///<summary>Time message was sent and accepted at Open Dental.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
-		public DateTime DateTimeSent;
+		public DateTime DateTimeEntry;
 		///<summary>Date time that the message was either successfully delivered or was failed.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeTerminated;

@@ -7,46 +7,38 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class EServiceSignals{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
-		#region CachePattern
-		//This region can be eliminated if this is not a table type with cached data.
-		//If leaving this region in place, be sure to add RefreshCache and FillCache 
-		//to the Cache.cs file with all the other Cache types.
 
-		///<summary>A list of all EServiceSignals.</summary>
-		private static List<EServiceSignal> listt;
-
-		///<summary>A list of all EServiceSignals.</summary>
-		public static List<EServiceSignal> Listt{
-			get {
-				if(listt==null) {
-					RefreshCache();
+		///<summary>Returns dictionary for each service</summary>
+		private static Dictionary<eServiceCode,eServiceStatus> GetServiceStatuses() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<eServiceCode,eServiceStatus>>(MethodBase.GetCurrentMethod());
+			}
+			Dictionary<eServiceCode,eServiceStatus> retVal=new Dictionary<eServiceCode,eServiceStatus>();
+			string command="SELECT * FROM eservicesignal WHERE IsProcessed = 0";
+			List<EServiceSignal> listSignals=Crud.EServiceSignalCrud.SelectMany(command);
+			foreach(eServiceCode sc in Enum.GetValues(typeof(eServiceCode))) {
+				retVal.Add(sc,eServiceStatus.Working);
+			}
+			for(int i=0;i<listSignals.Count;i++) {
+				eServiceCode sc;
+				if(!Enum.TryParse<eServiceCode>(listSignals[i].ServiceCode.ToString(),out sc)) {
+					continue;//must be a signal from a new service not supported by this version of OD.
 				}
-				return listt;
+				retVal[sc]=(eServiceStatus)Math.Max((int)retVal[sc],(int)listSignals[i].Severity);
 			}
-			set {
-				listt=value;
-			}
+			return retVal;
 		}
 
-		///<summary></summary>
-		public static DataTable RefreshCache(){
-			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM eservicesignal ORDER BY ItemOrder";//stub query probably needs to be changed
-			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
-			table.TableName="EServiceSignal";
-			FillCache(table);
-			return table;
-		}
+		//private static List<EServiceSignal> GetAllForService(eServiceCode serviceCode) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode);
+		//	}
+		//	EServiceSignal e=new EServiceSignal();
+		//	e.ServiceCode
+		//	string command="SELECT * FROM eservicesignal WHERE ServiceCode = "+POut.Int((int)serviceCode);
+		//	return Crud.EServiceSignalCrud.SelectMany(command);
+		//}
 
-		///<summary></summary>
-		public static void FillCache(DataTable table){
-			//No need to check RemotingRole; no call to db.
-			listt=Crud.EServiceSignalCrud.TableToList(table);
-		}
-		#endregion
-		*/
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
