@@ -33,22 +33,29 @@ namespace OpenDentBusiness {
 		}
 	}
 	
-	///<summary>Used to determine that status of the entire service. 
-	///For example, if there is a Listener eServiceSignal (ReasonCode 10000 to 19999) and a Status of Error, 
-	///then the entire listener service is considered to be in the error state.</summary>
+	///<summary>Used to determine that status of the entire service.</summary>
 	public enum eServiceStatus {
+		///<summary>Service is not in use and is not supposed to be in use.</summary>
 		NotEnabled,
+		///<summary>Used to convey information. Does not change the "working" status of the service. Will always be inserted with IsProcess=true.</summary>
 		Info,
+		///<summary>Service is operational and working as designed. Typcially used for heartbeat and initialization.</summary>
 		Working,
+		///<summary>Recoverable error has has occurred and no user intervention is required. Typically requires user acknowledgement only.</summary>
 		Warning,
+		///<summary>Recoverable error has has occurred and user intervention is probably required in addition to user acknowledgement only.</summary>
 		Error,
+		///<summary>Unrecoverable error and the service has shut itself off. Immediate user intervention is required.</summary>
 		Critical
 	}
 
 	///<summary>Used by EServiceSignal.ServiceCode. Each service will have an entry here. Stored as an int for forward compatibility.</summary>
 	public enum eServiceCode {
+		///<summary>Should not be used. If you are seeing this then an entry was made incorrectly.</summary>		
 		Undefined=0,
+		///<summary>Runs 1 instance per customer on a given client PC.</summary>		
 		ListenerService=1,
+		///<summary>Runs 1 instance total on HQ server.</summary>		
 		SMSService=2
 	}
 }
