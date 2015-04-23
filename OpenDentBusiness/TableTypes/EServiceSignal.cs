@@ -38,6 +38,7 @@ namespace OpenDentBusiness {
 	///then the entire listener service is considered to be in the error state.</summary>
 	public enum eServiceStatus {
 		NotEnabled,
+		Info,
 		Working,
 		Warning,
 		Error,
