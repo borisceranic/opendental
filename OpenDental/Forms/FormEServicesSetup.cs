@@ -9,6 +9,9 @@ using OpenDentBusiness.Mobile;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.ServiceProcess;
+using CodeBase;
+using Microsoft.Win32;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup. Currently inludes Patient Portal, MobileWeb (new-style), Mobile Synch (old-style).</summary>
@@ -45,6 +48,9 @@ namespace OpenDental {
 				case EService.WebSched:
 					tabControl.SelectTab(tabWebSched);
 					break;
+				case EService.ListenerService:
+					tabControl.SelectTab(tabListenerService);
+					break;
 				case EService.PatientPortal:
 				default:
 					tabControl.SelectTab(tabPatientPortal);
@@ -77,6 +83,15 @@ namespace OpenDental {
 				butWebSchedEnable.Enabled=false;
 				labelWebSchedEnable.Text=Lan.g(this,"Web Sched service is currently enabled.");
 			}
+			#endregion
+			#region Listener Service
+			//Show the last known state of the listener service via the heartbeats.
+			string status="stopped";//ESignals.GetCurrentListenerServiceState();   //TODO
+			if(status=="stopped") {//Check computer name here?
+				butStartListenerService.Enabled=true;
+			}
+			textListenerServiceStatus.Text="Running/Stopped";
+			FillGridListenerService();
 			#endregion
 			SetControlEnabledState();
 		}
@@ -140,7 +155,6 @@ namespace OpenDental {
 				_changed=true;//Sends invalid signal upon closing the form.
 			}
 			MsgBox.Show(this,"Patient Portal Info Saved");
-			butSaveListenerPort_Click(sender,e);
 		}
 		#endregion
 
@@ -885,8 +899,10 @@ namespace OpenDental {
 		}
 		#endregion
 
-		private void tabControl_SelectedIndexChanged(object sender,EventArgs e) {
-			SetControlEnabledState();
+		#region Listener Service
+
+		private void FillGridListenerService() {
+			//TODO: display some historical information for the last 30 days in this grid about the lifespan of the listener heartbeats.
 		}
 
 		private void butSaveListenerPort_Click(object sender,EventArgs e) {
@@ -898,6 +914,59 @@ namespace OpenDental {
 				_changed=true;//Sends invalid signal upon closing the form.
 			}
 			MsgBox.Show(this,"Listener Port Saved");
+		}
+
+		private void butStartListenerService_Click(object sender,EventArgs e) {
+			//Check to see if the listener service is installed on this computer.
+			List<ServiceController> listServices=ODEnvironment.GetAllOpenDentServices();
+			ServiceController listenerService=null;
+			//Look for the service that uses "OpenDentalCustListener.exe"
+			for(int i=0;i<listServices.Count;i++) {
+				RegistryKey hklm=Registry.LocalMachine;
+				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+listServices[i].ServiceName);
+				string test=hklm.GetValue("ImagePath").ToString();
+				string test1=test.Replace("\"","");
+				string[] arrayExePath=hklm.GetValue("ImagePath").ToString().Replace("\"","").Split('\\');
+				//This will not work if in the future we allow command line args for the listener service that include paths.
+				if(arrayExePath[arrayExePath.Length-1]=="OpenDentalCustListener.exe") {
+					listenerService=listServices[i];
+					break;
+				}
+			}
+			if(listenerService==null) {
+				MsgBox.Show(this,"Listener Service was not found on this computer.  The service can only be started from the computer that is hosting the Listener Service.");
+				return;
+			}
+			//The listener service is installed on this computer.  Try to start it if it is in a stopped or stop pending status.
+			//If we do not do this, an InvalidOperationException will throw that says "An instance of the service is already running"
+			if(listenerService.Status==ServiceControllerStatus.Stopped || listenerService.Status==ServiceControllerStatus.StopPending) {
+				try {
+					Cursor=Cursors.WaitCursor;
+					listenerService.Start();
+					listenerService.WaitForStatus(ServiceControllerStatus.Running,new TimeSpan(0,0,7));
+					Cursor=Cursors.Default;
+				}
+				catch {
+					Cursor=Cursors.Default;
+					//An InvalidOperationException can get thrown if the service could not be started.  E.g. current user is not running Open Dental as an administrator.
+					MsgBox.Show(this,"There was a problem starting the Listener Service.  Please go manually start your Listener Service or call us for help.");
+					return;
+				}
+				MsgBox.Show(this,"Listener Service Started.");
+			}
+			else {
+				MsgBox.Show(this,"Listener Service is already running.  Please call us for support if eServices are still not working.");
+			}
+		}
+
+		private void butListenerAlertsOff_Click(object sender,EventArgs e) {
+			//TODO: insert a row into the eservicesignal table that indicates to the eServices main menu item that it should not turn colors.
+		}
+
+		#endregion
+
+		private void tabControl_SelectedIndexChanged(object sender,EventArgs e) {
+			SetControlEnabledState();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
@@ -937,7 +1006,8 @@ namespace OpenDental {
 			PatientPortal,
 			MobileOld,
 			MobileNew,
-			WebSched
+			WebSched,
+			ListenerService,
 		}
 	}
 }

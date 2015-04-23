@@ -140,6 +140,12 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>Listener Port is only used when Open Dental is hosting your eServices.  It is not used for Mobile Synch (old-style). 
+It represents the port that must be forwarded by your router to the computer that is running the OpenDentCustListener service.
+It is shared by all eServices that are being hosted by Open Dental on your behalf.  
+For more information, see our online manual.</value>
+  </data>
   <data name="label12.Text" xml:space="preserve">
     <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
@@ -152,8 +158,10 @@ For more information, see our online manual.</value>
 This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
 For more information, see our online manual.</value>
   </data>
-  <data name="label11.Text" xml:space="preserve">
-    <value>Listener Port is only used when Open Dental is hosting your eServices.  It is not used for Mobile Synch (old-style). It represents the port that must be forwarded by your router to the computer that is running the OpenDentCustListener service.  It is shared by all eServices that are being hosted by Open Dental on your behalf.  For more information, see our online manual.</value>
+  <data name="label24.Text" xml:space="preserve">
+    <value>Stops monitoring the Listener Service.
+Monitoring will automatically turn back on when an active listener service has been detected.
+"Stop Monitoring" should only be used after you have successfully uninstalled the Listener Service.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
