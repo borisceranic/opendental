@@ -41,6 +41,8 @@ namespace OpenDental{
 		private CheckBox checkTasksNewTrackedByUser;
 		private CheckBox checkShowOpenTickets;
 		private CheckBox checkColorTheme;
+		private ValidNumber textInactiveSignal;
+		private Label label5;
 		private Label label1;
 		//private List<Def> posAdjTypes;
 
@@ -81,8 +83,6 @@ namespace OpenDental{
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkShowOpenTickets = new System.Windows.Forms.CheckBox();
 			this.groupBoxTaskDefaults = new System.Windows.Forms.GroupBox();
-			this.validNumY = new OpenDental.ValidNumber();
-			this.validNumX = new OpenDental.ValidNumber();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -90,11 +90,15 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.textWebServiceServerName = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
+			this.checkColorTheme = new System.Windows.Forms.CheckBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.textInactiveSignal = new OpenDental.ValidNumber();
+			this.validNumY = new OpenDental.ValidNumber();
+			this.validNumX = new OpenDental.ValidNumber();
 			this.butLanguages = new OpenDental.UI.Button();
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkColorTheme = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBoxTaskDefaults.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -121,7 +125,7 @@ namespace OpenDental{
 			// label4
 			// 
 			this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label4.Location = new System.Drawing.Point(59, 197);
+			this.label4.Location = new System.Drawing.Point(59, 229);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(298, 17);
 			this.label4.TabIndex = 64;
@@ -245,7 +249,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.checkTaskListAlwaysShow);
 			this.groupBox2.Controls.Add(this.checkTasksCheckOnStartup);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(101, 254);
+			this.groupBox2.Location = new System.Drawing.Point(101, 286);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(364, 184);
 			this.groupBox2.TabIndex = 188;
@@ -280,30 +284,6 @@ namespace OpenDental{
 			this.groupBoxTaskDefaults.TabIndex = 76;
 			this.groupBoxTaskDefaults.TabStop = false;
 			this.groupBoxTaskDefaults.Text = "Local Computer Default Settings";
-			// 
-			// validNumY
-			// 
-			this.validNumY.Location = new System.Drawing.Point(235, 59);
-			this.validNumY.MaxLength = 4;
-			this.validNumY.MaxVal = 1200;
-			this.validNumY.MinVal = 300;
-			this.validNumY.Name = "validNumY";
-			this.validNumY.Size = new System.Drawing.Size(47, 20);
-			this.validNumY.TabIndex = 188;
-			this.validNumY.Text = "542";
-			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// validNumX
-			// 
-			this.validNumX.Location = new System.Drawing.Point(115, 59);
-			this.validNumX.MaxLength = 4;
-			this.validNumX.MaxVal = 2000;
-			this.validNumX.MinVal = 300;
-			this.validNumX.Name = "validNumX";
-			this.validNumX.Size = new System.Drawing.Size(47, 20);
-			this.validNumX.TabIndex = 186;
-			this.validNumX.Text = "542";
-			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label15
 			// 
@@ -362,7 +342,7 @@ namespace OpenDental{
 			// 
 			// textWebServiceServerName
 			// 
-			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 226);
+			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 258);
 			this.textWebServiceServerName.Name = "textWebServiceServerName";
 			this.textWebServiceServerName.Size = new System.Drawing.Size(165, 20);
 			this.textWebServiceServerName.TabIndex = 197;
@@ -370,12 +350,68 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(4, 227);
+			this.label2.Location = new System.Drawing.Point(4, 259);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(279, 17);
 			this.label2.TabIndex = 198;
 			this.label2.Text = "Middle Tier: Server Name";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkColorTheme
+			// 
+			this.checkColorTheme.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkColorTheme.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkColorTheme.Location = new System.Drawing.Point(87, 132);
+			this.checkColorTheme.Name = "checkColorTheme";
+			this.checkColorTheme.Size = new System.Drawing.Size(362, 17);
+			this.checkColorTheme.TabIndex = 199;
+			this.checkColorTheme.Text = "Blue theme";
+			this.checkColorTheme.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label5
+			// 
+			this.label5.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label5.Location = new System.Drawing.Point(41, 183);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(333, 35);
+			this.label5.TabIndex = 200;
+			this.label5.Text = "Disable signal interval after this many minutes of user inactivity.  \r\nLeave blan" +
+    "k to disable.";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textInactiveSignal
+			// 
+			this.textInactiveSignal.Location = new System.Drawing.Point(375, 192);
+			this.textInactiveSignal.MaxVal = 1000000;
+			this.textInactiveSignal.MinVal = 1;
+			this.textInactiveSignal.Name = "textInactiveSignal";
+			this.textInactiveSignal.Size = new System.Drawing.Size(74, 20);
+			this.textInactiveSignal.TabIndex = 201;
+			this.textInactiveSignal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumY
+			// 
+			this.validNumY.Location = new System.Drawing.Point(235, 59);
+			this.validNumY.MaxLength = 4;
+			this.validNumY.MaxVal = 1200;
+			this.validNumY.MinVal = 300;
+			this.validNumY.Name = "validNumY";
+			this.validNumY.Size = new System.Drawing.Size(47, 20);
+			this.validNumY.TabIndex = 188;
+			this.validNumY.Text = "542";
+			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumX
+			// 
+			this.validNumX.Location = new System.Drawing.Point(115, 59);
+			this.validNumX.MaxLength = 4;
+			this.validNumX.MaxVal = 2000;
+			this.validNumX.MinVal = 300;
+			this.validNumX.Name = "validNumX";
+			this.validNumX.Size = new System.Drawing.Size(47, 20);
+			this.validNumX.TabIndex = 186;
+			this.validNumX.Text = "542";
+			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// butLanguages
 			// 
@@ -384,7 +420,7 @@ namespace OpenDental{
 			this.butLanguages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLanguages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLanguages.CornerRadius = 4F;
-			this.butLanguages.Location = new System.Drawing.Point(360, 192);
+			this.butLanguages.Location = new System.Drawing.Point(360, 224);
 			this.butLanguages.Name = "butLanguages";
 			this.butLanguages.Size = new System.Drawing.Size(88, 24);
 			this.butLanguages.TabIndex = 63;
@@ -410,7 +446,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(487, 421);
+			this.butCancel.Location = new System.Drawing.Point(487, 449);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -425,28 +461,19 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(487, 383);
+			this.butOK.Location = new System.Drawing.Point(487, 411);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkColorTheme
-			// 
-			this.checkColorTheme.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkColorTheme.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkColorTheme.Location = new System.Drawing.Point(87, 132);
-			this.checkColorTheme.Name = "checkColorTheme";
-			this.checkColorTheme.Size = new System.Drawing.Size(362, 17);
-			this.checkColorTheme.TabIndex = 199;
-			this.checkColorTheme.Text = "Blue theme";
-			this.checkColorTheme.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormMisc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(579, 458);
+			this.ClientSize = new System.Drawing.Size(579, 486);
+			this.Controls.Add(this.textInactiveSignal);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.checkColorTheme);
 			this.Controls.Add(this.textWebServiceServerName);
 			this.Controls.Add(this.label2);
@@ -484,6 +511,12 @@ namespace OpenDental{
 			}
 			else{
 				textSigInterval.Text=PrefC.GetLong(PrefName.ProcessSigsIntervalInSecs).ToString();
+			}
+			if(PrefC.GetLong(PrefName.SignalInactiveMinutes)==0) {
+				textSigInterval.Text="";
+			}
+			else {
+				textSigInterval.Text=PrefC.GetLong(PrefName.SignalInactiveMinutes).ToString();
 			}
 			checkColorTheme.Checked=PrefC.GetBool(PrefName.ColorTheme);
 			textMainWindowTitle.Text=PrefC.GetString(PrefName.MainWindowTitle);
@@ -559,6 +592,13 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
+			if(PIn.Long(textSigInterval.Text)>=(5+(PIn.Long(textInactiveSignal.Text)*60))) {//Signal Refresh time is less than or equal to 5 seconds plus the number of seconds in textSigInterval
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,@"The inactive signal time is less than or equal to the signal refresh time.  
+					This could inadvertently cause signals to not correctly refresh.  Continue?")) 
+				{
+					return;
+				}
+			}
 			bool changed=false;
 			if( Prefs.UpdateString(PrefName.MainWindowTitle,textMainWindowTitle.Text)
 				| Prefs.UpdateLong(PrefName.ShowIDinTitleBar,comboShowID.SelectedIndex)
@@ -606,6 +646,16 @@ namespace OpenDental{
 			}
 			else{
 				if(Prefs.UpdateLong(PrefName.ProcessSigsIntervalInSecs,PIn.Long(textSigInterval.Text))){
+					changed=true;
+				}
+			}
+			if(textInactiveSignal.Text=="") {
+				if(Prefs.UpdateLong(PrefName.SignalInactiveMinutes,0)) {
+					changed=true;
+				}
+			}
+			else {
+				if(Prefs.UpdateLong(PrefName.SignalInactiveMinutes,PIn.Long(textInactiveSignal.Text))) {
 					changed=true;
 				}
 			}

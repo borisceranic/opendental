@@ -8161,7 +8161,14 @@ namespace OpenDentBusiness {
 						+"'')";
 					Db.NonQ(command);
 				}//end X-Web properties.
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SignalInactiveMinutes','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SignalInactiveMinutes','0')";
+					Db.NonQ(command);
+				}
 
 
 

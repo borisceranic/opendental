@@ -448,6 +448,8 @@ namespace OpenDentBusiness {
 		ShowIDinTitleBar,
 		ShowProgressNotesInsteadofCommLog,
 		ShowUrgFinNoteInProgressNotes,
+		///<summary>Used to stop signals after a period of inactivity.  A value of 0 disables this feature.  Default value of 0 to maintain backward compatibility</summary>
+		SignalInactiveMinutes,
 		///<summary>Only used on startup.  The date in which stale signalods were removed.</summary>
 		SignalLastClearedDate,
 		/// <summary>Name of this Software.  Defaults to 'Open Dental Software'.</summary>
