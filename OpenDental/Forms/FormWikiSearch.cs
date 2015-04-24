@@ -9,9 +9,13 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
+	///<summary></summary>
+	public delegate void NavToPageDeligate(string pageTitle);
+
 	public partial class FormWikiSearch:Form {
 		private List<string> listWikiPageTitles;
 		public string wikiPageTitleSelected;
+		public NavToPageDeligate NavToPage;
 
 		public FormWikiSearch() {
 			InitializeComponent();
@@ -81,7 +85,8 @@ namespace OpenDental {
 				return;
 			}
 			wikiPageTitleSelected=listWikiPageTitles[e.Row];
-			DialogResult=DialogResult.OK;
+			NavToPage(wikiPageTitleSelected);
+			Close();
 		}
 
 		private void textSearch_TextChanged(object sender,EventArgs e) {
@@ -115,7 +120,7 @@ namespace OpenDental {
 			WikiPage wikiPageRestored=WikiPageHists.RevertFrom(WikiPageHists.GetDeletedByTitle(listWikiPageTitles[gridMain.SelectedIndices[0]]));
 			wikiPageRestored.UserNum=Security.CurUser.UserNum;
 			WikiPages.InsertAndArchive(wikiPageRestored);
-			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void timer1_Tick(object sender,EventArgs e) {
@@ -127,11 +132,12 @@ namespace OpenDental {
 			if(gridMain.SelectedIndices.Length>0) {
 				wikiPageTitleSelected=listWikiPageTitles[gridMain.SelectedIndices[0]];
 			}
-			DialogResult=DialogResult.OK;
+			NavToPage(wikiPageTitleSelected);
+			Close();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 
 

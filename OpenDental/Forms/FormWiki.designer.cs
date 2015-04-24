@@ -94,6 +94,7 @@ namespace OpenDental{
 			this.Name = "FormWiki";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Wiki";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormWiki_FormClosing);
 			this.Load += new System.EventHandler(this.FormWiki_Load);
 			this.ResumeLayout(false);
 

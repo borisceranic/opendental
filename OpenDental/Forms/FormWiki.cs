@@ -22,6 +22,7 @@ namespace OpenDental {
 		[PreserveSig]
 		[return: MarshalAs(UnmanagedType.Error)]
 		static extern int CoInternetSetFeatureEnabled(int FeatureEntry,[MarshalAs(UnmanagedType.U4)] int dwFlags,bool fEnable);
+		private FormWikiSearch FormWS;
 
 		public FormWiki() {
 			InitializeComponent();
@@ -372,16 +373,27 @@ namespace OpenDental {
 		}
 
 		private void Search_Click() {
-			FormWikiSearch FormWS=new FormWikiSearch();
-			FormWS.ShowDialog();
-			if(FormWS.DialogResult!=DialogResult.OK) {
+			//Reselect existing window if available, if not create a new instance
+			if(FormWS==null || FormWS.IsDisposed) {
+				FormWS=new FormWikiSearch();
+				FormWS.NavToPage=navPage;
+			}
+			FormWS.Show();
+			if(FormWS.WindowState==FormWindowState.Minimized) {//only applicable if re-using an existing instance
+				FormWS.WindowState=FormWindowState.Normal;
+			}
+			FormWS.BringToFront();
+		}
+
+		private void navPage(string pageTitle) {
+			if(String.IsNullOrEmpty(pageTitle)) {
 				return;
 			}
-			if(FormWS.wikiPageTitleSelected=="") {
+			if(this==null || this.IsDisposed) {//when used as a deligate.
 				return;
 			}
 			historyNavBack--;//We have to decrement historyNavBack to tell whether or not we need to branch our page history
-			LoadWikiPage(FormWS.wikiPageTitleSelected);
+			LoadWikiPage(pageTitle);
 		}
 
 		private void webBrowserWiki_Navigating(object sender,WebBrowserNavigatingEventArgs e) {
@@ -447,6 +459,14 @@ namespace OpenDental {
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void FormWiki_FormClosing(object sender,FormClosingEventArgs e) {
+			if(FormWS==null || FormWS.IsDisposed) {//Close any delinquent search window that may be open.
+				return;
+			}
+			FormWS.Close();
+			FormWS.Dispose();
 		}
 
 	}
