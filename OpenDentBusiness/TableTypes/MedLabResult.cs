@@ -39,6 +39,7 @@ namespace OpenDentBusiness {
 		///OBX|6|TX|001180^Potassium, Serum^L||||3.5-5.5|||N|C|19830527||200511071406|01|
 		///NTE|1|L|Red cells observed in serum. Glucose may be falsely decreased.
 		///NTE|2|L|Potassium may be falsely increased.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string ObsValue;
 		///<summary>OBX.5.3 - Data Subtype.  Used to identify the coding system. Required if Discrete Microbiology testing is ordered to identify
 		///Microbiology Result Type.  Example of use: If OBX.5.3 is ORM, then the observation sub ID in OBX.4 is used to associate the result with

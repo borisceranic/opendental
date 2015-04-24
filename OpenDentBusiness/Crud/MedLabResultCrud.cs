@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLabResult.ObsLoinc)+"',"
 				+"'"+POut.String(medLabResult.ObsLoincText)+"',"
 				+"'"+POut.String(medLabResult.ObsIDSub)+"',"
-				+"'"+POut.String(medLabResult.ObsValue)+"',"
+				+    DbHelper.ParamChar+"paramObsValue,"
 				+"'"+POut.String(medLabResult.ObsSubType.ToString())+"',"
 				+"'"+POut.String(medLabResult.ObsUnits)+"',"
 				+"'"+POut.String(medLabResult.ReferenceRange)+"',"
@@ -151,15 +151,19 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLabResult.FacilityID)+"',"
 				+    POut.Long  (medLabResult.DocNum)+","
 				+    DbHelper.ParamChar+"paramNote)";
+			if(medLabResult.ObsValue==null) {
+				medLabResult.ObsValue="";
+			}
+			OdSqlParameter paramObsValue=new OdSqlParameter("paramObsValue",OdDbType.Text,medLabResult.ObsValue);
 			if(medLabResult.Note==null) {
 				medLabResult.Note="";
 			}
 			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,medLabResult.Note);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command,paramNote);
+				Db.NonQ(command,paramObsValue,paramNote);
 			}
 			else {
-				medLabResult.MedLabResultNum=Db.NonQ(command,true,paramNote);
+				medLabResult.MedLabResultNum=Db.NonQ(command,true,paramObsValue,paramNote);
 			}
 			return medLabResult.MedLabResultNum;
 		}
@@ -173,7 +177,7 @@ namespace OpenDentBusiness.Crud{
 				+"ObsLoinc       = '"+POut.String(medLabResult.ObsLoinc)+"', "
 				+"ObsLoincText   = '"+POut.String(medLabResult.ObsLoincText)+"', "
 				+"ObsIDSub       = '"+POut.String(medLabResult.ObsIDSub)+"', "
-				+"ObsValue       = '"+POut.String(medLabResult.ObsValue)+"', "
+				+"ObsValue       =  "+DbHelper.ParamChar+"paramObsValue, "
 				+"ObsSubType     = '"+POut.String(medLabResult.ObsSubType.ToString())+"', "
 				+"ObsUnits       = '"+POut.String(medLabResult.ObsUnits)+"', "
 				+"ReferenceRange = '"+POut.String(medLabResult.ReferenceRange)+"', "
@@ -184,11 +188,15 @@ namespace OpenDentBusiness.Crud{
 				+"DocNum         =  "+POut.Long  (medLabResult.DocNum)+", "
 				+"Note           =  "+DbHelper.ParamChar+"paramNote "
 				+"WHERE MedLabResultNum = "+POut.Long(medLabResult.MedLabResultNum);
+			if(medLabResult.ObsValue==null) {
+				medLabResult.ObsValue="";
+			}
+			OdSqlParameter paramObsValue=new OdSqlParameter("paramObsValue",OdDbType.Text,medLabResult.ObsValue);
 			if(medLabResult.Note==null) {
 				medLabResult.Note="";
 			}
 			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,medLabResult.Note);
-			Db.NonQ(command,paramNote);
+			Db.NonQ(command,paramObsValue,paramNote);
 		}
 
 		///<summary>Updates one MedLabResult in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -220,7 +228,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(medLabResult.ObsValue != oldMedLabResult.ObsValue) {
 				if(command!=""){ command+=",";}
-				command+="ObsValue = '"+POut.String(medLabResult.ObsValue)+"'";
+				command+="ObsValue = "+DbHelper.ParamChar+"paramObsValue";
 			}
 			if(medLabResult.ObsSubType != oldMedLabResult.ObsSubType) {
 				if(command!=""){ command+=",";}
@@ -261,13 +269,17 @@ namespace OpenDentBusiness.Crud{
 			if(command==""){
 				return false;
 			}
+			if(medLabResult.ObsValue==null) {
+				medLabResult.ObsValue="";
+			}
+			OdSqlParameter paramObsValue=new OdSqlParameter("paramObsValue",OdDbType.Text,medLabResult.ObsValue);
 			if(medLabResult.Note==null) {
 				medLabResult.Note="";
 			}
 			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,medLabResult.Note);
 			command="UPDATE medlabresult SET "+command
 				+" WHERE MedLabResultNum = "+POut.Long(medLabResult.MedLabResultNum);
-			Db.NonQ(command,paramNote);
+			Db.NonQ(command,paramObsValue,paramNote);
 			return true;
 		}
 
