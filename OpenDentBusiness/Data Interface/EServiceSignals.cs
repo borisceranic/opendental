@@ -24,12 +24,13 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<eServiceSignalSeverity>(MethodBase.GetCurrentMethod(),serviceCode);
 			}
 			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
-				+" AND Severity!=1 ORDER BY TimeStamp DESC"+DbHelper.LimitWhere(1);//ignore "info" statuses.
+				+" AND Severity!=1 ORDER BY TimeStamp DESC "+DbHelper.LimitWhere(1);//ignore "info" statuses.
 			List<EServiceSignal> listSignal=Crud.EServiceSignalCrud.SelectMany(command);
 			if(listSignal.Count==0) {
 				//NoSignals exist for this service.
 				return eServiceSignalSeverity.None;
 			}
+			//The listener service is considered down and in a critical state if there hasn't been a heartbeat in the last 5 minutes.
 			if(serviceCode==eServiceCode.ListenerService && listSignal[0].TimeStamp<DateTime.Now.AddMinutes(-5)) {
 				return eServiceSignalSeverity.Critical;
 			}
