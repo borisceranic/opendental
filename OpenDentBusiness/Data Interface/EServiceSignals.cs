@@ -6,38 +6,35 @@ using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class EServiceSignals{
-
-		///<summary>Returns dictionary for each service</summary>
-		private static Dictionary<eServiceCode,eServiceStatus> GetServiceStatuses() {
+	public class EServiceSignals {
+		
+		///<summary>returns all eServiceSignals for a given service within the date range, inclusive.</summary>
+		private static List<EServiceSignal> GetServiceHistory(eServiceCode serviceCode,DateTime dateStart,DateTime dateStop) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Dictionary<eServiceCode,eServiceStatus>>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode,dateStart,dateStop);
 			}
-			Dictionary<eServiceCode,eServiceStatus> retVal=new Dictionary<eServiceCode,eServiceStatus>();
-			string command="SELECT * FROM eservicesignal WHERE IsProcessed = 0";
-			List<EServiceSignal> listSignals=Crud.EServiceSignalCrud.SelectMany(command);
-			foreach(eServiceCode sc in Enum.GetValues(typeof(eServiceCode))) {
-				retVal.Add(sc,eServiceStatus.Working);
-			}
-			for(int i=0;i<listSignals.Count;i++) {
-				eServiceCode sc;
-				if(!Enum.TryParse<eServiceCode>(listSignals[i].ServiceCode.ToString(),out sc)) {
-					continue;//must be a signal from a new service not supported by this version of OD.
-				}
-				retVal[sc]=(eServiceStatus)Math.Max((int)retVal[sc],(int)listSignals[i].Severity);
-			}
-			return retVal;
+			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
+				+" AND TimeStamp BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateStop.Date.AddDays(1))+" ORDER BY TimeStamp DESC";
+			return Crud.EServiceSignalCrud.SelectMany(command);
 		}
 
-		//private static List<EServiceSignal> GetAllForService(eServiceCode serviceCode) {
-		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-		//		return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode);
-		//	}
-		//	EServiceSignal e=new EServiceSignal();
-		//	e.ServiceCode
-		//	string command="SELECT * FROM eservicesignal WHERE ServiceCode = "+POut.Int((int)serviceCode);
-		//	return Crud.EServiceSignalCrud.SelectMany(command);
-		//}
+		///<summary>Ignores eServiceStatus.Info. Returns the last known status for the given eService.</summary>
+		private static eServiceSignalSeverity GetServiceStatus(eServiceCode serviceCode) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<eServiceSignalSeverity>(MethodBase.GetCurrentMethod(),serviceCode);
+			}
+			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
+				+" AND Severity!=1 ORDER BY TimeStamp DESC"+DbHelper.LimitWhere(1);//ignore "info" statuses.
+			List<EServiceSignal> listSignal=Crud.EServiceSignalCrud.SelectMany(command);
+			if(listSignal.Count==0) {
+				//NoSignals exist for this service.
+				return eServiceSignalSeverity.None;
+			}
+			if(serviceCode==eServiceCode.ListenerService && listSignal[0].TimeStamp<DateTime.Now.AddMinutes(-5)) {
+				return eServiceSignalSeverity.Critical;
+			}
+			return listSignal[0].Severity;
+		}
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.

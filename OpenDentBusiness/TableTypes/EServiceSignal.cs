@@ -15,8 +15,8 @@ namespace OpenDentBusiness {
 		///<summary>The reason for the eServiceSignal. This code is used to determine what actions to take and how to process this message. 
 		///It is a function of ReasonCategory. It will most likely be defined by an enum that lives on HQ-only closed source.</summary>
 		public int ReasonCode;
-		///<summary>Adverse reaction description.</summary>
-		public eServiceStatus Severity;
+		///<summary>.</summary>
+		public eServiceSignalSeverity Severity;
 		///<summary>Human readable description of what this signal means, or a message for the user.</summary>
 		public string Description;
 		///<summary>Time signal was sent.</summary>
@@ -34,7 +34,9 @@ namespace OpenDentBusiness {
 	}
 	
 	///<summary>Used to determine that status of the entire service.</summary>
-	public enum eServiceStatus {
+	public enum eServiceSignalSeverity {
+		///<summary>Service is not in use and is not supposed to be in use.</summary>
+		None=-1,
 		///<summary>Service is not in use and is not supposed to be in use.</summary>
 		NotEnabled,
 		///<summary>Used to convey information. Does not change the "working" status of the service. Will always be inserted with IsProcess=true.</summary>

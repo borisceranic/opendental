@@ -7970,7 +7970,8 @@ namespace OpenDentBusiness {
 						IsProcessed tinyint NOT NULL
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				} else {//oracle
+				}
+				else {//oracle
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE eservicesignal'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE eservicesignal (
@@ -8133,7 +8134,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				} 
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE clinic ADD SmsContractDate date NOT NULL DEFAULT '0001-01-01'";
+					command="ALTER TABLE clinic ADD SmsContractDate datetime NOT NULL";
 					Db.NonQ(command);
 				} else {//oracle
 					command="ALTER TABLE clinic ADD SmsContractDate date";
@@ -8142,7 +8143,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE clinic MODIFY SmsContractDate NOT NULL";
 					Db.NonQ(command);
-				} if(DataConnection.DBtype==DatabaseType.MySql) {
+				} 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE clinic ADD SmsContractName varchar(255) NOT NULL";
 					Db.NonQ(command);
 				} else {//oracle
@@ -8239,5 +8241,7 @@ namespace OpenDentBusiness {
 				
 
 
+
+				
 
 				

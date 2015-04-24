@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace OpenDentBusiness{
 
@@ -35,6 +34,11 @@ namespace OpenDentBusiness{
 		public long EmailAddressNum;
 		///<summary>FK to provider.ProvNum.  Used in place of the default practice provider when making new patients.</summary>
 		public long DefaultProv;
+		///<summary>DateSMSContract was signed.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
+		public DateTime SmsContractDate;
+		///<summary>Name used to sign the contract.</summary>
+		public string SmsContractName;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

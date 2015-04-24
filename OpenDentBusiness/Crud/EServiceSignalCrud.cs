@@ -47,8 +47,10 @@ namespace OpenDentBusiness.Crud{
 			for(int i=0;i<table.Rows.Count;i++) {
 				eServiceSignal=new EServiceSignal();
 				eServiceSignal.EServiceSignalNum= PIn.Long  (table.Rows[i]["EServiceSignalNum"].ToString());
+				eServiceSignal.ServiceCode      = PIn.Int   (table.Rows[i]["ServiceCode"].ToString());
+				eServiceSignal.ReasonCategory   = PIn.Int   (table.Rows[i]["ReasonCategory"].ToString());
 				eServiceSignal.ReasonCode       = PIn.Int   (table.Rows[i]["ReasonCode"].ToString());
-				eServiceSignal.SeverityStatus   = (OpenDentBusiness.eServiceStatus)PIn.Int(table.Rows[i]["SeverityStatus"].ToString());
+				eServiceSignal.Severity         = (OpenDentBusiness.eServiceSignalSeverity)PIn.Int(table.Rows[i]["Severity"].ToString());
 				eServiceSignal.Description      = PIn.String(table.Rows[i]["Description"].ToString());
 				eServiceSignal.TimeStamp        = PIn.DateT (table.Rows[i]["TimeStamp"].ToString());
 				eServiceSignal.Tag              = PIn.String(table.Rows[i]["Tag"].ToString());
@@ -93,13 +95,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EServiceSignalNum,";
 			}
-			command+="ReasonCode,SeverityStatus,Description,TimeStamp,Tag,IsProcessed) VALUES(";
+			command+="ServiceCode,ReasonCategory,ReasonCode,Severity,Description,TimeStamp,Tag,IsProcessed) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(eServiceSignal.EServiceSignalNum)+",";
 			}
 			command+=
-				     POut.Int   (eServiceSignal.ReasonCode)+","
-				+    POut.Int   ((int)eServiceSignal.SeverityStatus)+","
+				     POut.Int   (eServiceSignal.ServiceCode)+","
+				+    POut.Int   (eServiceSignal.ReasonCategory)+","
+				+    POut.Int   (eServiceSignal.ReasonCode)+","
+				+    POut.Int   ((int)eServiceSignal.Severity)+","
 				+"'"+POut.String(eServiceSignal.Description)+"',"
 				+    POut.DateT (eServiceSignal.TimeStamp)+","
 				+"'"+POut.String(eServiceSignal.Tag)+"',"
@@ -116,8 +120,10 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one EServiceSignal in the database.</summary>
 		public static void Update(EServiceSignal eServiceSignal){
 			string command="UPDATE eservicesignal SET "
+				+"ServiceCode      =  "+POut.Int   (eServiceSignal.ServiceCode)+", "
+				+"ReasonCategory   =  "+POut.Int   (eServiceSignal.ReasonCategory)+", "
 				+"ReasonCode       =  "+POut.Int   (eServiceSignal.ReasonCode)+", "
-				+"SeverityStatus   =  "+POut.Int   ((int)eServiceSignal.SeverityStatus)+", "
+				+"Severity         =  "+POut.Int   ((int)eServiceSignal.Severity)+", "
 				+"Description      = '"+POut.String(eServiceSignal.Description)+"', "
 				+"TimeStamp        =  "+POut.DateT (eServiceSignal.TimeStamp)+", "
 				+"Tag              = '"+POut.String(eServiceSignal.Tag)+"', "
@@ -129,13 +135,21 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one EServiceSignal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(EServiceSignal eServiceSignal,EServiceSignal oldEServiceSignal){
 			string command="";
+			if(eServiceSignal.ServiceCode != oldEServiceSignal.ServiceCode) {
+				if(command!=""){ command+=",";}
+				command+="ServiceCode = "+POut.Int(eServiceSignal.ServiceCode)+"";
+			}
+			if(eServiceSignal.ReasonCategory != oldEServiceSignal.ReasonCategory) {
+				if(command!=""){ command+=",";}
+				command+="ReasonCategory = "+POut.Int(eServiceSignal.ReasonCategory)+"";
+			}
 			if(eServiceSignal.ReasonCode != oldEServiceSignal.ReasonCode) {
 				if(command!=""){ command+=",";}
 				command+="ReasonCode = "+POut.Int(eServiceSignal.ReasonCode)+"";
 			}
-			if(eServiceSignal.SeverityStatus != oldEServiceSignal.SeverityStatus) {
+			if(eServiceSignal.Severity != oldEServiceSignal.Severity) {
 				if(command!=""){ command+=",";}
-				command+="SeverityStatus = "+POut.Int   ((int)eServiceSignal.SeverityStatus)+"";
+				command+="Severity = "+POut.Int   ((int)eServiceSignal.Severity)+"";
 			}
 			if(eServiceSignal.Description != oldEServiceSignal.Description) {
 				if(command!=""){ command+=",";}

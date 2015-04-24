@@ -60,6 +60,8 @@ namespace OpenDentBusiness.Crud{
 				clinic.Fax                = PIn.String(table.Rows[i]["Fax"].ToString());
 				clinic.EmailAddressNum    = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());
 				clinic.DefaultProv        = PIn.Long  (table.Rows[i]["DefaultProv"].ToString());
+				clinic.SmsContractDate    = PIn.DateT (table.Rows[i]["SmsContractDate"].ToString());
+				clinic.SmsContractName    = PIn.String(table.Rows[i]["SmsContractName"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -100,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsContractName) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -117,7 +119,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (clinic.InsBillingProv)+","
 				+"'"+POut.String(clinic.Fax)+"',"
 				+    POut.Long  (clinic.EmailAddressNum)+","
-				+    POut.Long  (clinic.DefaultProv)+")";
+				+    POut.Long  (clinic.DefaultProv)+","
+				+    POut.DateT (clinic.SmsContractDate)+","
+				+"'"+POut.String(clinic.SmsContractName)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +146,9 @@ namespace OpenDentBusiness.Crud{
 				+"InsBillingProv     =  "+POut.Long  (clinic.InsBillingProv)+", "
 				+"Fax                = '"+POut.String(clinic.Fax)+"', "
 				+"EmailAddressNum    =  "+POut.Long  (clinic.EmailAddressNum)+", "
-				+"DefaultProv        =  "+POut.Long  (clinic.DefaultProv)+" "
+				+"DefaultProv        =  "+POut.Long  (clinic.DefaultProv)+", "
+				+"SmsContractDate    =  "+POut.DateT (clinic.SmsContractDate)+", "
+				+"SmsContractName    = '"+POut.String(clinic.SmsContractName)+"' "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -201,6 +207,14 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.DefaultProv != oldClinic.DefaultProv) {
 				if(command!=""){ command+=",";}
 				command+="DefaultProv = "+POut.Long(clinic.DefaultProv)+"";
+			}
+			if(clinic.SmsContractDate != oldClinic.SmsContractDate) {
+				if(command!=""){ command+=",";}
+				command+="SmsContractDate = "+POut.DateT(clinic.SmsContractDate)+"";
+			}
+			if(clinic.SmsContractName != oldClinic.SmsContractName) {
+				if(command!=""){ command+=",";}
+				command+="SmsContractName = '"+POut.String(clinic.SmsContractName)+"'";
 			}
 			if(command==""){
 				return false;
