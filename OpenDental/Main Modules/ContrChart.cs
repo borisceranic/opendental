@@ -290,6 +290,8 @@ namespace OpenDental{
 		private UI.Button butPhoneNums;
 		private Label label3;
 		private ODButtonPanel panelQuickButtons;
+		private Label label1;
+		private UI.Button butClearAllMovements;
 		private bool IsDistributorKey;
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
@@ -407,6 +409,8 @@ namespace OpenDental{
 			this.butMissing = new OpenDental.UI.Button();
 			this.butHidden = new OpenDental.UI.Button();
 			this.tabMovements = new System.Windows.Forms.TabPage();
+			this.label1 = new System.Windows.Forms.Label();
+			this.butClearAllMovements = new OpenDental.UI.Button();
 			this.label16 = new System.Windows.Forms.Label();
 			this.butApplyMovements = new OpenDental.UI.Button();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -1368,6 +1372,8 @@ namespace OpenDental{
 			// 
 			// tabMovements
 			// 
+			this.tabMovements.Controls.Add(this.label1);
+			this.tabMovements.Controls.Add(this.butClearAllMovements);
 			this.tabMovements.Controls.Add(this.label16);
 			this.tabMovements.Controls.Add(this.butApplyMovements);
 			this.tabMovements.Controls.Add(this.groupBox4);
@@ -1379,11 +1385,35 @@ namespace OpenDental{
 			this.tabMovements.Text = "Movements";
 			this.tabMovements.UseVisualStyleBackColor = true;
 			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(47, 198);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(180, 18);
+			this.label1.TabIndex = 33;
+			this.label1.Text = "Clear all tooth movements.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// butClearAllMovements
+			// 
+			this.butClearAllMovements.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClearAllMovements.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butClearAllMovements.Autosize = true;
+			this.butClearAllMovements.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClearAllMovements.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClearAllMovements.CornerRadius = 4F;
+			this.butClearAllMovements.Location = new System.Drawing.Point(159, 169);
+			this.butClearAllMovements.Name = "butClearAllMovements";
+			this.butClearAllMovements.Size = new System.Drawing.Size(68, 23);
+			this.butClearAllMovements.TabIndex = 32;
+			this.butClearAllMovements.Text = "Clear All";
+			this.butClearAllMovements.Click += new System.EventHandler(this.butClearAllMovements_Click);
+			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(180, 183);
+			this.label16.Location = new System.Drawing.Point(233, 198);
 			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(267, 18);
+			this.label16.Size = new System.Drawing.Size(229, 18);
 			this.label16.TabIndex = 29;
 			this.label16.Text = "(if you typed in changes)";
 			this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -1396,7 +1426,7 @@ namespace OpenDental{
 			this.butApplyMovements.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butApplyMovements.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butApplyMovements.CornerRadius = 4F;
-			this.butApplyMovements.Location = new System.Drawing.Point(404, 154);
+			this.butApplyMovements.Location = new System.Drawing.Point(394, 169);
 			this.butApplyMovements.Name = "butApplyMovements";
 			this.butApplyMovements.Size = new System.Drawing.Size(68, 23);
 			this.butApplyMovements.TabIndex = 16;
@@ -7864,6 +7894,20 @@ namespace OpenDental{
 						ToothInitialType.TipB,PIn.Float(textTipB.Text));
 				}
 			}
+			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
+			FillToothChart(true);
+		}
+
+		private void butClearAllMovements_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This will clear all movements made on all teeth for this patient.  Continue?")) {
+				return;
+			}
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.Rotate);
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.ShiftB);
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.ShiftM);
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.ShiftO);
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.TipB);
+			ToothInitials.ClearAllValuesForType(PatCur.PatNum,ToothInitialType.TipM);
 			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
 			FillToothChart(true);
 		}
