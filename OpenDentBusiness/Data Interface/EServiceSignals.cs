@@ -55,133 +55,156 @@ namespace OpenDentBusiness{
 			Crud.EServiceSignalCrud.Update(eServiceSignal);
 		}
 
-		///<summary>Inserts an info signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
-		public static void InsertInfoFromListener(string desc,string tag) {
-			//No remoting role check necessary.
-			InsertSignalFromListener(eServiceSignalSeverity.Info,desc,tag);
-		}
-
-		///<summary>Inserts a warning signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
-		public static void InsertWarningFromListener(string desc,string tag) {
-			//No remoting role check necessary.
-			InsertSignalFromListener(eServiceSignalSeverity.Warning,desc,tag);
-		}
-
-		///<summary>Inserts an error signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
-		public static void InsertErrorFromListener(string desc,string tag) {
-			//No remoting role check necessary.
-			InsertSignalFromListener(eServiceSignalSeverity.Error,desc,tag);
-		}
-
-		///<summary>Only used internally for Info, Warning, Error. Working and Critical should use InsertHeartbeatFromListener.</summary>
-		private static void InsertSignalFromListener(eServiceSignalSeverity status,string desc,string tag) {
+		///<summary>Inserts a healthy heartbeat.</summary>
+		private static void InsertHeartbeatForService(eServiceCode serviceCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),status,desc,tag);
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			//Create a signal with the given inputs. We will make copies of this and insert/update below depending on status.
-			EServiceSignal newSignal=new EServiceSignal();
-			newSignal.Description=desc;
-			newSignal.IsProcessed=true;
-			newSignal.ReasonCategory=0;
-			newSignal.ReasonCode=0;
-			newSignal.ServiceCode=(int)eServiceCode.ListenerService;
-			newSignal.Severity=status;
-			newSignal.Tag=tag;
-			newSignal.SigDateTime=DateTime.Now;
-			Insert(newSignal);
+			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
+				+" AND Severity IN ("
+				+eServiceSignalSeverity.NotEnabled+","
+				+eServiceSignalSeverity.Working+","
+				+eServiceSignalSeverity.Critical
+				+") ORDER BY SigDateTime DESC "+DbHelper.LimitWhere(1);//only select not enabled, working, and critical statuses.
+			EServiceSignal lastSignal=Crud.EServiceSignalCrud.SelectOne(command);
+			//If initializing or changing state to working from not working, insert two signals; An anchor and a rolling timestamp.
+			if(lastSignal==null || lastSignal.Severity!=eServiceSignalSeverity.Working) { //First ever heartbeat or critical which was not previously critical.
+				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now,IsProcessed=true,Description="Heartbeat." });//anchor heartbeat
+				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now.AddSeconds(1),IsProcessed=true,Description="Heartbeat." });//rolling heartbeat
+				return;
+			}
+			lastSignal.SigDateTime=DateTime.Now;//succeptible to system clock being different than server time. But since this code is being run from the server, this should never happen.
+			Crud.EServiceSignalCrud.Update(lastSignal);
 		}
 
-		///<summary>Updates local listener heartbeat to a valid working state. Any previous alert indicators in OD will be silenced automatically.</summary>
-		public static void SetListenerWorking(string desc) {
-			//No remoting role check necessary.
-			InsertHeartbeatFromListener(eServiceSignalSeverity.Working,desc);
-		}
+		/////<summary>Inserts an info signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
+		//public static void InsertInfoFromListener(string desc,string tag) {
+		//	//No remoting role check necessary.
+		//	InsertSignalFromListener(eServiceSignalSeverity.Info,desc,tag);
+		//}
 
-		///<summary>Updates local listener heartbeat to an invalid critical state. OD will instantly begin seeing alert indicators.</summary>
-		public static void SetListenerCritical(string desc) {
-			//No remoting role check necessary.
-			InsertHeartbeatFromListener(eServiceSignalSeverity.Critical,desc);
-		}
+		/////<summary>Inserts a warning signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
+		//public static void InsertWarningFromListener(string desc,string tag) {
+		//	//No remoting role check necessary.
+		//	InsertSignalFromListener(eServiceSignalSeverity.Warning,desc,tag);
+		//}
 
-		///<summary></summary>
-		private static void InsertHeartbeatFromListener(eServiceSignalSeverity status,string desc) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),status,desc);
-				return;
-			}
-			//Create a signal with the given inputs. We will make copies of this and insert/update below depending on status.
-			EServiceSignal newSignal=new EServiceSignal();
-			newSignal.Description=desc;
-			newSignal.IsProcessed=status!=eServiceSignalSeverity.Critical;
-			newSignal.ReasonCategory=0;
-			newSignal.ReasonCode=0;
-			newSignal.ServiceCode=(int)eServiceCode.ListenerService;
-			newSignal.Severity=status;
-			newSignal.Tag="";
-			newSignal.SigDateTime=DateTime.Now;
-			//Get the previous signal so we can compare it with our new status.
-			EServiceSignal lastSignal=Crud.EServiceSignalCrud.SelectOne(
-				"SELECT * FROM eservicesignal "+
-				"WHERE "+
-				//Working or critical only.
-				"(Severity="+POut.Int((int)eServiceSignalSeverity.Critical)+" OR Severity="+POut.Int((int)eServiceSignalSeverity.Working)+") "+
-				//Listener service only.
-				"AND ServiceCode="+POut.Int((int)eServiceCode.ListenerService)+" "+
-				//Latest.
-				"ORDER BY SigDateTime DESC "+
-				"LIMIT 1");
-			if(lastSignal==null) { //First ever signal for this service.
-				//Insert the original, this will be frozen in time.
-				Insert(newSignal);
-				//Insert a copy, this will be updated with each subsequent timestamp.
-				EServiceSignal currentSignal=newSignal.Copy();
-				currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
-				Insert(currentSignal);
-				return;
-			}
-			if(status==eServiceSignalSeverity.Working) {
-				if(lastSignal.Severity==eServiceSignalSeverity.Working) {
-					//We were working before and we are still working so just update last working signal with current timestamp.
-					lastSignal.SigDateTime=DateTime.Now;
-					Update(lastSignal);
-					return;
-				}
-				//We were NOT working before but now we are working.
+		/////<summary>Inserts an error signal. This will be entered as IsProcessed=true to no user intervention is required.</summary>
+		//public static void InsertErrorFromListener(string desc,string tag) {
+		//	//No remoting role check necessary.
+		//	InsertSignalFromListener(eServiceSignalSeverity.Error,desc,tag);
+		//}
 
-				//todo: we are now officially working so should we set all previous IsProcessed=true??? 
+		/////<summary>Only used internally for Info, Warning, Error. Working and Critical should use InsertHeartbeatFromListener.</summary>
+		//private static void InsertSignalFromListener(eServiceSignalSeverity status,string desc,string tag) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		Meth.GetVoid(MethodBase.GetCurrentMethod(),status,desc,tag);
+		//		return;
+		//	}
+		//	//Create a signal with the given inputs. We will make copies of this and insert/update below depending on status.
+		//	EServiceSignal newSignal=new EServiceSignal();
+		//	newSignal.Description=desc;
+		//	newSignal.IsProcessed=true;
+		//	newSignal.ReasonCategory=0;
+		//	newSignal.ReasonCode=0;
+		//	newSignal.ServiceCode=(int)eServiceCode.ListenerService;
+		//	newSignal.Severity=status;
+		//	newSignal.Tag=tag;
+		//	newSignal.SigDateTime=DateTime.Now;
+		//	Insert(newSignal);
+		//}
 
-				//Insert a working signal which will NOT get updated in the future. It will be frozen in time.
-				Insert(newSignal);
-				//Insert a copy, this will be updated with each subsequent timestamp.
-				EServiceSignal currentSignal=newSignal.Copy();
-				currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
-				Insert(currentSignal);
+		/////<summary>Updates local listener heartbeat to a valid working state. Any previous alert indicators in OD will be silenced automatically.</summary>
+		//public static void SetListenerWorking(string desc) {
+		//	//No remoting role check necessary.
+		//	InsertHeartbeatFromListener(eServiceSignalSeverity.Working,desc);
+		//}
 
-				return;
-			}
-			else if(status==eServiceSignalSeverity.Critical) {
-				if(lastSignal.Severity==eServiceSignalSeverity.Critical) {
-					//We were critical before and we are still critical so just update last critical signal with current timestamp.
-					lastSignal.SigDateTime=DateTime.Now;
-					Update(lastSignal);
-					return;
-				}
-				//We were NOT critical before but now we are critical.
-				//Insert a critical signal which will NOT get updated in the future. It will be frozen in time.
-				Insert(newSignal);
-				//Insert a copy, this will be updated with each subsequent timestamp.
-				EServiceSignal currentSignal=newSignal.Copy();
-				currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
-				Insert(currentSignal);
+		/////<summary>Updates local listener heartbeat to an invalid critical state. OD will instantly begin seeing alert indicators.</summary>
+		//public static void SetListenerCritical(string desc) {
+		//	//No remoting role check necessary.
+		//	InsertHeartbeatFromListener(eServiceSignalSeverity.Critical,desc);
+		//}
 
-				//todo: set all previous criticals to IsProcessed=true				
-				return;
-			}
-			else { //Some other status so just insert it. Won't affect working/critical flags.
-				Insert(newSignal);
-			}
-		}
+		/////<summary></summary>
+		//private static void InsertHeartbeatFromListener(eServiceSignalSeverity status,string desc) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		Meth.GetVoid(MethodBase.GetCurrentMethod(),status,desc);
+		//		return;
+		//	}
+		//	//Create a signal with the given inputs. We will make copies of this and insert/update below depending on status.
+		//	EServiceSignal newSignal=new EServiceSignal();
+		//	newSignal.Description=desc;
+		//	newSignal.IsProcessed=status!=eServiceSignalSeverity.Critical;
+		//	newSignal.ReasonCategory=0;
+		//	newSignal.ReasonCode=0;
+		//	newSignal.ServiceCode=(int)eServiceCode.ListenerService;
+		//	newSignal.Severity=status;
+		//	newSignal.Tag="";
+		//	newSignal.SigDateTime=DateTime.Now;
+		//	//Get the previous signal so we can compare it with our new status.
+		//	EServiceSignal lastSignal=Crud.EServiceSignalCrud.SelectOne(
+		//		"SELECT * FROM eservicesignal "+
+		//		"WHERE "+
+		//		//Working or critical only.
+		//		"(Severity="+POut.Int((int)eServiceSignalSeverity.Critical)+" OR Severity="+POut.Int((int)eServiceSignalSeverity.Working)+") "+
+		//		//Listener service only.
+		//		"AND ServiceCode="+POut.Int((int)eServiceCode.ListenerService)+" "+
+		//		//Latest.
+		//		"ORDER BY SigDateTime DESC "+
+		//		"LIMIT 1");
+		//	if(lastSignal==null) { //First ever signal for this service.
+		//		//Insert the original, this will be frozen in time.
+		//		Insert(newSignal);
+		//		//Insert a copy, this will be updated with each subsequent timestamp.
+		//		EServiceSignal currentSignal=newSignal.Copy();
+		//		currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
+		//		Insert(currentSignal);
+		//		return;
+		//	}
+		//	if(status==eServiceSignalSeverity.Working) {
+		//		if(lastSignal.Severity==eServiceSignalSeverity.Working) {
+		//			//We were working before and we are still working so just update last working signal with current timestamp.
+		//			lastSignal.SigDateTime=DateTime.Now;
+		//			Update(lastSignal);
+		//			return;
+		//		}
+		//		//We were NOT working before but now we are working.
+
+		//		//todo: we are now officially working so should we set all previous IsProcessed=true??? 
+
+		//		//Insert a working signal which will NOT get updated in the future. It will be frozen in time.
+		//		Insert(newSignal);
+		//		//Insert a copy, this will be updated with each subsequent timestamp.
+		//		EServiceSignal currentSignal=newSignal.Copy();
+		//		currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
+		//		Insert(currentSignal);
+
+		//		return;
+		//	}
+		//	else if(status==eServiceSignalSeverity.Critical) {
+		//		if(lastSignal.Severity==eServiceSignalSeverity.Critical) {
+		//			//We were critical before and we are still critical so just update last critical signal with current timestamp.
+		//			lastSignal.SigDateTime=DateTime.Now;
+		//			Update(lastSignal);
+		//			return;
+		//		}
+		//		//We were NOT critical before but now we are critical.
+		//		//Insert a critical signal which will NOT get updated in the future. It will be frozen in time.
+		//		Insert(newSignal);
+		//		//Insert a copy, this will be updated with each subsequent timestamp.
+		//		EServiceSignal currentSignal=newSignal.Copy();
+		//		currentSignal.SigDateTime=newSignal.SigDateTime.AddSeconds(1);
+		//		Insert(currentSignal);
+
+		//		//todo: set all previous criticals to IsProcessed=true				
+		//		return;
+		//	}
+		//	else { //Some other status so just insert it. Won't affect working/critical flags.
+		//		Insert(newSignal);
+		//	}
+		//}
 
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
