@@ -21,7 +21,7 @@ namespace OpenDentBusiness {
 		public string Description;
 		///<summary>Time signal was sent.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
-		public DateTime TimeStamp;
+		public DateTime SigDateTime;
 		///<summary>Used to store serialized data that can be used for processing this signal.</summary>
 		public string Tag;
 		///<summary>After a message has been processed or acknowledged this is set true.</summary>
