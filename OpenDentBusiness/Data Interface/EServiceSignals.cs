@@ -14,7 +14,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode,dateStart,dateStop);
 			}
 			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
-				+" AND TimeStamp BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateStop.Date.AddDays(1))+" ORDER BY TimeStamp DESC";
+				+" AND SigDateTime BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateStop.Date.AddDays(1))+" ORDER BY SigDateTime DESC";
 			return Crud.EServiceSignalCrud.SelectMany(command);
 		}
 
@@ -24,7 +24,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<eServiceSignalSeverity>(MethodBase.GetCurrentMethod(),serviceCode);
 			}
 			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
-				+" AND Severity!=1 ORDER BY TimeStamp DESC "+DbHelper.LimitWhere(1);//ignore "info" statuses.
+				+" AND Severity!=1 ORDER BY SigDateTime DESC "+DbHelper.LimitWhere(1);//ignore "info" statuses.
 			List<EServiceSignal> listSignal=Crud.EServiceSignalCrud.SelectMany(command);
 			if(listSignal.Count==0) {
 				//NoSignals exist for this service.
@@ -129,7 +129,7 @@ namespace OpenDentBusiness{
 				//Listener service only.
 				"AND ServiceCode="+POut.Int((int)eServiceCode.ListenerService)+" "+
 				//Latest.
-				"ORDER BY TimeStamp DESC "+
+				"ORDER BY SigDateTime DESC "+
 				"LIMIT 1");
 			if(lastSignal==null) { //First ever signal for this service.
 				//Insert the original, this will be frozen in time.

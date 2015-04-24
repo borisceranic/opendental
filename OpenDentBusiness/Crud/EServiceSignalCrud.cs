@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				eServiceSignal.ReasonCode       = PIn.Int   (table.Rows[i]["ReasonCode"].ToString());
 				eServiceSignal.Severity         = (OpenDentBusiness.eServiceSignalSeverity)PIn.Int(table.Rows[i]["Severity"].ToString());
 				eServiceSignal.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				eServiceSignal.TimeStamp        = PIn.DateT (table.Rows[i]["TimeStamp"].ToString());
+				eServiceSignal.SigDateTime      = PIn.DateT (table.Rows[i]["SigDateTime"].ToString());
 				eServiceSignal.Tag              = PIn.String(table.Rows[i]["Tag"].ToString());
 				eServiceSignal.IsProcessed      = PIn.Bool  (table.Rows[i]["IsProcessed"].ToString());
 				retVal.Add(eServiceSignal);
@@ -95,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EServiceSignalNum,";
 			}
-			command+="ServiceCode,ReasonCategory,ReasonCode,Severity,Description,TimeStamp,Tag,IsProcessed) VALUES(";
+			command+="ServiceCode,ReasonCategory,ReasonCode,Severity,Description,SigDateTime,Tag,IsProcessed) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(eServiceSignal.EServiceSignalNum)+",";
 			}
@@ -105,7 +105,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (eServiceSignal.ReasonCode)+","
 				+    POut.Int   ((int)eServiceSignal.Severity)+","
 				+"'"+POut.String(eServiceSignal.Description)+"',"
-				+    POut.DateT (eServiceSignal.TimeStamp)+","
+				+    POut.DateT (eServiceSignal.SigDateTime)+","
 				+"'"+POut.String(eServiceSignal.Tag)+"',"
 				+    POut.Bool  (eServiceSignal.IsProcessed)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
@@ -125,7 +125,7 @@ namespace OpenDentBusiness.Crud{
 				+"ReasonCode       =  "+POut.Int   (eServiceSignal.ReasonCode)+", "
 				+"Severity         =  "+POut.Int   ((int)eServiceSignal.Severity)+", "
 				+"Description      = '"+POut.String(eServiceSignal.Description)+"', "
-				+"TimeStamp        =  "+POut.DateT (eServiceSignal.TimeStamp)+", "
+				+"SigDateTime      =  "+POut.DateT (eServiceSignal.SigDateTime)+", "
 				+"Tag              = '"+POut.String(eServiceSignal.Tag)+"', "
 				+"IsProcessed      =  "+POut.Bool  (eServiceSignal.IsProcessed)+" "
 				+"WHERE EServiceSignalNum = "+POut.Long(eServiceSignal.EServiceSignalNum);
@@ -155,9 +155,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(eServiceSignal.Description)+"'";
 			}
-			if(eServiceSignal.TimeStamp != oldEServiceSignal.TimeStamp) {
+			if(eServiceSignal.SigDateTime != oldEServiceSignal.SigDateTime) {
 				if(command!=""){ command+=",";}
-				command+="TimeStamp = "+POut.DateT(eServiceSignal.TimeStamp)+"";
+				command+="SigDateTime = "+POut.DateT(eServiceSignal.SigDateTime)+"";
 			}
 			if(eServiceSignal.Tag != oldEServiceSignal.Tag) {
 				if(command!=""){ command+=",";}

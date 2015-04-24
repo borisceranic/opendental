@@ -7965,13 +7965,12 @@ namespace OpenDentBusiness {
 						ReasonCode int NOT NULL,
 						Severity tinyint NOT NULL,
 						Description varchar(255) NOT NULL,
-						TimeStamp datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						SigDateTime datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						Tag varchar(255) NOT NULL,
 						IsProcessed tinyint NOT NULL
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				}
-				else {//oracle
+				} else {//oracle
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE eservicesignal'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE eservicesignal (
@@ -7981,7 +7980,7 @@ namespace OpenDentBusiness {
 						ReasonCode number(11) NOT NULL,
 						Severity number(3) NOT NULL,
 						Description varchar2(255),
-						TimeStamp date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						SigDateTime date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						Tag varchar2(255),
 						IsProcessed number(3) NOT NULL,
 						CONSTRAINT eservicesignal_EServiceSignalN PRIMARY KEY (EServiceSignalNum)
@@ -8241,7 +8240,3 @@ namespace OpenDentBusiness {
 				
 
 
-
-				
-
-				
