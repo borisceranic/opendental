@@ -24,7 +24,7 @@ namespace OpenDentBusiness {
 		public DateTime SigDateTime;
 		///<summary>Used to store serialized data that can be used for processing this signal.</summary>
 		public string Tag;
-		///<summary>After a message has been processed or acknowledged this is set true.</summary>
+		///<summary>After a message has been processed or acknowledged this is set true. Not currently used for heartbeat or service status signals.</summary>
 		public bool IsProcessed;
 
 		///<summary></summary>
