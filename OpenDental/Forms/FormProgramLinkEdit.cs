@@ -382,6 +382,7 @@ namespace OpenDental{
 			pathOverrideOld=ProgramProperties.GetLocalPathOverrideForProgram(ProgramCur.ProgramNum);
 			textOverride.Text=pathOverrideOld;
 			FillForm();
+			ShowPopup();
 		}
 
 		private void FillForm(){
@@ -408,6 +409,19 @@ namespace OpenDental{
 				textButtonText.Text=itemsForProgram[0].ButtonText;
 			}
 			FillGrid();
+		}
+
+		///<summary>Used to display popus and warning for specific bridges.
+		///For example, we want to encourage all users to use the VixWinNumbered bridge instead of any of the other vixwin bridges.</summary>
+		private void ShowPopup() {
+			switch(ProgramCur.ProgName) {
+				case "VixWin"://ProgramName.VixWin
+				case "VixWinOld"://ProgramName.VixWinOld
+				case "VixWinBase36"://ProgramName.VixWinBase36
+				case "VixWinBase41"://ProgramName.VixWinBase41
+					MsgBox.Show(this,"This VixWin bridge is outdated. You should instead consider using the \"VixWin(numbered)\" bridge. See the online manual for details.");
+					break;
+			}
 		}
 
 		private void FillGrid(){
