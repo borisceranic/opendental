@@ -9,7 +9,7 @@ namespace OpenDentBusiness{
 	public class EServiceSignals {
 		
 		///<summary>returns all eServiceSignals for a given service within the date range, inclusive.</summary>
-		private static List<EServiceSignal> GetServiceHistory(eServiceCode serviceCode,DateTime dateStart,DateTime dateStop) {
+		public static List<EServiceSignal> GetServiceHistory(eServiceCode serviceCode,DateTime dateStart,DateTime dateStop) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode,dateStart,dateStop);
 			}
@@ -19,7 +19,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Ignores eServiceStatus.Info. Returns the last known status for the given eService.</summary>
-		private static eServiceSignalSeverity GetServiceStatus(eServiceCode serviceCode) {
+		public static eServiceSignalSeverity GetServiceStatus(eServiceCode serviceCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<eServiceSignalSeverity>(MethodBase.GetCurrentMethod(),serviceCode);
 			}
