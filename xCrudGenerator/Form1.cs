@@ -49,7 +49,7 @@ namespace xCrudGenerator {
 			Type typeTableBase=typeof(TableBase);
 			Assembly assembly=Assembly.GetAssembly(typeTableBase);
 			foreach(Type typeClass in assembly.GetTypes()){
-				if(typeClass.BaseType==typeTableBase) {
+				if(typeClass.IsSubclassOf(typeTableBase)) {
 					if(CrudGenHelper.IsMobile(typeClass)){
 						tableTypesM.Add(typeClass);	
 					}
