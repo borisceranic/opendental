@@ -34,40 +34,43 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectOne(emailAttachNum);
 		}
 
-		///<summary>Creates the file name to be used for an attachment when given the display name of the file.  Uses time stamps and random strings to virtually guarantee file name uniqueness, although does not truly guarantee a unique file name.</summary>
-		private static string CreateActualFileName(string displayFileName) {
-			//Display name is tacked onto actual file name last as to ensure file extensions are the same.
-			return DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()
-				+"_"+MiscUtils.CreateRandomAlphaNumericString(4)+"_"+displayFileName;
+		///<summary>Throws exceptions.  Creates a new file within the Out subfolder of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  The displayFileName should not be blank because it is what the user sees.  The actual file name will be partially based on the displayFileName, so that the actual files are easier to locate.</summary>
+		public static EmailAttach CreateAttach(string displayedFileName,byte[] arrayData) {
+			return CreateAttach(displayedFileName,"",arrayData,true);
 		}
 
-		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  The displayFileName is what the user sees.  The actual file name of the saved file is partially based on the displayFileName, so that the actual files are easier to locate.</summary>
-		public static EmailAttach CreateAttach(string displayFileName,byte[] arrayData) {
+		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  If isOutbound is true, then the file will be saved to the "Out" subfolder, otherwise the file will be saved to the "In" subfolder.  The displayFileName should not be blank because it is what the user sees.  If a file already exists matching the actualFileName, then an exception will occur.  Set actualFileName to empty string to generate a unique actual file name.  If the actual file name is generated, then the name will be partially based on the displayFileName, so that the actual files are easier to locate.</summary>
+		public static EmailAttach CreateAttach(string displayedFileName,string actualFileName,byte[] arrayData,bool isOutbound) {
 			//No need to check RemotingRole; no call to db.
-			string displayFileNameAdjusted=displayFileName;
-			if(String.IsNullOrEmpty(displayFileName)) {
+			EmailAttach emailAttach=new EmailAttach();
+			emailAttach.DisplayedFileName=displayedFileName;
+			if(String.IsNullOrEmpty(emailAttach.DisplayedFileName)) {
 				//This could only happen for malformed incoming emails, but should not happen.  Name uniqueness is virtually guaranteed below.
 				//The actual file name will not have an extension, so the user will be asked to pick the program to open the attachment with when
 				//the attachment is double-clicked.
-				displayFileNameAdjusted="attach";
+				emailAttach.DisplayedFileName="attach";
 			}
 			string attachDir=GetAttachPath();
-			string actualFileName=CreateActualFileName(displayFileNameAdjusted);
-			string attachFilePath=ODFileUtils.CombinePaths(attachDir,actualFileName);
-			while(File.Exists(attachFilePath)) {
-				actualFileName=CreateActualFileName(displayFileNameAdjusted);
-				attachFilePath=ODFileUtils.CombinePaths(attachDir,actualFileName);
+			string subDir="In";
+			if(isOutbound) {
+				subDir="Out";
 			}
-			return CreateAttachQuick(displayFileName,actualFileName,arrayData);
-		}
-
-		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  The displayFileName is what the user sees.  If a file already exists matching the actualFileName, then an exception will occur.</summary>
-		private static EmailAttach CreateAttachQuick(string displayFileName,string actualFileName,byte[] arrayData) {
-			//No need to check RemotingRole; no call to db.
-			EmailAttach emailAttach=new EmailAttach();
-			emailAttach.DisplayedFileName=displayFileName;
-			emailAttach.ActualFileName=actualFileName;
-			string attachFilePath=ODFileUtils.CombinePaths(GetAttachPath(),emailAttach.ActualFileName);
+			if(!Directory.Exists(ODFileUtils.CombinePaths(attachDir,subDir))) {
+				Directory.CreateDirectory(ODFileUtils.CombinePaths(attachDir,subDir));
+			}
+			if(String.IsNullOrEmpty(actualFileName)) {
+				while(String.IsNullOrEmpty(emailAttach.ActualFileName) || File.Exists(ODFileUtils.CombinePaths(attachDir,emailAttach.ActualFileName))) {
+					//Display name is tacked onto actual file name last as to ensure file extensions are the same.
+					emailAttach.ActualFileName=ODFileUtils.CombinePaths(subDir,
+						DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()
+							+"_"+MiscUtils.CreateRandomAlphaNumericString(4)+"_"+emailAttach.DisplayedFileName);
+				}
+			}
+			else {
+				//The caller wants a specific actualFileName.  Use the given name as is.
+				emailAttach.ActualFileName=ODFileUtils.CombinePaths(subDir,actualFileName);
+			}
+			string attachFilePath=ODFileUtils.CombinePaths(attachDir,emailAttach.ActualFileName);
 			if(File.Exists(attachFilePath)) {
 				throw new ApplicationException("Email attachment could not be saved because a file with the same name already exists.");
 			}

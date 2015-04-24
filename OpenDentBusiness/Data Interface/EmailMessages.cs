@@ -253,7 +253,7 @@ namespace OpenDentBusiness{
 				return strErrors;//Cannot recover from an encryption error.
 			}
 			outMsgEncrypted.Message.SubjectValue="Encrypted Message";//Prevents a warning in the transport testing tool (TTT). http://tools.ietf.org/html/rfc5322#section-3.6.5
-			EmailMessage emailMessageEncrypted=ConvertMessageToEmailMessage(outMsgEncrypted.Message,false);//No point in saving the encrypted attachment, because nobody can read it and it will bloat the OpenDentImages folder.
+			EmailMessage emailMessageEncrypted=ConvertMessageToEmailMessage(outMsgEncrypted.Message,false,true);//No point in saving the encrypted attachment, because nobody can read it and it will bloat the OpenDentImages folder.
 			NameValueCollection nameValueCollectionHeaders=new NameValueCollection();
 			for(int i=0;i<outMsgEncrypted.Message.Headers.Count;i++) {
 				nameValueCollectionHeaders.Add(outMsgEncrypted.Message.Headers[i].Name,outMsgEncrypted.Message.Headers[i].ValueRaw);
@@ -311,7 +311,7 @@ namespace OpenDentBusiness{
 					if(notificationMsg.ToValue.Trim().ToLower()==notificationMsg.FromValue.Trim().ToLower()) {
 						continue;//Do not send an ack to self.
 					}
-					EmailMessage emailMessage=ConvertMessageToEmailMessage(outMsgDirect.Message,false);
+					EmailMessage emailMessage=ConvertMessageToEmailMessage(outMsgDirect.Message,false,true);
 					emailMessage.PatNum=patNum;
 					//First save the ack message to the database in case their is a failure sending the email. This way we can remember to try and send it again later, based on SentOrRecieved.
 					emailMessage.SentOrReceived=EmailSentOrReceived.AckDirectNotSent;
@@ -692,7 +692,7 @@ namespace OpenDentBusiness{
 						}
 						if(isEmailFromInbox) {
 							string strRawEmail=openPopMsg.MessagePart.BodyEncoding.GetString(openPopMsg.RawMessage);
-							EmailMessage emailMessage=ProcessRawEmailMessage(strRawEmail,0,emailAddressInbox,true);//Inserts to db.
+							EmailMessage emailMessage=ProcessRawEmailMessageIn(strRawEmail,0,emailAddressInbox,true);//Inserts to db.
 							retVal.Add(emailMessage);
 							msgDownloadedCount++;
 						}
@@ -764,13 +764,13 @@ namespace OpenDentBusiness{
 		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.
 		///If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.
 		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
-		public static EmailMessage ProcessRawEmailMessage(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
+		public static EmailMessage ProcessRawEmailMessageIn(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail);
 			bool isEncrypted=IsReceivedMessageEncrypted(inMsg);
 			EmailMessage emailMessage=null;
 			if(isEncrypted) {
-				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false);//Exclude attachments until we decrypt.
+				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false,false);//Exclude attachments until we decrypt.
 				emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
 				emailMessage.EmailMessageNum=emailMessageNum;
 				emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedEncrypted;
@@ -779,14 +779,14 @@ namespace OpenDentBusiness{
 				emailMessage.BodyText=strRawEmail;
 				try {
 					inMsg=DecryptIncomingMessage(inMsg);
-					emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);//If the message was wrapped, then the To, From, Subject and Date can change after decyption. We also need to create the attachments for the decrypted message.
+					emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true,false);//If the message was wrapped, then the To, From, Subject and Date can change after decyption. We also need to create the attachments for the decrypted message.
 					emailMessage.RawEmailIn=strRawEmail;//The raw encrypted email, including the message, the attachments, and the signature.  The body of the encrypted email is just a base64 string until decrypted.
 					emailMessage.EmailMessageNum=emailMessageNum;
 					emailMessage.SentOrReceived=EmailSentOrReceived.ReceivedDirect;
 					emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
 					if(inMsg.HasSenderSignatures) {
 						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s","",inMsg.SenderSignatures[i].Certificate.GetRawCertData(),false);
 							emailMessage.Attachments.Add(emailAttach);
 						}
 					}
@@ -797,7 +797,7 @@ namespace OpenDentBusiness{
 					//We add the signature to the email message so it will show up next to the email message in the inbox and make it easier for the user to add trust for the sender.
 					if(inMsg.HasSenderSignatures) {
 						for(int i=0;i<inMsg.SenderSignatures.Count;i++) {
-							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s",inMsg.SenderSignatures[i].Certificate.GetRawCertData());
+							EmailAttach emailAttach=EmailAttaches.CreateAttach("smime.p7s","",inMsg.SenderSignatures[i].Certificate.GetRawCertData(),false);
 							emailMessage.Attachments.Add(emailAttach);
 						}
 					}
@@ -810,7 +810,7 @@ namespace OpenDentBusiness{
 				}
 			}
 			else {//Unencrypted
-				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true);
+				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true,false);
 				emailMessage.RawEmailIn=strRawEmail;
 				emailMessage.EmailMessageNum=emailMessageNum;
 				emailMessage.SentOrReceived=EmailSentOrReceived.Received;
@@ -1273,7 +1273,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Throws exceptions.  Converts the Health.Direct.Common.Mail.Message into an OD EmailMessage.  The Direct library is used for both encrypted and unencrypted email.  Set hasAttachments to false to exclude attachments.</summary>
-		private static EmailMessage ConvertMessageToEmailMessage(Health.Direct.Common.Mail.Message message,bool hasAttachments) {
+		private static EmailMessage ConvertMessageToEmailMessage(Health.Direct.Common.Mail.Message message,bool hasAttachments,bool isOutbound) {
 			//No need to check RemotingRole; no call to db.
 			EmailMessage emailMessage=new EmailMessage();
 			emailMessage.FromAddress=message.FromValue.Trim();
@@ -1373,7 +1373,7 @@ namespace OpenDentBusiness{
 					if(arrayData==null) {//Plain attachment.
 						arrayData=Encoding.UTF8.GetBytes(mimePartAttach.Body.Text);
 					}
-					EmailAttach emailAttach=EmailAttaches.CreateAttach(mimePartAttach.ParsedContentType.Name,arrayData);
+					EmailAttach emailAttach=EmailAttaches.CreateAttach(mimePartAttach.ParsedContentType.Name,"",arrayData,isOutbound);
 					emailMessage.Attachments.Add(emailAttach);//The attachment EmailMessageNum is set when the emailMessage is inserted/updated below.
 				}
 			}

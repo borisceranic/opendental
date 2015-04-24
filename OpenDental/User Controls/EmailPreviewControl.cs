@@ -266,20 +266,9 @@ namespace OpenDental.User_Controls {
 			if(dlg.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			Random rnd=new Random();
-			string newName;
-			EmailAttach attach;
-			string attachPath=EmailAttaches.GetAttachPath();
 			try {
 				for(int i=0;i<dlg.FileNames.Length;i++) {
-					//copy the file
-					newName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+Path.GetExtension(dlg.FileNames[i]);
-					File.Copy(dlg.FileNames[i],ODFileUtils.CombinePaths(attachPath,newName));
-					//create the attachment
-					attach=new EmailAttach();
-					attach.DisplayedFileName=Path.GetFileName(dlg.FileNames[i]);
-					attach.ActualFileName=newName;
-					_emailMessage.Attachments.Add(attach);
+					_emailMessage.Attachments.Add(EmailAttaches.CreateAttach(Path.GetFileName(dlg.FileNames[i]),File.ReadAllBytes(dlg.FileNames[i])));
 				}
 			}
 			catch(Exception ex) {

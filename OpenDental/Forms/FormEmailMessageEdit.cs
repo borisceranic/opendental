@@ -530,7 +530,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=emailPreview.GetEmailAddress();
 			try {
-				_emailMessage=EmailMessages.ProcessRawEmailMessage(_emailMessage.BodyText,_emailMessage.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
+				_emailMessage=EmailMessages.ProcessRawEmailMessageIn(_emailMessage.BodyText,_emailMessage.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
 				//The Direct message was decrypted.
 				EmailMessages.UpdateSentOrReceivedRead(_emailMessage);//Mark read, because we are already viewing the message within the current window.					
 				RefreshAll();
@@ -584,7 +584,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=emailPreview.GetEmailAddress();
 			try {
-				_emailMessage=EmailMessages.ProcessRawEmailMessage(_emailMessage.RawEmailIn,_emailMessage.EmailMessageNum,emailAddress,false);
+				_emailMessage=EmailMessages.ProcessRawEmailMessageIn(_emailMessage.RawEmailIn,_emailMessage.EmailMessageNum,emailAddress,false);
 				EmailMessages.UpdateSentOrReceivedRead(_emailMessage);//Mark read, because we are already viewing the message within the current window.
 				RefreshAll();
 			}
