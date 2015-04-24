@@ -40,10 +40,10 @@ namespace OpenDental {
 			}
 			if(IsNew) {
 				ListSplitsCur=AutoSplitForPayment(listPatNums,PaymentCur.PayNum,PayDate);//New payment, generated autosplits overwrites any manual/pre-existing splits.
-				textSplitAmt.Text=(PaymentAmt-_payAvailableCur).ToString("f");//Amount Paid Increases as PayAmt decreases.
+				textSplitTotal.Text=(PaymentAmt-_payAvailableCur).ToString("f");//Amount Paid Increases as PayAmt decreases.
 			}
 			else {//Existing.
-				textSplitAmt.Text=POut.Double(PaymentCur.PayAmt);
+				textSplitTotal.Text=POut.Double(PaymentCur.PayAmt);
 				if(_payAvailableCur>PaymentCur.PayAmt) {//If they increased the amount of the old payment, they want to be able to use it. 
 					_payAvailableCur=_payAvailableCur-PaymentCur.PayAmt;
 				}
@@ -55,72 +55,16 @@ namespace OpenDental {
 				//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
 				ListSplitsCur.AddRange(AutoSplitForPayment(listPatNums,PaymentCur.PayNum,PayDate));
 			}
-			FillChargeGrid();
-		}
-
-		///<summary>Fills charge grid, and then split grid.</summary>
-		private void FillChargeGrid() {
-			//Fill right-hand grid with all the charges, filtered based on checkbox.
-			textAmtAvailable.Text=_payAvailableCur.ToString("f");
-			gridCharges.BeginUpdate();
-			gridCharges.Columns.Clear();
-			ODGridColumn col;
-			col=new ODGridColumn(Lan.g(this,"Date"),65);
-			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Prov"),40);
-			gridCharges.Columns.Add(col);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-				col=new ODGridColumn(Lan.g(this,"Clinic"),40);
-				gridCharges.Columns.Add(col);
-			}
-			col=new ODGridColumn(Lan.g(this,"Patient"),75);
-			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Type"),95);
-			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Amount"),50,HorizontalAlignment.Right);
-			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Paid"),10);
-			gridCharges.Columns.Add(col);
-			gridCharges.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<_listAccountCharges.Count;i++) {
-				if(_listAccountCharges[i].AmountCur==0 && !checkShowPaid.Checked) {//Filter out those that have been paid if checkShowPaid is unchecked.
-					continue;
-				}
-				row=new ODGridRow();
-				row.Cells.Add(_listAccountCharges[i].Date.ToShortDateString());//Date
-				row.Cells.Add(Providers.GetAbbr(_listAccountCharges[i].ProvNum));//Provider
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-					row.Cells.Add(Clinics.GetDesc(_listAccountCharges[i].ClinicNum));
-				}
-				else {
-					row.Cells.Add("");
-				}
-				row.Cells.Add(Patients.GetPat(_listAccountCharges[i].PatNum).GetNameFL());
-				row.Cells.Add(_listAccountCharges[i].GetType().Name);//Type
-				if(_listAccountCharges[i].GetType()==typeof(Procedure)) {
-					//Get the proc and add its description if the row is a proc.
-					Procedure proc=(Procedure)_listAccountCharges[i].Tag;
-					row.Cells[row.Cells.Count-1].Text+=": "+Procedures.GetDescription(proc);
-				}
-				row.Tag=_listAccountCharges[i].Tag;
-				row.Cells.Add(_listAccountCharges[i].AmountCur.ToString("f"));//Amount
-				if(_listAccountCharges[i].AmountCur==0) {
-					row.Cells.Add("X");//Paid
-				}
-				gridCharges.Rows.Add(row);
-			}
-			gridCharges.EndUpdate();
-			FillSplitGrid();
+			FillGridCharges();
 		}
 
 		///<summary>Fills the paysplit grid.</summary>
-		private void FillSplitGrid() {
+		private void FillGridSplits() {
 			//Fill left grid with paysplits created, highlight procs on right.
 			gridSplits.BeginUpdate();
 			gridSplits.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn(Lan.g(this,"Date"),70);
+			col=new ODGridColumn(Lan.g(this,"Date"),65,HorizontalAlignment.Center);
 			gridSplits.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Prov"),40);
 			gridSplits.Columns.Add(col);
@@ -128,16 +72,24 @@ namespace OpenDental {
 				col=new ODGridColumn(Lan.g(this,"Clinic"),40);
 				gridSplits.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g(this,"Patient"),80);
+			col=new ODGridColumn(Lan.g(this,"Patient"),100);
 			gridSplits.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Type"),100);
 			gridSplits.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Amount"),50,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Amount"),55,HorizontalAlignment.Right);
 			gridSplits.Columns.Add(col);
 			gridSplits.Rows.Clear();
 			ODGridRow row;
+			double splitTotal=0;
 			for(int i=0;i<ListSplitsCur.Count;i++) {
+				splitTotal+=ListSplitsCur[i].SplitAmt;
 				row=new ODGridRow();
+				for(int j=0;j<_listAccountCredits.Count;j++) {
+					if(_listAccountCredits[j].GetType()==typeof(PaySplit) && _listAccountCredits[j].Tag==ListSplitsCur[i]) {
+						row.Tag=_listAccountCredits[j];
+						break;
+					}
+				}
 				row.Cells.Add(ListSplitsCur[i].DatePay.ToShortDateString());//Date
 				row.Cells.Add(Providers.GetAbbr(ListSplitsCur[i].ProvNum));//Prov
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
@@ -161,10 +113,65 @@ namespace OpenDental {
 					row.Cells.Add("Adjustment");//Type
 				}
 				row.Cells.Add(ListSplitsCur[i].SplitAmt.ToString("f"));//Amount
-				row.Tag=ListSplitsCur[i];
 				gridSplits.Rows.Add(row);
 			}
+			textSplitTotal.Text=POut.Double(splitTotal);
 			gridSplits.EndUpdate();
+		}
+
+		///<summary>Fills charge grid, and then split grid.</summary>
+		private void FillGridCharges() {
+			//Fill right-hand grid with all the charges, filtered based on checkbox.
+			gridCharges.BeginUpdate();
+			gridCharges.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn(Lan.g(this,"Date"),65);
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Prov"),40);
+			gridCharges.Columns.Add(col);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+				col=new ODGridColumn(Lan.g(this,"Clinic"),40);
+				gridCharges.Columns.Add(col);
+			}
+			col=new ODGridColumn(Lan.g(this,"Patient"),100);
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Type"),100);
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Amount"),55,HorizontalAlignment.Right);
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Paid"),12,HorizontalAlignment.Center);
+			gridCharges.Columns.Add(col);
+			gridCharges.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_listAccountCharges.Count;i++) {
+				if(_listAccountCharges[i].AmountCur==0 && !checkShowPaid.Checked) {//Filter out those that have been paid if checkShowPaid is unchecked.
+					continue;
+				}
+				row=new ODGridRow();
+				row.Tag=_listAccountCharges[i];
+				row.Cells.Add(_listAccountCharges[i].Date.ToShortDateString());//Date
+				row.Cells.Add(Providers.GetAbbr(_listAccountCharges[i].ProvNum));//Provider
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+					row.Cells.Add(Clinics.GetDesc(_listAccountCharges[i].ClinicNum));
+				}
+				else {
+					row.Cells.Add("");
+				}
+				row.Cells.Add(Patients.GetPat(_listAccountCharges[i].PatNum).GetNameFL());
+				row.Cells.Add(_listAccountCharges[i].GetType().Name);//Type
+				if(_listAccountCharges[i].GetType()==typeof(Procedure)) {
+					//Get the proc and add its description if the row is a proc.
+					Procedure proc=(Procedure)_listAccountCharges[i].Tag;
+					row.Cells[row.Cells.Count-1].Text+=": "+Procedures.GetDescription(proc);
+				}
+				row.Cells.Add(_listAccountCharges[i].AmountCur.ToString("f"));//Amount
+				if(_listAccountCharges[i].AmountCur==0) {
+					row.Cells.Add("X");//Paid
+				}
+				gridCharges.Rows.Add(row);
+			}
+			gridCharges.EndUpdate();
+			FillGridSplits();
 		}
 
 		///<summary>Creates and paysplits associated to the patient passed in for the payment passed in until the payAmt has been met.  
@@ -179,6 +186,15 @@ namespace OpenDental {
 			List<Adjustment> listNegAdjustments=Adjustments.GetAdjustForPats(listPatNums,false);
 			List<Adjustment> listPosAdjustments=Adjustments.GetAdjustForPats(listPatNums,true);
 			List<PaySplit> listPaySplits=PaySplits.GetForPats(listPatNums);//Might contain payplan payments.
+			//Fix the memory locations of the existing pay splits for this payment within the list of pay splits for the entire family.
+			//This is necessary for associating the correct tag values to grid rows.
+			for(int i=0;i<listPaySplits.Count;i++) {
+				for(int j=0;j<ListSplitsCur.Count;j++) {
+					if(listPaySplits[i].SplitNum==ListSplitsCur[j].SplitNum) {
+						listPaySplits[i]=ListSplitsCur[j];
+					}
+				}
+			}
 			List<ClaimProc> listInsPayAsTotal=ClaimProcs.GetByTotForPats(listPatNums);//Claimprocs paid as total, might contain ins payplan payments.
 			List<PayPlan> listPayPlans=PayPlans.GetForPats(listPatNums,PatCur.PatNum);//Used to figure out how much we need to pay off procs with, also contains insurance payplans.
 			List<PayPlanCharge> listPayPlanCharges=new List<PayPlanCharge>();
@@ -285,10 +301,8 @@ namespace OpenDental {
 					if(charge.AmountCur<=0 || credit.AmountCur<=0) {//The charge.AmountCur can change as we look through the credits.
 						continue;//The credit has already been used.  May have been set to 0 for a previous owed item.
 					}
-					if(credit.GetType()==typeof(PayPlan) && charge.GetType()==typeof(PayPlanCharge)) {
-						//These are skipped because payplancharges are paid by splits and adjustments only.
-						//The payplan creates an immediate credit for the patient account, but not the payment plan (the payment plan is credited over time).
-						continue;
+					if(charge.GetType()==typeof(PayPlanCharge)) {
+						continue;//These are skipped because payplancharges are paid explicitly by splits only.
 					}
 					ApplyCredit(charge,credit);
 				}
@@ -349,66 +363,29 @@ namespace OpenDental {
 			credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
 		}
 
-		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.</summary>
-		private double CreateSplit(ODGridRow row,double payAmt,bool strict) {
-			double chargeAmt=PIn.Double(row.Cells[5].Text);
-			if((chargeAmt<=0 || payAmt<=0) && strict) {//They selected a paid row or the amount they want to pay with is empty, skip it.
-				return payAmt;
-			}
-			if(payAmt>_payAvailableCur) {//They tried to enter in a partial payment for more than was remaining on the payment. Reduce it down.
-				payAmt=_payAvailableCur;
-			}
+		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.  If payAmt=0, pay charge in full.</summary>
+		private void CreateSplit(AccountEntry charge,double payAmt) {
 			PaySplit split=new PaySplit();
 			split.DatePay=DateTime.Today;
-			AccountEntry charge=null;
-			if(row.Tag.GetType()==typeof(Procedure)) {//Row selected is a Procedure.
-				Procedure proc=(Procedure)row.Tag;
-				for(int j=0;j<_listAccountCharges.Count;j++) {//Go through charges and find the charge entry for this Procedure.
-					if(_listAccountCharges[j].PriKey!=proc.ProcNum || _listAccountCharges[j].GetType()!=typeof(Procedure)) {
-						continue;
-					}
-					else {
-						charge=_listAccountCharges[j];
-						split.ProcNum=charge.PriKey;
-						break;
-					}					
-				}
+			if(charge.GetType()==typeof(Procedure)) {//Row selected is a Procedure.
+				Procedure proc=(Procedure)charge.Tag;
+				split.ProcNum=charge.PriKey;
 			}
-			else if(row.Tag.GetType()==typeof(PayPlanCharge)) {//Row selected is a PayPlanCharge.
-				PayPlanCharge payPlanCharge=(PayPlanCharge)row.Tag;
-				for(int j=0;j<_listAccountCharges.Count;j++) {//Go through charges and find the charge entry for this PayPlanCharge.
-					if(_listAccountCharges[j].PriKey!=payPlanCharge.PayPlanChargeNum || _listAccountCharges[j].GetType()!=typeof(PayPlanCharge)) {
-						continue;
-					}
-					else {
-						charge=_listAccountCharges[j];
-						split.PayPlanNum=payPlanCharge.PayPlanNum;
-						break;
-					}					
-				}
+			else if(charge.GetType()==typeof(PayPlanCharge)) {//Row selected is a PayPlanCharge.
+				PayPlanCharge payPlanCharge=(PayPlanCharge)charge.Tag;
+				split.PayPlanNum=payPlanCharge.PayPlanNum;
 			}
-			else if(row.Tag.GetType()==typeof(Adjustment)) {//Row selected is an Adjustment.
-				Adjustment adjust=(Adjustment)row.Tag;
-				for(int j=0;j<_listAccountCharges.Count;j++) {//Go through charges to find the charge entry for this Adjustment.
-					if(_listAccountCharges[j].PriKey!=adjust.AdjNum || _listAccountCharges[j].GetType()!=typeof(Adjustment)) {
-						continue;
-					}
-					else {
-						charge=_listAccountCharges[j];
-						break;
-					}
-				}
+			else if(charge.Tag.GetType()==typeof(Adjustment)) {//Row selected is an Adjustment.
+				//Do nothing, nothing to link.
 			}
-			double amtOwed=charge.AmountCur;
-			if(amtOwed<payAmt) {//Partial payment
-				payAmt-=amtOwed;
+			double chargeAmt=charge.AmountCur;
+			if(chargeAmt<payAmt || payAmt==0) {//Full payment of charge
+				split.SplitAmt=chargeAmt;
 				charge.AmountCur=0;//Reflect payment in underlying datastructure
-				split.SplitAmt=amtOwed;
 			}
-			else {//Full payment
-				charge.AmountCur=amtOwed-payAmt;
+			else {//Partial payment of charge
+				charge.AmountCur-=payAmt;
 				split.SplitAmt=payAmt;
-				payAmt=0;
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
 				split.ClinicNum=charge.ClinicNum;
@@ -421,93 +398,65 @@ namespace OpenDental {
 			credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
 			_listAccountCredits.Add(credit);
 			ListSplitsCur.Add(split);
-			if(strict) {
-				textSplitAmt.Text=(PIn.Double(textSplitAmt.Text)+split.SplitAmt).ToString("f");
-				_payAvailableCur-=split.SplitAmt;
-			}
-			else {
-				textSplitAmt.Text=(PIn.Double(textSplitAmt.Text)+payAmt).ToString("f");
-				_payAvailableCur-=payAmt;
-			}
-			return payAmt;
 		}
 
 		///<summary>Deletes selected paysplits from the grid and attributes amounts back to where they originated from.</summary>
 		private void DeleteSelected() {
-			if(gridSplits.SelectedIndices.Length==0) {
-				return;
-			}
 			for(int i=gridSplits.SelectedIndices.Length-1;i>=0;i--) {
-				PaySplit split=ListSplitsCur[gridSplits.SelectedIndices[i]];
-				_payAvailableCur+=split.SplitAmt;
-				textSplitAmt.Text=(PIn.Double(textSplitAmt.Text)-split.SplitAmt).ToString("f");
-				List<long> listChargeAccountEntryNums=new List<long>();
-				for(int j=0;j<_listAccountCredits.Count;j++) {
-					AccountEntry credit=_listAccountCredits[j];
-					if(credit.GetType()==typeof(PaySplit) && credit.PriKey==split.SplitNum) {//Found the split being deleted, find what it's attached to.
-						listChargeAccountEntryNums=credit.ListChargeAccountEntryNums;//Typically will only be one entry unless it was implicitly linked to several charges.
-						_listAccountCredits.RemoveAt(j);
-						break;
-					}
-				}
+				int idx=gridSplits.SelectedIndices[i];
+				AccountEntry selectedCredit=(AccountEntry)gridSplits.Rows[idx].Tag;
+				_listAccountCredits.Remove(selectedCredit);
+				List<long> listChargeAccountEntryNums=selectedCredit.ListChargeAccountEntryNums;
 				for(int j=0;j<_listAccountCharges.Count;j++) {
 					AccountEntry charge=_listAccountCharges[j];
 					if(!listChargeAccountEntryNums.Contains(charge.AccountEntryNum))	{
 						continue;
 					}
-					double chargeAmtNew=charge.AmountCur+split.SplitAmt;
+					double chargeAmtNew=charge.AmountCur+selectedCredit.AmountCur;
 					if(chargeAmtNew>charge.AmountOriginal) {//Trying to delete an overpayment, just increase charge's amount to the max.
 						charge.AmountCur=charge.AmountOriginal;
 					}
 					else {
-						charge.AmountCur+=split.SplitAmt;//Give the money back to the charge so it will display.
+						charge.AmountCur+=selectedCredit.AmountCur;//Give the money back to the charge so it will display.
 					}
 				}
-				ListSplitsCur.RemoveAt(gridSplits.SelectedIndices[i]);
+				ListSplitsCur.Remove((PaySplit)selectedCredit.Tag);
+				gridSplits.Rows.RemoveAt(idx);
 			}
+			FillGridCharges();
 		}
 		
 		///<summary>Allows editing of an individual double clicked paysplit entry.</summary>
 		private void gridSplits_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PaySplit paySplitOld=ListSplitsCur[e.Row];
-			PaySplit paySplitNew=paySplitOld.Copy();
+			PaySplit paySplit=paySplitOld.Copy();
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
-			FormPSE.PaySplitCur=paySplitNew;
+			FormPSE.PaySplitCur=paySplit;
 			FormPSE.IsNew=false;
-			if(FormPSE.ShowDialog()==DialogResult.OK) {//paySplitNew contains all the info we want.  
-				double splitDiff=paySplitNew.SplitAmt-paySplitOld.SplitAmt;
-				if(_payAvailableCur<splitDiff) {//New amount is greater, and it's more than the payment had left.
-					MsgBox.Show(this,"Entered amount for split is greater than amount remaining for this payment.");
-					return;
-				}
+			if(FormPSE.ShowDialog()==DialogResult.OK) {//paySplit contains all the info we want.  
+				double splitDiff=paySplit.SplitAmt-paySplitOld.SplitAmt;
 				//Delete paysplit from paysplit grid, credit the charge it's associated to.  Paysplit may be re-associated with a different charge and we wouldn't know, so we need to do this.
 				DeleteSelected();
 				if(FormPSE.PaySplitCur==null) {//Deleted the paysplit, just return here.
-					FillChargeGrid();
+					FillGridCharges();
 					return;
 				}
-				UpdateForManualSplit(paySplitNew);
+				UpdateForManualSplit(paySplit);
 			}
-			FillChargeGrid();
 		}
 
 		///<summary>Creates a manual paysplit.</summary>
-		private void butCreateManual_Click(object sender,EventArgs e) {
-			PaySplit paySplitNew=new PaySplit();
-			paySplitNew.SplitAmt=_payAvailableCur;
-			paySplitNew.DateEntry=DateTime.Today;
-			paySplitNew.DatePay=DateTime.Today;
-			paySplitNew.PayNum=PaymentCur.PayNum;
+		private void butAdd_Click(object sender,EventArgs e) {
+			PaySplit paySplit=new PaySplit();
+			paySplit.SplitAmt=0;
+			paySplit.DateEntry=DateTime.Today;
+			paySplit.DatePay=DateTime.Today;
+			paySplit.PayNum=PaymentCur.PayNum;
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
-			FormPSE.PaySplitCur=paySplitNew;
+			FormPSE.PaySplitCur=paySplit;
 			if(FormPSE.ShowDialog()==DialogResult.OK) {
-				if(_payAvailableCur-paySplitNew.SplitAmt<0) {//New amount is greater, and it's more than the payment had left.
-					MsgBox.Show(this,"Entered amount for split is greater than amount remaining for this payment.");
-					return;
-				}
-				UpdateForManualSplit(paySplitNew);
+				UpdateForManualSplit(paySplit);
 			}
-			FillChargeGrid();
 		}
 
 		///<summary>Updates the underlying data structures when a manual split is created or edited.</summary>
@@ -518,26 +467,30 @@ namespace OpenDental {
 			for(int j=0;j<listCharges.Count;j++) {
 				listPayPlanChargeNums.Add(listCharges[j].PayPlanChargeNum);
 			}
+			AccountEntry credit=new AccountEntry(paySplit);
+			_listAccountCredits.Add(credit);
+			ListSplitsCur.Add(paySplit);
+			//Locate a charge to apply the credit to, if a reasonable match exists.
 			for(int i=0;i<_listAccountCharges.Count;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				if(paySplit.ProcNum!=0 && charge.PriKey==paySplit.ProcNum) {//New Split is for this proc
-					double amtOwed=charge.AmountCur;
-					if(amtOwed<paySplit.SplitAmt) {//Partial payment
-						charge.AmountCur=0;//Reflect payment in underlying datastructure
-					}
-					else {//Full payment
-						charge.AmountCur=amtOwed-paySplit.SplitAmt;
-					}
-					AccountEntry credit=new AccountEntry(paySplit);
-					credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
-					_listAccountCredits.Add(credit);
- 					break;
+				if(charge.AmountCur<=0) {
+					continue;
+				}
+				bool isMatchFound=false;
+				if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum!=0 && charge.PriKey==paySplit.ProcNum) {//New Split is for this proc
+					isMatchFound=true;
 				}
 				else if(charge.GetType()==typeof(Adjustment) //New split is for this adjust
 						&& paySplit.ProcNum==0 && paySplit.PayPlanNum==0 //Both being 0 is the only way we can tell it's for an Adj
 						&& paySplit.ProcDate==charge.Date
 						&& paySplit.ProvNum==charge.ProvNum)
 				{
+					isMatchFound=true;
+				}
+				else if(charge.GetType()==typeof(PayPlanCharge) && listPayPlanChargeNums.Contains(charge.PriKey)) {//Payplancharge of same payplan as paysplit
+					isMatchFound=true;
+				}				
+				if(isMatchFound) {
 					double amtOwed=charge.AmountCur;
 					if(amtOwed<paySplit.SplitAmt) {//Partial payment
 						charge.AmountCur=0;//Reflect payment in underlying datastructure
@@ -545,111 +498,68 @@ namespace OpenDental {
 					else {//Full payment
 						charge.AmountCur=amtOwed-paySplit.SplitAmt;
 					}
-					AccountEntry credit=new AccountEntry(paySplit);
 					credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
-					_listAccountCredits.Add(credit); 						
-					break;
 				}
-				else if(listPayPlanChargeNums.Contains(charge.PriKey)//New split is for this PayPlanCharge
-						&& charge.GetType()==typeof(PayPlanCharge))
-				{
-					double amtOwed=charge.AmountCur;
-					if(amtOwed<paySplit.SplitAmt) {//Partial payment
-						charge.AmountCur=0;//Reflect payment in underlying datastructure
-					}
-					else {//Full payment
-						charge.AmountCur=amtOwed-paySplit.SplitAmt;
-					}
-					AccountEntry credit=new AccountEntry(paySplit);
-					credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
-					_listAccountCredits.Add(credit);
- 					break;
-				}
-				//If none of these, it's unattached to the best of our knowledge.
-			}
-			_payAvailableCur-=paySplit.SplitAmt;
-			textSplitAmt.Text=(PIn.Double(textSplitAmt.Text)+paySplit.SplitAmt).ToString("f");
-			ListSplitsCur.Add(paySplit);
+				//If none of these, it's unattached to the best of our knowledge.				
+			}			
+			FillGridCharges();//Fills credit grid too.
 		}
 
 		private void checkShowPaid_CheckedChanged(object sender,EventArgs e) {
-			FillChargeGrid();
+			FillGridCharges();
 		}
 
 		///<summary>Creates paysplits for selected charges if there is enough payment left.</summary>
-		private void butCreateSplit_Click(object sender,EventArgs e) {
-			//PayAmt needs to have an amount, only make splits for rows that have an outstanding balance.
-			if(_payAvailableCur==0) {
-				return;
-			}
-			double amt=_payAvailableCur;
-			ODGridRow row;
+		private void butAddSplit_Click(object sender,EventArgs e) {
 			for(int i=0;i<gridCharges.SelectedIndices.Length;i++) {
-				row=gridCharges.Rows[gridCharges.SelectedIndices[i]];
-				amt=CreateSplit(row,amt,true);
+				AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
+				CreateSplit(charge,0);
 			}
-			FillChargeGrid();
+			FillGridCharges();//Fills split grid too.
 		}
 
 		///<summary>Creates paysplits after allowing the user to enter in a custom amount to pay for each selected charge.</summary>
-		private void butCreatePartial_Click(object sender,EventArgs e) {
+		private void butAddPartial_Click(object sender,EventArgs e) {
 			for(int i=0;i<gridCharges.SelectedIndices.Length;i++) {
-				if(_payAvailableCur<=0) {//Only make splits if we have some available.
-					continue;
+				string chargeDescript="";
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+					chargeDescript=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[4].Text;
 				}
-				string chargeAmt=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[4].Text;
-				FormAmountEdit FormAE=new FormAmountEdit(chargeAmt);
-				string remainingAmt=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[5].Text;
-				FormAE.Amount=PIn.Double(remainingAmt);
+				else {
+					chargeDescript=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[3].Text;
+				}
+				FormAmountEdit FormAE=new FormAmountEdit(chargeDescript);
+				string remainingChargeAmt=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[5].Text;
+				FormAE.Amount=PIn.Double(remainingChargeAmt);
 				FormAE.ShowDialog();
 				if(FormAE.DialogResult==DialogResult.OK) {
 					double amount=FormAE.Amount;
 					if(amount>0) {
-						ODGridRow row=gridCharges.Rows[gridCharges.SelectedIndices[i]];
-						amount=CreateSplit(row,amount,true);
+						AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
+						CreateSplit(charge,amount);
 					}
 				}
 			}
-			FillChargeGrid();
+			FillGridCharges();//Fills split grid too.
 		}
 
 		///<summary>Deletes all paysplits.</summary>
 		private void butClearAll_Click(object sender,EventArgs e) {
 			gridSplits.SetSelected(true);
 			DeleteSelected();
-			FillChargeGrid();
 		}
 
 		///<summary>Deletes selected paysplits.</summary>
 		private void butDeleteSplit_Click(object sender,EventArgs e) {
 			DeleteSelected();
-			FillChargeGrid();
-		}
-
-		///<summary>Allows editing of the payment amount.</summary>
-		private void butEdit_Click(object sender,EventArgs e) {
-			FormAmountEdit FormAE=new FormAmountEdit("Payment Amount");
-			FormAE.Amount=PaymentAmt;
-			FormAE.ShowDialog();
-			if(FormAE.DialogResult==DialogResult.OK) {
-				double newAmount=FormAE.Amount;
-				double diff=PaymentAmt-newAmount;
-				if(_payAvailableCur<diff) {//They decreased the payment amount
-					PaymentAmt-=_payAvailableCur;//Decrease the payment amount down so the amount remaining is 0
-					textPayAmt.Text=PaymentAmt.ToString("f");
-					_payAvailableCur=0;
-				}
-				else {//They increased the payment amount or decreased it enough so the AmtRemaining isn't negative
-					PaymentAmt=newAmount;
-					textPayAmt.Text=PaymentAmt.ToString("f");
-					_payAvailableCur-=diff;
-				}
-			}
-			textAmtAvailable.Text=_payAvailableCur.ToString("f");
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			PaymentCur.PayAmt=PIn.Double(textSplitAmt.Text);
+			if(ListSplitsCur.Count>0) {
+				//If no splits entered, or the user deleted all of the existing splits, then do not change the payment amount.
+				//If there are splits, then we want to automatically set the payment amount to the total of the splits for convenience.
+				PaymentCur.PayAmt=PIn.Double(textSplitTotal.Text);
+			}
 			DialogResult=DialogResult.OK;
 		}
 
@@ -669,6 +579,7 @@ namespace OpenDental {
 
 			///<summary>No matter which constructor is used, the AccountEntryNum will be unique and automatically assigned.</summary>
 			public long AccountEntryNum=(AccountEntryAutoIncrementValue++);
+			///<summary>Read only data.  Do not modify, or else the historic information will be changed.</summary>
 			public object Tag;
 			public DateTime Date;
 			public long PriKey;

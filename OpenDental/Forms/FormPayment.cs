@@ -936,59 +936,39 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TablePaySplits","Prov"),50);
 			gridMain.Columns.Add(col);
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),170);
-				gridMain.Columns.Add(col);
-			}
-			else {//Using clinics.
-				col=new ODGridColumn(Lan.g("TablePaySplits","Clinic"),70);
-				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),100);
-				gridMain.Columns.Add(col);
-			}
-			col=new ODGridColumn(Lan.g("TablePaySplits","Type"),100);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Clinic"),70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Unearned"),60);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Patient"),130);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Amount"),50,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Procedure"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TablePaySplits","Remaining"),60);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Amount"),60,HorizontalAlignment.Right);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TablePaySplits","Unearned"),50);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			tot=0;
-			Procedure proc=null;
+			Procedure proc;
 			string procDesc;
 			for(int i=0;i<SplitList.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(SplitList[i].ProcDate.ToShortDateString());
 				row.Cells.Add(Providers.GetAbbr(SplitList[i].ProvNum));
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-					row.Cells.Add(Clinics.GetDesc(SplitList[i].ClinicNum));
-				}
+				row.Cells.Add(Clinics.GetDesc(SplitList[i].ClinicNum));
 				row.Cells.Add(FamCur.GetNameInFamFL(SplitList[i].PatNum));
 				if(SplitList[i].ProcNum>0) {
 					proc=Procedures.GetOneProc(SplitList[i].ProcNum,false);
 					procDesc=Procedures.GetDescription(proc);
-					row.Cells.Add("Proc: "+procDesc);
-				}
-				else if(SplitList[i].PayPlanNum>0) {
-					row.Cells.Add("PayPlanCharge");
+					row.Cells.Add(procDesc);
 				}
 				else {
-					row.Cells.Add("Adjustment");
+					row.Cells.Add("");
 				}
-				row.Cells.Add(DefC.GetName(DefCat.PaySplitUnearnedType,SplitList[i].UnearnedType));//handles 0 just fine
 				row.Cells.Add(SplitList[i].SplitAmt.ToString("F"));
+				row.Cells.Add(DefC.GetName(DefCat.PaySplitUnearnedType,SplitList[i].UnearnedType));//handles 0 just fine
 				tot+=SplitList[i].SplitAmt;
 				gridMain.Rows.Add(row);
-				if(proc!=null) {
-					double splitAmt=PIn.Double(PaySplits.GetTotForProc(proc.ProcNum));//This breaks if you're doing adjustment instead of procedures
-					double adjustAmt=Adjustments.GetTotForProc(proc.ProcNum);
-					if(splitAmt<proc.ProcFee+adjustAmt) {
-						row.Cells.Add(((proc.ProcFee+adjustAmt)-splitAmt).ToString("F"));
-					}
-				}
 			}
 			gridMain.EndUpdate();
 			textTotal.Text=tot.ToString("F");
@@ -1810,7 +1790,7 @@ namespace OpenDental {
 			FormPaySplitManage FormPSM=new FormPaySplitManage();
 			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
 			Family patFam=Patients.GetFamily(PatCur.PatNum);
-			FormPSM.FamCur=patFam;
+			FormPSM.FamCur=patFam; 
 			FormPSM.PatCur=PatCur;
 			FormPSM.PaymentCur=PaymentCur;
 			FormPSM.PayDate=PIn.DateT(textDate.Text);
@@ -1820,6 +1800,7 @@ namespace OpenDental {
 			if(FormPSM.DialogResult==DialogResult.OK) {
 				SplitList=FormPSM.ListSplitsCur;
 				PaymentCur=FormPSM.PaymentCur;
+				textAmount.Text=POut.Double(PaymentCur.PayAmt);
 			}
 			FillMain();//Is this what we want?  It will reflect changes and allow them to delete all splits for an old payment if desired.  More clicks though.
 		}
@@ -1989,6 +1970,12 @@ namespace OpenDental {
 						SplitList=FormPSM.ListSplitsCur;
 						PaymentCur=FormPSM.PaymentCur;
 					}
+					else {//Cancel
+						return;
+					}
+				}
+				else {//Either no allocation required, or user does not want to allocate.  Just add one split.
+					AddOneSplit();
 				}
 			}
 			else {//Existing payment and/or has splits.
@@ -1998,15 +1985,7 @@ namespace OpenDental {
 						SplitList=Payments.Allocate(PaymentCur);//PayAmt needs to be set first
 					}
 					else {//Either no allocation required, or user does not want to allocate.  Just add one split.
-						PaySplit split=new PaySplit();
-						split.PatNum=PaymentCur.PatNum;
-						split.ClinicNum=PaymentCur.ClinicNum;
-						split.PayNum=PaymentCur.PayNum;
-						split.ProcDate=PaymentCur.PayDate;
-						split.DatePay=PaymentCur.PayDate;
-						split.ProvNum=Patients.GetProvNum(PatCur);
-						split.SplitAmt=PaymentCur.PayAmt;
-						SplitList.Add(split);
+						AddOneSplit();
 					}
 				}
 				else {//A new or existing payment with splits.
