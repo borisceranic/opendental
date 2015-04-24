@@ -129,9 +129,9 @@ namespace OpenDental{
 					Application.Exit();
 					return false;
 				}
-				MessageBox.Show(Lan.g(this,"Updates are only allowed from the web server: ")+PrefC.GetString(PrefName.WebServiceServerName));
-				return false;
 #endif
+				MessageBox.Show(Lan.g(this,"Updates are only allowed from the web server: ")+PrefC.GetString(PrefName.WebServiceServerName));
+				return false;//if you are in debug mode and you really need to update the DB, you can manually clear the WebServiceServerName preference.
 			}
 			//If MyISAM and InnoDb mix, then try to fix
 			if(DataConnection.DBtype==DatabaseType.MySql) {//not for Oracle
@@ -188,7 +188,7 @@ namespace OpenDental{
 			if(!isSilent && MessageBox.Show("You are in Debug mode.  Your database can now be converted"+"\r"
 				+"from version"+" "+FromVersion.ToString()+"\r"
 				+"to version"+" "+ToVersion.ToString()+"\r"
-				+"You can click Cancel to skip conversion and attempt to the newer code against the older database."
+				+"You can click Cancel to skip conversion and attempt to run the newer code against the older database."
 				,"",MessageBoxButtons.OKCancel)!=DialogResult.OK)
 			{
 				return true;//If user clicks cancel, then do nothing
