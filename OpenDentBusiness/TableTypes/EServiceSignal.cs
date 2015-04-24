@@ -33,7 +33,7 @@ namespace OpenDentBusiness {
 		}
 	}
 	
-	///<summary>Used to determine that status of the entire service.</summary>
+	///<summary>Used to determine that status of the entire service.  Order of enum is important, from lowest to highest importance.</summary>
 	public enum eServiceSignalSeverity {
 		///<summary>Service is not in use and is not supposed to be in use.</summary>
 		None=-1,

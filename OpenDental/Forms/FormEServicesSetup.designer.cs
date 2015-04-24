@@ -893,6 +893,7 @@ namespace OpenDental{
 			// 
 			this.textListenerServiceStatus.Location = new System.Drawing.Point(254, 20);
 			this.textListenerServiceStatus.Name = "textListenerServiceStatus";
+			this.textListenerServiceStatus.ReadOnly = true;
 			this.textListenerServiceStatus.Size = new System.Drawing.Size(100, 20);
 			this.textListenerServiceStatus.TabIndex = 246;
 			// 
