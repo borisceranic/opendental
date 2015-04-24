@@ -8134,10 +8134,10 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				} 
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE clinic ADD SmsContractDate datetime NOT NULL";
+					command="ALTER TABLE clinic ADD SmsContractDate datetime NOT NULL DEFAULT '0001-01-01 00:00:00'";
 					Db.NonQ(command);
 				} else {//oracle
-					command="ALTER TABLE clinic ADD SmsContractDate date";
+					command="ALTER TABLE clinic ADD SmsContractDate date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD')";
 					Db.NonQ(command);
 					command="UPDATE clinic SET SmsContractDate = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SmsContractDate IS NULL";
 					Db.NonQ(command);
