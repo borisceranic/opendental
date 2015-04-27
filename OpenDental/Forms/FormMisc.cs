@@ -118,7 +118,7 @@ namespace OpenDental{
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(333, 35);
 			this.label3.TabIndex = 56;
-			this.label3.Text = "Process Signal Interval in seconds.  Usually every 6 to 20 seconds.  Leave blank " +
+			this.label3.Text = "Process Signal Interval in seconds.  Usually every 6 to 20 seconds.\r\nLeave blank " +
     "to disable autorefresh";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -399,8 +399,8 @@ namespace OpenDental{
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(333, 35);
 			this.label5.TabIndex = 200;
-			this.label5.Text = "Disable signal interval after this many minutes of user inactivity.  \r\nLeave blan" +
-    "k to disable.";
+			this.label5.Text = "Disable signal interval after this many minutes of user inactivity.\r\nLeave blank " +
+    "to disable.";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textInactiveSignal
@@ -513,10 +513,10 @@ namespace OpenDental{
 				textSigInterval.Text=PrefC.GetLong(PrefName.ProcessSigsIntervalInSecs).ToString();
 			}
 			if(PrefC.GetLong(PrefName.SignalInactiveMinutes)==0) {
-				textSigInterval.Text="";
+				textInactiveSignal.Text="";
 			}
 			else {
-				textSigInterval.Text=PrefC.GetLong(PrefName.SignalInactiveMinutes).ToString();
+				textInactiveSignal.Text=PrefC.GetLong(PrefName.SignalInactiveMinutes).ToString();
 			}
 			checkColorTheme.Checked=PrefC.GetBool(PrefName.ColorTheme);
 			textMainWindowTitle.Text=PrefC.GetString(PrefName.MainWindowTitle);
@@ -593,9 +593,9 @@ namespace OpenDental{
 				return;
 			}
 			if(PIn.Long(textSigInterval.Text)>=(5+(PIn.Long(textInactiveSignal.Text)*60))) {//Signal Refresh time is less than or equal to 5 seconds plus the number of seconds in textSigInterval
-				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,@"The inactive signal time is less than or equal to the signal refresh time.  
-					This could inadvertently cause signals to not correctly refresh.  Continue?")) 
-				{
+				string question=Lans.g(this,"The inactive signal time is less than or equal to the signal refresh time.")+"\r\n"
+					+Lans.g(this,"This could inadvertently cause signals to not correctly refresh.  Continue?");
+				if(MessageBox.Show(question,"",MessageBoxButtons.YesNo)!=DialogResult.Yes) {
 					return;
 				}
 			}
