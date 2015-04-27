@@ -523,6 +523,9 @@ namespace OpenDentBusiness {
 		UseInternationalToothNumbers,
 		///<summary>Boolean.  0 by default.  When enabled, users must enter their user name manually at the log on window.</summary>
 		UserNameManualEntry,
+		WaitingRoomAlertColor,
+		///<summary>0 to disable.  When enabled, sets rows to alert color based on wait time.</summary>
+		WaitingRoomAlertTime,
 		///<summary>Boolean.  0 by default.  When enabled, the waiting room will filter itself by the selected appointment view.  0, normal filtering, will show all patients waiting for the entire practice (or entire clinic when using clinics).</summary>
 		WaitingRoomFilterByView,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>

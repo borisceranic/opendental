@@ -2173,6 +2173,8 @@ namespace OpenDental {
 			gridWaiting.Rows.Clear();
 			DateTime waitTime;
 			ODGridRow row;
+			int waitingRoomAlertTime=PrefC.GetInt(PrefName.WaitingRoomAlertTime);
+			Color waitingRoomAlertColor=PrefC.GetColor(PrefName.WaitingRoomAlertColor);
 			for(int i=0;i<table.Rows.Count;i++) {
 				//Always filter the waiting room by appointment view first, regardless of using clinics or not.
 				if(PrefC.GetBool(PrefName.WaitingRoomFilterByView)) {
@@ -2205,6 +2207,11 @@ namespace OpenDental {
 				waitTime=DateTime.Parse(table.Rows[i]["waitTime"].ToString());//we ignore date
 				waitTime+=delta;
 				row.Cells.Add(waitTime.ToString("H:mm:ss"));
+				row.Bold=false;
+				if(waitingRoomAlertTime>0 && waitingRoomAlertTime<=waitTime.Minute+(waitTime.Hour*60)) {
+					row.ColorText=waitingRoomAlertColor;
+					row.Bold=true;
+				}
 				gridWaiting.Rows.Add(row);
 			}
 			gridWaiting.EndUpdate();
