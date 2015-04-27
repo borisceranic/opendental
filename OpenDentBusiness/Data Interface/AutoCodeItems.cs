@@ -99,6 +99,7 @@ namespace OpenDentBusiness{
 				//We need to remove redundant surfaces so that we have the correct surface count when locating the correct procedure code for the auto code.
 				//For example, in the USA, user enters VB in the chart, then we would only want to count this as a single surface.
 				//Or, in Canada, user enters 5B, then we would only want to count this as a single surface.
+				//TidyForClaims is used explicitly for determining the correct procedure for billing purposes.
 				cleanedSurf=Tooth.SurfTidyForClaims(surf,toothNum);//TidyForClaims can't have an invalid tooth num.
 			}
 			bool allCondsMet;
