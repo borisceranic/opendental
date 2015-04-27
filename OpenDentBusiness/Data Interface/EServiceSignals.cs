@@ -56,22 +56,22 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Inserts a healthy heartbeat.</summary>
-		private static void InsertHeartbeatForService(eServiceCode serviceCode) {
+		public static void InsertHeartbeatForService(eServiceCode serviceCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),serviceCode);
 				return;
 			}
 			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
 				+" AND Severity IN ("
-				+eServiceSignalSeverity.NotEnabled+","
-				+eServiceSignalSeverity.Working+","
-				+eServiceSignalSeverity.Critical
+				+POut.Int((int)eServiceSignalSeverity.NotEnabled)+","
+				+POut.Int((int)eServiceSignalSeverity.Working)+","
+				+POut.Int((int)eServiceSignalSeverity.Critical)
 				+") ORDER BY SigDateTime DESC "+DbHelper.LimitWhere(1);//only select not enabled, working, and critical statuses.
 			EServiceSignal lastSignal=Crud.EServiceSignalCrud.SelectOne(command);
 			//If initializing or changing state to working from not working, insert two signals; An anchor and a rolling timestamp.
 			if(lastSignal==null || lastSignal.Severity!=eServiceSignalSeverity.Working) { //First ever heartbeat or critical which was not previously critical.
-				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now,IsProcessed=true,Description="Heartbeat." });//anchor heartbeat
-				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now.AddSeconds(1),IsProcessed=true,Description="Heartbeat." });//rolling heartbeat
+				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now,IsProcessed=true,Description="Heartbeat Anchor" });//anchor heartbeat
+				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now.AddSeconds(1),IsProcessed=true,Description="Heartbeat" });//rolling heartbeat
 				return;
 			}
 			lastSignal.SigDateTime=DateTime.Now;//succeptible to system clock being different than server time. But since this code is being run from the server, this should never happen.
