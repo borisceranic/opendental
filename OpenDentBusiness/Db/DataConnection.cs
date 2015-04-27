@@ -438,15 +438,22 @@ namespace OpenDentBusiness {
 			SetDb(connectStr,connectStrLow,dbtype,false);
 		}
 
-		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  Should be called before connecting to a database from a thread outside of the main thread.</summary>
+		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  
+		///Should be called before connecting to a database from a thread outside of the main thread. Will validate both high and low permission connection by running an arbitrary query against each.</summary>
 		public void SetDbT(string server,string db,string user,string password,string userLow,string passLow,DatabaseType dbtype) {
+			SetDbT(server,db,user,password,userLow,passLow,dbtype,false);
+		}
+		
+		///<summary>This method sets all the thread specific variables for the DataConnection.  It will leave all normal static connection variables.  
+		///Should be called before connecting to a database from a thread outside of the main thread. Can optionally validate both high and low permission connections by running an arbitrary query against each.</summary>
+		public void SetDbT(string server,string db,string user,string password,string userLow,string passLow,DatabaseType dbtype,bool skipValidation) {
 			_dBtypeT=dbtype;
 			string connectStr=BuildSimpleConnectionString(server,db,user,password);
 			string connectStrLow="";
 			if(userLow!="") {
 				connectStrLow=BuildSimpleConnectionString(server,db,userLow,passLow);
 			}
-			TestConnection(connectStr,connectStrLow,dbtype,false);
+			TestConnection(connectStr,connectStrLow,dbtype,skipValidation);
 			//connection strings must be valid, so OK to set permanently
 			_databaseT=db;
 			_serverNameT=server;//yes, it includes the port
