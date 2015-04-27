@@ -83,8 +83,6 @@ namespace OpenDental{
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkShowOpenTickets = new System.Windows.Forms.CheckBox();
 			this.groupBoxTaskDefaults = new System.Windows.Forms.GroupBox();
-			this.validNumY = new OpenDental.ValidNumber();
-			this.validNumX = new OpenDental.ValidNumber();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -95,6 +93,8 @@ namespace OpenDental{
 			this.checkColorTheme = new System.Windows.Forms.CheckBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textInactiveSignal = new OpenDental.ValidNumber();
+			this.validNumY = new OpenDental.ValidNumber();
+			this.validNumX = new OpenDental.ValidNumber();
 			this.butLanguages = new OpenDental.UI.Button();
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
@@ -285,30 +285,6 @@ namespace OpenDental{
 			this.groupBoxTaskDefaults.TabStop = false;
 			this.groupBoxTaskDefaults.Text = "Local Computer Default Settings";
 			// 
-			// validNumY
-			// 
-			this.validNumY.Location = new System.Drawing.Point(235, 59);
-			this.validNumY.MaxLength = 4;
-			this.validNumY.MaxVal = 1200;
-			this.validNumY.MinVal = 300;
-			this.validNumY.Name = "validNumY";
-			this.validNumY.Size = new System.Drawing.Size(47, 20);
-			this.validNumY.TabIndex = 188;
-			this.validNumY.Text = "542";
-			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// validNumX
-			// 
-			this.validNumX.Location = new System.Drawing.Point(115, 59);
-			this.validNumX.MaxLength = 4;
-			this.validNumX.MaxVal = 2000;
-			this.validNumX.MinVal = 300;
-			this.validNumX.Name = "validNumX";
-			this.validNumX.Size = new System.Drawing.Size(47, 20);
-			this.validNumX.TabIndex = 186;
-			this.validNumX.Text = "542";
-			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
 			// label15
 			// 
 			this.label15.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -412,6 +388,30 @@ namespace OpenDental{
 			this.textInactiveSignal.Size = new System.Drawing.Size(74, 20);
 			this.textInactiveSignal.TabIndex = 201;
 			this.textInactiveSignal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumY
+			// 
+			this.validNumY.Location = new System.Drawing.Point(235, 59);
+			this.validNumY.MaxLength = 4;
+			this.validNumY.MaxVal = 1200;
+			this.validNumY.MinVal = 300;
+			this.validNumY.Name = "validNumY";
+			this.validNumY.Size = new System.Drawing.Size(47, 20);
+			this.validNumY.TabIndex = 188;
+			this.validNumY.Text = "542";
+			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumX
+			// 
+			this.validNumX.Location = new System.Drawing.Point(115, 59);
+			this.validNumX.MaxLength = 4;
+			this.validNumX.MaxVal = 2000;
+			this.validNumX.MinVal = 300;
+			this.validNumX.Name = "validNumX";
+			this.validNumX.Size = new System.Drawing.Size(47, 20);
+			this.validNumX.TabIndex = 186;
+			this.validNumX.Text = "542";
+			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// butLanguages
 			// 
@@ -592,7 +592,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
-			if(PIn.Long(textSigInterval.Text)>=(5+(PIn.Long(textInactiveSignal.Text)*60))) {//Signal Refresh time is less than or equal to 5 seconds plus the number of seconds in textSigInterval
+			if(PIn.Long(textSigInterval.Text)>=(5+(PIn.Long(textInactiveSignal.Text)*60)) && PIn.Long(textInactiveSignal.Text)!=0) {//Signal Refresh time is less than or equal to 5 seconds plus the number of seconds in textSigInterval
 				string question=Lans.g(this,"The inactive signal time is less than or equal to the signal refresh time.")+"\r\n"
 					+Lans.g(this,"This could inadvertently cause signals to not correctly refresh.  Continue?");
 				if(MessageBox.Show(question,"",MessageBoxButtons.YesNo)!=DialogResult.Yes) {

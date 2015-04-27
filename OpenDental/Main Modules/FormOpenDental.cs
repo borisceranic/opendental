@@ -4340,7 +4340,7 @@ namespace OpenDental{
 
 		private void timerSignals_Tick(object sender, System.EventArgs e) {
 			DateTime dtInactive=dateTimeLastActivity+TimeSpan.FromMinutes((double)PrefC.GetInt(PrefName.SignalInactiveMinutes));
-			if(DateTime.Now>dtInactive) {
+			if((double)PrefC.GetInt(PrefName.SignalInactiveMinutes)!=0 && DateTime.Now>dtInactive) {
 				return;
 			}
 			//typically every 4 seconds:
