@@ -227,7 +227,7 @@ namespace OpenDentBusiness{
 			myString=Regex.Replace(myString,@"[\n]{50,}","\n");//{50,} means 50 or more.
 			myString=Regex.Replace(myString,@"[\t]{50,}","\t");
 			myString=myString.Replace("\n","\r\n");
-			return myString;
+			return String(myString);
 		}
 
 		//<summary></summary>
