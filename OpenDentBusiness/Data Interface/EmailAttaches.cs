@@ -34,12 +34,12 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectOne(emailAttachNum);
 		}
 
-		///<summary>Throws exceptions.  Creates a new file within the Out subfolder of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  The displayFileName should not be blank because it is what the user sees.  The actual file name will be partially based on the displayFileName, so that the actual files are easier to locate.</summary>
+		///<summary>Throws exceptions.  Creates a new file within the Out subfolder of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  The displayFileName will always contain valid file name characters, because it is either a hard coded value or is based on an existing valid file name.  The actual file name will end with the displayFileName, so that the actual files are easier to locate and have the same file extension as the displayedFileName.</summary>
 		public static EmailAttach CreateAttach(string displayedFileName,byte[] arrayData) {
 			return CreateAttach(displayedFileName,"",arrayData,true);
 		}
 
-		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  If isOutbound is true, then the file will be saved to the "Out" subfolder, otherwise the file will be saved to the "In" subfolder.  The displayFileName should not be blank because it is what the user sees.  If a file already exists matching the actualFileName, then an exception will occur.  Set actualFileName to empty string to generate a unique actual file name.  If the actual file name is generated, then the name will be partially based on the displayFileName, so that the actual files are easier to locate.</summary>
+		///<summary>Throws exceptions.  Creates a new file inside of the email attachment path (inside OpenDentImages) and returns an EmailAttach object referencing the new file.  If isOutbound is true, then the file will be saved to the "Out" subfolder, otherwise the file will be saved to the "In" subfolder.  The displayFileName will always contain valid file name characters, because it is either a hard coded value or is based on an existing valid file name.  If a file already exists matching the actualFileName, then an exception will occur.  Set actualFileName to empty string to generate a unique actual file name.  If the actual file name is generated, then actual file name will end with the displayFileName, so that the actual files are easier to locate and have the same file extension as the displayedFileName.</summary>
 		public static EmailAttach CreateAttach(string displayedFileName,string actualFileName,byte[] arrayData,bool isOutbound) {
 			//No need to check RemotingRole; no call to db.
 			EmailAttach emailAttach=new EmailAttach();
