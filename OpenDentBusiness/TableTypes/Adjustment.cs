@@ -21,7 +21,7 @@ namespace OpenDentBusiness{
 		public long ProvNum;
 		///<summary>Note for this adjustment.</summary>
 		public string AdjNote;
-		///<summary>Procedure date.  Not when the adjustment was entered.  This is what the aging will be based on in a future version.</summary>
+		///<summary>Procedure date.  Not when the adjustment was entered.</summary>
 		public DateTime ProcDate;
 		///<summary>FK to procedurelog.ProcNum.  Only used if attached to a procedure.  Otherwise, 0.</summary>
 		public long ProcNum;
