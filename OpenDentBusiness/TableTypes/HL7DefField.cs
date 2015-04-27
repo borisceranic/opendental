@@ -52,7 +52,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("ackCode",DataTypeHL7.ID,"0008"));
 			retVal.Add(new FieldNameAndType("allergenRxNorm",DataTypeHL7.CWE));//Example: RxNormCode^^RXNORM^^^^^^
 			retVal.Add(new FieldNameAndType("allergenType",DataTypeHL7.CWE,"0127"));//DA - Drug Allergy, FA - Food Allergy, MA - Miscellaneous Allergy
-			retVal.Add(new FieldNameAndType("altPatId",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("altPatID",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("apt.AptDateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("apt.AptNum",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("apt.aptStatus",DataTypeHL7.CWE,"0278"));
@@ -79,7 +79,7 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("dateTimeReported",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("dateTimeSpecimen",DataTypeHL7.DR));
 			retVal.Add(new FieldNameAndType("eventType",DataTypeHL7.ID,"0003"));
-			retVal.Add(new FieldNameAndType("facilityId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("facilityID",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("facilityName",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("facilityAddress",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("facilityPhone",DataTypeHL7.ST));
@@ -110,22 +110,22 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("inssub.SubscriberID",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("inssub.subscriberName",DataTypeHL7.XPN));
 			retVal.Add(new FieldNameAndType("labNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlab.NoteLab column
-			retVal.Add(new FieldNameAndType("labPatId",DataTypeHL7.CX));
+			retVal.Add(new FieldNameAndType("labPatID",DataTypeHL7.CX));
 			retVal.Add(new FieldNameAndType("medicationRxNorm",DataTypeHL7.CWE));//code^descript^codeSystem, Example: RxNorm Code^^RXNORM, descript is ignored
 			retVal.Add(new FieldNameAndType("messageControlId",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("messageType",DataTypeHL7.MSG));
 			retVal.Add(new FieldNameAndType("obsAbnormalFlag",DataTypeHL7.ID,"0078"));
-			retVal.Add(new FieldNameAndType("obsId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsID",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsIDSub",DataTypeHL7.ST));
 			retVal.Add(new FieldNameAndType("obsNote",DataTypeHL7.FT));//this is used by LabCorp and will be in the medlabresult.Note column
 			retVal.Add(new FieldNameAndType("obsRefRange",DataTypeHL7.ST));
-			retVal.Add(new FieldNameAndType("obsIdSub",DataTypeHL7.ST));
-			retVal.Add(new FieldNameAndType("obsTestId",DataTypeHL7.CE));
+			retVal.Add(new FieldNameAndType("obsTestID",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("obsUnits",DataTypeHL7.CE));
 			retVal.Add(new FieldNameAndType("obsValue",DataTypeHL7.Varied));
 			retVal.Add(new FieldNameAndType("obsValueType",DataTypeHL7.ID,"0125"));
 			retVal.Add(new FieldNameAndType("orderingProv",DataTypeHL7.XCN));
-			retVal.Add(new FieldNameAndType("parentObsId",DataTypeHL7.PRL));
-			retVal.Add(new FieldNameAndType("parentObsTestId",DataTypeHL7.EIP));
+			retVal.Add(new FieldNameAndType("parentObsID",DataTypeHL7.PRL));
+			retVal.Add(new FieldNameAndType("parentObsTestID",DataTypeHL7.EIP));
 			retVal.Add(new FieldNameAndType("pat.addressCityStateZip",DataTypeHL7.XAD));
 			retVal.Add(new FieldNameAndType("pat.birthdateTime",DataTypeHL7.DTM));
 			retVal.Add(new FieldNameAndType("pat.ChartNumber",DataTypeHL7.CX));
@@ -174,9 +174,9 @@ namespace OpenDentBusiness{
 			retVal.Add(new FieldNameAndType("sequenceNum",DataTypeHL7.SI));
 			retVal.Add(new FieldNameAndType("specimenAction",DataTypeHL7.ID,"0065"));
 			retVal.Add(new FieldNameAndType("specimenDescript",DataTypeHL7.ST));
-			retVal.Add(new FieldNameAndType("specimenId",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("specimenID",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("specimenIDFiller",DataTypeHL7.EI));
-			retVal.Add(new FieldNameAndType("specimenIdAlt",DataTypeHL7.EI));
+			retVal.Add(new FieldNameAndType("specimenIDAlt",DataTypeHL7.EI));
 			retVal.Add(new FieldNameAndType("totalVolume",DataTypeHL7.CQ));
 			return retVal;
 		}

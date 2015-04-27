@@ -36,6 +36,15 @@ namespace OpenDentBusiness{
 			return Crud.OIDExternalCrud.Insert(oIDExternal);
 		}
 
+		///<summary>Under most circumstances this should not be used.</summary>
+		public static void Update(OIDExternal oIDExternal) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),oIDExternal);
+				return;
+			}
+			Crud.OIDExternalCrud.Update(oIDExternal);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
@@ -54,15 +63,6 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<OIDExternal>(MethodBase.GetCurrentMethod(),oIDExternalNum);
 			}
 			return Crud.OIDExternalCrud.SelectOne(oIDExternalNum);
-		}
-
-		///<summary></summary>
-		public static void Update(OIDExternal oIDExternal){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),oIDExternal);
-				return;
-			}
-			Crud.OIDExternalCrud.Update(oIDExternal);
 		}
 
 		///<summary></summary>

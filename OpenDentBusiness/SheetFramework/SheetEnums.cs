@@ -36,8 +36,9 @@ namespace OpenDentBusiness {
 		///<summary>14-Requires SheetParameter for PatNum.</summary>
 		DepositSlip,
 		///<summary>15-Requires SheetParameter for PatNum.</summary>
-		Statement
-#warning Remove Statement type if not releasing in 14.4
+		Statement,
+		///<summary>16-Requires SheetParameters for PatNum,MedLab,MedLabResult.</summary>
+		MedLabResults
 		/*StatementHeader,
 		TxPlanHeader,
 		Postcard*/
@@ -113,7 +114,8 @@ namespace OpenDentBusiness {
 		LabSlip,
 		ExamSheet,
 		DepositSlip,
-		Statement
+		Statement,
+		MedLabResults
 	}
 
 	public enum OutInCheck{

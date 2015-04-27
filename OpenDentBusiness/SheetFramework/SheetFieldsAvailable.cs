@@ -51,6 +51,8 @@ namespace OpenDentBusiness{
 					return GetDepositSlip(outInCheck);
 				case SheetTypeEnum.Statement:
 					return GetStatement(outInCheck);
+				case SheetTypeEnum.MedLabResults:
+					return GetMedLabResults(outInCheck);
 			}
 			return new List<SheetFieldDef>();
 		}
@@ -514,6 +516,48 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("statementIsCopy"));
 				list.Add(NewOutput("statementIsTaxReceipt"));
 				list.Add(NewOutput("providerLegend"));
+			}
+			else if(outInCheck==OutInCheck.In) {
+			}
+			else if(outInCheck==OutInCheck.Check) {
+			}
+			return list;
+		}
+		
+		private static List<SheetFieldDef> GetMedLabResults(OutInCheck outInCheck) {
+			List<SheetFieldDef> list=new List<SheetFieldDef>();
+			if(outInCheck==OutInCheck.Out) {
+				list.Add(NewOutput("medlab.ClinicalInfo"));
+				list.Add(NewOutput("medlab.dateEntered"));
+				list.Add(NewOutput("medlab.DateTimeCollected"));
+				list.Add(NewOutput("medlab.DateTimeReported"));
+				list.Add(NewOutput("medlab.NoteLab"));
+				list.Add(NewOutput("medlab.obsTests"));
+				list.Add(NewOutput("medlab.ProvID"));
+				list.Add(NewOutput("medlab.provNameLF"));
+				list.Add(NewOutput("medlab.ProvNPI"));
+				list.Add(NewOutput("medlab.PatAccountNum"));
+				list.Add(NewOutput("medlab.PatAge"));
+				list.Add(NewOutput("medlab.PatFasting"));
+				list.Add(NewOutput("medlab.PatIDAlt"));
+				list.Add(NewOutput("medlab.PatIDLab"));
+				list.Add(NewOutput("medlab.SpecimenID"));
+				list.Add(NewOutput("medlab.SpecimenIDAlt"));
+				list.Add(NewOutput("medlab.TotalVolume"));
+				list.Add(NewOutput("medLabFacilityAddr"));
+				list.Add(NewOutput("medLabFacilityDir"));
+				list.Add(NewOutput("patient.addrCityStZip"));
+				list.Add(NewOutput("patient.Birthdate"));
+				list.Add(NewOutput("patient.FName"));
+				list.Add(NewOutput("patient.Gender"));
+				list.Add(NewOutput("patient.HmPhone"));
+				list.Add(NewOutput("patient.MiddleI"));
+				list.Add(NewOutput("patient.LName"));
+				list.Add(NewOutput("patient.PatNum"));
+				list.Add(NewOutput("patient.SSN"));
+				list.Add(NewOutput("practiceAddrCityStZip"));
+				list.Add(NewOutput("PracticePh"));
+				list.Add(NewOutput("PracticeTitle"));
 			}
 			else if(outInCheck==OutInCheck.In) {
 			}

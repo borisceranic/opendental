@@ -44,22 +44,27 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary>Checks the database for a MedLabFacility with matching name, address, city, and state and if the facility doesn't exist, it's inserted.
-		///Returns the MedLabFacilityNum for the facility inserted or found.</summary>
+		///<summary>Checks the database for a MedLabFacility with matching name, address, city, state, zip, phone, and director title/name.
+		///If the facility doesn't exist, it's inserted.  Returns the MedLabFacilityNum for the facility inserted or found.
+		///Doesn't need any indexes, this runs in under a second with 100k worst case scenario rows (identical data).</summary>
 		public static long InsertIfNotInDb(MedLabFacility medLabFacility) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod(),medLabFacility);
 			}
-			string command="SELECT * FROM medlabfacility WHERE FacilityName='"+POut.String(medLabFacility.FacilityName)+"' "
+			string command="SELECT * FROM medlabfacility "
+				+"WHERE FacilityName='"+POut.String(medLabFacility.FacilityName)+"' "
 				+"AND Address='"+POut.String(medLabFacility.Address)+"' "
 				+"AND City='"+POut.String(medLabFacility.City)+"' "
-				+"AND State='"+POut.String(medLabFacility.State)+"'";
+				+"AND State='"+POut.String(medLabFacility.State)+"' "
+				+"AND Zip='"+POut.String(medLabFacility.Zip)+"' "
+				+"AND Phone='"+POut.String(medLabFacility.Phone)+"' "
+				+"AND DirectorTitle='"+POut.String(medLabFacility.DirectorTitle)+"' "
+				+"AND DirectorLName='"+POut.String(medLabFacility.DirectorLName)+"' "
+				+"AND DirectorFName='"+POut.String(medLabFacility.DirectorFName)+"'";
 			MedLabFacility medLabFacilityDb=Crud.MedLabFacilityCrud.SelectOne(command);
 			if(medLabFacilityDb==null) {
 				return Crud.MedLabFacilityCrud.Insert(medLabFacility);
 			}
-			medLabFacility.MedLabFacilityNum=medLabFacilityDb.MedLabFacilityNum;
-			Crud.MedLabFacilityCrud.Update(medLabFacility,medLabFacilityDb);
 			return medLabFacilityDb.MedLabFacilityNum;
 		}
 

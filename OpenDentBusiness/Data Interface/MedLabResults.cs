@@ -47,7 +47,7 @@ namespace OpenDentBusiness{
 
 
 
-		///<summary>Returns a list of all MedLabResults from the db for a given MedLab.  Ordered by ResultStatus,DateTimeObs DESC.
+		///<summary>Returns a list of all MedLabResults from the db for a given MedLab.  Ordered by ObsID,ObsIDSub,ResultStatus,DateTimeObs DESC.
 		///Corrected (ResultStatus=0) will be first in the list then 1=Final, 2=Incomplete, 3=Preliminary, and 4=Cancelled.
 		///Then ordered by DateTimeObs DESC, most recent of each status comes first in the list.
 		///If there are no results for the lab (or medLabNum=0), this will return an empty list.</summary>
@@ -55,7 +55,33 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<MedLabResult>>(MethodBase.GetCurrentMethod(),medLabNum);
 			}
-			string command="SELECT * FROM medlabresult WHERE MedLabNum="+POut.Long(medLabNum)+" ORDER BY ResultStatus,DateTimeObs DESC";
+			string command="SELECT * FROM medlabresult WHERE MedLabNum="+POut.Long(medLabNum)+" ORDER BY ObsID,ObsIDSub,ResultStatus,DateTimeObs DESC";
+			return Crud.MedLabResultCrud.SelectMany(command);
+		}
+
+		///<summary>Gets a list of all MedLabResult object from the database for all of the MedLab objects sent in.  The MedLabResults are ordered by
+		///ObsID,ObsIDSub,ResultStatus, and DateTimeObs DESC to make it easier to find the most recent and up to date result for a given ObsID and
+		///optional ObsIDSub result.  The result statuses are 0=Corrected, 1=Final, 2=Incomplete, 3=Preliminary, and 4=Cancelled.
+		///Corrected will be first in the list for each ObsID/ObsIDSub, then Final, etc.
+		///If there is more than one result with the same ObsID/ObsIDSub and status, the most recent DateTimeObs will be first.</summary>
+		public static List<MedLabResult> GetAllForLabs(List<MedLab> listMedLabs) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLabResult>>(MethodBase.GetCurrentMethod(),listMedLabs);
+			}
+			List<MedLabResult> retval=new List<MedLabResult>();
+			if(listMedLabs.Count==0) {
+				return retval;
+			}
+			List<string> listMedLabNumStr=new List<string>();
+			for(int i=0;i<listMedLabs.Count;i++) {
+				string medLabNumStr=POut.Long(listMedLabs[i].MedLabNum);
+				if(listMedLabNumStr.Contains(medLabNumStr)) {
+					continue;
+				}
+				listMedLabNumStr.Add(medLabNumStr);
+			}
+			string command="SELECT * FROM medlabresult WHERE MedLabNum IN("+string.Join(",",listMedLabNumStr)+") "
+				+"ORDER BY ObsID,ObsIDSub,ResultStatus,DateTimeObs DESC";
 			return Crud.MedLabResultCrud.SelectMany(command);
 		}
 
@@ -75,6 +101,41 @@ namespace OpenDentBusiness{
 				return;
 			}
 			Crud.MedLabResultCrud.Update(medLabResult);
+		}
+
+		public static string GetAbnormalFlagDescript(AbnormalFlag abnormalFlag) {
+			//No need to check RemotingRole; no call to db.
+			switch(abnormalFlag) {
+				case AbnormalFlag._gt:
+					return "Panic High";
+				case AbnormalFlag._lt:
+					return "Panic Low";
+				case AbnormalFlag.A:
+					return "Abnormal";
+				case AbnormalFlag.AA:
+					return "Critical Abnormal";
+				case AbnormalFlag.H:
+					return "Above High Normal";
+				case AbnormalFlag.HH:
+					return "Alert High";
+				case AbnormalFlag.I:
+					return "Intermediate";
+				case AbnormalFlag.L:
+					return "Below Low Normal";
+				case AbnormalFlag.LL:
+					return "Alert Low";
+				case AbnormalFlag.NEG:
+					return "Negative";
+				case AbnormalFlag.POS:
+					return "Positive";
+				case AbnormalFlag.R:
+					return "Resistant";
+				case AbnormalFlag.S:
+					return "Susceptible";
+				case AbnormalFlag.None:
+				default:
+					return "";
+			}
 		}
 
 		/*

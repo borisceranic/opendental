@@ -196,8 +196,8 @@ namespace OpenDentBusiness{
 				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
 		}
 
-		public static SheetFieldDef NewGrid(string fieldName,int xPos,int yPos,int width,int height) {
-			SheetFieldDef retVal=new SheetFieldDef(SheetFieldType.Grid,fieldName,"",8.5f,"",false,
+		public static SheetFieldDef NewGrid(string fieldName,int xPos,int yPos,int width,int height,float fontSize=8.5f,string fontName="") {
+			SheetFieldDef retVal=new SheetFieldDef(SheetFieldType.Grid,fieldName,"",fontSize,fontName,false,
 				xPos,yPos,width,height,GrowthBehaviorEnum.DownGlobal,"");
 			return retVal;
 		}

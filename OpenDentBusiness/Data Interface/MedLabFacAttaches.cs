@@ -69,8 +69,9 @@ namespace OpenDentBusiness{
 				if(medLabNum!=0) {
 					command+=" OR ";
 				}
-				command+="MedLabResultNum="+POut.Long(medLabResultNum);
+				command+="MedLabResultNum="+POut.Long(medLabResultNum)+" ";
 			}
+			command+="ORDER BY MedLabFacAttachNum DESC";
 			return Crud.MedLabFacAttachCrud.SelectMany(command);
 		}
 

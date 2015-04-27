@@ -1,10 +1,8 @@
  using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Reflection;
-using System.Windows.Forms;
 
 namespace OpenDentBusiness{
 
@@ -285,6 +283,34 @@ namespace OpenDentBusiness{
 			for(int i=0;i<listProvs.Count;i++) {
 				if(listProvs[i].LName.ToLower()==lName.ToLower() && listProvs[i].FName.ToLower()==fName.ToLower()) {
 					retval.Add(listProvs[i].Copy());
+				}
+			}
+			return retval;
+		}
+
+		///<summary>Gets a list of providers from ListLong with either the NPI provided or a blank NPI and the Medicaid ID provided.
+		///medicaidId can be blank.  If the npi param is blank, or there are no matching provs, returns an empty list.
+		///Shouldn't be two separate functions or we would have to compare the results of the two lists.</summary>
+		public static List<Provider> GetProvsByNpiOrMedicaidId(string npi,string medicaidId) {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> retval=new List<Provider>();
+			if(npi=="") {
+				return retval;
+			}
+			List<Provider> listProvs=ProviderC.GetListLong();
+			for(int i=0;i<listProvs.Count;i++) {
+				//if the prov has a NPI set and it's a match, add this prov to the list
+				if(listProvs[i].NationalProvID!="") {
+					if(listProvs[i].NationalProvID.Trim().ToLower()==npi.Trim().ToLower()) {
+						retval.Add(listProvs[i].Copy());
+					}
+				}
+				else {//if the NPI is blank and the Medicaid ID is set and it's a match, add this prov to the list
+					if(listProvs[i].MedicaidID!=""
+						&& listProvs[i].MedicaidID.Trim().ToLower()==medicaidId.Trim().ToLower())
+					{
+						retval.Add(listProvs[i].Copy());
+					}
 				}
 			}
 			return retval;

@@ -82,7 +82,7 @@ namespace OpenDentBusiness {
 
 	}
 
-	///<summary>MedLab Abnormal Flags.</summary>
+	///<summary>MedLab Abnormal Flags.  Similar to EhrLabResult.HL70078 abnormal flag enum.</summary>
 	public enum AbnormalFlag {
 		///<summary>0 - None.  Blank or null value indicates normal result, so no abnormal flag.</summary>
 		None,

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -51,6 +52,36 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),patNum);
 			}
 			string command="SELECT * FROM medlab WHERE PatNum="+POut.Long(patNum);
+			return Crud.MedLabCrud.SelectMany(command);
+		}
+
+		///<summary>Get unique MedLab orders, grouped by ProvNum, SpecimenID, and SpecimenIDFiller.  Also returns the most recent DateTime the results
+		///were released from the lab, the earliest DateTime the order was entered into the lab system, and a list of tests ordered.
+		///The list of tests ordered will not contain reflex result test IDs.</summary>
+		public static DataTable GetOrdersForPatient(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT ProvNum,SpecimenID,SpecimenIDFiller,MIN(DateTimeEntered) AS DateTimeEntered,"
+				+"MAX(DateTimeReported) AS DateTimeReported,"+DbHelper.GroupConcat("ObsTestID",true)+" AS TestsOrdered "
+				+"FROM medlab WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND ActionCode!='"+ResultAction.G.ToString()+"' "
+				+"GROUP BY ProvNum,SpecimenID,SpecimenIDFiller "
+				+"ORDER BY MIN(DateTimeEntered) DESC,MAX(DateTimeReported) DESC";
+			return Db.GetTable(command);
+		}
+
+		///<summary>Get MedLabs for a specific patient and a specific SpecimenID, SpecimenIDFiller combination.
+		///Ordered by DateTimeReported DESC so that the most recently received result will be first in the list.
+		///This will be the DateTime that populates the LabCorp result report Date/Time Reported field.</summary>
+		public static List<MedLab> GetForPatAndSpecimen(long patNum,string specimenID,string specimenIDFiller) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),patNum,specimenID,specimenIDFiller);
+			}
+			string command="SELECT * FROM medlab WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND SpecimenID='"+POut.String(specimenID)+"' "
+				+"AND SpecimenIDFiller='"+POut.String(specimenIDFiller)+"' "
+				+"ORDER BY DateTimeReported DESC";
 			return Crud.MedLabCrud.SelectMany(command);
 		}
 
