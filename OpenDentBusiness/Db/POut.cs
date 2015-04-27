@@ -226,7 +226,7 @@ namespace OpenDentBusiness{
 			myString=myString.Replace("\r","\n");
 			myString=Regex.Replace(myString,@"[\n]{50,}","\n");
 			myString=myString.Replace("\n","\r\n");
-			return String(myString);
+			return myString;
 		}
 
 		//<summary></summary>
