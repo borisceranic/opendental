@@ -417,6 +417,12 @@
     <Compile Include="Forms\FormAmountEdit.designer.cs">
       <DependentUpon>FormAmountEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormPayPlanRecalculate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormPayPlanRecalculate.designer.cs">
+      <DependentUpon>FormPayPlanRecalculate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormPaySplitManage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3649,6 +3655,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormAmountEdit.resx">
       <DependentUpon>FormAmountEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPayPlanRecalculate.resx">
+      <DependentUpon>FormPayPlanRecalculate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPaySplitManage.resx">
       <DependentUpon>FormPaySplitManage.cs</DependentUpon>
