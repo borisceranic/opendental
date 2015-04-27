@@ -31,7 +31,12 @@ namespace OpenDentBusiness{
 				return eServiceSignalSeverity.None;
 			}
 			//The listener service is considered down and in a critical state if there hasn't been a heartbeat in the last 5 minutes.
-			if(serviceCode==eServiceCode.ListenerService && listSignal[0].SigDateTime<DateTime.Now.AddMinutes(-5)) {
+			//An eSignal severity of "Not Enabled" means the office no longer wants to monitor the status of the service.
+			if(serviceCode==eServiceCode.ListenerService 
+				&& listSignal[0].Severity!=eServiceSignalSeverity.NotEnabled 
+				&& listSignal[0].SigDateTime<DateTime.Now.AddMinutes(-5)) 
+			{
+				//Office has not disabled the monitoring of the listener service and there hasn't been a heartbeat in the last 5 minutes.
 				return eServiceSignalSeverity.Critical;
 			}
 			return listSignal[0].Severity;
