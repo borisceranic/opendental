@@ -24,8 +24,19 @@ namespace OpenDental {
 			Location=new Point(Left,Top+150);
 			labelPrompt.Text=PromptText;
 			string[] lines=PromptOptions.Split(new string[] {"\r\n"},StringSplitOptions.RemoveEmptyEntries);
+			int stringWidthMax=120;//Minimum column width
 			for(int i=0;i<lines.Length;i++) {
+				int lineWidth=TextRenderer.MeasureText(lines[i],listMain.Font).Width;
+				if(lineWidth>stringWidthMax) {
+					stringWidthMax=lineWidth;
+				}
 				listMain.Items.Add(lines[i]);
+			}
+			if(stringWidthMax>listMain.Width-20) {//Give them some room
+				listMain.MultiColumn=false;
+			}
+			else {
+				listMain.ColumnWidth=stringWidthMax;
 			}
 		}
 
