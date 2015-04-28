@@ -61,8 +61,9 @@ namespace OpenDentBusiness{
 					return DepositSlip();
 				case SheetInternalType.Statement:
 					return StmtSheet();
-				case SheetInternalType.MedLabResults:
-					return MedLabResultReport();
+#warning Cameron12345 Remove this comment if releasing MedLabs
+				//case SheetInternalType.MedLabResults:
+				//	return MedLabResultReport();
 				default:
 					throw new ApplicationException("Invalid SheetInternalType.");
 			}

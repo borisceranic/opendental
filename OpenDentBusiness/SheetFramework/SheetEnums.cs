@@ -114,8 +114,10 @@ namespace OpenDentBusiness {
 		LabSlip,
 		ExamSheet,
 		DepositSlip,
-		Statement,
-		MedLabResults
+		Statement
+#warning Cameron12345 Remove this comment if releasing MedLab in version 15.2
+		//,
+		//MedLabResults
 	}
 
 	public enum OutInCheck{

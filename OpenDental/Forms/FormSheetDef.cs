@@ -33,6 +33,10 @@ namespace OpenDental {
 			textDescription.Text=SheetDefCur.Description;
 			//not allowed to change sheettype once created.
 			for(int i=0;i<Enum.GetNames(typeof(SheetTypeEnum)).Length;i++){
+				if((SheetTypeEnum)i==SheetTypeEnum.MedLabResults) {
+#warning Cameron12345 Remove this block if releasing MedLabs
+					continue;
+				}
 				listSheetType.Items.Add(Enum.GetNames(typeof(SheetTypeEnum))[i]);
 				if((int)SheetDefCur.SheetType==i && !IsInitial){
 					listSheetType.SelectedIndex=i;

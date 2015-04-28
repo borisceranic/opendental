@@ -106,9 +106,10 @@ namespace OpenDentBusiness{
 			def=GetInternalFromDb(HL7InternalType.HL7v2_6);
 			def=InternalHL7v2_6.GetDeepInternal(def);
 			listInternal.Add(def);
-			def=GetInternalFromDb(HL7InternalType.MedLabv2_3);
-			def=MedLabv2_3.GetDeepInternal(def);
-			listInternal.Add(def);
+#warning Cameron12345 Remove this comment if releasing MedLabs
+			//def=GetInternalFromDb(HL7InternalType.MedLabv2_3);
+			//def=MedLabv2_3.GetDeepInternal(def);
+			//listInternal.Add(def);
 			//Add defs for other companies like Centricity here later.
 			return listInternal;
 		}
