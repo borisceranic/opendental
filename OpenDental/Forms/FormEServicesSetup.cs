@@ -1007,7 +1007,7 @@ namespace OpenDental {
 			signalDisable.Tag="";
 			signalDisable.SigDateTime=DateTime.Now;
 			EServiceSignals.Insert(signalDisable);
-			MsgBox.Show(this,"Monitoring shutdown signal sent.");
+			MsgBox.Show(this,"Monitoring shutdown signal sent.  This will take up to one minute.");
 			FillGridListenerService();
 			GetListenerStatus();
 		}

@@ -323,6 +323,10 @@ namespace OpenDental{
 		private MenuItem menuItemMobileSync;
 		///<summary>HQ only. Keep track of last time triage task labels were filled. Too taxing on the server to perform every 1.6 seconds with the rest of the HQ thread metrics. Triage labels will be refreshed on ProcessSigsIntervalInSecs interval.</summary>
 		DateTime _hqMetricsLastRefreshed=DateTime.MinValue;
+		///<summary>Keeps track of the last time the Listener Service status was checked.</summary>
+		private DateTime _dateTimeListenerStatus=DateTime.MinValue;
+		///<summary>The current color of the eServices menu item in the main menu.</summary>
+		private Color _colorEServiceMenuItem=SystemColors.Control;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -1560,7 +1564,10 @@ namespace OpenDental{
             this.menuItemWebSched,
             this.menuItem14,
             this.menuItemListenerService});
+			this.menuItemEServices.OwnerDraw = true;
 			this.menuItemEServices.Text = "eServices";
+			this.menuItemEServices.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.menuItemEServices_DrawItem);
+			this.menuItemEServices.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.menuItemEServices_MeasureItem);
 			// 
 			// menuItemMobileSync
 			// 
@@ -1761,7 +1768,7 @@ namespace OpenDental{
 			this.panelPhoneSmall.Controls.Add(this.labelTriage);
 			this.panelPhoneSmall.Location = new System.Drawing.Point(71, 333);
 			this.panelPhoneSmall.Name = "panelPhoneSmall";
-			this.panelPhoneSmall.Size = new System.Drawing.Size(173, 321);
+			this.panelPhoneSmall.Size = new System.Drawing.Size(173, 237);
 			this.panelPhoneSmall.TabIndex = 56;
 			// 
 			// labelFieldType
@@ -1870,7 +1877,7 @@ namespace OpenDental{
 			// 
 			// FormOpenDental
 			// 
-			this.ClientSize = new System.Drawing.Size(982, 550);
+			this.ClientSize = new System.Drawing.Size(982, 466);
 			this.Controls.Add(this.panelPhoneSmall);
 			this.Controls.Add(this.panelSplitter);
 			this.Controls.Add(this.lightSignalGrid1);
@@ -4030,6 +4037,37 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary></summary>
+		private void ProcessEServiceSignals() {
+			//--------------------------------------------------------------------------------------------------------------------------------------------
+			//This method can get enhanced later to be more generic like ProcessSignals where it grabs a list of eService signals and loops through them.
+			//For now, we only care about the status of the Listener Service and I want the first edition of this method to be as light as possible.
+			//--------------------------------------------------------------------------------------------------------------------------------------------
+			//So that the loading of Open Dental is not hindered by this extra query, we will not run this extra query within the first minute.
+			if(_dateTimeListenerStatus==DateTime.MinValue) {
+				//Set the local listener heartbeat to now which will cause the status to get checked roughly one minute from now.
+				//This should only happen once on startup.
+				_dateTimeListenerStatus=DateTime.Now;
+			}
+			//The listener service will have a local heartbeat every 5 minutes so it's overkill to check every time timerSignals_Tick fires.
+ 			//Only check the Listener Service status once a minute.
+			//The downside to doing this is that the menu item will stay red up to one minute when a user wants to stop monitoring the service.
+			Color colorEServiceOld=_colorEServiceMenuItem;
+			if(_dateTimeListenerStatus.AddMinutes(1)<=DateTime.Now) {
+				eServiceSignalSeverity listenerStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
+				if(listenerStatus==eServiceSignalSeverity.Critical) {
+					_colorEServiceMenuItem=Color.Red;
+				}
+				else {
+					_colorEServiceMenuItem=SystemColors.Control;
+				}
+				_dateTimeListenerStatus=DateTime.Now;
+			}
+			if(colorEServiceOld!=_colorEServiceMenuItem) {
+				//TODO: Force a redraw so that the color change shows up instantly even if OpenDental is not the active program.
+			}
+		}
+
 		public void TaskGoToEvent(object sender, CancelEventArgs e){
 			FormTaskEdit FormT=(FormTaskEdit)sender;
 			TaskGoTo(FormT.GotoType,FormT.GotoKeyNum);
@@ -5751,6 +5789,46 @@ namespace OpenDental{
 		#endregion
 
 		#region eServices
+
+		private void menuItemEServices_DrawItem(object sender,DrawItemEventArgs e) {
+			using(SolidBrush brushListenerStatus=new SolidBrush(_colorEServiceMenuItem))
+			using(SolidBrush brushDisabled=new SolidBrush(SystemColors.ControlDark))
+			using(SolidBrush brushHighlight=new SolidBrush(SystemColors.Highlight))
+			using(SolidBrush brushHighlightText=new SolidBrush(SystemColors.HighlightText))
+			using(SolidBrush brushMenuText=new SolidBrush(SystemColors.MenuText)) {
+				//Get the text that is displaying from the menu item compenent.
+				MenuItem menuItem=(MenuItem)sender;
+				string menuText=menuItem.Text;
+				//Create a string format to center the text to mimic the other menu items.
+				StringFormat stringFormat=new StringFormat();
+				stringFormat.Alignment=StringAlignment.Center;
+				e.Graphics.FillRectangle(brushListenerStatus,e.Bounds);
+				if(!menuItem.Enabled || e.State==(DrawItemState.NoAccelerator | DrawItemState.Inactive)) {//Disabled and inactive (other app has focus) menu items need to show gray.
+					e.Graphics.DrawString(menuText,SystemInformation.MenuFont,brushDisabled,e.Bounds,stringFormat);
+					return;
+				}
+				//Menu is enabled.  
+				if(e.State==(DrawItemState.NoAccelerator | DrawItemState.Selected) 
+					|| e.State==(DrawItemState.NoAccelerator | DrawItemState.HotLight)) 
+				{
+					//Color the background blue when a user hovers or clicks on the menu item.
+					e.Graphics.FillRectangle(brushHighlight,e.Bounds);
+					e.Graphics.DrawString(menuText,SystemInformation.MenuFont,brushHighlightText,e.Bounds,stringFormat);
+				}
+				else {//Normal menu item drawing.
+					e.Graphics.DrawString(menuText,SystemInformation.MenuFont,brushMenuText,e.Bounds,stringFormat);
+				}
+			}
+		}
+
+		private void menuItemEServices_MeasureItem(object sender,MeasureItemEventArgs e) {
+			//Measure the text showing.
+			MenuItem menuItem=(MenuItem)sender;
+			StringFormat stringFormat=new StringFormat();
+			SizeF sizeString=e.Graphics.MeasureString(menuItem.Text,SystemInformation.MenuFont,1000,stringFormat);
+			e.ItemWidth=(int)Math.Ceiling(sizeString.Width);
+			e.ItemHeight=(int)Math.Ceiling(sizeString.Height);
+		}
 
 		private void menuItemMobileSync_Click(object sender,EventArgs e) {
 			FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.MobileOld);
