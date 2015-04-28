@@ -39,6 +39,7 @@ namespace OpenDental.UI {
 		//private Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
 		//private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
 		//private Font cellFont=new Font(FontFamily.GenericSansSerif,8.5f);
+		public Font FontForSheets;
 		private float cellFontSize=8.5f;
 		private int titleHeight=18;
 		private int headerHeight=15;
@@ -534,8 +535,12 @@ namespace OpenDental.UI {
 
 		///<summary>Called from PrintPage() and EndUpdate().  After adding rows to the grid, this calculates the height of each row because some rows may have text wrap and will take up more than one row.  Also, rows with notes, must be made much larger, because notes start on the second line.  If column images are used, rows will be enlarged to make space for the images.</summary>
 		private void ComputeRows(Graphics g,bool IsForPrinting=false) {
-			Font cellFontBold=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Bold);
-			using(Font cellFontNormal=new Font(FontFamily.GenericSansSerif,cellFontSize)) {
+			Font tempFont=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Regular);
+			if(FontForSheets!=null) {
+				tempFont=new Font(FontForSheets,FontStyle.Regular);
+			}
+			using(Font cellFontBold=new Font(tempFont,FontStyle.Bold))
+			using(Font cellFontNormal=new Font(tempFont,FontStyle.Regular)) {
 				_rowHeights=new int[rows.Count];
 				NoteHeights=new int[rows.Count];
 				//multiPageNoteHeights=new List<List<int>>();
@@ -593,7 +598,7 @@ namespace OpenDental.UI {
 								}
 							}
 							else {
-								cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height+1;
+								cellH=(int)(LineSpacingForFont(cellFont.Name)*g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height)+1;
 							}
 							//if(rows[i].Height==0) {//not set
 							//  cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
@@ -641,7 +646,7 @@ namespace OpenDental.UI {
 					GridH+=_rowHeights[i]+NoteHeights[i];
 				}
 			}//end using
-			cellFontBold.Dispose();
+			tempFont.Dispose();
 			if(IsForPrinting) {
 				ComputePrintRows();
 			}
@@ -1164,7 +1169,11 @@ namespace OpenDental.UI {
 		#region Printing
 
 		///<summary></summary>
-		public void PrintRow(int rowI,Graphics g,Font cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+		public void PrintRow(int rowI,Graphics g,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+			Font tempFont=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Regular);
+			if(FontForSheets!=null) {
+				tempFont=new Font(FontForSheets,FontStyle.Regular);
+			}
 			Color cOutline=Color.FromArgb(119,119,146);
 			if(_useBlueTheme) {
 				cOutline=Color.FromArgb(47,70,117);
@@ -1306,21 +1315,21 @@ namespace OpenDental.UI {
 					textBrush=new SolidBrush(rows[rowI].Cells[i].ColorText);
 				}
 				if(rows[rowI].Cells[i].Bold==YN.Yes) {
-					cellFont=new Font(cellFont,FontStyle.Bold);
+					tempFont=new Font(tempFont,FontStyle.Bold);
 				}
 				else if(rows[rowI].Cells[i].Bold==YN.No) {
-					cellFont=new Font(cellFont,FontStyle.Regular);
+					tempFont=new Font(tempFont,FontStyle.Regular);
 				}
 				else {//unknown.  Use row bold
 					if(rows[rowI].Bold) {
-						cellFont=new Font(cellFont,FontStyle.Bold);
+						tempFont=new Font(tempFont,FontStyle.Bold);
 					}
 					else {
-						cellFont=new Font(cellFont,FontStyle.Regular);
+						tempFont=new Font(tempFont,FontStyle.Regular);
 					}
 				}
 				if(columns[i].ImageList==null) {
-					g.DrawString(rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,_format);
+					g.DrawString(rows[rowI].Cells[i].Text,tempFont,textBrush,textRect,_format);
 				}
 				else {
 					int imageIndex=-1;
@@ -1340,10 +1349,10 @@ namespace OpenDental.UI {
 					noteW+=columns[i].ColWidth;
 				}
 				if(rows[rowI].Bold) {
-					cellFont=new Font(cellFont,FontStyle.Bold);
+					tempFont=new Font(tempFont,FontStyle.Bold);
 				}
 				else {
-					cellFont=new Font(cellFont,FontStyle.Regular);
+					tempFont=new Font(tempFont,FontStyle.Regular);
 				}
 				textBrush=new SolidBrush(rows[rowI].ColorText);
 				textRect=new RectangleF(
@@ -1352,7 +1361,7 @@ namespace OpenDental.UI {
 					ColPos[NoteSpanStop]+columns[NoteSpanStop].ColWidth-ColPos[NoteSpanStart],
 					NoteHeights[rowI]);
 				_format.Alignment=StringAlignment.Near;
-				g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,_format);
+				g.DrawString(rows[rowI].Note,tempFont,textBrush,textRect,_format);
 			}
 			//Left right and bottom lines of grid.  This creates the outline of the entire grid when not using outline control
 			//Outline the Title
@@ -1364,11 +1373,15 @@ namespace OpenDental.UI {
 					g.DrawLine(pen,x,y+_rowHeights[rowI]+NoteHeights[rowI]+1,x+Width,y+_rowHeights[rowI]+NoteHeights[rowI]+1);//bottom line.
 				}
 			}
-
+			tempFont.Dispose();
 		}
 
 		///<summary></summary>
-		public void PrintRowX(int rowI,XGraphics g,Font _cellFont,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+		public void PrintRowX(int rowI,XGraphics g,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+			Font tempFont=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Regular);
+			if(FontForSheets!=null) {
+				tempFont=new Font(FontForSheets,FontStyle.Regular);
+			}
 			Color cOutline=Color.FromArgb(119,119,146);
 			if(_useBlueTheme) {
 				cOutline=Color.FromArgb(47,70,117);
@@ -1376,7 +1389,7 @@ namespace OpenDental.UI {
 			if(isSheetGrid) {
 				cOutline=Color.Black;
 			}
-			XFont cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size);
+			XFont cellFont=new XFont(tempFont.Name,tempFont.Size);
 			XRect textRect;
 			XStringAlignment _xAlign=XStringAlignment.Near;
 			XPen gridPen=new XPen(this.cGridLine);
@@ -1515,17 +1528,17 @@ namespace OpenDental.UI {
 					textBrush=new XSolidBrush(rows[rowI].Cells[i].ColorText);
 				}
 				if(rows[rowI].Cells[i].Bold==YN.Yes) {
-					cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Bold);
+					cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Bold);
 				}
 				else if(rows[rowI].Cells[i].Bold==YN.No) {
-					cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Regular);
+					cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Regular);
 				}
 				else {//unknown.  Use row bold
 					if(rows[rowI].Bold) {
-						cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Bold);
+						cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Bold);
 					}
 					else {
-						cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Regular);
+						cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Regular);
 					}
 				}
 				if(columns[i].ImageList==null) {
@@ -1549,10 +1562,10 @@ namespace OpenDental.UI {
 					noteW+=columns[i].ColWidth;
 				}
 				if(rows[rowI].Bold) {
-					cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Bold);
+					cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Bold);
 				}
 				else {
-					cellFont=new XFont(_cellFont.FontFamily.ToString(),_cellFont.Size,XFontStyle.Regular);
+					cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Regular);
 				}
 				textBrush=new XSolidBrush(rows[rowI].ColorText);
 				textRect=new XRect(
@@ -1572,6 +1585,7 @@ namespace OpenDental.UI {
 			if(isBottom) {
 				g.DrawLine(pen,p(x),p(y+_rowHeights[rowI]+NoteHeights[rowI])+1,p(x+Width),p(y+_rowHeights[rowI]+NoteHeights[rowI]+1));//bottom line.
 			}
+			tempFont.Dispose();
 		}
 
 		public void PrintTitle(Graphics g,int x,int y) {
@@ -2888,7 +2902,7 @@ namespace OpenDental.UI {
 			}
 			//pixels: (except Size is em-size)
 			Font font=new Font(xfont.Name,(float)xfont.Size,fontstyle);
-			xfont=new XFont(xfont.FontFamily.ToString(),xfont.Size,xfont.Style);
+			xfont=new XFont(xfont.Name,xfont.Size,xfont.Style);
 			//pixels:
 			SizeF fit=new SizeF((float)(bounds.Width-rightPad),(float)(font.Height));
 			StringFormat format=StringFormat.GenericTypographic;

@@ -86,7 +86,7 @@ namespace OpenDentBusiness.HL7 {
 			if(indexPos > Components.Count-1) {
 				return "";
 			}
-			return Components[indexPos].ComponentVal.Trim();
+			return Components[indexPos].ComponentVal;
 		}
 
 		///<summary>This also resets the number of components.  And it sets fullText.</summary>

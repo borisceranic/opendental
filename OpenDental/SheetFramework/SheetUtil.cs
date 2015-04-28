@@ -12,6 +12,7 @@ using System.Globalization;
 
 namespace OpenDental{
 	public class SheetUtil {
+		private static List<MedLabResult> _listResults;
 		///<summary>Supply a template sheet as well as a list of primary keys.  This method creates a new collection of sheets which each have a parameter of int.  It also fills the sheets with data from the database, so no need to run that separately.</summary>
 		public static List<Sheet> CreateBatch(SheetDef sheetDef,List<long> priKeys) {
 			//we'll assume for now that a batch sheet has only one parameter, so no need to check for values.
@@ -37,7 +38,7 @@ namespace OpenDental{
 		}
 
 		///<summary>Just before printing or displaying the final sheet output, the heights and y positions of various fields are adjusted according to their growth behavior.  This also now gets run every time a user changes the value of a textbox while filling out a sheet.</summary>
-		public static void CalculateHeights(Sheet sheet,Graphics g,Statement stmt=null,bool isPrinting=false,int topMargin=40,int bottomMargin=60){
+		public static void CalculateHeights(Sheet sheet,Graphics g,Statement stmt=null,bool isPrinting=false,int topMargin=40,int bottomMargin=60,MedLab medLab=null){
 			//Sheet sheetCopy=sheet.Clone();
 			int calcH;
 			Font font;
@@ -88,7 +89,7 @@ namespace OpenDental{
 					calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
 				}
 				else {//handle grid height calculation seperately.
-					calcH=CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin);
+					calcH=CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab);
 				}
 				if(calcH<=field.Height //calc height is smaller
 					&& field.FieldName!="StatementPayPlan") 
@@ -109,16 +110,20 @@ namespace OpenDental{
 		}
 
 		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.</summary>
-		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin) {
+		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin,MedLab medLab) {
 			UI.ODGrid odGrid=new UI.ODGrid();
+			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			odGrid.Width=field.Width;
 			odGrid.HideScrollBars=true;
 			odGrid.YPosField=field.YPos;
 			odGrid.TopMargin=topMargin;
 			odGrid.BottomMargin=bottomMargin;
 			odGrid.PageHeight=sheet.HeightPage;
-			odGrid.Title=field.FieldName+(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
-			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt);
+			odGrid.Title=field.FieldName;
+			if(stmt!=null) {
+				odGrid.Title+=(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
+			}
+			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt,medLab);
 			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
 			#region  Fill Grid
 			odGrid.BeginUpdate();
@@ -206,6 +211,17 @@ namespace OpenDental{
 				return SheetDefs.GetSheetDef(listDefs[0].SheetDefNum);//Return first custom statement. Should be ordred by Description ascending.
 			}
 			return SheetsInternal.GetSheetDef(SheetInternalType.Statement);
+		}
+
+		///<summary>Returns either a user defined MedLabResults sheet or the internal sheet.</summary>
+		public static SheetDef GetMedLabResultsSheetDef() {
+#warning Cameron12345 Remove this comment block if releasing MedLabs
+			//List<SheetDef> listDefs=SheetDefs.GetCustomForType(SheetTypeEnum.MedLabResults);
+			//if(listDefs.Count>0) {
+			//	return SheetDefs.GetSheetDef(listDefs[0].SheetDefNum);//Return first custom statement. Should be ordred by Description ascending.
+			//}
+			//return SheetsInternal.GetSheetDef(SheetInternalType.MedLabResults);
+			return null;
 		}
 
 		/*
@@ -332,6 +348,13 @@ namespace OpenDental{
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
 					break;
+				case "MedLabResults":
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsIDValue",Description="Test / Result",ColumnWidth=506,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsAbnormalFlag",Description="Flag",ColumnWidth=78,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsUnits",Description="Units",ColumnWidth=56,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsRefRange",Description="Ref Interval",ColumnWidth=75,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="facilityID",Description="Lab",ColumnWidth=35,ItemOrder=++i });
+					break;
 			}
 			return retVal;
 		}
@@ -346,11 +369,14 @@ namespace OpenDental{
 					retVal.Add("StatementMain");
 					retVal.Add("StatementPayPlan");
 					break;
+				case SheetTypeEnum.MedLabResults:
+					retVal.Add("MedLabResults");
+					break;
 			}
 			return retVal;
 		}
 
-		public static DataTable GetDataTableForGridType(string gridType,Statement stmt) {
+		public static DataTable GetDataTableForGridType(string gridType,Statement stmt=null,MedLab medLab=null) {
 			DataTable retVal=new DataTable();
 			switch(gridType) {
 				case "StatementMain":
@@ -364,6 +390,9 @@ namespace OpenDental{
 					break;
 				case "StatementEnclosed":
 					retVal=getTable_StatementEnclosed(stmt);
+					break;
+				case "MedLabResults":
+					retVal=getTable_MedLabResults(medLab);
 					break;
 				default:
 					break;
@@ -523,6 +552,109 @@ namespace OpenDental{
 			return table;
 		}
 
+		private static DataTable getTable_MedLabResults(MedLab medLab) {
+			DataTable retval=new DataTable();
+			retval.Columns.Add(new DataColumn("obsIDValue"));
+			retval.Columns.Add(new DataColumn("obsAbnormalFlag"));
+			retval.Columns.Add(new DataColumn("obsUnits"));
+			retval.Columns.Add(new DataColumn("obsRefRange"));
+			retval.Columns.Add(new DataColumn("facilityID"));
+			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
+			Dictionary<long,string> dictLabNumLabId=SheetUtil.GetDictFacNumFacId(listMedLabs);
+			for(int i=0;i<_listResults.Count;i++) {
+				//LabCorp requested that these non-performance results not be displayed on the report
+				if(_listResults[i].ResultStatus==ResultStatus.F
+					&& _listResults[i].ObsValue==""
+					&& _listResults[i].Note=="")
+				{
+					continue;
+				}
+				DataRow row=retval.NewRow();
+				string spaces="    ";
+				string obsVal=_listResults[i].ObsText+"\r\n"+spaces+_listResults[i].ObsValue.Replace("\r\n","\r\n"+spaces);
+				if(_listResults[i].Note!="") {
+					obsVal+="\r\n"+spaces;
+				}
+				obsVal+=_listResults[i].Note.Replace("\r\n","\r\n"+spaces);
+				row["obsIDValue"]=obsVal;
+				row["obsAbnormalFlag"]=MedLabResults.GetAbnormalFlagDescript(_listResults[i].AbnormalFlag);
+				row["obsUnits"]=_listResults[i].ObsUnits;
+				row["obsRefRange"]=_listResults[i].ReferenceRange;
+				row["facilityID"]=_listResults[i].FacilityID;
+				retval.Rows.Add(row);
+			}
+			return retval;
+		}
 
+		///<summary>Returns a dictionary linking the MedLabFacilityNum on each result to a facility ID that is unique for the report.
+		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
+		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
+		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
+		///So each ID could link to multiple facilities.  We will have to append _1, _2, etc to differentiate them on the report.</summary>
+		public static Dictionary<long,string> GetDictFacNumFacId(List<MedLab> listMedLabs) {
+			_listResults=MedLabResults.GetAllForLabs(listMedLabs);//use the classwide variable so we can use the list to create the data table
+			for(int i=_listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
+				if(i==0) {
+					break;
+				}
+				if(_listResults[i].ObsID==_listResults[i-1].ObsID && _listResults[i].ObsIDSub==_listResults[i-1].ObsIDSub) {
+					_listResults.RemoveAt(i);
+				}
+			}
+			_listResults.Sort(SortResultsByPriKey);
+			//_listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
+			Dictionary<long,string> dictMedLabNumLabID=new Dictionary<long,string>();
+			for(int i=0;i<_listResults.Count;i++) {
+				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,_listResults[i].MedLabResultNum);
+				if(listFacAttaches.Count==0) {
+					continue;
+				}
+				//each result may have been processed at more than one facility, but we will only show the most recent on the report
+				if(dictMedLabNumLabID.ContainsKey(listFacAttaches[0].MedLabFacilityNum)) {
+					if(dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum].Contains("_")
+						&& !dictMedLabNumLabID.ContainsValue(_listResults[i].FacilityID))
+					{
+						dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum]=_listResults[i].FacilityID;
+					}
+					else {
+						_listResults[i].FacilityID=dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum];
+					}
+					continue;
+				}
+				//if the facility ID is already linked to a different facilitynum, add the facilitynum by not the ID
+				//the facility may be referenced by a different ID in another result, and we will use that result ID for all results that reference this facility
+				if(dictMedLabNumLabID.ContainsValue(_listResults[i].FacilityID)) {
+					//we need to find a unique ID for this facility
+					int appendNum=0;
+					string val=_listResults[i].FacilityID;
+					while(dictMedLabNumLabID.ContainsValue(val)) {
+						appendNum++;
+						val=_listResults[i].FacilityID+"_"+appendNum;
+					}
+					dictMedLabNumLabID.Add(listFacAttaches[0].MedLabFacilityNum,val);
+					_listResults[i].FacilityID=val;
+					continue;
+				}
+				//the dictionary doesn't contain the facilitynum or ID, so add them
+				dictMedLabNumLabID.Add(listFacAttaches[0].MedLabFacilityNum,_listResults[i].FacilityID);
+			}
+			//update any IDs on the results that have an "_" in them, in case we found a valid ID in a subsequent result
+			for(int i=0;i<_listResults.Count;i++) {
+				if(!_listResults[i].FacilityID.Contains("_")) {
+					continue;
+				}
+				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,_listResults[i].MedLabResultNum);
+				if(listFacAttaches.Count==0) {
+					continue;
+				}
+				_listResults[i].FacilityID=dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum];
+			}
+			return dictMedLabNumLabID;
+		}
+
+		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
+		private static int SortResultsByPriKey(MedLabResult medLabResultX,MedLabResult medLabResultY) {
+			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
+		}
 	}
 }

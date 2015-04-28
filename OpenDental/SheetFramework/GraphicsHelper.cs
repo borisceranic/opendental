@@ -13,7 +13,7 @@ namespace OpenDental {
 		private static int rightPad=5;//helps get measurements better.
 		//private static float hScale=.983f;
 
-		///<summary>This line spacing is specifically picked to match the RichTextBox.</summary>
+		///<summary>This line spacing is specifically picked to match the RichTextBox.  Using this for drawing large text boxes on sheets leads to extra white space.  Just space not characters.</summary>
 		private static float LineSpacingForFont(string fontName) {
 			if(fontName.ToLower()=="arial") {
 				return 1.08f;

@@ -10,7 +10,7 @@ using System.Data;
 namespace OpenDental{
 	public class SheetFiller {
 		///<summary>Gets the data from the database and fills the fields. Input should only be new sheets.</summary>
-		public static void FillFields(Sheet sheet,Statement stmt=null){
+		public static void FillFields(Sheet sheet,Statement stmt=null,MedLab medLab=null){
 			foreach(SheetParameter param in sheet.Parameters){
 				if(param.IsRequired && param.ParamValue==null){
 					throw new ApplicationException(Lan.g("Sheet","Parameter not specified for sheet: ")+param.ParamName);
@@ -91,6 +91,10 @@ namespace OpenDental{
 					pat=Patients.GetPat(sheet.PatNum);
 					//deposit=Deposits.GetOne((long)GetParamByName(sheet,"DepositNum").ParamValue);
 					FillFieldsForStatement(sheet,stmt);
+					break;
+				case SheetTypeEnum.MedLabResults:
+					pat=Patients.GetPat(sheet.PatNum);
+					FillFieldsForMedLabResults(sheet,medLab);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -2206,6 +2210,374 @@ namespace OpenDental{
 							field.FieldValue+=prov.Abbr+" - "+prov.FName+" "+prov.LName+suffix+" - "+prov.MedicaidID+"\r\n";
 						}
 						#endregion
+						break;
+				}
+			}
+		}
+
+		private static void FillFieldsForMedLabResults(Sheet sheet,MedLab medLab) {
+			Patient pat=Patients.GetPat(sheet.PatNum);
+			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(pat.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
+			Dictionary<long,string> dictLabNumLabId=SheetUtil.GetDictFacNumFacId(listMedLabs);
+			foreach(SheetField field in sheet.SheetFields) {
+				switch(field.FieldName) {
+					case "medlab.ClinicalInfo":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						field.FieldValue=listMedLabs[0].ClinicalInfo;
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(Regex.IsMatch(field.FieldValue,Regex.Escape(listMedLabs[i].ClinicalInfo),RegexOptions.IgnoreCase)) {
+								continue;
+							}
+							if(field.FieldValue!="") {
+								field.FieldValue+="\r\n";
+							}
+							field.FieldValue+=listMedLabs[i].ClinicalInfo;
+						}
+						break;
+					case "medlab.dateEntered":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						DateTime minDateEntered=DateTime.MaxValue;
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].DateTimeEntered>DateTime.MinValue && listMedLabs[i].DateTimeEntered<minDateEntered) {
+								minDateEntered=listMedLabs[i].DateTimeEntered;
+							}
+						}
+						if(minDateEntered==DateTime.MaxValue) {
+							field.FieldValue="";
+							break;
+						}
+						field.FieldValue=minDateEntered.ToShortDateString();
+						break;
+					case "medlab.DateTimeCollected":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						DateTime minDateCollected=DateTime.MaxValue;
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].DateTimeCollected>DateTime.MinValue && listMedLabs[i].DateTimeCollected<minDateCollected) {
+								minDateCollected=listMedLabs[i].DateTimeCollected;
+							}
+						}
+						if(minDateCollected==DateTime.MaxValue) {
+							break;
+						}
+						field.FieldValue=minDateCollected.ToString();
+						break;
+					case "medlab.DateTimeReported":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						DateTime maxDateReported=DateTime.MinValue;
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].DateTimeReported>maxDateReported) {
+								maxDateReported=listMedLabs[i].DateTimeReported;
+							}
+						}
+						if(maxDateReported==DateTime.MinValue) {
+							break;
+						}
+						field.FieldValue=maxDateReported.ToString();
+						break;
+					case "medlab.NoteLab":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						string patNote="";
+						string labNote="";
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(!Regex.IsMatch(patNote,Regex.Escape(listMedLabs[i].NotePat),RegexOptions.IgnoreCase)) {
+								if(patNote!="") {
+									patNote+="\r\n";
+								}
+								patNote+=listMedLabs[i].NotePat;
+							}
+							if(!Regex.IsMatch(labNote,Regex.Escape(listMedLabs[i].NoteLab),RegexOptions.IgnoreCase)) {
+								if(labNote!="") {
+									labNote+="\r\n";
+								}
+								labNote+=listMedLabs[i].NoteLab;
+							}
+						}
+						field.FieldValue=patNote;
+						if(field.FieldValue!="" && labNote!="") {
+							field.FieldValue+="\r\n";
+						}
+						field.FieldValue+=labNote;
+						break;
+					case "medlab.obsTests":
+						List<string> listTestIds=new List<string>();
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listTestIds.Contains(listMedLabs[i].ObsTestID)) {
+								continue;
+							}
+							if(listMedLabs[i].ActionCode==ResultAction.G) {//"G" indicates a reflex test, not a test originally ordered, so skip these
+								continue;
+							}
+							listTestIds.Add(listMedLabs[i].ObsTestID);
+							if(field.FieldValue!="") {
+								field.FieldValue+="\r\n";
+							}
+							field.FieldValue+=listMedLabs[i].ObsTestID+" - "+listMedLabs[i].ObsTestDescript;
+						}
+						break;
+					case "medlab.ProvID":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].OrderingProvLocalID=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].OrderingProvLocalID;
+							break;
+						}
+						break;
+					case "medlab.provNameLF":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						string provLName="";
+						string provFName="";
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].OrderingProvFName=="" && listMedLabs[i].OrderingProvLName=="") {//both names missing, continue
+								continue;
+							}
+							provFName=listMedLabs[i].OrderingProvFName;
+							provLName=listMedLabs[i].OrderingProvLName;
+							if(provFName!="" && provLName!="") {//if both first and last name are included, use the values from this medlab
+								break;
+							}
+						}
+						if(provLName!="") {
+							field.FieldValue=provLName;
+						}
+						if(provFName!="") {
+							if(field.FieldValue!="") {
+								field.FieldValue+=", ";
+							}
+							field.FieldValue+=provFName;
+						}
+						break;
+					case "medlab.ProvNPI":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].OrderingProvNPI=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].OrderingProvNPI;
+							break;
+						}
+						break;
+					case "medlab.PatAccountNum":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].PatAccountNum=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].PatAccountNum;
+							break;
+						}
+						break;
+					case "medlab.PatAge":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].PatAge=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].PatAge;
+							break;
+						}
+						break;
+					case "medlab.PatFasting":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].PatFasting==YN.Unknown) {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].PatFasting.ToString();
+							break;
+						}
+						break;
+					case "medlab.PatIDAlt":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].PatIDAlt=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].PatIDAlt;
+							break;
+						}
+						break;
+					case "medlab.PatIDLab":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].PatIDLab=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].PatIDLab;
+							break;
+						}
+						break;
+					case "medlab.SpecimenID":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].SpecimenID=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].SpecimenID;
+							break;
+						}
+						break;
+					case "medlab.SpecimenIDAlt":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].SpecimenIDAlt=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].SpecimenIDAlt;
+							break;
+						}
+						break;
+					case "medlab.TotalVolume":
+						for(int i=0;i<listMedLabs.Count;i++) {
+							if(listMedLabs[i].TotalVolume=="") {
+								continue;
+							}
+							field.FieldValue=listMedLabs[i].TotalVolume;
+							break;
+						}
+						break;
+					case "medLabFacilityAddr":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						string fieldValAddr="";
+						foreach(KeyValuePair<long,string> labNumLabId in dictLabNumLabId) {
+							if(fieldValAddr!="") {
+								fieldValAddr+="\r\n\r\n";
+							}
+							string row1=labNumLabId.Value;
+							int padlen=14;
+							if(labNumLabId.Value.Contains("_")) {
+								padlen=12;
+							}
+							row1=row1.PadRight(padlen,' ');
+							fieldValAddr+=row1;
+							string spaces=new string(' ',16);
+							MedLabFacility facilityCur=MedLabFacilities.GetOne(labNumLabId.Key);
+							fieldValAddr+=facilityCur.FacilityName+"\r\n"+spaces+facilityCur.Address+"\r\n"+spaces+facilityCur.City+", "+facilityCur.State+"  ";
+							if(facilityCur.Zip.Length==9) {
+								fieldValAddr+=facilityCur.Zip.Substring(0,5)+"-"+facilityCur.Zip.Substring(5,4);
+							}
+							else {
+								fieldValAddr+=facilityCur.Zip;
+							}
+						}
+						field.FieldValue=fieldValAddr;
+						break;
+					case "medLabFacilityDir":
+						if(listMedLabs.Count==0) {
+							break;
+						}
+						string fieldValDir="";
+						foreach(KeyValuePair<long,string> labNumLabId in dictLabNumLabId) {
+							if(fieldValDir!="") {
+								fieldValDir+="\r\n\r\n";
+							}
+							MedLabFacility facilityCur=MedLabFacilities.GetOne(labNumLabId.Key);
+							fieldValDir+="Dir:  "+facilityCur.DirectorFName+" "+facilityCur.DirectorLName+", "+facilityCur.DirectorTitle+"\r\nPh:  ";
+							if(facilityCur.Phone.Length==10) {
+								fieldValDir+=facilityCur.Phone.Substring(0,3)+"-"+facilityCur.Phone.Substring(3,3)+"-"+facilityCur.Phone.Substring(6);
+							}
+							else {
+								fieldValDir+=facilityCur.Phone;
+							}
+							fieldValDir+="\r\n";//blank line to keep it in line with the address
+						}
+						field.FieldValue=fieldValDir;
+						break;
+					case "patient.addrCityStZip":
+						field.FieldValue="";
+						if(pat.Address!="") {
+							field.FieldValue+=pat.Address+"\r\n";
+						}
+						if(pat.Address2!="") {
+							field.FieldValue+=pat.Address2+"\r\n";
+						}
+						if(pat.City!="") {
+							field.FieldValue+=pat.City;
+							if(pat.State!="" || pat.Zip!="") {
+								field.FieldValue+=", ";
+							}
+						}
+						if(pat.State!="") {
+							field.FieldValue+=pat.State;
+							if(pat.Zip!="") {
+								field.FieldValue+=" ";
+							}
+						}
+						field.FieldValue+=pat.Zip;
+						break;
+					case "patient.Birthdate":
+						if(pat.Birthdate.Year<1880) {
+							field.FieldValue="";
+							break;
+						}
+						field.FieldValue=pat.Birthdate.ToShortDateString();
+						break;
+					case "patient.FName":
+						field.FieldValue=pat.FName;
+						break;
+					case "patient.Gender":
+						field.FieldValue=Lan.g("enumPatientGender",pat.Gender.ToString());
+						break;
+					case "patient.HmPhone":
+						if(pat.HmPhone.Length==10) {
+							field.FieldValue=pat.HmPhone.Substring(0,3)+"-"+pat.HmPhone.Substring(3,3)+"-"+pat.HmPhone.Substring(6);
+							break;
+						}
+						field.FieldValue=pat.HmPhone;
+						break;
+					case "patient.MiddleI":
+						field.FieldValue=pat.MiddleI;
+						break;
+					case "patient.LName":
+						field.FieldValue=pat.LName;
+						break;
+					case "patient.PatNum":
+						field.FieldValue=pat.PatNum.ToString();
+						break;
+					case "patient.SSN":
+						field.FieldValue="***-**-";
+						if(pat.SSN.Length>3) {
+							field.FieldValue+=pat.SSN.Substring(pat.SSN.Length-4,4);
+						}
+						break;
+					case "practiceAddrCityStZip":
+						field.FieldValue="";
+						if(PrefC.GetString(PrefName.PracticeAddress)!="") {
+							field.FieldValue+=PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
+						}
+						if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
+							field.FieldValue+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
+						}
+						if(PrefC.GetString(PrefName.PracticeCity)!="") {
+							field.FieldValue+=PrefC.GetString(PrefName.PracticeCity);
+							if(PrefC.GetString(PrefName.PracticeST)!="" || PrefC.GetString(PrefName.PracticeZip)!="") {
+								field.FieldValue+=", ";
+							}
+						}
+						if(PrefC.GetString(PrefName.PracticeST)!="") {
+							field.FieldValue+=PrefC.GetString(PrefName.PracticeST);
+							if(PrefC.GetString(PrefName.PracticeZip)!="") {
+								field.FieldValue+=" ";
+							}
+						}
+						field.FieldValue+=PrefC.GetString(PrefName.PracticeZip);
+						break;
+					case "PracticePh":
+						if(PrefC.GetString(PrefName.PracticePhone).Length==10) {
+							field.FieldValue=PrefC.GetString(PrefName.PracticePhone).Substring(0,3)+"-"+PrefC.GetString(PrefName.PracticePhone).Substring(3,3)+
+								"-"+PrefC.GetString(PrefName.PracticePhone).Substring(6);
+							break;
+						}
+						field.FieldValue=PrefC.GetString(PrefName.PracticePhone);
+						break;
+					case "PracticeTitle":
+						field.FieldValue=PrefC.GetString(PrefName.PracticeTitle);
 						break;
 				}
 			}

@@ -3110,6 +3110,9 @@ namespace OpenDental{
 					if(ToolBarMain.Buttons["HL7"]!=null) {
 						ToolBarMain.Buttons["HL7"].Enabled=false;
 					}
+					if(ToolBarMain.Buttons["MedLab"]!=null) {
+						ToolBarMain.Buttons["MedLab"].Enabled=false;
+					}
 				}
 			}
 		}
@@ -3178,6 +3181,10 @@ namespace OpenDental{
 			}
 			if(HL7Defs.IsExistingHL7Enabled() && !UsingEcwTightOrFull()) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(HL7Defs.GetOneDeepEnabled().Description,-1,"","HL7"));
+			}
+			HL7Def hl7DefCur=HL7Defs.GetOneDeepEnabled(true);
+			if(hl7DefCur!=null) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton(hl7DefCur.Description,-1,"","MedLab"));
 			}
 			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ChartModule);
 			for(int i=0;i<toolButItems.Count;i++){
@@ -3306,6 +3313,9 @@ namespace OpenDental{
 				if(ToolBarMain.Buttons["HL7"]!=null) {
 					ToolBarMain.Buttons["HL7"].Enabled=false;
 				}
+				if(ToolBarMain.Buttons["MedLab"]!=null) {
+					ToolBarMain.Buttons["MedLab"].Enabled=false;
+				}
 				tabProc.Enabled = false;
 				butAddKey.Enabled=false;
 				butForeignKey.Enabled=false;
@@ -3424,6 +3434,9 @@ namespace OpenDental{
 				if(ToolBarMain.Buttons["HL7"]!=null) {
 					ToolBarMain.Buttons["HL7"].Enabled=true;
 				}
+				if(ToolBarMain.Buttons["MedLab"]!=null) {
+					ToolBarMain.Buttons["MedLab"].Enabled=true;
+				}
 				tabProc.Enabled=true;
 				butAddKey.Enabled=true;
 				butForeignKey.Enabled=true;
@@ -3534,6 +3547,9 @@ namespace OpenDental{
 						break;
 					case "HL7":
 						Tool_HL7_Click();
+						break;
+					case "MedLab":
+						Tool_MedLab_Click();
 						break;
 				}
 			}
@@ -4542,6 +4558,12 @@ namespace OpenDental{
 #if DEBUG
 			MsgBox.Show(this,messageHL7.ToString());
 #endif
+		}
+
+		private void Tool_MedLab_Click() {
+			FormMedLabs FormML=new FormMedLabs();
+			FormML.PatCur=PatCur;
+			FormML.Show();
 		}
 
 		private void menuConsent_Popup(object sender,EventArgs e) {

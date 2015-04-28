@@ -32,6 +32,7 @@ namespace OpenDental {
 		private static bool _printCalibration=false;//debug only
 		private static bool _isPrinting=false;
 		private static Statement _stmt;
+		private static MedLab _medLab;
 
 
 		public static void PrintStatement(object parameters) {
@@ -128,10 +129,11 @@ namespace OpenDental {
 		}
 
 		///<Summary></Summary>
-		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null){
+		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null){
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
 			_stmt=stmt;
+			_medLab=medLab;
 			_isPrinting=true;
 			_sheetList=new List<Sheet>();
 			for(int i=0;i<copies;i++){
@@ -221,8 +223,12 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
 			Sheet sheet=_sheetList[_sheetsPrinted];
+			_printMargin.Top=40;//default top margin
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
 			Sheets.SetPageMargin(sheet,_printMargin);
-			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);//this is here because of easy access to g.
+			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);//this is here because of easy access to g.
 			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			//Begin drawing.
 			foreach(SheetField field in sheet.SheetFields) {
@@ -252,7 +258,7 @@ namespace OpenDental {
 						drawFieldLine(field,g,null);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,g,null,_stmt);
+						drawFieldGrid(field,sheet,g,null,_stmt,_medLab);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:
@@ -481,8 +487,13 @@ namespace OpenDental {
 			GC.Collect();		
 		}
 
-		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx, Statement stmt) {
+		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,Statement stmt=null,MedLab medLab=null) {
+			_printMargin.Top=40;
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
 			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
+			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			int _yAdjCurRow=0;//used to adjust for Titles, Headers, Rows, and footers (all considered part of the same row).
 			odGrid.Width=0;
 			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
@@ -492,11 +503,14 @@ namespace OpenDental {
 			odGrid.Height=field.Height;
 			odGrid.HideScrollBars=true;
 			odGrid.YPosField=field.YPos;
-			odGrid.Title=field.FieldName+(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
-			odGrid.TopMargin=40;
-			odGrid.BottomMargin=60;
+			odGrid.Title=field.FieldName;
+			if(stmt!=null) {
+				odGrid.Title+=(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
+			}
+			odGrid.TopMargin=_printMargin.Top;
+			odGrid.BottomMargin=_printMargin.Bottom;
 			odGrid.PageHeight=sheet.HeightPage;
-			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt);
+			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt,medLab);
 			#region  Fill Grid, Set Text Alignment
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
@@ -611,10 +625,10 @@ namespace OpenDental {
 				#endregion
 				#region Draw Row
 				if(gx==null) {
-					odGrid.PrintRow(i,g,odGrid.Font,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
+					odGrid.PrintRow(i,g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
 				}
 				else {
-					odGrid.PrintRowX(i,gx,odGrid.Font,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
+					odGrid.PrintRowX(i,gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
 				}
 				_yAdjCurRow+=odGrid.RowHeights[i];
 				#endregion
@@ -654,12 +668,16 @@ namespace OpenDental {
 		}
 
 		///<summary>Calculates the bottom of the current page assuming a 40px and 60px top and bottom margin respectively.</summary>
-		public static int bottomCurPage(int yPos,Sheet sheet, out int pageCount) {
-			int retVal=sheet.HeightPage-60;//First page bottom is not changed by top margin. Example: 1100px page height, 60px bottom, 1040px is first page bottom
+		public static int bottomCurPage(int yPos,Sheet sheet,out int pageCount) {
+			_printMargin.Top=40;
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
+			int retVal=sheet.HeightPage-_printMargin.Bottom;//First page bottom is not changed by top margin. Example: 1100px page height, 60px bottom, 1040px is first page bottom
 			pageCount=0;
 			while(retVal<yPos){
 				pageCount++;
-				retVal+=(sheet.HeightPage-100);//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2140px
+				retVal+=(sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top));//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2140px
 			}
 			return retVal;
 		}
@@ -671,7 +689,7 @@ namespace OpenDental {
 			if(gx==null){
 				FontStyle fontstyle=(field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 				Font font=new Font(field.FontName,field.FontSize,fontstyle);
-				Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,Math.Min(field.Height,_yPosPrint+sheet.HeightPage-_printMargin.Bottom-field.YPos));
+				Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);//Math.Min(field.Height,_yPosPrint+sheet.HeightPage-_printMargin.Bottom-field.YPos));
 				StringAlignment sa= StringAlignment.Near;
 				switch(field.TextAlign) {
 					case System.Windows.Forms.HorizontalAlignment.Left:
@@ -692,20 +710,23 @@ namespace OpenDental {
 				XFontStyle xfontstyle=(field.FontIsBold?XFontStyle.Bold:XFontStyle.Regular);
 				XFont xfont=new XFont(field.FontName,field.FontSize,xfontstyle);
 				XStringAlignment xsa= XStringAlignment.Near;
+				int tempX=field.XPos;
 				switch(field.TextAlign) {
 					case System.Windows.Forms.HorizontalAlignment.Left:
 						xsa=XStringAlignment.Near;
 						break;
 					case System.Windows.Forms.HorizontalAlignment.Center:
 						xsa=XStringAlignment.Center;
-						field.XPos+=field.Width/2;
+						tempX+=field.Width/2;
+						//field.XPos+=field.Width/2;
 						break;
 					case System.Windows.Forms.HorizontalAlignment.Right:
 						xsa=XStringAlignment.Far;
-						field.XPos+=field.Width;
+						tempX+=field.Width;
+						//field.XPos+=field.Width;
 						break;
 				}
-				XRect xrect=new XRect(p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
+				XRect xrect=new XRect(p(tempX),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
 				GraphicsHelper.DrawStringX(gx,gfx,1d/p(1),field.FieldValue,xfont,(field.ItemColor==Color.FromArgb(0)?XBrushes.Black:new XSolidBrush(field.ItemColor)),xrect,xsa);
 				//xfont.Dispose();
 				xfont=null;
@@ -778,10 +799,13 @@ namespace OpenDental {
 			else {
 				gx.DrawRectangle(XPens.White,Brushes.White,p(0),p(0),p(sheet.WidthPage),p(_printMargin.Top));
 			}
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				drawMedLabHeader(sheet,g,gx);
+			}
 		}
 
 		private static void drawFooter(Sheet sheet,Graphics g,XGraphics gx) {
-			if(Sheets.CalculatePageCount(sheet,_printMargin)==1) {
+			if(Sheets.CalculatePageCount(sheet,_printMargin)==1 && sheet.SheetType!=SheetTypeEnum.MedLabResults) {
 				return;//Never draw footers on single page sheets.
 			}
 			//whiteout footer.
@@ -791,6 +815,198 @@ namespace OpenDental {
 			else {
 				gx.DrawRectangle(XPens.White,Brushes.White,p(0),p(sheet.HeightPage-_printMargin.Bottom),p(sheet.WidthPage),p(sheet.HeightPage));
 			}
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				drawMedLabFooter(sheet,g,gx);
+			}
+		}
+
+		private static void drawMedLabFooter(Sheet sheet,Graphics g,XGraphics gx) {
+			SheetField fieldCur=new SheetField();
+			fieldCur.FieldValue=String.Format("Page {0} of {1}",_pagesPrinted+1,Sheets.CalculatePageCount(sheet,_printMargin));
+			fieldCur.FontSize=8.5f;
+			fieldCur.FontName=sheet.FontName;
+			fieldCur.FontIsBold=false;
+			fieldCur.XPos=sheet.Width-125;//width of field is 75, with a right margin of 50 xPos is sheet width-75-50=width-125
+			int pageCount;
+			fieldCur.YPos=bottomCurPage(_pagesPrinted*sheet.HeightPage+1,sheet,out pageCount);
+			fieldCur.Width=75;
+			fieldCur.Height=15;
+			fieldCur.TextAlign=HorizontalAlignment.Left;
+			fieldCur.ItemColor=Color.FromKnownColor(KnownColor.Black);
+			drawFieldText(fieldCur,sheet,g,gx);
+		}
+
+		private static void drawMedLabHeader(Sheet sheet,Graphics g,XGraphics gx) {			
+			SheetField fieldCur=new SheetField();
+			fieldCur.XPos=50;
+			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+40;
+			fieldCur.Width=529;
+			fieldCur.Height=40;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=579;
+			fieldCur.Width=221;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=50;
+			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row
+			fieldCur.Width=100;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=150;
+			fieldCur.Width=140;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=290;
+			fieldCur.Width=100;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=390;
+			fieldCur.Width=145;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=535;
+			fieldCur.Width=100;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=635;
+			fieldCur.Width=65;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=700;
+			fieldCur.Width=100;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.FieldValue="Patient Name";
+			fieldCur.FontSize=8.5f;
+			fieldCur.FontName="Arial";
+			fieldCur.FontIsBold=false;
+			fieldCur.XPos=54;
+			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+43;
+			fieldCur.Width=522;
+			fieldCur.Height=15;
+			fieldCur.TextAlign=HorizontalAlignment.Left;
+			fieldCur.ItemColor=Color.FromKnownColor(KnownColor.GrayText);
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Specimen Number";
+			fieldCur.XPos=583;
+			fieldCur.Width=214;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Account Number";
+			fieldCur.XPos=54;
+			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row
+			fieldCur.Width=93;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Patient ID";
+			fieldCur.XPos=154;
+			fieldCur.Width=133;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Control Number";
+			fieldCur.XPos=294;
+			fieldCur.Width=93;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Date & Time Collected";
+			fieldCur.XPos=394;
+			fieldCur.Width=138;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Date Reported";
+			fieldCur.XPos=539;
+			fieldCur.Width=93;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Gender";
+			fieldCur.XPos=639;
+			fieldCur.Width=58;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue="Date of Birth";
+			fieldCur.XPos=704;
+			fieldCur.Width=93;
+			drawFieldText(fieldCur,sheet,g,gx);
+			string patLName="";
+			string patFName="";
+			string patMiddleI="";
+			string specNum="";
+			string acctNum="";
+			string patId="";
+			string ctrlNum="";
+			string dateTCollected="";
+			string dateReported="";
+			string gender="";
+			string birthdate="";
+			foreach(SheetField sf in sheet.SheetFields) {
+				switch(sf.FieldName) {
+					case "patient.LName":
+						patLName=sf.FieldValue;
+						continue;
+					case "patient.FName":
+						patFName=sf.FieldValue;
+						continue;
+					case "patient.MiddleI":
+						patMiddleI=sf.FieldValue;
+						continue;
+					case "medlab.PatIDLab":
+						specNum=sf.FieldValue;
+						continue;
+					case "medlab.PatAccountNum":
+						acctNum=sf.FieldValue;
+						continue;
+					case "medlab.PatIDAlt":
+						patId=sf.FieldValue;
+						continue;
+					case "medlab.SpecimenIDAlt":
+						ctrlNum=sf.FieldValue;
+						continue;
+					case "medlab.DateTimeCollected":
+						dateTCollected=sf.FieldValue;
+						continue;
+					case "medlab.DateTimeReported":
+						dateReported=PIn.DateT(sf.FieldValue).ToShortDateString();
+						if(dateReported==DateTime.MinValue.ToShortDateString()) {
+							dateReported="";
+						}
+						continue;
+					case "patient.Gender":
+						gender=sf.FieldValue;
+						continue;
+					case "patient.Birthdate":
+						birthdate=sf.FieldValue;
+						continue;
+				}
+			}
+			fieldCur.FieldValue=patLName+", "+patFName+" "+patMiddleI;
+			fieldCur.FontSize=9;
+			fieldCur.FontName="Arial";
+			fieldCur.FontIsBold=false;
+			fieldCur.XPos=53;
+			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+62;
+			fieldCur.Width=524;
+			fieldCur.Height=17;
+			fieldCur.TextAlign=HorizontalAlignment.Left;
+			fieldCur.ItemColor=Color.FromKnownColor(KnownColor.Black);
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=specNum;
+			fieldCur.XPos=582;
+			fieldCur.Width=216;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=acctNum;
+			fieldCur.XPos=53;
+			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row
+			fieldCur.Width=95;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=patId;
+			fieldCur.XPos=153;
+			fieldCur.Width=135;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=ctrlNum;
+			fieldCur.XPos=293;
+			fieldCur.Width=95;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=dateTCollected;
+			fieldCur.XPos=393;
+			fieldCur.Width=140;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=dateReported;
+			fieldCur.XPos=538;
+			fieldCur.Width=95;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=gender;
+			fieldCur.XPos=638;
+			fieldCur.Width=60;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=birthdate;
+			fieldCur.XPos=703;
+			fieldCur.Width=95;
+			drawFieldText(fieldCur,sheet,g,gx);
 		}
 
 		private static void drawCalibration(Sheet sheet,Graphics g,PrintPageEventArgs e,XGraphics gx, PdfPage page) {
@@ -904,8 +1120,13 @@ namespace OpenDental {
 
 		#endregion
 
-		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt) {
+		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt,MedLab medLab=null) {
+			_printMargin.Top=40;
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
 			_stmt=stmt;
+			_medLab=medLab;
 			_isPrinting=true;
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
@@ -950,7 +1171,7 @@ namespace OpenDental {
 						drawFieldLine(field,null,gx);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,null,gx,_stmt);
+						drawFieldGrid(field,sheet,null,gx,_stmt,_medLab);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:
@@ -1012,6 +1233,10 @@ namespace OpenDental {
 
 		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing, exporting to pdfs, or rendering the sheet fill edit window.  graphic should be null for pdfs and xgraphic should be null for printing and rendering the sheet fill edit window.</summary>
 		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic,bool drawAll=false) {
+			_printMargin.Top=40;
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
 			Bitmap bmpOriginal=null;
 			if(drawAll){// || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
 				_yPosPrint=0;
