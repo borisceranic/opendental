@@ -64,10 +64,10 @@ namespace OpenDentBusiness.HL7 {
 						//This should be the Open Dental patient number, sent in outbound PID.4 and returned in PID.2.
 						seg.AddField(2,"pat.PatNum");
 						//PID.3, Lab Assigned Patient ID.  LabCorp assigned specimen number.
-						seg.AddField(3,"labPatId");
+						seg.AddField(3,"labPatID");
 						//PID.4, Alternate Patient ID.  LabCorp defines this as a 'client' assigned patient id, just like they do PID.2.
 						//This will be in outbound PID.2, returned in PID.4.
-						seg.AddField(4,"altPatId");
+						seg.AddField(4,"altPatID");
 						//PID.5, Patient Name
 						//This will contain the last, first, and middle names as well as the title
 						//Example:  LName^FName^MiddleI
@@ -117,12 +117,12 @@ namespace OpenDentBusiness.HL7 {
 						//Must match the value in OBR.2 and is the ID value sent on the specimen container and is unique per patient order, not test order.
 						//ORC.2.2 is the constant value 'LAB'
 						//Example: L2435^LAB
-						seg.AddField(2,"specimenId");
+						seg.AddField(2,"specimenID");
 						//ORC.3, Filler Accession ID.  The LabCorp assigned specimen number.  These are reused on a yearly basis, but used with the client
 						//specific specimen ID in ORC.2, these two numbers should uniquely identify a specimen/order.  ORC.3.2 is the constant value 'LAB'.
 						//This should match OBR.3.
 						//Example: 08599499950^LAB
-						seg.AddField(3,"specimenIdFiller");
+						seg.AddField(3,"specimenIDFiller");
 						//ORC.12, Ordering Provider, XCN Data Type
 						//ProvID^ProvLName^ProvFName^ProvMiddleI^^^^SourceTable
 						//This field repeats for every ID available for the provider with the SourceTable component identifying the type of ID in each repetition.
@@ -139,16 +139,16 @@ namespace OpenDentBusiness.HL7 {
 						//Must match the value in ORC.2 and is the ID value sent on the specimen container and is unique per patient order, not test order.
 						//OBR.2.2 is the constant value 'LAB'.
 						//Example: L2435^LAB
-						seg.AddField(2,"specimenId");
+						seg.AddField(2,"specimenID");
 						//OBR.3, Internal Accession ID.  The LabCorp assigned specimen number.  These are reused on a yearly basis, but used with the client
 						//specific specimen ID in OBR.2, these two numbers should uniquely identify a specimen/order.  OBR.3.2 is the constant value 'LAB'.
 						//This should match ORC.3.
 						//Example: 08599499950^LAB
-						seg.AddField(3,"specimenIdFiller");
+						seg.AddField(3,"specimenIDFiller");
 						//OBR.4, Universal Service Identifier, CWE data type
 						//This identifies the observation.  This will be the ID and text description of the test, as well as the LOINC code and description.
 						//Example: 006072^RPR^L^20507-0^Reagin Ab^LN
-						seg.AddField(4,"obsTestId");
+						seg.AddField(4,"obsTestID");
 						//OBR.7, Observation/Specimen Collection Date/Time
 						//Format for LabCorp: yyyyMMddHHmm
 						seg.AddField(7,"dateTimeCollected");
@@ -170,22 +170,22 @@ namespace OpenDentBusiness.HL7 {
 						//Example: A12345^LNAME^FNAME^M^^^^U~23462^LNAME^FNAME^M^^^^L~0123456789^LNAME^FNAME^M^^^^N~1234567890^LNAME^FNAME^M^^^^P
 						seg.AddField(16,"orderingProv");
 						//OBR.18, Alternate Specimen ID.
-						seg.AddField(18,"specimenIdAlt");
+						seg.AddField(18,"specimenIDAlt");
 						//OBR.22, Date/Time Observation Reported.
 						//LabCorp format: yyyyMMddHHmm
 						seg.AddField(22,"dateTimeReported");
 						//OBR.24, Producer's Section ID, used by LabCorp to identify the facility responsible for performing the testing.
 						//This will be the footnote ID of the ZPS segment and will be used to attach a MedLab object to a MedLabFacility object.
-						seg.AddField(24,"facilityId");
+						seg.AddField(24,"facilityID");
 						//OBR.25, Order Result Status.
 						//LabCorp values: 'F' - Final, 'P' - Preliminary, 'X' - Cancelled, 'C' - Corrected
 						seg.AddField(25,"resultStatus");
 						//OBR.26, Link to Parent Result.
 						//If this is a reflex result, the value from the OBX.3.1 field of the parent result will be here.
-						seg.AddField(26,"parentObsId");
+						seg.AddField(26,"parentObsID");
 						//OBR.29, Link to Parent Order.
 						//If this is a reflex test, the value from the OBR.4.1 field of the parent test will be here.
-						seg.AddField(29,"parentObsTestId");
+						seg.AddField(29,"parentObsTestID");
 					#endregion OBR - Observation Request
 					#region NTE - Notes and Comments
 					seg=new HL7DefSegment();
@@ -209,11 +209,11 @@ namespace OpenDentBusiness.HL7 {
 						//OBX.3, Observation ID.  This field has the same structure as the OBR.4.
 						//ID^Text^CodeSystem^AltID^AltIDText^AltIDCodeSystem, the AltID is the LOINC code so the AltIDCodeSystem will be 'LN'
 						//Example: 006072^RPR^L^20507-0^Reagin Ab^LN
-						seg.AddField(3,"obsId");
+						seg.AddField(3,"obsID");
 						//OBX.4, Observation Sub ID.  This field is used to aid in the identification of results with the same observation ID (OBX.3) within a
 						//given OBR.  If OBX.5.3 is 'ORM' (organism) this field will link a result to an organism, whether this is for organism #1, organism #2,
 						//or organism #3.
-						seg.AddField(4,"obsIdSub");
+						seg.AddField(4,"obsIDSub");
 						//OBX.5, Observation Value.  ObsValue^TypeOfData^DataSubtype^Encoding^Data.  LabCorp report will display OBX.5.1 as the result.
 						//For value >21 chars in length: OBX.2 will be 'TX' for text, OBX.5 will be NULL (empty field), and the value will be in attached NTEs.
 						//"TNP" will be reported for Test Not Performed.
@@ -234,7 +234,7 @@ namespace OpenDentBusiness.HL7 {
 						//OBX.15, Producer's ID.
 						//For LabCorp this is used to report the facility responsible for performing the testing.  This will hold the lab ID that will reference
 						//a ZPS segment with the lab name, address, and director details.  Used to link a MedLabResult object to a MedLabFacility object.
-						seg.AddField(15,"facilityId");
+						seg.AddField(15,"facilityID");
 					#endregion OBX - Observation/Result
 					#region ZEF - Encapsulated Data Format
 					seg=new HL7DefSegment();
@@ -264,7 +264,7 @@ namespace OpenDentBusiness.HL7 {
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//SPM.2, Specimen ID.
 						//Unique ID of the specimen as sent on the specimen container.  Same as the value in ORC.2.
-						seg.AddField(2,"specimenId");
+						seg.AddField(2,"specimenID");
 						//SPM.4, Specimen Type
 						//SPM.8, Specimen Source Site
 						//SPM.4, Specimen Source Site Modifier
@@ -278,7 +278,7 @@ namespace OpenDentBusiness.HL7 {
 					msg.AddSegment(seg,11,true,false,SegmentNameHL7.ZPS);
 						//Fields-------------------------------------------------------------------------------------------------------------
 						//ZPS.2, Facility Mnemonic.  Footnote ID for the lab facility used to reference this segment from OBX.15.
-						seg.AddField(2,"facilityId");
+						seg.AddField(2,"facilityID");
 						//ZPS.3, Facility Name.
 						seg.AddField(3,"facilityName");
 						//ZPS.4, Facility Address.

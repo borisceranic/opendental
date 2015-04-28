@@ -98,8 +98,11 @@ namespace OpenDentBusiness.HL7 {
 
 		///<summary>Searches the field and any repetitions for the ID from the specified source.  Possible sources are "U"=UPIN, "P"=Provider Number
 		///(Medicaid or Commercial Ins Prov ID), "N"=NPI, "L"=Local Physician ID.  If the idSource is not a U, P, N, or L or if there is no ID of that
-		///type in the field, this will return an empty string.</summary>
+		///type in the field, this will return an empty string.  If fieldCur==null returns empty string.</summary>
 		public static string OrderingProvIDParse(FieldHL7 fieldCur,string idSource) {
+			if(fieldCur==null) {
+				return "";
+			}
 			if(fieldCur.GetComponentVal(7).Trim().ToLower()==idSource.ToLower()) {
 				return fieldCur.GetComponentVal(0).Trim();
 			}

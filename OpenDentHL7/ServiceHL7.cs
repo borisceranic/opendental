@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -15,6 +13,9 @@ using System.Xml.XPath;
 using CodeBase;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
+using Tamir.SharpSsh.jsch;
+using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace OpenDentHL7 {
 	public partial class ServiceHL7:ServiceBase {
@@ -23,6 +24,7 @@ namespace OpenDentHL7 {
 		private System.Threading.Timer timerReceiveFiles;
 		private System.Threading.Timer timerSendTCP;
 		private System.Threading.Timer timerSendConnectTCP;
+		private System.Threading.Timer _timerSftpGetFiles;
 		private Socket _socketIncomingMain;
 		private string hl7FolderIn;
 		private string hl7FolderOut;
@@ -42,6 +44,8 @@ namespace OpenDentHL7 {
 		private static bool _ecwTCPModeIsReceiving;//this is set to true right before an asynchronous BeginReceive call.  Right before closing the worker socket, it is set to false.  Otherwise the socket.Close() triggers the callback function and the EndReceive is referencing a disposed object.
 		private static ManualResetEvent connectDone=new ManualResetEvent(false);
 		private static ManualResetEvent receiveDone=new ManualResetEvent(false);
+		private static bool _sftpModeIsReceiving;
+		private HL7Def _medLabHL7DefEnabled;
 
 		public ServiceHL7() {
 			InitializeComponent();
@@ -94,6 +98,35 @@ namespace OpenDentHL7 {
 				EventLog.WriteEntry("OpenDentHL7","Versions do not match.  Db version:"+dbVersion+".  Application version:"+Application.ProductVersion.ToString(),EventLogEntryType.Error);
 				throw new ApplicationException("Versions do not match.  Db version:"+dbVersion+".  Application version:"+Application.ProductVersion.ToString());
 			}
+			#region MedLab HL7
+			_medLabHL7DefEnabled=HL7Defs.GetOneDeepEnabled(true);
+			if(_medLabHL7DefEnabled!=null) {
+				if(_medLabHL7DefEnabled.HL7Server=="") {
+					_medLabHL7DefEnabled.HL7Server=System.Environment.MachineName;
+					HL7Defs.Update(_medLabHL7DefEnabled);
+				}
+				if(_medLabHL7DefEnabled.HL7ServiceName=="") {
+					_medLabHL7DefEnabled.HL7ServiceName=this.ServiceName;
+					HL7Defs.Update(_medLabHL7DefEnabled);
+				}
+				if(_medLabHL7DefEnabled.HL7Server.ToLower()!=System.Environment.MachineName.ToLower()) {
+					EventLog.WriteEntry("OpenDentHL7","The HL7 Server name does not match the name in the enabled MedLab HL7Def Setup.  Server name: "
+						+System.Environment.MachineName+", Server name in MedLab HL7Def: "+_medLabHL7DefEnabled.HL7Server,EventLogEntryType.Error);
+					throw new ApplicationException("The HL7 Server name does not match the name in the enabled MedLab HL7Def Setup.  Server name: "
+						+System.Environment.MachineName+", Server name in MedLab HL7Def: "+_medLabHL7DefEnabled.HL7Server);
+				}
+				if(_medLabHL7DefEnabled.HL7ServiceName.ToLower()!=this.ServiceName.ToLower()) {
+					EventLog.WriteEntry("OpenDentHL7","The MedLab HL7 Service Name does not match the name in the enabled MedLab HL7Def Setup.  Service name: "
+						+this.ServiceName+", Service name in MedLab HL7Def: "+_medLabHL7DefEnabled.HL7ServiceName,EventLogEntryType.Error);
+					throw new ApplicationException("The MedLab HL7 Service Name does not match the name in the enabled MedLab HL7Def Setup.  Service name: "
+						+this.ServiceName+", Service name in MedLab HL7Def: "+_medLabHL7DefEnabled.HL7ServiceName);
+				}
+				_sftpModeIsReceiving=false;
+				TimerCallback timerCallbackSftpGetFiles=new TimerCallback(TimerCallbackSftpGetFiles);
+				_timerSftpGetFiles=new System.Threading.Timer(timerCallbackSftpGetFiles,null,1000,60000);//attempt to connect to the sftp server once a minute
+			}
+			#endregion MedLab HL7
+			#region eCW Send and Receive OLD
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks) && !HL7Defs.IsExistingHL7Enabled()) {//eCW enabled, and no HL7def enabled.
 				//prevent startup:
 				long progNum=Programs.GetProgramNum(ProgramName.eClinicalWorks);
@@ -122,6 +155,8 @@ namespace OpenDentHL7 {
 				EcwOldSendAndReceive();
 				return;
 			}
+			#endregion eCW Send and Receive OLD
+			#region HL7 Send and Receive New Defs
 			HL7Def hL7Def=HL7Defs.GetOneDeepEnabled();
 			if(hL7Def==null) {
 				return;
@@ -145,6 +180,7 @@ namespace OpenDentHL7 {
 				throw new ApplicationException("The HL7 Service Name does not match the name in the enabled HL7Def Setup.  Service name: "+this.ServiceName+", Service name in HL7Def: "+hL7Def.HL7ServiceName);
 			}
 			HL7DefEnabled=hL7Def;//so we can access it later from other methods
+			#region File Mode
 			if(HL7DefEnabled.ModeTx==ModeTxHL7.File) {
 				hl7FolderOut=HL7DefEnabled.OutgoingFolder;
 				hl7FolderIn=HL7DefEnabled.IncomingFolder;
@@ -165,6 +201,8 @@ namespace OpenDentHL7 {
 				TimerCallback timercallbackSend=new TimerCallback(TimerCallbackSendFiles);
 				timerSendFiles=new System.Threading.Timer(timercallbackSend,null,1800,1800);
 			}
+			#endregion File Mode
+			#region TCP/IP Mode
 			else {//TCP/IP
 				CreateIncomingTcpListener();//this method spawns a new thread for receiving, the main thread returns to perform the sending below
 				_ecwTCPSendSocketIsConnected=false;
@@ -173,8 +211,196 @@ namespace OpenDentHL7 {
 				TimerCallback timercallbackSendConnectTCP=new TimerCallback(TimerCallbackSendConnectTCP);
 				timerSendConnectTCP=new System.Threading.Timer(timercallbackSendConnectTCP,null,1800,20000);//every 20 seconds, re-connect to the socket if the connection has been closed
 			}
+			#endregion TCP/IP Mode
+			#endregion HL7 Send and Receive New Defs
 		}
 
+		#region SFTP Mode
+		///<summary>Runs in a separate thread, called once per minute.  If not already retrieving and processing files, this will connect to the MedLab SFTP server, check for new files to retrieve, process the files, and disconnect from the server.  Once the files are read, they are deleted by the MedLab SFTP server automatically, so it is not necessary to call a remove/delete function.</summary>
+		private void TimerCallbackSftpGetFiles(Object stateInfo) {
+			if(IsVerboseLogging) {
+				EventLog.WriteEntry("OpenDentHL7","A new thread is spawned once per minute to connect to the MedLab SFTP server.  "
+					+"If a connection has already been established, this thread will return.",EventLogEntryType.Information);
+			}
+			if(_sftpModeIsReceiving) {
+				return;
+			}
+			_sftpModeIsReceiving=true;
+			//get the message archive processed and failed paths for storing the inbound messages
+			string msgArchiveProcessedPath="";
+			string msgArchivePath="";
+			try {
+				if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+					msgArchivePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"MedLabHL7");
+					msgArchiveProcessedPath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"MedLabHL7","Processed");
+					if(!Directory.Exists(msgArchiveProcessedPath)) {
+						Directory.CreateDirectory(msgArchiveProcessedPath);
+					}
+				}
+			}
+			catch(Exception ex) {
+				//if the above fails, clear out the paths, the messages will not be archived
+				msgArchivePath="";
+				msgArchiveProcessedPath="";
+				EventLog.WriteEntry("OpenDentHL7","The MedLab HL7 message archive directory is not accessible or could not be created.  "
+					+"The inbound HL7 messages will not be archived.  Once processed, the original message text will be deleted.",EventLogEntryType.Warning);
+			}
+			Session session=null;
+			Channel ch=null;
+			ChannelSftp chsftp=null;
+			JSch jsch=new JSch();
+			string[] serverHostPort=_medLabHL7DefEnabled.SftpInSocket.Split(':');
+			bool isConnected=false;
+			try {
+				if(serverHostPort.Length==1) {
+					session=jsch.getSession(_medLabHL7DefEnabled.SftpUsername,serverHostPort[0]);
+				}
+				else if(serverHostPort.Length>=2) {
+					session=jsch.getSession(_medLabHL7DefEnabled.SftpUsername,serverHostPort[0],int.Parse(serverHostPort[1]));//port verified to be an int
+				}
+				session.setPassword(_medLabHL7DefEnabled.SftpPassword);
+				Hashtable config=new Hashtable();
+				config.Add("StrictHostKeyChecking","no");
+				session.setConfig(config);
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Connecting to the MedLab SFTP server to retrieve lab result HL7 message files.",EventLogEntryType.Information);
+				}
+				session.connect(15000);//timeout after 15 seconds
+				ch=session.openChannel("sftp");
+				ch.connect();
+				chsftp=(ChannelSftp)ch;
+				//this is the only place this flag is set to true.  If anything above here fails, whether an exception or not, the next line will not run
+				//and the finally will set the receiving flag to false for the next thread
+				isConnected=true;
+			}
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentHL7","Could not connect to the MedLab SFTP server using the values in the enabled MedLab HL7 definition.  "
+					+"Another connection attempt will occur in 1 minute.\r\n"+ex.Message,EventLogEntryType.Information);
+				_sftpModeIsReceiving=false;
+				return;
+			}
+			finally {
+				if(!isConnected) {//an error happened, make sure the session and channels are disconnected and reset the receiving flag
+					if(chsftp!=null) {
+						chsftp.disconnect();
+					}
+					if(ch!=null) {
+						ch.disconnect();
+					}
+					if(session!=null) {
+						session.disconnect();
+					}
+				}
+			}
+			if(!isConnected) {
+				_sftpModeIsReceiving=false;
+				return;
+			}
+			int countFilesFound=0;
+			int countFilesProcessed=0;
+			try {
+				//At this point we are connected to the LabCorp SFTP server.
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Getting list of file names to retrieve from the MedLab SFTP server.",EventLogEntryType.Information);
+				}
+				Tamir.SharpSsh.java.util.Vector fileList=chsftp.ls(".");//fileList will be ArrayList filled with LsEntry objects
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Processing MedLab HL7 message files.",EventLogEntryType.Information);
+				}
+				for(int i=0;i<fileList.Count;i++) {
+					StringBuilder sb=new StringBuilder();
+					string listItem=fileList[i].ToString().Trim();//LsEntry.ToString() overridden to return the file's longname
+					if(listItem[0]=='d') {
+						continue;//skip directories
+					}
+					countFilesFound++;
+					Match filenameMatch=Regex.Match(listItem,".*\\s+(.*)$");
+					string filename=filenameMatch.Result("$1");
+					Tamir.SharpSsh.java.io.InputStream fileStream=null;
+					try {
+						if(IsVerboseLogging) {
+							EventLog.WriteEntry("OpenDentHL7","Begin reading in the next MedLab HL7 file.",EventLogEntryType.Information);
+						}
+						fileStream=chsftp.get(filename);
+						byte[] fileBytes=new byte[100000];//100,000 byte chunks, 350 KB file size, average time to retrieve file 3.2 seconds
+						int numBytes=fileStream.Read(fileBytes,0,fileBytes.Length);
+						while(numBytes>0) {
+							sb.Append(Tamir.SharpSsh.java.String.getStringUTF8(fileBytes,0,numBytes));
+							numBytes=fileStream.Read(fileBytes,0,fileBytes.Length);
+						}
+						string msgArchiveFile="";
+						if(msgArchivePath!="") {
+							if(IsVerboseLogging) {
+								EventLog.WriteEntry("OpenDentHL7","Create the archive of the MedLab HL7 message in location "
+									+msgArchivePath,EventLogEntryType.Information);
+							}
+							try {
+								msgArchiveFile=ODFileUtils.CreateRandomFile(msgArchivePath,".txt");
+								File.WriteAllText(msgArchiveFile,sb.ToString());
+							}
+							catch(Exception ex) {
+								//do nothing, don't archive the message, might be a permission issue
+							}
+						}
+						if(IsVerboseLogging) {
+							EventLog.WriteEntry("OpenDentHL7","Create the MedLab HL7 Message Object from the file text.",EventLogEntryType.Information);
+						}
+						MessageHL7 messageHl7Object=new MessageHL7(sb.ToString());//this creates an entire heirarchy of objects.
+						if(IsVerboseLogging) {
+							EventLog.WriteEntry("OpenDentHL7","Process the MedLab HL7 message.",EventLogEntryType.Information);
+						}
+						List<long> medLabNumList=MessageParserMedLab.Process(messageHl7Object,msgArchiveFile,IsVerboseLogging);
+						if(msgArchiveProcessedPath!="" && msgArchiveFile!="") {
+							try {
+								string msgArchiveFileProcessed=ODFileUtils.CombinePaths(msgArchiveProcessedPath,Path.GetFileName(msgArchiveFile));
+								File.Move(msgArchiveFile,msgArchiveFileProcessed);
+								MedLabs.UpdateFileNames(medLabNumList,msgArchiveFileProcessed);
+							}
+							catch(Exception ex) {
+								//do nothing, the file will remain in the root location
+							}
+						}
+						countFilesProcessed++;
+						//chsftp.rm(filename);//LabCorp doesn't grant permission to remove files, but once the file has been read it is deleted from the SFTP server
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDentHL7","Error retrieving or processing a MedLab HL7 message.  If the file was not processed, it will remain "
+							+"on the server and another attempt will be made later.\r\n"+ex.Message,EventLogEntryType.Information);
+						continue;
+					}
+					finally {
+						if(fileStream!=null) {
+							fileStream.Dispose();
+						}
+					}
+				}
+			}
+			catch(Exception ex) {
+				EventLog.WriteEntry("OpenDentHL7","Error retrieving or processing a MedLab HL7 message.  Will retry in 1 minute.\r\n"
+					+ex.Message,EventLogEntryType.Information);
+				return;
+			}
+			finally {
+				if(IsVerboseLogging) {
+					EventLog.WriteEntry("OpenDentHL7","Files found: "+countFilesFound.ToString()+", Files Processed: "
+						+countFilesProcessed.ToString()+"\r\nDisconnecting from the MedLab SFTP server.",EventLogEntryType.Information);
+				}
+				//Disconnect from the MedLab SFTP server.
+				if(chsftp!=null) {
+					chsftp.disconnect();
+				}
+				if(ch!=null) {
+					ch.disconnect();
+				}
+				if(session!=null) {
+					session.disconnect();
+				}
+				_sftpModeIsReceiving=false;
+			}
+		}
+		#endregion SFTP Mode
+
+		#region File Mode
 		private void TimerCallbackReceiveFiles(Object stateInfo) {
 			//process all waiting messages
 			if(isReceivingFiles) {
@@ -270,7 +496,9 @@ namespace OpenDentHL7 {
 				_ecwFileModeIsSending=false;
 			}
 		}
+		#endregion File Mode
 
+		#region TCP/IP Mode
 		private void CreateIncomingTcpListener() {
 			//Use Minimal Lower Layer Protocol (MLLP):
 			//To send a message:              StartBlockChar(11) -          Payload            - EndBlockChar(28) - EndDataChar(13).
@@ -748,6 +976,7 @@ namespace OpenDentHL7 {
 				list=HL7Msgs.GetOnePending();//returns 0 or 1 pending message
 			}
 		}
+		#endregion TCP/IP Mode
 	}
 
 	///<summary>State object for reading client data asynchronously</summary>

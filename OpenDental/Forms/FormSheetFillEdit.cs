@@ -28,6 +28,7 @@ namespace OpenDental {
 		private Margins _printMargin=new Margins(0,0,40,60);
 		public bool IsStatement;//Used for statements, do not save a sheet version of the statement.
 		public Statement Stmt;
+		public MedLab MedLabCur;
 
 		public FormSheetFillEdit(Sheet sheet){
 			InitializeComponent();
@@ -550,7 +551,7 @@ namespace OpenDental {
 				if(SheetCur.SheetFields[f].FieldType!=SheetFieldType.Grid){
 					continue;
 				}
-				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,Stmt);
+				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,Stmt,MedLabCur);
 			}
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
@@ -647,7 +648,7 @@ namespace OpenDental {
 				return;
 			}
 			if(FormS.PaperCopies>0){
-				SheetPrinting.Print(SheetCur,FormS.PaperCopies,RxIsControlled,Stmt);
+				SheetPrinting.Print(SheetCur,FormS.PaperCopies,RxIsControlled,Stmt,MedLabCur);
 			}
 			EmailMessage message;
 			Random rnd=new Random();
@@ -670,7 +671,7 @@ namespace OpenDental {
 				}
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
-				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
+				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt,MedLabCur);
 				//Process.Start(filePathAndName);
 				message=new EmailMessage();
 				message.PatNum=SheetCur.PatNum;
@@ -697,7 +698,7 @@ namespace OpenDental {
 				//email referral
 				fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 				filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
-				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
+				SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt,MedLabCur);
 				//Process.Start(filePathAndName);
 				message=new EmailMessage();
 				message.PatNum=SheetCur.PatNum;
@@ -727,7 +728,7 @@ namespace OpenDental {
 			}
 			string filePathAndName=PrefL.GetRandomTempFile(".pdf");
 			//Graphics g=this.CreateGraphics();
-			SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt);
+			SheetPrinting.CreatePdf(SheetCur,filePathAndName,Stmt,MedLabCur);
 			//g.Dispose();
 			Process.Start(filePathAndName);
 			SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,SheetCur.Description+" from "+SheetCur.DateTimeSheet.ToShortDateString()+" pdf was created");

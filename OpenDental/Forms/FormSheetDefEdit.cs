@@ -104,7 +104,7 @@ namespace OpenDental {
 			else{
 				labelInternal.Visible=false;
 			}
-			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement) {
+			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement && SheetDefCur.SheetType!=SheetTypeEnum.MedLabResults) {
 				butAddGrid.Visible=false;
 			}
 			if(Sheets.SheetTypeIsSinglePage(SheetDefCur.SheetType)) {
@@ -411,7 +411,7 @@ namespace OpenDental {
 				}
 				odGrid.PrintHeader(g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid);
 				yPosGrid+=odGrid.HeaderHeight;
-				odGrid.PrintRow(0,g,odGrid.Font,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,false,true);//a single dummy row.
+				odGrid.PrintRow(0,g,SheetDefCur.SheetFieldDefs[i].XPos,yPosGrid,false,true);//a single dummy row.
 				yPosGrid+=odGrid.RowHeights[0]+2;
 				#region drawFooter
 				if(SheetDefCur.SheetFieldDefs[i].FieldName=="StatementPayPlan") {
