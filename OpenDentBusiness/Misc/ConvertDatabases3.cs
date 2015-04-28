@@ -7497,6 +7497,19 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.1.20.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_1_22();
+		}
+
+		///<summary></summary>
+		private static void To15_1_22() {
+			if(FromVersion<new Version("15.1.22.0")) {
+				string command="";
+				//The next command is MySQL and Oracle compatible.  Used LTRIM() to remove the leading space after "NewCrop" is removed from description.
+				command="UPDATE program SET ProgName='eRx', ProgDesc=LTRIM(REPLACE(ProgDesc,'NewCrop','')), Note=REPLACE(Note,'NewCrop','eRx') WHERE ProgName='NewCrop'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.1.22.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_2_0();
 		}
 
