@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.2.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.2.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -7510,12 +7510,12 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.1.22.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To15_2_0();
+			To15_2_1();
 		}
 
 		///<summary></summary>
-		private static void To15_2_0() {
-			if(FromVersion<new Version("15.2.0.0")) {
+		private static void To15_2_1() {
+			if(FromVersion<new Version("15.2.1.0")) {
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('WaitingRoomFilterByView','0')";
@@ -8238,13 +8238,10 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WaitingRoomAlertTime','0')";
 					Db.NonQ(command);
 				}
-
-
-
-				command="UPDATE preference SET ValueString = '15.2.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '15.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To15_2_1();
+			//To15_2_X();
 		}
 		
 
