@@ -57,6 +57,8 @@ namespace OpenDentBusiness{
 		Dxis,
 		EasyNotesPro,
 		eClinicalWorks,
+		///<summary>electronic Rx.</summary>
+		eRx,
 		EvaSoft,
 		EwooEZDent,
 		FloridaProbe,
@@ -71,8 +73,6 @@ namespace OpenDentBusiness{
 		MediaDent,
 		MiPACS,
 		Mountainside,
-		///<summary>electronic Rx.</summary>
-		NewCrop,
 		///<summary>Please use Programs.UsingOrion where possible.</summary>
 		Orion,
 		OrthoPlex,

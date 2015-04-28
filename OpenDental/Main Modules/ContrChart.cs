@@ -3569,7 +3569,7 @@ namespace OpenDental{
 
 		///<summary>Returns true if new information was pulled back from NewCrop.</summary>
 		private bool NewCropRefreshPrescriptions() {
-			Program programNewCrop=Programs.GetCur(ProgramName.NewCrop);
+			Program programNewCrop=Programs.GetCur(ProgramName.eRx);
 			if(ToolBarMain.Buttons["eRx"]!=null) {//Hidden for eCW
 				ToolBarMain.Buttons["eRx"].IsRed=false; //Set the eRx button back to default color.
 				ToolBarMain.Invalidate();
@@ -3841,10 +3841,10 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.RxCreate)) {
 				return;
 			}
-			Program programNewCrop=Programs.GetCur(ProgramName.NewCrop);
+			Program programNewCrop=Programs.GetCur(ProgramName.eRx);
 			string newCropAccountId=PrefC.GetString(PrefName.NewCropAccountId);
 			if(newCropAccountId==""){//NewCrop has not been enabled yet.
-				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Are you sure you want to enable NewCrop electronic prescriptions?  The cost is $15/month for each prescribing provider.  NewCrop only works for the United States and its territories, including Puerto Rico.")) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Continuing will enable basic Electronic Rx (eRx).  Fees are associated with this secure e-prescribing system.  See our online manual for details.  To enable comprehensive eRx (with drug interaction checks, formulary checks, etc.), contact support.  At this time, eRx only works for the United States and its territories, including Puerto Rico.  Continue?")) {
 					return;
 				}
 				//prepare the xml document to send--------------------------------------------------------------------------------------
@@ -3901,7 +3901,7 @@ namespace OpenDental{
 			}
 			else { //newCropAccountId!=""
 				if(!programNewCrop.Enabled) {
-					MessageBox.Show(Lan.g(this,"Electronic prescriptions are currently disabled.")+"\r\n"+Lan.g(this,"To enable, go to Setup | Program Links | NewCrop."));
+					MessageBox.Show(Lan.g(this,"eRx is currently disabled.")+"\r\n"+Lan.g(this,"To enable, see user manual for instructions."));
 					return;
 				}
 				if(!NewCropIsAccountIdValid()) {
