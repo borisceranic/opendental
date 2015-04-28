@@ -306,6 +306,8 @@ namespace OpenDental{
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			if(IsSelectionMode) {
+				//==Travis 04/27/15:  When using selection mode we use the normal cache to fill the grid.  We may want to enhance this in the future to
+				//		use _listDiseaseDefs becasuse we're still building the list as we go, and calling sync() when in selection mode anyway.
 				for(int i=0;i<DiseaseDefs.List.Length;i++) {
 					row=new ODGridRow();
 					row.Cells.Add(DiseaseDefs.List[i].ICD9Code);
@@ -380,6 +382,10 @@ namespace OpenDental{
 			//Security log entry made inside that form.
 			if(FormD.DialogResult!=DialogResult.OK) {
 				return;
+			}
+			//Need to invalidate cache for selection mode so that the new problem shows up.
+			if(IsSelectionMode) {
+				DataValid.SetInvalid(InvalidType.Diseases);
 			}
 			//Items are already in the right order in the DB, re-order in memory list to match
 			for(int i=0;i<_listDiseaseDefs.Count;i++) {
