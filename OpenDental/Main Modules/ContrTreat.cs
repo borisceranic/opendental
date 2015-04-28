@@ -3049,6 +3049,7 @@ namespace OpenDental{
 			ClaimCur.PlanNum=FormIPS.SelectedPlan.PlanNum;
 			ClaimCur.InsSubNum=FormIPS.SelectedSub.InsSubNum;
 			ClaimCur.ProvTreat=0;
+			ClaimCur.ClaimForm=FormIPS.SelectedPlan.ClaimFormNum;
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null){
 					continue;//skip any hightlighted subtotal lines
