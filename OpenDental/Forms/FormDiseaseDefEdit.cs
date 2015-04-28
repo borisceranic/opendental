@@ -394,6 +394,7 @@ namespace OpenDental{
 				DiseaseDefs.Update(DiseaseDefCur);
 				SecurityLogs.MakeLogEntry(Permissions.ProblemEdit,0,DiseaseDefCur.DiseaseName);
 			}
+			//Cache invalidation done in FormDiseaseDefs.cs
 			DialogResult=DialogResult.OK;
 		}
 
