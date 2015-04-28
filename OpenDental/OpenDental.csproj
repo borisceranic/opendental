@@ -7148,8 +7148,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared Projects Subversion\EHR\EHR_head\EHR\xEHR.csproj">
-      <Project>{5ABF1D9D-2B93-4217-AFA6-9EECCF6F525F}</Project>
+    <ProjectReference Include="..\..\..\Shared Projects Subversion\EHR\EHR_15_2\EHR\xEHR.csproj">
+      <Project>{5abf1d9d-2b93-4217-afa6-9eeccf6f525f}</Project>
       <Name>xEHR</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Shared Projects Subversion\OpenDentalHelp\head\OpenDentalHelp\OpenDentalHelp.csproj">
