@@ -412,12 +412,12 @@ namespace OpenDental {
 					if(!listChargeAccountEntryNums.Contains(charge.AccountEntryNum))	{
 						continue;
 					}
-					double chargeAmtNew=charge.AmountCur+selectedCredit.AmountCur;
+					double chargeAmtNew=charge.AmountCur+selectedCredit.AmountOriginal;
 					if(chargeAmtNew>charge.AmountOriginal) {//Trying to delete an overpayment, just increase charge's amount to the max.
 						charge.AmountCur=charge.AmountOriginal;
 					}
 					else {
-						charge.AmountCur+=selectedCredit.AmountCur;//Give the money back to the charge so it will display.
+						charge.AmountCur+=selectedCredit.AmountOriginal;//Give the money back to the charge so it will display.
 					}
 				}
 				ListSplitsCur.Remove((PaySplit)selectedCredit.Tag);
