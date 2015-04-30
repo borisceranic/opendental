@@ -1485,6 +1485,7 @@ namespace OpenDental{
 				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
 				ppCharge.Guarantor=PayPlanCur.Guarantor;
 				ppCharge.PatNum=PayPlanCur.PatNum;
+				ppCharge.Note="";
 				if(FormPayPlanOpts.radioWeekly.Checked) {
 					ppCharge.ChargeDate=firstDate.AddDays(7*countCharges);
 				}
