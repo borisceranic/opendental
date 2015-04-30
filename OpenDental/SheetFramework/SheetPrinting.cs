@@ -35,34 +35,37 @@ namespace OpenDental {
 		private static MedLab _medLab;
 
 
-		public static void PrintStatement(object parameters) {
-			List<object> listParams=(List<object>)parameters;
-			SheetDef sheetDef=(SheetDef)listParams[0];
-			Statement stmt=(Statement)listParams[1];
-			string filePath=(string)listParams[2];
-			try {
-				ProcessStartInfo info=new ProcessStartInfo();
-				info.Verb="print";
-				info.FileName=filePath;
-				info.CreateNoWindow=true;
-				info.WindowStyle=ProcessWindowStyle.Hidden;
-				Process p=new Process();
-				p.StartInfo=info;
-				p.Start();
-				p.WaitForInputIdle();
-				System.Threading.Thread.Sleep(3000);
-				if(p.CloseMainWindow()==false) {
-					p.Kill();
-				}
-			}
-			catch(Exception ex) {
-				//Must rest sheet, as PDF printing modifies fields.
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
-				SheetFiller.FillFields(sheet,stmt);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
-				SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
-			}
-		}
+		/////<summary>Not used. This code is copied and pasted in several locations. Easiest to find by searching for "info.Verb="print";"</summary>
+		//public static void PrintStatement(object parameters) {
+		//	List<object> listParams=(List<object>)parameters;
+		//	SheetDef sheetDef=(SheetDef)listParams[0];
+		//	Statement stmt=(Statement)listParams[1];
+		//	string filePath=(string)listParams[2];
+		//	try {
+		//		ProcessStartInfo info=new ProcessStartInfo();
+		//		info.Arguments = "\"" + Printers.GetForSit(PrintSituation.Statement).PrinterName + "\"";
+		//		info.UseShellExecute = true;
+		//		info.Verb="PrintTo";
+		//		info.FileName=filePath;
+		//		info.CreateNoWindow=true;
+		//		info.WindowStyle=ProcessWindowStyle.Hidden;
+		//		Process p=new Process();
+		//		p.StartInfo=info;
+		//		p.Start();
+		//		p.WaitForInputIdle();
+		//		System.Threading.Thread.Sleep(3000);
+		//		if(p.CloseMainWindow()==false) {
+		//			p.Kill();
+		//		}
+		//	}
+		//	catch(Exception ex) {
+		//		//Must restet sheet, as PDF printing modifies fields.
+		//		Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+		//		SheetFiller.FillFields(sheet,stmt);
+		//		SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+		//		SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
+		//	}
+		//}
 
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch,Statement stmt=null){
@@ -180,21 +183,21 @@ namespace OpenDental {
 						sit=PrintSituation.Rx;
 					}
 					break;
+				case SheetTypeEnum.Statement:
+					sit= PrintSituation.Statement;
+					break;
 			}
 			//later: add a check here for print preview.
-			#if DEBUG
-			//	//pd.DefaultPageSettings.Margins=new Margins(0,0,40,60);
-			//	//pd.OriginAtMargins=true;
-			//	//pd.DefaultPageSettings.PaperSize=new PaperSize("Default",sheet.Width,sheet.Height-(100));
-			//	FormPrintPreview printPreview;
-			//	int pageCount=0;
-			//	foreach(Sheet s in _sheetList) {
-			//		//SetForceSinglePage(s);
-			//		pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
-			//	}
-			//	printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
-			//	printPreview.ShowDialog();
-			//#else
+		#if DEBUG
+			FormPrintPreview printPreview;
+			int pageCount=0;
+			foreach(Sheet s in _sheetList) {
+				//SetForceSinglePage(s);
+				pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+			}
+			printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
+			printPreview.ShowDialog();
+		#else
 				try {
 					if(sheet.PatNum!=null){
 						if(!PrinterL.SetPrinter(pd,sit,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
@@ -213,7 +216,7 @@ namespace OpenDental {
 					throw ex;
 					//MessageBox.Show(Lan.g("Sheet","Printer not available"));
 				}
-			#endif
+		#endif
 			_isPrinting=false;
 		}
 
@@ -545,6 +548,9 @@ namespace OpenDental {
 				row=new ODGridRow();
 				for(int c=0;c<Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
 					row.Cells.Add(Table.Rows[i][Columns[c].InternalName].ToString());
+				}
+				if(Table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
+					row.Tag=Table.Rows[i]["PatNum"].ToString();
 				}
 				odGrid.Rows.Add(row);
 			}

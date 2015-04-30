@@ -139,6 +139,9 @@ namespace OpenDental{
 				for(int c=0;c<Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
 					row.Cells.Add(Table.Rows[i][Columns[c].InternalName].ToString());
 				}
+				if(Table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
+					row.Tag=Table.Rows[i]["PatNum"].ToString();
+				}
 				odGrid.Rows.Add(row);
 			}
 			odGrid.EndUpdate(true);//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
