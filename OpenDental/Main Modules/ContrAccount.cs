@@ -4013,33 +4013,11 @@ namespace OpenDental {
 #else
 				//Thread thread=new Thread(new ParameterizedThreadStart(SheetPrinting.PrintStatement));
 				//thread.Start(new List<object> { sheetDef,stmt,tempPath });
-				try {
-					ProcessStartInfo info=new ProcessStartInfo();
-					info.Verb="print";
-					info.FileName=tempPath;
-					info.CreateNoWindow=true;
-					info.WindowStyle=ProcessWindowStyle.Hidden;
-					Process p=new Process();
-					p.StartInfo=info;
-					p.Start();
-					p.WaitForInputIdle();
-					//Wait for process to be idle for at least 1 second.
-					long ticks = -1;
-					while(ticks != p.TotalProcessorTime.Ticks) {
-						ticks = p.TotalProcessorTime.Ticks;
-						Thread.Sleep(1000);
-					}
-					if(p.CloseMainWindow()==false) {
-						p.Kill();
-					}
-				}
-				catch(Exception ex) {
-					//Must reset sheet, PDF printing modifies field positions.
-					sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
-					SheetFiller.FillFields(sheet,stmt);
-					SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
-					SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
-				}
+				//NOTE: This is printing a "fresh" GDI+ version of the statment which is ever so slightly different than the PDFSharp statment that was saved to disk.
+				sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
+				SheetFiller.FillFields(sheet,stmt);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+				SheetPrinting.Print(sheet,1,false,stmt);//use GDI+ printing, which is slightly different than the pdf.
 #endif
 			}
 			Cursor=Cursors.Default;
