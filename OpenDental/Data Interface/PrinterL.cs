@@ -8,7 +8,10 @@ using OpenDentBusiness;
 namespace OpenDental{
 	public class PrinterL{
 
-		///<summary>Called from many places in the program.  Every single time we print, this function is used to figure out which printer to use.  It also handles displaying the dialog if necessary.  Tests to see if the selected printer is valid, and if not, then it gives user the option to print to an available printer.  PatNum and AuditDescription used to make audit log entry.  PatNum can be 0.  Audit Log Text will show AuditDescription exactly.</summary>
+		///<summary>Called from many places in the program.  Every single time we print, this function is used to figure out which printer to use.
+		///It also handles displaying the dialog if necessary.  Tests to see if the selected printer is valid, and if not, then it gives user the 
+		///option to print to an available printer.  PatNum and AuditDescription used to make audit log entry.  PatNum can be 0.  Audit Log Text will 
+		///show AuditDescription exactly.</summary>
 		public static bool SetPrinter(PrintDocument pd,PrintSituation sit,long patNum,string auditDescription){
 			PrinterSettings pSet=pd.PrinterSettings;
 			//pSet will always be new when this function is called

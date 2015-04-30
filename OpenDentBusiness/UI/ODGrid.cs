@@ -672,7 +672,8 @@ namespace OpenDental.UI {
 				}
 				else if(title.StartsWith("StatementMain.NotIntermingled")
 					&& i>0 
-					&& rows[i].Cells[1].Text!=rows[i-1].Cells[1].Text) //index 1 should be patient. May need to be enhanced later if grid customization is enabled.
+					//&& rows[i].Cells[1].Text!=rows[i-1].Cells[1].Text) //cell index 1 should be patient. May need to be enhanced later if grid customization is enabled.
+					&& rows[i].Tag.ToString()!=rows[i-1].Tag.ToString()) //Tag should be PatNum
 				{
 					yPosCur+=20;//space out grids.
 					PrintRows[i-1].IsBottomRow=true;

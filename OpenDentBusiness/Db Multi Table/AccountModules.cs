@@ -1485,6 +1485,7 @@ namespace OpenDentBusiness {
 			}
 			//Remove rows outside of daterange-------------------------------------------------------------------
 			bool foundBalForward;
+			long pnum=pat.Guarantor;//the patnum that should be put on the Balance foreward row.
 			if(rowsByPat==null){
 				foundBalForward=false;
 				for(int i=rows.Count-1;i>=0;i--) {//go backwards and remove from end
@@ -1503,7 +1504,7 @@ namespace OpenDentBusiness {
 				if(foundBalForward){
 					//add a balance forward row
 					row=table.NewRow();
-					SetBalForwardRow(row,balanceForward);
+					SetBalForwardRow(row,balanceForward,pnum);
 					rows.Insert(0,row);
 				}
 			}
@@ -1520,6 +1521,7 @@ namespace OpenDentBusiness {
 								foundBalForward=true;
 								balanceForward=(decimal)rowsByPat[p].Rows[i]["balanceDouble"];
 							}
+							long.TryParse(rowsByPat[p].Rows[i]["PatNum"].ToString(),out pnum);
 							rowsByPat[p].Rows.RemoveAt(i);
 						}
 					}
@@ -1527,7 +1529,7 @@ namespace OpenDentBusiness {
 					if(foundBalForward){
 						//add a balance forward row
 						row=rowsByPat[p].NewRow();
-						SetBalForwardRow(row,balanceForward);
+						SetBalForwardRow(row,balanceForward,pnum);
 						rowsByPat[p].Rows.InsertAt(row,0);
 					}
 				}
@@ -1559,7 +1561,7 @@ namespace OpenDentBusiness {
 			//return table;
 		}
 
-		private static void SetBalForwardRow(DataRow row,decimal amt){
+		private static void SetBalForwardRow(DataRow row,decimal amt,long patNum){
 			//No need to check RemotingRole; no call to db.
 			row["AdjNum"]="0";
 			row["balance"]=amt.ToString("n");
@@ -1575,7 +1577,7 @@ namespace OpenDentBusiness {
 			row["date"]="";
 			row["description"]=Lans.g("AccountModule","Balance Forward");
 			row["patient"]="";
-			row["PatNum"]="0";
+			row["PatNum"]=patNum;
 			row["PayNum"]="0";
 			row["PayPlanNum"]="0";
 			row["PayPlanChargeNum"]="0";
