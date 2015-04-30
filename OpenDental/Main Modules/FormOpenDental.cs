@@ -1600,8 +1600,11 @@ namespace OpenDental{
 			// menuItemListenerService
 			// 
 			this.menuItemListenerService.Index = 5;
+			this.menuItemListenerService.OwnerDraw = true;
 			this.menuItemListenerService.Text = "Listener Service";
 			this.menuItemListenerService.Click += new System.EventHandler(this.menuItemListenerService_Click);
+			this.menuItemListenerService.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.menuItemEServices_DrawItem);
+			this.menuItemListenerService.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.menuItemListenerService_MeasureItem);
 			// 
 			// menuItemHelp
 			// 
@@ -4081,6 +4084,8 @@ namespace OpenDental{
 		private void InvalidateEServicesMenuItem() {
 			menuItemEServices.Enabled=false;
 			menuItemEServices.Enabled=true;
+			menuItemListenerService.Enabled=false;
+			menuItemListenerService.Enabled=true;
 		}
 
 		public void TaskGoToEvent(object sender, CancelEventArgs e){
@@ -5845,6 +5850,14 @@ namespace OpenDental{
 			Size sizeString=TextRenderer.MeasureText(menuItem.Text,SystemInformation.MenuFont);
 			e.ItemWidth=sizeString.Width;
 			e.ItemHeight=sizeString.Height;
+		}
+
+		private void menuItemListenerService_MeasureItem(object sender,MeasureItemEventArgs e) {
+			//Measure the text showing.
+			MenuItem menuItem=(MenuItem)sender;
+			Size sizeString=TextRenderer.MeasureText(menuItem.Text,SystemInformation.MenuFont);
+			e.ItemWidth=sizeString.Width;
+			e.ItemHeight=sizeString.Height+5;//Pad the bottom
 		}
 
 		private void menuItemMobileSync_Click(object sender,EventArgs e) {
