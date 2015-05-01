@@ -249,7 +249,7 @@ namespace OpenDental{
 		}
 
 		///<summary>Creates a new pdf, attaches it to a new doc, and attaches that to the statement.  If it cannot create a pdf, for example if no AtoZ folders, then it will simply result in a docnum of zero, so no attached doc.</summary>
-		public void CreateStatementPdf(Statement stmt,Patient pat,Family fam,DataSet dataSet){
+		public void CreateStatementPdfClassic(Statement stmt,Patient pat,Family fam,DataSet dataSet){
 			Stmt=stmt;
 			dataSett=dataSet;
 			//dataSet=AccountModuleL.GetStatement(stmt.PatNum,stmt.SinglePatient,stmt.DateRangeFrom,stmt.DateRangeTo,
@@ -330,10 +330,67 @@ namespace OpenDental{
 			Statements.AttachDoc(stmt.StatementNum,docc.DocNum);
 		}
 
-		///<summary>Prints one statement to a specified printer which is passed in as a PrintDocument field.  Used when printer selection happens before a batch</summary>
-		public void PrintStatement(Statement stmt,PrintDocument pd,DataSet dataSet,Family fam,Patient pat) {
-			PrintStatement(stmt,false,pd,dataSet,fam,pat);
+		///<summary>Creates a new pdf, attaches it to a new doc, and attaches that to the statement.  If it cannot create a pdf, for example if no AtoZ folders, then it will simply result in a docnum of zero, so no attached doc.
+		///Only used for batch statment printing.</summary>
+		public void CreateStatementPdfSheets(Statement stmt,Patient pat,Family fam,DataSet dataSet) {
+			Statement StmtCur=stmt;
+			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
+			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
+			SheetFiller.FillFields(sheet,StmtCur);
+			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
+			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
+			SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
+			long category=0;
+			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+				if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
+					category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
+					break;
+				}
+			}
+			if(category==0) {
+				category=DefC.Short[(int)DefCat.ImageCats][0].DefNum;//put it in the first category.
+			}
+			//create doc--------------------------------------------------------------------------------------
+			OpenDentBusiness.Document docc=null;
+			try {
+				docc=ImageStore.Import(tempPath,category,Patients.GetPat(StmtCur.PatNum));
+			} 
+			catch {
+				MsgBox.Show(this,"Error saving document.");
+				//this.Cursor=Cursors.Default;
+				return;
+			} 
+			finally {
+				//Delete the temp file since we don't need it anymore.
+				try {
+					File.Delete(tempPath);
+				} 
+				catch {
+					//Do nothing.  This file will likely get cleaned up later.
+				}
+			}
+			docc.ImgType=ImageType.Document;
+			if(StmtCur.IsInvoice) {
+				docc.Description=Lan.g(this,"Invoice");
+			} 
+			else {
+				if(StmtCur.IsReceipt==true) {
+					docc.Description=Lan.g(this,"Receipt");
+				} 
+				else {
+					docc.Description=Lan.g(this,"Statement");
+				}
+			}
+			docc.DateCreated=StmtCur.DateSent;
+			Documents.Update(docc);
+			StmtCur.DocNum=docc.DocNum;//this signals the calling class that the pdf was created successfully.
+			Statements.AttachDoc(StmtCur.StatementNum,docc.DocNum);
 		}
+
+		/////<summary>Prints one statement to a specified printer which is passed in as a PrintDocument field.  Used when printer selection happens before a batch</summary>
+		//public void PrintStatement(Statement stmt,PrintDocument pd,DataSet dataSet,Family fam,Patient pat) {
+		//	PrintStatement(stmt,false,pd,dataSet,fam,pat);
+		//}
 
 		///<summary>Prints one statement.  Does not generate pdf or print from existing pdf.</summary>
 		public void PrintStatement(Statement stmt,bool previewOnly,DataSet dataSet,Family fam,Patient pat) {
@@ -1023,6 +1080,7 @@ namespace OpenDental{
 			#endregion PayPlan grid definition
 			//Payment plan grid.  There will be only one, if any----------------------------------------------------------------
 			#region PayPlan grid
+			//We currently show payment plan breakdowns on all statements, receipts, and invoices.
 			DataTable tablePP=dataSet.Tables["payplan"];
 			ODGridCell gcell;
 			if(tablePP.Rows.Count>0){

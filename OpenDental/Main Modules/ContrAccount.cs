@@ -3852,7 +3852,7 @@ namespace OpenDental {
 			Statements.Insert(stmt);
 			FormRpStatement FormST=new FormRpStatement();
 			DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
-			FormST.CreateStatementPdf(stmt,PatCur,FamCur,dataSet);
+			FormST.CreateStatementPdfClassic(stmt,PatCur,FamCur,dataSet);
 			//if(ImageStore.UpdatePatient == null){
 			//	ImageStore.UpdatePatient = new FileStore.UpdatePatientDelegate(Patients.Update);
 			//}

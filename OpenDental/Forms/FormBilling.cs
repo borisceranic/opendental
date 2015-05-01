@@ -804,7 +804,7 @@ namespace OpenDental{
 			//Concat all the pdf's together to create one print job.
 			//Also, if a statement is to be emailed, it does that here and does not attach it to the print job.
 			//If something fails badly, it's no big deal, because we can click the radio button to see "sent" bills, and unsend them from there.
-      PdfDocument outputDocument=new PdfDocument();
+			PdfDocument outputDocument=new PdfDocument();
 			PdfDocument inputDocument;
 			PdfPage page;
 			string savedPdfPath;
@@ -818,10 +818,10 @@ namespace OpenDental{
 			XmlWriter writerElect=XmlWriter.Create(strBuildElect,xmlSettings);
 			if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
 				OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect);
-			}
+			} 
 			else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
 				OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect);
-			}
+			} 
 			else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
 				OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect);
 			}
@@ -850,7 +850,12 @@ namespace OpenDental{
 				}
 				stmt.IsSent=true;
 				stmt.DateSent=DateTimeOD.Today;
-				FormST.CreateStatementPdf(stmt,pat,fam,dataSet);
+				if(PrefC.GetBool(PrefName.StatementsUseSheets)){
+					FormST.CreateStatementPdfSheets(stmt,pat,fam,dataSet);
+				}
+				else{
+					FormST.CreateStatementPdfClassic(stmt,pat,fam,dataSet);
+				}
 				if(stmt.DocNum==0){
 					MsgBox.Show(this,"Failed to save PDF.  In Setup, DataPaths, please make sure the top radio button is checked.");
 					Cursor=Cursors.Default;
@@ -961,7 +966,7 @@ namespace OpenDental{
 						for(int i=0;i<stateNumsElect.Count;i++) {
 							Statements.MarkSent(stateNumsElect[i],DateTimeOD.Today);
 						}
-					}
+					} 
 					catch(Exception ex) {
 						string errorMsg=ex.Message;
 						if(ex.Message.Contains("(404) Not Found")) {
@@ -972,7 +977,6 @@ namespace OpenDental{
 						}
 						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
 						msgbox.ShowDialog();
-						//MessageBox.Show();
 						sentelect=0;
 						labelSentElect.Text=Lan.g(this,"SentElect=")+sentelect.ToString();
 					}
@@ -999,7 +1003,7 @@ namespace OpenDental{
 					if(!Directory.Exists(dlg.InitialDirectory)) {
 						try {
 							Directory.CreateDirectory(dlg.InitialDirectory);
-						}
+						} 
 						catch {}
 					}
 					dlg.FileName="Statements.xml";

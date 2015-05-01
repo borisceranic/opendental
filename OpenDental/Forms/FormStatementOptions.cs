@@ -965,7 +965,7 @@ namespace OpenDental{
 				Family fam=Patients.GetFamily(StmtCur.PatNum);
 				Patient pat=fam.GetPatient(StmtCur.PatNum);
 				DataSet dataSet=AccountModules.GetStatementDataSet(StmtCur);
-				FormST.CreateStatementPdf(StmtCur,pat,fam,dataSet);
+				FormST.CreateStatementPdfClassic(StmtCur,pat,fam,dataSet);
 #if DEBUG
 				FormST.PrintStatement(StmtCur,true,dataSet,fam,pat);
 				FormST.ShowDialog();
@@ -1125,7 +1125,7 @@ namespace OpenDental{
 				Family fam=Patients.GetFamily(StmtCur.PatNum);
 				Patient pat=fam.GetPatient(StmtCur.PatNum);
 				DataSet dataSet=AccountModules.GetStatementDataSet(StmtCur);
-				FormST.CreateStatementPdf(StmtCur,pat,fam,dataSet);
+				FormST.CreateStatementPdfClassic(StmtCur,pat,fam,dataSet);
 				if(!CreateEmailMessage()) {
 					Cursor=Cursors.Default;
 					return;
