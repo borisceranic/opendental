@@ -140,6 +140,15 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
+  <data name="label25.Text" xml:space="preserve">
+    <value>The Listener Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the Listener Service again.  Make sure to install the Listener Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
+
+Installing the Listener Service for the first time requires installing the OpenDentalCustListener service via our Service Manager and forwarding the Listener Port from your router to the computer where the Listener Service is installed.  For more information, see our online manual.</value>
+  </data>
+  <data name="label26.Text" xml:space="preserve">
+    <value>A listener status of "Critical" means your eServices are not accessible and the Listener Service must be started immediately.
+If you are on the computer hosting the Listener Service click Start to try and turn the Listener Service on.</value>
+  </data>
   <data name="label12.Text" xml:space="preserve">
     <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
@@ -150,17 +159,6 @@ For more information, see our online manual.</value>
     <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
 
 This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
-For more information, see our online manual.</value>
-  </data>
-  <data name="label24.Text" xml:space="preserve">
-    <value>Stops monitoring the Listener Service.
-Monitoring will automatically turn back on when an active listener service has been detected.
-"Stop Monitoring" should only be used after you have successfully uninstalled the Listener Service.</value>
-  </data>
-  <data name="label11.Text" xml:space="preserve">
-    <value>Listener Port is only used when Open Dental is hosting your eServices.  It is not used for Mobile Synch (old-style). 
-It represents the port that must be forwarded by your router to the computer that is running the OpenDentCustListener service.
-It is shared by all eServices that are being hosted by Open Dental on your behalf.  
 For more information, see our online manual.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

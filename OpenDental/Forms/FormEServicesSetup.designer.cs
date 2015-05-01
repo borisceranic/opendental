@@ -86,19 +86,24 @@ namespace OpenDental{
 			this.labelWebSchedEnable = new System.Windows.Forms.Label();
 			this.labelWebSchedDesc = new System.Windows.Forms.Label();
 			this.tabListenerService = new System.Windows.Forms.TabPage();
+			this.butClose = new OpenDental.UI.Button();
+			this.label23 = new System.Windows.Forms.Label();
+			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textListenerPort = new OpenDental.ValidNum();
+			this.label10 = new System.Windows.Forms.Label();
+			this.butSaveListenerPort = new OpenDental.UI.Button();
+			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.label27 = new System.Windows.Forms.Label();
+			this.butListenerServiceHistoryRefresh = new OpenDental.UI.Button();
+			this.label26 = new System.Windows.Forms.Label();
 			this.gridListenerServiceStatusHistory = new OpenDental.UI.ODGrid();
 			this.butStartListenerService = new OpenDental.UI.Button();
 			this.label24 = new System.Windows.Forms.Label();
 			this.labelListenerStatus = new System.Windows.Forms.Label();
 			this.butListenerAlertsOff = new OpenDental.UI.Button();
 			this.textListenerServiceStatus = new System.Windows.Forms.TextBox();
-			this.butSaveListenerPort = new OpenDental.UI.Button();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
-			this.textListenerPort = new OpenDental.ValidNum();
-			this.butClose = new OpenDental.UI.Button();
-			this.label23 = new System.Windows.Forms.Label();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -110,6 +115,7 @@ namespace OpenDental{
 			this.tabWebSched.SuspendLayout();
 			this.groupRecallSetup.SuspendLayout();
 			this.tabListenerService.SuspendLayout();
+			this.groupBox4.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -278,11 +284,11 @@ namespace OpenDental{
 			this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.tabControl.Controls.Add(this.tabListenerService);
 			this.tabControl.Controls.Add(this.tabPatientPortal);
 			this.tabControl.Controls.Add(this.tabMobileNew);
 			this.tabControl.Controls.Add(this.tabMobileOld);
 			this.tabControl.Controls.Add(this.tabWebSched);
-			this.tabControl.Controls.Add(this.tabListenerService);
 			this.tabControl.Location = new System.Drawing.Point(12, 40);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
@@ -801,147 +807,15 @@ namespace OpenDental{
 			// tabListenerService
 			// 
 			this.tabListenerService.BackColor = System.Drawing.SystemColors.Control;
+			this.tabListenerService.Controls.Add(this.groupBox4);
+			this.tabListenerService.Controls.Add(this.label25);
 			this.tabListenerService.Controls.Add(this.groupBox3);
-			this.tabListenerService.Controls.Add(this.butSaveListenerPort);
-			this.tabListenerService.Controls.Add(this.label11);
-			this.tabListenerService.Controls.Add(this.label10);
-			this.tabListenerService.Controls.Add(this.textListenerPort);
 			this.tabListenerService.Location = new System.Drawing.Point(4, 22);
 			this.tabListenerService.Name = "tabListenerService";
 			this.tabListenerService.Padding = new System.Windows.Forms.Padding(3);
 			this.tabListenerService.Size = new System.Drawing.Size(944, 588);
 			this.tabListenerService.TabIndex = 4;
 			this.tabListenerService.Text = "Listener Service";
-			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.gridListenerServiceStatusHistory);
-			this.groupBox3.Controls.Add(this.butStartListenerService);
-			this.groupBox3.Controls.Add(this.label24);
-			this.groupBox3.Controls.Add(this.labelListenerStatus);
-			this.groupBox3.Controls.Add(this.butListenerAlertsOff);
-			this.groupBox3.Controls.Add(this.textListenerServiceStatus);
-			this.groupBox3.Location = new System.Drawing.Point(170, 126);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(604, 344);
-			this.groupBox3.TabIndex = 249;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Service Status";
-			// 
-			// gridListenerServiceStatusHistory
-			// 
-			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridListenerServiceStatusHistory.HScrollVisible = false;
-			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 51);
-			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
-			this.gridListenerServiceStatusHistory.ScrollValue = 0;
-			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(592, 200);
-			this.gridListenerServiceStatusHistory.TabIndex = 249;
-			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
-			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
-			this.gridListenerServiceStatusHistory.WrapText = false;
-			// 
-			// butStartListenerService
-			// 
-			this.butStartListenerService.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butStartListenerService.Autosize = true;
-			this.butStartListenerService.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butStartListenerService.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butStartListenerService.CornerRadius = 4F;
-			this.butStartListenerService.Enabled = false;
-			this.butStartListenerService.Location = new System.Drawing.Point(187, 18);
-			this.butStartListenerService.Name = "butStartListenerService";
-			this.butStartListenerService.Size = new System.Drawing.Size(61, 24);
-			this.butStartListenerService.TabIndex = 245;
-			this.butStartListenerService.Text = "Start";
-			this.butStartListenerService.Click += new System.EventHandler(this.butStartListenerService_Click);
-			// 
-			// label24
-			// 
-			this.label24.Location = new System.Drawing.Point(6, 264);
-			this.label24.Name = "label24";
-			this.label24.Size = new System.Drawing.Size(592, 45);
-			this.label24.TabIndex = 248;
-			this.label24.Text = resources.GetString("label24.Text");
-			// 
-			// labelListenerStatus
-			// 
-			this.labelListenerStatus.Location = new System.Drawing.Point(360, 21);
-			this.labelListenerStatus.Name = "labelListenerStatus";
-			this.labelListenerStatus.Size = new System.Drawing.Size(238, 17);
-			this.labelListenerStatus.TabIndex = 244;
-			this.labelListenerStatus.Text = "Current Listener Service Status";
-			this.labelListenerStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// butListenerAlertsOff
-			// 
-			this.butListenerAlertsOff.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butListenerAlertsOff.Autosize = true;
-			this.butListenerAlertsOff.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butListenerAlertsOff.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butListenerAlertsOff.CornerRadius = 4F;
-			this.butListenerAlertsOff.Location = new System.Drawing.Point(9, 312);
-			this.butListenerAlertsOff.Name = "butListenerAlertsOff";
-			this.butListenerAlertsOff.Size = new System.Drawing.Size(100, 24);
-			this.butListenerAlertsOff.TabIndex = 247;
-			this.butListenerAlertsOff.Text = "Stop Monitoring";
-			this.butListenerAlertsOff.Click += new System.EventHandler(this.butListenerAlertsOff_Click);
-			// 
-			// textListenerServiceStatus
-			// 
-			this.textListenerServiceStatus.Location = new System.Drawing.Point(254, 20);
-			this.textListenerServiceStatus.Name = "textListenerServiceStatus";
-			this.textListenerServiceStatus.ReadOnly = true;
-			this.textListenerServiceStatus.Size = new System.Drawing.Size(100, 20);
-			this.textListenerServiceStatus.TabIndex = 246;
-			// 
-			// butSaveListenerPort
-			// 
-			this.butSaveListenerPort.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSaveListenerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butSaveListenerPort.Autosize = true;
-			this.butSaveListenerPort.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSaveListenerPort.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSaveListenerPort.CornerRadius = 4F;
-			this.butSaveListenerPort.Location = new System.Drawing.Point(442, 555);
-			this.butSaveListenerPort.Name = "butSaveListenerPort";
-			this.butSaveListenerPort.Size = new System.Drawing.Size(61, 24);
-			this.butSaveListenerPort.TabIndex = 243;
-			this.butSaveListenerPort.Text = "Save";
-			this.butSaveListenerPort.Click += new System.EventHandler(this.butSaveListenerPort_Click);
-			// 
-			// label11
-			// 
-			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.label11.Location = new System.Drawing.Point(170, 12);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(604, 65);
-			this.label11.TabIndex = 56;
-			this.label11.Text = resources.GetString("label11.Text");
-			// 
-			// label10
-			// 
-			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label10.Location = new System.Drawing.Point(285, 81);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(185, 17);
-			this.label10.TabIndex = 57;
-			this.label10.Text = "Listener Port";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// textListenerPort
-			// 
-			this.textListenerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textListenerPort.Location = new System.Drawing.Point(179, 80);
-			this.textListenerPort.MaxVal = 65535;
-			this.textListenerPort.MinVal = 0;
-			this.textListenerPort.Name = "textListenerPort";
-			this.textListenerPort.Size = new System.Drawing.Size(100, 20);
-			this.textListenerPort.TabIndex = 51;
-			this.textListenerPort.Text = "0";
 			// 
 			// butClose
 			// 
@@ -970,6 +844,198 @@ namespace OpenDental{
 			this.label23.Text = "eServices refer to Open Dental features that can be delivered electronically via " +
     "the Internet.  All eServices hosted by Open Dental use the Listener Service.";
 			this.label23.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			// 
+			// groupBox4
+			// 
+			this.groupBox4.Controls.Add(this.label11);
+			this.groupBox4.Controls.Add(this.textListenerPort);
+			this.groupBox4.Controls.Add(this.label10);
+			this.groupBox4.Controls.Add(this.butSaveListenerPort);
+			this.groupBox4.Location = new System.Drawing.Point(117, 451);
+			this.groupBox4.Name = "groupBox4";
+			this.groupBox4.Size = new System.Drawing.Size(711, 133);
+			this.groupBox4.TabIndex = 255;
+			this.groupBox4.TabStop = false;
+			this.groupBox4.Text = "Listener Service Settings";
+			// 
+			// label11
+			// 
+			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.label11.Location = new System.Drawing.Point(7, 18);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(698, 35);
+			this.label11.TabIndex = 56;
+			this.label11.Text = "The Listener Port is the same for all eServices hosted by Open Dental and must be" +
+    " forwarded by your router to the computer that is running the OpenDentCustListen" +
+    "er service.";
+			// 
+			// textListenerPort
+			// 
+			this.textListenerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textListenerPort.Location = new System.Drawing.Point(311, 56);
+			this.textListenerPort.MaxVal = 65535;
+			this.textListenerPort.MinVal = 0;
+			this.textListenerPort.Name = "textListenerPort";
+			this.textListenerPort.Size = new System.Drawing.Size(100, 20);
+			this.textListenerPort.TabIndex = 51;
+			this.textListenerPort.Text = "0";
+			// 
+			// label10
+			// 
+			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label10.Location = new System.Drawing.Point(120, 57);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(185, 17);
+			this.label10.TabIndex = 57;
+			this.label10.Text = "Listener Port";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butSaveListenerPort
+			// 
+			this.butSaveListenerPort.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSaveListenerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSaveListenerPort.Autosize = true;
+			this.butSaveListenerPort.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSaveListenerPort.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSaveListenerPort.CornerRadius = 4F;
+			this.butSaveListenerPort.Location = new System.Drawing.Point(323, 100);
+			this.butSaveListenerPort.Name = "butSaveListenerPort";
+			this.butSaveListenerPort.Size = new System.Drawing.Size(61, 24);
+			this.butSaveListenerPort.TabIndex = 243;
+			this.butSaveListenerPort.Text = "Save";
+			this.butSaveListenerPort.Click += new System.EventHandler(this.butSaveListenerPort_Click);
+			// 
+			// label25
+			// 
+			this.label25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label25.Location = new System.Drawing.Point(123, 4);
+			this.label25.Name = "label25";
+			this.label25.Size = new System.Drawing.Size(687, 85);
+			this.label25.TabIndex = 254;
+			this.label25.Text = resources.GetString("label25.Text");
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.label27);
+			this.groupBox3.Controls.Add(this.butListenerServiceHistoryRefresh);
+			this.groupBox3.Controls.Add(this.label26);
+			this.groupBox3.Controls.Add(this.gridListenerServiceStatusHistory);
+			this.groupBox3.Controls.Add(this.butStartListenerService);
+			this.groupBox3.Controls.Add(this.label24);
+			this.groupBox3.Controls.Add(this.labelListenerStatus);
+			this.groupBox3.Controls.Add(this.butListenerAlertsOff);
+			this.groupBox3.Controls.Add(this.textListenerServiceStatus);
+			this.groupBox3.Location = new System.Drawing.Point(117, 113);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(711, 318);
+			this.groupBox3.TabIndex = 253;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Listener Service Monitor";
+			// 
+			// label27
+			// 
+			this.label27.Location = new System.Drawing.Point(7, 18);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(684, 19);
+			this.label27.TabIndex = 252;
+			this.label27.Text = "Open Dental monitors the status of the Listener Service and alerts all workstatio" +
+    "ns when status is critical.";
+			// 
+			// butListenerServiceHistoryRefresh
+			// 
+			this.butListenerServiceHistoryRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butListenerServiceHistoryRefresh.Autosize = true;
+			this.butListenerServiceHistoryRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butListenerServiceHistoryRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butListenerServiceHistoryRefresh.CornerRadius = 4F;
+			this.butListenerServiceHistoryRefresh.Location = new System.Drawing.Point(644, 87);
+			this.butListenerServiceHistoryRefresh.Name = "butListenerServiceHistoryRefresh";
+			this.butListenerServiceHistoryRefresh.Size = new System.Drawing.Size(61, 24);
+			this.butListenerServiceHistoryRefresh.TabIndex = 251;
+			this.butListenerServiceHistoryRefresh.Text = "Refresh";
+			this.butListenerServiceHistoryRefresh.Click += new System.EventHandler(this.butListenerServiceHistoryRefresh_Click);
+			// 
+			// label26
+			// 
+			this.label26.Location = new System.Drawing.Point(3, 70);
+			this.label26.Name = "label26";
+			this.label26.Size = new System.Drawing.Size(620, 37);
+			this.label26.TabIndex = 250;
+			this.label26.Text = resources.GetString("label26.Text");
+			this.label26.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// gridListenerServiceStatusHistory
+			// 
+			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridListenerServiceStatusHistory.HScrollVisible = false;
+			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
+			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
+			this.gridListenerServiceStatusHistory.ScrollValue = 0;
+			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(699, 138);
+			this.gridListenerServiceStatusHistory.TabIndex = 249;
+			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
+			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
+			this.gridListenerServiceStatusHistory.WrapText = false;
+			// 
+			// butStartListenerService
+			// 
+			this.butStartListenerService.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butStartListenerService.Autosize = true;
+			this.butStartListenerService.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butStartListenerService.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butStartListenerService.CornerRadius = 4F;
+			this.butStartListenerService.Enabled = false;
+			this.butStartListenerService.Location = new System.Drawing.Point(417, 45);
+			this.butStartListenerService.Name = "butStartListenerService";
+			this.butStartListenerService.Size = new System.Drawing.Size(61, 24);
+			this.butStartListenerService.TabIndex = 245;
+			this.butStartListenerService.Text = "Start";
+			this.butStartListenerService.Click += new System.EventHandler(this.butStartListenerService_Click);
+			// 
+			// label24
+			// 
+			this.label24.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label24.Location = new System.Drawing.Point(115, 285);
+			this.label24.Name = "label24";
+			this.label24.Size = new System.Drawing.Size(578, 29);
+			this.label24.TabIndex = 248;
+			this.label24.Text = "Before you stop monitoring, first uninstall the Listener Service.\r\nMonitoring wil" +
+    "l automatically resume when an active Listener Service has been detected.";
+			// 
+			// labelListenerStatus
+			// 
+			this.labelListenerStatus.Location = new System.Drawing.Point(67, 48);
+			this.labelListenerStatus.Name = "labelListenerStatus";
+			this.labelListenerStatus.Size = new System.Drawing.Size(238, 17);
+			this.labelListenerStatus.TabIndex = 244;
+			this.labelListenerStatus.Text = "Current Listener Service Status";
+			this.labelListenerStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butListenerAlertsOff
+			// 
+			this.butListenerAlertsOff.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butListenerAlertsOff.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butListenerAlertsOff.Autosize = true;
+			this.butListenerAlertsOff.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butListenerAlertsOff.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butListenerAlertsOff.CornerRadius = 4F;
+			this.butListenerAlertsOff.Location = new System.Drawing.Point(9, 286);
+			this.butListenerAlertsOff.Name = "butListenerAlertsOff";
+			this.butListenerAlertsOff.Size = new System.Drawing.Size(100, 24);
+			this.butListenerAlertsOff.TabIndex = 247;
+			this.butListenerAlertsOff.Text = "Stop Monitoring";
+			this.butListenerAlertsOff.Click += new System.EventHandler(this.butListenerAlertsOff_Click);
+			// 
+			// textListenerServiceStatus
+			// 
+			this.textListenerServiceStatus.Location = new System.Drawing.Point(311, 47);
+			this.textListenerServiceStatus.Name = "textListenerServiceStatus";
+			this.textListenerServiceStatus.ReadOnly = true;
+			this.textListenerServiceStatus.Size = new System.Drawing.Size(100, 20);
+			this.textListenerServiceStatus.TabIndex = 246;
 			// 
 			// FormEServicesSetup
 			// 
@@ -1000,7 +1066,8 @@ namespace OpenDental{
 			this.tabWebSched.ResumeLayout(false);
 			this.groupRecallSetup.ResumeLayout(false);
 			this.tabListenerService.ResumeLayout(false);
-			this.tabListenerService.PerformLayout();
+			this.groupBox4.ResumeLayout(false);
+			this.groupBox4.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			this.ResumeLayout(false);
@@ -1023,7 +1090,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textRedirectUrlPatientPortal;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label9;
-		private ValidNum textListenerPort;
 		private System.Windows.Forms.TabControl tabControl;
 		private System.Windows.Forms.TabPage tabMobileNew;
 		private System.Windows.Forms.TabPage tabPatientPortal;
@@ -1031,14 +1097,11 @@ namespace OpenDental{
 		private UI.Button butGetUrlPatientPortal;
 		private UI.Button butSavePatientPortal;
 		private System.Windows.Forms.TabPage tabMobileOld;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private UI.Button butGetUrlMobileWeb;
 		private System.Windows.Forms.TextBox textOpenDentalUrlMobileWeb;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label12;
-		private UI.Button butSaveListenerPort;
 		private System.Windows.Forms.CheckBox checkTroubleshooting;
 		private UI.Button butDelete;
 		private System.Windows.Forms.Label textDateTimeLastRun;
@@ -1076,14 +1139,23 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelRecallMessage;
 		private UI.Button butSignUp;
 		private System.Windows.Forms.TabPage tabListenerService;
+		private System.Windows.Forms.Label label23;
+		private System.Windows.Forms.GroupBox groupBox4;
+		private System.Windows.Forms.Label label11;
+		private ValidNum textListenerPort;
+		private System.Windows.Forms.Label label10;
+		private UI.Button butSaveListenerPort;
+		private System.Windows.Forms.Label label25;
 		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.Label label27;
+		private UI.Button butListenerServiceHistoryRefresh;
+		private System.Windows.Forms.Label label26;
+		private UI.ODGrid gridListenerServiceStatusHistory;
 		private UI.Button butStartListenerService;
 		private System.Windows.Forms.Label label24;
 		private System.Windows.Forms.Label labelListenerStatus;
 		private UI.Button butListenerAlertsOff;
 		private System.Windows.Forms.TextBox textListenerServiceStatus;
-		private System.Windows.Forms.Label label23;
-		private UI.ODGrid gridListenerServiceStatusHistory;
 
 	}
 }

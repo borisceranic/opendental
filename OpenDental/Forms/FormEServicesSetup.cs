@@ -1,18 +1,19 @@
-using System;
-using System.Text;
-using System.Windows.Forms;
-using OpenDentBusiness;
-using System.Net;
-using System.Xml;
-using System.Text.RegularExpressions;
-using OpenDentBusiness.Mobile;
-using System.Threading;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.ServiceProcess;
 using CodeBase;
 using Microsoft.Win32;
 using OpenDental.UI;
+using OpenDentBusiness;
+using OpenDentBusiness.Mobile;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Net;
+using System.ServiceProcess;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup.  Also includes monitoring for the Listener Service that is required for HQ hosted eServices.</summary>
@@ -40,6 +41,9 @@ namespace OpenDental {
 			InitializeComponent();
 			Lan.F(this);
 			switch(setTab) {
+				case EService.ListenerService:
+					tabControl.SelectTab(tabListenerService);
+					break;
 				case EService.MobileOld:
 					tabControl.SelectTab(tabMobileOld);
 					break;
@@ -48,9 +52,6 @@ namespace OpenDental {
 					break;
 				case EService.WebSched:
 					tabControl.SelectTab(tabWebSched);
-					break;
-				case EService.ListenerService:
-					tabControl.SelectTab(tabListenerService);
 					break;
 				case EService.PatientPortal:
 				default:
@@ -86,11 +87,7 @@ namespace OpenDental {
 			}
 			#endregion
 			#region Listener Service
-			//Enable the Start button if the service is currently off.
-			if(GetListenerStatus()!=eServiceSignalSeverity.Working) {
-				//Check computer name here?  For now, let anyone push the start button if the service is down.  At the least they'll get a helpful message.
-				butStartListenerService.Enabled=true;
-			}
+			FillTextListenerServiceStatus();
 			FillGridListenerService();
 			#endregion
 			SetControlEnabledState();
@@ -109,13 +106,6 @@ namespace OpenDental {
 			}
 			textListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
 			butSaveListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
-		}
-
-		///<summary>Updates the text box that is displaying the current status of the Listener Service.  Returns the status just in case other logic is needed outside of updating the status box.</summary>
-		private eServiceSignalSeverity GetListenerStatus() {
-			eServiceSignalSeverity eServiceStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
-			textListenerServiceStatus.Text=eServiceStatus.ToString();
-			return eServiceStatus;
 		}
 
 		#region patient portal
@@ -908,6 +898,21 @@ namespace OpenDental {
 
 		#region Listener Service
 
+		///<summary>Updates the text box that is displaying the current status of the Listener Service.  Returns the status just in case other logic is needed outside of updating the status box.</summary>
+		private eServiceSignalSeverity FillTextListenerServiceStatus() {
+			eServiceSignalSeverity eServiceStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
+			if(eServiceStatus==eServiceSignalSeverity.Critical) {
+				textListenerServiceStatus.BackColor=Color.Red;
+				butStartListenerService.Enabled=true;
+			}
+			else {
+				textListenerServiceStatus.BackColor=SystemColors.Control;
+				butStartListenerService.Enabled=false;
+			}
+			textListenerServiceStatus.Text=eServiceStatus.ToString();
+			return eServiceStatus;
+		}
+
 		private void FillGridListenerService() {
 			//Display some historical information for the last 30 days in this grid about the lifespan of the listener heartbeats.
 			List<EServiceSignal> listESignals=EServiceSignals.GetServiceHistory(eServiceCode.ListenerService,DateTime.Today.AddDays(-30),DateTime.Today);
@@ -915,7 +920,7 @@ namespace OpenDental {
 			gridListenerServiceStatusHistory.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"DateTime"),120);
 			gridListenerServiceStatusHistory.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Status"),80);
+			col=new ODGridColumn(Lan.g(this,"Status"),90);
 			gridListenerServiceStatusHistory.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Details"),0);
 			gridListenerServiceStatusHistory.Columns.Add(col);
@@ -945,7 +950,7 @@ namespace OpenDental {
 		private void butStartListenerService_Click(object sender,EventArgs e) {
 			//No setup permission check here so that anyone can hopefully get the service back up and running.
 			//Check to see if the service started up on its own while we were in this window.
-			if(GetListenerStatus()==eServiceSignalSeverity.Working) {
+			if(FillTextListenerServiceStatus()==eServiceSignalSeverity.Working) {
 				//Use a slightly different message than below so that we can easily tell which part of this method customers reached.
 				MsgBox.Show(this,"Listener Service already started.  Please call us for support if eServices are still not working.");
 				return;
@@ -992,8 +997,13 @@ namespace OpenDental {
 			}
 		}
 
+		private void butListenerServiceHistoryRefresh_Click(object sender,EventArgs e) {
+			FillTextListenerServiceStatus();
+			FillGridListenerService();
+		}
+
 		private void butListenerAlertsOff_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
+			if(!Security.IsAuthorized(Permissions.SecurityAdmin)) {
 				return;
 			}
 			//Insert a row into the eservicesignal table to indicate to all computers to stop monitoring.
@@ -1007,9 +1017,10 @@ namespace OpenDental {
 			signalDisable.Tag="";
 			signalDisable.SigDateTime=DateTime.Now;
 			EServiceSignals.Insert(signalDisable);
+			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"Listener Service monitoring manually stopped via eServices Setup window.");
 			MsgBox.Show(this,"Monitoring shutdown signal sent.  This will take up to one minute.");
 			FillGridListenerService();
-			GetListenerStatus();
+			FillTextListenerServiceStatus();
 		}
 
 		#endregion
