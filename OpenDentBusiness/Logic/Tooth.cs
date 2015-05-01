@@ -851,10 +851,29 @@ namespace OpenDentBusiness{
 			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
 			string surfTidy=surf;
 			if(isCanadian) {
-				surfTidy=Tooth.SurfTranslateFromCAtoUS(surfTidy,toothNum);
+				surfTidy=Tooth.SurfTidyCAtoUS(surfTidy,toothNum);
 			}
-			surfTidy=Tooth.SurfTranslateFromUStoDB(surfTidy,toothNum);
+			surfTidy=Tooth.SurfTidyUStoDB(surfTidy,toothNum);
+			surfTidy=Tooth.SurfTidyInvalidAndSort(surfTidy);
 			return surfTidy;
+		}
+
+		///<summary>Removed duplicate and invalid surfaces, also sorts remaining valid surfaces in MOIDBFVL order. Surface MUST be in "US" format at this point.</summary>
+		public static string SurfTidyInvalidAndSort(string surf) {
+			if(surf==null) {
+				surf="";
+			}
+			StringBuilder surfTidy=new StringBuilder();
+			surf=surf.ToUpper();
+			surfTidy.Append(surf.Contains("M")?"M":"");
+			surfTidy.Append(surf.Contains("O")?"O":"");
+			surfTidy.Append(surf.Contains("I")?"I":"");
+			surfTidy.Append(surf.Contains("D")?"D":"");
+			surfTidy.Append(surf.Contains("B")?"B":"");
+			surfTidy.Append(surf.Contains("F")?"F":"");
+			surfTidy.Append(surf.Contains("V")?"V":"");
+			surfTidy.Append(surf.Contains("L")?"L":"");
+			return surfTidy.ToString();
 		}
 
 		///<summary>Takes surfaces from Db and converts them to appropriate culture for display.  Only Canada supported so far.  ToothNum does not need to be valid since minimal manipulation here.</summary>
@@ -879,7 +898,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Translates teeth surfaces from CA display to US display.</summary>
-		public static string SurfTranslateFromCAtoUS(string surf,string toothNum) {
+		private static string SurfTidyCAtoUS(string surf,string toothNum) {
 			if(surf==null) {
 				return "";
 			}
@@ -894,20 +913,8 @@ namespace OpenDentBusiness{
 			return surf;
 		}
 
-		///<summary>Translates teeth surfaces from DB/US (they are the same) to CA display.</summary>
-		public static string SurfTranslateFromUStoCA(string surf,string toothNum) {
-			if(surf==null) {
-				return "";
-			}
-			if(IsAnterior(toothNum)) {
-				surf=surf.Replace("V","5");
-				surf=surf.Replace("F","V");
-			}
-			return surf;
-		}
-
 		///<summary>Translates teeth surfaces from US display to US database.</summary>
-		public static string SurfTranslateFromUStoDB(string surf,string toothNum) {
+		private static string SurfTidyUStoDB(string surf,string toothNum) {
 			if(surf==null) {
 				return "";
 			}
