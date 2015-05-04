@@ -326,6 +326,10 @@ namespace OpenDental{
 		///<summary>The current color of the eServices menu item in the main menu.</summary>
 		private Color _colorEServicesBackground=SystemColors.Control;
 		private ODThread _odThreadEServices;
+		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ALERT_BACKGROUND=Color.OrangeRed;
+		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -4067,7 +4071,7 @@ namespace OpenDental{
 			//The downside to doing this is that the menu item will stay red up to one minute when a user wants to stop monitoring the service.
 			eServiceSignalSeverity listenerStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
 			if(listenerStatus==eServiceSignalSeverity.Critical) {
-				_colorEServicesBackground=Color.Red;
+				_colorEServicesBackground=COLOR_ESERVICE_ALERT_BACKGROUND;
 			}
 			else {
 				_colorEServicesBackground=SystemColors.Control;
@@ -5813,33 +5817,38 @@ namespace OpenDental{
 		private void menuItemEServices_DrawItem(object sender,DrawItemEventArgs e) {
 			//Get the text that is displaying from the menu item compenent.
 			MenuItem menuItem=(MenuItem)sender;
-			//We use the standard menu font so that the font on this one menu item will match the rest of the menu.
-			Color colorFont=SystemColors.MenuText;
-			if(_colorEServicesBackground!=Color.Red) {
-				//Always default the menu item to "control" (gray) if it is not flagged as critical (red).
+			Color colorText=Color.White;
+			if(_colorEServicesBackground!=COLOR_ESERVICE_ALERT_BACKGROUND) {
+				//Always default the background and text colors to gray if not flagged as critical.
+				colorText=SystemColors.MenuText;
 				_colorEServicesBackground=SystemColors.Control;
 			}
+			//Check if disabled or inactive (other app has focus).
 			if(!menuItem.Enabled || e.State==(DrawItemState.NoAccelerator | DrawItemState.Inactive)) {
-				//Disabled and inactive (other app has focus) menu items need to show gray.
-				colorFont=SystemColors.ControlDark;
+				colorText=SystemColors.ControlDark;
 			}
+			//Check if selected or hovering over.
 			if(e.State==(DrawItemState.NoAccelerator | DrawItemState.Selected) 
 				|| e.State==(DrawItemState.NoAccelerator | DrawItemState.HotLight)) 
 			{
-				if(_colorEServicesBackground!=Color.Red) {
-					//Color the background of the menu item the system's "menu hover" color when a user hovers or clicks on the menu item.
-					_colorEServicesBackground=SystemColors.Highlight;
+				if(_colorEServicesBackground==COLOR_ESERVICE_ALERT_BACKGROUND) {
+					colorText=COLOR_ESERVICE_ALERT_TEXT;
 				}
-				colorFont=SystemColors.HighlightText;
+				else {//Service not critical.
+					//Color the background of the menu item the system's "menu hover" color when a user hovers or has clicked on the menu item.
+					_colorEServicesBackground=SystemColors.Highlight;
+					colorText=SystemColors.HighlightText;
+				}
 			}
 			using(SolidBrush brushBackground=new SolidBrush(_colorEServicesBackground))
-			using(SolidBrush brushFont=new SolidBrush(colorFont)) {
+			using(SolidBrush brushFont=new SolidBrush(colorText)) {
 				//Get the text that is displaying from the menu item compenent.
 				string menuText=menuItem.Text;
 				//Create a string format to center the text to mimic the other menu items.
 				StringFormat stringFormat=new StringFormat();
 				stringFormat.Alignment=StringAlignment.Center;
 				e.Graphics.FillRectangle(brushBackground,e.Bounds);
+				//We use the standard menu font so that the font on this one menu item will match the rest of the menu.
 				e.Graphics.DrawString(menuText,SystemInformation.MenuFont,brushFont,e.Bounds,stringFormat);
 			}
 		}

@@ -40,15 +40,16 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabListenerService = new System.Windows.Forms.TabPage();
+			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
 			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.label27 = new System.Windows.Forms.Label();
 			this.label26 = new System.Windows.Forms.Label();
-			this.gridListenerServiceStatusHistory = new OpenDental.UI.ODGrid();
 			this.label24 = new System.Windows.Forms.Label();
 			this.labelListenerStatus = new System.Windows.Forms.Label();
 			this.textListenerServiceStatus = new System.Windows.Forms.TextBox();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
 			this.tabPatientPortal = new System.Windows.Forms.TabPage();
 			this.tabMobileNew = new System.Windows.Forms.TabPage();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -81,8 +82,7 @@ namespace OpenDental{
 			this.labelWebSchedEnable = new System.Windows.Forms.Label();
 			this.labelWebSchedDesc = new System.Windows.Forms.Label();
 			this.label23 = new System.Windows.Forms.Label();
-			this.label27 = new System.Windows.Forms.Label();
-			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.gridListenerServiceStatusHistory = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
 			this.textListenerPort = new OpenDental.ValidNum();
 			this.butSaveListenerPort = new OpenDental.UI.Button();
@@ -108,6 +108,7 @@ namespace OpenDental{
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
 			this.tabListenerService.SuspendLayout();
+			this.groupBox4.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.tabPatientPortal.SuspendLayout();
 			this.tabMobileNew.SuspendLayout();
@@ -116,7 +117,6 @@ namespace OpenDental{
 			this.groupPreferences.SuspendLayout();
 			this.tabWebSched.SuspendLayout();
 			this.groupRecallSetup.SuspendLayout();
-			this.groupBox4.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -270,9 +270,9 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tabControl.Controls.Add(this.tabListenerService);
-			this.tabControl.Controls.Add(this.tabPatientPortal);
-			this.tabControl.Controls.Add(this.tabMobileNew);
 			this.tabControl.Controls.Add(this.tabMobileOld);
+			this.tabControl.Controls.Add(this.tabMobileNew);
+			this.tabControl.Controls.Add(this.tabPatientPortal);
 			this.tabControl.Controls.Add(this.tabWebSched);
 			this.tabControl.Location = new System.Drawing.Point(12, 40);
 			this.tabControl.Name = "tabControl";
@@ -293,6 +293,41 @@ namespace OpenDental{
 			this.tabListenerService.Size = new System.Drawing.Size(944, 588);
 			this.tabListenerService.TabIndex = 4;
 			this.tabListenerService.Text = "Listener Service";
+			// 
+			// groupBox4
+			// 
+			this.groupBox4.Controls.Add(this.label11);
+			this.groupBox4.Controls.Add(this.textListenerPort);
+			this.groupBox4.Controls.Add(this.label10);
+			this.groupBox4.Controls.Add(this.butSaveListenerPort);
+			this.groupBox4.Location = new System.Drawing.Point(119, 455);
+			this.groupBox4.Name = "groupBox4";
+			this.groupBox4.Size = new System.Drawing.Size(711, 133);
+			this.groupBox4.TabIndex = 252;
+			this.groupBox4.TabStop = false;
+			this.groupBox4.Text = "Listener Service Settings";
+			// 
+			// label11
+			// 
+			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.label11.Location = new System.Drawing.Point(7, 18);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(698, 35);
+			this.label11.TabIndex = 56;
+			this.label11.Text = "The Listener Port is the same for all eServices hosted by Open Dental and must be" +
+    " forwarded by your router to the computer that is running the OpenDentCustListen" +
+    "er service.";
+			// 
+			// label10
+			// 
+			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label10.Location = new System.Drawing.Point(120, 57);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(185, 17);
+			this.label10.TabIndex = 57;
+			this.label10.Text = "Listener Port";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label25
 			// 
@@ -321,6 +356,15 @@ namespace OpenDental{
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Listener Service Monitor";
 			// 
+			// label27
+			// 
+			this.label27.Location = new System.Drawing.Point(7, 18);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(684, 19);
+			this.label27.TabIndex = 252;
+			this.label27.Text = "Open Dental monitors the status of the Listener Service and alerts all workstatio" +
+    "ns when status is critical.";
+			// 
 			// label26
 			// 
 			this.label26.Location = new System.Drawing.Point(3, 70);
@@ -329,21 +373,6 @@ namespace OpenDental{
 			this.label26.TabIndex = 250;
 			this.label26.Text = resources.GetString("label26.Text");
 			this.label26.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// gridListenerServiceStatusHistory
-			// 
-			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridListenerServiceStatusHistory.HScrollVisible = false;
-			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
-			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
-			this.gridListenerServiceStatusHistory.ScrollValue = 0;
-			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(699, 138);
-			this.gridListenerServiceStatusHistory.TabIndex = 249;
-			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
-			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
-			this.gridListenerServiceStatusHistory.WrapText = false;
 			// 
 			// label24
 			// 
@@ -371,28 +400,6 @@ namespace OpenDental{
 			this.textListenerServiceStatus.ReadOnly = true;
 			this.textListenerServiceStatus.Size = new System.Drawing.Size(100, 20);
 			this.textListenerServiceStatus.TabIndex = 246;
-			// 
-			// label11
-			// 
-			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.label11.Location = new System.Drawing.Point(7, 18);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(698, 35);
-			this.label11.TabIndex = 56;
-			this.label11.Text = "The Listener Port is the same for all eServices hosted by Open Dental and must be" +
-    " forwarded by your router to the computer that is running the OpenDentCustListen" +
-    "er service.";
-			// 
-			// label10
-			// 
-			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label10.Location = new System.Drawing.Point(120, 57);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(185, 17);
-			this.label10.TabIndex = 57;
-			this.label10.Text = "Listener Port";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// tabPatientPortal
 			// 
@@ -727,27 +734,20 @@ namespace OpenDental{
     "the internet.  All eServices hosted by Open Dental use the Listener Service.";
 			this.label23.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
-			// label27
+			// gridListenerServiceStatusHistory
 			// 
-			this.label27.Location = new System.Drawing.Point(7, 18);
-			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(684, 19);
-			this.label27.TabIndex = 252;
-			this.label27.Text = "Open Dental monitors the status of the Listener Service and alerts all workstatio" +
-    "ns when status is critical.";
-			// 
-			// groupBox4
-			// 
-			this.groupBox4.Controls.Add(this.label11);
-			this.groupBox4.Controls.Add(this.textListenerPort);
-			this.groupBox4.Controls.Add(this.label10);
-			this.groupBox4.Controls.Add(this.butSaveListenerPort);
-			this.groupBox4.Location = new System.Drawing.Point(119, 455);
-			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(711, 133);
-			this.groupBox4.TabIndex = 252;
-			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Listener Service Settings";
+			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridListenerServiceStatusHistory.HScrollVisible = false;
+			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
+			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
+			this.gridListenerServiceStatusHistory.ScrollValue = 0;
+			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(699, 138);
+			this.gridListenerServiceStatusHistory.TabIndex = 249;
+			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
+			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
+			this.gridListenerServiceStatusHistory.WrapText = false;
 			// 
 			// butClose
 			// 
@@ -1056,6 +1056,8 @@ namespace OpenDental{
 			this.groupBox1.PerformLayout();
 			this.tabControl.ResumeLayout(false);
 			this.tabListenerService.ResumeLayout(false);
+			this.groupBox4.ResumeLayout(false);
+			this.groupBox4.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			this.tabPatientPortal.ResumeLayout(false);
@@ -1068,8 +1070,6 @@ namespace OpenDental{
 			this.groupPreferences.PerformLayout();
 			this.tabWebSched.ResumeLayout(false);
 			this.groupRecallSetup.ResumeLayout(false);
-			this.groupBox4.ResumeLayout(false);
-			this.groupBox4.PerformLayout();
 			this.ResumeLayout(false);
 
 		}

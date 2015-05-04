@@ -31,6 +31,10 @@ namespace OpenDental {
 		///<summary>If this variable is true then records are uploaded one at a time so that an error in uploading can be traced down to a single record</summary>
 		private static bool _isTroubleshootMode=false;
 		private static FormProgress FormP;
+		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ALERT_BACKGROUND=Color.OrangeRed;
+		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
 
 		///<summary>Launches the eServices Setup window defaulted to the patient portal tab.</summary>
 		public FormEServicesSetup():this(EService.PatientPortal){ 		
@@ -902,11 +906,13 @@ namespace OpenDental {
 		private eServiceSignalSeverity FillTextListenerServiceStatus() {
 			eServiceSignalSeverity eServiceStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
 			if(eServiceStatus==eServiceSignalSeverity.Critical) {
-				textListenerServiceStatus.BackColor=Color.Red;
+				textListenerServiceStatus.BackColor=COLOR_ESERVICE_ALERT_BACKGROUND;
+				textListenerServiceStatus.ForeColor=COLOR_ESERVICE_ALERT_TEXT;
 				butStartListenerService.Enabled=true;
 			}
 			else {
 				textListenerServiceStatus.BackColor=SystemColors.Control;
+				textListenerServiceStatus.ForeColor=SystemColors.WindowText;
 				butStartListenerService.Enabled=false;
 			}
 			textListenerServiceStatus.Text=eServiceStatus.ToString();
@@ -995,6 +1001,8 @@ namespace OpenDental {
 			else {
 				MsgBox.Show(this,"Listener Service is already running.  Please call us for support if eServices are still not working.");
 			}
+			FillTextListenerServiceStatus();
+			FillGridListenerService();
 		}
 
 		private void butListenerServiceHistoryRefresh_Click(object sender,EventArgs e) {

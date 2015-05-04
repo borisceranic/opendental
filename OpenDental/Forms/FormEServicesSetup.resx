@@ -143,11 +143,12 @@ For more information, see our online manual.</value>
   <data name="label25.Text" xml:space="preserve">
     <value>The Listener Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the Listener Service again.  Make sure to install the Listener Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
 
-Installing the Listener Service for the first time requires installing the OpenDentalCustListener service via our Service Manager and forwarding the Listener Port from your router to the computer where the Listener Service is installed.  For more information, see our online manual.</value>
+Installing the Listener Service for the first time requires installing the OpenDentalCustListener service via our Service Manager and forwarding the Listener Port from your router to the computer where the Listener Service is installed.  For more information, see our online manual.
+</value>
   </data>
   <data name="label26.Text" xml:space="preserve">
-    <value>A listener status of "Critical" means your eServices are not accessible and the Listener Service must be started immediately.
-If you are on the computer hosting the Listener Service click Start to try and turn the Listener Service on.</value>
+    <value>A listener status of "Critical" means your eServices are not accessible and the Listener Service should be started as soon as possible:  if you are on the computer hosting the Listener Service click Start to try and turn the Listener Service on.
+</value>
   </data>
   <data name="label12.Text" xml:space="preserve">
     <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
