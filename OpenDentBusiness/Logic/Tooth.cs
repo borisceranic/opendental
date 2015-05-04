@@ -849,31 +849,72 @@ namespace OpenDentBusiness{
 		///<summary>Takes display string and converts it into Db string.  ToothNum does not need to be valid.</summary>
 		public static string SurfTidyFromDisplayToDb(string surf,string toothNum) {
 			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
-			string surfTidy=surf;
-			if(isCanadian) {
-				surfTidy=Tooth.SurfTidyCAtoUS(surfTidy,toothNum);
-			}
-			surfTidy=Tooth.SurfTidyUStoDB(surfTidy,toothNum);
-			surfTidy=Tooth.SurfTidyInvalidAndSort(surfTidy);
-			return surfTidy;
-		}
-
-		///<summary>Removed duplicate and invalid surfaces, also sorts remaining valid surfaces in MOIDBFVL order. Surface MUST be in "US" format at this point.</summary>
-		public static string SurfTidyInvalidAndSort(string surf) {
+			//Canadian valid=MOIDBLV
 			if(surf==null) {
 				surf="";
 			}
-			StringBuilder surfTidy=new StringBuilder();
-			surf=surf.ToUpper();
-			surfTidy.Append(surf.Contains("M")?"M":"");
-			surfTidy.Append(surf.Contains("O")?"O":"");
-			surfTidy.Append(surf.Contains("I")?"I":"");
-			surfTidy.Append(surf.Contains("D")?"D":"");
-			surfTidy.Append(surf.Contains("B")?"B":"");
-			surfTidy.Append(surf.Contains("F")?"F":"");
-			surfTidy.Append(surf.Contains("V")?"V":"");
-			surfTidy.Append(surf.Contains("L")?"L":"");
-			return surfTidy.ToString();
+			string surfTidy="";
+			ArrayList al=new ArrayList();
+			for(int i=0;i<surf.Length;i++) {
+				al.Add(surf.Substring(i,1).ToUpper());
+			}
+			//M----------------------------------------
+			if(al.Contains("M")) {
+				surfTidy+="M";
+			}
+			//O-------------------------------------------
+			if(toothNum=="" || IsPosterior(toothNum)) {
+				if(al.Contains("O")) {
+					surfTidy+="O";
+				}
+			}
+			//I---------------------------------
+			if(toothNum=="" || IsAnterior(toothNum)) {
+				if(al.Contains("I")) {
+					surfTidy+="I";
+				}
+			}
+			//D---------------------------------------
+			if(al.Contains((string)"D")) {
+				surfTidy+="D";
+			}
+			//B------------------------------------------------
+			if(toothNum=="" || IsPosterior(toothNum)) {
+				if(al.Contains("B")) {
+					surfTidy+="B";
+				}
+			}
+			//F-----------------------------------------
+			if(isCanadian) {
+				if(toothNum=="" || IsAnterior(toothNum)) {
+					if(al.Contains("V")) {//Canadian equivalent of F
+						surfTidy+="F";//for db
+					}
+				}
+			}
+			else {
+				if(toothNum=="" || IsAnterior(toothNum)) {
+					if(al.Contains("F")) {
+						surfTidy+="F";
+					}
+				}
+			}
+			//V-----------------------------------------
+			if(isCanadian) {
+				if(al.Contains("5")) {//Canadian equivalent of V
+					surfTidy+="V";//for db
+				}
+			}
+			else {
+				if(al.Contains("V")) {
+					surfTidy+="V";
+				}
+			}
+			//L-----------------------------------------
+			if(al.Contains((string)"L")) {
+				surfTidy+="L";
+			}
+			return surfTidy;
 		}
 
 		///<summary>Takes surfaces from Db and converts them to appropriate culture for display.  Only Canada supported so far.  ToothNum does not need to be valid since minimal manipulation here.</summary>
@@ -897,37 +938,6 @@ namespace OpenDentBusiness{
 			return 0;
 		}
 
-		///<summary>Translates teeth surfaces from CA display to US display.</summary>
-		private static string SurfTidyCAtoUS(string surf,string toothNum) {
-			if(surf==null) {
-				return "";
-			}
-			if(IsAnterior(toothNum)) {
-				surf=surf.Replace("V","F");//CA V = US F must come before "5" tanslation
-				surf=surf.Replace("5","V");//CA 5 = US V
-			}
-			if(IsPosterior(toothNum)) {
-				surf=surf.Replace("V","F");//CA V = US F must come before "5" tanslation
-				surf=surf.Replace("5","B");//CA 5 = US B
-			}
-			return surf;
-		}
-
-		///<summary>Translates teeth surfaces from US display to US database.</summary>
-		private static string SurfTidyUStoDB(string surf,string toothNum) {
-			if(surf==null) {
-				return "";
-			}
-			if(IsAnterior(toothNum)) {
-				surf=surf.Replace("B","F");//There is no B anterior surface. B/F treated the same
-				surf=surf.Replace("O","I");//There is no O anterior surface. O/I treated the same
-			}
-			if(IsPosterior(toothNum)) {
-				surf=surf.Replace("F","B");//There is no F posterior surface. B/F treated the same
-				surf=surf.Replace("I","O");//There is no I posterior surface	 O/I treated the same
-			}
-			return surf;
-		}
 
 	}
 

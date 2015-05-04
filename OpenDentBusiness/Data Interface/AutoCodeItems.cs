@@ -94,14 +94,6 @@ namespace OpenDentBusiness{
 		///<summary>Only called from ContrChart.listProcButtons_Click.  Called once for each tooth selected and for each autocode item attached to the button.</summary>
 		public static long GetCodeNum(long autoCodeNum,string toothNum,string surf,bool isAdditional,long patNum,int age) {
 			//No need to check RemotingRole; no call to db.
-			string cleanedSurf="";
-			if(toothNum!="") {
-				//We need to remove redundant surfaces so that we have the correct surface count when locating the correct procedure code for the auto code.
-				//For example, in the USA, user enters VB in the chart, then we would only want to count this as a single surface.
-				//Or, in Canada, user enters 5B, then we would only want to count this as a single surface.
-				//TidyForClaims is used explicitly for determining the correct procedure for billing purposes.
-				cleanedSurf=Tooth.SurfTidyForClaims(surf,toothNum);//TidyForClaims can't have an invalid tooth num.
-			}
 			bool allCondsMet;
 			List<AutoCodeItem> listForCode=AutoCodeItems.GetListForCode(autoCodeNum);
 			if(listForCode.Count==0) {
@@ -113,7 +105,7 @@ namespace OpenDentBusiness{
 				condList=AutoCodeConds.GetListForItem(listForCode[i].AutoCodeItemNum);
 				allCondsMet=true;
 				for(int j=0;j<condList.Count;j++) {
-					if(!AutoCodeConds.ConditionIsMet(condList[j].Cond,toothNum,cleanedSurf,isAdditional,willBeMissing,age)) {
+					if(!AutoCodeConds.ConditionIsMet(condList[j].Cond,toothNum,surf,isAdditional,willBeMissing,age)) {
 						allCondsMet=false;
 					}
 				}
