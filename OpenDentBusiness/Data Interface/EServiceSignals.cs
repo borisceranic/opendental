@@ -13,18 +13,25 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EServiceSignal>>(MethodBase.GetCurrentMethod(),serviceCode,dateStart,dateStop);
 			}
-			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
-				+" AND SigDateTime BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateStop.Date.AddDays(1))+" ORDER BY SigDateTime DESC";
+			string command="SELECT * FROM eservicesignal "
+				+"WHERE ServiceCode="+POut.Int((int)serviceCode)+" "
+				+"AND SigDateTime BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateStop.Date.AddDays(1))+" "
+				+"ORDER BY SigDateTime DESC, Severity DESC";
 			return Crud.EServiceSignalCrud.SelectMany(command);
 		}
 
-		///<summary>Ignores eServiceStatus.Info. Returns the last known status for the given eService.</summary>
+		///<summary>Returns the last known status for the given eService.</summary>
 		public static eServiceSignalSeverity GetServiceStatus(eServiceCode serviceCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<eServiceSignalSeverity>(MethodBase.GetCurrentMethod(),serviceCode);
 			}
-			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)
-				+" AND Severity!=1 ORDER BY SigDateTime DESC "+DbHelper.LimitWhere(1);//ignore "info" statuses.
+			//The only statuses within the eServiceSignalSeverity enum are NotEnabled, Working, and Critical.
+			//All other statuses are used for logging purposes and should not be considered within this method.
+			string command="SELECT * FROM eservicesignal WHERE ServiceCode="+POut.Int((int)serviceCode)+" "
+				+"AND Severity IN("+POut.Int((int)eServiceSignalSeverity.NotEnabled)+","
+					+POut.Int((int)eServiceSignalSeverity.Working)+","
+					+POut.Int((int)eServiceSignalSeverity.Critical)+") "
+				+"ORDER BY SigDateTime DESC, Severity DESC "+DbHelper.LimitWhere(1);
 			List<EServiceSignal> listSignal=Crud.EServiceSignalCrud.SelectMany(command);
 			if(listSignal.Count==0) {
 				//NoSignals exist for this service.
