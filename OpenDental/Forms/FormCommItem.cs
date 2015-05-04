@@ -415,7 +415,18 @@ namespace OpenDental{
 			}
 			textNote.Select();
 			string keyData=GetSignatureKey();
-			signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData,CommlogCur.Signature);
+			//In version 13.1 and prior, the commlog Note was included in the keyData with newlines represented as "\r\n".
+			//In versions after 13.1, the commlog Note for new commlogs are included in the keyData with newlines represented as "\n", and changed
+			//to \r\n before being saved into the database.
+			//The two scenarios to be accounted for in terms of newline characters are:  
+			//  \r\n - used in v13.1 and prior.  Also used when loading the form for all versions (all versions save newlines as \r\n to the database).
+			//  \n   - for versions above 13.1, the ODTextBox will force all \r\n to \n after the form has loaded.
+			//Since we do not want to invalidate any existing key data, we must allow signatures to be valid with either type of newline.
+			signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData,CommlogCur.Signature);//Try to fill and validate the signature using "\r\n".
+			if(!signatureBoxWrapper.IsValid) {
+				//If validation failed, try again to validate the signature using "\n" newlines.
+				signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData.Replace("\r\n","\n"),CommlogCur.Signature);
+			}
 			signatureBoxWrapper.BringToFront();
 			IsStartingUp=false;
 			if(!Security.IsAuthorized(Permissions.CommlogEdit,CommlogCur.CommDateTime)){
@@ -449,10 +460,7 @@ namespace OpenDental{
 			keyData+=CommlogCur.Mode_.ToString();
 			keyData+=CommlogCur.SentOrReceived.ToString();
 			if(CommlogCur.Note!=null){
-				//We need to replace \r\n with \n because Commlog.Note is a TextIsClobNote and when inserting it into the db we will POut.StringNote it,
-				//which changes all \n to \r\n before inserting.  
-				//Since the signature is made with the initial \n, we need to change the note back or it will be invalid and show a blank signature.
-				keyData+=CommlogCur.Note.ToString().Replace("\r\n","\n");
+				keyData+=CommlogCur.Note.ToString();
 			}
 			return keyData;
 		}
