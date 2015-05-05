@@ -812,6 +812,20 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Updates every family members' Email, WirelessPhone, and WkPhone to the passed in patient object.</summary>
+		public static void UpdateEmailPhoneForFam(Patient pat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),pat);
+				return;
+			}
+			string command= "UPDATE patient SET "
+				+"Email='"+POut.String(pat.Email)+"'"
+				+",WirelessPhone='"+POut.String(pat.WirelessPhone)+"'"
+				+",WkPhone='"+POut.String(pat.WkPhone)+"'"
+				+" WHERE guarantor='"+POut.Long(pat.Guarantor)+"'";
+			Db.NonQ(command);
+		}
+
 		///<summary>This is only used in the Billing dialog</summary>
 		public static List<PatAging> GetAgingList(string age,DateTime lastStatement,List<long> billingNums,bool excludeAddr,
 			bool excludeNeg,double excludeLessThan,bool excludeInactive,bool includeChanged,bool excludeInsPending,
