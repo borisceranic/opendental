@@ -51,12 +51,12 @@ namespace OpenDental{
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.textBillingEmailBody = new OpenDental.ODtextBox();
 			this.label10 = new System.Windows.Forms.Label();
-			this.textInvoiceNote = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textDays = new OpenDental.ValidNum();
 			this.textNote = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.textInvoiceNote = new OpenDental.ODtextBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -114,7 +114,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Controls.Add(this.textVendorId);
 			this.groupBox1.Controls.Add(this.label2);
-			this.groupBox1.Location = new System.Drawing.Point(12, 204);
+			this.groupBox1.Location = new System.Drawing.Point(12, 195);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(635, 132);
 			this.groupBox1.TabIndex = 247;
@@ -296,7 +296,7 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.label9);
 			this.groupBox3.Controls.Add(this.textBillingEmailSubject);
 			this.groupBox3.Controls.Add(this.label10);
-			this.groupBox3.Location = new System.Drawing.Point(12, 354);
+			this.groupBox3.Location = new System.Drawing.Point(12, 331);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(635, 218);
 			this.groupBox3.TabIndex = 248;
@@ -325,16 +325,9 @@ namespace OpenDental{
     "], [nameFLnoPref], [namePref], [PatNum], and [currentMonth].";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// textInvoiceNote
-			// 
-			this.textInvoiceNote.Location = new System.Drawing.Point(24, 596);
-			this.textInvoiceNote.Name = "textInvoiceNote";
-			this.textInvoiceNote.Size = new System.Drawing.Size(616, 20);
-			this.textInvoiceNote.TabIndex = 249;
-			// 
 			// label11
 			// 
-			this.label11.Location = new System.Drawing.Point(23, 578);
+			this.label11.Location = new System.Drawing.Point(23, 552);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(152, 16);
 			this.label11.TabIndex = 250;
@@ -370,7 +363,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(482, 630);
+			this.butOK.Location = new System.Drawing.Point(482, 667);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -385,17 +378,29 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(563, 630);
+			this.butCancel.Location = new System.Drawing.Point(563, 667);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// textInvoiceNote
+			// 
+			this.textInvoiceNote.AcceptsTab = true;
+			this.textInvoiceNote.DetectUrls = false;
+			this.textInvoiceNote.Location = new System.Drawing.Point(24, 571);
+			this.textInvoiceNote.Name = "textInvoiceNote";
+			this.textInvoiceNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Statement;
+			this.textInvoiceNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textInvoiceNote.Size = new System.Drawing.Size(616, 90);
+			this.textInvoiceNote.TabIndex = 251;
+			this.textInvoiceNote.Text = "";
+			// 
 			// FormBillingDefaults
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(662, 666);
+			this.ClientSize = new System.Drawing.Size(662, 696);
 			this.Controls.Add(this.textInvoiceNote);
 			this.Controls.Add(this.label11);
 			this.Controls.Add(this.groupBox3);
@@ -456,7 +461,7 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.ListBox listElectBilling;
-		private System.Windows.Forms.TextBox textInvoiceNote;
 		private System.Windows.Forms.Label label11;
+		private ODtextBox textInvoiceNote;
 	}
 }
