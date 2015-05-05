@@ -2111,10 +2111,6 @@ namespace OpenDental{
 				timerSignals.Enabled=true;
 			}
 			timerTimeIndic.Enabled=true;
-			//Create a thread that will monitor the eService signals.
-			//TODO: Surround this with a check to see if the office is using eServices.
-			//      There is no need to run this thread if the office is not even using eServices.
-			StartEServiceMonitoring();
 			myOutlookBar.Buttons[0].Caption=Lan.g(this,"Appts");
 			myOutlookBar.Buttons[1].Caption=Lan.g(this,"Family");
 			myOutlookBar.Buttons[2].Caption=Lan.g(this,"Account");
@@ -2372,6 +2368,7 @@ namespace OpenDental{
 			timerReplicationMonitor.Enabled=true;
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
+			StartEServiceMonitoring();
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -4047,16 +4044,42 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Starts the eService monitoring thread that will run once a minute.</summary>
+		///<summary>Starts the eService monitoring thread that will run once a minute.  Only runs if the user currently logged in has the eServices permission.</summary>
 		private void StartEServiceMonitoring() {
-			if(_odThreadEServices!=null) {
-				return;//eService thread already running.
+			//If the user currently logged in has permission to view eService settings, turn on the listener monitor.
+			if(Security.CurUser==null || !Security.IsAuthorized(Permissions.EServicesSetup,true)) {
+				return;//Do not start the listener service monitor for users without permission.
 			}
-			//Create a separate thread that will run every 60 seconds to monitor eService signals.
-			_odThreadEServices=new ODThread(60000,ProcessEServiceSignals);
-			_odThreadEServices.Name="eService Monitoring Thread";
-			_odThreadEServices.GroupName="eServiceThreads";
+			if(_odThreadEServices==null) {
+				//Create a separate thread that will run every 60 seconds to monitor eService signals.
+				_odThreadEServices=new ODThread(60000,ProcessEServiceSignals);
+				//Add exception handling just in case MySQL is unreachable at any point in the lifetime of this session.
+				_odThreadEServices.AddExceptionHandler(EServiceMonitoringException);
+				_odThreadEServices.Name="eService Monitoring Thread";
+				_odThreadEServices.GroupName="eServiceThreads";
+			}
 			_odThreadEServices.Start();
+		}
+
+		///<summary>Stops the eService monitoring thread and sets the eServices menu item colors to a disabled state because the Log On window will be shown next.</summary>
+		private void StopEServiceMonitoring() {
+			if(_odThreadEServices==null) {
+				return;//Nothing to do, the service was already stopped.
+			}
+			//QuitSync the thread just because it has the power to live for up to a minute which is unnecessary.
+			//There is no reason to wait more than 1 second for the thread to quit.
+			_odThreadEServices.QuitSync(1000);
+			_odThreadEServices=null;
+			//Set the background color of the menu item back to gray just in case it was red for the last user that was logged in.
+			_colorEServicesBackground=SystemColors.Control;
+			InvalidateEServicesMenuItem();//No need to invoke this method, we should always be in the main thread when stopping the thread.
+		}
+
+		///<summary>The exception delegate for the eService monitoring thread.</summary>
+		private void EServiceMonitoringException(Exception ex) {
+			//Currently we don't want to do anything if the eService signal processing fails.  Simply try again in a minute.  
+			//Most likely cause for exceptions will be database IO when computers are just sitting around not doing anything.
+			//Implementing this delegate allows us to NOT litter ProcessEServiceSignals() with try catches.  
 		}
 
 		///<summary>Worker method for _odThreadEServices.  Call StartEServiceMonitoring() to start monitoring eService signals instead of calling this method directly.</summary>
@@ -4070,6 +4093,12 @@ namespace OpenDental{
 			//Only check the Listener Service status once a minute.
 			//The downside to doing this is that the menu item will stay red up to one minute when a user wants to stop monitoring the service.
 			eServiceSignalSeverity listenerStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
+			if(listenerStatus==eServiceSignalSeverity.None) {
+				//This office has never had a valid listener service running and does not have more than 5 patients set up to use the listener service.
+				//Quit the thread so that this computer does not waste its time sending queries to the server every minute.
+				odThread.QuitAsync();
+				return;
+			}
 			if(listenerStatus==eServiceSignalSeverity.Critical) {
 				_colorEServicesBackground=COLOR_ESERVICE_ALERT_BACKGROUND;
 			}
@@ -6526,6 +6555,7 @@ namespace OpenDental{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Security.CurUser=oldUser;//so that the queries in FormLogOn() will work for the web service, since the web service requires a valid user to run queries.
 			}
+			StopEServiceMonitoring();
 			FormLogOn_=new FormLogOn();
 			FormLogOn_.ShowDialog(this);
 			if(FormLogOn_.DialogResult==DialogResult.Cancel) {
@@ -6550,6 +6580,7 @@ namespace OpenDental{
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
+			StartEServiceMonitoring();
 			//User logged back in so log on form is no longer the active window.
 			IsFormLogOnLastActive=false;
 			dateTimeLastActivity=DateTime.Now;
@@ -6647,6 +6678,7 @@ namespace OpenDental{
 			myOutlookBar.Invalidate();
 			UnselectActive();
 			allNeutral();
+			StopEServiceMonitoring();
 			if(FormLogOn_!=null) {//To prevent multiple log on screens from showing.
 				FormLogOn_.Dispose();
 			}
@@ -6664,6 +6696,7 @@ namespace OpenDental{
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
+			StartEServiceMonitoring();
 			if(myOutlookBar.SelectedIndex==-1) {
 				MsgBox.Show(this,"You do not have permission to use any modules.");
 			}

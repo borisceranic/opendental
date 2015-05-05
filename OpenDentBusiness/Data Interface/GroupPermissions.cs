@@ -229,7 +229,8 @@ namespace OpenDentBusiness{
 				//case Permissions.UserQueryAdmin:
 				//case Permissions.InsPlanChangeAssign:
 				//case Permissions.ImageEdit:
-				case Permissions.EhrMeasureEventEdit:
+				//case Permissions.EhrMeasureEventEdit:
+				//case Permissions.EServicesSetup:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -307,6 +308,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Equipment Delete");
 				case Permissions.EquipmentSetup:
 					return Lans.g("enumPermissions","Equipment Setup");
+				case Permissions.EServicesSetup:
+					return Lans.g("enumPermissions","EServices Setup");
 				case Permissions.FamilyModule:
 					return Lans.g("enumPermissions","Family Module");
 				case Permissions.ImageDelete:

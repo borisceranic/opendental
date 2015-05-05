@@ -8238,6 +8238,51 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WaitingRoomAlertTime','0')";
 					Db.NonQ(command);
 				}
+				//Give all users with Setup permission the new EServices permission------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=8";//Setup
+				DataTable table=Db.GetTable(command);
+				long groupNum;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",91)";//EServices
+						Db.NonQ32(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",91)";//EServices
+						Db.NonQ32(command);
+					}
+				}
+				//Listener Service monitoring.  As of right now the Patient Portal is the only important eService.  
+				//Turn on Listener Service monitoring for offices using the patient portal by inserting an eService signal of status 'Critical'
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//Patients with OnlinePasswords will be the indicator that an office is or has attempted to use the patient portal.
+					command="SELECT COUNT(*) FROM patient WHERE OnlinePassword!=''";
+					int countPatPortals=PIn.Int(Db.GetCount(command));
+					if(countPatPortals > 5) {//Check for more than 5 patient portal patients to avoid false positives.
+						//Insert a 'Critical' signal into the eservicesignal table to trigger Listener Service monitoring.
+						//Customers with active Listener Services will instantly have a 'Working' signal inserted and will not get notified of the service being down.
+						//However, if the customer does not know that their service is down (not tech savy) then this will alert them to that fact (our goal).
+						command="INSERT INTO eservicesignal (ServiceCode,ReasonCategory,ReasonCode,Severity,Description,SigDateTime,Tag,IsProcessed) VALUES("
+						+"1,"//ListenerService
+						+"0,"
+						+"0,"
+						+"5,"//Critical
+						+"'Patient Portal users detected.  Listener Service status set to critical to trigger monitoring.',"
+						+POut.DateT(DateTime.Now)+","
+						+"'',"
+						+"0)";
+						Db.NonQ(command);
+					}
+				}
+				else {//Oracle
+					//eServices do not currently support Oracle.
+				}
 				command="UPDATE preference SET ValueString = '15.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

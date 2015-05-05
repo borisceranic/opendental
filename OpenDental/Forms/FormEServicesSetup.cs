@@ -64,7 +64,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void FormPatientPortalSetup_Load(object sender,EventArgs e) {
+		private void FormEServicesSetup_Load(object sender,EventArgs e) {
 			textRedirectUrlPatientPortal.Text=PrefC.GetString(PrefName.PatientPortalURL);
 			textBoxNotificationSubject.Text=PrefC.GetString(PrefName.PatientPortalNotifySubject);
 			textBoxNotificationBody.Text=PrefC.GetString(PrefName.PatientPortalNotifyBody);
@@ -98,13 +98,17 @@ namespace OpenDental {
 		}
 
 		private void SetControlEnabledState() {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
+			if(!Security.IsAuthorized(Permissions.EServicesSetup)) {
 				//Disable certain buttons but let them continue to view
 				butSavePatientPortal.Enabled=false;
 				butGetUrlPatientPortal.Enabled=false;
 				groupBoxNotification.Enabled=false;
 				textListenerPort.Enabled=false;
 				butSaveListenerPort.Enabled=false;
+				butWebSchedEnable.Enabled=false;
+				butOperatories.Enabled=false;
+				butRecallTypes.Enabled=false;
+				butRecallSchedSetup.Enabled=false;
 				((Control)tabMobileOld).Enabled = false;
 				return;
 			}
@@ -787,9 +791,6 @@ namespace OpenDental {
 
 		#region web sched
 		private void butWebSchedEnable_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
-			}
 			labelWebSchedEnable.Text="";
 			Application.DoEvents();
 			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
@@ -834,7 +835,7 @@ namespace OpenDental {
 				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
 				if(Prefs.UpdateBool(PrefName.WebSchedService,true)) {
 					_changed=true;
-					SecurityLogs.MakeLogEntry(Permissions.Setup,0,"The Web Sched service was enabled.");
+					SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"The Web Sched service was enabled.");
 				}
 				return;
 			}
@@ -873,30 +874,21 @@ namespace OpenDental {
 		}
 
 		private void butWebSchedSetup_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
-			}
 			FormRecallSetup FormRS=new FormRecallSetup();
 			FormRS.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall");
+			SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"Recall Setup accessed via EServices Setup window.");
 		}
 
 		private void butRecallTypes_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
-			}
 			FormRecallTypes FormRT=new FormRecallTypes();
 			FormRT.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Types");
+			SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"Recall Types accessed via EServices Setup window.");
 		}
 
 		private void butOperatories_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
-			}
 			FormOperatories FormO=new FormOperatories();
 			FormO.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Operatories");
+			SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"Operatories accessed via EServices Setup window.");
 		}
 		#endregion
 
@@ -1034,7 +1026,8 @@ namespace OpenDental {
 		#endregion
 
 		private void tabControl_SelectedIndexChanged(object sender,EventArgs e) {
-			SetControlEnabledState();
+			//jsalmon - The following method call was causing the "not authorized for ..." message to continuously pop up and was very annoying.
+			//SetControlEnabledState();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
