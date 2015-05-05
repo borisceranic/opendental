@@ -1012,16 +1012,32 @@ namespace OpenDental {
 					whereProv += ") ";
 					patStat = BuildPatStatList(checkActiveOnly.Checked);
 					command = SetPatientBaseSelect();
-					command += "WHERE CONCAT(CONCAT(CONCAT(CONCAT(LName,', '),FName),' '),MiddleI) >= " + 
-						"'" + POut.String(textStartName.Text) + "'";
-					command += " AND CONCAT(CONCAT(CONCAT(CONCAT(LName,', '),FName),' '),MiddleI) <= " + 
-						"'" + POut.String(textEndName.Text) + "'";
-					if(checkGroupByFamily.Checked == true) {
-						command += " AND patient.Guarantor = patient.PatNum";
+					if(checkGroupByFamily.Checked) {
+						command+=" INNER JOIN patient familymembers on familymembers.Guarantor=patient.Guarantor AND "+patStat.Replace("patient.","familymembers.");
+						command+=" WHERE CONCAT(CONCAT(CONCAT(CONCAT(familymembers.LName,', '),familymembers.FName),' '),familymembers.MiddleI) >= ";
 					}
-					command += " AND " + whereProv;
-					command += " AND " + patStat;
-					command += " ORDER BY CONCAT(CONCAT(CONCAT(CONCAT(LName,', '),FName),' '),MiddleI)";
+					else {
+						command+=" WHERE CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) >= ";
+					}
+					command+="'"+POut.String(textStartName.Text)+"'";
+					if(checkGroupByFamily.Checked) {
+						command+=" AND CONCAT(CONCAT(CONCAT(CONCAT(familymembers.LName,', '),familymembers.FName),' '),familymembers.MiddleI) <= ";
+					}
+					else {
+						command+=" AND CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) <= ";
+					}
+					command+="'"+POut.String(textEndName.Text)+"'";
+					if(checkGroupByFamily.Checked) {
+						command+=" AND patient.Guarantor=patient.PatNum";
+					}
+					else {
+						command+=" AND "+patStat;
+					}
+					command+=" AND " + whereProv;
+					if(checkGroupByFamily.Checked) {
+						command+=" GROUP BY patient.Guarantor ";
+					}
+					command+=" ORDER BY CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI)";
 					buildLabelTable(command);
 					break;
 				//
