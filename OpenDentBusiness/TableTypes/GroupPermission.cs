@@ -208,8 +208,9 @@ namespace OpenDentBusiness{
 		///<summary>89- Audit trail for images and documents in the image module.  There is no user interface in the security window for this permission because it is only used for tracking.</summary>
 		ImageEdit,
 		///<summary>90- Allows editing of all measure events.  Also used to track changes made to events.</summary>
-		EhrMeasureEventEdit
-
+		EhrMeasureEventEdit,
+		///<summary>91- Allows users to edit settings in the eServices Setup window.  Also causes the Listener Service monitor thread to start upon logging in.</summary>
+		EServicesSetup
 	}
 
 	

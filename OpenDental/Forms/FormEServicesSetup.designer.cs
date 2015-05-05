@@ -1049,7 +1049,7 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "eServices Setup";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormPatientPortalSetup_FormClosed);
-			this.Load += new System.EventHandler(this.FormPatientPortalSetup_Load);
+			this.Load += new System.EventHandler(this.FormEServicesSetup_Load);
 			this.groupBoxNotification.ResumeLayout(false);
 			this.groupBoxNotification.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
