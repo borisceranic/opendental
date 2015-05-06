@@ -64,7 +64,7 @@ namespace OpenDental.Bridges {
 			else {
 				iniText+="3";
 			}
-			File.WriteAllText(iniFile,iniText,Encoding.UTF8);
+			File.WriteAllText(iniFile,iniText,Encoding.GetEncoding(1252));
 			try {
 				Process.Start(path,cmd);
 			}
