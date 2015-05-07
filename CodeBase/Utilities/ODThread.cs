@@ -27,7 +27,7 @@ namespace CodeBase {
 		private WorkerDelegate _worker=null;
 		///<summary>Pointer to the function from the calling code which will be alerted when the run function has thrown an unhandled exception.</summary>
 		private ExceptionDelegate _exceptionHandler=null;
-		///<summary>Pointer to the function from the calling code which will be alerted when the run function has completed.</summary>
+		///<summary>Pointer to the function from the calling code which will be alerted when the run function has completed.  This will NOT fire if Join() times out.</summary>
 		private WorkerDelegate _threadExitHandler=null;		
 		///<summary>Custom data which can be set before launching the thread and then safely accessed within the WorkerDelegate.  Helps prevent the need to lock objects due to multi-threading, most of the time.</summary>
 		public object Tag=null;
@@ -39,6 +39,8 @@ namespace CodeBase {
 		private static List<ODThread> _listOdThreads=new List<ODThread>();
 		///<summary>Thread safe lock object.  Any time a static variable is accessed, it MUST be wrapped with a lock.  Failing to lock will result in a potential for unsafe access by multiple threads at the same time.</summary>
 		private static object _lockObj=new object();
+		///<summary>Only set when calling Start().  Causes this thread to automatically remove itself from the global list of ODThreads once it has finished doing work.</summary>
+		private bool _isAutoCleanup;
 
 		///<summary>Gets or sets the name of the C# thread to make it easier to find specific threads while debugging.</summary>
 		public string Name { 
@@ -83,6 +85,12 @@ namespace CodeBase {
 
 		///<summary>Starts the thread and returns immediately.  If the thread is already started or has already finished, then this function will have no effect.</summary>
 		public void Start() {
+			Start(false);
+		}
+
+		///<summary>Starts the thread and returns immediately.  If the thread is already started or has already finished, then this function will have no effect.  Set isAutoCleanup to true to have this thread automatically remove itself from the global list of ODThreads once it has finished doing work.</summary>
+		public void Start(bool isAutoCleanup) {
+			_isAutoCleanup=isAutoCleanup;
 			if(_thread.IsAlive) {
 				return;//The thread is already running.
 			}
@@ -102,7 +110,13 @@ namespace CodeBase {
 		private void Run() {
 			while(!_hasQuit) {
 				try {
-					_worker(this);				
+					_worker(this);
+				}
+				catch(ThreadAbortException) {
+					//We know that a join failed by exceeding the allotted timeout.
+					_dateTimeQuit=DateTime.Now;
+					_hasQuit=true;
+					return;
 				}
 				catch(Exception e) { //An exception was unhandled by the worker delegate. Alert the caller if they have subscribed to this event.
 					if(_exceptionHandler!=null) {
@@ -123,11 +137,22 @@ namespace CodeBase {
 			if(_threadExitHandler!=null) {
 				_threadExitHandler(this);
 			}
+			if(_isAutoCleanup) {
+				lock(_lockObj) {
+					_listOdThreads.Remove(this);
+				}
+			}
 		}
 
-		///<summary>Forces the calling thread to synchronously wait for the current thread to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for the thread to join.</summary>
+		///<summary>Forces the calling thread to synchronously wait for the current thread to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for the thread to join.  The thread will be aborted if the timeout was reached and then will return false.</summary>
 		public bool Join(int timeoutMS) {
-			return _thread.Join(timeoutMS);
+			bool hasJoined=_thread.Join(timeoutMS);
+			if(!hasJoined) {
+				//The timeout expired and the thread is still alive so we want to abort it manually.
+				//Abort exceptions will be swallowed within Run()
+				_thread.Abort();
+			}
+			return hasJoined;
 		}
 
 		///<summary>Synchronously waits for all threads in the specified group to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for all threads to join.</summary>
@@ -140,12 +165,19 @@ namespace CodeBase {
 
 		///<summary>Immediately returns after flagging the thread to quit itself asynchronously.  The thread may execute a bit longer.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
 		public void QuitAsync() {
+			QuitAsync(true);
+		}
+
+		///<summary>Immediately returns after flagging the thread to quit itself asynchronously.  The thread may execute a bit longer.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.  Set removeThread false if you want this thread to stay in the global list of ODThreads.</summary>
+		public void QuitAsync(bool removeThread) {
 			_hasQuit=true;
 			//If thread is in idle due to wait event, then wake it immediately so we can more quickly quit.  Helps the thread quit within timeoutMS.
 			Wakeup();
-			lock(_lockObj) {
-				_listOdThreads.Remove(this);
-			}		
+			if(removeThread) {
+				lock(_lockObj) {
+					_listOdThreads.Remove(this);
+				}
+			}
 		}
 
 		///<summary>Waits for this thread to quit itself before returning.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
@@ -154,9 +186,7 @@ namespace CodeBase {
 			//If thread is in waiting on wait event, wake it can quit gracefully.
 			Wakeup();
 			try {
-				if(!Join(timeoutMS)) {//Wait for allotted time before throwing ThreadAbortException.
-					_thread.Abort();//Should only get here if Run delegate took longer than the allotted timeout.
-				}
+				Join(timeoutMS);//Wait for allotted time before throwing ThreadAbortException.
 			}
 			catch {
 				//Guards against re-entrance into this function just in case the main thread called QuitSyncAllOdThreads() and this thread itself called QuitSync() at the same time.
@@ -173,13 +203,13 @@ namespace CodeBase {
 		public static void QuitSyncThreadsByGroupName(int timeoutMS,string groupName) {
 			List<ODThread> listThreadsForGroup=GetThreadsByGroupName(groupName);
 			for(int i=0;i<listThreadsForGroup.Count;i++) { //Quit all threads in parallel so our wait times are not cummulative.
-				listThreadsForGroup[i].QuitAsync();
+				listThreadsForGroup[i].QuitAsync(false);//Do not remove threads from global list so that the Join can have access to them.
 			}
 			//Wait for all threads to end or timeout, whichever comes first.
 			JoinThreadsByGroupName(timeoutMS,groupName);
 		}
 
-		///<summary>Should only be called when the main application is closing.  Loops through ALL ODThreads that are still running and synchronously quits them.  The main application thread will wait for all threads to finish doing work.</summary>
+		///<summary>Should only be called when the main application is closing.  Loops through ALL ODThreads that are still running and aborts them instantly.  If you want to give each thread a chance to gracefully quit, call QuitSyncThreadsByGroupName instead.</summary>
 		public static void QuitSyncAllOdThreads() {
 			QuitSyncThreadsByGroupName(0,"");
 		}
