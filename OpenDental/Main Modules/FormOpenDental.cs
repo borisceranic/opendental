@@ -6423,6 +6423,7 @@ namespace OpenDental{
 			//This helps ensure that the chart module and its tooth chart wrapper are properly disposed of in particular.
 			//This step is necessary so that graphics memory does not fill up.
 			Dispose();
+			Environment.Exit(0);//Guaranteed to kill any threads which are still running.
 		}
 
 
