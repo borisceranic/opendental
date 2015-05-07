@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace CodeBase {
-	///<summary>A wrapper for the c# Thread class.  The purpose of this class is to help implement a well defined pattern throughout our applications.  It also allows us to better document threading where C# lacks documentation.</summary>
+	///<summary>A wrapper for the c# Thread class.  The purpose of this class is to help implement a well defined pattern throughout our applications.  It also allows us to better document threading where C# lacks documentation.  Since there is no way to get the list of managed threads for an application, the only way we can maintain a list is to do it ourselves.  The advantage of maintaining a list of managed threads is that we can much more easily ensure that all threads are gracefully quit when the program exits.</summary>
 	public class ODThread {
 		///<summary>The C# thread that is used to run ODThread internally.</summary>
 		private Thread _thread=null;
 		///<summary>Sleep timer which can be interrupted elegantly.</summary>
 		private AutoResetEvent _waitEvent=new AutoResetEvent(false);
+		///<summary>The exact time when this thread was started.  Useful for determining thread run times.</summary>
+		private DateTime _dateTimeStart=DateTime.MinValue;
+		///<summary>The exact time when this thread was quit.  Useful for determining thread run times.</summary>
+		private DateTime _dateTimeQuit=DateTime.MinValue;
 		///<summary>Gets set to true when QuitSync() or QuitAsync() has been called or if this thread has finished and no timed interval was set.</summary>
 		private bool _hasQuit=false;
 		///<summary>Indicates if ODThread has been scheduled to quit. Check this from within a resource intensive thread periodically if you want to exit gracefully during the course of the WorkerDelegate function.</summary>
@@ -85,6 +89,7 @@ namespace CodeBase {
 			if(_hasQuit) {
 				return;//The thread has finished.
 			}
+			_dateTimeStart=DateTime.Now;
 			_thread.Start();
 		}
 
@@ -114,6 +119,7 @@ namespace CodeBase {
 					_hasQuit=true;
 				}
 			}
+			_dateTimeQuit=DateTime.Now;
 			if(_threadExitHandler!=null) {
 				_threadExitHandler(this);
 			}
@@ -127,7 +133,7 @@ namespace CodeBase {
 		///<summary>Synchronously waits for all threads in the specified group to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for all threads to join.</summary>
 		public static void JoinThreadsByGroupName(int timeoutMS,string groupName) {
 			List<ODThread> listOdThreadsForGroup=GetThreadsByGroupName(groupName);
-			for(int i=0;i<listOdThreadsForGroup.Count;i++) {				
+			for(int i=0;i<listOdThreadsForGroup.Count;i++) {
 				listOdThreadsForGroup[i].Join(timeoutMS);
 			}
 		}
@@ -135,7 +141,7 @@ namespace CodeBase {
 		///<summary>Immediately returns after flagging the thread to quit itself asynchronously.  The thread may execute a bit longer.  If the thread has been forgotten, it will be forcefully quit on closing of the main application.</summary>
 		public void QuitAsync() {
 			_hasQuit=true;
-			//If thread is in waiting on wait event, wake it can quit gracefully.
+			//If thread is in idle due to wait event, then wake it immediately so we can more quickly quit.  Helps the thread quit within timeoutMS.
 			Wakeup();
 			lock(_lockObj) {
 				_listOdThreads.Remove(this);
@@ -199,6 +205,17 @@ namespace CodeBase {
 		///<summary>Add an exception handler to be alerted of unhandled exceptions in the work delegate.</summary>
 		public void AddThreadExitHandler(WorkerDelegate threadExitHandler) {
 			_threadExitHandler+=threadExitHandler;
+		}
+
+		///<summary>If the thread has not started, then returns 0.  If the thread has started but has not quit yet, then returns the amount of time which has elapsed since the thread was started.  If the thread has quit, returns the time elapsed between when the thread was started and when the thread was quit.</summary>
+		public TimeSpan GetTimeElapsed() {
+			if(_hasQuit) {
+				return (_dateTimeQuit-_dateTimeStart);
+			}
+			else if(_dateTimeStart>DateTime.MinValue) {
+				return (DateTime.Now-_dateTimeStart);
+			}
+			return TimeSpan.Zero;
 		}
 
 		///<summary>Pointer delegate to the method that does the work for this thread.  The worker method has to take an ODThread as a parameter so that it has access to Tag and other variables when needed.</summary>
