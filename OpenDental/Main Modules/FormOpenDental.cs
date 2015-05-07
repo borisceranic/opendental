@@ -6793,6 +6793,31 @@ namespace OpenDental{
 			//This helps ensure that the chart module and its tooth chart wrapper are properly disposed of in particular.
 			//This step is necessary so that graphics memory does not fill up.
 			Dispose();
+			//"=====================================================
+			//https://msdn.microsoft.com/en-us/library/system.environment.exit%28v=vs.110%29.aspx
+			//Environment.Exit Method:
+			//Terminates this process and gives the underlying operating system the specified exit code.
+			//For the exitCode parameter, use a non-zero number to indicate an error. In your application, you can define your own error codes in an
+			//enumeration, and return the appropriate error code based on the scenario. For example, return a value of 1 to indicate that the required file
+			//is not present and a value of 2 to indicate that the file is in the wrong format. For a list of exit codes used by the Windows operating
+			//system, see System Error Codes in the Windows documentation.
+			//Calling the Exit method differs from using your programming language's return statement in the following ways:
+			//*Exit always terminates an application. Using the return statement may terminate an application only if it is used in the application entry
+			//	point, such as in the Main method.
+			//*Exit terminates an application immediately, even if other threads are running. If the return statement is called in the application entry
+			//	point, it causes an application to terminate only after all foreground threads have terminated.
+			//*Exit requires the caller to have permission to call unmanaged code. The return statement does not.
+			//*If Exit is called from a try or finally block, the code in any catch block does not execute. If the return statement is used, the code in the
+			//catch block does execute.
+			//====================================================="
+			//Call Environment.Exit() to kill all threads which we forgot to close.  Also sends exit code 0 to the command line to indicate success.
+			//If a thread needs to be gracefully quit, then it is up to the designing engineer to Join() to that thread before we get to this point.
+			//We considered trying to get a list of active threads and logging debug information for those threads, but there is no way
+			//to get the list of managed threads from the system.  It is our responsibility to keep track of our own managed threads.  There is a way
+			//to get the list of unmanaged system threads for our application using Process.GetCurrentProcess().Threads, but that does not help us enough.
+			//See http://stackoverflow.com/questions/466799/how-can-i-enumerate-all-managed-threads-in-c.  To keep track of a managed thread, use ODThread.
+			//Environment.Exit requires permission for unmanaged code, which we have explicitly specified in the solution already.
+			Environment.Exit(0);//Guaranteed to kill any threads which are still running.
 		}
 
 
