@@ -3407,6 +3407,13 @@ namespace OpenDental{
 		}
 
 		private void gridBenefits_DoubleClick(object sender,EventArgs e) {
+			if(IsNewPlan && PlanCur.PlanNum != PlanNumOriginal) {  //If adding a new plan and picked existing plan from list
+				//==Travis 05/06/2015:  Allowing users to edit insurance benefits for new plans that were picked from the list was causing problems with 
+				//	duplicating benefits.  This was the fix we decided to go with, as the issue didn't seem to be affecting existing plans for a patient.
+				MessageBox.Show(Lan.g(this,"You have picked an existing insurance plan and changes cannot be made to benefits until you have saved the plan for this new subscriber.")
+					+"\r\n"+Lan.g(this,"To edit, click OK and then open the edit insurance plan window again."));
+				return;
+			}
 			long patPlanNum=0;
 			if(PatPlanCur!=null) {
 				patPlanNum=PatPlanCur.PatPlanNum;

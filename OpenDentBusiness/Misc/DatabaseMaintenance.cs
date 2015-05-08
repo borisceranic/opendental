@@ -358,7 +358,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Completed appointments with treatment planned procedures attached")+": "+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -568,7 +568,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Scheduled appointments with completed procedures attached")+": "+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -669,6 +669,130 @@ namespace OpenDentBusiness {
 				if(numberFixed!=0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","Automation triggers deleted due to no sheet defs: ")+numberFixed.ToString()+"\r\n";
 				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		///<summary>Remove duplicates where all benefit columns match except for BenefitNum.</summary>
+		public static string BenefitsWithExactDuplicatesForInsPlan(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(DISTINCT ben2.BenefitNum) DuplicateCount "
+					+"FROM benefit ben "
+					+"INNER JOIN benefit ben2 ON ben.PlanNum=ben2.PlanNum "
+					+"AND ben.PatPlanNum=ben2.PatPlanNum "
+					+"AND ben.CovCatNum=ben2.CovCatNum "
+					+"AND ben.BenefitType=ben2.BenefitType "
+					+"AND ben.Percent=ben2.Percent "
+					+"AND ben.MonetaryAmt=ben2.MonetaryAmt "
+					+"AND ben.TimePeriod=ben2.TimePeriod "
+					+"AND ben.QuantityQualifier=ben2.QuantityQualifier "
+					+"AND ben.Quantity=ben2.Quantity "
+					+"AND ben.CodeNum=ben2.CodeNum "
+					+"AND ben.CoverageLevel=ben2.CoverageLevel "
+					+"AND ben.BenefitNum<ben2.BenefitNum";  //This ensures that the benefit with the lowest primary key in the match will not be counted.
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+						log+=Lans.g("FormDatabaseMaintenance","Duplicate benefits found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="SELECT DISTINCT ben2.BenefitNum "
+					+"FROM benefit ben "
+					+"INNER JOIN benefit ben2 ON ben.PlanNum=ben2.PlanNum "
+					+"AND ben.PatPlanNum=ben2.PatPlanNum "
+					+"AND ben.CovCatNum=ben2.CovCatNum "
+					+"AND ben.BenefitType=ben2.BenefitType "
+					+"AND ben.Percent=ben2.Percent "
+					+"AND ben.MonetaryAmt=ben2.MonetaryAmt "
+					+"AND ben.TimePeriod=ben2.TimePeriod "
+					+"AND ben.QuantityQualifier=ben2.QuantityQualifier "
+					+"AND ben.Quantity=ben2.Quantity "
+					+"AND ben.CodeNum=ben2.CodeNum "
+					+"AND ben.CoverageLevel=ben2.CoverageLevel "
+					+"AND ben.BenefitNum<ben2.BenefitNum";  //This ensures that the benefit with the lowest primary key in the match will not be deleted.
+				table=Db.GetTable(command);
+				List<long> listBenefitNums=new List<long>();
+				if(table.Rows.Count>0 || verbose) {
+						for(int i=0;i<table.Rows.Count;i++) {
+							listBenefitNums.Add(PIn.Long(table.Rows[i]["BenefitNum"].ToString()));
+						}
+						long numFixed=0;
+						if(listBenefitNums.Count>0) {
+							command="DELETE FROM benefit WHERE BenefitNum IN ("+string.Join(",",listBenefitNums)+")";
+							numFixed=PIn.Long(Db.NonQ(command).ToString());
+						}
+						log+=Lans.g("FormDatabaseMaintenance","Duplicate benefits deleted")+": "+numFixed.ToString()+"\r\n";
+				}				
+			}
+			return log;
+		}
+
+		[DbmMethod(HasBreakDown=true)]
+		///<summary>Identify duplicates where all benefit columns match except for BenefitNum, Percent, and MonetaryAmt.</summary>
+		public static string BenefitsWithPartialDuplicatesForInsPlan(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT DISTINCT employer.EmpName,carrier.CarrierName,carrier.Phone,carrier.Address,carrier.City,carrier.State,carrier.Zip, "
+				+"insplan.GroupNum,insplan.GroupName, carrier.NoSendElect,carrier.ElectID, "
+				+"(SELECT COUNT(DISTINCT Subscriber) FROM inssub WHERE insplan.PlanNum=inssub.PlanNum) subscribers, insplan.PlanNum "
+				+"FROM benefit ben "
+				+"INNER JOIN benefit ben2 ON ben.PlanNum=ben2.PlanNum "
+					+"AND ben.PatPlanNum=ben2.PatPlanNum "
+					+"AND ben.CovCatNum=ben2.CovCatNum "
+					+"AND ben.BenefitType=ben2.BenefitType "
+					+"AND (ben.Percent!=ben2.Percent OR ben.MonetaryAmt!=ben2.MonetaryAmt) "  //Only benefits with Percent or MonetaryAmts that don't match.
+					+"AND ben.TimePeriod=ben2.TimePeriod "
+					+"AND ben.QuantityQualifier=ben2.QuantityQualifier "
+					+"AND ben.Quantity=ben2.Quantity "
+					+"AND ben.CodeNum=ben2.CodeNum "
+					+"AND ben.CoverageLevel=ben2.CoverageLevel "
+					+"AND ben.BenefitNum<ben2.BenefitNum "
+				+"INNER JOIN insplan ON insplan.PlanNum=ben.PlanNum "
+				+"LEFT JOIN carrier ON carrier.CarrierNum=insplan.CarrierNum "
+				+"LEFT JOIN employer ON employer.EmployerNum=insplan.EmployerNum";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;   
+			}
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Insurance plans with partial duplicate benefits found")+": "+table.Rows.Count;
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					//Show the same columns as the Insurance Plans list.  We don't have an easy identifier for insurance plans, and we do not want to 
+					//  give a patient example since there is a good chance that in fixing the benefits the user will just split that plan off and will 
+					//  not solve the issue.
+					log+="   Employer: "+table.Rows[i]["EmpName"].ToString();
+					log+=",  Carrier: "+table.Rows[i]["CarrierName"].ToString();
+					log+=",  Phone: "+table.Rows[i]["Phone"].ToString();
+					log+=",  Address: "+table.Rows[i]["Address"].ToString();
+					log+=",  City: "+table.Rows[i]["City"].ToString();
+					log+=",  ST: "+table.Rows[i]["State"].ToString();
+					log+=",  Zip: "+table.Rows[i]["Zip"].ToString();
+					log+=",  Group#: "+table.Rows[i]["GroupNum"].ToString();
+					log+=",  GroupName: "+table.Rows[i]["GroupName"].ToString();
+					log+=",  NoE: ";
+					if(table.Rows[i]["NoSendElect"].ToString()=="1") {
+						log+="X";
+					}
+					else {
+						log+=" ";
+					}
+					log+=",  ElectID: "+table.Rows[i]["ElectID"].ToString();
+					log+=",  Subs: "+table.Rows[i]["subscribers"].ToString();
+					log+="\r\n";
+				}
+				log+=Lans.g("FormDatabaseMaintenance","   They need to be fixed manually.")+"\r\n";
 			}
 			return log;
 		}
@@ -1112,7 +1236,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Claim payment sums found incorrect: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -1649,7 +1773,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","ClaimProcs for preauths with status not preauth")+": "+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -1684,7 +1808,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with status not matching claim found: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -1828,7 +1952,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Negative writeoffs found: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -2817,7 +2941,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Patients with no Clinic assigned: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -2852,7 +2976,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Hidden providers with patients: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -3003,7 +3127,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","PatPlan duplicate ordinals: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -3199,7 +3323,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Pay plans with charges that have providers missing: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -3854,7 +3978,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.   
 			log+=Lans.g("FormDatabaseMaintenance","Procedures with multiple claimprocs for the same insurance plan")+": "+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -3969,7 +4093,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Procedures attached to claims with status of TP: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -4021,7 +4145,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Completed lab fees with treatment planned procedures attached")+": "+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -4141,7 +4265,7 @@ namespace OpenDentBusiness {
 			}
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Number of patients with duplicate recalls: ")+table.Rows.Count;
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
@@ -4543,7 +4667,7 @@ namespace OpenDentBusiness {
 			//There is something to report OR the user has verbose mode on.
 			log+=Lans.g("FormDatabaseMaintenance","Users with duplicates")+": "+table.Rows.Count;
 			//check and fix are currently identical
-			if(isCheck) {//Only the fix should show the entire list of items.
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
 				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
 			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
