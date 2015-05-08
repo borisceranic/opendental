@@ -1315,7 +1315,13 @@ namespace OpenDental{
 					emailBody=PrefC.GetString(PrefName.WebSchedMessage3);
 				}
 				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
-				emailBody=emailBody.Replace("[DueDate]",PIn.Date(addrTable.Rows[i]["dateDue"].ToString()).ToShortDateString());
+				//It is common for offices to have paitents with a blank recall date (they've never had a recall performed at the office).
+				//Instead of showing 01/01/0001 in the email, we will simply show today's date because that is what the Web Sched time slots will start showing.
+				DateTime dateDue=PIn.Date(addrTable.Rows[i]["dateDue"].ToString());
+				if(dateDue.Year < 1880) {
+					dateDue=DateTime.Today;
+				}
+				emailBody=emailBody.Replace("[DueDate]",dateDue.ToShortDateString());
 				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
 				string URL="";
 				try {
