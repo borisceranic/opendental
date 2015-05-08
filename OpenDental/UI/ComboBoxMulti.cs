@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace OpenDental.UI
 {
@@ -112,6 +113,13 @@ namespace OpenDental.UI
 			}
 			set{
 				selectedIndices=value;
+			}
+		}
+
+		///<summary>The indices of selected items.</summary>
+		public List<int> ListSelectedIndices {
+			get {
+				return new List<int>((int[])selectedIndices.ToArray(typeof(int)));
 			}
 		}
 

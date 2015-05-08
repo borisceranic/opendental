@@ -13,6 +13,7 @@ using PdfSharp;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Pdf.Printing;
+using System.Collections.Generic;
 
 
 namespace OpenDental{
@@ -549,13 +550,13 @@ namespace OpenDental{
 			else {
 				aboveAmount=0;
 			}
-			ArrayList provFilter=new ArrayList();
-			ArrayList billFilter=new ArrayList();
+			List<int> provFilter=new List<int>();
+			List<int> billFilter=new List<int>();
 			if(comboBoxMultiProv.SelectedIndices[0].ToString()!="0") {
-				provFilter=comboBoxMultiProv.SelectedIndices;
+				provFilter=comboBoxMultiProv.ListSelectedIndices;
 			}
 			if(comboBoxMultiBilling.SelectedIndices[0].ToString()!="0") {
-				billFilter=comboBoxMultiBilling.SelectedIndices;
+				billFilter=comboBoxMultiBilling.ListSelectedIndices;
 			}
 			string code1="";
 			string code2="";
