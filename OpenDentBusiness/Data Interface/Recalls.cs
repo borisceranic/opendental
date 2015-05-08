@@ -999,7 +999,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets a base table used for creating </summary>
-		private static DataTable GetAddrTableRaw(List<long> recallNums) {
+		public static DataTable GetAddrTableRaw(List<long> recallNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),recallNums);
 			}
