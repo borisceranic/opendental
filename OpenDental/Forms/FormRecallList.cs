@@ -1363,7 +1363,7 @@ namespace OpenDental{
 				#endregion
 				#region Insert Commlog
 				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
-					PrefC.GetLong(PrefName.RecallStatusEmailed),true);
+					PrefC.GetLong(PrefName.RecallStatusEmailed),true,Security.CurUser.UserNum);
 				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));
 				#endregion
 			}
