@@ -1564,8 +1564,8 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets the DataTable to display for treatment finder report</summary>
-		public static DataTable GetTreatmentFinderList(bool noIns,bool patsWithAppts,int monthStart,DateTime dateSince,double aboveAmount,ArrayList providerFilter,
-			ArrayList billingFilter,string code1,string code2) 
+		public static DataTable GetTreatmentFinderList(bool noIns,bool patsWithAppts,int monthStart,DateTime dateSince,double aboveAmount,List<int> providerFilter,
+			List<int> billingFilter,string code1,string code2) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),noIns,patsWithAppts,monthStart,dateSince,aboveAmount,providerFilter,billingFilter,code1,code2);
