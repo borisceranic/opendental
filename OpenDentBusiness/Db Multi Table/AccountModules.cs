@@ -521,6 +521,7 @@ namespace OpenDentBusiness {
 		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatmentPrinting,bool returnTable) {
 			retVal=new DataSet();
 			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatmentPrinting);
+			GetApptTable(fam,singlePatient,patNum);
 			return retVal;
 		}
 		
