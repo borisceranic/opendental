@@ -90,12 +90,20 @@ namespace OpenDental {
 					gr.Cells.Add(new ODGridCell(npi));
 					//2 YearMonthAdded
 					gr.Cells.Add(new ODGridCell(trNode.ChildNodes[9].InnerText));
-					//3 Type
-					gr.Cells.Add(new ODGridCell(trNode.ChildNodes[10].InnerText));
+					//3 Type (N=New customer who began using eRx in the report month, U=Customer who used eRx one month prior to report month, B=Both N and U.)
+					string billType=trNode.ChildNodes[10].InnerText;
+					gr.Cells.Add(new ODGridCell(billType));
 					//4 IsNew
-					List <RepeatCharge> RepeatChargesCur=RepeatCharges.GetForNewCrop(patNum);
-					RepeatCharge repeatChargeForNpi=GetRepeatChargeForNPI(RepeatChargesCur,npi);
-					gr.Cells.Add(new ODGridCell((repeatChargeForNpi==null)?"X":""));
+					List<RepeatCharge> listRepeatChargesCur=RepeatCharges.GetForErx(patNum);
+					RepeatCharge repeatChargeForNpi=GetRepeatChargeForNPI(listRepeatChargesCur,npi);
+					bool isNew=false;
+					//If billType=="U", then we will not post a repeating charge, since it should have been posted in the previous reporting month already.
+					//Not posting repeating charges where billType="U" allows our techs to delete repeating charges for customers who have cancelled.
+					//The repeating charge tool will not create any charges older than 50 days, thus adding this repeating charge is useless anyway.
+					if(repeatChargeForNpi==null && billType!="U") {
+						isNew=true;
+					}
+					gr.Cells.Add(new ODGridCell(isNew?"X":""));
 					//5 PracticeTitle
 					gr.Cells.Add(new ODGridCell(trNode.ChildNodes[0].InnerText));
 					//6 FirstLastName
@@ -109,7 +117,7 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Searches the repeatChargesCur list for the NewCrop repeating charge related to the given npi.
+		///<summary>Searches the repeatChargesCur list for the eRx repeating charge related to the given npi.
 		///A repeating charge is a match if the note beings with "NPIs=" followed by the given npi, or if the note simply starts with the npi.
 		///Returns null if no match found.</summary>
 		private RepeatCharge GetRepeatChargeForNPI(List <RepeatCharge> repeatChargesCur,string npi) {
@@ -126,12 +134,12 @@ namespace OpenDental {
 			return null;
 		}
 
-		///<summary>Returns the code NewCrop or a code like NewCrop##, depending on which codes are already in use for the current patnum.
+		///<summary>Returns a code in format Z###, depending on which codes are already in use for the current patnum.
 		///The returned code is guaranteed to exist in the database, because codes are created if they do not exist.</summary>
 		private string GetProcCodeForNewCharge(List<RepeatCharge> repeatChargesCur) {
-			//Locate a proc code for NewCrop which is not already in use.
-			string procCode="NewCrop";
-			int attempts=1;
+			//Locate a proc code for eRx which is not already in use.
+			string procCode="Z000";
+			int attempts=0;
 			bool procCodeInUse;
 			do {
 				procCodeInUse=false;
@@ -142,11 +150,11 @@ namespace OpenDental {
 					}
 				}
 				if(procCodeInUse) {
-					attempts++;//Should start at 2. The Codes will be "NewCrop", "NewCrop02", "NewCrop03", etc...
-					if(attempts>99) {
-						throw new Exception("Cannot add more than 99 NewCrop repeating charges yet. Ask programmer to increase.");
+					attempts++;//Should start at 2. The Codes will be "Z001", "Z002", "Z003", etc...
+					if(attempts>999) {
+						throw new Exception("Cannot add more than 999 Z-codes yet.  Ask programmer to increase.");
 					}
-					procCode="NewCrop"+(attempts.ToString().PadLeft(2,'0'));
+					procCode="Z"+(attempts.ToString().PadLeft(3,'0'));
 				}
 			} while(procCodeInUse);
 			//If the selected code is not in the database already, then add it automatically.
@@ -154,8 +162,8 @@ namespace OpenDental {
 			if(codeNum==0) {//The selected code does not exist, so we must add it.
 				ProcedureCode code=new ProcedureCode();
 				code.ProcCode=procCode;
-				code.Descript="NewCrop Rx";
-				code.AbbrDesc="NewCrop";
+				code.Descript="Electronic Rx";
+				code.AbbrDesc="eRx";
 				code.ProcTime="/X/";
 				code.ProcCat=162;//Software
 				code.TreatArea=TreatmentArea.Mouth;
@@ -166,7 +174,7 @@ namespace OpenDental {
 		}
 
 		private int GetChargeDayOfMonth(long patNum) {
-			//Match the day of the month for the NewCrop repeating charge to their existing monthly support charge (even if the monthly support is disabled).
+			//Match the day of the month for the eRx repeating charge to their existing monthly support charge (even if the monthly support is disabled).
 			int day=15;//Day 15 will be used if they do not have any existing repeating charges.
 			RepeatCharge[] chargesForPat=RepeatCharges.Refresh(patNum);
 			bool hasMaintCharge=false;
@@ -196,44 +204,47 @@ namespace OpenDental {
 				long patNum=PIn.Long(gridBillingList.Rows[i].Cells[0].Text);
 				string npi=PIn.String(gridBillingList.Rows[i].Cells[1].Text);
 				string billingType=gridBillingList.Rows[i].Cells[3].Text;
-				List<RepeatCharge> repeatChargesNewCrop=RepeatCharges.GetForNewCrop(patNum);
-				RepeatCharge repeatCur=GetRepeatChargeForNPI(repeatChargesNewCrop,npi);
+				List<RepeatCharge> listErxRepeatCharges=RepeatCharges.GetForErx(patNum);
+				RepeatCharge repeatCur=GetRepeatChargeForNPI(listErxRepeatCharges,npi);
 				if(repeatCur==null) {//No such repeating charge exists yet for the given npi.
+					if(gridBillingList.Rows[i].Cells[4].Text!="X") {
+						continue;//Only create a charge for rows marked new.
+					}
 					//We consider the provider a new provider and create a new repeating charge.
 					string yearMonth=gridBillingList.Rows[i].Cells[2].Text;
-					int yearBilling=PIn.Int(yearMonth.Substring(0,4));//The year chosen by the OD employee when running the NewCrop Billing report.
-					int monthBilling=PIn.Int(yearMonth.Substring(4));//The month chosen by the OD employee when running the NewCrop Billing report.
+					int yearBilling=PIn.Int(yearMonth.Substring(0,4));//The year chosen by the OD employee when running the eRx Billing report.
+					int monthBilling=PIn.Int(yearMonth.Substring(4));//The month chosen by the OD employee when running the eRx Billing report.
 					int dayOtherCharges=GetChargeDayOfMonth(patNum);//The day of the month that the customer already has other repeating charges. Keeps their billing simple (one bill per month for all charges).
 					int daysInMonth=DateTime.DaysInMonth(yearBilling,monthBilling);
 					if(dayOtherCharges>daysInMonth) {
-						//The day that the user used NewCrop (signed up) was in a month that does not have the day of the other monthly charges in it.
-						//E.g.  dayOtherCharges = 31 and the user started a new NewCrop account in a month without 31 days.
+						//The day that the user used eRx (signed up) was in a month that does not have the day of the other monthly charges in it.
+						//E.g.  dayOtherCharges = 31 and the user started a new eRx account in a month without 31 days.
 						//Therefore, we have to use the last day of the month that they started.
 						//This can introduce multiple statements being sent out which can potentially delay us (HQ) from getting paid in a timely fashion.
 						//A workaround for this would be to train our techs to never run billing after the 28th of every month that way incomplete statements are not sent.
 						dayOtherCharges=daysInMonth;
 					}
-					DateTime dateNewCropCharge=new DateTime(yearBilling,monthBilling,dayOtherCharges);
-					if(dateNewCropCharge<DateTime.Today.AddMonths(-3)) {//Just in case the user runs an older report.
+					DateTime dateErxCharge=new DateTime(yearBilling,monthBilling,dayOtherCharges);
+					if(dateErxCharge<DateTime.Today.AddMonths(-3)) {//Just in case the user runs an older report.
 						numSkipped++;
 						continue;
 					}
 					repeatCur=new RepeatCharge();
 					repeatCur.IsNew=true;
 					repeatCur.PatNum=patNum;
-					repeatCur.ProcCode=GetProcCodeForNewCharge(repeatChargesNewCrop);
+					repeatCur.ProcCode=GetProcCodeForNewCharge(listErxRepeatCharges);
 					repeatCur.ChargeAmt=15;//15$/month
-					repeatCur.DateStart=dateNewCropCharge;
+					repeatCur.DateStart=dateErxCharge;
 					repeatCur.Note="NPI="+npi;
 					repeatCur.IsEnabled=true;
 					repeatCur.CopyNoteToProc=true;//Copy the billing note to the procedure note by default so that the customer can see the NPI the charge corresponds to. Can be unchecked by user if a private note is added later (rare).
 					RepeatCharges.Insert(repeatCur);
 					numChargesAdded++;
 				}
-				else { //The repeating charge for NewCrop billing already exists for the given npi.
+				else { //The repeating charge for eRx billing already exists for the given npi.
 					DateTime dateEndLastMonth=(new DateTime(DateTime.Today.Year,DateTime.Today.Month,1)).AddDays(-1);
 					if(billingType=="B" || billingType=="N") {//The provider sent eRx last month.
-						if(repeatCur.DateStop.Year>2010) {//NewCrop support for this provider was disabled at one point, but has been used since.
+						if(repeatCur.DateStop.Year>2010) {//eRx support for this provider was disabled at one point, but has been used since.
 							if(repeatCur.DateStop<dateEndLastMonth) {//If the stop date is in the future or already at the end of the month, then we cannot presume that there will be a charge next month.
 								repeatCur.DateStop=dateEndLastMonth;//Make sure the recent use is reflected in the end date.
 								RepeatCharges.Update(repeatCur);
@@ -244,7 +255,7 @@ namespace OpenDental {
 						//Customers must call in to disable repeating charges, they are not disabled automatically.
 					}
 					else {
-						throw new Exception("Unknown NewCrop Billing type "+billingType);
+						throw new Exception("Unknown eRx Billing type "+billingType);
 					}
 				}
 			}
