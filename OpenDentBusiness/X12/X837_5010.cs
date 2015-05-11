@@ -1024,8 +1024,9 @@ namespace OpenDentBusiness
 				}
 				else if(medType==EnumClaimMedType.Dental) {
 					if(claim.PlaceService!=PlaceOfService.Office) {
-						if(IsClaimConnect(clearhouse)) {
+						if(IsClaimConnect(clearhouse) || IsDentiCal(clearhouse)) {
 							//Osvaldo Ferrer, VIP account manager for DentalXChange, says we need the segment whenever the place of service is not office.
+							//Denti-Cal now requires the ability to send facility information, as of the last round of testing for a customer on 05/11/2015.
 							sendFacilityNameAndAddress=true;
 						}
 						else {//for other clearinghouses, the X12 specs say that we don't send it if it's the same as the billing prov.
