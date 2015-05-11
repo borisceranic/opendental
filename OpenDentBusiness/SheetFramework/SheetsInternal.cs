@@ -1589,10 +1589,11 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,449,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementPayPlan",170,465,510,49));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementMain",65,535,720,31));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("futureAppointments",9f,"Arial",false,50,572,725,14));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("futureAppointments",9f,"Arial",false,50,572,725,14,GrowthBehaviorEnum.DownGlobal));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.Note",9f,"Arial",false,50,587,725,14,GrowthBehaviorEnum.DownGlobal));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,602,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
 			return sheet;
+		}
 		}
 
 		private static SheetDef MedLabResultReport() {
