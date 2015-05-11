@@ -1024,7 +1024,7 @@ namespace OpenDentBusiness
 				}
 				else if(medType==EnumClaimMedType.Dental) {
 					if(claim.PlaceService!=PlaceOfService.Office) {
-						if(IsClaimConnect(clearhouse)) {
+						if(IsClaimConnect(clearhouse) || IsDentiCal(clearhouse)) {
 							//Osvaldo Ferrer, VIP account manager for DentalXChange, says we need the segment whenever the place of service is not office.
 							sendFacilityNameAndAddress=true;
 						}
