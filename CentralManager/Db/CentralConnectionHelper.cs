@@ -5,7 +5,33 @@ using System.Windows.Forms;
 namespace CentralManager {
 	public class CentralConnectionHelper {
 
-		///<summary>Updates the current data connection settings of the central manager to the connection settings passed in.  Automatically refreshes the local cache to reflect the cache of the connection passed in.</summary>
+		///<summary>Returns command-line arguments for launching Open Dental based off of the settings for the connection passed in.</summary>
+		public static string GetArgsFromConnection(CentralConnection centralConnection) {
+			string args="";
+			if(centralConnection.DatabaseName!="") {
+				args+="ServerName=\""+centralConnection.ServerName+"\" "
+					+"DatabaseName=\""+centralConnection.DatabaseName+"\" "
+					+"MySqlUser=\""+centralConnection.MySqlUser+"\" ";
+				if(centralConnection.MySqlPassword!="") {
+					args+="MySqlPassword=\""+CentralConnections.Decrypt(centralConnection.MySqlPassword,FormCentralManager.EncryptionKey)+"\" ";
+				}
+			}
+			else if(centralConnection.ServiceURI!="") {
+				args+="WebServiceURI=\""+centralConnection.ServiceURI+"\" ";
+				if(centralConnection.WebServiceIsEcw) {
+					args+="WebServiceIsEcw=True ";
+				}
+			}
+			if(centralConnection.OdUser!="") {
+				args+="UserName=\""+centralConnection.OdUser+"\" ";
+			}
+			if(centralConnection.OdPassword!="") {
+				args+="OdPassword=\""+CentralConnections.Decrypt(centralConnection.OdPassword,FormCentralManager.EncryptionKey)+"\" ";
+			}
+			return args;
+		}
+
+		///<summary>Updates the current data connection settings of the central manager to the connection settings passed in.  Automatically refreshes the local cache to reflect the cache of the connection passed in.  There is an overload for this function if you dont want to refresh the entire cache.</summary>
 		public static bool UpdateCentralConnection(CentralConnection centralConnection) {
 			return UpdateCentralConnection(centralConnection,true);
 		}
@@ -52,7 +78,7 @@ namespace CentralManager {
 				else {
 					DataConnection.DBtype=DatabaseType.MySql;
 					OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
-					dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
+					dcon.SetDbT(computerName,database,user,password,"","",DataConnection.DBtype);
 					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
 				}
 				if(refreshCache) {

@@ -73,6 +73,12 @@
     <Compile Include="FormCentralGroupPermEdit.Designer.cs">
       <DependentUpon>FormCentralGroupPermEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCentralPatientSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCentralPatientSearch.Designer.cs">
+      <DependentUpon>FormCentralPatientSearch.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCentralProdInc.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -149,6 +155,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralGroupPermEdit.resx">
       <DependentUpon>FormCentralGroupPermEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralPatientSearch.resx">
+      <DependentUpon>FormCentralPatientSearch.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralProdInc.resx">
       <DependentUpon>FormCentralProdInc.cs</DependentUpon>

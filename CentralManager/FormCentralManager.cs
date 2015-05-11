@@ -250,6 +250,18 @@ namespace CentralManager {
 
 		#endregion
 
+		private void menuPatientSearch_Click(object sender,EventArgs e) {
+			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.Text=Lans.g("FormCentralConnections","Choose Databases to Search");
+			FormCC.LabelText.Text=Lans.g("FormCentralConnections","Choose which databases to search.  The more connections that are chosen the longer the search will take.");
+			FormCC.ShowDialog();
+			if(FormCC.DialogResult==DialogResult.OK) {
+				FormCentralPatientSearch FormCPS=new FormCentralPatientSearch();
+				FormCPS.ListConns=FormCC.ListConns;
+				FormCPS.ShowDialog();
+			}
+		}
+
 		private void FormCentralManager_FormClosing(object sender,FormClosingEventArgs e) {
 			ODThread.QuitSyncAllOdThreads();
 		}

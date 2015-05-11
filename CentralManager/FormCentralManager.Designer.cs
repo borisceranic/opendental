@@ -34,6 +34,8 @@
 			this.menuItemUsers = new System.Windows.Forms.MenuItem();
 			this.menuItemReports = new System.Windows.Forms.MenuItem();
 			this.menuItemAnnualPI = new System.Windows.Forms.MenuItem();
+			this.menuItem1 = new System.Windows.Forms.MenuItem();
+			this.menuPatientSearch = new System.Windows.Forms.MenuItem();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.label1 = new System.Windows.Forms.Label();
 			this.comboConnectionGroups = new System.Windows.Forms.ComboBox();
@@ -61,7 +63,8 @@
 			// 
 			this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemSetup,
-            this.menuItemReports});
+            this.menuItemReports,
+            this.menuItem1});
 			// 
 			// menuItemSetup
 			// 
@@ -109,6 +112,19 @@
 			this.menuItemAnnualPI.Index = 0;
 			this.menuItemAnnualPI.Text = "Annual P&&I";
 			this.menuItemAnnualPI.Click += new System.EventHandler(this.menuProdInc_Click);
+			// 
+			// menuItem1
+			// 
+			this.menuItem1.Index = 2;
+			this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuPatientSearch});
+			this.menuItem1.Text = "Search";
+			// 
+			// menuPatientSearch
+			// 
+			this.menuPatientSearch.Index = 0;
+			this.menuPatientSearch.Text = "Patients";
+			this.menuPatientSearch.Click += new System.EventHandler(this.menuPatientSearch_Click);
 			// 
 			// gridMain
 			// 
@@ -184,6 +200,8 @@
 		private System.Windows.Forms.MenuItem menuItemGroups;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox comboConnectionGroups;
+		private System.Windows.Forms.MenuItem menuItem1;
+		private System.Windows.Forms.MenuItem menuPatientSearch;
 	}
 }
 
