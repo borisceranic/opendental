@@ -1594,7 +1594,6 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.NoteBold",10f,"Arial",true,50,602,725,14,GrowthBehaviorEnum.DownGlobal,KnownColor.DarkRed));
 			return sheet;
 		}
-		}
 
 		private static SheetDef MedLabResultReport() {
 			SheetDef sheet=new SheetDef(SheetTypeEnum.MedLabResults);
