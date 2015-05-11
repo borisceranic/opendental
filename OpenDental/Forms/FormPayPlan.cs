@@ -1079,7 +1079,7 @@ namespace OpenDental{
 			int numCharges=1;
 			for(int i=0;i<_listPayPlanCharges.Count;i++){//Payplan Charges
 				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],numCharges));
-				if(!_listPayPlanCharges[i].Note.Contains("Recalculated based on")  && !_listPayPlanCharges[i].Note.Contains("Downpayment")) {//Don't increment the charge # for recalculated charges, since they won't have a #.
+				if(!_listPayPlanCharges[i].Note.Trim().ToLower().Contains("recalculated based on")) {//Don't increment the charge # for recalculated charges, since they won't have a #.
 					numCharges++;
 				}
 			}
@@ -1174,8 +1174,8 @@ namespace OpenDental{
 			string descript="#"+payPlanChargeOrdinal;
 			if(payPlanCharge.Note!="") {
 				descript+=" "+payPlanCharge.Note;
-				//Don't add a # if it's a recalculated/downpayment charge because they aren't "true" payplan charges.
-				if(payPlanCharge.Note.Contains("Recalculated based on") || payPlanCharge.Note.Contains("Downpayment")) {
+				//Don't add a # if it's a recalculated charge because they aren't "true" payplan charges.
+				if(payPlanCharge.Note.Trim().ToLower().Contains("recalculated based on")) {
 					descript=payPlanCharge.Note;
 				}
 			}
