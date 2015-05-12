@@ -61,7 +61,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.EmailAddressNum    = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());
 				clinic.DefaultProv        = PIn.Long  (table.Rows[i]["DefaultProv"].ToString());
 				clinic.SmsContractDate    = PIn.DateT (table.Rows[i]["SmsContractDate"].ToString());
-				clinic.SmsContractName    = PIn.String(table.Rows[i]["SmsContractName"].ToString());
+				clinic.SmsMonthlyLimit    = PIn.Double(table.Rows[i]["SmsMonthlyLimit"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsContractName) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -121,7 +121,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (clinic.EmailAddressNum)+","
 				+    POut.Long  (clinic.DefaultProv)+","
 				+    POut.DateT (clinic.SmsContractDate)+","
-				+"'"+POut.String(clinic.SmsContractName)+"')";
+				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -148,7 +148,7 @@ namespace OpenDentBusiness.Crud{
 				+"EmailAddressNum    =  "+POut.Long  (clinic.EmailAddressNum)+", "
 				+"DefaultProv        =  "+POut.Long  (clinic.DefaultProv)+", "
 				+"SmsContractDate    =  "+POut.DateT (clinic.SmsContractDate)+", "
-				+"SmsContractName    = '"+POut.String(clinic.SmsContractName)+"' "
+				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"' "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -212,9 +212,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SmsContractDate = "+POut.DateT(clinic.SmsContractDate)+"";
 			}
-			if(clinic.SmsContractName != oldClinic.SmsContractName) {
+			if(clinic.SmsMonthlyLimit != oldClinic.SmsMonthlyLimit) {
 				if(command!=""){ command+=",";}
-				command+="SmsContractName = '"+POut.String(clinic.SmsContractName)+"'";
+				command+="SmsMonthlyLimit = '"+POut.Double(clinic.SmsMonthlyLimit)+"'";
 			}
 			if(command==""){
 				return false;

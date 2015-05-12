@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class SmsMTs{
+	public class SmsToMobiles{
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*
 		#region CachePattern
@@ -68,15 +68,6 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static long Insert(SmsMT smsMT){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				smsMT.SmsMTNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsMT);
-				return smsMT.SmsMTNum;
-			}
-			return Crud.SmsMTCrud.Insert(smsMT);
-		}
-
-		///<summary></summary>
 		public static void Update(SmsMT smsMT){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsMT);
@@ -95,6 +86,16 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
+
+		///<summary></summary>
+		public static long Insert(SmsToMobile smsMT) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				smsMT.SmsToMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsMT);
+				return smsMT.SmsToMobileNum;
+			}
+			return Crud.SmsToMobileCrud.Insert(smsMT);
+		}
+
 
 
 

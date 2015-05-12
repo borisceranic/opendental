@@ -8012,7 +8012,7 @@ namespace OpenDentBusiness {
 						CommlogNum bigint NOT NULL,
 						MsgText text NOT NULL,
 						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-						SmsVln varchar(255) NOT NULL,
+						SmsPhone varchar(255) NOT NULL,
 						MsgPart varchar(255) NOT NULL,
 						MsgTotal varchar(255) NOT NULL,
 						MsgRefID varchar(255) NOT NULL,
@@ -8032,7 +8032,7 @@ namespace OpenDentBusiness {
 						CommlogNum number(20) NOT NULL,
 						MsgText clob,
 						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
-						SmsVln varchar2(255),
+						SmsPhone varchar2(255),
 						MsgPart varchar2(255),
 						MsgTotal varchar2(255),
 						MsgRefID varchar2(255),
@@ -8055,7 +8055,7 @@ namespace OpenDentBusiness {
 						PatNum bigint NOT NULL,
 						GuidMessage varchar(255) NOT NULL,
 						GuidBatch varchar(255) NOT NULL,
-						VlnNumber varchar(255) NOT NULL,
+						PhoneNumber varchar(255) NOT NULL,
 						PhonePat varchar(255) NOT NULL,
 						IsTimeSensitive tinyint NOT NULL,
 						MsgType tinyint NOT NULL,
@@ -8080,7 +8080,7 @@ namespace OpenDentBusiness {
 						PatNum number(20) NOT NULL,
 						GuidMessage varchar2(255),
 						GuidBatch varchar2(255),
-						VlnNumber varchar2(255),
+						PhoneNumber varchar2(255),
 						PhonePat varchar2(255),
 						IsTimeSensitive number(3) NOT NULL,
 						MsgType number(3) NOT NULL,
@@ -8107,7 +8107,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE smsvln (
 						SmsVlnNum bigint NOT NULL auto_increment PRIMARY KEY,
 						ClinicNum bigint NOT NULL,
-						VlnNumber varchar(255) NOT NULL,
+						PhoneNumber varchar(255) NOT NULL,
 						DateActive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						DateInactive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						InactiveCode varchar(255) NOT NULL,
@@ -8121,7 +8121,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE TABLE smsvln (
 						SmsVlnNum number(20) NOT NULL,
 						ClinicNum number(20) NOT NULL,
-						VlnNumber varchar2(255),
+						PhoneNumber varchar2(255),
 						DateActive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						DateInactive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						InactiveCode varchar2(255),
@@ -8299,6 +8299,180 @@ namespace OpenDentBusiness {
 		private static void To15_3_0() {
 			if(FromVersion<new Version("15.3.0.0")) {
 				string command="";
+				//Column clinic.SmsContractName was never used.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic DROP COLUMN SmsContractName";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic DROP COLUMN SmsContractName";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD SmsMonthlyLimit double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD SmsMonthlyLimit number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET SmsMonthlyLimit = 0 WHERE SmsMonthlyLimit IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY SmsMonthlyLimit NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('SmsMonthlyLimit','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SmsMonthlyLimit','0')";
+					Db.NonQ(command);
+				}
+				//Drop old sms tables with improper schema. They were never used.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS smsmt";
+					Db.NonQ(command);
+					command="DROP TABLE IF EXISTS smsmo";
+					Db.NonQ(command);
+					command="DROP TABLE IF EXISTS smsvln";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsmt'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsmo'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsvln'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+				}
+				//Re-Add SMS Tables. They were released in version 15.2 but were not used. This is the updated schema.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS smsfrommobile";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smsfrommobile (
+						SmsFromMobileNum bigint NOT NULL auto_increment PRIMARY KEY,
+						PatNum bigint NOT NULL,
+						ClinicNum bigint NOT NULL,
+						CommlogNum bigint NOT NULL,
+						MsgText text NOT NULL,
+						DateTimeReceived datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						SmsPhoneNumber varchar(255) NOT NULL,
+						MsgPart varchar(255) NOT NULL,
+						MsgTotal varchar(255) NOT NULL,
+						MsgRefID varchar(255) NOT NULL,
+						INDEX(PatNum),
+						INDEX(ClinicNum),
+						INDEX(CommlogNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsfrommobile'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smsfrommobile (
+						SmsFromMobileNum number(20) NOT NULL,
+						PatNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						CommlogNum number(20) NOT NULL,
+						MsgText clob,
+						DateTimeReceived date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						SmsPhoneNumber varchar2(255),
+						MsgPart varchar2(255),
+						MsgTotal varchar2(255),
+						MsgRefID varchar2(255),
+						CONSTRAINT smsfrommobile_SmsFromMobileNum PRIMARY KEY (SmsFromMobileNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smsfrommobile_PatNum ON smsfrommobile (PatNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smsfrommobile_ClinicNum ON smsfrommobile (ClinicNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smsfrommobile_CommlogNum ON smsfrommobile (CommlogNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS smsphone";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smsphone (
+						SmsPhoneNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ClinicNum bigint NOT NULL,
+						PhoneNumber varchar(255) NOT NULL,
+						DateTimeActive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						DateTimeInactive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						InactiveCode varchar(255) NOT NULL,
+						INDEX(ClinicNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsphone'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smsphone (
+						SmsPhoneNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						PhoneNumber varchar2(255),
+						DateTimeActive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						DateTimeInactive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						InactiveCode varchar2(255),
+						CONSTRAINT smsphone_SmsPhoneNum PRIMARY KEY (SmsPhoneNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smsphone_ClinicNum ON smsphone (ClinicNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS smstomobile";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smstomobile (
+						SmsToMobileNum bigint NOT NULL auto_increment PRIMARY KEY,
+						PatNum bigint NOT NULL,
+						GuidMessage varchar(255) NOT NULL,
+						GuidBatch varchar(255) NOT NULL,
+						SmsPhoneNumber varchar(255) NOT NULL,
+						PhonePat varchar(255) NOT NULL,
+						IsTimeSensitive tinyint NOT NULL,
+						MsgType tinyint NOT NULL,
+						MsgText text NOT NULL,
+						Status tinyint NOT NULL,
+						MsgParts int NOT NULL,
+						MsgCostUSD double NOT NULL,
+						ClinicNum bigint NOT NULL,
+						CustErrorText varchar(255) NOT NULL,
+						DateTimeSent datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						DateTimeTerminated datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						INDEX(PatNum),
+						INDEX(ClinicNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smstomobile'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE smstomobile (
+						SmsToMobileNum number(20) NOT NULL,
+						PatNum number(20) NOT NULL,
+						GuidMessage varchar2(255),
+						GuidBatch varchar2(255),
+						SmsPhoneNumber varchar2(255),
+						PhonePat varchar2(255),
+						IsTimeSensitive number(3) NOT NULL,
+						MsgType number(3) NOT NULL,
+						MsgText clob,
+						Status number(3) NOT NULL,
+						MsgParts number(11) NOT NULL,
+						MsgCostUSD number(38,8) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						CustErrorText varchar2(255),
+						DateTimeSent date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						DateTimeTerminated date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CONSTRAINT smstomobile_SmsToMobileNum PRIMARY KEY (SmsToMobileNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smstomobile_PatNum ON smstomobile (PatNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smstomobile_ClinicNum ON smstomobile (ClinicNum)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -8333,5 +8507,7 @@ namespace OpenDentBusiness {
 
 
 				
+
+
 
 

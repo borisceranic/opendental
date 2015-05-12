@@ -94,6 +94,7 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.ClearHouses) || isAll){
 				ds.Tables.Add(Clearinghouses.RefreshCache());//kh wants to add an EasyHideClearHouses to disable this
 			}
+			//InvalidType.Clinics see InvalidType.Providers
 			if(itypes.Contains((int)InvalidType.Computers) || isAll){
 				ds.Tables.Add(Computers.RefreshCache());
 				ds.Tables.Add(Printers.RefreshCache());

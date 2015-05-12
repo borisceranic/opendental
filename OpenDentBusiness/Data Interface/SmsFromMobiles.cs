@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class SmsMOs{
+	public class SmsFromMobiles{
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*
 		#region CachePattern

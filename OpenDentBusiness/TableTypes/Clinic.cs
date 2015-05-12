@@ -37,8 +37,8 @@ namespace OpenDentBusiness{
 		///<summary>DateSMSContract was signed.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime SmsContractDate;
-		///<summary>Name used to sign the contract.</summary>
-		public string SmsContractName;
+		///<summary>Always stored in USD, this is the desired limit for SMS out for a given month.</summary>
+		public double SmsMonthlyLimit;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

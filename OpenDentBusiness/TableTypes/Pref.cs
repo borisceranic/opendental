@@ -454,8 +454,10 @@ namespace OpenDentBusiness {
 		SignalLastClearedDate,
 		///<summary>Blank if not signed. Date signed. For practice level contract, if using clinics see Clinic.SmsContractDate. Record of signing also kept at HQ.</summary>
 		SmsContractDate,
-		///<summary>Blank if not signed. Name signed. For practice level contract, if using clinics see Clinic.SmsContractName. Record of signing also kept at HQ.</summary>
+		///<summary>(Deprecated) Blank if not signed. Name signed. For practice level contract, if using clinics see Clinic.SmsContractName. Record of signing also kept at HQ.</summary>
 		SmsContractName,
+		///<summary>Always stored in US dollars. This is the desired limit for SMS outbound messages per month.</summary>
+		SmsMonthlyLimit,
 		/// <summary>Name of this Software.  Defaults to 'Open Dental Software'.</summary>
 		SoftwareName,
 		SolidBlockouts,
