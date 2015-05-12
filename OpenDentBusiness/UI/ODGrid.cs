@@ -598,7 +598,11 @@ namespace OpenDental.UI {
 								}
 							}
 							else {
-								cellH=(int)(LineSpacingForFont(cellFont.Name)*g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height)+1;
+								float hTemp=g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth,_format).Height;
+								if(IsForPrinting) {
+									hTemp=LineSpacingForFont(cellFont.Name)*hTemp;
+								}
+								cellH=(int)hTemp+1;
 							}
 							//if(rows[i].Height==0) {//not set
 							//  cellH=(int)g.MeasureString(rows[i].Cells[j].Text,cellFont,columns[j].ColWidth).Height+1;
@@ -2946,10 +2950,10 @@ namespace OpenDental.UI {
 		///<summary>This line spacing is specifically picked to match the RichTextBox.</summary>
 		private static float LineSpacingForFont(string fontName) {
 			if(fontName.ToLower()=="arial") {
-				return 1.08f;
+				return 1.055f;
 			}
 			else if(fontName.ToLower()=="courier new") {
-				return 1.08f;
+				return 1.055f;
 			}
 			//else if(fontName.ToLower()=="microsoft sans serif"){
 			//	return 1.00f;
