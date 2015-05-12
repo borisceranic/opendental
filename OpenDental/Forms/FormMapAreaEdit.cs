@@ -34,7 +34,7 @@ namespace OpenDental {
 			textBoxExtension.Text=MapItem.Extension.ToString();
 			textBoxWidthFeet.Text=MapItem.Width.ToString();
 			textBoxHeightFeet.Text=MapItem.Height.ToString();
-			textBoxDescription.Text=MapItem.Description.ToString();
+			textBoxDescription.Text=MapItem.Description;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
