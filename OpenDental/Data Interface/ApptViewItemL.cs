@@ -127,7 +127,12 @@ namespace OpenDental{
 			List<long> listSchedOps;
 			bool opAdded;
 			int indexOp;
+			List<long> listApptViewOpNums=ApptViewItems.GetOpsForView(apptViewCur.ApptViewNum);
 			for(int i=0;i<OperatoryC.ListShort.Count;i++) {//loop through all ops for all views (except the hidden ones, of course)
+				//If this operatory was not one of the selected Ops from the Appt View Edit window, skip it.
+				if(!listApptViewOpNums.Contains(OperatoryC.ListShort[i].OperatoryNum)) {
+					continue;
+				}
 				//find any applicable sched for the op
 				opAdded=false;
 				for(int s=0;s<dailySched.Count;s++) {
