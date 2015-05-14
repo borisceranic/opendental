@@ -10,8 +10,8 @@ using OpenDental.UI;
 namespace OpenDental {
 	public partial class FormPayPlanRecalculate:Form {
 
-		public bool isPrepay=true;
-		public bool isRecalculateInterest=true;
+		public bool IsPrepay=true;
+		public bool IsRecalculateInterest=true;
 
 		public FormPayPlanRecalculate() {
 			InitializeComponent();
@@ -19,13 +19,13 @@ namespace OpenDental {
 		}
 
 		private void FormPayPlanRecalculate_Load(object sender,EventArgs e) {
-			radioPrepay.Checked=isPrepay;
-			checkRecalculateInterest.Checked=isRecalculateInterest;
+			radioPrepay.Checked=IsPrepay;
+			checkRecalculateInterest.Checked=IsRecalculateInterest;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			isPrepay=radioPrepay.Checked;
-			isRecalculateInterest=checkRecalculateInterest.Checked;
+			IsPrepay=radioPrepay.Checked;
+			IsRecalculateInterest=checkRecalculateInterest.Checked;
 			DialogResult=DialogResult.OK;
 		}
 

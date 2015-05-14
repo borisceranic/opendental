@@ -42,7 +42,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(199, 245);
+			this.butOK.Location = new System.Drawing.Point(199, 191);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -57,7 +57,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(292, 245);
+			this.butCancel.Location = new System.Drawing.Point(292, 191);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -109,17 +109,16 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(18, 13);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(1136, 13);
+			this.label1.Size = new System.Drawing.Size(349, 57);
 			this.label1.TabIndex = 46;
 			this.label1.Text = resources.GetString("label1.Text");
 			// 
 			// FormPayPlanRecalculate
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(379, 281);
+			this.ClientSize = new System.Drawing.Size(379, 227);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkRecalculateInterest);
 			this.Controls.Add(this.groupBox1);
@@ -134,7 +133,6 @@ namespace OpenDental{
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 

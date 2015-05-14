@@ -34,7 +34,7 @@ namespace OpenDental{
 		private OpenDental.ValidDouble textAmount;
 		private OpenDental.ValidDate textDateFirstPay;
 		private OpenDental.ValidDouble textAPR;
-		private OpenDental.ValidNum textTerm;
+		private OpenDental.ValidNum textPaymentCount;
 		private OpenDental.UI.Button butPrint;
 		private System.Windows.Forms.TextBox textGuarantor;
 		///<summary></summary>
@@ -111,6 +111,7 @@ namespace OpenDental{
 		private TextBox textDue;
 		private List<PaySplit> _listPaySplits;
 		private string _payPlanNote;
+		int _roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
 		public FormPayPlan(Patient patCur,PayPlan payPlanCur){
@@ -160,8 +161,17 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.butRecalculate = new OpenDental.UI.Button();
+			this.butMoreOptions = new OpenDental.UI.Button();
+			this.textAPR = new OpenDental.ValidDouble();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.textPeriodPayment = new OpenDental.ValidDouble();
+			this.textPaymentCount = new OpenDental.ValidNum();
+			this.textDownPayment = new OpenDental.ValidDouble();
 			this.label11 = new System.Windows.Forms.Label();
+			this.textDateFirstPay = new OpenDental.ValidDate();
+			this.textAmount = new OpenDental.ValidDouble();
+			this.butCreateSched = new OpenDental.UI.Button();
 			this.textTotalCost = new System.Windows.Forms.TextBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.textPatient = new System.Windows.Forms.TextBox();
@@ -184,6 +194,7 @@ namespace OpenDental{
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butPickProv = new OpenDental.UI.Button();
 			this.textInterest = new System.Windows.Forms.TextBox();
 			this.labelTotals = new System.Windows.Forms.Label();
 			this.gridCharges = new OpenDental.UI.ODGrid();
@@ -191,7 +202,6 @@ namespace OpenDental{
 			this.textBalance = new OpenDental.ValidDouble();
 			this.textPayment = new OpenDental.ValidDouble();
 			this.textPrincipal = new OpenDental.ValidDouble();
-			this.butPickProv = new OpenDental.UI.Button();
 			this.textCompletedAmt = new OpenDental.ValidDouble();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClear = new OpenDental.UI.Button();
@@ -204,15 +214,6 @@ namespace OpenDental{
 			this.butChangeGuar = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.butRecalculate = new OpenDental.UI.Button();
-			this.butMoreOptions = new OpenDental.UI.Button();
-			this.textAPR = new OpenDental.ValidDouble();
-			this.textPeriodPayment = new OpenDental.ValidDouble();
-			this.textTerm = new OpenDental.ValidNum();
-			this.textDownPayment = new OpenDental.ValidDouble();
-			this.textDateFirstPay = new OpenDental.ValidDate();
-			this.textAmount = new OpenDental.ValidDouble();
-			this.butCreateSched = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -313,11 +314,49 @@ namespace OpenDental{
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Terms";
 			// 
+			// butRecalculate
+			// 
+			this.butRecalculate.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRecalculate.Autosize = true;
+			this.butRecalculate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRecalculate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRecalculate.CornerRadius = 4F;
+			this.butRecalculate.Location = new System.Drawing.Point(250, 82);
+			this.butRecalculate.Name = "butRecalculate";
+			this.butRecalculate.Size = new System.Drawing.Size(99, 24);
+			this.butRecalculate.TabIndex = 145;
+			this.butRecalculate.Text = "Recalculate";
+			this.butRecalculate.UseVisualStyleBackColor = true;
+			this.butRecalculate.Click += new System.EventHandler(this.butRecalculate_Click);
+			// 
+			// butMoreOptions
+			// 
+			this.butMoreOptions.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMoreOptions.Autosize = true;
+			this.butMoreOptions.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMoreOptions.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMoreOptions.CornerRadius = 4F;
+			this.butMoreOptions.Location = new System.Drawing.Point(250, 110);
+			this.butMoreOptions.Name = "butMoreOptions";
+			this.butMoreOptions.Size = new System.Drawing.Size(99, 24);
+			this.butMoreOptions.TabIndex = 7;
+			this.butMoreOptions.Text = "More Options";
+			this.butMoreOptions.Click += new System.EventHandler(this.butMoreOptions_Click);
+			// 
+			// textAPR
+			// 
+			this.textAPR.Location = new System.Drawing.Point(142, 78);
+			this.textAPR.MaxVal = 100000000D;
+			this.textAPR.MinVal = 0D;
+			this.textAPR.Name = "textAPR";
+			this.textAPR.Size = new System.Drawing.Size(47, 20);
+			this.textAPR.TabIndex = 4;
+			// 
 			// groupBox3
 			// 
 			this.groupBox3.Controls.Add(this.label7);
 			this.groupBox3.Controls.Add(this.textPeriodPayment);
-			this.groupBox3.Controls.Add(this.textTerm);
+			this.groupBox3.Controls.Add(this.textPaymentCount);
 			this.groupBox3.Controls.Add(this.label8);
 			this.groupBox3.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox3.Location = new System.Drawing.Point(9, 101);
@@ -327,6 +366,35 @@ namespace OpenDental{
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Either";
 			// 
+			// textPeriodPayment
+			// 
+			this.textPeriodPayment.Location = new System.Drawing.Point(133, 39);
+			this.textPeriodPayment.MaxVal = 100000000D;
+			this.textPeriodPayment.MinVal = 0.01D;
+			this.textPeriodPayment.Name = "textPeriodPayment";
+			this.textPeriodPayment.Size = new System.Drawing.Size(85, 20);
+			this.textPeriodPayment.TabIndex = 2;
+			this.textPeriodPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textPeriodPayment_KeyPress);
+			// 
+			// textTerm
+			// 
+			this.textPaymentCount.Location = new System.Drawing.Point(133, 17);
+			this.textPaymentCount.MaxVal = 255;
+			this.textPaymentCount.MinVal = 0;
+			this.textPaymentCount.Name = "textTerm";
+			this.textPaymentCount.Size = new System.Drawing.Size(47, 20);
+			this.textPaymentCount.TabIndex = 1;
+			this.textPaymentCount.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textPaymentCount_KeyPress);
+			// 
+			// textDownPayment
+			// 
+			this.textDownPayment.Location = new System.Drawing.Point(142, 56);
+			this.textDownPayment.MaxVal = 100000000D;
+			this.textDownPayment.MinVal = 0D;
+			this.textDownPayment.Name = "textDownPayment";
+			this.textDownPayment.Size = new System.Drawing.Size(85, 20);
+			this.textDownPayment.TabIndex = 3;
+			// 
 			// label11
 			// 
 			this.label11.Location = new System.Drawing.Point(4, 59);
@@ -335,6 +403,37 @@ namespace OpenDental{
 			this.label11.TabIndex = 0;
 			this.label11.Text = "Down Payment";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDateFirstPay
+			// 
+			this.textDateFirstPay.Location = new System.Drawing.Point(142, 34);
+			this.textDateFirstPay.Name = "textDateFirstPay";
+			this.textDateFirstPay.Size = new System.Drawing.Size(85, 20);
+			this.textDateFirstPay.TabIndex = 2;
+			// 
+			// textAmount
+			// 
+			this.textAmount.Location = new System.Drawing.Point(142, 13);
+			this.textAmount.MaxVal = 100000000D;
+			this.textAmount.MinVal = 0.01D;
+			this.textAmount.Name = "textAmount";
+			this.textAmount.Size = new System.Drawing.Size(85, 20);
+			this.textAmount.TabIndex = 1;
+			this.textAmount.Validating += new System.ComponentModel.CancelEventHandler(this.textAmount_Validating);
+			// 
+			// butCreateSched
+			// 
+			this.butCreateSched.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCreateSched.Autosize = true;
+			this.butCreateSched.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCreateSched.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCreateSched.CornerRadius = 4F;
+			this.butCreateSched.Location = new System.Drawing.Point(250, 138);
+			this.butCreateSched.Name = "butCreateSched";
+			this.butCreateSched.Size = new System.Drawing.Size(99, 24);
+			this.butCreateSched.TabIndex = 6;
+			this.butCreateSched.Text = "Create Schedule";
+			this.butCreateSched.Click += new System.EventHandler(this.butCreateSched_Click);
 			// 
 			// textTotalCost
 			// 
@@ -529,6 +628,19 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Same for all charges";
 			// 
+			// butPickProv
+			// 
+			this.butPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickProv.Autosize = false;
+			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickProv.CornerRadius = 2F;
+			this.butPickProv.Location = new System.Drawing.Point(321, 14);
+			this.butPickProv.Name = "butPickProv";
+			this.butPickProv.Size = new System.Drawing.Size(18, 21);
+			this.butPickProv.TabIndex = 2;
+			this.butPickProv.Text = "...";
+			// 
 			// textInterest
 			// 
 			this.textInterest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -610,19 +722,6 @@ namespace OpenDental{
 			this.textPrincipal.Size = new System.Drawing.Size(60, 20);
 			this.textPrincipal.TabIndex = 139;
 			this.textPrincipal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// butPickProv
-			// 
-			this.butPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPickProv.Autosize = false;
-			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(321, 14);
-			this.butPickProv.Name = "butPickProv";
-			this.butPickProv.Size = new System.Drawing.Size(18, 21);
-			this.butPickProv.TabIndex = 2;
-			this.butPickProv.Text = "...";
 			// 
 			// textCompletedAmt
 			// 
@@ -789,105 +888,6 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// butRecalculate
-			// 
-			this.butRecalculate.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRecalculate.Autosize = true;
-			this.butRecalculate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRecalculate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRecalculate.CornerRadius = 4F;
-			this.butRecalculate.Location = new System.Drawing.Point(250, 82);
-			this.butRecalculate.Name = "butRecalculate";
-			this.butRecalculate.Size = new System.Drawing.Size(99, 24);
-			this.butRecalculate.TabIndex = 145;
-			this.butRecalculate.Text = "Recalculate";
-			this.butRecalculate.UseVisualStyleBackColor = true;
-			this.butRecalculate.Visible = false;
-			this.butRecalculate.Click += new System.EventHandler(this.butRecalculate_Click);
-			// 
-			// butMoreOptions
-			// 
-			this.butMoreOptions.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMoreOptions.Autosize = true;
-			this.butMoreOptions.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMoreOptions.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMoreOptions.CornerRadius = 4F;
-			this.butMoreOptions.Location = new System.Drawing.Point(250, 110);
-			this.butMoreOptions.Name = "butMoreOptions";
-			this.butMoreOptions.Size = new System.Drawing.Size(99, 24);
-			this.butMoreOptions.TabIndex = 7;
-			this.butMoreOptions.Text = "More Options";
-			this.butMoreOptions.Click += new System.EventHandler(this.butMoreOptions_Click);
-			// 
-			// textAPR
-			// 
-			this.textAPR.Location = new System.Drawing.Point(142, 78);
-			this.textAPR.MaxVal = 100000000D;
-			this.textAPR.MinVal = 0D;
-			this.textAPR.Name = "textAPR";
-			this.textAPR.Size = new System.Drawing.Size(47, 20);
-			this.textAPR.TabIndex = 4;
-			// 
-			// textPeriodPayment
-			// 
-			this.textPeriodPayment.Location = new System.Drawing.Point(133, 39);
-			this.textPeriodPayment.MaxVal = 100000000D;
-			this.textPeriodPayment.MinVal = 0.01D;
-			this.textPeriodPayment.Name = "textPeriodPayment";
-			this.textPeriodPayment.Size = new System.Drawing.Size(85, 20);
-			this.textPeriodPayment.TabIndex = 2;
-			this.textPeriodPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textPeriodPayment_KeyPress);
-			// 
-			// textTerm
-			// 
-			this.textTerm.Location = new System.Drawing.Point(133, 17);
-			this.textTerm.MaxVal = 255;
-			this.textTerm.MinVal = 0;
-			this.textTerm.Name = "textTerm";
-			this.textTerm.Size = new System.Drawing.Size(47, 20);
-			this.textTerm.TabIndex = 1;
-			this.textTerm.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textTerm_KeyPress);
-			// 
-			// textDownPayment
-			// 
-			this.textDownPayment.Location = new System.Drawing.Point(142, 56);
-			this.textDownPayment.MaxVal = 100000000D;
-			this.textDownPayment.MinVal = 0D;
-			this.textDownPayment.Name = "textDownPayment";
-			this.textDownPayment.Size = new System.Drawing.Size(85, 20);
-			this.textDownPayment.TabIndex = 3;
-			// 
-			// textDateFirstPay
-			// 
-			this.textDateFirstPay.Location = new System.Drawing.Point(142, 34);
-			this.textDateFirstPay.Name = "textDateFirstPay";
-			this.textDateFirstPay.Size = new System.Drawing.Size(85, 20);
-			this.textDateFirstPay.TabIndex = 2;
-			// 
-			// textAmount
-			// 
-			this.textAmount.Location = new System.Drawing.Point(142, 13);
-			this.textAmount.MaxVal = 100000000D;
-			this.textAmount.MinVal = 0.01D;
-			this.textAmount.Name = "textAmount";
-			this.textAmount.Size = new System.Drawing.Size(85, 20);
-			this.textAmount.TabIndex = 1;
-			this.textAmount.Validating += new System.ComponentModel.CancelEventHandler(this.textAmount_Validating);
-			// 
-			// butCreateSched
-			// 
-			this.butCreateSched.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCreateSched.Autosize = true;
-			this.butCreateSched.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCreateSched.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCreateSched.CornerRadius = 4F;
-			this.butCreateSched.Location = new System.Drawing.Point(250, 138);
-			this.butCreateSched.Name = "butCreateSched";
-			this.butCreateSched.Size = new System.Drawing.Size(99, 24);
-			this.butCreateSched.TabIndex = 6;
-			this.butCreateSched.Text = "Create Schedule";
-			this.butCreateSched.Click += new System.EventHandler(this.butCreateSched_Click);
-			// 
 			// butPrint
 			// 
 			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -976,7 +976,7 @@ namespace OpenDental{
 			textPatient.Text=Patients.GetLim(PayPlanCur.PatNum).GetNameLF();
 			textGuarantor.Text=Patients.GetLim(PayPlanCur.Guarantor).GetNameLF();
 			if(PayPlanCur.NumberOfPayments!=0) {
-				textTerm.Text=PayPlanCur.NumberOfPayments.ToString();
+				textPaymentCount.Text=PayPlanCur.NumberOfPayments.ToString();
 			}
 			else {
 				textPeriodPayment.Text=PayPlanCur.PayAmt.ToString("f");
@@ -1079,7 +1079,7 @@ namespace OpenDental{
 			int numCharges=1;
 			for(int i=0;i<_listPayPlanCharges.Count;i++){//Payplan Charges
 				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],numCharges));
-				if(!_listPayPlanCharges[i].Note.Contains("Recalculated based on")  && !_listPayPlanCharges[i].Note.Contains("Downpayment")) {//Don't increment the charge # for recalculated charges, since they won't have a #.
+				if(!_listPayPlanCharges[i].Note.Trim().ToLower().Contains("recalculated based on")) {//Don't increment the charge # for recalculated charges, since they won't have a #.
 					numCharges++;
 				}
 			}
@@ -1116,6 +1116,14 @@ namespace OpenDental{
 			textTotalCost.Text=TotPrincInt.ToString("f");
 			if(_listPayPlanCharges.Count>0){
 				textDateFirstPay.Text=_listPayPlanCharges[0].ChargeDate.ToShortDateString();
+				//Attempt to find the first real payment plan charge instead of potentially the downpayment charge
+				for(int i=0;i<_listPayPlanCharges.Count;i++) {
+					if(_listPayPlanCharges[i].Note.Trim().ToLower().Contains("downpayment") || _listPayPlanCharges[i].Note.Trim().ToLower().Contains("recalculated based on")) {
+						continue;
+					}
+					textDateFirstPay.Text=_listPayPlanCharges[i].ChargeDate.ToShortDateString();
+					break;
+				}
 			}
 			else{
 				//don't damage what's already in textDateFirstPay.Text
@@ -1174,9 +1182,8 @@ namespace OpenDental{
 			string descript="#"+payPlanChargeOrdinal;
 			if(payPlanCharge.Note!="") {
 				descript+=" "+payPlanCharge.Note;
-				//Don't add a # if it's a recalculated/downpayment charge because they aren't "true" payplan charges.
-				payPlanCharge.Note="";
-				if(payPlanCharge.Note.Contains("Recalculated based on") || payPlanCharge.Note.Contains("Downpayment")) {
+				//Don't add a # if it's a recalculated charge because they aren't "true" payplan charges.
+				if(payPlanCharge.Note.Trim().ToLower().Contains("recalculated based on")) {
 					descript=payPlanCharge.Note;
 				}
 			}
@@ -1349,12 +1356,12 @@ namespace OpenDental{
 			textInsPlan.Text=InsPlans.GetDescript(PayPlanCur.PlanNum,Patients.GetFamily(PayPlanCur.PatNum),new List <InsPlan> (),PayPlanCur.InsSubNum,new List<InsSub>());
 		}
 
-		private void textTerm_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e) {
+		private void textPaymentCount_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e) {
 			textPeriodPayment.Text="";
 		}
 
 		private void textPeriodPayment_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e) {
-			textTerm.Text="";
+			textPaymentCount.Text="";
 		}
 
 		private void butMoreOptions_Click(object sender,EventArgs e) {
@@ -1368,7 +1375,7 @@ namespace OpenDental{
 				|| textDateFirstPay.errorProvider1.GetError(textDateFirstPay)!=""
 				|| textDownPayment.errorProvider1.GetError(textDownPayment)!=""
 				|| textAPR.errorProvider1.GetError(textAPR)!=""
-				|| textTerm.errorProvider1.GetError(textTerm)!=""
+				|| textPaymentCount.errorProvider1.GetError(textPaymentCount)!=""
 				|| textPeriodPayment.errorProvider1.GetError(textPeriodPayment)!=""
 				|| textCompletedAmt.errorProvider1.GetError(textCompletedAmt)!=""
 				){
@@ -1388,19 +1395,19 @@ namespace OpenDental{
 			if(textAPR.Text==""){
 				textAPR.Text="0";
 			}
-			if(textTerm.Text=="" && textPeriodPayment.Text==""){
+			if(textPaymentCount.Text=="" && textPeriodPayment.Text==""){
 				MsgBox.Show(this,"Please enter a term or payment amount first.");
 				return;
 			}
-			if(textTerm.Text=="" && PIn.Double(textPeriodPayment.Text)==0){
+			if(textPaymentCount.Text=="" && PIn.Double(textPeriodPayment.Text)==0){
 				MsgBox.Show(this,"Payment cannot be 0.");
 				return;
 			}
-			if(textTerm.Text!="" && textPeriodPayment.Text!="") {
+			if(textPaymentCount.Text!="" && textPeriodPayment.Text!="") {
 				MsgBox.Show(this,"Please choose either Number of Payments or Payment Amt.");
 				return;
 			}
-			if(textPeriodPayment.Text=="" && PIn.Long(textTerm.Text)<1){
+			if(textPeriodPayment.Text=="" && PIn.Long(textPaymentCount.Text)<1){
 				MsgBox.Show(this,"Term cannot be less than 1.");
 				return;
 			}
@@ -1414,138 +1421,14 @@ namespace OpenDental{
 				}
 				_listPayPlanCharges.Clear();
 			}
-			PayPlanCharge ppCharge;
-			//down payment
-			double downpayment=PIn.Double(textDownPayment.Text);
-			if(downpayment!=0){
-				ppCharge=new PayPlanCharge();
-				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
-				ppCharge.Guarantor=PayPlanCur.Guarantor;
-				ppCharge.PatNum=PayPlanCur.PatNum;
-				ppCharge.ChargeDate=DateTimeOD.Today;
-				ppCharge.Interest=0;
-				ppCharge.Principal=downpayment;
-				ppCharge.Note=Lan.g(this,"Downpayment");
-				ppCharge.ProvNum=PatCur.PriProv;//will be changed at the end.
-				ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed at the end.
-				_listPayPlanCharges.Add(ppCharge);
-			}
-			double principal=PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text);//Always >= 0 due to validation.
-			PayPlanCur.DownPayment=PIn.Double(textDownPayment.Text);
-			double APR=PIn.Double(textAPR.Text);
-			PayPlanCur.APR=APR;
-			double periodRate;
-			decimal periodPayment;
-			if(APR==0){
-				periodRate=0;
-			}
-			else{
-				if(FormPayPlanOpts.radioWeekly.Checked){
-					periodRate=APR/100/52;
-					PayPlanCur.PaySchedule=PaymentSchedule.Weekly;
-				}
-				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked){
-					periodRate=APR/100/26;
-					PayPlanCur.PaySchedule=PaymentSchedule.BiWeekly;
-				}
-				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked){
-					periodRate=APR/100/12;
-					PayPlanCur.PaySchedule=PaymentSchedule.MonthlyDayOfWeek;
-				}
-				else if(FormPayPlanOpts.radioMonthly.Checked){
-					periodRate=APR/100/12;
-					PayPlanCur.PaySchedule=PaymentSchedule.Monthly;
-				}
-				else{//quarterly
-					periodRate=APR/100/4;
-					PayPlanCur.PaySchedule=PaymentSchedule.Quarterly;
-				}
-			}
-			int roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
-			int term=0;
-			if(textTerm.Text!=""){//Use term to determine period payment
-				term=PIn.Int(textTerm.Text);
-				double periodExactAmt=0;
-				if(APR==0){
-					periodExactAmt=principal/term;
-				}
-				else{
-					periodExactAmt=principal*periodRate/(1-Math.Pow(1+periodRate,-term));
-				}
-				//Round up to the nearest penny (or international equivalent).  This causes the principal on the last payment to be less than or equal to the other principal amounts.
-				periodPayment=(decimal)(Math.Ceiling(periodExactAmt*Math.Pow(10,roundDec))/Math.Pow(10,roundDec));
-				PayPlanCur.NumberOfPayments=term;
-			}
-			else{//Use period payment supplied
-				periodPayment=PIn.Decimal(textPeriodPayment.Text);
-				PayPlanCur.PayAmt=(double)periodPayment;
-			}
-			decimal principalDecrementing=(decimal)principal;//The principal which will be decreased to zero in the loop.  Always starts >= 0, due to validation.
-			DateTime firstDate=PIn.Date(textDateFirstPay.Text);
-			int countCharges=0;
-			while(principalDecrementing>0 && countCharges<2000){//the 2000 limit prevents infinite loop
-				ppCharge=new PayPlanCharge();
-				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
-				ppCharge.Guarantor=PayPlanCur.Guarantor;
-				ppCharge.PatNum=PayPlanCur.PatNum;
-				ppCharge.Note="";
-				if(FormPayPlanOpts.radioWeekly.Checked) {
-					ppCharge.ChargeDate=firstDate.AddDays(7*countCharges);
-				}
-				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked) {
-					ppCharge.ChargeDate=firstDate.AddDays(14*countCharges);
-				}
-				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked) {//First/second/etc Mon/Tue/etc of month
-					DateTime roughMonth=firstDate.AddMonths(1*countCharges);//this just gets us into the correct month and year
-					DayOfWeek dayOfWeekFirstDate=firstDate.DayOfWeek;
-					//find the starting point for the given month: the first day that matches day of week
-					DayOfWeek dayOfWeekFirstMonth=(new DateTime(roughMonth.Year,roughMonth.Month,1)).DayOfWeek;
-					if(dayOfWeekFirstMonth==dayOfWeekFirstDate) {//1st is the proper day of the week
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,1);
-					}
-					else if(dayOfWeekFirstMonth<dayOfWeekFirstDate) {//Example, 1st is a Tues (2), but we need to start on a Thursday (4)
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,dayOfWeekFirstDate-dayOfWeekFirstMonth+1);//4-2+1=3.  The 3rd is a Thursday
-					}
-					else {//Example, 1st is a Thursday (4), but we need to start on a Monday (1) 
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,7-(dayOfWeekFirstMonth-dayOfWeekFirstDate)+1);//7-(4-1)+1=5.  The 5th is a Monday
-					}
-					int ordinalOfMonth=GetOrdinalOfMonth(firstDate);//for example 3 if it's supposed to be the 3rd Friday of each month
-					ppCharge.ChargeDate=ppCharge.ChargeDate.AddDays(7*(ordinalOfMonth-1));//to get to the 3rd Friday, and starting from the 1st Friday, we add 2 weeks.
-				}
-				else if(FormPayPlanOpts.radioMonthly.Checked) {
-					ppCharge.ChargeDate=firstDate.AddMonths(1*countCharges);
-				}
-				else {//quarterly
-					ppCharge.ChargeDate=firstDate.AddMonths(3*countCharges);
-				}
-				ppCharge.Interest=Math.Round(((double)principalDecrementing*periodRate),roundDec);//2 decimals
-				ppCharge.Principal=(double)periodPayment-ppCharge.Interest;
-				ppCharge.ProvNum=PatCur.PriProv;
-				if(term>0 && countCharges==(term-1)) {//Using # payments method and this is the last payment.
-					//The purpose of this code block is to fix any rounding issues.  Corrects principal when off by a few pennies.  Principal will decrease slightly and interest will increase slightly to keep payment amounts consistent.
-					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated.
-					if(periodRate!=0) {//Interest amount on last entry must stay zero for payment plans with zero APR. When APR is zero, the interest amount is set to zero above, and the last payment amount might be less than the other payment amounts.
-						ppCharge.Interest=((double)periodPayment)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
-					}
-				}
-				else if(term==0 && principalDecrementing+((decimal)ppCharge.Interest) <= periodPayment) {//Payment amount method, last payment.
-					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.
-					//Interest was calculated above.
-				}
-				principalDecrementing-=(decimal)ppCharge.Principal;
-				//If somehow principalDecrementing was slightly negative right here due to rounding errors, then at worst the last charge amount would wrong by a few pennies and the loop would immediately exit.
-				_listPayPlanCharges.Add(ppCharge);
-				countCharges++;
-			}
-			FillCharges();
-			textNote.Text=_payPlanNote+DateTime.Today.ToShortDateString()
-				+" - Date of Agreement: "+textDate.Text
-				+", Total Amount: "+textAmount.Text
-				+", APR: "+textAPR.Text
-				+", Total Cost of Loan: "+textTotalCost.Text;
+			CreateScheduleCharges(false);
 		}
 
 		private void butRecalculate_Click(object sender,EventArgs e) {
+			if(_listPayPlanCharges.Count==0) {//This is only possible if they manually delete all of their rows and try to press recalculate.
+				MsgBox.Show(this,"There is no payment plan to recalculate.");
+				return;
+			}
 			if(checkIns.Checked) {
 				MsgBox.Show(this,"Insurance payment plans can't be recalculated.");
 				return;
@@ -1555,8 +1438,8 @@ namespace OpenDental{
 				return;
 			}
 			_formPayPlanRecalculate.ShowDialog();
-			if(_formPayPlanRecalculate.DialogResult==DialogResult.OK){
-				CalculateScheduleCharges(true);
+			if(_formPayPlanRecalculate.DialogResult==DialogResult.OK) {
+				CreateScheduleCharges(true);
 			}
 		}
 
@@ -1850,14 +1733,14 @@ namespace OpenDental{
 			}
 			//dateTimeX==dateTimeY
 			//We want to put recalculated charges to the bottom of the current date.  This is a "final" point when recalculating and needs to be at the end.
-			if(x.Cells[2].Text.Contains("Recalculated based on") && !y.Cells[2].Text.Contains("Recalculated based on")) {
+			if(x.Cells[2].Text.Trim().ToLower().Contains("recalculated based on") && !y.Cells[2].Text.Trim().ToLower().Contains("recalculated based on")) {
 				return 1;
 			}
-			if(!x.Cells[2].Text.Contains("Recalculated based on") && y.Cells[2].Text.Contains("Recalculated based on")) {
+			if(!x.Cells[2].Text.Trim().ToLower().Contains("recalculated based on") && y.Cells[2].Text.Trim().ToLower().Contains("recalculated based on")) {
 				return -1;
 			}
 			//If there is more than one recalculate charge, sort by descending charge amount. This only matters if one of the recalculated charges is 0
-			if(x.Cells[2].Text.Contains("Recalculated based on") && y.Cells[2].Text.Contains("Recalculated based on")) {
+			if(x.Cells[2].Text.Trim().ToLower().Contains("recalculated based on") && y.Cells[2].Text.Trim().ToLower().Contains("recalculated based on")) {
 				if(PIn.Double(x.Cells[3].Text)<PIn.Double(y.Cells[3].Text)) {
 					return 1;
 				}
@@ -1879,287 +1762,271 @@ namespace OpenDental{
 			return x.Cells[2].Text.CompareTo(y.Cells[2].Text);//Sort by description.  This orders the payment plan charges which are on the same date by their charge number.  Might order payments by check number as well.
 		}
 
-		///<summary>Creates pay plan charges and adds them to the end of listPayPlanCharges based off of the passed in schedule terms</param></summary>
-		private void CalculateScheduleCharges(bool isRecalculate) {
+		///<summary>Creates/recalculates the amortization schedule.  Uses the textfield term values and not the ones stored in the database.</summary>
+		private void CreateScheduleCharges(bool isRecalculate) {
 			PayPlanCharge ppCharge;
 			//down payment
 			double downpayment=PIn.Double(textDownPayment.Text);
 			if(downpayment!=0 && !isRecalculate) {
-				ppCharge=new PayPlanCharge();
-				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
-				ppCharge.Guarantor=PayPlanCur.Guarantor;
-				ppCharge.PatNum=PayPlanCur.PatNum;
-				ppCharge.ChargeDate=DateTimeOD.Today;
-				ppCharge.Interest=0;
-				ppCharge.Principal=downpayment;
-				ppCharge.Note=Lan.g(this,"Downpayment");
-				ppCharge.ProvNum=PatCur.PriProv;//will be changed at the end.
-				ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed at the end.
-				_listPayPlanCharges.Add(ppCharge);
+				_listPayPlanCharges.Add(CreateCharge(downpayment,0,DateTimeOD.Today,Lan.g(this,"Downpayment")));
 			}
-			double principal=PIn.Double(textAmount.Text);
-			//Skip downpayment subtraction if the user is unable to edit downpayment, as that means a plan exists and has already calculated a downpayment.
-			//The downpayment will get subtracted as a payplan charge later.
+			double principalAmt=PIn.Double(textAmount.Text);
+			//Skip downpayment subtraction if recalculating.  The downpayment will get subtracted as a payplan charge later.
 			if(!isRecalculate) {
-				principal-=PIn.Double(textDownPayment.Text);//principal is always >= 0 due to validation.  
-				PayPlanCur.DownPayment=PIn.Double(textDownPayment.Text);
+				principalAmt-=PIn.Double(textDownPayment.Text);//principal is always >= 0 due to validation.  
+				PayPlanCur.DownPayment=downpayment;
 			}
-			double APR=PIn.Double(textAPR.Text);
-			PayPlanCur.APR=APR;
-			double periodRate;
-			decimal periodPayment;
-			if(APR==0){
-				periodRate=0;
-			}
-			else{
-				if(FormPayPlanOpts.radioWeekly.Checked){
-					periodRate=APR/100/52;
-					PayPlanCur.PaySchedule=PaymentSchedule.Weekly;
-				}
-				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked){
-					periodRate=APR/100/26;
-					PayPlanCur.PaySchedule=PaymentSchedule.BiWeekly;
-				}
-				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked){
-					periodRate=APR/100/12;
-					PayPlanCur.PaySchedule=PaymentSchedule.MonthlyDayOfWeek;
-				}
-				else if(FormPayPlanOpts.radioMonthly.Checked){
-					periodRate=APR/100/12;
-					PayPlanCur.PaySchedule=PaymentSchedule.Monthly;
-				}
-				else{//quarterly
-					periodRate=APR/100/4;
-					PayPlanCur.PaySchedule=PaymentSchedule.Quarterly;
-				}
-			}
-			int roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
-			int term=0;
+			double periodRate=CalcPeriodRate();
 			int countPayPlanCharges=0;
-			double interestUnpaid=0;//Only used if recalculating.
-			double amtOverPaid=0;//Only used if recalculating.
-			DateTime firstDate=PIn.Date(textDateFirstPay.Text);
-			double amtPastDue=0;
-			double amtPaid=0;
-			double amtPastDueCopy=0;
+			double interestFutureUnpaidAmt=0;//Only used if recalculating.
+			DateTime dateFirst=PIn.Date(textDateFirstPay.Text);
+			double pastDueTotal=0;
+			const int payPlanChargesCeiling=2000;//This is the maximum number of payplan charges allowed to be made plus 1.
+			double interestInterimAmt=0;//This will be used to replace the next payplancharge with the correctly calculated interest amount.
+			double overPaidAmt=0;//Only used if recalculating.
+			int nextChargeIdx=-1;
 			if(isRecalculate) {
 				List<PayPlanCharge> listPayPlanChargesCopy=new List<PayPlanCharge>(_listPayPlanCharges);
 				_listPayPlanCharges.Clear();
-				int nextChargeIdx=2000;//Guaranteed to be less than 2000 pay plan charges
-				List<PaySplit> listNewPaySplits=new List<PaySplit>();
 				for(int i=0;i<listPayPlanChargesCopy.Count;i++) {
-					if(listPayPlanChargesCopy[i].ChargeDate<=DateTime.Today) {
-						amtPastDue+=listPayPlanChargesCopy[i].Principal+listPayPlanChargesCopy[i].Interest;
-						principal-=listPayPlanChargesCopy[i].Principal;
-						_listPayPlanCharges.Add(listPayPlanChargesCopy[i]);
+					PayPlanCharge chargeCur=listPayPlanChargesCopy[i];
+					if(chargeCur.ChargeDate<=DateTime.Today) {//Historical pay plan charge.
+						pastDueTotal+=chargeCur.Principal+chargeCur.Interest;
+						principalAmt-=chargeCur.Principal;
+						_listPayPlanCharges.Add(chargeCur);
 						//Don't count charges that we made in addition to the original terms
-						if(!listPayPlanChargesCopy[i].Note.Contains("Recalculated based on") && !listPayPlanChargesCopy[i].Note.Contains("Downpayment")) {
+						if(!chargeCur.Note.Trim().ToLower().Contains("recalculated based on") && !chargeCur.Note.Trim().ToLower().Contains("downpayment")) {
 							countPayPlanCharges++;
 						}
 					}
-					else {
-						interestUnpaid+=listPayPlanChargesCopy[i].Interest;//Only used if not recalculating interest
-						nextChargeIdx=Math.Min(nextChargeIdx,i);//Gets the index of the next month that will be the first date due of the recalculated schedule.
+					else {//Future pay plan charge.
+						interestFutureUnpaidAmt+=chargeCur.Interest;//Only used if not recalculating interest
 					}
 				}
-				if(nextChargeIdx!=2000) {//Incase they are recalculating after all charges are past due
-					firstDate=listPayPlanChargesCopy[nextChargeIdx].ChargeDate;//We use the next charge date as the first charge after recalculating.
-				}
-				else {
-					//Get the last due charge date and then we will add a period based off of what was last saved as the pay period.
-					firstDate=listPayPlanChargesCopy[listPayPlanChargesCopy.Count-1].ChargeDate;
-					if(PayPlanCur.PaySchedule==PaymentSchedule.Weekly) {
-						firstDate=firstDate.AddDays(7);
-					}
-					else if(PayPlanCur.PaySchedule==PaymentSchedule.BiWeekly) {
-						firstDate=firstDate.AddDays(14);
-					}
-					else if(PayPlanCur.PaySchedule==PaymentSchedule.MonthlyDayOfWeek) {//First/second/etc Mon/Tue/etc of month
-						DateTime roughMonth=firstDate.AddMonths(1);//this just gets us into the correct month and year
-						DayOfWeek dayOfWeekFirstDate=firstDate.DayOfWeek;
-						//find the starting point for the given month: the first day that matches day of week
-						DayOfWeek dayOfWeekFirstMonth=(new DateTime(roughMonth.Year,roughMonth.Month,1)).DayOfWeek;
-						if(dayOfWeekFirstMonth==dayOfWeekFirstDate) {//1st is the proper day of the week
-							firstDate=new DateTime(roughMonth.Year,roughMonth.Month,1);
-						}
-						else if(dayOfWeekFirstMonth<dayOfWeekFirstDate) {//Example, 1st is a Tues (2), but we need to start on a Thursday (4)
-							firstDate=new DateTime(roughMonth.Year,roughMonth.Month,dayOfWeekFirstDate-dayOfWeekFirstMonth+1);//4-2+1=3.  The 3rd is a Thursday
-						}
-						else {//Example, 1st is a Thursday (4), but we need to start on a Monday (1) 
-							firstDate=new DateTime(roughMonth.Year,roughMonth.Month,7-(dayOfWeekFirstMonth-dayOfWeekFirstDate)+1);//7-(4-1)+1=5.  The 5th is a Monday
-						}
-						int ordinalOfMonth=GetOrdinalOfMonth(firstDate);//for example 3 if it's supposed to be the 3rd Friday of each month
-						firstDate=firstDate.AddDays(7*(ordinalOfMonth-1));//to get to the 3rd Friday, and starting from the 1st Friday, we add 2 weeks.
-					}
-					else if(PayPlanCur.PaySchedule==PaymentSchedule.Monthly) {
-						firstDate=firstDate.AddMonths(1);
-					}
-					else {//quarterly
-						firstDate=firstDate.AddMonths(3);
+				//Find the first pay plan charge in the future which has not happened yet, or if all else fails get the date on the last charge.
+				for(int i=0;i<listPayPlanChargesCopy.Count;i++) {
+					nextChargeIdx=i;
+					if(listPayPlanChargesCopy[i].ChargeDate>DateTime.Today) {
+						break;//The first future charge has been located.
 					}
 				}
+				dateFirst=listPayPlanChargesCopy[nextChargeIdx].ChargeDate;
+				while(dateFirst<=DateTime.Today) {
+					dateFirst=CalcNextPeriodDate(dateFirst,1);//1 will get the next period date
+				}
+				double paidTotal=0;
 				for(int i=0;i<_listPaySplits.Count;i++) {
 					if(_listPaySplits[i].DatePay>DateTime.Today) {
 						break;
 					}
-					amtPaid+=_listPaySplits[i].SplitAmt;
-					listNewPaySplits.Add(_listPaySplits[i]);
+					paidTotal+=_listPaySplits[i].SplitAmt;
 				}
-				if(amtPaid>=amtPastDue) {
-					amtOverPaid=amtPaid-amtPastDue;
-					ppCharge=new PayPlanCharge();
-					ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
-					ppCharge.Guarantor=PayPlanCur.Guarantor;
-					ppCharge.PatNum=PayPlanCur.PatNum;
-					ppCharge.ChargeDate=DateTimeOD.Today;
-					ppCharge.Interest=0;
-					ppCharge.Principal=amtOverPaid;
+				if(paidTotal>=pastDueTotal) {//Overpaid
+					overPaidAmt=paidTotal-pastDueTotal;
 					string recalcType=Lan.g(this,"prepayment");
-					//Only deduct the overpaid amount from principal if we aren't prepaying, otherwise the payamount per month will be different than expected.
-					if(!_formPayPlanRecalculate.isPrepay) {
-						principal-=amtOverPaid;
-						amtOverPaid=0;
-						recalcType=Lan.g(this,"paying on principal");
+					if(!_formPayPlanRecalculate.IsPrepay) {
+						//Only deduct the overpaid amount from principal if we aren't prepaying, otherwise the payamount per month will be different than expected.
+						principalAmt-=overPaidAmt;
+						overPaidAmt=0;
+						recalcType=Lan.g(this,"pay on principal");
 					}
-					ppCharge.Note=Lan.g(this,"Recalculated based on ")+recalcType;
-					ppCharge.ProvNum=PatCur.PriProv;//will be changed at the end.
-					ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed at the end.
-					_listPayPlanCharges.Add(ppCharge);
+					_listPayPlanCharges.Add(CreateCharge(overPaidAmt,0,DateTimeOD.Today,Lan.g(this,"Recalculated based on ")+recalcType));
 				}
-				else {
-					amtPastDueCopy=amtPastDue-amtPaid;
-					int countPastDueChargesUnpaid=0;
-					double estimatedPeriodPayment=listPayPlanChargesCopy[listPayPlanChargesCopy.Count-1].Principal+listPayPlanChargesCopy[listPayPlanChargesCopy.Count-1].Interest;
-					while(amtPastDueCopy>0) {
-						if(amtPastDueCopy>=estimatedPeriodPayment) {
-							countPastDueChargesUnpaid++;
-						}
-						amtPastDueCopy-=estimatedPeriodPayment;
+				if(pastDueTotal>paidTotal) {//The patient currently owes more than they have paid.  There is an amount past due.
+					interestInterimAmt=(principalAmt+pastDueTotal-paidTotal)*periodRate;
+					if(nextChargeIdx==listPayPlanChargesCopy.Count-1) {//The original payment plan schedule has finished, but patinet still owes monie$.
+						_listPayPlanCharges.Add(CreateCharge(0,interestInterimAmt,dateFirst,Lan.g(this,"Increased interest")+": "+interestInterimAmt.ToString("c")));
+						FillCharges();
+						SetNote();
+						return;
 					}
-					principal+=amtPastDue-amtPaid;
-					countPayPlanCharges-=countPastDueChargesUnpaid;
 				}
 			}
-			if(textTerm.Text!=""){//Use term to determine period payment
-				term=PIn.Int(textTerm.Text)-countPayPlanCharges;//countPayPlanCharges will 0 unless isRecalculate=true
-				double periodExactAmt=0;
-				if(APR==0){
-					periodExactAmt=principal/term;
-				}
-				else{
-					periodExactAmt=principal*periodRate/(1-Math.Pow(1+periodRate,-term));
-					if(isRecalculate && !_formPayPlanRecalculate.isRecalculateInterest){
-						periodExactAmt=(principal+interestUnpaid)/term;
-					}
-				}
-				//Round up to the nearest penny (or international equivalent).  
-				//This causes the principal on the last payment to be less than or equal to the other principal amounts.
-				periodPayment=(decimal)(Math.Ceiling(periodExactAmt*Math.Pow(10,roundDec))/Math.Pow(10,roundDec));
-				PayPlanCur.NumberOfPayments=term+countPayPlanCharges;//countPayPlanCharges will 0 unless isRecalculate=true
-			}
-			else{//Use period payment supplied
-				periodPayment=PIn.Decimal(textPeriodPayment.Text);
-				PayPlanCur.PayAmt=(double)periodPayment;
-			}
-			decimal amtOverPaidDecrementing=(decimal)amtOverPaid;
-			decimal principalDecrementing=(decimal)principal;//The principal which will be decreased to zero.  Always starts >= 0, due to validation.
-			decimal interestUnpaidDecrementing=(decimal)interestUnpaid;//Only used if recalculating and _formPayPlanRecalculate.isRecalculateInterest=false
-			int countCharges=0;
-			while(principalDecrementing>0 && countCharges<2000){//the 2000 limit prevents infinite loop
-				ppCharge=new PayPlanCharge();
-				ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
-				ppCharge.Guarantor=PayPlanCur.Guarantor;
-				ppCharge.PatNum=PayPlanCur.PatNum;
-				if(FormPayPlanOpts.radioWeekly.Checked) {
-					ppCharge.ChargeDate=firstDate.AddDays(7*countCharges);
-				}
-				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked) {
-					ppCharge.ChargeDate=firstDate.AddDays(14*countCharges);
-				}
-				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked) {//First/second/etc Mon/Tue/etc of month
-					DateTime roughMonth=firstDate.AddMonths(1*countCharges);//this just gets us into the correct month and year
-					DayOfWeek dayOfWeekFirstDate=firstDate.DayOfWeek;
-					//find the starting point for the given month: the first day that matches day of week
-					DayOfWeek dayOfWeekFirstMonth=(new DateTime(roughMonth.Year,roughMonth.Month,1)).DayOfWeek;
-					if(dayOfWeekFirstMonth==dayOfWeekFirstDate) {//1st is the proper day of the week
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,1);
-					}
-					else if(dayOfWeekFirstMonth<dayOfWeekFirstDate) {//Example, 1st is a Tues (2), but we need to start on a Thursday (4)
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,dayOfWeekFirstDate-dayOfWeekFirstMonth+1);//4-2+1=3.  The 3rd is a Thursday
-					}
-					else {//Example, 1st is a Thursday (4), but we need to start on a Monday (1) 
-						ppCharge.ChargeDate=new DateTime(roughMonth.Year,roughMonth.Month,7-(dayOfWeekFirstMonth-dayOfWeekFirstDate)+1);//7-(4-1)+1=5.  The 5th is a Monday
-					}
-					int ordinalOfMonth=GetOrdinalOfMonth(firstDate);//for example 3 if it's supposed to be the 3rd Friday of each month
-					ppCharge.ChargeDate=ppCharge.ChargeDate.AddDays(7*(ordinalOfMonth-1));//to get to the 3rd Friday, and starting from the 1st Friday, we add 2 weeks.
-				}
-				else if(FormPayPlanOpts.radioMonthly.Checked) {
-					ppCharge.ChargeDate=firstDate.AddMonths(1*countCharges);
-				}
-				else {//quarterly
-					ppCharge.ChargeDate=firstDate.AddMonths(3*countCharges);
-				}
-				if(isRecalculate && !_formPayPlanRecalculate.isRecalculateInterest){
+			int paymentCount=PIn.Int(textPaymentCount.Text)-countPayPlanCharges;
+			decimal periodPaymentAmt=CalcPeriodPayment(principalAmt,periodRate,interestFutureUnpaidAmt,countPayPlanCharges,isRecalculate);
+			decimal overPaidDecrementingAmt=(decimal)overPaidAmt;
+			decimal principalDecrementingAmt=(decimal)principalAmt;//The principal which will be decreased to zero.  Always starts >= 0, due to validation.
+			decimal interestUnpaidDecrementingAmt=(decimal)interestFutureUnpaidAmt;//Only used if recalculating and _formPayPlanRecalculate.isRecalculateInterest=false
+			int chargesCount=0;//Not the same as _listPayPlanCharges.Count
+			int skippedChargesCount=0;
+			while(principalDecrementingAmt>0 && chargesCount<payPlanChargesCeiling) {//the ceiling prevents infinite loop
+				ppCharge=CreateCharge(0,0,CalcNextPeriodDate(dateFirst,chargesCount),"");
+				if(isRecalculate && !_formPayPlanRecalculate.IsRecalculateInterest) {
 					//Spread the unpaid interest out over the term
-					if(term>0) {//Specified number of payments when creating the plan
-						ppCharge.Interest=Math.Round(interestUnpaid/term,roundDec);
+					if(paymentCount>0) {//Specified number of payments when creating the plan
+						ppCharge.Interest=Math.Round(interestFutureUnpaidAmt/paymentCount,_roundDec);
 					}
 					else {
 						//This will take the total interest unpaid, and divide it by the calculated term, which is total amount/amount per month
-						ppCharge.Interest=Math.Round(interestUnpaid/((principal+interestUnpaid)/(double)periodPayment),roundDec);
+						ppCharge.Interest=Math.Round(interestFutureUnpaidAmt/((principalAmt+interestFutureUnpaidAmt)/(double)periodPaymentAmt),_roundDec);
 					}
 				}
 				else {//Either not recalculating or is recalculating but also recalculating interest
-					ppCharge.Interest=Math.Round(((double)principalDecrementing*periodRate),roundDec);//2 decimals
+					ppCharge.Interest=Math.Round(((double)principalDecrementingAmt*periodRate),_roundDec);//2 decimals
 				}
-				ppCharge.Principal=(double)periodPayment-ppCharge.Interest;
-				if((double)amtOverPaidDecrementing>=ppCharge.Principal+ppCharge.Interest) {//Will only happen for prepay.  Skips a payplan charge.
-					term--;//This will ensure that non-recalculated interest gets accurately distributed as well as keeps the number of payments accurate.
-					amtOverPaidDecrementing-=(decimal)(ppCharge.Principal+ppCharge.Interest);
-					ppCharge.Interest=0;//Interest will like it is not being accrued when looking at the charge, but it is being deducted via the line above.
-					ppCharge.Principal=0;
-					ppCharge.Note="Prepaid";
-					ppCharge.ProvNum=PatCur.PriProv;
-					_listPayPlanCharges.Add(ppCharge);
+				ppCharge.Principal=(double)periodPaymentAmt-ppCharge.Interest;
+				if(isRecalculate && (double)overPaidDecrementingAmt>=ppCharge.Principal+ppCharge.Interest) {//Will only happen for prepay.  Skips a payplan charge.
+					paymentCount--;//This will ensure that non-recalculated interest gets accurately distributed as well as keeps the number of payments accurate.
+					chargesCount++;
+					skippedChargesCount++;
+					overPaidDecrementingAmt-=(decimal)(ppCharge.Principal+ppCharge.Interest);
+					_listPayPlanCharges.Add(CreateCharge(0,0,ppCharge.ChargeDate,Lan.g(this,"Prepaid")));//placeholder
+					if(overPaidDecrementingAmt==0) {
+						principalDecrementingAmt-=(decimal)overPaidAmt;//Remove the amount overpaid from current principal balance to recalculate correct interest
+					}
 					continue;
 				}
-				if(amtOverPaidDecrementing>0) {
-					principalDecrementing-=(decimal)amtOverPaid;//Remove the amount overpaid from current principal balance to recalculate correct interest
-					ppCharge.Principal-=(double)amtOverPaidDecrementing;//Since this was a partial payment, reduce the overpayment amount from the first month of new plan.
-					amtOverPaid=0;
-					amtOverPaidDecrementing=0;
-					if(_formPayPlanRecalculate.isRecalculateInterest) {//Calculate interest based off of the balance AFTER removing the prepayment amount.
-						ppCharge.Interest=Math.Round(((double)principalDecrementing*periodRate),roundDec);//2 decimals
+				if(isRecalculate && overPaidDecrementingAmt>0) {//Partial prepayment
+					principalDecrementingAmt-=(decimal)overPaidAmt;//Remove the amount overpaid from current principal balance to recalculate correct interest
+					ppCharge.Principal-=(double)overPaidDecrementingAmt;//Since this was a partial payment, reduce the overpayment amount from the first month of new plan.
+					overPaidAmt=0;
+					overPaidDecrementingAmt=0;
+					if(_formPayPlanRecalculate.IsRecalculateInterest) {//Calculate interest based off of the balance AFTER removing the prepayment amount.
+						ppCharge.Interest=Math.Round(((double)principalDecrementingAmt*periodRate),_roundDec);//2 decimals
 					}
 				}
-				ppCharge.Note="";
-				ppCharge.ProvNum=PatCur.PriProv;
-				if(term>0 && countCharges==(term-1)) {//Using # payments method and this is the last payment.
+				if(paymentCount>0 && (chargesCount-skippedChargesCount)==(paymentCount-1)) {//Using # payments method and this is the last payment.
 					//The purpose of this code block is to fix any rounding issues.  Corrects principal when off by a few pennies.  Principal will decrease slightly and interest will increase slightly to keep payment amounts consistent.
-					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated.
-					if(periodRate!=0 && (!isRecalculate)) {//Interest amount on last entry must stay zero for payment plans with zero APR. When APR is zero, the interest amount is set to zero above, and the last payment amount might be less than the other payment amounts.
-						ppCharge.Interest=((double)periodPayment)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
+					ppCharge.Principal=(double)principalDecrementingAmt;//All remaining principal.  Causes loop to exit.  This is where the rounding error is eliminated.
+					if(periodRate!=0 && !isRecalculate) {//Interest amount on last entry must stay zero for payment plans with zero APR. When APR is zero, the interest amount is set to zero above, and the last payment amount might be less than the other payment amounts.
+						ppCharge.Interest=((double)periodPaymentAmt)-ppCharge.Principal;//Force the payment amount to match the rest of the period payments.
 					}
-					if(isRecalculate && !_formPayPlanRecalculate.isRecalculateInterest){
-						ppCharge.Interest=(double)interestUnpaidDecrementing;
+					if(isRecalculate && !_formPayPlanRecalculate.IsRecalculateInterest) {
+						ppCharge.Interest=(double)interestUnpaidDecrementingAmt;
 					}
 				}
-				else if(term<=0 && principalDecrementing+((decimal)ppCharge.Interest)<=periodPayment) {//Payment amount method, last payment.
-					ppCharge.Principal=(double)principalDecrementing;//All remaining principal.  Causes loop to exit.
+				else if(paymentCount==0 && principalDecrementingAmt+(decimal)ppCharge.Interest<=periodPaymentAmt) {//Payment amount method, last payment.
+					ppCharge.Principal=(double)principalDecrementingAmt;//All remaining principal.  Causes loop to exit.
 					//Interest was calculated above.
 				}
-				principalDecrementing-=(decimal)ppCharge.Principal;
-				interestUnpaidDecrementing-=(decimal)ppCharge.Interest;
+				principalDecrementingAmt-=(decimal)ppCharge.Principal;
+				interestUnpaidDecrementingAmt-=(decimal)ppCharge.Interest;//Only matters if not recalculating interest
 				//If somehow principalDecrementing was slightly negative right here due to rounding errors, then at worst the last charge amount would wrong by a few pennies and the loop would immediately exit.
 				_listPayPlanCharges.Add(ppCharge);
-				countCharges++;
+				chargesCount++;
+			}
+			if(isRecalculate && nextChargeIdx<payPlanChargesCeiling && interestInterimAmt>0) {//If they are recalculating in the middle of a payplan schedule
+				double increasedInterestAmt=interestInterimAmt-_listPayPlanCharges[nextChargeIdx].Interest;
+				_listPayPlanCharges[nextChargeIdx].Interest=interestInterimAmt;
+				_listPayPlanCharges[nextChargeIdx].Note=Lan.g(this,"Increased interest")+": "+increasedInterestAmt.ToString("c");
 			}
 			FillCharges();
+			SetNote();
+		}
+
+		private void SetNote() {
 			textNote.Text=_payPlanNote+DateTime.Today.ToShortDateString()
 				+" - Date of Agreement: "+textDate.Text
 				+", Total Amount: "+textAmount.Text
 				+", APR: "+textAPR.Text
 				+", Total Cost of Loan: "+textTotalCost.Text;
+		}
+
+		private decimal CalcPeriodPayment(double principalAmt,double periodRate,double interestUnpaidAmt,int payPlanChargesCount,bool isRecalculate) {
+			decimal periodPaymentAmt=0;
+			if(textPaymentCount.Text=="") {//Use a specified payment amount.
+				periodPaymentAmt=PIn.Decimal(textPeriodPayment.Text);
+				PayPlanCur.PayAmt=(double)periodPaymentAmt;
+			}
+			else {//Use the given number of payments.
+				int paymentCount=PIn.Int(textPaymentCount.Text)-payPlanChargesCount;//countPayPlanCharges will be 0 unless isRecalculate=true
+				double periodExactAmt=0;
+				if(PIn.Double(textAPR.Text)==0) {
+					periodExactAmt=principalAmt/paymentCount;
+				}
+				else if(isRecalculate && !_formPayPlanRecalculate.IsRecalculateInterest) {//APR applies, but the user wants to keep the old interest.
+					periodExactAmt=(principalAmt+interestUnpaidAmt)/paymentCount;
+				}
+				else {//APR applies and the user wants to recalculate the interest.
+					periodExactAmt=principalAmt*periodRate/(1-Math.Pow(1+periodRate,-paymentCount));
+				}
+				//Round up to the nearest penny (or international equivalent).  
+				//This causes the principal on the last payment to be less than or equal to the other principal amounts.
+				periodPaymentAmt=(decimal)(Math.Ceiling(periodExactAmt*Math.Pow(10,_roundDec))/Math.Pow(10,_roundDec));
+				PayPlanCur.NumberOfPayments=paymentCount+payPlanChargesCount;//countPayPlanCharges will 0 unless isRecalculate=true
+			}
+			return periodPaymentAmt;
+		}
+
+		private double CalcPeriodRate() {
+			double APR=PIn.Double(textAPR.Text);
+			PayPlanCur.APR=APR;
+			double periodRate;
+			if(APR==0) {
+				periodRate=0;
+			}
+			else {
+				if(FormPayPlanOpts.radioWeekly.Checked) {
+					periodRate=APR/100/52;
+					PayPlanCur.PaySchedule=PaymentSchedule.Weekly;
+				}
+				else if(FormPayPlanOpts.radioEveryOtherWeek.Checked) {
+					periodRate=APR/100/26;
+					PayPlanCur.PaySchedule=PaymentSchedule.BiWeekly;
+				}
+				else if(FormPayPlanOpts.radioOrdinalWeekday.Checked) {
+					periodRate=APR/100/12;
+					PayPlanCur.PaySchedule=PaymentSchedule.MonthlyDayOfWeek;
+				}
+				else if(FormPayPlanOpts.radioMonthly.Checked) {
+					periodRate=APR/100/12;
+					PayPlanCur.PaySchedule=PaymentSchedule.Monthly;
+				}
+				else {//quarterly
+					periodRate=APR/100/4;
+					PayPlanCur.PaySchedule=PaymentSchedule.Quarterly;
+				}
+			}
+			return periodRate;
+		}
+
+		///<summary>periodNum is zero-based.</summary>
+		private DateTime CalcNextPeriodDate(DateTime firstDate,int periodNum) {
+			DateTime retVal=DateTime.Today;
+			if(FormPayPlanOpts.radioWeekly.Checked) {
+				retVal=firstDate.AddDays(7*periodNum);
+			}
+			else if(FormPayPlanOpts.radioEveryOtherWeek.Checked) {
+				retVal=firstDate.AddDays(14*periodNum);
+			}
+			else if(FormPayPlanOpts.radioOrdinalWeekday.Checked) {//First/second/etc Mon/Tue/etc of month
+				DateTime roughMonth=firstDate.AddMonths(1*periodNum);//this just gets us into the correct month and year
+				DayOfWeek dayOfWeekFirstDate=firstDate.DayOfWeek;
+				//find the starting point for the given month: the first day that matches day of week
+				DayOfWeek dayOfWeekFirstMonth=(new DateTime(roughMonth.Year,roughMonth.Month,1)).DayOfWeek;
+				if(dayOfWeekFirstMonth==dayOfWeekFirstDate) {//1st is the proper day of the week
+					retVal=new DateTime(roughMonth.Year,roughMonth.Month,1);
+				}
+				else if(dayOfWeekFirstMonth<dayOfWeekFirstDate) {//Example, 1st is a Tues (2), but we need to start on a Thursday (4)
+					retVal=new DateTime(roughMonth.Year,roughMonth.Month,dayOfWeekFirstDate-dayOfWeekFirstMonth+1);//4-2+1=3.  The 3rd is a Thursday
+				}
+				else {//Example, 1st is a Thursday (4), but we need to start on a Monday (1) 
+					retVal=new DateTime(roughMonth.Year,roughMonth.Month,7-(dayOfWeekFirstMonth-dayOfWeekFirstDate)+1);//7-(4-1)+1=5.  The 5th is a Monday
+				}
+				int ordinalOfMonth=GetOrdinalOfMonth(firstDate);//for example 3 if it's supposed to be the 3rd Friday of each month
+				retVal=retVal.AddDays(7*(ordinalOfMonth-1));//to get to the 3rd Friday, and starting from the 1st Friday, we add 2 weeks.
+			}
+			else if(FormPayPlanOpts.radioMonthly.Checked) {
+				retVal=firstDate.AddMonths(1*periodNum);
+			}
+			else {//quarterly
+				retVal=firstDate.AddMonths(3*periodNum);
+			}
+			return retVal;
+		}
+
+		private PayPlanCharge CreateCharge(double principalAmt,double interestAmt,DateTime dateCharge,string note) {
+			PayPlanCharge ppCharge=new PayPlanCharge();
+			ppCharge.PayPlanNum=PayPlanCur.PayPlanNum;
+			ppCharge.Guarantor=PayPlanCur.Guarantor;
+			ppCharge.PatNum=PayPlanCur.PatNum;
+			ppCharge.ChargeDate=dateCharge;
+			ppCharge.Interest=interestAmt;
+			ppCharge.Principal=principalAmt;
+			ppCharge.Note=note;
+			ppCharge.ProvNum=PatCur.PriProv;//will be changed in SaveCur()
+			ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed in SaveCur()
+			return ppCharge;
 		}
 
 		private void FormPayPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
