@@ -84,6 +84,9 @@ provider.Abbr, ";
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.  listClinicNums must have at least one item if using clinics.</summary>
 		public static DataTable GetPatTable(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,List<long> listPatientTypes,bool hasAllProvs,bool hasAllClinics,bool hasPatientTypes,bool isGroupedByPatient) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,listPatientTypes,hasAllProvs,hasAllClinics,hasPatientTypes,isGroupedByPatient);
+			}
 			//patient payments-----------------------------------------------------------------------------------------
 			string whereProv="";
 			if(!hasAllProvs) {
