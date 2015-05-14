@@ -9,8 +9,18 @@ using CodeBase;
 
 namespace OpenDental {
 	public partial class FormEmailInbox:Form {
-		private EmailAddress AddressInbox;
+		///<summary>Do no access direclty.  Instead use AddressInbox.</summary>
+		private EmailAddress _addressInbox=null;
 		private List<EmailMessage> ListEmailMessages;
+
+		private EmailAddress AddressInbox {
+			get {
+				if(_addressInbox==null) {
+					_addressInbox=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
+				}
+				return _addressInbox;
+			}
+		}
 
 		public FormEmailInbox() {
 			InitializeComponent();
@@ -40,7 +50,6 @@ namespace OpenDental {
 
 		///<summary>Gets new messages from email inbox, as well as older messages from the db. Also fills the grid.</summary>
 		private int GetMessages() {
-			AddressInbox=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
 			Cursor=Cursors.WaitCursor;
 			FillGridEmailMessages();//Show what is in db.
 			Cursor=Cursors.Default;
