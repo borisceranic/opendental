@@ -231,7 +231,26 @@ namespace OpenDentBusiness {
 			//}
 			return key;
 		}
-	
+
+		///<summary>Get a list of RegistrationKey rows from the given input regKeys. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+		public static List<RegistrationKey> GetByKeys(List<string> regKeys) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod(),regKeys);
+			}
+			if(regKeys.Count<1) {
+				return new List<RegistrationKey>();
+			}
+			string whereClause="WHERE RegistrationKeyNum IN (";
+			for(int i=0;i<regKeys.Count;i++) {
+				if(i!=0) {
+					whereClause+=POut.String(",");
+				}
+				whereClause+="'"+POut.String(regKeys[i])+"'";
+			}
+			whereClause+=")";
+			string command="SELECT * FROM  registrationkey "+whereClause;
+			return Crud.RegistrationKeyCrud.SelectMany(command);
+		}
 
 	}
 }
