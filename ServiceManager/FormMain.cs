@@ -36,7 +36,7 @@ namespace ServiceManager {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormServiceManage FormS=new FormServiceManage("");
+			FormServiceManage FormS=new FormServiceManage("OpenDent");
 			FormS.ShowDialog();
 			FillList();
 		}
