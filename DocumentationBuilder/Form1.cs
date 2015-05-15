@@ -244,6 +244,8 @@ namespace DocumentationBuilder {
 				case "clockevent": return "ClockEvent";
 				case "codesystem": return "CodeSystem";
 				case "computerpref": return "ComputerPref";
+				case "connectiongroup": return "ConnectionGroup";
+				case "conngroupattach": return "ConnGroupAttach";
 				case "covcat": return "CovCat";
 				case "covspan": return "CovSpan";
 				case "creditcard": return "CreditCard";
@@ -289,6 +291,7 @@ namespace DocumentationBuilder {
 				case "emailtemplate": return "EmailTemplate";
 				case "eobattach": return "EobAttach";
 				case "erxlog": return "ErxLog";
+				case "eservicesignal": return "EServiceSignal";
 				case "etransmessagetext": return "EtransMessageText";
 				case "evaluationcriterion": return "EvaluationCriterion";
 				case "evaluationcriteriondef": return "EvaluationCriterionDef";
@@ -327,6 +330,11 @@ namespace DocumentationBuilder {
 				case "maparea": return "MapArea";
 				case "medicalorder": return "MedicalOrder";
 				case "medicationpat": return "MedicationPat";
+				case "medlab": return "MedLab";
+				case "medlabfacattach": return "MedLabFacAttach";
+				case "medlabfacility": return "MedLabFacility";
+				case "medlabresult": return "MedLabResult";
+				case "medlabspecimen": return "MedLabSpecimen";
 				case "mountdef": return "MountDef";
 				case "mountitem": return "MountItem";
 				case "mountitemdef": return "MountItemDef";
@@ -393,6 +401,9 @@ namespace DocumentationBuilder {
 				case "sigbutdefelement": return "SigButDefElement";
 				case "sigelement": return "SigElement";
 				case "sigelementdef": return "SigElementDef";
+				case "smsmo": return "SmsMO";
+				case "smsmt": return "SmsMT";
+				case "smsvln": return "SmsVln";
 				case "supplyneeded": return "SupplyNeeded";
 				case "supplyorder": return "SupplyOrder";
 				case "supplyorderitem": return "SupplyOrderItem";
