@@ -1789,8 +1789,7 @@ namespace OpenDental {
 		private void butSplitManage_Click(object sender,EventArgs e) {
 			FormPaySplitManage FormPSM=new FormPaySplitManage();
 			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
-			Family patFam=Patients.GetFamily(PatCur.PatNum);
-			FormPSM.FamCur=patFam; 
+			FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 			FormPSM.PatCur=PatCur;
 			FormPSM.PaymentCur=PaymentCur;
 			FormPSM.PayDate=PIn.DateT(textDate.Text);
@@ -1802,7 +1801,7 @@ namespace OpenDental {
 				PaymentCur=FormPSM.PaymentCur;
 				textAmount.Text=POut.Double(PaymentCur.PayAmt);
 			}
-			FillMain();//Is this what we want?  It will reflect changes and allow them to delete all splits for an old payment if desired.  More clicks though.
+			FillMain();
 		}
 
 		private void butDeleteAll_Click(object sender,System.EventArgs e) {
@@ -1955,12 +1954,10 @@ namespace OpenDental {
 			if(IsNew && SplitList.Count==0) {
 				//The user has no splits and is trying to submit a payment.
 				//We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
-				bool isAutoSplit=MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?");
-				if(isAutoSplit) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?")) {
 					FormPaySplitManage FormPSM=new FormPaySplitManage();
 					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
-					Family patFam=Patients.GetFamily(PatCur.PatNum);
-					FormPSM.FamCur=patFam;
+					FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 					FormPSM.PatCur=PatCur;
 					FormPSM.PaymentCur=PaymentCur;
 					FormPSM.PayDate=PIn.DateT(textDate.Text);
@@ -1969,9 +1966,12 @@ namespace OpenDental {
 					if(FormPSM.ShowDialog()==DialogResult.OK) {
 						SplitList=FormPSM.ListSplitsCur;
 						PaymentCur=FormPSM.PaymentCur;
+						if(SplitList.Count==0) {//If they clicked OK without any splits being added, add one split.
+							AddOneSplit();
+						}
 					}
 					else {//Cancel
-						return;
+						AddOneSplit();
 					}
 				}
 				else {//Either no allocation required, or user does not want to allocate.  Just add one split.

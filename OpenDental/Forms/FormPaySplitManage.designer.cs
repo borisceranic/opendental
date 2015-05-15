@@ -45,9 +45,9 @@ namespace OpenDental{
 			// label3
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label3.Location = new System.Drawing.Point(449, 29);
+			this.label3.Location = new System.Drawing.Point(434, 28);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(450, 32);
+			this.label3.Size = new System.Drawing.Size(532, 32);
 			this.label3.TabIndex = 8;
 			this.label3.Text = "Select outstanding charges and click Add Splits to create pay splits for those ch" +
     "arges.\r\nClick Add Partial to create a partial pay split for selected charges.";
@@ -55,9 +55,9 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(13, 29);
+			this.label4.Location = new System.Drawing.Point(7, 29);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(409, 32);
+			this.label4.Size = new System.Drawing.Size(418, 32);
 			this.label4.TabIndex = 14;
 			this.label4.Text = "Select payment splits and click the Delete Split button to remove selected splits" +
     ", or Clear All to remove all splits. \r\n";
@@ -66,11 +66,11 @@ namespace OpenDental{
 			// checkShowPaid
 			// 
 			this.checkShowPaid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkShowPaid.Location = new System.Drawing.Point(661, 543);
+			this.checkShowPaid.Location = new System.Drawing.Point(673, 633);
 			this.checkShowPaid.Name = "checkShowPaid";
 			this.checkShowPaid.Size = new System.Drawing.Size(227, 20);
 			this.checkShowPaid.TabIndex = 19;
-			this.checkShowPaid.Text = "Show Paid Charges";
+			this.checkShowPaid.Text = "Show Other Charges";
 			this.checkShowPaid.UseVisualStyleBackColor = true;
 			this.checkShowPaid.CheckedChanged += new System.EventHandler(this.checkShowPaid_CheckedChanged);
 			// 
@@ -78,9 +78,9 @@ namespace OpenDental{
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label2.Location = new System.Drawing.Point(302, 541);
+			this.label2.Location = new System.Drawing.Point(295, 631);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(62, 20);
+			this.label2.Size = new System.Drawing.Size(58, 20);
 			this.label2.TabIndex = 20;
 			this.label2.Text = "Total";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -88,10 +88,10 @@ namespace OpenDental{
 			// textSplitTotal
 			// 
 			this.textSplitTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.textSplitTotal.Location = new System.Drawing.Point(364, 541);
+			this.textSplitTotal.Location = new System.Drawing.Point(353, 631);
 			this.textSplitTotal.Name = "textSplitTotal";
 			this.textSplitTotal.ReadOnly = true;
-			this.textSplitTotal.Size = new System.Drawing.Size(60, 20);
+			this.textSplitTotal.Size = new System.Drawing.Size(55, 20);
 			this.textSplitTotal.TabIndex = 21;
 			this.textSplitTotal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -100,14 +100,15 @@ namespace OpenDental{
 			this.gridCharges.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridCharges.HScrollVisible = false;
-			this.gridCharges.Location = new System.Drawing.Point(449, 63);
+			this.gridCharges.Location = new System.Drawing.Point(434, 63);
 			this.gridCharges.Name = "gridCharges";
 			this.gridCharges.ScrollValue = 0;
 			this.gridCharges.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridCharges.Size = new System.Drawing.Size(450, 473);
+			this.gridCharges.Size = new System.Drawing.Size(532, 561);
 			this.gridCharges.TabIndex = 13;
 			this.gridCharges.Title = "Outstanding Charges";
 			this.gridCharges.TranslationName = null;
+			this.gridCharges.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridCharges_CellClick);
 			// 
 			// gridSplits
 			// 
@@ -115,15 +116,16 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridSplits.HScrollVisible = false;
-			this.gridSplits.Location = new System.Drawing.Point(13, 63);
+			this.gridSplits.Location = new System.Drawing.Point(7, 63);
 			this.gridSplits.Name = "gridSplits";
 			this.gridSplits.ScrollValue = 0;
 			this.gridSplits.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridSplits.Size = new System.Drawing.Size(429, 473);
+			this.gridSplits.Size = new System.Drawing.Size(418, 561);
 			this.gridSplits.TabIndex = 12;
 			this.gridSplits.Title = "Current Payment Splits";
 			this.gridSplits.TranslationName = null;
 			this.gridSplits.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSplits_CellDoubleClick);
+			this.gridSplits.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSplits_CellClick);
 			// 
 			// buttAddMany
 			// 
@@ -135,7 +137,7 @@ namespace OpenDental{
 			this.buttAddMany.CornerRadius = 4F;
 			this.buttAddMany.Image = global::OpenDental.Properties.Resources.Add;
 			this.buttAddMany.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.buttAddMany.Location = new System.Drawing.Point(449, 541);
+			this.buttAddMany.Location = new System.Drawing.Point(434, 630);
 			this.buttAddMany.Name = "buttAddMany";
 			this.buttAddMany.Size = new System.Drawing.Size(90, 24);
 			this.buttAddMany.TabIndex = 18;
@@ -151,11 +153,11 @@ namespace OpenDental{
 			this.butClear.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClear.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClear.CornerRadius = 4F;
-			this.butClear.Location = new System.Drawing.Point(116, 541);
+			this.butClear.Location = new System.Drawing.Point(110, 631);
 			this.butClear.Name = "butClear";
 			this.butClear.Size = new System.Drawing.Size(89, 24);
 			this.butClear.TabIndex = 17;
-			this.butClear.Text = "Clear All";
+			this.butClear.Text = "Delete All";
 			this.butClear.Click += new System.EventHandler(this.butClearAll_Click);
 			// 
 			// butDelete
@@ -168,7 +170,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(13, 541);
+			this.butDelete.Location = new System.Drawing.Point(7, 631);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(100, 24);
 			this.butDelete.TabIndex = 16;
@@ -184,7 +186,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(744, 575);
+			this.butOK.Location = new System.Drawing.Point(813, 660);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -199,7 +201,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(825, 575);
+			this.butCancel.Location = new System.Drawing.Point(894, 660);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -216,7 +218,7 @@ namespace OpenDental{
 			this.butCreatePartial.CornerRadius = 4F;
 			this.butCreatePartial.Image = global::OpenDental.Properties.Resources.Add;
 			this.butCreatePartial.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCreatePartial.Location = new System.Drawing.Point(542, 541);
+			this.butCreatePartial.Location = new System.Drawing.Point(530, 631);
 			this.butCreatePartial.Name = "butCreatePartial";
 			this.butCreatePartial.Size = new System.Drawing.Size(92, 24);
 			this.butCreatePartial.TabIndex = 22;
@@ -226,10 +228,10 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label5.Location = new System.Drawing.Point(2, 6);
+			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label5.Location = new System.Drawing.Point(11, 6);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(150, 20);
+			this.label5.Size = new System.Drawing.Size(139, 20);
 			this.label5.TabIndex = 23;
 			this.label5.Text = "Payment Amount";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -237,24 +239,24 @@ namespace OpenDental{
 			// butCreateManual
 			// 
 			this.butCreateManual.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCreateManual.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCreateManual.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butCreateManual.Autosize = true;
 			this.butCreateManual.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCreateManual.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCreateManual.CornerRadius = 4F;
 			this.butCreateManual.Image = global::OpenDental.Properties.Resources.Add;
 			this.butCreateManual.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCreateManual.Location = new System.Drawing.Point(208, 541);
+			this.butCreateManual.Location = new System.Drawing.Point(202, 631);
 			this.butCreateManual.Name = "butCreateManual";
-			this.butCreateManual.Size = new System.Drawing.Size(90, 24);
+			this.butCreateManual.Size = new System.Drawing.Size(92, 24);
 			this.butCreateManual.TabIndex = 26;
-			this.butCreateManual.Text = "Add";
+			this.butCreateManual.Text = "Add Manual";
 			this.butCreateManual.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
 			this.butCreateManual.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// textPayAmt
 			// 
-			this.textPayAmt.Location = new System.Drawing.Point(153, 6);
+			this.textPayAmt.Location = new System.Drawing.Point(151, 6);
 			this.textPayAmt.Name = "textPayAmt";
 			this.textPayAmt.ReadOnly = true;
 			this.textPayAmt.Size = new System.Drawing.Size(80, 20);
@@ -264,7 +266,7 @@ namespace OpenDental{
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(914, 611);
+			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textPayAmt);
 			this.Controls.Add(this.butCreateManual);
 			this.Controls.Add(this.label5);
@@ -281,10 +283,11 @@ namespace OpenDental{
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(919, 649);
+			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormPaySplitManage";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Pay Split Manager";
