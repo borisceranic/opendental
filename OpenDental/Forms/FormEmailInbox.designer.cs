@@ -29,6 +29,7 @@ namespace OpenDental{
 			this.menuItemSetup = new System.Windows.Forms.MenuItem();
 			this.labelInboxComputerName = new System.Windows.Forms.Label();
 			this.labelThisComputer = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
 			this.splitContainerNoFlicker = new OpenDental.SplitContainerNoFlicker();
 			this.gridEmailMessages = new OpenDental.UI.ODGrid();
 			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
@@ -59,7 +60,7 @@ namespace OpenDental{
 			// labelInboxComputerName
 			// 
 			this.labelInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxComputerName.Location = new System.Drawing.Point(279, 661);
+			this.labelInboxComputerName.Location = new System.Drawing.Point(279, 619);
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(417, 16);
 			this.labelInboxComputerName.TabIndex = 144;
@@ -69,12 +70,23 @@ namespace OpenDental{
 			// labelThisComputer
 			// 
 			this.labelThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelThisComputer.Location = new System.Drawing.Point(404, 677);
+			this.labelThisComputer.Location = new System.Drawing.Point(404, 635);
 			this.labelThisComputer.Name = "labelThisComputer";
 			this.labelThisComputer.Size = new System.Drawing.Size(292, 16);
 			this.labelThisComputer.TabIndex = 145;
 			this.labelThisComputer.Text = "This Computer Name: ";
 			this.labelThisComputer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label1
+			// 
+			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label1.Location = new System.Drawing.Point(12, 5);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(638, 16);
+			this.label1.TabIndex = 148;
+			this.label1.Text = "Email Inbox is limited and should not be used as your primary email solution yet." +
+    "  Work in progress.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// splitContainerNoFlicker
 			// 
@@ -95,7 +107,7 @@ namespace OpenDental{
 			this.splitContainerNoFlicker.Panel2.Controls.Add(this.emailPreview);
 			this.splitContainerNoFlicker.Panel2Collapsed = true;
 			this.splitContainerNoFlicker.Panel2MinSize = 200;
-			this.splitContainerNoFlicker.Size = new System.Drawing.Size(950, 634);
+			this.splitContainerNoFlicker.Size = new System.Drawing.Size(950, 592);
 			this.splitContainerNoFlicker.SplitterDistance = 200;
 			this.splitContainerNoFlicker.TabIndex = 0;
 			this.splitContainerNoFlicker.TabStop = false;
@@ -111,7 +123,7 @@ namespace OpenDental{
 			this.gridEmailMessages.Name = "gridEmailMessages";
 			this.gridEmailMessages.ScrollValue = 0;
 			this.gridEmailMessages.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridEmailMessages.Size = new System.Drawing.Size(950, 634);
+			this.gridEmailMessages.Size = new System.Drawing.Size(950, 592);
 			this.gridEmailMessages.TabIndex = 140;
 			this.gridEmailMessages.Title = "Email Messages";
 			this.gridEmailMessages.TranslationName = "TableApptProcs";
@@ -142,7 +154,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 666);
+			this.butDelete.Location = new System.Drawing.Point(12, 624);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(83, 24);
 			this.butDelete.TabIndex = 147;
@@ -217,7 +229,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(887, 666);
+			this.butClose.Location = new System.Drawing.Point(887, 624);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -240,7 +252,8 @@ namespace OpenDental{
 			// FormEmailInbox
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.ClientSize = new System.Drawing.Size(974, 675);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.splitContainerNoFlicker);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butChangePat);
@@ -252,7 +265,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu1;
-			this.MinimumSize = new System.Drawing.Size(990, 734);
+			this.MinimumSize = new System.Drawing.Size(990, 713);
 			this.Name = "FormEmailInbox";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Email Inbox";
@@ -283,5 +296,6 @@ namespace OpenDental{
 		private UI.Button butDelete;
 		private User_Controls.EmailPreviewControl emailPreview;
 		private SplitContainerNoFlicker splitContainerNoFlicker;
+		private System.Windows.Forms.Label label1;
 	}
 }
