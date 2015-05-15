@@ -250,21 +250,25 @@ namespace CentralManager {
 
 		#endregion
 
-		private void menuPatientSearch_Click(object sender,EventArgs e) {
-			FormCentralConnections FormCC=new FormCentralConnections();
-			FormCC.Text=Lans.g("FormCentralConnections","Choose Databases to Search");
-			FormCC.LabelText.Text=Lans.g("FormCentralConnections","Choose which databases to search.  The more connections that are chosen the longer the search will take.");
-			FormCC.ShowDialog();
-			if(FormCC.DialogResult==DialogResult.OK) {
-				FormCentralPatientSearch FormCPS=new FormCentralPatientSearch();
-				FormCPS.ListConns=FormCC.ListConns;
-				FormCPS.ShowDialog();
+		private void butSearch_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one connection to search first.");
+				return;
 			}
+			List<CentralConnection> listConns=new List<CentralConnection>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
+			FormCentralPatientSearch FormCPS=new FormCentralPatientSearch();
+			FormCPS.ListConns=listConns;
+			FormCPS.ShowDialog();
 		}
 
 		private void FormCentralManager_FormClosing(object sender,FormClosingEventArgs e) {
 			ODThread.QuitSyncAllOdThreads();
 		}
+
+		
 		
 	}
 }

@@ -34,11 +34,10 @@
 			this.menuItemUsers = new System.Windows.Forms.MenuItem();
 			this.menuItemReports = new System.Windows.Forms.MenuItem();
 			this.menuItemAnnualPI = new System.Windows.Forms.MenuItem();
-			this.menuItem1 = new System.Windows.Forms.MenuItem();
-			this.menuPatientSearch = new System.Windows.Forms.MenuItem();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.label1 = new System.Windows.Forms.Label();
 			this.comboConnectionGroups = new System.Windows.Forms.ComboBox();
+			this.butSearch = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -63,8 +62,7 @@
 			// 
 			this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemSetup,
-            this.menuItemReports,
-            this.menuItem1});
+            this.menuItemReports});
 			// 
 			// menuItemSetup
 			// 
@@ -113,19 +111,6 @@
 			this.menuItemAnnualPI.Text = "Annual P&&I";
 			this.menuItemAnnualPI.Click += new System.EventHandler(this.menuProdInc_Click);
 			// 
-			// menuItem1
-			// 
-			this.menuItem1.Index = 2;
-			this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuPatientSearch});
-			this.menuItem1.Text = "Search";
-			// 
-			// menuPatientSearch
-			// 
-			this.menuPatientSearch.Index = 0;
-			this.menuPatientSearch.Text = "Patients";
-			this.menuPatientSearch.Click += new System.EventHandler(this.menuPatientSearch_Click);
-			// 
 			// gridMain
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -145,7 +130,7 @@
 			// label1
 			// 
 			this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label1.Location = new System.Drawing.Point(129, 9);
+			this.label1.Location = new System.Drawing.Point(94, 10);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(177, 15);
 			this.label1.TabIndex = 213;
@@ -156,18 +141,29 @@
 			// 
 			this.comboConnectionGroups.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboConnectionGroups.FormattingEnabled = true;
-			this.comboConnectionGroups.Location = new System.Drawing.Point(312, 4);
+			this.comboConnectionGroups.Location = new System.Drawing.Point(277, 2);
 			this.comboConnectionGroups.MaxDropDownItems = 20;
 			this.comboConnectionGroups.Name = "comboConnectionGroups";
 			this.comboConnectionGroups.Size = new System.Drawing.Size(190, 21);
 			this.comboConnectionGroups.TabIndex = 214;
 			this.comboConnectionGroups.SelectionChangeCommitted += new System.EventHandler(this.comboConnectionGroups_SelectionChangeCommitted);
 			// 
+			// butSearch
+			// 
+			this.butSearch.Location = new System.Drawing.Point(13, 2);
+			this.butSearch.Name = "butSearch";
+			this.butSearch.Size = new System.Drawing.Size(75, 23);
+			this.butSearch.TabIndex = 215;
+			this.butSearch.Text = "Pt Search";
+			this.butSearch.UseVisualStyleBackColor = true;
+			this.butSearch.Click += new System.EventHandler(this.butSearch_Click);
+			// 
 			// FormCentralManager
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(784, 519);
+			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.comboConnectionGroups);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label2);
@@ -200,8 +196,7 @@
 		private System.Windows.Forms.MenuItem menuItemGroups;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox comboConnectionGroups;
-		private System.Windows.Forms.MenuItem menuItem1;
-		private System.Windows.Forms.MenuItem menuPatientSearch;
+		private System.Windows.Forms.Button butSearch;
 	}
 }
 
