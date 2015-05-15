@@ -954,44 +954,50 @@ namespace OpenDental {
 				return;
 			}
 			//Check to see if the listener service is installed on this computer.
-			List<ServiceController> listServices=ODEnvironment.GetAllOpenDentServices();
-			ServiceController listenerService=null;
+			List<ServiceController> listOdServices=ODEnvironment.GetAllOpenDentServices();
+			List<ServiceController> listListenerServices=new List<ServiceController>();
 			//Look for the service that uses "OpenDentalCustListener.exe"
-			for(int i=0;i<listServices.Count;i++) {
+			for(int i=0;i<listOdServices.Count;i++) {
 				RegistryKey hklm=Registry.LocalMachine;
-				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+listServices[i].ServiceName);
+				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+listOdServices[i].ServiceName);
 				string test=hklm.GetValue("ImagePath").ToString();
 				string test1=test.Replace("\"","");
 				string[] arrayExePath=hklm.GetValue("ImagePath").ToString().Replace("\"","").Split('\\');
 				//This will not work if in the future we allow command line args for the listener service that include paths.
-				if(arrayExePath[arrayExePath.Length-1]=="OpenDentalCustListener.exe") {
-					listenerService=listServices[i];
-					break;
+				if(arrayExePath[arrayExePath.Length-1].StartsWith("OpenDentalCustListener.exe")) {
+					listListenerServices.Add(listOdServices[i]);
 				}
 			}
-			if(listenerService==null) {
-				MsgBox.Show(this,"Listener Service was not found on this computer.  The service can only be started from the computer that is hosting the Listener Service.");
+			if(listListenerServices.Count==0) {
+				MsgBox.Show(this,"Listener Services were not found on this computer.  The service can only be started from the computer that is hosting Listener Services.");
 				return;
 			}
-			//The listener service is installed on this computer.  Try to start it if it is in a stopped or stop pending status.
-			//If we do not do this, an InvalidOperationException will throw that says "An instance of the service is already running"
-			if(listenerService.Status==ServiceControllerStatus.Stopped || listenerService.Status==ServiceControllerStatus.StopPending) {
-				try {
-					Cursor=Cursors.WaitCursor;
-					listenerService.Start();
-					listenerService.WaitForStatus(ServiceControllerStatus.Running,new TimeSpan(0,0,7));
-					Cursor=Cursors.Default;
+			Cursor=Cursors.WaitCursor;
+			List<ServiceController> listListenerServicesErrors=new List<ServiceController>();
+			for(int i=0;i<listListenerServices.Count;i++) {
+				//The listener service is installed on this computer.  Try to start it if it is in a stopped or stop pending status.
+				//If we do not do this, an InvalidOperationException will throw that says "An instance of the service is already running"
+				if(listListenerServices[i].Status==ServiceControllerStatus.Stopped || listListenerServices[i].Status==ServiceControllerStatus.StopPending) {
+					try {
+						listListenerServices[i].Start();
+						listListenerServices[i].WaitForStatus(ServiceControllerStatus.Running,new TimeSpan(0,0,7));
+					}
+					catch {
+						//An InvalidOperationException can get thrown if the service could not be started.  E.g. current user is not running Open Dental as an administrator.
+						listListenerServicesErrors.Add(listListenerServices[i]);
+					}
 				}
-				catch {
-					Cursor=Cursors.Default;
-					//An InvalidOperationException can get thrown if the service could not be started.  E.g. current user is not running Open Dental as an administrator.
-					MsgBox.Show(this,"There was a problem starting the Listener Service.  Please go manually start your Listener Service or call us for help.");
-					return;
+			}
+			Cursor=Cursors.Default;
+			if(listListenerServicesErrors.Count!=0) {
+				string error=Lan.g(this,"There was a problem starting Listener Services.  Please go manually start the following Listener Services")+":";
+				for(int i=0;i<listListenerServicesErrors.Count;i++) {
+					error+="\r\n"+listListenerServicesErrors[i].DisplayName;
 				}
-				MsgBox.Show(this,"Listener Service Started.");
+				MessageBox.Show(error);
 			}
 			else {
-				MsgBox.Show(this,"Listener Service is already running.  Please call us for support if eServices are still not working.");
+				MsgBox.Show(this,"Listener Services Started.");
 			}
 			FillTextListenerServiceStatus();
 			FillGridListenerService();
