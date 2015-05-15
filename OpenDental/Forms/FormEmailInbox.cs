@@ -28,8 +28,8 @@ namespace OpenDental {
 		}
 
 		private void FormEmailInbox_Load(object sender,EventArgs e) {
-			labelInboxComputerName.Text="Computer Name Where New Email Is Retrieved: "+PrefC.GetString(PrefName.EmailInboxComputerName);
-			labelThisComputer.Text+=Dns.GetHostName();
+			textComputerNameReceive.Text=PrefC.GetString(PrefName.EmailInboxComputerName);
+			textComputerName.Text=Dns.GetHostName();
 			Application.DoEvents();//Show the form contents before loading email into the grid.
 			GetMessages();//If no new messages, then the user will know based on what shows in the grid.
 		}
@@ -44,7 +44,7 @@ namespace OpenDental {
 			}
 			FormEmailAddresses formEA=new FormEmailAddresses();
 			formEA.ShowDialog();
-			labelInboxComputerName.Text="Computer Name Where New Email Is Fetched: "+PrefC.GetString(PrefName.EmailInboxComputerName);
+			textComputerNameReceive.Text=PrefC.GetString(PrefName.EmailInboxComputerName);
 			GetMessages();//Get new messages, just in case the user entered email information for the first time.
 		}
 
@@ -63,7 +63,7 @@ namespace OpenDental {
 				return 0;
 			}
 			if(PrefC.GetString(PrefName.EmailInboxComputerName)=="") {
-				MsgBox.Show(this,"Computer name to fetch new email from has not been setup.");
+				MsgBox.Show(this,"Computer name to receive new email from has not been setup.");
 				return 0;
 			}
 			Cursor=Cursors.WaitCursor;
@@ -84,7 +84,7 @@ namespace OpenDental {
 				}
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g(this,"Error retrieving email messages")+": "+ex.Message);
+				MessageBox.Show(Lan.g(this,"Error receiving email messages")+": "+ex.Message);
 			}
 			finally {
 				Text="Email Inbox for "+AddressInbox.EmailUsername;
@@ -104,6 +104,13 @@ namespace OpenDental {
 				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
 				listEmailMessageNumsSelected.Add(emailMessage.EmailMessageNum);
 			}
+			int sortByColIdx=gridEmailMessages.SortedByColumnIdx;
+			bool isSortAsc=gridEmailMessages.SortedIsAscending;
+			if(sortByColIdx==-1) {
+				//Default to sorting by Date Received descending.
+				sortByColIdx=2;
+				isSortAsc=false;
+			}
 			//Refresh the list and grid from the database.
 			ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
 			gridEmailMessages.BeginUpdate();
@@ -112,16 +119,16 @@ namespace OpenDental {
 			int colReceivedDatePixCount=140;
 			int colMessageTypePixCount=120;
 			int colFromPixCount=200;
-			int colSigPixCount=24;
+			int colSigPixCount=40;
 			int colPatientPixCount=140;
 			int variableWidth=gridEmailMessages.Width-10-colFromPixCount-colReceivedDatePixCount-colMessageTypePixCount-colSigPixCount-colPatientPixCount;
 			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"From"),colFromPixCount,HorizontalAlignment.Left));//0
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Subject"),variableWidth,HorizontalAlignment.Left));//1
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Date Received"),colReceivedDatePixCount,HorizontalAlignment.Center));//2
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Date Received"),colReceivedDatePixCount,HorizontalAlignment.Left));//2
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
-			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"MessageType"),colMessageTypePixCount,HorizontalAlignment.Center));//3
+			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"MessageType"),colMessageTypePixCount,HorizontalAlignment.Left));//3
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sig"),colSigPixCount,HorizontalAlignment.Center));//4
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
@@ -168,6 +175,7 @@ namespace OpenDental {
 				gridEmailMessages.Rows.Add(row);
 			}
 			gridEmailMessages.EndUpdate();
+			gridEmailMessages.SortForced(sortByColIdx,isSortAsc);
 			//Selection must occur after EndUpdate().
 			for(int i=0;i<gridEmailMessages.Rows.Count;i++) {
 				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[i].Tag;

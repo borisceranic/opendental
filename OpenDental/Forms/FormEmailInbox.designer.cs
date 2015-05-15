@@ -30,6 +30,8 @@ namespace OpenDental{
 			this.labelInboxComputerName = new System.Windows.Forms.Label();
 			this.labelThisComputer = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.textComputerName = new OpenDental.ODtextBox();
+			this.textComputerNameReceive = new OpenDental.ODtextBox();
 			this.splitContainerNoFlicker = new OpenDental.SplitContainerNoFlicker();
 			this.gridEmailMessages = new OpenDental.UI.ODGrid();
 			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
@@ -60,22 +62,22 @@ namespace OpenDental{
 			// labelInboxComputerName
 			// 
 			this.labelInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxComputerName.Location = new System.Drawing.Point(279, 619);
+			this.labelInboxComputerName.Location = new System.Drawing.Point(216, 619);
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
-			this.labelInboxComputerName.Size = new System.Drawing.Size(417, 16);
+			this.labelInboxComputerName.Size = new System.Drawing.Size(304, 16);
 			this.labelInboxComputerName.TabIndex = 144;
-			this.labelInboxComputerName.Text = "Computer Name Where New Email Is Retrieved:";
-			this.labelInboxComputerName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelInboxComputerName.Text = "Computer Name Where New Email Is Received:";
+			this.labelInboxComputerName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelThisComputer
 			// 
 			this.labelThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelThisComputer.Location = new System.Drawing.Point(404, 635);
+			this.labelThisComputer.Location = new System.Drawing.Point(213, 635);
 			this.labelThisComputer.Name = "labelThisComputer";
-			this.labelThisComputer.Size = new System.Drawing.Size(292, 16);
+			this.labelThisComputer.Size = new System.Drawing.Size(307, 16);
 			this.labelThisComputer.TabIndex = 145;
-			this.labelThisComputer.Text = "This Computer Name: ";
-			this.labelThisComputer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelThisComputer.Text = "This Computer Name:";
+			this.labelThisComputer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label1
 			// 
@@ -87,6 +89,36 @@ namespace OpenDental{
 			this.label1.Text = "Email Inbox is limited and should not be used as your primary email solution yet." +
     "  Work in progress.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// textComputerName
+			// 
+			this.textComputerName.AcceptsTab = true;
+			this.textComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textComputerName.DetectUrls = false;
+			this.textComputerName.Location = new System.Drawing.Point(520, 635);
+			this.textComputerName.Multiline = false;
+			this.textComputerName.Name = "textComputerName";
+			this.textComputerName.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textComputerName.ReadOnly = true;
+			this.textComputerName.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textComputerName.Size = new System.Drawing.Size(142, 18);
+			this.textComputerName.TabIndex = 150;
+			this.textComputerName.Text = "";
+			// 
+			// textComputerNameReceive
+			// 
+			this.textComputerNameReceive.AcceptsTab = true;
+			this.textComputerNameReceive.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textComputerNameReceive.DetectUrls = false;
+			this.textComputerNameReceive.Location = new System.Drawing.Point(520, 619);
+			this.textComputerNameReceive.Multiline = false;
+			this.textComputerNameReceive.Name = "textComputerNameReceive";
+			this.textComputerNameReceive.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textComputerNameReceive.ReadOnly = true;
+			this.textComputerNameReceive.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textComputerNameReceive.Size = new System.Drawing.Size(142, 18);
+			this.textComputerNameReceive.TabIndex = 149;
+			this.textComputerNameReceive.Text = "";
 			// 
 			// splitContainerNoFlicker
 			// 
@@ -253,6 +285,8 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 675);
+			this.Controls.Add(this.textComputerName);
+			this.Controls.Add(this.textComputerNameReceive);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.splitContainerNoFlicker);
 			this.Controls.Add(this.butDelete);
@@ -297,5 +331,7 @@ namespace OpenDental{
 		private User_Controls.EmailPreviewControl emailPreview;
 		private SplitContainerNoFlicker splitContainerNoFlicker;
 		private System.Windows.Forms.Label label1;
+		private ODtextBox textComputerNameReceive;
+		private ODtextBox textComputerName;
 	}
 }

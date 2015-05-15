@@ -48,7 +48,7 @@ namespace OpenDental{
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxComputerName.TabIndex = 6;
-			this.labelInboxComputerName.Text = "Computer Name To Retrieve New Email From";
+			this.labelInboxComputerName.Text = "Computer Name To Receive New Email From";
 			this.labelInboxComputerName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// labelInboxCheckInterval
@@ -58,7 +58,7 @@ namespace OpenDental{
 			this.labelInboxCheckInterval.Name = "labelInboxCheckInterval";
 			this.labelInboxCheckInterval.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxCheckInterval.TabIndex = 7;
-			this.labelInboxCheckInterval.Text = "Inbox Retrieve Interval";
+			this.labelInboxCheckInterval.Text = "Inbox Receive Interval";
 			this.labelInboxCheckInterval.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// labelInboxCheckUnits

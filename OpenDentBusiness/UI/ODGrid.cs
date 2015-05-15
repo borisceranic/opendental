@@ -480,7 +480,7 @@ namespace OpenDental.UI {
 			}
 		}
 
-		///<summary>Returns current sort order.  Only used in PatientPortalManager.</summary>
+		///<summary>Returns current sort order.  Used to maintain current grid sorting when refreshing the grid.</summary>
 		[Browsable(false)]
 		public bool SortedIsAscending {
 			get {
@@ -488,7 +488,7 @@ namespace OpenDental.UI {
 			}
 		}
 
-		///<summary>Returns current sort column index.  Only used in PatientPortalManager.</summary>
+		///<summary>Returns current sort column index.  Used to maintain current grid sorting when refreshing the grid.</summary>
 		[Browsable(false)]
 		public int SortedByColumnIdx {
 			get {
