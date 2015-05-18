@@ -1217,7 +1217,7 @@ namespace OpenDental {
 			FillMain();
 		}
 
-		/// <summary>Adds one split to work with.  Called when checkPayPlan click, or upon load if auto attaching to payplan.</summary>
+		/// <summary>Adds one split to work with.  Called when checkPayPlan click, or upon load if auto attaching to payplan, or upon OK click if no splits were created.</summary>
 		private void AddOneSplit() {
 			PaySplit PaySplitCur=new PaySplit();
 			PaySplitCur.PatNum=PatCur.PatNum;

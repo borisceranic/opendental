@@ -11,17 +11,16 @@ namespace OpenDental {
 	public partial class FormPaySplitManage:Form {
 		///<summary>List of current paysplits for this payment.</summary>
 		public List<PaySplit> ListSplitsCur;
-		///<summary>Amount currently available for paying off charges.  Gets modified in many places.</summary>
-		private double _payAvailableAmt;
 		///<summary>List of current account charges for the family.  Gets filled from AutoSplitForPayment</summary>
 		private List<AccountEntry> _listAccountCharges;
-		///<summary>The amount entered for the current payment.  May be changed in this window.</summary>
+		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.  May be changed in this window.</summary>
 		public double PaymentAmt;
 		public Family FamCur;
 		public Patient PatCur;
 		public Payment PaymentCur;
 		public DateTime PayDate;
 		public bool IsNew;
+		private List<long> listPatNums;
 
 		public FormPaySplitManage() {
 			InitializeComponent();
@@ -29,25 +28,29 @@ namespace OpenDental {
 		}
 
 		private void FormPaySplitManage_Load(object sender,EventArgs e) {
+			Init(false);
+		}
+
+		///<summary>Performs all of the Load functionality.  Public so it can be called from unit tests.</summary>
+		public void Init(bool isTest) {
 			_listAccountCharges=new List<AccountEntry>();
-			_payAvailableAmt=PaymentAmt;
 			textPayAmt.Text=PaymentAmt.ToString("f");
-			List<long> listPatNums=new List<long>();
+			listPatNums=new List<long>();
 			for(int i=0;i<FamCur.ListPats.Length;i++) {
 				listPatNums.Add(FamCur.ListPats[i].PatNum);
 			}
 			//The logic from line 42 to line 51 will ensure that regardless of if it's a new or old payment any created paysplits that haven't been saved, 
 			//such as if splits were made in this window then the window was closed and then reopened, will persist.
 			textSplitTotal.Text=POut.Double(PaymentCur.PayAmt);
-			if(Math.Abs(_payAvailableAmt)>Math.Abs(PaymentCur.PayAmt)) {//If they increased the amount of the old payment, they want to be able to use it. 
-				_payAvailableAmt=_payAvailableAmt-PaymentCur.PayAmt;
+			if(Math.Abs(PaymentAmt)>Math.Abs(PaymentCur.PayAmt)) {//If they increased the amount of the old payment, they want to be able to use it. 
+				PaymentAmt=PaymentAmt-PaymentCur.PayAmt;
 			}
 			else {//If they decreased (or did not change) the amount of the old payment.
-				_payAvailableAmt=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
+				PaymentAmt=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
 			}
 			//We want to fill the charge table.
 			//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
-			ListSplitsCur.AddRange(AutoSplitForPayment(listPatNums,PaymentCur.PayNum,PayDate));
+			ListSplitsCur.AddRange(AutoSplitForPayment(PaymentCur.PayNum,PayDate,isTest));
 			FillGridSplits();
 			//Select all charges on the right side that the paysplits are associated with.  Helps the user see what charges are attached.
 			gridSplits.SetSelected(true);
@@ -181,8 +184,8 @@ namespace OpenDental {
 		}
 
 		///<summary>Creates paysplits associated to the patient passed in for the current payment until the payAmt has been met.  
-		///Returns the list of new paysplits that have been created.  _payAvailableAmt will attempt to move towards 0 as paysplits are created.</summary>
-		private List<PaySplit> AutoSplitForPayment(List<long> listPatNums,long payNum,DateTime date) {
+		///Returns the list of new paysplits that have been created.  PaymentAmt will attempt to move towards 0 as paysplits are created.</summary>
+		private List<PaySplit> AutoSplitForPayment(long payNum,DateTime date,bool isTest) {
 			//Get the lists of items we'll be using to calculate with.
 			List<Procedure> listProcs=Procedures.GetCompleteForPats(listPatNums);
 			//listPayments should be empty, there isn't currently a way to make payments without at least one split.
@@ -331,32 +334,30 @@ namespace OpenDental {
 			List<PaySplit> listAutoSplits=new List<PaySplit>();
 			PaySplit split;
 			for(int i=0;i<_listAccountCharges.Count;i++) {
-				if(_payAvailableAmt==0) {
+				if(PaymentAmt==0) {
 					break;
 				}
 				AccountEntry charge=_listAccountCharges[i];
 				if(charge.AmountEnd==0) {
 					continue;//Skip charges which are already paid.
 				}
-				if(_payAvailableAmt<0 && charge.AmountEnd>0) {//If they're different signs, don't make any guesses.  
+				if(PaymentAmt<0 && charge.AmountEnd>0) {//If they're different signs, don't make any guesses.  
 					//Remaining credits will always be all of one sign.
-					MsgBox.Show(this,"Payment cannot be automatically allocated because there are no outstanding negative balances.");
-					return listAutoSplits;//Will be empty
-				}
-				if(_payAvailableAmt>0 && charge.AmountEnd<0) {//If they're different signs, don't make any guesses.  
-					MsgBox.Show(this,"Payment cannot be automatically allocated because there are no outstanding positive balances.");
+					if(!isTest) {
+						MsgBox.Show(this,"Payment cannot be automatically allocated because there are no outstanding negative balances.");
+					}
 					return listAutoSplits;//Will be empty
 				}
 				split=new PaySplit();
-				if(Math.Abs(charge.AmountEnd)<Math.Abs(_payAvailableAmt)) {//charge has "less" than the payment, use partial payment.
+				if(Math.Abs(charge.AmountEnd)<Math.Abs(PaymentAmt)) {//charge has "less" than the payment, use partial payment.
 					split.SplitAmt=charge.AmountEnd;
-					_payAvailableAmt-=charge.AmountEnd;
+					PaymentAmt-=charge.AmountEnd;
 					charge.AmountEnd=0;
 				}
 				else {//Use full payment
-					split.SplitAmt=_payAvailableAmt;
-					charge.AmountEnd-=_payAvailableAmt;
-					_payAvailableAmt=0;
+					split.SplitAmt=PaymentAmt;
+					charge.AmountEnd-=PaymentAmt;
+					PaymentAmt=0;
 				}
 				split.DatePay=date;
 				split.PatNum=charge.PatNum;
@@ -375,10 +376,10 @@ namespace OpenDental {
 				charge.ListPaySplits.Add(split);
 				listAutoSplits.Add(split);
 			}
-			if(listAutoSplits.Count==0 && ListSplitsCur.Count==0 && _payAvailableAmt!=0) {//Ensure there is at least one auto split if they entered a payAmt.
+			if(listAutoSplits.Count==0 && ListSplitsCur.Count==0 && PaymentAmt!=0) {//Ensure there is at least one auto split if they entered a payAmt.
 				split=new PaySplit();
-				split.SplitAmt=_payAvailableAmt;
-				_payAvailableAmt=0;
+				split.SplitAmt=PaymentAmt;
+				PaymentAmt=0;
 				split.DatePay=date;
 				split.PatNum=PaymentCur.PatNum;
 				split.ProcDate=PaymentCur.PayDate;
