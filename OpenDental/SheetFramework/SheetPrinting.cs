@@ -1257,6 +1257,9 @@ namespace OpenDental {
 						break; //Skip if on next page
 					} 
 				}
+				if(field.Height==0 || field.Width==0) {
+					continue;//might be possible with really old sheets.
+				}
 				#region Get the path for the image
 				string filePathAndName="";
 				switch(field.FieldType) {
