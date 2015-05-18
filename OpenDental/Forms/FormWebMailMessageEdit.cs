@@ -159,8 +159,9 @@ namespace OpenDental {
 			_emailAddressSender=EmailAddresses.GetOne(PrefC.GetLong(PrefName.EmailNotifyAddressNum));//Webmail notification email address.  One notification email per database (not clinic specific).
 			if(_emailAddressSender==null 
 				|| _emailAddressSender.EmailAddressNum==0
-				|| _emailAddressSender.EmailUsername==""
-				|| _emailAddressSender.Pop3ServerIncoming=="") { //No default email setup for this practice yet.
+				|| _emailAddressSender.EmailUsername=="")
+			{
+				//No valid "Notify" email setup for this practice yet.
 				BlockSendNotificationMessage("Practice email is not setup properly. Setup practice email in setup.");
 			}
 			if(notificationSubject=="") {
