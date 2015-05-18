@@ -368,8 +368,8 @@ namespace OpenDental.ReportingComplex {
 											if(newQuery.DictDefNames==null) {
 												return false;
 											}
-											if(newQuery.DictDefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
-												displayText=newQuery.DictDefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+											if(newQuery.DictDefNames.ContainsKey(PIn.Long(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
+												displayText=newQuery.DictDefNames[PIn.Long(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 												newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 												newQuery.GetGroupTitle().StaticText=displayText;
 											}
@@ -421,8 +421,8 @@ namespace OpenDental.ReportingComplex {
 								if(newQuery.DictDefNames==null) {
 									return false;
 								}
-								if(newQuery.DictDefNames.ContainsKey(PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
-									displayText=newQuery.DictDefNames[PIn.Int(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
+								if(newQuery.DictDefNames.ContainsKey(PIn.Long(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString()))) {
+									displayText=newQuery.DictDefNames[PIn.Long(newQuery.ReportTable.Rows[0][query.ColumnNameToSplitOn].ToString())];
 									newQuery.GetGroupTitle().Size=new Size((int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(displayText,newQuery.GetGroupTitle().Font).Height/grfx.DpiY*100+2));
 									newQuery.GetGroupTitle().StaticText=displayText;
 								}
