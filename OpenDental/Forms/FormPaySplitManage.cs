@@ -11,19 +11,16 @@ namespace OpenDental {
 	public partial class FormPaySplitManage:Form {
 		///<summary>List of current paysplits for this payment.</summary>
 		public List<PaySplit> ListSplitsCur;
-		///<summary>Amount currently available for paying off charges.</summary>
-		private double _payAvailableCur;
-		///<summary>List of current account charges for the family.</summary>
+		///<summary>List of current account charges for the family.  Gets filled from AutoSplitForPayment</summary>
 		private List<AccountEntry> _listAccountCharges;
-		///<summary>List of current account credits for the family.</summary>
-		private List<AccountEntry> _listAccountCredits;
-		///<summary>The amount entered for the current payment.  May be changed in this window.</summary>
+		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.  May be changed in this window.</summary>
 		public double PaymentAmt;
 		public Family FamCur;
 		public Patient PatCur;
 		public Payment PaymentCur;
 		public DateTime PayDate;
 		public bool IsNew;
+		private List<long> listPatNums;
 
 		public FormPaySplitManage() {
 			InitializeComponent();
@@ -31,36 +28,38 @@ namespace OpenDental {
 		}
 
 		private void FormPaySplitManage_Load(object sender,EventArgs e) {
+			Init(false);
+		}
+
+		///<summary>Performs all of the Load functionality.  Public so it can be called from unit tests.</summary>
+		public void Init(bool isTest) {
 			_listAccountCharges=new List<AccountEntry>();
-			_payAvailableCur=PaymentAmt;
 			textPayAmt.Text=PaymentAmt.ToString("f");
-			List<long> listPatNums=new List<long>();
+			listPatNums=new List<long>();
 			for(int i=0;i<FamCur.ListPats.Length;i++) {
 				listPatNums.Add(FamCur.ListPats[i].PatNum);
 			}
-			if(IsNew) {
-				ListSplitsCur=AutoSplitForPayment(listPatNums,PaymentCur.PayNum,PayDate);//New payment, generated autosplits overwrites any manual/pre-existing splits.
-				textSplitTotal.Text=(PaymentAmt-_payAvailableCur).ToString("f");//Amount Paid Increases as PayAmt decreases.
+			//The logic from line 42 to line 51 will ensure that regardless of if it's a new or old payment any created paysplits that haven't been saved, 
+			//such as if splits were made in this window then the window was closed and then reopened, will persist.
+			textSplitTotal.Text=POut.Double(PaymentCur.PayAmt);
+			if(Math.Abs(PaymentAmt)>Math.Abs(PaymentCur.PayAmt)) {//If they increased the amount of the old payment, they want to be able to use it. 
+				PaymentAmt=PaymentAmt-PaymentCur.PayAmt;
 			}
-			else {//Existing.
-				textSplitTotal.Text=POut.Double(PaymentCur.PayAmt);
-				if(_payAvailableCur>PaymentCur.PayAmt) {//If they increased the amount of the old payment, they want to be able to use it. 
-					_payAvailableCur=_payAvailableCur-PaymentCur.PayAmt;
-				}
-				else {//If they decreased (or did not change) the amount of the old payment.
-					_payAvailableCur=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
-				}
-				//We want to fill the charge table like we usually do.
-				//With the splits already made on the existing payment they will be attributed correctly in AutoSplitForPayment.
-				//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
-				ListSplitsCur.AddRange(AutoSplitForPayment(listPatNums,PaymentCur.PayNum,PayDate));
+			else {//If they decreased (or did not change) the amount of the old payment.
+				PaymentAmt=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
 			}
-			FillGridCharges();
+			//We want to fill the charge table.
+			//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
+			ListSplitsCur.AddRange(AutoSplitForPayment(PaymentCur.PayNum,PayDate,isTest));
+			FillGridSplits();
+			//Select all charges on the right side that the paysplits are associated with.  Helps the user see what charges are attached.
+			gridSplits.SetSelected(true);
+			HighlightChargesForSplits();
 		}
 
 		///<summary>Fills the paysplit grid.</summary>
 		private void FillGridSplits() {
-			//Fill left grid with paysplits created, highlight procs on right.
+			//Fill left grid with paysplits created
 			gridSplits.BeginUpdate();
 			gridSplits.Columns.Clear();
 			ODGridColumn col;
@@ -84,12 +83,7 @@ namespace OpenDental {
 			for(int i=0;i<ListSplitsCur.Count;i++) {
 				splitTotal+=ListSplitsCur[i].SplitAmt;
 				row=new ODGridRow();
-				for(int j=0;j<_listAccountCredits.Count;j++) {
-					if(_listAccountCredits[j].GetType()==typeof(PaySplit) && _listAccountCredits[j].Tag==ListSplitsCur[i]) {
-						row.Tag=_listAccountCredits[j];
-						break;
-					}
-				}
+				row.Tag=ListSplitsCur[i];
 				row.Cells.Add(ListSplitsCur[i].DatePay.ToShortDateString());//Date
 				row.Cells.Add(Providers.GetAbbr(ListSplitsCur[i].ProvNum));//Prov
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
@@ -109,14 +103,16 @@ namespace OpenDental {
 				else if(ListSplitsCur[i].PayPlanNum!=0) {
 					row.Cells.Add("PayPlanCharge");//Type
 				}
-				else {//Unattached split for a positive adjustment
-					row.Cells.Add("Adjustment");//Type
+				else {//Unattached split
+					row.Cells.Add("Unallocated");//Type
+					row.Cells[row.Cells.Count-1].ColorText=Color.Red;
 				}
 				row.Cells.Add(ListSplitsCur[i].SplitAmt.ToString("f"));//Amount
 				gridSplits.Rows.Add(row);
 			}
 			textSplitTotal.Text=POut.Double(splitTotal);
 			gridSplits.EndUpdate();
+			FillGridCharges();
 		}
 
 		///<summary>Fills charge grid, and then split grid.</summary>
@@ -137,54 +133,65 @@ namespace OpenDental {
 			gridCharges.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Type"),100);
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Amount"),55,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Amt Orig"),55,HorizontalAlignment.Right);
 			gridCharges.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Paid"),12,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g(this,"Amt Start"),55,HorizontalAlignment.Right);
+			gridCharges.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Amt End"),55,HorizontalAlignment.Right);
 			gridCharges.Columns.Add(col);
 			gridCharges.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_listAccountCharges.Count;i++) {
-				if(_listAccountCharges[i].AmountCur==0 && !checkShowPaid.Checked) {//Filter out those that have been paid if checkShowPaid is unchecked.
-					continue;
+				AccountEntry entryCharge=_listAccountCharges[i];
+				if(!checkShowPaid.Checked) {//Filter out those that are paid in full and from other payments if checkbox unchecked.
+					bool isFound=false;
+					if(entryCharge.AmountEnd!=0) {
+						isFound=true;
+					}
+					for(int j=0;j<gridSplits.Rows.Count;j++) {
+						PaySplit entryCredit=(PaySplit)gridSplits.Rows[j].Tag;
+						if(entryCharge.ListPaySplits.Contains(entryCredit)) 
+							//Charge is paid for by a split in this payment, display it.
+						{
+							isFound=true;
+							break;
+						}
+					}
+					if(!isFound) {//Hiding charges that aren't associated with the current payment or have been paid in full.
+						continue;
+					}
 				}
 				row=new ODGridRow();
 				row.Tag=_listAccountCharges[i];
-				row.Cells.Add(_listAccountCharges[i].Date.ToShortDateString());//Date
-				row.Cells.Add(Providers.GetAbbr(_listAccountCharges[i].ProvNum));//Provider
+				row.Cells.Add(entryCharge.Date.ToShortDateString());//Date
+				row.Cells.Add(Providers.GetAbbr(entryCharge.ProvNum));//Provider
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
-					row.Cells.Add(Clinics.GetDesc(_listAccountCharges[i].ClinicNum));
+					row.Cells.Add(Clinics.GetDesc(entryCharge.ClinicNum));
 				}
-				else {
-					row.Cells.Add("");
-				}
-				row.Cells.Add(Patients.GetPat(_listAccountCharges[i].PatNum).GetNameFL());
-				row.Cells.Add(_listAccountCharges[i].GetType().Name);//Type
-				if(_listAccountCharges[i].GetType()==typeof(Procedure)) {
+				row.Cells.Add(Patients.GetPat(entryCharge.PatNum).GetNameFL());
+				row.Cells.Add(entryCharge.GetType().Name);//Type
+				if(entryCharge.GetType()==typeof(Procedure)) {
 					//Get the proc and add its description if the row is a proc.
-					Procedure proc=(Procedure)_listAccountCharges[i].Tag;
-					row.Cells[row.Cells.Count-1].Text+=": "+Procedures.GetDescription(proc);
+					Procedure proc=(Procedure)entryCharge.Tag;
+					row.Cells[row.Cells.Count-1].Text="Proc: "+Procedures.GetDescription(proc);
 				}
-				row.Cells.Add(_listAccountCharges[i].AmountCur.ToString("f"));//Amount
-				if(_listAccountCharges[i].AmountCur==0) {
-					row.Cells.Add("X");//Paid
-				}
+				row.Cells.Add(entryCharge.AmountOriginal.ToString("f"));//Amount Original
+				row.Cells.Add(entryCharge.AmountStart.ToString("f"));//Amount Start
+				row.Cells.Add(entryCharge.AmountEnd.ToString("f"));//Amount End
 				gridCharges.Rows.Add(row);
 			}
 			gridCharges.EndUpdate();
-			FillGridSplits();
 		}
 
-		///<summary>Creates and paysplits associated to the patient passed in for the payment passed in until the payAmt has been met.  
-		///Returns the list of new paysplits that have been created.  payAmt is passed as a ref so that we can do this same logic for an entire 
-		///family while keeping track of the remaining pay amount.</summary>
-		private List<PaySplit> AutoSplitForPayment(List<long> listPatNums,long payNum,DateTime date) {
+		///<summary>Creates paysplits associated to the patient passed in for the current payment until the payAmt has been met.  
+		///Returns the list of new paysplits that have been created.  PaymentAmt will attempt to move towards 0 as paysplits are created.</summary>
+		private List<PaySplit> AutoSplitForPayment(long payNum,DateTime date,bool isTest) {
 			//Get the lists of items we'll be using to calculate with.
 			List<Procedure> listProcs=Procedures.GetCompleteForPats(listPatNums);
 			//listPayments should be empty, there isn't currently a way to make payments without at least one split.
 			//During research however we found there were sometimes payments with no splits, so erred on the side of caution.
 			List<Payment> listPayments=Payments.GetNonSplitForPats(listPatNums);
-			List<Adjustment> listNegAdjustments=Adjustments.GetAdjustForPats(listPatNums,false);
-			List<Adjustment> listPosAdjustments=Adjustments.GetAdjustForPats(listPatNums,true);
+			List<Adjustment> listAdjustments=Adjustments.GetAdjustForPats(listPatNums);
 			List<PaySplit> listPaySplits=PaySplits.GetForPats(listPatNums);//Might contain payplan payments.
 			//Fix the memory locations of the existing pay splits for this payment within the list of pay splits for the entire family.
 			//This is necessary for associating the correct tag values to grid rows.
@@ -220,8 +227,10 @@ namespace OpenDental {
 			for(int i=0;i<listPayPlanCharges.Count;i++) {
 				_listAccountCharges.Add(new AccountEntry(listPayPlanCharges[i]));
 			}
-			for(int i=0;i<listPosAdjustments.Count;i++) {
-				_listAccountCharges.Add(new AccountEntry(listPosAdjustments[i]));
+			for(int i=0;i<listAdjustments.Count;i++) {
+				if(listAdjustments[i].AdjAmt>0 && listAdjustments[i].ProcNum==0) {
+					_listAccountCharges.Add(new AccountEntry(listAdjustments[i]));
+				}
 			}
 			for(int i=0;i<listProcs.Count;i++) {
 				_listAccountCharges.Add(new AccountEntry(listProcs[i]));
@@ -230,104 +239,126 @@ namespace OpenDental {
 			#endregion Construct List of Charges
 			#region Construct List of Credits
 			//Getting a date-sorted list of all credits that haven't been attributed to anything.
-			_listAccountCredits=new List<AccountEntry>();
-			for(int i=0;i<listNegAdjustments.Count;i++) {
-				_listAccountCredits.Add(new AccountEntry(listNegAdjustments[i]));
+			double creditTotal=0;
+			for(int i=0;i<listAdjustments.Count;i++) {
+				if(listAdjustments[i].AdjAmt<0) {
+					creditTotal-=listAdjustments[i].AdjAmt;
+				}
 			}
 			for(int i=0;i<listPaySplits.Count;i++) {
-				_listAccountCredits.Add(new AccountEntry(listPaySplits[i]));
+				creditTotal+=listPaySplits[i].SplitAmt;
 			}
-			for(int i=0;i<listPayments.Count;i++) {				
-				_listAccountCredits.Add(new AccountEntry(listPayments[i]));
+			for(int i=0;i<ListSplitsCur.Count;i++) {
+				if(ListSplitsCur[i].SplitNum==0) {
+					//If they created new splits on an old payment we need to add those to the credits list since they won't be over-written unlike a new payment.
+					creditTotal+=ListSplitsCur[i].SplitAmt;//Adding splits that haven't been entered into DB yet (re-opened split manager)
+				}
+			}
+			for(int i=0;i<listPayments.Count;i++) {
+				creditTotal+=listPayments[i].PayAmt;
 			}
 			for(int i=0;i<listInsPayAsTotal.Count;i++) {			
-				_listAccountCredits.Add(new AccountEntry(listInsPayAsTotal[i]));
+				creditTotal+=listInsPayAsTotal[i].InsPayAmt;
 			}
 			for(int i=0;i<listPayPlans.Count;i++) {
-				_listAccountCredits.Add(new AccountEntry(listPayPlans[i]));
+				creditTotal+=listPayPlans[i].CompletedAmt;
 			}
-			_listAccountCredits.Sort(AccountEntrySort);
 			#endregion Construct List of Credits
 			#region Explicitly Link Credits
 			for(int i=0;i<_listAccountCharges.Count;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				for(int j=0;j<_listAccountCredits.Count;j++) {
-					AccountEntry credit=_listAccountCredits[j];
-					if(credit.GetType()==typeof(PaySplit)) {//Credit is a paysplit
-						PaySplit paySplit=(PaySplit)credit.Tag;
-						if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {//Charge is a Procedure, and paysplit is attached to it.
-							ApplyCredit(charge,credit);							
-							break;
-						}
-						else if(charge.GetType()==typeof(PayPlanCharge)) {//Charge is a payplancharge, paysplit may or may not be attached to its payplan.
-							PayPlanCharge payPlanCharge=(PayPlanCharge)charge.Tag;
-							if(payPlanCharge.PayPlanNum==paySplit.PayPlanNum && charge.AmountCur>0) {
-								//PaySplit was made for the same PayPlan and there's some left over in this charge.  Make an attribution.
-								ApplyCredit(charge,credit);
-								break;
-							}
+				for(int j=0;j<listPaySplits.Count;j++) {
+					PaySplit paySplit=listPaySplits[j];
+					if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
+						charge.ListPaySplits.Add(paySplit);
+						charge.AmountEnd-=paySplit.SplitAmt;
+						creditTotal-=paySplit.SplitAmt;
+						if(paySplit.PayNum!=PaymentCur.PayNum) {//This will make it so the AmountOriginal will reflect only what this payment paid.
+							charge.AmountStart-=paySplit.SplitAmt;
 						}
 					}
-					else if(credit.GetType()==typeof(Adjustment)) {//Credit is an adjustment
-						Adjustment adjustment=(Adjustment)credit.Tag;
-						if(adjustment.ProcNum==charge.PriKey) {//Adjustment is attached to this charge
-							ApplyCredit(charge,credit);
-							break;
+					else if(charge.GetType()==typeof(PayPlanCharge) && ((PayPlanCharge)charge.Tag).PayPlanNum==paySplit.PayPlanNum && charge.AmountEnd>0 && paySplit.SplitAmt>0) {
+						charge.AmountEnd-=paySplit.SplitAmt;
+						creditTotal-=paySplit.SplitAmt;
+					}
+				}
+				for(int j=0;j<ListSplitsCur.Count;j++) {//Explicitly join paysplits in ListSplitsCur that haven't been entered into DB yet.
+					PaySplit paySplit=ListSplitsCur[j];
+					if(paySplit.SplitNum!=0) {
+						continue;//Skip splits that are already in DB, they're taken care of in the previous loop
+					}
+					if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
+						charge.ListPaySplits.Add(paySplit);
+						charge.AmountEnd-=paySplit.SplitAmt;
+						creditTotal-=paySplit.SplitAmt;
+					}
+					else if(charge.GetType()==typeof(PayPlanCharge) && ((PayPlanCharge)charge.Tag).PayPlanNum==paySplit.PayPlanNum && charge.AmountEnd>0 && paySplit.SplitAmt>0) {
+						charge.AmountEnd-=paySplit.SplitAmt;
+						creditTotal-=paySplit.SplitAmt;
+					}
+				}
+				for(int j=0;j<listAdjustments.Count;j++) {
+					Adjustment adjustment=listAdjustments[j];
+					if(charge.GetType()==typeof(Procedure) && adjustment.ProcNum==charge.PriKey) {
+						charge.AmountEnd+=adjustment.AdjAmt;
+						if(adjustment.AdjAmt<0) {
+							creditTotal+=adjustment.AdjAmt;
 						}
+						charge.AmountStart+=adjustment.AdjAmt;//If the adjustment is attached to a procedure decrease the procedure's amountoriginal so we know what it was just prior to autosplitting.
 					}
 				}
 			}
 			#endregion Explicitly Link Credits
-			#region Cleanup Negative Transactions
-			//For now we do not support negative charges nor negative credits for implicit linking and auto-splits.
-			for(int i=_listAccountCredits.Count-1;i>=0;i--) {
-				if(_listAccountCredits[i].AmountCur<0) {
-					_listAccountCredits.RemoveAt(i);
-				}
+			//Apply negative charges as if they're credits.
+			for(int i=0;i<_listAccountCharges.Count;i++) {
+				AccountEntry entryCharge=_listAccountCharges[i];
+				if(entryCharge.AmountEnd<0) {
+					creditTotal-=entryCharge.AmountEnd;
+					entryCharge.AmountEnd=0;
+				}				
 			}
-			for(int i=_listAccountCharges.Count-1;i>=0;i--) {
-				if(_listAccountCharges[i].AmountCur<0) {
-					_listAccountCharges.RemoveAt(i);
-				}
-			}
-			#endregion Cleanup Negative Transactions
 			#region Implicitly Link Credits
 			//Now we have a date-sorted list of all the unpaid charges as well as all non-attributed credits.  
 			//We need to go through each and pay them off in order until all we have left is the most recent unpaid charges.
-			for(int i=0;i<_listAccountCharges.Count;i++) {
+			for(int i=0;i<_listAccountCharges.Count && creditTotal>0;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				for(int j=0;j<_listAccountCredits.Count;j++) {
-					AccountEntry credit=_listAccountCredits[j];
-					if(charge.AmountCur<=0 || credit.AmountCur<=0) {//The charge.AmountCur can change as we look through the credits.
-						continue;//The credit has already been used.  May have been set to 0 for a previous owed item.
-					}
-					if(charge.GetType()==typeof(PayPlanCharge)) {
-						continue;//These are skipped because payplancharges are paid explicitly by splits only.
-					}
-					ApplyCredit(charge,credit);
-				}
+				double amt=Math.Min(charge.AmountEnd,creditTotal);
+				charge.AmountEnd-=amt;
+				creditTotal-=amt;
+				charge.AmountStart-=amt;//Decrease amount original for the charge so we know what it was just prior to when the autosplits were made.
 			}
 			#endregion Implicitly Link Credits
-			#region Auto-split Current Payment
+			#region Auto-Split Current Payment
 			//At this point we have a list of procs, positive adjustments, and payplancharges that require payment if the Amount>0.   
 			//Create and associate new paysplits to their respective charge items.
 			List<PaySplit> listAutoSplits=new List<PaySplit>();
-			for(int i=0;i<_listAccountCharges.Count && _payAvailableCur>0;i++) {
+			PaySplit split;
+			for(int i=0;i<_listAccountCharges.Count;i++) {
+				if(PaymentAmt==0) {
+					break;
+				}
 				AccountEntry charge=_listAccountCharges[i];
-				if(charge.AmountCur<=0) {
+				if(charge.AmountEnd==0) {
 					continue;//Skip charges which are already paid.
 				}
-				PaySplit split=new PaySplit();
-				if(charge.AmountCur<_payAvailableCur) {//Use partial payment
-					split.SplitAmt=charge.AmountCur;
-					_payAvailableCur-=charge.AmountCur;
-					charge.AmountCur=0;
+				if(PaymentAmt<0 && charge.AmountEnd>0) {//If they're different signs, don't make any guesses.  
+					//Remaining credits will always be all of one sign.
+					if(!isTest) {
+						MsgBox.Show(this,"Payment cannot be automatically allocated because there are no outstanding negative balances.");
+					}
+					return listAutoSplits;//Will be empty
+				}
+				split=new PaySplit();
+				if(Math.Abs(charge.AmountEnd)<Math.Abs(PaymentAmt)) {//charge has "less" than the payment, use partial payment.
+					split.SplitAmt=charge.AmountEnd;
+					PaymentAmt-=charge.AmountEnd;
+					charge.AmountEnd=0;
 				}
 				else {//Use full payment
-					split.SplitAmt=_payAvailableCur;
-					charge.AmountCur-=_payAvailableCur;
-					_payAvailableCur=0;
-				}				
+					split.SplitAmt=PaymentAmt;
+					charge.AmountEnd-=PaymentAmt;
+					PaymentAmt=0;
+				}
 				split.DatePay=date;
 				split.PatNum=charge.PatNum;
 				split.ProcDate=charge.Date;
@@ -342,25 +373,25 @@ namespace OpenDental {
 					split.PayPlanNum=((PayPlanCharge)charge.Tag).PayPlanNum;
 				}
 				split.PayNum=payNum;
-				AccountEntry credit=new AccountEntry(split);
-				credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
-				_listAccountCredits.Add(credit);
+				charge.ListPaySplits.Add(split);
 				listAutoSplits.Add(split);
 			}
-			#endregion Auto-Spit Current Payment
+			if(listAutoSplits.Count==0 && ListSplitsCur.Count==0 && PaymentAmt!=0) {//Ensure there is at least one auto split if they entered a payAmt.
+				split=new PaySplit();
+				split.SplitAmt=PaymentAmt;
+				PaymentAmt=0;
+				split.DatePay=date;
+				split.PatNum=PaymentCur.PatNum;
+				split.ProcDate=PaymentCur.PayDate;
+				split.ProvNum=0;
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+					split.ClinicNum=PaymentCur.ClinicNum;
+				}
+				split.PayNum=payNum;
+				listAutoSplits.Add(split);
+			}
+			#endregion Auto-Split Current Payment
 			return listAutoSplits;
-		}
-
-		private void ApplyCredit(AccountEntry charge,AccountEntry credit) {
-			if(charge.AmountCur<credit.AmountCur) {
-				credit.AmountCur-=charge.AmountCur;
-				charge.AmountCur=0;
-			}
-			else {
-				charge.AmountCur-=credit.AmountCur;
-				credit.AmountCur=0;
-			}
-			credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
 		}
 
 		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.  If payAmt=0, pay charge in full.</summary>
@@ -378,13 +409,16 @@ namespace OpenDental {
 			else if(charge.Tag.GetType()==typeof(Adjustment)) {//Row selected is an Adjustment.
 				//Do nothing, nothing to link.
 			}
-			double chargeAmt=charge.AmountCur;
-			if(chargeAmt<payAmt || payAmt==0) {//Full payment of charge
+			else {//PaySplits and overpayment refunds.
+				//Do nothing, nothing to link.
+			}
+			double chargeAmt=charge.AmountEnd;
+			if(Math.Abs(chargeAmt)<Math.Abs(payAmt) || payAmt==0) {//Full payment of charge
 				split.SplitAmt=chargeAmt;
-				charge.AmountCur=0;//Reflect payment in underlying datastructure
+				charge.AmountEnd=0;//Reflect payment in underlying datastructure
 			}
 			else {//Partial payment of charge
-				charge.AmountCur-=payAmt;
+				charge.AmountEnd-=payAmt;
 				split.SplitAmt=payAmt;
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
@@ -394,9 +428,7 @@ namespace OpenDental {
 			split.PatNum=charge.PatNum;
 			split.ProcDate=charge.Date;
 			split.PayNum=PaymentCur.PayNum;
-			AccountEntry credit=new AccountEntry(split);
-			credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
-			_listAccountCredits.Add(credit);
+			charge.ListPaySplits.Add(split);
 			ListSplitsCur.Add(split);
 		}
 
@@ -404,44 +436,73 @@ namespace OpenDental {
 		private void DeleteSelected() {
 			for(int i=gridSplits.SelectedIndices.Length-1;i>=0;i--) {
 				int idx=gridSplits.SelectedIndices[i];
-				AccountEntry selectedCredit=(AccountEntry)gridSplits.Rows[idx].Tag;
-				_listAccountCredits.Remove(selectedCredit);
-				List<long> listChargeAccountEntryNums=selectedCredit.ListChargeAccountEntryNums;
+				PaySplit paySplit=(PaySplit)gridSplits.Rows[idx].Tag;
 				for(int j=0;j<_listAccountCharges.Count;j++) {
 					AccountEntry charge=_listAccountCharges[j];
-					if(!listChargeAccountEntryNums.Contains(charge.AccountEntryNum))	{
+					if(!charge.ListPaySplits.Contains(paySplit))	{
 						continue;
 					}
-					double chargeAmtNew=charge.AmountCur+selectedCredit.AmountOriginal;
-					if(chargeAmtNew>charge.AmountOriginal) {//Trying to delete an overpayment, just increase charge's amount to the max.
-						charge.AmountCur=charge.AmountOriginal;
+					double chargeAmtNew=charge.AmountEnd+paySplit.SplitAmt;
+					if(Math.Abs(chargeAmtNew)>Math.Abs(charge.AmountStart)) {//Trying to delete an overpayment, just increase charge's amount to the max.
+						charge.AmountEnd=charge.AmountStart;
 					}
 					else {
-						charge.AmountCur+=selectedCredit.AmountOriginal;//Give the money back to the charge so it will display.
+						charge.AmountEnd+=paySplit.SplitAmt;//Give the money back to the charge so it will display.
 					}
+					charge.ListPaySplits.Remove(paySplit);
 				}
-				ListSplitsCur.Remove((PaySplit)selectedCredit.Tag);
-				gridSplits.Rows.RemoveAt(idx);
+				ListSplitsCur.Remove(paySplit);
 			}
-			FillGridCharges();
+			FillGridSplits();
 		}
 		
 		///<summary>Allows editing of an individual double clicked paysplit entry.</summary>
 		private void gridSplits_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			PaySplit paySplitOld=ListSplitsCur[e.Row];
+			PaySplit paySplitOld=(PaySplit)gridSplits.Rows[e.Row].Tag;
 			PaySplit paySplit=paySplitOld.Copy();
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
 			FormPSE.PaySplitCur=paySplit;
-			FormPSE.IsNew=false;
 			if(FormPSE.ShowDialog()==DialogResult.OK) {//paySplit contains all the info we want.  
 				double splitDiff=paySplit.SplitAmt-paySplitOld.SplitAmt;
 				//Delete paysplit from paysplit grid, credit the charge it's associated to.  Paysplit may be re-associated with a different charge and we wouldn't know, so we need to do this.
 				DeleteSelected();
 				if(FormPSE.PaySplitCur==null) {//Deleted the paysplit, just return here.
-					FillGridCharges();
+					FillGridSplits();
 					return;
 				}
 				UpdateForManualSplit(paySplit);
+			}
+		}
+
+		///<summary>When a paysplit is selected this method highlights all charges associated with it.</summary>
+		private void gridSplits_CellClick(object sender,ODGridClickEventArgs e) {
+			HighlightChargesForSplits();
+		}
+
+		private void HighlightChargesForSplits() {
+			gridCharges.SetSelected(false);
+			for(int i=0;i<gridSplits.SelectedIndices.Length;i++) {
+				PaySplit paySplit=(PaySplit)gridSplits.Rows[gridSplits.SelectedIndices[i]].Tag;
+				for(int j=0;j<gridCharges.Rows.Count;j++) {
+					AccountEntry accountEntryCharge=(AccountEntry)gridCharges.Rows[j].Tag;
+					if(accountEntryCharge.ListPaySplits.Contains(paySplit)) {
+						gridCharges.SetSelected(j,true);
+					}
+				}
+			}
+		}
+
+		///<summary>When a charge is selected this method highlights all paysplits associated with it.</summary>
+		private void gridCharges_CellClick(object sender,ODGridClickEventArgs e) {
+			gridSplits.SetSelected(false);
+			for(int i=0;i<gridCharges.SelectedIndices.Length;i++) {
+				AccountEntry accountEntryCharge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
+				for(int j=0;j<gridSplits.Rows.Count;j++) {
+					PaySplit paySplit=(PaySplit)gridSplits.Rows[j].Tag;
+					if(accountEntryCharge.ListPaySplits.Contains(paySplit)) {
+						gridSplits.SetSelected(j,true);
+					}
+				}
 			}
 		}
 
@@ -462,22 +523,20 @@ namespace OpenDental {
 		///<summary>Updates the underlying data structures when a manual split is created or edited.</summary>
 		private void UpdateForManualSplit(PaySplit paySplit) {
 			//Find the charge row for this new split.
+			ListSplitsCur.Add(paySplit);
 			List<PayPlanCharge> listCharges=PayPlanCharges.GetForPayPlan(paySplit.PayPlanNum);
 			List<long> listPayPlanChargeNums=new List<long>();
 			for(int j=0;j<listCharges.Count;j++) {
 				listPayPlanChargeNums.Add(listCharges[j].PayPlanChargeNum);
 			}
-			AccountEntry credit=new AccountEntry(paySplit);
-			_listAccountCredits.Add(credit);
-			ListSplitsCur.Add(paySplit);
 			//Locate a charge to apply the credit to, if a reasonable match exists.
 			for(int i=0;i<_listAccountCharges.Count;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				if(charge.AmountCur<=0) {
+				if(charge.AmountEnd==0) {
 					continue;
 				}
 				bool isMatchFound=false;
-				if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum!=0 && charge.PriKey==paySplit.ProcNum) {//New Split is for this proc
+				if(charge.GetType()==typeof(Procedure) && charge.PriKey==paySplit.ProcNum) {//New Split is for this proc
 					isMatchFound=true;
 				}
 				else if(charge.GetType()==typeof(Adjustment) //New split is for this adjust
@@ -491,22 +550,22 @@ namespace OpenDental {
 					isMatchFound=true;
 				}				
 				if(isMatchFound) {
-					double amtOwed=charge.AmountCur;
-					if(amtOwed<paySplit.SplitAmt) {//Partial payment
-						charge.AmountCur=0;//Reflect payment in underlying datastructure
+					double amtOwed=charge.AmountEnd;
+					if(Math.Abs(amtOwed)<Math.Abs(paySplit.SplitAmt)) {//Partial payment
+						charge.AmountEnd=0;//Reflect payment in underlying datastructure
 					}
 					else {//Full payment
-						charge.AmountCur=amtOwed-paySplit.SplitAmt;
+						charge.AmountEnd=amtOwed-paySplit.SplitAmt;
 					}
-					credit.ListChargeAccountEntryNums.Add(charge.AccountEntryNum);
+					charge.ListPaySplits.Add(paySplit);
 				}
 				//If none of these, it's unattached to the best of our knowledge.				
 			}			
-			FillGridCharges();//Fills credit grid too.
+			FillGridSplits();//Fills charge grid too.
 		}
 
 		private void checkShowPaid_CheckedChanged(object sender,EventArgs e) {
-			FillGridCharges();
+			FillGridSplits();
 		}
 
 		///<summary>Creates paysplits for selected charges if there is enough payment left.</summary>
@@ -515,7 +574,7 @@ namespace OpenDental {
 				AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
 				CreateSplit(charge,0);
 			}
-			FillGridCharges();//Fills split grid too.
+			FillGridSplits();//Fills charge grid too.
 		}
 
 		///<summary>Creates paysplits after allowing the user to enter in a custom amount to pay for each selected charge.</summary>
@@ -534,13 +593,13 @@ namespace OpenDental {
 				FormAE.ShowDialog();
 				if(FormAE.DialogResult==DialogResult.OK) {
 					double amount=FormAE.Amount;
-					if(amount>0) {
+					if(amount!=0) {
 						AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
 						CreateSplit(charge,amount);
 					}
 				}
 			}
-			FillGridCharges();//Fills split grid too.
+			FillGridSplits();//Fills charge grid too.
 		}
 
 		///<summary>Deletes all paysplits.</summary>
@@ -579,16 +638,18 @@ namespace OpenDental {
 
 			///<summary>No matter which constructor is used, the AccountEntryNum will be unique and automatically assigned.</summary>
 			public long AccountEntryNum=(AccountEntryAutoIncrementValue++);
-			///<summary>Read only data.  Do not modify, or else the historic information will be changed.</summary>
+			//Read only data.  Do not modify, or else the historic information will be changed.
 			public object Tag;
 			public DateTime Date;
 			public long PriKey;
-			public double AmountOriginal;
-			public double AmountCur;
 			public long ProvNum;
 			public long ClinicNum;
 			public long PatNum;
-			public List<long> ListChargeAccountEntryNums;//List of PaySplitNum so we can have multiple splits for the same charge.
+			public double AmountOriginal;
+			//Variables below will be changed as needed.
+			public double AmountStart;
+			public double AmountEnd;
+			public List<PaySplit> ListPaySplits=new List<PaySplit>();//List of paysplits for this charge.
 
 			public new Type GetType() {
 				return Tag.GetType();
@@ -599,11 +660,11 @@ namespace OpenDental {
 				Date=payPlanCharge.ChargeDate;
 				PriKey=payPlanCharge.PayPlanChargeNum;
 				AmountOriginal=payPlanCharge.Principal+payPlanCharge.Interest;
-				AmountCur=AmountOriginal;
+				AmountStart=AmountOriginal;
+				AmountEnd=AmountOriginal;
 				ProvNum=payPlanCharge.ProvNum;
 				ClinicNum=payPlanCharge.ClinicNum;
 				PatNum=payPlanCharge.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
 			}
 
 			///<summary>Turns negative adjustments positive.</summary>
@@ -611,12 +672,12 @@ namespace OpenDental {
 				Tag=adjustment;
 				Date=adjustment.AdjDate;
 				PriKey=adjustment.AdjNum;
-				AmountOriginal=Math.Abs(adjustment.AdjAmt);
-				AmountCur=AmountOriginal;
+				AmountOriginal=adjustment.AdjAmt;
+				AmountStart=AmountOriginal;
+				AmountEnd=AmountOriginal;
 				ProvNum=adjustment.ProvNum;
 				ClinicNum=adjustment.ClinicNum;
 				PatNum=adjustment.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
 			}
 
 			public AccountEntry(Procedure proc) {
@@ -624,59 +685,11 @@ namespace OpenDental {
 				Date=proc.ProcDate;
 				PriKey=proc.ProcNum;
 				AmountOriginal=proc.ProcFee;
-				AmountCur=AmountOriginal;
+				AmountStart=AmountOriginal;
+				AmountEnd=AmountOriginal;
 				ProvNum=proc.ProvNum;
 				ClinicNum=proc.ClinicNum;
 				PatNum=proc.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
-			}
-
-			public AccountEntry(PaySplit paySplit) {
-				Tag=paySplit;
-				Date=paySplit.DatePay;
-				PriKey=paySplit.SplitNum;
-				AmountOriginal=paySplit.SplitAmt;
-				AmountCur=AmountOriginal;
-				ProvNum=paySplit.ProvNum;
-				ClinicNum=paySplit.ClinicNum;
-				PatNum=paySplit.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
-			}
-
-			public AccountEntry(Payment payment) {
-				Tag=payment;
-				Date=payment.PayDate;
-				PriKey=payment.PayNum;
-				AmountOriginal=payment.PayAmt;
-				AmountCur=AmountOriginal;
-				ProvNum=0;//Payments don't have a ProvNum
-				ClinicNum=payment.ClinicNum;
-				PatNum=payment.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
-			}
-
-			public AccountEntry(ClaimProc claimProc) {
-				Tag=claimProc;
-				Date=claimProc.DateCP;
-				PriKey=claimProc.ClaimProcNum;
-				AmountOriginal=claimProc.InsPayAmt;
-				AmountCur=AmountOriginal;
-				ProvNum=claimProc.ProvNum;
-				ClinicNum=claimProc.ClinicNum;
-				PatNum=claimProc.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
-			}
-
-			public AccountEntry(PayPlan payPlan) {
-				Tag=payPlan;
-				Date=payPlan.PayPlanDate;
-				PriKey=payPlan.PayPlanNum;
-				AmountOriginal=payPlan.CompletedAmt;
-				AmountCur=AmountOriginal;
-				ProvNum=0;
-				ClinicNum=0;
-				PatNum=payPlan.PatNum;
-				ListChargeAccountEntryNums=new List<long>();
 			}
 
 		}

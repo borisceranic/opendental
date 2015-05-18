@@ -41,7 +41,8 @@ namespace OpenDentBusiness {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),listPatNums);
 			}
 			string command="SELECT * from procedurelog WHERE PatNum IN("+String.Join(", ",listPatNums)+")"
-				+" AND ProcStatus="+(int)ProcStat.C;//Completed only
+				+" AND ProcStatus="+(int)ProcStat.C
+				+" ORDER BY ProcDate";//Completed only
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
