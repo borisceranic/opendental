@@ -65,23 +65,24 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Gets all operatories for the appointment view passed in.  Pass 0 to get all ops associated with the 'none' view.</summary>
 		public static List<long> GetOpsForView(long apptViewNum) {
 			//No need to check RemotingRole; no call to db.
-			//ArrayList AL=new ArrayList();
 			List<long> retVal=new List<long>();
-			for(int i=0;i<ApptViewItemC.List.Length;i++){
-				if(ApptViewItemC.List[i].ApptViewNum==apptViewNum && ApptViewItemC.List[i].OpNum!=0){
+			if(apptViewNum==0) {
+				//Simply return all visible ops.  These are the ops that the 'none' appointment view currently displays.
+				List<Operatory> listVisibleOps=OperatoryC.GetListShort();
+				for(int i=0;i<listVisibleOps.Count;i++) {
+					retVal.Add(listVisibleOps[i].OperatoryNum);
+				}
+				return retVal;
+			}
+			for(int i=0;i<ApptViewItemC.List.Length;i++) {
+				if(ApptViewItemC.List[i].ApptViewNum==apptViewNum && ApptViewItemC.List[i].OpNum!=0) {
 					retVal.Add(ApptViewItemC.List[i].OpNum);
 				}
-				if(apptViewNum==0 && ApptViewItemC.List[i].OpNum!=0) {//No view selected so return all operatories that are not hidden.
-					Operatory op=Operatories.GetOperatory(ApptViewItemC.List[i].OpNum);
-					if(!op.IsHidden) {
-						retVal.Add(ApptViewItemC.List[i].OpNum);
-					}
-				}
 			}
-			//int[] retVal=new int[AL.Count]();
-			return retVal;//(int[])AL.ToArray(typeof(int));
+			return retVal;
 		}
 
 		
