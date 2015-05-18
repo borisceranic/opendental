@@ -1255,7 +1255,10 @@ namespace OpenDental {
 					if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
 						&& field.YPos!= _yPosPrint+_printMargin.Top) {
 						break; //Skip if on next page
-					} 
+					}
+				}
+				if(field.Height==0 || field.Width==0) {
+					continue;//might be possible with really old sheets.
 				}
 				#region Get the path for the image
 				string filePathAndName="";
