@@ -1907,7 +1907,7 @@ namespace OpenDental{
 			FillComboZip();
 			checkSame.Checked=true;
 			checkNotesSame.Checked=true;
-			checkEmailPhoneSame.Checked=false;
+			checkEmailPhoneSame.Checked=true;
 			if(PatCur!=null){
 				for(int i=0;i<FamCur.ListPats.Length;i++){
 					if(PatCur.HmPhone!=FamCur.ListPats[i].HmPhone
@@ -1928,11 +1928,11 @@ namespace OpenDental{
 					{
 						checkNotesSame.Checked=false;
 					}
-					if(PatCur.WirelessPhone==FamCur.ListPats[i].WirelessPhone
-						&& PatCur.WkPhone==FamCur.ListPats[i].WkPhone
-						&& PatCur.Email==FamCur.ListPats[i].Email) 
+					if(PatCur.WirelessPhone!=FamCur.ListPats[i].WirelessPhone
+						|| PatCur.WkPhone!=FamCur.ListPats[i].WkPhone
+						|| PatCur.Email!=FamCur.ListPats[i].Email) 
 					{
-						checkEmailPhoneSame.Checked=true;
+						checkEmailPhoneSame.Checked=false;
 					}
 				}
 			}
