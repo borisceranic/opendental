@@ -80,13 +80,28 @@ namespace OpenDentBusiness{
 		///<summary>This must refresh Listt on client, not on server.</summary>
 		public static void Refresh() {
 			//No need to check RemotingRole; no call to db.
-			List<Medication> list=GetListFromDb();
+			RefreshCache();
+		}
+
+		public static DataTable RefreshCache() {
+			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
+			string command=
+				"SELECT * FROM medication ORDER BY MedName";
+			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
+			table.TableName="Medications";
+			FillCache(table);
+			return table;
+		}
+
+		public static void FillCache(DataTable table) {
+			//No need to check RemotingRole; no call to db.
+			List<Medication> listt=Crud.MedicationCrud.TableToList(table);
 			Hashtable hashList=new Hashtable();
-			for(int i=0;i<list.Count;i++) {
-				hashList.Add(list[i].MedicationNum,list[i]);
+			for(int i=0;i<listt.Count;i++) {
+				hashList.Add(listt[i].MedicationNum,listt[i]);
 			}
+			Listt=listt.ToArray();
 			HList=hashList;
-			Listt=list.ToArray();
 		}
 
 		///<summary>Checks to see if the medication exists in the current cache.  If not, the local cache will get refreshed and then searched again.  If med is still not found, false is returned because the med does not exist.</summary>
@@ -120,8 +135,6 @@ namespace OpenDentBusiness{
 		///<summary>Returns medications that contain the passed in string.  Blank for all.</summary>
 		public static List<Medication> GetList(string str) {
 			//No need to check RemotingRole; no call to db.
-			//This is not the correct way... The real answer is to implement invalid types for Medications.
-			Refresh();
 			List<Medication> retVal=new List<Medication>();
 			Medication[] arrayMeds=GetListt();
 			for(int i=0;i<arrayMeds.Length;i++) {
@@ -310,6 +323,16 @@ namespace OpenDentBusiness{
 			}
 			Hashtable hashMedications=GetHList();
 			return ((Medication)hashMedications[genericNum]).MedName;
+		}
+
+		///<summary>Gets the generic medication name, given it's generic Num.  Will search through the passed in list before resorting to cache.</summary>
+		public static string GetGenericName(long genericNum,Hashtable hlist) {
+			//No need to check RemotingRole; no call to db.
+			if(!hlist.ContainsKey(genericNum)) {
+				//Medication not found.  Refresh the cache and check again.
+				return GetGenericName(genericNum);
+			}
+			return ((Medication)hlist[genericNum]).MedName;
 		}
 
 		public static List<long> GetChangedSinceMedicationNums(DateTime changedSince) {

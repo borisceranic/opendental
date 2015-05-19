@@ -278,7 +278,9 @@ namespace OpenDentBusiness{
 		///<summary>57. In-Memory table used for hard-coded codes and CQMs</summary>
 		EhrCodes,
 		///<summary>58. Used to override appointment color.  Might be used for other appointment attributes in the future.</summary>
-		AppointmentTypes
+		AppointmentTypes,
+		///<summary>59. Caches the medication list to stop from over-refreshing and causing slowness.</summary>
+		Medications
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

@@ -26,6 +26,7 @@ namespace OpenDental{
 		///<summary>the number returned if using select mode.</summary>
 		public long SelectedMedicationNum;
 		private List<Medication> medList;
+		private bool _hasChanged;
 
 		///<summary></summary>
 		public FormMedications()
@@ -184,6 +185,7 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Medications";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMedications_FormClosing);
 			this.Load += new System.EventHandler(this.FormMedications_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -192,6 +194,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormMedications_Load(object sender, System.EventArgs e) {
+			_hasChanged=false;
 			//not refreshed in localdata
 			FillGrid();
 			//if(SelectGenericMode){
@@ -221,6 +224,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			Hashtable hlistCopy=Medications.GetHList();
 			for(int i=0;i<medList.Count;i++) {
 				row=new ODGridRow();
 				if(medList[i].MedicationNum==medList[i].GenericNum) {//isGeneric
@@ -229,7 +233,7 @@ namespace OpenDental{
 				}
 				else{
 					row.Cells.Add(medList[i].MedName);
-					row.Cells.Add(Medications.GetGenericName(medList[i].GenericNum));
+					row.Cells.Add(Medications.GetGenericName(medList[i].GenericNum,hlistCopy));
 				}
 				row.Cells.Add(medList[i].RxCui==0?"":medList[i].RxCui.ToString());
 				row.Cells.Add(medList[i].Notes);
@@ -250,6 +254,9 @@ namespace OpenDental{
 			FormME.MedicationCur=MedicationCur;
 			FormME.IsNew=true;
 			FormME.ShowDialog();
+			if(FormME.DialogResult==DialogResult.OK) {
+				_hasChanged=true;
+			}
 			FillGrid();
 		}
 
@@ -270,6 +277,9 @@ namespace OpenDental{
 			FormME.MedicationCur=MedicationCur;
 			FormME.IsNew=true;
 			FormME.ShowDialog();
+			if(FormME.DialogResult==DialogResult.OK) {
+				_hasChanged=true;
+			}
 			FillGrid();
 		}
 
@@ -283,6 +293,9 @@ namespace OpenDental{
 				FormMedicationEdit FormME=new FormMedicationEdit();
 				FormME.MedicationCur=medList[e.Row];
 				FormME.ShowDialog();
+				if(FormME.DialogResult==DialogResult.OK) {
+					_hasChanged=true;
+				}
 				FillGrid();
 			}
 		}
@@ -303,6 +316,12 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void FormMedications_FormClosing(object sender,FormClosingEventArgs e) {
+			if(_hasChanged) {
+				DataValid.SetInvalid(InvalidType.Medications);
+			}
 		}
 
 		

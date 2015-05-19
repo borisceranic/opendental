@@ -165,6 +165,9 @@ namespace OpenDentBusiness {
 				ds.Tables.Add(LetterMergeFields.RefreshCache());
 				ds.Tables.Add(LetterMerges.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.Medications) || isAll) {
+				ds.Tables.Add(Medications.RefreshCache());
+			}
 			if(itypes.Contains((int)InvalidType.Operatories) || isAll){
 				ds.Tables.Add(Operatories.RefreshCache());
 			}
