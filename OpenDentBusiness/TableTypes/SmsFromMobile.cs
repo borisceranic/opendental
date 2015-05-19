@@ -7,28 +7,35 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long SmsFromMobileNum;
-		///<summary>FK to patient.PatNum. </summary>
+		///<summary>FK to patient.PatNum. Not sent from HQ.</summary>
 		public long PatNum;
 		///<summary>FK to clinic.ClinicNum. </summary>
 		public long ClinicNum;
-		///<summary>FK to commlog.CommlogNum. </summary>
+		///<summary>FK to commlog.CommlogNum. Not sent from HQ.</summary>
 		public long CommlogNum;
 		///<summary>Contents of the message.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string MsgText;
-		///<summary>Date and time message was inserted into the DB.</summary>
+		///<summary>Date and time message was inserted into the DB. Not sent from HQ.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeReceived;
 		///<summary>This is the Phone Number of the office that the mobile device sent a message to.</summary>
 		public string SmsPhoneNumber;
+		///<summary>This is the PhoneNumber that this message was sent from.</summary>
+		public string MobilePhoneNumber;
 		///<summary>Message part sequence number. For single part messages this should always be 1. 
 		///For messages that exist as multiple parts, due to staggered delivery of the parts, this will be a number between 1 and MsgTotal.</summary>
-		public string MsgPart;
+		public int MsgPart;
 		///<summary>Total count of message parts for this single message identified by MsgRefID.
 		///For single part messages this should always be 1.</summary>
-		public string MsgTotal;
+		public int MsgTotal;
 		///<summary>Each part of a multipart message will have the same MsgRefID.</summary>
 		public string MsgRefID;
+		///<summary></summary>
+		public bool IsRead;
+		///<summary>Words surrounded by spaces. This allows simple querrying. Example: " Junk  Recall " allows you to 
+		///write "WHERE Flags like "% Junk %" without having to worry about commas. Also, adding and removing tags is easier. Example: Flags=Flags.Replace(" Junk ","");</summary>
+		public string Flags;
 
 		///<summary></summary>
 		public SmsFromMobile Copy() {

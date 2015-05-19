@@ -5,6 +5,7 @@ namespace OpenDentBusiness {
 	///When clinics is enabled all SmsPhones with clinic num 0 should be updated to have clinic num of the lowest numbered clinic.
 	///When clinics are disabled, all SmsPhones with the lowest numbered clinic num should be re-associated to clinic number 0.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class SmsPhone:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

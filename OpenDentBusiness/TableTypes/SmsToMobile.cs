@@ -16,7 +16,7 @@ namespace OpenDentBusiness {
 		///<summary>This is the sending phone number in international format. Each office may have several different numbers that they use.</summary>
 		public string SmsPhoneNumber;
 		///<summary>The phone number that this message was sent to. Must be kept in addition to the PatNum.</summary>
-		public string PhonePat;
+		public string MobilePhoneNumber;
 		///<summary>Set to true if this message should "jump the queue" and be sent asap.</summary>
 		public bool IsTimeSensitive;
 		///<summary>Enum:SMSMessageSource  This is used to identify where in the program this message originated from.</summary>
