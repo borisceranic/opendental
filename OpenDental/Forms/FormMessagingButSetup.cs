@@ -200,9 +200,6 @@ namespace OpenDental{
 			SigButDef button;
 			SigButDefElement[] elements;
 			string s;
-			if(SigButDefs.UpdateButtonIndexIfChanged(SubList)) {
-				DataValid.SetInvalid(InvalidType.Signals);
-			}
 			for(int i=0;i<20;i++){
 				button=SigButDefs.GetByIndex(i,SubList);
 				if(button==null){
@@ -279,6 +276,9 @@ namespace OpenDental{
 				FormS.ShowDialog();
 			}
 			else{//edit
+				if(listComputers.SelectedIndex>0) {//If "All" is selected, the computerName will already be blank, so it only needs reset if it isn't "All".
+					computerName=Computers.List[listComputers.SelectedIndex].CompName;
+				}
 				FormSigButDefEdit FormS=new FormSigButDefEdit();
 				FormS.ButtonCur=button.Copy();
 				FormS.ShowDialog();
