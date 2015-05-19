@@ -438,6 +438,55 @@ namespace UnitTests {
 			catch(Exception ex) {
 				textResults.Text+="40: Failed. "+ex.Message;
 			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyOne(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="41: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyTwo(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="42: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyThree(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="43: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyFour(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="44: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyFive(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="45: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtySix(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="46: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtySeven(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="47: Failed. "+ex.Message;
+			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
 		}

@@ -2359,5 +2359,302 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary></summary>
+		public static string TestFourtyOne(int specificTest) {
+			if(specificTest != 0 && specificTest != 41) {
+				return "";
+			}
+			string suffix="41";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",50,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.C,"",40,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",60,DateTime.Now.AddDays(-3));
+			Payment payment=new Payment();
+			payment.PatNum=patNum;
+			payment.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=150;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;			
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			if(FormPSM.ListSplitsCur.Count!=3) {
+				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=60 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 50 for the D1110 procedure. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[1].SplitAmt!=40 || FormPSM.ListSplitsCur[1].ProcNum!=procedure2.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D0120 procedure. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[2].SplitAmt!=50 || FormPSM.ListSplitsCur[2].ProcNum!=procedure1.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 60 for the D0220 procedure. \r\n");
+			}
+			retVal+="41: Passed.  PaySplitManager created and associated pay splits to the proper procedures.\r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtyTwo(int specificTest) {
+			if(specificTest != 0 && specificTest != 42) {
+				return "";
+			}
+			string suffix="42";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",40,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.C,"",60,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",80,DateTime.Now.AddDays(-3));
+			Payment payment=new Payment();
+			payment.PayAmt=110;
+			payment.PayDate=DateTime.Now.AddDays(-2);
+			payment.IsSplit=true;
+			payment.PatNum=patNum;
+			payment.PayNum=Payments.Insert(payment);
+			PaySplit paySplit=new PaySplit();
+			paySplit.PayNum=payment.PayNum;
+			paySplit.SplitAmt=110;
+			paySplit.PatNum=patNum;
+			PaySplits.Insert(paySplit);
+			Payment payment2=new Payment();
+			payment2.PatNum=patNum;
+			payment2.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment2.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment2;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=80;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain two paysplits, one for procedure1 for 40, and one for procedure2 for 30.
+			if(FormPSM.ListSplitsCur.Count!=2) {
+				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=30 || FormPSM.ListSplitsCur[0].ProcNum!=procedure2.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D0120 procedure. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[1].SplitAmt!=40 || FormPSM.ListSplitsCur[1].ProcNum!=procedure1.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D0220 procedure. \r\n");
+			}
+			retVal+="42: Passed.  PaySplitManager associated historical data to the proper procedures. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtyThree(int specificTest) {
+			if(specificTest != 0 && specificTest != 43) {
+				return "";
+			}
+			string suffix="43";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",40,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.C,"",60,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",80,DateTime.Now.AddDays(-3));
+			Payment payment=new Payment();
+			payment.PayAmt=200;
+			payment.PayDate=DateTime.Now.AddDays(-2);
+			payment.IsSplit=true;
+			payment.PatNum=patNum;
+			payment.PayNum=Payments.Insert(payment);
+			PaySplit paySplit=new PaySplit();
+			paySplit.PayNum=payment.PayNum;
+			paySplit.SplitAmt=200;
+			paySplit.PatNum=patNum;
+			PaySplits.Insert(paySplit);
+			Payment payment2=new Payment();
+			payment2.PatNum=patNum;
+			payment2.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment2.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment2;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=50;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain one paysplit worth 50 and not attached to any procedures.
+			if(FormPSM.ListSplitsCur.Count!=1) {
+				throw new Exception("PaySplitManager didn't create paysplits. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=50 || FormPSM.ListSplitsCur[0].ProcNum!=0) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 50 that is unallocated. \r\n");
+			}
+			retVal+="43: Passed.  PaySplitManager made one unallocated split due to there being no charges to pay. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtyFour(int specificTest) {
+			if(specificTest != 0 && specificTest != 44) {
+				return "";
+			}
+			string suffix="44";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",40,DateTime.Now.AddDays(-1));
+			Payment payment2=new Payment();
+			payment2.PatNum=patNum;
+			payment2.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment2.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment2;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=-50;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain no paysplits since it doesn't make sense to create negative payments when there are outstanding charges.
+			if(FormPSM.ListSplitsCur.Count!=0) {
+				throw new Exception("PaySplitManager created paysplits when it shouldn't have. \r\n");
+			}
+			retVal+="44: Passed.  PaySplitManager didn't make a paysplit when there were outstanding charges and the entered amount was negative. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtyFive(int specificTest) {
+			if(specificTest != 0 && specificTest != 45) {
+				return "";
+			}
+			string suffix="45";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",40,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.C,"",60,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",80,DateTime.Now.AddDays(-3));
+			Adjustment adjustment=new Adjustment();
+			adjustment.AdjAmt=-40;
+			adjustment.ProcNum=procedure2.ProcNum;
+			adjustment.PatNum=patNum;
+			adjustment.ProcDate=DateTime.Now.AddDays(-2);
+			Adjustments.Insert(adjustment);
+			Payment payment=new Payment();
+			payment.PayAmt=100;
+			payment.PayDate=DateTime.Now.AddDays(-2);
+			payment.IsSplit=true;
+			payment.PatNum=patNum;
+			payment.PayNum=Payments.Insert(payment);
+			PaySplit paySplit=new PaySplit();
+			paySplit.PayNum=payment.PayNum;
+			paySplit.SplitAmt=100;
+			paySplit.PatNum=patNum;
+			paySplit.ProcNum=procedure3.ProcNum;
+			paySplit.DatePay=payment.PayDate;
+			PaySplits.Insert(paySplit);
+			Payment payment2=new Payment();
+			payment2.PatNum=patNum;
+			payment2.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment2.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment2;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=50;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain one paysplit worth 40 and not attached to the D1110 procedure.
+			if(FormPSM.ListSplitsCur.Count!=1) {
+				throw new Exception("PaySplitManager didn't create the correct number of paysplits. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=40 || FormPSM.ListSplitsCur[0].ProcNum!=procedure1.ProcNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D1110 procedure. \r\n");
+			}
+			retVal+="45: Passed.  PaySplitManager made one split for the correct procedure with historical overpayments and adjustments. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtySix(int specificTest) {
+			if(specificTest != 0 && specificTest != 46) {
+				return "";
+			}
+			string suffix="46";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",-40,DateTime.Now.AddDays(-1));
+			Payment payment2=new Payment();
+			payment2.PatNum=patNum;
+			payment2.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment2.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment2;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=-50;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain one paysplit for the amount passed in that is unallocated.
+			if(FormPSM.ListSplitsCur.Count!=1) {
+				throw new Exception("PaySplitManager created incorrect number of splits. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=-50 || FormPSM.ListSplitsCur[0].ProcNum!=0) {
+				throw new Exception("PaySplitManager should have created a split for -50 that was unallocated. \r\n");
+			}
+			retVal+="46: Passed.  PaySplitManager created unallocated split with negative amount. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtySeven(int specificTest) {
+			if(specificTest != 0 && specificTest != 47) {
+				return "";
+			}
+			string suffix="47";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Patient patOld=PatientT.CreatePatient(suffix+"fam");
+			Patient pat2=patOld.Copy();
+			long patNum=pat.PatNum;
+			pat2.Guarantor=patNum;
+			Patients.Update(pat2,patOld);
+			long patNum2=pat2.PatNum;
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",50,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat2,"D0120",ProcStat.C,"",40,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",60,DateTime.Now.AddDays(-3));
+			Payment payment=new Payment();
+			payment.PatNum=patNum;
+			payment.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=150;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;		
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			if(FormPSM.ListSplitsCur.Count!=3) {
+				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=60 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum || FormPSM.ListSplitsCur[0].PatNum!=patNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 50 for the D0220 procedure attached to Pat1. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[1].SplitAmt!=40 || FormPSM.ListSplitsCur[1].ProcNum!=procedure2.ProcNum || FormPSM.ListSplitsCur[1].PatNum!=patNum2) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D0120 procedure attached to Pat2. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[2].SplitAmt!=50 || FormPSM.ListSplitsCur[2].ProcNum!=procedure1.ProcNum || FormPSM.ListSplitsCur[2].PatNum!=patNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 60 for the D1110 procedure attached to Pat1. \r\n");
+			}
+			retVal+="47: Passed.  PaySplitManager created and associated pay splits to the proper procedures within a family. \r\n";
+			return retVal;
+		}
+			
 	}
 }

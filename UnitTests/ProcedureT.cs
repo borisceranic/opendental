@@ -6,11 +6,16 @@ using OpenDentBusiness;
 namespace UnitTests {
 	public class ProcedureT {
 		/// <summary>Returns the proc</summary>
-		public static Procedure CreateProcedure(Patient pat,string procCodeStr,ProcStat procStatus,string toothNum,double procFee){
+		public static Procedure CreateProcedure(Patient pat,string procCodeStr,ProcStat procStatus,string toothNum,double procFee) {
+			return CreateProcedure(pat,procCodeStr,procStatus,toothNum,procFee,DateTime.Today);
+		}
+
+		/// <summary>Returns the proc</summary>
+		public static Procedure CreateProcedure(Patient pat,string procCodeStr,ProcStat procStatus,string toothNum,double procFee,DateTime procDate){
 			Procedure proc=new Procedure();
 			proc.CodeNum=ProcedureCodes.GetCodeNum(procCodeStr);
 			proc.PatNum=pat.PatNum;
-			proc.ProcDate=DateTime.Today;
+			proc.ProcDate=procDate;
 			proc.ProcStatus=procStatus;
 			proc.ProvNum=pat.PriProv;
 			proc.ProcFee=procFee;
