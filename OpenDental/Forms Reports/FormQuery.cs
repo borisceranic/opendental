@@ -1161,7 +1161,7 @@ namespace OpenDental{
 		}
 
 		private void butPrint_Click(object sender, System.EventArgs e) {
-			if(report.TableQ==null){
+			if(report==null || report.TableQ==null) {
 				MessageBox.Show(Lan.g(this,"Please run query first"));
 				return;
 			}
@@ -1172,7 +1172,7 @@ namespace OpenDental{
 		}
 
 		private void butPrintPreview_Click(object sender, System.EventArgs e) {
-			if(report.TableQ==null){
+			if(report==null || report.TableQ==null) {
 				MessageBox.Show(Lan.g(this,"Please run query first"));
 				return;
 			}
