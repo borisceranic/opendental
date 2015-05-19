@@ -46,16 +46,19 @@ namespace OpenDentBusiness.Crud{
 			SmsFromMobile smsFromMobile;
 			for(int i=0;i<table.Rows.Count;i++) {
 				smsFromMobile=new SmsFromMobile();
-				smsFromMobile.SmsFromMobileNum= PIn.Long  (table.Rows[i]["SmsFromMobileNum"].ToString());
-				smsFromMobile.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				smsFromMobile.ClinicNum       = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				smsFromMobile.CommlogNum      = PIn.Long  (table.Rows[i]["CommlogNum"].ToString());
-				smsFromMobile.MsgText         = PIn.String(table.Rows[i]["MsgText"].ToString());
-				smsFromMobile.DateTimeReceived= PIn.DateT (table.Rows[i]["DateTimeReceived"].ToString());
-				smsFromMobile.SmsPhoneNumber  = PIn.String(table.Rows[i]["SmsPhoneNumber"].ToString());
-				smsFromMobile.MsgPart         = PIn.String(table.Rows[i]["MsgPart"].ToString());
-				smsFromMobile.MsgTotal        = PIn.String(table.Rows[i]["MsgTotal"].ToString());
-				smsFromMobile.MsgRefID        = PIn.String(table.Rows[i]["MsgRefID"].ToString());
+				smsFromMobile.SmsFromMobileNum = PIn.Long  (table.Rows[i]["SmsFromMobileNum"].ToString());
+				smsFromMobile.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
+				smsFromMobile.ClinicNum        = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				smsFromMobile.CommlogNum       = PIn.Long  (table.Rows[i]["CommlogNum"].ToString());
+				smsFromMobile.MsgText          = PIn.String(table.Rows[i]["MsgText"].ToString());
+				smsFromMobile.DateTimeReceived = PIn.DateT (table.Rows[i]["DateTimeReceived"].ToString());
+				smsFromMobile.SmsPhoneNumber   = PIn.String(table.Rows[i]["SmsPhoneNumber"].ToString());
+				smsFromMobile.MobilePhoneNumber= PIn.String(table.Rows[i]["MobilePhoneNumber"].ToString());
+				smsFromMobile.MsgPart          = PIn.Int   (table.Rows[i]["MsgPart"].ToString());
+				smsFromMobile.MsgTotal         = PIn.Int   (table.Rows[i]["MsgTotal"].ToString());
+				smsFromMobile.MsgRefID         = PIn.String(table.Rows[i]["MsgRefID"].ToString());
+				smsFromMobile.IsRead           = PIn.Bool  (table.Rows[i]["IsRead"].ToString());
+				smsFromMobile.Flags            = PIn.String(table.Rows[i]["Flags"].ToString());
 				retVal.Add(smsFromMobile);
 			}
 			return retVal;
@@ -96,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsFromMobileNum,";
 			}
-			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MsgPart,MsgTotal,MsgRefID) VALUES(";
+			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,IsRead,Flags) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsFromMobile.SmsFromMobileNum)+",";
 			}
@@ -107,9 +110,12 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.ParamChar+"paramMsgText,"
 				+    POut.DateT (smsFromMobile.DateTimeReceived)+","
 				+"'"+POut.String(smsFromMobile.SmsPhoneNumber)+"',"
-				+"'"+POut.String(smsFromMobile.MsgPart)+"',"
-				+"'"+POut.String(smsFromMobile.MsgTotal)+"',"
-				+"'"+POut.String(smsFromMobile.MsgRefID)+"')";
+				+"'"+POut.String(smsFromMobile.MobilePhoneNumber)+"',"
+				+    POut.Int   (smsFromMobile.MsgPart)+","
+				+    POut.Int   (smsFromMobile.MsgTotal)+","
+				+"'"+POut.String(smsFromMobile.MsgRefID)+"',"
+				+    POut.Bool  (smsFromMobile.IsRead)+","
+				+"'"+POut.String(smsFromMobile.Flags)+"')";
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
 			}
@@ -126,15 +132,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one SmsFromMobile in the database.</summary>
 		public static void Update(SmsFromMobile smsFromMobile){
 			string command="UPDATE smsfrommobile SET "
-				+"PatNum          =  "+POut.Long  (smsFromMobile.PatNum)+", "
-				+"ClinicNum       =  "+POut.Long  (smsFromMobile.ClinicNum)+", "
-				+"CommlogNum      =  "+POut.Long  (smsFromMobile.CommlogNum)+", "
-				+"MsgText         =  "+DbHelper.ParamChar+"paramMsgText, "
-				+"DateTimeReceived=  "+POut.DateT (smsFromMobile.DateTimeReceived)+", "
-				+"SmsPhoneNumber  = '"+POut.String(smsFromMobile.SmsPhoneNumber)+"', "
-				+"MsgPart         = '"+POut.String(smsFromMobile.MsgPart)+"', "
-				+"MsgTotal        = '"+POut.String(smsFromMobile.MsgTotal)+"', "
-				+"MsgRefID        = '"+POut.String(smsFromMobile.MsgRefID)+"' "
+				+"PatNum           =  "+POut.Long  (smsFromMobile.PatNum)+", "
+				+"ClinicNum        =  "+POut.Long  (smsFromMobile.ClinicNum)+", "
+				+"CommlogNum       =  "+POut.Long  (smsFromMobile.CommlogNum)+", "
+				+"MsgText          =  "+DbHelper.ParamChar+"paramMsgText, "
+				+"DateTimeReceived =  "+POut.DateT (smsFromMobile.DateTimeReceived)+", "
+				+"SmsPhoneNumber   = '"+POut.String(smsFromMobile.SmsPhoneNumber)+"', "
+				+"MobilePhoneNumber= '"+POut.String(smsFromMobile.MobilePhoneNumber)+"', "
+				+"MsgPart          =  "+POut.Int   (smsFromMobile.MsgPart)+", "
+				+"MsgTotal         =  "+POut.Int   (smsFromMobile.MsgTotal)+", "
+				+"MsgRefID         = '"+POut.String(smsFromMobile.MsgRefID)+"', "
+				+"IsRead           =  "+POut.Bool  (smsFromMobile.IsRead)+", "
+				+"Flags            = '"+POut.String(smsFromMobile.Flags)+"' "
 				+"WHERE SmsFromMobileNum = "+POut.Long(smsFromMobile.SmsFromMobileNum);
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
@@ -170,17 +179,29 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SmsPhoneNumber = '"+POut.String(smsFromMobile.SmsPhoneNumber)+"'";
 			}
+			if(smsFromMobile.MobilePhoneNumber != oldSmsFromMobile.MobilePhoneNumber) {
+				if(command!=""){ command+=",";}
+				command+="MobilePhoneNumber = '"+POut.String(smsFromMobile.MobilePhoneNumber)+"'";
+			}
 			if(smsFromMobile.MsgPart != oldSmsFromMobile.MsgPart) {
 				if(command!=""){ command+=",";}
-				command+="MsgPart = '"+POut.String(smsFromMobile.MsgPart)+"'";
+				command+="MsgPart = "+POut.Int(smsFromMobile.MsgPart)+"";
 			}
 			if(smsFromMobile.MsgTotal != oldSmsFromMobile.MsgTotal) {
 				if(command!=""){ command+=",";}
-				command+="MsgTotal = '"+POut.String(smsFromMobile.MsgTotal)+"'";
+				command+="MsgTotal = "+POut.Int(smsFromMobile.MsgTotal)+"";
 			}
 			if(smsFromMobile.MsgRefID != oldSmsFromMobile.MsgRefID) {
 				if(command!=""){ command+=",";}
 				command+="MsgRefID = '"+POut.String(smsFromMobile.MsgRefID)+"'";
+			}
+			if(smsFromMobile.IsRead != oldSmsFromMobile.IsRead) {
+				if(command!=""){ command+=",";}
+				command+="IsRead = "+POut.Bool(smsFromMobile.IsRead)+"";
+			}
+			if(smsFromMobile.Flags != oldSmsFromMobile.Flags) {
+				if(command!=""){ command+=",";}
+				command+="Flags = '"+POut.String(smsFromMobile.Flags)+"'";
 			}
 			if(command==""){
 				return false;

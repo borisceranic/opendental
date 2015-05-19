@@ -8357,9 +8357,12 @@ namespace OpenDentBusiness {
 						MsgText text NOT NULL,
 						DateTimeReceived datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						SmsPhoneNumber varchar(255) NOT NULL,
-						MsgPart varchar(255) NOT NULL,
-						MsgTotal varchar(255) NOT NULL,
+						MobilePhoneNumber varchar(255) NOT NULL,
+						MsgPart int NOT NULL,
+						MsgTotal int NOT NULL,
 						MsgRefID varchar(255) NOT NULL,
+						IsRead tinyint NOT NULL,
+						Flags varchar(255) NOT NULL,
 						INDEX(PatNum),
 						INDEX(ClinicNum),
 						INDEX(CommlogNum)
@@ -8377,9 +8380,12 @@ namespace OpenDentBusiness {
 						MsgText clob,
 						DateTimeReceived date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						SmsPhoneNumber varchar2(255),
-						MsgPart varchar2(255),
-						MsgTotal varchar2(255),
+						MobilePhoneNumber varchar2(255),
+						MsgPart number(11) NOT NULL,
+						MsgTotal number(11) NOT NULL,
 						MsgRefID varchar2(255),
+						IsRead number(3) NOT NULL,
+						Flags varchar2(255),
 						CONSTRAINT smsfrommobile_SmsFromMobileNum PRIMARY KEY (SmsFromMobileNum)
 						)";
 					Db.NonQ(command);
@@ -8429,7 +8435,7 @@ namespace OpenDentBusiness {
 						GuidMessage varchar(255) NOT NULL,
 						GuidBatch varchar(255) NOT NULL,
 						SmsPhoneNumber varchar(255) NOT NULL,
-						PhonePat varchar(255) NOT NULL,
+						MobilePhoneNumber varchar(255) NOT NULL,
 						IsTimeSensitive tinyint NOT NULL,
 						MsgType tinyint NOT NULL,
 						MsgText text NOT NULL,
@@ -8454,7 +8460,7 @@ namespace OpenDentBusiness {
 						GuidMessage varchar2(255),
 						GuidBatch varchar2(255),
 						SmsPhoneNumber varchar2(255),
-						PhonePat varchar2(255),
+						MobilePhoneNumber varchar2(255),
 						IsTimeSensitive number(3) NOT NULL,
 						MsgType number(3) NOT NULL,
 						MsgText clob,
@@ -8510,4 +8516,7 @@ namespace OpenDentBusiness {
 
 
 
+
+
+    
 
