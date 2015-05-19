@@ -265,8 +265,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),"+priKeyParam+@");
 				return;
 			}
-			string command= ""DELETE FROM "+tablename+@" WHERE "+priKeyName+@" = ""+POut.Long("+priKeyParam+@");
-			Db.NonQ(command);
+			Crud."+typeClassName+@"Crud.Delete("+priKeyParam+@");
 		}
 		*/
 
