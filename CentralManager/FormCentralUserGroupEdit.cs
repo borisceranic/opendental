@@ -14,7 +14,7 @@ namespace CentralManager {
 
 		public FormCentralUserGroupEdit(UserGroup userGroup) {
 			InitializeComponent();
-			_groupCur=userGroup.Copy();
+			_groupCur=userGroup;
 		}
 
 		private void FormCentralUserGroupEdit_Load(object sender,EventArgs e) {
