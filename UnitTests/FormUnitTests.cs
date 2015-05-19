@@ -487,6 +487,13 @@ namespace UnitTests {
 			catch(Exception ex) {
 				textResults.Text+="47: Failed. "+ex.Message;
 			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFourtyEight(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="48: Failed. "+ex.Message;
+			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
 		}

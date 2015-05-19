@@ -2655,6 +2655,53 @@ namespace UnitTests {
 			retVal+="47: Passed.  PaySplitManager created and associated pay splits to the proper procedures within a family. \r\n";
 			return retVal;
 		}
+
+		///<summary></summary>
+		public static string TestFourtyEight(int specificTest) {
+			if(specificTest != 0 && specificTest != 48) {
+				return "";
+			}
+			string suffix="48";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long patNum=pat.PatNum;
+			InsPlan insPlan=InsPlanT.CreateInsPlan(CarrierT.CreateCarrier(suffix).CarrierNum);
+			InsSub insSub=InsSubT.CreateInsSub(patNum,insPlan.PlanNum);			
+			PatPlan patPlan=PatPlanT.CreatePatPlan(1,patNum,insSub.InsSubNum);
+			Procedure procedure1=ProcedureT.CreateProcedure(pat,"D1110",ProcStat.C,"",50,DateTime.Now.AddDays(-1));
+			Procedure procedure2=ProcedureT.CreateProcedure(pat,"D0120",ProcStat.C,"",40,DateTime.Now.AddDays(-2));
+			Procedure procedure3=ProcedureT.CreateProcedure(pat,"D0220",ProcStat.C,"",60,DateTime.Now.AddDays(-3));
+			ClaimProcT.AddInsPaid(patNum,insPlan.PlanNum,procedure1.ProcNum,20,insSub.InsSubNum,0,0);
+			ClaimProcT.AddInsPaid(patNum,insPlan.PlanNum,procedure2.ProcNum,5,insSub.InsSubNum,5,0);
+			ClaimProcT.AddInsPaid(patNum,insPlan.PlanNum,procedure3.ProcNum,20,insSub.InsSubNum,0,10);
+			Payment payment=new Payment();
+			payment.PatNum=patNum;
+			payment.PayAmt=0;//Amount payment has when entering Payment window (New payments have 0)
+			payment.PayNum=0;
+			FormPaySplitManage FormPSM=new FormPaySplitManage();
+			FormPSM.ListSplitsCur=new List<PaySplit>();
+			FormPSM.PaymentCur=payment;
+			FormPSM.FamCur=Patients.GetFamily(patNum);
+			FormPSM.PaymentAmt=150;//Amount we want to use in the split manager.  May or may not be what the Payment Amount was upon entering the Payment window.
+			FormPSM.PatCur=pat;
+			FormPSM.Init(true);
+			string retVal="";
+			//Auto Splits will be in opposite order from least recent to most recent.
+			//ListSplitsCur should contain three splits
+			if(FormPSM.ListSplitsCur.Count!=3) {
+				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=30 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum || FormPSM.ListSplitsCur[0].PatNum!=patNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D0220 procedure attached to Pat1. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[1].SplitAmt!=35 || FormPSM.ListSplitsCur[1].ProcNum!=procedure2.ProcNum || FormPSM.ListSplitsCur[1].PatNum!=patNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 35 for the D0120 procedure attached to Pat1. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[2].SplitAmt!=30 || FormPSM.ListSplitsCur[2].ProcNum!=procedure1.ProcNum || FormPSM.ListSplitsCur[2].PatNum!=patNum) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D1110 procedure attached to Pat1. \r\n");
+			}
+			retVal+="48: Passed.  PaySplitManager created paysplits for procedures partially paid by claimprocs. \r\n";
+			return retVal;
+		}
 			
 	}
 }
