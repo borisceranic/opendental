@@ -14,6 +14,8 @@ namespace OpenDental.UI {
 		private LinearGradientBrush _brushHover;
 		private LinearGradientBrush _brushMedium;
 		private LinearGradientBrush _brushDark;
+		///<summary>The same orange color as the unread task notification color.</summary>
+		private static LinearGradientBrush _brushNotify=new LinearGradientBrush(new Point(0,0),new Point(0,25),Color.FromArgb(255,231,167),Color.FromArgb(252,178,129));
 		private Brush _brushTextFore;
 		private Brush _brushText;
 		private Brush _brushTextDisabled;
@@ -41,6 +43,12 @@ namespace OpenDental.UI {
 		public LinearGradientBrush BrushDark {
 			get {
 				return _brushDark;
+			}
+		}
+
+		public LinearGradientBrush BrushNotify {
+			get {
+				return _brushNotify;
 			}
 		}
 

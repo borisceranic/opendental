@@ -329,6 +329,8 @@ namespace OpenDental.UI{
 		}
 
 		private void DrawButton(Graphics g,ODToolBarButton button) {
+			const int dropDownWidth=15;//The width of the dropdown rectangle where the triangle shows.
+			bool isNotify=(button.Style==ODToolBarButtonStyle.DropDownButton && !String.IsNullOrWhiteSpace(button.NotificationText));//Notifies even when disabled.
 			ODPaintTools paintToolboxCur=_paintToolboxDefault;
 			if(button.IsRed) {
 				paintToolboxCur=_paintToolboxError;
@@ -378,6 +380,10 @@ namespace OpenDental.UI{
 						,new Rectangle(button.Bounds.X+button.Bounds.Width-15,button.Bounds.Y
 						,15,button.Bounds.Height));
 					break;
+			}
+			if(isNotify) {//Override dropdown background to show notification color.
+				Rectangle rectDropDown=new Rectangle(button.Bounds.X+button.Bounds.Width-dropDownWidth,button.Bounds.Y,dropDownWidth,button.Bounds.Height);
+				g.FillRectangle(paintToolboxCur.BrushNotify,rectDropDown);//Fill the dropdown background area with the notification color.
 			}
 			//draw image and/or text
 			//Color textColor=ForeColor;
@@ -478,13 +484,21 @@ namespace OpenDental.UI{
 					break;
 			}
 			if(button.Style==ODToolBarButtonStyle.DropDownButton){
+				int adjDown=0;//The distance to push the triangle down to show the notification text.
+				if(isNotify) {
+					adjDown=6;
+					//Draw the notification text.
+					Size sizeText=TextRenderer.MeasureText(button.NotificationText,Font);
+					g.DrawString(button.NotificationText,Font,(button.Enabled?paintToolboxCur.BrushTextFore:paintToolboxCur.BrushTextDisabled),
+						button.Bounds.X+button.Bounds.Width+1-(dropDownWidth+sizeText.Width)/2f,button.Bounds.Y+2+sizeText.Height/2f,format);
+				}
 				Point[] triangle=new Point[3];
 				triangle[0]=new Point(button.Bounds.X+button.Bounds.Width-11
-					,button.Bounds.Y+button.Bounds.Height/2-2);
+					,button.Bounds.Y+button.Bounds.Height/2-2+adjDown);
 				triangle[1]=new Point(button.Bounds.X+button.Bounds.Width-4
-					,button.Bounds.Y+button.Bounds.Height/2-2);
+					,button.Bounds.Y+button.Bounds.Height/2-2+adjDown);
 				triangle[2]=new Point(button.Bounds.X+button.Bounds.Width-8
-					,button.Bounds.Y+button.Bounds.Height/2+2);
+					,button.Bounds.Y+button.Bounds.Height/2+2+adjDown);
 				if(button.Enabled) {
 					g.FillPolygon(paintToolboxCur.BrushTextFore,triangle);
 				}

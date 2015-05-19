@@ -328,6 +328,9 @@ namespace OpenDental{
 		private ODThread _odThreadEServices;
 		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
 		private Color COLOR_ESERVICE_ALERT_BACKGROUND=Color.OrangeRed;
+		private ContextMenu menuText;
+		private MenuItem menuItemTextMessagesReceived;
+		private MenuItem menuItemTextMessagesSent;
 		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
 		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
 
@@ -615,6 +618,9 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
+			this.menuText = new System.Windows.Forms.ContextMenu();
+			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
+			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -1881,6 +1887,22 @@ namespace OpenDental{
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
 			// 
+			// menuText
+			// 
+			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemTextMessagesReceived,
+            this.menuItemTextMessagesSent});
+			// 
+			// menuItemTextMessagesReceived
+			// 
+			this.menuItemTextMessagesReceived.Index = 0;
+			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
+			// 
+			// menuItemTextMessagesSent
+			// 
+			this.menuItemTextMessagesSent.Index = 1;
+			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
+			// 
 			// FormOpenDental
 			// 
 			this.ClientSize = new System.Drawing.Size(982, 466);
@@ -2843,7 +2865,10 @@ namespace OpenDental{
 				button=new ODToolBarButton(Lan.g(this,"WebMail"),2,Lan.g(this,"Secure WebMail"),"WebMail");
 				button.Enabled=true;//Always enabled.  If the patient does not have an email address, then the user will be blocked from the FormWebMailMessageEdit window.
 				ToolBarMain.Buttons.Add(button);
-				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Text"),5,Lan.g(this,"Send Text Message"),"Text"));
+				button=new ODToolBarButton(Lan.g(this,"Text"),5,Lan.g(this,"Send Text Message"),"Text");
+				button.Style=ODToolBarButtonStyle.DropDownButton;
+				button.DropDownMenu=menuText;
+				ToolBarMain.Buttons.Add(button);
 				button=new ODToolBarButton(Lan.g(this,"Letter"),-1,Lan.g(this,"Quick Letter"),"Letter");
 				button.Style=ODToolBarButtonStyle.DropDownButton;
 				button.DropDownMenu=menuLetter;
@@ -2988,16 +3013,11 @@ namespace OpenDental{
 					else {
 						ToolBarMain.Buttons["Email"].Enabled=false;
 					}
-					if(pat.WirelessPhone=="" || !Programs.IsEnabled(ProgramName.CallFire)) {
-						ToolBarMain.Buttons["Text"].Enabled=false;
+					if(Programs.IsEnabled(ProgramName.CallFire)) {//TODO: Also enable for NEXMO.
+						ToolBarMain.Buttons["Text"].Enabled=true;
 					}
-					else {//Pat has a wireless phone number and CallFire is enabled
-						if(pat.TxtMsgOk==YN.Unknown) {
-							ToolBarMain.Buttons["Text"].Enabled=!PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);//Not enabled since TxtMsgOk is ?? and "Treat ?? As No" is true.
-						}
-						else {
-							ToolBarMain.Buttons["Text"].Enabled=(pat.TxtMsgOk==YN.Yes);
-						}
+					else {
+						ToolBarMain.Buttons["Text"].Enabled=false;
 					}
 					ToolBarMain.Buttons["Letter"].Enabled=true;
 					ToolBarMain.Buttons["Form"].Enabled=true;
@@ -3404,8 +3424,17 @@ namespace OpenDental{
 		}
 
 		private void OnTxtMsg_Click() {
-			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();
 			Patient pat=Patients.GetPat(CurPatNum);
+			if(pat.TxtMsgOk==YN.No) {
+				MsgBox.Show(this,"This patient does not want to receive text messages.");
+				return;
+			}
+			if(pat.TxtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)) {
+				MsgBox.Show(this,"This patient might not want to receive text messages. "
+					+"Change Text OK in the Edit Patient Information window if the patient wants to receive text messages.");
+				return;
+			}
+			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();			
 			FormTME.PatNum=CurPatNum;
 			FormTME.WirelessPhone=pat.WirelessPhone;
 			FormTME.TxtMsgOk=pat.TxtMsgOk;
