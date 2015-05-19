@@ -23,10 +23,10 @@ namespace CentralManager {
 				}
 			}
 			if(centralConnection.OdUser!="") {
-				args+="UserName=\""+centralConnection.OdUser+"\" ";
+				args+="UserName=\""+Security.CurUser.UserName+"\" ";
 			}
 			if(centralConnection.OdPassword!="") {
-				args+="OdPassword=\""+CentralConnections.Decrypt(centralConnection.OdPassword,FormCentralManager.EncryptionKey)+"\" ";
+				args+="OdPassword=\""+Security.PasswordTyped+"\" ";
 			}
 			return args;
 		}

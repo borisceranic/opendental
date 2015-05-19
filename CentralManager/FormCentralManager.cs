@@ -41,21 +41,22 @@ namespace CentralManager {
 				Application.Exit();
 				return;
 			}
-			if(PrefC.GetString(PrefName.CentralManagerPassHash)!=""){
-				FormCentralPasswordCheck FormCPC=new FormCentralPasswordCheck();
-				FormCPC.ShowDialog();
-				if(FormCPC.DialogResult!=DialogResult.OK){
-					Application.Exit();
-					return;
-				}
+			FormCentralLogOn FormCLO=new FormCentralLogOn();
+			if(FormCLO.ShowDialog()!=DialogResult.OK) {
+				Application.Exit();
+				return;
 			}
+			this.Text+=" - "+Security.CurUser.UserName;
 			_listConnectionGroups=ConnectionGroups.GetListt();
 			comboConnectionGroups.Items.Clear();
 			comboConnectionGroups.Items.Add("All");
+			comboConnectionGroups.SelectedIndex=0;
 			for(int i=0;i<_listConnectionGroups.Count;i++) {
 				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
+				if(_listConnectionGroups[i].ConnectionGroupNum==PrefC.GetLong(PrefName.ConnGroupCEMT)) {
+					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
+				}
 			}
-			comboConnectionGroups.SelectedIndex=0;//Select 'All' on load.
 			FillGrid();
 		}
 
@@ -165,12 +166,8 @@ namespace CentralManager {
 				return;
 			}
 			//od username and password always allowed
-			if(_listConns[e.Row].OdUser!="") {
-				args+="UserName=\""+_listConns[e.Row].OdUser+"\" ";
-			}
-			if(_listConns[e.Row].OdPassword!="") {
-				args+="OdPassword=\""+CentralConnections.Decrypt(_listConns[e.Row].OdPassword,EncryptionKey)+"\" ";
-			}
+			args+="UserName=\""+Security.CurUser.UserName+"\" ";
+			args+="OdPassword=\""+Security.PasswordTyped+"\" ";
 			#if DEBUG
 				Process.Start("C:\\Development\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
 			#else
@@ -183,6 +180,12 @@ namespace CentralManager {
 		}
 		
 		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboConnectionGroups.SelectedIndex==0) {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,0);
+			}
+			else {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1].ConnectionGroupNum);
+			}
 			FillGrid();
 		}
 
@@ -214,6 +217,12 @@ namespace CentralManager {
 					comboConnectionGroups.SelectedIndex=i+1;//Reselect the connection group that the user had before.
 				}
 			}
+			if(comboConnectionGroups.SelectedIndex==0) {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,0);
+			}
+			else {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1].ConnectionGroupNum);
+			}
 			FillGrid();
 		}
 
@@ -221,11 +230,6 @@ namespace CentralManager {
 			FormCentralSecurity FormCUS=new FormCentralSecurity();
 			FormCUS.ShowDialog();
 			GetConfigAndConnect();
-		}
-
-		private void menuPassword_Click(object sender,EventArgs e) {
-			FormCentralPasswordChange FormCPC=new FormCentralPasswordChange();
-			FormCPC.ShowDialog();
 		}
 
 		#endregion
@@ -250,6 +254,24 @@ namespace CentralManager {
 
 		#endregion
 
+		private void menuItemLogoff_Click(object sender,EventArgs e) {
+			FormCentralLogOn FormCLO=new FormCentralLogOn();
+			if(FormCLO.ShowDialog()!=DialogResult.OK) {
+				Application.Exit();
+				return;
+			}
+			this.Text="Central Manager - "+Security.CurUser.UserName;
+		}
+		
+		private void menuItemPassword_Click(object sender,EventArgs e) {
+			FormCentralUserPasswordEdit FormCPE=new FormCentralUserPasswordEdit(false,Security.CurUser.UserName);
+			if(FormCPE.ShowDialog()==DialogResult.Cancel){
+				return;
+			}
+			Security.CurUser.Password=FormCPE.HashedResult;
+			Userods.Update(Security.CurUser);
+		}
+
 		private void butSearch_Click(object sender,EventArgs e) {
 			if(gridMain.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"Please select at least one connection to search first.");
@@ -268,7 +290,6 @@ namespace CentralManager {
 			ODThread.QuitSyncAllOdThreads();
 		}
 
-		
 		
 	}
 }

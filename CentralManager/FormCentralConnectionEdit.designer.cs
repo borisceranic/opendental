@@ -27,10 +27,6 @@ namespace CentralManager{
 			this.butCancel = new System.Windows.Forms.Button();
 			this.textServiceURI = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
-			this.textOdUser = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.textOdPassword = new System.Windows.Forms.TextBox();
-			this.label3 = new System.Windows.Forms.Label();
 			this.butDelete = new System.Windows.Forms.Button();
 			this.textServerName = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -48,17 +44,14 @@ namespace CentralManager{
 			this.label9 = new System.Windows.Forms.Label();
 			this.textItemOrder = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.label11 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
-			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butOK
 			// 
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Location = new System.Drawing.Point(520, 494);
+			this.butOK.Location = new System.Drawing.Point(520, 365);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 5;
@@ -68,7 +61,7 @@ namespace CentralManager{
 			// butCancel
 			// 
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Location = new System.Drawing.Point(601, 494);
+			this.butCancel.Location = new System.Drawing.Point(601, 365);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -92,45 +85,11 @@ namespace CentralManager{
 			this.label2.Text = "Remote URI";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textOdUser
-			// 
-			this.textOdUser.Location = new System.Drawing.Point(120, 59);
-			this.textOdUser.Name = "textOdUser";
-			this.textOdUser.Size = new System.Drawing.Size(165, 20);
-			this.textOdUser.TabIndex = 0;
-			// 
-			// label1
-			// 
-			this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label1.Location = new System.Drawing.Point(6, 62);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(111, 17);
-			this.label1.TabIndex = 202;
-			this.label1.Text = "OD User Name";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textOdPassword
-			// 
-			this.textOdPassword.Location = new System.Drawing.Point(120, 85);
-			this.textOdPassword.Name = "textOdPassword";
-			this.textOdPassword.Size = new System.Drawing.Size(165, 20);
-			this.textOdPassword.TabIndex = 1;
-			// 
-			// label3
-			// 
-			this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label3.Location = new System.Drawing.Point(6, 88);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(111, 17);
-			this.label3.TabIndex = 204;
-			this.label3.Text = "OD Password";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// butDelete
 			// 
 			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(13, 494);
+			this.butDelete.Location = new System.Drawing.Point(13, 365);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 205;
@@ -249,7 +208,7 @@ namespace CentralManager{
 			// label8
 			// 
 			this.label8.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label8.Location = new System.Drawing.Point(21, 382);
+			this.label8.Location = new System.Drawing.Point(21, 254);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(111, 17);
 			this.label8.TabIndex = 217;
@@ -258,7 +217,7 @@ namespace CentralManager{
 			// 
 			// textNote
 			// 
-			this.textNote.Location = new System.Drawing.Point(135, 405);
+			this.textNote.Location = new System.Drawing.Point(135, 277);
 			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
 			this.textNote.Size = new System.Drawing.Size(368, 61);
@@ -267,7 +226,7 @@ namespace CentralManager{
 			// label9
 			// 
 			this.label9.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label9.Location = new System.Drawing.Point(21, 408);
+			this.label9.Location = new System.Drawing.Point(21, 280);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(111, 17);
 			this.label9.TabIndex = 219;
@@ -276,7 +235,7 @@ namespace CentralManager{
 			// 
 			// textItemOrder
 			// 
-			this.textItemOrder.Location = new System.Drawing.Point(135, 379);
+			this.textItemOrder.Location = new System.Drawing.Point(135, 251);
 			this.textItemOrder.Name = "textItemOrder";
 			this.textItemOrder.Size = new System.Drawing.Size(57, 20);
 			this.textItemOrder.TabIndex = 3;
@@ -291,34 +250,10 @@ namespace CentralManager{
 			this.label10.Text = "OR (but not both)";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.label11);
-			this.groupBox3.Controls.Add(this.textOdUser);
-			this.groupBox3.Controls.Add(this.label3);
-			this.groupBox3.Controls.Add(this.textOdPassword);
-			this.groupBox3.Controls.Add(this.label1);
-			this.groupBox3.Location = new System.Drawing.Point(15, 251);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(341, 119);
-			this.groupBox3.TabIndex = 2;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Open Dental Credentials";
-			// 
-			// label11
-			// 
-			this.label11.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label11.Location = new System.Drawing.Point(48, 21);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(238, 32);
-			this.label11.TabIndex = 218;
-			this.label11.Text = "Required if using Middle Tier connection.  Optional for direct connection.";
-			// 
 			// FormCentralConnectionEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(688, 530);
-			this.Controls.Add(this.groupBox3);
+			this.ClientSize = new System.Drawing.Size(688, 401);
 			this.Controls.Add(this.label10);
 			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.label9);
@@ -337,8 +272,6 @@ namespace CentralManager{
 			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
-			this.groupBox3.ResumeLayout(false);
-			this.groupBox3.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -350,10 +283,6 @@ namespace CentralManager{
 		private System.Windows.Forms.Button butCancel;
 		private System.Windows.Forms.TextBox textServiceURI;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.TextBox textOdUser;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textOdPassword;
-		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Button butDelete;
 		private System.Windows.Forms.TextBox textServerName;
 		private System.Windows.Forms.Label label4;
@@ -370,8 +299,6 @@ namespace CentralManager{
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.TextBox textItemOrder;
 		private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.GroupBox groupBox3;
-		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.CheckBox checkWebServiceIsEcw;
 	}
 }

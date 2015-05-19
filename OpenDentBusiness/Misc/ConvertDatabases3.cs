@@ -8479,7 +8479,15 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX smstomobile_ClinicNum ON smstomobile (ClinicNum)";
 					Db.NonQ(command);
 				}
-
+				//Creating connection group preference for CEMT
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ConnGroupCEMT','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ConnGroupCEMT','0')";
+					Db.NonQ(command);
+				}
 
 
 

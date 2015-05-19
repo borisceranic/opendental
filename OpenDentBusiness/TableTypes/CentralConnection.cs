@@ -19,9 +19,9 @@ namespace OpenDentBusiness{
 		public string MySqlPassword;
 		///<summary>If connecting to the web service. Can be on VPN, or can be over https.</summary>
 		public string ServiceURI;
-		///<summary>If connecting to the web service.</summary>
+		///<summary>Deprecated.  If connecting to the web service.</summary>
 		public string OdUser;
-		///<summary>If connecting to the web service.  Symmetrically encrypted.</summary>
+		///<summary>Deprecated.  If connecting to the web service.  Symmetrically encrypted.</summary>
 		public string OdPassword;
 		///<summary>.</summary>
 		public string Note;

@@ -44,7 +44,8 @@ namespace CentralManager {
 				}
 			}
 			if(textPassword.Text==""){
-				HashedResult="";
+				MessageBox.Show(this,"Passwords cannot be blank.");
+				return;
 			}
 			else{
 				HashedResult=Userods.EncryptPassword(textPassword.Text);

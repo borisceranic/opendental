@@ -27,10 +27,12 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.textSearch = new System.Windows.Forms.TextBox();
 			this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
+			this.menuItemLogoff = new System.Windows.Forms.MenuItem();
+			this.menuItemFile = new System.Windows.Forms.MenuItem();
+			this.menuItemPassword = new System.Windows.Forms.MenuItem();
 			this.menuItemSetup = new System.Windows.Forms.MenuItem();
 			this.menuItemConnections = new System.Windows.Forms.MenuItem();
 			this.menuItemGroups = new System.Windows.Forms.MenuItem();
-			this.menuItemPassword = new System.Windows.Forms.MenuItem();
 			this.menuItemUsers = new System.Windows.Forms.MenuItem();
 			this.menuItemReports = new System.Windows.Forms.MenuItem();
 			this.menuItemAnnualPI = new System.Windows.Forms.MenuItem();
@@ -61,16 +63,36 @@
 			// mainMenu
 			// 
 			this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemLogoff,
+            this.menuItemFile,
             this.menuItemSetup,
             this.menuItemReports});
 			// 
+			// menuItemLogoff
+			// 
+			this.menuItemLogoff.Index = 0;
+			this.menuItemLogoff.Text = "Logoff";
+			this.menuItemLogoff.Click += new System.EventHandler(this.menuItemLogoff_Click);
+			// 
+			// menuItemFile
+			// 
+			this.menuItemFile.Index = 1;
+			this.menuItemFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemPassword});
+			this.menuItemFile.Text = "File";
+			// 
+			// menuItemPassword
+			// 
+			this.menuItemPassword.Index = 0;
+			this.menuItemPassword.Text = "Change Password";
+			this.menuItemPassword.Click += new System.EventHandler(this.menuItemPassword_Click);
+			// 
 			// menuItemSetup
 			// 
-			this.menuItemSetup.Index = 0;
+			this.menuItemSetup.Index = 2;
 			this.menuItemSetup.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemConnections,
             this.menuItemGroups,
-            this.menuItemPassword,
             this.menuItemUsers});
 			this.menuItemSetup.Text = "Setup";
 			// 
@@ -86,21 +108,15 @@
 			this.menuItemGroups.Text = "Groups";
 			this.menuItemGroups.Click += new System.EventHandler(this.menuGroups_Click);
 			// 
-			// menuItemPassword
-			// 
-			this.menuItemPassword.Index = 2;
-			this.menuItemPassword.Text = "Password";
-			this.menuItemPassword.Click += new System.EventHandler(this.menuPassword_Click);
-			// 
 			// menuItemUsers
 			// 
-			this.menuItemUsers.Index = 3;
-			this.menuItemUsers.Text = "Users";
+			this.menuItemUsers.Index = 2;
+			this.menuItemUsers.Text = "Security";
 			this.menuItemUsers.Click += new System.EventHandler(this.menuUserEdit_Click);
 			// 
 			// menuItemReports
 			// 
-			this.menuItemReports.Index = 1;
+			this.menuItemReports.Index = 3;
 			this.menuItemReports.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemAnnualPI});
 			this.menuItemReports.Text = "Reports";
@@ -189,7 +205,6 @@
 		private System.Windows.Forms.MainMenu mainMenu;
 		private System.Windows.Forms.MenuItem menuItemSetup;
 		private System.Windows.Forms.MenuItem menuItemReports;
-		private System.Windows.Forms.MenuItem menuItemPassword;
 		private System.Windows.Forms.MenuItem menuItemConnections;
 		private System.Windows.Forms.MenuItem menuItemUsers;
 		private System.Windows.Forms.MenuItem menuItemAnnualPI;
@@ -197,6 +212,9 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox comboConnectionGroups;
 		private System.Windows.Forms.Button butSearch;
+		private System.Windows.Forms.MenuItem menuItemLogoff;
+		private System.Windows.Forms.MenuItem menuItemFile;
+		private System.Windows.Forms.MenuItem menuItemPassword;
 	}
 }
 

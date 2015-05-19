@@ -145,6 +145,9 @@
     <Compile Include="FormCentralSecurity.Designer.cs">
       <DependentUpon>FormCentralSecurity.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCentralLogOn.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormCentralConnectionGroupEdit.resx">
@@ -194,6 +197,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralSecurity.resx">
       <DependentUpon>FormCentralSecurity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralLogOn.resx">
+      <DependentUpon>FormCentralLogOn.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
