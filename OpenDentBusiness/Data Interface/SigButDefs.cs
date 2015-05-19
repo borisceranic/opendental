@@ -113,47 +113,26 @@ namespace OpenDentBusiness {
 			return hasChanges;
 		}
 
-
-		///<summary>Used in Setup.  The returned list also includes defaults if not overridden by one with a computername.  The supplied computer name can be blank for the default setup.</summary>
+		///<summary>Used in Setup.  The returned list also includes defaults.  The supplied computer name can be blank for the default setup.</summary>
 		public static SigButDef[] GetByComputer(string computerName) {
 			//No need to check RemotingRole; no call to db.
-			//first, get a default list, because we will always need that
-			ArrayList AL=new ArrayList();
-			for(int i=0;i<Listt.Length;i++) {
-				if(Listt[i].ComputerName=="") {
-					AL.Add(Listt[i]);
-				}
-			}
-			SigButDef[] defaultList=new SigButDef[AL.Count];
-			AL.CopyTo(defaultList);
-			if(computerName=="") {//if all we are interested in is the default list, then done.
-				return defaultList;
-			}
-			//for any other computer:
 			List<SigButDef> listSigButDefs=new List<SigButDef>();
 			for(int i=0;i<Listt.Length;i++) {
-				if(computerName==Listt[i].ComputerName) {
-					listSigButDefs.Add(Listt[i]);
+				if(Listt[i].ComputerName=="" || Listt[i].ComputerName==computerName) {
+					listSigButDefs.Add(Listt[i].Copy());
 				}
-			}
-			//but we are still missing some defaults
-			SigButDef matchingBut;
-			for(int i=0;i<defaultList.Length;i++) {
-				matchingBut=GetByIndex(defaultList[i].ButtonIndex,listSigButDefs);//retVal);
-				if(matchingBut!=null) {//There is a button for this computer which overrides the default, so don't add the default.
-					continue;
-				}
-				//AL.Add(defaultList[i]);
-				listSigButDefs.Add(defaultList[i]);
 			}
 			listSigButDefs.Sort(CompareButtonsByIndex);
-			SigButDef[] retVal=new SigButDef[listSigButDefs.Count];
-			listSigButDefs.CopyTo(retVal);
-			return retVal;
+			return listSigButDefs.ToArray();
 		}
 
 		private static int CompareButtonsByIndex(SigButDef x,SigButDef y) {
 			//No need to check RemotingRole; no call to db.
+			if(x.ButtonIndex==y.ButtonIndex && x.ComputerName!="" && y.ComputerName=="") {
+				//If two buttons have the same index and one of the buttons is a specific computer and the other is an "All" button, move the specific
+				//computer's button to the top position for its index, so that it will always show instead of the "All" button.
+				return -1;
+			}
 			return x.ButtonIndex.CompareTo(y.ButtonIndex);
 		}
 
@@ -168,8 +147,10 @@ namespace OpenDentBusiness {
 			int selectedIdx=-1;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
-					&& subList[i].ButtonIndex==selected.ButtonIndex-1)//and position occupied
+					&& subList[i].ButtonIndex==selected.ButtonIndex-1
+					&& (subList[i].ComputerName!="" || selected.ComputerName=="")) 
 				{
+					//We want to swap positions with the selected button, which happens if we are moving a default button or moving to a non-default button.
 					occupied=subList[i].Copy();
 					occupiedIdx=i;
 				}
@@ -178,14 +159,17 @@ namespace OpenDentBusiness {
 				}
 			}
 			if(occupied!=null) {
-				occupied.ButtonIndex++;
-				subList[occupiedIdx+1]=occupied;
-				//Update(occupied);
+				subList[occupiedIdx].ButtonIndex++;
 			}
-			selected.ButtonIndex--;
-			subList[selectedIdx]=selected;
-			//Update(selected);
-			return subList;
+			subList[selectedIdx].ButtonIndex--;
+			List<SigButDef> listSigButDefs=new List<SigButDef>();
+			for(int i=0;i<subList.Length;i++) {
+				listSigButDefs.Add(subList[i].Copy());
+			}
+			listSigButDefs.Sort(CompareButtonsByIndex);
+			SigButDef[] retVal=new SigButDef[listSigButDefs.Count];
+			listSigButDefs.CopyTo(retVal);
+			return retVal;
 		}
 
 		///<summary>Moves the selected item down in the supplied sub list.  Does not update the cache because the user could want to potentially move buttons around a lot.</summary>
@@ -199,8 +183,10 @@ namespace OpenDentBusiness {
 			SigButDef occupied=null;
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].SigButDefNum!=selected.SigButDefNum//if not the selected object
-					&& (subList[i].ButtonIndex==selected.ButtonIndex+1))//and position occupied
+					&& subList[i].ButtonIndex==selected.ButtonIndex+1 
+					&& (subList[i].ComputerName!="" || selected.ComputerName=="")) 
 				{
+					//We want to swap positions with the selected button, which happens if we are moving a default button or moving to a non-default button.
 					occupied=subList[i].Copy();
 					occupiedIdx=i;
 				}
@@ -209,14 +195,17 @@ namespace OpenDentBusiness {
 				}
 			}
 			if(occupied!=null) {
-				occupied.ButtonIndex--;
-				subList[occupiedIdx-1]=occupied;
-				//Update(occupied);
+				subList[occupiedIdx].ButtonIndex--;
 			}
-			selected.ButtonIndex++;
-			subList[selectedIdx]=selected;
-			//Update(selected);
-			return subList;
+			subList[selectedIdx].ButtonIndex++;
+			List<SigButDef> listSigButDefs=new List<SigButDef>();
+			for(int i=0;i<subList.Length;i++) {
+				listSigButDefs.Add(subList[i].Copy());
+			}
+			listSigButDefs.Sort(CompareButtonsByIndex);
+			SigButDef[] retVal=new SigButDef[listSigButDefs.Count];
+			listSigButDefs.CopyTo(retVal);
+			return retVal;
 		}
 
 		///<summary>Returns the SigButDef with the specified buttonIndex.  Used from the setup page.  The supplied list will already have been filtered by computername.  Supply buttonIndex in 0-based format.</summary>
@@ -224,6 +213,7 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<subList.Count;i++) {
 				if(subList[i].ButtonIndex==buttonIndex) {
+					//Will always return a specific computer's button over a default if there are 2 buttons with the same index.  See CompareButtonsByIndex.
 					return subList[i].Copy();
 				}
 			}
@@ -235,6 +225,7 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<subList.Length;i++) {
 				if(subList[i].ButtonIndex==buttonIndex) {
+					//Will always return a specific computer's button over a default if there are 2 buttons with the same index.  See CompareButtonsByIndex.
 					return subList[i].Copy();
 				}
 			}
