@@ -221,6 +221,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			Hashtable hlistCopy=Medications.GetHList();
 			for(int i=0;i<medList.Count;i++) {
 				row=new ODGridRow();
 				if(medList[i].MedicationNum==medList[i].GenericNum) {//isGeneric
@@ -229,7 +230,7 @@ namespace OpenDental{
 				}
 				else{
 					row.Cells.Add(medList[i].MedName);
-					row.Cells.Add(Medications.GetGenericName(medList[i].GenericNum));
+					row.Cells.Add(Medications.GetGenericName(medList[i].GenericNum,hlistCopy));
 				}
 				row.Cells.Add(medList[i].RxCui==0?"":medList[i].RxCui.ToString());
 				row.Cells.Add(medList[i].Notes);
