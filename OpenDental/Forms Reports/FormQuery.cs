@@ -68,6 +68,7 @@ namespace OpenDental{
 		private static Hashtable hListPlans;
 		private UserQuery UserQueryCur;//never gets used.  It's a holdover.
 		private static Dictionary<long,string> patientNames;
+		///<summary>Will be null if a query has not been ran.</summary>
 		private ReportSimpleGrid report;
 
 		///<summary>Can pass in null if not a report.</summary>
@@ -1161,7 +1162,7 @@ namespace OpenDental{
 		}
 
 		private void butPrint_Click(object sender, System.EventArgs e) {
-			if(report.TableQ==null){
+			if(report==null || report.TableQ==null) {
 				MessageBox.Show(Lan.g(this,"Please run query first"));
 				return;
 			}
@@ -1172,7 +1173,7 @@ namespace OpenDental{
 		}
 
 		private void butPrintPreview_Click(object sender, System.EventArgs e) {
-			if(report.TableQ==null){
+			if(report==null || report.TableQ==null) {
 				MessageBox.Show(Lan.g(this,"Please run query first"));
 				return;
 			}
