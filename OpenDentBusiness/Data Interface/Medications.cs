@@ -312,6 +312,16 @@ namespace OpenDentBusiness{
 			return ((Medication)hashMedications[genericNum]).MedName;
 		}
 
+		///<summary>Gets the generic medication name, given it's generic Num.  Will search through the passed in list before resorting to cache.</summary>
+		public static string GetGenericName(long genericNum,Hashtable hlist) {
+			//No need to check RemotingRole; no call to db.
+			if(!hlist.ContainsKey(genericNum)) {
+				//Medication not found.  Refresh the cache and check again.
+				return GetGenericName(genericNum);
+			}
+			return ((Medication)hlist[genericNum]).MedName;
+		}
+
 		public static List<long> GetChangedSinceMedicationNums(DateTime changedSince) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),changedSince);
