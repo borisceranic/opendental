@@ -1447,6 +1447,7 @@ namespace OpenDental{
 				Text="AptNum"+AptCur.AptNum;
 			#endif
 			Plugins.HookAddCode(this,"FormApptEdit.Load_End",pat,butText);
+			Plugins.HookAddCode(this,"FormApptEdit.Load_end2",AptCur);
 		}
 
 		///<summary>If an eCW program link is turned on, then this attaches completed procs with the same date as the appt.</summary>
@@ -1646,6 +1647,9 @@ namespace OpenDental{
 		}
 
 		private void butText_Click(object sender,EventArgs e) {
+			if(Plugins.HookMethod(this,"FormApptEdit.butText_Click_start",pat,AptCur,this)) {
+				return;
+			}
 			string message;
 			message=PrefC.GetString(PrefName.ConfirmTextMessage);
 			message=message.Replace("[NameF]",pat.GetNameFirst());
