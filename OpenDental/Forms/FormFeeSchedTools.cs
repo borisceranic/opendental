@@ -443,8 +443,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormFeeSchedTools_Load(object sender, System.EventArgs e) {
-			for(int i=0;i<FeeSchedC.ListShort.Count;i++){
-				comboCopyFrom.Items.Add(FeeSchedC.ListShort[i].Description);
+			List<FeeSched> listFeeSchedShort=FeeSchedC.GetListShort();
+			for(int i=0;i<listFeeSchedShort.Count;i++){
+				comboCopyFrom.Items.Add(listFeeSchedShort[i].Description);
 			}
 			if(!Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				butImportEcw.Visible=false;
@@ -473,15 +474,17 @@ namespace OpenDental{
 			//clear current
 			Fees.ClearFeeSched(SchedNum);
 			//copy any values over
-			Fees.CopyFees(FeeSchedC.ListShort[comboCopyFrom.SelectedIndex].FeeSchedNum,SchedNum);
-			for(int i=0;i<Fees.Listt.Count;i++) {
+			List<FeeSched> listFeeSchedShort=FeeSchedC.GetListShort();
+			Fees.CopyFees(listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum,SchedNum);
+			List<Fee> listFees=Fees.GetListt();
+			for(int i=0;i<listFees.Count;i++) {
 				//ignore all but the OLD fee schedule.
-				if(Fees.Listt[i].FeeSched!=FeeSchedC.ListShort[comboCopyFrom.SelectedIndex].FeeSchedNum) {
+				if(listFees[i].FeeSched!=listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum) {
 					continue;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(Fees.Listt[i].CodeNum)
-					+", "+Lan.g(this,"Fee")+": "+Fees.Listt[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(Fees.Listt[i].FeeSched)
-					+". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(FeeSchedC.ListShort[comboCopyFrom.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools."),Fees.Listt[i].CodeNum);
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
+					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched)
+					+". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools."),listFees[i].CodeNum);
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -516,17 +519,18 @@ namespace OpenDental{
 			}
 			Fees.Increase(SchedNum,percent,round);
 			Fees.RefreshCache();
-			for(int i=0;i<Fees.Listt.Count;i++) {
-				if(Fees.Listt[i].FeeSched!=SchedNum) {
+			List<Fee> listFees=Fees.GetListt();
+			for(int i=0;i<listFees.Count;i++) {
+				if(listFees[i].FeeSched!=SchedNum) {
 					continue;
 				}
-				if(Fees.Listt[i].Amount==0) {
+				if(listFees[i].Amount==0) {
 					continue;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(Fees.Listt[i].CodeNum)
-					+", "+Lan.g(this,"Fee")+": "+Fees.Listt[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(Fees.Listt[i].FeeSched)
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
+					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched)
 					+". "+Lan.g(this,"Fee increased by")+" "+((float)percent/100.0f).ToString("p")+" "+Lan.g(this," using the increase button in the Fee Tools window.")
-					,Fees.Listt[i].CodeNum);
+					,listFees[i].CodeNum);
 			}
 			DialogResult=DialogResult.OK;
 		}
