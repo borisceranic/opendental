@@ -151,6 +151,8 @@ namespace OpenDentBusiness {
 		ConfirmStatusTextMessaged,
 		///<summary>The message that goes out to patients when doing a batch confirmation.</summary>
 		ConfirmTextMessage,
+		///<summary>Selected connection group within the CEMT.</summary>
+		ConnGroupCEMT,
 		CoPay_FeeSchedule_BlankLikeZero,
 		///<summary>Boolean.  Typically set to true when an update is in progress and will be set to false when finished.  Otherwise true means that the database is in a corrupt state.</summary>
 		CorruptedDatabase,
