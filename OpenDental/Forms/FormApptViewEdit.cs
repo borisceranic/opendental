@@ -659,7 +659,9 @@ namespace OpenDental{
 			elementsAll.Add("HmPhone");
 			elementsAll.Add("InsToSend[!]");
 			elementsAll.Add("Insurance");
+			elementsAll.Add("IsLate[L]");
 			elementsAll.Add("Lab");
+			elementsAll.Add("LateColor");
 			elementsAll.Add("MedOrPremed[+]");
 			elementsAll.Add("MedUrgNote");
 			elementsAll.Add("Note");
@@ -1298,30 +1300,6 @@ namespace OpenDental{
 				ApptViews.Delete(ApptViewCur);
 			}
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
 	}
 }
 

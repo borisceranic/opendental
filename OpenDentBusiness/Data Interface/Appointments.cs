@@ -711,6 +711,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("aptLength");
 			table.Columns.Add("aptTime");
 			table.Columns.Add("AptDateTime");
+			table.Columns.Add("AptDateTimeArrived");
 			table.Columns.Add("AptNum");
 			table.Columns.Add("AptStatus");
 			table.Columns.Add("Assistant");
@@ -761,7 +762,8 @@ namespace OpenDentBusiness{
 			table.Columns.Add("wirelessPhone");
 			table.Columns.Add("writeoffPPO");
 			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
-				+"patient.ApptModNote patApptModNote,appointment.AppointmentTypeNum,appointment.AptDateTime apptAptDateTime,appointment.AptNum apptAptNum,appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
+				+"patient.ApptModNote patApptModNote,appointment.AppointmentTypeNum,appointment.AptDateTime apptAptDateTime,appointment.DateTimeArrived apptAptDateTimeArrived,appointment.AptNum apptAptNum,"
+			  +"appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
 				+"patient.BillingType patBillingType,patient.BirthDate patBirthDate,patient.DateTimeDeceased patDateTimeDeceased,"
 				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,"
 				+"patient.ChartNumber patChartNumber,patient.City patCity,appointment.ColorOverride apptColorOverride,appointment.Confirmed apptConfirmed,"
@@ -810,7 +812,7 @@ namespace OpenDentBusiness{
 			}
 			else {//Oracle
 				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
-				+"patient.ApptModNote,appointment.AppointmentTypeNum,AptDateTime,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
+				+"patient.ApptModNote,appointment.AppointmentTypeNum,AptDateTime,appointment.DateTimeArrived,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
 				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
 				+"carrier1.CarrierName,carrier2.CarrierName,"
 				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
@@ -967,6 +969,7 @@ namespace OpenDentBusiness{
 				}
 			}
 			DateTime aptDate;
+			DateTime aptDateArrived;
 			TimeSpan span;
 			int hours;
 			int minutes;
@@ -985,7 +988,9 @@ namespace OpenDentBusiness{
 					row["addrNote"]=Lans.g("Appointments","AddrNote: ")+raw.Rows[i]["patAddrNote"].ToString();
 				}
 				aptDate=PIn.DateT(raw.Rows[i]["apptAptDateTime"].ToString());
+				aptDateArrived=PIn.DateT(raw.Rows[i]["apptAptDateTimeArrived"].ToString());
 				row["AptDateTime"]=aptDate;
+				row["AptDateTimeArrived"]=aptDateArrived;
 				birthdate=PIn.Date(raw.Rows[i]["patBirthdate"].ToString());
 				DateTime dateTimeDeceased=PIn.Date(raw.Rows[i]["patDateTimeDeceased"].ToString());
 				DateTime dateTimeTo=DateTime.Now;

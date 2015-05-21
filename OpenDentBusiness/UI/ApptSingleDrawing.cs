@@ -34,6 +34,21 @@ namespace OpenDentBusiness.UI {
 				provColor=Color.White;
 				penO=new Pen(Color.Black);
 			}
+			backColor=provColor;//Default the appointment to he primary provider's color.
+			//Check to see if the patient is late for their appointment.
+			DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
+			DateTime aptDateTimeArived=PIn.DateT(dataRoww["AptDateTimeArrived"].ToString());
+			if((aptDateTimeArived.TimeOfDay==TimeSpan.FromHours(0) && DateTime.Now>aptDateTime) 
+				|| (aptDateTimeArived.TimeOfDay>TimeSpan.FromHours(0) && aptDateTimeArived>aptDateTime)) 
+			{
+				//Loop through all the appt view items to see if appointments should display the late color.
+				for(int i=0;i<apptRows.Count;i++) {
+					if(apptRows[i].ElementDesc=="LateColor") {
+						backColor=apptRows[i].ElementColor;
+						break;
+					}
+				}
+			}
 			if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete) {
 				backColor=arrayDefs[(int)DefCat.AppointmentColors][2].ItemColor;
 			}
@@ -51,10 +66,6 @@ namespace OpenDentBusiness.UI {
 			//	AppointmentType t = AppointmentTypes.GetOne(PIn.Long(dataRoww["AppointmentTypeNum"].ToString()));
 			//	backColor=t.AppointmentTypeColor;
 			//}
-			else {
-				backColor=provColor;
-				//We might want to do something interesting here.
-			}
 			SolidBrush backBrush=new SolidBrush(backColor);
 			g.FillRectangle(backBrush,7,0,totalWidth-7,(int)totalHeight);
 			g.FillRectangle(Brushes.White,0,0,7,(int)totalHeight);
@@ -415,7 +426,13 @@ namespace OpenDentBusiness.UI {
 							text=dataRoww["wkPhone"].ToString();
 						}
 						break;
-
+					case "IsLate[L]":
+						DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
+						DateTime aptDateTimeArrived=PIn.DateT(dataRoww["AptDateTimeArrived"].ToString());
+						if(aptDateTimeArrived>aptDateTime || (aptDateTimeArrived.TimeOfDay==TimeSpan.Parse("00:00:00") && DateTime.Now>aptDateTime)) {
+							text="L";
+						}
+						break;
 				}
 			#endregion
 			if(text=="" && !isGraphic) {
