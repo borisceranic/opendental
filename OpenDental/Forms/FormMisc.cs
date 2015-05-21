@@ -582,9 +582,9 @@ namespace OpenDental{
 				labelY.Enabled=true;
 				validNumX.Enabled=true;
 				validNumY.Enabled=true;
-
 			}
 		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if( validNumX.errorProvider1.GetError(validNumX)!=""
 				| validNumY.errorProvider1.GetError(validNumY)!="")
