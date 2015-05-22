@@ -1004,16 +1004,19 @@ namespace OpenDental{
 				destPath2);
 		}
 
+		///<summary>Downloads the build update MSI file and starts the install, closing OpenDental.</summary>
 		private void butDownMsiBuild_Click(object sender,EventArgs e) {
 			string fileName=PrefC.GetString(PrefName.UpdateWebsitePath)+buildAvailableCode+"/OpenDental.msi";
 			Process.Start(fileName);
 		}
 
+		///<summary>Downloads the stable update MSI file and starts the install, closing OpenDental.</summary>
 		private void butDownloadMsiStable_Click(object sender,EventArgs e) {
 			string fileName=PrefC.GetString(PrefName.UpdateWebsitePath)+stableAvailableCode+"/OpenDental.msi";
 			Process.Start(fileName);
 		}
 
+		///<summary>Downloads the beta update MSI file and starts the install, closing OpenDental.</summary>
 		private void butDownloadMsiBeta_Click(object sender,EventArgs e) {
 			string fileName=PrefC.GetString(PrefName.UpdateWebsitePath)+betaAvailableCode+"/OpenDental.msi";
 			Process.Start(fileName);
