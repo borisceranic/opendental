@@ -995,6 +995,10 @@ namespace OpenDental {
 				// Patient Tab Fill Address Table with selected information
 				//
 				case 0:
+					if(!checkActiveOnly.Checked && listStatus.SelectedIndices.Count==0) {
+						MsgBox.Show(this,"At least one patient status must be selected.");
+						return;
+					}
 					if(checkAllProviders.Checked == true) {
 						for(int i = 0;i < listProviders.Items.Count;i++) {
 							listProviders.SetSelected(i,true);
@@ -1092,6 +1096,10 @@ namespace OpenDental {
 				//Birthday Labels Builder
 				//
 				case 3:
+					if(!checkBirthdayActive.Checked && listStatus.SelectedIndices.Count==0) {
+						MsgBox.Show(this,"At least one patient status must be selected.");
+						return;
+					}
 					DateTime dateBirthdayFrom = PIn.Date(textBirthdayFrom.Text);
 					DateTime dateBirthdayTo = PIn.Date(textBirthdayTo.Text);
 					if(dateBirthdayTo < dateBirthdayFrom) {
