@@ -1464,7 +1464,13 @@ namespace OpenDental {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete?")) {
 					return;
 				}
-				Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task from tasklist")+" "+TaskLists.GetOne(TaskCur.TaskListNum).Descript,TaskCur);
+				//TaskListNum=-1 is only possible if it's new.  This will never get hit if it's new.
+				if(TaskCur.TaskListNum==0) {
+					Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task"),TaskCur);
+				}
+				else {
+					Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task from tasklist")+" "+TaskLists.GetOne(TaskCur.TaskListNum).Descript,TaskCur);
+				}
 			}
 			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all four tables
 			DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
