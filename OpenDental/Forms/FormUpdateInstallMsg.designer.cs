@@ -26,8 +26,8 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormUpdateInstallMsg));
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label2 = new System.Windows.Forms.Label();
 			this.webBrowser = new System.Windows.Forms.WebBrowser();
+			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -60,16 +60,6 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// label2
-			// 
-			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(230, 577);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(290, 21);
-			this.label2.TabIndex = 5;
-			this.label2.Text = "Continue with installation of this update?";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-			// 
 			// webBrowser
 			// 
 			this.webBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -83,12 +73,24 @@ namespace OpenDental{
 			this.webBrowser.TabIndex = 6;
 			this.webBrowser.Url = new System.Uri("http://www.opendental.com/manual/updateAnnounce.html", System.UriKind.Absolute);
 			// 
+			// label2
+			// 
+			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label2.Location = new System.Drawing.Point(12, 572);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(508, 34);
+			this.label2.TabIndex = 7;
+			this.label2.Text = "Continue with installation of this update?\r\nWorkstations will be closed if you co" +
+    "ntinue.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormUpdateInstallMsg
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(694, 610);
-			this.Controls.Add(this.webBrowser);
 			this.Controls.Add(this.label2);
+			this.Controls.Add(this.webBrowser);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -103,7 +105,7 @@ namespace OpenDental{
 
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
-		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.WebBrowser webBrowser;
+		private System.Windows.Forms.Label label2;
 	}
 }
