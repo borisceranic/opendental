@@ -720,7 +720,8 @@ namespace OpenDental{
 				}
 				if(displayedElementsMain[i].ElementDesc=="MedOrPremed[+]"
 					|| displayedElementsMain[i].ElementDesc=="HasIns[I]"
-					|| displayedElementsMain[i].ElementDesc=="InsToSend[!]")
+					|| displayedElementsMain[i].ElementDesc=="InsToSend[!]"
+					|| displayedElementsMain[i].ElementDesc=="LateColor")
 				{
 					row.ColorBackG=displayedElementsMain[i].ElementColor;
 				}
@@ -749,7 +750,8 @@ namespace OpenDental{
 				}
 				if(displayedElementsUR[i].ElementDesc=="MedOrPremed[+]"
 					|| displayedElementsUR[i].ElementDesc=="HasIns[I]"
-					|| displayedElementsUR[i].ElementDesc=="InsToSend[!]")
+					|| displayedElementsUR[i].ElementDesc=="InsToSend[!]"
+					|| displayedElementsMain[i].ElementDesc=="LateColor")
 				{
 					row.ColorBackG=displayedElementsUR[i].ElementColor;
 				}
@@ -778,7 +780,8 @@ namespace OpenDental{
 				}
 				if(displayedElementsLR[i].ElementDesc=="MedOrPremed[+]"
 					|| displayedElementsLR[i].ElementDesc=="HasIns[I]"
-					|| displayedElementsLR[i].ElementDesc=="InsToSend[!]")
+					|| displayedElementsLR[i].ElementDesc=="InsToSend[!]"
+					|| displayedElementsMain[i].ElementDesc=="LateColor")
 				{
 					row.ColorBackG=displayedElementsLR[i].ElementColor;
 				}
