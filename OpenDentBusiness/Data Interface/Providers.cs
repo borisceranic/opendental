@@ -66,7 +66,8 @@ namespace OpenDentBusiness{
 		///but does not change the item order of the provider passed in.</summary>
 		public static void MoveDownBelow(Provider provider) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				provider.ProvNum=Meth.GetLong(MethodBase.GetCurrentMethod(),provider);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),provider);
+				return;
 			}
 			//Add 1 to all item orders equal to or greater than new provider's item order
 			Db.NonQ("UPDATE provider SET ItemOrder=ItemOrder+1"
@@ -106,7 +107,7 @@ namespace OpenDentBusiness{
 		///<summary>Gets table for main provider edit list when in dental school mode.  Always orders alphabetically, but there will be lots of filters to get the list shorter.  Must be very fast because refreshes while typing.  selectAll will trump selectInstructors and always return all providers.</summary>
 		public static DataTable RefreshForDentalSchool(long schoolClassNum,string lastName,string firstName,string provNum,bool selectInstructors,bool selectAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,selectInstructors,selectAll);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,firstName,provNum,selectInstructors,selectAll);
 			}
 			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName,PatCountPri,PatCountSec "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider LEFT JOIN schoolclass ON provider.SchoolClassNum=schoolclass.SchoolClassNum "
