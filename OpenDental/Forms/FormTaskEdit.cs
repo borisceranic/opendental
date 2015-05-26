@@ -772,28 +772,29 @@ namespace OpenDental {
 				//textDescript always editable
 			}
 			else {//trying to edit an existing task, so need to block some things
-				if(!Security.IsAuthorized(Permissions.TaskNoteEdit,true)) {//but only need to block them if they don't have TaskNoteEdit permission
-					if(TaskCur.UserNum!=Security.CurUser.UserNum) {//current user didn't write this task, so block them.
-						butDelete.Enabled=false;
-						textDescript.ReadOnly=true;
-						textDescript.BackColor=System.Drawing.SystemColors.Window;
-					}
-					if(TaskCur.TaskListNum!=Security.CurUser.TaskListInBox) {//the task is not in the logged-in user's inbox
-						butDelete.Enabled=false;
-						textDescript.ReadOnly=true;
-						textDescript.BackColor=System.Drawing.SystemColors.Window;
-					}
-					if(butDelete.Enabled) {//this just allows getting the NoteList less often
-						NoteList=TaskNotes.GetForTask(TaskCur.TaskNum);//so we can check so see if other users have added notes
-						for(int i=0;i<NoteList.Count;i++) {
-							if(Security.CurUser.UserNum!=NoteList[i].UserNum) {
-								butDelete.Enabled=false;
-								textDescript.ReadOnly=true;
-								textDescript.BackColor=System.Drawing.SystemColors.Window;
-								break;
-							}
+				bool isTaskForCurUser=true;
+				if(TaskCur.UserNum!=Security.CurUser.UserNum) {//current user didn't write this task, so block them.
+					isTaskForCurUser=false;//Delete will only be enabled if the user has the TaskEdit and TaskNoteEdit permissions.
+				}
+				if(TaskCur.TaskListNum!=Security.CurUser.TaskListInBox) {//the task is not in the logged-in user's inbox
+					isTaskForCurUser=false;
+				}
+				if(isTaskForCurUser) {//this just allows getting the NoteList less often
+					NoteList=TaskNotes.GetForTask(TaskCur.TaskNum);//so we can check so see if other users have added notes
+					for(int i=0;i<NoteList.Count;i++) {
+						if(Security.CurUser.UserNum!=NoteList[i].UserNum) {
+							isTaskForCurUser=false;
+							break;
 						}
 					}
+				}
+				if(!isTaskForCurUser && !Security.IsAuthorized(Permissions.TaskNoteEdit,true)) {//but only need to block them if they don't have TaskNoteEdit permission
+					butDelete.Enabled=false;
+				}
+				if(!isTaskForCurUser && !Security.IsAuthorized(Permissions.TaskEdit,true)) {
+					butDelete.Enabled=false;
+					textDescript.ReadOnly=true;
+					textDescript.BackColor=System.Drawing.SystemColors.Window;
 				}
 			}
 			_listTaskPriorities=new List<Def>();

@@ -563,6 +563,10 @@ namespace OpenDentBusiness{
 		}
 
 		public static void TaskEditCreateLog(string logText,Task task) {
+			TaskEditCreateLog(Permissions.TaskEdit,logText,task);
+		}
+
+		public static void TaskEditCreateLog(Permissions perm,string logText,Task task) {
 			long patNum=0;//Task type of none defaults to 0.
 			if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
 				patNum=task.KeyNum;
@@ -573,7 +577,7 @@ namespace OpenDentBusiness{
 				patNum=AptCur.PatNum;
 				//logText+=". Attached patient: "+task.PatientName+" from an appointment";
 			}
-			SecurityLogs.MakeLogEntry(Permissions.TaskEdit,patNum,logText,task.TaskNum);
+			SecurityLogs.MakeLogEntry(perm,patNum,logText,task.TaskNum);
 		}
 
 		///<summary>Sorted in Ascending order: Unread/Read, </summary>

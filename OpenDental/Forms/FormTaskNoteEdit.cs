@@ -52,7 +52,7 @@ namespace OpenDental {
 			TaskNotes.Delete(TaskNoteCur.TaskNoteNum);
 			DialogResult=DialogResult.OK;
 			OnEditComplete();
-			Tasks.TaskEditCreateLog(Lan.g(this,"Deleted note from task"),Tasks.GetOne(TaskNoteCur.TaskNum));
+			Tasks.TaskEditCreateLog(Permissions.TaskNoteEdit,Lan.g(this,"Deleted note from task"),Tasks.GetOne(TaskNoteCur.TaskNum));
 			Close();//Needed because the window is called as a non-modal window.
 		}
 
@@ -71,11 +71,11 @@ namespace OpenDental {
 			TaskNoteCur.Note=textNote.Text;
 			if(TaskNoteCur.IsNew) {
 				TaskNotes.Insert(TaskNoteCur);
-				Tasks.TaskEditCreateLog(Lan.g(this,"Added task note"),Tasks.GetOne(TaskNoteCur.TaskNum));
+				Tasks.TaskEditCreateLog(Permissions.TaskNoteEdit,Lan.g(this,"Added task note"),Tasks.GetOne(TaskNoteCur.TaskNum));
 			}
 			else {
 				TaskNotes.Update(TaskNoteCur);
-				Tasks.TaskEditCreateLog(Lan.g(this,"Task note changed"),Tasks.GetOne(TaskNoteCur.TaskNum));
+				Tasks.TaskEditCreateLog(Permissions.TaskNoteEdit,Lan.g(this,"Task note changed"),Tasks.GetOne(TaskNoteCur.TaskNum));
 			}
 			DialogResult=DialogResult.OK;
 			OnEditComplete();
