@@ -39,7 +39,7 @@ namespace OpenDentBusiness {
 					dictPrefs.Add(kv.Key,((Pref)kv.Value).Copy());
 				}
 			}
-			return _dict;
+			return dictPrefs;
 		}
 
 		///<summary>This property is just a shortcut to this pref to make typing faster.  This pref is used a lot.</summary>
