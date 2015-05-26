@@ -35,20 +35,6 @@ namespace OpenDentBusiness.UI {
 				penO=new Pen(Color.Black);
 			}
 			backColor=provColor;//Default the appointment to he primary provider's color.
-			//Check to see if the patient is late for their appointment.
-			DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
-			DateTime aptDateTimeArived=PIn.DateT(dataRoww["AptDateTimeArrived"].ToString());
-			if((aptDateTimeArived.TimeOfDay==TimeSpan.FromHours(0) && DateTime.Now>aptDateTime) 
-				|| (aptDateTimeArived.TimeOfDay>TimeSpan.FromHours(0) && aptDateTimeArived>aptDateTime)) 
-			{
-				//Loop through all the appt view items to see if appointments should display the late color.
-				for(int i=0;i<apptRows.Count;i++) {
-					if(apptRows[i].ElementDesc=="LateColor") {
-						backColor=apptRows[i].ElementColor;
-						break;
-					}
-				}
-			}
 			if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete) {
 				backColor=arrayDefs[(int)DefCat.AppointmentColors][2].ItemColor;
 			}
@@ -58,7 +44,26 @@ namespace OpenDentBusiness.UI {
 			else if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.PtNoteCompleted) {
 				backColor=arrayDefs[(int)DefCat.AppointmentColors][6].ItemColor;
 			}
-			else if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
+			//Check to see if the patient is late for their appointment.  This 
+			DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
+			DateTime aptDateTimeArrived=PIn.DateT(dataRoww["AptDateTimeArrived"].ToString());
+			//If the appointment is scheduled, complete, or ASAP and the patient was late for the appointment.
+			if((PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Scheduled
+				|| PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete
+				|| PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.ASAP)
+				&& ((aptDateTimeArrived.TimeOfDay==TimeSpan.FromHours(0) && DateTime.Now>aptDateTime) 
+					|| (aptDateTimeArrived.TimeOfDay>TimeSpan.FromHours(0) && aptDateTimeArrived>aptDateTime))) 
+			{
+				//Loop through all the appt view items to see if appointments should display the late color.
+				for(int i=0;i<apptRows.Count;i++) {
+					if(apptRows[i].ElementDesc=="LateColor") {
+						backColor=apptRows[i].ElementColor;
+						break;
+					}
+				}
+			}
+			//Always use the ColorOverride over any other appointment color.
+			if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
 				backColor=Color.FromArgb(PIn.Int(dataRoww["ColorOverride"].ToString()));
 			}
 			//Do not use the code block below. We do not want to draw appt color based on appointment type. Logic for that is handled with the color override column.
@@ -429,7 +434,13 @@ namespace OpenDentBusiness.UI {
 					case "IsLate[L]":
 						DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
 						DateTime aptDateTimeArrived=PIn.DateT(dataRoww["AptDateTimeArrived"].ToString());
-						if(aptDateTimeArrived>aptDateTime || (aptDateTimeArrived.TimeOfDay==TimeSpan.Parse("00:00:00") && DateTime.Now>aptDateTime)) {
+						//If the appointment is scheduled, complete, or ASAP and the patient was late for the appointment.
+						if((PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Scheduled
+							|| PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete
+							|| PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.ASAP)
+							&& ((aptDateTimeArrived.TimeOfDay==TimeSpan.FromHours(0) && DateTime.Now>aptDateTime) 
+								|| (aptDateTimeArrived.TimeOfDay>TimeSpan.FromHours(0) && aptDateTimeArrived>aptDateTime))) 
+						{
 							text="L";
 						}
 						break;
