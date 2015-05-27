@@ -618,7 +618,7 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<DateTime>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT IFNULL(MIN(DateTimeEntry),0) AS triageTime "
+			string command="SELECT GREATEST(IFNULL(task.DateTimeEntry,'0001-01-01'), IFNULL((SELECT MAX(DateTimeNote) FROM tasknote WHERE tasknote.tasknum=task.tasknum),'0001-01-01')) AS triageTime "
 				+"FROM task "
 				+"WHERE TaskListNum=1697 "//Triage task list.
 				+"AND TaskStatus<>2 "//Not done (new or viewed).
