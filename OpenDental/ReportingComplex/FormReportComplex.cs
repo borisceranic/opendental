@@ -1022,44 +1022,53 @@ namespace OpenDental.ReportingComplex
 		}
 
 		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i,QueryObject queryObj) {
+			return GetDisplayString(rawText,prevDisplayText,reportObject,i,queryObj,false);
+		}
+
+		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i,QueryObject queryObj,bool isExport) {
 			string displayText="";
 			List<string> retVals=new List<string>();
+			DataTable dt=queryObj.ReportTable;
+			//For exporting, we need to use the ExportTable which is the data that is visible to the user.  Using ReportTable would show raw query data (potentially different than what the user sees).
+			if(isExport) {
+				dt=queryObj.ExportTable;
+			}
 			if(reportObject.FieldValueType==FieldValueType.Age) {
 				displayText=Patients.AgeToString(Patients.DateToAge(PIn.Date(rawText)));//(fieldObject.FormatString);
 			}
 			else if(reportObject.FieldValueType==FieldValueType.Boolean) {
-				if(PIn.Bool(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString())) {
+				if(PIn.Bool(dt.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString())) {
 					displayText="X";
 				}
 				else {
 					displayText="";
 				}
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Bool(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
+					prevDisplayText=PIn.Bool(dt.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString();
 				}
 			}
 			else if(reportObject.FieldValueType==FieldValueType.Date) {
-				displayText=PIn.DateT(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+				displayText=PIn.DateT(dt.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.DateT(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+					prevDisplayText=PIn.DateT(dt.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
 			else if(reportObject.FieldValueType==FieldValueType.Integer) {
-				displayText=PIn.Long(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+				displayText=PIn.Long(dt.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Long(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+					prevDisplayText=PIn.Long(dt.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
 			else if(reportObject.FieldValueType==FieldValueType.Number) {
-				displayText=PIn.Double(queryObj.ReportTable.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+				displayText=PIn.Double(dt.Rows[i][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=PIn.Double(queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
+					prevDisplayText=PIn.Double(dt.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString()).ToString(reportObject.StringFormat);
 				}
 			}
 			else if(reportObject.FieldValueType==FieldValueType.String) {
 				displayText=rawText;
 				if(i>0 && reportObject.SuppressIfDuplicate) {
-					prevDisplayText=queryObj.ReportTable.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString();
+					prevDisplayText=dt.Rows[i-1][queryObj.ArrDataFields.IndexOf(reportObject.DataField)].ToString();
 				}
 			}
 			retVals.Add(displayText);
@@ -1159,14 +1168,28 @@ namespace OpenDental.ReportingComplex
 							string cell;
 							for(int i=0;i<query.ExportTable.Rows.Count;i++) {
 								line="";
-								for(int j=0;j<query.ExportTable.Columns.Count;j++) {
-									cell=query.ExportTable.Rows[i][j].ToString();
+								string displayText="";
+								foreach(ReportObject reportObj in query.ReportObjects) {
+									if(reportObj.SectionName!="Detail") {
+										continue;
+									}
+									string rawText="";
+									if(reportObj.ReportObjectKind==ReportObjectKind.FieldObject) {
+										rawText=query.ExportTable.Rows[i][query.ArrDataFields.IndexOf(reportObj.DataField)].ToString();
+										if(String.IsNullOrWhiteSpace(rawText)) {
+											line+="\t";
+											continue;
+										}
+										List<string> listString=GetDisplayString(rawText,"",reportObj,i,query,true);
+										displayText=listString[0];
+									}
+									cell=displayText;
 									cell=cell.Replace("\r","");
 									cell=cell.Replace("\n","");
 									cell=cell.Replace("\t","");
 									cell=cell.Replace("\"","");
 									line+=cell;
-									if(j<query.ExportTable.Columns.Count-1) {
+									if(query.ArrDataFields.IndexOf(reportObj.DataField)<query.ArrDataFields.Count-1) {
 										line+="\t";
 									}
 								}
