@@ -1058,6 +1058,7 @@ namespace OpenDental{
 			gridCharges.Columns.Clear();
 			ODGridColumn col;
 			//If this column is changed from a date column then the comparer method (ComparePayPlanRows) needs to be updated.
+			//If changes are made to the order of the grid, changes need to also be made for butPrint_Click
 			col=new ODGridColumn(Lan.g("PayPlanAmortization","Date"),64,HorizontalAlignment.Center);//0
 			gridCharges.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("PayPlanAmortization","Provider"),50);//1
@@ -1412,7 +1413,7 @@ namespace OpenDental{
 				return;
 			}
 			if(PIn.Double(textAmount.Text)-PIn.Double(textDownPayment.Text)<0) {
-				MsgBox.Show(this,"Down paymnent must be less than or equal to total amount.");
+				MsgBox.Show(this,"Down payment must be less than or equal to total amount.");
 				return;
 			}
 			if(gridCharges.Rows.Count>0){
@@ -1592,6 +1593,7 @@ namespace OpenDental{
 			tbl.Columns.Add("description");
 			tbl.Columns.Add("principal");
 			tbl.Columns.Add("interest");
+			tbl.Columns.Add("due");
 			tbl.Columns.Add("payment");
 			tbl.Columns.Add("balance");
 			DataRow row;
@@ -1602,19 +1604,21 @@ namespace OpenDental{
 				row["description"]=gridCharges.Rows[i].Cells[2].Text;
 				row["principal"]=gridCharges.Rows[i].Cells[3].Text;
 				row["interest"]=gridCharges.Rows[i].Cells[4].Text;
-				row["payment"]=gridCharges.Rows[i].Cells[5].Text;
-				row["balance"]=gridCharges.Rows[i].Cells[6].Text;
+				row["due"]=gridCharges.Rows[i].Cells[5].Text;
+				row["payment"]=gridCharges.Rows[i].Cells[6].Text;
+				row["balance"]=gridCharges.Rows[i].Cells[7].Text;
 				tbl.Rows.Add(row);
 			}
 			QueryObject query=report.AddQuery(tbl,"","",SplitByKind.None,1,true);
 			query.AddColumn("ChargeDate",80,FieldValueType.Date,font);
 			query.GetColumnHeader("ChargeDate").StaticText="Date";
 			query.AddColumn("Provider",80,FieldValueType.String,font);
-			query.AddColumn("Description",100,FieldValueType.String,font);
-			query.AddColumn("Principal",80,FieldValueType.Number,font);
-			query.AddColumn("Interest",80,FieldValueType.Number,font);
-			query.AddColumn("Payment",80,FieldValueType.Number,font);
-			query.AddColumn("Balance",80,FieldValueType.String,font);
+			query.AddColumn("Description",140,FieldValueType.String,font);
+			query.AddColumn("Principal",60,FieldValueType.Number,font);
+			query.AddColumn("Interest",52,FieldValueType.Number,font);
+			query.AddColumn("Due",60,FieldValueType.Number,font);
+			query.AddColumn("Payment",60,FieldValueType.Number,font);
+			query.AddColumn("Balance",60,FieldValueType.String,font);
 			query.GetColumnHeader("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			report.ReportObjects.Add(new ReportObject("Note","Report Footer",new Point(x1,20),new Size(500,200),textNote.Text,font,ContentAlignment.TopLeft));
