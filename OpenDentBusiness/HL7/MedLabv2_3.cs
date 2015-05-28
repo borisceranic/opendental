@@ -77,10 +77,16 @@ namespace OpenDentBusiness.HL7 {
 						//All age components are left padded with 0's, the years is padded to 3 chars, the months and days are padded to 2 chars
 						//Example: 19811213^033^02^19
 						seg.AddField(7,"patBirthdateAge");
+						//PID.8, Patient Gender
+						//We use this field to assist the user in selecting a patient if one is not found when importing the message, but we don't store it
+						seg.AddField(8,"pat.Gender");
 						//PID.18.1, Patient Account Number.  LabCorp assigned account number.  This field is also used to send the Fasting flag in component 7.
 						//Fasting flag values are 'Y', 'N', or blank
 						//Example: AccountNum^^^BillCode^ABNFlag^SpecimenStatus^FastingFlag
 						seg.AddField(18,"accountNum");
+						//PID.19, Patient SSN Number
+						//We use this field to assist the user in selecting a patient if one is not found when importing the message, but we don't store it
+						seg.AddField(19,"pat.SSN");
 					#endregion PID - Patient Identification
 					#region NK1 - Next of Kin
 					//This segment is for future use only, nothing is currently imported from this segment

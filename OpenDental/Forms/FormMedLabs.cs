@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
@@ -12,6 +11,7 @@ namespace OpenDental {
 
 		public FormMedLabs() {
 			InitializeComponent();
+			Lan.F(this);
 		}
 
 		private void FormMedLabs_Load(object sender,EventArgs e) {
@@ -22,25 +22,33 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn("Prov",80);
+			col=new ODGridColumn("Patient",130);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Placer Specimen ID",130);//should be the ID sent on the specimen container to lab
+			col=new ODGridColumn("Provider",80);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Filler Specimen ID",130);//lab assigned specimen ID
+			col=new ODGridColumn("Placer Specimen ID",120);//should be the ID sent on the specimen container to lab
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Date & Time Entered",140);//earliest date and time entered into the lab system
+			col=new ODGridColumn("Filler Specimen ID",120);//lab assigned specimen ID
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Date & Time Entered",135);//earliest date and time entered into the lab system
 			col.SortingStrategy=GridSortingStrategy.DateParse;
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Date & Time Reported",140);//most recent date and time a result came in
+			col=new ODGridColumn("Date & Time Reported",135);//most recent date and time a result came in
 			col.SortingStrategy=GridSortingStrategy.DateParse;
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Tests Ordered",240);//comma delimeted list of test IDs ordered, will include reflex tests
+			col=new ODGridColumn("Tests Ordered",140);//comma delimeted list of test IDs ordered, will include reflex tests
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			_tableMedLabs=MedLabs.GetOrdersForPatient(PatCur.PatNum);
+			_tableMedLabs=MedLabs.GetOrdersForPatient(PatCur.PatNum,checkIncludeNoPat.Checked);
 			for(int i=0;i<_tableMedLabs.Rows.Count;i++) {
 				row=new ODGridRow();
+				if(_tableMedLabs.Rows[i]["PatNum"].ToString()==PatCur.PatNum.ToString()) {
+					row.Cells.Add(PatCur.GetNameFLnoPref());
+				}
+				else {
+					row.Cells.Add("");
+				}
 				long provNum=0;
 				try {
 					provNum=PIn.Long(_tableMedLabs.Rows[i]["ProvNum"].ToString());
@@ -61,18 +69,19 @@ namespace OpenDental {
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormMedLabEdit FormLE=new FormMedLabEdit();
-			FormLE.PatCur=PatCur;
-			FormLE.ListMedLabs=MedLabs.GetForPatAndSpecimen(PatCur.PatNum,_tableMedLabs.Rows[e.Row]["SpecimenID"].ToString(),
-				_tableMedLabs.Rows[e.Row]["SpecimenIDFiller"].ToString());
-			FormLE.ShowDialog();
-			if(FormLE.DialogResult!=DialogResult.OK) {
-				return;
+			long patNum=0;
+			if(_tableMedLabs.Rows[e.Row]["PatNum"].ToString()==PatCur.PatNum.ToString()) {
+				FormLE.PatCur=PatCur;
+				patNum=PatCur.PatNum;
 			}
+			FormLE.ListMedLabs=MedLabs.GetForPatAndSpecimen(patNum,_tableMedLabs.Rows[e.Row]["SpecimenID"].ToString(),
+				_tableMedLabs.Rows[e.Row]["SpecimenIDFiller"].ToString());//patNum could be 0 if this MedLab is not attached to a patient
+			FormLE.ShowDialog();
 			FillGrid();
 		}
 
-		private void butMove_Click(object sender,EventArgs e) {
-
+		private void checkIncludeNoPat_Click(object sender,EventArgs e) {
+			FillGrid();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

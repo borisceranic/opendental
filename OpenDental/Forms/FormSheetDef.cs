@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Drawing.Text;
-using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -16,6 +12,8 @@ namespace OpenDental {
 		public bool IsReadOnly;
 		///<summary>On creation of a new sheetdef, the user must pick a description and a sheettype before allowing to start editing the sheet.  After the initial sheettype selection, this will be false, indicating that the user may not change the type.</summary>
 		public bool IsInitial;
+		///<summary>SheetTypeEnum includes SheetTypeEnum.MedLabResults which is hidden in some cases. This allows us to keep track of actual SheetType.</summary>
+		private List<int> _listSheetTypeIndexes;
 
 		public FormSheetDef() {
 			InitializeComponent();
@@ -31,15 +29,16 @@ namespace OpenDental {
 				listSheetType.Enabled=false;
 			}
 			textDescription.Text=SheetDefCur.Description;
+			_listSheetTypeIndexes=new List<int>();
 			//not allowed to change sheettype once created.
 			for(int i=0;i<Enum.GetNames(typeof(SheetTypeEnum)).Length;i++){
 				if((SheetTypeEnum)i==SheetTypeEnum.MedLabResults) {
-#warning Cameron12345 Remove this block if releasing MedLabs
 					continue;
 				}
 				listSheetType.Items.Add(Enum.GetNames(typeof(SheetTypeEnum))[i]);
+				_listSheetTypeIndexes.Add(i);
 				if((int)SheetDefCur.SheetType==i && !IsInitial){
-					listSheetType.SelectedIndex=i;
+					listSheetType.SelectedIndex=listSheetType.Items.Count-1;
 				}
 			}
 			InstalledFontCollection fColl=new InstalledFontCollection();
@@ -92,13 +91,13 @@ namespace OpenDental {
 				return;
 			}
 			SheetDef sheetdef=null;
-			switch((SheetTypeEnum)listSheetType.SelectedIndex){
+			switch((SheetTypeEnum)_listSheetTypeIndexes[listSheetType.SelectedIndex]){
 				case SheetTypeEnum.LabelCarrier:
 				case SheetTypeEnum.LabelPatient:
 				case SheetTypeEnum.LabelReferral:
 					sheetdef=SheetsInternal.GetSheetDef(SheetInternalType.LabelPatientMail);
 					if(textDescription.Text==""){
-						textDescription.Text=((SheetTypeEnum)listSheetType.SelectedIndex).ToString();
+						textDescription.Text=((SheetTypeEnum)_listSheetTypeIndexes[listSheetType.SelectedIndex]).ToString();
 					}
 					comboFontName.Text=sheetdef.FontName;
 					textFontSize.Text=sheetdef.FontSize.ToString();
@@ -109,7 +108,7 @@ namespace OpenDental {
 				case SheetTypeEnum.ReferralSlip:
 					sheetdef=SheetsInternal.GetSheetDef(SheetInternalType.ReferralSlip);
 					if(textDescription.Text==""){
-						textDescription.Text=((SheetTypeEnum)listSheetType.SelectedIndex).ToString();
+						textDescription.Text=((SheetTypeEnum)_listSheetTypeIndexes[listSheetType.SelectedIndex]).ToString();
 					}
 					comboFontName.Text=sheetdef.FontName;
 					textFontSize.Text=sheetdef.FontSize.ToString();
@@ -135,7 +134,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Description may not be blank.");
 				return;
 			}
-			if((SheetTypeEnum)listSheetType.SelectedIndex==SheetTypeEnum.ExamSheet) {
+			if((SheetTypeEnum)_listSheetTypeIndexes[listSheetType.SelectedIndex]==SheetTypeEnum.ExamSheet) {
 				//make sure description for exam sheet does not contain a ':' or a ';' because this interferes with pulling the exam sheet fields to fill a patient letter
 				if(textDescription.Text.Contains(":") || textDescription.Text.Contains(";")) {
 					MsgBox.Show(this,"Description for an Exam Sheet may not contain a ':' or a ';'.");
@@ -160,7 +159,7 @@ namespace OpenDental {
 				return;
 			}
 			SheetDefCur.Description=textDescription.Text;
-			SheetDefCur.SheetType=(SheetTypeEnum)listSheetType.SelectedIndex;
+			SheetDefCur.SheetType=(SheetTypeEnum)_listSheetTypeIndexes[listSheetType.SelectedIndex];
 			SheetDefCur.FontName=comboFontName.Text;
 			SheetDefCur.FontSize=fontSize;
 			SheetDefCur.Width=PIn.Int(textWidth.Text);

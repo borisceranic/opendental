@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OpenDentBusiness {
 	///<summary>The EHRLab table is structured to tightly with the HL7 standard and should have names that more reflect how the user will
@@ -126,6 +127,44 @@ namespace OpenDentBusiness {
 		public string FileName;
 		///<summary>The PID Segment from the HL7 message used to generate this MedLab object.</summary>
 		public string OriginalPIDSegment;
+
+		///<summary>Read-only property that indicates whether the test is marked as preliminary or any result returned for the test which is the most
+		///recent/up-to-date for that result is marked as preliminary.</summary>
+		public bool IsPreliminaryResult {
+			get {
+				if(this.ResultStatus==ResultStatus.P) {
+					return true;
+				}
+				List<MedLabResult> listResults=MedLabResults.GetForLab(this.MedLabNum);
+				//loop through backward and only keep the most final/most recent result
+				for(int i=listResults.Count-1;i>-1;i--) {
+					if(i==0) {
+						break;
+					}
+					if(listResults[i].ObsID==listResults[i-1].ObsID && listResults[i].ObsIDSub==listResults[i-1].ObsIDSub) {
+						listResults.RemoveAt(i);
+					}
+				}
+				//listResults now contains the most current result received, if any are still preliminary, this is still a preliminary medlab
+				for(int i=0;i<listResults.Count;i++) {
+					if(listResults[i].ResultStatus==ResultStatus.P) {
+						return true;
+					}
+				}
+				//PID.18.6, Status of Specimen.  Components: AccountNumber^CheckDigit^CheckDigitScheme^BillCode^ABNFlag^StatusOfSpecimen^Fasting
+				//Example PID-18: 66600009^^^03^^P^Y
+				string[] pidFields=this.OriginalPIDSegment.Split(new string[] { "|" },StringSplitOptions.None);
+				if(pidFields.Length<19) {
+					return false;
+				}
+				string[] components=pidFields[18].Split(new string[] { "^" },StringSplitOptions.None);
+				if(components.Length>5 && components[5].ToLower()=="p") {
+					return true;
+				}
+				return false;
+			}
+			//set { } Read only property.
+		}
 
 		///<summary></summary>
 		public MedLab Copy() {

@@ -98,17 +98,17 @@ namespace OpenDental{
 			this.groupOrderingPhys = new System.Windows.Forms.GroupBox();
 			this.butProvSelect = new OpenDental.UI.Button();
 			this.labelShowHL7 = new System.Windows.Forms.Label();
+			this.labelPrint = new System.Windows.Forms.Label();
 			this.gridFacilities = new OpenDental.UI.ODGrid();
 			this.gridResults = new OpenDental.UI.ODGrid();
+			this.butShowHL7 = new OpenDental.UI.Button();
+			this.butPDF = new OpenDental.UI.Button();
+			this.butCancel = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
+			this.butDelete = new OpenDental.UI.Button();
 			this.textGenComments = new OpenDental.ODtextBox();
 			this.textTestsOrd = new OpenDental.ODtextBox();
 			this.textAddlInfo = new OpenDental.ODtextBox();
-			this.labelPrint = new System.Windows.Forms.Label();
-			this.butDelete = new OpenDental.UI.Button();
-			this.butOK = new OpenDental.UI.Button();
-			this.butCancel = new OpenDental.UI.Button();
-			this.butPrint = new OpenDental.UI.Button();
-			this.butShowHL7 = new OpenDental.UI.Button();
 			this.groupPatAddressPh.SuspendLayout();
 			this.groupAcctAddr.SuspendLayout();
 			this.groupPat.SuspendLayout();
@@ -826,16 +826,24 @@ namespace OpenDental{
 			// labelShowHL7
 			// 
 			this.labelShowHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelShowHL7.Location = new System.Drawing.Point(538, 608);
+			this.labelShowHL7.Location = new System.Drawing.Point(552, 608);
 			this.labelShowHL7.Name = "labelShowHL7";
 			this.labelShowHL7.Size = new System.Drawing.Size(228, 16);
 			this.labelShowHL7.TabIndex = 329;
 			this.labelShowHL7.Text = "Show the original inbound HL7 message.";
 			// 
+			// labelPrint
+			// 
+			this.labelPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelPrint.Location = new System.Drawing.Point(258, 602);
+			this.labelPrint.Name = "labelPrint";
+			this.labelPrint.Size = new System.Drawing.Size(193, 28);
+			this.labelPrint.TabIndex = 331;
+			this.labelPrint.Text = "Create results report PDF and\r\nsave it in the patient\'s image folder.";
+			// 
 			// gridFacilities
 			// 
-			this.gridFacilities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridFacilities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridFacilities.HScrollVisible = false;
 			this.gridFacilities.Location = new System.Drawing.Point(12, 512);
@@ -848,7 +856,8 @@ namespace OpenDental{
 			// 
 			// gridResults
 			// 
-			this.gridResults.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridResults.HScrollVisible = false;
 			this.gridResults.Location = new System.Drawing.Point(12, 392);
@@ -858,6 +867,84 @@ namespace OpenDental{
 			this.gridResults.TabIndex = 315;
 			this.gridResults.Title = "Test Results";
 			this.gridResults.TranslationName = null;
+			this.gridResults.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridResults_CellDoubleClick);
+			// 
+			// butShowHL7
+			// 
+			this.butShowHL7.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butShowHL7.Autosize = true;
+			this.butShowHL7.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowHL7.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowHL7.CornerRadius = 4F;
+			this.butShowHL7.Location = new System.Drawing.Point(476, 604);
+			this.butShowHL7.Name = "butShowHL7";
+			this.butShowHL7.Size = new System.Drawing.Size(75, 24);
+			this.butShowHL7.TabIndex = 336;
+			this.butShowHL7.Text = "Show HL7";
+			this.butShowHL7.Click += new System.EventHandler(this.butShowHL7_Click);
+			// 
+			// butPDF
+			// 
+			this.butPDF.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPDF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butPDF.Autosize = true;
+			this.butPDF.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPDF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPDF.CornerRadius = 4F;
+			this.butPDF.Location = new System.Drawing.Point(182, 604);
+			this.butPDF.Name = "butPDF";
+			this.butPDF.Size = new System.Drawing.Size(75, 24);
+			this.butPDF.TabIndex = 335;
+			this.butPDF.Text = "Create PDF";
+			this.butPDF.Click += new System.EventHandler(this.butPDF_Click);
+			// 
+			// butCancel
+			// 
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(887, 604);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
+			this.butCancel.TabIndex = 334;
+			this.butCancel.Text = "&Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(806, 604);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 24);
+			this.butOK.TabIndex = 333;
+			this.butOK.Text = "&OK";
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
+			// butDelete
+			// 
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(12, 604);
+			this.butDelete.Name = "butDelete";
+			this.butDelete.Size = new System.Drawing.Size(85, 24);
+			this.butDelete.TabIndex = 332;
+			this.butDelete.Text = "&Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// textGenComments
 			// 
@@ -866,6 +953,7 @@ namespace OpenDental{
 			this.textGenComments.Location = new System.Drawing.Point(658, 318);
 			this.textGenComments.Name = "textGenComments";
 			this.textGenComments.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textGenComments.ReadOnly = true;
 			this.textGenComments.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textGenComments.Size = new System.Drawing.Size(304, 70);
 			this.textGenComments.TabIndex = 320;
@@ -897,98 +985,12 @@ namespace OpenDental{
 			this.textAddlInfo.TabIndex = 0;
 			this.textAddlInfo.Text = "";
 			// 
-			// labelPrint
-			// 
-			this.labelPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelPrint.Location = new System.Drawing.Point(330, 608);
-			this.labelPrint.Name = "labelPrint";
-			this.labelPrint.Size = new System.Drawing.Size(126, 16);
-			this.labelPrint.TabIndex = 331;
-			this.labelPrint.Text = "Print results report.";
-			// 
-			// butDelete
-			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Autosize = true;
-			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDelete.CornerRadius = 4F;
-			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
-			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 604);
-			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(85, 24);
-			this.butDelete.TabIndex = 332;
-			this.butDelete.Text = "&Delete";
-			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
-			// 
-			// butOK
-			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Autosize = true;
-			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(806, 604);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 333;
-			this.butOK.Text = "&OK";
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// butCancel
-			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Autosize = true;
-			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(887, 604);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 334;
-			this.butCancel.Text = "&Cancel";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// butPrint
-			// 
-			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butPrint.Autosize = true;
-			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPrint.CornerRadius = 4F;
-			this.butPrint.Location = new System.Drawing.Point(254, 604);
-			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(75, 24);
-			this.butPrint.TabIndex = 335;
-			this.butPrint.Text = "Print";
-			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
-			// 
-			// butShowHL7
-			// 
-			this.butShowHL7.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butShowHL7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butShowHL7.Autosize = true;
-			this.butShowHL7.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butShowHL7.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butShowHL7.CornerRadius = 4F;
-			this.butShowHL7.Location = new System.Drawing.Point(462, 604);
-			this.butShowHL7.Name = "butShowHL7";
-			this.butShowHL7.Size = new System.Drawing.Size(75, 24);
-			this.butShowHL7.TabIndex = 336;
-			this.butShowHL7.Text = "Show HL7";
-			this.butShowHL7.Click += new System.EventHandler(this.butShowHL7_Click);
-			// 
 			// FormMedLabEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 640);
 			this.Controls.Add(this.butShowHL7);
-			this.Controls.Add(this.butPrint);
+			this.Controls.Add(this.butPDF);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butDelete);
@@ -1130,7 +1132,7 @@ namespace OpenDental{
 		private UI.Button butPatSelect;
 		private UI.Button butProvSelect;
 		private UI.Button butCancel;
-		private UI.Button butPrint;
+		private UI.Button butPDF;
 		private UI.Button butShowHL7;
 
 	}

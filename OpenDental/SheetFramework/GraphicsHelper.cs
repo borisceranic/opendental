@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using PdfSharp;
+﻿using System.Drawing;
 using PdfSharp.Drawing;
-using PdfSharp.Drawing.Layout;
 
 namespace OpenDental {
 	public class GraphicsHelper {
@@ -13,10 +7,14 @@ namespace OpenDental {
 		private static int rightPad=5;//helps get measurements better.
 		//private static float hScale=.983f;
 
-		///<summary>This line spacing is specifically picked to match the RichTextBox.  Using this for drawing large text boxes on sheets leads to extra white space.  Just space not characters.</summary>
+		///<summary>This line spacing is specifically picked to match the RichTextBox.  Using this for drawing large text boxes on sheets may lead to extra 
+		///white space at the bottom of large text fields.  Just space not characters. 
+		///Used to scale text when drawing and measuring. Determines vertical text height and height of textboxes to be drawn. Only used for sheets. 
+		///UI has a similar function in OdGrid.LinseSPacingForFont</summary>
 		private static float LineSpacingForFont(string fontName) {
 			if(fontName.ToLower()=="arial") {
-				return 1.08f;
+				//Used to scale text when drawing and measuring. Determines vertical text height and height of textboxes to be drawn. Only used for sheets.
+				return 1.055f;
 			}
 			else if(fontName.ToLower()=="courier new") {
 				return 1.08f;

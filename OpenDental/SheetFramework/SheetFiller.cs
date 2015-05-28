@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Text;
 using OpenDentBusiness;
@@ -2217,8 +2216,9 @@ namespace OpenDental{
 
 		private static void FillFieldsForMedLabResults(Sheet sheet,MedLab medLab) {
 			Patient pat=Patients.GetPat(sheet.PatNum);
-			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(pat.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
-			Dictionary<long,string> dictLabNumLabId=SheetUtil.GetDictFacNumFacId(listMedLabs);
+			//pat might be null and sheet.PatNum might be invalid, that is ok.
+			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(sheet.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
+			List<long> listFacNums=SheetUtil.GetListFacNums(listMedLabs);
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "medlab.ClinicalInfo":
@@ -2265,7 +2265,7 @@ namespace OpenDental{
 						if(minDateCollected==DateTime.MaxValue) {
 							break;
 						}
-						field.FieldValue=minDateCollected.ToString();
+						field.FieldValue=minDateCollected.ToString("MM/dd/yyyy hh:mm tt");
 						break;
 					case "medlab.DateTimeReported":
 						if(listMedLabs.Count==0) {
@@ -2280,7 +2280,7 @@ namespace OpenDental{
 						if(maxDateReported==DateTime.MinValue) {
 							break;
 						}
-						field.FieldValue=maxDateReported.ToString();
+						field.FieldValue=maxDateReported.ToString("MM/dd/yyyy hh:mm tt");
 						break;
 					case "medlab.NoteLab":
 						if(listMedLabs.Count==0) {
@@ -2321,7 +2321,8 @@ namespace OpenDental{
 							if(field.FieldValue!="") {
 								field.FieldValue+="\r\n";
 							}
-							field.FieldValue+=listMedLabs[i].ObsTestID+" - "+listMedLabs[i].ObsTestDescript;
+							field.FieldValue+=listMedLabs[i].ObsTestID+" - "+listMedLabs[i].ObsTestDescript+"  (Reported: "
+								+listMedLabs[i].DateTimeReported.ToString("MM/dd/yyyy hh:mm tt")+")";
 						}
 						break;
 					case "medlab.ProvID":
@@ -2445,19 +2446,13 @@ namespace OpenDental{
 							break;
 						}
 						string fieldValAddr="";
-						foreach(KeyValuePair<long,string> labNumLabId in dictLabNumLabId) {
+						for(int i=0;i<listFacNums.Count;i++) {
 							if(fieldValAddr!="") {
 								fieldValAddr+="\r\n\r\n";
 							}
-							string row1=labNumLabId.Value;
-							int padlen=14;
-							if(labNumLabId.Value.Contains("_")) {
-								padlen=12;
-							}
-							row1=row1.PadRight(padlen,' ');
-							fieldValAddr+=row1;
+							fieldValAddr+=(i+1).ToString().PadLeft(2,'0').PadRight(14,' ');
 							string spaces=new string(' ',16);
-							MedLabFacility facilityCur=MedLabFacilities.GetOne(labNumLabId.Key);
+							MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
 							fieldValAddr+=facilityCur.FacilityName+"\r\n"+spaces+facilityCur.Address+"\r\n"+spaces+facilityCur.City+", "+facilityCur.State+"  ";
 							if(facilityCur.Zip.Length==9) {
 								fieldValAddr+=facilityCur.Zip.Substring(0,5)+"-"+facilityCur.Zip.Substring(5,4);
@@ -2473,11 +2468,11 @@ namespace OpenDental{
 							break;
 						}
 						string fieldValDir="";
-						foreach(KeyValuePair<long,string> labNumLabId in dictLabNumLabId) {
+						for(int i=0;i<listFacNums.Count;i++) {
 							if(fieldValDir!="") {
 								fieldValDir+="\r\n\r\n";
 							}
-							MedLabFacility facilityCur=MedLabFacilities.GetOne(labNumLabId.Key);
+							MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
 							fieldValDir+="Dir:  "+facilityCur.DirectorFName+" "+facilityCur.DirectorLName+", "+facilityCur.DirectorTitle+"\r\nPh:  ";
 							if(facilityCur.Phone.Length==10) {
 								fieldValDir+=facilityCur.Phone.Substring(0,3)+"-"+facilityCur.Phone.Substring(3,3)+"-"+facilityCur.Phone.Substring(6);
@@ -2490,6 +2485,9 @@ namespace OpenDental{
 						field.FieldValue=fieldValDir;
 						break;
 					case "patient.addrCityStZip":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue="";
 						if(pat.Address!="") {
 							field.FieldValue+=pat.Address+"\r\n";
@@ -2512,6 +2510,9 @@ namespace OpenDental{
 						field.FieldValue+=pat.Zip;
 						break;
 					case "patient.Birthdate":
+						if(pat==null) {
+							continue;
+						}
 						if(pat.Birthdate.Year<1880) {
 							field.FieldValue="";
 							break;
@@ -2519,12 +2520,21 @@ namespace OpenDental{
 						field.FieldValue=pat.Birthdate.ToShortDateString();
 						break;
 					case "patient.FName":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue=pat.FName;
 						break;
 					case "patient.Gender":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue=Lan.g("enumPatientGender",pat.Gender.ToString());
 						break;
 					case "patient.HmPhone":
+						if(pat==null) {
+							continue;
+						}
 						if(pat.HmPhone.Length==10) {
 							field.FieldValue=pat.HmPhone.Substring(0,3)+"-"+pat.HmPhone.Substring(3,3)+"-"+pat.HmPhone.Substring(6);
 							break;
@@ -2532,15 +2542,27 @@ namespace OpenDental{
 						field.FieldValue=pat.HmPhone;
 						break;
 					case "patient.MiddleI":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue=pat.MiddleI;
 						break;
 					case "patient.LName":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue=pat.LName;
 						break;
 					case "patient.PatNum":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue=pat.PatNum.ToString();
 						break;
 					case "patient.SSN":
+						if(pat==null) {
+							continue;
+						}
 						field.FieldValue="***-**-";
 						if(pat.SSN.Length>3) {
 							field.FieldValue+=pat.SSN.Substring(pat.SSN.Length-4,4);

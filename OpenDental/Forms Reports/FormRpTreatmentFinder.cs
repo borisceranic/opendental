@@ -1,19 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Collections;
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
-using PdfSharp;
 using PdfSharp.Pdf;
-using PdfSharp.Pdf.IO;
-using PdfSharp.Pdf.Printing;
-using System.Collections.Generic;
 
 
 namespace OpenDental{
@@ -691,6 +686,7 @@ namespace OpenDental{
 					sheet=SheetUtil.CreateSheet(sheetDef,PIn.Long(table.Rows[gridMain.SelectedIndices[j]]["PatNum"].ToString()));
 					SheetParameter.SetParameter(sheet,"PatNum",PIn.Long(table.Rows[gridMain.SelectedIndices[j]]["PatNum"].ToString()));
 					SheetFiller.FillFields(sheet);
+					sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 					SheetUtil.CalculateHeights(sheet,this.CreateGraphics());
 					FormSF=new FormSheetFillEdit(sheet);
 					SheetPrinting.CreatePdfPage(sheet,page);

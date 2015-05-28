@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using OpenDentBusiness;
 using CodeBase;
 using System.Data;
@@ -106,7 +104,146 @@ namespace OpenDental{
 					MoveAllDownBelowThis(sheet,field,amountOfGrowth);
 				}
 			}
+			if(isPrinting) {
+				//now break all text fields in between lines, not in the middle of actual text
+				sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
+				int originalSheetFieldCount=sheet.SheetFields.Count;
+				for(int i=0;i<originalSheetFieldCount;i++) {
+					SheetField fieldCur=sheet.SheetFields[i];
+					if(fieldCur.FieldType==SheetFieldType.StaticText
+						|| fieldCur.FieldType==SheetFieldType.OutputText
+						|| fieldCur.FieldType==SheetFieldType.InputField)
+					{
+						//recursive function to split text boxes for page breaks in between lines of text, not in the middle of text
+						CalculateHeightsPageBreak(fieldCur,sheet,g);
+					}
+				}
+				//sort the fields again since we may have broken up some of the text fields into multiple fields and added them to sheetfields.
+				sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
+			}
 			//return sheetCopy;
+		}
+
+		///<summary>Recursive.</summary>
+		private static void CalculateHeightsPageBreak(SheetField field,Sheet sheet,Graphics g) {
+			double lineSpacingForPdf=1.01d;
+			FontStyle fontstyle=FontStyle.Regular;
+			if(field.FontIsBold) {
+				fontstyle=FontStyle.Bold;
+			}
+			Font font=new Font(field.FontName,field.FontSize,fontstyle);
+			//adjust the height of the text box to accomodate PDFs if the field has a growth behavior other than None
+			double calcH=lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
+			if(field.GrowthBehavior!=GrowthBehaviorEnum.None && field.Height<Convert.ToInt32(Math.Ceiling(calcH))) {
+				int amtGrowth=Convert.ToInt32(Math.Ceiling(calcH)-field.Height);
+				field.Height+=amtGrowth;
+				if(field.GrowthBehavior==GrowthBehaviorEnum.DownLocal) {
+					MoveAllDownWhichIntersect(sheet,field,amtGrowth);
+				}
+				else if(field.GrowthBehavior==GrowthBehaviorEnum.DownGlobal) {
+					MoveAllDownBelowThis(sheet,field,amtGrowth);
+				}
+			}
+			int topMargin=40;
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				topMargin=120;
+			}
+			int pageCount;
+			int bottomCurPage=SheetPrinting.bottomCurPage(field.YPos,sheet,out pageCount);
+			//recursion base case, the field now fits on the current page, break out of recursion
+			if(field.YPos+field.Height<=bottomCurPage) {
+				return;
+			}
+			//field extends beyond the bottom of the current page, so we will split the text box in between lines, not through the middle of text
+			string measureText="Any";
+			double calcHLine=lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,measureText,font,field.Width);//calcHLine is height of single line of text
+			//if the height of one line is greater than the printable height of the page, don't try to split between lines
+			if(Convert.ToInt32(Math.Ceiling(calcHLine))>(sheet.HeightPage-60-topMargin)) {
+				return;
+			}
+			if(Convert.ToInt32(Math.Ceiling(field.YPos+calcHLine))>bottomCurPage) {//if no lines of text will fit on current page, move the entire text box to the next page
+				int moveAmount=bottomCurPage+1-field.YPos;
+				field.Height+=moveAmount;
+				MoveAllDownWhichIntersect(sheet,field,moveAmount);
+				field.Height-=moveAmount;
+				field.YPos+=moveAmount;
+				//recursive call
+				CalculateHeightsPageBreak(field,sheet,g);
+				return;
+			}
+			calcH=0;
+			int fieldH=0;
+			measureText="";
+			//while YPos + calc height of the string <= the bottom of the current page, add a new line and the text Any to the string
+			while(Convert.ToInt32(Math.Ceiling(field.YPos+calcH))<=bottomCurPage) {
+				fieldH=Convert.ToInt32(Math.Ceiling(calcH));
+				if(measureText!="") {
+					measureText+="\r\n";
+				}
+				measureText+="Any";//add new line and another word to measure the height of an additional line of text
+				calcH=lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,measureText,font,field.Width);
+			}
+			//get ready to copy text from the current field to a copy of the field that will be moved down.
+			SheetField fieldNew=new SheetField();
+			fieldNew=field.Copy();
+			field.Height=fieldH;
+			fieldNew.Height-=fieldH;//reduce the size of the new text box by the height of the text removed
+			fieldNew.YPos+=fieldH;//move the new field down the amount of the removed text to maintain the distance between all fields below
+			//this is so all new line characters will be a single character, we will replace \n's with \r\n's after this for loop
+			fieldNew.FieldValue=fieldNew.FieldValue.Replace("\r\n","\n");
+			int exponentN=Convert.ToInt32(Math.Ceiling(Math.Log(fieldNew.FieldValue.Length,2)))-1;
+			int indexCur=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
+			int fieldHeightCur=0;
+			while(exponentN>0) {
+				exponentN--;
+				if(indexCur>=fieldNew.FieldValue.Length
+					|| Convert.ToInt32(Math.Ceiling(lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,fieldNew.FieldValue.Substring(0,indexCur+1),
+								font,fieldNew.Width)))>field.Height)
+				{
+					indexCur-=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
+				}
+				else {
+					indexCur+=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
+				}
+			}
+			if(indexCur>=fieldNew.FieldValue.Length) {//just in case, set indexCur to the last character if it is larger than the size of the fieldValue
+				indexCur=fieldNew.FieldValue.Length-1;
+			}
+			fieldHeightCur=Convert.ToInt32(Math.Ceiling(lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,fieldNew.FieldValue.Substring(0,indexCur+1),
+				font,fieldNew.Width)));
+			while(fieldHeightCur>field.Height) {
+				indexCur--;
+				fieldHeightCur=Convert.ToInt32(Math.Ceiling(lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,fieldNew.FieldValue.Substring(0,indexCur+1),
+					font,fieldNew.Width)));
+			}
+			//add the new line character to the previous line so the next page doesn't start with a blank line
+			if(fieldNew.FieldValue.Length>indexCur+1
+				&& (fieldNew.FieldValue[indexCur+1]=='\r'
+				|| fieldNew.FieldValue[indexCur+1]=='\n'))
+			{
+				indexCur++;
+			}
+			field.FieldValue=fieldNew.FieldValue.Substring(0,indexCur+1);
+			if(field.FieldValue[indexCur]=='\r' || field.FieldValue[indexCur]=='\n') {
+				field.FieldValue=field.FieldValue.Substring(0,indexCur);
+			}
+			field.FieldValue=field.FieldValue.Replace("\n","\r\n");
+			if(fieldNew.FieldValue.Length>indexCur+1) {
+				fieldNew.FieldValue=fieldNew.FieldValue.Substring(indexCur+1);
+				fieldNew.FieldValue=fieldNew.FieldValue.Replace("\n","\r\n");
+			}
+			else {
+				//no text left for the field that would have been on the next page, done, break out of recursion
+				return;
+			}
+			int moveAmountNew=bottomCurPage+1-fieldNew.YPos;
+			fieldNew.Height+=moveAmountNew;
+			MoveAllDownWhichIntersect(sheet,fieldNew,moveAmountNew);
+			fieldNew.Height-=moveAmountNew;
+			fieldNew.YPos+=moveAmountNew;
+			sheet.SheetFields.Add(fieldNew);
+			//recursive call
+			CalculateHeightsPageBreak(fieldNew,sheet,g);
 		}
 
 		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.</summary>
@@ -218,13 +355,11 @@ namespace OpenDental{
 
 		///<summary>Returns either a user defined MedLabResults sheet or the internal sheet.</summary>
 		public static SheetDef GetMedLabResultsSheetDef() {
-#warning Cameron12345 Remove this comment block if releasing MedLabs
-			//List<SheetDef> listDefs=SheetDefs.GetCustomForType(SheetTypeEnum.MedLabResults);
-			//if(listDefs.Count>0) {
-			//	return SheetDefs.GetSheetDef(listDefs[0].SheetDefNum);//Return first custom statement. Should be ordred by Description ascending.
-			//}
-			//return SheetsInternal.GetSheetDef(SheetInternalType.MedLabResults);
-			return null;
+			List<SheetDef> listDefs=SheetDefs.GetCustomForType(SheetTypeEnum.MedLabResults);
+			if(listDefs.Count>0) {
+				return SheetDefs.GetSheetDef(listDefs[0].SheetDefNum);//Return first custom statement. Should be ordred by Description ascending.
+			}
+			return SheetsInternal.GetSheetDef(SheetInternalType.MedLabResults);
 		}
 
 		/*
@@ -352,11 +487,11 @@ namespace OpenDental{
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
 					break;
 				case "MedLabResults":
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsIDValue",Description="Test / Result",ColumnWidth=506,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsAbnormalFlag",Description="Flag",ColumnWidth=78,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsUnits",Description="Units",ColumnWidth=56,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsRefRange",Description="Ref Interval",ColumnWidth=75,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="facilityID",Description="Lab",ColumnWidth=35,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsIDValue",Description="Test / Result",ColumnWidth=500,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsAbnormalFlag",Description="Flag",ColumnWidth=75,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsUnits",Description="Units",ColumnWidth=70,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsRefRange",Description="Ref Interval",ColumnWidth=97,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="facilityID",Description="Lab",ColumnWidth=28,ItemOrder=++i });
 					break;
 			}
 			return retVal;
@@ -563,38 +698,79 @@ namespace OpenDental{
 			retval.Columns.Add(new DataColumn("obsRefRange"));
 			retval.Columns.Add(new DataColumn("facilityID"));
 			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
-			Dictionary<long,string> dictLabNumLabId=SheetUtil.GetDictFacNumFacId(listMedLabs);
+			GetListFacNums(listMedLabs);//refreshes and sorts the classwide _listResults variable
+			string obsDescriptPrev="";
 			for(int i=0;i<_listResults.Count;i++) {
 				//LabCorp requested that these non-performance results not be displayed on the report
-				if(_listResults[i].ResultStatus==ResultStatus.F
+				if((_listResults[i].ResultStatus==ResultStatus.F || _listResults[i].ResultStatus==ResultStatus.X)
 					&& _listResults[i].ObsValue==""
 					&& _listResults[i].Note=="")
 				{
 					continue;
 				}
-				DataRow row=retval.NewRow();
-				string spaces="    ";
-				string obsVal=_listResults[i].ObsText+"\r\n"+spaces+_listResults[i].ObsValue.Replace("\r\n","\r\n"+spaces);
-				if(_listResults[i].Note!="") {
-					obsVal+="\r\n"+spaces;
+				string obsDescript="";
+				MedLab medLabCur=MedLabs.GetOne(_listResults[i].MedLabNum);
+				if(i==0 || _listResults[i].MedLabNum!=_listResults[i-1].MedLabNum) {
+					if(medLabCur.ActionCode!=ResultAction.G) {
+						if(obsDescriptPrev==medLabCur.ObsTestDescript) {
+							obsDescript=".";
+						}
+						else {
+							obsDescript=medLabCur.ObsTestDescript;
+							obsDescriptPrev=obsDescript;
+						}
+					}
 				}
-				obsVal+=_listResults[i].Note.Replace("\r\n","\r\n"+spaces);
+				DataRow row=retval.NewRow();
+				string spaces="  ";
+				string spaces2="    ";
+				string obsVal="";
+				int padR=38;
+				string newLine="";
+				if(obsDescript!="") {
+					if(obsDescript==_listResults[i].ObsText) {
+						spaces="";
+						spaces2="  ";
+						padR=40;
+					}
+					else {
+						obsVal+=obsDescript+"\r\n";
+						newLine+="\r\n";
+					}
+				}
+				if(_listResults[i].ObsValue=="Test Not Performed") {
+					obsVal+=spaces+_listResults[i].ObsText;
+				}
+				else if(_listResults[i].ObsText=="."
+					|| _listResults[i].ObsValue.Contains(":")
+					|| _listResults[i].ObsValue.Length>20
+					|| medLabCur.ActionCode==ResultAction.G)
+				{
+					obsVal+=spaces+_listResults[i].ObsText+"\r\n"+spaces2+_listResults[i].ObsValue.Replace("\r\n","\r\n"+spaces2);
+					newLine+="\r\n";
+				}
+				else {
+					obsVal+=spaces+_listResults[i].ObsText.PadRight(padR,' ')+_listResults[i].ObsValue;
+				}
+				if(_listResults[i].Note!="") {
+					obsVal+="\r\n"+spaces2+_listResults[i].Note.Replace("\r\n","\r\n"+spaces2);
+				}
 				row["obsIDValue"]=obsVal;
-				row["obsAbnormalFlag"]=MedLabResults.GetAbnormalFlagDescript(_listResults[i].AbnormalFlag);
-				row["obsUnits"]=_listResults[i].ObsUnits;
-				row["obsRefRange"]=_listResults[i].ReferenceRange;
-				row["facilityID"]=_listResults[i].FacilityID;
+				row["obsAbnormalFlag"]=newLine+MedLabResults.GetAbnormalFlagDescript(_listResults[i].AbnormalFlag);
+				row["obsUnits"]=newLine+_listResults[i].ObsUnits;
+				row["obsRefRange"]=newLine+_listResults[i].ReferenceRange;
+				row["facilityID"]=newLine+_listResults[i].FacilityID;
 				retval.Rows.Add(row);
 			}
 			return retval;
 		}
 
-		///<summary>Returns a dictionary linking the MedLabFacilityNum on each result to a facility ID that is unique for the report.
+		///<summary>Returns a list of MedLabFacilityNums, the order in the list will be the facility ID on the report.  Basically a local re-numbering.
 		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
 		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
 		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
-		///So each ID could link to multiple facilities.  We will have to append _1, _2, etc to differentiate them on the report.</summary>
-		public static Dictionary<long,string> GetDictFacNumFacId(List<MedLab> listMedLabs) {
+		///So each ID could link to multiple facilities.  We will re-number the facilities so that each will have a unique number for this report.</summary>
+		public static List<long> GetListFacNums(List<MedLab> listMedLabs) {
 			_listResults=MedLabResults.GetAllForLabs(listMedLabs);//use the classwide variable so we can use the list to create the data table
 			for(int i=_listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
 				if(i==0) {
@@ -604,59 +780,27 @@ namespace OpenDental{
 					_listResults.RemoveAt(i);
 				}
 			}
-			_listResults.Sort(SortResultsByPriKey);
+			_listResults.Sort(SortByMedLabNum);
 			//_listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
-			Dictionary<long,string> dictMedLabNumLabID=new Dictionary<long,string>();
+			List<long> listMedLabFacilityNums=new List<long>();
 			for(int i=0;i<_listResults.Count;i++) {
 				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,_listResults[i].MedLabResultNum);
 				if(listFacAttaches.Count==0) {
 					continue;
 				}
-				//each result may have been processed at more than one facility, but we will only show the most recent on the report
-				if(dictMedLabNumLabID.ContainsKey(listFacAttaches[0].MedLabFacilityNum)) {
-					if(dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum].Contains("_")
-						&& !dictMedLabNumLabID.ContainsValue(_listResults[i].FacilityID))
-					{
-						dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum]=_listResults[i].FacilityID;
-					}
-					else {
-						_listResults[i].FacilityID=dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum];
-					}
-					continue;
+				if(!listMedLabFacilityNums.Contains(listFacAttaches[0].MedLabFacilityNum)) {
+					listMedLabFacilityNums.Add(listFacAttaches[0].MedLabFacilityNum);
 				}
-				//if the facility ID is already linked to a different facilitynum, add the facilitynum by not the ID
-				//the facility may be referenced by a different ID in another result, and we will use that result ID for all results that reference this facility
-				if(dictMedLabNumLabID.ContainsValue(_listResults[i].FacilityID)) {
-					//we need to find a unique ID for this facility
-					int appendNum=0;
-					string val=_listResults[i].FacilityID;
-					while(dictMedLabNumLabID.ContainsValue(val)) {
-						appendNum++;
-						val=_listResults[i].FacilityID+"_"+appendNum;
-					}
-					dictMedLabNumLabID.Add(listFacAttaches[0].MedLabFacilityNum,val);
-					_listResults[i].FacilityID=val;
-					continue;
-				}
-				//the dictionary doesn't contain the facilitynum or ID, so add them
-				dictMedLabNumLabID.Add(listFacAttaches[0].MedLabFacilityNum,_listResults[i].FacilityID);
+				_listResults[i].FacilityID=(listMedLabFacilityNums.IndexOf(listFacAttaches[0].MedLabFacilityNum)+1).ToString().PadLeft(2,'0');
 			}
-			//update any IDs on the results that have an "_" in them, in case we found a valid ID in a subsequent result
-			for(int i=0;i<_listResults.Count;i++) {
-				if(!_listResults[i].FacilityID.Contains("_")) {
-					continue;
-				}
-				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,_listResults[i].MedLabResultNum);
-				if(listFacAttaches.Count==0) {
-					continue;
-				}
-				_listResults[i].FacilityID=dictMedLabNumLabID[listFacAttaches[0].MedLabFacilityNum];
-			}
-			return dictMedLabNumLabID;
+			return listMedLabFacilityNums;
 		}
 
 		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
-		private static int SortResultsByPriKey(MedLabResult medLabResultX,MedLabResult medLabResultY) {
+		private static int SortByMedLabNum(MedLabResult medLabResultX,MedLabResult medLabResultY) {
+			if(medLabResultX.MedLabNum!=medLabResultY.MedLabNum) {
+				return medLabResultX.MedLabNum.CompareTo(medLabResultY.MedLabNum);
+			}
 			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
 		}
 	}

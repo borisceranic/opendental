@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -72,16 +73,34 @@ namespace OpenDentBusiness{
 			if(listMedLabs.Count==0) {
 				return retval;
 			}
-			List<string> listMedLabNumStr=new List<string>();
+			List<long> listMedLabNums=new List<long>();
 			for(int i=0;i<listMedLabs.Count;i++) {
-				string medLabNumStr=POut.Long(listMedLabs[i].MedLabNum);
-				if(listMedLabNumStr.Contains(medLabNumStr)) {
-					continue;
-				}
-				listMedLabNumStr.Add(medLabNumStr);
+				listMedLabNums.Add(listMedLabs[i].MedLabNum);
 			}
-			string command="SELECT * FROM medlabresult WHERE MedLabNum IN("+string.Join(",",listMedLabNumStr)+") "
-				+"ORDER BY ObsID,ObsIDSub,ResultStatus,DateTimeObs DESC";
+			string command="SELECT * FROM medlabresult WHERE MedLabNum IN("+String.Join(",",listMedLabNums)+") "
+				+"ORDER BY ObsID,ObsIDSub,ResultStatus,DateTimeObs DESC,MedLabResultNum DESC";
+			return Crud.MedLabResultCrud.SelectMany(command);
+		}
+
+		///<summary>Gets a list of all MedLabResult objects for this patient with the same ObsID and ObsIDSub as the supplied medLabResult,
+		///and for the same SpecimenID and SpecimenIDFiller.  Ordered by ResultStatus,DateTimeObs descending, MedLabResultNum descending.
+		///Used to display the history of a result as many statuses may be received.</summary>
+		public static List<MedLabResult> GetResultHist(MedLabResult medLabResult,long patNum,string specimenID,string specimenIDFiller) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLabResult>>(MethodBase.GetCurrentMethod(),medLabResult,patNum,specimenID,specimenIDFiller);
+			}
+			List<MedLabResult> retval=new List<MedLabResult>();
+			if(medLabResult==null) {
+				return retval;
+			}
+			string command="SELECT medlabresult.* FROM medlabresult "
+				+"INNER JOIN medlab ON medlab.MedLabNum=medlabresult.MedLabNum "
+					+"AND medlab.PatNum="+POut.Long(patNum)+" "
+					+"AND medlab.SpecimenID='"+POut.String(specimenID)+"' "
+					+"AND medlab.SpecimenIDFiller='"+POut.String(specimenIDFiller)+"' "
+				+"WHERE medlabresult.ObsID='"+POut.String(medLabResult.ObsID)+"' "
+				+"AND medlabresult.ObsIDSub='"+POut.String(medLabResult.ObsIDSub)+"' "
+				+"ORDER BY medlabresult.ResultStatus,medlabresult.DateTimeObs DESC,medlabresult.MedLabResultNum DESC";
 			return Crud.MedLabResultCrud.SelectMany(command);
 		}
 
@@ -101,6 +120,16 @@ namespace OpenDentBusiness{
 				return;
 			}
 			Crud.MedLabResultCrud.Update(medLabResult);
+		}
+
+		///<summary>Delete all of the MedLabResult objects by MedLabResultNum.</summary>
+		public static void DeleteAll(List<long> listResultNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listResultNums);
+				return;
+			}
+			string command= "DELETE FROM medlabresult WHERE MedLabResultNum IN("+String.Join(",",listResultNums)+")";
+			Db.NonQ(command);
 		}
 
 		public static string GetAbnormalFlagDescript(AbnormalFlag abnormalFlag) {

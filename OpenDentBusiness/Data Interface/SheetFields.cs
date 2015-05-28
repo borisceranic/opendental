@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -101,7 +97,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Sorts fields in the order that they shoudl be drawn on top of eachother. First Images, then Drawings, Lines, Rectangles, Text, Check Boxes, and SigBoxes. In that order.</summary>
 		public static int SortDrawingOrderLayers(SheetField f1,SheetField f2) {
-			if(f1.FieldType!=f2.FieldType) {
+			if(FieldTypeSortOrder(f1.FieldType)!=FieldTypeSortOrder(f2.FieldType)) {
 				return FieldTypeSortOrder(f1.FieldType).CompareTo(FieldTypeSortOrder(f2.FieldType));
 			}
 			return f1.YPos.CompareTo(f2.YPos);

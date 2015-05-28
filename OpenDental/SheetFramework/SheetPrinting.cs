@@ -7,7 +7,6 @@ using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -93,6 +92,10 @@ namespace OpenDental {
 					sit=PrintSituation.Default;
 					break;
 			}
+			//Moved Calculate heights here because we need to caluclate height before printing, not while we are printing.
+			foreach(Sheet s in _sheetList) {
+				SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);
+			}
 			//later: add a check here for print preview.
 			#if DEBUG
 				pd.DefaultPageSettings.Margins=new Margins(20,20,0,0);
@@ -138,10 +141,6 @@ namespace OpenDental {
 			_stmt=stmt;
 			_medLab=medLab;
 			_isPrinting=true;
-			_sheetList=new List<Sheet>();
-			for(int i=0;i<copies;i++){
-				_sheetList.Add(sheet.Copy());
-			}
 			_sheetsPrinted=0;
 			_yPosPrint=0;// _printMargin.Top;
 			PrintDocument pd=new PrintDocument();
@@ -162,7 +161,6 @@ namespace OpenDental {
 			}
 			pd.DefaultPageSettings.Margins=new Margins(0,0,0,0);
 			pd.OriginAtMargins=true;
-			//SetForceSinglePage(sheet);
 			PrintSituation sit=PrintSituation.Default;
 			pd.DefaultPageSettings.Landscape=sheet.IsLandscape;
 			switch(sheet.SheetType){
@@ -187,13 +185,25 @@ namespace OpenDental {
 					sit= PrintSituation.Statement;
 					break;
 			}
+			_printMargin.Top=40;//default top margin
+			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;
+			}
+			Sheets.SetPageMargin(sheet,_printMargin);
+			Graphics g=Graphics.FromImage(new Bitmap(sheet.WidthPage,sheet.HeightPage));
+			g.SmoothingMode=SmoothingMode.HighQuality;
+			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
+			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
+			_sheetList=new List<Sheet>();
+			for(int i=0;i<copies;i++) {
+				_sheetList.Add(sheet.Copy());
+			}
 			//later: add a check here for print preview.
 		#if DEBUG
 			FormPrintPreview printPreview;
 			int pageCount=0;
 			foreach(Sheet s in _sheetList) {
-				//SetForceSinglePage(s);
-				pageCount+=Sheets.CalculatePageCount(s,_printMargin);// (_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
+				pageCount+=Sheets.CalculatePageCount(s,_printMargin);
 			}
 			printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 			printPreview.ShowDialog();
@@ -218,6 +228,9 @@ namespace OpenDental {
 				}
 		#endif
 			_isPrinting=false;
+			g.Dispose();
+			g=null;
+			GC.Collect();
 		}
 
 		///<summary>This gets called for every page to be printed when sending to a printer.  Will stop printing when e.HasMorePages==false.  See also CreatePdfPage.</summary>
@@ -231,8 +244,6 @@ namespace OpenDental {
 				_printMargin.Top=120;
 			}
 			Sheets.SetPageMargin(sheet,_printMargin);
-			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);//this is here because of easy access to g.
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			//Begin drawing.
 			foreach(SheetField field in sheet.SheetFields) {
 				if(!fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) { 
@@ -291,13 +302,13 @@ namespace OpenDental {
 			g=null;
 			GC.Collect();
 			#region Set variables for next page to be printed
-			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
+			_yPosPrint+=sheet.HeightPage-_printMargin.Bottom-_printMargin.Top;//move _yPosPrint down equal to the amount of printable area per page.
 			_pagesPrinted++;
 			if(_pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
 				e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
-				_yPosPrint=0;// _printMargin.Top;
+				_yPosPrint=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
 				if(_sheetsPrinted<_sheetList.Count){
@@ -673,7 +684,7 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Calculates the bottom of the current page assuming a 40px and 60px top and bottom margin respectively.</summary>
+		///<summary>Calculates the bottom of the current page assuming a 40px top margin (except for MedLabResults sheets which have a 120 top margin) and 60px bottom margin.</summary>
 		public static int bottomCurPage(int yPos,Sheet sheet,out int pageCount) {
 			_printMargin.Top=40;
 			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
@@ -683,7 +694,8 @@ namespace OpenDental {
 			pageCount=0;
 			while(retVal<yPos){
 				pageCount++;
-				retVal+=(sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top));//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2140px
+				//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2040px if top is 40px, 1960 if top is 120px
+				retVal+=sheet.HeightPage-_printMargin.Bottom-_printMargin.Top;
 			}
 			return retVal;
 		}
@@ -828,24 +840,95 @@ namespace OpenDental {
 
 		private static void drawMedLabFooter(Sheet sheet,Graphics g,XGraphics gx) {
 			SheetField fieldCur=new SheetField();
-			fieldCur.FieldValue=String.Format("Page {0} of {1}",_pagesPrinted+1,Sheets.CalculatePageCount(sheet,_printMargin));
-			fieldCur.FontSize=8.5f;
-			fieldCur.FontName=sheet.FontName;
-			fieldCur.FontIsBold=false;
-			fieldCur.XPos=sheet.Width-125;//width of field is 75, with a right margin of 50 xPos is sheet width-75-50=width-125
+			fieldCur.XPos=50;
 			int pageCount;
-			fieldCur.YPos=bottomCurPage(_pagesPrinted*sheet.HeightPage+1,sheet,out pageCount);
-			fieldCur.Width=75;
-			fieldCur.Height=15;
+			fieldCur.YPos=bottomCurPage(_yPosPrint+_printMargin.Bottom+_printMargin.Top+1,sheet,out pageCount)+1;
+			fieldCur.Width=625;
+			fieldCur.Height=20;
+			drawFieldRectangle(fieldCur,g,gx);
+			fieldCur.XPos=675;
+			fieldCur.Width=125;
+			drawFieldRectangle(fieldCur,g,gx);
+			string patLName="";
+			string patFName="";
+			string patMiddleI="";
+			string specNum="";
+			foreach(SheetField sf in sheet.SheetFields) {
+				switch(sf.FieldName) {
+					case "patient.LName":
+						patLName=sf.FieldValue;
+						continue;
+					case "patient.FName":
+						patFName=sf.FieldValue;
+						continue;
+					case "patient.MiddleI":
+						patMiddleI=sf.FieldValue;
+						continue;
+					case "medlab.PatIDLab":
+						specNum=sf.FieldValue;
+						continue;
+					default:
+						continue;
+				}
+			}
+			fieldCur.FieldValue=patLName;
+			if(patLName!="" && (patFName!="" || patMiddleI!="")) {
+				fieldCur.FieldValue+=", ";
+			}
+			fieldCur.FieldValue+=patFName;
+			if(fieldCur.FieldValue!="" && patMiddleI!="") {
+				fieldCur.FieldValue+=" ";
+			}
+			fieldCur.FieldValue+=patMiddleI;
+			fieldCur.FontSize=9;
+			fieldCur.FontName="Arial";
+			fieldCur.FontIsBold=false;
+			fieldCur.XPos=53;
+			fieldCur.YPos+=1;
+			fieldCur.Width=245;
+			fieldCur.Height=17;
 			fieldCur.TextAlign=HorizontalAlignment.Left;
 			fieldCur.ItemColor=Color.FromKnownColor(KnownColor.Black);
 			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=specNum;
+			fieldCur.XPos=678;
+			fieldCur.Width=120;
+			fieldCur.TextAlign=HorizontalAlignment.Center;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
+			fieldCur.FontSize=8.5f;
+			fieldCur.FontName=sheet.FontName;
+			fieldCur.XPos=50;//position the field at 50 for left margin
+			fieldCur.YPos+=19;//drop down 19 pixels from the top of the text in the rect (17 pixel height of text box + 1 pixel to bottom of rect + 1 pixel)
+			fieldCur.Width=150;
+			fieldCur.TextAlign=HorizontalAlignment.Left;
+			drawFieldText(fieldCur,sheet,g,gx);
+			fieldCur.FieldValue=String.Format("Page {0} of {1}",_pagesPrinted+1,Sheets.CalculatePageCount(sheet,_printMargin));
+			fieldCur.XPos=sheet.Width-200;//width of field is 150, with a right margin of 50 xPos is sheet width-150-50=width-200
+			fieldCur.TextAlign=HorizontalAlignment.Right;
+			drawFieldText(fieldCur,sheet,g,gx);
+			if(_medLab.IsPreliminaryResult) {
+				fieldCur.FieldValue="Preliminary Report";
+			}
+			else {
+				fieldCur.FieldValue="Final Report";
+			}
+			fieldCur.FontSize=10.0f;
+			fieldCur.FontIsBold=true;
+			//field will be centered on page, since page count is taking up 150 pixels plus page right margin of 50 pixels on the right side of page
+			//and date printed is taking up 50 pixel left margin plus 150 pixel field width on the left side of page
+			//field width will be sheet.Width-400 and XPos will be 200
+			fieldCur.XPos=200;
+			fieldCur.YPos+=2;
+			fieldCur.Width=sheet.Width-400;//sheet width-150 (date field width)-150 (page count field width)-50 (left margin)-50 (right margin)
+			fieldCur.TextAlign=HorizontalAlignment.Center;
+			drawFieldText(fieldCur,sheet,g,gx);
 		}
 
-		private static void drawMedLabHeader(Sheet sheet,Graphics g,XGraphics gx) {			
+		private static void drawMedLabHeader(Sheet sheet,Graphics g,XGraphics gx) {
 			SheetField fieldCur=new SheetField();
 			fieldCur.XPos=50;
-			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+40;
+			fieldCur.YPos=_yPosPrint+40;//top of the top rectangle
 			fieldCur.Width=529;
 			fieldCur.Height=40;
 			drawFieldRectangle(fieldCur,g,gx);
@@ -853,7 +936,7 @@ namespace OpenDental {
 			fieldCur.Width=221;
 			drawFieldRectangle(fieldCur,g,gx);
 			fieldCur.XPos=50;
-			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row
+			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row of rectangles
 			fieldCur.Width=100;
 			drawFieldRectangle(fieldCur,g,gx);
 			fieldCur.XPos=150;
@@ -879,7 +962,7 @@ namespace OpenDental {
 			fieldCur.FontName="Arial";
 			fieldCur.FontIsBold=false;
 			fieldCur.XPos=54;
-			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+43;
+			fieldCur.YPos=_yPosPrint+44;//4 pixels down from the rectangle top for static text descriptions of text boxes in header
 			fieldCur.Width=522;
 			fieldCur.Height=15;
 			fieldCur.TextAlign=HorizontalAlignment.Left;
@@ -891,7 +974,7 @@ namespace OpenDental {
 			drawFieldText(fieldCur,sheet,g,gx);
 			fieldCur.FieldValue="Account Number";
 			fieldCur.XPos=54;
-			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row
+			fieldCur.YPos+=40;//drop down an additional 40 pixels for second row of static text descriptions
 			fieldCur.Width=93;
 			drawFieldText(fieldCur,sheet,g,gx);
 			fieldCur.FieldValue="Patient ID";
@@ -974,7 +1057,7 @@ namespace OpenDental {
 			fieldCur.FontName="Arial";
 			fieldCur.FontIsBold=false;
 			fieldCur.XPos=53;
-			fieldCur.YPos=(_pagesPrinted*(sheet.HeightPage-_printMargin.Bottom-_printMargin.Top))+62;
+			fieldCur.YPos=_yPosPrint+62;//22 pixels down from the rectangle top (second row of text is 20 pixels below static text descriptions)
 			fieldCur.Width=524;
 			fieldCur.Height=17;
 			fieldCur.TextAlign=HorizontalAlignment.Left;
@@ -1136,7 +1219,11 @@ namespace OpenDental {
 			_isPrinting=true;
 			_yPosPrint=0;
 			PdfDocument document=new PdfDocument();
-			//SetForceSinglePage(sheet);
+			Graphics g=Graphics.FromImage(new Bitmap(sheet.WidthPage,sheet.HeightPage));
+			g.SmoothingMode=SmoothingMode.HighQuality;
+			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
+			//this will set the page breaks as well as adjust for growth behavior
+			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
 			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			for(int i=0;i<pageCount;i++) {
 				_pagesPrinted=i;
@@ -1149,7 +1236,6 @@ namespace OpenDental {
 
 		///<summary>Called for every page that is generated for a PDF docuemnt. Pages and yPos must be tracked outside of this function. See also pd_PrintPage.</summary>
 		public static void CreatePdfPage(Sheet sheet,PdfPage page) {
-			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);//should always be sorted.
 			page.Width=p(sheet.Width);//XUnit.FromInch((double)sheet.Width/100);  //new XUnit((double)sheet.Width/100,XGraphicsUnit.Inch);
 			page.Height=p(sheet.Height);//new XUnit((double)sheet.Height/100,XGraphicsUnit.Inch);
 			if(sheet.IsLandscape){
@@ -1208,27 +1294,10 @@ namespace OpenDental {
 				//e.HasMorePages=true;
 			}
 			else {//we are printing the last page of the current sheet.
-				_yPosPrint=_printMargin.Top;
+				_yPosPrint=0;
 				_pagesPrinted=0;
 				_sheetsPrinted++;
-				//if(_sheetsPrinted<_sheetList.Count) {
-				//	//e.HasMorePages=true;
-				//}
-				//else {
-				//	//e.HasMorePages=false;
-				//	_sheetsPrinted=0;
-				//}
 			}
-
-
-			//foreach(SheetField field in sheet.SheetFields) {
-			//	if(field.Bounds.Bottom>_yPosPrint+sheet.HeightPage-_printMargin.Bottom
-			//		&& field.YPos!=_yPosPrint+_printMargin.Top) {
-			//		//Either set new page to the top of the next control or the top of the next natural page break, whichever comes first.
-			//		_yPosPrint=Math.Min(field.YPos-_printMargin.Top,_yPosPrint+sheet.HeightPage);
-			//		break;
-			//	}
-			//}
 			#endregion
 		}
 

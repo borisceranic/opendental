@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace OpenDentBusiness {
 	///<Summary>Different types of sheets that can be used.</Summary>
 	public enum SheetTypeEnum{
@@ -114,10 +111,9 @@ namespace OpenDentBusiness {
 		LabSlip,
 		ExamSheet,
 		DepositSlip,
-		Statement
-#warning Cameron12345 Remove this comment if releasing MedLab in version 15.2
-		//,
-		//MedLabResults
+		Statement,
+		///<summary>Users are NEVER allowed to use this sheet type. It is for internal use only. It should be hidden in all lists and unselectable.</summary>
+		MedLabResults
 	}
 
 	public enum OutInCheck{

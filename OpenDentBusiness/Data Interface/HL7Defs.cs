@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 using OpenDentBusiness.HL7;
 
 namespace OpenDentBusiness{
@@ -106,10 +104,9 @@ namespace OpenDentBusiness{
 			def=GetInternalFromDb(HL7InternalType.HL7v2_6);
 			def=InternalHL7v2_6.GetDeepInternal(def);
 			listInternal.Add(def);
-#warning Cameron12345 Remove this comment if releasing MedLabs
-			//def=GetInternalFromDb(HL7InternalType.MedLabv2_3);
-			//def=MedLabv2_3.GetDeepInternal(def);
-			//listInternal.Add(def);
+			def=GetInternalFromDb(HL7InternalType.MedLabv2_3);
+			def=MedLabv2_3.GetDeepInternal(def);
+			listInternal.Add(def);
 			//Add defs for other companies like Centricity here later.
 			return listInternal;
 		}

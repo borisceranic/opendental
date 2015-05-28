@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CodeBase;
@@ -52,6 +51,10 @@ namespace OpenDental {
 		}
 
 		private void FormSheetFillEdit_Load(object sender,EventArgs e) {
+			_printMargin.Top=40;//default margin size
+			if(SheetCur.SheetType==SheetTypeEnum.MedLabResults) {
+				_printMargin.Top=120;//includes space for header on MedLabResults
+			}
 			if(IsInTerminal) {
 				labelDateTime.Visible=false;
 				textDateTime.Visible=false;

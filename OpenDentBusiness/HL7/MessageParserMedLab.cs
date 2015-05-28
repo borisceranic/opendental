@@ -27,13 +27,17 @@ namespace OpenDentBusiness.HL7 {
 		///Each message will result in one MedLab object for each repitition of the ORC/OBR observation group in the message.
 		///Each of the MedLab objects created will be linked to the msgArchiveFileName supplied.
 		///Each repetition of the OBX result group will result in a MedLabResult object.
-		///This returns a list of the MedLab.MedLabNums for all MedLab objects created from this message.</summary>
-		public static List<long> Process(MessageHL7 msg,string msgArchiveFileName,bool isVerboseLogging) {
+		///This returns a list of the MedLab.MedLabNums for all MedLab objects created from this message.
+		///Use selectedPat to manually specify the patient to attach the objects and embedded files to.  Used when a patient could not be located using
+		///the original message PID segment info and the user has now manually selected a patient.  The ZEF segments would not have been processed if a
+		///patient could not be located and once the user selects the patient we will need to re-process the message to create the embedded PDFs.</summary>
+		public static List<long> Process(MessageHL7 msg,string msgArchiveFileName,bool isVerboseLogging,Patient selectedPat=null) {
 			_isVerboseLogging=isVerboseLogging;
 			_msgArchiveFileName=msgArchiveFileName;
 			_medLabNumList=new List<long>();
 			_medLabCur=null;//make sure the last medlab object is cleared out
 			_medLabResultCur=null;
+			_patCur=null;
 			HL7Def def=HL7Defs.GetOneDeepEnabled(true);
 			if(def==null) {
 				throw new Exception("Could not process the MedLab HL7 message.  No MedLab HL7 definition is enabled.");
@@ -62,10 +66,12 @@ namespace OpenDentBusiness.HL7 {
 				throw new Exception("Could not process the MedLab HL7 message.  "
 					+"The second segment in the message or message definition is not the PID segment.");
 			}
-			//get the patient from the PID segment
-			_patCur=GetPatFromPID(pidSegDef,pidSegCur);
-			if(_patCur==null) {
-				//TODO: Handle this, might process the message anyway and just not link it to a patient so the user can later link it manually, possibly throw an exception
+			if(selectedPat==null) {
+				//get the patient from the PID segment
+				_patCur=GetPatFromPID(pidSegDef,pidSegCur);
+			}
+			if(_patCur==null) {//if no patient is located using PID segment or if selectedPat is not null, use selectedPat
+				_patCur=selectedPat;//selectedPat could be null as well, but null _patCur is handled
 			}
 			#endregion Locate Patient
 			#region Validate Message Structure
@@ -102,7 +108,7 @@ namespace OpenDentBusiness.HL7 {
 					//the PID level NTE segments can follow after the PID segment, the optional NK1 segment, or other repetitions of the NTE segment
 					if(msg.Segments[i-1].Name!=SegmentNameHL7.PID
 						&& msg.Segments[i-1].Name!=SegmentNameHL7.NK1
-						&& msg.Segments[i-1].Name!=SegmentNameHL7.NTE)
+						&& msg.Segments[i-1].Name!=SegmentNameHL7.NTE) 
 					{
 						throw new Exception("Could not process the MedLab HL7 message.  Found a NTE segment before an ORC segment but after a "
 							+msg.Segments[i-1].Name.ToString()+" segment.  Incorrect message structure.");
@@ -178,9 +184,7 @@ namespace OpenDentBusiness.HL7 {
 			//IDType=IdentifierType.Patient, and IDInternal=PatNum if one does not already exist.
 			long patNum=0;
 			long patNumFromAlt=0;
-			long patNumFromLabID=0;
 			string altPatID="";
-			string labPatID="";
 			string patLName="";
 			string patFName="";
 			DateTime birthdate=DateTime.MinValue;
@@ -200,18 +204,6 @@ namespace OpenDentBusiness.HL7 {
 							continue;
 						}
 						patNumFromAlt=oidCur.IDInternal;
-						continue;
-					case "labPatID":
-						labPatID=pidSeg.GetFieldComponent(fieldDefCur.OrdinalPos);
-						if(labPatID=="") {
-							continue;
-						}
-						oidCur=OIDExternals.GetByRootAndExtension(HL7InternalType.MedLabv2_3.ToString()+".Patient",labPatID);
-						if(oidCur==null || oidCur.IDType!=IdentifierType.Patient) {
-							//not in the oidexternals table or the oidexternal located is not for a patient object, patNumFromAlt will remain 0
-							continue;
-						}
-						patNumFromLabID=oidCur.IDInternal;
 						continue;
 					case "patBirthdateAge":
 						//LabCorp sends the birthdate and age in years, months, and days like yyyyMMdd^YYY^MM^DD
@@ -238,22 +230,6 @@ namespace OpenDentBusiness.HL7 {
 			#region Upsert the oidexternals Table
 			//insert/update the altPatID and labPatID in the oidexternals table if a patient was found and the patient's name and birthdate match the message
 			if(patCur!=null && IsMatchNameBirthdate(patCur,patLName,patFName,birthdate)) {
-				//the labPatID field was populated in the PID segment (usually PID.3) and 
-				if(labPatID!="") {
-					if(patNumFromLabID==0) { //if the labPatID isn't stored in the oidexternals table as IDExternal, insert
-						OIDExternal oidCur=new OIDExternal();
-						oidCur.IDType=IdentifierType.Patient;
-						oidCur.IDInternal=patCur.PatNum;
-						oidCur.rootExternal=HL7InternalType.MedLabv2_3.ToString()+".Patient";
-						oidCur.IDExternal=labPatID;
-						OIDExternals.Insert(oidCur);
-					}
-					else if(patCur.PatNum!=patNumFromLabID) { //else if patCur.PatNum is different than the IDInternal stored in the oidexternals table, update
-						OIDExternal oidCur=OIDExternals.GetByRootAndExtension(HL7InternalType.MedLabv2_3.ToString()+".Patient",labPatID);
-						oidCur.IDInternal=patCur.PatNum;
-						OIDExternals.Update(oidCur);
-					}
-				}
 				//the altPatID field was populated in the PID segment (usually PID.4) and the altPatID isn't stored in the oidexternals table as IDExternal
 				if(altPatID!="") {
 					if(patNumFromAlt==0) { //if the altPatID isn't stored in the oidexternals table as IDExternal, insert
@@ -272,14 +248,6 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			#endregion Upsert the oidexternals Table
-			//patCur is null so try to find a patient from the labPatID (PID.3)
-			if(patCur==null && patNumFromLabID>0) {
-				patCur=Patients.GetPat(patNumFromLabID);
-				//We will only trust the labPatID if the name and birthdate of the patient match the name and birthdate in the message.
-				if(!IsMatchNameBirthdate(patCur,patLName,patFName,birthdate)) {
-					patCur=null;
-				}
-			}
 			//patCur is null so try to find a patient from the altPatID (PID.4)
 			if(patCur==null && patNumFromAlt>0) {
 				patCur=Patients.GetPat(patNumFromAlt);
@@ -306,7 +274,7 @@ namespace OpenDentBusiness.HL7 {
 			if(patCur!=null
 				&& patCur.Birthdate.Date==birthdate.Date
 				&& patCur.LName.ToLower().PadRight(25).Substring(0,25)==lname.ToLower().PadRight(25).Substring(0,25)
-				&& patCur.FName.ToLower().PadRight(15).Substring(0,15)==fname.ToLower().PadRight(15).Substring(0,15))
+				&& patCur.FName.ToLower().PadRight(15).Substring(0,15)==fname.ToLower().PadRight(15).Substring(0,15)) 
 			{
 				return true;
 			}
@@ -414,6 +382,9 @@ namespace OpenDentBusiness.HL7 {
 					if(segDefCur==null) {//do not process the ZEF segment if it's not defined
 						return;
 					}
+					if(_patCur==null) {
+						return;//cannot store the pdf without a patient, need a patient to create an entry in the document table
+					}
 					ProcessZEF(segDefCur,listSegs);
 					return;
 				case SegmentNameHL7.ZPS://required segment
@@ -458,12 +429,12 @@ namespace OpenDentBusiness.HL7 {
 			_medLabCur.MedLabNum=MedLabs.Insert(_medLabCur);
 			_medLabNumList.Add(_medLabCur.MedLabNum);
 		}
-		
+
 		///<summary>Not currently processing the NK1 segment.</summary>
 		public static void ProcessNK1(HL7DefSegment segDef,List<SegmentHL7> listSegs) {
 			return;
 		}
-		
+
 		///<summary>The segDef contains the field name that will identify which NTE segment we're processing.  It could be a PID note, an OBR/ORC note,
 		///or an OBX note.  The segDef field is named accordingly.</summary>
 		public static void ProcessNTE(HL7DefSegment segDef,List<SegmentHL7> listSegs,MessageHL7 msg) {
@@ -691,7 +662,7 @@ namespace OpenDentBusiness.HL7 {
 						}
 						_medLabResultCur.ObsUnits=obxSeg.GetFieldComponent(fieldDefCur.OrdinalPos);
 						if(obxSeg.GetFieldComponent(fieldDefCur.OrdinalPos,1).Length>0) {
-							if(_medLabResultCur.Note.Length>0) {
+							if(_medLabResultCur.Note!=null && _medLabResultCur.Note.Length>0) {
 								_medLabResultCur.Note+="\r\n";
 							}
 							_medLabResultCur.Note+="Units full text: "+obxSeg.GetFieldComponent(fieldDefCur.OrdinalPos,1);
@@ -914,7 +885,8 @@ namespace OpenDentBusiness.HL7 {
 			}
 			foreach(SegmentHL7 seg in listSegs) {
 				seg.SequenceNumIndex=sequenceNumIndex;
-				if(listSegs.Count>1 && seg.SequenceNum<0) {//the seq num is a field in the seg that we attempt to parse to an int, but parsing may fail and the seq num will be -1
+				//the seq num is a field in the seg that we attempt to parse to an int, but parsing may fail and the seq num will be -1
+				if(listSegs.Count>1 && seg.SequenceNum<0) {
 					EventLog.WriteEntry("MedLabHL7","A ZEF segment had a sequence number that was invalid or not present.  "
 						+"The ZEF segments were not processed and the embedded PDF was not created.");
 					return;
