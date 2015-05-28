@@ -1546,6 +1546,18 @@ namespace OpenDental{
 		}
 
 		private void butRecalculate_Click(object sender,EventArgs e) {
+			if(textDate.errorProvider1.GetError(textDate)!=""
+				|| textAmount.errorProvider1.GetError(textAmount)!=""
+				|| textDateFirstPay.errorProvider1.GetError(textDateFirstPay)!=""
+				|| textDownPayment.errorProvider1.GetError(textDownPayment)!=""
+				|| textAPR.errorProvider1.GetError(textAPR)!=""
+				|| textTerm.errorProvider1.GetError(textTerm)!=""
+				|| textPeriodPayment.errorProvider1.GetError(textPeriodPayment)!=""
+				|| textCompletedAmt.errorProvider1.GetError(textCompletedAmt)!="") 
+			{
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
 			if(checkIns.Checked) {
 				MsgBox.Show(this,"Insurance payment plans can't be recalculated.");
 				return;
