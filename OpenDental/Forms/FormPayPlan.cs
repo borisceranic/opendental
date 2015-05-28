@@ -1839,14 +1839,15 @@ namespace OpenDental{
 				}
 				if(paidTotal>=pastDueTotal) {//Overpaid
 					overPaidAmt=paidTotal-pastDueTotal;
-					string recalcType=Lan.g(this,"prepayment");
-					if(!_formPayPlanRecalculate.IsPrepay) {
+					if(_formPayPlanRecalculate.IsPrepay) {
+						_listPayPlanCharges.Add(CreateCharge(overPaidAmt,0,DateTimeOD.Today,Lan.g(this,"Recalculated based on prepayment")));
+					}
+					else {
 						//Only deduct the overpaid amount from principal if we aren't prepaying, otherwise the payamount per month will be different than expected.
 						principalAmt-=overPaidAmt;
+						_listPayPlanCharges.Add(CreateCharge(overPaidAmt,0,DateTimeOD.Today,Lan.g(this,"Recalculated based on pay on principal")));
 						overPaidAmt=0;
-						recalcType=Lan.g(this,"pay on principal");
 					}
-					_listPayPlanCharges.Add(CreateCharge(overPaidAmt,0,DateTimeOD.Today,Lan.g(this,"Recalculated based on ")+recalcType));
 				}
 				if(pastDueTotal>paidTotal) {//The patient currently owes more than they have paid.  There is an amount past due.
 					interestInterimAmt=(principalAmt+pastDueTotal-paidTotal)*periodRate;
