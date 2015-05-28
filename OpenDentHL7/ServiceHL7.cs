@@ -216,7 +216,9 @@ namespace OpenDentHL7 {
 		}
 
 		#region SFTP Mode
-		///<summary>Runs in a separate thread, called once per minute.  If not already retrieving and processing files, this will connect to the MedLab SFTP server, check for new files to retrieve, process the files, and disconnect from the server.  Once the files are read, they are deleted by the MedLab SFTP server automatically, so it is not necessary to call a remove/delete function.</summary>
+		///<summary>Runs in a separate thread, called once per minute.  If not already retrieving and processing files, this will connect to
+		///the MedLab SFTP server, check for new files to retrieve, process the files, and disconnect from the server.  Once the files are read,
+		///they are deleted by the MedLab SFTP server automatically, so it is not necessary to call a remove/delete function.</summary>
 		private void TimerCallbackSftpGetFiles(Object stateInfo) {
 			if(IsVerboseLogging) {
 				EventLog.WriteEntry("OpenDentHL7","A new thread is spawned once per minute to connect to the MedLab SFTP server.  "
@@ -361,7 +363,7 @@ namespace OpenDentHL7 {
 							}
 						}
 						countFilesProcessed++;
-						//chsftp.rm(filename);//LabCorp doesn't grant permission to remove files, but once the file has been read it is deleted from the SFTP server
+						//chsftp.rm(filename);//not necessary to remove the file, once it is read it is deleted
 					}
 					catch(Exception ex) {
 						EventLog.WriteEntry("OpenDentHL7","Error retrieving or processing a MedLab HL7 message.  If the file was not processed, it will remain "

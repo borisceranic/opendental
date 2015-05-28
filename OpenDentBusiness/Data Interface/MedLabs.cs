@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
@@ -46,6 +47,14 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
+		///<summary>Gets one MedLab from the db.</summary>
+		public static MedLab GetOne(long medLabNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<MedLab>(MethodBase.GetCurrentMethod(),medLabNum);
+			}
+			return Crud.MedLabCrud.SelectOne(medLabNum);
+		}
+
 		///<summary>Get all MedLab objects for a specific patient from the database.  Can return an empty list.</summary>
 		public static List<MedLab> GetForPatient(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -58,22 +67,27 @@ namespace OpenDentBusiness{
 		///<summary>Get unique MedLab orders, grouped by ProvNum, SpecimenID, and SpecimenIDFiller.  Also returns the most recent DateTime the results
 		///were released from the lab, the earliest DateTime the order was entered into the lab system, and a list of tests ordered.
 		///The list of tests ordered will not contain reflex result test IDs.</summary>
-		public static DataTable GetOrdersForPatient(long patNum) {
+		public static DataTable GetOrdersForPatient(long patNum,bool includeNoPat) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT ProvNum,SpecimenID,SpecimenIDFiller,MIN(DateTimeEntered) AS DateTimeEntered,"
+			string noPatClause="";
+			if(includeNoPat) {
+				noPatClause="OR PatNum=0";
+			}
+			string command="SELECT PatNum,ProvNum,SpecimenID,SpecimenIDFiller,MIN(DateTimeEntered) AS DateTimeEntered,"
 				+"MAX(DateTimeReported) AS DateTimeReported,"+DbHelper.GroupConcat("ObsTestID",true)+" AS TestsOrdered "
-				+"FROM medlab WHERE PatNum="+POut.Long(patNum)+" "
-				+"AND ActionCode!='"+ResultAction.G.ToString()+"' "
-				+"GROUP BY ProvNum,SpecimenID,SpecimenIDFiller "
-				+"ORDER BY MIN(DateTimeEntered) DESC,MAX(DateTimeReported) DESC";
+				+"FROM medlab WHERE (PatNum="+POut.Long(patNum)+" "
+				+noPatClause
+				+") AND ActionCode!='"+ResultAction.G.ToString()+"' "
+				+"GROUP BY PatNum,ProvNum,SpecimenID,SpecimenIDFiller "
+				+"ORDER BY PatNum DESC,MIN(DateTimeEntered) DESC,MAX(DateTimeReported) DESC";
 			return Db.GetTable(command);
 		}
 
 		///<summary>Get MedLabs for a specific patient and a specific SpecimenID, SpecimenIDFiller combination.
-		///Ordered by DateTimeReported DESC so that the most recently received result will be first in the list.
-		///This will be the DateTime that populates the LabCorp result report Date/Time Reported field.</summary>
+		///Ordered by DateTimeReported descending, MedLabNum descending so the most recently reported/processed message is first in the list.
+		///If using random primary keys, this information may be incorectly ordered, but that is only an annoyance and this function should still work.</summary>
 		public static List<MedLab> GetForPatAndSpecimen(long patNum,string specimenID,string specimenIDFiller) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),patNum,specimenID,specimenIDFiller);
@@ -81,7 +95,7 @@ namespace OpenDentBusiness{
 			string command="SELECT * FROM medlab WHERE PatNum="+POut.Long(patNum)+" "
 				+"AND SpecimenID='"+POut.String(specimenID)+"' "
 				+"AND SpecimenIDFiller='"+POut.String(specimenIDFiller)+"' "
-				+"ORDER BY DateTimeReported DESC";
+				+"ORDER BY DateTimeReported DESC,MedLabNum DESC";
 			return Crud.MedLabCrud.SelectMany(command);
 		}
 
@@ -112,16 +126,38 @@ namespace OpenDentBusiness{
 			Crud.MedLabCrud.Update(medLab);
 		}
 
+		///<summary>Translates enum values into human readable strings.</summary>
+		public static string GetStatusDescript(ResultStatus resultStatus) {
+			//No need to check RemotingRole; no call to db.
+			switch(resultStatus) {
+				case ResultStatus.C:
+					return "Corrected";
+				case ResultStatus.F:
+					return "Final";
+				case ResultStatus.I:
+					return "Incomplete";
+				case ResultStatus.P:
+					return "Preliminary";
+				case ResultStatus.X:
+					return "Canceled";
+				default:
+					return "";
+			}
+		}
+
+		///<summary>Delete all of the MedLab objects by MedLabNum.</summary>
+		public static void DeleteAll(List<long> listLabNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listLabNums);
+				return;
+			}
+			string command= "DELETE FROM medlab WHERE MedLabNum IN("+String.Join(",",listLabNums)+")";
+			Db.NonQ(command);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
-		///<summary>Gets one MedLab from the db.</summary>
-		public static MedLab GetOne(long medLabNum){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<MedLab>(MethodBase.GetCurrentMethod(),medLabNum);
-			}
-			return Crud.MedLabCrud.SelectOne(medLabNum);
-		}
 
 		///<summary></summary>
 		public static void Delete(long medLabNum) {

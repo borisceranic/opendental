@@ -1,4 +1,6 @@
+using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -51,6 +53,16 @@ namespace OpenDentBusiness{
 				return medLabSpecimen.MedLabSpecimenNum;
 			}
 			return Crud.MedLabSpecimenCrud.Insert(medLabSpecimen);
+		}
+		
+		///<summary>Deletes all MedLabSpecimen objects from the db for a list of MedLabNums.</summary>
+		public static void DeleteAllForLabs(List<long> listLabNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listLabNums);
+				return;
+			}
+			string command="DELETE FROM medlabspecimen WHERE MedLabNum IN("+String.Join(",",listLabNums)+")";
+			Db.NonQ(command);
 		}
 
 		/*

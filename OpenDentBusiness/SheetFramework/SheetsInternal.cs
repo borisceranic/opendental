@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDentBusiness{
@@ -61,9 +60,8 @@ namespace OpenDentBusiness{
 					return DepositSlip();
 				case SheetInternalType.Statement:
 					return StmtSheet();
-#warning Cameron12345 Remove this comment if releasing MedLabs
-				//case SheetInternalType.MedLabResults:
-				//	return MedLabResultReport();
+				case SheetInternalType.MedLabResults:
+					return MedLabResultReport();
 				default:
 					throw new ApplicationException("Invalid SheetInternalType.");
 			}
@@ -72,7 +70,9 @@ namespace OpenDentBusiness{
 		public static List<SheetDef> GetAllInternal(){
 			List<SheetDef> list=new List<SheetDef>();
 			for(int i=0;i<Enum.GetValues(typeof(SheetInternalType)).Length;i++){
-				list.Add(GetSheetDef((SheetInternalType)i));
+				if((SheetInternalType)i==SheetInternalType.MedLabResults) {
+					continue;
+				}
 			}
 			return list;
 		}
@@ -1645,16 +1645,16 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medlab.TotalVolume",9,"Arial",false,328,222,121,17,HorizontalAlignment.Left));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(50,240,165,40));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(215,240,110,40));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(325,240,56,40));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(381,240,70,40));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(325,240,63,40));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(388,240,63,40));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Age (Y/M/D)",sheet.FontSize,"Arial",false,54,243,158,15,itemColor:KnownColor.GrayText));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Date of Birth",sheet.FontSize,"Arial",false,219,243,103,15,itemColor:KnownColor.GrayText));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Gender",sheet.FontSize,"Arial",false,329,243,49,15,itemColor:KnownColor.GrayText));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Fasting",sheet.FontSize,"Arial",false,385,243,63,15,itemColor:KnownColor.GrayText));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Date of Birth",sheet.FontSize,"Arial",false,219,243,103,15,itemColor :KnownColor.GrayText));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Gender",sheet.FontSize,"Arial",false,329,243,56,15,itemColor :KnownColor.GrayText));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Fasting",sheet.FontSize,"Arial",false,392,243,56,15,itemColor :KnownColor.GrayText));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medlab.PatAge",9,"Arial",false,53,262,160,17,HorizontalAlignment.Left));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("patient.Birthdate",9,"Arial",false,218,262,105,17,HorizontalAlignment.Left));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("patient.Gender",9,"Arial",false,328,262,51,17,HorizontalAlignment.Left));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medlab.PatFasting",9,"Arial",false,384,262,65,17,HorizontalAlignment.Left));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("patient.Gender",9,"Arial",false,328,262,58,17,HorizontalAlignment.Left));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medlab.PatFasting",9,"Arial",false,391,262,58,17,HorizontalAlignment.Left));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(50,280,401,80));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewRect(451,280,349,80));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Patient Address",sheet.FontSize,"Arial",false,54,283,393,15,itemColor:KnownColor.GrayText,
@@ -1705,15 +1705,15 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(50,580,750,0));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Lab Results",sheet.FontSize,"Arial",false,54,583,742,15,itemColor:KnownColor.GrayText,
 				textAlign:HorizontalAlignment.Center));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("MedLabResults",50,602,750,37,8f,"Courier New"));//LabCorp requested we use a fixed width font for the grids
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(50,640,750,0));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Lab Facilities",sheet.FontSize,"Arial",false,54,643,742,15,itemColor:KnownColor.GrayText,
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("MedLabResults",40,604,770,37,7.5f,"Courier New"));//LabCorp requested we use a fixed width font for the grids
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(50,644,750,0));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Lab Facilities",sheet.FontSize,"Arial",false,54,649,742,15,itemColor:KnownColor.GrayText,
 				textAlign:HorizontalAlignment.Center));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medLabFacilityAddr",9,"Arial",false,52,662,371,37,HorizontalAlignment.Left,
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medLabFacilityAddr",9,"Arial",false,52,668,371,37,HorizontalAlignment.Left,
 				growthBehavior:GrowthBehaviorEnum.DownLocal));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medLabFacilityDir",9,"Arial",false,427,662,371,37,HorizontalAlignment.Left,
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("medLabFacilityDir",9,"Arial",false,427,668,371,37,HorizontalAlignment.Left,
 				growthBehavior:GrowthBehaviorEnum.DownLocal));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(50,700,750,0));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(50,708,750,0));
 			return sheet;
 		}
 

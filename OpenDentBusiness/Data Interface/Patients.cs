@@ -1783,6 +1783,7 @@ FROM insplan";
 				"labpanel.PatNum",
 				"medicalorder.PatNum",
 				"medicationpat.PatNum",
+				"medlab.PatNum",
 				"mount.PatNum",
 				"orthochart.PatNum",
 				//"patfield.PatNum", //Taken care of below

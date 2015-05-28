@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -422,7 +420,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>This gives the number of pages required to print all fields without cutting any of them in half. This must be calculated ahead of time when creating multi page pdfs.</summary>
+		///<summary>This gives the number of pages required to print all fields. This must be calculated ahead of time when creating multi page pdfs.</summary>
 		public static int CalculatePageCount(Sheet sheet,System.Drawing.Printing.Margins m) {
 			//HeightLastField takes the bottom bounds (sum of lengths of Y. Ex. Y=0 to Y=1099, bounds=1100).
 			//HeightPage is the value of Width/Length depending on Landscape/Portrait.
