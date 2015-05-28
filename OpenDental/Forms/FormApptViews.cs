@@ -349,6 +349,7 @@ namespace OpenDental{
 			else {
 				ApptViewCur.ItemOrder=_listApptViews[_listApptViews.Count-1].ItemOrder+1;
 			}
+			ApptViewCur.ApptTimeScrollStart=DateTime.Parse("08:00:00").TimeOfDay;//default to 8 AM
 			ApptViews.Insert(ApptViewCur);//this also gets the primary key
 			FormApptViewEdit FormAVE=new FormApptViewEdit();
 			FormAVE.ApptViewCur=ApptViewCur;

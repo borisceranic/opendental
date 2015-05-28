@@ -1382,8 +1382,16 @@ namespace OpenDental {
 				//use the row setting from the selected view.
 				if(ApptViewC.List.Length>0 && comboView.SelectedIndex>0) {
 					rowsPerHr=60/ApptDrawing.MinPerIncr*ApptViewC.List[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
+					TimeSpan apptTimeScrollStart=ApptViewC.List[comboView.SelectedIndex-1].ApptTimeScrollStart;
+					double apptTimeHrs=((apptTimeScrollStart.Hours*60)+apptTimeScrollStart.Minutes)/60.0;
+					if(apptTimeHrs*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
+						vScrollBar1.Value=(int)(apptTimeHrs*rowsPerHr*ApptDrawing.LineH);
+					}
+					else {
+						vScrollBar1.Value=vScrollBar1.Maximum;
+					}
 				}
-				if(8*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
+				else if(8*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
 					vScrollBar1.Value=8*rowsPerHr*ApptDrawing.LineH;//8am
 				}
 			}

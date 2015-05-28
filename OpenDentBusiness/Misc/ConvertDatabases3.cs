@@ -8508,6 +8508,19 @@ namespace OpenDentBusiness {
 						Db.NonQ32(command);
 					}
 				}
+				//Adding ApptTimeScrollStart column into apptview table.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE apptview ADD ApptTimeScrollStart time NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE apptview SET ApptTimeScrollStart='08:00:00'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE apptview ADD ApptTimeScrollStart varchar2(255)";
+					Db.NonQ(command);
+					command="UPDATE apptview SET ApptTimeScrollStart='08:00:00'";
+					Db.NonQ(command);
+				}		
 
 
 
