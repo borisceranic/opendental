@@ -1426,6 +1426,18 @@ namespace OpenDental{
 		}
 
 		private void butRecalculate_Click(object sender,EventArgs e) {
+			if(textDate.errorProvider1.GetError(textDate)!=""
+				|| textAmount.errorProvider1.GetError(textAmount)!=""
+				|| textDateFirstPay.errorProvider1.GetError(textDateFirstPay)!=""
+				|| textDownPayment.errorProvider1.GetError(textDownPayment)!=""
+				|| textAPR.errorProvider1.GetError(textAPR)!=""
+				|| textPaymentCount.errorProvider1.GetError(textPaymentCount)!=""
+				|| textPeriodPayment.errorProvider1.GetError(textPeriodPayment)!=""
+				|| textCompletedAmt.errorProvider1.GetError(textCompletedAmt)!="") 
+			{
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
 			if(_listPayPlanCharges.Count==0) {//This is only possible if they manually delete all of their rows and try to press recalculate.
 				MsgBox.Show(this,"There is no payment plan to recalculate.");
 				return;
