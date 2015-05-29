@@ -1896,10 +1896,10 @@ namespace OpenDental {
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
 				ToolBarMain.Buttons["Statement"].Enabled=false;
-				if(PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
+				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=false;
 				}
-				if(PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
+				if(ToolBarMain.Buttons["TrojanCollect"]!=null && PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
 					ToolBarMain.Buttons["TrojanCollect"].Enabled=false;
 				}
 				ToolBarMain.Invalidate();
@@ -1917,10 +1917,10 @@ namespace OpenDental {
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
 				ToolBarMain.Buttons["Statement"].Enabled=true;
-				if(PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
+				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=true;
 				}
-				if(PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
+				if(ToolBarMain.Buttons["TrojanCollect"]!=null && PrefC.GetBool(PrefName.AccountShowTrojanExpressCollect)) {
 					ToolBarMain.Buttons["TrojanCollect"].Enabled=true;
 				}
 				ToolBarMain.Invalidate();
