@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Text;
-using OpenDentBusiness;
 using System.Text.RegularExpressions;
-using System.Data;
+using OpenDentBusiness;
 
 namespace OpenDental{
 	public class SheetFiller {
@@ -2218,7 +2218,8 @@ namespace OpenDental{
 			Patient pat=Patients.GetPat(sheet.PatNum);
 			//pat might be null and sheet.PatNum might be invalid, that is ok.
 			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(sheet.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
-			List<long> listFacNums=SheetUtil.GetListFacNums(listMedLabs);
+			List<MedLabResult> listResults;
+			List<long> listFacNums=MedLabs.GetListFacNums(listMedLabs,out listResults);
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "medlab.ClinicalInfo":

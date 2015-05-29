@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using CodeBase;
 using OpenDental.UI;
 using OpenDentBusiness;
-using System.Drawing;
-using CodeBase;
-using System.IO;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using OpenDentBusiness.HL7;
 
 namespace OpenDental {
@@ -32,14 +32,6 @@ namespace OpenDental {
 
 		private void FormMedLabEdit_Load(object sender,EventArgs e) {
 			_medLabCur=ListMedLabs[0];
-#warning Change this functionality.
-			//The specimen referenced by this set of MedLab, MedLabResult, MedLabSpecimen etc objects can come from more than one HL7 message, e.g.
-			//if there is a preliminary, final, and corrected result there will be at least 3 different HL7 messages.
-			//The data on the form is comprised of the most recent/most correct results which could come from any one of the messages.
-			//Since we can't be sure which HL7 message the user wants to see when they press the Show HL7 button, we will hide it for now.
-			//In the future, we may give them a list of HL7 messages, ordered by date received, and let them choose which message they would like to see.
-			labelShowHL7.Visible=false;
-			butShowHL7.Visible=false;
 			SetFields();
 		}
 
@@ -156,7 +148,7 @@ namespace OpenDental {
 			gridResults.Columns.Add(col);
 			gridResults.Rows.Clear();
 			ODGridRow row;
-			RefreshResults();
+			MedLabs.GetListFacNums(ListMedLabs,out _listResults);//fills the classwide variable _listResults as well as returning the list of lab facility nums
 			string obsDescriptPrev="";
 			for(int i=0;i<_listResults.Count;i++) {
 				//LabCorp requested that these non-performance results not be displayed on the report
@@ -248,7 +240,8 @@ namespace OpenDental {
 			gridFacilities.Columns.Add(col);
 			gridFacilities.Rows.Clear();
 			ODGridRow row;
-			List<long> listFacNums=RefreshResults();//list of MedLabFacilityNums used by all results, the position in the list will be the facility id
+			//list of MedLabFacilityNums used by all results, the position in the list will be the facility id
+			List<long> listFacNums=MedLabs.GetListFacNums(ListMedLabs,out _listResults);
 			for(int i=0;i<listFacNums.Count;i++) {
 				MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
 				row=new ODGridRow();
@@ -271,27 +264,6 @@ namespace OpenDental {
 				gridFacilities.Rows.Add(row);
 			}
 			gridFacilities.EndUpdate();
-		}
-
-		///<summary>Fills _listResults with the most recent and/or most final results for ListMedLabs. Some lab results may supercede other lab results.
-		///Example: A Corrected result supercedes a Final result which supercedes a Preliminary result.</summary>
-		private List<long> RefreshResults() {
-			_listResults=MedLabResults.GetAllForLabs(ListMedLabs);
-			for(int i=_listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
-				if(i==0) {
-					break;
-				}
-				if(_listResults[i].ObsID==_listResults[i-1].ObsID && _listResults[i].ObsIDSub==_listResults[i-1].ObsIDSub) {
-					_listResults.RemoveAt(i);
-				}
-			}
-			_listResults.Sort(SortResultsByPriKey);
-			return SheetUtil.GetListFacNums(ListMedLabs);
-		}
-
-		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
-		private static int SortResultsByPriKey(MedLabResult medLabResultX,MedLabResult medLabResultY) {
-			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
 		}
 
 		///<summary>Shows result history. Example: Show that a Corrected result had a Final and a Preliminary result in the past.</summary>
@@ -443,29 +415,34 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
-		//not now, button not visible, every set of objects could come from many files and we would have to give the user a list of HL7 files to choose from
+
 		private void butShowHL7_Click(object sender,EventArgs e) {
-#warning Change this to show list of source messages.
-			//if(ListMedLabs.Count==0 || !File.Exists(_medLabCur.FileName)) {
-			//	MsgBox.Show(this,"Could not locate the file associated with this MedLab.");
-			//	return;
-			//}
-			//string hl7MsgText="";
-			//try {
-			//	hl7MsgText=File.ReadAllText(_medLabCur.FileName);
-			//}
-			//catch(Exception ex) {
-			//	MessageBox.Show(Lan.g(this,"Could not read the MedLab HL7 message text file located at")+" "+_medLabCur.FileName+".");
-			//	return;
-			//}
-			//MsgBoxCopyPaste FormMbcp = new MsgBoxCopyPaste(hl7MsgText);
-			//FormMbcp.Width=990;
-			//FormMbcp.ShowDialog();
-			//if(FormMbcp.DialogResult==DialogResult.OK) {
-			//	if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to update all values with those from the HL7 message?")) {
-			//		ReprocessMessages(hl7MsgText,null);
-			//	}
-			//}
+			Cursor=Cursors.WaitCursor;
+			List<string[]> listFileNamesDateMod=new List<string[]>();
+			for(int i=0;i<ListMedLabs.Count;i++) {
+				bool isFileAdded=false;
+				for(int j=0;j<listFileNamesDateMod.Count;j++) {
+					if(listFileNamesDateMod[j][0]==ListMedLabs[i].FileName) {
+						isFileAdded=true;
+						break;
+					}
+				}
+				if(isFileAdded) {
+					continue;
+				}
+				string dateModified=DateTime.MinValue.ToString();
+				try {
+					dateModified=File.GetLastWriteTime(ListMedLabs[i].FileName).ToString();
+				}
+				catch(Exception ex) {
+					//dateModified will be min value, do nothing?
+				}
+				listFileNamesDateMod.Add(new string[] { ListMedLabs[i].FileName,dateModified });
+			}
+			FormMedLabHL7MsgText FormMsgText=new FormMedLabHL7MsgText();
+			FormMsgText.ListFileNamesDatesMod=listFileNamesDateMod;
+			Cursor=Cursors.Default;
+			FormMsgText.ShowDialog();
 		}
 
 		///<summary>Used to revert any changes made to the MedLab object 
