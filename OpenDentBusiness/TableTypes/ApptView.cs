@@ -30,6 +30,9 @@ namespace OpenDentBusiness{
 		public ApptViewStackBehavior StackBehavLR;
 		///<summary>FK to clinic.ClinicNum.  0=All clinics.  This appointment view will only be visible when the current clinic showing is set to this clinic.  Within the appointment edit window, this setting is used to filter the list of available operatories.  Also used in conjunction with 'OnlyScheduledProvs' (when enabled) in order to filter the visible operatories within the Appt module.</summary>
 		public long ClinicNum;
+		///<summary>Time the appointment module's view will scroll to on load.</summary>
+		[XmlIgnore]
+		public TimeSpan ApptTimeScrollStart;
 
 		///<summary>Returns a copy of this ApptView.</summary>
 		public ApptView Copy() {
