@@ -444,7 +444,7 @@ namespace OpenDental{
 				FormC.AutomaticMode=true;
 				FormC.ShowDialog();
 			}
-			_arrayQueueAll=Claims.GetQueueList(0,0,0);//Get all claims with no filters applied
+			_arrayQueueAll=new ClaimSendQueueItem[0];
 			for(int i=0;i<_arrayQueueAll.Length;i++) {
 				_arrayQueueAll[i].MissingData=Lan.g(this,"(validated when sending)");
 			}
@@ -566,6 +566,20 @@ namespace OpenDental{
 					listOldSelectedClaimNums.Add(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum);
 				}
 			}
+			ClaimSendQueueItem[] arrayClaimQueue=Claims.GetQueueList(0,0,0);//Get fresh new "all" list from db.
+			for(int i=0;i<arrayClaimQueue.Length;i++) {
+				//If any data in the new list needs to be refreshed because something changed, refresh it.
+				//At this point, _arrayQueueAll is the old list of all claims.
+				for(int j=0;j<_arrayQueueAll.Length;j++) {//Go through the old list of all claims.
+					if(arrayClaimQueue[i].ClaimNum==_arrayQueueAll[j].ClaimNum) {//The same claim is in both the old and new "all" lists.
+						arrayClaimQueue[i]=_arrayQueueAll[j];//Keep the same exact queue item as before so we can maintain the MissingData, etc.
+					}
+				}
+				if(arrayClaimQueue[i].MissingData==null) {//Can only be null if the claim was not in the old "all" list.  For example, on load or when undo.
+					arrayClaimQueue[i].MissingData="(validated when sending)";
+				}
+			}
+			_arrayQueueAll=arrayClaimQueue;
 			//Get filtered list from list all
 			_arrayQueueFiltered=GetListQueueFiltered();//We update the class wide variable because it is used in double clicking and other events.
 			gridMain.BeginUpdate();
