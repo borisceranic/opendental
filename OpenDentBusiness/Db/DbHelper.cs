@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenDentBusiness {
@@ -74,18 +71,10 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Specify column for equivalent of "GROUP_CONCAT(column)" in MySQL.</summary>
-		public static string GroupConcat(string column) {
-			return GroupConcat(column,false);
-		}
-
-		///<summary>Specify column for equivalent of "GROUP_CONCAT(column)" in MySQL. Adds DISTINCT in MySQL if specified.</summary>
-		public static string GroupConcat(string column,bool distinct) {
-			return GroupConcat(column,distinct,false);
-		}
-
-		///<summary>Specify column for equivalent of "GROUP_CONCAT(column)" in MySQL. Adds DISTINCT (MySQL only) and ORDERBY as specified.</summary>
-		public static string GroupConcat(string column,bool distinct,bool orderby) {
+		///<summary>Specify column for equivalent of "GROUP_CONCAT(column)" in MySQL. Adds DISTINCT (MySQL only) and ORDERBY and SEPARATOR as specified.
+		///SEPARATOR not used for Oracle.
+		///Call using parameters by name, example: GroupConcat(column,distinct:true,separator:" | ").</summary>
+		public static string GroupConcat(string column,bool distinct=false,bool orderby=false,string separator=",") {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				if(orderby) {
 					return "RTRIM(REPLACE(REPLACE(XMLAgg(XMLElement(\"x\","+column+") ORDER BY "+column+"),'<x>'),'</x>',','),',')";
@@ -96,16 +85,16 @@ namespace OpenDentBusiness {
 			}
 			else {
 				if(distinct && orderby) {
-					return "GROUP_CONCAT(DISTINCT "+column+" ORDER BY "+column+")";
+					return "GROUP_CONCAT(DISTINCT "+column+" ORDER BY "+column+" SEPARATOR '"+separator+"')";
 				}
 				if(distinct &&  !orderby) {
-					return "GROUP_CONCAT(DISTINCT "+column+")";
+					return "GROUP_CONCAT(DISTINCT "+column+" SEPARATOR '"+separator+"')";
 				}
 				if(!distinct && orderby) {
-					return "GROUP_CONCAT("+column+" ORDER BY "+column+")";
+					return "GROUP_CONCAT("+column+" ORDER BY "+column+" SEPARATOR '"+separator+"')";
 				}
 				else {
-					return "GROUP_CONCAT("+column+")";
+					return "GROUP_CONCAT("+column+" SEPARATOR '"+separator+"')";
 				}
 			}
 		}

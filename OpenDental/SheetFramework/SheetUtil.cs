@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using OpenDentBusiness;
-using CodeBase;
 using System.Data;
-using OpenDental.UI;
+using System.Drawing;
 using System.Globalization;
+using System.IO;
+using CodeBase;
+using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental{
 	public class SheetUtil {
@@ -694,7 +694,7 @@ namespace OpenDental{
 			retval.Columns.Add(new DataColumn("obsRefRange"));
 			retval.Columns.Add(new DataColumn("facilityID"));
 			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
-			GetListFacNums(listMedLabs);//refreshes and sorts the classwide _listResults variable
+			MedLabs.GetListFacNums(listMedLabs,out _listResults);//refreshes and sorts the classwide _listResults variable
 			string obsDescriptPrev="";
 			for(int i=0;i<_listResults.Count;i++) {
 				//LabCorp requested that these non-performance results not be displayed on the report
@@ -757,45 +757,6 @@ namespace OpenDental{
 				retval.Rows.Add(row);
 			}
 			return retval;
-		}
-
-		///<summary>Returns a list of MedLabFacilityNums, the order in the list will be the facility ID on the report.  Basically a local re-numbering.
-		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
-		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
-		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
-		///So each ID could link to multiple facilities.  We will re-number the facilities so that each will have a unique number for this report.</summary>
-		public static List<long> GetListFacNums(List<MedLab> listMedLabs) {
-			_listResults=MedLabResults.GetAllForLabs(listMedLabs);//use the classwide variable so we can use the list to create the data table
-			for(int i=_listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
-				if(i==0) {
-					break;
-				}
-				if(_listResults[i].ObsID==_listResults[i-1].ObsID && _listResults[i].ObsIDSub==_listResults[i-1].ObsIDSub) {
-					_listResults.RemoveAt(i);
-				}
-			}
-			_listResults.Sort(SortByMedLabNum);
-			//_listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
-			List<long> listMedLabFacilityNums=new List<long>();
-			for(int i=0;i<_listResults.Count;i++) {
-				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,_listResults[i].MedLabResultNum);
-				if(listFacAttaches.Count==0) {
-					continue;
-				}
-				if(!listMedLabFacilityNums.Contains(listFacAttaches[0].MedLabFacilityNum)) {
-					listMedLabFacilityNums.Add(listFacAttaches[0].MedLabFacilityNum);
-				}
-				_listResults[i].FacilityID=(listMedLabFacilityNums.IndexOf(listFacAttaches[0].MedLabFacilityNum)+1).ToString().PadLeft(2,'0');
-			}
-			return listMedLabFacilityNums;
-		}
-
-		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
-		private static int SortByMedLabNum(MedLabResult medLabResultX,MedLabResult medLabResultY) {
-			if(medLabResultX.MedLabNum!=medLabResultY.MedLabNum) {
-				return medLabResultX.MedLabNum.CompareTo(medLabResultY.MedLabNum);
-			}
-			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
 		}
 	}
 }

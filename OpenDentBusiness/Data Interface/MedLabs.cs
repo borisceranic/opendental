@@ -64,24 +64,37 @@ namespace OpenDentBusiness{
 			return Crud.MedLabCrud.SelectMany(command);
 		}
 
-		///<summary>Get unique MedLab orders, grouped by ProvNum, SpecimenID, and SpecimenIDFiller.  Also returns the most recent DateTime the results
-		///were released from the lab, the earliest DateTime the order was entered into the lab system, and a list of tests ordered.
-		///The list of tests ordered will not contain reflex result test IDs.</summary>
-		public static DataTable GetOrdersForPatient(long patNum,bool includeNoPat) {
+		///<summary>Get unique MedLab orders, grouped by PatNum, ProvNum, and SpecimenID.  Also returns the most recent DateTime the results
+		///were released from the lab, a list of test descriptions ordered, and the count of results for each test.
+		///If includeNoPat==true, the lab orders not attached to a patient will be included.
+		///If groupBySpec==true, all tests for one specimen will be in one row of the grid with the most recent date reported.</summary>
+		public static DataTable GetOrdersForPatient(Patient pat,bool includeNoPat,bool groupBySpec,DateTime dateReportedStart,DateTime dateReportedEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),pat,includeNoPat,groupBySpec,dateReportedStart,dateReportedEnd);
 			}
+			//include all patients unless a patient is specified.
+			string patNumClause="PatNum>0";
+			if(pat!=null) {
+				patNumClause="PatNum="+POut.Long(pat.PatNum);
+			}
+			//do not include patnum=0 unless specified.
 			string noPatClause="";
 			if(includeNoPat) {
 				noPatClause="OR PatNum=0";
 			}
-			string command="SELECT PatNum,ProvNum,SpecimenID,SpecimenIDFiller,MIN(DateTimeEntered) AS DateTimeEntered,"
-				+"MAX(DateTimeReported) AS DateTimeReported,"+DbHelper.GroupConcat("ObsTestID",true)+" AS TestsOrdered "
-				+"FROM medlab WHERE (PatNum="+POut.Long(patNum)+" "
-				+noPatClause
-				+") AND ActionCode!='"+ResultAction.G.ToString()+"' "
-				+"GROUP BY PatNum,ProvNum,SpecimenID,SpecimenIDFiller "
-				+"ORDER BY PatNum DESC,MIN(DateTimeEntered) DESC,MAX(DateTimeReported) DESC";
+			string groupByTestClause="";
+			if(!groupBySpec) {
+				groupByTestClause=",ObsTestID";
+			}
+			string command="SELECT PatNum,ProvNum,MAX(DateTimeReported) AS DateTimeReported,SpecimenID,SpecimenIDFiller,"
+				+DbHelper.GroupConcat("ObsTestDescript",distinct :true,separator :"\r\n")+" AS ObsTestDescript,"
+				+"COUNT(DISTINCT medlabresult.ObsID,medlabresult.ObsIDSub) AS ResultCount "
+				+"FROM medlab "
+				+"INNER JOIN medlabresult ON medlab.MedLabNum=medlabresult.MedLabNum "
+				+"WHERE ("+patNumClause+" "+noPatClause+") " //Ex: WHERE (PatNum>0 OR Patnum=0) 
+				+"AND "+DbHelper.DtimeToDate("DateTimeReported")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)+" "
+				+"GROUP BY PatNum,ProvNum,SpecimenID"+groupByTestClause+" "
+				+"ORDER BY MAX(DateTimeReported) DESC,SpecimenID,medlab.MedLabNum";//most recently received lab on top, with all for a specific specimen together
 			return Db.GetTable(command);
 		}
 
@@ -153,6 +166,46 @@ namespace OpenDentBusiness{
 			}
 			string command= "DELETE FROM medlab WHERE MedLabNum IN("+String.Join(",",listLabNums)+")";
 			Db.NonQ(command);
+		}
+
+		///<summary>Returns a list of MedLabFacilityNums, the order in the list will be the facility ID on the report.  Basically a local re-numbering.
+		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
+		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
+		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
+		///So each ID could link to multiple facilities.  We will re-number the facilities so that each will have a unique number for this report.</summary>
+		public static List<long> GetListFacNums(List<MedLab> listMedLabs,out List<MedLabResult> listResults) {
+			//No need to check RemotingRole; no call to db.
+			listResults=MedLabResults.GetAllForLabs(listMedLabs);//use the classwide variable so we can use the list to create the data table
+			for(int i=listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
+				if(i==0) {
+					break;
+				}
+				if(listResults[i].ObsID==listResults[i-1].ObsID && listResults[i].ObsIDSub==listResults[i-1].ObsIDSub) {
+					listResults.RemoveAt(i);
+				}
+			}
+			listResults.Sort(SortByMedLabNum);
+			//listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
+			List<long> listMedLabFacilityNums=new List<long>();
+			for(int i=0;i<listResults.Count;i++) {
+				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,listResults[i].MedLabResultNum);
+				if(listFacAttaches.Count==0) {
+					continue;
+				}
+				if(!listMedLabFacilityNums.Contains(listFacAttaches[0].MedLabFacilityNum)) {
+					listMedLabFacilityNums.Add(listFacAttaches[0].MedLabFacilityNum);
+				}
+				listResults[i].FacilityID=(listMedLabFacilityNums.IndexOf(listFacAttaches[0].MedLabFacilityNum)+1).ToString().PadLeft(2,'0');
+			}
+			return listMedLabFacilityNums;
+		}
+
+		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
+		private static int SortByMedLabNum(MedLabResult medLabResultX,MedLabResult medLabResultY) {
+			if(medLabResultX.MedLabNum!=medLabResultY.MedLabNum) {
+				return medLabResultX.MedLabNum.CompareTo(medLabResultY.MedLabNum);
+			}
+			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
 		}
 
 		/*

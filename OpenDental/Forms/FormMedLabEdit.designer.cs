@@ -830,7 +830,7 @@ namespace OpenDental {
 			this.labelShowHL7.Name = "labelShowHL7";
 			this.labelShowHL7.Size = new System.Drawing.Size(228,16);
 			this.labelShowHL7.TabIndex = 329;
-			this.labelShowHL7.Text = "Show the original inbound HL7 message.";
+			this.labelShowHL7.Text = "Show the original inbound HL7 message(s).";
 			// 
 			// labelPrint
 			// 
