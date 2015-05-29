@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
@@ -349,6 +349,7 @@ namespace OpenDental{
 		private void FormHL7Defs_FormClosing(object sender,FormClosingEventArgs e) {
 			DataValid.SetInvalid(InvalidType.HL7Defs);
 			DataValid.SetInvalid(InvalidType.Prefs);
+			DataValid.SetInvalid(InvalidType.ToolBut);
 		}
 
 	}

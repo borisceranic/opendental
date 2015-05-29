@@ -2680,12 +2680,7 @@ namespace OpenDental{
 				if(Programs.UsingEcwTightMode()) {//has nothing to do with HL7
 					myOutlookBar.Buttons[6].Visible=false;
 				}
-				if(!Programs.UsingEcwTightOrFullMode() && HL7Defs.IsExistingHL7Enabled()) {//There may be a def enabled as well as the old program link enabled. In this case, do not look at the def for whether or not to show the appt and account modules, instead go by the eCW interface enabled.
-					HL7Def def=HL7Defs.GetOneDeepEnabled();
-					myOutlookBar.Buttons[0].Visible=def.ShowAppts;//Appt
-					myOutlookBar.Buttons[2].Visible=def.ShowAccount;//Account
-				}
-				else {//old eCW interfaces
+				if(Programs.UsingEcwTightOrFullMode()) {//old eCW interfaces
 					if(Programs.UsingEcwTightMode()) {
 						myOutlookBar.Buttons[0].Visible=false;//Appt
 						myOutlookBar.Buttons[2].Visible=false;//Account
@@ -2694,6 +2689,15 @@ namespace OpenDental{
 						//We might create a special Appt module for eCW full users so they can access Recall.
 						myOutlookBar.Buttons[0].Visible=false;//Appt
 					}
+				}
+				else if(HL7Defs.IsExistingHL7Enabled()) {//There may be a def enabled as well as the old program link enabled. In this case, do not look at the def for whether or not to show the appt and account modules, instead go by the eCW interface enabled.
+					HL7Def def=HL7Defs.GetOneDeepEnabled();
+					myOutlookBar.Buttons[0].Visible=def.ShowAppts;//Appt
+					myOutlookBar.Buttons[2].Visible=def.ShowAccount;//Account
+				}
+				else {//no def and not using eCW tight or full program link
+					myOutlookBar.Buttons[0].Visible=true;//Appt
+					myOutlookBar.Buttons[2].Visible=true;//Account
 				}
 				if(Programs.UsingOrion) {
 					myOutlookBar.Buttons[0].Visible=false;//Appt module
