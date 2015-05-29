@@ -93,6 +93,8 @@ namespace OpenDentBusiness {
 		BillingDefaultsIntermingle,
 		BillingDefaultsLastDays,
 		BillingDefaultsNote,
+		///<summary>Value is an integer, identifying the max number of electronic statements that can be sent per batch.  Default of 0, which indicates no limit.</summary>
+		BillingElectBatchMax,
 		BillingElectClientAcctNumber,
 		BillingElectCreditCardChoices,
 		BillingElectPassword,

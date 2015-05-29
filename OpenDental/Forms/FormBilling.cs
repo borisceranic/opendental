@@ -795,7 +795,6 @@ namespace OpenDental{
 			int skippedElect=0;
 			int emailed=0;
 			int printed=0;
-			int sentelect=0;
 			//FormEmailMessageEdit FormEME=new FormEmailMessageEdit();
 			//if(ImageStore.UpdatePatient == null){
 			//	ImageStore.UpdatePatient = new FileStore.UpdatePatientDelegate(Patients.Update);
@@ -809,24 +808,8 @@ namespace OpenDental{
 			PdfPage page;
 			string savedPdfPath;
 			PrintDocument pd=null;
-			XmlWriterSettings xmlSettings=new XmlWriterSettings();
-			xmlSettings.OmitXmlDeclaration=true;
-			xmlSettings.Encoding=Encoding.UTF8;
-			xmlSettings.Indent=true;
-			xmlSettings.IndentChars="   ";
-			StringBuilder strBuildElect=new StringBuilder();
-			XmlWriter writerElect=XmlWriter.Create(strBuildElect,xmlSettings);
-			if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
-				OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect);
-			} 
-			else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
-				OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect);
-			} 
-			else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
-				OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect);
-			}
 			DataSet dataSet;
-			List<long> stateNumsElect=new List<long>();
+			List<Statement> listElectStmts= new List<Statement>();
 			//TODO: Query the database to get an updated list of unsent bills and compare them to the local list to make sure that we do not resend statements that have already been sent by another user.
 			for(int i=0;i<gridBill.SelectedIndices.Length;i++){
 				stmt=Statements.CreateObject(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
@@ -914,30 +897,7 @@ namespace OpenDental{
 						skippedElect++;
 						continue;
 					}
-					bool statementWritten=true;
-					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
-						try {
-							OpenDental.Bridges.EHG_statements.GenerateOneStatement(writerElect,stmt,pat,fam,dataSet);
-						}
-						catch(Exception ex){
-							MessageBox.Show(Lan.g(this,"Error sending statement")+": "+Environment.NewLine+ex.ToString());
-							statementWritten=false;
-						}
-					}
-					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
-						OpenDental.Bridges.POS_statements.GenerateOneStatement(writerElect,stmt,pat,fam,dataSet);
-					}
-					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
-						OpenDental.Bridges.ClaimX_Statements.GenerateOneStatement(writerElect,stmt,pat,fam,dataSet);
-					}
-					if(statementWritten) {
-						stateNumsElect.Add(stmt.StatementNum);
-						sentelect++;
-						labelSentElect.Text=Lan.g(this,"SentElect=")+sentelect.ToString();
-						Application.DoEvents();
-						//do this later:
-						//Statements.MarkSent(stmt.StatementNum,stmt.DateSent);
-					}
+					listElectStmts.Add(stmt);//Add the electronic statements to a list to batch them later.
 				}
 			}
 			//now print-------------------------------------------------------------------------------------
@@ -950,75 +910,128 @@ namespace OpenDental{
 				catch(Exception ex){
 					MessageBox.Show(Lan.g(this,"Error: Please make sure Adobe Reader is installed.")+ex.Message);
 				}
-				//}
 			}
-			//finish up elect and send if needed------------------------------------------------------------
-			if(sentelect>0) {
-				if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
-					OpenDental.Bridges.EHG_statements.GenerateWrapUp(writerElect);
-					writerElect.Close();
-					try {
-						//OpenDental.Bridges.Tesia_statements.Send(strBuildElect.ToString());
-						OpenDental.Bridges.EHG_statements.Send(strBuildElect.ToString());
-						//CodeBase.MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(strBuildElect.ToString());
-						//msgbox.ShowDialog();
-						//loop through all statements and mark sent
-						for(int i=0;i<stateNumsElect.Count;i++) {
-							Statements.MarkSent(stateNumsElect[i],DateTimeOD.Today);
+			//Attempt to send electronic bills if needed------------------------------------------------------------
+			int sentElect=0;
+			if(listElectStmts.Count>0) {
+				int maxNumOfBatches=listElectStmts.Count;
+				int maxElectStmtsPerBatch=PrefC.GetInt(PrefName.BillingElectBatchMax);
+				if(maxElectStmtsPerBatch==0) {
+					maxElectStmtsPerBatch=listElectStmts.Count;//Make the batch size equal to the list of statements so that we send them all at once.
+				}
+				XmlWriterSettings xmlSettings=new XmlWriterSettings();
+				xmlSettings.OmitXmlDeclaration=true;
+				xmlSettings.Encoding=Encoding.UTF8;
+				xmlSettings.Indent=true;
+				xmlSettings.IndentChars="   ";
+				//Loop through all electronic bills and try to send them in batches.  Each batch size will be dictated via electBatchMaxNum.
+				//At this point we know we will have at least one batch to send so we start batchNum to 1.
+				for(int batchNum=1;batchNum<=maxNumOfBatches;batchNum++) {
+					if(listElectStmts.Count==0) {//All statements have been sent.  Nothing more to do.
+						break;
+					}
+					StringBuilder strBuildElect=new StringBuilder();
+					XmlWriter writerElect=XmlWriter.Create(strBuildElect,xmlSettings);
+					List<long> listElectStmtNums=new List<long>();
+					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
+						OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect);
+					}
+					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
+						OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect);
+					}
+					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
+						OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect);
+					}
+					//Generate the statements for each batch.
+					for(int j=listElectStmts.Count-1;j>=0;j--) {
+						Statement stmtCur=listElectStmts[j];
+						listElectStmts.RemoveAt(j);//Remove the statement from our list so that we do not send it again in the next batch.
+						fam=Patients.GetFamily(stmtCur.PatNum);
+						pat=fam.GetPatient(stmtCur.PatNum);
+						dataSet=AccountModules.GetStatementDataSet(stmtCur);
+						bool statementWritten=true;
+						if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
+							try {
+								OpenDental.Bridges.EHG_statements.GenerateOneStatement(writerElect,stmtCur,pat,fam,dataSet);
+							}
+							catch(Exception ex) {
+								MessageBox.Show(Lan.g(this,"Error sending statement")+": "+Environment.NewLine+ex.ToString());
+								statementWritten=false;
+							}
 						}
-					} 
-					catch(Exception ex) {
-						string errorMsg=ex.Message;
-						if(ex.Message.Contains("(404) Not Found")) {
-							//The full error is "The remote server returned an error: (404) Not Found."  We convert the message into a more user friendly message.
-							errorMsg=Lan.g(this,"The connection to the server could not be established or was lost, or the upload timed out.  "
-								+"Ensure your internet connection is working and that your firewall is not blocking this application.  "
-								+"If the upload timed out after 10 minutes, try sending 25 statements or less in each batch to reduce upload time.");
+						else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
+							OpenDental.Bridges.POS_statements.GenerateOneStatement(writerElect,stmtCur,pat,fam,dataSet);
 						}
-						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
-						msgbox.ShowDialog();
-						sentelect=0;
-						labelSentElect.Text=Lan.g(this,"SentElect=")+sentelect.ToString();
+						else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
+							OpenDental.Bridges.ClaimX_Statements.GenerateOneStatement(writerElect,stmtCur,pat,fam,dataSet);
+						}
+						if(statementWritten) {
+							listElectStmtNums.Add(stmtCur.StatementNum);
+							sentElect++;
+						}
 					}
+					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
+						writerElect.Close();
+						for(int attempts=0;attempts<3;attempts++) {
+							try {
+								OpenDental.Bridges.EHG_statements.Send(strBuildElect.ToString());
+								//loop through all statements in the batch and mark them sent
+								for(int i=0;i<listElectStmtNums.Count;i++) {
+									Statements.MarkSent(listElectStmtNums[i],DateTimeOD.Today);
+								}
+								break;//At this point the batch was successfully sent so there is no need to loop through additional attempts.
+							}
+							catch(Exception ex) {
+								if(attempts<2) {//Don't indicate the error unless it failed on the last attempt.
+									continue;//The only thing skipped besides the error message is evaluating if the statement was written, which is wasn't.
+								}
+								sentElect-=listElectStmtNums.Count;
+								string errorMsg=ex.Message;
+								if(ex.Message.Contains("(404) Not Found")) {
+									//The full error is "The remote server returned an error: (404) Not Found."  We convert the message into a more user friendly message.
+									errorMsg=Lan.g(this,"The connection to the server could not be established or was lost, or the upload timed out.  "
+										+"Ensure your internet connection is working and that your firewall is not blocking this application.  "
+										+"If the upload timed out after 10 minutes, try sending 25 statements or less in each batch to reduce upload time.");
+								}
+								MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
+								msgbox.ShowDialog();
+							}
+						}
+					}
+					if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
+						writerElect.Close();
+						SaveFileDialog dlg=new SaveFileDialog();
+						dlg.FileName="Statements.xml";
+						if(dlg.ShowDialog()!=DialogResult.OK) {
+							sentElect-=listElectStmtNums.Count;
+						}
+						File.WriteAllText(dlg.FileName,strBuildElect.ToString());
+						for(int i=0;i<listElectStmtNums.Count;i++) {
+							Statements.MarkSent(listElectStmtNums[i],DateTimeOD.Today);
+						}
+					}
+					if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
+						writerElect.Close();
+						SaveFileDialog dlg=new SaveFileDialog();
+						dlg.InitialDirectory=@"C:\StatementX\";//Clint from ExtraDent requested this default path.
+						if(!Directory.Exists(dlg.InitialDirectory)) {
+							try {
+								Directory.CreateDirectory(dlg.InitialDirectory);
+							}
+							catch { }
+						}
+						dlg.FileName="Statements.xml";
+						if(dlg.ShowDialog()!=DialogResult.OK) {
+							sentElect-=listElectStmtNums.Count;
+						}
+						File.WriteAllText(dlg.FileName,strBuildElect.ToString());
+						for(int i=0;i<listElectStmtNums.Count;i++) {
+							Statements.MarkSent(listElectStmtNums[i],DateTimeOD.Today);
+						}
+					}
+					labelSentElect.Text=Lan.g(this,"SentElect=")+sentElect.ToString();
+					Application.DoEvents();
 				}
-				if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
-					OpenDental.Bridges.POS_statements.GenerateWrapUp(writerElect);
-					writerElect.Close();
-					SaveFileDialog dlg=new SaveFileDialog();
-					dlg.FileName="Statements.xml";
-					if(dlg.ShowDialog()!=DialogResult.OK) {
-						sentelect=0;
-						labelSentElect.Text=Lan.g(this,"SentElect=")+sentelect.ToString();
-					}
-					File.WriteAllText(dlg.FileName,strBuildElect.ToString());
-					for(int i=0;i<stateNumsElect.Count;i++) {
-						Statements.MarkSent(stateNumsElect[i],DateTimeOD.Today);
-					}
-				}
-				if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
-					OpenDental.Bridges.ClaimX_Statements.GenerateWrapUp(writerElect);
-					writerElect.Close();
-					SaveFileDialog dlg=new SaveFileDialog();
-					dlg.InitialDirectory=@"C:\StatementX\";//Clint from ExtraDent requested this default path.
-					if(!Directory.Exists(dlg.InitialDirectory)) {
-						try {
-							Directory.CreateDirectory(dlg.InitialDirectory);
-						} 
-						catch {}
-					}
-					dlg.FileName="Statements.xml";
-					if(dlg.ShowDialog()!=DialogResult.OK) {
-						sentelect=0;
-						labelSentElect.Text=Lan.g(this,"SentElect=")+sentelect.ToString();
-					}
-					File.WriteAllText(dlg.FileName,strBuildElect.ToString());
-					for(int i=0;i<stateNumsElect.Count;i++) {
-						Statements.MarkSent(stateNumsElect[i],DateTimeOD.Today);
-					}
-				}
-			}
-			else {
-				writerElect.Close();
 			}
 			string msg="";
 			if(skipped>0){
@@ -1029,7 +1042,7 @@ namespace OpenDental{
 			}
 			msg+=Lan.g(this,"Printed: ")+printed.ToString()+"\r\n"
 				+Lan.g(this,"E-mailed: ")+emailed.ToString()+"\r\n"
-				+Lan.g(this,"SentElect: ")+sentelect.ToString();
+				+Lan.g(this,"SentElect: ")+sentElect.ToString();
 			MessageBox.Show(msg);
 			Cursor=Cursors.Default;
 			isPrinting=false;

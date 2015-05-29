@@ -8521,6 +8521,14 @@ namespace OpenDentBusiness {
 					command="UPDATE apptview SET ApptTimeScrollStart='08:00:00'";
 					Db.NonQ(command);
 				}		
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('BillingElectBatchMax','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BillingElectBatchMax','0')";
+					Db.NonQ(command);
+				}
 
 
 
