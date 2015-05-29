@@ -1358,6 +1358,55 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod(HasBreakDown=true)]
+		public static string ClaimPaymentsNotPartialWithNoClaimProcs(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT claimpayment.CheckDate, definition.ItemName, claimpayment.CheckAmt, "+
+					"claimpayment.CarrierName, clinic.Description, claimpayment.Note "+
+					"FROM claimpayment "+
+					"INNER JOIN definition ON definition.DefNum=claimpayment.PayType "+
+					"LEFT JOIN clinic ON clinic.ClinicNum=claimpayment.ClinicNum "+
+					"WHERE claimpayment.IsPartial=0 "+
+					"AND NOT EXISTS( "+
+						"SELECT ClaimProcNum "+
+						"FROM claimproc "+
+						"WHERE claimproc.ClaimPaymentNum=claimpayment.ClaimPaymentNum "+
+					") ";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.   
+			log+=Lans.g("FormDatabaseMaintenance","Insurance payments with no claims attached that are not marked as partial")+": "+table.Rows.Count;
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   "+Lans.g("FormDatabaseMaintenance","Date")+": "+PIn.Date(table.Rows[i]["CheckDate"].ToString()).ToShortDateString();
+					log+=", "+Lans.g("FormDatabaseMaintenance","Type")+": "+PIn.String(table.Rows[i]["ItemName"].ToString());
+					log+=", "+Lans.g("FormDatabaseMaintenance","Amount")+": "+PIn.Long(table.Rows[i]["CheckAmt"].ToString()).ToString("c");
+					//Partial will always be blank
+					log+=", "+Lans.g("FormDatabaseMaintenance","Carrier")+": "+PIn.String(table.Rows[i]["CarrierName"].ToString());
+					log+=", "+Lans.g("FormDatabaseMaintenance","Clinic")+": "+PIn.String(table.Rows[i]["Description"].ToString());
+					log+=", "+Lans.g("FormDatabaseMaintenance","Note")+": ";
+					if(PIn.String(table.Rows[i]["Note"].ToString()).Length>15) {
+						log+=PIn.String(table.Rows[i]["Note"].ToString()).Substring(0,15)+"...";
+					}
+					else {
+						log+=PIn.String(table.Rows[i]["Note"].ToString());
+					}
+					log+="\r\n";
+				}
+				log+="   "+Lans.g("FormDatabaseMaintenance","They need to be fixed manually.")+"\r\n";
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		///<summary>Deletes claimprocs that are attached to group notes.</summary>
 		public static string ClaimProcEstimateAttachedToGroupNote(bool verbose,bool isCheck) {
