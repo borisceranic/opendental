@@ -4226,10 +4226,23 @@ namespace OpenDental {
 			else if(DataSetMain.Tables["Commlog"].Rows[row]["EmailMessageNum"].ToString()!="0") {
 				EmailMessage email=
 					EmailMessages.GetOne(PIn.Long(DataSetMain.Tables["Commlog"].Rows[row]["EmailMessageNum"].ToString()));
-				FormEmailMessageEdit FormE=new FormEmailMessageEdit(email);
-				FormE.ShowDialog();
-				if(FormE.DialogResult==DialogResult.OK) {
-					ModuleSelected(PatCur.PatNum);
+				if(email.SentOrReceived==EmailSentOrReceived.WebMailReceived
+					|| email.SentOrReceived==EmailSentOrReceived.WebMailRecdRead
+					|| email.SentOrReceived==EmailSentOrReceived.WebMailSent
+					|| email.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
+				{
+					//web mail uses special secure messaging portal
+					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,email.EmailMessageNum);
+					if(FormWMME.ShowDialog()==DialogResult.OK) {
+						ModuleSelected(PatCur.PatNum);
+					}
+				}
+				else {
+					FormEmailMessageEdit FormE=new FormEmailMessageEdit(email);
+					FormE.ShowDialog();
+					if(FormE.DialogResult==DialogResult.OK) {
+						ModuleSelected(PatCur.PatNum);
+					}
 				}
 			}
 			else if(DataSetMain.Tables["Commlog"].Rows[row]["FormPatNum"].ToString()!="0") {
