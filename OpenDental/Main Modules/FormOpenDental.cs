@@ -334,6 +334,8 @@ namespace OpenDental{
 		private MenuItem menuItemRemoteSupport;
 		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
 		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
+		///<summary>A specific reference to the "Text" button.  This special reference helps us preserve the notification text on the button after setup is modified.</summary>
+		private ODToolBarButton _butText;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -1906,11 +1908,13 @@ namespace OpenDental{
 			// 
 			this.menuItemTextMessagesReceived.Index = 0;
 			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
+			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
 			// 
 			// menuItemTextMessagesSent
 			// 
 			this.menuItemTextMessagesSent.Index = 1;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
+			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
 			// 
 			// FormOpenDental
 			// 
@@ -2400,6 +2404,8 @@ namespace OpenDental{
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
 			StartEServiceMonitoring();
+			ODThread threadSmsTextMessage=new ODThread(60000,ThreadSmsTextMessageNotify);
+			threadSmsTextMessage.Start();
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -2878,10 +2884,12 @@ namespace OpenDental{
 				button=new ODToolBarButton(Lan.g(this,"WebMail"),2,Lan.g(this,"Secure WebMail"),"WebMail");
 				button.Enabled=true;//Always enabled.  If the patient does not have an email address, then the user will be blocked from the FormWebMailMessageEdit window.
 				ToolBarMain.Buttons.Add(button);
-				button=new ODToolBarButton(Lan.g(this,"Text"),5,Lan.g(this,"Send Text Message"),"Text");
-				button.Style=ODToolBarButtonStyle.DropDownButton;
-				button.DropDownMenu=menuText;
-				ToolBarMain.Buttons.Add(button);
+				if(_butText==null) {//If laying out again (after modifying setup), we keep the button to preserve the current notification text.
+					_butText=new ODToolBarButton(Lan.g(this,"Text"),5,Lan.g(this,"Send Text Message"),"Text");
+					_butText.Style=ODToolBarButtonStyle.DropDownButton;
+					_butText.DropDownMenu=menuText;
+				}
+				ToolBarMain.Buttons.Add(_butText);
 				button=new ODToolBarButton(Lan.g(this,"Letter"),-1,Lan.g(this,"Quick Letter"),"Letter");
 				button.Style=ODToolBarButtonStyle.DropDownButton;
 				button.DropDownMenu=menuLetter;
@@ -3436,6 +3444,8 @@ namespace OpenDental{
 			FormPFF.ShowDialog();
 		}
 
+		#region SMS Text Messaging
+
 		private void OnTxtMsg_Click() {
 			Patient pat=Patients.GetPat(CurPatNum);
 			if(pat.TxtMsgOk==YN.No) {
@@ -3456,6 +3466,47 @@ namespace OpenDental{
 				RefreshCurrentModule();
 			}
 		}
+
+		private void menuItemTextMessagesReceived_Click(object sender,EventArgs e) {
+			FormSmsTextMessaging form=new FormSmsTextMessaging();
+			form.IsSent=false;
+			form.ShowDialog();
+		}
+
+		private void menuItemTextMessagesSent_Click(object sender,EventArgs e) {
+			FormSmsTextMessaging form=new FormSmsTextMessaging();
+			form.IsSent=true;
+			form.ShowDialog();
+		}
+
+		private void SetSmsNotificationText(string smsNotificationText) {
+			if(_butText==null) {
+				return;//This button does not exist in eCW tight integration mode.
+			}
+			if(this.InvokeRequired) {//For when called from the ThreadSmsTextMessageNotify() thread.
+				this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText); });
+			}
+			_butText.NotificationText=smsNotificationText;
+			if(menuItemTextMessagesReceived.Text.Contains("(")) {//Remove the old count from the menu item.
+				menuItemTextMessagesReceived.Text=menuItemTextMessagesReceived.Text.Substring(0,menuItemTextMessagesReceived.Text.IndexOf("(")-1);
+			}
+			if(smsNotificationText!="") {
+				menuItemTextMessagesReceived.Text+=" ("+smsNotificationText+")";
+			}
+			ToolBarMain.Invalidate();//To cause the Text button to redraw.
+		}
+
+		private void ThreadSmsTextMessageNotify(ODThread odThread) {
+			if(odThread.GetTimeElapsed()<TimeSpan.FromSeconds(15)) {
+				return;//Do not execute within 15 seconds after logging in.  This ensures that we do not affect the load time of the application.
+			}
+			if(_butText==null) {
+				return;//For eCW, _butText does not exist.
+			}
+			SetSmsNotificationText(SmsFromMobiles.GetSmsNotification());
+		}
+
+		#endregion SMS Text Messaging
 
 		private void RefreshMenuClinics() {
 			menuClinics.MenuItems.Clear();
@@ -3963,7 +4014,7 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.</summary>
+		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.  Does not fire for the first time until one signal interval has passed (5-10 seconds after login).</summary>
 		public void ProcessSignals(){
 			if(Security.CurUser==null) {
 				//User must be at the log in screen, so no need to process signals.  We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.

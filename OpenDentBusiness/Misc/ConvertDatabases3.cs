@@ -8345,7 +8345,7 @@ namespace OpenDentBusiness {
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsvln'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 				}
-				//Re-Add SMS Tables. They were released in version 15.2 but were not used. This is the updated schema.
+				//Re-Add SMS Tables.  They were released in version 15.2 but were not used.  This is the updated schema.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS smsfrommobile";
 					Db.NonQ(command);
@@ -8361,11 +8361,12 @@ namespace OpenDentBusiness {
 						MsgPart int NOT NULL,
 						MsgTotal int NOT NULL,
 						MsgRefID varchar(255) NOT NULL,
-						IsRead tinyint NOT NULL,
+						SmsStatus tinyint NOT NULL,
 						Flags varchar(255) NOT NULL,
 						INDEX(PatNum),
 						INDEX(ClinicNum),
-						INDEX(CommlogNum)
+						INDEX(CommlogNum),
+						INDEX(SmsStatus)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
 				}
@@ -8384,7 +8385,7 @@ namespace OpenDentBusiness {
 						MsgPart number(11) NOT NULL,
 						MsgTotal number(11) NOT NULL,
 						MsgRefID varchar2(255),
-						IsRead number(3) NOT NULL,
+						SmsStatus number(3) NOT NULL,
 						Flags varchar2(255),
 						CONSTRAINT smsfrommobile_SmsFromMobileNum PRIMARY KEY (SmsFromMobileNum)
 						)";
@@ -8394,6 +8395,8 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX smsfrommobile_ClinicNum ON smsfrommobile (ClinicNum)";
 					Db.NonQ(command);
 					command=@"CREATE INDEX smsfrommobile_CommlogNum ON smsfrommobile (CommlogNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX smsfrommobile_SmsStatus ON smsfrommobile (SmsStatus)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {

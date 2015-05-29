@@ -31,8 +31,8 @@ namespace OpenDentBusiness {
 		public int MsgTotal;
 		///<summary>Each part of a multipart message will have the same MsgRefID.</summary>
 		public string MsgRefID;
-		///<summary></summary>
-		public bool IsRead;
+		///<summary>Enum:SmsFromStatus .</summary>
+		public SmsFromStatus SmsStatus;
 		///<summary>Words surrounded by spaces. This allows simple querrying. Example: " Junk  Recall " allows you to 
 		///write "WHERE Flags like "% Junk %" without having to worry about commas. Also, adding and removing tags is easier. Example: Flags=Flags.Replace(" Junk ","");</summary>
 		public string Flags;
@@ -42,4 +42,17 @@ namespace OpenDentBusiness {
 			return (SmsFromMobile)this.MemberwiseClone();
 		}
 	}
+
+	///<summary>Status of an incoming message.</summary>
+	public enum SmsFromStatus {
+		///<summary>0</summary>
+		ReceivedUnread,
+		///<summary>1</summary>
+		ReceivedRead,
+		///<summary>2</summary>
+		Junk,
+		///<summary>3</summary>
+		Deleted
+	}
+
 }
