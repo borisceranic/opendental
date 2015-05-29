@@ -331,6 +331,7 @@ namespace OpenDental{
 		private ContextMenu menuText;
 		private MenuItem menuItemTextMessagesReceived;
 		private MenuItem menuItemTextMessagesSent;
+		private MenuItem menuItemRemoteSupport;
 		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
 		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
 
@@ -590,6 +591,7 @@ namespace OpenDental{
 			this.menuItemHelpWindows = new System.Windows.Forms.MenuItem();
 			this.menuItemHelpContents = new System.Windows.Forms.MenuItem();
 			this.menuItemHelpIndex = new System.Windows.Forms.MenuItem();
+			this.menuItemRemoteSupport = new System.Windows.Forms.MenuItem();
 			this.menuItemRequestFeatures = new System.Windows.Forms.MenuItem();
 			this.menuItemUpdate = new System.Windows.Forms.MenuItem();
 			this.imageList32 = new System.Windows.Forms.ImageList(this.components);
@@ -1624,6 +1626,7 @@ namespace OpenDental{
             this.menuItemHelpWindows,
             this.menuItemHelpContents,
             this.menuItemHelpIndex,
+            this.menuItemRemoteSupport,
             this.menuItemRequestFeatures,
             this.menuItemUpdate});
 			this.menuItemHelp.Text = "&Help";
@@ -1653,15 +1656,21 @@ namespace OpenDental{
 			this.menuItemHelpIndex.Text = "Online Help - Index";
 			this.menuItemHelpIndex.Click += new System.EventHandler(this.menuItemHelpIndex_Click);
 			// 
+			// menuItemRemoteSupport
+			// 
+			this.menuItemRemoteSupport.Index = 4;
+			this.menuItemRemoteSupport.Text = "Remote Support with Code";
+			this.menuItemRemoteSupport.Click += new System.EventHandler(this.menuItemRemoteSupport_Click);
+			// 
 			// menuItemRequestFeatures
 			// 
-			this.menuItemRequestFeatures.Index = 4;
+			this.menuItemRequestFeatures.Index = 5;
 			this.menuItemRequestFeatures.Text = "Request Features";
 			this.menuItemRequestFeatures.Click += new System.EventHandler(this.menuItemRequestFeatures_Click);
 			// 
 			// menuItemUpdate
 			// 
-			this.menuItemUpdate.Index = 5;
+			this.menuItemUpdate.Index = 6;
 			this.menuItemUpdate.Text = "&Update";
 			this.menuItemUpdate.Click += new System.EventHandler(this.menuItemUpdate_Click);
 			// 
@@ -5963,7 +5972,7 @@ namespace OpenDental{
 			}
 			catch(Exception ex) {
 				MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/contact.html" + "\r\n"
-					+"Please set up a default web browser.");
+					+Lan.g(this,"Please set up a default web browser."));
 			}
 			/*
 			if(!MsgBox.Show(this,true,"A remote connection will now be attempted. Do NOT continue unless you are already on the phone with us.  Do you want to continue?"))
@@ -6001,7 +6010,22 @@ namespace OpenDental{
 				Process.Start(@"http://www.opendental.com/manual/alphabetical.html");
 			}
 			catch{
-				MessageBox.Show("Could not find file.");
+				MsgBox.Show(this,"Could not find file.");
+			}
+		}
+
+		private void menuItemRemoteSupport_Click(object sender,EventArgs e) {
+			//Check the installation directory for the GoToAssist corporate exe.
+			string fileGTA=CodeBase.ODFileUtils.CombinePaths(Application.StartupPath,"GoToAssist_Corporate_Customer_ver11_3.exe");
+			try {
+				if(!File.Exists(fileGTA)) {
+					throw new ApplicationException();//No message because a different message shows below.
+				}
+				//GTA exe is available, so load it up
+				Process.Start(fileGTA);
+			}
+			catch {
+				MsgBox.Show(this,"Could not find file.  Please use Online Support instead.");
 			}
 		}
 
