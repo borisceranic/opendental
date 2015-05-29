@@ -5341,7 +5341,9 @@ namespace OpenDental{
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				ClinicNum=Security.CurUser.ClinicNum;
+				if(Security.CurUser.ClinicIsRestricted) {
+					ClinicNum=Security.CurUser.ClinicNum;
+				}
 				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 				RefreshMenuClinics();
 			}
@@ -6599,7 +6601,7 @@ namespace OpenDental{
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				ClinicNum=Security.CurUser.ClinicNum;
+				ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
 				RefreshMenuClinics();
 			}
 			SetModuleSelected();
