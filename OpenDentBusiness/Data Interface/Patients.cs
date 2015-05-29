@@ -522,8 +522,8 @@ namespace OpenDentBusiness{
 			//This query will be using UNION ALLs so that duplicate-row removal does not occur. 
 			string command=@"
 					SELECT tempfambal.PatNum,tempfambal.ProvNum,
-						tempfambal.ClinicNum,SUM(tempfambal.AmtBal) StartBal,
-						SUM(tempfambal.AmtBal-tempfambal.InsEst) AfterIns,patient.FName,patient.Preferred,0.0 EndBal,
+						tempfambal.ClinicNum,ROUND(SUM(tempfambal.AmtBal),3) StartBal,
+						ROUND(SUM(tempfambal.AmtBal-tempfambal.InsEst),3) AfterIns,patient.FName,patient.Preferred,0.0 EndBal,
 						CASE WHEN patient.Guarantor!=patient.PatNum THEN 1 ELSE 0 END IsNotGuar,patient.Birthdate
 					FROM(
 						/*Completed procedures*/
