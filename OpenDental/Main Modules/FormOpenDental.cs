@@ -4815,7 +4815,7 @@ namespace OpenDental{
 
 		#region MenuEvents
 		private void menuItemLogOff_Click(object sender, System.EventArgs e) {
-			LogOffNow();
+			LogOffNow(false);
 		}
 
 		#region File
@@ -6536,7 +6536,7 @@ namespace OpenDental{
 				return;//user hit cancel, so don't log off
 			}
 			try {
-				LogOffNow();
+				LogOffNow(true);
 			}
 			catch { }
 		}
@@ -6588,9 +6588,12 @@ namespace OpenDental{
 		}
 
 		private void LogOffNow() {
-			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			bool isForceClose=PrefC.GetLong(PrefName.SecurityLogOffAfterMinutes)>0;
-			if(!CloseOpenForms(isForceClose)) {
+			LogOffNow(isForceClose);
+		}
+
+		private void LogOffNow(bool isForced) {
+			if(!CloseOpenForms(isForced)) {
 				return;//A form is still open.  Do not continue to log the user off.
 			}
 			LastModule=myOutlookBar.SelectedIndex;
@@ -6600,6 +6603,12 @@ namespace OpenDental{
 			allNeutral();
 			if(userControlTasks1.Visible) {
 				userControlTasks1.ClearLogOff();
+			}
+			if(isForced) {
+				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has auto logged off.");
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			}
 			Userod oldUser=Security.CurUser;
 			Security.CurUser=null;
@@ -6725,34 +6734,7 @@ namespace OpenDental{
 			if(Security.CurUser==null) {//not sure if this is a good test.
 				return;
 			}
-			//simply copied and pasted code from logoff menu click for testing.
-			LastModule=myOutlookBar.SelectedIndex;
-			myOutlookBar.SelectedIndex=-1;
-			myOutlookBar.Invalidate();
-			UnselectActive();
-			allNeutral();
-			StopEServiceMonitoring();
-			if(FormLogOn_!=null) {//To prevent multiple log on screens from showing.
-				FormLogOn_.Dispose();
-			}
-			FormLogOn_=new FormLogOn();
-			FormLogOn_.ShowDialog(this);//Passing "this" brings FormL to the front when user logs back in.
-			if(FormLogOn_.DialogResult==DialogResult.Cancel) {
-				Application.Exit();
-				return;
-			}
-			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
-			myOutlookBar.Invalidate();
-			SetModuleSelected();
-			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
-			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
-			if(userControlTasks1.Visible) {
-				userControlTasks1.InitializeOnStartup();
-			}
-			StartEServiceMonitoring();
-			if(myOutlookBar.SelectedIndex==-1) {
-				MsgBox.Show(this,"You do not have permission to use any modules.");
-			}
+			LogOffNow(true);
 		}
 
 		private void FormOpenDental_FormClosing(object sender,FormClosingEventArgs e) {
