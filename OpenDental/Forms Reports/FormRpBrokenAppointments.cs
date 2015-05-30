@@ -45,6 +45,10 @@ namespace OpenDental {
 				}
 				for(int i=0;i<_listClinics.Count;i++) {
 					int curIndex=listClinics.Items.Add(_listClinics[i].Description);
+					if(FormOpenDental.ClinicNum==0) {
+						listClinics.SetSelected(curIndex,true);
+						checkAllClinics.Checked=true;
+					}
 					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
 						listClinics.SelectedIndices.Clear();
 						listClinics.SetSelected(curIndex,true);
