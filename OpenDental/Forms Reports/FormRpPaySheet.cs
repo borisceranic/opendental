@@ -321,6 +321,10 @@ namespace OpenDental{
 				}
 				for(int i=0;i<_listClinics.Count;i++) {
 					int curIndex=listClin.Items.Add(_listClinics[i].Description);
+					if(FormOpenDental.ClinicNum==0) {
+						listClin.SetSelected(curIndex,true);
+						checkAllClin.Checked=true;
+					}
 					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
 						listClin.SelectedIndices.Clear();
 						listClin.SetSelected(curIndex,true);
@@ -520,7 +524,7 @@ namespace OpenDental{
 			}
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",90,FieldValueType.Number,font);
-			query.AddGroupSummaryField("Total Insurance Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),fontBold,0,10);
+			query.AddGroupSummaryField("Total Insurance Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups1),Color.Black,fontBold,0,10);
 			//Patient Payments Query---------------------------------------
 			query=report.AddQuery(tablePat,"Patient Payments","PayType",SplitByKind.Definition,2,true,dictPatDefNames,fontSubTitle);
 			query.AddColumn("Date",90,FieldValueType.Date,font);
@@ -533,8 +537,8 @@ namespace OpenDental{
 			}
 			query.AddColumn("Check#",75,FieldValueType.String,font);
 			query.AddColumn("Amount",120,FieldValueType.Number,font);
-			query.AddGroupSummaryField("Total Patient Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),fontBold,0,10);
-			query.AddGroupSummaryField("Total All Payments:",Color.Black,"Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups3),fontBold,0,10);
+			query.AddGroupSummaryField("Total Patient Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups2),Color.Black,fontBold,0,10);
+			query.AddGroupSummaryField("Total All Payments:","Amount","amt",SummaryOperation.Sum,new List<int>(summaryGroups3),Color.Black,fontBold,0,10);
 			report.AddPageNum(font);
 			report.AddGridLines();
 			if(!report.SubmitQueries()) {

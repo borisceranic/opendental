@@ -305,7 +305,7 @@ namespace OpenDental{
 		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
 		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
-		///<summary>This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
+		///<summary>Defaulted to 0 - Headquarters.  This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
 		public static long ClinicNum=0;
 		///<summary>This is used to determine how Open Dental closed.  If this is set to anything but 0 then some kind of error occurred and Open Dental was forced to close.  Currently only used when updating Open Dental silently.</summary>
 		public static int ExitCode=0;
@@ -616,15 +616,15 @@ namespace OpenDental{
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();
 			this.labelMsg = new System.Windows.Forms.Label();
-			this.butMapPhones = new OpenDental.UI.Button();
-			this.butTriage = new OpenDental.UI.Button();
-			this.butBigPhones = new OpenDental.UI.Button();
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
-			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.menuText = new System.Windows.Forms.ContextMenu();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
+			this.butMapPhones = new OpenDental.UI.Button();
+			this.butTriage = new OpenDental.UI.Button();
+			this.butBigPhones = new OpenDental.UI.Button();
+			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -1791,7 +1791,7 @@ namespace OpenDental{
 			this.panelPhoneSmall.Controls.Add(this.labelTriage);
 			this.panelPhoneSmall.Location = new System.Drawing.Point(71, 333);
 			this.panelPhoneSmall.Name = "panelPhoneSmall";
-			this.panelPhoneSmall.Size = new System.Drawing.Size(173, 237);
+			this.panelPhoneSmall.Size = new System.Drawing.Size(173, 216);
 			this.panelPhoneSmall.TabIndex = 56;
 			// 
 			// labelFieldType
@@ -1824,6 +1824,46 @@ namespace OpenDental{
 			this.labelMsg.TabIndex = 53;
 			this.labelMsg.Text = "V:00";
 			this.labelMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// labelWaitTime
+			// 
+			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
+			this.labelWaitTime.Location = new System.Drawing.Point(89, 2);
+			this.labelWaitTime.Name = "labelWaitTime";
+			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
+			this.labelWaitTime.TabIndex = 53;
+			this.labelWaitTime.Text = "00m";
+			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelTriage
+			// 
+			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTriage.ForeColor = System.Drawing.Color.Black;
+			this.labelTriage.Location = new System.Drawing.Point(41, 2);
+			this.labelTriage.Name = "labelTriage";
+			this.labelTriage.Size = new System.Drawing.Size(41, 20);
+			this.labelTriage.TabIndex = 53;
+			this.labelTriage.Text = "T:000";
+			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// menuText
+			// 
+			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemTextMessagesReceived,
+            this.menuItemTextMessagesSent});
+			// 
+			// menuItemTextMessagesReceived
+			// 
+			this.menuItemTextMessagesReceived.Index = 0;
+			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
+			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
+			// 
+			// menuItemTextMessagesSent
+			// 
+			this.menuItemTextMessagesSent.Index = 1;
+			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
+			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
 			// 
 			// butMapPhones
 			// 
@@ -1867,28 +1907,6 @@ namespace OpenDental{
 			this.butBigPhones.Text = "B";
 			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
 			// 
-			// labelWaitTime
-			// 
-			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
-			this.labelWaitTime.Location = new System.Drawing.Point(89, 2);
-			this.labelWaitTime.Name = "labelWaitTime";
-			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
-			this.labelWaitTime.TabIndex = 53;
-			this.labelWaitTime.Text = "00m";
-			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelTriage
-			// 
-			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTriage.ForeColor = System.Drawing.Color.Black;
-			this.labelTriage.Location = new System.Drawing.Point(41, 2);
-			this.labelTriage.Name = "labelTriage";
-			this.labelTriage.Size = new System.Drawing.Size(41, 20);
-			this.labelTriage.TabIndex = 53;
-			this.labelTriage.Text = "T:000";
-			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// lightSignalGrid1
 			// 
 			this.lightSignalGrid1.Location = new System.Drawing.Point(0, 463);
@@ -1898,27 +1916,9 @@ namespace OpenDental{
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
 			// 
-			// menuText
-			// 
-			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItemTextMessagesReceived,
-            this.menuItemTextMessagesSent});
-			// 
-			// menuItemTextMessagesReceived
-			// 
-			this.menuItemTextMessagesReceived.Index = 0;
-			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
-			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
-			// 
-			// menuItemTextMessagesSent
-			// 
-			this.menuItemTextMessagesSent.Index = 1;
-			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
-			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
-			// 
 			// FormOpenDental
 			// 
-			this.ClientSize = new System.Drawing.Size(982, 466);
+			this.ClientSize = new System.Drawing.Size(982, 445);
 			this.Controls.Add(this.panelPhoneSmall);
 			this.Controls.Add(this.panelSplitter);
 			this.Controls.Add(this.lightSignalGrid1);
