@@ -568,10 +568,10 @@ namespace OpenDental.ReportingComplex
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 						length=maxHorizontalLength*lineObject.IntLinePercent/100;
-						if(lineObject.LinePosition==LinePosition.Bottom) {
+						if(lineObject.LinePosition==LinePosition.South) {
 							y+=MyReport.GetSectionHeight(lineObject.SectionName);
 						}
-						else if(lineObject.LinePosition==LinePosition.Top) {
+						else if(lineObject.LinePosition==LinePosition.North) {
 							//Do Nothing Here
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
@@ -585,10 +585,10 @@ namespace OpenDental.ReportingComplex
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
 						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
-						if(lineObject.LinePosition==LinePosition.Left) {
+						if(lineObject.LinePosition==LinePosition.West) {
 							//Do Nothing Here
 						}
-						else if(lineObject.LinePosition==LinePosition.Right) {
+						else if(lineObject.LinePosition==LinePosition.East) {
 							x+=maxHorizontalLength;
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
@@ -644,10 +644,10 @@ namespace OpenDental.ReportingComplex
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 						length=maxHorizontalLength*lineObject.IntLinePercent/100;
-						if(lineObject.LinePosition==LinePosition.Bottom) {
+						if(lineObject.LinePosition==LinePosition.South) {
 							y+=MyReport.GetSectionHeight(lineObject.SectionName);
 						}
-						else if(lineObject.LinePosition==LinePosition.Top) {
+						else if(lineObject.LinePosition==LinePosition.North) {
 							//Do Nothing Here
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
@@ -661,10 +661,10 @@ namespace OpenDental.ReportingComplex
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
 						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
-						if(lineObject.LinePosition==LinePosition.Left) {
+						if(lineObject.LinePosition==LinePosition.West) {
 							//Do Nothing Here
 						}
-						else if(lineObject.LinePosition==LinePosition.Right) {
+						else if(lineObject.LinePosition==LinePosition.East) {
 							x=maxHorizontalLength;
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
@@ -896,10 +896,10 @@ namespace OpenDental.ReportingComplex
 						}
 						if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 							length=maxHorizontalLength*lineObject.IntLinePercent/100;
-							if(lineObject.LinePosition==LinePosition.Bottom) {
+							if(lineObject.LinePosition==LinePosition.South) {
 								y+=queryObj.GetSectionHeight(lineObject.SectionName);
 							}
-							else if(lineObject.LinePosition==LinePosition.Top) {
+							else if(lineObject.LinePosition==LinePosition.North) {
 								//Do Nothing Here
 							}
 							else if(lineObject.LinePosition==LinePosition.Center) {
@@ -913,10 +913,10 @@ namespace OpenDental.ReportingComplex
 						}
 						else if(lineObject.LineOrientation==LineOrientation.Vertical) {
 							length=queryObj.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
-							if(lineObject.LinePosition==LinePosition.Left) {
+							if(lineObject.LinePosition==LinePosition.West) {
 								//Do Nothing Here
 							}
-							else if(lineObject.LinePosition==LinePosition.Right) {
+							else if(lineObject.LinePosition==LinePosition.East) {
 								x+=maxHorizontalLength;
 							}
 							else if(lineObject.LinePosition==LinePosition.Center) {

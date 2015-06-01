@@ -130,9 +130,12 @@ namespace OpenDental.ReportingComplex {
 			}
 		}
 
+		///<summary>Adds a ReportObject, Tahoma font, 17-point and bold, to the top-center of the Report Header Section.  Should only be done once, and done before any subTitles.</summary>
+		public void AddTitle(string name,string title) {
+			AddTitle(name,title,new Font("Tahoma",17,FontStyle.Bold));
+		}
 
-
-		///<summary>Adds a ReportObject large, centered, and bold, to the top of the Report Header Section.  Should only be done once, and done before any subTitles.</summary>
+		///<summary>Adds a ReportObject with the given font, to the top-center of the Report Header Section.  Should only be done once, and done before any subTitles.</summary>
 		public void AddTitle(string name,string title,Font font){
 			Size size=new Size((int)(_grfx.MeasureString(title,font).Width/_grfx.DpiX*100+2)
 				,(int)(_grfx.MeasureString(title,font).Height/_grfx.DpiY*100+2));
@@ -157,11 +160,12 @@ namespace OpenDental.ReportingComplex {
 			//FormR.Dispose();
 		}
 
-		public void AddTitle(string name,string title) {
-			AddTitle(name,title,new Font("Tahoma",17,FontStyle.Bold));
+		///<summary>Adds a ReportObject, Tahoma font, 10-point and bold, at the bottom-center of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
+		public void AddSubTitle(string name,string subTitle) {
+			AddSubTitle(name,subTitle,new Font("Tahoma",10,FontStyle.Bold));
 		}
 
-		///<summary>Adds a ReportObject, centered and bold, at the bottom of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
+		///<summary>Adds a ReportObject with the given font, at the bottom-center of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
 		public void AddSubTitle(string name,string subTitle,Font font){
 			Size size=new Size((int)(_grfx.MeasureString(subTitle,font).Width/_grfx.DpiX*100+2)
 				,(int)(_grfx.MeasureString(subTitle,font).Height/_grfx.DpiY*100+2));
@@ -191,42 +195,56 @@ namespace OpenDental.ReportingComplex {
 			_sections["Report Header"].Height+=(int)size.Height+5;
 		}
 
-		public void AddSubTitle(string name,string subTitle) {
-			AddSubTitle(name,subTitle,new Font("Tahoma",10,FontStyle.Bold));
+		public QueryObject AddQuery(string query,string title) {
+			QueryObject queryObj=new QueryObject(query,title);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
+		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind) {
+			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
+		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup) {
+			QueryObject queryObj=new QueryObject(query,title,queryGroup,columnNameToSplitOn,splitByKind);
+			_reportObjects.Add(queryObj);
+			return queryObj;
 		}
 
 		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
+			QueryObject queryObj=new QueryObject(query,title,isCentered,queryGroup,columnNameToSplitOn,splitByKind);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
 		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Font font) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null,font);
-			_reportObjects.Add(queryObj);
-			return queryObj;
-		}
-
-		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered);
-			_reportObjects.Add(queryObj);
-			return queryObj;
-		}
-
-		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Font font) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,enumNames,null,font);
+			QueryObject queryObj=new QueryObject(query,title,font,isCentered,queryGroup,columnNameToSplitOn,splitByKind,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
 		public QueryObject AddQuery(string query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames,Font font) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames,font);
+			QueryObject queryObj=new QueryObject(query,title,font,isCentered,queryGroup,columnNameToSplitOn,splitByKind,null,dictDefNames);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
+			QueryObject queryObj=new QueryObject(query,title,isCentered,queryGroup,columnNameToSplitOn,splitByKind);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,List<string> enumNames,Font font) {
+			QueryObject queryObj=new QueryObject(query,title,font,isCentered,queryGroup,columnNameToSplitOn,splitByKind,enumNames,null);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}
 
 		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered,Dictionary<long,string> dictDefNames,Font font) {
-			QueryObject queryObj=new QueryObject(query,title,columnNameToSplitOn,splitByKind,queryGroup,isCentered,null,dictDefNames,font);
+			QueryObject queryObj=new QueryObject(query,title,font,isCentered,queryGroup,columnNameToSplitOn,splitByKind,null,dictDefNames);
 			_reportObjects.Add(queryObj);
 			return queryObj;
 		}

@@ -308,7 +308,14 @@ namespace OpenDental.ReportingComplex {
 
 		}
 
-		///<summary>Overload for TextObject with offsets.</summary>
+		#region ReportObject Polymorphisms
+		///<summary>Creates a TextObject with the specified name, section, location and size.  The staticText and font will determine what and how it displays, while the contentAlignment will determine the relative location in the text area.</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment)
+			: this(name,sectionName,location,size,staticText,font,contentAlignment,0,0) {
+
+		}
+
+		///<summary>Creates a TextObject with the specified name, section, location and size.  The staticText and font will determine what and how it displays, while the contentAlignment will determine the relative location in the text area.  The text will be offset of its position in pixels according to the given X/Y values.</summary>
 		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment,int offSetX,int offSetY){
 			_name=name;
 			_sectionName=sectionName;
@@ -323,20 +330,13 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
-		///<summary>Overload for TextObject.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment) {
-			_name=name;
-			_sectionName=sectionName;
-			_location=location;
-			_size=size;
-			_staticText=staticText;
-			_font=font;
-			_contentAlignment=contentAlignment;
-			_foreColor=Color.Black;
-			_reportObjectKind=ReportObjectKind.TextObject;
+		///<summary>Creates a BoxObject with the specified name, section, color and line thickness.</summary>
+		public ReportObject(string name,string sectionName,Color color,float lineThickness)
+			: this(name,sectionName,color,lineThickness,0,0) {
+
 		}
 
-		///<summary>Overload for BoxObject.</summary>
+		///<summary>Creates a BoxObject with the specified name, section, color and line thickness.  The box will be offset of its position in pixels according to the given X/Y values.</summary>
 		public ReportObject(string name,string sectionName,Color color,float lineThickness,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
@@ -347,7 +347,13 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.BoxObject;
 		}
 
-		///<summary>Overload for LineObject.</summary>
+		///<summary>Creates a LineObject with the specified name, section, color, line thickness, line orientation, line position and percent.  Orientation determines whether the line is horizontal or vertical.  Position determines which side of the section the line draws on.  Percent determines how much of available space the line will take up.</summary>
+		public ReportObject(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent)
+			: this(name,sectionName,color,lineThickness,lineOrientation,linePosition,linePercent,0,0) {
+
+		}
+
+		///<summary>Creates a LineObject with the specified name, section, color, line thickness, line orientation, line position and percent.  Orientation determines whether the line is horizontal or vertical.  Position determines which side of the section the line draws on.  Percent determines how much of available space the line will take up.  The line will be offset of its position in pixels according to the given X/Y values.</summary>
 		public ReportObject(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
@@ -361,7 +367,7 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.LineObject;
 		}
 
-		///<summary>Overload for DataTableField ReportObject</summary>
+		///<summary>Mainly used from inside QueryObject.  Creates a DataTableFieldObject with the specified name, section, location, size, dataFieldName, fieldValueType, font, contentAlignment and stringFormat.  DataFieldName determines what the field will be filled with from the table.  FieldValueType determines how the field will be filled with data (i.e Number will be formatted as a number and have a summary added to the bottom of a column).  ContentAlignment determines where the text will be drawn in the box.  StringFormat is used to determined how a ToString() method call will format the field text.</summary>
 		public ReportObject(string name,string sectionName,Point location,Size size
 			,string dataFieldName,FieldValueType fieldValueType
 			,Font font,ContentAlignment contentAlignment,string stringFormat) {
@@ -380,7 +386,7 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.FieldObject;
 		}
 
-		///<summary>Overload for SummaryField ReportObject</summary>
+		///<summary>Mainly used from inside QueryObject.  Creates a SummaryFieldObject with the specified name, section, location, size, summaryOperation, summarizedFieldName, font, contentAlignment and stringFormat.  SummaryOperation determines what calculation will be used when summarizing the column.  SummarizedFieldName determines the field that will be summarized at the bottom of the column.  ContentAlignment determines where the text will be drawn in the box.  StringFormat is used to determined how a ToString() method call will format the field text.</summary>
 		public ReportObject(string name,string sectionName,Point location,Size size,SummaryOperation summaryOperation,string summarizedFieldName,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
 			_sectionName=sectionName;
@@ -398,8 +404,8 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.FieldObject;
 		}
 
-		///<summary>Overload for GroupSummary ReportObject</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,Color color,string summarizedFieldName,string datafield,Font font,SummaryOperation summaryOperation,int offSetX,int offSetY) {
+		///<summary>Mainly used from inside QueryObject.  Creates a GroupSummaryObject with the specified name, section, location, size, color, summaryOperation, summarizedFieldName, font, datafield, and offsets.  SummaryOperation determines what calculation will be used when summarizing the group of column.  SummarizedFieldName determines the field that will be summarized and must be the same in each of the queries.  Datafield determines which column the summary will draw under.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public ReportObject(string name,string sectionName,Point location,Size size,Color color,SummaryOperation summaryOperation,string summarizedFieldName,Font font,string datafield,int offSetX,int offSetY) {
 			_name=name;
 			_sectionName=sectionName;
 			_location=location;
@@ -418,7 +424,7 @@ namespace OpenDental.ReportingComplex {
 			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 
-		///<summary>Overload for SpecialField ReportObject</summary>
+		///<summary>Currently only used for page numbers.</summary>
 		public ReportObject(string name,string sectionName,Point location,Size size,FieldValueType fieldValueType,SpecialFieldType specialType,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
 			_sectionName=sectionName;
@@ -434,6 +440,7 @@ namespace OpenDental.ReportingComplex {
 			_foreColor=Color.Black;
 			_reportObjectKind=ReportObjectKind.FieldObject;
 		}
+		#endregion
 
 		///<summary>Converts contentAlignment into a combination of StringAlignments used to format strings.  This method is mostly called for drawing text on reportObjects.</summary>
 		public static StringFormat GetStringFormatAlignment(ContentAlignment contentAlignment){
@@ -553,15 +560,15 @@ namespace OpenDental.ReportingComplex {
 
 	}
 
-	///<summary>Specifies the field kind in the FieldKind property of the ReportObject class.</summary>
+	///<summary>Specifies the field kind in the FieldKind property of the ReportObject class.  Used in Queries and Datatables.</summary>
 	public enum FieldDefKind{
-		///<summary></summary>
+		///<summary>Basic informational cell/field for a Datatable.</summary>
 		DataTableField,
-		///<summary></summary>
+		///<summary>Currently not in use.</summary>
 		FormulaField,
-		///<summary></summary>
+		///<summary>Used in conjunction with SpecialFieldType to determine special logic for certain objects.  Currently only used for PageNumbers</summary>
 		SpecialField,
-		///<summary></summary>
+		///<summary>Used when creating summaries of a column.  Uses the current SummaryOperation to determine which calculation to make.</summary>
 		SummaryField
 		//RunningTotalField
 		//GroupNameField
@@ -569,21 +576,22 @@ namespace OpenDental.ReportingComplex {
 
 	///<summary>Used in the Kind field of each ReportObject to provide a quick way to tell what kind of reportObject.</summary>
 	public enum ReportObjectKind{
-		//BlobFieldObject Object is a blob field. 
-		///<summary>Object is a box.</summary>
+		///<summary>Object is a box and will draw a rectangle with the specified parameters.</summary>
 		BoxObject,
+		///<summary>Object is a field object and will be used in drawing datatables.</summary>
+		FieldObject,
+		///<summary>Object is a line and will draw a straight line with the specified parameters.</summary>
+		LineObject,
+		///<summary>Object is a special subset of ReportObject.  Contains its own list of ReportObjects and always contains a query or datatable of information that will be drawn in the report.</summary>
+		QueryObject,
+		///<summary>Object is a text object.  Can be placed anywhere and is used in multiple sections.  Not to be confused with Datatable cell/field objects.</summary>
+		TextObject
+		//Not Implemented--------------------------------------------------------------
+		//BlobFieldObject Object is a blob field. 
 		//ChartObject Object is a chart. 
 		//CrossTabObject Object is a cross tab. 
-		///<summary>Object is a field object.</summary>
-		FieldObject,
-		///<summary>Object is a line. </summary>
-		LineObject,
 		//PictureObject Object is a picture. 
 		//SubreportObject Object is a subreport.
-		///<summary>Object is a text object. </summary>
-		TextObject,
-		///<summary>Object is a text object. </summary>
-		QueryObject
 	}
 
 	///<summary>Specifies the special field type in the SpecialType property of the ReportObject class.</summary>
@@ -592,22 +600,23 @@ namespace OpenDental.ReportingComplex {
 		PageNofM,
 		///<summary>Field returns the current page number.</summary>
 		PageNumber,
-		///<summary>Field returns the current date.</summary>
+		///<summary>Field returns the current date.  Currently not in use.</summary>
 		PrintDate
 	}
 
 	///<summary></summary>
 	public enum SummaryOperation{
-		//Average Summary returns the average of a field.
 		///<summary>Summary counts the number of values, from the field.</summary>
 		Count,
+		///<summary>Summary returns the total of all the values for the field.</summary>
+		Sum
+		//Not Implemented--------------------------------------------------------------
+		//Average Summary returns the average of a field.
 		//DistinctCount Summary returns the number of none repeating values, from the field. 
 		//Maximum Summary returns the largest value from the field. 
 		//Median Summary returns the middle value in a sequence of numeric values. 
 		//Minimum Summary returns the smallest value from the field. 
 		//Percentage Summary returns as a percentage of the grand total summary. 
-		///<summary>Summary returns the total of all the values for the field.</summary>
-		Sum
 	}
 
 	///<summary>Used to determine how a line draws in a section.</summary>
@@ -616,6 +625,8 @@ namespace OpenDental.ReportingComplex {
 		Horizontal,
 		///<summary></summary>
 		Vertical
+		//Not Implemented--------------------------------------------------------------
+		//Diagnonal
 	}
 
 	///<summary>Used to determine where a line draws in a section.</summary>
@@ -623,18 +634,18 @@ namespace OpenDental.ReportingComplex {
 		///<summary>Used in Horizontal and Vertical Orientation</summary>
 		Center,
 		///<summary>Used in Vertical Orientation</summary>
-		Left,
+		East,
+		///<summary>Used in Horizontal Orientation</summary>
+		North,
+		///<summary>Used in Horizontal Orientation</summary>
+		South,
 		///<summary>Used in Vertical Orientation</summary>
-		Right,
-		///<summary>Used in Horizontal Orientation</summary>
-		Top,
-		///<summary>Used in Horizontal Orientation</summary>
-		Bottom
+		West
 	}
 
 	///<summary>This determines what type of column the table will be splitting on. Default is none.</summary>
 	public enum SplitByKind {
-		///<summary>0</summary>
+		///<summary></summary>
 		None,
 		///<summary>1</summary>
 		Date,

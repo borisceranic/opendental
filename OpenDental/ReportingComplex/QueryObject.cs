@@ -60,6 +60,7 @@ namespace OpenDental.ReportingComplex {
 			}
 		}
 
+		///<summary>A table that represents the raw results of the query.</summary>
 		public DataTable ReportTable {
 			get {
 				return _reportTable;
@@ -69,6 +70,7 @@ namespace OpenDental.ReportingComplex {
 			}
 		}
 
+		///<summary>A table that only contains columns from the ReportTable that will be displayed.</summary>
 		public DataTable ExportTable {
 			get {
 				return _exportTable;
@@ -164,8 +166,177 @@ namespace OpenDental.ReportingComplex {
 		public QueryObject() {
 		}
 
-		///<summary>Creates a QueryObject from the given query string. If a column is specified for splitting, then this will create</summary>
-		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames,Font font) {
+		#region QueryObject String Polymorphisms
+		///<summary>Creates a QueryObject from the given query string.</summary>
+		public QueryObject(string stringQuery,string title)
+			: this(stringQuery,title,new Font("Tahoma",9),true,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.</summary>
+		public QueryObject(string stringQuery,string title,Font font)
+			: this(stringQuery,title,font,true,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered)
+			: this(stringQuery,title,font,isCentered,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(string stringQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,font,true,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(string stringQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(string stringQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(stringQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,font,true,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(stringQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,font,true,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(stringQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query string.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(string stringQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames,Dictionary<long,string> dictDefNames) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_stringQuery=stringQuery;
@@ -189,8 +360,179 @@ namespace OpenDental.ReportingComplex {
 			_exportTable=new DataTable();
 			grfx.Dispose();
 		}
+		#endregion
 
-		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,List<string> listEnumNames,Dictionary<long,string> dictDefNames,Font font) {
+		#region QueryObject Datatable Polymorphisms
+		///<summary>Creates a QueryObject from the given query datatable.</summary>
+		public QueryObject(DataTable tableQuery,string title)
+			: this(tableQuery,title,new Font("Tahoma",9),true,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font)
+			: this(tableQuery,title,font,true,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered)
+			: this(tableQuery,title,font,isCentered,0,"",SplitByKind.None,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,font,true,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(DataTable tableQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind)
+			: this(tableQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,font,true,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified list must be a list of enumeration names if the SplitByKind is Enum.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames)
+			: this(tableQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,listEnumNames,null) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,new Font("Tahoma",9),true,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,font,true,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,font,isCentered,0,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,new Font("Tahoma",9),true,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,new Font("Tahoma",9),isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,font,true,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Creates a title with the specified font.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.  Specified dictionary must be a dictionary of definition primary keys and names if the SplitByKind is Def.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,Dictionary<long,string> dictDefNames)
+			: this(tableQuery,title,font,isCentered,queryGroupValue,columnNameToSplitOn,splitByKind,null,dictDefNames) {
+
+		}
+
+		///<summary>Creates a QueryObject from the given query datatable.  Specifying a column name and split type will cause the query to be broken into separate tables according to changes in that column.  Specifying a query group will allow GroupSummary objects to total up only queries in the specified group.</summary>
+		public QueryObject(DataTable tableQuery,string title,Font font,bool isCentered,int queryGroupValue,string columnNameToSplitOn,SplitByKind splitByKind,List<string> listEnumNames,Dictionary<long,string> dictDefNames) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_reportTable=tableQuery;
@@ -214,38 +556,25 @@ namespace OpenDental.ReportingComplex {
 			_exportTable=new DataTable();
 			grfx.Dispose();
 		}
+		#endregion
 
-		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,Font font)
-			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,font) {
-			
+		#region AddColumn Polymorphisms
+		///<summary>Adds a string datafield column with the specified width.</summary>
+		public void AddColumn(string dataField,int width) {
+			AddColumn(dataField,width,FieldValueType.String,new Font("Tahoma",9));
 		}
 
-		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered,Font font)
-			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,font) {
-			
+		///<summary>Adds a datafield column with the specified type and width.  If the column is type Double, then the alignment is set right and a total field is added. Also, default formatstrings are set for dates and doubles.  Does not add lines or shading.</summary>
+		public void AddColumn(string dataField,int width,FieldValueType fieldValueType) {
+			AddColumn(dataField,width,fieldValueType,new Font("Tahoma",9));
 		}
 
-		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
-			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,new Font("Tahoma",9)) {
-
+		///<summary>Adds a datafield column with the specified width and font.  If the column is type Double, then the alignment is set right and a total field is added. Also, default formatstrings are set for dates and doubles.  Does not add lines or shading.</summary>
+		public void AddColumn(string dataField,int width,Font font) {
+			AddColumn(dataField,width,FieldValueType.String,font);
 		}
 
-		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue,bool isCentered)
-			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,isCentered,null,null,new Font("Tahoma",9)) {
-
-		}
-
-		public QueryObject(string stringQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue)
-			: this(stringQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,true,null,null,new Font("Tahoma",9)) {
-
-		}
-
-		public QueryObject(DataTable tableQuery,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroupValue)
-			: this(tableQuery,title,columnNameToSplitOn,splitByKind,queryGroupValue,true,null,null,new Font("Tahoma",9)) {
-
-		}
-
-		///<summary>Adds all the objects necessary for a typical column, including the textObject for column header and the fieldObject for the data.  If the column is type Double, then the alignment is set right and a total field is added. Also, default formatstrings are set for dates and doubles.  Does not add lines or shading.</summary>
+		///<summary>Adds a datafield column with the specified type, width and font.  If the column is type Double, then the alignment is set right and a total field is added. Also, default formatstrings are set for dates and doubles.  Does not add lines or shading.</summary>
 		public void AddColumn(string dataField,int width,FieldValueType fieldValueType,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_arrDataFields.Add(dataField);
@@ -299,13 +628,45 @@ namespace OpenDental.ReportingComplex {
 			grfx.Dispose();
 			return;
 		}
+		#endregion
 
-		///<summary>Font default is Tahoma 9pt</summary>
-		public void AddColumn(string dataField,int width,FieldValueType fieldValueType) {
-			AddColumn(dataField,width,fieldValueType,new Font("Tahoma",9));
+		#region AddSummaryLabel Polymorphisms
+		///<summary>Add a label with the given text to the summary value of a column.  By default label shows on the west.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText) {
+			AddSummaryLabel(dataFieldName,summaryText,SummaryOrientation.West,true,new Font("Tahoma",9));
 		}
 
-		///<summary>Add a label to a summaryfield based on the orientation given.</summary>
+		///<summary>Add a label with the given text to the summary value of a column, based on the orientation given.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,SummaryOrientation summaryOrientation) {
+			AddSummaryLabel(dataFieldName,summaryText,summaryOrientation,true,new Font("Tahoma",9));
+		}
+
+		///<summary>Add a label with the given text to the summary value of a column.  By default label shows on the west.  True will cause the label to wrap within the bounds of the column.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,bool hasWordWrap) {
+			AddSummaryLabel(dataFieldName,summaryText,SummaryOrientation.West,hasWordWrap,new Font("Tahoma",9));
+		}
+
+		///<summary>Add a label with the given text and font to the summary value of a column.  By default label shows on the west.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,Font font) {
+			AddSummaryLabel(dataFieldName,summaryText,SummaryOrientation.West,true,font);
+		}
+
+		///<summary>Add a label with the given text to the summary value of a column.  By default label shows on the west.  True will cause the label to wrap within the bounds of the column.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,SummaryOrientation summaryOrientation,bool hasWordWrap) {
+			AddSummaryLabel(dataFieldName,summaryText,summaryOrientation,hasWordWrap,new Font("Tahoma",9));
+		}
+
+		///<summary>Add a label with the given text and font to the summary value of a column, based on the orientation given.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,SummaryOrientation summaryOrientation,Font font) {
+			AddSummaryLabel(dataFieldName,summaryText,summaryOrientation,true,font);
+		}
+
+		///<summary>Add a label with the given text and font to the summary value of a column.  By default label shows on the west.  True will cause the label to wrap within the bounds of the column.</summary>
+		public void AddSummaryLabel(string dataFieldName,string summaryText,bool hasWordWrap,Font font) {
+			AddSummaryLabel(dataFieldName,summaryText,SummaryOrientation.West,hasWordWrap,font);
+		}
+
+		///<summary>Add a label with the given text and font to the summary value of a column, based on the orientation given.  True will cause the label to wrap within the bounds of the column.</summary>
 		public void AddSummaryLabel(string dataFieldName,string summaryText,SummaryOrientation summaryOrientation,bool hasWordWrap,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			ReportObject summaryField=GetObjectByName(dataFieldName+"Footer");
@@ -362,43 +723,133 @@ namespace OpenDental.ReportingComplex {
 			}
 			grfx.Dispose();
 		}
+		#endregion
 
-		///<summary>Font default is Tahoma 9pt</summary>
-		public void AddSummaryLabel(string dataFieldName,string summaryText,SummaryOrientation summaryOrientation,bool hasWordWrap) {
-			AddSummaryLabel(dataFieldName,summaryText,summaryOrientation,hasWordWrap,new Font("Tahoma",9));
+		#region AddLine Polymorphisms
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space, black in color and in 2pt size.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition) {
+			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,2,50,0,0);
 		}
 
-		/// <summary>Adds a line to a section.</summary>
-		public void AddLine(string name,string sectionName,Color color,float floatLineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercentValue,int offSetX,int offSetY) {
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space and in 2pt size.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color) {
+			AddLine(name,sectionName,lineOrientation,linePosition,color,2,50,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space and black in color.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness) {
+			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,floatLineThickness,50,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is black in color and in 2pt size.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,int linePercentValue) {
+			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,2,linePercentValue,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness) {
+			AddLine(name,sectionName,lineOrientation,linePosition,color,floatLineThickness,50,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is in 2pt size.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,int linePercentValue) {
+			AddLine(name,sectionName,lineOrientation,linePosition,color,2,linePercentValue,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is black in color.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness,int linePercentValue) {
+			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,floatLineThickness,linePercentValue,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue) {
+			AddLine(name,sectionName,lineOrientation,linePosition,color,floatLineThickness,linePercentValue,0,0);
+		}
+
+		///<summary>Adds a line to the specified section with the specified orientation and position.  The line will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue,int offSetX,int offSetY) {
 			_reportObjects.Add(new ReportObject(name,sectionName,color,floatLineThickness,lineOrientation,linePosition,linePercentValue,offSetX,offSetY));
 		}
+		#endregion
 
-		/// <summary></summary>
-		public void AddLine(string name,string sectionName,Color color,float floatLineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercentValue) {
-			AddLine(name,sectionName,color,floatLineThickness,lineOrientation,linePosition,linePercentValue,0,0);
+		#region AddGroupSummaryField Polymorphisms
+		///<summary>Adds a summary object for a group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },Color.Black,new Font("Tahoma",8,FontStyle.Bold),0,0);
 		}
 
-		/// <summary>Line is drawn in 50% of the available space.</summary>
-		public void AddLine(string name,string sectionName,Color color,float floatLineThickness,LineOrientation lineOrientation,LinePosition linePosition) {
-			AddLine(name,sectionName,color,floatLineThickness,lineOrientation,linePosition,50,0,0);
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,Color.Black,new Font("Tahoma",8,FontStyle.Bold),0,0);
 		}
 
-		/// <summary>Line is drawn in 50% of the available space, black in color and in 2pt size.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition) {
-			AddLine(name,sectionName,Color.Black,2,lineOrientation,linePosition,50,0,0);
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Color color) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },color,new Font("Tahoma",8,FontStyle.Bold),0,0);
 		}
 
-		///<summary>Do not use. Only used when splitting a table on a column.</summary>
-		public void AddInitialHeader(string title,Font font) {
-			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
-			Font newFont=new Font(font.FontFamily,font.Size+2,font.Style);
-			_reportObjects.Insert(0,new ReportObject("Initial Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,newFont).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,newFont).Height/grfx.DpiY*100+2)),title,newFont,ContentAlignment.MiddleLeft));
-			_reportObjects["Initial Group Title"].IsUnderlined=true;
-			grfx.Dispose();
+		///<summary>Adds a summary object for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },Color.Black,font,0,0);
 		}
 
-		///<summary>Adds a summary value to a group of QueryObjects.</summary>
-		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Font font,int offSetX,int offSetY) {
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Color color) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,color,new Font("Tahoma",8,FontStyle.Bold),0,0);
+		}
+
+		///<summary>Adds a summary object for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Font font) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,Color.Black,font,0,0);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Color color,Font font) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },color,font,0,0);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Color color,Font font) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,color,font,0,0);
+		}
+
+		///<summary>Adds a summary object for a group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },Color.Black,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,Color.Black,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Color color,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },color,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },Color.Black,font,offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Color color,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,color,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Font font,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,queryGroupValues,Color.Black,font,offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  By default, querygroup value is 0.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Color color,Font font,int offSetX,int offSetY) {
+			AddGroupSummaryField(staticText,columnName,dataFieldName,summaryOperation,new List<int>() { 0 },color,font,offSetX,offSetY);
+		}
+
+		///<summary>Adds a summary object, of the specified color, for the specified group of queries, giving it a label with the given text and font.  The summary is placed under the specified column and summarizes the specified datafield.  Choosing a summaryOperation will change the displayed value calculation.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
+		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Color color,Font font,int offSetX,int offSetY) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			Point location=GetObjectByName(columnName+"Header").Location;
 			Size labelSize=new Size((int)(grfx.MeasureString(staticText,font).Width/grfx.DpiX*100+2)
@@ -407,44 +858,19 @@ namespace OpenDental.ReportingComplex {
 			_reportObjects[i].DataField=dataFieldName;
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			_sections["Group Footer"].Height+=(int)((grfx.MeasureString(staticText,font)).Height/grfx.DpiY*100+2)+offSetY;
-			i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryText","Group Footer",location,new Size(0,0),color,columnName,dataFieldName,font,summaryOperation,offSetX,offSetY));
+			i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryText","Group Footer",location,new Size(0,0),color,summaryOperation,columnName,font,dataFieldName,offSetX,offSetY));
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			grfx.Dispose();
 		}
+		#endregion
 
-		///<summary></summary>
-		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,Font font) {
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,queryGroupValues,font,0,0);
-		}
-
-		///<summary>Default Font is Tahoma 8pt Bold.</summary>
-		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,List<int> queryGroupValues,int offSetX,int offSetY) {
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,queryGroupValues,new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
-		}
-
-		///<summary>Defaults: Font Tahoma 8pt Bold, summary group 1.</summary>
-		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation) {
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),0,0);
-		}
-
-		///<summary>Default Font is Tahoma 8pt Bold.  Summary group is set to 1.  Color is Black.</summary>
-		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation) {
-			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),0,0);
-		}
-
-		///<summary>Default Font is Tahoma 8pt Bold. Summary group is set to 1., Color is set to Black.</summary>
-		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,int offSetX,int offSetY) {
-			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },new Font("Tahoma",8,FontStyle.Bold),offSetX,offSetY);
-		}
-
-		///<summary>Summary group is set to 1., Color is set to Black.</summary>
-		public void AddGroupSummaryField(string staticText,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font,int offSetX,int offSetY) {
-			AddGroupSummaryField(staticText,Color.Black,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },font,offSetX,offSetY);
-		}
-
-		///<summary>Summary group is set to 1.</summary>
-		public void AddGroupSummaryField(string staticText,Color color,string columnName,string dataFieldName,SummaryOperation summaryOperation,Font font,int offSetX,int offSetY) {
-			AddGroupSummaryField(staticText,color,columnName,dataFieldName,summaryOperation,new List<int>() { 1 },font,offSetX,offSetY);
+		///<summary>Do not use. Only used when splitting a table on a column.</summary>
+		public void AddInitialHeader(string title,Font font) {
+			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
+			Font newFont=new Font(font.FontFamily,font.Size+2,font.Style);
+			_reportObjects.Insert(0,new ReportObject("Initial Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,newFont).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,newFont).Height/grfx.DpiY*100+2)),title,newFont,ContentAlignment.MiddleLeft));
+			_reportObjects["Initial Group Title"].IsUnderlined=true;
+			grfx.Dispose();
 		}
 
 		///<summary>Submits the Query to the database and fills ReportTable with the results.  Returns false if the query fails.</summary>
