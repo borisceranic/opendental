@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness {
 	public class ChartModules {
@@ -1043,10 +1041,24 @@ namespace OpenDentBusiness {
 			}
 			if(componentsToLoad.ShowSheets) {
 				#region sheet
-				command="SELECT Description,SheetNum,DateTimeSheet,SheetType "
+				command="SELECT PatNum,Description,SheetNum,DateTimeSheet,SheetType "
 				+"FROM sheet "
-				+"WHERE PatNum="+POut.Long(patNum)
-				+" AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)//rx are only accesssible from within Rx edit window.
+				+"WHERE (PatNum="+POut.Long(patNum);
+				Patient patClone=null;
+				Patient patNonClone=null;
+				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
+					List<Patient> listMatchingPats;
+					Patients.GetCloneAndNonClone(Patients.GetPat(patNum),out patClone,out patNonClone,out listMatchingPats);
+					if(patClone!=null && patNonClone!=null) {//a clone relationship exists
+						if(patClone.PatNum==patNum) {//if the table data is for the clone patient, add an OR statement to get the non-clone's sheets
+							command+=" OR PatNum="+POut.Long(patNonClone.PatNum);
+						}
+						else {//table data is for the non-clone, add an OR statement to get the clone's sheets
+							command+=" OR PatNum="+POut.Long(patClone.PatNum);
+						}
+					}
+				}
+				command+=") AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)//rx are only accesssible from within Rx edit window.
 				+" AND SheetType!="+POut.Long((int)SheetTypeEnum.LabSlip)//labslips are only accesssible from within the labslip edit window.
 				+" ORDER BY DateTimeSheet";
 				DataTable rawSheet=dcon.GetTable(command);
@@ -1070,8 +1082,18 @@ namespace OpenDentBusiness {
 						row["dateEntryC"]=dateT.ToString(Lans.GetShortDateTimeFormat());
 						row["dateTP"]=dateT.ToString(Lans.GetShortDateTimeFormat());
 					}
-					//sheetType=(SheetTypeEnum)PIn.PLong(rawSheet.Rows[i]["SheetType"].ToString());
-					row["description"]=rawSheet.Rows[i]["Description"].ToString();
+					//Add patient name if using clone feature and the sheet belongs to the clone.
+					if(patClone!=null && patNonClone!=null //if both clone and non clone have been set, meaning the clone feature is enabled and there is a clone relationship
+						&& rawSheet.Rows[i]["PatNum"].ToString()!=patNum.ToString()) //if this row is for the other patient (clone or non-clone)
+					{
+						if(patClone.PatNum==patNum) {//if the table data is for the clone patient, display the non-clone name with the data
+							row["description"]="("+patNonClone.FName+") ";
+						}
+						else {//if the table data is for the non-clone, display the clone name
+							row["description"]="("+patClone.FName+") ";
+						}
+					}
+					row["description"]+=rawSheet.Rows[i]["Description"].ToString();
 					row["dx"]="";
 					row["Dx"]="";
 					row["EmailMessageNum"]=0;
