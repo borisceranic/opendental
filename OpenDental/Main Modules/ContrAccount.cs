@@ -1720,8 +1720,11 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Installment Plan"),-1,"","InstallPlan"));
 			if(!PrefC.GetBool(PrefName.EasyHideRepeatCharges)) {
 				button=new ODToolBarButton(Lan.g(this,"Repeating Charge"),-1,"","RepeatCharge");
-				button.Style=ODToolBarButtonStyle.DropDownButton;
-				button.DropDownMenu=contextMenuRepeat;
+				button.Style=ODToolBarButtonStyle.PushButton;
+				if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//contextMenuRepeat items only get initialized when at HQ.
+					button.Style=ODToolBarButtonStyle.DropDownButton;
+					button.DropDownMenu=contextMenuRepeat;
+				}
 				ToolBarMain.Buttons.Add(button);
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
