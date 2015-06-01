@@ -32,10 +32,12 @@ namespace OpenDental.Bridges{
 					} else {
 						id=pat.ChartNumber;
 					}
-					Encoding enc=Encoding.UTF8;
-					if(ProgramCur.ProgName==ProgramName.XDR.ToString()) {//XDR only, not Dexis.
-						enc=Encoding.GetEncoding(1252);//This encoding was specifically requested by the XDR development team.
-					}
+					//Encoding 1252 was specifically requested by the XDR development team to help with accented characters (ex Canadian customers).
+					//On 05/19/2015, a reseller noticed UTF8 encoding in the Dexis bridge caused a similar issue.
+					//We decided it was safe to switch Dexis from using UTF8 to code page 1252 because the bridge depends entirely on the bridge ID,
+					//not the patient names.  Thus there is no chance of breaking the Dexis bridge by using code page 1252 instead.
+					//06/01/2015 A customer tested and confirmed that using the XDR bridge and thus coding page 1252, solved the special characters issue.
+					Encoding enc=Encoding.GetEncoding(1252);
 					using(StreamWriter sw=new StreamWriter(infoFile,false,enc)) {
 						sw.WriteLine(pat.LName+", "+pat.FName
 							+"  "+pat.Birthdate.ToShortDateString()
