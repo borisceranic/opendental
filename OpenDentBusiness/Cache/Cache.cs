@@ -394,6 +394,8 @@ namespace OpenDentBusiness {
 			}
 			if(itypes.Contains((int)InvalidType.Providers) || isAll) {
 				Providers.FillCache(ds.Tables["Provider"]);
+				//Refresh the clinics as well because InvalidType.Providers has a comment that says "also includes clinics".  Also, there currently isn't an itype for Clinics.
+				Clinics.FillCache(ds.Tables["clinic"]);//Case must match the table name in Clinics.RefrechCache().
 			}
 			if(itypes.Contains((int)InvalidType.QuickPaste) || isAll) {
 				QuickPasteNotes.FillCache(ds.Tables["QuickPasteNote"]);
