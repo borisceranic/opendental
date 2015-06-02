@@ -23,37 +23,56 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.label1 = new System.Windows.Forms.Label();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+			this.labelFile = new System.Windows.Forms.Label();
+			this.butRetry = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
-			// label1
+			// labelFile
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(110,42);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(81,13);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Copying Files....";
+			this.labelFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelFile.Location = new System.Drawing.Point(12, 9);
+			this.labelFile.Name = "labelFile";
+			this.labelFile.Size = new System.Drawing.Size(278, 58);
+			this.labelFile.TabIndex = 0;
+			this.labelFile.Text = "Preparing to Copy Files...";
+			this.labelFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// butRetry
+			// 
+			this.butRetry.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.butRetry.Location = new System.Drawing.Point(114, 77);
+			this.butRetry.Name = "butRetry";
+			this.butRetry.Size = new System.Drawing.Size(75, 23);
+			this.butRetry.TabIndex = 1;
+			this.butRetry.Text = "Retry";
+			this.butRetry.UseVisualStyleBackColor = true;
+			this.butRetry.Click += new System.EventHandler(this.butRetry_Click);
 			// 
 			// FormMain
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(302,101);
-			this.Controls.Add(this.label1);
+			this.ClientSize = new System.Drawing.Size(302, 112);
+			this.Controls.Add(this.butRetry);
+			this.Controls.Add(this.labelFile);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(318, 151);
 			this.Name = "FormMain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Update File Copier";
 			this.Load += new System.EventHandler(this.FormMain_Load);
 			this.Shown += new System.EventHandler(this.FormMain_Shown);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelFile;
+		private System.Windows.Forms.Button butRetry;
 	}
 }
 
