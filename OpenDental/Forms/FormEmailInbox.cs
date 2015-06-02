@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
@@ -133,7 +134,8 @@ namespace OpenDental {
 			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Sig"),colSigPixCount,HorizontalAlignment.Center));//4
 			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridEmailMessages.Columns.Add(new UI.ODGridColumn(Lan.g(this,"Patient"),colPatientPixCount,HorizontalAlignment.Left));//5
-			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;			
+			gridEmailMessages.Columns[gridEmailMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			Dictionary<long,string> dictPatNames=Patients.GetAllPatientNames();
 			for(int i=0;i<ListEmailMessages.Count;i++) {
 				EmailMessage emailMessage=ListEmailMessages[i];
 				UI.ODGridRow row=new UI.ODGridRow();
@@ -141,6 +143,7 @@ namespace OpenDental {
 				if(emailMessage.SentOrReceived==EmailSentOrReceived.Received || emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived
 					|| emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedEncrypted || emailMessage.SentOrReceived==EmailSentOrReceived.ReceivedDirect) {
 					row.Bold=true;//unread
+					//row.ColorText=UI.ODPaintTools.ColorNotify;
 				}
 				row.Cells.Add(new UI.ODGridCell(emailMessage.FromAddress));//0 From
 				row.Cells.Add(new UI.ODGridCell(emailMessage.Subject));//1 Subject
@@ -166,11 +169,10 @@ namespace OpenDental {
 					patNumRegardingPatient=emailMessage.PatNumSubj;
 				}
 				if(patNumRegardingPatient==0) {
-					row.Cells.Add(new UI.ODGridCell(""));//5 Patient
+					row.Cells.Add("");//5 Patient
 				}
 				else {
-					Patient pat=Patients.GetPat(patNumRegardingPatient);
-					row.Cells.Add(new UI.ODGridCell(pat.GetNameLF()));//5 Patient
+					row.Cells.Add(dictPatNames[patNumRegardingPatient]);//5 Patient
 				}
 				gridEmailMessages.Rows.Add(row);
 			}
