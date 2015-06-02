@@ -127,6 +127,7 @@ namespace OpenDental{
 		private ColorDialog colorDialog;
 		private Label label24;
 		private ValidNum textBillingElectBatchMax;
+		private CheckBox checkGoogleAddress;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -276,6 +277,7 @@ namespace OpenDental{
 			this.textPayPlansBillInAdvanceDays = new OpenDental.ValidNum();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkGoogleAddress = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -941,6 +943,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkGoogleAddress);
 			this.tabFamily.Controls.Add(this.checkInsPPOsecWriteoffs);
 			this.tabFamily.Controls.Add(this.checkFamPhiAccess);
 			this.tabFamily.Controls.Add(this.checkInsDefaultAssignmentOfBenefits);
@@ -1615,6 +1618,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkGoogleAddress
+			// 
+			this.checkGoogleAddress.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkGoogleAddress.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkGoogleAddress.Location = new System.Drawing.Point(58, 200);
+			this.checkGoogleAddress.Name = "checkGoogleAddress";
+			this.checkGoogleAddress.Size = new System.Drawing.Size(382, 18);
+			this.checkGoogleAddress.TabIndex = 215;
+			this.checkGoogleAddress.Text = "Show Google Maps in patient edit";
+			this.checkGoogleAddress.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1755,6 +1769,7 @@ namespace OpenDental{
 			comboCobRule.SelectedIndex=PrefC.GetInt(PrefName.InsDefaultCobRule);
 			checkTextMsgOkStatusTreatAsNo.Checked=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
 			checkFamPhiAccess.Checked=PrefC.GetBool(PrefName.FamPhiAccess);
+			checkGoogleAddress.Checked=PrefC.GetBool(PrefName.ShowFeatureGoogleMaps);
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -2072,6 +2087,7 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertTime,waitingRoomAlertTime)
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
 				| Prefs.UpdateInt(PrefName.BillingElectBatchMax,PIn.Int(textBillingElectBatchMax.Text))
+				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
 				)
 			{
 				_changed=true;

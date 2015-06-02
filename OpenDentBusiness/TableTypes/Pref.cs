@@ -444,6 +444,8 @@ namespace OpenDentBusiness {
 		SecurityLogOffWithWindows,
 		ShowAccountFamilyCommEntries,
 		ShowFeatureEhr,
+		///<summary>Set to 1 by default.  Shows a button in Edit Patient Information that lets users launch Google Maps.</summary>
+		ShowFeatureGoogleMaps,
 		ShowFeatureMedicalInsurance,
 		///<summary>Set to 1 to enable the Synch Clone button in the Family module which allows users to create and synch clones of patients.</summary>
 		ShowFeaturePatientClone,

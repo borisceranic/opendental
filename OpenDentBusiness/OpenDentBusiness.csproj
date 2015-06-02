@@ -492,6 +492,7 @@
     <Compile Include="Data Interface\Hcpcses.cs" />
     <Compile Include="Data Interface\Icd10s.cs" />
     <Compile Include="Data Interface\Interventions.cs" />
+    <Compile Include="Data Interface\JoeTables.cs" />
     <Compile Include="Data Interface\Loincs.cs" />
     <Compile Include="Data Interface\MapAreas.cs" />
     <Compile Include="Data Interface\MedLabFacAttaches.cs" />

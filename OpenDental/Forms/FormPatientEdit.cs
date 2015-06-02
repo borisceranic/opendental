@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
+using System.Diagnostics;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -178,6 +179,7 @@ namespace OpenDental{
 		private EhrPatient _ehrPatientCur;
 		private GroupBox groupBox3;
 		private CheckBox checkEmailPhoneSame;
+		private UI.Button butShowMap;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -306,6 +308,7 @@ namespace OpenDental{
 			this.textChartNumber = new System.Windows.Forms.TextBox();
 			this.textBirthdate = new OpenDental.ValidDate();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butShowMap = new OpenDental.UI.Button();
 			this.butPickSecondary = new OpenDental.UI.Button();
 			this.butPickPrimary = new OpenDental.UI.Button();
 			this.label40 = new System.Windows.Forms.Label();
@@ -883,6 +886,7 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.butShowMap);
 			this.groupBox1.Controls.Add(this.butPickSecondary);
 			this.groupBox1.Controls.Add(this.butPickPrimary);
 			this.groupBox1.Controls.Add(this.label40);
@@ -919,6 +923,21 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 28;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Address and Phone";
+			// 
+			// butShowMap
+			// 
+			this.butShowMap.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowMap.Autosize = true;
+			this.butShowMap.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowMap.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowMap.CornerRadius = 4F;
+			this.butShowMap.Location = new System.Drawing.Point(361, 155);
+			this.butShowMap.Name = "butShowMap";
+			this.butShowMap.Size = new System.Drawing.Size(73, 22);
+			this.butShowMap.TabIndex = 61;
+			this.butShowMap.Text = "Show Map";
+			this.butShowMap.Visible = false;
+			this.butShowMap.Click += new System.EventHandler(this.butShowMap_Click);
 			// 
 			// butPickSecondary
 			// 
@@ -2309,6 +2328,9 @@ namespace OpenDental{
 					butOK.Enabled=false;
 				}
 			}
+			if(PrefC.GetBool(PrefName.ShowFeatureGoogleMaps)) {
+				butShowMap.Visible=true;
+			}
 		}
 
 		private void FillComboZip(){
@@ -2565,6 +2587,22 @@ namespace OpenDental{
 				textCity.Text=FormZS.ZipSelected.City;
 				textState.Text=FormZS.ZipSelected.State;
 				textZip.Text=FormZS.ZipSelected.ZipCodeDigits;
+			}
+		}
+
+		private void butShowMap_Click(object sender,EventArgs e) {
+			if(textAddress.Text=="" 
+				|| textCity.Text=="" 
+				|| textState.Text=="") 
+			{
+				MsgBox.Show(this,"Please fill in Address, City, and ST before using maps.");
+				return;
+			}
+			try {
+				Process.Start("http://maps.google.com/maps?t=m&q="+textAddress.Text+" "+textAddress2.Text+" "+textCity.Text+" "+textState.Text);
+			}
+			catch {
+				MsgBox.Show(this,"Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
 			}
 		}
 
