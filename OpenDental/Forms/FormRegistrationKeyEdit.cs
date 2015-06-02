@@ -19,7 +19,6 @@ namespace OpenDental{
 		private TextBox textNote;
 		private Label label1;
 		private Label label2;
-		private OpenDental.UI.Button butDelete;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -110,7 +109,6 @@ namespace OpenDental{
 			this.textDateDisabled = new OpenDental.ValidDate();
 			this.textDateStarted = new OpenDental.ValidDate();
 			this.butPracticeTitleReset = new OpenDental.UI.Button();
-			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
@@ -386,23 +384,6 @@ namespace OpenDental{
 			this.butPracticeTitleReset.Visible = false;
 			this.butPracticeTitleReset.Click += new System.EventHandler(this.butPracticeTitleReset_Click);
 			// 
-			// butDelete
-			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Autosize = true;
-			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDelete.CornerRadius = 4F;
-			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
-			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(24, 485);
-			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(75, 26);
-			this.butDelete.TabIndex = 6;
-			this.butDelete.Text = "Delete";
-			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
-			// 
 			// butOK
 			// 
 			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -461,7 +442,6 @@ namespace OpenDental{
 			this.Controls.Add(this.textDateStarted);
 			this.Controls.Add(this.checkForeign);
 			this.Controls.Add(this.butPracticeTitleReset);
-			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textNote);
