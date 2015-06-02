@@ -78,7 +78,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -412,12 +411,12 @@
     <Compile Include="Forms\FormMedLabHL7MsgText.Designer.cs">
       <DependentUpon>FormMedLabHL7MsgText.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormSmsTextMessaging.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormSmsTextMessaging.designer.cs">
-      <DependentUpon>FormSmsTextMessaging.cs</DependentUpon>
-    </Compile>
+	<Compile Include="Forms\FormSmsTextMessaging.cs">
+	  <SubType>Form</SubType>
+	</Compile>
+	<Compile Include="Forms\FormSmsTextMessaging.designer.cs">
+	  <DependentUpon>FormSmsTextMessaging.cs</DependentUpon>
+	</Compile>
     <Compile Include="Forms\FormMedLabResultHist.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3678,9 +3677,9 @@
     <EmbeddedResource Include="Forms\FormMedLabHL7MsgText.resx">
       <DependentUpon>FormMedLabHL7MsgText.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormSmsTextMessaging.resx">
-      <DependentUpon>FormSmsTextMessaging.cs</DependentUpon>
-    </EmbeddedResource>
+	<EmbeddedResource Include="Forms\FormSmsTextMessaging.resx">
+	  <DependentUpon>FormSmsTextMessaging.cs</DependentUpon>
+	</EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMedLabResultHist.resx">
       <DependentUpon>FormMedLabResultHist.cs</DependentUpon>
     </EmbeddedResource>
