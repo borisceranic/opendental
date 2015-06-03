@@ -11,7 +11,7 @@ namespace OpenDentBusiness {
 	   public long ProcButtonQuickNum;
 	   ///<summary>Description used for display.</summary>
 	   public string Description;
-	   ///<summary>FK to procedure.procnum. </summary>
+		 ///<summary>FK to procedurecode.ProcCode. </summary>
 	   public string CodeValue;
 	   ///<summary>Surfaces. </summary>
 	   public string Surf;
