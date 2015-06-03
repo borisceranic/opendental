@@ -2875,9 +2875,7 @@ namespace OpenDental{
 				if(checkShowDiscount.Checked){
 					procTP.Discount=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Discount.ToString());
 				}
-				if(checkShowIns.Checked){
-					procTP.PatAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Pat.ToString());
-				}
+				procTP.PatAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Pat.ToString());
 				procTP.Prognosis=RowsMain[gridMain.SelectedIndices[i]].Prognosis;
 				procTP.Dx=RowsMain[gridMain.SelectedIndices[i]].Dx;
 				ProcTPs.InsertOrUpdate(procTP,true);
