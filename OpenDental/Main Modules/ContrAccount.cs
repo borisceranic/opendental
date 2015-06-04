@@ -1898,6 +1898,7 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=false;
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
+				ToolBarMain.Buttons["RepeatCharge"].Enabled=false;
 				ToolBarMain.Buttons["Statement"].Enabled=false;
 				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=false;
@@ -1919,6 +1920,7 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=true;
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
+				ToolBarMain.Buttons["RepeatCharge"].Enabled=true;
 				ToolBarMain.Buttons["Statement"].Enabled=true;
 				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=true;
