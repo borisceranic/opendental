@@ -37,6 +37,7 @@ namespace OpenDental {
 			checkShowAccount.Checked=HL7DefCur.ShowAccount;
 			checkShowAppts.Checked=HL7DefCur.ShowAppts;
 			checkQuadAsToothNum.Checked=HL7DefCur.IsQuadAsToothNum;
+			checkLongDCodes.Checked=HL7DefCur.HasLongDCodes;
 			textSftpUsername.Text=HL7DefCur.SftpUsername;
 			textSftpPassword.Text=HL7DefCur.SftpPassword;
 			for(int i=0;i<Enum.GetNames(typeof(ModeTxHL7)).Length;i++) {
@@ -62,6 +63,7 @@ namespace OpenDental {
 			#region Enabled/Disabled Affected Controls
 			butBrowseIn.Enabled=false;
 			butBrowseOut.Enabled=false;
+			checkLongDCodes.Enabled=false;
 			checkQuadAsToothNum.Enabled=false;
 			checkShowAccount.Enabled=false;
 			checkShowAppts.Enabled=false;
@@ -79,6 +81,7 @@ namespace OpenDental {
 			#endregion Enabled/Disabled Affected Controls
 			#region Internal Type Affected Controls
 			butAdd.Enabled=false;
+			checkLongDCodes.Visible=false;
 			checkQuadAsToothNum.Visible=false;
 			checkShowAccount.Visible=false;
 			checkShowAppts.Visible=false;
@@ -108,6 +111,7 @@ namespace OpenDental {
 			if(checkEnabled.Checked) {
 				butBrowseIn.Enabled=true;
 				butBrowseOut.Enabled=true;
+				checkLongDCodes.Enabled=true;//set visible down further.
 				checkQuadAsToothNum.Enabled=true;
 				checkShowAccount.Enabled=true;
 				checkShowAppts.Enabled=true;
@@ -137,6 +141,12 @@ namespace OpenDental {
 				checkShowAccount.Visible=true;
 				checkShowAppts.Visible=true;
 				groupShowDemographics.Visible=true;
+			}
+			if(HL7DefCur.InternalType==HL7InternalType.eCWFull
+				|| HL7DefCur.InternalType==HL7InternalType.eCWTight
+				|| HL7DefCur.InternalType==HL7InternalType.eCWStandalone)
+			{
+				checkLongDCodes.Visible=true;
 			}
 			#endregion Set Internal Type Controls
 			#region Set IsInternal Controls
@@ -496,6 +506,7 @@ namespace OpenDental {
 			HL7DefCur.ShowAccount=checkShowAccount.Checked;
 			HL7DefCur.ShowAppts=checkShowAppts.Checked;
 			HL7DefCur.IsQuadAsToothNum=checkQuadAsToothNum.Checked;
+			HL7DefCur.HasLongDCodes=checkLongDCodes.Checked;
 			//clear all fields in order to save the relevant data in the proper fields and clear out data that may not be relevant for the Tx mode
 			HL7DefCur.IncomingFolder="";
 			HL7DefCur.OutgoingFolder="";

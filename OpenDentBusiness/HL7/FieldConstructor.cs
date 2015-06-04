@@ -480,7 +480,7 @@ namespace OpenDentBusiness.HL7 {
 						return "";
 					}
 					if(_isEcwDef) {
-						return gProcCodeOld(proc);
+						return gProcCodeOld(proc,def.HasLongDCodes);
 					}
 					//ProcNum^Descript^CD2^^^^2014^^LaymanTerm
 					//Example: D0150^comprehensive oral evaluation - new or established patient^CD2^^^^2014^^Comprehensive Exam
@@ -840,10 +840,13 @@ namespace OpenDentBusiness.HL7 {
 			}
 		}
 
-		private static string gProcCodeOld(Procedure proc) {
+		private static string gProcCodeOld(Procedure proc,bool hasLongDCodes) {
 			string retVal="";
 			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
-			if(procCode.ProcCode.Length>5 && procCode.ProcCode.StartsWith("D")) {
+			if(procCode.ProcCode.Length>5
+				&& procCode.ProcCode.StartsWith("D")
+				&& !hasLongDCodes)//truncate only if HasLongDCodes is false
+			{
 				retVal=procCode.ProcCode.Substring(0,5);//Remove suffix from all D codes.
 			}
 			else {

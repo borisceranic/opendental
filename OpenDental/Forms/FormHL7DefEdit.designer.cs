@@ -88,6 +88,7 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.checkLongDCodes = new System.Windows.Forms.CheckBox();
 			this.groupShowDemographics.SuspendLayout();
 			this.groupDelimeters.SuspendLayout();
 			this.groupHL7Comm.SuspendLayout();
@@ -150,7 +151,7 @@ namespace OpenDental{
 			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
 			this.textNote.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textNote.Size = new System.Drawing.Size(368, 40);
+			this.textNote.Size = new System.Drawing.Size(368, 56);
 			this.textNote.TabIndex = 62;
 			// 
 			// labelOutAddrPortEx
@@ -502,7 +503,7 @@ namespace OpenDental{
 			this.groupShowDemographics.Controls.Add(this.radioChange);
 			this.groupShowDemographics.Controls.Add(this.radioShow);
 			this.groupShowDemographics.Controls.Add(this.radioHide);
-			this.groupShowDemographics.Location = new System.Drawing.Point(286, 224);
+			this.groupShowDemographics.Location = new System.Drawing.Point(286, 242);
 			this.groupShowDemographics.Name = "groupShowDemographics";
 			this.groupShowDemographics.Size = new System.Drawing.Size(525, 85);
 			this.groupShowDemographics.TabIndex = 0;
@@ -764,20 +765,31 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(17, 314);
+			this.gridMain.Location = new System.Drawing.Point(17, 332);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(796, 336);
+			this.gridMain.Size = new System.Drawing.Size(796, 318);
 			this.gridMain.TabIndex = 0;
 			this.gridMain.Title = "Messages / Segments";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
+			// checkLongProcCodes
+			// 
+			this.checkLongDCodes.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkLongDCodes.Location = new System.Drawing.Point(6, 306);
+			this.checkLongDCodes.Name = "checkLongProcCodes";
+			this.checkLongDCodes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.checkLongDCodes.Size = new System.Drawing.Size(162, 18);
+			this.checkLongDCodes.TabIndex = 71;
+			this.checkLongDCodes.Text = "Send Long D Codes";
+			// 
 			// FormHL7DefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
 			this.ClientSize = new System.Drawing.Size(823, 696);
+			this.Controls.Add(this.checkLongDCodes);
 			this.Controls.Add(this.groupHL7Comm);
 			this.Controls.Add(this.groupDelimeters);
 			this.Controls.Add(this.label17);
@@ -892,5 +904,6 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupDelimeters;
 		private System.Windows.Forms.TextBox textFieldSep;
 		private System.Windows.Forms.GroupBox groupHL7Comm;
+		private System.Windows.Forms.CheckBox checkLongDCodes;
 	}
 }

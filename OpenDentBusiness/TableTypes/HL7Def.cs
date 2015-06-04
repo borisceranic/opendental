@@ -65,6 +65,9 @@ namespace OpenDentBusiness{
 		///<summary>The socket used to connect to the Sftp server for retrieving inbound HL7 messages.  Currently only used by MedLabv2_3 interfaces.
 		///This will be the address:port of the Sftp server to connect to for retrieving lab results.  Example: server.address.com:20020.</summary>
 		public string SftpInSocket;
+		///<summary>For eCW HL7 interfaces only.  False by default.  When false, D codes sent in outbound DFT messages will be limited to 5 characters.
+		///Any additional characters will be stripped off when generating the HL7 message.  When true, D codes will not be truncated.</summary>
+		public bool HasLongDCodes;
 
 
 		///<Summary>List of messages associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>

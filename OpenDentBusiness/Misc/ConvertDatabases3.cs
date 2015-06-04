@@ -8540,6 +8540,18 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ShowFeatureGoogleMaps','1')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD HasLongDCodes tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD HasLongDCodes number(3)";
+					Db.NonQ(command);
+					command="UPDATE hl7def SET HasLongDCodes = 0 WHERE HasLongDCodes IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE hl7def MODIFY HasLongDCodes NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

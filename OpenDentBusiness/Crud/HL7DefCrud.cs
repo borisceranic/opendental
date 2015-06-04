@@ -82,6 +82,7 @@ namespace OpenDentBusiness.Crud{
 				hL7Def.SftpUsername         = PIn.String(table.Rows[i]["SftpUsername"].ToString());
 				hL7Def.SftpPassword         = PIn.String(table.Rows[i]["SftpPassword"].ToString());
 				hL7Def.SftpInSocket         = PIn.String(table.Rows[i]["SftpInSocket"].ToString());
+				hL7Def.HasLongDCodes        = PIn.Bool  (table.Rows[i]["HasLongDCodes"].ToString());
 				retVal.Add(hL7Def);
 			}
 			return retVal;
@@ -122,7 +123,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="HL7DefNum,";
 			}
-			command+="Description,ModeTx,IncomingFolder,OutgoingFolder,IncomingPort,OutgoingIpPort,FieldSeparator,ComponentSeparator,SubcomponentSeparator,RepetitionSeparator,EscapeCharacter,IsInternal,InternalType,InternalTypeVersion,IsEnabled,Note,HL7Server,HL7ServiceName,ShowDemographics,ShowAppts,ShowAccount,IsQuadAsToothNum,LabResultImageCat,SftpUsername,SftpPassword,SftpInSocket) VALUES(";
+			command+="Description,ModeTx,IncomingFolder,OutgoingFolder,IncomingPort,OutgoingIpPort,FieldSeparator,ComponentSeparator,SubcomponentSeparator,RepetitionSeparator,EscapeCharacter,IsInternal,InternalType,InternalTypeVersion,IsEnabled,Note,HL7Server,HL7ServiceName,ShowDemographics,ShowAppts,ShowAccount,IsQuadAsToothNum,LabResultImageCat,SftpUsername,SftpPassword,SftpInSocket,HasLongDCodes) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(hL7Def.HL7DefNum)+",";
 			}
@@ -152,7 +153,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (hL7Def.LabResultImageCat)+","
 				+"'"+POut.String(hL7Def.SftpUsername)+"',"
 				+"'"+POut.String(hL7Def.SftpPassword)+"',"
-				+"'"+POut.String(hL7Def.SftpInSocket)+"')";
+				+"'"+POut.String(hL7Def.SftpInSocket)+"',"
+				+    POut.Bool  (hL7Def.HasLongDCodes)+")";
 			if(hL7Def.Note==null) {
 				hL7Def.Note="";
 			}
@@ -194,7 +196,8 @@ namespace OpenDentBusiness.Crud{
 				+"LabResultImageCat    =  "+POut.Long  (hL7Def.LabResultImageCat)+", "
 				+"SftpUsername         = '"+POut.String(hL7Def.SftpUsername)+"', "
 				+"SftpPassword         = '"+POut.String(hL7Def.SftpPassword)+"', "
-				+"SftpInSocket         = '"+POut.String(hL7Def.SftpInSocket)+"' "
+				+"SftpInSocket         = '"+POut.String(hL7Def.SftpInSocket)+"', "
+				+"HasLongDCodes        =  "+POut.Bool  (hL7Def.HasLongDCodes)+" "
 				+"WHERE HL7DefNum = "+POut.Long(hL7Def.HL7DefNum);
 			if(hL7Def.Note==null) {
 				hL7Def.Note="";
@@ -309,6 +312,10 @@ namespace OpenDentBusiness.Crud{
 			if(hL7Def.SftpInSocket != oldHL7Def.SftpInSocket) {
 				if(command!=""){ command+=",";}
 				command+="SftpInSocket = '"+POut.String(hL7Def.SftpInSocket)+"'";
+			}
+			if(hL7Def.HasLongDCodes != oldHL7Def.HasLongDCodes) {
+				if(command!=""){ command+=",";}
+				command+="HasLongDCodes = "+POut.Bool(hL7Def.HasLongDCodes)+"";
 			}
 			if(command==""){
 				return false;
