@@ -50,7 +50,7 @@ namespace OpenDentBusiness {
 		///<summary>1</summary>
 		ReceivedRead,
 		///<summary>2</summary>
-		Junk,
+		ReceivedJunk,
 		///<summary>3</summary>
 		Deleted
 	}

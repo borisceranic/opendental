@@ -24,43 +24,19 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSmsTextMessaging));
-			this.gridMessages = new OpenDental.UI.ODGrid();
-			this.comboClinic = new ODR.ComboBoxMulti();
 			this.label1 = new System.Windows.Forms.Label();
-			this.textDateFrom = new ODR.ValidDate();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.textDateTo = new ODR.ValidDate();
 			this.listStatus = new System.Windows.Forms.ListBox();
 			this.label4 = new System.Windows.Forms.Label();
+			this.textDateTo = new ODR.ValidDate();
+			this.textDateFrom = new ODR.ValidDate();
+			this.comboClinic = new ODR.ComboBoxMulti();
+			this.gridMessages = new OpenDental.UI.ODGrid();
+			this.butRefresh = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
-			// 
-			// gridMessages
-			// 
-			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMessages.HScrollVisible = false;
-			this.gridMessages.Location = new System.Drawing.Point(12, 74);
-			this.gridMessages.Name = "gridMessages";
-			this.gridMessages.ScrollValue = 0;
-			this.gridMessages.Size = new System.Drawing.Size(950, 580);
-			this.gridMessages.TabIndex = 4;
-			this.gridMessages.Title = "Text Messages";
-			this.gridMessages.TranslationName = null;
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.BackColor = System.Drawing.SystemColors.Window;
-			this.comboClinic.DroppedDown = false;
-			this.comboClinic.Items = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.Items")));
-			this.comboClinic.Location = new System.Drawing.Point(135, 9);
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.SelectedIndices")));
-			this.comboClinic.Size = new System.Drawing.Size(225, 21);
-			this.comboClinic.TabIndex = 5;
 			// 
 			// label1
 			// 
@@ -70,13 +46,6 @@ namespace OpenDental{
 			this.label1.TabIndex = 6;
 			this.label1.Text = "Clinic";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textDateFrom
-			// 
-			this.textDateFrom.Location = new System.Drawing.Point(135, 30);
-			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
-			this.textDateFrom.TabIndex = 7;
 			// 
 			// label2
 			// 
@@ -96,13 +65,6 @@ namespace OpenDental{
 			this.label3.Text = "Date To";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textDateTo
-			// 
-			this.textDateTo.Location = new System.Drawing.Point(135, 50);
-			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(81, 20);
-			this.textDateTo.TabIndex = 9;
-			// 
 			// listStatus
 			// 
 			this.listStatus.FormattingEnabled = true;
@@ -120,6 +82,61 @@ namespace OpenDental{
 			this.label4.TabIndex = 12;
 			this.label4.Text = "Status";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDateTo
+			// 
+			this.textDateTo.Location = new System.Drawing.Point(135, 50);
+			this.textDateTo.Name = "textDateTo";
+			this.textDateTo.Size = new System.Drawing.Size(81, 20);
+			this.textDateTo.TabIndex = 9;
+			// 
+			// textDateFrom
+			// 
+			this.textDateFrom.Location = new System.Drawing.Point(135, 30);
+			this.textDateFrom.Name = "textDateFrom";
+			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
+			this.textDateFrom.TabIndex = 7;
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.BackColor = System.Drawing.SystemColors.Window;
+			this.comboClinic.DroppedDown = false;
+			this.comboClinic.Items = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.Items")));
+			this.comboClinic.Location = new System.Drawing.Point(135, 9);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.SelectedIndices")));
+			this.comboClinic.Size = new System.Drawing.Size(225, 21);
+			this.comboClinic.TabIndex = 5;
+			// 
+			// gridMessages
+			// 
+			this.gridMessages.AllowSortingByColumn = true;
+			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMessages.HScrollVisible = false;
+			this.gridMessages.Location = new System.Drawing.Point(12, 74);
+			this.gridMessages.Name = "gridMessages";
+			this.gridMessages.ScrollValue = 0;
+			this.gridMessages.Size = new System.Drawing.Size(950, 580);
+			this.gridMessages.TabIndex = 4;
+			this.gridMessages.Title = "Text Messages";
+			this.gridMessages.TranslationName = null;
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(887, 48);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 24);
+			this.butRefresh.TabIndex = 13;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
 			// butOK
 			// 
@@ -155,6 +172,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.listStatus);
 			this.Controls.Add(this.label3);
@@ -190,5 +208,6 @@ namespace OpenDental{
 		private ODR.ValidDate textDateTo;
 		private System.Windows.Forms.ListBox listStatus;
 		private System.Windows.Forms.Label label4;
+		private UI.Button butRefresh;
 	}
 }

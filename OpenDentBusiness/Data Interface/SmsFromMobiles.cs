@@ -112,24 +112,24 @@ namespace OpenDentBusiness{
 			return smsUnreadCount.ToString();
 		}
 
-		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If clinicNum is zero then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
+		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
 		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,params SmsFromStatus[] arrayStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,arrayStatuses);
 			}
 			List <string> listCommandFilters=new List<string>();
 			if(dateStart>DateTime.MinValue) {
-				listCommandFilters.Add("DateTimeReceived>="+POut.Date(dateStart));
+				listCommandFilters.Add(DbHelper.DtimeToDate("DateTimeReceived")+">="+POut.Date(dateStart));
 			}
 			if(dateEnd>DateTime.MinValue) {
-				listCommandFilters.Add("DateTimeReceived<="+POut.Date(dateEnd));
+				listCommandFilters.Add(DbHelper.DtimeToDate("DateTimeReceived")+"<="+POut.Date(dateEnd));
 			}
 			if(listClinicNums.Count>0) {
 				string[] arrayClinicNumStrs=new string[listClinicNums.Count];
 				for(int i=0;i<listClinicNums.Count;i++) {
 					arrayClinicNumStrs[i]=POut.Long(listClinicNums[i]);
 				}
-				listCommandFilters.Add("ClinicNum="+String.Join(",",arrayClinicNumStrs));
+				listCommandFilters.Add("ClinicNum IN ("+String.Join(",",arrayClinicNumStrs)+")");
 			}
 			if(arrayStatuses.Length>0) {
 				string statuses="";
@@ -146,6 +146,20 @@ namespace OpenDentBusiness{
 				command+=" WHERE "+String.Join(" AND ",listCommandFilters);
 			}
 			return Crud.SmsFromMobileCrud.SelectMany(command);
+		}
+
+		public static string GetSmsFromStatusDescript(SmsFromStatus smsFromStatus) {
+			//No need to check RemotingRole; no call to db.
+			if(smsFromStatus==SmsFromStatus.ReceivedUnread) {
+				return "Unread";
+			}
+			else if(smsFromStatus==SmsFromStatus.ReceivedRead) {
+				return "Read";
+			}
+			else if(smsFromStatus==SmsFromStatus.ReceivedJunk) {
+				return "Junk";
+			}
+			return "";
 		}
 
 	}
