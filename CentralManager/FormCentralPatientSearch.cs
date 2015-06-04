@@ -92,7 +92,7 @@ namespace CentralManager {
 						textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 						textSSN.Text,textPatNum.Text,textChartNumber.Text,0,
 						checkGuarantors.Checked,!checkHideArchived.Checked,//checkHideArchived is opposite label for what this function expects, but hideArchived makes more sense
-						DateTime.MinValue,0,textSubscriberID.Text,textEmail.Text,textCountry.Text,"");
+						DateTime.MinValue,0,textSubscriberID.Text,textEmail.Text,textCountry.Text,"","");
 			}
 			catch(ThreadAbortException tae) {
 				throw tae;//ODThread needs to clean up after an abort exception is thrown.

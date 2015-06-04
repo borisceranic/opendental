@@ -129,6 +129,7 @@ namespace OpenDentBusiness {
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
 					//list.Add(new DisplayField("OtherPhone",90,category));
 					//list.Add(new DisplayField("Country",90,category));
+					//list.Add(new DisplayField("RegKey",150,category));
 				}
 				list.Add(new DisplayField("PatNum",80,category));
 				//list.Add(new DisplayField("ChartNum",60,category));
@@ -371,6 +372,7 @@ namespace OpenDentBusiness {
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
 					list.Add(new DisplayField("OtherPhone",90,category));
 					list.Add(new DisplayField("Country",90,category));
+					list.Add(new DisplayField("RegKey",150,category));
 				}
 				list.Add(new DisplayField("PatNum",80,category));
 				list.Add(new DisplayField("ChartNum",60,category));
