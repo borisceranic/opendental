@@ -73,6 +73,7 @@ namespace OpenDentBusiness{
 				if((SheetInternalType)i==SheetInternalType.MedLabResults) {
 					continue;
 				}
+				list.Add(GetSheetDef((SheetInternalType)i));
 			}
 			return list;
 		}
