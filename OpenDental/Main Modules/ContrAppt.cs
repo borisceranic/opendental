@@ -2445,7 +2445,8 @@ namespace OpenDental {
 				}
 				return;
 			}
-			if(TempApptSingle.Location.X>ContrApptSheet2.Width) {
+			//Make sure there are operatories for the appointment to be scheduled and make sure the user dragged the appointment to a valid location.
+			if(ApptDrawing.VisOps.Count==0 || TempApptSingle.Location.X>ContrApptSheet2.Width) {
 				mouseIsDown=false;
 				boolAptMoved=false;
 				TempApptSingle.Dispose();
@@ -3904,6 +3905,9 @@ namespace OpenDental {
 				if(!Security.IsAuthorized(Permissions.AppointmentCreate)) {
 					return;
 				}
+				if(ApptDrawing.VisOps.Count==0) {//no ops visible.
+					return;
+				}
 				FormPatientSelect FormPS=new FormPatientSelect();
 				if(PatCur!=null) {
 					FormPS.InitialPatNum=PatCur.PatNum;
@@ -4301,6 +4305,10 @@ namespace OpenDental {
 		}
 
 		private void OnPrint_Click() {
+			if(ApptDrawing.VisOps.Count==0) {//no ops visible.
+				MsgBox.Show(this,"There must be at least one operatory showing in order to Print Schedule.");
+				return;
+			}
 			if(PrinterSettings.InstalledPrinters.Count==0) {
 				MessageBox.Show(Lan.g(this,"Printer not installed"));
 			}
