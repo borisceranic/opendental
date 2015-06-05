@@ -473,6 +473,15 @@ namespace OpenDentBusiness{
 			return multPats;
 		}
 
+		///<summary>Get all patients who have a corresponding entry in the RegistrationKey table. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+		public static List<Patient> GetPatientsWithRegKeys() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM patient WHERE PatNum IN (SELECT PatNum FROM registrationkey)";
+			return Crud.PatientCrud.SelectMany(command);
+		}
+
 		///<summary>First call GetMultPats to fill the list of multPats. Then, use this to return one patient from that list.</summary>
 		public static Patient GetOnePat(Patient[] multPats,long patNum) {
 			//No need to check RemotingRole; no call to db.

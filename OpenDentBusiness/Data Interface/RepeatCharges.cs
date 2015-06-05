@@ -77,8 +77,15 @@ namespace OpenDentBusiness{
 				+"WHERE PatNum="+POut.Long(patNum)+" AND ProcCode REGEXP '^Z[0-9]{3,}$'";
 			return Crud.RepeatChargeCrud.SelectMany(command);
 		}
-		
 
+		///<summary>Get the list of all RepeatCharge rows. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+		public static List<RepeatCharge> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<RepeatCharge>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM repeatcharge";
+			return Crud.RepeatChargeCrud.SelectMany(command);
+		}
 		
 
 
