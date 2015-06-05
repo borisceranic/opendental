@@ -277,7 +277,7 @@ namespace OpenDentBusiness {
 			return result;
 		}
 
-		///<summary>Returns true if the input string is a reserved word in MySQL 5.5.31.</summary>
+		///<summary>Returns true if the input string is a reserved word in MySQL 5.6.25.</summary>
 		public static bool isMySQLReservedWord(string input) {
 			bool retval;
 			//using a switch statement makes this method run in constant time (faster).
@@ -300,6 +300,7 @@ namespace OpenDentBusiness {
 				case "BY":
 				case "CALL":
 				case "CASCADE":
+				case "CASE":
 				case "CHANGE":
 				case "CHAR":
 				case "CHARACTER":
@@ -356,6 +357,8 @@ namespace OpenDentBusiness {
 				case "FOREIGN":
 				case "FROM":
 				case "FULLTEXT":
+				case "GENERAL":
+				case "GET":
 				case "GRANT":
 				case "GROUP":
 				case "HAVING":
@@ -365,6 +368,7 @@ namespace OpenDentBusiness {
 				case "HOUR_SECOND":
 				case "IF":
 				case "IGNORE":
+				case "IGNORE_SERVER_IDS":
 				case "IN":
 				case "INDEX":
 				case "INFILE":
@@ -381,6 +385,8 @@ namespace OpenDentBusiness {
 				case "INTEGER":
 				case "INTERVAL":
 				case "INTO":
+				case "IO_AFTER_GTIDS":
+				case "IO_BEFORE_GTIDS":
 				case "IS":
 				case "ITERATE":
 				case "JOIN":
@@ -403,6 +409,8 @@ namespace OpenDentBusiness {
 				case "LONGTEXT":
 				case "LOOP":
 				case "LOW_PRIORITY":
+				case "MASTER_BIND":
+				case "MASTER_HEARTBEAT_PERIOD":
 				case "MASTER_SSL_VERIFY_SERVER_CERT":
 				case "MATCH":
 				case "MAXVALUE":
@@ -420,6 +428,7 @@ namespace OpenDentBusiness {
 				case "NULL":
 				case "NUMERIC":
 				case "ON":
+				case "ONE_SHOT":
 				case "OPTIMIZE":
 				case "OPTION":
 				case "OPTIONALLY":
@@ -428,6 +437,7 @@ namespace OpenDentBusiness {
 				case "OUT":
 				case "OUTER":
 				case "OUTFILE":
+				case "PARTITION":
 				case "PRECISION":
 				case "PRIMARY":
 				case "PROCEDURE":
@@ -459,6 +469,7 @@ namespace OpenDentBusiness {
 				case "SET":
 				case "SHOW":
 				case "SIGNAL":
+				case "SLOW":
 				case "SMALLINT":
 				case "SPATIAL":
 				case "SPECIFIC":
@@ -466,6 +477,8 @@ namespace OpenDentBusiness {
 				case "SQLEXCEPTION":
 				case "SQLSTATE":
 				case "SQLWARNING":
+				case "SQL_AFTER_GTIDS":
+				case "SQL_BEFORE_GTIDS":
 				case "SQL_BIG_RESULT":
 				case "SQL_CALC_FOUND_ROWS":
 				case "SQL_SMALL_RESULT":
@@ -507,11 +520,6 @@ namespace OpenDentBusiness {
 				case "XOR":
 				case "YEAR_MONTH":
 				case "ZEROFILL":
-				//New as of mysql 5.5
-				case "GENERAL":
-				case "IGNORE_SERVER_IDS":
-				case "MASTER_HEARTBEAT_PERIOD":
-				case "SLOW":
 					retval=true;
 					break;
 				default:
