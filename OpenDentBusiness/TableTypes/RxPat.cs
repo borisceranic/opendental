@@ -55,7 +55,15 @@ namespace OpenDentBusiness{
 		///<summary>2</summary>
 		SentElect,
 		///<summary>3</summary>
-		Printed
+		Printed,
+		///<summary>4</summary>
+		Faxed,
+		///<summary>5</summary>
+		CalledIn,
+		///<summary>6</summary>
+		GaveScript,
+		///<summary>7</summary>
+		Pending
 	}
 
 
