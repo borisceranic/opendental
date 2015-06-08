@@ -242,7 +242,7 @@ namespace OpenDental{
 			this.checkClinicIsRestricted.Name = "checkClinicIsRestricted";
 			this.checkClinicIsRestricted.Size = new System.Drawing.Size(125, 83);
 			this.checkClinicIsRestricted.TabIndex = 18;
-			this.checkClinicIsRestricted.Text = "Restrict select patient window search to this clinic";
+			this.checkClinicIsRestricted.Text = "Restrict user to only see this clinic";
 			this.checkClinicIsRestricted.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.checkClinicIsRestricted.UseVisualStyleBackColor = true;
 			// 
