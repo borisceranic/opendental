@@ -190,6 +190,12 @@ namespace OpenDental {
 				_printMargin.Top=120;
 			}
 			Sheets.SetPageMargin(sheet,_printMargin);
+			foreach(SheetField field in sheet.SheetFields) {//validate all signatures before modifying any of the text fields.
+				if(field.FieldType!= SheetFieldType.SigBox) {
+					continue;
+				}
+				field.SigKey=Sheets.GetSignatureKey(sheet);
+			}
 			Graphics g=Graphics.FromImage(new Bitmap(sheet.WidthPage,sheet.HeightPage));
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
@@ -690,6 +696,10 @@ namespace OpenDental {
 			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
 				_printMargin.Top=120;
 			}
+			pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
+			if(pageCount==1 && sheet.SheetType!=SheetTypeEnum.MedLabResults) {
+				return sheet.HeightPage;
+			}
 			int retVal=sheet.HeightPage-_printMargin.Bottom;//First page bottom is not changed by top margin. Example: 1100px page height, 60px bottom, 1040px is first page bottom
 			pageCount=0;
 			while(retVal<yPos){
@@ -789,8 +799,8 @@ namespace OpenDental {
 				if(field.FieldValue.Length>1) {
 					signature=field.FieldValue.Substring(1);
 				}
-				string keyData=Sheets.GetSignatureKey(sheet);
-				wrapper.FillSignature(sigIsTopaz,keyData,signature);
+				//string keyData=Sheets.GetSignatureKey(sheet);//can't do this because some of the fields might have different new line characters. Sig will be invalid.
+				wrapper.FillSignature(sigIsTopaz,field.SigKey,signature);
 			}
 			if(g!=null) {
 				Bitmap sigBitmap=wrapper.GetSigImage();
@@ -1222,6 +1232,12 @@ namespace OpenDental {
 			Graphics g=Graphics.FromImage(new Bitmap(sheet.WidthPage,sheet.HeightPage));
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
+			foreach(SheetField field in sheet.SheetFields) {//validate all signatures before modifying any of the text fields.
+				if(field.FieldType!= SheetFieldType.SigBox) {
+					continue;
+				}
+				field.SigKey=Sheets.GetSignatureKey(sheet);
+			}
 			//this will set the page breaks as well as adjust for growth behavior
 			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
 			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
