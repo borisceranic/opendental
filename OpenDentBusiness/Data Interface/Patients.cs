@@ -739,11 +739,21 @@ namespace OpenDentBusiness{
 				+",Country = '"    +POut.String(pat.Country)+"'"
 				+",Zip = '"        +POut.String(pat.Zip)+"'"
 				+",HmPhone = '"    +POut.String(pat.HmPhone)+"'"
-				+",credittype = '" +POut.String(pat.CreditType)+"'"
-				+",priprov = '"    +POut.Long   (pat.PriProv)+"'"
-				+",secprov = '"    +POut.Long   (pat.SecProv)+"'"
-				+",feesched = '"   +POut.Long   (pat.FeeSched)+"'"
-				+",billingtype = '"+POut.Long   (pat.BillingType)+"'"
+				+" WHERE guarantor = '"+POut.Long(pat.Guarantor)+"'";
+			Db.NonQ(command);
+		}
+
+		public static void UpdateBillingProviderForFam(Patient pat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),pat);
+				return;
+			}
+			string command= "UPDATE patient SET "
+				+"credittype = '" +POut.String(pat.CreditType)+"'"
+				+",priprov = '"    +POut.Long(pat.PriProv)+"'"
+				+",secprov = '"    +POut.Long(pat.SecProv)+"'"
+				+",feesched = '"   +POut.Long(pat.FeeSched)+"'"
+				+",billingtype = '"+POut.Long(pat.BillingType)+"'"
 				+" WHERE guarantor = '"+POut.Long(pat.Guarantor)+"'";
 			Db.NonQ(command);
 		}

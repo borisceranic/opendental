@@ -51,9 +51,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.TextBox textSalutation;
 		private System.Windows.Forms.TextBox textEmail;
-		private System.Windows.Forms.Label label27;
-		private System.Windows.Forms.TextBox textCreditType;
-		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.TextBox textSchool;
 		private System.Windows.Forms.RadioButton radioStudentN;
@@ -127,13 +124,6 @@ namespace OpenDental{
 		private Label label28;
 		private ComboBox comboLanguage;
 		private Patient PatOld;
-		private ComboBox comboBillType;
-		private Label label40;
-		private Label label39;
-		private Label label38;
-		private ComboBox comboFeeSched;
-		private ComboBox comboSecProv;
-		private ComboBox comboPriProv;
 		private ComboBox comboContact;
 		private Label label23;
 		private ComboBox comboConfirm;
@@ -174,12 +164,25 @@ namespace OpenDental{
 		private List<Guardian> GuardianList;
 		private Label labelDeceased;
 		private TextBox textDateDeceased;
-		private UI.Button butPickSecondary;
-		private UI.Button butPickPrimary;
 		private EhrPatient _ehrPatientCur;
 		private GroupBox groupBox3;
 		private CheckBox checkEmailPhoneSame;
 		private UI.Button butShowMap;
+		private GroupBox groupBillProv;
+		private UI.Button butPickSecondary;
+		private ComboBox comboBillType;
+		private UI.Button butPickPrimary;
+		private Label label1;
+		private Label label40;
+		private TextBox textCreditType;
+		private Label label39;
+		private Label label27;
+		private Label label38;
+		private ComboBox comboPriProv;
+		private ComboBox comboFeeSched;
+		private ComboBox comboSecProv;
+		private TextBox textBox2;
+		private CheckBox checkBillProvSame;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -293,9 +296,6 @@ namespace OpenDental{
 			this.label21 = new System.Windows.Forms.Label();
 			this.textEmail = new System.Windows.Forms.TextBox();
 			this.label22 = new System.Windows.Forms.Label();
-			this.label27 = new System.Windows.Forms.Label();
-			this.textCreditType = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.labelCanadianEligibilityCode = new System.Windows.Forms.Label();
 			this.comboCanadianEligibilityCode = new System.Windows.Forms.ComboBox();
@@ -309,15 +309,6 @@ namespace OpenDental{
 			this.textBirthdate = new OpenDental.ValidDate();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.butShowMap = new OpenDental.UI.Button();
-			this.butPickSecondary = new OpenDental.UI.Button();
-			this.butPickPrimary = new OpenDental.UI.Button();
-			this.label40 = new System.Windows.Forms.Label();
-			this.label39 = new System.Windows.Forms.Label();
-			this.label38 = new System.Windows.Forms.Label();
-			this.comboFeeSched = new System.Windows.Forms.ComboBox();
-			this.comboSecProv = new System.Windows.Forms.ComboBox();
-			this.comboPriProv = new System.Windows.Forms.ComboBox();
-			this.comboBillType = new System.Windows.Forms.ComboBox();
 			this.butEditZip = new OpenDental.UI.Button();
 			this.textZip = new System.Windows.Forms.TextBox();
 			this.comboZip = new System.Windows.Forms.ComboBox();
@@ -395,11 +386,27 @@ namespace OpenDental{
 			this.textDateDeceased = new System.Windows.Forms.TextBox();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.checkEmailPhoneSame = new System.Windows.Forms.CheckBox();
+			this.groupBillProv = new System.Windows.Forms.GroupBox();
+			this.textBox2 = new System.Windows.Forms.TextBox();
+			this.checkBillProvSame = new System.Windows.Forms.CheckBox();
+			this.butPickSecondary = new OpenDental.UI.Button();
+			this.comboBillType = new System.Windows.Forms.ComboBox();
+			this.butPickPrimary = new OpenDental.UI.Button();
+			this.label1 = new System.Windows.Forms.Label();
+			this.label40 = new System.Windows.Forms.Label();
+			this.textCreditType = new System.Windows.Forms.TextBox();
+			this.label39 = new System.Windows.Forms.Label();
+			this.label27 = new System.Windows.Forms.Label();
+			this.label38 = new System.Windows.Forms.Label();
+			this.comboPriProv = new System.Windows.Forms.ComboBox();
+			this.comboFeeSched = new System.Windows.Forms.ComboBox();
+			this.comboSecProv = new System.Windows.Forms.ComboBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
 			this.groupPH.SuspendLayout();
 			this.groupBox3.SuspendLayout();
+			this.groupBillProv.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -745,33 +752,6 @@ namespace OpenDental{
 			this.label22.Text = "E-mail";
 			this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label27
-			// 
-			this.label27.Location = new System.Drawing.Point(8, 158);
-			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(152, 16);
-			this.label27.TabIndex = 0;
-			this.label27.Text = "Credit Type";
-			this.label27.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// textCreditType
-			// 
-			this.textCreditType.Location = new System.Drawing.Point(161, 155);
-			this.textCreditType.MaxLength = 1;
-			this.textCreditType.Name = "textCreditType";
-			this.textCreditType.Size = new System.Drawing.Size(18, 20);
-			this.textCreditType.TabIndex = 10;
-			this.textCreditType.TextChanged += new System.EventHandler(this.textCreditType_TextChanged);
-			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(8, 177);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(152, 16);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Billing Type";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.labelCanadianEligibilityCode);
@@ -887,15 +867,6 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.butShowMap);
-			this.groupBox1.Controls.Add(this.butPickSecondary);
-			this.groupBox1.Controls.Add(this.butPickPrimary);
-			this.groupBox1.Controls.Add(this.label40);
-			this.groupBox1.Controls.Add(this.label39);
-			this.groupBox1.Controls.Add(this.label38);
-			this.groupBox1.Controls.Add(this.comboFeeSched);
-			this.groupBox1.Controls.Add(this.comboSecProv);
-			this.groupBox1.Controls.Add(this.comboPriProv);
-			this.groupBox1.Controls.Add(this.comboBillType);
 			this.groupBox1.Controls.Add(this.textHmPhone);
 			this.groupBox1.Controls.Add(this.butEditZip);
 			this.groupBox1.Controls.Add(this.textZip);
@@ -906,8 +877,6 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.textState);
 			this.groupBox1.Controls.Add(this.labelST);
 			this.groupBox1.Controls.Add(this.textAddress);
-			this.groupBox1.Controls.Add(this.label27);
-			this.groupBox1.Controls.Add(this.textCreditType);
 			this.groupBox1.Controls.Add(this.label12);
 			this.groupBox1.Controls.Add(this.labelCity);
 			this.groupBox1.Controls.Add(this.textAddress2);
@@ -915,11 +884,10 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Controls.Add(this.textCity);
 			this.groupBox1.Controls.Add(this.label11);
-			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(488, 1);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(474, 278);
+			this.groupBox1.Size = new System.Drawing.Size(474, 162);
 			this.groupBox1.TabIndex = 28;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Address and Phone";
@@ -931,110 +899,13 @@ namespace OpenDental{
 			this.butShowMap.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butShowMap.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butShowMap.CornerRadius = 4F;
-			this.butShowMap.Location = new System.Drawing.Point(361, 155);
+			this.butShowMap.Location = new System.Drawing.Point(341, 134);
 			this.butShowMap.Name = "butShowMap";
 			this.butShowMap.Size = new System.Drawing.Size(73, 22);
 			this.butShowMap.TabIndex = 61;
 			this.butShowMap.Text = "Show Map";
 			this.butShowMap.Visible = false;
 			this.butShowMap.Click += new System.EventHandler(this.butShowMap_Click);
-			// 
-			// butPickSecondary
-			// 
-			this.butPickSecondary.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPickSecondary.Autosize = false;
-			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPickSecondary.CornerRadius = 2F;
-			this.butPickSecondary.Location = new System.Drawing.Point(360, 217);
-			this.butPickSecondary.Name = "butPickSecondary";
-			this.butPickSecondary.Size = new System.Drawing.Size(23, 21);
-			this.butPickSecondary.TabIndex = 15;
-			this.butPickSecondary.Text = "...";
-			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
-			// 
-			// butPickPrimary
-			// 
-			this.butPickPrimary.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPickPrimary.Autosize = false;
-			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPickPrimary.CornerRadius = 2F;
-			this.butPickPrimary.Location = new System.Drawing.Point(360, 196);
-			this.butPickPrimary.Name = "butPickPrimary";
-			this.butPickPrimary.Size = new System.Drawing.Size(23, 21);
-			this.butPickPrimary.TabIndex = 13;
-			this.butPickPrimary.Text = "...";
-			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
-			// 
-			// label40
-			// 
-			this.label40.Location = new System.Drawing.Point(8, 241);
-			this.label40.Name = "label40";
-			this.label40.Size = new System.Drawing.Size(152, 34);
-			this.label40.TabIndex = 0;
-			this.label40.Text = "Fee Schedule (rarely used)";
-			this.label40.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// label39
-			// 
-			this.label39.Location = new System.Drawing.Point(8, 221);
-			this.label39.Name = "label39";
-			this.label39.Size = new System.Drawing.Size(152, 16);
-			this.label39.TabIndex = 0;
-			this.label39.Text = "Secondary Provider";
-			this.label39.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// label38
-			// 
-			this.label38.Location = new System.Drawing.Point(8, 198);
-			this.label38.Name = "label38";
-			this.label38.Size = new System.Drawing.Size(152, 16);
-			this.label38.TabIndex = 0;
-			this.label38.Text = "Primary Provider";
-			this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// comboFeeSched
-			// 
-			this.comboFeeSched.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboFeeSched.FormattingEnabled = true;
-			this.comboFeeSched.ItemHeight = 13;
-			this.comboFeeSched.Location = new System.Drawing.Point(161, 238);
-			this.comboFeeSched.MaxDropDownItems = 30;
-			this.comboFeeSched.Name = "comboFeeSched";
-			this.comboFeeSched.Size = new System.Drawing.Size(198, 21);
-			this.comboFeeSched.TabIndex = 16;
-			// 
-			// comboSecProv
-			// 
-			this.comboSecProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboSecProv.FormattingEnabled = true;
-			this.comboSecProv.ItemHeight = 13;
-			this.comboSecProv.Location = new System.Drawing.Point(161, 217);
-			this.comboSecProv.MaxDropDownItems = 30;
-			this.comboSecProv.Name = "comboSecProv";
-			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
-			this.comboSecProv.TabIndex = 14;
-			// 
-			// comboPriProv
-			// 
-			this.comboPriProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboPriProv.FormattingEnabled = true;
-			this.comboPriProv.Location = new System.Drawing.Point(161, 196);
-			this.comboPriProv.MaxDropDownItems = 30;
-			this.comboPriProv.Name = "comboPriProv";
-			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
-			this.comboPriProv.TabIndex = 12;
-			// 
-			// comboBillType
-			// 
-			this.comboBillType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboBillType.FormattingEnabled = true;
-			this.comboBillType.Location = new System.Drawing.Point(161, 175);
-			this.comboBillType.MaxDropDownItems = 30;
-			this.comboBillType.Name = "comboBillType";
-			this.comboBillType.Size = new System.Drawing.Size(198, 21);
-			this.comboBillType.TabIndex = 11;
 			// 
 			// butEditZip
 			// 
@@ -1043,7 +914,7 @@ namespace OpenDental{
 			this.butEditZip.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butEditZip.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butEditZip.CornerRadius = 4F;
-			this.butEditZip.Location = new System.Drawing.Point(361, 134);
+			this.butEditZip.Location = new System.Drawing.Point(268, 134);
 			this.butEditZip.Name = "butEditZip";
 			this.butEditZip.Size = new System.Drawing.Size(73, 22);
 			this.butEditZip.TabIndex = 9;
@@ -1055,7 +926,7 @@ namespace OpenDental{
 			this.textZip.Location = new System.Drawing.Point(161, 134);
 			this.textZip.MaxLength = 100;
 			this.textZip.Name = "textZip";
-			this.textZip.Size = new System.Drawing.Size(179, 20);
+			this.textZip.Size = new System.Drawing.Size(87, 20);
 			this.textZip.TabIndex = 8;
 			this.textZip.TextChanged += new System.EventHandler(this.textZip_TextChanged);
 			this.textZip.Validating += new System.ComponentModel.CancelEventHandler(this.textZip_Validating);
@@ -1066,7 +937,7 @@ namespace OpenDental{
 			this.comboZip.Location = new System.Drawing.Point(161, 134);
 			this.comboZip.MaxDropDownItems = 20;
 			this.comboZip.Name = "comboZip";
-			this.comboZip.Size = new System.Drawing.Size(198, 21);
+			this.comboZip.Size = new System.Drawing.Size(106, 21);
 			this.comboZip.TabIndex = 60;
 			this.comboZip.TabStop = false;
 			this.comboZip.SelectionChangeCommitted += new System.EventHandler(this.comboZip_SelectionChangeCommitted);
@@ -1107,9 +978,9 @@ namespace OpenDental{
 			this.groupNotes.Controls.Add(this.textAddrNotes);
 			this.groupNotes.Controls.Add(this.checkNotesSame);
 			this.groupNotes.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupNotes.Location = new System.Drawing.Point(488, 280);
+			this.groupNotes.Location = new System.Drawing.Point(488, 163);
 			this.groupNotes.Name = "groupNotes";
-			this.groupNotes.Size = new System.Drawing.Size(474, 107);
+			this.groupNotes.Size = new System.Drawing.Size(474, 85);
 			this.groupNotes.TabIndex = 29;
 			this.groupNotes.TabStop = false;
 			this.groupNotes.Text = "Address and Phone Notes";
@@ -1118,11 +989,11 @@ namespace OpenDental{
 			// 
 			this.textAddrNotes.AcceptsTab = true;
 			this.textAddrNotes.DetectUrls = false;
-			this.textAddrNotes.Location = new System.Drawing.Point(161, 42);
+			this.textAddrNotes.Location = new System.Drawing.Point(161, 35);
 			this.textAddrNotes.Name = "textAddrNotes";
 			this.textAddrNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.PatAddressNote;
 			this.textAddrNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textAddrNotes.Size = new System.Drawing.Size(224, 59);
+			this.textAddrNotes.Size = new System.Drawing.Size(224, 45);
 			this.textAddrNotes.TabIndex = 0;
 			this.textAddrNotes.TabStop = false;
 			this.textAddrNotes.Text = "";
@@ -1130,7 +1001,7 @@ namespace OpenDental{
 			// checkNotesSame
 			// 
 			this.checkNotesSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkNotesSame.Location = new System.Drawing.Point(161, 22);
+			this.checkNotesSame.Location = new System.Drawing.Point(161, 17);
 			this.checkNotesSame.Name = "checkNotesSame";
 			this.checkNotesSame.Size = new System.Drawing.Size(307, 18);
 			this.checkNotesSame.TabIndex = 1;
@@ -1819,11 +1690,177 @@ namespace OpenDental{
 			this.checkEmailPhoneSame.TabIndex = 1;
 			this.checkEmailPhoneSame.Text = "Same for entire family";
 			// 
+			// groupBillProv
+			// 
+			this.groupBillProv.Controls.Add(this.textBox2);
+			this.groupBillProv.Controls.Add(this.checkBillProvSame);
+			this.groupBillProv.Controls.Add(this.butPickSecondary);
+			this.groupBillProv.Controls.Add(this.comboBillType);
+			this.groupBillProv.Controls.Add(this.butPickPrimary);
+			this.groupBillProv.Controls.Add(this.label1);
+			this.groupBillProv.Controls.Add(this.label40);
+			this.groupBillProv.Controls.Add(this.textCreditType);
+			this.groupBillProv.Controls.Add(this.label39);
+			this.groupBillProv.Controls.Add(this.label27);
+			this.groupBillProv.Controls.Add(this.label38);
+			this.groupBillProv.Controls.Add(this.comboPriProv);
+			this.groupBillProv.Controls.Add(this.comboFeeSched);
+			this.groupBillProv.Controls.Add(this.comboSecProv);
+			this.groupBillProv.Location = new System.Drawing.Point(488, 247);
+			this.groupBillProv.Name = "groupBillProv";
+			this.groupBillProv.Size = new System.Drawing.Size(474, 142);
+			this.groupBillProv.TabIndex = 34;
+			this.groupBillProv.TabStop = false;
+			this.groupBillProv.Text = "Billing and Provider(s)";
+			// 
+			// textBox2
+			// 
+			this.textBox2.BackColor = System.Drawing.SystemColors.Control;
+			this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textBox2.Location = new System.Drawing.Point(181, 14);
+			this.textBox2.Multiline = true;
+			this.textBox2.Name = "textBox2";
+			this.textBox2.ReadOnly = true;
+			this.textBox2.Size = new System.Drawing.Size(251, 16);
+			this.textBox2.TabIndex = 47;
+			this.textBox2.Text = "Same for entire family";
+			// 
+			// checkBillProvSame
+			// 
+			this.checkBillProvSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBillProvSame.Location = new System.Drawing.Point(163, 11);
+			this.checkBillProvSame.Name = "checkBillProvSame";
+			this.checkBillProvSame.Size = new System.Drawing.Size(18, 21);
+			this.checkBillProvSame.TabIndex = 48;
+			this.checkBillProvSame.TabStop = false;
+			// 
+			// butPickSecondary
+			// 
+			this.butPickSecondary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickSecondary.Autosize = false;
+			this.butPickSecondary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickSecondary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickSecondary.CornerRadius = 2F;
+			this.butPickSecondary.Location = new System.Drawing.Point(361, 93);
+			this.butPickSecondary.Name = "butPickSecondary";
+			this.butPickSecondary.Size = new System.Drawing.Size(23, 21);
+			this.butPickSecondary.TabIndex = 45;
+			this.butPickSecondary.Text = "...";
+			// 
+			// comboBillType
+			// 
+			this.comboBillType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBillType.FormattingEnabled = true;
+			this.comboBillType.Location = new System.Drawing.Point(162, 51);
+			this.comboBillType.MaxDropDownItems = 30;
+			this.comboBillType.Name = "comboBillType";
+			this.comboBillType.Size = new System.Drawing.Size(198, 21);
+			this.comboBillType.TabIndex = 41;
+			// 
+			// butPickPrimary
+			// 
+			this.butPickPrimary.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickPrimary.Autosize = false;
+			this.butPickPrimary.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickPrimary.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickPrimary.CornerRadius = 2F;
+			this.butPickPrimary.Location = new System.Drawing.Point(361, 72);
+			this.butPickPrimary.Name = "butPickPrimary";
+			this.butPickPrimary.Size = new System.Drawing.Size(23, 21);
+			this.butPickPrimary.TabIndex = 43;
+			this.butPickPrimary.Text = "...";
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(9, 53);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(152, 16);
+			this.label1.TabIndex = 39;
+			this.label1.Text = "Billing Type";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label40
+			// 
+			this.label40.Location = new System.Drawing.Point(9, 117);
+			this.label40.Name = "label40";
+			this.label40.Size = new System.Drawing.Size(152, 20);
+			this.label40.TabIndex = 35;
+			this.label40.Text = "Fee Schedule (rarely used)";
+			this.label40.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textCreditType
+			// 
+			this.textCreditType.Location = new System.Drawing.Point(162, 31);
+			this.textCreditType.MaxLength = 1;
+			this.textCreditType.Name = "textCreditType";
+			this.textCreditType.Size = new System.Drawing.Size(18, 20);
+			this.textCreditType.TabIndex = 40;
+			// 
+			// label39
+			// 
+			this.label39.Location = new System.Drawing.Point(9, 97);
+			this.label39.Name = "label39";
+			this.label39.Size = new System.Drawing.Size(152, 16);
+			this.label39.TabIndex = 36;
+			this.label39.Text = "Secondary Provider";
+			this.label39.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label27
+			// 
+			this.label27.Location = new System.Drawing.Point(9, 34);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(152, 16);
+			this.label27.TabIndex = 38;
+			this.label27.Text = "Credit Type";
+			this.label27.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// label38
+			// 
+			this.label38.Location = new System.Drawing.Point(9, 74);
+			this.label38.Name = "label38";
+			this.label38.Size = new System.Drawing.Size(152, 16);
+			this.label38.TabIndex = 37;
+			this.label38.Text = "Primary Provider";
+			this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboPriProv
+			// 
+			this.comboPriProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboPriProv.FormattingEnabled = true;
+			this.comboPriProv.Location = new System.Drawing.Point(162, 72);
+			this.comboPriProv.MaxDropDownItems = 30;
+			this.comboPriProv.Name = "comboPriProv";
+			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
+			this.comboPriProv.TabIndex = 42;
+			// 
+			// comboFeeSched
+			// 
+			this.comboFeeSched.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboFeeSched.FormattingEnabled = true;
+			this.comboFeeSched.ItemHeight = 13;
+			this.comboFeeSched.Location = new System.Drawing.Point(162, 114);
+			this.comboFeeSched.MaxDropDownItems = 30;
+			this.comboFeeSched.Name = "comboFeeSched";
+			this.comboFeeSched.Size = new System.Drawing.Size(198, 21);
+			this.comboFeeSched.TabIndex = 46;
+			// 
+			// comboSecProv
+			// 
+			this.comboSecProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboSecProv.FormattingEnabled = true;
+			this.comboSecProv.ItemHeight = 13;
+			this.comboSecProv.Location = new System.Drawing.Point(162, 93);
+			this.comboSecProv.MaxDropDownItems = 30;
+			this.comboSecProv.Name = "comboSecProv";
+			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
+			this.comboSecProv.TabIndex = 44;
+			// 
 			// FormPatientEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.groupBillProv);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.textDateDeceased);
 			this.Controls.Add(this.labelDeceased);
@@ -1916,6 +1953,8 @@ namespace OpenDental{
 			this.groupPH.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
+			this.groupBillProv.ResumeLayout(false);
+			this.groupBillProv.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1925,6 +1964,7 @@ namespace OpenDental{
 		private void FormPatientEdit_Load(object sender, System.EventArgs e) {
 			FillComboZip();
 			checkSame.Checked=true;
+			checkBillProvSame.Checked=true;
 			checkNotesSame.Checked=true;
 			checkEmailPhoneSame.Checked=true;
 			if(PatCur!=null){
@@ -1942,6 +1982,9 @@ namespace OpenDental{
 						|| PatCur.FeeSched!=FamCur.ListPats[i].FeeSched)
 					{
 						checkSame.Checked=false;
+					}
+					{
+						checkBillProvSame.Checked=false;
 					}
 					if(PatCur.AddrNote!=FamCur.ListPats[i].AddrNote)
 					{
@@ -3420,6 +3463,9 @@ namespace OpenDental{
 			if(checkSame.Checked){
 				//might want to include a mechanism for comparing fields to be overwritten
 				Patients.UpdateAddressForFam(PatCur);
+			}
+			if(checkBillProvSame.Checked) {
+				Patients.UpdateBillingProviderForFam(PatCur);
 			}
 			if(checkNotesSame.Checked){
 				Patients.UpdateNotesForFam(PatCur);
