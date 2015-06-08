@@ -19,13 +19,13 @@ namespace OpenDentBusiness {
 		public string MobilePhoneNumber;
 		///<summary>Set to true if this message should "jump the queue" and be sent asap.</summary>
 		public bool IsTimeSensitive;
-		///<summary>Enum:SMSMessageSource  This is used to identify where in the program this message originated from.</summary>
-		public SMSMessageSource MsgType;
+		///<summary>Enum:SmsMessageSource  This is used to identify where in the program this message originated from.</summary>
+		public SmsMessageSource MsgType;
 		///<summary>The contents of the message.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string MsgText;
-		///<summary>Enum:SMSDeliveryStatus  Set by the Listener, tracks status of SMS.</summary>
-		public SMSDeliveryStatus Status;
+		///<summary>Enum:SmsDeliveryStatus  Set by the Listener, tracks status of SMS.</summary>
+		public SmsDeliveryStatus Status;
 		///<summary>The count of parts that this message will be broken into when sent.
 		///A single long message will be broken into several smaller 153 utf8 or 70 unicode character messages.</summary>
 		public int MsgParts;
@@ -33,7 +33,7 @@ namespace OpenDentBusiness {
 		public double MsgCostUSD;
 		///<summary>FK to clinic.ClinicNum.  0 when not using clinics.</summary>
 		public long ClinicNum;
-		///<summary>Only used when SMSDeliveryStatus==Failed.</summary>
+		///<summary>Only used when SmsDeliveryStatus==Failed.</summary>
 		public string CustErrorText;
 		///<summary>Time message was accepted at ODHQ.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
@@ -48,7 +48,7 @@ namespace OpenDentBusiness {
 	}
 
 	///<summary>This helps us determine how to handle messages.</summary>
-	public enum SMSMessageSource{
+	public enum SmsMessageSource{
 		///<summary>0. Should not be used.</summary>
 		Undefined,
 		///<summary>1. This should be used for one-off messages that might be sent as direct communication with patient.</summary>
@@ -60,7 +60,7 @@ namespace OpenDentBusiness {
 	}
 
 	///<summary>None should never be used, the code should be re-written to not use it.</summary>
-	public enum SMSDeliveryStatus {
+	public enum SmsDeliveryStatus {
 		///<summary>0. Should not be used.</summary>
 		None,
 		///<summary>1. After a message has been accepted at ODHQ. Before any feedback.</summary>
