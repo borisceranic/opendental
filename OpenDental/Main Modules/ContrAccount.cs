@@ -1718,9 +1718,11 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Payment Plan"),-1,"","PayPlan"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Installment Plan"),-1,"","InstallPlan"));
+
 			if(!PrefC.GetBool(PrefName.EasyHideRepeatCharges)) {
 				button=new ODToolBarButton(Lan.g(this,"Repeating Charge"),-1,"","RepeatCharge");
 				button.Style=ODToolBarButtonStyle.PushButton;
+
 				if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//contextMenuRepeat items only get initialized when at HQ.
 					button.Style=ODToolBarButtonStyle.DropDownButton;
 					button.DropDownMenu=contextMenuRepeat;
@@ -1898,7 +1900,9 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=false;
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
-				ToolBarMain.Buttons["RepeatCharge"].Enabled=false;
+				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
+					ToolBarMain.Buttons["RepeatCharge"].Enabled=false;
+				}
 				ToolBarMain.Buttons["Statement"].Enabled=false;
 				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=false;
@@ -1920,7 +1924,9 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=true;
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
-				ToolBarMain.Buttons["RepeatCharge"].Enabled=true;
+				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
+					ToolBarMain.Buttons["RepeatCharge"].Enabled=true;
+				} 
 				ToolBarMain.Buttons["Statement"].Enabled=true;
 				if(ToolBarMain.Buttons["Questionnaire"]!=null && PrefC.GetBool(PrefName.AccountShowQuestionnaire)) {
 					ToolBarMain.Buttons["Questionnaire"].Enabled=true;
