@@ -24,10 +24,10 @@ namespace OpenDental.UI {
 				return base.Width;
 			}
 			set {
-				if(sigBoxTopaz!=null) {
-					sigBoxTopaz.Width=value;
-				}
 				base.Width=value;
+				if(sigBoxTopaz!=null && sigBox!=null) {
+					sigBoxTopaz.Width=sigBox.Width;
+				}
 			}
 		}
 
@@ -37,10 +37,10 @@ namespace OpenDental.UI {
 				return base.Height;
 			}
 			set {
-				if(sigBoxTopaz!=null) {
-					sigBoxTopaz.Height=value;
-				}
 				base.Height=value;
+				if(sigBoxTopaz!=null && sigBox!=null) {
+					sigBoxTopaz.Height=sigBox.Height;
+				}
 			}
 		}
 
