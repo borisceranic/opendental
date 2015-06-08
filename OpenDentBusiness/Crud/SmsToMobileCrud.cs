@@ -53,9 +53,9 @@ namespace OpenDentBusiness.Crud{
 				smsToMobile.SmsPhoneNumber    = PIn.String(table.Rows[i]["SmsPhoneNumber"].ToString());
 				smsToMobile.MobilePhoneNumber = PIn.String(table.Rows[i]["MobilePhoneNumber"].ToString());
 				smsToMobile.IsTimeSensitive   = PIn.Bool  (table.Rows[i]["IsTimeSensitive"].ToString());
-				smsToMobile.MsgType           = (OpenDentBusiness.SMSMessageSource)PIn.Int(table.Rows[i]["MsgType"].ToString());
+				smsToMobile.MsgType           = (OpenDentBusiness.SmsMessageSource)PIn.Int(table.Rows[i]["MsgType"].ToString());
 				smsToMobile.MsgText           = PIn.String(table.Rows[i]["MsgText"].ToString());
-				smsToMobile.Status            = (OpenDentBusiness.SMSDeliveryStatus)PIn.Int(table.Rows[i]["Status"].ToString());
+				smsToMobile.Status            = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(table.Rows[i]["Status"].ToString());
 				smsToMobile.MsgParts          = PIn.Int   (table.Rows[i]["MsgParts"].ToString());
 				smsToMobile.MsgCostUSD        = PIn.Double(table.Rows[i]["MsgCostUSD"].ToString());
 				smsToMobile.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
