@@ -392,6 +392,7 @@ namespace OpenDental{
 			// 
 			// FormChooseDatabase
 			// 
+			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(716, 574);
 			this.Controls.Add(this.textConnectionString);
