@@ -61,6 +61,9 @@ namespace OpenDentBusiness{
 		///<summary>Text color, line color, rectangle color.</summary>
 		[XmlIgnore]
 		public Color ItemColor;
+		///<summary>Used to store the key to display signature box when printing.  Not stored in DB.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public string SigKey;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ColorOverride",typeof(int))]
