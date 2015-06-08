@@ -64,7 +64,9 @@ namespace OpenDentBusiness {
 		ApptPrintColumnsPerPage,
 		///<summary>Float</summary>
 		ApptPrintFontSize,
+		///<summary>Stored as DateTime.  Currently the date portion is not used but might be used in future versions.</summary>
 		ApptPrintTimeStart,
+		///<summary>Stored as DateTime.  Currently the date portion is not used but might be used in future versions.</summary>
 		ApptPrintTimeStop,
 		///<summary>Used by OD HQ.  Not added to db convert script.  Used to store the IP address of the asterisk phone server for the phone comms and voice mails.</summary>
 		AsteriskServerIp,

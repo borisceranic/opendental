@@ -28,16 +28,14 @@ namespace OpenDental{
 			this.labelFontSize = new System.Windows.Forms.Label();
 			this.labelStartTime = new System.Windows.Forms.Label();
 			this.labelStopTime = new System.Windows.Forms.Label();
-			this.textStopTime = new System.Windows.Forms.TextBox();
-			this.textStartTime = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
 			this.textFontSize = new OpenDental.ValidNum();
 			this.butSave = new OpenDental.UI.Button();
 			this.textColumnsPerPage = new OpenDental.ValidNumber();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.label3 = new System.Windows.Forms.Label();
+			this.comboStart = new System.Windows.Forms.ComboBox();
+			this.comboStop = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// labelColumnsPerPage
@@ -79,40 +77,6 @@ namespace OpenDental{
 			this.labelStopTime.TabIndex = 78;
 			this.labelStopTime.Text = "Stop time";
 			this.labelStopTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textStopTime
-			// 
-			this.textStopTime.Location = new System.Drawing.Point(146, 56);
-			this.textStopTime.Name = "textStopTime";
-			this.textStopTime.Size = new System.Drawing.Size(75, 20);
-			this.textStopTime.TabIndex = 83;
-			// 
-			// textStartTime
-			// 
-			this.textStartTime.Location = new System.Drawing.Point(146, 30);
-			this.textStartTime.Name = "textStartTime";
-			this.textStartTime.Size = new System.Drawing.Size(75, 20);
-			this.textStartTime.TabIndex = 84;
-			// 
-			// label1
-			// 
-			this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label1.Location = new System.Drawing.Point(227, 33);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(128, 15);
-			this.label1.TabIndex = 86;
-			this.label1.Text = "Example: 5:00 AM";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// label2
-			// 
-			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(227, 59);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(128, 15);
-			this.label2.TabIndex = 87;
-			this.label2.Text = "Example: 8:00 PM";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textFontSize
 			// 
@@ -187,16 +151,32 @@ namespace OpenDental{
 			this.label3.Text = "Between 2 and 50";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// comboStart
+			// 
+			this.comboStart.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboStart.FormattingEnabled = true;
+			this.comboStart.Location = new System.Drawing.Point(147, 33);
+			this.comboStart.Name = "comboStart";
+			this.comboStart.Size = new System.Drawing.Size(142, 21);
+			this.comboStart.TabIndex = 90;
+			// 
+			// comboStop
+			// 
+			this.comboStop.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboStop.FormattingEnabled = true;
+			this.comboStop.Location = new System.Drawing.Point(146, 57);
+			this.comboStop.Name = "comboStop";
+			this.comboStop.Size = new System.Drawing.Size(143, 21);
+			this.comboStop.TabIndex = 91;
+			// 
 			// FormApptPrintSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(367, 204);
+			this.Controls.Add(this.comboStop);
+			this.Controls.Add(this.comboStart);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textFontSize);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.textStartTime);
-			this.Controls.Add(this.textStopTime);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.labelStopTime);
 			this.Controls.Add(this.labelStartTime);
@@ -206,6 +186,8 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MaximumSize = new System.Drawing.Size(383, 242);
+			this.MinimumSize = new System.Drawing.Size(383, 242);
 			this.Name = "FormApptPrintSetup";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Form Appt Print Setup";
@@ -225,11 +207,9 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelStartTime;
 		private System.Windows.Forms.Label labelStopTime;
 		private UI.Button butSave;
-		private System.Windows.Forms.TextBox textStopTime;
-		private System.Windows.Forms.TextBox textStartTime;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label2;
 		private ValidNum textFontSize;
 		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.ComboBox comboStart;
+		private System.Windows.Forms.ComboBox comboStop;
 	}
 }

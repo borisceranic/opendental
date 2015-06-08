@@ -21,8 +21,20 @@ namespace OpenDental {
 		}
 
 		private void FormApptPrintSetup_Load(object sender,EventArgs e) {
-			textStartTime.Text=PrefC.GetDateT(PrefName.ApptPrintTimeStart).ToShortTimeString();
-			textStopTime.Text=PrefC.GetDateT(PrefName.ApptPrintTimeStop).ToShortTimeString();
+			TimeSpan time;
+			string timeStart=PrefC.GetDateT(PrefName.ApptPrintTimeStart).ToShortTimeString();
+			string timeStop=PrefC.GetDateT(PrefName.ApptPrintTimeStop).ToShortTimeString();
+			for(int i=0;i<=24;i++) {
+				time=new TimeSpan(i,0,0);
+				comboStart.Items.Add(time.ToShortTimeString());
+				comboStop.Items.Add(time.ToShortTimeString());
+				if(time.ToShortTimeString()==timeStart) {
+					comboStart.SelectedIndex=i;
+				}
+				if(time.ToShortTimeString()==timeStop) {
+					comboStop.SelectedIndex=i;
+				}
+			}
 			textFontSize.Text=PrefC.GetString(PrefName.ApptPrintFontSize);
 			textColumnsPerPage.Text=PrefC.GetInt(PrefName.ApptPrintColumnsPerPage).ToString();
 		}
@@ -35,13 +47,14 @@ namespace OpenDental {
 		}
 
 		private bool ValidEntries() {
-			DateTime start=PIn.DateT(textStartTime.Text);
-			DateTime stop=PIn.DateT(textStopTime.Text);
+			DateTime start=PIn.DateT(comboStart.SelectedItem.ToString());
+			DateTime stop=PIn.DateT(comboStop.SelectedItem.ToString());
 			if(start.Minute>0 || stop.Minute>0) {
 				MsgBox.Show(this,"Please use hours only, no minutes.");
 				return false;
 			}
-			if(stop.Hour==start.Hour) {//If stop time is the same as start time.
+			//If stop time is the same as start time and not midnight to midnight.
+			if(stop.Hour==start.Hour && (stop.Hour!=0 && start.Hour!=0)) {
 				MsgBox.Show(this,"Start time must be different than stop time.");
 				return false;
 			}
@@ -72,8 +85,8 @@ namespace OpenDental {
 
 		private void SaveChanges(bool suppressMessage) {
 			if(ValidEntries()) {
-				Prefs.UpdateDateT(PrefName.ApptPrintTimeStart,PIn.DateT(textStartTime.Text));
-				Prefs.UpdateDateT(PrefName.ApptPrintTimeStop,PIn.DateT(textStopTime.Text));
+				Prefs.UpdateDateT(PrefName.ApptPrintTimeStart,PIn.DateT(comboStart.SelectedItem.ToString()));
+				Prefs.UpdateDateT(PrefName.ApptPrintTimeStop,PIn.DateT(comboStop.SelectedItem.ToString()));
 				Prefs.UpdateString(PrefName.ApptPrintFontSize,textFontSize.Text);
 				Prefs.UpdateInt(PrefName.ApptPrintColumnsPerPage,PIn.Int(textColumnsPerPage.Text));
 				if(!suppressMessage) {
@@ -87,8 +100,8 @@ namespace OpenDental {
 			if(!ValidEntries()) {
 				return;
 			}
-			if(PIn.DateT(textStartTime.Text).Hour!=PrefC.GetDateT(PrefName.ApptPrintTimeStart).Hour
-				|| PIn.DateT(textStopTime.Text).Hour!=PrefC.GetDateT(PrefName.ApptPrintTimeStop).Hour
+			if(PIn.DateT(comboStart.SelectedItem.ToString()).Hour!=PrefC.GetDateT(PrefName.ApptPrintTimeStart).Hour
+				|| PIn.DateT(comboStop.SelectedItem.ToString()).Hour!=PrefC.GetDateT(PrefName.ApptPrintTimeStop).Hour
 				|| textFontSize.Text!=PrefC.GetString(PrefName.ApptPrintFontSize)
 				|| textColumnsPerPage.Text!=PrefC.GetInt(PrefName.ApptPrintColumnsPerPage).ToString())
 			{
@@ -99,8 +112,8 @@ namespace OpenDental {
 					SaveChanges(true);
 				}
 			}
-			ApptPrintStartTime=PIn.DateT(textStartTime.Text);
-			ApptPrintStopTime=PIn.DateT(textStopTime.Text);
+			ApptPrintStartTime=PIn.DateT(comboStart.SelectedItem.ToString());
+			ApptPrintStopTime=PIn.DateT(comboStop.SelectedItem.ToString());
 			ApptPrintFontSize=PIn.Int(textFontSize.Text);
 			ApptPrintColsPerPage=PIn.Int(textColumnsPerPage.Text);
 			DialogResult=DialogResult.OK;
