@@ -192,6 +192,7 @@ namespace OpenDental {
 				}
 				Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
+				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,DateTime.Now);
 				Cache.Refresh(InvalidType.Prefs);
 			}
 			if(storedVersion>currentVersion) {
@@ -427,6 +428,7 @@ namespace OpenDental {
 			string database=MiscData.GetCurrentDatabase();
 			if(storedVersion<currentVersion) {
 				Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
+				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,PIn.DateT(DateTime.Now.ToShortDateString()));
 				Cache.Refresh(InvalidType.Prefs);
 			}
 			if(storedVersion>currentVersion) {

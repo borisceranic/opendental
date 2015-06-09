@@ -365,6 +365,8 @@ namespace OpenDentBusiness {
 		///<summary>Frequency at which signals are processed. Also used by HQ to determine triage label refresh frequency.</summary>		
 		ProcessSigsIntervalInSecs,
 		ProcGroupNoteDoesAggregate,
+		///<summary>Stores the DateTime of when the ProgramVersion preference last changed.</summary>
+		ProgramVersionLastUpdated,
 		ProgramVersion,
 		ProviderIncomeTransferShows,
 		///<summary>FK to sheet.SheetNum. Must be an exam sheet. Only makes sense if PublicHealthScreeningUsePat is true.</summary>

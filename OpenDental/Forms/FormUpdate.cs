@@ -154,7 +154,7 @@ namespace OpenDental{
 			this.labelVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelVersion.Location = new System.Drawing.Point(74, 9);
 			this.labelVersion.Name = "labelVersion";
-			this.labelVersion.Size = new System.Drawing.Size(176, 20);
+			this.labelVersion.Size = new System.Drawing.Size(280, 20);
 			this.labelVersion.TabIndex = 10;
 			this.labelVersion.Text = "Using Version ";
 			// 
@@ -619,7 +619,8 @@ namespace OpenDental{
 
 		private void FormUpdate_Load(object sender, System.EventArgs e) {
 			SetMsiVisibility();
-			labelVersion.Text=Lan.g(this,"Using Version:")+" "+Application.ProductVersion;
+			labelVersion.Text=Lan.g(this,"Using Version:")+" "+Application.ProductVersion+"  "
+				+Lan.g(this,"Since")+": "+PrefC.GetDateT(PrefName.ProgramVersionLastUpdated).ToShortDateString();
 			//keeps the trailing year up to date
 			this.label10.Text=PrefC.GetString(PrefName.SoftwareName)+" "+Lan.g(this,"Copyright 2003-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", Jordan S. Sparks, D.M.D.");
 			this.label8.Text=Lan.g(this, "MySQL - Copyright 1995-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", www.mysql.com");
