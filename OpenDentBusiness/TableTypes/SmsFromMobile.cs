@@ -33,13 +33,28 @@ namespace OpenDentBusiness {
 		public string MsgRefID;
 		///<summary>Enum:SmsFromStatus .</summary>
 		public SmsFromStatus SmsStatus;
-		///<summary>Words surrounded by spaces. This allows simple querrying. Example: " Junk  Recall " allows you to 
-		///write "WHERE Flags like "% Junk %" without having to worry about commas. Also, adding and removing tags is easier. Example: Flags=Flags.Replace(" Junk ","");</summary>
+		///<summary>Words surrounded by spaces, flags should be all lower case. This allows simple querrying. Example: " junk  recall " allows you to 
+		///write "WHERE Flags like "% junk %" without having to worry about commas. Also, adding and removing tags is easier. Example: Flags=Flags.Replace(" junk ","");</summary>
 		public string Flags;
+		///<summary>Messages are not deleted, they can only be hidden.</summary>
+		public bool IsHidden;
 
 		///<summary></summary>
 		public SmsFromMobile Copy() {
 			return (SmsFromMobile)this.MemberwiseClone();
+		}
+
+		///<summary>Convenient way to access the Flags and check or set Read status.</summary>
+		public bool IsRead {
+			get {
+				return Flags.Contains(" read ");
+			}
+			set {
+				Flags=Flags.Replace(" read ","");
+				if(value) {
+					Flags=Flags+" read ";
+				}
+			}
 		}
 	}
 

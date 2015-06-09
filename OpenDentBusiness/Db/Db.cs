@@ -20,6 +20,21 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
+		///<summary>Performs PIn.Long on first column of table returned. Surround with try/catch. Returns empty list if nothing found.</summary>
+		internal static List<long> GetListLong(string command) {
+			List<long> retVal=new List<long>();
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				throw new ApplicationException("No longer allowed to send sql directly.  For user sql, use GetTableLow.  Othewise, rewrite the calling class to not use this query:\r\n"+command);
+			}
+			else {
+				DataTable Table=DataCore.GetTable(command);
+				for(int i=0;i<Table.Rows.Count;i++) {
+					retVal.Add(PIn.Long(Table.Rows[i][0].ToString()));
+				}
+			}
+			return retVal;
+		}
+
 		///<summary>This is used for queries written by the user.  If using direct connection, it gets a table in the ordinary way.  If ServerWeb, it uses the user with lower privileges to prevent injection attack.</summary>
 		internal static DataTable GetTableLow(string command) {
 			DataTable retVal;

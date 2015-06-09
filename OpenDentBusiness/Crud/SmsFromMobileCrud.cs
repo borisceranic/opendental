@@ -59,6 +59,7 @@ namespace OpenDentBusiness.Crud{
 				smsFromMobile.MsgRefID         = PIn.String(table.Rows[i]["MsgRefID"].ToString());
 				smsFromMobile.SmsStatus        = (OpenDentBusiness.SmsFromStatus)PIn.Int(table.Rows[i]["SmsStatus"].ToString());
 				smsFromMobile.Flags            = PIn.String(table.Rows[i]["Flags"].ToString());
+				smsFromMobile.IsHidden         = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
 				retVal.Add(smsFromMobile);
 			}
 			return retVal;
@@ -99,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsFromMobileNum,";
 			}
-			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags) VALUES(";
+			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsFromMobile.SmsFromMobileNum)+",";
 			}
@@ -115,7 +116,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (smsFromMobile.MsgTotal)+","
 				+"'"+POut.String(smsFromMobile.MsgRefID)+"',"
 				+    POut.Int   ((int)smsFromMobile.SmsStatus)+","
-				+"'"+POut.String(smsFromMobile.Flags)+"')";
+				+"'"+POut.String(smsFromMobile.Flags)+"',"
+				+    POut.Bool  (smsFromMobile.IsHidden)+")";
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
 			}
@@ -143,7 +145,8 @@ namespace OpenDentBusiness.Crud{
 				+"MsgTotal         =  "+POut.Int   (smsFromMobile.MsgTotal)+", "
 				+"MsgRefID         = '"+POut.String(smsFromMobile.MsgRefID)+"', "
 				+"SmsStatus        =  "+POut.Int   ((int)smsFromMobile.SmsStatus)+", "
-				+"Flags            = '"+POut.String(smsFromMobile.Flags)+"' "
+				+"Flags            = '"+POut.String(smsFromMobile.Flags)+"', "
+				+"IsHidden         =  "+POut.Bool  (smsFromMobile.IsHidden)+" "
 				+"WHERE SmsFromMobileNum = "+POut.Long(smsFromMobile.SmsFromMobileNum);
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
@@ -202,6 +205,10 @@ namespace OpenDentBusiness.Crud{
 			if(smsFromMobile.Flags != oldSmsFromMobile.Flags) {
 				if(command!=""){ command+=",";}
 				command+="Flags = '"+POut.String(smsFromMobile.Flags)+"'";
+			}
+			if(smsFromMobile.IsHidden != oldSmsFromMobile.IsHidden) {
+				if(command!=""){ command+=",";}
+				command+="IsHidden = "+POut.Bool(smsFromMobile.IsHidden)+"";
 			}
 			if(command==""){
 				return false;

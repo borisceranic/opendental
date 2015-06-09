@@ -8363,10 +8363,10 @@ namespace OpenDentBusiness {
 						MsgRefID varchar(255) NOT NULL,
 						SmsStatus tinyint NOT NULL,
 						Flags varchar(255) NOT NULL,
+						IsHidden tinyint NOT NULL,
 						INDEX(PatNum),
 						INDEX(ClinicNum),
-						INDEX(CommlogNum),
-						INDEX(SmsStatus)
+						INDEX(CommlogNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
 				}
@@ -8387,6 +8387,7 @@ namespace OpenDentBusiness {
 						MsgRefID varchar2(255),
 						SmsStatus number(3) NOT NULL,
 						Flags varchar2(255),
+						IsHidden number(3) NOT NULL,
 						CONSTRAINT smsfrommobile_SmsFromMobileNum PRIMARY KEY (SmsFromMobileNum)
 						)";
 					Db.NonQ(command);
@@ -8395,8 +8396,6 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX smsfrommobile_ClinicNum ON smsfrommobile (ClinicNum)";
 					Db.NonQ(command);
 					command=@"CREATE INDEX smsfrommobile_CommlogNum ON smsfrommobile (CommlogNum)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX smsfrommobile_SmsStatus ON smsfrommobile (SmsStatus)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -8449,6 +8448,7 @@ namespace OpenDentBusiness {
 						CustErrorText varchar(255) NOT NULL,
 						DateTimeSent datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						DateTimeTerminated datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						IsHidden tinyint NOT NULL,
 						INDEX(PatNum),
 						INDEX(ClinicNum)
 						) DEFAULT CHARSET=utf8";
@@ -8474,6 +8474,7 @@ namespace OpenDentBusiness {
 						CustErrorText varchar2(255),
 						DateTimeSent date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						DateTimeTerminated date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						IsHidden number(3) NOT NULL,
 						CONSTRAINT smstomobile_SmsToMobileNum PRIMARY KEY (SmsToMobileNum)
 						)";
 					Db.NonQ(command);

@@ -62,6 +62,7 @@ namespace OpenDentBusiness.Crud{
 				smsToMobile.CustErrorText     = PIn.String(table.Rows[i]["CustErrorText"].ToString());
 				smsToMobile.DateTimeSent      = PIn.DateT (table.Rows[i]["DateTimeSent"].ToString());
 				smsToMobile.DateTimeTerminated= PIn.DateT (table.Rows[i]["DateTimeTerminated"].ToString());
+				smsToMobile.IsHidden          = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
 				retVal.Add(smsToMobile);
 			}
 			return retVal;
@@ -102,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsToMobileNum,";
 			}
-			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgCostUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated) VALUES(";
+			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgCostUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsToMobile.SmsToMobileNum)+",";
 			}
@@ -121,7 +122,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (smsToMobile.ClinicNum)+","
 				+"'"+POut.String(smsToMobile.CustErrorText)+"',"
 				+    POut.DateT (smsToMobile.DateTimeSent)+","
-				+    POut.DateT (smsToMobile.DateTimeTerminated)+")";
+				+    POut.DateT (smsToMobile.DateTimeTerminated)+","
+				+    POut.Bool  (smsToMobile.IsHidden)+")";
 			if(smsToMobile.MsgText==null) {
 				smsToMobile.MsgText="";
 			}
@@ -152,7 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+"ClinicNum         =  "+POut.Long  (smsToMobile.ClinicNum)+", "
 				+"CustErrorText     = '"+POut.String(smsToMobile.CustErrorText)+"', "
 				+"DateTimeSent      =  "+POut.DateT (smsToMobile.DateTimeSent)+", "
-				+"DateTimeTerminated=  "+POut.DateT (smsToMobile.DateTimeTerminated)+" "
+				+"DateTimeTerminated=  "+POut.DateT (smsToMobile.DateTimeTerminated)+", "
+				+"IsHidden          =  "+POut.Bool  (smsToMobile.IsHidden)+" "
 				+"WHERE SmsToMobileNum = "+POut.Long(smsToMobile.SmsToMobileNum);
 			if(smsToMobile.MsgText==null) {
 				smsToMobile.MsgText="";
@@ -223,6 +226,10 @@ namespace OpenDentBusiness.Crud{
 			if(smsToMobile.DateTimeTerminated != oldSmsToMobile.DateTimeTerminated) {
 				if(command!=""){ command+=",";}
 				command+="DateTimeTerminated = "+POut.DateT(smsToMobile.DateTimeTerminated)+"";
+			}
+			if(smsToMobile.IsHidden != oldSmsToMobile.IsHidden) {
+				if(command!=""){ command+=",";}
+				command+="IsHidden = "+POut.Bool(smsToMobile.IsHidden)+"";
 			}
 			if(command==""){
 				return false;

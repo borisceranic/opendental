@@ -58,6 +58,6 @@ namespace OpenDentBusiness {
 		///<summary>Runs 1 instance per customer on a given client PC.</summary>		
 		ListenerService=1,
 		///<summary>Runs 1 instance total on HQ server.</summary>		
-		SMSService=2
+		IntegratedTexting=2
 	}
 }

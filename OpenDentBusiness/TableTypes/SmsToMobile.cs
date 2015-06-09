@@ -41,6 +41,8 @@ namespace OpenDentBusiness {
 		///<summary>Date time that the message was either successfully delivered or failed.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeTerminated;
+		///<summary>Messages are hidden, not deleted.</summary>
+		public bool IsHidden;
 
 		public SmsToMobile Copy() {
 			return (SmsToMobile)this.MemberwiseClone();
@@ -52,7 +54,7 @@ namespace OpenDentBusiness {
 		///<summary>0. Should not be used.</summary>
 		Undefined,
 		///<summary>1. This should be used for one-off messages that might be sent as direct communication with patient.</summary>
-		DirectSMS,
+		DirectSms,
 		///<summary>2. Used when sending single or batch recall SMS.</summary>
 		Recall,
 		///<summary>3. Used when sending single or batch reminder SMS.</summary>
