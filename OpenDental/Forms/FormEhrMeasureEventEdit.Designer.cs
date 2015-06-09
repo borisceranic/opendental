@@ -30,7 +30,7 @@
 			this.labelDateTime = new System.Windows.Forms.Label();
 			this.textType = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
+			this.labelMoreInfo = new System.Windows.Forms.Label();
 			this.butDelete = new System.Windows.Forms.Button();
 			this.textResult = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -95,14 +95,14 @@
 			this.label1.Text = "Event";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label2
+			// labelMoreInfo
 			// 
-			this.label2.Location = new System.Drawing.Point(12, 117);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(183, 17);
-			this.label2.TabIndex = 22;
-			this.label2.Text = "More information about the event.";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelMoreInfo.Location = new System.Drawing.Point(12, 117);
+			this.labelMoreInfo.Name = "labelMoreInfo";
+			this.labelMoreInfo.Size = new System.Drawing.Size(183, 54);
+			this.labelMoreInfo.TabIndex = 22;
+			this.labelMoreInfo.Text = "More information about the event.";
+			this.labelMoreInfo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butDelete
 			// 
@@ -167,7 +167,7 @@
 			this.Controls.Add(this.textResult);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.labelMoreInfo);
 			this.Controls.Add(this.textType);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.labelDateTime);
@@ -193,7 +193,7 @@
 		private System.Windows.Forms.Label labelDateTime;
 		private System.Windows.Forms.TextBox textType;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label labelMoreInfo;
 		private System.Windows.Forms.Button butDelete;
 		private System.Windows.Forms.TextBox textResult;
 		private System.Windows.Forms.Label label3;

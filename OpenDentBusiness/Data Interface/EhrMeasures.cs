@@ -2387,6 +2387,105 @@ namespace OpenDentBusiness{
 						mu.Action2="Enter Referrals";
 						break;
 					#endregion
+					#region DrugDrugInteractChecking
+					case EhrMeasureType.DrugDrugInteractChecking:
+						List<EhrMeasureEvent> listDDIC=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.DrugDrugInteractChecking,false);
+						if(listDDIC.Count!=0 && !String.IsNullOrWhiteSpace(listDDIC[listDDIC.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region DrugFormularyChecking
+					case EhrMeasureType.DrugFormularyChecking:
+						List<EhrMeasureEvent> listDFC=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.DrugFormularyChecking,false);
+						if(listDFC.Count!=0 && !String.IsNullOrWhiteSpace(listDFC[listDFC.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region ProtectElectHealthInfo
+					case EhrMeasureType.ProtectElectHealthInfo:
+						List<EhrMeasureEvent> listPEHI=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.ProtectElectHealthInfo,false);
+						if(listPEHI.Count!=0 && !String.IsNullOrWhiteSpace(listPEHI[listPEHI.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region ImmunizationRegistries
+					case EhrMeasureType.ImmunizationRegistries:
+						List<EhrMeasureEvent> listIR=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.ImmunizationRegistries,false);
+						if(listIR.Count!=0 && !String.IsNullOrWhiteSpace(listIR[listIR.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region SyndromicSurveillance
+					case EhrMeasureType.SyndromicSurveillance:
+						List<EhrMeasureEvent> listSS=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.SyndromicSurveillance,false);
+						if(listSS.Count!=0 && !String.IsNullOrWhiteSpace(listSS[listSS.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region PatientList
+					case EhrMeasureType.PatientList:
+						List<EhrMeasureEvent> listPL=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.PatientList,false);
+						if(listPL.Count!=0) {
+							mu.Met=MuMet.True;
+							mu.Details="List generated";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="List not generated";
+						}
+						mu.Action="Generate List";
+						break;
+					#endregion
+					#region ClinicalInterventionRules
+					case EhrMeasureType.ClinicalInterventionRules:
+						List<EhrTrigger> listEhrTriggers=EhrTriggers.GetAll();
+						if(listEhrTriggers.Count>0) {
+							mu.Met=MuMet.True;
+							mu.Details="Triggers enabled";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="No triggers enabled";
+						}
+						mu.Action="Edit triggers";
+						mu.Action2="Screenshot EHR Triggers for audit";
+						break;
+					#endregion
 				}
 				list.Add(mu);
 			}
@@ -2420,7 +2519,14 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 				+POut.Int((int)EhrMeasureType.Reminders)+","
 				+POut.Int((int)EhrMeasureType.MedReconcile)+","
-				+POut.Int((int)EhrMeasureType.SummaryOfCare)+") ";
+				+POut.Int((int)EhrMeasureType.SummaryOfCare)+","
+				+POut.Int((int)EhrMeasureType.DrugDrugInteractChecking)+","
+				+POut.Int((int)EhrMeasureType.DrugFormularyChecking)+","
+				+POut.Int((int)EhrMeasureType.ProtectElectHealthInfo)+","
+				+POut.Int((int)EhrMeasureType.ImmunizationRegistries)+","
+				+POut.Int((int)EhrMeasureType.SyndromicSurveillance)+","
+				+POut.Int((int)EhrMeasureType.PatientList)+","
+				+POut.Int((int)EhrMeasureType.ClinicalInterventionRules)+") ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="ORDER BY FIELD(MeasureType,"
 					+POut.Int((int)EhrMeasureType.ProblemList)+","
@@ -2444,7 +2550,14 @@ namespace OpenDentBusiness{
 					+POut.Int((int)EhrMeasureType.ClinicalSummaries)+","
 					+POut.Int((int)EhrMeasureType.Reminders)+","
 					+POut.Int((int)EhrMeasureType.MedReconcile)+","
-					+POut.Int((int)EhrMeasureType.SummaryOfCare)+") ";
+					+POut.Int((int)EhrMeasureType.SummaryOfCare)+","
+					+POut.Int((int)EhrMeasureType.DrugDrugInteractChecking)+","
+					+POut.Int((int)EhrMeasureType.DrugFormularyChecking)+","
+					+POut.Int((int)EhrMeasureType.ProtectElectHealthInfo)+","
+					+POut.Int((int)EhrMeasureType.ImmunizationRegistries)+","
+					+POut.Int((int)EhrMeasureType.SyndromicSurveillance)+","
+					+POut.Int((int)EhrMeasureType.PatientList)+","
+					+POut.Int((int)EhrMeasureType.ClinicalInterventionRules)+") ";
 			}
 			else {
 				//TODO: Order the measures nicely for Oracle users.
@@ -3855,8 +3968,14 @@ namespace OpenDentBusiness{
 				+POut.Int((int)EhrMeasureType.SummaryOfCareElectronic)+","
 				+POut.Int((int)EhrMeasureType.SecureMessaging)+","
 				+POut.Int((int)EhrMeasureType.FamilyHistory)+","
-				+POut.Int((int)EhrMeasureType.ElectronicNote)+","
-				+POut.Int((int)EhrMeasureType.LabImages)+") ";
+				+POut.Int((int)EhrMeasureType.LabImages)+","
+				+POut.Int((int)EhrMeasureType.DrugDrugInteractChecking)+","
+				+POut.Int((int)EhrMeasureType.DrugFormularyChecking)+","
+				+POut.Int((int)EhrMeasureType.ProtectElectHealthInfo)+","
+				+POut.Int((int)EhrMeasureType.ImmunizationRegistries)+","
+				+POut.Int((int)EhrMeasureType.SyndromicSurveillance)+","
+				+POut.Int((int)EhrMeasureType.PatientList)+","
+				+POut.Int((int)EhrMeasureType.ClinicalInterventionRules)+") ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="ORDER BY FIELD(MeasureType,"
 					+POut.Int((int)EhrMeasureType.CPOE_MedOrdersOnly)+","
@@ -3880,7 +3999,14 @@ namespace OpenDentBusiness{
 					+POut.Int((int)EhrMeasureType.SecureMessaging)+","
 					+POut.Int((int)EhrMeasureType.FamilyHistory)+","
 					+POut.Int((int)EhrMeasureType.ElectronicNote)+","
-					+POut.Int((int)EhrMeasureType.LabImages)+") ";//Is always going to be excluded
+					+POut.Int((int)EhrMeasureType.LabImages)+","
+					+POut.Int((int)EhrMeasureType.DrugDrugInteractChecking)+","
+					+POut.Int((int)EhrMeasureType.DrugFormularyChecking)+","
+					+POut.Int((int)EhrMeasureType.ProtectElectHealthInfo)+","
+					+POut.Int((int)EhrMeasureType.ImmunizationRegistries)+","
+					+POut.Int((int)EhrMeasureType.SyndromicSurveillance)+","
+					+POut.Int((int)EhrMeasureType.PatientList)+","
+					+POut.Int((int)EhrMeasureType.ClinicalInterventionRules)+") ";//Is always going to be excluded
 			}
 			else {
 				//TODO: Order the measures nicely for Oracle users.
@@ -4594,6 +4720,105 @@ namespace OpenDentBusiness{
 						mu.Action="Manage Lab Images";
 						break;
 					#endregion
+					#region DrugDrugInteractChecking
+					case EhrMeasureType.DrugDrugInteractChecking:
+						List<EhrMeasureEvent> listDDIC=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.DrugDrugInteractChecking,false);
+						if(listDDIC.Count!=0 && !String.IsNullOrWhiteSpace(listDDIC[listDDIC.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region DrugFormularyChecking
+					case EhrMeasureType.DrugFormularyChecking:
+						List<EhrMeasureEvent> listDFC=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.DrugFormularyChecking,false);
+						if(listDFC.Count!=0 && !String.IsNullOrWhiteSpace(listDFC[listDFC.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region ProtectElectHealthInfo
+					case EhrMeasureType.ProtectElectHealthInfo:
+						List<EhrMeasureEvent> listPEHI=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.ProtectElectHealthInfo,false);
+						if(listPEHI.Count!=0 && !String.IsNullOrWhiteSpace(listPEHI[listPEHI.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region ImmunizationRegistries
+					case EhrMeasureType.ImmunizationRegistries:
+						List<EhrMeasureEvent> listIR=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.ImmunizationRegistries,false);
+						if(listIR.Count!=0 && !String.IsNullOrWhiteSpace(listIR[listIR.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region SyndromicSurveillance
+					case EhrMeasureType.SyndromicSurveillance:
+						List<EhrMeasureEvent> listSS=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.SyndromicSurveillance,false);
+						if(listSS.Count!=0 && !String.IsNullOrWhiteSpace(listSS[listSS.Count-1].MoreInfo)) {
+							mu.Met=MuMet.True;
+							mu.Details="Action taken/Explanation given";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Explanation missing";
+						}
+						mu.Action="Edit Explanation";
+						break;
+					#endregion
+					#region PatientList
+					case EhrMeasureType.PatientList:
+						List<EhrMeasureEvent> listPL=EhrMeasureEvents.GetAllByTypeFromDB(new DateTime(DateTime.Now.Year,1,1),new DateTime(DateTime.Now.Year,12,31),EhrMeasureEventType.PatientList,false);
+						if(listPL.Count!=0) {
+							mu.Met=MuMet.True;
+							mu.Details="List generated";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="List not generated";
+						}
+						mu.Action="Generate List";
+						break;
+					#endregion
+					#region ClinicalInterventionRules
+					case EhrMeasureType.ClinicalInterventionRules:
+						List<EhrTrigger> listEhrTriggers=EhrTriggers.GetAll();
+						if(listEhrTriggers.Count>4) {
+							mu.Met=MuMet.True;
+							mu.Details="Triggers enabled";
+						}
+						else {
+							mu.Met=MuMet.False;
+							mu.Details="Less than 5 triggers enabled";
+						}
+						mu.Action="Edit triggers";
+						mu.Action2="Screenshot EHR Triggers for audit";
+						break;
+					#endregion			
 				}
 				list.Add(mu);
 			}

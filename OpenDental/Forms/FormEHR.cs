@@ -365,6 +365,81 @@ namespace OpenDental {
 						FormLO.ShowDialog();
 						FillGridMu();
 						break;
+					case EhrMeasureType.DrugDrugInteractChecking:
+						EhrMeasureEvent measureEventDDIC=new EhrMeasureEvent();
+						measureEventDDIC.DateTEvent=DateTime.Now;
+						measureEventDDIC.EventType=EhrMeasureEventType.DrugDrugInteractChecking;
+						measureEventDDIC.MoreInfo=EhrMeasureEvents.GetLatestInfoByType(EhrMeasureEventType.DrugDrugInteractChecking);
+						measureEventDDIC.IsNew=true;
+						FormEhrMeasureEventEdit FormDDIC=new FormEhrMeasureEventEdit(measureEventDDIC);
+						FormDDIC.MeasureDescript="Explain how you have enabled Drug-Drug Interaction Checking";
+						FormDDIC.ShowDialog();
+						if(FormDDIC.DialogResult==DialogResult.OK) {
+							FillGridMu();
+						}
+						break;
+					case EhrMeasureType.DrugFormularyChecking:
+						EhrMeasureEvent measureEventDFC=new EhrMeasureEvent();
+						measureEventDFC.DateTEvent=DateTime.Now;
+						measureEventDFC.EventType=EhrMeasureEventType.DrugFormularyChecking;
+						measureEventDFC.MoreInfo=EhrMeasureEvents.GetLatestInfoByType(EhrMeasureEventType.DrugFormularyChecking);
+						measureEventDFC.IsNew=true;
+						FormEhrMeasureEventEdit FormDFC=new FormEhrMeasureEventEdit(measureEventDFC);
+						FormDFC.MeasureDescript="Explain how you have enabled Drug Formulary Checks";
+						FormDFC.ShowDialog();
+						if(FormDFC.DialogResult==DialogResult.OK) {
+							FillGridMu();
+						}
+						break;
+					case EhrMeasureType.ProtectElectHealthInfo:
+						EhrMeasureEvent measureEventPEHI=new EhrMeasureEvent();
+						measureEventPEHI.DateTEvent=DateTime.Now;
+						measureEventPEHI.EventType=EhrMeasureEventType.ProtectElectHealthInfo;
+						measureEventPEHI.MoreInfo=EhrMeasureEvents.GetLatestInfoByType(EhrMeasureEventType.ProtectElectHealthInfo);
+						measureEventPEHI.IsNew=true;
+						FormEhrMeasureEventEdit FormPEHI=new FormEhrMeasureEventEdit(measureEventPEHI);
+						FormPEHI.MeasureDescript="Have you performed your security risk analysis?  Explain.";
+						FormPEHI.ShowDialog();
+						if(FormPEHI.DialogResult==DialogResult.OK) {
+							FillGridMu();
+						}
+						break;
+					case EhrMeasureType.ImmunizationRegistries:
+						EhrMeasureEvent measureEventIR=new EhrMeasureEvent();
+						measureEventIR.DateTEvent=DateTime.Now;
+						measureEventIR.EventType=EhrMeasureEventType.ImmunizationRegistries;
+						measureEventIR.MoreInfo=EhrMeasureEvents.GetLatestInfoByType(EhrMeasureEventType.ImmunizationRegistries);
+						measureEventIR.IsNew=true;
+						FormEhrMeasureEventEdit FormIR=new FormEhrMeasureEventEdit(measureEventIR);
+						FormIR.MeasureDescript="Check with your state agency for guidance and recommendations.  Usually excluded.  Explain.";
+						FormIR.ShowDialog();
+						if(FormIR.DialogResult==DialogResult.OK) {
+							FillGridMu();
+						}
+						break;
+					case EhrMeasureType.SyndromicSurveillance:
+						EhrMeasureEvent measureEventSS=new EhrMeasureEvent();
+						measureEventSS.DateTEvent=DateTime.Now;
+						measureEventSS.EventType=EhrMeasureEventType.SyndromicSurveillance;
+						measureEventSS.MoreInfo=EhrMeasureEvents.GetLatestInfoByType(EhrMeasureEventType.SyndromicSurveillance);
+						measureEventSS.IsNew=true;
+						FormEhrMeasureEventEdit FormSS=new FormEhrMeasureEventEdit(measureEventSS);
+						FormSS.MeasureDescript="Check with your state agency for guidance and recommendations.  Usually excluded.  Explain.";
+						FormSS.ShowDialog();
+						if(FormSS.DialogResult==DialogResult.OK) {
+							FillGridMu();
+						}
+						break;
+					case EhrMeasureType.PatientList:
+						FormPatListEHR2014 FormPL=new FormPatListEHR2014();
+						FormPL.ShowDialog();
+						FillGridMu();
+						break;
+					case EhrMeasureType.ClinicalInterventionRules:
+						FormEhrTriggers FormET=new FormEhrTriggers();
+						FormET.ShowDialog();
+						FillGridMu();
+						break;
 				}
 			}
 			if(e.Col==4) {

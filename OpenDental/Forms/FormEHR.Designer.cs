@@ -54,7 +54,7 @@
 			// butClose
 			// 
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butClose.Location = new System.Drawing.Point(713, 638);
+			this.butClose.Location = new System.Drawing.Point(713, 663);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(86, 23);
 			this.butClose.TabIndex = 9;
@@ -271,7 +271,7 @@
 			this.gridMu.Name = "gridMu";
 			this.gridMu.ScrollValue = 0;
 			this.gridMu.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridMu.Size = new System.Drawing.Size(688, 573);
+			this.gridMu.Size = new System.Drawing.Size(688, 598);
 			this.gridMu.TabIndex = 24;
 			this.gridMu.Title = "Stage 1 Meaningful Use for this patient";
 			this.gridMu.TranslationName = null;
@@ -281,7 +281,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(817, 674);
+			this.ClientSize = new System.Drawing.Size(817, 696);
 			this.Controls.Add(this.butMeasureEvent);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butCarePlans);

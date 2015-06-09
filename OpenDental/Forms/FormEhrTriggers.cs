@@ -88,6 +88,14 @@ namespace OpenDental {
 			DialogResult=DialogResult.Cancel;
 		}
 
+		private void FormEhrTriggers_FormClosing(object sender,FormClosingEventArgs e) {
+			EhrMeasureEvent measureEvent=new EhrMeasureEvent();
+			measureEvent.DateTEvent=DateTime.Now;
+			measureEvent.EventType=EhrMeasureEventType.ClinicalInterventionRules;
+			measureEvent.MoreInfo="Triggers currently enabled: "+ListEhrTriggers.Count;
+			EhrMeasureEvents.Insert(measureEvent);
+		}
+
 
 	}
 }

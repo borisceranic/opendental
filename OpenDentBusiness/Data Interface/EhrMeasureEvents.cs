@@ -23,6 +23,22 @@ namespace OpenDentBusiness{
 			return Crud.EhrMeasureEventCrud.SelectMany(command);
 		}
 
+		///<summary>Gets the MoreInfo column from the most recent event of the specified type. Returns blank if none exists.</summary>
+		public static string GetLatestInfoByType(EhrMeasureEventType measureEventType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),measureEventType);
+			}
+			string command="SELECT * FROM ehrmeasureevent WHERE EventType="+POut.Int((int)measureEventType)
+			+" ORDER BY DateTEvent DESC LIMIT 1";
+			EhrMeasureEvent measureEvent=Crud.EhrMeasureEventCrud.SelectOne(command);
+			if(measureEvent==null) {
+				return "";
+			}
+			else {
+				return measureEvent.MoreInfo;
+			}
+		}
+
 		///<summary>Ordered by dateT</summary>
 		public static List<EhrMeasureEvent> Refresh(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

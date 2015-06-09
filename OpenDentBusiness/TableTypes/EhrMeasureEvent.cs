@@ -16,7 +16,7 @@ namespace OpenDentBusiness {
 		public EhrMeasureEventType EventType;
 		///<summary>FK to patient.PatNum</summary>
 		public long PatNum;
-		///<summary>Only used for some types: EducationProvided, TobaccoCessation, TobaccoUseAssessed.</summary>
+		///<summary>Used to provide extra information about a measure event.  Not typically used.</summary>
 		public string MoreInfo;
 		///<summary>The code for this event.  Example: TobaccoUseAssessed can be one of three LOINC codes: 11366-2 History of tobacco use Narrative, 68535-4 Have you used tobacco in the last 30 days, and 68536-2 Have you used smokeless tobacco product in the last 30 days.</summary>
 		public string CodeValueEvent;
@@ -68,7 +68,21 @@ namespace OpenDentBusiness {
 		///<summary>14 - When a Summary of Care is provided to a doctor electronically in one of the following ways: Exported (we assume they send another way), or a Direct message is sent with Summary of Care attached.</summary>
 		SummaryOfCareProvidedToDrElectronic,
 		///<summary>15</summary>
-		SecureMessageFromPat
+		SecureMessageFromPat,
+		///<summary>16</summary>
+		DrugDrugInteractChecking,
+		///<summary>17</summary>
+		DrugFormularyChecking,
+		///<summary>18</summary>
+		ProtectElectHealthInfo,
+		///<summary>19</summary>
+		ImmunizationRegistries,
+		///<summary>20</summary>
+		SyndromicSurveillance,
+		///<summary>21</summary>
+		PatientList,
+		///<summary>22</summary>
+		ClinicalInterventionRules
 	}
 
 }

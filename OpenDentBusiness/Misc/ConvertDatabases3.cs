@@ -8561,6 +8561,47 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProgramVersionLastUpdated ','')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(29,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(30,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(31,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(32,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(33,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(34,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(MeasureType,Numerator,Denominator) VALUES(35,-1,-1)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),29,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),30,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),31,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),32,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),33,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),34,-1,-1)";
+					Db.NonQ(command);
+					command="INSERT INTO ehrmeasure(EhrMeasureNum,MeasureType,Numerator,Denominator) VALUES((SELECT MAX(EhrMeasureNum)+1 FROM ehrmeasure),35,-1,-1)";
+					Db.NonQ(command);
+				}
+				command="SELECT COUNT(*) FROM ehrtrigger";
+				int count=PIn.Int(Db.GetCount(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO ehrmeasureevent (DateTEvent,EventType,PatNum,MoreInfo) VALUES("+POut.DateT(DateTime.Now)+",22,0,'Triggers currently enabled: "+count+"')";
+					Db.NonQ(command);
+				}
+				else {
+					//EHR is not Oracle compatable, so we don't worry about Oracle here.
+				}
 
 
 

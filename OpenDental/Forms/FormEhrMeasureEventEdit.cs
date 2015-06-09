@@ -14,6 +14,7 @@ namespace OpenDental {
 	///<summary>Only used for editing smoking documentation.</summary>
 	public partial class FormEhrMeasureEventEdit:Form {
 		private EhrMeasureEvent _measureEventCur;
+		public string MeasureDescript;
 
 		public FormEhrMeasureEventEdit(EhrMeasureEvent measureEventCur) {
 			InitializeComponent();
@@ -25,6 +26,9 @@ namespace OpenDental {
 			Patient patCur=Patients.GetPat(_measureEventCur.PatNum);
 			if(patCur!=null) {
 				textPatient.Text=patCur.GetNameFL();
+			}
+			if(!String.IsNullOrWhiteSpace(MeasureDescript)) {
+				labelMoreInfo.Text=MeasureDescript;
 			}
 			if(_measureEventCur.EventType==EhrMeasureEventType.TobaccoUseAssessed) {
 				Loinc lCur=Loincs.GetByCode(_measureEventCur.CodeValueEvent);//TobaccoUseAssessed events can be one of three types, all LOINC codes
@@ -84,7 +88,12 @@ namespace OpenDental {
 			SecurityLogs.MakeLogEntry(Permissions.EhrMeasureEventEdit,_measureEventCur.PatNum,logEntry);
 			_measureEventCur.MoreInfo=textMoreInfo.Text;
 			_measureEventCur.DateTEvent=dateTEvent;
-			EhrMeasureEvents.Update(_measureEventCur);
+			if(_measureEventCur.IsNew) {
+				EhrMeasureEvents.Insert(_measureEventCur);
+			}
+			else {
+				EhrMeasureEvents.Update(_measureEventCur);
+			}
 			DialogResult=DialogResult.OK;
 		}
 

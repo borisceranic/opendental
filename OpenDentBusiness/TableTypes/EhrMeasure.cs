@@ -108,7 +108,21 @@ namespace OpenDentBusiness {
 		///<summary>27</summary>
 		LabImages,
 		///<summary>28</summary>
-		VitalSigns2014
+		VitalSigns2014,
+		///<summary>29</summary>
+		DrugDrugInteractChecking,
+		///<summary>30</summary>
+		DrugFormularyChecking,
+		///<summary>31</summary>
+		ProtectElectHealthInfo,
+		///<summary>32</summary>
+		ImmunizationRegistries,
+		///<summary>33</summary>
+		SyndromicSurveillance,
+		///<summary>34</summary>
+		PatientList,
+		///<summary>35</summary>
+		ClinicalInterventionRules
 	}
 
 	///<summary>Helps track whether the current patient has met the measurement objectives.</summary>

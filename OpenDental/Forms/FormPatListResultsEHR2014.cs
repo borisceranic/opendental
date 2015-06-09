@@ -25,6 +25,10 @@ namespace OpenDental {
 			if(PrefC.GetString(PrefName.SoftwareName)!="") {
 				this.Text+=" - "+PrefC.GetString(PrefName.SoftwareName);
 			}
+			EhrMeasureEvent measureEvent=new EhrMeasureEvent();
+			measureEvent.DateTEvent=DateTime.Now;
+			measureEvent.EventType=EhrMeasureEventType.PatientList;
+			EhrMeasureEvents.Insert(measureEvent);
 			FillGrid();
 		}
 
