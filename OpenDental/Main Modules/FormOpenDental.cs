@@ -326,14 +326,22 @@ namespace OpenDental{
 		///<summary>The current color of the eServices menu item in the main menu.</summary>
 		private Color _colorEServicesBackground=SystemColors.Control;
 		private ODThread _odThreadEServices;
-		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
-		private Color COLOR_ESERVICE_ALERT_BACKGROUND=Color.OrangeRed;
 		private ContextMenu menuText;
 		private MenuItem menuItemTextMessagesReceived;
 		private MenuItem menuItemTextMessagesSent;
 		private MenuItem menuItemRemoteSupport;
-		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
-		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
+		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_CRITICAL_BACKGROUND=Color.OrangeRed;
+		///<summary>The text color used when the OpenDentalCustListener service is down.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_CRITICAL_TEXT=Color.Yellow;
+		///<summary>The background color used when the OpenDentalCustListener service has an error that has not be processed.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ERROR_BACKGROUND=Color.LightGoldenrodYellow;
+		///<summary>The text color used when the OpenDentalCustListener service has an error that has not be processed.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ERROR_TEXT=Color.OrangeRed;
 		///<summary>A specific reference to the "Text" button.  This special reference helps us preserve the notification text on the button after setup is modified.</summary>
 		private ODToolBarButton _butText;
 
@@ -4144,6 +4152,8 @@ namespace OpenDental{
 				return;//Do not start the listener service monitor for users without permission.
 			}
 			if(_odThreadEServices==null) {
+				//Process any Error signals that happened due to an update:
+				EServiceSignals.ProcessErrorSignalsAroundTime(PrefC.GetDateT(PrefName.ProgramVersionLastUpdated));
 				//Create a separate thread that will run every 60 seconds to monitor eService signals.
 				_odThreadEServices=new ODThread(60000,ProcessEServiceSignals);
 				//Add exception handling just in case MySQL is unreachable at any point in the lifetime of this session.
@@ -4185,7 +4195,7 @@ namespace OpenDental{
 			//The listener service will have a local heartbeat every 5 minutes so it's overkill to check every time timerSignals_Tick fires.
  			//Only check the Listener Service status once a minute.
 			//The downside to doing this is that the menu item will stay red up to one minute when a user wants to stop monitoring the service.
-			eServiceSignalSeverity listenerStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
+			eServiceSignalSeverity listenerStatus=EServiceSignals.GetListenerServiceStatus();
 			if(listenerStatus==eServiceSignalSeverity.None) {
 				//This office has never had a valid listener service running and does not have more than 5 patients set up to use the listener service.
 				//Quit the thread so that this computer does not waste its time sending queries to the server every minute.
@@ -4193,7 +4203,10 @@ namespace OpenDental{
 				return;
 			}
 			if(listenerStatus==eServiceSignalSeverity.Critical) {
-				_colorEServicesBackground=COLOR_ESERVICE_ALERT_BACKGROUND;
+				_colorEServicesBackground=COLOR_ESERVICE_CRITICAL_BACKGROUND;
+			}
+			else if(listenerStatus==eServiceSignalSeverity.Error) {
+				_colorEServicesBackground=COLOR_ESERVICE_ERROR_BACKGROUND;
 			}
 			else {
 				_colorEServicesBackground=SystemColors.Control;
@@ -5942,10 +5955,13 @@ namespace OpenDental{
 			//Get the text that is displaying from the menu item compenent.
 			MenuItem menuItem=(MenuItem)sender;
 			Color colorText=Color.White;
-			if(_colorEServicesBackground!=COLOR_ESERVICE_ALERT_BACKGROUND) {
-				//Always default the background and text colors to gray if not flagged as critical.
+			if(_colorEServicesBackground!=COLOR_ESERVICE_CRITICAL_BACKGROUND) {
+				//Always default the background and text colors to gray if the current eServices status is not critical.
 				colorText=SystemColors.MenuText;
-				_colorEServicesBackground=SystemColors.Control;
+				//Only change the background to "control" if the status is not of Error.
+				if(_colorEServicesBackground!=COLOR_ESERVICE_ERROR_BACKGROUND) {
+					_colorEServicesBackground=SystemColors.Control;
+				}
 			}
 			//Check if disabled or inactive (other app has focus).
 			if(!menuItem.Enabled || e.State==(DrawItemState.NoAccelerator | DrawItemState.Inactive)) {
@@ -5955,10 +5971,13 @@ namespace OpenDental{
 			if(e.State==(DrawItemState.NoAccelerator | DrawItemState.Selected) 
 				|| e.State==(DrawItemState.NoAccelerator | DrawItemState.HotLight)) 
 			{
-				if(_colorEServicesBackground==COLOR_ESERVICE_ALERT_BACKGROUND) {
-					colorText=COLOR_ESERVICE_ALERT_TEXT;
+				if(_colorEServicesBackground==COLOR_ESERVICE_CRITICAL_BACKGROUND) {
+					colorText=COLOR_ESERVICE_CRITICAL_TEXT;
 				}
-				else {//Service not critical.
+				else if(_colorEServicesBackground==COLOR_ESERVICE_ERROR_BACKGROUND) {
+					colorText=COLOR_ESERVICE_ERROR_TEXT;
+				}
+				else {//Service not critical or has an error.
 					//Color the background of the menu item the system's "menu hover" color when a user hovers or has clicked on the menu item.
 					_colorEServicesBackground=SystemColors.Highlight;
 					colorText=SystemColors.HighlightText;

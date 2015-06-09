@@ -31,10 +31,18 @@ namespace OpenDental {
 		///<summary>If this variable is true then records are uploaded one at a time so that an error in uploading can be traced down to a single record</summary>
 		private static bool _isTroubleshootMode=false;
 		private static FormProgress FormP;
-		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
-		private Color COLOR_ESERVICE_ALERT_BACKGROUND=Color.OrangeRed;
-		///<summary>The text color used when the OpenDentalCustListener service is down.  This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
-		private Color COLOR_ESERVICE_ALERT_TEXT=Color.Yellow;
+		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_CRITICAL_BACKGROUND=Color.OrangeRed;
+		///<summary>The text color used when the OpenDentalCustListener service is down.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_CRITICAL_TEXT=Color.Yellow;
+		///<summary>The background color used when the OpenDentalCustListener service has an error that has not be processed.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ERROR_BACKGROUND=Color.LightGoldenrodYellow;
+		///<summary>The text color used when the OpenDentalCustListener service has an error that has not be processed.
+		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
+		private Color COLOR_ESERVICE_ERROR_TEXT=Color.OrangeRed;
 
 		///<summary>Launches the eServices Setup window defaulted to the patient portal tab.</summary>
 		public FormEServicesSetup():this(EService.PatientPortal){ 		
@@ -104,6 +112,7 @@ namespace OpenDental {
 				butGetUrlPatientPortal.Enabled=false;
 				groupBoxNotification.Enabled=false;
 				textListenerPort.Enabled=false;
+				butListenerServiceAck.Enabled=false;
 				butSaveListenerPort.Enabled=false;
 				butWebSchedEnable.Enabled=false;
 				butOperatories.Enabled=false;
@@ -896,10 +905,15 @@ namespace OpenDental {
 
 		///<summary>Updates the text box that is displaying the current status of the Listener Service.  Returns the status just in case other logic is needed outside of updating the status box.</summary>
 		private eServiceSignalSeverity FillTextListenerServiceStatus() {
-			eServiceSignalSeverity eServiceStatus=EServiceSignals.GetServiceStatus(eServiceCode.ListenerService);
+			eServiceSignalSeverity eServiceStatus=EServiceSignals.GetListenerServiceStatus();
 			if(eServiceStatus==eServiceSignalSeverity.Critical) {
-				textListenerServiceStatus.BackColor=COLOR_ESERVICE_ALERT_BACKGROUND;
-				textListenerServiceStatus.ForeColor=COLOR_ESERVICE_ALERT_TEXT;
+				textListenerServiceStatus.BackColor=COLOR_ESERVICE_CRITICAL_BACKGROUND;
+				textListenerServiceStatus.ForeColor=COLOR_ESERVICE_CRITICAL_TEXT;
+				butStartListenerService.Enabled=true;
+			}
+			else if(eServiceStatus==eServiceSignalSeverity.Error) {
+				textListenerServiceStatus.BackColor=COLOR_ESERVICE_ERROR_BACKGROUND;
+				textListenerServiceStatus.ForeColor=COLOR_ESERVICE_ERROR_TEXT;
 				butStartListenerService.Enabled=true;
 			}
 			else {
@@ -929,6 +943,10 @@ namespace OpenDental {
 				row.Cells.Add(listESignals[i].SigDateTime.ToString());
 				row.Cells.Add(listESignals[i].Severity.ToString());
 				row.Cells.Add(listESignals[i].Description.ToString());
+				//Color the row if it is an error that has not been processed.
+				if(listESignals[i].Severity==eServiceSignalSeverity.Error && !listESignals[i].IsProcessed) {
+					row.ColorBackG=COLOR_ESERVICE_ERROR_BACKGROUND;
+				}
 				gridListenerServiceStatusHistory.Rows.Add(row);
 			}
 			gridListenerServiceStatusHistory.EndUpdate();
@@ -1006,6 +1024,13 @@ namespace OpenDental {
 		private void butListenerServiceHistoryRefresh_Click(object sender,EventArgs e) {
 			FillTextListenerServiceStatus();
 			FillGridListenerService();
+		}
+
+		private void butListenerServiceAck_Click(object sender,EventArgs e) {
+			EServiceSignals.ProcessSignalsForSeverity(eServiceSignalSeverity.Error);
+			FillTextListenerServiceStatus();
+			FillGridListenerService();
+			MsgBox.Show(this,"Errors successfully acknowledged.");
 		}
 
 		private void butListenerAlertsOff_Click(object sender,EventArgs e) {
