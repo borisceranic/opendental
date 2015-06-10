@@ -19,6 +19,9 @@ namespace OpenDental {
 
 		private void FormMedLabs_Load(object sender,EventArgs e) {
 			_selectedPat=PatCur;
+			if(_selectedPat==null) {
+				checkIncludeNoPat.Checked=true;
+			}
 			FillGrid();
 		}
 
