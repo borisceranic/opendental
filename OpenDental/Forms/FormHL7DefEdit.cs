@@ -47,11 +47,11 @@ namespace OpenDental {
 			}
 			if(HL7DefCur.InternalType==HL7InternalType.MedLabv2_3) {
 				comboModeTx.SelectedIndex=(int)ModeTxHL7.Sftp;//just in case, for MedLabv2_3 types this should always be Sftp and isn't editable for now
-				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
-					comboLabImageCat.Items.Add(DefC.Short[(int)DefCat.ImageCats][i].ItemName);
-					if(DefC.Short[(int)DefCat.ImageCats][i].DefNum==HL7DefCur.LabResultImageCat) {
-						comboLabImageCat.SelectedIndex=i;
-					}
+			}
+			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
+				comboLabImageCat.Items.Add(DefC.Short[(int)DefCat.ImageCats][i].ItemName);
+				if(DefC.Short[(int)DefCat.ImageCats][i].DefNum==HL7DefCur.LabResultImageCat) {
+					comboLabImageCat.SelectedIndex=i;
 				}
 			}
 			//no need to call SetControls since the comboModeTx_SelectedIndexChanged and/or checkEnabled_CheckedChanged triggered it already
@@ -72,8 +72,8 @@ namespace OpenDental {
 			textDescription.ReadOnly=false;
 			textHL7Server.ReadOnly=false;
 			textHL7ServiceName.ReadOnly=false;
-			textInPathOrAddrPort.ReadOnly=false;
-			textOutPathOrAddrPort.ReadOnly=false;
+			textInPathOrSocket.ReadOnly=false;
+			textOutPathSocketOrDir.ReadOnly=false;
 			textSftpPassword.ReadOnly=false;
 			textSftpUsername.ReadOnly=false;
 			#endregion Enabled/Disabled Affected Controls
@@ -94,13 +94,11 @@ namespace OpenDental {
 			butBrowseIn.Visible=false;
 			butBrowseOut.Visible=false;
 			comboLabImageCat.Visible=false;
-			labelInAddrPortEx.Visible=false;
+			labelInSocketEx.Visible=false;
 			labelLabImageCat.Visible=false;
-			labelOutAddrPortEx.Visible=false;
-			labelOutPathOrAddrPort.Visible=false;
+			labelOutSocketOrDirEx.Visible=false;
 			labelSftpPassword.Visible=false;
 			labelSftpUsername.Visible=false;
-			textOutPathOrAddrPort.Visible=false;
 			textSftpPassword.Visible=false;
 			textSftpUsername.Visible=false;
 			#endregion Tx Mode Affected Controls
@@ -119,8 +117,8 @@ namespace OpenDental {
 				textDescription.ReadOnly=true;
 				textHL7Server.ReadOnly=true;
 				textHL7ServiceName.ReadOnly=true;
-				textInPathOrAddrPort.ReadOnly=true;
-				textOutPathOrAddrPort.ReadOnly=true;
+				textInPathOrSocket.ReadOnly=true;
+				textOutPathSocketOrDir.ReadOnly=true;
 				textSftpPassword.ReadOnly=true;
 				textSftpUsername.ReadOnly=true;
 			}
@@ -152,35 +150,36 @@ namespace OpenDental {
 				case (int)ModeTxHL7.File:
 					butBrowseIn.Visible=true;
 					butBrowseOut.Visible=true;
-					labelInPathOrAddrPort.Text="Inbound Folder";
-					labelOutPathOrAddrPort.Text="Outbound Folder";
-					labelOutPathOrAddrPort.Visible=true;
-					textInPathOrAddrPort.Text=HL7DefCur.IncomingFolder;
-					textOutPathOrAddrPort.Text=HL7DefCur.OutgoingFolder;
-					textOutPathOrAddrPort.Visible=true;
+					labelInPathOrSocket.Text="Inbound Folder";
+					labelOutPathSocketOrDir.Text="Outbound Folder";
+					textInPathOrSocket.Text=HL7DefCur.IncomingFolder;
+					textOutPathSocketOrDir.Text=HL7DefCur.OutgoingFolder;
 					break;
 				case (int)ModeTxHL7.TcpIp:
-					labelInAddrPortEx.Text="Ex: 5845";
-					labelInAddrPortEx.Visible=true;
-					labelInPathOrAddrPort.Text="Inbound Port";
-					labelOutAddrPortEx.Visible=true;
-					labelOutPathOrAddrPort.Text="Outbound IP:Port";
-					labelOutPathOrAddrPort.Visible=true;
-					textInPathOrAddrPort.Text=HL7DefCur.IncomingPort;
-					textOutPathOrAddrPort.Text=HL7DefCur.OutgoingIpPort;
-					textOutPathOrAddrPort.Visible=true;
+					labelInPathOrSocket.Text="Inbound Port";
+					labelInSocketEx.Text="Ex: 5845";
+					labelInSocketEx.Visible=true;
+					labelOutPathSocketOrDir.Text="Outbound IP:Port";
+					labelOutSocketOrDirEx.Text="Ex: 192.168.0.23:5846";
+					labelOutSocketOrDirEx.Visible=true;
+					textInPathOrSocket.Text=HL7DefCur.IncomingPort;
+					textOutPathSocketOrDir.Text=HL7DefCur.OutgoingIpPort;
 					break;
 				case (int)ModeTxHL7.Sftp:
-					comboLabImageCat.Visible=true;
-					labelInAddrPortEx.Text="Ex: server.address.com:12345";
-					labelInAddrPortEx.Visible=true;
-					labelInPathOrAddrPort.Text="Sftp Server Address:Port";
+					labelInPathOrSocket.Text="Sftp Server Address:Port";
+					labelInSocketEx.Text="Ex: server.address.com:12345";
+					labelInSocketEx.Visible=true;
+					labelOutPathSocketOrDir.Text="Sftp Server Results Directory";
+					labelOutSocketOrDirEx.Text="Ex: ./results";
+					labelOutSocketOrDirEx.Visible=true;
 					labelLabImageCat.Visible=true;
 					labelSftpPassword.Visible=true;
 					labelSftpUsername.Visible=true;
-					textInPathOrAddrPort.Text=HL7DefCur.SftpInSocket;
+					textInPathOrSocket.Text=HL7DefCur.SftpInSocket;
+					textOutPathSocketOrDir.Text=HL7DefCur.IncomingFolder;
 					textSftpPassword.Visible=true;
 					textSftpUsername.Visible=true;
+					comboLabImageCat.Visible=true;
 					break;
 				default:
 					break;
@@ -245,17 +244,17 @@ namespace OpenDental {
 
 		private void butBrowseIn_Click(object sender,EventArgs e) {
 			FolderBrowserDialog dlg=new FolderBrowserDialog();
-			dlg.SelectedPath=textInPathOrAddrPort.Text;
+			dlg.SelectedPath=textInPathOrSocket.Text;
 			if(dlg.ShowDialog()==DialogResult.OK) {
-				textInPathOrAddrPort.Text=dlg.SelectedPath;
+				textInPathOrSocket.Text=dlg.SelectedPath;
 			}
 		}
 
 		private void butBrowseOut_Click(object sender,EventArgs e) {
 			FolderBrowserDialog dlg=new FolderBrowserDialog();
-			dlg.SelectedPath=textOutPathOrAddrPort.Text;
+			dlg.SelectedPath=textOutPathSocketOrDir.Text;
 			if(dlg.ShowDialog()==DialogResult.OK) {
-				textOutPathOrAddrPort.Text=dlg.SelectedPath;
+				textOutPathSocketOrDir.Text=dlg.SelectedPath;
 			}
 		}
 
@@ -365,26 +364,26 @@ namespace OpenDental {
 			}
 			switch(comboModeTx.SelectedIndex) {
 				case (int)ModeTxHL7.File:
-					if(textInPathOrAddrPort.Text=="") {
+					if(textInPathOrSocket.Text=="") {
 						MsgBox.Show(this,"The path for Inbound Folder is empty.");
 						return false;
 					}
-					if(textOutPathOrAddrPort.Text=="") {
+					if(textOutPathSocketOrDir.Text=="") {
 						MsgBox.Show(this,"The path for Outbound Folder is empty.");
 						return false;
 					}
 					//paths are checked when service starts, not when closing form, since paths are local paths but only exist on the ODHL7 server
 					break;
 				case (int)ModeTxHL7.TcpIp:
-					if(textInPathOrAddrPort.Text=="") {
+					if(textInPathOrSocket.Text=="") {
 						MsgBox.Show(this,"The Inbound Port is empty.");
 						return false;
 					}
-					if(textOutPathOrAddrPort.Text=="") {
+					if(textOutPathSocketOrDir.Text=="") {
 						MsgBox.Show(this,"The Outbound IP:Port is empty.");
 						return false;
 					}
-					string[] strIpPort=textOutPathOrAddrPort.Text.Split(':');
+					string[] strIpPort=textOutPathSocketOrDir.Text.Split(':');
 					if(strIpPort.Length!=2) {//there isn't a ':' in the IpPort field
 						MsgBox.Show(this,"The Outbound IP:Port field requires an IP address, followed by a colon, followed by a port number.");
 						return false;
@@ -404,7 +403,7 @@ namespace OpenDental {
 						return false;
 					}
 					try {
-						int.Parse(textInPathOrAddrPort.Text.ToString());
+						int.Parse(textInPathOrSocket.Text.ToString());
 					}
 					catch {
 						MsgBox.Show(this,"The Inbound Port must be a valid integer.");
@@ -412,7 +411,7 @@ namespace OpenDental {
 					}
 					break;
 				case (int)ModeTxHL7.Sftp:
-					if(textInPathOrAddrPort.Text=="") {
+					if(textInPathOrSocket.Text=="") {
 						MsgBox.Show(this,"The Sftp Server Address:Port field is empty.");
 						return false;
 					}
@@ -425,7 +424,7 @@ namespace OpenDental {
 						return false;
 					}
 					//NOTE: May not always require a port, so this test may not be necessary
-					string[] strAddressPort=textInPathOrAddrPort.Text.Split(':');
+					string[] strAddressPort=textInPathOrSocket.Text.Split(':');
 					if(strAddressPort.Length>=2) {
 						try {
 							int.Parse(strAddressPort[1]);
@@ -505,17 +504,18 @@ namespace OpenDental {
 			HL7DefCur.SftpUsername="";
 			HL7DefCur.SftpPassword="";
 			if(comboModeTx.SelectedIndex==(int)ModeTxHL7.File) {
-				HL7DefCur.IncomingFolder=textInPathOrAddrPort.Text;
-				HL7DefCur.OutgoingFolder=textOutPathOrAddrPort.Text;
+				HL7DefCur.IncomingFolder=textInPathOrSocket.Text.Trim();
+				HL7DefCur.OutgoingFolder=textOutPathSocketOrDir.Text.Trim();
 			}
 			else if(comboModeTx.SelectedIndex==(int)ModeTxHL7.TcpIp) {
-				HL7DefCur.IncomingPort=textInPathOrAddrPort.Text;
-				HL7DefCur.OutgoingIpPort=textOutPathOrAddrPort.Text;
+				HL7DefCur.IncomingPort=textInPathOrSocket.Text.Trim();
+				HL7DefCur.OutgoingIpPort=textOutPathSocketOrDir.Text.Trim();
 			}
 			else if(comboModeTx.SelectedIndex==(int)ModeTxHL7.Sftp) {
-				HL7DefCur.SftpInSocket=textInPathOrAddrPort.Text;
-				HL7DefCur.SftpUsername=textSftpUsername.Text.Trim();
-				HL7DefCur.SftpPassword=textSftpPassword.Text.Trim();
+				HL7DefCur.SftpInSocket=textInPathOrSocket.Text.Trim();
+				HL7DefCur.IncomingFolder=textOutPathSocketOrDir.Text.Trim();
+				HL7DefCur.SftpUsername=textSftpUsername.Text.Trim().Trim();
+				HL7DefCur.SftpPassword=textSftpPassword.Text.Trim().Trim();
 			}
 			if(comboLabImageCat.SelectedIndex>=0) {
 				HL7DefCur.LabResultImageCat=DefC.Short[(int)DefCat.ImageCats][comboLabImageCat.SelectedIndex].DefNum;

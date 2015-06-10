@@ -30,8 +30,8 @@ namespace OpenDental{
 			this.label4 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.textNote = new System.Windows.Forms.TextBox();
-			this.labelOutAddrPortEx = new System.Windows.Forms.Label();
-			this.labelInAddrPortEx = new System.Windows.Forms.Label();
+			this.labelOutSocketOrDirEx = new System.Windows.Forms.Label();
+			this.labelInSocketEx = new System.Windows.Forms.Label();
 			this.textInternalTypeVersion = new System.Windows.Forms.TextBox();
 			this.label13 = new System.Windows.Forms.Label();
 			this.textInternalType = new System.Windows.Forms.TextBox();
@@ -54,10 +54,10 @@ namespace OpenDental{
 			this.labelSftpPassword = new System.Windows.Forms.Label();
 			this.textSftpUsername = new System.Windows.Forms.TextBox();
 			this.labelSftpUsername = new System.Windows.Forms.Label();
-			this.textOutPathOrAddrPort = new System.Windows.Forms.TextBox();
-			this.labelOutPathOrAddrPort = new System.Windows.Forms.Label();
-			this.textInPathOrAddrPort = new System.Windows.Forms.TextBox();
-			this.labelInPathOrAddrPort = new System.Windows.Forms.Label();
+			this.textOutPathSocketOrDir = new System.Windows.Forms.TextBox();
+			this.labelOutPathSocketOrDir = new System.Windows.Forms.Label();
+			this.textInPathOrSocket = new System.Windows.Forms.TextBox();
+			this.labelInPathOrSocket = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textDescription = new System.Windows.Forms.TextBox();
@@ -155,23 +155,23 @@ namespace OpenDental{
 			// 
 			// labelOutAddrPortEx
 			// 
-			this.labelOutAddrPortEx.Location = new System.Drawing.Point(336, 39);
-			this.labelOutAddrPortEx.Name = "labelOutAddrPortEx";
-			this.labelOutAddrPortEx.Size = new System.Drawing.Size(182, 18);
-			this.labelOutAddrPortEx.TabIndex = 0;
-			this.labelOutAddrPortEx.Text = "Ex: 192.168.0.23:5846";
-			this.labelOutAddrPortEx.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelOutAddrPortEx.Visible = false;
+			this.labelOutSocketOrDirEx.Location = new System.Drawing.Point(336, 39);
+			this.labelOutSocketOrDirEx.Name = "labelOutAddrPortEx";
+			this.labelOutSocketOrDirEx.Size = new System.Drawing.Size(182, 18);
+			this.labelOutSocketOrDirEx.TabIndex = 0;
+			this.labelOutSocketOrDirEx.Text = "Ex: 192.168.0.23:5846";
+			this.labelOutSocketOrDirEx.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelOutSocketOrDirEx.Visible = false;
 			// 
 			// labelInAddrPortEx
 			// 
-			this.labelInAddrPortEx.Location = new System.Drawing.Point(336, 17);
-			this.labelInAddrPortEx.Name = "labelInAddrPortEx";
-			this.labelInAddrPortEx.Size = new System.Drawing.Size(182, 18);
-			this.labelInAddrPortEx.TabIndex = 0;
-			this.labelInAddrPortEx.Text = "Ex: server.address.com:12345";
-			this.labelInAddrPortEx.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelInAddrPortEx.Visible = false;
+			this.labelInSocketEx.Location = new System.Drawing.Point(336, 17);
+			this.labelInSocketEx.Name = "labelInAddrPortEx";
+			this.labelInSocketEx.Size = new System.Drawing.Size(182, 18);
+			this.labelInSocketEx.TabIndex = 0;
+			this.labelInSocketEx.Text = "Ex: server.address.com:12345";
+			this.labelInSocketEx.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelInSocketEx.Visible = false;
 			// 
 			// textInternalTypeVersion
 			// 
@@ -377,35 +377,35 @@ namespace OpenDental{
 			// 
 			// textOutPathOrAddrPort
 			// 
-			this.textOutPathOrAddrPort.Location = new System.Drawing.Point(157, 38);
-			this.textOutPathOrAddrPort.Name = "textOutPathOrAddrPort";
-			this.textOutPathOrAddrPort.Size = new System.Drawing.Size(177, 20);
-			this.textOutPathOrAddrPort.TabIndex = 55;
+			this.textOutPathSocketOrDir.Location = new System.Drawing.Point(157, 38);
+			this.textOutPathSocketOrDir.Name = "textOutPathOrAddrPort";
+			this.textOutPathSocketOrDir.Size = new System.Drawing.Size(177, 20);
+			this.textOutPathSocketOrDir.TabIndex = 55;
 			// 
 			// labelOutPathOrAddrPort
 			// 
-			this.labelOutPathOrAddrPort.Location = new System.Drawing.Point(6, 39);
-			this.labelOutPathOrAddrPort.Name = "labelOutPathOrAddrPort";
-			this.labelOutPathOrAddrPort.Size = new System.Drawing.Size(150, 18);
-			this.labelOutPathOrAddrPort.TabIndex = 0;
-			this.labelOutPathOrAddrPort.Text = "Outgoing Folder";
-			this.labelOutPathOrAddrPort.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelOutPathSocketOrDir.Location = new System.Drawing.Point(6, 39);
+			this.labelOutPathSocketOrDir.Name = "labelOutPathOrAddrPort";
+			this.labelOutPathSocketOrDir.Size = new System.Drawing.Size(150, 18);
+			this.labelOutPathSocketOrDir.TabIndex = 0;
+			this.labelOutPathSocketOrDir.Text = "Outgoing Folder";
+			this.labelOutPathSocketOrDir.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textInPathOrAddrPort
 			// 
-			this.textInPathOrAddrPort.Location = new System.Drawing.Point(157, 16);
-			this.textInPathOrAddrPort.Name = "textInPathOrAddrPort";
-			this.textInPathOrAddrPort.Size = new System.Drawing.Size(177, 20);
-			this.textInPathOrAddrPort.TabIndex = 53;
+			this.textInPathOrSocket.Location = new System.Drawing.Point(157, 16);
+			this.textInPathOrSocket.Name = "textInPathOrAddrPort";
+			this.textInPathOrSocket.Size = new System.Drawing.Size(177, 20);
+			this.textInPathOrSocket.TabIndex = 53;
 			// 
 			// labelInPathOrAddrPort
 			// 
-			this.labelInPathOrAddrPort.Location = new System.Drawing.Point(6, 17);
-			this.labelInPathOrAddrPort.Name = "labelInPathOrAddrPort";
-			this.labelInPathOrAddrPort.Size = new System.Drawing.Size(150, 18);
-			this.labelInPathOrAddrPort.TabIndex = 0;
-			this.labelInPathOrAddrPort.Text = "Incoming Folder";
-			this.labelInPathOrAddrPort.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelInPathOrSocket.Location = new System.Drawing.Point(6, 17);
+			this.labelInPathOrSocket.Name = "labelInPathOrAddrPort";
+			this.labelInPathOrSocket.Size = new System.Drawing.Size(150, 18);
+			this.labelInPathOrSocket.TabIndex = 0;
+			this.labelInPathOrSocket.Text = "Incoming Folder";
+			this.labelInPathOrSocket.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label2
 			// 
@@ -649,16 +649,16 @@ namespace OpenDental{
 			this.groupHL7Comm.Controls.Add(this.labelLabImageCat);
 			this.groupHL7Comm.Controls.Add(this.textSftpUsername);
 			this.groupHL7Comm.Controls.Add(this.labelSftpPassword);
-			this.groupHL7Comm.Controls.Add(this.textOutPathOrAddrPort);
+			this.groupHL7Comm.Controls.Add(this.textOutPathSocketOrDir);
 			this.groupHL7Comm.Controls.Add(this.labelSftpUsername);
-			this.groupHL7Comm.Controls.Add(this.textInPathOrAddrPort);
-			this.groupHL7Comm.Controls.Add(this.labelOutPathOrAddrPort);
+			this.groupHL7Comm.Controls.Add(this.textInPathOrSocket);
+			this.groupHL7Comm.Controls.Add(this.labelOutPathSocketOrDir);
 			this.groupHL7Comm.Controls.Add(this.butBrowseOut);
-			this.groupHL7Comm.Controls.Add(this.labelInPathOrAddrPort);
+			this.groupHL7Comm.Controls.Add(this.labelInPathOrSocket);
 			this.groupHL7Comm.Controls.Add(this.butBrowseIn);
 			this.groupHL7Comm.Controls.Add(this.comboLabImageCat);
-			this.groupHL7Comm.Controls.Add(this.labelOutAddrPortEx);
-			this.groupHL7Comm.Controls.Add(this.labelInAddrPortEx);
+			this.groupHL7Comm.Controls.Add(this.labelOutSocketOrDirEx);
+			this.groupHL7Comm.Controls.Add(this.labelInSocketEx);
 			this.groupHL7Comm.Location = new System.Drawing.Point(286, 12);
 			this.groupHL7Comm.Name = "groupHL7Comm";
 			this.groupHL7Comm.Size = new System.Drawing.Size(525, 126);
@@ -837,8 +837,8 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.TextBox textNote;
-		private System.Windows.Forms.Label labelOutAddrPortEx;
-		private System.Windows.Forms.Label labelInAddrPortEx;
+		private System.Windows.Forms.Label labelOutSocketOrDirEx;
+		private System.Windows.Forms.Label labelInSocketEx;
 		private System.Windows.Forms.TextBox textInternalTypeVersion;
 		private System.Windows.Forms.Label label13;
 		private System.Windows.Forms.TextBox textInternalType;
@@ -862,10 +862,10 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelSftpPassword;
 		private System.Windows.Forms.TextBox textSftpUsername;
 		private System.Windows.Forms.Label labelSftpUsername;
-		private System.Windows.Forms.TextBox textOutPathOrAddrPort;
-		private System.Windows.Forms.Label labelOutPathOrAddrPort;
-		private System.Windows.Forms.TextBox textInPathOrAddrPort;
-		private System.Windows.Forms.Label labelInPathOrAddrPort;
+		private System.Windows.Forms.TextBox textOutPathSocketOrDir;
+		private System.Windows.Forms.Label labelOutPathSocketOrDir;
+		private System.Windows.Forms.TextBox textInPathOrSocket;
+		private System.Windows.Forms.Label labelInPathOrSocket;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textDescription;
