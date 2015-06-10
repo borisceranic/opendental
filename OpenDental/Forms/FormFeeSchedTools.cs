@@ -456,10 +456,26 @@ namespace OpenDental{
 		}
 
 		private void butClear_Click(object sender, System.EventArgs e) {
-			if(!MsgBox.Show(this,true,"This will clear all values from the current fee schedule showing in the main window.  Are you sure you want to continue?")){
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(!MsgBox.Show(this,true,"This will clear all values from the current fee schedule showing in the main window for the currently selected clinic.  Are you sure you want to continue?")) {
+					return;
+				}
+			}
+			else if(!MsgBox.Show(this,true,"This will clear all values from the current fee schedule showing in the main window.  Are you sure you want to continue?")) {
 				return;
 			}
 			Fees.ClearFeeSched(SchedNum);
+			string logText=Lan.g(this,"Procedures for Fee Schedule")+" "+FeeScheds.GetDescription(SchedNum)+" ";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(Clinics.GetDesc(FormOpenDental.ClinicNum)=="") {
+					logText+=Lan.g(this,"at Headquarters");
+				}
+				else {
+					logText+=Lan.g(this,"at clinic")+" "+Clinics.GetDesc(FormOpenDental.ClinicNum);
+				}
+			}
+			logText+=" "+Lan.g(this,"were all cleared.");
+			SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText);
 			DialogResult=DialogResult.OK;
 		}
 
@@ -482,9 +498,18 @@ namespace OpenDental{
 				if(listFees[i].FeeSched!=listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum) {
 					continue;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
-					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched)
-					+". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools."),listFees[i].CodeNum);
+				string logText=Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
+					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					if(Clinics.GetDesc(FormOpenDental.ClinicNum)=="") {
+						logText+=Lan.g(this,"at Headquarters");
+					}
+					else {
+						logText+=", "+Lan.g(this,"at clinic")+": "+Clinics.GetDesc(FormOpenDental.ClinicNum);
+					}
+				}
+				logText+=". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(listFeeSchedShort[comboCopyFrom.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools.");
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,listFees[i].CodeNum);
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -527,10 +552,18 @@ namespace OpenDental{
 				if(listFees[i].Amount==0) {
 					continue;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
-					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched)
-					+". "+Lan.g(this,"Fee increased by")+" "+((float)percent/100.0f).ToString("p")+" "+Lan.g(this," using the increase button in the Fee Tools window.")
-					,listFees[i].CodeNum);
+				string logText=Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(listFees[i].CodeNum)
+					+", "+Lan.g(this,"Fee")+": "+listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(listFees[i].FeeSched);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					if(Clinics.GetDesc(FormOpenDental.ClinicNum)=="") {
+						logText+=Lan.g(this,"at Headquarters");
+					}
+					else {
+						logText+=", "+Lan.g(this,"at clinic")+": "+Clinics.GetDesc(FormOpenDental.ClinicNum);
+					}
+				}
+				logText+=". "+Lan.g(this,"Fee increased by")+" "+((float)percent/100.0f).ToString("p")+" "+Lan.g(this," using the increase button in the Fee Tools window.");
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,listFees[i].CodeNum);
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -603,6 +636,7 @@ namespace OpenDental{
 						else {
 							feeAmt=PIn.Double(fields[1]);
 						}
+						//Import deletes fee of the given sched for the active clinic if it exists and inserts new fees based on feesched.IsGlobal and currently active clinic.
 						Fees.Import(fields[0],feeAmt,SchedNum);
 						SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+fields[0]
 							+", "+Lan.g(this,"Fee")+": "+feeAmt.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(SchedNum)
@@ -652,6 +686,7 @@ namespace OpenDental{
 				feesched.FeeSchedType=FeeScheduleType.Normal;
 				feesched.ItemOrder=FeeSchedC.ListLong[FeeSchedC.ListLong.Count-1].ItemOrder+1;
 				feesched.IsHidden=false;
+				feesched.IsGlobal=true;//True is the default state.  We might need to give the user a choice in the future.
 				//feesched.IsNew=true;
 				FeeScheds.Insert(feesched);
 				DataValid.SetInvalid(InvalidType.FeeScheds);

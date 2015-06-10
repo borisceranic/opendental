@@ -10,6 +10,8 @@ namespace OpenDentBusiness{
 		///<summary>Clinics cannot be hidden or deleted, so there is only one list.</summary>
 		private static Clinic[] _list;
 		private static object _lockObj=new object();
+		///<summary>Currently active clinic within OpenDental.  Reflects FormOpenDental.ClinicNum</summary>
+		public static long ClinicNum=0;
 
 		public static Clinic[] List{
 			//No need to check RemotingRole; no call to db.

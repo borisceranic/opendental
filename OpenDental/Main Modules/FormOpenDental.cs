@@ -2328,6 +2328,7 @@ namespace OpenDental{
 				else {//the user is either not restricted to a clinic(s) or the user is restricted but has access to the computerpref clinic
 					ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
 				}
+				Clinics.ClinicNum=ClinicNum;
 				RefreshMenuClinics();
 			}
 			SetModuleSelected();
@@ -3550,6 +3551,7 @@ namespace OpenDental{
 			}
 			Clinic clinicCur=(Clinic)((MenuItem)sender).Tag;
 			ClinicNum=clinicCur.ClinicNum;
+			Clinics.ClinicNum=ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			RefreshMenuClinics();
 		}
@@ -5437,6 +5439,7 @@ namespace OpenDental{
 				if(Security.CurUser.ClinicIsRestricted) {
 					ClinicNum=Security.CurUser.ClinicNum;
 				}
+				Clinics.ClinicNum=ClinicNum;
 				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 				RefreshMenuClinics();
 			}
@@ -5503,6 +5506,7 @@ namespace OpenDental{
 			//this menu item is only visible if the clinics show feature is enabled (!EasyNoClinics)
 			if(Clinics.GetDesc(ClinicNum)=="") {//will be empty string if ClinicNum is not valid, in case they deleted the clinic
 				ClinicNum=Security.CurUser.ClinicNum;
+				Clinics.ClinicNum=ClinicNum;
 				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
 			}
 			RefreshMenuClinics();
@@ -6689,6 +6693,7 @@ namespace OpenDental{
 			Userod oldUser=Security.CurUser;
 			Security.CurUser=null;
 			ClinicNum=0;
+			Clinics.ClinicNum=ClinicNum;
 			Text=PatientL.GetMainTitle(null,ClinicNum);
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Security.CurUser=oldUser;//so that the queries in FormLogOn() will work for the web service, since the web service requires a valid user to run queries.
@@ -6710,6 +6715,7 @@ namespace OpenDental{
 			myOutlookBar.Invalidate();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
+				Clinics.ClinicNum=ClinicNum;
 				RefreshMenuClinics();
 			}
 			SetModuleSelected();

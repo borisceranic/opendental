@@ -8602,6 +8602,29 @@ namespace OpenDentBusiness {
 				else {
 					//EHR is not Oracle compatable, so we don't worry about Oracle here.
 				}
+				//Associating Clinics to Fee Schedules
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE fee ADD ClinicNum bigint NOT NULL";//0 is default
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE fee ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE fee SET ClinicNum = 0 WHERE ClinicNum IS NULL";//0 is default
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE feesched ADD IsGlobal tinyint NOT NULL";//1 is default (true)
+					Db.NonQ(command);
+					command="UPDATE feesched SET IsGlobal = 1 WHERE IsGlobal = 0";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE feesched ADD IsGlobal number(3)";
+					Db.NonQ(command);
+					command="UPDATE feesched SET IsGlobal = 1 WHERE IsGlobal IS NULL";//1 is default (true)
+					Db.NonQ(command);
+				}
 
 
 

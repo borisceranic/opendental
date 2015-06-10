@@ -16,6 +16,8 @@ namespace OpenDentBusiness{
 		public int ItemOrder;
 		///<summary>True if the fee schedule is hidden.  Can't delete fee schedules or change their type once created.</summary>
 		public bool IsHidden;
+		///<summary>True if the fee schedule is used globally and linked to the HQ. (Localization of the fees are not allowed)</summary>
+		public bool IsGlobal;
 		
 		public FeeSched Copy(){
 			return (FeeSched)this.MemberwiseClone();

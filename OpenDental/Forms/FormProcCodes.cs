@@ -55,6 +55,7 @@ namespace OpenDental{
 		private UI.Button butShowHiddenDefault;
 		///<summary>The list of definitions that is currently showing in the category list.</summary>
 		private Def[] CatList;
+		private List<FeeSched> _listFeeScheds;
 
 		///<summary></summary>
 		public FormProcCodes() {
@@ -524,6 +525,7 @@ namespace OpenDental{
 				butOK.Visible=false;
 				butCancel.Text=Lan.g(this,"Close");
 			}
+			_listFeeScheds=FeeSchedC.GetListLong();
 			FillCats();
 			for(int i=0;i<listCategories.Items.Count;i++) {
 				listCategories.SetSelected(i,true);
@@ -599,17 +601,19 @@ namespace OpenDental{
 			for(int i=0;i<listCategories.SelectedIndices.Count;i++) {
 				cats.Add(CatList[listCategories.SelectedIndices[i]].DefNum);
 			}
-			long feeSched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
-			long feeSchedComp1=0;
+			long feeSchedNum=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
+			long feeSched2Num=0;
 			if(comboCompare1.SelectedIndex!=0) {
-				feeSchedComp1=FeeSchedC.ListShort[comboCompare1.SelectedIndex-1].FeeSchedNum;
+				feeSched2Num=FeeSchedC.ListShort[comboCompare1.SelectedIndex-1].FeeSchedNum;
 			}
-			long feeSchedComp2=0;
+			long feeSched3Num=0;
 			if(comboCompare2.SelectedIndex!=0) {
-				feeSchedComp2=FeeSchedC.ListShort[comboCompare2.SelectedIndex-1].FeeSchedNum;
+				feeSched3Num=FeeSchedC.ListShort[comboCompare2.SelectedIndex-1].FeeSchedNum;
 			}
-			ProcTable=ProcedureCodes.GetProcTable(textAbbreviation.Text,textDescription.Text,textCode.Text,cats,feeSched,
-				feeSchedComp1,feeSchedComp2);
+			ProcTable=ProcedureCodes.GetProcTable(textAbbreviation.Text,textDescription.Text,textCode.Text,cats,feeSchedNum,feeSched2Num,feeSched3Num);
+			FeeSched feeSched=FeeScheds.GetOne(feeSchedNum,_listFeeScheds);//Gets from cache.
+			FeeSched feeSched2=FeeScheds.GetOne(feeSched2Num,_listFeeScheds);//Gets from cache.
+			FeeSched feeSched3=FeeScheds.GetOne(feeSched3Num,_listFeeScheds);//Gets from cache.
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableProcedures","Category"),90);
@@ -662,18 +666,27 @@ namespace OpenDental{
 				}
 				else {
 					row.Cells.Add(PIn.Double(ProcTable.Rows[i]["FeeAmt1"].ToString()).ToString("n"));
+					if(feeSched!=null && !feeSched.IsGlobal && Clinics.ClinicNum!=0 && PIn.Bool(ProcTable.Rows[i]["IsClinic1"].ToString())) {
+						row.Cells[row.Cells.Count-1].ColorText=ODPaintTools.ColorNotifyDark;
+					}
 				}
 				if(ProcTable.Rows[i]["FeeAmt2"].ToString()=="-1") {
 					row.Cells.Add("");
 				}
 				else {
 					row.Cells.Add(PIn.Double(ProcTable.Rows[i]["FeeAmt2"].ToString()).ToString("n"));
+					if(feeSched2!=null && !feeSched2.IsGlobal && Clinics.ClinicNum!=0 && PIn.Bool(ProcTable.Rows[i]["IsClinic2"].ToString())) {
+						row.Cells[row.Cells.Count-1].ColorText=ODPaintTools.ColorNotifyDark;
+					}
 				}
 				if(ProcTable.Rows[i]["FeeAmt3"].ToString()=="-1") {
 					row.Cells.Add("");
 				}
 				else {
 					row.Cells.Add(PIn.Double(ProcTable.Rows[i]["FeeAmt3"].ToString()).ToString("n"));
+					if(feeSched3!=null && !feeSched3.IsGlobal && Clinics.ClinicNum!=0 && PIn.Bool(ProcTable.Rows[i]["IsClinic3"].ToString())) {
+						row.Cells[row.Cells.Count-1].ColorText=ODPaintTools.ColorNotifyDark;
+					}
 				}
 				gridMain.Rows.Add(row);
 			}
@@ -949,7 +962,7 @@ namespace OpenDental{
 			}
 			long codeNum=PIn.Long(ProcTable.Rows[e.Row]["CodeNum"].ToString());
 			//string =ProcTable.Rows[e.Row]["ProcCode"].ToString();
-			if(e.Col>3) {//if double clicked on a fee
+			if(e.Col>3) {//if double clicked on a fee (This code never executes.  Cannot double-click the fee column because it isEditable.
 				Fee FeeCur=null;
 				long feesched=0;
 				if(e.Col==4) {
@@ -962,7 +975,6 @@ namespace OpenDental{
 					}
 					feesched=FeeSchedC.ListShort[comboCompare1.SelectedIndex-1].FeeSchedNum;
 					FeeCur=Fees.GetFee(codeNum,feesched);
-
 				}
 				if(e.Col==6) {
 					if(comboCompare2.SelectedIndex==0) {
@@ -972,11 +984,17 @@ namespace OpenDental{
 					FeeCur=Fees.GetFee(codeNum,feesched);
 				}
 				FormFeeEdit FormFE=new FormFeeEdit();
-				if(FeeCur==null) {
+				if(FeeCur==null) {//Fee not found either because HQ feesched and no HQ fee, or local feesched and no local fee.  Need to make a new one.
 					FeeCur=new Fee();
 					FeeCur.FeeSched=feesched;
 					FeeCur.CodeNum=codeNum;
-					Fees.Insert(FeeCur);
+					if(FeeScheds.GetOne(feesched,_listFeeScheds).IsGlobal) {//Fee is for HQ
+						FeeCur.ClinicNum=0;
+					}
+					else {//Fee is for local clinic
+						FeeCur.ClinicNum=FormOpenDental.ClinicNum;
+					}
+					Fees.Insert(FeeCur);//Update done in form, not insertion.
 					//SecurityLog is updated in FormFeeEdit.
 					FormFE.IsNew=true;
 				}
@@ -1002,73 +1020,110 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellLeave(object sender,ODGridClickEventArgs e) {
+			//This is where the real fee editing logic is.
 			//logic only works for column 4.
 			long codeNum=PIn.Long(ProcTable.Rows[e.Row]["CodeNum"].ToString());
-			long feesched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
-			Fee fee=Fees.GetFee(codeNum,feesched);
-			string strOld="";
-			if(fee!=null) {
-				strOld=fee.Amount.ToString("n");
+			long feeSchedNum=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
+			FeeSched feeSched=FeeScheds.GetOne(feeSchedNum,FeeSchedC.GetListLong());
+			Fee fee=Fees.GetFee(codeNum,feeSchedNum);
+			string feeAmtOld="";
+			if(fee!=null){
+				feeAmtOld=fee.Amount.ToString("n");
 			}
-			string strNew=gridMain.Rows[e.Row].Cells[e.Col].Text;
-			if(strOld==strNew) {
+			string feeAmtNew=gridMain.Rows[e.Row].Cells[e.Col].Text;
+			try { //Attempt to parse the entered value for errors.
+				PIn.Double(gridMain.Rows[e.Row].Cells[e.Col].Text);
+			}
+			catch {
+				gridMain.SetSelected(new Point(e.Col,e.Row));
+				gridMain.Rows[e.Row].Cells[e.Col].Text=feeAmtOld;
+				MessageBox.Show(Lan.g(this,"Please fix data entry error first."));
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.Setup)) {//includes dialog
-				gridMain.Rows[e.Row].Cells[e.Col].Text=strOld;
+			if((fee!=null && fee.Amount==PIn.Double(feeAmtNew)) || feeAmtNew=="") { //Don't do anything if the amounts are the same.
+				gridMain.Rows[e.Row].Cells[e.Col].Text=feeAmtOld;
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.Setup)) { //Don't do anything if they don't have permission.
+				gridMain.Rows[e.Row].Cells[e.Col].Text=feeAmtOld;
 				gridMain.Invalidate();
 				return;
 			}
-			double dNew=-1;
-			if(strNew!="") {
-				try {
-					dNew=PIn.Double(strNew);
-				}
-				catch {
-					gridMain.SetSelected(new Point(e.Col,e.Row));
-					MessageBox.Show(Lan.g(this,"Please fix data entry error first."));
-					return;
-				}
-				gridMain.Rows[e.Row].Cells[e.Col].Text=dNew.ToString("n");//to standardize formatting.  They probably didn't type .00
-				//invalidate doesn't seem to be necessary here
-			}
-			if(strOld=="") {//if no fee was originally entered and since it's no longer empty, then we need to insert a fee.
-				//Somehow duplicate fees were being inserted so double check that this fee does not already exist.
-				Fee tmpFee=Fees.GetFee(codeNum,feesched);//Looks in cache.
-				if(tmpFee!=null) {
-					return;//Fee exists. Must be unknown bug.
-				}
-				fee=new Fee();
-				fee.FeeSched=feesched;
-				fee.CodeNum=codeNum;
-				fee.Amount=dNew;
-				Fees.Insert(fee);
-				List<Fee> listFees=Fees.GetListt();
-				listFees.Add(fee);
-				Fees.Listt=listFees;
-			}
-			else {//if fee existed
-				if(strNew=="") {//delete old fee
-					Fees.Delete(fee);
+			gridMain.Rows[e.Row].Cells[e.Col].Text=PIn.Double(feeAmtNew).ToString("n"); //Fix the number formatting and display it.
+			if(feeSched.IsGlobal) { //Blindly insert/update the fee. There will be no more localized copy.
+				if(fee==null) { //Fee doesn't exist, insert
+					fee=new Fee();
+					fee.FeeSched=feeSchedNum;
+					fee.CodeNum=codeNum;
+					fee.Amount=PIn.Double(feeAmtNew);
+					fee.ClinicNum=0;
+					Fees.Insert(fee);
 					List<Fee> listFees=Fees.GetListt();
-					for(int i=0;i<listFees.Count;i++) {
-						if(listFees[i].FeeNum==fee.FeeNum) {
-							listFees.RemoveAt(i);
-							break;
-						}
-					}
+					listFees.Add(fee);
 					Fees.Listt=listFees;
+					//Fees.RefreshCache();
 				}
-				else {//change fee
-					List<Fee> listFees=Fees.GetListt();
-					for(int i=0;i<listFees.Count;i++) {
-						if(listFees[i].FeeNum==fee.FeeNum) {
-							listFees[i].Amount=dNew;
-							Fees.Update(listFees[i]);
-							Fees.Listt=listFees;
-							break;
+				else { //Fee does exist, update or delete.
+					if(feeAmtNew=="") { //They want to delete the fee
+						Fees.Delete(fee);
+						List<Fee> listFees=Fees.GetListt();
+						for(int i=0;i<listFees.Count;i++) {
+							if(listFees[i].FeeNum==fee.FeeNum) {
+								listFees.RemoveAt(i);
+								break;
+							}
 						}
+						Fees.Listt=listFees;
+						//Fees.RefreshCache();
 					}
+					else { //They want to update the fee
+						fee.Amount=PIn.Double(feeAmtNew);
+						Fees.Update(fee);
+						//Fees.RefreshCache();
+					}
+				}
+			}
+			else { //FeeSched isn't HQ feeschedule.
+				if(feeAmtNew=="") { //They want to delete the fee
+					if(fee.ClinicNum!=Clinics.ClinicNum) { //Don't delete other clinic's fee.
+						gridMain.Rows[e.Row].Cells[e.Col].Text=feeAmtOld;
+						return;
+					}
+					else {//They want to delete a fee for their current location.
+						Fees.Delete(fee);
+						List<Fee> listFees=Fees.GetListt();
+						for(int i=0;i<listFees.Count;i++) {
+							if(listFees[i].FeeNum==fee.FeeNum) {
+								listFees.RemoveAt(i);
+								break;
+							}
+						}
+						Fees.Listt=listFees;
+						Fee defaultFee=Fees.GetFee(fee.CodeNum,feeSched.FeeSchedNum);
+						if(defaultFee!=null) {//This is null when fee was the HQ fee.  Otherwise, fee was the clinic fee and defaultFee is the HQ fee.
+							gridMain.Rows[e.Row].Cells[e.Col].Text=defaultFee.Amount.ToString("n");
+						}
+						gridMain.Rows[e.Row].Cells[e.Col].ColorText=Color.Black;
+						//Fees.RefreshCache();
+					}
+				}
+				else if(fee==null || fee.ClinicNum==0) {//The fee did not previously exist, or the user is overwriting the HQ fee.
+					fee=new Fee();
+					fee.FeeSched=feeSchedNum;
+					fee.CodeNum=codeNum;
+					fee.Amount=PIn.Double(feeAmtNew);
+					fee.ClinicNum=Clinics.ClinicNum;
+					Fees.Insert(fee);
+					List<Fee> listFees=Fees.GetListt();
+					listFees.Add(fee);
+					Fees.Listt=listFees;
+					gridMain.Rows[e.Row].Cells[e.Col].ColorText=ODPaintTools.ColorNotifyDark; //Changed fee to be clinic specific, color it.
+					//Fees.RefreshCache();
+				}
+				else { //Fee isn't null and is for our current clinic and they don't want to delete it, just update.
+					fee.Amount=PIn.Double(feeAmtNew);
+					Fees.Update(fee);
+					//Fees.RefreshCache();
 				}
 			}
 			changed=true;//Cause a cache refresh signal to be sent on closing.

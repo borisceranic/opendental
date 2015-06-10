@@ -50,6 +50,16 @@ namespace OpenDentBusiness{
 			Crud.FeeSchedCrud.Update(feeSched);
 		}
 
+		///<summary>Gets one fee sched from the cache.  Will return null if not found.</summary>
+		public static FeeSched GetOne(long feeSchedNum,List<FeeSched> listFeeScheds) {
+			for(int i=0;i<listFeeScheds.Count;i++) {
+				if(listFeeScheds[i].FeeSchedNum==feeSchedNum) {
+					return listFeeScheds[i].Copy();
+				}
+			}
+			return null;//Shouldn't ever happen since we're looking up by primary key.
+		}
+
 		public static string GetDescription(long feeSchedNum) {
 			//No need to check RemotingRole; no call to db.
 			if(feeSchedNum==0){

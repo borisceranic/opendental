@@ -205,10 +205,11 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets a list of procedure codes directly from the database.  If categories.length==0, then we will get for all categories.  Categories are defnums.  FeeScheds are, for now, defnums.</summary>
-		public static DataTable GetProcTable(string abbr,string desc,string code,List<long> categories,long feeSched,
-			long feeSchedComp1,long feeSchedComp2) {
+		public static DataTable GetProcTable(string abbr,string desc,string code,List<long> categories,long feeSchedNum,
+			long feeSched2Num,long feeSched3Num)
+		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),abbr,desc,code,categories,feeSched,feeSchedComp1,feeSchedComp2);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),abbr,desc,code,categories,feeSchedNum,feeSched2Num,feeSched3Num);
 			}
 			string whereCat;
 			if(categories.Count==0){
@@ -224,22 +225,86 @@ namespace OpenDentBusiness{
 				}
 				whereCat+=")";
 			}
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			FeeSched feeSched=FeeScheds.GetOne(feeSchedNum,listFeeScheds);//Gets from cache.
+			FeeSched feeSched2=FeeScheds.GetOne(feeSched2Num,listFeeScheds);//Gets from cache.
+			FeeSched feeSched3=FeeScheds.GetOne(feeSched3Num,listFeeScheds);//Gets from cache.
 			//Query changed to be compatible with both MySQL and Oracle (not tested).
-			string command="SELECT ProcCat,Descript,AbbrDesc,procedurecode.ProcCode,"
-				+"CASE WHEN (fee1.Amount IS NULL) THEN -1 ELSE fee1.Amount END FeeAmt1,"
-				+"CASE WHEN (fee2.Amount IS NULL) THEN -1 ELSE fee2.Amount END FeeAmt2,"
-				+"CASE WHEN (fee3.Amount IS NULL) THEN -1 ELSE fee3.Amount END FeeAmt3, "
-				+"procedurecode.CodeNum "
-				+"FROM procedurecode "
-				+"LEFT JOIN fee fee1 ON fee1.CodeNum=procedurecode.CodeNum AND fee1.FeeSched="+POut.Long(feeSched)+" "
-				+"LEFT JOIN fee fee2 ON fee2.CodeNum=procedurecode.CodeNum AND fee2.FeeSched="+POut.Long(feeSchedComp1)+" "
-				+"LEFT JOIN fee fee3 ON fee3.CodeNum=procedurecode.CodeNum AND fee3.FeeSched="+POut.Long(feeSchedComp2)+" "
-				+"LEFT JOIN definition ON definition.DefNum=procedurecode.ProcCat "
-				+"WHERE "+whereCat
-				+" AND Descript LIKE '%"+POut.String(desc)+"%' "
-				+"AND AbbrDesc LIKE '%"+POut.String(abbr)+"%' "
-				+"AND procedurecode.ProcCode LIKE '%"+POut.String(code)+"%' "
-				+"ORDER BY definition.ItemOrder,procedurecode.ProcCode";
+			string command="SELECT ProcCat,Descript,AbbrDesc,procedurecode.ProcCode,";
+			if(feeSched==null) {
+				command+="-1 FeeAmt1,";
+			}
+			else {
+				command+="CASE ";
+				if(!feeSched.IsGlobal && Clinics.ClinicNum!=0) {//Use local clinic fee if there's one present
+					command+="WHEN (feeclinic1.Amount IS NOT NULL) THEN feeclinic1.Amount ";
+				}
+				command+="WHEN (feehq1.Amount IS NOT NULL) THEN feehq1.Amount ELSE -1 END FeeAmt1,";
+			}
+			if(feeSched2==null) {
+				command+="-1 FeeAmt2,";
+			}
+			else {
+				command+="CASE ";
+				if(!feeSched2.IsGlobal && Clinics.ClinicNum!=0) {//Use local clinic fee if there's one present
+					command+="WHEN (feeclinic2.Amount IS NOT NULL) THEN feeclinic2.Amount ";
+				}
+				command+="WHEN (feehq2.Amount IS NOT NULL) THEN feehq2.Amount ELSE -1 END FeeAmt2,";
+			}
+			if(feeSched3==null) {
+				command+="-1 FeeAmt3,";
+			}
+			else {
+				command+="CASE ";
+				if(!feeSched3.IsGlobal && Clinics.ClinicNum!=0) {//Use local clinic fee if there's one present
+					command+="WHEN (feeclinic3.Amount IS NOT NULL) THEN feeclinic3.Amount ";
+				}
+				command+="WHEN (feehq3.Amount IS NOT NULL) THEN feehq3.Amount ELSE -1 END FeeAmt3,";				
+			}
+			command+="procedurecode.CodeNum ";
+			if(feeSched!=null && !feeSched.IsGlobal && Clinics.ClinicNum!=0) {
+				command+=",CASE WHEN (feeclinic1.Amount IS NOT NULL) THEN 1 ELSE 0 END IsClinic1 ";
+			}
+			if(feeSched2!=null && !feeSched2.IsGlobal && Clinics.ClinicNum!=0) {
+				command+=",CASE WHEN (feeclinic2.Amount IS NOT NULL) THEN 1 ELSE 0 END IsClinic2 ";
+			}
+			if(feeSched3!=null && !feeSched3.IsGlobal && Clinics.ClinicNum!=0) {
+				command+=",CASE WHEN (feeclinic3.Amount IS NOT NULL) THEN 1 ELSE 0 END IsClinic3 ";
+			}
+			command+="FROM procedurecode ";
+			if(feeSched!=null) {
+				if(!feeSched.IsGlobal && Clinics.ClinicNum!=0) {//Get local clinic fee if there's one present
+					command+="LEFT JOIN fee feeclinic1 ON feeclinic1.CodeNum=procedurecode.CodeNum AND feeclinic1.FeeSched="+POut.Long(feeSched.FeeSchedNum)
+						+" AND feeclinic1.ClinicNum="+POut.Long(Clinics.ClinicNum)+" ";
+				}
+				//Get the hq clinic fee if there's one present
+				command+="LEFT JOIN fee feehq1 ON feehq1.CodeNum=procedurecode.CodeNum AND feehq1.FeeSched="+POut.Long(feeSched.FeeSchedNum)
+					+" AND feehq1.ClinicNum=0 ";
+			}
+			if(feeSched2!=null) {
+				if(!feeSched2.IsGlobal && Clinics.ClinicNum!=0) {//Get local clinic fee if there's one present
+					command+="LEFT JOIN fee feeclinic2 ON feeclinic2.CodeNum=procedurecode.CodeNum AND feeclinic2.FeeSched="+POut.Long(feeSched2.FeeSchedNum)
+						+" AND feeclinic2.ClinicNum="+POut.Long(Clinics.ClinicNum)+" ";
+				}
+				//Get the hq clinic fee if there's one present
+				command+="LEFT JOIN fee feehq2 ON feehq2.CodeNum=procedurecode.CodeNum AND feehq2.FeeSched="+POut.Long(feeSched2.FeeSchedNum)
+					+" AND feehq2.ClinicNum=0 ";
+			}
+			if(feeSched3!=null) {
+				if(!feeSched3.IsGlobal && Clinics.ClinicNum!=0) {//Get local clinic fee if there's one present
+					command+="LEFT JOIN fee feeclinic3 ON feeclinic3.CodeNum=procedurecode.CodeNum AND feeclinic3.FeeSched="+POut.Long(feeSched3.FeeSchedNum)
+						+" AND feeClinic3.ClinicNum="+POut.Long(Clinics.ClinicNum)+" ";
+				}
+				//Get the hq clinic fee if there's one present
+				command+="LEFT JOIN fee feehq3 ON feehq3.CodeNum=procedurecode.CodeNum AND feehq3.FeeSched="+POut.Long(feeSched3.FeeSchedNum)
+					+" AND feehq3.ClinicNum=0 ";
+			}
+			command+="LEFT JOIN definition ON definition.DefNum=procedurecode.ProcCat "
+			+"WHERE "+whereCat+" "
+			+"AND Descript LIKE '%"+POut.String(desc)+"%' "
+			+"AND AbbrDesc LIKE '%"+POut.String(abbr)+"%' "
+			+"AND procedurecode.ProcCode LIKE '%"+POut.String(code)+"%' "
+			+"ORDER BY definition.ItemOrder,procedurecode.ProcCode";
 			return Db.GetTable(command);
 		}
 

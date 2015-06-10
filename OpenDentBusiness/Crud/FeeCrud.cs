@@ -53,6 +53,7 @@ namespace OpenDentBusiness.Crud{
 				fee.UseDefaultFee= PIn.Bool  (table.Rows[i]["UseDefaultFee"].ToString());
 				fee.UseDefaultCov= PIn.Bool  (table.Rows[i]["UseDefaultCov"].ToString());
 				fee.CodeNum      = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
+				fee.ClinicNum    = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				retVal.Add(fee);
 			}
 			return retVal;
@@ -93,7 +94,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="FeeNum,";
 			}
-			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum) VALUES(";
+			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(fee.FeeNum)+",";
 			}
@@ -103,7 +104,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (fee.FeeSched)+","
 				+    POut.Bool  (fee.UseDefaultFee)+","
 				+    POut.Bool  (fee.UseDefaultCov)+","
-				+    POut.Long  (fee.CodeNum)+")";
+				+    POut.Long  (fee.CodeNum)+","
+				+    POut.Long  (fee.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -121,7 +123,8 @@ namespace OpenDentBusiness.Crud{
 				+"FeeSched     =  "+POut.Long  (fee.FeeSched)+", "
 				+"UseDefaultFee=  "+POut.Bool  (fee.UseDefaultFee)+", "
 				+"UseDefaultCov=  "+POut.Bool  (fee.UseDefaultCov)+", "
-				+"CodeNum      =  "+POut.Long  (fee.CodeNum)+" "
+				+"CodeNum      =  "+POut.Long  (fee.CodeNum)+", "
+				+"ClinicNum    =  "+POut.Long  (fee.ClinicNum)+" "
 				+"WHERE FeeNum = "+POut.Long(fee.FeeNum);
 			Db.NonQ(command);
 		}
@@ -152,6 +155,10 @@ namespace OpenDentBusiness.Crud{
 			if(fee.CodeNum != oldFee.CodeNum) {
 				if(command!=""){ command+=",";}
 				command+="CodeNum = "+POut.Long(fee.CodeNum)+"";
+			}
+			if(fee.ClinicNum != oldFee.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(fee.ClinicNum)+"";
 			}
 			if(command==""){
 				return false;

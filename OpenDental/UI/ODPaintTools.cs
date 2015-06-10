@@ -16,6 +16,8 @@ namespace OpenDental.UI {
 		private LinearGradientBrush _brushDark;
 		///<summary>The same orange color as the unread task notification color.</summary>
 		public static Color ColorNotify=Color.FromArgb(252,178,129);
+		///<summary>The darker version of ColorNotify.  This color is useful for coloring grid cell text, because it contrasts well with the normal white background, as well as the slate gray background of selected cells, as well as the normal black text.  Calculated by using website paletton.com.  This darker color is not calculated by using a simple division or subtraction, but is instead calculated using a more advanced formula.</summary>
+		public static Color ColorNotifyDark=Color.FromArgb(182,98,44);
 		///<summary>The same orange color as the unread task notification color.</summary>
 		private static LinearGradientBrush _brushNotify=new LinearGradientBrush(new Point(0,0),new Point(0,25),Color.FromArgb(255,231,167),ColorNotify);
 		private Brush _brushTextFore;

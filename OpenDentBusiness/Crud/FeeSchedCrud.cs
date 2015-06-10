@@ -51,6 +51,7 @@ namespace OpenDentBusiness.Crud{
 				feeSched.FeeSchedType= (OpenDentBusiness.FeeScheduleType)PIn.Int(table.Rows[i]["FeeSchedType"].ToString());
 				feeSched.ItemOrder   = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				feeSched.IsHidden    = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				feeSched.IsGlobal    = PIn.Bool  (table.Rows[i]["IsGlobal"].ToString());
 				retVal.Add(feeSched);
 			}
 			return retVal;
@@ -91,7 +92,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="FeeSchedNum,";
 			}
-			command+="Description,FeeSchedType,ItemOrder,IsHidden) VALUES(";
+			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(feeSched.FeeSchedNum)+",";
 			}
@@ -99,7 +100,8 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(feeSched.Description)+"',"
 				+    POut.Int   ((int)feeSched.FeeSchedType)+","
 				+    POut.Int   (feeSched.ItemOrder)+","
-				+    POut.Bool  (feeSched.IsHidden)+")";
+				+    POut.Bool  (feeSched.IsHidden)+","
+				+    POut.Bool  (feeSched.IsGlobal)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -115,7 +117,8 @@ namespace OpenDentBusiness.Crud{
 				+"Description = '"+POut.String(feeSched.Description)+"', "
 				+"FeeSchedType=  "+POut.Int   ((int)feeSched.FeeSchedType)+", "
 				+"ItemOrder   =  "+POut.Int   (feeSched.ItemOrder)+", "
-				+"IsHidden    =  "+POut.Bool  (feeSched.IsHidden)+" "
+				+"IsHidden    =  "+POut.Bool  (feeSched.IsHidden)+", "
+				+"IsGlobal    =  "+POut.Bool  (feeSched.IsGlobal)+" "
 				+"WHERE FeeSchedNum = "+POut.Long(feeSched.FeeSchedNum);
 			Db.NonQ(command);
 		}
@@ -138,6 +141,10 @@ namespace OpenDentBusiness.Crud{
 			if(feeSched.IsHidden != oldFeeSched.IsHidden) {
 				if(command!=""){ command+=",";}
 				command+="IsHidden = "+POut.Bool(feeSched.IsHidden)+"";
+			}
+			if(feeSched.IsGlobal != oldFeeSched.IsGlobal) {
+				if(command!=""){ command+=",";}
+				command+="IsGlobal = "+POut.Bool(feeSched.IsGlobal)+"";
 			}
 			if(command==""){
 				return false;

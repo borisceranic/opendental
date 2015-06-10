@@ -105,46 +105,62 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>Returns null if no fee exists for code/feeSched combo.</summary>
+		///<summary>Deletes all fees for the supplied FeeSched that aren't for the HQ clinic.</summary>
+		public static void DeleteNonHQFeesForSched(long feeSchedNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),feeSchedNum);
+				return;
+			}
+			string command="DELETE FROM fee WHERE FeeSched="+POut.Long(feeSchedNum)+" AND ClinicNum!=0";
+			Db.NonQ(command);
+		}
+
+		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.</summary>
 		public static Fee GetFee(long codeNum,long feeSchedNum) {
+			//No need to check RemotingRole; no call to db.
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			return GetFee(codeNum,GetListt(),FeeScheds.GetOne(feeSchedNum,listFeeScheds));
+		}
+
+		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.</summary>
+		public static Fee GetFee(long codeNum,List<Fee> listFees,FeeSched feeSched) {
 			//No need to check RemotingRole; no call to db.
 			if(codeNum==0){
 				return null;
 			}
-			if(feeSchedNum==0){
+			if(feeSched==null || feeSched.FeeSchedNum==0){
 				return null;
 			}
-			List<Fee> listFees=GetListt();
-			for(int i=0;i<listFees.Count;i++) {
-				if(listFees[i].CodeNum==codeNum && listFees[i].FeeSched==feeSchedNum) {
+			if(!feeSched.IsGlobal) {//Clinic fee schedule.
+				for(int i=0;i<listFees.Count;i++) {
+					if(listFees[i].CodeNum==codeNum && listFees[i].FeeSched==feeSched.FeeSchedNum && listFees[i].ClinicNum==Clinics.ClinicNum) {
+						return listFees[i];
+					}
+				}
+			}
+			//This fee schedule is a HQ fee schedule, or the clinic fee was not found.
+			for(int i=0;i<listFees.Count;i++) {//Search for the HQ fee schedule.
+				if(listFees[i].CodeNum==codeNum && listFees[i].ClinicNum==0 && listFees[i].FeeSched==feeSched.FeeSchedNum) {
 					return listFees[i];
 				}
 			}
 			return null;
 		}
 
-		///<summary>Returns an amount if a fee has been entered.  Otherwise returns -1.  Not usually used directly.</summary>
+		///<summary>Returns an amount if a fee has been entered.  Prefers local clinic fees over HQ fees.  Otherwise returns -1.  Not usually used directly.</summary>
 		public static double GetAmount(long codeNum,long feeSchedNum) {
 			//No need to check RemotingRole; no call to db.
-			if(codeNum==0){
-				return -1;
-			}
-			if(feeSchedNum==0){
-				return -1;
-			}
 			if(FeeScheds.GetIsHidden(feeSchedNum)){
 				return -1;//you cannot obtain fees for hidden fee schedules
 			}
-			List<Fee> listFees=GetListt();
-			for(int i=0;i<listFees.Count;i++) {
-				if(listFees[i].CodeNum==codeNum && listFees[i].FeeSched==feeSchedNum) {
-					return listFees[i].Amount;
-				}
+			Fee fee=GetFee(codeNum,feeSchedNum);
+			if(fee==null) {
+				return -1;
 			}
-			return -1;//code not found
+			return fee.Amount;
 		}
 
-		///<summary>Almost the same as GetAmount.  But never returns -1;  Returns an amount if a fee has been entered.  Returns 0 if code can't be found.
+		///<summary>Almost the same as GetAmount.  But never returns -1;  Returns an amount if a fee has been entered.  Prefers local clinic fees over HQ fees.  Returns 0 if code can't be found.
 		///TODO: =js 6/19/13 There are many places where this is used to get the fee for a proc.  This results in approx 12 identical chunks of code throughout the program.
 		///We need to build a method to eliminate all those identical sections.  This will prevent bugs from cropping up when these sections get out of synch.</summary>
 		public static double GetAmount0(long codeNum,long feeSched) {
@@ -252,11 +268,16 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),schedNum);
 				return;
 			}
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			FeeSched feeSched=FeeScheds.GetOne(schedNum,listFeeScheds);
 			string command="DELETE FROM fee WHERE FeeSched="+schedNum;
+			if(!feeSched.IsGlobal) {
+				command+=" AND ClinicNum="+Clinics.ClinicNum;
+			}
 			Db.NonQ(command);
 		}
 
-		///<summary>Copies any fee objects over to the new fee schedule.  Usually run ClearFeeSched first.  Be careful exactly which int's you supply.</summary>
+		///<summary>Copies any fee objects over to the new fee schedule.  Usually run ClearFeeSched first.  Be careful exactly which int's you supply.  Only copies the currently active clinic's fees to the new schedule.</summary>
 		public static void CopyFees(long fromFeeSched,long toFeeSched) {
 			//No need to check RemotingRole; no call to db.
 			List<Fee> listFees=GetListt();
@@ -264,41 +285,63 @@ namespace OpenDentBusiness{
 				RefreshCache();
 			}
 			Fee fee;
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			FeeSched toSched=FeeScheds.GetOne(toFeeSched,listFeeScheds);
 			for(int i=0;i<listFees.Count;i++){
 				if(listFees[i].FeeSched!=fromFeeSched){
 					continue;
 				}
+				if(listFees[i].ClinicNum!=Clinics.ClinicNum) {
+					continue;
+				}
 				fee=listFees[i].Copy();
+				if(toSched.IsGlobal) {
+					fee.ClinicNum=0;
+				}
+				else {
+					fee.ClinicNum=Clinics.ClinicNum;
+				}
+				fee.FeeNum=0;//Set 0 to insert
 				fee.FeeSched=toFeeSched;
 				Fees.Insert(fee);
 			}
 		}
 
 		///<summary>Increases the fee schedule by percent.  Round should be the number of decimal places, either 0,1,or 2.</summary>
-		public static void Increase(long feeSched,int percent,int round) {
+		public static void Increase(long feeSchedNum,int percent,int round) {
 			//No need to check RemotingRole; no call to db.
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			FeeSched feeSched=FeeScheds.GetOne(feeSchedNum,listFeeScheds);
 			List<Fee> listFees=GetListt();
 			if(listFees==null) {
 				RefreshCache();
 			}
-			Fee fee;
-			double newVal;
-			for(int i=0;i<listFees.Count;i++){
-				if(listFees[i].FeeSched!=feeSched){
-					continue;
+			for(int i=listFees.Count-1;i>=0;i--) { //Contains all fees for all scheds.
+				Fee feeCur=listFees[i];
+				Fee feeForCode=GetFee(feeCur.CodeNum,listFees,feeSched);
+				if(feeForCode!=null && feeForCode.Amount!=0) {
+					double newVal=(double)feeForCode.Amount*(1+(double)percent/100);
+					if(round>0) {
+						feeForCode.Amount=Math.Round(newVal,round);
+					}
+					else {
+						feeForCode.Amount=Math.Round(newVal,MidpointRounding.AwayFromZero);
+					}
+					if(!feeSched.IsGlobal && feeForCode.ClinicNum!=Clinics.ClinicNum) {//The fee showing in the clinic fee schedule is the HQ fee.
+						feeForCode.ClinicNum=Clinics.ClinicNum;
+						feeForCode.FeeNum=0;//Reset the primary key to zero, so that a new record will be inserted.
+						Fees.Insert(feeForCode);
+					}
+					else {
+						Fees.Update(feeForCode);
+					}
 				}
-				if(listFees[i].Amount==0){
-					continue;
+				for(int j=listFees.Count-1;j>=0;j--) {
+					if(listFees[j].CodeNum==feeCur.CodeNum) {
+						listFees.RemoveAt(j);
+					}
 				}
-				fee=listFees[i].Copy();
-				newVal=(double)fee.Amount*(1+(double)percent/100);
-				if(round>0) {
-					fee.Amount=Math.Round(newVal,round);
-				}
-				else {
-					fee.Amount=Math.Round(newVal,MidpointRounding.AwayFromZero);
-				}
-				Fees.Update(fee);
+				i=listFees.Count;
 			}
 		}
 
@@ -308,7 +351,7 @@ namespace OpenDentBusiness{
 			if(!ProcedureCodes.IsValidCode(codeText)){
 				return;//skip for now. Possibly insert a code in a future version.
 			}
-			long feeNum=GetFeeNum(ProcedureCodes.GetCodeNum(codeText),feeSchedNum);
+			long feeNum=GetFeeNum(ProcedureCodes.GetCodeNum(codeText),feeSchedNum);//feeNum will be for the currently active clinic.
 			if(feeNum>0) {
 				Delete(feeNum);
 			}
@@ -320,16 +363,26 @@ namespace OpenDentBusiness{
 			fee.Amount=amt;
 			fee.FeeSched=feeSchedNum;
 			fee.CodeNum=ProcedureCodes.GetCodeNum(codeText);
-			Insert(fee);
+			fee.ClinicNum=0;//Either 0 because you're importing on an HQ schedule or local clinic because the feesched is localizable.
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			if(!FeeScheds.GetOne(feeSchedNum,listFeeScheds).IsGlobal) {//FeeSched is localizable.
+				fee.ClinicNum=Clinics.ClinicNum;
+			}
+			Insert(fee);//Insert new fee specific to the active clinic.
 			//RefreshCache();//moved this outside the loop
 		}
 
-		///<summary>Gets the FeeNum from the database, returns 0 if none found.</summary>
+		///<summary>Gets the FeeNum from the database based on FeeSched.IsGlobal and currently active clinic, returns 0 if none found.</summary>
 		public static long GetFeeNum(long codeNum,long feeSchedNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod(),codeNum,feeSchedNum);
 			}
-			string command="SELECT FeeNum FROM fee WHERE CodeNum="+POut.Long(codeNum)+" AND FeeSched="+POut.Long(feeSchedNum);
+			long clinicNum=0;
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			if(!FeeScheds.GetOne(feeSchedNum,listFeeScheds).IsGlobal) {//FeeSched is localizable.
+				clinicNum=Clinics.ClinicNum;
+			}
+			string command="SELECT FeeNum FROM fee WHERE CodeNum="+POut.Long(codeNum)+" AND FeeSched="+POut.Long(feeSchedNum)+" AND ClinicNum="+POut.Long(clinicNum);
 			return PIn.Long(Db.GetScalar(command));
 		}
 

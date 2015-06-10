@@ -22,7 +22,9 @@ namespace OpenDental{
 		private Label label2;
 		private ListBox listType;
 		private CheckBox checkIsHidden;
+		private CheckBox checkIsGlobal;
 		public FeeSched FeeSchedCur;
+		public Clinic ClinicCur;
 
 		///<summary></summary>
 		public FormFeeSchedEdit()
@@ -62,6 +64,7 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.listType = new System.Windows.Forms.ListBox();
 			this.checkIsHidden = new System.Windows.Forms.CheckBox();
+			this.checkIsGlobal = new System.Windows.Forms.CheckBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
@@ -102,7 +105,7 @@ namespace OpenDental{
 			// checkIsHidden
 			// 
 			this.checkIsHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsHidden.Location = new System.Drawing.Point(70, 95);
+			this.checkIsHidden.Location = new System.Drawing.Point(176, 95);
 			this.checkIsHidden.Name = "checkIsHidden";
 			this.checkIsHidden.Size = new System.Drawing.Size(104, 19);
 			this.checkIsHidden.TabIndex = 13;
@@ -110,6 +113,20 @@ namespace OpenDental{
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsHidden.UseVisualStyleBackColor = true;
 			this.checkIsHidden.Click += new System.EventHandler(this.checkIsHidden_Click);
+			// 
+			// checkIsGlobal
+			// 
+			this.checkIsGlobal.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsGlobal.Enabled = false;
+			this.checkIsGlobal.Location = new System.Drawing.Point(112, 115);
+			this.checkIsGlobal.Name = "checkIsGlobal";
+			this.checkIsGlobal.Size = new System.Drawing.Size(168, 19);
+			this.checkIsGlobal.TabIndex = 14;
+			this.checkIsGlobal.Text = "Use Global Fees";
+			this.checkIsGlobal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsGlobal.UseVisualStyleBackColor = true;
+			this.checkIsGlobal.Visible = false;
+			this.checkIsGlobal.Click += new System.EventHandler(this.checkIsGlobal_Click);
 			// 
 			// butOK
 			// 
@@ -145,6 +162,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(501, 214);
+			this.Controls.Add(this.checkIsGlobal);
 			this.Controls.Add(this.checkIsHidden);
 			this.Controls.Add(this.listType);
 			this.Controls.Add(this.label2);
@@ -185,6 +203,27 @@ namespace OpenDental{
 				}
 			}
 			checkIsHidden.Checked=FeeSchedCur.IsHidden;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)){//Not no clinics (Yes clinics)
+				checkIsGlobal.Visible=true;
+				if(FormOpenDental.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
+					checkIsGlobal.Enabled=true;
+				}
+			}
+			checkIsGlobal.Checked=FeeSchedCur.IsGlobal;
+		}
+
+		private void checkIsGlobal_Click(object sender,EventArgs e) {
+			if(checkIsGlobal.Checked) {//Checking IsGlobal (They want to delete their local fees for the feeschedule and use the HQ ones)
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Checking this option will use the global HQ fees and delete any clinic specific fees.  Are you sure?")) {
+					checkIsGlobal.Checked=false;
+				}
+			}
+			else {//Unchecking IsGlobal (They want to create local fees for the feeschedule and override the HQ ones)
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Unchecking this option will override the global HQ fees with the clinic fees for this fee schedule.  Are you sure?")){
+					checkIsGlobal.Checked=true;
+				}
+			}
+		
 		}
 
 		private void checkIsHidden_Click(object sender,EventArgs e) {
@@ -218,6 +257,8 @@ namespace OpenDental{
 			FeeSchedCur.Description=textDescription.Text;
 			FeeSchedCur.FeeSchedType=(FeeScheduleType)listType.SelectedIndex;
 			FeeSchedCur.IsHidden=checkIsHidden.Checked;
+			bool isGlobalOld=FeeSchedCur.IsGlobal;
+			FeeSchedCur.IsGlobal=checkIsGlobal.Checked;
 			try{
 				if(FeeSchedCur.IsNew) {
 					FeeScheds.Insert(FeeSchedCur);
@@ -229,6 +270,25 @@ namespace OpenDental{
 			catch(Exception ex){
 				MessageBox.Show(ex.Message);
 				return;
+			}
+			if(!isGlobalOld && FeeSchedCur.IsGlobal) {//Feesched was clinic specific and now it isn't. Delete non-HQ clinic fees for this feesched.
+				Fees.DeleteNonHQFeesForSched(FeeSchedCur.FeeSchedNum);
+			}
+			if(isGlobalOld!=FeeSchedCur.IsGlobal) {
+				string log="Edited Fee Schedule \""+textDescription.Text+"\": Changed \"Use Headquarter's Fees\" from ";
+				if(isGlobalOld) {
+					log+="Checked ";
+				}
+				else {
+					log+="Unchecked ";
+				}
+				if(FeeSchedCur.IsGlobal) {
+					log+="to Checked";
+				}
+				else {
+					log+="to Unchecked";
+				}
+				SecurityLogs.MakeLogEntry(Permissions.FeeSchedEdit,0,log);
 			}
 			DialogResult=DialogResult.OK;
 		}

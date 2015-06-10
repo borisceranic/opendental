@@ -21,6 +21,8 @@ namespace OpenDentBusiness{
 		public bool UseDefaultCov;
 		///<summary>FK to procedurecode.CodeNum.</summary>
 		public long CodeNum;
+		///<summary>FK to clinic.ClinicNum.  (Used if localization of fees for a feesched is enabled)</summary>
+		public long ClinicNum;
 
 		///<summary></summary>
 		public Fee Copy(){

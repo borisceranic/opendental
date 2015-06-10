@@ -210,7 +210,9 @@ namespace OpenDentBusiness{
 		///<summary>90- Allows editing of all measure events.  Also used to track changes made to events.</summary>
 		EhrMeasureEventEdit,
 		///<summary>91- Allows users to edit settings in the eServices Setup window.  Also causes the Listener Service monitor thread to start upon logging in.</summary>
-		EServicesSetup
+		EServicesSetup,
+		///<summary>92- There is no user interface in the security window for this permission.  It is only used for tracking.  Tracks editing of fee schedule properties.</summary>
+		FeeSchedEdit
 	}
 
 	

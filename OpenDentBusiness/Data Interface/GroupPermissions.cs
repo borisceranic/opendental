@@ -231,6 +231,7 @@ namespace OpenDentBusiness{
 				//case Permissions.ImageEdit:
 				//case Permissions.EhrMeasureEventEdit:
 				//case Permissions.EServicesSetup:
+				//case Permissions.FeeSchedEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
