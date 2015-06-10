@@ -650,7 +650,7 @@ namespace OpenDental{
 			this.textHmPhone.Name = "textHmPhone";
 			this.textHmPhone.Size = new System.Drawing.Size(198, 20);
 			this.textHmPhone.TabIndex = 2;
-			this.textHmPhone.TextChanged += new System.EventHandler(this.textHmPhone_TextChanged);
+			this.textHmPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
 			// 
 			// textWkPhone
 			// 
@@ -659,7 +659,7 @@ namespace OpenDental{
 			this.textWkPhone.Name = "textWkPhone";
 			this.textWkPhone.Size = new System.Drawing.Size(150, 20);
 			this.textWkPhone.TabIndex = 3;
-			this.textWkPhone.TextChanged += new System.EventHandler(this.textWkPhone_TextChanged);
+			this.textWkPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
 			// 
 			// textWirelessPhone
 			// 
@@ -668,7 +668,7 @@ namespace OpenDental{
 			this.textWirelessPhone.Name = "textWirelessPhone";
 			this.textWirelessPhone.Size = new System.Drawing.Size(150, 20);
 			this.textWirelessPhone.TabIndex = 2;
-			this.textWirelessPhone.TextChanged += new System.EventHandler(this.textWirelessPhone_TextChanged);
+			this.textWirelessPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
 			// 
 			// butOK
 			// 
@@ -2644,31 +2644,14 @@ namespace OpenDental{
 			}
 		}
 
-		private void textWirelessPhone_TextChanged(object sender, System.EventArgs e) {
-			int cursor=textWirelessPhone.SelectionStart;
-			int length=textWirelessPhone.Text.Length;
-			textWirelessPhone.Text=TelephoneNumbers.AutoFormat(textWirelessPhone.Text);
-			if(textWirelessPhone.Text.Length>length)
-				cursor++;
-			textWirelessPhone.SelectionStart=cursor;		
-		}
-
-		private void textWkPhone_TextChanged(object sender, System.EventArgs e) {
-		 	int cursor=textWkPhone.SelectionStart;
-			int length=textWkPhone.Text.Length;
-			textWkPhone.Text=TelephoneNumbers.AutoFormat(textWkPhone.Text);
-			if(textWkPhone.Text.Length>length)
-				cursor++;
-			textWkPhone.SelectionStart=cursor;		
-		}
-
-		private void textHmPhone_TextChanged(object sender, System.EventArgs e) {
-		 	int cursor=textHmPhone.SelectionStart;
-			int length=textHmPhone.Text.Length;
-			textHmPhone.Text=TelephoneNumbers.AutoFormat(textHmPhone.Text);
-			if(textHmPhone.Text.Length>length)
-				cursor++;
-			textHmPhone.SelectionStart=cursor;		
+		///<summary>All text boxes on this form that accept a phone number use this text changed event.</summary>
+		private void textAnyPhoneNumber_TextChanged(object sender,System.EventArgs e) {
+			if(sender.GetType()!=typeof(TextBox)) {
+				return;
+			}
+			TextBox textPhone=(TextBox)sender;
+			textPhone.Text=TelephoneNumbers.AutoFormat(textPhone.Text);
+			textPhone.SelectionStart=textPhone.Text.Length;
 		}
 
 		private void butAuto_Click(object sender, System.EventArgs e) {

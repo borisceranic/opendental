@@ -66,7 +66,7 @@ namespace OpenDental{
 			this.textWkPhone.Name = "textWkPhone";
 			this.textWkPhone.Size = new System.Drawing.Size(224, 20);
 			this.textWkPhone.TabIndex = 7;
-			this.textWkPhone.TextChanged += new System.EventHandler(this.textWkPhone_TextChanged);
+			this.textWkPhone.TextChanged += new System.EventHandler(this.textAnyPhone_TextChanged);
 			// 
 			// label2
 			// 
@@ -83,7 +83,7 @@ namespace OpenDental{
 			this.textHmPhone.Name = "textHmPhone";
 			this.textHmPhone.Size = new System.Drawing.Size(224, 20);
 			this.textHmPhone.TabIndex = 9;
-			this.textHmPhone.TextChanged += new System.EventHandler(this.textHmPhone_TextChanged);
+			this.textHmPhone.TextChanged += new System.EventHandler(this.textAnyPhone_TextChanged);
 			// 
 			// label3
 			// 
@@ -100,7 +100,7 @@ namespace OpenDental{
 			this.textWirelessPhone.Name = "textWirelessPhone";
 			this.textWirelessPhone.Size = new System.Drawing.Size(224, 20);
 			this.textWirelessPhone.TabIndex = 11;
-			this.textWirelessPhone.TextChanged += new System.EventHandler(this.textWirelessPhone_TextChanged);
+			this.textWirelessPhone.TextChanged += new System.EventHandler(this.textAnyPhone_TextChanged);
 			// 
 			// label4
 			// 

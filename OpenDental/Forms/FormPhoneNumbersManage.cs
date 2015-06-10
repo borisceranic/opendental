@@ -36,31 +36,13 @@ namespace OpenDental {
 			}
 		}
 
-		private void textWirelessPhone_TextChanged(object sender, System.EventArgs e) {
-			int cursor=textWirelessPhone.SelectionStart;
-			int length=textWirelessPhone.Text.Length;
-			textWirelessPhone.Text=TelephoneNumbers.AutoFormat(textWirelessPhone.Text);
-			if(textWirelessPhone.Text.Length>length)
-				cursor++;
-			textWirelessPhone.SelectionStart=cursor;		
-		}
-
-		private void textWkPhone_TextChanged(object sender, System.EventArgs e) {
-		 	int cursor=textWkPhone.SelectionStart;
-			int length=textWkPhone.Text.Length;
-			textWkPhone.Text=TelephoneNumbers.AutoFormat(textWkPhone.Text);
-			if(textWkPhone.Text.Length>length)
-				cursor++;
-			textWkPhone.SelectionStart=cursor;		
-		}
-
-		private void textHmPhone_TextChanged(object sender, System.EventArgs e) {
-		 	int cursor=textHmPhone.SelectionStart;
-			int length=textHmPhone.Text.Length;
-			textHmPhone.Text=TelephoneNumbers.AutoFormat(textHmPhone.Text);
-			if(textHmPhone.Text.Length>length)
-				cursor++;
-			textHmPhone.SelectionStart=cursor;		
+		private void textAnyPhone_TextChanged(object sender,System.EventArgs e) {
+			if(sender.GetType()!=typeof(TextBox)) {
+				return;
+			}
+			TextBox textResult=((TextBox)sender);
+			textResult.Text=TelephoneNumbers.AutoFormat(textResult.Text);
+			textResult.SelectionStart=textResult.Text.Length;
 		}
 
 		private void listOther_DoubleClick(object sender,EventArgs e) {
@@ -74,13 +56,14 @@ namespace OpenDental {
 			if(input.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			otherList[index].PhoneNumberVal=input.textResult.Text;
+			otherList[index].PhoneNumberVal=TelephoneNumbers.AutoFormat(input.textResult.Text);
 			PhoneNumbers.Update(otherList[index]);
 			FillList();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
 			InputBox input=new InputBox("Phone Number");
+			input.textResult.TextChanged+=new EventHandler(textAnyPhone_TextChanged);//Auto format the number as the user types.
 			input.ShowDialog();
 			if(input.DialogResult!=DialogResult.OK) {
 				return;
