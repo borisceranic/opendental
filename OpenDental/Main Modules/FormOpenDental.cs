@@ -4893,6 +4893,10 @@ namespace OpenDental{
 		//File
 		private void menuItemPassword_Click(object sender,EventArgs e) {
 			//no security blocking because everyone is allowed to change their own password.
+			if(Security.CurUser.UserNumCEMT!=0) {
+				MsgBox.Show(this,"Use the CEMT tool to change your password.");
+				return;
+			}
 			FormUserPassword FormU=new FormUserPassword(false,Security.CurUser.UserName);
 			FormU.ShowDialog();
 			if(FormU.DialogResult==DialogResult.Cancel) {
