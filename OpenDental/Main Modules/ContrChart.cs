@@ -3110,9 +3110,6 @@ namespace OpenDental{
 					if(ToolBarMain.Buttons["HL7"]!=null) {
 						ToolBarMain.Buttons["HL7"].Enabled=false;
 					}
-					if(ToolBarMain.Buttons["MedLab"]!=null) {
-						ToolBarMain.Buttons["MedLab"].Enabled=false;
-					}
 				}
 			}
 		}
@@ -3313,9 +3310,6 @@ namespace OpenDental{
 				if(ToolBarMain.Buttons["HL7"]!=null) {
 					ToolBarMain.Buttons["HL7"].Enabled=false;
 				}
-				if(ToolBarMain.Buttons["MedLab"]!=null) {
-					ToolBarMain.Buttons["MedLab"].Enabled=false;
-				}
 				tabProc.Enabled = false;
 				butAddKey.Enabled=false;
 				butForeignKey.Enabled=false;
@@ -3433,9 +3427,6 @@ namespace OpenDental{
 				}
 				if(ToolBarMain.Buttons["HL7"]!=null) {
 					ToolBarMain.Buttons["HL7"].Enabled=true;
-				}
-				if(ToolBarMain.Buttons["MedLab"]!=null) {
-					ToolBarMain.Buttons["MedLab"].Enabled=true;
 				}
 				tabProc.Enabled=true;
 				butAddKey.Enabled=true;
