@@ -3326,8 +3326,17 @@ namespace OpenDental{
 					//sigBox.SetEncryptionMode(2);//high encryption
 					//sigBox.SetSigCompressionMode(2);//high compression
 					sigBox.SetSigString(ProcCur.Signature);
-					if(sigBox.NumberOfTabletPoints()==0) {
-						labelInvalidSig.Visible=true;
+					if(sigBox.NumberOfTabletPoints()==0) {  //Signature invalid.
+						//At this point we think the signature is invalid.  We must now recheck signature without replacing \r\n with \n.  This is because old 
+						//	signatures were captured with \r\n instead of \n, and updating to a newer version would invalidate all valid signatures.
+						sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
+						sigBox.SetSigString(ProcCur.Signature);
+						if(sigBox.NumberOfTabletPoints()==0) {  //Both signature checks were invalid.
+							labelInvalidSig.Visible=true;
+						}
+						else { //The first signature check was invalid, but the second was valid.
+							labelInvalidSig.Visible=false;
+						}
 					}
 					sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
 				}
