@@ -68,15 +68,6 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void Update(SmsMT smsMT){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsMT);
-				return;
-			}
-			Crud.SmsMTCrud.Update(smsMT);
-		}
-
-		///<summary></summary>
 		public static void Delete(long smsMTNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsMTNum);
@@ -86,6 +77,24 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
+
+		///<summary></summary>
+		public static void Update(SmsToMobile smsToMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsToMobile);
+				return;
+			}
+			Crud.SmsToMobileCrud.Update(smsToMobile);
+		}
+
+		///<summary>Gets one SmsToMobile from the db.</summary>
+		public static SmsToMobile GetMessageByGuid(string guid) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<SmsToMobile>(MethodBase.GetCurrentMethod(),guid);
+			}
+			string command="SELECT * FROM smstomobile WHERE GuidMessage='"+guid+"'";
+			return Crud.SmsToMobileCrud.SelectOne(command);
+		}
 
 		///<summary></summary>
 		public static long Insert(SmsToMobile smsMT) {
