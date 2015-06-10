@@ -8,8 +8,407 @@ namespace OpenDentBusiness {
 	public class RpProdInc {
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
+		public static DataSet GetDailyDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+			DataTable tableProduction=dataSet.Tables["tableProduction"];
+			DataTable tableAdj=dataSet.Tables["tableAdj"];
+			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
+			DataTable tablePay=dataSet.Tables["tablePay"];
+			DataTable tableIns=dataSet.Tables["tableIns"];
+			DataTable dt=new DataTable("Total");
+			dt.Columns.Add(new DataColumn("Date"));
+			dt.Columns.Add(new DataColumn("Name"));
+			dt.Columns.Add(new DataColumn("Description"));
+			dt.Columns.Add(new DataColumn("Production"));
+			dt.Columns.Add(new DataColumn("Adjust"));
+			dt.Columns.Add(new DataColumn("Writeoff"));
+			dt.Columns.Add(new DataColumn("Pt Income"));
+			dt.Columns.Add(new DataColumn("Ins Income"));
+			dt.Columns.Add(new DataColumn("Clinic"));
+			DataTable dtClinic=new DataTable("Clinic");
+			dtClinic.Columns.Add(new DataColumn("Date"));
+			dtClinic.Columns.Add(new DataColumn("Name"));
+			dtClinic.Columns.Add(new DataColumn("Description"));
+			dtClinic.Columns.Add(new DataColumn("Production"));
+			dtClinic.Columns.Add(new DataColumn("Adjust"));
+			dtClinic.Columns.Add(new DataColumn("Writeoff"));
+			dtClinic.Columns.Add(new DataColumn("Pt Income"));
+			dtClinic.Columns.Add(new DataColumn("Ins Income"));
+			dtClinic.Columns.Add(new DataColumn("Clinic"));
+			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
+			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
+				for(int i=0;i<tableProduction.Rows.Count;i++) {
+					if(PIn.Long(tableProduction.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
+						continue;
+					}
+					DataRow row=dtClinic.NewRow();
+					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[1]=tableProduction.Rows[i]["namelf"].ToString();
+					row[2]=tableProduction.Rows[i]["Description"].ToString();
+					row[3]=tableProduction.Rows[i]["Production"].ToString();
+					row[4]=0;
+					row[5]=0;
+					row[6]=0;
+					row[7]=0;
+					row[8]=tableProduction.Rows[i]["Clinic"].ToString();
+					dtClinic.Rows.Add(row);
+				}
+				for(int i=0;i<tableAdj.Rows.Count;i++) {
+					if(PIn.Long(tableAdj.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
+						continue;
+					}
+					DataRow row=dtClinic.NewRow();
+					row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[1]=tableAdj.Rows[i]["namelf"].ToString();
+					row[2]=tableAdj.Rows[i]["Description"].ToString();
+					row[3]=0;
+					row[4]=tableAdj.Rows[i]["AdjAmt"].ToString();
+					row[5]=0;
+					row[6]=0;
+					row[7]=0;
+					row[8]=tableAdj.Rows[i]["Clinic"].ToString();
+					dtClinic.Rows.Add(row);
+				}
+				for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
+					if(PIn.Long(tableInsWriteoff.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
+						continue;
+					}
+					DataRow row=dtClinic.NewRow();
+					row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
+					row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
+					row[3]=0;
+					row[4]=0;
+					row[5]=tableInsWriteoff.Rows[i]["WriteOff"].ToString();
+					row[6]=0;
+					row[7]=0;
+					row[8]=tableInsWriteoff.Rows[i]["Clinic"].ToString();
+					dtClinic.Rows.Add(row);
+				}
+				for(int i=0;i<tablePay.Rows.Count;i++) {
+					if(PIn.Long(tablePay.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
+						continue;
+					}
+					DataRow row=dtClinic.NewRow();
+					row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[1]=tablePay.Rows[i]["namelf"].ToString();
+					row[2]=tablePay.Rows[i]["Description"].ToString();
+					row[3]=0;
+					row[4]=0;
+					row[5]=0;
+					row[6]=tablePay.Rows[i]["PayAmt"].ToString();
+					row[7]=0;
+					row[8]=tablePay.Rows[i]["Clinic"].ToString();
+					dtClinic.Rows.Add(row);
+				}
+				for(int i=0;i<tableIns.Rows.Count;i++) {
+					if(PIn.Long(tableIns.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
+						continue;
+					}
+					DataRow row=dtClinic.NewRow();
+					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[1]=tableIns.Rows[i]["namelf"].ToString();
+					row[2]=tableIns.Rows[i]["Description"].ToString();
+					row[3]=0;
+					row[4]=0;
+					row[5]=0;
+					row[6]=0;
+					row[7]=tableIns.Rows[i]["InsPayAmt"].ToString();
+					row[8]=tableIns.Rows[i]["Clinic"].ToString();
+					dtClinic.Rows.Add(row);
+				}
+			}
+			//Totals table now.
+			for(int i=0;i<tableProduction.Rows.Count;i++) {
+				DataRow row=dt.NewRow();
+				row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[1]=tableProduction.Rows[i]["namelf"].ToString();
+				row[2]=tableProduction.Rows[i]["Description"].ToString();
+				row[3]=tableProduction.Rows[i]["Production"].ToString();
+				row[4]=0;
+				row[5]=0;
+				row[6]=0;
+				row[7]=0;
+				row[8]="";
+				dt.Rows.Add(row);
+			}
+			for(int i=0;i<tableAdj.Rows.Count;i++) {
+				DataRow row=dt.NewRow();
+				row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[1]=tableAdj.Rows[i]["namelf"].ToString();
+				row[2]=tableAdj.Rows[i]["Description"].ToString();
+				row[3]=0;
+				row[4]=tableAdj.Rows[i]["AdjAmt"].ToString();
+				row[5]=0;
+				row[6]=0;
+				row[7]=0;
+				row[8]="";
+				dt.Rows.Add(row);
+			}
+			for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
+				DataRow row=dt.NewRow();
+				row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
+				row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
+				row[3]=0;
+				row[4]=0;
+				row[5]=tableInsWriteoff.Rows[i]["WriteOff"].ToString();
+				row[6]=0;
+				row[7]=0;
+				row[8]="";
+				dt.Rows.Add(row);
+			}
+			for(int i=0;i<tablePay.Rows.Count;i++) {
+				DataRow row=dt.NewRow();
+				row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[1]=tablePay.Rows[i]["namelf"].ToString();
+				row[2]=tablePay.Rows[i]["Description"].ToString();
+				row[3]=0;
+				row[4]=0;
+				row[5]=0;
+				row[6]=tablePay.Rows[i]["PayAmt"].ToString();
+				row[7]=0;
+				row[8]="";
+				dt.Rows.Add(row);
+			}
+			for(int i=0;i<tableIns.Rows.Count;i++) {
+				DataRow row=dt.NewRow();
+				row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[1]=tableIns.Rows[i]["namelf"].ToString();
+				row[2]=tableIns.Rows[i]["Description"].ToString();
+				row[3]=0;
+				row[4]=0;
+				row[5]=0;
+				row[6]=0;
+				row[7]=tableIns.Rows[i]["InsPayAmt"].ToString();
+				row[8]="";
+				dt.Rows.Add(row);
+			}
+			List<DataRow> listDtRows=new List<DataRow>();
+			for(int i=0;i<dt.Rows.Count;i++) {
+				listDtRows.Add(dt.Rows[i]);
+			}
+			listDtRows.Sort(RowComparer);
+			DataTable tableSortedDt=dt.Clone();
+			tableSortedDt.Rows.Clear();
+			for(int i=0;i<listDtRows.Count;i++) {
+				tableSortedDt.Rows.Add(listDtRows[i].ItemArray);
+			}
+			List<DataRow> listDtClinicRows=new List<DataRow>();
+			for(int i=0;i<dtClinic.Rows.Count;i++) {
+				listDtClinicRows.Add(dtClinic.Rows[i]);
+			}
+			listDtClinicRows.Sort(RowComparer);
+			DataTable tableSortedDtClinic=dtClinic.Clone();
+			tableSortedDtClinic.Rows.Clear();
+			for(int i=0;i<listDtClinicRows.Count;i++) {
+				tableSortedDtClinic.Rows.Add(listDtClinicRows[i].ItemArray);
+				string clinicDesc=Clinics.GetDesc(PIn.Long(tableSortedDtClinic.Rows[i]["Clinic"].ToString()));
+				tableSortedDtClinic.Rows[i]["Clinic"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;//Replacing the ClinicNum with the actual desc.
+			}
+			DataSet ds=new DataSet("DailyData");
+			ds.Tables.Add(tableSortedDt);
+			if(listClinicNums.Count!=0) {
+				ds.Tables.Add(tableSortedDtClinic);
+			}
+			return ds;
+		}
+
+		///<summary>Returns a dataset that contains 5 tables used to generate the daily report.  if not using clinics then simply supply an empty list of clinicNums.</summary>
+		private static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+			}
+			//Procedures------------------------------------------------------------------------------
+			string whereProv="";
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereProv="AND provider.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			string whereClin="";
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			string command="SELECT "
+				+"procedurelog.ProcDate Date, "
+				+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName, ', '),patient.FName),' '),patient.MiddleI) namelf, "
+				+"procedurecode.Descript Description, "
+				+"provider.Abbr, "
+				+"procedurelog.ClinicNum Clinic, "
+				+"procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)-IFNULL(SUM(claimproc.WriteOff),0) Production, "
+				+"procedurelog.ProcNum "
+				+"FROM patient "
+				+"INNER JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "
+					+"AND procedurelog.ProcStatus='2' "
+					+"AND DATE(procedurelog.ProcDate) >= "+POut.Date(dateFrom)+" "
+					+"AND DATE(procedurelog.ProcDate) <= "+POut.Date(dateTo)+" "
+					+whereClin+" "
+				+"LEFT JOIN claimproc ON procedurelog.ProcNum=claimproc.ProcNum "
+					+"AND claimproc.Status='7' "
+				+"INNER JOIN provider ON procedurelog.ProvNum=provider.ProvNum "
+					+whereProv
+				+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+				+"GROUP BY procedurelog.ProcNum "
+				+"ORDER BY Date,namelf";
+			DataTable tableProduction=Db.GetTable(command);
+			tableProduction.TableName="tableProduction";
+			//Adjustments----------------------------------------------------------------------------
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin="AND adjustment.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT "
+				+"adjustment.AdjDate Date, "
+				+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName, ', '),patient.FName),' '),patient.MiddleI) namelf, "
+				+"definition.ItemName Description, "
+				+"provider.Abbr, "
+				+"adjustment.ClinicNum Clinic, "
+				+"adjustment.AdjAmt AdjAmt, "
+				+"adjustment.AdjNum "
+				+"FROM adjustment "
+				+"INNER JOIN patient ON adjustment.PatNum=patient.PatNum "
+				+"INNER JOIN definition ON adjustment.AdjType=definition.DefNum "
+				+"INNER JOIN provider ON adjustment.ProvNum=provider.ProvNum "
+					+whereProv
+				+"WHERE adjustment.AdjDate >= "+POut.Date(dateFrom)+" "
+					+"AND adjustment.AdjDate <= "+POut.Date(dateTo)+" "
+					+whereClin+" "
+				+"ORDER BY Date,namelf";
+			DataTable tableAdj=Db.GetTable(command);
+			tableAdj.TableName="tableAdj";
+			//InsWriteoff--------------------------------------------------------------------------
+			string whereInsWriteoffProvs="";
+			if(!hasAllProvs && listProvNums.Count>0) {
+				whereInsWriteoffProvs="AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			if(writeOffPay) {
+				command="SELECT claimproc.DateCP Date, "
+					+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) namelf, "
+					+"CONCAT(CONCAT(procedurecode.AbbrDesc,' '),carrier.CarrierName) Description, "//AbbrDesc might be null, which is ok.
+					+"provider.Abbr, "
+					+"claimproc.ClinicNum Clinic, "
+					+"-SUM(claimproc.WriteOff) WriteOff, "
+					+"claimproc.ClaimNum "
+					+"FROM claimproc "
+					+"LEFT JOIN patient ON claimproc.PatNum = patient.PatNum "
+					+"LEFT JOIN provider ON provider.ProvNum = claimproc.ProvNum "
+					+"LEFT JOIN insplan ON insplan.PlanNum = claimproc.PlanNum "
+					+"LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum "
+					+"LEFT JOIN procedurelog ON procedurelog.ProcNum=claimproc.ProcNum "
+					+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+					+"WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
+					+whereInsWriteoffProvs
+					+whereClin
+					+"AND claimproc.WriteOff > '.0001' "
+					+"AND claimproc.DateCP >= "+POut.Date(dateFrom)+" "
+					+"AND claimproc.DateCP <= "+POut.Date(dateTo)+" "
+					+"GROUP BY claimproc.ClaimProcNum "
+					+"ORDER BY Date,namelf";
+			}
+			else {
+				command="SELECT claimproc.ProcDate Date,"
+					+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) namelf,"
+					+"CONCAT(CONCAT(procedurecode.AbbrDesc,' '),carrier.CarrierName) Description,"
+					+"provider.Abbr,"
+					+"claimproc.ClinicNum Clinic,"
+					+"-SUM(claimproc.WriteOff) WriteOff,"
+					+"claimproc.ClaimNum "
+					+"FROM claimproc "
+					+"LEFT JOIN patient ON claimproc.PatNum = patient.PatNum "
+					+"LEFT JOIN provider ON provider.ProvNum = claimproc.ProvNum "
+					+"LEFT JOIN insplan ON insplan.PlanNum = claimproc.PlanNum "
+					+"LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum "
+					+"LEFT JOIN procedurelog ON procedurelog.ProcNum=claimproc.ProcNum "
+					+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+					+"WHERE (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) "//received or supplemental or notreceived
+					+whereInsWriteoffProvs
+					+whereClin
+					+"AND claimproc.WriteOff > '.0001' "
+					+"AND claimproc.ProcDate >= "+POut.Date(dateFrom)+" "
+					+"AND claimproc.ProcDate <= "+POut.Date(dateTo)+" "
+					+"GROUP BY claimproc.ClaimProcNum "
+					+"ORDER BY Date,namelf";
+			}
+			DataTable tableInsWriteoff=Db.GetTable(command);
+			tableInsWriteoff.TableName="tableInsWriteoff";
+			//PtIncome--------------------------------------------------------------------------------
+			string wherePtIncomeProvs="";
+			if(!hasAllProvs && listProvNums.Count>0) {
+				wherePtIncomeProvs="AND paysplit.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND paysplit.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT "
+				+"paysplit.DatePay Date, "
+				+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) namelf, "
+				+"definition.ItemName Description, "
+				+"provider.Abbr, "
+				+"paysplit.ClinicNum Clinic, "
+				+"SUM(paysplit.SplitAmt) PayAmt, "
+				+"payment.PayNum "
+				+"FROM paysplit "
+				+"LEFT JOIN payment ON payment.PayNum=paysplit.PayNum "
+				+"LEFT JOIN patient ON patient.PatNum=paysplit.PatNum "
+				+"LEFT JOIN provider ON provider.ProvNum=paysplit.ProvNum "
+				+"LEFT JOIN definition ON payment.PayType=definition.DefNum "
+				+"WHERE payment.PayDate >= "+POut.Date(dateFrom)+" "
+				+"AND payment.PayDate <= "+POut.Date(dateTo)+" "
+				+wherePtIncomeProvs
+				+whereClin
+				+"GROUP BY paysplit.PatNum,paysplit.ProvNum,paysplit.ClinicNum,PayType,paysplit.DatePay "
+				+"ORDER BY Date,namelf";
+			DataTable tablePay=Db.GetTable(command);
+			tablePay.TableName="tablePay";
+			//InsIncome---------------------------------------------------------------------------------
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT "
+				+"claimpayment.CheckDate Date, "
+				+"CONCAT(CONCAT(CONCAT(CONCAT(patient.LName,', '),patient.FName),' '),patient.MiddleI) namelf, "
+				+"carrier.CarrierName Description, "
+				+"provider.Abbr, "
+				+"claimproc.ClinicNum Clinic, "
+				+"SUM(claimproc.InsPayAmt) InsPayAmt, "
+				+"claimproc.ClaimNum "
+				+"FROM claimproc "
+				+"INNER JOIN patient ON claimproc.PatNum=patient.PatNum "
+				+"INNER JOIN insplan ON claimproc.PlanNum=insplan.PlanNum "
+				+"INNER JOIN carrier ON insplan.CarrierNum=carrier.CarrierNum "
+				+"INNER JOIN provider ON claimproc.ProvNum=provider.ProvNum "
+					+whereProv+" "
+				+"INNER JOIN claimpayment ON claimproc.ClaimPaymentNum=claimpayment.ClaimPaymentNum "
+				+"WHERE (claimproc.Status=1 OR claimproc.Status=4) "//received or supplemental
+					+"AND claimpayment.CheckDate >= "+POut.Date(dateFrom)+" "
+					+"AND claimpayment.CheckDate <= "+POut.Date(dateTo)+" "
+					+whereClin+" "
+				+"GROUP BY claimproc.PatNum,claimproc.ProvNum,claimproc.PlanNum,claimproc.ClinicNum,claimpayment.CheckDate "
+				+"ORDER BY Date,namelf";
+			DataTable tableIns=Db.GetTable(command);
+			tableIns.TableName="tableIns";
+			DataSet dataSet=new DataSet();
+			dataSet.Tables.Add(tableProduction);
+			dataSet.Tables.Add(tableAdj);
+			dataSet.Tables.Add(tableInsWriteoff);
+			dataSet.Tables.Add(tablePay);
+			dataSet.Tables.Add(tableIns);
+			return dataSet;
+		}
+
+		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
+		public static DataSet GetMonthlyDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			return GetDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,false);
+		}
+
+		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
 		public static DataSet GetAnnualDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			DataSet dataSet=GetProdIncAnnualDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+			return GetDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,true);
+		}
+
+		private static DataSet GetDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics, bool isAnnual) {
+			DataSet dataSet=GetProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -43,14 +442,32 @@ namespace OpenDentBusiness {
 			dtClinic.Columns.Add(new DataColumn("Clinic"));
 			//length of array is number of months between the two dates plus one.
 			//The from date and to date will not be more than one year and must will be within the same year due to FormRpProdInc UI validation enforcement.
-			DateTime[] dates=new DateTime[dateTo.Month-dateFrom.Month+1];
+			DateTime[] dates=null;
+			if(isAnnual) {
+				dates=new DateTime[dateTo.Month-dateFrom.Month+1];//Make a DateTime array representing one position for each month in the report.  User can't specify different years in the report.
+			}
+			else {
+				dates=new DateTime[dateTo.Subtract(dateFrom).Days+1];//Make a DateTime array with one position for each day in the report.
+			}
 			//Get a list of clinics so that we have access to their descriptions for the report.
 			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
-			for(int it=0;it<listClinicNums.Count;it++) {
-				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop
-					dates[i]=dateFrom.AddMonths(i);//only the month and year are important
+			bool hasData;
+			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
+				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop for annual.  Loop through the DateTime array, each position represents one date in the report.
+					hasData=false;
+					if(isAnnual) {
+						dates[i]=dateFrom.AddMonths(i);//only the month and year are important.  For each month slot, add i to the dateFrom and put it in the array.
+					}
+					else {
+						dates[i]=dateFrom.AddDays(i);//Monthly/Daily report, add a day
+					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=dates[i].ToString("MMM yy");//JAN 14
+					if(isAnnual) {
+						row[0]=dates[i].ToString("MMM yyyy");//JAN 2014
+					}
+					else {
+						row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
+					}
 					production=0;
 					adjust=0;
 					inswriteoff=0;	//spk 5/19/05
@@ -66,9 +483,15 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Year
-								&& dates[i].Month==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Month) 
+								&& dates[i].Month==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Month) //If the proc was in the month and year that we're making a row for
 						{
-							production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+							if(isAnnual) {
+								production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+							}
+							else if(dates[i].Day==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Day) {//If the proc is also on the day (Only monthly report)
+								production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+								hasData=true;
+							}
 						}
 					}
 					for(int j=0;j<tableAdj.Rows.Count;j++) {
@@ -79,9 +502,15 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Year
-								&& dates[i].Month==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Month) 
+								&& dates[i].Month==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Month) //If the adjustment was in the month and year that we're making a row for.
 						{
-							adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+							if(isAnnual) {
+								adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+							}
+							else if(dates[i].Day==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Day) {//If the adjustment is also on the day (Only monthly report)
+								adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+								hasData=true;
+							}
 						}
 					}
 					for(int j=0;j<tableInsWriteoff.Rows.Count;j++) {
@@ -92,9 +521,15 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Year
-								&& dates[i].Month==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Month) 
+								&& dates[i].Month==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Month) //If the claim writeoff was in the month and year that we're making a row for.
 						{
-							inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
+							if(isAnnual) {
+								inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
+							}
+							else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {//If the claim is also on the day (Only monthly report)
+								inswriteoff+=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
+								hasData=true;
+							}
 						}
 					}
 					for(int j=0;j<tablePay.Rows.Count;j++) {
@@ -105,9 +540,15 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Year
-								&& dates[i].Month==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Month) 
+								&& dates[i].Month==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Month) //If the payment was in the month and year that we're making a row for.
 						{
-							ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+							if(isAnnual) {
+								ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+							}
+							else if(dates[i].Day==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Day) {//If the payment is also on the day (Only monthly report)
+								ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+								hasData=true;
+							}
 						}
 					}
 					for(int j=0;j<tableIns.Rows.Count;j++) {
@@ -118,9 +559,15 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Year
-								&& dates[i].Month==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Month) 
+								&& dates[i].Month==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Month) //If the ins payment was in the month and year that we're making a row for.
 						{
-							insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+							if(isAnnual) {
+								insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+							}
+							else if(dates[i].Day==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Day) {//If the ins payment is also on the day (Only monthly report)
+								insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+								hasData=true;
+							}
 						}
 					}
 					totalproduction=production+adjust+inswriteoff;
@@ -134,13 +581,29 @@ namespace OpenDentBusiness {
 					row[6]=insincome.ToString("n");
 					row[7]=totalincome.ToString("n");
 					row[8]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
-					dtClinic.Rows.Add(row);  //adds row to table Q
+					if(isAnnual) {
+						dtClinic.Rows.Add(row);  //adds row to table
+					}
+					else if(hasData) {
+						dtClinic.Rows.Add(row);//prevents adding row to monthly report if there is no data in it.
+					}
 				}
 			}
 			for(int i=0;i<dates.Length;i++) {//usually 12 months in loop
-				dates[i]=dateFrom.AddMonths(i);//only the month and year are important
+				hasData=false;
+				if(isAnnual) {
+					dates[i]=dateFrom.AddMonths(i);//only the month and year are important
+				}
+				else {
+					dates[i]=dateFrom.AddDays(i);
+				}
 				DataRow row=dt.NewRow();
-				row[0]=dates[i].ToString("MMM yy");//JAN 14
+				if(isAnnual) {
+					row[0]=dates[i].ToString("MMM yyyy");//JAN 2014
+				}
+				else {
+					row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
+				}
 				production=0;
 				adjust=0;
 				inswriteoff=0;	//spk 5/19/05
@@ -152,35 +615,65 @@ namespace OpenDentBusiness {
 					if(dates[i].Year==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Year
 						&& dates[i].Month==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Month) 
 					{
-						production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+						if(isAnnual) {
+							production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+						}
+						else if(dates[i].Day==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Day) {//If the proc is also on the day (Only monthly report)
+							production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
+							hasData=true;
+						}
 					}
 				}
 				for(int j=0;j<tableAdj.Rows.Count;j++) {
 					if(dates[i].Year==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Year
 						&& dates[i].Month==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Month) 
 					{
-						adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+						if(isAnnual) {
+							adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+						}
+						else if(dates[i].Day==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Day) {
+							adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
+							hasData=true;
+						}
 					}
 				}
 				for(int j=0;j<tableInsWriteoff.Rows.Count;j++) {
 					if(dates[i].Year==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Year
 						&& dates[i].Month==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Month) 
 					{
-						inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
+						if(isAnnual) {
+							inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
+						}
+						else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {
+							inswriteoff+=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
+							hasData=true;
+						}
 					}
 				}
 				for(int j=0;j<tablePay.Rows.Count;j++) {
 					if(dates[i].Year==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Year
 						&& dates[i].Month==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Month) 
 					{
-						ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+						if(isAnnual) {
+							ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+						}
+						else if(dates[i].Day==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Day) {
+							ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
+							hasData=true;
+						}
 					}
 				}
 				for(int j=0;j<tableIns.Rows.Count;j++) {
 					if(dates[i].Year==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Year
 						&& dates[i].Month==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Month) 
 					{
-						insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+						if(isAnnual) {
+							insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+						}
+						else if(dates[i].Day==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Day) {
+							insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
+							hasData=true;
+						}
 					}
 				}
 				totalproduction=production+adjust+inswriteoff;
@@ -192,9 +685,20 @@ namespace OpenDentBusiness {
 				row[5]=ptincome.ToString("n");
 				row[6]=insincome.ToString("n");
 				row[7]=totalincome.ToString("n");
-				dt.Rows.Add(row);
+				if(isAnnual) {
+					dt.Rows.Add(row);
+				}
+				else if(hasData) {
+					dt.Rows.Add(row);//prevents adding row if there is no data in the monthly report.
+				}
 			}
-			DataSet ds=new DataSet("AnnualData");
+			DataSet ds=null;
+			if(isAnnual) {
+				ds=new DataSet("AnnualData");
+			}
+			else {
+				ds=new DataSet("MonthlyData");
+			}
 			ds.Tables.Add(dt);
 			if(listClinicNums.Count!=0) {
 				ds.Tables.Add(dtClinic);
@@ -202,10 +706,10 @@ namespace OpenDentBusiness {
 			return ds;
 		}
 
-		///<summary>Returns a dataset that contains 5 tables used to generate the annual report. If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetProdIncAnnualDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		///<summary>Returns a dataset that contains 5 tables used to generate the annual or monthly report. If not using clinics then supply an empty list of clinicNums.</summary>
+		private static DataSet GetProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool isAnnual) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";
@@ -229,8 +733,11 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND procedurelog.ProcDate >= " +POut.Date(dateFrom)+" "
 				+"AND procedurelog.ProcDate <= " +POut.Date(dateTo)+" "
-				+"GROUP BY MONTH(procedurelog.ProcDate),ClinicNum "
-				+"ORDER BY ClinicNum,ProcDate";
+				+"GROUP BY ClinicNum,MONTH(procedurelog.ProcDate)";
+			if(!isAnnual) {
+				command+=",DAY(procedurelog.ProcDate)";
+			}
+			command+=" ORDER BY ClinicNum,ProcDate";
 			DataTable tableProduction=Db.GetTable(command);
 			tableProduction.TableName="tableProduction";
 			//Adjustments----------------------------------------------------------------------------
@@ -249,8 +756,11 @@ namespace OpenDentBusiness {
 				+"AND adjustment.AdjDate <= "+POut.Date(dateTo)+" "
 				+whereProv
 				+whereClin
-				+"GROUP BY MONTH(adjustment.AdjDate),ClinicNum "
-				+"ORDER BY ClinicNum,ProcDate";
+				+"GROUP BY ClinicNum,MONTH(adjustment.AdjDate)";
+			if(!isAnnual) {
+				command+=",DAY(adjustment.AdjDate)";
+			}
+			command+=" ORDER BY ClinicNum,AdjDate";
 			DataTable tableAdj=Db.GetTable(command);
 			tableAdj.TableName="tableAdj";
 			//TableInsWriteoff--------------------------------------------------------------------------
@@ -271,8 +781,11 @@ namespace OpenDentBusiness {
 					+whereProv
 					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4) "//Received or supplemental
-					+"GROUP BY MONTH(claimproc.DateCP),ClinicNum "
-					+"ORDER BY ClinicNum,DateCP";
+					+"GROUP BY ClinicNum,MONTH(claimproc.DateCP)";
+				if(!isAnnual) {
+					command+=",DAY(claimproc.DateCP)";
+				}
+				command+=" ORDER BY ClinicNum,DateCP";
 			}
 			else {
 				command="SELECT "
@@ -285,8 +798,11 @@ namespace OpenDentBusiness {
 					+whereProv
 					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) " //received or supplemental or notreceived
-					+"GROUP BY MONTH(claimproc.ProcDate),ClinicNum "
-					+"ORDER BY ClinicNum,ProcDate";
+					+"GROUP BY ClinicNum,MONTH(claimproc.ProcDate)";
+				if(!isAnnual) {
+					command+=",DAY(claimproc.ProcDate)";
+				}
+				command+=" ORDER BY ClinicNum,ProcDate";
 			}
 			DataTable tableInsWriteoff=Db.GetTable(command);
 			tableInsWriteoff.TableName="tableInsWriteoff";
@@ -307,8 +823,11 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND paysplit.DatePay >= "+POut.Date(dateFrom)+" "
 				+"AND paysplit.DatePay <= "+POut.Date(dateTo)+" "
-				+"GROUP BY MONTH(paysplit.DatePay),ClinicNum "
-				+"ORDER BY ClinicNum,DatePay";
+				+"GROUP BY ClinicNum,MONTH(paysplit.DatePay)";
+				if(!isAnnual) {
+					command+=",DAY(paysplit.DatePay)";
+				}
+				command+=" ORDER BY ClinicNum,DatePay";
 			DataTable tablePay=Db.GetTable(command);
 			tablePay.TableName="tablePay";
 			//InsIncome---------------------------------------------------------------------------------
@@ -335,6 +854,26 @@ namespace OpenDentBusiness {
 			dataSet.Tables.Add(tablePay);
 			dataSet.Tables.Add(tableIns);
 			return dataSet;
+		}
+
+		private static int RowComparer(DataRow x,DataRow y) {
+			string xClinic=x["Clinic"].ToString();
+			string yClinic=y["Clinic"].ToString();
+			if(xClinic!=yClinic) {//Sort by clinic first, if no clinic then they'll be the same empty string.
+				return String.Compare(xClinic,yClinic);
+			}
+			DateTime xDate=PIn.Date(x["Date"].ToString());
+			DateTime yDate=PIn.Date(y["Date"].ToString());
+			if(xDate!=yDate) {//Then by date
+				return DateTime.Compare(xDate,yDate);
+			}
+			string xName=x["Name"].ToString();
+			string yName=y["Name"].ToString();
+			if(xName!=yName) {//Then by name
+				return String.Compare(xName,yName);
+			}
+			//We might want to include transaction type here but procedures have all different kinds of descriptions.
+			return 0;
 		}
 
 	}
