@@ -13,7 +13,9 @@ namespace OpenDentBusiness{
 		public string Description;
 		///<summary>Enum:ModeTxHL7 File, TcpIp.</summary>
 		public ModeTxHL7 ModeTx;
-		///<summary>Only used for File mode</summary>
+		///<summary>Used for File mode and for SFTP mode.  For file mode, this is the folder for inbound HL7 messages.
+		///For SFTP mode, this is the relative path from the SFTP root directory to the directory where the result messages can be found.
+		///The root or home directory '.' can be included in the path but is not necessary.  Examples: /./results or /results or results.</summary>
 		public string IncomingFolder;
 		///<summary>Only used for File mode</summary>
 		public string OutgoingFolder;
