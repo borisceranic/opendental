@@ -396,9 +396,7 @@ namespace OpenDentBusiness{
 			if(subscriberId!=""){
 				command+="AND inssub.SubscriberId LIKE '%"+POut.String(subscriberId)+"%' ";
 			}
-			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
-				command+="GROUP BY patient.PatNum ";
-			}
+			command+="GROUP BY patient.PatNum ";
 			command+="ORDER BY LName,FName ";
 			if(limit){
 				command=DbHelper.LimitOrderBy(command,40);
