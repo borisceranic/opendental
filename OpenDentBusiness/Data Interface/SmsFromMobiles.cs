@@ -67,14 +67,7 @@ namespace OpenDentBusiness{
 			return Crud.SmsFromMobileCrud.SelectOne(smsFromMobileNum);
 		}
 		
-		///<summary></summary>
-		public static long Insert(SmsFromMobile smsFromMobile) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				smsFromMobile.SmsFromMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsFromMobile);
-				return smsFromMobile.SmsFromMobileNum;
-			}
-			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
-		}
+
 
 		///<summary></summary>
 		public static void Update(SmsFromMobile smsFromMobile){
@@ -95,6 +88,15 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
+
+		///<summary></summary>
+		public static long Insert(SmsFromMobile smsFromMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				smsFromMobile.SmsFromMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsFromMobile);
+				return smsFromMobile.SmsFromMobileNum;
+			}
+			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
+		}
 
 		///<summary>Returns the number of messages which have not yet been read.  If there are no unread messages, then empty string is returned.  If more than 99 messages are unread, then "99" is returned.  The count limit is 99, because only 2 digits can fit in the SMS notification text.</summary>
 		public static string GetSmsNotification() {
