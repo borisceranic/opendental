@@ -13,6 +13,8 @@ namespace OpenDental {
 		public string WirelessPhone;
 		public string Message;
 		public YN TxtMsgOk;
+		///<summary>Set to false to use CallFire, true to use integrated Texting.</summary>
+		public bool IsIntegratedTexting;
 		
 		public FormTxtMsgEdit() {
 			InitializeComponent();
@@ -24,8 +26,10 @@ namespace OpenDental {
 			textMessage.Text=Message;
 		}
 
-		/// <summary>May be called from other parts of the program without showing this form. You must still create an instance of this form though. Checks CallFire bridge, if it is OK to send a text, etc. (Buttons to load this form are usually  disabled if it is not OK, but this is needed for Confirmations, Recalls, etc.) </summary>
-		public bool SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk) {
+		/// <summary>May be called from other parts of the program without showing this form. You must still create an instance of this form though. 
+		/// Checks CallFire bridge, if it is OK to send a text, etc. (Buttons to load this form are usually disabled if it is not OK, 
+		/// but this is needed for Confirmations, Recalls, etc.) </summary>
+		public bool SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk,long clinicNum) {
 			if(Plugins.HookMethod(this,"FormTxtMsgEdit.SendText_Start",patNum,wirelessPhone,message,txtMsgOk)) {
 				return false;
 			}
@@ -36,7 +40,19 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a phone number.");
 				return false;
 			}
-			if(!Programs.IsEnabled(ProgramName.CallFire)) {
+			if(IsIntegratedTexting) {
+				if(clinicNum==0 && PrefC.GetDateT(PrefName.SmsContractDate).Year<1880) {
+					//Technically this should be impossible and should never happen.
+					MsgBox.Show(this,"Integrated Texting has not been enabled from the eServices setup window.");
+					return false;
+				}
+				else if(!Clinics.IsTextingEnabled(clinicNum)) {
+					//This is likely to happen a few times per office until they setup texting properly.
+					MsgBox.Show(this,"Integrated Texting has not been enabled for this clinic from the eServices setup window.");
+					return false;
+				}
+			}
+			else if(!Programs.IsEnabled(ProgramName.CallFire)) {
 				MsgBox.Show(this,"CallFire Program Link must be enabled.");
 				return false;
 			}
@@ -52,6 +68,21 @@ namespace OpenDental {
 				MsgBox.Show(this,"Text length must be less than 160 characters.");
 				return false;
 			}
+			if(IsIntegratedTexting) {
+				try {
+					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);
+				}
+				catch(Exception ex) {
+					MsgBox.Show(this,ex.Message);
+					return false;
+				}
+			}
+			else {
+				return SendCallFire(patNum,wirelessPhone,message);
+			}
+		}
+
+		private bool SendCallFire(long patNum,string wirelessPhone,string message) {
 			string key=ProgramProperties.GetPropVal(ProgramName.CallFire,"Key From CallFire");
 			string msg=wirelessPhone+","+message.Replace(",","");//ph#,msg Commas in msg cause error.
 			try {
@@ -85,7 +116,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a message first.");
 				return;
 			}
-			if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk)) {
+			if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk,SmsPhones.GetClinicNumForTexting(PatNum))) {
 				return;//Allow the user to try again.  A message was already shown to the user inside SendText().
 			}
 			DialogResult=DialogResult.OK;

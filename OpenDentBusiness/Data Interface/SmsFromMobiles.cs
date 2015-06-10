@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -89,15 +90,6 @@ namespace OpenDentBusiness{
 		}
 		*/
 
-		///<summary></summary>
-		public static long Insert(SmsFromMobile smsFromMobile) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				smsFromMobile.SmsFromMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsFromMobile);
-				return smsFromMobile.SmsFromMobileNum;
-			}
-			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
-		}
-
 		///<summary>Returns the number of messages which have not yet been read.  If there are no unread messages, then empty string is returned.  If more than 99 messages are unread, then "99" is returned.  The count limit is 99, because only 2 digits can fit in the SMS notification text.</summary>
 		public static string GetSmsNotification() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -112,6 +104,15 @@ namespace OpenDentBusiness{
 				return "99";
 			}
 			return smsUnreadCount.ToString();
+		}
+
+		///<summary>Call ProcessInboundSms instead.</summary>
+		private static long Insert(SmsFromMobile smsFromMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				smsFromMobile.SmsFromMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsFromMobile);
+				return smsFromMobile.SmsFromMobileNum;
+			}
+			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
 		}
 
 		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
@@ -149,6 +150,38 @@ namespace OpenDentBusiness{
 			}
 			return Crud.SmsFromMobileCrud.SelectMany(command);
 		}
+		
+		///<summary>Attempts to find exact match for patient. If found, creates commlog, associates Patnum, and inserts into DB.
+		///Otherwise, it simply inserts SmsFromMobiles into the DB. ClinicNum should have already been set before calling this function.</summary>
+		public static void ProcessInboundSms(List<SmsFromMobile> listMessages) {
+			if(listMessages==null || listMessages.Count==0) {
+				return;
+			}
+			for(int i=0;i<listMessages.Count;i++) {
+				SmsFromMobile sms=listMessages[i];
+				sms.DateTimeReceived=DateTime.Now;
+				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber);
+				//We could not find definitive match, either 0 matches found, or more than one match found
+				if(listPatNums.Count!=1) {
+					Insert(sms);
+					continue;
+				}
+				//We found exactly one match
+				//associate patnum, create commlog, insert message
+				sms.PatNum=listPatNums[0];
+				Commlog comm=new Commlog() {
+					 CommDateTime=sms.DateTimeReceived,
+					 DateTimeEnd=sms.DateTimeReceived.AddSeconds(1),
+					 Mode_= CommItemMode.Text,
+					 Note=sms.MsgText,
+					 PatNum=sms.PatNum,
+					 //CommType=??,
+					 SentOrReceived= CommSentOrReceived.Received
+				};
+				sms.CommlogNum=Commlogs.Insert(comm);
+				Insert(sms);
+			}
+		}
 
 		public static string GetSmsFromStatusDescript(SmsFromStatus smsFromStatus) {
 			//No need to check RemotingRole; no call to db.
@@ -162,6 +195,22 @@ namespace OpenDentBusiness{
 				return "Junk";
 			}
 			return "";
+		}
+
+		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
+		public static List<long> FindPatNums(string PhonePat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),PhonePat);
+			}
+			List<long> listPatNums=new List<long>();
+			try {
+				string command="SELECT PatNum FROM phonenumber WHERE PhoneNumberVal='"+POut.String(PhonePat)+"'";
+				listPatNums = Db.GetListLong(command);
+				command="SELECT PatNum FROM patient WHERE HmPhone='"+POut.String(PhonePat)+"' OR WkPhone='"+POut.String(PhonePat)+"' OR WirelessPhone='"+POut.String(PhonePat)+"'";
+				listPatNums.AddRange(Db.GetListLong(command));
+			}
+			catch {	}
+			return listPatNums.Distinct().ToList();
 		}
 
 	}

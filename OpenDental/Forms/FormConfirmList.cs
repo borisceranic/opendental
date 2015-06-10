@@ -1076,6 +1076,15 @@ namespace OpenDental{
 					gridMain.SetSelected(gridMain.SelectedIndices[i],false);
 					continue;
 				}
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && SmsPhones.IsIntegratedTextingEnabled()){//using clinics with Integrated texting must have a non-zero clinic num.
+					patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+					long clinicNum=SmsPhones.GetClinicNumForTexting(patNum);
+					if(clinicNum==0 || Clinics.GetClinic(clinicNum).SmsContractDate.Year<1880) {//no clinic or assigned clinic is not enabled.
+						skipped++;
+						gridMain.SetSelected(gridMain.SelectedIndices[i],false);
+						continue;
+					}
+				}
 			}
 			if(gridMain.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"None of the selected patients have wireless phone numbers and are OK to text.");
@@ -1093,6 +1102,7 @@ namespace OpenDental{
 			//Appointment apt;
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				long clinicNum=SmsPhones.GetClinicNumForTexting(patNum);
 				wirelessPhone=PIn.String(Table.Rows[gridMain.SelectedIndices[i]]["WirelessPhone"].ToString());
 				txtMsgOk=((YN)PIn.Int(Table.Rows[gridMain.SelectedIndices[i]]["TxtMsgOk"].ToString()));
 				message=PrefC.GetString(PrefName.ConfirmTextMessage);
@@ -1100,7 +1110,7 @@ namespace OpenDental{
 				message=message.Replace("[NameFL]",Table.Rows[gridMain.SelectedIndices[i]]["nameFL"].ToString());
 				message=message.Replace("[date]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
 				message=message.Replace("[time]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
-				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk)) {
+				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk,clinicNum)) {
 					Appointments.SetConfirmed(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
 				}
 			}

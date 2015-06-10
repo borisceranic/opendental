@@ -306,6 +306,15 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		public static bool IsTextingEnabled(long clinicNum) {
+			Clinic clinic=GetClinic(clinicNum);
+			if(clinic==null) {
+				return false;
+			}
+			return clinic.SmsContractDate.Year>1880;
+		}
+
+
 	}
 	
 

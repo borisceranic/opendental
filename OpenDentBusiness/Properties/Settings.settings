@@ -5,5 +5,8 @@
     <Setting Name="OpenDentBusiness_OpenDentalServer_ServiceMain" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://localhost/OpenDentalServer/ServiceMain.asmx</Value>
     </Setting>
+    <Setting Name="OpenDentBusiness_WebServiceMainHQ_WebServiceMainHQ" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

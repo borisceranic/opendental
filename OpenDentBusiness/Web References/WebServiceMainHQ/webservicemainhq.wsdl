@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="https://www.opendental.com/OpenDentalWebServiceHQ/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/">
+      <s:element name="SmsSend">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SmsSendResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SmsSendResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SmsSignAgreement">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SmsSignAgreementResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SmsSignAgreementResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SmsCancelService">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SmsCancelServiceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SmsCancelServiceResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="SmsSendSoapIn">
+    <wsdl:part name="parameters" element="tns:SmsSend" />
+  </wsdl:message>
+  <wsdl:message name="SmsSendSoapOut">
+    <wsdl:part name="parameters" element="tns:SmsSendResponse" />
+  </wsdl:message>
+  <wsdl:message name="SmsSignAgreementSoapIn">
+    <wsdl:part name="parameters" element="tns:SmsSignAgreement" />
+  </wsdl:message>
+  <wsdl:message name="SmsSignAgreementSoapOut">
+    <wsdl:part name="parameters" element="tns:SmsSignAgreementResponse" />
+  </wsdl:message>
+  <wsdl:message name="SmsCancelServiceSoapIn">
+    <wsdl:part name="parameters" element="tns:SmsCancelService" />
+  </wsdl:message>
+  <wsdl:message name="SmsCancelServiceSoapOut">
+    <wsdl:part name="parameters" element="tns:SmsCancelServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="SmsSendHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SmsSendHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="SmsSignAgreementHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SmsSignAgreementHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="SmsCancelServiceHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SmsCancelServiceHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="WebServiceMainHQSoap">
+    <wsdl:operation name="SmsSend">
+      <wsdl:input message="tns:SmsSendSoapIn" />
+      <wsdl:output message="tns:SmsSendSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SmsSignAgreement">
+      <wsdl:input message="tns:SmsSignAgreementSoapIn" />
+      <wsdl:output message="tns:SmsSignAgreementSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SmsCancelService">
+      <wsdl:input message="tns:SmsCancelServiceSoapIn" />
+      <wsdl:output message="tns:SmsCancelServiceSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="WebServiceMainHQHttpPost">
+    <wsdl:operation name="SmsSend">
+      <wsdl:input message="tns:SmsSendHttpPostIn" />
+      <wsdl:output message="tns:SmsSendHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SmsSignAgreement">
+      <wsdl:input message="tns:SmsSignAgreementHttpPostIn" />
+      <wsdl:output message="tns:SmsSignAgreementHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SmsCancelService">
+      <wsdl:input message="tns:SmsCancelServiceHttpPostIn" />
+      <wsdl:output message="tns:SmsCancelServiceHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WebServiceMainHQSoap" type="tns:WebServiceMainHQSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SmsSend">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsSend" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsSignAgreement">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsSignAgreement" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsCancelService">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsCancelService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WebServiceMainHQSoap12" type="tns:WebServiceMainHQSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SmsSend">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsSend" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsSignAgreement">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsSignAgreement" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsCancelService">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsCancelService" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WebServiceMainHQHttpPost" type="tns:WebServiceMainHQHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="SmsSend">
+      <http:operation location="/SmsSend" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsSignAgreement">
+      <http:operation location="/SmsSignAgreement" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SmsCancelService">
+      <http:operation location="/SmsCancelService" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WebServiceMainHQ">
+    <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
+      <soap:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
+      <soap12:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
+      <http:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

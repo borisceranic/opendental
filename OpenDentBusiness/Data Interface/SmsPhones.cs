@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -113,22 +115,30 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets sms phones when not using clinics.</summary>
 		public static List<SmsPhone> GetForPractice() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsPhone>>(MethodBase.GetCurrentMethod());
-			}
-			string command= "SELECT * FROM smsvln WHERE ClinicNum=0";
-			return Crud.SmsPhoneCrud.SelectMany(command);
+			//No remoting role check, No call to database.
+			//Get for practice is just getting for clinic num 0
+			return GetForClinics(new List<Clinic>() { new Clinic() });
 		}
-		
+
 		///<summary>Returns usage for each of the phone numbers passed in. the list of int's are counts of messages 
 		///for [SentAllTime],[SentLastMonth],[SentThisMonth],[CostThisMonth],[RcvdAllTime],[RcvdLastMonth],[RcvdThisMonth],[CostThisMonth].</summary>
-		public static Dictionary<string,List<double>> GetSMSUsage(List<SmsPhone> phones) {
+		public static Dictionary<string,Dictionary<string,double>> GetSmsUsageLocal(List<SmsPhone> phones) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Dictionary<string,List<double>>>(MethodBase.GetCurrentMethod(),phones);
+				return Meth.GetObject<Dictionary<string,Dictionary<string,double>>>(MethodBase.GetCurrentMethod(),phones);
 			}
-			Dictionary<string,List<double>> retVal=new Dictionary<string,List<double>>();
+			//Dictionary<string,List<double>> retVal=new Dictionary<string,List<double>>();
+			Dictionary<string,Dictionary<string,double>> retVal=new Dictionary<string,Dictionary<string,double>>();
 			foreach(SmsPhone phone in phones) {
-				retVal.Add(phone.PhoneNumber,new List<double> { 0,0,0,0,0,0,0,0 });//Initialize values to zero here. Important, otherwise we can get jagged arrays.
+				retVal.Add(phone.PhoneNumber,new Dictionary<string,double>());
+				//Initialize values to zero here. Important, otherwise we can get jagged arrays.
+				retVal[phone.PhoneNumber].Add("SentAllTime",0);
+				retVal[phone.PhoneNumber].Add("SentLastMonth",0);
+				retVal[phone.PhoneNumber].Add("SentThisMonth",0);
+				retVal[phone.PhoneNumber].Add("SentThisMonthCost",0);
+				retVal[phone.PhoneNumber].Add("InboundAllTime",0);
+				retVal[phone.PhoneNumber].Add("InboundLastMonth",0);
+				retVal[phone.PhoneNumber].Add("InboundThisMonth",0);
+				retVal[phone.PhoneNumber].Add("InboundThisMonthCost",0);
 			}
 			//Sent All Time
 			string command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile WHERE MsgCostUSD>0 GROUP BY SmsPhoneNumber";
@@ -136,30 +146,30 @@ namespace OpenDentBusiness{
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {//if there are messages in the table for that Phone number 
-					retVal[phone][0]=PIn.Int(table.Rows[i][1].ToString());
+					retVal[phone]["SentAllTime"]=PIn.Int(table.Rows[i][1].ToString());
 				}
 			}
 			//Sent Last Month
 			DateTime dateStartMonthCur=DateTime.Now.AddDays(-DateTime.Now.Day).Date;
 			command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile "
-				+"WHERE DateTimeEntry >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
-				+"AND DateTimeEntry<"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
+				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
+				+"AND DateTimeSent<"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {
-					retVal[phone][1]=PIn.Int(table.Rows[i][1].ToString());
+					retVal[phone]["SentLastMonth"]=PIn.Int(table.Rows[i][1].ToString());
 				}
 			}
 			//count and cost sent this month
 			command="SELECT SmsPhoneNumber, COUNT(*), SUM(MsgCostUSD) FROM smstomobile "
-				+"WHERE DateTimeEntry >"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
+				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {
-					retVal[phone][2]=PIn.Int(table.Rows[i][1].ToString());//msg count
-					retVal[phone][3]=PIn.Double(table.Rows[i][2].ToString());//msg costs
+					retVal[phone]["SentThisMonth"]=PIn.Int(table.Rows[i][1].ToString());//msg count
+					retVal[phone]["SentThisMonthCost"]=PIn.Double(table.Rows[i][2].ToString());//msg costs
 				}
 			}
 			//Inbound All Time
@@ -168,32 +178,238 @@ namespace OpenDentBusiness{
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {//if there are messages in the table for that Phone number 
-					retVal[phone][4]=PIn.Int(table.Rows[i][1].ToString());
+					retVal[phone]["InboundAllTime"]=PIn.Int(table.Rows[i][1].ToString());
 				}
 			}
 			//Inbound Last Month
 			command="SELECT SmsPhoneNumber, COUNT(*) FROM smsfrommobile "
-				+"WHERE DateTimeEntry >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
-				+"AND DateTimeEntry<"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
+				+"WHERE DateTimeReceived >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
+				+"AND DateTimeReceived<"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {
-					retVal[phone][5]=PIn.Int(table.Rows[i][1].ToString());
+					retVal[phone]["InboundLastMonth"]=PIn.Int(table.Rows[i][1].ToString());
 				}
 			}
 			//count and cost Inbound This Month
 			command="SELECT SmsPhoneNumber, COUNT(*) FROM smsfrommobile "
-				+"WHERE DateTimeEntry >"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
+				+"WHERE DateTimeReceived >"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
 				if(retVal.ContainsKey(phone)) {
-					retVal[phone][6]=PIn.Int(table.Rows[i][1].ToString());//msg count
-					retVal[phone][7]=0;//PIn.Double(table.Rows[i][2].ToString());//msg costs
+					retVal[phone]["InboundThisMonth"]=PIn.Int(table.Rows[i][1].ToString());//msg count
+					retVal[phone]["InboundThisMonthCost"]=0;//PIn.Double(table.Rows[i][2].ToString());//msg costs
 				}
 			}
 			return retVal;
+		}
+		
+		///<summary>Surround with Try/Catch</summary>
+		public static List<SmsPhone> SignContract(long clinicNum,double monthlyLimitUSD) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<SmsPhone>>(MethodBase.GetCurrentMethod(),clinicNum,monthlyLimitUSD);
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)){
+				writer.WriteStartElement("Request");
+				writer.WriteStartElement("Credentials");
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticeTitle");
+				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticePhone");
+				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ProgramVersion");
+				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ServiceCode");
+				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
+				writer.WriteEndElement();
+				writer.WriteEndElement();//End Credentials
+				writer.WriteStartElement("Payload");
+				writer.WriteStartElement("ClinicNum");
+				writer.WriteString(clinicNum.ToString());
+				writer.WriteEndElement(); //ClinicNum	
+				writer.WriteStartElement("SmsMonthlyLimit");
+				writer.WriteString(monthlyLimitUSD.ToString());
+				writer.WriteEndElement(); //SmsMonthlyLimit	
+				writer.WriteStartElement("CountryCode");
+				writer.WriteString(CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
+				writer.WriteEndElement(); //SmsMonthlyLimit	
+				writer.WriteEndElement(); //Payload	
+				writer.WriteEndElement(); //Request
+			}
+			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
+#if DEBUG
+			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
+#endif
+			string result = "";
+			try {
+				result=service.SmsSignAgreement(strbuild.ToString());
+			}
+			catch(Exception ex) {
+				throw new Exception("Unable to sign agreement using web service.");
+			}
+			XmlDocument doc=new XmlDocument();
+			doc.LoadXml(result);
+			XmlNode node=doc.SelectSingleNode("//Error");
+			if(node!=null) {
+				throw new Exception(node.InnerText);
+			}
+			node=doc.SelectSingleNode("//ListSmsPhone");
+			if(node==null) {
+				//should never happen
+				throw new Exception("An error has occured while attempting to acknowledge agreement.");
+			}
+			List<SmsPhone> listPhones=null;
+			using(XmlReader reader=XmlReader.Create(new System.IO.StringReader(node.InnerXml))) {
+				System.Xml.Serialization.XmlSerializer xmlListSmsPhoneSerializer=new System.Xml.Serialization.XmlSerializer(typeof(List<SmsPhone>));
+				listPhones=(List<SmsPhone>)xmlListSmsPhoneSerializer.Deserialize(reader);
+			}
+			if(listPhones==null || listPhones.Count==0) {
+				//should never happen
+				throw new Exception("An error has occured while attempting to sign contract.");
+			}
+			//Will always deletes old rows and inserts new rows because SmsPhoneNum is always 0 in new list.
+			SmsPhones.InsertNewFromList(listPhones,clinicNum);
+			return listPhones;
+		}
+
+		public static bool UnSignContract(long clinicNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),clinicNum);
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("Request");
+				writer.WriteStartElement("Credentials");
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticeTitle");
+				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticePhone");
+				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ProgramVersion");
+				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ServiceCode");
+				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
+				writer.WriteEndElement();
+				writer.WriteEndElement();//End Credentials
+				writer.WriteStartElement("Payload");
+				writer.WriteStartElement("ClinicNum");
+				writer.WriteString(clinicNum.ToString());
+				writer.WriteEndElement(); //ClinicNum	
+				writer.WriteEndElement(); //Payload	
+				writer.WriteEndElement(); //Request
+			}
+			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
+#if DEBUG
+			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
+#endif
+			string result = "";
+			try {
+				result=service.SmsCancelService(strbuild.ToString());
+			}
+			catch(Exception ex) {
+				//nothing to do here. Throw up to UI layer.
+				throw ex;
+			}
+			XmlDocument doc=new XmlDocument();
+			doc.LoadXml(result);
+			XmlNode node=doc.SelectSingleNode("//Error");
+			if(node!=null) {
+				throw new Exception(node.InnerText);
+			}
+			node=doc.SelectSingleNode("//Success");
+			if(node!=null) {
+				return true;
+			}
+			return false;
+		}
+
+		public static void InsertNewFromList(List<SmsPhone> listPhones,long clinicNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPhones,clinicNum);
+				return;
+			}
+			string command="SELECT * FROM smsphone WHERE clinicNum="+POut.Long(clinicNum);
+			List<SmsPhone> listPhonesBD=Crud.SmsPhoneCrud.SelectMany(command);
+			for(int i=0;i<listPhones.Count;i++) {
+				bool isNew=true;
+				for(int j=0;j<listPhonesBD.Count;j++) {
+					if(listPhones[i].PhoneNumber==listPhonesBD[j].PhoneNumber) {
+						////Do not reactivate the phone number if it is set incative, it can only be set inactive from HQ.
+						//if(listPhones[i].DateTimeActive.Year<1880) {
+						//	listPhones[i].DateTimeActive=DateTime.Now;
+						//}
+						//if(listPhones[i].DateTimeInactive.Year>1880) {
+						//	listPhones[i].DateTimeInactive=DateTime.MinValue;
+						//}
+						isNew=false; 
+						break;
+					}
+				}
+				if(isNew) {
+					Insert(listPhones[i]);
+				}
+			}
+		}
+
+		///<summary>Returns current clinic limit minus message usage for current calendar month.</summary>
+		public static double GetClinicBalance(long clinicNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDouble(MethodBase.GetCurrentMethod(),clinicNum);
+			}
+			double limit=0;
+			if(PrefC.GetBool(PrefName.EasyNoClinics) && PrefC.GetDate(PrefName.SmsContractDate).Year>1880){
+				limit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
+			}
+			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880){
+				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;	
+			}
+			string command="SELECT SUM(MsgCostUSD) FROM smstomobile WHERE ClinicNum="+POut.Long(clinicNum);
+			limit-=PIn.Double(Db.GetScalar(command));
+			return limit;
+		}
+
+		///<summary>Returns true if texting is enabled for any of the clinics, or if not using clinics, if it is enabled for the practice.</summary>
+		public static bool IsIntegratedTextingEnabled() {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				return PrefC.GetDateT(PrefName.SmsContractDate).Year>1880;
+			}
+			for(int i=0;i<Clinics.List.Length;i++) {
+				if(Clinics.List[i].SmsContractDate.Year>1880) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		///<summary>Returns 0 if clinics not in use, or patient.ClinicNum if assigned to a clinic, or ClinicNum of first clinic.</summary>
+		public static long GetClinicNumForTexting(long patNum) {
+			if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
+				return 0;//0 used for no clinics
+			}
+			Clinic clinic=Clinics.GetClinic(Patients.GetPat(patNum).ClinicNum);//if patnum invalid will throw unhandled exception.
+			if(clinic!=null) {//if pat assigned to invalid clinic or clinic num 0
+				return clinic.ClinicNum;
+			}
+			return Clinics.List[0].ClinicNum;
 		}
 
 	}

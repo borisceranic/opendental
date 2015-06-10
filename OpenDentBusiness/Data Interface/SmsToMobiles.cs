@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -130,8 +131,89 @@ namespace OpenDentBusiness{
 			}
 			return Crud.SmsToMobileCrud.SelectMany(command);
 		}
+		
+		///<summary>Surround with Try/Catch.  Sent as time sensitive message.</summary>
+		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum) {
+			double balance=SmsPhones.GetClinicBalance(clinicNum);
+			if(balance-0.04<0) {
+				throw new Exception("To send this message first increase spending limit for integrated texting from eServices Setup.");
+			}
+			SmsToMobile smsToMobile=new SmsToMobile();
+			smsToMobile.ClinicNum=clinicNum;
+			smsToMobile.GuidMessage=Guid.NewGuid().ToString();
+			smsToMobile.GuidBatch=smsToMobile.GuidMessage;
+			smsToMobile.IsTimeSensitive=true;
+			smsToMobile.MobilePhoneNumber=wirelessPhone;
+			smsToMobile.PatNum=patNum;
+			smsToMobile.MsgText=message;
+			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
+			smsToMobile.Status=SmsDeliveryStatus.Pending;
+			smsToMobile.DateTimeSent=DateTime.Now;
+			SmsToMobiles.Insert(smsToMobile);
+			return true;
+		}
 
-
+		///<summary>Surround with try/catch. Returns true is all messages succeded, throws exception if it failed. 
+		///All Integrated Testing should use this method, CallFire texting does not use this method.</summary>
+		public static bool SendSms(List<SmsToMobile> listMessages) {
+			if(listMessages==null || listMessages.Count==0) {
+				throw new Exception("No messages to send.");
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("Request");
+				writer.WriteStartElement("Credentials");
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticeTitle");
+				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
+				writer.WriteEndElement();
+				writer.WriteStartElement("PracticePhone");
+				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ProgramVersion");
+				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
+				writer.WriteEndElement();
+				writer.WriteStartElement("ServiceCode");
+				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
+				writer.WriteEndElement();
+				writer.WriteEndElement(); //Credentials
+				writer.WriteStartElement("Payload");
+				writer.WriteStartElement("ListSmsToMobile");
+				System.Xml.Serialization.XmlSerializer xmlListSmsToMobileSerializer=new System.Xml.Serialization.XmlSerializer(typeof(List<SmsToMobile>));
+				xmlListSmsToMobileSerializer.Serialize(writer,listMessages);
+				writer.WriteEndElement(); //ListSmsToMobile	
+				writer.WriteEndElement(); //Payload	
+				writer.WriteEndElement(); //Request
+			}
+			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
+#if DEBUG
+			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
+#endif
+			string result = "";
+			try {
+				service.SmsSend(strbuild.ToString());
+			}
+			catch(Exception ex) {
+				throw new Exception("Unable to send using web service.");
+			}
+			XmlDocument doc=new XmlDocument();
+			doc.LoadXml(result);
+			XmlNode node=doc.SelectSingleNode("//Error");
+			if(node!=null) {
+				throw new Exception(node.InnerText);
+			}
+			node=doc.SelectSingleNode("//Success");
+			if(node!=null) {
+				return true;
+			}
+			//Should never happen, we didn't get an explicit fail or success
+			throw new Exception("Unkown error has occured.");
+		}
 
 	}
 }

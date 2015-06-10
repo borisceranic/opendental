@@ -147,6 +147,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -1053,6 +1055,11 @@
     <Compile Include="UI\ODGridColumnCollection.cs" />
     <Compile Include="UI\ODGridRow.cs" />
     <Compile Include="UI\ODGridRowCollection.cs" />
+    <Compile Include="Web References\WebServiceMainHQ\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="WebServiceTests.cs" />
     <Compile Include="X12\X835.cs" />
     <Compile Include="X12\X277.cs" />
@@ -1284,6 +1291,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Web References\WebServiceMainHQ\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\WebServiceMainHQ\webservicemainhq.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WebReferenceUrl Include="http://localhost/OpenDentalServer/ServiceMain.asmx">
@@ -1296,6 +1308,17 @@
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OpenDentBusiness_OpenDentalServer_ServiceMain</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WebServiceMainHQ\</RelPath>
+      <UpdateFromURL>http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>OpenDentBusiness_WebServiceMainHQ_WebServiceMainHQ</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
@@ -1319,6 +1342,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Patient Info.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web References\WebServiceMainHQ\webservicemainhq.disco" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
