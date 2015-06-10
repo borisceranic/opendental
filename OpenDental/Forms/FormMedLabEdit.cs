@@ -581,7 +581,8 @@ namespace OpenDental {
 					destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
 					while(File.Exists(destFilePath)) {
 						//if still not unique, try appending date/time to seconds precision until the file name is unique
-						destFileName=patOld.PatNum.ToString()+"_"+fromDoc.FileName+"_"+DateTime.Now.ToString("yyyyMMddhhmmss");
+						destFileName=patOld.PatNum.ToString()+"_"+Path.GetFileNameWithoutExtension(fromDoc.FileName)
+							+"_"+DateTime.Now.ToString("yyyyMMddhhmmss")+Path.GetExtension(fromDoc.FileName);
 						destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
 					}
 				}
