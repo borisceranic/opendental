@@ -2188,12 +2188,7 @@ namespace OpenDental{
 			for(int i=0;i<_listClinics.Count;i++) {
 				comboClinic.Items.Add(_listClinics[i].Description);
 				if(_listClinics[i].ClinicNum==PatCur.ClinicNum) {
-					if(Security.CurUser.ClinicIsRestricted) {
-						comboClinic.SelectedIndex=i;
-					}
-					else {
-						comboClinic.SelectedIndex=i+1;
-					}
+					comboClinic.SelectedIndex=i+1;
 				}
 			}
 			switch(PatCur.StudentStatus){
