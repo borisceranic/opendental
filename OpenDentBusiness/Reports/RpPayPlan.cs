@@ -81,7 +81,7 @@ namespace OpenDentBusiness {
 				//Do not filter the query at all which will show both insurance and patient payment plan types.
 			}
 			command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
-			if(!hideCompletedPlans) {
+			if(hideCompletedPlans) {
 				command+="HAVING _paid+_insPaid < _principal ";
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
