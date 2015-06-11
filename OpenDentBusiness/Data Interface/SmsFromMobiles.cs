@@ -197,6 +197,14 @@ namespace OpenDentBusiness{
 			return "";
 		}
 
+		///<summary>Updates only the changed fields of the SMS text message (if any).</summary>
+		public static bool Update(SmsFromMobile smsFromMobile,SmsFromMobile oldSmsFromMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),smsFromMobile,oldSmsFromMobile);
+			}
+			return Crud.SmsFromMobileCrud.Update(smsFromMobile,oldSmsFromMobile);
+		}
+
 		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
 		public static List<long> FindPatNums(string PhonePat) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

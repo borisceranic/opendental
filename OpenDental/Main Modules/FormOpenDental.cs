@@ -3034,7 +3034,6 @@ namespace OpenDental{
 			if(CurPatNum==0) {//Only on startup, I think.
 				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Email"].Enabled=false;
-					ToolBarMain.Buttons["Text"].Enabled=false;
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
 					ToolBarMain.Buttons["Letter"].Enabled=false;
 					ToolBarMain.Buttons["Form"].Enabled=false;
@@ -3465,6 +3464,10 @@ namespace OpenDental{
 		#region SMS Text Messaging
 
 		private void OnTxtMsg_Click() {
+			if(CurPatNum==0) {
+				MsgBox.Show(this,"No patient selected.  Please select a patient before composing a text message.");
+				return;
+			}
 			Patient pat=Patients.GetPat(CurPatNum);
 			if(pat.TxtMsgOk==YN.No) {
 				MsgBox.Show(this,"This patient does not want to receive text messages.");
@@ -3488,12 +3491,22 @@ namespace OpenDental{
 		private void menuItemTextMessagesReceived_Click(object sender,EventArgs e) {
 			FormSmsTextMessaging form=new FormSmsTextMessaging();
 			form.IsSent=false;
+			form.SmsNotifier=SetSmsNotificationText;
+			form.UnreadMessageCount=0;
+			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
+				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
+			}
 			form.ShowDialog();
 		}
 
 		private void menuItemTextMessagesSent_Click(object sender,EventArgs e) {
 			FormSmsTextMessaging form=new FormSmsTextMessaging();
 			form.IsSent=true;
+			form.SmsNotifier=SetSmsNotificationText;
+			form.UnreadMessageCount=0;
+			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
+				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
+			}
 			form.ShowDialog();
 		}
 
@@ -3503,6 +3516,9 @@ namespace OpenDental{
 			}
 			if(this.InvokeRequired) {//For when called from the ThreadSmsTextMessageNotify() thread.
 				this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText); });
+			}
+			if(smsNotificationText=="0") {
+				smsNotificationText="";
 			}
 			_butText.NotificationText=smsNotificationText;
 			if(menuItemTextMessagesReceived.Text.Contains("(")) {//Remove the old count from the menu item.

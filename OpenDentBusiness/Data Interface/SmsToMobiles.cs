@@ -15,11 +15,11 @@ namespace OpenDentBusiness{
 		//If leaving this region in place, be sure to add RefreshCache and FillCache 
 		//to the Cache.cs file with all the other Cache types.
 
-		///<summary>A list of all SmsMTs.</summary>
-		private static List<SmsMT> listt;
+		///<summary>A list of all SmsToMobile.</summary>
+		private static List<SmsToMobile> listt;
 
-		///<summary>A list of all SmsMTs.</summary>
-		public static List<SmsMT> Listt{
+		///<summary>A list of all SmsToMobile.</summary>
+		public static List<SmsToMobile> Listt{
 			get {
 				if(listt==null) {
 					RefreshCache();
@@ -34,9 +34,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache(){
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM smsmt ORDER BY ItemOrder";//stub query probably needs to be changed
+			string command="SELECT * FROM smstomobile ORDER BY ItemOrder";//stub query probably needs to be changed
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
-			table.TableName="SmsMT";
+			table.TableName="SmsToMobile";
 			FillCache(table);
 			return table;
 		}
@@ -44,7 +44,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.SmsMTCrud.TableToList(table);
+			listt=Crud.SmsToMobileCrud.TableToList(table);
 		}
 		#endregion
 		*/
@@ -52,29 +52,38 @@ namespace OpenDentBusiness{
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
-		public static List<SmsMT> Refresh(long patNum){
+		public static List<SmsToMobile> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsMT>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<SmsToMobile>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM smsmt WHERE PatNum = "+POut.Long(patNum);
-			return Crud.SmsMTCrud.SelectMany(command);
+			string command="SELECT * FROM smstomobile WHERE PatNum = "+POut.Long(patNum);
+			return Crud.SmsToMobileCrud.SelectMany(command);
 		}
 
-		///<summary>Gets one SmsMT from the db.</summary>
-		public static SmsMT GetOne(long smsMTNum){
+		///<summary>Gets one SmsToMobile from the db.</summary>
+		public static SmsToMobile GetOne(long smsToMobileNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<SmsMT>(MethodBase.GetCurrentMethod(),smsMTNum);
+				return Meth.GetObject<SmsToMobile>(MethodBase.GetCurrentMethod(),smsToMobileNum);
 			}
-			return Crud.SmsMTCrud.SelectOne(smsMTNum);
+			return Crud.SmsToMobileCrud.SelectOne(smsToMobileNum);
 		}
 
 		///<summary></summary>
-		public static void Delete(long smsMTNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsMTNum);
+		public static void Update(SmsToMobile smsToMobile){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsToMobile);
 				return;
 			}
-			string command= "DELETE FROM smsmt WHERE SmsMTNum = "+POut.Long(smsMTNum);
+			Crud.SmsToMobileCrud.Update(smsToMobile);
+		}
+
+		///<summary></summary>
+		public static void Delete(long smsToMobileNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsToMobileNum);
+				return;
+			}
+			string command= "DELETE FROM smstomobile WHERE smsToMobileNum = "+POut.Long(smsToMobileNum);
 			Db.NonQ(command);
 		}
 		*/
@@ -98,12 +107,12 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static long Insert(SmsToMobile smsMT) {
+		public static long Insert(SmsToMobile smsToMobile) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				smsMT.SmsToMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsMT);
-				return smsMT.SmsToMobileNum;
+				smsToMobile.SmsToMobileNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsToMobile);
+				return smsToMobile.SmsToMobileNum;
 			}
-			return Crud.SmsToMobileCrud.Insert(smsMT);
+			return Crud.SmsToMobileCrud.Insert(smsToMobile);
 		}
 
 		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
@@ -151,6 +160,15 @@ namespace OpenDentBusiness{
 			smsToMobile.DateTimeSent=DateTime.Now;
 			SmsToMobiles.Insert(smsToMobile);
 			return true;
+		}
+
+		///<summary></summary>
+		public static void Update(SmsToMobile smsToMobile,SmsToMobile oldSmsToMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsToMobile);
+				return;
+			}
+			Crud.SmsToMobileCrud.Update(smsToMobile,oldSmsToMobile);
 		}
 
 		///<summary>Surround with try/catch. Returns true is all messages succeded, throws exception if it failed. 

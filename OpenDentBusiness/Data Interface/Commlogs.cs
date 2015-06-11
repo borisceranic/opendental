@@ -61,6 +61,14 @@ namespace OpenDentBusiness{
 			Crud.CommlogCrud.Update(comm);
 		}
 
+		///<summary>Updates only the changed fields (if any).</summary>
+		public static bool Update(Commlog comm,Commlog oldCommlog) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),comm,oldCommlog);
+			}
+			return Crud.CommlogCrud.Update(comm,oldCommlog);
+		}
+
 		///<summary></summary>
 		public static void Delete(Commlog comm) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
