@@ -4553,7 +4553,9 @@ namespace OpenDental{
 			}
 			//typically every 4 seconds:
 			ProcessSignals();
-			//lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
+			}
 		}
 
 		private void timerDisabledKey_Tick(object sender,EventArgs e) {
