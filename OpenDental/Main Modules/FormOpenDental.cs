@@ -6129,7 +6129,7 @@ namespace OpenDental{
 
 		private void menuItemRequestFeatures_Click(object sender,EventArgs e) {
 			FormFeatureRequest FormF=new FormFeatureRequest();
-			FormF.ShowDialog();
+			FormF.Show();
 		}
 
 		private void menuItemUpdate_Click(object sender, System.EventArgs e) {
