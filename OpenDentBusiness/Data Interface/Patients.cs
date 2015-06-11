@@ -257,13 +257,10 @@ namespace OpenDentBusiness{
 				}
 				regexp+=phonedigits[i];
 			}
-			string command="SELECT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
+			string command="SELECT DISTINCT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
 				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email,Country,patient.ClinicNum ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+=",GROUP_CONCAT(DISTINCT phonenumber.PhoneNumberVal) AS OtherPhone ";//this customer might have multiple extra phone numbers that match the param.
-			}
-			if(subscriberId!=""){
-				command+=",inssub.SubscriberId ";
 			}
 			command+="FROM patient ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
