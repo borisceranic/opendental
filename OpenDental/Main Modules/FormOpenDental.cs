@@ -3979,9 +3979,14 @@ namespace OpenDental{
 				case 9: x=11; y=11; break;
 			}
 			g.FillRectangle(new SolidBrush(color),x,y,4,4);
-			Icon=Icon.FromHandle(bitmapIcon.GetHicon());
+			IntPtr intPtr=bitmapIcon.GetHicon();
+			Icon=Icon.FromHandle(intPtr);
+			DestroyIcon(intPtr);
 			g.Dispose();
 		}
+
+		[System.Runtime.InteropServices.DllImport("user32.dll",CharSet = CharSet.Auto)]
+		extern static bool DestroyIcon(IntPtr handle);
 
 		private void lightSignalGrid1_ButtonClick(object sender,OpenDental.UI.ODLightSignalGridClickEventArgs e) {
 			if(e.ActiveSignal!=null){//user trying to ack an existing light signal
