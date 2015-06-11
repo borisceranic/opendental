@@ -261,6 +261,10 @@ namespace OpenDental{
 					return;
 				}
 			}
+			else if(SchedCur.Status!=SchedStatus.Holiday && textNote.Text=="") {//don't allow blank schedule notes
+				MsgBox.Show(this,"Please enter a note first.");
+				return;
+			}
 			SchedCur.StartTime=DateTime.Parse(comboStart.Text).TimeOfDay;
 			SchedCur.StopTime=DateTime.Parse(comboStop.Text).TimeOfDay;
       SchedCur.Note=textNote.Text;

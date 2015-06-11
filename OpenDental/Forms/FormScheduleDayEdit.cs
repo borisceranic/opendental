@@ -550,6 +550,10 @@ namespace OpenDental{
 		//}
 
 		private void butAddTime_Click(object sender, System.EventArgs e) {
+			if(listProv.SelectedIndices.Count==0 && listEmp.SelectedIndices.Count==0) {
+				MsgBox.Show(this,"Please select at least one provider or one employee first.");
+				return;
+			}
 			Schedule schedCur=new Schedule();
 			schedCur.SchedDate=_dateSched;
 			schedCur.Status=SchedStatus.Open;
@@ -582,6 +586,10 @@ namespace OpenDental{
 		}
 
 		private void butProvNote_Click(object sender,EventArgs e) {
+			if(listProv.SelectedIndices.Count==0 && listEmp.SelectedIndices.Count==0) {
+				MsgBox.Show(this,"Please select at least one provider or one employee first.");
+				return;
+			}
 			Schedule schedCur=new Schedule();
 			schedCur.SchedDate=_dateSched;
 			schedCur.Status=SchedStatus.Open;
