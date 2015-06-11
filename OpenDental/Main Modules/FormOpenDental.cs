@@ -317,6 +317,7 @@ namespace OpenDental{
 		private MenuItem menuItemEServices;
 		private MenuItem menuItemPatientPortal;
 		private MenuItem menuMobileWeb;
+		private MenuItem menuItemIntegratedTexting;
 		private MenuItem menuItemWebSched;
 		private MenuItem menuItem14;
 		private MenuItem menuItemListenerService;
@@ -593,6 +594,7 @@ namespace OpenDental{
 			this.menuItemMobileSync = new System.Windows.Forms.MenuItem();
 			this.menuMobileWeb = new System.Windows.Forms.MenuItem();
 			this.menuItemPatientPortal = new System.Windows.Forms.MenuItem();
+			this.menuItemIntegratedTexting = new System.Windows.Forms.MenuItem();
 			this.menuItemWebSched = new System.Windows.Forms.MenuItem();
 			this.menuItem14 = new System.Windows.Forms.MenuItem();
 			this.menuItemListenerService = new System.Windows.Forms.MenuItem();
@@ -624,14 +626,14 @@ namespace OpenDental{
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();
 			this.labelMsg = new System.Windows.Forms.Label();
+			this.butMapPhones = new OpenDental.UI.Button();
+			this.butTriage = new OpenDental.UI.Button();
+			this.butBigPhones = new OpenDental.UI.Button();
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.menuText = new System.Windows.Forms.ContextMenu();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
-			this.butMapPhones = new OpenDental.UI.Button();
-			this.butTriage = new OpenDental.UI.Button();
-			this.butBigPhones = new OpenDental.UI.Button();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -1582,6 +1584,7 @@ namespace OpenDental{
             this.menuItemMobileSync,
             this.menuMobileWeb,
             this.menuItemPatientPortal,
+            this.menuItemIntegratedTexting,
             this.menuItemWebSched,
             this.menuItem14,
             this.menuItemListenerService});
@@ -1608,20 +1611,26 @@ namespace OpenDental{
 			this.menuItemPatientPortal.Text = "Patient Portal";
 			this.menuItemPatientPortal.Click += new System.EventHandler(this.menuItemPatientPortal_Click);
 			// 
+			// menuItemIntegratedTexting
+			// 
+			this.menuItemIntegratedTexting.Index = 3;
+			this.menuItemIntegratedTexting.Text = "Integrated Texting";
+			this.menuItemIntegratedTexting.Click += new System.EventHandler(this.menuItemIntegratedTexting_Click);
+			// 
 			// menuItemWebSched
 			// 
-			this.menuItemWebSched.Index = 3;
+			this.menuItemWebSched.Index = 4;
 			this.menuItemWebSched.Text = "Web Sched";
 			this.menuItemWebSched.Click += new System.EventHandler(this.menuItemWebSched_Click);
 			// 
 			// menuItem14
 			// 
-			this.menuItem14.Index = 4;
+			this.menuItem14.Index = 5;
 			this.menuItem14.Text = "-";
 			// 
 			// menuItemListenerService
 			// 
-			this.menuItemListenerService.Index = 5;
+			this.menuItemListenerService.Index = 6;
 			this.menuItemListenerService.OwnerDraw = true;
 			this.menuItemListenerService.Text = "Listener Service";
 			this.menuItemListenerService.Click += new System.EventHandler(this.menuItemListenerService_Click);
@@ -1833,46 +1842,6 @@ namespace OpenDental{
 			this.labelMsg.Text = "V:00";
 			this.labelMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// labelWaitTime
-			// 
-			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
-			this.labelWaitTime.Location = new System.Drawing.Point(89, 2);
-			this.labelWaitTime.Name = "labelWaitTime";
-			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
-			this.labelWaitTime.TabIndex = 53;
-			this.labelWaitTime.Text = "00m";
-			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelTriage
-			// 
-			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTriage.ForeColor = System.Drawing.Color.Black;
-			this.labelTriage.Location = new System.Drawing.Point(41, 2);
-			this.labelTriage.Name = "labelTriage";
-			this.labelTriage.Size = new System.Drawing.Size(41, 20);
-			this.labelTriage.TabIndex = 53;
-			this.labelTriage.Text = "T:000";
-			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// menuText
-			// 
-			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItemTextMessagesReceived,
-            this.menuItemTextMessagesSent});
-			// 
-			// menuItemTextMessagesReceived
-			// 
-			this.menuItemTextMessagesReceived.Index = 0;
-			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
-			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
-			// 
-			// menuItemTextMessagesSent
-			// 
-			this.menuItemTextMessagesSent.Index = 1;
-			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
-			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
-			// 
 			// butMapPhones
 			// 
 			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1914,6 +1883,46 @@ namespace OpenDental{
 			this.butBigPhones.TabIndex = 52;
 			this.butBigPhones.Text = "B";
 			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
+			// 
+			// labelWaitTime
+			// 
+			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelWaitTime.ForeColor = System.Drawing.Color.Black;
+			this.labelWaitTime.Location = new System.Drawing.Point(89, 2);
+			this.labelWaitTime.Name = "labelWaitTime";
+			this.labelWaitTime.Size = new System.Drawing.Size(30, 20);
+			this.labelWaitTime.TabIndex = 53;
+			this.labelWaitTime.Text = "00m";
+			this.labelWaitTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelTriage
+			// 
+			this.labelTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelTriage.ForeColor = System.Drawing.Color.Black;
+			this.labelTriage.Location = new System.Drawing.Point(41, 2);
+			this.labelTriage.Name = "labelTriage";
+			this.labelTriage.Size = new System.Drawing.Size(41, 20);
+			this.labelTriage.TabIndex = 53;
+			this.labelTriage.Text = "T:000";
+			this.labelTriage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// menuText
+			// 
+			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemTextMessagesReceived,
+            this.menuItemTextMessagesSent});
+			// 
+			// menuItemTextMessagesReceived
+			// 
+			this.menuItemTextMessagesReceived.Index = 0;
+			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
+			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
+			// 
+			// menuItemTextMessagesSent
+			// 
+			this.menuItemTextMessagesSent.Index = 1;
+			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
+			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
 			// 
 			// lightSignalGrid1
 			// 
@@ -6032,6 +6041,11 @@ namespace OpenDental{
 
 		private void menuItemPatientPortal_Click(object sender,EventArgs e) {
 			FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.PatientPortal);
+			FormESS.ShowDialog();
+		}
+
+		private void menuItemIntegratedTexting_Click(object sender,EventArgs e) {
+			FormEServicesSetup FormESS=new FormEServicesSetup(FormEServicesSetup.EService.SmsService);
 			FormESS.ShowDialog();
 		}
 
