@@ -258,24 +258,6 @@ namespace OpenDental {
 			FillGridEmailMessages();//To show the email is read.
 		}
 
-		private void butChangePat_Click(object sender,EventArgs e) {
-			if(gridEmailMessages.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select an email message.");
-				return;
-			}
-			FormPatientSelect form=new FormPatientSelect();
-			if(form.ShowDialog()!=DialogResult.OK) {
-				return;
-			}
-			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
-				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
-				emailMessage.PatNum=form.SelectedPatNum;
-				EmailMessages.UpdatePatNum(emailMessage);
-			}
-			MessageBox.Show(Lan.g(this,"Email messages moved successfully")+": "+gridEmailMessages.SelectedIndices.Length);
-			FillGridEmailMessages();//Refresh grid to show changed patient.
-		}
-
 		private void butMarkUnread_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
@@ -296,8 +278,31 @@ namespace OpenDental {
 			Cursor=Cursors.Default;
 		}
 
+		private void butChangePat_Click(object sender,EventArgs e) {
+			if(gridEmailMessages.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an email message.");
+				return;
+			}
+			FormPatientSelect form=new FormPatientSelect();
+			if(form.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			Cursor=Cursors.WaitCursor;
+			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
+				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
+				emailMessage.PatNum=form.SelectedPatNum;
+				EmailMessages.UpdatePatNum(emailMessage);
+			}
+			int messagesMovedCount=gridEmailMessages.SelectedIndices.Length;
+			FillGridEmailMessages();//Refresh grid to show changed patient.
+			Cursor=Cursors.Default;
+			MessageBox.Show(Lan.g(this,"Email messages moved successfully")+": "+messagesMovedCount);
+		}
+
 		private void butRefresh_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			GetMessages();
+			Cursor=Cursors.Default;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
