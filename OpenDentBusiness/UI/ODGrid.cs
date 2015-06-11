@@ -113,6 +113,7 @@ namespace OpenDental.UI {
 		public int YPosField;
 		///<summary>Height of field when printing.  Set using CalculateHeights() from EndUpdate()</summary>
 		private int _printHeight;
+		private bool _hasMultilineHeaders;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -213,6 +214,17 @@ namespace OpenDental.UI {
 		public int PrintHeight {
 			get {
 				return _printHeight;
+			}
+		}
+
+		///<summary>Allow Headers to be multiple lines tall.</summary>
+		[Category("Appearance"),Description("Set true to allow new line characters in column headers.")]
+		public bool HasMultilineHeaders {
+			get {
+				return _hasMultilineHeaders;
+			}
+			set {
+				_hasMultilineHeaders=value;
 			}
 		}
 
@@ -765,7 +777,14 @@ namespace OpenDental.UI {
 			}
 			ComputeColumns();//it's only here because I can't figure out how to do it when columns are added. It will be removed.
 			Bitmap doubleBuffer=new Bitmap(Width,Height,e.Graphics);
-			using(Graphics g=Graphics.FromImage(doubleBuffer)) {
+			using(Graphics g=Graphics.FromImage(doubleBuffer)) 
+			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold))
+			{
+				if(_hasMultilineHeaders) {
+					foreach(ODGridColumn column in columns){
+						headerHeight=Math.Max(headerHeight,Convert.ToInt32(g.MeasureString(column.Heading,headerFont).Height));
+					}
+				}
 				g.SmoothingMode=SmoothingMode.HighQuality;//for the up/down triangles
 				//g.TextRenderingHint=TextRenderingHint.AntiAlias;//for accurate string measurements. Didn't work
 				//g.TextRenderingHint=TextRenderingHint.SingleBitPerPixelGridFit;
@@ -1043,7 +1062,9 @@ namespace OpenDental.UI {
 			}
 			g.FillRectangle(new SolidBrush(cTitleBackG),0,titleHeight,Width,headerHeight);//background
 			g.DrawLine(new Pen(Color.FromArgb(102,102,122)),0,titleHeight,Width,titleHeight);//line between title and headers
-			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold)) {
+			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold)) 
+			using(StringFormat format=new StringFormat())
+			{
 				for(int i=0;i<columns.Count;i++) {
 					if(i!=0) {
 						//vertical lines separating column headers
@@ -1052,9 +1073,11 @@ namespace OpenDental.UI {
 						g.DrawLine(new Pen(Color.White),-hScroll.Value+1+ColPos[i]+1,titleHeight+3,
 							-hScroll.Value+1+ColPos[i]+1,titleHeight+headerHeight-2);
 					}
+					format.Alignment=StringAlignment.Center;
 					g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
-						-hScroll.Value+ColPos[i]+columns[i].ColWidth/2-g.MeasureString(columns[i].Heading,headerFont).Width/2,
-						titleHeight+2);
+						-hScroll.Value+ColPos[i]+columns[i].ColWidth/2,
+						titleHeight+2,
+						format);
 					if(sortedByColumnIdx==i) {
 						PointF p=new PointF(-hScroll.Value+1+ColPos[i]+6,titleHeight+(float)headerHeight/2f);
 						if(sortedIsAscending) {//pointing up
