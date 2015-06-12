@@ -2480,7 +2480,29 @@ namespace OpenDental{
 			}
 			string aptPattern=Appointments.ConvertPatternTo5(strBTime.ToString());
 			//Only run appt overlap check if editing an appt not in unscheduled list and in chart module and eCW program link not enabled.
-			if((IsInChartModule || IsInViewPatAppts) && !Programs.UsingEcwTightOrFullMode() && AptCur.AptStatus!=ApptStatus.UnschedList) {
+			//Also need to see if there is a generic HL7 def enabled where Open Dental is not the filler application.
+			//Open Dental is the filler application if appointments, schedules, and operatories are maintained by Open Dental and messages are sent out
+			//to inform another software of any changes made.  If Open Dental is an auxiliary application, appointments are created from inbound SIU
+			//messages and Open Dental no longer has control over whether the appointments overlap or which operatory/provider's schedule the appointment
+			//belongs to.  In this case, we do not want to check for overlapping appointments and the appointment module should be hidden.
+			HL7Def hl7DefEnabled=HL7Defs.GetOneDeepEnabled();//the ShowAppts check box is hidden for MedLab HL7 interfaces, so only need to check the others
+			bool isAuxiliaryRole=false;
+			if(hl7DefEnabled!=null && !hl7DefEnabled.ShowAppts) {//if the appts module is hidden
+				for(int i=0;i<hl7DefEnabled.hl7DefMessages.Count;i++) {
+					HL7DefMessage msgDefCur=hl7DefEnabled.hl7DefMessages[i];
+					//if there is also an inbound SIU defined
+					if(msgDefCur.MessageType==MessageTypeHL7.SIU && msgDefCur.InOrOut==InOutHL7.Incoming) {
+						//OD is considered an auxiliary application which neither exerts control over nor requests changes to a schedule
+						isAuxiliaryRole=true;
+						break;
+					}
+				}
+			}
+			if((IsInChartModule || IsInViewPatAppts)
+				&& !Programs.UsingEcwTightOrFullMode()//if eCW Tight or Full mode, appts created from inbound SIU messages and appt module always hidden
+				&& AptCur.AptStatus!=ApptStatus.UnschedList
+				&& !isAuxiliaryRole)//generic HL7 def enabled, appt module hidden and an inbound SIU msg defined, appts created from msgs so no overlap check
+			{
 				//==Travis 04/06/2015:  This call was added on 04/23/2014 and backported to 14.1.  It is not storing the return value and does not look to be
 				//		doing anything so it has been commented out.
 				//Appointments.RefreshPeriod(AptCur.AptDateTime,AptCur.AptDateTime);

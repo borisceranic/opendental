@@ -458,6 +458,18 @@ namespace OpenDental {
 				MsgBox.Show(this,"The escape character must be a single character.");
 				return false;
 			}
+			for(int i=0;i<HL7DefCur.hl7DefMessages.Count;i++) {
+				if(HL7DefCur.InternalType==HL7InternalType.MedLabv2_3 || !checkShowAppts.Checked) {
+					break;//The ShowAppts flag is hidden for MedLab, so we ignore MebLab defs here.
+				}
+				//if there is an inbound SIU defined, appts will be created from these messages and there is no overlap check
+				//since OD has no control over the scheduling of these appts and inserts them all with OpNum=0, the appts module should be hidden
+				if(HL7DefCur.hl7DefMessages[i].MessageType==MessageTypeHL7.SIU && HL7DefCur.hl7DefMessages[i].InOrOut==InOutHL7.Incoming) {
+					MsgBox.Show(this,"The Appts module should be hidden if there is an inbound SIU message defined.\r\n"
+						+"Either uncheck the Show Appts Module check box or delete the inbound SIU message definition.");
+					return false;
+				}
+			}
 			return true;
 		}
 
