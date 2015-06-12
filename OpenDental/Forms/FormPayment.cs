@@ -1960,6 +1960,7 @@ namespace OpenDental {
 					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
 					FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 					FormPSM.PatCur=PatCur;
+					PaymentCur.PayAmt=0;//Fix for PSM logic depending on new payments having 0 amount.
 					FormPSM.PaymentCur=PaymentCur;
 					FormPSM.PayDate=PIn.DateT(textDate.Text);
 					FormPSM.IsNew=IsNew;
