@@ -236,7 +236,7 @@ namespace OpenDental {
 			_isPrinting=false;
 			g.Dispose();
 			g=null;
-			GC.Collect();
+			GC.Collect();//We are done with printing so we can forcefully clean up all the objects and controls that were used in printing.
 		}
 
 		///<summary>This gets called for every page to be printed when sending to a printer.  Will stop printing when e.HasMorePages==false.  See also CreatePdfPage.</summary>
@@ -295,7 +295,6 @@ namespace OpenDental {
 						//Parameter or possibly new field type.
 						break;
 				}
-				GC.Collect();
 			}//end foreach SheetField
 			drawHeader(sheet,g,null);
 			drawFooter(sheet,g,null);
@@ -306,7 +305,6 @@ namespace OpenDental {
 			#endif
 			g.Dispose();
 			g=null;
-			GC.Collect();
 			#region Set variables for next page to be printed
 			_yPosPrint+=sheet.HeightPage-_printMargin.Bottom-_printMargin.Top;//move _yPosPrint down equal to the amount of printable area per page.
 			_pagesPrinted++;
@@ -340,10 +338,6 @@ namespace OpenDental {
 		}
 
 		#region Drawing Helpers. One for almost every field type. =====================================================================================
-		///<summary>Public accessor to the draw image function</summary>
-		public static void drawImageHelper(SheetField field,Graphics g) {
-			drawFieldImage(field,g,null);
-		}
 
 		///<summary>Draws the image to the graphics object passed in.  Can throw an OutOfMemoryException when printing that will have a message that should be displayed and the print job should be cancelled.</summary>
 		public static void drawFieldImage(SheetField field,Graphics g, XGraphics gx) {
@@ -408,7 +402,6 @@ namespace OpenDental {
 				//do nothing
 			}
 			#endregion
-			GC.Collect();
 			//We used to scale down bmpOriginal here to avoid memory exceptions.
 			//Doing so was causing significant quality loss when printing or creating pdfs with very large images.
 			if(gx==null) {
@@ -450,7 +443,6 @@ namespace OpenDental {
 				bmpOriginal.Dispose();
 				bmpOriginal=null;
 			}
-			GC.Collect();
 		}
 
 		public static void drawFieldDrawing(SheetField field,Graphics g,XGraphics gx) {
@@ -479,7 +471,6 @@ namespace OpenDental {
 				}
 				pen=null;
 			}
-			GC.Collect();
 		}
 
 		public static void drawFieldRectangle(SheetField field,Graphics g,XGraphics gx) {
@@ -504,7 +495,6 @@ namespace OpenDental {
 					p(field.XPos+field.Width),
 					p(field.YPos-_yPosPrint+field.Height));
 			}
-			GC.Collect();		
 		}
 
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,Statement stmt=null,MedLab medLab=null) {
@@ -763,7 +753,6 @@ namespace OpenDental {
 			doubleBuffer=null;
 			gfx.Dispose();
 			gfx=null;
-			GC.Collect();
 		}
 
 		public static void drawFieldCheckBox(SheetField field,Graphics g,XGraphics gx) {
@@ -783,7 +772,6 @@ namespace OpenDental {
 				gx.DrawLine(pen3,p(field.XPos+field.Width),p(field.YPos-_yPosPrint),p(field.XPos),p(field.YPos-_yPosPrint+field.Height));
 				pen3=null;
 			}
-			GC.Collect();
 		}
 
 		public static void drawFieldSigBox(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
@@ -1214,7 +1202,6 @@ namespace OpenDental {
 			font.Dispose();
 			font=null;
 			xfont=null;
-			GC.Collect();
 		}
 
 		#endregion
@@ -1248,6 +1235,7 @@ namespace OpenDental {
 			}
 			document.Save(fullFileName);
 			_isPrinting=false;
+			GC.Collect();//We are done creating the pdf so we can forcefully clean up all the objects and controls that were used.
 		}
 
 		///<summary>Called for every page that is generated for a PDF docuemnt. Pages and yPos must be tracked outside of this function. See also pd_PrintPage.</summary>
@@ -1296,13 +1284,11 @@ namespace OpenDental {
 						//Parameter or possibly new field type.
 						break;
 				}
-				GC.Collect();
 			}//end foreach SheetField
 			drawHeader(sheet,null,gx);
 			drawFooter(sheet,null,gx);
 			gx.Dispose();
 			gx=null;
-			GC.Collect();
 			#region Set variables for next page to be printed
 			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
 			_pagesPrinted++;
@@ -1417,7 +1403,6 @@ namespace OpenDental {
 				else if(graphic!=null) {//Drawing an image to a printer or the sheet fill edit window.
 					graphic.DrawImage(bmpOriginal,field.XPos+adjustX,field.YPos+adjustY-_yPosPrint,imgDrawWidth,imgDrawHeight);
 				}
-				GC.Collect();
 				#endregion
 			}
 			if(bmpOriginal!=null) {
