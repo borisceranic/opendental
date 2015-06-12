@@ -264,7 +264,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Delete"].Enabled=true;
 				ToolBarMain.Buttons["Guarantor"].Enabled=true;
 				ToolBarMain.Buttons["Move"].Enabled=true;
-				if(!PrefC.GetBool(PrefName.EasyHideInsurance)){
+				if(ToolBarMain.Buttons["Ins"]!=null && !PrefC.GetBool(PrefName.EasyHideInsurance)) {
 					ToolBarMain.Buttons["Ins"].Enabled=true;
 				}
 				if(ToolBarMain.Buttons["AddSuper"]==null){//because the toolbar only refreshes on restart. //PrefC.GetBool(PrefName.ShowFeatureSuperfamilies)){
@@ -305,7 +305,7 @@ namespace OpenDental{
 					ToolBarMain.Buttons["RemoveSuper"].Enabled=false;
 					ToolBarMain.Buttons["DisbandSuper"].Enabled=false;
 				}
-				if(!PrefC.GetBool(PrefName.EasyHideInsurance)){
+				if(ToolBarMain.Buttons["Ins"]!=null && !PrefC.GetBool(PrefName.EasyHideInsurance)) {
 					ToolBarMain.Buttons["Ins"].Enabled=false;
 				}
 				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {

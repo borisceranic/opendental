@@ -235,6 +235,7 @@ namespace OpenDental{
 			this.checkInsurance.TabIndex = 11;
 			this.checkInsurance.Text = "All Insurance";
 			this.checkInsurance.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkInsurance.Click += new System.EventHandler(this.checkInsurance_Click);
 			// 
 			// checkHospitals
 			// 
@@ -413,6 +414,12 @@ namespace OpenDental{
 			}
 		}
 
+		private void checkInsurance_Click(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.EasyHideInsurance)!=checkInsurance.Checked) {
+				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
+			}
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			Prefs.UpdateBool(PrefName.EasyHideCapitation,!checkCapitation.Checked);
 			Prefs.UpdateBool(PrefName.EasyHideMedicaid,!checkMedicaid.Checked);
@@ -431,6 +438,8 @@ namespace OpenDental{
 			Prefs.UpdateBool(PrefName.AccountShowQuestionnaire,checkQuestionnaire.Checked);
 			Prefs.UpdateBool(PrefName.AccountShowTrojanExpressCollect,checkTrojanCollect.Checked);
 			DataValid.SetInvalid(InvalidType.Prefs);
+			//We should use ToolBut invalidation to redraw toolbars that could've been just enabled and stop forcing customers restarting.
+			//DataValid.SetInvalid(InvalidType.ToolBut);
 			DialogResult=DialogResult.OK;
 		}
 
