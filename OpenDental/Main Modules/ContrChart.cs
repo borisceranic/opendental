@@ -3070,7 +3070,7 @@ namespace OpenDental{
 			if(PatCur!=null){
 				FillToothChart(true);
 			}
-			//if(PrefC.GetBoolSilent(PrefName.ChartQuickAddHideAmalgam,true)){
+			//if(PrefC.GetBoolSilent(PrefName.ChartQuickAddHideAmalgam,true)){ //Preference is Deprecated.
 			//	panelQuickPasteAmalgam.Visible=false;
 			//}
 			//else{

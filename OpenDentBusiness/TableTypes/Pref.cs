@@ -133,6 +133,7 @@ namespace OpenDentBusiness {
 		CentralManagerSecurityLock,
 		///<summary>This is the hash of the password that is needed to open the Central Manager tool.</summary>
 		CentralManagerPassHash,
+		///<summary>Deprecated.</summary>
 		ChartQuickAddHideAmalgam,
 		///<summary>Deprecated. If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.
 		///This preference was never fully implemented and should not be used.  We may revisit some day.</summary>
