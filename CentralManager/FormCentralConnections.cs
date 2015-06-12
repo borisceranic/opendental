@@ -24,6 +24,9 @@ namespace CentralManager {
 			comboConnectionGroups.SelectedIndex=0;
 			for(int i=0;i<_listConnectionGroups.Count;i++) {
 				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
+				if(_listConnectionGroups[i].ConnectionGroupNum==PrefC.GetLong(PrefName.ConnGroupCEMT)) {
+					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
+				}
 			}
 			FillGrid();
 		}
@@ -44,6 +47,7 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
+			List<int> listIdxSelect=new List<int>();
 			for(int i=0;i<_listConnsDisplay.Count;i++) {
 				bool isFound=false;
 				for(int j=0;j<ListConns.Count;j++) {
@@ -53,7 +57,7 @@ namespace CentralManager {
 					}
 				}
 				if(isFound) {
-					continue;
+					listIdxSelect.Add(i);
 				}
 				row=new ODGridRow();
 				row.Cells.Add(_listConnsDisplay[i].ItemOrder.ToString());
@@ -68,6 +72,9 @@ namespace CentralManager {
 				gridMain.Rows.Add(row); 
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<listIdxSelect.Count;i++) {
+				gridMain.SetSelected(listIdxSelect[i],true);
+			}
 		}
 
 		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
