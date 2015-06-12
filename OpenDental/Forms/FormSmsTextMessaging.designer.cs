@@ -24,105 +24,79 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSmsTextMessaging));
-			this.label1 = new System.Windows.Forms.Label();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.listStatus = new System.Windows.Forms.ListBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.checkShowHidden = new System.Windows.Forms.CheckBox();
+			this.gridMessages = new OpenDental.UI.ODGrid();
+			this.contextMenuMessages = new System.Windows.Forms.ContextMenu();
+			this.menuItemChangePat = new System.Windows.Forms.MenuItem();
+			this.menuItemMarkUnread = new System.Windows.Forms.MenuItem();
+			this.menuItemMarkRead = new System.Windows.Forms.MenuItem();
+			this.menuItemMarkJunk = new System.Windows.Forms.MenuItem();
+			this.menuItemHide = new System.Windows.Forms.MenuItem();
+			this.menuItemUnhide = new System.Windows.Forms.MenuItem();
+			this.textPatient = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
 			this.textDateTo = new ODR.ValidDate();
 			this.textDateFrom = new ODR.ValidDate();
-			this.comboClinic = new ODR.ComboBoxMulti();
-			this.gridMessages = new OpenDental.UI.ODGrid();
-			this.butUnhide = new OpenDental.UI.Button();
-			this.butDelete = new OpenDental.UI.Button();
-			this.butJunk = new OpenDental.UI.Button();
-			this.butChangePat = new OpenDental.UI.Button();
-			this.butMarkUnread = new OpenDental.UI.Button();
-			this.butMarkRead = new OpenDental.UI.Button();
+			this.comboStatus = new OpenDental.UI.ComboBoxMulti();
+			this.butPatCurrent = new OpenDental.UI.Button();
+			this.butPatAll = new OpenDental.UI.Button();
+			this.butPatFind = new OpenDental.UI.Button();
+			this.comboClinic = new OpenDental.UI.ComboBoxMulti();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
-			// label1
+			// labelClinic
 			// 
-			this.label1.Location = new System.Drawing.Point(13, 9);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(90, 21);
-			this.label1.TabIndex = 6;
-			this.label1.Text = "Clinic";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Location = new System.Drawing.Point(492, 32);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(111, 21);
+			this.labelClinic.TabIndex = 6;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Visible = false;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(13, 30);
+			this.label2.Location = new System.Drawing.Point(15, 10);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(90, 21);
+			this.label2.Size = new System.Drawing.Size(81, 21);
 			this.label2.TabIndex = 8;
 			this.label2.Text = "Date From";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(13, 50);
+			this.label3.Location = new System.Drawing.Point(12, 31);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(90, 21);
+			this.label3.Size = new System.Drawing.Size(84, 21);
 			this.label3.TabIndex = 10;
 			this.label3.Text = "Date To";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// listStatus
-			// 
-			this.listStatus.FormattingEnabled = true;
-			this.listStatus.Location = new System.Drawing.Point(448, 9);
-			this.listStatus.Name = "listStatus";
-			this.listStatus.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listStatus.Size = new System.Drawing.Size(120, 56);
-			this.listStatus.TabIndex = 11;
-			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(335, 9);
+			this.label4.Location = new System.Drawing.Point(489, 8);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(112, 21);
+			this.label4.Size = new System.Drawing.Size(114, 21);
 			this.label4.TabIndex = 12;
 			this.label4.Text = "Type and Status";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkShowHidden
 			// 
-			this.checkShowHidden.Location = new System.Drawing.Point(358, 66);
+			this.checkShowHidden.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkShowHidden.Location = new System.Drawing.Point(838, 10);
 			this.checkShowHidden.Name = "checkShowHidden";
 			this.checkShowHidden.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkShowHidden.Size = new System.Drawing.Size(104, 20);
+			this.checkShowHidden.Size = new System.Drawing.Size(124, 16);
 			this.checkShowHidden.TabIndex = 153;
 			this.checkShowHidden.Text = "Show Hidden";
 			this.checkShowHidden.UseVisualStyleBackColor = true;
-			// 
-			// textDateTo
-			// 
-			this.textDateTo.Location = new System.Drawing.Point(104, 50);
-			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(81, 20);
-			this.textDateTo.TabIndex = 9;
-			// 
-			// textDateFrom
-			// 
-			this.textDateFrom.Location = new System.Drawing.Point(104, 30);
-			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
-			this.textDateFrom.TabIndex = 7;
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.BackColor = System.Drawing.SystemColors.Window;
-			this.comboClinic.DroppedDown = false;
-			this.comboClinic.Items = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.Items")));
-			this.comboClinic.Location = new System.Drawing.Point(104, 9);
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.SelectedIndices")));
-			this.comboClinic.Size = new System.Drawing.Size(225, 21);
-			this.comboClinic.TabIndex = 5;
 			// 
 			// gridMessages
 			// 
@@ -130,107 +104,160 @@ namespace OpenDental{
 			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMessages.HasMultilineHeaders = false;
 			this.gridMessages.HScrollVisible = false;
-			this.gridMessages.Location = new System.Drawing.Point(12, 92);
+			this.gridMessages.Location = new System.Drawing.Point(12, 63);
 			this.gridMessages.Name = "gridMessages";
 			this.gridMessages.ScrollValue = 0;
 			this.gridMessages.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMessages.Size = new System.Drawing.Size(950, 562);
+			this.gridMessages.Size = new System.Drawing.Size(950, 591);
 			this.gridMessages.TabIndex = 4;
-			this.gridMessages.Title = "Text Messages";
+			this.gridMessages.Title = "Text Messages - Right click for options";
 			this.gridMessages.TranslationName = null;
 			// 
-			// butUnhide
+			// contextMenuMessages
 			// 
-			this.butUnhide.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butUnhide.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butUnhide.Autosize = true;
-			this.butUnhide.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butUnhide.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butUnhide.CornerRadius = 4F;
-			this.butUnhide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUnhide.Location = new System.Drawing.Point(97, 660);
-			this.butUnhide.Name = "butUnhide";
-			this.butUnhide.Size = new System.Drawing.Size(83, 24);
-			this.butUnhide.TabIndex = 152;
-			this.butUnhide.Text = "Unhide";
-			this.butUnhide.Click += new System.EventHandler(this.butUnhide_Click);
+			this.contextMenuMessages.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemChangePat,
+            this.menuItemMarkUnread,
+            this.menuItemMarkRead,
+            this.menuItemMarkJunk,
+            this.menuItemHide,
+            this.menuItemUnhide});
 			// 
-			// butDelete
+			// menuItemChangePat
 			// 
-			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Autosize = true;
-			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDelete.CornerRadius = 4F;
-			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(12, 660);
-			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(83, 24);
-			this.butDelete.TabIndex = 151;
-			this.butDelete.Text = "Hide";
-			this.butDelete.Click += new System.EventHandler(this.butHide_Click);
+			this.menuItemChangePat.Index = 0;
+			this.menuItemChangePat.Text = "Change Pat";
+			this.menuItemChangePat.Click += new System.EventHandler(this.menuItemChangePat_Click);
 			// 
-			// butJunk
+			// menuItemMarkUnread
 			// 
-			this.butJunk.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butJunk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butJunk.Autosize = true;
-			this.butJunk.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butJunk.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butJunk.CornerRadius = 4F;
-			this.butJunk.Location = new System.Drawing.Point(886, 66);
-			this.butJunk.Name = "butJunk";
-			this.butJunk.Size = new System.Drawing.Size(76, 24);
-			this.butJunk.TabIndex = 150;
-			this.butJunk.Text = "Mark Junk";
-			this.butJunk.Click += new System.EventHandler(this.butJunk_Click);
+			this.menuItemMarkUnread.Index = 1;
+			this.menuItemMarkUnread.Text = "Mark Unread";
+			this.menuItemMarkUnread.Click += new System.EventHandler(this.menuItemMarkUnread_Click);
 			// 
-			// butChangePat
+			// menuItemMarkRead
 			// 
-			this.butChangePat.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butChangePat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butChangePat.Autosize = true;
-			this.butChangePat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butChangePat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butChangePat.CornerRadius = 4F;
-			this.butChangePat.Location = new System.Drawing.Point(655, 66);
-			this.butChangePat.Name = "butChangePat";
-			this.butChangePat.Size = new System.Drawing.Size(75, 24);
-			this.butChangePat.TabIndex = 149;
-			this.butChangePat.Text = "Change Pat";
-			this.butChangePat.Click += new System.EventHandler(this.butChangePat_Click);
+			this.menuItemMarkRead.Index = 2;
+			this.menuItemMarkRead.Text = "Mark Read";
+			this.menuItemMarkRead.Click += new System.EventHandler(this.menuItemMarkRead_Click);
 			// 
-			// butMarkUnread
+			// menuItemMarkJunk
 			// 
-			this.butMarkUnread.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMarkUnread.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butMarkUnread.Autosize = true;
-			this.butMarkUnread.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMarkUnread.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMarkUnread.CornerRadius = 4F;
-			this.butMarkUnread.Location = new System.Drawing.Point(732, 66);
-			this.butMarkUnread.Name = "butMarkUnread";
-			this.butMarkUnread.Size = new System.Drawing.Size(75, 24);
-			this.butMarkUnread.TabIndex = 148;
-			this.butMarkUnread.Text = "Mark Unread";
-			this.butMarkUnread.Click += new System.EventHandler(this.butMarkUnread_Click);
+			this.menuItemMarkJunk.Index = 3;
+			this.menuItemMarkJunk.Text = "Mark Junk";
+			this.menuItemMarkJunk.Click += new System.EventHandler(this.menuItemMarkJunk_Click);
 			// 
-			// butMarkRead
+			// menuItemHide
 			// 
-			this.butMarkRead.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMarkRead.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butMarkRead.Autosize = true;
-			this.butMarkRead.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMarkRead.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMarkRead.CornerRadius = 4F;
-			this.butMarkRead.Location = new System.Drawing.Point(809, 66);
-			this.butMarkRead.Name = "butMarkRead";
-			this.butMarkRead.Size = new System.Drawing.Size(75, 24);
-			this.butMarkRead.TabIndex = 147;
-			this.butMarkRead.Text = "Mark Read";
-			this.butMarkRead.Click += new System.EventHandler(this.butMarkRead_Click);
+			this.menuItemHide.Index = 4;
+			this.menuItemHide.Text = "Hide";
+			this.menuItemHide.Click += new System.EventHandler(this.menuItemHide_Click);
+			// 
+			// menuItemUnhide
+			// 
+			this.menuItemUnhide.Index = 5;
+			this.menuItemUnhide.Text = "Unhide";
+			this.menuItemUnhide.Click += new System.EventHandler(this.menuItemUnhide_Click);
+			// 
+			// textPatient
+			// 
+			this.textPatient.Location = new System.Drawing.Point(266, 10);
+			this.textPatient.Name = "textPatient";
+			this.textPatient.ReadOnly = true;
+			this.textPatient.Size = new System.Drawing.Size(216, 20);
+			this.textPatient.TabIndex = 156;
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(181, 14);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(84, 13);
+			this.label1.TabIndex = 155;
+			this.label1.Text = "Patient";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDateTo
+			// 
+			this.textDateTo.Location = new System.Drawing.Point(97, 31);
+			this.textDateTo.Name = "textDateTo";
+			this.textDateTo.Size = new System.Drawing.Size(81, 20);
+			this.textDateTo.TabIndex = 9;
+			// 
+			// textDateFrom
+			// 
+			this.textDateFrom.Location = new System.Drawing.Point(97, 10);
+			this.textDateFrom.Name = "textDateFrom";
+			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
+			this.textDateFrom.TabIndex = 7;
+			// 
+			// comboStatus
+			// 
+			this.comboStatus.BackColor = System.Drawing.SystemColors.Window;
+			this.comboStatus.DroppedDown = false;
+			this.comboStatus.Items = ((System.Collections.ArrayList)(resources.GetObject("comboStatus.Items")));
+			this.comboStatus.Location = new System.Drawing.Point(604, 10);
+			this.comboStatus.Name = "comboStatus";
+			this.comboStatus.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboStatus.SelectedIndices")));
+			this.comboStatus.Size = new System.Drawing.Size(225, 21);
+			this.comboStatus.TabIndex = 160;
+			this.comboStatus.UseCommas = false;
+			// 
+			// butPatCurrent
+			// 
+			this.butPatCurrent.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatCurrent.Autosize = true;
+			this.butPatCurrent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatCurrent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatCurrent.CornerRadius = 4F;
+			this.butPatCurrent.Location = new System.Drawing.Point(266, 31);
+			this.butPatCurrent.Name = "butPatCurrent";
+			this.butPatCurrent.Size = new System.Drawing.Size(63, 24);
+			this.butPatCurrent.TabIndex = 159;
+			this.butPatCurrent.Text = "Current";
+			this.butPatCurrent.Click += new System.EventHandler(this.butPatCurrent_Click);
+			// 
+			// butPatAll
+			// 
+			this.butPatAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatAll.Autosize = true;
+			this.butPatAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatAll.CornerRadius = 4F;
+			this.butPatAll.Location = new System.Drawing.Point(419, 31);
+			this.butPatAll.Name = "butPatAll";
+			this.butPatAll.Size = new System.Drawing.Size(63, 24);
+			this.butPatAll.TabIndex = 158;
+			this.butPatAll.Text = "All";
+			this.butPatAll.Click += new System.EventHandler(this.butPatAll_Click);
+			// 
+			// butPatFind
+			// 
+			this.butPatFind.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatFind.Autosize = true;
+			this.butPatFind.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatFind.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatFind.CornerRadius = 4F;
+			this.butPatFind.Location = new System.Drawing.Point(342, 31);
+			this.butPatFind.Name = "butPatFind";
+			this.butPatFind.Size = new System.Drawing.Size(63, 24);
+			this.butPatFind.TabIndex = 157;
+			this.butPatFind.Text = "Find";
+			this.butPatFind.Click += new System.EventHandler(this.butPatFind_Click);
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.BackColor = System.Drawing.SystemColors.Window;
+			this.comboClinic.DroppedDown = false;
+			this.comboClinic.Items = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.Items")));
+			this.comboClinic.Location = new System.Drawing.Point(604, 32);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.SelectedIndices")));
+			this.comboClinic.Size = new System.Drawing.Size(225, 21);
+			this.comboClinic.TabIndex = 154;
+			this.comboClinic.UseCommas = false;
+			this.comboClinic.Visible = false;
 			// 
 			// butRefresh
 			// 
@@ -240,7 +267,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(578, 66);
+			this.butRefresh.Location = new System.Drawing.Point(887, 31);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 13;
@@ -266,22 +293,21 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.comboStatus);
+			this.Controls.Add(this.butPatCurrent);
+			this.Controls.Add(this.butPatAll);
+			this.Controls.Add(this.butPatFind);
+			this.Controls.Add(this.textPatient);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.checkShowHidden);
-			this.Controls.Add(this.butUnhide);
-			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.butJunk);
-			this.Controls.Add(this.butChangePat);
-			this.Controls.Add(this.butMarkUnread);
-			this.Controls.Add(this.butMarkRead);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.label4);
-			this.Controls.Add(this.listStatus);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textDateTo);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textDateFrom);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.gridMessages);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -299,21 +325,27 @@ namespace OpenDental{
 
 		private OpenDental.UI.Button butClose;
 		private UI.ODGrid gridMessages;
-		private ODR.ComboBoxMulti comboClinic;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelClinic;
 		private ODR.ValidDate textDateFrom;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		private ODR.ValidDate textDateTo;
-		private System.Windows.Forms.ListBox listStatus;
 		private System.Windows.Forms.Label label4;
 		private UI.Button butRefresh;
-		private UI.Button butChangePat;
-		private UI.Button butMarkUnread;
-		private UI.Button butMarkRead;
-		private UI.Button butJunk;
-		private UI.Button butDelete;
-		private UI.Button butUnhide;
 		private System.Windows.Forms.CheckBox checkShowHidden;
+		private System.Windows.Forms.ContextMenu contextMenuMessages;
+		private System.Windows.Forms.MenuItem menuItemChangePat;
+		private System.Windows.Forms.MenuItem menuItemMarkUnread;
+		private System.Windows.Forms.MenuItem menuItemMarkRead;
+		private System.Windows.Forms.MenuItem menuItemMarkJunk;
+		private System.Windows.Forms.MenuItem menuItemHide;
+		private System.Windows.Forms.MenuItem menuItemUnhide;
+		private UI.ComboBoxMulti comboClinic;
+		private UI.Button butPatCurrent;
+		private UI.Button butPatAll;
+		private UI.Button butPatFind;
+		private System.Windows.Forms.TextBox textPatient;
+		private System.Windows.Forms.Label label1;
+		private UI.ComboBoxMulti comboStatus;
 	}
 }

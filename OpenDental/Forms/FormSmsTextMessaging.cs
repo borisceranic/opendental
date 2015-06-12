@@ -19,6 +19,10 @@ namespace OpenDental {
 		///<summary>Set in FormOpenDental.  Initialize to the current number of unread text messages.
 		///Used by FormSmsTextMessaging to determine when to call the SmsNotifier delegate.</summary>
 		public long UnreadMessageCount=0;
+		///<summary>This gets set externally beforehand.  Lets user quickly select messages for current patient.</summary>
+		public long CurPatNum;
+		///<summary>The selected patNum.  Can be 0 to include all.</summary>
+		private long _patNum;
 
 		public FormSmsTextMessaging() {
 			InitializeComponent();
@@ -26,28 +30,33 @@ namespace OpenDental {
 		}
 
 		private void FormSmsTextMessaging_Load(object sender,EventArgs e) {
-			_listClinics=Clinics.GetForUserod(Security.CurUser);
-			comboClinic.Items.Clear();
-			for(int i=0;i<_listClinics.Count;i++) {
-				comboClinic.Items.Add(_listClinics[i].Description);
-				comboClinic.SetSelected(i,true);
+			gridMessages.ContextMenu=contextMenuMessages;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				labelClinic.Visible=true;
+				comboClinic.Visible=true;
+				comboClinic.Items.Clear();
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				for(int i=0;i<_listClinics.Count;i++) {
+					comboClinic.Items.Add(_listClinics[i].Description);
+					comboClinic.SetSelected(i,true);
+				}
 			}
 			textDateFrom.Text=DateTimeOD.Today.AddDays(-7).ToShortDateString();
 			textDateTo.Text=DateTimeOD.Today.ToShortDateString();
-			listStatus.Items.Clear();
-			listStatus.Items.Add("Sent");//0
+			comboStatus.Items.Clear();
+			comboStatus.Items.Add("Sent");//0
 			if(IsSent) {
-				listStatus.SetSelected(listStatus.Items.Count-1,true);
+				comboStatus.SetSelected(comboStatus.Items.Count-1,true);
 			}
-			listStatus.Items.Add("Received Unread");//1
+			comboStatus.Items.Add("Received Unread");//1
 			if(!IsSent) {
-				listStatus.SetSelected(listStatus.Items.Count-1,true);
+				comboStatus.SetSelected(comboStatus.Items.Count-1,true);
 			}
-			listStatus.Items.Add("Received Read");//2
+			comboStatus.Items.Add("Received Read");//2
 			if(!IsSent) {
-				listStatus.SetSelected(listStatus.Items.Count-1,true);
+				comboStatus.SetSelected(comboStatus.Items.Count-1,true);
 			}
-			listStatus.Items.Add("Received Junk");//3
+			comboStatus.Items.Add("Received Junk");//3
 			FillGridTextMessages();
 		}
 
@@ -56,13 +65,21 @@ namespace OpenDental {
 			bool isSortAsc=gridMessages.SortedIsAscending;
 			if(sortByColIdx==-1) {
 				//Default to sorting by Date descending.
-				sortByColIdx=1;
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+					sortByColIdx=2;
+				}
+				else {
+					sortByColIdx=1;
+				}
 				isSortAsc=false;
 			}
 			gridMessages.BeginUpdate();
 			gridMessages.Rows.Clear();
 			gridMessages.Columns.Clear();
 			gridMessages.Columns.Add(new UI.ODGridColumn("Patient",150,HorizontalAlignment.Left));
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				gridMessages.Columns.Add(new UI.ODGridColumn("Clinic",130,HorizontalAlignment.Left));
+			}
 			gridMessages.Columns.Add(new UI.ODGridColumn("DateTime",140,HorizontalAlignment.Left));
 			gridMessages.Columns.Add(new UI.ODGridColumn("Type",80,HorizontalAlignment.Center));
 			gridMessages.Columns.Add(new UI.ODGridColumn("Status",90,HorizontalAlignment.Center));
@@ -71,14 +88,17 @@ namespace OpenDental {
 			}
 			gridMessages.Columns.Add(new UI.ODGridColumn("Cost",32,HorizontalAlignment.Right));
 			gridMessages.Columns.Add(new UI.ODGridColumn("Message",0,HorizontalAlignment.Left));
-			List<long> listClinicNums=new List<long>();
-			for(int i=0;i<_listClinics.Count;i++) {
-				listClinicNums.Add(_listClinics[i].ClinicNum);
+			List<long> listClinicNums=new List<long>();//Leaving this blank will cause the clinic filter to be ignored in SmsFromMobiles.GetMessages().
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+				for(int i=0;i<comboClinic.SelectedIndices.Count;i++) {
+					int index=(int)comboClinic.SelectedIndices[i];
+					listClinicNums.Add(_listClinics[index].ClinicNum);
+				}
 			}
 			bool isSent=false;
 			List <SmsFromStatus> listSmsFromStatuses=new List<SmsFromStatus>();
-			for(int i=0;i<listStatus.SelectedIndices.Count;i++) {
-				int index=listStatus.SelectedIndices[i];
+			for(int i=0;i<comboStatus.SelectedIndices.Count;i++) {
+				int index=(int)comboStatus.SelectedIndices[i];
 				if(index==0) {
 					isSent=true;
 				}
@@ -102,13 +122,20 @@ namespace OpenDental {
 					if(!checkShowHidden.Checked && listSmsFromMobile[i].IsHidden) {
 						continue;
 					}
+					if(_patNum!=0 && listSmsFromMobile[i].PatNum!=_patNum) {
+						continue;
+					}
 					UI.ODGridRow row=new UI.ODGridRow();
 					row.Tag=listSmsFromMobile[i];
+					Clinic clinic=Clinics.GetClinic(listSmsFromMobile[i].ClinicNum);
 					if(listSmsFromMobile[i].PatNum==0) {
 						row.Cells.Add("");//Patient
 					}
 					else {
 						row.Cells.Add(dictPatNames[listSmsFromMobile[i].PatNum]);//Patient
+					}
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+						row.Cells.Add(clinic.Description);//Clinic
 					}
 					if(listSmsFromMobile[i].SmsStatus==SmsFromStatus.ReceivedUnread) {
 						row.Bold=true;
@@ -138,13 +165,20 @@ namespace OpenDental {
 					if(!checkShowHidden.Checked && listSmsToMobile[i].IsHidden) {
 						continue;
 					}
+					if(_patNum!=0 && listSmsToMobile[i].PatNum!=_patNum) {
+						continue;
+					}
 					UI.ODGridRow row=new UI.ODGridRow();
 					row.Tag=listSmsToMobile[i];
+					Clinic clinic=Clinics.GetClinic(listSmsToMobile[i].ClinicNum);
 					if(listSmsToMobile[i].PatNum==0) {
 						row.Cells.Add("");//Patient
 					}
 					else {
 						row.Cells.Add(dictPatNames[listSmsToMobile[i].PatNum]);//Patient
+					}
+					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
+						row.Cells.Add(clinic.Description);//Clinic
 					}
 					row.Cells.Add(listSmsToMobile[i].DateTimeSent.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Sent"));//Type
@@ -161,6 +195,37 @@ namespace OpenDental {
 			gridMessages.SortForced(sortByColIdx,isSortAsc);
 		}
 
+		private void butPatCurrent_Click(object sender,EventArgs e) {
+			_patNum=CurPatNum;
+			if(_patNum==0) {
+				textPatient.Text="";
+			}
+			else {
+				textPatient.Text=Patients.GetLim(_patNum).GetNameLF();
+			}
+		}
+
+		private void butPatFind_Click(object sender,EventArgs e) {
+			FormPatientSelect FormP=new FormPatientSelect();
+			FormP.ShowDialog();
+			if(FormP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_patNum=FormP.SelectedPatNum;
+			textPatient.Text=Patients.GetLim(_patNum).GetNameLF();
+		}
+
+		private void butPatAll_Click(object sender,EventArgs e) {
+			_patNum=0;
+			textPatient.Text="";
+		}
+
+		private void butRefresh_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
+			FillGridTextMessages();
+			Cursor=Cursors.Default;
+		}
+
 		///<summary>Unselects all sent messages.  Returns true if there is at least one received message selected.</summary>
 		private bool UnselectSentMessages() {
 			int unselectedCount=0;
@@ -171,14 +236,22 @@ namespace OpenDental {
 					unselectedCount++;
 				}
 			}
+			string msg="";
 			if(unselectedCount>0) {
-				MessageBox.Show(Lan.g(this,"Number of sent messages unselected")+": "+unselectedCount);
+				msg=Lan.g(this,"Number of sent messages unselected")+": "+unselectedCount;
 			}
+			bool retVal=true;
 			if(gridMessages.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select at least one received message.");
-				return false;
+				if(msg!="") {
+					msg+="\r\n";
+				}
+				msg+=Lan.g(this,"Please select at least one received message.");
+				retVal=false;
 			}
-			return true;
+			if(msg!="") {
+				MessageBox.Show(msg);
+			}
+			return retVal;
 		}
 
 		///<summary>Unselects any sent messages, then sets the given status for any selected receieved messages.</summary>
@@ -198,19 +271,7 @@ namespace OpenDental {
 			Cursor=Cursors.Default;
 		}
 
-		private void butJunk_Click(object sender,EventArgs e) {
-			SetReceivedSelectedStatus(SmsFromStatus.ReceivedJunk);
-		}
-
-		private void butMarkUnread_Click(object sender,EventArgs e) {
-			SetReceivedSelectedStatus(SmsFromStatus.ReceivedUnread);
-		}
-
-		private void butMarkRead_Click(object sender,EventArgs e) {
-			SetReceivedSelectedStatus(SmsFromStatus.ReceivedRead);
-		}
-
-		private void butChangePat_Click(object sender,EventArgs e) {
+		private void ChangePat() {
 			if(!UnselectSentMessages()) {
 				return;
 			}
@@ -225,10 +286,12 @@ namespace OpenDental {
 				SmsFromMobile oldSmsFromMobile=smsFromMobile.Copy();
 				smsFromMobile.PatNum=form.SelectedPatNum;
 				SmsFromMobiles.Update(smsFromMobile,oldSmsFromMobile);
-				Commlog commlog=Commlogs.GetOne(smsFromMobile.CommlogNum);
-				Commlog oldCommlog=commlog.Copy();
-				commlog.PatNum=form.SelectedPatNum;
-				Commlogs.Update(commlog,oldCommlog);
+				if(smsFromMobile.CommlogNum!=0) {//Not sure if CommlogNum can be zero.
+					Commlog commlog=Commlogs.GetOne(smsFromMobile.CommlogNum);
+					Commlog oldCommlog=commlog.Copy();
+					commlog.PatNum=form.SelectedPatNum;
+					Commlogs.Update(commlog,oldCommlog);
+				}
 			}
 			int messagesMovedCount=gridMessages.SelectedIndices.Length;
 			FillGridTextMessages();//Refresh grid to show changed patient.
@@ -236,32 +299,16 @@ namespace OpenDental {
 			MessageBox.Show(Lan.g(this,"Text messages moved successfully")+": "+messagesMovedCount);
 		}
 
-		private void butRefresh_Click(object sender,EventArgs e) {
-			Cursor=Cursors.WaitCursor;
-			FillGridTextMessages();
-			Cursor=Cursors.Default;
+		private void MarkUnread() {
+			SetReceivedSelectedStatus(SmsFromStatus.ReceivedUnread);
 		}
 
-		private void butHide_Click(object sender,EventArgs e) {
-			if(gridMessages.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select at least one message before attempting to hide.");
-				return;
-			}
-			if(!MsgBox.Show(this,true,"Hide all selected messages?")) {
-				return;
-			}
-			HideOrUnhideMessages(true);
+		private void MarkRead() {
+			SetReceivedSelectedStatus(SmsFromStatus.ReceivedRead);
 		}
 
-		private void butUnhide_Click(object sender,EventArgs e) {
-			if(gridMessages.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select at least one message before attempting to unhide.");
-				return;
-			}
-			if(!MsgBox.Show(this,true,"Unhide all selected messages?")) {
-				return;
-			}
-			HideOrUnhideMessages(false);
+		private void MarkJunk() {
+			SetReceivedSelectedStatus(SmsFromStatus.ReceivedJunk);
 		}
 
 		///<summary>Set isHide to true to hide the selected messages.  Set IsHide to false to unhide the selected messages.</summary>
@@ -284,6 +331,52 @@ namespace OpenDental {
 			}
 			FillGridTextMessages();
 			Cursor=Cursors.Default;
+		}
+
+		private void MarkHidden() {
+			if(gridMessages.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one message before attempting to hide.");
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Hide all selected messages?")) {
+				return;
+			}
+			HideOrUnhideMessages(true);
+		}
+
+		private void MarkUnhidden() {
+			if(gridMessages.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one message before attempting to unhide.");
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Unhide all selected messages?")) {
+				return;
+			}
+			HideOrUnhideMessages(false);
+		}
+
+		private void menuItemChangePat_Click(object sender,EventArgs e) {
+			ChangePat();
+		}
+
+		private void menuItemMarkUnread_Click(object sender,EventArgs e) {
+			MarkUnread();
+		}
+
+		private void menuItemMarkRead_Click(object sender,EventArgs e) {
+			MarkRead();
+		}
+
+		private void menuItemMarkJunk_Click(object sender,EventArgs e) {
+			MarkJunk();
+		}
+
+		private void menuItemHide_Click(object sender,EventArgs e) {
+			MarkHidden();
+		}
+
+		private void menuItemUnhide_Click(object sender,EventArgs e) {
+			MarkUnhidden();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

@@ -234,10 +234,13 @@ namespace ODR
 
 		///<summary></summary>
 		public void SetSelected(int index,bool setToValue){
-			if(setToValue)
+			if(setToValue) {
 				selectedIndices.Add(index);
-			else
+			}
+			else {
 				selectedIndices.Remove(index);
+			}
+			FillText();//Since the selections probably changed, the text in the combobox display probably changed as well.
 		}
 
 		

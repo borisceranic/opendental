@@ -3493,6 +3493,7 @@ namespace OpenDental{
 			form.IsSent=false;
 			form.SmsNotifier=SetSmsNotificationText;
 			form.UnreadMessageCount=0;
+			form.CurPatNum=CurPatNum;
 			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
 				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
 			}
@@ -3504,6 +3505,7 @@ namespace OpenDental{
 			form.IsSent=true;
 			form.SmsNotifier=SetSmsNotificationText;
 			form.UnreadMessageCount=0;
+			form.CurPatNum=CurPatNum;
 			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
 				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
 			}

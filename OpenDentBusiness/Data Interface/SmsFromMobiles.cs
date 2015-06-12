@@ -115,7 +115,7 @@ namespace OpenDentBusiness{
 			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
 		}
 
-		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
+		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will not filter by clinic.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
 		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,params SmsFromStatus[] arrayStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,arrayStatuses);
