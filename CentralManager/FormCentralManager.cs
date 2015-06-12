@@ -156,7 +156,7 @@ namespace CentralManager {
 				}
 			}
 			else if(_listConns[e.Row].ServiceURI!="") {
-				args+="WebServiceURI=\""+_listConns[e.Row].ServiceURI+"\" ";
+				args+="WebServiceUri=\""+_listConns[e.Row].ServiceURI+"\" ";//Command line args expects WebServiceUri explicitly. Case sensitive.
 				if(_listConns[e.Row].WebServiceIsEcw){
 					args+="WebServiceIsEcw=True ";
 				}
@@ -226,8 +226,11 @@ namespace CentralManager {
 			FillGrid();
 		}
 
-		private void menuUserEdit_Click(object sender,EventArgs e) {
+		private void menuItemSecurity_Click(object sender,EventArgs e) {
 			FormCentralSecurity FormCUS=new FormCentralSecurity();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
+				FormCUS.ListConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
 			FormCUS.ShowDialog();
 			GetConfigAndConnect();
 		}
@@ -272,7 +275,63 @@ namespace CentralManager {
 			Userods.Update(Security.CurUser);
 		}
 
-		private void butSearch_Click(object sender,EventArgs e) {
+		private void butAdd_Click(object sender,EventArgs e) {
+			CentralConnection conn=new CentralConnection();
+			conn.IsNew=true;
+			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
+			FormCCS.CentralConnectionCur=conn;
+			FormCCS.ShowDialog();//Will insert conn on OK.
+			FillGrid();
+		}
+
+		private void butEdit_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select a connection to edit first.");
+				return;
+			}
+			FormCentralConnectionEdit FormCCE=new FormCentralConnectionEdit();
+			FormCCE.CentralConnectionCur=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;//No support for editing multiple.
+			FormCCE.ShowDialog();
+			FillGrid();
+		}
+
+		private void butSecurity_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one connection.");
+				return;
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
+			CentralSyncHelper.SyncAll(listSelectedConns);
+		}
+
+		private void butUsers_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one connection.");
+				return;
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
+			CentralSyncHelper.SyncUsers(listSelectedConns);
+		}
+
+		private void butLocks_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select at least one connection.");
+				return;
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
+			CentralSyncHelper.SyncLocks(listSelectedConns);
+		}
+
+		private void butPtSearch_Click(object sender,EventArgs e) {
 			if(gridMain.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"Please select at least one connection to search first.");
 				return;

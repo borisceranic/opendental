@@ -45,6 +45,8 @@
 			this.textDate = new OpenDental.ValidDate();
 			this.label2 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
+			this.butSyncUsers = new OpenDental.UI.Button();
+			this.butSyncLocks = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -290,11 +292,43 @@
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// butSyncUsers
+			// 
+			this.butSyncUsers.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSyncUsers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSyncUsers.Autosize = true;
+			this.butSyncUsers.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSyncUsers.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSyncUsers.CornerRadius = 4F;
+			this.butSyncUsers.Location = new System.Drawing.Point(566, 473);
+			this.butSyncUsers.Name = "butSyncUsers";
+			this.butSyncUsers.Size = new System.Drawing.Size(75, 24);
+			this.butSyncUsers.TabIndex = 108;
+			this.butSyncUsers.Text = "Sync Users";
+			this.butSyncUsers.Click += new System.EventHandler(this.butSyncUsers_Click);
+			// 
+			// butSyncLocks
+			// 
+			this.butSyncLocks.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSyncLocks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSyncLocks.Autosize = true;
+			this.butSyncLocks.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSyncLocks.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSyncLocks.CornerRadius = 4F;
+			this.butSyncLocks.Location = new System.Drawing.Point(566, 503);
+			this.butSyncLocks.Name = "butSyncLocks";
+			this.butSyncLocks.Size = new System.Drawing.Size(75, 24);
+			this.butSyncLocks.TabIndex = 109;
+			this.butSyncLocks.Text = "Sync Locks";
+			this.butSyncLocks.Click += new System.EventHandler(this.butSyncLocks_Click);
+			// 
 			// FormCentralSecurity
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(653, 628);
+			this.Controls.Add(this.butSyncLocks);
+			this.Controls.Add(this.butSyncUsers);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butSyncAll);
@@ -341,6 +375,8 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.CheckBox checkEnable;
 		private OpenDental.UI.Button butOK;
+		private OpenDental.UI.Button butSyncUsers;
+		private OpenDental.UI.Button butSyncLocks;
 
 
 	}
