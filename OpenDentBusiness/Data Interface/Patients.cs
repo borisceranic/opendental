@@ -255,6 +255,14 @@ namespace OpenDentBusiness{
 				if(i!=0){
 					regexp+="[^0-9]*";//zero or more intervening digits that are not numbers
 				}
+				if(i==3) {//If there is more than three digits and the first digit is 1, make it optional.
+					if(phonedigits.StartsWith("1")) {
+						regexp="1?"+regexp.Substring(1);
+					}
+					else {
+						regexp="1?[^0-9]*"+regexp;//add a leading 1 so that 1-800 numbers can show up simply by typing in 800 followed by the number.
+					}
+				}
 				regexp+=phonedigits[i];
 			}
 			string command="SELECT DISTINCT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
