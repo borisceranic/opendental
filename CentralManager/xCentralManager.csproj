@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Db\CentralConnectionHelper.cs" />
     <Compile Include="Db\CentralGroupPermissions.cs" />
+    <Compile Include="Db\CentralSyncHelper.cs" />
     <Compile Include="Db\CentralUserGroups.cs" />
     <Compile Include="Db\CentralUserods.cs" />
     <Compile Include="FormCentralConnectionGroupEdit.cs">

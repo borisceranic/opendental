@@ -306,6 +306,34 @@ namespace OpenDentBusiness{
 			Insert(sig);
 		}
 
+		///<summary>Sends a signal for cache refresh to a database and doesn't use the local cache.  Useful for multithreaded connections.</summary>
+		public static void SetInvalidNoCache(params InvalidType[] itypes) {
+			string itypeString="";
+			for(int i=0;i<itypes.Length;i++) {
+				if(i>0) {
+					itypeString+=",";
+				}
+				itypeString+=((int)itypes[i]).ToString();
+			}
+			Signalod sig=new Signalod();
+			sig.ITypes=itypeString;
+			sig.DateViewing=DateTime.MinValue;
+			sig.SigType=SignalType.Invalid;
+			sig.TaskNum=0;
+			sig.SigDateTime=MiscData.GetNowDateTime();
+			string command="INSERT INTO signalod (FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum) VALUES("
+				+"'',"
+				+sig.ITypes+","
+				+POut.DateT(sig.DateViewing)+","
+				+(int)sig.SigType+","
+				+"'',"
+				+POut.DateT(sig.SigDateTime)+","
+				+"'',"
+				+POut.DateT(sig.AckTime)+","
+				+sig.TaskNum+")";
+			Db.NonQ(command);
+		}
+
 		///<summary>Acknowledge one signal from the manage module grid</summary>
 		public static void AckSignal(long signalNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

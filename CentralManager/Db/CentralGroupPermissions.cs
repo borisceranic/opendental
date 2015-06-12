@@ -60,13 +60,13 @@ namespace CentralManager {
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
-				GroupPermissions.Insert(listIns[i]);
+				GroupPermissions.InsertNoCache(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {
-				GroupPermissions.Update(listUpdNew[i]);
+				GroupPermissions.UpdateNoCache(listUpdNew[i]);
 			}
 			for(int i=0;i<listDel.Count;i++) {
-				GroupPermissions.Delete(listDel[i]);
+				GroupPermissions.DeleteNoCache(listDel[i]);
 			}
 		}
 

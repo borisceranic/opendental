@@ -40,6 +40,17 @@ namespace OpenDentBusiness{
 			Crud.GroupPermissionCrud.Update(gp);
 		}
 
+		///<summary>Update that doesnt use the local cache.  Useful for multithreaded connections.</summary>
+		public static void UpdateNoCache(GroupPermission gp) {
+			string command="UPDATE grouppermission SET "
+				+"NewerDate   =  "+POut.Date  (gp.NewerDate)+", "
+				+"NewerDays   =  "+POut.Int   (gp.NewerDays)+", "
+				+"UserGroupNum=  "+POut.Long  (gp.UserGroupNum)+", "
+				+"PermType    =  "+POut.Int   ((int)gp.PermType)+" "
+				+"WHERE GroupPermNum = "+POut.Long(gp.GroupPermNum);
+			Db.NonQ(command);
+		}
+
 		///<summary>Deletes GroupPermissions based on primary key.  Do not call this method unless you have checked specific dependencies first.  E.g. after deleting this permission, there will still be a security admin user.  This method is only called from the CEMT sync.  RemovePermission should probably be used instead.</summary>
 		public static void Delete(GroupPermission gp) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -47,6 +58,12 @@ namespace OpenDentBusiness{
 				return;
 			}
 			string command="DELETE FROM grouppermission WHERE GroupPermNum = "+POut.Long(gp.GroupPermNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Deletes without using the cache.  Useful for multithreaded connections.</summary>
+		public static void DeleteNoCache(GroupPermission gp) {
+			string command="DELETE FROM grouppermission WHERE GroupPermNum="+POut.Long(gp.GroupPermNum);
 			Db.NonQ(command);
 		}
 
@@ -74,6 +91,16 @@ namespace OpenDentBusiness{
 				}
 			}
 			return Crud.GroupPermissionCrud.Insert(gp);
+		}
+
+		///<summary>Inserts without using the local cache.  Useful for multithreaded connections.  Doesn't validate SecurityAdminPermission like the normal Insert does.</summary>
+		public static long InsertNoCache(GroupPermission gp) {
+			string command="INSERT INTO grouppermission (NewerDate,NewerDays,UserGroupNum,PermType) VALUES("
+				+		 POut.Date  (gp.NewerDate)+","
+				+    POut.Int   (gp.NewerDays)+","
+				+    POut.Long  (gp.UserGroupNum)+","
+				+    POut.Int   ((int)gp.PermType)+")";
+			return Db.NonQ(command,true);
 		}
 
 		///<summary></summary>
@@ -119,6 +146,15 @@ namespace OpenDentBusiness{
 				}
 			}
 			return listGroupPerms;
+		}
+
+		///<summary>Gets a list of GroupPermissions for the supplied UserGroupNum without using the local cache.  Useful for multithreaded connections.</summary>
+		public static List<GroupPermission> GetPermsNoCache(long userGroupNum) {
+			List<GroupPermission> retVal=new List<GroupPermission>();
+			string command="SELECT * FROM grouppermission WHERE UserGroupNum="+POut.Long(userGroupNum);
+			DataTable tableGroupPerms=Db.GetTable(command);
+			retVal=Crud.GroupPermissionCrud.TableToList(tableGroupPerms);
+			return retVal;
 		}
 
 		///<summary>Used in Security.IsAuthorized</summary>

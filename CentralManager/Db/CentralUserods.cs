@@ -60,7 +60,7 @@ namespace CentralManager {
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
-				Userods.Insert(listIns[i]);
+				Userods.InsertNoCache(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {
 				Userods.UpdateCEMT(listUpdNew[i]);//listUpdNew gets populated by the list coming from the CEMT. Userods.Update uses primary key to update. Won't work.  Need to make new update.

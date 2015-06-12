@@ -75,6 +75,12 @@ namespace OpenDentBusiness{
 			return UpdateLong(prefName,newValue);
 		}
 
+		///<summary>Updates a pref of type int without using the cache.  Useful for multithreaded connections.</summary>
+		public static void UpdateIntNoCache(PrefName prefName,int newValue) {
+			string command="UPDATE preference SET ValueString='"+POut.Long(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
+			Db.NonQ(command);
+		}
+
 		///<summary>Updates a pref of type long.  Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateLong(PrefName prefName,long newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
@@ -162,6 +168,12 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Updates a bool without using cache classes.  Useful for multithreaded connections.</summary>
+		public static void UpdateBoolNoCache(PrefName prefName,bool newValue) {
+			string command="UPDATE preference SET ValueString='"+POut.Bool(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
+			Db.NonQ(command);
+		}
+
 		///<summary>Returns true if a change was required, or false if no change needed.</summary>
 		public static bool UpdateString(PrefName prefName,string newValue) {
 			//Very unusual.  Involves cache, so Meth is used further down instead of here at the top.
@@ -189,6 +201,12 @@ namespace OpenDentBusiness{
 			dictPrefsUpdated[prefName.ToString()]=pref;
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
+		}
+
+		///<summary>Updates a pref string without using the cache classes.  Useful for multithreaded connections.</summary>
+		public static void UpdateStringNoCache(PrefName prefName,string newValue) {
+			string command="UPDATE preference SET ValueString='"+POut.String(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
+			Db.NonQ(command);
 		}
 
 		///<summary>Used for prefs that are non-standard.  Especially by outside programmers. Returns true if a change was required, or false if no change needed.</summary>

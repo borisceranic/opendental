@@ -19,6 +19,14 @@ namespace OpenDentBusiness{
 			return Crud.SecurityLogHashCrud.Insert(securityLogHash);
 		}
 
+		///<summary>Inserts securityloghash into DB without using cache.  Usually used when multithreading connections.</summary>
+		public static long InsertNoCache(SecurityLogHash securityLogHash) {
+			string command="INSERT INTO securityloghash (SecurityLogNum,LogHash) VALUES("
+				+    POut.Long  (securityLogHash.SecurityLogNum)+","
+				+"'"+POut.String(securityLogHash.LogHash)+"')";
+			return Db.NonQ(command);
+		}
+
 		///<summary>Creates a new SecurityLogHash entry in the Db.</summary>
 		public static void InsertSecurityLogHash(long securityLogNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -32,6 +40,15 @@ namespace OpenDentBusiness{
 			//Hash the securityLog
 			securityLogHash.LogHash=GetHashString(securityLog);
 			Insert(securityLogHash);
+		}
+
+		///<summary>Used for inserting without using the cache.  Usually used when multithreading connections.</summary>
+		public static long InsertSecurityLogHashNoCache(long securityLogNum) {
+			SecurityLog securityLog=Crud.SecurityLogCrud.SelectOne(securityLogNum);
+			SecurityLogHash securityLogHash=new SecurityLogHash();
+			securityLogHash.SecurityLogNum=securityLog.SecurityLogNum;
+			securityLogHash.LogHash=GetHashString(securityLog);
+			return InsertNoCache(securityLogHash);
 		}
 
 		///<summary>Does not make a call to the db.  Returns a SHA-256 hash of the entire security log.  Length of 32 bytes.  Only called from CreateSecurityLogHash() and FormAudit.FillGrid()</summary>

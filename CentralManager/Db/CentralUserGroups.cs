@@ -60,10 +60,10 @@ namespace CentralManager {
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
-				UserGroups.Insert(listIns[i]);
+				UserGroups.InsertNoCache(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {
-				UserGroups.UpdateCEMT(listUpdNew[i]);
+				UserGroups.UpdateCEMTNoCache(listUpdNew[i]);//Doesn't use cache
 			}
 			//for(int i=0;i<listDel.Count;i++) {
 			//	UserGroups.Delete(listDel[i]);

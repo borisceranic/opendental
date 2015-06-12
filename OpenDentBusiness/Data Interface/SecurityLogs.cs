@@ -131,6 +131,32 @@ namespace OpenDentBusiness{
 			SecurityLogHashes.InsertSecurityLogHash(securityLog.SecurityLogNum);//uses db date/time
 		}
 
+		///<summary>Used when making a security log from a remote server, possibly with multithreaded connections.</summary>
+		public static void MakeLogEntryNoCache(Permissions permType,long patnum,string logText) {
+			SecurityLog securityLog=new SecurityLog();
+			securityLog.PermType=permType;
+			securityLog.LogText=logText;
+			securityLog.CompName=Environment.MachineName;
+			securityLog.PatNum=patnum;
+			securityLog.FKey=0;
+			securityLog.LogSource=LogSources.None;
+			securityLog.SecurityLogNum=SecurityLogs.InsertNoCache(securityLog);
+			SecurityLogHashes.InsertSecurityLogHashNoCache(securityLog.SecurityLogNum);
+		}
+
+		///<summary>Used for inserting without using the cache.  Usually used when multithreading connections.</summary>
+		private static long InsertNoCache(SecurityLog securityLog) {
+			string command="INSERT INTO securitylog (PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES("
+				+    POut.Int((int)securityLog.PermType)+","
+				+    POut.Long(securityLog.UserNum)+","
+				+    DbHelper.Now()+","
+				+"'"+POut.String(securityLog.LogText)+"',"
+				+    POut.Long(securityLog.PatNum)+","
+				+"'"+POut.String(securityLog.CompName)+"',"
+				+    POut.Long(securityLog.FKey)+","
+				+    POut.Int((int)securityLog.LogSource)+")";
+			return Db.NonQ(command,true);
+		}
 
 	}
 }

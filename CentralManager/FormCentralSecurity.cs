@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CentralManager {
@@ -16,8 +17,10 @@ namespace CentralManager {
 		private List<Userod> _listCEMTUsers;
 		private long _selectedGroupNum;
 		private TreeNode _clickedPermNode;
+		public List<CentralConnection> ListConns;
 
 		public FormCentralSecurity() {
+			ListConns=new List<CentralConnection>();
 			InitializeComponent();
 		}
 
@@ -475,133 +478,48 @@ namespace CentralManager {
 			Prefs.UpdateInt(PrefName.SecurityLockDays,days);
 			Prefs.UpdateBool(PrefName.SecurityLockIncludesAdmin,checkAdmin.Checked) ;
 			Prefs.UpdateBool(PrefName.CentralManagerSecurityLock,checkEnable.Checked);
-			List<CentralConnection> listChosenConns=new List<CentralConnection>();
 			FormCentralConnections FormCC=new FormCentralConnections();
-			FormCC.LabelText.Text=Lans.g("CentralSecuritiy","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
+			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
 			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
+			FormCC.ListConns=ListConns;
 			FormCC.ShowDialog();
 			if(FormCC.DialogResult==DialogResult.OK) {
-				listChosenConns=FormCC.ListConns;
+				ListConns=FormCC.ListConns;
 			}
 			else {
 				return;
 			}
-
-			SyncAll(listChosenConns);
-			DialogResult=DialogResult.OK;
+			CentralSyncHelper.SyncAll(ListConns);
 		}
 
-		private void SyncAll(List<CentralConnection> listConns) {
-			Cursor=Cursors.WaitCursor;
-			//Get CEMT users, groups, and associated permissions
-			List<CentralUserData> listCentralUserData=new List<CentralUserData>();
-			for(int i=0;i<_listCEMTUsers.Count;i++) {
-				bool hasUserGroup=false;
-				UserGroup userGroupCEMT=UserGroups.GetGroup(_listCEMTUsers[i].UserGroupNum);//All users have a usergroup.
-				for(int j=0;j<listCentralUserData.Count;j++) {
-					if(listCentralUserData[j].UserGroup.Description==userGroupCEMT.Description) {
-						listCentralUserData[j].ListUsers.Add(_listCEMTUsers[i]);
-						hasUserGroup=true;
-						break;
-					}
-				}
-				if(!hasUserGroup) {//Add user group and permissions if they aren't already included.
-					List<GroupPermission> listGroupPerms=GroupPermissions.GetPerms(userGroupCEMT.UserGroupNum);
-					//New struct element with a one member list of the only person found so far in that usergroup, along with the permissions.
-					listCentralUserData.Add(new CentralUserData(userGroupCEMT,new List<Userod>() { _listCEMTUsers[i] },listGroupPerms));
-				}
+		private void butSyncUsers_Click(object sender,EventArgs e) {
+			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
+			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
+			FormCC.ListConns=ListConns;
+			FormCC.ShowDialog();
+			if(FormCC.DialogResult==DialogResult.OK) {
+				ListConns=FormCC.ListConns;
 			}
-			string failedConns="";
-			string nameConflicts="";
-			for(int i=0;i<listConns.Count;i++) {
-				if(!CentralConnectionHelper.UpdateCentralConnection(listConns[i])) {
-					string serverName="";
-					if(listConns[i].ServiceURI!="") {
-						serverName=listConns[i].ServiceURI;
-					}
-					else {
-						serverName=listConns[i].ServerName+", "+listConns[i].DatabaseName;
-					}
-					failedConns+=serverName+"\r\n";
-					continue;
-				}
-				Prefs.RefreshCache();
-				if(Prefs.UpdateString(PrefName.SecurityLockDate,POut.Date(PIn.Date(textDate.Text),false))
-					| Prefs.UpdateInt(PrefName.SecurityLockDays,PIn.Int(textDays.Text))
-					| Prefs.UpdateBool(PrefName.SecurityLockIncludesAdmin,checkAdmin.Checked)  
-					| Prefs.UpdateBool(PrefName.CentralManagerSecurityLock,checkEnable.Checked)) 
-				{
-					Signalods.SetInvalid(InvalidType.Prefs);//Causes cache refresh on workstations
-				}
-				//We're connected, cache has been refreshed
-				//Get remote users, usergroups, and associated permissions
-				List<Userod> listRemoteUsers=UserodC.GetListt();
-				List<UserGroup> listRemoteUserGroups=UserGroups.GetList();
-				#region Detect Conflicts
-				//User conflicts
-				bool nameConflict=false;
-				for(int j=0;j<_listCEMTUsers.Count;j++) {
-					for(int k=0;k<listRemoteUsers.Count;k++) {
-						if(listRemoteUsers[k].UserName==_listCEMTUsers[j].UserName && listRemoteUsers[k].UserNumCEMT==0) {//User doesn't belong to CEMT
-							string serverName="";
-							if(listConns[i].ServiceURI!="") {
-								serverName=listConns[i].ServiceURI;
-							}
-							else {
-								serverName=listConns[i].ServerName+", "+listConns[i].DatabaseName;
-							}
-							nameConflicts+=listRemoteUsers[j].UserName+" already exists in "+serverName+"\r\n";
-							nameConflict=true;
-							break;
-						}
-					}
-				}
-				if(nameConflict) {
-					continue;//Skip on to the next connection.
-				}
-				#endregion
-				List<UserGroup> listRemoteCEMTUserGroups=UserGroups.GetCEMTGroups();
-				List<UserGroup> listCEMTUserGroups=new List<UserGroup>();
-				for(int j=0;j<listCentralUserData.Count;j++) {
-					listCEMTUserGroups.Add(listCentralUserData[j].UserGroup.Copy());
-				}
-				//SyncUserGroups returns the list of UserGroups for deletion so it can be used after syncing Users and GroupPermissions.
-				List<UserGroup> listUserGroupsForDeletion=CentralUserGroups.Sync(listCEMTUserGroups,listRemoteCEMTUserGroups);
-				UserGroups.RefreshCache();
-				listRemoteCEMTUserGroups=UserGroups.GetCEMTGroups();
-				for(int j=0;j<listCentralUserData.Count;j++) {
-					List<GroupPermission> listGroupPerms=new List<GroupPermission>();
-					for(int k=0;k<listRemoteCEMTUserGroups.Count;k++) {
-						if(listCentralUserData[j].UserGroup.UserGroupNumCEMT==listRemoteCEMTUserGroups[k].UserGroupNumCEMT) {
-							for(int l=0;l<listCentralUserData[j].ListUsers.Count;l++) {
-								listCentralUserData[j].ListUsers[l].UserGroupNum=listRemoteCEMTUserGroups[k].UserGroupNum;
-							}
-							for(int l=0;l<listCentralUserData[j].ListGroupPermissions.Count;l++) {
-								listCentralUserData[j].ListGroupPermissions[l].UserGroupNum=listRemoteCEMTUserGroups[k].UserGroupNum;
-							}
-							listGroupPerms=GroupPermissions.GetPerms(listRemoteCEMTUserGroups[k].UserGroupNum);
-						}
-					}
-					CentralUserods.Sync(listCentralUserData[j].ListUsers,listRemoteUsers);
-					CentralGroupPermissions.Sync(listCentralUserData[j].ListGroupPermissions,listGroupPerms);
-				}
-				for(int j=0;j<listUserGroupsForDeletion.Count;j++) {
-					UserGroups.Delete(listUserGroupsForDeletion[j]);
-				}
+			else {
+				return;
 			}
-			string errorText="";
-			if(failedConns=="" && nameConflicts=="") {
-				errorText+="Done";
+			CentralSyncHelper.SyncUsers(ListConns);
+		}
+
+		private void butSyncLocks_Click(object sender,EventArgs e) {
+			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
+			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
+			FormCC.ListConns=ListConns;
+			FormCC.ShowDialog();
+			if(FormCC.DialogResult==DialogResult.OK) {
+				ListConns=FormCC.ListConns;
 			}
-			if(failedConns!="") {
-				errorText="Failed Connections:\r\n"+failedConns+"Please try these connections again.\r\n";
+			else {
+				return;
 			}
-			if(nameConflicts!="") {
-				errorText+="Name Conflicts:\r\n"+nameConflicts+"Please rename users and try again.\r\n";
-			}
-			Cursor=Cursors.Default;
-			MsgBoxCopyPaste MsgBoxCopyPaste=new MsgBoxCopyPaste(errorText);
-			MsgBoxCopyPaste.ShowDialog();
+			CentralSyncHelper.SyncLocks(ListConns);
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -621,18 +539,6 @@ namespace CentralManager {
 
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}
-
-		///<summary>Custom data structure for containing a UserGroup and its associated list of GroupPermissions and users.</summary>
-		public struct CentralUserData {
-			public UserGroup UserGroup;
-			public List<Userod> ListUsers;
-			public List<GroupPermission> ListGroupPermissions;
-			public CentralUserData(UserGroup userGroup,List<Userod> listUsers,List<GroupPermission> listGroupPermissions) {
-				UserGroup=userGroup;
-				ListUsers=listUsers;
-				ListGroupPermissions=listGroupPermissions;
-			}
 		}
 
 	}

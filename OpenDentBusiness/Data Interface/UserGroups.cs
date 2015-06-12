@@ -67,7 +67,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Only called from the CEMT in order to update a remote database with changes.  This method will update rows based on the UserGroupNumCEMT instead of the typical UserGroupNum column.</summary>
-		public static void UpdateCEMT(UserGroup userGroupCEMT) {
+		public static void UpdateCEMTNoCache(UserGroup userGroupCEMT) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),userGroupCEMT);
 				return;
@@ -89,6 +89,15 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Gets a list of CEMT usergroups without using the cache.  Useful for multithreaded connections.</summary>
+		public static List<UserGroup> GetCEMTGroupsNoCache() {
+			List<UserGroup> retVal=new List<UserGroup>();
+			string command="SELECT * FROM usergroup WHERE UserGroupNumCEMT!=0";
+			DataTable tableUserGroups=Db.GetTable(command);
+			retVal=Crud.UserGroupCrud.TableToList(tableUserGroups);
+			return retVal;
+		}
+
 		///<summary></summary>
 		public static long Insert(UserGroup group) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -96,6 +105,11 @@ namespace OpenDentBusiness{
 				return group.UserGroupNum;
 			}
 			return Crud.UserGroupCrud.Insert(group);
+		}
+
+		public static long InsertNoCache(UserGroup group) {
+			string command="INSERT INTO usergroup (Description,UserGroupNumCEMT) VALUES('"+POut.String(group.Description)+"',"+group.UserGroupNumCEMT+")";
+			return Db.NonQ(command,true);
 		}
 
 		///<summary>Checks for dependencies first</summary>
@@ -121,6 +135,14 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="DELETE FROM grouppermission WHERE UserGroupNum='"
 				+POut.Long(group.UserGroupNum)+"'";
+			Db.NonQ(command);
+		}
+		
+		///<summary>Deletes without using the cache.  Doesn't check dependencies.  Useful for multithreaded connections.</summary>
+		public static void DeleteNoCache(UserGroup group) {
+			string command="DELETE FROM usergroup WHERE UserGroupNum="+POut.Long(group.UserGroupNum);
+			Db.NonQ(command);
+			command="DELETE FROM grouppermission WHERE UserGroupNum="+POut.Long(group.UserGroupNum);
 			Db.NonQ(command);
 		}
 
