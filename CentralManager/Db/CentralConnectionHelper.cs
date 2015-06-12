@@ -17,7 +17,7 @@ namespace CentralManager {
 				}
 			}
 			else if(centralConnection.ServiceURI!="") {
-				args+="WebServiceURI=\""+centralConnection.ServiceURI+"\" ";
+				args+="WebServiceUri=\""+centralConnection.ServiceURI+"\" ";
 				if(centralConnection.WebServiceIsEcw) {
 					args+="WebServiceIsEcw=True ";
 				}
