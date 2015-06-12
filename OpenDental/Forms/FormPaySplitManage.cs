@@ -39,11 +39,18 @@ namespace OpenDental {
 			for(int i=0;i<FamCur.ListPats.Length;i++) {
 				listPatNums.Add(FamCur.ListPats[i].PatNum);
 			}
-			//The logic from line 42 to line 51 will ensure that regardless of if it's a new or old payment any created paysplits that haven't been saved, 
+			//This logic will ensure that regardless of if it's a new, or old payment any created paysplits that haven't been saved, 
 			//such as if splits were made in this window then the window was closed and then reopened, will persist.
-			textSplitTotal.Text=POut.Double(PaymentCur.PayAmt);
+			double splitTotal=0;
+			for(int i=0;i<ListSplitsCur.Count;i++) {
+				splitTotal+=ListSplitsCur[i].SplitAmt;
+			}
+			textSplitTotal.Text=POut.Double(splitTotal);
 			if(Math.Abs(PaymentAmt)>Math.Abs(PaymentCur.PayAmt)) {//If they increased the amount of the old payment, they want to be able to use it. 
 				PaymentAmt=PaymentAmt-PaymentCur.PayAmt;
+			}
+			else if(splitTotal!=PaymentCur.PayAmt) {//If they deleted a paysplit from this payment in the Payment window.
+				PaymentAmt-=splitTotal;
 			}
 			else {//If they decreased (or did not change) the amount of the old payment.
 				PaymentAmt=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
@@ -195,11 +202,19 @@ namespace OpenDental {
 			List<PaySplit> listPaySplits=PaySplits.GetForPats(listPatNums);//Might contain payplan payments.
 			//Fix the memory locations of the existing pay splits for this payment within the list of pay splits for the entire family.
 			//This is necessary for associating the correct tag values to grid rows.
-			for(int i=0;i<listPaySplits.Count;i++) {
+			for(int i=listPaySplits.Count-1;i>=0;i--) {
+				bool isFound=false;
 				for(int j=0;j<ListSplitsCur.Count;j++) {
 					if(listPaySplits[i].SplitNum==ListSplitsCur[j].SplitNum) {
 						listPaySplits[i]=ListSplitsCur[j];
+						isFound=true;
 					}
+				}
+				if(!isFound && listPaySplits[i].PayNum==PaymentCur.PayNum) {
+					//If we have a split that's not found in the passed-in list of splits for the payment
+					//and the split we got from the DB is on this payment, remove it because the user must have deleted the split from the payment window.
+					//The payment window won't update the DB with the change until it's closed.
+					listPaySplits.RemoveAt(i);
 				}
 			}
 			List<ClaimProc> listInsPayAsTotal=ClaimProcs.GetByTotForPats(listPatNums);//Claimprocs paid as total, might contain ins payplan payments.
