@@ -98,6 +98,9 @@ namespace OpenDentBusiness{
 			EServiceSignal eServiceSignalLast=Crud.EServiceSignalCrud.SelectOne(command);
 			//If initializing or changing state to working from not working, insert two signals; An anchor and a rolling timestamp.
 			if(eServiceSignalLast==null || eServiceSignalLast.Severity!=eServiceSignalSeverity.Working) { //First ever heartbeat or critical which was not previously critical.
+				if(eServiceSignalLast!=null && eServiceSignalLast.Severity==eServiceSignalSeverity.Critical) { //Changing from critical to working so alert user that this change took place and tell them how long we were in critical state.
+					Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Error,SigDateTime=DateTime.Now,IsProcessed=false,Description="Listener was critical for "+DateTime.Now.Subtract(eServiceSignalLast.SigDateTime).ToStringHmm() });//Length of time listener was critical										
+				}
 				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now,IsProcessed=true,Description="Heartbeat Anchor" });//anchor heartbeat
 				Crud.EServiceSignalCrud.Insert(new EServiceSignal() { ServiceCode=(int)serviceCode,Severity=eServiceSignalSeverity.Working,SigDateTime=DateTime.Now.AddSeconds(1),IsProcessed=true,Description="Heartbeat" });//rolling heartbeat
 				return;
