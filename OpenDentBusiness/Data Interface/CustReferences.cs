@@ -47,10 +47,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Used only from FormReferenceSelect to get the list of references.</summary>
 		public static DataTable GetReferenceTable(bool limit,long[] billingTypes,bool showBadRefs,bool showUsed,bool showGuarOnly,string city,string state,string zip,
-			string areaCode,string specialty,int superFam,string lname,string fname,string patnum,int age) 
+			string areaCode,string specialty,int superFam,string lname,string fname,string patnum,int age,string country) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,billingTypes,showBadRefs,showUsed,showGuarOnly,city,state,zip,areaCode,specialty,superFam,lname,fname,patnum,age);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,billingTypes,showBadRefs,showUsed,showGuarOnly,city,state,zip,areaCode,specialty,superFam,lname,fname,patnum,age,country);
 			}
 			string billingSnippet="";
 			if(billingTypes.Length!=0){
@@ -91,6 +91,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("State");
 			table.Columns.Add("City");
 			table.Columns.Add("Zip");
+			table.Columns.Add("Country");
 			table.Columns.Add("Specialty");
 			table.Columns.Add("age");
 			table.Columns.Add("SuperFamily");
@@ -100,7 +101,8 @@ namespace OpenDentBusiness{
 			List<DataRow> rows=new List<DataRow>();
 			string command=@"SELECT * FROM (SELECT cr.*,p.LName,p.FName,p.HmPhone,p.State,p.City,p.Zip,p.Birthdate,pf.FieldValue,
 				(SELECT COUNT(*) FROM patient tempp WHERE tempp.SuperFamily=p.SuperFamily AND tempp.SuperFamily<>0) AS SuperFamily,
-				(SELECT COUNT(*) FROM custrefentry tempcre WHERE tempcre.PatNumRef=cr.PatNum) AS TimesUsed
+				(SELECT COUNT(*) FROM custrefentry tempcre WHERE tempcre.PatNumRef=cr.PatNum) AS TimesUsed,
+				p.Country
 				FROM custreference cr
 				INNER JOIN patient p ON cr.PatNum=p.PatNum
 				LEFT JOIN patfield pf ON cr.PatNum=pf.PatNum AND pf.FieldName='Specialty' 
@@ -118,6 +120,7 @@ namespace OpenDentBusiness{
 					+(city.Length>0?"AND p.City LIKE '"+POut.String(city)+"%' ":"")
 					+(state.Length>0?"AND p.State LIKE '"+POut.String(state)+"%' ":"")
 					+(zip.Length>0?"AND p.Zip LIKE '"+POut.String(zip)+"%' ":"")
+					+(country.Length>0?"AND p.Country LIKE '"+POut.String(country)+"%' ":"")
 					+(patnum.Length>0?"AND p.PatNum LIKE '"+POut.String(patnum)+"%' ":"")
 					+(specialty.Length>0?"AND pf.FieldValue LIKE '"+POut.String(specialty)+"%' ":"")
 					+(showBadRefs?"":"AND cr.IsBadRef=0 ")
@@ -143,6 +146,7 @@ namespace OpenDentBusiness{
 				row["State"]=rawtable.Rows[i]["State"].ToString();
 				row["City"]=rawtable.Rows[i]["City"].ToString();
 				row["Zip"]=rawtable.Rows[i]["Zip"].ToString();
+				row["Country"]=rawtable.Rows[i]["Country"].ToString();
 				row["Specialty"]=rawtable.Rows[i]["FieldValue"].ToString();
 				row["age"]=Patients.DateToAge(PIn.Date(rawtable.Rows[i]["Birthdate"].ToString())).ToString();
 				row["SuperFamily"]=rawtable.Rows[i]["SuperFamily"].ToString();

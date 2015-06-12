@@ -47,7 +47,7 @@ namespace OpenDental {
 				}
 			}
 			RefTable=CustReferences.GetReferenceTable(limit,billingTypes,checkBadRefs.Checked,checkUsedRefs.Checked,checkGuarOnly.Checked,textCity.Text,textState.Text,
-				textZip.Text,textAreaCode.Text,textSpecialty.Text,superFam,textLName.Text,textFName.Text,textPatNum.Text,age);
+				textZip.Text,textAreaCode.Text,textSpecialty.Text,superFam,textLName.Text,textFName.Text,textPatNum.Text,age,textCountry.Text);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("PatNum",50);
@@ -63,6 +63,8 @@ namespace OpenDental {
 			col=new ODGridColumn("City",80);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Zip Code",60);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Country",90);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Specialty",90);
 			gridMain.Columns.Add(col);
@@ -93,6 +95,7 @@ namespace OpenDental {
 				row.Cells.Add(RefTable.Rows[i]["State"].ToString());
 				row.Cells.Add(RefTable.Rows[i]["City"].ToString());
 				row.Cells.Add(RefTable.Rows[i]["Zip"].ToString());
+				row.Cells.Add(RefTable.Rows[i]["Country"].ToString());
 				row.Cells.Add(RefTable.Rows[i]["Specialty"].ToString());
 				row.Cells.Add(RefTable.Rows[i]["age"].ToString());
 				row.Cells.Add(RefTable.Rows[i]["SuperFamily"].ToString());
@@ -195,6 +198,10 @@ namespace OpenDental {
 		}
 
 		private void textAge_TextChanged(object sender,EventArgs e) {
+			OnDataEntered();
+		}
+
+		private void textCountry_TextChanged(object sender,EventArgs e) {
 			OnDataEntered();
 		}
 		#endregion
