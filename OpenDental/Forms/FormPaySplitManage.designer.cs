@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.label4.Size = new System.Drawing.Size(418, 32);
 			this.label4.TabIndex = 14;
 			this.label4.Text = "Select payment splits and click the Delete Split button to remove selected splits" +
-    ", or Clear All to remove all splits. \r\n";
+    ", or Delete All to remove all splits. \r\n";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// checkShowPaid
