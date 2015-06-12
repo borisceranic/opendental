@@ -767,6 +767,7 @@ namespace OpenDental {
 					gridMain.Enabled=false;
 					butPay.Enabled=false;
 					checkRecurring.Enabled=false;
+					butSplitManage.Enabled=false;
 				}
 			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
