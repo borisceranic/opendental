@@ -1229,6 +1229,7 @@ namespace OpenDental {
 			PaySplitCur.ClinicNum=PaymentCur.ClinicNum;
 			PaySplitCur.SplitAmt=PIn.Double(textAmount.Text);
 			SplitList.Add(PaySplitCur);
+			PaymentCur.PayAmt=PIn.Double(textAmount.Text);
 		}
 
 		///<summary>Updates the passed in paysplit with the provider and clinic that is set for the payment plan charges.  PayPlanNum should already be set for the split.</summary>
@@ -1973,6 +1974,7 @@ namespace OpenDental {
 						}
 					}
 					else {//Cancel
+						SplitList.Clear();//This is OK, they got this far because it's new and had no splits to begin with.
 						AddOneSplit();
 					}
 				}
