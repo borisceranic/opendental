@@ -440,21 +440,21 @@ namespace OpenDental{
 
 		private void butRecopy_Click(object sender,EventArgs e) {
 			Version versionCurrent=new Version(Application.ProductVersion);
-			string folderUpdate="";
-			if(PrefC.AtoZfolderUsed) {
-				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
-			}
-			else{//db
-				folderUpdate=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),"UpdateFiles");
-				if(Directory.Exists(folderUpdate)) {
+			string folderUpdate=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),"UpdateFiles");
+			if(Directory.Exists(folderUpdate)) {
+				try {
 					Directory.Delete(folderUpdate,true);
 				}
-				DocumentMisc docmisc=DocumentMiscs.GetUpdateFilesZip();
-				if(docmisc!=null){
-					byte[] rawBytes=Convert.FromBase64String(docmisc.RawBase64);
-					using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
-						unzipped.ExtractAll(folderUpdate);
-					}
+				catch {
+					MsgBox.Show(this,"Recopy failed.  Please run as administrator then try again.");
+					return;
+				}
+			}
+			DocumentMisc docmisc=DocumentMiscs.GetUpdateFilesZip();
+			if(docmisc!=null) {
+				byte[] rawBytes=Convert.FromBase64String(docmisc.RawBase64);
+				using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
+					unzipped.ExtractAll(folderUpdate);
 				}
 			}
 			//identify the ideal situation where everything is already in place and no copy is needed.

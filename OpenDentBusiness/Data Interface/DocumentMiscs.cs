@@ -18,10 +18,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void SetUpdateFilesZip(string rawBase64zipped) {
+		public static long SetUpdateFilesZip(string rawBase64zipped) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64zipped);
-				return;
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),rawBase64zipped);
 			}
 			string command="DELETE FROM documentmisc WHERE DocMiscType="+POut.Long((int)DocumentMiscType.UpdateFiles);
 			Db.NonQ(command);
@@ -30,7 +29,18 @@ namespace OpenDentBusiness{
 			doc.DocMiscType=DocumentMiscType.UpdateFiles;
 			doc.FileName="UpdateFiles.zip";
 			doc.RawBase64=rawBase64zipped;
-			Crud.DocumentMiscCrud.Insert(doc);
+			return Crud.DocumentMiscCrud.Insert(doc);
+		}
+
+		///<summary>Appends the passed in rawBase64 string to the RawBase64 column in the db for the corresponding document.</summary>
+		public static void AppendRawBase64ForDoc(string rawBase64,long docMiscNum){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64,docMiscNum);
+				return;
+			}
+			string command="UPDATE documentmisc SET RawBase64=CONCAT(RawBase64,"+DbHelper.ParamChar+"paramRawBase64) WHERE DocMiscNum="+POut.Long(docMiscNum);
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,rawBase64);
+			Db.NonQ(command,paramRawBase64);
 		}
 
 		/*
