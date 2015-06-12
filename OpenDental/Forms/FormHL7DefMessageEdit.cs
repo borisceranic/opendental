@@ -139,8 +139,8 @@ namespace OpenDental {
 			}
 			else {
 				HL7DefMesCur.InOrOut=InOutHL7.Outgoing;
-				HL7DefMesCur.ItemOrder=PIn.Int(textItemOrder.Text);
 			}
+			HL7DefMesCur.ItemOrder=PIn.Int(textItemOrder.Text);
 			HL7DefMesCur.Note=textNote.Text;
 			if(HL7DefMesCur.IsNew) {
 				HL7DefMessages.Insert(HL7DefMesCur);
