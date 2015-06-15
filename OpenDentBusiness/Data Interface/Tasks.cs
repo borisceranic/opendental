@@ -564,14 +564,14 @@ namespace OpenDentBusiness{
 
 		public static void TaskEditCreateLog(string logText,Task task) {
 			long patNum=0;//Task type of none defaults to 0.
-			if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
-				patNum=task.KeyNum;
-				//logText+=". Attached patient: "+task.PatientName;
-			}
-			else if(task.ObjectType==TaskObjectType.Appointment) {//Task type of appointment we have to look up the patient from the apt.
-				Appointment AptCur=Appointments.GetOneApt(task.KeyNum);
-				patNum=AptCur.PatNum;
-				//logText+=". Attached patient: "+task.PatientName+" from an appointment";
+			if(task.KeyNum!=0) {  //Either no object attached, or object hasn't been commited to db yet (Changed the object but haven't clicked OK on TaskEdit).
+				if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
+					patNum=task.KeyNum;
+				}
+				else if(task.ObjectType==TaskObjectType.Appointment) {//Task type of appointment we have to look up the patient from the apt.
+					Appointment AptCur=Appointments.GetOneApt(task.KeyNum);
+					patNum=AptCur.PatNum;
+				}
 			}
 			SecurityLogs.MakeLogEntry(Permissions.TaskEdit,patNum,logText,task.TaskNum);
 		}
