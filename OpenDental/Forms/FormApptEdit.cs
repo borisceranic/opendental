@@ -837,6 +837,7 @@ namespace OpenDental{
 			// 
 			this.gridFields.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridFields.HasMultilineHeaders = false;
 			this.gridFields.HScrollVisible = false;
 			this.gridFields.Location = new System.Drawing.Point(21, 578);
 			this.gridFields.Name = "gridFields";
@@ -851,6 +852,7 @@ namespace OpenDental{
 			// 
 			this.gridPatient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPatient.HasMultilineHeaders = false;
 			this.gridPatient.HScrollVisible = false;
 			this.gridPatient.Location = new System.Drawing.Point(282, 405);
 			this.gridPatient.Name = "gridPatient";
@@ -866,6 +868,7 @@ namespace OpenDental{
 			this.gridComm.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridComm.HasMultilineHeaders = false;
 			this.gridComm.HScrollVisible = false;
 			this.gridComm.Location = new System.Drawing.Point(542, 405);
 			this.gridComm.Name = "gridComm";
@@ -882,6 +885,7 @@ namespace OpenDental{
 			this.gridProc.AllowSelection = false;
 			this.gridProc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProc.HasMultilineHeaders = false;
 			this.gridProc.HScrollVisible = false;
 			this.gridProc.Location = new System.Drawing.Point(434, 28);
 			this.gridProc.Name = "gridProc";
@@ -1263,6 +1267,8 @@ namespace OpenDental{
 			}
 			comboUnschedStatus.Items.Add(Lan.g(this,"none"));
 			comboUnschedStatus.SelectedIndex=0;
+			//Consider making a local copy of DefC.Short[(int)DefCat.RecallUnschedStatus] because each call creates a deep copy of the cache . 
+			//This is due to the new thread safe cache pattern implemented in 15.1
 			for(int i=0;i<DefC.Short[(int)DefCat.RecallUnschedStatus].Length;i++) {
 				comboUnschedStatus.Items.Add(DefC.Short[(int)DefCat.RecallUnschedStatus][i].ItemName);
 				if(DefC.Short[(int)DefCat.RecallUnschedStatus][i].DefNum==AptCur.UnschedStatus)
@@ -2439,6 +2445,13 @@ namespace OpenDental{
 				}
 			}
 			DateTime dateTimeArrived=AptCur.AptDateTime.Date;
+			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0 //Using appointmentTimeArrivedTrigger preference
+				&& comboConfirmed.SelectedIndex>-1 //Valid index selected
+				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger) //selected index matches pref
+				&& String.IsNullOrWhiteSpace(textTimeArrived.Text))//time not already set 
+			{
+				textTimeArrived.Text=DateTime.Now.ToShortTimeString();
+			}
 			if(textTimeArrived.Text!=""){
 				try{
 					dateTimeArrived=AptCur.AptDateTime.Date+DateTime.Parse(textTimeArrived.Text).TimeOfDay;
