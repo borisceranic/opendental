@@ -293,6 +293,9 @@ namespace OpenDental{
 		}
 
 		private void FormOperatories_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			for(int i=0;i<_listOps.Count;i++) {
+				_listOps[i].ItemOrder=i;
+			}
 			Operatories.Sync(_listOps);
 			DataValid.SetInvalid(InvalidType.Operatories);//With sync we don't know if anything changed.
 		}
