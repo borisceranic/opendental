@@ -209,7 +209,7 @@ namespace OpenDentBusiness{
 		///Set listPaySplits to an empty list before calling.</summary>
 		public static DataTable GetForPayPlan(long payPlanNum,List<PaySplit> listPaySplits) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum,listPaySplits);
 			}
 			string command="SELECT paysplit.*,payment.CheckNum,SUM(payment.PayAmt) AS 'PayAmt',payment.PayType "
 					+"FROM paysplit "
