@@ -292,7 +292,11 @@ namespace OpenDental{
 			Close();
 		}
 
-		private void FormOperatories_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+		private void FormOperatories_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
+			//Renumber the itemorders to match the grid.  In most cases this will not do anything, but will fix any duplicate itemorders.
+			for(int i=0;i<_listOps.Count;i++) {
+				_listOps[i].ItemOrder=i;
+			}
 			Operatories.Sync(_listOps);
 			DataValid.SetInvalid(InvalidType.Operatories);//With sync we don't know if anything changed.
 		}
