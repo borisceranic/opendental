@@ -2439,6 +2439,13 @@ namespace OpenDental{
 				}
 			}
 			DateTime dateTimeArrived=AptCur.AptDateTime.Date;
+			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0 //Using appointmentTimeArrivedTrigger preference
+				&& comboConfirmed.SelectedIndex>-1 //Valid index selected
+				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger) //selected index matches pref
+				&& String.IsNullOrWhiteSpace(textTimeArrived.Text))//time not already set 
+			{
+				textTimeArrived.Text=DateTime.Now.ToShortTimeString();
+			}
 			if(textTimeArrived.Text!=""){
 				try{
 					dateTimeArrived=AptCur.AptDateTime.Date+DateTime.Parse(textTimeArrived.Text).TimeOfDay;
