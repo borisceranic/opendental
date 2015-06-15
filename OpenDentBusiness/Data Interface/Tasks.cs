@@ -566,16 +566,19 @@ namespace OpenDentBusiness{
 			TaskEditCreateLog(Permissions.TaskEdit,logText,task);
 		}
 
+		///<summary>Makes audit trail entry for the task passed in.
+		///If this task has an object type set, the log will show up under the corresponding patient for the selected object type.
+		///Used for both TaskEdit and TaskNoteEdit permissions.</summary>
 		public static void TaskEditCreateLog(Permissions perm,string logText,Task task) {
 			long patNum=0;//Task type of none defaults to 0.
-			if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
-				patNum=task.KeyNum;
-				//logText+=". Attached patient: "+task.PatientName;
-			}
-			else if(task.ObjectType==TaskObjectType.Appointment) {//Task type of appointment we have to look up the patient from the apt.
-				Appointment AptCur=Appointments.GetOneApt(task.KeyNum);
-				patNum=AptCur.PatNum;
-				//logText+=". Attached patient: "+task.PatientName+" from an appointment";
+			if(task.KeyNum!=0) {  //Either no object attached, or object hasn't been commited to db yet (Changed the object but haven't clicked OK on TaskEdit).
+				if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
+					patNum=task.KeyNum;
+				}
+				else if(task.ObjectType==TaskObjectType.Appointment) {//Task type of appointment we have to look up the patient from the apt.
+					Appointment AptCur=Appointments.GetOneApt(task.KeyNum);
+					patNum=AptCur.PatNum;
+				}
 			}
 			SecurityLogs.MakeLogEntry(perm,patNum,logText,task.TaskNum);
 		}
