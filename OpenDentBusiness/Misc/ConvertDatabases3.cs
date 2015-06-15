@@ -8679,6 +8679,30 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX taskhist_TaskNum ON taskhist (TaskNum)";
 					Db.NonQ(command);
 				}
+				//Add index for operatory------------------------------------------------------------------------------------------------------
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE appointment ADD INDEX (Op)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX appointment_Op ON appointment (Op)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				//Add index for operatory------------------------------------------------------------------------------------------------------
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="ALTER TABLE apptviewitem ADD INDEX (OpNum)";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"CREATE INDEX apptviewitem_OpNum ON appointment (Op)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 
 
 
