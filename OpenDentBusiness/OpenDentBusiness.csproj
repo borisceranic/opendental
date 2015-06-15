@@ -415,6 +415,7 @@
     <Compile Include="Crud\SupplyOrderItemCrud.cs" />
     <Compile Include="Crud\TaskAncestorCrud.cs" />
     <Compile Include="Crud\TaskCrud.cs" />
+    <Compile Include="Crud\TaskHistCrud.cs" />
     <Compile Include="Crud\TaskListCrud.cs" />
     <Compile Include="Crud\TaskNoteCrud.cs" />
     <Compile Include="Crud\TaskSubscriptionCrud.cs" />
@@ -508,6 +509,7 @@
     <Compile Include="Data Interface\SmsFromMobiles.cs" />
     <Compile Include="Data Interface\SmsToMobiles.cs" />
     <Compile Include="Data Interface\SmsPhones.cs" />
+    <Compile Include="Data Interface\TaskHists.cs" />
     <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />
@@ -930,6 +932,7 @@
     <Compile Include="TableTypes\MedLabSpecimen.cs" />
     <Compile Include="TableTypes\MedLabResult.cs" />
     <Compile Include="TableTypes\MedLab.cs" />
+    <Compile Include="TableTypes\TaskHist.cs" />
     <Compile Include="TableTypes\UserodApptView.cs" />
     <Compile Include="TableTypes\WikiListHist.cs" />
     <Compile Include="TableTypes\DispSupply.cs" />

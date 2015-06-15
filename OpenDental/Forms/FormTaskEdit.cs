@@ -95,6 +95,7 @@ namespace OpenDental {
 		private const long _triageBlueNum=502;
 		///<summary>FK to the definition.DefNum at HQ for the triage priority color for white.</summary>
 		private const long _triageWhiteNum=503;
+		private UI.Button butAudit;
 		///<summary>FK to tasklist.TaskListNum. </summary>
 		private const long _triageTaskListNum=1697;
 
@@ -139,6 +140,8 @@ namespace OpenDental {
 			this.listObjectType = new System.Windows.Forms.ListBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.panelObject = new System.Windows.Forms.Panel();
+			this.butGoto = new OpenDental.UI.Button();
+			this.butChange = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textDateTimeEntry = new System.Windows.Forms.TextBox();
 			this.textUser = new System.Windows.Forms.TextBox();
@@ -168,13 +171,12 @@ namespace OpenDental {
 			this.butNowFinished = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butNow = new OpenDental.UI.Button();
-			this.butGoto = new OpenDental.UI.Button();
-			this.butChange = new OpenDental.UI.Button();
 			this.textDateTask = new OpenDental.ValidDate();
 			this.butCopy = new OpenDental.UI.Button();
 			this.textDescript = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.butAudit = new OpenDental.UI.Button();
 			this.panelObject.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -277,6 +279,34 @@ namespace OpenDental {
 			this.panelObject.Size = new System.Drawing.Size(550, 34);
 			this.panelObject.TabIndex = 15;
 			// 
+			// butGoto
+			// 
+			this.butGoto.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butGoto.Autosize = true;
+			this.butGoto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butGoto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butGoto.CornerRadius = 4F;
+			this.butGoto.Location = new System.Drawing.Point(449, 6);
+			this.butGoto.Name = "butGoto";
+			this.butGoto.Size = new System.Drawing.Size(75, 22);
+			this.butGoto.TabIndex = 12;
+			this.butGoto.Text = "Go To";
+			this.butGoto.Click += new System.EventHandler(this.butGoto_Click);
+			// 
+			// butChange
+			// 
+			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChange.Autosize = true;
+			this.butChange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChange.CornerRadius = 4F;
+			this.butChange.Location = new System.Drawing.Point(369, 6);
+			this.butChange.Name = "butChange";
+			this.butChange.Size = new System.Drawing.Size(75, 22);
+			this.butChange.TabIndex = 10;
+			this.butChange.Text = "Change";
+			this.butChange.Click += new System.EventHandler(this.butChange_Click);
+			// 
 			// label5
 			// 
 			this.label5.Location = new System.Drawing.Point(9, 25);
@@ -295,7 +325,7 @@ namespace OpenDental {
 			// 
 			// textUser
 			// 
-			this.textUser.Location = new System.Drawing.Point(594, 16);
+			this.textUser.Location = new System.Drawing.Point(582, 16);
 			this.textUser.Name = "textUser";
 			this.textUser.ReadOnly = true;
 			this.textUser.Size = new System.Drawing.Size(134, 20);
@@ -303,7 +333,7 @@ namespace OpenDental {
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(499, 18);
+			this.label16.Location = new System.Drawing.Point(487, 18);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(94, 16);
 			this.label16.TabIndex = 125;
@@ -328,7 +358,7 @@ namespace OpenDental {
 			// 
 			// textTaskNum
 			// 
-			this.textTaskNum.Location = new System.Drawing.Point(454, 37);
+			this.textTaskNum.Location = new System.Drawing.Point(427, 27);
 			this.textTaskNum.Name = "textTaskNum";
 			this.textTaskNum.ReadOnly = true;
 			this.textTaskNum.Size = new System.Drawing.Size(54, 20);
@@ -337,7 +367,7 @@ namespace OpenDental {
 			// 
 			// labelTaskNum
 			// 
-			this.labelTaskNum.Location = new System.Drawing.Point(379, 38);
+			this.labelTaskNum.Location = new System.Drawing.Point(352, 28);
 			this.labelTaskNum.Name = "labelTaskNum";
 			this.labelTaskNum.Size = new System.Drawing.Size(73, 16);
 			this.labelTaskNum.TabIndex = 133;
@@ -357,7 +387,7 @@ namespace OpenDental {
 			// 
 			// textTaskList
 			// 
-			this.textTaskList.Location = new System.Drawing.Point(594, 39);
+			this.textTaskList.Location = new System.Drawing.Point(582, 39);
 			this.textTaskList.Name = "textTaskList";
 			this.textTaskList.ReadOnly = true;
 			this.textTaskList.Size = new System.Drawing.Size(134, 20);
@@ -365,7 +395,7 @@ namespace OpenDental {
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(499, 41);
+			this.label10.Location = new System.Drawing.Point(487, 41);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(94, 16);
 			this.label10.TabIndex = 147;
@@ -427,7 +457,7 @@ namespace OpenDental {
 			// comboTaskPriorities
 			// 
 			this.comboTaskPriorities.FormattingEnabled = true;
-			this.comboTaskPriorities.Location = new System.Drawing.Point(594, 61);
+			this.comboTaskPriorities.Location = new System.Drawing.Point(582, 61);
 			this.comboTaskPriorities.Name = "comboTaskPriorities";
 			this.comboTaskPriorities.Size = new System.Drawing.Size(134, 21);
 			this.comboTaskPriorities.TabIndex = 157;
@@ -435,7 +465,7 @@ namespace OpenDental {
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(500, 62);
+			this.label8.Location = new System.Drawing.Point(488, 62);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(94, 16);
 			this.label8.TabIndex = 158;
@@ -446,7 +476,7 @@ namespace OpenDental {
 			// 
 			this.butColor.Enabled = false;
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.butColor.Location = new System.Drawing.Point(731, 61);
+			this.butColor.Location = new System.Drawing.Point(719, 61);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(24, 21);
 			this.butColor.TabIndex = 159;
@@ -503,7 +533,7 @@ namespace OpenDental {
 			this.butChangeUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChangeUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butChangeUser.CornerRadius = 4F;
-			this.butChangeUser.Location = new System.Drawing.Point(731, 14);
+			this.butChangeUser.Location = new System.Drawing.Point(719, 14);
 			this.butChangeUser.Name = "butChangeUser";
 			this.butChangeUser.Size = new System.Drawing.Size(24, 22);
 			this.butChangeUser.TabIndex = 151;
@@ -602,34 +632,6 @@ namespace OpenDental {
 			this.butNow.Text = "Now";
 			this.butNow.Click += new System.EventHandler(this.butNow_Click);
 			// 
-			// butGoto
-			// 
-			this.butGoto.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butGoto.Autosize = true;
-			this.butGoto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butGoto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butGoto.CornerRadius = 4F;
-			this.butGoto.Location = new System.Drawing.Point(449, 6);
-			this.butGoto.Name = "butGoto";
-			this.butGoto.Size = new System.Drawing.Size(75, 22);
-			this.butGoto.TabIndex = 12;
-			this.butGoto.Text = "Go To";
-			this.butGoto.Click += new System.EventHandler(this.butGoto_Click);
-			// 
-			// butChange
-			// 
-			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butChange.Autosize = true;
-			this.butChange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butChange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butChange.CornerRadius = 4F;
-			this.butChange.Location = new System.Drawing.Point(369, 6);
-			this.butChange.Name = "butChange";
-			this.butChange.Size = new System.Drawing.Size(75, 22);
-			this.butChange.TabIndex = 10;
-			this.butChange.Text = "Change";
-			this.butChange.Click += new System.EventHandler(this.butChange_Click);
-			// 
 			// textDateTask
 			// 
 			this.textDateTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -700,10 +702,26 @@ namespace OpenDental {
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butAudit
+			// 
+			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAudit.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.butAudit.Autosize = true;
+			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAudit.CornerRadius = 4F;
+			this.butAudit.Location = new System.Drawing.Point(749, 59);
+			this.butAudit.Name = "butAudit";
+			this.butAudit.Size = new System.Drawing.Size(61, 24);
+			this.butAudit.TabIndex = 160;
+			this.butAudit.Text = "Audit";
+			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
+			// 
 			// FormTaskEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(836, 676);
+			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.butColor);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.comboTaskPriorities);
@@ -966,6 +984,9 @@ namespace OpenDental {
 				butRed.Visible=true;
 				butBlue.Visible=true;
 			}
+			if(!Security.IsAuthorized(Permissions.TaskEdit,true)){
+				butAudit.Visible=false;
+			}
 		}
 
 		private void FillGrid() {
@@ -992,7 +1013,6 @@ namespace OpenDental {
 							comboTaskPriorities.SelectedIndex=i;//Change selection to the triage white
 						}
 					}
-					textDescript.Text=textDescript.Text.Replace("@@","");
 				}
 				else if(_pritoryDefNumSelected==_triageWhiteNum && _numNotes!=0 && NoteList.Count==0) {//White triage task with note that has been deleted, change it back to blue.
 					_pritoryDefNumSelected=_triageBlueNum;
@@ -1001,7 +1021,6 @@ namespace OpenDental {
 							comboTaskPriorities.SelectedIndex=i;//Change selection to the triage blue
 						}
 					}
-					//textDescript.Text+=" @@";//Taken care of when selectedIndex is changed on the line above
 				}
 				_numNotes=NoteList.Count;
 			}
@@ -1125,151 +1144,47 @@ namespace OpenDental {
 		}
 
 		private void butBlue_Click(object sender,EventArgs e) {
-			UpdateDescriptForColor(butBlue.Name);
-		}
-
-		private void butRed_Click(object sender,EventArgs e) {
-			UpdateDescriptForColor(butRed.Name);
-		}
-
-		///<summary>Handles changing a triage task from red or blue depending on which color button was pushed.</summary>
-		private void UpdateDescriptForColor(string color) {
-			//Only do weird logic when editing a task if HQ
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				return;
-			}
-			int textDescriptCursorPosition=textDescript.SelectionStart;
-			//Handles the blue color.  If it is currently blue, we're changing it to white.
-			if(_pritoryDefNumSelected==_triageBlueNum) {//Also goes here if it's red, and blue button is clicked while @@'s are present (aka. CUSTOMER @@)
-				textDescript.Text=textDescript.Text.Replace("@@","");//Replace any @@'s if present
-				_pritoryDefNumSelected=_triageWhiteNum;//White
+			if(_pritoryDefNumSelected==_triageBlueNum) {//Blue button is clicked while it's already blue
+				_pritoryDefNumSelected=_triageWhiteNum;//Change to white.
 				for(int i=0;i<_listTaskPriorities.Count;i++) {
 					if(_listTaskPriorities[i].DefNum==_triageWhiteNum) {
 						comboTaskPriorities.SelectedIndex=i;//Change selection to the triage white
 					}
-				}
+				}	
 			}
-			else if(color==butBlue.Name) {//Blue button was pressed, we change the task to be blue
-				if(!textDescript.Text.Contains("@@")) {
-					textDescript.Text+=" @@";
-				}
-			}
-			//Handles the red color. If it is currently red, we're changing it to white
-			if(textDescript.Text.Contains("CUSTOMER")
-				||textDescript.Text.Contains("DOWN")
-				||textDescript.Text.Contains("URGENT")
-				||textDescript.Text.Contains("CONFERENCE")
-				||textDescript.Text.Contains("!!")
-				||_pritoryDefNumSelected==_triageRedNum)
-			{
-				textDescript.Text=textDescript.Text.Replace("!!","");
-				textDescript.Text=textDescript.Text.Replace("CUSTOMER","customer");
-				textDescript.Text=textDescript.Text.Replace("DOWN","down");
-				textDescript.Text=textDescript.Text.Replace("URGENT","urgent");
-				textDescript.Text=textDescript.Text.Replace("CONFERENCE","conference");
-				if(color!=butBlue.Name) {
-					_pritoryDefNumSelected=_triageWhiteNum;//White
-					for(int i=0;i<_listTaskPriorities.Count;i++) {
-						if(_listTaskPriorities[i].DefNum==_triageWhiteNum) {
-							comboTaskPriorities.SelectedIndex=i;//Change selection to the triage white
-						}
+			else {//Blue button is clicked while it's red or white, simply change it to blue
+				_pritoryDefNumSelected=_triageBlueNum;//Change to blue.
+				for(int i=0;i<_listTaskPriorities.Count;i++) {
+					if(_listTaskPriorities[i].DefNum==_triageBlueNum) {
+						comboTaskPriorities.SelectedIndex=i;//Change selection to the triage blue
 					}
-				}
-				if(textDescriptCursorPosition > -1) {
-					textDescript.SelectionStart=textDescriptCursorPosition;
-				}
+				}	
 			}
-			else if(color==butRed.Name) {//Red button was pressed, we change the task to red.
-				textDescript.Text+=" !!";
+		}
+
+		private void butRed_Click(object sender,EventArgs e) {
+			if(_pritoryDefNumSelected==_triageRedNum) {//Red button is clicked while it's already red
+				_pritoryDefNumSelected=_triageWhiteNum;//Change to white.
+				for(int i=0;i<_listTaskPriorities.Count;i++) {
+					if(_listTaskPriorities[i].DefNum==_triageWhiteNum) {
+						comboTaskPriorities.SelectedIndex=i;//Change combo selection to the triage white
+					}
+				}	
+			}
+			else {//Red button is clicked while it's blue or white, simply change it to red
+				_pritoryDefNumSelected=_triageRedNum;//Change to red.
+				for(int i=0;i<_listTaskPriorities.Count;i++) {
+					if(_listTaskPriorities[i].DefNum==_triageRedNum) {
+						comboTaskPriorities.SelectedIndex=i;//Change combo selection to the triage red
+					}
+				}	
 			}
 		}
 
 		///<summary>This event is fired whenever the combo box is changed manually or the index is changed programmatically.</summary>
 		private void comboTaskPriorities_SelectedIndexChanged(object sender,EventArgs e) {
-			UpdateTaskPriorityForTriageBasedOnCombo();
-		}
-
-		///<summary>Looks at the description text box contents and change the priority according to triage color logic.</summary>
-		private void UpdateTaskPriorityForTriageBasedOnCombo() {
 			_pritoryDefNumSelected=_listTaskPriorities[comboTaskPriorities.SelectedIndex].DefNum;
 			butColor.BackColor=DefC.GetColor(DefCat.TaskPriorities,_pritoryDefNumSelected);//Change the color swatch so people know the priority's color
-			//Only do weird logic when editing a task if HQ
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				return;
-			}
-			if(IsNew && textDescript.Text.Trim()=="") {
-				return;
-			}
-			int textDescriptCursorPosition=textDescript.SelectionStart;
-			string descriptText=textDescript.Text;
-			if(_pritoryDefNumSelected==_triageRedNum) {//User manually changed to red.
-				descriptText=descriptText.Replace(" @@","");//Strip out any @@'s
-				if(!descriptText.Contains("!!")
-						&&!descriptText.Contains("CUSTOMER")
-						&&!descriptText.Contains("DOWN")
-						&&!descriptText.Contains("URGENT")
-						&&!descriptText.Contains("CONFERENCE")) 
-				{
-					descriptText+=" !!";//Add !!'s
-				}
-			}
-			else if(_pritoryDefNumSelected==_triageBlueNum) {//Index changed to blue
-				descriptText=descriptText.Replace("!!","");//Change out any triageRed text
-				descriptText=descriptText.Replace("CUSTOMER","customer");
-				descriptText=descriptText.Replace("DOWN","down");
-				descriptText=descriptText.Replace("URGENT","urgent");
-				descriptText=descriptText.Replace("CONFERENCE","conference");
-				if(!descriptText.Contains("@@")) {
-					descriptText+=" @@";//Add blue text, gets fired when opening up new task in triage list so automatically appends @@'s
-				}
-			}
-			else { //Remove all triggers from the text box that would force the priority to change to red or blue.  This allows other colors, like white, or brown, etc.
-				descriptText=descriptText.Replace("!!","");//Change out any triageRed and triageBlue text
-				descriptText=descriptText.Replace("@@","");
-				descriptText=descriptText.Replace("CUSTOMER","customer");
-				descriptText=descriptText.Replace("DOWN","down");
-				descriptText=descriptText.Replace("URGENT","urgent");
-				descriptText=descriptText.Replace("CONFERENCE","conference");
-			}
-			textDescript.Text=descriptText;
-			if(textDescriptCursorPosition > -1) {
-				textDescript.SelectionStart=textDescriptCursorPosition;
-			}
-		}
-
-		///<summary>Looks at the text in the description, and correctly sets comboTaskPriorities based on what color it should be.</summary>
-		private void UpdateTaskPriorityForTriageBasedOnDescript() {
-			//We could potentially make this user customizeable!
-			//Only do weird logic when editing a task if HQ
-			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				return;
-			}
-			if(textDescript.Text.Trim()=="") {
-				return;
-			}
-			int indexToSelect=-1;
-			if(textDescript.Text.Contains("@@")) {//They've entered @@ into the text. Change it to blue.
-				for(int i=0;i<_listTaskPriorities.Count;i++) {
-					if(_listTaskPriorities[i].DefNum==_triageBlueNum) {
-						indexToSelect=i;
-					}
-				}
-			}
-			if(textDescript.Text.Contains("CUSTOMER")//They've entered red terms into the text. Change it to red.  Red takes priority over blue.
-					||textDescript.Text.Contains("DOWN")
-					||textDescript.Text.Contains("URGENT")
-					||textDescript.Text.Contains("CONFERENCE")
-					||textDescript.Text.Contains("!!")) 
-			{
-				for(int i=0;i<_listTaskPriorities.Count;i++) {
-					if(_listTaskPriorities[i].DefNum==_triageRedNum) {
-						indexToSelect=i;
-					}
-				}
-			}
-			if(indexToSelect > -1 && indexToSelect!=comboTaskPriorities.SelectedIndex) {
-				comboTaskPriorities.SelectedIndex=indexToSelect;//This will fire comboTaskPriorities_SelectedIndexChanged
-			}
 		}
 
 		private void listObjectType_MouseDown(object sender,System.Windows.Forms.MouseEventArgs e) {
@@ -1282,6 +1197,12 @@ namespace OpenDental {
 			TaskCur.KeyNum=0;
 			TaskCur.ObjectType=(TaskObjectType)listObjectType.SelectedIndex;
 			FillObject();
+		}
+
+		private void butAudit_Click(object sender,EventArgs e) {
+			FormTaskHist FormTH=new FormTaskHist();
+			FormTH.TaskNumCur=TaskCur.TaskNum;
+			FormTH.Show();
 		}
 
 		private void butChange_Click(object sender,System.EventArgs e) {
@@ -1335,7 +1256,6 @@ namespace OpenDental {
 				StatusChanged=true;
 				MightNeedSetRead=false;//so that the automation won't happen again
 			}
-			UpdateTaskPriorityForTriageBasedOnDescript();
 			if(TaskOld.TaskStatus==TaskStatusEnum.Done && textDescript.Text!=TaskOld.Descript) {
 				checkDone.Checked=false;
 			}
@@ -1436,7 +1356,6 @@ namespace OpenDental {
 			}
 			//ObjectType already handled
 			//Cur.KeyNum already handled
-			UpdateTaskPriorityForTriageBasedOnDescript();//This will correct the task priority in the case that a user created / edited a task in their task list and then sent it to the triage task list.
 			TaskCur.PriorityDefNum=_pritoryDefNumSelected;
 			try {
 				if(IsNew) {
@@ -1475,6 +1394,10 @@ namespace OpenDental {
 			}
 			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all four tables
 			DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
+			TaskHist taskHistory=new TaskHist(TaskOld);
+			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.UserNum=Security.CurUser.UserNum;
+			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}
@@ -1508,6 +1431,10 @@ namespace OpenDental {
 				return;
 			}
 			DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
+			TaskHist taskHistory=new TaskHist(TaskOld);
+			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.UserNum=Security.CurUser.UserNum;
+			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}
@@ -1564,6 +1491,10 @@ namespace OpenDental {
 			if(notesChanged || !TaskCur.Equals(TaskOld) || StatusChanged) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
+			TaskHist taskHistory=new TaskHist(TaskOld);
+			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.UserNum=Security.CurUser.UserNum;
+			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}
@@ -1590,6 +1521,10 @@ namespace OpenDental {
 			else {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
+			TaskHist taskHistory=new TaskHist(TaskOld);
+			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.UserNum=Security.CurUser.UserNum;
+			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}

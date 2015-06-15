@@ -8625,6 +8625,60 @@ namespace OpenDentBusiness {
 					command="UPDATE feesched SET IsGlobal = 1 WHERE IsGlobal IS NULL";//1 is default (true)
 					Db.NonQ(command);
 				}
+				//Creating TaskHist table, extends Task.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS taskhist";
+					Db.NonQ(command);
+					command=@"CREATE TABLE taskhist (
+						TaskHistNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNumHist bigint NOT NULL,
+						DateTStamp datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						IsNoteChange tinyint NOT NULL,
+						TaskNum bigint NOT NULL,
+						TaskListNum bigint NOT NULL,
+						DateTask date NOT NULL DEFAULT '0001-01-01',
+						KeyNum bigint NOT NULL,
+						Descript text NOT NULL,
+						TaskStatus tinyint NOT NULL,
+						IsRepeating tinyint NOT NULL,
+						DateType tinyint NOT NULL,
+						FromNum bigint NOT NULL,
+						ObjectType tinyint NOT NULL,
+						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						UserNum bigint NOT NULL,
+						DateTimeFinished datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						PriorityDefNum bigint NOT NULL,
+						INDEX(TaskNum)) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE taskhist'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE taskhist (
+						TaskHistNum number(20) NOT NULL,
+						UserNumHist number(20) NOT NULL,
+						DateTStamp date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						IsNoteChange number(3) NOT NULL,
+						TaskNum number(20) NOT NULL,
+						TaskListNum number(20) NOT NULL,
+						DateTask date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						KeyNum number(20) NOT NULL,
+						Descript clob,
+						TaskStatus number(3) NOT NULL,
+						IsRepeating number(3) NOT NULL,
+						DateType number(3) NOT NULL,
+						FromNum number(20) NOT NULL,
+						ObjectType number(3) NOT NULL,
+						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						UserNum number(20) NOT NULL,
+						DateTimeFinished date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						PriorityDefNum number(20) NOT NULL,
+						CONSTRAINT taskhist_TaskHistNum PRIMARY KEY (TaskHistNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX taskhist_TaskNum ON taskhist (TaskNum)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -8663,4 +8717,3 @@ namespace OpenDentBusiness {
 
 
     
-
