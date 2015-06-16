@@ -8698,7 +8698,7 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 					else {//oracle
-						command=@"CREATE INDEX apptviewitem_OpNum ON appointment (Op)";
+						command=@"CREATE INDEX apptviewitem_OpNum ON apptviewitem (OpNum)";
 						Db.NonQ(command);
 					}
 				}
