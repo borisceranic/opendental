@@ -337,7 +337,7 @@ namespace SparksToothChart {
 
 		///<summary>Must be called after the ToothChartDirectX control has been added to a form and should be called before it is drawn the first time.</summary>
 		public void InitializeGraphics(){
-			if(deviceFormat!=null){
+			if(deviceLost && deviceFormat!=null){
 				device=deviceFormat.CreateDevice(this);
 				if(device==null) {
 					throw new Exception("Failed to create DirectX device.");
@@ -357,7 +357,9 @@ namespace SparksToothChart {
 		public void Reinitialize(){
 			CleanupDirectX();
 			if(device!=null) {
-				device.Dispose();
+				if(!deviceLost) {
+					device.Dispose();//This line causes OnDeviceLost() to fire.  If deviceLost, then device.Dispose() was already called.
+				}
 				device=null;
 			}
 			InitializeGraphics();

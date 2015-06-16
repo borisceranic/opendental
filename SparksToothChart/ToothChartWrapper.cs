@@ -50,6 +50,7 @@ namespace SparksToothChart {
 					//then we need to cleanup DirectX resources in case the 
 					//chart is never switched back to DirectX mode.
 					toothChartDirectX.Dispose();//Calls CleanupDirectX() and device.Dispose().
+					toothChartDirectX=null;
 				}
 				try {
 					drawMode=value;
@@ -349,11 +350,19 @@ namespace SparksToothChart {
 				toothChart2D.ResumeLayout();
 			}
 			else if(drawMode==DrawingMode.DirectX){
-				if(toothChartDirectX!=null){
-					toothChartDirectX.Dispose();
-					toothChartDirectX=null;
+				//I noticed that this code executes when the program starts, then also when the Chart module is selected for the first time.
+				//Thus the Chart graphic was loading twice before the user could see it.
+				bool isInitialized=true;
+				if(toothChartDirectX==null) {
+					isInitialized=false;
 				}
-				toothChartDirectX=new ToothChartDirectX();//(hardwareMode,preferredPixelFormatNum);
+				if(isInitialized) {
+					//Since the control is already initialized, reuse it.  This helps the load time of the Chart module and helps to prevent an issue.
+					//This flag helps prevent a red X on the tooth chart when the Chart module is left open and the Windows user is switched then switched back.
+				}
+				else {
+					toothChartDirectX=new ToothChartDirectX();//(hardwareMode,preferredPixelFormatNum);
+				}
 				//preferredPixelFormatNum=toothChart.SelectedPixelFormatNumber;
 				//toothChartDirectX.ColorText=colorText;
 				toothChartDirectX.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -366,7 +375,9 @@ namespace SparksToothChart {
 				this.Controls.Add(toothChartDirectX);
 				ResetTeeth();
 				toothChartDirectX.deviceFormat=deviceFormat;
-				toothChartDirectX.InitializeGraphics();
+				if(!isInitialized) {
+					toothChartDirectX.InitializeGraphics();
+				}
 				toothChartDirectX.ResumeLayout();//Might help with the MDA debug error we used to get (if the option wasn't disabled in our compilers).
 			}
 			else if(drawMode==DrawingMode.OpenGL){
