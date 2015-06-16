@@ -141,7 +141,7 @@ namespace OpenDentBusiness{
 				retVal[phone.PhoneNumber].Add("InboundThisMonthCost",0);
 			}
 			//Sent All Time
-			string command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile WHERE MsgCostUSD>0 GROUP BY SmsPhoneNumber";
+			string command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile WHERE MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
@@ -153,7 +153,7 @@ namespace OpenDentBusiness{
 			DateTime dateStartMonthCur=DateTime.Now.AddDays(-DateTime.Now.Day).Date;
 			command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile "
 				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
-				+"AND DateTimeSent<"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
+				+"AND DateTimeSent<"+POut.Date(dateStartMonthCur)+" AND MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
@@ -162,8 +162,8 @@ namespace OpenDentBusiness{
 				}
 			}
 			//count and cost sent this month
-			command="SELECT SmsPhoneNumber, COUNT(*), SUM(MsgCostUSD) FROM smstomobile "
-				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur)+" AND MsgCostUSD>0 GROUP BY SmsPhoneNumber";
+			command="SELECT SmsPhoneNumber, COUNT(*), SUM(MsgChargeUSD) FROM smstomobile "
+				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur)+" AND MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
 				string phone=table.Rows[i][0].ToString();
@@ -382,7 +382,7 @@ namespace OpenDentBusiness{
 			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880){
 				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;	
 			}
-			string command="SELECT SUM(MsgCostUSD) FROM smstomobile WHERE ClinicNum="+POut.Long(clinicNum);
+			string command="SELECT SUM(MsgChargeUSD) FROM smstomobile WHERE ClinicNum="+POut.Long(clinicNum);
 			limit-=PIn.Double(Db.GetScalar(command));
 			return limit;
 		}

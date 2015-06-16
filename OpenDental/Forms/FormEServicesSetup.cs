@@ -1199,7 +1199,7 @@ namespace OpenDental {
 			//gridSmsSummary.Columns.Add(col);
 			//col=new ODGridColumn(Lan.g(this,"Charge This Mo"),100,HorizontalAlignment.Right);
 			//gridSmsSummary.Columns.Add(col);
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
+			ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual\r\nPhone\r\nNumber"),130,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"All Time"),60,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
@@ -1525,7 +1525,7 @@ namespace OpenDental {
 					string GUID = Guid.NewGuid().ToString();
 					SmsToMobiles.Insert(new SmsToMobile() {
 						DateTimeSent=msgDate, DateTimeTerminated=msgDate.AddMinutes(rand.Next(60)),
-						GuidMessage=GUID, GuidBatch=GUID, MsgParts=1, ClinicNum=phone.ClinicNum, MsgCostUSD=0.04f,
+						GuidMessage=GUID, GuidBatch=GUID, MsgParts=1, ClinicNum=phone.ClinicNum, MsgChargeUSD=0.04f,
 						PatNum=1, MobilePhoneNumber="12223334444", Status= SmsDeliveryStatus.DeliveryConf, MsgText="This is msg #"+i+" of "+msgCount,
 						SmsPhoneNumber=phone.PhoneNumber, MsgType= SmsMessageSource.DirectSms, IsTimeSensitive=true
 					});

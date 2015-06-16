@@ -186,7 +186,7 @@ namespace OpenDental {
 					if(checkShowHidden.Checked) {
 						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
 					}
-					row.Cells.Add(listSmsToMobile[i].MsgCostUSD.ToString("f"));//Cost
+					row.Cells.Add(listSmsToMobile[i].MsgChargeUSD.ToString("f"));//Cost
 					row.Cells.Add(listSmsToMobile[i].MsgText);//Message
 					gridMessages.Rows.Add(row);
 				}

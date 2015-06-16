@@ -48,6 +48,8 @@ namespace OpenDental{
 			this.butSaveListenerPort = new OpenDental.UI.Button();
 			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.labelListenerServiceAck = new System.Windows.Forms.Label();
+			this.butListenerServiceAck = new OpenDental.UI.Button();
 			this.label27 = new System.Windows.Forms.Label();
 			this.butListenerServiceHistoryRefresh = new OpenDental.UI.Button();
 			this.label26 = new System.Windows.Forms.Label();
@@ -103,22 +105,20 @@ namespace OpenDental{
 			this.labelWebSchedEnable = new System.Windows.Forms.Label();
 			this.labelWebSchedDesc = new System.Windows.Forms.Label();
 			this.tabSmsServices = new System.Windows.Forms.TabPage();
-			this.butSmsUnsubscribe = new OpenDental.UI.Button();
-			this.gridSmsSummary = new OpenDental.UI.ODGrid();
-			this.butSmsSubmit = new OpenDental.UI.Button();
-			this.label28 = new System.Windows.Forms.Label();
-			this.butSmsCancel = new OpenDental.UI.Button();
-			this.textSmsLimit = new System.Windows.Forms.TextBox();
-			this.checkSmsAgree = new System.Windows.Forms.CheckBox();
-			this.gridClinics = new OpenDental.UI.ODGrid();
-			this.label29 = new System.Windows.Forms.Label();
-			this.label23 = new System.Windows.Forms.Label();
-			this.butClose = new OpenDental.UI.Button();
-			this.butListenerServiceAck = new OpenDental.UI.Button();
-			this.groupBox5 = new System.Windows.Forms.GroupBox();
-			this.labelListenerServiceAck = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.label29 = new System.Windows.Forms.Label();
+			this.checkSmsAgree = new System.Windows.Forms.CheckBox();
+			this.textSmsLimit = new System.Windows.Forms.TextBox();
+			this.butSmsUnsubscribe = new OpenDental.UI.Button();
+			this.butSmsCancel = new OpenDental.UI.Button();
+			this.label28 = new System.Windows.Forms.Label();
+			this.butSmsSubmit = new OpenDental.UI.Button();
+			this.gridSmsSummary = new OpenDental.UI.ODGrid();
+			this.gridClinics = new OpenDental.UI.ODGrid();
+			this.label23 = new System.Windows.Forms.Label();
+			this.butClose = new OpenDental.UI.Button();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -417,6 +417,31 @@ namespace OpenDental{
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Listener Service Monitor";
 			// 
+			// labelListenerServiceAck
+			// 
+			this.labelListenerServiceAck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelListenerServiceAck.Location = new System.Drawing.Point(60, 263);
+			this.labelListenerServiceAck.Name = "labelListenerServiceAck";
+			this.labelListenerServiceAck.Size = new System.Drawing.Size(578, 13);
+			this.labelListenerServiceAck.TabIndex = 254;
+			this.labelListenerServiceAck.Text = "Acknowledge all errors.  This will stop the eServices menu from showing yellow.";
+			this.labelListenerServiceAck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butListenerServiceAck
+			// 
+			this.butListenerServiceAck.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butListenerServiceAck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butListenerServiceAck.Autosize = true;
+			this.butListenerServiceAck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butListenerServiceAck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butListenerServiceAck.CornerRadius = 4F;
+			this.butListenerServiceAck.Location = new System.Drawing.Point(644, 257);
+			this.butListenerServiceAck.Name = "butListenerServiceAck";
+			this.butListenerServiceAck.Size = new System.Drawing.Size(61, 24);
+			this.butListenerServiceAck.TabIndex = 253;
+			this.butListenerServiceAck.Text = "Ack";
+			this.butListenerServiceAck.Click += new System.EventHandler(this.butListenerServiceAck_Click);
+			// 
 			// label27
 			// 
 			this.label27.Location = new System.Drawing.Point(7, 18);
@@ -454,36 +479,7 @@ namespace OpenDental{
 			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridListenerServiceStatusHistory.HScrollVisible = false;
-			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
-			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
-			this.gridListenerServiceStatusHistory.ScrollValue = 0;
-			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(699, 134);
-			this.gridListenerServiceStatusHistory.TabIndex = 249;
-			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
-			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
-			this.gridListenerServiceStatusHistory.WrapText = false;
-			// 
-			// butStartListenerService
-			// 
-			this.butStartListenerService.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butStartListenerService.Autosize = true;
-			this.butStartListenerService.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butStartListenerService.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butStartListenerService.CornerRadius = 4F;
-			this.butStartListenerService.Enabled = false;
-			this.butStartListenerService.Location = new System.Drawing.Point(417, 45);
-			this.butStartListenerService.Name = "butStartListenerService";
-			this.butStartListenerService.Size = new System.Drawing.Size(61, 24);
-			this.butStartListenerService.TabIndex = 245;
-			this.butStartListenerService.Text = "Start";
-			this.butStartListenerService.Click += new System.EventHandler(this.butStartListenerService_Click);
-			// 
-			// gridListenerServiceStatusHistory
-			// 
-			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridListenerServiceStatusHistory.HasMultilineHeaders = false;
 			this.gridListenerServiceStatusHistory.HScrollVisible = false;
 			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
 			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
@@ -1074,6 +1070,73 @@ namespace OpenDental{
 			this.tabSmsServices.TabIndex = 6;
 			this.tabSmsServices.Text = "Texting Services";
 			// 
+			// comboClinic
+			// 
+			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(109, 243);
+			this.comboClinic.MaxDropDownItems = 30;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(226, 21);
+			this.comboClinic.TabIndex = 259;
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelClinic.Location = new System.Drawing.Point(19, 246);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(89, 14);
+			this.labelClinic.TabIndex = 258;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// groupBox5
+			// 
+			this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupBox5.Controls.Add(this.label29);
+			this.groupBox5.Controls.Add(this.checkSmsAgree);
+			this.groupBox5.Controls.Add(this.textSmsLimit);
+			this.groupBox5.Controls.Add(this.butSmsUnsubscribe);
+			this.groupBox5.Controls.Add(this.butSmsCancel);
+			this.groupBox5.Controls.Add(this.label28);
+			this.groupBox5.Controls.Add(this.butSmsSubmit);
+			this.groupBox5.Location = new System.Drawing.Point(9, 267);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(326, 210);
+			this.groupBox5.TabIndex = 257;
+			this.groupBox5.TabStop = false;
+			this.groupBox5.Text = "Service Acknowledgement";
+			// 
+			// label29
+			// 
+			this.label29.Location = new System.Drawing.Point(6, 16);
+			this.label29.Name = "label29";
+			this.label29.Size = new System.Drawing.Size(314, 104);
+			this.label29.TabIndex = 56;
+			this.label29.Text = resources.GetString("label29.Text");
+			// 
+			// checkSmsAgree
+			// 
+			this.checkSmsAgree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkSmsAgree.AutoSize = true;
+			this.checkSmsAgree.Location = new System.Drawing.Point(9, 131);
+			this.checkSmsAgree.Name = "checkSmsAgree";
+			this.checkSmsAgree.Size = new System.Drawing.Size(271, 17);
+			this.checkSmsAgree.TabIndex = 250;
+			this.checkSmsAgree.Text = "I understand and acknowledge the terms of service.";
+			this.checkSmsAgree.UseVisualStyleBackColor = true;
+			this.checkSmsAgree.CheckedChanged += new System.EventHandler(this.checkSmsAgree_CheckedChanged);
+			// 
+			// textSmsLimit
+			// 
+			this.textSmsLimit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textSmsLimit.Location = new System.Drawing.Point(9, 154);
+			this.textSmsLimit.Name = "textSmsLimit";
+			this.textSmsLimit.Size = new System.Drawing.Size(148, 20);
+			this.textSmsLimit.TabIndex = 252;
+			this.textSmsLimit.TextChanged += new System.EventHandler(this.textSmsLimit_TextChanged);
+			this.textSmsLimit.Leave += new System.EventHandler(this.textSmsLimit_Leave);
+			// 
 			// butSmsUnsubscribe
 			// 
 			this.butSmsUnsubscribe.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1089,48 +1152,6 @@ namespace OpenDental{
 			this.butSmsUnsubscribe.Text = "Unsubscribe";
 			this.butSmsUnsubscribe.UseVisualStyleBackColor = true;
 			this.butSmsUnsubscribe.Click += new System.EventHandler(this.butSmsUnsubscribe_Click);
-			// 
-			// gridSmsSummary
-			// 
-			this.gridSmsSummary.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridSmsSummary.HScrollVisible = false;
-			this.gridSmsSummary.Location = new System.Drawing.Point(341, 6);
-			this.gridSmsSummary.Name = "gridSmsSummary";
-			this.gridSmsSummary.ScrollValue = 0;
-			this.gridSmsSummary.Size = new System.Drawing.Size(597, 471);
-			this.gridSmsSummary.TabIndex = 252;
-			this.gridSmsSummary.Title = "Text Messaging Phone Number and Usage Summary";
-			this.gridSmsSummary.TranslationName = "FormEServicesSetup";
-			this.gridSmsSummary.WrapText = false;
-			// 
-			// butSmsSubmit
-			// 
-			this.butSmsSubmit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSmsSubmit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butSmsSubmit.Autosize = true;
-			this.butSmsSubmit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSmsSubmit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSmsSubmit.CornerRadius = 4F;
-			this.butSmsSubmit.Location = new System.Drawing.Point(165, 180);
-			this.butSmsSubmit.Name = "butSmsSubmit";
-			this.butSmsSubmit.Size = new System.Drawing.Size(75, 23);
-			this.butSmsSubmit.TabIndex = 251;
-			this.butSmsSubmit.Text = "Subcribe";
-			this.butSmsSubmit.UseVisualStyleBackColor = true;
-			this.butSmsSubmit.Click += new System.EventHandler(this.butSmsSubmit_Click);
-			// 
-			// label28
-			// 
-			this.label28.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.label28.Location = new System.Drawing.Point(160, 155);
-			this.label28.Name = "label28";
-			this.label28.Size = new System.Drawing.Size(160, 17);
-			this.label28.TabIndex = 253;
-			this.label28.Text = "Monthly Limit in USD";
-			this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// butSmsCancel
 			// 
@@ -1148,32 +1169,55 @@ namespace OpenDental{
 			this.butSmsCancel.UseVisualStyleBackColor = true;
 			this.butSmsCancel.Click += new System.EventHandler(this.butSmsCancel_Click);
 			// 
-			// textSmsLimit
+			// label28
 			// 
-			this.textSmsLimit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textSmsLimit.Location = new System.Drawing.Point(9, 154);
-			this.textSmsLimit.Name = "textSmsLimit";
-			this.textSmsLimit.Size = new System.Drawing.Size(148, 20);
-			this.textSmsLimit.TabIndex = 252;
-			this.textSmsLimit.TextChanged += new System.EventHandler(this.textSmsLimit_TextChanged);
-			this.textSmsLimit.Leave += new System.EventHandler(this.textSmsLimit_Leave);
+			this.label28.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.label28.Location = new System.Drawing.Point(160, 155);
+			this.label28.Name = "label28";
+			this.label28.Size = new System.Drawing.Size(160, 17);
+			this.label28.TabIndex = 253;
+			this.label28.Text = "Monthly Limit in USD";
+			this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// checkSmsAgree
+			// butSmsSubmit
 			// 
-			this.checkSmsAgree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.checkSmsAgree.AutoSize = true;
-			this.checkSmsAgree.Location = new System.Drawing.Point(9, 131);
-			this.checkSmsAgree.Name = "checkSmsAgree";
-			this.checkSmsAgree.Size = new System.Drawing.Size(271, 17);
-			this.checkSmsAgree.TabIndex = 250;
-			this.checkSmsAgree.Text = "I understand and acknowledge the terms of service.";
-			this.checkSmsAgree.UseVisualStyleBackColor = true;
-			this.checkSmsAgree.CheckedChanged += new System.EventHandler(this.checkSmsAgree_CheckedChanged);
+			this.butSmsSubmit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSmsSubmit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butSmsSubmit.Autosize = true;
+			this.butSmsSubmit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSmsSubmit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSmsSubmit.CornerRadius = 4F;
+			this.butSmsSubmit.Location = new System.Drawing.Point(165, 180);
+			this.butSmsSubmit.Name = "butSmsSubmit";
+			this.butSmsSubmit.Size = new System.Drawing.Size(75, 23);
+			this.butSmsSubmit.TabIndex = 251;
+			this.butSmsSubmit.Text = "Subcribe";
+			this.butSmsSubmit.UseVisualStyleBackColor = true;
+			this.butSmsSubmit.Click += new System.EventHandler(this.butSmsSubmit_Click);
+			// 
+			// gridSmsSummary
+			// 
+			this.gridSmsSummary.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridSmsSummary.HasMultilineHeaders = true;
+			this.gridSmsSummary.HScrollVisible = false;
+			this.gridSmsSummary.Location = new System.Drawing.Point(341, 6);
+			this.gridSmsSummary.Name = "gridSmsSummary";
+			this.gridSmsSummary.ScrollValue = 0;
+			this.gridSmsSummary.SelectionMode = OpenDental.UI.GridSelectionMode.None;
+			this.gridSmsSummary.Size = new System.Drawing.Size(597, 471);
+			this.gridSmsSummary.TabIndex = 252;
+			this.gridSmsSummary.Title = "Text Messaging Phone Number and Usage Summary";
+			this.gridSmsSummary.TranslationName = "FormEServicesSetup";
+			this.gridSmsSummary.WrapText = false;
 			// 
 			// gridClinics
 			// 
 			this.gridClinics.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridClinics.HasMultilineHeaders = false;
 			this.gridClinics.HScrollVisible = false;
 			this.gridClinics.Location = new System.Drawing.Point(13, 6);
 			this.gridClinics.Name = "gridClinics";
@@ -1184,14 +1228,6 @@ namespace OpenDental{
 			this.gridClinics.TranslationName = "FormEServicesSetup";
 			this.gridClinics.WrapText = false;
 			this.gridClinics.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClinics_CellClick);
-			// 
-			// label29
-			// 
-			this.label29.Location = new System.Drawing.Point(6, 16);
-			this.label29.Name = "label29";
-			this.label29.Size = new System.Drawing.Size(314, 104);
-			this.label29.TabIndex = 56;
-			this.label29.Text = resources.GetString("label29.Text");
 			// 
 			// label23
 			// 
@@ -1220,64 +1256,6 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
-			// 
-			// butListenerServiceAck
-			// groupBox5
-			// 
-			this.butListenerServiceAck.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butListenerServiceAck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butListenerServiceAck.Autosize = true;
-			this.butListenerServiceAck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butListenerServiceAck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butListenerServiceAck.CornerRadius = 4F;
-			this.butListenerServiceAck.Location = new System.Drawing.Point(644, 257);
-			this.butListenerServiceAck.Name = "butListenerServiceAck";
-			this.butListenerServiceAck.Size = new System.Drawing.Size(61, 24);
-			this.butListenerServiceAck.TabIndex = 253;
-			this.butListenerServiceAck.Text = "Ack";
-			this.butListenerServiceAck.Click += new System.EventHandler(this.butListenerServiceAck_Click);
-			this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.groupBox5.Controls.Add(this.label29);
-			this.groupBox5.Controls.Add(this.checkSmsAgree);
-			this.groupBox5.Controls.Add(this.textSmsLimit);
-			this.groupBox5.Controls.Add(this.butSmsUnsubscribe);
-			this.groupBox5.Controls.Add(this.butSmsCancel);
-			this.groupBox5.Controls.Add(this.label28);
-			this.groupBox5.Controls.Add(this.butSmsSubmit);
-			this.groupBox5.Location = new System.Drawing.Point(9, 267);
-			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Size = new System.Drawing.Size(326, 210);
-			this.groupBox5.TabIndex = 257;
-			this.groupBox5.TabStop = false;
-			this.groupBox5.Text = "Service Acknowledgement";
-			// 
-			// labelListenerServiceAck
-			// comboClinic
-			// 
-			this.labelListenerServiceAck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelListenerServiceAck.Location = new System.Drawing.Point(60, 263);
-			this.labelListenerServiceAck.Name = "labelListenerServiceAck";
-			this.labelListenerServiceAck.Size = new System.Drawing.Size(578, 13);
-			this.labelListenerServiceAck.TabIndex = 254;
-			this.labelListenerServiceAck.Text = "Acknowledge all errors.  This will stop the eServices menu from showing yellow.";
-			this.labelListenerServiceAck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(109, 243);
-			this.comboClinic.MaxDropDownItems = 30;
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(226, 21);
-			this.comboClinic.TabIndex = 259;
-			// 
-			// labelClinic
-			// 
-			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelClinic.Location = new System.Drawing.Point(19, 246);
-			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(89, 14);
-			this.labelClinic.TabIndex = 258;
-			this.labelClinic.Text = "Clinic";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// FormEServicesSetup
 			// 

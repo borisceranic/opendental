@@ -57,7 +57,7 @@ namespace OpenDentBusiness.Crud{
 				smsToMobile.MsgText           = PIn.String(table.Rows[i]["MsgText"].ToString());
 				smsToMobile.Status            = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(table.Rows[i]["Status"].ToString());
 				smsToMobile.MsgParts          = PIn.Int   (table.Rows[i]["MsgParts"].ToString());
-				smsToMobile.MsgCostUSD        = PIn.Double(table.Rows[i]["MsgCostUSD"].ToString());
+				smsToMobile.MsgChargeUSD      = PIn.Double(table.Rows[i]["MsgChargeUSD"].ToString());
 				smsToMobile.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				smsToMobile.CustErrorText     = PIn.String(table.Rows[i]["CustErrorText"].ToString());
 				smsToMobile.DateTimeSent      = PIn.DateT (table.Rows[i]["DateTimeSent"].ToString());
@@ -103,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsToMobileNum,";
 			}
-			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgCostUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
+			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsToMobile.SmsToMobileNum)+",";
 			}
@@ -118,7 +118,7 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.ParamChar+"paramMsgText,"
 				+    POut.Int   ((int)smsToMobile.Status)+","
 				+    POut.Int   (smsToMobile.MsgParts)+","
-				+"'"+POut.Double(smsToMobile.MsgCostUSD)+"',"
+				+"'"+POut.Double(smsToMobile.MsgChargeUSD)+"',"
 				+    POut.Long  (smsToMobile.ClinicNum)+","
 				+"'"+POut.String(smsToMobile.CustErrorText)+"',"
 				+    POut.DateT (smsToMobile.DateTimeSent)+","
@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"MsgText           =  "+DbHelper.ParamChar+"paramMsgText, "
 				+"Status            =  "+POut.Int   ((int)smsToMobile.Status)+", "
 				+"MsgParts          =  "+POut.Int   (smsToMobile.MsgParts)+", "
-				+"MsgCostUSD        = '"+POut.Double(smsToMobile.MsgCostUSD)+"', "
+				+"MsgChargeUSD      = '"+POut.Double(smsToMobile.MsgChargeUSD)+"', "
 				+"ClinicNum         =  "+POut.Long  (smsToMobile.ClinicNum)+", "
 				+"CustErrorText     = '"+POut.String(smsToMobile.CustErrorText)+"', "
 				+"DateTimeSent      =  "+POut.DateT (smsToMobile.DateTimeSent)+", "
@@ -207,9 +207,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="MsgParts = "+POut.Int(smsToMobile.MsgParts)+"";
 			}
-			if(smsToMobile.MsgCostUSD != oldSmsToMobile.MsgCostUSD) {
+			if(smsToMobile.MsgChargeUSD != oldSmsToMobile.MsgChargeUSD) {
 				if(command!=""){ command+=",";}
-				command+="MsgCostUSD = '"+POut.Double(smsToMobile.MsgCostUSD)+"'";
+				command+="MsgChargeUSD = '"+POut.Double(smsToMobile.MsgChargeUSD)+"'";
 			}
 			if(smsToMobile.ClinicNum != oldSmsToMobile.ClinicNum) {
 				if(command!=""){ command+=",";}
