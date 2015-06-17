@@ -22,6 +22,8 @@ namespace OpenDentBusiness {
 		public DateTime DateTimeInactive;
 		///<summary>Used to indicate why this phone number was made inactive.</summary>
 		public string InactiveCode;
+		///<summary>Country linked to this phone's clinic at the instant that this phone is created. Based on ISO31661.</summary>
+		public string CountryCode;
 
 		///<summary></summary>
 		public SmsPhone Copy() {
