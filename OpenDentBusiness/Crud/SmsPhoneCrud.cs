@@ -52,6 +52,7 @@ namespace OpenDentBusiness.Crud{
 				smsPhone.DateTimeActive  = PIn.DateT (table.Rows[i]["DateTimeActive"].ToString());
 				smsPhone.DateTimeInactive= PIn.DateT (table.Rows[i]["DateTimeInactive"].ToString());
 				smsPhone.InactiveCode    = PIn.String(table.Rows[i]["InactiveCode"].ToString());
+				smsPhone.CountryCode     = PIn.String(table.Rows[i]["CountryCode"].ToString());
 				retVal.Add(smsPhone);
 			}
 			return retVal;
@@ -92,7 +93,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsPhoneNum,";
 			}
-			command+="ClinicNum,PhoneNumber,DateTimeActive,DateTimeInactive,InactiveCode) VALUES(";
+			command+="ClinicNum,PhoneNumber,DateTimeActive,DateTimeInactive,InactiveCode,CountryCode) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsPhone.SmsPhoneNum)+",";
 			}
@@ -101,7 +102,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(smsPhone.PhoneNumber)+"',"
 				+    POut.DateT (smsPhone.DateTimeActive)+","
 				+    POut.DateT (smsPhone.DateTimeInactive)+","
-				+"'"+POut.String(smsPhone.InactiveCode)+"')";
+				+"'"+POut.String(smsPhone.InactiveCode)+"',"
+				+"'"+POut.String(smsPhone.CountryCode)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -118,7 +120,8 @@ namespace OpenDentBusiness.Crud{
 				+"PhoneNumber     = '"+POut.String(smsPhone.PhoneNumber)+"', "
 				+"DateTimeActive  =  "+POut.DateT (smsPhone.DateTimeActive)+", "
 				+"DateTimeInactive=  "+POut.DateT (smsPhone.DateTimeInactive)+", "
-				+"InactiveCode    = '"+POut.String(smsPhone.InactiveCode)+"' "
+				+"InactiveCode    = '"+POut.String(smsPhone.InactiveCode)+"', "
+				+"CountryCode     = '"+POut.String(smsPhone.CountryCode)+"' "
 				+"WHERE SmsPhoneNum = "+POut.Long(smsPhone.SmsPhoneNum);
 			Db.NonQ(command);
 		}
@@ -145,6 +148,10 @@ namespace OpenDentBusiness.Crud{
 			if(smsPhone.InactiveCode != oldSmsPhone.InactiveCode) {
 				if(command!=""){ command+=",";}
 				command+="InactiveCode = '"+POut.String(smsPhone.InactiveCode)+"'";
+			}
+			if(smsPhone.CountryCode != oldSmsPhone.CountryCode) {
+				if(command!=""){ command+=",";}
+				command+="CountryCode = '"+POut.String(smsPhone.CountryCode)+"'";
 			}
 			if(command==""){
 				return false;

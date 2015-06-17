@@ -8408,6 +8408,7 @@ namespace OpenDentBusiness {
 						DateTimeActive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						DateTimeInactive datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						InactiveCode varchar(255) NOT NULL,
+						CountryCode varchar(255) NOT NULL,
 						INDEX(ClinicNum)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
@@ -8422,6 +8423,7 @@ namespace OpenDentBusiness {
 						DateTimeActive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						DateTimeInactive date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						InactiveCode varchar2(255),
+						CountryCode varchar2(255),
 						CONSTRAINT smsphone_SmsPhoneNum PRIMARY KEY (SmsPhoneNum)
 						)";
 					Db.NonQ(command);
