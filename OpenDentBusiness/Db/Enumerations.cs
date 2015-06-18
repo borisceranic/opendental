@@ -280,7 +280,9 @@ namespace OpenDentBusiness{
 		///<summary>58. Used to override appointment color.  Might be used for other appointment attributes in the future.</summary>
 		AppointmentTypes,
 		///<summary>59. Caches the medication list to stop from over-refreshing and causing slowness.</summary>
-		Medications
+		Medications,
+		///<summary>This is a special InvalidType which indicates a refresh, but also includes the data to be refreshed inside of the signalod.SigText field.</summary>
+		SmsTextMsgReceivedUnreadCount,
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

@@ -135,6 +135,23 @@ namespace OpenDentBusiness{
 			return Crud.SignalodCrud.Insert(sig);
 		}
 
+		///<summary>Inserts a signal which tells all client machines to update the received unread SMS message count inside the Text button of the main toolbar.  To get the current count from the database, use SmsFromMobiles.GetSmsNotification().</summary>
+		public static long InsertSmsNotification(long smsReceivedUnreadCount) {
+			Signalod sig=new Signalod();
+			sig.SigType=SignalType.Invalid;
+			sig.ITypes=((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString();
+			if(smsReceivedUnreadCount<=0) {
+				sig.SigText="";
+			}
+			else if(smsReceivedUnreadCount>=99) {
+				sig.SigText="99";
+			}
+			else {
+				sig.SigText=smsReceivedUnreadCount.ToString();
+			}
+			return Signalods.Insert(sig);
+		}
+
 		//<summary>There's no such thing as deleting a signal</summary>
 		/*public void Delete(){
 			string command= "DELETE from Signalod WHERE SignalNum = '"
@@ -210,6 +227,9 @@ namespace OpenDentBusiness{
 					continue;
 				}
 				if(signalodList[i].ITypes==((int)InvalidType.TaskPopup).ToString()){
+					continue;
+				}
+				if(signalodList[i].ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString()) {
 					continue;
 				}
 				strArray=signalodList[i].ITypes.Split(',');

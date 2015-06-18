@@ -17,7 +17,7 @@ namespace OpenDentBusiness{
 		public DateTime DateViewing;
 		///<summary>Enum:SignalType  Button, or Invalid.</summary>
 		public SignalType SigType;
-		///<summary>This is only used if the type is button, and the user types in some text.  This is the typed portion and does not include any of the text that was on the buttons.  These types of signals are displayed in their own separate list in addition to any light and sound that they may cause.</summary>
+		///<summary>This is used if the type is button and the user types in some text, or for type Invalid when ITypes equals InvalidType.SmsTextMsgReceivedUnreadCount.  This is the typed portion and does not include any of the text that was on the buttons, or is the count of unread SMS messages.  Button types of signals are displayed in their own separate list in addition to any light and sound that they may cause, whereas the SMS unread message count is shown in the dropdown portion of the Text button in the main toolbar.</summary>
 		public string SigText;
 		///<summary>The exact server time when this signal was entered into db.  This does not need to be set by sender since it's handled automatically.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]

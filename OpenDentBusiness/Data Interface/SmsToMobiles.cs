@@ -115,10 +115,10 @@ namespace OpenDentBusiness{
 			return Crud.SmsToMobileCrud.Insert(smsToMobile);
 		}
 
-		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
-		public static List<SmsToMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List<long> listClinicNums) {
+		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will return messages for all clinics.  If patNum is non-zero, then only the messages for the specified patient will be returned, otherwise messages for all patients will be returned.</summary>
+		public static List<SmsToMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List<long> listClinicNums,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsToMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums);
+				return Meth.GetObject<List<SmsToMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,patNum);
 			}
 			List<string> listCommandFilters=new List<string>();
 			if(dateStart>DateTime.MinValue) {
@@ -133,6 +133,9 @@ namespace OpenDentBusiness{
 					arrayClinicNumStrs[i]=POut.Long(listClinicNums[i]);
 				}
 				listCommandFilters.Add("ClinicNum IN ("+String.Join(",",arrayClinicNumStrs)+")");
+			}
+			if(patNum!=0) {
+				listCommandFilters.Add("PatNum="+POut.Long(patNum));
 			}
 			string command="SELECT * FROM smstomobile";
 			if(listCommandFilters.Count>0) {

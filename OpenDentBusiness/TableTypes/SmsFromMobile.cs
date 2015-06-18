@@ -64,10 +64,6 @@ namespace OpenDentBusiness {
 		ReceivedUnread,
 		///<summary>1</summary>
 		ReceivedRead,
-		///<summary>2</summary>
-		ReceivedJunk,
-		///<summary>3</summary>
-		Deleted
 	}
 
 }

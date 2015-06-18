@@ -2422,8 +2422,6 @@ namespace OpenDental{
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
 			StartEServiceMonitoring();
-			ODThread threadSmsTextMessage=new ODThread(60000,ThreadSmsTextMessageNotify);
-			threadSmsTextMessage.Start();
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -3512,15 +3510,22 @@ namespace OpenDental{
 			form.ShowDialog();
 		}
 
-		private void SetSmsNotificationText(string smsNotificationText) {
+		///<summary>Set isSignalNeeded to true if a refresh signal should be sent out to the other workstations.</summary>
+		private void SetSmsNotificationText(string smsNotificationText,bool isSignalNeeded) {
 			if(_butText==null) {
 				return;//This button does not exist in eCW tight integration mode.
 			}
+			if(!_butText.Enabled) {
+				return;//This button is disabled when neither of the Text Messaging bridges have been enabled.
+			}
 			if(this.InvokeRequired) {//For when called from the ThreadSmsTextMessageNotify() thread.
-				this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText); });
+				this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText,isSignalNeeded); });
 			}
 			if(smsNotificationText=="0") {
 				smsNotificationText="";
+			}
+			if(_butText.NotificationText==smsNotificationText) {
+				return;//This prevents the toolbar from being invalidated unnecessarily.  Also prevents unnecessary signals.
 			}
 			_butText.NotificationText=smsNotificationText;
 			if(menuItemTextMessagesReceived.Text.Contains("(")) {//Remove the old count from the menu item.
@@ -3530,16 +3535,9 @@ namespace OpenDental{
 				menuItemTextMessagesReceived.Text+=" ("+smsNotificationText+")";
 			}
 			ToolBarMain.Invalidate();//To cause the Text button to redraw.
-		}
-
-		private void ThreadSmsTextMessageNotify(ODThread odThread) {
-			if(odThread.GetTimeElapsed()<TimeSpan.FromSeconds(15)) {
-				return;//Do not execute within 15 seconds after logging in.  This ensures that we do not affect the load time of the application.
+			if(isSignalNeeded) {
+				Signalods.InsertSmsNotification(PIn.Long(smsNotificationText));
 			}
-			if(_butText==null) {
-				return;//For eCW, _butText does not exist.
-			}
-			SetSmsNotificationText(SmsFromMobiles.GetSmsNotification());
 		}
 
 		#endregion SMS Text Messaging
@@ -4056,7 +4054,7 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.  Does not fire for the first time until one signal interval has passed (5-10 seconds after login).</summary>
+		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.  Does not fire until one signal interval has passed (5-10 seconds after login).</summary>
 		public void ProcessSignals(){
 			if(Security.CurUser==null) {
 				//User must be at the log in screen, so no need to process signals.  We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
@@ -4064,6 +4062,17 @@ namespace OpenDental{
 			}
 			try {
 				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs				
+				if(_butText!=null && _butText.Enabled) {//Not visible if eCW, and not enabled unless Text Messaging is enabled.
+					for(int i=sigList.Count-1;i>=0;i--) {//Look backwards because we only care about the latest SMS Unread Message Count.
+						if(sigList[i].SigType==SignalType.Invalid && sigList[i].ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString()) {
+							SetSmsNotificationText(sigList[i].SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
+							break;//We only care about the latest count.
+						}
+					}
+					if(_butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
+						SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
+					}
+				}
 				if(sigList.Count==0) {
 					return;
 				}

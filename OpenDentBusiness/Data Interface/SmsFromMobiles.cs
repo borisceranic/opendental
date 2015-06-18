@@ -115,10 +115,10 @@ namespace OpenDentBusiness{
 			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
 		}
 
-		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will not filter by clinic.  If arrayStatuses is empty then messages will all statuses will be returned.</summary>
-		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,params SmsFromStatus[] arrayStatuses) {
+		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will not filter by clinic.  If patNum is non-zero, then only the messages for the specified patient will be returned, otherwise messages for all patients will be returned.  If arrayStatuses is empty then messages with all statuses will be returned.</summary>
+		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,long patNum,params SmsFromStatus[] arrayStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,arrayStatuses);
+				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,patNum,arrayStatuses);
 			}
 			List <string> listCommandFilters=new List<string>();
 			if(dateStart>DateTime.MinValue) {
@@ -143,6 +143,9 @@ namespace OpenDentBusiness{
 					statuses+=(int)arrayStatuses[i];
 				}
 				listCommandFilters.Add("SmsStatus IN ("+statuses+")");
+			}
+			if(patNum!=0) {
+				listCommandFilters.Add("PatNum="+POut.Long(patNum));
 			}
 			string command="SELECT * FROM smsfrommobile";
 			if(listCommandFilters.Count>0) {
@@ -190,9 +193,6 @@ namespace OpenDentBusiness{
 			}
 			else if(smsFromStatus==SmsFromStatus.ReceivedRead) {
 				return "Read";
-			}
-			else if(smsFromStatus==SmsFromStatus.ReceivedJunk) {
-				return "Junk";
 			}
 			return "";
 		}
