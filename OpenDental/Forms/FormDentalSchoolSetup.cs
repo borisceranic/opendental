@@ -44,7 +44,7 @@ namespace OpenDental {
 					Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,false);
 				}
 				catch {
-					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
+					MsgBox.Show(this,"Cannot move students to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student.");
 					return;
 				}
 				Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
@@ -68,8 +68,8 @@ namespace OpenDental {
 			if(FormUGP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			DialogResult diag=MessageBox.Show(Lan.g(this,"Update all existing students to this user group?")+"\r\n"
-				+Lan.g(this,"Choose No to just save the new default user group for students."),"",MessageBoxButtons.YesNoCancel);
+			DialogResult diag=MessageBox.Show(Lan.g(this,"Update all existing instructors to this user group?")+"\r\n"
+				+Lan.g(this,"Choose No to just save the new default user group for instructors."),"",MessageBoxButtons.YesNoCancel);
 			if(diag==DialogResult.Cancel) {
 				return;
 			}
@@ -78,7 +78,7 @@ namespace OpenDental {
 					Userods.UpdateUserGroupsForDentalSchools(FormUGP.UserGroup,true);
 				}
 				catch {
-					MsgBox.Show(this,"Cannot move students or instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student or instructor.");
+					MsgBox.Show(this,"Cannot move instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as an instructor.");
 					return;
 				}
 				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
